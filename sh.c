@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.111 2004/05/21 18:50:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.112 2004/07/24 21:52:48 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.111 2004/05/21 18:50:36 christos Exp $")
+RCSID("$Id: sh.c,v 3.112 2004/07/24 21:52:48 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2386,7 +2386,7 @@ initdesc()
 {
 #ifdef NLS_BUGS
 #ifdef NLS_CATALOGS
-    nlsclose(catd);
+    nlsclose();
 #endif /* NLS_CATALOGS */
 #endif /* NLS_BUGS */
 
