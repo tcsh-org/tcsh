@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.95 2001/02/21 18:11:19 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.96 2001/03/18 19:06:29 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -38,6 +38,12 @@
 #define _h_sh
 
 #include "config.h"
+
+#ifndef HAVE_QUAD
+#ifdef __GNUC__
+#define HAVE_QUAD	1
+#endif
+#endif
 
 #ifndef EXTERN
 # define EXTERN extern
