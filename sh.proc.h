@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.proc.h,v 2.1 1991/03/31 13:06:41 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.h,v 3.0 1991/07/04 21:49:28 christos Exp christos $ */
 /*
  * sh.proc.h: Process data structures and variables
  */
@@ -55,8 +55,8 @@ struct process {
     short unsigned p_flags;	/* various job status flags */
     char    p_reason;		/* reason for entering this state */
     int     p_index;		/* shorthand job index */
-    int     p_pid;
-    int     p_jobid;		/* pid of job leader */
+    pid_t   p_pid;
+    pid_t   p_jobid;		/* pid of job leader */
     /* if a job is stopped/background p_jobid gives its pgrp */
 #ifdef BSDTIMES
     struct timeval p_btime;	/* begin time */
