@@ -2851,12 +2851,14 @@ Lists the active jobs.  With \fB\-l\fR, lists process
 IDs in addition to the normal information.  On TCF systems, prints
 the site on which each job is executing.
 .PP
-.B kill \fR[\fB\-\fIsignal\fR] \fB%\fIjob\fR|\fIpid\fR ...
+.PD 0
+.TP 8
+.B kill \fR[\fB\-s \fIsignal\fR] \fB%\fIjob\fR|\fIpid\fR ...
 .PD 0
 .TP 8
 .B kill \-l
-The first form sends the specified \fIsignal\fR (or, if none is given,
-the TERM (terminate) signal) to the specified jobs or processes.
+The first and second forms sends the specified \fIsignal\fR (or, if none
+is given, the TERM (terminate) signal) to the specified jobs or processes.
 \fIjob\fR may be a number, a string, `', `%', `+' or `\-' as described
 under \fBJobs\fR.
 Signals are either given by number or by name (as given in
@@ -2865,7 +2867,7 @@ There is no default \fIjob\fR; saying just `kill' does not send a signal
 to the current job.  If the signal being sent is TERM (terminate)
 or HUP (hangup), then the job or process is sent a
 CONT (continue) signal as well.
-The second form lists the signal names.
+The third form lists the signal names.
 .PD
 .ig \" Obsolete tcsh command
 .TP 8
