@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.sched.c,v 3.6 1991/11/26 04:41:23 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tc.sched.c,v 3.7 1992/01/27 04:20:47 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.6 1991/11/26 04:41:23 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.7 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -92,7 +92,7 @@ dosched(v, c)
 	    timeline[16] = '\0';
 	    xprintf("%6d\t%s\t", count, timeline);
 	    blkpr(tp->t_lex);
-	    xprintf("\n");
+	    xputchar('\n');
 	}
 	return;
     }

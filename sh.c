@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.c,v 3.23 1992/01/28 19:06:06 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.c,v 3.25 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.23 1992/01/28 19:06:06 christos Exp $")
+RCSID("$Id: sh.c,v 3.25 1992/03/21 02:46:07 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -118,9 +118,9 @@ static int     gid;		/* Invokers gid */
 extern char **environ;
 
 static	int		  srccat	__P((Char *, Char *));
-static	int		  srcfile	__P((char *, bool, bool));
+static	int		  srcfile	__P((char *, bool, bool, Char **));
 static	sigret_t	  phup		__P((int));
-static	void		  srcunit	__P((int, bool, bool));
+static	void		  srcunit	__P((int, bool, bool, Char **));
 static	void		  mailchk	__P((void));
 static	Char	 	**defaultpath	__P((void));
 
@@ -478,6 +478,11 @@ main(argc, argv)
      * suffix of file names...
      */
     set(STRaddsuffix, Strsave(STRNULL));
+
+    /*
+     * don't stat in /afs.  It's too damn slow.
+     */
+    set(STRnostat, Strsave(STRslashafs));
 
     /*
      * Re-initialize path if set in environment
@@ -950,13 +955,13 @@ main(argc, argv)
 	    setintr = 0;
 	    parintr = SIG_IGN;	/* onintr in /etc/ files has no effect */
 #ifdef _PATH_DOTCSHRC
-	    (void) srcfile(_PATH_DOTCSHRC, 0, 0);
+	    (void) srcfile(_PATH_DOTCSHRC, 0, 0, NULL);
 #endif
 	    if (!arginp && !onelflg && !havhash)
 		dohash(NULL,NULL);
 #ifdef _PATH_DOTLOGIN
 	    if (loginsh)
-		(void) srcfile(_PATH_DOTLOGIN, 0, 0);
+		(void) srcfile(_PATH_DOTLOGIN, 0, 0, NULL);
 #endif
 #ifdef BSDSIGS
 	    (void) sigsetmask(omask);
@@ -1117,13 +1122,13 @@ srccat(cp, dp)
     Char   *cp, *dp;
 {
     if (cp[0] == '/' && cp[1] == '\0') 
-	return srcfile(short2str(dp), mflag ? 0 : 1, 0);
+	return srcfile(short2str(dp), (mflag ? 0 : 1), 0, NULL);
     else {
 	register Char *ep = Strspl(cp, dp);
 	char   *ptr = short2str(ep);
 
 	xfree((ptr_t) ep);
-	return srcfile(ptr, mflag ? 0 : 1, 0);
+	return srcfile(ptr, (mflag ? 0 : 1), 0, NULL);
     }
 }
 
@@ -1131,9 +1136,10 @@ srccat(cp, dp)
  * Source to a file putting the file descriptor in a safe place (> 2).
  */
 static int
-srcfile(f, onlyown, flag)
+srcfile(f, onlyown, flag, av)
     char   *f;
     bool    onlyown, flag;
+    Char **av;
 {
     register int unit;
 
@@ -1144,7 +1150,7 @@ srcfile(f, onlyown, flag)
 #ifdef FIOCLEX
     (void) ioctl(unit, FIOCLEX, NULL);
 #endif
-    srcunit(unit, onlyown, flag);
+    srcunit(unit, onlyown, flag, av);
     return 1;
 }
 
@@ -1153,10 +1159,12 @@ srcfile(f, onlyown, flag)
  * we don't chance it.	This occurs on ".cshrc"s and the like.
  */
 int     insource;
+static  Char **goargv = NULL;
 static void
-srcunit(unit, onlyown, hflg)
+srcunit(unit, onlyown, hflg, av)
     register int unit;
     bool    onlyown, hflg;
+    Char **av;
 {
     /*
      * PWP: this is arranged like this so that an optimizing compiler won't go
@@ -1181,6 +1189,7 @@ srcunit(unit, onlyown, hflg)
     bool    oenterhist = enterhist;
     char    OHIST = HIST;
     bool    otell = cantell;
+    Char **oargv;
     struct Bin saveB;
 #ifdef BSDSIGS
     volatile sigmask_t omask = (sigmask_t) 0;
@@ -1189,6 +1198,7 @@ srcunit(unit, onlyown, hflg)
 
     /* The (few) real local variables */
     int     my_reenter;
+
 
     if (unit < 0)
 	return;
@@ -1242,6 +1252,20 @@ srcunit(unit, onlyown, hflg)
     enterhist = hflg;
     if (enterhist)
 	HIST = '\0';
+    /*
+     * we can now pass arguments to source. 
+     * For compatibility we do that only if arguments were really
+     * passed, otherwise we keep the old, global $argv like before.
+     */
+
+    oargv = goargv;
+    goargv = NULL;
+    if (av != NULL && *av != NULL && **av != '\0') {
+	struct varent *vp;
+	if ((vp = adrof(STRargv)) != NULL)
+	    goargv = saveblk(vp->vec);
+	setq(STRargv, saveblk(av), &shvhed);
+    }
 
     /*
      * Now if we are allowing commands to be interrupted, we let ourselves be
@@ -1291,11 +1315,18 @@ srcunit(unit, onlyown, hflg)
 	intty = oldintty, whyles = oldwhyl, gointr = ogointr;
 	if (enterhist)
 	    HIST = OHIST;
+	if (av != NULL && *av != NULL && **av != '\0') {
+	    if (goargv)
+		setq(STRargv, goargv, &shvhed);
+	    else
+		unsetv(STRargv);
+	}
 	enterhist = oenterhist;
 	cantell = otell;
     }
 
     resexit(oldexit);
+    goargv = oargv;
     /*
      * If process reset() (effectively an unwind) then we must also unwind.
      */
@@ -1368,7 +1399,7 @@ goodbye(v, c)
 	if (!(adrof(STRlogout)))
 	    set(STRlogout, STRnormal);
 #ifdef _PATH_DOTLOGOUT
-	(void) srcfile(_PATH_DOTLOGOUT, 0, 0);
+	(void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
 #endif
 	if (adrof(STRhome))
 	    (void) srccat(value(STRhome), STRsldtlogout);
@@ -1481,10 +1512,17 @@ pintr1(wantnl)
 #endif
 	if (pjobs) {
 	    pjobs = 0;
-	    xprintf("\n");
+	    xputchar('\n');
 	    dojobs(jobargv, NULL);
 	    stderror(ERR_NAME | ERR_INTR);
 	}
+    }
+    /* MH - handle interrupted completions specially */
+    {
+	extern int InsideCompletion;
+
+	if (InsideCompletion)
+	    stderror(ERR_SILENT);
     }
     /* JV - Make sure we shut off inputl */
     {
@@ -1518,7 +1556,7 @@ pintr1(wantnl)
 	reset();
     }
     else if (intty && wantnl) {
-	/* xprintf("\n"); *//* Some like this, others don't */
+	/* xputchar('\n'); *//* Some like this, others don't */
 	(void) putraw('\r');
 	(void) putraw('\n');
     }
@@ -1744,10 +1782,10 @@ dosource(t, c)
 	    stderror(ERR_NAME | ERR_HFLAG);
 	hflg++;
     }
-    f = globone(*t, G_ERROR);
+    f = globone(*t++, G_ERROR);
     (void) strcpy(buf, short2str(f));
     xfree((ptr_t) f);
-    if ((!srcfile(buf, 0, hflg)) && (!hflg))
+    if ((!srcfile(buf, 0, hflg, t)) && (!hflg))
 	stderror(ERR_SYSTEM, buf, strerror(errno));
 }
 

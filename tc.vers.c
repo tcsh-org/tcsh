@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.vers.c,v 3.15 1992/02/21 23:16:20 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tc.vers.c,v 3.16 1992/03/08 02:17:22 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.15 1992/02/21 23:16:20 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.16 1992/03/08 02:17:22 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -324,7 +324,7 @@ gethosttype()
 #  endif /* MIPSEB || __MIPSEB */
 # endif /* mips || __mips */
 
-# ifdef m88k
+# if defined(m88k) || defined(__m88k__)
 #  define _havehosttype_
     hosttype = str2short("m88k");	/* Motorola 88100 system */
 # endif 
@@ -405,6 +405,11 @@ gethosttype()
    /* Tasos Kotsikonas <tasos@avs.com> */
    hosttype = str2short("vistra800"); /* Stardent Vistra */
 #endif /* i860  && !_havehosttype_ */
+
+# if (defined(mc68000) || defined(__mc68000__)) && !defined(_havehosttype_)
+#  define _havehosttype_
+    hosttype = str2short("m68k");	/* Motorola 68000 system */
+# endif 
 
 # ifndef _havehosttype_
 #  define _havehosttype_

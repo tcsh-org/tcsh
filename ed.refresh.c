@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.refresh.c,v 3.4 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/ed.refresh.c,v 3.6 1992/03/21 02:46:07 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.4 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.6 1992/03/21 02:46:07 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -1101,7 +1101,7 @@ PutPlusOne(c)
 	CursorH = 0;
 	CursorV++;
 	OldvcV++;
-	if (!T_Margin) {
+	if (T_Margin != (MARGIN_AUTO|MARGIN_MAGIC)) {
 	    (void) putraw('\r');
 	    (void) putraw('\n');
 	}

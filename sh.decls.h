@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/sh.decls.h,v 3.8 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.decls.h,v 3.9 1992/03/21 22:34:18 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -66,7 +66,7 @@ extern	Char		 *dcanon	__P((Char *, Char *));
 extern	void		  dtildepr	__P((Char *, Char *));
 extern	void		  dtilde	__P((void));
 extern	void		  dochngd	__P((Char **, struct command *));
-extern	Char		 *dnormalize	__P((Char *));
+extern	Char		 *dnormalize	__P((Char *, int));
 extern	void		  dopushd	__P((Char **, struct command *));
 extern	void		  dopopd	__P((Char **, struct command *));
 extern	void		  dfree		__P((struct directory *));
@@ -168,6 +168,7 @@ extern	Char		**dobackp	__P((Char *, bool));
 extern	void		  Gcat		__P((Char *, Char *));
 extern	Char		 *globone	__P((Char *, int));
 extern	int		  Gmatch	__P((Char *, Char *));
+extern	int		  Gnmatch	__P((Char *, Char *, Char **));
 extern	void		  ginit		__P((void));
 extern	Char		**globall	__P((Char **));
 extern	void		  rscan		__P((Char **, void (*)()));

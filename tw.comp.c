@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.comp.c,v 1.3 1992/02/13 05:28:51 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tw.comp.c,v 1.7 1992/03/21 02:46:07 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.3 1992/02/13 05:28:51 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.7 1992/03/21 02:46:07 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -45,12 +45,13 @@ RCSID("$Id: tw.comp.c,v 1.3 1992/02/13 05:28:51 christos Exp $")
 /* #define TDEBUG */
 struct varent completions;
 
-static int 	 	 tw_result	__P((Char *, Char *));
-static struct varent	*tw_adrof1	__P((Char *, struct varent *, int));
-static Char 		*tw_tok		__P((Char *));
-static bool	 	 tw_pos		__P((Char *, int));
-static void	  	 tw_pr		__P((Char **));
-static void	 	 tw_prlist	__P((struct varent *));
+static int 	 	  tw_result	__P((Char *, Char *));
+static Char		**tw_find	__P((Char *, struct varent *, int));
+static Char 		 *tw_tok	__P((Char *));
+static bool	 	  tw_pos	__P((Char *, int));
+static void	  	  tw_pr		__P((Char **));
+static void	  	  tw_match	__P((Char *, Char *));
+static void	 	  tw_prlist	__P((struct varent *));
 
 /* docomplete():
  *	Add or list completions in the completion list
@@ -71,7 +72,7 @@ docomplete(v, t)
     else if (*v == 0) {
 	vp = adrof1(strip(p), &completions);
 	if (vp)
-	    tw_pr(vp->vec), xprintf("\n");
+	    tw_pr(vp->vec), xputchar('\n');
     }
     else
 	set1(strip(p), saveblk(v), &completions);
@@ -113,8 +114,7 @@ tw_prlist(p)
 x:
 	if (p->v_parent == 0)	/* is it the header? */
 	    return;
-	xprintf(short2str(p->v_name));
-	xputchar('\t');
+	xprintf("%s\t", short2str(p->v_name));
 	tw_pr(p->vec);
 	xputchar('\n');
 	if (p->v_right) {
@@ -157,38 +157,33 @@ tw_pr(cmp)
 } /* end tw_pr */
 
 
-/* tw_adrof1():
- *	Like adrof1 only we only return variables with globbing
- *	patterns that match our target if cmd is set.
+/* tw_find():
+ *	Find the first matching completion. 
+ *	For commands we only look at names that start with -
  */
-static struct varent *
-tw_adrof1(nam, vp, cmd)
+static Char **
+tw_find(nam, vp, cmd)
     Char   *nam;
     register struct varent *vp;
     int cmd;
 {
     register struct varent *vp1;
-    static Char *f[2] = { NULL, NULL };
 
     for (vp = vp->v_left; vp; vp = vp->v_right) {
-	if (vp->v_left && (vp1 = tw_adrof1(nam, vp, cmd)) != NULL)
+	if (vp->v_left && (vp1 = tw_find(nam, vp, cmd)) != NULL)
 	    return vp1;
-	/*
-	 * We need to have wild characters to match. Don't
-	 * do anything for exact matches.
-	 */
-	f[0] = vp->v_name;
 	if (cmd) {
-	    gflag = 0;
-	    tglob(f);
+	    if (vp->name[0] != '-')
+		continue;
+	    if (Gmatch(nam, &vp->name[1]) && vp->vec != NULL)
+		return vp->vec;
 	}
-	else 
-	    gflag = 1;
-	if (gflag && Gmatch(nam, vp->v_name))
-	    return vp;
+	else
+	    if (Gmatch(nam, vp->v_name) && vp->vec != NULL)
+		return vp->vec;
     }
     return vp;
-} /* end tw_adrof1 */
+} /* end tw_find */
 
 
 /* tw_pos():
@@ -245,6 +240,26 @@ tw_tok(str)
 
     return *str ? str : NULL;
 } /* end tw_tok */
+
+
+/* tw_match():
+ *	Match a string against the pattern given.
+ *	and return the number of matched characters
+ *	in a prefix of the string.
+ */
+static int
+tw_match(str, pat)
+    Char *str, *pat;
+{
+    Char *estr;
+    (void) Gnmatch(str, pat, &estr);
+#ifdef TDEBUG
+    xprintf("Gnmatch(%s, ", short2str(str));
+    xprintf("%s, ", short2str(pat));
+    xprintf("%s) = %d\n", short2str(estr), estr - str);
+#endif /* TDEBUG */
+    return (estr - str);
+}
 
 
 /* tw_result():
@@ -339,18 +354,18 @@ tw_result(act, pat)
  *	Return the appropriate completion for the command
  *
  *	valid completion strings are:
- *	p/<range>/<completion>/		positional
- *	c/<pattern>/<completion>/	current word
- *	n/<pattern>/<completion>/	next word
+ *	p/<range>/<completion>/[<suffix>/]	positional
+ *	c/<pattern>/<completion>/[<suffix>/]	current word ignore pattern
+ *	C/<pattern>/<completion>/[<suffix>/]	current word with pattern
+ *	n/<pattern>/<completion>/[<suffix>/]	next word
  */
 int
-tw_complete(line, word, pat, looking)
+tw_complete(line, word, pat, looking, suf)
     Char *line, **word, *pat;
-    int looking;
+    int looking, *suf;
 {
     Char buf[MAXPATHLEN + 1], **vec, *cword, *wp, *owp, *ptr;
-    struct varent *vp;
-    int wordno;
+    int wordno, n;
 
     copyn(buf, line, MAXPATHLEN);
 
@@ -364,12 +379,9 @@ tw_complete(line, word, pat, looking)
      * look for hardwired command completions using a globbing
      * search and for arguments using a normal search.
      */
-    if ((vp = tw_adrof1(wp, &completions, (looking == TW_COMMAND))) == NULL)
+    if ((vec = tw_find(wp, &completions, (looking == TW_COMMAND))) == NULL)
 	return looking;
 
-    if ((vec = vp->vec) == NULL || *vec == NULL)
-	return TW_ZERO;
-    
     /* find the last word before the current one */
     wp = owp = cword;
     ptr = tw_tok(NULL);
@@ -417,6 +429,7 @@ tw_complete(line, word, pat, looking)
 	case 'p':
 	case 'n':
 	case 'c':
+	case 'C':
 	    break;
 	default:
 	    stderror(ERR_COMPILL, "command", cmd);
@@ -449,12 +462,30 @@ tw_complete(line, word, pat, looking)
 	    return TW_ZERO;
 	}
 
-	*pos = '\0';
+	*pos++ = '\0';
+	if (*pos != '\0') {
+	    if (*pos == sep)
+		*suf = -1;
+	    else
+		*suf = *pos;
+	}
 
 #ifdef TDEBUG
 	xprintf("command:    %c\nseparator:  %c\n", cmd, sep);
 	xprintf("pattern:    %s\n", short2str(ran));
 	xprintf("completion: %s\n", short2str(com));
+	xprintf("suffix:     ");
+        switch (*suf) {
+	case 0:
+	    xprintf("*auto suffix*\n");
+	    break;
+	case -1:
+	    xprintf("*no suffix*\n");
+	    break;
+	default:
+	    xprintf("%c\n", *suf);
+	    break;
+	}
 #endif /* TDEBUG */
 
 	switch (cmd) {
@@ -468,26 +499,21 @@ tw_complete(line, word, pat, looking)
 	    return tw_result(com, pat);
 
 	case 'c':			/* match with the current word */
-	    eran[0] = '*';		/* append * to the pattern */
-	    eran[1] = '\0';
+	case 'C':
 #ifdef TDEBUG
-	    xprintf("c: Gmatch(%s, ", short2str(wp));
-	    xprintf("%s) = %d\n", short2str(ran), Gmatch(wp, ran));
+	    xprintf("%c: ", cmd);
 #endif /* TDEBUG */
-	    if (!Gmatch(wp, ran))
+	    if ((n = tw_match(wp, ran)) == 0)
 		continue;
-#ifdef TDEBUG
-	    xprintf("eran - ran = %d\n", eran - ran);
-#endif
-	    *word += eran - ran;
+	    if (cmd != 'C')
+		*word += n;
 	    return tw_result(com, pat);
 
 	case 'n':			/* match with the next word */
 #ifdef TDEBUG
-	    xprintf("n: Gmatch(%s, ", short2str(owp));
-	    xprintf("%s) = %d\n", short2str(ran), Gmatch(owp, ran));
+	    xprintf("n: ");
 #endif /* TDEBUG */
-	    if (!Gmatch(owp, ran))
+	    if (tw_match(owp, ran) == 0)
 		continue;
 	    return tw_result(com, pat);
 

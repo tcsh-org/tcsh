@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.sig.c,v 3.6 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tc.sig.c,v 3.7 1992/01/06 22:36:56 christos Exp $ */
 /*
  * sh.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.6 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.7 1992/01/06 22:36:56 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -362,6 +362,40 @@ bsd_sigpause(mask)
 	if (ISSET(mask, i))
 	    sigaddset(&set, i);
     sigsuspend(&set);
+}
+
+/*
+ * bsd_signal(sig, func)
+ *
+ * Emulate bsd style signal()
+ */
+void (*bsd_signal(sig, func))()
+        int sig;
+        sigret_t (*func)();
+{
+        struct sigaction act, oact;
+        sigset_t set;
+        sigret_t (*r_func)();
+
+        if (sig < 0 || sig > MAXSIG) {
+                printf("error: bsd_signal(%d) signal out of range\n", sig);
+                return;
+        }
+
+        sigemptyset(&set);
+
+        act.sa_handler = (sigret_t(*)()) func;      /* user function */
+        act.sa_mask = set;                      /* signal mask */
+        act.sa_flags = 0;                       /* no special actions */
+
+        if (sigaction(sig, &act, &oact)) {
+                printf("error: bsd_signal(%d) - sigaction failed, errno %d\n",
+                    sig, errno);
+                return((sigret_t(*)()) SIG_IGN);
+        }
+
+        r_func = (sigret_t(*)()) oact.sa_handler;
+        return(r_func);
 }
 #endif /* _SEQUENT_ */
 

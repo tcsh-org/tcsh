@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.decls.h,v 3.3 1992/02/13 05:28:51 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tw.decls.h,v 3.5 1992/03/21 02:46:07 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -48,7 +48,8 @@ extern	void		  do_help		__P((Char *));
 extern	 int		  tenematch		__P((Char *, int, int, 
 						     COMMAND));
 extern	 int		  t_search		__P((Char *, Char *, COMMAND, 
-						     int, int, int, Char *));
+						     int, int, int, Char *, 
+						     int));
 extern	 int		  starting_a_command	__P((Char *, Char *));
 extern	 void		  copyn			__P((Char *, Char *, int));
 extern	 void		  catn			__P((Char *, Char *, int));
@@ -106,5 +107,5 @@ extern	 void		  docomplete		__P((Char **,
 extern	 void		  douncomplete		__P((Char **, 
 						     struct command *));
 extern	 int		  tw_complete		__P((Char *, Char **, 
-						     Char *, int));
+						     Char *, int, int *));
 #endif /* _h_tw_decls */

@@ -1,4 +1,20 @@
 V6.02.00, ...
+60. source builtin takes arguments now that are passed in the script e.g.:
+    > ./tcsh -i a b c
+    > cat test
+    echo $argv
+    > echo $argv
+    a b c
+    > source test 1 2 3
+    1 2 3
+    > echo $argv
+    a b c
+59. Eliminate $margin_bug, add more intelligent margin code [from Justin]
+58. expand_symlinks variable Urgh...
+57. SGI CONTROL() fixes...
+56. new dnormalize(), expand_symlinks flag.
+55. interrupting completion restores the current line. [from Marc]
+54. 6.01.08 (3/20/92)
 53. inputmode affects the first line too.
 52. Searches in vi do not destroy the current line.
 51. -drwX test enhancement.

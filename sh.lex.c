@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.lex.c,v 3.17 1992/01/28 19:06:06 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.lex.c,v 3.18 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.17 1992/01/28 19:06:06 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.18 1992/03/21 02:46:07 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -129,7 +129,7 @@ static Char *histlinep = NULL;	/* current pointer into histline */
 
 static Char getCtmp;
 
-#define getC(f)		(((getCtmp = peekc) != NULL) ? (peekc = 0, getCtmp) : getC1(f))
+#define getC(f)		(((getCtmp = peekc) != '\0') ? (peekc = 0, getCtmp) : getC1(f))
 #define	ungetC(c)	peekc = (Char) c
 #define	ungetD(c)	peekd = (Char) c
 

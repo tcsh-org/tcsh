@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.h,v 3.5 1992/02/13 05:28:51 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tw.h,v 3.7 1992/03/21 02:46:07 christos Exp $ */
 /*
  * tw.h: TwENEX functions headers
  */
@@ -56,8 +56,11 @@
 #define TW_SIGNAL	15
 #define TW_JOB		16
 
-#define TW_EXEC_OK	1
-#define TW_DIR_OK	2
+#define TW_EXEC_CHK	0x01
+#define TW_DIR_CHK	0x02
+#define TW_DIR_OK	0x04
+#define TW_PAT_OK	0x08
+#define TW_IGN_OK	0x10
 
 #ifndef TRUE
 # define TRUE		1

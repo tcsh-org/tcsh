@@ -235,14 +235,14 @@ printdirs()
 
 	cur += len;
 	if ((dirflag & DIR_LINE) && cur >= T_Cols - 1 && len < T_Cols) {
-	    xprintf("\n");
+	    xputchar('\n');
 	    cur = len;
 	}
 	xprintf(s != dp->di_name ? "~%s%c" : "%s%c",
 		short2str(s), (dirflag & DIR_VERT) ? '\n' : ' ');
     } while ((dp = dp->di_prev) != dcwd);
     if (!(dirflag & DIR_VERT))
-	xprintf("\n");
+	xputchar('\n');
 }
 
 void
@@ -272,27 +272,53 @@ dtilde()
 
 
 /* dnormalize():
- *	If the name starts with . or .. then we might need to normalize
- *	it depending on the symbolic link flags
+ *	If the variable ignore_symlinks is set, and the name is
+ *	1) "..",
+ *	2) or starts with "../",
+ *	3) or ends with "/..",
+ *	4) or contains the string "/../",
+ *	then it will be normalized, unless those strings are quoted. 
+ *	Otherwise, a copy is made and sent back.
+ *
+ *	The old dnormalize() was not quite right. For example, if aaa is
+ *	a symbolically linked directory, then names contain 
+ *	/whatever/aaa/..
+ *	../aaa/..
+ *	bbb/../.. (where bbb is a subdir of aaa)
+ *	would not be normalized correctly.
+ *	From ymy@ams.sunysb.edu (Yumin Yang)
  */
 Char   *
-dnormalize(cp)
+dnormalize(cp, exp)
     Char   *cp;
+    int exp;
 {
-    if (TRM(cp[0]) == '/')
-	return (Strsave(cp));
-
+    if (exp)
+	exp = adrof(STRignore_symlinks) != NULL ||
+	      adrof(STRexpand_symlinks) != NULL;
+    else
+	exp = adrof(STRignore_symlinks) != NULL &&
+	      adrof(STRexpand_symlinks) == NULL;
 #ifdef S_IFLNK
-    if (adrof(STRignore_symlinks)) {
-	int     dotdot = 0;
-	Char   *dp, *cwd;
+    if (exp) {
+ 	int     dotdot = 0;
+	Char   *dp, *cwd, *start = cp, buf[MAXPATHLEN];
 #ifdef apollo
 	bool slashslash;
 #endif
 
+	for (dp=start; *dp && *(dp+1); dp++)
+	    if ( ISDOTDOT(dp) && (dp == start || *(dp-1) == '/') )
+	        dotdot++;
+        if (dotdot == 0)
+	    return (Strsave(cp));
+
 	cwd = (Char *) xmalloc((size_t) ((Strlen(dcwd->di_name) + 3) *
 					 sizeof(Char)));
 	(void) Strcpy(cwd, dcwd->di_name);
+
+	if ( *start == '/' )
+	    *cwd = '\0';
 #ifdef apollo
 	slashslash = cwd[0] == '/' && cwd[1] == '/';
 #endif
@@ -300,43 +326,42 @@ dnormalize(cp)
 	/*
 	 * Ignore . and count ..'s
 	 */
-	while (*cp) {
-	    if (ISDOT(cp)) {
-		if (*++cp)
-		    cp++;
-	    }
-	    else if (ISDOTDOT(cp)) {
-		dotdot++;
-		cp += 2;
-		if (*cp)
-		    cp++;
-	    }
-	    else
-		break;
-	}
-	while (dotdot > 0) 
-	    if ((dp = Strrchr(cwd, '/')) != NULL) {
-#ifdef apollo
-		if (dp == &cwd[1]) 
-		    slashslash = 1;
-#endif
-		*dp = '\0';
-		dotdot--;
-	    }
-	    else
-		break;
+	for (;;) {
+	    dotdot = 0;
+	    buf[0] = '\0';
+	    dp = buf; 
+	    while (*cp) 
+	        if (ISDOT(cp)) {
+	            if (*++cp)
+	                cp++;
+	        }
+	        else if ( Strlen(cp)>1 && ISDOTDOT(cp) 
+		    && (cp == start || *(cp-1) == '/') ) {
+		    if (*buf)
+		        break; /* finish analyzing .././../xxx/[..] */
+		    dotdot++;
+		    cp += 2;
+		    if (*cp)
+		        cp++;
+	        }
+	        else 
+	   	    *dp++ = *cp++;
 
-	if (*cp) {
-	    if ((TRM(cwd[(dotdot = Strlen(cwd)) - 1])) != '/')
-		cwd[dotdot++] = '/';
-	    cwd[dotdot] = '\0';
-	    dp = Strspl(cwd, cp);
-	    xfree((ptr_t) cwd);
-	    return dp;
-	}
-	else {
-	    if (!*cwd) {
-		cwd[0] = '/';
+	    *dp = '\0';
+	    while (dotdot > 0) 
+	        if ((dp = Strrchr(cwd, '/')) != NULL) {
+#ifdef apollo
+		    if (dp == &cwd[1]) 
+		        slashslash = 1;
+#endif
+		        *dp = '\0';
+		        dotdot--;
+	        }
+	        else
+		    break;
+
+	    if (!*cwd) {	/* too many ..'s, starts with "/" */
+	        cwd[0] = '/';
 #ifdef apollo
 		cwd[1] = '/';
 		cwd[2] = '\0';
@@ -350,12 +375,26 @@ dnormalize(cp)
 		cwd[2] = '\0';
 	    }
 #endif
-	    return cwd;
+
+	    if (*buf) {
+	        if ((TRM(cwd[(dotdot = Strlen(cwd)) - 1])) != '/')
+		    cwd[dotdot++] = '/';
+	        cwd[dotdot] = '\0';
+	        dp = Strspl(cwd, TRM(*buf) == '/' ? buf+1 : buf);
+	        xfree((ptr_t) cwd);
+	        cwd = dp;
+	        if ((TRM(cwd[(dotdot = Strlen(cwd)) - 1])) == '/')
+		    cwd[--dotdot] = '\0';
+	    }
+	    if (!*cp)
+	        break;
 	}
+	return cwd;
     }
 #endif
     return Strsave(cp);
 }
+
 
 /*
  * dochngd - implement chdir command.
@@ -428,13 +467,13 @@ dgoto(cp)
 	for (p = cp; *p++;)
 	    continue;
 	dp = (Char *) xmalloc((size_t)((cwdlen + (p - cp) + 1) * sizeof(Char)));
-	for (p = dp, q = dcwd->di_name; (*p++ = *q++) != NULL;)
+	for (p = dp, q = dcwd->di_name; (*p++ = *q++) != '\0';)
 	    continue;
 	if (cwdlen)
 	    p[-1] = '/';
 	else
 	    p--;		/* don't add a / after root */
-	for (q = cp; (*p++ = *q++) != NULL;)
+	for (q = cp; (*p++ = *q++) != '\0';)
 	    continue;
 	xfree((ptr_t) cp);
 	cp = dp;
@@ -477,18 +516,26 @@ dfollow(cp)
 	    
     /*
      * if we are ignoring symlinks, try to fix relatives now.
-     */
-    dp = dnormalize(cp);
+     */ 
+    dp = dnormalize(cp, 0);
     if (chdir(short2str(dp)) >= 0) {
-	xfree((ptr_t) cp);
-	return dgoto(dp);
+        xfree((ptr_t) cp);
+        return dgoto(dp);
     }
     else {
-	xfree((ptr_t) dp);
-	if (chdir(short2str(cp)) >= 0) 
+        xfree((ptr_t) dp);
+        if (chdir(short2str(cp)) >= 0)
 	    return dgoto(cp);
 	serrno = errno;
     }
+
+#ifdef notdef
+    /* since we no longer do dnormailize() here, the old code is simplified */
+    if (chdir(short2str(cp)) >= 0) 
+	return dgoto(cp);
+    else 
+	serrno = errno;
+#endif
 
     if (cp[0] != '/' && !prefix(STRdotsl, cp) && !prefix(STRdotdotsl, cp)
 	&& (c = adrof(STRcdpath))) {
@@ -497,16 +544,19 @@ dfollow(cp)
 	Char    buf[MAXPATHLEN];
 
 	for (cdp = c->vec; *cdp; cdp++) {
-	    for (dp = buf, p = *cdp; (*dp++ = *p++) != NULL;)
+	    for (dp = buf, p = *cdp; (*dp++ = *p++) != '\0';)
 		continue;
 	    dp[-1] = '/';
-	    for (p = cp; (*dp++ = *p++) != NULL;)
+	    for (p = cp; (*dp++ = *p++) != '\0';)
 		continue;
-	    if (chdir(short2str(buf)) >= 0) {
+	    /*
+	     * if expand_symlinks is set, .. in the cdpath needs to be fixed.
+	     */
+	    dp = dnormalize(buf, 1);
+	    if (chdir(short2str(dp)) >= 0) {
 		printd = 1;
 		xfree((ptr_t) cp);
-		cp = Strsave(buf);
-		return dgoto(cp);
+		return dgoto(dp);
 	    }
 	}
     }
@@ -768,7 +818,7 @@ dcanon(cp, p)
 	while (*++p == '/')	/* flush extra slashes */
 	    continue;
 	if (p != ++sp)
-	    for (p1 = sp, p2 = p; (*p1++ = *p2++) != NULL;)
+	    for (p1 = sp, p2 = p; (*p1++ = *p2++) != '\0';)
 		continue;
 	p = sp;			/* save start of component */
 	slash = 0;
@@ -790,7 +840,7 @@ dcanon(cp, p)
 		*sp = '\0';
 	else if (sp[0] == '.' && sp[1] == 0) {
 	    if (slash) {
-		for (p1 = sp, p2 = p + 1; (*p1++ = *p2++) != NULL;)
+		for (p1 = sp, p2 = p + 1; (*p1++ = *p2++) != '\0';)
 		    continue;
 		p = --sp;
 	    }
@@ -841,11 +891,11 @@ dcanon(cp, p)
 		    /*
 		     * Copy new path into newcp
 		     */
-		    for (p2 = cp; (*p1++ = *p2++) != NULL;)
+		    for (p2 = cp; (*p1++ = *p2++) != '\0';)
 			continue;
-		    for (p1--, p2 = link; (*p1++ = *p2++) != NULL;)
+		    for (p1--, p2 = link; (*p1++ = *p2++) != '\0';)
 			continue;
-		    for (p1--, p2 = p; (*p1++ = *p2++) != NULL;)
+		    for (p1--, p2 = p; (*p1++ = *p2++) != '\0';)
 			continue;
 		    /*
 		     * Restart canonicalization at expanded "/xxx".
@@ -861,9 +911,9 @@ dcanon(cp, p)
 		    /*
 		     * Copy new path into newcp
 		     */
-		    for (p2 = link; (*p1++ = *p2++) != NULL;)
+		    for (p2 = link; (*p1++ = *p2++) != '\0';)
 			continue;
-		    for (p1--, p2 = p; (*p1++ = *p2++) != NULL;)
+		    for (p1--, p2 = p; (*p1++ = *p2++) != '\0';)
 			continue;
 		    /*
 		     * Restart canonicalization at beginning
@@ -880,7 +930,7 @@ dcanon(cp, p)
 		while (*--sp != '/')
 		    continue;
 	    if (slash) {
-		for (p1 = sp + 1, p2 = p + 1; (*p1++ = *p2++) != NULL;)
+		for (p1 = sp + 1, p2 = p + 1; (*p1++ = *p2++) != '\0';)
 		    continue;
 		p = sp;
 	    }
@@ -934,11 +984,11 @@ dcanon(cp, p)
 		    /*
 		     * Copy new path into newcp
 		     */
-		    for (p2 = cp; (*p1++ = *p2++) != NULL;)
+		    for (p2 = cp; (*p1++ = *p2++) != '\0';)
 			continue;
-		    for (p1--, p2 = link; (*p1++ = *p2++) != NULL;)
+		    for (p1--, p2 = link; (*p1++ = *p2++) != '\0';)
 			continue;
-		    for (p1--, p2 = p; (*p1++ = *p2++) != NULL;)
+		    for (p1--, p2 = p; (*p1++ = *p2++) != '\0';)
 			continue;
 		    /*
 		     * Restart canonicalization at expanded "/xxx".
@@ -954,9 +1004,9 @@ dcanon(cp, p)
 		    /*
 		     * Copy new path into newcp
 		     */
-		    for (p2 = link; (*p1++ = *p2++) != NULL;)
+		    for (p2 = link; (*p1++ = *p2++) != '\0';)
 			continue;
-		    for (p1--, p2 = p; (*p1++ = *p2++) != NULL;)
+		    for (p1--, p2 = p; (*p1++ = *p2++) != '\0';)
 			continue;
 		    /*
 		     * Restart canonicalization at beginning

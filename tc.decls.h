@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.decls.h,v 3.12 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tc.decls.h,v 3.13 1992/02/21 23:16:20 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -219,6 +219,7 @@ extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
 extern	sigmask_t	  sigsetmask	__P((sigmask_t));
 extern	sigmask_t	  sigblock	__P((sigmask_t));
 extern	void		  bsd_sigpause	__P((sigmask_t));
+extern  sigret_t        (*bsd_signal    __P((int, sigret_t (*)(int)))) ();
 #endif
 #ifdef SIGSYNCH
 extern	sigret_t	  synch_handler	__P((int));

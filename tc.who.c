@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.who.c,v 3.10 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tc.who.c,v 3.11 1992/01/06 22:36:56 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.10 1991/11/26 04:28:26 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.11 1992/01/06 22:36:56 christos Exp $")
 
 #include "tc.h"
 
@@ -590,7 +590,7 @@ struct command *c;
     if ((vp = adrof(STRwatch)) == NULL)
 	stderror(ERR_NOWATCH);
     blkpr(vp->vec);
-    xprintf("\n");
+    xputchar('\n');
     resetwatch();
     wp = whohead.who_next;
     while (wp->who_next != NULL) {

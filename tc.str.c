@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.str.c,v 3.4 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tc.str.c,v 3.5 1992/03/21 02:46:07 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.str.c,v 3.4 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.5 1992/03/21 02:46:07 christos Exp $")
 
 #define MALLOC_INCR	128
 
@@ -152,7 +152,7 @@ s_strcpy(dst, src)
     register Char *sdst;
 
     sdst = dst;
-    while ((*dst++ = *src++) != NULL)
+    while ((*dst++ = *src++) != '\0')
 	continue;
     return (sdst);
 }
@@ -188,7 +188,7 @@ s_strcat(dst, src)
     while (*dst++)
 	continue;
     --dst;
-    while ((*dst++ = *src++) != NULL)
+    while ((*dst++ = *src++) != '\0')
 	continue;
     return (sdst);
 }
@@ -321,7 +321,7 @@ s_strsave(s)
     for (p = s; *p++;)
 	continue;
     n = p = (Char *) xmalloc((size_t) ((p - s) * sizeof(Char)));
-    while ((*p++ = *s++) != NULL)
+    while ((*p++ = *s++) != '\0')
 	continue;
     return (n);
 }
@@ -343,9 +343,9 @@ s_strspl(cp, dp)
 	continue;
     ep = (Char *) xmalloc((size_t)
 			  (((p - cp) + (q - dp) - 1) * sizeof(Char)));
-    for (p = ep, q = cp; (*p++ = *q++) != NULL;)
+    for (p = ep, q = cp; (*p++ = *q++) != '\0';)
 	continue;
-    for (p--, q = dp; (*p++ = *q++) != NULL;)
+    for (p--, q = dp; (*p++ = *q++) != '\0';)
 	continue;
     return (ep);
 }

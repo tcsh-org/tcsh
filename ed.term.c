@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.term.c,v 1.7 1991/12/14 20:45:46 christos Exp christos $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/ed.term.c,v 1.8 1991/12/19 22:34:14 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.7 1991/12/14 20:45:46 christos Exp christos $")
+RCSID("$Id: ed.term.c,v 1.8 1991/12/19 22:34:14 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -589,7 +589,7 @@ dosetty(v, t)
 		    xprintf("%s ", m->m_name);
 	    }
 	}
-	xprintf("\n");
+	xputchar('\n');
 	return;
     }
     while (v && (s = *v++)) {
@@ -1092,8 +1092,8 @@ tty_printchar(s)
 	if (m->m_name)
 	    xprintf("%s ^%c ", m->m_name, s[i] + 'A' - 1);
 	if (i % 5 == 0)
-	    xprintf("\n");
+	    xputchar('\n');
     }
-    xprintf("\n"); 
+    xputchar('\n');
 }
 #endif /* DEBUG_TTY */

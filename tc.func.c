@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.25 1992/02/21 23:16:20 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tc.func.c,v 3.26 1992/03/21 02:46:07 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.25 1992/02/21 23:16:20 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.26 1992/03/21 02:46:07 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -192,7 +192,7 @@ dolist(v, c)
     struct stat st;
 
     if (*++v == NULL) {
-	(void) t_search(STRNULL, NULL, LIST, 0, TW_ZERO, 0, STRNULL);
+	(void) t_search(STRNULL, NULL, LIST, 0, TW_ZERO, 0, STRNULL, 0);
 	return;
     }
     gflag = 0;
@@ -272,7 +272,7 @@ dolist(v, c)
 	Char   *dp, *tmp, buf[MAXPATHLEN];
 
 	for (k = 0, i = 0; v[k] != NULL; k++) {
-	    tmp = dnormalize(v[k]);
+	    tmp = dnormalize(v[k], 0);
 	    dp = &tmp[Strlen(tmp) - 1];
 	    if (*dp == '/' && dp != tmp)
 #ifdef apollo
@@ -306,7 +306,7 @@ dolist(v, c)
 		else 
 		    dp[-1] &= TRIM;
 		*dp = '\0';
-		(void) t_search(buf, NULL, LIST, 0, TW_ZERO, 0, STRNULL);
+		(void) t_search(buf, NULL, LIST, 0, TW_ZERO, 0, STRNULL, 0);
 		i = k + 1;
 	    }
 	    xfree((ptr_t) tmp);
@@ -400,7 +400,7 @@ dowhich(v, c)
 	if ((vp = adrof1(*v, &aliases)) != NULL) {
 	    xprintf("%s: \t aliased to ", short2str(*v));
 	    blkpr(vp->vec);
-	    xprintf("\n");
+	    xputchar('\n');
 	}
 	else {
 	    lex[1].word = *v;
@@ -575,7 +575,7 @@ auto_lock()
 #else /* !BSDSIGS */
     (void) sigrelse(SIGALRM);
 #endif /* BSDSIGS */
-    xprintf("\n"); 
+    xputchar('\n'); 
     for (i = 0; i < 5; i++) {
 	char *crpp, *pp;
 	pp = xgetpass("Password:"); 
@@ -1126,11 +1126,11 @@ insert(plist, file_args)
 	*cp1++ = '~';
 	*cp1++ = '/';
 	*cp1++ = '.';
-	while ((*cp1++ = *cp2++) != NULL)
+	while ((*cp1++ = *cp2++) != '\0')
 	    continue;
 	cp1--;
 	cp2 = pause;
-	while ((*cp1++ = *cp2++) != NULL)
+	while ((*cp1++ = *cp2++) != '\0')
 	    continue;
 	insert_we(now, last->prev);
 
@@ -1142,7 +1142,7 @@ insert(plist, file_args)
 	cp1 = bcmd;
 	cp2 = cmd;
 	*cp1++ = '%';
-	while ((*cp1++ = *cp2++) != NULL)
+	while ((*cp1++ = *cp2++) != '\0')
 	    continue;
 	now = (struct wordent *) xcalloc(1, (size_t) (sizeof(struct wordent)));
 	now->word = bcmd;
@@ -1158,7 +1158,7 @@ insert(plist, file_args)
 	cp1 = now->word;
 	cp2 = cmd;
 	*cp1++ = '%';
-	while ((*cp1++ = *cp2++) != NULL)
+	while ((*cp1++ = *cp2++) != '\0')
 	    continue;
 	for (now = now->next;
 	     *now->word != '\n' && *now->word != ';' && now != plist;) {

@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.33 1992/03/21 02:46:07 christos Exp $
+.\" $Id: tcsh.man,v 3.34 1992/03/21 22:34:18 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -2671,9 +2671,9 @@ There are three different completion arguments, modelled after the
 .I sed(1) 
 substitute command and they are of the form:
 .sp
-.B <command>/<matching-pattern>/<completion-action>/
+.B <command>/<matching-pattern>/<completion-action>/[<suffix>|/]
 .sp
-The three commands available are:
+The four commands available are:
 .TP 
 .B p
 This specifies position-dependent completion. The matching pattern is
@@ -2693,7 +2693,7 @@ command completion:
 > set autolist
 > co[TAB]
 complete compress
-> complete co* 'p/0/(complete)/'
+> complete -co* 'p/0/(complete)/'
 > co[TAB]
 > complete _
 .fi
@@ -2701,7 +2701,9 @@ complete compress
 The above command tells the completion mechanism to match any word on
 position 0, that matches the pattern
 .I "co*"
-and replace it with the literal word "complete".
+and replace it with the literal word "complete". Note the leading '-'
+in the pattern that tells the completion, that is pattern is only to be 
+used with ambiguous command completions.
 .TP 
 .B n
 This command specifies next-word completions. The matching pattern in
@@ -2715,15 +2717,20 @@ the command line. For example:
 Here the argument of the find command which follows the -user argument is
 completed from the list of users.
 .TP
-.B c
-The last completion command completes the current word. The matching pattern
-in this case must match the prefix of the current word. For example:
+.B c,C
+The last two completion commands complete the current word. The matching 
+pattern in this case must match the prefix of the current word. For example:
 .sp
 .nf
 > complete cc 'c/-I/d/'
 .fi
 .sp
 completes the the word containing -I from the list of directories.
+While
+.B `c' 
+discards the matched prefix, 
+.B `C'
+keeps it and applies the completion using it.
 .sp
 .PP
 So far the 
@@ -2881,6 +2888,29 @@ christos root
 > find -user christos 
 .fi
 .PP
+Another useful feature is to override the default suffix rules.
+For example:
+.sp
+.nf
+> complete rcp 'p/1/$hosts/:' 'c/*:/f/'
+> finger 'p/1/u/@' 'c/*:/f/'
+.fi
+.sp
+completes from $hosts appending a `:' and then begins expanding files.
+.PP
+Notes:
+.TP 
+1. 
+The completion command-patterns are overriden when the internal
+parsing mechanism determines that the completion is a login name,
+or a variable.
+.TP
+2.
+Note that there is no quoting performed inside the completion patterns.
+If the character '/' is used in the matched pattern, then another
+punctuation character can be used as a separator.
+.TP 
+3.
 This is an experimental feature and the syntax/behavior may change in
 future versions.
 .sp
@@ -3027,11 +3057,6 @@ is shown.
 .TP 10
 .B listmax 
 maximum number of items to list without asking first.
-.TP 10
-.B margin_bug
-If your terminal scrolls when a character is printed on the rightmost
-column, then setting this variable avoids printing on the rightmost
-column.
 .TP 10
 .B matchbeep
 control beeping on completion.  With matchbeep=nomatch, completion

@@ -49,13 +49,13 @@ if ($?complete) then
     complete xdb	'p/1/c/'
     complete gdb	'p/1/c/'
     complete ups	'p/1/c/'
-    complete set	'p/1/s/'		# only shell variables
+    complete set	'p/1/s/='		# only shell variables
     complete unset	'p/1/s/'
     complete setenv 	'p/1/e/'		# only environment variables 
     complete unsetenv 	'p/1/e/'
     complete alias 	'p/1/a/'		# only aliases are valid
     complete unalias 	'p/1/a/'
-    complete finger 	'c/*@/$hosts/' 'c/*/u/'	# Only usernames
+    complete finger 	'c/*/u/'		# Only usernames
     complete xdvi 	'n/*/f:*.dvi/'		# Only files that match *.dvi
     complete dvips 	'n/*/f:*.dvi/'
     complete latex 	'n/*/f:*.tex/'
@@ -101,13 +101,13 @@ if ($?complete) then
 			      I D U O O2 C E H B b V M MD MM i dynamic \
 			      nodtdlib static nostdinc undef)/' \
 		 	'c/-l/f:*.a/' \
-		 	'n/*/f:*.[coa]/'
+		 	'n/*/f:*.{c,C,cc,o,a}/'
     complete g++ 	'n/*/f:*.{C,cc,o}/'
     complete CC 	'n/*/f:*.{C,cc,o}/'
     complete rm 	'n/*/f:^*.{c,cc,C,h}/'	# Protect precious files
     complete vi 	'n/*/f:^*.o/'
     complete emacs 	'n/*/f:^*~/'		# don't want to edit a backup
-    complete mail 	'n/1/u/'		# trade files for users
+    complete mail 	'p/1/u/'		# trade files for users
     complete bindkey 	'p/1/b/'
     complete find 	'n/-fstype/(nfs 4.2)/' 'n/-name/f/' \
 		  	'n/-type/(c b d f p l s)/' 'n/-user/u/' 'n/-exec/c/' \
@@ -116,5 +116,23 @@ if ($?complete) then
 		  	      group nogroup size inum atime mtime ctime exec \
 			      ok print ls cpio ncpio newer xdev depth)/' \
 			'n/*/d/'
+
+    complete kill	'c/-/S/' 'c/%/j/'
+    complete %*		'c/%/j/'		# fill in the jobs builtin
+    complete fg		'c/%/j/'
+    complete bg		'c/%/j/'
+    complete stop	'c/%/j/'
+
+    complete limit	'c/-/(h)/' 'n/*/l/'
+    complete unlimit	'c/-/(h)/' 'n/*/l/'
+
+    complete co*	'p/0/(compress)/'	# make compress completion
+						# not ambiguous
+    complete zcat	'n/*/f:*.Z/'
+    complete nm		'n/*/f:^*.{h,C,c,cc}/'
+
+    complete rcp 'c/*:/f/' 'p/1/$hosts/:'
+    complete finger 'c/*@/$hosts/' 'p/1/u/@' 
+
     unset complete
 endif

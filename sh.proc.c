@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.proc.c,v 3.22 1992/02/13 05:28:51 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.proc.c,v 3.24 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.22 1992/02/13 05:28:51 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.24 1992/03/21 02:46:07 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -596,7 +596,7 @@ pjwait(pp)
     if ((jobflags & (PSIGNALED | PSTOPPED | PTIME)) ||
 	!eq(dcwd->di_name, fp->p_cwd->di_name)) {
 	if (jobflags & PSTOPPED) {
-	    xprintf("\n");
+	    xputchar('\n');
 	    if (adrof(STRlistjobs)) {
 		Char   *jobcommand[3];
 
@@ -972,7 +972,7 @@ pendjob()
 	    xprintf(" %d", pp->p_procid);
 	    pp = pp->p_friends;
 	} while (pp != tp);
-	xprintf("\n");
+	xputchar('\n');
     }
     pholdjob = pcurrjob = 0;
 }
@@ -1042,10 +1042,10 @@ pprint(pp, flag)
 	if (pcond && linp != linbuf && !(flag & FANCY) &&
 	    ((pstatus == status && pp->p_reason == reason) ||
 	     !(flag & REASON)))
-	    xprintf(" ");
+	    xputchar(' ');
 	else {
 	    if (pcond && linp != linbuf)
-		xprintf("\n");
+		xputchar('\n');
 	    if (flag & NUMBER) {
 #ifdef BACKPIPE
 		pcond = ((pp == tp && !inpipe) ||
@@ -1177,7 +1177,7 @@ prcomd:
 #endif /* BACKPIPE */
 	if (pcond) {
 	    if (linp != linbuf)
-		xprintf("\n");
+		xputchar('\n');
 	    if (flag & SHELLDIR && !eq(tp->p_cwd->di_name, dcwd->di_name)) {
 		xprintf("(wd now: ");
 		dtildepr(value(STRhome), dcwd->di_name);
@@ -1448,13 +1448,13 @@ dokill(v, c)
 		if ((name = mesg[signum].iname) != NULL) {
 		    len += strlen(name) + 1;
 		    if (len >= T_Cols - 1) {
-			xprintf("\n");
+			xputchar('\n');
 			len = strlen(name) + 1;
 		    }
 		    xprintf("%s ", name);
 		}
 	    }
-	    xprintf("\n");
+	    xputchar('\n');
 	    return;
 	}
 	if (Isdigit(v[0][1])) {

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.term.h,v 1.6 1991/12/14 20:45:46 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/ed.term.h,v 1.7 1992/03/08 02:17:22 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -150,44 +150,53 @@
 # define _POSIX_VDISABLE ((unsigned char) -1)
 #endif /* _POSIX_VDISABLE */
 
+
 #if !defined(CREPRINT) && defined(CRPRNT)
 # define CREPRINT CRPRNT
 #endif /* !CREPRINT && CRPRNT */
 #if !defined(CDISCARD) && defined(CFLUSH)
 # define CDISCARD CFLUSH
 #endif /* !CDISCARD && CFLUSH */
+#if !defined(CDISCARD) && defined(CFLUSHO)
+# define CDISCARD CFLUSHO
+#endif /* !CDISCARD && CFLUSHO */
 
 /*
  * IRIX4.0 control macro is broken!
- * Ignore and undef all default tty chars defined.
+ * Ignore and undef all default tty chars defined and redefine only
+ * the ones that are different in the IRIX file.
  */
 #if __STDC__ && defined(IRIS4D)
-# undef CINTR
-# undef CQUIT
-# undef CERASE
-# undef CKILL
-# undef CEOF
-# undef CEOL
-# undef CEOL2	
-# undef CSWTCH	
-# undef CDSWTCH 
-# undef CERASE2
-# undef CSTART
-# undef CSTOP
-# undef CWERASE
-# undef CSUSP
-# undef CDSUSP
-# undef CREPRINT
-# undef CDISCARD
-# undef CLNEXT
-# undef CSTATUS
-# undef CPAGE
-# undef CPGOFF
-# undef CKILL2
-# undef CBRK
-# undef CMIN
-# undef CTIME
+# undef  CINTR
+# define CINTR		0177	/* ^? */
+# undef  CQUIT
+# undef  CERASE
+# define CERASE		CONTROL('h')
+# undef  CKILL
+# undef  CEOF
+# undef  CEOL
+# undef  CEOL2	
+# undef  CSWTCH	
+# define CSWTCH		CONTROL('z')
+# undef  CDSWTCH 
+# undef  CERASE2
+# undef  CSTART
+# undef  CSTOP
+# undef  CWERASE
+# undef  CSUSP
+# undef  CDSUSP
+# undef  CREPRINT
+# undef  CDISCARD
+# undef  CLNEXT
+# undef  CSTATUS
+# undef  CPAGE
+# undef  CPGOFF
+# undef  CKILL2
+# undef  CBRK
+# undef  CMIN
+# undef  CTIME
 #endif /* __STDC__ && IRIS4D */
+
 
 #ifndef CINTR
 # define CINTR		CONTROL('c')

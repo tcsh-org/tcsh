@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.os.c,v 3.16 1992/01/27 04:49:51 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tc.os.c,v 3.17 1992/02/21 23:16:20 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.16 1992/01/27 04:49:51 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.17 1992/02/21 23:16:20 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -334,7 +334,7 @@ dogetspath(v, c)
 		xprintf("*site %d* ", (int) (p[i] & SPATH_MASK));
 	}
     }
-    xprintf("\n");
+    xputchar('\n');
     flush();
 }
 

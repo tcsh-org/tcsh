@@ -1,4 +1,4 @@
-/* $Header: /u/christos/tt/tcsh-6.01/RCS/ed.screen.c,v 3.17 1992/03/20 18:50:05 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/ed.screen.c,v 3.18 1992/03/21 02:46:07 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.17 1992/03/20 18:50:05 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.18 1992/03/21 02:46:07 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -227,18 +227,36 @@ static struct termcapval {
     int     val;
 }       tval[] = {
 #define T_am	0
-    {	"am",	"Has automatic margins",	0 },
+    {	"am",	"Has automatic margins",		0 },
 #define T_pt	1
-    {	"pt",	"Can use physical tabs", 	0 },
+    {	"pt",	"Can use physical tabs", 		0 },
 #define T_li	2
-    {	"li",	"Number of lines",	 	0 },
+    {	"li",	"Number of lines",	 		0 },
 #define T_co	3
-    {	"co",	"Number of columns",	 	0 },
+    {	"co",	"Number of columns",	 		0 },
 #define T_km	4
-    {	"km",	"Has meta key",		 	0 },
-#define T_val	5
-    {	NULL, 	NULL,		 		0 }
+    {	"km",	"Has meta key",		 		0 },
+#define T_xn	5
+    {	"xn",	"Newline ignored at right margin",	0 },
+#define T_val	6
+    {	NULL, 	NULL,		 			0 }
 };
+
+
+/*
+ * A very useful table from justin@crim.ca (Justin Bur) :-)
+ *
+ * XXX: we might want to fix tcsh to use the rightmost column in
+ *	the automargins case; this would involve to move the cursor
+ *	manually at the end of updates that cross the line.
+ *
+ * Description     Termcap variables       tcsh behavior
+ * 		   am      xn              UseRightmost    SendCRLF
+ * --------------  ------- -------         ------------    ------------
+ * Automargins     yes     no              no              yes
+ * Magic Margins   yes     yes             yes             no
+ * No Wrap         no      --              yes             yes
+ */
 
 static bool me_all = 0;		/* does two or more of the attributes use me */
 
@@ -324,12 +342,13 @@ TellTC(what)
 	    Val(T_co), Val(T_li));
     xprintf("\tIt has %s meta key\n", T_HasMeta ? "a" : "no");
     xprintf("\tIt can%suse tabs\n", T_Tabs ? " " : "not ");
-    xprintf("\tIt can%suse the rightmost column\n", T_Margin ? " " : "not ");
+    xprintf("\tIt has %sautomatic margins\n", (T_Margin&MARGIN_AUTO)?"":"no ");
+    xprintf("\tIt has %smagic margins\n", (T_Margin&MARGIN_MAGIC)?"":"no ");
 
     for (t = tstr; t->name != NULL; t++)
 	xprintf("\t%25s (%s) == %s\n", t->long_name, t->name,
 		t->str && *t->str ? t->str : "(empty)");
-    xprintf("\n");
+    xputchar('\n');
 }
 
 
@@ -355,7 +374,11 @@ ReBufferDisplay()
 	xfree((ptr_t) b);
     }
     TermH = Val(T_co);
-    if (! T_Margin)
+    /*
+     * XXX: we cannot use the rightmost column with only
+     * automatic margins
+     */
+    if (T_Margin == MARGIN_AUTO)
 	/* make this public, -1 to avoid wraps */
 	TermH--;
     TermV = (INBUFSIZE * 4) / TermH + 1;
@@ -423,7 +446,8 @@ SetTC(what, how)
 	    }
 	    T_Tabs = Val(T_pt);
 	    T_HasMeta = Val(T_km);
-	    T_Margin = !Val(T_am) && (adrof(STRmargin_bug) == NULL);
+	    T_Margin = Val(T_am) ? MARGIN_AUTO : 0;
+	    T_Margin |= Val(T_xn) ? MARGIN_MAGIC : 0;
 	    return;
 	}
 	else {
@@ -498,8 +522,13 @@ EchoTC(v)
 	flush();
 	return;
     }
-    else if (strcmp(cv, "margin") == 0) {
-	xprintf(fmts, T_Margin ? "yes" : "no");
+    else if (strcmp(cv, "magic_margin") == 0) {
+	xprintf(fmts, T_Margin & MARGIN_MAGIC ? "yes" : "no");
+	flush();
+	return;
+    }
+    else if (strcmp(cv, "auto_margin") == 0) {
+	xprintf(fmts, T_Margin & MARGIN_AUTO ? "yes" : "no");
 	flush();
 	return;
     }
@@ -1013,7 +1042,7 @@ ClearEOL(num)			/* clear to end of line.  There are num */
 {
     register int i;
 
-    if (num == 0 && T_Margin)
+    if (num == 0 && T_Margin == (MARGIN_AUTO|MARGIN_MAGIC))
 	return;
 
     if (T_CanCEOL && GoodStr(T_ce))
@@ -1135,7 +1164,8 @@ GetTermCaps()
 	Val(T_pt) = tgetflag("pt") && !tgetflag("xt");
 	/* do we have a meta? */
 	Val(T_km) = (tgetflag("km") || tgetflag("MT"));
-	Val(T_am) = tgetflag("am") && !tgetflag("xn");
+	Val(T_am) = tgetflag("am");
+	Val(T_xn) = tgetflag("xn");
 	Val(T_co) = tgetnum("co");
 	Val(T_li) = tgetnum("li");
 	for (t = tstr; t->name != NULL; t++)
@@ -1151,7 +1181,8 @@ GetTermCaps()
     if (T_Tabs)
 	T_Tabs = Val(T_pt);
     T_HasMeta = Val(T_km);
-    T_Margin = !Val(T_am) && (adrof(STRmargin_bug) == NULL);
+    T_Margin = Val(T_am) ? MARGIN_AUTO : 0;
+    T_Margin |= Val(T_xn) ? MARGIN_MAGIC : 0;
     T_CanCEOL = GoodStr(T_ce);
     T_CanDel = GoodStr(T_dc) || GoodStr(T_DC);
     T_CanIns = GoodStr(T_im) || GoodStr(T_ic) || GoodStr(T_IC);

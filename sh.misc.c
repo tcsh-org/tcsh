@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/sh.misc.c,v 3.10 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.misc.c,v 3.11 1992/03/21 23:01:22 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.10 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.11 1992/03/21 23:01:22 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -82,7 +82,7 @@ strsave(s)
     for (p = (char *) s; *p++;)
 	continue;
     n = p = (char *) xmalloc((size_t) ((p - s) * sizeof(char)));
-    while ((*p++ = *s++) != NULL)
+    while ((*p++ = *s++) != '\0')
 	continue;
     return (n);
 }

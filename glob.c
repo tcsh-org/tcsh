@@ -153,7 +153,7 @@ Opendir(str)
 
     if (!*str)
 	return (opendir("."));
-    while ((*dc++ = *str++) != NULL)
+    while ((*dc++ = *str++) != '\0')
 	continue;
     return (opendir(buf));
 }
@@ -167,7 +167,7 @@ Lstat(fn, sb)
     char    buf[MAXPATHLEN];
     register char *dc = buf;
 
-    while ((*dc++ = *fn++) != NULL)
+    while ((*dc++ = *fn++) != '\0')
 	continue;
 # ifdef NAMEI_BUG
     {
@@ -194,7 +194,7 @@ Stat(fn, sb)
     char    buf[MAXPATHLEN];
     register char *dc = buf;
 
-    while ((*dc++ = *fn++) != NULL)
+    while ((*dc++ = *fn++) != '\0')
 	continue;
 #ifdef NAMEI_BUG
     {
@@ -383,7 +383,7 @@ glob(pattern, flags, errfunc, pglob)
 	    Char *dp = compilebuf;
 	    const unsigned char *sp = compilepat;
 
-	    while ((*dp++ = *sp++) != NULL)
+	    while ((*dp++ = *sp++) != '\0')
 		continue;
 	}
 	else {
@@ -523,7 +523,7 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob, no_match)
 	if (dp->d_name[0] == DOT && *pattern != DOT)
 	    continue;
 	for (sc = (unsigned char *) dp->d_name, dc = pathend; 
-	     (*dc++ = *sc++) != NULL;)
+	     (*dc++ = *sc++) != '\0';)
 	    continue;
 	if (match(pathend, pattern, restpattern, (int) m_not) == no_match) {
 	    *pathend = EOS;
@@ -585,7 +585,7 @@ globextend(path, pglob)
 	register char *dc = copy;
 	register Char *sc = path;
 
-	while ((*dc++ = *sc++) != NULL)
+	while ((*dc++ = *sc++) != '\0')
 	    continue;
 	pathv[pglob->gl_offs + pglob->gl_pathc++] = copy;
     }

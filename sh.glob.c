@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.glob.c,v 3.16 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.glob.c,v 3.17 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.16 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.17 1992/03/21 02:46:07 christos Exp $")
 
 #include "tc.h"
 
@@ -80,7 +80,7 @@ static	Char	**libglob	__P((Char **));
 static	Char	**globexpand	__P((Char **));
 static	int	  globbrace	__P((Char *, Char *, Char ***));
 static  void	  expbrace	__P((Char ***, Char ***, int));
-static  int	  pmatch	__P((Char *, Char *));
+static  int	  pmatch	__P((Char *, Char *, Char **));
 static	void	  pword		__P((void));
 static	void	  psave		__P((int));
 static	void	  backeval	__P((Char *, bool));
@@ -142,7 +142,7 @@ globequal(nv, s)
 	    blkfree(nv);
 	    stderror(ERR_DEEP);
 	}
-	for (b = &s[2], d = &gp[Strlen(gp)]; (*d++ = *b++) != NULL;)
+	for (b = &s[2], d = &gp[Strlen(gp)]; (*d++ = *b++) != '\0';)
 	    continue;
 	xfree((ptr_t) s);
 	return (Strsave(gp));
@@ -324,7 +324,7 @@ globexpand(v)
     /*
      * Step 1: expand backquotes.
      */
-    while ((s = *v++) != NULL) {
+    while ((s = *v++) != '\0') {
 	if (Strchr(s, '`')) {
 	    int     i;
 
@@ -577,7 +577,7 @@ rscan(t, f)
 {
     register Char *p;
 
-    while ((p = *t++) != NULL)
+    while ((p = *t++) != '\0')
 	while (*p)
 	    (*f) (*p++);
 }
@@ -588,7 +588,7 @@ trim(t)
 {
     register Char *p;
 
-    while ((p = *t++) != NULL)
+    while ((p = *t++) != '\0')
 	while (*p)
 	    *p++ &= TRIM;
 }
@@ -599,13 +599,13 @@ tglob(t)
 {
     register Char *p, c;
 
-    while ((p = *t++) != NULL) {
+    while ((p = *t++) != '\0') {
 	if (*p == '~' || *p == '=')
 	    gflag |= G_CSH;
 	else if (*p == '{' &&
 		 (p[1] == '\0' || (p[1] == '}' && p[2] == '\0')))
 	    continue;
-	while ((c = *p++) != NULL) {
+	while ((c = *p++) != '\0') {
 	    /*
 	     * eat everything inside the matching backquotes
 	     */
@@ -849,11 +849,18 @@ pword()
     pnleft = MAXPATHLEN - 4;
 }
 
-int 
+int
 Gmatch(string, pattern)
     Char *string, *pattern;
 {
-    Char **blk, **p;
+    return Gnmatch(string, pattern, NULL);
+}
+
+int 
+Gnmatch(string, pattern, endstr)
+    Char *string, *pattern, **endstr;
+{
+    Char **blk, **p, *tstring = string;
     int	   gpol = 1, gres = 0;
 
     if (*pattern == '^') {
@@ -867,16 +874,32 @@ Gmatch(string, pattern)
 
     expbrace(&blk, NULL, GLOBSPACE);
 
-    for (p = blk; *p; p++)
-	gres |= pmatch(string, *p);
+    if (endstr == NULL)
+	/* Exact matches only */
+	for (p = blk; *p; p++) 
+	    gres |= pmatch(string, *p, &tstring);
+    else {
+	/* partial matches */
+	int minc = 0x7fffffff;
+	for (p = blk; *p; p++) {
+	    int t;
+
+	    (void) pmatch(string, *p, &tstring);
+	    t = tstring - string;
+	    gres |= t ? 1 : 0;
+	    if (minc == -1 || minc > t)
+		minc = t;
+	}
+	*endstr = string + minc;
+    }
 
     blkfree(blk);
     return(gres == gpol);
 } 
 
 static int
-pmatch(string, pattern)
-    register Char *string, *pattern;
+pmatch(string, pattern, estr)
+    register Char *string, *pattern, **estr;
 {
     register Char stringc, patternc;
     int     match, negate_range;
@@ -890,23 +913,29 @@ pmatch(string, pattern)
 	patternc = *pattern++;
 	switch (patternc) {
 	case 0:
+	    *estr = string;
 	    return (stringc == 0);
 	case '?':
 	    if (stringc == 0)
 		return (0);
+	    *estr = string;
 	    break;
 	case '*':
-	    if (!*pattern)
+	    if (!*pattern) {
+		while (*string) string++;
+		*estr = string;
 		return (1);
-	    while (*string)
-		if (Gmatch(string++, pattern))
+	    }
+	    while (*string) {
+		if (pmatch(string++, pattern, estr))
 		    return (1);
+	    }
 	    return (0);
 	case '[':
 	    match = 0;
 	    if ((negate_range = (*pattern == '^')) != 0)
 		pattern++;
-	    while ((rangec = *pattern++) != NULL) {
+	    while ((rangec = *pattern++) != '\0') {
 		if (rangec == ']')
 		    break;
 		if (match)
@@ -923,10 +952,12 @@ pmatch(string, pattern)
 		stderror(ERR_NAME | ERR_MISSING, ']');
 	    if (match == negate_range)
 		return (0);
+	    *estr = string;
 	    break;
 	default:
 	    if ((patternc & TRIM) != stringc)
 		return (0);
+	    *estr = string;
 	    break;
 
 	}
@@ -952,9 +983,9 @@ Gcat(s1, s2)
     }
     gargv[gargc] = 0;
     p = gargv[gargc - 1] = (Char *) xmalloc((size_t) (n * sizeof(Char)));
-    for (q = s1; (*p++ = *q++) != NULL;)
+    for (q = s1; (*p++ = *q++) != '\0';)
 	continue;
-    for (p--, q = s2; (*p++ = *q++) != NULL;)
+    for (p--, q = s2; (*p++ = *q++) != '\0';)
 	continue;
 }
 

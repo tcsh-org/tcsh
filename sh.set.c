@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.set.c,v 3.10 1992/02/21 23:16:20 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.set.c,v 3.11 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.10 1992/02/21 23:16:20 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.11 1992/03/21 02:46:07 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -159,10 +159,6 @@ doset(v, c)
 	    if (cp && (*cp != '/'))	/* if TERMCAP and not a path */
 		Unsetenv(STRTERMCAP);
 #endif				/* DOESNT_WORK_RIGHT */
-	    GotTermCaps = 0;
-	    ed_Init();		/* reset the editor */
-	}
-	else if (eq(vp, STRmargin_bug)) {
 	    GotTermCaps = 0;
 	    ed_Init();		/* reset the editor */
 	}
@@ -565,10 +561,9 @@ unset(v, c)
     Char   **v;
     struct command *c;
 {
-    bool did_only, new_margin;
+    bool did_only;
 
     did_only = adrof(STRrecognize_only_executables) != NULL;
-    new_margin = adrof(STRmargin_bug) != NULL;
     unset1(v, &shvhed);
     if (adrof(STRhistchars) == 0) {
 	HIST = '!';
@@ -582,10 +577,6 @@ unset(v, c)
 	editing = 0;
     if (adrof(STRbackslash_quote) == 0)
 	bslash_quote = 0;
-    if (new_margin && adrof(STRmargin_bug) == 0) {
-	GotTermCaps = 0;
-	ed_Init();		/* reset the editor */
-    }
     if (did_only && adrof(STRrecognize_only_executables) == 0)
 	tw_cmd_free();
 }
@@ -876,8 +867,7 @@ x:
 	if (p->v_parent == 0)	/* is it the header? */
 	    return;
 	len = blklen(p->vec);
-	xprintf(short2str(p->v_name));
-	xputchar('\t');
+	xprintf("%s\t", short2str(p->v_name));
 	if (len != 1)
 	    xputchar('(');
 	blkpr(p->vec);

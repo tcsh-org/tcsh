@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/sh.exp.c,v 3.6 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.exp.c,v 3.7 1992/03/21 22:34:18 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.6 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.7 1992/03/21 22:34:18 christos Exp $")
 
 /*
  * C shell
@@ -712,7 +712,7 @@ etraci(str, i, vp)
 {
     xprintf("%s=%d\t", str, i);
     blkpr(*vp);
-    xprintf("\n");
+    xputchar('\n');
 }
 static void
 etracc(str, cp, vp)
@@ -722,6 +722,6 @@ etracc(str, cp, vp)
 {
     xprintf("%s=%s\t", str, cp);
     blkpr(*vp);
-    xprintf("\n");
+    xputchar('\n');
 }
 #endif

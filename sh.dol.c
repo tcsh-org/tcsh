@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dol.c,v 3.10 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.dol.c,v 3.11 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.10 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.11 1992/03/21 02:46:07 christos Exp $")
 
 /*
  * C shell
@@ -108,15 +108,24 @@ Dfix(t)
     if (noexec)
 	return;
     /* Note that t_dcom isn't trimmed thus !...:q's aren't lost */
-    for (pp = t->t_dcom; (p = *pp++) != NULL;)
+    for (pp = t->t_dcom; (p = *pp++) != NULL;) {
 	for (; *p; p++) {
 	    if (cmap(*p, _DOL | QUOTES)) {	/* $, \, ', ", ` */
 		Dfix2(t->t_dcom);	/* found one */
 		blkfree(t->t_dcom);
 		t->t_dcom = gargv;
 		gargv = 0;
-		return;
+		break;
 	    }
+	}
+	if (*p)
+	    break;
+    }
+
+    if (adrof(STRexpand_symlinks))
+	for (pp = t->t_dcom; (p = *pp) != NULL; pp++) {
+	    *pp = dnormalize(p, 1);
+	    xfree((ptr_t) p);
 	}
 }
 

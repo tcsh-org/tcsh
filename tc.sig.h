@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.sig.h,v 3.5 1991/11/26 04:41:23 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tc.sig.h,v 3.6 1992/01/06 22:36:56 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -119,7 +119,7 @@ typedef struct sigvec sigvec_t;
 # define	sigmask(s)	(1 << ((s)-1))
 # ifdef _SEQUENT_
 #  define 	sigpause(a)	bsd_sigpause(a)
-#  define 	signal(a, b)	sigset(a, b)
+#  define 	signal(a, b)	bsd_signal(a, b)
 # else /* _SEQUENT_ */
 #  define	sighold(s)	sigblock(sigmask(s))
 #  define	sigignore(s)	signal(s, SIG_IGN)

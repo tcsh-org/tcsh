@@ -1,4 +1,4 @@
-/* $Header: /u/christos/tt/tcsh-6.01/RCS/sh.func.c,v 3.27 1992/03/08 02:17:22 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.func.c,v 3.28 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.27 1992/03/08 02:17:22 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.28 1992/03/21 02:46:07 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -231,7 +231,7 @@ doalias(v, c)
     else if (*v == 0) {
 	vp = adrof1(strip(p), &aliases);
 	if (vp)
-	    blkpr(vp->vec), xprintf("\n");
+	    blkpr(vp->vec), xputchar('\n');
     }
     else {
 	if (eq(p, STRalias) || eq(p, STRunalias)) {
@@ -1707,7 +1707,7 @@ plim(lp, hard)
     else
 # endif /* BSDTIMES */
 	xprintf("%ld %s", (long) (limit / lp->limdiv), lp->limscale);
-    xprintf("\n");
+    xputchar('\n');
 }
 
 /*ARGSUSED*/

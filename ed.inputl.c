@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.inputl.c,v 3.17 1992/01/28 19:06:06 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/ed.inputl.c,v 3.19 1992/03/21 02:46:07 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.17 1992/01/28 19:06:06 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.19 1992/03/21 02:46:07 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -509,7 +509,7 @@ RunCommand(str)
 {
     Char *cmd[2];
 
-    xprintf("\n");	/* Start on a clean line */
+    xputchar('\n');	/* Start on a clean line */
 
     cmd[0] = str;
     cmd[1] = NULL;
