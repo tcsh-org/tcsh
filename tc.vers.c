@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tc.vers.c,v 1.3 91/07/09 04:06:44 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.1 1991/07/15 19:37:24 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: tc.vers.c,v 3.1 1991/07/15 19:37:24 christos Exp christos $")
 
 #include "sh.h"
 #include "patchlevel.h"
@@ -208,6 +208,7 @@ gethosttype()
 #  endif 
 # else /* !sequent */
 #  ifdef ns32000
+#   define _havehosttype_
 #   ifdef CMUCS			/* hack for Mach (in the true spirit of CMU) */
     hosttype = str2short("multimax");
 #   else /* CMUCS */
