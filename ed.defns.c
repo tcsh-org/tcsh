@@ -241,8 +241,12 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		F_INC_FWD	97
     e_inc_rev,
 #define		F_INC_REV	98
+    v_rchar_fwd,
+#define		V_RCHAR_FWD	99
+    v_rchar_back,
+#define		V_RCHAR_BACK	100
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	99
+#define		F_NUM_FNS	101
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -857,7 +861,7 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* ) */
     F_EXPAND_GLOB,		/* * */
     F_DOWN_HIST,		/* + */
-    F_UNASSIGNED,		/* , */	 /* KSH Command exists */
+    V_RCHAR_BACK,		/* , */	
     F_UP_HIST,			/* - */	
     F_UNASSIGNED,		/* . */
     V_DSH_META,			/* / */
@@ -872,7 +876,7 @@ KEYCMD  CcViCmdMap[] = {
     F_ARGDIGIT,			/* 8 */
     F_ARGDIGIT,			/* 9 */
     F_UNASSIGNED,		/* : */
-    F_UNASSIGNED,		/* ; */
+    V_RCHAR_FWD,		/* ; */
     F_UNASSIGNED,		/* < */
     F_UNASSIGNED,		/* = */
     F_UNASSIGNED,		/* > */
@@ -1238,17 +1242,21 @@ struct KeyFuncs FuncNames[] = {
     "Vi move to the end of the current space delimited word",
     "vi-eword", V_EWORD,
     "Vi move to the end of the current word",
-    "vi-back-char", V_CHAR_BACK,
+    "vi-char-back", V_CHAR_BACK,
     "Vi move to the character specified backwards",
-    "vi-fwd-char", V_CHAR_FWD,
+    "vi-char-fwd", V_CHAR_FWD,
     "Vi move to the character specified forward",
     "vi-insert", V_INSERT,
     "Enter vi insert mode",
     "vi-insert-at-bol", V_INSBEG,
     "Enter vi insert mode at beginning of line",
-    "vi-search-fwd", V_RSRCH_FWD,
+    "vi-repeat-char-fwd", V_RCHAR_FWD,
+    "Vi repeat current character search in the same search direction",
+    "vi-repeat-char-back", V_RCHAR_BACK,
+    "Vi repeat current character search in the opposite search direction",
+    "vi-repeat-search-fwd", V_RSRCH_FWD,
     "Vi repeat current search in the same search direction",
-    "vi-search-rev", V_RSRCH_REV,
+    "vi-repeat-search-rev", V_RSRCH_REV,
     "Vi repeat current search in the opposite search direction",
     "vi-replace-char", V_REPLONE,
     "Vi replace character under the cursor with the next character typed",
@@ -1264,7 +1272,7 @@ struct KeyFuncs FuncNames[] = {
     "Vi replace entire line",
     "vi-word-back", V_WORDBACK,
     "Vi move to the previous word",
-    "vi-word-fwd", V_WORDBACK,
+    "vi-word-fwd", V_WORDFWD,
     "Vi move to the next word",
     "vi-undo", V_UNDO,
     "Vi undo last change",

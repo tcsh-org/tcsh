@@ -413,7 +413,8 @@ VI Command Mode functions
 "$"	->  end-of-line
 "*"	->  expand-glob
 "+"	->  down-history
-","	->  is undefined
+";"	->  vi-repeat-char-fwd
+","	->  vi-repeat-char-back
 "-"	->  up-history
 "."	->  is undefined
 "/"	->  vi-search-back

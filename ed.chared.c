@@ -49,12 +49,23 @@ RCSID("$Id: ed.chared.c,v 3.5 1991/09/10 21:38:09 christos Exp $")
 #define INSERT 	  0x02
 #define CHANGE 	  0x04
 
+#define CHAR_FWD	0
+#define CHAR_BACK	1
+
 static Char *InsertPos = InputBuf; /* Where insertion starts */
 static Char *ActionPos = 0;	   /* Where action begins  */
 static int  ActionFlag = NOP;	   /* What delayed action to take */
-static int  searchdir = F_UP_SEARCH_HIST; /* Direction of last search */
-static Char patbuf[INBUFSIZ];
+/*
+ * Word search state
+ */
+static int  searchdir = F_UP_SEARCH_HIST; 	/* Direction of last search */
+static Char patbuf[INBUFSIZ];			/* Search target */
 static int patlen = 0;
+/*
+ * Char search state
+ */
+static int  srch_dir = CHAR_FWD;		/* Direction of last search */
+static Char srch_char = 0;			/* Search target */
 
 /* all routines that start with c_ are private to this set of routines */
 static	void	 c_alternativ_key_map	__P((int));
@@ -80,6 +91,8 @@ static	Char	*c_eword		__P((Char *, Char *, int));
 static  CCRETVAL v_repeat_srch		__P((int));
 static	CCRETVAL e_inc_search		__P((int));
 static	CCRETVAL v_search		__P((int));
+static	CCRETVAL v_csearch_fwd		__P((int, int));
+static	CCRETVAL v_csearch_back		__P((int, int));
 
 static void
 c_alternativ_key_map(state)
@@ -1776,12 +1789,15 @@ e_delnext(c)
 		flush();
 		return(CC_EOF);
 	    }
-	    else {
+	    else 
 		return(CC_ERROR);
-	    }
 	}
-	else 
-	    Cursor--;
+	else {
+	    if (Cursor != InputBuf)
+		Cursor--;
+	    else
+		return(CC_ERROR);
+	}
     }
     c_delafter(Argument);	/* delete after dot */
     if (Cursor > LastChar)
@@ -2210,10 +2226,67 @@ v_repeat_srch(c)
     case F_DOWN_SEARCH_HIST:
 	return(e_down_search_hist(0));
     case F_UP_SEARCH_HIST:
-	return(e_up_search_hist(c));
+	return(e_up_search_hist(0));
     default:
 	return(CC_ERROR);
     }
+}
+
+static CCRETVAL
+v_csearch_back(ch, count)
+    int ch, count;
+{
+    Char *cp;
+
+    cp = Cursor;
+    while (count--) {
+	if (*cp == ch) 
+	    cp--;
+	while (cp > InputBuf && *cp != ch) 
+	    cp--;
+    }
+
+    if (cp < InputBuf || (cp == InputBuf && *cp != ch))
+	return(CC_ERROR);
+
+    Cursor = cp;
+
+    if (ActionFlag & DELETE) {
+	Cursor++;
+	c_delfini();
+	return(CC_REFRESH);
+    }
+
+    RefCursor();
+    return(CC_NORM);
+}
+
+static CCRETVAL
+v_csearch_fwd(ch, count)
+    int ch, count;
+{
+    Char *cp;
+
+    cp = Cursor;
+    while (count--) {
+	if(*cp == ch) 
+	    cp++;
+	while (cp < LastChar && *cp != ch) 
+	    cp++;
+    }
+
+    if (cp >= LastChar)
+	return(CC_ERROR);
+
+    Cursor = cp;
+
+    if (ActionFlag & DELETE) {
+	Cursor++;
+	c_delfini();
+	return(CC_REFRESH);
+    }
+    RefCursor();
+    return(CC_NORM);
 }
 
 /*ARGSUSED*/
@@ -2826,27 +2899,16 @@ CCRETVAL
 v_char_fwd(c)
     int c;
 {
-    Char ch, *cp;
+    Char ch;
 
     if (GetNextChar(&ch) != 1)
 	return e_send_eof(0);
 
-    for (cp = Cursor + 1; cp < LastChar; cp++)
-	if (*cp == ch)
-	    break;
+    srch_dir = CHAR_FWD;
+    srch_char = ch;
 
-    if (cp >= LastChar)
-	return(CC_ERROR);
+    return v_csearch_fwd(ch, Argument);
 
-    Cursor = cp;
-
-    if (ActionFlag & DELETE) {
-	Cursor++;
-	c_delfini();
-	return(CC_REFRESH);
-    }
-    RefCursor();
-    return(CC_NORM);
 }
 
 /*ARGSUSED*/
@@ -2854,27 +2916,39 @@ CCRETVAL
 v_char_back(c)
     int c;
 {
-    Char ch, *cp;
+    Char ch;
 
     if (GetNextChar(&ch) != 1)
 	return e_send_eof(0);
 
-    for (cp = Cursor - 1; cp > InputBuf; cp--)
-	if (*cp == ch)
-	    break;
+    srch_dir = CHAR_BACK;
+    srch_char = ch;
 
-    if (cp < InputBuf || (cp == InputBuf && *cp != ch))
-	return(CC_ERROR);
+    return v_csearch_back(ch, Argument);
+}
 
-    Cursor = cp;
+/*ARGSUSED*/
+CCRETVAL
+v_rchar_fwd(c)
+    int c;
+{
+    if (srch_char == 0)
+	return CC_ERROR;
 
-    if (ActionFlag & DELETE) {
-	Cursor++;
-	c_delfini();
-	return(CC_REFRESH);
-    }
-    RefCursor();
-    return(CC_NORM);
+    return srch_dir == CHAR_FWD ? v_csearch_fwd(srch_char, Argument) : 
+			          v_csearch_back(srch_char, Argument);
+}
+
+/*ARGSUSED*/
+CCRETVAL
+v_rchar_back(c)
+    int c;
+{
+    if (srch_char == 0)
+	return CC_ERROR;
+
+    return srch_dir == CHAR_BACK ? v_csearch_fwd(srch_char, Argument) : 
+			           v_csearch_back(srch_char, Argument);
 }
 
 /*ARGSUSED*/

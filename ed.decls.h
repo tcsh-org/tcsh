@@ -193,6 +193,8 @@ extern  CCRETVAL        v_char_back		__P((int));
 extern  CCRETVAL        v_chgmeta		__P((int));
 extern	CCRETVAL	e_inc_fwd		__P((int));
 extern	CCRETVAL	e_inc_rev		__P((int));
+extern	CCRETVAL	v_rchar_fwd		__P((int));
+extern	CCRETVAL	v_rchar_back		__P((int));
 
 /*
  * ed.inputl.c
