@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 1991/10/12 04:23:51 christos Exp $
+# $Id: Makefile,v 1.2 1991/10/13 23:44:48 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -169,7 +169,7 @@ TCOBJS=	tc.alloc.${SUF} tc.bind.${SUF} tc.const.${SUF} tc.disc.${SUF} \
 PVSRCS= Makefile
 AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
-	pathnames.h tcsh.man Ported src.desc Imakefile config.imake \
+	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
 	README.imake
 VHSRCS=${PVSRCS} ${AVSRCS}
 
