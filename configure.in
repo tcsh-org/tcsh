@@ -306,7 +306,7 @@ dnl else
 dnl   ipv6_cv_$1=no
 dnl   ifelse([$3], , :, [$3])
 dnl fi])
-dnl IPv6_CHECK_FUNC(getaddrinfo, DFLAGS="$DFLAGS -DINET6")
+dnl IPv6_CHECK_FUNC(getnameinfo, DFLAGS="$DFLAGS -DINET6")
 
 AC_SUBST(DFLAGS)
 

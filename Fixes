@@ -1,4 +1,6 @@
- 25. V6.11.03 - 20020701
+ 38. Disable ipv6 for Apple (Nelson Beebe)
+ 37. Fix darwin configure entry (Nelson Beebe)
+ 36. V6.11.03 - 20020701
  35. Add Ian D. Allen's bug list.
  34. If we are invoked as csh, default to bsd echo (Matej Vela)
  33. Don't close file descriptors too early because setuid scripts fail.
