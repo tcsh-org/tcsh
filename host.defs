@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /src/pub/tcsh/host.defs,v 1.36 2003/02/08 20:03:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/host.defs,v 1.37 2004/08/04 17:12:28 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.36 2003/02/08 20:03:25 christos Exp $")
+RCSID("$Id: host.defs,v 1.37 2004/08/04 17:12:28 christos Exp $")
 
 endcode	:
 
@@ -438,11 +438,21 @@ enddef	:
 newdef	: defined(linux)
 comment	: Linus Torvalds's linux
 vendor	: defined(M_intel)				: "intel"
+hosttype: defined(__ia64__)				: "ia64-linux"
+hosttype: defined(__powerpc64__)			: "powerpc64-linux"
+hosttype: defined(__s390x__)				: "s390x-linux"
+hosttype: defined(__s390__)				: "s390-linux"
+hosttype: defined(__x86_64__)				: "x86_64-linux"
 hosttype: defined(M_i586) 				: "i586-linux"
 hosttype: defined(M_i486) 				: "i486-linux"
 hosttype: defined(M_i386)				: "i386-linux"
 ostype	: !defined(PPC) 				: "linux"
 ostype	: defined(PPC)					: "mklinux"
+machtype: defined(__ia64__)				: "ia64"
+machtype: defined(__powerpc64__)			: "powerpc64"
+machtype: defined(__s390x__)				: "s390x"
+machtype: defined(__s390__)				: "s390"
+machtype: defined(__x86_64__)				: "x86_64"
 machtype: defined(M_i586) 				: "i586"
 machtype: defined(M_i486) 				: "i486"
 machtype: defined(M_i386)				: "i386"
