@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.91 2000/07/04 19:42:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.92 2000/11/11 23:03:35 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.91 2000/07/04 19:42:47 christos Exp $")
+RCSID("$Id: sh.c,v 3.92 2000/11/11 23:03:35 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -528,14 +528,26 @@ main(argc, argv)
      */
     shlvl(1);
 
-    if ((tcp = getenv("HOME")) != NULL)
-	cp = quote(SAVE(tcp));
-    else
+    if ((tcp = getenv("HOME")) != NULL) {
+	if (strlen(tcp) >= MAXPATHLEN) {
+	    struct passwd *pw;
+	    if ((pw = getpwuid(getuid())) != NULL)
+		cp = quote(SAVE(pw->pw_dir));
+	    else {
+		tcp[MAXPATHLEN-1] = '\0';
+		cp = quote(SAVE(tcp));
+	    }
+	} else {
+	    cp = quote(SAVE(tcp));
+	}
+    } else
 	cp = NULL;
+
     if (cp == NULL)
 	fast = 1;		/* No home -> can't read scripts */
     else
 	set(STRhome, cp, VAR_READWRITE);
+
     dinit(cp);			/* dinit thinks that HOME == cwd in a login
 				 * shell */
     /*
