@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.50 1998/09/19 14:29:39 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.51 1998/09/26 12:28:29 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.50 1998/09/19 14:29:39 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.51 1998/09/26 12:28:29 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -493,7 +493,7 @@ dgoto(cp)
 
 	for (p = dcwd->di_name; *p++;)
 	    continue;
-	if ((cwdlen = p - dcwd->di_name - 1) == 1)	/* root */
+	if ((cwdlen = (int) (p - dcwd->di_name - 1)) == 1)	/* root */
 	    cwdlen = 0;
 	for (p = cp; *p++;)
 	    continue;
@@ -836,7 +836,7 @@ dcanon(cp, p)
 	Char    tmpdir[MAXPATHLEN];
 
 	p1 = varval(STRcwd);
-	if (p1 == STRNULL || ABSOLUTEP(p1))
+	if (p1 == STRNULL || !ABSOLUTEP(p1))
 	    abort();
 	if (Strlen(p1) + Strlen(cp) + 1 >= MAXPATHLEN)
 	    abort();

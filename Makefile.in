@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.9 1998/09/09 10:29:11 christos Exp $
+# $Id: Makefile.in,v 3.10 1998/10/02 10:56:45 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -208,10 +208,6 @@ LIBES= @LIBS@	 			 ## This is set by autoconf.
 ################################################################
 ## EXTRAFLAGS and EXTRALIBS
 ################################################################
-# Compiling for HESIOD
-#HESDEF = -DHESIOD -I/usr/athena/include
-#HESLIB = -L/usr/athena/lib -lhesiod
-#
 # Compiling for AFS with kerberos authentication
 #AFSLIBDIR = /usr/afsws/lib
 #AFSDEF = -DAFS -I/usr/afsws/include
@@ -227,8 +223,8 @@ LIBES= @LIBS@	 			 ## This is set by autoconf.
 #         $(AFSLIBDIR)/afs/util.a $(AFS33LIB) $(AFSAUXLIB)
 #
 
-EXTRAFLAGS = $(HESDEF) $(AFSDEF)
-EXTRALIBS = $(HESLIB) $(AFSLIB)
+EXTRAFLAGS = @HESDEF@ $(AFSDEF)
+EXTRALIBS = @HESLIB@ $(AFSLIB)
 
 
 # The difficult choice of a c-compiler...
@@ -257,6 +253,7 @@ CC = @CC@ # This is set by autoconf.
 #CC=	/usr/lib/sun.compile/cc  # FPS 500 (+FPX) with Sun C compiler
 #CC=	/opt/SUNWspro/bin/cc	# Solaris 2.1
 #CC=	scc 	# Alliant fx2800
+#CC=	cc	-h0,ansi,novector,float0 # for NEC SX-4
 #CC=	lcc	-wa 
 ED=	ed
 AS=	as
@@ -271,11 +268,11 @@ PARALLEL=12				# Make the multi-max run fast.
 P=
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-DESTDIR=${prefix}
-#DESTDIR=/usr/contrib
+bindir=@bindir@
+mandir=@mandir@
 MANSECT=1
-DESTBIN=@bindir@
-DESTMAN=${DESTDIR}/man/man${MANSECT}
+DESTBIN=${DESTDIR}${bindir}
+DESTMAN=${DESTDIR}${mandir}/man/man${MANSECT}
 # DESTMAN=${DESTDIR}/catman/man${MANSECT}	 # A/UX
 # DESTMAN=${DESTDIR}/usr/share/man/man${MANSECT} # Stardent Vistra (SysVR4)
 # DESTMAN=/usr/catman/1l			 # Amiga unix (SysVR4)

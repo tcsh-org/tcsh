@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.45 1998/04/21 16:08:47 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.46 1998/07/07 12:06:23 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.45 1998/04/21 16:08:47 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.46 1998/07/07 12:06:23 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -919,7 +919,147 @@ mesginit()
 #ifdef SIGUNUSED
     if (mesg[SIGUNUSED].pname == NULL) {
 	mesg[SIGUNUSED].iname = "UNUSED";
-	mesg[SIGUNUSED].pname = CSAVS(2, 91, "Stack limit exceeded");
+	mesg[SIGUNUSED].pname = CSAVS(2, 91, "Unused signal");
     }
 #endif /* SIGUNUSED */
+
+#ifdef SIGOVLY
+    /* SX-4 */
+    if (mesg[SIGOVLY].pname == NULL) {
+	mesg[SIGOVLY].iname = "OVLY";
+	mesg[SIGOVLY].pname = CSAVS(2, 92, "LM overlay");
+    }
+#endif /* SIGOVLY */
+
+#ifdef SIGFRZ
+    /* SX-4 */
+    if (mesg[SIGFRZ].pname == NULL) {
+	mesg[SIGFRZ].iname = "FRZ";
+	mesg[SIGFRZ].pname = CSAVS(2, 93, "system freeze");
+    }
+#endif /* SIGFRZ */
+
+#ifdef SIGDFRZ
+    /* SX-4 */
+    if (mesg[SIGDFRZ].pname == NULL) {
+	mesg[SIGDFRZ].iname = "DFRZ";
+	mesg[SIGDFRZ].pname = CSAVS(2, 94, "system defreeze");
+    }
+#endif /* SIGDFRZ */
+
+#ifdef SIGDEAD
+    /* SX-4 */
+    if (mesg[SIGDEAD].pname == NULL) {
+	mesg[SIGDEAD].iname = "DEAD";
+	mesg[SIGDEAD].pname = CSAVS(2, 95, "dead lock");
+    }
+#endif /* SIGDEAD */
+
+#ifdef SIGXMEM
+    /* SX-4 */
+    if (mesg[SIGXMEM].pname == NULL) {
+	mesg[SIGXMEM].iname = "XMEM";
+	mesg[SIGXMEM].pname = CSAVS(2, 96, "exceeded memory size limit");
+    }
+#endif /* SIGXMEM */
+
+#ifdef SIGXDSZ
+    /* SX-4 */
+    if (mesg[SIGXDSZ].pname == NULL) {
+	mesg[SIGXDSZ].iname = "XDSZ";
+	mesg[SIGXDSZ].pname = CSAVS(2, 97, "exceeded data size limit");
+    }
+#endif /* SIGXDSZ */
+
+#ifdef SIGMEM32
+    /* SX-4 */
+    if (mesg[SIGMEM32].pname == NULL) {
+	mesg[SIGMEM32].iname = "MEM32";
+	mesg[SIGMEM32].pname = CSAVS(2, 98, "exceeded memory size limit of 32KB");
+    }
+#endif /* SIGMEM32 */
+
+#ifdef SIGNMEM
+    /* SX-4 */
+    if (mesg[SIGNMEM].pname == NULL) {
+	mesg[SIGNMEM].iname = "NMEM";
+	mesg[SIGNMEM].pname = CSAVS(2, 99, "exce error for no memory");
+    }
+#endif /* SIGNMEM */
+
+#ifdef SIGCHKP
+    /* SX-4 */
+    if (mesg[SIGCHKP].pname == NULL) {
+	mesg[SIGCHKP].iname = "CHKP";
+	mesg[SIGCHKP].pname = CSAVS(2, 100, "check point start");
+    }
+#endif /* SIGCHKP */
+
+#ifdef SIGKCHKP
+#if 0
+    /* SX-4 */
+    if (mesg[SIGKCHKP].pname == NULL) {
+	mesg[SIGKCHKP].iname = "KCHKP";
+	mesg[SIGKCHKP].pname = CSAVS(2, 101, "check point start of kernel");
+    }
+#endif
+#endif /* SIGKCHKP */
+
+#ifdef SIGRSTA
+    /* SX-4 */
+    if (mesg[SIGRSTA].pname == NULL) {
+	mesg[SIGRSTA].iname = "RSTA";
+	mesg[SIGRSTA].pname = CSAVS(2, 102, "restart start");
+    }
+#endif /* SIGRSTA */
+
+#ifdef SIGKRSTA
+#if 0
+    /* SX-4 */
+    if (mesg[SIGKRSTA].pname == NULL) {
+	mesg[SIGKRSTA].iname = "KRSTA";
+	mesg[SIGKRSTA].pname = CSAVS(2, 103, "restart of kernel");
+    }
+#endif
+#endif /* SIGKRSTA */
+
+#ifdef SIGXXMU
+    /* SX-4 */
+    if (mesg[SIGXXMU].pname == NULL) {
+	mesg[SIGXXMU].iname = "XXMU";
+	mesg[SIGXXMU].pname = CSAVS(2, 104, "exeeded XMU size limit");
+    }
+#endif /* SIGXXMU */
+
+#ifdef SIGXRLG0
+    /* SX-4 */
+    if (mesg[SIGXRLG0].pname == NULL) {
+	mesg[SIGXRLG0].iname = "XRLG0";
+	mesg[SIGXRLG0].pname = CSAVS(2, 105, "exeeded RLG0 limit");
+    }
+#endif /* SIGXRLG0 */
+
+#ifdef SIGXRLG1
+    /* SX-4 */
+    if (mesg[SIGXRLG1].pname == NULL) {
+	mesg[SIGXRLG1].iname = "XRLG1";
+	mesg[SIGXRLG1].pname = CSAVS(2, 106, "exeeded RLG1 limit");
+    }
+#endif /* SIGXRLG1 */
+
+#ifdef SIGXRLG2
+    /* SX-4 */
+    if (mesg[SIGXRLG2].pname == NULL) {
+	mesg[SIGXRLG2].iname = "XRLG2";
+	mesg[SIGXRLG2].pname = CSAVS(2, 107, "exeeded RLG2 limit");
+    }
+#endif /* SIGXRLG2 */
+
+#ifdef SIGXRLG3
+    /* SX-4 */
+    if (mesg[SIGXRLG3].pname == NULL) {
+	mesg[SIGXRLG3].iname = "XRLG3";
+	mesg[SIGXRLG3].pname = CSAVS(2, 108, "exeeded RLG3 limit");
+    }
+#endif /* SIGXRLG3 */
 }

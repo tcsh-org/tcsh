@@ -1,4 +1,4 @@
-$ $Id: set2,v 1.2 1995/03/19 18:07:15 christos Exp $
+$ $Id: set2,v 1.3 1997/10/27 23:33:51 christos Exp $
 $ Signal names
 $set 2 
 1 Null signal
@@ -92,3 +92,20 @@ $set 2
 89 New input character
 90 Stack limit exceeded
 91 Unused signal
+92 LM overlay
+93 system freeze
+94 system defreeze
+95 dead lock
+96 exceeded memory size limit
+97 exceeded data size limit
+98 exceeded memory size limit of 32KB
+99 exce error for no memory
+100 check point start
+101 check point start of kernel
+102 restart start
+103 restart of kernel
+104 exeeded XMU size limit
+105 exeeded RLG0 limit
+106 exeeded RLG1 limit
+107 exeeded RLG2 limit
+108 exeeded RLG3 limit

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.78 1998/09/18 16:09:19 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.79 1998/09/26 12:28:33 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -502,10 +502,10 @@ struct ucred {
 #endif /* POSIX */
 
 
-#if !defined(SOLARIS2) && !defined(sinix) && !defined(BSD4_4) && !defined(WIN32)
-# if (SYSVREL > 0 && !defined(OREO) && !defined(sgi) && !defined(linux) && !defined(sinix) && !defined(_AIX)) || defined(NeXT)
+#if !defined(SOLARIS2) && !defined(sinix) && !defined(BSD4_4) && !defined(WINNT)
+# if (SYSVREL > 0 && !defined(OREO) && !defined(sgi) && !defined(linux) && !defined(sinix) && !defined(_AIX) &&!defined(_UWIN)) || defined(NeXT)
 #  define NEEDgetcwd
-# endif /* (SYSVREL > 0 && !OREO && !sgi && !linux && !sinix && !IBMAIX) || NeXT */
+# endif /* (SYSVREL > 0 && !OREO && !sgi && !linux && !sinix && !_AIX && !_UWIN) || NeXT */
 #endif
 
 #ifndef S_IFLNK
@@ -527,11 +527,11 @@ typedef struct timeval timeval_t;
 # define free tcsh_free
 #endif /* NeXT */
 
-#if !defined(BSD4_4) && !defined(__linux__) &&!defined(__hpux)
+#if !defined(BSD4_4) && !defined(__linux__) && !defined(__hpux) && !defined(sgi)
 #ifndef NEEDgethostname
 extern int gethostname __P((char *, int));
 #endif /* NEEDgethostname */
-#endif /* !BDS4_4 && !__linux__ && !__hpux */
+#endif /* !BDS4_4 && !__linux__ && !__hpux && !sgi */
 
 #if !defined(POSIX) || defined(SUNOS4) || defined(UTekV) || defined(sysV88)
 extern time_t time();
@@ -720,7 +720,7 @@ extern void bcopy	__P((const void *, void *, size_t));
 # ifdef REMOTEHOST
 /* Irix6 defines getpeername(int, void *, int *) which conflicts with
    the definition below. */
-#  if !defined(__sgi)
+#  if !defined(__sgi) && !defined(_OSD_POSIX)
 struct sockaddr;
 extern int getpeername __P((int, struct sockaddr *, int *));
 #  endif /* __sgi */

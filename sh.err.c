@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.err.c,v 3.31 1998/06/27 12:27:17 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.err.c,v 3.32 1998/09/04 21:16:51 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.31 1998/06/27 12:27:17 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.32 1998/09/04 21:16:51 christos Exp $")
 
 /*
  * C Shell
@@ -360,7 +360,7 @@ errinit()
     elst[ERR_MFLAG] = CSAVS(1, 133, "No operand for -m flag");
     elst[ERR_ULIMUS] = CSAVS(1, 134, "Usage: unlimit [-fh] [limits]");
     elst[ERR_READONLY] = CSAVS(1, 135, "$%S is read-only");
-    elst[ERR_BADJOB] = CSAVS(1, 136, "No such job");
+    elst[ERR_BADJOB] = CSAVS(1, 136, "No such job (badjob)");
     elst[ERR_BADCOLORVAR] = CSAVS(1, 137, "Unknown colorls variable `%c%c'");
 }
 /*

@@ -79,6 +79,13 @@ case "${tcsh_cv_canonical}" in
     tcsh_config_file=aix
   ;;
 
+  ## SX-4
+  sx4-nec-*)
+    CC='cc -h0,ansi,novector,float0'
+    LDFLAGS='-Gsmall'
+    tcsh_config_file=superux8
+  ;;
+
   ## Linux
   *-*-linux* )
     tcsh_config_file=linux
@@ -186,13 +193,18 @@ case "${tcsh_cv_canonical}" in
     tcsh_config_file=sco32v2
   ;;
 
-  ## Siemens Nixdorf BS2000
-  bs2000-sni-posix)
+  ## Siemens BS2000 Mainframe
+  bs2000-siemens-posix)
     tcsh_config_file=bs2000
   ;;
   ## Cray
   *-cray-unicos*)
     tcsh_config_file=cray
+  ;;
+
+  ## Cygnus GNU Win32
+  *-cygwin32-* )
+    tcsh_config_file=3Dcygwin32
   ;;
 
   * )
@@ -238,5 +250,21 @@ if test $ac_cv_func_connect = no; then
   AC_CHECK_LIB(socket, connect)
 fi
 AC_SUBST(DFLAGS)
+
+AC_ARG_WITH(hesiod,
+  [  --with-hesiod=PREFIX    Use Hesiod lookup for ~ expansion],
+  [hesiod="$withval"], [hesiod=no])
+if test "$hesiod" != no; then
+  HESLIB="-lhesiod"
+  AC_CHECK_FUNC(res_send, :,
+    AC_CHECK_LIB(resolv, res_send, HESLIB="$HESLIB -lresolv"))
+  HESDEF=-DHESIOD
+  if test "$hesiod" != yes; then
+    HESDEF="$HESDEF -I$hesiod/include"
+    HESLIB="-L$hesiod/lib $HESLIB"
+  fi
+fi
+AC_SUBST(HESDEF)
+AC_SUBST(HESLIB)
 
 AC_OUTPUT(Makefile)

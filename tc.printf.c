@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.printf.c,v 3.17 1997/10/27 22:44:36 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.printf.c,v 3.18 1998/04/08 17:57:34 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.17 1997/10/27 22:44:36 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.18 1998/04/08 17:57:34 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -145,7 +145,7 @@ doprnt(addchar, sfmt, ap)
 		} while ((l /= 10) > 0);
 		if (sign)
 		    *bp++ = '-';
-		f_width = f_width - (bp - buf);
+		f_width = f_width - (int) (bp - buf);
 		if (!flush_left)
 		    while (f_width-- > 0) 
 			(*addchar) ((int) (pad | attributes));
@@ -177,7 +177,7 @@ doprnt(addchar, sfmt, ap)
 		}
 		else if (fmt == 'x') {	/* hex */
 		    do {
-			i = u % 16;
+			i = (int) (u % 16);
 			if (i < 10)
 			    *bp++ = i + '0';
 			else
@@ -188,7 +188,7 @@ doprnt(addchar, sfmt, ap)
 			*bp++ = '0';
 		    }
 		}
-		i = f_width - (bp - buf);
+		i = f_width - (int) (bp - buf);
 		if (!flush_left)
 		    while (i-- > 0)
 			(*addchar) ((int) (pad | attributes));

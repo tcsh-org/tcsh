@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.inputl.c,v 3.44 1996/04/26 19:18:05 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.inputl.c,v 3.45 1997/10/27 22:44:22 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.44 1996/04/26 19:18:05 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.45 1997/10/27 22:44:22 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -76,7 +76,7 @@ Repair()
     Argument = 1;
     DoingArg = 0;
     curchoice = -1;
-    return LastChar - InputBuf;
+    return (int) (LastChar - InputBuf);
 }
 
 /* CCRETVAL */
@@ -205,12 +205,12 @@ Inputl()
 	case CC_ARGHACK:	/* Suggested by Rich Salz */
 	    /* <rsalz@pineapple.bbn.com> */
 	    curchoice = -1;
-	    curlen = LastChar - InputBuf;
+	    curlen = (int) (LastChar - InputBuf);
 	    break;		/* keep going... */
 
 	case CC_EOF:		/* end of file typed */
 	    curchoice = -1;
-	    curlen = LastChar - InputBuf;
+	    curlen = (int) (LastChar - InputBuf);
 	    num = 0;
 	    break;
 
@@ -222,7 +222,7 @@ Inputl()
 	    *LastChar++ = '\n';	/* for the benifit of CSH */
 	    HistWhich = Hist_num;
 	    Hist_num = 0;	/* for the history commands */
-	    num = LastChar - InputBuf;	/* number characters read */
+	    num = (int) (LastChar - InputBuf);	/* number characters read */
 	    break;
 
 	case CC_NEWLINE:	/* normal end of line */
@@ -293,7 +293,7 @@ Inputl()
                 match_unique_match = 1;  /* match unique matches */
 		matchval = CompleteLine();
                 match_unique_match = 0;
-        	curlen = LastChar - InputBuf;
+        	curlen = (int) (LastChar - InputBuf);
 		if (matchval != 1) {
                     PastBottom();
 		}
@@ -315,7 +315,7 @@ Inputl()
                     *LastChar++ = '\n';
                     *LastChar = '\0';
 		}
-        	curlen = LastChar - InputBuf;
+        	curlen = (int) (LastChar - InputBuf);
             }
 	    else
 		PastBottom();
@@ -324,7 +324,7 @@ Inputl()
 	        tellwhat = 0;	/* just in case */
 	        Hist_num = 0;	/* for the history commands */
 		/* return the number of chars read */
-	        num = LastChar - InputBuf;
+	        num = (int) (LastChar - InputBuf);
 	        /*
 	         * For continuation lines, we set the prompt to prompt 2
 	         */
@@ -352,13 +352,13 @@ Inputl()
 	    switch (retval) {
 	    case CC_COMPLETE:
 		fn = RECOGNIZE;
-		curlen = LastChar - InputBuf;
+		curlen = (int) (LastChar - InputBuf);
 		curchoice = -1;
 		rotate = 0;
 		break;
 	    case CC_COMPLETE_ALL:
 		fn = RECOGNIZE_ALL;
-		curlen = LastChar - InputBuf;
+		curlen = (int) (LastChar - InputBuf);
 		curchoice = -1;
 		rotate = 0;
 		break;
@@ -376,15 +376,15 @@ Inputl()
 		abort();
 	    }
 	    if (InputBuf[curlen] && rotate) {
-		newlen = LastChar - InputBuf;
-		for (idx = (Cursor - InputBuf); 
+		newlen = (int) (LastChar - InputBuf);
+		for (idx = (int) (Cursor - InputBuf); 
 		     idx <= newlen; idx++)
 			InputBuf[idx - newlen + curlen] =
 			InputBuf[idx];
 		LastChar = InputBuf + curlen;
 		Cursor = Cursor - newlen + curlen;
 	    }
-	    curlen = LastChar - InputBuf;
+	    curlen = (int) (LastChar - InputBuf);
 
 
 	    if (adrof(STRautoexpand))
@@ -394,7 +394,7 @@ Inputl()
 	     * A separate variable now controls beeping after
 	     * completion, independently of autolisting.
 	     */
-	    expnum = Cursor - InputBuf;
+	    expnum = (int) (Cursor - InputBuf);
 	    switch (matchval = tenematch(InputBuf, Cursor-InputBuf, fn)){
 	    case 1:
 		if (non_unique_match && matchbeep &&
@@ -452,15 +452,15 @@ Inputl()
 	case CC_LIST_CHOICES:
 	case CC_LIST_ALL:
 	    if (InputBuf[curlen] && rotate) {
-		newlen = LastChar - InputBuf;
-		for (idx = (Cursor - InputBuf); 
+		newlen = (int) (LastChar - InputBuf);
+		for (idx = (int) (Cursor - InputBuf); 
 		     idx <= newlen; idx++)
 			InputBuf[idx - newlen + curlen] =
 			InputBuf[idx];
 		LastChar = InputBuf + curlen;
 		Cursor = Cursor - newlen + curlen;
 	    }
-	    curlen = LastChar - InputBuf;
+	    curlen = (int) (LastChar - InputBuf);
 	    if (curchoice >= 0)
 		curchoice--;
 
@@ -512,7 +512,7 @@ Inputl()
 	    Argument = 1;
 	    DoingArg = 0;
 	    curchoice = -1;
-	    curlen = LastChar - InputBuf;
+	    curlen = (int) (LastChar - InputBuf);
 	    break;
 
 	case CC_FATAL:		/* fatal error, reset to known state */
@@ -526,7 +526,7 @@ Inputl()
 	    Argument = 1;
 	    DoingArg = 0;
 	    curchoice = -1;
-	    curlen = LastChar - InputBuf;
+	    curlen = (int) (LastChar - InputBuf);
 	    break;
 
 	case CC_ERROR:
@@ -536,7 +536,7 @@ Inputl()
 	    SoundBeep();
 	    flush();
 	    curchoice = -1;
-	    curlen = LastChar - InputBuf;
+	    curlen = (int) (LastChar - InputBuf);
 	    break;
 	}
     }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.22 1998/09/04 21:16:42 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.23 1998/09/18 16:09:01 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.22 1998/09/04 21:16:42 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.23 1998/09/18 16:09:01 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -681,12 +681,12 @@ update_line(old, new, cur_line)
      * fx is the number of characters we need to insert/delete: in the
      * beginning to bring the two same begins together
      */
-    fx = (nsb - nfd) - (osb - ofd);
+    fx = (int) ((nsb - nfd) - (osb - ofd));
     /*
      * sx is the number of characters we need to insert/delete: in the end to
      * bring the two same last parts together
      */
-    sx = (nls - nse) - (ols - ose);
+    sx = (int) ((nls - nse) - (ols - ose));
 
     if (!T_CanIns) {
 	if (fx > 0) {
@@ -737,8 +737,8 @@ update_line(old, new, cur_line)
     /*
      * Now that we are done with pragmatics we recompute fx, sx
      */
-    fx = (nsb - nfd) - (osb - ofd);
-    sx = (nls - nse) - (ols - ose);
+    fx = (int) ((nsb - nfd) - (osb - ofd));
+    sx = (int) ((nls - nse) - (ols - ose));
 
 #ifdef DEBUG_UPDATE
     dprintf("\n");
@@ -961,7 +961,7 @@ update_line(old, new, cur_line)
 	    so_write(nse, (nls - nse));
 	}
 	else {
-	    int olen = oe - old + fx;
+	    int olen = (int) (oe - old + fx);
 	    if (olen > TermH)
 		olen = TermH;
 #ifdef DEBUG_UPDATE
@@ -1003,7 +1003,7 @@ update_line(old, new, cur_line)
 	     * to zero above as a flag saying that we hadn't done
 	     * an early first insert.
 	     */
-	    fx = (nsb - nfd) - (osb - ofd);
+	    fx = (int) ((nsb - nfd) - (osb - ofd));
 	    if (fx > 0) {
 		/*
 		 * insert fx chars of new starting at nfd
@@ -1275,12 +1275,12 @@ RefPlusOne()
 void
 ClearDisp()
 {
-    register int i;
+    register int i, j;
 
     CursorV = 0;		/* clear the display buffer */
     CursorH = 0;
     for (i = 0; i < TermV; i++)
-	Display[i][0] = '\0';
+	(void) memset(Display[i], 0, TermH * sizeof(Display[0][0]));
     OldvcV = 0;
 }
 

@@ -9,21 +9,21 @@ christos
 
 VENDOR	:	sun
 MODELS	:	sun3, sun4, sun386i
-COMPILER:	cc, gcc
+COMPILER:	cc, gcc, acc
 CFLAGS	:	normal
 LIBES	:	-ltermcap
-OS	:	sunos 3.5, 4.0, 4.1, 4.1.1, 4.1.2, 4.1.3
+OS	:	sunos 3.5, 4.0, 4.1, 4.1.1, 4.1.2, 4.1.3, 4.1.4
 CONFIG	:	sunos*
 ENVIRON	:	n/a
 NOTES	:	Don't compile with /usr/5bin/cc
-VERSION	:	6.05.06
+VERSION	:	6.08
 
 VENDOR	:	sun
-MODELS	:	sun4
+MODELS	:	sun4, ultra
 COMPILER:	cc, gcc
 CFLAGS	:	normal
 LIBES	:	-lcurses -lsocket -lnsl
-OS	:	solaris 2.1, 2.2, 2.3, 2.4
+OS	:	solaris 2.1, 2.2, 2.3, 2.4, 2.5, 2.5.1
 CONFIG	:	sol*
 ENVIRON	:	n/a
 NOTES	:	The sunpro compiler cannot compile tcsh with -O, it crashes
@@ -32,7 +32,18 @@ NOTES	:	The sunpro compiler cannot compile tcsh with -O, it crashes
 	:	floating point is already initialized and does not do the
 	:	necessary initializations. This results in weird floating
 	:	point failures of programs exec'ed from tcsh.
-VERSION	:	6.05.06
+VERSION	:	6.08
+
+VENDOR	:	sun
+MODELS	:	ultra
+COMPILER:	WorkShop cc
+CFLAGS	:	normal
+LIBES	:	-lcurses -lsocket -lnsl
+OS	:	solaris 2.6
+CONFIG	:	sol26
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.08
 
 VENDOR	:	sun
 MODELS	:	i386
@@ -55,7 +66,6 @@ CONFIG	:	linux
 ENVIRON	:	n/a
 NOTES	:	none
 VERSION	:	6.07.03
-
 
 VENDOR	:	hp
 MODELS	:	apollo
@@ -81,30 +91,30 @@ NOTES	:	Don't use -lBSD; breaks getpgrp(). Config.hp-3.2 obsolete?
 	:	If it does not work, lower the optimization level...
 VERSION	:	6.05.06
 
-
+VENDOR	:	hp
 MODELS	:	hp9000s700
-COMPILER:	cc, gcc	2.6.3
-CFLAGS	:	normal -Aa -O (cc) -O (gcc)
+COMPILER:	cc, c89, gcc
+CFLAGS	:	+O3 -Aa (cc), +O3 (c89), normal (gcc)
 LIBES	:	-ltermcap
-OS	:	hpux 10.01
+OS	:	hpux 10.00, 10.01
 CONFIG	:	hpux8
 ENVIRON	:	n/a
-VERSION	:	6.06
-NOTES	:	All references to <sys/bsdtty> had to be eliminated,
-	:	otherwise a ioctl call gives error return with ERRNO 22
-	:	(Illegal arg) (sh.os.h). Without this fix the shell exits
-	:	immediately in interactive mode.
-	:	A fix in sh.init.c: Test for SIGRTMAX >= 0 added;
-	:	otherwise static data are overwritten (alvecp),	and the	shell
-	:	starts forking children	indefinitely.
-	:	All changes included in	a patch	avaliable from tor.teorfys.lu.se
-	:	Carl-Olof Almbladh (coa@teorfys.lu.se)
+NOTES	:	Carl-Olof Almbladh (coa@teorfys.lu.se)
 	:	To make a statically linked version: in config_f.h, #undef NLS
 	:	and use these LDFLAGS in the Makefile: LDFLAGS= -Wl,-a,archive
 	:	[orban@kato.den.csci.csc.com (Tom Orban)
-
+VERSION	:	6.08
 
 VENDOR	:	hp
+MODELS	:	SPP-1200 SPP-1600 S-2X00 X-2X00
+COMPILER:	cc
+CFLAGS	:	-Ae
+LIBES	:	-ltermcap
+OS	:	SPP-UX 5.X
+CONFIG	:	hpux8
+ENVIRON	:	n/a
+NOTES	:	n/a
+VERSION	:	6.07.02
 
 VENDOR	:	hp
 MODELS	:	hp9000s500
@@ -141,11 +151,11 @@ NOTES	:	cc broken: typedef void sigret_t; typedef void pret_t;
 VERSION	:	6.03.09
 
 VENDOR	:	digital
-MODELS	:	vax, decstation
-COMPILER:	cc
-CFLAGS	:	normal
+MODELS	:	vax, DECstation
+COMPILER:	cc, gcc
+CFLAGS	:	-O -Olimit 2000 (cc), normal (gcc)
 LIBES	:	-ltermcap
-OS	:	ultrix 3.0 (vax), 4.0, 4.1, 4.2, 4.3
+OS	:	ultrix 3.0 (vax), 4.0, 4.1, 4.2, 4.3, 4.4
 CONFIG	:	ultrix 
 ENVIRON	:	n/a
 NOTES	:	pcc broken: typedef void sigret_t (vax); 
@@ -153,7 +163,7 @@ NOTES	:	mips compiler on ultrix 3.5 needs -Dvoid=int
 NOTES	:	vax compiler on ultrix 3.0 needs -Dvoid=int
 NOTES	:	Does Ultrix 4.x still need YPBUGS?
 NOTES	:	Ultrix4.2 may need NAMEI_BUG
-VERSION	:	6.04.00
+VERSION	:	6.07.11
 
 VENDOR	:	apple
 MODELS	:	macII
@@ -318,6 +328,17 @@ CONFIG	:	cray
 ENVIRON	:	n/a
 NOTES	:	none
 VERSION	:	6.00.01
+
+VENDOR	:	Cray Research
+MODELS	:	C90
+COMPILER:	cc
+CFLAGS	:	normal
+LIBES	:	-ltermcap
+OS	:	Unicos 9.0.2.1
+CONFIG	:	cray
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.08
 
 VENDOR	:	pyramid
 MODELS	:	MIS4/2T 
@@ -811,22 +832,26 @@ NOTES	:	n/a
 VERSION	:	6.03.00
 
 VENDOR  :	digital
-MODELS  :	DECstation 3000/400 (alpha)
+MODELS  :	DEC 3000/400 (alpha)
 COMPILER:	cc
 CFLAGS  :	-call_shared -I. -I.. -O -Olimit 2000 -std1
 LIBES   :	-lcurses
 OS      :	OSF1 1.2
 CONFIG  :	decosf1
+ENVIRON :       n/a
+NOTES	:	none
 VERSION :	6.03
 
 VENDOR  :	digital
-MODELS  :	DECstation 3000/400 (alpha)
+MODELS  :	DEC 3000/400 (alpha)
 COMPILER:	cc
 CFLAGS  :	-O2 -I. -I.. -Olimit 2000
 LIBES   :	-lcurses
-OS      :	OSF1 1.3, 2.0, 3.0, 4.0
+OS      :	OSF1 (Digital Unix) 1.3, 2.0, 3.0, 3.2, 4.0
 CONFIG  :	decosf1
-VERSION :	6.07.02
+ENVIRON :       n/a
+NOTES	:	none
+VERSION :	6.07.11
 
 VENDOR  :	Intel
 MODELS  :	Paragon
@@ -921,6 +946,18 @@ NOTES   :       In config.h, set HAVEUTMPX und unset BSDSIGS and BSDTIMES
 NOTES   :
 VERSION :       6.06.03
 
+VENDOR  :       U/WIN
+MODELS  :       i386
+COMPILER:       cc
+CFLAGS  :       -O
+LIBES   :       -lcurses
+OS      :       Windows NT with U/WIN
+CONFIG  :       uwin
+ENVIRON :
+NOTES   :       Needs POSIX.DLL from U/WIN version later than 1.6
+NOTES   :       Did not function correctly when using #define SYSMALLOC
+VERSION :       6.07.02
+
 VENDOR  :       SNI (Siemens Nixdorf Information Systems)
 MODELS  :       rm600  (R4000 mips)
 COMPILER:       /usr/bin/cc
@@ -957,3 +994,13 @@ ENVIRON	:	n/a
 NOTES	:	none
 VERSION	:	6.06.00
 
+VENDOR	:	NEC
+MODELS	:	SX-4, SX-5
+COMPILER:	cc
+CFLAGS	:	-h0,ansi,novector,float0 # for NEC SX-4
+LIBES	:	-Gsmall
+OS	:	NEC's
+CONFIG	:	superux8
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.08.01

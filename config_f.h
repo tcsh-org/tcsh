@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.19 1998/09/19 14:45:15 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.20 1998/09/19 14:48:08 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -121,7 +121,8 @@
 
 /*
  * DSPMBYTE	add variable "dspmbyte" and display multi-byte string at
- *		only output, when "dspmbyte" is set.
+ *		only output, when "dspmbyte" is set. Should be used with
+ *		KANJI
  */
 #undef DSPMBYTE
 

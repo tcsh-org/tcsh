@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.35 1997/02/23 19:03:20 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.36 1997/10/27 22:44:28 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.35 1997/02/23 19:03:20 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.36 1997/10/27 22:44:28 christos Exp $")
 
 /*
  * C shell
@@ -183,7 +183,7 @@ sh_access(fname, mode)
 
 	if (n > 0) {
 	    groups = (GID_T *) xmalloc((size_t) (n * sizeof(GID_T)));
-	    n = getgroups(n, groups);
+	    n = getgroups((int) n, groups);
 	    while (--n >= 0)
 		if (groups[n] == statb.st_gid) {
 		    mode <<= 3;

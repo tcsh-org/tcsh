@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.color.c,v 1.3 1998/07/07 12:06:35 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.color.c,v 1.4 1998/09/13 13:51:23 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.3 1998/07/07 12:06:35 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.4 1998/09/13 13:51:23 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -162,7 +162,7 @@ getstring(dp, sp, pd, f)
     }
 
     pd->s = *dp;
-    pd->len = d - *dp;
+    pd->len = (int) (d - *dp);
     *sp = s;
     *dp = d;
     return *s == f;
@@ -247,7 +247,7 @@ parseLS_COLORS(value)
 	    v++;
     }
 
-    nextensions = e - extensions;
+    nextensions = (int) (e - extensions);
 }
 
 

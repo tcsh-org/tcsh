@@ -303,7 +303,13 @@ EOF
 	exit 0 ;;
     CRAY-2:*:*:*)
 	echo cray2-cray-unicos
-        exit 0 ;;
+	exit 0 ;;
+    SX-4:SUPER-UX:*:*)
+	echo sx4-nec-superux${UNAME_RELEASE}
+	exit 0 ;;
+    SX-5:SUPER-UX:*:*)
+	echo sx5-nec-superux${UNAME_RELEASE}
+	exit 0 ;;
     hp3[0-9][05]:NetBSD:*:*)
 	echo m68k-hp-netbsd${UNAME_RELEASE}
 	exit 0 ;;
@@ -422,12 +428,15 @@ EOF
     rs6000:LynxOS:2.[23]*:*)
 	echo rs6000-lynx-lynxos${UNAME_RELEASE}
 	exit 0 ;;
-    BS2000:POSIX-BC:1.0A:A30)
-	echo bs2000-sni-posix
+    BS2000:POSIX-BC:*:*)
+	echo bs2000-siemens-posix
 	exit 0 ;;
     RM*:SINIX-*:*:*)
 	echo mips-sni-sysv4
 	exit 0 ;;
+    i[3456]86:CYGWIN32_NT:*:*)
+      echo ${UNAME_MACHINE}-cygwin32-winnt
+      exit 0 ;;
     *:SINIX-*:*:*)
 	if uname -p 2>/dev/null >/dev/null ; then
 		UNAME_MACHINE=`(uname -p) 2>/dev/null`
@@ -518,6 +527,10 @@ main ()
 
 #if defined (alliant) && defined (i860)
   printf ("i860-alliant-bsd\n"); exit (0);
+#endif
+
+#if defined (__CYGWIN32__)
+  printf ("ix86-cygwin-winnt\n"); exit (0);
 #endif
 
   exit (1);

@@ -1,3 +1,21 @@
+ 15. V6.08.01 - 19981025
+ 14. SX4 port; this adds many casts for machines where ptrdiff_t is 64 bits.
+     (Andreas Schott)
+ 13. U/Win port; does not work properly with U/Win 1.6, wait for the next
+     version (Chris Jones)
+ 12. Sgi does not need gethostname prototype (John Bogan)
+ 11. Logic in sh.dir.c was wrong for NT (Amol)
+ 10. HP_CXD_SPP stat64 fixes (Scott Garee)
+  9. Documentation spelling fixes (Keith Thompson)
+  8. Documentation fix for savedirs (Amol)
+  7. Siemens OSD_POSIX fixes (Martin Kraemer)
+  6. include <errno.h> for all the BSD's (Trevor Johnson)
+  5. Multibyte display fixes for gnu ls (Taga Nayuta)
+  4. Configure/Makefile hesiod and bindir fixes (Dan Winship)
+  3. Use winnt not win32 in tc.os.h (Amol)
+  2. Cygwin32 port (Raj Menon)
+  1. Ported Fixes (Tom)
+
  95. V6.08.00 - 19981002
  94. where builtin nt fix (Amol)
  93. V6.07.13 - 19980926
@@ -1352,11 +1370,3 @@ V5.19.02, 10/23/90.
  1. Added IRIX3.3.1 support.
 
 V5.19.01, 9/26/90.
-7. Brought the README file up-to-date, and changed the bug report
-   address to point to me.
-6. sh.lex.c. In addla(), overflow computation was wrong.
-5. Fixed SHELLPATH, to be set correctly when $SHELL is not set.
-4. Fixed print statement in sh.proc.c that contained \215.
-3. Fixed the Makefile and MAKEDIFFS so that a tahoe diff can be made.
-2. RS6000: hacked around execv bug, and ed.init.c warning.
-1. Editor should not be enabled when we don't have a tty.

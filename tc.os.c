@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.48 1998/09/18 16:09:18 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.49 1998/09/19 14:45:19 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,12 +36,17 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.48 1998/09/18 16:09:18 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.49 1998/09/19 14:45:19 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 #include "sh.decls.h"
+
+#ifdef _UWIN
+#define TIOCGPGRP TIOCGETPGRP
+#define TIOCSPGRP TIOCSETPGRP
+#endif
 
 /***
  *** MACH
@@ -970,6 +975,14 @@ osinit()
 #ifdef apollo
     (void) isapad();
 #endif
+
+#ifdef _SX
+    /* 
+     * kill(SIGCONT) problems, don't know what this syscall does
+     * [schott@rzg.mpg.de]
+     */
+    syscall(151, getpid(), getpid());
+#endif /* _SX */
 }
 
 #ifdef strerror
@@ -1236,7 +1249,7 @@ xgetcwd(pathname, pathlen)
 		if (ISDOT(d->d_name) || ISDOTDOT(d->d_name))
 		    continue;
 		(void)strncpy(cur_name_add, d->d_name,
-		    &nextpathbuf[sizeof(nextpathbuf) - 1] - cur_name_add);
+		    (size_t) (&nextpathbuf[sizeof(nextpathbuf) - 1] - cur_name_add));
 		if (lstat(nextpathptr, &st_next) == -1) {
 		    /*
 		     * We might not be able to stat() some path components

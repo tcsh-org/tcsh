@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.43 1998/07/07 12:06:12 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.44 1998/09/04 21:16:44 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.43 1998/07/07 12:06:12 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.44 1998/09/04 21:16:44 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1665,7 +1665,7 @@ ChangeSize(lins, cols)
 		(void) Strcpy(backup, termcap);
 	    }
 	    else {
-		i = ptr - termcap + Strlen(buf);
+		i = (int) (ptr - termcap + Strlen(buf));
 		(void) Strncpy(backup, termcap, (size_t) i);
 		backup[i] = '\0';
 		Itoa(Val(T_co), buf);
@@ -1683,7 +1683,7 @@ ChangeSize(lins, cols)
 		(void) Strcpy(termcap, backup);
 	    }
 	    else {
-		i = ptr - backup + Strlen(buf);
+		i = (int) (ptr - backup + Strlen(buf));
 		(void) Strncpy(termcap, backup, (size_t) i);
 		termcap[i] = '\0';
 		Itoa(Val(T_li), buf);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.33 1998/06/27 12:27:27 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.34 1998/09/18 16:09:14 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.33 1998/06/27 12:27:27 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.34 1998/09/18 16:09:14 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1076,16 +1076,19 @@ x:
 }
 
 #if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
+bool dspmbyte_ls;
+
 void
 update_dspmbyte_vars()
 {
     int lp, iskcode;
     Char *dstr1;
-
+    struct varent *vp;
+    
     /* if variable "nokanji" is set, multi-byte display is disabled */
-    if (adrof(CHECK_MBYTEVAR) && !adrof(STRnokanji)) {
+    if ((vp = adrof(CHECK_MBYTEVAR)) && !adrof(STRnokanji)) {
 	_enable_mbdisp = 1;
-	dstr1 = varval(CHECK_MBYTEVAR);
+	dstr1 = vp->vec[0];
 	if(eq (dstr1, STRKSJIS))
 	    iskcode = 1;
 	else if (eq(dstr1, STRKEUC))
@@ -1098,6 +1101,10 @@ update_dspmbyte_vars()
 	       "Warning: unknown multibyte display; using default(euc(JP))\n"));
 	    iskcode = 2;
 	}
+	if (dstr1 && vp->vec[1] && eq(vp->vec[1], STRls))
+	  dspmbyte_ls = 1;
+	else
+	  dspmbyte_ls = 0;
 	for (lp = 0; lp < 256 && iskcode > 0; lp++) {
 	    switch (iskcode) {
 	    case 1:
@@ -1156,6 +1163,7 @@ update_dspmbyte_vars()
 	    _mbmap[lp] = 0;	/* Default map all 0 */
 	}
 	_enable_mbdisp = 0;
+	dspmbyte_ls = 0;
     }
 #ifdef MBYTEDEBUG	/* Sorry, use for beta testing */
     {

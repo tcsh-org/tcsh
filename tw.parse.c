@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.84 1998/06/27 12:27:45 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.85 1998/09/04 21:17:09 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.84 1998/06/27 12:27:45 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.85 1998/09/04 21:17:09 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -237,7 +237,7 @@ tenematch(inputline, num_read, command)
     space_left = QLINESIZE - 1;
     space_left -= word - qline;
 #else
-    space_left = QLINESIZE - 1 - (word - qline);
+    space_left = QLINESIZE - 1 - (int) (word - qline);
 #endif
 
     /*
@@ -527,7 +527,7 @@ insert_meta(cp, cpend, word, closequotes)
     Char buffer[2 * FILSIZ + 1], *bptr, *wptr;
     int in_sync = (cp != NULL);
     int qu = 0;
-    int ndel = cp ? cpend - cp : 0;
+    int ndel = (int) (cp ? cpend - cp : 0);
     Char w, wq;
 
     for (bptr = buffer, wptr = word;;) {

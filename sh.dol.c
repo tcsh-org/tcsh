@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.36 1998/06/27 12:27:15 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.37 1998/09/13 13:51:08 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.36 1998/06/27 12:27:15 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.37 1998/09/13 13:51:08 christos Exp $")
 
 /*
  * C shell
@@ -170,7 +170,7 @@ Dpack(wbuf, wp)
     Char   *wbuf, *wp;
 {
     register int c;
-    register int i = MAXWLEN - (wp - wbuf);
+    register int i = MAXWLEN - (int) (wp - wbuf);
 
     for (;;) {
 	c = DgetC(DODOL);
@@ -308,9 +308,9 @@ Dword()
      * rewritten. Therefore, we can't just ignore it, DAS DEC-90.
      */
 		i = MAXWLEN;
-		i -= (wp - wbuf);
+		i -= (int) (wp - wbuf);
 #else /* !masscomp */
-		i = MAXWLEN - (wp - wbuf);
+		i = MAXWLEN - (int) (wp - wbuf);
 #endif /* masscomp */
 		done = 0;
 	    }
@@ -342,9 +342,9 @@ Dword()
      * rewritten. Therefore, we can't just ignore it, DAS DEC-90.
      */
 		i = MAXWLEN;
-		i -= (wp - wbuf);
+		i -= (int) (wp - wbuf);
 #else /* !masscomp */
-		i = MAXWLEN - (wp - wbuf);
+		i = MAXWLEN - (int) (wp - wbuf);
 #endif /* masscomp */
 		done = 0;
 	    }
@@ -1054,7 +1054,7 @@ heredoc(term)
 	 */
 	if (c < 0 || eq(lbuf, term)) {
 	    (void) write(0, short2str(obuf), (size_t) (BUFSIZE - ocnt));
-	    (void) lseek(0, 0l, L_SET);
+	    (void) lseek(0, (off_t) 0, L_SET);
 	    inheredoc = 0;
 	    return;
 	}

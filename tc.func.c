@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.79 1998/09/13 13:51:12 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.80 1998/09/18 15:31:49 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.79 1998/09/13 13:51:12 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.80 1998/09/18 15:31:49 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -213,6 +213,9 @@ dolist(v, c)
 {
     int     i, k;
     struct stat st;
+#if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
+    extern bool dspmbyte_ls;
+#endif
 #ifdef COLOR_LS_F
     extern bool color_context_ls;
 #endif /* COLOR_LS_F */
@@ -294,6 +297,15 @@ dolist(v, c)
 	nextword->word = Strsave(STRmCF);
 	lastword->next = nextword;
 	nextword->prev = lastword;
+#if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
+	if (dspmbyte_ls) {
+	    lastword = nextword;
+	    nextword = (struct wordent *) xcalloc(1, sizeof cmd);
+	    nextword->word = Strsave(STRmmliteral);
+	    lastword->next = nextword;
+	    nextword->prev = lastword;
+	}
+#endif
 #ifdef COLOR_LS_F
 	if (color_context_ls) {
 	    lastword = nextword;
@@ -585,7 +597,7 @@ find_stop_ed()
 	     * editors have may be happily running in a separate window, no
 	     * point in foregrounding these if they're already running - webb
 	     */
-	    pstatus = pp->p_flags & PALLSTATES;
+	    pstatus = (int) (pp->p_flags & PALLSTATES);
 	    if (pstatus != PINTERRUPTED && pstatus != PSTOPPED &&
 		pstatus != PSIGNALED)
 		continue;

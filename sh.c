@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.82 1998/09/18 16:09:04 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.83 1998/09/26 12:28:26 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.82 1998/09/18 16:09:04 christos Exp $")
+RCSID("$Id: sh.c,v 3.83 1998/09/26 12:28:26 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -297,7 +297,7 @@ main(argc, argv)
     gid = getgid();
     euid = geteuid();
     egid = getegid();
-#ifdef OREO
+#if defined(OREO) || defined(DT_SUPPORT)
     /*
      * We are a login shell if: 1. we were invoked as -<something> with
      * optional arguments 2. or we were invoked only with the -l flag

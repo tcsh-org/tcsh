@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.84 1998/09/13 13:51:10 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.85 1998/09/18 16:09:13 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -189,6 +189,13 @@ typedef int sigret_t;
 # endif /* __EMX__ || WINNT */
 #endif /* !PATHSEP */
 
+#ifdef __HP_CXD_SPP
+# include <sys/cnx_stat.h>
+# define stat stat64
+# define fstat fstat64
+# define lstat lstat64
+#endif /* __HP_CXD_SPP */
+
 /*
  * This macro compares the st_dev field of struct stat. On aix on ibmESA
  * st_dev is a structure, so comparison does not work. 
@@ -216,7 +223,7 @@ typedef int sigret_t;
 
 #if defined(BSDTIMES) || defined(BSDLIMIT)
 # include <sys/time.h>
-# if SYSVREL>3 && !defined(SCO) && !defined(sgi) && !defined(SNI) && !defined(sun) && !(defined(__alpha) && defined(__osf__))
+# if SYSVREL>3 && !defined(SCO) && !defined(sgi) && !defined(SNI) && !defined(sun) && !(defined(__alpha) && defined(__osf__)) && !defined(_SX)
 #  include "/usr/ucbinclude/sys/resource.h"
 # else
 #  ifdef convex
@@ -237,7 +244,11 @@ typedef int sigret_t;
 #   include <sgtty.h>
 #  endif /* TERMIO */
 # else /* POSIX */
-#  include <termios.h>
+#  ifndef _UWIN
+#   include <termios.h>
+#  else
+#   include <termio.h>
+#  endif /* _UWIN */
 #  if SYSVREL > 3
 #   undef TIOCGLTC	/* we don't need those, since POSIX has them */
 #   undef TIOCSLTC
@@ -268,7 +279,7 @@ typedef int sigret_t;
  * redefines malloc(), so we define the following
  * to avoid it.
  */
-# if defined(linux) || defined(sgi)
+# if defined(linux) || defined(sgi) || defined(_OSD_POSIX)
 #  define NO_FIX_MALLOC
 #  include <stdlib.h>
 # else /* linux */
@@ -309,9 +320,9 @@ typedef int sigret_t;
 #define CSWTCH _POSIX_VDISABLE
 #endif
 
-#if (!defined(FIOCLEX) && defined(SUNOS4)) || ((SYSVREL == 4) && !defined(_SEQUENT_) && !defined(SCO))
+#if (!defined(FIOCLEX) && defined(SUNOS4)) || ((SYSVREL == 4) && !defined(_SEQUENT_) && !defined(SCO) && !defined(_SX))
 # include <sys/filio.h>
-#endif /* (!FIOCLEX && SUNOS4) || (SYSVREL == 4 && !_SEQUENT_ && !SCO) */
+#endif /* (!FIOCLEX && SUNOS4) || (SYSVREL == 4 && !_SEQUENT_ && !SCO && !_SX ) */
 
 #if !defined(_MINIX) && !defined(COHERENT) && !defined(supermax) && !defined(WINNT)
 # include <sys/file.h>
@@ -1154,7 +1165,7 @@ extern int	tcsh;
 /*
  * To print system call errors...
  */
-#ifdef __NetBSD__
+#ifdef BSD4_4
 # include <errno.h>
 #else
 # ifndef linux

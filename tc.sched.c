@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.sched.c,v 3.14 1996/04/26 19:21:25 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.sched.c,v 3.15 1997/10/28 22:34:34 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.14 1996/04/26 19:21:25 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.15 1997/10/28 22:34:34 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -171,7 +171,11 @@ dosched(v, c)
 	}
     }
     tp = (struct sched_event *) xcalloc(1, sizeof *tp);
+#ifdef _SX
+    tp->t_when = cur_time - ltp->tm_sec + dif_hour * 3600 + dif_min * 60;
+#else	/* _SX */	
     tp->t_when = cur_time - ltp->tm_sec + dif_hour * 3600L + dif_min * 60L;
+#endif /* _SX */
     /* use of tm_sec: get to beginning of minute. */
     if (!sched_ptr || tp->t_when < sched_ptr->t_when) {
 	tp->t_next = sched_ptr;

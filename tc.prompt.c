@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.33 1998/06/28 15:07:28 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.34 1998/09/04 21:17:01 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.33 1998/06/28 15:07:28 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.34 1998/09/04 21:17:01 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -205,7 +205,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
     for (; *cp; cp++) {
 	if (p >= ep)
 	    break;
-	if (*cp == '%') {
+	if ((*cp == '%') && ! (cp[1] == '\0')) {
 	    cp++;
 	    switch (*cp) {
 	    case 'R':
@@ -547,7 +547,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			if (p >= ep) break;
 		break;
 	    case '$':
-		sz = ep - p;
+		sz = (int) (ep - p);
 		(void) expdollar(&p, &cp, &pdirs, attributes);
 		break;
 	    case '%':

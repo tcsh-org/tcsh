@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.21 1998/04/21 16:08:40 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.22 1998/06/27 15:29:33 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.21 1998/04/21 16:08:40 christos Exp $")
+RCSID("$Id: host.defs,v 1.22 1998/06/27 15:29:33 christos Exp $")
 
 endcode	:
 
@@ -976,6 +976,14 @@ ostype	: 						: "posix"
 machtype:						: "bs2000"
 enddef	:
 
+newdef	: defined(_SX)
+comment : NEC Corporation (SX-4)
+vendor	: 						: "nec"
+ostype	:						: "superux"
+hosttype:						: "sx4"
+machtype:						: "sx4"
+enddef	:
+
 newdef  : !defined(SOLARIS2) && (SYSVREL == 4)
 comment : Unix System V Release 4.0
 vendor  : defined(DELL)					: "dell"
@@ -991,6 +999,14 @@ hosttype:						: "ds90"
 ostype	:						: "sysv4"
 machtype:						: "sparc"
 enddef	:
+
+newdef  : defined(_UWIN)
+comment : AT&T Research Unix for Windows
+vendor  :               				: "att"
+hosttype:                       			: "win32.i386"
+machtype:                       			: "i386"
+enddef	:
+
 
 newdef	: defined(mc68000) || defined(__mc68000__) || defined(mc68k32) || defined(m68k) || defined(mc68010) || defined(mc68020)
 hosttype:						: "m68k"

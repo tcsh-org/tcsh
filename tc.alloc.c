@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.alloc.c,v 3.31 1997/10/27 22:44:33 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.alloc.c,v 3.32 1998/04/08 13:59:01 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.31 1997/10/27 22:44:33 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.32 1998/04/08 13:59:01 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -255,7 +255,7 @@ morecore(bucket)
     if (membot == NULL)
 	membot = memtop;
     if ((long) op & 0x3ff) {
-	memtop = (char *) sbrk(1024 - ((long) op & 0x3ff));
+	memtop = (char *) sbrk((int) (1024 - ((long) op & 0x3ff)));
 	memtop += (long) (1024 - ((long) op & 0x3ff));
     }
 

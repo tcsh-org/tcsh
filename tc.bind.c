@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.30 1998/09/04 21:16:58 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.31 1998/09/26 12:28:31 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.30 1998/09/04 21:16:58 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.31 1998/09/26 12:28:31 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -285,7 +285,7 @@ parsebind(s, str)
     if (Iscntrl(*s)) {
 	*b++ = *s;
 	*b = '\0';
-	str->len = b - str->buf;
+	str->len = (int) (b - str->buf);
 	return str;
     }
 
@@ -417,7 +417,7 @@ parsebind(s, str)
 	return NULL;
     }
 
-    str->len = b - str->buf;
+    str->len = (int) (b - str->buf);
     return str;
 }
 
@@ -448,7 +448,7 @@ parsestring(str, buf)
 	    *b++ = *p & CHAR;
     }
     *b = 0;
-    buf->len = b - buf->buf;
+    buf->len = (int) (b - buf->buf);
     return buf;
 }
 

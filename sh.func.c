@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.76 1998/07/07 12:06:18 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.77 1998/09/18 16:09:11 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.76 1998/07/07 12:06:18 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.77 1998/09/18 16:09:11 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1695,7 +1695,11 @@ doumask(v, c)
 #   if defined(SOLARIS2)
      typedef rlim_t RLIM_TYPE;
 #   else
-     typedef unsigned long RLIM_TYPE;
+#    if defined(_SX)
+      typedef long long RLIM_TYPE;
+#    else /* _SX */
+      typedef unsigned long RLIM_TYPE;
+#    endif /* _SX */
 #   endif /* SOLARIS2 */
 #  endif /* BSD4_4 && !__386BSD__  */
 # endif /* BSDLIMIT */
@@ -1723,7 +1727,7 @@ doumask(v, c)
 #  endif /* SIGRTMIN */
 # endif /* (HPUXVERSION > 700) && BSDLIMIT */
 
-# if SYSVREL > 3 && defined(BSDLIMIT)
+# if SYSVREL > 3 && defined(BSDLIMIT) && !defined(_SX)
 /* In order to use rusage, we included "/usr/ucbinclude/sys/resource.h" in */
 /* sh.h.  However, some SVR4 limits are defined in <sys/resource.h>.  Rather */
 /* than include both and get warnings, we define the extra SVR4 limits here. */
@@ -1768,6 +1772,10 @@ struct limits limits[] =
 # ifdef RLIMIT_RSS
     { RLIMIT_RSS, 	"memoryuse",	1024,	"kbytes"	},
 # endif /* RLIMIT_RSS */
+
+# ifdef RLIMIT_UMEM
+    { RLIMIT_UMEM, 	"memoryuse",	1024,	"kbytes"	},
+# endif /* RLIMIT_UMEM */
 
 # ifdef RLIMIT_VMEM
     { RLIMIT_VMEM, 	"vmemoryuse",	1024,	"kbytes"	},
@@ -2009,7 +2017,9 @@ plim(lp, hard)
 	limit -= 0x20000000;
 #  endif /* aiws */
 # else /* BSDLIMIT */
+xprintf("Getting limit %s(%d)\n", lp->limname,lp->limconst);
     (void) getrlimit(lp->limconst, &rlim);
+xprintf("Hard: %lld, Soft: %lld\n", rlim.rlim_max, rlim.rlim_cur);
     limit = hard ? rlim.rlim_max : rlim.rlim_cur;
 # endif /* BSDLIMIT */
 
@@ -2034,7 +2044,12 @@ plim(lp, hard)
 	psecs((long) limit);
     else
 # endif /* RLIMIT_CPU */
+# if defined(_SX)
+	xprintf("(%ld , %ld)", rlim.rlim_max, rlim.rlim_cur);
+	xprintf("%ld / %d %s", limit,  div, lp->limscale);
+#else	/* _SX */
 	xprintf("%ld %s", (long) (limit / div), lp->limscale);
+#endif	/* _SX */
     xputchar('\n');
 }
 

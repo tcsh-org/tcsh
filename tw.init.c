@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.init.c,v 3.23 1998/04/08 17:57:43 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.init.c,v 3.24 1998/07/07 12:06:37 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.23 1998/04/08 17:57:43 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.24 1998/07/07 12:06:37 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -154,7 +154,7 @@ tw_str_add(sl, len)
 		    (Char *) xmalloc((size_t) (sl->tbuff * sizeof(Char)));
 	/* Re-thread the new pointer list, if changed */
 	if (ptr != NULL && ptr != sl->buff) {
-	    int offs = sl->buff - ptr;
+	    int offs = (int) (sl->buff - ptr);
 	    for (i = 0; i < sl->nlist; i++)
 		sl->list[i] += offs;
 	}
