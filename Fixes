@@ -1,5 +1,14 @@
 V6.05.00, ... 
- 36. 6.04.03, 09/30/93
+ 45. 6.04.04 11/12/93
+ 44. Made =x obey nonomatch.
+ 43. Fixed rechist and recdirs not to depend on savehist and savedirs
+ 42. Removed aliases, bind, linedit builtins [ifdef'ed out as OBSOLETE]
+ 41. change REMHOST to REMOTEHOST for compatibility with SGI.
+ 40. $owd was not working correctly.
+ 39. Debugging printf elimination (from Kimmo)
+ 38. Typos in the new hup code in sh.c (from Matt)
+ 37. Imakefile fix for sequent (from Jaap)
+ 36. 6.04.03, 10/30/93
  35. New manual page in place.
  34. Fixed Makefile sed RE to work with gnu sed.
  33. Added hup builtin.

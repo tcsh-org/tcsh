@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.55 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.56 1993/10/30 19:50:16 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.55 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: sh.c,v 3.56 1993/10/30 19:50:16 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -127,6 +127,7 @@ static	sigret_t	  phup		__P((int));
 static	void		  srcunit	__P((int, bool, int, Char **));
 static	void		  mailchk	__P((void));
 static	Char	 	**defaultpath	__P((void));
+static	void		  record	__P((void));
 
 int
 main(argc, argv)
@@ -497,12 +498,12 @@ main(argc, argv)
      */
     tsetenv(STRHOSTTYPE, str2short(gethosttype()));
 
-#ifdef REMHOST
+#ifdef REMOTEHOST
     /*
      * Try to determine the remote host we were logged in from.
      */
     remhost();
-#endif /* REMHOST */
+#endif /* REMOTEHOST */
  
 #ifdef apollo
     if ((tcp = getenv("SYSTYPE")) == NULL)
@@ -1146,10 +1147,7 @@ main(argc, argv)
 	    xprintf("exit\n");
 	}
     }
-    if (!fast) {
-	recdirs(NULL);
-	rechist(NULL);
-    }
+    record();
     exitstat();
     return (0);
 }
@@ -1440,10 +1438,7 @@ goodbye(v, c)
     struct command *c;
 {
     USE(c);
-    if (!fast) {
-	rechist(NULL);
-	recdirs(NULL);
-    }
+    record();
 
     if (loginsh) {
 	(void) signal(SIGQUIT, SIG_IGN);
@@ -1491,10 +1486,8 @@ int snum;
     if (snum)
 	(void) sigset(snum, SIG_IGN);
 #endif /* UNRELSIGS */
-    if (!fast) {
-	rechist(NULL);
-	recdirs(NULL);
-    }
+
+    record();
 
 #ifdef POSIXJOBS 
     /*
@@ -2078,11 +2071,11 @@ xexit(i)
     {
 	struct process *pp, *np;
 
-	/* Kill all processes market for hup'ing */
+	/* Kill all processes marked for hup'ing */
 	for (pp = proclist.p_next; pp; pp = pp->p_next) {
 	    np = pp;
 	    do 
-		if ((np->p_flags & PHUP) || np->p_jobid != shpgrp)
+		if ((np->p_flags & PHUP) && np->p_jobid != shpgrp)
 		    if (killpg(np->p_jobid, SIGHUP) != -1) {
 			/* In case the job was suspended... */
 			(void) killpg(np->p_jobid, SIGCONT);
@@ -2139,4 +2132,13 @@ defaultpath()
 #endif
     *blkp = NULL;
     return (blk);
+}
+
+static void
+record()
+{
+    if (!fast) {
+	recdirs(NULL, adrof(STRsavedirs) != NULL);
+	rechist(NULL, adrof(STRsavehist) != NULL);
+    }
 }

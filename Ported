@@ -389,6 +389,19 @@ NOTES   :       AUTOLOGOUT is probably best undef'ed
 NOTES   :       For 4.0, the NLS define in config.h can be enabled.
 VERSION :       6.01
 
+VENDOR	:	SGI
+MODELS	:	INDY
+COMPILER:	cc
+CFLAGS	:
+LIBES	:	-lcurses -lbsd
+OS	:	IRIX 5.1
+CONFIG	:	config.sgi
+ENVIRON	:	n/a
+NOTES	:	it will build without -lbsd but then job control
+NOTES	:	won't actually work.
+VERSION	:	6.04.00
+
+
 VENDOR  :       alliant
 MODELS  :       FX/2800 series
 COMPILER:       scc

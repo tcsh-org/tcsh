@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.49 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.50 1993/10/30 19:50:16 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -624,6 +624,10 @@ extern char *getwd();
 # ifdef SCO
 extern char *ttyname();   
 # endif /* SCO */
+
+# ifdef __clipper__
+extern char *ttyname();   
+# endif
 
 #endif /* !POSIX || SUNOS4 || UTekV || sysV88 */
 

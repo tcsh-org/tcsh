@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.37 1993/08/11 16:25:52 christos Exp $
+/**/# $Id: Imakefile,v 1.38 1993/10/30 16:58:18 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.04
 /**/# Marc Horowitz, MIT SIPB
@@ -176,7 +176,7 @@ LIBTERMCAP =
 #endif
 
 #if defined(SQNTArchitecture) || defined(SequentArchitecture)
-LIBSQNT=-lseq
+LIBSQNT=-lsocket -linet -lnsl -lseq
 #endif
 
 /* This may not be good enough - I don't have access to enough systems

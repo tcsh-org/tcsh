@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.36 1993/10/08 19:14:01 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.37 1993/10/30 19:50:16 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.36 1993/10/08 19:14:01 christos Exp christos $")
+RCSID("$Id: ed.chared.c,v 3.37 1993/10/30 19:50:16 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2329,6 +2329,7 @@ e_charswitch(cc)
 	return(CC_REFRESH);
     }
     else {
+	Cursor--;		/* Restore cursor position */
 	return(CC_ERROR);
     }
 }

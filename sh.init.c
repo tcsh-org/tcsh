@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.init.c,v 3.29 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.init.c,v 3.30 1993/10/30 19:50:16 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.29 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.30 1993/10/30 19:50:16 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -51,10 +51,14 @@ struct	biltins bfunc[] = {
     { ":",		dozip,		0,	INF	},
     { "@",		dolet,		0,	INF	},
     { "alias",		doalias,	0,	INF	},
+#ifdef OBSOLETE
     { "aliases",	doaliases,	0,	1,	},
+#endif
     { "alloc",		showall,	0,	1	},
     { "bg",		dobg,		0,	INF	},
+#ifdef OBSOLETE
     { "bind",		dobind,		0,	2	},
+#endif
     { "bindkey",	dobindkey,	0,	8	},
     { "break",		dobreak,	0,	0	},
     { "breaksw",	doswbrk,	0,	0	},
@@ -100,7 +104,9 @@ struct	biltins bfunc[] = {
 #ifndef HAVENOLIMIT
     { "limit",		dolimit,	0,	3	},
 #endif /* ! HAVENOLIMIT */
+#ifdef OBSOLETE
     { "linedit",	doecho,		0,	INF	},
+#endif
 #if !defined(HAVENOUTMP) && !defined(KAI)
     { "log",		dolog,		0,	0	},
 #endif /* !HAVENOUTMP && !KAI */

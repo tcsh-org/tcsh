@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.23 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.24 1993/07/07 19:16:17 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.23 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.24 1993/07/07 19:16:17 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -546,7 +546,7 @@ execash(t, kp)
      * Hmm, we don't really want to do that now because we might
      * fail, but what is the choice
      */
-    rechist(NULL);
+    rechist(NULL, 1);
 
 
     osigint  = signal(SIGINT, parintr);

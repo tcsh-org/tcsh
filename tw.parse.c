@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.56 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.57 1993/10/08 20:36:28 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.56 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.57 1993/10/08 20:36:28 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -319,12 +319,15 @@ tenematch(inputline, num_read, command)
 	 * We don't quote the last space if we had a unique match and 
 	 * addsuffix was set. Otherwise the last space was part of a word.
 	 */
-#ifdef notdef
 	if (*wp && InsertStr(quote_meta(wp, qu, search_ret == 1 &&
 			     is_set(STRaddsuffix) != NULL)) < 0)
 	    /* put it in the input buffer */
 	    return -1;		/* error inserting */
-#endif
+#ifdef notdef
+	/* 
+	 * We really don't want to delete what we have currently, breaks
+	 * completion
+	 */
 	if (*wp) {
 	    DeleteBack(str_end - word_start);
             if (*wordp == '$') {
@@ -337,6 +340,7 @@ tenematch(inputline, num_read, command)
 		    return -1;          /* error inserting */
             }
 	}
+#endif
 	return search_ret;
 
     case SPELL:

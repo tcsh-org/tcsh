@@ -96,7 +96,9 @@ static	int	 glob3		__P((Char *, Char *, Char *, Char *,
 				     glob_t *, int));
 static	int	 globextend	__P((Char *, glob_t *));
 static	int	 match		__P((Char *, Char *, Char *, int));
+#ifndef __clipper__
 static	int	 compare	__P((const ptr_t, const ptr_t));
+#endif
 static 	DIR	*Opendir	__P((Char *));
 #ifdef S_IFLNK
 static	int	 Lstat		__P((Char *, struct stat *));

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.20 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.21 1993/10/30 19:50:16 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -71,7 +71,7 @@ extern	void		  dopopd	__P((Char **, struct command *));
 extern	void		  dfree		__P((struct directory *));
 extern	void		  dsetstack	__P((void));
 extern	int		  getstakd	__P((Char *, int));
-extern	void		  recdirs	__P((Char *));
+extern	void		  recdirs	__P((Char *, int));
 extern	void		  loaddirs	__P((Char *));
 
 /*
@@ -190,7 +190,7 @@ extern	void	 	  dohist	__P((Char **, struct command *));
 extern  struct Hist 	 *enthist	__P((int, struct wordent *, bool, bool));
 extern	void	 	  savehist	__P((struct wordent *, bool));
 extern	void		  fmthist	__P((int, ptr_t, char *));
-extern	void		  rechist	__P((Char *));
+extern	void		  rechist	__P((Char *, int));
 extern	void		  loadhist	__P((Char *, bool));
 
 

@@ -1,4 +1,4 @@
-# $Id: Makefile.vms,v 1.14 1993/08/11 16:25:52 christos Exp $
+# $Id: Makefile.vms,v 1.15 1993/10/30 19:49:53 christos Exp christos $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -84,8 +84,14 @@ LFLAGS=$(INCLUDES)
 # Stardent Stellar or sunos4 /bin/cc or Solaris2.1 /opt/SUNWspro/bin/cc
 #CFLAGS = $(INCLUDES) -O4
 
+# Intergraph clipper CLIX 3.1
+#CFLAGS= -w -O2 $(INCLUDES)
+
 # Dnix 5.3
 #CFLAGS = -O -X7
+
+# Pyramid OS/x
+#CFLAGS = -OG
 
 # Apollo's with cc [apollo builtins don't work with gcc]
 # and apollo should not define __STDC__ if it does not have
@@ -105,10 +111,11 @@ LFLAGS=$(INCLUDES)
 # DEC/osf-1 on the alpha
 #DFLAGS=-D_BSD
 DFLAGS=
+#DFLAGS=-D_PATH_TCSH='"${DESTBIN}/tcsh"'
 
 
 ################################################################
-## LDLAGS.  Define something here if you need to
+## LDFLAGS.  Define something here if you need to
 ################################################################
 LDFLAGS= 			## The simplest, suitable for all.
 #LDFLAGS= -s			## Stripped. Takes less space on disk.
@@ -134,10 +141,9 @@ LDFLAGS= 			## The simplest, suitable for all.
 #LIBES= -ltermcap -lauth		 ## Ultrix with Enhanced Security
 #LIBES= -ltermcap -ldir -lx		 ## Xenix 386 style things
 #LIBES= -ltermcap -lndir -lsocket -ljobs ## masscomp RTU6.0
-#LIBES= -ltermc				 ## emx under OS/2
 #LIBES= -lcurses			 ## AIX on the rt
 #LIBES= -lcurses			 ## TitanOS on the stellar
-#LIBES= -lcurses			 ## SysV4 w/o BSDTIMES or Solaris 2
+#LIBES= -ltermlib			 ## SysV4 w/o BSDTIMES or Solaris 2
 #LIBES= -lcurses			 ## SysV3 w/o networking
 #LIBES= -lcurses -lnet			 ## SysV3 with networking
 #LIBES= -lcurses -ldir			 ## SysV2 w/o networking & dirlib
@@ -181,6 +187,8 @@ LIBES=					 ## Minix, VMS_POSIX
 #CC=	cc
 #CC=	occ
 #CC=	acc
+#CC=	pcc
+#CC=	hc -w
 CC=	c89	# For VMS/POSIX
 #CC=	/bin/cc	# For suns, w/o gcc and SVR4
 #CC=	/usr/lib/sun.compile/cc  # FPS 500 (+FPX) with Sun C compiler
@@ -383,19 +391,19 @@ install: tcsh
 	-strip ${DESTBIN}/tcsh
 	chmod 555 ${DESTBIN}/tcsh
 
-manpage: tcsh.man
+install.man: tcsh.man
 	-rm -f ${DESTMAN}/tcsh.${MANSECT}
 	cp tcsh.man ${DESTMAN}/tcsh.${MANSECT}
 	chmod 444 ${DESTMAN}/tcsh.${MANSECT}
 
 # Amiga Unix
-#manpage: tcsh.man
+#install.man: tcsh.man
 #        compress tcsh.man
 #	cp tcsh.man.Z ${DESTMAN}/tcsh.Z
 #	chmod 444 ${DESTMAN}/tcsh.Z
 
 # Apple A/UX
-#manpage: tcsh.man
+#install.man: tcsh.man
 #	-rm -f ${DESTMAN}/tcsh.${MANSECT}.Z
 #	nroff -man tcsh.man | compress > ${DESTMAN}/tcsh.${MANSECT}.Z
 #	chmod 444 ${DESTMAN}/tcsh.${MANSECT}.Z

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.30 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.31 1993/08/11 16:25:52 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.30 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: tc.os.c,v 3.31 1993/08/11 16:25:52 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1060,8 +1060,13 @@ xgetwd(pathname)
 	if (DEV_DEV_COMPARE(st_dotdot.st_dev, st_cur.st_dev)) {
 	    /* Parent has same device. No need to stat every member */
 	    for (d = readdir(dp); d != NULL; d = readdir(dp)) 
+#ifdef __clipper__
+		if (((unsigned long)d->d_fileno & 0xffff) == st_cur.st_ino)
+		    break;
+#else
 		if (d->d_fileno == st_cur.st_ino)
 		    break;
+#endif
 	}
 	else {
 	    /* 

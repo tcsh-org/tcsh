@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.33 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.34 1993/10/30 19:50:16 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.33 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.34 1993/10/30 19:50:16 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -575,6 +575,13 @@ gethosttype()
 # endif
 
 # ifndef _havehosttype_
+#  if defined(__clipper__)
+#   define _havehosttype_
+     hosttype = "clipper";	/* Clipper Chipset (Intergraph) */
+#  endif 
+# endif
+
+# ifndef _havehosttype_
 #  define _havehosttype_
     /* Default to something reasonable */
     hosttype = "unknown";
@@ -654,7 +661,7 @@ fix_version()
 #else
 # define NGSTR	""
 #endif
-#ifdef REMHOST
+#ifdef REMOTEHOST
 # define RHSTR	",rh"
 #else
 # define RHSTR	""

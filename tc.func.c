@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.45 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.46 1993/10/30 20:03:30 christos Exp christos $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.45 1993/10/30 19:50:16 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.46 1993/10/30 20:03:30 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1456,6 +1456,7 @@ getusername(hm)
     return NULL;
 }
 
+#ifdef OBSOLETE
 /*
  * PWP: read a bunch of aliases out of a file QUICKLY.  The format
  *  is almost the same as the result of saying "alias > FILE", except
@@ -1543,6 +1544,7 @@ eof:
 	blkfree(gargv), gargv = 0;
     resexit(oldexit);
 }
+#endif
 
 
 /*
@@ -1772,7 +1774,7 @@ hashbang(fd, vp)
 }
 #endif /* HASHBANG */
 
-#ifdef REMHOST
+#ifdef REMOTEHOST
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -1817,6 +1819,6 @@ remhost()
     }
 
     if (host)
-	tsetenv(STRREMHOST, str2short(host));
+	tsetenv(STRREMOTEHOST, str2short(host));
 }
-#endif /* REMHOST */
+#endif /* REMOTEHOST */

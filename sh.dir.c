@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dir.c,v 3.32 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dir.c,v 3.33 1993/10/30 19:50:16 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.32 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.33 1993/10/30 19:50:16 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -141,8 +141,8 @@ Char *dp;
      * Don't call set() directly cause if the directory contains ` or
      * other junk characters glob will fail. 
      */
-    set(STRcwd, Strsave(dp), VAR_READWRITE);
     set(STRowd, Strsave(value(STRcwd)), VAR_READWRITE);
+    set(STRcwd, Strsave(dp), VAR_READWRITE);
 
     tsetenv(STRPWD, dp);
 }
@@ -210,7 +210,7 @@ dodirs(v, c)
     if ((dflag & DIR_LOAD) != 0) 
 	loaddirs(*v++);
     else if ((dflag & DIR_SAVE) != 0)
-	recdirs(*v++);
+	recdirs(*v++, 1);
 
     if (*v != NULL || (dflag & DIR_OLD))
 	stderror(ERR_DIRUS, "dirs", flags, "");
@@ -1284,17 +1284,16 @@ loaddirs(fname)
  * -strike
  */
 void
-recdirs(fname)
+recdirs(fname, def)
     Char *fname;
+    int def;
 {
     int     fp, ftmp, oldidfds;
     int     cdflag = 0;
     extern struct directory *dcwd;
     struct directory *dp;
 
-    if (fname == NULL) {
-	if (adrof(STRsavedirs) == NULL)
-	    return;
+    if (fname == NULL && def) {
 	if ((fname = value(STRdirsfile)) == STRNULL)
 	    fname = Strspl(value(STRhome), &STRtildotdirs[1]);
 	else

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.bind.c,v 3.15 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.bind.c,v 3.16 1993/10/08 19:14:01 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,15 +36,19 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.15 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.16 1993/10/08 19:14:01 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
 
+#ifdef OBSOLETE
 static	int    tocontrol	__P((int));
 static	char  *unparsekey	__P((int));
 static	KEYCMD getkeycmd	__P((Char **));
 static	int    parsekey		__P((Char **));
+static	void   pkeys		__P((int, int));
+#endif
+
 static	void   printkey		__P((KEYCMD *, Char *));
 static	KEYCMD parsecmd		__P((Char *));
 static	Char  *parsestring	__P((Char *, Char *));
@@ -52,285 +56,10 @@ static	void   print_all_keys	__P((void));
 static	void   printkeys	__P((KEYCMD *, int, int));
 static	void   bindkey_usage	__P((void));
 static	void   list_functions	__P((void));
-static	void   pkeys		__P((int, int));
 
 extern int MapsAreInited;
 
-/*
- * Unfortunately the apollo optimizer does not like & operations
- * with 0377, and produces illegal instructions. So we make it
- * an unsigned char, and hope for the best.
- * Of-course the compiler is smart enough to produce bad assembly
- * language instructions, but dumb when it comes to fold the constant :-)
- */
-#ifdef apollo
-static unsigned char APOLLO_0377 = 0377;
-#else /* sane */
-# define APOLLO_0377    0377
-#endif /* apollo */
 
-
-static int
-tocontrol(c)
-    int    c;
-{
-    c &= CHAR;
-    if (Islower(c))
-	c = Toupper(c);
-    else if (c == ' ')
-	c = '@';
-    if (c == '?')
-	c = 0177;
-    else
-	c &= 037;
-    return (c);
-}
-
-static char *
-unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
-    register int c;
-{
-    register char *cp;
-    static char tmp[10];
-
-    cp = tmp;
-
-    if (c & 0400) {
-	*cp++ = 'A';
-	*cp++ = '-';
-	c &= APOLLO_0377;
-    }
-    if ((c & META) && !(Isprint(c) || (Iscntrl(c) && Isprint(c | 0100)))) {
-	*cp++ = 'M';
-	*cp++ = '-';
-	c &= ASCII;
-    }
-    if (Isprint(c)) {
-	*cp++ = (char) c;
-	*cp = '\0';
-	return (tmp);
-    }
-    switch (c) {
-    case ' ':
-	(void) strcpy(cp, "Spc");
-	return (tmp);
-    case '\n':
-	(void) strcpy(cp, "Lfd");
-	return (tmp);
-    case '\r':
-	(void) strcpy(cp, "Ret");
-	return (tmp);
-    case '\t':
-	(void) strcpy(cp, "Tab");
-	return (tmp);
-    case '\033':
-	(void) strcpy(cp, "Esc");
-	return (tmp);
-    case '\177':
-	(void) strcpy(cp, "Del");
-	return (tmp);
-    default:
-	*cp++ = '^';
-	if (c == '\177') {
-	    *cp++ = '?';
-	}
-	else {
-	    *cp++ = c | 0100;
-	}
-	*cp = '\0';
-	return (tmp);
-    }
-}
-
-static  KEYCMD
-getkeycmd(sp)
-    Char  **sp;
-{
-    register Char *s = *sp;
-    register char c;
-    register KEYCMD keycmd = F_UNASSIGNED;
-    KEYCMD *map;
-    int     meta = 0;
-    Char   *ret_sp = s;
-
-    map = CcKeyMap;
-
-    while (*s) {
-	if (*s == '^' && s[1]) {
-	    s++;
-	    c = tocontrol(*s++);
-	}
-	else
-	    c = *s++;
-
-	if (*s == '\0')
-	    break;
-
-	switch (map[c | meta]) {
-	case F_METANEXT:
-	    meta = META;
-	    keycmd = F_METANEXT;
-	    ret_sp = s;
-	    break;
-
-	case F_XKEY:
-	    keycmd = F_XKEY;
-	    ret_sp = s;
-	    /* FALLTHROUGH */
-
-	default:
-	    *sp = ret_sp;
-	    return (keycmd);
-
-	}
-    }
-    *sp = ret_sp;
-    return (keycmd);
-}
-
-static int
-parsekey(sp)
-    Char  **sp;			/* Return position of first unparsed character
-				 * for return value -2 (xkeynext) */
-{
-    register int c, meta = 0, control = 0, ctrlx = 0;
-    Char   *s = *sp;
-    KEYCMD  keycmd;
-
-    if (s == NULL) {
-	xprintf("bad key specification -- null string\n");
-	return -1;
-    }
-    if (*s == 0) {
-	xprintf("bad key specification -- empty string\n");
-	return -1;
-    }
-
-    (void) strip(s);		/* trim to 7 bits. */
-
-    if (s[1] == 0)		/* single char */
-	return (s[0] & APOLLO_0377);
-
-    if ((s[0] == 'F' || s[0] == 'f') && s[1] == '-') {
-	if (s[2] == 0) {
-	    xprintf("Bad function-key specification.  Null key not allowed\n");
-	    return (-1);
-	}
-	*sp = s + 2;
-	return (-2);
-    }
-
-    if (s[0] == '0' && s[1] == 'x') {	/* if 0xn, then assume number */
-	c = 0;
-	for (s += 2; *s; s++) {	/* convert to hex; skip the first 0 */
-	    c *= 16;
-	    if (!Isxdigit(*s)) {
-		xprintf("bad key specification -- malformed hex number\n");
-		return -1;	/* error */
-	    }
-	    if (Isdigit(*s))
-		c += *s - '0';
-	    else if (*s >= 'a' && *s <= 'f')
-		c += *s - 'a' + 0xA;
-	    else if (*s >= 'F' && *s <= 'F')
-		c += *s - 'A' + 0xA;
-	}
-    }
-    else if (s[0] == '0' && Isdigit(s[1])) {	/* if 0n, then assume number */
-	c = 0;
-	for (s++; *s; s++) {	/* convert to octal; skip the first 0 */
-	    if (!Isdigit(*s) || *s == '8' || *s == '9') {
-		xprintf("bad key specification -- malformed octal number\n");
-		return -1;	/* error */
-	    }
-	    c = (c * 8) + *s - '0';
-	}
-    }
-    else if (Isdigit(s[0]) && Isdigit(s[1])) {	/* decimal number */
-	c = 0;
-	for (; *s; s++) {	/* convert to octal; skip the first 0 */
-	    if (!Isdigit(*s)) {
-		xprintf("bad key specification -- malformed decimal number\n");
-		return -1;	/* error */
-	    }
-	    c = (c * 10) + *s - '0';
-	}
-    }
-    else {
-	keycmd = getkeycmd(&s);
-
-	if ((s[0] == 'X' || s[0] == 'x') && s[1] == '-') {	/* X- */
-	    ctrlx++;
-	    s += 2;
-	    keycmd = getkeycmd(&s);
-	}
-	if ((*s == 'm' || *s == 'M') && s[1] == '-') {	/* meta */
-	    meta++;
-	    s += 2;
-	    keycmd = getkeycmd(&s);
-	}
-	else if (keycmd == F_METANEXT && *s) {	/* meta */
-	    meta++;
-	    keycmd = getkeycmd(&s);
-	}
-	if (*s == '^' && s[1]) {
-	    control++;
-	    s++;
-	    keycmd = getkeycmd(&s);
-	}
-	else if ((*s == 'c' || *s == 'C') && s[1] == '-') {	/* control */
-	    control++;
-	    s += 2;
-	    keycmd = getkeycmd(&s);
-	}
-
-	if (keycmd == F_XKEY) {
-	    if (*s == 0) {
-		xprintf("Bad function-key specification.\n");
-		xprintf("Null key not allowed\n");
-		return (-1);
-	    }
-	    *sp = s;
-	    return (-2);
-	}
-
-	if (s[1] != 0) {	/* if symbolic name */
-	    char   *ts;
-
-	    ts = short2str(s);
-	    if (!strcmp(ts, "space") || !strcmp(ts, "Spc"))
-		c = ' ';
-	    else if (!strcmp(ts, "return") || !strcmp(ts, "Ret"))
-		c = '\r';
-	    else if (!strcmp(ts, "newline") || !strcmp(ts, "Lfd"))
-		c = '\n';
-	    else if (!strcmp(ts, "linefeed"))
-		c = '\n';
-	    else if (!strcmp(ts, "tab"))
-		c = '\t';
-	    else if (!strcmp(ts, "escape") || !strcmp(ts, "Esc"))
-		c = '\033';
-	    else if (!strcmp(ts, "backspace"))
-		c = '\b';
-	    else if (!strcmp(ts, "delete"))
-		c = '\177';
-	    else {
-		xprintf("bad key specification -- unknown name \"%S\"\n", s);
-		return -1;	/* error */
-	    }
-	}
-	else
-	    c = *s;		/* just a single char */
-
-	if (control)
-	    c = tocontrol(c);
-	if (meta)
-	    c |= META;
-	if (ctrlx)
-	    c |= 0400;
-    }
-    return (c & 0777);
-}
 
 
 /*ARGSUSED*/
@@ -772,6 +501,284 @@ list_functions()
     }
 }
 
+#ifdef OBSOLETE
+
+/*
+ * Unfortunately the apollo optimizer does not like & operations
+ * with 0377, and produces illegal instructions. So we make it
+ * an unsigned char, and hope for the best.
+ * Of-course the compiler is smart enough to produce bad assembly
+ * language instructions, but dumb when it comes to fold the constant :-)
+ */
+#ifdef apollo
+static unsigned char APOLLO_0377 = 0377;
+#else /* sane */
+# define APOLLO_0377    0377
+#endif /* apollo */
+
+static int
+tocontrol(c)
+    int    c;
+{
+    c &= CHAR;
+    if (Islower(c))
+	c = Toupper(c);
+    else if (c == ' ')
+	c = '@';
+    if (c == '?')
+	c = 0177;
+    else
+	c &= 037;
+    return (c);
+}
+
+static char *
+unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
+    register int c;
+{
+    register char *cp;
+    static char tmp[10];
+
+    cp = tmp;
+
+    if (c & 0400) {
+	*cp++ = 'A';
+	*cp++ = '-';
+	c &= APOLLO_0377;
+    }
+    if ((c & META) && !(Isprint(c) || (Iscntrl(c) && Isprint(c | 0100)))) {
+	*cp++ = 'M';
+	*cp++ = '-';
+	c &= ASCII;
+    }
+    if (Isprint(c)) {
+	*cp++ = (char) c;
+	*cp = '\0';
+	return (tmp);
+    }
+    switch (c) {
+    case ' ':
+	(void) strcpy(cp, "Spc");
+	return (tmp);
+    case '\n':
+	(void) strcpy(cp, "Lfd");
+	return (tmp);
+    case '\r':
+	(void) strcpy(cp, "Ret");
+	return (tmp);
+    case '\t':
+	(void) strcpy(cp, "Tab");
+	return (tmp);
+    case '\033':
+	(void) strcpy(cp, "Esc");
+	return (tmp);
+    case '\177':
+	(void) strcpy(cp, "Del");
+	return (tmp);
+    default:
+	*cp++ = '^';
+	if (c == '\177') {
+	    *cp++ = '?';
+	}
+	else {
+	    *cp++ = c | 0100;
+	}
+	*cp = '\0';
+	return (tmp);
+    }
+}
+
+static  KEYCMD
+getkeycmd(sp)
+    Char  **sp;
+{
+    register Char *s = *sp;
+    register char c;
+    register KEYCMD keycmd = F_UNASSIGNED;
+    KEYCMD *map;
+    int     meta = 0;
+    Char   *ret_sp = s;
+
+    map = CcKeyMap;
+
+    while (*s) {
+	if (*s == '^' && s[1]) {
+	    s++;
+	    c = tocontrol(*s++);
+	}
+	else
+	    c = *s++;
+
+	if (*s == '\0')
+	    break;
+
+	switch (map[c | meta]) {
+	case F_METANEXT:
+	    meta = META;
+	    keycmd = F_METANEXT;
+	    ret_sp = s;
+	    break;
+
+	case F_XKEY:
+	    keycmd = F_XKEY;
+	    ret_sp = s;
+	    /* FALLTHROUGH */
+
+	default:
+	    *sp = ret_sp;
+	    return (keycmd);
+
+	}
+    }
+    *sp = ret_sp;
+    return (keycmd);
+}
+
+static int
+parsekey(sp)
+    Char  **sp;			/* Return position of first unparsed character
+				 * for return value -2 (xkeynext) */
+{
+    register int c, meta = 0, control = 0, ctrlx = 0;
+    Char   *s = *sp;
+    KEYCMD  keycmd;
+
+    if (s == NULL) {
+	xprintf("bad key specification -- null string\n");
+	return -1;
+    }
+    if (*s == 0) {
+	xprintf("bad key specification -- empty string\n");
+	return -1;
+    }
+
+    (void) strip(s);		/* trim to 7 bits. */
+
+    if (s[1] == 0)		/* single char */
+	return (s[0] & APOLLO_0377);
+
+    if ((s[0] == 'F' || s[0] == 'f') && s[1] == '-') {
+	if (s[2] == 0) {
+	    xprintf("Bad function-key specification.  Null key not allowed\n");
+	    return (-1);
+	}
+	*sp = s + 2;
+	return (-2);
+    }
+
+    if (s[0] == '0' && s[1] == 'x') {	/* if 0xn, then assume number */
+	c = 0;
+	for (s += 2; *s; s++) {	/* convert to hex; skip the first 0 */
+	    c *= 16;
+	    if (!Isxdigit(*s)) {
+		xprintf("bad key specification -- malformed hex number\n");
+		return -1;	/* error */
+	    }
+	    if (Isdigit(*s))
+		c += *s - '0';
+	    else if (*s >= 'a' && *s <= 'f')
+		c += *s - 'a' + 0xA;
+	    else if (*s >= 'F' && *s <= 'F')
+		c += *s - 'A' + 0xA;
+	}
+    }
+    else if (s[0] == '0' && Isdigit(s[1])) {	/* if 0n, then assume number */
+	c = 0;
+	for (s++; *s; s++) {	/* convert to octal; skip the first 0 */
+	    if (!Isdigit(*s) || *s == '8' || *s == '9') {
+		xprintf("bad key specification -- malformed octal number\n");
+		return -1;	/* error */
+	    }
+	    c = (c * 8) + *s - '0';
+	}
+    }
+    else if (Isdigit(s[0]) && Isdigit(s[1])) {	/* decimal number */
+	c = 0;
+	for (; *s; s++) {	/* convert to octal; skip the first 0 */
+	    if (!Isdigit(*s)) {
+		xprintf("bad key specification -- malformed decimal number\n");
+		return -1;	/* error */
+	    }
+	    c = (c * 10) + *s - '0';
+	}
+    }
+    else {
+	keycmd = getkeycmd(&s);
+
+	if ((s[0] == 'X' || s[0] == 'x') && s[1] == '-') {	/* X- */
+	    ctrlx++;
+	    s += 2;
+	    keycmd = getkeycmd(&s);
+	}
+	if ((*s == 'm' || *s == 'M') && s[1] == '-') {	/* meta */
+	    meta++;
+	    s += 2;
+	    keycmd = getkeycmd(&s);
+	}
+	else if (keycmd == F_METANEXT && *s) {	/* meta */
+	    meta++;
+	    keycmd = getkeycmd(&s);
+	}
+	if (*s == '^' && s[1]) {
+	    control++;
+	    s++;
+	    keycmd = getkeycmd(&s);
+	}
+	else if ((*s == 'c' || *s == 'C') && s[1] == '-') {	/* control */
+	    control++;
+	    s += 2;
+	    keycmd = getkeycmd(&s);
+	}
+
+	if (keycmd == F_XKEY) {
+	    if (*s == 0) {
+		xprintf("Bad function-key specification.\n");
+		xprintf("Null key not allowed\n");
+		return (-1);
+	    }
+	    *sp = s;
+	    return (-2);
+	}
+
+	if (s[1] != 0) {	/* if symbolic name */
+	    char   *ts;
+
+	    ts = short2str(s);
+	    if (!strcmp(ts, "space") || !strcmp(ts, "Spc"))
+		c = ' ';
+	    else if (!strcmp(ts, "return") || !strcmp(ts, "Ret"))
+		c = '\r';
+	    else if (!strcmp(ts, "newline") || !strcmp(ts, "Lfd"))
+		c = '\n';
+	    else if (!strcmp(ts, "linefeed"))
+		c = '\n';
+	    else if (!strcmp(ts, "tab"))
+		c = '\t';
+	    else if (!strcmp(ts, "escape") || !strcmp(ts, "Esc"))
+		c = '\033';
+	    else if (!strcmp(ts, "backspace"))
+		c = '\b';
+	    else if (!strcmp(ts, "delete"))
+		c = '\177';
+	    else {
+		xprintf("bad key specification -- unknown name \"%S\"\n", s);
+		return -1;	/* error */
+	    }
+	}
+	else
+	    c = *s;		/* just a single char */
+
+	if (control)
+	    c = tocontrol(c);
+	if (meta)
+	    c |= META;
+	if (ctrlx)
+	    c |= 0400;
+    }
+    return (c & 0777);
+}
+
+
 /*ARGSUSED*/
 void
 dobind(v, dummy)
@@ -971,3 +978,4 @@ pkeys(first, last)
 	xprintf("CcAltMap[%d] == %d\n", first, CcAltMap[first]);
     }
 }
+#endif /* OBSOLETE */

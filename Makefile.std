@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.57 1993/08/11 16:25:52 christos Exp christos $
+# $Id: Makefile.std,v 1.58 1993/10/30 19:49:53 christos Exp christos $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -84,6 +84,9 @@ CFLAGS=-O2 $(INCLUDES) -g
 # Stardent Stellar or sunos4 /bin/cc or Solaris2.1 /opt/SUNWspro/bin/cc
 #CFLAGS = $(INCLUDES) -O4
 
+# Intergraph clipper CLIX 3.1
+#CFLAGS= -w -O2 $(INCLUDES)
+
 # Dnix 5.3
 #CFLAGS = -O -X7
 
@@ -140,7 +143,7 @@ LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -ltermcap -lndir -lsocket -ljobs ## masscomp RTU6.0
 #LIBES= -lcurses			 ## AIX on the rt
 #LIBES= -lcurses			 ## TitanOS on the stellar
-#LIBES= -lcurses			 ## SysV4 w/o BSDTIMES or Solaris 2
+#LIBES= -ltermlib			 ## SysV4 w/o BSDTIMES or Solaris 2
 #LIBES= -lcurses			 ## SysV3 w/o networking
 #LIBES= -lcurses -lnet			 ## SysV3 with networking
 #LIBES= -lcurses -ldir			 ## SysV2 w/o networking & dirlib
@@ -341,7 +344,7 @@ tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
 	@echo '#define _h_tc_const' >> $@
 	${CC} -E $(INCLUDES) ${DFLAGS} -D_h_tc_const tc.const.c | \
 	    grep 'Char STR' | \
-	    sed -e 's/Char \([a-zA-Z0-9_]*\)\(.*\)/extern Char \1[];/' | \
+	    sed -e 's/Char \([a-zA-Z0-9_]*\)\[.*/extern Char \1[];/' | \
 	    sort >> $@
 	@echo '#endif /* _h_tc_const */' >> $@
 

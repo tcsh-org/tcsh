@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.50 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.51 1993/10/30 19:50:16 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.50 1993/08/11 16:25:52 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.51 1993/10/30 19:50:16 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -335,7 +335,7 @@ dologin(v, c)
 {
     USE(c);
     islogin();
-    rechist(NULL);
+    rechist(NULL, 1);
     (void) signal(SIGTERM, parterm);
     (void) execl(_PATH_LOGIN, "login", short2str(v[1]), NULL);
     untty();
