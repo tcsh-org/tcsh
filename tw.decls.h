@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.decls.h,v 3.10 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.decls.h,v 3.11 1993/10/08 19:21:36 christos Exp christos $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -89,6 +89,7 @@ extern	 Char		 *tw_grpname_next	__P((Char *, int *));
 extern	 void		  tw_dir_end		__P((void));
 extern	 void		  tw_cmd_free		__P((void));
 extern	 void		  tw_logname_end	__P((void));
+extern	 void		  tw_grpname_end	__P((void));
 extern	 Char		 *tw_item_add		__P((int));
 extern	 Char	        **tw_item_get		__P((void));
 extern	 void		  tw_item_free		__P((void));

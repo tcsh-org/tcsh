@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.55 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.56 1993/10/08 19:14:01 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.55 1993/08/11 16:25:52 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.56 1993/10/08 19:14:01 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -81,7 +81,7 @@ static void (*tw_end_entry[]) __P((void)) = {
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
     tw_dir_end,	       tw_dir_end,     tw_dir_end,    tw_dir_end,
-    tw_grpname_next
+    tw_grpname_end
 };
 
 /* #define TDEBUG */
