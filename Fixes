@@ -1,3 +1,4 @@
+ 28. SUSE dspmbyte fixes (via Harald)
  27. Newline handling in command substitution controlled by csubstnonl
      (Miloslav Trmac)
  26. Fix UNC prompt expansion (WIN32) (Yasuhiro Matsumoto)

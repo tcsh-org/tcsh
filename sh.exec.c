@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.59 2004/08/04 14:28:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.60 2004/08/04 17:12:29 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.59 2004/08/04 14:28:23 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.60 2004/08/04 17:12:29 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -592,10 +592,10 @@ execash(t, kp)
     oSHDIAG = SHDIAG;
     oOLDSTD = OLDSTD;
 
-    saveIN = dcopy(SHIN, -1);
-    saveOUT = dcopy(SHOUT, -1);
-    saveDIAG = dcopy(SHDIAG, -1);
-    saveSTD = dcopy(OLDSTD, -1);
+    (void)close_on_exec (saveIN = dcopy(SHIN, -1), 1);
+    (void)close_on_exec (saveOUT = dcopy(SHOUT, -1), 1);
+    (void)close_on_exec (saveDIAG = dcopy(SHDIAG, -1), 1);
+    (void)close_on_exec (saveSTD = dcopy(OLDSTD, -1), 1);
 	
     lshift(kp->t_dcom, 1);
 
@@ -609,9 +609,9 @@ execash(t, kp)
 #else /* !cray */
     if ((my_reenter = setexit()) == 0) {
 #endif /* cray */
-	SHIN = dcopy(0, -1);
-	SHOUT = dcopy(1, -1);
-	SHDIAG = dcopy(2, -1);
+	(void)close_on_exec (SHIN = dcopy(0, -1), 1);
+	(void)close_on_exec (SHOUT = dcopy(1, -1), 1);
+	(void)close_on_exec (SHDIAG = dcopy(2, -1), 1);
 #ifndef CLOSE_ON_EXEC
 	didcch = 0;
 #endif /* CLOSE_ON_EXEC */
@@ -639,10 +639,10 @@ execash(t, kp)
     (void) close(SHOUT);
     (void) close(SHDIAG);
     (void) close(OLDSTD);
-    SHIN = dmove(saveIN, oSHIN);
-    SHOUT = dmove(saveOUT, oSHOUT);
-    SHDIAG = dmove(saveDIAG, oSHDIAG);
-    OLDSTD = dmove(saveSTD, oOLDSTD);
+    (void)close_on_exec(SHIN = dmove(saveIN, oSHIN), 1);
+    (void)close_on_exec(SHOUT = dmove(saveOUT, oSHOUT), 1);
+    (void)close_on_exec(SHDIAG = dmove(saveDIAG, oSHDIAG), 1);
+    (void)close_on_exec(OLDSTD = dmove(saveSTD, oOLDSTD), 1);
 
     resexit(osetexit);
     if (my_reenter)
