@@ -353,6 +353,17 @@ ENVIRON	:	n/a
 NOTES	:	none
 VERSION	:	6.08
 
+VENDOR  :       Cray Research
+MODELS  :       SV1, probably also SV2
+COMPILER:       cc
+CFLAGS  :       normal
+LIBES   :       -ltermlib
+OS      :       Unicos 10.0.1.0
+CONFIG  :       cray
+ENVIRON :       n/a
+NOTES   :       none
+VERSION :       6.11
+
 VENDOR	:	pyramid
 MODELS	:	MIS4/2T 
 COMPILER:	cc

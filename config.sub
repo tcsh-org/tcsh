@@ -307,6 +307,10 @@ case $basic_machine in
 		basic_machine=c90-cray
 		os=-unicos
 		;;
+	sv[12]-cray)
+		basic_machine=c90-cray
+		os=-unicos
+		;;
 	crds | unos)
 		basic_machine=m68k-crds
 		;;
