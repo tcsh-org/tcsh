@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.54 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.55 2002/05/16 13:51:25 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.54 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.55 2002/05/16 13:51:25 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1496,8 +1496,10 @@ readc(wanteof)
 	    }
 	    numeof = numeof * 10 + *ptr++ - '0';
 	}
+	if (numeof != 0)
+	    numeof++;
     } 
-    if (numeof < 1) numeof = 26;	/* Sanity check */
+    if (numeof < 0) numeof = 26;	/* Sanity check */
 
 top:
     aret = TCSH_F_SEEK;
@@ -1605,7 +1607,7 @@ reread:
 		int     ctpgrp;
 #endif /* BSDJOBS */
 
-		if (++sincereal >= numeof)	/* Too many EOFs?  Bye! */
+		if (numeof != 0 && ++sincereal >= numeof)	/* Too many EOFs?  Bye! */
 		    goto oops;
 #ifdef BSDJOBS
 		if (tpgrp != -1 &&
