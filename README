@@ -186,3 +186,11 @@ I can make the binary available to anyone who wants it (for example people
 who can't get access to a cross-compiling environment, and who don't yet
 have gcc running under minix).
 
+
+***************************************************************************
+
+If your compiler cannot handle long symbol names, add 
+
+#include "snames.h" 
+
+to your config.h file
