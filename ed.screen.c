@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.screen.c,v 3.29 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.screen.c,v 3.30 1993/07/03 23:47:53 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.29 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: ed.screen.c,v 3.30 1993/07/03 23:47:53 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1281,7 +1281,7 @@ GetTermCaps()
 	ptr = "dumb";
 #endif /* apollo */
 
-    if (!ptr || !ptr[0] || !strcmp(ptr, "wm"))
+    if (!ptr || !ptr[0] || !strcmp(ptr, "wm") || !strcmp(ptr,"dmx"))
 	ptr = "dumb";
 
     setzero(bp, TC_BUFSIZE);

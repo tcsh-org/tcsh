@@ -245,7 +245,13 @@ static int
 compare(p, q)
     const ptr_t  p, q;
 {
+#if defined(NLS) && !defined(NOSTRCOLL)
+    errno = 0;  /* strcoll sets errno, another brain-damage */
+ 
+    return (strcoll(*(char **) p, *(char **) q));
+#else
     return (strcmp(*(char **) p, *(char **) q));
+#endif /* NLS && !NOSTRCOLL */
 }
 
 /*

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.exp.c,v 3.18 1993/04/26 21:13:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.19 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.18 1993/04/26 21:13:10 christos Exp christos $")
+RCSID("$Id: sh.exp.c,v 3.19 1993/05/17 00:11:09 christos Exp christos $")
 
 /*
  * C shell
@@ -73,6 +73,7 @@ static	Char 	*exp6		__P((Char ***, bool));
 static	void	 evalav		__P((Char **));
 static	int	 isa		__P((Char *, int));
 static	int	 egetn		__P((Char *));
+
 
 #ifdef EDEBUG
 static	void	 etracc		__P((char *, Char *, Char ***));
@@ -531,7 +532,7 @@ exp6(vp, ignore)
     bool    ignore;
 {
     int     ccode, i = 0;
-    register Char *cp, *dp, *ep;
+    register Char *cp;
 
     if (**vp == 0)
 	stderror(ERR_NAME | ERR_EXPRESSION);
@@ -603,174 +604,336 @@ exp6(vp, ignore)
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));
     cp = *(*vp)++;
-#define FILETESTS "erwxfdzoplstSX"
-    if (*cp == '-' && any(FILETESTS, cp[1])) {
-	struct stat stb;
-	Char *ft;
-
-	for (ft = &cp[2]; *ft; ft++) 
-	    if (!any(FILETESTS, *ft))
-		stderror(ERR_NAME | ERR_FILEINQ);
-	/*
-	 * Detect missing file names by checking for operator in the file name
-	 * position.  However, if an operator name appears there, we must make
-	 * sure that there's no file by that name (e.g., "/") before announcing
-	 * an error.  Even this check isn't quite right, since it doesn't take
-	 * globbing into account.
-	 */
-	if (isa(**vp, ANYOP) && stat(short2str(**vp), &stb))
-	    stderror(ERR_NAME | ERR_FILENAME);
-
-	dp = *(*vp)++;
-	if (ignore & IGNORE)
-	    return (Strsave(STRNULL));
-	ep = globone(dp, G_ERROR);
-	ft = &cp[1];
-	do 
-	    switch (*ft) {
-
-	    case 'r':
-		i = !sh_access(ep, R_OK);
-		break;
-
-	    case 'w':
-		i = !sh_access(ep, W_OK);
-		break;
-
-	    case 'x':
-		i = !sh_access(ep, X_OK);
-		break;
-
-	    case 'X':	/* tcsh extension, name is an executable in the path
-			 * or a tcsh builtin command 
-			 */
-		i = find_cmd(ep, 0);
-		break;
-
-	    case 't':	/* SGI extension, true when file is a tty */
-		i = isatty(atoi(short2str(ep)));
-		break;
-
-	    default:
-		if (
-#ifdef S_IFLNK
-		    *ft == 'l' ? lstat(short2str(ep), &stb) :
-#endif
-		    stat(short2str(ep), &stb)) {
-		    xfree((ptr_t) ep);
-		    return (Strsave(STR0));
-		}
-		switch (*ft) {
-
-		case 'f':
-#ifdef S_ISREG
-		    i = S_ISREG(stb.st_mode);
-#else
-		    i = 0;
-#endif
-		    break;
-
-		case 'd':
-#ifdef S_ISDIR
-		    i = S_ISDIR(stb.st_mode);
-#else
-		    i = 0;
-#endif
-		    break;
-
-		case 'p':
-#ifdef S_ISFIFO
-		    i = S_ISFIFO(stb.st_mode);
-#else
-		    i = 0;
-#endif
-		    break;
-
-		case 'l':
-#ifdef S_ISLNK
-		    i = S_ISLNK(stb.st_mode);
-#else
-		    i = 0;
-#endif
-		    break;
-
-		case 'S':
-# ifdef S_ISSOCK
-		    i = S_ISSOCK(stb.st_mode);
-# else
-		    i = 0;
-# endif
-		    break;
-
-		case 'b':
-#ifdef S_ISBLK
-		    i = S_ISBLK(stb.st_mode);
-#else
-		    i = 0;
-#endif
-		    break;
-
-		case 'c':
-#ifdef S_ISCHR
-		    i = S_ISCHR(stb.st_mode);
-#else
-		    i = 0;
-#endif
-		    break;
-
-		case 'u':
-#ifdef S_ISUID
-		    i = (S_ISUID & stb.st_mode) != 0;
-#else
-		    i = 0;
-#endif
-		    break;
-
-		case 'g':
-#ifdef S_ISGID
-		    i = (S_ISGID & stb.st_mode) != 0;
-#else
-		    i = 0;
-#endif
-		    break;
-
-		case 'k':
-#ifdef S_ISVTX
-		    i = (S_ISVTX & stb.st_mode) != 0;
-#else
-		    i = 0;
-#endif
-		    break;
-
-		case 'z':
-		    i = stb.st_size == 0;
-		    break;
-
-		case 's':
-		    i = stb.st_size != 0;
-		    break;
-
-		case 'e':
-		    i = 1;
-		    break;
-
-		case 'o':
-		    i = stb.st_uid == uid;
-		    break;
-		}
-	    }
-	while (*++ft && i);
-#ifdef EDEBUG
-	etraci("exp6 -? i", i, vp);
-#endif
-	xfree((ptr_t) ep);
-	return (putn(i));
-    }
+#define FILETESTS "erwxfdzoplstSXL"
+#define FILEVALS  "ZAMCDIUGNFPL"
+    if (*cp == '-' && (any(FILETESTS, cp[1]) || any(FILEVALS, cp[1])))
+        return(filetest(cp, vp, ignore));
 #ifdef EDEBUG
     etracc("exp6 default", cp, vp);
 #endif
     return (ignore & NOGLOB ? Strsave(cp) : globone(cp, G_ERROR));
 }
+
+
+/* 
+ * Extended file tests
+ * From: John Rowe <rowe@excc.exeter.ac.uk>
+ */
+Char *
+filetest(cp, vp, ignore)
+    Char *cp, ***vp;
+    bool ignore;
+{
+    struct stat stb, *st = NULL;
+#ifdef S_IFLNK
+    struct stat lstb, *lst = NULL;
+#endif
+    int i = 0;
+    unsigned pmask = 0xffff;
+    bool altout = 0;
+    Char *ft = cp, *dp, *ep, *strdev, *strino, *strF, *str, valtest = '\0',
+    *errval = STR0;
+    char *string, string0[8], *filnam;
+    time_t footime;
+    struct passwd *pw;
+    struct group *gr;
+
+    while(any(FILETESTS, *++ft))
+	continue;
+
+    if (!*ft && *(ft - 1) == 'L')
+	--ft;
+
+    if (any(FILEVALS, *ft)) {
+	valtest = *ft++;
+	/*
+	 * Value tests return '-1' on failure as 0 is
+	 * a legitimate value for many of them.
+	 * 'F' returns ':' for compatibility.
+	 */
+	errval = valtest == 'F' ? STRcolon : STRminus1;
+
+	if (valtest == 'P' && *ft >= '0' && *ft <= '7') {
+	    pmask = (char) *ft - '0';
+	    while ( *++ft >= '0' && *ft <= '7' )
+		pmask = 8 * pmask + ((char) *ft - '0');
+	}
+	if (Strcmp(ft, STRcolon) == 0 && any("AMCUGP", valtest)) {
+	    altout = 1;
+	    ++ft;
+	}
+    }
+
+    if (*ft || ft == cp + 1)
+	stderror(ERR_NAME | ERR_FILEINQ);
+
+    /*
+     * Detect missing file names by checking for operator in the file name
+     * position.  However, if an operator name appears there, we must make
+     * sure that there's no file by that name (e.g., "/") before announcing
+     * an error.  Even this check isn't quite right, since it doesn't take
+     * globbing into account.
+     */
+    if (isa(**vp, ANYOP) && stat(short2str(**vp), &stb))
+	stderror(ERR_NAME | ERR_FILENAME);
+
+    dp = *(*vp)++;
+    if (ignore & IGNORE)
+	return (Strsave(STRNULL));
+    ep = globone(dp, G_ERROR);
+    ft = &cp[1];
+    do 
+	switch (*ft) {
+
+	case 'r':
+	    i = !sh_access(ep, R_OK);
+	    break;
+
+	case 'w':
+	    i = !sh_access(ep, W_OK);
+	    break;
+
+	case 'x':
+	    i = !sh_access(ep, X_OK);
+	    break;
+
+	case 'X':	/* tcsh extension, name is an executable in the path
+			 * or a tcsh builtin command 
+			 */
+	    i = find_cmd(ep, 0);
+	    break;
+
+	case 't':	/* SGI extension, true when file is a tty */
+	    i = isatty(atoi(short2str(ep)));
+	    break;
+
+	default:
+
+#ifdef S_IFLNK
+	    if (tolower(*ft) == 'l') {
+		if (!lst && lstat(short2str(ep), lst = &lstb) == -1) {
+		    xfree((ptr_t) ep);
+		    return (Strsave(errval));
+		}
+		if (*ft == 'L')
+		    st = lst;
+	    }
+	    else 
+#endif
+		if (!st && stat(short2str(ep), st = &stb) == -1) {
+		    xfree((ptr_t) ep);
+		    return (Strsave(errval));
+		}
+
+	    switch (*ft) {
+
+	    case 'f':
+#ifdef S_ISREG
+		i = S_ISREG(st->st_mode);
+#else
+		i = 0;
+#endif
+		break;
+
+	    case 'd':
+#ifdef S_ISDIR
+		i = S_ISDIR(st->st_mode);
+#else
+		i = 0;
+#endif
+		break;
+
+	    case 'p':
+#ifdef S_ISFIFO
+		i = S_ISFIFO(st->st_mode);
+#else
+		i = 0;
+#endif
+		break;
+
+	    case 'l':
+#ifdef S_ISLNK
+		i = S_ISLNK(lst->st_mode);
+#else
+		i = 0;
+#endif
+		break;
+
+	    case 'S':
+# ifdef S_ISSOCK
+		i = S_ISSOCK(st->st_mode);
+# else
+		i = 0;
+# endif
+		break;
+
+	    case 'b':
+#ifdef S_ISBLK
+		i = S_ISBLK(st->st_mode);
+#else
+		i = 0;
+#endif
+		break;
+
+	    case 'c':
+#ifdef S_ISCHR
+		i = S_ISCHR(st->st_mode);
+#else
+		i = 0;
+#endif
+		break;
+
+	    case 'u':
+#ifdef S_ISUID
+		i = (S_ISUID & st->st_mode) != 0;
+#else
+		i = 0;
+#endif
+		break;
+
+	    case 'g':
+#ifdef S_ISGID
+		i = (S_ISGID & st->st_mode) != 0;
+#else
+		i = 0;
+#endif
+		break;
+
+	    case 'k':
+#ifdef S_ISVTX
+		i = (S_ISVTX & st->st_mode) != 0;
+#else
+		i = 0;
+#endif
+		break;
+
+	    case 'z':
+		i = st->st_size == 0;
+		break;
+
+	    case 's':
+		i = stb.st_size != 0;
+		break;
+
+	    case 'e':
+		i = 1;
+		break;
+
+	    case 'o':
+		i = st->st_uid == uid;
+		break;
+
+		/*
+		 * Value operators are a tcsh extension.
+		 */
+
+	    case 'D':
+		i = (int) st->st_dev;
+		break;
+
+	    case 'I':
+		i =  (int) st->st_ino;
+		break;
+		
+	    case 'F':
+		strdev = putn( (int) st->st_dev);
+		strino = putn( (int) st->st_ino);
+		strF = (Char *) xmalloc((2 + Strlen(strdev) + 
+					 Strlen(strino)) * sizeof(Char));
+		(void) Strcat(Strcat(Strcpy(strF, strdev), STRcolon), strino);
+		xfree((ptr_t) strdev);
+		xfree((ptr_t) strino);
+		xfree((ptr_t) ep);
+		return(strF);
+		break;
+		
+	    case 'L':
+		if ( *(ft + 1) ) {
+		    i = 1;
+		    break;
+		}
+#ifdef S_ISLNK
+		filnam = short2str(ep);
+#ifdef PATH_MAX
+# define MY_PATH_MAX PATH_MAX
+#else   
+/* 
+ * I can't think of any more sensible alterative; readlink doesn't give 
+ * us an errno if the buffer isn't large enough :-(
+ */
+# define MY_PATH_MAX  2048
+#endif
+		i = readlink(filnam, string = (char *) 
+		      xmalloc((1 + MY_PATH_MAX) * sizeof(char)), MY_PATH_MAX);
+		strF = (i < 0) ? errval : str2short(string);
+		xfree((ptr_t) string);
+		xfree((ptr_t) ep);
+		return(Strsave(strF));
+		break;
+
+#else
+		i = 0;
+		break
+#endif
+		
+
+	    case 'N':
+		i = (int) st->st_nlink;
+		break;
+
+	    case 'P':
+		string = string0 + 1;
+		xsprintf(string, "%o", pmask & (unsigned int) 
+		     ((S_IRWXU|S_IRWXG|S_IRWXG|S_ISUID|S_ISGID) & st->st_mode));
+		if (altout && *string != '0')
+		    *--string = '0';
+		xfree((ptr_t) ep);
+		return(Strsave(str2short(string)));
+		break;
+
+	    case 'U':
+		if (altout && (pw = getpwuid(st->st_uid))) {
+		    xfree((ptr_t) ep);
+		    return(Strsave(str2short(pw->pw_name)));
+		}
+		i = (int) st->st_uid;
+		break;
+
+	    case 'G':
+		if ( altout && (gr = getgrgid(st->st_gid))) {
+		    xfree((ptr_t) ep);
+		    return(Strsave(str2short(gr->gr_name)));
+		}
+		i = (int) st->st_gid;
+		break;
+
+	    case 'Z':
+		i = (int) st->st_size;
+		break;
+
+	    case 'A': case 'M': case 'C':
+		footime = *ft == 'A' ? st->st_atime :
+		    *ft == 'M' ? st->st_mtime : st->st_ctime;
+		if (altout) {
+		    strF = str2short(ctime(&footime));
+		    if ((str = Strchr(strF, '\n')) != NULL)
+			*str = (Char) '\0';
+		    xfree((ptr_t) ep);
+		    return(Strsave(strF));
+		}
+		i = (int) footime;
+		break;
+
+	    }
+	}
+    while (*++ft && i);
+#ifdef EDEBUG
+    etraci("exp6 -? i", i, vp);
+#endif
+    xfree((ptr_t) ep);
+    return (putn(i));
+}
+
 
 static void
 evalav(v)

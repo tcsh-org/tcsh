@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.init.c,v 3.26 1993/02/12 17:22:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.init.c,v 3.27 1993/03/05 20:14:33 christos Exp christos $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.26 1993/02/12 17:22:20 christos Exp christos $")
+RCSID("$Id: sh.init.c,v 3.27 1993/03/05 20:14:33 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -146,6 +146,7 @@ struct	biltins bfunc[] = {
 #endif /* TCF */
     { "shift",		shift,		0,	1	},
     { "source",		dosource,	1,	INF	},
+    { "stat",		dostat,		2,	INF	},
     { "stop",		dostop,		1,	INF	},
     { "suspend",	dosuspend,	0,	0	},
     { "switch",		doswitch,	1,	INF	},

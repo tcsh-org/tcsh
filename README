@@ -132,7 +132,7 @@ Tcsh has been ported to minix by  Scott Krotz (krotz@honey.rtsg.mot.com).
 Unfortunately the minix sed is broken, so you'll have to find a way to
 make tc.const.h, sh.err.h, ed.defns.h which are automatically generated.
 The easiest way to create them is to make a copy from unix, copying 
-config.minix to config.h, and then 'make sh.err.h tc.const.h ed.defns.h'
+minix to config.h, and then 'make sh.err.h tc.const.h ed.defns.h'
 
 The OS/dependent files are in mi.termios.h, mi.wait.h, mi.varargs.h
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.c,v 3.29 1993/04/07 21:52:08 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.30 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.29 1993/04/07 21:52:08 christos Exp christos $")
+RCSID("$Id: tc.os.c,v 3.30 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -818,9 +818,9 @@ xstrerror(i)
 {
     static char errbuf[40]; /* 64 bit num */
 
-    if (i >= 0 && i < sys_nerr) 
+    if (i >= 0 && i < sys_nerr) {
 	return sys_errlist[i];
-    else {
+    } else {
 	(void) xsprintf(errbuf, "Unknown Error: %d", i);
 	return errbuf;
     }

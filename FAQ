@@ -47,6 +47,9 @@ be able to get ftp it... :-)
     or
     /usr/etc/setsid dbxtool &
 
+    If that does not work, for dbxtool at least you can add "sh stty sane"
+    in your .dbxinit
+
 3.  I tried to compile tcsh and it cannot find <locale.h>?
 
     Your system does not support NLS. Undefine NLS in config_f.h and it
@@ -164,6 +167,10 @@ be able to get ftp it... :-)
 
     This is another manifestation of item 5. Just add the pathname
     to tcsh in /etc/shells and everything should work fine.
+
+16. On machines that use YP (NIS) tilde expansion might end up in /dev/null
+    If this happens complain to your vendor, to get a new version of NIS.
+    You can fix that in tcsh by defining YPBUGS in config.h
 
 christos
 

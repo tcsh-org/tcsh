@@ -29,7 +29,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\" $Id: tcsh.man,v 3.60 1993/06/25 21:20:57 christos Exp $
+.\" $Id: tcsh.man,v 3.61 1993/07/03 23:47:53 christos Exp $
 .TH TCSH 1 "3 July 1993" "Cornell 6.04.00"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1089,13 +1089,13 @@ variable, followed by the corrected line, e.g.
 .RS +.6i
 .nf
 > lz /usr/bin
-CORRECT>ls /usr/bin (y|n|e)?
+CORRECT>ls /usr/bin (y|n|e|a)?
 .fi
 .RE
 .sp
 Answering 'y' or <space> at the prompt
 will cause the corrected line to be executed, 'e' will leave the uncorrected 
-command in the input buffer and
+command in the input buffer, 'a' will abort the line, and
 anything else will execute the original line unchanged.
 .PP
 Automatic correction is not guaranteed to work the way the user intended.
@@ -1378,7 +1378,7 @@ The
 .I prompt3
 variable is used when displaying the corrected command line when
 automatic spelling correction is in effect; it defaults to 
-"CORRECT>%R (y|n|e)? ".
+"CORRECT>%R (y|n|e|a)? ".
 
 .PP
 .SH "13. TIME-STAMPED HISTORY LIST"
@@ -1981,6 +1981,12 @@ The current possible values are:
 \fIcoherent\fR		an unknown machine running Coherent
 \fIconvex\fR		a Convex
 \fIcray\fR		a Cray running Unicos
+\fIcray-1\fR		Cray-1	(No longer in service)
+\fIcray-xmp\fR		Cray X/MP
+\fIcray-2\fR		Cray-2
+\fIcray-ymp\fR		Cray Y/MP
+\fIcray-c90\fR		Cray Y/MP C90
+\fIcray\fR		Generic Cray system [no support target(2)]
 \fIdecstation\fR	a DecStation XXXX
 \fIeta10\fR		an ETA 10 running SVR3
 \fIgould-np1\fR		a Gould NP1

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.30 1993/06/24 15:29:37 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.31 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,10 +36,18 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.30 1993/06/24 15:29:37 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.31 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "patchlevel.h"
 
+#ifdef cray
+/* 
+ * On crays, find the current machine type via the target() syscall
+ * We need ctype.h to convert the name returned to lower case
+ */
+# include <sys/target.h>
+# include <ctype.h>
+#endif
 
 char *
 gethosttype()
@@ -239,7 +247,11 @@ gethosttype()
 
 # ifdef __386BSD__
 # define _havehosttype_
+#  ifdef __BSD_NET2__
+    hosttype = "NetBSD";
+#  else
     hosttype = "386BSD";
+#  endif /* __BSD_NET2__ */
 # endif /* __386BSD__ */
 
 # if defined(i386) && defined(bsdi)
@@ -382,7 +394,11 @@ gethosttype()
 #     ifdef sony_news
     hosttype = "news_mips";
 #     else
+#      ifdef Lynx
+    hosttype = "lynxos-mips";
+#      else
     hosttype = "mips";
+#      endif /* Lynx */
 #     endif /* sony_news */
 #    endif /* sgi */
 #   endif /* ultrix || __ultrix */
@@ -481,7 +497,33 @@ gethosttype()
 
 # ifdef cray
 #  define _havehosttype_
-   hosttype = "cray";
+#  ifdef MC_GET_SYSTEM /* If we have target() */
+    /* From: hpa@hook.eecs.nwu.edu (H. Peter Anvin) */
+    {
+	struct target data;
+
+	if (target(MC_GET_SYSTEM, &data) != -1) {
+	    static char hosttype_buf[sizeof(data.mc_pmt)+1];
+	    char *p = (char *) &(data.mc_pmt);
+	    char *q = hosttype_buf;
+	    int n;
+
+	    /* 
+	     * Copy to buffer and convert to lower case 
+	     * String may not be null-terminated, so keep a counter
+	     */
+	    for (n = 0; *p && n < sizeof(data.mc_pmt); n++)
+	      *q++ = tolower(p[n]);
+
+	    *q = '\0';
+	    hosttype = hosttype_buf; 	/* Return in static buffer */
+	}
+	else
+	    hosttype = "cray";		/* target() failed */
+    }
+#  else /* MC_GET_SYSTEM */
+    hosttype = "cray";
+#  endif /* MC_GET_SYSTEM */
 # endif /* cray */
 
 # ifdef NDIX
@@ -512,12 +554,6 @@ gethosttype()
 #  if defined(sparc)
 #   define _havehosttype_
     hosttype = "lynxos-sparc";
-#  endif
-#  if defined(mips)
-#   ifndef _havehosttype_
-#    define _havehosttype_
-#   endif
-    hosttype = "lynxos-mips";
 #  endif
 #  ifndef _havehosttype_
 #   define _havehosttype_

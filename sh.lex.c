@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.33 1993/06/05 21:09:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.lex.c,v 3.34 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.33 1993/06/05 21:09:15 christos Exp christos $")
+RCSID("$Id: sh.lex.c,v 3.34 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1452,7 +1452,9 @@ readc(wanteof)
     bool    wanteof;
 {
     int c;
-    static  sincereal;
+    static  sincereal;	/* Number of real EOFs we've seen */
+    Char *ptr;		/* For STRignoreeof */
+    int numeof = 0;	/* Value of STRignoreeof */
 
 #ifdef DEBUG_INP
     xprintf("readc\n");
@@ -1461,6 +1463,19 @@ readc(wanteof)
 	peekread = 0;
 	return (c);
     }
+
+    /* Compute the value of EOFs */
+    if ((ptr = value(STRignoreeof)) != STRNULL) {
+	while (*ptr) {
+	    if (!Isdigit(*ptr)) {
+		numeof = 0;
+		break;
+	    }
+	    numeof = numeof * 10 + *ptr++ - '0';
+	}
+    } 
+    if (numeof < 1) numeof = 26;	/* Sanity check */
+
 top:
     aret = F_SEEK;
     if (alvecp) {
@@ -1562,7 +1577,7 @@ reread:
 		int     ctpgrp;
 #endif /* BSDJOBS */
 
-		if (++sincereal > 25)
+		if (++sincereal >= numeof)	/* Too many EOFs?  Bye! */
 		    goto oops;
 #ifdef BSDJOBS
 		if (tpgrp != -1 &&

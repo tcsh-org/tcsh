@@ -1,3 +1,17 @@
+V6.05.00, ...
+ 12. 6.04.01, 08/10/93
+ 11. Vi mode word moves [they work like vi and don't obey wordchars anymore].
+ 10. New file operators and stat builtin
+  9. David's FIONREAD patch for SVR4
+  8. Bruce's ignoreeof=n patch
+  7. Dan's complete/correct enhancement
+  6. Abort corrections patch.
+  5. Print_by_columns, now does not use the rightmost column.
+  4. Renamed config/config.$i to $i to avoid once and for all filename length
+     problems.
+  3. bbn butterfly config
+  2. Beto's proc fixes
+  1. Bruces bug fix for ed.chared.c, signals
 V6.04.00, 07/03/93
  92. Alpha prototypes, for gcc -Wall clean compile.
  91. Fixed alpha hashing. Did not work for directories > 31, Thanks to

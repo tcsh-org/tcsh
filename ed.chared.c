@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.33 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.34 1993/07/03 23:47:53 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.33 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: ed.chared.c,v 3.34 1993/07/03 23:47:53 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -51,6 +51,14 @@ RCSID("$Id: ed.chared.c,v 3.33 1993/06/25 21:17:12 christos Exp christos $")
 
 #define CHAR_FWD	0
 #define CHAR_BACK	1
+
+/*
+ * vi word treatment
+ * from: Gert-Jan Vons <vons@cesar.crbca1.sinet.slb.com>
+ */
+#define C_CLASS_WHITE	1
+#define C_CLASS_ALNUM	2
+#define C_CLASS_OTHER	3
 
 static Char *InsertPos = InputBuf; /* Where insertion starts */
 static Char *ActionPos = 0;	   /* Where action begins  */
@@ -72,6 +80,7 @@ static	void	 c_alternativ_key_map	__P((int));
 static	void	 c_insert		__P((int));
 static	void	 c_delafter		__P((int));
 static	void	 c_delbefore		__P((int));
+static 	int	 c_to_class		__P((int));
 static	Char	*c_prev_word		__P((Char *, Char *, int));
 static	Char	*c_next_word		__P((Char *, Char *, int));
 static	Char	*c_number		__P((Char *, int *, int));
@@ -213,6 +222,31 @@ c_preword(p, low, n)
     return(p);
 }
 
+/*
+ * c_to_class() returns the class of the given character.
+ *
+ * This is used to make the c_prev_word() and c_next_word() functions
+ * work like vi's, which classify characters. A word is a sequence of
+ * characters belonging to the same class, classes being defined as
+ * follows:
+ *
+ *	1/ whitespace
+ *	2/ alphanumeric chars, + underscore
+ *	3/ others
+ */
+static int
+c_to_class(ch)
+register int  ch;
+{
+    if (Isspace(ch))
+        return C_CLASS_WHITE;
+
+    if (Isdigit(ch) || Isalpha(ch) || ch == '_')
+        return C_CLASS_ALNUM;
+
+    return C_CLASS_OTHER;
+}
+
 static Char *
 c_prev_word(p, low, n)
     register Char *p, *low;
@@ -220,19 +254,46 @@ c_prev_word(p, low, n)
 {
     p--;
 
+    if (!VImode) {
+	while (n--) {
+	    while ((p >= low) && !isword(*p)) 
+		p--;
+	    while ((p >= low) && isword(*p)) 
+		p--;
+	}
+      
+	/* cp now points to one character before the word */
+	p++;
+	if (p < low)
+	    p = low;
+	/* cp now points where we want it */
+	return(p);
+    }
+  
     while (n--) {
-	while ((p >= low) && !isword(*p)) 
-	    p--;
-	while ((p >= low) && isword(*p)) 
-	    p--;
+        register int  c_class;
+
+        if (p < low)
+            break;
+
+        /* scan until beginning of current word (may be all whitespace!) */
+        c_class = c_to_class(*p);
+        while ((p >= low) && c_class == c_to_class(*p))
+            p--;
+
+        /* if this was a non_whitespace word, we're ready */
+        if (c_class != C_CLASS_WHITE)
+            continue;
+
+        /* otherwise, move back to beginning of the word just found */
+        c_class = c_to_class(*p);
+        while ((p >= low) && c_class == c_to_class(*p))
+            p--;
     }
 
-    /* cp now points to one character before the word */
-    p++;
-    if (p < low)
-	p = low;
-    /* cp now points where we want it */
-    return(p);
+    p++;                        /* correct overshoot */
+
+    return (p);
 }
 
 static Char *
@@ -240,16 +301,42 @@ c_next_word(p, high, n)
     register Char *p, *high;
     register int n;
 {
-    while (n--) {
-	while ((p < high) && !isword(*p)) 
-	    p++;
-	while ((p < high) && isword(*p)) 
-	    p++;
+    if (!VImode) {
+	while (n--) {
+	    while ((p < high) && !isword(*p)) 
+		p++;
+	    while ((p < high) && isword(*p)) 
+		p++;
+	}
+	if (p > high)
+	    p = high;
+	/* p now points where we want it */
+	return(p);
     }
-    if (p > high)
-	p = high;
-    /* p now points where we want it */
-    return(p);
+
+    while (n--) {
+        register int  c_class;
+
+        if (p >= high)
+            break;
+
+        /* scan until end of current word (may be all whitespace!) */
+        c_class = c_to_class(*p);
+        while ((p < high) && c_class == c_to_class(*p))
+            p++;
+
+        /* if this was all whitespace, we're ready */
+        if (c_class == C_CLASS_WHITE)
+            continue;
+
+	/* if we've found white-space at the end of the word, skip it */
+        while ((p < high) && c_to_class(*p) == C_CLASS_WHITE)
+            p++;
+    }
+
+    p--;                        /* correct overshoot */
+
+    return (p);
 }
 
 static Char *
@@ -1261,7 +1348,7 @@ e_newline(c)
     int c;
 {				/* always ignore argument */
     USE(c);
-    PastBottom();
+  /*  PastBottom();  NOW done in ed.inputl.c */
     *LastChar++ = '\n';		/* for the benefit of CSH */
     *LastChar = '\0';		/* just in case */
     if (VImode)
@@ -2370,8 +2457,10 @@ v_repeat_srch(c)
     switch (c) {
     case F_DOWN_SEARCH_HIST:
 	rv = e_down_search_hist(0);
+	break;
     case F_UP_SEARCH_HIST:
 	rv = e_up_search_hist(0);
+	break;
     default:
 	break;
     }

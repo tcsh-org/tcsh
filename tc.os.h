@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.47 1993/07/06 21:32:33 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.48 1993/07/07 19:16:17 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -475,6 +475,9 @@ typedef struct timeval timeval_t;
 # define free tcsh_free
 #endif /* NeXT */
 
+#ifndef NEEDgethostname
+extern int gethostname();
+#endif /* NEEDgethostname */
 
 #if !defined(POSIX) || defined(SUNOS4) || defined(UTekV) || defined(sysV88)
 extern time_t time();
@@ -509,10 +512,6 @@ extern void qsort();
 #  endif /* hpux */
 # endif	/* SUNOS4 */
 extern void perror();
-
-# ifndef NEEDgethostname
-extern int gethostname();
-# endif /* NEEDgethostname */
 
 # ifdef BSDSIGS
 #  if defined(_AIX370) || defined(MACH) || defined(NeXT) || defined(_AIXPS2) || defined(ardent) || defined(SUNOS4)
@@ -629,17 +628,16 @@ extern void bcopy	__P((const void *, void *, size_t));
 
 #if !defined(hpux) && !defined(COHERENT) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(__386BSD__) && !defined(memmove)
 # define NEEDmemmove
-#endif /* !hpux && !COHERENT && (SYSVREL < 4 || _SEQUENT_) && !__36BSD__ && !memmove */
+#endif /* !hpux && !COHERENT && (SYSVREL < 4 || _SEQUENT_) && !__386BSD__ && !memmove */
 
 #if SYSVREL == 4
-extern int gethostname();
+# ifndef BSDTIMES
 extern int getrlimit();
 extern int setrlimit();
-extern int getrusage();
-# ifndef IRIS4D
-extern int gettimeofday();
-extern int wait3();
-# endif
+# endif /* !BSDTIMES */
+# if !defined(IRIS4D) || !defined(SOLARIS2)
+extern int wait3();	/* I think some bizarre systems still need this */
+# endif /* !IRIS4D || !SOLARIS2 */
 #endif /* SYSVREL == 4 */
 
 #if defined(__osf__) && defined(__alpha)

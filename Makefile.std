@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.55 1993/06/25 21:31:05 christos Exp $
+# $Id: Makefile.std,v 1.56 1993/07/03 23:47:53 christos Exp christos $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -108,6 +108,7 @@ CFLAGS=-O2 $(INCLUDES) -g
 # DEC/osf-1 on the alpha
 #DFLAGS=-D_BSD
 DFLAGS=
+#DFLAGS=-D_PATH_TCSH='"${DESTBIN}/tcsh"'
 
 
 ################################################################
@@ -137,7 +138,6 @@ LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -ltermcap -lauth		 ## Ultrix with Enhanced Security
 #LIBES= -ltermcap -ldir -lx		 ## Xenix 386 style things
 #LIBES= -ltermcap -lndir -lsocket -ljobs ## masscomp RTU6.0
-#LIBES= -ltermc				 ## emx under OS/2
 #LIBES= -lcurses			 ## AIX on the rt
 #LIBES= -lcurses			 ## TitanOS on the stellar
 #LIBES= -lcurses			 ## SysV4 w/o BSDTIMES or Solaris 2
@@ -252,7 +252,7 @@ AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	README.imake complete.tcsh vmsreadme.txt termcap.vms snames.h
 VHSRCS=${PVSRCS} ${AVSRCS}
 
-CONFSRCS=config/config.* 
+CONFSRCS=config/* 
 
 ALLSRCS=  ${SHSRCS} ${TWSRCS} ${EDSRCS} ${TCSRCS} ${VHSRCS}
 DISTSRCS= ${PSSRCS} ${TWSRCS} ${EDSRCS} ${TCSRCS} ${AVSRCS}
@@ -388,19 +388,19 @@ install: tcsh
 	-strip ${DESTBIN}/tcsh
 	chmod 555 ${DESTBIN}/tcsh
 
-manpage: tcsh.man
+install.man: tcsh.man
 	-rm -f ${DESTMAN}/tcsh.${MANSECT}
 	cp tcsh.man ${DESTMAN}/tcsh.${MANSECT}
 	chmod 444 ${DESTMAN}/tcsh.${MANSECT}
 
 # Amiga Unix
-#manpage: tcsh.man
+#install.man: tcsh.man
 #        compress tcsh.man
 #	cp tcsh.man.Z ${DESTMAN}/tcsh.Z
 #	chmod 444 ${DESTMAN}/tcsh.Z
 
 # Apple A/UX
-#manpage: tcsh.man
+#install.man: tcsh.man
 #	-rm -f ${DESTMAN}/tcsh.${MANSECT}.Z
 #	nroff -man tcsh.man | compress > ${DESTMAN}/tcsh.${MANSECT}.Z
 #	chmod 444 ${DESTMAN}/tcsh.${MANSECT}.Z

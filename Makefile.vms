@@ -1,4 +1,4 @@
-# $Id: Makefile.vms,v 1.12 1993/06/25 21:31:05 christos Exp $
+# $Id: Makefile.vms,v 1.13 1993/07/03 23:47:53 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -247,7 +247,7 @@ AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	README.imake complete.tcsh vmsreadme.txt termcap.vms snames.h
 VHSRCS=${PVSRCS} ${AVSRCS}
 
-CONFSRCS=config/config.* 
+CONFSRCS=config/* 
 
 ALLSRCS=  ${SHSRCS} ${TWSRCS} ${EDSRCS} ${TCSRCS} ${VHSRCS}
 DISTSRCS= ${PSSRCS} ${TWSRCS} ${EDSRCS} ${TCSRCS} ${AVSRCS}

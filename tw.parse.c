@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.53 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.54 1993/07/03 23:47:53 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.53 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: tw.parse.c,v 3.54 1993/07/03 23:47:53 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -88,6 +88,7 @@ static void (*tw_end_entry[]) __P((void)) = {
 
 int curchoice = -1;
 
+int match_unique_match = FALSE;
 int non_unique_match = FALSE;
 static bool SearchNoDirErr = 0;	/* t_search returns -2 if dir is unreadable */
 
@@ -112,6 +113,7 @@ static	Char	 filetype		__P((Char *, Char *));
 static	int	 t_glob			__P((Char ***, int));
 static	int	 c_glob			__P((Char ***));
 static	int	 is_prefix		__P((Char *, Char *));
+static	int	 is_prefixmatch		__P((Char *, Char *));
 static	int	 is_suffix		__P((Char *, Char *));
 static	int	 recognize		__P((Char *, Char *, int, int));
 static	int	 ignored		__P((Char *));
@@ -313,10 +315,24 @@ tenematch(inputline, num_read, command)
 	 * We don't quote the last space if we had a unique match and 
 	 * addsuffix was set. Otherwise the last space was part of a word.
 	 */
+#ifdef notdef
 	if (*wp && InsertStr(quote_meta(wp, qu, search_ret == 1 &&
 			     is_set(STRaddsuffix) != NULL)) < 0)
 	    /* put it in the input buffer */
 	    return -1;		/* error inserting */
+#endif
+	if (*wp) {
+	    DeleteBack(str_end - word_start);
+            if (*wordp == '$') {
+                if (InsertStr(wordp) < 0)
+		    return -1;          /* error inserting */
+            } else {
+                if (InsertStr(quote_meta(wordp, qu, search_ret == 1 &&
+		              is_set(STRaddsuffix) != NULL)) < 0)
+	            /* put it in the input buffer */
+		    return -1;          /* error inserting */
+            }
+	}
 	return search_ret;
 
     case SPELL:
@@ -562,6 +578,39 @@ is_prefix(check, template)
     return (TRUE);
 } /* end is_prefix */
 
+/* is_prefixmatch():
+ *	return true if check matches initial chars in template
+ *	This differs from PWB imatch in that if check is null
+ *	it matches anything
+ * and matches on shortening of commands
+ */
+static int
+is_prefixmatch(check, template)
+    register Char *check, *template;
+{
+    Char MCH1,MCH2;
+
+    for (; *check; check++, template++) {
+	if ((*check & TRIM) != (*template & TRIM)) {
+            if ((*check & TRIM) == '-' || (*check & TRIM) == '.' || (*check & TRIM) == '_') {
+                MCH1 = MCH2 = (*check & TRIM);
+                if (MCH1 == '_') {
+                    MCH2 = '-';
+                } else if (MCH1 == '-') {
+                    MCH2 = '_';
+                }
+                for (;*template && (*template & TRIM) != MCH1 && (*template & TRIM) != MCH2; template++);
+                if (!*template) {
+	            return (FALSE);
+                }
+            } else {
+	        return (FALSE);
+            }
+        }
+    }
+    return (TRUE);
+} /* end is_prefixmatch */
+
 
 /* is_suffix():
  *	Return true if the chars in template appear at the
@@ -704,7 +753,7 @@ recognize(exp_name, item, name_length, numitems)
 	     *x && (*x & TRIM) == (*ent & TRIM); x++, len++, ent++)
 	    continue;
 	*x = '\0';		/* Shorten at 1st char diff */
-	if (len == name_length)	/* Ambiguous to prefix? */
+	if (!(match_unique_match || is_set(STRrecexact)) && len == name_length)	/* Ambiguous to prefix? */
 	    return (-1);	/* So stop now and save time */
     }
     return (0);
@@ -832,8 +881,13 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	case RECOGNIZE_ALL:
 	case RECOGNIZE_SCROLL:
 
-	    if (!is_prefix(target, item)) 
-		break;
+	    if ((vp = adrof(STRcomplete)) != NULL && !Strcmp(*(vp->vec),STRenhance)) {
+	        if (!is_prefixmatch(target, item)) 
+		    break;
+     	    } else {
+	        if (!is_prefix(target, item)) 
+		    break;
+	    }
 
 	    if (exec_check && !executable(exp_dir, item, dir_ok))
 		break;
@@ -897,7 +951,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		    cnt++;
 		}
 		
-		if (is_set(STRrecexact)) {
+		if (match_unique_match || is_set(STRrecexact)) {
 		    if (StrQcmp(target, item) == 0) {	/* EXACT match */
 			copyn(exp_name, item, MAXNAMLEN);
 			numitems = 1;	/* fake into expanding */
@@ -1143,7 +1197,7 @@ tw_list_items(looking, numitems, list_max)
     }
 
     if (max_items == 0 && (ptr = value(STRlistmaxrows)) != STRNULL) {
-	int rows = 0;
+	int rows;
 
 	while (*ptr) {
 	    if (!Isdigit(*ptr)) {
@@ -1436,7 +1490,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 
 	tw_fixword(looking, word, dir, exp_name, max_word_length);
 
-	if (is_set(STRaddsuffix) && numitems == 1) {
+	if (!match_unique_match && is_set(STRaddsuffix) && numitems == 1) {
 	    Char suffix[2];
 
 	    suffix[1] = '\0';
@@ -1822,7 +1876,7 @@ print_by_column(dir, items, count, no_file_suffix)
 	maxwidth = max(maxwidth, (unsigned int) Strlen(items[i]));
 
     maxwidth += no_file_suffix ? 1 : 2;	/* for the file tag and space */
-    columns = (TermH + 1) / maxwidth;	/* PWP: terminal size change */
+    columns = TermH / maxwidth;		/* PWP: terminal size change */
     if (!columns)
 	columns = 1;
     rows = (count + (columns - 1)) / columns;

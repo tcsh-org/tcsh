@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.h,v 3.12 1992/10/10 18:17:34 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.h,v 3.13 1993/04/26 21:13:10 christos Exp christos $ */
 /*
  * tw.h: TwENEX functions headers
  */
@@ -101,6 +101,8 @@ extern struct scroll_tab_list *scroll_tab;
 extern int curchoice;
 
 extern int non_unique_match;
+
+extern int match_unique_match;
 
 #include "tw.decls.h"
 

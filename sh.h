@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.54 1993/06/25 21:17:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.55 1993/07/03 23:47:53 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -270,9 +270,9 @@ extern int setpgrp();
 #define CSWTCH _POSIX_VDISABLE
 #endif
 
-#if !defined(FIOCLEX) && defined(SUNOS4)
+#if (!defined(FIOCLEX) && defined(SUNOS4)) || SYSVREL == 4
 # include <sys/filio.h>
-#endif /* !FIOCLEX && SUNOS4 */
+#endif /* (!FIOCLEX && SUNOS4) || SYSVREL == 4 */
 
 #if !defined(_MINIX) && !defined(COHERENT)
 # include <sys/file.h>
@@ -310,6 +310,7 @@ extern int setpgrp();
 # include <stdio.h>	/* So the fgetpwent() prototypes work */
 #endif /* hpux || sgi || OREO || COHERENT */
 #include <pwd.h>
+#include <grp.h>
 #ifdef PW_SHADOW
 # include <shadow.h>
 #endif /* PW_SHADOW */

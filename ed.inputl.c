@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.inputl.c,v 3.34 1993/06/05 21:09:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.inputl.c,v 3.35 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.34 1993/06/05 21:09:15 christos Exp christos $")
+RCSID("$Id: ed.inputl.c,v 3.35 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -55,6 +55,7 @@ static Char mismatch[] = {'!', '\\', '^', '-', '%', '\0'};
 
 static	int	GetNextCommand	__P((KEYCMD *, Char *));
 static	int	SpellLine	__P((int));
+static	int	CompleteLine	__P((void));
 static	void	RunCommand	__P((Char *));
 static void 	doeval1		__P((Char **));
 
@@ -206,8 +207,10 @@ Inputl()
 	case CC_NEWLINE:	/* normal end of line */
 	    curlen = 0;
 	    curchoice = -1;
+	    matchval = 1;
 	    if (crct && (!Strcmp(*(crct->vec), STRcmd) ||
 			 !Strcmp(*(crct->vec), STRall))) {
+                PastBottom();
 		copyn(Origin, InputBuf, INBUFSIZE);
 		SaveChar = LastChar;
 		if (SpellLine(!Strcmp(*(crct->vec), STRcmd)) == 1) {
@@ -239,7 +242,7 @@ Inputl()
 			}
 			else if (ch == 'a') {
 			    xprintf("abort\n");
-			    *LastChar = '\0';
+		            LastChar = InputBuf;   /* Null the current line */
 			    Cursor = LastChar;
 			    printprompt(0, NULL);
 			    Refresh();
@@ -249,14 +252,52 @@ Inputl()
 		    }
 		    flush();
 		}
-	    }			/* end CORRECT code */
-	    tellwhat = 0;	/* just in case */
-	    Hist_num = 0;	/* for the history commands */
-	    num = LastChar - InputBuf;	/* return the number of chars read */
-	    /*
-	     * For continuation lines, we set the prompt to prompt 2
-	     */
-	    printprompt(1, NULL);
+	    } else if (crct && !Strcmp(*(crct->vec), STRcomplete)) {
+                if (LastChar > InputBuf && LastChar[-1] == '\n') {
+                    LastChar[-1] = '\0';
+                    LastChar--;
+                    Cursor = LastChar;
+                }
+                match_unique_match = 1;  /* match unique matches */
+		matchval = CompleteLine();
+                match_unique_match = 0;
+        	curlen = LastChar - InputBuf;
+		if (matchval != 1) {
+                    PastBottom();
+		}
+		if (matchval == 0) {
+		    xprintf("No matching command\n");
+		} else if (matchval == 2) {
+		    xprintf("Ambiguous command\n");
+		}
+	        if (NeedsRedraw) {
+		    ClearLines();
+		    ClearDisp();
+		    NeedsRedraw = 0;
+	        }
+	        Refresh();
+	        Argument = 1;
+	        DoingArg = 0;
+		if (matchval == 1) {
+                    PastBottom();
+                    *LastChar++ = '\n';
+                    *LastChar = '\0';
+		}
+        	curlen = LastChar - InputBuf;
+            }
+	    else
+		PastBottom();
+
+	    if (matchval == 1) {
+	        tellwhat = 0;	/* just in case */
+	        Hist_num = 0;	/* for the history commands */
+		/* return the number of chars read */
+	        num = LastChar - InputBuf;
+	        /*
+	         * For continuation lines, we set the prompt to prompt 2
+	         */
+	        printprompt(1, NULL);
+	    }
 	    break;
 
 	case CC_CORRECT:
@@ -294,7 +335,6 @@ Inputl()
 	case CC_COMPLETE_ALL:
 	case CC_COMPLETE_FWD:
 	case CC_COMPLETE_BACK:
-	    expnum = Cursor - InputBuf;
 	    switch (retval) {
 	    case CC_COMPLETE:
 		fn = RECOGNIZE;
@@ -767,5 +807,56 @@ SpellLine(cmdonly)
     } while (endflag);
     Cursor = OldCursor;
     return matchval;
+}
+
+/*
+ * CompleteLine - do command completion on the entire command line
+ * (which may have trailing newline).
+ * Return value:
+ *  0: No command matched or failure
+ *  1: One command matched
+ *  2: Several commands matched
+ */
+static int
+CompleteLine()
+{
+    int     endflag, tmatch;
+    Char   *argptr, *OldCursor, *OldLastChar;
+
+    OldLastChar = LastChar;
+    OldCursor = Cursor;
+    argptr = InputBuf;
+    endflag = 1;
+    do {
+	while (ismetahash(*argptr) || iscmdmeta(*argptr))
+	    argptr++;
+	for (Cursor = argptr;
+	     *Cursor != '\0' && ((Cursor != argptr && Cursor[-1] == '\\') ||
+				 (!ismetahash(*Cursor) && !iscmdmeta(*Cursor)));
+	     Cursor++)
+	     continue;
+	if (*Cursor == '\0') {
+	    Cursor = LastChar;
+	    if (LastChar[-1] == '\n')
+		Cursor--;
+	    endflag = 0;
+	}
+	if (!Strchr(mismatch, *argptr) && starting_a_command(argptr, InputBuf)) {
+	    tmatch = tenematch(InputBuf, Cursor - InputBuf, RECOGNIZE);
+	    if (tmatch <= 0) {
+                return 0;
+            } else if (tmatch > 1) {
+                return 2;
+	    }
+	    if (LastChar != OldLastChar) {
+		if (argptr < OldCursor)
+		    OldCursor += (LastChar - OldLastChar);
+		OldLastChar = LastChar;
+	    }
+	}
+	argptr = Cursor;
+    } while (endflag);
+    Cursor = OldCursor;
+    return 1;
 }
 

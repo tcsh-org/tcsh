@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.52 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.53 1993/07/03 23:47:53 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.52 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.53 1993/07/03 23:47:53 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -452,7 +452,7 @@ main(argc, argv)
 	int     oid = getoid();
 
 	Itoa(oid, buff);
-	set(STRoid, Strsave(buff));
+	set(STRoid, Strsave(buff), VAR_READWRITE);
 #endif /* apollo */
 
 	Itoa(uid, buff);
@@ -1028,7 +1028,9 @@ main(argc, argv)
         act.sa_flags=0;	           /* want behaviour of sigset() without
                                     * SA_NOCLDSTOP
 				    */
-        (void) sigaction(SIGCHLD,&act,(struct sigaction *)NULL);
+
+        if ((sigaction(SIGCHLD,&act,(struct sigaction *)NULL)) == -1)
+	    stderror(ERR_SYSTEM, "sigaction", strerror(errno));
     }
 #else /* SYSVREL <= 3 */
     (void) sigset(SIGCHLD, pchild);	/* while signals not ready */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.48 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.49 1993/07/03 23:47:53 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.48 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.49 1993/07/03 23:47:53 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -215,6 +215,45 @@ dozip(v, c)
 {
     USE(c);
     USE(v);
+}
+
+/*ARGSUSED*/
+void
+dostat(v, c)
+    Char **v;
+    struct command *c;
+{
+  Char **fileptr, *ftest, *res;
+
+  if ( *(ftest = *++v) != '-' ) stderror(ERR_NAME | ERR_FILEINQ);
+  ++v;
+  /*
+   * OK, I just copied the globbing from everywhere else.
+   */
+  gflag = 0;
+  tglob(v);
+  if (gflag) {
+    v = globall(v);
+    if (v == 0)
+      stderror(ERR_NAME | ERR_NOMATCH);
+  }
+  else
+    v = gargv = saveblk(v);
+  trim(v);
+
+  while (*(fileptr = v++)) {
+    xprintf("%S", res = filetest(ftest, &fileptr, 0));
+    xfree(res);
+    if ( *v ) xprintf(" ");
+  }
+  xprintf("\n");
+
+/* Likewise, copied. I hope it's right.. */
+  if (gargv) {
+    blkfree(gargv);
+    gargv = 0;
+  }
+
 }
 
 void

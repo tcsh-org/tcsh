@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.49 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.50 1993/07/07 20:53:55 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.49 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.50 1993/07/07 20:53:55 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -565,7 +565,7 @@ pjwait(pp)
 		getpid(), fp->p_procid);
 #endif /* JOBDEBUG */
 #ifdef BSDSIGS
-	/* sigpause(sigblock((sigmask_t) 0) &~ sigmask(SIGCHLD)); */
+	/* (void) sigpause(sigblock((sigmask_t) 0) &~ sigmask(SIGCHLD)); */
 	(void) sigpause(omask & ~sigmask(SIGCHLD));
 #else /* !BSDSIGS */
 	(void) sigpause(SIGCHLD);
@@ -1943,7 +1943,7 @@ pfork(t, wanttty)
 	 * either have exited or not yet started to run.  Two uglies become
 	 * one.
 	 */
-	sigpause(omask & ~SYNCHMASK);
+	(void) sigpause(omask & ~SYNCHMASK);
 	if (mysigvec(SIGSYNCH, &osv, NULL))
 	    stderror(ERR_SYSTEM, "pfork parent: sigvec restore",
 		     strerror(errno));
@@ -1974,7 +1974,6 @@ static void
 setttypgrp(pgrp)
     int pgrp;
 {
-#ifdef BSDJOBS
     /*
      * If we are piping out a builtin, eg. 'echo | more' things can go
      * out of sequence, i.e. the more can run before the echo. This
@@ -1989,20 +1988,19 @@ setttypgrp(pgrp)
      *    group again.
      */
     if (tcgetpgrp(FSHTTY) != pgrp) {
-# ifdef POSIXJOBS
+#ifdef POSIXJOBS
         /*
 	 * tcsetpgrp will set SIGTTOU to all the the processes in 
 	 * the background according to POSIX... We ignore this here.
 	 */
 	sigret_t (*old)() = sigset(SIGTTOU, SIG_IGN);
-# endif /* POSIXJOBS */
+#endif
 	(void) tcsetpgrp(FSHTTY, pgrp);
 # ifdef POSIXJOBS
 	(void) sigset(SIGTTOU, old);
-# endif /* POSIXJOBS */
+# endif
 
     }
-#endif /* BSDJOBS */
 }
 
 

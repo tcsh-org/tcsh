@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.35 1993/07/07 19:16:17 christos Exp $
+/**/# $Id: Imakefile,v 1.36 1993/07/07 20:28:30 christos Exp christos $
 /**/#
 /**/# Imakefile for for tcsh 6.04
 /**/# Marc Horowitz, MIT SIPB
@@ -46,16 +46,21 @@ ones.  Please send in your fixes and additions! */
 
 # if defined(SunArchitecture)
 #  if (OSMajorVersion == 3)
-#   define ConfigH sos3
-#  else /* OSMajorVersion == 4 */
-#   if (OSMinorVersion == 0)
-#    define ConfigH sos40
-#   else /* OSMinorVersion == 1 */
-#    if (OSTeenyVersion == 3)
-#     define ConfigH sos413
-#    else /* OsTeenyVersion in [0,1,2] */
-#     define ConfigH sos41
+#   define ConfigH sunos35
+#  else
+#   if (OSMajorVersion == 4)
+#    if (OSMinorVersion == 0)
+#     define ConfigH sunos40
+#    else /* OSMinorVersion == 1 */
+#     if (OSTeenyVersion == 3)
+#      define ConfigH sunos413
+#     else /* OsTeenyVersion in [0,1,2] */
+#      define ConfigH sunos41
+#     endif
 #    endif
+#   else /* OSMajorVersion == 5 */
+#    define ConfigH solaris2
+#    define NoCombineRegs
 #   endif
 #  endif
 # endif
@@ -152,7 +157,7 @@ EXTF=mi.termios.c mi.wait.h mi.varargs.h vms.termcap.c
 # endif
 #endif
 
-#CONFIGH = Concat3(-DCONFIGH=\"config/config.,ConfigH,\")
+#CONFIGH = Concat3(-DCONFIGH=\"config/,ConfigH,\")
 
 #ifdef TcshPath
 TCSHPATH = Concat3(-D_PATH_TCSHELL=\",TcshPath,\")
@@ -275,7 +280,11 @@ CC = MyCC
 #  if HasGcc2
 CC = gcc 
 #  else
+#   ifdef NoCombineRegs
+CC = gcc -finline-functions -fstrength-reduce
+#   else
 CC = gcc -fcombine-regs -finline-functions -fstrength-reduce
+#   endif
 #  endif
 # else
 CC = cc
@@ -395,7 +404,7 @@ MISCF = Makefile.std Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
 	README.imake complete.tcsh vmsreadme.txt Makefile.vms termcap.vms \
 	snames.h
-CONFSRCS=config/config.*
+CONFSRCS=config/[a-z]*
 
 
 SRCS = $(SHSRCS) $(TWSRCS) $(EDSRCS) $(TCSRCS)
@@ -433,7 +442,7 @@ tc.const.h: config.h tc.const.c
 	@echo '#endif /* _h_tc_const */' >> $@
 
 config.h:
-	@cp config/config.ConfigH config.h
+	@cp config/ConfigH config.h
 
 $(OBJS): sh.err.h tc.const.h ed.defns.h
 
