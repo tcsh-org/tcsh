@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.8 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.9 1991/10/13 23:44:48 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.8 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.9 1991/10/13 23:44:48 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -765,18 +765,18 @@ e_inc_search(dir)
     int oldHist_num = Hist_num,
 	oldpatlen = patlen,
 	newdir = dir,
-        done, wrap;
+        done, redo;
 
     if (LastChar + sizeof(STRfwd)/sizeof(Char) + 2 + patlen >= InputLim)
 	return(CC_ERROR);
-    if (patlen == 0) {		/* first round */
-	pchar = ':';
-	patbuf[patlen++] = '*';
-    }
 
     for (;;) {
 
-	done = wrap = 0;
+	if (patlen == 0) {	/* first round */
+	    pchar = ':';
+	    patbuf[patlen++] = '*';
+	}
+	done = redo = 0;
 	*LastChar++ = '\n';
 	for (cp = newdir == F_UP_SEARCH_HIST ? STRbck : STRfwd; 
 	     *cp; *LastChar++ = *cp++);
@@ -802,19 +802,13 @@ e_inc_search(dir)
 	    break;
 
 	case F_INC_FWD:
-	    if ((newdir = F_DOWN_SEARCH_HIST) == dir && patlen > 1) {
-		Cursor++;
-		if (pchar == '?')
-		    wrap++;
-	    }
+	    newdir = F_DOWN_SEARCH_HIST;
+	    redo++;
 	    break;
 
 	case F_INC_BACK:
-	    if ((newdir = F_UP_SEARCH_HIST) == dir && patlen > 1) {
-		Cursor--;
-		if (pchar == '?')
-		    wrap++;
-	    }
+	    newdir = F_UP_SEARCH_HIST;
+	    redo++;
 	    break;
 
 	case F_DELPREV:
@@ -833,26 +827,26 @@ e_inc_search(dir)
 
 	    case 0027:		/* ^W: Append word */
 		/* No can do if globbing characters in pattern */
-		for (cp = &patbuf[1]; cp < &patbuf[patlen] && !isglob(*cp);
-		     cp++)
-		    ;
-		if (isglob(*cp)) {
-		    Beep();
-		} else {
-		    Cursor += patlen - 1;
-		    cp = c_next_word(Cursor, LastChar, 1);
-		    while (Cursor < cp && *Cursor != '\n') {
-			if (patlen > INBUFSIZ - 3) {
-			    Beep();
-			    break;
-			} 
-			patbuf[patlen++] = *Cursor;
-			*LastChar++ = *Cursor++;
+		for (cp = &patbuf[1]; ; cp++)
+		    if (cp >= &patbuf[patlen]) {
+			Cursor += patlen - 1;
+			cp = c_next_word(Cursor, LastChar, 1);
+			while (Cursor < cp && *Cursor != '\n') {
+			    if (patlen > INBUFSIZ - 3) {
+				Beep();
+				break;
+			    }
+			    patbuf[patlen++] = *Cursor;
+			    *LastChar++ = *Cursor++;
+			}
+			Cursor = oldCursor;
+			*LastChar = '\0';
+			Refresh();
+			break;
+		    } else if (isglob(*cp)) {
+			Beep();
+			break;
 		    }
-		    Cursor = oldCursor;
-		    *LastChar = '\0';
-		    Refresh();
-		}
 		break;
 	    
 	    default:		/* Terminate and execute cmd */
@@ -875,21 +869,28 @@ e_inc_search(dir)
 	if (!done) {
 
 	    /* Can't search if unmatched '[' */
-	    for (cp = &patbuf[1], ch = ']'; cp < &patbuf[patlen]; cp++)
-		if (*cp == '[' || *cp == ']')
+	    for (cp = &patbuf[patlen - 1], ch = ']'; cp > patbuf; cp--)
+		if (*cp == '[' || *cp == ']') {
 		    ch = *cp;
+		    break;
+		}
 
 	    if (patlen > 1 && ch != '[') {
-		if (wrap) {
-		    Hist_num = newdir == F_UP_SEARCH_HIST ? 0 : 0x7fffffff;
-		    if (c_get_histline() == CC_ERROR)
-			/* Hist_num was fixed by first call */
-			(void) c_get_histline();
-		    Cursor = newdir == F_UP_SEARCH_HIST ? LastChar : InputBuf;
+		if (redo && newdir == dir) {
+		    if (pchar == '?') {	/* wrap around */
+			Hist_num = newdir == F_UP_SEARCH_HIST ? 0 : 0x7fffffff;
+			if (c_get_histline() == CC_ERROR)
+			    /* Hist_num was fixed by first call */
+			    (void) c_get_histline();
+			Cursor = newdir == F_UP_SEARCH_HIST ?
+			    LastChar : InputBuf;
+		    } else
+			Cursor += newdir == F_UP_SEARCH_HIST ? -1 : 1;
 		}
 		patbuf[patlen++] = '*';
 		patbuf[patlen] = '\0';
-		if ((ret = c_search_line(&patbuf[1], newdir)) == CC_ERROR) {
+		if (Cursor < InputBuf || Cursor >= LastChar ||
+		    (ret = c_search_line(&patbuf[1], newdir)) == CC_ERROR) {
 		    LastCmd = newdir; /* avoid c_hsetpat */
 		    ret = newdir == F_UP_SEARCH_HIST ?
 			e_up_search_hist(0) : e_down_search_hist(0);
