@@ -2,7 +2,11 @@ This file contains visible (incompatible) changes to the users.
 This version of tcsh has the following new things:
 
 6.08
-* Autoconf support.
+* %$variables are now expanded in the prompt.
+* print_by_columns prints in a single column if the output is not a tty.
+* REMOTEHOST contains only the IP address, not the host name of the machine.
+* names in .cshdirs are quoted.
+* exit value from 0..255 not -128..127 as posix mandates.
 
 6.07
 * Implicit cd when the variable implicitcd is set or set to verbose

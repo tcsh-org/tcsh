@@ -1,0 +1,30 @@
+Hello,
+
+I am pleased to announce that tcsh-6.08 is finally available; this version
+fixes a lot of bugs and adds the following enhancements:
+
+	* Windows/NT support.			Amol Deshpande
+	* Autoconf support.			Kaveh Ghazi
+	* More NLS message catalogs.		(various)
+	* color-ls builtin.			Taga Nayuta
+	* support for right side prompt.	Luke Mewburn
+	* EBCDIC port.				Martin Kraemer
+	* wide-char display support.		Yoshiyuki Sakakibara
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most unix machines, VMS_POSIX, OS/2 EMX, WIN32.
+
+You can get tcsh from ftp.astron.com:/pub/tcsh/tcsh-6.08.tar.gz
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you
+can get it from prep.ai.mit.edu or other GNU mirrors, or ask ftp to
+unpack it on the fly using 'get tcsh-6.08.tar'.
+
+I would like to thank:
+
+    o everyone who sent bug reports
+    o the beta team for all their help, bug fixes, and suggestions
+
+christos

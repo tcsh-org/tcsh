@@ -1,0 +1,8 @@
+
+The tcsh code has been tested on a solaris-2.6 machine and a
+NetBSD-1.3H machine running before, and after the year 2000. The
+code has been also visually inspected for Y2K compliance problems.
+Tcsh does not use time functions for anything but display purposes,
+so its operation should not be affected assuming that the time
+related functions of the c library work properly.
+

@@ -1,4 +1,4 @@
-# $Id: Makefile.vms,v 1.30 1997/10/27 22:44:18 christos Exp $
+# $Id: Makefile.vms,v 1.31 1998/06/27 15:33:05 christos Exp $
 #	Makefile.vms	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -8,7 +8,7 @@
 # things; Paul Placeway, CIS Dept., Ohio State University
 #
 SHELL=/bin/sh
-VERSION=6.07
+VERSION=6.08
 BUILD=tcsh
 
 ################################################################
