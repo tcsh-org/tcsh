@@ -59,12 +59,12 @@
  *		This may or may not be true.  For example, Apple Unix
  *		(OREO) has BSDJOBS and BSDSIGS but not BSDTIMES.
  */
-/* #undef BSDTIMES */
+#define BSDTIMES
 
 /*
  * BSDLIMIT	You have BSD-style resource limit stuff (getrlimit/setrlimit)
  */
-/* #undef BSDLIMIT */
+#define BSDLIMIT
 
 /*
  * TERMIO	You have struct termio instead of struct sgttyb.
