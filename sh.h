@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.113 2004/02/11 20:57:45 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.114 2004/02/21 20:34:25 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -1031,7 +1031,7 @@ EXTERN Char  **alvec IZERO_STRUCT,
  */
 EXTERN int   gflag;		/* After tglob -> is globbing needed? */
 
-#define MAXVARLEN 30		/* Maximum number of char in a variable name */
+#define MAXVARLEN 256		/* Maximum number of char in a variable name */
 
 #ifdef __CYGWIN__
 # undef MAXPATHLEN
