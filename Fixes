@@ -1,3 +1,4 @@
+ 35. V6.07.05 - 10/28/97
  34. Integrate Amol Deshpande's WINNT fixes to the tcsh source. Note that
      this is not complete yet; we are missing the NT glue code and the message
      catalogs.
@@ -10,7 +11,8 @@
  28. Port to an EBCDIC machine: BS2000 by Siemens Nixdorf that has an
      IBM/390 compatible processor (Martin.Kraemer)
  27. Detect when we have errors writing to stdout (Vadim Vygonets)
- 26. Ignore quotes in the comparisons for builtins, so that \builtin works.
+ 26. Ignore quotes in the comparisons for builtins, so that \builtin works
+     (Amol Deshpande).
  25. HPUX, portability fixes; make sure that we have the right config file
      (Jonathan Kamens)
  24. Don't do lookups for x displays and figure out ttys properly 
