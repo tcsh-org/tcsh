@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.26 1992/02/21 23:16:20 christos Exp $ */
+/* $Header: /u/christos/tt/tcsh-6.01/RCS/sh.func.c,v 3.27 1992/03/08 02:17:22 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.26 1992/02/21 23:16:20 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.27 1992/03/08 02:17:22 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1173,7 +1173,8 @@ dosetenv(v, c)
 	int     k;
 
 	(void) setlocale(LC_ALL, "");
-	for (k = 0200; k <= 0377 && !Isprint(k); k++);
+	for (k = 0200; k <= 0377 && !Isprint(k); k++)
+	    continue;
 	AsciiOnly = k > 0377;
 #else /* !NLS */
 	AsciiOnly = 0;
@@ -1235,7 +1236,8 @@ dounsetenv(v, c)
      * Find the longest environment variable
      */
     for (maxi = 0, ep = STR_environ; *ep; ep++) {
-	for (i = 0, p = *ep; *p && *p != '='; p++, i++);
+	for (i = 0, p = *ep; *p && *p != '='; p++, i++)
+	    continue;
 	if (i > maxi)
 	    maxi = i;
     }
@@ -1245,7 +1247,8 @@ dounsetenv(v, c)
     while (++v && *v) 
 	for (maxi = 1; maxi;)
 	    for (maxi = 0, ep = STR_environ; *ep; ep++) {
-		for (n = name, p = *ep; *p && *p != '='; *n++ = *p++);
+		for (n = name, p = *ep; *p && *p != '='; *n++ = *p++)
+		    continue;
 		*n = '\0';
 		if (!Gmatch(name, *v))
 		    continue;
@@ -1261,7 +1264,8 @@ dounsetenv(v, c)
 		    int     k;
 
 		    (void) setlocale(LC_ALL, "");
-		    for (k = 0200; k <= 0377 && !Isprint(k); k++);
+		    for (k = 0200; k <= 0377 && !Isprint(k); k++)
+			continue;
 		    AsciiOnly = k > 0377;
 #else /* !NLS */
 		    AsciiOnly = getenv("LANG") == NULL &&
@@ -1401,13 +1405,8 @@ doumask(v, c)
 # endif /* BSDTIMES */
 
 
-static struct limits {
-    int     limconst;
-    char   *limname;
-    int     limdiv;
-    char   *limscale;
-}       limits[] = {
-
+struct limits limits[] = 
+{
 # ifdef RLIMIT_CPU
     RLIMIT_CPU, 	"cputime",	1,	"seconds",
 # endif /* RLIMIT_CPU */

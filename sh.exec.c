@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/tcsh-6.01/RCS/sh.exec.c,v 3.11 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.exec.c,v 3.12 1992/02/21 23:16:20 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.11 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.12 1992/02/21 23:16:20 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -583,33 +583,33 @@ dohash(vv, c)
 
 #ifdef FASTHASH
     if (vv && vv[1]) {
-       hashlength = atoi(short2str(vv[1]));
-       if (vv[2]) {
-	  hashwidth = atoi(short2str(vv[2]));
-	  if ((hashwidth != sizeof(unsigned char)) && 
-	      (hashwidth != sizeof(unsigned short)) && 
-	      (hashwidth != sizeof(unsigned long)))
-	     hashwidth = 0;
-	  if (vv[3])
-	     hashdebug = atoi(short2str(vv[3]));
-       }
+        hashlength = atoi(short2str(vv[1]));
+        if (vv[2]) {
+	    hashwidth = atoi(short2str(vv[2]));
+	    if ((hashwidth != sizeof(unsigned char)) && 
+	        (hashwidth != sizeof(unsigned short)) && 
+	        (hashwidth != sizeof(unsigned long)))
+	        hashwidth = 0;
+	    if (vv[3])
+		hashdebug = atoi(short2str(vv[3]));
+        }
     }
 
     if (hashwidth == 0) {
-       for (pv = v->vec; *pv; pv++, hashwidth++);
-       if (hashwidth <= widthof(unsigned char))
-	  hashwidth = sizeof(unsigned char);
-       else if (hashwidth <= widthof(unsigned short))
-	  hashwidth = sizeof(unsigned short);
-       else
-	  hashwidth = sizeof(unsigned long);
+        for (pv = v->vec; *pv; pv++, hashwidth++)
+	    continue;
+        if (hashwidth <= widthof(unsigned char))
+	    hashwidth = sizeof(unsigned char);
+        else if (hashwidth <= widthof(unsigned short))
+	    hashwidth = sizeof(unsigned short);
+	else
+	    hashwidth = sizeof(unsigned long);
     }
-    if (hashlength == 0) {
-       hashlength = hashwidth * (8*64);	/* "average" files per dir in path */
-    }
+    if (hashlength == 0) 
+        hashlength = hashwidth * (8*64);/* "average" files per dir in path */
 
     if (xhash)
-       xfree((ptr_t) xhash);
+        xfree((ptr_t) xhash);
     xhash = (unsigned long *) xcalloc((size_t) (hashlength * hashwidth), 
 				      (size_t) 1);
 #endif /* FASTHASH */
@@ -643,8 +643,8 @@ dohash(vv, c)
 	    hashval = hashname(str2short(dp->d_name));
 	    bis(hashval, i);
 	    if (hashdebug & 1)
-	       xprintf("hash=%-4d dir=%-2d prog=%s\n",
-		       hashname(str2short(dp->d_name)), i, dp->d_name);
+	        xprintf("hash=%-4d dir=%-2d prog=%s\n",
+		        hashname(str2short(dp->d_name)), i, dp->d_name);
 #else /* OLD HASH */
 	    hashval = hash(hashname(str2short(dp->d_name)), i);
 	    bis(xhash, hashval);
@@ -850,7 +850,7 @@ tellmewhat(lex)
 	}
     }
 
-    if (i = iscommand(strip(sp->word))) {
+    if ((i = iscommand(strip(sp->word))) != 0) {
 	register Char **pv;
 	register struct varent *v;
 	bool    slash = any(short2str(sp->word), '/');
@@ -918,7 +918,7 @@ dowhere(v, c)
 	/* first, look for an alias */
 
 	if (adrof1(*v, &aliases)) {
-	    if (var = adrof1(*v, &aliases)) {
+	    if ((var = adrof1(*v, &aliases)) != NULL) {
 		xprintf("%s is aliased to ", short2str(*v));
 		blkpr(var->vec);
 		xprintf("\n");

@@ -2648,9 +2648,12 @@ can be changed by telling
 that these commands only expect directory arguments:
 .sp
 .nf
-> complete cd =d
+> complete cd 'n/*/d/'
 .fi
 .sp
+The above command tells 
+.I tcsh
+to complete the any following word with a directory.
 .PP 
 The syntax for the
 .I complete 
@@ -2658,38 +2661,112 @@ and
 .I uncomplete
 builtins is:
 .sp
-.I complete [<command>] [<pattern>|<string>|<escape>]*
+.I complete [<command-pattern>] [<completion-argument>]
 .br
-.I uncomplete <command>
+.I uncomplete <command-pattern>
 .PP
-Recognized escapes are:
+Completion arguments are matched in turn from left to write and
+the first sucessful match is returned.
+There are three different completion arguments, modelled after the
+.I sed(1) 
+substitute command and they are of the form:
+.sp
+.B <command>/<matching-pattern>/<completion-action>/
+.sp
+The three commands available are:
+.TP 
+.B p
+This specifies position-dependent completion. The matching pattern is
+a numeric range, similar to the one used to index shell variables. 
+If the current word is within that range, then completion action is
+taken. For example:
+.sp
+.nf
+> complete cd 'p/1/d/'
+.fi
+.sp
+completes only the first argument of 'cd' with a directory. A special
+useful case of position-dependent completion can be used to disambiguate
+command completion:
+.sp
+.nf
+> set autolist
+> co[TAB]
+complete compress
+> complete co* 'p/0/(complete)/'
+> co[TAB]
+> complete _
+.fi
+.sp
+The above command tells the completion mechanism to match any word on
+position 0, that matches the pattern
+.I "co*"
+and replace it with the literal word "complete".
+.TP 
+.B n
+This command specifies next-word completions. The matching pattern in
+this case is a shell pattern that must match the previous word on
+the command line. For example:
+.sp
+.nf
+> complete find 'n/-user/u/'
+.fi
+.sp
+Here the argument of the find command which follows the -user argument is
+completed from the list of users.
+.TP
+.B c
+The last completion command completes the current word. The matching pattern
+in this case must match the prefix of the current word. For example:
+.sp
+.nf
+> complete cc 'c/-I/d/'
+.fi
+.sp
+completes the the word containing -I from the list of directories.
+.sp
+.PP
+So far the 
+.I d,
+.I u,
+.I (word)
+completion actions have been mentioned. The complete list of 
+completion actions are:
 .sp
 .RS +.6i
 .ta 1.2i 1.7i
 .nf
-=a	Complete aliases
-=b	Complete binding
-=c	Complete command
-=d	Complete directory
-=e	Complete environment variable
-=f	Complete file or path component
-=s	Complete shell variable
-=v	Complete any variable
-=u	Complete username
-=$var	Complete using words from variable
+C	Complete completions
+S	Complete signals
+a	Complete aliases
+b	Complete binding
+c	Complete command
+d	Complete directory
+e	Complete environment variable
+f	Complete file or path component
+j	Complete jobs
+l	Complete limits
+n	Complete nothing
+s	Complete shell variable
+v	Complete any variable
+u	Complete username
+$var	Complete using words from variable
+(...)	Complete using words from list
 .fi
 .RE
 .DT
 .sp
-All the above escapes, except 
+All the above completion actions, except 
 .I $var
+and
+.I (...)
 can have an additional shell pattern which must match the files to be
 completed.
 For example, in the C compiler, it makes sense to complete only files
 that the compiler understands:
 .sp
 .br
-> complete cc '=f:*.[cao]'
+> complete cc 'n/*/f:*.[cao]/'
 .br
 .PP
 It is also useful to exclude files from the completion list. Normally
@@ -2700,9 +2777,9 @@ will expand the following command:
 > set fignore=(.o)
 > ls
 foo.c foo.o
-> vi f<tab>
+> vi f[TAB]
 > vi foo.c
-> rm f<tab>
+> rm f[TAB]
 > rm foo.c
 .fi
 .sp
@@ -2712,12 +2789,12 @@ builtin to protect precious files:
 .sp
 .nf
 > set fignore=(.o)
-> complete rm '=f:^*.{c,h,cc,C,tex,1,man,l,y}'
+> complete rm 'n/*/f:^*.{c,h,cc,C,tex,1,man,l,y}/'
 > ls
 foo.c foo.o
-> vi f<tab>
+> vi f[TAB]
 > vi foo.c
-> rm f<tab>
+> rm f[TAB]
 > rm foo.o
 .fi
 .sp
@@ -2725,24 +2802,84 @@ foo.c foo.o
 Other commands don't expect files as arguments, so the completion builtin
 can be used to change the list of items to be completed:
 .sp
-.ta 1.2i 3.0i
 .nf
-> complete man =c	# complete commands 
-> complete which =c	
-> complete dbx =c core
-> complete alias =a	# complete aliases
-> complete set =s	# complete variables
-> complete finger =u	# complete user-names
+> complete man 			'n/*/c/'		# complete commands 
+> complete which		'n/*/c/'	
+> complete dbx 			'n/*/c/' 'p/2/(core)/'
+> complete alias 		'p/1/a/'		# complete aliases
+> complete set 			'p/1/s/			# complete variables
+> complete finger 		'p/1/u/'		# complete user-names
 .fi
 .sp
 .pp
-Finally in some cases, the list needs to be customized:
+In some cases, the list needs to be customized:
 .sp
 .nf
 > set hostnames=(prep.ai.mit.edu tesla.ee.cornell.edu)
-> complete rlogin =$hostnames -l =u
+> complete rlogin 'p/1/$hostnames/'
 .fi
 .sp
+Consider a complex example using matching patterns to direct argument
+dependent completions:
+.ta 1.2i 1.6i
+.nf
+> complete find	'n/-fstype/(nfs 4.2)/' 'n/-name/f/' \e
+		'n/-type/(c b d f p l s)/' 'n/-user/u/' 'n/-exec/c/' \e
+		'n/-ok/c/' 'n/-cpio/f/' 'n/-ncpio/f/' 'n/-newer/f/' \e
+		'c/-/(fstype name perm prune type user nouser \e
+		      group nogroup size inum atime mtime ctime exec \e
+		      ok print ls cpio ncpio newer xdev depth)/' \e
+		'n/*/d/'
+.fi
+.sp
+.sp
+The words following the
+.I -fstype
+and
+.I -type
+arguments is to be completed from the lists specified.
+The word following the
+.I -name,
+.I -cpio,
+.I -ncpio,
+and
+.I -newer
+arguments are to be completed using files or directory components.
+The word following the
+.I -user
+argument will be completed from the list of user names of the system,
+and the word following the 
+.I -exec 
+and 
+.I -ok
+arguments will be completed from the list of commands.
+The fourth line specifies how the current word will be completed if
+it starts with a 
+.I -.
+Note that the pattern of this completion argument refers to the 
+.I current 
+word and not to the 
+.I previous
+word, like before.
+Finally the last line in the find completion matches all the remaining cases
+and requires a directory component.
+.sp
+.ta 1.2i 3.0i
+.nf
+> cd /usr
+> set autolist
+> find [TAB]
+bin/ include/ lib/ local/ man/ src/
+> find -[TAB]
+atime   depth   group   mtime   newer   ok      prune   user
+cpio    exec    inum    name    nogroup perm    size    xdev
+ctime   fstype  ls      ncpio   nouser  print   type
+> find -u[TAB]
+> find -user [TAB]
+christos root
+> find -user c[TAB]
+> find -user christos 
+.fi
 .PP
 This is an experimental feature and the syntax/behavior may change in
 future versions.

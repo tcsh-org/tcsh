@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exp.c,v 3.4 1991/10/28 06:26:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.exp.c,v 3.5 1991/11/11 01:56:34 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.4 1991/10/28 06:26:50 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.5 1991/11/11 01:56:34 christos Exp $")
 
 /*
  * C shell
@@ -212,7 +212,7 @@ exp2c(vp, ignore)
 #ifdef EDEBUG
     etracc("exp2c p1", p1, vp);
 #endif
-    if (i = isa(**vp, EQOP)) {
+    if ((i = isa(**vp, EQOP)) != 0) {
 	(*vp)++;
 	if (i == EQMATCH || i == NOTEQMATCH)
 	    ignore |= NOGLOB;
@@ -260,7 +260,7 @@ exp3(vp, ignore)
 #ifdef EDEBUG
     etracc("exp3 p1", p1, vp);
 #endif
-    if (i = isa(**vp, RELOP)) {
+    if ((i = isa(**vp, RELOP)) != 0) {
 	(*vp)++;
 	if (**vp && eq(**vp, STRequal))
 	    i |= 1, (*vp)++;

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.help.c,v 3.5 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.help.c,v 3.6 1992/01/27 04:20:47 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.help.c,v 3.5 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: tw.help.c,v 3.6 1992/01/27 04:20:47 christos Exp $")
 
 #include "tw.h"
 #include "tc.h"
@@ -190,6 +190,7 @@ static Char *
 skipslist(sl)
     register Char *sl;
 {
-    while (*sl && *sl++ != ':');
+    while (*sl && *sl++ != ':')
+	continue;
     return (sl);
 }

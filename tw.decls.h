@@ -64,18 +64,25 @@ extern	 void		  tw_alias_start	__P((DIR *, Char *));
 extern	 void		  tw_cmd_start		__P((DIR *, Char *));
 extern	 void		  tw_logname_start	__P((DIR *, Char *));
 extern	 void		  tw_var_start		__P((DIR *, Char *));
+extern	 void		  tw_complete_start	__P((DIR *, Char *));
 extern	 void		  tw_file_start		__P((DIR *, Char *));
 extern	 void		  tw_vl_start		__P((DIR *, Char *));
 extern	 void		  tw_wl_start		__P((DIR *, Char *));
 extern	 void		  tw_bind_start		__P((DIR *, Char *));
+extern	 void		  tw_limit_start	__P((DIR *, Char *));
+extern	 void		  tw_sig_start		__P((DIR *, Char *));
+extern	 void		  tw_job_start		__P((DIR *, Char *));
 extern	 Char		 *tw_cmd_next		__P((Char *, int *));
 extern	 Char		 *tw_logname_next	__P((Char *, int *));
 extern	 Char		 *tw_shvar_next		__P((Char *, int *));
 extern	 Char		 *tw_envvar_next	__P((Char *, int *));
 extern	 Char		 *tw_var_next		__P((Char *, int *));
 extern	 Char		 *tw_file_next		__P((Char *, int *));
-extern	 Char		 *tw_bind_next		__P((Char *, int *));
 extern	 Char		 *tw_wl_next		__P((Char *, int *));
+extern	 Char		 *tw_bind_next		__P((Char *, int *));
+extern	 Char		 *tw_limit_next		__P((Char *, int *));
+extern	 Char		 *tw_sig_next		__P((Char *, int *));
+extern	 Char		 *tw_job_next		__P((Char *, int *));
 extern	 void		  tw_dir_end		__P((void));
 extern	 void		  tw_cmd_free		__P((void));
 extern	 void		  tw_logname_end	__P((void));
@@ -98,6 +105,6 @@ extern	 void		  docomplete		__P((Char **,
 						     struct command *));
 extern	 void		  douncomplete		__P((Char **, 
 						     struct command *));
-extern	 int		  tw_complete		__P((Char *, Char *, 
-						     Char **, Char *));
-#endif				/* _h_tw_decls */
+extern	 int		  tw_complete		__P((Char *, Char **, 
+						     Char *, int));
+#endif /* _h_tw_decls */

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.defns.c,v 3.10 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.defns.c,v 3.11 1992/01/27 04:20:47 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.10 1991/11/26 04:28:26 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.11 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 
@@ -1355,9 +1355,11 @@ ed_InitMetaBindings()
     KEYCMD *map;
 
     map = CcKeyMap;
-    for (i = 0; i <= 0377 && CcKeyMap[i] != F_METANEXT; i++);
+    for (i = 0; i <= 0377 && CcKeyMap[i] != F_METANEXT; i++)
+	continue;
     if (i > 0377) {
-	for (i = 0; i <= 0377 && CcAltMap[i] != F_METANEXT; i++);
+	for (i = 0; i <= 0377 && CcAltMap[i] != F_METANEXT; i++)
+	    continue;
 	if (i > 0377) {
 	    i = 033;
 	    if (VImode)

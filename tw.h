@@ -38,19 +38,23 @@
 #define _h_tw
 
 #define TW_ZERO		-1
-#define TW_COMMAND	0
-#define TW_VARIABLE	1
-#define TW_LOGNAME	2
-#define TW_FILE		3
-#define TW_DIRECTORY	4
-#define TW_VARLIST	5
-#define TW_USER		6
-#define TW_LITERAL	7
-#define TW_ALIAS	8
-#define TW_SHELLVAR	9
-#define TW_ENVVAR	10
-#define TW_BINDING	11
-#define TW_WORDLIST	12
+#define TW_NONE		0
+#define TW_COMMAND	1
+#define TW_VARIABLE	2
+#define TW_LOGNAME	3
+#define TW_FILE		4
+#define TW_DIRECTORY	5
+#define TW_VARLIST	6
+#define TW_USER		7
+#define TW_COMPLETION	8
+#define TW_ALIAS	9
+#define TW_SHELLVAR	10
+#define TW_ENVVAR	11
+#define TW_BINDING	12
+#define TW_WORDLIST	13
+#define TW_LIMIT	14
+#define TW_SIGNAL	15
+#define TW_JOB		16
 
 #define TW_EXEC_OK	1
 #define TW_DIR_OK	2

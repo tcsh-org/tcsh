@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.lex.c,v 3.16 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.lex.c,v 3.17 1992/01/28 19:06:06 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.16 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.17 1992/01/28 19:06:06 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -129,7 +129,7 @@ static Char *histlinep = NULL;	/* current pointer into histline */
 
 static Char getCtmp;
 
-#define getC(f)		((getCtmp = peekc) ? (peekc = 0, getCtmp) : getC1(f))
+#define getC(f)		(((getCtmp = peekc) != NULL) ? (peekc = 0, getCtmp) : getC1(f))
 #define	ungetC(c)	peekc = (Char) c
 #define	ungetD(c)	peekd = (Char) c
 
@@ -252,7 +252,8 @@ word()
     wp = wbuf;
     i = BUFSIZE - 4;
 loop:
-    while ((c = getC(DOALL)) == ' ' || c == '\t');
+    while ((c = getC(DOALL)) == ' ' || c == '\t')
+	continue;
     if (cmap(c, _META | _ESC))
 	switch (c) {
 	case '&':
@@ -1262,7 +1263,8 @@ gethent(sc)
 		event = sizeof(lhsb) / sizeof(lhsb[0]);
 		np = &lhsb[--event];
 		*np-- = '\0';
-		for (event--; np > lhsb; *np-- = lhsb[--event]);
+		for (event--; np > lhsb; *np-- = lhsb[--event])
+		    continue;
 		*np = '-';
 	    }
 	    hp = findev(lhsb, 0);
@@ -1715,6 +1717,7 @@ struct Ain *l;
 #endif
 	return;
     case F_SEEK:
+	/*SUPPRESS 112*/
 	l->f_seek = fseekp;
 	l->a_seek = NULL;
 #ifdef DEBUG_SEEK

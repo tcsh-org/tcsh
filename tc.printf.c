@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.printf.c,v 3.3 1991/11/26 04:41:23 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.printf.c,v 3.4 1992/01/27 04:20:47 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.3 1991/11/26 04:41:23 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.4 1992/01/27 04:20:47 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -47,7 +47,7 @@ RCSID("$Id: tc.printf.c,v 3.3 1991/11/26 04:41:23 christos Exp $")
 
 #define INF	32766		/* should be bigger than any field to print */
 
-static unsigned char buf[128];
+static char buf[128];
 
 static	void	xaddchar	__P((int));
 static	void	doprnt		__P((void (*) __P((int)), char *, va_list));
@@ -58,7 +58,7 @@ doprnt(addchar, sfmt, ap)
     char   *sfmt;
     va_list ap;
 {
-    register unsigned char *f, *bp;
+    register char *f, *bp;
     register long l;
     register unsigned long u;
     register int i;
@@ -69,10 +69,10 @@ doprnt(addchar, sfmt, ap)
     int     attributes = 0;
 
 
-    f = (unsigned char *) sfmt;
+    f = sfmt;
     for (; *f; f++) {
 	if (*f != '%') {	/* then just out the char */
-	    (*addchar) ((int) (*f | attributes));
+	    (*addchar) ((int) (((unsigned char)*f) | attributes));
 	}
 	else {
 	    f++;		/* skip the % */
@@ -91,9 +91,9 @@ doprnt(addchar, sfmt, ap)
 		f_width = va_arg(ap, int);
 		f++;
 	    }
-	    else if (Isdigit(*f)) {
-		f_width = atoi((char *) f);
-		while (Isdigit(*f))
+	    else if (Isdigit((unsigned char) *f)) {
+		f_width = atoi(f);
+		while (Isdigit((unsigned char) *f))
 		    f++;	/* skip the digits */
 	    }
 
@@ -103,9 +103,9 @@ doprnt(addchar, sfmt, ap)
 		    prec = va_arg(ap, int);
 		    f++;
 		}
-		else if (Isdigit(*f)) {
+		else if (Isdigit((unsigned char) *f)) {
 		    prec = atoi((char *) f);
-		    while (Isdigit(*f))
+		    while (Isdigit((unsigned char) *f))
 			f++;	/* skip the digits */
 		}
 	    }
@@ -120,7 +120,7 @@ doprnt(addchar, sfmt, ap)
 		f++;
 	    }
 
-	    fmt = *f;
+	    fmt = (unsigned char) *f;
 	    if (Isupper(fmt)) {
 		do_long = 1;
 		fmt = Tolower(fmt);
@@ -146,7 +146,7 @@ doprnt(addchar, sfmt, ap)
 		    while (f_width-- > 0)
 			(*addchar) ((int) (pad | attributes));
 		for (bp--; bp >= buf; bp--)
-		    (*addchar) ((int) (*bp | attributes));
+		    (*addchar) ((int) (((unsigned char) *bp) | attributes));
 		if (flush_left)
 		    while (f_width-- > 0)
 			(*addchar) ((int) (' ' | attributes));
@@ -189,7 +189,7 @@ doprnt(addchar, sfmt, ap)
 		    while (i-- > 0)
 			(*addchar) ((int) (pad | attributes));
 		for (bp--; bp >= buf; bp--)
-		    (*addchar) ((int) (*bp | attributes));
+		    (*addchar) ((int) (((unsigned char) *bp) | attributes));
 		if (flush_left)
 		    while (i-- > 0)
 			(*addchar) ((int) (' ' | attributes));
@@ -202,15 +202,15 @@ doprnt(addchar, sfmt, ap)
 		break;
 
 	    case 's':
-		bp = va_arg(ap, unsigned char *);
+		bp = va_arg(ap, char *);
 		if (!bp)
-		    bp = (unsigned char *) "(nil)";
+		    bp = "(nil)";
 		f_width = f_width - strlen((char *) bp);
 		if (!flush_left)
 		    while (f_width-- > 0)
 			(*addchar) ((int) (pad | attributes));
 		for (i = 0; *bp && i < prec; i++) {
-		    (*addchar) ((int) (*bp | attributes));
+		    (*addchar) ((int) (((unsigned char) *bp) | attributes));
 		    bp++;
 		}
 		if (flush_left)
@@ -238,7 +238,7 @@ doprnt(addchar, sfmt, ap)
 }
 
 
-static unsigned char *xstring;
+static char *xstring;
 static void
 xaddchar(c)
     int     c;
@@ -267,7 +267,7 @@ xsprintf(va_alist)
     fmt = va_arg(va, char *);
 #endif
 
-    xstring = (unsigned char *) str;
+    xstring = (char *) str;
     doprnt(xaddchar, fmt, va);
     va_end(va);
     *xstring++ = '\0';
@@ -311,7 +311,7 @@ xvsprintf(str, fmt, va)
     char   *fmt;
     va_list va;
 {
-    xstring = (unsigned char *) str;
+    xstring = (char *) str;
     doprnt(xaddchar, fmt, va);
     *xstring++ = '\0';
 }

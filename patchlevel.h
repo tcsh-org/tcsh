@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/patchlevel.h,v 3.29 1992/03/08 02:19:22 christos Exp $ */
+/* $Header: /u/christos/tt/tcsh-6.01/RCS/patchlevel.h,v 3.30 1992/03/10 04:02:28 christos Exp $ */
 /*
  * patchlevel.h: Our life story.
  */
@@ -8,7 +8,7 @@
 #define ORIGIN "Cornell"
 #define REV 6
 #define VERS 1
-#define PATCHLEVEL 7
-#define DATE "92/03/09"
+#define PATCHLEVEL 8
+#define DATE "92/03/20"
 
 #endif /* _h_patchlevel */

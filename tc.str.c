@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.str.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.str.c,v 3.4 1992/01/27 04:20:47 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.str.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.4 1992/01/27 04:20:47 christos Exp $")
 
 #define MALLOC_INCR	128
 
@@ -52,7 +52,8 @@ blk2short(src)
     /*
      * Count
      */
-    for (n = 0; src[n] != NULL; n++);
+    for (n = 0; src[n] != NULL; n++)
+	continue;
     sdst = dst = (Char **) xmalloc((size_t) ((n + 1) * sizeof(Char *)));
 
     for (; *src != NULL; src++)
@@ -71,7 +72,8 @@ short2blk(src)
     /*
      * Count
      */
-    for (n = 0; src[n] != NULL; n++);
+    for (n = 0; src[n] != NULL; n++)
+	continue;
     sdst = dst = (char **) xmalloc((size_t) ((n + 1) * sizeof(char *)));
 
     for (; *src != NULL; src++)
@@ -98,7 +100,7 @@ str2short(src)
 
     dst = sdst;
     edst = &dst[dstsize];
-    while (*src) {
+    while ((unsigned char) *src) {
 	*dst++ = (Char) ((unsigned char) *src++);
 	if (dst == edst) {
 	    dstsize += MALLOC_INCR;
@@ -150,7 +152,8 @@ s_strcpy(dst, src)
     register Char *sdst;
 
     sdst = dst;
-    while (*dst++ = *src++);
+    while ((*dst++ = *src++) != NULL)
+	continue;
     return (sdst);
 }
 
@@ -182,9 +185,11 @@ s_strcat(dst, src)
     register short *sdst;
 
     sdst = dst;
-    while (*dst++);
+    while (*dst++)
+	continue;
     --dst;
-    while (*dst++ = *src++);
+    while ((*dst++ = *src++) != NULL)
+	continue;
     return (sdst);
 }
 
@@ -201,13 +206,15 @@ s_strncat(dst, src, n)
 
     sdst = dst;
 
-    while (*dst++);
+    while (*dst++)
+	continue;
     --dst;
 
     do 
 	if ((*dst++ = *src++) == '\0')
 	    return(sdst);
-    while (--n != 0);
+    while (--n != 0)
+	continue;
 
     *dst = '\0';
     return (sdst);
@@ -248,7 +255,8 @@ s_strlen(str)
 {
     register size_t n;
 
-    for (n = 0; *str++; n++);
+    for (n = 0; *str++; n++)
+	continue;
     return (n);
 }
 
@@ -256,7 +264,8 @@ int
 s_strcmp(str1, str2)
     register Char *str1, *str2;
 {
-    for (; *str1 && *str1 == *str2; str1++, str2++);
+    for (; *str1 && *str1 == *str2; str1++, str2++)
+	continue;
     /*
      * The following case analysis is necessary so that characters which look
      * negative collate low against normal characters but high against the
@@ -309,9 +318,11 @@ s_strsave(s)
 
     if (s == 0)
 	s = STRNULL;
-    for (p = s; *p++;);
+    for (p = s; *p++;)
+	continue;
     n = p = (Char *) xmalloc((size_t) ((p - s) * sizeof(Char)));
-    while (*p++ = *s++);
+    while ((*p++ = *s++) != NULL)
+	continue;
     return (n);
 }
 
@@ -326,12 +337,16 @@ s_strspl(cp, dp)
 	cp = STRNULL;
     if (!dp)
 	dp = STRNULL;
-    for (p = cp; *p++;);
-    for (q = dp; *q++;);
+    for (p = cp; *p++;)
+	continue;
+    for (q = dp; *q++;)
+	continue;
     ep = (Char *) xmalloc((size_t)
 			  (((p - cp) + (q - dp) - 1) * sizeof(Char)));
-    for (p = ep, q = cp; *p++ = *q++;);
-    for (p--, q = dp; *p++ = *q++;);
+    for (p = ep, q = cp; (*p++ = *q++) != NULL;)
+	continue;
+    for (p--, q = dp; (*p++ = *q++) != NULL;)
+	continue;
     return (ep);
 }
 

@@ -41,6 +41,7 @@ RCSID("$Id: tw.init.c,v 3.6 1992/02/21 23:16:20 christos Exp $")
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
+#include "sh.proc.h"
 
 #define TW_INCR	128
 
@@ -56,8 +57,12 @@ typedef struct {
 
 static struct varent *tw_vptr = NULL;	/* Current shell variable 	*/
 static Char **tw_env = NULL;		/* Current environment variable */
-static Char  *tw_word = NULL;		/* Current word pointer		*/
+static Char  *tw_word;			/* Current word pointer		*/
 static struct KeyFuncs *tw_bind = NULL;	/* List of the bindings		*/
+#ifndef HAVENOLIMIT
+static struct limits *tw_limit = NULL;	/* List of the resource limits	*/
+#endif /* HAVENOLIMIT */
+static int tw_index = 0;		/* signal and job index		*/
 static DIR   *tw_dir_fd = NULL;		/* Current directory descriptor	*/
 static Char   tw_retname[MAXPATHLEN+1];	/* Return buffer		*/
 static int    tw_cmd_got = 0;		/* What we need to do		*/
@@ -185,7 +190,7 @@ tw_dir_next(dfd)
     if (dfd == NULL)
 	return NULL;
 
-    if (dirp = readdir(dfd)) {
+    if ((dirp = readdir(dfd)) != NULL) {
 	(void) Strcpy(tw_retname, str2short(dirp->d_name));
 	return (tw_retname);
     }
@@ -523,7 +528,8 @@ tw_envvar_next(dir, flags)
     if (tw_env == NULL || *tw_env == NULL)
 	return (NULL);
     for (ps = *tw_env, pd = tw_retname;
-	 *ps && *ps != '=' && pd <= &tw_retname[MAXPATHLEN]; *pd++ = *ps++);
+	 *ps && *ps != '=' && pd <= &tw_retname[MAXPATHLEN]; *pd++ = *ps++)
+	continue;
     *pd = '\0';
     tw_env++;
     return (tw_retname);
@@ -558,6 +564,22 @@ tw_alias_start(dfd, pat)
     tw_vptr_start(&aliases);
     tw_env = NULL;
 } /* tw_alias_start */
+
+
+/* tw_complete_start():
+ *	Begin the list of completions
+ */
+/*ARGSUSED*/
+void
+tw_complete_start(dfd, pat)
+    DIR *dfd;
+    Char *pat;
+{
+    extern struct varent completions;
+    SETDIR(dfd)
+    tw_vptr_start(&completions);
+    tw_env = STR_environ;
+} /* end tw_complete_start */
 
 
 /* tw_var_next():
@@ -649,7 +671,7 @@ tw_file_start(dfd, pat)
 {
     struct varent *vp;
     SETDIR(dfd)
-    if (vp = adrof(STRcdpath))
+    if ((vp = adrof(STRcdpath)) != NULL)
 	tw_env = vp->vec;
 } /* end tw_file_start */
 
@@ -732,7 +754,7 @@ tw_vl_start(dfd, pat)
     Char *pat;
 {
     SETDIR(dfd)
-    if (tw_vptr = adrof(pat)) {
+    if ((tw_vptr = adrof(pat)) != NULL) {
 	tw_env = tw_vptr->vec;
 	tw_vptr = NULL;
     }
@@ -757,6 +779,7 @@ tw_wl_start(dfd, pat)
 /*
  * Return the next word from the word list
  */
+/*ARGSUSED*/
 Char *
 tw_wl_next(dir, flags)
     Char *dir;
@@ -800,10 +823,129 @@ tw_bind_next(dir, flags)
 {
     char *ptr;
     if (tw_bind && tw_bind->name) {
-	for (ptr = tw_bind->name, dir = tw_retname; *dir++ = *ptr++;)
+	for (ptr = tw_bind->name, dir = tw_retname; (*dir++ = *ptr++) != NULL;)
 	    continue;
 	tw_bind++;
 	return(tw_retname);
     }
     return NULL;
 } /* end tw_bind_next */
+
+
+/* tw_limit_start():
+ *	Begin the list of the shell limitings
+ */
+/*ARGSUSED*/
+void
+tw_limit_start(dfd, pat)
+    DIR *dfd;
+    Char *pat;
+{
+    SETDIR(dfd)
+#ifndef HAVENOLIMIT
+    tw_limit = limits;
+#endif /* ! HAVENOLIMIT */
+} /* end tw_limit_start */
+
+
+/* tw_limit_next():
+ *	Begin the list of the shell limitings
+ */
+/*ARGSUSED*/
+Char *
+tw_limit_next(dir, flags)
+    Char *dir;
+    int *flags;
+{
+    char *ptr;
+#ifndef HAVENOLIMIT
+    if (tw_limit && tw_limit->limname) {
+	for (ptr = tw_limit->limname, dir = tw_retname; 
+	     (*dir++ = *ptr++) != NULL;)
+	    continue;
+	tw_limit++;
+	return(tw_retname);
+    }
+#endif /* ! HAVENOLIMIT */
+    return NULL;
+} /* end tw_limit_next */
+
+
+/* tw_sig_start():
+ *	Begin the list of the shell sigings
+ */
+/*ARGSUSED*/
+void
+tw_sig_start(dfd, pat)
+    DIR *dfd;
+    Char *pat;
+{
+    SETDIR(dfd)
+    tw_index = 0;
+} /* end tw_sig_start */
+
+
+/* tw_sig_next():
+ *	Begin the list of the shell sigings
+ */
+/*ARGSUSED*/
+Char *
+tw_sig_next(dir, flags)
+    Char *dir;
+    int *flags;
+{
+    char *ptr;
+    for (;tw_index < NSIG; tw_index++) {
+
+	if (mesg[tw_index].iname == NULL)
+	    continue;
+
+	for (ptr = mesg[tw_index].iname, dir = tw_retname; 
+	     (*dir++ = *ptr++) != NULL;)
+	    continue;
+	tw_index++;
+	return(tw_retname);
+    }
+    return NULL;
+} /* end tw_sig_next */
+
+
+/* tw_job_start():
+ *	Begin the list of the shell jobings
+ */
+/*ARGSUSED*/
+void
+tw_job_start(dfd, pat)
+    DIR *dfd;
+    Char *pat;
+{
+    SETDIR(dfd)
+    tw_index = 1;
+} /* end tw_job_start */
+
+
+/* tw_job_next():
+ *	Begin the list of the shell jobings
+ */
+/*ARGSUSED*/
+Char *
+tw_job_next(dir, flags)
+    Char *dir;
+    int *flags;
+{
+    Char *ptr;
+    struct process *j;
+    for (;tw_index <= pmaxindex; tw_index++) {
+	for (j = proclist.p_next; j != NULL; j = j->p_next)
+	    if (j->p_index == tw_index && j->p_procid == j->p_jobid)
+		break;
+	if (j == NULL) 
+	    continue;
+	for (ptr = j->p_command, dir = tw_retname; (*dir++ = *ptr++) != NULL;)
+	    continue;
+	*dir = '\0';
+	tw_index++;
+	return(tw_retname);
+    }
+    return NULL;
+} /* end tw_job_next */

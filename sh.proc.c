@@ -790,7 +790,8 @@ palloc(pid, t)
 	pp->p_index = pcurrjob->p_index;
 	pp->p_friends = pcurrjob;
 	pp->p_jobid = pcurrjob->p_procid;
-	for (fp = pcurrjob; fp->p_friends != pcurrjob; fp = fp->p_friends);
+	for (fp = pcurrjob; fp->p_friends != pcurrjob; fp = fp->p_friends)
+	    continue;
 	fp->p_friends = pp;
     }
     else {

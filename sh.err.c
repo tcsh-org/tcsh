@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.err.c,v 3.7 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.err.c,v 3.8 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_tc_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.7 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.8 1992/01/27 04:20:47 christos Exp $")
 
 /*
  * C Shell
@@ -323,7 +323,13 @@ static char *errorlist[] =
     "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]",
 # endif /* __convex__ || convex */
 #endif /* apollo */
-#define ERR_INVALID	127
+#define ERR_COMPCOM	127
+    "Illegal completion: \"%s\"",
+#define ERR_COMPILL	128
+    "Illegal %s: '%c'",
+#define ERR_COMPINC	129
+    "Incomplete %s: \"%s\"",
+#define ERR_INVALID	130
     "Invalid Error"
 };
 

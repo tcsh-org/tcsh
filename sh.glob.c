@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.glob.c,v 3.15 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.glob.c,v 3.16 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.15 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.16 1992/01/27 04:20:47 christos Exp $")
 
 #include "tc.h"
 
@@ -99,7 +99,8 @@ globtilde(nv, s)
     u = s;
     for (b = gstart, e = &gbuf[MAXPATHLEN - 1]; 
 	 *s && *s != '/' && *s != ':' && b < e;
-	 *b++ = *s++);
+	 *b++ = *s++)
+	continue;
     *b = EOS;
     if (gethdir(gstart)) {
 	blkfree(nv);
@@ -141,7 +142,8 @@ globequal(nv, s)
 	    blkfree(nv);
 	    stderror(ERR_DEEP);
 	}
-	for (b = &s[2], d = &gp[Strlen(gp)]; *d++ = *b++;);
+	for (b = &s[2], d = &gp[Strlen(gp)]; (*d++ = *b++) != NULL;)
+	    continue;
 	xfree((ptr_t) s);
 	return (Strsave(gp));
     }
@@ -262,7 +264,7 @@ expbrace(nvp, elp, size)
 	/* leave {} untouched for find */
 	if (s[0] == '{' && (s[1] == '\0' || (s[1] == '}' && s[2] == '\0')))
 	    continue;
-	if (b = Strchr(s, '{')) {
+	if ((b = Strchr(s, '{')) != NULL) {
 	    Char  **bl;
 	    int     len;
 
@@ -322,7 +324,7 @@ globexpand(v)
     /*
      * Step 1: expand backquotes.
      */
-    while (s = *v++) {
+    while ((s = *v++) != NULL) {
 	if (Strchr(s, '`')) {
 	    int     i;
 
@@ -575,7 +577,7 @@ rscan(t, f)
 {
     register Char *p;
 
-    while (p = *t++)
+    while ((p = *t++) != NULL)
 	while (*p)
 	    (*f) (*p++);
 }
@@ -586,7 +588,7 @@ trim(t)
 {
     register Char *p;
 
-    while (p = *t++)
+    while ((p = *t++) != NULL)
 	while (*p)
 	    *p++ &= TRIM;
 }
@@ -597,13 +599,13 @@ tglob(t)
 {
     register Char *p, c;
 
-    while (p = *t++) {
+    while ((p = *t++) != NULL) {
 	if (*p == '~' || *p == '=')
 	    gflag |= G_CSH;
 	else if (*p == '{' &&
 		 (p[1] == '\0' || (p[1] == '}' && p[2] == '\0')))
 	    continue;
-	while (c = *p++) {
+	while ((c = *p++) != NULL) {
 	    /*
 	     * eat everything inside the matching backquotes
 	     */
@@ -904,7 +906,7 @@ pmatch(string, pattern)
 	    match = 0;
 	    if ((negate_range = (*pattern == '^')) != 0)
 		pattern++;
-	    while (rangec = *pattern++) {
+	    while ((rangec = *pattern++) != NULL) {
 		if (rangec == ']')
 		    break;
 		if (match)
@@ -938,8 +940,10 @@ Gcat(s1, s2)
     register Char *p, *q;
     int     n;
 
-    for (p = s1; *p++;);
-    for (q = s2; *q++;);
+    for (p = s1; *p++;)
+	continue;
+    for (q = s2; *q++;)
+	continue;
     n = (p - s1) + (q - s2) - 1;
     if (++gargc >= gargsiz) {
 	gargsiz += GLOBSPACE;
@@ -948,8 +952,10 @@ Gcat(s1, s2)
     }
     gargv[gargc] = 0;
     p = gargv[gargc - 1] = (Char *) xmalloc((size_t) (n * sizeof(Char)));
-    for (q = s1; *p++ = *q++;);
-    for (p--, q = s2; *p++ = *q++;);
+    for (q = s1; (*p++ = *q++) != NULL;)
+	continue;
+    for (p--, q = s2; (*p++ = *q++) != NULL;)
+	continue;
 }
 
 #ifdef FILEC

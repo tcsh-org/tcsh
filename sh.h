@@ -778,6 +778,18 @@ EXTERN int   gflag;		/* After tglob -> is globbing needed? */
 # define MAXNAMLEN 512
 #endif /* MAXNAMLEN */
 
+#ifndef HAVENOLIMIT
+/*
+ * resource limits
+ */
+extern struct limits {
+    int     limconst;
+    char   *limname;
+    int     limdiv;
+    char   *limscale;
+} limits[];
+#endif /* !HAVENOLIMIT */
+
 /*
  * Variables for filename expansion
  */

@@ -211,7 +211,8 @@ main(argc, argv)
 	tempv[1][0] = '\0';
 	tempv[1][1] = '\0';
 	tempv[1] = NULL;
-	for (tcp = *tempv; *tcp++;);
+	for (tcp = *tempv; *tcp++;)
+	     continue;
 	for (tcp--; tcp >= *tempv; tcp--)
 	    tcp[1] = tcp[0];
 	*++tcp = '-';
@@ -227,7 +228,8 @@ main(argc, argv)
     {
 	int     k;
 
-	for (k = 0200; k <= 0377 && !Isprint(k); k++);
+	for (k = 0200; k <= 0377 && !Isprint(k); k++)
+	    continue;
 	AsciiOnly = k > 0377;
     }
 #else
@@ -280,7 +282,7 @@ main(argc, argv)
     /*
      * Get and set the tty now
      */
-    if (ttyn = ttyname(SHIN)) {
+    if ((ttyn = ttyname(SHIN)) != NULL) {
 	/*
 	 * Could use rindex to get rid of other possible path components, but
 	 * hpux preserves the subdirectory /pty/ when storing the tty name in
@@ -1314,7 +1316,7 @@ rechist()
 	 * If $savehist is just set, we use the value of $history
 	 * else we use the value in $savehist
 	 */
-	if (shist = adrof(STRsavehist)) {
+	if ((shist = adrof(STRsavehist)) != NULL) {
 	    if (shist->vec[0][0] != '\0')
 		(void) Strcpy(hbuf, shist->vec[0]);
 	    else if ((shist = adrof(STRhistory)) != 0 && 
@@ -1816,7 +1818,7 @@ gethdir(home)
      * Is it us?
      */
     if (*home == '\0') {
-	if (h = value(STRhome)) {
+	if ((h = value(STRhome)) != NULL) {
 	    (void) Strcpy(home, h);
 	    return 0;
 	}

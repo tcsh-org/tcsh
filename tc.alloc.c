@@ -561,7 +561,8 @@ showall(v, c)
 
     xprintf("tcsh current memory allocation:\nfree:\t");
     for (i = 0; i < NBUCKETS; i++) {
-	for (j = 0, p = nextf[i]; p; p = p->ov_next, j++);
+	for (j = 0, p = nextf[i]; p; p = p->ov_next, j++)
+	    continue;
 	xprintf(" %4d", j);
 	totfree += j * (1 << (i + 3));
     }

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.parse.c,v 3.23 1992/03/10 04:02:53 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.parse.c,v 3.22 1992/02/13 05:28:51 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.23 1992/03/10 04:02:53 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.22 1992/02/13 05:28:51 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -47,29 +47,37 @@ RCSID("$Id: tw.parse.c,v 3.23 1992/03/10 04:02:53 christos Exp $")
 
 #define EVEN(x) (((x) & 1) != 1)
 
-#define DOT_NONE	0	/* Don't display dot files	*/
-#define DOT_NOT		1	/* Don't display dot or dot-dot	*/
-#define DOT_ALL		2	/* Display all dot files	*/
+#define DOT_NONE	0	/* Don't display dot files		*/
+#define DOT_NOT		1	/* Don't display dot or dot-dot		*/
+#define DOT_ALL		2	/* Display all dot files		*/
 
-/*  TW_COMMAND	    TW_VARIABLE    TW_LOGNAME	     TW_FILE	*/
-/*  TW_DIRECTORY    TW_VARLIST	   TW_USER	     TW_ALIAS	*/
-/*  TW_SHELLVAR     TW_ENVVAR 	   TW_BINDING	     TW_WORDLIST*/
+/*  TW_NONE,	       TW_COMMAND,     TW_VARIABLE,    TW_LOGNAME,	*/
+/*  TW_FILE,	       TW_DIRECTORY,   TW_VARLIST,     TW_USER,		*/
+/*  TW_COMPLETION,     TW_ALIAS,       TW_SHELLVAR,    TW_ENVVAR,	*/
+/*  TW_BINDING,        TW_WORDLIST,    TW_LIMIT,       TW_SIGNAL	*/
+/*  TW_JOB								*/
 static void (*tw_start_entry[]) __P((DIR *, Char *)) = {
-    tw_cmd_start,   tw_var_start,  tw_logname_start, tw_file_start,
-    tw_file_start,  tw_vl_start,   tw_logname_start, tw_alias_start, 
-    tw_var_start,   tw_var_start,  tw_bind_start,    tw_wl_start
+    tw_file_start,     tw_cmd_start,   tw_var_start,   tw_logname_start, 
+    tw_file_start,     tw_file_start,  tw_vl_start,    tw_logname_start, 
+    tw_complete_start, tw_alias_start, tw_var_start,   tw_var_start,     
+    tw_bind_start,     tw_wl_start,    tw_limit_start, tw_sig_start,
+    tw_job_start
 };
 
 static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
-    tw_cmd_next,   tw_var_next,   tw_logname_next,  tw_file_next,
-    tw_file_next,  tw_var_next,   tw_logname_next,  tw_var_next,   
-    tw_shvar_next, tw_envvar_next,tw_bind_next,     tw_wl_next
+    tw_file_next,      tw_cmd_next,    tw_var_next,    tw_logname_next,  
+    tw_file_next,      tw_file_next,   tw_var_next,    tw_logname_next,  
+    tw_var_next,       tw_var_next,    tw_shvar_next,  tw_envvar_next,   
+    tw_bind_next,      tw_wl_next,     tw_limit_next,  tw_sig_next,
+    tw_job_next
 };
 
 static void (*tw_end_entry[]) __P((void)) = {
-    tw_dir_end,    tw_dir_end,    tw_logname_end,   tw_dir_end,
-    tw_dir_end,    tw_dir_end,    tw_logname_end,   tw_dir_end,	 
-    tw_dir_end,	   tw_dir_end,    tw_dir_end, 	    tw_dir_end
+    tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_logname_end,
+    tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_logname_end, 
+    tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
+    tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
+    tw_dir_end
 };
 
 /* #define TDEBUG */
@@ -83,6 +91,7 @@ static bool SearchNoDirErr = 0;	/* t_search returns -2 if dir is unreadable */
 /* do the expand or list on the command line -- SHOULD BE REPLACED */
 
 extern Char NeedsRedraw;	/* from ed.h */
+extern int Tty_raw_mode;
 extern int TermH;		/* from the editor routines */
 extern int lbuffed;		/* from sh.print.c */
 
@@ -144,7 +153,8 @@ tenematch(inputline, inputline_size, num_read, command)
      */
     for (cmd_start = str_end, backq = 0;
 	 cmd_start >= inputline;
-	 backq ^= (*cmd_start-- == '`'));
+	 backq ^= (*cmd_start-- == '`'))
+	continue;
     /*
      * space backward looking for the beginning of this command
      */
@@ -259,12 +269,13 @@ tenematch(inputline, inputline_size, num_read, command)
     xprintf(":\n");
 #endif
 
-    if (looking == TW_ZERO) {
-	looking = tw_complete(cmd_start, word_start, &wordp, pat);
 #ifdef TDEBUG
-	xprintf("complete %d %s\n", looking, short2str(pat));
+    xprintf("complete %d ", looking);
 #endif
-    }
+    looking = tw_complete(cmd_start, &wordp, pat, looking);
+#ifdef TDEBUG
+    xprintf("complete %d %s\n", looking, short2str(pat));
+#endif
 
     switch ((int) command) {
 	Char    buffer[FILSIZ + 1], *bptr;
@@ -552,8 +563,10 @@ is_suffix(check, template)
 {
     register Char *t, *c;
 
-    for (t = template; *t++;);
-    for (c = check; *c++;);
+    for (t = template; *t++;)
+	continue;
+    for (c = check; *c++;)
+	continue;
     for (;;) {
 	if (t == template)
 	    return 1;
@@ -603,7 +616,8 @@ starting_a_command(wordstart, inputline)
      */
     for (ptr = wordstart, count = 0;
 	 ptr >= inputline;
-	 count += (*ptr-- == '`'));
+	 count += (*ptr-- == '`'))
+	continue;
     /*
      * if the number of backquotes is even don't include the backquote char in
      * the list of command starting delimiters [if it is zero, then it does not
@@ -627,7 +641,7 @@ starting_a_command(wordstart, inputline)
 	/*
 	 * found white space
 	 */
-	if (ptr = Strchr(cmdalive, *wordstart))
+	if ((ptr = Strchr(cmdalive, *wordstart)) != NULL)
 	    count = 1;
 	if (count == 1 && !ptr)
 	    return (FALSE);
@@ -637,13 +651,15 @@ starting_a_command(wordstart, inputline)
 	switch (*wordstart) {
 	case '&':		/* Look for >& */
 	    while (wordstart > inputline &&
-		   (*--wordstart == ' ' || *wordstart == '\t'));
+		   (*--wordstart == ' ' || *wordstart == '\t'))
+		continue;
 	    if (*wordstart == '>')
 		return (FALSE);
 	    break;
 	case '(':		/* check for foreach, if etc. */
 	    while (wordstart > inputline &&
-		   (*--wordstart == ' ' || *wordstart == '\t'));
+		   (*--wordstart == ' ' || *wordstart == '\t'))
+		continue;
 	    if (!iscmdmeta(*wordstart) &&
 		(*wordstart != ' ' && *wordstart != '\t'))
 		return (FALSE);
@@ -675,7 +691,8 @@ recognize(exp_name, entry, name_length, numitems)
 	register int len = 0;
 
 	for (x = exp_name, ent = entry;
-	     *x && (*x & TRIM) == (*ent & TRIM); x++, len++, ent++);
+	     *x && (*x & TRIM) == (*ent & TRIM); x++, len++, ent++)
+	    continue;
 	*x = '\0';		/* Shorten at 1st char diff */
 	if (len == name_length)	/* Ambiguous to prefix? */
 	    return (-1);	/* So stop now and save time */
@@ -747,6 +764,9 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
      */
 
     switch (looking) {
+    case TW_NONE:
+	return -1;
+
     case TW_ZERO:
 	looking = TW_FILE;
 	break;
@@ -771,6 +791,11 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
 	break;
     }
 
+    /*
+     * let fignore work only when we are not using a pattern
+     */
+    ignoring = (gpat != NULL);
+
     if ((*word == '~') && (Strchr(word, '/') == NULL)) {
 	looking = TW_LOGNAME;
 	target = name;
@@ -793,6 +818,10 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
     case TW_SHELLVAR:
     case TW_ENVVAR:
     case TW_BINDING:
+    case TW_LIMIT:
+    case TW_SIGNAL:
+    case TW_JOB:
+    case TW_COMPLETION:
 	break;
 
 
@@ -1029,7 +1058,7 @@ again:
 	    break;
 	
 	case TW_VARIABLE:
-	    if (ptr = Strrchr(word, '$'))
+	    if ((ptr = Strrchr(word, '$')) != NULL)
 		*++ptr = '\0';	/* Delete after the dollar */
 	    else
 		word[0] = '\0';
@@ -1058,8 +1087,8 @@ again:
 		/*
 		 * Don't consider array variables or empty variables
 		 */
-		if (vp = adrof(exp_name)) {
-		    if (!(ptr = vp->vec[0]) || vp->vec[0][0] == '\0' ||
+		if ((vp = adrof(exp_name)) != NULL) {
+		    if ((ptr = vp->vec[0]) != NULL || vp->vec[0][0] == '\0' ||
 			vp->vec[1]) {
 			catn(word, STRspace, max_word_length);
 			ptr = NULL;
@@ -1098,6 +1127,10 @@ again:
 	    case TW_ENVVAR:
 	    case TW_USER:
 	    case TW_BINDING:
+	    case TW_LIMIT:
+	    case TW_SIGNAL:
+	    case TW_JOB:
+	    case TW_COMPLETION:
 		catn(word, STRspace, max_word_length);
 		break;
 
@@ -1110,7 +1143,7 @@ again:
     case LIST:
 
         max_items = 0;
-	if (ptr = value(STRlistmax)) {
+	if ((ptr = value(STRlistmax)) != NULL) {
 	    while (*ptr) {
 		if (!Isdigit(*ptr)) {
 		    max_items = 0;
@@ -1136,7 +1169,23 @@ again:
 
 	qsort((ptr_t) tw_item_get(), (size_t) numitems, sizeof(Char *), 
 	      (int (*) __P((const void *, const void *))) fcompare);
-	print_by_column(STRNULL, tw_item_get(), numitems, TRUE);
+	if (looking != TW_JOB)
+	    print_by_column(STRNULL, tw_item_get(), numitems, TRUE);
+	else {
+	    /*
+	     * print one item on every line because jobs can have spaces
+	     * and it is confusing.
+	     */
+	    int i;
+	    Char **w = tw_item_get();
+
+	    for (i = 0; i < numitems; i++) {
+		xprintf("%s", short2str(w[i]));
+		if (Tty_raw_mode)
+		    xputchar('\r');
+		xputchar('\n');
+	    }
+	}
 
 	tw_item_free();
 	return (numitems);
@@ -1149,7 +1198,7 @@ again:
 	    break;
 
 	case TW_VARIABLE:
-	    if (ptr = Strrchr(word, '$'))
+	    if ((ptr = Strrchr(word, '$')) != NULL)
 		*++ptr = '\0';	/* Delete after the dollar */
 	    else
 		word[0] = '\0';
@@ -1216,7 +1265,8 @@ dollar(new, old)
 	    struct varent *vp;
 
 	    /* found a variable, expand it */
-	    for (var = ++old; alnum(*old); old++);
+	    for (var = ++old; alnum(*old); old++)
+		continue;
 	    save = *old;
 	    *old = '\0';
 	    vp = adrof(var);
@@ -1261,7 +1311,8 @@ tilde(new, old)
 	return (new);
     }
 
-    for (p = new, o = &old[1]; *o && *o != '/'; *p++ = *o++);
+    for (p = new, o = &old[1]; *o && *o != '/'; *p++ = *o++)
+	continue;
     *p = '\0';
 
     if (old[0] == '~') {
@@ -1320,13 +1371,16 @@ expand_dir(dir, edir, dfd, cmd)
 	    /*
 	     * Copy and append a / if there was one
 	     */
-	    for (p = edir; *p; p++);
+	    for (p = edir; *p; p++)
+		continue;
 	    if (*--p == '/') {
-		for (p = nd; *p; p++);
+		for (p = nd; *p; p++)
+		    continue;
 		if (*--p != '/')
 		    p = NULL;
 	    }
-	    for (d = edir, s = nd; *d++ = *s++;);
+	    for (d = edir, s = nd; (*d++ = *s++) != NULL;)
+		continue;
 	    if (!p) {
 		*d-- = '\0';
 		*d = '/';
@@ -1446,7 +1500,6 @@ print_by_column(dir, items, count, no_file_suffix)
 {
     register int i, r, c, columns, rows;
     unsigned int w, maxwidth = 0;
-    extern int Tty_raw_mode;
 
     lbuffed = 0;		/* turn off line buffering */
 
@@ -1499,7 +1552,8 @@ int
 StrQcmp(str1, str2)
     register Char *str1, *str2;
 {
-    for (; *str1 && (*str1 & TRIM) == (*str2 & TRIM); str1++, str2++);
+    for (; *str1 && (*str1 & TRIM) == (*str2 & TRIM); str1++, str2++)
+	continue;
     /*
      * The following case analysis is necessary so that characters which look
      * negative collate low against normal characters but high against the

@@ -474,7 +474,8 @@ update_line(old, new, cur_line)
     /*
      * find first diff
      */
-    for (o = old, n = new; *o && (*o == *n); o++, n++);
+    for (o = old, n = new; *o && (*o == *n); o++, n++)
+	continue;
     ofd = o;
     nfd = n;
 
@@ -520,7 +521,8 @@ update_line(old, new, cur_line)
     /*
      * find last same pointer
      */
-    while ((o > ofd) && (n > nfd) && (*--o == *--n));
+    while ((o > ofd) && (n > nfd) && (*--o == *--n))
+	continue;
     ols = ++o;
     nls = ++n;
 
@@ -538,7 +540,8 @@ update_line(old, new, cur_line)
     if (*ofd) {
 	for (c = *ofd, n = nfd; n < nls; n++) {
 	    if (c == *n) {
-		for (o = ofd, p = n; p < nls && o < ols && *o == *p; o++, p++);
+		for (o = ofd, p = n; p < nls && o < ols && *o == *p; o++, p++)
+		    continue;
 		/*
 		 * if the new match is longer and it's worth keeping, then we
 		 * take it
@@ -559,7 +562,8 @@ update_line(old, new, cur_line)
     if (*nfd) {
 	for (c = *nfd, o = ofd; o < ols; o++) {
 	    if (c == *o) {
-		for (n = nfd, p = o; p < ols && n < nls && *p == *n; p++, n++);
+		for (n = nfd, p = o; p < ols && n < nls && *p == *n; p++, n++)
+		    continue;
 		/*
 		 * if the new match is longer and it's worth keeping, then we
 		 * take it

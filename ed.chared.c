@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.chared.c,v 3.19 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.chared.c,v 3.20 1992/02/13 05:28:51 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.19 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.20 1992/02/13 05:28:51 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -332,7 +332,8 @@ c_number(p, num, dval)
 	sign = -1;		/* Handle $- */
 	++p;
     }
-    for (i = 0; *p >= '0' && *p <= '9'; i = 10 * i + *p++ - '0');
+    for (i = 0; *p >= '0' && *p <= '9'; i = 10 * i + *p++ - '0')
+	continue;
     *num = (sign < 0 ? dval - i : i);
     return(--p);
 }
@@ -454,7 +455,8 @@ excl_sw:
 	     */
 	    dval = 0;
 	    if ((l = h->Hlex.prev) != 0) {
-		for (l = l->prev; l != h->Hlex.next; l = l->prev, dval++);
+		for (l = l->prev; l != h->Hlex.next; l = l->prev, dval++)
+		    continue;
 	    }
 	    if (!dval)
 		goto excl_err;
@@ -546,7 +548,8 @@ c_excl(p)
      */
     if ((p[1] == ' ' || p[1] == '\t') &&
 	(p[-1] == ' ' || p[-1] == '\t' || p[-1] == '>')) {
-	for (q = p - 1; q > InputBuf && (*q == ' ' || *q == '\t'); --q);
+	for (q = p - 1; q > InputBuf && (*q == ' ' || *q == '\t'); --q)
+	    continue;
 	if (*q == '>')
 	    ++p;
     }
@@ -563,7 +566,8 @@ c_excl(p)
     for (;;) {
 	while (*p != HIST && p < Cursor)
 	    ++p;
-	for (i = 1; (p - i) >= InputBuf && p[-i] == '\\'; i++);
+	for (i = 1; (p - i) >= InputBuf && p[-i] == '\\'; i++)
+	    continue;
 	if (i % 2 == 0)
 	    ++p;
 	if (p >= Cursor)
@@ -584,7 +588,8 @@ c_substitute()
      * for white space, the beginning of the line, or a history character.
      */
     for (p = Cursor - 1; 
-	 p > InputBuf && *p != ' ' && *p != '\t' && *p != HIST; --p);
+	 p > InputBuf && *p != ' ' && *p != '\t' && *p != HIST; --p)
+	continue;
 
     /*
      * If we found a history character, go expand it.
@@ -786,9 +791,11 @@ e_inc_search(dir)
 	done = redo = 0;
 	*LastChar++ = '\n';
 	for (cp = newdir == F_UP_SEARCH_HIST ? STRbck : STRfwd; 
-	     *cp; *LastChar++ = *cp++);
+	     *cp; *LastChar++ = *cp++)
+	    continue;
 	*LastChar++ = pchar;
-	for (cp = &patbuf[1]; cp < &patbuf[patlen]; *LastChar++ = *cp++);
+	for (cp = &patbuf[1]; cp < &patbuf[patlen]; *LastChar++ = *cp++)
+	    continue;
 	*LastChar = '\0';
 	Refresh();
 
@@ -2688,7 +2695,8 @@ e_expand(c)
     register Char *p;
     extern bool justpr;
 
-    for (p = InputBuf; Isspace(*p); p++);
+    for (p = InputBuf; Isspace(*p); p++)
+	continue;
     if (p == LastChar)
 	return(CC_ERROR);
 

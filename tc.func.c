@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.24 1992/02/13 05:28:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.25 1992/02/21 23:16:20 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.24 1992/02/13 05:28:51 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.25 1992/02/21 23:16:20 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -205,7 +205,8 @@ dolist(v, c)
     else
 	v = gargv = saveblk(v);
     trim(v);
-    for (k = 0; v[k] != NULL && v[k][0] != '-'; k++);
+    for (k = 0; v[k] != NULL && v[k][0] != '-'; k++)
+	continue;
     if (v[k]) {
 	/*
 	 * We cannot process a flag therefore we let ls do it right.
@@ -298,7 +299,8 @@ dolist(v, c)
 		if (k != 0 && v[1] != NULL)
 		    xputchar('\n');
 		xprintf("%s:\n", short2str(tmp));
-		for (cp = tmp, dp = buf; *cp; *dp++ = (*cp++ | QUOTE));
+		for (cp = tmp, dp = buf; *cp; *dp++ = (*cp++ | QUOTE))
+		    continue;
 		if (dp[-1] != (Char) ('/' | QUOTE))
 		    *dp++ = '/';
 		else 
@@ -395,7 +397,7 @@ dowhich(v, c)
     lex[2].word = STRret;
 
     while (*++v) {
-	if (vp = adrof1(*v, &aliases)) {
+	if ((vp = adrof1(*v, &aliases)) != NULL) {
 	    xprintf("%s: \t aliased to ", short2str(*v));
 	    blkpr(vp->vec);
 	    xprintf("\n");
@@ -871,7 +873,7 @@ setalarm(lck)
     unsigned alrm_time = 0, logout_time, lock_time;
     time_t cl, nl, sched_dif;
 
-    if (vp = adrof(STRautologout)) {
+    if ((vp = adrof(STRautologout)) != NULL) {
 	if ((cp = vp->vec[0]) != 0) {
 	    if ((logout_time = atoi(short2str(cp)) * 60) > 0) {
 		alrm_time = logout_time;
@@ -983,7 +985,8 @@ rmstar(cp)
 	}
 	for (we = we->next;
 	     *we->word != ';' && we != cp;
-	     we = we->next);
+	     we = we->next)
+	    continue;
 	if (*we->word == ';')
 	    we = we->next;
     }
@@ -1057,7 +1060,8 @@ continue_jobs(cp)
 	}
 	for (we = we->next;
 	     *we->word != ';' && we != cp;
-	     we = we->next);
+	     we = we->next)
+	    continue;
 	if (*we->word == ';')
 	    we = we->next;
     }
@@ -1102,7 +1106,8 @@ insert(plist, file_args)
 	insert_we(now, plist);
 
 	for (last = now; *last->word != '\n' && *last->word != ';';
-	     last = last->next);
+	     last = last->next)
+	    continue;
 
 	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
 	now->word = (Char *) xcalloc(1, (size_t) (2 * sizeof(Char)));
@@ -1121,10 +1126,12 @@ insert(plist, file_args)
 	*cp1++ = '~';
 	*cp1++ = '/';
 	*cp1++ = '.';
-	while (*cp1++ = *cp2++);
+	while ((*cp1++ = *cp2++) != NULL)
+	    continue;
 	cp1--;
 	cp2 = pause;
-	while (*cp1++ = *cp2++);
+	while ((*cp1++ = *cp2++) != NULL)
+	    continue;
 	insert_we(now, last->prev);
 
 	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
@@ -1135,7 +1142,8 @@ insert(plist, file_args)
 	cp1 = bcmd;
 	cp2 = cmd;
 	*cp1++ = '%';
-	while (*cp1++ = *cp2++);
+	while ((*cp1++ = *cp2++) != NULL)
+	    continue;
 	now = (struct wordent *) xcalloc(1, (size_t) (sizeof(struct wordent)));
 	now->word = bcmd;
 	insert_we(now, last->prev);
@@ -1150,7 +1158,8 @@ insert(plist, file_args)
 	cp1 = now->word;
 	cp2 = cmd;
 	*cp1++ = '%';
-	while (*cp1++ = *cp2++);
+	while ((*cp1++ = *cp2++) != NULL)
+	    continue;
 	for (now = now->next;
 	     *now->word != '\n' && *now->word != ';' && now != plist;) {
 	    now->prev->next = now->next;

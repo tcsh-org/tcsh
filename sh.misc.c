@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.misc.c,v 3.8 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.misc.c,v 3.9 1992/01/29 05:23:23 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.8 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.9 1992/01/29 05:23:23 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -79,9 +79,11 @@ strsave(s)
 
     if (s == NULL)
 	s = (const char *) "";
-    for (p = (char *) s; *p++;);
+    for (p = (char *) s; *p++;)
+	continue;
     n = p = (char *) xmalloc((size_t) ((p - s) * sizeof(char)));
-    while (*p++ = *s++);
+    while ((*p++ = *s++) != NULL)
+	continue;
     return (n);
 }
 
@@ -126,7 +128,7 @@ blkcpy(oav, bv)
 {
     register Char **av = oav;
 
-    while (*av++ = *bv++)
+    while ((*av++ = *bv++) != NULL)
 	continue;
     return (oav);
 }
@@ -355,9 +357,9 @@ copy(to, from, size)
     register char *to, *from;
     register int size;
 {
-
     if (size && from && to)
 	do
+	    /*SUPPRESS 112*/
 	    *to++ = *from++;
 	while (--size != 0);
 }

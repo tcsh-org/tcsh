@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.c,v 3.10 1992/01/28 19:06:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.c,v 3.11 1992/02/13 05:28:51 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.10 1992/01/28 19:06:06 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.11 1992/02/13 05:28:51 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -113,7 +113,7 @@ dinit(hp)
 	    /*
 	     * use PWD if we have it (for subshells)
 	     */
-	    if (cwd = getenv("PWD")) {
+	    if ((cwd = getenv("PWD")) != NULL) {
 		if (stat(cwd, &shp) != -1 && 
 			DEV_DEV_COMPARE(swd.st_dev, shp.st_dev) &&
 		    swd.st_ino == shp.st_ino)
@@ -315,7 +315,7 @@ dnormalize(cp)
 		break;
 	}
 	while (dotdot > 0) 
-	    if ((dp = Strrchr(cwd, '/'))) {
+	    if ((dp = Strrchr(cwd, '/')) != NULL) {
 #ifdef apollo
 		if (dp == &cwd[1]) 
 		    slashslash = 1;
@@ -421,17 +421,21 @@ dgoto(cp)
 	register Char *p, *q;
 	int     cwdlen;
 
-	for (p = dcwd->di_name; *p++;);
+	for (p = dcwd->di_name; *p++;)
+	    continue;
 	if ((cwdlen = p - dcwd->di_name - 1) == 1)	/* root */
 	    cwdlen = 0;
-	for (p = cp; *p++;);
+	for (p = cp; *p++;)
+	    continue;
 	dp = (Char *) xmalloc((size_t)((cwdlen + (p - cp) + 1) * sizeof(Char)));
-	for (p = dp, q = dcwd->di_name; *p++ = *q++;);
+	for (p = dp, q = dcwd->di_name; (*p++ = *q++) != NULL;)
+	    continue;
 	if (cwdlen)
 	    p[-1] = '/';
 	else
 	    p--;		/* don't add a / after root */
-	for (q = cp; *p++ = *q++;);
+	for (q = cp; (*p++ = *q++) != NULL;)
+	    continue;
 	xfree((ptr_t) cp);
 	cp = dp;
 	dp += cwdlen;
@@ -493,9 +497,11 @@ dfollow(cp)
 	Char    buf[MAXPATHLEN];
 
 	for (cdp = c->vec; *cdp; cdp++) {
-	    for (dp = buf, p = *cdp; *dp++ = *p++;);
+	    for (dp = buf, p = *cdp; (*dp++ = *p++) != NULL;)
+		continue;
 	    dp[-1] = '/';
-	    for (p = cp; *dp++ = *p++;);
+	    for (p = cp; (*dp++ = *p++) != NULL;)
+		continue;
 	    if (chdir(short2str(buf)) >= 0) {
 		printd = 1;
 		xfree((ptr_t) cp);
@@ -587,7 +593,7 @@ dopushd(v, c)
 	/* NOTREACHED */
 	return;
     }
-    else if (dp = dfind(cp)) {
+    else if ((dp = dfind(cp)) != NULL) {
 	char   *tmp;
 
 	if (chdir(tmp = short2str(dp->di_name)) < 0)
@@ -760,9 +766,10 @@ dcanon(cp, p)
     while (*p) {		/* for each component */
 	sp = p;			/* save slash address */
 	while (*++p == '/')	/* flush extra slashes */
-	    ;
+	    continue;
 	if (p != ++sp)
-	    for (p1 = sp, p2 = p; *p1++ = *p2++;);
+	    for (p1 = sp, p2 = p; (*p1++ = *p2++) != NULL;)
+		continue;
 	p = sp;			/* save start of component */
 	slash = 0;
 	while (*++p)		/* find next slash or end of path */
@@ -783,7 +790,8 @@ dcanon(cp, p)
 		*sp = '\0';
 	else if (sp[0] == '.' && sp[1] == 0) {
 	    if (slash) {
-		for (p1 = sp, p2 = p + 1; *p1++ = *p2++;);
+		for (p1 = sp, p2 = p + 1; (*p1++ = *p2++) != NULL;)
+		    continue;
 		p = --sp;
 	    }
 	    else if (--sp != cp)
@@ -813,13 +821,15 @@ dcanon(cp, p)
 		/*
 		 * find length of p
 		 */
-		for (p1 = p; *p1++;);
+		for (p1 = p; *p1++;)
+		    continue;
 		if (*link != '/') {
 		    /*
 		     * Relative path, expand it between the "yyy/" and the
 		     * "/..". First, back sp up to the character past "yyy/".
 		     */
-		    while (*--sp != '/');
+		    while (*--sp != '/')
+			continue;
 		    sp++;
 		    *sp = 0;
 		    /*
@@ -831,9 +841,12 @@ dcanon(cp, p)
 		    /*
 		     * Copy new path into newcp
 		     */
-		    for (p2 = cp; *p1++ = *p2++;);
-		    for (p1--, p2 = link; *p1++ = *p2++;);
-		    for (p1--, p2 = p; *p1++ = *p2++;);
+		    for (p2 = cp; (*p1++ = *p2++) != NULL;)
+			continue;
+		    for (p1--, p2 = link; (*p1++ = *p2++) != NULL;)
+			continue;
+		    for (p1--, p2 = p; (*p1++ = *p2++) != NULL;)
+			continue;
 		    /*
 		     * Restart canonicalization at expanded "/xxx".
 		     */
@@ -848,8 +861,10 @@ dcanon(cp, p)
 		    /*
 		     * Copy new path into newcp
 		     */
-		    for (p2 = link; *p1++ = *p2++;);
-		    for (p1--, p2 = p; *p1++ = *p2++;);
+		    for (p2 = link; (*p1++ = *p2++) != NULL;)
+			continue;
+		    for (p1--, p2 = p; (*p1++ = *p2++) != NULL;)
+			continue;
 		    /*
 		     * Restart canonicalization at beginning
 		     */
@@ -862,9 +877,11 @@ dcanon(cp, p)
 #endif				/* S_IFLNK */
 	    *sp = '/';
 	    if (sp != cp)
-		while (*--sp != '/');
+		while (*--sp != '/')
+		    continue;
 	    if (slash) {
-		for (p1 = sp + 1, p2 = p + 1; *p1++ = *p2++;);
+		for (p1 = sp + 1, p2 = p + 1; (*p1++ = *p2++) != NULL;)
+		    continue;
 		p = sp;
 	    }
 	    else if (cp == sp)
@@ -896,14 +913,16 @@ dcanon(cp, p)
 		/*
 		 * find length of p
 		 */
-		for (p1 = p; *p1++;);
+		for (p1 = p; *p1++;)
+		    continue;
 		if (*link != '/') {
 		    /*
 		     * Relative path, expand it between the "yyy/" and the
 		     * remainder. First, back sp up to the character past
 		     * "yyy/".
 		     */
-		    while (*--sp != '/');
+		    while (*--sp != '/')
+			continue;
 		    sp++;
 		    *sp = 0;
 		    /*
@@ -915,9 +934,12 @@ dcanon(cp, p)
 		    /*
 		     * Copy new path into newcp
 		     */
-		    for (p2 = cp; *p1++ = *p2++;);
-		    for (p1--, p2 = link; *p1++ = *p2++;);
-		    for (p1--, p2 = p; *p1++ = *p2++;);
+		    for (p2 = cp; (*p1++ = *p2++) != NULL;)
+			continue;
+		    for (p1--, p2 = link; (*p1++ = *p2++) != NULL;)
+			continue;
+		    for (p1--, p2 = p; (*p1++ = *p2++) != NULL;)
+			continue;
 		    /*
 		     * Restart canonicalization at expanded "/xxx".
 		     */
@@ -932,8 +954,10 @@ dcanon(cp, p)
 		    /*
 		     * Copy new path into newcp
 		     */
-		    for (p2 = link; *p1++ = *p2++;);
-		    for (p1--, p2 = p; *p1++ = *p2++;);
+		    for (p2 = link; (*p1++ = *p2++) != NULL;)
+			continue;
+		    for (p1--, p2 = p; (*p1++ = *p2++) != NULL;)
+			continue;
 		    /*
 		     * Restart canonicalization at beginning
 		     */
@@ -984,7 +1008,7 @@ dcanon(cp, p)
 			sp = (Char *) - 1;
 			break;
 	    }
-	    if (sp = Strrchr(p2, '/'))
+	    if ((sp = Strrchr(p2, '/')) != NULL)
 		*sp = '\0';
 	}
 	/*
@@ -1126,7 +1150,6 @@ recdirs()
 	ftmp = SHOUT;
 	SHOUT = fp;
 	{
-	    extern struct directory dhead;
 	    extern struct directory *dcwd;
 	    struct directory *dp = dcwd->di_next;
 
