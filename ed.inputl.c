@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.50 2002/03/08 17:36:45 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.51 2002/06/25 19:02:11 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.50 2002/03/08 17:36:45 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.51 2002/06/25 19:02:11 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -738,6 +738,10 @@ GetNextChar(cp)
 #ifdef WINNT_NATIVE
     __nt_want_vcode = 1;
 #endif /* WINNT_NATIVE */
+#ifdef SIG_WINDOW
+    if (windowchg)
+	(void) check_window_size(0);	/* for window systems */
+#endif /* SIG_WINDOW */
     while ((num_read = read(SHIN, (char *) &tcp, 1)) == -1) {
 	if (errno == EINTR)
 	    continue;

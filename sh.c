@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.109 2004/02/21 20:34:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.110 2004/05/19 18:51:43 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.109 2004/02/21 20:34:24 christos Exp $")
+RCSID("$Id: sh.c,v 3.110 2004/05/19 18:51:43 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2181,7 +2181,6 @@ process(catch)
 	freesyn(savet), savet = NULL;
 #ifdef SIG_WINDOW
 	if (windowchg || (catch && intty && !whyles && !tellwhat)) {
-	    windowchg = 0;
 	    (void) check_window_size(0);	/* for window systems */
 	}
 #endif /* SIG_WINDOW */

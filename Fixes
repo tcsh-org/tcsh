@@ -1,3 +1,4 @@
+  8. Make sure terminal size change takes effect immediately.
   7. Obey $printexitvalue for builtins.
   6. FreeBSD PR/66420: Allow history parsing to be special so that it
      can handle inline # characters (Oliver Eikemeier)

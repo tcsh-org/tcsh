@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.57 2003/08/04 16:19:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.58 2004/05/19 18:51:43 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.57 2003/08/04 16:19:13 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.58 2004/05/19 18:51:43 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1775,6 +1775,10 @@ bgetc()
 	if (c == 0 || (c < 0 && fixio(SHIN, errno) == -1))
 	    return (-1);
     }
+#ifdef SIG_WINDOW
+    if (windowchg)
+	(void) check_window_size(0);	/* for window systems */
+#endif /* SIG_WINDOW */
 #ifndef WINNT_NATIVE
     c = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
     fseekp++;
