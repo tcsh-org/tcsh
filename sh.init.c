@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.init.c,v 3.39 1995/03/19 22:33:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.init.c,v 3.40 1995/04/16 19:15:53 christos Exp christos $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.39 1995/03/19 22:33:26 christos Exp christos $")
+RCSID("$Id: sh.init.c,v 3.40 1995/04/16 19:15:53 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -55,6 +55,9 @@ struct	biltins bfunc[] = {
     { "aliases",	doaliases,	0,	1,	},
 #endif /* OBSOLETE */
     { "alloc",		showall,	0,	1	},
+#if defined(_CX_UX)
+    { "att",		doatt,		0,	INF	},
+#endif /* _CX_UX */
     { "bg",		dobg,		0,	INF	},
 #ifdef OBSOLETE
     { "bind",		dobind,		0,	2	},
@@ -154,13 +157,16 @@ struct	biltins bfunc[] = {
     { "switch",		doswitch,	1,	INF	},
     { "telltc",		dotelltc,	0,	INF	},
     { "time",		dotime,		0,	INF	},
+#if defined(_CX_UX)
+    { "ucb",		doucb,		0,	INF	},
+#endif /* _CX_UX */
     { "umask",		doumask,	0,	1	},
     { "unalias",	unalias,	1,	INF	},
     { "uncomplete",	douncomplete,	1,	INF	},
     { "unhash",		dounhash,	0,	0	},
-#if defined(masscomp) || defined(hcx)
-    { "universe",	douniverse,	0,	1	},
-#endif /* masscomp || hcx */
+#if defined(masscomp) || defined(_CX_UX)
+    { "universe",	douniverse,	0,	INF	},
+#endif /* masscomp || _CX_UX */
 #ifndef HAVENOLIMIT
     { "unlimit",	dounlimit,	0,	INF	},
 #endif /* !HAVENOLIMIT */
@@ -728,49 +734,64 @@ mesginit()
     }
 #endif /* SIGTHAW */
 
-#ifdef SIGRTMIN
-    /* solaris */
-    if (mesg[SIGRTMIN].pname == NULL) {
-	mesg[SIGRTMIN].iname = "RTMIN";
-	mesg[SIGRTMIN].pname = CSAVS(2, 68, "First Realtime Signal");
-    }
+/*
+ * Careful, some OS's (HP/UX 10.0) define these as -1
+ */
+#ifdef SIGRTMIN 
+    /*
+     * Cannot do this at compile time; Solaris2 uses _sysconf for these
+     */
+    if (SIGRTMIN > 0 && SIGRTMIN < NUMSIG) { 
+	if (mesg[SIGRTMIN].pname == NULL) {
+	    mesg[SIGRTMIN].iname = "RTMIN";
+	    mesg[SIGRTMIN].pname = CSAVS(2, 68, "First Realtime Signal");
+	}
 
-    if (mesg[SIGRTMIN+1].pname == NULL) {
-	mesg[SIGRTMIN+1].iname = "RTMIN+1";
-	mesg[SIGRTMIN+1].pname = CSAVS(2, 69, "Second Realtime Signal");
-    }
+	if (mesg[SIGRTMIN+1].pname == NULL) {
+	    mesg[SIGRTMIN+1].iname = "RTMIN+1";
+	    mesg[SIGRTMIN+1].pname = CSAVS(2, 69, "Second Realtime Signal");
+	}
 
-    if (mesg[SIGRTMIN+2].pname == NULL) {
-	mesg[SIGRTMIN+2].iname = "RTMIN+2";
-	mesg[SIGRTMIN+2].pname = CSAVS(2, 70, "Third Realtime Signal");
-    }
+	if (mesg[SIGRTMIN+2].pname == NULL) {
+	    mesg[SIGRTMIN+2].iname = "RTMIN+2";
+	    mesg[SIGRTMIN+2].pname = CSAVS(2, 70, "Third Realtime Signal");
+	}
 
-    if (mesg[SIGRTMIN+3].pname == NULL) {
-	mesg[SIGRTMIN+3].iname = "RTMIN+3";
-	mesg[SIGRTMIN+3].pname = CSAVS(2, 71, "Fourth Realtime Signal");
+	if (mesg[SIGRTMIN+3].pname == NULL) {
+	    mesg[SIGRTMIN+3].iname = "RTMIN+3";
+	    mesg[SIGRTMIN+3].pname = CSAVS(2, 71, "Fourth Realtime Signal");
+	}
     }
 #endif /* SIGRTMIN */
 
 #ifdef SIGRTMAX
-    /* solaris */
-    if (mesg[SIGRTMAX-3].pname == NULL) {
-	mesg[SIGRTMAX-3].iname = "RTMAX-3";
-	mesg[SIGRTMAX-3].pname = CSAVS(2, 72, "Fourth Last Realtime Signal");
-    }
+    /*
+     * Cannot do this at compile time; Solaris2 uses _sysconf for these
+     */
+    if (SIGRTMAX > 0 && SIGRTMAX < NUMSIG) { 
+	if (mesg[SIGRTMAX-3].pname == NULL) {
+	    mesg[SIGRTMAX-3].iname = "RTMAX-3";
+	    mesg[SIGRTMAX-3].pname = CSAVS(2, 72,
+					   "Fourth Last Realtime Signal");
+	}
 
-    if (mesg[SIGRTMAX-2].pname == NULL) {
-	mesg[SIGRTMAX-2].iname = "RTMAX-2";
-	mesg[SIGRTMAX-2].pname = CSAVS(2, 73, "Third Last Realtime Signal");
-    }
+	if (mesg[SIGRTMAX-2].pname == NULL) {
+	    mesg[SIGRTMAX-2].iname = "RTMAX-2";
+	    mesg[SIGRTMAX-2].pname = CSAVS(2, 73,
+					   "Third Last Realtime Signal");
+	}
 
-    if (mesg[SIGRTMAX-1].pname == NULL) {
-	mesg[SIGRTMAX-1].iname = "RTMAX-1";
-	mesg[SIGRTMAX-1].pname = CSAVS(2, 74, "Second Last Realtime Signal");
-    }
+	if (mesg[SIGRTMAX-1].pname == NULL) {
+	    mesg[SIGRTMAX-1].iname = "RTMAX-1";
+	    mesg[SIGRTMAX-1].pname = CSAVS(2, 74,
+					   "Second Last Realtime Signal");
+	}
 
-    if (mesg[SIGRTMAX].pname == NULL) {
-	mesg[SIGRTMAX].iname = "RTMAX";
-	mesg[SIGRTMAX].pname = CSAVS(2, 75, "Last Realtime Signal");
+	if (mesg[SIGRTMAX].pname == NULL) {
+	    mesg[SIGRTMAX].iname = "RTMAX";
+	    mesg[SIGRTMAX].pname = CSAVS(2, 75,
+					 "Last Realtime Signal");
+	}
     }
 #endif /* SIGRTMAX */
 
@@ -849,7 +870,7 @@ mesginit()
 #endif /* SIGSAK */
 
 #ifdef SIGRESCHED
-    /* hcx */
+    /* CX/UX */
     if (mesg[SIGRESCHED].pname == NULL) {
 	mesg[SIGRESCHED].iname = "RESCHED";
 	mesg[SIGRESCHED].pname = CSAVS(2, 85, "Reschedule");

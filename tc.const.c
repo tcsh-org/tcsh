@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.const.c,v 3.34 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.const.c,v 3.35 1995/03/19 22:33:26 christos Exp christos $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,39 +36,41 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.34 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: tc.const.c,v 3.35 1995/03/19 22:33:26 christos Exp christos $")
 
-Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
-Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
+Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
+Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
 			    '\0' };
 Char STRdefautologout[] = { '6', '0', '\0' };
-Char STRautomatic[]     = { 'a', 'u', 't', 'o', 'm', 'a', 't', 'i', 'c', '\0' };
+Char STRautomatic[]	= { 'a', 'u', 't', 'o', 'm', 'a', 't', 'i', 'c',
+			    '\0' };
 Char STRhangup[]	= { 'h', 'a', 'n', 'g', 'u', 'p', '\0' };
-Char STRaout[]          = { 'a', '.', 'o', 'u', 't', '\0' };
-Char STRtty[]           = { 't', 't', 'y', '\0' };
-Char STRany[]           = { 'a', 'n', 'y', '\0' };
-Char STRstatus[]        = { 's', 't', 'a', 't', 'u', 's', '\0' };
-Char STR0[]             = { '0', '\0' };
-Char STR1[]             = { '1', '\0' };
+Char STRaout[]		= { 'a', '.', 'o', 'u', 't', '\0' };
+Char STRtty[]		= { 't', 't', 'y', '\0' };
+Char STRpts[]		= { 'p', 't', 's', '\0' };
+Char STRany[]		= { 'a', 'n', 'y', '\0' };
+Char STRstatus[]	= { 's', 't', 'a', 't', 'u', 's', '\0' };
+Char STR0[]		= { '0', '\0' };
+Char STR1[]		= { '1', '\0' };
 /* STRm1 would look too much like STRml IMHO */
 Char STRminus1[]	= { '-', '1', '\0' };
 Char STRmaxint[]	= { '0', 'x', '7', 'f', 'f', 'f', 'f', 'f', 'f', 'f',
 			    '\0' };
 Char STRcolon[]		= { ':', '\0' };
-Char STRNULL[]          = { '\0' };
-Char STRtcsh[]          = { 't', 'c', 's', 'h', '\0' };
-Char STRhome[]          = { 'h', 'o', 'm', 'e', '\0' };
-Char STRuser[]          = { 'u', 's', 'e', 'r', '\0' };
-Char STRgroup[]         = { 'g', 'r', 'o', 'u', 'p', '\0' };
+Char STRNULL[]		= { '\0' };
+Char STRtcsh[]		= { 't', 'c', 's', 'h', '\0' };
+Char STRhome[]		= { 'h', 'o', 'm', 'e', '\0' };
+Char STRuser[]		= { 'u', 's', 'e', 'r', '\0' };
+Char STRgroup[]		= { 'g', 'r', 'o', 'u', 'p', '\0' };
 #ifdef AFS
-Char STRafsuser[]          = { 'a', 'f', 's', 'u', 's', 'e', 'r', '\0' };
+Char STRafsuser[]	   = { 'a', 'f', 's', 'u', 's', 'e', 'r', '\0' };
 #endif /* AFS */
-Char STRterm[]          = { 't', 'e', 'r', 'm', '\0' };
-Char STRversion[]       = { 'v', 'e', 'r', 's', 'i', 'o', 'n', '\0' };
-Char STRuid[]           = { 'u', 'i', 'd', '\0' };
-Char STRgid[]           = { 'g', 'i', 'd', '\0' };
+Char STRterm[]		= { 't', 'e', 'r', 'm', '\0' };
+Char STRversion[]	= { 'v', 'e', 'r', 's', 'i', 'o', 'n', '\0' };
+Char STRuid[]		= { 'u', 'i', 'd', '\0' };
+Char STRgid[]		= { 'g', 'i', 'd', '\0' };
 Char STRunknown[]	= { 'u', 'n', 'k', 'n', 'o', 'w', 'n', '\0' };
-Char STRHOST[]          = { 'H', 'O', 'S', 'T', '\0' };
+Char STRHOST[]		= { 'H', 'O', 'S', 'T', '\0' };
 #ifdef REMOTEHOST
 Char STRREMOTEHOST[]	= { 'R', 'E', 'M', 'O', 'T', 'E', 'H', 
 			    'O', 'S', 'T', '\0' };
@@ -77,60 +79,63 @@ Char STRHOSTTYPE[]	= { 'H', 'O', 'S', 'T', 'T', 'Y', 'P', 'E', '\0' };
 Char STRVENDOR[]	= { 'V', 'E', 'N', 'D', 'O', 'R', '\0' };
 Char STRMACHTYPE[]	= { 'M', 'A', 'C', 'H', 'T', 'Y', 'P', 'E', '\0' };
 Char STROSTYPE[]	= { 'O', 'S', 'T', 'Y', 'P', 'E', '\0' };
-Char STRedit[]          = { 'e', 'd', 'i', 't', '\0' };
-Char STRaddsuffix[]     = { 'a', 'd', 'd', 's', 'u', 'f', 'f', 'i', 'x', '\0' };
-Char STRnostat[]        = { 'n', 'o', 's', 't', 'a', 't', '\0' };
-Char STRshell[]         = { 's', 'h', 'e', 'l', 'l', '\0' };
-Char STRtmpsh[]         = { '/', 't', 'm', 'p', '/', 's', 'h', '\0' };
-Char STRverbose[]       = { 'v', 'e', 'r', 'b', 'o', 's', 'e', '\0' };
-Char STRecho[]          = { 'e', 'c', 'h', 'o', '\0' };
-Char STRpath[]          = { 'p', 'a', 't', 'h', '\0' };
-Char STRprompt[]        = { 'p', 'r', 'o', 'm', 'p', 't', '\0' };
-Char STRprompt2[]       = { 'p', 'r', 'o', 'm', 'p', 't', '2', '\0' };
-Char STRprompt3[]       = { 'p', 'r', 'o', 'm', 'p', 't', '3', '\0' };
-Char STRellipsis[]      = { 'e', 'l', 'l', 'i', 'p', 's', 'i', 's', '\0' };
-Char STRcwd[]           = { 'c', 'w', 'd', '\0' };
-Char STRowd[]           = { 'o', 'w', 'd', '\0' };
-Char STRstar[]          = { '*', '\0' };
-Char STRdot[]           = { '.', '\0' };
-Char STRhistory[]       = { 'h', 'i', 's', 't', 'o', 'r', 'y', '\0' };
+Char STRedit[]		= { 'e', 'd', 'i', 't', '\0' };
+Char STRaddsuffix[]	= { 'a', 'd', 'd', 's', 'u', 'f', 'f', 'i', 'x',
+			    '\0' };
+Char STRnostat[]	= { 'n', 'o', 's', 't', 'a', 't', '\0' };
+Char STRshell[]		= { 's', 'h', 'e', 'l', 'l', '\0' };
+Char STRtmpsh[]		= { '/', 't', 'm', 'p', '/', 's', 'h', '\0' };
+Char STRverbose[]	= { 'v', 'e', 'r', 'b', 'o', 's', 'e', '\0' };
+Char STRecho[]		= { 'e', 'c', 'h', 'o', '\0' };
+Char STRpath[]		= { 'p', 'a', 't', 'h', '\0' };
+Char STRprompt[]	= { 'p', 'r', 'o', 'm', 'p', 't', '\0' };
+Char STRprompt2[]	= { 'p', 'r', 'o', 'm', 'p', 't', '2', '\0' };
+Char STRprompt3[]	= { 'p', 'r', 'o', 'm', 'p', 't', '3', '\0' };
+Char STRellipsis[]	= { 'e', 'l', 'l', 'i', 'p', 's', 'i', 's', '\0' };
+Char STRcwd[]		= { 'c', 'w', 'd', '\0' };
+Char STRowd[]		= { 'o', 'w', 'd', '\0' };
+Char STRstar[]		= { '*', '\0' };
+Char STRdot[]		= { '.', '\0' };
+Char STRhistory[]	= { 'h', 'i', 's', 't', 'o', 'r', 'y', '\0' };
 Char STRhistdup[]	= { 'h', 'i', 's', 't', 'd', 'u', 'p', '\0' };
-Char STRhistfile[]      = { 'h', 'i', 's', 't', 'f', 'i', 'l', 'e', '\0' };
-Char STRsource[]        = { 's', 'o', 'u', 'r', 'c', 'e', '\0' };
-Char STRmh[]            = { '-', 'h', '\0' };
-Char STRmm[]            = { '-', 'm', '\0' };
-Char STRmr[]            = { '-', 'r', '\0' };
-Char STRmerge[]         = { 'm', 'e', 'r', 'g', 'e', '\0' };
-Char STRtildothist[]    = { '~', '/', '.', 'h', 'i', 's', 't', 'o', 'r', 
-		            'y', '\0' };
+Char STRhistfile[]	= { 'h', 'i', 's', 't', 'f', 'i', 'l', 'e', '\0' };
+Char STRsource[]	= { 's', 'o', 'u', 'r', 'c', 'e', '\0' };
+Char STRmh[]		= { '-', 'h', '\0' };
+Char STRmhT[]		= { '-', 'h', 'T', '\0' };
+Char STRmm[]		= { '-', 'm', '\0' };
+Char STRmr[]		= { '-', 'r', '\0' };
+Char STRmerge[]		= { 'm', 'e', 'r', 'g', 'e', '\0' };
+Char STRtildothist[]	= { '~', '/', '.', 'h', 'i', 's', 't', 'o', 'r', 
+			    'y', '\0' };
 
 #ifdef KANJI
-Char STRnokanji[]       = { 'n', 'o', 'k', 'a', 'n', 'j', 'i', '\0' };
+Char STRnokanji[]	= { 'n', 'o', 'k', 'a', 'n', 'j', 'i', '\0' };
 #endif
 
-Char STRtildotdirs[]    = { '~', '/', '.', 'c', 's', 'h', 'd', 'i', 'r',
+Char STRtildotdirs[]	= { '~', '/', '.', 'c', 's', 'h', 'd', 'i', 'r',
 			    's', '\0' };
-Char STRdirsfile[]      = { 'd', 'i', 'r', 's', 'f', 'i', 'l', 'e', '\0' };
-Char STRsavedirs[]      = { 's', 'a', 'v', 'e', 'd', 'i', 'r', 's', '\0' };
-Char STRloginsh[]       = { 'l', 'o', 'g', 'i', 'n', 's', 'h', '\0' };
-Char STRdirstack[]      = { 'd', 'i', 'r', 's', 't', 'a', 'c', 'k', '\0' };
-Char STRargv[]          = { 'a', 'r', 'g', 'v', '\0' };
-Char STRcommand[]       = { 'c', 'o', 'm', 'm', 'a', 'n', 'd', '\0' };
-Char STRsavehist[]      = { 's', 'a', 'v', 'e', 'h', 'i', 's', 't', '\0' };
-Char STRnormal[]        = { 'n', 'o', 'r', 'm', 'a', 'l', '\0' };
-Char STRsldtlogout[]    = { '/', '.', 'l', 'o', 'g', 'o', 'u', 't', '\0' };
-Char STRjobs[]          = { 'j', 'o', 'b', 's', '\0' };
-Char STRdefprompt[]     = { '%', '#', ' ', '\0' };
-Char STRmquestion[]     = { '%', 'R', '?' | QUOTE, ' ', '\0' };
-Char STRKCORRECT[]      = { 'C', 'O', 'R', 'R', 'E', 'C', 'T', '>', '%', 'R', 
+Char STRdirsfile[]	= { 'd', 'i', 'r', 's', 'f', 'i', 'l', 'e', '\0' };
+Char STRsavedirs[]	= { 's', 'a', 'v', 'e', 'd', 'i', 'r', 's', '\0' };
+Char STRloginsh[]	= { 'l', 'o', 'g', 'i', 'n', 's', 'h', '\0' };
+Char STRdirstack[]	= { 'd', 'i', 'r', 's', 't', 'a', 'c', 'k', '\0' };
+Char STRargv[]		= { 'a', 'r', 'g', 'v', '\0' };
+Char STRcommand[]	= { 'c', 'o', 'm', 'm', 'a', 'n', 'd', '\0' };
+Char STRsavehist[]	= { 's', 'a', 'v', 'e', 'h', 'i', 's', 't', '\0' };
+Char STRnormal[]	= { 'n', 'o', 'r', 'm', 'a', 'l', '\0' };
+Char STRsldtlogout[]	= { '/', '.', 'l', 'o', 'g', 'o', 'u', 't', '\0' };
+Char STRjobs[]		= { 'j', 'o', 'b', 's', '\0' };
+Char STRdeftcshprompt[]	= { '%', '#', ' ', '\0' };
+Char STRdefcshprompt[]	= { '%', '\0' };
+Char STRmquestion[]	= { '%', 'R', '?' | QUOTE, ' ', '\0' };
+Char STRKCORRECT[]	= { 'C', 'O', 'R', 'R', 'E', 'C', 'T', '>', '%', 'R', 
 			    ' ', '(', 'y', '|', 'n', '|', 'e', '|', 'a', ')', 
 			    '?' | QUOTE, ' ', '\0' };
-Char STRunalias[]       = { 'u', 'n', 'a', 'l', 'i', 'a', 's', '\0' };
-Char STRalias[]         = { 'a', 'l', 'i', 'a', 's', '\0' };
-Char STRprecmd[]        = { 'p', 'r', 'e', 'c', 'm', 'd', '\0' };
-Char STRcwdcmd[]        = { 'c', 'w', 'd', 'c', 'm', 'd', '\0' };
-Char STRperiodic[]      = { 'p', 'e', 'r', 'i', 'o', 'd', 'i', 'c', '\0' };
-Char STRtperiod[]       = { 't', 'p', 'e', 'r', 'i', 'o', 'd', '\0' };
+Char STRunalias[]	= { 'u', 'n', 'a', 'l', 'i', 'a', 's', '\0' };
+Char STRalias[]		= { 'a', 'l', 'i', 'a', 's', '\0' };
+Char STRprecmd[]	= { 'p', 'r', 'e', 'c', 'm', 'd', '\0' };
+Char STRcwdcmd[]	= { 'c', 'w', 'd', 'c', 'm', 'd', '\0' };
+Char STRperiodic[]	= { 'p', 'e', 'r', 'i', 'o', 'd', 'i', 'c', '\0' };
+Char STRtperiod[]	= { 't', 'p', 'e', 'r', 'i', 'o', 'd', '\0' };
 Char STRml[]		= { '-', 'l', '\0' };
 Char STRslash[]		= { '/', '\0' };
 Char STRdotsl[]		= { '.', '/', '\0' };
@@ -142,8 +147,8 @@ Char STRpushdsilent[]	= { 'p', 'u', 's', 'h', 'd', 's', 'i', 'l', 'e', 'n',
 			    't', '\0' };
 Char STRdextract[]	= { 'd', 'e', 'x', 't', 'r', 'a', 'c', 't', '\0' };
 Char STRdunique[]	= { 'd', 'u', 'n', 'i', 'q', 'u', 'e', '\0' };
-Char STRsymlinks[]      = { 's', 'y', 'm', 'l', 'i', 'n', 'k', 's', '\0' };
-Char STRignore[] 	= { 'i', 'g', 'n', 'o', 'r', 'e', '\0' };
+Char STRsymlinks[]	= { 's', 'y', 'm', 'l', 'i', 'n', 'k', 's', '\0' };
+Char STRignore[]	= { 'i', 'g', 'n', 'o', 'r', 'e', '\0' };
 Char STRchase[]		= { 'c', 'h', 'a', 's', 'e', '\0' };
 Char STRexpand[]	= { 'e', 'x', 'p', 'a', 'n', 'd', '\0' };
 Char STRecho_style[]	= { 'e', 'c', 'h', 'o', '_', 's', 't', 'y', 'l', 'e', 
@@ -165,7 +170,7 @@ Char STRLparen[]	= { '(', '\0' };
 Char STRLbrace[]	= { '{', '\0' };
 Char STRfakecom[]	= { '{', ' ', '.', '.', '.', ' ', '}', '\0' };
 Char STRRbrace[]	= { '}', '\0' };
-Char STRKPATH[] 	= { 'P', 'A', 'T', 'H', '\0' };
+Char STRKPATH[]		= { 'P', 'A', 'T', 'H', '\0' };
 Char STRdefault[]	= { 'd', 'e', 'f', 'a', 'u', 'l', 't', '\0' };
 Char STRmn[]		= { '-', 'n', '\0' };
 Char STRminus[]		= { '-', '\0' };
@@ -193,13 +198,13 @@ Char STRspRarrow2[]	= { ' ', '>', '>', '\0' };
 Char STRspRarrow[]	= { ' ', '>', '\0' };
 Char STRgt[]		= { '>', '\0' };
 Char STRsp3dots[]	= { ' ', '.', '.', '.', '\0' };
-Char STRcent2[] 	= { '%', '%', '\0' };
-Char STRcentplus[] 	= { '%', '+', '\0' };
-Char STRcentminus[] 	= { '%', '-', '\0' };
-Char STRcenthash[] 	= { '%', '#', '\0' };
+Char STRcent2[]		= { '%', '%', '\0' };
+Char STRcentplus[]	= { '%', '+', '\0' };
+Char STRcentminus[]	= { '%', '-', '\0' };
+Char STRcenthash[]	= { '%', '#', '\0' };
 #ifdef BSDJOBS
 Char STRcontinue[]	= { 'c', 'o', 'n', 't', 'i', 'n', 'u', 'e', '\0' };
-Char STRcontinue_args[]	= { 'c', 'o', 'n', 't', 'i', 'n', 'u', 'e', '_', 'a',
+Char STRcontinue_args[] = { 'c', 'o', 'n', 't', 'i', 'n', 'u', 'e', '_', 'a',
 			    'r', 'g', 's', '\0' };
 Char STRunderpause[]	= { '_', 'p', 'a', 'u', 's', 'e', '\0' };
 #endif
@@ -256,16 +261,19 @@ Char STRambiguous[]	= { 'a', 'm', 'b', 'i', 'g', 'u', 'o', 'u', 's', '\0' };
 Char STRnotunique[]	= { 'n', 'o', 't', 'u', 'n', 'i', 'q', 'u', 'e', '\0' };
 Char STRret[]		= { '\n', '\0' };
 Char STRnobeep[]	= { 'n', 'o', 'b', 'e', 'e', 'p', '\0' };
+Char STRnoding[]	= { 'n', 'o', 'd', 'i', 'n', 'g', '\0' };
 Char STRnoambiguous[]	= { 'n', 'o', 'a', 'm', 'b', 'i', 'g', 'u', 'o', 'u', 
 			    's', '\0' };
 Char STRvisiblebell[]	= { 'v', 'i', 's', 'i', 'b', 'l', 'e', 'b', 'e', 'l', 
 			    'l', '\0' };
-Char STRrecognize_only_executables[] = { 'r', 'e', 'c', 'o', 'g', 'n', 'i', 'z',
-					 'e', '_', 'o', 'n', 'l', 'y', '_', 'e',
-					 'x', 'e', 'c', 'u', 't', 'a', 'b', 'l',
-					 'e', 's', '\0' };
-Char STRinputmode[]	= { 'i', 'n', 'p', 'u', 't', 'm', 'o', 'd', 'e', '\0' };
-Char STRoverwrite[]	= { 'o', 'v', 'e', 'r', 'w', 'r', 'i', 't', 'e', '\0' };
+Char STRrecognize_only_executables[] = { 'r', 'e', 'c', 'o', 'g', 'n', 'i',
+					 'z', 'e', '_', 'o', 'n', 'l', 'y',
+					 '_', 'e', 'x', 'e', 'c', 'u', 't',
+					 'a', 'b', 'l', 'e', 's', '\0' };
+Char STRinputmode[]	= { 'i', 'n', 'p', 'u', 't', 'm', 'o', 'd', 'e',
+			    '\0' };
+Char STRoverwrite[]	= { 'o', 'v', 'e', 'r', 'w', 'r', 'i', 't', 'e',
+			    '\0' };
 Char STRinsert[]	= { 'i', 'n', 's', 'e', 'r', 't', '\0' };
 Char STRnohup[]		= { 'n', 'o', 'h', 'u', 'p', '\0' };
 Char STRhup[]		= { 'h', 'u', 'p', '\0' };
@@ -277,8 +285,8 @@ Char STRlistflags[]	= { 'l', 'i', 's', 't', 'f', 'l', 'a', 'g', 's', '\0' };
 Char STRlong[]		= { 'l', 'o', 'n', 'g', '\0' };
 Char STRwho[]		= { 'w', 'h', 'o', '\0' };
 Char STRsched[]		= { 's', 'c', 'h', 'e', 'd', '\0' };
-Char STRrmstar[]        = { 'r', 'm', 's', 't', 'a', 'r', '\0' };
-Char STRrm[]            = { 'r', 'm', '\0' };
+Char STRrmstar[]	= { 'r', 'm', 's', 't', 'a', 'r', '\0' };
+Char STRrm[]		= { 'r', 'm', '\0' };
 Char STRshlvl[]		= { 's', 'h', 'l', 'v', 'l', '\0' };
 Char STRKSHLVL[]	= { 'S', 'H', 'L', 'V', 'L', '\0' };
 Char STRLANG[]		= { 'L', 'A', 'N', 'G', '\0' };
@@ -292,28 +300,28 @@ Char STRLC_MESSAGES[]	= { 'L', 'C', '_', 'M', 'E', 'S', 'S', 'A', 'G',
 			    'E', 'S', '\0' };
 Char STRLC_MONETARY[]	= { 'L', 'C', '_', 'M', 'O', 'N', 'E', 'T', 'A',
 			    'R', 'Y', '\0' };
-Char STRNOREBIND[] = { 'N', 'O', 'R', 'E', 'B', 'I', 'N', 'D', '\0' };
+Char STRNOREBIND[] 	= { 'N', 'O', 'R', 'E', 'B', 'I', 'N', 'D', '\0' };
 
-#if defined(SIG_WINDOW) || defined (_VMS_POSIX)  
+#if defined(SIG_WINDOW) || defined (_VMS_POSIX)	 
 /* atp - problem with declaration of str{lines,columns} in sh.func.c (1277) */
-Char STRLINES[] = { 'L', 'I', 'N', 'E', 'S', '\0'};
-Char STRCOLUMNS[] = { 'C', 'O', 'L', 'U', 'M', 'N', 'S', '\0'};
-Char STRTERMCAP[] = { 'T', 'E', 'R', 'M', 'C', 'A', 'P', '\0'};
+Char STRLINES[]		= { 'L', 'I', 'N', 'E', 'S', '\0'};
+Char STRCOLUMNS[]	= { 'C', 'O', 'L', 'U', 'M', 'N', 'S', '\0'};
+Char STRTERMCAP[]	= { 'T', 'E', 'R', 'M', 'C', 'A', 'P', '\0'};
 #endif /* SIG_WINDOW  || _VMS_POSIX */
 
 #ifdef WARP
-Char STRwarp[] = { 'w', 'a', 'r', 'p', '\0' };
+Char STRwarp[]		= { 'w', 'a', 'r', 'p', '\0' };
 #endif /* WARP */
 
 #ifdef apollo
-Char STRSYSTYPE[] = { 'S', 'Y', 'S', 'T', 'Y', 'P', 'E', '\0' };
-Char STRoid[] = { 'o', 'i', 'd', '\0' };
-Char STRbsd43[] = { 'b', 's', 'd', '4', '.', '3', '\0' };
-Char STRsys53[] = { 's', 'y', 's', '5', '.', '3', '\0' };
-Char STRver[] = { 'v', 'e', 'r', '\0' };
+Char STRSYSTYPE[] 	= { 'S', 'Y', 'S', 'T', 'Y', 'P', 'E', '\0' };
+Char STRoid[] 		= { 'o', 'i', 'd', '\0' };
+Char STRbsd43[] 	= { 'b', 's', 'd', '4', '.', '3', '\0' };
+Char STRsys53[] 	= { 's', 'y', 's', '5', '.', '3', '\0' };
+Char STRver[]		= { 'v', 'e', 'r', '\0' };
 #endif /* apollo */
 
-Char STRup[] = { 'u', 'p', '\0' };
-Char STRdown[] = { 'd', 'o', 'w', 'n', '\0' };
-Char STRleft[] = { 'l', 'e', 'f', 't', '\0' };
-Char STRright[] = { 'r', 'i', 'g', 'h', 't', '\0' };
+Char STRup[]		= { 'u', 'p', '\0' };
+Char STRdown[]		= { 'd', 'o', 'w', 'n', '\0' };
+Char STRleft[]		= { 'l', 'e', 'f', 't', '\0' };
+Char STRright[]		= { 'r', 'i', 'g', 'h', 't', '\0' };

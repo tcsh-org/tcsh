@@ -1,3 +1,46 @@
+V6.07.00
+ 29. 6.06.01 - 05/24/96
+ 28. Use sysconf to get NCARGS if available Robert Daniel Kennedy
+     <kennedy@b0ru01.fnal.gov>
+ 27. Grab the program name and use that instead of tcsh in error messages.
+ 26. Fix histdup, so that it does not leave gaps in the event sequence.
+ 25. HP/UX v10.0 fixes: Don't use bsdtty.h and avoid clobbering memory
+     since SIGRT??? is defined as -1.
+ 24. Avoid coredumps when $TERMCAP exceeds 1024 characters
+     Michael Schroeder <Michael.Schroeder@informatik.uni-erlangen.de>
+ 23. Fix memory clobbering when SHORT_STRINGS is not defined. 
+     Todd J Derr <infidel+@pitt.edu>
+ 22. Only restart stopped editors. Robert Webb <robertw@wormald.com.au>
+ 21. Recognize pts sysv ptys when checking to set autologout Bob Myers
+     <bob@intelenet.net> 
+ 20. Magic space incomplete modified core dump fix. Chris Metcalf
+     <metcalf@catfish.lcs.mit.edu>, Bradley White <bww@fore.com>
+ 19. Linux nls fixes Rik Faith <faith@cs.unc.edu>
+ 18. SGI RS8000, Ported notes. Ralf W. Grosse-Kunstleve
+     <rwgk@laplace.csb.yale.edu>
+ 17. Greek nls messages. Aggelos P. Varvitsiotis <avarvit@cc.ece.ntua.gr>
+ 16. Imakefile linux and libcrypt fixes. Jonathan Kamens  <jik@cam.ov.com>
+ 15. FreeBSD fixes Jukka Ukkonen <jau@jau.csc.fi>
+ 14. Expand the environment space for path Steve Kelem <steve.kelem@xilinx.com>
+ 13. Don't overwrite the environment randomly Steve Kelem
+     <steve.kelem@xilinx.com>
+ 12. Don't turn the editor on when we have dumb or unknown terminals. This
+     breaks emacs when compiled with terminfo Jonathan Kamens  <jik@cam.ov.com>
+ 11. Fix F- parsing in tc.bind.c <bob@intelnet.net> (Bob Meyers)
+ 10. Added -T option in history to force timestamp printing. -h alone does
+     not print timestamps anymore for compatibility with csh.
+  9. Typo in tc.bind.c [with -DOBSOLETE] (misplaced parenthesis)
+  8. Recognize convex models properly.
+  7. suppress the DING! option using the noding variable.
+  6. negative nice values did not work.
+  5. Harris CX/UX 7.x support.
+  4. ERR_DMMODE was used on the crays but not defined. I changed the error
+     messages in tc.os.c to use ERR_STRING instead, and fixed a missing error
+     message in the catalogs. Someone will need to retranslate #30 and #31
+     in set23.
+  3. Bug setting listflags... Workaround: set listflags=(A /bin/ls)
+  2. Typo in Imakefile (# comment instead of c comment)
+  1. Typo in ma.setp.c (missing parenthesis)
 V6.06.00, 05/13/95
  88. Cleanup off-by-one error ed.defns.c.
  87. 6.05.09 - 05/06/95

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.exec.c,v 3.33 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.exec.c,v 3.34 1995/04/16 19:15:53 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.33 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: sh.exec.c,v 3.34 1995/04/16 19:15:53 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -433,7 +433,8 @@ texec(sf, st)
 	 * it, don't feed it to the shell if it looks like a binary!
 	 */
 	if ((fd = open(f, O_RDONLY)) != -1) {
-	    if (read(fd, (char *) pref, 2) == 2) {
+	    int nread;
+	    if ((nread = read(fd, (char *) pref, 2)) == 2) {
 		if (!Isprint(pref[0]) && (pref[0] != '\n' && pref[0] != '\t')) {
 		    (void) close(fd);
 		    /*
@@ -441,6 +442,12 @@ texec(sf, st)
 		     */
 		    stderror(ERR_ARCH, f, strerror(errno));
 		}
+	    }
+	    else if (nread < 0 && errno != EINTR) {
+#ifdef convex
+		/* need to print error incase the file is migrated */
+		stderror(ERR_SYSTEM, CMDname, strerror(errno));
+#endif
 	    }
 #ifdef _PATH_BSHELL
 	    else {

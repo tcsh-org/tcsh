@@ -1,42 +1,42 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.time.c,v 3.15 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.time.c,v 3.16 1995/03/05 03:18:09 christos	Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
 /*-
- * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * Copyright (c) 1980, 1991 The	Regents	of the University of California.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * Redistribution and use in source and	binary forms, with or without
+ * modification, are permitted provided	that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
+ * 1. Redistributions of source	code must retain the above copyright
+ *    notice, this list	of conditions and the following	disclaimer.
+ * 2. Redistributions in binary	form must reproduce the	above copyright
+ *    notice, this list	of conditions and the following	disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
+ * 3. All advertising materials	mentioning features or use of this software
  *    must display the following acknowledgement:
- *	This product includes software developed by the University of
+ *	This product includes software developed by the	University of
  *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
+ *    may be used to endorse or	promote	products derived from this software
  *    without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * THIS	SOFTWARE IS PROVIDED BY	THE REGENTS AND	CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * ARE DISCLAIMED.  IN NO EVENT	SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR	CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * OR SERVICES;	LOSS OF	USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH	DAMAGE.
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.15 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: sh.time.c,v	3.16 1995/03/05	03:18:09 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -55,49 +55,53 @@ struct tms times0;
 #endif /* BSDTIMES */
 
 #if !defined(BSDTIMES) && !defined(_SEQUENT_)
-# ifdef POSIX
+# ifdef	POSIX
 static	void	pdtimet	__P((clock_t, clock_t));
 # else /* ! POSIX */
 static	void	pdtimet	__P((time_t, time_t));
-# endif /* ! POSIX */
+# endif	/* ! POSIX */
 #else /* BSDTIMES || _SEQUENT_ */
-static 	void 	tvadd	__P((timeval_t *, timeval_t *));
+static	void	tvadd	__P((timeval_t *, timeval_t *));
 static	void	pdeltat	__P((timeval_t *, timeval_t *));
-#endif /* BSDTIMES || _SEQUENT_ */
+#endif /* BSDTIMES || _SEQUENT_	*/
 
 void
 settimes()
 {
 #ifdef BSDTIMES
-    struct rusage ruch;
+    struct sysrusage ruch;
+#ifdef convex
+    memset(ru0, 0, sizeof(ru0));
+    memset(ruch, 0, sizeof(ruch));
+#endif /* convex */
 
-    (void) gettimeofday(&time0, NULL);
-    (void) getrusage(RUSAGE_SELF, &ru0);
-    (void) getrusage(RUSAGE_CHILDREN, &ruch);
-    ruadd(&ru0, &ruch);
+    (void) gettimeofday(&time0,	NULL);
+    (void) getrusage(RUSAGE_SELF, (struct rusage *) &ru0);
+    (void) getrusage(RUSAGE_CHILDREN, (struct rusage *) &ruch);
+    ruadd(&ru0,	&ruch);
 #else
-# ifdef _SEQUENT_
+# ifdef	_SEQUENT_
     struct process_stats ruch;
 
     (void) get_process_stats(&time0, PS_SELF, &ru0, &ruch);
-    ruadd(&ru0, &ruch);
+    ruadd(&ru0,	&ruch);
 # else	/* _SEQUENT_ */
 #  ifndef COHERENT
     time0 = times(&times0);
-#  else /* !COHERENT */
+#  else	/* !COHERENT */
     time0 = HZ * time(NULL);
     times(&times0);
 #  endif /* !COHERENT */
-    times0.tms_stime += times0.tms_cstime;
-    times0.tms_utime += times0.tms_cutime;
-    times0.tms_cstime = 0;
-    times0.tms_cutime = 0;
+    times0.tms_stime +=	times0.tms_cstime;
+    times0.tms_utime +=	times0.tms_cutime;
+    times0.tms_cstime =	0;
+    times0.tms_cutime =	0;
 # endif	/* _SEQUENT_ */
 #endif /* BSDTIMES */
 }
 
 /*
- * dotime is only called if it is truly a builtin function and not a
+ * dotime is only called if it is truly	a builtin function and not a
  * prefix to another command
  */
 /*ARGSUSED*/
@@ -108,38 +112,42 @@ dotime(v, c)
 {
 #ifdef BSDTIMES
     timeval_t timedol;
-    struct rusage ru1, ruch;
+    struct sysrusage ru1, ruch;
+#ifdef convex
+    memset(ru1, 0, sizeof(ru1));
+    memset(ruch, 0, sizeof(ruch));
+#endif /* convex */
 
-    (void) getrusage(RUSAGE_SELF, &ru1);
-    (void) getrusage(RUSAGE_CHILDREN, &ruch);
-    ruadd(&ru1, &ruch);
+    (void) getrusage(RUSAGE_SELF, (struct rusage *) &ru1);
+    (void) getrusage(RUSAGE_CHILDREN, (struct rusage *) &ruch);
+    ruadd(&ru1,	&ruch);
     (void) gettimeofday(&timedol, NULL);
-    prusage(&ru0, &ru1, &timedol, &time0);
+    prusage(&ru0, &ru1,	&timedol, &time0);
 #else
-# ifdef _SEQUENT_
+# ifdef	_SEQUENT_
     timeval_t timedol;
     struct process_stats ru1, ruch;
 
-    (void) get_process_stats(&timedol, PS_SELF, &ru1, &ruch);
-    ruadd(&ru1, &ruch);
-    prusage(&ru0, &ru1, &timedol, &time0);
+    (void) get_process_stats(&timedol, PS_SELF,	&ru1, &ruch);
+    ruadd(&ru1,	&ruch);
+    prusage(&ru0, &ru1,	&timedol, &time0);
 # else /* _SEQUENT_ */
 #  ifndef POSIX
     time_t  timedol;
-#  else /* POSIX */
+#  else	/* POSIX */
     clock_t timedol;
 #  endif /* POSIX */
 
     struct tms times_dol;
 
-#ifndef COHERENT
+#ifndef	COHERENT
     timedol = times(&times_dol);
 #else
     timedol = HZ * time(NULL);
     times(&times_dol);
 #endif
-    times_dol.tms_stime += times_dol.tms_cstime;
-    times_dol.tms_utime += times_dol.tms_cutime;
+    times_dol.tms_stime	+= times_dol.tms_cstime;
+    times_dol.tms_utime	+= times_dol.tms_cutime;
     times_dol.tms_cstime = 0;
     times_dol.tms_cutime = 0;
     prusage(&times0, &times_dol, timedol, time0);
@@ -150,7 +158,7 @@ dotime(v, c)
 }
 
 /*
- * donice is only called when it on the line by itself or with a +- value
+ * donice is only called when it on the	line by	itself or with a +- value
  */
 /*ARGSUSED*/
 void
@@ -159,16 +167,16 @@ donice(v, c)
     struct command *c;
 {
     register Char *cp;
-    int     nval = 0;
+    int	    nval = 0;
 
     USE(c);
     v++, cp = *v++;
     if (cp == 0)
 	nval = 4;
-    else if (*v == 0 && any("+-", cp[0]))
+    else if (*v	== 0 &&	any("+-", cp[0]))
 	nval = getn(cp);
 #ifdef BSDNICE
-    (void) setpriority(PRIO_PROCESS, 0, nval);
+    (void) setpriority(PRIO_PROCESS, 0,	nval);
 #else /* BSDNICE */
     (void) nice(nval);
 #endif /* BSDNICE */
@@ -177,12 +185,12 @@ donice(v, c)
 #ifdef BSDTIMES
 void
 ruadd(ru, ru2)
-    register struct rusage *ru, *ru2;
+    register struct sysrusage *ru,	*ru2;
 {
     tvadd(&ru->ru_utime, &ru2->ru_utime);
     tvadd(&ru->ru_stime, &ru2->ru_stime);
     if (ru2->ru_maxrss > ru->ru_maxrss)
-	ru->ru_maxrss = ru2->ru_maxrss;
+	ru->ru_maxrss =	ru2->ru_maxrss;
 
     ru->ru_ixrss += ru2->ru_ixrss;
     ru->ru_idrss += ru2->ru_idrss;
@@ -197,10 +205,18 @@ ruadd(ru, ru2)
     ru->ru_nsignals += ru2->ru_nsignals;
     ru->ru_nvcsw += ru2->ru_nvcsw;
     ru->ru_nivcsw += ru2->ru_nivcsw;
+
+# ifdef	convex
+    tvadd(&ru->ru_exutime, &ru2->ru_exutime);
+    ru->ru_utotal += ru2->ru_utotal;
+    ru->ru_usamples += ru2->ru_usamples;
+    ru->ru_stotal += ru2->ru_stotal;
+    ru->ru_ssamples += ru2->ru_ssamples;
+# endif	/* convex */
 }
 
 #else /* BSDTIMES */
-# ifdef _SEQUENT_
+# ifdef	_SEQUENT_
 void
 ruadd(ru, ru2)
     register struct process_stats *ru, *ru2;
@@ -208,14 +224,14 @@ ruadd(ru, ru2)
     tvadd(&ru->ps_utime, &ru2->ps_utime);
     tvadd(&ru->ps_stime, &ru2->ps_stime);
     if (ru2->ps_maxrss > ru->ps_maxrss)
-	ru->ps_maxrss = ru2->ps_maxrss;
+	ru->ps_maxrss =	ru2->ps_maxrss;
 
     ru->ps_pagein += ru2->ps_pagein;
     ru->ps_reclaim += ru2->ps_reclaim;
     ru->ps_zerofill += ru2->ps_zerofill;
     ru->ps_pffincr += ru2->ps_pffincr;
     ru->ps_pffdecr += ru2->ps_pffdecr;
-    ru->ps_swap += ru2->ps_swap;
+    ru->ps_swap	+= ru2->ps_swap;
     ru->ps_syscall += ru2->ps_syscall;
     ru->ps_volcsw += ru2->ps_volcsw;
     ru->ps_involcsw += ru2->ps_involcsw;
@@ -234,18 +250,18 @@ ruadd(ru, ru2)
 #ifdef BSDTIMES
 
 /*
- * PWP: the LOG1024 and pagetok stuff taken from the top command,
+ * PWP:	the LOG1024 and	pagetok	stuff taken from the top command,
  * written by William LeFebvre
  */
 /* Log base 2 of 1024 is 10 (2^10 == 1024) */
-#define LOG1024         10
+#define	LOG1024		10
 
 /* Convert clicks (kernel pages) to kbytes ... */
-/* If there is no PGSHIFT defined, assume it is 11 */
-/* Is this needed for compatability with some old flavor of 4.2 or 4.1? */
+/* If there is no PGSHIFT defined, assume it is	11 */
+/* Is this needed for compatability with some old flavor of 4.2	or 4.1?	*/
 #ifdef SUNOS4
 # ifndef PGSHIFT
-#  define pagetok(size)   ((size) << 1)
+#  define pagetok(size)	  ((size) << 1)
 # else
 #  if PGSHIFT>10
 #   define pagetok(size)   ((size) << (PGSHIFT - LOG1024))
@@ -256,30 +272,38 @@ ruadd(ru, ru2)
 #endif
 
 /*
- * if any other machines return wierd values in the ru_i* stuff, put
+ * if any other	machines return	wierd values in	the ru_i* stuff, put
  * the adjusting macro here:
  */
 #ifdef SUNOS4
 # define IADJUST(i)	(pagetok(i)/2)
-#else /* SUNOS4 */
-# define IADJUST(i)	(i)
+#else /* SUNOS4	*/
+# ifdef	convex
+   /*
+    * convex has megabytes * CLK_TCK
+    * multiply by 100 since we use time	in 100ths of a second in prusage
+    */
+#  define IADJUST(i) (((i) << 10) / CLK_TCK * 100)
+# else /* convex */
+#  define IADJUST(i)	(i)
+# endif	/* convex */
 #endif /* SUNOS4 */
 
 void
-prusage(r0, r1, e, b)
-    register struct rusage *r0, *r1;
+prusage(r0, r1,	e, b)
+    register struct sysrusage *r0,	*r1;
     timeval_t *e, *b;
 
 #else /* BSDTIMES */
-# ifdef _SEQUENT_
+# ifdef	_SEQUENT_
 void
-prusage(r0, r1, e, b)
+prusage(r0, r1,	e, b)
     register struct process_stats *r0, *r1;
     timeval_t *e, *b;
 
 # else /* _SEQUENT_ */
 void
-prusage(bs, es, e, b)
+prusage(bs, es,	e, b)
     struct tms *bs, *es;
 
 #  ifndef POSIX
@@ -294,30 +318,30 @@ prusage(bs, es, e, b)
 {
 #ifdef BSDTIMES
     register time_t t =
-    (r1->ru_utime.tv_sec - r0->ru_utime.tv_sec) * 100 +
+    (r1->ru_utime.tv_sec - r0->ru_utime.tv_sec)	* 100 +
     (r1->ru_utime.tv_usec - r0->ru_utime.tv_usec) / 10000 +
-    (r1->ru_stime.tv_sec - r0->ru_stime.tv_sec) * 100 +
+    (r1->ru_stime.tv_sec - r0->ru_stime.tv_sec)	* 100 +
     (r1->ru_stime.tv_usec - r0->ru_stime.tv_usec) / 10000;
 
 #else
-# ifdef _SEQUENT_
+# ifdef	_SEQUENT_
     register time_t t =
-    (r1->ps_utime.tv_sec - r0->ps_utime.tv_sec) * 100 +
+    (r1->ps_utime.tv_sec - r0->ps_utime.tv_sec)	* 100 +
     (r1->ps_utime.tv_usec - r0->ps_utime.tv_usec) / 10000 +
-    (r1->ps_stime.tv_sec - r0->ps_stime.tv_sec) * 100 +
+    (r1->ps_stime.tv_sec - r0->ps_stime.tv_sec)	* 100 +
     (r1->ps_stime.tv_usec - r0->ps_stime.tv_usec) / 10000;
 
 # else /* _SEQUENT_ */
 #  ifndef POSIX
-    register time_t t = (es->tms_utime - bs->tms_utime +
-			 es->tms_stime - bs->tms_stime) * 100 / HZ;
+    register time_t t =	(es->tms_utime - bs->tms_utime +
+			 es->tms_stime - bs->tms_stime)	* 100 /	HZ;
 
-#  else /* POSIX */
-    register clock_t t = (es->tms_utime - bs->tms_utime +
-			  es->tms_stime - bs->tms_stime) * 100 / clk_tck;
+#  else	/* POSIX */
+    register clock_t t = (es->tms_utime	- bs->tms_utime	+
+			  es->tms_stime	- bs->tms_stime) * 100 / clk_tck;
 
 #  endif /* POSIX */
-# endif /* _SEQUENT_ */
+# endif	/* _SEQUENT_ */
 #endif /* BSDTIMES */
 
     register char *cp;
@@ -325,87 +349,91 @@ prusage(bs, es, e, b)
     register struct varent *vp = adrof(STRtime);
 
 #ifdef BSDTIMES
-    int     ms = (int)
-    ((e->tv_sec - b->tv_sec) * 100 + (e->tv_usec - b->tv_usec) / 10000);
+# ifdef	convex
+    static struct system_information sysinfo;
+    long long memtmp;	/* let memory calculations exceede 2Gb */
+# endif	/* convex */
+    int	    ms = (int)
+    ((e->tv_sec	- b->tv_sec) * 100 + (e->tv_usec - b->tv_usec) / 10000);
 
-    cp = "%Uu %Ss %E %P %X+%Dk %I+%Oio %Fpf+%Ww";
+    cp = "%Uu %Ss %E %P	%X+%Dk %I+%Oio %Fpf+%Ww";
 #else /* !BSDTIMES */
-# ifdef _SEQUENT_
-    int     ms = (int)
-    ((e->tv_sec - b->tv_sec) * 100 + (e->tv_usec - b->tv_usec) / 10000);
+# ifdef	_SEQUENT_
+    int	    ms = (int)
+    ((e->tv_sec	- b->tv_sec) * 100 + (e->tv_usec - b->tv_usec) / 10000);
 
-    cp = "%Uu %Ss %E %P %I+%Oio %Fpf+%Ww";
+    cp = "%Uu %Ss %E %P	%I+%Oio	%Fpf+%Ww";
 # else /* !_SEQUENT_ */
 #  ifndef POSIX
     time_t  ms = (e - b) * 100 / HZ;
 
-#  else /* POSIX */
+#  else	/* POSIX */
     clock_t ms = (e - b) * 100 / clk_tck;
 
 #  endif /* POSIX */
     cp = "%Uu %Ss %E %P";
 
     /*
-     * the tms stuff is not very precise, so we fudge it.
-     * granularity fix: can't be more than 100% 
+     * the tms stuff is	not very precise, so we	fudge it.
+     * granularity fix:	can't be more than 100%	
      * this breaks in multi-processor systems...
      * maybe I should take it out and let people see more then 100% 
      * utilizations.
      */
-    if (ms < t && ms != 0)
+    if (ms < t && ms !=	0)
 	ms = t;
-# endif /*! _SEQUENT_ */
+# endif	/*! _SEQUENT_ */
 #endif /* !BSDTIMES */
 #ifdef TDEBUG
     xprintf("es->tms_utime %lu bs->tms_utime %lu\n",
 	    es->tms_utime, bs->tms_utime);
     xprintf("es->tms_stime %lu bs->tms_stime %lu\n",
 	    es->tms_stime, bs->tms_stime);
-    xprintf("ms %lu e %lu b %lu\n", ms, e, b);
+    xprintf("ms	%lu e %lu b %lu\n", ms,	e, b);
     xprintf("t %lu\n", t);
 #endif /* TDEBUG */
 
     if (vp && vp->vec[0] && vp->vec[1])
 	cp = short2str(vp->vec[1]);
-    for (; *cp; cp++)
-	if (*cp != '%')
+    for	(; *cp;	cp++)
+	if (*cp	!= '%')
 	    xputchar(*cp);
-	else if (cp[1])
+	else if	(cp[1])
 	    switch (*++cp) {
 
-	    case 'U':		/* user CPU time used */
+	    case 'U':		/* user	CPU time used */
 #ifdef BSDTIMES
 		pdeltat(&r1->ru_utime, &r0->ru_utime);
 #else
-# ifdef _SEQUENT_
+# ifdef	_SEQUENT_
 		pdeltat(&r1->ps_utime, &r0->ps_utime);
 # else /* _SEQUENT_ */
 #  ifndef POSIX
 		pdtimet(es->tms_utime, bs->tms_utime);
-#  else /* POSIX */
+#  else	/* POSIX */
 		pdtimet(es->tms_utime, bs->tms_utime);
 #  endif /* POSIX */
-# endif /* _SEQUENT_ */
+# endif	/* _SEQUENT_ */
 #endif /* BSDTIMES */
 		break;
 
-	    case 'S':		/* system CPU time used */
+	    case 'S':		/* system CPU time used	*/
 #ifdef BSDTIMES
 		pdeltat(&r1->ru_stime, &r0->ru_stime);
 #else
-# ifdef _SEQUENT_
+# ifdef	_SEQUENT_
 		pdeltat(&r1->ps_stime, &r0->ps_stime);
 # else /* _SEQUENT_ */
 #  ifndef POSIX
 		pdtimet(es->tms_stime, bs->tms_stime);
-#  else /* POSIX */
+#  else	/* POSIX */
 		pdtimet(es->tms_stime, bs->tms_stime);
 #  endif /* POSIX */
-# endif /* _SEQUENT_ */
+# endif	/* _SEQUENT_ */
 #endif /* BSDTIMES */
 		break;
 
-	    case 'E':		/* elapsed (wall-clock) time */
+	    case 'E':		/* elapsed (wall-clock)	time */
 #ifdef BSDTIMES
 		pcsecs((long) ms);
 #else /* BSDTIMES */
@@ -413,9 +441,20 @@ prusage(bs, es, e, b)
 #endif /* BSDTIMES */
 		break;
 
-	    case 'P':		/* percent time spent running */
-		/* check if the process did not run */
-		i = (ms == 0) ? 0 : (t * 1000 / ms);
+	    case 'P':		/* percent time	spent running */
+		/* check if the	process	did not	run */
+#ifdef convex
+		/*
+		 * scale the cpu %- ages by the	number of processors
+		 * available on	this machine
+		 */
+		if ((sysinfo.cpu_count == 0) &&
+		    (getsysinfo(SYSINFO_SIZE, &sysinfo)	< 0))
+		    sysinfo.cpu_count =	1;
+		    i =	(ms == 0) ? 0 :	(t * 1000 / (ms	* sysinfo.cpu_count));
+#else /* convex	*/
+		i = (ms	== 0) ?	0 : (t * 1000 /	ms);
+#endif /* convex */
 		xprintf("%ld.%01ld%%", i / 10, i % 10);	/* nn.n% */
 		break;
 
@@ -424,71 +463,114 @@ prusage(bs, es, e, b)
 		i = r1->ru_nswap - r0->ru_nswap;
 		xprintf("%ld", i);
 		break;
-
+ 
+#ifdef convex
 	    case 'X':		/* (average) shared text size */
-		xprintf("%ld", t == 0 ? 0L :
+		memtmp = (t == 0 ? 0LL : IADJUST((long long)r1->ru_ixrss -
+				 (long long)r0->ru_ixrss) /
+			 (long long)t);
+		xprintf("%lu", (unsigned long)memtmp);
+			
+		break;
+
+	    case 'D':		/* (average) unshared data size	*/
+		memtmp = (t == 0 ? 0LL : IADJUST((long long)r1->ru_idrss +
+				 (long long)r1->ru_isrss -
+				 ((long	long)r0->ru_idrss +
+				  (long	long)r0->ru_isrss)) /
+			 (long long)t);
+		xprintf("%lu", (unsigned long)memtmp);
+		break;
+
+	    case 'K':		/* (average) total data	memory used  */
+		memtmp = (t == 0 ? 0LL : IADJUST(((long	long)r1->ru_ixrss +
+				  (long	long)r1->ru_isrss +
+				  (long	long)r1->ru_idrss) -
+				  ((long long)r0->ru_ixrss +
+				   (long long)r0->ru_idrss +
+				   (long long)r0->ru_isrss)) /
+			 (long long)t);
+		xprintf("%lu", (unsigned long)memtmp);
+		break;
+#else /* !convex */
+	    case 'X':		/* (average) shared text size */
+		xprintf("%ld", t == 0 ?	0L :
 			IADJUST(r1->ru_ixrss - r0->ru_ixrss) / t);
 		break;
 
-	    case 'D':		/* (average) unshared data size */
-		xprintf("%ld", t == 0 ? 0L :
+	    case 'D':		/* (average) unshared data size	*/
+		xprintf("%ld", t == 0 ?	0L :
 			IADJUST(r1->ru_idrss + r1->ru_isrss -
-				(r0->ru_idrss + r0->ru_isrss)) / t);
+				(r0->ru_idrss +	r0->ru_isrss)) / t);
 		break;
 
-	    case 'K':		/* (average) total data memory used  */
-		xprintf("%ld", t == 0 ? 0L :
-			IADJUST((r1->ru_ixrss + r1->ru_isrss + r1->ru_idrss) -
-			   (r0->ru_ixrss + r0->ru_idrss + r0->ru_isrss)) / t);
+	    case 'K':		/* (average) total data	memory used  */
+		xprintf("%ld", t == 0 ?	0L :
+			IADJUST((r1->ru_ixrss +	r1->ru_isrss + r1->ru_idrss) -
+			   (r0->ru_ixrss + r0->ru_idrss	+ r0->ru_isrss)) / t);
 		break;
-
-	    case 'M':		/* max. Resident Set Size */
+#endif /* convex */
+	    case 'M':		/* max.	Resident Set Size */
 #ifdef SUNOS4
 		xprintf("%ld", pagetok(r1->ru_maxrss));
 #else
+# ifdef	convex
+		xprintf("%ld", r1->ru_maxrss * 4L);
+# else /* !convex */
 		xprintf("%ld", r1->ru_maxrss / 2L);
+# endif	/* convex */
 #endif /* SUNOS4 */
 		break;
 
-	    case 'F':		/* page faults */
+	    case 'F':		/* page	faults */
 		xprintf("%ld", r1->ru_majflt - r0->ru_majflt);
 		break;
 
-	    case 'R':		/* page reclaims */
+	    case 'R':		/* page	reclaims */
 		xprintf("%ld", r1->ru_minflt - r0->ru_minflt);
 		break;
 
-	    case 'I':		/* FS blocks in */
-		xprintf("%ld", r1->ru_inblock - r0->ru_inblock);
+	    case 'I':		/* FS blocks in	*/
+		xprintf("%ld", r1->ru_inblock -	r0->ru_inblock);
 		break;
 
 	    case 'O':		/* FS blocks out */
-		xprintf("%ld", r1->ru_oublock - r0->ru_oublock);
+		xprintf("%ld", r1->ru_oublock -	r0->ru_oublock);
 		break;
 
-	    case 'r':		/* PWP: socket messages recieved */
+# ifdef	convex
+	    case 'C':			/*  CPU	parallelization	factor */
+		if (r1->ru_usamples	!= 0LL)	{
+		    long long parr = ((r1->ru_utotal * 100LL) /
+				      r1->ru_usamples);
+		    xprintf("%d.%02d", (int)(parr/100), (int)(parr%100));
+		} else
+		    xprintf("?");
+		break;
+# endif	/* convex */
+	    case 'r':		/* PWP:	socket messages	recieved */
 		xprintf("%ld", r1->ru_msgrcv - r0->ru_msgrcv);
 		break;
 
-	    case 's':		/* PWP: socket messages sent */
+	    case 's':		/* PWP:	socket messages	sent */
 		xprintf("%ld", r1->ru_msgsnd - r0->ru_msgsnd);
 		break;
 
-	    case 'k':		/* PWP: signals received */
+	    case 'k':		/* PWP:	signals	received */
 		xprintf("%ld", r1->ru_nsignals - r0->ru_nsignals);
 		break;
 
-	    case 'w':		/* PWP: voluntary context switches (waits) */
+	    case 'w':		/* PWP:	voluntary context switches (waits) */
 		xprintf("%ld", r1->ru_nvcsw - r0->ru_nvcsw);
 		break;
 
-	    case 'c':		/* PWP: involuntary context switches */
+	    case 'c':		/* PWP:	involuntary context switches */
 		xprintf("%ld", r1->ru_nivcsw - r0->ru_nivcsw);
 		break;
 #else /* BSDTIMES */
-# ifdef _SEQUENT_
+# ifdef	_SEQUENT_
 	    case 'W':		/* number of swaps */
-		i = r1->ps_swap - r0->ps_swap;
+		i = r1->ps_swap	- r0->ps_swap;
 		xprintf("%ld", i);
 		break;
 
@@ -501,7 +583,7 @@ prusage(bs, es, e, b)
 		break;
 
 	    case 'R':
-		xprintf("%ld", r1->ps_reclaim - r0->ps_reclaim);
+		xprintf("%ld", r1->ps_reclaim -	r0->ps_reclaim);
 		break;
 
 	    case 'I':
@@ -529,15 +611,15 @@ prusage(bs, es, e, b)
 		break;
 
 	    case 'i':
-		xprintf("%ld", r1->ps_pffincr - r0->ps_pffincr);
+		xprintf("%ld", r1->ps_pffincr -	r0->ps_pffincr);
 		break;
 
 	    case 'd':
-		xprintf("%ld", r1->ps_pffdecr - r0->ps_pffdecr);
+		xprintf("%ld", r1->ps_pffdecr -	r0->ps_pffdecr);
 		break;
 
 	    case 'Y':
-		xprintf("%ld", r1->ps_syscall - r0->ps_syscall);
+		xprintf("%ld", r1->ps_syscall -	r0->ps_syscall);
 		break;
 
 	    case 'l':
@@ -553,7 +635,7 @@ prusage(bs, es, e, b)
 		break;
 
 	    case 'q':
-		xprintf("%ld", r1->ps_phwrite - r0->ps_phwrite);
+		xprintf("%ld", r1->ps_phwrite -	r0->ps_phwrite);
 		break;
 # endif	/* _SEQUENT_ */
 #endif /* BSDTIMES */
@@ -582,7 +664,7 @@ tvadd(tsum, t0)
     tsum->tv_sec += t0->tv_sec;
     tsum->tv_usec += t0->tv_usec;
     if (tsum->tv_usec >= 1000000)
-	tsum->tv_sec++, tsum->tv_usec -= 1000000;
+	tsum->tv_sec++,	tsum->tv_usec -= 1000000;
 }
 
 void
@@ -593,34 +675,34 @@ tvsub(tdiff, t1, t0)
     tdiff->tv_sec = t1->tv_sec - t0->tv_sec;
     tdiff->tv_usec = t1->tv_usec - t0->tv_usec;
     if (tdiff->tv_usec < 0)
-	tdiff->tv_sec--, tdiff->tv_usec += 1000000;
+	tdiff->tv_sec--, tdiff->tv_usec	+= 1000000;
 }
 
 #else /* !BSDTIMES && !_SEQUENT_ */
 static void
 pdtimet(eval, bval)
-#ifndef POSIX
+#ifndef	POSIX
     time_t  eval, bval;
 
 #else /* POSIX */
     clock_t eval, bval;
 
-#endif /* POSIX */
+#endif /* POSIX	*/
 {
-#ifndef POSIX
+#ifndef	POSIX
     time_t  val;
 
 #else /* POSIX */
     clock_t val;
 
-#endif /* POSIX */
+#endif /* POSIX	*/
 
-#ifndef POSIX
-    val = (eval - bval) * 100 / HZ;
+#ifndef	POSIX
+    val	= (eval	- bval)	* 100 /	HZ;
 #else /* POSIX */
-    val = (eval - bval) * 100 / clk_tck;
-#endif /* POSIX */
+    val	= (eval	- bval)	* 100 /	clk_tck;
+#endif /* POSIX	*/
 
-    xprintf("%ld.%02ld", val / 100, val - (val / 100 * 100));
+    xprintf("%ld.%02ld", val / 100, val	- (val / 100 * 100));
 }
-#endif /* BSDTIMES || _SEQUENT_ */
+#endif /* BSDTIMES || _SEQUENT_	*/

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/snames.h,v 1.1 1993/06/11 20:52:46 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/snames.h,v 1.2 1993/10/30 19:50:16 christos Exp $ */
 /*
  * snames.h: Short names for old compilers
  */

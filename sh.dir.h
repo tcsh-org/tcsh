@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.dir.h,v 3.2 1992/01/28 19:06:06 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.dir.h,v 3.3 1992/04/03 22:15:14 christos Exp $ */
 /*
  * sh.dir.h: Directory data structures and globals
  */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.h,v 3.67 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.h,v 3.68 1995/04/16 19:15:53 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -191,7 +191,13 @@ typedef int sigret_t;
 # if SYSVREL>3 && !defined(sgi) && !defined(sun) && !(defined(__alpha) && defined(__osf__))
 #  include "/usr/ucbinclude/sys/resource.h"
 # else
-#  include <sys/resource.h>
+#  ifdef convex
+#   define sysrusage cvxrusage
+#   include <sys/sysinfo.h>
+#  else
+#   define sysrusage rusage
+#   include <sys/resource.h>
+#  endif /* convex */
 # endif /* SYSVREL>3 */
 #endif /* BSDTIMES */
 
@@ -515,7 +521,7 @@ EXTERN Char   *shtemp;		/* Temp name for << shell files in /tmp */
 
 #ifdef BSDTIMES
 EXTERN struct timeval time0;	/* Time at which the shell started */
-EXTERN struct rusage ru0;
+EXTERN struct sysrusage ru0;
 #else
 # ifdef _SEQUENT_
 EXTERN timeval_t time0;		/* time at which shell started */
@@ -987,7 +993,7 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
  */
 #ifndef SHORT_STRINGS
 #define Strchr(a, b)  		strchr(a, b)
-#define Strrchr(a, b)  	strrchr(a, b)
+#define Strrchr(a, b)  		strrchr(a, b)
 #define Strcat(a, b)  		strcat(a, b)
 #define Strncat(a, b, c) 	strncat(a, b, c)
 #define Strcpy(a, b)  		strcpy(a, b)
@@ -1064,6 +1070,9 @@ extern int     dont_free;	/* Tell free that we are in danger if we free */
 extern Char    *INVPTR;
 extern Char    **INVPPTR;
 
+extern char    *progname;
+extern int	tcsh;
+
 #include "tc.h"
 #include "sh.decls.h"
 
@@ -1079,7 +1088,10 @@ extern int errno, sys_nerr;
 
 #ifdef NLS_CATALOGS
 # ifdef linux
-#  include <localeinfo.h>
+#  include <locale.h>
+#  ifdef notdef
+#   include <localeinfo.h>	/* Has this changed ? */
+#  endif
 #  include <features.h>
 # endif
 # ifdef SUNOS4
@@ -1104,5 +1116,12 @@ EXTERN nl_catd catd;
 # define CGETS(b, c, d)	d
 # define CSAVS(b, c, d)	d
 #endif 
+
+/*
+ * Since on some machines characters are unsigned, and the signed
+ * keyword is not universally implemented, we treat all characters
+ * as unsigned and sign extend them where we need.
+ */
+#define SIGN_EXTEND_CHAR(a)	(((a) & 0x80) ? ((a) | ~0x7f) : (a))
 
 #endif /* _h_sh */

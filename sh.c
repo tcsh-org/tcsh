@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.c,v 3.69 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.c,v 3.70 1995/05/06 17:51:58 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.69 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: sh.c,v 3.70 1995/05/06 17:51:58 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -84,6 +84,8 @@ extern bool NoNLSRebind;
 
 jmp_buf_t reslab;
 
+static const char tcshstr[] = "tcsh";
+
 sigret_t (*parintr) () = 0;	/* Parents interrupt catch */
 sigret_t (*parterm) () = 0;	/* Parents terminate catch */
 
@@ -119,7 +121,8 @@ Char  *ffile = NULL;
 bool	dolzero = 0;
 int	insource = 0;
 static time_t  chktim;		/* Time mail last checked */
-
+char *progname;
+int tcsh;
 extern char **environ;
 
 /*
@@ -228,6 +231,17 @@ main(argc, argv)
     }
 
     osinit();			/* Os dependent initialization */
+
+    
+    {
+	char *t;
+
+	t = strrchr(argv[0], '/');
+	t = t ? ++t : argv[0];
+	if (*t == '-') t++;
+	progname = strsave((t && *t) ? t : tcshstr);    /* never want a null */
+	tcsh = strcmp(progname, tcshstr) == 0;
+    }
 
     /*
      * Initialize non constant strings
@@ -432,14 +446,24 @@ main(argc, argv)
      * (smart) C compiler might re-arange things wrong.
      */
 #ifdef AUTOLOGOUT
+# ifdef convex
+    if (uid == 0) {
+	/*  root always has a 15 minute autologout  */
+	set(STRautologout, Strsave(STRrootdefautologout));
+    }
+    else
+	if (loginsh)
+	    /*  users get autologout set to 0  */
+	    set(STRautologout, Strsave(STR0));
+# else /* convex */
     if (loginsh || (uid == 0)) {
 	if (*cp) {
 	    /* only for login shells or root and we must have a tty */
 	    if ((cp2 = Strrchr(cp, (Char) '/')) != NULL) {
 		cp = cp2 + 1;
 	    }
-	    if (!((Strncmp(cp, STRtty, 3) == 0) &&
-		  (cp[3] >= 'p' && cp[3] <= 'u'))) {
+	    if (!((Strncmp(cp2, STRtty, 3) == 0) && Isalpha(cp2[3])) ||
+		!((Strncmp(cp, STRpts, 3) == 0) && cp[3] == '/')) {
 		if (getenv("DISPLAY") == NULL) {
 		    /* NOT on X window shells */
 		    set(STRautologout, Strsave(STRdefautologout), 
@@ -448,6 +472,7 @@ main(argc, argv)
 	    }
 	}
     }
+# endif /* convex */
 #endif /* AUTOLOGOUT */
 
     (void) sigset(SIGALRM, alrmcatch);
@@ -583,10 +608,13 @@ main(argc, argv)
      * does not restore all the tty modes, so xterm is not very well
      * set up. But this is not the shell's fault.
      * Also don't edit if $TERM == wm, for when we're running under an ATK app.
+     * Finally, emacs compiled under terminfo, sets the terminal to dumb,
+     * so disable editing for that too.
      */
     if ((tcp = getenv("TERM")) != NULL) {
 	set(STRterm, quote(SAVE(tcp)), VAR_READWRITE);
-	editing = (strcmp(tcp, "emacs") != 0 && strcmp(tcp, "wm") != 0);
+	editing = strcmp(tcp, "emacs") != 0 && strcmp(tcp, "wm") != 0 &&
+		  strcmp(tcp, "unknown") != 0 && strcmp(tcp, "dumb");
     }
     else 
 	editing = ((tcp = getenv("EMACS")) == NULL || strcmp(tcp, "t") != 0);
@@ -627,15 +655,17 @@ main(argc, argv)
 	 * default isn't appropriate (sg).
 	 */
 
-	int sh_len;
+	int sh_len = 0;
 
-	if ((tcp = getenv("SHELL")) != (char *)0 &&
-	    (sh_len = strlen(tcp)) >= 5 &&
-	    strcmp(tcp + (sh_len - 5), "/tcsh") == 0)
-	{
-	    set(STRshell, quote(SAVE(tcp)), VAR_READWRITE);
+	if ((tcp = getenv("SHELL")) != NULL) {
+	    sh_len = strlen(tcp);
+	    if ((sh_len >= 5 && strcmp(tcp + (sh_len - 5), "/tcsh") == 0) || 
+	        (sh_len >= 4 && strcmp(tcp + (sh_len - 4), "/csh") == 0))
+		set(STRshell, quote(SAVE(tcp)), VAR_READWRITE);
+	    else
+		sh_len = 0;
 	}
-	else
+	if (sh_len == 0)
 	    set(STRshell, Strsave(STR_SHELLPATH), VAR_READWRITE);
     }
 
@@ -841,7 +871,7 @@ main(argc, argv)
 
 	    default:		/* Unknown command option */
 		exiterr = 1;
-		stderror(ERR_TCSHUSAGE, tcp-1);
+		stderror(ERR_TCSHUSAGE, progname, tcp-1);
 		break;
 
 	} while (*tcp);
@@ -903,14 +933,16 @@ main(argc, argv)
 	editing = 0;
     }
     intty |= intact;
+#ifndef convex
     if (intty || (intact && isatty(SHOUT))) {
 	if (!batch && (uid != euid || gid != egid)) {
 	    errno = EACCES;
 	    child = 1;		/* So this ... */
 	    /* ... doesn't return */
-	    stderror(ERR_SYSTEM, "tcsh", strerror(errno));
+	    stderror(ERR_SYSTEM, progname, strerror(errno));
 	}
     }
+#endif /* convex */
     isoutatty = isatty(SHOUT);
     isdiagatty = isatty(SHDIAG);
     /*
@@ -932,7 +964,10 @@ main(argc, argv)
      * Set up the prompt.
      */
     if (prompt) {
-	set(STRprompt, Strsave(STRdefprompt), VAR_READWRITE);
+	if (tcsh)
+	    set(STRprompt, Strsave(STRdeftcshprompt), VAR_READWRITE);
+	else
+	    set(STRprompt, Strsave(STRdefcshprompt), VAR_READWRITE);
 	/* that's a meta-questionmark */
 	set(STRprompt2, Strsave(STRmquestion), VAR_READWRITE);
 	set(STRprompt3, Strsave(STRKCORRECT), VAR_READWRITE);
@@ -965,16 +1000,16 @@ main(argc, argv)
 	 * interactive.
 	 */
 	osig = signal(SIGHUP, phup);	/* exit processing on HUP */
-	if (osig == SIG_IGN)
+	if (!loginsh && osig == SIG_IGN)
 	    (void) signal(SIGHUP, osig);
 #ifdef SIGXCPU
 	osig = signal(SIGXCPU, phup);	/* exit processing on XCPU */
-	if (osig == SIG_IGN)
+	if (!loginsh && osig == SIG_IGN)
 	    (void) signal(SIGXCPU, osig);
 #endif
 #ifdef SIGXFSZ
 	osig = signal(SIGXFSZ, phup);	/* exit processing on XFSZ */
-	if (osig == SIG_IGN)
+	if (!loginsh && osig == SIG_IGN)
 	    (void) signal(SIGXFSZ, osig);
 #endif
 
@@ -1298,9 +1333,11 @@ srccat(cp, dp)
     else {
 	register Char *ep = Strspl(cp, dp);
 	char   *ptr = short2str(ep);
+	int rv;
 
+	rv = srcfile(ptr, (mflag ? 0 : 1), 0, NULL);
 	xfree((ptr_t) ep);
-	return srcfile(ptr, (mflag ? 0 : 1), 0, NULL);
+	return rv;
     }
 }
 
@@ -1550,6 +1587,9 @@ goodbye(v, c)
 	(void) sigset(SIGTERM, SIG_IGN);
 	(void) sigset(SIGHUP, SIG_IGN);
 	setintr = 0;		/* No interrupts after "logout" */
+	/* Trap errors inside .logout */
+	if ((reenter = setexit()) != 0)
+	    exitstat();
 	if (!(adrof(STRlogout)))
 	    set(STRlogout, Strsave(STRnormal), VAR_READWRITE);
 #ifdef _PATH_DOTLOGOUT

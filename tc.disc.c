@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.disc.c,v 3.8 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.disc.c,v 3.9 1995/03/12 04:49:26 christos Exp $ */
 /*
  * tc.disc.c: Functions to set/clear line disciplines
  *
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.disc.c,v 3.8 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: tc.disc.c,v 3.9 1995/03/12 04:49:26 christos Exp $")
 
 #ifdef OREO
 #include <compat.h>

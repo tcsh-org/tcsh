@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.func.c,v 3.65 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.func.c,v 3.66 1995/05/06 22:00:08 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.65 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.66 1995/05/06 22:00:08 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -103,8 +103,8 @@ static	void	 getremotehost	__P((void));
 Char   *
 expand_lex(buf, bufsiz, sp0, from, to)
     Char   *buf;
-    int     bufsiz;
-    struct wordent *sp0;
+    size_t  bufsiz;
+    struct  wordent *sp0;
     int     from, to;
 {
     register struct wordent *sp;
@@ -139,7 +139,8 @@ expand_lex(buf, bufsiz, sp0, from, to)
 			(((*s & TRIM) == '\\') && (prev_c != '\\')))) {
 		    *d++ = '\\';
 		}
-		*d++ = (*s & TRIM);
+		if (d < e)
+		    *d++ = (*s & TRIM);
 		prev_c = *s;
 	    }
 	    if (d < e)
@@ -156,13 +157,14 @@ expand_lex(buf, bufsiz, sp0, from, to)
 }
 
 Char   *
-sprlex(buf, sp0)
+sprlex(buf, bufsiz, sp0)
     Char   *buf;
+    size_t  bufsiz;
     struct wordent *sp0;
 {
     Char   *cp;
 
-    cp = expand_lex(buf, INBUFSIZE, sp0, 0, NCARGS);
+    cp = expand_lex(buf, bufsiz, sp0, 0, NCARGS);
     *cp = '\0';
     return (buf);
 }
@@ -258,7 +260,7 @@ dolist(v, c)
 	/* Look at listflags, to add -A to the flags, to get a path
 	   of ls if necessary */
 	if ((vp = adrof(STRlistflags)) != NULL && vp->vec[0] != STRNULL) {
-	    if (vp->vec[1] != STRNULL)
+	    if (vp->vec[1] != NULL && vp->vec[1][0] != '\0')
 		lspath = vp->vec[1];
 	    for (cp = vp->vec[0]; *cp; cp++)
 		switch (*cp) {
@@ -501,9 +503,9 @@ dowhich(v, c)
 struct process *
 find_stop_ed()
 {
-    register struct process *pp;
+    register struct process *pp, *retp;
     register char *ep, *vp, *cp, *p;
-    int     epl, vpl;
+    int     epl, vpl, pstatus;
 
     if ((ep = getenv("EDITOR")) != NULL) {	/* if we have a value */
 	if ((p = strrchr(ep, '/')) != NULL) 	/* if it has a path */
@@ -527,8 +529,20 @@ find_stop_ed()
     if (pcurrent == NULL)	/* see if we have any jobs */
 	return NULL;		/* nope */
 
+    retp = NULL;
     for (pp = proclist.p_next; pp; pp = pp->p_next)
 	if (pp->p_procid == pp->p_jobid) {
+
+	    /*
+	     * Only foreground an edit session if it is suspended.  Some GUI
+	     * editors have may be happily running in a separate window, no
+	     * point in foregrounding these if they're already running - webb
+	     */
+	    pstatus = pp->p_flags & PALLSTATES;
+	    if (pstatus != PINTERRUPTED && pstatus != PSTOPPED &&
+		pstatus != PSIGNALED)
+		continue;
+
 	    p = short2str(pp->p_command);
 	    /* get the first word */
 	    for (cp = p; *cp && !isspace(*cp); cp++)
@@ -542,11 +556,21 @@ find_stop_ed()
 
 	    /* if we find either in the current name, fg it */
 	    if (strncmp(ep, cp, (size_t) epl) == 0 ||
-		strncmp(vp, cp, (size_t) vpl) == 0)
-		return pp;
+		strncmp(vp, cp, (size_t) vpl) == 0) {
+
+		/*
+		 * If there is a choice, then choose the current process if
+		 * available, or the previous process otherwise, or else
+		 * anything will do - Robert Webb (robertw@mulga.cs.mu.oz.au).
+		 */
+		if (pp == pcurrent)
+		    return pp;
+		else if (retp == NULL || pp == pprevious)
+		    retp = pp;
+	    }
 	}
 
-    return NULL;		/* didn't find a job */
+    return retp;		/* Will be NULL if we didn't find a job */
 }
 
 void
@@ -646,7 +670,7 @@ auto_lock()
 #if defined(PW_AUTH) && !defined(XCRYPT)
 
     struct authorization *apw;
-    extern char *crypt16();
+    extern const char *crypt16();
 
 # define XCRYPT(a, b) crypt16(a, b)
 
@@ -659,7 +683,7 @@ auto_lock()
 #if defined(PW_SHADOW) && !defined(XCRYPT)
 
     struct spwd *spw;
-    extern char *crypt();
+    extern const char *crypt();
 
 # define XCRYPT(a, b) crypt(a, b)
 
@@ -670,7 +694,7 @@ auto_lock()
 #endif /* PW_SHADOW && !XCRYPT */
 
 #ifndef XCRYPT
-    extern char *crypt();
+    extern const char *crypt();
 
 #define XCRYPT(a, b) crypt(a, b)
 
@@ -693,7 +717,8 @@ auto_lock()
 #endif /* BSDSIGS */
     xputchar('\n'); 
     for (i = 0; i < 5; i++) {
-	char *crpp, *pp;
+	const char *crpp;
+	char *pp;
 #ifdef AFS
 	char *afsname;
 	Char *safs;
@@ -1104,8 +1129,8 @@ rmstar(cp)
 		     * actual locale
 		     */
 		    doit = (strchr(CGETS(22, 14, "Yy"), c) != NULL);
-		    while (c != '\n')
-			(void) read(SHIN, &c, 1);
+		    while (c != '\n' && read(SHIN, &c, 1) == 1)
+			continue;
 		    if (!doit) {
 			/* remove the command instead */
 #ifdef RMDEBUG
@@ -1588,8 +1613,12 @@ doaliases(v, c)
 		if (n <= 0) {
 		    int     i;
 
-		    if ((n = read(fd, tbuf, BUFSIZE)) <= 0)
+		    if ((n = read(fd, tbuf, BUFSIZE)) <= 0) {
+#ifdef convex
+			stderror(ERR_SYSTEM, progname, strerror(errno));
+#endif /* convex */
 			goto eof;
+		    }
 		    for (i = 0; i < n; i++)
   			buf[i] = (Char) tbuf[i];
 		    p = buf;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.h,v 3.5 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.proc.h,v 3.6 1993/10/30 19:50:16 christos Exp $ */
 /*
  * sh.proc.h: Process data structures and variables
  */
@@ -61,7 +61,7 @@ struct process {
 #ifdef BSDTIMES
     struct timeval p_btime;	/* begin time */
     struct timeval p_etime;	/* end time */
-    struct rusage p_rusage;
+    struct sysrusage p_rusage;
 #else				/* BSDTIMES */
 # ifdef _SEQUENT_
     timeval_t p_btime;		/* begin time */

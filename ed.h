@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.h,v 3.24 1994/07/08 14:43:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.h,v 3.25 1995/03/12 04:49:26 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */

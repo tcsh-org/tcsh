@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.61 1995/03/19 22:33:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.proc.c,v 3.62 1995/04/16 19:15:53 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.61 1995/03/19 22:33:26 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.62 1995/04/16 19:15:53 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -63,6 +63,12 @@ RCSID("$Id: sh.proc.c,v 3.61 1995/03/19 22:33:26 christos Exp christos $")
 # define WSTOPSIG(w)	(((union wait *) &(w))->w_stopsig)
 #endif /* !WSTOPSIG */
 
+#ifdef __osf__
+# ifndef WCOREDUMP
+#  define WCOREDUMP(x) (_W_INT(x) & WCOREFLAG)
+# endif
+#endif
+
 #ifndef WCOREDUMP
 # ifdef BSDWAIT
 #  define WCOREDUMP(w)	(((union wait *) &(w))->w_coredump)
@@ -78,23 +84,31 @@ RCSID("$Id: sh.proc.c,v 3.61 1995/03/19 22:33:26 christos Exp christos $")
 #define BIGINDEX	9	/* largest desirable job index */
 
 #ifdef BSDTIMES
-# if defined(SUNOS4) || defined(hp9000) || (defined(__alpha) && defined(__osf__))
+# ifdef convex
+/* use 'cvxrusage' to get parallel statistics */
+static struct cvxrusage zru = {{0L, 0L}, {0L, 0L}, 0L, 0L, 0L, 0L,
+				0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L,
+				{0L, 0L}, 0LL, 0LL, 0LL, 0LL, 0L, 0L, 0L,
+				0LL, 0LL, {0L, 0L, 0L, 0L, 0L}};
+# else
+#  if defined(SUNOS4) || defined(hp9000) || (defined(__alpha) && defined(__osf__))
 static struct rusage zru = {{0L, 0L}, {0L, 0L}, 0L, 0L, 0L, 0L,
 			    0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L};
 
-# else /* !SUNOS4 && !hp9000 && !(__alpha && __osf__) */
-#  ifdef masscomp
+#  else /* !SUNOS4 && !hp9000 && !(__alpha && __osf__) */
+#   ifdef masscomp
 /*
  * Initialization of this structure under RTU 4.1A & RTU 5.0 is problematic
  * because the first two elements are unions of a time_t and a struct timeval.
  * So we'll just have to trust the loader to do the "right thing", DAS DEC-90.
  */
 static struct rusage zru;
-#  else	/* masscomp */
+#   else	/* masscomp */
 static struct rusage zru = {{0L, 0L}, {0L, 0L}, 0, 0, 0, 0, 0, 0, 0, 
 			    0, 0, 0, 0, 0, 0};
-#  endif /* masscomp */
-# endif	/* SUNOS4 || hp9000 || (__alpha && __osf__) */
+#   endif /* masscomp */
+#  endif	/* SUNOS4 || hp9000 || (__alpha && __osf__) */
+# endif /* convex */
 #else /* !BSDTIMES */
 # ifdef _SEQUENT_
 static struct process_stats zru = {{0L, 0L}, {0L, 0L}, 0, 0, 0, 0, 0, 0, 0,
@@ -146,7 +160,7 @@ int snum;
 #endif /* !BSDWAIT */
     int     jobflags;
 #ifdef BSDTIMES
-    struct rusage ru;
+    struct sysrusage ru;
 #else /* !BSDTIMES */
 # ifdef _SEQUENT_
     struct process_stats ru;
@@ -191,14 +205,20 @@ loop:
 #endif /* JOBDEBUG */
 #ifdef BSDJOBS
 # ifdef BSDTIMES
+#  ifdef convex
+    /* use 'cvxwait' to get parallel statistics */
+    pid = cvxwait(&w,
+        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
+#  else
     /* both a wait3 and rusage */
-#  if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || defined(linux) || (defined(IRIS4D) && (__STDC__ || defined(FUNCPROTO)) && SYSVREL <= 3) || defined(__lucid)
+#   if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || defined(linux) || (defined(IRIS4D) && (__STDC__ || defined(FUNCPROTO)) && SYSVREL <= 3) || defined(__lucid) || defined(__osf__)
     pid = wait3(&w,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
-#  else /* BSDWAIT */
+#   else /* BSDWAIT */
     pid = wait3(&w.w_status,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
-#  endif /* BSDWAIT */
+#   endif /* BSDWAIT */
+#  endif /* convex */
 # else /* !BSDTIMES */
 #  ifdef _SEQUENT_
     (void) get_process_stats(&tv, PS_SELF, 0, &cpst1);
@@ -1254,7 +1274,7 @@ ptprint(tp)
 #ifdef BSDTIMES
     struct timeval tetime, diff;
     static struct timeval ztime;
-    struct rusage ru;
+    struct sysrusage ru;
     register struct process *pp = tp;
 
     ru = zru;
@@ -1934,12 +1954,14 @@ pfork(t, wanttty)
 	 */
 	if (t->t_dflg & F_NOHUP)
 	    (void) signal(SIGHUP, SIG_IGN);
-	if (t->t_dflg & F_NICE)
+	if (t->t_dflg & F_NICE) {
+	    int nval = SIGN_EXTEND_CHAR(t->t_nice);
 #ifdef BSDNICE
-	    (void) setpriority(PRIO_PROCESS, 0, t->t_nice);
+	    (void) setpriority(PRIO_PROCESS, 0, nval);
 #else /* !BSDNICE */
-	    (void) nice(t->t_nice);
+	    (void) nice(nval);
 #endif /* !BSDNICE */
+	}
 #ifdef F_VER
         if (t->t_dflg & F_VER) {
 	    tsetenv(STRSYSTYPE, t->t_systype ? STRbsd43 : STRsys53);

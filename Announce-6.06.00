@@ -1,0 +1,41 @@
+Hello,
+
+I am pleased to announce that tcsh-6.06 is finally available.
+
+- NLS Message Catalog support.
+- Many bug fixes.
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most unix machines, VMS_POSIX, and it compiles
+and is very close to working on OS/2 EMX.
+
+You can get tcsh from tesla.ee.cornell.edu:/pub/tcsh/tcsh-6.06.tar.gz
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you
+can get it from prep.ai.mit.edu or other GNU mirrors, or ask tesla to
+unpack it on the fly using 'get tcsh-6.06.tar'.
+
+For the DNS impaired: tesla.ee.cornell.edu == 128.84.253.11
+
+I would like to thank:
+
+    o the Cornell EE Department for giving tcsh a home for the past 8 years.
+    o everyone who sent bug reports
+    o the beta test team and specially:
+
+      Paul DuBois <dubois@primate.wisc.ed>
+	For testing every little feature mentioned in the manual page
+	and finding lots of bugs and inconsistencies.
+      Michael Schmidt <michael@muc.de>
+	For providing the initial implementation of the NLS catalog stuff.
+      Michael Schroeder <mlschroe@immd4.informatik.uni-erlangen.de>
+	For insisting that I was wrong and there was indeed a bug...
+      Dave Schweisguth <dcs@proton.chem.yale.edu>
+	For continuously trying to keep the manual page up-to-date.
+      Bruce Sterling Woodcock <bsw@netcom.com>
+	For cleaning up the code after the latest storm of patches.
+
+
+christos

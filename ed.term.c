@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.term.c,v 1.17 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.term.c,v 1.18 1995/04/16 19:15:53 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.17 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: ed.term.c,v 1.18 1995/04/16 19:15:53 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.types.h,v 3.32 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.types.h,v 3.33 1995/04/29 22:28:24 christos Exp christos $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -540,6 +540,15 @@ typedef char * caddr_t;
 #  define _PID_T
 # endif /* _PID_T */
 #endif /* pdp11 */
+
+/***
+ *** a Harris, running CX/UX
+ ***/
+#ifdef _CX_UX
+# ifndef _PID_T
+#  define _PID_T
+# endif /* _PID_T */
+#endif /* _CX_UX */
 
 /***
  *** Catch all for non POSIX and/or non ANSI systems.

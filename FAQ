@@ -1,6 +1,6 @@
 
 Last Updated: 
-Mon Apr 18 01:41:44 EDT 1994
+Thu Oct 26 19:40:18 EDT 1995
 
 This is for people who do not read the manual!
 
@@ -177,6 +177,10 @@ be able to get ftp it... :-)
     control. Their csh does not have job control either. Try:
 	% script
 	% cat > /dev/tty
+
+18. I start tcsh and it takes a couple of minutes to get the prompt.
+    You have defined REMOTEHOST and your DNS is not responding. Either
+    undefine REMOTEHOST and recompile or fix your DNS.
 
 christos
 

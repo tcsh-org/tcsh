@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.screen.c,v 3.36 1995/03/19 22:33:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.screen.c,v 3.37 1995/04/16 19:15:53 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.36 1995/03/19 22:33:26 christos Exp christos $")
+RCSID("$Id: ed.screen.c,v 3.37 1995/04/16 19:15:53 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1425,15 +1425,15 @@ GetTermCaps()
     if (i <= 0) {
 	if (i == -1) {
 #if (SYSVREL == 0) || defined(IRIS3D)
-	    xprintf(CGETS(7, 20, "tcsh: Cannot open /etc/termcap.\n"));
+	    xprintf(CGETS(7, 20, "%s: Cannot open /etc/termcap.\n"), progname);
 	}
 	else if (i == 0) {
 #endif /* SYSVREL */
 	    xprintf(CGETS(7, 21,
-			    "tcsh: No entry for terminal type \"%s\"\n"),
+			  "%s: No entry for terminal type \"%s\"\n"), progname,
 		    getenv("TERM"));
 	}
-	xprintf(CGETS(7, 22, "tcsh: using dumb terminal settings.\n"));
+	xprintf(CGETS(7, 22, "%s: using dumb terminal settings.\n"), progname);
 	Val(T_co) = 80;		/* do a dumb terminal */
 	Val(T_pt) = Val(T_km) = Val(T_li) = 0;
 	for (t = tstr; t->name != NULL; t++)
@@ -1477,7 +1477,8 @@ GetTermCaps()
 
 #ifdef DEBUG_SCREEN
     if (!T_CanUP) {
-	xprintf(CGETS(7, 23, "tcsh: WARNING: Your terminal cannot move up.\n"));
+	xprintf(CGETS(7, 23, "%s: WARNING: Your terminal cannot move up.\n",
+		progname));
 	xprintf(CGETS(7, 24, "Editing may be odd for long lines.\n"));
     }
     if (!T_CanCEOL)
@@ -1590,7 +1591,8 @@ ChangeSize(lins, cols)
 	}
 
 	if ((tptr = getenv("TERMCAP")) != NULL) {
-	    Char    termcap[1024], backup[1024], *ptr;
+	    /* Leave 64 characters slop in case we enlarge the termcap string */
+	    Char    termcap[1024+64], backup[1024+64], *ptr;
 	    int     i;
 
 	    ptr = str2short(tptr);
@@ -1632,6 +1634,11 @@ ChangeSize(lins, cols)
 		ptr = Strchr(ptr, ':');
 		(void) Strcat(termcap, ptr);
 	    }
+	    /*
+	     * Chop the termcap string at 1024 characters to avoid core-dumps
+	     * in the termcap routines
+	     */
+	    termcap[1023] = '\0';
 	    tsetenv(STRTERMCAP, termcap);
 	}
     }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.decls.h,v 3.22 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.decls.h,v 3.23 1995/03/19 22:33:26 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */

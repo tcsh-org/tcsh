@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.bind.c,v 3.23 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.bind.c,v 3.24 1995/03/12 04:49:26 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.23 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.24 1995/03/12 04:49:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -307,6 +307,7 @@ parsebind(s, str)
 	    *b++ = '\033';
 	    while ((*b++ = *s++) != '\0')
 		continue;
+	    b--;
 	    break;
 
 	case 'C': case 'c':	/* Turn into ^c */
@@ -770,7 +771,7 @@ parsekey(sp)
 		c = '\177';
 	    else {
 		xprintf(CGETS(20, 35,
-			"bad key specification -- unknown name \"%S\"\n", s));
+			"bad key specification -- unknown name \"%S\"\n"), s);
 		return -1;	/* error */
 	    }
 	}

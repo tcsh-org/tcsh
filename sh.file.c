@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.file.c,v 3.11 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.file.c,v 3.12 1995/04/29 22:28:24 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.11 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: sh.file.c,v 3.12 1995/04/29 22:28:24 christos Exp $")
 
 #ifdef FILEC
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/pathnames.h,v 3.14 1993/12/16 16:51:24 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/pathnames.h,v 3.15 1995/01/20 23:48:56 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.init.c,v 3.36 1993/06/25 21:17:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.init.c,v 3.37 1994/09/04 21:54:15 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.36 1993/06/25 21:17:12 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.37 1994/09/04 21:54:15 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -642,6 +642,11 @@ Load_input_line()
 	    Input_Line = Strsave(str2short(buf));
 	    PushMacro(Input_Line);
 	}
+#ifdef convex
+        /* need to print errno message in case file is migrated */
+        if (chrs < 0)
+            stderror(ERR_SYSTEM, progname, strerror(errno));
+#endif
     }
 #endif  /* FIONREAD && !OREO */
     return chrs > 0;

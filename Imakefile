@@ -1,5 +1,5 @@
 XCOMM
-XCOMM $Id: Imakefile,v 1.62 1995/04/29 22:28:24 christos Exp $
+XCOMM $Id: Imakefile,v 1.63 1995/05/06 17:51:58 christos Exp $
 XCOMM
 XCOMM Imakefile for tcsh 6.06
 XCOMM Marc Horowitz, MIT SIPB
@@ -37,10 +37,18 @@ ones.  Please send in your fixes and additions! */
 #  define ConfigH ultrix
 # endif
 
+# ifdef LinuxArchitecture
+#  define ConfigH linux
+# endif
+
 # ifdef AlphaArchitecture
-#  define ConfigH decosf1
+#  ifndef LinuxArchitecture
+#    define ConfigH decosf1
+#  endif
 #  if !HasGcc
 #   define MyCflags -std1 -Olimit 2000
+#  else
+#   define NoCombineRegs
 #  endif
 # endif
 
@@ -87,6 +95,8 @@ ones.  Please send in your fixes and additions! */
 # endif
 
 # ifdef HPArchitecture
+/* For some stupid reason makedepend on HP requires this */
+DEPENDFLAGS = -o.o
 #  if (OSMajorVersion >= 8)
 #   define ConfigH hpux8
 #  else
@@ -124,6 +134,7 @@ CCOPTIONS=-float	# We don't want -cckr and -prototypes
 #   define AOSArchitecture
 #  endif
 # endif
+
 
 #ifdef AOSArchitecture
 #define MyStdc -U__STDC__
@@ -169,6 +180,10 @@ EXTF=mi.termios.c mi.wait.h mi.varargs.h vms.termcap.c
 #   define ConfigH isc202
 #  endif
 # endif /* i386Isc */
+
+# ifdef LinuxArchitecture
+#   define ConfigH linux
+# endif
 
 # ifdef NetBSDArchitecture
 #  define ConfigH bsd4.4
@@ -295,8 +310,8 @@ LIBDIRECTENT = -ldirent
 LIBDIRECTENT =
 #endif
 
-# The order here is significant.  Although nothing uses all of these, 
-# some platforms which use more than one do care about the order.
+/* The order here is significant.  Although nothing uses all of these, 
+some platforms which use more than one do care about the order. */
 
 SYSLIBS = $(LIBPOSIX) $(LIBDIRECTENT) $(LIBTERMCAP) $(LIBCURSES) \
 	$(LIBNET) $(LIBINTL) $(LIBSOCKET) $(LIBSUN) $(LIBBSD) $(LIBCPOSIX) \
@@ -514,7 +529,7 @@ tc.const.h: config.h tc.const.c
 	    sort >> $@
 	@echo '#endif /* _h_tc_const */' >> $@
 
-config.h:
+config.h: config_f.h
 	cp config/ConfigH config.h
 
 $(OBJS): sh.err.h tc.const.h ed.defns.h

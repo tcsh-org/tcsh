@@ -50,7 +50,7 @@ To install tcsh:
     "VENDOR" correctly.  If you need to make changes, PLEASE SEND THEM 
     BACK TO ME.
 
-5)  You may want to adjust the TCSH_DESTDIR and TCSH_DESTMAN entries in
+5)  You may want to adjust the TCSH_BINDIR and TCSH_MANDIR entries in
     the Makefile.  These are the directories that tcsh, and the tcsh.1
     man entry will be placed in when you do a "make install" and "make
     install.man" respectively.  If you decide to install tcsh somewhere

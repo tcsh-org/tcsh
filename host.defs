@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.05/RCS/host.defs,v 1.10 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/host.defs,v 1.11 1995/04/29 22:28:24 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.10 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: host.defs,v 1.11 1995/04/29 22:28:24 christos Exp $")
 
 endcode	:
 
@@ -94,6 +94,70 @@ getcray()
     else
 # endif /* MC_GET_SYSTEM */
 	return "cray";		/* target() failed */
+}
+endcode	:
+enddef	:
+
+
+newdef	: defined(convex)
+newcode	:
+/*  
+ * On convex, find the current machine type via the getsysinfo() syscall
+ */
+#include <sys/sysinfo.h> 
+
+/* From: fox@convex.com (David DeSimone) */
+static char *
+getconvex()
+{
+    struct system_information  sysinfo;
+    static char  result[8];
+
+    if (getsysinfo(SYSINFO_SIZE, &sysinfo) == -1)
+	return "convex";
+
+    switch(sysinfo.cpu_type) {
+#ifdef SI_CPUTYPE_C1
+    case SI_CPUTYPE_C1:
+	return "c1";
+#endif
+
+#ifdef SI_CPUTYPE_C2
+    case SI_CPUTYPE_C2:
+	return "c2";
+#endif
+
+#ifdef SI_CPUTYPE_C2MP
+    case SI_CPUTYPE_C2MP:
+	(void) strcpy(result, "c2X0");
+	result[2] = sysinfo.cpu_count + '0';
+	return result;
+#endif
+
+#ifdef SI_CPUTYPE_C34
+    case SI_CPUTYPE_C34:
+	(void) strcpy(result, "c34X0");
+	result[3] = sysinfo.cpu_count + '0';
+	return result;
+#endif
+
+#ifdef SI_CPUTYPE_C38
+    case SI_CPUTYPE_C38:
+	(void) strcpy(result, "c38X0");
+	result[3] = sysinfo.cpu_count + '0';
+	return result;
+#endif
+
+#ifdef SI_CPUTYPE_C46
+    case SI_CPUTYPE_C46:
+	(void) strcpy(result, "c46X0");
+	result[3] = sysinfo.cpu_count + '0';
+	return result;
+#endif
+
+    default:
+	return "convex";
+    }
 }
 endcode	:
 enddef	:
@@ -225,7 +289,7 @@ machtype:						: "pyramid"
 enddef	:
 
 
-newdef	: defined(hcx)
+newdef	: defined(hcx) || defined(_CX_UX)
 comment	: Harris Tahoe running CX/UX
 vendor	:						: "harris"
 hosttype:						: "hcx"
@@ -365,6 +429,9 @@ hosttype: defined(i386)					: "i386-linux"
 ostype	: 						: "linux"
 hosttype: defined(i486) || defined(__i486__)		: "i486"
 machtype: defined(i386)					: "i386"
+vendor	: defined(__alpha)				: "dec"
+hosttype: defined(__alpha)				: "alpha"
+machtype: defined(__alpha)				: "alpha"
 enddef	:
 
 
@@ -379,22 +446,27 @@ enddef	:
 
 newdef	: defined(__NetBSD__) 
 comment	: Chris Demetriou's NetBSD
+vendor	: defined(alpha)				: "digital"
 vendor	: defined(amiga)				: "commodore"
+vendor	: defined(atari)				: "atari"
 vendor	: defined(hp300)				: "hp"
 vendor	: defined(i386)					: "intel"
 vendor	: defined(m68k)					: "motorola"
 vendor	: defined(mac68k)				: "apple"
 vendor	: defined(pc532)				: "national-semi"
-vendor	: defined(pmax)					: "dec"
+vendor	: defined(pmax)	|| defined(mips)		: "dec"
 vendor	: defined(sparc)				: "sun"
 vendor	: defined(sun3)					: "sun"
+vendor	: defined(vax)					: "digital"
 hosttype: 						: "NetBSD"
 ostype	: 						: "NetBSD"
 machtype: defined(sparc)				: "sparc"
 machtype: defined(mc68020)				: "m68k"
 machtype: defined(i386)					: "i386"
-machtype: defined(pmax)					: "i860"
+machtype: defined(pmax) || defined(mips)		: "mips"
 machtype: defined(pc532)				: "pc532"
+machtype: defined(vax)					: "vax"
+machtype: defined(alpha)				: "alpha"
 enddef	:
 
 
@@ -566,7 +638,8 @@ newdef	: defined(convex)
 comment	: Convex
 vendor	: 						: "convex"
 hosttype:						: "convex"
-machtype: defined(i386) || defined(__i386__)		: "i386"
+ostype	:						: "convexos"
+machtype:						: getconvex()
 enddef	:
 
 
@@ -584,6 +657,8 @@ hosttype:						: "next"
 ostype	:						: "mach"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
 machtype: defined(i386) || defined(__i386__)		: "i386"
+machtype: defined(hppa) || defined(__hppa__)		: "hppa"
+machtype: defined(sparc) || defined(__sparc__)		: "sparc"
 enddef	:
 
 newdef	: defined(sony_news)
@@ -836,6 +911,14 @@ vendor	: defined(i386)					: "intel"
 machtype:						: "i386"
 enddef	:
 
+newdef	: defined(SNI)
+comment	: Siemens-Nixdorf
+vendor	:						: "SNI"
+hosttype: defined(MIPSEB)				: "RM200"
+ostype	: defined(sinix)				: "sinix"
+machtype: defined(M_mipsel)				: "mipsel"
+machtype: defined(M_mipseb)				: "mipseb"
+enddef	:
 
 newdef	: defined(sparc) || defined(__sparc__)
 hosttype:						: "sparc"

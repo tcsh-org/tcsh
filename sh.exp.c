@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.exp.c,v 3.30 1995/01/20 23:48:56 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.exp.c,v 3.31 1995/04/16 19:15:53 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.30 1995/01/20 23:48:56 christos Exp christos $")
+RCSID("$Id: sh.exp.c,v 3.31 1995/04/16 19:15:53 christos Exp $")
 
 /*
  * C shell
@@ -155,7 +155,7 @@ sh_access(fname, mode)
      * and they define _SC_NGROUPS_MAX without having sysconf
      */
 #   undef _SC_NGROUPS_MAX	
-#   ifdef __NetBSD__
+#   if defined(__NetBSD__) || defined(__FreeBSD__)
 #    define GID_T gid_t
 #   else
 #    define GID_T int
@@ -615,7 +615,11 @@ exp6(vp, ignore)
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));
     cp = *(*vp)++;
-#define FILETESTS "erwxfdzoplstSXLbcugkmK"
+#ifdef convex
+# define FILETESTS "erwxfdzoplstSXLbcugkmKR"
+#else
+# define FILETESTS "erwxfdzoplstSXLbcugkmK"
+#endif /* convex */
 #define FILEVALS  "ZAMCDIUGNFPL"
     if (*cp == '-' && (any(FILETESTS, cp[1]) || any(FILEVALS, cp[1])))
         return(filetest(cp, vp, ignore));
@@ -635,11 +639,25 @@ filetest(cp, vp, ignore)
     Char *cp, ***vp;
     bool ignore;
 {
+#ifdef convex
+    struct cvxstat stb, *st = NULL;
+# define STAT	stat64
+#else
+# define STAT	stat
     struct stat stb, *st = NULL;
+#endif /* convex */
+
 #ifdef S_IFLNK
+# ifdef convex
+    struct cvxstat lstb, *lst = NULL;
+#  define LSTAT lstat64
+# else
+#  define LSTAT lstat
     struct stat lstb, *lst = NULL;
+# endif /* convex */
     char *filnam;
 #endif /* S_IFLNK */
+
     int i = 0;
     unsigned pmask = 0xffff;
     bool altout = 0;
@@ -686,7 +704,8 @@ filetest(cp, vp, ignore)
      * an error.  Even this check isn't quite right, since it doesn't take
      * globbing into account.
      */
-    if (isa(**vp, ANYOP) && stat(short2str(**vp), &stb))
+
+    if (isa(**vp, ANYOP) && STAT(short2str(**vp), &stb))
 	stderror(ERR_NAME | ERR_FILENAME);
 
     dp = *(*vp)++;
@@ -723,7 +742,7 @@ filetest(cp, vp, ignore)
 
 #ifdef S_IFLNK
 	    if (tolower(*ft) == 'l') {
-		if (!lst && lstat(short2str(ep), lst = &lstb) == -1) {
+		if (!lst && LSTAT(short2str(ep), lst = &lstb) == -1) {
 		    xfree((ptr_t) ep);
 		    return (Strsave(errval));
 		}
@@ -732,7 +751,7 @@ filetest(cp, vp, ignore)
 	    }
 	    else 
 #endif /* S_IFLNK */
-		if (!st && stat(short2str(ep), st = &stb) == -1) {
+		if (!st && STAT(short2str(ep), st = &stb) == -1) {
 		    xfree((ptr_t) ep);
 		    return (Strsave(errval));
 		}
@@ -827,6 +846,12 @@ filetest(cp, vp, ignore)
 	    case 'z':
 		i = st->st_size == 0;
 		break;
+
+#ifdef convex
+	    case 'R':
+		i = (stb.st_dmonflags & IMIGRATED) == IMIGRATED;
+		break;
+#endif /* convex */
 
 	    case 's':
 		i = stb.st_size != 0;

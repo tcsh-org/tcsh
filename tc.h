@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.h,v 3.2 1993/02/12 17:22:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.h,v 3.3 1994/05/26 13:11:20 christos Exp $ */
 /*
  * tc.h: Tcsh includes
  */

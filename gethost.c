@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/gethost.c,v 1.3 1994/03/13 00:46:35 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/gethost.c,v 1.4 1995/04/16 19:15:53 christos Exp christos $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: gethost.c,v 1.3 1994/03/13 00:46:35 christos Exp christos $")
+RCSID("$Id: gethost.c,v 1.4 1995/04/16 19:15:53 christos Exp christos $")
 
 #include <stdio.h>
 #include <ctype.h>

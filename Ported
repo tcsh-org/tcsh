@@ -69,6 +69,27 @@ NOTES	:	Don't use -lBSD; breaks getpgrp(). Config.hp-3.2 obsolete?
 	:	If it does not work, lower the optimization level...
 VERSION	:	6.05.06
 
+
+MODELS	:	hp9000s700
+COMPILER:	cc, gcc	2.6.3
+CFLAGS	:	normal -Aa -O (cc) -O (gcc)
+LIBES	:	-ltermcap
+OS	:	hpux 10.01
+CONFIG	:	hpux8
+ENVIRON	:	n/a
+VERSION	:	6.06
+NOTES	:	All references to <sys/bsdtty> had to be eliminated,
+	:	otherwise a ioctl call gives error return with ERRNO 22
+	:	(Illegal arg) (sh.os.h). Without this fix the shell exits
+	:	immediately in interactive mode.
+	:	A fix in sh.init.c: Test for SIGRTMAX >= 0 added;
+	:	otherwise static data are overwritten (alvecp),	and the	shell
+	:	starts forking children	indefinitely.
+	:	All changes included in	a patch	avaliable from tor.teorfys.lu.se
+	:	Carl-Olof Almbladh (coa@teorfys.lu.se)
+
+VENDOR	:	hp
+
 VENDOR	:	hp
 MODELS	:	hp9000s500
 COMPILER:	cc
@@ -371,6 +392,21 @@ NOTES	:	For 4.0, the NLS define in h can be enabled.
 NOTES	:	4.0.5a cc does not have -O3 anymore.
 NOTES	:	If you don't like -lbsd, you can define POSIXJOBS in
 NOTES	:	config.h and omit it.
+VERSION	:	6.06.00
+
+VENDOR	:	SGI
+MODELS	:	R8000 PowerIndigo2
+COMPILER:	cc -n32
+CFLAGS	:	-D__STDC__
+LIBES	:	-lcurses -lsun -lbsd -lc_s
+OS	:	IRIX 6.2
+CONFIG	:	sgi
+ENVIRON	:	n/a
+NOTES	:	CCOPTIONS=-OPT:fold_arith_limit=4000
+NOTES	:	SHLIBDIR=/usr/lib32
+NOTES	:	LDPOSTLIB = -nostdlib -L$(ROOT)$(SHLIBDIR)/mips3 \
+NOTES	:	-L$(ROOT)$(SHLIBDIR)
+NOTES	:	In config.h #undef NLS and #undef NLS_CATALOGS
 VERSION	:	6.06.00
 
 VENDOR	:	ibm + compatibles
@@ -757,7 +793,7 @@ CFLAGS  :	-O2 -I. -I.. -Olimit 2000
 LIBES   :	-lcurses
 OS      :	OSF1 1.3, 2.0, 3.0
 CONFIG  :	decosf1
-VERSION :	6.05.06
+VERSION :	6.06.00
 
 VENDOR  :	Intel
 MODELS  :	Paragon
@@ -797,11 +833,11 @@ MODELS	:	Tahoe
 COMPILER:	cc, gcc 1.42
 CFLAGS	:	-O
 LIBES	:	-ltermcap
-OS	:	CX/UX 5.1
+OS	:	CX/UX 5.1 CX/UX 7.1
 CONFIG	:	hcx
 ENVIRON :	universe bsd
 NOTES	:	n/a
-VERSION :	6.04.00
+VERSION :	6.06.01
 
 VENDOR	:	Multiflow
 MODELS	:	multiflow

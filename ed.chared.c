@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.chared.c,v 3.45 1995/03/19 22:33:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.chared.c,v 3.46 1995/04/16 19:15:53 christos Exp christos $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.45 1995/03/19 22:33:26 christos Exp christos $")
+RCSID("$Id: ed.chared.c,v 3.46 1995/04/16 19:15:53 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -587,7 +587,9 @@ excl_sw:
 	    default:
 		break;
 	    }
-	    q += 2;
+	    ++q;
+	    if (q[1])
+		++q;
 	}
 	if (omodbuf != buf) {
 	    (void) Strcpy(buf, omodbuf);
@@ -803,7 +805,7 @@ c_get_histline()
 	CurrentHistLit = 1;
     }
     else {
-	(void) sprlex(InputBuf, &hp->Hlex);
+	(void) sprlex(InputBuf, sizeof(InputBuf), &hp->Hlex);
 	CurrentHistLit = 0;
     }
     LastChar = InputBuf + Strlen(InputBuf);
@@ -1220,6 +1222,10 @@ e_insert(c)
 #ifndef SHORT_STRINGS
     c &= ASCII;			/* no meta chars ever */
 #endif
+#ifdef DSPKANJI
+    CCRETVAL ret;
+    ret = (CCRETVAL)CC_NORM;
+#endif
 
     if (!c)
 	return(CC_ERROR);	/* no NULs in the input ever!! */
@@ -1261,7 +1267,11 @@ e_insert(c)
     if (inputmode == MODE_REPLACE_1)
 	(void) v_cmd_mode(0);
 
+#ifdef DSPKANJI
+    return(ret);
+#else
     return(CC_NORM);
+#endif
 }
 
 int
@@ -1481,7 +1491,7 @@ e_toggle_hist(c)
 	}
     }
     else {
-	(void) sprlex(InputBuf, &hp->Hlex);
+	(void) sprlex(InputBuf, sizeof(InputBuf), &hp->Hlex);
 	CurrentHistLit = 0;
     }
 
@@ -1607,7 +1617,7 @@ e_up_search_hist(c)
     *LastChar = '\0';		/* just in case */
     if (Hist_num < 0) {
 #ifdef DEBUG_EDIT
-	xprintf("tcsh: e_up_search_hist(): Hist_num < 0; resetting.\n");
+	xprintf("%s: e_up_search_hist(): Hist_num < 0; resetting.\n", progname);
 #endif
 	Hist_num = 0;
 	return(CC_ERROR);
@@ -1632,9 +1642,9 @@ e_up_search_hist(c)
     while (hp != NULL) {
 	Char sbuf[INBUFSIZE], *hl;
 	if (hp->histline == NULL) {
-	    hp->histline = Strsave(sprlex(sbuf, &hp->Hlex));
+	    hp->histline = Strsave(sprlex(sbuf, sizeof(sbuf), &hp->Hlex));
 	}
-	hl = HistLit ? hp->histline : sprlex(sbuf, &hp->Hlex);
+	hl = HistLit ? hp->histline : sprlex(sbuf, sizeof(sbuf), &hp->Hlex);
 #ifdef SDEBUG
 	xprintf("Comparing with \"%S\"\n", hl);
 #endif
@@ -1685,9 +1695,9 @@ e_down_search_hist(c)
     for (h = 1; h < Hist_num && hp; h++) {
 	Char sbuf[INBUFSIZE], *hl;
 	if (hp->histline == NULL) {
-	    hp->histline = Strsave(sprlex(sbuf, &hp->Hlex));
+	    hp->histline = Strsave(sprlex(sbuf, sizeof(sbuf), &hp->Hlex));
 	}
-	hl = HistLit ? hp->histline : sprlex(sbuf, &hp->Hlex);
+	hl = HistLit ? hp->histline : sprlex(sbuf, sizeof(sbuf), &hp->Hlex);
 #ifdef SDEBUG
 	xprintf("Comparing with \"%S\"\n", hl);
 #endif

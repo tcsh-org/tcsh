@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.dir.c,v 3.39 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.dir.c,v 3.40 1995/04/16 19:15:53 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.39 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: sh.dir.c,v 3.40 1995/04/16 19:15:53 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -62,7 +62,7 @@ static void
 dstart(from)
     const char *from;
 {
-    xprintf(CGETS(12, 1, "tcsh: Trying to start from \"%s\"\n"), from);
+    xprintf(CGETS(12, 1, "%s: Trying to start from \"%s\"\n"), progname, from);
 }
 
 /*
@@ -80,7 +80,7 @@ dinit(hp)
     /* Don't believe the login shell home, because it may be a symlink */
     tcp = (char *) getwd(path);
     if (tcp == NULL || *tcp == '\0') {
-	xprintf("tcsh: %s\n", path);
+	xprintf("%s: %s\n", progname, path);
 	if (hp && *hp) {
 	    tcp = short2str(hp);
 	    dstart(tcp);

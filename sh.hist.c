@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.hist.c,v 3.19 1994/03/13 00:46:35 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.hist.c,v 3.20 1994/07/08 14:43:50 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.19 1994/03/13 00:46:35 christos Exp christos $")
+RCSID("$Id: sh.hist.c,v 3.20 1994/07/08 14:43:50 christos Exp $")
 
 #include "tc.h"
 
@@ -54,6 +54,7 @@ static	void	phist	__P((struct Hist *, int));
 #define HIST_REV	0x08
 #define HIST_CLEAR	0x10
 #define HIST_MERGE	0x20
+#define HIST_TIME	0x40
 
 /*
  * C shell
@@ -132,18 +133,23 @@ enthist(event, lp, docopy, mflg)
 		if (heq(lp, &(p->Hlex))){
 		    px->Hnext = p->Hnext;
 		    hfree(p);
-		    p = NULL;
+		    for (n = px->Hnum; p != NULL; p = p->Hnext)
+			p->Href = p->Hnum = n--;
 		    break;
 		}
 	}
 	else if (eq(dp, STRall)) {
 	    for (p = pp; (p = p->Hnext) != NULL;)
-		if (heq(lp, &(p->Hlex)))
+		if (heq(lp, &(p->Hlex))) {
+		    eventno--;
 		    break;
+		}
 	}
 	else if (eq(dp, STRprev)) {
-	    if (pp->Hnext && heq(lp, &(pp->Hnext->Hlex)))
+	    if (pp->Hnext && heq(lp, &(pp->Hnext->Hlex))) {
 		p = pp->Hnext;
+		eventno--;
+	    }
 	}
     }
 
@@ -254,8 +260,11 @@ dohist(vp, c)
 	    case 'M':
 	    	hflg |= HIST_MERGE;
 		break;
+	    case 'T':
+	    	hflg |= HIST_TIME;
+		break;
 	    default:
-		stderror(ERR_HISTUS, "chrSLM");
+		stderror(ERR_HISTUS, "chrSLMT");
 		break;
 	    }
     }
@@ -310,11 +319,12 @@ phist(hp, hflg)
 {
 
     if (hflg & HIST_ONLY) {
-	/* 
-	 * Make file entry with history time in format:
-	 * "+NNNNNNNNNN" (10 digits, left padded with ascii '0') 
-	 */
-	xprintf("#+%010lu\n", hp->Htime);
+	if (hflg & HIST_TIME)
+	    /* 
+	     * Make file entry with history time in format:
+	     * "+NNNNNNNNNN" (10 digits, left padded with ascii '0') 
+	     */
+	    xprintf("#+%010lu\n", hp->Htime);
 
 	if (HistLit && hp->histline)
 	    xprintf("%S\n", hp->histline);
@@ -353,7 +363,7 @@ fmthist(fmt, ptr, buf)
 	else {
 	    Char ibuf[INBUFSIZE], *ip;
 	    char *p;
-	    (void) sprlex(ibuf, &hp->Hlex);
+	    (void) sprlex(ibuf, sizeof(ibuf), &hp->Hlex);
 	    for (p = buf, ip = ibuf; (*p++ = *ip++) != '\0'; )
 		continue;
 	}
@@ -373,7 +383,7 @@ rechist(fname, ref)
     Char    *snum;
     int     fp, ftmp, oldidfds;
     struct varent *shist;
-    static Char   *dumphist[] = {STRhistory, STRmh, 0, 0};
+    static Char   *dumphist[] = {STRhistory, STRmhT, 0, 0};
 
     if (fname == NULL && !ref) 
 	return;
