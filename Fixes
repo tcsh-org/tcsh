@@ -1,3 +1,4 @@
+ 49. Alpha configure nit from Kaveh
  48. V6.08.05 - 19990511
  47. In some system, when a builtin fails immediately after we start
      tcsh and before we print any messages, NLS messages fail (some
