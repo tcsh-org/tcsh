@@ -3,7 +3,7 @@
  *
  * All source files should #include this FIRST.
  *
- * This is the config file for Linux systems
+ * This is the config file for Win32 systems
  */
 
 #ifndef _h_config
@@ -18,7 +18,7 @@
  * POSIXJOBS	This system supports the optional IEEE Std 1003.1-1988 (POSIX)
  *		job control facilities.
  */
-//#define POSIXJOBS
+#undef POSIXJOBS
 
 /*
  * POSIXSIGS	Use the POSIX signal facilities to emulate BSD signals.
@@ -44,32 +44,32 @@
  * BSDJOBS	You have BSD-style job control (both process groups and
  *		a tty that deals correctly
  */
-//#define BSDJOBS
+#undef BSDJOBS
 
 /*
  * BSDSIGS	You have 4.2-style signals, rather than USG style.
  *		Note: POSIX systems should not define this unless they
  *		have sigvec() and friends (ie: 4.3BSD-RENO, HP-UX).
  */
-//#define BSDSIGS
+#undef BSDSIGS
 
 /*
  * BSDTIMES	You have BSD-style process time stuff (like rusage)
  *		This may or may not be true.  For example, Apple Unix
  *		(OREO) has BSDJOBS and BSDSIGS but not BSDTIMES.
  */
-//#define BSDTIMES
+#undef BSDTIMES
 
 /*
  * BSDLIMIT	You have BSD-style resource limit stuff (getrlimit/setrlimit)
  */
-//#define BSDLIMIT
+#undef BSDLIMIT
 
 /*
  * BSDNICE	Your system uses setpriority() instead of nice, to
  *		change a processes scheduling priority
  */
-//#define BSDNICE
+#undef BSDNICE
 
 /*
  * TERMIO	You have struct termio instead of struct sgttyb.

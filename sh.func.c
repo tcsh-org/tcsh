@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.69 1997/10/27 22:44:28 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.70 1997/10/28 22:34:24 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.69 1997/10/27 22:44:28 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.70 1997/10/28 22:34:24 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1358,6 +1358,11 @@ dosetenv(v, c)
 	xfree((ptr_t) lp);
 	return;
     }
+    if (eq(vp, STRNTonlystartexes)) {
+	__nt_only_start_exes = 1;
+	xfree((ptr_t) lp);
+	return;
+    }
 #endif /* WINNT */
     if (eq(vp, STRKTERM)) {
 	char *t;
@@ -1520,6 +1525,9 @@ dounsetenv(v, c)
 		    nls_dll_unload();
 		    nlsinit();
 		}
+		else if (eq(name,(STRNTonlystartexes))) {
+			__nt_only_start_exes = 0;
+		}
 #endif /* WINNT */
 		/*
 		 * start again cause the environment changes
@@ -1652,9 +1660,9 @@ doumask(v, c)
     typedef quad_t RLIM_TYPE;
 #  else
 #   if defined(SOLARIS2)
-#    define RLIM_TYPE rlim_t
+     typedef rlim_t RLIM_TYPE;
 #   else
-     typedef unsigned long RLIM_TYPE
+     typedef unsigned long RLIM_TYPE;
 #   endif /* SOLARIS2 */
 #  endif /* BSD4_4 && !__386BSD__  */
 # endif /* BSDLIMIT */

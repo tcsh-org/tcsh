@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.42 1997/02/23 19:03:22 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.43 1997/10/27 22:44:30 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.42 1997/02/23 19:03:22 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.43 1997/10/27 22:44:30 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -166,6 +166,9 @@ struct	biltins bfunc[] = {
     { "switch",		doswitch,	1,	INF	},
     { "telltc",		dotelltc,	0,	INF	},
     { "time",		dotime,		0,	INF	},
+#ifdef WINNT
+    { "title",		dotitle,	1,	INF	},
+#endif /* WINNT */
 #if defined(_CX_UX)
     { "ucb",		doucb,		0,	INF	},
 #endif /* _CX_UX */

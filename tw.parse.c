@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.79 1997/10/02 16:36:35 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.80 1997/10/27 22:44:41 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.79 1997/10/02 16:36:35 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.80 1997/10/27 22:44:41 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1734,8 +1734,8 @@ extract_dir_and_name(path, dir, name)
 
     p = Strrchr(path, '/');
 #ifdef WINNT
-    if (p == NULL) {
-	    p = Strrchr(path, ':');
+    if (p == NULL)
+	p = Strrchr(path, ':');
 #endif /* WINNT */
     if (p == NULL) {
 	copyn(name, path, MAXNAMLEN);

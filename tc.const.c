@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.42 1997/10/02 16:36:31 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.43 1997/10/27 22:44:34 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.42 1997/10/02 16:36:31 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.43 1997/10/27 22:44:34 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -264,6 +264,8 @@ Char STRNTlameargfix[]  = { 'N', 'T', 'l', 'a', 'm', 'e', 'a', 'r', 'g', 'f',
 Char STRtcshlang[]	= { 'T', 'C', 'S', 'H', 'L', 'A', 'N', 'G', '\0' };
 Char STRtcshsubsthb[]	= { 'T', 'C', 'S', 'H', 'S', 'U', 'B', 'S', 'T',
 			    'H', 'B', '\0' };
+Char STRNTonlystartexes[]={ 'N', 'T', 'O', 'N', 'L', 'Y', 'S', 'T', 'A', 'R',
+			    'T', 'E', 'X', 'E', 'S', '\0' };
 #endif /* WINNT */
 Char STRautoexpand[]	= { 'a', 'u', 't', 'o', 'e', 'x', 'p', 'a', 'n', 'd',
 			    '\0' };

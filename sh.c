@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.75 1997/10/27 22:44:24 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.76 1997/10/28 22:34:21 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.75 1997/10/27 22:44:24 christos Exp $")
+RCSID("$Id: sh.c,v 3.76 1997/10/28 22:34:21 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -82,7 +82,7 @@ extern bool NoNLSRebind;
  * ported to Apple Unix (TM) (OREO)  26 -- 29 Jun 1987
  */
 
-jmp_buf_t reslab IZERO_STRUCT;
+jmp_buf_t reslab INIT_ZERO_STRUCT;
 
 static const char tcshstr[] = "tcsh";
 #ifdef WINNT
@@ -906,7 +906,7 @@ main(argc, argv)
 
 	    default:		/* Unknown command option */
 		exiterr = 1;
-		stderror(ERR_TCSHUSAGE, progname, tcp-1);
+		stderror(ERR_TCSHUSAGE, tcp-1, progname);
 		break;
 
 	} while (*tcp);

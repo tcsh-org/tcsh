@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.76 1997/10/27 22:44:29 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.77 1997/10/28 22:34:26 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -54,6 +54,11 @@
 #ifndef IZERO_STRUCT
 # define IZERO_STRUCT
 # endif /* IZERO_STRUCT */
+
+#ifndef WINNT
+# define INIT_ZERO
+# define INIT_ZERO_STRUCT
+#endif /*!WINNT */
 
 /*
  * Sanity
@@ -208,7 +213,7 @@ typedef int sigret_t;
 
 #if defined(BSDTIMES) || defined(BSDLIMIT)
 # include <sys/time.h>
-# if SYSVREL>3 && !defined(SCO) && !defined(sgi) && !defined(sun) && !(defined(__alpha) && defined(__osf__))
+# if SYSVREL>3 && !defined(SCO) && !defined(sgi) && !defined(SNI) && !defined(sun) && !(defined(__alpha) && defined(__osf__))
 #  include "/usr/ucbinclude/sys/resource.h"
 # else
 #  ifdef convex
@@ -423,16 +428,18 @@ typedef int bool;
 
 #include "sh.types.h"
 
-#ifndef POSIX
+#ifndef WINNT
+# ifndef POSIX
 extern pid_t getpgrp __P((int));
-#else /* POSIX */
-# if defined(BSD) || defined(SUNOS4) || defined(IRIS4D) || defined(DGUX)
+# else /* POSIX */
+#  if defined(BSD) || defined(SUNOS4) || defined(IRIS4D) || defined(DGUX)
 extern pid_t getpgrp __P((int));
-# else /* !(BSD || SUNOS4 || IRIS4D || DGUX) */
+#  else /* !(BSD || SUNOS4 || IRIS4D || DGUX) */
 extern pid_t getpgrp __P((void));
-# endif	/* BSD || SUNOS4 || IRISD || DGUX */
-#endif /* POSIX */
+#  endif	/* BSD || SUNOS4 || IRISD || DGUX */
+# endif /* POSIX */
 extern pid_t setpgrp __P((pid_t, pid_t));
+#endif /* !WINNT */
 
 typedef sigret_t (*signalfun_t) __P((int));
 
@@ -499,6 +506,10 @@ extern void		DebugFree	__P((ptr_t, char *, int));
 # define MAXNAMLEN _D_NAME_MAX
 #endif /* MAXNAMLEN */
 
+#ifdef HESIOD
+# include <hesiod.h>
+#endif /* HESIOD */
+
 #ifdef REMOTEHOST
 # include <netdb.h>
 #endif /* REMOTEHOST */
@@ -562,11 +573,11 @@ EXTERN bool    inheredoc IZERO;	/* Currently parsing a heredoc */
  */
 EXTERN Char   *arginp IZERO;	/* Argument input for sh -c and internal `xx` */
 EXTERN int     onelflg IZERO;	/* 2 -> need line for -t, 1 -> exit on read */
-extern Char   *ffile IZERO;	/* Name of shell file for $0 */
-extern bool    dolzero IZERO;	/* if $?0 should return true... */
+extern Char   *ffile;		/* Name of shell file for $0 */
+extern bool    dolzero;		/* if $?0 should return true... */
 
-extern char *seterr IZERO;	/* Error message from scanner/parser */
-extern int errno IZERO;		/* Error from C library routines */
+extern char *seterr;		/* Error message from scanner/parser */
+extern int errno;		/* Error from C library routines */
 EXTERN Char   *shtemp IZERO;	/* Temp name for << shell files in /tmp */
 
 #ifdef BSDTIMES

@@ -167,6 +167,11 @@ case "${tcsh_cv_canonical}" in
     tcsh_config_file=sco32v2
   ;;
 
+  ## Siemens Nixdorf BS2000
+  bs2000-sni-posix)
+    tcsh_config_file=bs2000
+  ;;
+
   * )
   changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name
@@ -180,6 +185,7 @@ esac
 echo "Tcsh will use configuration file \`$tcsh_config_file'."
 changequote([, ])dnl
 
+AC_CONFIG_HEADER(config.h:config/${tcsh_config_file}:config.h.in)
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_GCC_TRADITIONAL
@@ -210,11 +216,4 @@ if test $ac_cv_func_connect = no; then
 fi
 AC_SUBST(DFLAGS)
 
-AC_OUTPUT(config.h.new:config/${tcsh_config_file} Makefile)
-
-if cmp -s config.h.new config.h >/dev/null 2>&1; then
-	rm -f config.h.new
-else
-	rm -f config.h
-	mv config.h.new config.h
-fi
+AC_OUTPUT(Makefile)

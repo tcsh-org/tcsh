@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.26 1997/10/02 16:36:30 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.27 1997/10/27 22:44:34 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.26 1997/10/02 16:36:30 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.27 1997/10/27 22:44:34 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -308,7 +308,7 @@ parsebind(s, str)
     case 'C':
 #ifdef WINNT
     case 'N':
-#endif WINNT
+#endif /* WINNT */
 	if (s[1] != '-' || s[2] == '\0') {
 	    bad_spec(s);
 	    return NULL;

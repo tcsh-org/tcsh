@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.who.c,v 3.26 1996/04/26 19:21:50 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.who.c,v 3.27 1997/10/27 22:44:39 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.26 1996/04/26 19:21:50 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.27 1997/10/27 22:44:39 christos Exp $")
 
 #include "tc.h"
 
@@ -169,12 +169,16 @@ watch_login(force)
     Char  **vp = NULL;
     time_t  t, interval = MAILINTVL;
     struct stat sta;
-#ifdef WINNT
-    static int ncbs_posted = 0;
-#endif /* WINNT */
 #if defined(UTHOST) && defined(_SEQUENT_)
     char   *host, *ut_find_host();
 #endif
+#ifdef WINNT
+    static int ncbs_posted = 0;
+    USE(utmp);
+    USE(utmpfd);
+    USE(sta);
+    USE(wpnew);
+#endif /* WINNT */
 
     /* stop SIGINT, lest our login list get trashed. */
 #ifdef BSDSIGS

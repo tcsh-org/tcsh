@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.41 1997/05/04 17:52:16 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.42 1997/10/27 22:44:33 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.41 1997/05/04 17:52:16 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.42 1997/10/27 22:44:33 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -83,20 +83,6 @@ static	void		 chkclob	__P((char *));
  * David Dawes (dawes@physics.su.oz.au) Oct 1991
  */
 
-static struct {
-    int wanttty;
-    struct biltins *bifunc;
-    bool forked;
-} _gv IZERO_STRUCT;
-
-#define VOL_SAVE()	( bifunc = _gv.bifunc, \
-			  forked = _gv.forked, \
-			  owanttty = _gv.wanttty )
-#define VOL_RESTORE() (	_gv.bifunc = bifunc, \
-			_gv.forked = forked, \
-			_gv.wanttty = owanttty )
-
-
 /*VARARGS 1*/
 void
 execute(t, wanttty, pipein, pipeout)
@@ -108,9 +94,9 @@ execute(t, wanttty, pipein, pipeout)
     extern bool use_fork;	/* use fork() instead of vfork()? */
 #endif
 
-    bool    forked;
+    bool    forked = 0;
     struct biltins *bifunc;
-    int     pid = 0, owanttty;
+    int     pid = 0;
     int     pv[2];
 #ifdef BSDSIGS
     static sigmask_t csigmask;
@@ -119,6 +105,10 @@ execute(t, wanttty, pipein, pipeout)
     static int onosigchld = 0;
 #endif /* VFORK */
     static int nosigchld = 0;
+
+    (void) &wanttty;
+    (void) &forked;
+    (void) &bifunc;
 
     if (t == 0) 
 	return;
@@ -174,17 +164,12 @@ execute(t, wanttty, pipein, pipeout)
 	}
     }
 
-    VOL_SAVE();
-    _gv.forked = 0;
-    _gv.wanttty = wanttty;
-    _gv.bifunc = NULL;
-
     /*
      * From: Michael Schroeder <mlschroe@immd4.informatik.uni-erlangen.de>
      * Don't check for wantty > 0...
      */
     if (t->t_dflg & F_AMPERSAND)
-	_gv.wanttty = 0;
+	wanttty = 0;
     switch (t->t_dtyp) {
 
     case NODE_COMMAND:
@@ -193,7 +178,6 @@ execute(t, wanttty, pipein, pipeout)
 	if ((t->t_dflg & F_REPEAT) == 0)
 	    Dfix(t);		/* $ " ' \ */
 	if (t->t_dcom[0] == 0) {
-	    VOL_RESTORE();
 	    return;
 	}
 	/*FALLTHROUGH*/
@@ -285,28 +269,28 @@ execute(t, wanttty, pipein, pipeout)
 	    /*
 	     * Check if we have a builtin function and remember which one.
 	     */
-	    _gv.bifunc = isbfunc(t);
- 	    if (noexec && _gv.bifunc) {
+	    bifunc = isbfunc(t);
+ 	    if (noexec && bifunc) {
 		/*
 		 * Continue for builtins that are part of the scripting language
 		 */
-		if (_gv.bifunc->bfunct != (bfunc_t)dobreak	&&
-		    _gv.bifunc->bfunct != (bfunc_t)docontin	&&
-		    _gv.bifunc->bfunct != (bfunc_t)doelse	&&
-		    _gv.bifunc->bfunct != (bfunc_t)doend	&&
-		    _gv.bifunc->bfunct != (bfunc_t)doforeach	&&
-		    _gv.bifunc->bfunct != (bfunc_t)dogoto	&&
-		    _gv.bifunc->bfunct != (bfunc_t)doif		&&
-		    _gv.bifunc->bfunct != (bfunc_t)dorepeat	&&
-		    _gv.bifunc->bfunct != (bfunc_t)doswbrk	&&
-		    _gv.bifunc->bfunct != (bfunc_t)doswitch	&&
-		    _gv.bifunc->bfunct != (bfunc_t)dowhile	&&
-		    _gv.bifunc->bfunct != (bfunc_t)dozip)
+		if (bifunc->bfunct != (bfunc_t)dobreak	&&
+		    bifunc->bfunct != (bfunc_t)docontin	&&
+		    bifunc->bfunct != (bfunc_t)doelse	&&
+		    bifunc->bfunct != (bfunc_t)doend	&&
+		    bifunc->bfunct != (bfunc_t)doforeach&&
+		    bifunc->bfunct != (bfunc_t)dogoto	&&
+		    bifunc->bfunct != (bfunc_t)doif	&&
+		    bifunc->bfunct != (bfunc_t)dorepeat	&&
+		    bifunc->bfunct != (bfunc_t)doswbrk	&&
+		    bifunc->bfunct != (bfunc_t)doswitch	&&
+		    bifunc->bfunct != (bfunc_t)dowhile	&&
+		    bifunc->bfunct != (bfunc_t)dozip)
 		    break;
 	    }
 	}
 	else {			/* not a command */
-	    _gv.bifunc = NULL;
+	    bifunc = NULL;
 	    if (noexec)
 		break;
 	}
@@ -330,29 +314,29 @@ execute(t, wanttty, pipein, pipeout)
 	if (t->t_dflg & F_PIPEIN)
 	    t->t_dflg &= ~(F_NOFORK);
 #endif /* BACKPIPE */
-	if (_gv.bifunc && (_gv.bifunc->bfunct == (bfunc_t)dochngd ||
-			   _gv.bifunc->bfunct == (bfunc_t)dopushd ||
-			   _gv.bifunc->bfunct == (bfunc_t)dopopd))
+	if (bifunc && (bifunc->bfunct == (bfunc_t)dochngd ||
+		       bifunc->bfunct == (bfunc_t)dopushd ||
+		       bifunc->bfunct == (bfunc_t)dopopd))
 	    t->t_dflg &= ~(F_NICE);
 	if (((t->t_dflg & F_TIME) || ((t->t_dflg & F_NOFORK) == 0 &&
-	     (!_gv.bifunc || t->t_dflg &
+	     (!bifunc || t->t_dflg &
 	      (F_PIPEOUT | F_AMPERSAND | F_NICE | F_NOHUP | F_HUP)))) ||
 	/*
 	 * We have to fork for eval too.
 	 */
-	    (_gv.bifunc && (t->t_dflg & F_PIPEIN) != 0 &&
-	     _gv.bifunc->bfunct == (bfunc_t)doeval))
+	    (bifunc && (t->t_dflg & F_PIPEIN) != 0 &&
+	     bifunc->bfunct == (bfunc_t)doeval))
 #ifdef VFORK
 	    if (t->t_dtyp == NODE_PAREN ||
-		t->t_dflg & (F_REPEAT | F_AMPERSAND) || _gv.bifunc)
+		t->t_dflg & (F_REPEAT | F_AMPERSAND) || bifunc)
 #endif /* VFORK */
 	    {
-		_gv.forked++;
+		forked++;
 		/*
 		 * We need to block SIGCHLD here, so that if the process does
 		 * not die before we can set the process group
 		 */
-		if (_gv.wanttty >= 0 && !nosigchld) {
+		if (wanttty >= 0 && !nosigchld) {
 #ifdef BSDSIGS
 		    csigmask = sigblock(sigmask(SIGCHLD));
 #else /* !BSDSIGS */
@@ -362,7 +346,7 @@ execute(t, wanttty, pipein, pipeout)
 		    nosigchld = 1;
 		}
 
-		pid = pfork(t, _gv.wanttty);
+		pid = pfork(t, wanttty);
 		if (pid == 0 && nosigchld) {
 #ifdef BSDSIGS
 		    (void) sigsetmask(csigmask);
@@ -406,7 +390,7 @@ execute(t, wanttty, pipein, pipeout)
 		sigmask_t savesm;
 
 # endif /* SAVESIGVEC */
-		if (_gv.wanttty >= 0 && !nosigchld && !noexec) {
+		if (wanttty >= 0 && !nosigchld && !noexec) {
 # ifdef BSDSIGS
 		    csigmask = sigblock(sigmask(SIGCHLD));
 # else /* !BSDSIGS */
@@ -461,7 +445,7 @@ execute(t, wanttty, pipein, pipeout)
 # endif  /* BSDSIGS */
 		    stderror(ERR_NOPROC);
 		}
-		_gv.forked++;
+		forked++;
 		if (pid) {	/* parent */
 # ifdef SAVESIGVEC
 		    restoresigvec(savesv, savesm);
@@ -539,7 +523,7 @@ execute(t, wanttty, pipein, pipeout)
 			    (void) signal(SIGQUIT, SIG_DFL);
 			}
 # ifdef BSDJOBS
-			if (_gv.wanttty >= 0) {
+			if (wanttty >= 0) {
 			    (void) signal(SIGTSTP, SIG_DFL);
 			    (void) signal(SIGTTIN, SIG_DFL);
 			    (void) signal(SIGTTOU, SIG_DFL);
@@ -554,7 +538,7 @@ execute(t, wanttty, pipein, pipeout)
 			(void) signal(SIGQUIT, SIG_IGN);
 		    }
 
-		    pgetty(_gv.wanttty, pgrp);
+		    pgetty(wanttty, pgrp);
 
 		    if (t->t_dflg & F_NOHUP)
 			(void) signal(SIGHUP, SIG_IGN);
@@ -630,9 +614,9 @@ execute(t, wanttty, pipein, pipeout)
 	 * Perform a builtin function. If we are not forked, arrange for
 	 * possible stopping
 	 */
-	if (_gv.bifunc) {
-	    func(t, _gv.bifunc);
-	    if (_gv.forked)
+	if (bifunc) {
+	    func(t, bifunc);
+	    if (forked)
 		exitstat();
 	    break;
 	}
@@ -654,33 +638,33 @@ execute(t, wanttty, pipein, pipeout)
 	didcch = 0;
 #endif /* !CLOSE_ON_EXEC */
 	didfds = 0;
-	_gv.wanttty = -1;
+	wanttty = -1;
 	t->t_dspr->t_dflg |= t->t_dflg & F_NOINTERRUPT;
-	execute(t->t_dspr, _gv.wanttty, NULL, NULL);
+	execute(t->t_dspr, wanttty, NULL, NULL);
 	exitstat();
 
     case NODE_PIPE:
 #ifdef BACKPIPE
 	t->t_dcdr->t_dflg |= F_PIPEIN | (t->t_dflg &
 			(F_PIPEOUT | F_AMPERSAND | F_NOFORK | F_NOINTERRUPT));
-	execute(t->t_dcdr, _gv.wanttty, pv, pipeout);
+	execute(t->t_dcdr, wanttty, pv, pipeout);
 	t->t_dcar->t_dflg |= F_PIPEOUT |
 	    (t->t_dflg & (F_PIPEIN | F_AMPERSAND | F_STDERR | F_NOINTERRUPT));
-	execute(t->t_dcar, _gv.wanttty, pipein, pv);
+	execute(t->t_dcar, wanttty, pipein, pv);
 #else /* !BACKPIPE */
 	t->t_dcar->t_dflg |= F_PIPEOUT |
 	    (t->t_dflg & (F_PIPEIN | F_AMPERSAND | F_STDERR | F_NOINTERRUPT));
-	execute(t->t_dcar, _gv.wanttty, pipein, pv);
+	execute(t->t_dcar, wanttty, pipein, pv);
 	t->t_dcdr->t_dflg |= F_PIPEIN | (t->t_dflg &
 			(F_PIPEOUT | F_AMPERSAND | F_NOFORK | F_NOINTERRUPT));
-	execute(t->t_dcdr, _gv.wanttty, pv, pipeout);
+	execute(t->t_dcdr, wanttty, pv, pipeout);
 #endif /* BACKPIPE */
 	break;
 
     case NODE_LIST:
 	if (t->t_dcar) {
 	    t->t_dcar->t_dflg |= t->t_dflg & F_NOINTERRUPT;
-	    execute(t->t_dcar, _gv.wanttty, NULL, NULL);
+	    execute(t->t_dcar, wanttty, NULL, NULL);
 	    /*
 	     * In strange case of A&B make a new job after A
 	     */
@@ -691,7 +675,7 @@ execute(t, wanttty, pipein, pipeout)
 	if (t->t_dcdr) {
 	    t->t_dcdr->t_dflg |= t->t_dflg &
 		(F_NOFORK | F_NOINTERRUPT);
-	    execute(t->t_dcdr, _gv.wanttty, NULL, NULL);
+	    execute(t->t_dcdr, wanttty, NULL, NULL);
 	}
 	break;
 
@@ -699,17 +683,16 @@ execute(t, wanttty, pipein, pipeout)
     case NODE_AND:
 	if (t->t_dcar) {
 	    t->t_dcar->t_dflg |= t->t_dflg & F_NOINTERRUPT;
-	    execute(t->t_dcar, _gv.wanttty, NULL, NULL);
+	    execute(t->t_dcar, wanttty, NULL, NULL);
 	    if ((getn(varval(STRstatus)) == 0) !=
 		(t->t_dtyp == NODE_AND)) {
-		VOL_RESTORE();
 		return;
 	    }
 	}
 	if (t->t_dcdr) {
 	    t->t_dcdr->t_dflg |= t->t_dflg &
 		(F_NOFORK | F_NOINTERRUPT);
-	    execute(t->t_dcdr, _gv.wanttty, NULL, NULL);
+	    execute(t->t_dcdr, wanttty, NULL, NULL);
 	}
 	break;
 
@@ -725,7 +708,6 @@ execute(t, wanttty, pipein, pipeout)
      */
     if (didfds && !(t->t_dflg & F_REPEAT))
 	donefds();
-    VOL_RESTORE();
 }
 
 #ifdef VFORK

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.lex.c,v 3.47 1997/02/23 19:03:23 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.lex.c,v 3.48 1997/10/27 22:44:31 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.47 1997/02/23 19:03:23 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.48 1997/10/27 22:44:31 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1717,7 +1717,7 @@ bgetc()
 		fbuf[0][i] = (unsigned char) tbuf[i];
 	    feobp += c;
 	}
-#ifndef NEW_CRLF
+#ifndef WINNT
 	c = fbuf[0][fseekp - fbobp];
 	fseekp++;
 #else
@@ -1725,7 +1725,7 @@ bgetc()
 	    c = fbuf[0][fseekp - fbobp];
 	    fseekp++;
 	} while(c == '\r');
-#endif /* NEW_CRLF */
+#endif /* !WINNT */
 	return (c);
     }
 
@@ -1763,7 +1763,7 @@ bgetc()
 	if (c == 0 || (c < 0 && fixio(SHIN, errno) == -1))
 	    return (-1);
     }
-#ifndef NEW_CRLF
+#ifndef WINNT
     c = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
     fseekp++;
 #else
@@ -1771,7 +1771,7 @@ bgetc()
 	c = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
 	fseekp++;
     } while(c == '\r');
-#endif
+#endif /* !WINNT */
     return (c);
 }
 

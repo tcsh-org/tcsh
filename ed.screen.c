@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.40 1997/10/27 22:44:23 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.41 1997/10/28 22:34:18 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.40 1997/10/27 22:44:23 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.41 1997/10/28 22:34:18 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1227,13 +1227,10 @@ so_write(cp, n)
 #endif /* DEBUG_LITERAL */
 #ifdef WINNT
 	    {
-		extern void ParseAnsi __P((char *));
-		extern void set_cons_attr __P((char *));
 		char buf[256], *ptr = &buf[0];
 		for (d = litptr[*cp++ & CHAR]; *d & LITERAL; d++)
 		    *ptr++ = (*d & CHAR);
 		flush();
-		ParseAnsi(buf);
 		set_cons_attr(buf);
 	    }
 #else /* !WINNT */

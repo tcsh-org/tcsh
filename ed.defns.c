@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.defns.c,v 3.27 1997/10/02 16:36:25 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.defns.c,v 3.28 1997/10/27 22:44:20 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.27 1997/10/02 16:36:25 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.28 1997/10/27 22:44:20 christos Exp $")
 
 #include "ed.h"
 
@@ -275,8 +275,8 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 
 KEYCMD  NumFuns = F_NUM_FNS;
 
-KEYCMD  CcKeyMap[256];		/* the real key map */
-KEYCMD  CcAltMap[256];		/* the alternative key map */
+KEYCMD  CcKeyMap[NT_NUM_KEYS];		/* the real key map */
+KEYCMD  CcAltMap[NT_NUM_KEYS];		/* the alternative key map */
 #define	F_NUM_FUNCNAMES	(F_NUM_FNS + 2)
 struct KeyFuncs FuncNames[F_NUM_FUNCNAMES];
 

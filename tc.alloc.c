@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.alloc.c,v 3.30 1996/04/26 19:20:34 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.alloc.c,v 3.31 1997/10/27 22:44:33 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.30 1996/04/26 19:20:34 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.31 1997/10/27 22:44:33 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -129,13 +129,13 @@ union overhead {
  * precedes the data area returned to the user.
  */
 #define	NBUCKETS ((sizeof(long) << 3) - 3)
-static union overhead *nextf[NBUCKETS];
+static union overhead *nextf[NBUCKETS] IZERO_STRUCT;
 
 /*
  * nmalloc[i] is the difference between the number of mallocs and frees
  * for a given block size.
  */
-static U_int nmalloc[NBUCKETS];
+static U_int nmalloc[NBUCKETS] IZERO_STRUCT;
 
 #ifndef lint
 static	int	findbucket	__P((union overhead *, int));

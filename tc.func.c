@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.72 1997/10/27 22:44:35 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.73 1997/10/28 22:34:31 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,16 +36,12 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.72 1997/10/27 22:44:35 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.73 1997/10/28 22:34:31 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 #include "tw.h"
 #include "tc.h"
-
-#ifdef HESIOD
-# include <hesiod.h>
-#endif /* HESIOD */
 
 #ifdef AFS
 #define PASSMAX 16
@@ -323,8 +319,7 @@ dolist(v, c)
     else {
 	Char   *dp, *tmp, buf[MAXPATHLEN];
 #ifdef WINNT
-	char is_it_unc[3];
-	int yes_it_is = 0;
+	int is_unc = 0;
 #endif /* WINNT */
 
 	for (k = 0, i = 0; v[k] != NULL; k++) {
@@ -336,16 +331,14 @@ dolist(v, c)
 #endif /* apollo */
 		*dp = '\0';
 #ifdef WINNT
- 		is_it_unc[0] = (char)tmp[0];
- 		is_it_unc[1] = (char)tmp[1];
- 		is_it_unc[2] = 0;
- 		yes_it_is = lstrcmp(is_it_unc,"//") == 0 ||
-			    lstrcmp(is_it_unc,"\\\\") == 0;
+		if ((((tmp[0] & CHAR) == '/') || ((tmp[0] & CHAR) == '\\')) &&  
+		    (((tmp[1] & CHAR) == '/') || ((tmp[1] & CHAR) == '\\')))
+		    is_unc = 1;
 #endif /* WINNT */
 	    if (
 #ifdef WINNT
 		((char)tmp[1] != ':') &&
-		(!yes_it_is) &&
+		(!is_unc) &&
 #endif /* WINNT */
 		stat(short2str(tmp), &st) == -1) {
 		if (k != i) {
@@ -358,8 +351,8 @@ dolist(v, c)
 	    }
 	    else if (
 #ifdef WINNT
-		((char)tmp[1] != ':') &&
-		(!yes_it_is) &&
+		((char)tmp[1] != ':') ||
+		(is_unc) ||
 #endif /* WINNT */
 		S_ISDIR(st.st_mode)) {
 		Char   *cp;
@@ -1904,9 +1897,9 @@ hashbang(fd, vp)
 	switch (*p) {
 	case ' ':
 	case '\t':
-#ifdef NEW_CRLF
+#ifdef WINNT
 	case '\r':
-#endif NEW_CRLF
+#endif /* WINNT */
 	    if (ws) {	/* a blank after a word.. save it */
 		*p = '\0';
 #ifndef WINNT
@@ -1949,8 +1942,10 @@ hashbang(fd, vp)
 		    sargc++;
 		}
 #endif /* !WINNT */
-		sargv[sargc] = NULL;
-		ws = NULL;
+	    }
+	    sargv[sargc] = NULL;
+	    ws = NULL;
+	    if (sargc > 0)
 		*vp = blk2short(sargv);
 		return 0;
 	    }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.38 1997/10/27 22:44:27 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.39 1997/10/28 22:34:23 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.38 1997/10/27 22:44:27 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.39 1997/10/28 22:34:23 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -676,6 +676,7 @@ dohash(vv, c)
     int hashval;
 #ifdef WINNT
     int is_windir; /* check if it is the windows directory */
+    USE(hashval);
 #endif /* WINNT */
 
     USE(c);
