@@ -738,7 +738,7 @@ void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {
 			ExitProcess(0);
 		errno = 0;
 
-		heap_free(cmdstr-1);
+		heap_free(originalPtr);
 		return;
 	}
 	if (throw_ok) { 
@@ -754,7 +754,7 @@ void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {
 		stderror(ERR_SYSTEM,err2,cmdstr);
 	}
 
-	heap_free(cmdstr-1);
+	heap_free(originalPtr);
 	restore_path(ptr);
 
 	errno = ENOEXEC;
