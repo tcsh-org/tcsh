@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.58 2002/05/16 13:51:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.59 2002/06/25 19:02:11 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.58 2002/05/16 13:51:25 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.59 2002/06/25 19:02:11 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -319,6 +319,7 @@ dnormalize(cp, exp)
     if (exp) {
  	int     dotdot = 0;
 	Char   *dp, *cwd, *start = cp, buf[MAXPATHLEN];
+	struct stat sb;
 # ifdef apollo
 	bool slashslash;
 # endif /* apollo */
@@ -334,6 +335,13 @@ dnormalize(cp, exp)
 	 */
         if (dotdot == 0)
 	    return (Strsave(cp));
+
+	/*
+	 * If the path doesn't exist, we are done too.
+	 */
+	if (lstat(short2str(cp), &sb) != 0 && errno == ENOENT)
+	    return (Strsave(cp));
+	
 
 	cwd = (Char *) xmalloc((size_t) (((int) Strlen(dcwd->di_name) + 3) *
 					   sizeof(Char)));
