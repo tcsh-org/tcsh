@@ -122,6 +122,11 @@
  * Large file support from <features.h>
  */
 
+#define __STRICT_ANSI__
+#define _BSD_SOURCE
+#define _SVID_SOURCE
+#define _POSIX_SOURCE
+
 /* Some more functions for correct standard I/O. */
 #define _LARGEFILE_SOURCE
 /* Additional functionality from LFS for large files. */
