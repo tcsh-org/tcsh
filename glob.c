@@ -354,6 +354,14 @@ glob(pattern, flags, errfunc, pglob)
     if (flags & GLOB_QUOTE) {
 	/* Protect the quoted characters */
 	while (bufnext < bufend && (c = *patnext++) != EOS) 
+#ifdef DSPMBYTE
+	    if (Ismbyte1(c) && *patnext != EOS)
+	    {
+	      *bufnext++ = (Char) c;
+	      *bufnext++ = (Char) *patnext++;
+	    }
+	    else
+#endif /* DSPMBYTE */
 	    if (c == QUOTE) {
 		if ((c = *patnext++) == EOS) {
 		    c = QUOTE;
@@ -373,6 +381,14 @@ glob(pattern, flags, errfunc, pglob)
     qpatnext = patbuf;
     /* we don't need to check for buffer overflow any more */
     while ((c = *qpatnext++) != EOS) {
+#ifdef DSPMBYTE
+	if (Ismbyte1(c) && *qpatnext != EOS)
+	{
+	  *bufnext++ = CHAR(c);
+	  *bufnext++ = CHAR(*qpatnext++);
+	}
+	else
+#endif /* DSPMBYTE */
 	switch (c) {
 	case LBRACKET:
 	    c = *qpatnext;
