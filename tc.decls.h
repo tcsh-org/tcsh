@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.49 2001/08/06 23:57:33 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.50 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -299,6 +299,7 @@ extern	size_t		  s_strlen	__P((const Char *));
 extern	int		  s_strcmp	__P((const Char *, const Char *));
 extern	int		  s_strncmp	__P((const Char *, const Char *, 
 					     size_t));
+extern	int		  s_strcasecmp	__P((const Char *, const Char *));
 extern	Char		 *s_strsave	__P((const Char *));
 extern	Char		 *s_strend	__P((const Char *));
 extern	Char		 *s_strstr	__P((const Char *, const Char *));

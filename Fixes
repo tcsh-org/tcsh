@@ -1,3 +1,4 @@
+ 17. do a case insensitive comparison for the multibyte vars (Martin Godisch)
  16. don't sigsuspend() for an already exited job
  15. glob all arguments in source (Martin Godisch)
  14. various debian fixes (Martin Godisch)

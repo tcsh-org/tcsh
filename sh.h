@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.110 2003/03/12 19:14:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.111 2003/05/26 07:11:07 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -1127,6 +1127,7 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 #define Strlen(a)		strlen(a)
 #define Strcmp(a, b)		strcmp(a, b)
 #define Strncmp(a, b, c)	strncmp(a, b, c)
+#define Strcasecmp(a, b)	strcasecmp(a, b)
 
 #define Strspl(a, b)		strspl(a, b)
 #define Strsave(a)		strsave(a)
@@ -1147,6 +1148,7 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 #define Strlen(a)		s_strlen(a)
 #define Strcmp(a, b)		s_strcmp(a, b)
 #define Strncmp(a, b, c)	s_strncmp(a, b, c)
+#define Strcasecmp(a, b)	s_strcasecmp(a, b)
 
 #define Strspl(a, b)		s_strspl(a, b)
 #define Strsave(a)		s_strsave(a)
