@@ -369,7 +369,9 @@ ENVIRON	:	n/a
 NOTES	:	AUTOLOGOUT is probably best undef'ed
 NOTES	:	For 4.0, the NLS define in h can be enabled.
 NOTES	:	4.0.5a cc does not have -O3 anymore.
-VERSION	:	6.03.00
+NOTES	:	If you don't like -lbsd, you can define POSIXJOBS in
+NOTES	:	config.h and omit it.
+VERSION	:	6.06.00
 
 VENDOR	:	ibm + compatibles
 MODELS	:	i386,i486
