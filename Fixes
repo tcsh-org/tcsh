@@ -5,7 +5,7 @@
  28. BS2000 bs2cmd builtin. (Martin Kraemer)
  27. Fix interrupt resetting code when /etc startup scripts have syntax errors
      (Mark A. Grondona)
- 26. Clarification of kill-ring commands (Per Hederland)
+ 26. Clarification of kill-ring commands (Per Hedeland)
  25. Debian completion additions (Martin Godisch)
  24. Japanese character set fixes (Juehiro-san) from debian
  23. NLS charset fixes; disabled since they only work with gnu gencat
