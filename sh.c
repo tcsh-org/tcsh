@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.5 1991/07/29 21:22:46 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.6 1991/07/30 20:51:12 jwo Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,7 +41,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.5 1991/07/29 21:22:46 christos Exp $")
+RCSID("$Id: sh.c,v 3.6 1991/07/30 20:51:12 jwo Exp christos $")
 
 #include "sh.h"
 #include "tc.h"
@@ -1625,7 +1625,7 @@ mailchk()
 	new = stb.st_mtime > time0;
 #endif
 	if (stb.st_size == 0 || stb.st_atime > stb.st_mtime ||
-	    (stb.st_atime < chktim && stb.st_mtime < chktim) ||
+	    (stb.st_atime <= chktim && stb.st_mtime <= chktim) ||
 	    loginsh && !new)
 	    continue;
 	if (cnt == 1)
