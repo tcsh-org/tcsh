@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 3.7 1991/08/01 16:36:23 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 3.8 1991/08/02 06:28:40 christos Exp christos $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.glob.c,v 3.7 1991/08/01 16:36:23 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.8 1991/08/02 06:28:40 christos Exp christos $")
 
 #include "sh.h"
 #include "tc.h"
@@ -520,6 +520,8 @@ globall(v)
 	if ((gflg & G_CSH) && vl != vo)
 	    blkfree(vo);
     }
+    else
+	trim(vl);
 
     gargc = vl ? blklen(vl) : 0;
     return (gargv = vl);
