@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.86 2005/01/05 16:06:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.87 2005/01/18 20:24:51 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.86 2005/01/05 16:06:14 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.87 2005/01/18 20:24:51 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1167,12 +1167,14 @@ pprint(pp, flag)
 			    && reason != SIGINT
 			    && (reason != SIGPIPE
 				|| (pp->p_flags & PPOU) == 0))) {
-			char *ptr;
+			const char *ptr;
 			char buf[1024];
 
-			if ((ptr = mesg[pp->p_reason & ASCII].pname) == NULL)
-			    xsnprintf(ptr = buf, sizeof(buf), "%s %d",
+			if ((ptr = mesg[pp->p_reason & ASCII].pname) == NULL) {
+			    xsnprintf(buf, sizeof(buf), "%s %d",
 				CGETS(17, 5, "Signal"), pp->p_reason & ASCII);
+			    ptr = buf;
+			}
 			xprintf(format, ptr);
 		    }
 		    else

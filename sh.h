@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.125 2005/01/06 16:55:59 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.126 2005/01/18 20:24:50 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -467,6 +467,7 @@ typedef void pret_t;
 
 #include "sh.types.h"
 
+#ifndef __NetBSD__ /* XXX */
 #ifndef WINNT_NATIVE
 # ifndef GETPGRP_VOID
 extern pid_t getpgrp __P((int));
@@ -474,6 +475,7 @@ extern pid_t getpgrp __P((int));
 extern pid_t getpgrp __P((void));
 # endif
 #endif /* !WINNT_NATIVE */
+#endif
 
 typedef RETSIGTYPE (*signalfun_t) __P((int));
 
@@ -1203,7 +1205,7 @@ EXTERN Char   *evalp;
 
 extern struct mesg {
     const char   *iname;	/* name from /usr/include */
-    char *pname;		/* print name */
+    const char *pname;		/* print name */
 } mesg[];
 
 /* word_chars is set by default to WORD_CHARS but can be overridden by

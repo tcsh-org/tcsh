@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.80 2004/12/25 21:15:05 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.81 2005/01/05 16:06:12 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.80 2004/12/25 21:15:05 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.81 2005/01/05 16:06:12 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -138,6 +138,7 @@ static  CCRETVAL c_get_histline		__P((void));
 static  CCRETVAL c_search_line		__P((Char *, int));
 static  CCRETVAL v_repeat_srch		__P((int));
 static	CCRETVAL e_inc_search		__P((int));
+static  CCRETVAL e_insert_str		__P((Char *));
 static	CCRETVAL v_search		__P((int));
 static	CCRETVAL v_csearch_fwd		__P((Char, int, int));
 static	CCRETVAL v_action		__P((int));
@@ -1422,7 +1423,6 @@ CCRETVAL
 e_insert(c)
     Char c;
 {
-    int i;
 #ifndef SHORT_STRINGS
     c &= ASCII;			/* no meta chars ever */
 #endif
@@ -1470,9 +1470,9 @@ e_insert(c)
     }
     else {
 	if (inputmode != MODE_INSERT) {
-
-	    for(i=0;i<Argument;i++) 
-		UndoBuf[UndoSize++] = *(Cursor+i);
+	    int i;
+	    for(i = 0; i < Argument; i++) 
+		UndoBuf[UndoSize++] = *(Cursor + i);
 
 	    UndoBuf[UndoSize] = '\0';
 	    c_delafter(Argument);   /* Do NOT use the saving ONE */

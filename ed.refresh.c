@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.36 2005/01/05 16:06:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.37 2005/01/18 20:12:14 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.36 2005/01/05 16:06:13 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.37 2005/01/18 20:12:14 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -122,11 +122,6 @@ dprintf(va_list)
 #endif  /* DEBUG_UPDATE || DEBUG_REFRESH || DEBUG_LITERAL */
 
 static int litlen = 0, litalloc = 0;
-
-static void ResetLiterals()
-{
-    litlen = 0;
-}
 
 static int MakeLiteral(str, len, addlit)
     Char *str;
@@ -1345,7 +1340,7 @@ ClearDisp()
     for (i = 0; i < TermV; i++)
 	(void) memset(Display[i], 0, TermH * sizeof(Display[0][0]));
     OldvcV = 0;
-    ResetLiterals();
+    litlen = 0;
 }
 
 void
