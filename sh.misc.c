@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.misc.c,v 3.1 1991/07/05 02:11:19 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.misc.c,v 3.2 1991/07/05 02:23:28 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -37,7 +37,7 @@
 #include "config.h"
 #ifndef lint
 static char *rcsid() 
-    { return "$Id: sh.misc.c,v 3.1 1991/07/05 02:11:19 christos Exp christos $"; }
+    { return "$Id: sh.misc.c,v 3.2 1991/07/05 02:23:28 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -74,14 +74,14 @@ setzero(cp, i)
 
 char   *
 strsave(s)
-    register char *s;
+    register const char *s;
 {
     char   *n;
     register char *p;
 
-    if (s == 0)
-	s = "";
-    for (p = s; *p++;);
+    if (s == NULL)
+	s = (const char *) "";
+    for (p = (char *) s; *p++;);
     n = p = (char *) xmalloc((size_t) ((p - s) * sizeof(char)));
     while (*p++ = *s++);
     return (n);
