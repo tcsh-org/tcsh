@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.14 1992/02/21 23:16:20 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.15 1992/03/08 02:17:22 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.14 1992/02/21 23:16:20 christos Exp christos $")
+RCSID("$Id: ed.screen.c,v 3.15 1992/03/08 02:17:22 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -227,7 +227,7 @@ static struct termcapval {
     int     val;
 }       tval[] = {
 #define T_am	0
-    {	"am",	"Can use automatic margins",	0 },
+    {	"am",	"Has automatic margins",	0 },
 #define T_pt	1
     {	"pt",	"Can use physical tabs", 	0 },
 #define T_li	2

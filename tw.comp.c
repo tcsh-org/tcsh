@@ -45,8 +45,8 @@ RCSID("$Id: tw.comp.c,v 1.3 1992/02/13 05:28:51 christos Exp $")
 /* #define TDEBUG */
 static struct varent completions;
 
-static int 	tw_result	__P((Char *, Char *));
-static int	tw_tok		__P((Char **, Char *));
+static int 	 tw_result	__P((Char *, Char *));
+static Char 	*tw_tok		__P((Char *));
 
 /* docomplete():
  *	Add or list completions in the completion list
@@ -90,23 +90,28 @@ douncomplete(v, t)
 /* tw_tok():
  *	Return the next word from string, unquoteing it.
  */
-static int
-tw_tok(str, buf)
-    Char **str;
-    Char *buf;
+static Char *
+tw_tok(str)
+    Char *str;
 {
-    Char *ptr = *str;
+    static Char *bf = NULL;
 
-    while (*ptr && !Isspace(*ptr)) {
-	if (ismeta(*ptr))
-	    return(0);
-	*buf++ = *ptr++ & ~QUOTE;
+    if (str != NULL)
+	bf = str;
+    
+    /* skip leading spaces */
+    for (; *bf && Isspace(*bf); bf++)
+	continue;
+
+    for (str = bf; *bf && !Isspace(*bf); bf++) {
+	if (ismeta(*bf))
+	    return NULL;
+	*bf = *bf & ~QUOTE;
     }
-    *buf = '\0';
-    while (*ptr && Isspace(*ptr))
-	ptr++;
-    *str = ptr;
-    return(1);
+    if (*bf != '\0')
+	*bf++ = '\0';
+
+    return *str ? str : NULL;
 } /* end tw_tok */
 
 
@@ -149,19 +154,30 @@ tw_result(act, pat)
 	case 'b':
 	    looking = TW_BINDING;
 	    break;
+
 	case '$':
 	    copyn(pat, &act[2], MAXPATHLEN);
 	    (void) strip(pat);
 	    return(TW_VARLIST);
+
+	case '(':
+	    copyn(pat, &act[2], MAXPATHLEN);
+	    if ((act = Strchr(pat, ')')) != NULL)
+		*act = '\0';
+	    (void) strip(pat);
+	    return TW_WORDLIST;
+
 	default:
 	    copyn(pat, act, MAXPATHLEN);
 	    (void) strip(pat);
 	    return(TW_LITERAL);
 	}
+
 	if ((act[2] & ~QUOTE) == ':') {
 	    copyn(pat, &act[3], MAXPATHLEN);
 	    (void) strip(pat);
 	}
+
 	return looking;
     }
     copyn(pat, act, MAXPATHLEN);
@@ -174,42 +190,104 @@ tw_result(act, pat)
  *	Return the appropriate completion for the command
  */
 int
-tw_complete(cmd, word, pat)
-    Char *cmd, *word, *pat;
+tw_complete(line, wstart, word, pat)
+    Char *line, *wstart, **word, *pat;
 {
-    Char buf[MAXPATHLEN + 1], **vec;
+    Char buf[MAXPATHLEN + 1], **vec, *cmd, *wp, *owp, *ptr;
     struct varent *vp;
+    int res, plen = 0;
 
-    (void) tw_tok(&cmd, buf); 
+    copyn(buf, line, MAXPATHLEN);
 
-#ifdef TDEBUG
-    xprintf(" cmd: %x %s\n", cmd, short2str(buf));
-    xprintf("word: %x %s\n", word, short2str(word));
-#endif
+    /* find the command */
+    if ((cmd = tw_tok(buf)) == NULL)
+	return TW_ZERO;
 
     if ((vp = adrof1(strip(buf), &completions)) == NULL)
 	return TW_ZERO;
 
     if ((vec = vp->vec) == NULL || *vec == NULL)
 	return TW_ZERO;
-
-    /*
-     * Now match the arguments
-     */
-    for (;;) {
-	if (cmd >= word) 
-	    /* we are done */
-	    return tw_result(*vec, pat);
-	if (tw_tok(&cmd, buf) == 0)
-	    return TW_ZERO;
-#ifdef TDEBUG
-	xprintf("cmd %x word %x token = %s\n", cmd, word, short2str(buf));
-	xprintf("Gmatch(%s, ", short2str(buf));
-	xprintf("%s) = %d\n", short2str(*vec), Gmatch(buf, *vec));
-#endif
-	if (vec[0][0] == '=' || Gmatch(buf, *vec)) {
-	    if (vec[1] != NULL)
-		vec++;
-	}
+    
+    /* find the last word before the current one */
+    wp = owp = cmd;
+    ptr = tw_tok(NULL);
+    while (ptr != NULL) {
+	owp = wp;
+	wp = ptr;
+	ptr = tw_tok(NULL);
     }
+
+    /* if the current word is empty move the last word to the next */
+    if (**word == '\0') {
+	owp = wp;
+	wp = *word;
+    }
+
+#ifdef TDEBUG
+    xprintf("\r\n");
+    xprintf("line: %x %s\n", line,   short2str(line));
+    xprintf(" cmd: %x %s\n", cmd,    short2str(cmd));
+    xprintf("wstr: %x %s\n", wstart, short2str(wstart));
+    xprintf("word: %x %s\n", *word,   short2str(*word));
+    xprintf("last: %x %s\n", owp,    short2str(owp));
+    xprintf("this: %x %s\n", wp,     short2str(wp));
+#endif /* TDEBUG */
+    
+    for (res = TW_ZERO; vec != NULL && (ptr = vec[0]) != NULL; vec++) {
+	Char buf[MAXPATHLEN + 1], *pos, *mat;
+
+	if (ptr[0] == '\0')
+	    continue;
+#ifdef TDEBUG
+	xprintf("match %s\n", short2str(ptr));
+#endif /* TDEBUG */
+	copyn(buf, ptr, MAXPATHLEN);
+	plen = 0;
+	cmd = ptr;
+	if ((pos = Strchr(buf, ',')) != NULL && pos[1] == '=') {
+	    cmd = &ptr[pos - buf + 1];
+	    mat = buf;
+	    *pos = '\0';
+	    /*
+	     * If the pattern did not end with a space, the match
+	     * against the current word otherwise the match is 
+	     * against the previous word.
+	     */
+	    if (pos != buf) {
+		if (Isspace(pos[-1])) {
+		    /* match is with the previous word */
+		    pos[-1] = '\0';
+#ifdef TDEBUG
+		    xprintf("prev Gmatch(%s, ", short2str(owp));
+		    xprintf("%s) = ", short2str(mat));
+		    xprintf("%d\n", Gmatch(owp, mat));
+#endif /* TDEBUG */
+		    if (!Gmatch(owp, mat))
+			continue;
+		}
+		else {
+#ifdef TDEBUG
+		    xprintf("curr Gmatch(%s, ", short2str(wp));
+		    xprintf("%s) = ", short2str(mat));
+		    xprintf("%d\n", Gmatch(owp, mat));
+#endif /* TDEBUG */
+		    plen = pos - buf;
+		    *pos++ = '*';
+		    *pos = '\0';
+		    /* match is with this word */
+		    if (!Gmatch(wp, mat))
+			continue;
+		}
+	    }
+	}
+#ifdef TDEBUG
+	xprintf("okvec = %s\n", short2str(cmd));
+#endif /* TDEBUG */
+	res = tw_result(cmd, pat);
+	break;
+    }
+    if (res != TW_ZERO)
+	*word += plen;
+    return res;
 } /* end tw_complete */

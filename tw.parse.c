@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.parse.c,v 3.21 1992/01/28 19:06:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.parse.c,v 3.22 1992/02/13 05:28:51 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.21 1992/01/28 19:06:06 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.22 1992/02/13 05:28:51 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -54,22 +54,26 @@ RCSID("$Id: tw.parse.c,v 3.21 1992/01/28 19:06:06 christos Exp $")
 /*  TW_COMMAND,	    TW_VARIABLE,   TW_LOGNAME,	     TW_FILE	*/
 /*  TW_DIRECTORY,   TW_VARLIST,	   TW_USER,	     TW_LITERAL	*/
 /*  TW_ALIAS,	    TW_SHELLVAR,   TW_ENVVAR, 	     TW_BINDING	*/
+/*  TW_WORDLIST							*/
 static void (*tw_start_entry[]) __P((DIR *, Char *)) = {
     tw_cmd_start,   tw_var_start,  tw_logname_start, tw_file_start,
     tw_file_start,  tw_vl_start,   tw_logname_start, tw_file_start,
-    tw_alias_start, tw_var_start,  tw_var_start,     tw_bind_start
+    tw_alias_start, tw_var_start,  tw_var_start,     tw_bind_start,
+    tw_wl_start
 };
 
 static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
     tw_cmd_next,   tw_var_next,   tw_logname_next,  tw_file_next,
     tw_file_next,  tw_var_next,   tw_logname_next,  tw_file_next,
-    tw_var_next,   tw_shvar_next, tw_envvar_next,   tw_bind_next
+    tw_var_next,   tw_shvar_next, tw_envvar_next,   tw_bind_next,
+    tw_wl_next
 };
 
 static void (*tw_end_entry[]) __P((void)) = {
     tw_dir_end,    tw_dir_end,    tw_logname_end,   tw_dir_end,
     tw_dir_end,    tw_dir_end,    tw_logname_end,   tw_dir_end,
-    tw_dir_end,	   tw_dir_end,	  tw_dir_end,	    tw_dir_end
+    tw_dir_end,	   tw_dir_end,	  tw_dir_end,	    tw_dir_end,
+    tw_dir_end
 };
 
 /* #define TDEBUG */
@@ -125,7 +129,7 @@ tenematch(inputline, inputline_size, num_read, command)
 {
     Char    word[FILSIZ + 1], pat[MAXPATHLEN + 1];
     register Char *str_end, *word_start, *cp, *wp;
-    Char   *cmd_start;
+    Char   *cmd_start, *wordp;
     int     space_left;
     int     looking;		/* what we are looking for		*/
     int     search_ret;		/* what search returned for debugging 	*/
@@ -247,6 +251,7 @@ tenematch(inputline, inputline_size, num_read, command)
 
     looking = starting_a_command(word_start - 1, inputline) ? 
 	TW_COMMAND : TW_ZERO;
+    wordp = word;
 
 #ifdef TDEBUG
     xprintf("starting_a_command %d\n", looking);
@@ -259,7 +264,7 @@ tenematch(inputline, inputline_size, num_read, command)
 #endif
 
     if (looking == TW_ZERO) {
-	looking = tw_complete(cmd_start, word_start, pat);
+	looking = tw_complete(cmd_start, word_start, &wordp, pat);
 #ifdef TDEBUG
 	xprintf("complete %d %s\n", looking, short2str(pat));
 #endif
@@ -273,9 +278,9 @@ tenematch(inputline, inputline_size, num_read, command)
 
     case RECOGNIZE:
 	if (adrof(STRautocorrect)) {
-	    if ((slshp = Strrchr(word, '/')) != NULL && slshp[1] != '\0') {
+	    if ((slshp = Strrchr(wordp, '/')) != NULL && slshp[1] != '\0') {
 		SearchNoDirErr = 1;
-		for (bptr = word; bptr < slshp; bptr++) {
+		for (bptr = wordp; bptr < slshp; bptr++) {
 		    /*
 		     * do not try to correct spelling of words containing
 		     * globbing characters
@@ -289,7 +294,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	}
 	else
 	    slshp = STRNULL;
-	search_ret = t_search(word, wp, command, space_left, looking, 1, pat);
+	search_ret = t_search(wordp, wp, command, space_left, looking, 1, pat);
 	SearchNoDirErr = 0;
 
 	if (search_ret == -2) {
@@ -298,14 +303,15 @@ tenematch(inputline, inputline_size, num_read, command)
 	    (void) Strcpy(rword, slshp);
 	    if (slshp != STRNULL)
 		*slshp = '\0';
-	    search_ret = spell_me(word, sizeof(word), looking == TW_COMMAND);
+	    search_ret = spell_me(wordp, sizeof(word) - (wordp - word), 
+				  looking == TW_COMMAND);
 	    if (search_ret == 1) {
 		DeleteBack(str_end - word_start);/* get rid of old word */
-		(void) Strcat(word, rword);
-		if (InsertStr(word) < 0)	/* insert newly spelled word */
+		(void) Strcat(wordp, rword);
+		if (InsertStr(wordp) < 0)	/* insert newly spelled word */
 		    return -1;	/* error inserting */
-		wp = word + Strlen(word);
-		search_ret = t_search(word, wp, command, space_left,
+		wp = wordp + Strlen(wordp);
+		search_ret = t_search(wordp, wp, command, space_left,
 				      looking, 1, pat);
 	    }
 	}
@@ -332,10 +338,11 @@ tenematch(inputline, inputline_size, num_read, command)
 	    if (isglob(*bptr))
 		return 0;
 	}
-	search_ret = spell_me(word, sizeof(word), looking == TW_COMMAND);
+	search_ret = spell_me(wordp, sizeof(word) - (wordp - word), 
+			      looking == TW_COMMAND);
 	if (search_ret == 1) {
 	    DeleteBack(str_end - word_start);	/* get rid of old word */
-	    if (InsertStr(word) < 0)	/* insert newly spelled word */
+	    if (InsertStr(wordp) < 0)	/* insert newly spelled word */
 		return -1;	/* error inserting */
 	}
 	return search_ret;
@@ -346,11 +353,11 @@ tenematch(inputline, inputline_size, num_read, command)
 
     case GLOB:
     case GLOB_EXPAND:
-	(void) Strncpy(buffer, word, FILSIZ + 1);
+	(void) Strncpy(buffer, wordp, FILSIZ + 1);
 	items[0] = buffer;
 	items[1] = NULL;
 	ptr = items;
-	count = (looking == TW_COMMAND && Strchr(word, '/') == 0) ? 
+	count = (looking == TW_COMMAND && Strchr(wordp, '/') == 0) ? 
 		c_glob(&ptr) : 
 		t_glob(&ptr, looking == TW_COMMAND);
 	if (count > 0) {
@@ -373,7 +380,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	return count;
 
     case VARS_EXPAND:
-	if (dollar(buffer, word)) {
+	if (dollar(buffer, wordp)) {
 	    DeleteBack(str_end - word_start);
 	    if (InsertStr((in_single || in_double) ?
 			  buffer : quote_meta(buffer, 0)) < 0)
@@ -383,7 +390,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	return (0);
 
     case PATH_NORMALIZE:
-	if ((bptr = dnormalize(word)) != NULL) {
+	if ((bptr = dnormalize(wordp)) != NULL) {
 	    (void) Strcpy(buffer, bptr);
 	    xfree((ptr_t) bptr);
 	    DeleteBack(str_end - word_start);
@@ -395,7 +402,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	return (0);
 
     case LIST:
-	search_ret = t_search(word, wp, command, space_left, looking, 1, pat);
+	search_ret = t_search(wordp, wp, command, space_left, looking, 1, pat);
 	return search_ret;
 
     default:
@@ -769,6 +776,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
 	return 1;
 
     case TW_VARLIST:
+    case TW_WORDLIST:
 	gpat = 0;	/* pattern holds the name of the variable */
 	break;
 
@@ -871,6 +879,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
 
     case TW_COMMAND:
     case TW_VARLIST:
+    case TW_WORDLIST:
 	copyn(target, word, MAXNAMLEN);	/* so it can match things */
 	break;
 
@@ -1097,6 +1106,7 @@ again:
 
 	    case TW_ALIAS:
 	    case TW_VARLIST:
+	    case TW_WORDLIST:
 	    case TW_SHELLVAR:
 	    case TW_ENVVAR:
 	    case TW_USER:

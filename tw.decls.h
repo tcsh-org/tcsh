@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.decls.h,v 3.2 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.decls.h,v 3.3 1992/02/13 05:28:51 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -66,6 +66,7 @@ extern	 void		  tw_logname_start	__P((DIR *, Char *));
 extern	 void		  tw_var_start		__P((DIR *, Char *));
 extern	 void		  tw_file_start		__P((DIR *, Char *));
 extern	 void		  tw_vl_start		__P((DIR *, Char *));
+extern	 void		  tw_wl_start		__P((DIR *, Char *));
 extern	 void		  tw_bind_start		__P((DIR *, Char *));
 extern	 Char		 *tw_cmd_next		__P((Char *, int *));
 extern	 Char		 *tw_logname_next	__P((Char *, int *));
@@ -74,6 +75,7 @@ extern	 Char		 *tw_envvar_next	__P((Char *, int *));
 extern	 Char		 *tw_var_next		__P((Char *, int *));
 extern	 Char		 *tw_file_next		__P((Char *, int *));
 extern	 Char		 *tw_bind_next		__P((Char *, int *));
+extern	 Char		 *tw_wl_next		__P((Char *, int *));
 extern	 void		  tw_dir_end		__P((void));
 extern	 void		  tw_cmd_free		__P((void));
 extern	 void		  tw_logname_end	__P((void));
@@ -96,5 +98,6 @@ extern	 void		  docomplete		__P((Char **,
 						     struct command *));
 extern	 void		  douncomplete		__P((Char **, 
 						     struct command *));
-extern	 int		  tw_complete		__P((Char *, Char *, Char *));
+extern	 int		  tw_complete		__P((Char *, Char *, 
+						     Char **, Char *));
 #endif				/* _h_tw_decls */
