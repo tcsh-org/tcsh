@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.105 2002/07/12 13:16:18 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.106 2002/11/21 20:02:01 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.105 2002/07/12 13:16:18 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.106 2002/11/21 20:02:01 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -2163,7 +2163,7 @@ getremotehost()
 	     * have not caught up yet.
 	     */
 	    addr.s_addr = inet_addr(name);
-	    if (addr.s_addr != (unsigned long)~0)
+	    if (addr.s_addr != (unsigned int)~0)
 		host = name;
 	    else {
 		if (sptr != name) {
