@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.56 2004/11/20 18:23:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.57 2004/11/20 20:30:47 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.56 2004/11/20 18:23:03 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.57 2004/11/20 20:30:47 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1265,7 +1265,7 @@ autoset_dspmbyte(pcp)
     };
 #ifdef HAVE_NL_LANGINFO
     struct dspm_autoset_Table dspmc[] = {
-	{ STRstarutfstar8, STRutf8` },
+	{ STRstarutfstar8, STRutf8 },
 	{ STReuc, STReuc },
 	{ STRGB2312, STReuc },
 	{ STRLANGBIG5, STRbig5 },
