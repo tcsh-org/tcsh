@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.65 2001/02/21 02:34:14 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.66 2001/03/05 02:09:44 kim Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -76,7 +76,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.65 2001/02/21 02:34:14 kim Exp $")
+RCSID("$Id: ed.chared.c,v 3.66 2001/03/05 02:09:44 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2737,6 +2737,7 @@ e_killregion(c)
     if (Mark > Cursor) {
 	c_push_kill(Cursor, Mark); /* copy it */
 	c_delafter((int)(cp - Cursor));	/* delete it - UNUSED BY VI mode */
+	Mark = Cursor;
     }
     else {			/* mark is before cursor */
 	c_push_kill(Mark, Cursor); /* copy it */
