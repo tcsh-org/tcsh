@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tc.os.c,v 1.2 91/07/14 22:24:06 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.2 1991/07/15 19:37:24 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: tc.os.c,v 3.2 1991/07/15 19:37:24 christos Exp christos $")
 
 #include "sh.h"
 #include "tw.h"
@@ -177,7 +177,7 @@ abortpath:
 	    if (Strcmp(paths[i], STRPATH) == 0) {
 		importpath(val);
 		if (havhash)
-		    dohash();
+		    dohash(NULL, NULL);
 	    }
 	    *--val = '=';
 	}
@@ -953,7 +953,7 @@ dover(v, c)
     }
     else {
 	Setenv(STRSYSTYPE, getv(*v) ? STRbsd43 : STRsys53);
-	dohash();
+	dohash(NULL, NULL);
     }
 }
 
@@ -993,7 +993,7 @@ dorootnode(v, c)
     name_$set_diru(&uid, "", &namelen, &dirtype, &st);
     if (st.all != status_$ok) 
 	stderror(ERR_SYSTEM, name, apperr(&st));
-    dohash();
+    dohash(NULL, NULL);
 }
 
 int
