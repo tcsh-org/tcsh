@@ -1,0 +1,101 @@
+#!/bin/sh
+# @(#)$Id$
+#
+# Copyright (c) 2005 Kimmo Suominen
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer
+#    in the documentation and/or other materials provided with the
+#    distribution.
+# 3. The name of the author may not be used to endorse or promote
+#    products derived from this software without specific prior
+#    written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+# OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#
+# Create tcsh release tar.gz and patch files.
+#
+# 20050303  Kimmo Suominen
+#
+REPOSITORY=/src/pub
+#
+if [ $# -ne 3 ]
+then
+    echo "Usage: $0 major minor beta" 1>&2
+    exit 1
+fi
+#
+umask 022
+#
+WRKDIR=`mktemp -d -t tcsh`
+#
+if [ ! -d "${WRKDIR}" ]
+then
+    echo "Creating work directory failed!" 1>&2
+    exit 1
+fi
+#
+cd ${WRKDIR} || exit 1
+#
+cleanit()
+{
+    (cd tcsh && rm -f \
+	Announce* \
+	Copyright \
+	MAKERELEASE \
+	Makefile.ADMIN \
+	RELEASE-PROCEDURE \
+    )
+    chmod -R u=rwX,go=rX tcsh
+}
+#
+TagA=`printf "TCSH%d_%02d_%02d" "${1}" "${2}" "${3}"`
+VerA=`printf "%d.%02d.%02d" "${1}" "${2}" "${3}"`
+#
+echo "Checking out ${TagA}"
+cvs -d ${REPOSITORY} -q export -r "${TagA}" tcsh > /dev/null
+cleanit
+mv tcsh "tcsh-${VerA}"
+echo "Creating tarball"
+tar -cf "tcsh-${VerA}.tar" "tcsh-${VerA}"
+gzip -9 "tcsh-${VerA}.tar"
+#
+if [ "${3}" -gt 0 ]
+then
+    prev=`expr "${3}" - 1`
+    TagB=`printf "TCSH%d_%02d_%02d" "${1}" "${2}" "${prev}"`
+    VerB=`printf "%d.%02d.%02d" "${1}" "${2}" "${prev}"`
+    pfile=`printf "patch%d" "${3}"`
+    echo "Checking out ${TagB}"
+    cvs -d ${REPOSITORY} -q export -r "${TagB}" tcsh > /dev/null
+    cleanit
+    mv tcsh "tcsh-${VerB}"
+    echo "Creating patch"
+    diff -urN "tcsh-${VerB}" "tcsh-${VerA}" > "${pfile}"
+    gzip -9 "${pfile}"
+fi
+#
+echo ""
+echo "${WRKDIR}:"
+ls -l "tcsh-${VerA}.tar.gz"
+if [ "${3}" -gt 0 ]
+then
+    ls -l "${pfile}.gz"
+fi

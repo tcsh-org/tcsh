@@ -11,6 +11,11 @@ HOW TO RELEASE TCSH
 	yy == VERS
 	zz == PATCHLEVEL
     from patchlevel.h (the new values you picked)
+
+Steps 7-10 are now automated by running
+
+    ./MAKERELEASE x yy zz
+
 7)  Export the code using the new tag you created.  Rename
     the directory from "tcsh" to "tcsh-x.yy.zz" and create
     tcsh-x.yy.zz.tar.gz
@@ -18,9 +23,13 @@ HOW TO RELEASE TCSH
 9)  Remove files that should not be in a release:
     - Announce*
     - Copyright
+    - MAKERELEASE
     - Makefile.ADMIN
     - RELEASE-PROCEDURE (this file)
 10) Generate a "diff -urN" between the two directories you
     have exported, save it in patchz.gz (z is PATCHLEVEL)
+
+The rest are still manual:
+
 11) Make the patch and the source tarball available on ftp
 12) Mail an announcement to tcsh@mx.gw.com
