@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.90 2000/06/11 02:14:15 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.91 2000/07/04 19:44:11 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.90 2000/06/11 02:14:15 kim Exp $")
+RCSID("$Id: tc.func.c,v 3.91 2000/07/04 19:44:11 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -2107,7 +2107,12 @@ getremotehost()
 	    if ((sptr = strchr(name, ':')) != NULL)
 		*sptr = '\0';
 	    /* Leave IPv4 address as is */
-	    if (inet_aton(name, &addr))
+	    /*
+	     * we use inet_addr here, not inet_aton because many systems
+	     * have not caught up yet.
+	     */
+	    addr.s_addr = inet_addr(name);
+	    if (addr.s_addr != (unsigned long)~0)
 		host = name;
 	    else {
 		if (sptr != name) {
