@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.93 2000/11/11 23:03:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.94 2000/11/12 02:18:06 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.93 2000/11/11 23:03:38 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.94 2000/11/12 02:18:06 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1532,14 +1532,18 @@ gethomedir(us)
 #ifdef YPBUGS
     fix_yp_bugs();
 #endif /* YPBUGS */
-    if (pp != NULL)
-	return Strsave(str2short(pp->pw_dir));
+    if (pp != NULL) {
+	/* Don't return if root */
+	if (pp->pw_dir[0] == '/' && pp->pw_dir[1] == '\0')
+	    return NULL;
+	else
+	    return Strsave(str2short(pp->pw_dir));
+    }
 #ifdef HESIOD
     res = hes_resolve(short2str(us), "filsys");
-    rp = 0;
-    if (res != 0) {
-	extern char *strtok();
-	if ((*res) != 0) {
+    rp = NULL;
+    if (res != NULL) {
+	if ((*res) != NULL) {
 	    /*
 	     * Look at the first token to determine how to interpret
 	     * the rest of it.
@@ -1564,6 +1568,10 @@ gethomedir(us)
 	}
 	for (res1 = res; *res1; res1++)
 	    free(*res1);
+	if (rp != NULL && rp[0] == '/' && rp[1] == '\0') {
+	    xfree((ptr_t)rp);
+	    rp = NULL;
+	}
 	return rp;
     }
 #endif /* HESIOD */
