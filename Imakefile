@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.53 1994/07/08 14:43:50 christos Exp $
+/**/# $Id: Imakefile,v 1.54 1995/01/20 23:48:56 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.05
 /**/# Marc Horowitz, MIT SIPB
@@ -77,6 +77,8 @@ ones.  Please send in your fixes and additions! */
 #     define ConfigH sol23
 #    endif
 #    define NoCombineRegs
+#   else
+#    define ConfigH sol24
 #   endif
 #  endif
 # endif
