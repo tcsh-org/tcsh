@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/config_f.h,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/tcsh-6.01/RCS/config_f.h,v 3.2 1991/09/08 00:45:32 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -125,7 +125,7 @@
 # ifndef __GNUC__
 #  define RCSID(id) static char *rcsid = (id);
 # else
-#  define RCSID(id) static char *rcsid() { return (id); }
+#  define RCSID(id) static char *rcsid() { return rcsid(id); }
 # endif /* !__GNUC__ */
 #else
 # define RCSID(id)	/* Nothing */
