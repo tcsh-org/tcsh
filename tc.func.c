@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.75 1998/06/05 16:19:55 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.76 1998/06/27 12:27:34 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,12 +36,15 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.75 1998/06/05 16:19:55 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.76 1998/06/27 12:27:34 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 #include "tw.h"
 #include "tc.h"
+#ifdef WINNT
+#include "nt.const.h"
+#endif WINNT
 
 #ifdef AFS
 #define PASSMAX 16
@@ -349,7 +352,7 @@ dolist(v, c)
 #endif /* WINNT */
 	    if (
 #ifdef WINNT
-		((char)tmp[1] == ':') &&
+		((char)tmp[1] != ':') &&
 		(!is_unc) &&
 #endif /* WINNT */
 		stat(short2str(tmp), &st) == -1) {
@@ -1957,7 +1960,7 @@ hashbang(fd, vp)
 	    }
 	    sargv[sargc] = NULL;
 	    ws = NULL;
-	    if (sargc > 0)
+	    if (sargc > 0) {
 		*vp = blk2short(sargv);
 		return 0;
 	    }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.73 1998/04/21 16:08:43 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.74 1998/06/27 12:27:20 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,11 +36,14 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.73 1998/04/21 16:08:43 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.74 1998/06/27 12:27:20 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
 #include "tc.h"
+#ifdef WINNT
+#include "nt.const.h"
+#endif WINNT
 
 /*
  * C shell

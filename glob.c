@@ -156,8 +156,9 @@ globcharcoll(c1, c2)
     s2[0] = c2;
     s1[1] = s2[1] = '\0';
     return strcoll(s1, s2);
-#endif
+#else
     return (c1 - c2);
+#endif
 }
 
 /*

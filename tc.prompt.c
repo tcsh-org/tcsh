@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.31 1998/04/21 16:08:55 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.32 1998/06/27 12:27:37 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.31 1998/04/21 16:08:55 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.32 1998/06/27 12:27:37 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -199,7 +199,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			/* prompt stuff */
     static Char *olddir = NULL, *olduser = NULL;
     extern int tlength;	/* cache cleared */
-    int updirs, pdirs, sz;
+    int updirs, sz;
+    size_t pdirs;
 
     for (; *cp; cp++) {
 	if (p >= ep)
@@ -307,10 +308,10 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'M':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO)
-		    cz = (unsigned char *) who_info(info, 'M', (char *) cbuff, sizeof(cbuff));
+		    cz = who_info(info, 'M', (char *) cbuff, sizeof(cbuff));
 		else 
 #endif /* HAVENOUTMP */
-		    cz = (unsigned char *) getenv("HOST");
+		    cz = getenv("HOST");
 		/*
 		 * Bug pointed out by Laurent Dami <dami@cui.unige.ch>: don't
 		 * derefrence that NULL (if HOST is not set)...
@@ -323,10 +324,10 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'm':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO)
-		    cz = (unsigned char *) who_info(info, 'm', (char *) cbuff, sizeof(cbuff));
+		    cz = who_info(info, 'm', (char *) cbuff, sizeof(cbuff));
 		else 
 #endif /* HAVENOUTMP */
-		    cz = (unsigned char *) getenv("HOST");
+		    cz = getenv("HOST");
 
 		if (cz != NULL)
 		    for ( ; *cz && (what == FMT_WHO || *cz != '.')
@@ -439,7 +440,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'n':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO) {
-		    cz = (unsigned char *) who_info(info, 'n', (char *) cbuff, sizeof(cbuff));
+		    cz = who_info(info, 'n', (char *) cbuff, sizeof(cbuff));
 		    for (; cz && *cz ; *p++ = attributes | *cz++)
 			if (p >= ep) break;
 		}
@@ -454,7 +455,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'l':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO) {
-		    cz = (unsigned char *) who_info(info, 'l', (char *) cbuff, sizeof(cbuff));
+		    cz = who_info(info, 'l', (char *) cbuff, sizeof(cbuff));
 		    for (; cz && *cz ; *p++ = attributes | *cz++)
 			if (p >= ep) break;
 		}
@@ -467,7 +468,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		}
 		break;
 	    case 'd':
-		for (cz = (unsigned char *) day_list[t->tm_wday]; *cz; *p++ = attributes | *cz++)
+		for (cz = day_list[t->tm_wday]; *cz; *p++ = attributes | *cz++)
 		    if (p >= ep) break;
 		break;
 	    case 'D':
@@ -484,7 +485,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		break;
 	    case 'w':
 		if (p >= ep - 5) break;
-		for (cz = (unsigned char *) month_list[t->tm_mon]; *cz;)
+		for (cz = month_list[t->tm_mon]; *cz;)
 		    *p++ = attributes | *cz++;
 		break;
 	    case 'W':
@@ -569,7 +570,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    default:
 #ifndef HAVENOUTMP
 		if (*cp == 'a' && what == FMT_WHO) {
-		    cz = (unsigned char *) who_info(info, 'a', (char *) cbuff, sizeof(cbuff));
+		    cz = who_info(info, 'a', (char *) cbuff, sizeof(cbuff));
 		    for (; cz && *cz; *p++ = attributes | *cz++)
 			if (p >= ep) break;
 		}

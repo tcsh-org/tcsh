@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.45 1998/04/21 16:08:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.46 1998/06/27 12:27:31 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.45 1998/04/21 16:08:53 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.46 1998/06/27 12:27:31 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -254,23 +254,6 @@ Char STRerase[]		= { 'e', 'r', 'a', 's', 'e', '\0' };
 Char STRprev[]		= { 'p', 'r', 'e', 'v', '\0' };
 Char STRcomplete[]	= { 'c', 'o', 'm', 'p', 'l', 'e', 't', 'e', '\0' };
 Char STRenhance[]	= { 'e', 'n', 'h', 'a', 'n', 'c', 'e', '\0' };
-#ifdef WINNT
-Char STRNTslowexec[]	= { 'N', 'T', 's', 'l', 'o', 'w', 'e', 'x', 'e', 'c',
-			    '\0' };
-Char STRigncase[]	= { 'i', 'g', 'n', 'c', 'a', 's', 'e', '\0' };
-Char STRoldtitle[]	= { 'o', 'l', 'd', 't', 'i', 't', 'l', 'e', '\0' };
-Char STRNTlamepathfix[] = { 'N', 'T', 'l', 'a', 'm', 'e', 'p', 'a', 't', 'h',
-			    'f', 'i','x','\0'};
-#ifdef notdef
-Char STRNTlameargfix[]  = { 'N', 'T', 'l', 'a', 'm', 'e', 'a', 'r', 'g', 'f',
-			    'i', 'x', '\0' };
-#endif
-Char STRtcshlang[]	= { 'T', 'C', 'S', 'H', 'L', 'A', 'N', 'G', '\0' };
-Char STRtcshsubsthb[]	= { 'T', 'C', 'S', 'H', 'S', 'U', 'B', 'S', 'T',
-			    'H', 'B', '\0' };
-Char STRtcshonlystartexes[] = { 'T', 'C', 'S', 'H', 'O', 'N', 'L', 'Y', 'S',
-				'T', 'A', 'R', 'T', 'E', 'X', 'E', 'S', '\0' };
-#endif /* WINNT */
 Char STRautoexpand[]	= { 'a', 'u', 't', 'o', 'e', 'x', 'p', 'a', 'n', 'd',
 			    '\0' };
 Char STRautocorrect[]	= { 'a', 'u', 't', 'o', 'c', 'o', 'r', 'r', 'e', 'c',

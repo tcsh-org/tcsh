@@ -1,4 +1,4 @@
-/* $Header: /usr/local/src/tcsh/tcsh-6.07.02-color/tw.color.c,v 1.4 1998/05/03 12:35:37 nayuta Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.color.c,v 1.1 1998/06/27 12:46:50 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.4 1998/05/03 12:35:37 nayuta Exp $")
+RCSID("$Id: tw.color.c,v 1.1 1998/06/27 12:46:50 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -101,7 +101,7 @@ static bool  color_context_lsmF = FALSE;	/* do colored ls-F */
 
 static bool getstring __P((char **, const Char **, Str *, int));
 static void put_color __P((Str *));
-static void print_color __P((Char *, size_t, Char));
+static void print_color __P((Char *, size_t, int));
 
 /* set_color_context():
  */
@@ -270,7 +270,7 @@ static void
 print_color(fname, len, suffix)
     Char   *fname;
     size_t  len;
-    Char    suffix;
+    int     suffix;
 {
     int     i;
     char   *filename = short2str(fname);
@@ -320,7 +320,7 @@ void
 print_with_color(filename, len, suffix)
     Char   *filename;
     size_t  len;
-    Char    suffix;
+    int    suffix;
 {
     if (color_context_lsmF &&
 	(haderr ? (didfds ? is2atty : isdiagatty) :
