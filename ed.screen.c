@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.screen.c,v 3.20 1992/04/24 21:50:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.screen.c,v 3.21 1992/05/09 04:03:53 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.20 1992/04/24 21:50:47 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.21 1992/05/09 04:03:53 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -245,15 +245,13 @@ static struct termcapval {
 
 /*
  * A very useful table from justin@crim.ca (Justin Bur) :-)
- *
- * XXX: we might want to fix tcsh to use the rightmost column in
- *	the automargins case; this would involve to move the cursor
- *	manually at the end of updates that cross the line.
+ * (Modified by per@erix.ericsson.se (Per Hedeland)
+ *  - first (and second:-) case fixed)
  *
  * Description     Termcap variables       tcsh behavior
  * 		   am      xn              UseRightmost    SendCRLF
  * --------------  ------- -------         ------------    ------------
- * Automargins     yes     no              no              yes
+ * Automargins     yes     no              yes             no
  * Magic Margins   yes     yes             yes             no
  * No Wrap         no      --              yes             yes
  */

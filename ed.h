@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/ed.h,v 3.14 1992/03/08 02:17:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.h,v 3.15 1992/03/27 01:59:46 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -135,8 +135,6 @@ EXTERN Char WhichBuf[INBUFSIZE];	/* buffer for which command */
 EXTERN Char *LastWhich;		/* points to end of which buffer */
 EXTERN Char *CursWhich;		/* points to the cursor point in which buf */
 EXTERN int HistWhich;		/* Hist_num is saved in this */
-EXTERN Char *SearchPrompt;	/* points to string that holds search prompt */
-EXTERN Char DoingSearch;	/* true if we are doing a history search */
 EXTERN char Expand;		/* true if we are expanding a line */
 EXTERN Char HistLit;		/* true if history lines are shown literal */
 EXTERN Char CurrentHistLit;	/* Literal status of current show history line */

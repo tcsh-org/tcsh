@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.refresh.c,v 3.8 1992/05/02 23:39:58 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.refresh.c,v 3.9 1992/05/09 04:03:53 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.8 1992/05/02 23:39:58 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.9 1992/05/09 04:03:53 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -50,7 +50,6 @@ static int vcursor_h, vcursor_v;
 
 static	void	Draw 			__P((int));
 static	void	Vdraw 			__P((int));
-static	void	Vnewline 		__P((void));
 static	void	update_line 		__P((Char *, Char *, int));
 static	void	str_insert		__P((Char *, int, int, Char *, int));
 static	void	str_delete		__P((Char *, int, int, int));
@@ -126,9 +125,17 @@ Draw(c)				/* draw c, expand tabs, ctl chars */
     }
     /* from wolman%crltrx.DEC@decwrl.dec.com (Alec Wolman) */
     if (ch == '\n') {		/* expand the newline	 */
-	Vdraw('\0');	/* assure end of line	 */
-	vcursor_h = 0;		/* reset cursor pos	 */
-	vcursor_v++;
+	/*
+	 * Don't force a newline if Vdraw does it (i.e. we're at end of line)
+	 * - or we will get two newlines and possibly garbage in between
+	 */
+	int oldv = vcursor_v;
+
+	Vdraw('\0');		/* assure end of line	 */
+	if (oldv == vcursor_v) {
+	    vcursor_h = 0;	/* reset cursor pos	 */
+	    vcursor_v++;
+	}
 	return;
     }
     if (ch == '\t') {		/* expand the tab 	 */
@@ -184,11 +191,6 @@ Vdraw(c)			/* draw char c onto V lines */
     }
 }
 
-static void
-Vnewline()
-{
-    /* needs work. */
-}
 
 /*
  *  Refresh()
@@ -252,20 +254,6 @@ Refresh()
 	    cur_v = vcursor_v;
 	}
 	Draw(*cp);
-    }
-
-    /* to next line and draw the current search prompt if searching */
-    if (DoingSearch) {
-	Vnewline();
-	for (cp = SearchPrompt; *cp; cp++)
-	    Draw(*cp);
-	for (cp = InputBuf; (cp < LastChar); cp++) {
-	    if (cp == Cursor) {
-		cur_h = vcursor_h;	/* save for later */
-		cur_v = vcursor_v;
-	    }
-	    Draw(*cp);
-	}
     }
 
     if (cur_h == -1) {		/* if I havn't been set yet, I'm at the end */
@@ -998,11 +986,6 @@ RefCursor()
     register Char *cp, c;
     register int h, th, v;
 
-    if (DoingSearch) {
-	Refresh();
-	return;
-    }
-
     /* first we must find where the cursor is... */
     h = 0;
     v = 0;
@@ -1127,11 +1110,6 @@ RefPlusOne()
 	return;
     }				/* else (only do at end of line, no TAB) */
 
-    if (DoingSearch) {
-	Refresh();
-	return;
-    }
-
     if (Iscntrl(c)) {		/* if control char, do caret */
 	mc = (c == '\177') ? '?' : (c | 0100);
 	PutPlusOne('^');
@@ -1169,12 +1147,17 @@ ClearLines()
     register int i;
 
     if (T_CanCEOL) {
-	for (i = 0; i <= OldvcV; i++) {	/* for each line on the screen */
+	/*
+	 * Clear the lines from the bottom up so that if we try moving
+	 * the cursor down by writing the character that is at the end
+	 * of the screen line, we won't rewrite a character that shouldn't
+	 * be there.
+	 */
+	for (i = OldvcV; i >= 0; i--) {	/* for each line on the screen */
 	    MoveToLine(i);
 	    MoveToChar(0);
 	    ClearEOL(TermH);
 	}
-	MoveToLine(0);
     }
     else {
 	MoveToLine(OldvcV);	/* go to last line */

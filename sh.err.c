@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.err.c,v 3.8 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.err.c,v 3.9 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#define _h_tc_err		/* Don't redefine the errors	 */
+#define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.8 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.9 1992/03/21 02:46:07 christos Exp $")
 
 /*
  * C Shell
