@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.48 2002/01/30 21:03:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.49 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.48 2002/01/30 21:03:43 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.49 2002/03/08 17:36:46 christos Exp $")
 
 /*
  * C shell
@@ -645,7 +645,7 @@ Dgetdol()
 	dolp = (vp || getenv(short2str(name))) ? STR1 : STR0;
 	goto eatbrac;
     }
-    if (vp == 0) {
+    if (vp == NULL || vp->vec == NULL) {
 	np = str2short(getenv(short2str(name)));
 	if (np) {
 	    fixDolMod();

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.49 2000/11/11 23:03:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.50 2002/03/08 17:36:45 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.49 2000/11/11 23:03:34 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.50 2002/03/08 17:36:45 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -106,7 +106,7 @@ Inputl()
     if (GettingInput)
 	MacroLvl = -1;		/* editor was interrupted during input */
 
-    if (imode) {
+    if (imode && imode->vec != NULL) {
 	if (!Strcmp(*(imode->vec), STRinsert))
 	    inputmode = MODE_INSERT;
 	else if (!Strcmp(*(imode->vec), STRoverwrite))
@@ -225,7 +225,7 @@ Inputl()
 	    curlen = 0;
 	    curchoice = -1;
 	    matchval = 1;
-	    if (crct && (!Strcmp(*(crct->vec), STRcmd) ||
+	    if (crct && crct->vec != NULL && (!Strcmp(*(crct->vec), STRcmd) ||
 			 !Strcmp(*(crct->vec), STRall))) {
                 PastBottom();
 		copyn(Origin, InputBuf, INBUFSIZE);
@@ -280,7 +280,8 @@ Inputl()
 		    }
 		    flush();
 		}
-	    } else if (crct && !Strcmp(*(crct->vec), STRcomplete)) {
+	    } else if (crct && crct->vec != NULL &&
+		!Strcmp(*(crct->vec), STRcomplete)) {
                 if (LastChar > InputBuf && LastChar[-1] == '\n') {
                     LastChar[-1] = '\0';
                     LastChar--;
@@ -393,12 +394,12 @@ Inputl()
 	    expnum = (int) (Cursor - InputBuf);
 	    switch (matchval = tenematch(InputBuf, Cursor-InputBuf, fn)){
 	    case 1:
-		if (non_unique_match && matchbeep &&
+		if (non_unique_match && matchbeep && matchbeep->vec != NULL &&
 		    (Strcmp(*(matchbeep->vec), STRnotunique) == 0))
 		    SoundBeep();
 		break;
 	    case 0:
-		if (matchbeep) {
+		if (matchbeep && matchbeep->vec != NULL) {
 		    if (Strcmp(*(matchbeep->vec), STRnomatch) == 0 ||
 			Strcmp(*(matchbeep->vec), STRambiguous) == 0 ||
 			Strcmp(*(matchbeep->vec), STRnotunique) == 0)
@@ -413,7 +414,7 @@ Inputl()
 		    SoundBeep();
 		    break;
 		}
-		if (matchbeep) {
+		if (matchbeep && matchbeep->vec != NULL) {
 		    if ((Strcmp(*(matchbeep->vec), STRambiguous) == 0 ||
 			 Strcmp(*(matchbeep->vec), STRnotunique) == 0))
 			SoundBeep();
@@ -426,7 +427,8 @@ Inputl()
 		 * (PWP: this is the best feature addition to tcsh I have 
 		 * seen in many months.)
 		 */
-		if (autol && (Strcmp(*(autol->vec), STRambiguous) != 0 || 
+		if (autol && autol->vec != NULL && 
+		    (Strcmp(*(autol->vec), STRambiguous) != 0 || 
 				     expnum == Cursor - InputBuf)) {
 		    PastBottom();
 		    fn = (retval == CC_COMPLETE_ALL) ? LIST_ALL : LIST;

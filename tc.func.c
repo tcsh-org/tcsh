@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.101 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.102 2002/05/16 14:03:33 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.101 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.102 2002/05/16 14:03:33 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -286,7 +286,8 @@ dolist(v, c)
 	STRmCF[3] = '\0';
 	/* Look at listflags, to add -A to the flags, to get a path
 	   of ls if necessary */
-	if ((vp = adrof(STRlistflags)) != NULL && vp->vec[0] != STRNULL) {
+	if ((vp = adrof(STRlistflags)) != NULL && vp->vec != NULL &&
+	    vp->vec[0] != STRNULL) {
 	    if (vp->vec[1] != NULL && vp->vec[1][0] != '\0')
 		lspath = vp->vec[1];
 	    for (cp = vp->vec[0]; *cp; cp++)
@@ -500,7 +501,7 @@ cmd_expand(cmd, str)
     lexp[0].word = STRNULL;
     lexp[2].word = STRret;
 
-    if ((vp = adrof1(cmd, &aliases)) != NULL) {
+    if ((vp = adrof1(cmd, &aliases)) != NULL && vp->vec != NULL) {
 	if (str == NULL) {
 	    xprintf(CGETS(22, 1, "%S: \t aliased to "), cmd);
 	    blkpr(vp->vec);
@@ -1185,7 +1186,7 @@ setalarm(lck)
     unsigned alrm_time = 0, logout_time, lock_time;
     time_t cl, nl, sched_dif;
 
-    if ((vp = adrof(STRautologout)) != NULL) {
+    if ((vp = adrof(STRautologout)) != NULL && vp->vec != NULL) {
 	if ((cp = vp->vec[0]) != 0) {
 	    if ((logout_time = (unsigned) atoi(short2str(cp)) * 60) > 0) {
 		alrm_time = logout_time;

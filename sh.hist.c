@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.hist.c,v 3.27 2000/06/10 22:07:56 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.hist.c,v 3.28 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.27 2000/06/10 22:07:56 kim Exp $")
+RCSID("$Id: sh.hist.c,v 3.28 2002/03/08 17:36:46 christos Exp $")
 
 #include "tc.h"
 
@@ -344,7 +344,7 @@ phist(hp, hflg)
 	Char buf[INBUFSIZE];
 	struct varent *vp = adrof(STRhistory);
 
-	if (vp && vp->vec[0] && vp->vec[1])
+	if (vp && vp->vec != NULL && vp->vec[0] && vp->vec[1])
 	    cp = vp->vec[1];
 
 	tprintf(FMT_HISTORY, buf, cp, INBUFSIZE, NULL, hp->Htime, (ptr_t) hp);
@@ -435,7 +435,7 @@ rechist(fname, ref)
      */
     oldidfds = didfds;
     didfds = 0;
-    if ((shist = adrof(STRsavehist)) != NULL)
+    if ((shist = adrof(STRsavehist)) != NULL && shist->vec != NULL)
 	if (shist->vec[1] && eq(shist->vec[1], STRmerge))
 	    loadhist(fname, 1);
     fp = creat(short2str(fname), 0600);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.57 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.58 2002/05/16 13:51:25 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.57 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.58 2002/05/16 13:51:25 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -578,7 +578,7 @@ dfollow(cp)
     }
 
     if (cp[0] != '/' && !prefix(STRdotsl, cp) && !prefix(STRdotdotsl, cp)
-	&& (c = adrof(STRcdpath))) {
+	&& (c = adrof(STRcdpath)) && c->vec != NULL) {
 	Char  **cdp;
 	register Char *p;
 	Char    buf[MAXPATHLEN];
@@ -1209,7 +1209,7 @@ dsetstack()
     struct varent *vp;
     struct directory *dn, *dp;
 
-    if ((vp = adrof(STRdirstack)) == NULL)
+    if ((vp = adrof(STRdirstack)) == NULL || vp->vec == NULL)
 	return;
 
     /* Free the whole stack */

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.time.c,v 3.23 2001/03/18 19:06:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.time.c,v 3.24 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.23 2001/03/18 19:06:31 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.24 2002/03/08 17:36:46 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -394,7 +394,7 @@ prusage(bs, es,	e, b)
     xprintf("t %lu\n", t);
 #endif /* TDEBUG */
 
-    if (vp && vp->vec[0] && vp->vec[1])
+    if (vp && vp->vec && vp->vec[0] && vp->vec[1])
 	cp = short2str(vp->vec[1]);
     for	(; *cp;	cp++)
 	if (*cp	!= '%')

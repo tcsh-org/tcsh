@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.98 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.99 2002/05/16 13:51:04 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.98 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.99 2002/05/16 13:51:04 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -300,7 +300,7 @@ doalias(v, c)
 	plist(&aliases, VAR_ALL);
     else if (*v == 0) {
 	vp = adrof1(strip(p), &aliases);
-	if (vp)
+	if (vp && vp->vec)
 	    blkpr(vp->vec), xputchar('\n');
     }
     else {

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.init.c,v 3.27 2000/11/11 23:03:40 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.init.c,v 3.28 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.27 2000/11/11 23:03:40 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.28 2002/03/08 17:36:47 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -241,7 +241,7 @@ tw_cmd_cmd()
     int len;
 
 
-    if (v == NULL) /* if no path */
+    if (v == NULL || v->vec == NULL) /* if no path */
 	return;
 
     for (pv = v->vec; *pv; pv++) {

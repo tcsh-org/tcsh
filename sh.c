@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.98 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.99 2002/04/05 15:34:56 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.98 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.c,v 3.99 2002/04/05 15:34:56 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1491,7 +1491,7 @@ st_save(st, unit, hflg, al, av)
      */
     if (av != NULL && *av != NULL) {
 	struct varent *vp;
-	if ((vp = adrof(STRargv)) != NULL)
+	if ((vp = adrof(STRargv)) != NULL && vp->vec != NULL)
 	    st->argv = saveblk(vp->vec);
 	else
 	    st->argv = NULL;
@@ -2189,7 +2189,7 @@ mailchk()
     bool    new;
 
     v = adrof(STRmail);
-    if (v == 0)
+    if (v == NULL || v->vec == NULL)
 	return;
     (void) time(&t);
     vp = v->vec;

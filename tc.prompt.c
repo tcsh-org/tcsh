@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.43 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.44 2002/05/16 14:05:42 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.43 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.44 2002/05/16 14:05:42 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -616,7 +616,7 @@ expdollar(dstp, srcp, spp, attr)
 
     vp = adrof(var);
     val = (!vp) ? tgetenv(var) : NULL;
-    if (vp) {
+    if (vp && vp->vec) {
 	for (i = 0; vp->vec[i] != NULL; i++) {
 	    for (val = vp->vec[i]; *spp > 0 && *val; (*spp)--)
 		*dst++ = *val++ | attr;
