@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/pathnames.h,v 3.13 1993/07/08 04:51:54 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/pathnames.h,v 3.14 1993/12/16 16:51:24 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -144,9 +144,13 @@
 #  define _PATH_TCSHELL		"/usr/local/bin/tcsh"
 #endif /* !_PATH_TCSHELL */
 
-#ifndef _PATH_LOGIN
-# define _PATH_LOGIN		"/bin/login"
-#endif /* !_PATH_LOGIN */
+#ifndef _PATH_BIN_LOGIN
+# define _PATH_BIN_LOGIN	"/bin/login"
+#endif /* !_PATH_BIN_LOGIN */
+
+#ifndef _PATH_USRBIN_LOGIN
+# define _PATH_USRBIN_LOGIN	"/usr/bin/login"
+#endif /* !_PATH_USRBIN_LOGIN */
 
 #ifndef _PATH_BIN_NEWGRP
 # define _PATH_BIN_NEWGRP	"/bin/newgrp"

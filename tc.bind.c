@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.bind.c,v 3.20 1994/07/08 14:43:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.bind.c,v 3.21 1994/09/04 21:54:15 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.20 1994/07/08 14:43:50 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.21 1994/09/04 21:54:15 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -93,8 +93,10 @@ dobindkey(v, c)
     key = remove = bind = 0;
     for (no = 1, par = v[no]; 
 	 par != NULL && (*par++ & CHAR) == '-'; no++, par = v[no]) {
-	if ((p = (*par & CHAR)) == '-')
+	if ((p = (*par & CHAR)) == '-') {
+	    no++;
 	    break;
+	}
 	else 
 	    switch (p) {
 	    case 'b':
@@ -441,21 +443,22 @@ printkeys(map, first, last)
 static void
 bindkey_usage()
 {
-    xprintf(
-	"Usage: bindkey [options] [--] [in-string [out-string | command]]\n");
-    xprintf("    -a   bind key in alternative key binding\n");
-    xprintf("    -b   accept symbolic key definitions\n");
-    xprintf("    -s   bind an out-string instead of a command\n");
-    xprintf("    -c   bind a unix-command instead of a command\n");
-    xprintf("    -v   initialized maps to default vi bindings\n");
-    xprintf("    -e   initialized maps to default emacs bindings\n");
-    xprintf("    -d   initialized maps to default bindings\n");
-    xprintf("    -l   list available functions with descriptions\n");
-    xprintf("    -r   remove the binding of in-string\n");
-    xprintf("    -k   bind arrow key with name in in-string\n");
-    xprintf(
-       "\nIn no out-string or command is given, the binding for in-string\n");
-    xprintf("is printed or all bindings if in-strings is not given.\n");
+    xprintf("Usage: bindkey [options] [--] [KEY [COMMAND]]\n");
+    xprintf("    -l   list editor commands with descriptions\n");
+    xprintf("    -d   bind all keys to default editor's bindings\n");
+    xprintf("    -e   bind all keys to emacs bindings\n");
+    xprintf("    -v   bind all keys to vi bindings\n");
+    xprintf("    -a   list or bind KEY in alternative key map\n");
+    xprintf("    -b   interpret KEY as a C-, M-, F- or X- key name\n");
+    xprintf("    -k   interpret KEY as a symbolic arrow-key name\n");
+    xprintf("    -r   remove KEY's binding\n");
+    xprintf("    -c   interpret COMMAND as a builtin or external command\n");
+    xprintf("    -s   interpret COMMAND as a literal string to be output\n");
+    xprintf("    --   force a break from option processing\n");
+    xprintf("    -u   (or any invalid option) this message\n");
+    xprintf("\n");
+    xprintf("Without KEY or COMMAND, prints all bindings.\n");
+    xprintf("Without COMMAND, prints the binding for KEY.\n");
 }
 
 static void

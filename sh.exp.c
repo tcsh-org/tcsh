@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.28 1994/05/28 15:44:57 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.exp.c,v 3.29 1994/06/06 05:04:54 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.28 1994/05/28 15:44:57 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.29 1994/06/06 05:04:54 christos Exp $")
 
 /*
  * C shell
@@ -615,7 +615,7 @@ exp6(vp, ignore)
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));
     cp = *(*vp)++;
-#define FILETESTS "erwxfdzoplstSXLbcugk"
+#define FILETESTS "erwxfdzoplstSXLbcugkmK"
 #define FILEVALS  "ZAMCDIUGNFPL"
     if (*cp == '-' && (any(FILETESTS, cp[1]) || any(FILEVALS, cp[1])))
         return(filetest(cp, vp, ignore));
@@ -762,6 +762,23 @@ filetest(cp, vp, ignore)
 		i = 0;
 #endif /* S_ISFIFO */
 		break;
+
+	    case 'm' :
+#ifdef S_ISOFL
+	      i = S_ISOFL(st->st_dm_mode);
+#else /* !S_ISOFL */
+	      i = 0;
+#endif /* S_ISOFL */
+	      break ;
+
+	    case 'K' :
+#ifdef S_ISOFL
+	      i = stb.st_dm_key;
+#else /* !S_ISOFL */
+	      i = 0;
+#endif /* S_ISOFL */
+	      break ;
+  
 
 	    case 'l':
 #ifdef S_ISLNK

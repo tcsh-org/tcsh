@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.decls.h,v 3.30 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.decls.h,v 3.31 1994/07/08 14:43:50 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -133,6 +133,10 @@ extern	void		  domigrate	__P((Char **, struct command *));
 #ifdef WARP
 extern	void 		  dowarp	__P((Char **, struct command *));
 #endif /* WARP */
+
+#ifdef _CRAY
+extern	void 		  dodmmode	__P((Char **, struct command *));
+#endif /* _CRAY */
 
 #if defined(masscomp) || defined(hcx)
 extern	void		  douniverse	__P((Char **, struct command *));

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.glob.c,v 3.34 1993/11/13 00:40:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.glob.c,v 3.35 1993/11/13 01:27:11 christos Exp christos $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.34 1993/11/13 00:40:56 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.35 1993/11/13 01:27:11 christos Exp christos $")
 
 #include "tc.h"
 
@@ -440,6 +440,8 @@ handleone(str, vl, action)
 {
 
     Char   *cp, **vlp = vl;
+    int chars;
+    Char **t, *p, *strp;
 
     switch (action) {
     case G_ERROR:
@@ -448,15 +450,17 @@ handleone(str, vl, action)
 	stderror(ERR_NAME | ERR_AMBIG);
 	break;
     case G_APPEND:
-	trim(vlp);
-	str = Strsave(*vlp++);
-	do {
-	    cp = Strspl(str, STRspace);
-	    xfree((ptr_t) str);
-	    str = Strspl(cp, *vlp);
-	    xfree((ptr_t) cp);
+	chars = 0;
+	for (t = vlp; (p = *t++) != '\0'; chars++)
+	    while (*p++)
+		chars++;
+	str = (Char *)xmalloc((size_t)(chars * sizeof(Char)));
+	for (t = vlp, strp = str; (p = *t++) != '\0'; chars++) {
+	    while (*p)
+		 *strp++ = *p++ & TRIM;
+	    *strp++ = ' ';
 	}
-	while (*++vlp);
+	*--strp = '\0';
 	blkfree(vl);
 	break;
     case G_IGNORE:

@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.05/RCS/host.defs,v 1.7 1994/07/08 14:43:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/host.defs,v 1.8 1994/09/04 21:54:15 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.7 1994/07/08 14:43:50 christos Exp $")
+RCSID("$Id: host.defs,v 1.8 1994/09/04 21:54:15 christos Exp $")
 
 endcode	:
 
@@ -795,7 +795,7 @@ enddef	:
 
 newdef	: defined(__clipper__)
 comment	: Clipper Chipset (Intergraph)
-vendor	:						: "integraph"
+vendor	:						: "intergraph"
 hosttype:						: "clipper"
 machtype:						: "clipper"
 enddef	:

@@ -1,4 +1,24 @@
 V6.06.00, -
+ 36. 6.05.03 - 01/17/95
+ 35. Don't print the whole watchlist on startup. One can use explicitly
+     the log builtin for that.
+ 34. Don't display the $watch value in the log command. 
+ 33. Don't delete the unmatched portion if we try to complete a spelling error.
+ 32. Solaris 2.4 workaround for isprint('\t') lossage (From Casper)
+ 31. Fixed csh bug: [Reported by Jaap]
+	set test="one\
+	two\
+	three"
+	echo "$test:q"
+ 30. Fixed the lossage in setting the looking mode in tw.parse.c before
+     calling t_search; $x/$y will not append the right suffix.
+ 29. Another attempt at the gethost timeout code.
+ 28. Cray dmmode and filetests -m -k [need documentation!]
+ 27. More manual patches.
+ 26. Don't glob the path; security problem and core-dump. [from beto]
+ 25. Avoid waiting for jobs that failed to restart, thus hanging the shell.
+     eg, run job in background, attach to debugger; kill it inside the
+     debugger. Get out of the debugger and you are stuck if you fg that job.
  24. 6.05.02 - 09/04/94
  23. remhost code could pass the wrong length to getpeername()
  22. too eager sed'ing broke convex getwarpbyvalue() to getwarpbyvarval()

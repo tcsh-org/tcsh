@@ -180,6 +180,17 @@ ENVIRON	:	universe on Dynix 3.1, 3.2: ucb
 NOTES	:	none
 VERSION	:	6.04.00
 
+VENDOR	:	sequent
+MODELS	:	symmetry
+COMPILER:	gcc 2.6.2
+CFLAGS	:	-m486
+LIBES	:	-ltermcap -lseq -lsocket -linet -lnsl
+OS	:	DYNIX/ptx 2.1.0
+CONFIG	:	sequent
+ENVIRON	:
+NOTES	:	Didn't work for me with Sequent's /bin/cc
+VERSION	:	6.05.00
+
 VENDOR	:	encore
 MODELS	:	multimax
 COMPILER:	gcc
@@ -767,3 +778,14 @@ CONFIG	:	bsd
 ENVIRON :	n/a
 NOTES	:	Lower the optimization or you'll get a 5M binary!
 VERSION :	6.04.00
+
+VENDOR	:	Intergraph
+MODELS	:	clipper
+COMPILER:	cc
+CFLAGS	:	n/a
+LIBES	:	-ltermcap -lbsd
+OS	:	clix 7.1.3
+CONFIG	:	clipper
+ENVIRON :	n/a
+NOTES	:	n/a
+VERSION :	6.05.00

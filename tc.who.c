@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.who.c,v 3.20 1993/10/30 19:50:16 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.who.c,v 3.21 1994/03/13 00:46:35 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.20 1993/10/30 19:50:16 christos Exp christos $")
+RCSID("$Id: tc.who.c,v 3.21 1994/03/13 00:46:35 christos Exp $")
 
 #include "tc.h"
 
@@ -135,6 +135,7 @@ initwatch()
 {
     whohead.who_next = &whotail;
     whotail.who_prev = &whohead;
+    stlast = 1;
 #ifdef WHODEBUG
     debugwholist(NULL, NULL);
 #endif /* WHODEBUG */
@@ -156,6 +157,7 @@ watch_login(force)
     int force;
 {
     int     utmpfd, comp = -1, alldone;
+    int	    firsttime = stlast == 1;
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif				/* BSDSIGS */
@@ -374,24 +376,28 @@ watch_login(force)
 		continue;	/* entry doesn't qualify */
 	    /* already printed or not right one to print */
 
+
 	    if (wp->who_time == 0)/* utmp entry was cleared */
 		wp->who_time = watch_period;
 
 	    if ((wp->who_status & OFFLINE) &&
 		(wp->who_name[0] != '\0')) {
-		print_who(wp);
+		if (!firsttime)
+		    print_who(wp);
 		wp->who_name[0] = '\0';
 		wp->who_status |= ANNOUNCE;
 		continue;
 	    }
 	    if (wp->who_status & ONLINE) {
-		print_who(wp);
+		if (!firsttime)
+		    print_who(wp);
 		(void) strcpy(wp->who_name, wp->who_new);
 		wp->who_status |= ANNOUNCE;
 		continue;
 	    }
 	    if (wp->who_status & CHANGED) {
-		print_who(wp);
+		if (!firsttime)
+		    print_who(wp);
 		(void) strcpy(wp->who_name, wp->who_new);
 		wp->who_status |= ANNOUNCE;
 		continue;
@@ -557,8 +563,6 @@ struct command *c;
     USE(c);
     if ((vp = adrof(STRwatch)) == NULL)
 	stderror(ERR_NOWATCH);
-    blkpr(vp->vec);
-    xputchar('\n');
     resetwatch();
     wp = whohead.who_next;
     while (wp->who_next != NULL) {

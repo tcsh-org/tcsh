@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.char.h,v 3.7 1993/07/03 23:47:53 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.char.h,v 3.8 1994/03/31 22:36:44 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -112,8 +112,19 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 #  define Isxdigit(c)	(((Char)(c) & QUOTE) ? 0 : isxdigit((unsigned char) (c)))
 #  define Isalnum(c)	(((Char)(c) & QUOTE) ? 0 : isalnum((unsigned char) (c)))
 #  define Iscntrl(c) 	(((Char)(c) & QUOTE) ? 0 : iscntrl((unsigned char) (c)))
-#  define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : isprint((unsigned char) (c)))
-#  define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : ispunct((unsigned char) (c)))
+#  if SOLARIS2 == 24
+    /* 
+     * From <casper@fwi.uva.nl> Casper Dik:
+     * In Solaris 2.4, isprint('\t') returns true after setlocal(LC_ALL,"").
+     * This breaks commandline editing when you include tabs.
+     * (This is in the en_US locale).
+     */
+#   define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : \
+				(isprint((unsigned char) (c)) && (c) != '\t'))
+#  else
+#   define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : isprint((unsigned char) (c)))
+#  endif /* SOLARIS2 == 24 */
+#   define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : ispunct((unsigned char) (c)))
 # endif /* !NeXT */
 #else /* !NLS */
 # define Isspace(c)	cmap(c, _SP|_NL)

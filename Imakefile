@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.52 1994/06/22 14:09:34 christos Exp $
+/**/# $Id: Imakefile,v 1.53 1994/07/08 14:43:50 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.05
 /**/# Marc Horowitz, MIT SIPB
@@ -15,6 +15,14 @@
 /* All config options go in a separate file. */
 
 #include "imake.config"
+
+#ifndef HasGCC
+# define HasGCC 0
+#endif
+
+#ifndef HasGcc2
+# define HasGcc2 0
+#endif
 
 /* This is a giant conditional block.  It should be set up right for
 platforms which are in here, but it may need to be changed for new
@@ -60,7 +68,11 @@ ones.  Please send in your fixes and additions! */
 #    endif
 #   else /* OSMajorVersion == 5 */
 #    if (OSMinorVersion < 3)
-#     define ConfigH sol2
+#     if (OSMinorVersion < 2)
+#      define ConfigH sol2
+#     else
+#      define ConfigH sol22
+#     endif
 #    else
 #     define ConfigH sol23
 #    endif

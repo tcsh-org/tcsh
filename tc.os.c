@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.c,v 3.36 1994/04/12 17:37:37 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.c,v 3.37 1994/09/04 21:54:15 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.36 1994/04/12 17:37:37 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.37 1994/09/04 21:54:15 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -526,6 +526,45 @@ done:
 }
 
 #endif /* TCF */
+
+/***
+ *** CRAY ddmode <velo@sesun3.epfl.ch> (Martin Ouwehand EPFL-SIC/SE)
+ ***/
+#ifdef _CRAY
+void
+dodmmode(v, c)
+    Char  **v;
+    struct command *c;
+{
+    Char *cp = v[1];
+
+    USE(c);
+
+    if ( !cp ) {
+	int mode;
+
+	mode = dmmode(0);
+	dmmode(mode);
+	xprintf("%d\n",mode);
+    }
+    else {
+	if (cp[1] != '\0')
+	    stderror(ERR_DMMODE);
+	else
+	    switch(*cp) {
+	    case '0':
+		dmmode(0);
+		break;
+	    case '1':
+		dmmode(1);
+		break;
+	    default:
+		stderror(ERR_DMMODE);
+	    }
+    }
+}
+#endif /* _CRAY */
+
 
 /***
  *** CONVEX Warps.

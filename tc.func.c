@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.func.c,v 3.59 1994/09/04 21:54:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.func.c,v 3.60 1994/09/22 19:07:17 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.59 1994/09/04 21:54:15 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.60 1994/09/22 19:07:17 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -76,6 +76,7 @@ static	void	 insert_we	__P((struct wordent *, struct wordent *));
 static	int	 inlist		__P((Char *, Char *));
 #endif /* BSDJOBS */
 static  Char    *gethomedir	__P((Char *));
+static	void	 getremotehost	__P((void));
 
 /*
  * Tops-C shell
@@ -557,7 +558,7 @@ fg_proc_entry(pp)
 	(void) alarm(0);	/* No autologout */
 	if (!pstart(pp, 1)) {
 	    pp->p_procid = 0;
-	    stderr(ERR_BADJOB, pp->p_command, strerror(errno));
+	    stderror(ERR_BADJOB, pp->p_command, strerror(errno));
 	}
 	pjwait(pp);
     }
@@ -1849,26 +1850,21 @@ palarm(snum)
 	(void) sigset(snum, SIG_IGN);
 #endif /* UNRELSIGS */
     (void) alarm(0);
+    reset();
 
 #ifndef SIGVOID
     return (snum);
 #endif
 }
 
-/*
- * From: <lesv@ppvku.ericsson.se> (Lennart Svensson)
- */
-void 
-remotehost()
+
+static void
+getremotehost()
 {
     const char *host = NULL;
     struct hostent* hp;
     struct sockaddr_in saddr;
     int len = sizeof(struct sockaddr_in);
-
-    /* Don't get stuck if the resolver does not work! */
-    sigret_t (*osig)() = signal(SIGALRM, palarm);
-    (void) alarm(2);
 
     if (getpeername(SHIN, (struct sockaddr *) &saddr, &len) != -1) {
 	if ((hp = gethostbyaddr((char *)&saddr.sin_addr, sizeof(struct in_addr),
@@ -1885,22 +1881,49 @@ remotehost()
 	    /* Look for host:display.screen */
 	    if ((sptr = strchr(name, ':')) != NULL)
 		*sptr = '\0';
-	    if ((hp = gethostbyname(name)) == NULL) {
-		/* Try again eliminating the trailing domain */
-		if ((ptr = strchr(name, '.')) != NULL) {
-		    *ptr = '\0';
-		    if ((hp = gethostbyname(name)) != NULL)
-			host = hp->h_name;
-		    *ptr = '.';
+	    if (sptr != name) {
+		if ((hp = gethostbyname(name)) == NULL) {
+		    /* Try again eliminating the trailing domain */
+		    if ((ptr = strchr(name, '.')) != NULL) {
+			*ptr = '\0';
+			if ((hp = gethostbyname(name)) != NULL)
+			    host = hp->h_name;
+			*ptr = '.';
+		    }
 		}
+		else
+		    host = hp->h_name;
 	    }
-	    else
-		host = hp->h_name;
 	    if (sptr)
 		*sptr = ':';
 	}
     }
 #endif
+
+    if (host)
+	tsetenv(STRREMOTEHOST, str2short(host));
+}
+
+
+/*
+ * From: <lesv@ppvku.ericsson.se> (Lennart Svensson)
+ */
+void 
+remotehost()
+{
+    /* Don't get stuck if the resolver does not work! */
+    sigret_t (*osig)() = signal(SIGALRM, palarm);
+
+    jmp_buf_t osetexit;
+    getexit(osetexit);
+
+    (void) alarm(2);
+
+    if (setexit() == 0)
+	getremotehost();
+
+    resexit(osetexit);
+
     (void) alarm(0);
     (void) signal(SIGALRM, osig);
 
@@ -1909,7 +1932,5 @@ remotehost()
     fix_yp_bugs();
 #endif /* YPBUGS */
 
-    if (host)
-	tsetenv(STRREMOTEHOST, str2short(host));
 }
 #endif /* REMOTEHOST */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dol.c,v 3.26 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.dol.c,v 3.27 1993/12/16 16:51:24 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.26 1993/10/30 19:50:16 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.27 1993/12/16 16:51:24 christos Exp $")
 
 /*
  * C shell
@@ -263,8 +263,11 @@ Dword()
 		    break;
 		if (c == '\n' || c == DEOF)
 		    stderror(ERR_UNMATCHED, c1);
-		if ((c & (QUOTE | TRIM)) == ('\n' | QUOTE))
-		    --wp, ++i;
+		if ((c & (QUOTE | TRIM)) == ('\n' | QUOTE)) {
+		    if ((wp[-1] & TRIM) == '\\')
+			--wp;
+		    ++i;
+		}
 		if (--i <= 0)
 		    stderror(ERR_WTOOLONG);
 		switch (c1) {

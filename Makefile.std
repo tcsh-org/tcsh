@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.71 1994/06/20 14:08:32 christos Exp christos $
+# $Id: Makefile.std,v 1.72 1994/09/04 21:54:15 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -154,6 +154,7 @@ LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -ltermcap -lcs			 ## Mach
 #LIBES= -ltermcap -lbsd			 ## DEC osf1 on the alpha
 #LIBES= -ltermcap -lbsd			 ## Intel paragon
+#LIBES= -ltermcap -lbsd			 ## Clipper intergraph
 #LIBES= -ltermcap -lseq			 ## Sequent's Dynix
 #LIBES= -ltermcap -lauth		 ## Ultrix with Enhanced Security
 #LIBES= -ltermcap -ldir -lx		 ## Xenix 386 style things
@@ -188,6 +189,7 @@ LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -ltermc				 ## emx under OS/2
 #LIBES=					 ## Minix, VMS_POSIX
 #LIBES= -ltermcap -lcrypt		 ## Multiflow
+LIBES= -ltermcap -lcrypt		 ## NetBSD
 #LIBES= -lcurses 			 ## DDE Supermax
 
 ################################################################

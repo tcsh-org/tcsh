@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.init.c,v 3.34 1994/02/04 15:12:06 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.init.c,v 3.35 1994/05/26 13:11:20 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.34 1994/02/04 15:12:06 christos Exp christos $")
+RCSID("$Id: sh.init.c,v 3.35 1994/05/26 13:11:20 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -73,6 +73,9 @@ struct	biltins bfunc[] = {
     { "continue",	docontin,	0,	0	},
     { "default",	dozip,		0,	0	},
     { "dirs",		dodirs,		0,	INF	},
+#ifdef _CRAY
+    { "dmmode",		dodmmode,	0,	1	},
+#endif /* _CRAY */
     { "echo",		doecho,		0,	INF	},
     { "echotc",		doechotc,	0,	INF	},
     { "else",		doelse,		0,	INF	},
@@ -289,11 +292,11 @@ struct	mesg mesg[] = {
 /* 16 */	{ "USR1",	"User signal 1"		},
 /* 17 */	{ "USR2", 	"User signal 2"		},
 /* 18 */	{ "CLD",	"Child status change"	},
-#  if SOLARIS2 >= 23
+#  if SOLARIS2 >= 22
 /* 19 */	{ "PWR",  	"Power failure"		},
-#  else /* SOLARIS2 < 23 */
+#  else /* SOLARIS2 < 22 */
 /* 19 */	{ "LOST",  	"Resource Lost"		},
-#  endif /* SOLARIS2 >= 23 */
+#  endif /* SOLARIS2 >= 22 */
 # endif /* SOLARIS2 */
 
 # ifdef __EMX__

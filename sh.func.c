@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.58 1994/07/08 14:43:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.59 1994/09/04 21:54:15 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.58 1994/07/08 14:43:50 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.59 1994/09/04 21:54:15 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -336,7 +336,8 @@ dologin(v, c)
     islogin();
     rechist(NULL, adrof(STRsavehist) != NULL);
     (void) signal(SIGTERM, parterm);
-    (void) execl(_PATH_LOGIN, "login", short2str(v[1]), NULL);
+    (void) execl(_PATH_BIN_LOGIN, "login", short2str(v[1]), NULL);
+    (void) execl(_PATH_USRBIN_LOGIN, "login", short2str(v[1]), NULL);
     untty();
     xexit(1);
 }
@@ -1577,9 +1578,9 @@ doumask(v, c)
 # ifndef BSDLIMIT
    typedef long RLIM_TYPE;
 #  ifndef RLIM_INFINITY
-#   ifndef _MINIX
+#   if !defined(_MINIX) && !defined(__clipper__)
     extern RLIM_TYPE ulimit();
-#   endif /* ! _MINIX */
+#   endif /* ! _MINIX && !__clipper__ */
 #   define RLIM_INFINITY 0x003fffff
 #   define RLIMIT_FSIZE 1
 #  endif /* RLIM_INFINITY */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.67 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.68 1994/09/04 21:54:15 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.67 1994/05/26 13:11:20 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.68 1994/09/04 21:54:15 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -104,7 +104,7 @@ extern int TermH;		/* from the editor routines */
 extern int lbuffed;		/* from sh.print.c */
 
 static	void	 extract_dir_and_name	__P((Char *, Char *, Char *));
-static	Char	*quote_meta		__P((Char *, int, bool));
+static	int	 insert_meta		__P((Char *, Char *, Char *, bool));
 static	Char	*dollar			__P((Char *, Char *));
 static	Char	*tilde			__P((Char *, Char *));
 static  int      expand_dir		__P((Char *, Char *, DIR  **, COMMAND));
@@ -143,6 +143,11 @@ static	int	 find_rows		__P((Char *[], int, int));
 #endif
 
 #define QLINESIZE (INBUFSIZE + 1)
+
+/* TRUE if character must be quoted */
+#define tricky(w) (cmap(w, _META | _DOL | _QF | _QB | _ESC | _GLOB) && w != '#')
+/* TRUE if double quotes don't protect character */
+#define tricky_dq(w) (cmap(w, _DOL | _QB))
 
 /* tenematch():
  *	Return:
@@ -202,10 +207,16 @@ tenematch(inputline, num_read, command)
 	}
 	if (iscmdmeta(*cp))
 	    cmd_start = wp + 1;
+
 	/* Don't quote '/' to make the recognize stuff work easily */
 	/* Don't quote '$' in double quotes */
-	*wp = *cp | (qu && *cp != '/'  && (*cp != '$' || qu != '"') ? 
-		     QUOTE : 0);
+
+	if (cmap(*cp, _ESC) && cp < str_end - 1 && cp[1] == HIST)
+	  *wp = *++cp | QUOTE;
+	else if (qu && (tricky(*cp) || *cp == '~') && !(qu == '\"' && tricky_dq(*cp)))
+	  *wp = *cp | QUOTE;
+	else
+	  *wp = *cp;
 	if (ismetahash(*wp) /* || isaset(cmd_start, wp + 1) */)
 	    word = wp + 1, word_start = cp + 1;
 	wp++;
@@ -227,12 +238,19 @@ tenematch(inputline, num_read, command)
     space_left = QLINESIZE - 1 - (word - qline);
 #endif
 
+    /*
+     *  SPECIAL HARDCODED COMPLETIONS:
+     *    first word of command       -> TW_COMMAND
+     *    everything else             -> TW_ZERO
+     *
+     */
     looking = starting_a_command(word - 1, qline) ? 
 	TW_COMMAND : TW_ZERO;
+
     wordp = word;
 
 #ifdef TDEBUG
-    xprintf("starting_a_command %d\n", looking);
+    xprintf("looking for %d\n", looking);
     xprintf("\ncmd_start:%S:\n", cmd_start);
     xprintf("qline:%S:\n", qline);
     xprintf("qline:");
@@ -247,13 +265,13 @@ tenematch(inputline, num_read, command)
     xprintf(":\n");
 #endif
 
-    if (command == RECOGNIZE || command == LIST || command == SPELL ||
-	command == RECOGNIZE_SCROLL || command == RECOGNIZE_ALL) {
+    if ((looking == TW_COMMAND || looking == TW_ZERO) &&
+        (command == RECOGNIZE || command == LIST || command == SPELL ||
+	 command == RECOGNIZE_SCROLL || command == RECOGNIZE_ALL)) {
 #ifdef TDEBUG
 	xprintf("complete %d ", looking);
 #endif
 	looking = tw_complete(cmd_start, &wordp, &pat, looking, &suf);
-	word_start += wordp - word;
 #ifdef TDEBUG
 	xprintf("complete %d %S\n", looking, pat);
 #endif
@@ -298,48 +316,14 @@ tenematch(inputline, num_read, command)
 	    search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), looking,
 				  pat, suf);
 	    if (search_ret == 1) {
-		/* get rid of old word */
-		DeleteBack(str_end - word_start);
-		qu = 0;
 		(void) Strcat(wordp, rword);
-		/* insert newly spelled word */
-		if (InsertStr(quote_meta(wordp, qu, 0)) < 0)	
-		    return -1;	/* error inserting */
 		wp = wordp + (int) Strlen(wordp);
 		search_ret = t_search(wordp, wp, command, space_left,
 				      looking, 1, pat, suf);
 	    }
 	}
-
-	/*
-	 * Change by Christos Zoulas: if the name has metachars in it, quote
-	 * the metachars, but only if we are outside quotes.
-	 * We don't quote the last space if we had a unique match and 
-	 * addsuffix was set. Otherwise the last space was part of a word.
-	 */
-#ifdef notdef
-	if (*wp && InsertStr(quote_meta(wp, qu, search_ret == 1 &&
-			     is_set(STRaddsuffix) != NULL)) < 0)
-	    /* put it in the input buffer */
+	if (*wp && insert_meta(word_start, str_end, word, !qu) < 0)
 	    return -1;		/* error inserting */
-#else
-	/* 
-	 * We really don't want to delete what we have currently, breaks
-	 * completion
-	 */
-	if (*wp) {
-	    DeleteBack(str_end - word_start);
-            if (*wordp == '$') {
-                if (InsertStr(wordp) < 0)
-		    return -1;          /* error inserting */
-            } else {
-                if (InsertStr(quote_meta(wordp, qu, search_ret == 1 &&
-		              is_set(STRaddsuffix) != NULL)) < 0)
-	            /* put it in the input buffer */
-		    return -1;          /* error inserting */
-            }
-	}
-#endif
 	return search_ret;
 
     case SPELL:
@@ -354,19 +338,8 @@ tenematch(inputline, num_read, command)
 	search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), looking,
 			      pat, suf);
 	if (search_ret == 1) {
-	    /* get rid of old word */
-	    DeleteBack(str_end - word_start);	
-	    /* insert newly spelled word */
-#ifdef notdef
-	    /* 
-	     * We don't want to quote spelling stuff, otherwise
-	     * $OHME -> \$HOME 
-	     */
-	    if (InsertStr(quote_meta(wordp, 0, 0)) < 0)
-		return -1;	/* error inserting */
-#endif
-	    if (InsertStr(wordp) < 0)
-		return -1;	/* error inserting */
+	    if (insert_meta(word_start, str_end, word, !qu) < 0)
+		return -1;		/* error inserting */
 	}
 	return search_ret;
 
@@ -390,10 +363,11 @@ tenematch(inputline, num_read, command)
 		DeleteBack(str_end - word_start);/* get rid of old word */
 		for (i = 0; i < count; i++)
 		    if (ptr[i] && *ptr[i]) {
-			if (InsertStr(quote_meta(ptr[i], 0, 0)) < 0 ||
+			quote(ptr[i]);
+			if (insert_meta(0, 0, ptr[i], 0) < 0 ||
 			    InsertStr(STRspace) < 0) {
 			    blkfree(ptr);
-			    return -1;
+			    return -1;		/* error inserting */
 			}
 		    }
 	    }
@@ -402,10 +376,9 @@ tenematch(inputline, num_read, command)
 	return count;
 
     case VARS_EXPAND:
-	if (dollar(buffer, wordp)) {
-	    DeleteBack(str_end - word_start);
-	    if (InsertStr(quote_meta(buffer, qu, 0)) < 0)
-		return -1;
+	if (dollar(buffer, word)) {
+	    if (insert_meta(word_start, str_end, buffer, !qu) < 0)
+		return -1;		/* error inserting */
 	    return 1;
 	}
 	return 0;
@@ -415,9 +388,8 @@ tenematch(inputline, num_read, command)
 				      symlinks == SYM_EXPAND)) != NULL) {
 	    (void) Strcpy(buffer, bptr);
 	    xfree((ptr_t) bptr);
-	    DeleteBack(str_end - word_start);
-	    if (InsertStr(quote_meta(buffer, 0, 0)) < 0)
-		return -1;
+	    if (insert_meta(word_start, str_end, buffer, !qu) < 0)
+		return -1;		/* error inserting */
 	    return 1;
 	}
 	return 0;
@@ -425,10 +397,8 @@ tenematch(inputline, num_read, command)
     case COMMAND_NORMALIZE:
 	if (!cmd_expand(wordp, buffer))
 	    return 0;
-
-	DeleteBack(str_end - word_start);
-	if (InsertStr(quote_meta(buffer, 0, 0)) < 0)
-	    return -1;
+	if (insert_meta(word_start, str_end, buffer, !qu) < 0)
+	    return -1;		/* error inserting */
 	return 1;
 
     case LIST:
@@ -536,47 +506,103 @@ c_glob(v)
 } /* end c_glob */
 
 
-/* quote_meta():
- *	quote (\) the meta-characters in a word
- *	except trailing space if trail_space is set
- *	return pointer to quoted word in static storage
+/* insert_meta():
+ *      change the word before the cursor.
+ *        cp must point to the start of the unquoted word.
+ *        cpend to the end of it.
+ *        word is the text that has to be substituted.
+ *      strategy:
+ *        try to keep all the quote characters of the user's input.
+ *        change quote type only if necessary.
  */
-static Char *
-quote_meta(word, qu, trail_space)
+static int
+insert_meta(cp, cpend, word, closequotes)
+    Char   *cp;
+    Char   *cpend;
     Char   *word;
-    int     qu;
-    bool    trail_space;
+    bool    closequotes;
 {
-    static Char buffer[2 * FILSIZ + 1], *bptr, *wptr;
+    Char buffer[2 * FILSIZ + 1], *bptr, *wptr;
+    int in_sync = (cp != NULL);
+    int qu = 0;
+    int ndel = cp ? cpend - cp : 0;
+    Char w, wq;
 
-    for (bptr = buffer, wptr = word; *wptr != '\0';) {
-	if (bptr > buffer + 2 * FILSIZ - 4)
+    for (bptr = buffer, wptr = word;;) {
+	if (bptr > buffer + 2 * FILSIZ - 5)
 	    break;
 	  
-	if (qu && *wptr == qu) {
-	    *bptr++ = (Char) qu;
-	    *bptr++ = '\\';
-	    *bptr++ = (Char) qu;
+	if (cp >= cpend)
+	    in_sync = 0;
+	if (in_sync && !cmap(qu, _ESC) && cmap(*cp, _QF|_ESC))
+	    if (qu == 0 || qu == *cp) {
+		qu ^= *cp;
+		*bptr++ = *cp++;
+		continue;
+	    }
+	w = *wptr;
+	if (w == 0)
+	    break;
+
+	wq = w & QUOTE;
+	w &= ~QUOTE;
+
+	if (cmap(w, _ESC | _QF))
+	    wq = QUOTE;		/* quotes are always quoted */
+
+	if (!wq && qu && tricky(w) && !(qu == '\"' && tricky_dq(w))) {
+	    /* We have to unquote the character */
+	    in_sync = 0;
+	    if (cmap(qu, _ESC))
+		bptr[-1] = w;
+	    else {
+		*bptr++ = (Char) qu;
+		*bptr++ = w;
+		if (wptr[1] == 0)
+		    qu = 0;
+		else
+		    *bptr++ = (Char) qu;
+	    }
+	} else if (qu && w == qu) {
+	    in_sync = 0;
+	    if (bptr > buffer && bptr[-1] == qu) {
+		/* User misunderstanding :) */
+		bptr[-1] = '\\';
+		*bptr++ = w;
+		qu = 0;
+	    } else {
+		*bptr++ = (Char) qu;
+		*bptr++ = '\\';
+		*bptr++ = w;
+		*bptr++ = (Char) qu;
+	    }
 	}
-	if (!qu &&
-	    (cmap(*wptr, _META | _DOL | _QF | _QB | _ESC | _GLOB) ||
-	     *wptr == HIST || *wptr == HISTSUB) &&
-	    (*wptr != ' ' || !trail_space || *(wptr + 1) != '\0') &&
-             *wptr != '#')
+	else if (wq && qu == '\"' && tricky_dq(w)) {
+	    in_sync = 0;
+	    *bptr++ = (Char) qu;
 	    *bptr++ = '\\';
-	*bptr++ = *wptr++;
+	    *bptr++ = w;
+	    *bptr++ = (Char) qu;
+	} else if (wq && ((!qu && (tricky(w) || (w == HISTSUB && bptr == buffer))) || (!cmap(qu, _ESC) && w == HIST))) {
+	    in_sync = 0;
+	    *bptr++ = '\\';
+	    *bptr++ = w;
+	} else {
+	    if (in_sync && *cp++ != w)
+		in_sync = 0;
+	    *bptr++ = w;
+	}
+	wptr++;
 	if (cmap(qu, _ESC))
-	  qu = 0;
+	    qu = 0;
     }
-    if (qu && trail_space && wptr > word && *wptr == 0 && wptr[-1] == ' ')
-      {
-        *bptr = bptr[-1];
-        bptr[-1] = (Char) qu;
-        bptr++;
-      }
+    if (closequotes && qu && !cmap(qu, _ESC))
+	*bptr++ = qu;
     *bptr = '\0';
-    return (buffer);
-} /* end quote_meta */
+    if (ndel)
+	DeleteBack(ndel);
+    return InsertStr(buffer);
+} /* end insert_meta */
 
 
 
@@ -768,24 +794,33 @@ recognize(exp_name, item, name_length, numitems, enhanced)
     Char   *exp_name, *item;
     int     name_length, numitems, enhanced;
 {
-    Char MCH1,MCH2;
+    Char MCH1, MCH2;
+    register Char *x, *ent;
+    register int len = 0;
 
-    if (numitems == 1)		/* 1st match */
+    if (numitems == 1) {	/* 1st match */
 	copyn(exp_name, item, MAXNAMLEN);
-    else {			/* 2nd and subsequent matches */
-	register Char *x, *ent;
-	register int len = 0;
-
-	for (x = exp_name, ent = item;
-	     *x && enhanced ? (MCH1 = (*x & TRIM),Isupper(MCH1) ? Tolower(MCH1) : MCH1) == 
-                              (MCH2 = (*ent & TRIM),Isupper(MCH2) ? Tolower(MCH2) : MCH2)
-                            : (*x & TRIM) == (*ent & TRIM);
-             x++, len++, ent++)
-	    continue;
-	*x = '\0';		/* Shorten at 1st char diff */
-	if (!(match_unique_match || is_set(STRrecexact)) && len == name_length)	/* Ambiguous to prefix? */
-	    return (-1);	/* So stop now and save time */
+	return (0);
     }
+    if (!enhanced) {
+	for (x = exp_name, ent = item; *x && (*x & TRIM) == (*ent & TRIM); x++, ent++)
+	    len++;
+    } else {
+	for (x = exp_name, ent = item; *x; x++, ent++) {
+	    MCH1 = *x & TRIM;
+	    MCH2 = *ent & TRIM;
+            MCH1 = Isupper(MCH1) ? Tolower(MCH1) : MCH1;
+            MCH2 = Isupper(MCH2) ? Tolower(MCH2) : MCH2;
+	    if (MCH1 != MCH2)
+		break;
+	    len++;
+	}
+	if (*x || !*ent)	/* Shorter or exact match */
+	    copyn(exp_name, item, MAXNAMLEN);
+    }
+    *x = '\0';		/* Shorten at 1st char diff */
+    if (!(match_unique_match || is_set(STRrecexact) || (enhanced && *ent)) && len == name_length)	/* Ambiguous to prefix? */
+	return (-1);	/* So stop now and save time */
     return (0);
 } /* end recognize */
 
@@ -822,7 +857,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
     Char *item, *ptr;
     Char buf[MAXPATHLEN+1];
     struct varent *vp;
-    int len;
+    int len, enhanced;
     int cnt = 0;
 
 
@@ -915,7 +950,8 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	case RECOGNIZE_ALL:
 	case RECOGNIZE_SCROLL:
 
-	    if ((vp = adrof(STRcomplete)) != NULL && !Strcmp(*(vp->vec),STRenhance)) {
+	    enhanced = (vp = adrof(STRcomplete)) != NULL && !Strcmp(*(vp->vec),STRenhance);
+	    if (enhanced) {
 	        if (!is_prefixmatch(target, item)) 
 		    break;
      	    } else {
@@ -995,9 +1031,11 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 			break;
 		    }
 		}
-		if (recognize(exp_name, item, name_length, ++numitems, vp != NULL && !Strcmp(*(vp->vec),STRenhance))) 
+		if (recognize(exp_name, item, name_length, ++numitems, enhanced)) 
 		    if (command != RECOGNIZE_SCROLL)
 			done = TRUE;
+		if (enhanced && (int)Strlen(exp_name) < name_length)
+		    copyn(exp_name, target, MAXNAMLEN);
 	    }
 	    break;
 
@@ -1046,6 +1084,9 @@ tw_suffix(looking, exp_dir, exp_name, target, name)
     Char *ptr;
     struct varent *vp;
 
+
+    strip(exp_name);
+
     switch (looking) {
 
     case TW_LOGNAME:
@@ -1062,8 +1103,9 @@ tw_suffix(looking, exp_dir, exp_name, target, name)
 	}
 	else if ((ptr = tgetenv(exp_name)) == NULL || *ptr == '\0')
 	    return ' ';
+
 	*--target = '\0';
-	(void) Strcat(exp_dir, name);
+
 	return isadirectory(exp_dir, ptr) ? '/' : ' ';
 
 
@@ -1129,6 +1171,7 @@ tw_fixword(looking, word, dir, exp_name, max_word_length)
 	break;
     }
 
+    quote(exp_name);
     catn(word, exp_name, max_word_length);	/* add extended name */
 } /* end tw_fixword */
 
@@ -1346,6 +1389,26 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
     extract_dir_and_name(word, dir, name);
 
     /*
+     *  SPECIAL HARDCODED COMPLETIONS:
+     *    foo$variable                -> TW_VARIABLE
+     *    ~user                       -> TW_LOGNAME
+     *
+     */
+    if ((*word == '~') && (Strchr(word, '/') == NULL)) {
+	looking = TW_LOGNAME;
+	target = name;
+	gpat = 0;	/* Override pattern mechanism */
+    }
+    else if ((target = Strrchr(name, '$')) != 0 && 
+	     (Strchr(name, '/') == NULL)) {
+	target++;
+	looking = TW_VARIABLE;
+	gpat = 0;	/* Override pattern mechanism */
+    }
+    else
+	target = name;
+
+    /*
      * Try to figure out what we should be looking for
      */
     if (looking & TW_PATH) {
@@ -1397,20 +1460,6 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
     default:
 	break;
     }
-
-    if ((*word == '~') && (Strchr(word, '/') == NULL)) {
-	looking = TW_LOGNAME;
-	target = name;
-	gpat = 0;	/* Override pattern mechanism */
-    }
-    else if ((target = Strrchr(name, '$')) != 0 && 
-	     (Strchr(name, '/') == NULL)) {
-	target++;
-	looking = TW_VARIABLE;
-	gpat = 0;	/* Override pattern mechanism */
-    }
-    else
-	target = name;
 
     /*
      * let fignore work only when we are not using a pattern
@@ -1657,16 +1706,16 @@ dollar(new, old)
 	    if (vp) {
 		for (i = 0; vp->vec[i] != NULL; i++) {
 		    for (val = vp->vec[i]; space > 0 && *val; space--)
-			*p++ = *val++;
+			*p++ = *val++ | QUOTE;
 		    if (vp->vec[i+1] && space > 0) {
-			*p++ = ' ';
+			*p++ = ' ';	/* | QUOTE ? */
 			space--;
 		    }
 		}
 	    }
 	    else if (val) {
 		for (;space > 0 && *val; space--)
-		    *p++ = *val++;
+		    *p++ = *val++ | QUOTE;
 	    }
 	    else {
 		*new = '\0';

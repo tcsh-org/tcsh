@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.56 1994/09/22 19:07:11 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.57 1994/09/22 19:09:29 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.56 1994/09/22 19:07:11 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.57 1994/09/22 19:09:29 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1373,7 +1373,7 @@ dofg(v, c)
 	pp = pfind(*v);
 	if (!pstart(pp, 1)) {
 	    pp->p_procid = 0;
-	    stderr(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
+	    stderror(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
 	    continue;
 	}
 #ifndef BSDSIGS
@@ -1402,7 +1402,7 @@ dofg1(v, c)
     pp = pfind(v[0]);
     if (!pstart(pp, 1)) {
 	pp->p_procid = 0;
-	stderr(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
+	stderror(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
 	return;
     }
 #ifndef BSDSIGS
@@ -1432,7 +1432,7 @@ dobg(v, c)
 	pp = pfind(*v);
 	if (!pstart(pp, 0)) {
 	    pp->p_procid = 0;
-	    stderr(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
+	    stderror(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
 	}
     } while (*v && *++v);
 }
@@ -1452,7 +1452,7 @@ dobg1(v, c)
     pp = pfind(v[0]);
     if (!pstart(pp, 0)) {
 	pp->p_procid = 0;
-	stderr(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
+	stderror(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
     }
 }
 
@@ -1587,7 +1587,8 @@ pkill(v, signum)
 	    case SIGCONT:
 		if (!pstart(pp, 0)) {
 		    pp->p_procid = 0;
-		    stderr(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
+		    stderror(ERR_NAME|ERR_BADJOB, pp->p_command,
+			     strerror(errno));
 		}
 		goto cont;
 	    default:
