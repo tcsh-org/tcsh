@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.h,v 3.5 2005/01/18 20:01:10 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.h,v 3.7 2005/01/18 20:05:14 christos Exp $ */
 /*
  * tc.nls.h: NLS support
  *
@@ -36,6 +36,8 @@
 
 #include "sh.h"
 
+#define NLSZEROT	((size_t)-1)
+
 #ifdef WIDE_STRINGS
 
 # define NLSSize(s, l) 1
@@ -62,7 +64,7 @@ extern int NLSTo __P((Char *, NLSChar));
 extern void NLSQuote __P((Char *));
 
 #define NLSSize(s, l) NLSFrom(s, l, (NLSChar *)0)
-#define TRIM_AND_EXTEND(s, c) (s += NLSFrom(s - 1, -1, &c) - 1)
+#define TRIM_AND_EXTEND(s, c) (s += NLSFrom(s - 1, NLSZEROT, &c) - 1)
 #define NLS_ILLEGAL 0x40000000
 
 

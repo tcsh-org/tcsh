@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.37 2005/01/18 20:12:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.38 2005/01/18 20:43:30 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.37 2005/01/18 20:12:14 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.38 2005/01/18 20:43:30 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -188,7 +188,7 @@ Draw(cp, nocomb)	/* draw char at cp, expand tabs, ctl chars */
     NLSChar c;
 
     attr = *cp & ~CHAR;
-    l = NLSFrom(cp, -1, &c);
+    l = NLSFrom(cp, NLSZEROT, &c);
     w = NLSClassify(c, nocomb);
     switch (w) {
 	case NLSCLASS_NL:
@@ -321,7 +321,7 @@ RefreshPromptpart(buf)
 	    while (*cp & LITERAL)
 		cp++;
 	    if (*cp) {
-		l = NLSFrom(cp, -1, &c);
+		l = NLSFrom(cp, NLSZEROT, &c);
 		w = NLSWidth(c);
 		Vdraw(MakeLiteral(litstart, cp + l - litstart, 0), w);
 		cp += l;
@@ -1169,7 +1169,7 @@ RefCursor()
 	    cp++;
 	    continue;
 	}
-	l = NLSFrom(cp, -1, &c);
+	l = NLSFrom(cp, NLSZEROT, &c);
 	w = NLSClassify(c, cp == PromptBuf);
 	cp += l;
 	switch(w) {
@@ -1293,7 +1293,7 @@ RefPlusOne(int l)
 	return;
     }
     cp = Cursor - l;
-    NLSFrom(cp, l, &c);
+    NLSFrom(cp, (size_t)l, &c);
     w = NLSClassify(c, cp == InputBuf);
     switch(w) {
 	case NLSCLASS_CTRL:
