@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.114 2004/08/04 14:28:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.115 2004/08/04 17:12:28 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.114 2004/08/04 14:28:23 christos Exp $")
+RCSID("$Id: sh.c,v 3.115 2004/08/04 17:12:28 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -674,6 +674,11 @@ main(argc, argv)
      */
     set(STRaddsuffix, Strsave(STRNULL), VAR_READWRITE);
 
+    /*
+     * Compatibility with tcsh >= 6.12 by default
+     */
+    set(STRcsubstnonl, Strsave(STRNULL), VAR_READWRITE);
+    
     /*
      * Random default kill ring size
      */

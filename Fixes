@@ -1,3 +1,6 @@
+ 27. Newline handling in command substitution controlled by csubstnonl
+     (Miloslav Trmac)
+ 26. Fix UNC prompt expansion (WIN32) (Yasuhiro Matsumoto)
  25. Fix incorrect xprintf() usage (Miloslav Trmac)
  24. Additional architectures support for $HOSTTYPE and $MACHTYPE
      (Miloslav Trmac)

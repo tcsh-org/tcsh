@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.56 2004/05/19 18:27:53 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.57 2004/08/04 17:12:29 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.56 2004/05/19 18:27:53 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.57 2004/08/04 17:12:29 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -824,7 +824,8 @@ backeval(cp, literal)
      */
     mypipe(pvec);
     if (pfork(&faket, -1) == 0) {
-	struct command *t;
+	jmp_buf_t osetexit;
+	struct command *volatile t;
 
 	(void) close(pvec[0]);
 	(void) dmove(pvec[1], 1);
@@ -841,7 +842,7 @@ backeval(cp, literal)
 	arginp = cp;
 	for (arginp = cp; *cp; cp++) {
 	    *cp &= TRIM;
-	    if (*cp == '\n' || *cp == '\r')
+	    if (is_set(STRcsubstnonl) && (*cp == '\n' || *cp == '\r'))
 		*cp = ' ';
 	}
 
@@ -853,26 +854,58 @@ backeval(cp, literal)
 	evalvec = NULL;
 	alvecp = NULL;
 	evalp = NULL;
-	(void) lex(&paraml);
-	if (seterr)
-	    stderror(ERR_OLD);
-	alias(&paraml);
-	t = syntax(paraml.next, &paraml, 0);
-	if (seterr)
-	    stderror(ERR_OLD);
-	if (t)
-	    t->t_dflg |= F_NOFORK;
+
+	t = NULL;
+	getexit(osetexit);
+	for (;;) {
+
+	    if (paraml.next && paraml.next != &paraml)
+		freelex(&paraml);
+	    
+	    paraml.next = paraml.prev = &paraml;
+	    paraml.word = STRNULL;
+	    (void) setexit();
+	    justpr = 0;
+	    
+	    /*
+	     * For the sake of reset()
+	     */
+	    freelex(&paraml);
+	    if (t)
+		freesyn(t), t = NULL;
+
+	    if (haderr) {
+		/* unwind */
+		doneinp = 0;
+		resexit(osetexit);
+		reset();
+	    }
+	    if (seterr) {
+		xfree((ptr_t) seterr);
+		seterr = NULL;
+	    }
+
+	    (void) lex(&paraml);
+	    if (seterr)
+		stderror(ERR_OLD);
+	    alias(&paraml);
+	    t = syntax(paraml.next, &paraml, 0);
+	    if (seterr)
+		stderror(ERR_OLD);
 #ifdef SIGTSTP
-	(void) sigignore(SIGTSTP);
+	    (void) sigignore(SIGTSTP);
 #endif
 #ifdef SIGTTIN
-	(void) sigignore(SIGTTIN);
+	    (void) sigignore(SIGTTIN);
 #endif
 #ifdef SIGTTOU
-	(void) sigignore(SIGTTOU);
+	    (void) sigignore(SIGTTOU);
 #endif
-	execute(t, -1, NULL, NULL, TRUE);
-	exitstat();
+	    execute(t, -1, NULL, NULL, TRUE);
+
+	    freelex(&paraml);
+	    freesyn(t), t = NULL;
+	}
     }
     xfree((ptr_t) cp);
     (void) close(pvec[1]);

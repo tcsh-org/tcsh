@@ -1308,6 +1308,10 @@ quotes (`"') retain blanks and tabs; only newlines force new words.  The single
 final newline does not force a new word in any case.  It is thus possible for a
 command substitution to yield only part of a word, even if the command outputs
 a complete line.
+.PP
+By default, the shell since version 6.12 replaces all newline and carriage 
+return characters in the command by spaces.  If this is switched off by
+unsetting \fBcsubstnonl\fR, newlines separate commands as usual.
 .SS "Filename substitution"
 If a word contains any of the characters `*', `?', `[' or `{' or begins with
 the character `~' it is a candidate for filename substitution, also known as
@@ -3497,7 +3501,7 @@ desired interpreter (e.g., `/bin/csh' or `/usr/local/bin/tcsh').
 .SS "Special shell variables"
 The variables described in this section have special meaning to the shell.
 .PP
-The shell sets \fBaddsuffix\fR, \fBargv\fR, \fBautologout\fR, \fBcommand\fR, \fBecho_style\fR,
+The shell sets \fBaddsuffix\fR, \fBargv\fR, \fBautologout\fR, \fBcsubstnonl\fR, \fBcommand\fR, \fBecho_style\fR,
 \fBedit\fR, \fBgid\fR, \fBgroup\fR, \fBhome\fR, \fBloginsh\fR, \fBoid\fR, \fBpath\fR,
 \fBprompt\fR, \fBprompt2\fR, \fBprompt3\fR, \fBshell\fR, \fBshlvl\fR,
 \fBtcsh\fR, \fBterm\fR, \fBtty\fR, \fBuid\fR, \fBuser\fR and \fBversion\fR at
@@ -3606,6 +3610,10 @@ echo `pwd` $argv > ~/.<cmd>_pause; %<cmd>
 If set to `cmd', commands are automatically spelling-corrected.
 If set to `complete', commands are automatically completed.
 If set to `all', the entire command line is corrected.
+.TP 8
+.B csubstnonl \fR(+)
+If set, newlines and carriage returns in command substitution are
+replaced by spaces.  Set by default.
 .TP 8
 .B cwd
 The full pathname of the current directory.
@@ -4972,6 +4980,9 @@ the expression is false and the command is not executed.
 \fIls\-F\fR includes file identification characters when sorting filenames
 and does not handle control characters in filenames well.  It cannot be
 interrupted.
+.PP
+Command substitution supports multiple commands and conditions, but not
+cycles or backward \fIgoto\fRs.
 .PP
 Report bugs to tcsh-bugs@mx.gw.com, preferably with fixes.  If you want to
 help maintain and test tcsh, send mail to listserv@mx.gw.com with the text
