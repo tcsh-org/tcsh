@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.96 2001/08/06 23:52:04 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.97 2001/08/28 23:13:44 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.96 2001/08/06 23:52:04 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.97 2001/08/28 23:13:44 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -341,7 +341,7 @@ dolist(v, c)
 	lastword = nextword;
 	for (cp = *v; cp; cp = *++v) {
 	    nextword = (struct wordent *) xcalloc(1, sizeof cmd);
-	    nextword->word = Strsave(cp);
+	    nextword->word = quote(Strsave(cp));
 	    lastword->next = nextword;
 	    nextword->prev = lastword;
 	    lastword = nextword;
