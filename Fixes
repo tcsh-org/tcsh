@@ -1,5 +1,14 @@
- 41. Make -shell invocations always treated as a login shell.
- 40. V6.11.01 - 20020308
+ 25. V6.11.02 - 20020516
+ 24. Fix prompt bugs in $var and %c0n (TAKAI Kousuke)
+ 23. Add Cray SV2 config (Rafal Maszkowski)
+ 22. Add pdf manual page (Warren Ferguson)
+ 21. Fix REMOTEHOST lossage in with AF_LOCAL sockets (Tom Mander)
+ 20. Fix win32 break because of TIOCSTI (Amol)
+ 19. Fix TIOCSTI for hpux 11  (Igor Schein)
+ 18. Avoid collapsing paths that refer to non-existent components
+     (Martin Kraemer)
+ 17. Make -shell invocations always treated as a login shell.
+ 16. V6.11.01 - 20020308
  15. Fixes to polish nls locale (Pawe³ Niewiadomski)
  14. russian locale fixes (Alexey Dokuchaev)
  13. document door support (Shaen)
