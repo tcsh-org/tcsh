@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.4 1991/07/23 23:20:08 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.5 1991/07/29 21:22:46 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,7 +41,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.4 1991/07/23 23:20:08 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.5 1991/07/29 21:22:46 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -947,7 +947,7 @@ importpath(cp)
      * i+2 where i is the number of colons in the path. There are i+1
      * directories in the path plus we need room for a zero terminator.
      */
-    pv = (Char **) xcalloc((size_t) (i + 2), sizeof(Char **));
+    pv = (Char **) xcalloc((size_t) (i + 2), sizeof(Char *));
     dp = cp;
     i = 0;
     if (*dp)
