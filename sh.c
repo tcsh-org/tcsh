@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.13 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.14 1991/10/20 01:38:14 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.13 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.c,v 3.14 1991/10/20 01:38:14 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -851,7 +851,8 @@ main(argc, argv)
 
 
     if (intty && !arginp) 	
-	(void) ed_Setup(1);	/* Get the tty state, and set defaults */
+	(void) ed_Setup(editing);/* Get the tty state, and set defaults */
+				 /* Only alter the tty state if editing */
     
     /*
      * Set an exit here in case of an interrupt or error reading the shell

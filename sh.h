@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.17 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.18 1991/10/21 17:24:49 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -44,7 +44,12 @@ easily confused. */
 # define CONFIGH "config.h"
 #endif
 
-#include CONFIGH
+/*
+ * Avoid cpp bugs (CONFIGH is always defined at this point)
+ */
+#ifdef CONFIGH
+# include CONFIGH
+#endif
 
 #ifndef EXTERN
 # define EXTERN extern
