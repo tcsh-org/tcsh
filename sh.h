@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.1 1991/07/05 19:07:20 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.2 1991/07/08 00:09:43 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -688,7 +688,7 @@ struct Hist {
     struct wordent Hlex;
     int     Hnum;
     int     Href;
-    long    Htime;
+    time_t  Htime;
     Char   *histline;
     struct Hist *Hnext;
 }       Histlist;

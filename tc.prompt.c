@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.prompt.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.prompt.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -37,7 +37,7 @@
 #include "config.h"
 #ifndef lint
 static char *rcsid() 
-    { return "$Id: tc.prompt.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
+    { return "$Id: tc.prompt.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -62,7 +62,7 @@ printprompt(promptno, str)
     static int print_prompt_did_ding = 0;
     register char *cz;
     struct tm *t;
-    long    lclock;
+    time_t  lclock;
     Char    buff[BUFSIZ];
     Char   *cp;
 

@@ -83,15 +83,14 @@ static char *rcsid()
 # define HZ	100		/* for division into seconds */
 #endif
 
-#if (defined(_BSD) && defined(_BSD_INCLUDES)) || defined(BSD)
+#if (defined(_BSD) && defined(_BSD_INCLUDES))
 # define BSDWAIT
-#endif /* (_BSD && _BSD_INCLUDES) || BSD */
-
+#endif
 #ifndef WTERMSIG
 # define WTERMSIG(w)	(((union wait *) &(w))->w_termsig)
 # ifndef BSDWAIT
 #  define BSDWAIT
-# endif /* BSDWAIT */
+# endif
 #endif /* !WTERMSIG */
 #ifndef WEXITSTATUS
 # define WEXITSTATUS(w)	(((union wait *) &(w))->w_retcode)
@@ -270,6 +269,9 @@ loop:
     pid = wait(&w.w_status);
 #  endif /* SVID >= 3 */
 # endif	/* BSDTIMES */
+# ifndef BSDSIGS
+    (void) sigset(SIGCHLD, pchild);
+# endif /* !BSDSIGS */
 #endif /* BSDJOBS */
 
 #ifdef JOBDEBUG
