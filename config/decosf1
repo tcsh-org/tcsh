@@ -121,6 +121,7 @@
 #define _BSD	/* BSD emulation */
 
 #undef PW_AUTH	/* Define this if you are running the security gunk */
+#define _POSIX_PII_SOCKET	/* need this for socklen_t */
 
 #ifdef notdef
 # define DECOSF1	120	/* For version 1.2  */
