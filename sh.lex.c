@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.24 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.25 1992/10/05 02:41:30 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.24 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.25 1992/10/05 02:41:30 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -250,14 +250,15 @@ copylex(hp, fp)
 	register struct wordent *new;
 	
 	new = (struct wordent *) xmalloc((size_t) sizeof(*wdp));
+	new->word = STRNULL;
 	new->prev = wdp;
 	new->next = hp;
 	wdp->next = new;
+	hp->prev = new;
 	wdp = new;
 	wdp->word = Strsave(fp->word);
 	fp = fp->next;
     } while (wdp->word[0] != '\n');
-    hp->prev = wdp;
 }
 
 void
@@ -269,7 +270,8 @@ freelex(vp)
     while (vp->next != vp) {
 	fp = vp->next;
 	vp->next = fp->next;
-	xfree((ptr_t) fp->word);
+	if (fp->word != STRNULL)
+	    xfree((ptr_t) fp->word);
 	xfree((ptr_t) fp);
     }
     vp->prev = vp;

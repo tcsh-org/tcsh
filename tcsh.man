@@ -29,7 +29,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\" $Id: tcsh.man,v 3.49 1992/10/05 02:41:30 christos Exp $
+.\" $Id: tcsh.man,v 3.50 1992/10/10 18:17:34 christos Exp $
 .TH TCSH 1 "17 September 1992" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1972,6 +1972,8 @@ The current possible values are:
 \fIbalance\fR		a Sequent Balance (32000 based)
 \fIbsd386\fR		an Intel 386, running BSDI's bsd386
 \fIbutterfly\fR		a BBN Computer Butterfly 1000
+\fIcoh386\fR		a 386 running Coherent 4.0
+\fIcoherent\fR		an unknown machine running Coherent
 \fIconvex\fR		a Convex
 \fIcray\fR		a Cray running Unicos
 \fIdecstation\fR	a DecStation XXXX
@@ -3462,7 +3464,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.02.07 (Cornell) 92/09/17.
+This man page documents tcsh 6.03.00 (Cornell) 92/XX/XX.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
@@ -3514,6 +3516,10 @@ James J Dempsey, BBN, 1988, and Paul Placeway, OSU, 1988
 Re-ported tcsh to A/UX.
 .sp
 .SH "BUGFIXES AND ENHANCEMENTS"
+.sp
+Harry C. Pulley, 1992
+.br
+Coherent port
 .sp
 Andy Phillips, Mullard Space Science Lab U.K., 1992
 .br

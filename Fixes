@@ -1,4 +1,14 @@
 V6.03.00, ...
+82. Don't free STRNULL in freelex(). Update linked list in copylex() to
+    do the same insert as in lex().
+81. Fixed spurious tilde printing in %c prompt.
+80. Fixed dumb wild free in AddXKey... 
+    (thanks Harald for the complex bindings! :-)
+    > bindkey "\e10z" expand-line # Any editor command will do
+    > bindkey -[cs] "\e10z" "foo" # Any string or command will do
+    Free(%x) ....
+79. coherent additions.
+78. fixes for hpux8 resource limits [Thanks Harald]
 77. 6.02.09 10/10/92
 76. More vms cleanups.
 75. Removed #include CONFIGH from sh.h. There was no way to make it work 

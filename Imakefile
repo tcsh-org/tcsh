@@ -1,7 +1,7 @@
 /**/#
-/**/# $Id: Imakefile,v 1.18 1992/10/05 02:41:30 christos Exp christos $
+/**/# $Id: Imakefile,v 1.19 1992/10/10 18:17:34 christos Exp $
 /**/#
-/**/# Imakefile for for tcsh 6.00
+/**/# Imakefile for for tcsh 6.03
 /**/# Marc Horowitz, MIT SIPB
 /**/#
 
@@ -49,7 +49,11 @@ ones.  Please send in your fixes and additions! */
 #endif
 
 #ifdef HPArchitecture
-#define ConfigH hpux
+# if (OSMajorVersion == 8)
+#  define ConfigH hpux8
+# else
+#  define ConfigH hpux7
+# endif
 #endif
 
 #ifdef CrayArchitecture
@@ -335,7 +339,7 @@ INCLUDES = -I. MyIncludes
 LDLIBS = MyLibs
 
 SUF = o
-VERSION = 6.02
+VERSION = 6.03
 
 SHSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.exp.c sh.file.c sh.func.c sh.glob.c sh.hist.c sh.init.c \
@@ -405,7 +409,7 @@ tc.const.h: config.h tc.const.c
 	    sort >> $@
 
 config.h:
-	@cp -p config/config.ConfigH config.h
+	@cp config/config.ConfigH config.h
 
 $(OBJS): sh.err.h tc.const.h ed.defns.h
 

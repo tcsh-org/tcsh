@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.27 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.28 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.27 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.28 1992/10/05 02:41:30 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -513,8 +513,14 @@ RunCommand(str)
     cmd[0] = str;
     cmd[1] = NULL;
 
+    (void) Cookedmode();
+    GettingInput = 0;
+
     doeval1(cmd);
     
+    (void) Rawmode();
+    GettingInput = 1;
+
     ClearLines();
     ClearDisp();
     NeedsRedraw = 1;

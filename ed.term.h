@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.term.h,v 1.8 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.term.h,v 1.9 1992/10/05 02:41:30 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -141,12 +141,12 @@
  * Work around convex weirdness where turning off IEXTEN makes us
  * lose all postprocessing!
  */
-#if defined(convex) || defined(__convex__)
+#ifdef convex
 # if defined(IEXTEN) && IEXTEN != 0
 #  undef IEXTEN
 #  define IEXTEN 0
 # endif /* IEXTEN != 0 */
-#endif /* convex || __convex__ */
+#endif /* convex */
 
 
 # else /* SGTTY */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.38 1992/10/05 02:41:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.39 1992/10/10 18:17:34 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.38 1992/10/05 02:41:30 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.39 1992/10/10 18:17:34 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1561,13 +1561,13 @@ struct limits limits[] =
     -1, 		NULL, 		0, 	NULL
 };
 
-static struct limits *findlim();
-static RLIM_TYPE getval();
-static void limtail();
-static void plim();
-static int setlim();
+static struct limits *findlim	__P((Char *));
+static RLIM_TYPE getval		__P((struct limits *, Char **));
+static void limtail		__P((Char *, char*));
+static void plim		__P((struct limits *, int));
+static int setlim		__P((struct limits *, int, RLIM_TYPE));
 
-#if defined(convex) || defined(__convex__)
+#ifdef convex
 static  RLIM_TYPE
 restrict_limit(value)
     double  value;
@@ -1576,12 +1576,14 @@ restrict_limit(value)
      * is f too large to cope with? return the maximum or minimum int
      */
     if (value > (double) INT_MAX)
-	return (INT_MAX);
+	return (RLIM_TYPE) INT_MAX;
     else if (value < (double) INT_MIN)
-	return (INT_MIN);
+	return (RLIM_TYPE) INT_MIN;
     else
-	return ((int) value);
+	return (RLIM_TYPE) value;
 }
+#else /* !convex */
+# define restrict_limit(x)	((RLIM_TYPE) (x))
 #endif /* convex */
 
 
@@ -1613,7 +1615,7 @@ dolimit(v, c)
 {
     register struct limits *lp;
     register RLIM_TYPE limit;
-    char    hard = 0;
+    int    hard = 0;
 
     v++;
     if (*v && eq(*v, STRmh)) {
@@ -1640,10 +1642,6 @@ getval(lp, v)
     register struct limits *lp;
     Char  **v;
 {
-# if defined(convex) || defined(__convex__)
-    RLIM_TYPE restrict_limit __P((double));
-# endif /* convex */
-
     register float f;
 #ifndef atof	/* This can be a macro on linux */
     extern double  atof __P((const char *));
@@ -1652,7 +1650,7 @@ getval(lp, v)
 
     f = atof(short2str(cp));
 
-# if defined(convex) || defined(__convex__)
+# ifdef convex
     /*
      * is f too large to cope with. limit f to minint, maxint  - X-6768 by
      * strike
@@ -1666,11 +1664,7 @@ getval(lp, v)
 	cp++;
     if (*cp == 0) {
 	if (*v == 0)
-# if defined(convex) || defined(__convex__)
-	    return ((RLIM_TYPE) restrict_limit((f + 0.5) * lp->limdiv));
-# else /* convex */
-	    return ((RLIM_TYPE) ((f + 0.5) * lp->limdiv));
-# endif /* convex */
+	    return restrict_limit((f + 0.5) * lp->limdiv);
 	cp = *v;
     }
     switch (*cp) {
@@ -1678,12 +1672,7 @@ getval(lp, v)
     case ':':
 	if (lp->limconst != RLIMIT_CPU)
 	    goto badscal;
-#  if defined(convex) || defined(__convex__)
-	return ((RLIM_TYPE)
-		restrict_limit((f * 60.0 + atof(short2str(cp + 1)))));
-#  else /* convex */
-	return ((RLIM_TYPE) (f * 60.0 + atof(short2str(cp + 1))));
-#  endif /* convex */
+	return restrict_limit((f * 60.0 + atof(short2str(cp + 1))));
     case 'h':
 	if (lp->limconst != RLIMIT_CPU)
 	    goto badscal;
@@ -1740,8 +1729,8 @@ badscal:
 # endif /* RLIMIT_CPU */
 	stderror(ERR_NAME | ERR_SCALEF);
     }
-# if defined(convex) || defined(__convex__)
-    return ((RLIM_TYPE) restrict_limit((f + 0.5)));
+# ifdef convex
+    return restrict_limit((f + 0.5));
 # else
     f += 0.5;
     if (f > (float) RLIM_INFINITY)
@@ -1767,12 +1756,13 @@ limtail(cp, str)
 static void
 plim(lp, hard)
     register struct limits *lp;
-    Char    hard;
+    int hard;
 {
 # ifdef BSDLIMIT
     struct rlimit rlim;
 # endif /* BSDLIMIT */
     RLIM_TYPE limit;
+    int     div = lp->limdiv;
 
     xprintf("%s \t", lp->limname);
 
@@ -1787,24 +1777,28 @@ plim(lp, hard)
     limit = hard ? rlim.rlim_max : rlim.rlim_cur;
 # endif /* BSDLIMIT */
 
+# if !defined(BSDLIMIT) || defined(hpux)
+    /*
+     * Christos: filesize comes in 512 blocks. we divide by 2 to get 1024
+     * blocks. Note we cannot pre-multiply cause we might overflow (A/UX)
+     */
+    if (lp->limconst == RLIMIT_FSIZE) {
+	if (limit >= (RLIM_INFINITY / 512))
+	    limit = RLIM_INFINITY;
+	else
+	    div = (div == 1024 ? 2 : 1);
+    }
+# endif /* !BSDLIMIT || hpux */
+
     if (limit == RLIM_INFINITY)
 	xprintf("unlimited");
+    else
 # ifdef RLIMIT_CPU
-    else if (lp->limconst == RLIMIT_CPU)
+    if (lp->limconst == RLIMIT_CPU)
 	psecs((long) limit);
+    else
 # endif /* RLIMIT_CPU */
-    else
-# if !defined(BSDLIMIT) || defined(hpux)
-    if (lp->limconst == RLIMIT_FSIZE)
-	/*
-	 * Christos: filesize comes in 512 blocks. we divide by 2 to get 1024
-	 * blocks. Note we cannot pre-multiply cause we might overflow (A/UX)
-	 */
-	xprintf("%ld %s", (long) (limit / (lp->limdiv == 1024 ? 2 : 1)), 
-	        lp->limscale);
-    else
-# endif /* !BSDLIMIT || hpux */
-	xprintf("%ld %s", (long) (limit / lp->limdiv), lp->limscale);
+	xprintf("%ld %s", (long) (limit / div), lp->limscale);
     xputchar('\n');
 }
 
@@ -1816,7 +1810,7 @@ dounlimit(v, c)
 {
     register struct limits *lp;
     int     lerr = 0;
-    Char    hard = 0;
+    int    hard = 0;
 
     v++;
     if (*v && eq(*v, STRmh)) {
@@ -1841,7 +1835,7 @@ dounlimit(v, c)
 static int
 setlim(lp, hard, limit)
     register struct limits *lp;
-    Char    hard;
+    int    hard;
     RLIM_TYPE limit;
 {
 # ifdef BSDLIMIT

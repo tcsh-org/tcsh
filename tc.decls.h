@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.decls.h,v 3.19 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.decls.h,v 3.20 1992/10/05 02:41:30 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -215,22 +215,32 @@ extern	void		  sched_run	__P((void));
  * tc.sig.c
  */
 #ifndef BSDSIGS
-# if SYSVREL < 3 || defined(UNIXPC)
-extern	sigret_t	(*sigset	__P((int, sigret_t (*)(int)))) ();
-extern	void		  sigrelse	__P((int));
-extern	void		  sighold	__P((int));
-extern	void		  sigignore	__P((int));
-extern	void 		  sigpause	__P((int));
-# endif
+# ifdef UNRELSIGS
+#  ifdef COHERENT
+extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
+#   define signal(x,y)	  xsignal(x,y)
+#  endif /* COHERENT */
+extern	sigret_t	(*xsigset	__P((int, sigret_t (*)(int)))) ();
+#  define sigset(x,y)	  xsigset(x,y)
+extern	void		  xsigrelse	__P((int));
+#  define sigrelse(x)	  xsigrelse(x)
+extern	void		  xsighold	__P((int));
+#  define sighold(x)	  xsighold(x)
+extern	void		  xsigignore	__P((int));
+#  define sigignore(x)	  xsigignore(x)
+extern	void 		  xsigpause	__P((int));
+#  define sigpause(x)	  xsigpause(x)
+extern	pid_t 		  ourwait	__P((int *));
+# endif /* UNRELSIGS */
 # ifdef SXA
 extern	void 		  sigpause	__P((int));
-# endif
-extern	pid_t 		  ourwait	__P((int *));
-#endif
+# endif /* SXA */
+#endif /* !BSDSIGS */
+
 #ifdef NEEDsignal
 extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
-#define signal(a, b)	  xsignal(a, b)
-#endif
+# define signal(a, b)	  xsignal(a, b)
+#endif /* NEEDsignal */
 #ifdef _SEQUENT_
 extern	sigmask_t	  sigsetmask	__P((sigmask_t));
 extern	sigmask_t	  sigblock	__P((sigmask_t));
@@ -239,7 +249,7 @@ extern  sigret_t        (*bsd_signal    __P((int, sigret_t (*)(int)))) ();
 #endif /* _SEQUENT_ */
 #ifdef SIGSYNCH
 extern	sigret_t	  synch_handler	__P((int));
-#endif
+#endif /* SIGSYNCH */
 
 
 /*
@@ -249,9 +259,9 @@ extern	sigret_t	  synch_handler	__P((int));
 extern	Char		 *s_strchr	__P((const Char *, int));
 extern	Char		 *s_strrchr	__P((const Char *, int));
 extern	Char		 *s_strcat	__P((Char *, const Char *));
-#ifdef NOTUSED
+# ifdef NOTUSED
 extern	Char		 *s_strncat	__P((Char *, const Char *, size_t));
-#endif
+# endif /* NOTUSED */
 extern	Char		 *s_strcpy	__P((Char *, const Char *));
 extern	Char		 *s_strncpy	__P((Char *, const Char *, size_t));
 extern	Char		 *s_strspl	__P((const Char *, const Char *));
@@ -266,7 +276,7 @@ extern	Char		 *str2short	__P((const char *));
 extern	Char		**blk2short	__P((char **));
 extern	char		 *short2str	__P((const Char *));
 extern	char		**short2blk	__P((Char **));
-#endif
+#endif /* SHORT_STRINGS */
 extern	char		 *short2qstr	__P((const Char *));
 
 
@@ -287,4 +297,4 @@ extern	char 		 *who_info	__P((ptr_t, int, char *));
 extern	void		  dolog		__P((Char **, struct command *));
 #endif /* HAVENOUTMP */
 
-#endif				/* _h_tc_decls */
+#endif /* _h_tc_decls */

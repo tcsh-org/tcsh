@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.35 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.36 1992/10/10 18:17:34 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.35 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.36 1992/10/10 18:17:34 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1217,6 +1217,17 @@ prcomd:
     return (jobflags);
 }
 
+/*
+ * All 4.3 BSD derived implementations are buggy and I've had enough.
+ * The following implementation produces similar code and works in all
+ * cases. The 4.3BSD one works only for <, >, !=
+ */
+# undef timercmp
+#  define timercmp(tvp, uvp, cmp) \
+      (((tvp)->tv_sec == (uvp)->tv_sec) ? \
+	   ((tvp)->tv_usec cmp (uvp)->tv_usec) : \
+	   ((tvp)->tv_sec  cmp (uvp)->tv_sec))
+
 static void
 ptprint(tp)
     register struct process *tp;
@@ -1239,9 +1250,6 @@ ptprint(tp)
     prusage(&zru, &ru, &tetime, &ztime);
 #else /* !BSDTIMES */
 # ifdef _SEQUENT_
-#  define timercmp(tvp, uvp, cmp) \
-      ((tvp)->tv_sec cmp (uvp)->tv_sec || \
-       ((tvp)->tv_sec == (uvp)->tv_sec && (tvp)->tv_usec cmp (uvp)->tv_usec))
     timeval_t tetime, diff;
     static timeval_t ztime;
     struct process_stats ru;
@@ -1785,6 +1793,11 @@ pfork(t, wanttty)
     if (setintr)
 	ignint = (tpgrp == -1 && (t->t_dflg & F_NOINTERRUPT))
 	    || (gointr && eq(gointr, STRminus));
+
+#ifdef COHERENT
+    ignint |= gointr && eq(gointr, STRminus);
+#endif /* COHERENT */
+
     /*
      * Check for maximum nesting of 16 processes to avoid Forking loops
      */

@@ -1,6 +1,26 @@
 This file contains visible (incompatible) changes to the users.
 This version of tcsh has the following new things:
 
+6.03
+* $%var contains the number of characters in $var.
+* Shell -w -x are now POSIX compliant on POSIX machines.
+* Imported environment variables are not globbed.
+* $dirstack can be used to set and examine the directory stack.
+* $? == $status and $# == $#argv like in the bourne shell.
+* expand variables expands arrays too (but not array elements yet).
+* $0 contains argv[0] on interactive shells.
+* new -b -c etc file operators from SGI csh.
+* nostat takes a list of shell patterns.
+* symbolic names for arrow key bindings [left, right, up, down]
+* shift, left operators update variables correctly.
+* builtins builtin.
+* history and dirs accept now -LSc flags.
+* $history accepts an optional second argument, that can change the
+  history builtin output similar to the $time format.
+* History timestamps preserved in .history. The history file contains
+  now the timestamps as csh comments.
+
+
 6.02
 * ignore_symlinks and chase_symlinks are replaced with symlinks=ignore
   and symlinks=chase; symlinks=expand addition

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.23 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.24 1992/10/10 18:17:34 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.23 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.24 1992/10/10 18:17:34 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -225,6 +225,15 @@ gethosttype()
    hosttype = "bsd386"; /* BSD/386*/
 # endif /* i386 && bsdi */
 
+# ifdef COHERENT
+#  define _havehosttype_
+#  ifdef _I386
+    hosttype = "coh386";
+#  else
+    hosttype = "coherent";
+#  endif /* _I386 */
+# endif /* COHERENT */
+
 # if defined(i386) && SYSVREL > 0
 
 #  if !defined(_havehosttype_) && (defined(ISC) || defined(ISC202))
@@ -305,7 +314,7 @@ gethosttype()
 #  endif /* ns32000 */
 # endif /* sequent */
 
-# if defined(convex) || defined(__convex__)
+# ifdef convex
 #  define _havehosttype_
     /* From: Brian Allison <uiucdcs!convex!allison@RUTGERS.EDU> */
     hosttype = "convex";

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.printf.c,v 3.8 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.printf.c,v 3.9 1992/10/10 18:17:34 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.8 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.9 1992/10/10 18:17:34 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -50,15 +50,16 @@ RCSID("$Id: tc.printf.c,v 3.8 1992/07/06 15:26:18 christos Exp $")
 static char buf[128];
 
 static	void	xaddchar	__P((int));
-static	void	doprnt		__P((void (*) __P((int)), char *, va_list));
+static	void	doprnt		__P((void (*) __P((int)), const char *, va_list));
 
 static void
 doprnt(addchar, sfmt, ap)
     void    (*addchar)();
-    char   *sfmt;
+    const char   *sfmt;
     va_list ap;
 {
-    register char *f, *bp;
+    register char *bp;
+    register const char *f;
     register Char *Bp;
     register long l;
     register unsigned long u;
@@ -360,19 +361,19 @@ int
 fprintf(FILE *fp, const char* fmt, ...)
 #else
 fprintf(va_alist)
+    va_dcl
 #endif
-va_dcl
 {
     va_list va;
 #if __STDC__
     va_start(va, fmt);
 #else
     FILE *fp;
-    char   *fmt;
+    const char   *fmt;
 
     va_start(va);
     fp = va_arg(va, FILE *);
-    fmt = va_arg(va, char *);
+    fmt = va_arg(va, const char *);
 #endif
     doprnt(xputchar, fmt, va);
     va_end(va);
@@ -382,7 +383,7 @@ va_dcl
 int 
 vfprintf(fp, fmt, va)
     FILE *fp;
-    char   *fmt;
+    const char   *fmt;
     va_list va;
 {
     doprnt(xputchar, fmt, va);

@@ -580,3 +580,23 @@ CONFIG	:	config.sysv4
 ENVIRON	:	n/a
 NOTES	:	Use /usr/bin/cc, not /usr/ucb/cc.
 VERSION	:	6.00.03
+
+VENDOR	:	ibm & compatible
+MODELS	:	i386, i486
+COMPILER:	cc
+CFLAGS	:	production
+LIBES	:	-lterm
+OS	:	Coherent 4.0
+CONFIG	:	config.coh386
+ENVIRON	:	gnu tools (see below)
+NOTES	:	The standard make, /bin/sh and sed that come with Coherent are
+NOTES	:	not quite up to the makefile.  Either use gnu make or change 
+NOTES	:	occurances of '# to '\# since Coherent's make takes all '#'s to
+NOTES	:	be a comment, even when quoted, except when escaped by '\'.
+NOTES	:	Coherent's /bin/sh does not allow you to set VERSION, etc.
+NOTES	:	since they are hard-wired internal variables.  Either use 
+NOTES	:	/usr/bin/ksh, another sh or change the name of the offending
+NOTES	:	variables.  Coherent's sed, unfortunately, is broken beyond a
+NOTES	:	workaround.  Either get gnu sed or run that portion of the
+NOTES	:	makefile on a machine with a full sed and import the output.
+VERSION	:	6.02.08

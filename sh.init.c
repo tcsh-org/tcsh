@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.init.c,v 3.19 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.init.c,v 3.20 1992/10/10 18:17:34 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.19 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.20 1992/10/10 18:17:34 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -775,8 +775,8 @@ struct	mesg mesg[] = {
 #  undef  _sigextra_
 # endif /* _sigextra_ */
 
-#ifdef _VMS_POSIX
-# define _sigextra_
+# ifdef _VMS_POSIX
+#  define _sigextra_
 /* 16 */	0,		"Signal 16",
 /* 17 */	0,		"Signal 17",
 /* 18 */	"USR1",		"User defined signal 1",
@@ -788,7 +788,7 @@ struct	mesg mesg[] = {
 /* 24 */	"TTIN", 	MSG_TTIN,
 /* 25 */	"TTOU", 	MSG_TTOU,
 /* 26 */        "DEBUG",        "Signaling SS$_DEBUG", 
-#else /* BSD */
+# else /* BSD */
 /* 16 */	"URG",		"Urgent condition on IO channel",
 /* 17 */	"STOP",		MSG_STOP,
 /* 18 */	"TSTP",		MSG_TSTP,
@@ -801,34 +801,40 @@ struct	mesg mesg[] = {
 /* 25 */	"XFSZ", 	"Filesize limit exceeded",
 /* 26 */	"VTALRM", 	"Virtual time alarm",
 /* 27 */	"PROF",		"Profiling time alarm",
-#endif /* _VMS_POSIX */
+# endif /* _VMS_POSIX */
 
-# if defined(RENO) || defined(BSD4_4)
-# define _sigextra_
+# ifndef _sigextra_
+#  if defined(RENO) || defined(BSD4_4)
+#   define _sigextra_
 /* 28 */	"WINCH",	"Window size changed",
 /* 29 */	"INFO",		"Information request",
 /* 30 */	"USR1",		"User defined signal 1",
 /* 31 */	"USR2",		"User defined signal 2",
 /* 32 */	0,		"Signal 32",
-# endif /* RENO || BSD4_4 */
+#  endif /* RENO || BSD4_4 */
+# endif /* !_sigextra_ */
 
-# if (defined(SUNOS4) || defined(ultrix) || defined(hp9000) || defined(convex) || defined(__convex__)) && !defined(_sigextra_)
-#  define _sigextra_
+# ifndef _sigextra_
+#  if defined(SUNOS4) || defined(ultrix) || defined(hp9000) || defined(convex)
+#   define _sigextra_
 /* 28 */	"WINCH", 	"Window changed",
 /* 29 */	"LOST",		"Resource lost",
 /* 30 */	"USR1",		"User signal 1",
 /* 31 */	"USR2",		"User signal 2",
 /* 32 */	0,		"Signal 32",
-# endif /* various */
+#  endif /* SUNOS4 || ultrix || hp9000 || convex */
+# endif /* !_sigextra_ */
 
-# ifdef pyr
-#  define _sigextra_
+# ifndef _sigextra_
+#  ifdef pyr
+#   define _sigextra_
 /* 28 */	"USR1",		"User signal 1",
 /* 29 */	"USR2",		"User signal 2",
 /* 30 */	"PWR",		"Power failure",
 /* 31 */	0,		"Signal 31",
 /* 32 */	0,		"Signal 32",
-# endif /* pyr */
+#  endif /* pyr */
+# endif /* !_sigextra_ */
 
 # ifndef _sigextra_
 /* 28 */	"WINCH",	"Window size changed",

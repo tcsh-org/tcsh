@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/pathnames.h,v 3.8 1992/06/16 20:46:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/pathnames.h,v 3.9 1992/10/05 02:41:30 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -45,7 +45,7 @@
 # define _PATH_LOCAL		"/usr/lbin"
 #endif /* _CRAYCOM && !_PATH_LOCAL */
 
-#if defined(convex) || defined(__convex__) || defined(stellar) || defined(INTEL)
+#if defined(convex) || defined(stellar) || defined(INTEL)
 # ifndef _PATH_DOTLOGIN
 #  define _PATH_DOTLOGIN	"/etc/login"
 # endif /* !_PATH_DOTLOGIN */
@@ -55,7 +55,7 @@
 # ifndef _PATH_DOTCSHRC
 #  define _PATH_DOTCSHRC	"/etc/cshrc"
 # endif /* !_PATH_DOTCSHRC */
-#endif /* convex || __convex__ || stellar || INTEL */
+#endif /* convex || stellar || INTEL */
 
 #ifdef NeXT
 # ifndef _PATH_DOTLOGIN

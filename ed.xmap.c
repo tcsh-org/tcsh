@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.xmap.c,v 3.7 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.xmap.c,v 3.8 1992/07/06 15:26:18 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.7 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.8 1992/07/06 15:26:18 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -271,14 +271,27 @@ TryNode(ptr, string, val, ntype)
 	    PutFreeNode(ptr->next);	/* lose longer Xkeys with this prefix */
 	    ptr->next = NULL;
 	}
+
+	switch (ptr->type) {
+	case XK_STR:
+	case XK_EXE:
+	    if (ptr->val.str != NULL)
+		xfree((ptr_t) ptr->val.str);
+	    break;
+	case XK_NOD:
+	case XK_CMD:
+	    break;
+	default:
+	    abort();
+	    break;
+	}
+
 	switch (ptr->type = ntype) {
 	case XK_CMD:
 	    ptr->val = *val;
 	    break;
 	case XK_STR:
 	case XK_EXE:
-	    if (ptr->val.str)
-		xfree((ptr_t) ptr->val.str);
 	    ptr->val.str = Strsave(val->str);
 	    break;
 	default:

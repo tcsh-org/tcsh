@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.err.c,v 3.13 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.err.c,v 3.14 1992/10/05 02:41:30 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.13 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.14 1992/10/05 02:41:30 christos Exp $")
 
 /*
  * C Shell
@@ -313,11 +313,11 @@ static char *errorlist[] =
 #ifdef apollo
     "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX -Dname[=value] ] [ argument ... ]",
 #else /* !apollo */
-# if defined(__convex__) || defined(convex)
+# ifdef convex
     "Unknown option: -%s\nUsage: tcsh [ -bcdefFilmnqstvVxX ] [ argument ... ]",
 # else /* rest */
     "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]",
-# endif /* __convex__ || convex */
+# endif /* convex */
 #endif /* apollo */
 #define ERR_COMPCOM	125
     "Illegal completion: \"%s\"",

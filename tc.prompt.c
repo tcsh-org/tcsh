@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.prompt.c,v 3.14 1992/07/23 14:42:29 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.prompt.c,v 3.15 1992/09/18 20:56:35 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.14 1992/07/23 14:42:29 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.15 1992/09/18 20:56:35 christos Exp $")
 
 #include "ed.h"
 
@@ -333,7 +333,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 
 			/* RWM - if *q == '~' and *z != '~' then print */
 			/*       out the '~' ahead of the partial path */
-			if ((*q == '~') && (*z != '~'))
+			if (pdirs && (*q == '~') && (*z != '~'))
 			    *p++ = attributes | '~';
 			
 			/* RWM - tell you how many dirs we've ignored */

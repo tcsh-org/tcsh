@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exec.c,v 3.18 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exec.c,v 3.19 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.18 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.19 1992/10/05 02:41:30 christos Exp christos $")
 
 #include "tc.h"
 #include "tw.h"
@@ -132,7 +132,7 @@ static char xhash[HSHSIZ / BITS_PER_BYTE];
 
 #ifdef VFORK
 static int hits, misses;
-#endif
+#endif /* VFORK */
 
 /* Dummy search path for just absolute search when no path */
 static Char *justabs[] = {STRNULL, 0};
@@ -177,7 +177,7 @@ doexec(t)
     expath = Strsave(pv[0]);
 #ifdef VFORK
     Vexpath = expath;
-#endif
+#endif /* VFORK */
 
     v = adrof(STRpath);
     if (v == 0 && expath[0] != '/') {
@@ -236,10 +236,10 @@ doexec(t)
      */
 #ifdef BSDSIGS
     (void) sigsetmask((sigmask_t) 0);
-#else				/* BSDSIGS */
+#else /* BSDSIGS */
     (void) sigrelse(SIGINT);
     (void) sigrelse(SIGCHLD);
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
 
     /*
      * If no path, no words in path, or a / in the filename then restrict the
@@ -252,13 +252,13 @@ doexec(t)
     sav = Strspl(STRslash, *av);/* / command name for postpending */
 #ifdef VFORK
     Vsav = sav;
-#endif
+#endif /* VFORK */
     hashval = havhash ? hashname(*av) : 0;
 
     i = 0;
 #ifdef VFORK
     hits++;
-#endif
+#endif /* VFORK */
     do {
 	/*
 	 * Try to save time by looking at the hash table for where this command
@@ -277,31 +277,75 @@ doexec(t)
 #endif /* FASTHASH */
 	}
 	if (pv[0][0] == 0 || eq(pv[0], STRdot))	/* don't make ./xxx */
+	{
+
+#ifdef COHERENT
+	    if (t->t_dflg & F_AMPERSAND) {
+# ifdef JOBDEBUG
+    	        xprintf("set SIGINT to SIG_IGN\n");
+    	        xprintf("set SIGQUIT to SIG_DFL\n");
+# endif /* JOBDEBUG */
+    	        (void) signal(SIGINT,SIG_IGN); /* may not be necessary */
+	        (void) signal(SIGQUIT,SIG_DFL);
+	    }
+
+	    if (gointr && eq(gointr, STRminus) {
+# ifdef JOBDEBUG
+    	        xprintf("set SIGINT to SIG_IGN\n");
+    	        xprintf("set SIGQUIT to SIG_IGN\n");
+# endif /* JOBDEBUG */
+    	        (void) signal(SIGINT,SIG_IGN); /* may not be necessary */
+	        (void) signal(SIGQUIT,SIG_IGN);
+	    }
+#endif /* COHERENT */
+
 	    texec(*av, av);
+}
 	else {
 	    dp = Strspl(*pv, sav);
 #ifdef VFORK
 	    Vdp = dp;
-#endif
+#endif /* VFORK */
+
+#ifdef COHERENT
+	    if ((t->t_dflg & F_AMPERSAND)) {
+# ifdef JOBDEBUG
+    	        xprintf("set SIGINT to SIG_IGN\n");
+# endif /* JOBDEBUG */
+		/* 
+		 * this is necessary on Coherent or all background 
+		 * jobs are killed by CTRL-C 
+		 * (there must be a better fix for this) 
+		 */
+    	        (void) signal(SIGINT,SIG_IGN); 
+	    }
+	    if (gointr && eq(gointr,STRminus)) {
+# ifdef JOBDEBUG
+    	        xprintf("set SIGINT to SIG_IGN\n");
+    	        xprintf("set SIGQUIT to SIG_IGN\n");
+# endif /* JOBDEBUG */
+    	        (void) signal(SIGINT,SIG_IGN); /* may not be necessary */
+	        (void) signal(SIGQUIT,SIG_IGN);
+	    }
+#endif /* COHERENT */
+
 	    texec(dp, av);
 #ifdef VFORK
 	    Vdp = 0;
-#endif
+#endif /* VFORK */
 	    xfree((ptr_t) dp);
 	}
 #ifdef VFORK
 	misses++;
-#endif
+#endif /* VFORK */
 cont:
 	pv++;
 	i++;
     } while (*pv);
 #ifdef VFORK
     hits--;
-#endif
-#ifdef VFORK
     Vsav = 0;
-#endif
+#endif /* VFORK */
     xfree((ptr_t) sav);
     pexerr();
 }
@@ -314,7 +358,7 @@ pexerr()
 	setname(short2str(expath));
 #ifdef VFORK
 	Vexpath = 0;
-#endif
+#endif /* VFORK */
 	xfree((ptr_t) expath);
 	expath = 0;
     }
@@ -349,7 +393,7 @@ texec(sf, st)
     f = short2str(sf);
 #ifdef VFORK
     Vt = t;
-#endif
+#endif /* VFORK */
     errno = 0;			/* don't use a previous error */
 #ifdef apollo
     /*
@@ -362,11 +406,11 @@ texec(sf, st)
 	    errno = EISDIR;
     }
     if (errno == 0)
-#endif
+#endif /* apollo */
     (void) execv(f, t);
 #ifdef VFORK
     Vt = 0;
-#endif
+#endif /* VFORK */
     blkfree((Char **) t);
     switch (errno) {
 
@@ -437,11 +481,11 @@ texec(sf, st)
 	blkfree((Char **) vp);
 #ifdef VFORK
 	Vt = t;
-#endif
+#endif /* VFORK */
 	(void) execv(f, t);
 #ifdef VFORK
 	Vt = 0;
-#endif
+#endif /* VFORK */
 	blkfree((Char **) t);
 	/* The sky is falling, the sky is falling! */
 	stderror(ERR_SYSTEM, f, strerror(errno));
@@ -453,7 +497,7 @@ texec(sf, st)
 
 #ifdef _IBMR2
     case 0:			/* execv fails and returns 0! */
-#endif				/* _IBMR2 */
+#endif /* _IBMR2 */
     case ENOENT:
 	break;
 
@@ -465,7 +509,7 @@ texec(sf, st)
 	    expath = Strsave(sf);
 #ifdef VFORK
 	    Vexpath = expath;
-#endif
+#endif /* VFORK */
 	}
 	break;
     }
@@ -702,7 +746,7 @@ hashstat(v, c)
 	      hits, misses, 100 * hits / (hits + misses));
 }
 
-#endif
+#endif /* VFORK */
 
 /*
  * Hash a command name.

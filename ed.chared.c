@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.29 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.30 1992/10/10 18:17:34 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.29 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.30 1992/10/10 18:17:34 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2408,6 +2408,7 @@ v_action(c)
     }
 #endif
 }
+
 #ifdef COMMENT
 /* by: Brian Allison <uiucdcs!convex!allison@RUTGERS.EDU> */
 static void
@@ -2427,7 +2428,7 @@ c_get_word(begin, end)
 	*begin = ++cp;
     }
 }
-#endif				/* COMMENT */
+#endif /* COMMENT */
 
 /*ARGSUSED*/
 CCRETVAL

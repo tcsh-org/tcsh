@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.36 1992/10/05 02:41:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.37 1992/10/10 18:17:34 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -165,9 +165,9 @@ struct ucred {
 # endif /* INTEL || att || isc || sco */
 #endif /* !linux && !_VMS_POSIX */
 
-#ifdef UNIXPC
+#if defined(UNIXPC) || defined(COHERENT)
 # define NEEDgethostname
-#endif /* UNIXPC */
+#endif /* UNIXPC || COHERENT */
 
 #ifdef IRIS4D
 # include <sys/time.h>
@@ -609,7 +609,7 @@ extern void bcopy	__P((char *, char *, int));
 # define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
 #endif
 
-#if !defined(hpux) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(__386BSD__) && !defined(memmove)
+#if !defined(hpux) && !defined(COHERENT) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(__386BSD__) && !defined(memmove)
 # define NEEDmemmove
 #endif
 

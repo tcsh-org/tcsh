@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.c,v 3.11 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.c,v 3.12 1992/10/05 02:41:30 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.11 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.12 1992/10/05 02:41:30 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -54,23 +54,23 @@ static struct mysigstack {
 static int stk_ptr = -1;
 
 
-#ifdef UNRELSIGS
+# ifdef UNRELSIGS
 /* queue child signals
  */
 static sigret_t
 sig_ch_queue()
 {
-#ifdef JOBDEBUG
+#  ifdef JOBDEBUG
     xprintf("queue SIGCHLD\n");
     flush();
-#endif /* JOBDEBUG */
+#  endif /* JOBDEBUG */
     stk_ptr++;
     stk[stk_ptr].s_pid = (pid_t) wait(&stk[stk_ptr].s_w);
     stk[stk_ptr].s_errno = errno;
     (void) signal(SIGCHLD, sig_ch_queue);
-#ifndef SIGVOID
+#  ifndef SIGVOID
     return(0);
-#endif /* SIGVOID */
+#  endif /* SIGVOID */
 }
 
 /* process all awaiting child signals
@@ -80,18 +80,19 @@ sig_ch_rel()
 {
     while (stk_ptr > -1)
 	pchild(SIGCHLD);
-#ifdef JOBDEBUG
+#  ifdef JOBDEBUG
     xprintf("signal(SIGCHLD, pchild);\n");
-#endif /* JOBDEBUG */
+#  endif /* JOBDEBUG */
     (void) signal(SIGCHLD, pchild);
-#ifndef SIGVOID
+#  ifndef SIGVOID
     return(0);
-#endif /* SIGVOID */
+#  endif /* SIGVOID */
 }
+
 
 /* libc.a contains these functions in SYSVREL >= 3. */
 sigret_t
-(*sigset(a, b)) ()
+(*xsigset(a, b)) ()
     int     a;
     sigret_t  (*b) __P((int));
 {
@@ -109,36 +110,30 @@ sigrelse(what)
     if (what == SIGCHLD)
 	sig_ch_rel();
 
-#ifdef notdef	/* XXX: Should not need that when compiled with SYSVREL=1 */
-# ifdef UNIXPC	
-    if (what == SIGINT)
-    	(void)signal(SIGINT, pintr);
-# endif
-#endif
+#  ifdef COHERENT
+    (void) signal(what, what == SIGINT ? pintr : SIG_DFL);
+#  endif /* COHERENT */
 }
 
 /* hold signal
  * only works with child and interrupt
  */
 void
-sighold(what)
+xsighold(what)
     int     what;
 {
     if (what == SIGCHLD)
 	(void) signal(SIGCHLD, sig_ch_queue);
 
-#ifdef notdef	/* XXX: Should not need that when compiled with SYSVREL=1 */
-# ifdef UNIXPC	
-    if (what == SIGINT)
-    	(void)signal(SIGINT, SIG_IGN);
-# endif
-#endif
+#  ifdef COHERENT
+    (void) signal(what, SIG_IGN);
+#  endif /* COHERENT */
 }
 
 /* ignore signal
  */
 void
-sigignore(a)
+xsigignore(a)
     int     a;
 {
     (void) signal(a, SIG_IGN);
@@ -147,28 +142,63 @@ sigignore(a)
 /* atomically release one signal
  */
 void
-sigpause(what)
+xsigpause(what)
     int     what;
 {
-#ifdef notdef
-    if (what == SIGCHLD) {
-	if (stk_ptr > -1) {
-	    pchild(SIGCHLD);
-	}
-	else {
-	    (void) sleep(1);
-	}
-    }
-#endif
     /* From: Jim Mattson <mattson%cs@ucsd.edu> */
     if (what == SIGCHLD)
 	pchild(SIGCHLD);
-
 }
 
-#endif /* UNRELSIGS */
 
-#ifdef SXA
+/* return either awaiting processes or do a wait now
+ */
+pid_t
+ourwait(w)
+    int    *w;
+{
+    pid_t pid;
+
+#  ifdef JOBDEBUG
+    xprintf("our wait %d\n", stk_ptr);
+    flush();
+#  endif /* JOBDEBUG */
+
+    if (stk_ptr == -1) {
+	/* stack empty return signal from stack */
+	pid = (pid_t) wait(w);
+#  ifdef JOBDEBUG
+	xprintf("signal(SIGCHLD, pchild);\n");
+#  endif /* JOBDEBUG */
+	(void) signal(SIGCHLD, pchild);
+	return (pid);
+    }
+    else {
+	/* return signal from stack */
+	errno = stk[stk_ptr].s_errno;
+	*w = stk[stk_ptr].s_w;
+	stk_ptr--;
+	return (stk[stk_ptr + 1].s_pid);
+    }
+} /* end ourwait */
+
+#  ifdef COHERENT
+#   undef signal
+sigret_t
+(*xsignal(a, b)) ()
+    int     a;
+    sigret_t  (*b) __P((int));
+{
+    if (a == SIGCHLD)
+	return SIG_DFL;
+    else
+	return (signal(a, b));
+}
+#  endif /* COHERENT */
+
+# endif /* UNRELSIGS */
+
+# ifdef SXA
 /*
  * SX/A is SYSVREL3 but does not have sys5-sigpause().
  * I've heard that sigpause() is not defined in SYSVREL3.
@@ -188,41 +218,9 @@ sigpause(what)
 	pause();
     }
 }
+# endif /* SXA */
 
-#endif /* SXA */
-
-/* return either awaiting processes or do a wait now
- */
-pid_t
-ourwait(w)
-    int    *w;
-{
-    pid_t pid;
-
-#ifdef JOBDEBUG
-    xprintf("our wait %d\n", stk_ptr);
-    flush();
-#endif /* JOBDEBUG */
-
-    if (stk_ptr == -1) {
-	/* stack empty return signal from stack */
-	pid = (pid_t) wait(w);
-#ifdef JOBDEBUG
-	xprintf("signal(SIGCHLD, pchild);\n");
-#endif /* JOBDEBUG */
-	(void) signal(SIGCHLD, pchild);
-	return (pid);
-    }
-    else {
-	/* return signal from stack */
-	errno = stk[stk_ptr].s_errno;
-	*w = stk[stk_ptr].s_w;
-	stk_ptr--;
-	return (stk[stk_ptr + 1].s_pid);
-    }
-} /* end ourwait */
-
-#endif /* BSDSIGS */
+#endif /* !BSDSIGS */
 
 #ifdef NEEDsignal
 /* turn into bsd signals */
@@ -238,10 +236,10 @@ sigret_t(*
     sv.sv_handler = a;
 #ifdef SIG_STK
     sv.sv_onstack = SIG_STK;
-#endif
+#endif /* SIG_STK */
 #ifdef SV_BSDSIG
     sv.sv_flags = SV_BSDSIG;
-#endif
+#endif /* SV_BSDSIG */
 
     if (mysigvec(s, &sv, NULL) < 0)
 	return (BADSIG);
@@ -264,11 +262,11 @@ extern int errno;
 
 #ifdef DEBUG
 # define SHOW_SIGNALS	1	/* to assist in debugging signals */
-#endif
+#endif /* DEBUG */
 
 #ifdef SHOW_SIGNALS
 char   *show_sig_mask();
-#endif
+#endif /* SHOW_SIGNALS */
 
 int     debug_signals = 0;
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.36 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.37 1992/10/10 18:17:34 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.36 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: sh.c,v 3.37 1992/10/10 18:17:34 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -89,9 +89,9 @@ int do_logout;
 #endif				/* TESLA */
 
 
-#if defined(convex) || defined(__convex__)
+#ifdef convex
 bool    use_fork = 0;		/* use fork() instead of vfork()? */
-#endif
+#endif /* convex */
 
 static int     nofile = 0;
 static bool    reenter = 0;
@@ -188,6 +188,8 @@ main(argc, argv)
     HISTSUB = '^';
     word_chars = STR_WORD_CHARS;
     bslash_quote = 0;		/* PWP: do tcsh-style backslash quoting? */
+
+    set(STRhistory, SAVE("100"));	/* Default history size to 100 */
 
     tempv = argv;
     ffile = SAVE(tempv[0]);
@@ -558,8 +560,18 @@ main(argc, argv)
 #else				/* BSDSIGS */
     parintr = signal(SIGINT, SIG_IGN);	/* parents interruptibility */
     (void) sigset(SIGINT, parintr);	/* ... restore */
+
+# ifdef COHERENT
+    if (loginsh) /* it seems that SIGTERM is always set to SIG_IGN by */
+                 /* init/getty so it should be set to SIG_DFL - there may be */
+                 /* a better fix for this. */
+         parterm = SIG_DFL;
+    else
+# else /* !COHERENT */
     parterm = signal(SIGTERM, SIG_IGN);	/* parents terminability */
+# endif /* COHERENT */
     (void) sigset(SIGTERM, parterm);	/* ... restore */
+
 #endif /* BSDSIGS */
 
     /* No reason I can see not to save history on all these events..
@@ -716,7 +728,7 @@ main(argc, argv)
 		setNS(STRecho);	/* NOW! */
 		break;
 
-#if defined(__convex__) || defined(convex)
+#ifdef convex
 	    case 'F':		/* Undocumented flag */
 		/*
 		 * This will cause children to be created using fork instead of
@@ -724,7 +736,7 @@ main(argc, argv)
 		 */
 		use_fork = 1;
 		break;
-#endif
+#endif /* convex */
 	    default:		/* Unknown command option */
 		exiterr = 1;
 		stderror(ERR_TCSHUSAGE, tcp-1);

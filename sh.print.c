@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.print.c,v 3.2 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.print.c,v 3.3 1992/08/14 13:56:09 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.2 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.3 1992/08/14 13:56:09 christos Exp $")
 
 #include "ed.h"
 
@@ -52,7 +52,7 @@ static	void	p2dig	__P((int));
  * C Shell
  */
 
-#ifdef RLIMIT_CPU
+#ifdef BSDLIMIT
 void
 psecs(l)
     long    l;

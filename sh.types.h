@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.types.h,v 3.24 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.types.h,v 3.25 1992/10/10 18:17:34 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -149,9 +149,9 @@ extern char *sbrk();
 #endif
 #endif /* __hpux */
 
-#if defined(_MINIX) || defined(__EMX__)
+#if defined(_MINIX) || defined(__EMX__) || defined(COHERENT)
 typedef char * caddr_t;
-#endif /* _MINIX || __EMX__ */
+#endif /* _MINIX || __EMX__ || COHERENT */
 
 /***
  *** hp9000s500 running hpux-5.2
@@ -440,11 +440,11 @@ typedef char * caddr_t;
 /*
  * Convex
  */
-#if defined(convex) || defined(__convex__)
+#ifdef convex
 # if defined(__SIZE_T) && !defined(_SIZE_T)
 #  define _SIZE_T
 # endif /* __SIZE_T && !_SIZE_T */
-#endif /* convex || __convex__ */
+#endif /* convex */
 
 /*
  * Alliant FX-2800/FX-80

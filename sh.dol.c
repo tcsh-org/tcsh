@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dol.c,v 3.16 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dol.c,v 3.17 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.16 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.17 1992/10/05 02:41:30 christos Exp christos $")
 
 /*
  * C shell
@@ -462,7 +462,17 @@ Dgetdol()
 	setDolp(doldol);
 	goto eatbrac;
 
-    case '<' | QUOTE:
+#ifdef COHERENT
+    /* Coherent compiler doesn't allow case-labels that are not 
+       constant-expressions */
+#ifdef SHORT_STRINGS
+    case 0100074:
+#else /* !SHORT_STRINGS */
+    case 0274:
+#endif
+#else /* !COHERENT */
+    case '<'|QUOTE:
+#endif
 	if (bitset)
 	    stderror(ERR_NOTALLOWED, "$?<");
 	if (dimen)
