@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.55 1995/01/20 23:52:38 christos Exp $
+/**/# $Id: Imakefile,v 1.56 1995/01/20 23:55:01 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.05
 /**/# Marc Horowitz, MIT SIPB
@@ -66,6 +66,7 @@ ones.  Please send in your fixes and additions! */
 #      define ConfigH sunos41
 #     endif
 #    endif
+#    define NoCombineRegs
 #   else /* OSMajorVersion == 5 */
 #    if (OSMinorVersion < 3)
 #     if (OSMinorVersion < 2)
@@ -79,8 +80,8 @@ ones.  Please send in your fixes and additions! */
 #     else
 #      define ConfigH sol24
 #     endif
-#     define NoCombineRegs
 #    endif
+#    define NoCombineRegs
 #   endif
 #  endif
 # endif

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.glob.c,v 3.35 1993/11/13 01:27:11 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.glob.c,v 3.36 1995/01/20 23:48:56 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.35 1993/11/13 01:27:11 christos Exp christos $")
+RCSID("$Id: sh.glob.c,v 3.36 1995/01/20 23:48:56 christos Exp $")
 
 #include "tc.h"
 
@@ -439,7 +439,7 @@ handleone(str, vl, action)
     int     action;
 {
 
-    Char   *cp, **vlp = vl;
+    Char   **vlp = vl;
     int chars;
     Char **t, *p, *strp;
 
