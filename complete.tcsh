@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.1 1992/02/21 23:34:59 christos Exp $
+# $Id: complete.tcsh,v 1.4 1992/03/27 01:59:46 christos Exp $
 # example file using the new completion code
 #
 
@@ -55,7 +55,6 @@ if ($?complete) then
     complete unsetenv 	'p/1/e/'
     complete alias 	'p/1/a/'		# only aliases are valid
     complete unalias 	'p/1/a/'
-    complete finger 	'c/*/u/'		# Only usernames
     complete xdvi 	'n/*/f:*.dvi/'		# Only files that match *.dvi
     complete dvips 	'n/*/f:*.dvi/'
     complete latex 	'n/*/f:*.tex/'
@@ -126,13 +125,16 @@ if ($?complete) then
     complete limit	'c/-/(h)/' 'n/*/l/'
     complete unlimit	'c/-/(h)/' 'n/*/l/'
 
-    complete co*	'p/0/(compress)/'	# make compress completion
+    complete -co*	'p/0/(compress)/'	# make compress completion
 						# not ambiguous
     complete zcat	'n/*/f:*.Z/'
     complete nm		'n/*/f:^*.{h,C,c,cc}/'
 
     complete rcp 'c/*:/f/' 'p/1/$hosts/:'
     complete finger 'c/*@/$hosts/' 'p/1/u/@' 
+    complete talk 'p/1/`users | tr " " "\012" | uniq`/' \
+		  'n/*/`who | grep $:1 | cut -d" " -f2`/'
+
 
     unset complete
 endif
