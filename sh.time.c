@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.time.c,v 3.26 2004/08/04 17:12:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.time.c,v 3.27 2005/01/05 16:06:14 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.26 2004/08/04 17:12:30 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.27 2005/01/05 16:06:14 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -187,6 +187,7 @@ ruadd(ru, ru2)
 {
     tvadd(&ru->ru_utime, &ru2->ru_utime);
     tvadd(&ru->ru_stime, &ru2->ru_stime);
+#ifndef _OSD_POSIX
     if (ru2->ru_maxrss > ru->ru_maxrss)
 	ru->ru_maxrss =	ru2->ru_maxrss;
 
@@ -203,6 +204,7 @@ ruadd(ru, ru2)
     ru->ru_nsignals += ru2->ru_nsignals;
     ru->ru_nvcsw += ru2->ru_nvcsw;
     ru->ru_nivcsw += ru2->ru_nivcsw;
+#endif /*bs2000*/
 
 # ifdef	convex
     tvadd(&ru->ru_exutime, &ru2->ru_exutime);
@@ -461,7 +463,11 @@ prusage(bs, es,	e, b)
 
 #ifdef BSDTIMES
 	    case 'W':		/* number of swaps */
+#ifdef _OSD_POSIX
+		i = 0;
+#else
 		i = r1->ru_nswap - r0->ru_nswap;
+#endif
 		xprintf("%ld", i);
 		break;
  
@@ -495,20 +501,32 @@ prusage(bs, es,	e, b)
 		break;
 #else /* !convex */
 	    case 'X':		/* (average) shared text size */
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", t == 0 ?	0L :
 			IADJUST(r1->ru_ixrss - r0->ru_ixrss) / t);
+#endif
 		break;
 
 	    case 'D':		/* (average) unshared data size	*/
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", t == 0 ?	0L :
 			IADJUST(r1->ru_idrss + r1->ru_isrss -
 				(r0->ru_idrss +	r0->ru_isrss)) / t);
+#endif
 		break;
 
 	    case 'K':		/* (average) total data	memory used  */
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", t == 0 ?	0L :
 			IADJUST((r1->ru_ixrss +	r1->ru_isrss + r1->ru_idrss) -
 			   (r0->ru_ixrss + r0->ru_idrss	+ r0->ru_isrss)) / t);
+#endif
 		break;
 #endif /* convex */
 	    case 'M':		/* max.	Resident Set Size */
@@ -518,25 +536,45 @@ prusage(bs, es,	e, b)
 # ifdef	convex
 		xprintf("%ld", r1->ru_maxrss * 4L);
 # else /* !convex */
+#  ifdef _OSD_POSIX
+		xprintf("0",0);
+#  else
 		xprintf("%ld", r1->ru_maxrss / 2L);
+#  endif
 # endif	/* convex */
 #endif /* SUNOS4 */
 		break;
 
 	    case 'F':		/* page	faults */
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", r1->ru_majflt - r0->ru_majflt);
+#endif
 		break;
 
 	    case 'R':		/* page	reclaims */
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", r1->ru_minflt - r0->ru_minflt);
+#endif
 		break;
 
 	    case 'I':		/* FS blocks in	*/
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", r1->ru_inblock -	r0->ru_inblock);
+#endif
 		break;
 
 	    case 'O':		/* FS blocks out */
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", r1->ru_oublock -	r0->ru_oublock);
+#endif
 		break;
 
 # ifdef	convex
@@ -550,23 +588,43 @@ prusage(bs, es,	e, b)
 		break;
 # endif	/* convex */
 	    case 'r':		/* PWP:	socket messages	recieved */
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", r1->ru_msgrcv - r0->ru_msgrcv);
+#endif
 		break;
 
 	    case 's':		/* PWP:	socket messages	sent */
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", r1->ru_msgsnd - r0->ru_msgsnd);
+#endif
 		break;
 
 	    case 'k':		/* PWP:	signals	received */
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", r1->ru_nsignals - r0->ru_nsignals);
+#endif
 		break;
 
 	    case 'w':		/* PWP:	voluntary context switches (waits) */
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", r1->ru_nvcsw - r0->ru_nvcsw);
+#endif
 		break;
 
 	    case 'c':		/* PWP:	involuntary context switches */
+#ifdef _OSD_POSIX
+		xprintf("0",0);
+#else
 		xprintf("%ld", r1->ru_nivcsw - r0->ru_nivcsw);
+#endif
 		break;
 #else /* BSDTIMES */
 # ifdef	_SEQUENT_

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.93 2005/01/05 16:06:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.94 2005/01/18 20:24:51 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -454,7 +454,7 @@ typedef struct timeval timeval_t;
 #endif /* NeXT */
 
 #if !defined(BSD4_4) && !defined(__linux__) && !defined(__GNU__) && !defined(__GLIBC__) && !defined(__hpux) && \
-    !defined(sgi) && !defined(_AIX) && !defined(__CYGWIN__)
+    !defined(sgi) && !defined(_AIX) && !defined(__CYGWIN__) && !defined(_OSD_POSIX)
 #ifdef HAVE_GETHOSTNAME
 extern int gethostname __P((char *, int));
 #endif /* HAVE_GETHOSTNAME */

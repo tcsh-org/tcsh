@@ -1,3 +1,5 @@
+ 66. Handle delay in termcap entries (Martin Kraemer)
+ 65. EBCDIC and BS2000 fixes (Martin Kraemer)
  64. Avoid the SCCS percent-S-percent sequence differently (Kimmo Suominen)
  63. Mark position update fixes (Martin Kraemer)
  62. Define BSDLIMIT and BSDTIMES for Cygwin (Corinna Vinschen)

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.char.h,v 3.24 2005/01/05 16:06:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.char.h,v 3.25 2005/01/05 17:54:03 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -89,28 +89,18 @@ extern tcshuc _cmap_lower[], _cmap_upper[];
 #define _CTR	0x4000		/* control */
 #define _PUN	0x8000		/* punctuation */
 
-#ifdef WIDE_STRINGS
-#  define ASC(ch) ch
-#  define CTL_ESC(ch) ch
-#  define cmap(c, bits)	\
-	(((c) & QUOTE) || (c) >= 0x0080 ? 0 : (_cmap[(tcshuc)(c)] & (bits)))
-#elif defined(SHORT_STRINGS) && defined(KANJI)
+#ifdef IS_ASCII
 # define ASC(ch) ch
 # define CTL_ESC(ch) ch
-# define cmap(c, bits) \
-	((((c) & QUOTE) || ((c & 0x80) && adrof(STRnokanji))) ? \
-	0 : (_cmap[(tcshuc)(c)] & (bits)))
-#else /* SHORT_STRINGS && KANJI */
-# ifdef IS_ASCII
-#  define ASC(ch) ch
-#  define CTL_ESC(ch) ch
-#  define cmap(c, bits)	\
-	(((c) & QUOTE) ? 0 : (_cmap[(tcshuc)(c)] & (bits)))
-# else /* IS_ASCII */
+#else
+# ifdef _OSD_POSIX
 /* "BS2000 OSD" is a POSIX on a main frame using a EBCDIC char set */
+#   include <ascii_ebcdic.h>
+# else
 /* "OS/390 USS" is a POSIX on a main frame using an IBM1047 char set */
-extern unsigned short _toascii[256];
-extern unsigned short _toebcdic[256];
+# endif
+  extern unsigned short _toascii[256];
+  extern unsigned short _toebcdic[256];
 
 /* mainly for comparisons if (ASC(ch)=='\177')... */
 #  define ASC(ch)     _toascii[(tcshuc)ch]
@@ -119,10 +109,18 @@ extern unsigned short _toebcdic[256];
  * for C-Escapes   ('\b'), the compiler already does it.
  */
 #  define CTL_ESC(ch) _toebcdic[(tcshuc)ch]
+#endif /*IS_ASCII*/
 
+#ifdef WIDE_STRINGS
+# define cmap(c, bits)	\
+	(((c) & QUOTE) || (c) >= 0x0080 ? 0 : (_cmap[(tcshuc)ASC(c)] & (bits)))
+#elif defined(SHORT_STRINGS) && defined(KANJI)
 #  define cmap(c, bits)	\
-	(((c) & QUOTE) ? 0 : (_cmap[_toascii[(tcshuc)(c)]] & (bits)))
-# endif /* IS_ASCII */
+	((((c) & QUOTE) || ((ASC(c) & 0x80) && adrof(STRnokanji))) ? \
+	0 : (_cmap[(tcshuc)ASC(c)] & (bits)))
+#else /* SHORT_STRINGS && KANJI */
+# define cmap(c, bits)	\
+	(((c) & QUOTE) ? 0 : (_cmap[(tcshuc)ASC(c)] & (bits)))
 #endif /* SHORT_STRINGS && KANJI */
 
 #define isglob(c)	cmap(c, _GLOB)
@@ -249,14 +247,8 @@ extern unsigned short _toebcdic[256];
 # define Isalpha(c)	(cmap(c,_LET) && !(((c) & META) && AsciiOnly))
 # define Islower(c)	(cmap(c,_DOW) && !(((c) & META) && AsciiOnly))
 # define Isupper(c)	(cmap(c, _UP) && !(((c) & META) && AsciiOnly))
-# ifdef IS_ASCII
-#  define Tolower(c)	(_cmap_lower[(tcshuc)(c)])
-#  define Toupper(c)	(_cmap_upper[(tcshuc)(c)])
-# else
-/* "BS2000 OSD" is a POSIX on a main frame using a EBCDIC char set */
-#  define Tolower(c)	(_cmap_lower[_toascii[(tcshuc)(c)]])
-#  define Toupper(c)	(_cmap_upper[_toascii[(tcshuc)(c)]])
-# endif
+# define Tolower(c)	(_cmap_lower[ASC(c)])
+# define Toupper(c)	(_cmap_upper[ASC(c)])
 # define Isxdigit(c)	cmap(c, _XD)
 # define Isalnum(c)	(cmap(c, _DIG|_LET) && !(((Char)(c) & META) && AsciiOnly))
 #if defined(DSPMBYTE)

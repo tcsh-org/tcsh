@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.122 2004/12/25 21:15:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.123 2005/01/18 20:14:03 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.122 2004/12/25 21:15:07 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.123 2005/01/18 20:14:03 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1743,6 +1743,9 @@ doumask(v, c)
 #ifndef HAVENOLIMIT
 # ifndef BSDLIMIT
    typedef long RLIM_TYPE;
+#  ifdef _OSD_POSIX /* BS2000 */
+#   include <ulimit.h>
+#  endif
 #  ifndef RLIM_INFINITY
 #   if !defined(_MINIX) && !defined(__clipper__) && !defined(_CRAY)
     extern RLIM_TYPE ulimit();
@@ -2116,6 +2119,12 @@ plim(lp, hard)
     if (limit == RLIM_INFINITY)
 	xprintf("unlimited");
     else
+# if defined(RLIMIT_CPU) && defined(_OSD_POSIX)
+    if (lp->limconst == RLIMIT_CPU &&
+        (unsigned long)limit >= 0x7ffffffdUL)
+	xprintf("unlimited");
+    else
+# endif
 # ifdef RLIMIT_CPU
     if (lp->limconst == RLIMIT_CPU)
 	psecs((long) limit);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.defns.c,v 3.40 2004/08/04 17:12:27 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.defns.c,v 3.41 2004/11/23 02:10:47 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.40 2004/08/04 17:12:27 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.41 2004/11/23 02:10:47 christos Exp $")
 
 #include "ed.h"
 
@@ -1826,8 +1826,8 @@ ed_InitNLSMaps()
     if (NoNLSRebind)
 	return;
     for (i = 0200; i <= 0377; i++) {
-	if (Isprint(i)) {
-	    CcKeyMap[i] = F_INSERT;
+	if (Isprint(CTL_ESC(i))) {
+	    CcKeyMap[CTL_ESC(i)] = F_INSERT;
 	}
     }
     NLSMapsAreInited = 1;
@@ -1842,13 +1842,13 @@ ed_InitMetaBindings()
     KEYCMD *map;
 
     map = CcKeyMap;
-    for (i = 0; i <= 0377 && CcKeyMap[i] != F_METANEXT; i++)
+    for (i = 0; i <= 0377 && CcKeyMap[CTL_ESC(i)] != F_METANEXT; i++)
 	continue;
     if (i > 0377) {
-	for (i = 0; i <= 0377 && CcAltMap[i] != F_METANEXT; i++)
+	for (i = 0; i <= 0377 && CcAltMap[CTL_ESC(i)] != F_METANEXT; i++)
 	    continue;
 	if (i > 0377) {
-	    i = CTL_ESC('\033');
+	    i = '\033';
 	    if (VImode)
 		map = CcAltMap;
 	}
@@ -1856,18 +1856,14 @@ ed_InitMetaBindings()
 	    map = CcAltMap;
 	}
     }
-    buf[0] = (Char) i;
+    buf[0] = (Char)CTL_ESC(i);
     buf[2] = 0;
     cstr.buf = buf;
     cstr.len = 2;
     for (i = 0200; i <= 0377; i++) {
-	if (map[i] != F_INSERT && map[i] != F_UNASSIGNED && map[i] != F_XKEY) {
-#ifdef IS_ASCII
-	    buf[1] = i & ASCII;
-#else
-	    buf[1] = _toebcdic[_toascii[i] & ASCII];
-#endif
-	    AddXkey(&cstr, XmapCmd((int) map[i]), XK_CMD);
+	if (map[CTL_ESC(i)] != F_INSERT && map[CTL_ESC(i)] != F_UNASSIGNED && map[CTL_ESC(i)] != F_XKEY) {
+	    buf[1] = CTL_ESC(i & ASCII);
+	    AddXkey(&cstr, XmapCmd((int) map[CTL_ESC(i)]), XK_CMD);
 	}
     }
     map[buf[0]] = F_XKEY;

@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /src/pub/tcsh/host.defs,v 1.38 2004/11/20 17:32:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/host.defs,v 1.39 2004/12/25 21:15:06 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.38 2004/11/20 17:32:07 christos Exp $")
+RCSID("$Id: host.defs,v 1.39 2004/12/25 21:15:06 christos Exp $")
 
 endcode	:
 
@@ -1006,9 +1006,9 @@ machtype:						: "clipper"
 enddef	:
 
 
-newdef	: defined(SNI) || defined(sinix)
-comment	: Siemens Nixdorf Informationssysteme SINIX
-vendor	:						: "sni"
+newdef	: (defined(SNI) || defined(sinix)) && !defined(_OSD_POSIX)
+comment	: Fujitsu Siemens Computers (former "Siemens Nixdorf Informationssysteme"): SINIX aka. ReliantUNIX, a SVR4 derivative
+vendor	:						: "fsc"
 hosttype: defined(M_intel)				: "wx200i"
 hosttype: defined(MIPSEB)				: "rm400"
 ostype	: defined(sinix)				: "sinix"
@@ -1021,10 +1021,13 @@ machtype:						: "mips"
 enddef	:
 
 newdef	: defined(_OSD_POSIX)
-comment	: Siemens Nixdorf Informationssysteme BS2000 POSIX (mainframe, EBCDIC)
-vendor	:						: "sni"
-hosttype: defined(M_intel)				: "bs2000"
-ostype	: 						: "posix"
+comment	: Fujitsu Siemens Computers (former "Siemens Nixdorf Informationssysteme"): BS2000 POSIX (mainframe, EBCDIC)
+vendor	:						: "fsc"
+hosttype:						: "bs2000"
+ostype	:						: "osdposix"
+machtype: #machine(7500)				: "s390"
+machtype: #machine(mips)				: "mips"
+machtype: #machine(sparc)				: "sparc"
 machtype:						: "bs2000"
 enddef	:
 

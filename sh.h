@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.128 2005/03/03 15:53:36 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.129 2005/03/03 15:56:43 kim Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -83,6 +83,14 @@ typedef unsigned long intptr_t;
 
 #if defined(POSIXSIGS) && !defined(BSDSIGS)
 # define BSDSIGS
+#endif
+
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
 #endif
 
 #ifdef SHORT_STRINGS

@@ -198,7 +198,7 @@ case "${host}" in
   ;;
 
   ## Siemens BS2000 Mainframe
-  bs2000-siemens-posix)
+  bs2000-siemens-*)
     tcsh_config_file=bs2000
   ;;
 

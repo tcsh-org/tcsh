@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.87 2005/01/18 20:24:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.88 2005/01/18 20:43:31 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.87 2005/01/18 20:24:51 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.88 2005/01/18 20:43:31 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -104,8 +104,12 @@ static struct rusage zru = {{0L, 0L}, {0L, 0L}, 0L, 0L, 0L, 0L,
  */
 static struct rusage zru;
 #   else	/* masscomp */
-static struct rusage zru = {{0L, 0L}, {0L, 0L}, 0, 0, 0, 0, 0, 0, 0, 
-			    0, 0, 0, 0, 0, 0};
+static struct rusage zru = {{0L, 0L}, {0L, 0L}
+#ifndef _OSD_POSIX /* BS2000 has fewer resource fields */
+			   ,0, 0, 0, 0, 0, 0, 0, 
+			    0, 0, 0, 0, 0, 0
+#endif
+};
 #   endif /* masscomp */
 #  endif	/* SUNOS4 || hp9000 || (__alpha && __osf__) */
 # endif /* convex */
