@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.9 1991/08/06 01:45:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.10 1991/09/08 00:45:32 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.init.c,v 3.9 1991/08/06 01:45:29 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.10 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #define EXTERN			/* intern */
@@ -771,16 +771,6 @@ ed_Init()
 	    T_Tabs = 1;
 	}
 
-#ifdef notdef
-	nio.c_iflag &= ~(INLCR | IGNCR);
-	nio.c_iflag |= (ICRNL);
-
-	nio.c_oflag &= ~(ONLRET);
-	nio.c_oflag |= (OPOST | ONLCR);
-	/* don't muck with c_cflag */
-	nio.c_lflag &= ~(NOFLSH | ECHOK | ECHONL | EXTPROC | FLUSHO);
-	nio.c_lflag |= (ISIG | ICANON | ECHO | ECHOE | ECHOCTL | IEXTEN);
-#endif 
 	nio.c_iflag &= ~ttylist[M_INPUT].t_clrmask;
 	nio.c_iflag |=  ttylist[M_INPUT].t_setmask;
 
@@ -884,25 +874,13 @@ ed_Init()
 	}
 
 	if (T_Tabs) {		/* order of &= and |= is important to XTABS */
-#ifdef notdef
-	    nb.sg_flags &= ~(CBREAK | RAW | LCASE | XTABS | VTDELAY | ALLDELAY);
-	    nb.sg_flags |= (ECHO | CRMOD | ANYP);
-#endif 
 	    nb.sg_flags &= ~(ttylist[M_CONTROL].t_clrmask | XTABS);
 	    nb.sg_flags |=  ttylist[M_CONTROL].t_setmask;
 	}
 	else {
-#ifdef notdef
-	    nb.sg_flags &= ~(CBREAK | RAW | LCASE | VTDELAY | ALLDELAY);
-	    nb.sg_flags |= (ECHO | CRMOD | XTABS | ANYP);
-#endif 
 	    nb.sg_flags &= ~ttylist[M_CONTROL].t_clrmask;
 	    nb.sg_flags |=  (ttylist[M_CONTROL].t_setmask | XTABS);
 	}
-#ifdef notdef
-	nlb &= ~(LPRTERA);	/* let 8-bit mode stand as set */
-	nlb |= (LCRTBS | LCRTERA | LCRTKIL);
-#endif 
 	nlb &= ~ttylist[M_LOCAL].t_clrmask;
 	nlb |=  ttylist[M_LOCAL].t_setmask;
 
@@ -1175,10 +1153,6 @@ Rawmode()
     if ((testio.c_lflag != nio.c_lflag) &&
 	(testio.c_lflag != xio.c_lflag)) {
 	nio.c_lflag = testio.c_lflag;
-#ifdef notdef
-	nio.c_lflag &= ~(NOFLSH | ECHOK | ECHONL | EXTPROC | FLUSHO);
-	nio.c_lflag |= (ISIG | ICANON | IEXTEN | ECHO | ECHOE | ECHOCTL);
-#endif 
 	nio.c_lflag &= ~ttylist[M_LINED].t_clrmask;
 	nio.c_lflag |=  ttylist[M_LINED].t_setmask;
 
@@ -1192,10 +1166,6 @@ Rawmode()
     if ((testio.c_iflag != nio.c_iflag) &&
 	(testio.c_iflag != xio.c_iflag)) {
 	nio.c_iflag = testio.c_iflag;
-#ifdef notdef
-	nio.c_iflag &= ~(INLCR | IGNCR);
-	nio.c_iflag |= (ICRNL);
-#endif 
 	nio.c_iflag &= ~ttylist[M_INPUT].t_clrmask;
 	nio.c_iflag |=  ttylist[M_INPUT].t_setmask;
 
@@ -1208,10 +1178,6 @@ Rawmode()
 	(testio.c_oflag != xio.c_oflag)) {
 	/* Christos: There was and ifdef here that would set ONLRET!?? */
 	nio.c_oflag = testio.c_oflag;
-#ifdef notdef
-	nio.c_oflag &= ~(ONLRET);
-	nio.c_oflag |= (OPOST | ONLCR);
-#endif 
 	nio.c_oflag &= ~ttylist[M_OUTPUT].t_clrmask;
 	nio.c_oflag |=  ttylist[M_OUTPUT].t_setmask;
 
@@ -1387,10 +1353,6 @@ Rawmode()
 	    T_Tabs = CanWeTab();
 	}
 
-#ifdef notdef
-	nb.sg_flags &= ~(CBREAK | RAW | LCASE | VTDELAY | ALLDELAY);
-	nb.sg_flags |= (ECHO | CRMOD | ANYP);
-#endif 
 	nb.sg_flags &= ~ttylist[M_CONTROL].t_clrmask;
 	nb.sg_flags |=  ttylist[M_CONTROL].t_setmask;
 
@@ -1419,10 +1381,6 @@ Rawmode()
  * Montreal (Qc) Canada H3C 3J7		  <bur%iro.udem.cdn@ubc.csnet>
  * Thanks!
  */
-#ifdef notdef
-	nlb &= ~(LPRTERA | LFLUSHO);
-	nlb |= (LCRTBS | LCRTERA | LCRTKIL);
-#endif 
 	nlb &= ~ttylist[M_LOCAL].t_clrmask;
 	nlb |=  ttylist[M_LOCAL].t_setmask;
 
