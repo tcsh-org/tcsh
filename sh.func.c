@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.2 1991/07/15 19:37:24 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.3 1991/07/29 22:27:35 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "config.h"
 
-RCSID("$Id: sh.func.c,v 3.2 1991/07/15 19:37:24 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.3 1991/07/29 22:27:35 christos Exp christos $")
 
 #include "sh.h"
 #include "ed.h"
@@ -99,7 +99,7 @@ isbfunc(t)
     if (eq(STRwarp, cp) && !checkwarp()) {
 	return (0);		/* this builtin disabled */
     }
-#endif
+#endif 
     /*
      * Binary search Bp1 is the beginning of the current search range. Bp2 is
      * one past the end.
@@ -113,7 +113,7 @@ isbfunc(t)
 	    return bp;
 	if (i < 0)
 	    bp2 = bp;
-	else
+	else 
 	    bp1 = bp + 1;
     }
     return (0);
@@ -156,31 +156,31 @@ doonintr(v, c)
 #ifdef BSDSIGS
 	if (setintr)
 	    (void) sigblock(sigmask(SIGINT));
-	else
+	else 
 	    (void) signal(SIGINT, SIG_DFL);
-#else
+#else 
 	if (setintr)
 	    (void) sighold(SIGINT);
-	else
+	else 
 	    (void) sigset(SIGINT, SIG_DFL);
-#endif
+#endif 
 	gointr = 0;
     }
     else if (eq((vv = strip(vv)), STRminus)) {
 #ifdef BSDSIGS
 	(void) signal(SIGINT, SIG_IGN);
-#else
+#else 
 	(void) sigset(SIGINT, SIG_IGN);
-#endif
+#endif 
 	gointr = Strsave(STRminus);
     }
     else {
 	gointr = Strsave(vv);
 #ifdef BSDSIGS
 	(void) signal(SIGINT, pintr);
-#else
+#else 
 	(void) sigset(SIGINT, pintr);
-#endif
+#endif 
     }
 }
 
@@ -196,7 +196,7 @@ donohup(v, c)
 	(void) signal(SIGHUP, SIG_IGN);
 #ifdef CC
 	submit(getpid());
-#endif
+#endif 
     }
 }
 
@@ -293,7 +293,7 @@ donewgrp(v, c)
     untty();
     xexit(1);
 }
-#endif
+#endif 
 
 static void
 islogin()
@@ -323,7 +323,7 @@ doif(v, kp)
 	    stderror(ERR_NAME | ERR_IMPRTHEN);
 	setname(short2str(STRthen));
 	/*
-	 * If expression was zero, then scan to else, otherwise just fall into
+	 * If expression was zero, then scan to else , otherwise just fall into
 	 * following code.
 	 */
 	if (!i)
@@ -361,7 +361,7 @@ reexecute(kp)
 
 /*ARGSUSED*/
 void
-doelse(v, c)
+doelse (v, c)
     Char **v;
     struct command *c;
 {
@@ -387,7 +387,7 @@ dogoto(v, c)
 	    search(T_BREAK, 0, NOSTR);
 	    wp->w_end = btell();
 	}
-	else
+	else 
 	    bseek(wp->w_end);
     search(T_GOTO, 0, lp = globone(v[1], G_ERROR));
     xfree((ptr_t) lp);
@@ -425,7 +425,7 @@ dobreak(v, c)
 {
     if (whyles)
 	toend();
-    else
+    else 
 	stderror(ERR_NAME | ERR_NOTWHILE);
 }
 
@@ -511,7 +511,7 @@ dowhile(v, c)
      */
     if (intty && !again)
 	status = !exp0(&v, 1);
-    else
+    else 
 	status = !exp(&v);
     if (*v)
 	stderror(ERR_NAME | ERR_EXPRESSION);
@@ -545,16 +545,16 @@ preread()
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else
-	(void) sigrelse(SIGINT);
-#endif
+#else 
+	(void) sigrelse (SIGINT);
+#endif 
     search(T_BREAK, 0, NOSTR);		/* read the expression in */
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigblock(sigmask(SIGINT));
-#else
+#else 
 	(void) sighold(SIGINT);
-#endif
+#endif 
     whyles->w_end = btell();
 }
 
@@ -612,23 +612,23 @@ dorepeat(v, kp)
 #ifdef BSDSIGS
     register sigmask_t omask = 0;
 
-#endif
+#endif 
 
     i = getn(v[1]);
     if (setintr)
 #ifdef BSDSIGS
 	omask = sigblock(sigmask(SIGINT)) & ~sigmask(SIGINT);
-#else
+#else 
 	(void) sighold(SIGINT);
-#endif
+#endif 
     lshift(v, 2);
     while (i > 0) {
 	if (setintr)
 #ifdef BSDSIGS
 	    (void) sigsetmask(omask);
-#else
-	    (void) sigrelse(SIGINT);
-#endif
+#else 
+	    (void) sigrelse (SIGINT);
+#endif 
 	reexecute(kp);
 	--i;
     }
@@ -636,9 +636,9 @@ dorepeat(v, kp)
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigsetmask(omask);
-#else
-	(void) sigrelse(SIGINT);
-#endif
+#else 
+	(void) sigrelse (SIGINT);
+#endif 
 }
 
 /*ARGSUSED*/
@@ -668,7 +668,7 @@ srchx(cp)
 	    return sp->s_value;
 	if (i < 0)
 	    sp2 = sp;
-	else
+	else 
 	    sp1 = sp + 1;
     }
     return (-1);
@@ -851,10 +851,10 @@ past:
     switch (Stype) {
 
     case T_IF:
-	stderror(ERR_NAME | ERR_NOTFOUND, "then/endif");
+	stderror(ERR_NAME | ERR_NOTFOUND, "then/endif ");
 
     case T_ELSE:
-	stderror(ERR_NAME | ERR_NOTFOUND, "endif");
+	stderror(ERR_NAME | ERR_NOTFOUND, "endif ");
 
     case T_BRKSW:
     case T_SWITCH:
@@ -905,7 +905,7 @@ toend()
 	search(T_BREAK, 0, NOSTR);
 	whyles->w_end = btell() - 1;
     }
-    else
+    else 
 	bseek(whyles->w_end);
     wfree();
 }
@@ -960,9 +960,9 @@ xecho(sep, v)
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else
-	(void) sigrelse(SIGINT);
-#endif
+#else 
+	(void) sigrelse (SIGINT);
+#endif 
     v++;
     if (*v == 0)
 	return;
@@ -1027,8 +1027,8 @@ xecho(sep, v)
 		    break;
 		}
 	    }
-#endif				/* OREO */
-#endif				/* SVID > 0 */
+#endif /* OREO */
+#endif /* SVID > 0 */
 	    xputchar(c | QUOTE);
 
 	}
@@ -1038,18 +1038,18 @@ xecho(sep, v)
 #if SVID > 0
 #ifndef OREO
 done:
-#endif				/* OREO */
-#endif				/* SVID > 0 */
+#endif /* OREO */
+#endif /* SVID > 0 */
     if (sep && nonl == 0)
 	xputchar('\n');
-    else
+    else 
 	flush();
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigblock(sigmask(SIGINT));
-#else
+#else 
 	(void) sighold(SIGINT);
-#endif
+#endif 
     if (gargv)
 	blkfree(gargv), gargv = 0;
 }
@@ -1072,9 +1072,9 @@ dosetenv(v, c)
 	if (setintr)
 #ifdef BSDSIGS
 	    (void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else
-	    (void) sigrelse(SIGINT);
-#endif
+#else 
+	    (void) sigrelse (SIGINT);
+#endif 
 	for (ep = STR_environ; *ep; ep++)
 	    xprintf("%s\n", short2str(*ep));
 	return;
@@ -1089,7 +1089,7 @@ dosetenv(v, c)
 #ifdef apollo
     else if (eq(vp, STRSYSTYPE))
 	dohash(NULL, NULL);
-#endif				/* apollo */
+#endif /* apollo */
     else if (eq(vp, STRLANG) || eq(vp, STRLC_CTYPE)) {
 #ifdef NLS
 	int     k;
@@ -1097,9 +1097,9 @@ dosetenv(v, c)
 	(void) setlocale(LC_ALL, "");
 	for (k = 0200; k <= 0377 && !Isprint(k); k++);
 	AsciiOnly = k > 0377;
-#else
+#else 
 	AsciiOnly = 0;
-#endif				/* NLS */
+#endif /* NLS */
 	NLSMapsAreInited = 0;
 	ed_Init();
 	if (MapsAreInited && !NLSMapsAreInited)
@@ -1114,7 +1114,7 @@ dosetenv(v, c)
 	     eq(vp, STRTERMCAP)) {
 	check_window_size(1);
     }
-#endif				/* SIG_WINDOW */
+#endif /* SIG_WINDOW */
     xfree((ptr_t) lp);
 }
 
@@ -1154,7 +1154,7 @@ dounsetenv(v, c)
 #ifdef apollo
 		else if (eq(name, STRSYSTYPE))
 		    dohash(NULL, NULL);
-#endif				/* apollo */
+#endif /* apollo */
 		else if (eq(name, STRLANG) || eq(name, STRLC_CTYPE)) {
 #ifdef NLS
 		    int     k;
@@ -1162,10 +1162,10 @@ dounsetenv(v, c)
 		    (void) setlocale(LC_ALL, "");
 		    for (k = 0200; k <= 0377 && !Isprint(k); k++);
 		    AsciiOnly = k > 0377;
-#else
+#else 
 		    AsciiOnly = getenv("LANG") == NULL &&
 			getenv("LC_CTYPE") == NULL;
-#endif				/* NLS */
+#endif /* NLS */
 		    NLSMapsAreInited = 0;
 		    ed_Init();
 		    if (MapsAreInited && !NLSMapsAreInited)
@@ -1194,7 +1194,7 @@ Setenv(name, val)
 	return;
     (void) strcpy(nameBuf, cname);
     setenv(nameBuf, short2str(val), 1);
-#else
+#else 
     register Char **ep = STR_environ;
     register Char *cp, *dp;
     Char   *blk[2];
@@ -1222,7 +1222,7 @@ Setenv(name, val)
     blkfree((Char **) environ);
     environ = short2blk(STR_environ);
     xfree((ptr_t) oep);
-#endif				/* SETENV_IN_LIB */
+#endif /* SETENV_IN_LIB */
 }
 
 static void
@@ -1272,25 +1272,23 @@ doumask(v, c)
     (void) umask(i);
 }
 
-#ifndef BSDTIMES
-typedef long RLIM_TYPE;
-
-#ifndef RLIM_INFINITY
-extern RLIM_TYPE ulimit();
-
-#define RLIM_INFINITY 0x003fffff
-#define RLIMIT_FSIZE 1
-#endif				/* RLIM_INFINITY */
-#ifdef aiws
-#define toset(a) (((a) == 3) ? 1004 : (a) + 1)
-#define RLIMIT_STACK 1005
-#else				/* aiws */
-#define toset(a) ((a) + 1)
-#endif				/* aiws */
-#else				/* BSDTIMES */
-typedef int RLIM_TYPE;
-
-#endif				/* BSDTIMES */
+#ifndef HAVENOLIMIT
+# ifndef BSDTIMES
+   typedef long RLIM_TYPE;
+#  ifndef RLIM_INFINITY
+    extern RLIM_TYPE ulimit();
+#   define RLIM_INFINITY 0x003fffff
+#   define RLIMIT_FSIZE 1
+#  endif /* RLIM_INFINITY */
+#  ifdef aiws
+#   define toset(a) (((a) == 3) ? 1004 : (a) + 1)
+#   define RLIMIT_STACK 1005
+#  else /* aiws */
+#   define toset(a) ((a) + 1)
+#  endif /* aiws */
+# else /* BSDTIMES */
+   typedef int RLIM_TYPE;
+# endif /* BSDTIMES */
 
 
 static struct limits {
@@ -1300,49 +1298,49 @@ static struct limits {
     char   *limscale;
 }       limits[] = {
 
-#ifdef RLIMIT_CPU
+# ifdef RLIMIT_CPU
     RLIMIT_CPU, 	"cputime",	1,	"seconds",
-#endif /* RLIMIT_CPU */
+# endif /* RLIMIT_CPU */
 
-#ifdef RLIMIT_FSIZE
+# ifdef RLIMIT_FSIZE
     RLIMIT_FSIZE, 	"filesize",	1024,	"kbytes",
-#endif /* RLIMIT_FSIZE */
+# endif /* RLIMIT_FSIZE */
 
-#ifdef RLIMIT_DATA
+# ifdef RLIMIT_DATA
     RLIMIT_DATA, 	"datasize",	1024,	"kbytes",
-#endif /* RLIMIT_DATA */
+# endif /* RLIMIT_DATA */
 
-#ifdef RLIMIT_STACK
+# ifdef RLIMIT_STACK
     RLIMIT_STACK, 	"stacksize",	1024,	"kbytes",
-#endif /* RLIMIT_STACK */
+# endif /* RLIMIT_STACK */
 
-#ifdef RLIMIT_CORE
+# ifdef RLIMIT_CORE
     RLIMIT_CORE, 	"coredumpsize",	1024,	"kbytes",
-#endif /* RLIMIT_CORE */
+# endif /* RLIMIT_CORE */
 
-#ifdef RLIMIT_RSS
+# ifdef RLIMIT_RSS
     RLIMIT_RSS, 	"memoryuse",	1024,	"kbytes",
-#endif /* RLIMIT_RSS */
+# endif /* RLIMIT_RSS */
 
-#ifdef RLIMIT_NOFILE
+# ifdef RLIMIT_NOFILE
     RLIMIT_NOFILE, 	"descriptors", 1,	"",
-#endif
+# endif 
 
-#ifdef RLIMIT_CONCUR
+# ifdef RLIMIT_CONCUR
     RLIMIT_CONCUR, 	"concurrency", 1,	"thread(s)",
-#endif
+# endif 
 
-#ifdef RLIMIT_MEMLOCK
+# ifdef RLIMIT_MEMLOCK
     RLIMIT_MEMLOCK,	"memorylocked",	1024,	"kbytes",
-#endif
+# endif 
 
-#ifdef RLIMIT_NPROC
+# ifdef RLIMIT_NPROC
     RLIMIT_NPROC,	"maxproc",	1,	"",
-#endif
+# endif 
 
-#ifdef RLIMIT_OFILE
+# ifdef RLIMIT_OFILE
     RLIMIT_OFILE,	"openfiles",	1,	"",
-#endif
+# endif 
 
     -1, 		NULL, 		0, 	NULL
 };
@@ -1365,7 +1363,7 @@ restrict_limit(value)
 	return (INT_MAX);
     else if (value < (double) INT_MIN)
 	return (INT_MIN);
-    else
+    else 
 	return ((int) value);
 }
 #endif /* convex */
@@ -1426,9 +1424,9 @@ getval(lp, v)
     register struct limits *lp;
     Char  **v;
 {
-#if defined(convex) || defined(__convex__)
+# if defined(convex) || defined(__convex__)
     RLIM_TYPE restrict_limit();
-#endif /* convex */
+# endif /* convex */
 
     register float f;
     double  atof();
@@ -1436,7 +1434,7 @@ getval(lp, v)
 
     f = atof(short2str(cp));
 
-#if defined(convex)||defined(__convex__)
+# if defined(convex) || defined(__convex__)
     /*
      * is f too large to cope with. limit f to minint, maxint  - X-6768 by
      * strike
@@ -1444,30 +1442,30 @@ getval(lp, v)
     if ((f < (double) INT_MIN) || (f > (double) INT_MAX)) {
 	stderror(ERR_NAME | ERR_TOOLARGE);
     }
-#endif /* convex */
+# endif /* convex */
 
     while (Isdigit(*cp) || *cp == '.' || *cp == 'e' || *cp == 'E')
 	cp++;
     if (*cp == 0) {
 	if (*v == 0)
-#if defined(convex) || defined(__convex__)
+# if defined(convex) || defined(__convex__)
 	    return ((RLIM_TYPE) restrict_limit((f + 0.5) * lp->limdiv));
-#else /* convex */
+# else /* convex */
 	    return ((RLIM_TYPE) ((f + 0.5) * lp->limdiv));
-#endif /* convex */
+# endif /* convex */
 	cp = *v;
     }
     switch (*cp) {
-#ifdef RLIMIT_CPU
+# ifdef RLIMIT_CPU
     case ':':
 	if (lp->limconst != RLIMIT_CPU)
 	    goto badscal;
-#if defined(convex) || defined(__convex__)
+#  if defined(convex) || defined(__convex__)
 	return ((RLIM_TYPE)
 		restrict_limit((f * 60.0 + atof(short2str(cp + 1)))));
-#else /* convex */
+#  else /* convex */
 	return ((RLIM_TYPE) (f * 60.0 + atof(short2str(cp + 1))));
-#endif /* convex */
+#  endif /* convex */
     case 'h':
 	if (lp->limconst != RLIMIT_CPU)
 	    goto badscal;
@@ -1489,21 +1487,21 @@ getval(lp, v)
 	    goto badscal;
 	limtail(cp, "seconds");
 	break;
-#endif				/* RLIMIT_CPU */
+# endif /* RLIMIT_CPU */
     case 'M':
-#ifdef RLIMIT_CPU
+# ifdef RLIMIT_CPU
 	if (lp->limconst == RLIMIT_CPU)
 	    goto badscal;
-#endif				/* RLIMIT_CPU */
+# endif /* RLIMIT_CPU */
 	*cp = 'm';
 	limtail(cp, "megabytes");
 	f *= 1024.0 * 1024.0;
 	break;
     case 'k':
-#ifdef RLIMIT_CPU
+# ifdef RLIMIT_CPU
 	if (lp->limconst == RLIMIT_CPU)
 	    goto badscal;
-#endif				/* RLIMIT_CPU */
+# endif /* RLIMIT_CPU */
 	limtail(cp, "kbytes");
 	f *= 1024.0;
 	break;
@@ -1511,16 +1509,16 @@ getval(lp, v)
 	limtail(cp, "unlimited");
 	return (RLIM_INFINITY);
     default:
-#ifdef RLIMIT_CPU
+# ifdef RLIMIT_CPU
 badscal:
-#endif				/* RLIMIT_CPU */
+# endif /* RLIMIT_CPU */
 	stderror(ERR_NAME | ERR_SCALEF);
     }
-#if defined(convex) || defined(__convex__)
+# if defined(convex) || defined(__convex__)
     return ((RLIM_TYPE) restrict_limit((f + 0.5)));
-#else
+# else 
     return ((RLIM_TYPE) (f + 0.5));
-#endif
+# endif 
 }
 
 static void
@@ -1541,37 +1539,36 @@ plim(lp, hard)
     register struct limits *lp;
     Char    hard;
 {
-#ifdef BSDTIMES
+# ifdef BSDTIMES
     struct rlimit rlim;
-
-#endif				/* BSDTIMES */
+# endif /* BSDTIMES */
     RLIM_TYPE limit;
 
     xprintf("%s \t", lp->limname);
 
-#ifndef BSDTIMES
+# ifndef BSDTIMES
     limit = ulimit(lp->limconst, 0);
-#else				/* BSDTIMES */
+# else /* BSDTIMES */
     (void) getrlimit(lp->limconst, &rlim);
     limit = hard ? rlim.rlim_max : rlim.rlim_cur;
-#endif				/* BSDTIMES */
+# endif /* BSDTIMES */
 
     if (limit == RLIM_INFINITY)
 	xprintf("unlimited");
-#ifdef RLIMIT_CPU
+# ifdef RLIMIT_CPU
     else if (lp->limconst == RLIMIT_CPU)
 	psecs((long) limit);
-#endif				/* RLIMIT_CPU */
-    else
-#ifndef BSDTIMES
+# endif /* RLIMIT_CPU */
+    else 
+# ifndef BSDTIMES
     if (lp->limconst == RLIMIT_FSIZE)
 	/*
 	 * Christos: filesize comes in 512 blocks. we divide by 2 to get 1024
 	 * blocks. Note we cannot pre-multiply cause we might overflow (A/UX)
 	 */
 	xprintf("%ld %s", (long) (limit / 2), lp->limscale);
-    else
-#endif				/* BSDTIMES */
+    else 
+# endif /* BSDTIMES */
 	xprintf("%ld %s", (long) (limit / lp->limdiv), lp->limscale);
     xprintf("\n");
 }
@@ -1612,7 +1609,7 @@ setlim(lp, hard, limit)
     Char    hard;
     RLIM_TYPE limit;
 {
-#ifdef BSDTIMES
+# ifdef BSDTIMES
     struct rlimit rlim;
 
     (void) getrlimit(lp->limconst, &rlim);
@@ -1621,15 +1618,15 @@ setlim(lp, hard, limit)
 	rlim.rlim_max = limit;
     else if (limit == RLIM_INFINITY && geteuid() != 0)
 	rlim.rlim_cur = rlim.rlim_max;
-    else
+    else 
 	rlim.rlim_cur = limit;
 
     if (setrlimit(lp->limconst, &rlim) < 0) {
-#else				/* BSDTIMES */
+# else /* BSDTIMES */
     if (limit != RLIM_INFINITY && lp->limconst == RLIMIT_FSIZE)
 	limit /= 512;
     if (ulimit(toset(lp->limconst), limit) < 0) {
-#endif				/* BSDTIMES */
+# endif /* BSDTIMES */
 	xprintf("%s: %s: Can't %s%s limit\n", bname, lp->limname,
 		limit == RLIM_INFINITY ? "remove" : "set",
 		hard ? " hard" : "");
@@ -1637,6 +1634,8 @@ setlim(lp, hard, limit)
     }
     return (0);
 }
+
+#endif /* !HAVENOLIMIT */
 
 /*ARGSUSED*/
 void
@@ -1657,9 +1656,9 @@ dosuspend(v, c)
     (void) kill(0, SIGTSTP);
     /* the shell stops here */
     (void) signal(SIGTSTP, old);
-#else
+#else 
     stderror(ERR_JOBCONTROL);
-#endif				/* BSDJOBS */
+#endif /* BSDJOBS */
 
 #ifdef BSDJOBS
     if (tpgrp != -1) {
@@ -1674,7 +1673,7 @@ retry:
 	(void) setpgid(0, shpgrp);
 	(void) tcsetpgrp(FSHTTY, shpgrp);
     }
-#endif				/* BSDJOBS */
+#endif /* BSDJOBS */
     (void) setdisc(FSHTTY);
 }
 
@@ -1702,11 +1701,9 @@ doeval(v, c)
     Char  **oevalvec;
     Char   *oevalp;
     int     odidfds;
-
 #ifndef FIOCLEX
     int     odidcch;
-
-#endif				/* FIOCLEX */
+#endif /* FIOCLEX */
     jmp_buf osetexit;
     int     my_reenter;
     Char  **savegv;
@@ -1722,7 +1719,7 @@ doeval(v, c)
     odidfds = didfds;
 #ifndef FIOCLEX
     odidcch = didcch;
-#endif				/* FIOCLEX */
+#endif /* FIOCLEX */
     oSHIN = SHIN;
     oSHOUT = SHOUT;
     oSHDIAG = SHDIAG;
@@ -1761,7 +1758,7 @@ doeval(v, c)
 	SHDIAG = dcopy(2, -1);
 #ifndef FIOCLEX
 	didcch = 0;
-#endif				/* FIOCLEX */
+#endif /* FIOCLEX */
 	didfds = 0;
 	process(0);
     }
@@ -1771,7 +1768,7 @@ doeval(v, c)
     doneinp = 0;
 #ifndef FIOCLEX
     didcch = odidcch;
-#endif				/* FIOCLEX */
+#endif /* FIOCLEX */
     didfds = odidfds;
     (void) close(SHIN);
     (void) close(SHOUT);

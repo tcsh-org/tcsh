@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.3 1991/07/29 21:22:46 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.4 1991/07/29 22:27:35 christos Exp christos $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.init.c,v 3.3 1991/07/29 21:22:46 christos Exp christos $")
+RCSID("$Id: sh.init.c,v 3.4 1991/07/29 22:27:35 christos Exp christos $")
 
 #include "sh.h"
 #include "ed.h"
@@ -95,7 +95,9 @@ struct	biltins bfunc[] = {
 #endif
     { "jobs",	dojobs,		0,	1, },
     { "kill",	dokill,		1,	INF, },
+#ifndef HAVENOLIMIT
     { "limit",	dolimit,	0,	3, },
+#endif /* ! HAVENOLIMIT */
     { "linedit",	doecho,		0,	INF, },
 #ifndef KAI
     { "log",	dolog,		0,	0, },
@@ -150,7 +152,9 @@ struct	biltins bfunc[] = {
 #ifdef masscomp
     { "universe",	douniverse,	0,	1, },
 #endif
+#ifndef HAVENOLIMIT
     { "unlimit",	dounlimit,	0,	INF, },
+#endif /* !HAVENOLIMIT */
     { "unset",	unset,		1,	INF, },
     { "unsetenv",	dounsetenv,	1,	INF, },
 #ifdef apollo
