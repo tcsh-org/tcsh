@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.const.c,v 3.69 2003/03/12 19:14:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.const.c,v 3.70 2003/05/26 07:11:07 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.69 2003/03/12 19:14:51 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.70 2003/05/26 07:11:07 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -407,8 +407,8 @@ Char STRkillring[] 	= { 'k', 'i', 'l', 'l', 'r', 'i', 'n', 'g', '\0' };
 Char STRkilldup[] 	= { 'k', 'i', 'l', 'l', 'd', 'u', 'p', '\0' };
 Char STRshlvl[]		= { 's', 'h', 'l', 'v', 'l', '\0' };
 Char STRKSHLVL[]	= { 'S', 'H', 'L', 'V', 'L', '\0' };
-Char STRALL[]		= { 'L', 'C', '_', 'A', 'L', 'L', '\0' };
 Char STRLANG[]		= { 'L', 'A', 'N', 'G', '\0' };
+Char STRLC_ALL[]		= { 'L', 'C', '_', 'A', 'L', 'L', '\0' };
 Char STRLC_CTYPE[]	= { 'L', 'C', '_', 'C', 'T', 'Y', 'P', 'E' ,'\0' };
 Char STRLC_NUMERIC[]	= { 'L', 'C', '_', 'N', 'U', 'M', 'E', 'R', 'I',
 			    'C', '\0' };
