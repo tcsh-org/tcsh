@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.40 2000/07/20 16:00:04 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.41 2000/11/11 23:03:39 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.40 2000/07/20 16:00:04 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.41 2000/11/11 23:03:39 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -513,6 +513,20 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'L':
 		ClearToBottom();
 		break;
+
+	    case 'j':
+		{
+		    Char buf[128], *ebuf, *q;
+		    int njobs = -1;
+		    struct process *pp;
+		    for (pp = proclist.p_next; pp; pp = pp->p_next)
+			njobs++;
+		    /* make sure we have space */
+		    ebuf = Itoa(njobs, buf, 1, attributes);
+		    for (q = buf; q < ebuf; *p++ = *q++)
+			if (p >= ep) break;
+		    break;
+		}
 	    case '?':
 		if ((z = varval(STRstatus)) != STRNULL)
 		    for (; *z; *p++ = attributes | *z++)
