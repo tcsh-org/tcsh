@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.who.c,v 1.3 91/09/24 17:11:56 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.5 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.3 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.5 1991/10/12 04:23:51 christos Exp $")
 
 #include "tc.h"
 
@@ -44,7 +44,22 @@ RCSID("$Id: tc.who.c,v 3.3 1991/09/10 04:51:46 christos Exp $")
  * kfk 26 Jan 1984 - for login watch functions.
  */
 #include <ctype.h>
-#include <utmp.h>
+
+#ifdef HAVEUTMPX
+# include <utmpx.h>
+/* I just redefine a few words here.  Changing every occurrence below
+ * seems like too much of work.  All UTMP functions have equivalent
+ * UTMPX counterparts, so they can be added all here when needed.
+ * Kimmo Suominen, Oct 14 1991
+ */
+# ifndef _PATH_UTMP
+#  define _PATH_UTMP UTMPX_FILE
+# endif /* _PATH_UTMP */
+# define utmp utmpx
+# define ut_time ut_xtime
+#else /* !HAVEUTMPX */
+# include <utmp.h>
+#endif /* HAVEUTMPX */
 
 #ifndef BROKEN_CC
 # define UTNAMLEN	sizeof(((struct utmp *) 0)->ut_name)
@@ -55,7 +70,7 @@ RCSID("$Id: tc.who.c,v 3.3 1991/09/10 04:51:46 christos Exp $")
 #  else
 #   define UTHOSTLEN	sizeof(((struct utmp *) 0)->ut_host)
 #  endif
-# endif				/* UTHOST */
+# endif	/* UTHOST */
 #else
 /* give poor cc a little help if it needs it */
 struct utmp __ut;
@@ -68,16 +83,16 @@ struct utmp __ut;
 #  else
 #   define UTHOSTLEN	sizeof(__ut.ut_host)
 #  endif
-# endif				/* UTHOST */
-#endif				/* BROKEN_CC */
+# endif /* UTHOST */
+#endif /* BROKEN_CC */
 
 #ifndef _PATH_UTMP
 # ifdef	UTMP_FILE
 #  define _PATH_UTMP UTMP_FILE
 # else
 #  define _PATH_UTMP "/etc/utmp"
-# endif				/* UTMP_FILE */
-#endif				/* _PATH_UTMP */
+# endif /* UTMP_FILE */
+#endif /* _PATH_UTMP */
 
 
 struct who {
