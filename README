@@ -85,15 +85,16 @@ To install tcsh:
 
 9)  Once satisfied that tcsh is working correctly, complete the installation
     by typing "make install" to install the binary, and "make install.man" to
-    install the documentation.
+    install the documentation. Don't forget to look at complete.tcsh for
+    useful completions...
 
 10) Enjoy.
 
 11) PLEASE send any bug reports (and fixes), code for new features,
     comments, questions, etc. (even flames) to:
 
-	     -- Christos Zoulas
-		christos@gw.com
+	The tcsh mailing list
+	tcsh@mx.gw.com
 
 Various:
 
@@ -200,3 +201,7 @@ If your compiler cannot handle long symbol names, add
 #include "snames.h" 
 
 to your config.h file
+
+	     -- Christos Zoulas
+		christos@zoulas.com
+
