@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tc.func.c,v 1.2 91/07/14 22:24:03 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.3 1991/07/16 11:11:55 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: tc.func.c,v 3.3 1991/07/16 11:11:55 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -47,6 +47,7 @@ extern time_t t_period;
 static bool precmd_active = 0;
 static bool periodic_active = 0;
 static bool cwdcmd_active = 0;	/* PWP: for cwd_cmd */
+static bool beepcmd_active = 0;
 
 static	void	Reverse		__P((Char *));
 static	void	auto_logout	__P((void));
@@ -590,6 +591,39 @@ leave:
 #endif
 }
 
+/*
+ * Joachim Hoenig  07/16/91  Added beep_cmd, run every time tcsh wishes 
+ * to beep the terminal bell. Useful for playing nice sounds instead.
+ */
+void
+beep_cmd()
+{
+#ifdef BSDSIGS
+    sigmask_t omask;
+#endif
+
+#ifdef BSDSIGS
+    omask = sigblock(sigmask(SIGINT));
+#else
+    (void) sighold(SIGINT);
+#endif
+    if (beepcmd_active) {	/* an error must have been caught */
+	aliasrun(2, STRunalias, STRbeepcmd);
+	xprintf("Faulty alias 'beepcmd' removed.\n");
+    }
+    else {
+	beepcmd_active = 1;
+	if (!whyles && adrof1(STRbeepcmd, &aliases))
+	    aliasrun(1, STRbeepcmd, NULL);
+    }
+    beepcmd_active = 0;
+#ifdef BSDSIGS
+    (void) sigsetmask(omask);
+#else
+    (void) sigrelse(SIGINT);
+#endif
+}
+
 
 /*
  * Karl Kleinpaste, 18 Jan 1984.
@@ -709,6 +743,8 @@ aliasrun(cnt, s1, s2)
 	 */
 	else if (cwdcmd_active)
 	    cwd_cmd();
+	else if (beepcmd_active)
+	    beep_cmd();
 	else if (periodic_active)
 	    period_cmd();
 #endif
