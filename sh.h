@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.77 1997/10/28 22:34:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.80 1998/04/21 16:08:45 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -107,7 +107,8 @@ typedef int sigret_t;
 #ifndef WINNT
 # define ABSOLUTEP(p)	(*(p) == '/')
 #else /* WINNT */
-# define ABSOLUTEP(p)	((p)[0] == '/' || ((p)[1] == ':' && (p)[2] == '/'))
+# define ABSOLUTEP(p)	((p)[0] == '/' || \
+			 (Isalpha((p)[0]) && (p)[1] == ':' && (p)[2] == '/'))
 #endif /* WINNT */
 
 /*

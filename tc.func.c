@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.73 1997/10/28 22:34:31 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.74 1998/04/08 13:59:06 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.73 1997/10/28 22:34:31 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.74 1998/04/08 13:59:06 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -351,7 +351,7 @@ dolist(v, c)
 	    }
 	    else if (
 #ifdef WINNT
-		((char)tmp[1] != ':') ||
+		((char)tmp[1] == ':') ||
 		(is_unc) ||
 #endif /* WINNT */
 		S_ISDIR(st.st_mode)) {
