@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -37,7 +37,7 @@
 #include "config.h"
 #ifndef lint
 static char *rcsid() 
-    { return "$Id: tc.func.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
+    { return "$Id: tc.func.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -1178,10 +1178,10 @@ doaliases(v)
     getexit(oldexit);
     if (setexit() == 0) {
 	for (;;) {
+	    Char   *p = NULL;
+	    int     n = 0;
 	    lp = line;
 	    for (;;) {
-		Char   *p = NULL;
-		int     n = 0;
 		if (n <= 0) {
 		    int     i;
 
