@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.char.c,v 3.14 2001/03/18 19:06:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.char.c,v 3.15 2001/03/18 22:19:46 christos Exp $ */
 /*
  * sh.char.c: Character classification tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.char.c,v 3.14 2001/03/18 19:06:29 christos Exp $")
+RCSID("$Id: sh.char.c,v 3.15 2001/03/18 22:19:46 christos Exp $")
 
 #include "sh.char.h"
 
@@ -838,8 +838,8 @@ unsigned short _mbmap_big5[256] = {
     _MB2,	_MB2,		_MB2,		_MB2,
 						/* 0x7f = 0 */
     _MB2,	_MB2,		_MB2,		0,
-/* 0x80 - 0xfe = 3 */
-    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/* 0x80 = 2, 0x81 - 0xfe = 3 */
+    _MB2,      _MB1|_MB2,      _MB1|_MB2,      _MB1|_MB2,
     _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
     _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
     _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
