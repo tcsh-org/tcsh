@@ -3567,7 +3567,7 @@ If set to `enhance', completion 1) ignores case and 2) considers
 periods, hyphens and underscores (`.', `\-' and `_') to be word
 separators and hyphens and underscores to be equivalent.
 .TP 8
-.B continue_args \fR(+)
+.B continue \fR(+)
 If set to a list of commands, the shell will continue the listed
 commands, instead of starting a new one.
 .TP 8
