@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.2 1991/07/16 11:36:42 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.3 1991/07/18 15:23:05 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -182,7 +182,6 @@ EXTERN Char CurrentHistLit;	/* Literal status of current show history line */
  * These are truly extern
  */
 extern Char PromptBuf[];
-extern short SHIN, SHOUT;
 extern int MacroLvl;
 
 EXTERN Char *KeyMacro[MAXMACROLEVELS];
