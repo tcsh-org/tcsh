@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.30 2000/06/11 02:14:16 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.31 2000/11/11 23:03:39 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.30 2000/06/11 02:14:16 kim Exp $")
+RCSID("$Id: tc.who.c,v 3.31 2000/11/11 23:03:39 christos Exp $")
 
 #include "tc.h"
 
@@ -616,6 +616,12 @@ struct command *c;
 }
 
 # ifdef UTHOST
+size_t
+utmphostsize()
+{
+    return UTHOSTLEN;
+}
+
 char *
 utmphost()
 {

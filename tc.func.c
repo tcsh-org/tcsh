@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.92 2000/07/15 17:13:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.93 2000/11/11 23:03:38 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.92 2000/07/15 17:13:01 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.93 2000/11/11 23:03:38 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -81,9 +81,6 @@ struct tildecache;
 static	int	 tildecompare	__P((struct tildecache *, struct tildecache *));
 static  Char    *gethomedir	__P((Char *));
 #ifdef REMOTEHOST
-#ifdef INET6
-#include <utmp.h>
-#endif
 static	sigret_t palarm		__P((int));
 static	void	 getremotehost	__P((void));
 #endif /* REMOTEHOST */
@@ -2125,7 +2122,12 @@ getremotehost()
 		    hints.ai_family = PF_UNSPEC;
 		    hints.ai_socktype = SOCK_STREAM;
 		    hints.ai_flags = AI_PASSIVE | AI_CANONNAME;
-		    if (strlen(name) < UT_HOSTSIZE) {
+#if defined(UTHOST) && !defined(HAVENOUTMP)
+		    if (strlen(name) < utmphostsize())
+#else
+		    if (name != NULL)
+#endif
+		    {
 			if (getaddrinfo(name, NULL, &hints, &res) != 0)
 			    res = NULL;
 		    } else if (gethostname(dbuf, sizeof(dbuf) - 1) == 0 &&

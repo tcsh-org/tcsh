@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.45 2000/07/15 19:58:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.46 2000/11/11 23:03:38 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -329,6 +329,7 @@ extern	const char 	 *who_info	__P((ptr_t, int, char *, size_t));
 extern	void		  dolog		__P((Char **, struct command *));
 # ifdef UTHOST
 extern	char		 *utmphost	__P((void));
+extern	size_t		  utmphostsize	__P((void));
 # endif /* UTHOST */
 #endif /* HAVENOUTMP */
 
