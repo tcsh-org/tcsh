@@ -1,3 +1,4 @@
+ 13. make automatic dspmbyte determination case insensitive
  12. V6.13.01 - 20040724
  11. bug fix in automatic dspmbyte setting (Miloslav Trmac)
  10. iconv patches (Aleksey Nogin)

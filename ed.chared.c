@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.71 2002/03/08 17:36:45 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.72 2004/05/19 18:51:42 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.71 2002/03/08 17:36:45 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.72 2004/05/19 18:51:42 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1127,8 +1127,10 @@ c_get_histline()
 	    LastChar = InputBuf;
     }
   
+#ifdef DSPMBYTE
     if (dspmbyte_utf8)
 	setutf8lit();
+#endif /* DSPMBYTE */
 
 #ifdef KSHVI
     if (VImode)
@@ -1918,8 +1920,10 @@ e_toggle_hist(c)
 	    LastChar = InputBuf;
     }
 
+#ifdef DSPMBYTE
     if (dspmbyte_utf8)
 	setutf8lit();
+#endif /* DSPMBYTE */
 
 #ifdef KSHVI
     if (VImode)
