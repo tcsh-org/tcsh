@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.97 2002/03/05 23:21:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.98 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.97 2002/03/05 23:21:14 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.98 2002/03/08 17:36:46 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1378,10 +1378,12 @@ dosetenv(v, c)
 	return;
     }
 
+#ifdef NLS_CATALOGS
     if (eq(vp, STRNLSPATH)) {
 	(void) catclose(catd);
 	nlsinit();
     }
+#endif
 
     if (eq(vp, STRNOREBIND)) {
 	NoNLSRebind = 1;
@@ -1577,10 +1579,12 @@ dounsetenv(v, c)
 		else if (eq(name, STRLS_COLORS))
 		    parseLS_COLORS(n);
 #endif /* COLOR_LS_F */
+#ifdef NLS_CATALOGS
 		else if (eq(name, STRNLSPATH)) {
 		    (void) catclose(catd);
 		    nlsinit();
 		}
+#endif
 		/*
 		 * start again cause the environment changes
 		 */
