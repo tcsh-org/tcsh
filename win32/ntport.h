@@ -1,4 +1,4 @@
-/*$Header$*/
+/*$Header: /src/pub/tcsh/win32/ntport.h,v 1.3 2002/08/11 07:58:12 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -304,7 +304,7 @@ extern int quoteProtect(char *, char *,unsigned long) ;
 extern char* fix_path_for_child(void) ;
 extern void restore_path(char *) ;
 extern int copy_quote_and_fix_slashes(char *,char *, int * );
-extern void concat_args_and_quote(char **,char **,unsigned int *, char **, 
+extern char* concat_args_and_quote(char **,char**,char **,unsigned int *, char **, 
 	unsigned int *) ;
 
 

@@ -226,6 +226,11 @@ void dostart(Char ** vc, struct command *c) {
 			if (j + cmdlen > cmdsize) {
 				ptr = cmdstr;
 				cmdstr = heap_realloc(cmdstr, cmdsize << 1);
+				if(!cmdstr)
+				{
+					heap_free(ptr);
+					stderror(ERR_NOMEM,"start");
+				}
 				cmdend =  cmdstr + (cmdend - ptr);
 				cmdsize <<= 1;
 			}
@@ -649,6 +654,7 @@ void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {
 
 	char *prog;
 	char *cmdstr, *p2, *cmdend;
+	char *originalPtr = NULL;
 	unsigned int cmdsize,cmdlen;
 	int hasdot = 0;
 	char err2[256];
@@ -661,6 +667,7 @@ void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {
 
 	prog=*argv;
 
+	dprintf("trying shellex for prog %s\n",prog);
 	ptr = prog;
 	if (!is_url(prog)) {
 
@@ -689,9 +696,8 @@ void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {
 		}
 
 	}
-	cmdstr= heap_alloc(MAX_PATH<<2);
+	originalPtr = cmdstr= heap_alloc(MAX_PATH<<2);
 
-	cmdstr++; // concat_args_and_quote expects ptr to 2nd place in string
 	cmdsize = MAX_PATH<<2;
 
 	p2 = cmdstr;
@@ -702,7 +708,13 @@ void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {
 	*argv++; // the first arg is the command
 
 
-	concat_args_and_quote(argv,&cmdstr,&cmdlen,&cmdend,&cmdsize);
+	dprintf("try_shell_ex calling c_a_a_q");
+	if(!concat_args_and_quote(argv,&originalPtr,&cmdstr,&cmdlen,&cmdend,&cmdsize))
+	{
+		errno = ENOMEM;
+		heap_free(originalPtr);
+		return;
+	}
 
 	*cmdend = 0;
 
@@ -876,6 +888,7 @@ int nt_texec(char *prog, char**args ) {
 	unsigned int priority;
 	char *argv0, *savepath;
 	char *cmdstr,*cmdend ;
+	char *originalPtr = NULL;
 	unsigned int cmdsize,cmdlen;
     char *p2;
 	char **savedargs;
@@ -888,7 +901,7 @@ int nt_texec(char *prog, char**args ) {
 	savedargs = args;
 
 	/* MUST FREE !! */
-	cmdstr= heap_alloc(MAX_PATH<<2);
+	originalPtr = cmdstr= heap_alloc(MAX_PATH<<2);
 	cmdsize = MAX_PATH<<2;
 
 	is_winnt = (gdwPlatform != VER_PLATFORM_WIN32_WINDOWS);
@@ -904,6 +917,7 @@ int nt_texec(char *prog, char**args ) {
 		 // If not quoted, skip initial character we left for quote
 		*cmdstr = 'A';
 		cmdstr++; 
+		cmdsize--;
 	}
 	*p2 = 0; 
 	cmdend = p2;
@@ -937,7 +951,14 @@ int nt_texec(char *prog, char**args ) {
 
 	*args++; // the first arg is the command
 
-	concat_args_and_quote(args,&cmdstr,&cmdlen,&cmdend,&cmdsize);
+	dprintf("nt_texec calling c_a_a_q");
+	if(concat_args_and_quote(args,&originalPtr,&cmdstr,&cmdlen,&cmdend,&cmdsize) == NULL)
+	{
+		retval = 1;
+		errno  = ENOMEM;
+		heap_free(originalPtr);
+		goto free_mem;
+	}
 
 	*cmdend = 0;
 
@@ -983,7 +1004,7 @@ int nt_texec(char *prog, char**args ) {
 		}while(retries < 3);
 	}
 re_cp:
-	dprintf("cmdstr %s\n",cmdstr);
+	//dprintf("cmdstr %s\n",cmdstr);
 
 	savepath = fix_path_for_child();
 
@@ -1012,7 +1033,6 @@ re_cp:
 			goto re_cp;
 		}
 		retval = 1;
-		goto cleanup;
 	}
 	else{
 		int gui_app ;
@@ -1024,17 +1044,16 @@ re_cp:
 			gui_app=0;
 		else
 			gui_app= is_gui(argv0);
-		
+
 		if(!gui_app) {
 			WaitForSingleObject(pi.hProcess,INFINITE);
 			(void)GetExitCodeProcess(pi.hProcess,&exitcode);
 			set(STRstatus, putn(exitcode), VAR_READWRITE);
 		}
 		retval = 0;
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
 	}
-cleanup:
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
 free_mem:
 	CloseHandle(si.hStdInput);
 	CloseHandle(si.hStdOutput);
@@ -1042,7 +1061,7 @@ free_mem:
 
 	restore_path(savepath);
 
-	heap_free(cmdstr -1);
+	heap_free(originalPtr);
 	if (argv0)
 		heap_free(argv0);
 	return retval;

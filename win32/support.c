@@ -1,4 +1,4 @@
-/*$Header$*/
+/*$Header: /src/pub/tcsh/win32/support.c,v 1.3 2002/08/11 07:58:13 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -183,16 +183,39 @@ void getmachine (void) {
 	GetSystemInfo(&sysinfo);
 
 	if(osver.dwPlatformId == VER_PLATFORM_WIN32_NT) {
-		if (gdwVersion > 4)
-			ostype = "Windows2000";
-		else
-			ostype = "WindowsNT";
+		char *ostr;
+		switch(osver.dwMajorVersion)
+		{
+			case 5:
+				switch (osver.dwMinorVersion)
+				{
+					case 0:
+						ostype = "Windows2000";
+						ostr = "Windows 2000";
+						break;
+					case 1:
+						ostype = "WindowsXP";
+						ostr = "Windows XP";
+						break;
+					case 2:
+						ostype = "WindowsServer2003";
+						ostr = "Windows Server 2003";
+						break;
+					default:
+						ostype = "Windows-Post-2000";
+						ostr = "Windows Post Windows-2000";
+				}
+				break;
+			default:
+				ostype = "WindowsNT";
+				ostr = "Windows NT";
+		}
 
 		wsprintf(temp,"%s %d.%d Build %d (%s)",
-			gdwVersion > 4 ? "Windows 2000":"NT",
+			ostr,
 			osver.dwMajorVersion,osver.dwMinorVersion,
 			osver.dwBuildNumber,
-			osver.szCSDVersion[0]?osver.szCSDVersion:"vanilla");
+			osver.szCSDVersion[0]?osver.szCSDVersion:"");
 		tsetenv(STRHOSTTYPE,str2short(temp));
 	}
 	else if (osver.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
@@ -242,6 +265,7 @@ void nt_execve(char *prog, char**args, char**envir ) {
 	unsigned int priority;
 	char *argv0;
 	char *cmdstr, *cmdend ;
+	char *originalPtr;
 	unsigned int cmdsize,cmdlen;
     char *p2;
 	char **savedargs;
@@ -256,7 +280,7 @@ void nt_execve(char *prog, char**args, char**envir ) {
 	 * This memory is not freed because we are exec()ed and will
 	 * not be alive long.
 	 */
-	cmdstr= heap_alloc(MAX_PATH<<2);
+	originalPtr = cmdstr= heap_alloc(MAX_PATH<<2);
 
 	is_winnt = (gdwPlatform != VER_PLATFORM_WIN32_WINDOWS);
 
@@ -275,6 +299,7 @@ void nt_execve(char *prog, char**args, char**envir ) {
 	if (*cmdstr != '"') {
 		*cmdstr = 'A';
 		cmdstr++; 
+		cmdsize--;
 	}
 	*p2 = 0;
 	cmdend = p2;
@@ -346,7 +371,14 @@ win95_directly_here:
 	*args++; // the first arg is the command
 
 
-	concat_args_and_quote(args,&cmdstr,&cmdlen,&cmdend,&cmdsize);
+	dprintf("nt_execve calling c_a_a_q");
+	if(!concat_args_and_quote(args,&originalPtr,&cmdstr,&cmdlen,&cmdend,
+				&cmdsize))
+	{
+		heap_free(originalPtr);
+		errno = ENOMEM;
+		return;
+	}
 
 	*cmdend = 0;
 
@@ -363,7 +395,7 @@ win95_directly_here:
 
 
 re_cp:
-	dprintf("argv0 %s cmdstr %s\n",argv0,cmdstr);
+	//dprintf("argv0 %s cmdstr %s\n",argv0,cmdstr);
 	bRet = CreateProcessA(argv0, cmdstr,
 			NULL, NULL,
 			TRUE, // need this for redirecting std handles
@@ -736,8 +768,8 @@ int copy_quote_and_fix_slashes(char *source,char *target, int *hasdot ) {
  * It's about a zillion times faster. 
  * -amol 2/4/99
  */
-void concat_args_and_quote(char **args, char **cstr, unsigned int *clen,
-		char **cend, unsigned int *cmdsize) {
+char *concat_args_and_quote(char **args, char **poriginalPtr,char **cstr, 
+  unsigned int *clen, char **cend, unsigned int *cmdsize) {
 
 	unsigned int argcount, arglen, cmdlen;
 	char *tempptr, *cmdend ,*cmdstr;
@@ -748,6 +780,7 @@ void concat_args_and_quote(char **args, char **cstr, unsigned int *clen,
 	unsigned long tqlen = 256;
 	int rc;
 
+	dprintf("entering concat_args_and_quote\n");
 	tempquotedbuf = heap_alloc(tqlen);
 
 	noquoteprotect = (varval(STRNTnoquoteprotect) != STRNULL);
@@ -771,7 +804,7 @@ void concat_args_and_quote(char **args, char **cstr, unsigned int *clen,
 		arglen = 0;
 		argcount++;
 
-		dprintf("args is %s\n",*args);
+		//dprintf("args is %s\n",*args);
 		if (!*tempptr) {
 			*cmdend++ = '"';
 			*cmdend++ = '"';
@@ -785,12 +818,24 @@ void concat_args_and_quote(char **args, char **cstr, unsigned int *clen,
 			arglen++;
 		}
         if (arglen + cmdlen +4 > *cmdsize) { // +4 is if we have to quote
-            tempptr = cmdstr-1;
-            cmdstr = heap_realloc(cmdstr-1,*cmdsize<<1);
-            if (tempptr != cmdstr) {
-                cmdend = cmdstr + (cmdend-tempptr);
+
+			dprintf("before realloc: original %p, cmdstr %p\n",
+				*poriginalPtr,cmdstr);
+
+            tempptr = heap_realloc(*poriginalPtr,*cmdsize<<1);
+
+			if(!tempptr)
+				return NULL;
+
+			// If it's not the same heap block, re-adjust the pointers.
+            if (tempptr != *poriginalPtr) {
+				cmdstr = tempptr + (cmdstr - *poriginalPtr);
+                cmdend = cmdstr + (cmdend- *poriginalPtr);
+				*poriginalPtr = tempptr;
             }
-            cmdstr++;
+			dprintf("after realloc: original %p, cmdstr %p\n",
+				*poriginalPtr,cmdstr);
+
             *cmdsize <<=1;
         }
 		if (quotespace)
@@ -839,6 +884,8 @@ void concat_args_and_quote(char **args, char **cstr, unsigned int *clen,
 
 	heap_free(tempquotedbuf);
 
+
+	return cmdstr-1;
 }
 char *fix_path_for_child(void) {
 
