@@ -1,3 +1,4 @@
+ 40. Security fix for here-doc tmp files (proton@ENERGYMECH.NET>)
  39. Fix resource limit rounding *again* (Johannes Gross)
  38. Fix $ expansion in prompt (Takashi Sumiyoshi)
  37. V6.09.03 - 20000715
