@@ -1,3 +1,6 @@
+ 45. Fix repeat 3 repeat 2 echo foo
+ 44. Fix I/O redirection in scripts (Ian D Allen)
+ 43. Fix ` \\\n ` evaluation (Jean-Luc Leger)
  42. add --version (Nelson Beebe)
  41. portability fixes for sed (Nelson Beebe)
  40. undef sv_handler for AIX's benefit. (Nelson Beebe)
