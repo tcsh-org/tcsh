@@ -3727,7 +3727,10 @@ instead of `/<skipped>'.
 Lists file name suffixes to be ignored by completion.
 .TP 8
 .B filec
-In \fItcsh\fR, completion is always used and this variable is ignored.
+In \fItcsh\fR, completion is always used and this variable is ignored
+by default. If 
+.B edit
+is unset, then the traditional \fIcsh\fR completion is used.
 If set in \fIcsh\fR, filename completion is used.
 .TP 8
 .B gid \fR(+)
