@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.52 1993/12/12 19:55:08 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.53 1993/12/16 16:51:24 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -601,10 +601,8 @@ extern int setpriority();
 extern int nice();
 # endif	/* BSDNICE */
 
-# if (!defined(fps500) && !defined(apollo) && !defined(__lucid) && !defined(HPBSD))
-extern void setpwent();
-extern void endpwent();
-# endif /* !fps500 && !apollo && !__lucid */
+# if (!defined(fps500) && !defined(apollo) && !defined(__lucid) && !defined(HPBSD) && !defined(DECOSF1))
+# endif /* !fps500 && !apollo && !__lucid && !HPBSD && !DECOSF1 */
 
 # ifndef __STDC__
 extern struct passwd *getpwuid(), *getpwnam(), *getpwent();
@@ -651,7 +649,9 @@ extern int getpeername __P((int, struct sockaddr *, int *));
 #endif /* SUNOS4 && __GNUC__ == 2 */
 
 #if (defined(BSD) && !defined(__386BSD__)) || defined(SUNOS4) 
+# ifndef DECOSF1
 extern void bcopy	__P((const void *, void *, size_t));
+# endif
 # define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
 #endif /* (BSD && !__386BSD__) || SUNOS4 */
 
