@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.init.c,v 3.24 1998/07/07 12:06:37 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.init.c,v 3.25 1998/10/25 15:10:50 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.24 1998/07/07 12:06:37 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.25 1998/10/25 15:10:50 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -260,6 +260,16 @@ tw_cmd_cmd()
 	if (recexec)
 	    dir = Strspl(*pv, STRslash);
 	while ((dp = readdir(dirp)) != NULL) {
+#if defined(_UWIN) || defined(__CYGWIN__)
+	    /* Turn foo.{exe,com,bat} into foo since UWIN's readdir returns
+	     * the file with the .exe, .com, .bat extension
+	     */
+	    size_t ext = strlen(dp->d_name) - 4;
+	    if ((ext > 0) && (strcmp(&dp->d_name[ext], ".exe") == 0 ||
+		strcmp(&dp->d_name[ext], ".bat") == 0 ||
+		strcmp(&dp->d_name[ext], ".com") == 0))
+		dp->d_name[ext] = '\0';
+#endif /* _UWIN || __CYGWIN__ */
 	    /* the call to executable() may make this a bit slow */
 	    name = str2short(dp->d_name);
 	    if (dp->d_ino == 0 || (recexec && !executable(dir, name, 0)))

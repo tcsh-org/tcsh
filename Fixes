@@ -1,3 +1,10 @@
+ 37. V6.09.03 - 20000715
+ 36. cygwin port fixes (Arihiro Yoshida)
+ 35. Add a new "catalog" variable that specifies which NLS catalog
+     to be used (Issei Suzuki)
+ 34. cleanup and addition of page up/down (amol)
+ 33. fix vfork compile problem.
+ 32. use inet_addr instead of inet_aton for portability.
  31. V6.09.02 - 20000704
  30. lots more completions (George Cox)
  29. change FILSIZ to BUFSIZE [now that BUFSIZE >> MAXPATHLEN] and

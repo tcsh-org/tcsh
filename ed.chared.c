@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.60 2000/06/10 22:07:55 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.61 2000/06/11 02:14:11 kim Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -76,7 +76,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.60 2000/06/10 22:07:55 kim Exp $")
+RCSID("$Id: ed.chared.c,v 3.61 2000/06/11 02:14:11 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -118,8 +118,8 @@ static Char srch_char = 0;			/* Search target */
 /* all routines that start with c_ are private to this set of routines */
 static	void	 c_alternativ_key_map	__P((int));
 static	void	 c_insert		__P((int));
-static	void	 c_delafter		__P((int));
-static	void	 c_delbefore		__P((int));
+void	 c_delafter		__P((int));
+void	 c_delbefore		__P((int));
 static 	int	 c_to_class		__P((int));
 static	Char	*c_prev_word		__P((Char *, Char *, int));
 static	Char	*c_next_word		__P((Char *, Char *, int));
@@ -187,7 +187,7 @@ c_insert(num)
     LastChar += num;
 }
 
-static void
+void
 c_delafter(num)	
     register int num;
 {
@@ -254,7 +254,7 @@ c_delafter(num)
 #endif /* notdef */
 }
 
-static void
+void
 c_delbefore(num)		/* delete before dot, with bounds checking */
     register int num;
 {
@@ -3902,79 +3902,19 @@ e_dosify_prev(c)
     USE(c);
     return (CC_ERROR);
 }
-#else /* WINNT */
-/*ARGSUSED*/
 CCRETVAL
-e_dosify_next(c)
+e_page_up(c)
     int c;
 {
-    register Char *cp, *p, *kp;
-
     USE(c);
-    if (Cursor == LastChar)
-	return(CC_ERROR);
-    /* else */
-
-	cp = Cursor;
-	while(  cp < LastChar) {
-		if ( (*cp & CHAR == ' ') && (cp[-1] & CHAR != '\\') )
-			break;
-		cp++;
-	}
-
-    for (p = Cursor, kp = KillBuf; p < cp; p++)	{/* save the text */
-	if ( ( *p & CHAR ) == '/') {
-	    *kp++ = '\\';
-	    *kp++ = '\\';
-	}
-	else
-	    *kp++ = *p;
-    }
-    LastKill = kp;
-
-    c_delafter((int)(cp - Cursor));	/* delete after dot */
-    if (Cursor > LastChar)
-	Cursor = LastChar;	/* bounds check */
-    return (e_yank_kill(c));
+    return (CC_ERROR);
 }
-/*ARGSUSED*/
 CCRETVAL
-e_dosify_prev(c)
+e_page_down(c)
     int c;
 {
-    register Char *cp, *p, *kp;
-
     USE(c);
-    if (Cursor == InputBuf)
-	return(CC_ERROR);
-    /* else */
-
-    cp = Cursor-1;
-    /* Skip trailing spaces */
-    while ((cp > InputBuf) && ( (*cp & CHAR) == ' '))
-    	cp--;
-
-    while (cp > InputBuf) {
-	if ( ((*cp & CHAR) == ' ') && ((cp[-1] & CHAR) != '\\') )
-	    break;
-	cp--;
-    }
-
-    for (p = cp, kp = KillBuf; p < Cursor; p++)	{/* save the text */
-	if ( ( *p & CHAR ) == '/') {
-	    *kp++ = '\\';
-	    *kp++ = '\\';
-	}
-	else
-	    *kp++ = *p;
-    }
-    LastKill = kp;
-
-    c_delbefore((int)(Cursor - cp));	/* delete before dot */
-    Cursor = cp;
-    if (Cursor < InputBuf)
-	Cursor = InputBuf;	/* bounds check */
-    return(e_yank_kill(c));
+    return (CC_ERROR);
 }
 #endif /* !WINNT */
 

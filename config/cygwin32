@@ -121,7 +121,9 @@
 #define HAVENOLIMIT
 
 #undef PW_SHADOW
+#ifndef _PATH_TCSHELL
 #define _PATH_TCSHELL "/bin/tcsh"
+#endif
 #define ECHO_STYLE      BOTH_ECHO
 #ifdef BSDSIGS
 # define __USE_BSD_SIGNAL

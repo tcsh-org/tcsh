@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.83 2000/06/11 02:14:16 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.84 2000/07/04 19:46:23 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -50,6 +50,10 @@
  */
 # define BACKPIPE
 #endif /* notdef */
+
+#ifdef __CYGWIN__
+#  undef NEEDstrerror
+#endif
 
 #ifdef   _VMS_POSIX
 # ifndef  NOFILE 
@@ -528,7 +532,7 @@ typedef struct timeval timeval_t;
 #endif /* NeXT */
 
 #if !defined(BSD4_4) && !defined(__linux__) && !defined(__hpux) && \
-    !defined(sgi) && !defined(_AIX)
+    !defined(sgi) && !defined(_AIX) && !defined(__GYGWIN__)
 #ifndef NEEDgethostname
 extern int gethostname __P((char *, int));
 #endif /* NEEDgethostname */

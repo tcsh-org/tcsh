@@ -235,6 +235,13 @@ if test $ac_cv_prog_gcc = no ; then
   CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
 fi
 
+case "${host}" in
+  ## Cygnus GNU Win32
+  *-cygwin)
+    CFLAGS="$CFLAGS -mno-win32"
+  ;;
+esac
+
 AC_SEARCH_LIBS(crypt, crypt)
 AC_SEARCH_LIBS(tgetent, termlib curses termcap)
 AC_SEARCH_LIBS(gethostbyname, nsl)

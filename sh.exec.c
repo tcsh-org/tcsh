@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.48 2000/01/14 22:57:27 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.49 2000/06/10 20:08:44 kim Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.48 2000/01/14 22:57:27 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.49 2000/06/10 20:08:44 kim Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -147,7 +147,7 @@ static Char *justabs[] = {STRNULL, 0};
 
 static	void	pexerr		__P((void));
 static	void	texec		__P((Char *, Char **));
-static	int	hashname	__P((Char *));
+int	hashname	__P((Char *));
 static	int 	iscommand	__P((Char *));
 
 void
@@ -751,7 +751,7 @@ dohash(vv, c)
 #ifdef WINNT
 	    nt_check_name_and_hash(is_windir, dp->d_name, i);
 #else /* !WINNT */
-#if defined(_UWIN) /* XXX: Add cygwin too */
+#if defined(_UWIN) || defined(__CYGWIN__)
 	    /* Turn foo.{exe,com,bat} into foo since UWIN's readdir returns
 	     * the file with the .exe, .com, .bat extension
 	     */
@@ -762,7 +762,7 @@ dohash(vv, c)
 				  strcmp(&dp->d_name[ext], ".com") == 0))
 		    dp->d_name[ext] = '\0';
 	    }
-#endif /* _UWIN */
+#endif /* _UWIN || __CYGWIN__ */
 # ifdef FASTHASH
 	    hashval = hashname(str2short(dp->d_name));
 	    bis(hashval, i);
@@ -823,7 +823,7 @@ hashstat(v, c)
 /*
  * Hash a command name.
  */
-static int
+int
 hashname(cp)
     register Char *cp;
 {
@@ -1171,54 +1171,7 @@ find_cmd(cmd, prt)
     xfree((ptr_t) sv);
     return rval;
 }
-
 #ifdef WINNT
-int
-nt_check_if_windir(path)
-    char *path;
-{
-    char windir[MAX_PATH];
-
-    (void)GetWindowsDirectory(windir, sizeof(windir));
-    windir[2] = '/';
-
-    return (strstr(path, windir) != NULL);
-}
-
-void
-nt_check_name_and_hash(is_windir, file, i)
-    int is_windir;
-    char *file;
-    int i;
-{
-    char name_only[MAX_PATH];
-    char *tmp = (char *)strrchr(file, '.');
-    char uptmp[5], *nameptr, *np2;
-    int icount, hashval;
-
-    if(!tmp || tmp[4]) 
-	goto nodot;
-
-    for (icount = 0; icount < 4; icount++)
-	uptmp[icount] = toupper(tmp[icount]);
-    uptmp[4]=0;
-
-    if (is_windir)
-	if((uptmp[1] != 'E') || (uptmp[2] != 'X') || (uptmp[3] != 'E'))
-	    return;
-    (void) memset(name_only, 0, MAX_PATH);
-    nameptr = file;
-    np2 = name_only;
-    while(nameptr != tmp) {
-	*np2++= tolower(*nameptr);
-	nameptr++;
-    }
-    hashval = hashname(str2short(name_only));
-    bis(hashval, i);
-nodot:
-    hashval = hashname(str2short(file));
-    bis(hashval, i);
-}
 int hashval_extern(cp)
 	Char *cp;
 {
@@ -1230,4 +1183,11 @@ int bit_extern(val,i)
 {
 	return bit(val,i);
 }
+void bis_extern(val,i)
+	int val;
+	int i;
+{
+	bis(val,i);
+}
 #endif /* WINNT */
+

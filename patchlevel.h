@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/patchlevel.h,v 3.122 2000/01/14 22:57:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/patchlevel.h,v 3.123 2000/07/04 19:38:54 christos Exp $ */
 /*
  * patchlevel.h: Our life story.
  */
@@ -8,7 +8,7 @@
 #define ORIGIN "Astron"
 #define REV 6
 #define VERS 9
-#define PATCHLEVEL 2
-#define DATE "2000-07-04"
+#define PATCHLEVEL 3
+#define DATE "2000-07-15"
 
 #endif /* _h_patchlevel */

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.87 2000/06/09 19:43:43 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.88 2000/07/04 19:42:47 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.87 2000/06/09 19:43:43 kim Exp $")
+RCSID("$Id: sh.func.c,v 3.88 2000/07/04 19:42:47 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1396,11 +1396,6 @@ dosetenv(v, c)
 	xfree((ptr_t) lp);
 	return;
     }
-    if (eq(vp, STRtcshonlystartexes)) {
-	__nt_only_start_exes = 1;
-	xfree((ptr_t) lp);
-	return;
-	}
 #endif /* WINNT */
     if (eq(vp, STRKTERM)) {
 	char *t;
@@ -1575,9 +1570,6 @@ dounsetenv(v, c)
 		else if (eq(name,(STRtcshlang))) {
 		    nls_dll_unload();
 		    nlsinit();
-		}
-		else if (eq(name,(STRtcshonlystartexes))) {
-			__nt_only_start_exes = 0;
 		}
 #endif /* WINNT */
 #ifdef COLOR_LS_F
@@ -2391,8 +2383,13 @@ void
 nlsinit()
 {
 #ifdef NLS_CATALOGS
-    catd = catopen("tcsh", MCLoadBySet);
-#endif
+    char catalog[ 256 ] = { 't', 'c', 's', 'h', '\0' };
+
+    if (adrof(STRcatalog) != NULL)
+        xsnprintf((char *)catalog, sizeof(catalog), "tcsh.%s",
+		  short2str(varval(STRcatalog)));
+    catd = catopen(catalog, MCLoadBySet);
+#endif /* NLS_CATALOGS */
 #ifdef WINNT
     nls_dll_init();
 #endif /* WINNT */
