@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -43,7 +43,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: tc.alloc.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 
 #include "sh.h"
@@ -54,7 +54,7 @@ char   *membot = NULL;		/* PWP: bottom of allocatable memory */
 #ifndef SYSMALLOC
 
 #undef RCHECK
-#define DEBUG
+#undef DEBUG
 
 
 #ifndef NULL
