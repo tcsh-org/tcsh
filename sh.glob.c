@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.46 2000/07/04 19:40:57 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.47 2000/11/11 23:03:37 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.46 2000/07/04 19:40:57 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.47 2000/11/11 23:03:37 christos Exp $")
 
 #include "tc.h"
 
@@ -450,14 +450,12 @@ globexpand(v)
     /*
      * Step 4: expand .. if the variable symlinks==expand is set
      */
-    if ( symlinks == SYM_EXPAND )
+    if (symlinks == SYM_EXPAND) {
 	for (s = *vl; s; s = *++vl) {
-	    char *path = short2str(s);
-	    if (strstr(path, "..") != NULL && access(path, F_OK) == 0) {
-		*vl = dnormalize(s, 1);
-		xfree((ptr_t) s);
-	    }
+	    *vl = dnormalize(s, 1);
+	    xfree((ptr_t) s);
 	}
+    }
     vl = nv;
 
     return (vl);
