@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dir.c,v 3.3 1991/07/31 07:12:20 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.dir.c,v 1.3 91/09/24 17:08:34 marc Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -34,11 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: sh.dir.c,v 3.3 1991/07/31 07:12:20 christos Exp $")
-
-
 #include "sh.h"
+
+RCSID("$Id: sh.dir.c,v 3.4 1991/09/08 00:45:32 christos Exp $")
+
 /*
  * C Shell - directory management
  */
@@ -103,7 +102,8 @@ dinit(hp)
 	 */
 	if (hp && *hp &&
 	    stat(tcp, &swd) != -1 && stat(short2str(hp), &shp) != -1 &&
-	    swd.st_dev == shp.st_dev && swd.st_ino == shp.st_ino)
+	    DEV_DEV_COMPARE(swd.st_dev, shp.st_dev)  &&
+		swd.st_ino == shp.st_ino)
 	    cp = hp;
 	else {
 	    char   *cwd;
@@ -112,7 +112,8 @@ dinit(hp)
 	     * use PWD if we have it (for subshells)
 	     */
 	    if (cwd = getenv("PWD")) {
-		if (stat(cwd, &shp) != -1 && swd.st_dev == shp.st_dev &&
+		if (stat(cwd, &shp) != -1 && 
+			DEV_DEV_COMPARE(swd.st_dev, shp.st_dev) &&
 		    swd.st_ino == shp.st_ino)
 		    tcp = cwd;
 	    }
@@ -688,7 +689,7 @@ dfree(dp)
 	dp->di_next = dp->di_prev = 0;
     }
     else {
-	xfree((char *) dp->di_name);
+	xfree((ptr_t) dp->di_name);
 	xfree((ptr_t) dp);
     }
 }
@@ -966,10 +967,10 @@ dcanon(cp, p)
 	 */
 	p2 = Strcpy(link, cp);
 	for (sp = NULL; *p2 && stat(short2str(p2), &statbuf) != -1;) {
-	    if (statbuf.st_dev == home_dev &&
-		statbuf.st_ino == home_ino) {
-		sp = (Char *) - 1;
-		break;
+	    if (DEV_DEV_COMPARE(statbuf.st_dev, home_dev) &&
+			statbuf.st_ino == home_ino) {
+			sp = (Char *) - 1;
+			break;
 	    }
 	    if (sp = Strrchr(p2, '/'))
 		*sp = '\0';

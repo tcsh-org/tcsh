@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.5 1991/08/06 01:50:07 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.vers.c,v 1.3 91/09/24 17:11:48 marc Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: tc.vers.c,v 3.5 1991/08/06 01:50:07 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: tc.vers.c,v 3.6 1991/09/08 00:45:32 christos Exp $")
+
 #include "patchlevel.h"
 
 
@@ -111,6 +111,11 @@ gethosttype()
 #  define _havehosttype_
     hosttype = str2short("aix370");
 # endif /* _AIX370 */
+
+# ifdef _IBMESA
+#  define _havehosttype_
+    hosttype = str2short("aixESA");
+# endif /* _IBMESA */
 
 # ifdef _IBMR2
 #  define _havehosttype_

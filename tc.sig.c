@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.c,v 3.2 1991/08/05 23:02:13 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.sig.c,v 1.3 91/09/24 17:11:34 marc Exp $ */
 /*
  * sh.sig.c: Signal routine emulations
  */
@@ -34,36 +34,11 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: tc.sig.c,v 3.2 1991/08/05 23:02:13 christos Exp $")
-
 #include "sh.h"
-/*
- * a little complicated #include <sys/wait.h>! :-(
- */
-#if SVID > 0
-# ifdef hpux
-#  ifndef __hpux
-#   include "tc.wait.h"	/* 6.5 broke <sys/wait.h> */
-#  else
-#   ifndef POSIX
-#    define _BSD
-#   endif
-#   ifndef _CLASSIC_POSIX_TYPES
-#    define _CLASSIC_POSIX_TYPES
-#   endif
-#   include <sys/wait.h> /* 7.0 fixed it again */
-#  endif /* __hpux */
-# else /* hpux */
-#  if defined(OREO) || defined(IRIS4D) || defined(POSIX)
-#   include <sys/wait.h>
-#  else	/* OREO || IRIS4D || POSIX */
-#   include "tc.wait.h"
-#  endif /* OREO || IRIS4D || POSIX */
-# endif	/* hpux */
-#else /* SVID == 0 */
-# include <sys/wait.h>
-#endif /* SVID == 0 */
+
+RCSID("$Id: tc.sig.c,v 3.3 1991/08/06 01:49:53 christos Exp $")
+
+#include "tc.wait.h"
 
 #ifndef BSDSIGS
 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.4 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.sem.c,v 1.3 91/09/24 17:10:24 marc Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -35,10 +35,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: sh.sem.c,v 3.4 1991/09/08 00:45:32 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: sh.sem.c,v 3.5 1991/09/10 04:51:46 christos Exp $")
+
 #include "tc.h"
 
 #ifdef FIOCLEX
@@ -62,6 +62,22 @@ static	void		chkclob	__P((char *));
 /*
  * C shell
  */
+
+/*
+ * For SVR4, there are problems with pipelines having the first process as
+ * the group leader.  The problem occurs when the first process exits before
+ * the others have a chance to setpgid().  This is because in SVR4 you can't
+ * have a zombie as a group leader.  The solution I have used is to reverse
+ * the order in which pipelines are started, making the last process the
+ * group leader.  (Note I am not using 'pipeline' in the generic sense -- I
+ * mean processes connected by '|'.)  I don't know yet if this causes other
+ * problems.
+ *
+ * All the changes for this are in execute(), and are enclosed in '#if SVID>3'
+ *
+ * David Dawes (dawes@physics.su.oz.au) Oct 1991
+ */
+
 /*VARARGS 1*/
 void
 execute(t, wanttty, pipein, pipeout)
@@ -108,8 +124,13 @@ execute(t, wanttty, pipein, pipeout)
 	/* fall into... */
 
     case NODE_PAREN:
+#if SVID > 3
+	if (t->t_dflg & F_PIPEIN)
+	    mypipe(pipein);
+#else /* SVID <= 3 */
 	if (t->t_dflg & F_PIPEOUT)
 	    mypipe(pipeout);
+#endif /* SVID <= 3 */
 	/*
 	 * Must do << early so parent will know where input pointer should be.
 	 * If noexec then this is all we do.
@@ -212,6 +233,15 @@ execute(t, wanttty, pipein, pipeout)
 	 * Prevent forking cd, pushd, popd, chdir cause this will cause the
 	 * shell not to change dir!
 	 */
+#if SVID > 3
+	/*
+	 * Can't have NOFORK for the tail of a pipe - because it is not the
+	 * last command spawned (even if it is at the end of a parenthesised
+	 * list).
+	 */
+	if (t->t_dflg & F_PIPEIN)
+	    t->t_dflg &= ~(F_NOFORK);
+#endif /* SVID > 3 */
 	if (bifunc && (bifunc->bfunct == dochngd ||
 		       bifunc->bfunct == dopushd ||
 		       bifunc->bfunct == dopopd))
@@ -472,29 +502,51 @@ execute(t, wanttty, pipein, pipeout)
 	     * wait for the whole job anyway, but this test doesn't really
 	     * express our intentions.
 	     */
+#if SVID > 3
+	    if (didfds == 0 && t->t_dflg & F_PIPEOUT) {
+		(void) close(pipeout[0]);
+		(void) close(pipeout[1]);
+	    }
+#else /* SVID <= 3 */
 	    if (didfds == 0 && t->t_dflg & F_PIPEIN) {
 		(void) close(pipein[0]);
 		(void) close(pipein[1]);
 	    }
-	    if ((t->t_dflg & F_PIPEOUT) == 0) {
-		if (nosigchld) {
+#endif /* SVID <= 3 */
+
+#if SVID > 3
+	    if ((t->t_dflg & F_PIPEIN) != 0)
+		break;
+#else /* SVID <= 3 */
+	    if ((t->t_dflg & F_PIPEOUT) != 0)
+		break;
+#endif /* SVID <= 3 */
+
+	    if (nosigchld) {
 #ifdef BSDSIGS
-		    (void) sigsetmask(csigmask);
+		(void) sigsetmask(csigmask);
 #else /* !BSDSIGS */
-		    (void) sigrelse(SIGCHLD);
+		(void) sigrelse(SIGCHLD);
 #endif /* BSDSIGS */
-		    nosigchld = 0;
-		}
-		if ((t->t_dflg & F_AMPERSAND) == 0)
-		    pwait();
+		nosigchld = 0;
 	    }
+	    if ((t->t_dflg & F_AMPERSAND) == 0)
+		pwait();
 	    break;
 	}
+
 	doio(t, pipein, pipeout);
+#if SVID > 3
+	if (t->t_dflg & F_PIPEIN) {
+	    (void) close(pipein[0]);
+	    (void) close(pipein[1]);
+	}
+#else /* SVID <= 3 */
 	if (t->t_dflg & F_PIPEOUT) {
 	    (void) close(pipeout[0]);
 	    (void) close(pipeout[1]);
 	}
+#endif /* SVID <= 3 */
 	/*
 	 * Perform a builtin function. If we are not forked, arrange for
 	 * possible stopping
@@ -529,6 +581,16 @@ execute(t, wanttty, pipein, pipeout)
 	exitstat();
 
     case NODE_PIPE:
+#if SVID > 3
+	t->t_dcdr->t_dflg |= F_PIPEIN | (t->t_dflg &
+			(F_PIPEOUT | F_AMPERSAND | F_NOFORK | F_NOINTERRUPT));
+	execute(t->t_dcdr, wanttty, pv, pipeout);
+	t->t_dcar->t_dflg |= F_PIPEOUT |
+	    (t->t_dflg & (F_PIPEIN | F_AMPERSAND | F_STDERR | F_NOINTERRUPT));
+	if (wanttty > 0)
+	    wanttty = 0;	/* got tty already */
+	execute(t->t_dcar, wanttty, pipein, pv);
+#else /* SVID <= 3 */
 	t->t_dcar->t_dflg |= F_PIPEOUT |
 	    (t->t_dflg & (F_PIPEIN | F_AMPERSAND | F_STDERR | F_NOINTERRUPT));
 	execute(t->t_dcar, wanttty, pipein, pv);
@@ -537,6 +599,7 @@ execute(t, wanttty, pipein, pipeout)
 	if (wanttty > 0)
 	    wanttty = 0;	/* got tty already */
 	execute(t->t_dcdr, wanttty, pv, pipeout);
+#endif /* SVID <= 3 */
 	break;
 
     case NODE_LIST:

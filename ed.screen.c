@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.4 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/ed.screen.c,v 1.3 91/09/24 17:08:08 marc Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: ed.screen.c,v 3.4 1991/09/08 00:45:32 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: ed.screen.c,v 3.5 1991/09/10 04:51:46 christos Exp $")
+
 #include "ed.h"
 #include "tc.h"
 #include "ed.defns.h"

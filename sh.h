@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.11 1991/08/05 23:02:13 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.h,v 1.2 91/09/26 02:13:24 marc Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -37,6 +37,16 @@
 #ifndef _h_sh
 #define _h_sh
 
+#ifdef CONFIGH
+# include CONFIGH
+#endif
+
+/* This is separated instead of a #else of above because makedepend is
+easily confused. */
+
+#ifndef CONFIGH
+# include "config.h"
+#endif
 
 /*
  * Sanity
@@ -103,6 +113,15 @@ typedef int sigret_t;
 #endif 
 
 #include <sys/types.h>
+
+/*
+ * This macro compares the st_dev field of struct stat. On aix on ibmESA
+ * st_dev is a structure, so comparison does not work. 
+ */
+#ifndef DEV_DEV_COMPARE
+# define DEV_DEV_COMPARE(x,y)   ((x) == (y))
+#endif /* DEV_DEV_COMPARE */
+
 #ifdef _SEQUENT_
 # include <sys/procstats.h>
 #endif /* _SEQUENT_ */
@@ -119,7 +138,11 @@ typedef int sigret_t;
 
 #ifdef BSDTIMES
 # include <sys/time.h>
-# include <sys/resource.h>
+# if SVID>3
+#  include "/usr/ucbinclude/sys/resource.h"
+# else
+#  include <sys/resource.h>
+# endif /* SVID>3 */
 #endif /* BSDTIMES */
 
 #ifndef POSIX
@@ -138,7 +161,7 @@ typedef int sigret_t;
 # else
 #  include <sgtty.h>
 # endif /* TERMIO */
-#else				/* POSIX */
+#else /* POSIX */
 # include <termios.h>
 #endif /* POSIX */
 
@@ -174,11 +197,11 @@ extern int setpgrp();
 # include <limits.h>
 #endif /* POSIX */
 
-#if SVID > 0
+#if SVID > 0 || __STDC__
 # if !defined(pyr) || !defined(aiws)
 #  include <time.h>
 # endif /* !aiws || !pyr */
-#endif /* SVID > 0 */
+#endif /* SVID > 0 || __STDC__ */
 
 #if !(defined(sun) && defined(TERMIO))
 # include <sys/ioctl.h>

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.4 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.lex.c,v 1.4 91/09/26 12:02:15 eichin Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: sh.lex.c,v 3.4 1991/09/08 00:45:32 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: sh.lex.c,v 3.5 1991/09/10 04:51:46 christos Exp $")
+
 #include "ed.h"
 /* #define DEBUG_INP */
 /* #define DEBUG_SEEK */
@@ -578,7 +578,29 @@ getdol()
 	    if (c == 'g')
 		gmodflag++, *np++ = c, c = getC(DOEXCL);
 	    *np++ = c;
-	    if (!any("htrqxe", c)) {
+	    /* scan s// [eichin:19910926.0512EST] */
+	    if (c == 's') {
+		int delimcnt = 2;
+		int delim = getC(0);
+		*np++ = delim;
+		
+		if (!delim || letter(delim)
+		    || Isdigit(delim) || any(" \t\n", delim)) {
+		    seterror(ERR_BADSUBST);
+		    break;
+		}	
+		while ((c = getC(0)) != (-1)) {
+		    *np++ = c;
+		    if(c == delim) delimcnt--;
+		    if(!delimcnt) break;
+		}
+		if(delimcnt) {
+		    seterror(ERR_BADSUBST);
+		    break;
+		}
+		c = 's';
+	    }
+	    if (!any("htrqxes", c)) {
 		if (gmodflag && c == '\n')
 		    stderror(ERR_VARSYN);	/* strike */
 		seterror(ERR_VARMOD, c);
@@ -1148,7 +1170,7 @@ gethent(sc)
 	    }
 	    np = lhsb;
 	    event = 0;
-	    while (!cmap(c, _ESC | _META | _Q | _Q1) && !any("{}:", c)) {
+	    while (!cmap(c, _ESC | _META | _Q | _Q1) && !any("${}:", c)) {
 		if (event != -1 && Isdigit(c))
 		    event = event * 10 + c - '0';
 		else
@@ -1363,35 +1385,29 @@ reread:
 	c = bgetc();
 	if (c < 0) {
 #ifndef POSIX
-#ifdef TERMIO
-#include <termio.h>
+# ifdef TERMIO
 	    struct termio tty;
-
-#else				/* SGTTYB */
-#include <sys/ioctl.h>
+# else /* SGTTYB */
 	    struct sgttyb tty;
-
-#endif				/* TERMIO */
-#else				/* POSIX */
-#include <termios.h>
+# endif /* TERMIO */
+#else /* POSIX */
 	    struct termios tty;
-
-#endif				/* POSIX */
+#endif /* POSIX */
 	    if (wanteof)
 		return (-1);
 	    /* was isatty but raw with ignoreeof yields problems */
 #ifndef POSIX
-#ifdef TERMIO
+# ifdef TERMIO
 	    if (ioctl(SHIN, TCGETA, (ioctl_t) & tty) == 0 &&
 		(tty.c_lflag & ICANON))
-#else				/* GSTTYB */
+# else /* GSTTYB */
 	    if (ioctl(SHIN, TIOCGETP, (ioctl_t) & tty) == 0 &&
 		(tty.sg_flags & RAW) == 0)
-#endif				/* TERMIO */
-#else				/* POSIX */
+# endif /* TERMIO */
+#else /* POSIX */
 	    if (tcgetattr(SHIN, &tty) == 0 &&
 		(tty.c_lflag & ICANON))
-#endif				/* POSIX */
+#endif /* POSIX */
 	    {
 		/* was 'short' for FILEC */
 		int     ctpgrp;
@@ -1407,7 +1423,7 @@ reread:
 		    xprintf("Reset tty pgrp from %d to %d\n", ctpgrp, tpgrp);
 		    goto reread;
 		}
-#endif				/* BSDJOBS */
+#endif /* BSDJOBS */
 		if (adrof(STRignoreeof)) {
 		    if (loginsh)
 			xprintf("\nUse \"logout\" to logout.\n");

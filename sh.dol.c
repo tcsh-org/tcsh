@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.dol.c,v 1.4 91/09/26 12:01:44 eichin Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -34,10 +34,9 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: sh.dol.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: sh.dol.c,v 3.2 1991/07/24 17:38:12 christos Exp $")
 
 /*
  * C shell
@@ -627,7 +626,29 @@ fixDolMod()
 	    c = DgetC(0), dolmcnt = 1;
 	    if (c == 'g')
 		c = DgetC(0), dolmcnt = 10000;
-	    if (!any("htrqxe", c))
+	    if (c == 's') {	/* [eichin:19910926.0755EST] */
+		int delimcnt = 2;
+		int delim = DgetC(0);
+		dolmod[dolnmod++] = c;
+		dolmod[dolnmod++] = delim;
+		
+		if (!delim || letter(delim)
+		    || Isdigit(delim) || any(" \t\n", delim)) {
+		    seterror(ERR_BADSUBST);
+		    break;
+		}	
+		while ((c = DgetC(0)) != (-1)) {
+		    dolmod[dolnmod++] = c;
+		    if(c == delim) delimcnt--;
+		    if(!delimcnt) break;
+		}
+		if(delimcnt) {
+		    seterror(ERR_BADSUBST);
+		    break;
+		}
+		continue;
+	    }
+	    if (!any("htrqxes", c))
 		stderror(ERR_BADMOD, c);
 #ifndef COMPAT
 	    dolmod[dolnmod++] = c;
@@ -667,8 +688,44 @@ setDolp(cp)
     dp = domod(cp, dolmod);
 #else
     dp = cp = Strsave(cp);
-    for (i = 0; i < dolnmod; i++)
-	if ((dp = domod(cp, dolmod[i]))) {
+    for (i = 0; i < dolnmod; i++) {
+	/* handle s// [eichin:19910926.0510EST] */
+	if(dolmod[i] == 's') {
+	    int delim;
+	    Char *lhsub, *rhsub, *np;
+	    size_t lhlen = 0, rhlen = 0;
+		
+	    delim = dolmod[++i];
+	    if (!delim || letter(delim)
+		|| Isdigit(delim) || any(" \t\n", delim)) {
+		seterror(ERR_BADSUBST);
+		break;
+	    }
+	    lhsub = &dolmod[++i];
+	    while(dolmod[i] != delim && dolmod[++i]) {
+		lhlen++;
+	    }
+	    dolmod[i] = 0;
+	    rhsub = &dolmod[++i];
+	    while(dolmod[i] != delim && dolmod[++i]) {
+		rhlen++;
+	    }
+	    dolmod[i] = 0;
+
+	    dp = Strstr(cp, lhsub);
+	    if(dp) {
+		np = (Char *) xmalloc((size_t)
+				      ((Strlen(cp) + 1 - lhlen + rhlen)*sizeof(Char)));
+		Strncpy(np,cp,dp-cp);
+		Strcpy(np+(dp-cp),rhsub);
+		Strcpy(np+(dp-cp)+rhlen,dp+lhlen);
+
+		xfree((ptr_t) cp);
+		dp = cp = np;
+	    } else {
+		/* should this do a seterror? */
+	    }
+        } else if ((dp = domod(cp, dolmod[i]))) {
 	    xfree((ptr_t) cp);
 	    cp = dp;
 	    dolmcnt--;
@@ -677,6 +734,7 @@ setDolp(cp)
 	    dp = cp;
 	    break;
 	}
+    }
 #endif /* COMPAT */
 
     if (dp) {

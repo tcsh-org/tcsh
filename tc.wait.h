@@ -1,6 +1,6 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.wait.h,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.wait.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
- * tc.wait.h: Wait.h for machines that don't have it or have it and
+ * tc.wait.h: <sys/wait.h> for machines that don't have it or have it and
  *	      is incorrect.
  */
 /*-
@@ -39,6 +39,36 @@
 #define _h_tc_wait
 
 /*
+ * a little complicated #include <sys/wait.h>! :-(
+ * We try to use the system's wait.h when we can...
+ */
+
+#if SVID > 0
+# ifdef hpux
+#  ifndef __hpux
+#   define NEEDwait
+#  else
+#   ifndef POSIX
+#    define _BSD
+#   endif
+#   ifndef _CLASSIC_POSIX_TYPES
+#    define _CLASSIC_POSIX_TYPES
+#   endif
+#   include <sys/wait.h> /* 7.0 fixed it again */
+#  endif /* __hpux */
+# else /* hpux */
+#  if defined(OREO) || defined(IRIS4D) || defined(POSIX)
+#   include <sys/wait.h>
+#  else	/* OREO || IRIS4D || POSIX */
+#   define NEEDwait
+#  endif /* OREO || IRIS4D || POSIX */
+# endif	/* hpux */
+#else /* SVID == 0 */
+# include <sys/wait.h>
+#endif /* SVID == 0 */
+
+#ifdef NEEDwait
+/*
  *	This wait is for big-endians and little endians
  */
 union wait {
@@ -55,13 +85,13 @@ union wait {
     }       w_S;
 };
 
-# define w_termsig     w_T.w_Termsig
-# define w_coredump    w_T.w_Coredump
-# define w_retcode     w_T.w_Retcode
-# define w_stopval     w_S.w_Stopval
-# define w_stopsig     w_S.w_Stopsig
-#else /* _SEQUENT_ */
-# if defined(vax) || defined(i386)
+#  define w_termsig     w_T.w_Termsig
+#  define w_coredump    w_T.w_Coredump
+#  define w_retcode     w_T.w_Retcode
+#  define w_stopval     w_S.w_Stopval
+#  define w_stopsig     w_S.w_Stopsig
+# else /* _SEQUENT_ */
+#  if defined(vax) || defined(i386)
     union {
 	struct {
 	    unsigned int w_Termsig:7;
@@ -75,7 +105,7 @@ union wait {
 	    unsigned int w_Dummy:16;
 	}       w_S;
     }       w_P;
-# else /* mc68000 || sparc || ??? */
+#  else /* mc68000 || sparc || ??? */
     union {
 	struct {
 	    unsigned int w_Dummy:16;
@@ -89,24 +119,29 @@ union wait {
 	    unsigned int w_Stopval:8;
 	}       w_S;
     }       w_P;
-# endif	/* vax || i386 */
+#  endif /* vax || i386 */
 };
 
-# define w_termsig	w_P.w_T.w_Termsig
-# define w_coredump	w_P.w_T.w_Coredump
-# define w_retcode	w_P.w_T.w_Retcode
-# define w_stopval	w_P.w_S.w_Stopval
-# define w_stopsig	w_P.w_S.w_Stopsig
-#endif /* _SEQUENT_ */
+#  define w_termsig	w_P.w_T.w_Termsig
+#  define w_coredump	w_P.w_T.w_Coredump
+#  define w_retcode	w_P.w_T.w_Retcode
+#  define w_stopval	w_P.w_S.w_Stopval
+#  define w_stopsig	w_P.w_S.w_Stopsig
+# endif /* _SEQUENT_ */
 
 
-#ifndef WNOHANG
-# define WNOHANG	1	/* dont hang in wait */
-#endif
+# ifndef WNOHANG
+#  define WNOHANG	1	/* dont hang in wait */
+# endif
+
 # ifndef WUNTRACED
 #  define WUNTRACED	2	/* tell about stopped, untraced children */
 # endif
+
 # define WSTOPPED 0177
 # define WIFSTOPPED(x)	((x).w_stopval == WSTOPPED)
 # define WIFSIGNALED(x)	(((x).w_stopval != WSTOPPED) && ((x).w_termsig != 0))
+
+#endif /* NEEDwait */
+
 #endif /* _h_tc_wait */

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/pathnames.h,v 3.0 1991/07/04 21:54:11 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/pathnames.h,v 1.2 91/09/26 02:14:13 marc Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -58,6 +58,12 @@
 # define _PATH_DOTLOGIN		"/etc/cshrc"
 #endif /* sgi || OREO */
 
+#if defined(NeXT)
+# define _PATH_DOTLOGIN		"/etc/login.std"
+# define _PATH_DOTLOGOUT	"/etc/logout.std"
+# define _PATH_DOTCSHRC		"/etc/cshrc.std"
+#endif /* NeXT */
+
 #ifndef _PATH_DOTLOGIN
 # define _PATH_DOTCSHRC		"/etc/csh.cshrc"
 # define _PATH_DOTLOGIN		"/etc/csh.login"
@@ -70,7 +76,9 @@
 #ifdef notdef
 # define _PATH_CSHELL 		"/bin/csh"
 #endif
+#ifndef _PATH_TCSHELL
 #define _PATH_TCSHELL		"/usr/local/bin/tcsh"
+#endif
 
 #define _PATH_LOGIN		"/bin/login"
 #ifdef NEWGRP

@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.hist.c,v 1.2 91/07/14 22:23:16 marc Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.hist.c,v 1.3 91/09/24 17:09:36 marc Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id$")
-
 #include "sh.h"
+
+RCSID("$Id: sh.hist.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+
 #include "tc.h"
 
 extern bool histvalid;

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.exec.c,v 1.5 91/10/02 03:44:10 marc Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: sh.exec.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: sh.exec.c,v 3.2 1991/09/10 04:51:46 christos Exp $")
+
 #include "tc.h"
 #include "tw.h"
 
@@ -63,29 +63,46 @@ static char *exerr;		/* Execution error message */
 static Char *expath;		/* Path for exerr */
 
 /*
- * Xhash is an array of HSHSIZ bits (HSHSIZ / 8 chars), which are used
- * to hash execs.  If it is allocated (havhash true), then to tell
- * whether ``name'' is (possibly) present in the i'th component
- * of the variable path, you look at the bit in xhash indexed by
- * hash(hashname("name"), i).  This is setup automatically
- * after .login is executed, and recomputed whenever ``path'' is
- * changed.
+ * xhash is an array of hash buckets which are used to hash execs.  If
+ * it is allocated (havhash true), then to tell if ``name'' is
+ * (possibly) presend in the i'th component of the variable path, look
+ * at the [hashname(name)] bucket of size [hashwidth] bytes, in the [i
+ * mod size*8]'th bit.  The cache size is defaults to a length of 1024
+ * buckets, each 1 byte wide.  This implementation guarantees that
+ * objects n bytes wide will be aligned on n byte boundaries.
+ *
  * The two part hash function is designed to let texec() call the
  * more expensive hashname() only once and the simple hash() several
  * times (once for each path component checked).
  * Byte size is assumed to be 8.
  */
-#define	HSHSIZ		8192	/* 1k bytes */
-#define HSHMASK		(HSHSIZ - 1)
-#define HSHMUL		243
-static char xhash[HSHSIZ / 8];
 
-#define hash(a, b)	(((a) * HSHMUL + (b)) & HSHMASK)
-#define bit(h, b)	((h)[(b) >> 3] & 1 << ((b) & 7))	/* bit test */
-#define bis(h, b)	((h)[(b) >> 3] |= 1 << ((b) & 7))	/* bit set */
+
+#define HSHMUL		241
+
+static unsigned long *xhash = NULL;
+static int hashlength = 0;
+static int hashwidth = 0;
+static int hashdebug = 0;
+
+#define hash(a, b)	(((a) * HSHMUL + (b)) % (hashlength))
+#define width(t)	(sizeof(t)*8)
+#define tbit(f, i, t)	(((unsigned t *) xhash)[(f)] &  \
+			 1 << (i & (width(t)-1)))
+#define tbis(f, i, t)	(((unsigned t *) xhash)[(f)] |= \
+			 1 << (i & (width(t)-1)))
+#define cbit(f, i)	tbit(f, i, char)
+#define cbis(f, i)	tbis(f, i, char)
+#define sbit(f, i)	tbit(f, i, short)
+#define sbis(f, i)	tbis(f, i, short)
+#define lbit(f, i)	tbit(f, i, long)
+#define lbis(f, i)	tbis(f, i, long)
+
+#define bit(f, i) (hashwidth==1?cbit(f,i):(hashwidth==2?sbit(f, i):lbit(f,i)))
+#define bis(f, i) (hashwidth==1?cbis(f,i):(hashwidth==2?sbis(f, i):lbis(f,i)))
+
 #ifdef VFORK
 static int hits, misses;
-
 #endif
 
 /* Dummy search path for just absolute search when no path */
@@ -102,7 +119,7 @@ doexec(t)
     register Char *dp, **pv, **av, *sav;
     register struct varent *v;
     register bool slash;
-    register int hashval = 0, hashval1, i;
+    register int hashval = 0, i;
     Char   *blk[2];
 
     /*
@@ -220,8 +237,7 @@ doexec(t)
 	 * Shell's "tracked aliases".
 	 */
 	if (!slash && pv[0][0] == '/' && havhash) {
-	    hashval1 = hash(hashval, i);
-	    if (!bit(xhash, hashval1))
+	    if (!bit(hashval, i))
 		goto cont;
 	}
 	if (pv[0][0] == 0 || eq(pv[0], STRdot))	/* don't make ./xxx */
@@ -410,16 +426,21 @@ execash(t, kp)
     /*
      * Why we don't want to close SH* on exec? I think we do... Christos
      */
-#ifndef FIOCLEX
+# ifndef FIOCLEX
     didcch = 1;
-#endif
-#endif				/* notdef */
+# endif
+#endif /* notdef */
     rechist();
     (void) signal(SIGINT, parintr);
     (void) signal(SIGQUIT, parintr);
     (void) signal(SIGTERM, parterm);	/* if doexec loses, screw */
     lshift(kp->t_dcom, 1);
+    /*
+     * hmm. Let's not die if doexec fails...
+     */
+#ifdef notdef
     exiterr = 1;
+#endif
     doexec(kp);
     /* NOTREACHED */
 }
@@ -451,7 +472,34 @@ dohash(vv, c)
     int     i = 0;
     struct varent *v = adrof(STRpath);
     Char  **pv;
-    int     hashval;
+
+    if (vv && vv[1]) {
+       hashlength = atoi(short2str(vv[1]));
+       if (vv[2]) {
+	  hashwidth = atoi(short2str(vv[2]));
+	  if ((hashwidth != 1) && (hashwidth != 2) && (hashwidth != 4))
+	     hashwidth = 0;
+	  if (vv[3])
+	     hashdebug = atoi(short2str(vv[3]));
+       }
+    }
+
+    if (hashwidth == 0) {
+       for (pv = v->vec; *pv; pv++, hashwidth++);
+       if (hashwidth <= 8)
+	  hashwidth = 1;
+       else if (hashwidth <= 16)
+	  hashwidth = 2;
+       else
+	  hashwidth = 4;
+    }
+    if (hashlength == 0) {
+       hashlength = hashwidth * (8*64);	/* "average" files per dir in path */
+    }
+
+    if (xhash)
+       xfree((ptr_t) xhash);
+    xhash = (unsigned long *) xmalloc(hashlength * hashwidth);
 
     (void) getusername(NULL);	/* flush the tilde cashe */
     tw_clear_comm_list();
@@ -480,8 +528,10 @@ dohash(vv, c)
 		(dp->d_name[1] == '\0' ||
 		 (dp->d_name[1] == '.' && dp->d_name[2] == '\0')))
 		continue;
-	    hashval = hash(hashname(str2short(dp->d_name)), i);
-	    bis(xhash, hashval);
+	    bis(hashname(str2short(dp->d_name)), i);
+	    if (hashdebug & 1)
+	       xprintf("hash=%-4d dir=%-2d prog=%s\n",
+		       hashname(str2short(dp->d_name)), i, dp->d_name);
 	    /* tw_add_comm_name (dp->d_name); */
 	}
 	(void) closedir(dirp);
@@ -495,6 +545,10 @@ dounhash(v, c)
     struct command *c;
 {
     havhash = 0;
+    if (xhash) {
+       xfree((ptr_t) xhash);
+       xhash = NULL;
+    }
 }
 
 #ifdef VFORK
@@ -504,9 +558,16 @@ hashstat(v, c)
     Char **v;
     struct command *c;
 {
-    if (hits + misses)
-	xprintf("%d hits, %d misses, %d%%\n",
-		hits, misses, 100 * hits / (hits + misses));
+   if (havhash && hashlength && hashwidth)
+      xprintf("%d hash buckets of %d bits each\n",
+	      hashlength, hashwidth*8);
+
+   if (hits + misses)
+      xprintf("%d hits, %d misses, %d%%\n",
+	      hits, misses, 100 * hits / (hits + misses));
+
+   if (hashdebug)
+      xprintf("debug mask = 0x%08x\n", hashdebug);
 }
 
 #endif
@@ -533,7 +594,7 @@ iscommand(name)
     register Char *sav;
     register struct varent *v;
     register bool slash = any(short2str(name), '/');
-    register int hashval = 0, hashval1, i;
+    register int hashval = 0, i;
 
     v = adrof(STRpath);
     if (v == 0 || v->vec[0] == 0 || slash)
@@ -546,8 +607,7 @@ iscommand(name)
     i = 0;
     do {
 	if (!slash && pv[0][0] == '/' && havhash) {
-	    hashval1 = hash(hashval, i);
-	    if (!bit(xhash, hashval1))
+	    if (!bit(hashval, i))
 		goto cont;
 	}
 	if (pv[0][0] == 0 || eq(pv[0], STRdot)) {	/* don't make ./xxx */
@@ -698,4 +758,72 @@ tellmewhat(lex)
 	flush();
     }
     sp->word = s0;		/* we save and then restore this */
+}
+
+/*
+ * Builtin to look at and list all places a command may be defined:
+ * aliases, shell builtins, and the path.
+ *
+ * Marc Horowitz <marc@mit.edu>
+ * MIT Student Information Processing Board
+ */
+
+void
+dowhere(v, c)
+    register Char **v;
+    struct command *c;
+{
+   struct varent *var;
+   struct biltins *bptr;
+   Char **pv;
+   Char *sv;
+   int hashval, i, ex;
+
+   for (v++; *v; v++) {
+      if (any(short2str(*v), '/')) {
+	 xprintf("where: / in command makes no sense\n");
+	 continue;
+      }
+
+      /* first, look for an alias */
+
+      if (adrof1(*v, &aliases)) {
+	 if (var = adrof1(*v, &aliases)) {
+	    xprintf("%s is aliased to ", short2str(*v));
+	    blkpr(var->vec);
+	    xprintf("\n");
+	 }
+      }
+
+      /* next, look for a shell builtin */
+
+      for (bptr = bfunc; bptr < &bfunc[nbfunc]; bptr++) {
+	 if (eq(*v, str2short(bptr->bname))) {
+	    xprintf("%s is a shell built-in\n", short2str(*v));
+	    /* flush(); */
+	 }
+      }
+
+      /* last, look through the path for the command */
+
+      var = adrof(STRpath);
+
+      if (havhash)
+	 hashval = hashname(*v);
+      sv = Strspl(STRslash, *v);
+
+      for (pv = var->vec, i = 0; *pv; pv++, i++) {
+	 if (!havhash || eq(*pv, STRdot) || (havhash && bit(hashval, i))) {
+	    ex = executable(*pv, sv, 0);
+	    if (!ex && (hashdebug & 2))
+	       xprintf("hash miss: ");
+	    if (ex || (hashdebug & 2)) {
+	       xprintf("%s/",short2str(*pv));
+	       xprintf("%s\n",short2str(*v));
+	    }
+	 }
+      }
+
+      xfree((ptr_t) sv);
+   }
 }

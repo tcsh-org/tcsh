@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.9 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tw.parse.c,v 1.3 91/09/24 17:12:19 marc Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -37,10 +37,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: tw.parse.c,v 3.9 1991/09/08 00:45:32 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: tw.parse.c,v 3.10 1991/09/10 04:51:46 christos Exp $")
+
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"

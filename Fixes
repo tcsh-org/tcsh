@@ -1,4 +1,13 @@
 V6.00.03, ....
+23. New i-search from Per.
+22. ibmesa fixes
+21. convex fixes.
+20. t command for vi.
+19. SVR4 fixes (reverse pipeline and sigaction()) from David Dawes.
+18. New hashing from Marc
+17. Added : to the ~name separators so ~foo:~bar works.
+16. New ed.init.c. Added ed.term.c
+15. Still can't get the history exactly csh-like... !-2$ was broken...
 14. vi character searches.
 13. -Dvar=name command line option for the apollos.
 12. Prompt format changes for date/directory.

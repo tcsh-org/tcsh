@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 3.5 1991/09/10 21:38:09 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/ed.defns.c,v 1.3 91/09/24 17:07:37 marc Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: ed.defns.c,v 3.5 1991/09/10 21:38:09 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: ed.defns.c,v 3.7 1991/09/15 01:50:04 christos Exp $")
+
 #include "ed.h"
 
 static	void		ed_InitMetaBindings 	__P((void));
@@ -229,8 +229,8 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		V_DSH_META	91
     v_rsrch_fwd,
 #define		V_RSRCH_FWD	92
-    v_rsrch_rev,
-#define		V_RSRCH_REV	93
+    v_rsrch_back,
+#define		V_RSRCH_BACK	93
     v_char_fwd,
 #define		V_CHAR_FWD	94
     v_char_back,
@@ -239,14 +239,18 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		V_CHGMETA	96
     e_inc_fwd,
 #define		F_INC_FWD	97
-    e_inc_rev,
-#define		F_INC_REV	98
+    e_inc_back,
+#define		F_INC_BACK	98
     v_rchar_fwd,
 #define		V_RCHAR_FWD	99
     v_rchar_back,
 #define		V_RCHAR_BACK	100
+    v_charto_fwd,
+#define		V_CHARTO_FWD	101
+    v_charto_back,
+#define		V_CHARTO_BACK	102
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	101
+#define		F_NUM_FNS	103
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -895,13 +899,13 @@ KEYCMD  CcViCmdMap[] = {
     F_UP_SEARCH_HIST,		/* K */
     F_UNASSIGNED,		/* L */
     F_UNASSIGNED,		/* M */
-    V_RSRCH_REV,		/* N */
+    V_RSRCH_BACK,		/* N */
     F_XKEY,			/* O */
     F_UNASSIGNED,		/* P */
     F_UNASSIGNED,		/* Q */
     V_REPLMODE,			/* R */
     V_SUBSTLINE,		/* S */
-    F_TOGGLE_HIST,		/* T */
+    V_CHARTO_BACK,		/* T */
     F_UNASSIGNED,		/* U */
     F_EXPAND_VARS,		/* V */
     V_WORDFWD,			/* W */
@@ -933,7 +937,7 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* q */
     V_REPLONE,			/* r */
     V_SUBSTCHAR,		/* s */
-    F_TOGGLE_HIST,		/* t */
+    V_CHARTO_FWD,		/* t */
     V_UNDO,			/* u */
     F_EXPAND_VARS,		/* v */
     V_WORDBEGNEXT,		/* w */
@@ -1144,9 +1148,9 @@ struct KeyFuncs FuncNames[] = {
     "insert-last-word", F_LAST_ITEM,
     "Insert last item of previous command",
     "i-search-fwd", F_INC_FWD,
-    "Forward Incremental search",
-    "i-search-rev", F_INC_REV,
-    "Reverse Incremental search",
+    "Incremental search forward",
+    "i-search-back", F_INC_BACK,
+    "Incremental search backwards",
     "keyboard-quit", F_STARTOVER,
     "Clear line",
     "kill-line", F_KILLEND,
@@ -1246,6 +1250,10 @@ struct KeyFuncs FuncNames[] = {
     "Vi move to the character specified backwards",
     "vi-char-fwd", V_CHAR_FWD,
     "Vi move to the character specified forward",
+    "vi-charto-back", V_CHARTO_BACK,
+    "Vi move up to the character specified backwards",
+    "vi-charto-fwd", V_CHARTO_FWD,
+    "Vi move up to the character specified forward",
     "vi-insert", V_INSERT,
     "Enter vi insert mode",
     "vi-insert-at-bol", V_INSBEG,
@@ -1256,7 +1264,7 @@ struct KeyFuncs FuncNames[] = {
     "Vi repeat current character search in the opposite search direction",
     "vi-repeat-search-fwd", V_RSRCH_FWD,
     "Vi repeat current search in the same search direction",
-    "vi-repeat-search-rev", V_RSRCH_REV,
+    "vi-repeat-search-back", V_RSRCH_BACK,
     "Vi repeat current search in the opposite search direction",
     "vi-replace-char", V_REPLONE,
     "Vi replace character under the cursor with the next character typed",

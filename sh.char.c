@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.char.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.char.c,v 1.2 91/09/24 17:04:45 marc Exp $ */
 /*
  * sh.char.c: Character classification tables
  */
@@ -34,8 +34,9 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: sh.char.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+#include "sh.h"
+
+RCSID("$Id: sh.char.c,v 3.2 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.char.h"
 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.6 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.func.c,v 1.3 91/09/24 17:09:21 marc Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -34,11 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-
-RCSID("$Id: sh.func.c,v 3.6 1991/09/08 00:45:32 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: sh.func.c,v 3.7 1991/09/10 04:51:46 christos Exp $")
+
 #include "ed.h"
 #include "tw.h"
 #include "tc.h"
@@ -1022,7 +1021,6 @@ xecho(sep, v)
 		    break;
 		case '\\':
 		    c = '\\';
-		    --cp;
 		    break;
 		case '0':
 		    c = 0;
@@ -1034,8 +1032,7 @@ xecho(sep, v)
 			c = c * 8 + *cp++ - '0';
 		    break;
 		case '\0':
-		    c = '\\';
-		    --cp;
+		    c = *--cp;
 		    break;
 		default:
 		    xputchar('\\' | QUOTE);

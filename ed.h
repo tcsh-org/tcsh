@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.4 1991/07/29 22:41:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.5 1991/09/08 00:45:32 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -93,58 +93,6 @@ EXTERN KEYCMD NumFuns;		/* number of KEYCMDs in above table */
 #define CC_REFRESH		14
 #define CC_EXPAND_VARS		15
 
-/*************************/
-/* tty state             */
-/*************************/
-
-
-#ifndef POSIX
-# ifdef TERMIO
-EXTERN struct termio nio;
-EXTERN struct termio xio;
-EXTERN struct termio testio;
-
-#  if (defined(OREO) || defined(hpux) || defined(_IBMR2)) && !defined(hp9000s500)
-EXTERN struct ltchars nlc;
-EXTERN struct ltchars xlc;
-EXTERN struct ltchars testlc;
-#  endif /* OREO || hpux || _IBMR2 */
-
-# else /* GSTTY */
-EXTERN struct sgttyb nb;	/* original setup tty bits */
-EXTERN struct tchars ntc;
-EXTERN struct ltchars nlc;
-EXTERN int nlb;
-
-EXTERN struct sgttyb xb;	/* running setup tty bits */
-EXTERN struct tchars xtc;
-EXTERN struct ltchars xlc;
-EXTERN int xlb;
-
-EXTERN struct sgttyb testsgb;	/* running setup tty bits */
-EXTERN int testnlb;		/* test local mode word */
-EXTERN struct tchars testtc;
-EXTERN struct ltchars testlc;
-
-#  ifdef TIOCGPAGE
-EXTERN struct ttypagestat npc;
-EXTERN struct ttypagestat xpc;
-EXTERN struct ttypagestat testpc;
-
-#  endif /* TIOCGPAGE */
-# endif	/* TERMIO */
-#else /* POSIX */
-EXTERN struct termios nio;
-EXTERN struct termios xio;
-EXTERN struct termios testio;
-
-# if defined(OREO) || defined(hpux) || defined(_IBMR2)
-EXTERN struct ltchars nlc;
-EXTERN struct ltchars xlc;
-EXTERN struct ltchars testlc;
-# endif /* OREO || hpux || _IBMR2 */
-#endif /* POSIX */
-
 /****************************/
 /* Editor state and buffers */
 /****************************/
@@ -215,6 +163,61 @@ EXTERN Char T_HasMeta;		/* true if we have a meta key */
 #define min(x,y)	(((x)<(y))?(x):(y))
 #define max(x,y)	(((x)>(y))?(x):(y))
 
+/*
+ * Terminal dependend data structures
+ */
+typedef struct {
+#if defined(POSIX) || defined(TERMIO)
+# ifdef POSIX
+    struct termios d_t;
+# else
+    struct termio d_t;
+# endif /* POSIX */
+#else /* SGTTY */
+# ifdef TIOCGETP
+    struct sgttyb d_t;
+# endif /* TIOCGETP */
+# ifdef TIOCGETC
+    struct tchars d_tc;
+# endif /* TIOCGETC */
+# ifdef TIOCGPAGE
+    struct ttypagestat d_pc;
+# endif /* TIOCGPAGE */
+# ifdef TIOCLGET
+    int d_lb;
+# endif /* TIOCLGET */
+#endif /* POSIX || TERMIO */
+#ifdef TIOCGLTC
+    struct ltchars d_ltc;
+#endif /* TIOCGLTC */
+} ttydata_t;
+
+#define EXIO	0	/* while we are executing	*/
+#define EDIO	1	/* while we are editing		*/
+#define TSIO	2	/* new mode from terminal	*/
+#define QUIO	2	/* used only for quoted chars	*/
+#define NNIO	3	/* The number of entries	*/
+
+#if defined(POSIX) || defined(TERMIO)
+# define M_INPUT	0
+# define M_OUTPUT	1
+# define M_CONTROL	2
+# define M_LINED	3
+# define M_CHAR		4
+# define M_NN		5
+#else /* GSTTY */
+# define M_CONTROL	0
+# define M_LOCAL	1
+# define M_CHAR		2
+# define M_NN		3
+#endif /* TERMIO */
+typedef struct { 
+    char *t_name;
+    int  t_setmask;
+    int  t_clrmask;
+} ttyperm_t[NNIO][M_NN];
+
+extern ttyperm_t ttylist;
 #include "ed.decls.h"
 
 #endif /* _h_ed */

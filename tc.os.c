@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.6 1991/07/18 15:24:09 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.os.c,v 1.3 91/09/24 17:11:15 marc Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: tc.os.c,v 3.6 1991/07/18 15:24:09 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: tc.os.c,v 3.7 1991/09/08 00:45:32 christos Exp $")
+
 #include "tw.h"
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -889,7 +889,7 @@ xgetwd(pathname)
 
 	/* look if we found root yet */
 	if (st_cur.st_ino == st_root.st_ino &&
-	    st_cur.st_dev == st_root.st_dev) {
+	    DEV_DEV_COMPARE(st_cur.st_dev, st_root.st_dev)) {
 	    (void) strcpy(pathname, *pathptr != '/' ? "/" : pathptr);
 	    return (pathname);
 	}
@@ -915,7 +915,7 @@ xgetwd(pathname)
 
 	    /* check if we found it yet */
 	    if (st_next.st_ino == st_cur.st_ino &&
-		st_next.st_dev == st_cur.st_dev) {
+	    DEV_DEV_COMPARE(st_next.st_dev, st_cur.st_dev)) {
 		st_cur = st_dot;
 		pathptr = strrcpy(pathptr, d->d_name);
 		pathptr = strrcpy(pathptr, "/");

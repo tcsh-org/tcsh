@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.const.c,v 3.2 1991/07/16 11:06:33 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.const.c,v 1.3 91/09/24 17:10:55 marc Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -34,9 +34,9 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: tc.const.c,v 3.2 1991/07/16 11:06:33 christos Exp $")
 #include "sh.h"
+
+RCSID("$Id: tc.const.c,v 3.3 1991/08/05 23:02:13 christos Exp $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -96,8 +96,8 @@ Char STRsymhash[]       = { '#', ' ', '\0' };
 Char STRsymarrow[]      = { '>', ' ', '\0' };
 Char STRmquestion[]     = { '%', 'R', '?' | QUOTE, ' ', '\0' };
 Char STRCORRECT[]       = { 'C', 'O', 'R', 'R', 'E', 'C', 'T', '>', '%', 'R', 
-			    ' ', '(', 'y', '|', 'n', ')', '?' | QUOTE, ' ', 
-			    '\0' };
+			    ' ', '(', 'y', '|', 'n', '|', 'e', ')', 
+			    '?' | QUOTE, ' ', '\0' };
 Char STRunalias[]       = { 'u', 'n', 'a', 'l', 'i', 'a', 's', '\0' };
 Char STRalias[]         = { 'a', 'l', 'i', 'a', 's', '\0' };
 Char STRprecmd[]        = { 'p', 'r', 'e', 'c', 'm', 'd', '\0' };

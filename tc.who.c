@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.3 1991/09/10 04:51:46 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.who.c,v 1.3 91/09/24 17:11:56 marc Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
+#include "sh.h"
+
 RCSID("$Id: tc.who.c,v 3.3 1991/09/10 04:51:46 christos Exp $")
 
-#include "sh.h"
 #include "tc.h"
 
 /*
@@ -393,7 +393,7 @@ watch_login()
 }
 
 #ifdef WHODEBUG
-static  oid
+static void
 debugwholist(new, wp)
     register struct who *new, *wp;
 {

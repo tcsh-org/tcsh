@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.6 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.func.c,v 1.4 91/09/24 18:10:30 marc Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -34,14 +34,18 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: tc.func.c,v 3.6 1991/09/08 00:45:32 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: tc.func.c,v 3.7 1991/09/10 04:51:46 christos Exp $")
+
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 #include "tw.h"
 #include "tc.h"
+
+#ifdef HESIOD
+# include <hesiod.h>
+#endif /* HESIOD */
 
 extern time_t t_period;
 extern int do_logout;
@@ -1105,11 +1109,63 @@ tildecompare(p1, p2)
 }
 
 Char   *
+gethomedir(us)
+    Char   *us;
+{
+    register struct passwd *pp;
+#ifdef HESIOD
+    char **res, **res1, *cp;
+    Char *rp;
+#endif /* HESIOD */
+    
+    pp = getpwnam(short2str(us));
+#ifdef YPBUGS
+    fix_yp_bugs();
+#endif
+    if (pp != NULL)
+	return Strsave(str2short(pp->pw_dir));
+#ifdef HESIOD
+    res = hes_resolve(short2str(us), "filsys");
+    rp = 0;
+    if (res != 0) {
+	extern char *strtok();
+	if ((*res) != 0) {
+	    /*
+	     * Look at the first token to determine how to interpret
+	     * the rest of it.
+	     * Yes, strtok is evil (it's not thread-safe), but it's also
+	     * easy to use.
+	     */
+	    cp = strtok(*res, " ");
+	    if (strcmp(cp, "AFS") == 0) {
+		/* next token is AFS pathname.. */
+		cp = strtok(NULL, " ");
+		if (cp != NULL)
+		    rp = Strsave(str2short(cp));
+	    } else if (strcmp(cp, "NFS") == 0) {
+		cp = NULL;
+		if ((strtok(NULL, " ")) && /* skip remote pathname */
+		    (strtok(NULL, " ")) && /* skip host */
+		    (strtok(NULL, " ")) && /* skip mode */
+		    (cp = strtok(NULL, " "))) {
+		    rp = Strsave(str2short(cp));
+		}
+	    }
+	}
+	for (res1 = res; *res1; res1++)
+	    free(*res1);
+	return rp;
+    }
+#endif
+    return NULL;
+}
+
+Char   *
 gettilde(us)
     Char   *us;
 {
     struct tildecache *bp1, *bp2, *bp;
-    register struct passwd *pp;
+    Char *hd;
 
     if (tcache == NULL)
 	tcache = (struct tildecache *) xmalloc((size_t) (TILINCR *
@@ -1131,19 +1187,16 @@ gettilde(us)
     /*
      * Not in the cache, try to get it from the passwd file
      */
-    pp = getpwnam(short2str(us));
-#ifdef YPBUGS
-    fix_yp_bugs();
-#endif
-    if (pp == NULL)
+    hd = gethomedir(us);
+    if (hd == NULL)
 	return NULL;
 
     /*
      * Update the cache
      */
     tcache[tlength].user = Strsave(us);
-    us = tcache[tlength].home = Strsave(str2short(pp->pw_dir));
-    tcache[tlength++].hlen = Strlen(us);
+    tcache[tlength].home = hd;
+    tcache[tlength++].hlen = Strlen(hd);
 
     (void) qsort((ptr_t) tcache, (size_t) tlength, sizeof(struct tildecache),
 		 tildecompare);
@@ -1154,7 +1207,7 @@ gettilde(us)
 						(size_t) (tsize *
 						  sizeof(struct tildecache)));
     }
-    return (us);
+    return (hd);
 }
 
 /*

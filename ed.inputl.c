@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.3 1991/07/16 18:49:14 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/ed.inputl.c,v 1.3 91/09/24 17:07:51 marc Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: ed.inputl.c,v 3.3 1991/07/16 18:49:14 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: ed.inputl.c,v 3.4 1991/07/19 15:56:14 christos Exp $")
+
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 #include "tw.h"			/* for twenex stuff */
@@ -196,14 +196,21 @@ Inputl()
 		    Refresh();
 		    (void) read(SHIN, (char *) &tch, 1);
 		    ch = tch;
-		    if (ch != 'y' && ch != ' ') {
-			(void) Strcpy(InputBuf, Origin);
-			LastChar = SaveChar;
-			xprintf("no\n");
-		    }
-		    else {
+		    if (ch == 'y' || ch == ' ') {
 			LastChar = CorrChar;	/* Restore the corrected end */
 			xprintf("yes\n");
+		    }
+		    else {
+			(void) Strcpy(InputBuf, Origin);
+			LastChar = SaveChar;
+			if (ch == 'e') {
+			    xprintf("edit\n");
+			    *LastChar-- = '\0';
+			    printprompt(0, NULL);
+			    Refresh();
+			    break;
+			}
+			xprintf("no\n");
 		    }
 		    flush();
 		}
@@ -425,7 +432,7 @@ GetNextCommand(cmdnum, ch)
 	    break;
 	}
 	else
-#endif				/* KANJI */
+#endif /* KANJI */
 	if (MetaNext) {
 	    MetaNext = 0;
 	    *ch |= META;
@@ -433,7 +440,7 @@ GetNextCommand(cmdnum, ch)
 	cmd = CurrentKeyMap[(unsigned char) *ch];
 	if (cmd == F_XKEY) {
 	    if (GetXkey(ch, &str))
-		cmd = (KEYCMD) * str;
+		cmd = (KEYCMD) *str;
 	    else
 		PushMacro(str);
 	}
@@ -454,8 +461,8 @@ GetNextChar(cp)
 # if defined(FIONBIO) || (defined(F_SETFL) && defined(O_NDELAY))
 #  define TRY_AGAIN
     int     tried = 0;
-# endif				/* FIONBIO || (F_SETFL && O_NDELAY) */
-#endif				/* EWOULDBLOCK || (POSIX && EAGAIN) */
+# endif /* FIONBIO || (F_SETFL && O_NDELAY) */
+#endif /* EWOULDBLOCK || (POSIX && EAGAIN) */
     unsigned char tcp;
 
     for (;;) {
@@ -485,21 +492,21 @@ GetNextChar(cp)
 	     */
 #ifdef EWOULDBLOCK
 	case EWOULDBLOCK:
-#endif				/* EWOULDBLOCK */
+#endif /* EWOULDBLOCK */
 #if defined(POSIX) && defined(EAGAIN)
 # if defined(EWOULDBLOCK) && EAGAIN != EWOULDBLOCK
 	case EAGAIN:
-# endif				/* EWOULDBLOCK && EAGAIN != EWOULDBLOCK */
-#endif				/* POSIX && EAGAIN */
+# endif /* EWOULDBLOCK && EAGAIN != EWOULDBLOCK */
+#endif /* POSIX && EAGAIN */
 #ifdef TRY_AGAIN
 	    if (!tried) {
 # if defined(F_SETFL) && defined(O_NDELAY)
 		(void) fcntl(SHIN, F_SETFL,
 			     fcntl(SHIN, F_GETFL, 0) & ~O_NDELAY);
-# endif				/* F_SETFL && O_NDELAY */
+# endif /* F_SETFL && O_NDELAY */
 # ifdef FIONBIO
 		(void) ioctl(SHIN, FIONBIO, (ioctl_t) & tried);
-# endif				/* FIONBIO */
+# endif /* FIONBIO */
 		tried = 1;
 		break;
 	    }
@@ -508,7 +515,7 @@ GetNextChar(cp)
 #endif /* TRY_AGAIN */
 #ifdef _SEQUENT_
 	case EBADF:
-#endif				/* _SEQUENT_ */
+#endif /* _SEQUENT_ */
 	case EINTR:
 	    break;
 	default:

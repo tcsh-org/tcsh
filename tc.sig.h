@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.h,v 3.0 1991/07/04 23:34:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.h,v 3.1 1991/07/18 16:20:56 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -55,12 +55,13 @@
 /*
  * sigvec is not the same everywhere
  */
-# ifdef _SEQUENT_
+# if defined(_SEQUENT_) || defined(_POSIX_SOURCE)
 #  define HAVE_SIGVEC
 #  define mysigvec(a, b, c)	sigaction(a, b, c)
 typedef struct sigaction sigvec_t;
 #  define sv_handler sa_handler
-# endif	/* _SEQUENT */
+#  define sv_flags sa_flags
+# endif	/* _SEQUENT || _POSIX_SOURCE */
 
 # ifdef hpux
 #  define HAVE_SIGVEC
@@ -134,7 +135,10 @@ typedef struct sigvec sigvec_t;
 #endif /* SIGWINCH */
 
 #if defined(convex) || defined(__convex__)
-# define SIGSYNCH       0
+# ifdef notdef
+/* Does not seem to work right... Christos */
+#  define SIGSYNCH       0 
+# endif
 # ifdef SIGSYNCH
 #  define SYNCHMASK 	(sigmask(SIGCHLD)|sigmask(SIGSYNCH))
 # else

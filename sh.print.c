@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.print.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.print.c,v 1.3 91/09/24 17:10:10 marc Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id$")
-
 #include "sh.h"
+
+RCSID("$Id: sh.print.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+
 #include "ed.h"
 
 extern int Tty_eight_bit;

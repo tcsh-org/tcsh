@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.11 1991/09/10 04:51:46 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.c,v 1.3 91/09/27 21:31:58 marc Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -34,7 +34,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
+#include "sh.h"
+
 #ifndef lint
 char    copyright[] =
 "@(#) Copyright (c) 1991 The Regents of the University of California.\n\
@@ -43,7 +44,6 @@ char    copyright[] =
 
 RCSID("$Id: sh.c,v 3.11 1991/09/10 04:51:46 christos Exp $")
 
-#include "sh.h"
 #include "tc.h"
 #include "ed.h"
 
@@ -823,7 +823,31 @@ main(argc, argv)
     }
     if ((setintr == 0) && (parintr == SIG_DFL))
 	setintr = 1;
+
+/*
+ * SVR4 doesn't send a SIGCHLD when a child is stopped or continued if the
+ * handler is installed with signal(2) or sigset(2).  sigaction(2) must
+ * be used instead.
+ *
+ * David Dawes (dawes@physics.su.oz.au) Sept 1991
+ */
+
+#if SVID > 3
+    {
+	struct sigaction act;
+        act.sa_handler=pchild;
+	sigemptyset(&(act.sa_mask)); /* Don't block any extra sigs when the
+				      * handler is called
+				      */
+        act.sa_flags=0;	           /* want behaviour of sigset() without
+                                    * SA_NOCLDSTOP
+				    */
+        sigaction(SIGCHLD,&act,(struct sigaction *)NULL);
+    }
+#else /* SVID <= 3 */
     (void) sigset(SIGCHLD, pchild);	/* while signals not ready */
+#endif /* SVID <= 3 */
+
 
     /*
      * Set an exit here in case of an interrupt or error reading the shell

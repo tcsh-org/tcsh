@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.12 1991/08/06 02:00:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.13 1991/09/08 00:45:32 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -49,6 +49,13 @@
 # endif /* POSIX */
 #endif /* OREO */
 
+#ifndef NCARGS
+# ifdef ARG_MAX
+#  define NCARGS ARG_MAX
+# else
+#  define NCARGS 1024
+# endif /* ARG_MAX */
+#endif /* NCARGS */
 #ifdef titan
 extern int end;
 #endif /* titan */
@@ -260,14 +267,16 @@ struct ucred {
 # define NEEDtcgetpgrp
 #endif /* BSDJOBS && !(POSIX && POSIXJOBS) */
 
-#ifdef RENO
+#ifdef notdef /* RENO */
 /*
  * Older versions of RENO had this broken. It is fixed now. 
- * In any case, we use ours...
+ * In any case, we cannot use ours. The problem is that ansi
+ * headers define tcgetpgrp(int, pid_t) and this screws up
+ * argument passing
  */
 # define tcsetpgrp(fd, pgrp)	ioctl((fd), TIOCSPGRP, (ioctl_t) &(pgrp))
 # define NEEDtcgetpgrp
-#endif /* RENO */
+#endif /* notdef */ /* RENO */
 
 #ifdef DGUX
 # define setpgrp(a, b) setpgrp2(a, b)
@@ -425,9 +434,9 @@ extern char *getwd();
 # endif	/* getwd */
 #else /* POSIX */
 
-# if defined(sun) && !defined(__GNUC__)
+# if (defined(sun) && !defined(__GNUC__)) || defined(_IBMR2) || defined(_IBMESA)
 extern char *getwd();
-# endif	/* sun && ! __GNUC__ */
+# endif	/* (sun && ! __GNUC__) || _IBMR2 || _IBMESA */
 
 # ifdef SCO
 extern char *ttyname();   

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.bind.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.bind.c,v 1.3 91/09/24 17:10:49 marc Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -34,10 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: tc.bind.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: tc.bind.c,v 3.2 1991/09/10 04:51:46 christos Exp $")
+
 #include "ed.h"
 #include "ed.defns.h"
 
@@ -716,7 +716,7 @@ bindkey_usage()
     xprintf(
 	"Usage: bindkey [options] [--] [in-string [out-string | command]]\n");
     xprintf("    -a   bind key in alternative key binding\n");
-    xprintf("    -s   bind an out-string instad of a command\n");
+    xprintf("    -s   bind an out-string instead of a command\n");
     xprintf("    -v   initialized maps to default vi bindings\n");
     xprintf("    -e   initialized maps to default emacs bindings\n");
     xprintf("    -d   initialized maps to default bindings\n");

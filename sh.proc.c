@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.10 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.proc.c,v 1.4 91/09/26 01:05:18 marc Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -34,39 +34,13 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: sh.proc.c,v 3.10 1991/09/08 00:45:32 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: sh.proc.c,v 3.11 1991/09/10 04:51:46 christos Exp $")
+
 #include "ed.h"
 #include "tc.h"
-
-/*
- * a little complicated #include <sys/wait.h>! :-(
- */
-#if SVID > 0
-# ifdef hpux
-#  ifndef __hpux
-#   include "tc.wait.h"	/* 6.5 broke <sys/wait.h> */
-#  else
-#   ifndef POSIX
-#    define _BSD
-#   endif
-#   ifndef _CLASSIC_POSIX_TYPES
-#    define _CLASSIC_POSIX_TYPES
-#   endif
-#   include <sys/wait.h> /* 7.0 fixed it again */
-#  endif /* __hpux */
-# else /* hpux */
-#  if defined(OREO) || defined(IRIS4D) || defined(POSIX)
-#   include <sys/wait.h>
-#  else	/* OREO || IRIS4D || POSIX */
-#   include "tc.wait.h"
-#  endif /* OREO || IRIS4D || POSIX */
-# endif	/* hpux */
-#else /* SVID == 0 */
-# include <sys/wait.h>
-#endif /* SVID == 0 */
+#include "tc.wait.h"
 
 #if !defined(NSIG) && defined(SIGMAX)
 # define NSIG (SIGMAX+1)
@@ -221,7 +195,7 @@ loop:
 #ifdef BSDJOBS
 # ifdef BSDTIMES
     /* both a wait3 and rusage */
-#  ifndef BSDWAIT
+#  if !defined(BSDWAIT) || defined(NeXT)
     pid = wait3(&w,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
 #  else /* BSDWAIT */
@@ -977,6 +951,14 @@ pendjob()
 /*
  * pprint - print a job
  */
+
+/*
+ * Hacks have been added for SVR4 to deal with pipe's being spawned in
+ * reverse order
+ *
+ * David Dawes (dawes@physics.su.oz.au) Oct 1991
+ */
+
 static int
 pprint(pp, flag)
     register struct process *pp;
@@ -985,8 +967,13 @@ pprint(pp, flag)
     register status, reason;
     struct process *tp;
     extern char *linp, linbuf[];
-    int     jobflags, pstatus;
+    int     jobflags, pstatus, pcond;
     char   *format;
+
+#if SVID > 3
+    struct process *pipehead, *pipetail, *pmarker;
+    int inpipe = 0;
+#endif /* SVID > 3 */
 
     while (pp->p_pid != pp->p_jobid)
 	pp = pp->p_friends;
@@ -998,23 +985,53 @@ pprint(pp, flag)
     status = reason = -1;
     jobflags = 0;
     do {
+#if SVID > 3
+	/*
+	 * The pipeline is reversed, so locate the real head of the pipeline
+	 * if pp is at the tail of a pipe (and not already in a pipeline)
+	 */
+	if ((pp->p_friends->p_flags & PPOU) && !inpipe && (flag & NAME)) {
+	    inpipe = 1;
+	    pipetail = pp;
+	    do 
+		pp = pp->p_friends;
+	    while (pp->p_friends->p_flags & PPOU);
+	    pipehead = pp;
+	    pmarker = pp;
+	/*
+	 * pmarker is used to hold the place of the proc being processed, so
+	 * we can search for the next one downstream later.
+	 */
+	}
+	pcond = (tp != pp || (inpipe && tp == pp));
+#else /* SVID <= 3 */
+	pcond = (tp != pp);
+#endif /* SVID > 3 */	    
+
 	jobflags |= pp->p_flags;
 	pstatus = pp->p_flags & PALLSTATES;
-	if (tp != pp && linp != linbuf && !(flag & FANCY) &&
+	if (pcond && linp != linbuf && !(flag & FANCY) &&
 	    ((pstatus == status && pp->p_reason == reason) ||
 	     !(flag & REASON)))
 	    xprintf(" ");
 	else {
-	    if (tp != pp && linp != linbuf)
+	    if (pcond && linp != linbuf)
 		xprintf("\n");
-	    if (flag & NUMBER)
-		if (pp == tp)
+	    if (flag & NUMBER) {
+#if SVID <= 3
+		pcond = (pp == tp);
+#else /* SVID > 3 */
+		pcond : ((pp == tp && !inpipe) ||
+			 (inpipe && pipetail == tp && pp == pipehead));
+#endif /* SVID <= 3 */
+		if (pcond)
 		    xprintf("[%d]%s %c ", pp->p_index,
 			    pp->p_index < 10 ? " " : "",
 			    pp == pcurrent ? '+' :
 			    (pp == pprevious ? '-' : ' '));
 		else
 		    xprintf("       ");
+	    }
 	    if (flag & FANCY) {
 #ifdef TCF
 		extern char *sitename();
@@ -1123,7 +1140,13 @@ prcomd:
 #endif /* !BSDTIMES && !SEQUENT */
 
 	}
-	if (tp == pp->p_friends) {
+#if SVID <= 3
+	pcond = (tp == pp->p_friends);
+#else  /* SVID > 3 */
+	pcond = ((tp == pp->p_friends && !inpipe) ||
+		 (inpipe && pipehead->p_friends == tp && pp == pipetail));
+#endif /* SVID <= 3 */
+	if (pcond) {
 	    if (linp != linbuf)
 		xprintf("\n");
 	    if (flag & SHELLDIR && !eq(tp->p_cwd->di_name, dcwd->di_name)) {
@@ -1132,7 +1155,33 @@ prcomd:
 		xprintf(")\n");
 	    }
 	}
-    } while ((pp = pp->p_friends) != tp);
+#if SVID > 3
+	if (inpipe) {
+	    /*
+	     * if pmaker == pipetail, we are finished that pipeline, and
+	     * can now skip to past the head
+	     */
+	    if (pmarker == pipetail) {
+		inpipe = 0;
+		pp = pipehead;
+	    }
+	    else {
+	    /*
+	     * set pp to one before the one we want next, so the while below
+	     * increments to the correct spot.
+	     */
+		do
+		    pp = pp->p_friends;
+	    	while (pp->p_friends->p_friends != pmarker);
+	    	pmarker = pp->p_friends;
+	    }
+	}
+	pcond = ((pp = pp->p_friends) != tp || inpipe);
+#else /* SVID < 3 */
+	pcond = ((pp = pp->p_friends) != tp);
+#endif /* SVID > 3 */
+    } while (pcond);
+
     if (jobflags & PTIME && (jobflags & (PSTOPPED | PRUNNING)) == 0) {
 	if (jobflags & NUMBER)
 	    xprintf("       ");
@@ -1677,7 +1726,7 @@ pfork(t, wanttty)
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif /* BSDSIGS */
-#if SIGSYNCH
+#ifdef SIGSYNCH
     sigvec_t osv;
     static sigvec_t nsv = {synch_handler, ~0, 0};
 #endif /* SIGSYNCH */
@@ -1885,10 +1934,22 @@ pgetty(wanttty, pgrp)
 # ifndef POSIXJOBS
     if (wanttty >= 0)
 	if (setpgid(0, pgrp) == -1) {
-#  if !defined(ISC) && !defined(SCO)
+#  if !defined(ISC) && !defined(SCO) && SVID <= 3
 	    /* XXX: Wrong but why? */
 	    xprintf("tcsh: setpgid error (%s).\n", strerror(errno));
 	    xexit(0);
+#  elif SVID>3
+	    /*
+     	    * This usually happens in svr4 when the last command in a pipe
+	    * either couldn't be started, or exits without waiting for input.
+	    * Putting in the xexit() hangs the shell, so leave it out.
+	    * (DHD)
+     	    */
+#   ifdef JOBDEBUG
+	    xprintf("tcsh: setpgid error (%s).\n", strerror(errno));
+	    xprintf("pgrp = %d, shell pid = %d\n",pgrp,getpid());
+#   endif /* JOBDEBUG */
+	    /* xexit(0); */
 #  endif /* !ISC && !SCO */
 	}
 # else /* POSIXJOBS */

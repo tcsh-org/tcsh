@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sched.c,v 3.2 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.sched.c,v 1.3 91/09/24 17:11:29 marc Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -36,10 +36,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include "config.h"
-RCSID("$Id: tc.sched.c,v 3.2 1991/07/15 19:37:24 christos Exp $")
-
 #include "sh.h"
+
+RCSID("$Id: tc.sched.c,v 3.3 1991/07/17 13:24:11 christos Exp $")
+
 #include "ed.h"
 #include "tc.h"
 
@@ -223,7 +223,7 @@ sched_run()
 
     while (tp && tp->t_when < cur_time) {
 	if (seterr) {
-	    xfree((char *) seterr);
+	    xfree((ptr_t) seterr);
 	    seterr = NULL;
 	}
 	cmd.word = STRNULL;

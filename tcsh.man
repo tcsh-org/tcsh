@@ -1,5 +1,5 @@
-.\" $Id: tcsh.man,v 3.13 1991/09/10 04:51:46 christos Exp $
-.TH TCSH 1 "5 August 1991" "Cornell"
+.\" $Id: tcsh.man,v 3.15 1991/09/15 01:50:04 christos Exp $
+.TH TCSH 1 "11 October 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -431,11 +431,11 @@ VI Command Mode functions
 "I"	->  vi-insert-at-bol
 "J"	->  history-search-forward
 "K"	->  history-search-backward
-"N"	->  vi-search-rev
+"N"	->  vi-search-back
 "O"	->  sequence-lead-in
 "R"	->  vi-replace-mode
 "S"	->  vi-substitute-line
-"T"	->  toggle-literal-history
+"T"	->  vi-charto-back
 "U"	->  is undefined
 "V"	->  expand-variables
 "W"	->  vi-word-fwd
@@ -457,7 +457,7 @@ VI Command Mode functions
 "n"	->  vi-search-fwd
 "r"	->  vi-replace-char
 "s"	->  vi-substitute-char
-"t"	->  toggle-literal-history
+"t"	->  vi-charto-fwd
 "u"	->  vi-undo
 "v"	->  expand-variables
 "w"	->  vi-beginning-of-next-word
@@ -596,15 +596,33 @@ display is similar to
 and varies depending on the system's tty driver. Modes that 
 .I tcsh 
 will always try to set are shown as
-.I "+mode"
-modes that 
+.I "+mode".
+Modes that 
 .I tcsh 
 will always try to clear are shown as
 .I "-mode"
 and modes that tcsh will track and allow to be modified are not shown by
 default, or if the 
 .I "-a"
-flag is given, are shown without a leading sign.
+flag is given, are shown without a leading sign. For tty characters, only
+there is no 
+.I "-mode". 
+Tty characters marked with a 
+.I "+mode" 
+are set to the compiled-in defaults and the rest are unmodified.
+.PP
+Setty can be used to control the three different modes 
+.I tcsh
+uses for the tty. The default mode displayed is the "execute" mode which is 
+used when tcsh executes commands. The two other modes are the "edit" mode 
+and the "quote" mode. The "edit" mode is used for command line editing, and
+the "quote" mode is used when entering literal characters. The "execute" mode
+can be specified with
+.I "-x",
+the "edit" mode with 
+.I "-d", 
+and the "quote" mode with
+.I "-q"
 For example if one wants to set the 
 .I echok
 flag and let the 
@@ -619,6 +637,7 @@ oflag:+opost +onlcr -onlret
 cflag:
 lflag:+isig +icanon +echo +echoe -echok -echonl -noflsh 
       +echoctl -flusho +iexten 
+chars:
 > setty +echok echoe
 > setty
 iflag:-inlcr -igncr +icrnl 
@@ -626,6 +645,7 @@ oflag:+opost +onlcr -onlret
 cflag:
 lflag:+isig +icanon +echo +echok -echonl -noflsh +echoctl 
       -flusho +iexten 
+chars:
 .RE
 .fi
 .sp
@@ -1768,6 +1788,7 @@ The current possible values are:
 .ta 1.5i
 .nf
 \fIaix370\fR		an IBM 370, running aix
+\fIaixESA\fR		an IBM ESA, running aix
 \fIalliant\fR		an Alliant FX series
 \fIamdahl\fR		an Amdahl running uts 2.1
 \fIapollo\fR		an Apollo running DomainOS
@@ -1858,10 +1879,17 @@ to believe that the termcap capability `cap' ( as defined in
 improper use.
 .PP
 .SH "21. SEARCHING FOR THE VISUAL HISTORY"
-Two new editor functions have been added: history-search-backward,
-bound to M-p (and M-P), and history-search-forward, bound to M-n (and
-M-N).  Each of these search backward (or forward) through the history
-list for previous (next) occurrence of the first word in the input
+Four new editor functions have been added: Two of them,
+history-search-backward, bound to M-p (and M-P),
+and history-search-forward, bound to M-n (and M-N),
+implement a conventional search mechanism,
+while the other two, i-search-back and i-search-fwd,
+both unbound by default, implement the emacs-style
+incremental search.
+.PP
+History-search-backward (history-search-forward)
+searches backward (forward) through the history
+list for previous (next) occurrence of the beginnng of the input
 buffer as a command.  That is, if the user types:
 .sp
 .nf
@@ -1884,6 +1912,46 @@ editing buffer would be changed to "ls". The pattern used to search
 through the history is defined by the characters from the beginning of
 the line up to the current cursor position and may contain a shell globbing
 pattern. Successive history searches use the same pattern.
+.PP
+When the incremental search functions are used, a prompt -
+"bck:" or "fwd:", depending on the chosen direction - appears, and
+characters typed are appended to the search pattern.
+The matching command line is placed in the editing buffer,
+with the cursor positioned at the point where the pattern was found
+(the incremental search will also do searching within a command line).
+If the search fails, the terminal bell is rung,
+and the ':' in the prompt is changed to '?'.
+.PP
+If these functions are bound to single characters, and one of those
+is typed again during the incremental search, the search continues
+in the corresponding direction, with the pattern unchanged; if the previous
+search failed, this will also cause it to "wrap around" the history list.
+Finally, the following characters also have a special meaning
+during the search:
+.RS +.6i
+.nf
+.ta 1.2i
+.sp
+Delete	(or any character bound to \fIbackward-delete-char\fR)
+	Undo the effect of the last character typed,
+	deleting a character from the pattern if appropriate.
+^G	Abort the search, back to the last successful one
+	if previous search failed, otherwise entire search.
+^Y	Append the rest of the current word to the pattern.
+ESC	Terminate the search, leaving current line in buffer.
+.RE
+.DT
+.fi
+.sp
+Any other character, that isn't bound to
+.I self-insert-command,
+terminates the search, leaving the current command line in the editing
+buffer, after which
+.I tcsh
+interprets the character as if it was normal input -
+notably
+.I Return
+will cause the current command line to be executed.
 .PP
 .SH "22. BUILTIN WHICH(1) COMMAND"
 There is now a builtin version of the
@@ -2309,7 +2377,12 @@ the names of the system default files are
 .I "/etc/login"
 and
 .I "/etc/logout"
-respectively and on
+respectively. On the NeXT the names are also different:
+.I "/etc/cshrc.std",
+.I "/etc/login.std"
+and
+.I "/etc/logout.std"
+Finally on
 .I irix
 or
 .I A/UX
@@ -2668,7 +2741,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.00.02 (Cornell) 08/05/91.
+This man page documents tcsh 6.00.03 (Cornell) 10/11/91.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
@@ -2720,11 +2793,14 @@ James J Dempsey, BBN, 1988, and Paul Placeway, OSU, 1988
 Re-ported tcsh to A/UX.
 .sp
 .SH "BUGFIXES AND ENHANCEMENTS"
+David Dawes, Sydney U. Australia, Physics dept., 1991
+SVR4 job control fixes. (reverse pipeline startup code, and signal fixes).
+.br
 Jose Sousa, Interactive Systems Corp., 1991
 Extended vi fixes. Added delete command in vi.
 .br
 Marc Horowitz, MIT, 1991
-Ansification fixes
+Ansification fixes, new exec hashing code, imake fixes.
 .br
 Eric Schnoebelen, Convex, 1990
 .br
