@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.term.h,v 1.9 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.term.h,v 1.10 1992/10/14 20:19:19 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -37,7 +37,7 @@
 #ifndef _h_ed_term
 #define _h_ed_term
 
-#define CONTROL(A)	((A) & 037)
+#define TO_CONTROL(A)	((A) & 037)
 
 #if defined(TERMIO) || defined(POSIX)
 /*
@@ -182,13 +182,13 @@
 # define CINTR		0177	/* ^? */
 # undef  CQUIT
 # undef  CERASE
-# define CERASE		CONTROL('h')
+# define CERASE		TO_CONTROL('h')
 # undef  CKILL
 # undef  CEOF
 # undef  CEOL
 # undef  CEOL2	
 # undef  CSWTCH	
-# define CSWTCH		CONTROL('z')
+# define CSWTCH		TO_CONTROL('z')
 # undef  CDSWTCH 
 # undef  CERASE2
 # undef  CSTART
@@ -210,7 +210,7 @@
 
 
 #ifndef CINTR
-# define CINTR		CONTROL('c')
+# define CINTR		TO_CONTROL('c')
 #endif /* CINTR */
 #ifndef CQUIT
 # define CQUIT		034	/* ^\ */
@@ -219,10 +219,10 @@
 # define CERASE		0177	/* ^? */
 #endif /* CERASE */
 #ifndef CKILL
-# define CKILL		CONTROL('u')
+# define CKILL		TO_CONTROL('u')
 #endif /* CKILL */
 #ifndef CEOF
-# define CEOF		CONTROL('d')
+# define CEOF		TO_CONTROL('d')
 #endif /* CEOF */
 #ifndef CEOL
 # define CEOL		_POSIX_VDISABLE
@@ -240,16 +240,16 @@
 # define CERASE2	_POSIX_VDISABLE
 #endif /* CERASE2 */
 #ifndef CSTART
-# define CSTART		CONTROL('q')
+# define CSTART		TO_CONTROL('q')
 #endif /* CSTART */
 #ifndef CSTOP
-# define CSTOP		CONTROL('s')
+# define CSTOP		TO_CONTROL('s')
 #endif /* CSTOP */
 #ifndef CSUSP
-# define CSUSP		CONTROL('z')
+# define CSUSP		TO_CONTROL('z')
 #endif /* CSUSP */
 #ifndef CDSUSP
-# define CDSUSP		CONTROL('y')
+# define CDSUSP		TO_CONTROL('y')
 #endif /* CDSUSP */
 
 #ifdef hpux
@@ -270,28 +270,28 @@
 #else /* !hpux */
 
 # ifndef CREPRINT
-#  define CREPRINT	CONTROL('r')
+#  define CREPRINT	TO_CONTROL('r')
 # endif /* CREPRINT */
 # ifndef CDISCARD
-#  define CDISCARD	CONTROL('o')
+#  define CDISCARD	TO_CONTROL('o')
 # endif /* CDISCARD */
 # ifndef CLNEXT
-#  define CLNEXT	CONTROL('v')
+#  define CLNEXT	TO_CONTROL('v')
 # endif /* CLNEXT */
 # ifndef CWERASE
-#  define CWERASE	CONTROL('w')
+#  define CWERASE	TO_CONTROL('w')
 # endif /* CWERASE */
 
 #endif /* hpux */
 
 #ifndef CSTATUS
-# define CSTATUS	CONTROL('t')
+# define CSTATUS	TO_CONTROL('t')
 #endif /* CSTATUS */
 #ifndef CPAGE
 # define CPAGE		' '
 #endif /* CPAGE */
 #ifndef CPGOFF
-# define CPGOFF		CONTROL('m')
+# define CPGOFF		TO_CONTROL('m')
 #endif /* CPGOFF */
 #ifndef CKILL2
 # define CKILL2		_POSIX_VDISABLE

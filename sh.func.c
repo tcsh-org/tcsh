@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.57 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.58 1994/07/08 14:43:50 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.57 1994/05/26 13:11:20 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.58 1994/07/08 14:43:50 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -353,13 +353,13 @@ donewgrp(v, c)
     if (chkstop == 0 && setintr)
 	panystop(0);
     (void) signal(SIGTERM, parterm);
-    p = short2blk(&v[1]);
+    p = short2blk(v);
     /*
      * From Beto Appleton (beto@aixwiz.austin.ibm.com)
      * Newgrp can take 2 arguments...
      */
-    (void) execv(_PATH_BIN_NEWGRP, "newgrp", p, NULL);
-    (void) execv(_PATH_USRBIN_NEWGRP, "newgrp", p, NULL);
+    (void) execv(_PATH_BIN_NEWGRP, p);
+    (void) execv(_PATH_USRBIN_NEWGRP, p);
     blkfree((Char **) p);
     untty();
     xexit(1);
@@ -1378,7 +1378,9 @@ dosetenv(v, c)
      * Change the size to the one directed by $LINES and $COLUMNS
      */
     if (eq(vp, STRLINES) || eq(vp, STRCOLUMNS)) {
+#if 0
 	GotTermCaps = 0;
+#endif
 	xfree((ptr_t) lp);
 	ed_Init();
 	return;

@@ -9,3 +9,9 @@ Glob bindkey's args... Are other builtins for which args are not globbed
 and should be?
 
 fix keymaps so they handle ^@ [NULL's] in key strings
+
+make %N in prompt print the effective user.
+
+add a bindkey -C that does not redisplay the prompt.
+
+christos

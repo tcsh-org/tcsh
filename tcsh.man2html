@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: tcsh.man2html,v 1.1 1994/06/14 02:30:55 christos Exp christos $
+# $Id: tcsh.man2html,v 1.2 1994/06/19 20:46:44 christos Exp christos $
 
 # tcsh.man2html
 # Dave Schweisguth <dcs@proton.chem.yale.edu>
@@ -38,14 +38,14 @@ $isatty		= -t STDIN;
 
 $shortfiles	= 0;		# Use long filenames
 
-$dir		= 'tcsh';	# Directory in which to put the pieces
-				#   (suffix added later)
-$header		= 'header';	# HTML file for initial comments
-				#   (suffix added later)
+$dir		= 'tcsh';	# Directory in which to put the pieces *
+$header		= 'header';	# HTML file for initial comments *
 $outfile	= 'tcsh.man';	# Default input file and copy of input file
 $script		= $whatami;	# Copy of script; filename length must be OK
-$topfile	= 'top';	# Top-level HTML file
-				#   (suffix added later)
+$topfile	= 'top';	# Top-level HTML file *
+$listsfile	= 'lists';	# Mailing list description HTML file *	
+
+# * .htm or .html suffix added later
 
 # Sections to inline in the top page
 
@@ -91,9 +91,10 @@ if (@ARGV == 0) {
 # Decide on HTML suffix and append it to filenames
 
 $html = $shortfiles ? 'htm' : 'html';	# Max 3-character extension
-$dir .= ".$html";			# Directory in which to put the pieces
-$header .= ".$html";			# HTML file for initial comments
-$topfile .= ".$html";			# Top-level HTML file
+$dir		.= ".$html";		# Directory in which to put the pieces
+$header		.= ".$html";		# HTML file for initial comments
+$topfile	.= ".$html";		# Top-level HTML file
+$listsfile	.= ".$html";		# Mailing list description HTML file
 
 # Check for input file
 
@@ -245,13 +246,52 @@ and the <A HREF="file://tesla.ee.cornell.edu/pub/tcsh/">
 complete source code</A> for <I>tcsh</I>.
 <HR>
 <I>tcsh</I> is maintained by Christos Zoulas &lt;christos@ee.cornell.edu&gt;
-and the <I>tcsh</I> mailing list &lt;listserv@lut.fi&gt;.
+and the <A HREF="$listsfile"><I>tcsh</I> maintainers' mailing list</A>.
 Dave Schweisguth &lt;dcs@proton.chem.yale.edu&gt;
 wrote the <A HREF="$outfile">manpage</A>
 and the HTML conversion <A HREF="$script">script</A>.
 </BODY>
 EOP
 close TOP;
+
+### Make list page
+
+open(LISTS, ">$dir/$listsfile");
+select LISTS;
+print <<EOP;
+<HEAD>
+<TITLE>The tcsh mailing lists</TITLE>
+</HEAD>
+<BODY>
+<A HREF="top.html">Up</A>
+<H2>The <I>tcsh</I> mailing lists</H2>
+There are three <I>tcsh</I> mailing lists:
+<DL>
+<DT>
+<I>tcsh@lut.fi</I>
+<DD>
+The <I>tcsh</I> maintainers and testers' mailing list.
+<DT>
+<I>tcsh-diffs@lut.fi</I>
+<DD>
+The same as <I>tcsh@lut.fi</I>, plus diffs for each new
+patchlevel of <I>tcsh</I>.
+<DT>
+<I>tcsh-bugs@lut.fi</I>
+<DD>
+Bug reports.
+</DL>
+You can subscribe to any of these lists by sending mail to
+<I>listserv@lut.fi</I> with the text "subscribe &lt;list name&gt;
+&lt;your name&gt;" on a line by itself in the body. &lt;list name&gt;
+is the name of the mailing list, without "@lut.fi", and &lt;your
+name&gt; is your real name, not your email address. You can also ask
+the list server for help by sending only the word "help".
+<P>
+<A HREF="top.html">Up</A>
+</BODY>
+EOP
+close LISTS;
 
 ### Make sections
 

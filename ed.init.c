@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.init.c,v 3.35 1993/06/05 21:09:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.init.c,v 3.36 1993/06/25 21:17:12 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.35 1993/06/05 21:09:15 christos Exp christos $")
+RCSID("$Id: ed.init.c,v 3.36 1993/06/25 21:17:12 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -404,102 +404,82 @@ Rawmode()
 #endif /* POSIX || TERMIO */
 
     if (tty_cooked_mode(&tstty)) {
-#if defined(POSIX) || defined(TERMIO)
-	if (tstty.d_t.c_cflag != extty.d_t.c_cflag) { 
-	    extty.d_t.c_cflag  = tstty.d_t.c_cflag;
-	    extty.d_t.c_cflag &= ~ttylist[EX_IO][M_CONTROL].t_clrmask;
-	    extty.d_t.c_cflag |=  ttylist[EX_IO][M_CONTROL].t_setmask;
-
-	    edtty.d_t.c_cflag  = tstty.d_t.c_cflag;
-	    edtty.d_t.c_cflag &= ~ttylist[ED_IO][M_CONTROL].t_clrmask;
-	    edtty.d_t.c_cflag |=  ttylist[ED_IO][M_CONTROL].t_setmask;
-	}
-
-	if ((tstty.d_t.c_lflag != extty.d_t.c_lflag) &&
-	    (tstty.d_t.c_lflag != edtty.d_t.c_lflag)) {
-	    extty.d_t.c_lflag = tstty.d_t.c_lflag;
-	    extty.d_t.c_lflag &= ~ttylist[EX_IO][M_LINED].t_clrmask;
-	    extty.d_t.c_lflag |=  ttylist[EX_IO][M_LINED].t_setmask;
-
-	    edtty.d_t.c_lflag = tstty.d_t.c_lflag;
-	    edtty.d_t.c_lflag &= ~ttylist[ED_IO][M_LINED].t_clrmask;
-	    edtty.d_t.c_lflag |=  ttylist[ED_IO][M_LINED].t_setmask;
-	}
-
-	if ((tstty.d_t.c_iflag != extty.d_t.c_iflag) &&
-	    (tstty.d_t.c_iflag != edtty.d_t.c_iflag)) {
-	    extty.d_t.c_iflag = tstty.d_t.c_iflag;
-	    extty.d_t.c_iflag &= ~ttylist[EX_IO][M_INPUT].t_clrmask;
-	    extty.d_t.c_iflag |=  ttylist[EX_IO][M_INPUT].t_setmask;
-
-	    edtty.d_t.c_iflag = tstty.d_t.c_iflag;
-	    edtty.d_t.c_iflag &= ~ttylist[ED_IO][M_INPUT].t_clrmask;
-	    edtty.d_t.c_iflag |=  ttylist[ED_IO][M_INPUT].t_setmask;
-	}
-
-	if ((tstty.d_t.c_oflag != extty.d_t.c_oflag) &&
-	    (tstty.d_t.c_oflag != edtty.d_t.c_oflag)) {
-	    extty.d_t.c_oflag = tstty.d_t.c_oflag;
-	    extty.d_t.c_oflag &= ~ttylist[EX_IO][M_OUTPUT].t_clrmask;
-	    extty.d_t.c_oflag |=  ttylist[EX_IO][M_OUTPUT].t_setmask;
-
-	    edtty.d_t.c_oflag = tstty.d_t.c_oflag;
-	    edtty.d_t.c_oflag &= ~ttylist[ED_IO][M_OUTPUT].t_clrmask;
-	    edtty.d_t.c_oflag |=  ttylist[ED_IO][M_OUTPUT].t_setmask;
-	}
-
-	if (tty_gettabs(&extty) == 0) 
+	/*
+	 * re-test for some things here (like maybe the user typed 
+	 * "stty -tabs"
+	 */
+	if (tty_gettabs(&tstty) == 0)
 	    T_Tabs = 0;
 	else 
 	    T_Tabs = CanWeTab();
 
+#if defined(POSIX) || defined(TERMIO)
+	extty.d_t.c_cflag  = tstty.d_t.c_cflag;
+	extty.d_t.c_cflag &= ~ttylist[EX_IO][M_CONTROL].t_clrmask;
+	extty.d_t.c_cflag |=  ttylist[EX_IO][M_CONTROL].t_setmask;
+
+	edtty.d_t.c_cflag  = tstty.d_t.c_cflag;
+	edtty.d_t.c_cflag &= ~ttylist[ED_IO][M_CONTROL].t_clrmask;
+	edtty.d_t.c_cflag |=  ttylist[ED_IO][M_CONTROL].t_setmask;
+
+	extty.d_t.c_lflag = tstty.d_t.c_lflag;
+	extty.d_t.c_lflag &= ~ttylist[EX_IO][M_LINED].t_clrmask;
+	extty.d_t.c_lflag |=  ttylist[EX_IO][M_LINED].t_setmask;
+
+	edtty.d_t.c_lflag = tstty.d_t.c_lflag;
+	edtty.d_t.c_lflag &= ~ttylist[ED_IO][M_LINED].t_clrmask;
+	edtty.d_t.c_lflag |=  ttylist[ED_IO][M_LINED].t_setmask;
+
+	extty.d_t.c_iflag = tstty.d_t.c_iflag;
+	extty.d_t.c_iflag &= ~ttylist[EX_IO][M_INPUT].t_clrmask;
+	extty.d_t.c_iflag |=  ttylist[EX_IO][M_INPUT].t_setmask;
+
+	edtty.d_t.c_iflag = tstty.d_t.c_iflag;
+	edtty.d_t.c_iflag &= ~ttylist[ED_IO][M_INPUT].t_clrmask;
+	edtty.d_t.c_iflag |=  ttylist[ED_IO][M_INPUT].t_setmask;
+
+	extty.d_t.c_oflag = tstty.d_t.c_oflag;
+	extty.d_t.c_oflag &= ~ttylist[EX_IO][M_OUTPUT].t_clrmask;
+	extty.d_t.c_oflag |=  ttylist[EX_IO][M_OUTPUT].t_setmask;
+
+	edtty.d_t.c_oflag = tstty.d_t.c_oflag;
+	edtty.d_t.c_oflag &= ~ttylist[ED_IO][M_OUTPUT].t_clrmask;
+	edtty.d_t.c_oflag |=  ttylist[ED_IO][M_OUTPUT].t_setmask;
+
 #else /* GSTTY */
 
-	if (((tstty.d_t.sg_flags != extty.d_t.sg_flags) || 
-	     (tstty.d_lb != extty.d_lb)) &&
-	    ((tstty.d_t.sg_flags != edtty.d_t.sg_flags) || 
-	     (tstty.d_lb != edtty.d_lb))) {
+	extty.d_t.sg_flags = tstty.d_t.sg_flags;
 
-	    extty.d_t.sg_flags = tstty.d_t.sg_flags;
+	extty.d_t.sg_flags &= ~ttylist[EX_IO][M_CONTROL].t_clrmask;
+	extty.d_t.sg_flags |=  ttylist[EX_IO][M_CONTROL].t_setmask;
 
-	    /*
-	     * re-test for some things here (like maybe the user typed 
-	     * "stty -tabs"
-	     */
-	    if (tty_gettabs(&extty) == 0)
-		T_Tabs = 0;
-	    else 
-		T_Tabs = CanWeTab();
+	if (T_Tabs)		/* order of &= and |= is important to XTABS */
+	    extty.d_t.sg_flags &= ~XTABS;
+	else 
+	    extty.d_t.sg_flags |= XTABS;
 
-	    extty.d_t.sg_flags &= ~ttylist[EX_IO][M_CONTROL].t_clrmask;
-	    extty.d_t.sg_flags |=  ttylist[EX_IO][M_CONTROL].t_setmask;
+	extty.d_lb = tstty.d_lb;
+	extty.d_lb &= ~ttylist[EX_IO][M_LOCAL].t_clrmask;
+	extty.d_lb |= ttylist[EX_IO][M_LOCAL].t_setmask;
 
-	    if (T_Tabs)		/* order of &= and |= is important to XTABS */
-		extty.d_t.sg_flags &= ~XTABS;
-	    else 
-		extty.d_t.sg_flags |= XTABS;
-
-	    extty.d_lb = tstty.d_lb;
-	    extty.d_lb &= ~ttylist[EX_IO][M_LOCAL].t_clrmask;
-	    extty.d_lb |= ttylist[EX_IO][M_LOCAL].t_setmask;
-
-	    edtty.d_t.sg_flags = extty.d_t.sg_flags;
-	    if (T_Tabs) {	/* order of &= and |= is important to XTABS */
-		edtty.d_t.sg_flags &= 
-			~(ttylist[ED_IO][M_CONTROL].t_clrmask|XTABS);
-		edtty.d_t.sg_flags |=   ttylist[ED_IO][M_CONTROL].t_setmask;
-	    }
-	    else {
-		edtty.d_t.sg_flags &= ~ttylist[ED_IO][M_CONTROL].t_clrmask;
-		edtty.d_t.sg_flags |= 
-			(ttylist[ED_IO][M_CONTROL].t_setmask|XTABS);
-	    }
-
-	    edtty.d_lb = tstty.d_lb;
-	    edtty.d_lb &= ~ttylist[ED_IO][M_LOCAL].t_clrmask;
-	    edtty.d_lb |= ttylist[ED_IO][M_LOCAL].t_setmask;
+	edtty.d_t.sg_flags = extty.d_t.sg_flags;
+	if (T_Tabs) {	/* order of &= and |= is important to XTABS */
+	    edtty.d_t.sg_flags &= 
+		    ~(ttylist[ED_IO][M_CONTROL].t_clrmask|XTABS);
+	    edtty.d_t.sg_flags |=   ttylist[ED_IO][M_CONTROL].t_setmask;
 	}
+	else {
+	    edtty.d_t.sg_flags &= ~ttylist[ED_IO][M_CONTROL].t_clrmask;
+	    edtty.d_t.sg_flags |= 
+		    (ttylist[ED_IO][M_CONTROL].t_setmask|XTABS);
+	}
+
+	edtty.d_lb = tstty.d_lb;
+	edtty.d_lb &= ~ttylist[ED_IO][M_LOCAL].t_clrmask;
+	edtty.d_lb |= ttylist[ED_IO][M_LOCAL].t_setmask;
+
 # endif /* TERMIO || POSIX */
+
 	{
 	    extern int didsetty;
 	    int i;

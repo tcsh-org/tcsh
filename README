@@ -50,11 +50,12 @@ To install tcsh:
     "VENDOR" correctly.  If you need to make changes, PLEASE SEND THEM 
     BACK TO ME.
 
-5)  You may want to adjust the TCSH_DESTDIR and TCSH_DESTMAN entries in the
-    Makefile.  These are the directories that tcsh, and the tcsh.1 man
-    entry will be placed in when you do a "make install".  If you decide
-    to install tcsh somewhere other than in /usr/local/bin/tcsh, you should
-    #define _PATH_TCSHELL "/your/installation/directory/tcsh" in pathnames.h.
+5)  You may want to adjust the TCSH_DESTDIR and TCSH_DESTMAN entries in
+    the Makefile.  These are the directories that tcsh, and the tcsh.1
+    man entry will be placed in when you do a "make install" and "make
+    install.man" respectively.  If you decide to install tcsh somewhere
+    other than in /usr/local/bin/tcsh, you should #define _PATH_TCSHELL
+    "/your/installation/directory/tcsh" in pathnames.h.
 
 6)  make
 

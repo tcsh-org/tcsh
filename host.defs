@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.05/RCS/host.defs,v 1.6 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/host.defs,v 1.7 1994/07/08 14:43:50 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.6 1994/05/26 13:11:20 christos Exp $")
+RCSID("$Id: host.defs,v 1.7 1994/07/08 14:43:50 christos Exp $")
 
 endcode	:
 
@@ -349,7 +349,7 @@ enddef	:
 
 newdef	: defined(_MINIX)
 comment	: Andy Teitelbaum's minix
-vendor	: defined(i386)					: "ibm"
+vendor	: defined(i386)					: "intel"
 hosttype: defined(i386)					: "minix386"
 hosttype:						: "minix"
 ostype	:						: "minix"
@@ -359,7 +359,7 @@ enddef	:
 
 newdef	: defined(linux)
 comment	: Linus Torvalds's linux
-vendor	: defined(i386)					: "ibm"
+vendor	: defined(i386)					: "intel"
 hosttype: defined(i386)					: "i386-linux"
 ostype	: 						: "linux"
 machtype: defined(i386)					: "i386"
@@ -368,7 +368,7 @@ enddef	:
 
 newdef	: defined(__EMX__)
 comment	: OS/2 EMX [unix emulation under OS/2]
-vendor	: defined(i386)					: "ibm"
+vendor	: defined(i386)					: "intel"
 hosttype: defined(i386)					: "i386-emx"
 ostype	:						: "os2"
 machtype: defined(i386)					: "i386"
@@ -398,7 +398,7 @@ enddef	:
 
 newdef	: defined(__FreeBSD__) 
 comment	: Free BSD
-vendor	: defined(i386)					: "ibm"
+vendor	: defined(i386)					: "intel"
 hosttype:						: "FreeBSD"
 ostype	:						: "FreeBSD"
 machtype:						: "i386"
@@ -407,7 +407,7 @@ enddef	:
 
 newdef	: defined(__386BSD__)
 comment	: Bill Jolitz's 386BSD
-vendor	: defined(i386)					: "ibm"
+vendor	: defined(i386)					: "intel"
 hosttype:						: "386BSD"
 ostype	:						: "386BSD"
 machtype:						: "i386"
@@ -416,7 +416,7 @@ enddef	:
 
 newdef	: defined(bsdi)
 comment	: BSDI's unix
-vendor	: defined(i386)					: "ibm"
+vendor	: defined(i386)					: "intel"
 hosttype:						: "bsd386"
 ostype	:						: "bsdi"
 machtype: defined(i386)					: "i386"
@@ -425,7 +425,7 @@ enddef	:
 
 newdef	: defined(COHERENT)
 comment	: COHERENT's unix
-vendor	: defined(_I386)				: "ibm"
+vendor	: defined(_I386)				: "intel"
 hosttype:						: "coh386"
 hosttype:						: "coherent"
 ostype	:						: "coherent"
@@ -603,14 +603,19 @@ machtype: defined(mc68000) 				: "mc68000"
 enddef	:
 
 
+
 newdef	: defined(ultrix) || defined(__ultrix)
 comment	: Digital's Ultrix 
 vendor	:						: "dec"
 hosttype: defined(M_mipsel)				: "decstation"
 hosttype: defined(M_mipseb)				: "decmips"
+hosttype: defined(vax) || defined(__vax)		: "vax"
+hosttype: defined(__vax__) 				: "vax"
 ostype	:						: "ultrix"
 machtype: defined(M_mipsel)				: "mipsel"
 machtype: defined(M_mipseb)				: "mipseb"
+machtype: defined(vax) || defined (__vax)		: "vax"
+hosttype: defined(__vax__) 				: "vax"
 enddef	:
 
 
@@ -773,6 +778,12 @@ hosttype: 						: "sysV68"
 machtype:						: "m68k"
 enddef	:
 
+newdef	: defined(supermax)
+comment	: DDE Supermax running System V/68 R3 (SVR3/68020 based)
+vendor	:						: "supermax"
+hosttype: 						: "supermax"
+machtype:						: "m68k"
+enddef	:
 
 newdef	: defined(sysV88)
 comment	: Motorola MPC running System V/88 R32V2 (SVR3/88100 based)

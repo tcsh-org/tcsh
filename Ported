@@ -735,6 +735,17 @@ ENVIRON :	n/a
 NOTES   :	n/a
 VERSION :	6.04.00
 
+VENDOR	:	Data General
+MODELS	:	Aviion
+COMPILER:	gcc 2.5.8
+CFLAGS	:	-g -O2 -msvr4
+LIBES	:	-ltermcap
+OS	:	DGUX 5.4.1
+CONFIG	:	dgux5.4
+ENVIRON	:	sde m88kdguxelf
+VERSION	:	6.05.00
+
+
 VENDOR	:	Harris
 MODELS	:	Tahoe
 COMPILER:	cc, gcc 1.42

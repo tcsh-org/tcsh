@@ -3681,7 +3681,7 @@ was compiled; see the \fBversion\fR shell variable.
 A shell which is given neither the \fB-c\fR nor the \fB-t\fR option
 hashes the contents of the directories in \fBpath\fR after
 reading \fI~/.tcshrc\fR and each time \fBpath\fR is reset.
-If one adds a new command are to a directory in \fBpath\fR while the shell
+If one adds a new command to a directory in \fBpath\fR while the shell
 is active, one may need to do a \fIrehash\fR for the shell to find it.
 .TP 8
 .B printexitvalue \fR(+)
@@ -3935,6 +3935,7 @@ here's the behavior with \fBsymlinks\fR set to `chase',
 /tmp/from/src
 .br
 > cd ..; echo $cwd
+.br
 /tmp/from
 .PP
 here's the behavior with \fBsymlinks\fR set to `ignore',
@@ -4497,8 +4498,37 @@ the expression is false and the command is not executed.
 .PP
 \fIls-F\fR includes file identification characters when sorting filenames.
 .PP
-New bugs should be sent to Christos Zoulas <christos@ee.cornell.edu>,
-preferably with fixes.
+Report bugs to tcsh-bugs@lut.fi, preferably with fixes. If you want to
+help maintain and test tcsh, send mail to listserv@lut.fi with the text
+"subscribe tcsh <your name>" on a line by itself in the body. You can
+also "subscribe tcsh-bugs <your name>" to get all bug reports, or
+"subscribe tcsh-diffs <your name>" to get the development list plus
+diffs for each patchlevel.
+.SH THE TEE IN TCSH
+In 1964, DEC produced the PDP-6; the PDP-10 was a later re-implementation.  It
+was re-christened the DECsystem-10 in 1970 or so when they brought out the
+second model, the KI10.
+.PP
+TENEX was created at Bolt, Beranek & Newman (a Cambridge, Mass. think tank) in
+1972 as an experiment in demand-paged virtual memory operating systems.  They
+built a new pager for the DEC PDP-10 and created the OS to go with it.  It was
+extremely successful in academia.
+.PP
+In 1975, DEC brought out a new model of the PDP-10, the KL10; they intended to
+have only a version of TENEX, which they had licensed from BBN, for the new
+box.  They called their version TOPS-20 (their capitalization is trademarked).
+A lot of Tops-10 users ("The OPerating System for PDP-10") objected; thus DEC
+found themselves supporting two incompatible systems on the same hardware--but
+then there were 6 on the PDP-11!
+.PP
+TENEX, and Tops-20 (I hate the shift key) to version 3, had command completion
+via a user-code-level subroutine library called ULTCMD.  With version 3, DEC
+moved all that capability and more into the monitor ("kernel" for you Unix
+types), accessed by the COMND% JSYS ("Jump to SYStem" instruction, the super-
+visor call mechanism [are my IBM roots also showing?]).
+.PP
+The creator of tcsh was impressed by this feature and several others of TENEX
+and Tops-20, and created a version of csh which mimicked them.
 .SH LIMITATIONS
 Words can be no longer than 1024 characters.
 .PP
@@ -4680,3 +4710,6 @@ the other people at Ohio State for suggestions and encouragement
 .PP
 All the people on the net, for putting up with,
 reporting bugs in, and suggesting new additions to each and every version
+.PP
+Finally thanks to Richard M. Alderson III for writing the history of tenex
+section.

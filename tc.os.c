@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.35 1994/04/12 15:46:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.c,v 3.36 1994/04/12 17:37:37 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.35 1994/04/12 15:46:46 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.36 1994/04/12 17:37:37 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -572,7 +572,7 @@ dowarp(v, c)
     if (*v == 0) {		/* display warp value */
 	if (warp < 0)
 	    stderror(ERR_NAME | ERR_STRING, "Getwarp failed");
-	we = getwarpbyvarval(warp);
+	we = getwarpbyvalue(warp);
 	if (we)
 	    printf("%s\n", we->w_name);
 	else

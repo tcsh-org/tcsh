@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.66 1994/05/07 18:51:25 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.67 1994/05/26 13:11:20 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.66 1994/05/07 18:51:25 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.67 1994/05/26 13:11:20 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -295,7 +295,8 @@ tenematch(inputline, num_read, command)
 	    (void) Strcpy(rword, slshp);
 	    if (slshp != STRNULL)
 		*slshp = '\0';
-	    search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), looking);
+	    search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), looking,
+				  pat, suf);
 	    if (search_ret == 1) {
 		/* get rid of old word */
 		DeleteBack(str_end - word_start);
@@ -350,7 +351,8 @@ tenematch(inputline, num_read, command)
 	    if (isglob(*bptr))
 		return 0;
 	}
-	search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), looking);
+	search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), looking,
+			      pat, suf);
 	if (search_ret == 1) {
 	    /* get rid of old word */
 	    DeleteBack(str_end - word_start);	
@@ -878,7 +880,11 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    }
 	    if (gpat && !Gmatch(item, pat))
 		break;
-	    nd = spdist(item, target);	/* test the item against original */
+	    /*
+	     * Swapped the order of the spdist() arguments as suggested
+	     * by eeide@asylum.cs.utah.edu (Eric Eide)
+	     */
+	    nd = spdist(target, item);	/* test the item against original */
 	    if (nd <= d && nd != 4) {
 		if (!(exec_check && !executable(exp_dir, item, dir_ok))) {
 		    (void) Strcpy(exp_name, item);

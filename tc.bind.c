@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.bind.c,v 3.19 1994/06/18 19:48:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.bind.c,v 3.20 1994/07/08 14:43:50 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.19 1994/06/18 19:48:50 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.20 1994/07/08 14:43:50 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -166,7 +166,7 @@ dobindkey(v, c)
 	    (void) ClearArrowKeys(&in);
 	    return;
 	}
-	if (in.len >= 1) {
+	if (in.len > 1) {
 	    (void) DeleteXkey(&in);
 	}
 	else if (map[ch] == F_XKEY) {
@@ -208,7 +208,7 @@ dobindkey(v, c)
 	if (key)
 	    (void) SetArrowKeys(&in, XmapCmd((int) cmd), ntype);
 	else {
-	    if (in.len >= 1) {
+	    if (in.len > 1) {
 		AddXkey(&in, XmapCmd((int) cmd), ntype);
 		map[ch] = F_XKEY;
 	    }

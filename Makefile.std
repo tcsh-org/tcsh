@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.70 1994/06/19 20:46:44 christos Exp $
+# $Id: Makefile.std,v 1.71 1994/06/20 14:08:32 christos Exp christos $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -103,6 +103,9 @@ CFLAGS=-O2 $(INCLUDES)
 # Multiflow (5M binary... if you choose -O5!)
 #CFLAGS = -O5 -sb_trace 0
 
+# DDE Supermax Unix SYSV Rel III.
+# CFLAGS= -O3
+
 # Apollo's with cc [apollo builtins don't work with gcc]
 # and apollo should not define __STDC__ if it does not have
 # the standard header files. RT's (aos4.3) need that too;
@@ -120,6 +123,8 @@ CFLAGS=-O2 $(INCLUDES)
 #DFLAGS=-D_VMS_POSIX
 # Multiflow
 #DFLAGS=-DMULTIFLOW
+# DELL SVR4
+#DFLAGS=-DDELL
 DFLAGS=
 #DFLAGS=-D_PATH_TCSH='"${DESTBIN}/tcsh"'
 
@@ -183,6 +188,7 @@ LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -ltermc				 ## emx under OS/2
 #LIBES=					 ## Minix, VMS_POSIX
 #LIBES= -ltermcap -lcrypt		 ## Multiflow
+#LIBES= -lcurses 			 ## DDE Supermax
 
 ################################################################
 ## EXTRAFLAGS and EXTRALIBS

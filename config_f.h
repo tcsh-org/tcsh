@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/config_f.h,v 3.8 1993/12/12 19:55:08 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/config_f.h,v 3.9 1994/04/12 15:46:46 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -108,7 +108,7 @@
 /*
  * NEWGRP	Provide a newgrp builtin.
  */
-#undef NEWGRP
+#define NEWGRP
 
 /*
  * SYSMALLOC	Use the system provided version of malloc and friends.

@@ -1,6 +1,12 @@
 
-V6.07.00, -
- 14. 6.06.01 - 07/08/94
+V6.06.00, -
+ 19. Take into account programmable completion hints when spell checking.
+ 18. Unconditionally change stty modes in Rawmode()
+ 17. Change date in $version to be ISO 8601 per Keith's suggestion
+ 16. Fixed portability problems in the new counted-strings codes (From Kaveh)
+ 15. Fixed binding problem with the new counted-strings code [all key bindings
+     ended up in the extended map]
+ 14. 6.05.01 - 07/08/94
  13. Changed key bindings to use counted strings instead of Null terminated
      strings, so that binding ^@ works.
  12. Fix parsing bug, where words that contained keywords caused incorrect
