@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.23 1992/11/20 08:56:38 christos Exp $
+/**/# $Id: Imakefile,v 1.24 1993/02/12 17:22:20 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.03
 /**/# Marc Horowitz, MIT SIPB
@@ -377,7 +377,7 @@ TCOBJS=	tc.alloc.${SUF} tc.bind.${SUF} tc.const.${SUF} tc.disc.${SUF} \
 	tc.prompt.${SUF} tc.sched.${SUF} tc.sig.${SUF} tc.str.${SUF} \
 	tc.vers.${SUF} tc.who.${SUF} 
 
-MISCF = Makefile Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
+MISCF = Makefile.std Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
 	README.imake complete.tcsh vmsreadme.txt Makefile.vms termcap.vms
