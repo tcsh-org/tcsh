@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.85 1998/11/24 18:17:27 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.86 1998/12/15 13:07:22 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.85 1998/11/24 18:17:27 christos Exp $")
+RCSID("$Id: sh.c,v 3.86 1998/12/15 13:07:22 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -693,7 +693,7 @@ main(argc, argv)
 	if ((tcp = getenv("SHELL")) != NULL) {
 	    sh_len = strlen(tcp);
 	    if ((sh_len >= 5 && strcmp(tcp + (sh_len - 5), "/tcsh") == 0) || 
-	        (sh_len >= 4 && strcmp(tcp + (sh_len - 4), "/csh") == 0))
+	        (!tcsh && sh_len >= 4 && strcmp(tcp + (sh_len - 4), "/csh") == 0))
 		set(STRshell, quote(SAVE(tcp)), VAR_READWRITE);
 	    else
 		sh_len = 0;
@@ -1849,7 +1849,7 @@ pintr1(wantnl)
 	(void) sighold(SIGINT);
     (void) sigrelse(SIGCHLD);
 #endif
-    draino();
+    drainoline();
 #if !defined(_VMS_POSIX) && !defined(WINNT)
     (void) endpwent();
 #endif /* !_VMS_POSIX && !WINNT */

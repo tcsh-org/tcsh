@@ -1,3 +1,7 @@
+ 30. OpenBSD m68k patches (Paul DuBois)
+ 29. Avoid redefinition of getpeername on Solaris-2.7
+ 28. fix problems with savedups=erase, savehist=merge (Randy Gobbel)
+ 27. Don't set $shell to csh, if we were invoked as tcsh (Tomas Persson)
  26. added $_
  25. added postcmd
  24. V6.08.02 - 19981124

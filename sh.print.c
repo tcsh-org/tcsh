@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.15 1998/09/09 10:29:21 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.16 1998/10/25 15:10:21 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.15 1998/09/09 10:29:21 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.16 1998/10/25 15:10:21 christos Exp $")
 
 #include "ed.h"
 
@@ -194,7 +194,7 @@ putpure(c)
 }
 
 void
-draino()
+drainoline()
 {
     linp = linbuf;
 }

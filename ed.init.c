@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.init.c,v 3.39 1997/10/27 22:44:21 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.init.c,v 3.40 1997/10/28 22:34:16 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.39 1997/10/27 22:44:21 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.40 1997/10/28 22:34:16 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -63,15 +63,16 @@ static ttydata_t extty, edtty, tstty;
 extern int insource;
 #define SHTTY (insource ? OLDSTD : SHIN)
 
+#define uc unsigned char
 static unsigned char ttychars[NN_IO][C_NCC] = {
     {
-	CINTR,		 CQUIT, 	 CERASE, 	   CKILL,	
-	CEOF, 		 CEOL, 		 CEOL2, 	   CSWTCH, 
-	CDSWTCH,	 CERASE2,	 CSTART, 	   CSTOP,
-	CWERASE, 	 CSUSP, 	 CDSUSP, 	   CREPRINT,
-	CDISCARD, 	 CLNEXT,	 CSTATUS,	   CPAGE,
-	CPGOFF,		 CKILL2, 	 CBRK, 		   CMIN,
-	CTIME
+	(uc)CINTR,	(uc)CQUIT, 	 (uc)CERASE, 	   (uc)CKILL,	
+	(uc)CEOF, 	(uc)CEOL, 	 (uc)CEOL2, 	   (uc)CSWTCH, 
+	(uc)CDSWTCH,	(uc)CERASE2,	 (uc)CSTART, 	   (uc)CSTOP,
+	(uc)CWERASE, 	(uc)CSUSP, 	 (uc)CDSUSP, 	   (uc)CREPRINT,
+	(uc)CDISCARD, 	(uc)CLNEXT,	 (uc)CSTATUS,	   (uc)CPAGE,
+	(uc)CPGOFF,	(uc)CKILL2, 	 (uc)CBRK, 	   (uc)CMIN,
+	(uc)CTIME
     },
     {
 	CINTR, 		 CQUIT, 	  CERASE, 	   CKILL, 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.79 1998/09/26 12:28:33 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.80 1998/10/25 15:10:36 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -692,8 +692,10 @@ extern int readlink __P((const char *, char *, size_t));
 extern void setgrent __P((void));
 extern void endgrent __P((void));
 # ifdef REMOTEHOST
+#  ifndef _SOCKLEN_T	/* Avoid Solaris 2.7 bogosity. */
 struct sockaddr;
 extern int getpeername __P((int, struct sockaddr *, int *));
+#  endif /* _SOCKLEN_T
 # endif /* REMOTEHOST */
 #endif /* SUNOS4 && __GNUC__ == 2 */
 

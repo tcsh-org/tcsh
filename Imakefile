@@ -1,5 +1,5 @@
 XCOMM
-XCOMM $Id: Imakefile,v 1.72 1998/09/04 21:16:32 christos Exp $
+XCOMM $Id: Imakefile,v 1.73 1998/10/02 10:56:44 christos Exp $
 XCOMM
 XCOMM Imakefile for tcsh 6.08
 XCOMM Marc Horowitz, MIT SIPB
@@ -192,6 +192,10 @@ EXTF=mi.termios.c mi.wait.h mi.varargs.h vms.termcap.c
 #   define ConfigH isc202
 #  endif
 # endif /* i386Isc */
+
+# ifdef OpenBSDArchitecture
+#  define ConfigH bsd4.4
+# endif /* OpenBsdArchitecture */
 
 # ifdef NetBSDArchitecture
 #  define ConfigH bsd4.4
