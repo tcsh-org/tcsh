@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.101 2002/07/05 16:28:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.102 2002/07/08 20:43:55 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.101 2002/07/05 16:28:00 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.102 2002/07/08 20:43:55 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1311,6 +1311,16 @@ dosetenv(v, c)
 
     vp = *v++;
 
+    lp = vp;
+    if (!letter(*lp))
+        stderror(ERR_NAME | ERR_VARBEGIN);
+
+    for (; alnum(*lp); lp++)
+        continue;
+
+    if (*lp != '\0')
+	stderror(ERR_NAME | ERR_SYNTAX);
+ 
     if ((lp = *v++) == 0)
 	lp = STRNULL;
 
