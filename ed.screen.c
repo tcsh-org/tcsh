@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.44 1998/09/04 21:16:44 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.45 1998/10/25 15:09:55 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.44 1998/09/04 21:16:44 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.45 1998/10/25 15:09:55 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1638,12 +1638,12 @@ ChangeSize(lins, cols)
 	char   *tptr;
 
 	if (getenv("COLUMNS")) {
-	    Itoa(Val(T_co), buf);
+	    (void) Itoa(Val(T_co), buf, 0, 0);
 	    tsetenv(STRCOLUMNS, buf);
 	}
 
 	if (getenv("LINES")) {
-	    Itoa(Val(T_li), buf);
+	    (void) Itoa(Val(T_li), buf, 0, 0);
 	    tsetenv(STRLINES, buf);
 	}
 
@@ -1668,7 +1668,7 @@ ChangeSize(lins, cols)
 		i = (int) (ptr - termcap + Strlen(buf));
 		(void) Strncpy(backup, termcap, (size_t) i);
 		backup[i] = '\0';
-		Itoa(Val(T_co), buf);
+		(void) Itoa(Val(T_co), buf, 0, 0);
 		(void) Strcat(backup + i, buf);
 		ptr = Strchr(ptr, ':');
 		(void) Strcat(backup, ptr);
@@ -1686,7 +1686,7 @@ ChangeSize(lins, cols)
 		i = (int) (ptr - backup + Strlen(buf));
 		(void) Strncpy(termcap, backup, (size_t) i);
 		termcap[i] = '\0';
-		Itoa(Val(T_li), buf);
+		(void) Itoa(Val(T_li), buf, 0, 0);
 		(void) Strcat(termcap, buf);
 		ptr = Strchr(ptr, ':');
 		(void) Strcat(termcap, ptr);

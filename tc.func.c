@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.81 1998/10/25 15:10:32 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.82 1998/12/15 13:07:28 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.81 1998/10/25 15:10:32 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.82 1998/12/15 13:07:28 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -172,37 +172,48 @@ sprlex(buf, bufsiz, sp0)
     return (buf);
 }
 
-void
-Itoa(n, s)			/* convert n to characters in s */
-    int     n;
-    Char   *s;
+
+Char *
+Itoa(n, s, min_digits, attributes)
+    int n;
+    Char *s;
+    int min_digits, attributes;
 {
-    int     i, sign;
+    /*
+     * The array size here is derived from
+     *	log8(UINT_MAX)
+     * which is guaranteed to be enough for a decimal
+     * representation.  We add 1 because integer divide
+     * rounds down.
+     */
+#ifndef CHAR_BIT
+# define CHAR_BIT 8
+#endif
+    Char buf[CHAR_BIT * sizeof(int) / 3 + 1];
+    Char *p;
+    unsigned int un;	/* handle most negative # too */
+    int pad = (min_digits != 0);
 
-    if ((sign = n) < 0)		/* record sign */
-	n = -n;
-    i = 0;
-    do {
-	s[i++] = n % 10 + '0';
-    } while ((n /= 10) > 0);
-    if (sign < 0)
-	s[i++] = '-';
-    s[i] = '\0';
-    Reverse(s);
-}
+    if (sizeof(buf) - 1 < min_digits)
+	min_digits = sizeof(buf) - 1;
 
-static void
-Reverse(s)
-    Char   *s;
-{
-    Char   c;
-    int     i, j;
-
-    for (i = 0, j = (int) Strlen(s) - 1; i < j; i++, j--) {
-	c = s[i];
-	s[i] = s[j];
-	s[j] = c;
+    un = n;
+    if (n < 0) {
+	un = -un;
+	*s++ = '-';
     }
+
+    p = buf;
+    do {
+	*p++ = un % 10 + '0';
+	un /= 10;
+    } while ((pad && --min_digits > 0) || un != 0);
+
+    while (p > buf)
+	*s++ = *--p | attributes;
+
+    *s = '\0';
+    return s;
 }
 
 
@@ -1776,7 +1787,7 @@ shlvl(val)
 	else {
 	    Char    buff[BUFSIZE];
 
-	    Itoa(val, buff);
+	    (void) Itoa(val, buff, 0, 0);
 	    set(STRshlvl, Strsave(buff), VAR_READWRITE);
 	    tsetenv(STRKSHLVL, buff);
 	}

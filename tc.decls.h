@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.42 1998/09/18 16:09:17 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.43 1998/12/15 13:07:27 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -81,7 +81,7 @@ extern	int		  resetdisc	__P((int));
 extern	Char		 *expand_lex	__P((Char *, size_t, struct wordent *, 
 					     int, int));
 extern	Char		 *sprlex	__P((Char *, size_t, struct wordent *));
-extern	void		  Itoa		__P((int, Char *));
+extern	Char		 *Itoa		__P((int, Char *, int, int));
 extern	void		  dolist	__P((Char **, struct command *));
 extern	void		  dotelltc	__P((Char **, struct command *));
 extern	void		  doechotc	__P((Char **, struct command *));

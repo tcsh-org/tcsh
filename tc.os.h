@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.80 1998/10/25 15:10:36 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.81 1999/02/06 15:01:26 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -695,7 +695,7 @@ extern void endgrent __P((void));
 #  ifndef _SOCKLEN_T	/* Avoid Solaris 2.7 bogosity. */
 struct sockaddr;
 extern int getpeername __P((int, struct sockaddr *, int *));
-#  endif /* _SOCKLEN_T
+#  endif /* _SOCKLEN_T */
 # endif /* REMOTEHOST */
 #endif /* SUNOS4 && __GNUC__ == 2 */
 
@@ -723,9 +723,11 @@ extern void bcopy	__P((const void *, void *, size_t));
 /* Irix6 defines getpeername(int, void *, int *) which conflicts with
    the definition below. */
 #  if !defined(__sgi) && !defined(_OSD_POSIX)
+#   ifndef _SOCKLEN_T	/* Avoid Solaris 2.7 bogosity. */
 struct sockaddr;
 extern int getpeername __P((int, struct sockaddr *, int *));
-#  endif /* __sgi */
+#   endif /* _SOCKLEN_T */
+#  endif /* !__sgi && !_OSD_POSIX */
 # endif /* REMOTEHOST */
 # ifndef BSDTIMES
 extern int getrlimit __P((int, struct rlimit *));

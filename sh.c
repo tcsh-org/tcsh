@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.86 1998/12/15 13:07:22 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.87 1999/02/06 15:01:19 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.86 1998/12/15 13:07:22 christos Exp $")
+RCSID("$Id: sh.c,v 3.87 1999/02/06 15:01:19 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -551,14 +551,14 @@ main(argc, argv)
 #ifdef apollo
 	int     oid = getoid();
 
-	Itoa(oid, buff);
+	(void) Itoa(oid, buff, 0, 0);
 	set(STRoid, Strsave(buff), VAR_READWRITE);
 #endif /* apollo */
 
-	Itoa(uid, buff);
+	(void) Itoa(uid, buff, 0, 0);
 	set(STRuid, Strsave(buff), VAR_READWRITE);
 
-	Itoa(gid, buff);
+	(void) Itoa(gid, buff, 0, 0);
 	set(STRgid, Strsave(buff), VAR_READWRITE);
 
 	cln = getenv("LOGNAME");

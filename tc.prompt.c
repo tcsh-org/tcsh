@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.34 1998/09/04 21:17:01 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.35 1998/10/25 15:10:39 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.34 1998/09/04 21:17:01 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.35 1998/10/25 15:10:39 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -262,31 +262,12 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			what != FMT_PROMPT || adrof(STRnoding)) {
 			if (t->tm_min)
 			    print_prompt_did_ding = 0;
-			Itoa(hr, buff);
-			*p++ = attributes | buff[0];
-			if (buff[1]) 
-			    *p++ = attributes | buff[1];
+			p = Itoa(hr, p, 0, attributes);
 			*p++ = attributes | ':';
-			Itoa(t->tm_min, buff);
-			if (buff[1]) {
-			    *p++ = attributes | buff[0];
-			    *p++ = attributes | buff[1];
-			}
-			else {
-			    *p++ = attributes | '0';
-			    *p++ = attributes | buff[0];
-			}
+			p = Itoa(t->tm_min, p, 2, attributes);
 			if (*cp == 'p' || *cp == 'P') {
 			    *p++ = attributes | ':';
-			    Itoa(t->tm_sec, buff);
-			    if (buff[1]) {
-				*p++ = attributes | buff[0];
-				*p++ = attributes | buff[1];
-			    }
-			    else {
-				*p++ = attributes | '0';
-				*p++ = attributes | buff[0];
-			    }
+			    p = Itoa(t->tm_sec, p, 2, attributes);
 			}
 			if (adrof(STRampm) || (*cp != 'T' && *cp != 'P')) {
 			    *p++ = attributes | ampm;
@@ -472,16 +453,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    if (p >= ep) break;
 		break;
 	    case 'D':
-		Itoa(t->tm_mday, buff);
 		if (p >= ep - 3) break;
-		if (buff[1]) {
-		    *p++ = attributes | buff[0];
-		    *p++ = attributes | buff[1];
-		}
-		else {
-		    *p++ = attributes | '0';
-		    *p++ = attributes | buff[0];
-		}
+		p = Itoa(t->tm_mday, p, 2, attributes);
 		break;
 	    case 'w':
 		if (p >= ep - 5) break;
@@ -490,35 +463,15 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		break;
 	    case 'W':
 		if (p >= ep - 3) break;
-		Itoa(t->tm_mon + 1, buff);
-		if (buff[1]) {
-		    *p++ = attributes | buff[0];
-		    *p++ = attributes | buff[1];
-		}
-		else {
-		    *p++ = attributes | '0';
-		    *p++ = attributes | buff[0];
-		}
+		p = Itoa(t->tm_mon + 1, p, 2, attributes);
 		break;
 	    case 'y':
 		if (p >= ep - 3) break;
-		Itoa(t->tm_year, buff);
-		if (buff[1]) {
-		    *p++ = attributes | buff[0];
-		    *p++ = attributes | buff[1];
-		}
-		else {
-		    *p++ = attributes | '0';
-		    *p++ = attributes | buff[0];
-		}
+		p = Itoa(t->tm_year % 100, p, 2, attributes);
 		break;
 	    case 'Y':
 		if (p >= ep - 5) break;
-		Itoa(t->tm_year + 1900, buff);
-		*p++ = attributes | buff[0];
-		*p++ = attributes | buff[1];
-		*p++ = attributes | buff[2];
-		*p++ = attributes | buff[3];
+		p = Itoa(t->tm_year + 1900, p, 4, attributes);
 		break;
 	    case 'S':		/* start standout */
 		attributes |= STANDOUT;

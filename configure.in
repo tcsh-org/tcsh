@@ -163,7 +163,7 @@ case "${tcsh_cv_canonical}" in
   *-*-solaris2.[45]* ) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol24
   ;;
-  *-*-solaris2.6* ) # Should handle sparc, x86 and powerpc
+  *-*-solaris2.* ) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol26
   ;;
 
