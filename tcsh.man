@@ -718,7 +718,7 @@ Searches for documentation on the current command, using the same notion of
 to use a pager; \fIrun-help\fR is designed for short help files.
 Documentation should be in a file named \fIcommand\fR.help, \fIcommand\fR.1,
 \fIcommand\fR.6, \fIcommand\fR.8 or \fIcommand\fR, which should be in one
-of the directories listed in the \fBHPATH\fR enviroment variable.
+of the directories listed in the \fBHPATH\fR environment variable.
 If there is more than one help file only the first is printed.
 .TP 8
 .B self-insert-command \fR(text characters)
@@ -1836,7 +1836,7 @@ introduces a job name.  If you wish to refer to job number 1, you can name it
 as `%1'.  Just naming a job brings it to the foreground; thus `%1' is a synonym
 for `fg %1', bringing job 1 back into the foreground.  Similarly, saying `%1 &'
 resumes job 1 in the background, just like `bg %1'. A job can also be named
-by an unambigous prefix of the string typed in to start it: `%ex' would
+by an unambiguous prefix of the string typed in to start it: `%ex' would
 normally restart a suspended \fIex\fR(1) job, if there were only one suspended
 job whose name began with the string `ex'.  It is also possible to say
 `%?\fIstring\fR' to specify a job whose text contains \fIstring\fR, if there
@@ -2595,7 +2595,7 @@ left and the first directory in the stack is the current directory.
 With \fB\-l\fR, `~' or `~\fIname\fP' in the output is expanded explicitly
 to \fBhome\fR or the pathname of the home directory for user \fIname\fP. (+)
 With \fB\-n\fR, entries are wrapped before they reach the edge of the screen. (+)
-With \fB\-v\fR, entries are printed one per line, preceded by their stack postions. (+)
+With \fB\-v\fR, entries are printed one per line, preceded by their stack positions. (+)
 If more than one of \fB\-n\fR or \fB\-v\fR is given, \fB\-v\fR takes precedence.
 \fB\-p\fR is accepted but does nothing.
 .PD
@@ -3174,7 +3174,6 @@ The fourth form sets \fIname\fR to the list of words in
 If \-r is specified, the value is set read-only. If \-f or \-l are
 specified, set only unique words keeping their order.
 \-f prefers the first occurrence of a word, and \-l the last.
-first occurance of the word
 The fifth form sets the \fIindex\fR'th component of name to \fIword\fR;
 this component must already exist.
 The sixth form lists the names (only) of all shell variables which are read-only.
@@ -3578,7 +3577,7 @@ table length require \fBjust\fR 256 byte. Each character of 256 characters corre
   1 ... use for first byte of multi-byte charcter.
   2 ... use for second byte of multi-byte character.
   3 ... use for both of first byte and second byte of multi-byte character.
-  Exapmle:
+  Example:
     if set `001322', first character(means 0x00 of ASCII code) and second character(means 0x01 of ASCII code) is set to `0'. then, it is not use for multi-byte character.3rd character(0x02) is set '2'. it is use for first byte of multi-byte charcter. 4th character(0x03) is set '3'. it is use for both of first byte and second byte of multi-byte character. 5th and 6th character(0x04,0x05) is set '2'. it is use for second byte of multi-byte charcter.
 .RE
 .TP 8
@@ -3738,7 +3737,7 @@ shell variable.
 .TP 8
 .B mail
 The names of the files or directories to check for incoming mail,
-separated by whitespace, and optionally preceeded by a numeric word.
+separated by whitespace, and optionally preceded by a numeric word.
 Before each prompt, if 10 minutes have passed since the last check, the
 shell checks each file and says `You have new mail.' (or, if \fBmail\fR
 contains multiple files, `You have new mail in \fIname\fR.') if the
@@ -4006,7 +4005,7 @@ If set, the user is prompted before `rm *' is executed.
 .B rprompt \fR(+)
 The string to print on the right-hand side of the screen (after
 the command input) when the prompt is being displayed on the left.
-It recognises the same formatting characters as \fBprompt\fR.
+It recognizes the same formatting characters as \fBprompt\fR.
 It will automatically disappear and reappear as necessary, to ensure that
 command input isn't obscured, and will only appear if the prompt,
 command input, and itself will fit together on the first line.
@@ -4015,6 +4014,8 @@ the prompt and before the command input.
 .TP 8
 .B savedirs \fR(+)
 If set, the shell does `dirs \-S' before exiting.
+If the first word is set to a number, at most that many directory stack
+entries are saved.
 .TP 8
 .B savehist
 If set, the shell does `history \-S' before exiting.
@@ -4455,7 +4456,7 @@ See \fBNative Language System support\fR.
 The number of lines in the terminal. See \fBTerminal management\fR.
 .TP 8
 .B LS_COLORS
-The format of this variable is reminicent of the \fBtermcap(5)\fR
+The format of this variable is reminiscent of the \fBtermcap(5)\fR
 file format; a colon-separated list of expressions of the form
 "\fIxx=string\fR", where "\fIxx\fR" is a two-character variable name.  The
 variables with their associated defaults are:
@@ -4472,7 +4473,7 @@ bd	01;33	Block device
 cd	01;32	Character device
 ex	01;32	Executable file
 mi	(none)	Missing file (defaults to fi)
-or	(none)	Orphanned symbolic link (defaults to ln)
+or	(none)	Orphaned symbolic link (defaults to ln)
 lc	^[[	Left code
 rc	m	Right code
 ec	(none)	End code (replaces lc+no+rc)
@@ -4736,7 +4737,7 @@ OS variant features
 (see \fBOS variant support\fR and the \fBecho_style\fR shell variable)
 and system-dependent file locations (see \fBFILES\fR).
 .PP
-Extensive terminal-managment capabilities. See \fBTerminal management\fR.
+Extensive terminal-management capabilities. See \fBTerminal management\fR.
 .PP
 New builtin commands including \fIbuiltins\fR, \fIhup\fR, \fIls\-F\fR,
 \fInewgrp\fR, \fIprintenv\fR, \fIwhich\fR and \fIwhere\fR (q.v.).
