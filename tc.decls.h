@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.46 2000/11/11 23:03:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.47 2000/11/12 02:18:06 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -96,6 +96,7 @@ extern	void		  postcmd	__P((void));
 extern	void		  cwd_cmd	__P((void));
 extern	void		  beep_cmd	__P((void));
 extern	void		  period_cmd	__P((void));
+extern	void		  job_cmd	__P((void));
 extern	void		  aliasrun	__P((int, Char *, Char *));
 extern	void		  setalarm	__P((int));
 extern	void		  rmstar	__P((struct wordent *));
