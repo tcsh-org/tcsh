@@ -128,6 +128,9 @@
 
 #define NAMEI_BUG
 
+#define NEEDstrerror
+#define strtoul(a, b, c) ((unsigned long)strtol((a), (b), (c)))
+
 /****************** configurable hacks ****************/
 /* have been moved to config_f.h */
 #include "config_f.h"
