@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.defns.c,v 3.15 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.defns.c,v 3.16 1993/01/08 22:23:12 christos Exp christos $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.15 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.16 1993/01/08 22:23:12 christos Exp christos $")
 
 #include "ed.h"
 
@@ -259,8 +259,12 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		F_COMPLETE_ALL	106
     e_list_all,
 #define		F_LIST_ALL	107
+    e_complete_fwd,
+#define		F_COMPLETE_FWD	108
+    e_complete_back,
+#define		F_COMPLETE_BACK	109
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	108
+#define		F_NUM_FNS	110
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -1113,6 +1117,10 @@ struct KeyFuncs FuncNames[] = {
       "Clear screen leaving current line on top" },
     { "complete-word", F_COMPLETE,
       "Complete current word" },
+    { "complete-word-fwd", F_COMPLETE_FWD,
+      "Tab forward through files" },
+    { "complete-word-back", F_COMPLETE_BACK,
+      "Tab backwards through files" },
     { "complete-word-raw", F_COMPLETE_ALL,
       "Complete current word ignoring programmable completions" },
     { "copy-prev-word", F_COPYPREV,

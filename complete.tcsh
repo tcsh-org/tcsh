@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.16 1993/01/08 22:23:12 christos Exp $
+# $Id: complete.tcsh,v 1.17 1993/02/12 17:22:20 christos Exp $
 # example file using the new completion code
 #
 
@@ -32,7 +32,6 @@ if ($?complete) then
     complete po 	p/1/d/
     complete mkdir 	p/1/d/
     complete rmdir 	p/1/d/
-    complete man 	p/1/c/		# only commands
     complete complete 	p/1/C/
     complete uncomplete p/1/C/
     complete exec 	p/1/c/
@@ -50,7 +49,6 @@ if ($?complete) then
     complete ups	p/1/c/
     complete set	'c/*=/f/' 'p/1/s/=' 'n/=/f/'
     complete unset	p/1/s/
-    complete setenv 	p/1/e/		# only environment variables 
     complete unsetenv 	p/1/e/
     complete alias 	p/1/a/		# only aliases are valid
     complete unalias 	p/1/a/
@@ -62,10 +60,12 @@ if ($?complete) then
     complete telnet 	n/*/\$hosts/ 
     complete su		c/-/"(f)"/ n/*/u/
     complete xrsh   	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/ 
-    complete cc 	c/-I/d/ c/-L/d/ c/-/"(o l c g L I D U)"/ \
-			n/*/f:*.[coa]/
-    complete acc 	c/-I/d/ c/-L/d/ c/-/"(o l c g L I D U)"/ \
-			n/*/f:*.[coa]/
+    complete cc 	c/-I/d/ c/-L/d/ \
+              c@-l@'`\ls -1 /usr/lib/lib*.a | sed s%^.\*/lib%%\;s%\\.a\$%%`'@ \
+			c/-/"(o l c g L I D U)"/ n/*/f:*.[coa]/
+    complete acc 	c/-I/d/ c/-L/d/ \
+       c@-l@'`\ls -1 /usr/lang/SC1.0/lib*.a | sed s%^.\*/lib%%\;s%\\.a\$%%`'@ \
+			c/-/"(o l c g L I D U)"/ n/*/f:*.[coa]/
     complete gcc 	c/-I/d/ c/-L/d/ \
 		 	c/-f/"(caller-saves cse-follow-jumps delayed-branch \
 		               elide-constructors expensive-optimizations \
@@ -164,15 +164,6 @@ if ($?complete) then
 	        c/*=/x:'<number>'/ \
 		n/*/"(if of conv ibs obs bs cbs files skip file seek count)"/=
 
-    complete emacs	c/-/"(batch d f funcall i insert kill l load \
-			no-init-file q t u user)"/ c/+/x:'<line_number>'/ \
-			n/-d/x:'<display>'/ n/-f/x:'<lisp_function>'/ n/-i/f/ \
-			n/-l/f:*.{el,elc}/ n/-t/x:'<terminal>'/ n/-u/u/ \
-			n/*/f:^*[\#~]/
-    complete mail       c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
-			n/-s/x:'<subject>'/ n/-u/u/ \
-			c@+@p:$HOME/Mail@ n/-f/f/ n/*/u/
-
     complete nslookup   p/1/x:'<host>'/ p/2/\$hosts/
 
     complete ar c/[dmpqrtx]/"(c l o u v a b i)"/ p/1/"(d m p q r t x)"// \
@@ -181,7 +172,75 @@ if ($?complete) then
     complete {refile,sprev,snext,scan,pick,rmm,inc,folder,show} \
 		c@+@p:$HOME/Mail/@
 
-    # More completions from waz@quahog.nusc.navy.mil (Tom Warzeka)
+    # More completions from waz@quahog.nl.nuwc.navy.mil (Tom Warzeka)
+    # this one works but is slow and doesn't descend into subdirectories
+    # complete	cd	C@[./]*@d@ \
+    #			p@1@'`\ls -1F . $cdpath | grep /\$ | sort -u`'@ n@*@n@
+
+    if ( -r /etc/shells ) then
+        complete setenv	p@1@e@ n@DISPLAY@\$hosts@: n@SHELL@'`cat /etc/shells`'@
+    else
+	complete setenv	p@1@e@ n@DISPLAY@\$hosts@:
+    endif
+
+
+
+    # replace "/usr/local/emacs" with your GNU Emacs main directory
+    complete emacs	c/-/"(batch d f funcall i insert kill l load \
+			no-init-file q t u user)"/ c/+/x:'<line_number>'/ \
+			n/-d/x:'<display>'/ n/-f/x:'<lisp_function>'/ n/-i/f/ \
+			n@-l@p:/usr/local/emacs/lisp@ n/-t/x:'<terminal>'/ \
+			n/-u/u/ n/*/f:^*[\#~]/
+
+    # if you're running SysV, change "/var/spool" to "/usr"
+    complete mail       c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
+			c@+@p:$HOME/Mail@ C@[./]@f@ n/-s/x:'<subject>'/ \
+			n@-u@p:/var/spool/mail@ n/-f/f/ n/*/u/
+
+    complete man	    n@1@'`\ls -1 /usr/man/man1 | sed s%\\.1.\*\$%%`'@ \
+			    n@2@'`\ls -1 /usr/man/man2 | sed s%\\.2.\*\$%%`'@ \
+			    n@3@'`\ls -1 /usr/man/man3 | sed s%\\.3.\*\$%%`'@ \
+			    n@4@'`\ls -1 /usr/man/man4 | sed s%\\.4.\*\$%%`'@ \
+			    n@5@'`\ls -1 /usr/man/man5 | sed s%\\.5.\*\$%%`'@ \
+			    n@6@'`\ls -1 /usr/man/man6 | sed s%\\.6.\*\$%%`'@ \
+			    n@7@'`\ls -1 /usr/man/man7 | sed s%\\.7.\*\$%%`'@ \
+			    n@8@'`\ls -1 /usr/man/man8 | sed s%\\.8.\*\$%%`'@ \
+    n@9@'`[ -r /usr/man/man9 ] && \ls -1 /usr/man/man9 | sed s%\\.9.\*\$%%`'@ \
+    n@0@'`[ -r /usr/man/man0 ] && \ls -1 /usr/man/man0 | sed s%\\.0.\*\$%%`'@ \
+  n@new@'`[ -r /usr/man/mann ] && \ls -1 /usr/man/mann | sed s%\\.n.\*\$%%`'@ \
+  n@old@'`[ -r /usr/man/mano ] && \ls -1 /usr/man/mano | sed s%\\.o.\*\$%%`'@ \
+n@local@'`[ -r /usr/man/manl ] && \ls -1 /usr/man/manl | sed s%\\.l.\*\$%%`'@ \
+n@public@'`[ -r /usr/man/manp ] && \ls -1 /usr/man/manp| sed s%\\.p.\*\$%%`'@ \
+		c/-/"(- f k P s t)"/ n/-f/c/ n/-k/x:'<keyword>'/ n/-P/d/ n/*/c/
+
+    complete touch 	c/-/"(a c f m)"/ n/*/f/
+    complete xhost	c/[+-]/\$hosts/ n/*/\$hosts/
+
+    complete gzcat	c/--/"(help license quiet version)"/ \
+			c/-/"(h L q V)"/ n/*/f:*.{Z,z,zip}/
+    complete gzip	c/--/"(stdout decompress force help license quiet \
+			       recurse test verbose version fast best)"/ \
+			c/-/"(c d f h L q r t v V 1 2 3 4 5 6 7 8 9)"/ \
+			n/{-d,--decompress}/f:*.{Z,z,zip,taz,tgz}/ \
+			N/{-d,--decompress}/f:*.{Z,z,zip,taz,tgz}/ \
+			n/*/f:^*.{Z,z,zip,taz,tgz}/
+    complete {gunzip,ungzip} c/--/"(stdout force help license quiet \
+			            recurse test verbose version)"/ \
+			c/-/"(c f h L q r t v V)"/ n/*/f:*.{Z,z,zip,taz,tgz}/
+
+    complete grep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			p/1/x:'<limited_regular_expression>'/ \
+			n/-*e/x:'<limited_regular_expression>'/ n/-*f/f/ n/*/f/
+    complete egrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			p/1/x:'<full_regular_expression>'/ \
+			n/-*e/x:'<full_regular_expression>'/ n/-*f/f/ n/*/f/
+    complete fgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			p/1/x:'<fixed_string>'/ \
+			n/-*e/x:'<fixed_string>'/ n/-*f/f/ n/*/f/
+
 
     complete users	p/1/x:'<accounting_file>'/
     complete who	p/1/x:'<accounting_file>'/ n/am/"(i)"/ n/are/"(you)"/
@@ -209,15 +268,6 @@ if ($?complete) then
 
     complete compress	c/-/"(c f v b)"/ n/-b/x:'<max_bits>'/ n/*/f:^*.Z/
     complete uncompress	c/-/"(c f v)"/                        n/*/f:*.Z/
-
-    complete man n@1@p:/usr/man/man1@     n@2@p:/usr/man/man2@ \
-		 n@3@p:/usr/man/man3@     n@4@p:/usr/man/man4@ \
-		 n@5@p:/usr/man/man5@     n@6@p:/usr/man/man6@ \
-		 n@7@p:/usr/man/man7@     n@8@p:/usr/man/man8@ \
-		 n@0@p:/usr/man/man0@     n@9@p:/usr/man/man9@ \
-	         n@new@p:/usr/man/mann@   n@old@p:/usr/man/mano@ \
-	         n@local@p:/usr/man/manl@ n@public@p:/usr/man/manp@ \
-	     c/-/"(- f k P s t)"/ n/-f/c/ n/-k/x:'<keyword>'/ n/-P/d/ n/*/c/
 
     unset noglob
     unset complete

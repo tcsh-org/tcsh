@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.45 1993/03/05 20:14:33 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.46 1993/04/07 21:39:23 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.45 1993/03/05 20:14:33 christos Exp christos $")
+RCSID("$Id: tw.parse.c,v 3.46 1993/04/07 21:39:23 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -85,6 +85,9 @@ static void (*tw_end_entry[]) __P((void)) = {
 /* Set to TRUE if recexact is set and an exact match is found
  * along with other, longer, matches.
  */
+
+int curchoice = -1;
+
 int non_unique_match = FALSE;
 static bool SearchNoDirErr = 0;	/* t_search returns -2 if dir is unreadable */
 
@@ -121,6 +124,9 @@ static	Char 	 tw_suffix		__P((int, Char *, Char *, Char *,
 					     Char *));
 static	void 	 tw_fixword		__P((int, Char *, Char *, Char *, int));
 static	void	 tw_list_items		__P((int, int, int));
+static 	void	 add_scroll_tab		__P((Char *));
+static 	void 	 choose_scroll_tab	__P((Char **, Char *, int));
+static	void	 free_scroll_tab	__P((void));
 
 #ifdef notdef
 /*
@@ -242,7 +248,8 @@ tenematch(inputline, num_read, command)
     xprintf(":\n");
 #endif
 
-    if (command == RECOGNIZE || command == LIST || command == SPELL) {
+    if (command == RECOGNIZE || command == LIST || command == SPELL ||
+	command == RECOGNIZE_SCROLL || command == RECOGNIZE_ALL) {
 #ifdef TDEBUG
 	xprintf("complete %d ", looking);
 #endif
@@ -259,6 +266,7 @@ tenematch(inputline, num_read, command)
 	int     i, count;
 
     case RECOGNIZE:
+    case RECOGNIZE_SCROLL:
     case RECOGNIZE_ALL:
 	if (adrof(STRautocorrect)) {
 	    if ((slshp = Strrchr(wordp, '/')) != NULL && slshp[1] != '\0') {
@@ -277,7 +285,7 @@ tenematch(inputline, num_read, command)
 	}
 	else
 	    slshp = STRNULL;
-	search_ret = t_search(wordp, wp, RECOGNIZE, space_left, looking, 1, 
+	search_ret = t_search(wordp, wp, command, space_left, looking, 1, 
 			      pat, suf);
 	SearchNoDirErr = 0;
 
@@ -296,7 +304,7 @@ tenematch(inputline, num_read, command)
 		if (InsertStr(quote_meta(wordp, qu, 0)) < 0)	
 		    return -1;	/* error inserting */
 		wp = wordp + Strlen(wordp);
-		search_ret = t_search(wordp, wp, RECOGNIZE, space_left,
+		search_ret = t_search(wordp, wp, command, space_left,
 				      looking, 1, pat, suf);
 	    }
 	}
@@ -732,6 +740,9 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
     Char buf[MAXPATHLEN+1];
     struct varent *vp;
     int len;
+    int cnt = 0;
+
+
     flags = 0;
 
     if ((vp = adrof(STRshowdots)) != NULL) {
@@ -814,6 +825,8 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 
 	case LIST:
 	case RECOGNIZE:
+	case RECOGNIZE_ALL:
+	case RECOGNIZE_SCROLL:
 
 	    if (!is_prefix(target, item)) 
 		break;
@@ -823,7 +836,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 
 	    if (dir_check && !isadirectory(exp_dir, item))
 		break;
-	    
+
 	    if (text_check && isadirectory(exp_dir, item))
 		break;
 
@@ -866,11 +879,17 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		}
 	    }
 		    
-	    if (command == RECOGNIZE) {
+	    if (command == RECOGNIZE || command == RECOGNIZE_ALL ||
+		command == RECOGNIZE_SCROLL) {
 		if (ignoring && ignored(item)) {
 		    nignored++;
 		    break;
+		} 
+		else if (command == RECOGNIZE_SCROLL) {
+		    add_scroll_tab(item);
+		    cnt++;
 		}
+		
 		if (is_set(STRrecexact)) {
 		    if (StrQcmp(target, item) == 0) {	/* EXACT match */
 			copyn(exp_name, item, MAXNAMLEN);
@@ -881,7 +900,8 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		    }
 		}
 		if (recognize(exp_name, item, name_length, ++numitems)) 
-		    done = TRUE;
+		    if (command != RECOGNIZE_SCROLL)
+			done = TRUE;
 	    }
 	    break;
 
@@ -892,6 +912,22 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	xprintf("done item = %S\n", item);
 #endif
     }
+
+
+    if (command == RECOGNIZE_SCROLL) {
+	if ((cnt <= curchoice) || (curchoice == -1)) {
+	    curchoice = -1;
+	    nignored = 0;
+	    numitems = 0;
+	} else if (numitems > 1) {
+	    if (curchoice < -1)
+		curchoice = cnt - 1;
+	    choose_scroll_tab(&exp_name, target, cnt);
+	    numitems = 1;
+	}
+    }
+    free_scroll_tab();
+
     if (command == SPELL)
 	return d;
     else {
@@ -1322,6 +1358,8 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 
     switch (command) {
     case RECOGNIZE:
+    case RECOGNIZE_ALL:
+    case RECOGNIZE_SCROLL:
 	if (numitems <= 0) 
 	    return (numitems);
 
@@ -1817,3 +1855,54 @@ tgetenv(str)
 	}
     return (NULL);
 } /* end tgetenv */
+
+
+struct scroll_tab_list *scroll_tab = 0;
+
+void
+add_scroll_tab(entry)
+    Char *entry;
+{
+    struct scroll_tab_list *new_scroll;
+
+    new_scroll = (struct scroll_tab_list *) xmalloc((size_t)
+	    sizeof(struct scroll_tab_list));
+    new_scroll->element = Strsave(entry);
+    new_scroll->next = scroll_tab;
+    scroll_tab = new_scroll;
+}
+
+void
+choose_scroll_tab(exp_name, target, cnt)
+    Char **exp_name;
+    Char *target;
+    int cnt;
+{
+    struct scroll_tab_list *loop;
+    int tmp = cnt;
+    Char **ptr;
+
+    ptr = (Char **) xmalloc(sizeof(Char *) * cnt);
+
+    for(loop = scroll_tab; loop && (tmp >= 0); loop = loop->next)
+	ptr[--tmp] = loop->element;
+
+    qsort((ptr_t) ptr, (size_t) cnt, sizeof(Char *), 
+	  (int (*) __P((const void *, const void *))) fcompare);
+	    
+    copyn(*exp_name, ptr[curchoice], Strlen(ptr[curchoice]));	
+    xfree((ptr_t) ptr);
+}
+
+void
+free_scroll_tab()
+{
+    struct scroll_tab_list *loop;
+
+    while(scroll_tab) {
+	loop = scroll_tab;
+	scroll_tab = scroll_tab->next;
+	xfree((ptr_t) loop->element);
+	xfree((ptr_t) loop);
+    }
+}

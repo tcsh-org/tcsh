@@ -29,7 +29,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\" $Id: tcsh.man,v 3.54 1993/01/08 22:23:12 christos Exp $
+.\" $Id: tcsh.man,v 3.55 1993/03/05 20:14:33 christos Exp $
 .TH TCSH 1 "20 November 1992" "Cornell 6.03.00"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -3128,8 +3128,9 @@ p	named pipe (fifo) *
 u	set-user-ID bit is set	
 g	set-group-ID bit is set	
 k	sticky bit is set
-s	socket special file *
+s	the file is non-zero size.
 t	open file descriptor for terminal device [a number]
+S	socket special file *
 X	executable in the path or shell builtin
 .fi
 .RE
@@ -3138,12 +3139,15 @@ X	executable in the path or shell builtin
 .PP
 Notes: On systems without the file types indicated by
 .I *
-the file inquiry operands return false. In the version of 
-.I csh 
-appearing on the Silicon Graphics IRIX, -s is true when the file is not
-zero size.
-.I Tcsh
-is *not* compatible with that. 
+the file inquiry operands return false. 
+.PP
+If tcsh is compiled for POSIX [i.e. POSIX is defined
+in config.h], then the result of test is based on the permission
+bits of the file and not on the result of the 
+.I access(2)
+system call. I.e. if you mount a file system read-only, and test
+-w a file, then the test will succeed in POSIX mode, if the permissions
+of the file allow writing.
 
 .PP
 .SH ENVIRONMENT
@@ -3525,6 +3529,10 @@ James J Dempsey, BBN, 1988, and Paul Placeway, OSU, 1988
 Re-ported tcsh to A/UX.
 .sp
 .SH "BUGFIXES AND ENHANCEMENTS"
+.sp
+Jeff Fink, 1992
+.br
+Added complete-word-fwd, and complete-word-back editor functions
 .sp
 Harry C. Pulley, 1992
 .br

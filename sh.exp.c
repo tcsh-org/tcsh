@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.exp.c,v 3.16 1992/11/14 20:40:02 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.exp.c,v 3.17 1993/04/07 21:39:23 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.16 1992/11/14 20:40:02 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.17 1993/04/07 21:39:23 christos Exp $")
 
 /*
  * C shell
@@ -603,7 +603,7 @@ exp6(vp, ignore)
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));
     cp = *(*vp)++;
-#define FILETESTS "erwxfdzoplstX"
+#define FILETESTS "erwxfdzoplstSX"
     if (*cp == '-' && any(FILETESTS, cp[1])) {
 	struct stat stb;
 	Char *ft;

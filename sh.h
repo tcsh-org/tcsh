@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.50 1993/03/05 20:14:33 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.51 1993/04/07 21:39:23 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -333,8 +333,9 @@ extern int setpgrp();
  * ANSIisms... These must be *after* the system include and 
  * *before* our includes, so that BSDreno has time to define __P
  */
+#undef __P
 #ifndef __P
-# if __STDC__
+# if __STDC__ || defined(FUNCPROTO)
 #  define __P(a) a
 # else
 #  define __P(a) ()

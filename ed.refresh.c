@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.refresh.c,v 3.11 1992/06/16 20:46:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.refresh.c,v 3.12 1992/10/27 16:18:15 christos Exp christos $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.11 1992/06/16 20:46:26 christos Exp christos $")
+RCSID("$Id: ed.refresh.c,v 3.12 1992/10/27 16:18:15 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -850,14 +850,17 @@ update_line(old, new, cur_line)
 	    so_write(nse, (nls - nse));
 	}
 	else {
+	    int olen = oe - old + fx;
+	    if (olen > TermH)
+		olen = TermH;
 #ifdef DEBUG_UPDATE
 	    dprintf("but with nothing left to save\r\n");
 #endif /* DEBUG_UPDATE */
 	    so_write(nse, (nls - nse));
 #ifdef DEBUG_REFRESH
-	    dprintf("cleareol %d\n", (oe - old) + fx - (ne - new));
+	    dprintf("cleareol %d\n", olen - (ne - new));
 #endif /* DEBUG_UPDATE */
-	    ClearEOL((oe - old) + fx - (ne - new));
+	    ClearEOL(olen - (ne - new));
 	}
     }
 

@@ -1,4 +1,4 @@
-# $Id: Makefile.vms,v 1.5 1992/11/20 08:56:38 christos Exp $
+# $Id: Makefile.vms,v 1.6 1993/02/12 17:22:20 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -48,13 +48,16 @@ LFLAGS=$(INCLUDES)
 # On the sparc, don't use -O2; it breaks setjmp() and vfork()
 #CFLAGS=-O $(INCLUDES)
 
-# gcc-2.1
+# gcc-2.1+
 #CFLAGS=-O2 $(INCLUDES)
+
+# lucid c on suns
+#CFLAGS=-O5 $(INCLUDES)
 
 # gcc 2.1 on linux
 #CFLAGS=-O6 -fomit-frame-pointer $(INCLUDES)
 
-#hpux 8.0
+#hpux 8.0, careful about the +O3... breaks globbing in some versions
 #CFLAGS= $(INCLUDES) +O3 -Aa
 
 # Ultrix 4.2a
@@ -64,9 +67,10 @@ LFLAGS=$(INCLUDES)
 # global optimizer! (-O3).
 # On SGI 4.0+ you need to add -D__STDC__ too.
 #CFLAGS= -O3 $(INCLUDES) 
+#CFLAGS= -O3 $(INCLUDES) -Olimit 2000	## Ultrix 4.2a
 #CF=-j
 #SUF=u
-#.SUFFIXES: .u 				## Ultrix needs that
+#.SUFFIXES: .u 				## Ultrix and gnu-make need that
 
 # mips systems
 # CFLAGS= $(INCLUDES) -O -systype bsd43 -Wf,-XNd5000 -Wf,-XNp6000 -Olimit 2000
@@ -77,7 +81,7 @@ LFLAGS=$(INCLUDES)
 # Stardent Titan
 #CFLAGS = $(INCLUDES) -O -43
 
-# Stardent Stellar or sunos4 w/o gcc
+# Stardent Stellar or sunos4 /bin/cc or Solaris2.1 /opt/SUNWspro/bin/cc
 #CFLAGS = $(INCLUDES) -O4
 
 # Dnix 5.3
@@ -97,8 +101,10 @@ LFLAGS=$(INCLUDES)
 # Tektronix 4300 running UTek 4.0 (BSD 4.2) needs:
 #DFLAGS = -DUTek
 # VMS_POSIX needs:
-DFLAGS=-D_VMS_POSIX
-#DFLAGS=
+#DFLAGS=-D_VMS_POSIX
+# DEC/osf-1 on the alpha
+#DFLAGS=-D_BSD
+DFLAGS=-DI_DEBUG	# Only for beta
 
 
 ################################################################
@@ -115,7 +121,7 @@ LDFLAGS= 			## The simplest, suitable for all.
 ################################################################
 ## LIBES.  Pick one, or roll your own.
 ################################################################
-#LIBES= -ltermcap		## BSD style things, hpux
+#LIBES= -ltermcap 		## BSD style things, hpux
 #LIBES= -ltermc			## emx under OS/2
 #LIBES= -ltermcap -lsec		## Tek XD88/10 (UTekV) with PW_SHADOW
 #LIBES= -ltermcap -lsec		## Motorola MPC (sysV88) with PW_SHADOW
@@ -140,6 +146,7 @@ LDFLAGS= 			## The simplest, suitable for all.
 #LIBES= -lcurses -lintl		## SCO SysVR3.2v2.0
 #LIBES= -lcurses -lintl -lsocket ## SCO+ODT1.1
 #LIBES= -lposix -ltermcap	## A/UX 2.0
+#LIBES= -lposix -ltermcap -lc_s	## A/UX 3.0
 #LIBES= -ltermcap -lbsd		## DEC osf1 on the alpha
 #LIBES= -ltermcap -lseq		## Sequent's Dynix
 #LIBES= -lcurses -lsocket	## Intel's hypercube and ns32000 based Opus.
@@ -162,7 +169,7 @@ LIBES=				## Minix, VMS_POSIX
 
 # The -B tells gcc to use /bin/ld. This is to avoid using the gnu ld, which
 # on the suns does not know how to make dynamically linked binaries.
-#CC=	gcc -Wall -B/bin/	
+#CC=	gcc -Wall -B/bin/	# -ansi -pedantic
 #CC=	gcc -m486 -Wall # Generate code for Intel 486 (linux)
 #CC=	cc
 #CC=	occ
@@ -170,7 +177,9 @@ LIBES=				## Minix, VMS_POSIX
 CC=	c89	# For VMS/POSIX
 #CC=	/bin/cc	# For suns, w/o gcc and SVR4
 #CC=	/usr/lib/sun.compile/cc  # FPS 500 (+FPX) with Sun C compiler
-#CC=	scc	# Alliant fx2800
+#CC=	/opt/SUNWspro/bin/cc	# Solaris 2.1
+#CC=	scc 	# Alliant fx2800
+#CC=	lcc	-wa 
 ED=	ed
 AS=	as
 RM=	rm
@@ -224,7 +233,7 @@ TCOBJS=	tc.alloc.${SUF} tc.bind.${SUF} tc.const.${SUF} tc.disc.${SUF} \
 	tc.prompt.${SUF} tc.sched.${SUF} tc.sig.${SUF} tc.str.${SUF} \
 	tc.vers.${SUF} tc.who.${SUF} 
 
-PVSRCS= Makefile Makefile.vms
+PVSRCS= Makefile.std Makefile.vms
 AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
@@ -245,6 +254,14 @@ all: ${BUILD}
 tcsh:$(P) ${OBJS} 
 	rm -f tcsh core
 	${CC} -o tcsh ${LDFLAGS} ${CFLAGS} ${OBJS} ${LIBES}
+
+# Purify
+pure:$(P) ${OBJS} 
+	rm -f tcsh core
+	purify `echo ${CC} | sed -e s,-B/bin/,,` -o tcsh ${LDFLAGS} ${CFLAGS} ${OBJS} ${LIBES}
+# OS/2
+tcsh.exe: tcsh
+	emxbind tcsh
 
 # Linux distribution
 jump: tcsh.a
@@ -399,13 +416,22 @@ veryclean: clean
 tags:	/tmp
 	${CTAGS} sh*.c
 
-tar:
+tar.Z:
 	rm -f tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION} 
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
 	tar cvf - tcsh-${VERSION} | compress > tcsh-${VERSION}.tar.Z
+	rm -rf tcsh-${VERSION}
+
+tar.z:
+	rm -f tcsh-${VERSION}.tar.z
+	rm -rf tcsh-${VERSION} 
+	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
+	cp ${ALLSRCS} tcsh-${VERSION}
+	cp ${CONFSRCS} tcsh-${VERSION}/config
+	tar cvf - tcsh-${VERSION} | gzip > tcsh-${VERSION}.tar.z
 	rm -rf tcsh-${VERSION}
 
 shar:	

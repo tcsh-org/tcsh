@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.24 1993/02/12 17:22:20 christos Exp $
+/**/# $Id: Imakefile,v 1.25 1993/04/09 00:15:37 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.03
 /**/# Marc Horowitz, MIT SIPB
@@ -423,13 +423,22 @@ config.h:
 
 $(OBJS): sh.err.h tc.const.h ed.defns.h
 
-tar:
+tar.Z:
 	rm -f tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION} 
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
 	tar cvf - tcsh-${VERSION} | compress > tcsh-${VERSION}.tar.Z
+	rm -rf tcsh-${VERSION}
+
+tar.z:
+	rm -f tcsh-${VERSION}.tar.z
+	rm -rf tcsh-${VERSION} 
+	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
+	cp ${ALLSRCS} tcsh-${VERSION}
+	cp ${CONFSRCS} tcsh-${VERSION}/config
+	tar cvf - tcsh-${VERSION} | gzip > tcsh-${VERSION}.tar.z
 	rm -rf tcsh-${VERSION}
 
 shar:

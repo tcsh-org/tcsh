@@ -22,6 +22,9 @@ names of the authors from the source code or documentation).
 
 To install tcsh:
 
+0)  If you are using imake, try xmkmf. Otherwise copy Makefile.std to
+    Makefile.
+
 1)  Look at the Makefile and make sure that you are using the right
     compilation flags.
 

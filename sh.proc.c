@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.41 1993/02/12 17:22:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.42 1993/03/05 20:14:33 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.41 1993/02/12 17:22:20 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.42 1993/03/05 20:14:33 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -189,7 +189,7 @@ loop:
 #ifdef BSDJOBS
 # ifdef BSDTIMES
     /* both a wait3 and rusage */
-#  if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || (defined(IRIS4D) && __STDC__ && SYSVREL <= 3) || defined(__lucid)
+#  if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || (defined(IRIS4D) && (__STDC__ || defined(FUNCPROTO)) && SYSVREL <= 3) || defined(__lucid)
     pid = wait3(&w,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
 #  else /* BSDWAIT */

@@ -452,6 +452,7 @@ glob2(pathbuf, pathend, pattern, pglob, no_match)
     for (;;) {
 	if (*pattern == EOS) {	/* end of pattern? */
 	    *pathend = EOS;
+
 	    if (Lstat(pathbuf, &sbuf))
 		return (0);
 

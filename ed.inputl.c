@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.inputl.c,v 3.30 1992/10/27 16:18:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.inputl.c,v 3.31 1992/11/13 04:19:10 christos Exp christos $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.30 1992/10/27 16:18:15 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.31 1992/11/13 04:19:10 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -79,6 +79,9 @@ Inputl()
     Char    Origin[INBUFSIZE], Change[INBUFSIZE];
     int     matchval;		/* from tenematch() */
     COMMAND fn;
+    int curlen = 0;
+    int newlen;
+    int index;
 
     if (!MapsAreInited)		/* double extra just in case */
 	ed_InitMaps();
@@ -171,9 +174,13 @@ Inputl()
 	    /*FALLTHROUGH*/
 	case CC_ARGHACK:	/* Suggested by Rich Salz */
 	    /* <rsalz@pineapple.bbn.com> */
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    break;		/* keep going... */
 
 	case CC_EOF:		/* end of file typed */
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    num = 0;
 	    break;
 
@@ -189,6 +196,8 @@ Inputl()
 	    break;
 
 	case CC_NEWLINE:	/* normal end of line */
+	    curlen = 0;
+	    curchoice = -1;
 	    if (crct && (!Strcmp(*(crct->vec), STRcmd) ||
 			 !Strcmp(*(crct->vec), STRall))) {
 		copyn(Origin, InputBuf, INBUFSIZE);
@@ -251,6 +260,8 @@ Inputl()
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    break;
 
 	case CC_CORRECT_L:
@@ -264,12 +275,50 @@ Inputl()
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    break;
 
 
 	case CC_COMPLETE:
 	case CC_COMPLETE_ALL:
-	    fn = (retval == CC_COMPLETE_ALL) ? RECOGNIZE_ALL : RECOGNIZE;
+	case CC_COMPLETE_FWD:
+	case CC_COMPLETE_BACK:
+	    expnum = Cursor - InputBuf;
+	    switch (retval) {
+	    case CC_COMPLETE:
+		fn = RECOGNIZE;
+		curlen = LastChar - InputBuf;
+		curchoice = -1;
+		break;
+	    case CC_COMPLETE_ALL:
+		fn = RECOGNIZE_ALL;
+		curlen = LastChar - InputBuf;
+		curchoice = -1;
+		break;
+	    case CC_COMPLETE_FWD:
+		fn = RECOGNIZE_SCROLL;
+		curchoice++;
+		break;
+	    case CC_COMPLETE_BACK:
+		fn = RECOGNIZE_SCROLL;
+		curchoice--;
+		break;
+	    default:
+		abort();
+	    }
+	    if (InputBuf[curlen]) {
+		newlen = LastChar - InputBuf;
+		for (index = (Cursor - InputBuf); 
+		     index <= newlen; index++)
+			InputBuf[index - newlen + curlen] =
+			InputBuf[index];
+		LastChar = InputBuf + curlen;
+		Cursor = Cursor - newlen + curlen;
+	    }
+	    curlen = LastChar - InputBuf;
+
+
 	    if (adrof(STRautoexpand))
 		(void) e_expand_history(0);
 	    /*
@@ -296,6 +345,7 @@ Inputl()
 		break;
 	    default:
 		if (matchval < 0) {	/* Error from tenematch */
+		    curchoice = -1;
 		    Beep();
 		    break;
 		}
@@ -333,6 +383,19 @@ Inputl()
 
 	case CC_LIST_CHOICES:
 	case CC_LIST_ALL:
+	    if (InputBuf[curlen]) {
+		newlen = LastChar - InputBuf;
+		for (index = (Cursor - InputBuf); 
+		     index <= newlen; index++)
+			InputBuf[index - newlen + curlen] =
+			InputBuf[index];
+		LastChar = InputBuf + curlen;
+		Cursor = Cursor - newlen + curlen;
+	    }
+	    curlen = LastChar - InputBuf;
+	    if (curchoice >= 0)
+		curchoice--;
+
 	    fn = (retval == CC_LIST_ALL) ? LIST_ALL : LIST;
 	    /* should catch ^C here... */
 	    if (tenematch(InputBuf, Cursor - InputBuf, fn) < 0)
@@ -349,6 +412,8 @@ Inputl()
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    break;
 
 	case CC_EXPAND_GLOB:
@@ -362,6 +427,8 @@ Inputl()
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    break;
 
 	case CC_NORMALIZE_PATH:
@@ -375,6 +442,8 @@ Inputl()
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    break;
 
 	case CC_EXPAND_VARS:
@@ -388,6 +457,8 @@ Inputl()
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    break;
 
 	case CC_HELPME:
@@ -397,6 +468,8 @@ Inputl()
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    break;
 
 	case CC_FATAL:		/* fatal error, reset to known state */
@@ -409,6 +482,8 @@ Inputl()
 	    Refresh();		/* print the prompt again */
 	    Argument = 1;
 	    DoingArg = 0;
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    break;
 
 	case CC_ERROR:
@@ -417,6 +492,8 @@ Inputl()
 	    Argument = 1;
 	    Beep();
 	    flush();
+	    curchoice = -1;
+	    curlen = LastChar - InputBuf;
 	    break;
 	}
     }
@@ -677,3 +754,4 @@ SpellLine(cmdonly)
     Cursor = OldCursor;
     return matchval;
 }
+

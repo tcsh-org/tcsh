@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.h,v 3.19 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.h,v 3.20 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -93,6 +93,8 @@ extern KEYCMD NumFuns;		/* number of KEYCMDs in above table */
 #define CC_NORMALIZE_PATH	16
 #define CC_LIST_ALL		17
 #define CC_COMPLETE_ALL		18
+#define CC_COMPLETE_FWD		19
+#define CC_COMPLETE_BACK	20
 
 typedef union Xmapval {		/* value passed to the Xkey routines */
     KEYCMD cmd;

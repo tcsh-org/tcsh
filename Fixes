@@ -1,4 +1,18 @@
 V6.04.00, ...
+ 53. Added complete-word-fwd and complete-word-back that scroll through
+     the list of possible completions... Neat addition from 
+     jfink@csugrad.cs.vt.edu (Jeff "$DOTDIR" Fink)
+ 52. Workaround hpux9.01 broken optimizer in sh.glob.c where 'ls *' breaks.
+ 51. Michael's editor fix.  With "magic margins" and 80 char width, try:
+	> set prompt=
+	<ESC>20a<CTRL>a<ESC>76b<CTRL>ac
+ 50. Reverted fix that does not glob the expanded back-quote text again.
+ 49. > cd /., echo $cwd
+     /.
+     Eliminate the . in this case...
+ 48. Matt's optimization in glob.c [retracted]
+ 47. Fixed bug with -S
+ 46. Renamed Makefile Makefile.std, and fixed the readme file
  45. 6.03.04 04/07/93
  44. Changed -s == !-z and -S == socket
  43. Fixed typo in sh.c, in phup [shpgrp != pr->pgrp]
