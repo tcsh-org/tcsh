@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.7 1991/07/29 21:22:46 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.8 1991/08/01 16:36:23 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.proc.c,v 3.7 1991/07/29 21:22:46 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.8 1991/08/01 16:36:23 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -1059,7 +1059,7 @@ pprint(pp, flag)
 			    && reason != SIGINT
 			    && (reason != SIGPIPE
 				|| (pp->p_flags & PPOU) == 0)))
-			xprintf(format, mesg[pp->p_reason].pname);
+			xprintf(format, mesg[pp->p_reason & ASCII].pname);
 		    else
 			reason = -1;
 		    break;
@@ -1401,8 +1401,8 @@ pkill(v, signum)
     int     signum;
 {
     register struct process *pp, *np;
-    register int jobflags = 0;
-    int     pid, err1 = 0;
+    int jobflags = 0, err1 = 0;
+    pid_t     pid;
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif /* BSDSIGS */
@@ -1463,27 +1463,27 @@ pkill(v, signum)
 		goto cont;
 	    }
 #endif /* BSDJOBS */
-	    if (killpg((pid_t) pp->p_jobid, signum) < 0) {
+	    if (killpg(pp->p_jobid, signum) < 0) {
 		xprintf("%s: %s\n", short2str(cp), strerror(errno));
 		err1++;
 	    }
 #ifdef BSDJOBS
 	    if (signum == SIGTERM || signum == SIGHUP)
-		(void) killpg((pid_t) pp->p_jobid, SIGCONT);
+		(void) killpg(pp->p_jobid, SIGCONT);
 #endif /* BSDJOBS */
 	}
 	else if (!(Isdigit(*cp) || *cp == '-'))
 	    stderror(ERR_NAME | ERR_JOBARGS);
 	else {
 	    pid = atoi(short2str(cp));
-	    if (kill((pid_t) pid, signum) < 0) {
+	    if (kill(pid, signum) < 0) {
 		xprintf("%d: %s\n", pid, strerror(errno));
 		err1++;
 		goto cont;
 	    }
 #ifdef BSDJOBS
 	    if (signum == SIGTERM || signum == SIGHUP)
-		(void) kill((pid_t) pid, SIGCONT);
+		(void) kill(pid, SIGCONT);
 #endif /* BSDJOBS */
 	}
 cont:
@@ -1540,7 +1540,7 @@ pstart(pp, foregnd)
     if (foregnd)
 	(void) tcsetpgrp(FSHTTY, pp->p_jobid);
     if (jobflags & PSTOPPED)
-	(void) killpg((pid_t) pp->p_jobid, SIGCONT);
+	(void) killpg(pp->p_jobid, SIGCONT);
 #endif /* BSDJOBS */
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
