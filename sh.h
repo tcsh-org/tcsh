@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.8 1991/07/24 15:36:18 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.9 1991/07/24 17:38:12 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -401,10 +401,10 @@ Char    PromptBuf[256];		/* buffer for the actual printed prompt. this
  * The desired initial values for these descriptors are defined in
  * sh.local.h.
  */
-short   SHIN;			/* Current shell input (script) */
-short   SHOUT;			/* Shell output */
-short   SHDIAG;			/* Diagnostic output... shell errs go here */
-short   OLDSTD;			/* Old standard input (def for cmds) */
+int   SHIN;			/* Current shell input (script) */
+int   SHOUT;			/* Shell output */
+int   SHDIAG;			/* Diagnostic output... shell errs go here */
+int   OLDSTD;			/* Old standard input (def for cmds) */
 
 /*
  * Error control
@@ -470,7 +470,7 @@ struct Bin {
     off_t   Bfseekp;		/* Seek pointer */
     off_t   Bfbobp;		/* Seekp of beginning of buffers */
     off_t   Bfeobp;		/* Seekp of end of buffers */
-    short   Bfblocks;		/* Number of buffer blocks */
+    int     Bfblocks;		/* Number of buffer blocks */
     Char  **Bfbuf;		/* The array of buffer blocks */
 }       B;
 
@@ -614,13 +614,13 @@ struct command {
 extern struct biltins {
     char   *bname;
     void    (*bfunct) __P((Char **, struct command *));
-    short   minargs, maxargs;
+    int     minargs, maxargs;
 }       bfunc[];
 extern int nbfunc;
 
 extern struct srch {
     char   *s_name;
-    short   s_value;
+    int     s_value;
 }       srchn[];
 extern int nsrchn;
 
@@ -669,7 +669,7 @@ Char  **alvec;			/* The (remnants of) alias vector */
 /*
  * Filename/command name expansion variables
  */
-short   gflag;			/* After tglob -> is globbing needed? */
+int   gflag;			/* After tglob -> is globbing needed? */
 
 #define MAXVARLEN 30		/* Maximum number of char in a variable name */
 
