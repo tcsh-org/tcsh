@@ -1,15 +1,46 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.help.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/tw.help.c,v 2.1 1991/03/31 13:06:41 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
  *	      function is NOT meant to look at manual pages, it only does so
  *	      if there is no .help file to look in.
  */
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include "config.h"
-
 #ifndef lint
-static char *rcsid = "$Id: tw.help.c,v 2.0 1991/03/26 02:59:29 christos Exp $";
-
+static char *rcsid() 
+    { return "$Id: tw.help.c,v 2.1 1991/03/31 13:06:41 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -17,26 +48,25 @@ static char *rcsid = "$Id: tw.help.c,v 2.0 1991/03/26 02:59:29 christos Exp $";
 
 
 static int f = -1;
-static sigret_t cleanf();	/* forward ref */
-static Char *skipslist();
-static void nextslist();
+static	sigret_t	 cleanf		__P((int));
+static	Char    	*skipslist	__P((Char *));
+static	void		 nextslist 	__P((Char *, Char *));
 
-static char *h_ext[] = { 
-	".help", ".1", ".8", ".6", (char *) 0
+static char *h_ext[] = {
+    ".help", ".1", ".8", ".6", NULL
 };
 
 void
 do_help(command)
-Char   *command;
+    Char   *command;
 {
     Char    name[FILSIZ + 1];
-    Char   *cmd_p,
-           *ep;
-    char   **sp;
+    Char   *cmd_p, *ep;
+    char  **sp;
+
     sigret_t(*orig_intr) ();
     Char    curdir[MAXPATHLEN];	/* Current directory being looked at */
     register Char *hpath;	/* The environment parameter */
-    Char   *skipslist();
     Char    full[MAXPATHLEN];
     char    buf[512];		/* full path name and buffer for read */
     int     len;		/* length of read buffer */
@@ -67,13 +97,13 @@ Char   *command;
 	/* got is, now "cat" the file based on the path $HPATH */
 
 	hpath = str2short(getenv(SEARCHLIST));
-	if (hpath == (Char *) 0)
+	if (hpath == NULL)
 	    hpath = str2short(DEFAULTLIST);
 	thpath = hpath = Strsave(hpath);
 
 	while (1) {
 	    if (!*hpath) {
-		CSHprintf("No help file for %s\n", short2str(name));
+		xprintf("No help file for %s\n", short2str(name));
 		break;
 	    }
 	    nextslist(hpath, curdir);
@@ -91,7 +121,7 @@ Char   *command;
 	    for (sp = h_ext; *sp; sp++) {
 		*ep = '\0';
 		catn(full, str2short(*sp), sizeof(full) / sizeof(Char));
-		if ((f = open(short2str(full), 0)) != -1)
+		if ((f = open(short2str(full), O_RDONLY)) != -1)
 		    break;
 	    }
 	    if (f != -1) {
@@ -110,13 +140,15 @@ Char   *command;
 }
 
 static  sigret_t
-cleanf()
+/*ARGSUSED*/
+cleanf(snum)
+int snum;
 {
     if (f != -1)
 	(void) close(f);
     f = -1;
 #ifndef SIGVOID
-    return (0);
+    return (snum);
 #endif
 }
 
@@ -132,8 +164,8 @@ cleanf()
 
 static void
 nextslist(sl, np)
-register Char *sl;
-register Char *np;
+    register Char *sl;
+    register Char *np;
 {
     if (!*sl)
 	*np = '\000';
@@ -154,7 +186,7 @@ register Char *np;
 
 static Char *
 skipslist(sl)
-register Char *sl;
+    register Char *sl;
 {
     while (*sl && *sl++ != ':');
     return (sl);

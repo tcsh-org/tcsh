@@ -1,79 +1,84 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.20/RCS/pwprintf.c,v 1.5 1990/11/25 10:12:00 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.printf.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
- * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints 
- *	       through the putchar() routine.  Feel free to use for 
- *	       anything...  -- 7/17/87 Paul Placeway 
+ * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
+ *	       through the putchar() routine.  Feel free to use for
+ *	       anything...  -- 7/17/87 Paul Placeway
  */
-#if !defined(CSH_SPRINTF) && !defined(CSH_PRINTF)
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+#include "config.h"
 #ifndef lint
-static char *rcsid = "$Id: pwprintf.c,v 1.5 1990/11/25 10:12:00 christos Exp $";
+static char *rcsid() 
+    { return "$Id: tc.printf.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
 #endif
 
-#include "config.h"
-
 #include "sh.h"
-#include "sh.char.h"
-#include <varargs.h>
 
 #ifdef lint
 #undef va_arg
 #define va_arg(a, b) (a ? (b) 0 : (b) 0)
 #endif
 
-/* use varargs since it's the RIGHT WAY, and assuming things about parameters
-   on the stack will be wrong on a register passing machine (Pyramid) */
-
 #define INF	32766		/* should be bigger than any field to print */
 
 static unsigned char buf[128];
-#define CSH_SPRINTF
-#define PUTCHAR(a, b) *a++ = (char) b
-#include "tc.printf.c"
-#undef CSH_SPRINTF
-#undef PUTCHAR
-#define CSH_PRINTF
-#define PUTCHAR(a, b) CSHputchar(b)
-#include "tc.printf.c"
-#undef CSH_PRINTF
-#undef PUTCHAR
-#endif /* !CSH_SPRINTF && !CSH_PRINTF */
 
-#ifdef CSH_PRINTF
-void
-/*VARARGS*/
-CSHprintf (sfmt, va_alist)
-char *sfmt;
-va_dcl
-#endif /* CSH_PRINTF */
+static	void	xaddchar	__P((int));
+static	void	doprnt		__P((void (*) __P((int)), char *, va_list));
 
-#ifdef CSH_SPRINTF
-void
-/*VARARGS*/
-CSHsprintf (dest, sfmt, va_alist)
-char *dest, *sfmt;
-va_dcl
-#endif /* CSH_SPRINTF */
-
-#if defined(CSH_SPRINTF) || defined(CSH_PRINTF)
-{
+static void
+doprnt(addchar, sfmt, ap)
+    void    (*addchar)();
+    char   *sfmt;
     va_list ap;
+{
     register unsigned char *f, *bp;
     register long l;
     register unsigned long u;
     register int i;
     register int fmt;
     register unsigned char pad = ' ';
-    int flush_left = 0, f_width = 0, prec = INF, hash = 0, do_long = 0;
-    int sign = 0;
-    int attributes = 0;
+    int     flush_left = 0, f_width = 0, prec = INF, hash = 0, do_long = 0;
+    int     sign = 0;
+    int     attributes = 0;
 
-    va_start(ap);
-    
-    f = (unsigned char *)sfmt;
+
+    f = (unsigned char *) sfmt;
     for (; *f; f++) {
 	if (*f != '%') {	/* then just out the char */
-	    PUTCHAR(dest, (int) (*f | attributes));
-	} else {
+	    (*addchar) ((int) (*f | attributes));
+	}
+	else {
 	    f++;		/* skip the % */
 
 	    if (*f == '-') {	/* minus: flush left */
@@ -81,7 +86,7 @@ va_dcl
 		f++;
 	    }
 
-	    if (*f == '0' || *f == '.') {	
+	    if (*f == '0' || *f == '.') {
 		/* padding with 0 rather than blank */
 		pad = '0';
 		f++;
@@ -89,19 +94,23 @@ va_dcl
 	    if (*f == '*') {	/* field width */
 		f_width = va_arg(ap, int);
 		f++;
-	    } else if (isdigit(*f)) {
-		f_width = atoi ((char *) f);
-		while (isdigit(*f)) f++; /* skip the digits */
 	    }
-	   
+	    else if (Isdigit(*f)) {
+		f_width = atoi((char *) f);
+		while (Isdigit(*f))
+		    f++;	/* skip the digits */
+	    }
+
 	    if (*f == '.') {	/* precision */
 		f++;
 		if (*f == '*') {
 		    prec = va_arg(ap, int);
 		    f++;
-		} else if (isdigit(*f)) {
-		    prec = atoi ((char *) f);
-		    while (isdigit(*f)) f++; /* skip the digits */
+		}
+		else if (Isdigit(*f)) {
+		    prec = atoi((char *) f);
+		    while (Isdigit(*f))
+			f++;	/* skip the digits */
 		}
 	    }
 
@@ -116,19 +125,19 @@ va_dcl
 	    }
 
 	    fmt = *f;
-	    if (isupper(fmt)) {
+	    if (Isupper(fmt)) {
 		do_long = 1;
-		fmt = tolower(fmt);
+		fmt = Tolower(fmt);
 	    }
 	    bp = buf;
 	    switch (fmt) {	/* do the format */
-	      case 'd':
+	    case 'd':
 		if (do_long)
 		    l = va_arg(ap, long);
 		else
-		    l = (long) ( va_arg(ap, int) );
+		    l = (long) (va_arg(ap, int));
 		if (l < 0) {
-		    sign = 1;		    
+		    sign = 1;
 		    l = -l;
 		}
 		do {
@@ -139,32 +148,34 @@ va_dcl
 		f_width = f_width - (bp - buf);
 		if (!flush_left)
 		    while (f_width-- > 0)
-			PUTCHAR(dest, (int) (pad | attributes));
+			(*addchar) ((int) (pad | attributes));
 		for (bp--; bp >= buf; bp--)
-		    PUTCHAR(dest, (int) (*bp | attributes));
+		    (*addchar) ((int) (*bp | attributes));
 		if (flush_left)
 		    while (f_width-- > 0)
-			PUTCHAR(dest, (int) (' ' | attributes));
+			(*addchar) ((int) (' ' | attributes));
 		break;
 
-	      case 'o':
-	      case 'x':
-	      case 'u':
+	    case 'o':
+	    case 'x':
+	    case 'u':
 		if (do_long)
 		    u = va_arg(ap, unsigned long);
 		else
-		    u = (unsigned long) ( va_arg(ap, unsigned) );
-		if (fmt == 'u') { /* unsigned decimal */
+		    u = (unsigned long) (va_arg(ap, unsigned));
+		if (fmt == 'u') {	/* unsigned decimal */
 		    do {
 			*bp++ = u % 10 + '0';
 		    } while ((u /= 10) > 0);
-		} else if (fmt == 'o') { /* octal */
+		}
+		else if (fmt == 'o') {	/* octal */
 		    do {
 			*bp++ = u % 8 + '0';
 		    } while ((u /= 8) > 0);
 		    if (hash)
 			*bp++ = '0';
-		} else if (fmt == 'x') { /* hex */
+		}
+		else if (fmt == 'x') {	/* hex */
 		    do {
 			i = u % 16;
 			if (i < 10)
@@ -180,43 +191,44 @@ va_dcl
 		i = f_width - (bp - buf);
 		if (!flush_left)
 		    while (i-- > 0)
-			PUTCHAR(dest, (int) (pad | attributes));
+			(*addchar) ((int) (pad | attributes));
 		for (bp--; bp >= buf; bp--)
-		    PUTCHAR(dest, (int) (*bp | attributes));
+		    (*addchar) ((int) (*bp | attributes));
 		if (flush_left)
 		    while (i-- > 0)
-			PUTCHAR(dest, (int) (' ' | attributes));
+			(*addchar) ((int) (' ' | attributes));
 		break;
-		
 
-	      case 'c':
+
+	    case 'c':
 		i = va_arg(ap, int);
-		PUTCHAR(dest, (int) (i | attributes));
+		(*addchar) ((int) (i | attributes));
 		break;
 
-	      case 's':
+	    case 's':
 		bp = va_arg(ap, unsigned char *);
-		if (!bp) bp = (unsigned char *) "(nil)";
+		if (!bp)
+		    bp = (unsigned char *) "(nil)";
 		f_width = f_width - strlen((char *) bp);
 		if (!flush_left)
 		    while (f_width-- > 0)
-			PUTCHAR(dest, (int) (pad | attributes));
-	        for (i = 0; *bp && i < prec; i++) {
-		    PUTCHAR(dest, (int) (*bp | attributes));
+			(*addchar) ((int) (pad | attributes));
+		for (i = 0; *bp && i < prec; i++) {
+		    (*addchar) ((int) (*bp | attributes));
 		    bp++;
 		}
 		if (flush_left)
 		    while (f_width-- > 0)
-			PUTCHAR(dest, (int) (' ' | attributes));
+			(*addchar) ((int) (' ' | attributes));
 
 		break;
 
-              case 'a':
-                attributes = va_arg(ap,int);
-                break;
+	    case 'a':
+		attributes = va_arg(ap, int);
+		break;
 
-	      case '%':
-		PUTCHAR(dest, (int) ('%' | attributes));
+	    case '%':
+		(*addchar) ((int) ('%' | attributes));
 		break;
 	    }
 	    flush_left = 0, f_width = 0, prec = INF, hash = 0, do_long = 0;
@@ -224,9 +236,83 @@ va_dcl
 	    pad = ' ';
 	}
     }
-    va_end(ap);
-#ifdef CSH_SPRINTF
-    *dest = '\0';
-#endif /* CSH_SPRINTF */
 }
-#endif /* CSH_SPRINTF || CSH_PRINTF */
+
+
+static unsigned char *xstring;
+static void
+xaddchar(c)
+    int     c;
+{
+    *xstring++ = c;
+}
+
+
+void
+/*VARARGS*/
+#if __STDC__
+xsprintf(char *str, char *fmt, ...)
+#else
+xsprintf(va_alist)
+    va_dcl
+#endif
+{
+    va_list va;
+#if __STDC__
+    va_start(va, fmt);
+#else
+    char *str, *fmt;
+
+    va_start(va);
+    str = va_arg(va, char *);
+    fmt = va_arg(va, char *);
+#endif
+
+    xstring = (unsigned char *) str;
+    doprnt(xaddchar, fmt, va);
+    va_end(va);
+    *xstring++ = '\0';
+}
+
+
+void
+/*VARARGS*/
+#if __STDC__
+xprintf(char *fmt, ...)
+#else
+xprintf(va_alist)
+    va_dcl
+#endif
+{
+    va_list va;
+#if __STDC__
+    va_start(va, fmt);
+#else
+    char   *fmt;
+
+    va_start(va);
+    fmt = va_arg(va, char *);
+#endif
+    doprnt(xputchar, fmt, va);
+    va_end(va);
+}
+
+
+void
+xvprintf(fmt, va)
+    char   *fmt;
+    va_list va;
+{
+    doprnt(xputchar, fmt, va);
+}
+
+void
+xvsprintf(str, fmt, va)
+    char   *str;
+    char   *fmt;
+    va_list va;
+{
+    xstring = (unsigned char *) str;
+    doprnt(xaddchar, fmt, va);
+    *xstring++ = '\0';
+}

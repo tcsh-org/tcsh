@@ -1,44 +1,71 @@
-/* $Header$ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.disc.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * tc.disc.c: Functions to set/clear line disciplines
  *
  */
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include "config.h"
 #ifndef lint
-static char *rcsid = "$Id$";
-
+static char *rcsid() 
+    { return "$Id: tc.disc.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
 #endif
 
 #include "sh.h"
-#include "sh.local.h"
 
 #ifdef OREO
 #include <compat.h>
-#endif				/* OREO */
+#endif	/* OREO */
 
 static bool add_discipline = 0;	/* Did we add a line discipline	 */
 
 #if defined(IRIS4D) || defined(OREO)
-#define HAVE_DISC
-#ifndef POSIX
+# define HAVE_DISC
+# ifndef POSIX
 static struct termio otermiob;
-
-#else
+# else
 static struct termios otermiob;
-
-#endif
-#endif				/* IRIS4D || OREO */
+# endif /* POSIX */
+#endif	/* IRIS4D || OREO */
 
 #ifdef _IBMR2
-#define HAVE_DISC
+# define HAVE_DISC
 char    strPOSIX[] = "posix";
+#endif	/* _IBMR2 */
 
-#endif				/* _IBMR2 */
-
-#if !defined(HAVEDISC) && defined(TIOCGETD) && defined(NTTYDISC)
+#if !defined(HAVE_DISC) && defined(TIOCGETD) && defined(NTTYDISC)
 static int oldisc;
-
-#endif				/* !HAVEDISC && TIOCGETD && NTTYDISC */
+#endif /* !HAVE_DISC && TIOCGETD && NTTYDISC */
 
 int
 /*ARGSUSED*/
@@ -46,14 +73,11 @@ setdisc(f)
 int     f;
 {
 #ifdef IRIS4D
-#define HAVE_DISC
-#ifndef POSIX
+# ifndef POSIX
     struct termio termiob;
-
-#else
+# else
     struct termios termiob;
-
-#endif
+# endif
 
     if (ioctl(f, TCGETA, (ioctl_t) & termiob) == 0) {
 	otermiob = termiob;
@@ -72,22 +96,20 @@ int     f;
 
 
 #ifdef OREO
-#define HAVE_DISC
-#ifndef POSIX
+# ifndef POSIX
     struct termio termiob;
-
-#else
+# else
     struct termios termiob;
+# endif
 
-#endif
     struct ltchars ltcbuf;
 
     if (ioctl(f, TCGETA, (ioctl_t) & termiob) == 0) {
+	otermiob = termiob;
 	if ((getcompat(COMPAT_BSDTTY) & COMPAT_BSDTTY) != COMPAT_BSDTTY) {
 	    setcompat(COMPAT_BSDTTY);
-	    otermiob = termiob;
 	    if (ioctl(f, TIOCGLTC, (ioctl_t) & ltcbuf) != 0)
-		CSHprintf("Couldn't get local chars.\n");
+		xprintf("Couldn't get local chars.\n");
 	    else {
 		ltcbuf.t_suspc = '\032';	/* ^Z */
 		ltcbuf.t_dsuspc = '\031';	/* ^Y */
@@ -96,7 +118,7 @@ int     f;
 		ltcbuf.t_werasc = '\027';	/* ^W */
 		ltcbuf.t_lnextc = '\026';	/* ^V */
 		if (ioctl(f, TIOCSLTC, (ioctl_t) & ltcbuf) != 0)
-		    CSHprintf("Couldn't set local chars.\n");
+		    xprintf("Couldn't set local chars.\n");
 	    }
 	    termiob.c_cc[VSWTCH] = '\0';
 	    if (ioctl(f, TCSETAF, (ioctl_t) & termiob) != 0)
@@ -111,7 +133,6 @@ int     f;
 
 
 #ifdef _IBMR2
-#define HAVE_DISC
     union txname tx;
 
     tx.tx_which = 0;
@@ -126,17 +147,17 @@ int     f;
     }
     else
 	return (-1);
-#endif				/* _IBMR2 */
+#endif	/* _IBMR2 */
 
 #ifndef HAVE_DISC
 # if defined(TIOCGETD) && defined(NTTYDISC)
-#  define HAVE_DISC
     if (ioctl(f, TIOCGETD, (ioctl_t) & oldisc) == 0) {
 	if (oldisc != NTTYDISC) {
 	    int     ldisc = NTTYDISC;
 
 	    if (ioctl(f, TIOCSETD, (ioctl_t) & ldisc) != 0)
 		return (-1);
+	    add_discipline = 1;
 	}
 	else
 	    oldisc = -1;
@@ -144,40 +165,12 @@ int     f;
     }
     else
 	return (-1);
-    add_discipline = 1;
+# else
     return (0);
-#endif				/* TIOCGETD && NTTYDISC */
-#endif				/* !HAVE_DISC */
+# endif	/* TIOCGETD && NTTYDISC */
+#endif	/* !HAVE_DISC */
+} /* end setdisc */
 
-#ifndef HAVE_DISC
-# ifdef notdef
-#  if defined(CSUSP) && defined(VSUSP)
-#   ifdef POSIX
-    struct termios termiob;
-
-    if (tcgetattr(FSHTTY, &termiob) == 0)
-	if (termiob.c_cc[VSUSP] != CSUSP) {
-	    termiob.c_cc[VSUSP] = CSUSP;
-	    (void) tcsetattr(FSHTTY, TCSANOW, &termiob);
-	}
-#   else				/* POSIX */
-    struct termio termiob;
-
-    if (ioctl(f, TCGETA, (ioctl_t) & termiob) == 0)
-	if (termiob.c_cc[VSUSP] != CSUSP) {
-	    termiob.c_cc[VSUSP] = CSUSP;
-	    (void) ioctl(f, TCSETAF, (ioctl_t) & termiob);
-	}
-#   endif				/* POSIX */
-#  endif				/* CSUSP && VSUSP */
-# endif
-    return (0);
-#endif				/* !HAVE_DISC */
-
-}
-
-
-#undef HAVE_DISC
 
 int
 /*ARGSUSED*/
@@ -187,24 +180,18 @@ int f;
     if (add_discipline) {
 	add_discipline = 0;
 #if defined(OREO) || defined(IRIS4D)
-#define HAVE_DISC
 	return (ioctl(f, TCSETAF, &otermiob));
-#endif				/* OREO || IRIS4D */
+#endif /* OREO || IRIS4D */
 
 #ifdef _IBMR2
-#define HAVE_DISC
-	return (ioctl(FSHTTY, TXDELCD, (ioctl_t) strPOSIX));
-#endif				/* _IBMR2 */
+	return (ioctl(f, TXDELCD, (ioctl_t) strPOSIX));
+#endif /* _IBMR2 */
 
 #ifndef HAVE_DISC
-#if defined(TIOCSETD) && defined(NTTYDISC)
-#define HAVE_DISC
+# if defined(TIOCSETD) && defined(NTTYDISC)
 	return (ioctl(f, TIOCSETD, (ioctl_t) & oldisc));
-#endif				/* TIOCSETD && NTTYDISC */
-#endif				/* !HAVE_DISC */
+# endif /* TIOCSETD && NTTYDISC */
+#endif /* !HAVE_DISC */
     }
-
-#ifndef HAVE_DISC
     return (0);
-#endif				/* !HAVE_DISC */
-}				/* end resetdisp */
+} /* end resetdisc */

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.20/RCS/ed.xmap.c,v 1.8 1990/12/05 11:16:08 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.xmap.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -59,17 +59,50 @@
  *	        1) It is not possible to have one Xkey that is a
  *		   substring of another.
  */
-#ifndef lint
-static char *rcsid = "$Id: ed.xmap.c,v 1.8 1990/12/05 11:16:08 christos Exp $";
-#endif
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include "config.h"
+#ifndef lint
+static char *rcsid() 
+    { return "$Id: ed.xmap.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
+#endif
 
 #include "sh.h"
 #include "ed.h"
 #include "ed.defns.h"
 
 #ifndef NULL
-# define NULL 0
+#define NULL 0
 #endif
 
 /* Internal Data types and declarations */
@@ -79,33 +112,32 @@ static char *rcsid = "$Id: ed.xmap.c,v 1.8 1990/12/05 11:16:08 christos Exp $";
  */
 typedef struct Xmapnode {
     Char    ch;			/* single character of Xkey */
-    Char   *code;		/* command code or pointer to string, 
-				 * if this is a leaf */
+    Char   *code;		/* command code or pointer to string, if this
+				 * is a leaf */
     struct Xmapnode *next;	/* ptr to next char of this Xkey */
     struct Xmapnode *sibling;	/* ptr to another Xkey with same prefix */
-} XmapNode;
+}       XmapNode;
 
 static XmapNode *Xmap = NULL;	/* the current Xmap */
 
 static Char CurCode;
-static XmapNode CurCmd = { 0, &CurCode, (XmapNode *) 0, (XmapNode *) 0 };
+static XmapNode CurCmd = {0, &CurCode, NULL, NULL};
 
 /* Some declarations of procedures */
-
-static int TraverseMap();
-static int TryNode();
-static XmapNode *GetFreeNode();
-static void PutFreeNode();
-static int TryDeleteNode();
+static	int       	 TraverseMap	__P((XmapNode *, Char *, Char **));
+static	int       	 TryNode	__P((XmapNode *, Char *, Char *, int));
+static	XmapNode	*GetFreeNode	__P((int));
+static	void		 PutFreeNode	__P((XmapNode *));
+static	int		 TryDeleteNode	__P((XmapNode **, Char *));
 
 
 /* ResetXmap():
- *	Takes all nodes on Xmap and puts them on free list.  Then 
+ *	Takes all nodes on Xmap and puts them on free list.  Then
  *	initializes Xmap with arrow keys
  */
-void 
+void
 ResetXmap(vi)
-int vi;
+    int     vi;
 {
     static Char strA[] = {033, '[', 'A', '\0'};
     static Char strB[] = {033, '[', 'B', '\0'};
@@ -141,12 +173,12 @@ int vi;
 
 
 /* GetXkey():
- *	Calls the recursive function with entry point Xmap 
+ *	Calls the recursive function with entry point Xmap
  */
-int 
+int
 GetXkey(ch, code)
-Char   *ch;
-Char  **code;
+    Char   *ch;
+    Char  **code;
 {
     return (TraverseMap(Xmap, ch, code));
 }
@@ -155,33 +187,35 @@ Char  **code;
  *	recursively traverses node in tree until match or mismatch is
  * 	found.  May read in more characters.
  */
-static int 
+static int
 TraverseMap(ptr, ch, code)
-XmapNode *ptr;
-Char   *ch;
-Char  **code;
+    XmapNode *ptr;
+    Char   *ch;
+    Char  **code;
 {
     Char    tch;
 
     if (ptr->ch == *ch) {
 	/* match found */
-	if (ptr->next && ptr->next != &CurCmd) {
-	    /* Xkey not complete so get next char */
-	    if (GetNextChar(&tch) != 1) {	/* if EOF or error */
-		*ch = 0;
-		CurCmd.code[0] = F_SEND_EOF;
-		*code = CurCmd.code;
-		return 1;	/* PWP: Pretend we just read an end-of-file */
+	if (ptr->next) {
+	    if (ptr->next != &CurCmd) {
+		/* Xkey not complete so get next char */
+		if (GetNextChar(&tch) != 1) {	/* if EOF or error */
+		    *ch = 0;
+		    CurCmd.code[0] = F_SEND_EOF;
+		    *code = CurCmd.code;
+		    return 1;	/* PWP: Pretend we just read an end-of-file */
+		}
+		*ch = tch;
+		return (TraverseMap(ptr->next, ch, code));
 	    }
-	    *ch = tch;
-	    return (TraverseMap(ptr->next, ch, code));
-	}
-	else {
-	    if (ptr->next) {
+	    else {
 		CurCmd.code[0] = (Char) ptr->code;
 		*code = CurCmd.code;
 		return 1;
 	    }
+	}
+	else {
 	    /* next is null so this is leaf node and a string */
 	    *ch = 0;
 	    *code = ptr->code;
@@ -202,13 +236,13 @@ Char  **code;
     }
 }
 
-void 
+void
 AddXkey(Xkey, code)
-Char   *Xkey;
-Char   *code;
+    Char   *Xkey;
+    Char   *code;
 {
     if (Xkey[0] == '\0') {
-	CSHprintf("AddXkey: Null extended-key not allowed.\n");
+	xprintf("AddXkey: Null extended-key not allowed.\n");
 	return;
     }
 
@@ -221,19 +255,20 @@ Char   *code;
     return;
 }
 
-void 
+void
 AddXkeyCmd(Xkey, CmdCode)
-Char   *Xkey;
-Char    CmdCode;
+    Char   *Xkey;
+    int    CmdCode;
 {
     /* Gould does not like casts... */
     unsigned int compiler_bug;
+
     if (Xkey[0] == '\0') {
-	CSHprintf("AddXkeyCmd: Null extended-key not allowed.\n");
+	xprintf("AddXkeyCmd: Null extended-key not allowed.\n");
 	return;
     }
     if (CmdCode == F_XKEY) {
-	CSHprintf("AddXkeyCmd: sequence-lead-in command not allowed\n");
+	xprintf("AddXkeyCmd: sequence-lead-in command not allowed\n");
 	return;
     }
 
@@ -248,12 +283,12 @@ Char    CmdCode;
 }
 
 
-static int 
+static int
 TryNode(ptr, string, code, IsString)
-XmapNode *ptr;
-Char   *string;
-Char   *code;
-int     IsString;
+    XmapNode *ptr;
+    Char   *string;
+    Char   *code;
+    int     IsString;
 {
     /*
      * Find a node that matches *string or allocate a new one
@@ -261,17 +296,17 @@ int     IsString;
     if (ptr->ch != *string) {
 	XmapNode *xm;
 
-	for (xm = ptr; xm->sibling != (XmapNode *) 0; xm = xm->sibling)
+	for (xm = ptr; xm->sibling != NULL; xm = xm->sibling)
 	    if (xm->sibling->ch == *string)
 		break;
-	if (xm->sibling == (XmapNode *) 0)
+	if (xm->sibling == NULL)
 	    xm->sibling = GetFreeNode(*string);	/* setup new node */
 	ptr = xm->sibling;
     }
 
     if (*++string == '\0') {
 	/* we're there */
-	if (ptr->next != (XmapNode *) 0 && ptr->next != &CurCmd) {
+	if (ptr->next != NULL && ptr->next != &CurCmd) {
 	    PutFreeNode(ptr->next);	/* lose longer Xkeys with this prefix */
 	    ptr->next = NULL;
 	}
@@ -288,12 +323,12 @@ int     IsString;
     }
     else {
 	/* still more chars to go */
-	/* 
-	 * christos: We need to allocate a new XmapNode also if
-	 * the next XmapNode is the CurCmd, cause the previous
-	 * XmapNode definition was only one char long!
+	/*
+	 * christos: We need to allocate a new XmapNode also if the next
+	 * XmapNode is the CurCmd, cause the previous XmapNode definition was
+	 * only one char long!
 	 */
-	if (ptr->next == NULL || ptr->next == &CurCmd) 
+	if (ptr->next == NULL || ptr->next == &CurCmd)
 	    ptr->next = GetFreeNode(*string);	/* setup new node */
 	(void) TryNode(ptr->next, string, code, IsString);
     }
@@ -302,35 +337,35 @@ int     IsString;
 
 void
 ClearXkey(map, in)
-KEYCMD *map;
-Char *in;
+    KEYCMD *map;
+    Char   *in;
 {
-    if ((map[(unsigned char)*in] == F_XKEY) &&
-	((map == CcKeyMap && CcAltMap[(unsigned char)*in] != F_XKEY) ||
-	 (map == CcAltMap && CcKeyMap[(unsigned char)*in] != F_XKEY)))
+    if ((map[(unsigned char) *in] == F_XKEY) &&
+	((map == CcKeyMap && CcAltMap[(unsigned char) *in] != F_XKEY) ||
+	 (map == CcAltMap && CcKeyMap[(unsigned char) *in] != F_XKEY)))
 	(void) DeleteXkey(in);
-} 
+}
 
 int
 DeleteXkey(Xkey)
-Char *Xkey;
+    Char   *Xkey;
 {
     if (Xkey[0] == '\0') {
-	CSHprintf("DeleteXkey: Null extended-key not allowed.\n");
+	xprintf("DeleteXkey: Null extended-key not allowed.\n");
 	return (-1);
     }
 
     if (Xmap == NULL)
 	return (0);
 
-    (void) TryDeleteNode(&Xmap,Xkey);
+    (void) TryDeleteNode(&Xmap, Xkey);
     return (0);
 }
 
-static int 
+static int
 TryDeleteNode(inptr, string)
-XmapNode **inptr;
-Char   *string;
+    XmapNode **inptr;
+    Char   *string;
 {
     XmapNode *ptr;
     XmapNode *prev_ptr = NULL;
@@ -342,10 +377,10 @@ Char   *string;
     if (ptr->ch != *string) {
 	XmapNode *xm;
 
-	for (xm = ptr; xm->sibling != (XmapNode *) 0; xm = xm->sibling)
+	for (xm = ptr; xm->sibling != NULL; xm = xm->sibling)
 	    if (xm->sibling->ch == *string)
 		break;
-	if (xm->sibling == (XmapNode *) 0)
+	if (xm->sibling == NULL)
 	    return (0);
 	prev_ptr = xm;
 	ptr = xm->sibling;
@@ -361,7 +396,7 @@ Char   *string;
 	PutFreeNode(ptr);
 	return (1);
     }
-    else if (ptr->next != NULL && TryDeleteNode(&ptr->next,string) == 1) {
+    else if (ptr->next != NULL && TryDeleteNode(&ptr->next, string) == 1) {
 	if (ptr->next != NULL)
 	    return (0);
 	if (prev_ptr == NULL)
@@ -377,15 +412,16 @@ Char   *string;
     }
 }
 
-
+
+
 
 
 /* PutFreeNode():
- *	Puts a tree of nodes onto free list using free(3). 
+ *	Puts a tree of nodes onto free list using free(3).
  */
 static void
 PutFreeNode(ptr)
-XmapNode *ptr;
+    XmapNode *ptr;
 {
     if (ptr == NULL)
 	return;
@@ -400,15 +436,15 @@ XmapNode *ptr;
 
 
 /* GetFreeNode():
- *	Returns pointer to an XmapNode for ch. 
+ *	Returns pointer to an XmapNode for ch.
  */
 static XmapNode *
 GetFreeNode(ch)
-Char    ch;
+    int    ch;
 {
     XmapNode *ptr;
 
-    ptr = (XmapNode *) xalloc((size_t) sizeof(XmapNode));
+    ptr = (XmapNode *) xmalloc((size_t) sizeof(XmapNode));
     ptr->ch = ch;
     ptr->code = NULL;
     ptr->next = NULL;
@@ -427,12 +463,12 @@ static int unparsech();
 extern unsigned char *unparsestring();
 
 /* PrintXKey():
- *	Print the binding associated with Xkey key.  
- *	Print entire Xmap if null 
+ *	Print the binding associated with Xkey key.
+ *	Print entire Xmap if null
  */
-void 
+void
 PrintXkey(key)
-Char   *key;
+    Char   *key;
 {
     /* do nothing if Xmap is empty and null key specified */
     if (Xmap == NULL && *key == 0)
@@ -441,19 +477,19 @@ Char   *key;
     printbuf[0] = '"';
     if (Lookup(key, Xmap, 1) <= -1)
 	/* key is not bound */
-	CSHprintf("Unbound extended key \"%s\"\n", short2str(key));
+	xprintf("Unbound extended key \"%s\"\n", short2str(key));
     return;
 }
 
 /* Lookup():
- *	look for the string starting at node ptr.  
- *	Print if last node 
+ *	look for the string starting at node ptr.
+ *	Print if last node
  */
-static int 
+static int
 Lookup(string, ptr, cnt)
-int     cnt;
-Char   *string;
-XmapNode *ptr;
+    int     cnt;
+    Char   *string;
+    XmapNode *ptr;
 {
     int     ncnt;
 
@@ -495,24 +531,24 @@ XmapNode *ptr;
     }
 }
 
-static int 
+static int
 Enumerate(ptr, cnt)
-int     cnt;
-XmapNode *ptr;
+    int     cnt;
+    XmapNode *ptr;
 {
     int     ncnt;
 
     if (cnt >= maxXkey - 5) {	/* buffer too small */
 	printbuf[++cnt] = '"';
 	printbuf[++cnt] = '\0';
-	CSHprintf("Some extended keys too long for internal print buffer");
-	CSHprintf(" \"%s...\"\n", short2str(printbuf));
+	xprintf("Some extended keys too long for internal print buffer");
+	xprintf(" \"%s...\"\n", short2str(printbuf));
 	return (0);
     }
 
     if (ptr == NULL) {
 #ifdef DEBUG_EDIT
-	CSHprintf("Enumerate: BUG!! Null ptr passed\n!");
+	xprintf("Enumerate: BUG!! Null ptr passed\n!");
 #endif
 	return (-1);
     }
@@ -535,38 +571,38 @@ XmapNode *ptr;
 
 
 /* PrintOne():
- *	Print the specified key and its associated 
- *	function specified by code 
+ *	Print the specified key and its associated
+ *	function specified by code
  */
-static int 
+static int
 printOne(key, code, prstring)
-Char   *key;
-Char   *code;
-int     prstring;
+    Char   *key;
+    Char   *code;
+    int     prstring;
 {
     struct KeyFuncs *fp;
     unsigned char unparsbuf[200];
     static char *fmt = "%-15s->  %s\n";
 
     if (code) {
-	if (prstring) 
-	    CSHprintf(fmt, short2str(key), unparsestring(code, unparsbuf));
+	if (prstring)
+	    xprintf(fmt, short2str(key), unparsestring(code, unparsbuf));
 	else {
 	    for (fp = FuncNames; fp->name; fp++) {
 		if ((int) code == fp->func)
-		    CSHprintf(fmt, short2str(key), fp->name);
+		    xprintf(fmt, short2str(key), fp->name);
 	    }
 	}
     }
-    else 
-	CSHprintf(fmt, short2str(key), "no input");
+    else
+	xprintf(fmt, short2str(key), "no input");
     return (0);
 }
 
-static int 
+static int
 unparsech(cnt, ch)
-int     cnt;
-Char    ch;
+    int     cnt;
+    Char    ch;
 {
     if (ch == 0) {
 	printbuf[cnt++] = '^';
@@ -574,7 +610,7 @@ Char    ch;
 	return cnt;
     }
 
-    if (iscntrl(ch)) {
+    if (Iscntrl(ch)) {
 	printbuf[cnt++] = '^';
 	if (ch == '\177')
 	    printbuf[cnt] = '?';
@@ -589,7 +625,7 @@ Char    ch;
 	printbuf[cnt++] = '\\';
 	printbuf[cnt] = '\\';
     }
-    else if (ch == ' ' || (isprint(ch) && !isspace(ch))) {
+    else if (ch == ' ' || (Isprint(ch) && !Isspace(ch))) {
 	printbuf[cnt] = ch;
     }
     else {

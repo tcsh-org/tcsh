@@ -1,18 +1,49 @@
-/* $Header$ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sched.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
  * Karl Kleinpaste: Computer Consoles Inc. 1984
  */
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include "config.h"
 #ifndef lint
-static char *rcsid = "$Id$";
-#endif /* !lint */
+static char *rcsid() 
+    { return "$Id: tc.sched.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
+#endif
 
 #include "sh.h"
-#include "sh.local.h"
-
-
+#include "ed.h"
 
 extern int just_signaled;
 
@@ -21,30 +52,24 @@ struct sched_event {
     long    t_when;
     Char  **t_lex;
 };
-static struct sched_event *sched_ptr = (struct sched_event *) 0;
+static struct sched_event *sched_ptr = NULL;
 
 
 time_t
 sched_next()
 {
-   if (sched_ptr)
-	return(sched_ptr->t_when);
-   return((time_t) -1);
+    if (sched_ptr)
+	return (sched_ptr->t_when);
+    return ((time_t) - 1);
 }
 
 void
 dosched(v)
-register Char **v;
+    register Char **v;
 {
-    register struct sched_event *tp,
-           *tp1,
-           *tp2;
+    register struct sched_event *tp, *tp1, *tp2;
     long    cur_time;
-    int     count,
-            hours,
-            minutes,
-            dif_hour,
-            dif_min;
+    int     count, hours, minutes, dif_hour, dif_min;
     Char   *cp;
     bool    relative;		/* time specified as +hh:mm */
     struct tm *ltp;
@@ -58,9 +83,9 @@ register Char **v;
 	for (count = 1, tp = sched_ptr; tp; count++, tp = tp->t_next) {
 	    timeline = ctime(&tp->t_when);
 	    timeline[16] = '\0';
-	    CSHprintf("%6d\t%s\t", count, timeline);
+	    xprintf("%6d\t%s\t", count, timeline);
 	    blkpr(tp->t_lex);
-	    CSHprintf("\n");
+	    xprintf("\n");
 	}
 	return;
     }
@@ -68,12 +93,12 @@ register Char **v;
     if (*cp == '-') {
 	/* remove item from list */
 	if (!sched_ptr)
-	    error("No scheduled events");
+	    stderror(ERR_NOSCHED);
 	if (*v)
-	    error("Too many args for 'sched -<item#>'");
+	    stderror(ERR_SCHEDUSAGE);
 	count = atoi(short2str(++cp));
 	if (count <= 0)
-	    error("Usage to delete: sched -<item#>");
+	    stderror(ERR_SCHEDUSAGE);
 	tp = sched_ptr;
 	tp1 = 0;
 	while (--count) {
@@ -85,7 +110,7 @@ register Char **v;
 	    }
 	}
 	if (count)
-	    error("Not that many scheduled events");
+	    stderror(ERR_SCHEDEV);
 	if (tp1 == 0)
 	    sched_ptr = tp->t_next;
 	else
@@ -97,11 +122,11 @@ register Char **v;
 
     /* else, add an item to the list */
     if (!*v)
-	error("No command to run");
+	stderror(ERR_SCHEDCOM);
     relative = 0;
-    if (!isdigit(*cp)) {	/* not abs. time */
+    if (!Isdigit(*cp)) {	/* not abs. time */
 	if (*cp != '+')
-	    error("Usage: sched [+]hh:mm <command>");
+	    stderror(ERR_SCHEDUSAGE);
 	cp++, relative++;
     }
     minutes = 0;
@@ -112,11 +137,11 @@ register Char **v;
 	minutes = atoi(short2str(++cp));
     if ((hours < 0) || (minutes < 0) ||
 	(hours > 23) || (minutes > 59))
-	error("Invalid time for event");
+	stderror(ERR_SCHEDTIME);
     while (*cp && *cp != 'p' && *cp != 'a')
 	cp++;
     if (*cp && relative)
-	error("Relative time inconsistent with am/pm");
+	stderror(ERR_SCHEDREL);
     if (*cp == 'p')
 	hours += 12;
     (void) time(&cur_time);
@@ -134,7 +159,7 @@ register Char **v;
 		dif_hour = 23;
 	}
     }
-    tp = (struct sched_event *) calloc(1, sizeof *tp);
+    tp = (struct sched_event *) xcalloc(1, sizeof *tp);
     tp->t_when = cur_time - ltp->tm_sec + dif_hour * 3600L + dif_min * 60L;
     /* use of tm_sec: get to beginning of minute. */
     if (!sched_ptr || tp->t_when < sched_ptr->t_when) {
@@ -161,14 +186,10 @@ void
 sched_run()
 {
     long    cur_time;
-    register struct sched_event *tp,
-           *tp1;
-    struct wordent cmd,
-           *nextword,
-           *lastword;
-    struct command *t = (struct command *) 0;
-    Char  **v,
-           *cp;
+    register struct sched_event *tp, *tp1;
+    struct wordent cmd, *nextword, *lastword;
+    struct command *t;
+    Char  **v, *cp;
     extern Char GettingInput;
 
 #ifdef BSDSIGS
@@ -201,12 +222,15 @@ sched_run()
 	(void) Cookedmode();
 
     while (tp && tp->t_when < cur_time) {
-	err = (char *) 0;
+	if (seterr) {
+	    xfree((char *) seterr);
+	    seterr = NULL;
+	}
 	cmd.word = STRNULL;
 	lastword = &cmd;
 	v = tp->t_lex;
 	for (cp = *v; cp; cp = *++v) {
-	    nextword = (struct wordent *) calloc(1, sizeof cmd);
+	    nextword = (struct wordent *) xcalloc(1, sizeof cmd);
 	    nextword->word = Strsave(cp);
 	    lastword->next = nextword;
 	    nextword->prev = lastword;
@@ -223,10 +247,10 @@ sched_run()
 	alias(&cmd);
 	/* build a syntax tree for the command. */
 	t = syntax(cmd.next, &cmd, 0);
-	if (err)
-	    error(err);
+	if (seterr)
+	    stderror(ERR_OLD);
 	/* execute the parse tree. */
-	execute(t, -1);
+	execute(t, -1, NULL, NULL);
 	/* done. free the lex list and parse tree. */
 	freelex(&cmd), freesyn(t);
     }

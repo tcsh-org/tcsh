@@ -1,10 +1,43 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.20/RCS/ed.refresh.c,v 1.8 1990/11/25 10:11:36 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.refresh.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include "config.h"
 #ifndef lint
-static char *rcsid = "$Id: ed.refresh.c,v 1.8 1990/11/25 10:11:36 christos Exp $";
+static char *rcsid()
+    { return "$Id: ed.refresh.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -15,55 +48,55 @@ static char *rcsid = "$Id: ed.refresh.c,v 1.8 1990/11/25 10:11:36 christos Exp $
 
 /* refresh.c -- refresh the current set of lines on the screen */
 
-Char *litptr[256];
-
+Char   *litptr[256];
 static int vcursor_h, vcursor_v;
-static void Draw();
-static void Vdraw();
-static void Vnewline();
-static  void update_line();
-static int has_other_than_spaces();
-static void str_insert();
-static void str_delete();
-static void str_cp();
-static void PutPlusOne();
+
+static	void	Draw 			__P((int));
+static	void	Vdraw 			__P((int));
+static	void	Vnewline 		__P((void));
+static	void	update_line 		__P((Char *, Char *, int));
+static	int	has_other_than_spaces	__P((Char *, int));
+static	void	str_insert		__P((Char *, int, int, Char *, int));
+static	void	str_delete		__P((Char *, int, int, int));
+static	void	str_cp			__P((Char *, Char *, int));
+static	void	PutPlusOne		__P((int));
 
 static void
-Draw(c)					/* draw c, expand tabs, ctl chars */
-register Char c;
+Draw(c)				/* draw c, expand tabs, ctl chars */
+    register int c;
 {
     register Char ch = c & CHAR;
 
-    if (isprint(ch)) {
+    if (Isprint(ch)) {
 	Vdraw(c);
 	return;
     }
     /* from wolman%crltrx.DEC@decwrl.dec.com (Alec Wolman) */
-    if (ch == '\n') {			/* expand the newline	*/
-	Vdraw((Char) '\0');		/* assure end of line	*/
-	vcursor_h = 0;			/* reset cursor pos	*/
+    if (ch == '\n') {		/* expand the newline	 */
+	Vdraw('\0');	/* assure end of line	 */
+	vcursor_h = 0;		/* reset cursor pos	 */
 	vcursor_v++;
 	return;
     }
-    if (ch == '\t') {			/* expand the tab 	*/
+    if (ch == '\t') {		/* expand the tab 	 */
 	for (;;) {
-	    Vdraw((Char) ' ');
+	    Vdraw(' ');
 	    if ((vcursor_h & 07) == 0)
-		break;			/* go until tab stop	*/
+		break;		/* go until tab stop	 */
 	}
     }
-    else if (iscntrl(ch)) {
-	Vdraw((Char) '^');
+    else if (Iscntrl(ch)) {
+	Vdraw('^');
 	if (ch == '\177') {
-	    Vdraw((Char) '?');
+	    Vdraw('?');
 	}
 	else {
 	    /* uncontrolify it; works only for iso8859-1 like sets */
-	    Vdraw((Char) (c | 0100));	
+	    Vdraw((c | 0100));
 	}
     }
     else {
-	Vdraw((Char) '\\');
+	Vdraw('\\');
 	Vdraw(((c >> 6) & 7) + '0');
 	Vdraw(((c >> 3) & 7) + '0');
 	Vdraw((c & 7) + '0');
@@ -71,14 +104,14 @@ register Char c;
 }
 
 static void
-Vdraw(c)					/* draw char c onto V lines */
-register Char c;
+Vdraw(c)			/* draw char c onto V lines */
+    register int c;
 {
 #ifdef DEBUG_REFRESH
 # ifdef SHORT_STRINGS
-    CSHprintf("Vdrawing %6.6o '%c'\r\n", c, c & ASCII);
+    xprintf("Vdrawing %6.6o '%c'\r\n", c, c & ASCII);
 # else
-    CSHprintf("Vdrawing %3.3o '%c'\r\n", c, c);
+    xprintf("Vdrawing %3.3o '%c'\r\n", c, c);
 # endif
 #endif
 
@@ -90,10 +123,10 @@ register Char c;
 	vcursor_v++;
 	if (vcursor_v >= TermV) {	/* should NEVER happen. */
 #ifdef DEBUG_REFRESH
-	    CSHprintf("\r\nVdraw: vcursor_v overflow! Vcursor_v == %d > %d\r\n",
-		      vcursor_v, TermV);
+	    xprintf("\r\nVdraw: vcursor_v overflow! Vcursor_v == %d > %d\r\n",
+		    vcursor_v, TermV);
 	    abort();
-#endif /* DEBUG_REFRESH */
+#endif				/* DEBUG_REFRESH */
 	}
     }
 }
@@ -105,10 +138,10 @@ Vnewline()
 }
 
 /*
- *  Refresh() 
+ *  Refresh()
  *	draws the new virtual screen image from the current input
- *  	line, then goes line-by-line changing the real image to the new 
- *	virtual image. The routine to re-draw a line can be replaced 
+ *  	line, then goes line-by-line changing the real image to the new
+ *	virtual image. The routine to re-draw a line can be replaced
  *	easily in hopes of a smarter one being placed there.
  */
 static int OldvcV = 0;
@@ -119,11 +152,11 @@ Refresh()
     register Char *cp;
     int     cur_h, cur_v = 0, new_vcv;
     Char    oldgetting;
-    int	    litnum = 0;
+    int     litnum = 0;
 
 #ifdef DEBUG_REFRESH
-    CSHprintf("PromptBuf = :%s:\r\n", short2str(PromptBuf));
-    CSHprintf("InputBuf = :%s:\r\n", short2str(InputBuf));
+    xprintf("PromptBuf = :%s:\r\n", short2str(PromptBuf));
+    xprintf("InputBuf = :%s:\r\n", short2str(InputBuf));
 #endif
     oldgetting = GettingInput;
     GettingInput = 0;		/* avoid re-entrance via SIGWINCH */
@@ -138,18 +171,18 @@ Refresh()
 	    if (litnum < (sizeof(litptr) / sizeof(litptr[0]))) {
 		litptr[litnum] = cp;
 #ifdef DEBUG_LITERAL
-		CSHprintf("litnum = %d, litptr = %x:\r\n", 
-			  litnum, litptr[litnum]);
+		xprintf("litnum = %d, litptr = %x:\r\n",
+			litnum, litptr[litnum]);
 #endif
 	    }
-	    while (*cp & LITERAL) cp++;
-	    if (*cp) 
+	    while (*cp & LITERAL)
+		cp++;
+	    if (*cp)
 		Vdraw(litnum++ | LITERAL);
 	    else {
-		/* 
-		 * XXX: This is a bug, we lose the last literal, if
-		 * it is not followed by a normal character, but
-		 * it is too hard to fix
+		/*
+		 * XXX: This is a bug, we lose the last literal, if it is not
+		 * followed by a normal character, but it is too hard to fix
 		 */
 		break;
 	    }
@@ -187,12 +220,12 @@ Refresh()
 	cur_v = vcursor_v;
     }
     new_vcv = vcursor_v;	/* must be done BEFORE the NUL is written */
-    Vdraw((Char) '\0');		/* put NUL on end */
+    Vdraw('\0');		/* put NUL on end */
 
 #ifdef DEBUG_REFRESH
-    CSHprintf(
-    "TermH=%d, vcursor_h=%d, vcursor_v=%d, Vdisplay[0]=\r\n:%80.80s:\r\n",
-	      TermH, vcursor_h, vcursor_v, short2str(Vdisplay[0]));
+    xprintf(
+	"TermH=%d, vcursor_h=%d, vcursor_v=%d, Vdisplay[0]=\r\n:%80.80s:\r\n",
+	    TermH, vcursor_h, vcursor_v, short2str(Vdisplay[0]));
 #endif
 
     for (cur_line = 0; cur_line <= new_vcv; cur_line++) {
@@ -202,8 +235,8 @@ Refresh()
 	Display[cur_line][TermH] = '\0';	/* just in case */
     }
 #ifdef DEBUG_REFRESH
-    CSHprintf("\r\nvcursor_v = %d, OldvcV = %d, cur_line = %d\r\n",
-	      vcursor_v, OldvcV, cur_line);
+    xprintf("\r\nvcursor_v = %d, OldvcV = %d, cur_line = %d\r\n",
+	    vcursor_v, OldvcV, cur_line);
 #endif
     if (OldvcV > new_vcv) {
 	for (; cur_line <= OldvcV; cur_line++) {
@@ -218,8 +251,8 @@ Refresh()
     }
     OldvcV = new_vcv;		/* set for next time */
 #ifdef DEBUG_REFRESH
-    CSHprintf("\r\nCursorH = %d, CursorV = %d, cur_h = %d, cur_v = %d\r\n",
-	      CursorH, CursorV, cur_h, cur_v);
+    xprintf("\r\nCursorH = %d, CursorV = %d, cur_h = %d, cur_v = %d\r\n",
+	    CursorH, CursorV, cur_h, cur_v);
 #endif
     MoveToLine(cur_v);		/* go to where the cursor is */
     MoveToChar(cur_h);
@@ -248,8 +281,8 @@ PastBottom()
 
 static int
 has_other_than_spaces(s, n)
-register Char *s;
-register int n;
+    register Char *s;
+    register int n;
 {
     if (n <= 0)
 	return 0;
@@ -266,11 +299,12 @@ register int n;
    maximum length of d is dlen */
 static void
 str_insert(d, dat, dlen, s, num)
-register Char *d, *s;
-register int dat, dlen, num;
+    register Char *d;
+    register int dat, dlen;
+    register Char *s;
+    register int num;
 {
-    register Char *a,
-           *b;
+    register Char *a, *b;
 
     if (num <= 0)
 	return;
@@ -278,9 +312,9 @@ register int dat, dlen, num;
 	num = dlen - dat;
 
 #ifdef DEBUG_REFRESH
-    CSHprintf("str_insert() starting: %d at %d max %d, d == \"%s\"\n",
-	      num, dat, dlen, short2str(d));
-    CSHprintf("s == \"%s\"n", short2str(s));
+    xprintf("str_insert() starting: %d at %d max %d, d == \"%s\"\n",
+	    num, dat, dlen, short2str(d));
+    xprintf("s == \"%s\"n", short2str(s));
 #endif
 
     /* open up the space for num chars */
@@ -292,9 +326,9 @@ register int dat, dlen, num;
 	d[dlen] = '\0';		/* just in case */
     }
 #ifdef DEBUG_REFRESH
-    CSHprintf("str_insert() after insert: %d at %d max %d, d == \"%s\"\n",
-	      num, dat, dlen, short2str(d));
-    CSHprintf("s == \"%s\"n", short2str(s));
+    xprintf("str_insert() after insert: %d at %d max %d, d == \"%s\"\n",
+	    num, dat, dlen, short2str(d));
+    xprintf("s == \"%s\"n", short2str(s));
 #endif
 
     /* copy the characters */
@@ -302,17 +336,17 @@ register int dat, dlen, num;
 	*a++ = *s++;
 
 #ifdef DEBUG_REFRESH
-    CSHprintf("str_insert() after copy: %d at %d max %d, d == \"%s\"\n",
-	      num, dat, dlen, d, short2str(s));
-    CSHprintf("s == \"%s\"n", short2str(s));
+    xprintf("str_insert() after copy: %d at %d max %d, d == \"%s\"\n",
+	    num, dat, dlen, d, short2str(s));
+    xprintf("s == \"%s\"n", short2str(s));
 #endif
 }
 
 /* delete num characters d at dat, maximum length of d is dlen */
 static void
 str_delete(d, dat, dlen, num)
-register Char *d;
-register int dat, dlen, num;
+    register Char *d;
+    register int dat, dlen, num;
 {
     register Char *a, *b;
 
@@ -324,8 +358,8 @@ register int dat, dlen, num;
     }
 
 #ifdef DEBUG_REFRESH
-    CSHprintf("str_delete() starting: %d at %d max %d, d == \"%s\"\n",
-	      num, dat, dlen, short2str(d));
+    xprintf("str_delete() starting: %d at %d max %d, d == \"%s\"\n",
+	    num, dat, dlen, short2str(d));
 #endif
 
     /* open up the space for num chars */
@@ -337,15 +371,15 @@ register int dat, dlen, num;
 	d[dlen] = '\0';		/* just in case */
     }
 #ifdef DEBUG_REFRESH
-    CSHprintf("str_delete() after delete: %d at %d max %d, d == \"%s\"\n",
-	      num, dat, dlen, short2str(d));
+    xprintf("str_delete() after delete: %d at %d max %d, d == \"%s\"\n",
+	    num, dat, dlen, short2str(d));
 #endif
 }
 
 static void
 str_cp(a, b, n)
-register Char *a, *b;
-register int n;
+    register Char *a, *b;
+    register int n;
 {
     while (n-- && *b)
 	*a++ = *b++;
@@ -380,12 +414,12 @@ new:	eddie> Oh, my little buggy says to me, as lurgid as
 
 static void			/* could be changed to make it smarter */
 update_line(old, new, cur_line)
-register Char *old, *new;
-int     cur_line;
+    register Char *old, *new;
+    int     cur_line;
 {
     register Char *o, *n, *p, c;
     Char   *ofd, *ols, *oe, *nfd, *nls, *ne;
-    Char   *osb, *ose, *nsb, *nse; 
+    Char   *osb, *ose, *nsb, *nse;
     int     fx, sx;
 
     /*
@@ -401,23 +435,25 @@ int     cur_line;
     if (*ofd == '\0' && *nfd == '\0') {
 #ifdef DEBUG_UPDATE
 	DEBUGPRINT("no difference.\r\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	return;
     }
 
     /*
      * Find the end of both old and new
      */
-    while (*o) o++;
+    while (*o)
+	o++;
     oe = o;
 
-    while (*n) n++;
+    while (*n)
+	n++;
     ne = n;
 
     /*
      * find last same *
      */
-    for (;(o > ofd) && (n > nfd) && (o[-1] == n[-1]); o--, n--);
+    for (; (o > ofd) && (n > nfd) && (o[-1] == n[-1]); o--, n--);
     ols = o;
     nls = n;
 
@@ -451,7 +487,7 @@ int     cur_line;
     }
 
     /*
-     * case 2: delete: scan from ofd to ols looking for *nfd 
+     * case 2: delete: scan from ofd to ols looking for *nfd
      */
     if (*nfd) {
 	for (c = *nfd, o = ofd; o < ols; o++) {
@@ -547,23 +583,23 @@ int     cur_line;
     sx = (nls - nse) - (ols - ose);
 
 #ifdef DEBUG_UPDATE
-    CSHprintf("\n");
-    CSHprintf("ofd %d, osb %d, ose %d, ols %d, oe %d\n",
-	      ofd - old, osb - old, ose - old, ols - old, oe - old);
-    CSHprintf("nfd %d, nsb %d, nse %d, nls %d, ne %d\n",
-	      nfd - new, nsb - new, nse - new, nls - new, ne - new);
-    CSHprintf("old:\"%s\"\r\n", short2str(old));
-    CSHprintf("new:\"%s\"\r\n", short2str(new));
-    CSHprintf("ofd:\"%s\"\r\n", short2str(ofd));
-    CSHprintf("nfd:\"%s\"\r\n", short2str(nfd));
-    CSHprintf("ols:\"%s\"\r\n", short2str(ols));
-    CSHprintf("nls:\"%s\"\r\n", short2str(nls));
-    CSHprintf("*oe:%o,*ne:%o\r\n", *oe, *ne);
-    CSHprintf("osb:\"%s\"\r\n", short2str(osb));
-    CSHprintf("ose:\"%s\"\r\n", short2str(ose));
-    CSHprintf("nsb:\"%s\"\r\n", short2str(nsb));
-    CSHprintf("nse:\"%s\"\r\n", short2str(nse));
-#endif /* DEBUG_UPDATE */
+    xprintf("\n");
+    xprintf("ofd %d, osb %d, ose %d, ols %d, oe %d\n",
+	    ofd - old, osb - old, ose - old, ols - old, oe - old);
+    xprintf("nfd %d, nsb %d, nse %d, nls %d, ne %d\n",
+	    nfd - new, nsb - new, nse - new, nls - new, ne - new);
+    xprintf("old:\"%s\"\r\n", short2str(old));
+    xprintf("new:\"%s\"\r\n", short2str(new));
+    xprintf("ofd:\"%s\"\r\n", short2str(ofd));
+    xprintf("nfd:\"%s\"\r\n", short2str(nfd));
+    xprintf("ols:\"%s\"\r\n", short2str(ols));
+    xprintf("nls:\"%s\"\r\n", short2str(nls));
+    xprintf("*oe:%o,*ne:%o\r\n", *oe, *ne);
+    xprintf("osb:\"%s\"\r\n", short2str(osb));
+    xprintf("ose:\"%s\"\r\n", short2str(ose));
+    xprintf("nsb:\"%s\"\r\n", short2str(nsb));
+    xprintf("nse:\"%s\"\r\n", short2str(nse));
+#endif				/* DEBUG_UPDATE */
 
     /*
      * CursorV to this line cur_line MUST be in this routine so that if we
@@ -580,7 +616,7 @@ int     cur_line;
      * eddie> Oh, my fredded gruntle-buggy is to me, as foo var lurgid as
      * eddie> Oh, my fredded quiux buggy is to me, as gruntle-lurgid as
      * ^.....................^     ^..................^       ^........^ 
-     * \new                  \nfd  \nsb               \nse    \nls     \ne
+     * \new                  \nfd  \nsb               \nse     \nls    \ne
      * 
      */
 
@@ -608,7 +644,7 @@ int     cur_line;
     if ((nsb != nfd) && fx > 0 && ((p - old) + fx <= TermH)) {
 #ifdef DEBUG_UPDATE
 	DEBUGPRINT("\nfirst diff insert at %d...\n", nfd - new);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	/*
 	 * Move to the first char to insert, where the first diff is.
 	 */
@@ -619,20 +655,20 @@ int     cur_line;
 	if (nsb != ne) {
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("\nwith stuff to keep at end\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    /*
 	     * insert fx chars of new starting at nfd
 	     */
 	    if (fx > 0) {
 #ifdef DEBUG_UPDATE
-		if (!T_CanIns) 
-		    CSHprintf("   ERROR: cannot insert in early first diff\n");
-#endif /* DEBUG_UPDATE */
+		if (!T_CanIns)
+		    xprintf("   ERROR: cannot insert in early first diff\n");
+#endif				/* DEBUG_UPDATE */
 		Insert_write(nfd, fx);
 		str_insert(old, ofd - old, TermH, nfd, fx);
 	    }
-	    /* 
-	     * write (nsb-nfd) - fx chars of new starting at (nfd + fx) 
+	    /*
+	     * write (nsb-nfd) - fx chars of new starting at (nfd + fx)
 	     */
 	    so_write(nfd + fx, (nsb - nfd) - fx);
 	    str_cp(ofd + fx, nfd + fx, (nsb - nfd) - fx);
@@ -640,7 +676,7 @@ int     cur_line;
 	else {
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("\nwithout anything to save\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    so_write(nfd, (nsb - nfd));
 	    str_cp(ofd, nfd, (nsb - nfd));
 	    /*
@@ -652,7 +688,7 @@ int     cur_line;
     else if (fx < 0) {
 #ifdef DEBUG_UPDATE
 	DEBUGPRINT("\nfirst diff delete at %d...\n", ofd - old);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	/*
 	 * move to the first char to delete where the first diff is
 	 */
@@ -660,22 +696,22 @@ int     cur_line;
 	/*
 	 * Check if we have stuff to save
 	 */
-	if (osb != oe) {	
+	if (osb != oe) {
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("\nwith stuff to save at end\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    /*
 	     * fx is less than zero *always* here but we check for code
 	     * symmetry
 	     */
 	    if (fx < 0) {
 		if (!T_CanDel)
-		    CSHprintf("   ERROR: cannot delete in first diff\n");
-		DeleteChars(-fx);	
-		str_delete(old, ofd - old, TermH, -fx);	
+		    xprintf("   ERROR: cannot delete in first diff\n");
+		DeleteChars(-fx);
+		str_delete(old, ofd - old, TermH, -fx);
 	    }
-	    /* 
-	     * write (nsb-nfd) chars of new starting at nfd 
+	    /*
+	     * write (nsb-nfd) chars of new starting at nfd
 	     */
 	    so_write(nfd, (nsb - nfd));
 	    str_cp(ofd, nfd, (nsb - nfd));
@@ -684,14 +720,14 @@ int     cur_line;
 	else {
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("\nbut with nothing left to save\n", 0);
-#endif /* DEBUG_UPDATE */
-	    /* 
-	     * write (nsb-nfd) chars of new starting at nfd 
+#endif				/* DEBUG_UPDATE */
+	    /*
+	     * write (nsb-nfd) chars of new starting at nfd
 	     */
 	    so_write(nfd, (nsb - nfd));
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("cleareol %d\n", (oe - old) - (ne - new));
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    ClearEOL((oe - old) - (ne - new));
 	    /*
 	     * Done
@@ -702,45 +738,45 @@ int     cur_line;
     else
 	fx = 0;
 
-    if (sx < 0) {		
+    if (sx < 0) {
 #ifdef DEBUG_UPDATE
 	DEBUGPRINT("\nsecond diff delete at %d...\n", (ose - old) + fx);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	/*
 	 * Check if we have stuff to delete
 	 */
-	/* 
-	 * fx is the number of characters inserted (+) or deleted (-) 
+	/*
+	 * fx is the number of characters inserted (+) or deleted (-)
 	 */
 	MoveToChar((ose - old) + fx);
 	if (ols != oe) {
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("\nwith stuff to save at end\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    /*
 	     * Again a duplicate test.
 	     */
 	    if (sx < 0) {
 #ifdef DEBUG_UPDATE
-		if (!T_CanDel) 
-		   CSHprintf("   ERROR: cannot delete in second diff\n");
-#endif /* DEBUG_UPDATE */
+		if (!T_CanDel)
+		    xprintf("   ERROR: cannot delete in second diff\n");
+#endif				/* DEBUG_UPDATE */
 		DeleteChars(-sx);
 	    }
 
-	    /* 
-	     * write (nls-nse) chars of new starting at nse 
+	    /*
+	     * write (nls-nse) chars of new starting at nse
 	     */
 	    so_write(nse, (nls - nse));
 	}
 	else {
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("\nbut with nothing left to save\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    so_write(nse, (nls - nse));
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("cleareol %d\n", (oe - old) - (ne - new));
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    ClearEOL((oe - old) - (ne - new));
 	}
     }
@@ -751,7 +787,7 @@ int     cur_line;
     if ((nsb != nfd) && (osb - ofd) <= (nsb - nfd) && (fx == 0)) {
 #ifdef DEBUG_UPDATE
 	DEBUGPRINT("\nlate first diff insert at %d...\n", nfd - new);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	MoveToChar(nfd - new);
 	/*
 	 * Check if we have stuff to keep at the end
@@ -759,21 +795,21 @@ int     cur_line;
 	if (nsb != ne) {
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("\nwith stuff to keep at end\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    if (fx > 0) {
-		/* 
-		 * insert fx chars of new starting at nfd 
+		/*
+		 * insert fx chars of new starting at nfd
 		 */
 #ifdef DEBUG_UPDATE
 		if (!T_CanIns)
-		    CSHprintf("   ERROR: cannot insert in late first diff\n");
-#endif /* DEBUG_UPDATE */
+		    xprintf("   ERROR: cannot insert in late first diff\n");
+#endif				/* DEBUG_UPDATE */
 		Insert_write(nfd, fx);
 		str_insert(old, ofd - old, TermH, nfd, fx);
 	    }
 
-	    /* 
-	     * write (nsb-nfd) - fx chars of new starting at (nfd + fx) 
+	    /*
+	     * write (nsb-nfd) - fx chars of new starting at (nfd + fx)
 	     */
 	    so_write(nfd + fx, (nsb - nfd) - fx);
 	    str_cp(ofd + fx, nfd + fx, (nsb - nfd) - fx);
@@ -781,7 +817,7 @@ int     cur_line;
 	else {
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("\nwithout anything to save\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    so_write(nfd, (nsb - nfd));
 	    str_cp(ofd, nfd, (nsb - nfd));
 	}
@@ -793,46 +829,43 @@ int     cur_line;
     if ((nls != nse) && has_other_than_spaces(nse, (nls - nse)) && sx >= 0) {
 #ifdef DEBUG_UPDATE
 	DEBUGPRINT("\nsecond diff insert at %d...\n", nse - new);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	MoveToChar(nse - new);
 	if (nls != ne) {
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("\nwith stuff to keep at end\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    if (sx > 0) {
 		/* insert sx chars of new starting at nse */
 #ifdef DEBUG_UPDATE
-		if (!T_CanIns) 
-		   CSHprintf("   ERROR: cannot insert in second diff\n");
-#endif /* DEBUG_UPDATE */
+		if (!T_CanIns)
+		    xprintf("   ERROR: cannot insert in second diff\n");
+#endif				/* DEBUG_UPDATE */
 		Insert_write(nse, sx);
 	    }
 
 	    /*
-	     * write (nls-nse) - sx chars of new starting at (nse + sx) 
+	     * write (nls-nse) - sx chars of new starting at (nse + sx)
 	     */
 	    so_write(nse + sx, (nls - nse) - sx);
 	}
 	else {
 #ifdef DEBUG_UPDATE
 	    DEBUGPRINT("\nwithout anything to save\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 	    so_write(nse, (nls - nse));
 	}
     }
 #ifdef DEBUG_UPDATE
     DEBUGPRINT("\ndone.\n", 0);
-#endif /* DEBUG_UPDATE */
+#endif				/* DEBUG_UPDATE */
 }
 
 void
 RefCursor()
 {				/* only move to new cursor pos */
-    register Char *cp,
-            c;
-    register int h,
-            th,
-            v;
+    register Char *cp, c;
+    register int h, th, v;
 
     if (DoingSearch) {
 	Refresh();
@@ -863,14 +896,14 @@ RefCursor()
 		    h++;
 		}
 	    }
-	    else if (iscntrl(c)) {	/* if control char */
+	    else if (Iscntrl(c)) {	/* if control char */
 		h++;
 		if (h > th) {	/* if overflow, compensate */
 		    h = 1;
 		    v++;
 		}
 	    }
-	    else if (!isprint(c)) {
+	    else if (!Isprint(c)) {
 		h += 3;
 		if (h > th) {	/* if overflow, compensate */
 		    h = h - th;
@@ -899,14 +932,14 @@ RefCursor()
 		    h++;
 		}
 	    }
-	    else if (iscntrl(c)) {	/* if control char */
+	    else if (Iscntrl(c)) {	/* if control char */
 		h++;
 		if (h > th) {	/* if overflow, compensate */
 		    h = 1;
 		    v++;
 		}
 	    }
-	    else if (!isprint(c)) {
+	    else if (!Isprint(c)) {
 		h += 3;
 		if (h > th) {	/* if overflow, compensate */
 		    h = h - th;
@@ -929,7 +962,7 @@ RefCursor()
 
 static void
 PutPlusOne(c)
-Char    c;
+    int    c;
 {
     (void) putraw(c);
     Display[CursorV][CursorH++] = c;
@@ -946,8 +979,7 @@ void
 RefPlusOne()
 {				/* we added just one char, handle it fast *//* a
 				 * ssumes that screen cursor == real cursor */
-    register Char c,
-            mc;
+    register Char c, mc;
 
     c = Cursor[-1] & CHAR;	/* the char we just added */
 
@@ -961,12 +993,12 @@ RefPlusOne()
 	return;
     }
 
-    if (iscntrl(c)) {		/* if control char, do caret */
+    if (Iscntrl(c)) {		/* if control char, do caret */
 	mc = (c == '\177') ? '?' : (c | 0100);
 	PutPlusOne('^');
 	PutPlusOne(mc);
     }
-    else if (isprint(c)) {	/* normal char */
+    else if (Isprint(c)) {	/* normal char */
 	PutPlusOne(c);
     }
     else {

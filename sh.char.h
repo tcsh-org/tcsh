@@ -1,36 +1,49 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.char.h,v 2.1 1991/03/31 13:06:41 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.char.h,v 2.2 1991/04/01 21:38:12 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
  */
-/*
- * Copyright (c) 1989 The Regents of the University of California.
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms are permitted provided
- * that: (1) source distributions retain this entire copyright notice and
- * comment, and (2) distributions including binaries display the following
- * acknowledgement:  ``This product includes software developed by the
- * University of California, Berkeley and its contributors'' in the
- * documentation or other materials provided with the distribution and in
- * all advertising materials mentioning features or use of this software.
- * Neither the name of the University nor the names of its contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
 #ifndef _h_sh_char
 #define _h_sh_char
-/*
- *	@(#)sh.char.h	5.3 (Berkeley) 3/29/86
- */
-
+#include <ctype.h>
 
 extern unsigned short _cmap[];
+
 #ifndef NLS
 extern unsigned char _cmap_lower[], _cmap_upper[];
+
 #endif
 
 #define	_Q	0x0001		/* '" */
@@ -61,19 +74,29 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 #define alnum(c)	(((c) & QUOTE) ? 0 : \
 		         (isalnum((unsigned char) (c)) || (c) == '_'))
 #ifdef NLS
-#    include <ctype.h>
+# define Isspace(c)	(((c) & QUOTE) ? 0 : isspace((unsigned char) (c)))
+# define Isdigit(c)	(((c) & QUOTE) ? 0 : isdigit((unsigned char) (c)))
+# define Isalpha(c)	(((c) & QUOTE) ? 0 : isalpha((unsigned char) (c)))
+# define Islower(c)	(((c) & QUOTE) ? 0 : islower((unsigned char) (c)))
+# define Isupper(c)	(((c) & QUOTE) ? 0 : isupper((unsigned char) (c)))
+# define Tolower(c) 	(((c) & QUOTE) ? 0 : tolower((unsigned char) (c)))
+# define Toupper(c) 	(((c) & QUOTE) ? 0 : toupper((unsigned char) (c)))
+# define Isxdigit(c)	(((c) & QUOTE) ? 0 : isxdigit((unsigned char) (c)))
+# define Isalnum(c)	(((c) & QUOTE) ? 0 : isalnum((unsigned char) (c)))
+# define Iscntrl(c) 	(((c) & QUOTE) ? 0 : iscntrl((unsigned char) (c)))
+# define Isprint(c) 	(((c) & QUOTE) ? 0 : isprint((unsigned char) (c)))
 #else
-#    define isspace(c)	cmap(c, _SP|_NL)
-#    define isdigit(c)	cmap(c, _DIG)
-#    define isalpha(c)	(cmap(c,_LET) && !(((c) & META) && AsciiOnly))
-#    define islower(c)	(cmap(c,_LOW) && !(((c) & META) && AsciiOnly))
-#    define isupper(c)	(cmap(c, _UP) && !(((c) & META) && AsciiOnly))
-#    define tolower(c)  (_cmap_lower[(unsigned char)(c)])
-#    define toupper(c)  (_cmap_upper[(unsigned char)(c)])
-#    define isxdigit(c)	cmap(c, _XD)
-#    define isalnum(c)	(cmap(c, _DIG|_LET) && !(((c) & META) && AsciiOnly))
-#    define iscntrl(c)  (cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
-#    define isprint(c)  (!cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
+# define Isspace(c)	cmap(c, _SP|_NL)
+# define Isdigit(c)	cmap(c, _DIG)
+# define Isalpha(c)	(cmap(c,_LET) && !(((c) & META) && AsciiOnly))
+# define Islower(c)	(cmap(c,_LOW) && !(((c) & META) && AsciiOnly))
+# define Isupper(c)	(cmap(c, _UP) && !(((c) & META) && AsciiOnly))
+# define Tolower(c)	(_cmap_lower[(unsigned char)(c)])
+# define Toupper(c)	(_cmap_upper[(unsigned char)(c)])
+# define Isxdigit(c)	cmap(c, _XD)
+# define Isalnum(c)	(cmap(c, _DIG|_LET) && !(((c) & META) && AsciiOnly))
+# define Iscntrl(c)	(cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
+# define Isprint(c)	(!cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
 #endif
 
 #endif /* _h_sh_char */

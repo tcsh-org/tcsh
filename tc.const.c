@@ -1,8 +1,44 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.const.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/tc.const.c,v 2.1 1991/03/31 13:06:41 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include "config.h"
+#ifndef lint
+static char *rcsid() 
+    { return "$Id$"; }
+#endif
 #include "sh.h"
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
@@ -103,7 +139,6 @@ Char STRmn[]		= { '-', 'n', '\0' };
 Char STRminus[]		= { '-', '\0' };
 Char STRnoglob[]	= { 'n', 'o', 'g', 'l', 'o', 'b', '\0' };
 Char STRnonomatch[]	= { 'n', 'o', 'n', 'o', 'm', 'a', 't', 'c', 'h', '\0' };
-Char STRLRbrace[]	= { '{', '}', '\0' };
 Char STRfakecom1[]	= { '`', ' ', '.', '.', '.', ' ', '`', '\0' };
 Char STRampm[]		= { 'a', 'm', 'p', 'm', '\0' };
 Char STRchild[]		= { 'c', 'h', 'i', 'l', 'd', '\0' };
@@ -149,7 +184,6 @@ Char STRRparen[]	= { ')', '\0' };
 Char STRcolon[]		= { ':', '\0' };
 Char STRmail[]		= { 'm', 'a', 'i', 'l', '\0' };
 Char STRwatch[]		= { 'w', 'a', 't', 'c', 'h', '\0' };
-Char STRsletc[]		= { '/', 'e', 't', 'c', '\0' };
 
 Char STRsldottcshrc[]	= { '/', '.', 't', 'c', 's', 'h', 'r', 'c', '\0' };
 Char STRsldotcshrc[]	= { '/', '.', 'c', 's', 'h', 'r', 'c', '\0' };
@@ -161,6 +195,7 @@ Char STRhelpcommand[]	= { 'h', 'e', 'l', 'p', 'c', 'o', 'm', 'm', 'a', 'n',
 Char STRfignore[]	= { 'f', 'i', 'g', 'n', 'o', 'r', 'e', '\0' };
 Char STRrecexact[]	= { 'r', 'e', 'c', 'e', 'x', 'a', 'c', 't', '\0' };
 Char STRlistmax[]	= { 'l', 'i', 's', 't', 'm', 'a', 'x', '\0' };
+Char STRlistlinks[]	= { 'l', 'i', 's', 't', 'l', 'i', 'n', 'k', 's', '\0' };
 Char STRDING[]		= { 'D', 'I', 'N', 'G', '!', '\0' };
 Char STRQNULL[]		= { '\0' | QUOTE, '\0' };
 Char STRcorrect[]	= { 'c', 'o', 'r', 'r', 'e', 'c', 't', '\0' };
@@ -168,9 +203,14 @@ Char STRcmd[]		= { 'c', 'm', 'd', '\0' };
 Char STRall[]		= { 'a', 'l', 'l', '\0' };
 Char STRautoexpand[]	= { 'a', 'u', 't', 'o', 'e', 'x', 'p', 'a', 'n', 'd',
 			    '\0' };
+Char STRautocorrect[]	= { 'a', 'u', 't', 'o', 'c', 'o', 'r', 'r', 'e', 'c',
+			    't', '\0' };
 Char STRautolist[]	= { 'a', 'u', 't', 'o', 'l', 'i', 's', 't', '\0' };
-Char STRbeepnone[]	= { 'b', 'e', 'e', 'p', 'n', 'o', 'n', 'e', '\0' };
-Char STRbeepnever[]	= { 'b', 'e', 'e', 'p', 'n', 'e', 'v', 'e', 'r', '\0' };
+Char STRmatchbeep[]	= { 'm', 'a', 't', 'c', 'h', 'b', 'e', 'e', 'p', '\0' };
+Char STRnever[]		= { 'n', 'e', 'v', 'e', 'r', '\0' };
+Char STRnomatch[]	= { 'n', 'o', 'm', 'a', 't', 'c', 'h', '\0' };
+Char STRambiguous[]	= { 'a', 'm', 'b', 'i', 'g', 'u', 'o', 'u', 's', '\0' };
+Char STRnotunique[]	= { 'n', 'o', 't', 'u', 'n', 'i', 'q', 'u', 'e', '\0' };
 Char STRret[]		= { '\n', '\0' };
 Char STRnobeep[]	= { 'n', 'o', 'b', 'e', 'e', 'p', '\0' };
 Char STRvisiblebell[]	= { 'v', 'i', 's', 'i', 'b', 'l', 'e', 'b', 'e', 'l', 
@@ -207,3 +247,11 @@ Char STRTERMCAP[] = { 'T', 'E', 'R', 'M', 'C', 'A', 'P', '\0'};
 #ifdef WARP
 Char STRwarp[] = { 'w', 'a', 'r', 'p', '\0' };
 #endif /* WARP */
+
+#ifdef apollo
+Char STRSYSTYPE[] = { 'S', 'Y', 'S', 'T', 'Y', 'P', 'E', '\0' };
+Char STRoid[] = { 'o', 'i', 'd', '\0' };
+Char STRbsd43[] = { 'b', 's', 'd', '4', '.', '3', '\0' };
+Char STRsys53[] = { 's', 'y', 's', '5', '.', '3', '\0' };
+Char STRver[] = { 'v', 'e', 'r', '\0' };
+#endif /* apollo */

@@ -1,31 +1,60 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.20/RCS/sh.nfunc.c,v 1.15 1991/01/30 18:14:03 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include "config.h"
 #ifndef lint
-static char *rcsid = "$Id: sh.nfunc.c,v 1.15 1991/01/30 18:14:03 christos Exp $";
-
+static char *rcsid() 
+    { return "$Id: tc.func.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
 #endif
+
 #include "sh.h"
-#include "sh.proc.h"
-#include "sh.dir.h"
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
-#define MAKE_TWENEX
 #include "tw.h"
-#include "sh.char.h"
 
 extern time_t t_period;
-static bool	precmd_active = 0;
-static bool	periodic_active = 0;
-static bool	cwdcmd_active = 0;	/* PWP: for cwd_cmd */
+static bool precmd_active = 0;
+static bool periodic_active = 0;
+static bool cwdcmd_active = 0;	/* PWP: for cwd_cmd */
 
-static void Reverse();
-static void auto_logout();
-static void insert();
-static void insert_we();
-static int inlist();
+static	void	Reverse		__P((Char *));
+static	void	auto_logout	__P((void));
+static	void	insert		__P((struct wordent *, bool));
+static	void	insert_we	__P((struct wordent *, struct wordent *));
+static	int	inlist		__P((Char *, Char *));
 
 
 /*
@@ -47,16 +76,13 @@ static int inlist();
 
 Char   *
 expand_lex(buf, bufsiz, sp0, from, to)
-Char   *buf;
-int     bufsiz;
-struct wordent *sp0;
-int     from,
-        to;
+    Char   *buf;
+    int     bufsiz;
+    struct wordent *sp0;
+    int     from, to;
 {
     register struct wordent *sp;
-    register Char *s,
-           *d,
-           *e;
+    register Char *s, *d, *e;
     register Char prev_c;
     register int i;
 
@@ -103,8 +129,8 @@ int     from,
 
 Char   *
 sprlex(buf, sp0)
-Char   *buf;
-struct wordent *sp0;
+    Char   *buf;
+    struct wordent *sp0;
 {
     Char   *cp;
 
@@ -115,11 +141,10 @@ struct wordent *sp0;
 
 void
 Itoa(n, s)			/* convert n to characters in s */
-int     n;
-Char   *s;
+    int     n;
+    Char   *s;
 {
-    int     i,
-            sign;
+    int     i, sign;
 
     if ((sign = n) < 0)		/* record sign */
 	n = -n;
@@ -135,11 +160,9 @@ Char   *s;
 
 static void
 Reverse(s)
-Char   *s;
+    Char   *s;
 {
-    int     c,
-            i,
-            j;
+    int     c, i, j;
 
     for (i = 0, j = Strlen(s) - 1; i < j; i++, j--) {
 	c = s[i];
@@ -151,14 +174,13 @@ Char   *s;
 
 void
 dolist(v)
-register Char **v;
+    register Char **v;
 {
-    int     i,
-            k;
+    int     i, k;
     struct stat st;
 
     if (*++v == NULL) {
-	(void) t_search(STRNULL, (Char *) 0, LIST, 0, 0, 0);
+	(void) t_search(STRNULL, NULL, LIST, 0, 0, 0);
 	return;
     }
     gflag = 0;
@@ -166,7 +188,7 @@ register Char **v;
     if (gflag) {
 	v = globall(v);
 	if (v == 0)
-	    stdbferr(ERR_NOMATCH);
+	    stderror(ERR_NAME | ERR_NOMATCH);
     }
     else
 	v = gargv = saveblk(v);
@@ -174,16 +196,14 @@ register Char **v;
     for (k = 0; v[k] != NULL && v[k][0] != '-'; k++);
     if (v[k]) {
 	/*
-	 * We cannot process a flag therefore we let ls doit it right.
+	 * We cannot process a flag therefore we let ls do it right.
 	 */
 	static Char STRls[] =
 	{'l', 's', '\0'};
 	static Char STRmCF[] =
 	{'-', 'C', 'F', '\0'};
 	struct command *t;
-	struct wordent cmd,
-	       *nextword,
-	       *lastword;
+	struct wordent cmd, *nextword, *lastword;
 	Char   *cp;
 
 #ifdef BSDSIGS
@@ -194,21 +214,24 @@ register Char **v;
 #else
 	sighold(SIGINT);
 #endif
-	err = (char *) 0;
+	if (seterr) {
+	    xfree((ptr_t) seterr);
+	    seterr = NULL;
+	}
 	cmd.word = STRNULL;
 	lastword = &cmd;
-	nextword = (struct wordent *) calloc(1, sizeof cmd);
+	nextword = (struct wordent *) xcalloc(1, sizeof cmd);
 	nextword->word = Strsave(STRls);
 	lastword->next = nextword;
 	nextword->prev = lastword;
 	lastword = nextword;
-	nextword = (struct wordent *) calloc(1, sizeof cmd);
+	nextword = (struct wordent *) xcalloc(1, sizeof cmd);
 	nextword->word = Strsave(STRmCF);
 	lastword->next = nextword;
 	nextword->prev = lastword;
 	lastword = nextword;
 	for (cp = *v; cp; cp = *++v) {
-	    nextword = (struct wordent *) calloc(1, sizeof cmd);
+	    nextword = (struct wordent *) xcalloc(1, sizeof cmd);
 	    nextword->word = Strsave(cp);
 	    lastword->next = nextword;
 	    nextword->prev = lastword;
@@ -219,12 +242,12 @@ register Char **v;
 
 	/* build a syntax tree for the command. */
 	t = syntax(cmd.next, &cmd, 0);
-	if (err)
-	    error(err);
+	if (seterr)
+	    stderror(ERR_OLD);
 	/* expand aliases like process() does */
 	/* alias(&cmd); */
 	/* execute the parse tree. */
-	execute(t, tpgrp > 0 ? tpgrp : -1);
+	execute(t, tpgrp > 0 ? tpgrp : -1, NULL, NULL);
 	/* done. free the lex list and parse tree. */
 	freelex(&cmd), freesyn(t);
 	if (setintr)
@@ -235,46 +258,50 @@ register Char **v;
 #endif
     }
     else {
-	Char    tmp[MAXPATHLEN];
-	int     p;
+	Char   *dp, *tmp, buf[MAXPATHLEN];
 
 	for (k = 0, i = 0; v[k] != NULL; k++) {
-	    (void) Strncpy(tmp, v[k], MAXPATHLEN);
-	    tmp[MAXPATHLEN - 1] = '\0';
-	    if (tmp[p = Strlen(tmp) - 1] == '/' && p != 0)
-		tmp[p] = '\0';
-	    else
-		p++;
+	    tmp = dnormalize(v[k]);
+	    dp = &tmp[Strlen(tmp) - 1];
+	    if (*dp == '/' && dp != tmp)
+#ifdef apollo
+		if (dp != &tmp[1])
+#endif
+		*dp = '\0';
 	    if (stat(short2str(tmp), &st) == -1) {
 		if (k != i) {
 		    if (i != 0)
-			CSHputchar('\n');
+			xputchar('\n');
 		    print_by_column(STRNULL, &v[i], k - i, FALSE);
 		}
-		CSHprintf("%s: %s.\n", short2str(tmp), strerror());
+		xprintf("%s: %s.\n", short2str(tmp), strerror(errno));
 		i = k + 1;
 	    }
-	    else if (isdir(st)) {
+	    else if (S_ISDIR(st.st_mode)) {
 		Char   *cp;
 
 		if (k != i) {
 		    if (i != 0)
-			CSHputchar('\n');
+			xputchar('\n');
 		    print_by_column(STRNULL, &v[i], k - i, FALSE);
 		}
 		if (k != 0 && v[1] != NULL)
-		    CSHputchar('\n');
-		CSHprintf("%s:\n", short2str(tmp));
-		for (cp = tmp; *cp; cp++)
-		    *cp |= QUOTE;
-		tmp[p] = '/';
-		(void) t_search(tmp, (Char *) 0, LIST, 0, 0, 0);
+		    xputchar('\n');
+		xprintf("%s:\n", short2str(tmp));
+		for (cp = tmp, dp = buf; *cp; *dp++ = (*cp++ | QUOTE));
+		if (dp[-1] != (Char) ('/' | QUOTE))
+		    *dp++ = '/';
+		else 
+		    dp[-1] &= TRIM;
+		*dp = '\0';
+		(void) t_search(buf, NULL, LIST, 0, 0, 0);
 		i = k + 1;
 	    }
+	    xfree((ptr_t) tmp);
 	}
 	if (k != i) {
 	    if (i != 0)
-		CSHputchar('\n');
+		xputchar('\n');
 	    print_by_column(STRNULL, &v[i], k - i, FALSE);
 	}
     }
@@ -290,7 +317,7 @@ extern bool GotTermCaps;
 
 void
 dotelltc(v)
-register Char **v;
+    register Char **v;
 {
 
     if (!GotTermCaps)
@@ -301,7 +328,7 @@ register Char **v;
 
 void
 doechotc(v)
-register Char **v;
+    register Char **v;
 {
     if (!GotTermCaps)
 	GetTermCaps();
@@ -310,7 +337,7 @@ register Char **v;
 
 void
 dosettc(v)
-Char  **v;
+    Char  **v;
 {
     char    tv[2][BUFSIZ];
 
@@ -333,7 +360,7 @@ Char  **v;
 
 void
 dowhich(v)
-register Char **v;
+    register Char **v;
 {
     struct wordent lex[3];
     struct varent *vp;
@@ -351,9 +378,9 @@ register Char **v;
 
     while (*++v) {
 	if (vp = adrof1(*v, &aliases)) {
-	    CSHprintf("%s: \t aliased to ", short2str(*v));
+	    xprintf("%s: \t aliased to ", short2str(*v));
 	    blkpr(vp->vec);
-	    CSHprintf("\n");
+	    xprintf("\n");
 	}
 	else {
 	    lex[1].word = *v;
@@ -366,16 +393,13 @@ register Char **v;
 /* jbs - fixed hack so it worked :-) 3/28/89 */
 
 struct process *
-find_stopped_editor()
+find_stop_ed()
 {
     register struct process *pp;
-    register char *ep,
-           *vp,
-           *p;
-    int     epl,
-            vpl;
+    register char *ep, *vp, *p;
+    int     epl, vpl;
 
-    if ((ep = getenv("EDINODE_OR")) != NULL) {	/* if we have a value */
+    if ((ep = getenv("EDITOR")) != NULL) {	/* if we have a value */
 	if ((p = strrchr(ep, '/')) != NULL) {	/* if it has a path */
 	    ep = p + 1;		/* then we want only the last part */
 	}
@@ -410,10 +434,12 @@ find_stopped_editor()
 }
 
 void
-fg_a_proc_entry(pp)
-register struct process *pp;
+fg_proc_entry(pp)
+    register struct process *pp;
 {
+#ifdef BSDSIGS
     sigmask_t omask;
+#endif
     jmp_buf osetexit;
     bool    ohaderr;
 
@@ -439,7 +465,7 @@ register struct process *pp;
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
 #else
-    sigrelse(SIGINT);
+    (void) sigrelse(SIGINT);
 #endif
 
 }
@@ -447,12 +473,12 @@ register struct process *pp;
 static void
 auto_logout()
 {
-    CSHprintf("auto-logout\n");
+    xprintf("auto-logout\n");
     /* Don't leave the tty in raw mode */
     if (editing)
 	(void) Cookedmode();
     (void) close(SHIN);
-    set(STRlogout, STRautomatic);
+    set(STRlogout, Strsave(STRautomatic));
     child = 1;
 #ifdef TESLA
     do_logout = 1;
@@ -461,7 +487,9 @@ auto_logout()
 }
 
 sigret_t
-alrmcatch()
+/*ARGSUSED*/
+alrmcatch(snum)
+int snum;
 {
     time_t  cl, nl;
 
@@ -474,7 +502,7 @@ alrmcatch()
 	auto_logout();
     setalarm();
 #ifndef SIGVOID
-    return (0);
+    return (snum);
 #endif
 }
 
@@ -490,7 +518,9 @@ alrmcatch()
 void
 precmd()
 {
+#ifdef BSDSIGS
     sigmask_t omask;
+#endif
 
 #ifdef BSDSIGS
     omask = sigblock(sigmask(SIGINT));
@@ -499,18 +529,18 @@ precmd()
 #endif
     if (precmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRprecmd);
-	CSHprintf("Faulty alias 'precmd' removed.\n");
+	xprintf("Faulty alias 'precmd' removed.\n");
 	goto leave;
     }
     precmd_active = 1;
     if (!whyles && adrof1(STRprecmd, &aliases))
-	aliasrun(1, STRprecmd, (Char *) 0);
-  leave:
+	aliasrun(1, STRprecmd, NULL);
+leave:
     precmd_active = 0;
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
 #else
-    sigrelse(SIGINT);
+    (void) sigrelse(SIGINT);
 #endif
 }
 
@@ -523,7 +553,9 @@ precmd()
 void
 cwd_cmd()
 {
+#ifdef BSDSIGS
     sigmask_t omask;
+#endif
 
 #ifdef BSDSIGS
     omask = sigblock(sigmask(SIGINT));
@@ -532,18 +564,18 @@ cwd_cmd()
 #endif
     if (cwdcmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRcwdcmd);
-	CSHprintf("Faulty alias 'cwdcmd' removed.\n");
+	xprintf("Faulty alias 'cwdcmd' removed.\n");
 	goto leave;
     }
     cwdcmd_active = 1;
     if (!whyles && adrof1(STRcwdcmd, &aliases))
-	aliasrun(1, STRcwdcmd, (Char *) 0);
-  leave:
+	aliasrun(1, STRcwdcmd, NULL);
+leave:
     cwdcmd_active = 0;
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
 #else
-    sigrelse(SIGINT);
+    (void) sigrelse(SIGINT);
 #endif
 }
 
@@ -557,9 +589,10 @@ void
 period_cmd()
 {
     register Char *vp;
-    time_t  t,
-            interval;
+    time_t  t, interval;
+#ifdef BSDSIGS
     sigmask_t omask;
+#endif
 
 #ifdef BSDSIGS
     omask = sigblock(sigmask(SIGINT));
@@ -568,7 +601,7 @@ period_cmd()
 #endif
     if (periodic_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRperiodic);
-	CSHprintf("Faulty alias 'periodic' removed.\n");
+	xprintf("Faulty alias 'periodic' removed.\n");
 	goto leave;
     }
     periodic_active = 1;
@@ -580,15 +613,15 @@ period_cmd()
 	(void) time(&t);
 	if (t - t_period >= interval * 60) {
 	    t_period = t;
-	    aliasrun(1, STRperiodic, (Char *) 0);
+	    aliasrun(1, STRperiodic, NULL);
 	}
     }
-  leave:
+leave:
     periodic_active = 0;
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
 #else
-    sigrelse(SIGINT);
+    (void) sigrelse(SIGINT);
 #endif
 }
 
@@ -599,20 +632,20 @@ period_cmd()
  */
 void
 aliasrun(cnt, s1, s2)
-int     cnt;
-Char   *s1,
-       *s2;
+    int     cnt;
+    Char   *s1, *s2;
 {
-    struct wordent w,
-           *new1,
-           *new2;		/* for holding alias name */
-    struct command *t = (struct command *) 0;
+    struct wordent w, *new1, *new2;	/* for holding alias name */
+    struct command *t = NULL;
     jmp_buf osetexit;
 
     getexit(osetexit);
-    err = (char *) 0;		/* don't repeatedly print err msg. */
+    if (seterr) {
+	xfree((ptr_t) seterr);
+	seterr = NULL;	/* don't repeatedly print err msg. */
+    }
     w.word = STRNULL;
-    new1 = (struct wordent *) calloc(1, sizeof w);
+    new1 = (struct wordent *) xcalloc(1, sizeof w);
     new1->word = Strsave(s1);
     if (cnt == 1) {
 	/* build a lex list with one word. */
@@ -621,7 +654,7 @@ Char   *s1,
     }
     else {
 	/* build a lex list with two words. */
-	new2 = (struct wordent *) calloc(1, sizeof w);
+	new2 = (struct wordent *) xcalloc(1, sizeof w);
 	new2->word = Strsave(s2);
 	w.next = new2->prev = new1;
 	new1->next = w.prev = new2;
@@ -632,14 +665,20 @@ Char   *s1,
     alias(&w);
     /* build a syntax tree for the command. */
     t = syntax(w.next, &w, 0);
-    if (err)
-	error(err);
+    if (seterr)
+	stderror(ERR_OLD);
 
     psavejob();
     /* catch any errors here */
     if (setexit() == 0)
 	/* execute the parse tree. */
-	execute(t, tpgrp);	/* PWP: was (t, -1) */
+	/*
+	 * From: Michael Schroeder <mlschroe@immd4.informatik.uni-erlangen.de>
+	 * was execute(t, tpgrp);
+	 */
+	execute(t, tpgrp > 0 ? tpgrp : -1, NULL, NULL);	
+    /* done. free the lex list and parse tree. */
+    freelex(&w), freesyn(t);
     if (haderr) {
 	haderr = 0;
 	/*
@@ -667,8 +706,6 @@ Char   *s1,
     resexit(osetexit);
     prestjob();
     pendjob();
-    /* done. free the lex list and parse tree. */
-    freelex(&w), freesyn(t);
 }
 
 void
@@ -677,8 +714,7 @@ setalarm()
     struct varent *vp;
     Char   *cp;
     unsigned alrm_time = 0;
-    long    cl, nl,
-            sched_dif;
+    long    cl, nl, sched_dif;
 
     if (vp = adrof(STRautologout)) {
 	if (cp = vp->vec[0])
@@ -697,12 +733,10 @@ setalarm()
 
 void
 rmstar(cp)
-struct wordent *cp;
+    struct wordent *cp;
 {
-    struct wordent *we,
-           *args;
-    register struct wordent *tmp,
-           *del;
+    struct wordent *we, *args;
+    register struct wordent *tmp, *del;
 
 #ifdef RMDEBUG
     static Char STRrmdebug[] =
@@ -712,10 +746,7 @@ struct wordent *cp;
 #endif
     Char   *charac;
     char    c;
-    int     ask = 0,
-            star = 0,
-            doit = 0,
-            silent = 0;
+    int     ask, doit, star = 0, silent = 0;
 
     if (!adrof(STRrmstar))
 	return;
@@ -728,7 +759,7 @@ struct wordent *cp;
     while (we != cp) {
 #ifdef RMDEBUG
 	if (*tag)
-	    CSHprintf("parsing command line\n");
+	    xprintf("parsing command line\n");
 #endif
 	if (!Strcmp(we->word, STRrm)) {
 	    args = we->next;
@@ -745,7 +776,7 @@ struct wordent *cp;
 		    if (!Strcmp(args->word, STRstar))
 			star = 1;
 		if (ask && star) {
-		    CSHprintf("Do you really want to delete all files? [n/y] ");
+		    xprintf("Do you really want to delete all files? [n/y] ");
 		    flush();
 		    (void) read(SHIN, &c, 1);
 		    doit = (c == 'Y' || c == 'y');
@@ -754,7 +785,7 @@ struct wordent *cp;
 		    if (!doit) {
 			/* remove the command instead */
 			if (*tag)
-			    CSHprintf("skipping deletion of files!\n");
+			    xprintf("skipping deletion of files!\n");
 			for (tmp = we;
 			     *tmp->word != '\n' &&
 			     *tmp->word != ';' && tmp != cp;) {
@@ -784,91 +815,13 @@ struct wordent *cp;
     }
 #ifdef RMDEBUG
     if (*tag) {
-	CSHprintf("command line now is:\n");
+	xprintf("command line now is:\n");
 	for (we = cp->next; we != cp; we = we->next)
-	    CSHprintf("%s ", short2str(we->word));
+	    xprintf("%s ", short2str(we->word));
     }
 #endif
     return;
 }
-
-/*
- * if we don't have vfork(), things can still go in the wrong order
- * resulting in the famous 'Stopped (tty output)'. But some systems
- * don't permit the setpgid() call, (these are more recent secure
- * systems such as ibm's aix). Then we'd rather print an error message
- * than hang the shell!
- * I am open to suggestions how to fix that.
- */
-void
-pgetty(wanttty, pgrp)
-int     wanttty,
-        pgrp;
-{
-#ifdef BSDJOBS
-#if defined(BSDSIGS) && defined(POSIXJOBS)
-    sigmask_t omask = 0;
-
-#endif				/* BSDSIGS && POSIXJOBS */
-
-#ifdef JOBDEBUG
-    CSHprintf("wanttty %d\n", wanttty);
-#endif
-
-#ifdef POSIXJOBS
-    /*
-     * christos: I am blocking the tty signals till I've set things
-     * correctly....
-     */
-    if (wanttty > 0)
-#ifdef BSDSIGS
-	omask = sigblock(sigmask(SIGTSTP) | sigmask(SIGTTIN) | sigmask(SIGTTOU));
-#else				/* BSDSIGS */
-    {
-	(void) sighold(SIGTSTP);
-	(void) sighold(SIGTTIN);
-	(void) sighold(SIGTTOU);
-    }
-#endif				/* BSDSIGS */
-
-    if (wanttty >= 0 && tpgrp >= 0)
-	if (setpgid(0, pgrp) == -1) {
-#ifdef IBMAIX
-	    CSHprintf("tcsh: setpgid error.\n");
-	    xexit(0);
-#endif				/* IBMAIX */
-	}
-#endif				/* POSIXJOBS */
-
-    if (wanttty > 0)
-	(void) tcsetpgrp(FSHTTY, pgrp);
-
-#ifndef POSIXJOBS
-    if (wanttty >= 0 && tpgrp >= 0)
-	if (setpgid(0, pgrp) == -1) {
-#ifdef IBMAIX
-	    CSHprintf("tcsh: setpgid error.\n");
-	    xexit(0);
-#endif				/* IBMAIX */
-	}
-#else
-    if (wanttty > 0)
-#ifdef BSDSIGS
-	(void) sigsetmask(omask);
-#else				/* BSDSIGS */
-    {
-	(void) sigrelse(SIGTSTP);
-	(void) sigrelse(SIGTTIN);
-	(void) sigrelse(SIGTTOU);
-    }
-#endif				/* BSDSIGS */
-#endif				/* POSIXJOBS */
-
-    if (tpgrp > 0)
-	tpgrp = 0;		/* gave tty away */
-#endif				/* BSDJOBS */
-}
-
 
 #ifdef BSDJOBS
 /* Check if command is in continue list
@@ -877,14 +830,11 @@ int     wanttty,
 #define CNDEBUG			/* For now */
 void
 continue_jobs(cp)
-struct wordent *cp;
+    struct wordent *cp;
 {
     struct wordent *we;
-    register struct process *pp,
-           *np;
-    Char   *cmd,
-           *continue_list,
-           *continue_args_list;
+    register struct process *pp, *np;
+    Char   *cmd, *continue_list, *continue_args_list;
 
 #ifdef CNDEBUG
     Char   *tag;
@@ -892,8 +842,7 @@ struct wordent *cp;
     {'c', 'n', 'd', 'e', 'b', 'u', 'g', '\0'};
 
 #endif
-    bool    in_cont_list,
-            in_cont_arg_list;
+    bool    in_cont_list, in_cont_arg_list;
 
 
 #ifdef CNDEBUG
@@ -910,7 +859,7 @@ struct wordent *cp;
     while (we != cp) {
 #ifdef CNDEBUG
 	if (*tag)
-	    CSHprintf("parsing command line\n");
+	    xprintf("parsing command line\n");
 #endif
 	cmd = we->word;
 	in_cont_list = inlist(continue_list, cmd);
@@ -918,7 +867,7 @@ struct wordent *cp;
 	if (in_cont_list || in_cont_arg_list) {
 #ifdef CNDEBUG
 	    if (*tag)
-		CSHprintf("in one of the lists\n");
+		xprintf("in one of the lists\n");
 #endif
 	    np = PNULL;
 	    for (pp = proclist.p_next; pp; pp = pp->p_next) {
@@ -941,10 +890,10 @@ struct wordent *cp;
     }
 #ifdef CNDEBUG
     if (*tag) {
-	CSHprintf("command line now is:\n");
+	xprintf("command line now is:\n");
 	for (we = cp->next; we != cp; we = we->next)
-	    CSHprintf("%s ",
-		      short2str(we->word));
+	    xprintf("%s ",
+		    short2str(we->word));
     }
 #endif
     return;
@@ -954,50 +903,46 @@ struct wordent *cp;
    with the aid of insert_we().   */
 static void
 insert(plist, file_args)
-struct wordent *plist;
-bool    file_args;
+    struct wordent *plist;
+    bool    file_args;
 {
-    struct wordent *now,
-           *last;
-    Char   *cmd,
-           *bcmd,
-           *cp1,
-           *cp2;
+    struct wordent *now, *last;
+    Char   *cmd, *bcmd, *cp1, *cp2;
     int     cmd_len;
     Char   *pause = STRunderpause;
     int     p_len = Strlen(pause);
 
     cmd_len = Strlen(plist->word);
-    cmd = (Char *) calloc(1, (size_t) ((cmd_len + 1) * sizeof(Char)));
+    cmd = (Char *) xcalloc(1, (size_t) ((cmd_len + 1) * sizeof(Char)));
     (void) Strcpy(cmd, plist->word);
 /* Do insertions at beginning, first replace command word */
 
     if (file_args) {
 	now = plist;
 	xfree((ptr_t) now->word);
-	now->word = (Char *) calloc(1, (size_t) (5 * sizeof(Char)));
+	now->word = (Char *) xcalloc(1, (size_t) (5 * sizeof(Char)));
 	(void) Strcpy(now->word, STRecho);
 
-	now = (struct wordent *) calloc(1, (size_t) sizeof(struct wordent));
-	now->word = (Char *) calloc(1, (size_t) (6 * sizeof(Char)));
+	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
+	now->word = (Char *) xcalloc(1, (size_t) (6 * sizeof(Char)));
 	(void) Strcpy(now->word, STRbackqpwd);
 	insert_we(now, plist);
 
 	for (last = now; *last->word != '\n' && *last->word != ';';
 	     last = last->next);
 
-	now = (struct wordent *) calloc(1, (size_t) sizeof(struct wordent));
-	now->word = (Char *) calloc(1, (size_t) (2 * sizeof(Char)));
+	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
+	now->word = (Char *) xcalloc(1, (size_t) (2 * sizeof(Char)));
 	(void) Strcpy(now->word, STRgt);
 	insert_we(now, last->prev);
 
-	now = (struct wordent *) calloc(1, (size_t) sizeof(struct wordent));
-	now->word = (Char *) calloc(1, (size_t) (2 * sizeof(Char)));
+	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
+	now->word = (Char *) xcalloc(1, (size_t) (2 * sizeof(Char)));
 	(void) Strcpy(now->word, STRbang);
 	insert_we(now, last->prev);
 
-	now = (struct wordent *) calloc(1, (size_t) sizeof(struct wordent));
-	now->word = (Char *) calloc(1, (size_t) cmd_len + p_len + 4);
+	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
+	now->word = (Char *) xcalloc(1, (size_t) cmd_len + p_len + 4);
 	cp1 = now->word;
 	cp2 = cmd;
 	*cp1++ = '~';
@@ -1009,16 +954,16 @@ bool    file_args;
 	while (*cp1++ = *cp2++);
 	insert_we(now, last->prev);
 
-	now = (struct wordent *) calloc(1, (size_t) sizeof(struct wordent));
-	now->word = (Char *) calloc(1, (size_t) (2 * sizeof(Char)));
+	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
+	now->word = (Char *) xcalloc(1, (size_t) (2 * sizeof(Char)));
 	(void) Strcpy(now->word, STRsemi);
 	insert_we(now, last->prev);
-	bcmd = (Char *) calloc(1, (size_t) ((cmd_len + 2) * sizeof(Char)));
+	bcmd = (Char *) xcalloc(1, (size_t) ((cmd_len + 2) * sizeof(Char)));
 	cp1 = bcmd;
 	cp2 = cmd;
 	*cp1++ = '%';
 	while (*cp1++ = *cp2++);
-	now = (struct wordent *) calloc(1, (size_t) (sizeof(struct wordent)));
+	now = (struct wordent *) xcalloc(1, (size_t) (sizeof(struct wordent)));
 	now->word = bcmd;
 	insert_we(now, last->prev);
     }
@@ -1027,7 +972,7 @@ bool    file_args;
 
 	now = plist;
 	xfree((ptr_t) now->word);
-	now->word = (Char *) calloc(1, (size_t) ((cmd_len + 2) * sizeof(Char)));
+	now->word = (Char *) xcalloc(1, (size_t) ((cmd_len + 2) * sizeof(Char)));
 	cp1 = now->word;
 	cp2 = cmd;
 	*cp1++ = '%';
@@ -1046,8 +991,7 @@ bool    file_args;
 
 static void
 insert_we(new, where)
-struct wordent *new,
-       *where;
+    struct wordent *new, *where;
 {
 
     new->prev = where;
@@ -1058,11 +1002,9 @@ struct wordent *new,
 
 static int
 inlist(list, name)
-Char   *list,
-       *name;
+    Char   *list, *name;
 {
-    register Char *l,
-           *n;
+    register Char *l, *n;
 
     l = list;
     n = name;
@@ -1088,3 +1030,193 @@ Char   *list,
 }
 
 #endif				/* BSDJOBS */
+
+
+/*
+ * Implement a small cache for tilde names. This is used primarily
+ * to expand tilde names to directories, but also
+ * we can find users from their home directories for the tilde
+ * prompt, on machines where yp lookup is slow this can be a big win...
+ * As with any cache this can run out of sync...
+ */
+static struct tildecache {
+    Char   *user;
+    Char   *home;
+    int     hlen;
+}      *tcache = NULL;
+
+#define TILINCR 10
+static int tlength = 0, tsize = TILINCR;
+
+static int
+tildecompare(p1, p2)
+    struct tildecache *p1, *p2;
+{
+    return Strcmp(p1->user, p2->user);
+}
+
+Char   *
+gettilde(us)
+    Char   *us;
+{
+    struct tildecache *bp1, *bp2, *bp;
+    register struct passwd *pp;
+
+    if (tcache == NULL)
+	tcache = (struct tildecache *) xmalloc((size_t) (TILINCR *
+						  sizeof(struct tildecache)));
+    /*
+     * Binary search
+     */
+    for (bp1 = tcache, bp2 = tcache + tlength; bp1 < bp2;) {
+	register int i;
+
+	bp = bp1 + ((bp2 - bp1) >> 1);
+	if ((i = *us - *bp->user) == 0 && (i = Strcmp(us, bp->user)) == 0)
+	    return (bp->home);
+	if (i < 0)
+	    bp2 = bp;
+	else
+	    bp1 = bp + 1;
+    }
+    /*
+     * Not in the cache, try to get it from the passwd file
+     */
+    pp = getpwnam(short2str(us));
+#ifdef YPBUGS
+    fix_yp_bugs();
+#endif
+    if (pp == NULL)
+	return NULL;
+
+    /*
+     * Update the cache
+     */
+    tcache[tlength].user = Strsave(us);
+    us = tcache[tlength].home = Strsave(str2short(pp->pw_dir));
+    tcache[tlength++].hlen = Strlen(us);
+
+    (void) qsort((ptr_t) tcache, (size_t) tlength, sizeof(struct tildecache),
+		 tildecompare);
+
+    if (tlength == tsize) {
+	tsize += TILINCR;
+	tcache = (struct tildecache *) xrealloc((ptr_t) tcache,
+						(size_t) (tsize *
+						  sizeof(struct tildecache)));
+    }
+    return (us);
+}
+
+/*
+ * Return the username if the directory path passed contains a
+ * user's home directory in the tilde cache, otherwise return NULL
+ * hm points to the place where the path became different.
+ * Special case: Our own home directory.
+ */
+Char   *
+getusername(hm)
+    Char  **hm;
+{
+    Char   *h, *p;
+    int     i, j;
+
+    if (((h = value(STRhome)) != NULL) &&
+	(Strncmp(p = *hm, h, j = Strlen(h)) == 0) &&
+	(p[j] == '/' || p[j] == '\0')) {
+	*hm = &p[j];
+	return STRNULL;
+    }
+    for (i = 0; i < tlength; i++)
+	if ((Strncmp(p = *hm, tcache[i].home, j = tcache[i].hlen) == 0) &&
+	    (p[j] == '/' || p[j] == '\0')) {
+	    *hm = &p[j];
+	    return tcache[i].user;
+	}
+    return NULL;
+}
+
+/*
+ * PWP: read a bunch of aliases out of a file QUICKLY.  The format
+ *  is almost the same as the result of saying "alias > FILE", except
+ *  that saying "aliases > FILE" does not expand non-letters to printable
+ *  sequences.
+ */
+void
+doaliases(v)
+    Char  **v;
+{
+    jmp_buf oldexit;
+    Char  **vec, *lp;
+    int     fd;
+    Char    buf[BUFSIZ], line[BUFSIZ];
+    char    tbuf[BUFSIZ + 1], *tmp;
+    extern bool output_raw;	/* PWP: in sh.print.c */
+
+    v++;
+    if (*v == 0) {
+	output_raw = 1;
+	plist(&aliases);
+	output_raw = 0;
+	return;
+    }
+
+    gflag = 0, tglob(v);
+    if (gflag) {
+	v = globall(v);
+	if (v == 0)
+	    stderror(ERR_NAME | ERR_NOMATCH);
+    }
+    else {
+	v = gargv = saveblk(v);
+	trim(v);
+    }
+
+    if ((fd = open(tmp = short2str(*v), O_RDONLY)) < 0)
+	stderror(ERR_NAME | ERR_SYSTEM, tmp, strerror(errno));
+
+    getexit(oldexit);
+    if (setexit() == 0) {
+	for (;;) {
+	    lp = line;
+	    for (;;) {
+		Char   *p = NULL;
+		int     n = 0;
+		if (n <= 0) {
+		    int     i;
+
+		    if ((n = read(fd, tbuf, BUFSIZ)) <= 0)
+			goto eof;
+		    for (i = 0; i < n; i++)
+			buf[i] = tbuf[i];
+		    p = buf;
+		}
+		n--;
+		if ((*lp++ = *p++) == '\n') {
+		    lp[-1] = '\0';
+		    break;
+		}
+	    }
+	    for (lp = line; *lp; lp++) {
+		if (isspc(*lp)) {
+		    *lp++ = '\0';
+		    while (isspc(*lp))
+			lp++;
+		    vec = (Char **) xmalloc((size_t)
+					    (2 * sizeof(Char **)));
+		    vec[0] = Strsave(lp);
+		    vec[1] = NULL;
+		    setq(strip(line), vec, &aliases);
+		    break;
+		}
+	    }
+	}
+    }
+
+eof:
+    (void) close(fd);
+    tw_clear_comm_list();
+    if (gargv)
+	blkfree(gargv), gargv = 0;
+    resexit(oldexit);
+}

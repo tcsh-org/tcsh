@@ -1,37 +1,46 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.init.c,v 2.1 1991/03/31 13:06:41 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
-/*
- * Copyright (c) 1989 The Regents of the University of California.
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms are permitted provided
- * that: (1) source distributions retain this entire copyright notice and
- * comment, and (2) distributions including binaries display the following
- * acknowledgement:  ``This product includes software developed by the
- * University of California, Berkeley and its contributors'' in the
- * documentation or other materials provided with the distribution and in
- * all advertising materials mentioning features or use of this software.
- * Neither the name of the University nor the names of its contributors may
- * be used to endorse or promote products derived from this software without
- * specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
-
 #include "config.h"
-
-#ifdef notdef
-static char *sccsid = "@(#)sh.init.c	5.2 (Berkeley) 6/6/85";
-#endif
 #ifndef lint
-static char *rcsid = "$Id: sh.init.c,v 2.0 1991/03/26 02:59:29 christos Exp $";
+static char *rcsid() 
+    { return "$Id: sh.init.c,v 2.1 1991/03/31 13:06:41 christos Exp $"; }
 #endif 
 
 #include "sh.h"
-#include "sh.local.h"
 
 /*
  * C shell
@@ -40,135 +49,144 @@ static char *rcsid = "$Id: sh.init.c,v 2.0 1991/03/26 02:59:29 christos Exp $";
 #define	INF	1000
 
 struct	biltins bfunc[] = {
-		"@",		dolet,		0,	INF,
-		"alias",	doalias,	0,	INF,
-		"aliases",	doaliases,	0,	1, /* PWP */
-		"alloc",	showall,	0,	1,
-		"bg",		dobg,		0,	INF,
-		"bind",		dobind,		0,	2,
-		"bindkey",	dobindkey,	0,	8,
-		"break",	dobreak,	0,	0,
-		"breaksw",	doswbrk,	0,	0,
+    "@",	dolet,		0,	INF,
+    "alias",	doalias,	0,	INF,
+    "aliases",	doaliases,	0,	1, /* PWP */
+    "alloc",	showall,	0,	1,
+    "bg",	dobg,		0,	INF,
+    "bind",	dobind,		0,	2,
+    "bindkey",	dobindkey,	0,	8,
+    "break",	dobreak,	0,	0,
+    "breaksw",	doswbrk,	0,	0,
 #if defined(IIASA) || defined(KAI)
-		"bye",		goodbye,	0,	0,
+    "bye",	goodbye,	0,	0,
 #endif
-		"case",		dozip,		0,	1,
-		"cd",		dochngd,	0,	INF,
-		"chdir",	dochngd,	0,	INF,
-		"continue",	docontin,	0,	0,
-		"default",	dozip,		0,	0,
-		"dirs",		dodirs,		0,	INF,
-		"echo",		doecho,		0,	INF,
-		"echotc",	doechotc,	0,	INF,
-		"else",		doelse,		0,	INF,
-		"end",		doend,		0,	0,
-		"endif",	dozip,		0,	0,
-		"endsw",	dozip,		0,	0,
-		"eval",		doeval,		0,	INF,
-		"exec",		execash,	1,	INF,
-		"exit",		doexit,		0,	INF,
-		"fg",		dofg,		0,	INF,
-		"foreach",	doforeach,	3,	INF,
+    "case",	dozip,		0,	1,
+    "cd",	dochngd,	0,	INF,
+    "chdir",	dochngd,	0,	INF,
+    "continue",	docontin,	0,	0,
+    "default",	dozip,		0,	0,
+    "dirs",	dodirs,		0,	INF,
+    "echo",	doecho,		0,	INF,
+    "echotc",	doechotc,	0,	INF,
+    "else",	doelse,		0,	INF,
+    "end",	doend,		0,	0,
+    "endif",	dozip,		0,	0,
+    "endsw",	dozip,		0,	0,
+    "eval",	doeval,		0,	INF,
+    "exec",	execash,	1,	INF,
+    "exit",	doexit,		0,	INF,
+    "fg",	dofg,		0,	INF,
+    "foreach",	doforeach,	3,	INF,
 #ifdef TCF
-		"getspath", 	dogetspath,	0,	0,
-		"getxvers", 	dogetxvers,	0,	0,
+    "getspath",	dogetspath,	0,	0,
+    "getxvers", dogetxvers,	0,	0,
 #endif /* TCF */
 #ifdef IIASA
-		"gd",		dopushd,	0,	INF,
+    "gd",	dopushd,	0,	INF,
 #endif
-		"glob",		doglob,		0,	INF,
-		"goto",		dogoto,		1,	1,
+    "glob",	doglob,		0,	INF,
+    "goto",	dogoto,		1,	1,
 #ifdef VFORK
-		"hashstat",	hashstat,	0,	0,
+    "hashstat",	hashstat,	0,	0,
 #endif
-		"history",	dohist,		0,	2,
-		"if",		doif,		1,	INF,
-		"jobs",		dojobs,		0,	1,
-		"kill",		dokill,		1,	INF,
-		"limit",	dolimit,	0,	3,
-		"linedit",	doecho,		0,	INF,
+    "history",	dohist,		0,	2,
+    "if",	doif,		1,	INF,
+#ifdef apollo
+    "inlib",    doinlib,	1,	INF,
+#endif
+    "jobs",	dojobs,		0,	1,
+    "kill",	dokill,		1,	INF,
+    "limit",	dolimit,	0,	3,
+    "linedit",	doecho,		0,	INF,
 #ifndef KAI
-		"log",		dolog,		0,	0,
+    "log",	dolog,		0,	0,
 #endif
-		"login",	dologin,	0,	1,
-		"logout",	dologout,	0,	0,
-		"ls-F",		dolist,		0,	INF,
+    "login",	dologin,	0,	1,
+    "logout",	dologout,	0,	0,
+    "ls-F",	dolist,		0,	INF,
 #ifdef TCF
-		"migrate",	domigrate,	1,	INF,
+    "migrate",	domigrate,	1,	INF,
 #endif /* TCF */
 #ifdef NEWGRP
-		"newgrp",	donewgrp,	1,	1,
+    "newgrp",	donewgrp,	1,	1,
 #endif
-		"nice",		donice,		0,	INF,
-		"nohup",	donohup,	0,	INF,
-		"notify",	donotify,	0,	INF,
-		"onintr",	doonintr,	0,	2,
-		"popd",		dopopd,		0,	INF,
-		"pushd",	dopushd,	0,	INF,
+    "nice",	donice,		0,	INF,
+    "nohup",	donohup,	0,	INF,
+    "notify",	donotify,	0,	INF,
+    "onintr",	doonintr,	0,	2,
+    "popd",	dopopd,		0,	INF,
+    "pushd",	dopushd,	0,	INF,
 #ifdef IIASA
-		"rd",		dopopd,		0,	INF,
+    "rd",	dopopd,		0,	INF,
 #endif
-		"rehash",	dohash,		0,	0,
-		"repeat",	dorepeat,	2,	INF,
-		"sched",	dosched,	0,	INF,
-		"set",		doset,		0,	INF,
-		"setenv",	dosetenv,	0,	2,
+    "rehash",	dohash,		0,	0,
+    "repeat",	dorepeat,	2,	INF,
+#ifdef apollo
+    "rootnode", dorootnode,	1,	1,
+#endif
+    "sched",	dosched,	0,	INF,
+    "set",	doset,		0,	INF,
+    "setenv",	dosetenv,	0,	2,
 #ifdef MACH
-		"setpath",	dosetpath,	0,	INF,
+    "setpath",	dosetpath,	0,	INF,
 #endif	/* MACH */
 #ifdef TCF
-		"setspath",	dosetspath,	1,	INF,
+    "setspath",	dosetspath,	1,	INF,
 #endif /* TCF */
-		"settc",	dosettc,	2,	2,
+    "settc",	dosettc,	2,	2,
 #ifdef TCF
-		"setxvers",	dosetxvers,	0,	1,
+    "setxvers",	dosetxvers,	0,	1,
 #endif /* TCF */
-		"shift",	shift,		0,	1,
-		"source",	dosource,	1,	2,
-		"stop",		dostop,		1,	INF,
-		"suspend",	dosuspend,	0,	0,
-		"switch",	doswitch,	1,	INF,
-		"telltc",	dotelltc,	0,	INF,
-		"time",		dotime,		0,	INF,
-		"umask",	doumask,	0,	1,
-		"unalias",	unalias,	1,	INF,
-		"unhash",	dounhash,	0,	0,
+    "shift",	shift,		0,	1,
+    "source",	dosource,	1,	2,
+    "stop",	dostop,		1,	INF,
+    "suspend",	dosuspend,	0,	0,
+    "switch",	doswitch,	1,	INF,
+    "telltc",	dotelltc,	0,	INF,
+    "time",	dotime,		0,	INF,
+    "umask",	doumask,	0,	1,
+    "unalias",	unalias,	1,	INF,
+    "unhash",	dounhash,	0,	0,
 #ifdef masscomp
-		"universe",	douniverse,	0,	1,
+    "universe",	douniverse,	0,	1,
 #endif
-		"unlimit",	dounlimit,	0,	INF,
-		"unset",	unset,		1,	INF,
-		"unsetenv",	dounsetenv,	1,	INF,
-		"wait",		dowait,		0,	0,
+    "unlimit",	dounlimit,	0,	INF,
+    "unset",	unset,		1,	INF,
+    "unsetenv",	dounsetenv,	1,	INF,
+#ifdef apollo
+    "ver",	dover,		0,	INF,
+#endif
+    "wait",	dowait,		0,	0,
 #ifdef WARP
-		"warp",		dowarp,		0,	2,
+    "warp",	dowarp,		0,	2,
 #endif
 #ifdef KAI
-		"watchlog",	dolog,		0,	0,
+    "watchlog",	dolog,		0,	0,
 #endif
-		"which",	dowhich,	1,	INF,
-		"while",	dowhile,	1,	INF,
+    "which",	dowhich,	1,	INF,
+    "while",	dowhile,	1,	INF,
 };
 int nbfunc = sizeof bfunc / sizeof *bfunc;
 
 struct srch srchn[] = {
-		"@",		T_LET,
-		"break",	T_BREAK,
-		"breaksw",	T_BRKSW,
-		"case",		T_CASE,
-		"default", 	T_DEFAULT,
-		"else",		T_ELSE,
-		"end",		T_END,
-		"endif",	T_ENDIF,
-		"endsw",	T_ENDSW,
-		"exit",		T_EXIT,
-		"foreach", 	T_FOREACH,
-		"goto",		T_GOTO,
-		"if",		T_IF,
-		"label",	T_LABEL,
-		"set",		T_SET,
-		"switch",	T_SWITCH,
-		"while",	T_WHILE,
+    "@",	T_LET,
+    "break",	T_BREAK,
+    "breaksw",	T_BRKSW,
+    "case",	T_CASE,
+    "default", 	T_DEFAULT,
+    "else",	T_ELSE,
+    "end",	T_END,
+    "endif",	T_ENDIF,
+    "endsw",	T_ENDSW,
+    "exit",	T_EXIT,
+    "foreach", 	T_FOREACH,
+    "goto",	T_GOTO,
+    "if",	T_IF,
+    "label",	T_LABEL,
+    "set",	T_SET,
+    "switch",	T_SWITCH,
+    "while",	T_WHILE,
 };
 int nsrchn = sizeof srchn / sizeof *srchn;
 
@@ -200,7 +218,7 @@ struct	mesg mesg[] = {
 /* 14 */	"ALRM",		"Alarm clock",
 /* 15 */	"TERM",		"Terminated",
 
-#if (SVID > 0) || defined(DGUX) || defined(IBMAIX)
+#if (SVID > 0) || defined(DGUX) || defined(IBMAIX) || defined(apollo)
 
 # ifdef _sigextra_
 #  undef  _sigextra_
@@ -210,8 +228,13 @@ struct	mesg mesg[] = {
 /* these are the real svid signals */
 /* 16 */	"USR1",		"User signal 1",
 /* 17 */	"USR2", 	"User signal 2",
+# ifdef apollo
+/* 18 */	"CLD",		"Death of child",
+/* 19 */	"APOLLO",  	"Apollo-specific fault",
+# else
 /* 18 */	"CHLD",		"Child exited",
 /* 19 */	"PWR",  	"Power failure",
+# endif /* apollo */
 #endif /* IBMAIX */
 
 # ifdef OREO
@@ -233,8 +256,8 @@ struct	mesg mesg[] = {
 /* 27 */	"PROF", 	"Profiling time alarm",
 /* 28 */	"WINCH", 	"Window changed",
 /* 29 */	"CONT",		"Continued",
-/* 30 */	0,		"Signal 30",
-/* 31 */	0,		"Signal 31",
+/* 30 */	"URG",		"Urgent condition on IO channel",
+/* 31 */	"IO",		"Asynchronous I/O (select)",
 /* 32 */	0,		"Signal 32",
 # endif /* OREO */
 
@@ -315,6 +338,33 @@ struct	mesg mesg[] = {
 /* 31 */	0,		"Signal 31",
 /* 32 */	0,		"Signal 32",
 # endif /* IRIS4D */
+
+# ifdef apollo
+#  define _sigextra_
+#  ifdef SUSPENDED
+/* 20 */	"STOP",		"Suspended (signal)",
+/* 21 */	"TSTP",		"Suspended",
+#  else /* SUSPENDED */
+/* 20 */	"STOP",		"Stopped (signal)",
+/* 21 */	"TSTP",		"Stopped",
+#  endif /* SUSPENDED */
+/* 22 */	"CONT",		"Continued",
+/* 23 */	"CHLD",		"Child stopped or exited",
+#  ifdef SUSPENDED
+/* 24 */	"TTIN", 	"Suspended (tty input)",
+/* 25 */	"TTOU", 	"Suspended (tty output)",
+#  else /* SUSPENDED */
+/* 24 */	"TTIN", 	"Stopped (tty input)",
+/* 25 */	"TTOU", 	"Stopped (tty output)",
+#  endif /* SUSPENDED */
+/* 26 */	"IO", 		"Asynchronous I/O (select)",
+/* 27 */	"XCPU",		"Cputime limit exceeded",
+/* 28 */	"XFSZ", 	"Filesize limit exceeded",
+/* 29 */	"VTALRM", 	"Virtual time alarm",
+/* 30 */	"PROF", 	"Profiling time alarm",
+/* 31 */	"URG",		"Urgent condition on IO channel",
+/* 32 */	"WINCH", 	"Window changed",
+# endif /* apollo */
 
 # ifdef aiws
 #  define _sigextra_
@@ -560,7 +610,11 @@ struct	mesg mesg[] = {
 
 # ifndef _sigextra_
 /* 28 */	"WINCH",	"Window size changed",
+#  ifdef RENO
+/* 29 */	"INFO",		"Information request",
+#  else
 /* 29 */	0,		"Signal 29",
+#  endif /* RENO */
 /* 30 */	"USR1",		"User defined signal 1",
 /* 31 */	"USR2",		"User defined signal 2",
 /* 32 */	0,		"Signal 32",

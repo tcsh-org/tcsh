@@ -1,31 +1,62 @@
-/* $Header$ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.bind.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include "config.h"
 #ifndef lint
-static char *rcsid = "$Id$";
-
-#endif				/* lint */
+static char *rcsid() 
+    { return "$Id: tc.bind.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
+#endif
 
 #include "sh.h"
-#include "sh.local.h"
 #include "ed.h"
 #include "ed.defns.h"
 
-static int str7cmp();
-static char tocontrol();
-static char * unparsekey();
-static  KEYCMD getkeycmd();
-static int parsekey();
-static void printkey();
-static KEYCMD parsecmd();
-static Char *parsestring();
-static void print_all_keys();
-static void printkeys();
-static void bindkey_usage();
-static void list_functions();
-static void pkeys();
+static	int    str7cmp		__P((char *, char *));
+static	int    tocontrol	__P((int));
+static	char  *unparsekey	__P((int));
+static	KEYCMD getkeycmd	__P((Char **));
+static	int    parsekey		__P((Char **));
+static	void   printkey		__P((KEYCMD *, Char *));
+static	KEYCMD parsecmd		__P((Char *));
+static	Char  *parsestring	__P((Char *, Char *));
+static	void   print_all_keys	__P((void));
+static	void   printkeys	__P((KEYCMD *, int, int));
+static	void   bindkey_usage	__P((void));
+static	void   list_functions	__P((void));
+static	void   pkeys		__P((int, int));
 
 extern int MapsAreInited;
 
@@ -33,8 +64,7 @@ extern int MapsAreInited;
    (due to shell stupidness) */
 static int
 str7cmp(a, b)
-register char *a,
-       *b;
+    register char *a, *b;
 {
     while ((*a & TRIM) == (*b++ & TRIM))
 	if (!*a++)
@@ -42,12 +72,13 @@ register char *a,
     b--;
     return ((*a & TRIM) - (*b & TRIM));
 }
-static char
+static int
 tocontrol(c)
-char    c;
+    int    c;
 {
-    if (islower(c))
-	c = toupper(c);
+    c &= CHAR;
+    if (Islower(c))
+	c = Toupper(c);
     else if (c == ' ')
 	c = '@';
     if (c == '?')
@@ -59,7 +90,7 @@ char    c;
 
 static char *
 unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
-register int c;
+    register int c;
 {
     register char *cp;
     static char tmp[10];
@@ -71,12 +102,12 @@ register int c;
 	*cp++ = '-';
 	c &= 0377;
     }
-    if ((c & META) && !(isprint(c) || iscntrl(c) && isprint(c | 0100))) {
+    if ((c & META) && !(Isprint(c) || Iscntrl(c) && Isprint(c | 0100))) {
 	*cp++ = 'M';
 	*cp++ = '-';
 	c &= ASCII;
     }
-    if (isprint(c)) {
+    if (Isprint(c)) {
 	*cp++ = c;
 	*cp = '\0';
 	return (tmp);
@@ -120,7 +151,7 @@ register int c;
 
 static  KEYCMD
 getkeycmd(sp)
-Char  **sp;
+    Char  **sp;
 {
     register Char *s = *sp;
     register char c;
@@ -134,7 +165,7 @@ Char  **sp;
     while (*s) {
 	if (*s == '^' && s[1]) {
 	    s++;
-	    c = tocontrol((char) *s++);
+	    c = tocontrol(*s++);
 	}
 	else
 	    c = *s++;
@@ -166,22 +197,19 @@ Char  **sp;
 
 static int
 parsekey(sp)
-Char  **sp;			/* Return position of first unparsed character
+    Char  **sp;			/* Return position of first unparsed character
 				 * for return value -2 (xkeynext) */
 {
-    register int c,
-            meta = 0,
-            control = 0,
-            ctrlx = 0;
+    register int c, meta = 0, control = 0, ctrlx = 0;
     Char   *s = *sp;
     KEYCMD  keycmd;
 
-    if (s == (Char *) 0) {
-	CSHprintf("bad key specification -- null string\n");
+    if (s == NULL) {
+	xprintf("bad key specification -- null string\n");
 	return -1;
     }
     if (*s == 0) {
-	CSHprintf("bad key specification -- empty string\n");
+	xprintf("bad key specification -- empty string\n");
 	return -1;
     }
 
@@ -192,7 +220,7 @@ Char  **sp;			/* Return position of first unparsed character
 
     if ((s[0] == 'F' || s[0] == 'f') && s[1] == '-') {
 	if (s[2] == 0) {
-	    CSHprintf("Bad function-key specification.  Null key not allowed\n");
+	    xprintf("Bad function-key specification.  Null key not allowed\n");
 	    return (-1);
 	}
 	*sp = s + 2;
@@ -203,11 +231,11 @@ Char  **sp;			/* Return position of first unparsed character
 	c = 0;
 	for (s += 2; *s; s++) {	/* convert to hex; skip the first 0 */
 	    c *= 16;
-	    if (!isxdigit(*s)) {
-		CSHprintf("bad key specification -- malformed hex number\n");
+	    if (!Isxdigit(*s)) {
+		xprintf("bad key specification -- malformed hex number\n");
 		return -1;	/* error */
 	    }
-	    if (isdigit(*s))
+	    if (Isdigit(*s))
 		c += *s - '0';
 	    else if (*s >= 'a' && *s <= 'f')
 		c += *s - 'a' + 0xA;
@@ -215,21 +243,21 @@ Char  **sp;			/* Return position of first unparsed character
 		c += *s - 'A' + 0xA;
 	}
     }
-    else if (s[0] == '0' && isdigit(s[1])) {	/* if 0n, then assume number */
+    else if (s[0] == '0' && Isdigit(s[1])) {	/* if 0n, then assume number */
 	c = 0;
 	for (s++; *s; s++) {	/* convert to octal; skip the first 0 */
-	    if (!isdigit(*s) || *s == '8' || *s == '9') {
-		CSHprintf("bad key specification -- malformed octal number\n");
+	    if (!Isdigit(*s) || *s == '8' || *s == '9') {
+		xprintf("bad key specification -- malformed octal number\n");
 		return -1;	/* error */
 	    }
 	    c = (c * 8) + *s - '0';
 	}
     }
-    else if (isdigit(s[0]) && isdigit(s[1])) {	/* decimal number */
+    else if (Isdigit(s[0]) && Isdigit(s[1])) {	/* decimal number */
 	c = 0;
 	for (; *s; s++) {	/* convert to octal; skip the first 0 */
-	    if (!isdigit(*s)) {
-		CSHprintf("bad key specification -- malformed decimal number\n");
+	    if (!Isdigit(*s)) {
+		xprintf("bad key specification -- malformed decimal number\n");
 		return -1;	/* error */
 	    }
 	    c = (c * 10) + *s - '0';
@@ -265,7 +293,8 @@ Char  **sp;			/* Return position of first unparsed character
 
 	if (keycmd == F_XKEY) {
 	    if (*s == 0) {
-		CSHprintf("Bad function-key specification.  Null key not allowed\n");
+		xprintf("Bad function-key specification.\n");
+		xprintf("Null key not allowed\n");
 		return (-1);
 	    }
 	    *sp = s;
@@ -293,7 +322,7 @@ Char  **sp;			/* Return position of first unparsed character
 	    else if (!str7cmp(ts, "delete"))
 		c = '\177';
 	    else {
-		CSHprintf("bad key specification -- unknown name \"%s\"\n", s);
+		xprintf("bad key specification -- unknown name \"%s\"\n", s);
 		return -1;	/* error */
 	    }
 	}
@@ -301,7 +330,7 @@ Char  **sp;			/* Return position of first unparsed character
 	    c = *s;		/* just a single char */
 
 	if (control)
-	    c = tocontrol((char) c);
+	    c = tocontrol(c);
 	if (meta)
 	    c |= META;
 	if (ctrlx)
@@ -311,14 +340,12 @@ Char  **sp;			/* Return position of first unparsed character
 }
 
 
-void 
+void
 dobindkey(v)
-Char  **v;
+    Char  **v;
 {
     KEYCMD *map;
-    int     string,
-            no,
-            remove;
+    int     string, no, remove;
     Char   *par;
     Char    p;
     Char    inbuf[200];
@@ -333,7 +360,8 @@ Char  **v;
     map = CcKeyMap;
     string = 0;
     remove = 0;
-    for (no = 1, par = v[no]; par != NULL && (*par++ & CHAR) == '-'; no++, par = v[no]) {
+    for (no = 1, par = v[no]; 
+	 par != NULL && (*par++ & CHAR) == '-'; no++, par = v[no]) {
 	if ((p = (*par & CHAR)) == '-') {
 	    break;
 	}
@@ -420,10 +448,10 @@ Char  **v;
     }
 }
 
-static void 
+static void
 printkey(map, in)
-KEYCMD *map;
-Char   *in;
+    KEYCMD *map;
+    Char   *in;
 {
     unsigned char outbuf[100];
     register struct KeyFuncs *fp;
@@ -432,7 +460,7 @@ Char   *in;
 	(void) unparsestring(in, outbuf);
 	for (fp = FuncNames; fp->name; fp++) {
 	    if (fp->func == map[(unsigned char) *in]) {
-		CSHprintf("%s\t->\t%s\n", outbuf, fp->name);
+		xprintf("%s\t->\t%s\n", outbuf, fp->name);
 	    }
 	}
     }
@@ -441,9 +469,9 @@ Char   *in;
     }
 }
 
-static KEYCMD 
+static  KEYCMD
 parsecmd(str)
-Char   *str;
+    Char   *str;
 {
     register struct KeyFuncs *fp;
 
@@ -452,21 +480,20 @@ Char   *str;
 	    return fp->func;
 	}
     }
-    CSHprintf("Bad command name: %s\n", short2str(str));
+    xprintf("Bad command name: %s\n", short2str(str));
     return 0;
 }
 
 int
 parseescape(ptr)
-Char  **ptr;
+    Char  **ptr;
 {
-    Char   *p,
-            c;
+    Char   *p, c;
 
     p = *ptr;
 
     if ((p[1] & CHAR) == 0) {
-	CSHprintf("Something must follow: %c\\n", *p);
+	xprintf("Something must follow: %c\\n", *p);
 	return 0;
     }
     if ((*p & CHAR) == '\\') {
@@ -505,9 +532,7 @@ Char  **ptr;
 	case '6':
 	case '7':
 	    {
-		register int cnt,
-		        val,
-		        ch;
+		register int cnt, val, ch;
 
 		for (cnt = 0, val = 0; cnt < 3; cnt++) {
 		    ch = *p++ & CHAR;
@@ -518,7 +543,7 @@ Char  **ptr;
 		    val = (val << 3) | (ch - '0');
 		}
 		if ((val & 0xffffff00) != 0) {
-		    CSHprintf("Octal constant does not fit in a char.\n");
+		    xprintf("Octal constant does not fit in a char.\n");
 		    return 0;
 		}
 		c = val;
@@ -542,15 +567,15 @@ Char  **ptr;
 
 static Char *
 parsestring(str, buf)
-Char   *str;
-Char   *buf;
+    Char   *str;
+    Char   *buf;
 {
     Char   *b;
     Char   *p;
 
     b = buf;
     if (*str == 0) {
-	CSHprintf("Null string specification\n");
+	xprintf("Null string specification\n");
 	return 0;
     }
 
@@ -569,8 +594,8 @@ Char   *buf;
 
 unsigned char *
 unparsestring(str, buf)
-Char   *str;
-unsigned char *buf;
+    Char   *str;
+    unsigned char *buf;
 {
     unsigned char *b;
     Char   *p;
@@ -586,7 +611,7 @@ unsigned char *buf;
     }
 
     for (p = str; *p != 0; p++) {
-	if (iscntrl(*p)) {
+	if (Iscntrl(*p)) {
 	    *b++ = '^';
 	    if (*p == '\177')
 		*b++ = '?';
@@ -597,7 +622,7 @@ unsigned char *buf;
 	    *b++ = '\\';
 	    *b++ = *p;
 	}
-	else if (*p == ' ' || (isprint(*p) && !isspace(*p))) {
+	else if (*p == ' ' || (Isprint(*p) && !Isspace(*p))) {
 	    *b++ = *p;
 	}
 	else {
@@ -612,13 +637,12 @@ unsigned char *buf;
     return buf;			/* should check for overflow */
 }
 
-static void 
+static void
 print_all_keys()
 {
-    int     prev,
-            i;
+    int     prev, i;
 
-    CSHprintf("Standard key bindings\n");
+    xprintf("Standard key bindings\n");
     prev = 0;
     for (i = 0; i < 256; i++) {
 	if (CcKeyMap[prev] == CcKeyMap[i])
@@ -628,7 +652,7 @@ print_all_keys()
     }
     printkeys(CcKeyMap, prev, i - 1);
 
-    CSHprintf("Alternative key bindings\n");
+    xprintf("Alternative key bindings\n");
     prev = 0;
     for (i = 0; i < 256; i++) {
 	if (CcAltMap[prev] == CcAltMap[i])
@@ -637,21 +661,18 @@ print_all_keys()
 	prev = i;
     }
     printkeys(CcAltMap, prev, i - 1);
-    CSHprintf("Multi-character bindings\n");
+    xprintf("Multi-character bindings\n");
     (void) PrintXkey(STRNULL);	/* print all Xkey bindings */
 }
 
-static void 
+static void
 printkeys(map, first, last)
-KEYCMD *map;
-int     first,
-        last;
+    KEYCMD *map;
+    int     first, last;
 {
     register struct KeyFuncs *fp;
-    Char    firstbuf[2],
-            lastbuf[2];
-    unsigned char unparsbuf[10],
-            extrabuf[10];
+    Char    firstbuf[2], lastbuf[2];
+    unsigned char unparsbuf[10], extrabuf[10];
 
     firstbuf[0] = first;
     firstbuf[1] = 0;
@@ -659,67 +680,72 @@ int     first,
     lastbuf[1] = 0;
     if (map[first] == F_UNASSIGNED) {
 	if (first == last)
-	    CSHprintf("%-15s->  is undefined\n", unparsestring(firstbuf, unparsbuf));
+	    xprintf("%-15s->  is undefined\n",
+		    unparsestring(firstbuf, unparsbuf));
 	return;
     }
 
     for (fp = FuncNames; fp->name; fp++) {
 	if (fp->func == map[first]) {
 	    if (first == last) {
-		CSHprintf("%-15s->  %s\n", unparsestring(firstbuf, unparsbuf), fp->name);
+		xprintf("%-15s->  %s\n",
+			unparsestring(firstbuf, unparsbuf), fp->name);
 	    }
 	    else {
-		CSHprintf("%-4s to %-7s->  %s\n", unparsestring(firstbuf, unparsbuf),
-			  unparsestring(lastbuf, extrabuf), fp->name);
+		xprintf("%-4s to %-7s->  %s\n",
+			unparsestring(firstbuf, unparsbuf),
+			unparsestring(lastbuf, extrabuf), fp->name);
 	    }
 	    return;
 	}
     }
     if (map == CcKeyMap) {
-	CSHprintf("BUG!!! %s isn't bound to anything.\n", unparsestring(firstbuf, unparsbuf));
-	CSHprintf("CcKeyMap[%d] == %d\n", first, CcKeyMap[first]);
+	xprintf("BUG!!! %s isn't bound to anything.\n",
+		unparsestring(firstbuf, unparsbuf));
+	xprintf("CcKeyMap[%d] == %d\n", first, CcKeyMap[first]);
     }
     else {
-	CSHprintf("BUG!!! %s isn't bound to anything.\n", unparsestring(firstbuf, unparsbuf));
-	CSHprintf("CcAltMap[%d] == %d\n", first, CcAltMap[first]);
+	xprintf("BUG!!! %s isn't bound to anything.\n",
+		unparsestring(firstbuf, unparsbuf));
+	xprintf("CcAltMap[%d] == %d\n", first, CcAltMap[first]);
     }
 }
 
-static void 
+static void
 bindkey_usage()
 {
-    CSHprintf("Usage: bindkey [options] [--] [in-string [out-string | command]]\n");
-    CSHprintf("    -a   bind key in alternative key binding\n");
-    CSHprintf("    -s   bind an out-string instad of a command\n");
-    CSHprintf("    -v   initialized maps to default vi bindings\n");
-    CSHprintf("    -e   initialized maps to default emacs bindings\n");
-    CSHprintf("    -d   initialized maps to default bindings\n");
-    CSHprintf("    -l   list available functions with descriptions\n");
-    CSHprintf("    -r   remove the binding of in-string\n");
-    CSHprintf("\nIn no out-string or command is given, the binding for in-string\n");
-    CSHprintf("is printed or all bindings if in-strings is not given.\n");
+    xprintf(
+	"Usage: bindkey [options] [--] [in-string [out-string | command]]\n");
+    xprintf("    -a   bind key in alternative key binding\n");
+    xprintf("    -s   bind an out-string instad of a command\n");
+    xprintf("    -v   initialized maps to default vi bindings\n");
+    xprintf("    -e   initialized maps to default emacs bindings\n");
+    xprintf("    -d   initialized maps to default bindings\n");
+    xprintf("    -l   list available functions with descriptions\n");
+    xprintf("    -r   remove the binding of in-string\n");
+    xprintf(
+       "\nIn no out-string or command is given, the binding for in-string\n");
+    xprintf("is printed or all bindings if in-strings is not given.\n");
 }
 
-static void 
+static void
 list_functions()
 {
     register struct KeyFuncs *fp;
 
     for (fp = FuncNames; fp->name; fp++) {
-	CSHprintf("%s\n          %s\n", fp->name, fp->description);
+	xprintf("%s\n          %s\n", fp->name, fp->description);
     }
 }
 
 void
 dobind(v)
-register Char **v;
+    register Char **v;
 {
     register int c;
     register struct KeyFuncs *fp;
-    register int i,
-            prev;
-    Char   *p,
-           *l;
+    register int i, prev;
+    Char   *p, *l;
     Char    buf[1000];
 
     /*
@@ -731,19 +757,22 @@ register Char **v;
 	ed_InitMaps();
 
     if (v[1] && v[2] && v[3]) {
-	CSHprintf(
+	xprintf(
 	   "usage: bind [KEY | COMMAND KEY | \"emacs\" | \"vi\" | \"-a\"]\n");
 	return;
     }
 
     if (v[1] && v[2]) {		/* if bind FUNCTION KEY */
 	for (fp = FuncNames; fp->name; fp++) {
-	    if (str7cmp(short2str(v[1]), fp->name) == 0) {	/* if this key */
-		if ((c = parsekey(&v[2])) == -1)
+	    if (str7cmp(short2str(v[1]), fp->name) == 0) {
+		Char   *s = v[2];
+
+		if ((c = parsekey(&s)) == -1)
 		    return;
 		if (c == -2) {	/* extented key */
 		    for (i = 0; i < 256; i++) {
-			if (i != 033 && (CcKeyMap[i] == F_XKEY || CcAltMap[i] == F_XKEY)) {
+			if (i != 033 && (CcKeyMap[i] == F_XKEY ||
+					 CcAltMap[i] == F_XKEY)) {
 			    p = buf;
 			    if (i > 0177) {
 				*p++ = 033;
@@ -752,7 +781,7 @@ register Char **v;
 			    else {
 				*p++ = i;
 			    }
-			    for (l = v[2]; *l != 0; l++) {
+			    for (l = s; *l != 0; l++) {
 				*p++ = *l;
 			    }
 			    *p = 0;
@@ -763,8 +792,8 @@ register Char **v;
 		}
 		if (c & 0400) {
 		    if (VImode) {
-			CcAltMap[c & 0377] = fp->func;	/* bind the vi cmd mode
-							 * key */
+			CcAltMap[c & 0377] = fp->func;	
+			/* bind the vi cmd mode key */
 			if (c & META) {
 			    buf[0] = 033;
 			    buf[1] = c & ASCII;
@@ -792,14 +821,14 @@ register Char **v;
 		return;
 	    }
 	}
-	bferr("I don't know that function");
+	stderror(ERR_NAME | ERR_STRING, "Invalid function");
     }
     else if (v[1]) {
 	char   *cv = short2str(v[1]);
 
 	if (str7cmp(cv, "list") == 0) {
 	    for (fp = FuncNames; fp->name; fp++) {
-		CSHprintf("%s\n", fp->name);
+		xprintf("%s\n", fp->name);
 	    }
 	    return;
 	}
@@ -824,10 +853,12 @@ register Char **v;
 	    ed_InitVIMaps();
 	}
 	else {			/* want to know what this key does */
-	    if ((c = parsekey(&v[1])) == -1)
+	    Char   *s = v[1];
+
+	    if ((c = parsekey(&s)) == -1)
 		return;
 	    if (c == -2) {	/* extended key */
-		(void) PrintXkey(v[1]);
+		(void) PrintXkey(s);
 		return;
 	    }
 	    pkeys(c, c);	/* must be regular key */
@@ -857,8 +888,7 @@ register Char **v;
 
 static void
 pkeys(first, last)
-register int first,
-        last;
+    register int first, last;
 {
     register struct KeyFuncs *fp;
     register KEYCMD *map;
@@ -875,10 +905,10 @@ register int first,
     if (map[first] == F_UNASSIGNED) {
 	if (first == last)
 #ifdef _SEQUENT_
-	    CSHprintf(" %s\t\tis undefined\n",
-		      unparsekey(map == CcAltMap ? first | 0400 : first));
+	    xprintf(" %s\t\tis undefined\n",
+		    unparsekey(map == CcAltMap ? first | 0400 : first));
 #else				/* _SEQUENT_ */
-	    CSHprintf(" %s\t\tis undefined\n", unparsekey(first));
+	    xprintf(" %s\t\tis undefined\n", unparsekey(first));
 #endif				/* _SEQUENT_ */
 	return;
     }
@@ -886,27 +916,27 @@ register int first,
     for (fp = FuncNames; fp->name; fp++) {
 	if (fp->func == map[first]) {
 	    if (first == last) {
-		CSHprintf(" %s\t\t%s\n",
+		xprintf(" %s\t\t%s\n",
 		    unparsekey((first & 0377) | (map == CcAltMap ? 0400 : 0)),
-			  fp->name);
+			fp->name);
 	    }
 	    else {
 		(void) strcpy(buf, unparsekey((first & 0377) |
 					      (map == CcAltMap ? 0400 : 0)));
-		CSHprintf(" %s..%s\t\t%s\n", buf,
+		xprintf(" %s..%s\t\t%s\n", buf,
 		     unparsekey((last & 0377) | (map == CcAltMap ? 0400 : 0)),
-			  fp->name);
+			fp->name);
 	    }
 	    return;
 	}
     }
     if (map == CcKeyMap) {
-	CSHprintf("BUG!!! %s isn't bound to anything.\n", unparsekey(first));
-	CSHprintf("CcKeyMap[%d] == %d\n", first, CcKeyMap[first]);
+	xprintf("BUG!!! %s isn't bound to anything.\n", unparsekey(first));
+	xprintf("CcKeyMap[%d] == %d\n", first, CcKeyMap[first]);
     }
     else {
-	CSHprintf("BUG!!! %s isn't bound to anything.\n",
-		  unparsekey(first & 0400));
-	CSHprintf("CcAltMap[%d] == %d\n", first, CcAltMap[first]);
+	xprintf("BUG!!! %s isn't bound to anything.\n",
+		unparsekey(first & 0400));
+	xprintf("CcAltMap[%d] == %d\n", first, CcAltMap[first]);
     }
 }

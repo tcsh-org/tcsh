@@ -1,13 +1,44 @@
-/* $Header$ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
+ */
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
  *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
 #include "config.h"
 #ifndef lint
-static char *rcsid = "$Id$";
-
-#endif				/* !lint */
+static char *rcsid() 
+    { return "$Id: tc.vers.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
+#endif
 
 #include "sh.h"
 #include "patchlevel.h"
@@ -17,193 +48,266 @@ Char   *
 gethosttype()
 {
     Char *hosttype;
-
+    
 #ifdef vax
-    hosttype = SAVE("vax");
+# define _havehosttype_
+    hosttype = str2short("vax");
 #endif				/* vax */
 
 #ifdef hp9000			/* hp9000 running MORE/bsd */
-#ifdef hp300
-    hosttype = SAVE("hp300");
-#endif
-#ifdef hp800
-    hosttype = SAVE("hp800");
-#endif
+# ifdef hp300
+#  define _havehosttype_
+    hosttype = str2short("hp300");
+# endif
+# ifdef hp800
+#  define _havehosttype_
+    hosttype = str2short("hp800");
+# endif
+# ifndef _havehosttype_
+#  define _havehosttype_
+    hosttype = str2short("hp9000");	
+# endif
 #endif				/* hp9000 */
 
 #ifdef sun
-#ifdef mc68010
-    hosttype = SAVE("sun2");
-#endif				/* mc68010 */
-#ifdef mc68020
-    hosttype = SAVE("sun3");
-#endif				/* mc68020 */
-#ifdef sparc
-    hosttype = SAVE("sun4");
-#endif				/* sparc */
-#ifdef i386
-    hosttype = SAVE("sun386i");
-#endif				/* i386 */
+# ifdef mc68010
+#  define _havehosttype_
+    hosttype = str2short("sun2");
+# endif				/* mc68010 */
+# ifdef mc68020
+#  define _havehosttype_
+    hosttype = str2short("sun3");
+# endif				/* mc68020 */
+# ifdef sparc
+#  define _havehosttype_
+    hosttype = str2short("sun4");
+# endif				/* sparc */
+# ifdef i386
+#  define _havehosttype_
+    hosttype = str2short("sun386i");
+# endif				/* i386 */
+# ifndef _havehosttype_
+#  define _havehosttype_
+    hosttype = str2short("sun");	
+# endif
 #endif				/* sun */
 
 #ifdef pyr			/* pyramid */
-    hosttype = SAVE("pyramid");
+# define _havehosttype_
+    hosttype = str2short("pyramid");
 #endif				/* pyr */
 
 #ifdef ibm032			/* from Jak Kirman
 				 * <jak%cs.brown.edu@RELAY.CS.NET>. */
-    hosttype = SAVE("rt");
+# define _havehosttype_
+    hosttype = str2short("rt");
 #endif				/* ibm032 */
 
 #ifdef aiws			/* not to be confused with the above */
-    hosttype = SAVE("rtpc");
+# define _havehosttype_
+    hosttype = str2short("rtpc");
 #endif				/* aiws */
 
 #ifdef _AIX370
-    hosttype = SAVE("aix370");
+# define _havehosttype_
+    hosttype = str2short("aix370");
 #endif				/* _AIX370 */
 
 #ifdef _IBMR2
-    hosttype = SAVE("rs6000");
+# define _havehosttype_
+    hosttype = str2short("rs6000");
 #endif				/* _IBMR2 */
 
 #ifdef _AIXPS2			/* AIX on a PS/2 */
-    hosttype = SAVE("ps2");
+# define _havehosttype_
+    hosttype = str2short("ps2");
 #endif				/* _AIXPS2 */
 
 #ifdef OREO
-    hosttype = SAVE("mac2");
+# define _havehosttype_
+    hosttype = str2short("mac2");
 #endif				/* OREO */
 
 #ifdef hpux
-#ifdef hp9000s800
-    hosttype = SAVE("hp9000s800");	/* maybe "spectrum" */
-#else				/* hp9000s800 */
-#ifdef hp9000s300
-    hosttype = SAVE("hp9000s300");
-#else				/* hp9000s300 */
-    hosttype = SAVE("hp");
-#endif				/* hp9000s300 */
-#endif				/* hp9000s800 */
-#endif				/* hpux */
+# if defined(__hp9000s700) && !defined(_havehosttype_)
+#  define _havehosttype_
+   hosttype = str2short("hp9000s700");
+# endif /* __hp9000s700 */
+# if defined(hp9000s800) && !defined(_havehosttype_)
+#  define _havehosttype_
+   hosttype = str2short("hp9000s800");	/* maybe "spectrum" */
+# endif /* hp9000s800 */
+# if defined(hp9000s300) && !defined(_havehosttype_)
+#  define _havehosttype_
+   hosttype = str2short("hp9000s300");
+# endif /* hp9000s300 */
+# ifndef _havehosttype_
+#  define _havehosttype_
+   hosttype = str2short("hp");
+# endif /* _havehosttype_ */
+#endif /* hpux */
+
+#ifdef apollo
+# define _havehosttype_
+    hosttype = str2short("apollo");
+#endif
 
 #ifdef u3b20d
-    hosttype = SAVE("att3b20");
+# define _havehosttype_
+    hosttype = str2short("att3b20");
 #endif				/* u3b20d */
 
 #ifdef u3b15
-    hosttype = SAVE("att3b15");
+# define _havehosttype_
+    hosttype = str2short("att3b15");
 #endif				/* u3b15 */
 
 #ifdef u3b5
-    hosttype = SAVE("att3b5");
+# define _havehosttype_
+    hosttype = str2short("att3b5");
 #endif				/* u3b5 */
 
 #ifdef u3b2
-    hosttype = SAVE("att3b2");
+# define _havehosttype_
+    hosttype = str2short("att3b2");
 #endif				/* u3b2 */
 
 #if defined(i386) && SVID > 0
-    hosttype = SAVE("iAPX386");
+# define _havehosttype_
+    hosttype = str2short("iAPX386");
 #endif
 
 #ifdef alliant
-    hosttype = SAVE("alliant");	/* for Alliant FX Series */
+# define _havehosttype_
+    hosttype = str2short("alliant");	/* for Alliant FX Series */
 #endif
 
 #if defined(i386) && defined(MACH)
-    hosttype = SAVE("i386-mach");
+# define _havehosttype_
+    hosttype = str2short("i386-mach");
 #endif
 
 #if defined(sequent) || defined(_SEQUENT_)
-#ifdef i386
-#ifdef sequent
-    hosttype = SAVE("symmetry");/* Sequent Symmetry Dynix/3 */
-#define LOCALSTR	" (Dynix/3)"
-#else
-    hosttype = SAVE("ptx");	/* Sequent Symmetry Dynix/ptx */
-#define LOCALSTR	" (Dynix/ptx)"
-#endif
-#else
-    hosttype = SAVE("balance");	/* for Sequent Balance Series */
-#define LOCALSTR	" (Dynix/3)"
-#endif
+# define _havehosttype_
+# ifdef i386
+#  ifdef sequent
+    hosttype = str2short("symmetry");/* Sequent Symmetry Dynix/3 */
+#   ifndef LOCALSTR
+#    define LOCALSTR	" (Dynix/3)"
+#   endif /* LOCALSTR */
+#  else
+    hosttype = str2short("ptx");	/* Sequent Symmetry Dynix/ptx */
+#   ifndef LOCALSTR
+#    define LOCALSTR	" (Dynix/ptx)"
+#   endif /* LOCALSTR */
+#  endif
+# else
+    hosttype = str2short("balance");	/* for Sequent Balance Series */
+#  ifndef LOCALSTR
+#   define LOCALSTR	" (Dynix/3)"
+#  endif /* LOCALSTR */
+# endif
 #else				/* !sequent */
-#ifdef ns32000
-#ifdef CMUCS			/* hack for Mach (in the true spirit of CMU) */
-    hosttype = SAVE("multimax");
-#else				/* CMUCS */
-    hosttype = SAVE((!access("/Umax.image", F_OK) ? "multimax" : "ns32000"));
-#endif				/* CMUCS */
-#endif				/* ns32000 */
+# ifdef ns32000
+#  ifdef CMUCS			/* hack for Mach (in the true spirit of CMU) */
+    hosttype = str2short("multimax");
+#  else				/* CMUCS */
+    hosttype = str2short((!access("/Umax.image", F_OK) ? "multimax" : "ns32000"));
+#  endif				/* CMUCS */
+# endif				/* ns32000 */
 #endif				/* sequent */
 
 #if defined(convex) || defined(__convex__)
+# define _havehosttype_
     /* From: Brian Allison <uiucdcs!convex!allison@RUTGERS.EDU> */
-    hosttype = SAVE("convex");
+    hosttype = str2short("convex");
 #endif				/* convex */
 
 #ifdef butterfly
+# define _havehosttype_
     /* this will work _until_ the bfly with 88000s comes out */
-    hosttype = SAVE("butterfly");	/* BBN Butterfly 1000 */
+    hosttype = str2short("butterfly");	/* BBN Butterfly 1000 */
 #endif				/* butterfly */
 
 #ifdef NeXT
-    hosttype = SAVE("next");
+# define _havehosttype_
+    hosttype = str2short("next");
 #endif				/* NeXT */
 
 /* From Kazuhiro Honda <honda@mt.cs.keio.ac.jp> */
 #ifdef sony_news
-#ifdef mips			/* Sony NEWS based on a r3000 */
-    hosttype = SAVE("news_mips");
-#else
-    hosttype = SAVE("news");
-#endif
+# define _havehosttype_
+# ifdef mips			/* Sony NEWS based on a r3000 */
+    hosttype = str2short("news_mips");
+# else
+    hosttype = str2short("news");
+# endif
 #endif				/* sony_news */
 
 #ifdef mips
-#ifdef MIPSEL
-#ifdef ultrix
+# define _havehosttype_
+# ifdef MIPSEL
+#  ifdef ultrix
     /* decstation XXXX */
-    hosttype = SAVE("decstation");
-#else
-    hosttype = SAVE("mips");
-#endif				/* ultrix */
-#endif				/* MIPSEL */
-
-#ifdef MIPSEB
-#ifdef sgi			/* sgi iris 4d */
-    hosttype = SAVE("iris4d");
-#else
-#ifdef sony_news
-    hosttype = SAVE("news_mips");
-#else
-    hosttype = SAVE("mips");
-#endif				/* sony_news */
-#endif				/* sgi */
-#endif				/* MIPSEB */
+    hosttype = str2short("decstation");
+#  else
+    hosttype = str2short("mips");
+#  endif				/* ultrix */
+# endif				/* MIPSEL */
+# ifdef MIPSEB
+#  ifdef sgi			/* sgi iris 4d */
+    hosttype = str2short("iris4d");
+#  else
+#   ifdef sony_news
+    hosttype = str2short("news_mips");
+#   else
+    hosttype = str2short("mips");
+#   endif				/* sony_news */
+#  endif				/* sgi */
+# endif				/* MIPSEB */
 #endif				/* mips */
 
 #ifdef m88k
-    hosttype = SAVE("m88k");	/* Motorola 88100 system */
+# define _havehosttype_
+    hosttype = str2short("m88k");	/* Motorola 88100 system */
 #endif
 
 #ifdef masscomp			/* Added, DAS DEC-90. */
-    hosttype = SAVE("masscomp");/* masscomp == concurrent */
+# define _havehosttype_
+    hosttype = str2short("masscomp");/* masscomp == concurrent */
 #endif				/* masscomp */
 
 #ifdef GOULD_NP1
-    hosttype = SAVE("gould_np1");
+# define _havehosttype_
+    hosttype = str2short("gould_np1");
 #endif				/* GOULD_NP1 */
 
 #ifdef SXA
-    hosttype = SAVE("pfa50");
-#ifdef  _BSDX_
-#define LOCALSTR	" (SX/A E60+BSDX)"
-#else
-#define LOCALSTR	" (SX/A E60)"
-#endif
+# define _havehosttype_
+    hosttype = str2short("pfa50");
+# ifdef  _BSDX_
+#  ifndef LOCALSTR
+#   define LOCALSTR	" (SX/A E60+BSDX)"
+#  endif /* LOCALSTR */
+# else
+#  ifndef LOCALSTR
+#   define LOCALSTR	" (SX/A E60)"
+#  endif /* LOCALSTR */
+# endif
 #endif				/* PFU/Fujitsu A-xx computer */
+
+#ifdef titan
+# define _havehosttype_
+    /* Ken Laprade <laprade@trantor.harris-atd.com> */
+    hosttype = str2short("titan");
+#endif /* titan */
+
+#ifndef _havehosttype_
+# define _havehosttype_
+    /* Default to something reasonable */
+    hosttype = str2short("unknown");
+#endif
+#undef _havehosttype_
     return hosttype;
 }				/* end gethosttype */
 
@@ -218,66 +322,71 @@ fix_version()
     char    version[BUFSIZ];
 
 #ifdef SHORT_STRINGS
-#define SSSTR "8b"
+# define SSSTR "8b"
 #else
-#define SSSTR "7b"
+# define SSSTR "7b"
 #endif
 #ifdef NLS
-#define NLSSTR ",nls"
+# define NLSSTR ",nls"
 #else
-#define NLSSTR ""
+# define NLSSTR ""
 #endif
 #ifdef LOGINFIRST
-#define LFSTR ",lf"
+# define LFSTR ",lf"
 #else
-#define LFSTR ""
+# define LFSTR ""
 #endif
 #ifdef DOTLAST
-#define DLSTR ",dl"
+# define DLSTR ",dl"
 #else
-#define DLSTR ""
+# define DLSTR ""
 #endif
 #ifdef VIDEFAULT
-#define VISTR ",vi"
+# define VISTR ",vi"
 #else
-#define VISTR ""
+# define VISTR ""
 #endif
 #ifdef TESLA
-#define DTRSTR ",dtr"
+# define DTRSTR ",dtr"
 #else
-#define DTRSTR ""
+# define DTRSTR ""
 #endif
 #ifdef KAI
-#define BYESTR ",bye"
+# define BYESTR ",bye"
 #else
-#define BYESTR ""
+# define BYESTR ""
 #endif
 #ifdef AUTOLOGOUT
-#define ALSTR ",al"
+# define ALSTR ",al"
 #else
-#define ALSTR ""
+# define ALSTR ""
 #endif
 #ifdef CSHDIRS
-#define DIRSTR ",dir"
+# define DIRSTR ",dir"
 #else
-#define DIRSTR ""
+# define DIRSTR ""
 #endif
 #ifdef KANJI
-#define KANSTR ",kan"
+# define KANSTR ",kan"
 #else
-#define KANSTR ""
+# define KANSTR ""
+#endif
+#ifdef SYSMALLOC
+# define SMSTR	",sm"
+#else
+# define SMSTR  ""
 #endif
 /* if you want your local version to say something */
 #ifndef LOCALSTR
-#define LOCALSTR ""
+# define LOCALSTR ""
 #endif				/* LOCALSTR */
 
-    CSHsprintf(version,
-	       "tcsh %d.%.2d.%.2d (%s) %s options %s%s%s%s%s%s%s%s%s%s%s",
+    xsprintf(version,
+	       "tcsh %d.%.2d.%.2d (%s) %s options %s%s%s%s%s%s%s%s%s%s%s%s",
 	       REV, VERS, PATCHLEVEL, ORIGIN, DATE,
 	       SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR,
-	       BYESTR, ALSTR, DIRSTR, KANSTR, LOCALSTR);
+	       BYESTR, ALSTR, DIRSTR, KANSTR, SMSTR, LOCALSTR);
     set(STRversion, SAVE(version));
-    CSHsprintf(version, "%d.%.2d.%.2d", REV, VERS, PATCHLEVEL);
+    xsprintf(version, "%d.%.2d.%.2d", REV, VERS, PATCHLEVEL);
     set(STRtcsh, SAVE(version));
 }
