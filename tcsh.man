@@ -1,5 +1,5 @@
-.\" $Id: tcsh.man,v 3.6 1991/07/19 18:50:11 christos Exp christos $
-.TH TCSH 1 "17 July 1991" "Cornell"
+\" $Id: tcsh.man,v 3.7 1991/07/24 15:36:18 christos Exp christos $
+.TH TCSH 1 "24 July 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -121,6 +121,9 @@ directory is changed.
 .sp
 .ti -4
 31) Additional/Undocumented Options
+.sp
+.ti -4
+32) Enhanced history/variable modifier expansion
 .RE
 .sp
 For a description of standard C-shell features, see the
@@ -221,7 +224,11 @@ left arrow	backward-char
 .DT
 .fi
 .sp
-Also the vt100 sequences for arrow keys are always bound.
+except where these bindings would alter other single character bindings.
+If this is not desired one can avoid the automatic arrow key binding using
+.I settc 
+to change the arrow key escape sequences to the empty string.
+The ansi/vt100 sequences for arrow keys are always bound.
 .PP
 The following is a list of the default emacs and vi bindings.
 Characters with the 8th bit set are written as M-<character>.
@@ -551,7 +558,55 @@ Some changes to the command keys will be obeyed, however if a command key
 is unset,
 .I tcsh
 will reset it to what it was.  Also, the shell will automatically turn off
-RAW and CBREAK modes, and will turn on the tty driver's output processing.
+RAW and CBREAK (on systems that use 
+.I termio(7) 
+it will turn on ICANON) modes, and will turn on 
+the tty driver's output processing (OPOST).
+.PP
+The list of the tty modes that are always set or cleared by 
+.I tcsh 
+can be examined and modified using the
+.I setty 
+builtin.  The
+.I setty
+display is similar to 
+.I stty(1),
+and varies depending on the system's tty driver. Modes that 
+.I tcsh 
+will always try to set are shown as
+.I "+mode"
+modes that 
+.I tcsh 
+will always try to clear are shown as
+.I "-mode"
+and modes that tcsh will track and allow to be modified are not shown by
+default, or if the 
+.I "-a"
+flag is given, are shown without a leading sign.
+For example if one wants to set the 
+.I echok
+flag and let the 
+.I echoe
+pass unchanged:
+.sp
+.nf
+.RS +.6i
+> setty 
+iflag:-inlcr -igncr +icrnl 
+oflag:+opost +onlcr -onlret 
+cflag:
+lflag:+isig +icanon +echo +echoe -echok -echonl -noflsh 
+      +echoctl -flusho +iexten 
+> setty +echok echoe
+> setty
+iflag:-inlcr -igncr +icrnl 
+oflag:+opost +onlcr -onlret 
+cflag:
+lflag:+isig +icanon +echo +echok -echonl -noflsh +echoctl 
+      -flusho +iexten 
+.RE
+.fi
+.sp
 .PP
 .SH "4. WORD COMPLETION"
 In typing commands,
@@ -1910,16 +1965,31 @@ now supports a special alias,
 .I cwdcmd,
 which if set holds a command that will be executed after changing the
 value of $cwd.  For example, if the user is running on an X window
-system xterm, and has done
+system 
+.I xterm(1),
+and a reparenting window manager that supports title bars such
+as 
+.I twm(1) and has done:
 .sp
 .RS +.6i
-> alias cwdcmd  'echo -n ^[]2 $hostname $cwd ^G'
+> alias cwdcmd  'echo -n "^[]2;${HOST}:$cwd ^G"'
 .RE
 .sp
 then the shell
-will change the title of the running xterm to be the name of the host,
-a colon, and the full current working directory.  Note that if a user
-defines
+will change the title of the running 
+.I xterm(1)
+to be the name of the host,
+a colon, and the full current working directory.  
+A more fancy way to do that is:
+.sp
+.RS +.6i
+> alias cwdcmd 'echo -n "]2;${HOST}:$cwd]1;${HOST}"'
+.RE
+.sp
+This will put the hostname and working directory on the title bar but
+only the hostname in the icon manager menu.
+.pp
+Note that if a user defines
 .I cwdcmd
 to contain a
 .I cd,
@@ -2243,6 +2313,54 @@ can pass that to the shell. (some versions of csh have it) (+*)
 Make the shell accept SIGQUIT, and behave when it is used under a debugger.
 Job control is disabled. (*)
 .sp
+.SH "32. HISTORY AND VARIABLE MODIFIER ENHANCEMENTS"
+.I Tcsh
+accepts more than one variable modifier per variable or history expansion. 
+For example, in 
+.I csh(1)
+the following command expands to:
+.sp
+.nf
+.RS +.6in
+% set a=/usr/local/foo.bar.baz
+% echo $a:t:r:e
+foo.bar.baz:r:e
+.RE
+.fi
+.sp
+but in 
+.I tcsh:
+.sp
+.nf
+.RS +.6in
+> set a=/usr/local/foo.bar.baz
+> echo $a:t:r:e
+bar
+.RE
+.fi
+.sp
+This bug fix changes slightly the input syntax of 
+.I csh,
+causing expressions of the form to have invalid syntax:
+.sp
+.nf
+.RS +.6in
+> set a=/usr/local/foo.bar.baz
+> echo $a:t:$cwd
+Unknown variable modifier.
+.RE
+.fi
+.sp
+Which is the correct behavior, since after the second colon a variable
+modifier is expected and `$' is found.  Expressions like this should be 
+re-written as:
+.sp
+.nf
+.RS +.6in
+> echo ${a:t}:$cwd
+.RE
+.fi
+.sp
 .SH FYI
 This shell uses cbreak mode but takes typed-ahead characters anyway.
 You can still use
@@ -2250,7 +2368,9 @@ You can still use
 to set some of the modes of your terminal (but not bindings).
 .PP
 This shell will restore your tty to a sane mode if it appears to
-return from some command in raw, cbreak, or noecho mode.
+return from some command in raw, cbreak, or noecho mode. This behavior
+can be changed using 
+.I setty.
 .PP
 .SH ENVIRONMENT
 HPATH -- path to look for command documentation
@@ -2486,7 +2606,7 @@ the command to be run every time
 wants to echo the terminal bell. 
 .PP
 .SH "SEE ALSO"
-csh(1), chsh(1), termcap(5)
+xterm(1), twm(1), csh(1), chsh(1), termcap(5), termio(7)
 .SH BUGS
 The screen update for lines longer than the screen width is very poor
 if the terminal cannot move the cursor up (i.e. terminal type "dumb").
@@ -2495,7 +2615,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.00.02 (Cornell) 07/17/91.
+This man page documents tcsh 6.00.02 (Cornell) 07/24/91.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
