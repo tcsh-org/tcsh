@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.54 2004/08/04 17:12:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.55 2004/08/04 17:17:40 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.54 2004/08/04 17:12:28 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.55 2004/08/04 17:17:40 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -457,8 +457,8 @@ static void
 ReBufferDisplay()
 {
     int i;
-    Char  **b;
-    Char  **bufp;
+    eChar **b;
+    eChar **bufp;
 
     b = Display;
     Display = NULL;
@@ -476,14 +476,14 @@ ReBufferDisplay()
     }
     TermH = Val(T_co);
     TermV = (INBUFSIZE * 4) / TermH + 1;
-    b = (Char **) xmalloc((size_t) (sizeof(Char *) * (TermV + 1)));
+    b = (eChar **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
     for (i = 0; i < TermV; i++)
-	b[i] = (Char *) xmalloc((size_t) (sizeof(Char) * (TermH + 1)));
+	b[i] = (eChar *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
     b[TermV] = NULL;
     Display = b;
-    b = (Char **) xmalloc((size_t) (sizeof(Char *) * (TermV + 1)));
+    b = (eChar **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
     for (i = 0; i < TermV; i++)
-	b[i] = (Char *) xmalloc((size_t) (sizeof(Char) * (TermH + 1)));
+	b[i] = (eChar *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
     b[TermV] = NULL;
     Vdisplay = b;
 }
@@ -1092,17 +1092,18 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
     if (del > 0) {
 	while (del > 0) {
 	    if ((T_Margin & MARGIN_AUTO) && Display[CursorV][0] != '\0') {
+		size_t h;
+
+		for (h = TermH - 1; h > 0 && Display[CursorV][h] == CHAR_ERR;
+		     h--)
+		    ;
 		/* move without newline */
-		MoveToChar(TermH - 1);
+		MoveToChar(h);
 #ifdef DSPMBYTE
-		if (Ismbyte2(Display[CursorV][CursorH])) {
-		    MoveToChar(TermH - 2);
-		    so_write(&Display[CursorV][CursorH], 2); /* updates CursorH/V*/
-		} else {
-		    so_write(&Display[CursorV][CursorH], 1); /* updates CursorH/V*/
-		}
+		if (h > 0 && Ismbyte2(Display[CursorV][CursorH]))
+		    MoveToChar(h - 1);
 #else
-		so_write(&Display[CursorV][CursorH], 1); /* updates CursorH/V*/
+		so_write(&Display[CursorV][CursorH], TermH - CursorH); /* updates CursorH/V*/
 #endif
 		del--;
 	    }
@@ -1173,11 +1174,12 @@ mc_again:
 		    && !_enable_mbdisp
 #endif /* DSPMBYTE */
 		) {
-		    if ((CursorH & 0370) != (where & 0370)) {
+		    if ((CursorH & 0370) != (where & ~0x7)
+			&& Display[CursorV][where & ~0x7] != CHAR_ERR) {
 			/* if not within tab stop */
-			for (i = (CursorH & 0370); i < (where & 0370); i += 8)
+			for (i = (CursorH & 0370); i < (where & ~0x7); i += 8)
 			    (void) putraw('\t');	/* then tab over */
-			CursorH = where & 0370;
+			CursorH = where & ~0x7;
 			/* Note: considering that we often want to go to
 			   TermH - 1 for the wrapping, it would be nice to
 			   optimize this case by tabbing to the last column
@@ -1212,7 +1214,7 @@ mc_again:
 
 void
 so_write(cp, n)
-    Char *cp;
+    eChar *cp;
     int n;
 {
     if (n <= 0)
@@ -1227,20 +1229,22 @@ so_write(cp, n)
     }
 
     do {
-	if (*cp & LITERAL) {
-	    Char   *d;
-
+	if (*cp != CHAR_ERR) {
+	    if (*cp & LITERAL) {
+		Char   *d;
+		
 #ifdef DEBUG_LITERAL
-	    xprintf("so: litnum %d, litptr %x\r\n",
-		    (int)(*cp & CHAR), litptr[*cp & CHAR]);
+		xprintf("so: litnum %d, litptr %x\r\n",
+			(int)(*cp & CHAR), litptr[*cp & CHAR]);
 #endif /* DEBUG_LITERAL */
-	    for (d = litptr[*cp++ & CHAR]; *d & LITERAL; d++)
-	        (void) putwraw(*d & CHAR);
-	    (void) putwraw(*d);
-
+		for (d = litptr[*cp & CHAR]; *d & LITERAL; d++)
+		    (void) putwraw(*d & CHAR);
+		(void) putwraw(*d);
+	    }
+	    else
+		(void) putwraw(*cp);
 	}
-	else
-	    (void) putwraw(*cp++);
+	cp++;
 	CursorH++;
     } while (--n);
 
@@ -1250,7 +1254,7 @@ so_write(cp, n)
 	    CursorV++;
 	    if (T_Margin & MARGIN_MAGIC) {
 		/* force the wrap to avoid the "magic" situation */
-		Char c;
+		eChar c;
 		if ((c = Display[CursorV][CursorH]) != '\0') {
 		    so_write(&c, 1);
 #ifdef DSPMBYTE
@@ -1258,10 +1262,13 @@ so_write(cp, n)
 			if (Ismbyte2(c))
 			    so_write(&c, 1);
 #endif
+		    while(Display[CursorV][CursorH] == CHAR_ERR)
+			CursorH++;
 		}
-		else
+		else {
 		    (void) putraw(' ');
-		CursorH = 1;
+		    CursorH = 1;
+		}
 	    }
 	}
 	else			/* no wrap, but cursor stays on screen */
@@ -1312,7 +1319,7 @@ DeleteChars(num)		/* deletes <num> characters */
 
 void
 Insert_write(cp, num)		/* Puts terminal in insert character mode, */
-    Char *cp;
+    eChar *cp;
     int num;		/* or inserts num characters in the line */
 {
     if (num <= 0)

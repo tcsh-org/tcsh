@@ -1,4 +1,4 @@
-/*$Header$*/
+/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.1 2002/09/13 05:27:10 amold Exp $*/
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -88,8 +88,8 @@ TellTC(what)
 ReBufferDisplay()
 {
 	register int i;
-	Char  **b;
-	Char  **bufp;
+	eChar **b;
+	eChar **bufp;
 	int lins,cols;
 
 	nt_getsize(&lins,&cols,&DisplayWindowHSize);
@@ -111,14 +111,14 @@ ReBufferDisplay()
 	TermH = cols;
 
 	TermV = (INBUFSIZE * 4) / TermH + 1;
-	b = (Char **) xmalloc((size_t) (sizeof(Char *) * (TermV + 1)));
+	b = (eChar **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
 	for (i = 0; i < TermV; i++)
-		b[i] = (Char *) xmalloc((size_t) (sizeof(Char) * (TermH + 1)));
+		b[i] = (eChar *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
 	b[TermV] = NULL;
 	Display = b;
-	b = (Char **) xmalloc((size_t) (sizeof(Char *) * (TermV + 1)));
+	b = (eChar **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
 	for (i = 0; i < TermV; i++)
-		b[i] = (Char *) xmalloc((size_t) (sizeof(Char) * (TermH + 1)));
+		b[i] = (eChar *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
 	b[TermV] = NULL;
 	Vdisplay = b;
 }
@@ -326,7 +326,7 @@ MoveToChar(where)		/* move to character position (where) */
 
 	void
 so_write(cp, n)
-	register Char *cp;
+	register eChar *cp;
 	register int n;
 {
 	if (n <= 0)
@@ -391,7 +391,7 @@ DeleteChars(num)		/* deletes <num> characters */
 
 	void
 Insert_write(cp, num)		/* Puts terminal in insert character mode, */
-	register Char *cp;
+	register eChar *cp;
 	register int num;		/* or inserts num characters in the line */
 {
 	if (num <= 0)
@@ -520,11 +520,11 @@ ChangeSize(lins, cols)
 }
 	void
 PutPlusOne(c)
-	int    c;
+	Char  c;
 {
 	extern int OldvcV;
 
-	(void) putraw(c);
+	(void) putwraw(c);
 
 	Display[CursorV][CursorH++] = (Char) c;
 

@@ -266,6 +266,8 @@ AC_SEARCH_LIBS(connect, socket)
 AC_SEARCH_LIBS([iconv], [iconv], [AC_DEFINE([HAVE_ICONV], [1],
 	[Define to 1 if you have the iconv () interface])])
 
+AC_CHECK_FUNCS([utmpname wcwidth])
+
 dnl This is not good enough; we need sockaddr_storage too.
 dnl See whether we can use IPv6 related functions
 dnl AC_DEFUN([IPv6_CHECK_FUNC], [

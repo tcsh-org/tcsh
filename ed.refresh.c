@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.32 2004/08/04 17:12:27 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.33 2004/11/20 18:23:03 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.32 2004/08/04 17:12:27 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.33 2004/11/20 18:23:03 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -45,32 +45,33 @@ Char   *litptr[512];
 static int vcursor_h, vcursor_v;
 static int rprompt_h, rprompt_v;
 
+static	size_t	char_width		__P((Char));
 static	void	Draw 			__P((Char));
-static	void	Vdraw 			__P((int));
+static	void	Vdraw 			__P((Char));
 static	void	RefreshPromptpart	__P((Char *));
-static	void	update_line 		__P((Char *, Char *, int));
-static	void	str_insert		__P((Char *, int, int, Char *, int));
-static	void	str_delete		__P((Char *, int, int, int));
-static	void	str_cp			__P((Char *, Char *, int));
+static	void	update_line 		__P((eChar *, eChar *, int));
+static	void	str_insert		__P((eChar *, int, int, eChar *, int));
+static	void	str_delete		__P((eChar *, int, int, int));
+static	void	str_cp			__P((eChar *, eChar *, int));
 #ifndef WINNT_NATIVE
 static
 #else
 extern
 #endif
 	void    PutPlusOne      __P((Char));
-static	void	cpy_pad_spaces		__P((Char *, Char *, int));
+static	void	cpy_pad_spaces		__P((eChar *, eChar *, int));
 #if defined(DSPMBYTE)
-static	Char 	*update_line_fix_mbyte_point __P((Char *, Char *, int));
+static	eChar 	*update_line_fix_mbyte_point __P((eChar *, eChar *, int));
 #endif
 #if defined(DEBUG_UPDATE) || defined(DEBUG_REFRESH) || defined(DEBUG_LITERAL)
 static	void	dprintf			__P((char *, ...));
 #ifdef DEBUG_UPDATE
-static	void	dprintstr		__P((char *, Char *, Char *));
+static	void	dprintstr		__P((char *, const eChar *, const eChar *));
 
 static void
 dprintstr(str, f, t)
 char *str;
-Char *f, *t;
+const eChar *f, *t;
 {
     dprintf("%s:\"", str);
     while (f < t)
@@ -118,6 +119,23 @@ dprintf(va_list)
     }
 }
 #endif  /* DEBUG_UPDATE || DEBUG_REFRESH || DEBUG_LITERAL */
+
+/* Returns 1 for NUL and nonprinting characters */
+static size_t
+char_width(c)
+     Char c;
+{
+#if defined (WIDE_STRINGS) && defined (HAVE_WCWIDTH)
+    int r;
+
+    r = wcwidth (c);
+    if (r <= 0)
+	r = 1;
+    return r;
+#else
+    return 1;
+#endif
+}
 
 static void
 Draw(c)				/* draw c, expand tabs, ctl chars */
@@ -202,18 +220,26 @@ Draw(c)				/* draw c, expand tabs, ctl chars */
 
 static void
 Vdraw(c)			/* draw char c onto V lines */
-    int c;
+    Char c;
 {
+    size_t width;
 #ifdef DEBUG_REFRESH
 # ifdef SHORT_STRINGS
-    dprintf("Vdrawing %6.6o '%c'\r\n", c, c & ASCII);
+    dprintf("Vdrawing %6.6o '%c'\r\n", (unsigned)c, (int)(c & ASCII));
 # else
-    dprintf("Vdrawing %3.3o '%c'\r\n", c, c);
+    dprintf("Vdrawing %3.3o '%c'\r\n", (unsigned)c, (int)c);
 # endif /* SHORT_STRNGS */
 #endif  /* DEBUG_REFRESH */
 
+    width = char_width(c);
+    /* Hopefully this is what all the terminals do with multi-column characters
+       that "span line breaks". */
+    while (vcursor_h + width > (size_t)TermH)
+	Vdraw(' ');
     Vdisplay[vcursor_v][vcursor_h] = (Char) c;
     vcursor_h++;		/* advance to next place */
+    while (--width != 0)
+	Vdisplay[vcursor_v][vcursor_h++] = CHAR_ERR;
     if (vcursor_h >= TermH) {
 	Vdisplay[vcursor_v][TermH] = '\0';	/* assure end of line */
 	vcursor_h = 0;		/* reset it. */
@@ -256,7 +282,7 @@ RefreshPromptpart(buf)
 	    while (*cp & LITERAL)
 		cp++;
 	    if (*cp)
-		Vdraw((int) (litnum++ | LITERAL));
+		Vdraw((Char) (litnum++ | LITERAL));
 	    else {
 		/*
 		 * XXX: This is a bug, we lose the last literal, if it is not
@@ -341,7 +367,7 @@ Refresh()
 		    break;
 	    if (cp + i < LastChar && litnum < sizeof(litptr)/sizeof(*litptr)) {
 		litptr[litnum] = litstart;
-		Vdraw((int) (litnum++ | LITERAL));
+		Vdraw((Char) (litnum++ | LITERAL));
 	    }
 	    cp += i;
 	} else {
@@ -373,7 +399,8 @@ Refresh()
     new_vcv = vcursor_v;	/* must be done BEFORE the NUL is written */
     Vdraw('\0');		/* put NUL on end */
 
-#ifdef DEBUG_REFRESH
+#if 0 && defined (DEBUG_REFRESH)
+    /* Doesn't work because Vdisplay is eChar **, not Char ** */
     dprintf("TermH=%d, vcur_h=%d, vcur_v=%d, Vdisplay[0]=\r\n:%80.80s:\r\n",
 	    TermH, vcursor_h, vcursor_v, short2str(Vdisplay[0]));
 #endif /* DEBUG_REFRESH */
@@ -395,10 +422,6 @@ Refresh()
 	 * screen line, it won't be a NUL or some old leftover stuff.
 	 */
 	cpy_pad_spaces(Display[cur_line], Vdisplay[cur_line], TermH);
-#ifdef notdef
-	(void) Strncpy(Display[cur_line], Vdisplay[cur_line], (size_t) TermH);
-	Display[cur_line][TermH] = '\0';	/* just in case */
-#endif
     }
 #ifdef DEBUG_REFRESH
     dprintf("\r\nvcursor_v = %d, OldvcV = %d, cur_line = %d\r\n",
@@ -406,7 +429,7 @@ Refresh()
 #endif /* DEBUG_REFRESH */
     if (OldvcV > new_vcv) {
 	for (; cur_line <= OldvcV; cur_line++) {
-	    update_line(Display[cur_line], STRNULL, cur_line);
+	    update_line(Display[cur_line], eSTRNULL, cur_line);
 	    *Display[cur_line] = '\0';
 	}
     }
@@ -448,12 +471,12 @@ PastBottom()
    maximum length of d is dlen */
 static void
 str_insert(d, dat, dlen, s, num)
-    Char *d;
+    eChar *d;
     int dat, dlen;
-    Char *s;
+    eChar *s;
     int num;
 {
-    Char *a, *b;
+    eChar *a, *b;
 
     if (num <= 0)
 	return;
@@ -494,10 +517,10 @@ str_insert(d, dat, dlen, s, num)
 /* delete num characters d at dat, maximum length of d is dlen */
 static void
 str_delete(d, dat, dlen, num)
-    Char *d;
+    eChar *d;
     int dat, dlen, num;
 {
-    Char *a, *b;
+    eChar *a, *b;
 
     if (num <= 0)
 	return;
@@ -527,7 +550,7 @@ str_delete(d, dat, dlen, num)
 
 static void
 str_cp(a, b, n)
-    Char *a, *b;
+    eChar *a, *b;
     int n;
 {
     while (n-- && *b)
@@ -536,9 +559,9 @@ str_cp(a, b, n)
 
 
 #if defined(DSPMBYTE) /* BY TAGA Nayuta VERY THANKS */
-static Char *
+static eChar *
 update_line_fix_mbyte_point(start, target, d)
-     Char *start, *target;
+     eChar *start, *target;
      int d;
 {
     if (_enable_mbdisp) {
@@ -582,16 +605,16 @@ new:	eddie> Oh, my little buggy says to me, as lurgid as
 
 static void			/* could be changed to make it smarter */
 update_line(old, new, cur_line)
-    Char *old, *new;
+    eChar *old, *new;
     int     cur_line;
 {
-    Char *o, *n, *p, c;
-    Char   *ofd, *ols, *oe, *nfd, *nls, *ne;
-    Char   *osb, *ose, *nsb, *nse;
+    eChar *o, *n, *p, c;
+    eChar  *ofd, *ols, *oe, *nfd, *nls, *ne;
+    eChar  *osb, *ose, *nsb, *nse;
     int     fx, sx;
 
     /*
-     * find first diff
+     * find first diff (won't be CHAR_ERR in either line)
      */
     for (o = old, n = new; *o && (*o == *n); o++, n++)
 	continue;
@@ -643,6 +666,10 @@ update_line(old, new, cur_line)
     while ((o > ofd) && (n > nfd) && (*--o == *--n))
 	continue;
     if (*o != *n) {
+	o++;
+	n++;
+    }
+    while (*o == CHAR_ERR) {
 	o++;
 	n++;
     }
@@ -1125,7 +1152,7 @@ update_line(old, new, cur_line)
 
 static void
 cpy_pad_spaces(dst, src, width)
-    Char *dst, *src;
+    eChar *dst, *src;
     int width;
 {
     int i;
@@ -1155,10 +1182,17 @@ RefCursor()
     th = TermH;			/* optimize for speed */
 
     for (cp = PromptBuf; *cp; cp++) {	/* do prompt */
+	size_t width;
+	
 	if (*cp & LITERAL)
 	    continue;
 	c = *cp & CHAR;		/* extra speed plus strip the inverse */
-	h++;			/* all chars at least this long */
+	width = char_width (c);
+	if (h + width > (size_t)TermH) {
+	    h = 0;
+	    v++;
+	}
+	h += width;
 
 	/* from wolman%crltrx.DEC@decwrl.dec.com (Alec Wolman) */
 	/* lets handle newline as part of the prompt */
@@ -1196,10 +1230,17 @@ RefCursor()
     }
 
     for (cp = InputBuf; cp < Cursor; cp++) {	/* do input buffer to Cursor */
+	size_t width;
+
 	if (*cp & LITERAL)
 	    continue;
 	c = *cp & CHAR;		/* extra speed plus strip the inverse */
-	h++;			/* all chars at least this long */
+	width = char_width (c);
+	if (h + width > (size_t)TermH) {
+	    h = 0;
+	    v++;
+	}
+	h += width;
 
 	if (c == '\n') {	/* handle newline in data part too */
 	    h = 0;
@@ -1258,8 +1299,15 @@ static void
 PutPlusOne(c)
     Char   c;
 {
+    size_t width;
+
+    width = char_width(c);
+    while (CursorH + width > (size_t)TermH)
+	PutPlusOne(' ');
     (void) putwraw(c);
     Display[CursorV][CursorH++] = (Char) c;
+    while (--width != 0)
+	Display[CursorV][CursorH++] = CHAR_ERR;
     if (CursorH >= TermH) {	/* if we must overflow */
 	CursorH = 0;
 	CursorV++;

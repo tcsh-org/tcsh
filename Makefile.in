@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.20 2003/03/12 19:14:50 christos Exp $
+# $Id: Makefile.in,v 3.21 2004/08/04 17:12:26 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -431,8 +431,9 @@ tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
 	@echo '#ifndef _h_tc_const' >> $@
 	@echo '#define _h_tc_const' >> $@
 	${CPP} $(CPPFLAGS) ${DFLAGS} ${EXTRAFLAGS} -D_h_tc_const\
-	    $(srcdir)/tc.const.c | grep 'Char STR' | \
-	    sed -e 's/Char \([a-zA-Z0-9_]*\) *\[ *\].*/extern Char \1[];/' | \
+	    $(srcdir)/tc.const.c | \
+	    sed -n -e 's/^\(Char STR[a-zA-Z0-9_]*\) *\[ *\].*/extern \1[];/p' \
+		-e 's/^\(eChar eSTR[a-zA-Z0-9_]*\) *\[ *\].*/extern \1[];/p' | \
 	    sort >> $@
 	@echo '#endif /* _h_tc_const */' >> $@
 

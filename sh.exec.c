@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.60 2004/08/04 17:12:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.61 2004/11/20 18:25:26 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.60 2004/08/04 17:12:29 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.61 2004/11/20 18:25:26 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -444,7 +444,8 @@ texec(sf, st)
 	    setmode(fd, O_TEXT);
 #endif
 	    if ((nread = read(fd, (char *) pref, 2)) == 2) {
-		if (!isprint(pref[0]) && (pref[0] != '\n' && pref[0] != '\t')) {
+		if (!isprint((unsigned char)pref[0]) &&
+		    (pref[0] != '\n' && pref[0] != '\t')) {
 		    (void) close(fd);
 		    /*
 		     * We *know* what ENOEXEC means.

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.111 2004/08/04 17:12:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.112 2004/08/04 17:24:23 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.111 2004/08/04 17:12:31 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.112 2004/08/04 17:24:23 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -577,9 +577,9 @@ find_stop_ed()
     else 
 	vp = "vi";
 
-    for (vpl = 0; vp[vpl] && !isspace(vp[vpl]); vpl++)
+    for (vpl = 0; vp[vpl] && !isspace((unsigned char)vp[vpl]); vpl++)
 	continue;
-    for (epl = 0; ep[epl] && !isspace(ep[epl]); epl++)
+    for (epl = 0; ep[epl] && !isspace((unsigned char)ep[epl]); epl++)
 	continue;
 
     if (pcurrent == NULL)	/* see if we have any jobs */

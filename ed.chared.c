@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.75 2004/11/20 18:23:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.76 2004/11/20 20:30:46 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.75 2004/11/20 18:23:02 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.76 2004/11/20 20:30:46 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2677,7 +2677,7 @@ e_delnext_eof(c)
 	if (!VImode) {
 	    if (Cursor == InputBuf) {	
 		/* if I'm also at the beginning */
-		so_write(STReof, 4);/* then do a EOF */
+		so_write(eSTReof, 4);/* then do a EOF */
 		flush();
 		return(CC_EOF);
 	    }
@@ -2724,7 +2724,7 @@ e_delnext_list_eof(c)
     USE(c);
     if (Cursor == LastChar) {	/* if I'm at the end */
 	if (Cursor == InputBuf) {	/* if I'm also at the beginning */
-	    so_write(STReof, 4);/* then do a EOF */
+	    so_write(eSTReof, 4);/* then do a EOF */
 	    flush();
 	    return(CC_EOF);
 	}
@@ -2751,7 +2751,7 @@ e_list_eof(c)
 
     USE(c);
     if (Cursor == LastChar && Cursor == InputBuf) {
-	so_write(STReof, 4);	/* then do a EOF */
+	so_write(eSTReof, 4);	/* then do a EOF */
 	flush();
 	rv = CC_EOF;
     }

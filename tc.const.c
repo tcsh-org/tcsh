@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.const.c,v 3.78 2004/11/20 17:30:15 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.const.c,v 3.79 2004/11/20 17:40:36 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.78 2004/11/20 17:30:15 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.79 2004/11/20 17:40:36 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -412,7 +412,6 @@ Char STRnohup[]		= { 'n', 'o', 'h', 'u', 'p', '\0' };
 Char STRhup[]		= { 'h', 'u', 'p', '\0' };
 Char STRnice[]		= { 'n', 'i', 'c', 'e', '\0' };
 Char STRthen[]		= { 't', 'h', 'e', 'n', '\0' };
-Char STReof[]		= { '^', 'D', '\b', '\b', '\0' };
 Char STRlistjobs[]	= { 'l', 'i', 's', 't', 'j', 'o', 'b', 's', '\0' };
 Char STRlistflags[]	= { 'l', 'i', 's', 't', 'f', 'l', 'a', 'g', 's', '\0' };
 Char STRlong[]		= { 'l', 'o', 'n', 'g', '\0' };
@@ -491,3 +490,6 @@ Char STRcolorcat[]	= { 'c', 'o', 'l', 'o', 'r', 'c', 'a', 't', '\0' };
 Char STRshwspace[]	= { ' ', '\t', '\0' };
 Char STRshwordsep[]	= { ' ', '\t', '&', '|', ';', '<', '>', '(', ')', '\0' };
 Char STRrepeat[]	= { 'r', 'e', 'p', 'e', 'a', 't', '\0' };
+
+eChar eSTRNULL[]	= { '\0' };
+eChar eSTReof[]		= { '^', 'D', '\b', '\b', '\0' };
