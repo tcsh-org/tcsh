@@ -1,5 +1,5 @@
-\" $Id: tcsh.man,v 3.8 1991/07/25 04:50:55 christos Exp $
-.TH TCSH 1 "24 July 1991" "Cornell"
+\" $Id: tcsh.man,v 3.9 1991/08/02 04:29:41 christos Exp christos $
+.TH TCSH 1 "5 August 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -1746,8 +1746,8 @@ The current possible values are:
 \fIamdahl\fR		an Amdahl running uts 2.1
 \fIapollo\fR		an Apollo running DomainOS
 \fIatt3b15\fR		an AT&T 3b15
-\fIatt3b20\fR		an AT&T 3b20
 \fIatt3b2\fR		an AT&T 3b2
+\fIatt3b20\fR		an AT&T 3b20
 \fIatt3b5\fR		an AT&T 3b5
 \fIbalance\fR		a Sequent Balance (32000 based)
 \fIbutterfly\fR		a BBN Computer Butterfly 1000
@@ -1762,18 +1762,21 @@ The current possible values are:
 \fIhp9000s700\fR	an HP 9000, series 700, running hpux
 \fIhp9000s800\fR	an HP 9000, series 800, running hpux
 \fIhp\fR			an HP, running hpux
+\fIi386\fR		an Intel 386, generic
 \fIi386-mach\fR		an Intel 386, running mach
+\fIintel386\fR		an Intel 386, running INTEL's SVR3
 \fIiris3d\fR		a Silicon Graphics Iris 3000
 \fIiris4d\fR		a Silicon Graphics Iris 4D
+\fIisc386\fR		an Intel 386, running ISC
 \fIm88k\fR			an mc88000 CPU machine
 \fImac2\fR			an Apple Computer Macintosh II, running AUX
 \fImasscomp\fR			a Concurrent (Masscomp), running RTU
 \fImips\fR			another mips CPU
 \fImultimax\fR		an Encore Computer Corp. Multimax (32000 based)
-\fInext\fR			a NeXT computer
 \fInews\fR			a Sony NEWS 800 or 1700 workstation
 \fInews_mips\fR		a NeWS machine with mips CPU
 \fIns32000\fR		an NS32000 CPU machine
+\fInext\fR			a NeXT computer
 \fIpfa50\fR			a PFU/Fujitsu A-xx computer
 \fIps2\fR			an IBM PS/2, running aix
 \fIptx\fR			a Sequent Symmetry running DYNIX/ptx (386/486 based)
@@ -1781,13 +1784,15 @@ The current possible values are:
 \fIrs6000\fR		an IBM RS6000, running aix 
 \fIrt\fR			an IBM PC/RT, running BSD (AOS 4.3) or mach
 \fIrtpc\fR			an IBM PC/RT, running aix
-\fIsun2\fR			a Sun Microsystems series 2 workstation (68010 based)
-\fIsun386i\fR		a Sun Microsystems 386i workstation (386 based)
-\fIsun3\fR			a Sun Microsystems series 3 workstation (68020 based)
-\fIsun4\fR			a Sun Microsystems series 4 workstation (SPARC based)
+\fIsco386\fR		an Intel 386, running SCO
 \fIsun\fR			a Sun workstation of none of the above types
+\fIsun2\fR			a Sun Microsystems series 2 workstation (68010 based)
+\fIsun3\fR			a Sun Microsystems series 3 workstation (68020 based)
+\fIsun386i\fR		a Sun Microsystems 386i workstation (386 based)
+\fIsun4\fR			a Sun Microsystems series 4 workstation (SPARC based)
 \fIsymmetry\fR		a Sequent Symmetry running DYNIX 3 (386/486 based)
 \fItitan\fR		an Stardent Titan
+\fIunixpc\fR		an UNIX/PC running SVR1 att7300 aka att3b1
 \fIvax\fR			a Digital Equipment Corp. Vax (of any flavor)
 .DT
 .fi
@@ -2452,6 +2457,14 @@ history line can be toggled between literal and lexical with the
 toggle-literal-history function.
 History lines saved at shell exit are also saved as this variable indicates.
 .TP 10
+.B histfile 
+If set, it contains the full path-name where a history file is read/written.
+It defaults to $home/.history. This is useful when sharing the same home
+directory in different machines, or if one wants to save all the histories
+in the tty sessions. It is usually set in .cshrc for interractive shells,
+because history is sourced between .cshrc and .login so that it is available
+from .login.
+.TP 10
 .B ignore_symlinks 
 don't resolve symbolic links to real names on cd, etc.
 .TP 10
@@ -2621,7 +2634,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.00.02 (Cornell) 07/24/91.
+This man page documents tcsh 6.00.02 (Cornell) 08/05/91.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
