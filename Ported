@@ -596,7 +596,7 @@ LIBES	:	-ltermcap
 OS	:	UTek 4.0 (BSD 4.2)
 CONFIG	:	bsd
 ENVIRON	:	n/a
-NOTES	:	set DFLAGS = -DUTek in the Makefile
+NOTES	:	set DFLAGS = -DUTek -DBSD in the Makefile
 VERSION	:	6.02.07
 
 VENDOR	:	BBN

@@ -1,4 +1,11 @@
 V6.05.00, ... 
+ 89. 6.04.11 04/12/94
+ 88. Don't source .logout when killed with -HUP unless we are a login shell.
+     [ actually $loginsh controls the behavior now ]
+ 87. ISC-4.0 posix exec() bug workaround
+     (from Jonathan Broome <jon@wilbur.uucp>)
+ 86. Dan's patch for complete=enhance
+ 85. Kaveh's patches for memset, host.defs, _{U,G}ID_T
  84. 6.04.10 03/29/94
  83. Pathname completion bug fixes...
  82. Completion pathname(p) changes: Completion 'C' -> 'X'.
@@ -106,7 +113,9 @@ V6.05.00, ...
      problems.
   3. bbn butterfly config
   2. Beto's proc fixes
-  1. Bruces bug fix for ed.chared.c, signals
+  1. Bruce's bug fix for ed.chared.c, signals
+
+
 V6.04.00, 07/03/93
  92. Alpha prototypes, for gcc -Wall clean compile.
  91. Fixed alpha hashing. Did not work for directories > 31, Thanks to
@@ -263,6 +272,7 @@ V6.04.00, 07/03/93
   2. Fix vms/posix ifdefs in tc.alloc.c
   1. Elide gcc-2.3.1 warnings
 
+
 V6.03.00, 11/20/92
 102. Solaris2 patches, renamed sunosX to sosX to fit in 14 character filenames.
 101. 6.02.12 11/12/92
@@ -409,6 +419,7 @@ V6.03.00, 11/20/92
 2.  Collapse adjacent stars in glob.c to avoid exponential behavior.
 1.  Fixed parseescape to put ^ literally if not followed by alpha.
 
+
 V6.02.00, 5/15/92
 94. Default echo_style was not being set correctly.
 93. $< did not work correctly with NLS chars.
@@ -544,6 +555,7 @@ V6.02.00, 5/15/92
 2.  Alliant process group fix.
 1.  Xenix fixes for broken vi and help path with no suffixes.
 
+
 V6.01.00, 12/19/91 [for comp.sources.unix]
 22. Restore the original prompt in automatic correction when the user
     asks to re-edit the command.
@@ -616,6 +628,7 @@ V6.00.04, (never released)
 3.  missing 'break;' in prompt code '%y'.
 2.  infinite loop in :a<mod> code.
 1.  hashstat was not reporting hits+misses
+
 
 V6.00.03, 10/21/91
 31. watch code now accepts shell patterns.

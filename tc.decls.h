@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.decls.h,v 3.26 1993/12/12 19:55:08 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.decls.h,v 3.27 1994/02/10 14:36:00 christos Exp christos $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -162,9 +162,14 @@ extern	void	 	  fix_strcoll_bug	__P((void));
 extern	void	 	  osinit	__P((void));
 
 #ifdef NEEDmemmove
-extern void 		 *xmemmove	__P((ptr_t, const ptr_t, size_t));
+extern ptr_t 		 xmemmove	__P((ptr_t, const ptr_t, size_t));
 # define memmove(a, b, c) xmemmove((a), (b), (c))
 #endif /* NEEDmemmove */
+
+#ifdef NEEDmemset
+extern ptr_t 		 xmemset	__P((ptr_t, int, size_t));
+# define memset(a, b, c) xmemset((a), (b), (c))
+#endif /* NEEDmemset */
 
 
 #ifdef NEEDgetwd

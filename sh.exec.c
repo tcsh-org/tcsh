@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.27 1994/02/04 15:12:06 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.28 1994/03/13 00:46:35 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.27 1994/02/04 15:12:06 christos Exp christos $")
+RCSID("$Id: sh.exec.c,v 3.28 1994/03/13 00:46:35 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -412,7 +412,15 @@ texec(sf, st)
     }
     if (errno == 0)
 #endif /* apollo */
-    (void) execv(f, t);
+    {
+#ifdef ISC_POSIX_EXEC_BUG
+	__setostype(0);		/* "0" is "__OS_SYSV" in <sys/user.h> */
+#endif /* ISC_POSIX_EXEC_BUG */
+	(void) execv(f, t);
+#ifdef ISC_POSIX_EXEC_BUG
+	__setostype(1);		/* "1" is "__OS_POSIX" in <sys/user.h> */
+#endif /* ISC_POSIX_EXEC_BUG */
+    }
 #ifdef VFORK
     Vt = 0;
 #endif /* VFORK */
@@ -487,7 +495,13 @@ texec(sf, st)
 #ifdef VFORK
 	Vt = t;
 #endif /* VFORK */
+#ifdef ISC_POSIX_EXEC_BUG
+	__setostype(0);		/* "0" is "__OS_SYSV" in <sys/user.h> */
+#endif /* ISC_POSIX_EXEC_BUG */
 	(void) execv(f, t);
+#ifdef ISC_POSIX_EXEC_BUG
+	__setostype(1);		/* "1" is "__OS_POSIX" in <sys/user.h> */
+#endif /* ISC_POSIX_EXEC_BUG */
 #ifdef VFORK
 	Vt = 0;
 #endif /* VFORK */

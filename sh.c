@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.59 1994/02/10 14:36:00 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.60 1994/03/13 00:46:35 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.59 1994/02/10 14:36:00 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.60 1994/03/13 00:46:35 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1536,12 +1536,14 @@ int snum;
 	(void) sigset(snum, SIG_IGN);
 #endif /* UNRELSIGS */
 
-    set(STRlogout, STRhangup, VAR_READWRITE);
+    if (loginsh) {
+	set(STRlogout, STRhangup, VAR_READWRITE);
 #ifdef _PATH_DOTLOGOUT
-    (void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
+	(void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
 #endif
-    if (adrof(STRhome))
-	(void) srccat(varval(STRhome), STRsldtlogout);
+	if (adrof(STRhome))
+	    (void) srccat(varval(STRhome), STRsldtlogout);
+    }
 
     record();
 

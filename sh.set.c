@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.set.c,v 3.23 1993/07/03 23:47:53 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.set.c,v 3.24 1994/03/13 00:46:35 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.23 1993/07/03 23:47:53 christos Exp christos $")
+RCSID("$Id: sh.set.c,v 3.24 1994/03/13 00:46:35 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -83,6 +83,9 @@ update_vars(vp)
     }
     else if (eq(vp, STRwordchars)) {
 	word_chars = varval(vp);
+    }
+    else if (eq(vp, STRloginsh)) {
+	loginsh = 1;
     }
     else if (eq(vp, STRsymlinks)) {
 	register Char *pn = varval(vp);
@@ -613,6 +616,8 @@ unset(v, c)
     }
     if (adrof(STRhistlit) == 0)
 	HistLit = 0;
+    if (adrof(STRloginsh) == 0)
+	loginsh = 0;
     if (adrof(STRwordchars) == 0)
 	word_chars = STR_WORD_CHARS;
     if (adrof(STRedit) == 0)

@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.45 1994/02/10 14:36:00 christos Exp $
+/**/# $Id: Imakefile,v 1.46 1994/03/13 00:46:35 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.04
 /**/# Marc Horowitz, MIT SIPB
@@ -528,7 +528,7 @@ tc.defs.c:	gethost host.defs
 NormalProgramTarget(tcsh, $(OBJS), ed.defns.h sh.err.h tc.const.h, \
 			/*LOCALLIBS*/, $(HESLIB) $(AFSLIB) $(SYSLIBS))
 
-NormalProgramTarget(gethost, gethost.c, sh.err.h tc.const.h sh.h, \
+NormalProgramTarget(gethost, gethost.${SUF}, sh.err.h tc.const.h sh.h, \
 			/*LOCALLIBS*/, $(HESLIB) $(AFSLIB) $(SYSLIBS))
 
 InstallProgram(tcsh, $(TCSH_BINDIR));

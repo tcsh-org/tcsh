@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.52 1994/01/31 16:04:49 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.53 1994/03/13 00:46:35 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.52 1994/01/31 16:04:49 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.53 1994/03/13 00:46:35 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1825,6 +1825,7 @@ static sigret_t
 palarm(snum)
     int snum;
 {
+    USE(snum);
 #ifdef UNRELSIGS
     if (snum)
 	(void) sigset(snum, SIG_IGN);

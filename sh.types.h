@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.types.h,v 3.29 1993/12/16 16:51:24 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.types.h,v 3.30 1994/03/31 22:36:44 christos Exp christos $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -432,6 +432,14 @@ typedef char * caddr_t;
 # ifndef _SIZE_T
 #  define _SIZE_T
 # endif /* _SIZE_T */
+# ifndef _UID_T
+#  define _UID_T
+   typedef int uid_t;
+# endif /* _UID_T */
+# ifndef _GID_T
+#  define _GID_T
+   typedef int gid_t;
+# endif /* _GID_T */
 #endif /* UTek */
 
 /* 

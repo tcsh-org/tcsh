@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.64 1994/02/10 14:36:00 christos Exp $
+# $Id: Makefile.std,v 1.65 1994/03/13 00:46:35 christos Exp christos $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -105,7 +105,7 @@ CFLAGS=-O2 $(INCLUDES) -g
 # AU/X 2.0 needs a flag for POSIX (read the config file)
 #DFLAGS=-Zp
 # Tektronix 4300 running UTek 4.0 (BSD 4.2) needs:
-#DFLAGS = -DUTek
+#DFLAGS = -DUTek -DBSD
 # VMS_POSIX needs:
 #DFLAGS=-D_VMS_POSIX
 # DEC/osf-1 on the alpha
@@ -305,7 +305,7 @@ tcsh.exe: tcsh
 
 gethost:  gethost.c sh.err.h tc.const.h sh.h
 	rm -f gethost
-	${CC} -o gethost ${LDFLAGS} ${CFLAGS} gethost.c ${LIBES} ${EXTRALIBS}
+	${CC} -o gethost ${LDFLAGS} ${CFLAGS} ${DFLAGS} gethost.c ${LIBES} ${EXTRALIBS}
 
 tc.defs.c:	gethost host.defs
 	@rm -f $@

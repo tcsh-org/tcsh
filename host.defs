@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.04/RCS/host.defs,v 1.2 1994/02/10 14:36:00 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/host.defs,v 1.3 1994/03/13 00:46:35 christos Exp christos $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.2 1994/02/10 14:36:00 christos Exp $")
+RCSID("$Id: host.defs,v 1.3 1994/03/13 00:46:35 christos Exp christos $")
 
 endcode	:
 
@@ -175,15 +175,15 @@ newdef	: defined(hpux) || defined(__hpux)
 comment	: Hewlett Packard running HP/UX
 vendor	:						: "hp"
 hosttype: defined(__hp9000s700)				: "hp9000s700"
-hosttype: defined(__hp9000s800) || defined(hp9000s800)) : "hp9000s800"
+hosttype: defined(__hp9000s800) || defined(hp9000s800)  : "hp9000s800"
 hosttype: defined(hp9000s500)				: "hp9000s500"
-hosttype: defined(__hp9000s300) || defined(hp9000s300)) : "hp9000s300"
+hosttype: defined(__hp9000s300) || defined(hp9000s300)  : "hp9000s300"
 hosttype: 						: "hp"
 ostype	:						: "hpux"
 machtype: defined(__hp9000s700)				: "pa_risc"
-machtype: defined(__hp9000s800) || defined(hp9000s800)) : "pa_risc"
+machtype: defined(__hp9000s800) || defined(hp9000s800)  : "pa_risc"
 machtype: defined(hp9000s500)				: "m68k"
-machtype: defined(__hp9000s300) || defined(hp9000s300)) : "m68k"
+machtype: defined(__hp9000s300) || defined(hp9000s300)  : "m68k"
 enddef	:
 
 
@@ -564,7 +564,7 @@ enddef	:
 
 newdef	: defined(NeXT)
 comment	: NeXT
-vendor	:						: "NeXT"
+vendor	:						: "next"
 hosttype:						: "next"
 ostype	:						: "mach"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
@@ -673,8 +673,8 @@ enddef	:
 
 
 newdef	: defined(titan)
-comment	: (St)Arden Titan
-vendor	:						: "arden"
+comment	: (St)Ardent Titan
+vendor	:						: "ardent"
 hosttype:						: "titan"
 enddef	:
 
@@ -726,6 +726,20 @@ machtype:						: "amdahl"
 enddef	:
 
 
+newdef	: defined(UTek)
+comment	: Tektronix 4300 running UTek (BSD 4.2 / 68020 based)
+vendor	:						: "tektronix"
+hosttype: 						: "tek4300"
+enddef	:
+
+
+newdef	: defined(UTekV)
+comment	: Tektronix XD88/10 running UTekV 3.2e (SVR3/88100 based)
+vendor	:						: "tektronix"
+hosttype: 						: "tekXD88"
+enddef	:
+
+
 newdef	: defined(sysV68)
 comment	: Motorola MPC running System V/68 R32V2 (SVR3/68020 based)
 vendor	:						: "motorola"
@@ -736,23 +750,11 @@ enddef	:
 
 newdef	: defined(sysV88)
 comment	: Motorola MPC running System V/88 R32V2 (SVR3/88100 based)
+vendor	:						: "motorola"
 hosttype: 						: "sysV88"
 machtype:						: "m88k"
 enddef	:
 
-
-newdef	: defined(UTek)
-comment	: Tektronix 4300 running UTek (BSD 4.2 / 68020 based)
-vendor	:						: "tek"
-hosttype: 						: "tek4300"
-enddef	:
-
-
-newdef	: defined(UTekV)
-comment	: Tektronix XD88/10 running UTekV 3.2e (SVR3/88100 based)
-vendor	:						: "tek"
-hosttype: 						: "tekXD88"
-enddef	:
 
 newdef	: defined(__clipper__)
 comment	: Clipper Chipset (Intergraph)
@@ -766,6 +768,12 @@ newdef	: defined(mc68000) || defined(__mc68000__) || defined(mc68k32) || defined
 hosttype:						: "m68k"
 vendor	: defined(m68k)					: "motorola"
 machtype:						: "m68k"
+enddef	:
+
+
+newdef	: defined(m88k) || defined(__m88k__)
+hosttype:						: "m88k"
+machtype:						: "m88k"
 enddef	:
 
 
@@ -783,7 +791,7 @@ enddef	:
 
 newdef	: defined(i860) || defined(__i860__)
 hosttype:						: "i860"
-machtype:						: "sparc"
+machtype:						: "i860"
 enddef	:
 
 newdef	: defined(osf1)
@@ -805,7 +813,7 @@ newdef	: SYSVREL == 2
 ostype	: 						: "svr2"
 enddef	:
 
-newdef	: SYSVREL == 2
+newdef	: SYSVREL == 3
 ostype	: 						: "svr3"
 enddef	:
 
@@ -824,7 +832,7 @@ newcode	:
     vendor = "unknown";
 #endif
 #ifndef _machtype_
-    machtype = unknown;
+    machtype = "unknown";
 #endif
     tsetenv(STRHOSTTYPE, str2short(hosttype));
     tsetenv(STRVENDOR,   str2short(vendor));

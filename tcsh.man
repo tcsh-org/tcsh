@@ -50,7 +50,7 @@
 .\"   Remember to note OS-specific things in "OS variant support", new features
 .\"   in NEW FEATURES and referenced external commands in SEE ALSO.
 .\" 
-.TH TCSH 1 "12 March 1994" "Cornell 6.04.09"
+.TH TCSH 1 "12 April 1994" "Cornell 6.04.11"
 .SH NAME
 tcsh - C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -1034,28 +1034,26 @@ expanded and literal forms of history lines in the input buffer.
 \fIexpand-history\fR and \fIexpand-line\fR expand history substitutions
 in the current word and in the entire input buffer respectively.
 .SS "Alias substitution"
-The shell maintains a list of aliases which can be set, unset and printed
-by the \fIalias\fR and \fIunalias\fR commands.  After a command line
-is scanned, it is parsed into distinct commands and the first word of each
-command, left-to-right, is checked to see if it has an alias.  If it does, then
-the text which is the alias for that command is reread with the history
-mechanism available as though that command were the previous input line.  The
-resulting words replace the command and argument list.  If no reference is made
-to the history list, then the argument list is left unchanged.
+The shell maintains a list of aliases which can be set, unset and printed by
+the \fIalias\fR and \fIunalias\fR commands.  After a command line is parsed
+into simple commands (see \fBCommands\fR) the first word of each command,
+left-to-right, is checked to see if it has an alias.  If so, the first word is
+replaced by the alias. If the alias contains a history reference, it undergoes
+\fBHistory substitution\fR (q.v.) as though the original command were the
+previous input line. If the alias does not contain a history reference, the
+argument list is left untouched.
 .PP
-Thus if the alias for `ls' were `ls -l' the command `ls /usr' would map to
-`ls -l /usr', the argument list here being undisturbed.  Similarly if the alias
-for `lookup' was `grep !^ /etc/passwd' then `lookup bill' would map to `grep
-bill /etc/passwd'.
+Thus if the alias for `ls' were `ls -l' the command `ls /usr' would become `ls
+-l /usr', the argument list here being undisturbed.  If the alias for `lookup'
+were `grep !^ /etc/passwd' then `lookup bill' would become `grep bill
+/etc/passwd'.  Aliases can be used to introduce parser metasyntax.  For
+example, `alias print 'pr \e!* | lpr'' defines a ``command'' (`print') which
+\fIpr\fR's its arguments to the line printer.
 .PP
-If an alias is found, the word transformation of the input text is performed
-and the aliasing process begins again on the reformed input line.  Looping is
-prevented if the first word of the new text is the same as the old by flagging
-it to prevent further aliasing.  Other loops are detected and cause an error.
-.PP
-Note that the mechanism allows aliases to introduce parser metasyntax.  Thus we
-can `alias print 'pr \e!* | lpr'' to make a command which \fIpr\fR's its
-arguments to the line printer.
+Alias substitution is repeated until the first word of the command has no
+alias. If an alias substitution does not change the first word (as in the
+previous example) it is flagged to prevent a loop. Other loops are detected and
+cause an error.
 .PP
 Some aliases are referred to by the shell; see \fBSpecial aliases\fR.
 .SS "Variable substitution"
@@ -2211,14 +2209,15 @@ Bindings (editor commands)
 .TP 8
 .B c
 Commands (builtin or external commands)
+.TP 8
 .B C
-Commands (builtin or external commands) with supplied pathname prefix
+External commands which begin with the supplied path prefix
 .TP 8
 .B d
 Directories
 .TP 8
 .B D
-Directories with supplied pathname prefix
+Directories which begin with the supplied path prefix
 .TP 8
 .B e
 Environment variables
@@ -2227,7 +2226,7 @@ Environment variables
 Filenames
 .TP 8
 .B F
-Filenames with supplied pathname prefix
+Filenames which begin with the supplied path prefix
 .TP 8
 .B g
 Groupnames
@@ -2251,7 +2250,7 @@ Signals
 Plain (`text') files
 .TP 8
 .B T
-Plain (`text') files with supplied pathname prefix
+Plain (`text') files which begin with the supplied path prefix
 .TP 8
 .B v
 Any variables
@@ -2387,8 +2386,22 @@ described under \fBFilename substitution\fR. One might use
 .IP "" 4
 > complete rm 'n/*/f:^*.{c,h,cc,C,tex,1,man,l,y}/'
 .PP
-to exclude precious source code from `rm' completion. Of course, it would
-still be possible to type these names explicitly.
+to exclude precious source code from `rm' completion. Of course, one could
+still type excluded names manually or override the completion mechanism 
+using [^X^I] (\fIcomplete-word-raw\fR) or [^X^D]  (\FIlist-choices-raw\fR).
+.PP
+The `C', `D', `F' and `T' \fIlist\fRs are like `c', `d', `f' and `t'
+respectively, but they use the \fIselect\fR argument in a different way: to
+restrict completion to files beginning with a particular path prefix. For
+example, the Elm mail program uses `=' as an abbreviation for one's mail
+directory. One might use
+.IP "" 4
+> complete elm 'c@=@F:$HOME/Mail/@'
+.PP
+to complete `elm -f =' as if it were `elm -f ~/Mail/'. Note that we used `@'
+instead of `/' to avoid confusion with the \fIselect\fR argument, and we used
+`$HOME' instead of `~' because home directory substitution only works at the
+beginning of a word.
 .PP
 \fIsuffix\fR is used to add a nonstandard suffix
 (not space or `/' for directories) to completed words.
@@ -4414,7 +4427,7 @@ access(2), execve(2), fork(2), killpg(2), pipe(2), setrlimit(2),
 sigvec(2), stat(2), umask(2), vfork(2), wait(2), malloc(3), setlocale(3), tty(4),
 a.out(5), termcap(5), environ(7), termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.09 (Cornell) 94/03/12.
+This man page documents tcsh 6.04.11 (Cornell) 94/04/12.
 .SH AUTHORS
 .PD 0
 .TP 2

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.38 1994/02/04 15:16:59 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.39 1994/02/10 14:36:00 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -37,7 +37,7 @@
 #include "sh.h"
 #include "tw.h"
 
-RCSID("$Id: tc.vers.c,v 3.38 1994/02/04 15:16:59 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.39 1994/02/10 14:36:00 christos Exp christos $")
 
 #include "patchlevel.h"
 
@@ -138,7 +138,7 @@ fix_version()
 
     (void) xsprintf(version,
  "tcsh %d.%.2d.%.2d (%s) %s (%S-%S-%S) options %s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
-	     REV, VERS, PATCHLEVEL, ORIGIN, DATE, vendor, ostype, machtype,
+	     REV, VERS, PATCHLEVEL, ORIGIN, DATE, machtype, vendor, ostype,
 	     SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR, BYESTR,
 	     ALSTR, KANSTR, SMSTR, HBSTR, NGSTR, RHSTR, AFSSTR, LOCALSTR);
     set(STRversion, SAVE(version), VAR_READWRITE);

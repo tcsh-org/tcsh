@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.33 1993/12/12 19:55:08 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.34 1994/03/13 00:46:35 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.33 1993/12/12 19:55:08 christos Exp christos $")
+RCSID("$Id: tc.os.c,v 3.34 1994/03/13 00:46:35 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -669,19 +669,35 @@ pr_stat_sub(p2, p1, pr)
 #endif /* _SEQUENT_ */
 
 
+#ifdef NEEDmemset
+/* This is a replacement for a missing memset function */
+ptr_t xmemset(loc, value, len)
+    ptr_t *loc;
+    int len;
+    size_t value;
+{
+    char *ptr = (char *) loc;
+  
+    while (len--)
+	*ptr++ = value;
+    return loc;
+}
+#endif /* NEEDmemset */
+
+
 #ifdef NEEDmemmove
 /* memmove():
  * 	This is the ANSI form of bcopy() with the arguments backwards...
  *	Unlike memcpy(), it handles overlaps between source and 
  *	destination memory
  */
-void*
+ptr_t
 xmemmove(vdst, vsrc, len)
     ptr_t vdst;
     const ptr_t vsrc;
     size_t len;
 {
-    const char *src = (char *) vsrc;
+    const char *src = (const char *) vsrc;
     char *dst = (char *) vdst;
 
     if (src == dst)

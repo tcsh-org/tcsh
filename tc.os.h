@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.56 1994/02/10 14:36:00 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.57 1994/03/13 00:46:35 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -663,6 +663,10 @@ extern void bcopy	__P((const void *, void *, size_t));
 #if !defined(hpux) && !defined(COHERENT) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(__386BSD__) && !defined(memmove)
 # define NEEDmemmove
 #endif /* !hpux && !COHERENT && (SYSVREL < 4 || _SEQUENT_) && !__386BSD__ && !memmove */
+
+#if defined(UTek)
+# define NEEDmemset
+#endif /* Utek */
 
 #if SYSVREL == 4
 # ifdef REMOTEHOST
