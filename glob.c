@@ -568,7 +568,6 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob, no_match)
     glob_t *pglob;
     int     no_match;
 {
-    extern int errno;
     DIR    *dirp;
     struct dirent *dp;
     int     err;
