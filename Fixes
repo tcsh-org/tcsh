@@ -1,3 +1,8 @@
+ 52. move intptr_t definition to sh.h and include both stdint.h and inttypes.h
+ 51. Fix dup2() issues, and introduce FSAFE as the highest file descriptor
+     to be left untouched. This is to avoid closing hesiod/nis etc file
+     descriptors behind their backs. I need to really fix file descriptor
+     handling one day.
  50. forward<->reverse char conversion verification (Miloslav Trmac)
  49. japanese locale additions (Yoshiyuki Sakakibara)
  48. wide character/utf 8 cleanups (Michael Schroeder)
