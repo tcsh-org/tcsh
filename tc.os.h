@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.35 1992/09/18 20:56:35 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.36 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -190,17 +190,17 @@ struct ucred {
  *
  * From: scott@craycos.com (Scott Bolte)
  */
-#ifdef FD_CLOEXEC
+#ifdef F_SETFD
 # define close_on_exec(fd, v)	\
     ((v) ? fcntl((fd), F_SETFD, 1) : fcntl((fd), F_SETFD, 0))
-#else /* !FD_CLOEXEC */
+#else /* !F_SETFD */
 # ifdef FIOCLEX
 # define close_on_exec(fd, v)	\
     ((v) ? ioctl((fd), FIOCLEX, NULL) : ioctl((fd), FIONCLEX, NULL))
 # else /* Nothing */
 # define close_on_exec(fd, v)	/* Nothing */
 # endif /* FIOCLEX */
-#endif /* FD_CLOEXEC */
+#endif /* F_SETFD */
 
 /*
  * Stat
@@ -459,7 +459,7 @@ typedef struct timeval timeval_t;
 #endif /* NeXT */
 
 
-#if !defined(POSIX) || defined(SUNOS4) || defined(UTekV)
+#if !defined(POSIX) || defined(SUNOS4) || defined(UTekV) || defined(sysV88)
 extern time_t time();
 extern char *getenv();
 extern int atoi();

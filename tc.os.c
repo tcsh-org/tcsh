@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.25 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.26 1992/10/05 02:41:30 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.25 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.26 1992/10/05 02:41:30 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -996,7 +996,7 @@ prepend(dirname, pathname)
 
 # else /* ! hp9000s500 */
 
-#if (SYSVREL != 0 && !defined(d_fileno)) !! defined(_VMS_POSIX)
+#if (SYSVREL != 0 && !defined(d_fileno)) || defined(_VMS_POSIX)
 # define d_fileno d_ino
 #endif
 

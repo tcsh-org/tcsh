@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.37 1992/08/14 13:56:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.38 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.37 1992/08/14 13:56:09 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.38 1992/10/05 02:41:30 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1258,7 +1258,6 @@ dosetenv(v, c)
 	     eq(vp, STRTERMCAP)) {
 	check_window_size(1);
     }
-#endif /* SIG_WINDOW */
     /*
      * Change the size to the one directed by $LINES and $COLUMNS
      */
@@ -1266,6 +1265,7 @@ dosetenv(v, c)
 	GotTermCaps = 0;
 	ed_Init();
     }
+#endif /* SIG_WINDOW */
     xfree((ptr_t) lp);
 }
 
@@ -1477,6 +1477,32 @@ doumask(v, c)
     typedef int RLIM_TYPE;
 #  endif /* BSD4_4 && !__386BSD__ */
 # endif /* BSDLIMIT */
+
+# if defined(hpux) && defined(BSDLIMIT)
+/* Yes hpux8.0 has limits but <sys/resource.h> does not make them public */
+/* Yes, we could have defined _KERNEL, and -I/etc/conf/h, but is that better? */
+#  ifndef RLIMIT_CPU
+#   define RLIMIT_CPU		0
+#  endif /* RLIMIT_CPU */
+#  ifndef RLIMIT_FSIZE
+#   define RLIMIT_FSIZE		1
+#  endif /* RLIMIT_FSIZE */
+#  ifndef RLIMIT_DATA
+#   define RLIMIT_DATA		2
+#  endif /* RLIMIT_DATA */
+#  ifndef RLIMIT_STACK
+#   define RLIMIT_STACK		3
+#  endif /* RLIMIT_STACK */
+#  ifndef RLIMIT_CORE
+#   define RLIMIT_CORE		4
+#  endif /* RLIMIT_CORE */
+#  ifndef RLIMIT_RSS
+#   define RLIMIT_RSS		5
+#  endif /* RLIMIT_RSS */
+#  ifndef RLIMIT_NOFILE
+#   define RLIMIT_NOFILE	6
+#  endif /* RLIMIT_NOFILE */
+# endif /* hpux && BSDLIMIT */
 
 struct limits limits[] = 
 {
@@ -1768,7 +1794,7 @@ plim(lp, hard)
 	psecs((long) limit);
 # endif /* RLIMIT_CPU */
     else
-# ifndef BSDLIMIT
+# if !defined(BSDLIMIT) || defined(hpux)
     if (lp->limconst == RLIMIT_FSIZE)
 	/*
 	 * Christos: filesize comes in 512 blocks. we divide by 2 to get 1024
@@ -1777,7 +1803,7 @@ plim(lp, hard)
 	xprintf("%ld %s", (long) (limit / (lp->limdiv == 1024 ? 2 : 1)), 
 	        lp->limscale);
     else
-# endif /* BSDLIMIT */
+# endif /* !BSDLIMIT || hpux */
 	xprintf("%ld %s", (long) (limit / lp->limdiv), lp->limscale);
     xputchar('\n');
 }
@@ -1823,6 +1849,11 @@ setlim(lp, hard, limit)
 
     (void) getrlimit(lp->limconst, &rlim);
 
+#  ifdef hpux
+    /* Even though hpux has setrlimit(), it expects fsize in 512 byte blocks */
+    if (limit != RLIM_INFINITY && lp->limconst == RLIMIT_FSIZE)
+	limit /= 512;
+#  endif /* hpux */
     if (hard)
 	rlim.rlim_max = limit;
     else if (limit == RLIM_INFINITY && euid != 0)

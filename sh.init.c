@@ -1,7 +1,4 @@
-#ifdef _VMS_POSIX
-#module sh_init_c
-#endif 
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.init.c,v 3.18 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.init.c,v 3.19 1992/10/05 02:41:30 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -39,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.18 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.19 1992/10/05 02:41:30 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -791,12 +788,6 @@ struct	mesg mesg[] = {
 /* 24 */	"TTIN", 	MSG_TTIN,
 /* 25 */	"TTOU", 	MSG_TTOU,
 /* 26 */        "DEBUG",        "Signaling SS$_DEBUG", 
-/* 27 */	0,		"Signal 27",
-/* 28 */	0,		"Signal 28",
-/* 29 */	0,		"Signal 29",
-/* 30 */	0,		"Signal 30",
-/* 31 */	0,		"Signal 31",
-/* 32 */	0,		"Signal 32",
 #else /* BSD */
 /* 16 */	"URG",		"Urgent condition on IO channel",
 /* 17 */	"STOP",		MSG_STOP,

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.comp.c,v 1.18 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.comp.c,v 1.19 1992/07/06 15:26:18 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.18 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.19 1992/07/06 15:26:18 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -320,6 +320,9 @@ tw_result(act, pat)
 	break;
     case 's':
 	looking = TW_SHELLVAR;
+	break;
+    case 't':
+	looking = TW_TEXT;
 	break;
     case 'v':
 	looking = TW_VARIABLE;

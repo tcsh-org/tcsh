@@ -1,11 +1,11 @@
 
-Last Updated: Wed Jul 29 01:34:54 EDT 1992
+Last Updated: Thu Oct  8 18:38:00 EDT 1992
 
 This is for people that do not read the manual!
 
-So far people who don't read manuals don't read this either...
-I may call it README.*PLEASE* in the future, but then people won't
-be able to get it... :-)
+So far people who don't read manuals don't read this either... I may
+call it README.*PLEASE* in the future, but then the same people won't
+be able to get ftp it... :-)
 
 1.  Why is the meta key broken in tcsh-5.20 and up? 
 
@@ -16,10 +16,10 @@ be able to get it... :-)
     logged in through a modem line with 7 bits and parity and your terminal 
     has a meta key. Then tcsh 5.19 would set wrongly set pass8.
 
-    If you did like the prevous behavior you can add in /etc/Login, or
+    If you did like the prevous behavior you can add in /etc/csh.login, or
     in .login:
 
-    if ( $?prompt ) then
+    if ( $?tcsh && $?prompt ) then
 	if ( "`echotc meta`" == "yes" ) then
 	     stty pass8
 	endif
@@ -132,10 +132,6 @@ be able to get it... :-)
 
     You interrupted make, while it was making the automatically
     generated headers. Type 'make clean; make'
-
-
-
-
 
 christos
 

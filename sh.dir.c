@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dir.c,v 3.18 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dir.c,v 3.19 1992/10/05 02:41:30 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.18 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.19 1992/10/05 02:41:30 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -81,7 +81,7 @@ dinit(hp)
 	    if (chdir(tcp) == -1)
 		cp = NULL;
 	    else
-		cp = hp;
+		cp = Strsave(hp);
 	}
 	else
 	    cp = NULL;
@@ -104,7 +104,7 @@ dinit(hp)
 	    stat(tcp, &swd) != -1 && stat(short2str(hp), &shp) != -1 &&
 	    DEV_DEV_COMPARE(swd.st_dev, shp.st_dev)  &&
 		swd.st_ino == shp.st_ino)
-	    cp = hp;
+	    cp = Strsave(hp);
 	else {
 	    char   *cwd;
 
@@ -125,7 +125,7 @@ dinit(hp)
     }
 
     dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
-    dp->di_name = Strsave(cp);
+    dp->di_name = cp;
     dp->di_count = 0;
     dhead.di_next = dhead.di_prev = dp;
     dp->di_next = dp->di_prev = &dhead;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.39 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.40 1992/10/05 02:41:30 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.39 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.40 1992/10/05 02:41:30 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -55,13 +55,13 @@ RCSID("$Id: tw.parse.c,v 3.39 1992/09/18 20:56:35 christos Exp $")
 /*  TW_FILE,	       TW_DIRECTORY,   TW_VARLIST,     TW_USER,		*/
 /*  TW_COMPLETION,     TW_ALIAS,       TW_SHELLVAR,    TW_ENVVAR,	*/
 /*  TW_BINDING,        TW_WORDLIST,    TW_LIMIT,       TW_SIGNAL	*/
-/*  TW_JOB,	       TW_EXPLAIN,     TW_PATHNAME			*/
+/*  TW_JOB,	       TW_EXPLAIN,     TW_PATHNAME,    TW_TEXT		*/
 static void (*tw_start_entry[]) __P((DIR *, Char *)) = {
     tw_file_start,     tw_cmd_start,   tw_var_start,   tw_logname_start, 
     tw_file_start,     tw_file_start,  tw_vl_start,    tw_logname_start, 
     tw_complete_start, tw_alias_start, tw_var_start,   tw_var_start,     
     tw_bind_start,     tw_wl_start,    tw_limit_start, tw_sig_start,
-    tw_job_start,      tw_file_start,  tw_file_start
+    tw_job_start,      tw_file_start,  tw_file_start,  tw_file_start
 };
 
 static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
@@ -69,7 +69,7 @@ static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
     tw_file_next,      tw_file_next,   tw_var_next,    tw_logname_next,  
     tw_var_next,       tw_var_next,    tw_shvar_next,  tw_envvar_next,   
     tw_bind_next,      tw_wl_next,     tw_limit_next,  tw_sig_next,
-    tw_job_next,       tw_file_next,   tw_file_next
+    tw_job_next,       tw_file_next,   tw_file_next,   tw_file_next
 };
 
 static void (*tw_end_entry[]) __P((void)) = {
@@ -77,7 +77,7 @@ static void (*tw_end_entry[]) __P((void)) = {
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_logname_end, 
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
-    tw_dir_end,	       tw_dir_end,     tw_dir_end
+    tw_dir_end,	       tw_dir_end,     tw_dir_end,    tw_dir_end
 };
 
 /* #define TDEBUG */
@@ -723,6 +723,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
     int	name_length = Strlen(target);	 /* Length of prefix (file name) */
     int exec_check = flags & TW_EXEC_CHK;/* need to check executability	*/
     int dir_check  = flags & TW_DIR_CHK; /* Need to check for directories */
+    int text_check = flags & TW_TEXT_CHK;/* Need to check for non-directories */
     int dir_ok     = flags & TW_DIR_OK;  /* Ignore directories? */
     int gpat       = flags & TW_PAT_OK;	 /* Match against a pattern */
     int ignoring   = flags & TW_IGN_OK;	 /* Use fignore? */
@@ -750,6 +751,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	switch (looking) {
 	case TW_FILE:
 	case TW_DIRECTORY:
+	case TW_TEXT:
 	    /*
 	     * Don't match . files on null prefix match
 	     */
@@ -820,6 +822,9 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		break;
 
 	    if (dir_check && !isadirectory(exp_dir, entry))
+		break;
+	    
+	    if (text_check && isadirectory(exp_dir, entry))
 		break;
 
 	    if (gpat && !Gmatch(entry, pat) && !isadirectory(exp_dir, entry))
@@ -948,6 +953,7 @@ tw_suffix(looking, exp_dir, exp_name, target, name)
     case TW_SIGNAL:
     case TW_JOB:
     case TW_COMPLETION:
+    case TW_TEXT:
 	return ' ';
 
     default:
@@ -981,6 +987,7 @@ tw_fixword(looking, word, dir, exp_name, max_word_length)
 
     case TW_DIRECTORY:
     case TW_FILE:
+    case TW_TEXT:
 	copyn(word, dir, max_word_length);	/* put back dir part */
 	break;
 
@@ -1260,6 +1267,9 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 	    return nd;
 	break;
 
+    case TW_TEXT:
+	flags |= TW_TEXT_CHK;
+	/*FALLTHROUGH*/
     case TW_FILE:
 	if ((nd = expand_dir(dir, exp_dir, &dir_fd, command)) != 0)
 	    return nd;

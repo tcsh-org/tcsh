@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.22 1992/09/18 20:56:35 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.23 1992/10/05 02:41:30 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.22 1992/09/18 20:56:35 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.23 1992/10/05 02:41:30 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -254,10 +254,20 @@ gethosttype()
     hosttype = "unixpc";
 #endif /* UNIXPC/att3b1/att7300 */
 
-# ifdef alliant
+#ifdef alliant
+# ifdef mc68000
+#  define _havehosttype_
+    hosttype = "alliant-fx80";
+# endif /* mc68000 */
+# ifdef i860 
+#  define _havehosttype_
+    hosttype = "alliant-fx2800";
+# endif /* i860 */
+# ifndef _havehosttype_
 #  define _havehosttype_
     hosttype = "alliant";	/* for Alliant FX Series */
-# endif 
+# endif /* _havehosttype_ */
+#endif  /* alliant */
 
 # if defined(i386) && defined(MACH)
 #  define _havehosttype_

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.alloc.c,v 3.15 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.alloc.c,v 3.16 1992/10/05 02:41:30 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,10 +44,12 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.15 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.16 1992/10/05 02:41:30 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
+
+int dont_free = 0;
 
 #ifndef SYSMALLOC
 
@@ -60,7 +62,6 @@ static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
  * pointers most of the time, in cases where we know we are going to get
  * a bad pointer, we'd rather leak.
  */
-int dont_free = 0;
 
 #ifndef NULL
 #define	NULL 0
@@ -529,7 +530,7 @@ void
 sfree(p)
     ptr_t   p;
 {
-    if (p)
+    if (p && !dont_free)
 	free(p);
 }
 

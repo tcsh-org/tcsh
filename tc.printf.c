@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.printf.c,v 3.7 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.printf.c,v 3.8 1992/07/06 15:26:18 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.7 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.8 1992/07/06 15:26:18 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -144,9 +144,9 @@ doprnt(addchar, sfmt, ap)
 		    *bp++ = '-';
 		f_width = f_width - (bp - buf);
 		if (!flush_left)
-		    while (f_width-- > 0)
+		    while (f_width-- > 0) 
 			(*addchar) ((int) (pad | attributes));
-		for (bp--; bp >= buf; bp--)
+		for (bp--; bp >= buf; bp--) 
 		    (*addchar) ((int) (((unsigned char) *bp) | attributes));
 		if (flush_left)
 		    while (f_width-- > 0)
@@ -354,80 +354,39 @@ xvsprintf(str, fmt, va)
  * ones that do tcsh output directly - see dumb hook in doreaddirs()
  * (sh.dir.c) -sg
  */
-
-#include <stdio.h>
-
-int printf(va_alist)
+#define FILE int
+int 
+#if __STDC__
+fprintf(FILE *fp, const char* fmt, ...)
+#else
+fprintf(va_alist)
+#endif
 va_dcl
 {
     va_list va;
-    char   *fmt;
-    va_start(va);
-    fmt = va_arg(va, char *);
-    doprnt(xputchar, fmt, va);
-    va_end(va);
-    return 1;
-}
-
-int vprintf(fmt, va)
-char   *fmt;
-va_list va;
-{
-    doprnt(xputchar, fmt, va);
-    return 1;
-}
-
-int fprintf(va_alist)
-va_dcl
-{
-    va_list va;
-
+#if __STDC__
+    va_start(va, fmt);
+#else
     FILE *fp;
     char   *fmt;
+
     va_start(va);
     fp = va_arg(va, FILE *);
     fmt = va_arg(va, char *);
+#endif
     doprnt(xputchar, fmt, va);
     va_end(va);
     return 1;
 }
 
-int vfprintf(fp, fmt, va)
-FILE *fp;
-char   *fmt;
-va_list va;
-{
-    doprnt(xputchar, fmt, va);
-    return 1;
-}
-
-char * sprintf(va_alist)
-va_dcl
-{
+int 
+vfprintf(fp, fmt, va)
+    FILE *fp;
+    char   *fmt;
     va_list va;
-    char *str, *fmt;
-
-    va_start(va);
-    str = va_arg(va, char *);
-    fmt = va_arg(va, char *);
-    xstring = (unsigned char *) str;
-    doprnt(xaddchar, fmt, va);
-    va_end(va);
-    *xstring++ = '\0';
-
-    return str;
-}
-
-char * vsprintf(str, fmt, va)
-char   *str;
-char   *fmt;
-va_list va;
 {
-    xstring = (unsigned char *) str;
-    doprnt(xaddchar, fmt, va);
-    *xstring++ = '\0';
-
-    return str;
+    doprnt(xputchar, fmt, va);
+    return 1;
 }
 
 #endif	/* PURIFY */

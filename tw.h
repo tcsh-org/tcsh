@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.h,v 3.10 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.h,v 3.11 1992/10/05 02:41:30 christos Exp $ */
 /*
  * tw.h: TwENEX functions headers
  */
@@ -57,12 +57,15 @@
 #define TW_JOB		16
 #define TW_EXPLAIN	17
 #define TW_PATHNAME	18
+#define TW_TEXT		19
 
 #define TW_EXEC_CHK	0x01
 #define TW_DIR_CHK	0x02
-#define TW_DIR_OK	0x04
-#define TW_PAT_OK	0x08
-#define TW_IGN_OK	0x10
+#define TW_TEXT_CHK	0x04
+
+#define TW_DIR_OK	0x10
+#define TW_PAT_OK	0x20
+#define TW_IGN_OK	0x40
 
 #ifndef TRUE
 # define TRUE		1

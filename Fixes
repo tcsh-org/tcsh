@@ -1,5 +1,14 @@
 V6.03.00, ...
-69. 6.02.08 9/18/92
+77. 6.02.09 10/10/92
+76. More vms cleanups.
+75. Removed #include CONFIGH from sh.h. There was no way to make it work 
+    under VMS/POSIX
+74. Added t completion (Gray Watson)
+73. Memory leaks in sh.dir.c and sh.glob.c [thanks purify :-)]
+72. IRIX 5.0 patches (from Paul Close)
+71. BSD resource limits for hpux8.0 (From Andreas Stolcke)
+70. NGROUPS_MAX fixes (from Matt Day)
+69. 6.02.08 10/04/92
 68. VMS port additions.
 67. Added $%var, which == strlen(var)
 66. Added ^X^I and ^X^D to override programmable listing+completion

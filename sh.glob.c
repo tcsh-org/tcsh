@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.glob.c,v 3.25 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.glob.c,v 3.26 1992/10/05 02:41:30 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.25 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.26 1992/10/05 02:41:30 christos Exp $")
 
 #include "tc.h"
 
@@ -597,7 +597,7 @@ globall(v)
 
     if (!noglob && (gflg & G_GLOB)) {
 	vl = libglob(vo);
-	if ((gflg & G_CSH) && vl != vo)
+	if (vl != vo)
 	    blkfree(vo);
     }
     else

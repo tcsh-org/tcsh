@@ -29,7 +29,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\" $Id: tcsh.man,v 3.48 1992/09/18 20:56:35 christos Exp $
+.\" $Id: tcsh.man,v 3.49 1992/10/05 02:41:30 christos Exp $
 .TH TCSH 1 "17 September 1992" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1959,6 +1959,8 @@ The current possible values are:
 \fIaix370\fR		an IBM 370, running aix
 \fIaixESA\fR		an IBM ESA, running aix
 \fIalliant\fR		an Alliant FX series
+\fIalliant-fx80\fR	an Alliant FX80 (mc68000 based)
+\fIalliant-fx2800\fR	an Alliant FX2800 (i860 based)
 \fIalpha\fR		an DEC Alpha running OSF/1
 \fIamdahl\fR		an Amdahl running uts 2.1
 \fIamiga\fR		an amiga running amix 2.02
@@ -1997,7 +1999,6 @@ The current possible values are:
 \fIminix386\fR			an i386 running minix
 \fIminix\fR			a mac or an amiga running minix
 \fImips\fR			another mips CPU
-\fIsysV88\fR		a Motorola MPC running System V/88 R32V2 (SVR3/88100 ba
 \fImultimax\fR		an Encore Computer Corp. Multimax (32000 based)
 \fInews\fR			a Sony NEWS 800 or 1700 workstation
 \fInews_mips\fR		a NeWS machine with mips CPU
@@ -2019,8 +2020,10 @@ The current possible values are:
 \fIsun386i\fR		a Sun Microsystems 386i workstation (386 based)
 \fIsun4\fR			a Sun Microsystems series 4 workstation (SPARC based)
 \fIsymmetry\fR		a Sequent Symmetry running DYNIX 3 (386/486 based)
+\fIsysV88\fR		a Motorola MPC running System V/88 R32V2 (SVR3/88100 based)
 \fItahoe\fR		a tahoe running 4BSD
-\fItekXD88\fR		a Tektronix XD88/10 running UTekV 3.2e
+\fItek4300\fR		a Tektronix 4300 running UTek (BSD 4.2 / 68020 based)
+\fItekXD88\fR		a Tektronix XD88/10 running UTekV 3.2e (SVR3/88100 based)
 \fItitan\fR		an Stardent Titan
 \fIunixpc\fR		an UNIX/PC running SVR1 att7300 aka att3b1
 \fIvax\fR			a Digital Equipment Corp. Vax (of any flavor)
@@ -2876,6 +2879,7 @@ l	Complete limits
 n	Complete nothing
 p	Complete files using the supplied pathname prefix
 s	Complete shell variable
+t	Complete non directory `text' filename
 v	Complete any variable
 u	Complete username
 x	Explain what argument when listing is requested.
@@ -3511,7 +3515,7 @@ Re-ported tcsh to A/UX.
 .sp
 .SH "BUGFIXES AND ENHANCEMENTS"
 .sp
-Andy Phillips, M.S.S.L. U.K., 1992
+Andy Phillips, Mullard Space Science Lab U.K., 1992
 .br
 VMS-POSIX port.
 .sp

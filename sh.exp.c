@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exp.c,v 3.12 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exp.c,v 3.13 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.12 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.13 1992/10/05 02:41:30 christos Exp christos $")
 
 /*
  * C shell
@@ -149,15 +149,32 @@ sh_access(fname, mode)
 # ifdef NGROUPS_MAX
     else {
 	/* you can be in several groups */
-	int             n = NGROUPS_MAX;
-	gid_t           groups[NGROUPS_MAX];
+	int	n;
+	gid_t	*groups;
 
-	n = getgroups(n, groups);
-	while (--n >= 0)
-	    if (groups[n] == statb.st_gid) {
-		mode <<= 3;
-		break;
-	    }
+	/*
+	 * Try these things to find a positive maximum groups value:
+	 *   1) sysconf(_SC_NGROUPS_MAX)
+	 *   2) NGROUPS_MAX
+	 *   3) getgroups(0, unused)
+	 * Then allocate and scan the groups array if one of these worked.
+	 */
+#  ifdef _SC_NGROUPS_MAX
+	if ((n = sysconf(_SC_NGROUPS_MAX)) == -1)
+#  endif /* _SC_NGROUPS_MAX */
+	    n = NGROUPS_MAX;
+	if (n <= 0)
+	    n = getgroups(0, (gid_t *) NULL);
+
+	if (n > 0) {
+	    groups = (gid_t *) xmalloc((size_t) (n * sizeof(gid_t)));
+	    n = getgroups(n, groups);
+	    while (--n >= 0)
+		if (groups[n] == statb.st_gid) {
+		    mode <<= 3;
+		    break;
+		}
+	}
     }
 # endif /* NGROUPS_MAX */
 

@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.13 1992/09/18 21:23:53 christos Exp $
+# $Id: complete.tcsh,v 1.14 1992/10/05 02:41:30 christos Exp $
 # example file using the new completion code
 #
 
@@ -187,8 +187,7 @@ if ($?complete) then
     complete chown	c/-/"(f R)"/ n/-*/u/           p/1/u/           n/*/f/
 
     complete cat	c/-/"(b e n s t u v)"/ n/*/f/
-    complete mv		c/-/"(f i)"/ n/-*/f/ N/-*/x:'<destination>'/ \
-			p/1/f/ p/2/x:'<destination>'/
+    complete mv		c/-/"(f i)"/ n/-*/f/ N/-*/d/ p/1/f/ p/2/d/ n/*/f/
     complete cp		c/-/"(i p r)"/ n/-*r*/d/ n/-*/f/ N/-*/d/ \
 			p/1/f/ p/2/d/ n/*/f/
 

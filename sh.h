@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.41 1992/09/18 20:56:35 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.42 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -37,25 +37,7 @@
 #ifndef _h_sh
 #define _h_sh
 
-/* This is separated instead of a #else of above because makedepend is
-easily confused. */
-
-#ifndef _VMS_POSIX
-# ifndef CONFIGH
-#  define CONFIGH "config.h"
-# endif
-#endif /* atp vmsposix */
-
-/*
- * Avoid cpp bugs (CONFIGH is always defined at this point)
- */
-#ifndef _VMS_POSIX
-# ifdef CONFIGH
-#  include CONFIGH
-# endif
-#else 
-# include "config.h"
-#endif /* vmsposix atp */
+#include "config.h"
 
 #ifndef EXTERN
 # define EXTERN extern
@@ -82,6 +64,15 @@ typedef short Char;
 typedef char Char;
 # define SAVE(a) (strsave(a))
 #endif 
+
+#ifdef PURIFY
+/* Re-define those, cause purify might use them */
+# define xprintf 	printf
+# define xsprintf	sprintf
+# define xvprintf	vprintf
+/* exit normally, allowing purify to trace leaks */
+# define _exit		exit
+#endif /* PURIFY */
 
 /*
  * If your compiler complains, then you can either
@@ -222,6 +213,10 @@ typedef int sigret_t;
 #  undef CSWTCH
 #  define CSWTCH _POSIX_VDISABLE	/* So job control works */
 #endif /* DGUX */
+
+#ifdef sonyrisc
+# include <sys/ttold.h>
+#endif /* sonyrisc */
 
 #ifdef POSIX
 /*
@@ -439,11 +434,11 @@ extern void		DebugFree	__P((ptr_t, char *, int));
  */
 EXTERN bool    chkstop;		/* Warned of stopped jobs... allow exit */
 
-#if (defined(FIOCLEX) && defined(FIONCLEX)) || (defined(FD_CLOEXEC) && defined(F_SETFD))
+#if (defined(FIOCLEX) && defined(FIONCLEX)) || defined(F_SETFD)
 # define CLOSE_ON_EXEC
 #else
 EXTERN bool    didcch;		/* Have closed unused fd's for child */
-#endif /* (FIOCLEX && FIONCLEX) || (FD_CLOEXEC && F_SETFD) */
+#endif /* (FIOCLEX && FIONCLEX) || F_SETFD */
 
 EXTERN bool    didfds;		/* Have setup i/o fd's for child */
 EXTERN bool    doneinp;		/* EOF indicator after reset from readc */

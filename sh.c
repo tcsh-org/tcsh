@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.35 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.36 1992/10/05 02:41:30 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.35 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: sh.c,v 3.36 1992/10/05 02:41:30 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -173,11 +173,12 @@ main(argc, argv)
 #ifdef _PATH_BSHELL
     STR_BSHELL = SAVE(_PATH_BSHELL);
 #endif
-#ifdef _PATH_CSHELL
-    STR_SHELLPATH = SAVE(_PATH_CSHELL);
-#endif
 #ifdef _PATH_TCSHELL
     STR_SHELLPATH = SAVE(_PATH_TCSHELL);
+#else
+# ifdef _PATH_CSHELL
+    STR_SHELLPATH = SAVE(_PATH_CSHELL);
+# endif
 #endif
     STR_environ = blk2short(environ);
     environ = short2blk(STR_environ);	/* So that we can free it */

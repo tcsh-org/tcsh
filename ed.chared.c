@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.28 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.29 1992/10/05 02:41:30 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.28 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.29 1992/10/05 02:41:30 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2787,17 +2787,18 @@ e_tty_int(c)
 /*ARGSUSED*/
 CCRETVAL
 e_stuff_char(c)
-     char c;
+     int c;
 {
 #ifdef TIOCSTI
      extern int Tty_raw_mode;
      int was_raw = Tty_raw_mode;
+     char ch = c;
 
      if (was_raw)
          Cookedmode();
 
      write(SHIN, "\n", 1);
-     (void) ioctl(SHIN, TIOCSTI, (ioctl_t) & c);
+     (void) ioctl(SHIN, TIOCSTI, (ioctl_t) &ch);
 
      if (was_raw)
          Rawmode();

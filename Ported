@@ -570,3 +570,13 @@ ENVIRON	:	n/a
 NOTES	:	n/a
 VERSION	:	6.02.07
 
+VENDOR	:       sony
+MODELS	:       news 3700
+COMPILER:	cc
+CFLAGS	:	-O -Wf,-XNp15000,-XNd15000,-XNh15000
+LIBES	:	-lcurses -lc /usr/ucblib/libucb.a
+OS	:	sysvr4, news-os 5.02
+CONFIG	:	config.sysv4
+ENVIRON	:	n/a
+NOTES	:	Use /usr/bin/cc, not /usr/ucb/cc.
+VERSION	:	6.00.03

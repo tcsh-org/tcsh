@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/config_f.h,v 3.3 1992/02/13 05:31:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/config_f.h,v 3.4 1992/06/16 20:46:26 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -110,7 +110,11 @@
  *		This can be much slower and no memory statistics will be
  *		provided.
  */
-#undef SYSMALLOC
+#ifdef PURIFY
+# define SYSMALLOC
+#else
+# undef SYSMALLOC
+#endif
 
 /*
  * RCSID	This defines if we want rcs strings in the binary or not
