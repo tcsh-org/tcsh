@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/clip.c,v 1.3 2002/08/11 07:58:12 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/clip.c,v 1.4 2004/05/19 18:22:27 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -480,9 +480,9 @@ e_dosify_next(c)
 	len = 0;
 
 	while(  cp < LastChar) {
-		if ( (*cp & CHAR == ' ') && (cp[-1] & CHAR != '\\') )
+		if ( ((*cp & CHAR) == ' ') && ((cp[-1] & CHAR) != '\\') )
 			break;
-		if ( ( *cp & CHAR ) == '/')  {
+		if ( (*cp & CHAR) == '/')  {
 			*bp++ = '\\'  | (*cp & ~(*cp & CHAR) );
 			*bp++ = '\\'  | (*cp & ~(*cp & CHAR) );
 
