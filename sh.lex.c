@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.lex.c,v 1.4 91/09/26 12:02:15 eichin Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.6 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.5 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.6 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -457,6 +457,7 @@ getdol()
 
     case '<':
     case '$':
+    case '!':
 	if (special)
 	    seterror(ERR_SPDOLLT);
 	*np = 0;

@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.proc.c,v 1.4 91/09/26 01:05:18 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.12 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.11 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.12 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -55,7 +55,7 @@ RCSID("$Id: sh.proc.c,v 3.11 1991/09/10 04:51:46 christos Exp $")
 # define HZ	100		/* for division into seconds */
 #endif
 
-#if (defined(_BSD) && defined(_BSD_INCLUDES))
+#if (defined(_BSD) && defined(_BSD_INCLUDES)) || (defined(IRIS4D) && __STDC__)
 # define BSDWAIT
 #endif
 #ifndef WTERMSIG
@@ -195,7 +195,7 @@ loop:
 #ifdef BSDJOBS
 # ifdef BSDTIMES
     /* both a wait3 and rusage */
-#  if !defined(BSDWAIT) || defined(NeXT)
+#  if !defined(BSDWAIT) || defined(NeXT) || (defined(IRIS4D) && __STDC__)
     pid = wait3(&w,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
 #  else /* BSDWAIT */
@@ -230,21 +230,28 @@ loop:
 #  endif /* !hpux */
 # else /* !BSDTIMES */
 # ifdef ODT  /* For Sco Unix 3.2.0 or ODT 1.0 */
+#  define HAVEwait
     pid = waitpid(-1, &w,
 	    (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG));
-# else /* !ODT */	    
-#  if SVID < 3
+# endif /* ODT */	    
+# ifdef aiws
+#  define HAVEwait
+    pid = wait3(&w.w_status, 
+	(setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), 0);
+# endif /* aiws */
+# ifndef HAVEwait
+#  if SVID < 3 && !defined(BSDSIGS)
     /* no wait3, therefore no rusage */
     /* on Sys V, this may hang.  I hope it's not going to be a problem */
     pid = ourwait(&w.w_status);
-#  else	/* SVID >= 3 */
+#  else	/* SVID >= 3 && !defined(BSDSIGS) */
     /* 
      * XXX: for greater than 3 we should use waitpid(). 
      * but then again, SVR4 falls into the POSIX/BSDJOBS category.
      */
     pid = wait(&w.w_status);
 #  endif /* SVID >= 3 */
-# endif /* ODT */
+# endif /* HAVEwait */
 # endif	/* BSDTIMES */
 # ifndef BSDSIGS
     (void) sigset(SIGCHLD, pchild);
@@ -422,9 +429,9 @@ found:
 	    }
 	}
     }
-#ifdef BSDJOBS
+#if defined(BSDJOBS) || defined(WNOHANG)
     goto loop;
-#endif /* BSDJOBS */
+#endif /* BSDJOBS || WNOHANG */
 }
 
 void
@@ -970,10 +977,10 @@ pprint(pp, flag)
     int     jobflags, pstatus, pcond;
     char   *format;
 
-#if SVID > 3
+#ifdef BACKPIPE
     struct process *pipehead, *pipetail, *pmarker;
     int inpipe = 0;
-#endif /* SVID > 3 */
+#endif /* BACKPIPE */
 
     while (pp->p_pid != pp->p_jobid)
 	pp = pp->p_friends;
@@ -985,7 +992,7 @@ pprint(pp, flag)
     status = reason = -1;
     jobflags = 0;
     do {
-#if SVID > 3
+#ifdef BACKPIPE
 	/*
 	 * The pipeline is reversed, so locate the real head of the pipeline
 	 * if pp is at the tail of a pipe (and not already in a pipeline)
@@ -1004,9 +1011,9 @@ pprint(pp, flag)
 	 */
 	}
 	pcond = (tp != pp || (inpipe && tp == pp));
-#else /* SVID <= 3 */
+#else /* !BACKPIPE */
 	pcond = (tp != pp);
-#endif /* SVID > 3 */	    
+#endif /* BACKPIPE */	    
 
 	jobflags |= pp->p_flags;
 	pstatus = pp->p_flags & PALLSTATES;
@@ -1018,12 +1025,12 @@ pprint(pp, flag)
 	    if (pcond && linp != linbuf)
 		xprintf("\n");
 	    if (flag & NUMBER) {
-#if SVID <= 3
-		pcond = (pp == tp);
-#else /* SVID > 3 */
-		pcond : ((pp == tp && !inpipe) ||
+#ifdef BACKPIPE
+		pcond = ((pp == tp && !inpipe) ||
 			 (inpipe && pipetail == tp && pp == pipehead));
-#endif /* SVID <= 3 */
+#else /* BACKPIPE */
+		pcond = (pp == tp);
+#endif /* BACKPIPE */
 		if (pcond)
 		    xprintf("[%d]%s %c ", pp->p_index,
 			    pp->p_index < 10 ? " " : "",
@@ -1140,12 +1147,12 @@ prcomd:
 #endif /* !BSDTIMES && !SEQUENT */
 
 	}
-#if SVID <= 3
-	pcond = (tp == pp->p_friends);
-#else  /* SVID > 3 */
+#ifdef BACKPIPE
 	pcond = ((tp == pp->p_friends && !inpipe) ||
 		 (inpipe && pipehead->p_friends == tp && pp == pipetail));
-#endif /* SVID <= 3 */
+#else  /* !BACKPIPE */
+	pcond = (tp == pp->p_friends);
+#endif /* BACKPIPE */
 	if (pcond) {
 	    if (linp != linbuf)
 		xprintf("\n");
@@ -1155,7 +1162,7 @@ prcomd:
 		xprintf(")\n");
 	    }
 	}
-#if SVID > 3
+#ifdef BACKPIPE
 	if (inpipe) {
 	    /*
 	     * if pmaker == pipetail, we are finished that pipeline, and
@@ -1177,9 +1184,9 @@ prcomd:
 	    }
 	}
 	pcond = ((pp = pp->p_friends) != tp || inpipe);
-#else /* SVID < 3 */
+#else /* !BACKPIPE */
 	pcond = ((pp = pp->p_friends) != tp);
-#endif /* SVID > 3 */
+#endif /* BACKPIPE */
     } while (pcond);
 
     if (jobflags & PTIME && (jobflags & (PSTOPPED | PRUNNING)) == 0) {
@@ -1911,6 +1918,12 @@ pgetty(wanttty, pgrp)
 	(void) sighold(SIGTTOU);
     }
 #  endif /* !BSDSIGS */
+# endif /* POSIXJOBS */
+
+# ifndef POSIXJOBS
+    if (wanttty > 0)
+	(void) tcsetpgrp(FSHTTY, pgrp);
+# endif /* !POSIXJOBS */
 
     /*
      * From: Michael Schroeder <mlschroe@immd4.informatik.uni-erlangen.de>
@@ -1920,49 +1933,37 @@ pgetty(wanttty, pgrp)
      */
     if (wanttty >= 0)
 	if (setpgid(0, pgrp) == -1) {
+# ifdef BACKPIPE
+	    /*
+     	     * This usually happens in svr4 when the last command in a pipe
+	     * either couldn't be started, or exits without waiting for input.
+	     * Putting in the xexit() hangs the shell, so leave it out.
+	     * (DHD)
+     	     */
+#  ifdef JOBDEBUG
+	    xprintf("tcsh: setpgid error (%s).\n", strerror(errno));
+	    xprintf("pgrp = %d, shell pid = %d\n",pgrp,getpid());
+#  endif /* JOBDEBUG */
+# else /* !BACKPIPE */
 #  if !defined(ISC) && !defined(SCO) && !defined(cray)
 	    /* XXX: Wrong but why? */
 	    xprintf("tcsh: setpgid error (%s).\n", strerror(errno));
+#  endif /* !ISC && !SCO && !cray */
 	    xexit(0);
-#  endif /* !ISC && !SCO */
+# endif /* BACKPIPE */
 	}
-# endif /* POSIXJOBS */
 
-    if (wanttty > 0)
+# ifdef POSIXJOBS
+    if (wanttty > 0) {
 	(void) tcsetpgrp(FSHTTY, pgrp);
-
-# ifndef POSIXJOBS
-    if (wanttty >= 0)
-	if (setpgid(0, pgrp) == -1) {
-#  if !defined(ISC) && !defined(SCO) && SVID <= 3
-	    /* XXX: Wrong but why? */
-	    xprintf("tcsh: setpgid error (%s).\n", strerror(errno));
-	    xexit(0);
-#  elif SVID>3
-	    /*
-     	    * This usually happens in svr4 when the last command in a pipe
-	    * either couldn't be started, or exits without waiting for input.
-	    * Putting in the xexit() hangs the shell, so leave it out.
-	    * (DHD)
-     	    */
-#   ifdef JOBDEBUG
-	    xprintf("tcsh: setpgid error (%s).\n", strerror(errno));
-	    xprintf("pgrp = %d, shell pid = %d\n",pgrp,getpid());
-#   endif /* JOBDEBUG */
-	    /* xexit(0); */
-#  endif /* !ISC && !SCO */
-	}
-# else /* POSIXJOBS */
-    if (wanttty > 0)
 #  ifdef BSDSIGS
 	(void) sigsetmask(omask);
 #  else /* BSDSIGS */
-    {
 	(void) sigrelse(SIGTSTP);
 	(void) sigrelse(SIGTTIN);
 	(void) sigrelse(SIGTTOU);
-    }
 #  endif /* !BSDSIGS */
+    }
 # endif /* POSIXJOBS */
 
     if (tpgrp > 0)

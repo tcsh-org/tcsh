@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.13 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.14 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -36,6 +36,14 @@
  */
 #ifndef _h_tc_os
 #define _h_tc_os
+
+#if SVID > 3
+/*
+ * for SVR4 we fork pipelines backwards. 
+ * more info in sh.sem.c
+ */
+# define BACKPIPE
+#endif /* SVID > 3 */
 
 #ifdef OREO
 # include <sys/time.h>
@@ -427,7 +435,10 @@ extern int nice();
 extern void setpwent();
 extern void endpwent();
 # endif /* fps500 */
+
+#ifndef __STDC__
 extern struct passwd *getpwuid(), *getpwnam(), *getpwent();
+#endif /* __STDC__ */
 
 # ifndef getwd
 extern char *getwd();

@@ -1,5 +1,5 @@
-.\" $Id: tcsh.man,v 3.16 1991/10/12 04:23:51 christos Exp $
-.TH TCSH 1 "12 October 1991" "Cornell"
+.\" $Id: tcsh.man,v 3.17 1991/10/13 23:44:48 christos Exp $
+.TH TCSH 1 "18 October 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -91,9 +91,11 @@ in a set of characters and the ability to negate a globbing pattern.
 21) Searching for the visual history mechanism.
 .sp
 .ti -4
-22) A new builtin for the
-.IR which (1)
-command.
+22) New builtins for the
+.IR which (1) 
+and
+.IR where
+commands.
 .sp
 .ti -4
 23) Restarting a stopped editor with two keystrokes.
@@ -1962,7 +1964,7 @@ an
 in which case the matched history event is executed. If no history event 
 matches the shell pattern then the bell is rung.
 .PP
-.SH "22. BUILTIN WHICH(1) COMMAND"
+.SH "22. BUILTIN WHICH(1)/WHERE COMMANDS"
 There is now a builtin version of the
 .IR which (1)
 command.  The builtin version is just like the original, except that
@@ -1974,6 +1976,9 @@ There is also a key-function interface to this command: the
 .I which-command
 function (normally bound to M-?), can be used anywhere on the command line,
 and will in effect do a 'which' on the command name.
+.PP
+Similarly where will report all known instances of the command: aliases,
+builtins, as well as all references in the path.
 .PP
 .SH "23. RESTARTING A STOPPED EDITOR"
 There is another new editor function: run-fg-editor, which is bound to
@@ -2750,7 +2755,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.00.03 (Cornell) 10/12/91.
+This man page documents tcsh 6.00.03 (Cornell) 10/18/91.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
@@ -2809,7 +2814,7 @@ Jose Sousa, Interactive Systems Corp., 1991
 Extended vi fixes. Added delete command in vi.
 .br
 Marc Horowitz, MIT, 1991
-Ansification fixes, new exec hashing code, imake fixes.
+Ansification fixes, new exec hashing code, imake fixes, where builtin.
 .br
 Eric Schnoebelen, Convex, 1990
 .br

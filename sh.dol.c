@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.dol.c,v 1.4 91/09/26 12:01:44 eichin Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.2 1991/07/24 17:38:12 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 
 /*
  * C shell
@@ -397,6 +397,7 @@ Dgetdol()
     bool    dimen = 0, bitset = 0;
     char    tnp;
     Char    wbuf[BUFSIZ];
+    static Char *dolbang = NULL;
 
 #ifdef COMPAT
     dolmod = dolmcnt = 0;
@@ -411,6 +412,16 @@ Dgetdol()
     else if (c == '?')
 	bitset++, c = DgetC(0);	/* $? tests existence */
     switch (c) {
+
+    case '!':
+	if (dimen || bitset)
+	    stderror(ERR_SYNTAX);
+	if (backpid != 0) {
+	    if (dolbang) 
+		xfree((pid_t) dolbang);
+	    setDolp(dolbang = putn(backpid));
+	}
+	goto eatbrac;
 
     case '$':
 	if (dimen || bitset)

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.11 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.12 1991/10/13 23:44:48 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,13 +39,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.11 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.12 1991/10/13 23:44:48 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
 
-#define TENEDEBUG 
+/* #define TENEDEBUG */
 
 /* true if the path has relative elements */
 static bool relatives_in_path;
@@ -613,8 +613,8 @@ t_search(word, wp, command, max_word_length, looking_for_command, list_max)
     int     looking_for_shellvar,	/* true if looking for $foo */
             looking_for_file;	/* true if looking for a file name */
     Char  **pathv;		/* pointer to PATH elements */
-    struct varent *v_ptr = NULL;/* current shell variable position */
-    Char  **env_ptr = NULL;	/* current env. variable position */
+    struct varent *vptr = NULL;/* current shell variable position */
+    Char  **envptr = NULL;	/* current env. variable position */
 
     int     d = 4, nd;		/* distance and new distance to command for
 				 * SPELL */
@@ -634,7 +634,7 @@ t_search(word, wp, command, max_word_length, looking_for_command, list_max)
      */
     static int numitems;
 
-    pathv = (v_ptr = adrof(STRPATH)) == NULL ? pv : v_ptr->vec;
+    pathv = (vptr = adrof(STRPATH)) == NULL ? pv : vptr->vec;
 
     if (items != NULL)
 	FREE_ITEMS(items, numitems);
@@ -658,8 +658,8 @@ t_search(word, wp, command, max_word_length, looking_for_command, list_max)
     dollar_dir[0] = '\0';
 
     if (looking_for_shellvar) {	/* Looking for a shell var? */
-	v_ptr = tw_start_shell_list();
-	env_ptr = tw_start_env_list();
+	vptr = tw_start_shell_list();
+	envptr = tw_start_env_list();
 	target++;
     }
     else
@@ -741,8 +741,8 @@ again:
 
     while (1) {
 	if (looking_for_shellvar) {
-	    if ((entry = tw_next_shell_var(&v_ptr)) == NULL)
-		if ((entry = tw_next_env_var(&env_ptr)) == NULL)
+	    if ((entry = tw_next_shell_var(&vptr)) == NULL)
+		if ((entry = tw_next_env_var(&envptr)) == NULL)
 		    break;
 	}
 	else if (looking_for_file || looking_for_lognames) {

@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.4 91/10/02 03:41:41 marc Exp Locker: marc $
+/**/# $Id: Imakefile,v 1.1 1991/10/13 23:44:48 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -78,6 +78,10 @@ ones.  Please send in your fixes and additions! */
 #define ConfigH convex
 #endif
 
+#ifdef SQNTArchitecture
+#define ConfigH sequent
+#endif
+
 /* generic os's */
 
 #ifndef ConfigH
@@ -113,11 +117,15 @@ TCSHPATH =
 
 /**** libraries ****/
 
-#if (SystemV == NO) || defined(HPArchitecture) || defined(_SEQUENT_) || \
+#if (SystemV == NO) || defined(HPArchitecture) || defined(SQNTArchitecture) || \
 	defined(MacIIArchitecture) || defined(UseLibTermcap)
 LIBTERMCAP = -ltermcap
 #else
 LIBTERMCAP =
+#endif
+
+#if defined(SQNTArchitecture)
+LIBSQNT=-lseq
 #endif
 
 /* This may not be good enough - I don't have access to enough systems
@@ -209,7 +217,7 @@ LIBDIRENT =
 
 SYSLIBS = $(LIBPOSIX) $(LIBDIRENT) $(LIBTERMCAP) $(LIBCURSES) \
 	$(LIBNET) $(LIBINTL) $(LIBSOCKET) $(LIBSUN) $(LIBBSD) $(LIBCPOSIX) \
-	$(LIBINET) $(LIBDIR) $(LIBX) $(LIBC_S)
+	$(LIBINET) $(LIBDIR) $(LIBX) $(LIBC_S) $(LIBSQNT)
 
 /* Past here, nothing should need to be changed to compile on a different
 platform, unless you have a really weird architecture. */
@@ -241,12 +249,6 @@ HESDEF =
 /* This is encore specific, but I don't know what encore's #define is,
 and it shouldn't hurt to have it here, so here it is */
 PARALLEL=12				# Make the multi-max run fast.
-
-#ifdef _SEQUENT_
-P = &
-#else
-P =
-#endif
 
 #ifndef DestDir
 #define DestDir /usr/local
@@ -371,6 +373,8 @@ tc.const.h: tc.const.c
 	    sed -e 's/Char \([a-zA-Z0-9_]*\)\(.*\)/extern Char \1[];/' | \
 	    sort >> $@
 
+$(OBJS): sh.err.h tc.const.h ed.defns.h
+
 tar:
 	rm -f tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION} 
@@ -394,11 +398,11 @@ world:
 	make clean ; make depend ; make tcsh ; make install
 
 clean::
-	rm ed.defns.h sh.err.h tc.const.h
+	rm -f ed.defns.h sh.err.h tc.const.h
 
 depend:: ed.defns.h sh.err.h tc.const.h $(SRCS)
 
-NormalProgramTarget(tcsh, $(P) $(OBJS), ed.defns.h sh.err.h tc.const.h, \
+NormalProgramTarget(tcsh, $(OBJS), ed.defns.h sh.err.h tc.const.h, \
 			/*LOCALLIBS*/, $(HESLIB) $(SYSLIBS))
 
 InstallProgram(tcsh, $(BINDIR));

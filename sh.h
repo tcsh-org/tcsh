@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.14 1991/10/13 23:44:48 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.15 1991/10/14 20:42:30 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -426,6 +426,7 @@ struct tms shtimes;		/* shell and child times for process timing */
  * Miscellany
  */
 Char   *doldol;			/* Character pid for $$ */
+int	backpid;		/* pid of the last background job */
 time_t  chktim;			/* Time mail last checked */
 
 /*

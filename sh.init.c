@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.init.c,v 1.4 91/10/02 03:45:16 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.8 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.7 1991/09/08 00:45:32 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.8 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 
@@ -515,7 +515,7 @@ struct	mesg mesg[] = {
 #  define _sigextra_
 /* 20 */	0,		"Signal 20",
 /* 21 */	0,		"Signal 21",
-/* 22 */	0,		"Signal 22"
+/* 22 */	0,		"Signal 22",
 /* 23 */	"AIO", 		"LAN Asyncronous I/O",
 /* 24 */	"PTY", 		"PTY read/write availability",
 /* 25 */	"IOINT", 	"I/O intervention required",

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.12 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.13 1991/10/13 23:44:48 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.12 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.13 1991/10/13 23:44:48 christos Exp $")
 
 #define EXTERN			/* intern */
 #include "ed.h"
@@ -287,14 +287,6 @@ ed_Init()
 #endif /* POSIX || TERMIO */
 
     tty_setchar(&edtty, ttychars[EDIO]);
-
-
-    /* Make sure the tty has a well-defined initial state */
-    /* But don't bother to alter the settings if we are not editing */
-    if (editing) {
-	Tty_raw_mode = 0;
-	(void) Rawmode();
-    }
 }
 
 /* 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.10 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.11 1991/10/12 04:23:51 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -240,15 +240,17 @@ extern char *sbrk();
 
 
 /***
- *** rs6000, ibm370, ps2: running flavors of aix.
+ *** rs6000, ibm370, ps2, rt: running flavors of aix.
  ***/
 #ifdef IBMAIX
 # ifndef _SIZE_T
 #  define _SIZE_T
 # endif /* _SIZE_T */
-# ifndef _PID_T
-#  define _PID_T
-# endif /* _PID_T */
+# ifndef aiws
+#  ifndef _PID_T
+#   define _PID_T
+#  endif /* _PID_T */
+# endif /* !aiws */
 # ifdef _IBMR2
 #  ifndef _SPEED_T 
 #   define _SPEED_T

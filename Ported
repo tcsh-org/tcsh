@@ -61,6 +61,7 @@ OS	:	bsd4.3
 CONFIG	:	config.bsd 
 ENVIRON	:	n/a
 NOTES	:	cc broken: typedef void sigret_t;
+NOTES	:	time.h is broken for ansi compilers. Use gcc -traditional
 VERSION	:	6.00.00
 
 VENDOR	:	digital
@@ -72,6 +73,7 @@ OS	:	mtXinu 4.3
 CONFIG	:	config.mtxinu 
 ENVIRON	:	n/a
 NOTES	:	cc broken: typedef void sigret_t;
+NOTES	:	time.h is broken for ansi compilers. Use gcc -traditional
 VERSION	:	6.00.00
 
 VENDOR	:	digital
@@ -125,16 +127,27 @@ NOTES	:	Old versions of the compiler break with -O. No ansi include
 NOTES	:	files so we have to undef __STDC__
 VERSION	:	6.00.01
 
+VENDOR	:	ibm
+MODELS	:	rt
+COMPILER:	cc
+CFLAGS	:	-I. -Nd4000 -Nn3000
+LIBES	:	-lcurses
+OS	:	aix 2.1.2
+CONFIG	:	config.aix
+ENVIRON	:	n/a
+NOTES	:	Stacksize limit is 1K off?
+VERSION	:	6.00.03
+
 VENDOR	:	sequent
-MODELS	:	symmetry
+MODELS	:	balance, symmetry
 COMPILER:	cc
 CFLAGS	:	normal
 LIBES	:	-ltermcap -lseq
-OS	:	Dynix 3.0
-CONFIG	:	config.symmetry
-ENVIRON	:	n/a
+OS	:	Dynix 3.1, ptx 1.2
+CONFIG	:	config.sequent
+ENVIRON	:	universe on Dynix 3.1: ucb
 NOTES	:	none
-VERSION	:	6.00.00
+VERSION	:	6.00.03
 
 VENDOR	:	encore
 MODELS	:	multimax
@@ -178,6 +191,7 @@ OS	:	MORE/bsd 4.3+
 CONFIG	:	config.mtxinu
 ENVIRON	:	n/a
 NOTES	:	none
+NOTES	:	time.h is broken for ansi compilers. Use gcc -traditional
 VERSION	:	6.00.02
 
 VENDOR	:	digital
@@ -292,3 +306,15 @@ ENVIRON :       n/a
 NOTES   :       The -O option makes the compiler run for ages!
 VERSION :       6.00.03
 
+VENDOR	:	SGI
+MODELS	:	4D, 3000
+COMPILER:	cc
+CFLAGS	:	-D__STDC__ (??? through 3.3.x)
+CFLAGS	:	-D__STDC__ -cckr (>= 4.0)
+LIBES	:	-lcurses -lsun -lbsd -lc_s
+OS	:	IRIX (3.?) 3.2 3.3 4.0
+CONFIG	:	config.sgi
+ENVIRON	:	n/a
+NOTES	:	AUTOLOGOUT is probably best undef'ed
+NOTES	:	For 4.0, the NLS define in config.h can be enabled.
+VERSION	:	6.00.03

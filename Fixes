@@ -1,4 +1,7 @@
 V6.00.03, ....
+28. Added $! (the pid of the last background job forked)
+27. exec does not kill the shell when it fails.
+26. Irix4.0 decls.
 25. SVR4 uthost fixes from Kimmo Suominen
 24. Imake addition from marc
 23. New i-search from Per.

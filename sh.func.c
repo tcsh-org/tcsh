@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.9 1991/10/13 23:44:48 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.10 1991/10/14 20:42:30 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.9 1991/10/13 23:44:48 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.10 1991/10/14 20:42:30 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1294,6 +1294,7 @@ doumask(v, c)
 #  endif /* RLIM_INFINITY */
 #  ifdef aiws
 #   define toset(a) (((a) == 3) ? 1004 : (a) + 1)
+#   define RLIMIT_DATA	3
 #   define RLIMIT_STACK 1005
 #  else /* aiws */
 #   define toset(a) ((a) + 1)
@@ -1315,7 +1316,11 @@ static struct limits {
 # endif /* RLIMIT_CPU */
 
 # ifdef RLIMIT_FSIZE
+#  ifndef aiws
     RLIMIT_FSIZE, 	"filesize",	1024,	"kbytes",
+#  else
+    RLIMIT_FSIZE, 	"filesize",	512,	"blocks",
+#  endif /* aiws */
 # endif /* RLIMIT_FSIZE */
 
 # ifdef RLIMIT_DATA
@@ -1323,7 +1328,11 @@ static struct limits {
 # endif /* RLIMIT_DATA */
 
 # ifdef RLIMIT_STACK
+#  ifndef aiws
     RLIMIT_STACK, 	"stacksize",	1024,	"kbytes",
+#  else
+    RLIMIT_STACK, 	"stacksize",	1024 * 1024,	"kbytes",
+#  endif /* aiws */
 # endif /* RLIMIT_STACK */
 
 # ifdef RLIMIT_CORE
@@ -1518,6 +1527,14 @@ getval(lp, v)
 	limtail(cp, "kbytes");
 	f *= 1024.0;
 	break;
+    case 'b':
+# ifdef RLIMIT_CPU
+	if (lp->limconst == RLIMIT_CPU)
+	    goto badscal;
+# endif /* RLIMIT_CPU */
+	limtail(cp, "blocks");
+	f *= 512.0;
+	break;
     case 'u':
 	limtail(cp, "unlimited");
 	return (RLIM_INFINITY);
@@ -1563,6 +1580,10 @@ plim(lp, hard)
 
 # ifndef BSDTIMES
     limit = ulimit(lp->limconst, 0);
+#  ifdef aiws
+    if (lp->limconst == RLIMIT_DATA)
+	limit -= 0x20000000;
+#  endif /* aiws */
 # else /* BSDTIMES */
     (void) getrlimit(lp->limconst, &rlim);
     limit = hard ? rlim.rlim_max : rlim.rlim_cur;
@@ -1581,7 +1602,8 @@ plim(lp, hard)
 	 * Christos: filesize comes in 512 blocks. we divide by 2 to get 1024
 	 * blocks. Note we cannot pre-multiply cause we might overflow (A/UX)
 	 */
-	xprintf("%ld %s", (long) (limit / 2), lp->limscale);
+	xprintf("%ld %s", (long) (limit / (lp->limdiv == 1024 ? 2 : 1)), 
+	        lp->limscale);
     else
 # endif /* BSDTIMES */
 	xprintf("%ld %s", (long) (limit / lp->limdiv), lp->limscale);
@@ -1640,6 +1662,10 @@ setlim(lp, hard, limit)
 # else /* BSDTIMES */
     if (limit != RLIM_INFINITY && lp->limconst == RLIMIT_FSIZE)
 	limit /= 512;
+# ifdef aiws
+    if (lp->limconst == RLIMIT_DATA)
+	limit += 0x20000000;
+# endif /* aiws */
     if (ulimit(toset(lp->limconst), limit) < 0) {
 # endif /* BSDTIMES */
 	xprintf("%s: %s: Can't %s%s limit\n", bname, lp->limname,

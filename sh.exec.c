@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.exec.c,v 1.5 91/10/02 03:44:10 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.2 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -420,29 +420,89 @@ execash(t, kp)
     Char  **t;
     register struct command *kp;
 {
+    int     saveIN, saveOUT, saveDIAG, saveSTD;
+    int     oSHIN;
+    int     oSHOUT;
+    int     oSHDIAG;
+    int     oOLDSTD;
+    jmp_buf osetexit;
+    int	    my_reenter;
+    int     odidfds;
+#ifndef FIOCLEX
+    int	    odidcch;
+#endif /* FIOCLEX */
+    sigret_t (*osigint)(), (*osigquit)(), (*osigterm)();
+
     if (chkstop == 0 && setintr)
 	panystop(0);
-#ifdef notdef
     /*
-     * Why we don't want to close SH* on exec? I think we do... Christos
+     * Hmm, we don't really want to do that now because we might
+     * fail, but what is the choice
      */
-# ifndef FIOCLEX
-    didcch = 1;
-# endif
-#endif /* notdef */
     rechist();
-    (void) signal(SIGINT, parintr);
-    (void) signal(SIGQUIT, parintr);
-    (void) signal(SIGTERM, parterm);	/* if doexec loses, screw */
+
+
+    osigint  = signal(SIGINT, parintr);
+    osigquit = signal(SIGQUIT, parintr);
+    osigterm = signal(SIGTERM, parterm);
+
+    odidfds = didfds;
+#ifndef FIOCLEX
+    odidcch = didcch;
+#endif /* FIOCLEX */
+    oSHIN = SHIN;
+    oSHOUT = SHOUT;
+    oSHDIAG = SHDIAG;
+    oOLDSTD = OLDSTD;
+
+    saveIN = dcopy(SHIN, -1);
+    saveOUT = dcopy(SHOUT, -1);
+    saveDIAG = dcopy(SHDIAG, -1);
+    saveSTD = dcopy(OLDSTD, -1);
+
     lshift(kp->t_dcom, 1);
-    /*
-     * hmm. Let's not die if doexec fails...
-     */
-#ifdef notdef
-    exiterr = 1;
-#endif
-    doexec(kp);
-    /* NOTREACHED */
+
+    getexit(osetexit);
+
+    /* PWP: setjmp/longjmp bugfix for optimizing compilers */
+#ifdef cray
+    my_reenter = 1;             /* assume non-zero return val */
+    if (setexit() == 0) {
+        my_reenter = 0;         /* Oh well, we were wrong */
+#else /* !cray */
+    if ((my_reenter = setexit()) == 0) {
+#endif /* cray */
+	SHIN = dcopy(0, -1);
+	SHOUT = dcopy(1, -1);
+	SHDIAG = dcopy(2, -1);
+#ifndef FIOCLEX
+	didcch = 0;
+#endif /* FIOCLEX */
+	didfds = 0;
+	doexec(kp);
+    }
+
+    (void) sigset(SIGINT, osigint);
+    (void) sigset(SIGQUIT, osigquit);
+    (void) sigset(SIGTERM, osigterm);
+
+    doneinp = 0;
+#ifndef FIOCLEX
+    didcch = odidcch;
+#endif /* FIOCLEX */
+    didfds = odidfds;
+    (void) close(SHIN);
+    (void) close(SHOUT);
+    (void) close(SHDIAG);
+    (void) close(OLDSTD);
+    SHIN = dmove(saveIN, oSHIN);
+    SHOUT = dmove(saveOUT, oSHOUT);
+    SHDIAG = dmove(saveDIAG, oSHDIAG);
+    OLDSTD = dmove(saveSTD, oOLDSTD);
+
+    resexit(osetexit);
+    if (my_reenter)
+	stderror(ERR_SILENT);
 }
 
 void

@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.err.c,v 1.3 91/09/24 17:08:45 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.err.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_tc_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.2 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 
 /*
  * C Shell
@@ -215,7 +215,7 @@ static char *errorlist[] =
 #define ERR_HISTUS	78
     "Usage: history [-rht] [# number of events]",
 #define ERR_SPDOLLT	79
-    "$ or < not allowed with $# or $?",
+    "$, ! or < not allowed with $# or $?",
 #define ERR_NEWLINE	80
     "Newline in variable name",
 #define ERR_SPSTAR	81
