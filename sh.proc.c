@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.73 2001/06/10 02:25:52 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.74 2001/06/10 02:26:38 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.73 2001/06/10 02:25:52 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.74 2001/06/10 02:26:38 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -802,6 +802,21 @@ pclrcurr(pp)
 static Char command[PMAXLEN + 4];
 static int cmdlen;
 static Char *cmdp;
+
+/* GrP
+ * unparse - Export padd() functionality 
+ */
+Char *
+unparse(t)
+    register struct command *t;
+{
+    cmdp = command;
+    cmdlen = 0;
+    padd(t);
+    *cmdp++ = '\0';
+    return Strsave(command);
+}
+
 
 /*
  * palloc - allocate a process structure and fill it up.
@@ -1734,6 +1749,12 @@ pstart(pp, foregnd)
     if (!foregnd)
 	pclrcurr(pp);
     (void) pprint(pp, foregnd ? NAME | JOBDIR : NUMBER | NAME | AMPERSAND);
+
+    /* GrP run jobcmd hook if foregrounding */
+    if (foregnd) {
+	job_cmd(pp->p_command);
+    }
+
 #ifdef BSDJOBS
     if (foregnd) {
 	rv = tcsetpgrp(FSHTTY, pp->p_jobid);

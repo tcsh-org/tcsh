@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.94 2000/11/12 02:18:06 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.95 2001/04/27 22:25:54 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.94 2000/11/12 02:18:06 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.95 2001/04/27 22:25:54 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -63,6 +63,7 @@ extern int do_logout;
 extern time_t t_period;
 extern int just_signaled;
 static bool precmd_active = 0;
+static bool jobcmd_active = 0; /* GrP */
 static bool postcmd_active = 0;
 static bool periodic_active = 0;
 static bool cwdcmd_active = 0;	/* PWP: for cwd_cmd */
@@ -1042,6 +1043,44 @@ leave:
     (void) sigrelse(SIGINT);
 #endif /* BSDSIGS */
 }
+
+
+/* 
+ * GrP Greg Parker May 2001
+ * Added job_cmd(), which is run every time a job is started or 
+ * foregrounded. The command is passed a single argument, the string 
+ * used to start the job originally. With precmd, useful for setting 
+ * xterm titles.
+ * Cloned from cwd_cmd().
+ */
+void
+job_cmd(args)
+    Char *args;
+{
+#ifdef BSDSIGS
+    sigmask_t omask;
+
+    omask = sigblock(sigmask(SIGINT));
+#else /* !BSDSIGS */
+    (void) sighold(SIGINT);
+#endif /* BSDSIGS */
+    if (jobcmd_active) {	/* an error must have been caught */
+	aliasrun(2, STRunalias, STRjobcmd);
+	xprintf(CGETS(22, 14, "Faulty alias 'jobcmd' removed.\n"));
+	goto leave;
+    }
+    jobcmd_active = 1;
+    if (!whyles && adrof1(STRjobcmd, &aliases))
+	aliasrun(2, STRjobcmd, args);
+leave:
+    jobcmd_active = 0;
+#ifdef BSDSIGS
+    (void) sigsetmask(omask);
+#else /* !BSDSIGS */
+    (void) sigrelse(SIGINT);
+#endif /* BSDSIGS */
+}
+
 
 /*
  * Karl Kleinpaste, 21oct1983.
