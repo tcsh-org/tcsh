@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/vms.termcap.c,v 1.4 1996/04/26 19:23:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/vms.termcap.c,v 1.5 1997/10/02 16:36:36 christos Exp $ */
 /*
  *	termcap.c	1.1	20/7/87		agc	Joypace Ltd
  *
@@ -9,7 +9,7 @@
  *	A public domain implementation of the termcap(3) routines.
  */
 #include "sh.h"
-RCSID("$Id: vms.termcap.c,v 1.4 1996/04/26 19:23:29 christos Exp $")
+RCSID("$Id: vms.termcap.c,v 1.5 1997/10/02 16:36:36 christos Exp $")
 #if defined(_VMS_POSIX) || defined(_OSD_POSIX)
 /*    efth      1988-Apr-29
 
@@ -334,4 +334,4 @@ int		(*outc)();
 		(*outc)(*cp++);
 	return(1);
 }
-#endif /* _VMS_POSIX */
+#endif /* _VMS_POSIX || _OSD_POSIX */
