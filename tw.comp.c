@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.10 1992/03/27 22:16:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.12 1992/03/28 00:15:01 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.10 1992/03/27 22:16:09 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.12 1992/03/28 00:15:01 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -397,7 +397,7 @@ tw_dollar(str, wl, nwl, buffer, sep, msg)
     if (*sp++ == sep)
 	return sp;
 
-    stderror(ERR_COMPILL, msg, str);
+    stderror(ERR_COMPILL, msg, short2str(str));
     return --sp;
 } /* end tw_dollar */
 		

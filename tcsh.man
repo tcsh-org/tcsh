@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.35 1992/03/27 01:59:46 christos Exp $
+.\" $Id: tcsh.man,v 3.36 1992/03/27 22:18:27 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -2916,8 +2916,8 @@ hosts.
 Another exotic example that makes use of dynamic command execution is:
 .sp
 .nf
-> complete talk 'p/1/`users | tr " " "\012" | uniq`/' \
-	        'n/*/`who | grep $:1 | cut -d" " -f2`/'
+> complete talk p/1/'`users | tr " " "\012" | uniq`'/ \e
+		n/\e*/\e`who\ \e|\e grep\e \e$:1\e \e|\e awk\e \e'\e{\e print\e \e$2\e \e}\e'\e`/
 .fi
 .sp
 Here we want to get a list of the active users, as an argument to talk,
