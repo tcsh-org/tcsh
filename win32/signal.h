@@ -1,4 +1,3 @@
-/*$Header$*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -48,7 +47,7 @@
 #define SIGILL		8 
 #define SIGFPE		9	
 #define SIGALRM		10
-#define SIGWINCH	11
+//#define SIGWINCH	11
 #define SIGSEGV 	12	
 #define SIGSTOP 	13
 #define SIGPIPE 	14

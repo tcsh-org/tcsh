@@ -223,15 +223,15 @@ void NT_WrapHorizontal(void) {
     CONSOLE_SCREEN_BUFFER_INFO scrbuf;
 
 
-    if (ghstdout == INVALID_HANDLE_VALUE){
-	return;
-    }
-    if(!GetConsoleScreenBufferInfo(ghstdout, &scrbuf) ) {
-	return;
-    }
+	if (ghstdout == INVALID_HANDLE_VALUE){
+		return;
+	}
+	if(!GetConsoleScreenBufferInfo(ghstdout, &scrbuf) ) {
+		return;
+	}
     //absolute movement
-    wnd.Left =  scrbuf.srWindow.Left ;
-    wnd.Right = scrbuf.srWindow.Right;
+    wnd.Left =  0;//scrbuf.srWindow.Left ;
+    wnd.Right = scrbuf.srWindow.Right- scrbuf.srWindow.Left + 1;
     wnd.Top =  scrbuf.srWindow.Top;
     wnd.Bottom = scrbuf.srWindow.Bottom;
 
@@ -302,8 +302,7 @@ void NT_MoveToLineOrChar(int where,int line) {
 		if ( (where> (scrbuf.srWindow.Right)) &&( where >0)){
 			ScrollBufHorizontal(hStdout,&scrbuf,where);
 		}
-		else
-			scrbuf.dwCursorPosition.X = where;
+		scrbuf.dwCursorPosition.X = where;
 	}
 	if (scrbuf.dwCursorPosition.X < 0 || scrbuf.dwCursorPosition.Y <0)
 		return;
