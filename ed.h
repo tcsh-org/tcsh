@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.34 2004/08/01 20:49:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.35 2004/08/04 17:12:27 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -239,6 +239,10 @@ extern char *tgoto	__P((const char *, int, int));
 extern void  tputs	__P((const char *, int, void (*)(int)));
 # define PUTPURE ((void (*)__P((int))) putpure)
 # define PUTRAW ((void (*)__P((int))) putraw)
+#endif
+
+#ifdef DSPMBYTE
+extern bool dspmbyte_utf8;
 #endif
 
 #endif /* _h_ed */

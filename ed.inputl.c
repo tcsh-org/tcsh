@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.52 2004/05/21 18:50:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.53 2004/08/04 17:12:27 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.52 2004/05/21 18:50:36 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.53 2004/08/04 17:12:27 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -61,6 +61,10 @@ static bool rotate = 0;
 static int
 Repair()
 {
+#ifdef DSPMBYTE
+    if (dspmbyte_utf8)
+	Setutf8lit(InputBuf, LastChar);
+#endif
     if (NeedsRedraw) {
 	ClearLines();
 	ClearDisp();
@@ -433,6 +437,10 @@ Inputl()
 		}
 		break;
 	    }
+#ifdef DSPMBYTE
+	    if (dspmbyte_utf8)
+		setutf8lit(InputBuf, LastChar);
+#endif
 	    if (NeedsRedraw) {
 		PastBottom();
 		ClearLines();

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.73 2004/07/25 05:18:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.74 2004/08/04 17:12:27 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.73 2004/07/25 05:18:28 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.74 2004/08/04 17:12:27 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -146,7 +146,6 @@ static	CCRETVAL v_csearch_back		__P((int, int, int));
 #if defined(DSPMBYTE)
 static	void 	 e_charfwd_mbyte	__P((int));
 static	void 	 e_charback_mbyte	__P((int));
-static  void	 setutf8lit		__P((void));
 static  int	 extdel;
 static  int	 extins = 0;
 extern  bool	 dspmbyte_utf8;
@@ -1016,59 +1015,102 @@ c_push_kill(start, end)
 
 #if defined(DSPMBYTE)
 
-static void
-setutf8lit()
+static int
+Utf8Len(cp, w)
+    Char *cp;
+    int *w;
 {
-    Char c, *cp;
-    int f = 0, n = 0;
-    for (cp = InputBuf; cp < LastChar; cp++) {
+    Char c;
+    int n, u, f = 0;
+
+    c = *cp++;
+    if (!Ismbyte1(c)) {
+        *w = 1;
+	return 1;
+    }
+    n = 1;
+    if ((c & 0xfe) == 0xfc) {
+	n = 5;
+	u = c & 0x01;
+    } else if ((c & 0xfc) == 0xf8) {
+	n = 4;
+	u = c & 0x03;
+    } else if ((c & 0xf8) == 0xf0) {
+	n = 3;
+	u = c & 0x07;
+    } else if ((c & 0xf0) == 0xe0) {
+	n = 2;
+	u = c & 0x0f;
+    } else {
+	n = 1;
+	u = c & 0x1f;
+    }
+    while (n-- > 0) {
+	c = *cp++;
+	f++;
+        if (!Ismbyte2(c)) {
+	    *w = -1;
+	    return f;
+        }
+        u = u << 6 | (c & 0x3f);
+    }
+    *w = (u >= 0x1100 &&
+     (u <= 0x115f ||		/* Hangul Jamo init. consonants */
+      (u >= 0x2e80 && u <= 0xa4cf && (u & ~0x0011) != 0x300a &&
+       u != 0x303f) ||                  /* CJK ... Yi */
+      (u >= 0xac00 && u <= 0xd7a3) || /* Hangul Syllables */
+      (u >= 0xdf00 && u <= 0xdfff) || /* dw combining sequence */
+      (u >= 0xf900 && u <= 0xfaff) || /* CJK Compatibility Ideographs */
+      (u >= 0xfe30 && u <= 0xfe6f) || /* CJK Compatibility Forms */
+      (u >= 0xff00 && u <= 0xff5f) || /* Fullwidth Forms */
+      (u >= 0xffe0 && u <= 0xffe6) ||
+      (u >= 0x20000 && u <= 0x2ffff))) ? 2 : 1;
+    return f + 1;
+}
+
+int
+ColLen(cp)
+    Char *cp;
+{
+    Char c;
+    int w, l = 0;
+    while ((c = *cp) != 0) {
+	if (Ismbyte1(c)) {
+	    cp += Utf8Len(cp, &w);
+	    if (w > 0)
+		l += w;
+	}
+	else {
+	    cp++;
+	    l++;
+	}
+    }
+    return l;
+}
+
+
+void
+Setutf8lit(cp, end)
+    Char *cp;
+    Char *end;
+{
+    Char c
+    int w, f;
+    for (end ? cp < end; : *cp != '\0') {
 	c = *cp;
-	if (n == 0) {
-	    if (!Ismbyte1(c))
-		continue;
-	    n = 1;
-	    if ((c & 0xfe) == 0xfc)
-		n = 5;
-	    else if ((c & 0xfc) == 0xf8)
-		n = 4;
-	    else if ((c & 0xf8) == 0xf0)
-		n = 3;
-	    else if ((c & 0xf0) == 0xe0)
-		n = 2;
-	    f = 0;
-	    *cp |= LITERAL;
+	if (!Ismbyte1(c)) {
+	    cp++;
 	    continue;
 	}
-	if (!Ismbyte2(c)) {
-	    n = f = 0;
-	    cp--;
+	f = Utf8Len(cp, &w);
+	if (w < 0) {
+	    cp += f;
 	    continue;
 	}
-	if (++f < n) {
-	    *cp |= LITERAL;
-	    continue;
-	}
-	f = 0;
-	if (n == 2) {
-	    /* range 0x800 - 0xffff */
-	    int u;
-	    u = (cp[-2] & 0x0f) << 12 | (cp[-1] & 0x3f) << 6 | (c & 0x3f);
-	    if (u >= 0x1100 &&
-		 (u <= 0x115f ||                    /* Hangul Jamo init. consonants */
-		  (u >= 0x2e80 && u <= 0xa4cf && (u & ~0x0011) != 0x300a &&
-		   u != 0x303f) ||                  /* CJK ... Yi */
-		  (u >= 0xac00 && u <= 0xd7a3) || /* Hangul Syllables */
-		  (u >= 0xdf00 && u <= 0xdfff) || /* dw combining sequence */ 
-		  (u >= 0xf900 && u <= 0xfaff) || /* CJK Compatibility Ideographs */
-		  (u >= 0xfe30 && u <= 0xfe6f) || /* CJK Compatibility Forms */
-		  (u >= 0xff00 && u <= 0xff5f) || /* Fullwidth Forms */
-		  (u >= 0xffe0 && u <= 0xffe6)))
-		cp[-1] &= ~LITERAL;
-	} else if (n == 3) {
-	    /* check for 0x20000 - 0x2ffff */
-	    if ((cp[-3] & 7) == 1 && (cp[-2] & 0x20) == 0x00)
-		cp[-1] &= ~LITERAL;
-	}
+	w = f - w;
+	for (; f-- > 0; cp++)
+	    if (w-- > 0) 
+		*cp |= LITERAL;
     }
 }
 
@@ -1129,7 +1171,7 @@ c_get_histline()
   
 #ifdef DSPMBYTE
     if (dspmbyte_utf8)
-	setutf8lit();
+	Setutf8lit(InputBuf, LastChar);
 #endif /* DSPMBYTE */
 
 #ifdef KSHVI
@@ -1580,7 +1622,7 @@ e_insert(c)
 	}
 	else if (_enable_mbdisp && extins && Ismbyte2(c)) {
 	    if (dspmbyte_utf8) {
-		int n = 1;
+		int n = 1, w;
 		if ((savec & 0xfe) == 0xfc)
 		    n = 5;
 		else if ((savec & 0xfc) == 0xf8)
@@ -1589,32 +1631,17 @@ e_insert(c)
 		    n = 3;
 		else if ((savec & 0xf0) == 0xe0)
 		    n = 2;
-		if (extins < n) {
-		    *Cursor++ = (Char ) c | LITERAL;
-		    extins++;
+		if (extins++ < n) {
+		    *Cursor++ = (Char )c;
 		} else {
-		    *(Cursor-extins) = savec | LITERAL;
-		    if (n == 2) {
-			/* range 0x800 - 0xffff */
-			int u;
-			u = (savec & 0x0f) << 12 | (Cursor[-1] & 0x3f) << 6 | (c & 0x3f);
-			if (u >= 0x1100 &&
-			     (u <= 0x115f ||                    /* Hangul Jamo init. consonants */
-			      (u >= 0x2e80 && u <= 0xa4cf && (u & ~0x0011) != 0x300a &&
-			       u != 0x303f) ||                  /* CJK ... Yi */
-			      (u >= 0xac00 && u <= 0xd7a3) || /* Hangul Syllables */
-			      (u >= 0xdf00 && u <= 0xdfff) || /* dw combining sequence */ 
-			      (u >= 0xf900 && u <= 0xfaff) || /* CJK Compatibility Ideographs */
-			      (u >= 0xfe30 && u <= 0xfe6f) || /* CJK Compatibility Forms */
-			      (u >= 0xff00 && u <= 0xff5f) || /* Fullwidth Forms */
-			      (u >= 0xffe0 && u <= 0xffe6)))
-			    Cursor[-1] &= ~LITERAL;
-		    } else if (n == 3) {
-			/* check for 0x20000 - 0x2ffff */
-			if ((savec & 7) == 1 && (Cursor[-2] & 0x20) == 0x00)
-			    Cursor[-1] &= ~LITERAL;
+		    *Cursor++ = (Char )c;
+		    *(Cursor-extins) = savec;
+		    Utf8Len(Cursor - extins, &w);
+		    if (w > 0) {
+			w = extins - w;
+			while (w-- > 0)
+			    Cursor[w - extins] |= LITERAL;
 		    }
-		    *Cursor++ = (Char ) c;
 		    extins = 0;
 		    e_redisp(1);
 		    Refresh();
@@ -1622,7 +1649,7 @@ e_insert(c)
 		}
 	    } else {
 		*(Cursor-1) = savec;
-		*Cursor++ = (Char) c;
+		*Cursor++ = (Char)c;
 		extins = 0;
 		e_redisp(1);
 		Refresh();
@@ -1923,7 +1950,7 @@ e_toggle_hist(c)
 
 #ifdef DSPMBYTE
     if (dspmbyte_utf8)
-	setutf8lit();
+	Setutf8lit(InputBuf, LastChar);
 #endif /* DSPMBYTE */
 
 #ifdef KSHVI

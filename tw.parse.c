@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.98 2004/08/04 17:12:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.99 2004/08/08 06:42:29 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,11 +35,16 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.98 2004/08/04 17:12:32 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.99 2004/08/08 06:42:29 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
+
+#ifdef DSPMBYTE
+extern bool dspmbyte_utf8;
+extern int ColLen __P((Char *));
+#endif
 
 #ifdef WINNT_NATIVE
 #include "nt.const.h"
@@ -2065,8 +2070,15 @@ print_by_column(dir, items, count, no_file_suffix)
     across = ((val = varval(STRlistflags)) != STRNULL) && 
 	     (Strchr(val, 'x') != NULL);
 
-    for (i = 0; i < count; i++)	/* find widest string */
+    for (i = 0; i < count; i++)	{ /* find widest string */
+#ifdef DSPMBYTE
+	if (dspmbyte_utf8) {
+	    maxwidth = max(maxwidth, (unsigned int) ColLen(items[i]));
+	    continue;
+	}
+#endif
 	maxwidth = max(maxwidth, (unsigned int) Strlen(items[i]));
+    }
 
     maxwidth += no_file_suffix ? 1 : 2;	/* for the file tag and space */
     columns = TermH / maxwidth;		/* PWP: terminal size change */
@@ -2107,9 +2119,14 @@ print_by_column(dir, items, count, no_file_suffix)
 		}
 #endif /* COLOR_LS_F */
 
-		if (c < (columns - 1))	/* Not last column? */
+		if (c < (columns - 1)) {	/* Not last column? */
+#ifdef DSPMBYTE
+		    if (dspmbyte_utf8)
+			w = (unsigned int) ColLen(items[i]);
+#endif
 		    for (; w < maxwidth; w++)
 			xputchar(' ');
+		}
 	    }
 	    else if (across)
 		break;

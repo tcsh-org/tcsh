@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.118 2004/08/04 17:12:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.119 2004/08/08 06:42:28 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -787,7 +787,7 @@ extern signalfun_t parterm;	/* Parents terminate catch */
 # define	CHAR		0x001FFFFF /* Mask to mask out the character */
 #elif defined (SHORT_STRINGS)
 # define	QUOTE 	((Char)	0100000)/* 16nth char bit used for 'ing */
-# define	TRIM		0077777	/* Mask to strip quote bit */
+# define	TRIM		0073777	/* Mask to strip quote/lit bit */
 # define	UNDER		0040000	/* Underline flag */
 # define	BOLD		0020000	/* Bold flag */
 # define	STANDOUT	0010000	/* Standout flag */

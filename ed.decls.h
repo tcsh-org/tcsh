@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.decls.h,v 3.31 2002/03/08 17:36:45 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.decls.h,v 3.32 2004/08/04 17:12:27 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -39,6 +39,9 @@
 extern	int	InsertStr		__P((Char *));
 extern	void	DeleteBack		__P((int));
 extern	void	SetKillRing		__P((int));
+#ifdef DSPMBYTE
+extern	void	Setutf8lit		__P((Char *, Char *)); 
+#endif
 
 /*
  * ed.init.c

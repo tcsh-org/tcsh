@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.31 2004/05/19 18:51:42 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.32 2004/08/04 17:12:27 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.31 2004/05/19 18:51:42 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.32 2004/08/04 17:12:27 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -317,7 +317,6 @@ Refresh()
     for (cp = InputBuf; (cp < LastChar); cp++) {
 #if defined(DSPMBYTE)
 	if (vcursor_h + 1 >= TermH && Ismbyte1(*cp)) {
-	    extern bool dspmbyte_utf8;
 	    if (dspmbyte_utf8) {
 		int i;
 		for (i = 1 ; cp + i < LastChar; i++)
@@ -1230,7 +1229,6 @@ RefCursor()
 
 #if defined(DSPMBYTE)
         if (h + 1 >= th && cp + 1 < LastChar && Ismbyte1(cp[1])) {
-            extern bool dspmbyte_utf8;
             if (dspmbyte_utf8) {
                 int i;
                 for (i = 2 ; cp + i < LastChar; i++)

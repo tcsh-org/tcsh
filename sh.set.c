@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.54 2004/09/28 15:08:27 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.55 2004/11/20 17:30:15 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.54 2004/09/28 15:08:27 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.55 2004/11/20 17:30:15 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1121,6 +1121,7 @@ bool dspmbyte_utf8;
 
 #if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
 bool dspmbyte_ls;
+bool dspmbyte_utf8;
 
 void
 update_dspmbyte_vars()
