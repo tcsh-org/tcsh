@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.40 2004/11/23 01:39:35 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.41 2005/01/18 20:24:51 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.40 2004/11/23 01:39:35 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.41 2005/01/18 20:24:51 christos Exp $")
 
 #include "tc.h"
 
@@ -49,28 +49,32 @@ RCSID("$Id: tc.who.c,v 3.40 2004/11/23 01:39:35 christos Exp $")
  * UTMPX counterparts, so they can be added all here when needed.
  * Kimmo Suominen, Oct 14 1991
  */
-# ifndef _PATH_UTMP
-#  if defined(__UTMPX_FILE) && !defined(UTMPX_FILE)
-#   define _PATH_UTMP __UTMPX_FILE
-#  elif defined(_PATH_UTMPX)
-#   define _PATH_UTMP _PATH_UTMPX
+# if defined(__UTMPX_FILE) && !defined(UTMPX_FILE)
+#  define TCSH_PATH_UTMP __UTMPX_FILE
+# elif defined(_PATH_UTMPX)
+#  define TCSH_PATH_UTMP _PATH_UTMPX
+# elif defined(UTMPX_FILE)
+#  define TCSH_PATH_UTMP UTMPX_FILE
+# endif /* __UTMPX_FILE && !UTMPX_FILE */
+# ifdef TCSH_PATH_UTMP
+#  define utmp utmpx
+#  if defined (__MVS__) || defined (linux)
+#   define ut_time ut_tv.tv_sec
+#   define ut_name ut_user
 #  else
-#   define _PATH_UTMP UTMPX_FILE
-#  endif /* __UTMPX_FILE && !UTMPX_FILE */
-# endif /* _PATH_UTMP */
-# define utmp utmpx
-# if defined (__MVS__) || defined (linux)
-#  define ut_time ut_tv.tv_sec
-#  define ut_name ut_user
+#   define ut_time ut_xtime
+#  endif /* __MVS__ */
+#  ifdef HAVE_UTMPNAME
+#   define getutent getutxent
+#   define setutent setutxent
+#   define endutent endutxent
+#   define utmpname utmpxname
+#  endif /* HAVE_UTMPNAME */
 # else
-#  define ut_time ut_xtime
-# endif /* __MVS__ */
-# ifdef HAVE_UTMPNAME
-#  define getutent getutxent
-#  define setutent setutxent
-#  define endutent endutxent
-#  define utmpname utmpxname
-# endif /* HAVE_UTMPNAME */
+#  ifdef HAVE_UTMP_H
+#   include <utmp.h>
+#  endif /* WINNT_NATIVE */
+# endif /* TCSH_PATH_UTMP */
 #else /* !HAVE_UTMPX_H */
 # ifdef HAVE_UTMP_H
 #  include <utmp.h>
@@ -102,13 +106,15 @@ struct utmp __ut;
 # endif /* HAVE_STRUCT_UTMP_UT_HOST */
 #endif /* BROKEN_CC */
 
-#ifndef _PATH_UTMP
+#ifndef TCSH_PATH_UTMP
 # ifdef	UTMP_FILE
-#  define _PATH_UTMP UTMP_FILE
+#  define TCSH_PATH_UTMP UTMP_FILE
+# elif defined(_PATH_UTMP)
+#  define TCSH_PATH_UTMP _PATH_UTMP
 # else
-#  define _PATH_UTMP "/etc/utmp"
+#  define TCSH_PATH_UTMP "/etc/utmp"
 # endif /* UTMP_FILE */
-#endif /* _PATH_UTMP */
+#endif /* TCSH_PATH_UTMP */
 
 
 struct who {
@@ -253,11 +259,11 @@ watch_login(force)
      * From: Michael Schroeder <mlschroe@immd4.informatik.uni-erlangen.de>
      * Don't open utmp all the time, stat it first...
      */
-    if (stat(_PATH_UTMP, &sta)) {
+    if (stat(TCSH_PATH_UTMP, &sta)) {
 	if (!force)
 	    xprintf(CGETS(26, 1,
 			  "cannot stat %s.  Please \"unset watch\".\n"),
-		    _PATH_UTMP);
+		    TCSH_PATH_UTMP);
 # ifdef BSDSIGS
 	(void) sigsetmask(omask);
 # else
@@ -275,14 +281,14 @@ watch_login(force)
     }
     stlast = sta.st_mtime;
 #ifdef HAVE_UTMPNAME
-    utmpname(_PATH_UTMP);
+    utmpname(TCSH_PATH_UTMP);
     setutent();
 #else
-    if ((utmpfd = open(_PATH_UTMP, O_RDONLY|O_LARGEFILE)) < 0) {
+    if ((utmpfd = open(TCSH_PATH_UTMP, O_RDONLY|O_LARGEFILE)) < 0) {
 	if (!force)
 	    xprintf(CGETS(26, 2,
 			  "%s cannot be opened.  Please \"unset watch\".\n"),
-		    _PATH_UTMP);
+		    TCSH_PATH_UTMP);
 # ifdef BSDSIGS
 	(void) sigsetmask(omask);
 # else
