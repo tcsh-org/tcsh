@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.22 1993/11/13 00:40:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.23 1994/01/31 16:04:49 christos Exp christos $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -94,9 +94,7 @@ extern	void		  doexec	__P((struct command *));
 extern	void		  dohash	__P((Char **, struct command *));
 extern	void		  dounhash	__P((Char **, struct command *));
 extern	void		  execash	__P((Char **, struct command *));
-#ifdef VFORK
 extern	void		  hashstat	__P((Char **, struct command *));
-#endif
 extern	void		  xechoit	__P((Char **));
 extern	int		  executable	__P((Char *, Char *, bool));
 extern	void		  tellmewhat	__P((struct wordent *));

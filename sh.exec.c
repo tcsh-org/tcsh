@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.25 1993/11/13 00:40:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.26 1993/11/13 01:36:09 christos Exp christos $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.25 1993/11/13 00:40:56 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.26 1993/11/13 01:36:09 christos Exp christos $")
 
 #include "tc.h"
 #include "tw.h"
@@ -87,8 +87,8 @@ static Char *expath;		/* Path for exerr */
 # define HSHMUL		241
 
 static unsigned long *xhash = NULL;
-static unsigned int hashlength = 0;
-static unsigned int hashwidth = 0;
+static unsigned int hashlength = 0, uhashlength = 0;
+static unsigned int hashwidth = 0, uhashwidth = 0;
 static int hashdebug = 0;
 
 # define hash(a, b)	(((a) * HSHMUL + (b)) % (hashlength))
@@ -644,36 +644,42 @@ dohash(vv, c)
     Char  **pv;
     int hashval;
 
-     USE(c);
+    USE(c);
 #ifdef FASTHASH
     if (vv && vv[1]) {
-        hashlength = atoi(short2str(vv[1]));
+        uhashlength = atoi(short2str(vv[1]));
         if (vv[2]) {
-	    hashwidth = atoi(short2str(vv[2]));
-	    if ((hashwidth != sizeof(unsigned char)) && 
-	        (hashwidth != sizeof(unsigned short)) && 
-	        (hashwidth != sizeof(unsigned long)))
-	        hashwidth = 0;
+	    uhashwidth = atoi(short2str(vv[2]));
+	    if ((uhashwidth != sizeof(unsigned char)) && 
+	        (uhashwidth != sizeof(unsigned short)) && 
+	        (uhashwidth != sizeof(unsigned long)))
+	        uhashwidth = 0;
 	    if (vv[3])
 		hashdebug = atoi(short2str(vv[3]));
         }
     }
 
-    if (hashwidth == 0) {
-        for (pv = v->vec; *pv; pv++, hashwidth++)
+    if (uhashwidth)
+	hashwidth = uhashwidth;
+    else {
+	hashwidth = 0;
+	for (pv = v->vec; *pv; pv++, hashwidth++)
 	    continue;
-        if (hashwidth <= widthof(unsigned char))
+	if (hashwidth <= widthof(unsigned char))
 	    hashwidth = sizeof(unsigned char);
-        else if (hashwidth <= widthof(unsigned short))
+	else if (hashwidth <= widthof(unsigned short))
 	    hashwidth = sizeof(unsigned short);
-        else if (hashwidth <= widthof(unsigned int))
+	else if (hashwidth <= widthof(unsigned int))
 	    hashwidth = sizeof(unsigned int);
 	else
 	    hashwidth = sizeof(unsigned long);
     }
-    if (hashlength == 0) 
-        hashlength = hashwidth * (8*64);/* "average" files per dir in path */
 
+    if (uhashlength)
+	hashlength = uhashlength;
+    else
+        hashlength = hashwidth * (8*64);/* "average" files per dir in path */
+    
     if (xhash)
         xfree((ptr_t) xhash);
     xhash = (unsigned long *) xcalloc((size_t) (hashlength * hashwidth), 
@@ -738,7 +744,6 @@ dounhash(v, c)
 #endif /* FASTHASH */
 }
 
-#ifdef VFORK
 /*ARGSUSED*/
 void
 hashstat(v, c)
@@ -754,12 +759,13 @@ hashstat(v, c)
    if (hashdebug)
       xprintf("debug mask = 0x%08x\n", hashdebug);
 #endif /* FASTHASH */
+#ifdef VFORK
    if (hits + misses)
       xprintf("%d hits, %d misses, %d%%\n",
 	      hits, misses, 100 * hits / (hits + misses));
+#endif
 }
 
-#endif /* VFORK */
 
 /*
  * Hash a command name.
@@ -873,7 +879,7 @@ tellmewhat(lexp)
     register struct biltins *bptr;
     register struct wordent *sp = lexp->next;
     bool    aliased = 0;
-    Char   *s0, *s1, *s2;
+    Char   *s0, *s1, *s2, *cmd;
     Char    qc;
 
     if (adrof1(sp->word, &aliases)) {
@@ -920,7 +926,9 @@ tellmewhat(lexp)
 	}
     }
 
-    if ((i = iscommand(strip(sp->word))) != 0) {
+    sp->word = cmd = globone(sp->word, G_IGNORE);
+
+    if ((i = iscommand(sp->word)) != 0) {
 	register Char **pv;
 	register struct varent *v;
 	bool    slash = any(short2str(sp->word), '/');
@@ -942,6 +950,7 @@ tellmewhat(lexp)
 	    else
 		prlex(lexp);
 	    sp->word = s0;	/* we save and then restore this */
+	    xfree((ptr_t) cmd);
 	    return;
 	}
 	s1 = Strspl(*pv, STRslash);
@@ -957,6 +966,7 @@ tellmewhat(lexp)
 	flush();
     }
     sp->word = s0;		/* we save and then restore this */
+    xfree((ptr_t) cmd);
 }
 
 /*
