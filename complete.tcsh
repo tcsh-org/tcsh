@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.14 1992/10/05 02:41:30 christos Exp $
+# $Id: complete.tcsh,v 1.15 1992/10/10 18:17:34 christos Exp $
 # example file using the new completion code
 #
 
@@ -149,7 +149,11 @@ if ($?complete) then
 	complete ftp 	n/*/\$ftphosts/
     endif
 
-    complete rcp c/*:/f/ C@[./]*@f@ n/*/\$hosts/:
+    # this one is simple...
+    #complete rcp c/*:/f/ C@[./]*@f@ n/*/\$hosts/:
+    # From harald: This one will rsh to the file to fetch the list of files!
+    complete rcp 'c%*:%`set q=$:-1;set q="$q:s/:/ /";set q=($q " ");rsh $q[1] ls -dp $q[2]\*`%%' 'C@[./]*@f@' 'n/*/$hosts/:'
+
 
     complete dd c/if=/f/ c/of=/f/ \
 		c/conv=*,/"(ascii ebcdic ibm block unblock \

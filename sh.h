@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.46 1992/11/13 04:19:10 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.47 1992/11/13 08:47:03 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -192,7 +192,7 @@ typedef int sigret_t;
 
 #if defined(BSDTIMES) || defined(BSDLIMIT)
 # include <sys/time.h>
-# if SYSVREL>3 && !defined(sgi)
+# if SYSVREL>3 && !defined(sgi) && !defined(sun)
 #  include "/usr/ucbinclude/sys/resource.h"
 # else
 #  include <sys/resource.h>

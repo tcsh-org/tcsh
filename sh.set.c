@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.set.c,v 3.17 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.set.c,v 3.18 1992/10/05 02:41:30 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.17 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.18 1992/10/05 02:41:30 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -409,7 +409,7 @@ putn(n)
 	*putp++ = '-';
     }
     num = 2;			/* confuse lint */
-    if (sizeof(int) == num && ((unsigned int) n) == 32768) {
+    if (sizeof(int) == num && ((unsigned int) n) == 0x8000) {
 	*putp++ = '3';
 	n = 2768;
 #ifdef pdp11
@@ -418,7 +418,7 @@ putn(n)
     }
     else {
 	num = 4;		/* confuse lint */
-	if (sizeof(int) == num && ((unsigned int) n) == 2147483648) {
+	if (sizeof(int) == num && ((unsigned int) n) == 0x80000000) {
 	    *putp++ = '2';
 	    n = 147483648;
 	}

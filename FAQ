@@ -117,6 +117,7 @@ be able to get ftp it... :-)
     endif
 
     Note that by doing that you cannot use pgup and pgdn to scroll...
+    Also if you are using termcap, replace "smkx" with "ks"...
 
 12. On POSIX machines ^C and ^Z will do not work when tcsh is a login
     shell?

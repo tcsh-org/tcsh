@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.glob.c,v 3.27 1992/10/10 18:17:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.glob.c,v 3.28 1992/10/27 16:18:15 christos Exp christos $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.27 1992/10/10 18:17:34 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.28 1992/10/27 16:18:15 christos Exp christos $")
 
 #include "tc.h"
 
@@ -53,6 +53,8 @@ static int pargsiz, gargsiz;
 #define	G_CSH	2		/* string contains ~`{ characters	*/
 
 #define	GLOBSPACE	100	/* Alloc increment			*/
+#define LONGBSIZE	10240	/* Backquote expansion buffer size	*/
+
 
 #define LBRC '{'
 #define RBRC '}'
@@ -80,7 +82,7 @@ static	Char	**globexpand	__P((Char **));
 static	int	  globbrace	__P((Char *, Char *, Char ***));
 static  void	  expbrace	__P((Char ***, Char ***, int));
 static  int	  pmatch	__P((Char *, Char *, Char **));
-static	void	  pword		__P((void));
+static	void	  pword		__P((int));
 static	void	  psave		__P((int));
 static	void	  backeval	__P((Char *, bool));
 
@@ -691,7 +693,7 @@ dobackp(cp, literal)
     bool    literal;
 {
     register Char *lp, *rp;
-    Char   *ep, word[BUFSIZE];
+    Char   *ep, word[LONGBSIZE];
 
     if (pargv) {
 #ifdef notdef
@@ -704,12 +706,12 @@ dobackp(cp, literal)
     pargv[0] = NULL;
     pargcp = pargs = word;
     pargc = 0;
-    pnleft = BUFSIZE - 4;
+    pnleft = LONGBSIZE - 4;
     for (;;) {
 	for (lp = cp; *lp != '`'; lp++) {
 	    if (*lp == 0) {
 		if (pargcp != pargs)
-		    pword();
+		    pword(LONGBSIZE);
 		return (pargv);
 	    }
 	    psave(*lp);
@@ -867,7 +869,7 @@ backeval(cp, literal)
 	 * would lose blank lines.
 	 */
 	if (c != -1 && (cnt || literal))
-	    pword();
+	    pword(BUFSIZE);
 	hadnl = 0;
     } while (c >= 0);
     (void) close(pvec[0]);
@@ -885,7 +887,8 @@ psave(c)
 }
 
 static void
-pword()
+pword(bufsiz)
+    int    bufsiz;
 {
     psave(0);
     if (pargc == pargsiz - 1) {
@@ -896,7 +899,7 @@ pword()
     pargv[pargc++] = Strsave(pargs);
     pargv[pargc] = NULL;
     pargcp = pargs;
-    pnleft = BUFSIZE - 4;
+    pnleft = bufsiz - 4;
 }
 
 int

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dol.c,v 3.17 1992/10/05 02:41:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dol.c,v 3.18 1992/10/14 20:19:19 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.17 1992/10/05 02:41:30 christos Exp christos $")
+RCSID("$Id: sh.dol.c,v 3.18 1992/10/14 20:19:19 christos Exp $")
 
 /*
  * C shell
@@ -402,8 +402,8 @@ quotspec:
     return (c);
 }
 
-static Char *nulvec[] = {0};
-static struct varent nulargv = {nulvec, STRargv, 0};
+static Char *nulvec[] = { NULL };
+static struct varent nulargv = {nulvec, STRargv, { NULL, NULL, NULL }, 0 };
 
 static void
 dolerror(s)
@@ -971,7 +971,7 @@ heredoc(term)
 	    c = readc(1);	/* 1 -> Want EOF returns */
 	    if (c < 0 || c == '\n')
 		break;
-	    if (c &= TRIM) {
+	    if ((c &= TRIM) != 0) {
 		*lbp++ = (Char) c;
 		if (--lcnt < 0) {
 		    setname("<<");

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.41 1992/10/27 16:18:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.42 1992/11/13 04:19:10 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.41 1992/10/27 16:18:15 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.42 1992/11/13 04:19:10 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -494,9 +494,15 @@ doforeach(v, c)
 	stderror(ERR_NAME | ERR_NOPAREN);
     v++;
     gflag = 0, tglob(v);
-    v = globall(v);
-    if (v == 0)
-	stderror(ERR_NAME | ERR_NOMATCH);
+    if (gflag) {
+	v = globall(v);
+	if (v == 0)
+	    stderror(ERR_NAME | ERR_NOMATCH);
+    }
+    else {
+	v = gargv = saveblk(v);
+	trim(v);
+    }
     nwp = (struct whyle *) xcalloc(1, sizeof *nwp);
     nwp->w_fe = nwp->w_fe0 = v;
     gargv = 0;
@@ -619,7 +625,7 @@ doagain()
 	dobreak(NULL, NULL);
 	return;
     }
-    set(whyles->w_fename, Strsave(*whyles->w_fe++));
+    set(whyles->w_fename, quote(Strsave(*whyles->w_fe++)));
     bseek(&whyles->w_start);
 }
 
@@ -1157,6 +1163,39 @@ register Char *var;
     return 0;
 }
 
+/*ARGSUSED*/
+void
+doprintenv(v, c)
+    register Char **v;
+    struct command *c;
+{
+    Char   *e;
+    extern bool output_raw;
+    extern bool xlate_cr;
+
+    if (setintr)
+#ifdef BSDSIGS
+	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
+#else /* !BSDSIGS */
+	(void) sigrelse (SIGINT);
+#endif /* BSDSIGS */
+
+    v++;
+    if (*v == 0) {
+	register Char **ep;
+
+	xlate_cr = 1;
+	for (ep = STR_environ; *ep; ep++)
+	    xprintf("%S\n", *ep);
+	xlate_cr = 0;
+    }
+    else if ((e = tgetenv(*v)) != NULL) {
+	output_raw = 1;
+	xprintf("%S\n", e);
+	output_raw = 0;
+    }
+}
+
 /* from "Karl Berry." <karl%mote.umb.edu@relay.cs.net> -- for NeXT things
    (and anything else with a modern compiler) */
 
@@ -1168,20 +1207,13 @@ dosetenv(v, c)
 {
     Char   *vp, *lp;
 
-    v++;
-    if ((vp = *v++) == 0) {
-	register Char **ep;
-
-	if (setintr)
-#ifdef BSDSIGS
-	    (void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else /* !BSDSIGS */
-	    (void) sigrelse (SIGINT);
-#endif /* BSDSIGS */
-	for (ep = STR_environ; *ep; ep++)
-	    xprintf("%S\n", *ep);
+    if (*++v == 0) {
+	doprintenv(--v, 0);
 	return;
     }
+
+    vp = *v++;
+
     if ((lp = *v++) == 0)
 	lp = STRNULL;
 
@@ -1498,58 +1530,58 @@ doumask(v, c)
 struct limits limits[] = 
 {
 # ifdef RLIMIT_CPU
-    RLIMIT_CPU, 	"cputime",	1,	"seconds",
+    { RLIMIT_CPU, 	"cputime",	1,	"seconds"	},
 # endif /* RLIMIT_CPU */
 
 # ifdef RLIMIT_FSIZE
 #  ifndef aiws
-    RLIMIT_FSIZE, 	"filesize",	1024,	"kbytes",
+    { RLIMIT_FSIZE, 	"filesize",	1024,	"kbytes"	},
 #  else
-    RLIMIT_FSIZE, 	"filesize",	512,	"blocks",
+    { RLIMIT_FSIZE, 	"filesize",	512,	"blocks"	},
 #  endif /* aiws */
 # endif /* RLIMIT_FSIZE */
 
 # ifdef RLIMIT_DATA
-    RLIMIT_DATA, 	"datasize",	1024,	"kbytes",
+    { RLIMIT_DATA, 	"datasize",	1024,	"kbytes"	},
 # endif /* RLIMIT_DATA */
 
 # ifdef RLIMIT_STACK
 #  ifndef aiws
-    RLIMIT_STACK, 	"stacksize",	1024,	"kbytes",
+    { RLIMIT_STACK, 	"stacksize",	1024,	"kbytes"	},
 #  else
-    RLIMIT_STACK, 	"stacksize",	1024 * 1024,	"kbytes",
+    { RLIMIT_STACK, 	"stacksize",	1024 * 1024,	"kbytes"},
 #  endif /* aiws */
 # endif /* RLIMIT_STACK */
 
 # ifdef RLIMIT_CORE
-    RLIMIT_CORE, 	"coredumpsize",	1024,	"kbytes",
+    { RLIMIT_CORE, 	"coredumpsize",	1024,	"kbytes"	},
 # endif /* RLIMIT_CORE */
 
 # ifdef RLIMIT_RSS
-    RLIMIT_RSS, 	"memoryuse",	1024,	"kbytes",
+    { RLIMIT_RSS, 	"memoryuse",	1024,	"kbytes"	},
 # endif /* RLIMIT_RSS */
 
 # ifdef RLIMIT_NOFILE
-    RLIMIT_NOFILE, 	"descriptors", 1,	"",
+    { RLIMIT_NOFILE, 	"descriptors", 1,	""		},
 # endif /* RLIMIT_NOFILE */
 
 # ifdef RLIMIT_CONCUR
-    RLIMIT_CONCUR, 	"concurrency", 1,	"thread(s)",
+    { RLIMIT_CONCUR, 	"concurrency", 1,	"thread(s)"	},
 # endif /* RLIMIT_CONCUR */
 
 # ifdef RLIMIT_MEMLOCK
-    RLIMIT_MEMLOCK,	"memorylocked",	1024,	"kbytes",
+    { RLIMIT_MEMLOCK,	"memorylocked",	1024,	"kbytes"	},
 # endif /* RLIMIT_MEMLOCK */
 
 # ifdef RLIMIT_NPROC
-    RLIMIT_NPROC,	"maxproc",	1,	"",
+    { RLIMIT_NPROC,	"maxproc",	1,	""		},
 # endif /* RLIMIT_NPROC */
 
 # ifdef RLIMIT_OFILE
-    RLIMIT_OFILE,	"openfiles",	1,	"",
+    { RLIMIT_OFILE,	"openfiles",	1,	""		},
 # endif /* RLIMIT_OFILE */
 
-    -1, 		NULL, 		0, 	NULL
+    { -1, 		NULL, 		0, 	NULL		}
 };
 
 static struct limits *findlim	__P((Char *));

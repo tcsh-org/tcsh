@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.const.c,v 3.15 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.const.c,v 3.16 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.15 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.16 1992/10/05 02:41:30 christos Exp christos $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -73,10 +73,12 @@ Char STRprompt3[]       = { 'p', 'r', 'o', 'm', 'p', 't', '3', '\0' };
 Char STRcwd[]           = { 'c', 'w', 'd', '\0' };
 Char STRstar[]          = { '*', '\0' };
 Char STRdot[]           = { '.', '\0' };
-Char STRhistory[] 	= { 'h', 'i', 's', 't', 'o', 'r', 'y', '\0' };
-Char STRhistfile[] 	= { 'h', 'i', 's', 't', 'f', 'i', 'l', 'e', '\0' };
+Char STRhistory[]       = { 'h', 'i', 's', 't', 'o', 'r', 'y', '\0' };
+Char STRhistfile[]      = { 'h', 'i', 's', 't', 'f', 'i', 'l', 'e', '\0' };
 Char STRsource[]        = { 's', 'o', 'u', 'r', 'c', 'e', '\0' };
 Char STRmh[]            = { '-', 'h', '\0' };
+Char STRmm[]            = { '-', 'm', '\0' };
+Char STRmerge[]         = { 'm', 'e', 'r', 'g', 'e', '\0' };
 Char STRtildothist[]    = { '~', '/', '.', 'h', 'i', 's', 't', 'o', 'r', 
 		            'y', '\0' };
 

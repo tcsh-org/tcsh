@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.26 1992/10/14 20:19:19 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.27 1992/11/13 04:19:10 christos Exp christos $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.26 1992/10/14 20:19:19 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.27 1992/11/13 04:19:10 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -283,7 +283,8 @@ word()
     Char c, c1;
     Char *wp;
     Char    wbuf[BUFSIZE];
-    Char    hbuf[12], h;
+    Char    hbuf[12];
+    int	    h;
     bool dolflg;
     int i;
 
@@ -1007,7 +1008,7 @@ dosub(sc, en, global)
      * ANSI mode HP/UX compiler chokes on
      * return &enthist(HIST_PURGE, &lexi, 0)->Hlex;
      */
-    hst = enthist(HIST_PURGE, &lexi, 0);
+    hst = enthist(HIST_PURGE, &lexi, 0, 0);
     return &(hst->Hlex);
 }
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.types.h,v 3.25 1992/10/10 18:17:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.types.h,v 3.26 1992/10/14 20:19:19 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -47,6 +47,20 @@
 
 
 /***
+ *** LynxOS 2.1
+ ***/
+#ifdef Lynx
+# ifndef _SIGMASK_T
+#  define _SIGMASK_T
+    typedef long sigmask_t;
+# endif /* _SIGMASK_T */
+# ifndef _PID_T
+#  define _PID_T
+# endif /* _PID_T */
+#endif
+
+
+/***
  *** Suns running sunos3.x - sunos4.1.x
  ***/
 #if (defined(sun) || defined(__sun__)) && SYSVREL == 0
@@ -68,8 +82,10 @@
 # endif /* _SIZE_T */
 # ifndef __sys_stdtypes_h
 #  define __sys_stdtypes_h
-    typedef int pid_t;
-    typedef unsigned int speed_t;
+#   ifndef __lucid
+     typedef int pid_t;
+     typedef unsigned int speed_t;
+#   endif
 # endif /* __sys_stdtypes.h */
 # ifndef _PID_T
 #  define _PID_T
@@ -475,6 +491,7 @@ typedef char * caddr_t;
 #ifdef apollo
 # ifndef _PID_T
 #  define _PID_T
+   typedef int pid_t;	/* Older versions might not like that */
 # endif /* _PID_T */
 #endif /* apollo */
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.39 1992/11/13 04:19:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.40 1992/11/14 20:40:02 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -60,12 +60,16 @@
 # include <limits.h>
 #endif /*atp vmsposix*/
 
+#if defined(OPEN_MAX) && !defined(NOFILE)
+# define NOFILE OPEN_MAX
+#endif
+
+#if defined(USR_NFDS) && !defined(NOFILE)
+# define NOFILE USR_NFDS
+#endif
+
 #ifndef NOFILE
-# ifdef OPEN_MAX
-#  define NOFILE OPEN_MAX
-# else
-#  define NOFILE 256
-# endif
+# define NOFILE 256
 #endif /* NOFILE */
 
 #ifdef linux
@@ -136,6 +140,13 @@ struct ucred {
 # ifndef CSUSP
 #  define CSUSP 032
 # endif	/* CSUSP */
+# if defined(POSIX) && !defined(TIOCGWINSZ)
+/*
+ * ISC defines this only in termio.h. If we are using POSIX and include
+ * termios.h, then we define it ourselves so that window resizing works.
+ */
+#  define TIOCGWINSZ      (('T'<<8)|104)
+# endif
 #endif /* ISC */
 
 #ifdef ISC202
@@ -376,9 +387,9 @@ struct ucred {
 # define NEEDgethostname
 #endif /* _SEQUENT_ */
 
-#if defined(BSD) && defined(POSIXJOBS) 
+#if defined(BSD) && defined(POSIXJOBS) && !defined(__hp_osf)
 # define setpgid(pid, pgrp)	setpgrp(pid, pgrp)
-#endif /* BSD && POSIXJOBS */
+#endif /* BSD && POSIXJOBS && !__hp_osf */
 
 #if defined(BSDJOBS) && !(defined(POSIX) && defined(POSIXJOBS))
 # if !defined(_AIX370) && !defined(_AIXPS2)
@@ -475,7 +486,7 @@ extern int toupper __P((int));
 extern int tolower __P((int));
 # endif
 extern caddr_t sbrk __P((int));
-# if SYSVREL == 0
+# if SYSVREL == 0 && !defined(__lucid)
 extern int qsort();
 # endif
 #else
@@ -568,7 +579,7 @@ extern int setpriority();
 extern int nice();
 # endif	/* !BSDNICE */
 
-# if (!defined(fps500) && !defined(apollo))
+# if (!defined(fps500) && !defined(apollo) && !defined(__lucid))
 extern void setpwent();
 extern void endpwent();
 # endif /* fps500 */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.func.c,v 3.36 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.func.c,v 3.37 1992/10/27 16:18:15 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.36 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.37 1992/10/27 16:18:15 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -214,10 +214,11 @@ dolist(v, c)
 	 * We cannot process a flag therefore we let ls do it right.
 	 */
 	static Char STRls[] = {'l', 's', '\0'};
-	static Char STRmCF[] = {'-', 'C', 'F', '\0'};
+	static Char STRmCF[] = {'-', 'C', 'F', '\0', '\0' };
 	struct command *t;
 	struct wordent cmd, *nextword, *lastword;
 	Char   *cp;
+	struct varent *vp;
 
 #ifdef BSDSIGS
 	sigmask_t omask = 0;
@@ -231,6 +232,18 @@ dolist(v, c)
 	    xfree((ptr_t) seterr);
 	    seterr = NULL;
 	}
+
+	/* Look at showdots, to add -A to the flags if necessary */
+	if ((vp = adrof(STRshowdots)) != NULL) {
+	    if (vp->vec[0][0] == '-' && vp->vec[0][1] == 'A' &&
+		vp->vec[0][2] == '\0')
+		STRmCF[3] = 'A';
+	    else
+		STRmCF[3] = '\0';
+	}
+	else
+	    STRmCF[3] = '\0';
+
 	cmd.word = STRNULL;
 	lastword = &cmd;
 	nextword = (struct wordent *) xcalloc(1, sizeof cmd);
@@ -398,6 +411,12 @@ dowhich(v, c)
     lex[0].word = STRNULL;
     lex[2].word = STRret;
 
+#ifdef notdef
+    /* 
+     * We don't want to glob dowhich args because we lose quoteing
+     * E.g. which \ls if ls is aliased will not work correctly if
+     * we glob here.
+     */
     gflag = 0, tglob(v);
     if (gflag) {
 	v = globall(v);
@@ -408,6 +427,7 @@ dowhich(v, c)
 	v = gargv = saveblk(v);
 	trim(v);
     }
+#endif
 
     while (*++v) {
 	if ((vp = adrof1(*v, &aliases)) != NULL) {
@@ -420,8 +440,11 @@ dowhich(v, c)
 	    tellmewhat(lex);
 	}
     }
+#ifdef notdef
+    /* Again look at the comment above; since we don't glob, we don't free */
     if (gargv)
 	blkfree(gargv), gargv = 0;
+#endif
 }
 
 /* PWP: a hack to start up your stopped editor on a single keystroke */
@@ -1603,9 +1626,14 @@ collate(a, b)
     const Char *b;
 {
     int rv;
-    /* This actually strips the quote bit */
+#ifdef SHORT_STRINGS
+    /* This strips the quote bit as a side effect */
     char *sa = strsave(short2str(a));
     char *sb = strsave(short2str(b));
+#else
+    char *sa = strip(strsave(a));
+    char *sb = strip(strsave(b));
+#endif /* SHORT_STRINGS */
 
 #if defined(NLS) && !defined(NOSTRCOLL)
     errno = 0;	/* strcoll sets errno, another brain-damage */

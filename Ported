@@ -327,6 +327,17 @@ ENVIRON	:	n/a
 NOTES	:	none
 VERSION	:	6.00.04
 
+VENDOR	:	ibm + compatibles
+MODELS	:	i386,i486
+COMPILER:	gcc
+CFLAGS	:	normal
+LIBES	:	-lcurses -lc_s [for crypt]
+OS	:	SVR3.2.2 [SCO]
+CONFIG	:	config.sco32v2
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.03.00
+
 VENDOR	:	stardent
 MODELS	:	gs2600
 COMPILER:	/bin/cc
@@ -390,7 +401,7 @@ VENDOR  :       stardent
 MODELS  :	Vistra 800
 COMPILER:       /bin/cc
 CFLAGS  :       -O
-LIBES   :     -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a
+LIBES   :	-lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a
 OS      :	SYSVR4
 CONFIG  :	config.sysv4
 ENVIRON :       n/a
@@ -622,3 +633,27 @@ CONFIG	:	config.mips
 ENVIRON :	bsd4.3 (if sysv, need "set path=(/usr/bsd43/bin $path)" )
 NOTES	:	n/a
 VERSION :	6.02.00
+
+VENDOR  :       alliant
+MODELS  :       FX/8X series
+COMPILER:       pcc
+CFLAGS  :       normal
+LIBES   :       -ltermcap -lresolv
+OS      :       Concentrix 6.0.00 beta
+CONFIG  :       config.alliant (see NOTES)
+ENVIRON :       n/a
+NOTES   :       Needs to define DIRENT and BSDLIMIT in config.h.  The
+NOTES	:	beta release of the Concentrix 6.0.00 has some errors
+NOTES	:	in the system header files, namely, /usr/include/sys/dir.h.
+VERSION :       6.03.00
+
+VENDOR	:	hp
+MODELS	:	hp9000s700
+COMPILER:	cc
+CFLAGS	:	No -O here!!! Breaks quoting! Try echo 'foo | bar'...
+LIBES	:	-ltermcap
+OS	:	HP OSF/1 1.0
+CONFIG	:	config.hposf1
+ENVIRON	:	n/a
+NOTES	:	n/a
+VERSION	:	6.03.00

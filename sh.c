@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.40 1992/10/27 16:18:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.41 1992/11/13 04:19:10 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.40 1992/10/27 16:18:15 christos Exp $")
+RCSID("$Id: sh.c,v 3.41 1992/11/13 04:19:10 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -103,7 +103,7 @@ bool    fast = 0;
 static bool    batch = 0;
 static bool    mflag = 0;
 static bool    prompt = 1;
-static bool    enterhist = 0;
+static int     enterhist = 0;
 bool    tellwhat = 0;
 time_t  t_period;
 Char  *ffile = NULL;
@@ -112,9 +112,9 @@ static time_t  chktim;		/* Time mail last checked */
 extern char **environ;
 
 static	int		  srccat	__P((Char *, Char *));
-static	int		  srcfile	__P((char *, bool, bool, Char **));
+static	int		  srcfile	__P((char *, bool, int, Char **));
 static	sigret_t	  phup		__P((int));
-static	void		  srcunit	__P((int, bool, bool, Char **));
+static	void		  srcunit	__P((int, bool, int, Char **));
 static	void		  mailchk	__P((void));
 static	Char	 	**defaultpath	__P((void));
 
@@ -485,7 +485,7 @@ main(argc, argv)
 #ifdef apollo
     if ((tcp = getenv("SYSTYPE")) == NULL)
 	tcp = "bsd4.3";
-    Setenv(STRSYSTYPE, quote(str2short(tcp)));
+    tsetenv(STRSYSTYPE, quote(str2short(tcp)));
 #endif /* apollo */
 
     /*
@@ -681,10 +681,10 @@ main(argc, argv)
 		    cp = str2short(tcp);
 		    if (dp = Strchr(cp, '=')) {
 			*dp++ = '\0';
-			Setenv(cp, dp);
+			tsetenv(cp, dp);
 		    }
 		    else
-			Setenv(cp, STRNULL);
+			tsetenv(cp, STRNULL);
 		}
 		*tcp = '\0'; 	/* done with this argument */
 		break;
@@ -1054,7 +1054,7 @@ main(argc, argv)
 	/*
 	 * Source history before .login so that it is available in .login
 	 */
-	loadhist(NULL);
+	loadhist(NULL, 0);
 #ifndef LOGINFIRST
 	if (loginsh)
 	    (void) srccat(value(STRhome), STRsldotlogin);
@@ -1182,7 +1182,8 @@ srccat(cp, dp)
 static int
 srcfile(f, onlyown, flag, av)
     char   *f;
-    bool    onlyown, flag;
+    bool    onlyown;
+    int flag;
     Char **av;
 {
     register int unit;
@@ -1205,7 +1206,8 @@ static  Char **goargv = NULL;
 static void
 srcunit(unit, onlyown, hflg, av)
     register int unit;
-    bool    onlyown, hflg;
+    bool    onlyown;
+    int hflg;
     Char **av;
 {
     /*
@@ -1688,6 +1690,7 @@ process(catch)
 	if (neednote)
 	    pnote();
 	if (intty && prompt && evalvec == 0) {
+	    just_signaled = 0;
 	    mailchk();
 	    /*
 	     * Watch for logins/logouts. Next is scheduled commands stored
@@ -1745,7 +1748,7 @@ process(catch)
 	 * elsewhere...
 	 */
 	if (enterhist || (catch && intty && !whyles && !tellwhat))
-	    savehist(&paraml);
+	    savehist(&paraml, enterhist > 1);
 
 	if (Expand && seterr)
 	    Expand = 0;
@@ -1830,6 +1833,12 @@ dosource(t, c)
 	    stderror(ERR_NAME | ERR_HFLAG);
 	hflg++;
     }
+    else if (*t && eq(*t, STRmm)) {
+    	if (*++t == NULL)
+	    stderror(ERR_NAME | ERR_MFLAG);
+	hflg = 2;
+    }
+
     f = globone(*t++, G_ERROR);
     (void) strcpy(buf, short2str(f));
     xfree((ptr_t) f);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.comp.c,v 1.19 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.comp.c,v 1.20 1992/10/10 18:17:34 christos Exp christos $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.19 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.20 1992/10/10 18:17:34 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -404,12 +404,18 @@ tw_dollar(str, wl, nwl, buffer, sep, msg)
     Char *sp, *bp = buffer, *ebp = &buffer[MAXPATHLEN];
 
     for (sp = str; *sp && *sp != sep && bp < ebp;)
-	if (sp[0] == '$' && sp[1] == ':' && Isdigit(sp[2])) {
-	    int num;
+	if (sp[0] == '$' && sp[1] == ':' && Isdigit(sp[sp[2] == '-' ? 3 : 2])) {
+	    int num, neg = 0;
 	    sp += 2;
+	    if (*sp == '-') {
+		neg = 1;
+		sp++;
+	    }
 	    for (num = *sp++ - '0'; Isdigit(*sp); num += 10 * num + *sp++ - '0')
 		continue;
-	    if (num < nwl) {
+	    if (neg)
+		num = nwl - num - 1;
+	    if (num >= 0 && num < nwl) {
 		Char *ptr;
 		for (ptr = wl[num]; *ptr && bp < ebp - 1; *bp++ = *ptr++)
 		    continue;

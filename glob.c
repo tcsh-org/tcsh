@@ -513,17 +513,21 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob, no_match)
     struct dirent *dp;
     int     err;
     Char m_not = (pglob->gl_flags & GLOB_ALTNOT) ? M_ALTNOT : M_NOT;
+    char cpathbuf[MAXPATHLEN], *ptr;;
 
     *pathend = EOS;
     errno = 0;
 
-    if (!(dirp = Opendir(pathbuf)))
+    if (!(dirp = Opendir(pathbuf))) {
 	/* todo: don't call for ENOENT or ENOTDIR? */
-	if ((pglob->gl_errfunc && (*pglob->gl_errfunc) (pathbuf, errno)) ||
+	for (ptr = cpathbuf; (*ptr++ = (char) *pathbuf++) != EOS;)
+	    continue;
+	if ((pglob->gl_errfunc && (*pglob->gl_errfunc) (cpathbuf, errno)) ||
 	    (pglob->gl_flags & GLOB_ERR))
 	    return (GLOB_ABEND);
 	else
 	    return (0);
+    }
 
     err = 0;
 

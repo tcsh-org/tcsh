@@ -1,3 +1,24 @@
+V6.04.00, ...
+ 14. #undef SHORT_STRINGS gcc warning fixes...
+ 13. csh bug fix in foreach [quoteing problem]
+     > foreach i ("*")
+     > echo $i:q
+     > end
+     Should print *
+ 12. ls-F obeys showdots...
+ 11. After scheduled commands get executed, the editor could stay disabled
+     until the first enter.
+ 10. sigset() bug in ed.init.c; ^C could get disabled sometimes.
+  9. Don't glob in dowhich(); otherwise \pat does not work if pat is aliased.
+  8. When completion patterns are used $ and ~ expansion did not work right.
+  7. Printenv builtin and long backquote expansion fix from Harald.
+  6. $:-1, $:-0 enhancement from Paul and Michael.
+  5. Lynx/OS patches
+  4. Apollo bugs [Setenv -> tsetenv, typedef in pid_t]
+  3. ^@ did not work correctly in bindkey.
+  2. Fix vms/posix ifdefs in tc.alloc.c
+  1. Elide gcc-2.3.1 warnings
+
 V6.03.00, 11/20/92
 102. Solaris2 patches, renamed sunosX to sosX to fit in 14 character filenames.
 101. 6.02.12 11/12/92

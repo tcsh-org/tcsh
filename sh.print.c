@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.print.c,v 3.3 1992/08/14 13:56:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.print.c,v 3.4 1992/10/14 20:19:19 christos Exp christos $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.3 1992/08/14 13:56:09 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.4 1992/10/14 20:19:19 christos Exp christos $")
 
 #include "ed.h"
 
@@ -118,6 +118,7 @@ p2dig(i)
 char    linbuf[2048];		/* was 128 */
 char   *linp = linbuf;
 bool    output_raw = 0;		/* PWP */
+bool    xlate_cr   = 0;		/* HE */
 
 void
 xputchar(c)
@@ -129,7 +130,7 @@ xputchar(c)
     c &= CHAR | QUOTE;
     if (!output_raw && (c & QUOTE) == 0) {
 	if (Iscntrl(c)) {
-	    if (c != '\t' && c != '\n' && c != '\r') {
+	    if (c != '\t' && c != '\n' && (xlate_cr || c != '\r')) {
 		xputchar('^' | atr);
 		if (c == ASCII)
 		    c = '?';
