@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sched.c,v 3.19 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sched.c,v 3.20 2004/08/04 17:12:31 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -34,7 +34,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.19 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.20 2004/08/04 17:12:31 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -68,7 +68,7 @@ dosched(v, c)
     time_t  cur_time;
     int     count, hours, minutes, dif_hour, dif_min;
     Char   *cp;
-    bool    relative;		/* time specified as +hh:mm */
+    int    relative;		/* time specified as +hh:mm */
     struct tm *ltp;
 
     USE(c);

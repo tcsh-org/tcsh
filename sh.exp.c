@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exp.c,v 3.41 2004/08/01 20:45:10 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exp.c,v 3.42 2004/08/04 17:12:29 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.41 2004/08/01 20:45:10 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.42 2004/08/04 17:12:29 christos Exp $")
 
 #include "tw.h"
 
@@ -58,16 +58,16 @@ RCSID("$Id: sh.exp.c,v 3.41 2004/08/01 20:45:10 christos Exp $")
 #define NOTEQMATCH 8
 
 static	int	 sh_access	__P((Char *, int));
-static	int	 exp1		__P((Char ***, bool));
-static	int	 exp2x		__P((Char ***, bool));
-static	int	 exp2a		__P((Char ***, bool));
-static	int	 exp2b		__P((Char ***, bool));
-static	int	 exp2c		__P((Char ***, bool));
-static	Char 	*exp3		__P((Char ***, bool));
-static	Char 	*exp3a		__P((Char ***, bool));
-static	Char 	*exp4		__P((Char ***, bool));
-static	Char 	*exp5		__P((Char ***, bool));
-static	Char 	*exp6		__P((Char ***, bool));
+static	int	 exp1		__P((Char ***, int));
+static	int	 exp2x		__P((Char ***, int));
+static	int	 exp2a		__P((Char ***, int));
+static	int	 exp2b		__P((Char ***, int));
+static	int	 exp2c		__P((Char ***, int));
+static	Char 	*exp3		__P((Char ***, int));
+static	Char 	*exp3a		__P((Char ***, int));
+static	Char 	*exp4		__P((Char ***, int));
+static	Char 	*exp5		__P((Char ***, int));
+static	Char 	*exp6		__P((Char ***, int));
 static	void	 evalav		__P((Char **));
 static	int	 isa		__P((Char *, int));
 static	int	 egetn		__P((Char *));
@@ -208,7 +208,7 @@ expr(vp)
 int
 exp0(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     int p1 = exp1(vp, ignore);
 
@@ -231,7 +231,7 @@ exp0(vp, ignore)
 static int
 exp1(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     int p1 = exp2x(vp, ignore);
 
@@ -254,7 +254,7 @@ exp1(vp, ignore)
 static int
 exp2x(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     int p1 = exp2a(vp, ignore);
 
@@ -277,7 +277,7 @@ exp2x(vp, ignore)
 static int
 exp2a(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     int p1 = exp2b(vp, ignore);
 
@@ -300,7 +300,7 @@ exp2a(vp, ignore)
 static int
 exp2b(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     int p1 = exp2c(vp, ignore);
 
@@ -323,7 +323,7 @@ exp2b(vp, ignore)
 static int
 exp2c(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     Char *p1 = exp3(vp, ignore);
     Char *p2;
@@ -371,7 +371,7 @@ exp2c(vp, ignore)
 static Char *
 exp3(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     Char *p1, *p2;
     int i;
@@ -417,7 +417,7 @@ exp3(vp, ignore)
 static Char *
 exp3a(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     Char *p1, *p2, *op;
     int i;
@@ -447,7 +447,7 @@ exp3a(vp, ignore)
 static Char *
 exp4(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     Char *p1, *p2;
     int i = 0;
@@ -484,7 +484,7 @@ exp4(vp, ignore)
 static Char *
 exp5(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     Char *p1, *p2;
     int i = 0;
@@ -538,7 +538,7 @@ exp5(vp, ignore)
 static Char *
 exp6(vp, ignore)
     Char ***vp;
-    bool    ignore;
+    int    ignore;
 {
     int     ccode, i = 0;
     Char *cp;
@@ -635,7 +635,7 @@ exp6(vp, ignore)
 Char *
 filetest(cp, vp, ignore)
     Char *cp, ***vp;
-    bool ignore;
+    int ignore;
 {
 #ifdef convex
     struct cvxstat stb, *st = NULL;
@@ -658,7 +658,7 @@ filetest(cp, vp, ignore)
 
     int i = 0;
     unsigned pmask = 0xffff;
-    bool altout = 0;
+    int altout = 0;
     Char *ft = cp, *dp, *ep, *strdev, *strino, *strF, *str, valtest = '\0',
     *errval = STR0;
     char *string, string0[8];

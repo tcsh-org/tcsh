@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.119 2004/08/08 06:42:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.120 2004/11/20 18:23:03 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -472,8 +472,6 @@ typedef void pret_t;
 # endif /* (vax || uts || MULTIFLOW || PCC) && !__GNUC__ */
 #endif /* PURIFY */
 
-typedef int bool;
-
 /*
  * ASCII vs. EBCDIC
  */
@@ -590,42 +588,42 @@ extern void		DebugFree	__P((ptr_t, char *, int));
 /*
  * Global flags
  */
-EXTERN bool    chkstop IZERO;	/* Warned of stopped jobs... allow exit */
+EXTERN int    chkstop IZERO;	/* Warned of stopped jobs... allow exit */
 
 #if (defined(FIOCLEX) && defined(FIONCLEX)) || defined(F_SETFD)
 # define CLOSE_ON_EXEC
 #else
-EXTERN bool    didcch IZERO;	/* Have closed unused fd's for child */
+EXTERN int    didcch IZERO;	/* Have closed unused fd's for child */
 #endif /* (FIOCLEX && FIONCLEX) || F_SETFD */
 
-EXTERN bool    didfds IZERO;	/* Have setup i/o fd's for child */
-EXTERN bool    doneinp IZERO;	/* EOF indicator after reset from readc */
-EXTERN bool    exiterr IZERO;	/* Exit if error or non-zero exit status */
-EXTERN bool    child IZERO;	/* Child shell ... errors cause exit */
-EXTERN bool    haderr IZERO;	/* Reset was because of an error */
-EXTERN bool    intty IZERO;	/* Input is a tty */
-EXTERN bool    intact IZERO;	/* We are interactive... therefore prompt */
-EXTERN bool    justpr IZERO;	/* Just print because of :p hist mod */
-EXTERN bool    loginsh IZERO;	/* We are a loginsh -> .login/.logout */
-EXTERN bool    neednote IZERO;	/* Need to pnotify() */
-EXTERN bool    noexec IZERO;	/* Don't execute, just syntax check */
-EXTERN bool    pjobs IZERO;	/* want to print jobs if interrupted */
-EXTERN bool    setintr IZERO;	/* Set interrupts on/off -> Wait intr... */
-EXTERN bool    timflg IZERO;	/* Time the next waited for command */
-EXTERN bool    havhash IZERO;	/* path hashing is available */
-EXTERN bool    editing IZERO;	/* doing filename expansion and line editing */
-EXTERN bool    noediting IZERO;	/* initial $term defaulted to noedit */
-EXTERN bool    bslash_quote IZERO;/* PWP: tcsh-style quoting?  (in sh.c) */
-EXTERN bool    isoutatty IZERO;	/* is SHOUT a tty */
-EXTERN bool    isdiagatty IZERO;/* is SHDIAG a tty */
-EXTERN bool    is1atty IZERO;	/* is file descriptor 1 a tty (didfds mode) */
-EXTERN bool    is2atty IZERO;	/* is file descriptor 2 a tty (didfds mode) */
-EXTERN bool    arun IZERO;	/* Currently running multi-line-aliases */
+EXTERN int    didfds IZERO;	/* Have setup i/o fd's for child */
+EXTERN int    doneinp IZERO;	/* EOF indicator after reset from readc */
+EXTERN int    exiterr IZERO;	/* Exit if error or non-zero exit status */
+EXTERN int    child IZERO;	/* Child shell ... errors cause exit */
+EXTERN int    haderr IZERO;	/* Reset was because of an error */
+EXTERN int    intty IZERO;	/* Input is a tty */
+EXTERN int    intact IZERO;	/* We are interactive... therefore prompt */
+EXTERN int    justpr IZERO;	/* Just print because of :p hist mod */
+EXTERN int    loginsh IZERO;	/* We are a loginsh -> .login/.logout */
+EXTERN int    neednote IZERO;	/* Need to pnotify() */
+EXTERN int    noexec IZERO;	/* Don't execute, just syntax check */
+EXTERN int    pjobs IZERO;	/* want to print jobs if interrupted */
+EXTERN int    setintr IZERO;	/* Set interrupts on/off -> Wait intr... */
+EXTERN int    timflg IZERO;	/* Time the next waited for command */
+EXTERN int    havhash IZERO;	/* path hashing is available */
+EXTERN int    editing IZERO;	/* doing filename expansion and line editing */
+EXTERN int    noediting IZERO;	/* initial $term defaulted to noedit */
+EXTERN int    bslash_quote IZERO;/* PWP: tcsh-style quoting?  (in sh.c) */
+EXTERN int    isoutatty IZERO;	/* is SHOUT a tty */
+EXTERN int    isdiagatty IZERO;/* is SHDIAG a tty */
+EXTERN int    is1atty IZERO;	/* is file descriptor 1 a tty (didfds mode) */
+EXTERN int    is2atty IZERO;	/* is file descriptor 2 a tty (didfds mode) */
+EXTERN int    arun IZERO;	/* Currently running multi-line-aliases */
 EXTERN int     implicit_cd IZERO;/* implicit cd enabled?(1=enabled,2=verbose) */
-EXTERN bool    inheredoc IZERO;	/* Currently parsing a heredoc */
-EXTERN bool    windowchg IZERO;	/* We received a window change event */
+EXTERN int    inheredoc IZERO;	/* Currently parsing a heredoc */
+EXTERN int    windowchg IZERO;	/* We received a window change event */
 #if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
-EXTERN bool    dspmbyte_ls;
+EXTERN int    dspmbyte_ls;
 #endif
 
 /*
@@ -634,7 +632,7 @@ EXTERN bool    dspmbyte_ls;
 EXTERN Char   *arginp IZERO;	/* Argument input for sh -c and internal `xx` */
 EXTERN int     onelflg IZERO;	/* 2 -> need line for -t, 1 -> exit on read */
 extern Char   *ffile;		/* Name of shell file for $0 */
-extern bool    dolzero;		/* if $?0 should return true... */
+extern int    dolzero;		/* if $?0 should return true... */
 
 extern char *seterr;		/* Error message from scanner/parser */
 #if !defined(BSD4_4) && !defined(__linux__)
@@ -863,7 +861,7 @@ extern int aret;		/* Type of last char returned */
  */
 EXTERN struct Ain lineloc;
 
-EXTERN bool    cantell;		/* Is current source tellable ? */
+EXTERN int    cantell;		/* Is current source tellable ? */
 
 /*
  * Input lines are parsed into doubly linked circular
@@ -1246,8 +1244,8 @@ extern Char    **INVPPTR;
 
 extern char    *progname;
 extern int	tcsh;
-extern bool	xlate_cr;
-extern bool	output_raw;
+extern int	xlate_cr;
+extern int	output_raw;
 extern int	lbuffed;
 extern time_t	Htime;
 extern int	numeof;
@@ -1256,10 +1254,10 @@ extern char	linbuf[];
 extern char 	*linp;
 extern int	nsig;
 #ifdef VFORK
-extern bool	use_fork;
+extern int	use_fork;
 #endif
-extern bool	tellwhat;
-extern bool	NoNLSRebind;
+extern int	tellwhat;
+extern int	NoNLSRebind;
 
 #include "tc.h"
 
@@ -1324,7 +1322,7 @@ EXTERN nl_catd catd;
 #endif /* WINNT_NATIVE */
 
 #if defined(FILEC)
-extern bool    filec;
+extern int    filec;
 #endif /* FILEC */
 
 #include "sh.decls.h"

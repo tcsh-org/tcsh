@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.77 2004/11/21 04:38:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.78 2004/11/23 01:48:33 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.77 2004/11/21 04:38:03 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.78 2004/11/23 01:48:33 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -148,7 +148,7 @@ static	void 	 e_charfwd_mbyte	__P((int));
 static	void 	 e_charback_mbyte	__P((int));
 static  int	 extdel;
 static  int	 extins = 0;
-extern  bool	 dspmbyte_utf8;
+extern  int	 dspmbyte_utf8;
 #endif
 
 static void
@@ -530,8 +530,8 @@ c_expand(p)
     struct Hist *h = Histlist.Hnext;
     struct wordent *l;
     int     i, from, to, dval;
-    bool    all_dig;
-    bool    been_once = 0;
+    int    all_dig;
+    int    been_once = 0;
     Char   *op = p;
     Char    buf[INBUFSIZE];
     Char   *bend = buf;
@@ -2057,7 +2057,7 @@ e_up_search_hist(c)
 {
     struct Hist *hp;
     int h;
-    bool    found = 0;
+    int    found = 0;
 
     USE(c);
     ActionFlag = TCSHOP_NOP;
@@ -2126,7 +2126,7 @@ e_down_search_hist(c)
 {
     struct Hist *hp;
     int h;
-    bool    found = 0;
+    int    found = 0;
 
     USE(c);
     ActionFlag = TCSHOP_NOP;
@@ -2367,7 +2367,7 @@ e_dabbrev_expand(c)
     Char *cp, *ncp, *bp;
     struct Hist *hp;
     int arg = 0, len = 0, i; /* len = 0 to shut up gcc -Wall */
-    bool found = 0;
+    int found = 0;
     Char hbuf[INBUFSIZE];
     static int oldevent, hist, word;
     static Char *start, *oldcursor;

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.spell.c,v 3.15 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.spell.c,v 3.16 2004/08/04 17:12:32 christos Exp $ */
 /*
  * tw.spell.c: Spell check words
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.spell.c,v 3.15 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tw.spell.c,v 3.16 2004/08/04 17:12:32 christos Exp $")
 
 #include "tw.h"
 
@@ -48,7 +48,7 @@ spell_me(oldname, oldsize, looking, pat, suf)
     Char    guess[FILSIZ + 1], newname[FILSIZ + 1];
     Char *new = newname, *old = oldname;
     Char *p, *cp, *ws;
-    bool    foundslash = 0;
+    int    foundslash = 0;
     int     retval;
 
     for (;;) {

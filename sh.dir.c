@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.63 2004/05/10 19:12:37 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.64 2004/08/04 17:12:28 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.dir.c,v 3.63 2004/05/10 19:12:37 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.64 2004/08/04 17:12:28 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -322,7 +322,7 @@ dnormalize(cp, expnd)
 	Char   *dp, *cwd, *start = cp, buf[MAXPATHLEN];
 	struct stat sb;
 # ifdef apollo
-	bool slashslash;
+	int slashslash;
 # endif /* apollo */
 
 	/*
@@ -832,9 +832,9 @@ dcanon(cp, p)
 {
     Char *sp;
     Char *p1, *p2;	/* general purpose */
-    bool    slash;
+    int    slash;
 #ifdef apollo
-    bool    slashslash;
+    int    slashslash;
 #endif /* apollo */
     size_t  clen;
 

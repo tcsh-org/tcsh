@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.59 2004/05/21 18:50:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.60 2004/08/04 17:12:30 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.59 2004/05/21 18:50:36 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.60 2004/08/04 17:12:30 christos Exp $")
 
 #include "ed.h"
 
@@ -53,7 +53,7 @@ static	Char		*word		__P((int));
 static	eChar	 	 getC1		__P((int));
 static	void	 	 getdol		__P((void));
 static	void	 	 getexcl	__P((Char));
-static	struct Hist 	*findev		__P((Char *, bool));
+static	struct Hist 	*findev		__P((Char *, int));
 static	void	 	 setexclp	__P((Char *));
 static	eChar	 	 bgetc		__P((void));
 static	void		 balloc		__P((int));
@@ -62,8 +62,8 @@ static	struct wordent	*gethent	__P((Char));
 static	int	 	 matchs		__P((Char *, Char *));
 static	int	 	 getsel		__P((int *, int *, int));
 static	struct wordent	*getsub		__P((struct wordent *));
-static	Char 		*subword	__P((Char *, Char, bool *));
-static	struct wordent	*dosub		__P((Char, struct wordent *, bool));
+static	Char 		*subword	__P((Char *, Char, int *));
+static	struct wordent	*dosub		__P((Char, struct wordent *, int));
 static	ssize_t		 wide_read	__P((int, Char *, size_t, int));
 
 /*
@@ -114,7 +114,7 @@ static Char labuf[BUFSIZE];
  * when called by the alias routine to determine whether to keep the
  * argument list.
  */
-static bool hadhist = 0;
+static int hadhist = 0;
 
 /*
  * Avoid alias expansion recursion via \!#
@@ -124,7 +124,7 @@ int     hleft;
 Char    histline[BUFSIZE + 2];	/* last line input */
 
  /* The +2 is to fool hp's optimizer */
-bool    histvalid = 0;		/* is histline valid */
+int    histvalid = 0;		/* is histline valid */
 static Char *histlinep = NULL;	/* current pointer into histline */
 
 static Char getCtmp;
@@ -300,7 +300,7 @@ word(parsehtime)
     Char    wbuf[BUFSIZE];
     Char    hbuf[12];
     int	    h;
-    bool dolflg;
+    int dolflg;
     int i;
 #if defined(DSPMBYTE)
     int mbytepos = 1;
@@ -516,7 +516,7 @@ getdol()
     Char    name[4 * MAXVARLEN + 1];
     eChar c;
     eChar   sc;
-    bool    special = 0, toolong;
+    int    special = 0, toolong;
 
     np = name, *np++ = '$';
     c = sc = getC(DOEXCL);
@@ -843,7 +843,7 @@ getsub(en)
     eChar   delim;
     eChar   c;
     eChar   sc;
-    bool global;
+    int global;
     Char    orhsb[sizeof(rhsb) / sizeof(Char)];
 
 #ifndef COMPAT
@@ -995,10 +995,10 @@ static struct wordent *
 dosub(sc, en, global)
     Char   sc;
     struct wordent *en;
-    bool global;
+    int global;
 {
     struct wordent lexi;
-    bool    didsub = 0, didone = 0;
+    int    didsub = 0, didone = 0;
     struct wordent *hp = &lexi;
     struct wordent *wdp;
     int i = exclc;
@@ -1055,7 +1055,7 @@ static Char *
 subword(cp, type, adid)
     Char   *cp;
     Char    type;
-    bool   *adid;
+    int   *adid;
 {
     Char    wbuf[BUFSIZE];
     Char *wp, *mp, *np;
@@ -1210,7 +1210,7 @@ getsel(al, ar, dol)
 {
     eChar c = getC(0);
     int i;
-    bool    first = *al < 0;
+    int    first = *al < 0;
 
     switch (c) {
 
@@ -1297,7 +1297,7 @@ gethent(sc)
     Char *np;
     eChar c;
     int     event;
-    bool    back = 0;
+    int    back = 0;
 
     c = sc == HISTSUB ? (eChar)HIST : getC(0);
     if (c == (eChar)HIST) {
@@ -1418,7 +1418,7 @@ gethent(sc)
 static struct Hist *
 findev(cp, anyarg)
     Char   *cp;
-    bool    anyarg;
+    int    anyarg;
 {
     struct Hist *hp;
 
@@ -1485,7 +1485,7 @@ unreadc(c)
 
 eChar
 readc(wanteof)
-    bool    wanteof;
+    int    wanteof;
 {
     eChar c;
     static  int sincereal;	/* Number of real EOFs we've seen */

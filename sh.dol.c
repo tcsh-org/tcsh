@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.52 2003/03/12 19:14:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.53 2004/08/04 17:12:28 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.52 2003/03/12 19:14:51 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.53 2004/08/04 17:12:28 christos Exp $")
 
 /*
  * C shell
@@ -244,8 +244,8 @@ Dword()
     Char    wbuf[BUFSIZE];
     Char *wp = wbuf;
     int i = MAXWLEN;
-    bool dolflg;
-    bool    sofar = 0, done = 0;
+    int dolflg;
+    int    sofar = 0, done = 0;
 
     while (!done) {
 	done = 1;
@@ -453,7 +453,7 @@ Dgetdol()
     Char    name[4 * MAXVARLEN + 1];
     eChar   c, sc;
     int     subscr = 0, lwb = 1, upb = 0;
-    bool    dimen = 0, bitset = 0, length = 0;
+    int    dimen = 0, bitset = 0, length = 0;
     Char    wbuf[BUFSIZE];
     static Char *dolbang = NULL;
 
@@ -1061,7 +1061,7 @@ heredoc(term)
     int     ocnt, lcnt, mcnt;
     Char *lbp, *obp, *mbp;
     Char  **vp;
-    bool    quoted;
+    int    quoted;
     char   *tmp;
 #ifndef WINNT_NATIVE
     struct timeval tv;

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.22 2004/08/04 17:12:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.print.c,v 3.23 2004/11/21 04:28:12 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.22 2004/08/04 17:12:30 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.23 2004/11/21 04:28:12 christos Exp $")
 
 #include "ed.h"
 
@@ -111,8 +111,8 @@ p2dig(i)
 
 char    linbuf[2048];		/* was 128 */
 char   *linp = linbuf;
-bool    output_raw = 0;		/* PWP */
-bool    xlate_cr   = 0;		/* HE */
+int    output_raw = 0;		/* PWP */
+int    xlate_cr   = 0;		/* HE */
 
 #ifdef WIDE_STRINGS
 void

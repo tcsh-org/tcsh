@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.116 2004/11/20 17:40:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.117 2004/11/20 18:25:25 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,14 +39,14 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.116 2004/11/20 17:40:36 christos Exp $")
+RCSID("$Id: sh.c,v 3.117 2004/11/20 18:25:25 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
 #include "tw.h"
 
-extern bool MapsAreInited;
-extern bool NLSMapsAreInited;
+extern int MapsAreInited;
+extern int NLSMapsAreInited;
 
 /*
  * C Shell
@@ -93,7 +93,7 @@ int do_logout = 0;
 #endif /* TESLA */
 
 
-bool    use_fork = 0;		/* use fork() instead of vfork()? */
+int    use_fork = 0;		/* use fork() instead of vfork()? */
 
 /*
  * Magic pointer values. Used to specify other invalid conditions aside
@@ -104,20 +104,20 @@ Char    *INVPTR = &INVCHAR;
 Char    **INVPPTR = &INVPTR;
 
 static int     nofile = 0;
-static bool    reenter = 0;
-static bool    nverbose = 0;
-static bool    nexececho = 0;
-static bool    quitit = 0;
-static bool    rdirs = 0;
-bool    fast = 0;
-static bool    batch = 0;
-static bool    mflag = 0;
-static bool    prompt = 1;
+static int    reenter = 0;
+static int    nverbose = 0;
+static int    nexececho = 0;
+static int    quitit = 0;
+static int    rdirs = 0;
+int    fast = 0;
+static int    batch = 0;
+static int    mflag = 0;
+static int    prompt = 1;
 int     enterhist = 0;
-bool    tellwhat = 0;
+int    tellwhat = 0;
 time_t  t_period;
 Char  *ffile = NULL;
-bool	dolzero = 0;
+int	dolzero = 0;
 int	insource = 0;
 int	exitset = 0;
 static time_t  chktim;		/* Time mail last checked */
@@ -144,10 +144,10 @@ struct saved_state {
     Char	 *alvecp;
     Char	**alvec;
     int		  onelflg;
-    bool	  enterhist;
+    int	  enterhist;
     Char	**argv;
     Char	  HIST;
-    bool	  cantell;
+    int	  cantell;
     struct Bin	  B;
     /* These keep signal state and setjump state */
 #ifdef BSDSIGS
@@ -159,12 +159,12 @@ struct saved_state {
 
 static	int		  srccat	__P((Char *, Char *));
 #ifndef WINNT_NATIVE
-static	int		  srcfile	__P((const char *, bool, int, Char **));
+static	int		  srcfile	__P((const char *, int, int, Char **));
 #else
-int		  srcfile	__P((const char *, bool, int, Char **));
+int		  srcfile	__P((const char *, int, int, Char **));
 #endif /*WINNT_NATIVE*/
 static	sigret_t	  phup		__P((int));
-static	void		  srcunit	__P((int, bool, int, Char **));
+static	void		  srcunit	__P((int, int, int, Char **));
 static	void		  mailchk	__P((void));
 #ifndef _PATH_DEFPATH
 static	Char	 	**defaultpath	__P((void));
@@ -1473,7 +1473,7 @@ int
 #endif /*WINNT_NATIVE*/
 srcfile(f, onlyown, flag, av)
     const char   *f;
-    bool    onlyown;
+    int    onlyown;
     int flag;
     Char **av;
 {
@@ -1658,7 +1658,7 @@ st_restore(st, av)
 static void
 srcunit(unit, onlyown, hflg, av)
     int unit;
-    bool    onlyown;
+    int    onlyown;
     int hflg;
     Char **av;
 {
@@ -1897,7 +1897,7 @@ int snum;
 
 void
 pintr1(wantnl)
-    bool    wantnl;
+    int    wantnl;
 {
     Char **v;
 #ifdef BSDSIGS
@@ -1993,7 +1993,7 @@ pintr1(wantnl)
 static struct command *savet = NULL;
 void
 process(catch)
-    bool    catch;
+    int    catch;
 {
     jmp_buf_t osetexit;
     /* PWP: This might get nuked my longjmp so don't make it a register var */
@@ -2207,7 +2207,7 @@ dosource(t, c)
     struct command *c;
 {
     Char *f;
-    bool    hflg = 0;
+    int    hflg = 0;
     char    buf[BUFSIZE];
 
     USE(c);
@@ -2266,7 +2266,7 @@ mailchk()
     time_t  t;
     int     intvl, cnt;
     struct stat stb;
-    bool    new;
+    int    new;
 
     v = adrof(STRmail);
     if (v == NULL || v->vec == NULL)

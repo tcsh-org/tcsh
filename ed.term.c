@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.term.c,v 1.29 2003/05/26 07:11:06 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.term.c,v 1.30 2004/08/04 17:12:28 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #ifndef WINNT_NATIVE
 
-RCSID("$Id: ed.term.c,v 1.29 2003/05/26 07:11:06 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.30 2004/08/04 17:12:28 christos Exp $")
 
 #include "ed.h"
 
@@ -1092,7 +1092,7 @@ tty_setdisc(fd, dis)
     int fd;
     int dis;
 {
-    static bool edit_discipline = 0;
+    static int edit_discipline = 0;
     static union txname tx_disc;
     extern char strPOSIX[];
 

@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.1 2002/09/13 05:27:10 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.2 2004/11/21 04:38:04 christos Exp $*/
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -206,7 +206,7 @@ EchoTC(v)
 
 }
 
-bool    GotTermCaps = 0;
+int    GotTermCaps = 0;
 
 
 	void

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.disc.c,v 3.13 2002/07/06 22:28:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.disc.c,v 3.14 2004/08/04 14:28:24 christos Exp $ */
 /*
  * tc.disc.c: Functions to set/clear line disciplines
  *
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.disc.c,v 3.13 2002/07/06 22:28:13 christos Exp $")
+RCSID("$Id: tc.disc.c,v 3.14 2004/08/04 14:28:24 christos Exp $")
 
 #ifdef OREO
 #include <compat.h>
@@ -41,7 +41,7 @@ RCSID("$Id: tc.disc.c,v 3.13 2002/07/06 22:28:13 christos Exp $")
 
 #include "ed.h"
 
-static bool add_discipline = 0;	/* Did we add a line discipline	 */
+static int add_discipline = 0;	/* Did we add a line discipline	 */
 
 #if defined(IRIS4D) || defined(OREO) || defined(sonyrisc)
 # define HAVE_DISC

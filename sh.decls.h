@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.42 2004/08/08 06:42:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.43 2004/11/23 01:40:08 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -43,8 +43,8 @@ extern	void		  goodbye	__P((Char **, struct command *));
 extern	void		  importpath	__P((Char *));
 extern	void		  initdesc	__P((void));
 extern	sigret_t	  pintr		__P((int));
-extern	void		  pintr1	__P((bool));
-extern	void		  process	__P((bool));
+extern	void		  pintr1	__P((int));
+extern	void		  process	__P((int));
 extern	void		  untty		__P((void));
 #ifdef PROF
 extern	void		  done		__P((int));
@@ -87,13 +87,13 @@ extern	void		  stderror	__P((unsigned int, ...));
 /*
  * sh.exec.c
  */
-extern	void		  doexec	__P((struct command *, bool));
+extern	void		  doexec	__P((struct command *, int));
 extern	void		  dohash	__P((Char **, struct command *));
 extern	void		  dounhash	__P((Char **, struct command *));
 extern	void		  execash	__P((Char **, struct command *));
 extern	void		  hashstat	__P((Char **, struct command *));
 extern	void		  xechoit	__P((Char **));
-extern	int		  executable	__P((Char *, Char *, bool));
+extern	int		  executable	__P((Char *, Char *, int));
 extern	int		  tellmewhat	__P((struct wordent *, Char *));
 extern	void		  dowhere	__P((Char **, struct command *));
 extern	int		  find_cmd	__P((Char *, int));
@@ -101,9 +101,9 @@ extern	int		  find_cmd	__P((Char *, int));
 /*
  * sh.exp.c
  */
-extern  Char     *filetest       __P((Char *, Char ***, bool));
+extern  Char     *filetest       __P((Char *, Char ***, int));
 extern	int	 	  expr		__P((Char ***));
-extern	int		  exp0		__P((Char ***, bool));
+extern	int		  exp0		__P((Char ***, int));
 
 /*
  * sh.file.c
@@ -165,7 +165,7 @@ extern	void		  reexecute	__P((struct command *));
  * sh.glob.c
  */
 extern	Char	 	 *globequal	__P((Char *, Char *));
-extern	Char		**dobackp	__P((Char *, bool));
+extern	Char		**dobackp	__P((Char *, int));
 extern	void		  Gcat		__P((Char *, Char *));
 extern	Char		 *globone	__P((Char *, int));
 extern	int		  Gmatch	__P((Char *, Char *));
@@ -194,11 +194,11 @@ extern  int	  	  t_pmatch	__P((Char *, Char *, Char **, int));
  * sh.hist.c
  */
 extern	void	 	  dohist	__P((Char **, struct command *));
-extern  struct Hist 	 *enthist	__P((int, struct wordent *, bool, bool));
-extern	void	 	  savehist	__P((struct wordent *, bool));
+extern  struct Hist 	 *enthist	__P((int, struct wordent *, int, int));
+extern	void	 	  savehist	__P((struct wordent *, int));
 extern	void		  fmthist	__P((int, ptr_t, char *, size_t));
 extern	void		  rechist	__P((Char *, int));
-extern	void		  loadhist	__P((Char *, bool));
+extern	void		  loadhist	__P((Char *, int));
 
 /*
  * sh.init.c
@@ -218,7 +218,7 @@ extern	Char		 *domod		__P((Char *, Char));
 extern	void		  freelex	__P((struct wordent *));
 extern	int		  lex		__P((struct wordent *));
 extern	void		  prlex		__P((struct wordent *));
-extern	eChar		  readc		__P((bool));
+extern	eChar		  readc		__P((int));
 extern	void		  settell	__P((void));
 extern	void		  unreadc	__P((Char));
 
@@ -310,7 +310,7 @@ extern	void		  donotify	__P((Char **, struct command *));
 extern	void		  dostop	__P((Char **, struct command *));
 extern	void		  dowait	__P((Char **, struct command *));
 extern	void		  palloc	__P((int, struct command *));
-extern	void		  panystop	__P((bool));
+extern	void		  panystop	__P((int));
 extern	sigret_t	  pchild	__P((int));
 extern	void		  pendjob	__P((void));
 extern	int		  pfork		__P((struct command *, int));
@@ -327,7 +327,7 @@ extern  struct process   *pfind		__P((Char *));
  * sh.sem.c
  */
 extern	void		  execute	__P((struct command *, int, int *, 
-					     int *, bool));
+					     int *, int));
 extern	void		  mypipe	__P((int *));
 
 /*

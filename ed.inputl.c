@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.54 2004/11/20 18:23:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.55 2004/11/20 20:30:46 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.54 2004/11/20 18:23:03 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.55 2004/11/20 20:30:46 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -42,7 +42,7 @@ RCSID("$Id: ed.inputl.c,v 3.54 2004/11/20 18:23:03 christos Exp $")
 
 /* ed.inputl -- routines to get a single line from the input. */
 
-extern bool MapsAreInited;
+extern int MapsAreInited;
 
 /* mismatched first character */
 static Char mismatch[] = 
@@ -55,7 +55,7 @@ static	int	CompleteLine	__P((void));
 static	void	RunCommand	__P((Char *));
 static  void 	doeval1		__P((Char **));
 
-static bool rotate = 0;
+static int rotate = 0;
 
 
 static int

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.parse.c,v 3.11 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.parse.c,v 3.12 2004/08/04 17:12:30 christos Exp $ */
 /*
  * sh.parse.c: Interpret a list of tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.parse.c,v 3.11 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.parse.c,v 3.12 2004/08/04 17:12:30 christos Exp $")
 
 /*
  * C shell
@@ -141,7 +141,7 @@ asyn3(p1, p2)
 {
     struct varent *ap;
     struct wordent alout;
-    bool redid;
+    int redid;
 
     if (p1 == p2)
 	return;
@@ -496,7 +496,7 @@ syn3(p1, p2, flags)
     int l;
     Char  **av;
     int     n, c;
-    bool    specp = 0;
+    int    specp = 0;
 
     if (p1 != p2) {
 	p = p1;

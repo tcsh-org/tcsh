@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.h,v 3.22 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.h,v 3.23 2004/08/04 17:12:32 christos Exp $ */
 /*
  * tw.h: TwENEX functions headers
  */
@@ -105,7 +105,7 @@ extern int InsideCompletion;
 
 extern struct varent completions;
 
-extern bool color_context_ls;
+extern int color_context_ls;
 
 #include "tw.decls.h"
 

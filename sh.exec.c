@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.61 2004/11/20 18:25:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.62 2004/11/21 04:38:03 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.61 2004/11/20 18:25:26 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.62 2004/11/21 04:38:03 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -149,11 +149,11 @@ static	int 	iscommand	__P((Char *));
 void
 doexec(t, do_glob)
     struct command *t;
-    bool do_glob;
+    int do_glob;
 {
     Char *dp, **pv, **av, *sav;
     struct varent *v;
-    bool slash;
+    int slash;
     int hashval, i;
     Char   *blk[2];
 
@@ -856,7 +856,7 @@ iscommand(name)
     Char **pv;
     Char *sav;
     struct varent *v;
-    bool slash = any(short2str(name), '/');
+    int slash = any(short2str(name), '/');
     int hashval, i;
 
     v = adrof(STRpath);
@@ -918,7 +918,7 @@ cont:
 int
 executable(dir, name, dir_ok)
     Char   *dir, *name;
-    bool    dir_ok;
+    int    dir_ok;
 {
     struct stat stbuf;
     Char    path[MAXPATHLEN + 1];
@@ -951,7 +951,7 @@ tellmewhat(lexp, str)
     int i;
     struct biltins *bptr;
     struct wordent *sp = lexp->next;
-    bool    aliased = 0, found;
+    int    aliased = 0, found;
     Char   *s0, *s1, *s2, *cmd;
     Char    qc;
 
@@ -1026,7 +1026,7 @@ tellmewhat(lexp, str)
     if ((i = iscommand(sp->word)) != 0) {
 	Char **pv;
 	struct varent *v;
-	bool    slash = any(short2str(sp->word), '/');
+	int    slash = any(short2str(sp->word), '/');
 
 	v = adrof(STRpath);
 	if (v == NULL || v->vec == NULL || v->vec[0] == NULL || slash)

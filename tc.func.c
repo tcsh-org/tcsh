@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.112 2004/08/04 17:24:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.113 2004/11/21 04:38:03 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.112 2004/08/04 17:24:23 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.113 2004/11/21 04:38:03 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -58,19 +58,19 @@ extern int do_logout;
 #endif /* TESLA */
 extern time_t t_period;
 extern int just_signaled;
-static bool precmd_active = 0;
-static bool jobcmd_active = 0; /* GrP */
-static bool postcmd_active = 0;
-static bool periodic_active = 0;
-static bool cwdcmd_active = 0;	/* PWP: for cwd_cmd */
-static bool beepcmd_active = 0;
+static int precmd_active = 0;
+static int jobcmd_active = 0; /* GrP */
+static int postcmd_active = 0;
+static int periodic_active = 0;
+static int cwdcmd_active = 0;	/* PWP: for cwd_cmd */
+static int beepcmd_active = 0;
 static signalfun_t alm_fun = NULL;
 
 static	void	 auto_logout	__P((int));
 static	char	*xgetpass	__P((const char *));
 static	void	 auto_lock	__P((int));
 #ifdef BSDJOBS
-static	void	 insert		__P((struct wordent *, bool));
+static	void	 insert		__P((struct wordent *, int));
 static	void	 insert_we	__P((struct wordent *, struct wordent *));
 static	int	 inlist		__P((Char *, Char *));
 #endif /* BSDJOBS */
@@ -416,7 +416,7 @@ dolist(v, c)
 }
 
 static const char *defaulttell = "ALL";
-extern bool GotTermCaps;
+extern int GotTermCaps;
 
 /*ARGSUSED*/
 void
@@ -637,7 +637,7 @@ fg_proc_entry(pp)
     sigmask_t omask;
 #endif
     jmp_buf_t osetexit;
-    bool    ohaderr;
+    int    ohaderr;
     Char    oGettingInput;
 
     getexit(osetexit);
@@ -1340,7 +1340,7 @@ continue_jobs(cp)
     static Char STRcndebug[] =
     {'c', 'n', 'd', 'e', 'b', 'u', 'g', '\0'};
 #endif /* CNDEBUG */
-    bool    in_cont_list, in_cont_arg_list;
+    int    in_cont_list, in_cont_arg_list;
 
 
 #ifdef CNDEBUG
@@ -1402,7 +1402,7 @@ continue_jobs(cp)
 static void
 insert(pl, file_args)
     struct wordent *pl;
-    bool    file_args;
+    int    file_args;
 {
     struct wordent *now, *last;
     Char   *cmd, *bcmd, *cp1, *cp2;
@@ -1737,7 +1737,7 @@ doaliases(v, c)
     int     fd;
     Char    buf[BUFSIZE], line[BUFSIZE];
     char    tbuf[BUFSIZE + 1], *tmp;
-    extern bool output_raw;	/* PWP: in sh.print.c */
+    extern int output_raw;	/* PWP: in sh.print.c */
 
     USE(c);
     v++;

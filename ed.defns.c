@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.defns.c,v 3.39 2002/03/08 17:36:45 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.defns.c,v 3.40 2004/08/04 17:12:27 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.39 2002/03/08 17:36:45 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.40 2004/08/04 17:12:27 christos Exp $")
 
 #include "ed.h"
 
@@ -1812,9 +1812,9 @@ CheckMaps()
 
 #endif
 
-bool    MapsAreInited = 0;
-bool    NLSMapsAreInited = 0;
-bool    NoNLSRebind;
+int    MapsAreInited = 0;
+int    NLSMapsAreInited = 0;
+int    NoNLSRebind;
 
 void
 ed_InitNLSMaps()

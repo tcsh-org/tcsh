@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.82 2004/08/04 14:28:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.83 2004/08/04 17:12:30 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.82 2004/08/04 14:28:23 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.83 2004/08/04 17:12:30 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1054,7 +1054,7 @@ pendjob()
 static int
 pprint(pp, flag)
     struct process *pp;
-    bool    flag;
+    int    flag;
 {
     int status, reason;
     struct process *tp;
@@ -1784,7 +1784,7 @@ pstart(pp, foregnd)
 
 void
 panystop(neednl)
-    bool    neednl;
+    int    neednl;
 {
     struct process *pp;
 
@@ -1901,7 +1901,7 @@ pfork(t, wanttty)
     int     wanttty;
 {
     int pid;
-    bool    ignint = 0;
+    int    ignint = 0;
     int     pgrp;
 #ifdef BSDSIGS
     sigmask_t omask = 0;

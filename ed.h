@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.36 2004/11/20 18:23:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.37 2004/11/21 04:38:03 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -245,7 +245,7 @@ extern void  tputs	__P((const char *, int, void (*)(int)));
 #endif
 
 #ifdef DSPMBYTE
-extern bool dspmbyte_utf8;
+extern int dspmbyte_utf8;
 #endif
 
 #endif /* _h_ed */

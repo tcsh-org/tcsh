@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.64 2004/11/20 18:25:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.65 2004/11/21 04:35:22 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.64 2004/11/20 18:25:26 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.65 2004/11/21 04:35:22 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -88,9 +88,9 @@ execute(t, wanttty, pipein, pipeout, do_glob)
     struct command *t;
     int     wanttty;
     int *pipein, *pipeout;
-    bool do_glob;
+    int do_glob;
 {
-    bool    forked = 0;
+    int    forked = 0;
     struct biltins *bifunc;
     int     pid = 0;
     int     pv[2];
@@ -518,7 +518,7 @@ execute(t, wanttty, pipein, pipeout, do_glob)
 		else {		/* child */
 		    /* this is from pfork() */
 		    int     pgrp;
-		    bool    ignint = 0;
+		    int    ignint = 0;
 		    if (nosigchld) {
 # ifdef BSDSIGS
 			(void) sigsetmask(csigmask);

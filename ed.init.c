@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.init.c,v 3.49 2004/05/21 18:51:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.init.c,v 3.50 2004/08/04 17:12:27 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.49 2004/05/21 18:51:25 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.50 2004/08/04 17:12:27 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -50,7 +50,7 @@ static unsigned char vdisable;	/* The value of _POSIX_VDISABLE from
 
 int     Tty_eight_bit = -1;	/* does the tty handle eight bits */
 
-extern bool GotTermCaps;
+extern int GotTermCaps;
 
 static ttydata_t extty, edtty, tstty;
 #define qutty tstty

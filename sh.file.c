@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.24 2004/08/04 14:28:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.25 2004/08/04 17:12:29 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.file.c,v 3.24 2004/08/04 14:28:23 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.25 2004/08/04 17:12:29 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -86,7 +86,7 @@ static	int	 ignored		__P((Char *));
  * completion by default.  Filec controls completion, nobeep controls
  * ringing the terminal bell on incomplete expansions.
  */
-bool    filec = 0;
+int    filec = 0;
 
 static void
 setup_tty(on)

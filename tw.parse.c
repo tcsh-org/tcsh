@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.99 2004/08/08 06:42:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.100 2004/11/20 18:23:03 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,14 +35,14 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.99 2004/08/08 06:42:29 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.100 2004/11/20 18:23:03 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
 
 #ifdef DSPMBYTE
-extern bool dspmbyte_utf8;
+extern int dspmbyte_utf8;
 extern int ColLen __P((Char *));
 #endif
 
@@ -94,7 +94,7 @@ int curchoice = -1;
 
 int match_unique_match = FALSE;
 int non_unique_match = FALSE;
-static bool SearchNoDirErr = 0;	/* t_search returns -2 if dir is unreadable */
+static int SearchNoDirErr = 0;	/* t_search returns -2 if dir is unreadable */
 
 /* state so if a completion is interrupted, the input line doesn't get
    nuked */
@@ -103,12 +103,12 @@ int InsideCompletion = 0;
 /* do the expand or list on the command line -- SHOULD BE REPLACED */
 
 static	void	 extract_dir_and_name	__P((Char *, Char *, Char *));
-static	int	 insert_meta		__P((Char *, Char *, Char *, bool));
+static	int	 insert_meta		__P((Char *, Char *, Char *, int));
 static	Char	*tilde			__P((Char *, Char *));
 #ifndef __MVS__
 static  int      expand_dir		__P((Char *, Char *, DIR  **, COMMAND));
 #endif
-static	bool	 nostat			__P((Char *));
+static	int	 nostat			__P((Char *));
 static	Char	 filetype		__P((Char *, Char *));
 static	int	 t_glob			__P((Char ***, int));
 static	int	 c_glob			__P((Char ***));
@@ -523,7 +523,7 @@ insert_meta(cp, cpend, word, closequotes)
     Char   *cp;
     Char   *cpend;
     Char   *word;
-    bool    closequotes;
+    int    closequotes;
 {
     Char buffer[2 * FILSIZ + 1], *bptr, *wptr;
     int in_sync = (cp != NULL);
@@ -1891,7 +1891,7 @@ expand_dir(dir, edir, dfd, cmd)
  *	This way, things won't grind to a halt when you complete in /afs
  *	or very large directories.
  */
-static bool
+static int
 nostat(dir)
      Char *dir;
 {
@@ -2062,7 +2062,7 @@ print_by_column(dir, items, count, no_file_suffix)
     int i, r, c, columns, rows;
     unsigned int w, maxwidth = 0;
     Char *val;
-    bool across;
+    int across;
 
     lbuffed = 0;		/* turn off line buffering */
 

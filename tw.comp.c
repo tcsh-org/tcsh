@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.comp.c,v 1.35 2004/08/04 17:12:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.comp.c,v 1.36 2004/11/20 17:25:07 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.35 2004/08/04 17:12:32 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.36 2004/11/20 17:25:07 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -44,7 +44,7 @@ struct varent completions;
 static int 	 	  tw_result	__P((Char *, Char **));
 static Char		**tw_find	__P((Char *, struct varent *, int));
 static Char 		 *tw_tok	__P((Char *));
-static bool	 	  tw_pos	__P((Char *, int));
+static int	 	  tw_pos	__P((Char *, int));
 static void	  	  tw_pr		__P((Char **));
 static int	  	  tw_match	__P((Char *, Char *));
 static void	 	  tw_prlist	__P((struct varent *));
@@ -149,7 +149,7 @@ static void
 tw_pr(cmp)
     Char **cmp;
 {
-    bool sp, osp;
+    int sp, osp;
     Char *ptr;
 
     for (; *cmp; cmp++) {
@@ -200,7 +200,7 @@ tw_find(nam, vp, cmd)
 /* tw_pos():
  *	Return true if the position is within the specified range
  */
-static bool
+static int
 tw_pos(ran, wno)
     Char *ran;
     int	  wno;

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.57 2004/11/20 20:30:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.58 2004/11/21 04:30:54 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.57 2004/11/20 20:30:47 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.58 2004/11/21 04:30:54 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -41,7 +41,7 @@ RCSID("$Id: sh.set.c,v 3.57 2004/11/20 20:30:47 christos Exp $")
 #include <langinfo.h>
 #endif
 
-extern bool GotTermCaps;
+extern int GotTermCaps;
 int numeof = 0;
 
 static	void		 update_vars	__P((Char *));
@@ -215,12 +215,12 @@ doset(v, c)
     Char *p;
     Char   *vp, op;
     Char  **vecp;
-    bool    hadsub;
+    int    hadsub;
     int     subscr;
     int	    flags = VAR_READWRITE;
-    bool    first_match = 0;
-    bool    last_match = 0;
-    bool    changed = 0;
+    int    first_match = 0;
+    int    last_match = 0;
+    int    changed = 0;
 
     USE(c);
     v++;
@@ -360,7 +360,7 @@ dolet(v, dummy)
 {
     Char *p;
     Char   *vp, c, op;
-    bool    hadsub;
+    int    hadsub;
     int     subscr;
 
     USE(dummy);
@@ -732,7 +732,7 @@ unset(v, c)
     Char   **v;
     struct command *c;
 {
-    bool did_roe, did_edit;
+    int did_roe, did_edit;
 
     USE(c);
     did_roe = adrof(STRrecognize_only_executables) != NULL;
@@ -1116,12 +1116,12 @@ x:
 }
 
 #ifdef DSPMBYTE
-bool dspmbyte_utf8;
+int dspmbyte_utf8;
 #endif
 
 #if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
-bool dspmbyte_ls;
-bool dspmbyte_utf8;
+int dspmbyte_ls;
+int dspmbyte_utf8;
 
 void
 update_dspmbyte_vars()

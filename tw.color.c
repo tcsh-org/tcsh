@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.14 2004/08/04 17:12:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.15 2004/11/23 01:48:34 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.14 2004/08/04 17:12:32 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.15 2004/11/23 01:48:34 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -98,10 +98,10 @@ static Extension *extensions = NULL;
 static size_t nextensions = 0;
 
 static char *colors = NULL;
-bool	     color_context_ls = FALSE;	/* do colored ls */
-static bool  color_context_lsmF = FALSE;	/* do colored ls-F */
+int	     color_context_ls = FALSE;	/* do colored ls */
+static int  color_context_lsmF = FALSE;	/* do colored ls-F */
 
-static bool getstring __P((char **, const Char **, Str *, int));
+static int getstring __P((char **, const Char **, Str *, int));
 static void put_color __P((Str *));
 static void print_color __P((Char *, size_t, Char));
 
@@ -134,7 +134,7 @@ set_color_context()
 
 /* getstring():
  */
-static  bool
+static  int
 getstring(dp, sp, pd, f)
     char        **dp;		/* dest buffer */
     const Char  **sp;		/* source buffer */
@@ -268,7 +268,7 @@ put_color(color)
 {
     size_t  i;
     const char   *c = color->s;
-    bool    original_output_raw = output_raw;
+    int    original_output_raw = output_raw;
 
     output_raw = TRUE;
     for (i = color->len; 0 < i; i--)

@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/ntfunc.c,v 1.8 2003/11/04 01:37:44 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/ntfunc.c,v 1.9 2004/07/25 14:36:27 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -775,7 +775,7 @@ int nt_try_fast_exec(struct command *t) {
     register char *f;
 	register struct varent *v;
 	register int hashval,i;
-	register bool slash;
+	register int slash;
 	int rc;
 	Char *vp;
 	Char   *blk[2];
@@ -1151,7 +1151,7 @@ BOOL is_nt_executable(char *path,char *extension) {
 int
 executable(dir, name, dir_ok)
     Char   *dir, *name;
-    bool    dir_ok;
+    int    dir_ok;
 {
 	struct stat stbuf;
 	Char    path[MAXPATHLEN + 1];
