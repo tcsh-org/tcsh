@@ -1,3 +1,4 @@
+ 60. V6.07.07 - 19980628
  59. Fast execute by-pass for win32 (Amol Deshpande)
  58. Clean up const usage a bit, and fix gcc 2.8.1 warnings.
  57. Use @bindir@ for DESTBIN in Makefile.in (Edgar Hoch)
