@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.31 2001/02/19 23:30:44 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.32 2002/03/08 17:36:45 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -183,39 +183,6 @@ EXTERN Char T_HasMeta;		/* true if we have a meta key */
 #define min(x,y)	(((x)<(y))?(x):(y))
 #define max(x,y)	(((x)>(y))?(x):(y))
 
-/*
- * Terminal dependend data structures
- */
-typedef struct {
-#ifdef WINNT_NATIVE
-    int dummy;
-#else /* !WINNT_NATIVE */
-# if defined(POSIX) || defined(TERMIO)
-#  ifdef POSIX
-    struct termios d_t;
-#  else
-    struct termio d_t;
-#  endif /* POSIX */
-# else /* SGTTY */
-#  ifdef TIOCGETP
-    struct sgttyb d_t;
-#  endif /* TIOCGETP */
-#  ifdef TIOCGETC
-    struct tchars d_tc;
-#  endif /* TIOCGETC */
-#  ifdef TIOCGPAGE
-    struct ttypagestat d_pc;
-#  endif /* TIOCGPAGE */
-#  ifdef TIOCLGET
-    int d_lb;
-#  endif /* TIOCLGET */
-# endif /* POSIX || TERMIO */
-# ifdef TIOCGLTC
-    struct ltchars d_ltc;
-# endif /* TIOCGLTC */
-#endif /* WINNT_NATIVE */
-} ttydata_t;
-
 #define MODE_INSERT	0
 #define MODE_REPLACE	1
 #define MODE_REPLACE_1	2
@@ -246,6 +213,7 @@ typedef struct {
 } ttyperm_t[NN_IO][M_NN];
 
 extern ttyperm_t ttylist;
+#include "ed.term.h"
 #include "ed.decls.h"
 
 #endif /* _h_ed */

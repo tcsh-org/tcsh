@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.term.c,v 1.26 2001/08/06 23:51:09 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.term.c,v 1.27 2002/03/08 17:36:45 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -33,10 +33,9 @@
 #include "sh.h"
 #ifndef WINNT_NATIVE
 
-RCSID("$Id: ed.term.c,v 1.26 2001/08/06 23:51:09 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.27 2002/03/08 17:36:45 christos Exp $")
 
 #include "ed.h"
-#include "ed.term.h"
 
 int didsetty = 0;
 ttyperm_t ttylist = {   

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.disc.c,v 3.11 1997/10/02 16:36:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.disc.c,v 3.12 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tc.disc.c: Functions to set/clear line disciplines
  *
@@ -33,13 +33,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.disc.c,v 3.11 1997/10/02 16:36:31 christos Exp $")
+RCSID("$Id: tc.disc.c,v 3.12 2002/03/08 17:36:47 christos Exp $")
 
 #ifdef OREO
 #include <compat.h>
 #endif	/* OREO */
 
-#include "ed.term.h"
+#include "ed.h"
 
 static bool add_discipline = 0;	/* Did we add a line discipline	 */
 
