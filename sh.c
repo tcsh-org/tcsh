@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.10 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.11 1991/09/10 04:51:46 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,7 +41,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.10 1991/09/08 00:45:32 christos Exp $")
+RCSID("$Id: sh.c,v 3.11 1991/09/10 04:51:46 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -516,6 +516,23 @@ main(argc, argv)
 		prompt = 0;
 		nofile = 1;
 		break;
+
+#ifdef apollo
+	    case 'D':		/* -D	Define environment variable */
+		{
+		    register Char *cp, *dp;
+
+		    cp = str2short(tcp);
+		    if (dp = Strchr(cp, '=')) {
+			*dp++ = '\0';
+			Setenv(cp, dp);
+		    }
+		    else
+			Setenv(cp, STRNULL);
+		}
+		*tcp = '\0'; 	/* done with this argument */
+		break;
+#endif /* apollo */
 
 #ifdef CSHDIRS
 	    case 'd':		/* -d   Force load of ~/.cshdirs */
