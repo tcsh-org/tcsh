@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.77 2003/02/08 20:03:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.78 2003/03/12 19:14:51 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.77 2003/02/08 20:03:26 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.78 2003/03/12 19:14:51 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1599,7 +1599,6 @@ pkill(v, signum)
     sigmask_t omask;
 #endif /* BSDSIGS */
     Char   *cp, **vp;
-    char   *ep;
 
 #ifdef BSDSIGS
     omask = sigmask(SIGCHLD);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.103 2002/07/09 12:56:55 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.104 2003/05/08 19:36:33 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.103 2002/07/09 12:56:55 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.104 2003/05/08 19:36:33 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1245,8 +1245,8 @@ islocale_var(var)
     Char *var;
 {
     static Char *locale_vars[] = {
-	STRLANG,	STRLC_CTYPE,	STRLC_NUMERIC,	STRLC_TIME,
-	STRLC_COLLATE,	STRLC_MESSAGES,	STRLC_MONETARY, 0
+	STRLANG,	STRLC_ALL, 	STRLC_CTYPE,	STRLC_NUMERIC,
+	STRLC_TIME,	STRLC_COLLATE,	STRLC_MESSAGES,	STRLC_MONETARY, 0
     };
     register Char **v;
 
@@ -1312,15 +1312,11 @@ dosetenv(v, c)
     vp = *v++;
 
     lp = vp;
-    if (!letter(*lp))
-        stderror(ERR_NAME | ERR_VARBEGIN);
-
-    for (; alnum(*lp); lp++)
-        continue;
-
-    if (*lp != '\0')
-	stderror(ERR_NAME | ERR_SYNTAX);
  
+    for (; *lp != '\0' ; lp++) {
+	if (*lp == '=')
+	    stderror(ERR_NAME | ERR_SYNTAX);
+    }
     if ((lp = *v++) == 0)
 	lp = STRNULL;
 

@@ -684,7 +684,7 @@ See also \fIdelete-char-or-list-or-eof\fR.
 .TP 8
 .B magic-space \fR(not bound)
 Expands history substitutions in the current line,
-like \fIexpand-history\fR, and appends a space.
+like \fIexpand-history\fR, and inserts a space.
 \fImagic-space\fR is designed to be bound to the space bar,
 but is not bound by default.
 .TP 8
@@ -2549,13 +2549,13 @@ Finally, here's a complex example for inspiration:
 .IP "" 4
 > complete find \\
 .br
-\'n/\-name/f/' 'n/\-newer/f/' 'n/\-{,n}cpio/f/' \e
+\&'n/\-name/f/' 'n/\-newer/f/' 'n/\-{,n}cpio/f/' \e
 .br
 \'n/\-exec/c/' 'n/\-ok/c/' 'n/\-user/u/' \e
 .br
-\'n/\-group/g/' 'n/\-fstype/(nfs 4.2)/' \e
+\&'n/\-group/g/' 'n/\-fstype/(nfs 4.2)/' \e
 .br
-\'n/\-type/(b c d f l p s)/' \e
+\&'n/\-type/(b c d f l p s)/' \e
 .br
 \'c/\-/(name newer cpio ncpio exec ok user \e
 .br
@@ -2565,7 +2565,7 @@ ls mtime nogroup nouser perm print prune \e
 .br
 size xdev)/' \e
 .br
-\'p/*/d/'
+\&'p/*/d/'
 .PP
 This completes words following `\-name', `\-newer', `\-cpio' or `ncpio'
 (note the pattern which matches both) to files,

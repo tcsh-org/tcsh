@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.109 2002/11/21 20:02:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.110 2003/03/12 19:14:51 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -618,9 +618,9 @@ EXTERN int     onelflg IZERO;	/* 2 -> need line for -t, 1 -> exit on read */
 extern Char   *ffile;		/* Name of shell file for $0 */
 extern bool    dolzero;		/* if $?0 should return true... */
 
-#if defined(FILEC) && defined(TIOCSTI)
+#if defined(FILEC)
 extern bool    filec;
-#endif /* FILEC && TIOCSTI */
+#endif /* FILEC */
 
 extern char *seterr;		/* Error message from scanner/parser */
 #if !defined(BSD4_4) && !defined(__linux__)

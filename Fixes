@@ -1,3 +1,9 @@
+ 15. glob all arguments in source (Martin Godisch)
+ 14. various debian fixes (Martin Godisch)
+ 13. setenv syntax check revert (Satoshi I. Nozawa)
+ 12. EAGAIN typo (dan harkless)
+ 11. filec compilation issue on hpux (beebe)
+ 10. win32 compilation fixes for O_LARGEFILE (amol)
   9. Don't go into an infinite loop when tcgetpgrp() returns an error.
   8. Cygwin fixes (Corinna Vinschen)
   7. NLS catclose() bug avoidance (KAJIMOTO Masato)

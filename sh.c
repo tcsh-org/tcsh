@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.106 2002/11/21 20:02:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.107 2003/03/12 19:14:50 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.106 2002/11/21 20:02:00 christos Exp $")
+RCSID("$Id: sh.c,v 3.107 2003/03/12 19:14:50 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2213,6 +2213,15 @@ dosource(t, c)
     f = globone(*t++, G_ERROR);
     (void) strcpy(buf, short2str(f));
     xfree((ptr_t) f);
+    gflag = 0, tglob(t);
+    if (gflag) {
+	t = globall(t);
+	if (t == 0)
+	    stderror(ERR_NAME | ERR_NOMATCH);
+    } else {
+	t = saveblk(t);
+	trim(t);
+    }
     if ((!srcfile(buf, 0, hflg, t)) && (!hflg) && (!bequiet))
 	stderror(ERR_SYSTEM, buf, strerror(errno));
 }
