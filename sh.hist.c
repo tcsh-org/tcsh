@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.hist.c,v 3.20 1994/07/08 14:43:50 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.hist.c,v 3.21 1996/04/26 19:19:38 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.20 1994/07/08 14:43:50 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.21 1996/04/26 19:19:38 christos Exp $")
 
 #include "tc.h"
 
@@ -132,8 +132,9 @@ enthist(event, lp, docopy, mflg)
 	    for (p = pp; (px = p, p = p->Hnext) != NULL;)
 		if (heq(lp, &(p->Hlex))){
 		    px->Hnext = p->Hnext;
+		    n = p->Hnum + 1;
 		    hfree(p);
-		    for (n = px->Hnum; p != NULL; p = p->Hnext)
+		    for (;p != NULL; p = p->Hnext)
 			p->Href = p->Hnum = n--;
 		    break;
 		}
@@ -317,19 +318,28 @@ phist(hp, hflg)
     register struct Hist *hp;
     int     hflg;
 {
-
+    extern bool output_raw;
     if (hflg & HIST_ONLY) {
+       /*
+        * Control characters have to be written as is (output_raw).
+        * This way one can preserve special characters (like tab) in
+        * the history file.
+        * From: mveksler@vnet.ibm.com (Veksler Michael)
+        */
+        output_raw= 1;
 	if (hflg & HIST_TIME)
 	    /* 
 	     * Make file entry with history time in format:
 	     * "+NNNNNNNNNN" (10 digits, left padded with ascii '0') 
 	     */
+
 	    xprintf("#+%010lu\n", hp->Htime);
 
 	if (HistLit && hp->histline)
 	    xprintf("%S\n", hp->histline);
 	else
 	    prlex(&hp->Hlex);
+        output_raw= 0;
     }
     else {
 	Char   *cp = str2short("%h\t%T\t%R\n");
