@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.24 2002/01/07 03:19:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/config_f.h,v 3.25 2002/03/08 17:36:45 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -113,14 +113,14 @@
  *		be used with SHORT_STRINGS
  *
  */
-#undef KANJI
+#define KANJI
 
 /*
  * DSPMBYTE	add variable "dspmbyte" and display multi-byte string at
  *		only output, when "dspmbyte" is set. Should be used with
  *		KANJI
  */
-#undef DSPMBYTE
+#define DSPMBYTE
 
 /*
  * MBYTEDEBUG	when "dspmbyte" is changed, set multi-byte checktable to
