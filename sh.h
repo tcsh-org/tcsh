@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.71 1996/09/24 16:57:24 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.72 1996/10/05 17:39:11 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -1085,12 +1085,16 @@ extern int	tcsh;
 /*
  * To print system call errors...
  */
-#ifndef linux
-#ifdef NEEDstrerror
+#ifdef __NetBSD__
+# include <errno.h>
+#else
+# ifndef linux
+#  ifdef NEEDstrerror
 extern char *sys_errlist[];
-#endif
+#  endif
 extern int errno, sys_nerr;
-#endif /* !linux */
+# endif /* !linux */
+#endif
 
 #ifdef NLS_CATALOGS
 # ifdef linux
