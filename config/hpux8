@@ -134,6 +134,8 @@
 
 #define HPUXVERSION 800	/* For HP-UX version 8.00 */
 
+#define _XOPEN_SOURCE_EXTENDED
+
 /****************** configurable hacks ****************/
 /* have been moved to config_f.h */
 #include "config_f.h"
