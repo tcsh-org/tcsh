@@ -25,6 +25,12 @@
 # endif /* !_HPUX_SOURCE */
 #endif
 
+/*
+ * We need to define the following, otherwise we get:
+ * #error "Large Files (ILP32) not supported in strict ANSI mode."
+ */
+#define __STDC_EXT__ 
+
 /* for access to large files from 32 bit apps
  * define the following.  Removes the need to 
  * redefine stat, fstat and lstat in sh.h
