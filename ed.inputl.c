@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.3 1991/07/16 18:13:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.3 1991/07/16 18:49:14 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.inputl.c,v 3.3 1991/07/16 18:13:06 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.3 1991/07/16 18:49:14 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -319,7 +319,7 @@ Inputl()
 	    break;
 
 	case CC_LIST_GLOB:
-	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf, LIST) < 0)
+	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf, GLOB) < 0)
 		Beep();
 	    Refresh();
 	    Argument = 1;
