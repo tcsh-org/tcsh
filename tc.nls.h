@@ -79,3 +79,19 @@ extern void NLSQuote __P((Char *));
 #  define NLS_ILLEGAL 0x40000000
 # endif
 #endif
+
+extern int NLSExtend __P((Char *, int, int));
+extern Char *NLSChangeCase __P((Char *, int));
+extern int NLSClassify __P((NLSChar, int));
+
+#define NLSCLASS_CTRL		(-1)
+#define NLSCLASS_TAB		(-2)
+#define NLSCLASS_NL		(-3)
+#define NLSCLASS_ILLEGAL	(-4)
+#define NLSCLASS_ILLEGAL2	(-5)
+#define NLSCLASS_ILLEGAL3	(-6)
+#define NLSCLASS_ILLEGAL4	(-7)
+
+#define NLSCLASS_ILLEGAL_SIZE(x) (-(x) - (-(NLSCLASS_ILLEGAL) - 1))
+
+#endif
