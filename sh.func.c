@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.80 1999/04/20 07:48:46 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.81 1999/05/11 13:07:48 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.80 1999/04/20 07:48:46 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.81 1999/05/11 13:07:48 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1160,12 +1160,18 @@ xecho(sep, v)
 	while ((c = *cp++) != 0) {
 	    if ((echo_style & SYSV_ECHO) != 0 && c == '\\') {
 		switch (c = *cp++) {
+		case 'a':
+		    c = '\a';
+		    break;
 		case 'b':
 		    c = '\b';
 		    break;
 		case 'c':
 		    nonl = 1;
 		    goto done;
+		case 'e':
+		    c = '\e';
+		    break;
 		case 'f':
 		    c = '\f';
 		    break;

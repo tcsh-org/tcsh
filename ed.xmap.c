@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.xmap.c,v 3.19 1997/10/27 22:44:23 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.xmap.c,v 3.20 1998/06/27 12:27:08 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.19 1997/10/27 22:44:23 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.20 1998/06/27 12:27:08 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -701,23 +701,23 @@ parseescape(ptr)
 	case 'b':
 	    c = CTL_ESC('\010');         /* Backspace */
 	    break;
-	case 't':
-	    c = CTL_ESC('\011');         /* Horizontal Tab */
-	    break;
-	case 'n':
-	    c = CTL_ESC('\012');         /* New Line */
-	    break;
-	case 'v':
-	    c = CTL_ESC('\013');         /* Vertical Tab */
+	case 'e':
+	    c = CTL_ESC('\033');         /* Escape */
 	    break;
 	case 'f':
 	    c = CTL_ESC('\014');         /* Form Feed */
 	    break;
+	case 'n':
+	    c = CTL_ESC('\012');         /* New Line */
+	    break;
 	case 'r':
 	    c = CTL_ESC('\015');         /* Carriage Return */
 	    break;
-	case 'e':
-	    c = CTL_ESC('\033');         /* Escape */
+	case 't':
+	    c = CTL_ESC('\011');         /* Horizontal Tab */
+	    break;
+	case 'v':
+	    c = CTL_ESC('\013');         /* Vertical Tab */
 	    break;
 	case '0':
 	case '1':
