@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.defns.c,v 3.23 1995/04/29 22:28:24 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.defns.c,v 3.24 1995/05/06 17:51:58 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.23 1995/04/29 22:28:24 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.24 1995/05/06 17:51:58 christos Exp $")
 
 #include "ed.h"
 
@@ -277,7 +277,8 @@ KEYCMD  NumFuns = F_NUM_FNS;
 
 KEYCMD  CcKeyMap[256];		/* the real key map */
 KEYCMD  CcAltMap[256];		/* the alternative key map */
-struct KeyFuncs FuncNames[F_NUM_FNS + 1];
+#define	F_NUM_FUNCNAMES	(F_NUM_FNS + 2)
+struct KeyFuncs FuncNames[F_NUM_FUNCNAMES];
 
 KEYCMD  CcEmacsMap[] = {
 /* keymap table, each index into above tbl; should be 256*sizeof(KEYCMD)
@@ -1109,7 +1110,7 @@ editinit()
 #ifdef NLS_CATALOGS
     int i;
 
-    for (i = 0; i < F_NUM_FNS + 1; i++)
+    for (i = 0; i < F_NUM_FUNCNAMES; i++)
 	xfree((ptr_t) FuncNames[i].desc);
 #endif
 
@@ -1720,7 +1721,8 @@ editinit()
     f->func = 0;
     f->desc = NULL;
 
-    if (f - FuncNames != F_NUM_FNS + 1)
+    f++;
+    if (f - FuncNames != F_NUM_FUNCNAMES)
 	abort();
 }
 
