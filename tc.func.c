@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.func.c,v 3.39 1993/05/17 00:11:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.func.c,v 3.40 1993/06/11 20:18:52 christos Exp christos $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.39 1993/05/17 00:11:09 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.40 1993/06/11 20:18:52 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -47,8 +47,10 @@ RCSID("$Id: tc.func.c,v 3.39 1993/05/17 00:11:09 christos Exp $")
 # include <hesiod.h>
 #endif /* HESIOD */
 
-extern time_t t_period;
+#ifdef TESLA
 extern int do_logout;
+#endif /* TESLA */
+extern time_t t_period;
 extern int just_signaled;
 static bool precmd_active = 0;
 static bool periodic_active = 0;
@@ -174,9 +176,10 @@ static void
 Reverse(s)
     Char   *s;
 {
-    int     c, i, j;
+    Char   c;
+    int     i, j;
 
-    for (i = 0, j = Strlen(s) - 1; i < j; i++, j--) {
+    for (i = 0, j = (int) Strlen(s) - 1; i < j; i++, j--) {
 	c = s[i];
 	s[i] = s[j];
 	s[j] = c;
@@ -226,7 +229,7 @@ dolist(v, c)
 	if (setintr)
 	    omask = sigblock(sigmask(SIGINT)) & ~sigmask(SIGINT);
 #else /* !BSDSIGS */
-	sighold(SIGINT);
+	(void) sighold(SIGINT);
 #endif /* BSDSIGS */
 	if (seterr) {
 	    xfree((ptr_t) seterr);
@@ -397,19 +400,19 @@ dowhich(v, c)
     register Char **v;
     struct command *c;
 {
-    struct wordent lex[3];
+    struct wordent lexp[3];
     struct varent *vp;
 
-    lex[0].next = &lex[1];
-    lex[1].next = &lex[2];
-    lex[2].next = &lex[0];
+    lexp[0].next = &lexp[1];
+    lexp[1].next = &lexp[2];
+    lexp[2].next = &lexp[0];
 
-    lex[0].prev = &lex[2];
-    lex[1].prev = &lex[0];
-    lex[2].prev = &lex[1];
+    lexp[0].prev = &lexp[2];
+    lexp[1].prev = &lexp[0];
+    lexp[2].prev = &lexp[1];
 
-    lex[0].word = STRNULL;
-    lex[2].word = STRret;
+    lexp[0].word = STRNULL;
+    lexp[2].word = STRret;
 
 #ifdef notdef
     /* 
@@ -436,8 +439,8 @@ dowhich(v, c)
 	    xputchar('\n');
 	}
 	else {
-	    lex[1].word = *v;
-	    tellmewhat(lex);
+	    lexp[1].word = *v;
+	    tellmewhat(lexp);
 	}
     }
 #ifdef notdef
@@ -510,7 +513,7 @@ fg_proc_entry(pp)
 #endif
     jmp_buf_t osetexit;
     bool    ohaderr;
-    bool    oGettingInput;
+    Char    oGettingInput;
 
     getexit(osetexit);
 
@@ -527,7 +530,7 @@ fg_proc_entry(pp)
     if (setexit() == 0) {	/* come back here after pjwait */
 	pendjob();
 	pstart(pp, 1);		/* found it. */
-	alarm(0);		/* No autologout */
+	(void) alarm(0);	/* No autologout */
 	pjwait(pp);
     }
     setalarm(1);		/* Autologout back on */
@@ -946,13 +949,13 @@ setalarm(lck)
 
     if ((vp = adrof(STRautologout)) != NULL) {
 	if ((cp = vp->vec[0]) != 0) {
-	    if ((logout_time = atoi(short2str(cp)) * 60) > 0) {
+	    if ((logout_time = (unsigned) atoi(short2str(cp)) * 60) > 0) {
 		alrm_time = logout_time;
 		alm_fun = auto_logout;
 	    }
 	}
 	if ((cp = vp->vec[1]) != 0) {
-	    if ((lock_time = atoi(short2str(cp)) * 60) > 0) {
+	    if ((lock_time = (unsigned) atoi(short2str(cp)) * 60) > 0) {
 		if (lck) {
 		    if (alrm_time == 0 || lock_time < alrm_time) {
 			alrm_time = lock_time;
@@ -1157,9 +1160,9 @@ insert(pl, file_args)
     Char   *cmd, *bcmd, *cp1, *cp2;
     int     cmd_len;
     Char   *pause = STRunderpause;
-    int     p_len = Strlen(pause);
+    int     p_len = (int) Strlen(pause);
 
-    cmd_len = Strlen(pl->word);
+    cmd_len = (int) Strlen(pl->word);
     cmd = (Char *) xcalloc(1, (size_t) ((cmd_len + 1) * sizeof(Char)));
     (void) Strcpy(cmd, pl->word);
 /* Do insertions at beginning, first replace command word */
@@ -1397,7 +1400,7 @@ gettilde(us)
      */
     tcache[tlength].user = Strsave(us);
     tcache[tlength].home = hd;
-    tcache[tlength++].hlen = Strlen(hd);
+    tcache[tlength++].hlen = (int) Strlen(hd);
 
     qsort((ptr_t) tcache, (size_t) tlength, sizeof(struct tildecache),
 	  (int (*) __P((const void *, const void *))) tildecompare);
@@ -1437,14 +1440,14 @@ getusername(hm)
 	return NULL;
     }
     if (((h = value(STRhome)) != STRNULL) &&
-	(Strncmp(p = *hm, h, j = Strlen(h)) == 0) &&
+	(Strncmp(p = *hm, h, (size_t) (j = (int) Strlen(h))) == 0) &&
 	(p[j] == '/' || p[j] == '\0')) {
 	*hm = &p[j];
 	return STRNULL;
     }
     for (i = 0; i < tlength; i++)
-	if ((Strncmp(p = *hm, tcache[i].home, j = tcache[i].hlen) == 0) &&
-	    (p[j] == '/' || p[j] == '\0')) {
+	if ((Strncmp(p = *hm, tcache[i].home, (size_t)
+	    (j = tcache[i].hlen)) == 0) && (p[j] == '/' || p[j] == '\0')) {
 	    *hm = &p[j];
 	    return tcache[i].user;
 	}
@@ -1505,7 +1508,7 @@ doaliases(v, c)
 		    if ((n = read(fd, tbuf, BUFSIZE)) <= 0)
 			goto eof;
 		    for (i = 0; i < n; i++)
-			buf[i] = tbuf[i];
+  			buf[i] = (Char) tbuf[i];
 		    p = buf;
 		}
 		n--;

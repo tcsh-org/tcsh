@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.set.c,v 3.20 1993/05/17 00:11:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.set.c,v 3.21 1993/06/05 21:09:15 christos Exp christos $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.20 1993/05/17 00:11:09 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.21 1993/06/05 21:09:15 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -392,7 +392,7 @@ operate(op, vp, p)
     if (op != '=') {
 	if (*vp)
 	    *v++ = vp;
-	opr[0] = op;
+	opr[0] = (Char) op;
 	opr[1] = 0;
 	*v++ = opr;
 	if (op == '<' || op == '>')

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.decls.h,v 3.17 1993/05/17 00:11:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.decls.h,v 3.18 1993/06/05 21:09:15 christos Exp christos $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -218,9 +218,6 @@ extern	void		  blkfree	__P((Char **));
 extern	int		  blklen	__P((Char **));
 extern	void		  blkpr		__P((Char **));
 extern	Char		**blkspl	__P((Char **, Char **));
-#ifndef copy
-extern  void		  copy		__P((char *, char *, int));
-#endif
 extern	void		  closem	__P((void));
 #ifndef CLOSE_ON_EXEC
 extern  void 		  closech	__P((void));
@@ -238,14 +235,14 @@ extern	void		  setzero	__P((char *, int));
 extern	Char		 *strip		__P((Char *));
 extern	Char		 *quote		__P((Char *));
 extern	char		 *strsave	__P((const char *));
-extern	char		 *strspl	__P((char *, char *));
+extern	void		  udvar		__P((Char *));
 #ifndef POSIX
 extern  char   	  	 *strstr	__P((const char *, const char *));
-#endif
-extern	void		  udvar		__P((Char *));
+#endif /* !POSIX */
 #ifndef SHORT_STRINGS
+extern	char		 *strspl	__P((char *, char *));
 extern	char		 *strend	__P((char *));
-#endif
+#endif /* SHORT_STRINGS */
 
 /*
  * sh.parse.c
@@ -316,7 +313,6 @@ extern	void		  mypipe	__P((int *));
 extern	struct varent 	 *adrof1	__P((Char *, struct varent *));
 extern	void		  doset		__P((Char **, struct command *));
 extern	void		  dolet		__P((Char **, struct command *));
-extern	void		  doreadonly	__P((Char **, struct command *));
 extern	Char		 *putn		__P((int));
 extern	int		  getn		__P((Char *));
 extern	Char		 *value1	__P((Char *, struct varent *));

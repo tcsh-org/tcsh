@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.c,v 3.28 1993/04/07 21:39:23 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.c,v 3.29 1993/04/07 21:52:08 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.28 1993/04/07 21:39:23 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.29 1993/04/07 21:52:08 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -441,7 +441,8 @@ domigrate(v, c)
     char   *s;
     Char   *cp;
     struct process *pp;
-    int     pid, err1 = 0;
+    int    err1 = 0;
+    int    pid = 0;
     siteno_t new_site = 0;
     sigmask_t omask;
 
@@ -820,7 +821,7 @@ xstrerror(i)
     if (i >= 0 && i < sys_nerr) 
 	return sys_errlist[i];
     else {
-	xsprintf(errbuf, "Unknown Error: %d", i);
+	(void) xsprintf(errbuf, "Unknown Error: %d", i);
 	return errbuf;
     }
 }
@@ -959,9 +960,9 @@ xgetwd(pathname)
 	}
 
 	if (*pnptr == '\0')		/* current dir == root dir */
-		strcpy(pathname, "/");
+		(void) strcpy(pathname, "/");
 	else {
-		strcpy(pathname, pnptr);
+		(void) strcpy(pathname, pnptr);
 		if (chdir(pnptr) < 0) {
         		(void) xsprintf(pathname,
                         "getwd: Cannot change back to \".\" (%s)",

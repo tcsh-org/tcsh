@@ -16,7 +16,7 @@ OS	:	sunos 3.5, 4.0, 4.1, 4.1.1, 4.1.2, 4.1.3
 CONFIG	:	config.sos*
 ENVIRON	:	n/a
 NOTES	:	Don't compile with /usr/5bin/cc
-VERSION	:	6.03.00
+VERSION	:	6.03.09
 
 VENDOR	:	sun
 MODELS	:	sun4
@@ -51,7 +51,7 @@ ENVIRON	:	n/a
 NOTES	:	Don't use -lBSD; breaks getpgrp(). Config.hp-3.2 obsolete?
 	:	Some versions of the compiler are broken with -O3. Try 'ls *'
 	:	If it does not work, lower the optimization level...
-VERSION	:	6.03.00
+VERSION	:	6.03.09
 
 VENDOR	:	hp
 MODELS	:	hp9000s500
@@ -85,7 +85,7 @@ OS	:	mtXinu 4.3
 CONFIG	:	config.mtxinu 
 ENVIRON	:	n/a
 NOTES	:	cc broken: typedef void sigret_t;
-VERSION	:	6.00.00
+VERSION	:	6.03.09
 
 VENDOR	:	digital
 MODELS	:	vax, decstation
@@ -131,7 +131,7 @@ VERSION	:	6.03.00 (rs6000)
 
 VENDOR	:	ibm
 MODELS	:	rt
-COMPILER:	hc
+COMPILER:	hc,gcc
 CFLAGS	:	-I. -U__STDC__
 LIBES	:	-ltermcap
 OS	:	aos 4.3
@@ -139,7 +139,7 @@ CONFIG	:	config.bsd
 ENVIRON	:	n/a
 NOTES	:	Old versions of the compiler break with -O. No ansi include
 NOTES	:	files so we have to undef __STDC__
-VERSION	:	6.00.01
+VERSION	:	6.03.09
 
 VENDOR	:	ibm
 MODELS	:	rt
@@ -179,11 +179,11 @@ MODELS	:	news 1850, 1750
 COMPILER:	gcc
 CFLAGS	:	normal
 LIBES	:	-ltermcap
-OS	:	bsd 4.3, news-os 3.3
+OS	:	bsd 4.3, news-os 3.3,4.1C
 CONFIG	:	config.bsd
 ENVIRON	:	n/a
 NOTES	:	none
-VERSION	:	6.00.00
+VERSION	:	6.03.09
 
 VENDOR	:	ibm + compatibles
 MODELS	:	i386,i286
@@ -238,7 +238,7 @@ OS	:	OSx5.1,6.4
 CONFIG	:	config.pyr
 ENVIRON	:	n/a
 NOTES	:	If there are problems with the global optimizer, use -OP
-VERSION	:	6.00.02
+VERSION	:	6.03.09
 
 VENDOR	:	next
 MODELS	:	any
@@ -328,7 +328,7 @@ OS	:	SVR4 (DELL, ESIX, ISC, UHC)
 CONFIG	:	config.sysv4
 ENVIRON	:	n/a
 NOTES	:	none
-VERSION	:	6.03.06
+VERSION	:	6.03.09
 
 VENDOR	:	ibm + compatibles
 MODELS	:	i386,i486

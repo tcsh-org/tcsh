@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.32 1993/05/17 00:11:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.33 1993/06/05 21:09:15 christos Exp christos $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.32 1993/05/17 00:11:09 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.33 1993/06/05 21:09:15 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -196,7 +196,7 @@ lex(hp)
 
 static time_t
 a2time_t(word)
-    Char * word;
+    Char *word;
 {
     /* Attempt to distinguish timestamps from other possible entries.
      * Format: "+NNNNNNNNNN" (10 digits, left padded with ascii '0') */
@@ -650,7 +650,7 @@ getdol()
 	    if (c == 's') {
 		int delimcnt = 2;
 		int delim = getC(0);
-		*np++ = delim;
+		*np++ = (Char) delim;
 		
 		if (!delim || letter(delim)
 		    || Isdigit(delim) || any(" \t\n", delim)) {
@@ -1444,7 +1444,7 @@ void
 unreadc(c)
     int    c;
 {
-    peekread = c;
+    peekread = (Char) c;
 }
 
 int

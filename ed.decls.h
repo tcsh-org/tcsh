@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.decls.h,v 3.15 1992/10/05 02:41:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.decls.h,v 3.16 1993/04/26 21:13:10 christos Exp christos $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -46,10 +46,10 @@ extern	void	DeleteBack		__P((int));
 /*
  * ed.init.c
  */
-extern	void	check_window_size	__P((int));
 #ifdef SIG_WINDOW
+extern	void	check_window_size	__P((int));
 extern	sigret_t window_change		__P((int));
-#endif
+#endif /* SIG_WINDOW */
 extern	int	ed_Setup		__P((int));
 extern	void	ed_Init			__P((void));
 extern	int	Cookedmode		__P((void));
@@ -100,7 +100,9 @@ extern	void	BindArrowKeys		__P((void));
 extern	void	Beep			__P((void));
 extern	int	CanWeTab		__P((void));
 extern	void	ChangeSize		__P((int, int));
+#ifdef SIG_WINDOW
 extern	int	GetSize			__P((int *, int *));
+#endif /* SIG_WINDOW */
 extern	void	ClearToBottom		__P((void));
 extern	void	GetTermCaps		__P((void));
 

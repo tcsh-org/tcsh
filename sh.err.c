@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.err.c,v 3.18 1993/05/17 00:11:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.err.c,v 3.19 1993/06/05 21:09:15 christos Exp christos $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.18 1993/05/17 00:11:09 christos Exp christos $")
+RCSID("$Id: sh.err.c,v 3.19 1993/06/05 21:09:15 christos Exp christos $")
 
 /*
  * C Shell
@@ -418,7 +418,7 @@ stderror(va_alist)
      */
     dont_free = 0;
 
-    flags = id & ERR_FLAGS;
+    flags = (int) id & ERR_FLAGS;
     id &= ~ERR_FLAGS;
 
     /* Pyramid's OS/x has a subtle bug in <varargs.h> which prevents calling

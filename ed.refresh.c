@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.refresh.c,v 3.12 1992/10/27 16:18:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.refresh.c,v 3.13 1993/04/26 21:13:10 christos Exp christos $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.12 1992/10/27 16:18:15 christos Exp christos $")
+RCSID("$Id: ed.refresh.c,v 3.13 1993/04/26 21:13:10 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -175,7 +175,7 @@ Vdraw(c)			/* draw char c onto V lines */
 # endif /* SHORT_STRNGS */
 #endif  /* DEBUG_REFRESH */
 
-    Vdisplay[vcursor_v][vcursor_h] = c;
+    Vdisplay[vcursor_v][vcursor_h] = (Char) c;
     vcursor_h++;		/* advance to next place */
     if (vcursor_h >= TermH) {
 	Vdisplay[vcursor_v][TermH] = '\0';	/* assure end of line */
@@ -283,7 +283,7 @@ Refresh()
 	 */
 	cpy_pad_spaces(Display[cur_line], Vdisplay[cur_line], TermH);
 #ifdef notdef
-	(void) Strncpy(Display[cur_line], Vdisplay[cur_line], TermH);
+	(void) Strncpy(Display[cur_line], Vdisplay[cur_line], (size_t) TermH);
 	Display[cur_line][TermH] = '\0';	/* just in case */
 #endif
     }
@@ -1077,7 +1077,7 @@ PutPlusOne(c)
     int    c;
 {
     (void) putraw(c);
-    Display[CursorV][CursorH++] = c;
+    Display[CursorV][CursorH++] = (Char) c;
     if (CursorH >= TermH) {	/* if we must overflow */
 	CursorH = 0;
 	CursorV++;

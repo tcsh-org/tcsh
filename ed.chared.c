@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.chared.c,v 3.31 1992/10/14 20:19:19 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.chared.c,v 3.32 1993/04/26 21:13:10 christos Exp christos $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.31 1992/10/14 20:19:19 christos Exp christos $")
+RCSID("$Id: ed.chared.c,v 3.32 1993/04/26 21:13:10 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -110,7 +110,7 @@ c_alternativ_key_map(state)
 	return;
     }
 
-    AltKeyMap = state;
+    AltKeyMap = (Char) state;
 }
 
 static void
@@ -402,7 +402,7 @@ excl_sw:
 	    else {
 		for (i = q - p; h; h = h->Hnext) {
 		    if ((l = &h->Hlex) != 0) {
-			if (!Strncmp(p + 1, l->next->word, i))
+			if (!Strncmp(p + 1, l->next->word, (size_t) i))
 			    break;
 		    }
 		}
@@ -721,18 +721,20 @@ int dir;
     Char *cp;
     int len;
 
-    len = Strlen(pattern);
+    len = (int) Strlen(pattern);
 
     if (dir == F_UP_SEARCH_HIST) {
 	for (cp = Cursor; cp >= InputBuf; cp--)
-	    if (Strncmp(cp, pattern, len) == 0 || Gmatch(cp, pattern)) {
+	    if (Strncmp(cp, pattern, (size_t) len) == 0 ||
+		Gmatch(cp, pattern)) {
 		Cursor = cp;
 		return(CC_NORM);
 	    }
 	return(CC_ERROR);
     } else {
 	for (cp = Cursor; *cp != '\0' && cp < InputLim; cp++)
-	    if (Strncmp(cp, pattern, len) == 0 || Gmatch(cp, pattern)) {
+	    if (Strncmp(cp, pattern, (size_t) len) == 0 ||
+		Gmatch(cp, pattern)) {
 		Cursor = cp;
 		return(CC_NORM);
 	    }
@@ -1118,7 +1120,7 @@ e_insert(c)
 
         c_insert(1);
 
-	*Cursor++ = c;
+	*Cursor++ = (Char) c;
 	DoingArg = 0;		/* just in case */
 	RefPlusOne();		/* fast refresh for one char. */
     }
@@ -1135,7 +1137,7 @@ e_insert(c)
         c_insert(Argument);
 
 	while (Argument--)
-	    *Cursor++ = c;
+	    *Cursor++ = (Char) c;
 	Refresh();
     }
 
@@ -1151,7 +1153,7 @@ InsertStr(s)			/* insert ASCIZ s at cursor (for complete) */
 {
     register int len;
 
-    if ((len = Strlen(s)) <= 0)
+    if ((len = (int) Strlen(s)) <= 0)
 	return -1;
     if (LastChar + len >= InputLim)
 	return -1;		/* end of buffer space */
@@ -1203,7 +1205,7 @@ e_digit(c)			/* gray magic here */
 	    c_delafter(1);   /* Do NOT use the saving ONE */
     	}
 	c_insert(1);
-	*Cursor++ = c;
+	*Cursor++ = (Char) c;
 	DoingArg = 0;		/* just in case */
 	RefPlusOne();		/* fast refresh for one char. */
     }
@@ -1434,7 +1436,7 @@ static int
 c_hmatch(str)
 Char *str;
 {
-    if (Strncmp(patbuf, str, patlen) == 0)
+    if (Strncmp(patbuf, str, (size_t) patlen) == 0)
 	return 1;
     return Gmatch(str, patbuf);
 }
@@ -1449,11 +1451,11 @@ c_hsetpat()
 	patlen = Cursor - InputBuf;
 	if (patlen >= INBUFSIZE) patlen = INBUFSIZE -1;
 	if (patlen >= 0)  {
-	    (void) Strncpy(patbuf, InputBuf, patlen);
+	    (void) Strncpy(patbuf, InputBuf, (size_t) patlen);
 	    patbuf[patlen] = '\0';
 	}
 	else
-	    patlen = Strlen(patbuf);
+	    patlen = (int) Strlen(patbuf);
     }
 #ifdef SDEBUG
     xprintf("\nHist_num = %d\n", Hist_num);
@@ -1508,7 +1510,7 @@ e_up_search_hist(c)
 #ifdef SDEBUG
 	xprintf("Comparing with \"%S\"\n", hl);
 #endif
-	if ((Strncmp(hl, InputBuf, LastChar-InputBuf) || 
+	if ((Strncmp(hl, InputBuf, (size_t) (LastChar - InputBuf)) || 
 	     hl[LastChar-InputBuf]) && c_hmatch(hl)) {
 	    found++;
 	    break;
@@ -1560,7 +1562,7 @@ e_down_search_hist(c)
 #ifdef SDEBUG
 	xprintf("Comparing with \"%S\"\n", hl);
 #endif
-	if ((Strncmp(hl, InputBuf, LastChar-InputBuf) || 
+	if ((Strncmp(hl, InputBuf, (size_t) (LastChar - InputBuf)) || 
 	     hl[LastChar-InputBuf]) && c_hmatch(hl))
 	    found = h;
 	hp = hp->Hnext;
@@ -2811,16 +2813,16 @@ e_stuff_char(c)
 #ifdef TIOCSTI
      extern int Tty_raw_mode;
      int was_raw = Tty_raw_mode;
-     char ch = c;
+     char ch = (char) c;
 
      if (was_raw)
-         Cookedmode();
+         (void) Cookedmode();
 
-     write(SHIN, "\n", 1);
+     (void) write(SHIN, "\n", 1);
      (void) ioctl(SHIN, TIOCSTI, (ioctl_t) &ch);
 
      if (was_raw)
-         Rawmode();
+         (void) Rawmode();
      return(e_redisp(c));
 #else /* !TIOCSTI */  
      return(CC_ERROR);

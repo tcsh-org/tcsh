@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.xmap.c,v 3.8 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.xmap.c,v 3.9 1992/10/14 20:19:19 christos Exp christos $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.8 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.9 1992/10/14 20:19:19 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -123,12 +123,12 @@ static Char printbuf[MAXXKEY];	/* buffer for printing */
 /* Some declarations of procedures */
 static	int       TraverseMap	__P((XmapNode *, Char *, XmapVal *));
 static	int       TryNode	__P((XmapNode *, Char *, XmapVal *, int));
-static	XmapNode *GetFreeNode	__P((int));
+static	XmapNode *GetFreeNode	__P((Char *));
 static	void	  PutFreeNode	__P((XmapNode *));
 static	int	  TryDeleteNode	__P((XmapNode **, Char *));
 static	int	  Lookup	__P((Char *, XmapNode *, int));
 static	int	  Enumerate	__P((XmapNode *, int));
-static	int	  unparsech	__P((int, int));
+static	int	  unparsech	__P((int, Char *));
 
 
 XmapVal *
@@ -237,7 +237,7 @@ AddXkey(Xkey, val, ntype)
 
     if (Xmap == NULL)
 	/* tree is initially empty.  Set up new node to match Xkey[0] */
-	Xmap = GetFreeNode(Xkey[0]);	/* it is properly initialized */
+	Xmap = GetFreeNode(Xkey);	/* it is properly initialized */
 
     /* Now recurse through Xmap */
     (void) TryNode(Xmap, Xkey, val, ntype);	
@@ -261,7 +261,7 @@ TryNode(ptr, string, val, ntype)
 	    if (xm->sibling->ch == *string)
 		break;
 	if (xm->sibling == NULL)
-	    xm->sibling = GetFreeNode(*string);	/* setup new node */
+	    xm->sibling = GetFreeNode(string);	/* setup new node */
 	ptr = xm->sibling;
     }
 
@@ -302,7 +302,7 @@ TryNode(ptr, string, val, ntype)
     else {
 	/* still more chars to go */
 	if (ptr->next == NULL)
-	    ptr->next = GetFreeNode(*string);	/* setup new node */
+	    ptr->next = GetFreeNode(string);	/* setup new node */
 	(void) TryNode(ptr->next, string, val, ntype);
     }
     return (0);
@@ -424,19 +424,19 @@ PutFreeNode(ptr)
  */
 static XmapNode *
 GetFreeNode(ch)
-    int    ch;
+    Char *ch;
 {
     XmapNode *ptr;
 
     ptr = (XmapNode *) xmalloc((size_t) sizeof(XmapNode));
-    ptr->ch = ch;
+    ptr->ch = *ch;
     ptr->type = XK_NOD;
     ptr->val.str = NULL;
     ptr->next = NULL;
     ptr->sibling = NULL;
     return (ptr);
 }
-
+ 
 
 /* PrintXKey():
  *	Print the binding associated with Xkey key.
@@ -481,7 +481,7 @@ Lookup(string, ptr, cnt)
 	/* If match put this char into printbuf.  Recurse */
 	if (ptr->ch == *string) {
 	    /* match found */
-	    ncnt = unparsech(cnt, ptr->ch);
+	    ncnt = unparsech(cnt, &ptr->ch);
 	    if (ptr->next != NULL)
 		/* not yet at leaf */
 		return (Lookup(string + 1, ptr->next, ncnt + 1));
@@ -529,7 +529,7 @@ Enumerate(ptr, cnt)
 	return (-1);
     }
 
-    ncnt = unparsech(cnt, ptr->ch);	/* put this char at end of string */
+    ncnt = unparsech(cnt, &ptr->ch); /* put this char at end of string */
     if (ptr->next == NULL) {
 	/* print this Xkey and function */
 	printbuf[ncnt + 1] = '"';
@@ -584,37 +584,38 @@ printOne(key, val, ntype)
 
 static int
 unparsech(cnt, ch)
-    int     cnt, ch;
+    int     cnt;
+    Char   *ch;
 {
-    if (ch == 0) {
+    if (*ch == 0) {
 	printbuf[cnt++] = '^';
 	printbuf[cnt] = '@';
 	return cnt;
     }
 
-    if (Iscntrl(ch)) {
+    if (Iscntrl(*ch)) {
 	printbuf[cnt++] = '^';
-	if (ch == '\177')
+	if (*ch == '\177')
 	    printbuf[cnt] = '?';
 	else
-	    printbuf[cnt] = ch | 0100;
+	    printbuf[cnt] = *ch | 0100;
     }
-    else if (ch == '^') {
+    else if (*ch == '^') {
 	printbuf[cnt++] = '\\';
 	printbuf[cnt] = '^';
     }
-    else if (ch == '\\') {
+    else if (*ch == '\\') {
 	printbuf[cnt++] = '\\';
 	printbuf[cnt] = '\\';
     }
-    else if (ch == ' ' || (Isprint(ch) && !Isspace(ch))) {
-	printbuf[cnt] = ch;
+    else if (*ch == ' ' || (Isprint(*ch) && !Isspace(*ch))) {
+	printbuf[cnt] = *ch;
     }
     else {
 	printbuf[cnt++] = '\\';
-	printbuf[cnt++] = ((ch >> 6) & 7) + '0';
-	printbuf[cnt++] = ((ch >> 3) & 7) + '0';
-	printbuf[cnt] = (ch & 7) + '0';
+	printbuf[cnt++] = (*ch >> 6) & (7 + '0');
+	printbuf[cnt++] = (*ch >> 3) & (7 + '0');
+	printbuf[cnt] = *ch & (7 + '0');
     }
     return cnt;
 }

@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.52 1993/06/11 20:53:15 christos Exp $
+# $Id: Makefile.std,v 1.53 1993/06/24 15:29:37 christos Exp christos $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -180,6 +180,8 @@ CC=	gcc -Wall -B/bin/	# -ansi -pedantic
 #CC=	cc
 #CC=	occ
 #CC=	acc
+#CC=	pcc
+#CC=	hc -w
 #CC=	c89	# For VMS/POSIX
 #CC=	/bin/cc	# For suns, w/o gcc and SVR4
 #CC=	/usr/lib/sun.compile/cc  # FPS 500 (+FPX) with Sun C compiler

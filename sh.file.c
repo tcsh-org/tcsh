@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.file.c,v 3.6 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.file.c,v 3.7 1993/03/05 20:14:33 christos Exp christos $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.6 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.7 1993/03/05 20:14:33 christos Exp christos $")
 
 #ifdef FILEC
 
@@ -181,7 +181,7 @@ back_to_col_1()
 # ifdef BSDSIGS
     sigmask_t omask = sigblock(sigmask(SIGINT));
 # else
-    sighold(SIGINT);
+    (void) sighold(SIGINT);
 # endif /* BSDSIGS */
 
 #ifdef TERMIO
@@ -242,7 +242,7 @@ pushback(string)
 #ifdef BSDSIGS
     sigmask_t omask = sigblock(sigmask(SIGINT));
 #else
-    sighold(SIGINT);
+    (void) sighold(SIGINT);
 #endif /* BSDSIGS */
 
 #ifdef TERMIO
@@ -468,21 +468,21 @@ print_recognized_stuff(recognized_part)
     Char   *recognized_part;
 {
     /* An optimized erasing of that silly ^[ */
-    putraw('\b');
-    putraw('\b');
+    (void) putraw('\b');
+    (void) putraw('\b');
     switch (Strlen(recognized_part)) {
 
     case 0:			/* erase two Characters: ^[ */
-	putraw(' ');
-	putraw(' ');
-	putraw('\b');
-	putraw('\b');
+	(void) putraw(' ');
+	(void) putraw(' ');
+	(void) putraw('\b');
+	(void) putraw('\b');
 	break;
 
     case 1:			/* overstrike the ^, erase the [ */
 	xprintf("%S", recognized_part);
-	putraw(' ');
-	putraw('\b');
+	(void) putraw(' ');
+	(void) putraw('\b');
 	break;
 
     default:			/* overstrike both Characters ^[ */
@@ -679,7 +679,7 @@ again:				/* search for matches */
 	return (numitems);
     }
     else {			/* LIST */
-	qsort((ptr_t) items, numitems, sizeof(items[0]), sortscmp);
+	qsort((ptr_t) items, (size_t) numitems, sizeof(items[0]), sortscmp);
 	print_by_column(looking_for_lognames ? NULL : tilded_dir,
 			items, numitems);
 	if (items != NULL)

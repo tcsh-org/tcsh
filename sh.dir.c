@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.27 1993/06/07 14:29:53 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.28 1993/06/07 14:33:57 christos Exp christos $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.27 1993/06/07 14:29:53 christos Exp christos $")
+RCSID("$Id: sh.dir.c,v 3.28 1993/06/07 14:33:57 christos Exp christos $")
 
 /*
  * C Shell - directory management
@@ -240,9 +240,9 @@ printdirs(dflag)
 	s = dp->di_name;		
 	user = NULL;
 	if (!(dflag & DIR_LONG) && (user = getusername(&s)) != NULL)
-	    len = Strlen(user) + Strlen(s) + 2;
+	    len = (int) (Strlen(user) + Strlen(s) + 2);
 	else
-	    len = Strlen(s) + 1;
+	    len = (int) (Strlen(s) + 1);
 
 	cur += len;
 	if ((dflag & DIR_LINE) && cur >= T_Cols - 1 && len < T_Cols) {
@@ -322,8 +322,8 @@ dnormalize(cp, exp)
         if (dotdot == 0)
 	    return (Strsave(cp));
 
-	cwd = (Char *) xmalloc((size_t) ((Strlen(dcwd->di_name) + 3) *
-					 sizeof(Char)));
+	cwd = (Char *) xmalloc((size_t) (((int) Strlen(dcwd->di_name) + 3) *
+					   sizeof(Char)));
 	(void) Strcpy(cwd, dcwd->di_name);
 
 	/*
@@ -389,13 +389,13 @@ dnormalize(cp, exp)
 # endif /* apollo */
 
 	    if (buf[0]) {
-	        if ((TRM(cwd[(dotdot = Strlen(cwd)) - 1])) != '/')
+	        if ((TRM(cwd[(dotdot = (int) Strlen(cwd)) - 1])) != '/')
 		    cwd[dotdot++] = '/';
 	        cwd[dotdot] = '\0';
 	        dp = Strspl(cwd, TRM(buf[0]) == '/' ? &buf[1] : buf);
 	        xfree((ptr_t) cwd);
 	        cwd = dp;
-	        if ((TRM(cwd[(dotdot = Strlen(cwd)) - 1])) == '/')
+	        if ((TRM(cwd[(dotdot = (int) Strlen(cwd)) - 1])) == '/')
 		    cwd[--dotdot] = '\0';
 	    }
 	    if (!*cp)
@@ -1046,14 +1046,14 @@ dcanon(cp, p)
      */
 #ifdef S_IFLNK
     p1 = value(STRhome);
-    cc = Strlen(p1);
+    cc = (int) Strlen(p1);
     /*
      * See if we're not in a subdir of STRhome
      */
-    if (p1 && *p1 == '/' &&
-	(Strncmp(p1, cp, cc) != 0 || (cp[cc] != '/' && cp[cc] != '\0'))) {
+    if (p1 && *p1 == '/' && (Strncmp(p1, cp, (size_t) cc) != 0 ||
+	(cp[cc] != '/' && cp[cc] != '\0'))) {
 	static ino_t home_ino = (ino_t) -1;
-	static dev_t home_dev = -1;
+	static dev_t home_dev = (dev_t) -1;
 	static Char *home_ptr = NULL;
 	struct stat statbuf;
 	int found;

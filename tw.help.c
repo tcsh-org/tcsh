@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.help.c,v 3.8 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.help.c,v 3.9 1992/09/18 20:56:35 christos Exp christos $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.help.c,v 3.8 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tw.help.c,v 3.9 1992/09/18 20:56:35 christos Exp christos $")
 
 #include "tw.h"
 #include "tc.h"
@@ -117,13 +117,13 @@ do_help(command)
 	     * /bar/foo.1, /bar/foo.8, then finally /bar/foo.6.  This is so
 	     * that you don't spit a binary at the tty when $HPATH == $PATH.
 	     */
-	    copyn(full, curdir, sizeof(full) / sizeof(Char));
-	    catn(full, STRslash, sizeof(full) / sizeof(Char));
-	    catn(full, name, sizeof(full) / sizeof(Char));
+	    copyn(full, curdir, (int) (sizeof(full) / sizeof(Char)));
+	    catn(full, STRslash, (int) (sizeof(full) / sizeof(Char)));
+	    catn(full, name, (int) (sizeof(full) / sizeof(Char)));
 	    ep = &full[Strlen(full)];
 	    for (sp = h_ext; *sp; sp++) {
 		*ep = '\0';
-		catn(full, str2short(*sp), sizeof(full) / sizeof(Char));
+		catn(full, str2short(*sp), (int) (sizeof(full) / sizeof(Char)));
 		if ((f = open(short2str(full), O_RDONLY)) != -1)
 		    break;
 	    }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.52 1993/04/26 21:13:10 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.53 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -42,6 +42,7 @@
 #ifndef EXTERN
 # define EXTERN extern
 #endif /* EXTERN */
+
 /*
  * Sanity
  */
@@ -64,7 +65,6 @@ typedef short Char;
 typedef char Char;
 # define SAVE(a) (strsave(a))
 #endif 
-
 
 /*
  * If your compiler complains, then you can either
@@ -902,15 +902,15 @@ extern struct limits {
  * Variables for filename expansion
  */
 extern Char **gargv;		/* Pointer to the (stack) arglist */
-extern long gargc;		/* Number args in gargv */
+extern int    gargc;		/* Number args in gargv */
 
 /*
  * Variables for command expansion.
  */
 extern Char **pargv;		/* Pointer to the argv list space */
-EXTERN Char   *pargs;		/* Pointer to start current word */
-EXTERN long    pnleft;		/* Number of chars left in pargs */
-EXTERN Char   *pargcp;		/* Current index into pargs */
+EXTERN Char  *pargs;		/* Pointer to start current word */
+EXTERN long   pnleft;		/* Number of chars left in pargs */
+EXTERN Char  *pargcp;		/* Current index into pargs */
 
 /*
  * History list

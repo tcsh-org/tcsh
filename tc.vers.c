@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.29 1993/06/05 21:09:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.30 1993/06/24 15:29:37 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.29 1993/06/05 21:09:15 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.30 1993/06/24 15:29:37 christos Exp christos $")
 
 #include "patchlevel.h"
 
@@ -618,12 +618,12 @@ fix_version()
 # define LOCALSTR ""
 #endif /* LOCALSTR */
 
-    xsprintf(version,
+    (void) xsprintf(version,
 	     "tcsh %d.%.2d.%.2d (%s) %s (%s) options %s%s%s%s%s%s%s%s%s%s%s%s",
 	     REV, VERS, PATCHLEVEL, ORIGIN, DATE, gethosttype(),
 	     SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR,
 	     BYESTR, ALSTR, KANSTR, SMSTR, HBSTR, LOCALSTR);
     set(STRversion, SAVE(version), VAR_READWRITE);
-    xsprintf(version, "%d.%.2d.%.2d", REV, VERS, PATCHLEVEL);
+    (void) xsprintf(version, "%d.%.2d.%.2d", REV, VERS, PATCHLEVEL);
     set(STRtcsh, SAVE(version), VAR_READWRITE);
 }

@@ -29,7 +29,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\" $Id: tcsh.man,v 3.57 1993/05/17 00:11:09 christos Exp christos $
+.\" $Id: tcsh.man,v 3.58 1993/06/05 21:09:15 christos Exp $
 .TH TCSH 1 "16 May 1993" "Cornell 6.03.06"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -3595,7 +3595,8 @@ Fixes and Ports for Tek, m88k, Titan, Masscomp.
 .sp
 Mark Linderman, Cornell University, 1992
 .br
-OS/2 Port
+OS/2 Port, (he does not run OS/2 anymore so he cannot help you
+porting tcsh on it)
 .sp
 Mika Liljeberg, liljeber@kruuna.Helsinki.FI, 1992
 .br

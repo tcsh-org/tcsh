@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.glob.c,v 3.31 1993/04/26 21:13:10 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.glob.c,v 3.32 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.31 1993/04/26 21:13:10 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.32 1993/05/17 00:11:09 christos Exp christos $")
 
 #include "tc.h"
 
@@ -63,9 +63,9 @@ static int pargsiz, gargsiz;
 #define EOS '\0'
 
 Char  **gargv = NULL;
-long    gargc = 0;
+int     gargc = 0;
 Char  **pargv = NULL;
-static long    pargc = 0;
+static int pargc = 0;
 
 /*
  * globbing is now done in two stages. In the first pass we expand
@@ -786,7 +786,6 @@ backeval(cp, literal)
      */
     mypipe(pvec);
     if (pfork(&faket, -1) == 0) {
-	struct wordent paraml;
 	struct command *t;
 
 	(void) close(pvec[0]);
@@ -895,7 +894,7 @@ psave(c)
 {
     if (--pnleft <= 0)
 	stderror(ERR_WTOOLONG);
-    *pargcp++ = c;
+    *pargcp++ = (Char) c;
 }
 
 static void

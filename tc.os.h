@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.44 1993/05/17 00:11:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.45 1993/06/07 14:29:35 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -52,7 +52,7 @@
 #ifdef   _VMS_POSIX
 # ifndef  NOFILE 
 #  define  NOFILE 64
-# endif
+# endif /* NOFILE */
 # define  nice(a)       setprio((getpid()),a)
 # undef   NEEDstrerror    /* won't get sensible error messages otherwise */
 # define  NEEDgethostname 
@@ -62,11 +62,11 @@
 
 #if defined(OPEN_MAX) && !defined(NOFILE)
 # define NOFILE OPEN_MAX
-#endif
+#endif /* OPEN_MAX && !NOFILE */
 
 #if defined(USR_NFDS) && !defined(NOFILE)
 # define NOFILE USR_NFDS
-#endif
+#endif /* USR_NFDS && !NOFILE */
 
 #ifndef NOFILE
 # define NOFILE 256
@@ -81,7 +81,7 @@
 # ifdef notdef
   /* Don't include it, because it defines things we don't really have */
 #  include <sys/resource.h>	
-# endif
+# endif /* notdef */
 # ifdef POSIX
 #  include <sys/tty.h>
 #  include <termios.h>
@@ -91,7 +91,7 @@
 #ifndef NCARGS
 # ifdef ARG_MAX
 #  define NCARGS ARG_MAX
-# else
+# else /* !ARG_MAX */
 #  ifdef _MINIX
 #   define NCARGS 80
 #  else /* !_MINIX */
@@ -126,7 +126,7 @@ struct ucred {
 
 # ifndef hp9000s500
 #  include <sys/bsdtty.h>
-# endif
+# endif /* hp9000s500 */
 
 # ifndef POSIX
 #  ifdef BSDJOBS
@@ -149,7 +149,7 @@ struct ucred {
  * termios.h, then we define it ourselves so that window resizing works.
  */
 #  define TIOCGWINSZ      (('T'<<8)|104)
-# endif
+# endif /* POSIX && !TIOCGWINSZ */
 #endif /* ISC */
 
 #ifdef ISC202
@@ -176,7 +176,7 @@ struct ucred {
 #  ifndef ODT
 #   define NEEDgethostname
 #  endif /* ODT */
-# endif /* INTEL || att || isc || sco */
+# endif /* INTEL || u3b2 || u3b5 || ub15 || u3b20d || ISC || SCO || tower32 */
 #endif /* !linux && !_VMS_POSIX */
 
 #if defined(UNIXPC) || defined(COHERENT)
@@ -192,7 +192,7 @@ struct ucred {
  */
 #  define setpgrp BSDsetpgrp
 #  define getpgrp BSDgetpgrp
-# endif
+# endif /* POSIX */
 #endif /* IRIS4D */
 
 /*
@@ -209,7 +209,7 @@ struct ucred {
 #else /* !F_SETFD */
 # ifdef FIOCLEX
 # define close_on_exec(fd, v) ioctl((fd), ((v) ? FIOCLEX : FIONCLEX), NULL)
-# else /* Nothing */
+# else /* !FIOCLEX */
 # define close_on_exec(fd, v)	/* Nothing */
 # endif /* FIOCLEX */
 #endif /* F_SETFD */
@@ -251,7 +251,7 @@ struct ucred {
 # undef S_ISNAM
 # undef S_ISLNK
 # undef S_ISSOCK
-#endif /* uts || UTekV */
+#endif /* uts || UTekV || sysV88 */
 
 #ifdef S_IFMT
 # if !defined(S_ISDIR) && defined(S_IFDIR)
@@ -370,21 +370,21 @@ struct ucred {
 #ifndef L_SET
 # ifdef SEEK_SET
 #  define L_SET		SEEK_SET
-# else
+# else /* !SEEK_SET */
 #  define L_SET		0
 # endif	/* SEEK_SET */
 #endif /* L_SET */
 #ifndef L_INCR
 # ifdef SEEK_CUR
 #  define L_INCR	SEEK_CUR
-# else
+# else /* !SEEK_CUR */
 #  define L_INCR	1
 # endif	/* SEEK_CUR */
 #endif /* L_INCR */
 #ifndef L_XTND
 # ifdef SEEK_END
 #  define L_XTND	SEEK_END
-# else
+# else /* !SEEK_END */
 #  define L_XTND	2
 # endif /* SEEK_END */
 #endif /* L_XTND */
@@ -446,9 +446,9 @@ struct ucred {
 #else /* POSIX */
 # if defined(BSD) || defined(SUNOS4) || defined(IRIS4D) || defined(DGUX)
 #  define mygetpgrp()    getpgrp(0)
-# else /* BSD || SUNOS4 || IRIS4D */
+# else /* !(BSD || SUNOS4 || IRIS4D || DGUX) */
 #  define mygetpgrp()    getpgrp()
-# endif	/* BSD || SUNOS4 */
+# endif	/* BSD || SUNOS4 || IRISD || DGUX */
 #endif /* POSIX */
 
 
@@ -480,50 +480,50 @@ typedef struct timeval timeval_t;
 extern time_t time();
 extern char *getenv();
 extern int atoi();
-#ifndef __EMX__
+# ifndef __EMX__
 extern char *ttyname();
-#endif
+# endif /* __EMX__ */
 
-#if defined(SUNOS4)
-# ifndef toupper
+# if defined(SUNOS4)
+#  ifndef toupper
 extern int toupper __P((int));
-# endif
-# ifndef tolower
+#  endif /* toupper */
+#  ifndef tolower
 extern int tolower __P((int));
-# endif
+#  endif /* tolower */
 extern caddr_t sbrk __P((int));
-# if SYSVREL == 0 && !defined(__lucid)
+#  if SYSVREL == 0 && !defined(__lucid)
 extern int qsort();
-# endif
-#else
-# ifndef hpux
-#  if __GNUC__ != 2
+#  endif /* SYSVREL == 0 && !__lucid */
+# else /* !SUNOS4 */
+#  ifndef hpux
+#   if __GNUC__ != 2
 extern int abort();
-#  endif /* __GNUC__ != 2 */
-# ifndef fps500
+#   endif /* __GNUC__ != 2 */
+#   ifndef fps500
 extern int qsort();
-# endif /* fps500 */
-# else
+#   endif /* !fps500 */
+#  else /* !hpux */
 extern void abort();
 extern void qsort();
-# endif
-#endif	/* SUNOS4 */
+#  endif /* hpux */
+# endif	/* SUNOS4 */
 extern void perror();
 
-#ifndef NEEDgethostname
+# ifndef NEEDgethostname
 extern int gethostname();
-#endif
+# endif /* NEEDgethostname */
 
 # ifdef BSDSIGS
-#  if defined(_AIX370) || defined(MACH) || defined(NeXT) || defined(_AIXPS2) || defined(ardent)
+#  if defined(_AIX370) || defined(MACH) || defined(NeXT) || defined(_AIXPS2) || defined(ardent) || defined(SUNOS4)
 extern int sigvec();
 extern int sigpause();
-#  else	/* _AIX370 || MACH || NeXT || _AIXPS2 || ardent */
+#  else	/* !(_AIX370 || MACH || NeXT || _AIXPS2 || ardent || SUNOS4) */
 #   if (!defined(apollo) || !defined(__STDC__)) && !defined(__DGUX__) && !defined(fps500)
 extern sigret_t sigvec();
 extern void sigpause();
 #   endif /* (!apollo || !__STDC__) && !__DGUX__ && !fps500 */
-#  endif /* _AIX370 || MACH || NeXT || _AIXPS2 || ardent */
+#  endif /* _AIX370 || MACH || NeXT || _AIXPS2 || ardent || SUNOS4 */
 extern sigmask_t sigblock();
 extern sigmask_t sigsetmask();
 # endif	/* BSDSIGS */
@@ -536,10 +536,10 @@ extern int killpg();
 extern int lstat();
 # endif	/* lstat */
 
-#ifdef BSD
+# ifdef BSD
 extern uid_t getuid(), geteuid();
 extern gid_t getgid(), getegid();
-#endif /* BSD */
+# endif /* BSD */
 
 # ifdef SYSMALLOC
 extern memalign_t malloc();
@@ -557,51 +557,52 @@ extern int gettimeofday();
 
 # if defined(NLS) && !defined(NOSTRCOLL) && !defined(NeXT)
 extern int strcoll();
-# endif
+# endif /* NLS && !NOSTRCOLL && !NeXT */
 
 # ifdef BSDJOBS
 #  ifdef BSDTIMES
 extern int wait3();
-#  else	/* ! BSDTIMES */
+#  else	/* !BSDTIMES */
 #   if !defined(POSIXJOBS) && !defined(_SEQUENT_)
 extern int wait3();
 #   else /* POSIXJOBS || _SEQUENT_ */
 extern int waitpid();
 #   endif /* POSIXJOBS || _SEQUENT_ */
-#  endif /* ! BSDTIMES */
+#  endif /* BSDTIMES */
 # else /* !BSDJOBS */
 #  if SYSVREL < 3
 extern int ourwait();
 #  else	/* SYSVREL >= 3 */
 extern int wait();
-#  endif /* SYSVREL >= 3 */
-# endif	/* ! BSDJOBS */
+#  endif /* SYSVREL < 3 */
+# endif	/* BSDJOBS */
 
 # ifdef BSDNICE
 extern int setpriority();
 # else /* !BSDNICE */
 extern int nice();
-# endif	/* !BSDNICE */
+# endif	/* BSDNICE */
 
 # if (!defined(fps500) && !defined(apollo) && !defined(__lucid))
 extern void setpwent();
 extern void endpwent();
-# endif /* fps500 */
+# endif /* !fps500 && !apollo && !__lucid */
 
-#ifndef __STDC__
+# ifndef __STDC__
 extern struct passwd *getpwuid(), *getpwnam(), *getpwent();
-#ifdef PW_SHADOW
+#  ifdef PW_SHADOW
 extern struct spwd *getspnam(), *getspent();
-#endif /* PW_SHADOW */
-#ifdef PW_AUTH
+#  endif /* PW_SHADOW */
+#  ifdef PW_AUTH
 extern struct authorization *getauthuid();
-#endif /* PW_AUTH */
-#endif /* __STDC__ */
+#  endif /* PW_AUTH */
+# endif /* __STDC__ */
 
 # ifndef getwd
 extern char *getwd();
 # endif	/* getwd */
-#else /* POSIX */
+
+#else /* POSIX || !SUNOS4 || !UTekV || !sysV88 */
 
 # if (defined(SUNOS4) && !defined(__GNUC__)) || defined(_IBMR2) || defined(_IBMESA)
 extern char *getwd();
@@ -611,34 +612,32 @@ extern char *getwd();
 extern char *ttyname();   
 # endif /* SCO */
 
-#endif /* POSIX */
+#endif /* !POSIX || SUNOS4 || UTekV || sysV88 */
 
-# if defined(SUNOS4) && __GNUC__ == 2
+#if defined(SUNOS4) && __GNUC__ == 2
 /*
  * Somehow these are missing
  */
 extern int ioctl __P((int, int, ...));
 extern int readlink __P((const char *, char *, size_t));
-# endif /* SUNOS4 && __GNUC__ == 2 */
+#endif /* SUNOS4 && __GNUC__ == 2 */
 
-#if (defined(BSD) && !defined(__386BSD__))  || defined(SUNOS4) 
+#if (defined(BSD) && !defined(__386BSD__)) || defined(SUNOS4) 
 extern void bcopy	__P((const void *, void *, size_t));
 # define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
-#endif
+#endif /* (BSD && !__386BSD__) || SUNOS4 */
 
 #if !defined(hpux) && !defined(COHERENT) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(__386BSD__) && !defined(memmove)
 # define NEEDmemmove
-#endif
+#endif /* !hpux && !COHERENT && (SYSVREL < 4 || _SEQUENT_) && !__36BSD__ && !memmove */
 
 #if SYSVREL == 4
-# ifndef BSDTIMES
 extern int gethostname();
 extern int getrlimit();
 extern int setrlimit();
 extern int getrusage();
 extern int gettimeofday();
 extern int wait3();
-# endif
-#endif
+#endif /* SYSVREL == 4 */
 
 #endif /* _h_tc_os */

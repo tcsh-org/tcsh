@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.51 1993/06/11 20:53:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.52 1993/06/12 16:59:24 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.51 1993/06/11 20:53:15 christos Exp christos $")
+RCSID("$Id: tw.parse.c,v 3.52 1993/06/12 16:59:24 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -301,7 +301,7 @@ tenematch(inputline, num_read, command)
 		/* insert newly spelled word */
 		if (InsertStr(quote_meta(wordp, qu, 0)) < 0)	
 		    return -1;	/* error inserting */
-		wp = wordp + Strlen(wordp);
+		wp = wordp + (int) Strlen(wordp);
 		search_ret = t_search(wordp, wp, command, space_left,
 				      looking, 1, pat, suf);
 	    }
@@ -521,9 +521,9 @@ quote_meta(word, qu, trail_space)
 	    break;
 	  
 	if (qu && *wptr == qu) {
-	    *bptr++ = qu;
+	    *bptr++ = (Char) qu;
 	    *bptr++ = '\\';
-	    *bptr++ = qu;
+	    *bptr++ = (Char) qu;
 	}
 	if (!qu &&
 	    (cmap(*wptr, _META | _DOL | _QF | _QB | _ESC | _GLOB) ||
@@ -538,7 +538,7 @@ quote_meta(word, qu, trail_space)
     if (qu && trail_space && wptr > word && *wptr == 0 && wptr[-1] == ' ')
       {
         *bptr = bptr[-1];
-        bptr[-1] = qu;
+        bptr[-1] = (Char) qu;
         bptr++;
       }
     *bptr = '\0';
@@ -732,7 +732,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
     int showdots;			 /* Style to show dot files */
     int nignored = 0;			 /* Number of fignored items */
     int numitems = 0;			 /* Number of matched items */
-    int	name_length = Strlen(target);	 /* Length of prefix (file name) */
+    int name_length = (int) Strlen(target); /* Length of prefix (file name) */
     int exec_check = flags & TW_EXEC_CHK;/* need to check executability	*/
     int dir_check  = flags & TW_DIR_CHK; /* Need to check for directories */
     int text_check = flags & TW_TEXT_CHK;/* Need to check for non-directories */
@@ -854,7 +854,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    if (looking == TW_COMMAND || looking == TW_LOGNAME
 		|| looking == TW_USER || command == LIST) {
 		copyn(buf, item, MAXPATHLEN);
-		len = Strlen(buf);
+		len = (int) Strlen(buf);
 		switch (looking) {
 		case TW_COMMAND:
 		    if (!(dir_ok && exec_check))
@@ -1447,7 +1447,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 		return numitems;
 
 	    default:	/* completion specified suffix */
-		suffix[0] = suf;
+		suffix[0] = (Char) suf;
 		break;
 	    }
 	    catn(word, suffix, max_word_length);
@@ -1525,7 +1525,6 @@ dollar(new, old)
 	    vp = adrof(var);
 	    val = (!vp) ? tgetenv(var) : NULL;
 	    if (vp) {
-		int i;
 		for (i = 0; vp->vec[i] != NULL; i++) {
 		    for (val = vp->vec[i]; space > 0 && *val; space--)
 			*p++ = *val++;
@@ -1689,7 +1688,7 @@ filetype(dir, file)
 	if (nostat(dir)) return(' ');
 
 	(void) Strcpy(path, dir);
-	catn(path, file, sizeof(path) / sizeof(Char));
+	catn(path, file, (int) (sizeof(path) / sizeof(Char)));
 
 	if (lstat(ptr = short2str(path), &statb) != -1)
 	    /* see above #define of lstat */
@@ -1760,7 +1759,7 @@ isadirectory(dir, file)		/* return 1 if dir/file is a directory */
 	struct stat statb;
 
 	(void) Strcpy(path, dir);
-	catn(path, file, sizeof(path) / sizeof(Char));
+	catn(path, file, (int) (sizeof(path) / sizeof(Char)));
 	if (stat(short2str(path), &statb) >= 0) {	/* resolve through
 							 * symlink */
 #ifdef S_ISSOCK
@@ -1792,7 +1791,7 @@ find_rows(items, count, no_file_suffix)
     unsigned int maxwidth = 0;
 
     for (i = 0; i < count; i++)	/* find widest string */
-	maxwidth = max(maxwidth, Strlen(items[i]));
+	maxwidth = max(maxwidth, (unsigned int) Strlen(items[i]));
 
     maxwidth += no_file_suffix ? 1 : 2;	/* for the file tag and space */
     columns = (TermH + 1) / maxwidth;	/* PWP: terminal size change */
@@ -1818,7 +1817,7 @@ print_by_column(dir, items, count, no_file_suffix)
     lbuffed = 0;		/* turn off line buffering */
 
     for (i = 0; i < count; i++)	/* find widest string */
-	maxwidth = max(maxwidth, Strlen(items[i]));
+	maxwidth = max(maxwidth, (unsigned int) Strlen(items[i]));
 
     maxwidth += no_file_suffix ? 1 : 2;	/* for the file tag and space */
     columns = (TermH + 1) / maxwidth;	/* PWP: terminal size change */
@@ -1831,7 +1830,7 @@ print_by_column(dir, items, count, no_file_suffix)
 	    i = c * rows + r;
 
 	    if (i < count) {
-		w = Strlen(items[i]);
+		w = (unsigned int) Strlen(items[i]);
 
 		if (no_file_suffix) {
 		    /* Print the command name */
@@ -1942,7 +1941,7 @@ tgetenv(str)
     Char  **var;
     int     len, res;
 
-    len = Strlen(str);
+    len = (int) Strlen(str);
     for (var = STR_environ; var != NULL && *var != NULL; var++)
 	if ((*var)[len] == '=') {
 	    (*var)[len] = '\0';
@@ -1987,7 +1986,7 @@ choose_scroll_tab(exp_name, cnt)
     qsort((ptr_t) ptr, (size_t) cnt, sizeof(Char *), 
 	  (int (*) __P((const void *, const void *))) fcompare);
 	    
-    copyn(*exp_name, ptr[curchoice], Strlen(ptr[curchoice]));	
+    copyn(*exp_name, ptr[curchoice], (int) Strlen(ptr[curchoice]));	
     xfree((ptr_t) ptr);
 }
 

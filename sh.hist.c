@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.hist.c,v 3.7 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.hist.c,v 3.8 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.7 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.8 1993/05/17 00:11:09 christos Exp christos $")
 
 #include "tc.h"
 
@@ -314,11 +314,11 @@ fmthist(fmt, ptr, buf)
     struct Hist *hp = (struct Hist *) ptr;
     switch (fmt) {
     case 'h':
-	xsprintf(buf, "%6d", hp->Hnum);
+	(void) xsprintf(buf, "%6d", hp->Hnum);
 	break;
     case 'R':
 	if (HistLit && hp->histline)
-	    xsprintf(buf, "%S", hp->histline);
+	    (void) xsprintf(buf, "%S", hp->histline);
 	else {
 	    Char ibuf[BUFSIZE], *ip;
 	    char *p;

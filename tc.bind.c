@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.bind.c,v 3.12 1993/01/08 22:23:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.bind.c,v 3.13 1993/02/12 17:22:20 christos Exp christos $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.12 1993/01/08 22:23:12 christos Exp christos $")
+RCSID("$Id: tc.bind.c,v 3.13 1993/02/12 17:22:20 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -106,7 +106,7 @@ unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
 	c &= ASCII;
     }
     if (Isprint(c)) {
-	*cp++ = c;
+	*cp++ = (char) c;
 	*cp = '\0';
 	return (tmp);
     }
@@ -443,7 +443,7 @@ dobindkey(v, c)
 	if ((out = parsestring(v[no], outbuf)) == NULL)
 	    return;
 	if (key)
-	    SetArrowKeys(in, XmapStr(out), ntype);
+	    (void) SetArrowKeys(in, XmapStr(out), ntype);
 	else
 	    AddXkey(in, XmapStr(out), ntype);
 	map[(unsigned char) *in] = F_XKEY;
@@ -452,7 +452,7 @@ dobindkey(v, c)
 	if ((cmd = parsecmd(v[no])) == 0)
 	    return;
 	if (key)
-	    SetArrowKeys(in, XmapCmd((int) cmd), ntype);
+	    (void) SetArrowKeys(in, XmapCmd((int) cmd), ntype);
 	else {
 	    if (in[1]) {
 		AddXkey(in, XmapCmd((int) cmd), ntype);
@@ -609,7 +609,7 @@ parsestring(str, buf)
 	    if ((es = parseescape(&p)) == -1)
 		return 0;
 	    else
-		*b++ = es;
+		*b++ = (Char) es;
 	}
 	else
 	    *b++ = *p & CHAR;
@@ -703,9 +703,9 @@ printkeys(map, first, last)
     Char    firstbuf[2], lastbuf[2];
     unsigned char unparsbuf[10], extrabuf[10];
 
-    firstbuf[0] = first;
+    firstbuf[0] = (Char) first;
     firstbuf[1] = 0;
-    lastbuf[0] = last;
+    lastbuf[0] = (Char) last;
     lastbuf[1] = 0;
     if (map[first] == F_UNASSIGNED) {
 	if (first == last)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.sig.c,v 3.14 1993/06/07 14:29:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.sig.c,v 3.15 1993/06/11 20:53:15 christos Exp christos $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.14 1993/06/07 14:29:35 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.15 1993/06/11 20:53:15 christos Exp christos $")
 
 #include "tc.wait.h"
 
@@ -285,8 +285,8 @@ sigsetmask(mask)
     int     m;
     register int i;
 
-    sigemptyset(&set);
-    sigemptyset(&oset);
+    (void) sigemptyset(&set);
+    (void) sigemptyset(&oset);
 
     for (i = 1; i <= MAXSIG; i++)
 	if (ISSET(mask, i))
@@ -319,8 +319,8 @@ sigblock(mask)
     int     m;
     register int i;
 
-    sigemptyset(&set);
-    sigemptyset(&oset);
+    (void) sigemptyset(&set);
+    (void) sigemptyset(&oset);
 
     /* Get present set of signals. */
     if (sigprocmask(SIG_SETMASK, NULL, &set))
@@ -357,7 +357,7 @@ bsd_sigpause(mask)
     sigset_t set;
     register int i;
 
-    sigemptyset(&set);
+    (void) sigemptyset(&set);
 
     for (i = 1; i <= MAXSIG; i++)
 	if (ISSET(mask, i))
@@ -383,7 +383,7 @@ sigret_t (*bsd_signal(sig, func))()
                 return((sigret_t(*)()) SIG_IGN);
         }
 
-        sigemptyset(&set);
+        (void) sigemptyset(&set);
 
         act.sa_handler = (sigret_t(*)()) func;      /* user function */
         act.sa_mask = set;                      /* signal mask */

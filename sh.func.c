@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.46 1993/04/07 21:39:23 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.47 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.46 1993/04/07 21:39:23 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.47 1993/05/17 00:11:09 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -727,7 +727,7 @@ search(type, level, goal)
     register Char *aword = wordbuf;
     register Char *cp;
 
-    Stype = type;
+    Stype = (Char) type;
     Sgoal = goal;
     if (type == TC_GOTO) {
 	struct Ain a;

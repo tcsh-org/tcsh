@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.46 1993/06/05 21:09:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.47 1993/06/11 20:20:02 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.46 1993/06/05 21:09:15 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.47 1993/06/11 20:20:02 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -917,7 +917,7 @@ pads(cp)
     if (cp[0] == STRQNULL[0])
 	cp++;
 
-    i = Strlen(cp);
+    i = (int) Strlen(cp);
 
     if (cmdlen >= PMAXLEN)
 	return;
@@ -1088,10 +1088,10 @@ pprint(pp, flag)
 			goto prcomd;
 		    }
 		    else
-			reason = pp->p_reason;
+			reason = (int) pp->p_reason;
 		else {
 		    status = pstatus;
-		    reason = pp->p_reason;
+		    reason = (int) pp->p_reason;
 		}
 		switch (status) {
 
@@ -1240,7 +1240,6 @@ ptprint(tp)
     struct timeval tetime, diff;
     static struct timeval ztime;
     struct rusage ru;
-    static struct rusage zru;
     register struct process *pp = tp;
 
     ru = zru;
@@ -1257,7 +1256,6 @@ ptprint(tp)
     timeval_t tetime, diff;
     static timeval_t ztime;
     struct process_stats ru;
-    static struct process_stats zru;
     register struct process *pp = tp;
 
     ru = zru;
@@ -1608,7 +1606,8 @@ pstart(pp, foregnd)
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif /* BSDSIGS */
-    long    jobflags = 0;
+    /* We don't use jobflags in this function right now (see below) */
+    /* long    jobflags = 0; */
 
 #ifdef BSDSIGS
     omask = sigblock(sigmask(SIGCHLD));
@@ -1617,7 +1616,8 @@ pstart(pp, foregnd)
 #endif
     np = pp;
     do {
-	jobflags |= np->p_flags;
+	/* We don't use jobflags in this function right now (see below) */
+	/* jobflags |= np->p_flags; */
 	if (np->p_flags & (PRUNNING | PSTOPPED)) {
 	    np->p_flags |= PRUNNING;
 	    np->p_flags &= ~PSTOPPED;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.29 1993/06/07 14:29:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.30 1993/06/11 20:19:16 christos Exp christos $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.29 1993/06/07 14:29:35 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.30 1993/06/11 20:19:16 christos Exp christos $")
 
 #include "tc.h"
 
@@ -297,7 +297,7 @@ execute(t, wanttty, pipein, pipeout)
 #ifdef BSDSIGS
 		    csigmask = sigblock(sigmask(SIGCHLD));
 #else /* !BSDSIGS */
-		    sighold(SIGCHLD);
+		    (void) sighold(SIGCHLD);
 #endif /* BSDSIGS */
 
 		    nosigchld = 1;

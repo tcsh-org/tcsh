@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.spell.c,v 3.8 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.spell.c,v 3.9 1993/03/05 20:14:33 christos Exp christos $ */
 /*
  * tw.spell.c: Spell check words
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.spell.c,v 3.8 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tw.spell.c,v 3.9 1993/03/05 20:14:33 christos Exp christos $")
 
 #include "tw.h"
 
@@ -156,7 +156,7 @@ spdir(extended_name, tilded_dir, item, name)
     (void) Strcpy(path, tilded_dir);
     oldch = *s;
     *s = '/';
-    catn(path, name, sizeof(path) / sizeof(Char));
+    catn(path, name, (int) (sizeof(path) / sizeof(Char)));
     if (access(short2str(path), F_OK) == 0) {
 	(void) Strcpy(extended_name, name);
 	return 1;

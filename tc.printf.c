@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.printf.c,v 3.11 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.printf.c,v 3.12 1993/02/12 17:22:20 christos Exp christos $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.11 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.12 1993/02/12 17:22:20 christos Exp christos $")
 
 #ifdef lint
 #undef va_arg
@@ -141,7 +141,7 @@ doprnt(addchar, sfmt, ap)
 		    l = -l;
 		}
 		do {
-		    *bp++ = l % 10 + '0';
+		    *bp++ = (char) (l % 10) + '0';
 		} while ((l /= 10) > 0);
 		if (sign)
 		    *bp++ = '-';
@@ -165,12 +165,12 @@ doprnt(addchar, sfmt, ap)
 		    u = (unsigned long) (va_arg(ap, unsigned int));
 		if (fmt == 'u') {	/* unsigned decimal */
 		    do {
-			*bp++ = u % 10 + '0';
+			*bp++ = (char) (u % 10) + '0';
 		    } while ((u /= 10) > 0);
 		}
 		else if (fmt == 'o') {	/* octal */
 		    do {
-			*bp++ = u % 8 + '0';
+			*bp++ = (char) (u % 8) + '0';
 		    } while ((u /= 8) > 0);
 		    if (hash)
 			*bp++ = '0';

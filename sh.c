@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.50 1993/06/11 20:16:17 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.51 1993/06/24 15:29:37 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.50 1993/06/11 20:16:17 christos Exp $")
+RCSID("$Id: sh.c,v 3.51 1993/06/24 15:29:37 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -324,7 +324,7 @@ main(argc, argv)
 	 (void) close(SHIN);
 	 SHIN = open(ttyn, O_RDWR);
 	 shpgrp = getpid();
-	 (void) ioctl (SHIN, TIOCSPGRP, (ptr_t) &shpgrp);
+	 (void) ioctl (SHIN, TIOCSPGRP, (ioctl_t) &shpgrp);
 	 (void) setpgid(0, shpgrp);
      }
 #endif /* alliant */
@@ -662,7 +662,6 @@ main(argc, argv)
 		 * ensure that you don't make * nonportable csh scripts.
 		 */
 		{
-		    register Char *cp;
 		    register int count;
 
 		    cp = arginp + Strlen(arginp);
@@ -684,7 +683,7 @@ main(argc, argv)
 #ifdef apollo
 	    case 'D':		/* -D	Define environment variable */
 		{
-		    register Char *cp, *dp;
+		    register Char *dp;
 
 		    cp = str2short(tcp);
 		    if (dp = Strchr(cp, '=')) {
@@ -1023,13 +1022,13 @@ main(argc, argv)
     {
 	struct sigaction act;
         act.sa_handler=pchild;
-	sigemptyset(&(act.sa_mask)); /* Don't block any extra sigs when the
-				      * handler is called
-				      */
+	(void) sigemptyset(&(act.sa_mask));	/* Don't block any extra sigs
+						 * when the handler is called
+						 */
         act.sa_flags=0;	           /* want behaviour of sigset() without
                                     * SA_NOCLDSTOP
 				    */
-        sigaction(SIGCHLD,&act,(struct sigaction *)NULL);
+        (void) sigaction(SIGCHLD,&act,(struct sigaction *)NULL);
     }
 #else /* SYSVREL <= 3 */
     (void) sigset(SIGCHLD, pchild);	/* while signals not ready */
@@ -1055,7 +1054,7 @@ main(argc, argv)
 #ifdef BSDSIGS
 	    sigmask_t omask = sigblock(sigmask(SIGINT));
 #else
-	    sighold(SIGINT);
+	    (void) sighold(SIGINT);
 #endif
 	    setintr = 0;
 	    parintr = SIG_IGN;	/* onintr in /etc/ files has no effect */
@@ -1267,7 +1266,7 @@ srcunit(unit, onlyown, hflg, av)
     Char   *oevalp = evalp, **oevalvec = evalvec;
     int     oonelflg = onelflg;
     bool    oenterhist = enterhist;
-    char    OHIST = HIST;
+    Char    OHIST = HIST;
     bool    otell = cantell;
     Char **oargv;
     struct Bin saveB;

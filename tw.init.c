@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.init.c,v 3.13 1992/10/05 02:41:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.init.c,v 3.14 1993/03/05 20:14:33 christos Exp christos $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.13 1992/10/05 02:41:30 christos Exp christos $")
+RCSID("$Id: tw.init.c,v 3.14 1993/03/05 20:14:33 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -216,7 +216,7 @@ tw_cmd_add(name)
 
     if (name[0] == '#' || name[0] == '.')	/* emacs temp's, .files	*/
 	return;
-    len = Strlen(name) + 2;
+    len = (int) Strlen(name) + 2;
     if (name[len - 3] == '~')			/* No emacs backups */
 	return;
     
@@ -856,7 +856,8 @@ tw_bind_next(dir, flags)
 {
     char *ptr;
     if (tw_bind && tw_bind->name) {
-	for (ptr = tw_bind->name, dir = tw_retname; (*dir++ = *ptr++) != '\0';)
+	for (ptr = tw_bind->name, dir = tw_retname;
+	     (*dir++ = (Char) *ptr++) != '\0';)
 	    continue;
 	tw_bind++;
 	return(tw_retname);
@@ -894,7 +895,7 @@ tw_limit_next(dir, flags)
     char *ptr;
     if (tw_limit && tw_limit->limname) {
 	for (ptr = tw_limit->limname, dir = tw_retname; 
-	     (*dir++ = *ptr++) != '\0';)
+	     (*dir++ = (Char) *ptr++) != '\0';)
 	    continue;
 	tw_limit++;
 	return(tw_retname);
@@ -935,7 +936,7 @@ tw_sig_next(dir, flags)
 	    continue;
 
 	for (ptr = mesg[tw_index].iname, dir = tw_retname; 
-	     (*dir++ = *ptr++) != '\0';)
+	     (*dir++ = (Char) *ptr++) != '\0';)
 	    continue;
 	tw_index++;
 	return(tw_retname);
