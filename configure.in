@@ -8,13 +8,12 @@ dnl
 dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 dnl
 
-AC_PREREQ(2.13)dnl Minimum Autoconf version required.
-AC_INIT(tc.vers.c)
+AC_PREREQ([2.59])dnl Minimum Autoconf version required.
+AC_INIT
+AC_CONFIG_SRCDIR([tc.vers.c])
 
 AC_CANONICAL_HOST
 
-dnl We don't use AC_VALIDATE_CACHED_SYSTEM_TUPLE here because we only
-dnl care about the HOST value, not the HOST/BUILD/TARGET triplet.
 AC_MSG_CHECKING([cached host tuple])
 if { test x"${ac_cv_host_system_type+set}" = x"set" &&
      test x"$ac_cv_host_system_type" != x"$host"; }; then
@@ -230,8 +229,8 @@ case "${host}" in
   * )
   changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name
-for \`${host}' systems.
-Check tcsh's \`Ported' file for manual configuration instructions.])
+for `${host}' systems.
+Check tcsh's `Ported' file for manual configuration instructions.])
   changequote(, )dnl
   ;;
 
@@ -239,13 +238,15 @@ esac
 
 echo "Tcsh will use configuration file \`$tcsh_config_file'."
 changequote([, ])dnl
+cp config/${tcsh_config_file} config_p.h
+AH_BOTTOM([#include "config_p.h"])
 
-AC_CONFIG_HEADER(config.h:config/${tcsh_config_file}:config.h.in)
+AC_CONFIG_HEADER(config.h)
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_GCC_TRADITIONAL
 
-if test $ac_cv_prog_gcc = no ; then
+if test "x$GCC" != xyes ; then
   DFLAGS="$DFLAGS $NON_GNU_DFLAGS"
   CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
 fi
@@ -311,9 +312,9 @@ dnl fi])
 dnl IPv6_CHECK_FUNC(getnameinfo, DFLAGS="$DFLAGS -DINET6")
 
 AC_CACHE_CHECK([ss_family in sockaddr_storage], ac_cv_ss_family,
-[AC_TRY_COMPILE([#include <sys/types.h>
-#include <sys/socket.h>], [struct sockaddr_storage ss; ss.ss_family;],
-  ac_cv_ss_family=yes, ac_cv_ss_family=no)]
+[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
+#include <sys/socket.h>]], [[struct sockaddr_storage ss; ss.ss_family;]])],
+  [ac_cv_ss_family=yes], [ac_cv_ss_family=no])]
 if test "$ac_cv_ss_family" = no; then
   DFLAGS="$DFLAGS -DNO_SS_FAMILY"
 fi
@@ -344,4 +345,5 @@ AC_CHECK_HEADERS([wchar.h],
 
 AC_EXEEXT
 
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

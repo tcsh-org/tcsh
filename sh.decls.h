@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.40 2004/07/24 21:52:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.41 2004/08/04 17:12:28 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -115,7 +115,7 @@ extern	int		  tenex		__P((Char *, int));
 /*
  * sh.func.c
  */
-extern	void		  tsetenv	__P((Char *, Char *));
+extern	void		  tsetenv	__P((const Char *, const Char *));
 extern	void		  Unsetenv	__P((Char *));
 extern	void		  doalias	__P((Char **, struct command *));
 extern	void		  dobreak	__P((Char **, struct command *));
@@ -240,7 +240,7 @@ extern	void		  donefds	__P((void));
 extern	Char		  lastchr	__P((Char *));
 extern	void		  lshift	__P((Char **, int));
 extern	int		  number	__P((Char *));
-extern	int		  prefix	__P((Char *, Char *));
+extern	int		  prefix	__P((const Char *, const Char *));
 extern	Char		**saveblk	__P((Char **));
 extern	void		  setzero	__P((char *, int));
 extern	Char		 *strip		__P((Char *));
@@ -252,7 +252,7 @@ extern	void		  udvar		__P((Char *));
 extern  char   	  	 *strstr	__P((const char *, const char *));
 #endif /* !POSIX */
 #ifndef SHORT_STRINGS
-extern	char		 *strspl	__P((char *, char *));
+extern	char		 *strspl	__P((const char *, const char *));
 extern	char		 *strend	__P((char *));
 #endif /* SHORT_STRINGS */
 

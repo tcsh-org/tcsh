@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.97 2004/08/04 14:28:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.98 2004/08/04 17:12:32 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.97 2004/08/04 14:28:24 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.98 2004/08/04 17:12:32 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -2129,7 +2129,7 @@ print_by_column(dir, items, count, no_file_suffix)
  */
 int
 StrQcmp(str1, str2)
-    Char *str1, *str2;
+    const Char *str1, *str2;
 {
     for (; *str1 && samecase(*str1 & TRIM) == samecase(*str2 & TRIM); 
 	 str1++, str2++)
@@ -2168,7 +2168,8 @@ fcompare(file1, file2)
  */
 void
 catn(des, src, count)
-    Char *des, *src;
+    Char *des;
+    const Char *src;
     int count;
 {
     while (--count >= 0 && *des)

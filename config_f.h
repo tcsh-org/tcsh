@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.28 2004/08/04 17:18:37 christos Exp $ */
+/* $Header: /src/pub/tcsh/config_f.h,v 3.29 2004/08/04 17:19:39 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -50,16 +50,8 @@
  * WIDE_STRINGS	Represent strings using wide characters
  *		Allows proper function in multibyte encodings like UTF-8
  */
-#define WIDE_STRINGS
-
-#ifdef WIDE_STRINGS
-# ifdef WINNT_NATIVE
-#  error "WIDE_STRINGS cannot be used together with WINNT_NATIVE"
-# endif
-
-# ifndef SHORT_STRINGS
-#  error "SHORT_STRINGS must be defined if WIDE_STRINGS is defined"
-# endif
+#if defined (SHORT_STRINGS) && SIZEOF_WCHAR_T >= 4 && !defined (WINNT_NATIVE)
+# define WIDE_STRINGS
 #endif
 
 /*
@@ -69,10 +61,6 @@
  *		to define this.
  */
 #define NLS
-
-#if defined(WIDE_STRINGS) && !defined (NLS)
-# error "NLS must be defined if WIDE_STRINGS is defined"
-#endif
 
 /*
  * NLS_CATALOGS:Use Native Language System catalogs for
@@ -140,10 +128,8 @@
  *		only output, when "dspmbyte" is set. Should be used with
  *		KANJI
  */
-#undef DSPMBYTE
-
-#if defined (WIDE_STRINGS) && defined (DSPMBYTE)
-# error "DSPMBYTE must not be defined if WIDE_STRINGS is defined"
+#if defined (SHORT_STRINGS) && !defined (WIDE_STRINGS)
+# define DSPMBYTE
 #endif
 
 /*
@@ -214,5 +200,32 @@
 #else
 # define RCSID(id)	/* Nothing */
 #endif /* !lint && !SABER */
+
+/* Consistency checks */
+#ifdef WIDE_STRINGS
+# if SIZEOF_WCHAR_T < 4
+#  error "wchar_t must be at least 4 bytes for WIDE_STRINGS"
+# endif
+
+# ifdef WINNT_NATIVE
+#  error "WIDE_STRINGS cannot be used together with WINNT_NATIVE"
+# endif
+
+# ifndef SHORT_STRINGS
+#  error "SHORT_STRINGS must be defined if WIDE_STRINGS is defined"
+# endif
+
+# ifndef NLS
+#  error "NLS must be defined if WIDE_STRINGS is defined"
+# endif
+
+# ifdef DSPMBYTE
+#  error "DSPMBYTE must not be defined if WIDE_STRINGS is defined"
+# endif
+#endif
+
+#if !defined (SHORT_STRINGS) && defined (DSPMBYTE)
+# error "SHORT_STRINGS must be defined if DSPMBYTE is defined"
+#endif
 
 #endif /* _h_config_f */
