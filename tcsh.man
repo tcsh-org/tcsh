@@ -1,5 +1,5 @@
-.\" $Id: tcsh.man,v 3.0 1991/07/04 21:54:11 christos Exp $
-.TH TCSH 1 "4 July 1991" "Cornell"
+.\" $Id: tcsh.man,v 3.1 1991/07/15 19:37:24 christos Exp christos $
+.TH TCSH 1 "16 July 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -2476,6 +2476,11 @@ the command to be run every \fItperiod\fR minutes.
 .TP 10
 .I precmd 
 the command to be run prior to printing each prompt.
+.TP 10
+.I beepcmd
+the command to be run every time 
+.I tcsh
+wants to echo the terminal bell. 
 .PP
 .SH "SEE ALSO"
 csh(1), chsh(1), termcap(5)
@@ -2487,7 +2492,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.00.00 (Cornell) 07/04/91.
+This man page documents tcsh 6.00.01 (Cornell) 07/16/91.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
@@ -2529,16 +2534,19 @@ Chris Grevstad, TRW, 1987
 .br
 Ported the 4.3 csh sources to tcsh.
 .sp
-Christos S. Zoulas, Cornell U. EE dept., 1987-90
+Christos S. Zoulas, Cornell U. EE dept., 1987-91
 .br
 ported tcsh to HPUX, and System V rel. 2 and 3 and wrote a SysV version of
-getwd.c. Added SHORT_STRINGS support.
+getwd.c. Added SHORT_STRINGS support. New version of sh.glob.c.
 .sp
 James J Dempsey, BBN, 1988, and Paul Placeway, OSU, 1988
 .br
 Re-ported tcsh to A/UX.
 .sp
 .SH "BUGFIXES AND ENHANCEMENTS"
+Marc Horowitz, MIT, 1991
+Ansification fixes
+.br
 Eric Schnoebelen, Convex, 1990
 .br
 Convex support, lots of csh bug fixes, save and restore of directory stack.
