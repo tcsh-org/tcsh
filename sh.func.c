@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.118 2004/11/20 18:25:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.119 2004/11/23 01:48:34 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.118 2004/11/20 18:25:26 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.119 2004/11/23 01:48:34 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -41,9 +41,11 @@ RCSID("$Id: sh.func.c,v 3.118 2004/11/20 18:25:26 christos Exp $")
 #include "nt.const.h"
 #endif /* WINNT_NATIVE */
 
+#ifdef NLS_CATALOGS
 #ifdef HAVE_ICONV
 #include <langinfo.h>
 static iconv_t catgets_iconv; /* Or (iconv_t)-1 */
+#endif
 #endif
 
 /*
@@ -2432,6 +2434,7 @@ struct command *c;
     flush();
 }
 
+#ifdef NLS_CATALOGS
 #ifdef HAVE_ICONV
 char *
 iconv_catgets(ctd, set_id, msg_id, s)
@@ -2478,6 +2481,7 @@ const char *s;
     }
     return buf;
 }
+#endif
 #endif
 
 void
