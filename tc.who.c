@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.9 1991/11/17 06:00:36 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.who.c,v 3.10 1991/11/26 04:28:26 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.9 1991/11/17 06:00:36 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.10 1991/11/26 04:28:26 christos Exp $")
 
 #include "tc.h"
 
@@ -96,16 +96,16 @@ struct utmp __ut;
 
 
 struct who {
-    struct who *w_next;
-    struct who *w_prev;
-    char    w_name[UTNAMLEN + 1];
-    char    w_new[UTNAMLEN + 1];
-    char    w_tty[UTLINLEN + 1];
+    struct who *who_next;
+    struct who *who_prev;
+    char    who_name[UTNAMLEN + 1];
+    char    who_new[UTNAMLEN + 1];
+    char    who_tty[UTLINLEN + 1];
 #ifdef UTHOST
-    char    w_host[UTHOSTLEN + 1];
+    char    who_host[UTHOSTLEN + 1];
 #endif /* UTHOST */
-    time_t  w_time;
-    int     w_status;
+    time_t  who_time;
+    int     who_status;
 };
 
 static struct who whohead, whotail;
@@ -134,8 +134,8 @@ static	void	print_who	__P((struct who *));
 void
 initwatch()
 {
-    whohead.w_next = &whotail;
-    whotail.w_prev = &whohead;
+    whohead.who_next = &whotail;
+    whotail.who_prev = &whohead;
 #ifdef WHODEBUG
     debugwholist(NULL, NULL);
 #endif /* WHODEBUG */
@@ -235,9 +235,9 @@ watch_login()
      * xterm clears the entire utmp entry - mark everyone on the status list
      * OFFLINE or we won't notice X "logouts"
      */
-    for (wp = whohead.w_next; wp->w_next != NULL; wp = wp->w_next) {
-	wp->w_status = OFFLINE;
-	wp->w_time = 0;
+    for (wp = whohead.who_next; wp->who_next != NULL; wp = wp->who_next) {
+	wp->who_status = OFFLINE;
+	wp->who_time = 0;
     }
 
     /*
@@ -263,81 +263,81 @@ watch_login()
 	if (utmp.ut_type == DEAD_PROCESS && utmp.ut_line[0] == '\0')
 	    continue;
 #endif /* DEAD_PROCESS */
-	wp = whohead.w_next;
-	while (wp->w_next && (comp = strncmp(wp->w_tty, utmp.ut_line, UTLINLEN)) < 0)
-	    wp = wp->w_next;/* find that tty! */
+	wp = whohead.who_next;
+	while (wp->who_next && (comp = strncmp(wp->who_tty, utmp.ut_line, UTLINLEN)) < 0)
+	    wp = wp->who_next;/* find that tty! */
 
-	if (wp->w_next && comp == 0) {	/* found the tty... */
+	if (wp->who_next && comp == 0) {	/* found the tty... */
 #ifdef DEAD_PROCESS
 	    if (utmp.ut_type == DEAD_PROCESS) {
-		wp->w_time = utmp.ut_time;
-		wp->w_status = OFFLINE;
+		wp->who_time = utmp.ut_time;
+		wp->who_status = OFFLINE;
 	    }
 	    else
 #endif /* DEAD_PROCESS */
 	    if (utmp.ut_name[0] == '\0') {
-		wp->w_time = utmp.ut_time;
-		wp->w_status = OFFLINE;
+		wp->who_time = utmp.ut_time;
+		wp->who_status = OFFLINE;
 	    }
-	    else if (strncmp(utmp.ut_name, wp->w_name, UTNAMLEN) == 0) {
+	    else if (strncmp(utmp.ut_name, wp->who_name, UTNAMLEN) == 0) {
 		/* someone is logged in */ 
-		wp->w_time = utmp.ut_time;
-		wp->w_status = 0;	/* same guy */
+		wp->who_time = utmp.ut_time;
+		wp->who_status = 0;	/* same guy */
 	    }
 	    else {
-		(void) strncpy(wp->w_new, utmp.ut_name, UTNAMLEN);
+		(void) strncpy(wp->who_new, utmp.ut_name, UTNAMLEN);
 #ifdef UTHOST
 # ifdef _SEQUENT_
-		host = ut_find_host(wp->w_tty);
+		host = ut_find_host(wp->who_tty);
 		if (host)
-		    (void) strncpy(wp->w_host, host, UTHOSTLEN);
+		    (void) strncpy(wp->who_host, host, UTHOSTLEN);
 		else
-		    wp->w_host[0] = 0;
+		    wp->who_host[0] = 0;
 # else
-		(void) strncpy(wp->w_host, utmp.ut_host, UTHOSTLEN);
+		(void) strncpy(wp->who_host, utmp.ut_host, UTHOSTLEN);
 # endif
 #endif /* UTHOST */
-		wp->w_time = utmp.ut_time;
-		if (wp->w_name[0] == '\0')
-		    wp->w_status = ONLINE;
+		wp->who_time = utmp.ut_time;
+		if (wp->who_name[0] == '\0')
+		    wp->who_status = ONLINE;
 		else
-		    wp->w_status = CHANGED;
+		    wp->who_status = CHANGED;
 	    }
 	}
 	else {		/* new tty in utmp */
 	    wpnew = (struct who *) xcalloc(1, sizeof *wpnew);
-	    (void) strncpy(wpnew->w_tty, utmp.ut_line, UTLINLEN);
+	    (void) strncpy(wpnew->who_tty, utmp.ut_line, UTLINLEN);
 #ifdef UTHOST
 # ifdef _SEQUENT_
-	    host = ut_find_host(wpnew->w_tty);
+	    host = ut_find_host(wpnew->who_tty);
 	    if (host)
-		(void) strncpy(wpnew->w_host, host, UTHOSTLEN);
+		(void) strncpy(wpnew->who_host, host, UTHOSTLEN);
 	    else
-		wpnew->w_host[0] = 0;
+		wpnew->who_host[0] = 0;
 # else
-	    (void) strncpy(wpnew->w_host, utmp.ut_host, UTHOSTLEN);
+	    (void) strncpy(wpnew->who_host, utmp.ut_host, UTHOSTLEN);
 # endif
 #endif /* UTHOST */
-	    wpnew->w_time = utmp.ut_time;
+	    wpnew->who_time = utmp.ut_time;
 #ifdef DEAD_PROCESS
 	    if (utmp.ut_type == DEAD_PROCESS)
-		wpnew->w_status = OFFLINE;
+		wpnew->who_status = OFFLINE;
 	    else
 #endif /* DEAD_PROCESS */
 	    if (utmp.ut_name[0] == '\0')
-		wpnew->w_status = OFFLINE;
+		wpnew->who_status = OFFLINE;
 	    else {
-		(void) strncpy(wpnew->w_new, utmp.ut_name, UTNAMLEN);
-		wpnew->w_status = ONLINE;
+		(void) strncpy(wpnew->who_new, utmp.ut_name, UTNAMLEN);
+		wpnew->who_status = ONLINE;
 	    }
 #ifdef WHODEBUG
 	    debugwholist(wpnew, wp);
 #endif /* WHODEBUG */
 
-	    wpnew->w_next = wp;	/* link in a new 'who' */
-	    wpnew->w_prev = wp->w_prev;
-	    wpnew->w_prev->w_next = wpnew;
-	    wp->w_prev = wpnew;	/* linked in now */
+	    wpnew->who_next = wp;	/* link in a new 'who' */
+	    wpnew->who_prev = wp->who_prev;
+	    wpnew->who_prev->who_next = wpnew;
+	    wp->who_prev = wpnew;	/* linked in now */
 	}
     }
     (void) close(utmpfd);
@@ -356,36 +356,36 @@ watch_login()
 	if (eq(*vp, STRany) && eq(*(vp + 1), STRany))
 	    alldone = 1;
 
-	for (wp = whohead.w_next; wp->w_next != NULL; wp = wp->w_next) {
-	    if (wp->w_status & ANNOUNCE ||
+	for (wp = whohead.who_next; wp->who_next != NULL; wp = wp->who_next) {
+	    if (wp->who_status & ANNOUNCE ||
 		(!eq(STRany, vp[0]) &&
-		 !Gmatch(str2short(wp->w_name), vp[0]) &&
-		 !Gmatch(str2short(wp->w_new),  vp[0])) ||
-		(!Gmatch(str2short(wp->w_tty),  vp[1]) &&
+		 !Gmatch(str2short(wp->who_name), vp[0]) &&
+		 !Gmatch(str2short(wp->who_new),  vp[0])) ||
+		(!Gmatch(str2short(wp->who_tty),  vp[1]) &&
 		 !eq(STRany, vp[1])))
 		continue;	/* entry doesn't qualify */
 	    /* already printed or not right one to print */
 
-	    if (wp->w_time == 0)/* utmp entry was cleared */
-		wp->w_time = watch_period;
+	    if (wp->who_time == 0)/* utmp entry was cleared */
+		wp->who_time = watch_period;
 
-	    if ((wp->w_status & OFFLINE) &&
-		(wp->w_name[0] != '\0')) {
+	    if ((wp->who_status & OFFLINE) &&
+		(wp->who_name[0] != '\0')) {
 		print_who(wp);
-		wp->w_name[0] = '\0';
-		wp->w_status |= ANNOUNCE;
+		wp->who_name[0] = '\0';
+		wp->who_status |= ANNOUNCE;
 		continue;
 	    }
-	    if (wp->w_status & ONLINE) {
+	    if (wp->who_status & ONLINE) {
 		print_who(wp);
-		(void) strcpy(wp->w_name, wp->w_new);
-		wp->w_status |= ANNOUNCE;
+		(void) strcpy(wp->who_name, wp->who_new);
+		wp->who_status |= ANNOUNCE;
 		continue;
 	    }
-	    if (wp->w_status & CHANGED) {
+	    if (wp->who_status & CHANGED) {
 		print_who(wp);
-		(void) strcpy(wp->w_name, wp->w_new);
-		wp->w_status |= ANNOUNCE;
+		(void) strcpy(wp->who_name, wp->who_new);
+		wp->who_status |= ANNOUNCE;
 		continue;
 	    }
 	}
@@ -404,21 +404,21 @@ debugwholist(new, wp)
 {
     register struct who *a;
 
-    a = whohead.w_next;
-    while (a->w_next != NULL) {
-	xprintf("%s/%s -> ", a->w_name, a->w_tty);
-	a = a->w_next;
+    a = whohead.who_next;
+    while (a->who_next != NULL) {
+	xprintf("%s/%s -> ", a->who_name, a->who_tty);
+	a = a->who_next;
     }
     xprintf("TAIL\n");
     if (a != &whotail) {
 	xprintf("BUG! last element is not whotail!\n");
 	abort();
     }
-    a = whotail.w_prev;
+    a = whotail.who_prev;
     xprintf("backward: ");
-    while (a->w_prev != NULL) {
-	xprintf("%s/%s -> ", a->w_name, a->w_tty);
-	a = a->w_prev;
+    while (a->who_prev != NULL) {
+	xprintf("%s/%s -> ", a->who_name, a->who_tty);
+	a = a->who_prev;
     }
     xprintf("HEAD\n");
     if (a != &whohead) {
@@ -426,9 +426,9 @@ debugwholist(new, wp)
 	abort();
     }
     if (new)
-	xprintf("new: %s/%s\n", new->w_name, new->w_tty);
+	xprintf("new: %s/%s\n", new->who_name, new->who_tty);
     if (wp)
-	xprintf("wp: %s/%s\n", wp->w_name, wp->w_tty);
+	xprintf("wp: %s/%s\n", wp->who_name, wp->who_tty);
 }
 #endif /* WHODEBUG */
 
@@ -449,7 +449,7 @@ print_who(wp)
     char    ampm = 'a';
     int     attributes = 0;
 
-    t = localtime(&wp->w_time);
+    t = localtime(&wp->who_time);
     if (vp && vp->vec[0])
 	cp = short2str(vp->vec[0]);
 
@@ -459,20 +459,20 @@ print_who(wp)
 	else
 	    switch (*++cp) {
 	    case 'n':		/* user name */
-		switch (wp->w_status & STMASK) {
+		switch (wp->who_status & STMASK) {
 		case ONLINE:
 		case CHANGED:
-		    xprintf("%a%s", attributes, wp->w_new);
+		    xprintf("%a%s", attributes, wp->who_new);
 		    break;
 		case OFFLINE:
-		    xprintf("%a%s", attributes, wp->w_name);
+		    xprintf("%a%s", attributes, wp->who_name);
 		    break;
 		default:
 		    break;
 		}
 		break;
 	    case 'a':
-		switch (wp->w_status & STMASK) {
+		switch (wp->who_status & STMASK) {
 		case ONLINE:
 		    xprintf("%a%s", attributes, "logged on");
 		    break;
@@ -480,7 +480,7 @@ print_who(wp)
 		    xprintf("%a%s", attributes, "logged off");
 		    break;
 		case CHANGED:
-		    xprintf("%areplaced %s on", attributes, wp->w_name);
+		    xprintf("%areplaced %s on", attributes, wp->who_name);
 		    break;
 		default:
 		    break;
@@ -541,15 +541,15 @@ print_who(wp)
 		xprintf("%a%04d", attributes, t->tm_year + 1900);
 		break;
 	    case 'l':
-		xprintf("%a%s", attributes, wp->w_tty);
+		xprintf("%a%s", attributes, wp->who_tty);
 		break;
 #ifdef UTHOST
 	    case 'm':
-		if (wp->w_host[0] == '\0')
+		if (wp->who_host[0] == '\0')
 		    xprintf("%alocal", attributes);
 		else
 		    /* the ':' stuff is for <host>:<display>.<screen> */
-		    for (ptr = wp->w_host, flg = Isdigit(*ptr) ? '\0' : '.';
+		    for (ptr = wp->who_host, flg = Isdigit(*ptr) ? '\0' : '.';
 			 *ptr != '\0' &&
 			 (*ptr != flg || ((ptr = strchr(ptr, ':')) != 0));
 			 ptr++) {
@@ -561,10 +561,10 @@ print_who(wp)
 		    }
 		break;
 	    case 'M':
-		if (wp->w_host[0] == '\0')
+		if (wp->who_host[0] == '\0')
 		    xprintf("%alocal", attributes);
 		else
-		    for (ptr = wp->w_host; *ptr != '\0'; ptr++)
+		    for (ptr = wp->who_host; *ptr != '\0'; ptr++)
 			xputchar((int)
 				 ((Isupper(*ptr) ? Tolower(*ptr) : *ptr) |
 				  attributes));
@@ -592,9 +592,9 @@ struct command *c;
     blkpr(vp->vec);
     xprintf("\n");
     resetwatch();
-    wp = whohead.w_next;
-    while (wp->w_next != NULL) {
-	wp->w_name[0] = '\0';
-	wp = wp->w_next;
+    wp = whohead.who_next;
+    while (wp->who_next != NULL) {
+	wp->who_name[0] = '\0';
+	wp = wp->who_next;
     }
 }

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.9 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.decls.h,v 3.10 1991/12/14 20:45:46 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -182,7 +182,7 @@ extern	void		  sched_run	__P((void));
  * tc.sig.c
  */
 #ifndef BSDSIGS
-# if SVID < 3 || defined(UNIXPC)
+# if SYSVREL < 3 || defined(UNIXPC)
 extern	sigret_t	(*sigset	__P((int, sigret_t (*)(int)))) ();
 extern	void		  sigrelse	__P((int));
 extern	void		  sighold	__P((int));

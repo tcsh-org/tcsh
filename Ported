@@ -336,3 +336,26 @@ NOTES	:	works but not worth compiling with -O4...
 NOTES	:	setpgrp() and SIGCHLD work the BSD way, not the way documented.
 NOTES	:	we need to define BACKPIPE		
 VERSION	:	6.00.04
+
+VENDOR  :       SGI
+MODELS  :       INDIGO
+COMPILER:       cc
+CFLAGS  :       -D__STDC__
+LIBES   :       -lcurses -lsun -lbsd -lc_s
+OS      :       IRIX (3.?) 3.2 3.3 4.0
+CONFIG  :       config.sgi
+ENVIRON :       n/a
+NOTES   :       AUTOLOGOUT is probably best undef'ed
+NOTES   :       For 4.0, the NLS define in config.h can be enabled.
+VERSION :       6.01
+
+VENDOR  :       alliant
+MODELS  :       FX/2800 series
+COMPILER:       scc
+CFLAGS  :       normal
+LIBES   :       -ltermcap
+OS      :       Alliant Concentrix 2800 2.2.00
+CONFIG  :       config.bsd
+ENVIRON :       n/a
+NOTES   :       n/a
+VERSION :       6.01

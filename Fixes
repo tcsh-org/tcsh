@@ -1,3 +1,22 @@
+V6.02.00, ...
+11. Changed w_ fields in tc.who.c to who_ to avoid redefinitions in
+    <sys/wait.h> in some os's.
+10. Setting savehist to an empty string makes savehist use the value
+    in $history.
+9.  echotc did not use the internal termcap descriptions.
+8.  echotc did not work right for single argument termcap strings.
+7.  DGUX needs SAVESIGVEC, updated type protection, and disabled CSWTCH.
+6.  Changed SVID to SYSVREL, since there is no SVID == 4 (yet).
+5.  Typo in tc.sig.h: UNRELSIGS was not getting defined.
+4.  Globbing bug fix. tglob() should ignore globbing characters inside 
+    backquotes otherwise things get expanded twice:
+    % echo 'bar?' > 'foo?'
+    % echo `cat foo\?`
+    echo: No match.
+3.  Mach setpath fix.
+2.  Alliant process group fix.
+1.  Xenix fixes for broken vi and help path with no suffixes.
+
 V6.01.00, 12/19/91 [for comp.sources.unix]
 22. Restore the original prompt in automatic correction when the user
     asks to re-edit the command.

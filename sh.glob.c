@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.glob.c,v 3.13 1991/11/11 01:56:34 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.glob.c,v 3.14 1991/12/19 22:34:14 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.13 1991/11/11 01:56:34 christos Exp christos $")
+RCSID("$Id: sh.glob.c,v 3.14 1991/12/19 22:34:14 christos Exp $")
 
 #include "tc.h"
 
@@ -576,9 +576,29 @@ tglob(t)
 	else if (*p == '{' &&
 		 (p[1] == '\0' || (p[1] == '}' && p[2] == '\0')))
 	    continue;
-	while (c = *p++)
-	    if (isglob(c))
-		gflag |= (c == '{' || c == '`') ? G_CSH : G_GLOB;
+	while (c = *p++) {
+	    /*
+	     * eat everything inside the matching backquotes
+	     */
+	    if (c == '`') {
+		gflag |= G_CSH;
+		while (*p && *p != '`') 
+		    if (*p++ == '\\') {
+			if (*p)		/* Quoted chars */
+			    p++;
+			else
+			    break;
+		    }
+		if (*p)			/* The matching ` */
+		    p++;
+		else
+		    break;
+	    }
+	    else if (c == '{')
+		gflag |= G_CSH;
+	    else if (isglob(c))
+		gflag |= G_GLOB;
+	}
     }
 }
 

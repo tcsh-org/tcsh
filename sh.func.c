@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.20 1991/12/19 22:34:14 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.20 1991/12/19 22:34:14 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1034,7 +1034,7 @@ xecho(sep, v)
 	register int c;
 
 	while (c = *cp++) {
-#if SVID > 0
+#if SYSVREL > 0
 #ifndef OREO
 	    if (c == '\\') {
 		switch (c = *cp++) {
@@ -1080,18 +1080,18 @@ xecho(sep, v)
 		}
 	    }
 #endif /* OREO */
-#endif /* SVID > 0 */
+#endif /* SYSVREL > 0 */
 	    xputchar(c | QUOTE);
 
 	}
 	if (*v)
 	    xputchar(sep | QUOTE);
     }
-#if SVID > 0
+#if SYSVREL > 0
 #ifndef OREO
 done:
 #endif /* OREO */
-#endif /* SVID > 0 */
+#endif /* SYSVREL > 0 */
     if (sep && nonl == 0)
 	xputchar('\n');
     else

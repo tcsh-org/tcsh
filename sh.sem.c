@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.sem.c,v 3.13 1991/12/19 21:40:06 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.sem.c,v 3.14 1991/12/19 22:34:14 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.13 1991/12/19 21:40:06 christos Exp christos $")
+RCSID("$Id: sh.sem.c,v 3.14 1991/12/19 22:34:14 christos Exp $")
 
 #include "tc.h"
 
@@ -791,7 +791,7 @@ doio(t, pipein, pipeout)
 	else {
 	    (void) close(0);
 	    (void) dup(OLDSTD);
-#ifdef FIOCLEX
+#ifdef FIONCLEX
 # ifdef CLEX_DUPS
 	    /*
 	     * PWP: Unlike Bezerkeley 4.3, FIONCLEX for Pyramid is preserved
@@ -844,7 +844,7 @@ doio(t, pipein, pipeout)
 	(void) close(1);
 	(void) dup(SHOUT);
 	is1atty = isoutatty;
-#ifdef FIOCLEX
+#ifdef FIONCLEX
 # ifdef CLEX_DUPS
 	(void) ioctl(1, FIONCLEX, NULL);
 # endif /* CLEX_DUPS */
@@ -859,7 +859,7 @@ doio(t, pipein, pipeout)
     else {
 	(void) dup(SHDIAG);
 	is2atty = isdiagatty;
-#ifdef FIOCLEX
+#ifdef FIONCLEX
 # ifdef CLEX_DUPS
 	(void) ioctl(2, FIONCLEX, NULL);
 # endif /* CLEX_DUPS */

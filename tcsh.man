@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.25 1991/12/14 20:45:46 christos Exp $
+.\" $Id: tcsh.man,v 3.26 1991/12/19 21:40:06 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -2430,9 +2430,10 @@ and then
 if the shell was a login shell.
 .sp
 Note: On 
-.I convexos
-and
+.I convexos,
 .I stellix
+and
+.I INTEL
 the names of the system default files are
 .I "/etc/cshrc",
 .I "/etc/login"
@@ -2755,6 +2756,7 @@ Prompt the user before execution of `rm *'.
 .TP 10
 .B savehist 
 number of history items to save between login sessions.
+If it is just set, the number of items is taken from $history.
 .TP 10
 .B shlvl
 Integer value indicating the number

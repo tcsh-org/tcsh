@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.18 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.proc.c,v 3.19 1991/11/26 04:28:26 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.18 1991/11/22 02:28:12 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.19 1991/11/26 04:28:26 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -258,7 +258,7 @@ loop:
      * but then again, SVR4 falls into the POSIX/BSDJOBS category.
      */
     pid = wait(&w.w_status);
-#  endif /* SVID >= 3 */
+#  endif /* SYSVREL >= 3 */
 # endif /* HAVEwait3 */
 # endif	/* BSDTIMES */
 # ifndef BSDSIGS

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.21 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.os.h,v 3.22 1991/11/26 04:28:26 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -39,13 +39,13 @@
 
 #define NEEDstrerror		/* Too hard to find which systems have it */
 
-#if SVID > 3
+#if SYSVREL > 3
 /*
  * for SVR4 we fork pipelines backwards. 
  * more info in sh.sem.c
  */
 # define BACKPIPE
-#endif /* SVID > 3 */
+#endif /* SYSVREL > 3 */
 
 #ifdef OREO
 # include <sys/time.h>
@@ -122,7 +122,7 @@ struct ucred {
 
 /*
  * XXX: This will be changed soon to 
- * #if (SVID > 0) && defined(TIOCGWINSZ)
+ * #if (SYSVREL > 0) && defined(TIOCGWINSZ)
  * If that breaks on your machine, let me know.
  */
 #if defined(INTEL) || defined(u3b2) || defined (u3b5) || \
@@ -344,9 +344,9 @@ struct ucred {
 #endif /* POSIX */
 
 
-#if SVID > 0 && !defined(OREO) && !defined(sgi)
+#if SYSVREL > 0 && !defined(OREO) && !defined(sgi)
 # define NEEDgetwd
-#endif /* SVID > 0 && !OREO && !sgi */
+#endif /* SYSVREL > 0 && !OREO && !sgi */
 
 #ifndef S_IFLNK
 # define lstat stat
@@ -447,11 +447,11 @@ extern int waitpid();
 #   endif /* POSIXJOBS || _SEQUENT_ */
 #  endif /* ! BSDTIMES */
 # else /* !BSDJOBS */
-#  if SVID < 3
+#  if SYSVREL < 3
 extern int ourwait();
-#  else	/* SVID >= 3 */
+#  else	/* SYSVREL >= 3 */
 extern int wait();
-#  endif /* SVID >= 3 */
+#  endif /* SYSVREL >= 3 */
 # endif	/* ! BSDJOBS */
 
 # ifdef BSDNICE

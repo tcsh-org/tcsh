@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.vers.c,v 3.11 1991/12/14 20:45:46 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.vers.c,v 3.12 1991/12/19 22:34:14 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.11 1991/12/14 20:45:46 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.12 1991/12/19 22:34:14 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -137,14 +137,14 @@ gethosttype()
 #   define _havehosttype_
    hosttype = str2short("hp9000s700");
 #  endif /* __hp9000s700 */
-#  if defined(hp9000s800) && !defined(_havehosttype_)
+#  if (defined(__hp9000s800) || defined(hp9000s800)) && !defined(_havehosttype_)
 #   define _havehosttype_
    hosttype = str2short("hp9000s800");	/* maybe "spectrum" */
-#  endif /* hp9000s800 */
-#  if defined(hp9000s300) && !defined(_havehosttype_)
+#  endif /* __hp9000s800 || hp9000s800 */
+#  if (defined(__hp9000s300) || defined(hp9000s300)) && !defined(_havehosttype_)
 #   define _havehosttype_
    hosttype = str2short("hp9000s300");
-#  endif /* hp9000s300 */
+#  endif /* __hp9000s800 || hp9000s300 */
 # if defined(hp9000s500) && !defined(_havehosttype_)
 #  define _havehosttype_
    hosttype = str2short("hp9000s500");
@@ -189,7 +189,7 @@ gethosttype()
 # endif /* i386 */
 #endif /* _MINIX */
 
-# if defined(i386) && SVID > 0
+# if defined(i386) && SYSVREL > 0
 
 #  if !defined(_havehosttype_) && (defined(ISC) || defined(ISC202))
 #   define _havehosttype_

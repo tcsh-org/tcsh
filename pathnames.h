@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/pathnames.h,v 3.3 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/pathnames.h,v 3.4 1991/12/14 20:45:46 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -48,11 +48,11 @@
 #define _PATH_USRBSD		"/usr/bsd"
 #define _PATH_BIN		"/bin"
 
-#if defined(convex) || defined(__convex__) || defined(stellar)
+#if defined(convex) || defined(__convex__) || defined(stellar) || defined(INTEL)
 # define _PATH_DOTLOGIN		"/etc/login"
 # define _PATH_DOTLOGOUT	"/etc/logout"
 # define _PATH_DOTCSHRC		"/etc/cshrc"
-#endif /* convex || __convex__ || stellar */
+#endif /* convex || __convex__ || stellar || INTEL */
 
 #if defined(sgi) || defined(OREO) || defined(cray)
 # define _PATH_DOTLOGIN		"/etc/cshrc"

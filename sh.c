@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.c,v 3.20 1991/12/19 22:34:14 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.20 1991/12/19 22:34:14 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -217,6 +217,33 @@ main(argc, argv)
      */
     (void) time(&t_period);
     initwatch();
+
+#if defined(alliant)
+    /*
+     * From:  Jim Pace <jdp@research.att.com>
+     * tcsh does not work properly on the alliants through an rlogin session.
+     * The shell generally hangs.  Also, reference to the controlling terminal
+     * does not work ( ie: echo foo > /dev/tty ).
+     *
+     * A security feature was added to rlogind affecting FX/80's Concentrix
+     * from revision 5.5.xx upwards (through 5.7 where this fix was implemented)
+     * This security change also affects the FX/2800 series.
+     * The security change to rlogind requires the process group of an rlogin
+     * session become disassociated with the tty in rlogind.
+     *
+     * The changes needed are:
+     * 1. set the process group
+     * 2. reenable the control terminal
+     */
+     if (loginsh && isatty(SHIN)) {
+	 ttyn = (char *) ttyname(SHIN);
+	 (void) close(SHIN);
+	 SHIN = open(ttyn, O_RDWR);
+	 shpgrp = getpid();
+	 (void) ioctl (SHIN, TIOCSPGRP, (ptr_t) &shpgrp);
+	 (void) setpgid(0, shpgrp);
+     }
+#endif /* alliant */
 
     /*
      * Move the descriptors to safe places. The variable didfds is 0 while we
@@ -486,6 +513,18 @@ main(argc, argv)
 		if (argc == 1)
 		    xexit(0);
 		argc--, tempv++;
+#ifdef M_XENIX
+		/* Xenix Vi bug:
+		   it relies on a 7 bit environment (/bin/sh), so it
+		   pass ascii arguments with the 8th bit set */
+		if (!strcmp(argv[0], "sh"))
+		  {
+		    char *p;
+
+		    for (p = tempv[0]; *p; ++p)
+		      *p &= ASCII;
+		  }
+#endif
 		arginp = SAVE(tempv[0]);
 		/*
 		 * * Give an error on -c arguments that end in * backslash to
@@ -827,7 +866,7 @@ main(argc, argv)
  * David Dawes (dawes@physics.su.oz.au) Sept 1991
  */
 
-#if SVID > 3
+#if SYSVREL > 3
     {
 	struct sigaction act;
         act.sa_handler=pchild;
@@ -839,9 +878,9 @@ main(argc, argv)
 				    */
         sigaction(SIGCHLD,&act,(struct sigaction *)NULL);
     }
-#else /* SVID <= 3 */
+#else /* SYSVREL <= 3 */
     (void) sigset(SIGCHLD, pchild);	/* while signals not ready */
-#endif /* SVID <= 3 */
+#endif /* SYSVREL <= 3 */
 
 
     if (intty && !arginp) 	
@@ -1224,16 +1263,31 @@ srcunit(unit, onlyown, hflg)
 void
 rechist()
 {
-    Char    buf[BUFSIZE], *hfile;
+    Char    buf[BUFSIZE], hbuf[BUFSIZE], *hfile;
     int     fp, ftmp, oldidfds;
+    struct  varent *shist;
 
     if (!fast) {
-	if (value(STRsavehist)[0] == '\0')
+	/*
+	 * If $savehist is just set, we use the value of $history
+	 * else we use the value in $savehist
+	 */
+	if (shist = adrof(STRsavehist)) {
+	    if (shist->vec[0][0] != '\0')
+		(void) Strcpy(hbuf, shist->vec[0]);
+	    else if ((shist = adrof(STRhistory)) && shist->vec[0][0] != '\0')
+		(void) Strcpy(hbuf, shist->vec[0]);
+	    else
+		return;
+	}
+	else
 	    return;
+
 	if ((hfile = value(STRhistfile)) == STRNULL) {
 	    hfile = Strcpy(buf, value(STRhome));
 	    (void) Strcat(buf, STRsldthist);
 	}
+
 	fp = creat(short2str(hfile), 0600);
 	if (fp == -1) 
 	    return;
@@ -1241,8 +1295,7 @@ rechist()
 	didfds = 0;
 	ftmp = SHOUT;
 	SHOUT = fp;
-	(void) Strcpy(buf, value(STRsavehist));
-	dumphist[2] = buf;
+	dumphist[2] = hbuf;
 	dohist(dumphist, NULL);
 	(void) close(fp);
 	SHOUT = ftmp;

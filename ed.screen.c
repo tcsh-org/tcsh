@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.10 1991/12/14 20:45:46 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.11 1991/12/19 22:34:14 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.10 1991/12/14 20:45:46 christos Exp christos $")
+RCSID("$Id: ed.screen.c,v 3.11 1991/12/19 22:34:14 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -445,6 +445,7 @@ EchoTC(v)
     int     verbose = 0, silent = 0;
     char   *area;
     static char *fmts = "%s\n", *fmtd = "%d\n";
+    struct termcapstr *t;
     char    buf[TC_BUFSIZE];
 
     area = buf;
@@ -514,10 +515,17 @@ EchoTC(v)
 	return;
     }
 
-    /*
-     * Count home many values we need for this capability.
+    /* 
+     * Try to use our local definition first
      */
-    scap = tgetstr(cv, &area);
+    scap = NULL;
+    for (t = tstr; t->name != NULL; t++)
+	if (strcmp(t->name, cv) == 0) {
+	    scap = t->str;
+	    break;
+	}
+    if (t->name == NULL)
+	scap = tgetstr(cv, &area);
     if (!scap || scap[0] == '\0') {
 	if (silent)
 	    return;
@@ -525,6 +533,9 @@ EchoTC(v)
 	    stderror(ERR_NAME | ERR_TCCAP, cv);
     }
 
+    /*
+     * Count home many values we need for this capability.
+     */
     for (cap = scap, arg_need = 0; *cap; cap++)
 	if (*cap == '%')
 	    switch (*++cap) {
@@ -568,8 +579,8 @@ EchoTC(v)
 	v++;
 	if (!*v || *v[0] == '\0')
 	    stderror(ERR_NAME | ERR_TCNARGS, cv, 1);
-	arg_rows = 0;
-	arg_cols = atoi(short2str(*v));
+	arg_cols = 0;
+	arg_rows = atoi(short2str(*v));
 	v++;
 	if (*v && *v[0]) {
 	    if (silent)
@@ -1090,11 +1101,11 @@ GetTermCaps()
     i = tgetent(bp, ptr);
     if (i <= 0) {
 	if (i == -1) {
-#if (SVID == 0) || defined(IRIS3D)
+#if (SYSVREL == 0) || defined(IRIS3D)
 	    xprintf("tcsh: Cannot open /etc/termcap.\n");
 	}
 	else if (i == 0) {
-#endif /* SVID */
+#endif /* SYSVREL */
 	    xprintf("tcsh: No entry for terminal type \"%s\"\n",
 		    getenv("TERM"));
 	}

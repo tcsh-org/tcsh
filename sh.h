@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.h,v 3.25 1991/12/14 20:45:46 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.h,v 3.26 1991/12/19 22:34:14 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -142,9 +142,9 @@ typedef int sigret_t;
 #ifdef _SEQUENT_
 # include <sys/procstats.h>
 #endif /* _SEQUENT_ */
-#if defined(POSIX) || SVID > 0
+#if defined(POSIX) || SYSVREL > 0
 # include <sys/times.h>
-#endif /* POSIX || SVID > 0 */
+#endif /* POSIX || SYSVREL > 0 */
 
 #ifdef NLS
 # include <locale.h>
@@ -155,11 +155,11 @@ typedef int sigret_t;
 
 #ifdef BSDTIMES
 # include <sys/time.h>
-# if SVID>3
+# if SYSVREL>3
 #  include "/usr/ucbinclude/sys/resource.h"
 # else
 #  include <sys/resource.h>
-# endif /* SVID>3 */
+# endif /* SYSVREL>3 */
 #endif /* BSDTIMES */
 
 #ifndef POSIX
@@ -170,13 +170,17 @@ typedef int sigret_t;
 # endif /* TERMIO */
 #else /* POSIX */
 # include <termios.h>
-# if SVID > 3
+# if SYSVREL > 3
 #  undef TIOCGLTC	/* we don't need those, since POSIX has them */
 #  undef TIOCSLTC
 #  undef CSWTCH
 #  define CSWTCH _POSIX_VDISABLE	/* So job control works */
-# endif /* SVID > 3 */
+# endif /* SYSVREL > 3 */
 #endif /* POSIX */
+#ifdef DGUX
+#  undef CSWTCH
+#  define CSWTCH _POSIX_VDISABLE	/* So job control works */
+#endif /* DGUX */
 
 #ifdef POSIX
 /*
@@ -210,11 +214,11 @@ extern int setpgrp();
 # include <limits.h>
 #endif /* POSIX */
 
-#if SVID > 0 || defined(_IBMR2) || defined(_MINIX)
+#if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX)
 # if !defined(pyr) && !defined(aiws) && !defined(stellar)
 #  include <time.h>
 # endif /* !aiws && !pyr && !stellar */
-#endif /* SVID > 0 ||  _IBMR2 */
+#endif /* SYSVREL > 0 ||  _IBMR2 */
 
 #if !((defined(sun) || defined(_MINIX)) && defined(TERMIO))
 # include <sys/ioctl.h>
@@ -251,9 +255,9 @@ extern int setpgrp();
 # endif
 # define dirent direct
 #endif /* DIRENT */
-#if defined(hpux) || defined(sgi)
+#if defined(hpux) || defined(sgi) || defined(OREO)
 # include <stdio.h>	/* So the fgetpwent() prototypes work */
-#endif 
+#endif /* hpux || sgi || OREO */
 #include <pwd.h>
 #ifdef PW_SHADOW
 # include <shadow.h>

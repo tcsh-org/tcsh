@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.15 1991/12/19 22:05:32 christos Exp $
+# $Id: Makefile,v 1.16 1992/01/06 22:36:56 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -28,7 +28,7 @@ LFLAGS=$(INCLUDES)
 
 
 #CFLAGS= $(INCLUDES) -g			# debug
-CFLAGS= $(INCLUDES) -O4			# production
+#CFLAGS= $(INCLUDES) -O			# production
 #CFLAGS= $(INCLUDES) 			# Broken optimizers....
 
 #CFLAGS= -g -pg $(INCLUDES) -DPROF
@@ -38,11 +38,10 @@ CFLAGS= $(INCLUDES) -O4			# production
 #CFLAGS=-O $(INCLUDES) -finline-functions -fstrength-reduce 
 
 # gcc 1.37+
-#CFLAGS=-O $(INCLUDES) -fcombine-regs -finline-functions -fstrength-reduce 
+CFLAGS=-O $(INCLUDES) -fcombine-regs -finline-functions -fstrength-reduce 
 # add -msoft-float for 68881 machines.
 
 #hpux 8.0
-
 #CFLAGS=  $(INCLUDES) +O3 -Aa
 
 # for silicon graphics (and other mips compilers) -- use the
@@ -65,7 +64,7 @@ CFLAGS= $(INCLUDES) -O4			# production
 # Stardent Titan
 #CFLAGS = $(INCLUDES) -O -43
 
-# Stardent Stellar
+# Stardent Stellar or sunos4 w/o gcc
 #CFLAGS = $(INCLUDES) -O4
 
 # Apollo's with cc [apollo builtins don't work with gcc]
@@ -129,8 +128,8 @@ LIBES= -ltermcap		## BSD style things, hpux
 # If you want to take out -traditional, make sure that your sys/ioctl.h
 # is fixed correctly, otherwise you'll be stopped for tty input, or you
 # will lose the editor and job control.
-#CC=	gcc -Wall 
-CC=	cc
+CC=	gcc -Wall 
+#CC=	cc
 #CC=	occ
 #CC=	/bin/cc	# For suns, w/o gcc and SVR4
 #CC=	/usr/lib/sun.compile/cc  # FPS 500 (+FPX) with Sun C compiler

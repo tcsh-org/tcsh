@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.c,v 3.5 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.sig.c,v 3.6 1991/11/11 01:56:34 christos Exp $ */
 /*
  * sh.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.5 1991/10/20 01:38:14 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.6 1991/11/11 01:56:34 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -89,7 +89,7 @@ sig_ch_rel()
 #endif /* SIGVOID */
 }
 
-/* libc.a contains these functions in SVID >= 3. */
+/* libc.a contains these functions in SYSVREL >= 3. */
 sigret_t
 (*sigset(a, b)) ()
     int     a;
@@ -109,7 +109,7 @@ sigrelse(what)
     if (what == SIGCHLD)
 	sig_ch_rel();
 
-#ifdef notdef	/* XXX: Should not need that when compiled with SVID=1 */
+#ifdef notdef	/* XXX: Should not need that when compiled with SYSVREL=1 */
 # ifdef UNIXPC	
     if (what == SIGINT)
     	(void)signal(SIGINT, pintr);
@@ -127,7 +127,7 @@ sighold(what)
     if (what == SIGCHLD)
 	(void) signal(SIGCHLD, sig_ch_queue);
 
-#ifdef notdef	/* XXX: Should not need that when compiled with SVID=1 */
+#ifdef notdef	/* XXX: Should not need that when compiled with SYSVREL=1 */
 # ifdef UNIXPC	
     if (what == SIGINT)
     	(void)signal(SIGINT, SIG_IGN);
@@ -170,8 +170,8 @@ sigpause(what)
 
 #ifdef SXA
 /*
- * SX/A is SVID3 but does not have sys5-sigpause().
- * I've heard that sigpause() is not defined in SVID3.
+ * SX/A is SYSVREL3 but does not have sys5-sigpause().
+ * I've heard that sigpause() is not defined in SYSVREL3.
  */
 /* This is not need if you make tcsh by BSD option's cc. */
 void

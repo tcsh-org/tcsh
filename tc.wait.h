@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.wait.h,v 3.2 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.wait.h,v 3.3 1991/11/26 04:28:26 christos Exp $ */
 /*
  * tc.wait.h: <sys/wait.h> for machines that don't have it or have it and
  *	      is incorrect.
@@ -43,7 +43,7 @@
  * We try to use the system's wait.h when we can...
  */
 
-#if SVID > 0
+#if SYSVREL > 0
 # ifdef hpux
 #  ifndef __hpux
 #   define NEEDwait
@@ -63,9 +63,9 @@
 #   define NEEDwait
 #  endif /* OREO || IRIS4D || POSIX */
 # endif	/* hpux */
-#else /* SVID == 0 */
+#else /* SYSVREL == 0 */
 # include <sys/wait.h>
-#endif /* SVID == 0 */
+#endif /* SYSVREL == 0 */
 
 #ifdef _MINIX
 # undef NEEDwait
