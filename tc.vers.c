@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.25 1992/10/14 20:19:19 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.26 1993/01/08 22:23:12 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.25 1992/10/14 20:19:19 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.26 1993/01/08 22:23:12 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -54,6 +54,11 @@ gethosttype()
 #  define _havehosttype_
     hosttype = "amiga";
 # endif /* AMIX */
+
+# ifdef accel /* Celerity Accel */
+#  define _havehosttype_
+    hosttype = "celerityACCEL";
+# endif /* Celerity Accel */
 
 # ifdef _VMS_POSIX
 #  define _havehosttype_

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dol.c,v 3.18 1992/10/14 20:19:19 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dol.c,v 3.19 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.18 1992/10/14 20:19:19 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.19 1993/01/08 22:23:12 christos Exp $")
 
 /*
  * C shell
@@ -541,7 +541,7 @@ Dgetdol()
 	    }
 	    if (subscr == 0) {
 		if (bitset) {
-		    dolp = ffile ? STR1 : STR0;
+		    dolp = dolzero ? STR1 : STR0;
 		    goto eatbrac;
 		}
 		if (ffile == 0)

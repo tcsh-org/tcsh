@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.exp.c,v 3.15 1992/11/13 04:19:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.exp.c,v 3.16 1992/11/14 20:40:02 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.15 1992/11/13 04:19:10 christos Exp christos $")
+RCSID("$Id: sh.exp.c,v 3.16 1992/11/14 20:40:02 christos Exp $")
 
 /*
  * C shell
@@ -694,11 +694,7 @@ exp6(vp, ignore)
 #endif
 		    break;
 
-		/* 
-		 * ARGH!!! sgi defines (-s == ! -z) Why? Can you change it? 
-		 * Here I am not going to be compatible; they should fix it!
-		 */
-		case 's':
+		case 'S':
 # ifdef S_ISSOCK
 		    i = S_ISSOCK(stb.st_mode);
 # else
@@ -748,6 +744,10 @@ exp6(vp, ignore)
 
 		case 'z':
 		    i = stb.st_size == 0;
+		    break;
+
+		case 's':
+		    i = stb.st_size != 0;
 		    break;
 
 		case 'e':

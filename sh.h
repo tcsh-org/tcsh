@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.49 1993/02/12 19:02:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.50 1993/03/05 20:14:33 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -471,6 +471,7 @@ EXTERN bool    isoutatty;	/* is SHOUT a tty */
 EXTERN bool    isdiagatty;	/* is SHDIAG a tty */
 EXTERN bool    is1atty;		/* is file descriptor 1 a tty (didfds mode) */
 EXTERN bool    is2atty;		/* is file descriptor 2 a tty (didfds mode) */
+EXTERN bool    arun;		/* Currently running multi-line-aliases */
 
 /*
  * Global i/o info
@@ -478,6 +479,7 @@ EXTERN bool    is2atty;		/* is file descriptor 2 a tty (didfds mode) */
 EXTERN Char   *arginp;		/* Argument input for sh -c and internal `xx` */
 EXTERN int     onelflg;		/* 2 -> need line for -t, 1 -> exit on read */
 extern Char   *ffile;		/* Name of shell file for $0 */
+extern bool    dolzero;		/* if $?0 should return true... */
 
 extern char *seterr;		/* Error message from scanner/parser */
 extern int errno;		/* Error from C library routines */
@@ -634,7 +636,12 @@ struct Ain {
 #define A_SEEK	0		/* Alias seek */
 #define F_SEEK	1		/* File seek */
 #define E_SEEK	2		/* Eval seek */
-    off_t f_seek;
+    union {
+	off_t _f_seek;
+	Char* _c_seek;
+    } fc;
+#define f_seek fc._f_seek
+#define c_seek fc._c_seek
     Char **a_seek;
 } ;
 

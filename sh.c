@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.43 1993/02/12 17:22:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.44 1993/03/05 20:14:33 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.43 1993/02/12 17:22:20 christos Exp $")
+RCSID("$Id: sh.c,v 3.44 1993/03/05 20:14:33 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -110,6 +110,7 @@ static bool    nverbose = 0;
 static bool    nexececho = 0;
 static bool    quitit = 0;
 static bool    rdirs = 0;
+bool    arun = 0;
 bool    fast = 0;
 static bool    batch = 0;
 static bool    mflag = 0;
@@ -118,6 +119,7 @@ static int     enterhist = 0;
 bool    tellwhat = 0;
 time_t  t_period;
 Char  *ffile = NULL;
+bool	dolzero = 0;
 static time_t  chktim;		/* Time mail last checked */
 
 extern char **environ;
@@ -210,6 +212,7 @@ main(argc, argv)
 
     tempv = argv;
     ffile = SAVE(tempv[0]);
+    dolzero = 0;
     if (eq(ffile, STRaout))	/* A.out's are quittable */
 	quitit = 1;
     uid = getuid();
@@ -782,6 +785,7 @@ main(argc, argv)
 	}
 	if (ffile != NULL)
 	    xfree((ptr_t) ffile);
+	dolzero = 1;
 	ffile = SAVE(tempv[0]);
 	/* 
 	 * Replace FSHIN. Handle /dev/std{in,out,err} specially
@@ -1514,7 +1518,7 @@ int snum;
 		 * whole job is gone. Otherwise we keep going...
 		 * But avoid sending HUP to the shell again.
 		 */
-		if ((np->p_flags & PFOREGND) != 0 && np->p_jobid == shpgrp &&
+		if ((np->p_flags & PFOREGND) != 0 && np->p_jobid != shpgrp &&
 		    killpg(np->p_jobid, SIGHUP) != -1) {
 		    /* In case the job was suspended... */
 		    (void) killpg(np->p_jobid, SIGCONT);
@@ -1782,7 +1786,7 @@ process(catch)
 	 * PWP: entry of items in the history list while in a while loop is done
 	 * elsewhere...
 	 */
-	if (enterhist || (catch && intty && !whyles && !tellwhat))
+	if (enterhist || (catch && intty && !whyles && !tellwhat && !arun))
 	    savehist(&paraml, enterhist > 1);
 
 	if (Expand && seterr)

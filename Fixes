@@ -1,4 +1,16 @@
 V6.04.00, ...
+ 45. 6.03.04 04/07/93
+ 44. Changed -s == !-z and -S == socket
+ 43. Fixed typo in sh.c, in phup [shpgrp != pr->pgrp]
+ 42. Multi-line aliases are not entered into the history when executed.
+ 41. Changed f_seek to a union to avoid gcc warnings on 4.4BSD
+ 40. Fixed 'unset home; dirs' bug
+ 39. fixed $HOME->$home memory problem.
+ 38. $?0 returns false now on interactive shells for csh compatibility.
+ 37. Default watch inteval was 10 hours not 10 minutes as advertized in the
+     manual!
+ 36. Fixed clobbered veriable warning from gcc-1.39 in tw.parse.c
+ 35. Fixed typo with INVPTR in sh.lex.c
  34. 6.03.03 03/04/93
  33. Eliminate 'Reset tty pgrp error message'. It is normal for the
      walking process group stuff. Check about the killpg() above?

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.26 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.c,v 3.27 1992/10/10 18:17:34 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.26 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.27 1992/10/10 18:17:34 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1071,10 +1071,18 @@ xgetwd(pathname)
 		    continue;
 		(void) strcpy(cur_name_add, d->d_name);
 		if (lstat(nextpathptr, &st_next) == -1) {
+		    /*
+		     * We might not be able to stat() some path components
+		     * if we are using afs, but this is not an error as
+		     * long as we find the one we need
+		     */
+		    continue;
+#ifdef notdef
 		    (void) xsprintf(pathname, "getwd: Cannot stat \"%s\" (%s)",
 				    d->d_name, strerror(errno));
 		    (void) closedir(dp);
 		    return (NULL);
+#endif
 		}
 		/* check if we found it yet */
 		if (st_next.st_ino == st_cur.st_ino &&

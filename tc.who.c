@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.who.c,v 3.15 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.who.c,v 3.16 1992/10/05 02:41:30 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.15 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.16 1992/10/05 02:41:30 christos Exp $")
 
 #include "tc.h"
 
@@ -188,9 +188,9 @@ watch_login()
     }
     trim(vp = v->vec);
     if (blklen(vp) % 2)		/* odd # args: 1st == # minutes. */
-	interval = (number(*vp)) ? getn(*vp++) : MAILINTVL;
+	interval = (number(*vp)) ? (getn(*vp++) * 60) : MAILINTVL;
     (void) time(&t);
-    if (t - watch_period < interval * 60) {
+    if (t - watch_period < interval) {
 #ifdef BSDSIGS
 	(void) sigsetmask(omask);
 #else
