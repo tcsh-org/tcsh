@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.39 1992/04/10 16:38:09 christos Exp $
+.\" $Id: tcsh.man,v 3.40 1992/04/24 21:50:47 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -2690,8 +2690,8 @@ builtins can change the behaviour of the listing and file-completion
 in tcsh. For example some commands like 
 .I cd,
 .I pushd,
-.I popd 
-.I mkdir(1)
+.I popd ,
+.I mkdir(1),
 .I rmdir(1)
 accept only directories as arguments.
 Normally
@@ -2708,7 +2708,7 @@ that these commands only expect directory arguments:
 .sp
 The above command tells 
 .I tcsh
-to complete the any following word with a directory.
+to complete any following word with a directory.
 .PP 
 The syntax for the
 .I complete 
@@ -2716,11 +2716,11 @@ and
 .I uncomplete
 builtins is:
 .sp
-.I complete [<command-pattern>] [<completion-argument>]
+.I complete [<command-pattern> [<completion-argument>]]
 .br
 .I uncomplete <command-pattern>
 .PP
-Completion arguments are matched in turn from left to write and
+Completion arguments are matched in turn from left to right and
 the first sucessful match is returned.
 There are three different completion arguments, modelled after the
 .I sed(1) 
@@ -2758,7 +2758,7 @@ position 0, that matches the pattern
 .I "co*".
 If a match is found, the word is replaced with the literal pattern
 "complete". The leading '-'
-in the pattern signifies that is completion is to be used only with
+in the pattern signifies that this completion is to be used only with
 ambiguous commands.
 .TP 
 .B n,N
@@ -2826,14 +2826,15 @@ $var	Complete using words from variable
 .DT
 .sp
 All the above completion actions, except 
+.I x,
 .I $var,
-.I (...)
+.I (...),
 and
-.i "`...`"
+.I "`...`"
 can have an additional shell pattern which must match the files to be
-completed. The 
+completed, separated from the action with a ':'. The 
 .I 'x'
-completion action takes as argument the explanation string.
+completion action instead expects the explanation string specified this way.
 For example, in the C compiler, it makes sense to complete only files
 that the compiler understands:
 .sp
@@ -2883,7 +2884,7 @@ can be used to change the list of items to be completed:
 > complete which	'n/*/c/'	
 > complete dbx 	'p/2/(core)/' 'n/*/c/'
 > complete alias 	'p/1/a/'		# complete aliases
-> complete set 	'p/1/s/			# complete variables
+> complete set 	'p/1/s/'			# complete variables
 > complete finger 	'p/1/u/'		# complete user-names
 .fi
 .RE
@@ -2969,8 +2970,8 @@ Another useful feature is to override the default suffix rules.
 For example:
 .sp
 .nf
-> complete rcp 'p/1/$hosts/:' 'c/*:/f/'
-> finger 'p/1/u/@' 'c/*@/$hosts/'
+> complete rcp 'c/*:/f/' 'p/1/$hosts/:'
+> complete finger 'c/*@/$hosts/' 'p/1/u/@'
 .fi
 .sp
 completes from $hosts appending a `:' and then begins expanding files, 
@@ -2980,8 +2981,8 @@ hosts.
 Another exotic example that makes use of dynamic command execution is:
 .sp
 .nf
-> complete talk p/1/'`users | tr " " "\012" | uniq`'/ \e
-                      n/\e*/\e`who\ \e|\e grep\e \e$:1\e \e|\e awk\e \e'\e{\e print\e \e$2\e \e}\e'\e`/
+> complete talk p/1/'`users | tr " " "\e012" | uniq`'/ \e
+           n/\e*/\e`who\e \e|\e grep\e \e$:1\e \e|\e awk\e \e'\e{\e print\e \e$2\e \e}\e'\e`/
 .fi
 .sp
 Here we want to get a list of the active users, as an argument to talk,
@@ -3220,7 +3221,7 @@ can be set to:
 in order to resolve the full path names,
 .I "ignore",
 in order to use $cwd to resolve relative directory references for builting.
-.I "follow,
+.I "expand",
 in order to use $cwd and rewrite the arguments for commands.
 .TP 10
 .B tcsh

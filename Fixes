@@ -1,4 +1,13 @@
 V6.02.00, ...
+87. 6.01.13 (5/02/92) 
+86. Fixes in listing and completion of non-unique commands.
+85. Fix =stack entries > 9... from Bill Petro
+84. Fix for last character at margin. [on terminals that have am & xm move
+    the cursor manually to the next line]
+83. Fix for complete completions 
+82. small typo in tc.alloc.c from Mark Moraes.
+81. small typo in tw.parse.c from Richard.
+80. Man page fixes from Per.
 79. 6.01.12 (4/24/92) [release version for 6.02]
 78. Autosuffix was not getting reset all the time.
 77. Don't limit completion patterns to 1K.
@@ -9,7 +18,7 @@ V6.02.00, ...
     > echo !:2!:3[magic-space]
 73. Work-around for apollo optimizer in tc.bind.c
 72. Problem with setjmp in tw.parse.c
-71. symlinks=expand from Ymin.
+71. symlinks=expand from Yumin.
 70. tenematch() fixes from Michael;
 69. 6.01.10 (4/3/92)
 68. Fixed Gnmatch.

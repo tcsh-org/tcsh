@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.dir.c,v 3.13 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.dir.c,v 3.14 1992/04/03 22:15:14 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.13 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.14 1992/04/03 22:15:14 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -74,7 +74,7 @@ dinit(hp)
     static char *emsg = "tcsh: Trying to start from \"%s\"\n";
 
     /* Don't believe the login shell home, because it may be a symlink */
-    tcp = (char *) getwd(path);		/* see ngetwd.c for System V version */
+    tcp = (char *) getwd(path);
     if (tcp == NULL || *tcp == '\0') {
 	xprintf("tcsh: %s\n", path);
 	if (hp && *hp) {

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.30 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.31 1992/04/24 21:50:07 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.30 1992/04/10 16:38:09 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.31 1992/04/24 21:50:07 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -818,40 +818,40 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    /*
 	     * Remove duplicates in command listing and completion
 	     */
-	    if (looking == TW_COMMAND) {
-		if (isadirectory(exp_dir, entry)) {
-		    copyn(ptr = buf, entry, MAXPATHLEN);
-		    len = Strlen(ptr);
-		    ptr[len++] = '/';
-		    buf[len] = '\0';
-
-		}
-		else
-		    ptr = entry;
-		if (tw_item_find(ptr))
-		    break;
-	    }
-		    
-	    if (command == LIST) {
-		len = Strlen(entry);
-		/* maximum length 1 (NULL) + 1 (~ or $) + 1 (filetype) */
-		ptr = tw_item_add(len + 3);
-		copyn(ptr, entry, len + 3);
-
+	    if (looking == TW_COMMAND || command == LIST) {
+		copyn(buf, entry, MAXPATHLEN);
+		len = Strlen(buf);
 		switch (looking) {
+		case TW_COMMAND:
+		    if (!(dir_ok && exec_check))
+			break;
+		    if (filetype(exp_dir, entry) == '/') {
+			buf[len++] = '/';
+			buf[len] = '\0';
+		    }
+		    break;
+
 		case TW_FILE:
 		case TW_DIRECTORY:
-		case TW_COMMAND:
-		    ptr[len++] = filetype(exp_dir, entry);
-		    ptr[len] = '\0';
+		    buf[len++] = filetype(exp_dir, entry);
+		    buf[len] = '\0';
 		    break;
 
 		default:
 		    break;
 		}
-		numitems++;
+		if (tw_item_find(buf))
+		    break;
+		else {
+		    /* maximum length 1 (NULL) + 1 (~ or $) + 1 (filetype) */
+		    ptr = tw_item_add(len + 3);
+		    copyn(ptr, buf, MAXPATHLEN);
+		    if (command == LIST)
+			numitems++;
+		}
 	    }
-	    else { /* RECOGNIZE */
+		    
+	    if (command == RECOGNIZE) {
 		if (ignoring && ignored(entry)) {
 		    nignored++;
 		    break;
@@ -1173,7 +1173,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
     /*
      * let fignore work only when we are not using a pattern
      */
-    flags |= (gpat == NULL) ? TW_IGN_OK : TW_PAT_OK;
+    flags |= (gpat == 0) ? TW_IGN_OK : TW_PAT_OK;
 
     if ((*word == '~') && (Strchr(word, '/') == NULL)) {
 	looking = TW_LOGNAME;
@@ -1415,30 +1415,31 @@ tilde(new, old)
 {
     register Char *o, *p;
 
-    if ((old[0] != '~') &&
-	(old[0] != '=' || (!Isdigit(old[1]) && old[1] != '-'))) {
-	(void) Strcpy(new, old);
-	return (new);
-    }
-
-    for (p = new, o = &old[1]; *o && *o != '/'; *p++ = *o++)
-	continue;
-    *p = '\0';
-
-    if (old[0] == '~') {
+    switch (old[0]) {
+    case '~':
+	for (p = new, o = &old[1]; *o && *o != '/'; *p++ = *o++) 
+	    continue;
+	*p = '\0';
 	if (gethdir(new)) {
 	    new[0] = '\0';
-	    return (NULL);
+	    return NULL;
 	}
-    }
-    else {			/* '=' stack expansion */
-	if (!getstakd(new, (old[1] == '-') ? -1 : old[1] - '0')) {
-	    new[0] = '\0';
-	    return (NULL);
+	(void) Strcat(new, o);
+	return new;
+
+    case '=':
+	if ((p = globequal(new, old)) == NULL) {
+	    *new = '\0';
+	    return NULL;
 	}
+	if (p == new)
+	    return new;
+	/*FALLTHROUGH*/
+
+    default:
+	(void) Strcpy(new, old);
+	return new;
     }
-    (void) Strcat(new, o);
-    return (new);
 } /* end tilde */
 
 

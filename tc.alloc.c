@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.alloc.c,v 3.10 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.alloc.c,v 3.11 1992/04/03 22:15:14 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.10 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.11 1992/04/03 22:15:14 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -580,6 +580,6 @@ showall(v, c)
     memtop = (char *) sbrk(0);
     xprintf("Allocated memory from 0x%lx to 0x%lx (%ld).\n",
 	    (unsigned long) membot, (unsigned long) memtop, 
-	    (long) memtop - membot);
+	    (unsigned long) (memtop - membot));
 #endif				/* SYSMALLOC */
 }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.init.c,v 3.9 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.init.c,v 3.10 1992/04/03 22:15:14 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.9 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.10 1992/04/03 22:15:14 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -578,7 +578,7 @@ tw_complete_start(dfd, pat)
     extern struct varent completions;
     SETDIR(dfd)
     tw_vptr_start(&completions);
-    tw_env = STR_environ;
+    tw_env = NULL;
 } /* end tw_complete_start */
 
 

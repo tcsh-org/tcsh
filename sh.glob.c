@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.glob.c,v 3.20 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.glob.c,v 3.21 1992/04/24 21:50:47 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.20 1992/04/10 16:38:09 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.21 1992/04/24 21:50:47 christos Exp $")
 
 #include "tc.h"
 
@@ -75,7 +75,6 @@ static long    pargc = 0;
  *
  */
 static	Char	 *globtilde	__P((Char **, Char *));
-static	Char	 *globequal	__P((Char **, Char *));
 static	Char	**libglob	__P((Char **));
 static	Char	**globexpand	__P((Char **));
 static	int	  globbrace	__P((Char *, Char *, Char ***));
@@ -125,30 +124,45 @@ globtilde(nv, s)
     return (Strsave(gstart));
 }
 
-static Char *
-globequal(nv, s)
-    Char  **nv, *s;
+Char *
+globequal(new, old)
+    Char *new, *old;
 {
     int     dig;
-    Char    gp[MAXPATHLEN], *b, *d;
+    Char    *b = NULL, *d;
 
     /*
      * kfk - 17 Jan 1984 - stack hack allows user to get at arbitrary dir names
      * in stack. PWP: let =foobar pass through (for X windows)
      */
-    if ((Isdigit(s[1]) || s[1] == '-') && (s[2] == '\0' || s[2] == '/')) {
-	dig = (s[1] == '-') ? -1 : s[1] - '0';
-	if (!getstakd(gp, dig)) {
-	    blkfree(nv);
-	    stderror(ERR_DEEP);
-	}
-	for (b = &s[2], d = &gp[Strlen(gp)]; (*d++ = *b++) != '\0';)
-	    continue;
-	xfree((ptr_t) s);
-	return (Strsave(gp));
+    if (old[1] == '-' && (old[2] == '\0' || old[2] == '/')) {
+	/* =- */
+	dig = -1;
+	b = &old[2];
+    }
+    else if (Isdigit(old[1])) {
+	/* =<number> */
+	dig = old[1] - '0';
+	for (b = &old[2]; Isdigit(*b); b++)
+	    dig = dig * 10 + (*b - '0');
+	if (*b != '\0' && *b != '/')
+	    /* =<number>foobar */
+	    return old;
     }
     else
-	return (s);
+	/* =foobar */
+	return old;
+
+    if (!getstakd(new, dig))
+	return NULL;
+
+    /* Copy the rest of the string */
+    for (d = &new[Strlen(new)]; 
+	 d < &new[MAXPATHLEN - 1] && (*d++ = *b++) != '\0';)
+	continue;
+    *d = '\0';
+
+    return new;
 }
 
 static int
@@ -370,11 +384,21 @@ globexpand(v)
     vl = nv;
     for (s = *vl; s; s = *++vl)
 	switch (*s) {
+	    Char gp[MAXPATHLEN], *ns;
 	case '~':
 	    *vl = globtilde(nv, s);
 	    break;
 	case '=':
-	    *vl = globequal(nv, s);
+	    if ((ns = globequal(gp, s)) == NULL) {
+		/* Error */
+		blkfree(nv);
+		stderror(ERR_DEEP);
+	    }
+	    if (ns != s) {
+		/* Expansion succeeded */
+		xfree((ptr_t) s);
+		*vl = Strsave(gp);
+	    }
 	    break;
 	default:
 	    break;

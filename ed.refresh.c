@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/ed.refresh.c,v 3.6 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.refresh.c,v 3.7 1992/03/27 01:59:46 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.6 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.7 1992/03/27 01:59:46 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -1101,10 +1101,15 @@ PutPlusOne(c)
 	CursorH = 0;
 	CursorV++;
 	OldvcV++;
+	(void) putraw('\r');
+	(void) putraw('\n');
+#ifdef notdef
 	if (T_Margin != (MARGIN_AUTO|MARGIN_MAGIC)) {
+	    /* Cannot do that yet */
 	    (void) putraw('\r');
 	    (void) putraw('\n');
 	}
+#endif
     }
 }
 

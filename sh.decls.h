@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.decls.h,v 3.9 1992/03/21 22:34:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.decls.h,v 3.10 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -164,6 +164,7 @@ extern	void		  wfree		__P((void));
 /*
  * sh.glob.c
  */
+extern	Char	 	 *globequal	__P((Char *, Char *));
 extern	Char		**dobackp	__P((Char *, bool));
 extern	void		  Gcat		__P((Char *, Char *));
 extern	Char		 *globone	__P((Char *, int));
