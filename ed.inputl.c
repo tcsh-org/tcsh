@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.inputl.c,v 3.45 1997/10/27 22:44:22 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.inputl.c,v 3.46 1998/10/25 15:09:52 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.45 1997/10/27 22:44:22 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.46 1998/10/25 15:09:52 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -812,6 +812,20 @@ SpellLine(cmdonly)
 	     */
 	    if((Cursor - InputBuf) != 2 || (char)InputBuf[1] != ':')
 #endif /* WINNT */
+	    {
+#ifdef HASH_SPELL_CHECK
+		Char save;
+		size_t len = Cursor - InputBuf;
+
+		save = InputBuf[len];
+		InputBuf[len] = '\0';
+		if (find_cmd(InputBuf, 0) != 0) {
+		    InputBuf[len] = save;
+		    argptr = Cursor;
+		    continue;
+		}
+		InputBuf[len] = save;
+#endif /* HASH_SPELL_CHECK */
 		switch (tenematch(InputBuf, Cursor - InputBuf, SPELL)) {
 		case 1:		/* corrected */
 		    matchval = 1;
@@ -823,7 +837,7 @@ SpellLine(cmdonly)
 		default:		/* was correct */
 		    break;
 		}
-
+	    }
 	    if (LastChar != OldLastChar) {
 		if (argptr < OldCursor)
 		    OldCursor += (LastChar - OldLastChar);

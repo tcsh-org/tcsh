@@ -131,10 +131,6 @@
 /* have been moved to config_f.h */
 #include "config_f.h"
 
-/* that gives too long startup delays for me */
-
-#undef REMOTEHOST
-
 #define NLS_CATALOGS
 
 #endif /* _h_config */

@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.28 1995/05/06 17:51:58 christos Exp $
+# $Id: complete.tcsh,v 1.29 1998/07/07 12:06:10 christos Exp $
 # example file using the new completion code
 #
 
@@ -42,6 +42,7 @@ if ($?complete) then
 
     complete ywho  	n/*/\$hosts/	# argument from list in $hosts
     complete rsh	p/1/\$hosts/ c/-/"(l n)"/   n/-l/u/ N/-l/c/ n/-/c/ p/2/c/ p/*/f/
+    complete ssh	p/1/\$hosts/ c/-/"(l n)"/   n/-l/u/ N/-l/c/ n/-/c/ p/2/c/ p/*/f/
     complete xrsh	p/1/\$hosts/ c/-/"(l 8 e)"/ n/-l/u/ N/-l/c/ n/-/c/ p/2/c/ p/*/f/
     complete rlogin 	p/1/\$hosts/ c/-/"(l 8 e)"/ n/-l/u/
     complete telnet 	p/1/\$hosts/ p/2/x:'<port>'/ n/*/n/
@@ -173,9 +174,9 @@ if ($?complete) then
 
     complete dd c/--/"(help version)"/ c/[io]f=/f/ \
 		c/conv=*,/"(ascii ebcdic ibm block unblock \
-			    lcase ucase swab noerror sync)"/,\
+			    lcase notrunc ucase swab noerror sync)"/,\
 		c/conv=/"(ascii ebcdic ibm block unblock \
-			  lcase ucase swab noerror sync)"/,\
+			  lcase notrunc ucase swab noerror sync)"/,\
 	        c/*=/x:'<number>'/ \
 		n/*/"(if of conv ibs obs bs cbs files skip file seek count)"/=
 
@@ -184,7 +185,8 @@ if ($?complete) then
     complete ar c/[dmpqrtx]/"(c l o u v a b i)"/ p/1/"(d m p q r t x)"// \
 		p/2/f:*.a/ p/*/f:*.o/
 
-    complete {refile,sprev,snext,scan,pick,rmm,inc,folder,show} \
+    # these should be merged with the MH completion hacks below - jgotts
+    complete {sprev,snext} \
 		c@+@F:$HOME/Mail/@
 
     # these and interrupt handling from Jaap Vermeulen <jaap@sequent.com>
@@ -207,8 +209,17 @@ if ($?complete) then
 			      filsys sloc service)/'
 
     # these from E. Jay Berkenbilt <ejb@ERA.COM>
-    complete ./configure 'c/--*=/f/' 'c/--{cache-file,prefix,srcdir}/(=)//' \
-			 'c/--/(cache-file verbose prefix srcdir)//'
+    # = isn't always followed by a filename or a path anymore - jgotts
+    complete ./configure 'c/--*=/f/' 'c/--{cache-file,prefix,exec-prefix,\
+    				bindir,sbindir,libexecdir,datadir,\
+				sysconfdir,sharedstatedir,localstatedir,\
+				libdir,includedir,oldincludedir,infodir,\
+				mandir,srcdir}/(=)//' \
+			 'c/--/(cache-file verbose prefix exec-prefix bindir \
+			 	sbindir libexecdir datadir sysconfdir \
+				sharedstatedir localstatedir libdir \
+				includedir oldincludedir infodir mandir \
+				srcdir)//'
     complete gs 'c/-sDEVICE=/(x11 cdjmono cdj550 epson eps9high epsonc \
 			      dfaxhigh dfaxlow laserjet ljet4 sparc pbm \
 			      pbmraw pgm pgmraw ppm ppmraw bit)/' \
@@ -449,6 +460,7 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
     complete xhost	c/[+-]/\$hosts/ n/*/\$hosts/
 
     # these conform to the latest GNU versions available at press time ...
+    # updates by John Gotts <jgotts@engin.umich.edu>
 
     complete emacs	c/-/"(batch d f funcall i insert kill l load \
 			no-init-file nw q t u user)"/ c/+/x:'<line_number>'/ \
@@ -490,60 +502,101 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
     complete zforce	n/*/f:^*.{gz,tgz}/
 
     complete grep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
-			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			c/--/"(extended-regexp fixed-regexp basic-regexp \
+			regexp file ignore-case word-regexp line-regexp \
+			no-messages revert-match version help byte-offset \
+			line-number with-filename no-filename quiet silent \
+			text directories recursive files-without-match \
+			files-with-matches count before-context after-context \
+			context binary unix-byte-offsets)"/ \
+			c/-/"(A a B b C c d E e F f G H h i L l n q r s U u V \
+				v w x)"/ \
 			p/1/x:'<limited_regular_expression>'/ N/-*e/f/ \
 			n/-*e/x:'<limited_regular_expression>'/ n/-*f/f/ n/*/f/
     complete egrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
-			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			c/--/"(extended-regexp fixed-regexp basic-regexp \
+			regexp file ignore-case word-regexp line-regexp \
+			no-messages revert-match version help byte-offset \
+			line-number with-filename no-filename quiet silent \
+			text directories recursive files-without-match \
+			files-with-matches count before-context after-context \
+			context binary unix-byte-offsets)"/ \
+			c/-/"(A a B b C c d E e F f G H h i L l n q r s U u V \
+				v w x)"/ \
 			p/1/x:'<full_regular_expression>'/ N/-*e/f/ \
 			n/-*e/x:'<full_regular_expression>'/ n/-*f/f/ n/*/f/
     complete fgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
-			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			c/--/"(extended-regexp fixed-regexp basic-regexp \
+			regexp file ignore-case word-regexp line-regexp \
+			no-messages revert-match version help byte-offset \
+			line-number with-filename no-filename quiet silent \
+			text directories recursive files-without-match \
+			files-with-matches count before-context after-context \
+			context binary unix-byte-offsets)"/ \
+			c/-/"(A a B b C c d E e F f G H h i L l n q r s U u V \
+				v w x)"/ \
 			p/1/x:'<fixed_string>'/ N/-*e/f/ \
 			n/-*e/x:'<fixed_string>'/ n/-*f/f/ n/*/f/
 
     complete users	c/--/"(help version)"/ p/1/x:'<accounting_file>'/
-    complete who	c/--/"(heading mesg idle count help message version \
-			writable)"/ c/-/"(H T w i u m q s -)"/ \
+    complete who	c/--/"(heading idle count mesg message writable help \
+    			version)"/ c/-/"(H i m q s T w u -)"/ \
 			p/1/x:'<accounting_file>'/ n/am/"(i)"/ n/are/"(you)"/
 
-    complete chown	c/--/"(changes silent quiet verbose recursive help \
-			version)"/ c/-/"(c f v R -)"/ C@[./\$~]@f@ c/*[.:]/g/ \
+    complete chown	c/--/"(changes dereference no-dereference silent \
+    			quiet reference recursive verbose help version)"/ \
+			c/-/"(c f h R v -)"/ C@[./\$~]@f@ c/*[.:]/g/ \
 			n/-/u/. p/1/u/. n/*/f/
-    complete chgrp	c/--/"(changes silent quiet verbose recursive help \
-			version)"/ c/-/"(c f v R -)"/ n/-/g/ p/1/g/ n/*/f/
+    complete chgrp	c/--/"(changes no-dereference silent quiet reference \
+    			recursive verbose help version)"/ \
+			c/-/"(c f h R v -)"/ n/-/g/ p/1/g/ n/*/f/
+    complete chmod	c/--/"(changes silent quiet verbose reference \
+    			recursive help version)"/ c/-/"(c f R v)"/
+    complete df		c/--/"(all block-size human-readable si inodes \
+			kilobytes local megabytes no-sync portability sync \
+			type print-type exclude-type help version)"/ \
+			c/-/"(a H h i k l m P T t v x)"/
+    complete du		c/--/"(all block-size bytes total dereference-args \
+    			human-readable si kilobytes count-links dereference \
+			megabytes separate-dirs summarize one-file-system \
+			exclude-from exclude max-depth help version"/ \
+			c/-/"(a b c D H h k L l m S s X x)"/
 
     complete cat	c/--/"(number-nonblank number squeeze-blank show-all \
 			show-nonprinting show-ends show-tabs help version)"/ \
-			c/-/"(b e n s t u v A E T -)"/ n/*/f/
+			c/-/"(A b E e n s T t u v -)"/ n/*/f/
     complete mv		c/--/"(backup force interactive update verbose suffix \
 			version-control help version)"/ \
-			c/-/"(b f i u v S V -)"/ \
+			c/-/"(b f i S u V v -)"/ \
 			n/{-S,--suffix}/x:'<suffix>'/ \
 			n/{-V,--version-control}/"(t numbered nil existing \
 			never simple)"/ n/-/f/ N/-/d/ p/1/f/ p/2/d/ n/*/f/
-    complete cp		c/--/"(archive backup no-dereference force interactive \
-			link preserve symbolic-link update verbose parents \
-			one-file-system recursive suffix version-control help \
-			version)"/ c/-/"(a b d f i l p r s u v x P R S V -)"/ \
+    complete cp		c/--/"(archive backup no-dereference force \
+    			interactive link preserve parents sparse recursive \
+			symbolic-link suffix update verbose version-control \
+			one-file-system help version)"/ \
+			c/-/"(a b d f i l P p R r S s u V v x -)"/ \
 			n/-*r/d/ n/{-S,--suffix}/x:'<suffix>'/ \
 			n/{-V,--version-control}/"(t numbered nil existing \
 			never simple)"/ n/-/f/ N/-/d/ p/1/f/ p/2/d/ n/*/f/
-    complete ln		c/--/"(backup directory force interactive symbolic \
-			verbose suffix version-control help version)"/ \
-			c/-/"(b d F f i s v S V -)"/ \
+    complete ln		c/--/"(backup directory force no-dereference \
+    			interactive symbolic suffix verbose version-control \
+			help version)"/ \
+			c/-/"(b d F f i n S s V v -)"/ \
 			n/{-S,--suffix}/x:'<suffix>'/ \
 			n/{-V,--version-control}/"(t numbered nil existing \
 			never simple)"/ n/-/f/ N/-/x:'<link_name>'/ \
 			p/1/f/ p/2/x:'<link_name>'/
-    complete touch	c/--/"(date file help time version)"/ \
+    complete touch	c/--/"(date reference time help version)"/ \
 			c/-/"(a c d f m r t -)"/ \
 			n/{-d,--date}/x:'<date_string>'/ \
 			c/--time/"(access atime mtime modify use)"/ \
 			n/{-r,--file}/f/ n/-t/x:'<time_stamp>'/ n/*/f/
-    complete mkdir	c/--/"(parents help version mode)"/ c/-/"(p m -)"/ \
+    complete mkdir	c/--/"(mode parents verbose help version)"/ \
+    			c/-/"(p m -)"/ \
 			n/{-m,--mode}/x:'<mode>'/ n/*/d/
-    complete rmdir	c/--/"(parents help version)"/ c/-/"(p -)"/ n/*/d/
+    complete rmdir	c/--/"(ignore-fail-on-non-empty parents verbose help \
+    			version)"/ c/-/"(p -)"/ n/*/d/
 
     complete tar	c/-[Acru]*/"(b B C f F g G h i l L M N o P \
 			R S T v V w W X z Z)"/ \

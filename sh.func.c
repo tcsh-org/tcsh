@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.78 1998/10/25 15:10:12 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.79 1998/11/24 18:17:34 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.78 1998/10/25 15:10:12 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.79 1998/11/24 18:17:34 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1596,7 +1596,12 @@ tsetenv(name, val)
 	nt_set_env(name,val);
 #endif /* WINNT */
     for (; *ep; ep++) {
+#ifdef WINNT
+	for (cp = name, dp = *ep; *cp && Tolower(*cp & TRIM) == Tolower(*dp);
+				cp++, dp++)
+#else
 	for (cp = name, dp = *ep; *cp && (*cp & TRIM) == *dp; cp++, dp++)
+#endif WINNT
 	    continue;
 	if (*cp != 0 || *dp != '=')
 	    continue;

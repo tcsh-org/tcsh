@@ -220,6 +220,9 @@
 #define void int
 #endif /* aiws */
 
+/* > 2GB file support (stat64 etc.) */
+#define _LARGE_FILES
+
 /****************** configurable hacks ****************/
 /* have been moved to config_f.h */
 

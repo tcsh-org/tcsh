@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.83 1999/02/06 15:19:01 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.84 1999/02/14 13:43:20 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.83 1999/02/06 15:19:01 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.84 1999/02/14 13:43:20 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -357,9 +357,6 @@ dolist(v, c)
     }
     else {
 	Char   *dp, *tmp, buf[MAXPATHLEN];
-#ifdef WINNT
-	int is_unc = 0;
-#endif /* WINNT */
 
 	for (k = 0, i = 0; v[k] != NULL; k++) {
 	    tmp = dnormalize(v[k], symlinks == SYM_IGNORE);
@@ -369,17 +366,7 @@ dolist(v, c)
 		if (dp != &tmp[1])
 #endif /* apollo */
 		*dp = '\0';
-#ifdef WINNT
-		if ((((tmp[0] & CHAR) == '/') || ((tmp[0] & CHAR) == '\\')) &&  
-		    (((tmp[1] & CHAR) == '/') || ((tmp[1] & CHAR) == '\\')))
-		    is_unc = 1;
-#endif /* WINNT */
-	    if (
-#ifdef WINNT
-		((char)tmp[1] != ':') &&
-		(!is_unc) &&
-#endif /* WINNT */
-		stat(short2str(tmp), &st) == -1) {
+		if (stat(short2str(tmp), &st) == -1) {
 		if (k != i) {
 		    if (i != 0)
 			xputchar('\n');
@@ -388,12 +375,7 @@ dolist(v, c)
 		xprintf("%S: %s.\n", tmp, strerror(errno));
 		i = k + 1;
 	    }
-	    else if (
-#ifdef WINNT
-		((char)tmp[1] == ':') ||
-		(is_unc) ||
-#endif /* WINNT */
-		S_ISDIR(st.st_mode)) {
+	    else if (S_ISDIR(st.st_mode)) {
 		Char   *cp;
 
 		if (k != i) {

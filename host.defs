@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.23 1998/10/25 15:09:57 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.24 1998/11/24 18:17:24 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.23 1998/10/25 15:09:57 christos Exp $")
+RCSID("$Id: host.defs,v 1.24 1998/11/24 18:17:24 christos Exp $")
 
 endcode	:
 
@@ -900,6 +900,15 @@ comment	: Norsk Data ND 500/5000 running Ndix
 vendor	:						: "norsk"
 hosttype:						: "nd500"
 ostype	:						: "ndix"
+enddef	:
+
+
+newdef	: defined(AMIGA)
+comment	: Amiga running AmigaOS+GG
+vendor	:						: "commodore"
+hosttype:						: "amiga"
+ostype	:						: "AmigaOS"
+machtype:						: "m68k"
 enddef	:
 
 

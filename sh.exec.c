@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.45 1998/10/25 15:10:08 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.46 1998/11/24 18:17:30 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.45 1998/10/25 15:10:08 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.46 1998/11/24 18:17:30 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -922,7 +922,8 @@ executable(dir, name, dir_ok)
 	    int has_ext = 0;
 
 	    while (*ptr++)
-	    	continue;
+		continue;
+	    --ptr;
 
 	    while(ptr > p2) { 
 		if (*ptr == '/')

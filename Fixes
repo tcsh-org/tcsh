@@ -1,3 +1,9 @@
+ 39. V6.08.04 - 19990419
+ 38. complete additions (John Gotts)
+ 37. Port to amiga with geek gadgets (Arto Huusko)
+ 36. Ignore case in setenv for windows (amol)
+ 35. Bug fixes for NT unc stuff (amol)
+ 34. Hash spell check (amol)
  33. V6.08.03 - 19990211
  32. Helpcommand documentation (Vladimir Alexiev)
  31. small Y2K fix [%y in prompt would be formatted as 10 not 00 at year 2000],
