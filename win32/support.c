@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/support.c,v 1.3 2002/08/11 07:58:13 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/support.c,v 1.5 2003/11/04 01:37:44 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -836,7 +836,7 @@ char *concat_args_and_quote(char **args, char **poriginalPtr,char **cstr,
 			// If it's not the same heap block, re-adjust the pointers.
             if (tempptr != *poriginalPtr) {
 				cmdstr = tempptr + (cmdstr - *poriginalPtr);
-                cmdend = cmdstr + (cmdend- *poriginalPtr);
+                cmdend = tempptr + (cmdend- *poriginalPtr);
 				*poriginalPtr = tempptr;
             }
 			dprintf("after realloc: original %p, cmdstr %p\n",
