@@ -29,8 +29,7 @@
  */
  
 /* 
- * The fork() implementation borrows heavily from the cygnus gnu-win32
- * project's implementation. Check out www.cygnus.com for more information.
+ * The fork() here is based on the ideas used by cygwin
  * -amol
  *
  */
