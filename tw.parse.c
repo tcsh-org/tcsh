@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.14 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.15 1991/11/26 04:28:26 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.14 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.15 1991/11/26 04:28:26 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1253,24 +1253,26 @@ tilde(new, old)
 {
     register Char *o, *p;
 
-    if ((old[0] != '~') && (old[0] != '=')) {
+    if ((old[0] != '~') &&
+	(old[0] != '=' || (!Isdigit(old[1]) && old[1] != '-'))) {
 	(void) Strcpy(new, old);
 	return (new);
     }
 
-    new[0] = '\0';
     for (p = new, o = &old[1]; *o && *o != '/'; *p++ = *o++);
     *p = '\0';
 
     if (old[0] == '~') {
-	if (gethdir(new))
+	if (gethdir(new)) {
+	    new[0] = '\0';
 	    return (NULL);
+	}
     }
     else {			/* '=' stack expansion */
-	if (!Isdigit(old[1]) && old[1] != '-')
+	if (!getstakd(new, (old[1] == '-') ? -1 : old[1] - '0')) {
+	    new[0] = '\0';
 	    return (NULL);
-	if (!getstakd(new, (old[1] == '-') ? -1 : old[1] - '0'))
-	    return (NULL);
+	}
     }
     (void) Strcat(new, o);
     return (new);

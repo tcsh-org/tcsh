@@ -38,6 +38,7 @@ OS	:	hpux 6.5, 7.0.x, 8.0
 CONFIG	:	config.hpux
 ENVIRON	:	n/a
 NOTES	:	Don't use -lBSD; breaks getpgrp(). Config.hp-3.2 obsolete?
+NOTES	:	Gcc is not available on the 700's
 VERSION	:	6.00.03
 
 VENDOR	:	hp

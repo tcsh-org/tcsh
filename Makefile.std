@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.9 1991/11/22 02:28:12 christos Exp $
+# $Id: Makefile,v 1.10 1991/11/26 04:28:26 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -27,7 +27,7 @@ LFLAGS=$(INCLUDES)
 #LFLAGS=$(INCLUDES) -Zn10000		# hpux lint
 
 
-CFLAGS= $(INCLUDES) -g			# debug
+#CFLAGS= $(INCLUDES) -g			# debug
 #CFLAGS= $(INCLUDES) -O			# production
 #CFLAGS= $(INCLUDES) 			# Broken optimizers....
 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.c,v 1.4 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.c,v 1.5 1991/11/04 04:16:33 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.4 1991/10/21 17:24:49 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.5 1991/11/04 04:16:33 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -289,6 +289,9 @@ static struct tcshmodes {
 # ifdef	ALTWERASE
     { "altwerase",ALTWERASE,M_LINED },
 # endif /* ALTWERASE */
+# ifdef	EXTPROC
+    { "extproc",EXTPROC,M_LINED },
+# endif /* EXTPROC */
 
 #else /* GSTTY */
 

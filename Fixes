@@ -1,4 +1,21 @@
-V6.00.04, ....
+V6.01.00, ...
+6.  (V6.00.06 beta 12/05/91)
+7.  SunOS3's FIOCLEX dups...
+6.  Yet another globbing bug fix from Michael (echo .[^.])
+5.  Ultrix now wants __ before cpp symbols.
+4.  Workaround sun's header files inconsistency so tcsh can be compiled
+    with #undef POSIX
+3.  Fixed limit stuff so that large values don't cause errors.
+2.  Fixed =1 and ~user error messages (Per)
+1.  (beta-5 6.00.04 == 6.00.05)
+
+$#*
+$#* New numbering scheme (The last 2 digits are reserved for beta releases
+$#* from now on. So we start at 6.00.06 which is 6.00.04 beta 6, and we are
+$#* going to release 6.01.00...
+$#*
+
+V6.00.04, (never released)
 34. (beta-5 11/25/91)
 33. Simplify code in BindArrowKeys()
 32. Get rid of the PNULL's

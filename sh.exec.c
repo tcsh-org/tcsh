@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.6 1991/10/28 06:26:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.7 1991/11/11 01:56:34 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.6 1991/10/28 06:26:50 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.7 1991/11/11 01:56:34 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -148,7 +148,7 @@ doexec(t)
     register Char *dp, **pv, **av, *sav;
     register struct varent *v;
     register bool slash;
-    register int hashval = 0, i;
+    register int hashval, i;
     Char   *blk[2];
 
     /*
@@ -688,7 +688,7 @@ static int
 hashname(cp)
     register Char *cp;
 {
-    register long h = 0;
+    register long h;
 
     for (h = 0; *cp; cp++)
 	h = hash(h, *cp);
@@ -703,7 +703,7 @@ iscommand(name)
     register Char *sav;
     register struct varent *v;
     register bool slash = any(short2str(name), '/');
-    register int hashval = 0, i;
+    register int hashval, i;
 
     v = adrof(STRpath);
     if (v == 0 || v->vec[0] == 0 || slash)

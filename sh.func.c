@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.16 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.17 1991/11/26 04:28:26 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.16 1991/11/22 02:28:12 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.17 1991/11/26 04:28:26 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1588,9 +1588,13 @@ badscal:
 # if defined(convex) || defined(__convex__)
     return ((RLIM_TYPE) restrict_limit((f + 0.5)));
 # else
-    if ((f + 0.5) >= (float) lmax || (f + 0.5) < (float) lmin)
-	stderror(ERR_NAME | ERR_SCALEF);
-    return ((RLIM_TYPE) (f + 0.5));
+    f += 0.5;
+    if (f > (float) lmax)
+	return lmax;
+    else if (f < (float) lmin)
+	return lmin;
+    else
+	return ((RLIM_TYPE) f);
 # endif /* convex */
 }
 

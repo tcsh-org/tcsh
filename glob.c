@@ -615,7 +615,8 @@ match(name, pat, patend, m_not)
 	    break;
 	case M_SET:
 	    ok = 0;
-	    k = *name++;
+	    if ((k = *name++) == EOS)
+		return (0);
 	    if (negate_range = ((*pat & M_MASK) == m_not))
 		++pat;
 	    while (((c = *pat++) & M_MASK) != M_END) {

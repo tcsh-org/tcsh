@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.9 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.10 1991/11/22 02:28:12 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,16 +37,16 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.9 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.10 1991/11/22 02:28:12 christos Exp $")
 
 #include "tc.h"
 
 #ifdef FIOCLEX
-# ifndef sun
+# ifndef SUNOS4
 #  ifndef CLEX_DUPS
 #   define CLEX_DUPS
 #  endif /* CLEX_DUPS */
-# endif /* sun */
+# endif /* !SUNOS4 */
 #endif /* FIOCLEX */
 
 #ifdef sparc
