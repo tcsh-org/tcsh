@@ -1,3 +1,7 @@
+ 41. V6.13.05 - 20041121
+ 40. Protect HAVE_ICONV with NLS_CATALOGS
+ 39. Deal with wchar_t being unsigned.
+ 38. If we HAVEUTMPX redefine some utmp functions in terms of utmpx ones.
  37. V6.13.04 - 20041120
  36. Fix display problems with two-column characters when using WIDE_STRINGS.
      (Miloslav Trmac)
