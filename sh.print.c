@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.23 2004/11/21 04:28:12 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.print.c,v 3.24 2004/11/23 02:10:49 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.23 2004/11/21 04:28:12 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.24 2004/11/23 02:10:49 christos Exp $")
 
 #include "ed.h"
 
@@ -149,10 +149,11 @@ xputchar(c)
     if (!output_raw && (c & QUOTE) == 0) {
 	if (iscntrl(c) && (c < 0x80 || MB_CUR_MAX == 1)) {
 #ifdef COLORCAT
-	    if (c != '\t' && c != '\n' && !(adrof(STRcolorcat) && c=='\033') && (xlate_cr || c != '\r')) {
+	    if (c != '\t' && c != '\n' && !(adrof(STRcolorcat) && c=='\033') && (xlate_cr || c != '\r'))
 #else
-	    if (c != '\t' && c != '\n' && (xlate_cr || c != '\r')) {
+	    if (c != '\t' && c != '\n' && (xlate_cr || c != '\r'))
 #endif
+	    {
 		xputchar('^' | atr);
 #ifdef IS_ASCII
 		if (c == 0177)
