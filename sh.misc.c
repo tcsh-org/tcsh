@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.misc.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.misc.c,v 3.0 1991/07/04 23:34:26 christos Exp christos $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -37,7 +37,7 @@
 #include "config.h"
 #ifndef lint
 static char *rcsid() 
-    { return "$Id: sh.misc.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
+    { return "$Id: sh.misc.c,v 3.0 1991/07/04 23:34:26 christos Exp christos $"; }
 #endif
 
 #include "sh.h"
@@ -174,8 +174,8 @@ strstr(s, t)
     register const char *s, *t;
 {
     do {
-	register char *ss = s;
-	register char *tt = t;
+	register const char *ss = s;
+	register const char *tt = t;
 
 	do
 	    if (*tt == '\0')
@@ -185,7 +185,7 @@ strstr(s, t)
     return (NULL);
 }
 
-#endif				/* POSIX */
+#endif /* POSIX */
 
 #ifndef SHORT_STRINGS
 char   *
