@@ -1,8 +1,8 @@
-$ $Id: set27,v 1.2 1995/03/19 18:07:15 christos Exp $
+$ $Id: set27,v 1.1 2002/05/16 19:25:11 kunia Exp $
 $ tw.comp.c
 $set 27 
-1 command
-2 separator
-3 pattern
-4 range
-5 completion
+1 команда
+2 розд╕льник
+3 шаблон
+4 пром╕жок
+5 завершення

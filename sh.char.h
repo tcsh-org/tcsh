@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.char.h,v 3.18 2001/03/18 19:06:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.char.h,v 3.19 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -55,6 +55,7 @@ extern unsigned short _mbmap[];
 extern unsigned short _mbmap_euc[];
 extern unsigned short _mbmap_sjis[];
 extern unsigned short _mbmap_big5[];
+extern unsigned short _mbmap_utf8[];
 /* VARIABLE Check str */
 /* same compiler require #define even not define DSPMBYTE */
 #define _MB1	0x0001

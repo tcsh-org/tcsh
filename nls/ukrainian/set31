@@ -1,7 +1,7 @@
-$ $Id: set31,v 1.2 1995/03/19 18:07:15 christos Exp $
+$ $Id: set31,v 1.1 2002/05/16 19:25:11 kunia Exp $
 $ vms.termcap.c
 $set 31 
-1 Can't open TERMCAP: [%s]\n
-2 Can't open %s.\n
-3 Found %s in %s.\n
-4 No match found for %s in file %s\n
+1 Не можу в╕дкрити TERMCAP: [%s]\n
+2 Не можу в╕дкрити %s.\n
+3 Знайдено %s в %s.\n
+4 Не знайдено сп╕впадань по %s у %s\n

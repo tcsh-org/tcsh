@@ -1,4 +1,4 @@
-$ $Id: set5,v 1.2 1995/03/19 18:07:15 christos Exp $
+$ $Id: set5,v 1.1 2002/05/16 19:25:11 kunia Exp $
 $ ed.chared.c
 $set 5
-1 Load average unavailable\n
+1 Недоступне значення: середн╓ завантаження\n

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.char.c,v 3.16 2001/03/20 04:16:56 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.char.c,v 3.17 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.char.c: Character classification tables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.char.c,v 3.16 2001/03/20 04:16:56 christos Exp $")
+RCSID("$Id: sh.char.c,v 3.17 2002/03/08 17:36:46 christos Exp $")
 
 #include "sh.char.h"
 
@@ -870,6 +870,35 @@ unsigned short _mbmap_big5[256] = {
     _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	0,
 };
 
+unsigned short _mbmap_utf8[256] = {
+/* utf8 uses up to 6 bytes */
+/* first byte        0xc0 - 0xfd */
+/* any further bytes 0x80 - 0xbf */
+/* 0 - 7f all 0 */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+/*  80 - bf : all _MB2 */
+    _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2,
+    _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2,
+    _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2,
+    _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2,
+    _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2,
+    _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2,
+    _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2,
+    _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2, _MB2,
+/* c0 - fc : all _MB1 */
+    _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1,
+    _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1,
+    _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1,
+    _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1,
+    _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1,
+    _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1,
+    _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, _MB1,
+/*  f8    f9    fa    fb    fc    fd    fe    ff*/
+    _MB1, _MB1, _MB1, _MB1, _MB1, _MB1, 0,    0
+};
 
 #else /* !(defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)) */
 unsigned short _cmap[256] = {

@@ -3630,6 +3630,7 @@ See also the \fBcwd\fR and \fBowd\fR shell variables.
 If set to `euc', it enables display and editing EUC-kanji(Japanese) code.
 If set to `sjis', it enables display and editing Shift-JIS(Japanese) code.
 If set to `big5', it enables display and editing Big5(Chinese) code.
+If set to `utf8', it enables display and editing Utf8(Unicode) code.
 If set to the following format, it enables display and editing of original
 multi-byte code format:
 .RS +8
@@ -3673,6 +3674,11 @@ The GNU fileutils version of ls cannot display multi-byte
 filenames without the -N ( --literal ) option.   If you are using
 this version, set the second word of dspmbyte to "ls".  If not, for
 example, "ls-F -l" cannot display multi-byte filenames.
+.PP
+  Note:
+.br
+This variable can only be used if KANJI and DSPMBYTE has been defined at
+compile time.
 .RE
 .TP 8
 .B dunique \fR(+)
