@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -37,7 +37,7 @@
 #include "config.h"
 #ifndef lint
 static char *rcsid()
-    { return "$Id: ed.inputl.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
+    { return "$Id: ed.inputl.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -449,12 +449,10 @@ GetNextChar(cp)
     register Char *cp;
 {
     register int num_read;
-
 #if defined(EWOULDBLOCK) || (defined(POSIX) && defined(EAGAIN))
 # if defined(FIONBIO) || (defined(F_SETFL) && defined(O_NDELAY))
 #  define TRY_AGAIN
     int     tried = 0;
-
 # endif				/* FIONBIO || (F_SETFL && O_NDELAY) */
 #endif				/* EWOULDBLOCK || (POSIX && EAGAIN) */
     unsigned char tcp;
@@ -504,9 +502,9 @@ GetNextChar(cp)
 		tried = 1;
 		break;
 	    }
-#endif
 	    *cp = tcp;
 	    return (num_read);
+#endif /* TRY_AGAIN */
 #ifdef _SEQUENT_
 	case EBADF:
 #endif				/* _SEQUENT_ */
