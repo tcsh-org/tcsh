@@ -1,4 +1,4 @@
-# $Id: Makefile.vms,v 1.13 1993/07/03 23:47:53 christos Exp $
+# $Id: Makefile.vms,v 1.14 1993/08/11 16:25:52 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -336,7 +336,7 @@ tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
 	@echo '\#define _h_tc_const' >> $@
 	${CC} -E $(INCLUDES) ${DFLAGS} -D_h_tc_const tc.const.c | \
 	    grep 'Char STR' | \
-	    sed -e 's/Char \([a-zA-Z0-9_]*\)\(.*\)/extern Char \1[];/' | \
+	    sed -e 's/Char \([a-zA-Z0-9_]*\)\[.*/extern Char \1[];/' | \
 	    sort >> $@
 	@echo '\#endif /* _h_tc_const */' >> $@
 

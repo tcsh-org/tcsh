@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.56 1993/07/03 23:47:53 christos Exp christos $
+# $Id: Makefile.std,v 1.57 1993/08/11 16:25:52 christos Exp christos $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -112,7 +112,7 @@ DFLAGS=
 
 
 ################################################################
-## LDLAGS.  Define something here if you need to
+## LDFLAGS.  Define something here if you need to
 ################################################################
 LDFLAGS= 			## The simplest, suitable for all.
 #LDFLAGS= -s			## Stripped. Takes less space on disk.

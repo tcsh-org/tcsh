@@ -1,4 +1,24 @@
-V6.05.00, ...
+V6.05.00, ... 
+ 35. New manual page in place.
+ 34. Fixed Makefile sed RE to work with gnu sed.
+ 33. Added hup builtin.
+ 32. Added $REMHOST in config_f.h
+ 31. Fixed random parsing bug in sh.exp.c in isa(). It checked cp[1]
+     without checking cp[0] first... (should propagate to 4.4BSD)
+ 30. More sh.exp.c fixes from Bruce
+ 29. Always exit when the user types exit. 
+     cat | tcsh -f -s
+     exit
+     ls
+ 28. savedirs fix and readlink() null termination fix from Peter.
+ 27. Added -p flag (force dirs printing in all directory functions and $owd
+     variable
+ 26. Let $dirstack work by default without needing to be set.
+ 25. Fixed history -h to work with other history flags.
+ 24. Renamed ed-functions more consistently (dcs)
+ 23. Added missing filetests (dcs)
+ 22. Added NEWGRP define in config_f.h (dcs)
+ 21. More fixes for non blocking io recovery from Bruce
  20. 6.04.02, 10/08/93
  19. changed default prompt to %#
  18. New group 'g' completion.
