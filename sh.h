@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.99 2002/03/07 18:44:58 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.100 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -609,7 +609,7 @@ extern bool    filec;
 #endif /* FILEC */
 
 extern char *seterr;		/* Error message from scanner/parser */
-#ifndef BSD4_4
+#if !defined(BSD4_4) && !defined(__linux__)
 extern int errno;		/* Error from C library routines */
 #endif
 extern int exitset;
