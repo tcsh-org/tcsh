@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.65 1994/03/13 00:46:35 christos Exp christos $
+# $Id: Makefile.std,v 1.66 1994/04/12 15:46:46 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -93,6 +93,9 @@ CFLAGS=-O2 $(INCLUDES) -g
 # Pyramid OS/x
 #CFLAGS = -OG
 
+# Multiflow (5M binary... if you choose -O5!)
+#CFLAGS = -O5 -sb_trace 0
+
 # Apollo's with cc [apollo builtins don't work with gcc]
 # and apollo should not define __STDC__ if it does not have
 # the standard header files. RT's (aos4.3) need that too;
@@ -110,6 +113,8 @@ CFLAGS=-O2 $(INCLUDES) -g
 #DFLAGS=-D_VMS_POSIX
 # DEC/osf-1 on the alpha
 #DFLAGS=-D_BSD
+# Multiflow
+#DFLAGS=-DMULTIFLOW
 DFLAGS=
 #DFLAGS=-D_PATH_TCSH='"${DESTBIN}/tcsh"'
 
@@ -171,6 +176,7 @@ LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a ## Stardent Vistra
 #LIBES= -ltermc				 ## emx under OS/2
 #LIBES=					 ## Minix, VMS_POSIX
+#LIBES= -ltermcap -lcrypt		 ## Multiflow
 
 ################################################################
 ## EXTRAFLAGS and EXTRALIBS

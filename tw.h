@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.h,v 3.15 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.h,v 3.16 1994/03/31 22:36:44 christos Exp $ */
 /*
  * tw.h: TwENEX functions headers
  */
@@ -91,7 +91,8 @@ extern Char PromptBuf[];
 
 typedef enum {
     LIST, LIST_ALL, RECOGNIZE, RECOGNIZE_ALL, RECOGNIZE_SCROLL, 
-    PRINT_HELP, SPELL, GLOB, GLOB_EXPAND, VARS_EXPAND, PATH_NORMALIZE
+    PRINT_HELP, SPELL, GLOB, GLOB_EXPAND, VARS_EXPAND, PATH_NORMALIZE,
+    COMMAND_NORMALIZE
 } COMMAND;
 
 struct scroll_tab_list {

@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.04/RCS/host.defs,v 1.3 1994/03/13 00:46:35 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/host.defs,v 1.4 1994/04/12 15:46:46 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.3 1994/03/13 00:46:35 christos Exp christos $")
+RCSID("$Id: host.defs,v 1.4 1994/04/12 15:46:46 christos Exp $")
 
 endcode	:
 
@@ -661,6 +661,14 @@ hosttype:						: "gould_np1"
 machtype:						: "gould"
 enddef	:
 
+newdef	: defined(MULTIFLOW)
+comment	: Multiflow running 4.3BSD
+vendor	:						: "multiflow"
+hosttype:						: "multiflow"
+machtype:						: "multiflow"
+ostype	:						: "bsd43"
+enddef	:
+
 
 newdef	: defined(SXA)
 comment	: PFU/Fujitsu A-xx computer
@@ -684,6 +692,14 @@ comment	: Stellar
 vendor	:						: "stellar"
 hosttype:						: "stellar"
 ostype	:						: "stellix"
+enddef	:
+
+newdef	: defined(atari)
+comment	: Atari TT running SVR4. This machine was never
+comment	: commercially available.
+vendor	:						: "atari"
+hosttype:						: "atari"
+ostype	:						: "asv"
 enddef	:
 
 

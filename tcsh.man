@@ -50,7 +50,7 @@
 .\"   Remember to note OS-specific things in "OS variant support", new features
 .\"   in NEW FEATURES and referenced external commands in SEE ALSO.
 .\" 
-.TH TCSH 1 "28 April 1994" "Cornell 6.04.12"
+.TH TCSH 1 "7 May 1994" "Cornell 6.04.13"
 .SH NAME
 tcsh - C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -2350,9 +2350,9 @@ Different \fIlist\fRs are useful with different commands.
 > complete true 'p/1/x:Truth has no options./'
 .PP
 These complete words following `alias' with aliases, `man' with commands,
-`rlogin' with hostnames from the `hostnames' variable and `set' with shell variables.
+and `set' with shell variables.
 `true' doesn't have any options, so \fBx\fR does nothing when completion
-is attempted and prints `No options.' when completion choices are listed.
+is attempted and prints `Truth has no options.' when completion choices are listed.
 .PP
 Words can be completed from a variable evaluated at completion time,
 .IP "" 4
@@ -3408,7 +3408,7 @@ separators and hyphens and underscores to be equivalent.
 .TP 8
 .B correct \fR(+)
 If set to `cmd', commands are automatically spelling-corrected.
-If set to `correct', commands are automatically completed.
+If set to `complete', commands are automatically completed.
 If set to `all', the entire command line is corrected.
 .TP 8
 .B cwd
@@ -4453,7 +4453,7 @@ access(2), execve(2), fork(2), killpg(2), pipe(2), setrlimit(2),
 sigvec(2), stat(2), umask(2), vfork(2), wait(2), malloc(3), setlocale(3), tty(4),
 a.out(5), termcap(5), environ(7), termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.12 (Cornell) 94/04/28.
+This man page documents tcsh 6.04.13 (Cornell) 94/05/07.
 .SH AUTHORS
 .PD 0
 .TP 2

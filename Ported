@@ -718,3 +718,14 @@ CONFIG	:	hcx
 ENVIRON :	universe bsd
 NOTES	:	n/a
 VERSION :	6.04.00
+
+VENDOR	:	Multiflow
+MODELS	:	multiflow
+COMPILER:	cc
+CFLAGS	:	-O5 -sb_trace 0
+LIBES	:	-ltermcap -lcrypt
+OS	:	4.3 BSD TRACE/UNIX
+CONFIG	:	bsd
+ENVIRON :	n/a
+NOTES	:	Lower the optimization or you'll get a 5M binary!
+VERSION :	6.04.00

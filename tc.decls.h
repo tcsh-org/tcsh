@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.decls.h,v 3.27 1994/02/10 14:36:00 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.decls.h,v 3.28 1994/04/12 15:46:46 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -87,6 +87,7 @@ extern	void		  dolist	__P((Char **, struct command *));
 extern	void		  dotelltc	__P((Char **, struct command *));
 extern	void		  doechotc	__P((Char **, struct command *));
 extern	void		  dosettc	__P((Char **, struct command *));
+extern	int		  cmd_expand	__P((Char *, Char *));
 extern	void		  dowhich	__P((Char **, struct command *));
 extern	struct process	 *find_stop_ed	__P((void));
 extern	void		  fg_proc_entry	__P((struct process *));

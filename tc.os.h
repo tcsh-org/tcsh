@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.58 1994/04/12 15:46:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.59 1994/04/28 13:28:46 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -654,10 +654,10 @@ extern int getpeername __P((int, struct sockaddr *, int *));
 #endif /* SUNOS4 && __GNUC__ == 2 */
 
 #if (defined(BSD) && !defined(__386BSD__)) || defined(SUNOS4) 
-# ifndef DECOSF1
+# if defined(__alpha) && defined(__osf__) && DECOSF1 < 200
 extern void bcopy	__P((const void *, void *, size_t));
+#  define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
 # endif
-# define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
 #endif /* (BSD && !__386BSD__) || SUNOS4 */
 
 #if !defined(hpux) && !defined(COHERENT) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(__386BSD__) && !defined(memmove)
@@ -684,17 +684,14 @@ extern int wait3();	/* I think some bizarre systems still need this */
 # endif /* SOLARIS2 */
 #endif /* SYSVREL == 4 */
 
-#ifdef notdef
+#if defined(__alpha) && defined(__osf__) && DECOSF1 < 200
 /* These are ok for 1.3, but conflict with the header files for 2.0 */
-/* can someone fix them so the work for both? */
-#if defined(__osf__) && defined(__alpha)
 extern int gethostname __P((char *, int));
 extern void *sbrk __P((ssize_t));
 extern int ioctl __P((int, unsigned long, char *));
 extern pid_t vfork __P((void));
 extern int killpg __P((pid_t, int));
 extern char *getwd __P((char *));
-#endif /* __osf__ && __alpha */
-#endif
+#endif /* __osf__ && __alpha && DECOSF1 < 200 */
 
 #endif /* _h_tc_os */

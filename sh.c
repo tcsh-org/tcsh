@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.60 1994/03/13 00:46:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.61 1994/04/12 15:46:46 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.60 1994/03/13 00:46:35 christos Exp $")
+RCSID("$Id: sh.c,v 3.61 1994/04/12 15:46:46 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1874,7 +1874,7 @@ process(catch)
 	 * If had a tellwhat from twenex() then do
 	 */
 	if (tellwhat) {
-	    tellmewhat(&paraml);
+	    (void) tellmewhat(&paraml, NULL);
 	    reset();
 	}
 

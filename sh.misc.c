@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.misc.c,v 3.18 1993/01/08 22:23:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.misc.c,v 3.19 1993/08/11 16:25:52 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.18 1993/01/08 22:23:12 christos Exp christos $")
+RCSID("$Id: sh.misc.c,v 3.19 1993/08/11 16:25:52 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -108,6 +108,19 @@ blkpr(av)
 	xprintf("%S", *av);
 	if (av[1])
 	    xprintf(" ");
+    }
+}
+
+void
+blkexpand(av, str)
+    register Char **av;
+    Char *str;
+{
+    *str = '\0';
+    for (; *av; av++) {
+	(void) Strcat(str, *av);
+	if (av[1])
+	    (void) Strcat(str, STRspace);
     }
 }
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.54 1994/04/12 15:46:46 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.55 1994/04/28 13:28:46 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.54 1994/04/12 15:46:46 christos Exp christos $")
+RCSID("$Id: tc.func.c,v 3.55 1994/04/28 13:28:46 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -402,17 +402,15 @@ dosettc(v, c)
  *  West-Germany
  * Thanks!!
  */
-
-/*ARGSUSED*/
-void
-dowhich(v, c)
-    register Char **v;
-    struct command *c;
+int
+cmd_expand(cmd, str)
+    Char *cmd;
+    Char *str;
 {
     struct wordent lexp[3];
     struct varent *vp;
+    int rv = TRUE;
 
-    USE(c);
     lexp[0].next = &lexp[1];
     lexp[1].next = &lexp[2];
     lexp[2].next = &lexp[0];
@@ -423,6 +421,31 @@ dowhich(v, c)
 
     lexp[0].word = STRNULL;
     lexp[2].word = STRret;
+
+    if ((vp = adrof1(cmd, &aliases)) != NULL) {
+	if (str == NULL) {
+	    xprintf("%S: \t aliased to ", cmd);
+	    blkpr(vp->vec);
+	    xputchar('\n');
+	}
+	else 
+	    blkexpand(vp->vec, str);
+    }
+    else {
+	lexp[1].word = cmd;
+	rv = tellmewhat(lexp, str);
+    }
+    return rv;
+}
+
+
+/*ARGSUSED*/
+void
+dowhich(v, c)
+    register Char **v;
+    struct command *c;
+{
+    USE(c);
 
 #ifdef notdef
     /* 
@@ -442,17 +465,9 @@ dowhich(v, c)
     }
 #endif
 
-    while (*++v) {
-	if ((vp = adrof1(*v, &aliases)) != NULL) {
-	    xprintf("%S: \t aliased to ", *v);
-	    blkpr(vp->vec);
-	    xputchar('\n');
-	}
-	else {
-	    lexp[1].word = *v;
-	    tellmewhat(lexp);
-	}
-    }
+    while (*++v) 
+	(void) cmd_expand(*v, NULL);
+
 #ifdef notdef
     /* Again look at the comment above; since we don't glob, we don't free */
     if (gargv)

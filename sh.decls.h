@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.23 1994/01/31 16:04:49 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.24 1994/02/04 15:12:06 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -97,7 +97,7 @@ extern	void		  execash	__P((Char **, struct command *));
 extern	void		  hashstat	__P((Char **, struct command *));
 extern	void		  xechoit	__P((Char **));
 extern	int		  executable	__P((Char *, Char *, bool));
-extern	void		  tellmewhat	__P((struct wordent *));
+extern	int		  tellmewhat	__P((struct wordent *, Char *));
 extern	void		  dowhere	__P((Char **, struct command *));
 extern	int		  find_cmd	__P((Char *, int));
 
@@ -218,6 +218,7 @@ extern	Char		**blkcpy	__P((Char **, Char **));
 extern	void		  blkfree	__P((Char **));
 extern	int		  blklen	__P((Char **));
 extern	void		  blkpr		__P((Char **));
+extern	void		  blkexpand	__P((Char **, Char *));
 extern	Char		**blkspl	__P((Char **, Char **));
 extern	void		  closem	__P((void));
 #ifndef CLOSE_ON_EXEC

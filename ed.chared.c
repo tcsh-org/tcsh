@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.39 1993/12/16 16:51:24 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.40 1994/02/04 15:16:59 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.39 1993/12/16 16:51:24 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.40 1994/02/04 15:16:59 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1826,6 +1826,17 @@ e_normalize_path(c)
     *LastChar = '\0';		/* just in case */
     return(CC_NORMALIZE_PATH);
 }
+
+/*ARGSUSED*/
+CCRETVAL
+e_normalize_command(c)
+    int c;
+{
+    USE(c);
+    *LastChar = '\0';		/* just in case */
+    return(CC_NORMALIZE_COMMAND);
+}
+
 /*ARGSUSED*/
 CCRETVAL
 e_expand_vars(c)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.decls.h,v 3.17 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.decls.h,v 3.18 1993/10/30 19:50:16 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -224,6 +224,7 @@ extern	CCRETVAL	v_rchar_back		__P((int));
 extern  CCRETVAL        v_charto_fwd		__P((int));
 extern  CCRETVAL        v_charto_back		__P((int));
 extern  CCRETVAL        e_normalize_path	__P((int));
+extern  CCRETVAL        e_normalize_command	__P((int));
 extern  CCRETVAL        e_stuff_char		__P((int));
 extern  CCRETVAL        e_list_all		__P((int));
 extern  CCRETVAL        e_complete_all		__P((int));

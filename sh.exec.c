@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.28 1994/03/13 00:46:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.29 1994/04/12 15:46:46 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.28 1994/03/13 00:46:35 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.29 1994/04/12 15:46:46 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -885,9 +885,10 @@ executable(dir, name, dir_ok)
 	      access(strname, X_OK) == 0)));
 }
 
-void
-tellmewhat(lexp)
+int
+tellmewhat(lexp, str)
     struct wordent *lexp;
+    Char *str;
 {
     register int i;
     register struct biltins *bptr;
@@ -931,12 +932,16 @@ tellmewhat(lexp)
 
     for (bptr = bfunc; bptr < &bfunc[nbfunc]; bptr++) {
 	if (eq(sp->word, str2short(bptr->bname))) {
-	    if (aliased)
-		prlex(lexp);
-	    xprintf("%S: shell built-in command.\n", sp->word);
-	    flush();
+	    if (str == NULL) {
+		if (aliased)
+		    prlex(lexp);
+		xprintf("%S: shell built-in command.\n", sp->word);
+		flush();
+	    }
+	    else 
+		(void) Strcpy(str, sp->word);
 	    sp->word = s0;	/* we save and then restore this */
-	    return;
+	    return TRUE;
 	}
     }
 
@@ -965,22 +970,32 @@ tellmewhat(lexp)
 		prlex(lexp);
 	    sp->word = s0;	/* we save and then restore this */
 	    xfree((ptr_t) cmd);
-	    return;
+	    return TRUE;
 	}
 	s1 = Strspl(*pv, STRslash);
 	sp->word = Strspl(s1, sp->word);
 	xfree((ptr_t) s1);
-	prlex(lexp);
+	if (str == NULL)
+	    prlex(lexp);
+	else
+	    Strcpy(str, sp->word);
 	xfree((ptr_t) sp->word);
     }
     else {
-	if (aliased)
-	    prlex(lexp);
-	xprintf("%S: Command not found.\n", sp->word);
-	flush();
+	if (str == NULL) {
+	    if (aliased)
+		prlex(lexp);
+	    xprintf("%S: Command not found.\n", sp->word);
+	    flush();
+	}
+	else {
+	    Strcpy(str, sp->word);
+	    return FALSE;
+	}
     }
     sp->word = s0;		/* we save and then restore this */
     xfree((ptr_t) cmd);
+    return TRUE;
 }
 
 /*

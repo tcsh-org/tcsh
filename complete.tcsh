@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.21 1993/07/03 23:47:53 christos Exp $
+# $Id: complete.tcsh,v 1.22 1994/03/31 22:36:44 christos Exp christos $
 # example file using the new completion code
 #
 
@@ -22,23 +22,27 @@ if ($?complete) then
 	       guillemin.ee.cornell.edu theory.tc.cornell.edu \
 	       vangogh.cs.berkeley.edu)
 
-    complete rsh	n/*/\$hosts/	# argument from list in $hosts
-    complete ywho  	n/*/\$hosts/
+    complete ywho  	n/*/\$hosts/	# argument from list in $hosts
+    complete rsh	c/-/"(l n)"/   n/-l/u/ n/*/\$hosts/
+    complete xrsh   	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/
+    complete rlogin 	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/
+    complete telnet 	p/1/\$hosts/ p/2/x:'<port>'/ n/*/n/
+
     complete cd  	p/1/d/		# Directories only
     complete chdir 	p/1/d/
     complete pushd 	p/1/d/
     complete popd 	p/1/d/
     complete pu 	p/1/d/
     complete po 	p/1/d/
-    complete mkdir 	p/1/d/
-    complete rmdir 	p/1/d/
-    complete complete 	p/1/C/
-    complete uncomplete p/1/C/
-    complete exec 	p/1/c/
+    complete mkdir	n/*/d/
+    complete rmdir	n/*/d/
+    complete complete 	p/1/X/		# Completions only
+    complete uncomplete	n/*/X/
+    complete exec 	p/1/c/		# Commands only
     complete trace 	p/1/c/
     complete strace 	p/1/c/
-    complete which 	p/1/c/
-    complete where 	p/1/c/
+    complete which	n/*/c/
+    complete where	n/*/c/
     complete skill 	p/1/c/
     complete dde	p/1/c/ 
     complete adb	p/1/c/ 
@@ -48,18 +52,14 @@ if ($?complete) then
     complete gdb	p/1/c/
     complete ups	p/1/c/
     complete set	'c/*=/f/' 'p/1/s/=' 'n/=/f/'
-    complete unset	p/1/s/
-    complete unsetenv 	p/1/e/
+    complete unset	n/*/s/
     complete alias 	p/1/a/		# only aliases are valid
-    complete unalias 	p/1/a/
+    complete unalias	n/*/a/
     complete xdvi 	n/*/f:*.dvi/	# Only files that match *.dvi
     complete dvips 	n/*/f:*.dvi/
-    complete latex 	n/*/f:*.tex/
+    complete latex 	n/*/f:*.tex/	# Only files that match *.tex
     complete tex 	n/*/f:*.tex/
-    complete rlogin 	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/ 
-    complete telnet 	n/*/\$hosts/ 
     complete su		c/-/"(f c)"/ n/-c/c/ n/*/u/
-    complete xrsh   	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/ 
     complete cc 	c/-I/d/ c/-L/d/ \
               c@-l@'`\ls -1 /usr/lib/lib*.a | sed s%^.\*/lib%%\;s%\\.a\$%%`'@ \
 			c/-/"(o l c g L I D U)"/ n/*/f:*.[coa]/
@@ -112,8 +112,8 @@ if ($?complete) then
 			p/1/'x:<key-sequence or option>'/
 
     complete find 	n/-fstype/"(nfs 4.2)"/ n/-name/f/ \
-		  	n/-type/"(c b d f p l s)"/ n/-user/u/ n/-exec/c/ \
-		  	n/-ok/c/ n/-cpio/f/ n/-ncpio/f/ n/-newer/f/ \
+		  	n/-type/"(c b d f p l s)"/ n/-user/u/ n/-group/g/ \
+			n/-exec/c/ n/-ok/c/ n/-cpio/f/ n/-ncpio/f/ n/-newer/f/ \
 		  	c/-/"(fstype name perm prune type user nouser \
 		  	     group nogroup size inum atime mtime ctime exec \
 			     ok print ls cpio ncpio newer xdev depth)"/ \
@@ -173,6 +173,12 @@ if ($?complete) then
 		c@+@F:$HOME/Mail/@
 
     # More completions from waz@quahog.nl.nuwc.navy.mil (Tom Warzeka)
+    # you may need to set the following variables for your host
+    set _elispdir = /usr/local/lib/emacs/19.22/lisp  # GNU Emacs lisp directory
+    set _maildir = /var/spool/mail  # Post Office: /var/spool/mail or /usr/mail
+    set _ypdir  = /var/yp	# directory where NIS (YP) maps are kept
+    set _domain = `domainname`
+
     # this one works but is slow and doesn't descend into subdirectories
     # complete	cd	C@[./]*@d@ \
     #			p@1@'`\ls -1F . $cdpath | grep /\$ | sort -u`'@ n@*@n@
@@ -182,20 +188,17 @@ if ($?complete) then
     else
 	complete setenv	p@1@e@ n@DISPLAY@\$hosts@:
     endif
+    complete unsetenv	n/*/e/
 
-
-
-    # replace "/usr/local/emacs" with your GNU Emacs main directory
     complete emacs	c/-/"(batch d f funcall i insert kill l load \
-			no-init-file q t u user)"/ c/+/x:'<line_number>'/ \
+			no-init-file nw q t u user)"/ c/+/x:'<line_number>'/ \
 			n/-d/x:'<display>'/ n/-f/x:'<lisp_function>'/ n/-i/f/ \
-			n@-l@F:/usr/local/emacs/lisp@ n/-t/x:'<terminal>'/ \
+			n@-l@F:$_elispdir@ n/-t/x:'<terminal>'/ \
 			n/-u/u/ n/*/f:^*[\#~]/
 
-    # if you're running SysV, change "/var/spool" to "/usr"
     complete mail       c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
 			c@+@F:$HOME/Mail@ C@[./]@f@ n/-s/x:'<subject>'/ \
-			n@-u@F:/var/spool/mail@ n/-f/f/ n/*/u/
+			n@-u@T:$_maildir@ n/-f/f/ n/*/u/
 
     complete man	    n@1@'`\ls -1 /usr/man/man1 | sed s%\\.1.\*\$%%`'@ \
 			    n@2@'`\ls -1 /usr/man/man2 | sed s%\\.2.\*\$%%`'@ \
@@ -210,8 +213,9 @@ if ($?complete) then
   n@new@'`[ -r /usr/man/mann ] && \ls -1 /usr/man/mann | sed s%\\.n.\*\$%%`'@ \
   n@old@'`[ -r /usr/man/mano ] && \ls -1 /usr/man/mano | sed s%\\.o.\*\$%%`'@ \
 n@local@'`[ -r /usr/man/manl ] && \ls -1 /usr/man/manl | sed s%\\.l.\*\$%%`'@ \
-n@public@'`[ -r /usr/man/manp ] && \ls -1 /usr/man/manp| sed s%\\.p.\*\$%%`'@ \
-		c/-/"(- f k P s t)"/ n/-f/c/ n/-k/x:'<keyword>'/ n/-P/d/ n/*/c/
+n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
+		c/-/"(- f k P s t)"/ n/-f/c/ n/-k/x:'<keyword>'/ n/-P/d/ \
+		N@-P@'`\ls -1 $:-1/man? | sed s%\\..\*\$%%`'@ n/*/c/
 
     complete touch 	c/-/"(a c f m)"/ n/*/f/
     complete xhost	c/[+-]/\$hosts/ n/*/\$hosts/
@@ -246,6 +250,7 @@ n@public@'`[ -r /usr/man/manp ] && \ls -1 /usr/man/manp| sed s%\\.p.\*\$%%`'@ \
 
     complete znew	c/-/"(f t v 9 P K)"/ n/*/f:*.Z/
     complete zmore	n/*/f:*.{gz,Z,z,zip}/
+    complete zfile	n/*/f:*.{gz,Z,z,zip,taz,tgz}/
     complete ztouch	n/*/f:*.{gz,Z,z,zip,taz,tgz}/
     complete zforce	n/*/f:^*.{gz,tgz}/
 
@@ -262,21 +267,20 @@ n@public@'`[ -r /usr/man/manp ] && \ls -1 /usr/man/manp| sed s%\\.p.\*\$%%`'@ \
 			p/1/x:'<fixed_string>'/ \
 			n/-*e/x:'<fixed_string>'/ n/-*f/f/ n/*/f/
 
-
     complete users	p/1/x:'<accounting_file>'/
     complete who	p/1/x:'<accounting_file>'/ n/am/"(i)"/ n/are/"(you)"/
     complete ps	        c/-t/x:'<tty>'/ c/-/"(a c C e g k l S t u v w x)"/ \
 			n/-k/x:'<kernel>'/ N/-k/x:'<core_file>'/ n/*/x:'<PID>'/
 
-    complete chgrp	c/-/"(f R)"/ n/-*/x:'<group>'/ p/1/x:'<group>'/ n/*/f/
-    complete chown	c/-/"(f R)"/ n/-*/u/           p/1/u/           n/*/f/
+    complete chown	c/-/"(f R)"/ c/*./g/ n/-/u/. p/1/u/. n/*/f/
+    complete chgrp	c/-/"(f R)"/         n/-/g/  p/1/g/  n/*/f/
 
     complete cat	c/-/"(b e n s t u v)"/ n/*/f/
-    complete mv		c/-/"(f i)"/ n/-*/f/ N/-*/d/ p/1/f/ p/2/d/ n/*/f/
-    complete cp		c/-/"(i p r)"/ n/-*r*/d/ n/-*/f/ N/-*/d/ \
+    complete mv		c/-/"(f i)"/ n/-/f/ N/-/d/ p/1/f/ p/2/d/ n/*/f/
+    complete cp		c/-/"(i p r)"/ n/-*r/d/ n/-/f/ N/-/d/ \
 			p/1/f/ p/2/d/ n/*/f/
 
-    complete ln		c/-/"(f s)"/ n/-*/f/ N/-*/x:'<link_name>'/ \
+    complete ln		c/-/"(f s)"/ n/-/f/ N/-/x:'<link_name>'/ \
 			p/1/f/ p/2/x:'<link_name>'/
 
     complete tar 	c/-[cru]*/"(b B C f F FF h i l m o p v w)"/ \
@@ -285,10 +289,25 @@ n@public@'`[ -r /usr/man/manp ] && \ls -1 /usr/man/manp| sed s%\\.p.\*\$%%`'@ \
 			c/-/"(b B C f F FF h i l m o p v w)"/ \
 			n/-c*f/x:'<new_tar_file or "-">'/ n/-*f/f:*.tar/ \
 			n/-[cru]*b/x:'<block_size>'/ n/-b/x:'<block_size>'/ \
-			n/-C/d/ N/-C/x:'<file or ".">'/ n/*/f/
+			n/-C/d/ N/-C/'`\ls $:-1`'/ n/*/f/
 
     complete compress	c/-/"(c f v b)"/ n/-b/x:'<max_bits>'/ n/*/f:^*.Z/
     complete uncompress	c/-/"(c f v)"/                        n/*/f:*.Z/
+
+    complete domainname	p@1@D:$_ypdir@" " n@*@n@
+    complete ypcat	c@-@"(d k t x)"@ n@-x@n@ n@-d@D:$_ypdir@" " \
+	    N@-d@\`\\ls\ -1\ $_ypdir/\$:-1\ \|\ sed\ -n\ s%\\\\.pag\\\$%%p\`@ \
+	  n@*@\`\\ls\ -1\ $_ypdir/$_domain\ \|\ sed\ -n\ s%\\\\.pag\\\$%%p\`@
+    complete ypmatch	c@-@"(d k t x)"@ n@-x@n@ n@-d@D:$_ypdir@" " \
+			n@-@x:'<key ...>'@ p@1@x:'<key ...>'@ \
+	    N@-d@\`\\ls\ -1\ $_ypdir/\$:-1\ \|\ sed\ -n\ s%\\\\.pag\\\$%%p\`@ \
+	  n@*@\`\\ls\ -1\ $_ypdir/$_domain\ \|\ sed\ -n\ s%\\\\.pag\\\$%%p\`@
+    complete ypwhich	c@-@"(d m t x V1 V2)"@ n@-x@n@ n@-d@D:$_ypdir@" " \
+	 n@-m@\`\\ls\ -1\ $_ypdir/$_domain\ \|\ sed\ -n\ s%\\\\.pag\\\$%%p\`@ \
+			N@-m@n@ n@*@\$hosts@
+
+    # there's no need to clutter the user's shell with these
+    unset _elispdir _maildir _ypdir _domain
 
     unset noglob
     unset complete

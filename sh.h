@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.62 1994/02/10 14:36:00 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.63 1994/03/13 00:46:35 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -180,13 +180,13 @@ typedef int sigret_t;
 #endif 
 
 #if !defined(_MINIX) && !defined(_VMS_POSIX)
-#include <sys/param.h>
+# include <sys/param.h>
 #endif /* _MINIX && vmsposix atp */
 #include <sys/stat.h>
 
 #if defined(BSDTIMES) || defined(BSDLIMIT)
 # include <sys/time.h>
-# if SYSVREL>3 && !defined(sgi) && !defined(sun)
+# if SYSVREL>3 && !defined(sgi) && !defined(sun) && !(defined(__alpha) && defined(__osf__))
 #  include "/usr/ucbinclude/sys/resource.h"
 # else
 #  include <sys/resource.h>
@@ -366,7 +366,12 @@ extern int setpgrp();
 # define _exit		exit
 typedef  int		pret_t;
 #else
+# ifndef MULTIFLOW
 typedef void		pret_t;
+# else
+/* Multiflow compiler bug */
+#  define pret_t	void
+# endif
 #endif /* PURIFY */
 
 typedef int bool;
