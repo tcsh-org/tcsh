@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.85 1999/04/20 07:48:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.86 1999/07/01 05:45:36 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.85 1999/04/20 07:48:51 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.86 1999/07/01 05:45:36 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1010,8 +1010,10 @@ period_cmd()
     periodic_active = 1;
     if (!whyles && adrof1(STRperiodic, &aliases)) {
 	vp = varval(STRtperiod);
-	if (vp == STRNULL)
-	    return;
+	if (vp == STRNULL) {
+	    aliasrun(1, STRperiodic, NULL);
+	    goto leave;
+	}
 	interval = getn(vp);
 	(void) time(&t);
 	if (t - t_period >= interval * 60) {
