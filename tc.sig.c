@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.c,v 3.25 2000/07/04 19:46:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.c,v 3.26 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.25 2000/07/04 19:46:24 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.26 2002/03/08 17:36:47 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -293,7 +293,7 @@ sigsetmask(mask)
 
     m = 0;
     for (i = 1; i <= MAXSIG; i++)
-	if (sigismember(&oset, i))
+	if (sigismember(&oset, i) == 1)
 	    SETBIT(m, i);
 
     return (m);
@@ -333,7 +333,7 @@ sigblock(mask)
     /* Return old mask to user. */
     m = 0;
     for (i = 1; i <= MAXSIG; i++)
-	if (sigismember(&oset, i))
+	if (sigismember(&oset, i) == 1)
 	    SETBIT(m, i);
 
     return (m);
