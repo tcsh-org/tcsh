@@ -1,3 +1,14 @@
+ 37. V6.13.04 - 20041120
+ 36. Fix display problems with two-column characters when using WIDE_STRINGS.
+     (Miloslav Trmac)
+ 35. Change charset declarations for some of the translations.
+     (Miloslav Trmac)
+ 34. Set O_LARGEFILE properly (Miloslav Trmac)
+ 33. Use libc functions to access utmp data (Miloslav Trmac)
+ 32. t_pmatch() was not really case-insensitive when cs == 8
+     (Miloslav Trmac)
+ 31. Fix escaping of "control" bytes 0x80..0x9F when they are actually
+     parts of UTF-8 character representation.  (Miloslav Trmac)
  30. V6.13.03 - 20041120
  29. More close_on_exec fixes (Miloslav Trmac)
  28. SUSE dspmbyte fixes (via Harald)
