@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.8 1991/07/20 20:30:42 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.9 1991/07/23 23:20:08 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -336,10 +336,10 @@ extern int gethostname();
 extern int sigvec();
 extern int sigpause();
 #  else	/* _AIX370 || MACH || NeXT || _AIXPS2 */
-#   if !defined(apollo) && !defined(__STDC__)
+#   if !defined(apollo) || !defined(__STDC__)
 extern sigret_t sigvec();
 extern void sigpause();
-#   endif /* !apollo && !__STDC__ */
+#   endif /* !apollo || !__STDC__ */
 #  endif /* _AIX370 || MACH || NeXT || _AIXPS2 */
 extern sigmask_t sigblock();
 extern sigmask_t sigsetmask();
