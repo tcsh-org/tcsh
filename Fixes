@@ -1,4 +1,6 @@
 V6.05.00, ... 
+ 78. 6.04.10 03/29/94
+ 80. make spelling correction obey the current histchars setting.
  79. Fix rounding in limits so that 0 is a true 0. 
      (From Ken Lalonde <ken@cs.berkeley.edu>)
  78. 6.04.09 03/12/94
