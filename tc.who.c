@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.7 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.8 1991/11/17 05:39:06 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.7 1991/10/21 17:24:49 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.8 1991/11/17 05:39:06 christos Exp $")
 
 #include "tc.h"
 
@@ -134,8 +134,6 @@ static	void	print_who	__P((struct who *));
 void
 initwatch()
 {
-    register unsigned i;
-
     whohead.w_next = &whotail;
     whotail.w_prev = &whohead;
 #ifdef WHODEBUG
