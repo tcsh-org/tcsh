@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.44 1993/03/05 20:14:33 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.45 1993/04/07 21:39:23 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.44 1993/03/05 20:14:33 christos Exp $")
+RCSID("$Id: sh.c,v 3.45 1993/04/07 21:39:23 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1761,9 +1761,10 @@ process(catch)
 	 * Echo not only on VERBOSE, but also with history expansion. If there
 	 * is a lexical error then we forego history echo.
 	 */
-	if ((lex(&paraml) && !seterr && intty && !tellwhat && !Expand) ||
-	    adrof(STRverbose)) {
+	if ((lex(&paraml) && !seterr && intty && !tellwhat && !Expand && 
+	     !whyles) || adrof(STRverbose)) {
 	    haderr = 1;
+	    xprintf("here\n");
 	    prlex(&paraml);
 	    haderr = 0;
 	}
