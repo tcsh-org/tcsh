@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.49 2004/05/19 18:51:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.50 2004/07/24 21:52:49 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.49 2004/05/19 18:51:43 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.50 2004/07/24 21:52:49 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1265,7 +1265,7 @@ autoset_dspmbyte(pcp)
 
     for (i = 0; dspmt[i].n; i++) {
 	Char *estr;
-	if (t_pmatch(pcp, dspmt[i].n, &estr, 1) > 0) {
+	if (dspmt[i].n[0] && t_pmatch(pcp, dspmt[i].n, &estr, 1) > 0) {
 	    set(CHECK_MBYTEVAR, Strsave(dspmt[i].v), VAR_READWRITE);
 	    update_dspmbyte_vars();
 	    break;

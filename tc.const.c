@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.const.c,v 3.73 2004/02/21 22:05:18 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.const.c,v 3.74 2004/03/21 16:48:15 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.73 2004/02/21 22:05:18 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.74 2004/03/21 16:48:15 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -128,7 +128,7 @@ Char STRKEUC[]		= { 'e', 'u', 'c', '\0' };
 Char STRKSJIS[]		= { 's', 'j', 'i', 's', '\0' };
 Char STRKBIG5[]         = { 'b', 'i', 'g', '5', '\0' };
 Char STRKUTF8[]         = { 'u', 't', 'f', '8', '\0' };
-Char STRSTARKUTF8[]     = { '*', 'u', 't', 'f', '8', '\0' };
+Char STRSTARKUTF8[]     = { '*', 'u', 't', 'f', '*', '8', '\0' };
 #  ifdef MBYTEDEBUG	/* Sorry, use for beta testing */
 Char STRmbytemap[]	= { 'm', 'b', 'y', 't', 'e', 'm', 'a', 'p', '\0' };
 #  endif /* MBYTEMAP */
