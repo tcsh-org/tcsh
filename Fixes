@@ -2,7 +2,7 @@
      alphanumeric names (Ton Voon)
  50. Don't expand path components that don't resolve to path names (Jonathan
      Chen)
- 49. Make $ignoreeof agree with the man page(Matias Moreno Meringer)
+ 49. Make $ignoreeof agree with the man page (Matias Moreno Meringer)
  48. Fix argument passing in tc.prompt.c expdollar (Nelson Beebe)
  47. Completion fixes from FreeBSD (Mark Peek)
  46. FreeBSD's sbsize limit (Mark Peek)
