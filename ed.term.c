@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.term.c,v 1.22 1998/04/21 16:08:39 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.term.c,v 1.23 1998/06/27 12:27:07 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -37,7 +37,7 @@
 #include "sh.h"
 #ifndef WINNT
 
-RCSID("$Id: ed.term.c,v 1.22 1998/04/21 16:08:39 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.23 1998/06/27 12:27:07 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -533,14 +533,47 @@ static struct tcshmodes {
     { NULL, 0, -1 },
 };
 
+/*
+ * If EAGAIN and/or EWOULDBLOCK are defined, we can't just return -1 in all
+ * situations where ioctl() does.
+ * 
+ * On AIX 4.1.5 (and presumably some other versions and OSes), as you
+ * perform the manual test suite in the README, if you 'bg' vi immediately
+ * after suspending it, all is well, but if you wait a few seconds,
+ * usually ioctl() will return -1, which previously caused tty_setty() to
+ * return -1, causing Rawmode() to return -1, causing Inputl() to return
+ * 0, causing bgetc() to return -1, causing readc() to set doneinp to 1,
+ * causing process() to break out of the main loop, causing tcsh to exit
+ * prematurely.
+ * 
+ * If ioctl()'s errno is EAGAIN/EWOULDBLOCK ("Resource temporarily
+ * unavailable"), apparently the tty is being messed with by the OS and we
+ * need to try again.  In my testing, ioctl() was never called more than
+ * twice in a row.
+ *
+ * -- Dan Harkless <dan@wave.eng.uci.edu>
+ *
+ * So, I retry all ioctl's in case others happen to fail too (christos)
+ */
+
+#if defined(EAGAIN) && defined(EWOULDBLOCK) && (EWOULDBLOCK != EAGAIN)
+# define OKERROR(e) (((e) == EAGAIN) || ((e) == EWOULDBLOCK) || ((e) == EINTR))
+#elif defined(EGAIN)
+# define OKERROR(e) (((e) == EAGAIN) || ((e) == EINTR))
+#elif defined(EWOULDBLOCK)
+# define OKERROR(e) (((e) == EWOULDBLOCK) || ((e) == EINTR))
+#else
+# define OKERROR(e) ((e) == EINTR)
+#endif
+
 /* Retry a system call */
 #define RETRY(x) \
    for (;;) \
 	if ((x) == -1) { \
-	   if (errno != EINTR) \
-	       return -1; \
-	   else \
+	   if (OKERROR(errno)) \
 	       continue; \
+	   else \
+	       return -1; \
 	} \
 	else \
 	   break \
@@ -663,27 +696,22 @@ tty_getty(fd, td)
     RETRY(ioctl(fd, TCGETA,    (ioctl_t) &td->d_t));
 # else /* GSTTY */
 #  ifdef TIOCGETP
-    if (ioctl(fd, TIOCGETP,  (ioctl_t) &td->d_t) == -1)
-	return -1;
+    RETRY(ioctl(fd, TIOCGETP,  (ioctl_t) &td->d_t));
 #  endif /* TIOCGETP */
 #  ifdef TIOCGETC
-    if (ioctl(fd, TIOCGETC,  (ioctl_t) &td->d_tc) == -1)
-	return -1;
+    RETRY(ioctl(fd, TIOCGETC,  (ioctl_t) &td->d_tc));
 #  endif /* TIOCGETC */
 #  ifdef TIOCGPAGE
-    if (ioctl(fd, TIOCGPAGE, (ioctl_t) &td->d_pc) == -1)
-	return -1;
+    RETRY(ioctl(fd, TIOCGPAGE, (ioctl_t) &td->d_pc));
 #  endif /* TIOCGPAGE */
 #  ifdef TIOCLGET
-    if (ioctl(fd, TIOCLGET,  (ioctl_t) &td->d_lb) == -1)
-	return -1;
+    RETRY(ioctl(fd, TIOCLGET,  (ioctl_t) &td->d_lb));
 #  endif /* TIOCLGET */
 # endif /* TERMIO */
 #endif /* POSIX */
 
 #ifdef TIOCGLTC
-    if (ioctl(fd, TIOCGLTC,  (ioctl_t) &td->d_ltc) == -1)
-	return -1;
+    RETRY(ioctl(fd, TIOCGLTC,  (ioctl_t) &td->d_ltc));
 #endif /* TIOCGLTC */
 
     return 0;
@@ -701,27 +729,22 @@ tty_setty(fd, td)
     RETRY(ioctl(fd, TCSETAW,    (ioctl_t) &td->d_t));
 # else
 #  ifdef TIOCSETN
-    if (ioctl(fd, TIOCSETN,  (ioctl_t) &td->d_t) == -1)
-	return -1;
+    RETRY(ioctl(fd, TIOCSETN,  (ioctl_t) &td->d_t));
 #  endif /* TIOCSETN */
 #  ifdef TIOCGETC
-    if (ioctl(fd, TIOCSETC,  (ioctl_t) &td->d_tc) == -1)
-	return -1;
+    RETRY(ioctl(fd, TIOCSETC,  (ioctl_t) &td->d_tc));
 #  endif /* TIOCGETC */
 #  ifdef TIOCGPAGE
-    if (ioctl(fd, TIOCSPAGE, (ioctl_t) &td->d_pc) == -1)
-	return -1;
+    RETRY(ioctl(fd, TIOCSPAGE, (ioctl_t) &td->d_pc));
 #  endif /* TIOCGPAGE */
 #  ifdef TIOCLGET
-    if (ioctl(fd, TIOCLSET,  (ioctl_t) &td->d_lb) == -1)
-	return -1;
+    RETRY(ioctl(fd, TIOCLSET,  (ioctl_t) &td->d_lb));
 #  endif /* TIOCLGET */
 # endif /* TERMIO */
 #endif /* POSIX */
 
 #ifdef TIOCGLTC
-    if (ioctl(fd, TIOCSLTC,  (ioctl_t) &td->d_ltc) == -1)
-	return -1;
+    RETRY(ioctl(fd, TIOCSLTC,  (ioctl_t) &td->d_ltc));
 #endif /* TIOCGLTC */
 
     return 0;

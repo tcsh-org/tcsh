@@ -1,3 +1,5 @@
+ 57. Make NONLSREBIND work after tcsh starts up.
+ 56. Fix AIX stupid exit bug. (Dan Harkless)
  55. More irix fixes (Kaveh)
  54. V6.08.06 - 19990701
  53. module command completion (Dan Nicolaescu)

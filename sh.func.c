@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.81 1999/05/11 13:07:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.82 1999/06/01 20:01:36 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.81 1999/05/11 13:07:48 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.82 1999/06/01 20:01:36 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1372,6 +1372,9 @@ dosetenv(v, c)
 
     if (eq(vp, STRNOREBIND)) {
 	NoNLSRebind = 1;
+	MapsAreInited = 0;
+	NLSMapsAreInited = 0;
+	ed_InitMaps();
 	xfree((ptr_t) lp);
 	return;
     }
@@ -1505,8 +1508,12 @@ dounsetenv(v, c)
 		 */
 		Unsetenv(name);
 
-		if (eq(name, STRNOREBIND))
+		if (eq(name, STRNOREBIND)) {
 		    NoNLSRebind = 0;
+		    MapsAreInited = 0;
+		    NLSMapsAreInited = 0;
+		    ed_InitMaps();
+		}
 #ifdef apollo
 		else if (eq(name, STRSYSTYPE))
 		    dohash(NULL, NULL);
