@@ -4167,13 +4167,13 @@ Some examples are in order.  First, let's set up some play directories:
 .br
 > mkdir from from/src to
 .br
-> ln \-s from/src to/dist
+> ln \-s from/src to/dst
 .PP
 Here's the behavior with \fBsymlinks\fR unset,
 .IP "" 4
-> cd /tmp/to/dist; echo $cwd
+> cd /tmp/to/dst; echo $cwd
 .br
-/tmp/to/dist
+/tmp/to/dst
 .br
 > cd ..; echo $cwd
 .br
@@ -4191,7 +4191,7 @@ here's the behavior with \fBsymlinks\fR set to `chase',
 .PP
 here's the behavior with \fBsymlinks\fR set to `ignore',
 .IP "" 4
-> cd /tmp/to/dist; echo $cwd
+> cd /tmp/to/dst; echo $cwd
 .br
 /tmp/to/dst
 .br
@@ -4201,7 +4201,7 @@ here's the behavior with \fBsymlinks\fR set to `ignore',
 .PP
 and here's the behavior with \fBsymlinks\fR set to `expand'.
 .IP "" 4
-> cd /tmp/to/dist; echo $cwd
+> cd /tmp/to/dst; echo $cwd
 .br
 /tmp/to/dst
 .br
@@ -4209,7 +4209,7 @@ and here's the behavior with \fBsymlinks\fR set to `expand'.
 .br
 /tmp/to
 .br
-> cd /tmp/to/dist; echo $cwd
+> cd /tmp/to/dst; echo $cwd
 .br
 /tmp/to/dst
 .br
