@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.57 1998/10/25 15:09:49 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.58 1998/11/24 18:17:15 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -34,9 +34,49 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+/*
+  Bjorn Knutsson @ Thu Jun 24 19:02:17 1999
+
+  e_dabbrev_expand() did not do proper completion if quoted spaces were present
+  in the string being completed. Exemple:
+
+  # echo hello\ world
+  hello world
+  # echo h<press key bound to dabbrev-expande>
+  # echo hello\<cursor>
+
+  Correct behavior is:
+  # echo h<press key bound to dabbrev-expande>
+  # echo hello\ world<cursor>
+
+  The same problem occured if spaces were present in a string withing quotation
+  marks. Example:
+
+  # echo "hello world"
+  hello world
+  # echo "h<press key bound to dabbrev-expande>
+  # echo "hello<cursor>
+  
+  The former problem could be solved with minor modifications of c_preword()
+  and c_endword(). The latter, however, required a significant rewrite of
+  c_preword(), since quoted strings must be parsed from start to end to
+  determine if a given character is inside or outside the quotation marks.
+
+  Compare the following two strings:
+
+  # echo \"" 'foo \' bar\"
+  " 'foo \' bar\
+  # echo '\"" 'foo \' bar\"
+  \"" foo ' bar"
+
+  The only difference between the two echo lines is in the first character
+  after the echo command. The result is either one or three arguments.
+
+ */
+
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.57 1998/10/25 15:09:49 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.58 1998/11/24 18:17:15 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -280,20 +320,35 @@ c_preword(p, low, n)
     register Char *p, *low;
     register int n;
 {
-    p--;
+  while (n--) {
+    register Char *prev = low;
+    register Char *new;
 
-    while (n--) {
-	while ((p >= low) && Isspace(*p)) 
-	    p--;
-	while ((p >= low) && !Isspace(*p)) 
-	    p--;
+    while (prev < p) {		/* Skip initial spaces */
+      if (!Isspace(*prev) || (Isspace(*prev) && *(prev-1) == (Char)'\\'))
+	break;
+      prev++;
     }
-    /* cp now points to one character before the word */
-    p++;
-    if (p < low)
-	p = low;
-    /* cp now points where we want it */
-    return(p);
+
+    new = prev;
+
+    while (new < p) {
+      prev = new;
+      new = c_endword(prev-1, p, 1);	/* Skip to next space */
+      new++;			/* Step away from end of word */
+      while (new <= p) {	/* Skip trailing spaces */
+	if (!Isspace(*new) || (Isspace(*new) && *(new-1) == (Char)'\\'))
+	  break;
+	new++;
+      }
+    }
+
+    p = prev;			/* Set to previous word start */
+
+  }
+  if (p < low)
+    p = low;
+  return (p);
 }
 
 /*
@@ -817,13 +872,26 @@ c_endword(p, high, n)
     register Char *p, *high;
     register int n;
 {
+    register int inquote = 0;
     p++;
 
     while (n--) {
-	while ((p < high) && Isspace(*p))
-	    p++;
-	while ((p < high) && !Isspace(*p)) 
-	    p++;
+        while (p < high) {	/* Skip spaces */
+	  if (!Isspace(*p) || (Isspace(*p) && *(p-1) == (Char)'\\'))
+	    break;
+	  p++;
+        }
+	while (p < high) {	/* Skip string */
+	  if ((*p == (Char)'\'' || *p == (Char)'"')) { /* Quotation marks? */
+	    if ((!inquote && *(p-1) != (Char)'\\') || inquote) { /* Should it be honored? */
+	      if (inquote == 0) inquote = *p;
+	      else if (inquote == *p) inquote = 0;
+	    }
+	  }
+	  if (!inquote && (Isspace(*p) && *(p-1) != (Char)'\\')) /* Break if unquoted space */
+	    break;
+	  p++;
+	}
     }
 
     p--;
@@ -2113,7 +2181,7 @@ e_dabbrev_expand(c)
 	    continue;
 	} else {
 	    word++;
-	    len = (int) (c_endword(ncp, cp, 1) - ncp + 1);
+	    len = (int) (c_endword(ncp-1, cp, 1) - ncp + 1);
 	    cp = ncp;
 	}
 	if (len > patlen && Strncmp(cp, patbuf, patlen) == 0) {
