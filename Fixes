@@ -1,3 +1,4 @@
+ 47. V6.13.06 - 20050105
  46. autoconf cleanup (Miloslav Trmac)
  45. Fix literal refresh code (Michael Schroeder)
  44. Fix history printing bug with WIDE_STRINGS
