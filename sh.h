@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.97 2001/12/17 16:09:42 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.98 2002/01/07 03:19:04 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -113,12 +113,12 @@ typedef int sigret_t;
 /*
  * Return true if the path is absolute
  */
-#ifndef WINNT_NATIVE
-# define ABSOLUTEP(p)	(*(p) == '/')
-#else /* WINNT_NATIVE */
+#if defined(WINNT_NATIVE) || defined(__CYGWIN__)
 # define ABSOLUTEP(p)	((p)[0] == '/' || \
-			 (Isalpha((p)[0]) && (p)[1] == ':' && (p)[2] == '/'))
-#endif /* WINNT_NATIVE */
+    (Isalpha((p)[0]) && (p)[1] == ':' && (p)[2] == '/'))
+#else /* !WINNT_NATIVE && !__CYGWIN__ */
+# define ABSOLUTEP(p)	(*(p) == '/')
+#endif /* WINNT_NATIVE || __CYGWIN__ */
 
 /*
  * Fundamental definitions which may vary from system to system.
