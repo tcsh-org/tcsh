@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.decls.h,v 3.9 1992/04/24 21:50:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.decls.h,v 3.10 1992/10/05 02:41:30 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -73,6 +73,7 @@ extern	 void		  tw_bind_start		__P((DIR *, Char *));
 extern	 void		  tw_limit_start	__P((DIR *, Char *));
 extern	 void		  tw_sig_start		__P((DIR *, Char *));
 extern	 void		  tw_job_start		__P((DIR *, Char *));
+extern	 void		  tw_grpname_start	__P((DIR *, Char *));
 extern	 Char		 *tw_cmd_next		__P((Char *, int *));
 extern	 Char		 *tw_logname_next	__P((Char *, int *));
 extern	 Char		 *tw_shvar_next		__P((Char *, int *));
@@ -84,6 +85,7 @@ extern	 Char		 *tw_bind_next		__P((Char *, int *));
 extern	 Char		 *tw_limit_next		__P((Char *, int *));
 extern	 Char		 *tw_sig_next		__P((Char *, int *));
 extern	 Char		 *tw_job_next		__P((Char *, int *));
+extern	 Char		 *tw_grpname_next	__P((Char *, int *));
 extern	 void		  tw_dir_end		__P((void));
 extern	 void		  tw_cmd_free		__P((void));
 extern	 void		  tw_logname_end	__P((void));

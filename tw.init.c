@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.init.c,v 3.16 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.init.c,v 3.17 1993/10/08 19:14:01 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.16 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.17 1993/10/08 19:14:01 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -727,7 +727,7 @@ tw_grpname_next(dir, flags)
 #endif /* atp vmsposix */
     TW_RELS();
 
-    if (pw == NULL) {
+    if (gr == NULL) {
 #ifdef YPBUGS
 	fix_yp_bugs();
 #endif
