@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.5 1991/07/18 23:44:21 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.6 1991/07/19 01:51:48 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -259,14 +259,13 @@ struct ucred {
 #endif /* DGUX */
 
 #ifdef SXA
-# ifndef BSDNICE
+# ifndef _BSDX_
 /*
- * We check BSDNICE cause this is not defined in config.sxa.
  * Only needed in the system V environment.
  */
-#  define setrlimit(a, b) 	bsd_setrlimit(a, b)
-#  define getrlimit(a, b)	bsd_getrlimit(a, b)
-# endif	/* BSDNICE */
+#  define setrlimit 	bsd_setrlimit
+#  define getrlimit	bsd_getrlimit
+# endif	/* _BSDX_ */
 # ifndef NOFILE
 #  define	NOFILE	64
 # endif	/* NOFILE */
