@@ -1,17 +1,52 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.20/RCS/sh.os.c,v 1.3 1991/01/30 18:14:03 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include "config.h"
 #ifndef lint
-static char *rcsid = "$Id: sh.os.c,v 1.3 1991/01/30 18:14:03 christos Exp $";
-
+static char *rcsid() 
+    { return "$Id: tc.os.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
 #endif
+
 #include "sh.h"
-#include "sh.proc.h"
-#include "sh.dir.h"
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
+
+#ifdef titan
+int     end;
+#endif				/* titan */
 
 /***
  *** MACH
@@ -21,7 +56,7 @@ static char *rcsid = "$Id: sh.os.c,v 1.3 1991/01/30 18:14:03 christos Exp $";
 /* dosetpath -- setpath built-in command
  *
  **********************************************************************
- * HISNODE_ORY
+ * HISTORY
  * 08-May-88  Richard Draves (rpd) at Carnegie-Mellon University
  *	Major changes to remove artificial limits on sizes and numbers
  *	of paths.
@@ -30,35 +65,27 @@ static char *rcsid = "$Id: sh.os.c,v 1.3 1991/01/30 18:14:03 christos Exp $";
  */
 
 #ifdef MACH
-static Char STRCPATH[]		= { 'C', 'P', 'A', 'T', 'H', '\0' };
-static Char STRLPATH[]		= { 'L', 'P', 'A', 'T', 'H', '\0' };
-static Char STRMPATH[]		= { 'M', 'P', 'A', 'T', 'H', '\0' };
-static Char STREPATH[]		= { 'E', 'P', 'A', 'T', 'H', '\0' };
-#endif /* MACH */
-static Char *syspaths[] =
-{STRPATH, STRCPATH, STRLPATH, STRMPATH, STREPATH, 0};
+static Char STRCPATH[] = {'C', 'P', 'A', 'T', 'H', '\0'};
+static Char STRLPATH[] = {'L', 'P', 'A', 'T', 'H', '\0'};
+static Char STRMPATH[] = {'M', 'P', 'A', 'T', 'H', '\0'};
+static Char STREPATH[] = {'E', 'P', 'A', 'T', 'H', '\0'};
+#endif				/* MACH */
 
-/*#ifdef CMUCS */
+static Char *syspaths[] = {STRPATH, STRCPATH, STRLPATH, STRMPATH, STREPATH, 0};
 #define LOCALSYSPATH	"/usr/cs"
-/*#endif */
 
-void 
+void
 dosetpath(arglist)
-Char  **arglist;
+    Char  **arglist;
 {
     extern char *getenv();
 
-    Char  **pathvars,
-          **cmdargs;
+    Char  **pathvars, **cmdargs;
     Char  **paths;
-    char  **spaths,
-          **cpaths,
-          **cmds;
+    char  **spaths, **cpaths, **cmds;
     char   *tcp;
-    unsigned int npaths,
-            ncmds;
-    int     i,
-            sysflag;
+    unsigned int npaths, ncmds;
+    int     i, sysflag;
 
     for (i = 1; arglist[i] && (arglist[i][0] != '-'); i++);
     npaths = i - 1;
@@ -79,22 +106,22 @@ Char  **arglist;
 
     /* note that npaths != 0 */
 
-    spaths = (char **) xalloc(npaths * sizeof *spaths);
+    spaths = (char **) xmalloc(npaths * sizeof *spaths);
     setzero((char *) spaths, npaths * sizeof *spaths);
-    paths = (Char **) xalloc((npaths + 1) * sizeof *paths);
+    paths = (Char **) xmalloc((npaths + 1) * sizeof *paths);
     setzero((char *) paths, (npaths + 1) * sizeof *paths);
-    cpaths = (char **) xalloc((npaths + 1) * sizeof *cpaths);
+    cpaths = (char **) xmalloc((npaths + 1) * sizeof *cpaths);
     setzero((char *) cpaths, (npaths + 1) * sizeof *cpaths);
-    cmds = (char **) xalloc((ncmds + 1) * sizeof *cmds);
+    cmds = (char **) xmalloc((ncmds + 1) * sizeof *cmds);
     setzero((char *) cmds, (ncmds + 1) * sizeof *cmds);
     for (i = 0; i < npaths; i++) {
 	char   *val = getenv(short2str(pathvars[i]));
 
-	if (val == (char *) 0)
+	if (val == NULL)
 	    val = "";
 
-	spaths[i] = xalloc((Strlen(pathvars[i]) + strlen(val)
-			    + 2) * sizeof **spaths);
+	spaths[i] = xmalloc((Strlen(pathvars[i]) + strlen(val)
+			     + 2) * sizeof **spaths);
 	(void) strcpy(spaths[i], short2str(pathvars[i]));
 	(void) strcat(spaths[i], "=");
 	(void) strcat(spaths[i], val);
@@ -106,7 +133,7 @@ Char  **arglist;
 
 	if (val == NOSTR)
 	    goto abortpath;
-	cmds[i] = xalloc(Strlen(val) + 1);
+	cmds[i] = xmalloc(Strlen(val) + 1);
 	(void) strcpy(cmds[i], short2str(val));
     }
 
@@ -156,29 +183,28 @@ abortpath:
 	}
     }
 }
-
-#endif
+#endif /* MACH */
 
 /***
  *** AIX
  ***/
 #ifdef TCF
- /*VARARGS*//* ARGSUSED */
+/* VARARGS *//* ARGSUSED */
 void
 dogetxvers(v)
-Char  **v;
+    Char  **v;
 {
     char    xvers[MAXPATHLEN];
 
     if (getxvers(xvers, MAXPATHLEN) == -1)
-	Perror("getxvers");
-    CSHprintf("%s\n", xvers);
+	stderror(ERR_SYSTEM, "getxvers", strerror(errno));
+    xprintf("%s\n", xvers);
     flush();
 }
 
 void
 dosetxvers(v)
-Char  **v;
+    Char  **v;
 {
     char   *xvers;
 
@@ -188,51 +214,67 @@ Char  **v;
     else
 	xvers = short2str(*v);
     if (setxvers(xvers) == -1)
-	Perror("setxvers");
+	stderror(ERR_SYSTEM, "setxvers", strerror(errno));
 }
 
 #include <sf.h>
-#include <sys/x.out.h>
+#ifdef _AIXPS2
+# define XC_PDP11	0x01
+# define XC_23		0x02
+# define XC_Z8K		0x03
+# define XC_8086	0x04
+# define XC_68K		0x05
+# define XC_Z80		0x06
+# define XC_VAX		0x07
+# define XC_16032	0x08
+# define XC_286		0x09
+# define XC_386		0x0a
+# define XC_S370	0x0b
+#else
+# include <sys/x.out.h>
+#endif /* _AIXPS2 */
 
 static struct xc_cpu_t {
     short   xc_id;
     char   *xc_name;
 }       xcpu[] =
-{ { XC_PDP11, "pdp11"   },
-  { XC_23, "i370"       },
-  { XC_Z8K, "z8000"     },
-  { XC_8086, "i86"      },
-  { XC_68K, "mc68000"   },
-  { XC_Z80, "x80"       },
-  { XC_VAX, "vax"       },
-  { XC_16032, "ns16032" },
-  { XC_286, "i286"      },
-  { XC_386, "i386"      },
-  { XC_S370, "xa370"    },
-  { 0, (char *) 0       } };
+{
+    { XC_PDP11,	"pdp11"   },
+    { XC_23,	"i370"    },
+    { XC_Z8K,	"z8000"   },
+    { XC_8086,	"i86"	  },
+    { XC_68K,	"mc68000" },
+    { XC_Z80,	"x80"	  },
+    { XC_VAX,	"vax"	  },
+    { XC_16032,	"ns16032" },
+    { XC_286,	"i286"	  },
+    { XC_386,	"i386"	  },
+    { XC_S370,	"xa370"	  },
+    { 0,	NULL      }
+};
 
 /*
  * our local hack table, stolen from x.out.h
  */
 static char *
 getxcode(xcid)
-short   xcid;
+    short   xcid;
 {
     int     i;
 
-    for (i = 0; xcpu[i].xc_name != (char *) 0; i++)
+    for (i = 0; xcpu[i].xc_name != NULL; i++)
 	if (xcpu[i].xc_id == xcid)
 	    return (xcpu[i].xc_name);
-    return ((char *) 0);
+    return (NULL);
 }
 
 static short
 getxid(xcname)
-char   *xcname;
+    char   *xcname;
 {
     int     i;
 
-    for (i = 0; xcpu[i].xc_name != (char *) 0; i++)
+    for (i = 0; xcpu[i].xc_name != NULL; i++)
 	if (strcmp(xcpu[i].xc_name, xcname) == 0)
 	    return (xcpu[i].xc_id);
     return ((short) -1);
@@ -241,50 +283,51 @@ char   *xcname;
 
 void
 dogetspath(v)
-Char  **v;
+    Char  **v;
 {
-    int     i,
-            j;
+    int     i, j;
     sitepath_t p[MAXSITE];
     struct sf *st;
     static char *local = "LOCAL ";
 
     if ((j = getspath(p, MAXSITE)) == -1)
-	Perror("getspath");
+	stderror(ERR_SYSTEM, "getspath", strerror(errno));
     for (i = 0; i < j && (p[i] & SPATH_CPU) != NOSITE; i++) {
 	if (p[i] & SPATH_CPU) {
 	    if ((p[i] & SPATH_MASK) == NULLSITE)
-		CSHprintf(local);
-	    else if ((st = sfxcode((short) (p[i] & SPATH_MASK))) !=
-		     (struct sf *) 0)
-		CSHprintf("%s ", st->sf_ctype);
+		xprintf(local);
+	    else if ((st = sfxcode((short) (p[i] & SPATH_MASK))) != NULL)
+		xprintf("%s ", st->sf_ctype);
 	    else {
 		char   *xc = getxcode(p[i] & SPATH_MASK);
 
-		if (xc != (char *) 0)
-		    CSHprintf("%s ", xc);
+		if (xc != NULL)
+		    xprintf("%s ", xc);
 		else
-		    CSHprintf("*cpu %d* ", (int) (p[i] & SPATH_MASK));
-		endsf();	/* BUG in the aix code... needs that cause if
-				 * sfxcode fails once it fails for ever */
+		    xprintf("*cpu %d* ", (int) (p[i] & SPATH_MASK));
+		/* 
+		 * BUG in the aix code... needs that cause if
+		 * sfxcode fails once it fails for ever 
+		 */
+		endsf();	
 	    }
 	}
 	else {
 	    if (p[i] == NULLSITE)
-		CSHprintf(local);
-	    else if ((st = sfnum(p[i])) != (struct sf *) 0)
-		CSHprintf("%s ", st->sf_sname);
+		xprintf(local);
+	    else if ((st = sfnum(p[i])) != NULL)
+		xprintf("%s ", st->sf_sname);
 	    else
-		CSHprintf("*site %d* ", (int) (p[i] & SPATH_MASK));
+		xprintf("*site %d* ", (int) (p[i] & SPATH_MASK));
 	}
     }
-    CSHprintf("\n");
+    xprintf("\n");
     flush();
 }
 
 void
 dosetspath(v)
-Char  **v;
+    Char  **v;
 {
     int     i;
     short   j;
@@ -294,25 +337,25 @@ Char  **v;
 
     for (i = 0, v++; *v && *v[0] != '\0'; v++, i++) {
 	s = short2str(*v);
-	if (isdigit(*s))
+	if (Isdigit(*s))
 	    p[i] = atoi(s);
 	else if (strcmp(s, "LOCAL") == 0)
 	    p[i] = NULLSITE;
-	else if ((st = sfctype(s)) != (struct sf *) 0)
+	else if ((st = sfctype(s)) != NULL)
 	    p[i] = SPATH_CPU | st->sf_ccode;
 	else if ((j = getxid(s)) != -1)
 	    p[i] = SPATH_CPU | j;
-	else if ((st = sfname(s)) != (struct sf *) 0)
+	else if ((st = sfname(s)) != NULL)
 	    p[i] = st->sf_id;
 	else {
 	    setname(s);
-	    bferr("Bad cpu/site name");
+	    stderror(ERR_NAME | ERR_STRING, "Bad cpu/site name");
 	}
 	if (i == MAXSITE - 1)
-	    bferr("Site path too long");
+	    stderror(ERR_NAME | ERR_STRING, "Site path too long");
     }
     if (setspath(p, i) == -1)
-	Perror("setspath");
+	stderror(ERR_SYSTEM, "setspath", strerror(errno));
 }
 
 /* sitename():
@@ -320,12 +363,12 @@ Char  **v;
  */
 char   *
 sitename(pid)
-pid_t   pid;
+    pid_t   pid;
 {
     siteno_t ss;
     struct sf *st;
 
-    if ((ss = site(pid)) == -1 || (st = sfnum(ss)) == (struct sf *) 0)
+    if ((ss = site(pid)) == -1 || (st = sfnum(ss)) == NULL)
 	return ("unknown");
     else
 	return (st->sf_sname);
@@ -333,8 +376,8 @@ pid_t   pid;
 
 static int
 migratepid(pid, new_site)
-pid_t   pid;
-siteno_t new_site;
+    pid_t   pid;
+    siteno_t new_site;
 {
     struct sf *st;
     int     need_local;
@@ -342,24 +385,21 @@ siteno_t new_site;
     need_local = (pid == 0) || (pid == getpid());
 
     if (kill3((pid_t) pid, SIGMIGRATE, new_site) < 0) {
-	CSHprintf("%d: ", pid);
-	CSHprintf("%s\n", strerror());
+	xprintf("%d: %s\n", pid, strerror(errno));
 	return (-1);
     }
 
     if (need_local) {
 	if ((new_site = site(0)) == -1) {
-	    CSHprintf("site: ");
-	    CSHprintf("%s\n", strerror());
+	    xprintf("site: %s\n", strerror(errno));
 	    return (-1);
 	}
-	if ((st = sfnum(new_site)) == (struct sf *) 0) {
-	    CSHprintf("%d: Site not found\n", new_site);
+	if ((st = sfnum(new_site)) == NULL) {
+	    xprintf("%d: Site not found\n", new_site);
 	    return (-1);
 	}
 	if (setlocal(st->sf_local, strlen(st->sf_local)) == -1) {
-	    CSHprintf("setlocal: %s: ", st->sf_local);
-	    CSHprintf("%s\n", strerror());
+	    xprintf("setlocal: %s: %s\n", st->sf_local, strerror(errno));
 	    return (-1);
 	}
     }
@@ -368,14 +408,13 @@ siteno_t new_site;
 
 void
 domigrate(v)
-Char  **v;
+    Char  **v;
 {
     struct sf *st;
     char   *s;
     Char   *cp;
     struct process *pp;
-    int     pid,
-            err1 = 0;
+    int     pid, err1 = 0;
     siteno_t new_site = 0;
     sigmask_t omask;
 
@@ -388,7 +427,7 @@ Char  **v;
     if (setintr)
 	(void) sighold(SIGINT);
     (void) sighold(SIGCHLD);
-#endif
+#endif /* BSDSIGS */
 
     ++v;
     if (*v[0] == '-') {
@@ -396,9 +435,9 @@ Char  **v;
 	 * Do the -site.
 	 */
 	s = short2str(&v[0][1]);
-	if ((st = sfname(s)) == (struct sf *) 0) {
+	if ((st = sfname(s)) == NULL) {
 	    setname(s);
-	    bferr("Site not found");
+	    stderror(ERR_NAME | ERR_STRING, "Site not found");
 	}
 	new_site = st->sf_id;
 	++v;
@@ -406,14 +445,14 @@ Char  **v;
 
     if (!*v || *v[0] == '\0') {
 	if (migratepid(0, new_site) == -1)
-	    err++;
+	    err1++;
     }
     else {
 	gflag = 0, tglob(v);
 	if (gflag) {
-	    v = glob(v);
+	    v = globall(v);
 	    if (v == 0)
-		stdbferr(ERR_NOMATCH);
+		stderror(ERR_NAME | ERR_NOMATCH);
 	}
 	else {
 	    v = gargv = saveblk(v);
@@ -424,13 +463,12 @@ Char  **v;
 	    if (*cp == '%') {
 		pp = pfind(cp);
 		if (kill3((pid_t) - pp->p_jobid, SIGMIGRATE, new_site) < 0) {
-		    CSHprintf("%s: ", short2str(cp));
-		    CSHprintf("%s\n", strerror());
+		    xprintf("%s: %s\n", short2str(cp), strerror(errno));
 		    err1++;
 		}
 	    }
-	    else if (!(isdigit(*cp) || *cp == '-'))
-		bferr("Arguments should be jobs or process id's");
+	    else if (!(Isdigit(*cp) || *cp == '-'))
+		stderror(ERR_NAME | ERR_JOBARGS);
 	    else {
 		pid = atoi(short2str(cp));
 		if (migratepid(pid, new_site) == -1)
@@ -442,23 +480,24 @@ Char  **v;
 	    blkfree(gargv), gargv = 0;
     }
 
-  done:
+done:
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
 #else
-    sigrelse(SIGCHLD);
+    (void) sigrelse(SIGCHLD);
     if (setintr)
-	sigrelse(SIGINT);
-#endif
+	(void) sigrelse(SIGINT);
+#endif /* BSDSIGS */
     if (err1)
-	error((char *) 0);
+	stderror(ERR_SILENT);
 }
 
-#endif				/* TCF */
+#endif /* TCF */
 
 /***
  *** CONVEX Warps.
  ***/
+
 #ifdef WARP
 /*
  * handle the funky warping of symlinks
@@ -468,7 +507,7 @@ Char  **v;
 
 static jmp_buf sigsys_buf;
 
-static sigret_t
+static  sigret_t
 catch_sigsys()
 {
     longjmp(sigsys_buf, 1);
@@ -477,17 +516,17 @@ catch_sigsys()
 
 void
 dowarp(v)
-Char  **v;
+    Char  **v;
 {
-    int     warp,
-            oldwarp;
+    int     warp, oldwarp;
     struct warpent *we;
     void    (*old_sigsys_handler) () = 0;
     char   *newwarp;
 
     if (setjmp(sigsys_buf)) {
 	signal(SIGSYS, old_sigsys_handler);
-	bferr("You're trapped in a universe you never made");
+	stderror(ERR_NAME | ERR_STRING, 
+		 "You're trapped in a universe you never made");
 	return;
     }
     old_sigsys_handler = signal(SIGSYS, catch_sigsys);
@@ -497,7 +536,7 @@ Char  **v;
     v++;
     if (*v == 0) {		/* display warp value */
 	if (warp < 0)
-	    bferr("Getwarp failed");
+	    stderror(ERR_NAME | ERR_STRING, "Getwarp failed");
 	we = getwarpbyvalue(warp);
 	if (we)
 	    printf("%s\n", we->w_name);
@@ -507,7 +546,7 @@ Char  **v;
     else {			/* set warp value */
 	oldwarp = warp;
 	newwarp = short2str(*v);
-	if (isdigit(*v[0]))
+	if (Isdigit(*v[0]))
 	    warp = atoi(newwarp);
 	else {
 	    we = getwarpbyname(newwarp);
@@ -517,17 +556,16 @@ Char  **v;
 		warp = -1;
 	}
 	if ((warp < 0) || (warp >= WARP_MAXLINK))
-	    bferr("Invalid warp");
+	    stderror(ERR_NAME | ERR_STRING, "Invalid warp");
 	if ((setwarp(warp) < 0) || (getwarp() != warp)) {
 	    (void) setwarp(oldwarp);
-	    bferr("Setwarp failed");
+	    stderror(ERR_NAME | ERR_STRING, "Setwarp failed");
 	}
     }
     signal(SIGSYS, old_sigsys_handler);
     return;
 }
-
-#endif
+#endif /* WARP */
 
 /***
  *** Masscomp
@@ -536,20 +574,19 @@ Char  **v;
 #ifdef masscomp
 void
 douniverse(v)
-register Char **v;
+    register Char **v;
 {
     register Char *cp = v[1];
     char    ubuf[100];
 
     if (cp == 0) {
 	(void) getuniverse(ubuf);
-	CSHprintf("%s\n", ubuf);
+	xprintf("%s\n", ubuf);
     }
     else if (*cp == '\0' || setuniverse(short2str(cp)) != 0)
-	bferr("Illegal universe");
+	stderror(ERR_NAME | ERR_STRING, "Illegal universe");
 }
-
-#endif				/* masscomp */
+#endif /* masscomp */
 
 
 #ifdef _SEQUENT_
@@ -557,10 +594,8 @@ register Char **v;
  * Compute the difference in process stats.
  */
 void
-subtract_process_stats(p2, p1, pr)
-struct process_stats *p2,
-       *p1,
-       *pr;
+pr_stat_sub(p2, p1, pr)
+    struct process_stats *p2, *p1, *pr;
 {
     pr->ps_utime.tv_sec = p2->ps_utime.tv_sec - p1->ps_utime.tv_sec;
     pr->ps_utime.tv_usec = p2->ps_utime.tv_usec - p1->ps_utime.tv_usec;
@@ -594,13 +629,13 @@ struct process_stats *p2,
     pr->ps_phwrite = p2->ps_phwrite - p1->ps_phwrite;
 }
 
-#endif				/* _SEQUENT_ */
+#endif /* _SEQUENT_ */
 
 
 #ifdef tcgetpgrp
 int
 xtcgetpgrp(fd)
-int     fd;
+    int     fd;
 {
     int     pgrp;
 
@@ -610,7 +645,7 @@ int     fd;
     return (pgrp);
 }
 
-#endif				/* tcgetpgrp */
+#endif	/* tcgetpgrp */
 
 
 #ifdef YPBUGS
@@ -631,59 +666,72 @@ fix_yp_bugs()
     }
 }
 
-#endif				/* YPBUGS */
+#endif /* YPBUGS */
 
 
 void
 osinit()
 {
+    extern ptr_t membot;
+
+    membot = (char *) sbrk(0);
 
 #ifdef OREO
     set42sig();
     sigignore(SIGIO);		/* ignore SIGIO */
-#endif				/* OREO */
+#endif /* OREO */
 
 #ifdef aiws
     struct sigstack inst;
 
-    inst.ss_sp = xalloc(4192) + 4192;
+    inst.ss_sp = xmalloc(4192) + 4192;
     inst.ss_onstack = 0;
-    sigstack(&inst, (struct sigstack *) 0);
-#endif				/* aiws */
+    sigstack(&inst, NULL);
+#endif /* aiws */
 
 #ifdef hpux
     (void) sigspace(4192);
-#endif				/* hpux */
+#endif	/* hpux */
+#ifdef titan
+    end = sbrk(0);
+#endif	/* titan */
+
+#ifdef apollo
+    (void) isapad();
+#endif
 }
 
 #ifdef gethostname
 #include <sys/utsname.h>
 
+int
 xgethostname(name, namlen)
-char   *name;
-int     namlen;
+    char   *name;
+    int     namlen;
 {
-    int     i;
+    int     i, retval;
     struct utsname uts;
 
-    uname(&uts);
+    retval = uname(&uts);
 
 #ifdef DEBUG
-    CSHprintf("sysname:  %s\n", uts.sysname);
-    CSHprintf("nodename: %s\n", uts.nodename);
-    CSHprintf("release:  %s\n", uts.release);
-    CSHprintf("version:  %s\n", uts.version);
-    CSHprintf("machine:  %s\n", uts.machine);
+    xprintf("sysname:  %s\n", uts.sysname);
+    xprintf("nodename: %s\n", uts.nodename);
+    xprintf("release:  %s\n", uts.release);
+    xprintf("version:  %s\n", uts.version);
+    xprintf("machine:  %s\n", uts.machine);
 #endif				/* DEBUG */
     i = strlen(uts.nodename) + 1;
     (void) strncpy(name, uts.nodename, i < namlen ? i : namlen);
+
+    return retval;
 }				/* end gethostname */
 
 #endif				/* gethostname */
 
 
 #ifdef getwd
-static char *strrcpy();
+static char *strrcpy __P((char *, char *));
 
 /* xgetwd():
  *	Return the pathname of the current directory, or return
@@ -691,25 +739,21 @@ static char *strrcpy();
  */
 char   *
 xgetwd(pathname)
-char   *pathname;
+    char   *pathname;
 {
     DIR    *dp;
     struct dirent *d;
 
-    struct stat st_root,
-            st_cur,
-            st_next,
-            st_dot;
-    char    pathbuf[MAXPATHLEN],
-            nextpathbuf[MAXPATHLEN * 2];
+    struct stat st_root, st_cur, st_next, st_dot;
+    char    pathbuf[MAXPATHLEN], nextpathbuf[MAXPATHLEN * 2];
     char   *cur_name_add;
-    char   *pathptr,
-           *nextpathptr;
+    char   *pathptr, *nextpathptr;
 
     /* find the inode of root */
     if (stat("/", &st_root) == -1) {
-	(void) CSHsprintf(pathname, "getwd: Cannot stat \"/\" (%s)", strerror());
-	return ((char *) 0);
+	(void) xsprintf(pathname,
+			"getwd: Cannot stat \"/\" (%s)", strerror(errno));
+	return (NULL);
     }
     pathbuf[MAXPATHLEN - 1] = '\0';
     pathptr = &pathbuf[MAXPATHLEN - 1];
@@ -718,8 +762,9 @@ char   *pathname;
 
     /* find the inode of the current directory */
     if (lstat("./", &st_cur) == -1) {
-	(void) CSHsprintf(pathname, "getwd: Cannot stat \".\" (%s)", strerror());
-	return ((char *) 0);
+	(void) xsprintf(pathname,
+			"getwd: Cannot stat \".\" (%s)", strerror(errno));
+	return (NULL);
     }
     nextpathptr = strrcpy(nextpathptr, "../");
 
@@ -736,21 +781,20 @@ char   *pathname;
 	}
 
 	/* open the parent directory */
-	if ((dp = opendir(nextpathptr)) == (DIR *) 0) {
-	    (void) CSHsprintf(pathname,
-			      "getwd: Cannot open directory \"%s\" (%s)",
-			      nextpathptr, strerror());
-	    return ((char *) 0);
+	if ((dp = opendir(nextpathptr)) == NULL) {
+	    (void) xsprintf(pathname,
+			    "getwd: Cannot open directory \"%s\" (%s)",
+			    nextpathptr, strerror(errno));
+	    return (NULL);
 	}
 
 	/* look in the parent for the entry with the same inode */
-	for (d = readdir(dp);
-	     d != (struct dirent *) 0; d = readdir(dp)) {
+	for (d = readdir(dp); d != NULL; d = readdir(dp)) {
 	    (void) strcpy(cur_name_add, d->d_name);
 	    if (lstat(nextpathptr, &st_next) == -1) {
-		(void) CSHsprintf(pathname, "getwd: Cannot stat \"%s\" (%s)",
-				  d->d_name, strerror());
-		return ((char *) 0);
+		(void) xsprintf(pathname, "getwd: Cannot stat \"%s\" (%s)",
+				d->d_name, strerror(errno));
+		return (NULL);
 	    }
 	    if (d->d_name[0] == '.' && d->d_name[1] == '\0')
 		st_dot = st_next;
@@ -767,9 +811,9 @@ char   *pathname;
 		break;
 	    }
 	}
-	if (d == (struct dirent *) 0) {
-	    (void) CSHsprintf(pathname, "getwd: Cannot find \".\" in \"..\"");
-	    return ((char *) 0);
+	if (d == NULL) {
+	    (void) xsprintf(pathname, "getwd: Cannot find \".\" in \"..\"");
+	    return (NULL);
 	}
     }
 }				/* end getwd */
@@ -779,8 +823,7 @@ char   *pathname;
  */
 static char *
 strrcpy(ptr, str)
-register char *ptr,
-       *str;
+    register char *ptr, *str;
 {
     register int len = strlen(str);
 
@@ -796,7 +839,170 @@ register char *ptr,
 #include <sys/bsd_syscall.h>
 
 int
-vfork() {
-	return sys_local(VEND_ICON_BSD, 66);
+vfork()
+{
+    return sys_local(VEND_ICON_BSD, 66);
 }
-#endif /* iconuxv */
+
+#endif				/* iconuxv */
+
+#ifdef apollo
+/***
+ *** Domain/OS
+ ***/
+#undef value			/* XXX: Careful here */
+#include <apollo/base.h>
+#include <apollo/loader.h>
+#include <apollo/error.h>
+
+
+static char *
+apperr(st)
+    status_$t *st;
+{
+    static char buf[BUFSIZ];
+    short e_subl, e_modl, e_codel;
+    error_$string_t e_sub, e_mod, e_code;
+
+    error_$get_text(*st, e_sub, &e_subl, e_mod, &e_modl, e_code, &e_codel);
+    e_sub[e_subl] = '\0';
+    e_code[e_codel] = '\0';
+    e_mod[e_modl] = '\0';
+    (void) xsprintf(buf, "%s (%s/%s)", e_code, e_sub, e_mod);
+
+    return(buf);
+}
+
+static int
+llib(s)
+    Char *s;
+{
+    short len = Strlen(s);
+    status_$t st;
+    char *t;
+
+    loader_$inlib(t = short2str(s), len, &st);
+    if (st.all != status_$ok) 
+	stderror(ERR_SYSTEM, t, apperr(&st));
+}
+
+void
+doinlib(v)
+    Char **v;
+{
+    setname(short2str(*v++));
+    gflag = 0, tglob(v);
+    if (gflag) {
+	v = globall(v);
+	if (v == 0)
+	    stderror(ERR_NAME | ERR_NOMATCH);
+    }
+    else {
+	v = gargv = saveblk(v);
+	trim(v);
+    }
+
+    while (v && *v) 
+	llib(*v++);
+    if (gargv)
+	blkfree(gargv), gargv = 0;
+}
+
+int
+getv(v)
+    Char *v;
+{
+    if (eq(v, STRbsd43))
+	return(1);
+    else if (eq(v, STRsys53))
+	return(0);
+    else 
+	stderror(ERR_NAME | ERR_SYSTEM, short2str(v), "Invalid system type");
+    /*NOTREACHED*/
+    return(0);
+}
+
+void
+dover(v)
+    Char **v;
+{
+    Char *p;
+
+    setname(short2str(*v++));
+    if (!*v) {
+	if (!(p = Getenv(STRSYSTYPE)))
+	    stderror(ERR_NAME | ERR_STRING, "System type is not set");
+	xprintf("%s\n", short2str(p));
+    }
+    else {
+	Setenv(STRSYSTYPE, getv(*v) ? STRbsd43 : STRsys53);
+	dohash();
+    }
+}
+
+/*
+ * Many thanks to rees@citi.umich.edu (Jim Rees) and
+ *                mathys@ssdt-tempe.sps.mot.com (Yves Mathys)
+ * For figuring out how to do this... I could have never done
+ * it without their help.
+ */
+typedef short enum {
+	name_$wdir_type,
+	name_$ndir_type,
+	name_$node_dir_type,
+} name_$dir_type_t;
+
+void
+dorootnode(v)
+    Char **v;
+{
+    name_$dir_type_t dirtype = name_$node_dir_type;
+    uid_$t uid;
+    status_$t st;
+    char *name;
+    short namelen;
+
+    setname(short2str(*v++));
+
+    name = short2str(*v);
+    namelen = strlen(name);
+
+    name_$resolve(name, &namelen, &uid, &st);
+    if (st.all != status_$ok) 
+	stderror(ERR_SYSTEM, name, apperr(&st));
+    namelen = 0;
+    name_$set_diru(&uid, "", &namelen, &dirtype, &st);
+    if (st.all != status_$ok) 
+	stderror(ERR_SYSTEM, name, apperr(&st));
+    dohash();
+}
+
+int
+isapad()
+{
+    static int res = -1;
+    static status_$t st;
+
+    if (res == -1) {
+	int strm;
+	if (isatty(0))
+	    strm = 0;
+	if (isatty(1))
+	    strm = 1;
+	if (isatty(2))
+	    strm = 2;
+	else {
+	    res = 0;
+	    st.all = status_$ok;
+	    return(res);
+	}
+	res = stream_$isavt(&strm, &st);
+	res = res ? 1 : 0;
+    }
+    else {
+	if (st.all != status_$ok) 
+	    stderror(ERR_SYSTEM, "stream_$isavt", apperr(&st));
+    }
+    return(res);
+}
+#endif
