@@ -1,4 +1,5 @@
- 29. V6.13.03 - 20041120
+ 30. V6.13.03 - 20041120
+ 29. More close_on_exec fixes (Miloslav Trmac)
  28. SUSE dspmbyte fixes (via Harald)
  27. Newline handling in command substitution controlled by csubstnonl
      (Miloslav Trmac)
