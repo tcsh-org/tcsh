@@ -46,7 +46,7 @@
 .\" - Cross-reference as much as possible. Remember to note new features in
 .\"   NEW FEATURES and referenced commands in SEE ALSO.
 .\" 
-.TH TCSH 1 "16 September 1993" "Cornell 6.04.03"
+.TH TCSH 1 "12 November 1993" "Cornell 6.04.04"
 .SH NAME
 .B tcsh
 - C shell with file name completion and command line editing
@@ -4502,7 +4502,7 @@ access(2), execve(2), fork(2), killpg(2), pipe(2), setrlimit(2),
 sigvec(2), stat(2), umask(2), wait(2), malloc(3), setlocale(3), tty(4),
 a.out(5), termcap(5), environ(7), termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.03 (Cornell) 93/10/30.
+This man page documents tcsh 6.04.04 (Cornell) 93/11/12.
 .SH AUTHORS
 .PD 0
 .TP 2
