@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.87 1999/02/06 15:01:19 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.88 1999/02/06 15:18:58 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.87 1999/02/06 15:01:19 christos Exp $")
+RCSID("$Id: sh.c,v 3.88 1999/02/06 15:18:58 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2293,6 +2293,12 @@ gethdir(home)
 void
 initdesc()
 {
+#ifdef NLS_BUGS
+#ifdef NLS_CATALOGS
+    (void)catclose(catd);
+#endif /* NLS_CATALOGS */
+#endif /* NLS_BUGS */
+
 
     didfds = 0;			/* 0, 1, 2 aren't set up */
     (void) close_on_exec(SHIN = dcopy(0, FSHIN), 1);
@@ -2305,6 +2311,11 @@ initdesc()
     isdiagatty = isatty(SHDIAG);
     isoutatty = isatty(SHOUT);
     closem();
+#ifdef NLS_BUGS
+#ifdef NLS_CATALOGS
+    nlsinit();
+#endif /* NLS_CATALOGS */
+#endif /* NLS_BUGS */
 }
 
 
