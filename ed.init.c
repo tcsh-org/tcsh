@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.16 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.17 1991/10/28 06:26:50 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.16 1991/10/21 17:24:49 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.17 1991/10/28 06:26:50 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -50,6 +50,8 @@ int     Tty_raw_mode = 0;	/* Last tty change was to raw mode */
 int     MacroLvl = -1;		/* pointer to current macro nesting level; */
 				/* (-1 == none) */
 static int Tty_quote_mode = 0;	/* Last tty change was to quote mode */
+static unsigned char vdisable;	/* The value of _POSIX_VDISABLE from 
+				 * pathconf(2) */
 
 int     Tty_eight_bit = -1;	/* does the tty handle eight bits */
 
@@ -168,6 +170,26 @@ ed_Setup(rst)
     if (havesetup) 	/* if we have never been called */
 	return(0);
 
+#ifdef _PC_VDISABLE
+    { 
+	long pcret;
+
+	if ((pcret = fpathconf(SHTTY, _PC_VDISABLE)) == -1L)
+	    vdisable = _POSIX_VDISABLE;
+	else 
+	    vdisable = pcret;
+	if (vdisable != _POSIX_VDISABLE && rst != 0)
+	    for (rst = 0; rst < C_NCC - 2; rst++) {
+		if (ttychars[ED_IO][rst] == _POSIX_VDISABLE)
+		    ttychars[ED_IO][rst] = vdisable;
+		if (ttychars[EX_IO][rst] == _POSIX_VDISABLE)
+		    ttychars[EX_IO][rst] = vdisable;
+	    }
+    }
+#else /* !_PC_VDISABLE */
+    vdisable = _POSIX_VDISABLE;
+#endif /* _PC_VDISABLE */
+	
     replacemode = 0;	/* start out in insert mode */
     ed_InitMaps();
     Hist_num = 0;
@@ -229,11 +251,11 @@ ed_Setup(rst)
 	     * Don't affect CMIN and CTIME
 	     */
 	    for (rst = 0; rst < C_NCC - 2; rst++) {
-		if (ttychars[TS_IO][rst] != _POSIX_VDISABLE &&
-		    ttychars[EX_IO][rst] != _POSIX_VDISABLE)
+		if (ttychars[TS_IO][rst] != vdisable &&
+		    ttychars[EX_IO][rst] != vdisable)
 		    ttychars[EX_IO][rst] = ttychars[TS_IO][rst];
-		if (ttychars[TS_IO][rst] != _POSIX_VDISABLE &&
-		    ttychars[ED_IO][rst] != _POSIX_VDISABLE)
+		if (ttychars[TS_IO][rst] != vdisable &&
+		    ttychars[ED_IO][rst] != vdisable)
 		    ttychars[ED_IO][rst] = ttychars[TS_IO][rst];
 	    }
 	}
@@ -492,7 +514,7 @@ Rawmode()
 			(ttychars[TS_IO][i] != ttychars[EX_IO][i]))
 			ttychars[ED_IO][i] = ttychars[TS_IO][i];
 		    if (ttylist[ED_IO][M_CHAR].t_clrmask & C_SH(i))
-			ttychars[ED_IO][i] = _POSIX_VDISABLE;
+			ttychars[ED_IO][i] = vdisable;
 		}
 		tty_setchar(&edtty, ttychars[ED_IO]);
 
@@ -501,7 +523,7 @@ Rawmode()
 			(ttychars[TS_IO][i] != ttychars[EX_IO][i]))
 			ttychars[EX_IO][i] = ttychars[TS_IO][i];
 		    if (ttylist[EX_IO][M_CHAR].t_clrmask & C_SH(i))
-			ttychars[EX_IO][i] = _POSIX_VDISABLE;
+			ttychars[EX_IO][i] = vdisable;
 		}
 		tty_setchar(&extty, ttychars[EX_IO]);
 	    }

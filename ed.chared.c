@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.12 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.13 1991/11/04 04:16:33 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.12 1991/10/21 17:24:49 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.13 1991/11/04 04:16:33 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -492,7 +492,7 @@ excl_sw:
     if (q[1] == ':') {
 	*bend = '\0';
 	omodbuf = buf;
-	while (q[1] == ':' && (modbuf = domod(omodbuf, (int) q[2])) != NOSTR) {
+	while (q[1] == ':' && (modbuf = domod(omodbuf, (int) q[2])) != NULL) {
 	    if (omodbuf != buf)
 		xfree((ptr_t) omodbuf);
 	    omodbuf = modbuf;

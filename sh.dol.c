@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.6 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.7 1991/10/28 06:26:50 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.6 1991/10/21 17:24:49 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.7 1991/10/28 06:26:50 christos Exp $")
 
 /*
  * C shell
@@ -132,7 +132,7 @@ Dfix1(cp)
     if (noexec)
 	return (0);
     Dv[0] = cp;
-    Dv[1] = NOSTR;
+    Dv[1] = NULL;
     Dfix2(Dv);
     if (gargc != 1) {
 	setname(short2str(cp));
@@ -562,7 +562,8 @@ Dgetdol()
 	if (Isdigit(*np)) {
 	    int     i;
 
-	    for (i = 0; Isdigit(*np); i = i * 10 + *np++ - '0');
+	    for (i = 0; Isdigit(*np); i = i * 10 + *np++ - '0')
+		continue;
 	    if ((i < 0 || i > upb) && !any("-*", *np)) {
 		dolerror(vp->v_name);
 		return;
@@ -884,7 +885,7 @@ heredoc(term)
     }
     (void) unlink(tmp);		/* 0 0 inode! */
     Dv[0] = term;
-    Dv[1] = NOSTR;
+    Dv[1] = NULL;
     gflag = 0;
     trim(Dv);
     rscan(Dv, Dtestq);
@@ -981,7 +982,7 @@ heredoc(term)
 	}
 	else
 	    /* Setup trivial vector similar to return of dobackp */
-	    Dv[0] = mbp, Dv[1] = NOSTR, vp = Dv;
+	    Dv[0] = mbp, Dv[1] = NULL, vp = Dv;
 
 	/*
 	 * Resurrect the words from the command substitution each separated by

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.13 1991/10/28 06:26:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.14 1991/11/04 04:16:33 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.13 1991/10/28 06:26:50 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.14 1991/11/04 04:16:33 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -316,7 +316,7 @@ doif(v, kp)
     v++;
     i = expr(&v);
     vv = v;
-    if (*vv == NOSTR)
+    if (*vv == NULL)
 	stderror(ERR_NAME | ERR_EMPTYIF);
     if (eq(*vv, STRthen)) {
 	if (*++vv)
@@ -327,7 +327,7 @@ doif(v, kp)
 	 * following code.
 	 */
 	if (!i)
-	    search(T_IF, 0, NOSTR);
+	    search(T_IF, 0, NULL);
 	return;
     }
     /*
@@ -365,7 +365,7 @@ doelse (v, c)
     Char **v;
     struct command *c;
 {
-    search(T_ELSE, 0, NOSTR);
+    search(T_ELSE, 0, NULL);
 }
 
 /*ARGSUSED*/
@@ -392,7 +392,7 @@ gotolab(lab)
     zlast = T_GOTO;
     for (wp = whyles; wp; wp = wp->w_next)
 	if (wp->w_end.type == F_SEEK && wp->w_end.f_seek == 0) {
-	    search(T_BREAK, 0, NOSTR);
+	    search(T_BREAK, 0, NULL);
 	    btell(&wp->w_end);
 	}
 	else {
@@ -558,7 +558,7 @@ preread()
 #else /* !BSDSIGS */
 	(void) sigrelse (SIGINT);
 #endif /* BSDSIGS */
-    search(T_BREAK, 0, NOSTR);		/* read the expression in */
+    search(T_BREAK, 0, NULL);		/* read the expression in */
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigblock(sigmask(SIGINT));
@@ -657,7 +657,7 @@ doswbrk(v, c)
     Char **v;
     struct command *c;
 {
-    search(T_BRKSW, 0, NOSTR);
+    search(T_BRKSW, 0, NULL);
 }
 
 int
@@ -799,7 +799,7 @@ search(type, level, goal)
 		level = -1;
 	    break;
 	}
-	(void) getword(NOSTR);
+	(void) getword(NULL);
     } while (level >= 0);
 }
 
@@ -919,7 +919,7 @@ static void
 toend()
 {
     if (whyles->w_end.type == F_SEEK && whyles->w_end.f_seek == 0) {
-	search(T_BREAK, 0, NOSTR);
+	search(T_BREAK, 0, NULL);
 	btell(&whyles->w_end);
 	whyles->w_end.f_seek--;
     }

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.9 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.10 1991/10/21 17:24:49 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.9 1991/10/20 01:38:14 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.10 1991/10/21 17:24:49 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -131,7 +131,7 @@ dosetpath(arglist, c)
     for (i = 0; i < ncmds; i++) {
 	Char   *val = globone(cmdargs[i], G_ERROR);
 
-	if (val == NOSTR)
+	if (val == NULL)
 	    goto abortpath;
 	cmds[i] = xmalloc(Strlen(val) + 1);
 	(void) strcpy(cmds[i], short2str(val));
@@ -716,9 +716,6 @@ osinit()
     }
 #endif /* aiws */
 
-#ifdef hpux
-    (void) sigspace(4192);
-#endif	/* hpux */
 #ifdef titan
     end = sbrk(0);
 #endif	/* titan */

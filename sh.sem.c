@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.7 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.8 1991/11/04 04:16:33 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.7 1991/10/18 16:27:13 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.8 1991/11/04 04:16:33 christos Exp $")
 
 #include "tc.h"
 
@@ -291,7 +291,7 @@ execute(t, wanttty, pipein, pipeout)
 #endif /* BSDSIGS */
 		    nosigchld = 0;
 		}
-		else if (t->t_dflg & F_AMPERSAND)
+		else if (pid != 0 && (t->t_dflg & F_AMPERSAND))
 		    backpid = pid;
 	    }
 
@@ -685,7 +685,7 @@ int snum;
  * If more than one word is generated, then update the command vector.
  *
  * This is done differently in all the shells:
- * 1. in the bourne shell globbing is not performed
+ * 1. in the bourne shell and ksh globbing is not performed
  * 2. Bash/csh say ambiguous
  * 3. zsh does i/o to/from all the files
  * 4. itcsh concatenates the words.
@@ -693,7 +693,7 @@ int snum;
  * I don't know what is best to do. I think that Ambiguous is better
  * than restructuring the command vector, because the user can get
  * unexpected results. In any case, the command vector restructuring 
- * code is present, but disabled.
+ * code is present and the user can choose it by setting noambiguous
  */
 static Char *
 splicepipe(t, cp)
@@ -701,34 +701,36 @@ splicepipe(t, cp)
     Char *cp;	/* word after < or > */
 {
     Char *blk[2];
-#ifdef REWRITE_COMMAND
-    Char **pv;
 
-    blk[0] = Dfix1(cp); /* expand $ */
-    blk[1] = NULL;
+    if (adrof(STRnoambiguous)) {
+	Char **pv;
 
-    gflag = 0, tglob(blk);
-    if (gflag) {
-	pv = globall(blk);
-	if (pv == NULL) {
-	    setname(short2str(blk[0]));
+	blk[0] = Dfix1(cp); /* expand $ */
+	blk[1] = NULL;
+
+	gflag = 0, tglob(blk);
+	if (gflag) {
+	    pv = globall(blk);
+	    if (pv == NULL) {
+		setname(short2str(blk[0]));
+		xfree((ptr_t) blk[0]);
+		stderror(ERR_NAME | ERR_NOMATCH);
+	    }
+	    gargv = NULL;
+	    if (pv[1] != NULL) { /* we need to fix the command vector */
+		Char **av = blkspl(t->t_dcom, &pv[1]);
+		xfree((ptr_t) t->t_dcom);
+		t->t_dcom = av;
+	    }
 	    xfree((ptr_t) blk[0]);
-	    stderror(ERR_NAME | ERR_NOMATCH);
+	    blk[0] = pv[0];
+	    xfree((ptr_t) pv);
 	}
-	gargv = NULL;
-	if (pv[1] != NULL) { /* we need to fix the command vector */
-	    Char **av = blkspl(t->t_dcom, &pv[1]);
-	    xfree((ptr_t) t->t_dcom);
-	    t->t_dcom = av;
-	}
-	xfree((ptr_t) blk[0]);
-	blk[0] = pv[0];
-	xfree((ptr_t) pv);
     }
-#else /* AMBIGUOUS */
-    blk[0] = globone(blk[1] = Dfix1(cp), G_ERROR);
-    xfree((ptr_t) blk[1]);
-#endif /* REWRITE_COMMAND */
+    else {
+	blk[0] = globone(blk[1] = Dfix1(cp), G_ERROR);
+	xfree((ptr_t) blk[1]);
+    }
     return(blk[0]);
 }
     

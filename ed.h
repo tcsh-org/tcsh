@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.6 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.7 1991/10/20 01:38:14 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -42,7 +42,11 @@
 #endif
 
 #define TABSIZE		8	/* usually 8 spaces/tab */
-#define	INBUFSIZ	BUFSIZ	/* size of input buffer */
+#define	INBUFSIZ	1024	/* size of input buffer */
+				/* Used to be BUFSIZ, but that is could
+				 * be too small or too large for some
+				 * systems
+				 */
 #define MAXMACROLEVELS	10	/* max number of nested kbd macros */
 
 extern int errno;

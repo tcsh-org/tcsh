@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exp.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exp.c,v 3.4 1991/10/28 06:26:50 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.4 1991/10/28 06:26:50 christos Exp $")
 
 /*
  * C shell
@@ -459,7 +459,7 @@ exp6(vp, ignore)
 	faket.t_dcar = faket.t_dcdr = faket.t_dspr = NULL;
 	faket.t_dcom = fakecom;
 	fakecom[0] = STRfakecom;
-	fakecom[1] = NOSTR;
+	fakecom[1] = NULL;
 	(*vp)++;
 	v = *vp;
 	for (;;) {
@@ -486,7 +486,7 @@ exp6(vp, ignore)
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));
     cp = *(*vp)++;
-    if (*cp == '-' && any("erwxfdzopls", cp[1])) {
+    if (*cp == '-' && any("erwxfdzoplst", cp[1])) {
 	struct stat stb;
 
 	if (cp[2] != '\0')

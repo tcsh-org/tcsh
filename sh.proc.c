@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.15 1991/10/28 06:26:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.16 1991/11/04 04:16:33 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.15 1991/10/28 06:26:50 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.16 1991/11/04 04:16:33 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -45,6 +45,9 @@ RCSID("$Id: sh.proc.c,v 3.15 1991/10/28 06:26:50 christos Exp $")
 #if !defined(NSIG) && defined(SIGMAX)
 # define NSIG (SIGMAX+1)
 #endif /* !NSIG && SIGMAX */
+#if !defined(NSIG) && defined(_NSIG)
+# define NSIG _NSIG
+#endif /* !NSIG && _NSIG */
 
 #ifdef aiws
 # undef HZ

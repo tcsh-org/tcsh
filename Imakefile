@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.2 1991/10/18 16:27:13 christos Exp $
+/**/# $Id: Imakefile,v 1.3 1991/10/28 06:26:50 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -255,7 +255,7 @@ PARALLEL=12				# Make the multi-max run fast.
 #endif
 
 DESTDIR = DestDir
-MANSECT = 1
+MANSUFFIX = 1
 #ifdef DestBin
 BINDIR = DestBin
 #else
@@ -264,7 +264,7 @@ BINDIR = $(DESTDIR)/bin
 #ifdef DestMan
 MANDIR = DestMan
 #else
-MANDIR = $(DESTDIR)/man/man$(MANSECT)
+MANDIR = $(DESTDIR)/man/man$(MANSUFFIX)
 #endif
 
 #ifndef MyCflags

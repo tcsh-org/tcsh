@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.18 1991/10/28 06:26:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.19 1991/11/04 04:16:33 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -46,14 +46,6 @@
  */
 # define BACKPIPE
 #endif /* SVID > 3 */
-
-
-#if SVID > 0 && SVID < 3 && !defined(BSDSIGS)
-/*
- * If we have unreliable signals...
- */
-# define UNRELSIG
-#endif /* SVID > 0 && SVID < 3 && !BSDSIGS */
 
 #ifdef OREO
 # include <sys/time.h>

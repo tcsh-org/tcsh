@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.19 1991/10/22 06:52:57 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.20 1991/11/04 04:16:33 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -681,7 +681,12 @@ struct command {
 
 extern struct biltins {
     char   *bname;
+#if defined(hpux) && defined(__STDC__) && !defined(__GNUC__)
+    /* Avoid hpux ansi mode spurious warnings */
+    void    (*bfunct) ();
+#else
     void    (*bfunct) __P((Char **, struct command *));
+#endif /* hpux && __STDC__ && !__GNUC__ */
     int     minargs, maxargs;
 }       bfunc[];
 extern int nbfunc;
@@ -837,7 +842,6 @@ extern int errno, sys_nerr;
 #define Strstr(a, b)		s_strstr(a, b)
 #endif 
 
-#define	NOSTR	((Char *) 0)
 /*
  * setname is a macro to save space (see sh.err.c)
  */

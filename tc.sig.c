@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.c,v 3.4 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.c,v 3.5 1991/10/20 01:38:14 christos Exp $ */
 /*
  * sh.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.4 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.5 1991/10/20 01:38:14 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -239,8 +239,8 @@ sigret_t(*
 #ifdef SIG_STK
     sv.sv_onstack = SIG_STK;
 #endif
-#if defined(SV_BSDSIG) && defined(SV_ONSTACK)
-    sv.sv_flags = SV_BSDSIG | SV_ONSTACK;
+#ifdef SV_BSDSIG
+    sv.sv_flags = SV_BSDSIG;
 #endif
 
     if (mysigvec(s, &sv, NULL) < 0)

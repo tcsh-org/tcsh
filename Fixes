@@ -1,4 +1,9 @@
 V6.00.04, ....
+21. Get the value of _POSIX_VDISABLE from pathconf...
+20. Hpux 8.0 fixes. Sigstack botches with shared libraries. Ansi mode
+    static initialization of structures with prototyped function pointers
+    gives spurious warnings...
+19. Onintr in /etc rc files is disabled.
 18. (beta-2 11/03/91)
 17. Multi-line aliases with `` bug fix.
 16. Sticky emacs overwrite mode.

@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.19 1991/10/21 17:24:49 christos Exp $
+.\" $Id: tcsh.man,v 3.20.1.1 1991/11/10 23:45:00 raj Exp $
 .TH TCSH 1 "20 October 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -825,7 +825,7 @@ completion will
 .I also
 beep when there is an exact match but there are other, longer, matches
 (see recexact).  With matchbeep=never or set to any other value completion 
-will never beep. If matchbeep is not set it defaults to ambiquous.
+will never beep. If matchbeep is not set it defaults to ambiguous.
 .PP
 If the
 .I autoexpand
@@ -1108,7 +1108,7 @@ only numeric arguments are treated as
 event numbers; therefore
 .I "!3d" 
 is interpreted as: repeat the last command that
-started with the string "3d". To mimick the 
+started with the string "3d". To mimic the 
 .I csh
 behavior
 .I "!3\ed" 
@@ -1309,7 +1309,7 @@ Print entries in new lines so that the screen width is not exceeded
 Don't print \~ but print the whole path
 .TP 4
 .I "-v"
-Print the stack entries one in each line, preceeded by the stack number.
+Print the stack entries one in each line, preceded by the stack number.
 .PP 
 Note that popd +n can be used to pop out stack entries of directories that
 do not exist any more.
@@ -1714,10 +1714,10 @@ points to:
 .sp
 While setting 
 .I listlinks
-can be helpful while navigating around the filesystem, it slows down
+can be helpful while navigating around the file system, it slows down
 .I ls-F 
-and it causes mounting of filesystems if the symbolic links point
-to an NFS automounted partition.
+and it causes mounting of file systems if the symbolic links point
+to an NFS auto-mounted partition.
 .PP
 .SH "18. GLOBBING SYNTAX ADDITIONS"
 The syntax for any character in a range (for example ".[a-z]*") has
@@ -1896,7 +1896,7 @@ incremental search.
 .PP
 History-search-backward (history-search-forward)
 searches backward (forward) through the history
-list for previous (next) occurrence of the beginnng of the input
+list for previous (next) occurrence of the beginning of the input
 buffer as a command.  That is, if the user types:
 .sp
 .nf
@@ -2089,7 +2089,7 @@ which if set holds a command that will be executed after changing the
 value of $cwd.  For example, if the user is running on an X window
 system 
 .I xterm(1),
-and a reparenting window manager that supports title bars such
+and a re-parenting window manager that supports title bars such
 as 
 .I twm(1) and has done:
 .sp
@@ -2309,7 +2309,7 @@ In addition, jobs will print the site the job is executing.
 .PP
 .TP 
 .B inlib <shared-library> ...
-Inlib adds shared libraries to the current enviroment. There is no way
+Inlib adds shared libraries to the current environment. There is no way
 to remove them...
 .TP
 .B rootnode //<nodename>
@@ -2404,9 +2404,10 @@ respectively. On the NeXT the names are also different:
 and
 .I "/etc/logout.std"
 Finally on
-.I irix
-or
+.I irix,
 .I A/UX
+and the
+.I cray
 only the file
 .I "/etc/cshrc"
 is executed if the shell is a login shell. 
@@ -2647,7 +2648,7 @@ History lines saved at shell exit are also saved as this variable indicates.
 If set, it contains the full path-name where a history file is read/written.
 It defaults to $home/.history. This is useful when sharing the same home
 directory in different machines, or if one wants to save all the histories
-in the tty sessions. It is usually set in .cshrc for interractive shells,
+in the tty sessions. It is usually set in .cshrc for interactive shells,
 because history is sourced between .cshrc and .login so that it is available
 from .login.
 .TP 10
@@ -2790,7 +2791,7 @@ list of events to watch.
 format string for the printouts generated when \fIwatch\fR is set.
 .TP 10
 .B wordchars 
-list of nonalphanumeric characters considered part of a word for the purpose
+list of non-alphanumeric characters considered part of a word for the purpose
 of the forward-word, backward-word etc functions
 -- defaults to "*?_-.[]~=".
 .PP
@@ -2931,7 +2932,7 @@ Added the wordchars variable.
 .sp
 George Hartzell, MCD Biology, University of Colorado-Boulder, 1988
 .br
-Fixed the always reseting to DEL bug.
+Fixed the always resetting to DEL bug.
 .sp
 Patrick Wolfe, Kuck and Associates, Inc., 1988
 .br

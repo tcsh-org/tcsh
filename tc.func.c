@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.11 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.12 1991/11/04 04:16:33 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.11 1991/10/20 01:38:14 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.12 1991/11/04 04:16:33 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -660,7 +660,7 @@ period_cmd()
     periodic_active = 1;
     if (!whyles && adrof1(STRperiodic, &aliases)) {
 	vp = value(STRtperiod);
-	if (vp == NOSTR)
+	if (vp == NULL)
 	    return;
 	interval = getn(vp);
 	(void) time(&t);

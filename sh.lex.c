@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.9 1991/10/28 06:26:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.10 1991/11/04 04:16:33 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.9 1991/10/28 06:26:50 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.10 1991/11/04 04:16:33 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -900,7 +900,7 @@ dosub(sc, en, global)
     bool global;
 {
     struct wordent lexi;
-    bool    didsub = 0;
+    bool    didsub = 0, didone = 0;
     struct wordent *hp = &lexi;
     register struct wordent *wdp;
     register int i = exclc;
@@ -920,11 +920,13 @@ dosub(sc, en, global)
 	    Char *tword, *otword;
 
 	    if ((global & 1) || didsub == 0) {
-		tword = subword(en->word, sc, &didsub);
+		tword = subword(en->word, sc, &didone);
+		if (didone)
+		    didsub = 1;
 		if (global & 2) {
-		    while (didsub && tword != STRNULL) {
+		    while (didone && tword != STRNULL) {
 			otword = tword;
-			tword = subword(otword, sc, &didsub);
+			tword = subword(otword, sc, &didone);
 			if (Strcmp(tword, otword) == 0) {
 			    xfree((ptr_t) otword);
 			    break;
@@ -932,7 +934,6 @@ dosub(sc, en, global)
 			else
 			    xfree((ptr_t) otword);
 		    }
-		    didsub = 1;
 		}
 	    }
 	    else

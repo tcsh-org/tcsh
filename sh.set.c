@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.set.c,v 3.4 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.set.c,v 3.5 1991/10/14 20:42:30 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.4 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.5 1991/10/14 20:42:30 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -373,16 +373,15 @@ operate(op, vp, p)
     return (putn(i));
 }
 
-static Char *putp;
+static Char *putp, nbuf[50];
 
 Char   *
 putn(n)
     register int n;
 {
     int     num;
-    static Char number[15];
 
-    putp = number;
+    putp = nbuf;
     if (n < 0) {
 	n = -n;
 	*putp++ = '-';
@@ -405,7 +404,7 @@ putn(n)
 #endif
     putn1(n);
     *putp = 0;
-    return (Strsave(number));
+    return (Strsave(nbuf));
 }
 
 static void
@@ -790,7 +789,11 @@ balance(p, f, d)
 			p->v_bal > -1 ? 0 : 1;
 		    p->v_bal = 0;
 		    break;
+		default:
+		    break;
 		}
+		break;
+	    default:
 		break;
 	    }
 	}
@@ -823,7 +826,11 @@ balance(p, f, d)
 			p->v_bal > -1 ? 0 : 1;
 		    p->v_bal = 0;
 		    break;
+		default:
+		    break;
 		}
+		break;
+	    default:
 		break;
 	    }
 	}

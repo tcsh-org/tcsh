@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.h,v 3.2 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.h,v 3.3 1991/11/04 04:16:33 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -51,23 +51,30 @@
 # define SAVESIGVEC
 #endif
 
+#if SVID > 0 && SVID < 3 && !defined(BSDSIGS)
+/*
+ * If we have unreliable signals...
+ */
+# define UNRELSIG
+#endif /* SVID > 0 && SVID < 3 && !BSDSIGS */
+
 #ifdef BSDSIGS
 /*
  * sigvec is not the same everywhere
  */
-# if defined(_SEQUENT_) || defined(_POSIX_SOURCE)
+# if defined(_SEQUENT_) || (defined(_POSIX_SOURCE) && !defined(hpux))
 #  define HAVE_SIGVEC
 #  define mysigvec(a, b, c)	sigaction(a, b, c)
 typedef struct sigaction sigvec_t;
 #  define sv_handler sa_handler
 #  define sv_flags sa_flags
-# endif	/* _SEQUENT || _POSIX_SOURCE */
+# endif	/* _SEQUENT || (_POSIX_SOURCE && !hpux) */
 
 # ifdef hpux
 #  define HAVE_SIGVEC
 #  define mysigvec(a, b, c)	sigvector(a, b, c)
-#  define NEEDsignal
 typedef struct sigvec sigvec_t;
+#  define NEEDsignal
 # endif	/* hpux */
 
 # ifndef HAVE_SIGVEC

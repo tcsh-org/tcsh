@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.5 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.6 1991/10/28 06:26:50 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.5 1991/10/21 17:24:49 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.6 1991/10/28 06:26:50 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -399,7 +399,7 @@ texec(sf, st)
 	if (v == 0) {
 	    vp = lastsh;
 	    vp[0] = adrof(STRshell) ? value(STRshell) : STR_SHELLPATH;
-	    vp[1] = NOSTR;
+	    vp[1] = NULL;
 #ifdef _PATH_BSHELL
 	    if (fd != -1 
 # ifndef ISC	/* Compatible with ISC's /bin/csh */

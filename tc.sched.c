@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.sched.c,v 1.3 91/09/24 17:11:29 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sched.c,v 3.4 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.3 1991/07/17 13:24:11 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.4 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -78,7 +78,7 @@ dosched(v, c)
 
     v++;
     cp = *v++;
-    if (cp == NOSTR) {
+    if (cp == NULL) {
 	/* print list of scheduled events */
 	for (count = 1, tp = sched_ptr; tp; count++, tp = tp->t_next) {
 	    timeline = ctime(&tp->t_when);

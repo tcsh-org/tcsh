@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.12 1991/10/13 23:44:48 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.13 1991/10/18 16:27:13 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.12 1991/10/13 23:44:48 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.13 1991/10/18 16:27:13 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -156,7 +156,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	if (skp)
 	    continue;
 	if ((ismeta(word_start[-1]) || isaset(cmd_st, word_start)) &&
-	    (word_start[-1] != '#') && (word_start[-1] != '$') &&
+	    /* (word_start[-1] != '#') && */ (word_start[-1] != '$') &&
 	    ((word_start - 1 == inputline) || (word_start[-2] != '\\')))
 	    break;
     }
@@ -415,7 +415,8 @@ quote_meta(word, trail_space)
     for (bptr = buffer, wptr = word; *wptr != '\0';) {
 	if ((cmap(*wptr, _META | _DOL | _Q | _ESC | _GLOB) || *wptr == HIST ||
 	     *wptr == HISTSUB) &&
-	    (*wptr != ' ' || !trail_space || *(wptr + 1) != '\0'))
+	    (*wptr != ' ' || !trail_space || 
+	     *(wptr + 1) != '\0') && *wptr != '#')
 	    *bptr++ = '\\';
 	*bptr++ = *wptr++;
     }

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dir.c,v 3.5 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dir.c,v 3.6 1991/10/28 06:26:50 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.5 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.6 1991/10/28 06:26:50 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -161,7 +161,7 @@ skipargs(v, str)
     Char  **n = *v, *s;
 
     dirflag = 0;
-    for (n++; *n != NOSTR && (*n)[0] == '-'; n++)
+    for (n++; *n != NULL && (*n)[0] == '-'; n++)
 	for (s = &((*n)[1]); *s; s++)
 	    switch (*s) {
 	    case 'l':
@@ -191,7 +191,7 @@ dodirs(v, c)
 {
     skipargs(&v, "");
 
-    if (*v != NOSTR)
+    if (*v != NULL)
 	stderror(ERR_DIRUS, "dirs", "");
     printdirs();
 }
@@ -205,7 +205,7 @@ printdirs()
     extern int T_Cols;
 
     if (*hp == '\0')
-	hp = NOSTR;
+	hp = NULL;
     dp = dcwd;
     idx = 0;
     cur = 0;
@@ -216,7 +216,7 @@ printdirs()
 	    xprintf("%d\t", idx++);
 	    cur = 0;
 	}
-	if (!(dirflag & DIR_LONG) && hp != NOSTR && !eq(hp, STRslash) &&
+	if (!(dirflag & DIR_LONG) && hp != NULL && !eq(hp, STRslash) &&
 	    prefix(hp, dp->di_name))
 	    len = Strlen(s = (dp->di_name + Strlen(hp))) + 2;
 	else
@@ -366,14 +366,14 @@ dochngd(v, c)
 
     skipargs(&v, " [<dir>]");
     printd = 0;
-    if (*v == NOSTR) {
-	if ((cp = value(STRhome)) == NOSTR || *cp == 0)
+    if (*v == NULL) {
+	if ((cp = value(STRhome)) == NULL || *cp == 0)
 	    stderror(ERR_NAME | ERR_NOHOMEDIR);
 	if (chdir(short2str(cp)) < 0)
 	    stderror(ERR_NAME | ERR_CANTCHANGE);
 	cp = Strsave(cp);
     }
-    else if (v[1] != NOSTR) {
+    else if (v[1] != NULL) {
 	stderror(ERR_NAME | ERR_TOOMANY);
 	/* NOTREACHED */
 	return;
@@ -391,7 +391,7 @@ dochngd(v, c)
 	return;
     }
     else
-	if ((cp = dfollow(*v)) == NOSTR)
+	if ((cp = dfollow(*v)) == NULL)
 	    return;
     dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
     dp->di_name = cp;
@@ -514,12 +514,12 @@ dfollow(cp)
     if (!bequiet)
 	stderror(ERR_SYSTEM, ebuf, strerror(serrno));
     else
-	return (NOSTR);
+	return (NULL);
 #else
     stderror(ERR_SYSTEM, ebuf, strerror(serrno));
 #endif
     /* NOTREACHED */
-    return (NOSTR);
+    return (NULL);
 }
 
 
@@ -539,14 +539,14 @@ dopushd(v, c)
 
     skipargs(&v, " [<dir>|+<n>]");
     printd = 1;
-    if (*v == NOSTR) {
+    if (*v == NULL) {
 	if (adrof(STRpushdtohome)) {
-	    if ((cp = value(STRhome)) == NOSTR || *cp == 0)
+	    if ((cp = value(STRhome)) == NULL || *cp == 0)
 		stderror(ERR_NAME | ERR_NOHOMEDIR);
 	    if (chdir(short2str(cp)) < 0)
 		stderror(ERR_NAME | ERR_CANTCHANGE);
 	    cp = Strsave(cp);	/* hmmm... PWP */
-	    if ((cp = dfollow(cp)) == NOSTR)
+	    if ((cp = dfollow(cp)) == NULL)
 		return;
 	    dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
 	    dp->di_name = cp;
@@ -573,7 +573,7 @@ dopushd(v, c)
 	    dcwd->di_next = dp;
 	}
     }
-    else if (v[1] != NOSTR) {
+    else if (v[1] != NULL) {
 	stderror(ERR_NAME | ERR_TOOMANY);
 	/* NOTREACHED */
 	return;
@@ -592,7 +592,7 @@ dopushd(v, c)
     else {
 	register Char *ccp;
 
-	if ((ccp = dfollow(*v)) == NOSTR)
+	if ((ccp = dfollow(*v)) == NULL)
 	    return;
 	dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
 	dp->di_name = ccp;
@@ -648,9 +648,9 @@ dopopd(v, c)
 
     skipargs(&v, " [+<n>]");
     printd = 1;
-    if (*v == NOSTR)
+    if (*v == NULL)
 	dp = dcwd;
-    else if (v[1] != NOSTR) {
+    else if (v[1] != NULL) {
 	stderror(ERR_NAME | ERR_TOOMANY);
 	/* NOTREACHED */
 	return;
