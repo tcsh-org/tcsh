@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.82 1999/06/01 20:01:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.83 1999/08/12 14:19:23 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.82 1999/06/01 20:01:36 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.83 1999/08/12 14:19:23 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -77,6 +77,14 @@ isbfunc(t)
     static struct biltins label = {"", dozip, 0, 0};
     static struct biltins foregnd = {"%job", dofg1, 0, 0};
     static struct biltins backgnd = {"%job &", dobg1, 0, 0};
+
+    /*
+     * We never match a builtin that has quoted the first
+     * character; this has been the traditional way to escape 
+     * builtin commands.
+     */
+    if (*cp & QUOTE)
+	return NULL;
 
     if (*cp != ':' && lastchr(cp) == ':') {
 	label.bname = short2str(cp);
