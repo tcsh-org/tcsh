@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.56 1994/05/07 18:51:25 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.func.c,v 3.57 1994/05/26 13:11:20 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.56 1994/05/07 18:51:25 christos Exp christos $")
+RCSID("$Id: tc.func.c,v 3.57 1994/05/26 13:11:20 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1899,6 +1899,11 @@ remotehost()
 #endif
     (void) alarm(0);
     (void) signal(SIGALRM, osig);
+
+#ifdef YPBUGS
+    /* From: casper@fwi.uva.nl (Casper H.S. Dik), for Solaris 2.3 */
+    fix_yp_bugs();
+#endif /* YPBUGS */
 
     if (host)
 	tsetenv(STRREMOTEHOST, str2short(host));
