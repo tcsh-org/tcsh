@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /src/pub/tcsh/host.defs,v 1.28 2000/11/11 23:03:35 christos Exp $ */
+/* $Header: /src/pub/tcsh/host.defs,v 1.29 2001/03/18 19:06:28 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.28 2000/11/11 23:03:35 christos Exp $")
+RCSID("$Id: host.defs,v 1.29 2001/03/18 19:06:28 christos Exp $")
 
 endcode	:
 
@@ -539,6 +539,14 @@ hosttype:						: "coh386"
 hosttype:						: "coherent"
 ostype	:						: "coherent"
 machtype: defined(_I386)				: "i386"
+enddef	:
+
+newdef	: defined(concurrent)
+comment	: Concurrent PowerHawk
+vendor	:						: "concurrent"
+hosttype:						: "powerhawk"
+ostype	:						: "powermax_os"
+machtype:						: "powerhawk"
 enddef	:
 
 newdef	: defined(SCO)
