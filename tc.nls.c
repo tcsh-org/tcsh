@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.3 2005/01/18 20:01:10 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.4 2005/01/18 20:12:14 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -31,10 +31,8 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-#include <stdlib.h>
-#include <wchar.h>
 
-RCSID("$Id: tc.nls.c,v 3.3 2005/01/18 20:01:10 christos Exp $")
+RCSID("$Id: tc.nls.c,v 3.4 2005/01/18 20:12:14 christos Exp $")
 
 #ifdef SHORT_STRINGS
 int
