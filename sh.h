@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.73 1996/10/19 17:54:12 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.74 1997/02/23 19:03:21 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -188,7 +188,7 @@ typedef int sigret_t;
 
 #if defined(BSDTIMES) || defined(BSDLIMIT)
 # include <sys/time.h>
-# if SYSVREL>3 && !defined(sgi) && !defined(sun) && !(defined(__alpha) && defined(__osf__))
+# if SYSVREL>3 && !defined(SCO) && !defined(sgi) && !defined(sun) && !(defined(__alpha) && defined(__osf__))
 #  include "/usr/ucbinclude/sys/resource.h"
 # else
 #  ifdef convex
@@ -281,9 +281,9 @@ extern pid_t setpgrp();
 #define CSWTCH _POSIX_VDISABLE
 #endif
 
-#if (!defined(FIOCLEX) && defined(SUNOS4)) || ((SYSVREL == 4) && !defined(_SEQUENT_))
+#if (!defined(FIOCLEX) && defined(SUNOS4)) || ((SYSVREL == 4) && !defined(_SEQUENT_) && !defined(SCO))
 # include <sys/filio.h>
-#endif /* (!FIOCLEX && SUNOS4) || (SYSVREL == 4 && !_SEQUENT_) */
+#endif /* (!FIOCLEX && SUNOS4) || (SYSVREL == 4 && !_SEQUENT_ && !SCO) */
 
 #if !defined(_MINIX) && !defined(COHERENT) && !defined(supermax)
 # include <sys/file.h>
@@ -463,7 +463,11 @@ extern void		DebugFree	__P((ptr_t, char *, int));
 #endif /* REMOTEHOST */
 
 #ifndef MAXHOSTNAMELEN
-# define MAXHOSTNAMELEN	255
+# if defined(SCO) && (SYSVREL > 3)
+#  include <sys/socket.h>
+# else
+#  define MAXHOSTNAMELEN 255
+# endif
 #endif /* MAXHOSTNAMELEN */
 
 
@@ -896,6 +900,8 @@ EXTERN struct varent {
 #define VAR_READONLY	1
 #define VAR_READWRITE	2
 #define VAR_NOGLOB	4
+#define VAR_FIRST       32
+#define VAR_LAST        64
     struct varent *v_link[3];	/* The links, see below */
     int     v_bal;		/* Balance factor */
 }       shvhed, aliases;

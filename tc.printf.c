@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.printf.c,v 3.14 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.printf.c,v 3.15 1996/04/26 19:21:18 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.14 1993/10/30 19:50:16 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.15 1996/04/26 19:21:18 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -125,7 +125,7 @@ doprnt(addchar, sfmt, ap)
 	    }
 
 	    fmt = (unsigned char) *f;
-	    if (fmt != 'S' && Isupper(fmt)) {
+	    if (fmt != 'S' && fmt != 'Q' && Isupper(fmt)) {
 		do_long = 1;
 		fmt = Tolower(fmt);
 	    }
@@ -206,7 +206,7 @@ doprnt(addchar, sfmt, ap)
 		break;
 
 	    case 'S':
-#ifdef SHORT_STRINGS
+	    case 'Q':
 		Bp = va_arg(ap, Char *);
 		if (!Bp) {
 		    bp = NULL;
@@ -217,21 +217,18 @@ doprnt(addchar, sfmt, ap)
 		    while (f_width-- > 0)
 			(*addchar) ((int) (pad | attributes));
 		for (i = 0; *Bp && i < prec; i++) {
-		    (*addchar) ((int) ((unsigned char)*Bp | attributes));
+		    if (fmt == 'Q' && *Bp & QUOTE)
+			(*addchar) ((int) ('\\' | attributes));
+		    (*addchar) ((int) ((*Bp & TRIM) | attributes));
 		    Bp++;
 		}
 		if (flush_left)
 		    while (f_width-- > 0)
 			(*addchar) ((int) (' ' | attributes));
 		break;
-#else
-		bp = va_arg(ap, Char *);
-		if (bp)
-		    (void) strip((Char *) bp);
-		goto lcase_s;
-#endif /* SHORT_STRINGS */
 
 	    case 's':
+	    case 'q':
 		bp = va_arg(ap, char *);
 lcase_s:
 		if (!bp)
@@ -241,13 +238,14 @@ lcase_s:
 		    while (f_width-- > 0)
 			(*addchar) ((int) (pad | attributes));
 		for (i = 0; *bp && i < prec; i++) {
-		    (*addchar) ((int) (((unsigned char) *bp) | attributes));
+		    if (fmt == 'q' && *bp & QUOTE)
+			(*addchar) ((int) ('\\' | attributes));
+		    (*addchar) ((int) ((*bp & TRIM) | attributes));
 		    bp++;
 		}
 		if (flush_left)
 		    while (f_width-- > 0)
 			(*addchar) ((int) (' ' | attributes));
-
 		break;
 
 	    case 'a':

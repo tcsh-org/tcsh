@@ -76,7 +76,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "23 February 1997" "Astron 6.07.03"
+.TH TCSH 1 "4 May 1997" "Astron 6.07.04"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -3149,18 +3149,16 @@ based on the time of day.
 .br
 .B set \fIname\fR\fB=\fIword\fR ...
 .br
-.B set \fIname\fR\fB=(\fIwordlist\fB)\fR ...
+.B set [\-r] [\-f|\-l] \fIname\fR\fB=(\fIwordlist\fB)\fR ... (+)
 .br
 .B set \fIname[index]\fR\fB=\fIword\fR ...
 .br
 .B set \-r \fR(+)
 .br
 .B set \-r \fIname\fR ... (+)
-.br
-.B set \-r \fIname\fR\fB=\fIword\fR ... (+)
 .PD 0
 .TP 8
-.B set \-r \fIname\fR\fB=(\fIwordlist\fB)\fR ... (+)
+.B set \-r \fIname\fR\fB=\fIword\fR ... (+)
 The first form of the command prints the value of all shell variables.
 Variables which contain more than a single word print as a
 parenthesized word list.
@@ -3168,12 +3166,16 @@ The second form sets \fIname\fR to the null string.
 The third form sets \fIname\fR to the single \fIword\fR. 
 The fourth form sets \fIname\fR to the list of words in
 \fIwordlist\fR. In all cases the value is command and filename expanded.
+If \-r is specified, the value is set read-only. If \-f or \-l are
+specified, set only unique words keeping their order.
+\-f prefers the first occurrence of a word, and \-l the last.
+first occurance of the word
 The fifth form sets the \fIindex\fR'th component of name to \fIword\fR;
 this component must already exist.
 The sixth form lists the names (only) of all shell variables which are read-only.
 The seventh form makes \fIname\fR read-only, whether or not it has a value.
 The second form sets \fIname\fR to the null string.
-The eighth and ninth forms are the same as the third and fourth forms, but
+The eighth form is the same as the third form, but
 make \fIname\fR read-only at the same time.
 .PD
 .IP "" 8
@@ -4692,7 +4694,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.07.03 (Astron) 1997-02-23.
+This manual documents tcsh 6.07.04 (Astron) 1997-05-04.
 .SH AUTHORS
 .PD 0
 .TP 2

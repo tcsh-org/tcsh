@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.65 1996/09/24 16:57:31 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.66 1996/10/05 17:39:17 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -144,6 +144,7 @@ struct ucred {
 #  define CSUSP 032
 # endif	/* CSUSP */
 
+# include <signal.h>
 # if !defined(hp9000s500) && !(defined(SIGRTMAX) || defined(SIGRTMIN))
 /*
  * hpux < 7 || hpux >= 10

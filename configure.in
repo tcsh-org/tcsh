@@ -153,6 +153,17 @@ case "${tcsh_cv_canonical}" in
     tcsh_config_file=tekXD88
   ;;
 
+  ## SCO
+  *-sco3.2v5*) 
+    tcsh_config_file=sco32v5
+  ;;
+  *-sco3.2v4*)
+    tcsh_config_file=sco32v4
+  ;;
+  *-sco3.2v2*)
+    tcsh_config_file=sco32v2
+  ;;
+
   * )
   changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name

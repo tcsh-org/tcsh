@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.30 1996/06/22 21:44:41 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.31 1996/10/05 17:39:14 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.30 1996/06/22 21:44:41 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.31 1996/10/05 17:39:14 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -183,16 +183,33 @@ doset(v, c)
     bool    hadsub;
     int     subscr;
     int	    flags = VAR_READWRITE;
+    bool    first_match = 0;
+    bool    last_match = 0;
+    bool    changed = 0;
 
     USE(c);
     v++;
-    /*
-     * Readonly addition From: Tim P. Starrin <noid@cyborg.larc.nasa.gov>
-     */
-    if (*v && eq(*v, STRmr)) {
-	flags = VAR_READONLY;
-	v++;
-    }
+    do {
+	changed = 0;
+	/*
+	 * Readonly addition From: Tim P. Starrin <noid@cyborg.larc.nasa.gov>
+	 */
+	if (*v && eq(*v, STRmr)) {
+	    flags = VAR_READONLY;
+	    v++;
+	    changed = 1;
+	}
+	if (*v && eq(*v, STRmf) && !last_match) {
+	    first_match = 1;
+	    v++;
+	    changed = 1;
+	}
+	if (*v && eq(*v, STRml) && !first_match) {
+	    last_match = 1;
+	    v++;
+	    changed = 1;
+	}
+    } while(changed);
     p = *v++;
     if (p == 0) {
 	plist(&shvhed, flags);
@@ -241,6 +258,11 @@ doset(v, c)
 	    p = *e;
 	    *e = 0;
 	    vecp = saveblk(v);
+	    if (first_match)
+	       flags |= VAR_FIRST;
+	    else if (last_match)
+	       flags |= VAR_LAST;
+
 	    set1(vp, vecp, &shvhed, flags);
 	    *e = p;
 	    v = e + 1;
@@ -581,6 +603,55 @@ set1(var, vec, head, flags)
 	    gargv = 0;
 	}
     }
+    /*
+     * Uniqueness addition from: Michael Veksler <mveksler@vnet.ibm.com>
+     */
+    if ( flags & (VAR_FIRST | VAR_LAST) ) {
+	/*
+	 * Code for -f (VAR_FIRST) and -l (VAR_LAST) options.
+	 * Method:
+	 *  Delete all duplicate words leaving "holes" in the word array (vec).
+	 *  Then remove the "holes", keeping the order of the words unchanged.
+	 */
+	if (vec && vec[0] && vec[1]) { /* more than one word ? */
+	    int i, j;
+	    int num_items;
+
+	    for (num_items = 0; vec[num_items]; num_items++)
+	        continue;
+	    if (flags & VAR_FIRST) {
+		/* delete duplications, keeping first occurance */
+		for (i = 1; i < num_items; i++)
+		    for (j = 0; j < i; j++)
+			/* If have earlier identical item, remove i'th item */
+			if (vec[i] && vec[j] && Strcmp(vec[j], vec[i]) == 0) {
+			    free(vec[i]);
+			    vec[i] = NULL;
+			    break;
+			}
+	    } else if (flags & VAR_LAST) {
+	      /* delete duplications, keeping last occurance */
+		for (i = 0; i < num_items - 1; i++)
+		    for (j = i + 1; j < num_items; j++)
+			/* If have later identical item, remove i'th item */
+			if (vec[i] && vec[j] && Strcmp(vec[j], vec[i]) == 0) {
+			    /* remove identical item (the first) */
+			    free(vec[i]);
+			    vec[i] = NULL;
+			}
+	    }
+	    /* Compress items - remove empty items */
+	    for (j = i = 0; i < num_items; i++)
+	       if (vec[i]) 
+		  vec[j++] = vec[i];
+
+	    /* NULL-fy remaining items */
+	    for (; j < num_items; j++)
+		 vec[j] = NULL;
+	}
+	/* don't let the attribute propagate */
+	flags &= ~(VAR_FIRST|VAR_LAST);
+    } 
     setq(var, vec, head, flags);
 }
 

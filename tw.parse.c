@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.76 1996/10/05 17:39:20 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.77 1997/02/23 19:03:29 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.76 1996/10/05 17:39:20 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.77 1997/02/23 19:03:29 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1703,6 +1703,7 @@ dollar(new, old)
 	    if (expdollar(&p, &old, &space, QUOTE) == NULL)
 		return NULL;
 	}
+    *new = '\0';
     return (new);
 } /* end dollar */
 

@@ -45,6 +45,18 @@ ENVIRON	:	n/a
 NOTES	:	n/a
 VERSION	:	6.04.13
 
+VENDOR	:	sun
+MODELS	:	sun4
+COMPILER:	gcc
+CFLAGS	:	normal
+LIBES	:	-ltermcap
+OS	:	linux 2.0.x, 2.1.x
+CONFIG	:	linux
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.07.03
+
+
 VENDOR	:	hp
 MODELS	:	apollo
 COMPILER:	cc
@@ -87,6 +99,10 @@ NOTES	:	All references to <sys/bsdtty> had to be eliminated,
 	:	starts forking children	indefinitely.
 	:	All changes included in	a patch	avaliable from tor.teorfys.lu.se
 	:	Carl-Olof Almbladh (coa@teorfys.lu.se)
+	:	To make a statically linked version: in config_f.h, #undef NLS
+	:	and use these LDFLAGS in the Makefile: LDFLAGS= -Wl,-a,archive
+	:	[orban@kato.den.csci.csc.com (Tom Orban)
+
 
 VENDOR	:	hp
 
@@ -415,6 +431,16 @@ NOTES	:	LDPOSTLIB = -nostdlib -L$(ROOT)$(SHLIBDIR)/mips3 \
 NOTES	:	-L$(ROOT)$(SHLIBDIR)
 NOTES	:	In config.h #undef NLS and #undef NLS_CATALOGS
 VERSION	:	6.06.00
+
+VENDOR	:	SGI
+MODELS	:	Onyx R10000
+COMPILER:	gcc-2.7.2.1 configured for mips-sgi-irix5.3
+CFLAGS	:	none
+LIBES	:	-ltermcap -lbsd
+OS	:	IRIX 6.2
+CONFIG	:	sgi
+ENVIRON	:	n/a
+VERSION	:	6.07.02
 
 VENDOR	:	ibm + compatibles
 MODELS	:	i386,i486
@@ -894,3 +920,14 @@ NOTES   :       so use: -ltermcap -lc -L/usr/ucblib -lucb
 NOTES   :       In config.h, set HAVEUTMPX und unset BSDSIGS and BSDTIMES
 NOTES   :
 VERSION :       6.06.03
+
+VENDOR	:	FUJITSU
+MODELS	:	ds90
+COMPILER:	cc
+CFLAGS	:	-O -I. -DSVR4 -DANSICPP
+LIBES	:	-lsocket -lnsl -ltermcap
+OS	:	UXP/DS V20L10(SVR4.2)
+CONFIG	:	sysv4
+ENVIRON	:	n/a
+NOTES	:	n/a
+VERSION	:	6.07.02

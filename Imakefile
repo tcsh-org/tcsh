@@ -1,5 +1,5 @@
 XCOMM
-XCOMM $Id: Imakefile,v 1.67 1996/10/05 17:39:00 christos Exp $
+XCOMM $Id: Imakefile,v 1.68 1996/10/11 17:31:56 christos Exp $
 XCOMM
 XCOMM Imakefile for tcsh 6.07
 XCOMM Marc Horowitz, MIT SIPB
@@ -35,6 +35,10 @@ ones.  Please send in your fixes and additions! */
 #ifndef ConfigH
 # ifdef UltrixArchitecture
 #  define ConfigH ultrix
+# endif
+
+# ifdef UxpArchitecture
+#  define ConfigH sysv4
 # endif
 
 # ifdef LinuxArchitecture
@@ -116,8 +120,10 @@ DEPENDFLAGS = -o.o
 #  ifndef UseLibBSD
 #   define UseLibBSD
 #  endif
-#  define MyStdc -D__STDC__
+#  if !HasGCC
+#   define MyStdc -D__STDC__
 CCOPTIONS=-float	# We don't want -cckr and -prototypes
+#  endif
 # endif
 
 # ifdef IBMArchitecture

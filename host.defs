@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.16 1996/10/11 17:32:11 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.17 1997/02/23 19:03:18 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.16 1996/10/11 17:32:11 christos Exp $")
+RCSID("$Id: host.defs,v 1.17 1997/02/23 19:03:18 christos Exp $")
 
 endcode	:
 
@@ -276,7 +276,8 @@ comment	: Sun Microsystems series 3 workstation (68020 based)
 comment	: Sun Microsystems 386i workstation (386 based)
 comment	: Sun Microsystems series 4 workstation (SPARC based)
 vendor	:						: "sun"
-hosttype: defined(M_i386)				: "sun386i"
+hosttype: defined(M_i386) && !defined(__SVR4)		: "sun386i"
+hosttype: defined(M_i386) && defined(__SVR4)		: "i86pc"
 hosttype: defined(mc68010) || defined(__mc68010__)	: "sun2"
 hosttype: defined(mc68020) || defined(__mc68020__)	: "sun3"
 hosttype: defined(sparc) || defined(__sparc__)		: "sun4"
@@ -955,6 +956,13 @@ ostype  :						: "svr4"
 machtype: defined(M_i386)				: "i386"
 enddef	:
 
+newdef	: defined(__uxp__) || defined(__uxps__)
+comment	: FUJITSU DS/90 7000
+vendor	:						: "fujitsu"
+hosttype:						: "ds90"
+ostype	:						: "sysv4""
+machtype:						: "sparc"
+enddef	:
 
 newdef	: defined(mc68000) || defined(__mc68000__) || defined(mc68k32) || defined(m68k) || defined(mc68010) || defined(mc68020)
 hosttype:						: "m68k"

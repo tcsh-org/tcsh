@@ -1,4 +1,13 @@
-V6.07.03, 02/23/97
+ 20. set -f -l patch (Michael Veksler)
+ 19. SGI patches (Tomasz J. Cholewo). Also fix completion code to take into
+     account aliases that start with a period.
+ 18. SCO patches (Boyd Lynn Gerber)
+ 17. Fujitsu patches (Toshiaki Nomura)
+ 16. autoconf patches (Kaveh Ghazi)
+ 15. BSDI patches (Paul Vixie)
+ 14. %Q formatting character addition.
+ 13. Fix set=#123; echo $i:s/#// (Quoting problem)
+ 12. V6.07.03 - 02/23/97
  11. Understand %$variable in the prompt.
  10. Quote directory names properly in .cshdirs
   9. USE_ACCESS and autoconfig patches from (Larry Schwimmer)

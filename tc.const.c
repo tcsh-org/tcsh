@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.39 1996/10/05 17:39:15 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.40 1997/02/23 19:03:24 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.39 1996/10/05 17:39:15 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.40 1997/02/23 19:03:24 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -139,6 +139,7 @@ Char STRprecmd[]	= { 'p', 'r', 'e', 'c', 'm', 'd', '\0' };
 Char STRcwdcmd[]	= { 'c', 'w', 'd', 'c', 'm', 'd', '\0' };
 Char STRperiodic[]	= { 'p', 'e', 'r', 'i', 'o', 'd', 'i', 'c', '\0' };
 Char STRtperiod[]	= { 't', 'p', 'e', 'r', 'i', 'o', 'd', '\0' };
+Char STRmf[]		= { '-', 'f', '\0' };
 Char STRml[]		= { '-', 'l', '\0' };
 Char STRslash[]		= { '/', '\0' };
 Char STRdotsl[]		= { '.', '/', '\0' };

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.31 1996/04/26 19:19:06 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.32 1996/06/22 21:44:31 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.31 1996/04/26 19:19:06 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.32 1996/06/22 21:44:31 christos Exp $")
 
 /*
  * C shell
@@ -866,6 +866,8 @@ setDolp(cp)
 	    dolmod[i] = 0;
 
 	    do {
+		strip(lhsub);
+		strip(cp);
 		dp = Strstr(cp, lhsub);
 		if (dp) {
 		    np = (Char *) xmalloc((size_t)
@@ -879,6 +881,7 @@ setDolp(cp)
 		    dp = cp = np;
 		    didmod = 1;
 		} else {
+		    xprintf("No match on %Q\n", cp);
 		    /* should this do a seterror? */
 		    break;
 		}
