@@ -3574,9 +3574,8 @@ commands, instead of starting a new one.
 .B continue_args \fR(+)
 Same as continue, but the shell will execute:
 .RS +8
-.nf
-    echo `pwd` $argv > ~/.<command-name>_pause; %<command-name>
-.fi
+.IP "" 4
+echo `pwd` $argv > ~/.<cmd>_pause; %<cmd>
 .RE
 .TP 8
 .B correct \fR(+)
@@ -4537,22 +4536,52 @@ file format; a colon-separated list of expressions of the form
 variables with their associated defaults are:
 .PP
 .RS +8
-.nf
-no	0	Normal (non-filename) text
-fi	0	Regular file
-di	01;34	Directory
-ln	01;36	Symbolic link
-pi	33	Named pipe (FIFO)
-so	01;35	Socket
-bd	01;33	Block device
-cd	01;32	Character device
-ex	01;32	Executable file
-mi	(none)	Missing file (defaults to fi)
-or	(none)	Orphaned symbolic link (defaults to ln)
-lc	^[[	Left code
-rc	m	Right code
-ec	(none)	End code (replaces lc+no+rc)
-.fi
+.RS +4
+.PD 0
+.TP 12
+no	0
+Normal (non-filename) text
+.TP 12
+fi	0
+Regular file
+.TP 12
+di	01;34
+Directory
+.TP 12
+ln	01;36
+Symbolic link
+.TP 12
+pi	33
+Named pipe (FIFO)
+.TP 12
+so	01;35
+Socket
+.TP 12
+bd	01;33
+Block device
+.TP 12
+cd	01;32
+Character device
+.TP 12
+ex	01;32
+Executable file
+.TP 12
+mi	(none)
+Missing file (defaults to fi)
+.TP 12
+or	(none)
+Orphaned symbolic link (defaults to ln)
+.TP 12
+lc	^[[
+Left code
+.TP 12
+rc	m
+Right code
+.TP 12
+ec	(none)
+End code (replaces lc+no+rc)
+.PD
+.RE
 .PP
 You need to include only the variables you want to change from
 the default.
@@ -4647,6 +4676,7 @@ for cyan background
 .TP 4
 47
 for white (or gray) background
+.PD
 .RE
 .PP
 Not all commands will work on all systems or display devices.
