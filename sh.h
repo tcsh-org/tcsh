@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.4 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.5 1991/07/18 15:23:37 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -725,6 +725,9 @@ Char    HISTSUB;		/* auto-substitute character */
 extern char *sys_errlist[];
 extern int errno, sys_nerr;
 
+#ifdef strerror
+# undef strerror
+#endif 
 #define strerror(e) ((e) < sys_nerr && (e) >= 0 ? sys_errlist[(e)] :\
 		"Unknown Error")
 
