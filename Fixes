@@ -1,3 +1,7 @@
+ 61. V6.08.07 - 19990813
+ 60. Fix e_dabbrev_expand (Bjorn Knutsson)
+ 59. Make \builtin work again (by calling the command not the builtin)
+ 58. Add NLS_BUGS for OS's that keep file descriptors open for NLS (Ian Dowse)
  57. Make NONLSREBIND work after tcsh starts up.
  56. Fix AIX stupid exit bug. (Dan Harkless)
  55. More irix fixes (Kaveh)
