@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.54 2002/07/04 19:28:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.55 2004/03/21 16:48:14 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.54 2002/07/04 19:28:29 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.55 2004/03/21 16:48:14 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -1027,9 +1027,9 @@ t_pmatch(string, pattern, estr, cs)
 	 */
 	patternc = *pattern++;
 	switch (patternc) {
-	case 0:
+	case '\0':
 	    *estr = string;
-	    return (stringc == 0 ? 2 : 1);
+	    return (stringc == '\0' ? 2 : 1);
 	case '?':
 	    if (stringc == 0)
 		return (0);
@@ -1086,8 +1086,10 @@ t_pmatch(string, pattern, estr, cs)
 		else 
 		    match = (stringc == (rangec & TRIM));
 	    }
-	    if (rangec == 0)
+	    if (rangec == '\0')
 		stderror(ERR_NAME | ERR_MISSING, ']');
+	    if ((!match) && (stringc == '\0'))
+		return (0);
 	    if (match == negate_range)
 		return (0);
 	    *estr = string;
