@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.37 1992/10/10 18:17:34 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.38 1992/10/14 20:19:19 christos Exp moraes $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.37 1992/10/10 18:17:34 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.38 1992/10/14 20:19:19 christos Exp moraes $")
 
 #include "tc.h"
 #include "ed.h"
@@ -134,6 +134,12 @@ main(argc, argv)
 #ifdef BSDSIGS
     sigvec_t osv;
 #endif /* BSDSIGS */
+
+#ifdef MALLOC_TRACE
+     mal_setstatsfile(fdopen(dup2(open("/tmp/tcsh.trace", 
+				       O_WRONLY|O_CREAT, 0666), 25), "w"));
+     mal_trace(1);
+#endif /* MALLOC_TRACE */
 
 #if !(defined(BSDTIMES) || defined(_SEQUENT_)) && defined(POSIX)
 # ifdef _SC_CLK_TCK

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.38 1992/10/10 18:17:34 christos Exp $
+# $Id: Makefile,v 1.39 1992/10/14 20:19:19 christos Exp moraes $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -115,7 +115,7 @@ LDFLAGS= 			## The simplest, suitable for all.
 ################################################################
 ## LIBES.  Pick one, or roll your own.
 ################################################################
-LIBES= -ltermcap		## BSD style things, hpux
+LIBES= -ltermcap 		## BSD style things, hpux
 #LIBES= -ltermc			## emx under OS/2
 #LIBES= -ltermcap -lsec		## Tek XD88/10 (UTekV) with PW_SHADOW
 #LIBES= -ltermcap -lsec		## Motorola MPC (sysV88) with PW_SHADOW

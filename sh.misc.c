@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.misc.c,v 3.15 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.misc.c,v 3.16 1992/10/05 02:41:30 christos Exp moraes $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.15 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.16 1992/10/05 02:41:30 christos Exp moraes $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -250,7 +250,11 @@ closem()
 #endif
     for (f = 0; f < NOFILE; f++)
 	if (f != SHIN && f != SHOUT && f != SHDIAG && f != OLDSTD &&
-	    f != FSHTTY)
+	    f != FSHTTY 
+#ifdef MALLOC_TRACE
+	    && f != 25
+#endif /* MALLOC_TRACE */
+	    )
 	    (void) close(f);
 }
 

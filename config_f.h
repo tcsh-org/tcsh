@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/config_f.h,v 3.4 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/config_f.h,v 3.5 1992/10/10 18:17:34 christos Exp moraes $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -110,7 +110,7 @@
  *		This can be much slower and no memory statistics will be
  *		provided.
  */
-#ifdef PURIFY
+#if defined(PURIFY) || defined(MALLOC_TRACE)
 # define SYSMALLOC
 #else
 # undef SYSMALLOC
