@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.95 2001/04/27 22:36:39 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.96 2002/01/26 23:23:02 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.95 2001/04/27 22:36:39 christos Exp $")
+RCSID("$Id: sh.c,v 3.96 2002/01/26 23:23:02 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2045,9 +2045,13 @@ process(catch)
 	 */
 	if ((lex(&paraml) && !seterr && intty && !tellwhat && !Expand && 
 	     !whyles) || adrof(STRverbose)) {
+	    int odidfds = didfds;
 	    haderr = 1;
+	    didfds = 0;
 	    prlex(&paraml);
+	    flush();
 	    haderr = 0;
+	    didfds = odidfds;
 	}
 	(void) alarm(0);	/* Autologout OFF */
 

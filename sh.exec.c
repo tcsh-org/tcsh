@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.52 2002/01/26 23:23:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.53 2002/03/07 19:25:55 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.52 2002/01/26 23:23:03 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.53 2002/03/07 19:25:55 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -655,9 +655,13 @@ xechoit(t)
     Char  **t;
 {
     if (adrof(STRecho)) {
+	int odidfds = didfds;
 	flush();
 	haderr = 1;
+	didfds = 0;
 	blkpr(t), xputchar('\n');
+	flush();
+	didfds = odidfds;
 	haderr = 0;
     }
 }
