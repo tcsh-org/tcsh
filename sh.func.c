@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.func.c,v 2.2 1991/03/31 13:10:35 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -38,7 +38,7 @@
 
 #ifndef lint
 static char *rcsid() 
-    { return "$Id: sh.func.c,v 2.2 1991/03/31 13:10:35 christos Exp $"; }
+    { return "$Id: sh.func.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -1249,34 +1249,50 @@ static struct limits {
     char   *limscale;
 }       limits[] = {
 
-#ifndef BSDTIMES
-    RLIMIT_FSIZE, 	"filesize",	1024,	"kbytes",
-# ifdef RLIMIT_STACK
-    RLIMIT_STACK, 	"stacksize",	1024,	"kbytes",
-# endif				/* aiws */
-#else				/* BSDTIMES */
+#ifdef RLIMIT_CPU
     RLIMIT_CPU, 	"cputime",	1,	"seconds",
+#endif /* RLIMIT_CPU */
+
+#ifdef RLIMIT_FSIZE
     RLIMIT_FSIZE, 	"filesize",	1024,	"kbytes",
+#endif /* RLIMIT_FSIZE */
+
+#ifdef RLIMIT_DATA
     RLIMIT_DATA, 	"datasize",	1024,	"kbytes",
+#endif /* RLIMIT_DATA */
+
+#ifdef RLIMIT_STACK
     RLIMIT_STACK, 	"stacksize",	1024,	"kbytes",
+#endif /* RLIMIT_STACK */
+
+#ifdef RLIMIT_CORE
     RLIMIT_CORE, 	"coredumpsize",	1024,	"kbytes",
+#endif /* RLIMIT_CORE */
+
+#ifdef RLIMIT_RSS
     RLIMIT_RSS, 	"memoryuse",	1024,	"kbytes",
-# ifdef RLIMIT_NOFILE
+#endif /* RLIMIT_RSS */
+
+#ifdef RLIMIT_NOFILE
     RLIMIT_NOFILE, 	"descriptors", 1,	"",
-# endif
-# ifdef RLIMIT_CONCUR
+#endif
+
+#ifdef RLIMIT_CONCUR
     RLIMIT_CONCUR, 	"concurrency", 1,	"thread(s)",
-# endif
-# ifdef RLIMIT_MEMLOCK
+#endif
+
+#ifdef RLIMIT_MEMLOCK
     RLIMIT_MEMLOCK,	"memorylocked",	1024,	"kbytes",
-# endif
-# ifdef RLIMIT_NPROC
+#endif
+
+#ifdef RLIMIT_NPROC
     RLIMIT_NPROC,	"maxproc",	1,	"",
-# endif
-# ifdef RLIMIT_OFILE
+#endif
+
+#ifdef RLIMIT_OFILE
     RLIMIT_OFILE,	"openfiles",	1,	"",
-# endif
-#endif				/* BSDTIMES */
+#endif
+
     -1, 		NULL, 		0, 	NULL
 };
 
@@ -1301,8 +1317,9 @@ restrict_limit(value)
     else
 	return ((int) value);
 }
+#endif /* convex */
 
-#endif
+
 static struct limits *
 findlim(cp)
     Char   *cp;
@@ -1358,8 +1375,8 @@ getval(lp, v)
 {
 #if defined(convex) || defined(__convex__)
     RLIM_TYPE restrict_limit();
+#endif /* convex */
 
-#endif
     register float f;
     double  atof();
     Char   *cp = *v++;
@@ -1374,7 +1391,7 @@ getval(lp, v)
     if ((f < (double) INT_MIN) || (f > (double) INT_MAX)) {
 	stderror(ERR_NAME | ERR_TOOLARGE);
     }
-#endif
+#endif /* convex */
 
     while (Isdigit(*cp) || *cp == '.' || *cp == 'e' || *cp == 'E')
 	cp++;
@@ -1382,9 +1399,9 @@ getval(lp, v)
 	if (*v == 0)
 #if defined(convex) || defined(__convex__)
 	    return ((RLIM_TYPE) restrict_limit((f + 0.5) * lp->limdiv));
-#else
+#else /* convex */
 	    return ((RLIM_TYPE) ((f + 0.5) * lp->limdiv));
-#endif
+#endif /* convex */
 	cp = *v;
     }
     switch (*cp) {
@@ -1395,9 +1412,9 @@ getval(lp, v)
 #if defined(convex) || defined(__convex__)
 	return ((RLIM_TYPE)
 		restrict_limit((f * 60.0 + atof(short2str(cp + 1)))));
-#else
+#else /* convex */
 	return ((RLIM_TYPE) (f * 60.0 + atof(short2str(cp + 1))));
-#endif
+#endif /* convex */
     case 'h':
 	if (lp->limconst != RLIMIT_CPU)
 	    goto badscal;
