@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.sem.c,v 1.4 91/07/14 23:13:21 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -36,7 +36,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.sem.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -752,7 +752,7 @@ chkclob(cp)
 
     if (stat(cp, &stb) < 0)
 	return;
-    if ((stb.st_mode & S_IFMT) == S_IFCHR)
+    if (S_ISCHR(stb.st_mode))
 	return;
     stderror(ERR_EXISTS, cp);
 }
