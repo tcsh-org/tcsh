@@ -1,4 +1,5 @@
 V6.04.00, ...
+ 75. savedirs should glob the filename argument.
  74. 6.03.07, 06/05/93
  73. Changed _Q, _Q1 macros in sh.lex.c, sh.dol.c, sh.char.? to _QF and _QB
      because today 4.4BSD <ctype.h> defined _Q to be ``Phonetics''

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.c,v 3.12 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.sig.c,v 3.13 1992/10/14 20:19:19 christos Exp christos $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.12 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.13 1992/10/14 20:19:19 christos Exp christos $")
 
 #include "tc.wait.h"
 
@@ -46,6 +46,8 @@ RCSID("$Id: tc.sig.c,v 3.12 1992/10/05 02:41:30 christos Exp $")
  * we can handle up to MAX_CHLD outstanding children now;
  */
 #define MAX_CHLD 50
+
+# ifdef UNRELSIGS
 static struct mysigstack {
     int     s_w;		/* wait report			 */
     int     s_errno;		/* errno returned;		 */
@@ -54,7 +56,6 @@ static struct mysigstack {
 static int stk_ptr = -1;
 
 
-# ifdef UNRELSIGS
 /* queue child signals
  */
 static sigret_t

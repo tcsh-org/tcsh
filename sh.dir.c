@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.25 1993/04/26 21:13:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.26 1993/05/17 00:11:09 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.25 1993/04/26 21:13:10 christos Exp christos $")
+RCSID("$Id: sh.dir.c,v 3.26 1993/05/17 00:11:09 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -223,12 +223,10 @@ printdirs(dflag)
     int dflag;
 {
     register struct directory *dp;
-    Char   *s, *hp = value(STRhome);
+    Char   *s, *user;
     int     idx, len, cur;
     extern int T_Cols;
 
-    if (*hp == '\0')
-	hp = NULL;
     dp = dcwd;
     idx = 0;
     cur = 0;
@@ -239,32 +237,33 @@ printdirs(dflag)
 	    xprintf("%d\t", idx++);
 	    cur = 0;
 	}
-	if (!(dflag & DIR_LONG) && hp != NULL && !eq(hp, STRslash) &&
-	    (len = Strlen(hp), Strncmp(hp, dp->di_name, len) == 0) &&
-	    (dp->di_name[len] == '\0' || dp->di_name[len] == '/')) 
-	    len = Strlen(s = (dp->di_name + len)) + 2;
+	s = dp->di_name;		
+	user = NULL;
+	if (!(dflag & DIR_LONG) && (user = getusername(&s)) != NULL)
+	    len = Strlen(user) + Strlen(s) + 2;
 	else
-	    len = Strlen(s = dp->di_name) + 1;
+	    len = Strlen(s) + 1;
 
 	cur += len;
 	if ((dflag & DIR_LINE) && cur >= T_Cols - 1 && len < T_Cols) {
 	    xputchar('\n');
 	    cur = len;
 	}
-	xprintf(s != dp->di_name ? "~%S%c" : "%S%c",
-		s, (dflag & DIR_VERT) ? '\n' : ' ');
+	if (user) 
+	    xprintf("~%S", user);
+	xprintf("%S%c", s, (dflag & DIR_VERT) ? '\n' : ' ');
     } while ((dp = dp->di_prev) != dcwd);
     if (!(dflag & DIR_VERT))
 	xputchar('\n');
 }
 
 void
-dtildepr(home, dir)
-    register Char *home, *dir;
+dtildepr(dir)
+    Char *dir;
 {
-
-    if (!eq(home, STRslash) && prefix(home, dir))
-	xprintf("~%S", dir + Strlen(home));
+    Char* user;
+    if ((user = getusername(&dir)) != NULL)
+	xprintf("~%S%S", user, dir);
     else
 	xprintf("%S", dir);
 }
@@ -1279,41 +1278,45 @@ recdirs(fname)
     int     cdflag = 0;
     extern int fast;
     Char    buf[BUFSIZE];
+    extern struct directory *dcwd;
+    struct directory *dp;
 
-    if (!fast) {
-	if (!adrof(STRsavedirs))/* does it exist */
+    if (fname == NULL) {
+	if (fast || !adrof(STRsavedirs))
 	    return;
-	if (fname == NULL)
-	    if ((fname = value(STRdirsfile)) == STRNULL) {
-		fname = Strcpy(buf, value(STRhome));
-		(void) Strcat(buf, &STRtildotdirs[1]);
-	    }
-		
-	if ((fp = creat(short2str(fname), 0600)) == -1)
-	    return;
-	oldidfds = didfds;
-	didfds = 0;
-	ftmp = SHOUT;
-	SHOUT = fp;
-	{
-	    extern struct directory *dcwd;
-	    struct directory *dp = dcwd->di_next;
 
-	    do {
-		if (dp == &dhead)
-		    continue;
-		if (cdflag == 0)
-		    cdflag++, xprintf("cd %s\n",
-				      short2str(dp->di_name));
-		else
-		    xprintf("pushd %s\n",
-			    short2str(dp->di_name));
-	    } while ((dp = dp->di_next) != dcwd->di_next);
-	}
-	(void) close(fp);
-	SHOUT = ftmp;
-	didfds = oldidfds;
+	if ((fname = value(STRdirsfile)) == STRNULL)
+	    fname = Strspl(value(STRhome), &STRtildotdirs[1]);
+	else
+	    fname = Strsave(fname);
     }
+    else 
+	fname = globone(fname, G_ERROR);
+		
+    if ((fp = creat(short2str(fname), 0600)) == -1) {
+	xfree((ptr_t) fname);
+	return;
+    }
+
+    oldidfds = didfds;
+    didfds = 0;
+    ftmp = SHOUT;
+    SHOUT = fp;
+
+    dp = dcwd->di_next;
+    do {
+	if (dp == &dhead)
+	    continue;
+	if (cdflag == 0) {
+	    cdflag = 1;
+	    xprintf("cd %S\n", dp->di_name);
+	}
+	else
+	    xprintf("pushd %S\n", dp->di_name);
+    } while ((dp = dp->di_next) != dcwd->di_next);
+
+    (void) close(fp);
+    SHOUT = ftmp;
+    didfds = oldidfds;
+    xfree((ptr_t) fname);
 }
-
-

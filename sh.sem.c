@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.27 1993/05/17 00:11:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.28 1993/05/17 01:02:53 christos Exp christos $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.27 1993/05/17 00:11:09 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.28 1993/05/17 01:02:53 christos Exp christos $")
 
 #include "tc.h"
 
@@ -103,7 +103,9 @@ execute(t, wanttty, pipein, pipeout)
     int     wanttty;
     int *pipein, *pipeout;
 {
+#ifdef VFORK
     extern bool use_fork;	/* use fork() instead of vfork()? */
+#endif
 
     bool    forked;
     struct biltins *bifunc;

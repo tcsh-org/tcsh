@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.43 1993/03/05 20:14:33 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.44 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -628,6 +628,17 @@ extern void bcopy	__P((const void *, void *, size_t));
 
 #if !defined(hpux) && !defined(COHERENT) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(__386BSD__) && !defined(memmove)
 # define NEEDmemmove
+#endif
+
+#if SYSVREL == 4
+# ifndef BSDTIMES
+extern int gethostname();
+extern int getrlimit();
+extern int setrlimit();
+extern int getrusage();
+extern int gettimeofday();
+extern int wait3();
+# endif
 #endif
 
 #endif /* _h_tc_os */
