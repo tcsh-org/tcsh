@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.54 1994/03/13 00:46:35 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.55 1994/05/26 13:11:20 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.54 1994/03/13 00:46:35 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.55 1994/05/26 13:11:20 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -110,6 +110,7 @@ static struct tms zru = {0L, 0L, 0L, 0L}, lru = {0L, 0L, 0L, 0L};
 
 static	void		 pflushall	__P((void));
 static	void		 pflush		__P((struct process *));
+static	void		 pfree		__P((struct process *));
 static	void		 pclrcurr	__P((struct process *));
 static	void		 padd		__P((struct command *));
 static	int		 pprint		__P((struct process *, int));
@@ -471,6 +472,19 @@ pnote()
     }
 }
 
+
+static void
+pfree(pp)
+    struct proc *pp;
+{	
+    xfree((ptr_t) pp->p_command);
+    if (pp->p_cwd && --pp->p_cwd->di_count == 0)
+	if (pp->p_cwd->di_next == 0)
+	    dfree(pp->p_cwd);
+    xfree((ptr_t) pp);
+}
+
+
 /*
  * pwait - wait for current job to terminate, maintaining integrity
  *	of current and previous job indicators.
@@ -494,11 +508,7 @@ pwait()
     for (pp = (fp = &proclist)->p_next; pp != NULL; pp = (fp = pp)->p_next)
 	if (pp->p_procid == 0) {
 	    fp->p_next = pp->p_next;
-	    xfree((ptr_t) pp->p_command);
-	    if (pp->p_cwd && --pp->p_cwd->di_count == 0)
-		if (pp->p_cwd->di_next == 0)
-		    dfree(pp->p_cwd);
-	    xfree((ptr_t) pp);
+	    pfree(pp);
 	    pp = fp;
 	}
 #ifdef BSDSIGS
@@ -1361,7 +1371,11 @@ dofg(v, c)
     ++v;
     do {
 	pp = pfind(*v);
-	pstart(pp, 1);
+	if (!pstart(pp, 1)) {
+	    pp->p_procid = 0;
+	    stderr(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
+	    continue;
+	}
 #ifndef BSDSIGS
 # ifdef notdef
 	if (setintr)
@@ -1386,7 +1400,11 @@ dofg1(v, c)
     USE(c);
     okpcntl();
     pp = pfind(v[0]);
-    pstart(pp, 1);
+    if (!pstart(pp, 1)) {
+	pp->p_procid = 0;
+	stderr(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
+	return;
+    }
 #ifndef BSDSIGS
 # ifdef notdef
     if (setintr)
@@ -1412,7 +1430,10 @@ dobg(v, c)
     ++v;
     do {
 	pp = pfind(*v);
-	pstart(pp, 0);
+	if (!pstart(pp, 0)) {
+	    pp->p_procid = 0;
+	    stderr(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
+	}
     } while (*v && *++v);
 }
 
@@ -1429,7 +1450,10 @@ dobg1(v, c)
 
     USE(c);
     pp = pfind(v[0]);
-    pstart(pp, 0);
+    if (!pstart(pp, 0)) {
+	pp->p_procid = 0;
+	stderr(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
+    }
 }
 
 /*
@@ -1561,7 +1585,10 @@ pkill(v, signum)
 		 * says it is suspended, but it is running; thanks jaap..
 		 */
 	    case SIGCONT:
-		pstart(pp, 0);
+		if (!pstart(pp, 0)) {
+		    pp->p_procid = 0;
+		    stderr(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
+		}
 		goto cont;
 	    default:
 		break;
@@ -1609,11 +1636,12 @@ cont:
 /*
  * pstart - start the job in foreground/background
  */
-void
+int
 pstart(pp, foregnd)
     register struct process *pp;
     int     foregnd;
 {
+    int rv = 0;
     register struct process *np;
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -1644,7 +1672,7 @@ pstart(pp, foregnd)
     (void) pprint(pp, foregnd ? NAME | JOBDIR : NUMBER | NAME | AMPERSAND);
 #ifdef BSDJOBS
     if (foregnd) {
-	(void) tcsetpgrp(FSHTTY, pp->p_jobid);
+	rv = tcsetpgrp(FSHTTY, pp->p_jobid);
     }
     /*
      * 1. child process of csh (shell script) receives SIGTTIN/SIGTTOU
@@ -1658,16 +1686,20 @@ pstart(pp, foregnd)
      * 5. CONSEQUENCE : csh is UNaware that the process is stopped
      * 6. THIS LINE HAS BEEN COMMENTED OUT : if (jobflags&PSTOPPED)
      * 	  (beto@aixwiz.austin.ibm.com - aug/03/91)
+     * 7. I removed the line completely and added extra checks for
+     *    pstart, so that if a job gets attached to and dies inside
+     *    a debugger it does not confuse the shell. [christos]
      */
 
-    /* if (jobflags & PSTOPPED) */
-	(void) killpg(pp->p_jobid, SIGCONT);
+    if (rv != -1)
+	rv = killpg(pp->p_jobid, SIGCONT);
 #endif /* BSDJOBS */
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
 #else /* !BSDSIGS */
     (void) sigrelse(SIGCHLD);
 #endif /* !BSDSIGS */
+    return rv != -1;
 }
 
 void
