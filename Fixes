@@ -1,4 +1,5 @@
-V6.06.00, -
+V6.06.00, 05/13/95
+ 88. Cleanup off-by-one error ed.defns.c.
  87. 6.05.09 - 05/06/95
  86. Small memory leak in dosetenv()
  85. Make sure that the number of editing functions defined is correct

@@ -1,6 +1,9 @@
 This file contains visible (incompatible) changes to the users.
 This version of tcsh has the following new things:
 
+6.06
+* NLS Message Catalog support.
+
 6.05
 * The bind, aliases, linedit builtins are not used anymore; they are
   #ifdef'ed OBSOLETE and will be really removed in the next version
