@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.19 1992/05/15 23:49:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.20 1992/06/16 20:46:26 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.19 1992/05/15 23:49:22 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.20 1992/06/16 20:46:26 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -652,6 +652,36 @@ pr_stat_sub(p2, p1, pr)
 
 #endif /* _SEQUENT_ */
 
+#ifdef memmove
+/* memmove():
+ * 	This is the ANSI form of bcopy() with the arguments backwards...
+ *	Unlike memcpy(), it handles overlaps between source and 
+ *	destination memory
+ */
+static void*
+xmemmove(vsrc, vdst, len)
+    ptr_t vsrc;
+    const ptr_t vdst;
+    size_t len;
+{
+    char *src = (char *) vsrc;
+    const char *dst = (char *) vdst;
+
+    if (src == dst)
+	return;
+
+    if (src > dst) {
+	while (len--) 
+	    *dst++ = *src++;
+    }
+    else {
+	src += len;
+	dst += len;
+	while (len--) 
+	    *--dst = *--src;
+    }
+}
+#endif
 
 #ifdef tcgetpgrp
 int
