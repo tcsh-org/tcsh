@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.9 1992/03/27 02:22:59 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.10 1992/03/27 22:16:09 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,13 +36,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.9 1992/03/27 02:22:59 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.10 1992/03/27 22:16:09 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
 
-#define TDEBUG
+/* #define TDEBUG */
 struct varent completions;
 
 static int 	 	  tw_result	__P((Char *, Char *));
