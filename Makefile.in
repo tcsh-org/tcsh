@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.22 2004/11/21 04:38:03 christos Exp $
+# $Id: Makefile.in,v 3.23 2004/12/25 21:15:05 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -514,12 +514,13 @@ install.cygwin: install install.man
 #	chmod 444 ${DESTMAN}/tcsh.${MANSECT}.Z
 
 clean:
-	${RM} -f a.out strings x.c xs.c tcsh$(EXEEXT) tcsh.a _MAKE_LOG core gethost
+	${RM} -f a.out strings x.c xs.c tcsh$(EXEEXT) tcsh.a _MAKE_LOG gethost
 	${RM} -f *.${SUF} sh.prof.c ed.defns.h tc.const.h sh.err.h tc.defs.c
 	${RM} -f tcsh.*.m tcsh.*.cat
 
 veryclean: clean
-	${RM} -f config.h config.status config.cache config.log Makefile tcsh.ps
+	${RM} -f config.h config_p.h config.status config.cache config.log
+	${RM} -f Makefile tcsh.ps
 	${RM} -f *~ #*
 
 distclean: veryclean

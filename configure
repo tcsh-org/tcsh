@@ -1606,7 +1606,7 @@ Check tcsh's \`Ported' file for manual configuration instructions." >&2;}
 esac
 
 echo "Tcsh will use configuration file \`$tcsh_config_file'."
-cp config/${tcsh_config_file} config_p.h
+cp ${srcdir}/config/${tcsh_config_file} config_p.h
 
 
 

@@ -239,7 +239,7 @@ esac
 
 echo "Tcsh will use configuration file \`$tcsh_config_file'."
 changequote([, ])dnl
-cp config/${tcsh_config_file} config_p.h
+cp ${srcdir}/config/${tcsh_config_file} config_p.h
 AH_BOTTOM(
 [#include "config_p.h"
 #include "config_f.h"])
