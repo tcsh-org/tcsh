@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.50 1994/06/18 21:37:29 christos Exp $
+/**/# $Id: Imakefile,v 1.51 1994/06/19 20:46:44 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.05
 /**/# Marc Horowitz, MIT SIPB
@@ -535,6 +535,6 @@ AINC=ed.defns.h sh.err.h tc.const.h sh.h
 NormalProgramTarget(tcsh, $(OBJS), $(AINC), /*LOCALLIBS*/, $(ALIB))
 NormalProgramTarget(gethost, gethost.${SUF}, $(AINC), /*LOCALLIBS*/, $(ALIB))
 
-InstallProgram(tcsh, $(TCSH_BINDIR));
-InstallManPage(tcsh, $(TCSH_MANDIR));
+InstallProgram(tcsh,$(TCSH_BINDIR));
+InstallManPage(tcsh,$(TCSH_MANDIR));
 DependTarget()
