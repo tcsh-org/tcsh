@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.46 1998/06/27 12:27:31 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.47 1998/06/28 15:07:24 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.46 1998/06/27 12:27:31 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.47 1998/06/28 15:07:24 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -113,6 +113,49 @@ Char STRtildothist[]	= { '~', '/', '.', 'h', 'i', 's', 't', 'o', 'r',
 
 #ifdef KANJI
 Char STRnokanji[]	= { 'n', 'o', 'k', 'a', 'n', 'j', 'i', '\0' };
+# ifdef DSPMBYTE
+Char STRdspmbyte[]	= { 'd', 's', 'p', 'm', 'b', 'y', 't', 'e', '\0' };
+# endif
+# if defined(DSPMBYTE)
+Char STRKEUC[]		= { 'e', 'u', 'c', '\0' };
+Char STRKSJIS[]		= { 's', 'j', 'i', 's', '\0' };
+#  ifdef MBYTEDEBUG	/* Sorry, use for beta testing */
+Char STRmbytemap[]	= { 'm', 'b', 'y', 't', 'e', 'm', 'a', 'p', '\0' };
+#  endif /* MBYTEMAP */
+/* PATCH IDEA FROM Issei.Suzuki VERY THANKS */
+/* dspmbyte autoset trap */
+/* STRLANGEUC,STRLANGEUCB = EUC Trap */
+/* STRLANGSJIS,STRLANGSJISB = SJIS Trap */
+#  if defined(__FreeBSD__) || defined(__uxps__) || defined(linux) || defined(sgi) /* linux? */
+Char STRLANGEUC[]	= { 'j', 'a', '_', 'J', 'P', '.', 'E', 'U', 'C', '\0' };
+#   if defined(__uxps__)
+Char STRLANGEUCB[]	= { 'j', 'a', 'p', 'a', 'n', '\0' };
+#   elif defined(linux)
+Char STRLANGEUCB[]	= { 'j', 'a', '_', 'J', 'P', '.', 'u', 'j', 'i', 's',
+			    '\0' };
+#   else
+Char STRLANGEUCB[]	= { '\0' };
+#   endif
+Char STRLANGSJIS[]	= { 'j', 'a', '_', 'J', 'P', '.', 'S', 'J', 'I', 'S',
+			    '\0' };
+Char STRLANGSJISB[]	= { '\0' };
+#  elif defined(__uxpm__)
+Char STRLANGEUC[]	= { 'j', 'a', 'p', 'a', 'n', '\0' };
+Char STRLANGEUCB[]	= { '\0' };
+Char STRLANGSJIS[]	= { '\0' };
+Char STRLANGSJISB[]	= { '\0' };
+#  elif defined(SOLARIS2)
+Char STRLANGEUC[]	= { 'j', 'a', '\0' };
+Char STRLANGEUCB[]	= { 'j', 'a', 'p', 'a', 'n', 'e', 's', 'e', '\0' };
+Char STRLANGSJIS[]	= { '\0' };
+Char STRLANGSJISB[]	= { '\0' };
+#  else
+Char STRLANGEUC[]	= { '\0' };
+Char STRLANGEUCB[]	= { '\0' };
+Char STRLANGSJIS[]	= { '\0' };
+Char STRLANGSJISB[]	= { '\0' };
+#  endif
+# endif /* defined(DSPMBYTE) */
 #endif
 
 Char STRtildotdirs[]	= { '~', '/', '.', 'c', 's', 'h', 'd', 'i', 'r',

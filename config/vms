@@ -111,7 +111,7 @@
 #define DIRENT
 /****************** local defines *********************/
 
-#define NEEDgetwd
+#define NEEDgetcwd
 
 #ifndef _POSIX_SOURCE
 # define _POSIX_SOURCE

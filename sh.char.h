@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.char.h,v 3.13 1997/10/27 22:44:25 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.char.h,v 3.14 1998/09/18 15:31:44 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -48,6 +48,20 @@ typedef unsigned char tcshuc;
 # undef _SP
 #endif /* _MINIX */
 extern unsigned short _cmap[];
+#if defined(DSPMBYTE)
+extern unsigned short _mbmap[];
+# define CHECK_MBYTEVAR	STRdspmbyte
+#endif
+extern unsigned short _cmap_c[];
+extern unsigned short _cmap_mbyte[];
+extern short _enable_mbdisp;
+extern unsigned short _mbmap[];
+extern unsigned short _mbmap_euc[];
+extern unsigned short _mbmap_sjis[];
+/* VARIABLE Check str */
+/* same compiler require #define even not define DSPMBYTE */
+#define _MB1	0x0001
+#define _MB2	0x0002
 
 #ifndef NLS
 extern tcshuc _cmap_lower[], _cmap_upper[];
@@ -72,7 +86,6 @@ extern tcshuc _cmap_lower[], _cmap_upper[];
 #define _PUN	0x8000		/* punctuation */
 
 #if defined(SHORT_STRINGS) && defined(KANJI)
-
 #define ASC(ch) ch
 #define CTL_ESC(ch) ch
 #define cmap(c, bits)	\
@@ -110,6 +123,11 @@ extern unsigned short _toebcdic[256];
 			 (isalpha((tcshuc) (c)) || (c) == '_'))
 #define alnum(c)	(((Char)(c) & QUOTE) ? 0 : \
 		         (isalnum((tcshuc) (c)) || (c) == '_'))
+
+#if defined(DSPMBYTE)
+# define IsmbyteU(c)	(Ismbyte1((Char)(c))||(Ismbyte2((Char)(c))&&((c)&0200)))
+#endif
+
 #ifdef NLS
 # ifdef NeXT
 #  define Isspace(c)	(((Char)(c) & QUOTE) ? 0 : NXIsSpace((unsigned) (c)))
@@ -120,9 +138,16 @@ extern unsigned short _toebcdic[256];
 #  define Tolower(c) 	(((Char)(c) & QUOTE) ? 0 : NXToLower((unsigned) (c)))
 #  define Toupper(c) 	(((Char)(c) & QUOTE) ? 0 : NXToUpper((unsigned) (c)))
 #  define Isxdigit(c)	(((Char)(c) & QUOTE) ? 0 : NXIsXDigit((unsigned) (c)))
+#if defined(DSPMBYTE)
+#  define IscntrlM(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsCntrl((unsigned) (c)))
+#  define Iscntrl(c)	( (IscntrlM(c)) && !(_enable_mbdisp&&(IsmbyteU((c)))) )
+#  define IsprintM(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsPrint((unsigned) (c)))
+#  define Isprint(c)	( (IsprintM(c)) || (_enable_mbdisp&&(IsmbyteU((c)))) )
+#else
 #  define Isalnum(c)	(((Char)(c) & QUOTE) ? 0 : NXIsAlNum((unsigned) (c)))
 #  define Iscntrl(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsCntrl((unsigned) (c)))
 #  define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsPrint((unsigned) (c)))
+#endif /* !defined(DSPMBYTE) */
 #  define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsPunct((unsigned) (c)))
 # else /* !NeXT */
 #  ifndef WINNT
@@ -135,7 +160,12 @@ extern unsigned short _toebcdic[256];
 #   define Toupper(c) 	(((Char)(c) & QUOTE) ? 0 : toupper((tcshuc) (c)))
 #   define Isxdigit(c)	(((Char)(c) & QUOTE) ? 0 : isxdigit((tcshuc) (c)))
 #   define Isalnum(c)	(((Char)(c) & QUOTE) ? 0 : isalnum((tcshuc) (c)))
+#if defined(DSPMBYTE)
+#   define IscntrlM(c) 	(((Char)(c) & QUOTE) ? 0 : iscntrl((tcshuc) (c)))
+#   define Iscntrl(c)	( (IscntrlM(c)) && !(_enable_mbdisp&&(IsmbyteU((c)))) )
+#else
 #   define Iscntrl(c) 	(((Char)(c) & QUOTE) ? 0 : iscntrl((tcshuc) (c)))
+#endif /* !defined(DSPMBYTE) */
 #   if SOLARIS2 == 24
     /* 
      * From <casper@fwi.uva.nl> Casper Dik:
@@ -143,11 +173,23 @@ extern unsigned short _toebcdic[256];
      * This breaks commandline editing when you include tabs.
      * (This is in the en_US locale).
      */
+#if defined(DSPMBYTE)
+#    define IsprintM(c) 	(((Char)(c) & QUOTE) ? 0 : \
+				(isprint((tcshuc) (c)) && (c) != '\t'))
+#else
 #    define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : \
 				(isprint((tcshuc) (c)) && (c) != '\t'))
+#endif /* !defined(DSPMBYTE) */
 #   else
+#if defined(DSPMBYTE)
+#    define IsprintM(c) (((Char)(c) & QUOTE) ? 0 : isprint((tcshuc) (c)))
+#else
 #    define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : isprint((tcshuc) (c)))
+#endif /* !defined(DSPMBYTE) */
 #   endif /* SOLARIS2 == 24 */
+#if defined(DSPMBYTE)
+#   define Isprint(c)	( (IsprintM(c)) || (_enable_mbdisp&&(IsmbyteU((c)))) )
+#endif /* !defined(DSPMBYTE) */
 #    define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : ispunct((tcshuc) (c)))
 #  else /* WINNT */
 #   define Isspace(c) (((Char)(c) & QUOTE) ? 0 : isspace( oem_it((tcshuc)(c))))
@@ -160,8 +202,15 @@ extern unsigned short _toebcdic[256];
 #   define Isxdigit(c)(((Char)(c) & QUOTE) ? 0 : isxdigit(oem_it((tcshuc)(c))))
 #   define Isalnum(c) (((Char)(c) & QUOTE) ? 0 : isalnum( oem_it((tcshuc)(c))))
 #   define Ispunct(c) (((Char)(c) & QUOTE) ? 0 : ispunct( oem_it((tcshuc)(c))))
+#if defined(DSPMBYTE)
+#   define IscntrlM(c) (((Char)(c) & QUOTE) ? 0 : iscntrl( oem_it((tcshuc)(c))))
+#   define Iscntrl(c)	( (IscntrlM(c)) && !(_enable_mbdisp&&(IsmbyteU((c)))) )
+#   define IsprintM(c) (((Char)(c) & QUOTE) ? 0 : isprint( oem_it((tcshuc)(c))))
+#   define Isprint(c)	( (IsprintM(c)) || (_enable_mbdisp&&(IsmbyteU((c)))) )
+#else
 #   define Iscntrl(c) (((Char)(c) & QUOTE) ? 0 : iscntrl( oem_it((tcshuc)(c))))
 #   define Isprint(c) (((Char)(c) & QUOTE) ? 0 : isprint( oem_it((tcshuc)(c))))
+#endif /* !defined(DSPMBYTE) */
 #  endif /* WINNT */
 # endif /* !NeXT */
 #else /* !NLS */
@@ -180,10 +229,22 @@ extern unsigned short _toebcdic[256];
 #endif /*_OSD_POSIX*/
 # define Isxdigit(c)	cmap(c, _XD)
 # define Isalnum(c)	(cmap(c, _DIG|_LET) && !(((Char)(c) & META) && AsciiOnly))
+#if defined(DSPMBYTE)
+# define IscntrlM(c)	(cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
+# define Iscntrl(c)	( (IscntrlM(c)) && !(_enable_mbdisp&&(IsmbyteU((c)))) )
+# define IsprintM(c)	(!cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
+# define Isprint(c)	( (IsprintM(c)) || (_enable_mbdisp&&(IsmbyteU((c)))) )
+#else
 # define Iscntrl(c)	(cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
 # define Isprint(c)	(!cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
+#endif /* !defined(DSPMBYTE) */
 # define Ispunct(c)	(cmap(c,_PUN) && !(((c) & META) && AsciiOnly))
 
 #endif /* !NLS */
+
+#if defined(DSPMBYTE)
+# define Ismbyte1(c)	((_mbmap[(c) & 0377] & _MB1) ? 1 : 0)
+# define Ismbyte2(c)	((_mbmap[(c) & 0377] & _MB2) ? 1 : 0)
+#endif
 
 #endif /* _h_sh_char */

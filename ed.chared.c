@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.54 1998/09/04 21:16:36 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.55 1998/09/09 10:29:15 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.54 1998/09/04 21:16:36 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.55 1998/09/09 10:29:15 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -106,6 +106,13 @@ static	CCRETVAL v_csearch_fwd		__P((int, int, int));
 static	CCRETVAL v_action		__P((int));
 static	CCRETVAL v_csearch_back		__P((int, int, int));
 
+#if defined(DSPMBYTE)
+static	void 	 e_charfwd_mbyte	__P((int));
+static	void 	 e_charback_mbyte	__P((int));
+static  int extdel;
+static  int extins = 0;
+#endif
+
 static void
 c_alternativ_key_map(state)
     int     state;
@@ -144,12 +151,27 @@ static void
 c_delafter(num)	
     register int num;
 {
-    register Char *cp, *kp;
+    register Char *cp, *kp = NULL;
+
+#if defined(DSPMBYTE)
+    Char *wkcp;
+
+    extdel = 0;
+#endif
 
     if (num > LastChar - Cursor)
 	num = LastChar - Cursor;	/* bounds check */
 
     if (num > 0) {			/* if I can delete anything */
+#if defined(DSPMBYTE)
+	/* check for code of deleted character */
+	if (_enable_mbdisp) {
+	    for (wkcp = Cursor ; wkcp < Cursor + num; wkcp++) {
+		if (extdel == 0)
+		    extdel = Ismbyte1(*wkcp); /* check to 1st. byte */
+	    }
+	}
+#endif
 	if (VImode) {
 	    kp = UndoBuf;		/* Set Up for VI undo command */
 	    UndoAction = TCSHOP_INSERT;
@@ -164,6 +186,20 @@ c_delafter(num)
 	    for (cp = Cursor; cp <= LastChar; cp++)
 		*cp = cp[num];
 	LastChar -= num;
+#if defined(DSPMBYTE)
+	if (_enable_mbdisp && extdel && Ismbyte2(*Cursor)) {
+	    if( VImode ) {
+		UndoSize++;
+		*kp++ = *Cursor; /* Save deleted chars into undobuf */
+	    }
+	    for (cp = Cursor; cp <= LastChar; cp++)
+		*cp = cp[1];
+	    LastChar--;
+	    e_redisp( 1 );
+	}
+	else
+	    extdel = 0;
+#endif
     }
 #ifdef notdef
     else {
@@ -180,12 +216,23 @@ static void
 c_delbefore(num)		/* delete before dot, with bounds checking */
     register int num;
 {
-    register Char *cp, *kp;
+    register Char *cp, *kp = NULL;
+
+#if defined(DSPMBYTE)
+    Char *nowcur, *wkcp;
+    Char delc;
+
+    extdel = 0;
+#endif
 
     if (num > Cursor - InputBuf)
 	num = Cursor - InputBuf;	/* bounds check */
 
     if (num > 0) {			/* if I can delete anything */
+#if defined(DSPMBYTE)
+	nowcur = Cursor - num;
+	delc = *nowcur;
+#endif
 	if (VImode) {
 	    kp = UndoBuf;		/* Set Up for VI undo command */
 	    UndoAction = TCSHOP_INSERT;
@@ -200,6 +247,27 @@ c_delbefore(num)		/* delete before dot, with bounds checking */
 	    for (cp = Cursor - num; cp <= LastChar; cp++)
 		*cp = cp[num];
 	LastChar -= num;
+#if defined(DSPMBYTE)
+	if (_enable_mbdisp) {
+	    for (wkcp = InputBuf; wkcp < nowcur; wkcp++) {
+		if(extdel == 0)
+		    extdel = Ismbyte1(*wkcp); /* check to 1st. byte */
+	    }
+	    if (extdel && Ismbyte2(delc)) {
+		if( VImode ) {
+		    UndoSize++;
+		    UndoPtr--;
+		    *kp++ = *(nowcur-1);
+				/* Save deleted chars into undobuf */
+		}
+		for (cp = nowcur - 1; cp <= LastChar; cp++)
+		    *cp = cp[1];
+		LastChar--;
+	    }
+	}
+	else
+	    extdel = 0;
+#endif
     }
 }
 
@@ -720,6 +788,12 @@ c_delfini()		/* Finish up delete action */
 	Size = (int) (Cursor-ActionPos);
 	c_delbefore(Size); 
 	Cursor = ActionPos;
+#if defined(DSPMBYTE)
+	if (_enable_mbdisp && extdel) {
+	    Cursor--;
+	    e_redisp(1);
+	}
+#endif
 	RefCursor();
     }
     else if (Cursor < ActionPos) {
@@ -1232,12 +1306,16 @@ e_insert(c)
     register int c;
 {
     register int i;
+#if defined(DSPMBYTE)
+    CCRETVAL ret;
+    static Char savec;
+    static int exterr = 0;
+#endif
 #ifndef SHORT_STRINGS
     c &= ASCII;			/* no meta chars ever */
 #endif
-#ifdef DSPKANJI
-    CCRETVAL ret;
-    ret = (CCRETVAL)CC_NORM;
+#if defined(DSPMBYTE)
+    ret = (CCRETVAL) CC_NORM;
 #endif
 
     if (!c)
@@ -1248,6 +1326,13 @@ e_insert(c)
 
     if (Argument == 1) {  	/* How was this optimized ???? */
 
+#if defined(DSPMBYTE)
+	if(_enable_mbdisp && extins && exterr && Ismbyte2(c)) {
+	    extins = 0;
+	    exterr = 0;
+	    return(CC_ERROR);
+	}
+#endif
 	if (inputmode != MODE_INSERT) {
 	    UndoBuf[UndoSize++] = *Cursor;
 	    UndoBuf[UndoSize] = '\0';
@@ -1256,11 +1341,47 @@ e_insert(c)
 
         c_insert(1);
 
+#if defined(DSPMBYTE)
+	/* 1st. byte is store to special buffer, and replace space */
+	if(_enable_mbdisp && extins == 0 && Ismbyte1(c)) {
+	    extins++;
+	    savec = (Char) c;
+	    *Cursor++ = (Char) ' ';
+	}
+	else if (_enable_mbdisp && extins && Ismbyte2(c)) {
+	    *(Cursor-1) = savec;
+	    *Cursor++ = (Char) c;
+	    extins = 0;
+	    e_redisp(1);
+	    Refresh();
+	    ret = CC_REFRESH;
+	}
+	else
+	    *Cursor++ = (Char) c;
+	DoingArg = 0;		/* just in case */
+	if (ret != CC_REFRESH)
+	    RefPlusOne();	/* fast refresh for one char. */
+#else
 	*Cursor++ = (Char) c;
 	DoingArg = 0;		/* just in case */
 	RefPlusOne();		/* fast refresh for one char. */
+#endif
     }
     else {
+#if defined(DSPMBYTE)
+	/* Cannot use ESC-(number) for multi-byte */
+	if (_enable_mbdisp && extins == 0 && Ismbyte1(c)) {
+	    extins++;
+	    exterr++;
+	    return(CC_ERROR);
+	}
+	else if (_enable_mbdisp && extins && exterr && Ismbyte2(c))
+	{
+	    extins = 0;
+	    exterr = 0;
+	    return(CC_ERROR);
+	}
+#endif
 	if (inputmode != MODE_INSERT) {
 
 	    for(i=0;i<Argument;i++) 
@@ -1280,7 +1401,7 @@ e_insert(c)
     if (inputmode == MODE_REPLACE_1)
 	(void) v_cmd_mode(0);
 
-#ifdef DSPKANJI
+#if defined(DSPMBYTE)
     return(ret);
 #else
     return(CC_NORM);
@@ -1316,6 +1437,12 @@ DeleteBack(n)			/* delete the n characters before . */
 	    Cursor = InputBuf;	/* bounds check */
 	else
 	    Cursor -= n;
+#if defined(DSPMBYTE)
+	if(_enable_mbdisp && extdel && Cursor > InputBuf) {
+	    Cursor--;
+	    e_redisp(1);
+	}
+#endif
     }
 }
 
@@ -2049,6 +2176,12 @@ v_delprev(c) 		/* Backspace key in insert mode */
 	if (Argument <= Cursor - InsertPos) {
 	    c_delbefore(Argument);	/* delete before */
 	    Cursor -= Argument;
+#if defined(DSPMBYTE)
+	if (_enable_mbdisp && extdel) {
+	    Cursor--;
+	    e_redisp(c);
+	}
+#endif
 	    rc = CC_REFRESH;
 	}
     }
@@ -2067,6 +2200,12 @@ e_delprev(c)
 	    Cursor = InputBuf;	/* bounds check */
 	else
 	    Cursor -= Argument;
+#if defined(DSPMBYTE)
+	if (_enable_mbdisp && extdel && Cursor > InputBuf) {
+	    Cursor--;
+	    e_redisp(c);
+	}
+#endif
 	return(CC_REFRESH);
     }
     else {
@@ -2463,6 +2602,31 @@ e_gcharswitch(cc)
     }
 }
 
+#if defined(DSPMBYTE) /* BY TAGA Nayuta VERY THANKS */
+/*ARGSUSED*/
+static void
+e_charback_mbyte(argument)
+     int argument;
+{
+    if (!_enable_mbdisp) {
+	if (Argument > Cursor - InputBuf)
+	    Cursor = InputBuf;
+	else
+	    Cursor -= Argument;
+    }
+    else {
+	while (0 < argument && Cursor > InputBuf) {
+	    if (Cursor - 1 != InputBuf &&
+		Ismbyte1(*(Cursor - 2)) && Ismbyte2(*(Cursor - 1))) {
+		Cursor--;
+	    }
+	    Cursor--;
+	    argument--;
+	}
+    }
+}
+#endif
+
 /*ARGSUSED*/
 CCRETVAL
 e_charback(c)
@@ -2470,10 +2634,14 @@ e_charback(c)
 {
     USE(c);
     if (Cursor > InputBuf) {
+#if defined(DSPMBYTE) /* BY TAGA Nayuta VERY THANKS */
+	e_charback_mbyte(Argument);
+#else
 	if (Argument > Cursor - InputBuf)
 	    Cursor = InputBuf;
 	else
 	    Cursor -= Argument;
+#endif
 
 	if (VImode)
 	    if (ActionFlag & TCSHOP_DELETE) {
@@ -2532,6 +2700,26 @@ e_wordback(c)
     return(CC_NORM);
 }
 
+#if defined(DSPMBYTE) /* BY TAGA Nayuta VERY THANKS */
+/*ARGSUSED*/
+static void
+e_charfwd_mbyte(argument)
+     int argument;
+{
+    if (!_enable_mbdisp)
+	Cursor += argument;
+    else
+	while (0 < argument && Cursor < LastChar) {
+	    if (Cursor + 1 != LastChar &&
+		Ismbyte1(*Cursor) && Ismbyte2(*(Cursor + 1))) {
+		Cursor++;
+	    }
+	    Cursor++;
+	    argument--;
+	}
+}
+#endif
+
 /*ARGSUSED*/
 CCRETVAL
 e_charfwd(c)
@@ -2539,7 +2727,11 @@ e_charfwd(c)
 {
     USE(c);
     if (Cursor < LastChar) {
+#if defined(DSPMBYTE) /* BY TAGA Nayuta VERY THANKS */
+	e_charfwd_mbyte(Argument);
+#else
 	Cursor += Argument;
+#endif
 	if (Cursor > LastChar)
 	    Cursor = LastChar;
 

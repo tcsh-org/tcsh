@@ -1,3 +1,9 @@
+ 92. V6.07.12 - 19980918
+ 91. nls fixes
+ 90. Avoid buffer overflows in directory code (kim)
+ 89. Add multibyte character display support (Yoshiyuki Sakakibara)
+ 88. Make tcsh use getcwd instead of getwd and supply a getcwd.
+ 87. Fix remotehost again (kim)
  86. V6.07.11 - 19980913
  85. Leave remotehost ip addresses alone (don't try to resolve them) (Kim)
  84. Read vs. force_read fixes (Amol)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.32 1997/05/04 17:52:17 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.33 1998/06/27 12:27:27 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.32 1997/05/04 17:52:17 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.33 1998/06/27 12:27:27 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -173,6 +173,11 @@ update_vars(vp)
 	set_color_context();
     }
 #endif /* COLOR_LS_F */
+#if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
+    else if(eq(vp, CHECK_MBYTEVAR) || eq(vp, STRnokanji)) {
+	update_dspmbyte_vars();
+    }
+#endif
 }
 
 
@@ -737,6 +742,9 @@ unset(v, c)
     if (adrof(STRcolor) == 0)
 	set_color_context();
 #endif /* COLOR_LS_F */
+#if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
+    update_dspmbyte_vars();
+#endif
 }
 
 void
@@ -1066,3 +1074,128 @@ x:
 	goto x;
     }
 }
+
+#if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
+void
+update_dspmbyte_vars()
+{
+    int lp, iskcode;
+    Char *dstr1;
+
+    /* if variable "nokanji" is set, multi-byte display is disabled */
+    if (adrof(CHECK_MBYTEVAR) && !adrof(STRnokanji)) {
+	_enable_mbdisp = 1;
+	dstr1 = varval(CHECK_MBYTEVAR);
+	if(eq (dstr1, STRKSJIS))
+	    iskcode = 1;
+	else if (eq(dstr1, STRKEUC))
+	    iskcode = 2;
+	else if ((dstr1[0] - '0') >= 0 && (dstr1[0] - '0') <= 3) {
+	    iskcode = 0;
+	}
+	else {
+	    xprintf(CGETS(18, 2,
+	       "Warning: unknown multibyte display; using default(euc(JP))\n"));
+	    iskcode = 2;
+	}
+	for (lp = 0; lp < 256 && iskcode > 0; lp++) {
+	    switch (iskcode) {
+	    case 1:
+		/* Shift-JIS */
+		_cmap[lp] = _cmap_mbyte[lp];
+		_mbmap[lp] = _mbmap_sjis[lp];
+		break;
+	    case 2:
+		/* 2 ... euc */
+		_cmap[lp] = _cmap_mbyte[lp];
+		_mbmap[lp] = _mbmap_euc[lp];
+		break;
+	    default:
+		xprintf(CGETS(18, 3,
+		    "Warning: unknown multibyte code %d; multibyte disabled\n"),
+		    iskcode);
+		_cmap[lp] = _cmap_c[lp];
+		_mbmap[lp] = 0;	/* Default map all 0 */
+		_enable_mbdisp = 0;
+		break;
+	    }
+	}
+	if (iskcode == 0) {
+	    /* check original table */
+	    if (Strlen(dstr1) != 256) {
+		xprintf(CGETS(18, 4,
+       "Warning: Invalid multibyte table length (%d); multibyte disabled\n"),
+		    Strlen(dstr1));
+		_enable_mbdisp = 0;
+	    }
+	    for (lp = 0; lp < 256 && _enable_mbdisp == 1; lp++) {
+		if (!((dstr1[lp] - '0') >= 0 && (dstr1[lp] - '0') <= 3)) {
+		    xprintf(CGETS(18, 4,
+	   "Warning: bad multibyte code at offset +%d; multibyte diabled\n"),
+			lp);
+		    _enable_mbdisp = 0;
+		    break;
+		}
+	    }
+	    /* set original table */
+	    for (lp = 0; lp < 256; lp++) {
+		if (_enable_mbdisp == 1) {
+		    _cmap[lp] = _cmap_mbyte[lp];
+		    _mbmap[lp] = (unsigned short) ((dstr1[lp] - '0') & 0x0f);
+		}
+		else {
+		    _cmap[lp] = _cmap_c[lp];
+		    _mbmap[lp] = 0;	/* Default map all 0 */
+		}
+	    }
+	}
+    }
+    else {
+	for (lp = 0; lp < 256; lp++) {
+	    _cmap[lp] = _cmap_c[lp];
+	    _mbmap[lp] = 0;	/* Default map all 0 */
+	}
+	_enable_mbdisp = 0;
+    }
+#ifdef MBYTEDEBUG	/* Sorry, use for beta testing */
+    {
+	Char mbmapstr[300];
+	for (lp = 0; lp < 256; lp++) {
+	    mbmapstr[lp] = _mbmap[lp] + '0';
+	    mbmapstr[lp+1] = 0;
+	}
+	set(STRmbytemap, Strsave(mbmapstr), VAR_READWRITE);
+    }
+#endif /* MBYTEMAP */
+}
+
+/* dspkanji/dspmbyte autosetting */
+/* PATCH IDEA FROM Issei.Suzuki VERY THANKS */
+void
+autoset_dspmbyte(pcp)
+    Char *pcp;
+{
+    int i;
+    struct dspm_autoset_Table {
+	Char *n;
+	Char *v;
+    } dspmt[] = {
+	{ STRLANGEUC, STRKEUC },
+	{ STRLANGEUCB, STRKEUC },
+	{ STRLANGSJIS, STRKSJIS },
+	{ STRLANGSJISB, STRKSJIS },
+	{ NULL, NULL }
+    };
+
+    if (*pcp == '\0')
+	return;
+
+    for (i = 0; dspmt[i].n; i++) {
+	if (eq(pcp, dspmt[i].n)) {
+	    set(CHECK_MBYTEVAR, Strsave(dspmt[i].v), VAR_READWRITE);
+	    update_dspmbyte_vars();
+	    break;
+	}
+    }
+}
+#endif

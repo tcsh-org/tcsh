@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.40 1998/04/08 17:57:32 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.41 1998/06/27 12:27:32 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -183,11 +183,11 @@ extern ptr_t 		 xmemset	__P((ptr_t, int, size_t));
 #endif /* NEEDmemset */
 
 
-#ifdef NEEDgetwd
-extern	char		 *xgetwd	__P((char *));
-# undef getwd
-# define getwd(a) xgetwd(a)
-#endif /* NEEDgetwd */
+#ifdef NEEDgetcwd
+extern	char		 *xgetcwd	__P((char *, size_t));
+# undef getcwd
+# define getcwd(a, b) xgetcwd((a), (b))
+#endif /* NEEDgetcwd */
 
 #ifdef NEEDgethostname
 extern	int	 	  xgethostname	__P((char *, int));

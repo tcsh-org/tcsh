@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.char.c,v 3.10 1997/10/02 16:36:28 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.char.c,v 3.11 1997/10/28 22:34:22 christos Exp $ */
 /*
  * sh.char.c: Character classification tables
  */
@@ -36,10 +36,784 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.char.c,v 3.10 1997/10/02 16:36:28 christos Exp $")
+RCSID("$Id: sh.char.c,v 3.11 1997/10/28 22:34:22 christos Exp $")
 
 #include "sh.char.h"
 
+#if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
+/* on default same as original map */
+unsigned short _cmap[256] = {
+/*	  0 nul		  1 soh		  2 stx		  3 etx	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	  4 eot		  5 enq		  6 ack		  7 bel	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	  8 bs		  9 ht		 10 nl		 11 vt	*/
+	_CTR,		_CTR|_SP|_META,	_CTR|_NL|_META,	_CTR,
+
+/*	 12 np		 13 cr		 14 so		 15 si	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 16 dle		 17 dc1		 18 dc2		 19 dc3	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 20 dc4		 21 nak		 22 syn		 23 etb	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 24 can		 25 em		 26 sub		 27 esc	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 28 fs		 29 gs		 30 rs		 31 us	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 32 sp		 33 !		 34 "		 35 #	*/
+	_SP|_META,	_PUN,		_QF|_PUN,	_META|_PUN,
+
+/*	 36 $		 37 %		 38 &		 39 '	*/
+	_DOL|_PUN,	_PUN,		_META|_CMD|_PUN,_QF|_PUN,
+
+/*	 40 (		 41 )		 42 *		 43 +	*/
+	_META|_CMD|_PUN,_META|_PUN,	_GLOB|_PUN,	_PUN,
+
+/*	 44 ,		 45 -		 46 .		 47 /	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	 48 0		 49 1		 50 2		 51 3	*/
+	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,
+
+/*	 52 4		 53 5		 54 6		 55 7	*/
+	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,
+
+/*	 56 8		 57 9		 58 :		 59 ;	*/
+	_DIG|_XD,	_DIG|_XD,	_PUN,		_META|_CMD|_PUN,
+
+/*	 60 <		 61 =		 62 >		 63 ?	*/
+	_META|_PUN,	_PUN,		_META|_PUN,	_GLOB|_PUN,
+
+/*	 64 @		 65 A		 66 B		 67 C	*/
+	_PUN,		_LET|_UP|_XD,	_LET|_UP|_XD,	_LET|_UP|_XD,
+
+/*	 68 D		 69 E		 70 F		 71 G	*/
+	_LET|_UP|_XD,	_LET|_UP|_XD,	_LET|_UP|_XD,	_LET|_UP,
+
+/*	 72 H		 73 I		 74 J		 75 K	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 76 L		 77 M		 78 N		 79 O	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 80 P		 81 Q		 82 R		 83 S	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 84 T		 85 U		 86 V		 87 W	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 88 X		 89 Y		 90 Z		 91 [	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_GLOB|_PUN,
+
+/*	 92 \		 93 ]		 94 ^		 95 _	*/
+	_ESC|_PUN,	_PUN,		_PUN,		_PUN,
+
+/*	 96 `		 97 a		 98 b		 99 c	*/
+  _QB|_GLOB|_META|_PUN,	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW|_XD,
+
+/*	100 d		101 e		102 f		103 g	*/
+	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW,
+
+/*	104 h		105 i		106 j		107 k	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	108 l		109 m		110 n		111 o	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	112 p		113 q		114 r		115 s	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	116 t		117 u		118 v		119 w	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	120 x		121 y		122 z		123 {	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_GLOB|_PUN,
+
+/*	124 |		125 }		126 ~		127 del	*/
+	_META|_CMD|_PUN,_PUN,		_PUN,		_CTR,
+
+/****************************************************************/
+/* 128 - 255 The below is supposedly ISO 8859/1			*/
+/****************************************************************/
+/*	128 (undef)	129 (undef)	130 (undef)	131 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	132 (undef)	133 (undef)	134 (undef)	135 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	136 (undef)	137 (undef)	138 (undef)	139 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	140 (undef)	141 (undef)	142 (undef)	143 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	144 (undef)	145 (undef)	146 (undef)	147 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	148 (undef)	149 (undef)	150 (undef)	151 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	152 (undef)	153 (undef)	154 (undef)	155 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	156 (undef)	157 (undef)	158 (undef)	159 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	160 nobreakspace 161 exclamdown	162 cent	163 sterling	*/
+	_PUN, /* XXX */	_PUN,		_PUN,		_PUN,
+
+/*	164 currency	165 yen		166 brokenbar	167 section	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	168 diaeresis	169 copyright	170 ordfeminine	171 guillemotleft*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	172 notsign	173 hyphen	174 registered	175 macron	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	176 degree	177 plusminus	178 twosuperior	179 threesuperior*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	180 acute	181 mu 		182 paragraph	183 periodcentered*/
+	_PUN,		_PUN, /*XXX*/	_PUN,		_PUN,
+
+/*	184 cedilla	185 onesuperior	186 masculine	187 guillemotright*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	188 onequarter	189 onehalf	190 threequarters 191 questiondown*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	192 Agrave	193 Aacute	194 Acircumflex	195 Atilde	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	196 Adiaeresis	197 Aring	198 AE		199 Ccedilla	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	200 Egrave	201 Eacute	202 Ecircumflex	203 Ediaeresis	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	204 Igrave	205 Iacute	206 Icircumflex	207 Idiaeresis	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	208 ETH		209 Ntilde	210 Ograve	211 Oacute	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	212 Ocircumflex	213 Otilde	214 Odiaeresis	215 multiply	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_PUN,
+
+/*	216 Ooblique	217 Ugrave	218 Uacute	219 Ucircumflex	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	220 Udiaeresis	221 Yacute	222 THORN	223 ssharp	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_DOW,
+
+/*	224 agrave	225 aacute	226 acircumflex	227 atilde	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	228 adiaeresis	229 aring	230 ae		231 ccedilla	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	232 egrave	233 eacute	234 ecircumflex	235 ediaeresis	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	236 igrave	237 iacute	238 icircumflex	239 idiaeresis	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	240 eth		241 ntilde	242 ograve	243 oacute	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	244 ocircumflex	245 otilde	246 odiaeresis	247 division	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_PUN,
+
+/*	248 oslash	249 ugrave	250 uacute	251 ucircumflex	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	252 udiaeresis	253 yacute	254 thorn	255 ydiaeresis	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+};
+/* original table */
+unsigned short _cmap_c[256] = {
+/*	  0 nul		  1 soh		  2 stx		  3 etx	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	  4 eot		  5 enq		  6 ack		  7 bel	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	  8 bs		  9 ht		 10 nl		 11 vt	*/
+	_CTR,		_CTR|_SP|_META,	_CTR|_NL|_META,	_CTR,
+
+/*	 12 np		 13 cr		 14 so		 15 si	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 16 dle		 17 dc1		 18 dc2		 19 dc3	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 20 dc4		 21 nak		 22 syn		 23 etb	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 24 can		 25 em		 26 sub		 27 esc	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 28 fs		 29 gs		 30 rs		 31 us	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 32 sp		 33 !		 34 "		 35 #	*/
+	_SP|_META,	_PUN,		_QF|_PUN,	_META|_PUN,
+
+/*	 36 $		 37 %		 38 &		 39 '	*/
+	_DOL|_PUN,	_PUN,		_META|_CMD|_PUN,_QF|_PUN,
+
+/*	 40 (		 41 )		 42 *		 43 +	*/
+	_META|_CMD|_PUN,_META|_PUN,	_GLOB|_PUN,	_PUN,
+
+/*	 44 ,		 45 -		 46 .		 47 /	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	 48 0		 49 1		 50 2		 51 3	*/
+	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,
+
+/*	 52 4		 53 5		 54 6		 55 7	*/
+	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,
+
+/*	 56 8		 57 9		 58 :		 59 ;	*/
+	_DIG|_XD,	_DIG|_XD,	_PUN,		_META|_CMD|_PUN,
+
+/*	 60 <		 61 =		 62 >		 63 ?	*/
+	_META|_PUN,	_PUN,		_META|_PUN,	_GLOB|_PUN,
+
+/*	 64 @		 65 A		 66 B		 67 C	*/
+	_PUN,		_LET|_UP|_XD,	_LET|_UP|_XD,	_LET|_UP|_XD,
+
+/*	 68 D		 69 E		 70 F		 71 G	*/
+	_LET|_UP|_XD,	_LET|_UP|_XD,	_LET|_UP|_XD,	_LET|_UP,
+
+/*	 72 H		 73 I		 74 J		 75 K	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 76 L		 77 M		 78 N		 79 O	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 80 P		 81 Q		 82 R		 83 S	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 84 T		 85 U		 86 V		 87 W	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 88 X		 89 Y		 90 Z		 91 [	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_GLOB|_PUN,
+
+/*	 92 \		 93 ]		 94 ^		 95 _	*/
+	_ESC|_PUN,	_PUN,		_PUN,		_PUN,
+
+/*	 96 `		 97 a		 98 b		 99 c	*/
+  _QB|_GLOB|_META|_PUN,	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW|_XD,
+
+/*	100 d		101 e		102 f		103 g	*/
+	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW,
+
+/*	104 h		105 i		106 j		107 k	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	108 l		109 m		110 n		111 o	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	112 p		113 q		114 r		115 s	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	116 t		117 u		118 v		119 w	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	120 x		121 y		122 z		123 {	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_GLOB|_PUN,
+
+/*	124 |		125 }		126 ~		127 del	*/
+	_META|_CMD|_PUN,_PUN,		_PUN,		_CTR,
+
+/****************************************************************/
+/* 128 - 255 The below is supposedly ISO 8859/1			*/
+/****************************************************************/
+/*	128 (undef)	129 (undef)	130 (undef)	131 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	132 (undef)	133 (undef)	134 (undef)	135 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	136 (undef)	137 (undef)	138 (undef)	139 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	140 (undef)	141 (undef)	142 (undef)	143 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	144 (undef)	145 (undef)	146 (undef)	147 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	148 (undef)	149 (undef)	150 (undef)	151 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	152 (undef)	153 (undef)	154 (undef)	155 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	156 (undef)	157 (undef)	158 (undef)	159 (undef)	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	160 nobreakspace 161 exclamdown	162 cent	163 sterling	*/
+	_PUN, /* XXX */	_PUN,		_PUN,		_PUN,
+
+/*	164 currency	165 yen		166 brokenbar	167 section	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	168 diaeresis	169 copyright	170 ordfeminine	171 guillemotleft*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	172 notsign	173 hyphen	174 registered	175 macron	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	176 degree	177 plusminus	178 twosuperior	179 threesuperior*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	180 acute	181 mu 		182 paragraph	183 periodcentered*/
+	_PUN,		_PUN, /*XXX*/	_PUN,		_PUN,
+
+/*	184 cedilla	185 onesuperior	186 masculine	187 guillemotright*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	188 onequarter	189 onehalf	190 threequarters 191 questiondown*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	192 Agrave	193 Aacute	194 Acircumflex	195 Atilde	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	196 Adiaeresis	197 Aring	198 AE		199 Ccedilla	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	200 Egrave	201 Eacute	202 Ecircumflex	203 Ediaeresis	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	204 Igrave	205 Iacute	206 Icircumflex	207 Idiaeresis	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	208 ETH		209 Ntilde	210 Ograve	211 Oacute	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	212 Ocircumflex	213 Otilde	214 Odiaeresis	215 multiply	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_PUN,
+
+/*	216 Ooblique	217 Ugrave	218 Uacute	219 Ucircumflex	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	220 Udiaeresis	221 Yacute	222 THORN	223 ssharp	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_DOW,
+
+/*	224 agrave	225 aacute	226 acircumflex	227 atilde	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	228 adiaeresis	229 aring	230 ae		231 ccedilla	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	232 egrave	233 eacute	234 ecircumflex	235 ediaeresis	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	236 igrave	237 iacute	238 icircumflex	239 idiaeresis	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	240 eth		241 ntilde	242 ograve	243 oacute	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	244 ocircumflex	245 otilde	246 odiaeresis	247 division	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_PUN,
+
+/*	248 oslash	249 ugrave	250 uacute	251 ucircumflex	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	252 udiaeresis	253 yacute	254 thorn	255 ydiaeresis	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+};
+
+/* multi-byte table */
+/* BY Masaaki Koyanagi VERY THANKS */
+unsigned short _cmap_mbyte[256] = {
+/*	  0 nul		  1 soh		  2 stx		  3 etx	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	  4 eot		  5 enq		  6 ack		  7 bel	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	  8 bs		  9 ht		 10 nl		 11 vt	*/
+	_CTR,		_CTR|_SP|_META,	_CTR|_NL|_META,	_CTR,
+
+/*	 12 np		 13 cr		 14 so		 15 si	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 16 dle		 17 dc1		 18 dc2		 19 dc3	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 20 dc4		 21 nak		 22 syn		 23 etb	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 24 can		 25 em		 26 sub		 27 esc	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 28 fs		 29 gs		 30 rs		 31 us	*/
+	_CTR,		_CTR,		_CTR,		_CTR,
+
+/*	 32 sp		 33 !		 34 "		 35 #	*/
+	_SP|_META,	_PUN,		_QF|_PUN,	_META|_PUN,
+
+/*	 36 $		 37 %		 38 &		 39 '	*/
+	_DOL|_PUN,	_PUN,		_META|_CMD|_PUN,_QF|_PUN,
+
+/*	 40 (		 41 )		 42 *		 43 +	*/
+	_META|_CMD|_PUN,_META|_PUN,	_GLOB|_PUN,	_PUN,
+
+/*	 44 ,		 45 -		 46 .		 47 /	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	 48 0		 49 1		 50 2		 51 3	*/
+	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,
+
+/*	 52 4		 53 5		 54 6		 55 7	*/
+	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,	_DIG|_XD,
+
+/*	 56 8		 57 9		 58 :		 59 ;	*/
+	_DIG|_XD,	_DIG|_XD,	_PUN,		_META|_CMD|_PUN,
+
+/*	 60 <		 61 =		 62 >		 63 ?	*/
+	_META|_PUN,	_PUN,		_META|_PUN,	_GLOB|_PUN,
+
+/*	 64 @		 65 A		 66 B		 67 C	*/
+	_PUN,		_LET|_UP|_XD,	_LET|_UP|_XD,	_LET|_UP|_XD,
+
+/*	 68 D		 69 E		 70 F		 71 G	*/
+	_LET|_UP|_XD,	_LET|_UP|_XD,	_LET|_UP|_XD,	_LET|_UP,
+
+/*	 72 H		 73 I		 74 J		 75 K	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 76 L		 77 M		 78 N		 79 O	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 80 P		 81 Q		 82 R		 83 S	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 84 T		 85 U		 86 V		 87 W	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	 88 X		 89 Y		 90 Z		 91 [	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_GLOB|_PUN,
+
+/*	 92 \		 93 ]		 94 ^		 95 _	*/
+	_ESC|_PUN,	_PUN,		_PUN,		_PUN,
+
+/*	 96 `		 97 a		 98 b		 99 c	*/
+  _QB|_GLOB|_META|_PUN,	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW|_XD,
+
+/*	100 d		101 e		102 f		103 g	*/
+	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW,
+
+/*	104 h		105 i		106 j		107 k	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	108 l		109 m		110 n		111 o	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	112 p		113 q		114 r		115 s	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	116 t		117 u		118 v		119 w	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	120 x		121 y		122 z		123 {	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_GLOB|_PUN,
+
+/*	124 |		125 }		126 ~		127 del	*/
+	_META|_CMD|_PUN,_PUN,		_PUN,		_CTR,
+
+/****************************************************************/
+/* 128 - 255 The below is supposedly ISO 8859/1			*/
+/****************************************************************/
+/*	128 (undef)	129 (undef)	130 (undef)	131 (undef)	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	132 (undef)	133 (undef)	134 (undef)	135 (undef)	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	136 (undef)	137 (undef)	138 (undef)	139 (undef)	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	140 (undef)	141 (undef)	142 (undef)	143 (undef)	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	144 (undef)	145 (undef)	146 (undef)	147 (undef)	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	148 (undef)	149 (undef)	150 (undef)	151 (undef)	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	152 (undef)	153 (undef)	154 (undef)	155 (undef)	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	156 (undef)	157 (undef)	158 (undef)	159 (undef)	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	160 nobreakspace 161 exclamdown	162 cent	163 sterling	*/
+	_PUN, /* XXX */	_PUN,		_PUN,		_PUN,
+
+/*	164 currency	165 yen		166 brokenbar	167 section	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	168 diaeresis	169 copyright	170 ordfeminine	171 guillemotleft*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	172 notsign	173 hyphen	174 registered	175 macron	*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	176 degree	177 plusminus	178 twosuperior	179 threesuperior*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	180 acute	181 mu 		182 paragraph	183 periodcentered*/
+	_PUN,		_PUN, /*XXX*/	_PUN,		_PUN,
+
+/*	184 cedilla	185 onesuperior	186 masculine	187 guillemotright*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	188 onequarter	189 onehalf	190 threequarters 191 questiondown*/
+	_PUN,		_PUN,		_PUN,		_PUN,
+
+/*	192 Agrave	193 Aacute	194 Acircumflex	195 Atilde	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	196 Adiaeresis	197 Aring	198 AE		199 Ccedilla	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	200 Egrave	201 Eacute	202 Ecircumflex	203 Ediaeresis	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	204 Igrave	205 Iacute	206 Icircumflex	207 Idiaeresis	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	208 ETH		209 Ntilde	210 Ograve	211 Oacute	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	212 Ocircumflex	213 Otilde	214 Odiaeresis	215 multiply	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_PUN,
+
+/*	216 Ooblique	217 Ugrave	218 Uacute	219 Ucircumflex	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
+
+/*	220 Udiaeresis	221 Yacute	222 THORN	223 ssharp	*/
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_DOW,
+
+/*	224 agrave	225 aacute	226 acircumflex	227 atilde	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	228 adiaeresis	229 aring	230 ae		231 ccedilla	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	232 egrave	233 eacute	234 ecircumflex	235 ediaeresis	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	236 igrave	237 iacute	238 icircumflex	239 idiaeresis	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	240 eth		241 ntilde	242 ograve	243 oacute	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	244 ocircumflex	245 otilde	246 odiaeresis	247 division	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_PUN,
+
+/*	248 oslash	249 ugrave	250 uacute	251 ucircumflex	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+
+/*	252 udiaeresis	253 yacute	254 thorn	255 ydiaeresis	*/
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
+};
+
+short _enable_mbdisp = 0; /* control multi-byte 0...disable 1...enable */
+
+/* multi-byte check table */
+/* default = all 0 (clear process in update_vars()/unset()) */
+unsigned short _mbmap[256];
+
+unsigned short _mbmap_euc[256] = {
+/* first byte	0x8e,0xa0 - 0xf4 */
+/* second byte 	0xa0 - 0xfe */
+/* 0 - 7f all 0 */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+/*  80		81		82		83 */
+    0,		0,		0,		0,
+/*  84		85		86		87 */
+    0,		0,		0,		0,
+/*  88		89		8a		8b */
+    0,		0,		0,		0,
+/*  8c		8d		8e		8f */
+    0,		0,		_MB1,		0,
+/* 90 - 9f all 0 */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+/*  a0		a1		a2		a3 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  a4		a5		a6		a7 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  a8		a9		aa		ab */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  ac		ad		ae		af */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  b0		b1		b2		b3 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  b4		b5		b6		b7 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  b8		b9		ba		bb */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  bc		bd		be		bf */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  c0		c1		c2		c3 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  c4		c5		c6		c7 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  c8		c9		ca		cb */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  cc		cd		ce		cf */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  d0		d1		d2		d3 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  d4		d5		d6		d7 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  d8		d9		da		db */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  dc		dd		de		df */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  e0		e1		e2		e3 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  e4		e5		e6		e7 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  e8		e9		ea		eb */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  ec		ed		ee		ef */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  f0		f1		f2		f3 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  f4		f5		f6		f7 */
+    _MB1|_MB2,	_MB2,		_MB2,		_MB2,
+/*  f8		f9		fa		fb */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  fc		fd		fe		ff */
+    _MB2,	_MB2,		_MB2,		0,
+};
+
+unsigned short _mbmap_sjis[256] = {
+/* first byte	0x81-0x9f,0xe0 - 0xfc */
+/* second byte 	0x40-0x7e,0x80 - 0xfc */
+/* 0 - 3f all 0 */
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+/*  40		41		42		43 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  44		45		46		47 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  48		49		4a		4b */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  4c		4d		4e		4f */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  50		51		52		53 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  54		55		56		57 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  58		59		5a		5b */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  5c		5d		5e		5f */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  60		61		62		63 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  64		65		66		67 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  68		69		6a		6b */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  6c		6d		6e		6f */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  70		71		72		73 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  74		75		76		77 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  78		79		7a		7b */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  7c		7d		7e		7f */
+    _MB2,	_MB2,		_MB2,		0,
+/*  80		81		82		83 */
+    _MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  84		85		86		87 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  88		89		8a		8b */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  8c		8d		8e		8f */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  90		91		92		93 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  94		95		96		97 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  98		99		9a		9b */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  9c		9d		9e		9f */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  a0		a1		a2		a3 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  a4		a5		a6		a7 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  a8		a9		aa		ab */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  ac		ad		ae		af */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  b0		b1		b2		b3 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  b4		b5		b6		b7 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  b8		b9		ba		bb */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  bc		bd		be		bf */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  c0		c1		c2		c3 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  c4		c5		c6		c7 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  c8		c9		ca		cb */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  cc		cd		ce		cf */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  d0		d1		d2		d3 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  d4		d5		d6		d7 */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  d8		d9		da		db */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  dc		dd		de		df */
+    _MB2,	_MB2,		_MB2,		_MB2,
+/*  e0		e1		e2		e3 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  e4		e5		e6		e7 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  e8		e9		ea		eb */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  ec		ed		ee		ef */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  f0		f1		f2		f3 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  f4		f5		f6		f7 */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  f8		f9		fa		fb */
+    _MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,	_MB1|_MB2,
+/*  fc		fd		fe		ff */
+    _MB1|_MB2,	0,		0,		0,
+};
+
+#else /* !(defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)) */
 unsigned short _cmap[256] = {
 /*	  0 nul		  1 soh		  2 stx		  3 etx	*/
 	_CTR,		_CTR,		_CTR,		_CTR,
@@ -238,6 +1012,7 @@ unsigned short _cmap[256] = {
 	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 #endif /* SHORT_STRINGS */
 };
+#endif /* defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE) */
 
 #ifndef NLS
 /* _cmap_lower, _cmap_upper for ISO 8859/1 */

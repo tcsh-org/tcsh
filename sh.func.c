@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.75 1998/06/28 15:07:20 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.76 1998/07/07 12:06:18 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.75 1998/06/28 15:07:20 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.76 1998/07/07 12:06:18 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1313,6 +1313,14 @@ dosetenv(v, c)
 	return;
     }
 #endif /* apollo */
+
+    /* dspkanji/dspmbyte autosetting */
+    /* PATCH IDEA FROM Issei.Suzuki VERY THANKS */
+#if defined(DSPMBYTE)
+    if(eq(vp, STRLANG) && !adrof(CHECK_MBYTEVAR)) {
+	autoset_dspmbyte(lp);
+    }
+#endif
 
     if (islocale_var(vp)) {
 #ifdef NLS

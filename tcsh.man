@@ -76,7 +76,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "13 September 1998" "Astron 6.07.11"
+.TH TCSH 1 "18 September 1998" "Astron 6.07.12"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -3565,6 +3565,23 @@ One can change the stack arbitrarily by setting \fBdirstack\fR,
 but the first element (the current working directory) is always correct.
 See also the \fBcwd\fR and \fBowd\fR shell variables.
 .TP 8
+.B dspmbyte \fR(+)
+If set to `euc', it enables display and editing EUC-kanji(japanese) code.
+If set to `sjis', it enables display and editing Shift-JIS(japanese) code.
+If set to following format, it enables display and editing original multi-byte code format:
+.RS +8
+.IP "" 4
+> set dspkanji = 0000....(256 bytes)....0000
+.PP
+table length require \fBjust\fR 256 byte. Each character of 256 characters corresponds from the left from 0x01,0x02... to 0xff of ASCII code. Each character is set to number 0,1,2 and 3. Each number has the following meanings:
+  0 ... not use for multi-byte character.
+  1 ... use for first byte of multi-byte charcter.
+  2 ... use for second byte of multi-byte character.
+  3 ... use for both of first byte and second byte of multi-byte character.
+  Exapmle:
+    if set `001322', first character(means 0x00 of ASCII code) and second character(means 0x01 of ASCII code) is set to `0'. then, it is not use for multi-byte character.3rd character(0x02) is set '2'. it is use for first byte of multi-byte charcter. 4th character(0x03) is set '3'. it is use for both of first byte and second byte of multi-byte character. 5th and 6th character(0x04,0x05) is set '2'. it is use for second byte of multi-byte charcter.
+.RE
+.TP 8
 .B dunique \fR(+)
 If set, \fIpushd\fR removes any instances of \fIname\fR
 from the stack before pushing it onto the stack.
@@ -4832,7 +4849,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.07.11 (Astron) 1998-09-13.
+This manual documents tcsh 6.07.12 (Astron) 1998-09-18.
 .SH AUTHORS
 .PD 0
 .TP 2

@@ -37,6 +37,4 @@
 * Add another hook like precmd to be executed after the prompt but before the
   command.
 
-* Change getwd -> getcwd
-
 * Add instructions for using configure in the README file.

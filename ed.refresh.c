@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.21 1997/10/28 22:34:17 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.22 1998/09/04 21:16:42 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.21 1997/10/28 22:34:17 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.22 1998/09/04 21:16:42 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -58,6 +58,9 @@ static	void	str_delete		__P((Char *, int, int, int));
 static	void	str_cp			__P((Char *, Char *, int));
 static	void	PutPlusOne		__P((int));
 static	void	cpy_pad_spaces		__P((Char *, Char *, int));
+#if defined(DSPMBYTE)
+static	Char 	*update_line_fix_mbyte_point __P((Char *, Char *, int));
+#endif
 #if defined(DEBUG_UPDATE) || defined(DEBUG_REFRESH) || defined(DEBUG_LITERAL)
 static	void	dprintf			__P((char *, ...));
 #ifdef DEBUG_UPDATE
@@ -489,6 +492,26 @@ str_cp(a, b, n)
 }
 
 
+#if defined(DSPMBYTE) /* BY TAGA Nayuta VERY THANKS */
+static Char *
+update_line_fix_mbyte_point(start, target, d)
+     Char *start, *target;
+     int d;
+{
+    if (_enable_mbdisp) {
+	while (*start) {
+	    if (target == start)
+		break;
+	    if (target < start)
+		return target + d;
+	    if (Ismbyte1(*start) && Ismbyte2(*(start + 1)))
+		start++;
+	    start++;
+	}
+    }
+    return target;
+}
+#endif
 
 /* ****************************************************************
     update_line() is based on finding the middle difference of each line
@@ -745,6 +768,17 @@ update_line(old, new, cur_line)
      * diff char
      */
     MoveToLine(cur_line);
+
+#if defined(DSPMBYTE) /* BY TAGA Nayuta VERY THANKS */
+    ofd = update_line_fix_mbyte_point(old, ofd, -1);
+    osb = update_line_fix_mbyte_point(old, osb,  1);
+    ose = update_line_fix_mbyte_point(old, ose, -1);
+    ols = update_line_fix_mbyte_point(old, ols,  1);
+    nfd = update_line_fix_mbyte_point(new, nfd, -1);
+    nsb = update_line_fix_mbyte_point(new, nsb,  1);
+    nse = update_line_fix_mbyte_point(new, nse, -1);
+    nls = update_line_fix_mbyte_point(new, nls,  1);
+#endif
 
     /*
      * at this point we have something like this:

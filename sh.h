@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.83 1998/09/04 21:16:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.84 1998/09/13 13:51:10 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -1184,7 +1184,13 @@ extern int errno, sys_nerr;
    nl_catd catopen __P((const char *, int));
    int catclose __P((nl_catd));
 #  else
+#   ifdef __uxps__
+#    define gettxt gettxt_ds
+#   endif
 #   include <nl_types.h>
+#   ifdef __uxps__
+#    undef gettxt
+#   endif
 #  endif
 #  ifndef MCLoadBySet
 #   define MCLoadBySet 0

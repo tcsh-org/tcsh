@@ -127,7 +127,7 @@
 #define INTEL_32BITS	1
 
 #define HAVENOLIMIT
-#define NEEDgetwd
+#define NEEDgetcwd
 #define _POSIX_SOURCE
 #define _MINIX
 

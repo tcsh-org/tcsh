@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.46 1997/10/28 22:34:32 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.47 1998/04/08 13:59:08 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.46 1997/10/28 22:34:32 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.47 1998/04/08 13:59:08 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1049,10 +1049,10 @@ xnice(incr)
 } /* end xnice */
 #endif /* nice */
 
-#ifdef NEEDgetwd
-static char *strrcpy __P((char *, char *));
+#ifdef NEEDgetcwd
+static char *strnrcpy __P((char *, char *, size_t));
 
-/* xgetwd():
+/* xgetcwd():
  *	Return the pathname of the current directory, or return
  *	an error message in pathname.
  */
@@ -1068,96 +1068,85 @@ static char *strrcpy __P((char *, char *));
  *  consequences: it supports no job control and it has a filesystem
  *  without "." and ".." !!!
  */
-static int pathsize;			/* pathname length */
-
 char *
-xgetwd(pathname)
-	char *pathname;
+xgetcwd(pathname, pathlen)
+    char *pathname;
+    size_t pathlen;
 {
-	char pathbuf[MAXNAMLEN];	/* temporary pathname buffer */
-	char *pnptr = &pathbuf[(sizeof pathbuf)-1]; /* pathname pointer */
-	char *prepend();		/* prepend dirname to pathname */
-	dev_t rdev;			/* root device number */
-	DIR *dirp;			/* directory stream */
-	ino_t rino;			/* root inode number */
-	off_t rsize;			/* root size */
-	struct direct *dir;		/* directory entry struct */
-	struct stat d ,dd;		/* file status struct */
+    char pathbuf[MAXNAMLEN];	/* temporary pathname buffer */
+    char *pnptr = &pathbuf[(sizeof pathbuf)-1]; /* pathname pointer */
+    dev_t rdev;			/* root device number */
+    DIR *dirp = NULL;		/* directory stream */
+    ino_t rino;			/* root inode number */
+    off_t rsize;		/* root size */
+    struct direct *dir;		/* directory entry struct */
+    struct stat d, dd;		/* file status struct */
+    int serrno;
 
-	pathsize = 0;
-	*pnptr = '\0';
-	stat("/.", &d);
-	rdev = d.st_dev;
-	rino = d.st_ino;
-	rsize = d.st_size;
-	for (;;) {
-		stat(".", &d);
-		if (d.st_ino == rino && d.st_dev == rdev && d.st_size == rsize)
-			break;		/* reached root directory */
-		if ((dirp = opendir("..")) == NULL) {
-        		(void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 19,
-					"getwd: Cannot open \"..\" (%s)"),
-					strerror(errno));
-			goto fail;
-		}
-		if (chdir("..") < 0) {
-        		(void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 20,
-					"getwd: Cannot chdir to \"..\" (%s)"),
-					strerror(errno));
-			goto fail;
-		}
-		do {
-			if((dir = readdir(dirp)) == NULL) {
-				closedir(dirp);
-        			(void) xsnprintf(pathname, MAXPATHLEN, 
-				    CGETS(23, 21,
-				    "getwd: Read error in \"..\" (%s)"),
-				    strerror(errno));
-				goto fail;
-			}
-			stat(dir->d_name, &dd);
-		} while (dd.st_ino  != d.st_ino  ||
-			 dd.st_dev  != d.st_dev  ||
-			 dd.st_size != d.st_size
-			);
-		closedir(dirp);
-		pnptr = prepend("/", prepend(dir->d_name, pnptr));
+    *pnptr = '\0';
+    (void) stat("/.", &d);
+    rdev = d.st_dev;
+    rino = d.st_ino;
+    rsize = d.st_size;
+    for (;;) {
+	if (stat(".", &d) == -1) {
+	    (void) xsnprintf(pathname, pathlen, CGETS(23, 24,
+		"getcwd: Cannot stat \".\" (%s)"), strerror(errno));
+	    goto fail;
 	}
+	if (d.st_ino == rino && d.st_dev == rdev && d.st_size == rsize)
+	    break;		/* reached root directory */
+	if ((dirp = opendir("..")) == NULL) {
+	    (void) xsnprintf(pathname, pathlen, CGETS(23, 19,
+		"getcwd: Cannot open \"..\" (%s)"), strerror(errno));
+	    goto fail;
+	}
+	if (chdir("..") == -1) {
+	    (void) xsnprintf(pathname, pathlen, CGETS(23, 20,
+		"getcwd: Cannot chdir to \"..\" (%s)"), strerror(errno));
+	    goto fail;
+	}
+	do {
+	    if ((dir = readdir(dirp)) == NULL) {
+		(void) xsnprintf(pathname, pathlen, 
+		    CGETS(23, 21, "getcwd: Read error in \"..\" (%s)"),
+		    strerror(errno));
+		goto fail;
+	    }
+	    if (stat(dir->d_name, &dd) == -1) {
+		(void) xsnprintf(pathname, pathlen,
+		    CGETS(23, 25, "getcwd: Cannot stat directory \"%s\" (%s)"),
+		    dir->d_name, strerror(errno));
+		goto fail;
+	    }
+	} while (dd.st_ino  != d.st_ino  ||
+		 dd.st_dev  != d.st_dev  ||
+		 dd.st_size != d.st_size);
+	(void) closedir(dirp);
+	dirp = NULL;
+	pnptr = strnrcpy(dirp->d_name, pnptr, pnptr - pathbuf);
+	pnptr = strnrcpy("/", pnptr, pnptr - pathbuf);
+    }
 
-	if (*pnptr == '\0')		/* current dir == root dir */
-		(void) strcpy(pathname, "/");
-	else {
-		(void) strcpy(pathname, pnptr);
-		if (chdir(pnptr) < 0) {
-        		(void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 22,
-				"getwd: Cannot change back to \".\" (%s)"),
-				strerror(errno));
-			return (NULL);
-		}
+    if (*pnptr == '\0')		/* current dir == root dir */
+	(void) strncpy(pathname, "/", pathlen);
+    else {
+	(void) strncpy(pathname, pnptr, pathlen);
+	pathname[pathlen - 1] = '\0';
+	if (chdir(pnptr) == -1) {
+	    (void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 22,
+		    "getcwd: Cannot change back to \".\" (%s)"),
+		    strerror(errno));
+	    return NULL;
 	}
-	return (pathname);
+    }
+    return pathname;
 
 fail:
-	chdir(prepend(".", pnptr));
-	return (NULL);
-}
-
-/* prepend():
- *	 tacks a directory name onto the front of a pathname.
- */
-static char *
-prepend(dirname, pathname)
-	register char *dirname;
-	register char *pathname;
-{
-	register int i;			/* directory name size counter */
-
-	for (i = 0; *dirname != '\0'; i++, dirname++)
-		continue;
-	if ((pathsize += i) < MAXNAMLEN)
-		while (i-- > 0)
-			*--pathname = *--dirname;
-	return (pathname);
+    serrno = errno;
+    (void) chdir(strnrcpy(".", pnptr, pnptr - pathbuf));
+    errno = serrno;
+    return NULL;
 }
 
 # else /* ! hp9000s500 */
@@ -1167,8 +1156,9 @@ prepend(dirname, pathname)
 #  endif
 
 char *
-xgetwd(pathname)
+xgetcwd(pathname, pathlen)
     char   *pathname;
+    size_t pathlen;
 {
     DIR    *dp;
     struct dirent *d;
@@ -1180,10 +1170,10 @@ xgetwd(pathname)
 
     /* find the inode of root */
     if (stat("/", &st_root) == -1) {
-	(void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 23, 
-			"getwd: Cannot stat \"/\" (%s)"),
+	(void) xsnprintf(pathname, pathlen, CGETS(23, 23, 
+			"getcwd: Cannot stat \"/\" (%s)"),
 			strerror(errno));
-	return (NULL);
+	return NULL;
     }
     pathbuf[MAXPATHLEN - 1] = '\0';
     pathptr = &pathbuf[MAXPATHLEN - 1];
@@ -1192,12 +1182,12 @@ xgetwd(pathname)
 
     /* find the inode of the current directory */
     if (lstat(".", &st_cur) == -1) {
-	(void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 24,
-			 "getwd: Cannot stat \".\" (%s)"),
+	(void) xsnprintf(pathname, pathlen, CGETS(23, 24,
+			 "getcwd: Cannot stat \".\" (%s)"),
 			 strerror(errno));
-	return (NULL);
+	return NULL;
     }
-    nextpathptr = strrcpy(nextpathptr, "../");
+    nextpathptr = strnrcpy(nextpathptr, "../", nextpathptr - nextpathbuf);
 
     /* Descend to root */
     for (;;) {
@@ -1205,28 +1195,30 @@ xgetwd(pathname)
 	/* look if we found root yet */
 	if (st_cur.st_ino == st_root.st_ino &&
 	    DEV_DEV_COMPARE(st_cur.st_dev, st_root.st_dev)) {
-	    (void) strcpy(pathname, *pathptr != '/' ? "/" : pathptr);
-	    return (pathname);
+	    (void) strncpy(pathname, *pathptr != '/' ? "/" : pathptr, pathlen);
+	    pathname[pathlen - 1] = '\0';
+	    return pathname;
 	}
 
 	/* open the parent directory */
 	if (stat(nextpathptr, &st_dotdot) == -1) {
-	    (void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 25,
-			     "getwd: Cannot stat directory \"%s\" (%s)"),
+	    (void) xsnprintf(pathname, pathlen, CGETS(23, 25,
+			     "getcwd: Cannot stat directory \"%s\" (%s)"),
 			     nextpathptr, strerror(errno));
-	    return (NULL);
+	    return NULL;
 	}
 	if ((dp = opendir(nextpathptr)) == NULL) {
-	    (void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 26,
-			     "getwd: Cannot open directory \"%s\" (%s)"),
+	    (void) xsnprintf(pathname, pathlen, CGETS(23, 26,
+			     "getcwd: Cannot open directory \"%s\" (%s)"),
 			     nextpathptr, strerror(errno));
-	    return (NULL);
+	    return NULL;
 	}
 
 	/* look in the parent for the entry with the same inode */
 	if (DEV_DEV_COMPARE(st_dotdot.st_dev, st_cur.st_dev)) {
 	    /* Parent has same device. No need to stat every member */
-	    for (d = readdir(dp); d != NULL; d = readdir(dp)) 
+	    for (d = readdir(dp); d != NULL; d = readdir(dp))  {
+		xprintf("a. %d %d %s %s %s\n", st_cur.st_ino, d->d_fileno, d->d_name, pathptr, nextpathptr);
 #ifdef __clipper__
 		if (((unsigned long)d->d_fileno & 0xffff) == st_cur.st_ino)
 		    break;
@@ -1234,6 +1226,7 @@ xgetwd(pathname)
 		if (d->d_fileno == st_cur.st_ino)
 		    break;
 #endif
+	    }
 	}
 	else {
 	    /* 
@@ -1243,7 +1236,9 @@ xgetwd(pathname)
 	    for (d = readdir(dp); d != NULL; d = readdir(dp)) {
 		if (ISDOT(d->d_name) || ISDOTDOT(d->d_name))
 		    continue;
-		(void) strcpy(cur_name_add, d->d_name);
+		xprintf("b. %d %d %s %s %s\n", st_cur.st_ino, d->d_fileno, d->d_name, pathptr, nextpathptr);
+		(void)strncpy(cur_name_add, d->d_name,
+		    &nextpathbuf[sizeof(nextpathbuf) - 1] - cur_name_add);
 		if (lstat(nextpathptr, &st_next) == -1) {
 		    /*
 		     * We might not be able to stat() some path components
@@ -1262,39 +1257,42 @@ xgetwd(pathname)
 	    }
 	}
 	if (d == NULL) {
-	    (void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 27,
-			     "getwd: Cannot find \".\" in \"..\" (%s)"),
+	    (void) xsnprintf(pathname, pathlen, CGETS(23, 27,
+			     "getcwd: Cannot find \".\" in \"..\" (%s)"),
 			     strerror(save_errno ? save_errno : ENOENT));
 	    (void) closedir(dp);
-	    return (NULL);
+	    return NULL;
 	}
 	else
 	    save_errno = 0;
 	st_cur = st_dotdot;
-	pathptr = strrcpy(pathptr, d->d_name);
-	pathptr = strrcpy(pathptr, "/");
-	nextpathptr = strrcpy(nextpathptr, "../");
-	(void) closedir(dp);
+	pathptr = strnrcpy(pathptr, d->d_name, pathptr - pathbuf);
+	pathptr = strnrcpy(pathptr, "/", pathptr - pathbuf);
+	nextpathptr = strnrcpy(nextpathptr, "../", nextpathptr - nextpathbuf);
 	*cur_name_add = '\0';
+	(void) closedir(dp);
     }
-} /* end getwd */
+} /* end getcwd */
+# endif /* hp9000s500 */
 
-/* strrcpy():
- *	Like strcpy, going backwards and returning the new pointer
+/* strnrcpy():
+ *	Like strncpy, going backwards and returning the new pointer
  */
 static char *
-strrcpy(ptr, str)
+strnrcpy(ptr, str, siz)
     register char *ptr, *str;
+    size_t siz;
 {
     register int len = strlen(str);
+    if (siz == 0)
+	return ptr;
 
-    while (len)
+    while (len && siz--)
 	*--ptr = str[--len];
 
     return (ptr);
-} /* end strrcpy */
-# endif /* hp9000s500 */
-#endif /* getwd */
+} /* end strnrcpy */
+#endif /* getcwd */
 
 #ifdef apollo
 /***

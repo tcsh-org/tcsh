@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.47 1998/09/04 21:16:50 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.48 1998/09/18 15:31:46 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.47 1998/09/04 21:16:50 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.48 1998/09/18 15:31:46 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -78,9 +78,9 @@ dinit(hp)
     char    path[MAXPATHLEN];
 
     /* Don't believe the login shell home, because it may be a symlink */
-    tcp = (char *) getwd(path);
+    tcp = (char *) getcwd(path, sizeof(path));
     if (tcp == NULL || *tcp == '\0') {
-	xprintf("%s: %s\n", progname, path);
+	xprintf("%s: %s\n", progname, strerror(errno));
 	if (hp && *hp) {
 	    tcp = short2str(hp);
 	    dstart(tcp);
@@ -514,7 +514,7 @@ dgoto(cp)
 	dp = cp;
 
 #ifdef WINNT
-    cp = SAVE(getwd(NULL));
+    cp = SAVE(getcwd(NULL, 0));
 #else /* !WINNT */
     cp = dcanon(cp, dp);
 #endif /* WINNT */
@@ -539,7 +539,7 @@ dfollow(cp)
 	char *dptr, *ptr;
 	if (chdir(dptr = short2str(cp)) < 0) 
 	    stderror(ERR_SYSTEM, dptr, strerror(errno));
-	else if ((ptr = getwd(ebuf)) && *ptr != '\0') {
+	else if ((ptr = getcwd(ebuf, sizeof(ebuf))) && *ptr != '\0') {
 		xfree((ptr_t) cp);
 		cp = Strsave(str2short(ptr));
 		return dgoto(cp);
