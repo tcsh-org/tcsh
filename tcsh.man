@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.4 1991/07/18 15:24:56 christos Exp $
+.\" $Id: tcsh.man,v 3.5 1991/07/19 14:31:34 christos Exp christos $
 .TH TCSH 1 "17 July 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1698,6 +1698,7 @@ The current possible values are:
 \fIconvex\fR		a Convex
 \fIdecstation\fR	a DecStation XXXX
 \fIgould-np1\fR		a Gould NP1
+\fIhk68\fR		a Heurikon HK68 running Uniplus+ 5.0
 \fIhp300\fR		an HP 9000, series 300, running mtXinu
 \fIhp800\fR		an HP 9000, series 800, running mtXinu
 \fIhp9000s300\fR	an HP 9000, series 300, running hpux
