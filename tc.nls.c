@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.56 2004/08/04 17:12:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.1 2004/12/25 21:15:08 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <wchar.h>
 
-RCSID("$Id: tc.nls.c,v 3.56 2004/08/04 17:12:31 christos Exp $")
+RCSID("$Id: tc.nls.c,v 3.1 2004/12/25 21:15:08 christos Exp $")
 
 #ifdef SHORT_STRINGS
 int
@@ -114,8 +114,8 @@ NLSFrom(const Char *p, int l, NLSChar *cp)
 	    b[i] = p[i]; 
     }
     mbtowc(0, 0, 0);
-    len = mbtowc(&c, b, i);
-    if (len <= 0) { 
+    len = rt_mbtowc(&c, b, i);
+    if (len <= 0) {
 	if (cp)
 	  *cp = *p ? *p | 0x40000000 : 0;
         return 1;
@@ -130,7 +130,7 @@ NLSFinished(Char *p, size_t l, eChar extra)
 {
     size_t i, r; 
     wchar_t c;
-    char b[MB_LEN_MAX + 1];
+    char b[MB_LEN_MAX + 1], back[MB_LEN_MAX];
     mbstate_t state;
     for (i = 0; i < MB_CUR_MAX && i < l; i++)
 	b[i] = p[i]; 
@@ -140,7 +140,8 @@ NLSFinished(Char *p, size_t l, eChar extra)
     r = mbrtowc((wchar_t *)&c, b, i, (mbstate_t *)&state);
     if (r == (size_t)-2)
 	return 0;
-    if (r == (size_t)-1)
+    if (r == (size_t)-1 || (size_t)wctomb(back, c) != r ||
+	memcmp(b, back, r) != 0)
 	return -1;
     return r == i ? 1 : 2;
 }
@@ -272,3 +273,34 @@ NLSChangeCase(Char *p, int mode)
     return n;
 }
 #endif
+
+int
+NLSClassify(c, nocomb)
+    NLSChar c;
+    int nocomb;
+{
+    int w;
+    if (c & NLS_ILLEGAL)
+	return NLSCLASS_ILLEGAL;
+    w = NLSWidth(c);
+    if (w > 0 || (Isprint(c) && !nocomb))
+	return w;
+    if (Iscntrl(c) && c < 0x100) {
+	if (c == '\n')
+	    return NLSCLASS_NL;
+	if (c == '\t')
+	    return NLSCLASS_TAB;
+#ifndef ASCII
+	if (!Isupper(_toebcdic[_toascii[c]|0100]) && !strchr("@[\\]^_", _toebcdic[_toascii[c]|0100]))
+	    return NLSCLASS_ILLEGAL;
+#endif
+	return NLSCLASS_CTRL;
+    }
+    if (c >= 0x1000000)
+	return NLSCLASS_ILLEGAL4;
+    if (c >= 0x10000)
+	return NLSCLASS_ILLEGAL3;
+    if (c >= 0x100)
+	return NLSCLASS_ILLEGAL2;
+    return NLSCLASS_ILLEGAL;
+}

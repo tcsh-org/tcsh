@@ -86,16 +86,6 @@
 #endif /* _SEQUENT_ */
 
 /*
- * BSDNICE	Your system uses setpriority() instead of nice, to
- *		change a processes scheduling priority
- */
-#ifdef _SEQUENT_
-# undef BSDNICE
-#else /* _SEQUENT_ */
-# define BSDNICE
-#endif /* _SEQUENT_ */
-
-/*
  * TERMIO	You have struct termio instead of struct sgttyb.
  * 		This is usually the case for SYSV systems, where
  *		BSD uses sgttyb. POSIX systems should define this
@@ -170,9 +160,6 @@
 #endif /* _SEQUENT_ */
 
 /****************** local defines *********************/
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-#include "config_f.h"
 
 #ifdef _SEQUENT_
 #define NAMEI_BUG

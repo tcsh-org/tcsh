@@ -107,7 +107,7 @@ On sysv versions < 3.0 (not hpux) Doug Gwyn's public domain directory
 manipulation library has to be installed. This library is available
 for anonymous ftp from prep.ai.mit.edu:/pub/gnu/dirent.tar.Z
 If the network is not installed, then there is a gethostname()
-routine is tc.os.c, enabled by defining NEEDgethostname
+routine is tc.os.c
 
 ***************************************************************************
 

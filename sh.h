@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.121 2004/11/23 02:10:49 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.122 2004/12/25 21:15:07 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -38,12 +38,6 @@
 #include <stddef.h>
 #ifdef HAVE_ICONV
 #include <iconv.h>
-#endif
-
-#ifndef HAVE_QUAD
-#ifdef __GNUC__
-#define HAVE_QUAD	1
-#endif
 #endif
 
 #ifndef EXTERN
@@ -89,7 +83,7 @@ typedef wchar_t Char;
 typedef unsigned long uChar;
 typedef wint_t eChar; /* Can contain any Char value or CHAR_ERR */
 #define CHAR_ERR WEOF /* Pretty please, use bit 31... */
-#define normal_mbtowc(PWC, S, N) mbtowc(PWC, S, N)
+#define normal_mbtowc(PWC, S, N) rt_mbtowc(PWC, S, N)
 #define reset_mbtowc() mbtowc(NULL, NULL, 0)
 # else
 typedef short Char;
@@ -298,18 +292,7 @@ typedef int sigret_t;
 #endif /* sonyrisc */
 
 #if defined(POSIX) && !defined(WINNT_NATIVE)
-/*
- * We should be using setpgid and setpgid
- * by now, but in some systems we use the
- * old routines...
- */
-# if !defined(__APPLE__)
-# define getpgrp __getpgrp
-# define setpgrp __setpgrp
-# endif
 # include <unistd.h>
-# undef getpgrp
-# undef setpgrp
 
 /*
  * the gcc+protoize version of <stdlib.h>
@@ -376,7 +359,7 @@ typedef int sigret_t;
 
 #include <setjmp.h>
 
-#if __STDC__ || defined(FUNCPROTO)
+#if defined(PROTOTYPES)
 # include <stdarg.h>
 #else
 #ifdef	_MINIX
@@ -396,6 +379,9 @@ typedef int sigret_t;
 # endif
 # define dirent direct
 #endif /* DIRENT */
+#ifndef HAVE_STRUCT_DIRENT_D_INO
+# define d_ino d_fileno
+#endif
 #if defined(hpux) || defined(sgi) || defined(OREO) || defined(COHERENT)
 # include <stdio.h>	/* So the fgetpwent() prototypes work */
 #endif /* hpux || sgi || OREO || COHERENT */
@@ -449,10 +435,7 @@ typedef int sigret_t;
  */
 #undef __P
 #ifndef __P
-# if __STDC__ || defined(FUNCPROTO)
-#  ifndef FUNCPROTO
-#   define FUNCPROTO
-#  endif
+# if defined(PROTOTYPES)
 #  define __P(a) a
 # else
 #  define __P(a) ()
@@ -497,15 +480,11 @@ typedef void pret_t;
 #include "sh.types.h"
 
 #ifndef WINNT_NATIVE
-# ifndef POSIX
+# ifndef GETPGRP_VOID
 extern pid_t getpgrp __P((int));
-# else /* POSIX */
-#  if (defined(BSD) && !defined(BSD4_4)) || defined(SUNOS4) || defined(IRIS4D) || defined(DGUX)
-extern pid_t getpgrp __P((int));
-#  else /* !(BSD || SUNOS4 || IRIS4D || DGUX) */
+# else
 extern pid_t getpgrp __P((void));
-#  endif	/* BSD || SUNOS4 || IRISD || DGUX */
-# endif /* POSIX */
+# endif
 #endif /* !WINNT_NATIVE */
 
 typedef sigret_t (*signalfun_t) __P((int));

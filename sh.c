@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.117 2004/11/20 18:25:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.118 2004/11/23 02:10:48 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.117 2004/11/20 18:25:25 christos Exp $")
+RCSID("$Id: sh.c,v 3.118 2004/11/23 02:10:48 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1938,9 +1938,9 @@ pintr1(wantnl)
     (void) sigrelse(SIGCHLD);
 #endif
     drainoline();
-#if !defined(_VMS_POSIX) && !defined(WINNT_NATIVE)
+#ifdef HAVE_GETPWENT
     (void) endpwent();
-#endif /* !_VMS_POSIX && !WINNT_NATIVE */
+#endif
 
     /*
      * If we have an active "onintr" then we search for the label. Note that if

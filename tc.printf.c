@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.printf.c,v 3.25 2004/08/04 17:12:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.printf.c,v 3.26 2004/12/25 21:15:08 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -34,7 +34,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.25 2004/08/04 17:12:31 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.26 2004/12/25 21:15:08 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -60,7 +60,7 @@ doprnt(addchar, sfmt, ap)
 #ifdef SHORT_STRINGS
     Char *Bp;
 #endif /* SHORT_STRINGS */
-#ifdef HAVE_QUAD
+#ifdef HAVE_LONG_LONG
     long long l;
     unsigned long long u;
 #else
@@ -143,12 +143,12 @@ doprnt(addchar, sfmt, ap)
 		    l = (long) (va_arg(ap, int));
 		    break;
 		case 1:
-#ifndef HAVE_QUAD
+#ifndef HAVE_LONG_LONG
 		default:
 #endif
 		    l = va_arg(ap, long);
 		    break;
-#ifdef HAVE_QUAD
+#ifdef HAVE_LONG_LONG
 		default:
 		    l = va_arg(ap, long long);
 		    break;
@@ -188,12 +188,12 @@ doprnt(addchar, sfmt, ap)
 		    u = (unsigned long) (va_arg(ap, unsigned int));
 		    break;
 		case 1:
-#ifndef HAVE_QUAD
+#ifndef HAVE_LONG_LONG
 		default:
 #endif
 		    u = va_arg(ap, unsigned long);
 		    break;
-#ifdef HAVE_QUAD
+#ifdef HAVE_LONG_LONG
 		default:
 		    u = va_arg(ap, unsigned long long);
 		    break;
@@ -326,7 +326,7 @@ xaddchar(c)
 
 pret_t
 /*VARARGS*/
-#ifdef FUNCPROTO
+#ifdef PROTOTYPES
 xsnprintf(char *str, size_t size, const char *fmt, ...)
 #else
 xsnprintf(va_alist)
@@ -334,7 +334,7 @@ xsnprintf(va_alist)
 #endif
 {
     va_list va;
-#ifdef FUNCPROTO
+#ifdef PROTOTYPES
     va_start(va, fmt);
 #else
     char *str, *fmt;
@@ -358,7 +358,7 @@ xsnprintf(va_alist)
 
 pret_t
 /*VARARGS*/
-#ifdef FUNCPROTO
+#ifdef PROTOTYPES
 xprintf(const char *fmt, ...)
 #else
 xprintf(va_alist)
@@ -366,7 +366,7 @@ xprintf(va_alist)
 #endif
 {
     va_list va;
-#ifdef FUNCPROTO
+#ifdef PROTOTYPES
     va_start(va, fmt);
 #else
     char   *fmt;
@@ -423,7 +423,7 @@ xvsnprintf(str, size, fmt, va)
 #define FILE int
 #endif
 int 
-#ifdef FUNCPROTO
+#ifdef PROTOTYPES
 fprintf(FILE *fp, const char* fmt, ...)
 #else
 fprintf(va_alist)
@@ -431,7 +431,7 @@ fprintf(va_alist)
 #endif
 {
     va_list va;
-#ifdef FUNCPROTO
+#ifdef PROTOTYPES
     va_start(va, fmt);
 #else
     FILE *fp;

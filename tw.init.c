@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.init.c,v 3.32 2004/11/23 02:20:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.init.c,v 3.33 2004/12/25 21:15:09 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.32 2004/11/23 02:20:02 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.33 2004/12/25 21:15:09 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -631,9 +631,9 @@ tw_logname_start(dfd, pat)
 {
     USE(pat);
     SETDIR(dfd)
-#if !defined(_VMS_POSIX) && !defined(WINNT_NATIVE)
+#ifdef HAVE_GETPWENT
     (void) setpwent();	/* Open passwd file */
-#endif /* !_VMS_POSIX && !WINNT_NATIVE */
+#endif
 } /* end tw_logname_start */
 
 
@@ -657,12 +657,11 @@ tw_logname_next(dir, flags)
     USE(flags);
     USE(dir);
     TW_HOLD();
-#if !defined(_VMS_POSIX) && !defined(WINNT_NATIVE)
-    /* ISC does not declare getpwent()? */
-    pw = (struct passwd *) getpwent();
-#else /* _VMS_POSIX || WINNT_NATIVE */
+#ifdef HAVE_GETPWENT
+    pw = getpwent();
+#else
     pw = NULL;
-#endif /* !_VMS_POSIX && !WINNT_NATIVE */
+#endif
     TW_RELS();
 
     if (pw == NULL) {
@@ -685,9 +684,9 @@ tw_logname_end()
 #ifdef YPBUGS
     fix_yp_bugs();
 #endif
-#if !defined(_VMS_POSIX) && !defined(WINNT_NATIVE)
+#ifdef HAVE_GETPWENT
    (void) endpwent();
-#endif /* !_VMS_POSIX && !WINNT_NATIVE */
+#endif
 } /* end tw_logname_end */
 
 

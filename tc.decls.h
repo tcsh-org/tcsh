@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.54 2004/08/04 17:12:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.55 2004/12/25 21:15:08 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -175,40 +175,40 @@ extern	void	 	  fix_strcoll_bug	__P((void));
 
 extern	void	 	  osinit	__P((void));
 
-#ifdef NEEDmemmove
+#ifndef HAVE_MEMMOVE
 extern ptr_t 		 xmemmove	__P((ptr_t, const ptr_t, size_t));
-# define memmove(a, b, c) xmemmove((a), (b), (c))
-#endif /* NEEDmemmove */
+# define memmove(a, b, c) xmemmove(a, b, c)
+#endif /* !HAVE_MEMMOVE */
 
-#ifdef NEEDmemset
+#ifndef HAVE_MEMSET
 extern ptr_t 		 xmemset	__P((ptr_t, int, size_t));
-# define memset(a, b, c) xmemset((a), (b), (c))
-#endif /* NEEDmemset */
+# define memset(a, b, c) xmemset(a, b, c)
+#endif /* !HAVE_MEMSET */
 
 
-#ifdef NEEDgetcwd
+#ifndef HAVE_GETCWD
 extern	char		 *xgetcwd	__P((char *, size_t));
 # undef getcwd
-# define getcwd(a, b) xgetcwd((a), (b))
-#endif /* NEEDgetcwd */
+# define getcwd(a, b) xgetcwd(a, b)
+#endif /* !HAVE_GETCWD */
 
-#ifdef NEEDgethostname
+#ifndef HAVE_GETHOSTNAME
 extern	int	 	  xgethostname	__P((char *, int));
 # undef gethostname
-# define gethostname(a, b) xgethostname((a), (b))
-#endif /* NEEDgethostname */
+# define gethostname(a, b) xgethostname(a, b)
+#endif /* !HAVE_GETHOSTNAME */
 
-#ifdef NEEDnice
+#ifndef HAVE_NICE
 extern	int	 	  xnice	__P((int));
 # undef nice
 # define nice(a)	  xnice(a)
-#endif /* NEEDnice */
+#endif /* !HAVE_NICE */
 
-#ifdef NEEDstrerror
+#ifndef HAVE_STRERROR
 extern	char	 	 *xstrerror	__P((int));
 # undef strerror
 # define strerror(a) 	  xstrerror(a)
-#endif /* NEEDstrerror */
+#endif /* !HAVE_STRERROR */
 
 #ifdef apollo
 extern	void		  doinlib	__P((Char **, struct command *));
@@ -299,6 +299,7 @@ extern	size_t		  one_wctomb	__P((char *, wchar_t));
 #define one_wctomb(S, WCHAR) (*(S) = (WCHAR), (size_t)1)
 #endif
 #ifdef SHORT_STRINGS
+extern  int		  rt_mbtowc	__P((wchar_t *, const char *, size_t));
 extern	Char		 *s_strchr	__P((const Char *, int));
 extern	Char		 *s_strrchr	__P((const Char *, int));
 extern	Char		 *s_strcat	__P((Char *, const Char *));

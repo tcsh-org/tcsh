@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.37 2004/08/04 14:28:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.38 2004/08/04 17:12:30 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -40,16 +40,12 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.37 2004/08/04 14:28:23 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.38 2004/08/04 17:12:30 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
 
 int dont_free = 0;
-
-#if defined(_VMS_POSIX) || defined(_AMIGA_MEMORY)
-# define NO_SBRK
-#endif
 
 #ifdef WINNT_NATIVE
 # define malloc		fmalloc
@@ -494,21 +490,21 @@ smalloc(n)
 
     n = n ? n : 1;
 
-#ifndef NO_SBRK
+#ifdef HAVE_SBRK
     if (membot == NULL)
 	membot = (char*) sbrk(0);
-#endif /* !NO_SBRK */
+#endif /* HAVE_SBRK */
 
     if ((ptr = malloc(n)) == (ptr_t) 0) {
 	child++;
 	stderror(ERR_NOMEM);
     }
-#ifdef NO_SBRK
+#ifndef HAVE_SBRK
     if (memtop < ((char *) ptr) + n)
 	memtop = ((char *) ptr) + n;
     if (membot == NULL)
 	membot = (char*) ptr;
-#endif /* NO_SBRK */
+#endif /* !HAVE_SBRK */
     return ((memalign_t) ptr);
 }
 
@@ -521,21 +517,21 @@ srealloc(p, n)
 
     n = n ? n : 1;
 
-#ifndef NO_SBRK
+#ifdef HAVE_SBRK
     if (membot == NULL)
 	membot = (char*) sbrk(0);
-#endif /* NO_SBRK */
+#endif /* HAVE_SBRK */
 
     if ((ptr = (p ? realloc(p, n) : malloc(n))) == (ptr_t) 0) {
 	child++;
 	stderror(ERR_NOMEM);
     }
-#ifdef NO_SBRK
+#ifndef HAVE_SBRK
     if (memtop < ((char *) ptr) + n)
 	memtop = ((char *) ptr) + n;
     if (membot == NULL)
 	membot = (char*) ptr;
-#endif /* NO_SBRK */
+#endif /* !HAVE_SBRK */
     return ((memalign_t) ptr);
 }
 
@@ -549,10 +545,10 @@ scalloc(s, n)
     n *= s;
     n = n ? n : 1;
 
-#ifndef NO_SBRK
+#ifdef HAVE_SBRK
     if (membot == NULL)
 	membot = (char*) sbrk(0);
-#endif /* NO_SBRK */
+#endif /* HAVE_SBRK */
 
     if ((ptr = malloc(n)) == (ptr_t) 0) {
 	child++;
@@ -565,12 +561,12 @@ scalloc(s, n)
 	    *sptr++ = 0;
 	while (--n);
 
-#ifdef NO_SBRK
+#ifndef HAVE_SBRK
     if (memtop < ((char *) ptr) + n)
 	memtop = ((char *) ptr) + n;
     if (membot == NULL)
 	membot = (char*) ptr;
-#endif /* NO_SBRK */
+#endif /* !HAVE_SBRK */
 
     return ((memalign_t) ptr);
 }
@@ -622,9 +618,9 @@ showall(v, c)
 	    (unsigned long) membot, (unsigned long) memtop,
 	    (unsigned long) sbrk(0));
 #else
-#ifndef NO_SBRK
+#ifdef HAVE_SBRK
     memtop = (char *) sbrk(0);
-#endif /* !NO_SBRK */
+#endif /* HAVE_SBRK */
     xprintf(CGETS(19, 12, "Allocated memory from 0x%lx to 0x%lx (%ld).\n"),
 	    (unsigned long) membot, (unsigned long) memtop, 
 	    (unsigned long) (memtop - membot));

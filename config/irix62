@@ -78,16 +78,6 @@
 #endif
 
 /*
- * BSDNICE	Your system uses setpriority() instead of nice, to
- *		change a processes scheduling priority
- */
-#ifdef mips
-# define BSDNICE
-#else
-# undef BSDNICE
-#endif
-
-/*
  * TERMIO	You have struct termio instead of struct sgttyb.
  * 		This is usually the case for SYSV systems, where
  *		BSD uses sgttyb. POSIX systems should define this
@@ -195,10 +185,6 @@
  * lookupname/namei ignores tailing '/' on files
  */
 #define NAMEI_BUG
-
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-#include "config_f.h"
 
 #ifdef notdef
 /* You can put these back if your os does not really support nls */

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exp.c,v 3.42 2004/08/04 17:12:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exp.c,v 3.43 2004/11/23 02:10:48 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.42 2004/08/04 17:12:29 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.43 2004/11/23 02:10:48 christos Exp $")
 
 #include "tw.h"
 
@@ -153,17 +153,10 @@ sh_access(fname, mode)
      * and they define _SC_NGROUPS_MAX without having sysconf
      */
 #   undef _SC_NGROUPS_MAX	
-#   if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__bsdi__)
-#    define GID_T gid_t
-#   else
-#    define GID_T int
-#   endif
-#  else
-#   define GID_T gid_t
 #  endif /* __386BSD__ || BSD4_4 */
 	/* you can be in several groups */
 	long	n;
-	GID_T	*groups;
+	GETGROUPS_T *groups;
 
 	/*
 	 * Try these things to find a positive maximum groups value:
@@ -177,10 +170,10 @@ sh_access(fname, mode)
 #  endif /* _SC_NGROUPS_MAX */
 	    n = NGROUPS_MAX;
 	if (n <= 0)
-	    n = getgroups(0, (GID_T *) NULL);
+	    n = getgroups(0, (GETGROUPS_T *) NULL);
 
 	if (n > 0) {
-	    groups = (GID_T *) xmalloc((size_t) (n * sizeof(GID_T)));
+	    groups = xmalloc((size_t) (n * sizeof(*groups)));
 	    n = getgroups((int) n, groups);
 	    while (--n >= 0)
 		if (groups[n] == statb.st_gid) {

@@ -66,12 +66,6 @@
 #undef BSDLIMIT
 
 /*
- * BSDNICE	Your system uses setpriority() instead of nice, to
- *		change a processes scheduling priority
- */
-#undef BSDNICE
-
-/*
  * TERMIO	You have struct termio instead of struct sgttyb.
  * 		This is usually the case for SYSV systems, where
  *		BSD uses sgttyb. POSIX systems should define this
@@ -115,18 +109,9 @@
  */
 #define DIRENT
 
-/*
- * Lets try NEEDgethostname on this &%$/&$ DNIX engine....
- */
-
-#define NEEDgethostname
-
 /****************** local defines *********************/
 #define DNIX
 #define NOSTRCOLL
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-#include "config_f.h"
 
 /*
  * NLS		Dnix 5.3 2.2 supports NLS, but no dnix 5.3 1.x.x

@@ -66,12 +66,6 @@
 #undef BSDLIMIT
 
 /*
- * BSDNICE	Your system uses setpriority() instead of nice, to
- *		change a processes scheduling priority
- */
-#undef BSDNICE
-
-/*
  * TERMIO	You have struct termio instead of struct sgttyb.
  * 		This is usually the case for SYSV systems, where
  *		BSD uses sgttyb. POSIX systems should define this
@@ -141,9 +135,6 @@
 #define ECHO_STYLE BOTH_ECHO
 
 /****************** local defines *********************/
-#ifndef BSDTIMES
-# define NEEDgethostname
-#endif
 /*
  * Shadow passwd file
  */
@@ -155,9 +146,5 @@
  * Work around OS deficiency which cannot start #!/bin/sh scripts
  */
 #define HASHBANG
-
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-#include "config_f.h"
 
 #endif /* _h_config */

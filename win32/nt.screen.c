@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.2 2004/11/21 04:38:04 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.3 2004/11/23 02:10:50 christos Exp $*/
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -519,14 +519,25 @@ ChangeSize(lins, cols)
 	ClearDisp();
 }
 	void
-PutPlusOne(c)
+PutPlusOne(c, width)
 	Char  c;
+	int   width;
 {
 	extern int OldvcV;
 
-	(void) putwraw(c);
+	while (width > 1 && CursorH + width > DisplayWindowHSize)
+		PutPlusOne(' ', 1);
+	if ((c & LITERAL) != 0) { 
+		Char *d;
+		for (d = litptr + ((c & ~LITERAL) << 2); *d; d++)
+			(void) putwraw(*d);
+	} else {
+		(void) putwraw(c);
+	}
 
 	Display[CursorV][CursorH++] = (Char) c;
+	while (--width > 0)
+		Display[CursorV][CursorH++] = CHAR_DBWIDTH;
 
 	if (CursorH >= TermH) {	/* if we must overflow */
 		CursorH = 0;

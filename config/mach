@@ -68,12 +68,6 @@
 #define BSDLIMIT
 
 /*
- * BSDNICE	Your system uses setpriority() instead of nice, to
- *		change a processes scheduling priority
- */
-#define BSDNICE
-
-/*
  * TERMIO	You have struct termio instead of struct sgttyb.
  * 		This is usually the case for SYSV systems, where
  *		BSD uses sgttyb. POSIX systems should define this
@@ -138,10 +132,6 @@
 #if defined(__NeXT31__) && !defined(POSIX)
 # define _TERMIOS_H_
 #endif /* __NeXT31__  && !POSIX */
-
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-#include "config_f.h"
 
 #ifndef NeXT
 #undef NLS

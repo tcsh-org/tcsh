@@ -66,12 +66,6 @@
 #define BSDLIMIT
 
 /*
- * BSDNICE	Your system uses setpriority() instead of nice, to
- *		change a processes scheduling priority
- */
-#define BSDNICE
-
-/*
  * TERMIO	You have struct termio instead of struct sgttyb.
  * 		This is usually the case for SYSV systems, where
  *		BSD uses sgttyb. POSIX systems should define this
@@ -133,10 +127,6 @@
 
 #define NEEDstrerror
 #define strtoul(a, b, c) ((unsigned long)strtol((a), (b), (c)))
-
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-#include "config_f.h"
 
 #undef NLS
 #undef NLS_CATALOGS

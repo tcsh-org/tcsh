@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.30 2004/08/08 06:42:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.31 2004/11/23 01:48:34 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.30 2004/08/08 06:42:28 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.31 2004/11/23 01:48:34 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -177,7 +177,7 @@ saveblk(v)
     return (onewv);
 }
 
-#if !defined(SHORT_STRINGS) && !defined(POSIX)
+#ifndef HAVE_STRSTR
 char   *
 strstr(s, t)
     const char *s, *t;
@@ -193,8 +193,7 @@ strstr(s, t)
     } while (*s++ != '\0');
     return (NULL);
 }
-
-#endif /* !SHORT_STRINGS && !POSIX */
+#endif /* !HAVE_STRSTR */
 
 #ifndef SHORT_STRINGS
 char   *

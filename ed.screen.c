@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.58 2004/11/23 02:10:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.59 2004/12/25 21:15:06 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.58 2004/11/23 02:10:48 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.59 2004/12/25 21:15:06 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1223,14 +1223,10 @@ so_write(cp, n)
 	if (*cp != CHAR_DBWIDTH) {
 	    if (*cp & LITERAL) {
 		Char   *d;
-		int    i;
-		
 #ifdef DEBUG_LITERAL
-		xprintf("so: litnum %d, litptr %x\r\n",
-			(int)(*cp & CHAR), litptr[*cp & CHAR]);
+		xprintf("so: litnum %d\r\n", (int)(*cp & ~LITERAL));
 #endif /* DEBUG_LITERAL */
-		d = litptr[*cp & CHAR];
-		for (i = litlen[*cp & CHAR]; i > 0; i--, d++)
+		for (d = litptr + ((*cp & ~LITERAL) << 2); *d; d++)
 		    (void) putwraw(*d);
 	    }
 	    else

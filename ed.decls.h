@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.decls.h,v 3.35 2004/11/23 01:48:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.decls.h,v 3.36 2004/12/25 21:15:05 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -254,7 +254,7 @@ extern	void	ClearLines		__P((void));
 extern	void	ClearDisp		__P((void));
 extern	void	Refresh			__P((void));
 extern	void	RefCursor		__P((void));
-extern	void	RefPlusOne		__P((void));
+extern	void	RefPlusOne		__P((int));
 extern	void	PastBottom		__P((void));
 
 /*

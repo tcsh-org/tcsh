@@ -103,16 +103,6 @@
 #endif 
 
 /*
- * BSDNICE	Your system uses setpriority() instead of nice, to
- *		change a processes scheduling priority
- */
-#ifndef aiws
-# define BSDNICE
-#else
-# undef BSDNICE
-#endif
-
-/*
  * TERMIO	You have struct termio instead of struct sgttyb.
  * 		This is usually the case for SYSV systems, where
  *		BSD uses sgttyb. POSIX systems should define this
@@ -222,11 +212,6 @@
 
 /* > 2GB file support (stat64 etc.) */
 #define _LARGE_FILES
-
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-
-#include "config_f.h"
 
 #if defined(_AIXPS2) || defined(aiws)
 # undef NLS

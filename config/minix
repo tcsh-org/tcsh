@@ -61,12 +61,6 @@
 #undef BSDTIMES
 
 /*
- * BSDNICE	Your system uses setpriority() instead of nice, to
- *		change a processes scheduling priority
- */
-#undef BSDNICE
-
-/*
  * BSDLIMIT	You have BSD-style resource limit stuff (getrlimit/setrlimit)
  */
 #undef BSDLIMIT
@@ -127,7 +121,6 @@
 #define INTEL_32BITS	1
 
 #define HAVENOLIMIT
-#define NEEDgetcwd
 #define _POSIX_SOURCE
 #define _MINIX
 
@@ -135,10 +128,6 @@
  * define if you are on vmd system
  */
 #undef _MINIX_VMD
-
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-#include "config_f.h"
 
 #undef NLS
 #undef NLS_CATALOGS

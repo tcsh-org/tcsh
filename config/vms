@@ -61,12 +61,6 @@
 #undef BSDTIMES
 
 /*
- * BSDNICE	Your system uses setpriority() instead of nice, to
- *		change a processes scheduling priority
- */
-#undef BSDNICE
-
-/*
  * TERMIO	You have struct termio instead of struct sgttyb.
  * 		This is usually the case for SVID systems, where
  *		BSD uses sgttyb. POSIX systems should define this
@@ -111,8 +105,6 @@
 #define DIRENT
 /****************** local defines *********************/
 
-#define NEEDgetcwd
-
 #ifndef _POSIX_SOURCE
 # define _POSIX_SOURCE
 #endif
@@ -136,10 +128,6 @@
 /* Avoid conflicts with the standard library */
 #define glob		vms_glob
 #define globfree	vms_globfree
-
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-#include "config_f.h"
 
 #undef NLS
 #undef NLS_CATALOGS
