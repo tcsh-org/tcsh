@@ -42,13 +42,14 @@ To install tcsh:
     in the UCB universe even if you are running under the ATT universe
     usually; it will work anyway, and you get job control for free.
 
+
 3)  Look at config_f.h, and enable or disable any features you want.
     It is configured the way I like it, but you may disagree.
     If you do not have NLS, then locale.h will not be found. Undefine it
     and things should work ok. On the other hand, if you have NLS you
     might as well use it...
 
-4)  Look at sh.c to make sure that you have the right #ifdefs to set
+4)  Look at tc.vers.c to make sure that you have the right #ifdefs to set
     the environment variable "HOSTTYPE" correctly.  If you need to make
     changes, PLEASE SEND THEM BACK TO ME.
 

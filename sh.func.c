@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.func.c,v 1.3 91/09/24 17:09:21 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.8 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.7 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.8 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1764,7 +1764,13 @@ doeval(v, c)
     getexit(osetexit);
 
     /* PWP: setjmp/longjmp bugfix for optimizing compilers */
+#ifdef cray
+    my_reenter = 1;             /* assume non-zero return val */
+    if (setexit() == 0) {
+        my_reenter = 0;         /* Oh well, we were wrong */
+#else /* !cray */
     if ((my_reenter = setexit()) == 0) {
+#endif /* cray */
 	evalvec = v;
 	evalp = 0;
 	SHIN = dcopy(0, -1);

@@ -1,5 +1,5 @@
-.\" $Id: tcsh.man,v 3.15 1991/09/15 01:50:04 christos Exp $
-.TH TCSH 1 "11 October 1991" "Cornell"
+.\" $Id: tcsh.man,v 3.16 1991/10/12 04:23:51 christos Exp $
+.TH TCSH 1 "12 October 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -576,10 +576,7 @@ been changed, then
 will change to using that speed.
 .I Tcsh
 will also obey changes in the padding needed by the tty.
-Some changes to the command keys will be obeyed, however if a command key
-is unset,
-.I tcsh
-will reset it to what it was.  Also, the shell will automatically turn off
+Also, the shell will automatically turn off
 RAW and CBREAK (on systems that use 
 .I termio(7) 
 it will turn on ICANON) modes, and will turn on 
@@ -604,12 +601,11 @@ will always try to clear are shown as
 and modes that tcsh will track and allow to be modified are not shown by
 default, or if the 
 .I "-a"
-flag is given, are shown without a leading sign. For tty characters, only
-there is no 
-.I "-mode". 
-Tty characters marked with a 
-.I "+mode" 
-are set to the compiled-in defaults and the rest are unmodified.
+flag is given, are shown without a leading sign. For tty characters,
+.I "-char"
+disables the tty character, while 
+.I "+char" 
+protects the tty character from being changed.
 .PP
 Setty can be used to control the three different modes 
 .I tcsh
@@ -998,13 +994,14 @@ variable, followed by the corrected line, e.g.
 .RS +.6i
 .nf
 > lz /usr/bin
-CORRECT>ls /usr/bin (y/n)?
+CORRECT>ls /usr/bin (y|n|e)?
 .fi
 .RE
 .sp
 Answering 'y' or <space> at the prompt
-will cause the corrected line to be used,
-anything else will leave the original line unchanged.
+will cause the corrected line to be executed, 'e' will leave the uncorrected 
+command in the input buffer and
+anything else will execute the original line unchanged.
 .PP
 Automatic correction is not guaranteed to work the way the user intended.
 Command line parsing is done in a rudimentary fashion. It is mostly provided
@@ -1824,6 +1821,7 @@ The current possible values are:
 \fImultimax\fR		an Encore Computer Corp. Multimax (32000 based)
 \fInews\fR			a Sony NEWS 800 or 1700 workstation
 \fInews_mips\fR		a NeWS machine with mips CPU
+\fInd500\fR		a Norsk Data ND 500/5000 running Ndix
 \fIns32000\fR		an NS32000 CPU machine
 \fInext\fR			a NeXT computer
 \fIpfa50\fR			a PFU/Fujitsu A-xx computer
@@ -1879,7 +1877,7 @@ to believe that the termcap capability `cap' ( as defined in
 improper use.
 .PP
 .SH "21. SEARCHING FOR THE VISUAL HISTORY"
-Four new editor functions have been added: Two of them,
+Four new editor functions have been added in emacs mode: Two of them,
 history-search-backward, bound to M-p (and M-P),
 and history-search-forward, bound to M-n (and M-N),
 implement a conventional search mechanism,
@@ -1952,6 +1950,17 @@ interprets the character as if it was normal input -
 notably
 .I Return
 will cause the current command line to be executed.
+.PP
+In vi mode "vi-search-fwd" (bound to '/') and "vi-search-back" (bound to '?') 
+can be used to search the visual history. In command mode '/' or '?' followed 
+by a shell pattern, searches the visual history for the pattern. The pattern
+can be terminated either with a
+.I Return, 
+in which case the matched history event is placed in the command buffer or
+an 
+.I Escape,
+in which case the matched history event is executed. If no history event 
+matches the shell pattern then the bell is rung.
 .PP
 .SH "22. BUILTIN WHICH(1) COMMAND"
 There is now a builtin version of the
@@ -2741,7 +2750,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.00.03 (Cornell) 10/11/91.
+This man page documents tcsh 6.00.03 (Cornell) 10/12/91.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981

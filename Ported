@@ -280,3 +280,15 @@ ENVIRON :       n/a
 NOTES   :       Dont use the -pcc flag.
 	:	Use setty to fix the default tty settings.
 VERSION :       6.00.01
+
+VENDOR  :       Norsk Data
+MODELS  :       nd5000
+COMPILER:       cc
+CFLAGS  :       normal
+LIBES   :       -ltermcap
+OS      :       Ndix Version C
+CONFIG  :       config.bsd
+ENVIRON :       n/a
+NOTES   :       The -O option makes the compiler run for ages!
+VERSION :       6.00.03
+

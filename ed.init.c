@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/ed.init.c,v 1.5 91/10/02 03:47:09 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.12 1991/10/12 04:23:51 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.11 1991/09/10 21:38:09 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.12 1991/10/12 04:23:51 christos Exp $")
 
 #define EXTERN			/* intern */
 #include "ed.h"
@@ -443,20 +443,43 @@ Rawmode()
     }
 # endif /* TERMIO || POSIX */
     {
+	extern int didsetty;
 	int i;
 
 	tty_getchar(&tstty, ttychars[TSIO]);
-
+	/*
+	 * Check if the user made any changes.
+	 * If he did, then propagate the changes to the
+	 * edit and execute data structures.
+	 */
 	for (i = 0; i < C_NCC; i++)
-	    if (((ttylist[EDIO][M_CHAR].t_setmask & C_SH(i))))
-		ttychars[TSIO][i] = ttychars[EDIO][i];
-	tty_setchar(&edtty, ttychars[TSIO]);
+	    if (ttychars[TSIO][i] != ttychars[EXIO][i])
+		break;
+	    
+	if (i != C_NCC || didsetty) {
+	    didsetty = 0;
+	    /*
+	     * Propagate changes only to the unprotected chars
+	     * that have been modified just now.
+	     */
+	    for (i = 0; i < C_NCC; i++) {
+		if (!((ttylist[EDIO][M_CHAR].t_setmask & C_SH(i))) &&
+		    (ttychars[TSIO][i] != ttychars[EXIO][i]))
+		    ttychars[EDIO][i] = ttychars[TSIO][i];
+		if (ttylist[EDIO][M_CHAR].t_clrmask & C_SH(i))
+		    ttychars[EDIO][i] = _POSIX_VDISABLE;
+	    }
+	    tty_setchar(&edtty, ttychars[EDIO]);
 
-	tty_getchar(&tstty, ttychars[TSIO]);
-	for (i = 0; i < C_NCC; i++)
-	    if (((ttylist[EXIO][M_CHAR].t_setmask & C_SH(i))))
-		ttychars[TSIO][i] = ttychars[EXIO][i];
-	tty_setchar(&extty, ttychars[TSIO]);
+	    for (i = 0; i < C_NCC; i++) {
+		if (!((ttylist[EXIO][M_CHAR].t_setmask & C_SH(i))) &&
+		    (ttychars[TSIO][i] != ttychars[EXIO][i]))
+		    ttychars[EXIO][i] = ttychars[TSIO][i];
+		if (ttylist[EXIO][M_CHAR].t_clrmask & C_SH(i))
+		    ttychars[EXIO][i] = _POSIX_VDISABLE;
+	    }
+	    tty_setchar(&extty, ttychars[EXIO]);
+	}
 
     }
     if (tty_setty(SHTTY, &edtty) == -1) {

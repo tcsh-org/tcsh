@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tw.parse.c,v 1.3 91/09/24 17:12:19 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.11 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,13 +39,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.10 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.11 1991/10/12 04:23:51 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
 
-/* #define TENEDEBUG */
+#define TENEDEBUG 
 
 /* true if the path has relative elements */
 static bool relatives_in_path;
@@ -176,11 +176,6 @@ tenematch(inputline, inputline_size, num_read, command)
     space_left = inputline_size - (word_start - inputline) - 1;
 #endif
 
-    is_a_cmd = starting_a_command(word_start - 1, inputline);
-#ifdef TENEDEBUG
-    xprintf("starting_a_command %d\n", is_a_cmd);
-#endif
-
     /*
      * Quote args
      */
@@ -235,8 +230,9 @@ tenematch(inputline, inputline_size, num_read, command)
     if ((in_single || in_double) && (*word_start == '\'' || *word_start == '"'))
 	word_start++;
 
-
+    is_a_cmd = starting_a_command(word_start - 1, inputline);
 #ifdef TENEDEBUG
+    xprintf("starting_a_command %d\n", is_a_cmd);
     xprintf("\ncmd_st:%s:\n", short2str(cmd_st));
     xprintf("word:%s:\n", short2str(word));
     xprintf("word:");
@@ -328,8 +324,8 @@ tenematch(inputline, inputline_size, num_read, command)
 	items[1] = NULL;
 	ptr = items;
 	if (is_a_cmd) {
-	    xprintf("Sorry no globbing for commands yet..\n");
-	    return 0;
+	    xprintf("\nSorry no globbing for commands yet..\n");
+	    return -1;
 	}
 	if ((count = t_glob(&ptr)) > 0) {
 	    if (command == GLOB)

@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.h,v 1.2 91/09/26 02:13:24 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.13 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -112,7 +112,15 @@ typedef int sigret_t;
 #define	xexit(n)	done(n)
 #endif 
 
+#ifdef cray
+# define word word_t           /* sys/types.h defines word.. bad move! */
+#endif
+
 #include <sys/types.h>
+
+#ifdef cray
+# undef word
+#endif 
 
 /*
  * This macro compares the st_dev field of struct stat. On aix on ibmESA

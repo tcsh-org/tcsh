@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.vers.c,v 1.3 91/09/24 17:11:48 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.7 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.6 1991/09/08 00:45:32 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.7 1991/10/12 04:23:51 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -368,6 +368,12 @@ gethosttype()
 #  define _havehosttype_
    hosttype = str2short("cray");
 # endif /* cray */
+
+# ifdef NDIX
+#  define _havehosttype_
+   /* B|rje Josefsson <bj@dc.luth.se> */
+   hosttype = str2short("nd500");
+# endif /* NDIX */
 
 # ifndef _havehosttype_
 #  define _havehosttype_

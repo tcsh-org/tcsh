@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb/project/tcsh/beta/src/RCS/ed.term.c,v 1.8 91/09/27 21:59:41 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.c,v 1.1 1991/10/12 04:23:51 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,11 +36,12 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.11 1991/09/10 21:38:09 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.1 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
 
+int didsetty = 0;
 ttyperm_t ttylist = {   
     {
 #if defined(POSIX) || defined(TERMIO)
@@ -542,6 +543,7 @@ dosetty(v, t)
 	    break;
 	}
 
+    didsetty = 1;
     if (!v || !*v) {
 	int i = -1;
 	int len = 0, st = 0, cu;
@@ -693,7 +695,6 @@ tty_getchar(td, s)
     ttydata_t *td;
     unsigned char *s;
 {   
-
 #ifdef TIOCGLTC
     {
 	struct ltchars *n = &td->d_ltc;
@@ -1036,3 +1037,24 @@ tty_setdisc(fd, dis)
     }
 } /* end tty_setdisc */
 #endif /* _IBMR2 */
+
+#ifdef DEBUG_TTY
+static void
+tty_printchar(s)
+    unsigned char *s;
+{
+    struct tcshmodes *m;
+    int i;
+
+    for (i = 0; i < C_NCC; i++) {
+	for (m = modelist; m->m_name; m++) 
+	    if (m->m_type == M_CHAR && C_SH(i) == m->m_value)
+		break;
+	if (m->m_name)
+	    xprintf("%s ^%c ", m->m_name, s[i] + 'A' - 1);
+	if (i % 5 == 0)
+	    xprintf("\n");
+    }
+    xprintf("\n"); 
+}
+#endif /* DEBUG_TTY */
