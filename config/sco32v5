@@ -91,6 +91,13 @@
 #undef YPBUGS
 
 /*
+ * NISPLUS    Make sure that fd's 0, 1, and 2 always are open so that
+ *            Sun's NIS+ doesn't get them, making ~-expansion hang.
+ *            Also just generally a good idea.
+ */
+#define NISPLUS
+
+/*
  * SIGVOID	Define this if your signal handlers return void.  On older
  *		systems, signal returns int, but on newer ones, it returns void.
  */
@@ -102,14 +109,33 @@
 #define HAVEDUP2
 
 /*
+ * HAVEUTMPX	Define if you have extended utmp (utmpx).
+ *		(common for svr4 systems)
+ */
+#define HAVEUTMPX
+
+/*
  * UTHOST	Does the utmp file have a host field?
  */
-#undef UTHOST
+#ifdef HAVEUTMPX
+# define UTHOST
+#else
+# undef UTHOST
+#endif /* HAVEUTMPX */
 
 /*
  * DIRENT	Your system has <dirent.h> instead of <sys/dir.h>
  */
 #define DIRENT
+
+/*
+ * ECHO_STYLE	Optionally change the behavior of the builtin echo
+ *		BOTH_ECHO: Support both bsd options (-n) and sysv escapes (\nnn)
+ *		BSD_ECHO:  Support only -n
+ *		SYSV_ECHO: Support only sysv escapes (\nnn)
+ *		NONE_ECHO: Pure echo.
+ */
+#define ECHO_STYLE SYSV_ECHO	/* SYSV options only */
 /****************** local defines *********************/
 #define SCO
 #define ODT
