@@ -81,9 +81,10 @@
  *
  **********************************************************************
  */
+#include "sh.h"
+RCSID("$Id$")
 
 #ifdef MACH
-#include "sh.h"
 
 #define MAXDIRS 64		/* max directories on a path */
 #define NULL 0
