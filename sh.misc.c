@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.misc.c,v 3.7 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.misc.c,v 3.8 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.7 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.8 1992/01/27 04:20:47 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -131,7 +131,7 @@ blkcpy(oav, bv)
     return (oav);
 }
 
-Char  **
+static Char  **
 blkcat(up, vp)
     Char  **up, **vp;
 {
