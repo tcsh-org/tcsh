@@ -1,3 +1,4 @@
+ 19. V6.13.02 - 20040804
  18. de-register, de-extern, de-shadow, and const poison.
  17. WIDE_STRINGS support (Miloslav Trmac)
  16. warning cleanups (Miloslav Trmac)
