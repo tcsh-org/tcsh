@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.alloc.c,v 1.3 91/09/24 17:10:42 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.6 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.5 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.6 1991/10/12 04:23:51 christos Exp $")
 
 char   *memtop = NULL;		/* PWP: top of current memory */
 char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -161,8 +161,12 @@ malloc(nbytes)
     /*
      * SunOS localtime() overwrites the 9th byte on an 8 byte malloc()....
      * so we get one more...
+     * From Michael Schroeder: This is not true. It depends on the 
+     * timezone string. In Europe it can overwrite the 13th byte on a
+     * 12 byte malloc.
+     * So we punt and we always allocate an extra byte.
      */
-    if (nbytes == 8) nbytes++;
+    nbytes++;
 #endif
 
     nbytes = MEMALIGN(MEMALIGN(sizeof(union overhead)) + nbytes + RSLOP);
@@ -243,8 +247,6 @@ morecore(bucket)
     /* take 2k unless the block is bigger than that */
     rnu = (bucket <= 8) ? 11 : bucket + 3;
     nblks = 1 << (rnu - (bucket + 3));	/* how many blocks to get */
-    if (rnu < bucket)
-	rnu = bucket;
     memtop = (char *) sbrk(1 << rnu);	/* PWP */
     op = (union overhead *) memtop;
     memtop += 1 << rnu;
@@ -268,6 +270,7 @@ morecore(bucket)
 	op->ov_next = (union overhead *) (((caddr_t) op) + siz);
 	op = (union overhead *) (((caddr_t) op) + siz);
     }
+    op->ov_next = NULL;
 }
 
 #endif
@@ -406,8 +409,8 @@ realloc(cp, nbytes)
     onb = MEMALIGN(nbytes + MEMALIGN(sizeof(union overhead)) + RSLOP);
 
     /* avoid the copy if same size block */
-    if (was_alloced && (onb < (U_int) (1 << (i + 3))) && 
-	(onb >= (U_int) (1 << (i + 2))))
+    if (was_alloced && (onb <= (U_int) (1 << (i + 3))) && 
+	(onb > (U_int) (1 << (i + 2))))
 	return ((memalign_t) cp);
     if ((res = malloc(nbytes)) == NULL)
 	return ((memalign_t) NULL);

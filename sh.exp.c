@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.exp.c,v 1.3 91/09/24 17:09:01 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exp.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.2 1991/09/08 00:45:32 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 
 /*
  * C shell
@@ -517,6 +517,19 @@ exp6(vp, ignore)
 
 	case 'x':
 	    i = !access(short2str(ep), X_OK);
+	    break;
+
+	case 't':	/* SGI extension, true when file is a tty */
+	    {
+		int fd;
+
+		if ((fd = open(short2str(ep), O_RDONLY)) == -1)
+		    i = 0;
+		else {
+		    i = isatty(fd);
+		    (void) close(fd);
+		}
+	    }
 	    break;
 
 	default:

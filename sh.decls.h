@@ -154,9 +154,9 @@ extern	void		  dowhile	__P((Char **, struct command *));
 extern	void		  dozip		__P((Char **, struct command *));
 extern	void		  func		__P((struct command *, 
 					     struct biltins *));
+extern	void		  gotolab	__P((Char *));
 extern struct biltins 	 *isbfunc	__P((struct command *));
 extern	void		  prvars	__P((void));
-extern	void		  search	__P((int, int, Char *));
 extern	int		  srchx		__P((Char *));
 extern	void		  unalias	__P((Char **, struct command *));
 extern	void		  wfree		__P((void));

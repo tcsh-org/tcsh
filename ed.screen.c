@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/ed.screen.c,v 1.3 91/09/24 17:08:08 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.6 1991/10/12 04:23:51 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.5 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.6 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -622,7 +622,7 @@ bool    GotTermCaps = 0;
 void
 BindArrowKeys()
 {
-    KEYCMD *map;
+    KEYCMD *map, *dmap;
     int     i;
     char   *p;
     static struct {
@@ -638,11 +638,21 @@ BindArrowKeys()
     if (!GotTermCaps)
 	return;
     map = VImode ? CcAltMap : CcKeyMap;
+    dmap = VImode ? CcViCmdMap : CcEmacsMap;
 
     for (i = 0; i < 4; i++) {
 	p = tstr[ar[i].key].str;
 	if (p && *p) {
-	    if (p[1]) {
+	    /*
+	     * Assign the arrow keys only if:
+	     *
+	     * 1. They are multi-character arrow keys and the user 
+	     *    has not re-assigned the leading character, or 
+	     *    has re-assigned the leading character to be F_XKEY
+	     * 2. They are single arrow keys pointing to an unassigned key.
+	     */
+	    if (p[1] && (dmap[(unsigned char) *p] == map[(unsigned char) *p] ||
+			 map[(unsigned char) *p] == F_XKEY)) {
 		AddXkeyCmd(str2short(p), ar[i].fun);
 		map[(unsigned char) *p] = F_XKEY;
 	    }

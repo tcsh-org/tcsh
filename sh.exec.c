@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.4 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.5 1991/10/21 17:24:49 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.4 1991/10/18 16:27:13 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.5 1991/10/21 17:24:49 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -252,8 +252,8 @@ doexec(t)
 #ifdef VFORK
     Vsav = sav;
 #endif
-    if (havhash)
-	hashval = hashname(*av);
+    hashval = havhash ? hashname(*av) : 0;
+
     i = 0;
 #ifdef VFORK
     hits++;
@@ -673,11 +673,10 @@ hashstat(v, c)
 	      hashlength, hashwidth*8);
    if (hashdebug)
       xprintf("debug mask = 0x%08x\n", hashdebug);
-#else /* OLDHASH */
+#endif /* FASTHASH */
    if (hits + misses)
       xprintf("%d hits, %d misses, %d%%\n",
 	      hits, misses, 100 * hits / (hits + misses));
-#endif /* FASTHASH */
 }
 
 #endif
@@ -712,8 +711,7 @@ iscommand(name)
     else
 	pv = v->vec;
     sav = Strspl(STRslash, name);	/* / command name for postpending */
-    if (havhash)
-	hashval = hashname(name);
+    hashval = havhash ? hashname(name) : 0;
     i = 0;
     do {
 	if (!slash && pv[0][0] == '/' && havhash) {
@@ -925,8 +923,7 @@ dowhere(v, c)
 
 	var = adrof(STRpath);
 
-	if (havhash)
-	    hashval = hashname(*v);
+	hashval = havhash ? hashname(*v) : 0;
 
 	sv = Strspl(STRslash, *v);
 

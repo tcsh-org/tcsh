@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.dir.c,v 1.3 91/09/24 17:08:34 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dir.c,v 3.5 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.4 1991/09/08 00:45:32 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.5 1991/10/12 04:23:51 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -117,10 +117,10 @@ dinit(hp)
 		    swd.st_ino == shp.st_ino)
 		    tcp = cwd;
 	    }
-	    cp = dcanon(str2short(tcp), STRNULL);
+	    cp = dcanon(SAVE(tcp), STRNULL);
 	}
 #else				/* S_IFLNK */
-	cp = dcanon(str2short(tcp), STRNULL);
+	cp = dcanon(SAVE(tcp), STRNULL);
 #endif				/* S_IFLNK */
     }
 

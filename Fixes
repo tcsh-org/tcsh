@@ -1,3 +1,16 @@
+V6.00.04, ....
+11. (beta-1 10/28/91)
+10. Foreach loops were broken again.
+9.  SUNOS localtime() bug does not only happen on the 8th byte. [Michael]
+8.  sh.dir.c, memory corruption in dinit(). Thanks Michael.
+7.  uts broken <sys/stat.h> work-around, and has a wait3()
+6.  SGI (-t filename) extension, returns true when filename is a tty.
+5.  'default:' addition in all switch() statements.
+4.  oflag was not being updated correctly in Rawmode()
+3.  missing 'break;' in prompt code '%y'.
+2.  infinite loop in :a<mod> code.
+1.  hashstat was not reporting hits+misses
+
 V6.00.03, 10/21/91
 31. watch code now accepts shell patterns.
 30. new hashing code portability fixes.

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.11 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.12 1991/10/20 01:38:14 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.11 1991/10/18 16:27:13 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.12 1991/10/20 01:38:14 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -59,11 +59,13 @@ static	void	islogin		__P((void));
 static	void	reexecute	__P((struct command *));
 static	void	preread		__P((void));
 static	void	doagain		__P((void));
+static  char   *isrchx		__P((int));
+static	void	search		__P((int, int, Char *));
 static	int	getword		__P((Char *));
 static	int	keyword		__P((Char *));
-static	void	Unsetenv	__P((Char *));
 static	void	toend		__P((void));
 static	void	xecho		__P((int, Char **));
+static	void	Unsetenv	__P((Char *));
 
 struct biltins *
 isbfunc(t)
@@ -373,9 +375,17 @@ dogoto(v, c)
     Char  **v;
     struct command *c;
 {
-    register struct whyle *wp;
     Char   *lp;
 
+    gotolab(lp = globone(v[1], G_ERROR));
+    xfree((ptr_t) lp);
+}
+
+void
+gotolab(lab)
+    Char *lab;
+{
+    register struct whyle *wp;
     /*
      * While we still can, locate any unknown ends of existing loops. This
      * obscure code is the WORST result of the fact that we don't really parse.
@@ -389,8 +399,7 @@ dogoto(v, c)
 	else {
 	    bseek(&wp->w_end);
 	}
-    search(T_GOTO, 0, lp = globone(v[1], G_ERROR));
-    xfree((ptr_t) lp);
+    search(T_GOTO, 0, lab);
     /*
      * Eliminate loops which were exited.
      */
@@ -692,7 +701,7 @@ isrchx(n)
 static Char Stype;
 static Char *Sgoal;
 
-void
+static void
 search(type, level, goal)
     int     type;
     register int level;
@@ -872,6 +881,9 @@ past:
     case T_GOTO:
 	setname(short2str(Sgoal));
 	stderror(ERR_NAME | ERR_NOTFOUND, "label");
+
+    default:
+	break;
     }
     /* NOTREACHED */
     return (0);
@@ -930,11 +942,15 @@ wfree()
     for (; whyles; whyles = nwp) {
 	register struct whyle *wp = whyles;
 	nwp = wp->w_next;
-	if (wp->w_start.type != F_SEEK || wp->w_end.type != F_SEEK) 
+	if (wp->w_start.type != F_SEEK)
 	    break;
-	if (o.f_seek >= wp->w_start.f_seek && 
-	    (wp->w_end.f_seek == 0 || o.f_seek < wp->w_end.f_seek))
-	    break;
+	if (wp->w_end.type != I_SEEK) {
+	    if (wp->w_end.type != F_SEEK)
+		break;
+	    if (o.f_seek >= wp->w_start.f_seek && 
+		(wp->w_end.f_seek == 0 || o.f_seek < wp->w_end.f_seek))
+		break;
+	}
 	if (wp->w_fe0)
 	    blkfree(wp->w_fe0);
 	if (wp->w_fename)

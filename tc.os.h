@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.16 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.17 1991/10/21 17:24:49 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -172,6 +172,23 @@ struct ucred {
 # endif /* S_IFMT */
 #endif /* ISC */
 
+#ifdef uts
+/*
+ * The uts 2.1.2 macros (Amdahl) are busted!
+ * You should fix <sys/stat.h>, cause other programs will break too!
+ *
+ * From: creiman@ncsa.uiuc.edu (Charlie Reiman)
+ */
+# undef S_ISDIR
+# undef S_ISCHR
+# undef S_ISBLK
+# undef S_ISREG
+# undef S_ISFIFO
+# undef S_ISNAM
+# undef S_ISLNK
+# undef S_ISSOCK
+#endif /* uts */
+
 #ifdef S_IFMT
 # if !defined(S_ISDIR) && defined(S_IFDIR)
 #  define S_ISDIR(a)	(((a) & S_IFMT) == S_IFDIR)
@@ -188,9 +205,6 @@ struct ucred {
 # if !defined(S_ISFIFO) && defined(S_IFIFO)
 #  define S_ISFIFO(a)	(((a) & S_IFMT) == S_IFIFO)
 # endif	/* ! S_ISFIFO && S_IFIFO */
-# if !defined(S_ISNAM) && defined(S_IFNAM)
-#  define S_ISNAM(a)	(((a) & S_IFMT) == S_IFNAM)
-# endif	/* ! S_ISNAM && S_IFNAM */
 # if !defined(S_ISNAM) && defined(S_IFNAM)
 #  define S_ISNAM(a)	(((a) & S_IFMT) == S_IFNAM)
 # endif	/* ! S_ISNAM && S_IFNAM */

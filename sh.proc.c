@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.13 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.14 1991/10/20 01:38:14 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.13 1991/10/18 16:27:13 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.14 1991/10/20 01:38:14 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -234,11 +234,11 @@ loop:
     pid = waitpid(-1, &w,
 	    (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG));
 # endif /* ODT */	    
-# ifdef aiws
+# if defined(aiws) || defined(uts)
 #  define HAVEwait
     pid = wait3(&w.w_status, 
 	(setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), 0);
-# endif /* aiws */
+# endif /* aiws || uts */
 # ifndef HAVEwait
 #  ifdef UNRELSIGS
     /* no wait3, therefore no rusage */
@@ -863,9 +863,14 @@ padd(t)
 	case NODE_LIST:
 	    pads(STRsemisp);
 	    break;
+	default:
+	    break;
 	}
 	padd(t->t_dcdr);
 	return;
+
+    default:
+	break;
     }
     if ((t->t_dflg & F_PIPEIN) == 0 && t->t_dlef) {
 	pads((t->t_dflg & F_READ) ? STRspLarrow2sp : STRspLarrowsp);
@@ -1522,6 +1527,8 @@ pkill(v, signum)
 	    case SIGCONT:
 		pstart(pp, 0);
 		goto cont;
+	    default:
+		break;
 	    }
 #endif /* BSDJOBS */
 	    if (killpg(pp->p_jobid, signum) < 0) {

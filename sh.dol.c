@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.5 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.6 1991/10/21 17:24:49 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.5 1991/10/20 01:38:14 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.6 1991/10/21 17:24:49 christos Exp $")
 
 /*
  * C shell
@@ -284,6 +284,9 @@ Dword()
 		    /* Leave all text alone for later */
 		    *wp++ = c;
 		    break;
+
+		default:
+		    break;
 		}
 	    }
 	    if (c1 == '`')
@@ -304,6 +307,9 @@ Dword()
 		break;
 	    }
 	    c |= QUOTE;
+	    break;
+
+	default:
 	    break;
 	}
 	if (done) {
@@ -771,9 +777,16 @@ setDolp(cp)
 
 	    do {
 		if ((dp = domod(cp, dolmod[i]))) {
-		    xfree((ptr_t) cp);
-		    cp = dp;
 		    didmod = 1;
+		    if (Strcmp(cp, dp) == 0) {
+			xfree((ptr_t) cp);
+			cp = dp;
+			break;
+		    }
+		    else {
+			xfree((ptr_t) cp);
+			cp = dp;
+		    }
 		}
 		else
 		    break;

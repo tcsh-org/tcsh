@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.err.c,v 3.4 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.err.c,v 3.5 1991/10/21 17:24:49 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_tc_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.4 1991/10/18 16:27:13 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.5 1991/10/21 17:24:49 christos Exp $")
 
 /*
  * C Shell
@@ -313,7 +313,17 @@ static char *errorlist[] =
     "Malformed file inquiry",
 #define ERR_SELOVFL	125
     "Selector overflow",
-#define ERR_INVALID	126
+#define ERR_TCSHUSAGE   126
+#ifdef apollo
+    "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX -Dname[=value] ] [ argument ... ]",
+#else /* !apollo */
+# if defined(__convex__) || defined(convex)
+    "Unknown option: -%s\nUsage: tcsh [ -bcdefFilmnqstvVxX ] [ argument ... ]",
+# else /* rest */
+    "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]",
+# endif /* __convex__ || convex */
+#endif /* apollo */
+#define ERR_INVALID	127
     "Invalid Error"
 };
 

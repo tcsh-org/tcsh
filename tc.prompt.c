@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.prompt.c,v 1.3 91/09/24 17:11:25 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.prompt.c,v 3.5 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.3 1991/09/08 00:45:32 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.5 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 
@@ -295,6 +295,7 @@ printprompt(promptno, str)
 		    *p++ = attributes | '0';
 		    *p++ = attributes | buff[0];
 		}
+		break;
 	    case 'Y':
 		Itoa(t->tm_year + 1900, buff);
 		*p++ = attributes | buff[0];

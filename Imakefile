@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.1 1991/10/13 23:44:48 christos Exp $
+/**/# $Id: Imakefile,v 1.2 1991/10/18 16:27:13 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -149,7 +149,7 @@ LIBSOCKET =
 #endif
 
 #if defined(SGIArchitecture) || defined(_IBMR2) || \
-	(defined(RtArchitecture) && defined(AIXArchitecture)) || \
+	(!defined(RtArchitecture) && defined(AIXArchitecture)) || \
 	defined(UseLibBSD)
 LIBBSD = -lbsd
 #else

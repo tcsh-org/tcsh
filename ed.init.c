@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.15 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.16 1991/10/21 17:24:49 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.15 1991/10/20 01:38:14 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.16 1991/10/21 17:24:49 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -406,9 +406,9 @@ Rawmode()
 
 	if ((tstty.d_t.c_oflag != extty.d_t.c_oflag) &&
 	    (tstty.d_t.c_oflag != edtty.d_t.c_oflag)) {
-	    tstty.d_t.c_oflag = tstty.d_t.c_oflag;
-	    tstty.d_t.c_oflag &= ~ttylist[EX_IO][M_OUTPUT].t_clrmask;
-	    tstty.d_t.c_oflag |=  ttylist[EX_IO][M_OUTPUT].t_setmask;
+	    extty.d_t.c_oflag = tstty.d_t.c_oflag;
+	    extty.d_t.c_oflag &= ~ttylist[EX_IO][M_OUTPUT].t_clrmask;
+	    extty.d_t.c_oflag |=  ttylist[EX_IO][M_OUTPUT].t_setmask;
 
 	    edtty.d_t.c_oflag = tstty.d_t.c_oflag;
 	    edtty.d_t.c_oflag &= ~ttylist[ED_IO][M_OUTPUT].t_clrmask;

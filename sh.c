@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.14 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.15 1991/10/22 06:52:57 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.14 1991/10/20 01:38:14 christos Exp $")
+RCSID("$Id: sh.c,v 3.15 1991/10/22 06:52:57 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -602,6 +602,10 @@ main(argc, argv)
 		use_fork = 1;
 		break;
 #endif
+	    default:		/* Unknown command option */
+		exiterr = 1;
+		stderror(ERR_TCSHUSAGE, tcp-1);
+		break;
 
 	} while (*tcp);
 	tempv++, argc--;
@@ -1414,7 +1418,7 @@ pintr1(wantnl)
      * about that here.
      */
     if (gointr) {
-	search(T_GOTO, 0, gointr);
+	gotolab(gointr);
 	timflg = 0;
 	if (v = pargv)
 	    pargv = 0, blkfree(v);
