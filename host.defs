@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /src/pub/tcsh/host.defs,v 1.33 2002/07/12 13:16:18 christos Exp $ */
+/* $Header: /src/pub/tcsh/host.defs,v 1.34 2002/07/17 12:38:37 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.33 2002/07/12 13:16:18 christos Exp $")
+RCSID("$Id: host.defs,v 1.34 2002/07/17 12:38:37 christos Exp $")
 
 endcode	:
 
@@ -725,21 +725,11 @@ machtype: defined(sparc)   || defined(__sparc__)	: "sparc"
 enddef	:
 
 
-newdef	: defined(RHAPSODY)
-comment	: Rhapsody
+newdef	: defined(__APPLE__) && defined(__MACH__)
+comment	: OS X
 vendor	:						: "apple"
 hosttype: defined(__i386__)				: "intel-pc"
-hosttype: defined(__ppc__)				: "macintosh"
-ostype	:						: "darwin"
-machtype: defined(__i386__)				: "i386"
-machtype: defined(__ppc__)				: "powerpc"
-enddef	:
-
-newdef	: defined(DARWIN)
-comment	: Darwin
-vendor	:						: "apple"
-hosttype: defined(__i386__)				: "intel-pc"
-hosttype: defined(__ppc__)				: "macintosh"
+hosttype: defined(__ppc__)				: "powermac"
 ostype	:						: "darwin"
 machtype: defined(__i386__)				: "i386"
 machtype: defined(__ppc__)				: "powerpc"

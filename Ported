@@ -165,7 +165,7 @@ NOTES	:	Does Ultrix 4.x still need YPBUGS?
 NOTES	:	Ultrix4.2 may need NAMEI_BUG
 VERSION	:	6.09.00
 
-VENDOR	:	apple
+VENDOR	:	Apple
 MODELS	:	macII
 COMPILER:	cc
 CFLAGS	:	normal		(-ZP)

@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.17 2002/01/07 03:19:03 christos Exp $
+# $Id: Makefile.in,v 3.18 2002/07/02 18:38:43 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -8,7 +8,7 @@
 # things; Paul Placeway, CIS Dept., Ohio State University
 #
 SHELL=/bin/sh
-VERSION=6.11
+VERSION=6.12
 BUILD=tcsh
 VPATH=@srcdir@
 srcdir=@srcdir@

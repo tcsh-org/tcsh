@@ -1,4 +1,4 @@
-# $Id: BUGS,v 3.1 2002/07/01 21:07:44 christos Exp $
+# $Id: BUGS,v 3.2 2002/07/05 16:28:30 christos Exp $
 ============
 Bugs in TCSH
 ============
@@ -551,3 +551,52 @@ Subject: Csh null strings
         % if ("" == "`echo`") echo "huh?"
         huh?
 
+
+>On Jul 18,  8:15am, mark@peek.org (Mark Peek) wrote:
+>-- Subject: Updated tcsh-6.12.0 release date?
+>
+>| Hi Christos,
+>| I know I've been (part of) the cause of slipping the release date out
+>| for tcsh-6.12.0. :-) Do you have an updated date for releasing it?
+>| I'm trying to determine whether it will fit in the time frame for
+>| shipment with the next FreeBSD 5.0-DP release.
+>
+>I hope to release it sometime next week. There are only minor changes in it.
+>Is that convenient, or would you like me to push it more?
+
+I sent a note to the FreeBSD release engineers and they're inclined 
+to hold off on including the new version in the release which they're 
+branching later today. If DP2 slips out a bit they might consider 
+including it. I'd say go ahead with your current schedule and I'll 
+import it whenever it is available. I definitely will be including it 
+into the next -stable FreeBSD 4.7 release.
+
+BTW, one of the release engineers pointed out a bug with using 
+jobcmd. If you use the example in the book to update an xterm and 
+then run something like
+    grep bar `cat file.list`
+It screws up the xterm title bar containing "Faulty alias 'jobcmd' 
+removed" plus the list of files from the cat command.
+
+The good news is that I was able to reproduce this at home last 
+night. The bad news is that it is working fine right now here at 
+work. Oh wait, let me log in remotely and look at the alias I was 
+using...got it! The command fails if you use:
+
+     alias jobcmd 'echo -n "^[]2;\!#^G"'
+
+but works fine if you use: (note the switch of ' and " quotes)
+
+     alias jobcmd "echo -n '^[]2;\!#^G'"
+
+Note: I used the above by vi'ing a file and sourcing it from the shell.
+
+If you can confirm, I think this just needs to be updated in the man page.
+
+>Thanks for all the help BTW...
+
+No problem. I like fixing bugs and contributing code...especially for 
+a great piece of software like tcsh that I use *all* the time. Thank 
+you for keeping it going!
+
+Mark
