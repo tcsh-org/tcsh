@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.spell.c,v 3.10 1993/06/25 21:17:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.spell.c,v 3.11 1994/09/04 21:54:15 christos Exp $ */
 /*
  * tw.spell.c: Spell check words
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.spell.c,v 3.10 1993/06/25 21:17:12 christos Exp $")
+RCSID("$Id: tw.spell.c,v 3.11 1994/09/04 21:54:15 christos Exp $")
 
 #include "tw.h"
 
@@ -44,7 +44,7 @@ RCSID("$Id: tw.spell.c,v 3.10 1993/06/25 21:17:12 christos Exp $")
 int
 spell_me(oldname, oldsize, looking)
     Char   *oldname;
-    int     oldsize, looking,
+    int     oldsize, looking;
     Char   *pat;
     int     suf;
 {
