@@ -1,4 +1,25 @@
 V6.02.00, ...
+39. 6.01.05 (2/21/92)
+38. signal masking for BSD machines was still wrong in tw.init.c
+37. Added $margin_bug, and now the editor outputs on the rightmost 
+    column by default. This should fix the xterm cut-n-paste problem.
+36. AU/X 2.0 and SGI compiles with POSIX as a default now.
+35. sysv_echo is gone too. Now we have a variable called echo_style
+    which can be set to "none", "bsd", "sysv", "both" that defines
+    the builtin echo_style. The default is "bsd" for systems with
+    SYSVREL == 0, "sysv" otherwise. This can be overriden in config.h
+    by defining ECHO_STYLE ro be BSD_ECHO, SYSV_ECHO, BOTH_ECHO, 
+    or NONE_ECHO.
+34. asynchronous notification in run-fg-editor would try to change the 
+    tty settings and print an extra prompt.
+    > set notify 
+    > sleep 10 &
+    > vi^Z
+    > ^[^Z
+33. alias x /bin/true
+    x<esc>?
+    reported .//bin/true instead of /bin/true
+32. 6.01.04 (2/12/92)
 31. fixed vi_substitute_line
 30. binding completion addition.
 29. showdots=-A addition

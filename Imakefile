@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.6 1992/01/16 13:04:21 christos Exp $
+/**/# $Id: Imakefile,v 1.7 1992/01/27 04:20:47 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -82,6 +82,10 @@ ones.  Please send in your fixes and additions! */
 #define ConfigH sequent
 #endif
 
+#ifdef MacIIArchitecture
+#define ConfigH mac2
+#endif
+
 #ifdef MinixArchitecture
 /* Maybe conditional on MACH? */
 SYSSRCS=mi.termios.c mi.wait.h 
@@ -93,6 +97,7 @@ SYSSRCS=ma.setp.c
 SYSOBJS=ma.setp.${SUF}
 EXTF=mi.termios.c mi.wait.h
 #endif
+
 /* generic os's */
 
 #ifndef ConfigH

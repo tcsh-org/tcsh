@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.os.h,v 3.23 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/tcsh-6.01/RCS/tc.os.h,v 3.24 1992/01/16 13:04:21 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -146,11 +146,13 @@ struct ucred {
 #ifdef IRIS4D
 # include <sys/time.h>
 # include <sys/resource.h>
+# ifndef POSIX
 /*
  * BSDsetpgrp() and BSDgetpgrp() are BSD versions of setpgrp, etc.
  */
-# define setpgrp BSDsetpgrp
-# define getpgrp BSDgetpgrp
+#  define setpgrp BSDsetpgrp
+#  define getpgrp BSDgetpgrp
+# endif
 #endif /* IRIS4D */
 
 /*
@@ -324,21 +326,21 @@ struct ucred {
 # ifndef NOFILE
 #  define NOFILE 64
 # endif /* NOFILE */
+# define NEEDgethostname
+# define NEEDnice
 /*
  * Minix does not have these, so...
  */
-# define nice(a)		/**/
 # define ulimit(a, b)		(0x003fffff)
 # define getpgrp()		getpid()
-# define gethostname(a, b)	(strncpy((a), "minix") == NULL)
 #endif /* _MINIX */
 
 #ifndef POSIX
 # define mygetpgrp()    getpgrp(0)
 #else /* POSIX */
-# if defined(BSD) || defined(sun)
+# if defined(BSD) || defined(sun) || defined(IRIS4D)
 #  define mygetpgrp()    getpgrp(0)
-# else /* BSD || sun */
+# else /* BSD || sun || IRIS4D */
 #  define mygetpgrp()    getpgrp()
 # endif	/* BSD || sun */
 #endif /* POSIX */

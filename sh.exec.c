@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.exec.c,v 3.10 1992/01/16 13:04:21 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/tcsh-6.01/RCS/sh.exec.c,v 3.11 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.10 1992/01/16 13:04:21 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.11 1992/01/27 04:20:47 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -864,9 +864,13 @@ tellmewhat(lex)
 	while (--i)
 	    pv++;
 	if (pv[0][0] == 0 || eq(pv[0], STRdot)) {
-	    sp->word = Strspl(STRdotsl, sp->word);
-	    prlex(lex);
-	    xfree((ptr_t) sp->word);
+	    if (!slash) {
+		sp->word = Strspl(STRdotsl, sp->word);
+		prlex(lex);
+		xfree((ptr_t) sp->word);
+	    }
+	    else
+		prlex(lex);
 	    sp->word = s0;	/* we save and then restore this */
 	    return;
 	}

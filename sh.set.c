@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.set.c,v 3.8 1992/01/16 13:04:21 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.set.c,v 3.9 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.8 1992/01/16 13:04:21 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.9 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -159,6 +159,10 @@ doset(v, c)
 	    if (cp && (*cp != '/'))	/* if TERMCAP and not a path */
 		Unsetenv(STRTERMCAP);
 #endif				/* DOESNT_WORK_RIGHT */
+	    GotTermCaps = 0;
+	    ed_Init();		/* reset the editor */
+	}
+	else if (eq(vp, STRmargin_bug)) {
 	    GotTermCaps = 0;
 	    ed_Init();		/* reset the editor */
 	}
@@ -561,9 +565,10 @@ unset(v, c)
     Char   **v;
     struct command *c;
 {
-    register bool did_only;
+    bool did_only, new_margin;
 
-    did_only = adrof(STRrecognize_only_executables) != 0;
+    did_only = adrof(STRrecognize_only_executables) != NULL;
+    new_margin = adrof(STRmargin_bug) != NULL;
     unset1(v, &shvhed);
     if (adrof(STRhistchars) == 0) {
 	HIST = '!';
@@ -577,6 +582,10 @@ unset(v, c)
 	editing = 0;
     if (adrof(STRbackslash_quote) == 0)
 	bslash_quote = 0;
+    if (new_margin && adrof(STRmargin_bug) == 0) {
+	GotTermCaps = 0;
+	ed_Init();		/* reset the editor */
+    }
     if (did_only && adrof(STRrecognize_only_executables) == 0)
 	tw_cmd_free();
 }

@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.29 1992/01/28 19:06:06 christos Exp $
+.\" $Id: tcsh.man,v 3.30 1992/02/13 05:28:51 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1911,6 +1911,7 @@ The current possible values are:
 \fItitan\fR		an Stardent Titan
 \fIunixpc\fR		an UNIX/PC running SVR1 att7300 aka att3b1
 \fIvax\fR			a Digital Equipment Corp. Vax (of any flavor)
+\fIvistra800\fR		a Stardent Vistra 800 running SVR4
 .DT
 .fi
 .sp
@@ -2822,6 +2823,23 @@ extract a directory on pushd rather than rotating.
 .B dunique 
 Push only directories that are not already in the directory stack.
 .TP 10
+.B echo_style
+Set the style of the builtin echo. Valid values are:
+.RS 0.7in
+.TP 8
+.I "bsd":
+if the first argument is -n, don't echo a newline.
+.TP 8
+.I "sysv":
+recognize \e escape sequences in echo strings.
+.TP 8
+.I "both":
+recognize both -n and \e escape sequences.
+.TP 8
+.I "none":
+the purist's echo.
+.RE
+.TP 10
 .B edit 
 use the input editor, set by default.
 .TP 10
@@ -2859,6 +2877,11 @@ is shown.
 .TP 10
 .B listmax 
 maximum number of items to list without asking first.
+.TP 10
+.B margin_bug
+If your terminal scrolls when a character is printed on the rightmost
+column, then setting this variable avoids printing on the rightmost
+column.
 .TP 10
 .B matchbeep
 control beeping on completion.  With matchbeep=nomatch, completion
@@ -2918,9 +2941,6 @@ of nested shells.
 .B showdots 
 show hidden files in list and complete operations. If it is set to -A,
 then "." and ".." are not displayed, similarly to the BSD ls -A.
-.TP 10
-.B sysv_echo
-Makes the builtin echo behave like the System V /bin/echo.
 .TP 10
 .B tcsh
 Contains the current version of the shell as R.VV.PP. The 

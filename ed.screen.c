@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.12 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.13 1992/01/27 04:20:47 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.12 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.13 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -350,8 +350,10 @@ ReBufferDisplay()
 	    xfree((ptr_t) * bufp);
 	xfree((ptr_t) b);
     }
-    /* make this public, -1 to avoid wraps */
-    TermH = Val(T_co) - 1;
+    TermH = Val(T_co);
+    if (adrof(STRmargin_bug) != NULL)
+	/* make this public, -1 to avoid wraps */
+	TermH--;
     TermV = (INBUFSIZE * 4) / TermH + 1;
     b = (Char **) xmalloc((size_t) (sizeof(Char *) * (TermV + 1)));
     for (i = 0; i < TermV; i++)

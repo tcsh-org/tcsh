@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.vers.c,v 3.13 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.vers.c,v 3.14 1992/01/28 19:06:06 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.13 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.14 1992/01/28 19:06:06 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -393,6 +393,12 @@ gethosttype()
    /* B|rje Josefsson <bj@dc.luth.se> */
    hosttype = str2short("nd500");
 # endif /* NDIX */
+
+# if defined(i860) && !defined(_havehosttype_)
+#  define _havehosttype_
+   /* Tasos Kotsikonas <tasos@avs.com> */
+   hosttype = str2short("vistra800"); /* Stardent Vistra */
+#endif /* i860  && !_havehosttype_ */
 
 # ifndef _havehosttype_
 #  define _havehosttype_

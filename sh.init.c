@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.init.c,v 3.11 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.init.c,v 3.12 1992/01/16 13:04:21 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.11 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.12 1992/01/16 13:04:21 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -197,6 +197,17 @@ struct srch srchn[] = {
 };
 int nsrchn = sizeof srchn / sizeof *srchn;
 
+#ifdef SUSPENDED
+# define MSG_STOP		"Suspended (signal)"
+# define MSG_TSTP		"Suspended"
+# define MSG_TTIN		"Suspended (tty input)"
+# define MSG_TTOU		"Suspended (tty output)"
+#else /* STOPPED */
+# define MSG_STOP		"Stopped (signal)"
+# define MSG_TSTP		"Stopped"
+# define MSG_TTIN		"Stopped (tty input)"
+# define MSG_TTOU		"Stopped (tty output)"
+#endif /* SUSPENDED */
 /*
  * Note: For some machines, (hpux eg.)
  * NSIG = number of signals + 1...
@@ -262,21 +273,11 @@ struct	mesg mesg[] = {
 /* 25 */	"DLK",		"True deadlock detected",
 /* 26 */	"CPULIM",	"CPU time limit exceeded",
 /* 27 */	"SHUTDN",	"System shutdown imminent",
-# ifdef SUSPENDED
-/* 28 */	"STOP", 	"Suspended",
-/* 29 */	"TSTP", 	"Suspended",
-# else /* SUSPENDED */
-/* 28 */	"STOP", 	"Stopped",
-/* 29 */	"TSTP", 	"Stopped",
-# endif /* SUSPENDED */
+/* 28 */	"STOP", 	MSG_STOP,
+/* 29 */	"TSTP", 	MSG_TSTP,
 /* 30 */	"CONT",   	"Continue",
-# ifdef SUSPENDED
-/* 31 */	"TTIN",		"Suspended (tty input)",
-/* 32 */	"TTOU",		"Suspended (tty output)",
-# else /* SUSPENDED */
-/* 31 */	"TTIN",		"Stopped (tty input)",
-/* 32 */	"TTOU",		"Stopped (tty output)",
-# endif /* SUSPENDED */
+/* 31 */	"TTIN",		MSG_TTIN,
+/* 32 */	"TTOU",		MSG_TTOU,
 /* 33 */	"WINCH",	"Window size changed",
 /* 34 */	"RPE",		"CRAY Y-MP register parity error",
 /* 35 */	0,		"Signal 35",
@@ -321,17 +322,10 @@ struct	mesg mesg[] = {
 
 # ifdef OREO
 #  define _sigextra_
-#  ifdef SUSPENDED
-/* 20 */	"TSTP",		"Suspended",
-/* 21 */	"TTIN", 	"Suspended (tty input)",
-/* 22 */	"TTOU", 	"Suspended (tty output)",
-/* 23 */	"STOP",		"Suspended (signal)",
-#  else
-/* 20 */	"TSTP",		"Stopped",
-/* 21 */	"TTIN", 	"Stopped (tty input)",
-/* 22 */	"TTOU", 	"Stopped (tty output)",
-/* 23 */	"STOP",		"Stopped (signal)",
-#  endif /* SUSPENDED */
+/* 20 */	"TSTP",		MSG_TSTP,
+/* 21 */	"TTIN", 	MSG_TTIN,
+/* 22 */	"TTOU", 	MSG_TTOU,
+/* 23 */	"STOP",		MSG_STOP,
 /* 24 */	"XCPU",		"Cputime limit exceeded",
 /* 25 */	"XFSZ", 	"Filesize limit exceeded",
 /* 26 */	"VTALRM", 	"Virtual time alarm",
@@ -349,21 +343,11 @@ struct	mesg mesg[] = {
 /* 21 */	"PROF", 	"Profiling time alarm",
 /* 22 */	"IO", 		"Asynchronous I/O (select)",
 /* 23 */	"WINDOW", 	"Window changed",
-#  ifdef SUSPENDED
-/* 24 */	"STOP",		"Suspended (signal)",
-/* 25 */	"TSTP",		"Suspended",
-#  else /* SUSPENDED */
-/* 24 */	"STOP",		"Stopped (signal)",
-/* 25 */	"TSTP",		"Stopped",
-#  endif /* SUSPENDED */
+/* 24 */	"STOP",		MSG_STOP,
+/* 25 */	"TSTP",		MSG_TSTP,
 /* 26 */	"CONT",		"Continued",
-#  ifdef SUSPENDED
-/* 27 */	"TTIN", 	"Suspended (tty input)",
-/* 28 */	"TTOU", 	"Suspended (tty output)",
-#  else /* SUSPENDED */
-/* 27 */	"TTIN", 	"Stopped (tty input)",
-/* 28 */	"TTOU", 	"Stopped (tty output)",
-#  endif /* SUSPENDED */
+/* 27 */	"TTIN", 	MSG_TTIN,
+/* 28 */	"TTOU", 	MSG_TTOU,
 /* 29 */	"URG",		"Urgent condition on IO channel",
 /* 30 */	"LOST",		"Remote lock lost (NFS)",
 /* 31 */	0, 		"Reserved", /* Reserved */
@@ -375,21 +359,11 @@ struct	mesg mesg[] = {
 /* 20 */	"WINDOW", 	"Window changed",
 /* 21 */	"URG",		"Urgent condition on IO channel",
 /* 22 */	"POLL", 	"Pollable event occured",
-#  ifdef SUSPENDED
-/* 23 */	"STOP",		"Suspended (signal)",
-/* 24 */	"TSTP",		"Suspended",
-#  else /* SUSPENDED */
-/* 23 */	"STOP",		"Stopped (signal)",
-/* 24 */	"TSTP",		"Stopped",
-#  endif /* SUSPENDED */
+/* 23 */	"STOP",		MSG_STOP,
+/* 24 */	"TSTP",		MSG_TSTP,
 /* 25 */	"CONT",		"Continued",
-#  ifdef SUSPENDED
-/* 26 */	"TTIN", 	"Suspended (tty input)",
-/* 27 */	"TTOU", 	"Suspended (tty output)",
-#  else /* SUSPENDED */
-/* 26 */	"TTIN", 	"Stopped (tty input)",
-/* 27 */	"TTOU", 	"Stopped (tty output)",
-#  endif /* SUSPENDED */
+/* 26 */	"TTIN", 	MSG_TTIN,
+/* 27 */	"TTOU", 	MSG_TTOU,
 /* 28 */	"IO", 		"Asynchronous I/O (select)",
 /* 29 */	"XCPU",		"Cputime limit exceeded",
 /* 30 */	"XFSZ", 	"Filesize limit exceeded",
@@ -402,17 +376,10 @@ struct	mesg mesg[] = {
 /* 20 */	"WINDOW", 	"Window changed",
 /* 21 */	"URG",		"Urgent condition on IO channel",
 /* 22 */	"POLL", 	"Pollable event occured",
-#  ifdef SUSPENDED
-/* 23 */	"STOP",		"Suspended (signal)",
-/* 24 */	"TSTP",		"Suspended",
-/* 25 */	"TTIN", 	"Suspended (tty input)",
-/* 26 */	"TTOU", 	"Suspended (tty output)",
-#  else /* SUSPENDED */
-/* 23 */	"STOP",		"Stopped (signal)",
-/* 24 */	"TSTP",		"Stopped",
-/* 25 */	"TTIN", 	"Stopped (tty input)",
-/* 26 */	"TTOU", 	"Stopped (tty output)",
-#  endif /* SUSPENDED */
+/* 23 */	"STOP",		MSG_STOP,
+/* 24 */	"TSTP",		MSG_TSTP,
+/* 25 */	"TTIN", 	MSG_TTIN,
+/* 26 */	"TTOU", 	MSG_TTOU,
 /* 27 */	"CONT",		"Continued",
 /* 28 */	"XCPU",		"Cputime limit exceeded",
 /* 29 */	"XFSZ", 	"Filesize limit exceeded",
@@ -425,19 +392,11 @@ struct	mesg mesg[] = {
 /* 20 */	"WINCH", 	"Window change",
 /* 21 */	"URG", 		"Urgent socket condition",
 /* 22 */	"IO", 		"Socket I/O possible",
-#  ifdef SUSPENDED
-/* 23 */	"STOP",		"Suspended (signal)",
-/* 24 */	"TSTP",		"Suspended",
+/* 23 */	"STOP",		MSG_STOP,
+/* 24 */	"TSTP",		MSG_TSTP,
 /* 25 */	"CONT",		"Continued",
-/* 26 */	"TTIN", 	"Suspended (tty input)",
-/* 27 */	"TTOU", 	"Suspended (tty output)",
-#  else /* SUSPENDED */
-/* 23 */	"STOP",		"Stopped (signal)",
-/* 24 */	"TSTP",		"Stopped",
-/* 25 */	"CONT",		"Continued",
-/* 26 */	"TTIN", 	"Stopped (tty input)",
-/* 27 */	"TTOU", 	"Stopped (tty output)",
-#  endif /* SUSPENDED */
+/* 26 */	"TTIN", 	MSG_TTIN,
+/* 27 */	"TTOU", 	MSG_TTOU,
 /* 28 */	"VTALRM",	"Virtual timer expired",
 /* 29 */	"PROF",		"Profiling timer expired",
 /* 30 */	"XCPU",		"CPU time limit exceeded",
@@ -450,17 +409,10 @@ struct	mesg mesg[] = {
 /* 21 */	0, 		"Unused", /* SIGPHONE used only for UNIXPC */
 /* 22 */	"POLL", 	"Pollable event occured",
 /* 23 */	"CONT", 	"Continued",
-#  ifdef SUSPENDED
-/* 24 */	"STOP",		"Suspended (signal)",
-/* 25 */	"TSTP",		"Suspended",
-/* 26 */	"TTIN", 	"Suspended (tty input)",
-/* 27 */	"TTOU", 	"Suspended (tty output)",
-#  else /* SUSPENDED */
-/* 24 */	"STOP",		"Stopped (signal)",
-/* 25 */	"TSTP",		"Stopped",
-/* 26 */	"TTIN", 	"Stopped (tty input)",
-/* 27 */	"TTOU", 	"Stopped (tty output)",
-#  endif /* SUSPENDED */
+/* 24 */	"STOP",		MSG_STOP,
+/* 25 */	"TSTP",		MSG_TSTP,
+/* 26 */	"TTIN", 	MSG_TTIN,
+/* 27 */	"TTOU", 	MSG_TTOU,
 /* 28 */	0,	  	"number of signals",
 /* 29 */	0,		"Reserved", /* Reserved */
 /* 30 */	0,		"Reserved", /* Reserved */
@@ -473,19 +425,11 @@ struct	mesg mesg[] = {
 /* 20 */	"WINCH", 	"Window change",
 /* 21 */	0, 		"Unused", /* SIGPHONE used only for UNIXPC */
 /* 22 */	"POLL", 	"Pollable event occured",
-#  ifdef SUSPENDED
-/* 23 */	"STOP",		"Suspended (signal)",
-/* 24 */	"TSTP",		"Suspended",
+/* 23 */	"STOP",		MSG_STOP,
+/* 24 */	"TSTP",		MSG_TSTP,
 /* 25 */	"CONT", 	"Continued",
-/* 26 */	"TTIN", 	"Suspended (tty input)",
-/* 27 */	"TTOU", 	"Suspended (tty output)",
-#  else /* SUSPENDED */
-/* 23 */	"STOP",		"Stopped (signal)",
-/* 24 */	"TSTP",		"Stopped",
-/* 25 */	"CONT", 	"Continued",
-/* 26 */	"TTIN", 	"Stopped (tty input)",
-/* 27 */	"TTOU", 	"Stopped (tty output)",
-#  endif /* SUSPENDED */
+/* 26 */	"TTIN", 	MSG_TTIN,
+/* 27 */	"TTOU", 	MSG_TTOU,
 /* 28 */	0,	  	"number of signals",
 /* 29 */	0,		"Reserved", /* Reserved */
 /* 30 */	0,		"Reserved", /* Reserved */
@@ -495,13 +439,8 @@ struct	mesg mesg[] = {
 
 # ifdef IRIS4D
 #  define _sigextra_
-#  ifdef SUSPENDED
-/* 20 */	"STOP",		"Suspended (signal)",
-/* 21 */	"TSTP",		"Suspended",
-#  else /* SUSPENDED */
-/* 20 */	"STOP",		"Stopped (signal)",
-/* 21 */	"TSTP",		"Stopped",
-#  endif /* SUSPENDED */
+/* 20 */	"STOP",		MSG_STOP,
+/* 21 */	"TSTP",		MSG_TSTP,
 /* 22 */	"POLL", 	"Stream I/O pending",
 /* 23 */	"IO", 		"Asynchronous I/O (select)",
 /* 24 */	"URG",		"Urgent condition on IO channel",
@@ -509,13 +448,8 @@ struct	mesg mesg[] = {
 /* 26 */	"VTALRM", 	"Virtual time alarm",
 /* 27 */	"PROF", 	"Profiling time alarm",
 /* 28 */	"CONT",		"Continued",
-#  ifdef SUSPENDED
-/* 29 */	"TTIN", 	"Suspended (tty input)",
-/* 30 */	"TTOU", 	"Suspended (tty output)",
-#  else /* SUSPENDED */
-/* 29 */	"TTIN", 	"Stopped (tty input)",
-/* 30 */	"TTOU", 	"Stopped (tty output)",
-#  endif /* SUSPENDED */
+/* 29 */	"TTIN", 	MSG_TTIN,
+/* 30 */	"TTOU", 	MSG_TTOU,
 /* 31 */	0,		"Signal 31",
 /* 32 */	0,		"Signal 32",
 # endif /* IRIS4D */
@@ -539,22 +473,12 @@ struct	mesg mesg[] = {
 
 # ifdef apollo
 #  define _sigextra_
-#  ifdef SUSPENDED
-/* 20 */	"STOP",		"Suspended (signal)",
-/* 21 */	"TSTP",		"Suspended",
-#  else /* SUSPENDED */
-/* 20 */	"STOP",		"Stopped (signal)",
-/* 21 */	"TSTP",		"Stopped",
-#  endif /* SUSPENDED */
+/* 20 */	"STOP",		MSG_STOP,
+/* 21 */	"TSTP",		MSG_TSTP,
 /* 22 */	"CONT",		"Continued",
 /* 23 */	"CHLD",		"Child stopped or exited",
-#  ifdef SUSPENDED
-/* 24 */	"TTIN", 	"Suspended (tty input)",
-/* 25 */	"TTOU", 	"Suspended (tty output)",
-#  else /* SUSPENDED */
-/* 24 */	"TTIN", 	"Stopped (tty input)",
-/* 25 */	"TTOU", 	"Stopped (tty output)",
-#  endif /* SUSPENDED */
+/* 24 */	"TTIN", 	MSG_TTIN,
+/* 25 */	"TTOU", 	MSG_TTOU,
 /* 26 */	"IO", 		"Asynchronous I/O (select)",
 /* 27 */	"XCPU",		"Cputime limit exceeded",
 /* 28 */	"XFSZ", 	"Filesize limit exceeded",
@@ -566,21 +490,11 @@ struct	mesg mesg[] = {
 
 # ifdef masscomp
 #  define _sigextra_
-#  ifdef SUSPENDED
-/* 20 */	"STOP",		"Suspended (signal)",
-/* 21 */	"TSTP",		"Suspended",
-#  else /* SUSPENDED */
-/* 20 */	"STOP",		"Stopped (signal)",
-/* 21 */	"TSTP",		"Stopped",
-#  endif /* SUSPENDED */
+/* 20 */	"STOP",		MSG_STOP,
+/* 21 */	"TSTP",		MSG_TSTP,
 /* 22 */	"CONT",		"Continued",
-#  ifdef SUSPENDED
-/* 23 */	"TTIN", 	"Suspended (tty input)",
-/* 24 */	"TTOU", 	"Suspended (tty output)",
-#  else /* SUSPENDED */
-/* 23 */	"TTIN", 	"Stopped (tty input)",
-/* 24 */	"TTOU", 	"Stopped (tty output)",
-#  endif /* SUSPENDED */
+/* 23 */	"TTIN", 	MSG_TTIN,
+/* 24 */	"TTOU", 	MSG_TTOU,
 /* 25 */	"TINT", 	"New input character",
 /* 26 */	"XCPU",		"Cputime limit exceeded",
 /* 27 */	"XFSZ", 	"Filesize limit exceeded",
@@ -601,41 +515,27 @@ struct	mesg mesg[] = {
 /* 25 */	"IOINT", 	"I/O intervention required",
 /* 26 */	"GRANT", 	"monitor mode granted",
 /* 27 */	"RETRACT", 	"monitor mode retracted",
-/* 28 */	"WINCH","Window size changed",
+/* 28 */	"WINCH",	"Window size changed",
 /* 29 */	0,		"Signal 29",
 /* 30 */	"SOUND", 	"sound completed",
 /* 31 */	"MSG", 		"input hft data pending",
 /* 32 */	0,		"Signal 32",
 # endif /* aiws */
 
-# ifdef m88k				/* Motorola 88100: POSIX/BCS signals */
+# ifdef m88k			/* Motorola 88100: POSIX/BCS signals */
 #  define _sigextra_
 /* 20 */	"WINCH", 	"Window changed",
 # ifdef DGUX
 /* 21 */	0,		"Signal 21",
 # else
-#  ifdef SUSPENDED
-/* 21 */	"TTIN", 	"Suspended (tty input)",
-#  else /* SUSPENDED */
-/* 21 */	"TTIN", 	"Stopped (tty input)",
-#  endif /* SUSPENDED */
+/* 21 */	"TTIN", 	MSG_TTIN,	/* XXX: What? */
 # endif /* DGUX */
 /* 22 */	"POLL", 	"Stream I/O pending",
-# ifdef SUSPENDED
-/* 23 */	"STOP",		"Suspended (signal)",
-/* 24 */	"TSTP",		"Suspended",
-# else /* SUSPENDED */
-/* 23 */	"STOP",		"Stopped (signal)",
-/* 24 */	"TSTP",		"Stopped",
-# endif /* SUSPENDED */
+/* 23 */	"STOP",		MSG_STOP,
+/* 24 */	"TSTP",		MSG_TSTP,
 /* 25 */	"CONT",		"Continued",
-# ifdef SUSPENDED
-/* 26 */	"TTIN", 	"Suspended (tty input)",
-/* 27 */	"TTOU", 	"Suspended (tty output)",
-# else /* SUSPENDED */
-/* 26 */	"TTIN", 	"Stopped (tty input)",
-/* 27 */	"TTOU", 	"Stopped (tty output)",
-# endif /* SUSPENDED */
+/* 26 */	"TTIN", 	MSG_TTIN,
+/* 27 */	"TTOU", 	MSG_TTOU,
 /* 28 */	0,		"Signal 28",
 /* 29 */	0,		"Signal 29",
 /* 30 */	0,		"Signal 30",
@@ -675,27 +575,15 @@ struct	mesg mesg[] = {
 /* 64 */	0,		"Signal 64",
 # endif /* m88k */
 
-
 #ifdef IBMAIX
 # define _sigextra_
-
 /* 16 */	"URG",		"Urgent condition on IO channel",
-# ifdef SUSPENDED
-/* 17 */	"STOP",		"Suspended (signal)",
-/* 18 */	"TSTP",		"Suspended",
-# else /* SUSPENDED */
-/* 17 */	"STOP",		"Stopped (signal)",
-/* 18 */	"TSTP",		"Stopped",
-# endif /* SUSPENDED */
+/* 17 */	"STOP",		MSG_STOP,
+/* 18 */	"TSTP",		MSG_TSTP,
 /* 19 */	"CONT",		"Continued",
 /* 20 */	"CHLD",		"Child exited",
-# ifdef SUSPENDED
-/* 21 */	"TTIN", 	"Suspended (tty input)",
-/* 22 */	"TTOU", 	"Suspended (tty output)",
-# else /* SUSPENDED */
-/* 21 */	"TTIN", 	"Stopped (tty input)",
-/* 22 */	"TTOU", 	"Stopped (tty output)",
-# endif /* SUSPENDED */
+/* 21 */	"TTIN", 	MSG_TTIN,
+/* 22 */	"TTOU", 	MSG_TTOU,
 /* 23 */	"IO",   	"IO possible interrupt",
 /* 24 */	"XCPU",		"Cputime limit exceeded",
 /* 25 */	"XFSZ", 	"Filesize limit exceeded",
@@ -744,24 +632,17 @@ struct	mesg mesg[] = {
 /* 64 */	0,		"Signal 64",
 #endif /* IBMAIX */
 
+
 # ifdef _SEQUENT_
 #  define _sigextra_
 /* 20 */	"WINCH", 	"Window changed",
 /* 21 */	0,		"Signal 21",
 /* 22 */	"POLL", 	"Stream I/O pending",
-#  ifdef SUSPENDED
-/* 23 */	"STOP",		"Suspended (signal)",
-/* 24 */	"TSTP",		"Suspended",
+/* 23 */	"STOP",		MSG_STOP,
+/* 24 */	"TSTP",		MSG_TSTP,
 /* 25 */	"CONT",		"Continued",
-/* 26 */	"TTIN", 	"Suspended (tty input)",
-/* 27 */	"TTOU", 	"Suspended (tty output)",
-#  else /* SUSPENDED */
-/* 23 */	"STOP",		"Stopped (signal)",
-/* 24 */	"TSTP",		"Stopped",
-/* 25 */	"CONT",		"Continued",
-/* 26 */	"TTIN", 	"Stopped (tty input)",
-/* 27 */	"TTOU", 	"Stopped (tty output)",
-#  endif /* SUSPENDED */
+/* 26 */	"TTIN", 	MSG_TTIN,
+/* 27 */	"TTOU", 	MSG_TTOU,
 /* 28 */	0, 		"Signal 28",
 /* 29 */	0,		"Signal 29",
 /* 30 */	0, 		"Signal 30",
@@ -793,29 +674,28 @@ struct	mesg mesg[] = {
 # endif /* _sigextra_ */
 
 /* 16 */	"URG",		"Urgent condition on IO channel",
-# ifdef SUSPENDED
-/* 17 */	"STOP",		"Suspended (signal)",
-/* 18 */	"TSTP",		"Suspended",
-# else /* SUSPENDED */
-/* 17 */	"STOP",		"Stopped (signal)",
-/* 18 */	"TSTP",		"Stopped",
-# endif /* SUSPENDED */
+/* 17 */	"STOP",		MSG_STOP,
+/* 18 */	"TSTP",		MSG_TSTP,
 /* 19 */	"CONT",		"Continued",
 /* 20 */	"CHLD",		"Child exited",
-# ifdef SUSPENDED
-/* 21 */	"TTIN", 	"Suspended (tty input)",
-/* 22 */	"TTOU", 	"Suspended (tty output)",
-# else /* SUSPENDED */
-/* 21 */	"TTIN", 	"Stopped (tty input)",
-/* 22 */	"TTOU", 	"Stopped (tty output)",
-# endif /* SUSPENDED */
+/* 21 */	"TTIN", 	MSG_TTIN,
+/* 22 */	"TTOU", 	MSG_TTOU,
 /* 23 */	"IO",   	"IO possible interrupt",
 /* 24 */	"XCPU",		"Cputime limit exceeded",
 /* 25 */	"XFSZ", 	"Filesize limit exceeded",
 /* 26 */	"VTALRM", 	"Virtual time alarm",
 /* 27 */	"PROF",		"Profiling time alarm",
 
-# if defined(sun) || defined(ultrix) || defined(hp9000) || defined(convex) || defined(__convex__)
+# if defined(RENO) || defined(BSD4_4)
+# define _sigextra_
+/* 28 */	"WINCH",	"Window size changed",
+/* 29 */	"INFO",		"Information request",
+/* 30 */	"USR1",		"User defined signal 1",
+/* 31 */	"USR2",		"User defined signal 2",
+/* 32 */	0,		"Signal 32",
+# endif /* RENO || BSD4_4 */
+
+# if (defined(sun) || defined(ultrix) || defined(hp9000) || defined(convex) || defined(__convex__)) && !defined(_sigextra_)
 #  define _sigextra_
 /* 28 */	"WINCH", 	"Window changed",
 /* 29 */	"LOST",		"Resource lost",
@@ -835,16 +715,11 @@ struct	mesg mesg[] = {
 
 # ifndef _sigextra_
 /* 28 */	"WINCH",	"Window size changed",
-#  ifdef RENO
-/* 29 */	"INFO",		"Information request",
-#  else
 /* 29 */	0,		"Signal 29",
-#  endif /* RENO */
 /* 30 */	"USR1",		"User defined signal 1",
 /* 31 */	"USR2",		"User defined signal 2",
 /* 32 */	0,		"Signal 32",
 # endif /* _sigextra_ */
-
 
 #endif /* (SYSVREL > 0) || DGUX || IBMAIX */
 

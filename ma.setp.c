@@ -66,12 +66,6 @@
  *
  **********************************************************************
  * HISTORY
- * $Log: ma.setp.c,v $
- * Revision 1.1  1992/01/27  04:26:28  christos
- * 6.01.03
- *
- * Revision 1.1  1992/01/27  04:26:28  christos
- * 6.01.03
  *
  * Revision 1.4  90/12/11  17:58:44  mja
  * 	Add copyright/disclaimer for distribution.

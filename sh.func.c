@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.24 1992/01/28 19:06:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.25 1992/02/13 05:28:51 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.24 1992/01/28 19:06:06 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.25 1992/02/13 05:28:51 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1005,6 +1005,11 @@ doglob(v, c)
     flush();
 }
 
+#define NONE_ECHO	0
+#define BSD_ECHO	1
+#define SYSV_ECHO	2
+#define BOTH_ECHO	(BSD_ECHO|SYSV_ECHO)
+
 static void
 xecho(sep, v)
     int    sep;
@@ -1012,7 +1017,28 @@ xecho(sep, v)
 {
     register Char *cp;
     int     nonl = 0;
-    int     sysv_echo = adrof(STRsysv_echo) != NULL;
+#ifdef ECHO_STYLE
+    int	    echo_style = ECHO_STYLE;
+#else /* !ECHO_STYLE */
+# if SYSVREL > 0
+    int	    echo_style = SYSV_ECHO;
+# else /* SYSVREL == 0 */
+    int	    echo_style = BSD_ECHO;
+# endif /* SYSVREL */
+#endif /* ECHO_STYLE */
+    struct varent *vp;
+
+    if ((vp = adrof(STRecho_style)) != NULL && vp->vec != NULL &&
+	vp->vec[0] != NULL) {
+	if (Strcmp(vp->vec[0], STRbsd) == 0)
+	    echo_style = BSD_ECHO;
+	else if (Strcmp(vp->vec[0], STRsysv) == 0)
+	    echo_style = SYSV_ECHO;
+	else if (Strcmp(vp->vec[0], STRboth) == 0)
+	    echo_style = BOTH_ECHO;
+	else if (Strcmp(vp->vec[0], STRnone) == 0)
+	    echo_style = NONE_ECHO;
+    }
 
     if (setintr)
 #ifdef BSDSIGS
@@ -1033,19 +1059,15 @@ xecho(sep, v)
 	v = gargv = saveblk(v);
 	trim(v);
     }
-    /* 
-     * XXX: This is not really sysv echo, but too many things assume
-     *      csh accepts echo -n
-     */
 
-    if (!sysv_echo && sep == ' ' && *v && eq(*v, STRmn))
+    if ((echo_style & BSD_ECHO) != 0 && sep == ' ' && *v && eq(*v, STRmn))
 	nonl++, v++;
 
     while ((cp = *v++) != 0) {
 	register int c;
 
 	while ((c = *cp++) != 0) {
-	    if (sysv_echo && c == '\\') {
+	    if ((echo_style & SYSV_ECHO) != 0 && c == '\\') {
 		switch (c = *cp++) {
 		case 'b':
 		    c = '\b';
@@ -1337,7 +1359,9 @@ doumask(v, c)
 # ifndef BSDTIMES
    typedef long RLIM_TYPE;
 #  ifndef RLIM_INFINITY
+#   ifndef _MINIX
     extern RLIM_TYPE ulimit();
+#   endif /* ! _MINIX */
 #   define RLIM_INFINITY 0x003fffff
 #   define RLIMIT_FSIZE 1
 #  endif /* RLIM_INFINITY */

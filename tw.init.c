@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.init.c,v 3.4 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.init.c,v 3.5 1992/02/13 05:28:51 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.4 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.5 1992/02/13 05:28:51 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -77,10 +77,10 @@ static struct {				/* Current element pointer	*/
 
 #ifdef BSDSIGS
 static sigmask_t tw_omask;
-# define TW_HOLD()	tw_omask = sighold(SIGINT)
+# define TW_HOLD()	tw_omask = sigblock(sigmask(SIGINT))
 # define TW_RELS()	(void) sigsetmask(tw_omask)
 #else /* !BSDSIGS */
-# define TW_HOLD()	(void) sigblock(SIGINT)
+# define TW_HOLD()	(void) sighold(SIGINT)
 # define TW_RELS()	(void) sigrelse(SIGINT)
 #endif /* BSDSIGS */
 
@@ -770,4 +770,4 @@ tw_bind_next(dir, flags)
 	return(tw_retname);
     }
     return NULL;
-} /* end tw_var_next */
+} /* end tw_bind_next */

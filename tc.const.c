@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.const.c,v 3.8 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.const.c,v 3.9 1992/02/13 05:28:51 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.8 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.9 1992/02/13 05:28:51 christos Exp $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -123,8 +123,14 @@ Char STRignore_symlinks[] = { 'i', 'g', 'n', 'o', 'r', 'e', '_', 's', 'y', 'm',
 			    'l', 'i', 'n', 'k', 's', '\0' };
 Char STRchase_symlinks[] = { 'c', 'h', 'a', 's', 'e', '_', 's', 'y', 'm', 'l', 
 			    'i', 'n', 'k', 's', '\0' };
-Char STRsysv_echo[]	= { 's', 'y', 's', 'v', '_', 'e', 'c', 'h', 'o', '\0' };
-
+Char STRmargin_bug[] 	= { 'm', 'a', 'r', 'g', 'i', 'n', '_', 'b', 'u', 'g', 
+			    '\0' };
+Char STRecho_style[]	= { 'e', 'c', 'h', 'o', '_', 's', 't', 'y', 'l', 'e', 
+			    '\0' };
+Char STRbsd[]		= { 'b', 's', 'd', '\0' };
+Char STRsysv[]		= { 's', 'y', 's', 'v', '\0' };
+Char STRboth[]		= { 'b', 'o', 't', 'h', '\0' };
+Char STRnone[]		= { 'n', 'o', 'n', 'e', '\0' };
 Char STRPWD[]		= { 'P', 'W', 'D', '\0' };
 Char STRor2[]		= { '|', '|', '\0' };
 Char STRand2[]		= { '&', '&', '\0' };

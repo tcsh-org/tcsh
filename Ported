@@ -370,3 +370,14 @@ CONFIG  :       config.bsd
 ENVIRON :       n/a
 NOTES   :       n/a
 VERSION :       6.01
+
+VENDOR  :       stardent
+MODELS  :	Vistra 800
+COMPILER:       /bin/cc
+CFLAGS  :       -O
+LIBES   :       -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a
+OS      :	SYSVR4
+CONFIG  :	config.sysv4
+ENVIRON :       n/a
+NOTES   :	Works like a charm
+VERSION :	6.01
