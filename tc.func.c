@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.12 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.13 1991/11/11 01:56:34 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.12 1991/11/04 04:16:33 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.13 1991/11/11 01:56:34 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -49,16 +49,20 @@ RCSID("$Id: tc.func.c,v 3.12 1991/11/04 04:16:33 christos Exp $")
 
 extern time_t t_period;
 extern int do_logout;
+extern int just_signaled;
 static bool precmd_active = 0;
 static bool periodic_active = 0;
 static bool cwdcmd_active = 0;	/* PWP: for cwd_cmd */
 static bool beepcmd_active = 0;
+static void (*alm_fun)() = NULL;
 
-static	void	Reverse		__P((Char *));
-static	void	auto_logout	__P((void));
-static	void	insert		__P((struct wordent *, bool));
-static	void	insert_we	__P((struct wordent *, struct wordent *));
-static	int	inlist		__P((Char *, Char *));
+static	void	 Reverse	__P((Char *));
+static	void	 auto_logout	__P((void));
+static	char	*xgetpass	__P((char *));
+static	void	 auto_lock	__P((void));
+static	void	 insert		__P((struct wordent *, bool));
+static	void	 insert_we	__P((struct wordent *, struct wordent *));
+static	int	 inlist		__P((Char *, Char *));
 
 
 /*
@@ -259,9 +263,9 @@ dolist(v, c)
 	if (setintr)
 #ifdef BSDSIGS
 	    (void) sigsetmask(omask);
-#else
+#else /* !BSDSIGS */
 	    (void) sigrelse(SIGINT);
-#endif
+#endif /* BSDSIGS */
     }
     else {
 	Char   *dp, *tmp, buf[MAXPATHLEN];
@@ -480,10 +484,80 @@ fg_proc_entry(pp)
 
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
-#else
+#else /* !BSDSIGS */
     (void) sigrelse(SIGINT);
-#endif
+#endif /* BSDSIGS */
 
+}
+
+static char *
+xgetpass(prm)
+    char *prm;
+{
+    static char pass[9];
+    int fd, i;
+    sigret_t (*sigint)();
+
+    sigint = sigset(SIGINT, SIG_IGN);
+    Rawmode();	/* Make sure, cause we want echo off */
+    if ((fd = open("/dev/tty", O_RDWR)) == -1)
+	fd = SHIN;
+
+    xprintf("%s", prm); flush();
+    for (i = 0;;)  {
+	if (read(fd, &pass[i], 1) < 1 || pass[i] == '\n') 
+	    break;
+	if (i < 9)
+	    i++;
+    }
+	
+    pass[8] = '\0';
+
+    if (fd != SHIN)
+	(void) close(fd);
+    (void) sigset(SIGINT, sigint);
+
+    return(pass);
+}
+	
+static void
+auto_lock()
+{
+    int i;
+    struct passwd *pw;
+    extern char *crypt();
+
+
+    /* Get the passwd of our effective user.  */
+    if ((pw = getpwuid(geteuid())) == NULL)
+	return;
+
+    setalarm(0);		/* Not for locking any more */
+    (void) sigset(SIGALRM, alrmcatch);
+#ifdef BSDSIGS
+    (void) sigsetmask(sigblock(0) & ~(sigmask(SIGALRM)));
+#else /* !BSDSIGS */
+    (void) sigrelse(SIGALRM);
+#endif /* BSDSIGS */
+    xprintf("\n"); 
+    for (i = 0; i < 5; i++) {
+	char *crpp, *pp;
+	pp = xgetpass("Password:"); 
+	crpp = crypt(pp, pw->pw_passwd);
+	if (strcmp(crpp, pw->pw_passwd) == 0) {
+	    if (GettingInput && !just_signaled) {
+		(void) Rawmode();
+		ClearLines();	
+		ClearDisp();	
+		Refresh();
+	    }
+	    just_signaled = 0;
+	    return;
+	}
+	xprintf("\nIncorrect passwd for %s\n", pw->pw_name);
+    }
+    auto_logout();
+    Refresh();
 }
 
 static void
@@ -514,13 +588,13 @@ int snum;
 #endif /* UNRELSIGS */
 
     if ((nl = sched_next()) == -1)
-	auto_logout();		/* no other possibility - logout */
+	(*alm_fun)();		/* no other possibility - logout */
     (void) time(&cl);
     if (nl <= cl + 1)
 	sched_run();
     else
-	auto_logout();
-    setalarm();
+	(*alm_fun)();
+    setalarm(1);
 #ifndef SIGVOID
     return (snum);
 #endif
@@ -691,6 +765,7 @@ aliasrun(cnt, s1, s2)
     struct wordent w, *new1, *new2;	/* for holding alias name */
     struct command *t = NULL;
     jmp_buf osetexit;
+    flush();
 
     getexit(osetexit);
     if (seterr) {
@@ -764,16 +839,30 @@ aliasrun(cnt, s1, s2)
 }
 
 void
-setalarm()
+setalarm(lck)
+    int lck;
 {
     struct varent *vp;
     Char   *cp;
-    unsigned alrm_time = 0;
+    unsigned alrm_time = 0, lock_time;
     time_t cl, nl, sched_dif;
 
     if (vp = adrof(STRautologout)) {
-	if (cp = vp->vec[0])
+	if (cp = vp->vec[0]) {
 	    alrm_time = (atoi(short2str(cp)) * 60);
+	    alm_fun = auto_logout;
+	}
+	if ((cp = vp->vec[1])) {
+	    lock_time = atoi(short2str(cp) * 60);
+	    if (lck) {
+		if (lock_time < alrm_time) {
+		    alrm_time = lock_time;
+		    alm_fun = auto_lock;
+		}
+	    }
+	    else /* lock_time always < alrm_time */
+		alrm_time -= lock_time;
+	}
     }
     if ((nl = sched_next()) != -1) {
 	(void) time(&cl);

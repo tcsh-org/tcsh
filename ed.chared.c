@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.13 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.14 1991/11/11 01:56:34 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.13 1991/11/04 04:16:33 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.14 1991/11/11 01:56:34 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -161,7 +161,7 @@ c_delafter(num)
 	 * XXX: We don't want to do that. In emacs mode overwrite should be
 	 * sticky. I am not sure how that affects vi mode 
 	 */
-	replacemode = 0;
+	inputmode = MODE_INSERT;
     }
 #endif /* notdef */
 }
@@ -1079,7 +1079,7 @@ v_cmd_mode(c)
     else
 	UndoSize = (int)(Cursor - UndoPtr);
 
-    replacemode = 0;
+    inputmode = MODE_INSERT;
     c_alternativ_key_map(1);
 #ifdef notdef
     /*
@@ -1120,7 +1120,7 @@ e_insert(c)
 
     if (Argument == 1) {  	/* How was this optimized ???? */
 
-	if ((replacemode == 1) || (replacemode == 2)) {
+	if (inputmode != MODE_INSERT) {
 	    UndoBuf[UndoSize++] = *Cursor;
 	    UndoBuf[UndoSize] = '\0';
 	    c_delafter(1);   /* Do NOT use the saving ONE */
@@ -1133,7 +1133,7 @@ e_insert(c)
 	RefPlusOne();		/* fast refresh for one char. */
     }
     else {
-	if ((replacemode == 1) || (replacemode == 2)) {
+	if (inputmode != MODE_INSERT) {
 
 	    for(i=0;i<Argument;i++) 
 		UndoBuf[UndoSize++] = *(Cursor+i);
@@ -1149,7 +1149,7 @@ e_insert(c)
 	Refresh();
     }
 
-    if (replacemode == 2)
+    if (inputmode == MODE_REPLACE_1)
 	(void) v_cmd_mode(0);
 
     return(CC_NORM);
@@ -1207,6 +1207,11 @@ e_digit(c)			/* gray magic here */
 	if (LastChar + 1 >= InputLim)
 	    return CC_ERROR;	/* end of buffer space */
 
+	if (inputmode != MODE_INSERT) {
+	    UndoBuf[UndoSize++] = *Cursor;
+	    UndoBuf[UndoSize] = '\0';
+	    c_delafter(1);   /* Do NOT use the saving ONE */
+    	}
 	c_insert(1);
 	*Cursor++ = c;
 	DoingArg = 0;		/* just in case */
@@ -2545,7 +2550,7 @@ v_replone(c)
     int c;
 {				/* vi mode overwrite one character */
     c_alternativ_key_map(0);
-    replacemode = 2;
+    inputmode = MODE_REPLACE_1;
     UndoAction = CHANGE;	/* Set Up for VI undo command */
     UndoPtr = Cursor;
     UndoSize = 0;
@@ -2558,7 +2563,7 @@ v_replmode(c)
     int c;
 {				/* vi mode start overwriting */
     c_alternativ_key_map(0);
-    replacemode = 1;
+    inputmode = MODE_REPLACE;
     UndoAction = CHANGE;	/* Set Up for VI undo command */
     UndoPtr = Cursor;
     UndoSize = 0;
@@ -2727,7 +2732,7 @@ CCRETVAL
 e_insovr(c)
     int c;
 {
-    replacemode = !replacemode;
+    inputmode = (inputmode == MODE_INSERT ? MODE_REPLACE : MODE_INSERT);
     return(CC_NORM);
 }
 

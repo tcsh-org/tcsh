@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.8 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.9 1991/11/11 01:56:34 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.8 1991/11/04 04:16:33 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.9 1991/11/11 01:56:34 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -72,6 +72,7 @@ Inputl()
     struct varent *crct = adrof(STRcorrect);
     struct varent *autol = adrof(STRautolist);
     struct varent *matchbeep = adrof(STRmatchbeep);
+    struct varent *imode = adrof(STRinputmode);
     Char   *SaveChar, *CorrChar;
     Char    Origin[INBUFSIZ], Change[INBUFSIZ];
     int     matchval;		/* from tenematch() */
@@ -186,10 +187,10 @@ Inputl()
 	case CC_NEWLINE:	/* normal end of line */
 	    if (crct && (!Strcmp(*(crct->vec), STRcmd) ||
 			 !Strcmp(*(crct->vec), STRall))) {
-		(void) Strcpy(Origin, InputBuf);
+		copyn(Origin, InputBuf, INBUFSIZ);
 		SaveChar = LastChar;
 		if (SpellLine(!Strcmp(*(crct->vec), STRcmd)) == 1) {
-		    (void) Strcpy(Change, InputBuf);
+		    copyn(Change, InputBuf, INBUFSIZ);
 		    *Strchr(Change, '\n') = '\0';
 		    CorrChar = LastChar;	/* Save the corrected end */
 		    LastChar = InputBuf;	/* Null the current line */
@@ -203,7 +204,7 @@ Inputl()
 			xprintf("yes\n");
 		    }
 		    else {
-			(void) Strcpy(InputBuf, Origin);
+			(void) copyn(InputBuf, Origin, INBUFSIZ);
 			LastChar = SaveChar;
 			if (ch == 'e') {
 			    xprintf("edit\n");
@@ -224,6 +225,12 @@ Inputl()
 	    /*
 	     * For continuation lines, we set the prompt to prompt 2
 	     */
+	    if (imode) {
+		if (!Strcmp(*(imode->vec), STRinsert))
+		    inputmode = MODE_INSERT;
+		else if (!Strcmp(*(imode->vec), STRoverwrite))
+		    inputmode = MODE_REPLACE;
+	    }
 	    printprompt(1, NULL);
 #ifdef notdef
 	    ResetInLine();	/* reset the input pointers */

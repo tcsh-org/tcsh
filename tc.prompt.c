@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.prompt.c,v 3.5 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.prompt.c,v 3.6 1991/10/28 06:26:50 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.5 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.6 1991/10/28 06:26:50 christos Exp $")
 
 #include "ed.h"
 
@@ -56,20 +56,20 @@ printprompt(promptno, str)
     int     promptno;
     Char   *str;
 {
-    Char   *p, *z, *q;
+    Char   *p, *z, *q, *ep, *cp;
     register Char attributes = 0;
     static int print_prompt_did_ding = 0;
     register char *cz;
     struct tm *t;
     time_t  lclock;
     Char    buff[BUFSIZ];
-    Char   *cp;
 
     (void) time(&lclock);
     t = localtime(&lclock);
 
     PromptBuf[0] = '\0';
     p = PromptBuf;
+    ep = &PromptBuf[2*INBUFSIZ - 2];
     switch (promptno) {
     default:
     case 0:
@@ -84,13 +84,17 @@ printprompt(promptno, str)
     }
 
     for (; *cp; cp++) {
+	if (p >= ep)
+	    break;
 	if (*cp == '%') {
 	    cp++;
 	    switch (*cp) {
 	    case 'R':
 		if (str != NULL)
-		    while (*str)
+		    while (*str) {
 			*p++ = attributes | *str++;
+			if (p >= ep) break;
+		    }
 		break;
 	    case '#':
 		*p++ = attributes | ((uid == 0) ? '#' : '>');
@@ -98,8 +102,10 @@ printprompt(promptno, str)
 	    case '!':
 	    case 'h':
 		Itoa(eventno + 1, buff);
-		for (z = buff; *z; z++)
+		for (z = buff; *z; z++) {
 		    *p++ = attributes | *z;
+		    if (p >= ep) break;
+		}
 		break;
 	    case 'T':		/* 24 hour format	 */
 	    case '@':
@@ -107,6 +113,8 @@ printprompt(promptno, str)
 		{
 		    char    ampm = 'a';
 		    int     hr = t->tm_hour;
+
+		    if (p >= ep - 10) break;
 
 		    /* addition by Hans J. Albertsson */
 		    /* and another adapted from Justin Bur */
@@ -127,7 +135,7 @@ printprompt(promptno, str)
 			    print_prompt_did_ding = 0;
 			Itoa(hr, buff);
 			*p++ = attributes | buff[0];
-			if (buff[1])
+			if (buff[1]) 
 			    *p++ = attributes | buff[1];
 			*p++ = attributes | ':';
 			Itoa(t->tm_min, buff);
@@ -162,14 +170,18 @@ printprompt(promptno, str)
 		 * derefrence that NULL (if HOST is not set)...
 		 */
 		if ((cz = getenv("HOST")) != NULL)
-		    while (*cz)
+		    while (*cz) {
+			if (p >= ep) break;
 			*p++ = attributes | *cz++;
+		    }
 		break;
 
 	    case 'm':
 		if ((cz = getenv("HOST")) != NULL)
-		    while (*cz && *cz != '.')
+		    while (*cz && *cz != '.') {
+			if (p >= ep) break;
 			*p++ = attributes | *cz++;
+		    }
 		break;
 
 	    case '~':		/* show ~ whenever possible - a la dirs */
@@ -188,16 +200,21 @@ printprompt(promptno, str)
 		    }
 		    if (olduser) {
 			*p++ = attributes | '~';
-			for (q = olduser; *q; *p++ = attributes | *q++);
-			for (z = oldpath; *z; *p++ = attributes | *z++);
+			if (p >= ep) break;
+			for (q = olduser; *q; *p++ = attributes | *q++)
+			    if (p >= ep) break;
+			for (z = oldpath; *z; *p++ = attributes | *z++)
+			    if (p >= ep) break;
 			break;
 		    }
 		}
 		/* fall through if ~ not matched */
 	    case '/':
 		if (z = value(STRcwd)) {
-		    while (*z)
+		    while (*z) {
 			*p++ = attributes | *z++;
+			if (p >= ep) break;
+		    }
 		}
 		break;
 	    case '.':
@@ -240,27 +257,36 @@ printprompt(promptno, str)
 			}
 			if (*z == '/' && z != q)
 			    z++;
-			while (*z)
+			while (*z) {
 			    *p++ = attributes | *z++;
+			    if (p >= ep) break;
+			}
 		    }
 		}
 		break;
 	    case 'n':
 		if (z = value(STRuser))
-		    while (*z)
+		    while (*z) {
 			*p++ = attributes | *z++;
+			if (p >= ep) break;
+		    }
 		break;
 	    case 'l':
 		if (z = value(STRtty))
-		    while (*z)
+		    while (*z) {
 			*p++ = attributes | *z++;
+			if (p >= ep) break;
+		    }
 		break;
 	    case 'd':
-		for (cz = day_list[t->tm_wday]; *cz;)
+		for (cz = day_list[t->tm_wday]; *cz;) {
 		    *p++ = attributes | *cz++;
+		    if (p >= ep) break;
+		}
 		break;
 	    case 'D':
 		Itoa(t->tm_mday, buff);
+		if (p >= ep - 3) break;
 		if (buff[1]) {
 		    *p++ = attributes | buff[0];
 		    *p++ = attributes | buff[1];
@@ -271,10 +297,12 @@ printprompt(promptno, str)
 		}
 		break;
 	    case 'w':
-		for (cz = month_list[t->tm_mon]; *cz;)
+		if (p >= ep - 20) break;
+		for (cz = month_list[t->tm_mon]; *cz;) 
 		    *p++ = attributes | *cz++;
 		break;
 	    case 'W':
+		if (p >= ep - 3) break;
 		Itoa(t->tm_mon + 1, buff);
 		if (buff[1]) {
 		    *p++ = attributes | buff[0];
@@ -286,6 +314,7 @@ printprompt(promptno, str)
 		}
 		break;
 	    case 'y':
+		if (p >= ep - 3) break;
 		Itoa(t->tm_year, buff);
 		if (buff[1]) {
 		    *p++ = attributes | buff[0];
@@ -297,6 +326,7 @@ printprompt(promptno, str)
 		}
 		break;
 	    case 'Y':
+		if (p >= ep - 5) break;
 		Itoa(t->tm_year + 1900, buff);
 		*p++ = attributes | buff[0];
 		*p++ = attributes | buff[1];
@@ -326,8 +356,10 @@ printprompt(promptno, str)
 		break;
 	    case '?':
 		if (z = value(STRstatus))
-		    while (*z)
+		    while (*z) {
 			*p++ = attributes | *z++;
+			if (p >= ep) break;
+		    }
 		break;
 	    case '%':
 		*p++ = attributes | '%';
@@ -347,6 +379,7 @@ printprompt(promptno, str)
 		attributes &= ~LITERAL;
 		break;
 	    default:
+		if (p >= ep - 3) break;
 		*p++ = attributes | '%';
 		*p++ = attributes | *cp;
 		break;
@@ -357,8 +390,10 @@ printprompt(promptno, str)
 	}
 	else if (*cp == '!') {	/* EGS: handle '!'s in prompts */
 	    Itoa(eventno + 1, buff);
-	    for (z = buff; *z; z++)
+	    for (z = buff; *z; z++) {
 		*p++ = attributes | *z;
+		if (p >= ep) break;
+	    }
 	}
 	else {
 	    *p++ = attributes | *cp;	/* normal character */

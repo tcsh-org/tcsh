@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.20.1.1 1991/11/10 23:45:00 raj Exp $
+.\" $Id: tcsh.man,v 3.21 1991/11/11 01:56:34 christos Exp $
 .TH TCSH 1 "20 October 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -44,7 +44,7 @@ except for the added utilities of:
 8)  Enhanced history mechanism.
 .sp
 .ti -4
-9)  Automatic logout after long periods of idle time.
+9)  Automatic locking/logout after long periods of idle time.
 .sp
 .ti -4
 10) Automatic execution of a single command prior to printing each prompt.
@@ -477,6 +477,29 @@ VI Multi-character bindings
 .DT
 .fi
 .sp
+.PP
+In 
+.I tcsh
+there are two input modes: 
+.I insert
+and
+.I overwrite.
+All characters that are bound to the 
+.I self-insert-command
+either get inserted or overwrite what was under the cursor depending
+on the input mode. In emacs one can toggle between modes using
+the
+.I overwrite-mode
+function, and in VI one can use any of the replace mode commands.
+By default the mode is preserved between input lines. To specify
+a default mode that can be enforced at the beginning of each command line,
+the variable 
+.I inputmode
+can be set
+to either
+.I insert
+or 
+.I overwrite.
 .PP
 There is also an older version of bindkey called 
 .I bind,
@@ -1115,12 +1138,12 @@ behavior
 can be used. 
 
 .PP
-.SH "9. AUTOMATIC LOGOUT"
-The automatic logout time is controlled by the variable
-.I autologout,
-the value of which is the number of minutes of inactivity will be
+.SH "9. AUTOMATIC LOGOUT/LOCKING"
+The automatic locking and logout time are controlled by the variable
+.I autologout.
+The value of the first word is the number of minutes of inactivity will be
 allowed before automatically logging the user out.  When that many
-minutes have been reached, the shell prints "autologout" and dies
+minutes have been reached, the shell prints "auto-logout" and dies
 (without executing ~/.logout).  The default for 
 .I tcsh 
 is to set
@@ -1128,6 +1151,11 @@ is to set
 for 60 minutes on login shells, and when the user is root.  To disable
 autologout (for instance in a window system), unset the shell variable
 .I autologout.
+.PP
+The value of the optional second word indicates the number of
+minutes of inactivity after which the user will be prompted for his login 
+password to continue working. Failure to enter the correct password 5 times, 
+results in auto-logout.
 .PP
 .SH "10. EXECUTION OF A COMMAND PRIOR TO EACH PROMPT"
 .I Tcsh
@@ -2609,7 +2637,11 @@ invoke the expand-history function automatically on completion.
 list possibilities on an ambiguous completion.
 .TP 10
 .B autologout 
+The first word indicates
 number of minutes of inactivity before automatic logout.
+The optional second word indicates the number of minutes of inactivity
+after which the user will be prompted for his login password to enter a 
+command.
 .TP 10
 .B backslash_quote
 makes the backslash quote \\, \', and ". This option changes the

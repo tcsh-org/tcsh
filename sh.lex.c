@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.10 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.11 1991/11/11 01:56:34 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.10 1991/11/04 04:16:33 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.11 1991/11/11 01:56:34 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1217,7 +1217,7 @@ gethent(sc)
 	    }
 	    np = lhsb;
 	    event = 0;
-	    while (!cmap(c, _ESC | _META | _Q | _Q1) && !any("${}:", c)) {
+	    while (!cmap(c, _ESC | _META | _Q | _Q1) && !any("${}:#", c)) {
 		if (event != -1 && Isdigit(c))
 		    event = event * 10 + c - '0';
 		else
@@ -1239,6 +1239,13 @@ gethent(sc)
 		if (back)
 		    event = eventno + (alhistp == 0) - (event ? event : 0);
 		break;
+	    }
+	    if (back) {
+		event = sizeof(lhsb) / sizeof(lhsb[0]);
+		np = &lhsb[--event];
+		*np-- = '\0';
+		for (event--; np > lhsb; *np-- = lhsb[--event]);
+		*np = '-';
 	    }
 	    hp = findev(lhsb, 0);
 	    if (hp)

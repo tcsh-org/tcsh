@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.11 1991/09/10 21:38:09 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.h,v 1.1 1991/10/12 04:23:51 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -185,10 +185,10 @@
 # define CERASE2	_POSIX_VDISABLE
 #endif /* CERASE2 */
 #ifndef CSTART
-# define CSTART		CONTROL('s')
+# define CSTART		CONTROL('q')
 #endif /* CSTART */
 #ifndef CSTOP
-# define CSTOP		CONTROL('q')
+# define CSTOP		CONTROL('s')
 #endif /* CSTOP */
 #ifndef CSUSP
 # define CSUSP		CONTROL('z')

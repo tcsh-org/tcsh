@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.const.c,v 3.4 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.const.c,v 3.5 1991/11/11 01:56:34 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,11 +36,12 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.4 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.5 1991/11/11 01:56:34 christos Exp $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
 			    '\0' };
+Char STRlock[]    	= { 'l', 'o', 'c', 'k', '\0' };
 Char STRdefautologout[] = { '6', '0', '\0' };
 Char STRautomatic[]     = { 'a', 'u', 't', 'o', 'm', 'a', 't', 'i', 'c', '\0' };
 Char STRaout[]          = { 'a', '.', 'o', 'u', 't', '\0' };
@@ -220,6 +221,9 @@ Char STRrecognize_only_executables[] = { 'r', 'e', 'c', 'o', 'g', 'n', 'i', 'z',
 					 'e', '_', 'o', 'n', 'l', 'y', '_', 'e',
 					 'x', 'e', 'c', 'u', 't', 'a', 'b', 'l',
 					 'e', 's', '\0' };
+Char STRinputmode[]	= { 'i', 'n', 'p', 'u', 't', 'm', 'o', 'd', 'e', '\0' };
+Char STRoverwrite[]	= { 'o', 'v', 'e', 'r', 'w', 'r', 'i', 't', 'e', '\0' };
+Char STRinsert[]	= { 'i', 'n', 's', 'e', 'r', 't', '\0' };
 Char STRnohup[]		= { 'n', 'o', 'h', 'u', 'p', '\0' };
 Char STRnice[]		= { 'n', 'i', 'c', 'e', '\0' };
 Char STRlistpathnum[]	= { 'l', 'i', 's', 't', 'p', 'a', 't', 'h', 'n', 'u', 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.17 1991/10/28 06:26:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.18 1991/11/11 01:56:34 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.17 1991/10/28 06:26:50 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.18 1991/11/11 01:56:34 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -190,7 +190,7 @@ ed_Setup(rst)
     vdisable = _POSIX_VDISABLE;
 #endif /* _PC_VDISABLE */
 	
-    replacemode = 0;	/* start out in insert mode */
+    inputmode = MODE_INSERT;	/* start out in insert mode */
     ed_InitMaps();
     Hist_num = 0;
     Expand = 0;

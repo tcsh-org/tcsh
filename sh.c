@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.16 1991/10/28 06:26:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.17 1991/11/11 01:56:34 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.16 1991/10/28 06:26:50 christos Exp $")
+RCSID("$Id: sh.c,v 3.17 1991/11/11 01:56:34 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1535,7 +1535,7 @@ process(catch)
 	    if (fseekp == feobp && aret == F_SEEK)
 		printprompt(0, NULL);
 	    flush();
-	    setalarm();
+	    setalarm(1);
 	}
 	if (seterr) {
 	    xfree((ptr_t) seterr);

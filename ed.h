@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.7 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.8 1991/11/11 01:56:34 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -42,11 +42,6 @@
 #endif
 
 #define TABSIZE		8	/* usually 8 spaces/tab */
-#define	INBUFSIZ	1024	/* size of input buffer */
-				/* Used to be BUFSIZ, but that is could
-				 * be too small or too large for some
-				 * systems
-				 */
 #define MAXMACROLEVELS	10	/* max number of nested kbd macros */
 
 extern int errno;
@@ -102,7 +97,7 @@ extern KEYCMD NumFuns;		/* number of KEYCMDs in above table */
 /****************************/
 
 EXTERN KEYCMD *CurrentKeyMap;	/* current command key map */
-EXTERN int replacemode;		/* true if in overwrite mode */
+EXTERN int inputmode;		/* insert, replace, replace1 mode */
 EXTERN Char GettingInput;	/* true if getting an input line (mostly) */
 EXTERN Char NeedsRedraw;	/* for editor and twenex error messages */
 EXTERN Char InputBuf[INBUFSIZ];	/* the real input data */
@@ -195,6 +190,10 @@ typedef struct {
     struct ltchars d_ltc;
 #endif /* TIOCGLTC */
 } ttydata_t;
+
+#define MODE_INSERT	0
+#define MODE_REPLACE	1
+#define MODE_REPLACE_1	2
 
 #define EX_IO	0	/* while we are executing	*/
 #define ED_IO	1	/* while we are editing		*/

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.6 1991/10/14 20:42:30 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.7 1991/10/21 17:24:49 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.6 1991/10/14 20:42:30 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.7 1991/10/21 17:24:49 christos Exp $")
 
 #include "tc.h"
 
@@ -108,7 +108,7 @@ struct who {
     int     w_status;
 };
 
-static struct who *wholist = NULL;
+static struct who whohead, whotail;
 static int watch_period = 0;
 static time_t stlast = 0;
 extern char *month_list[];
@@ -136,16 +136,8 @@ initwatch()
 {
     register unsigned i;
 
-    wholist = (struct who *) xcalloc(1, sizeof *wholist);
-    wholist->w_next = (struct who *) xcalloc(1, sizeof *wholist);
-    wholist->w_next->w_prev = wholist;
-    for (i = 0; i < UTLINLEN; i++) {
-	wholist->w_tty[i] = '\01';
-	wholist->w_next->w_tty[i] = '~';
-    }
-    wholist->w_tty[i] = '\0';
-    wholist->w_next->w_tty[i] = '\0';
-
+    whohead.w_next = &whotail;
+    whotail.w_prev = &whohead;
 #ifdef WHODEBUG
     debugwholist(NULL, NULL);
 #endif /* WHODEBUG */
@@ -245,7 +237,7 @@ watch_login()
      * xterm clears the entire utmp entry - mark everyone on the status list
      * OFFLINE or we won't notice X "logouts"
      */
-    for (wp = wholist; wp != NULL; wp = wp->w_next) {
+    for (wp = whohead.w_next; wp->w_next != NULL; wp = wp->w_next) {
 	wp->w_status = OFFLINE;
 	wp->w_time = 0;
     }
@@ -273,11 +265,11 @@ watch_login()
 	if (utmp.ut_type == DEAD_PROCESS && utmp.ut_line[0] == '\0')
 	    continue;
 #endif /* DEAD_PROCESS */
-	wp = wholist;
-	while ((comp = strncmp(wp->w_tty, utmp.ut_line, UTLINLEN)) < 0)
+	wp = whohead.w_next;
+	while (wp->w_next && (comp = strncmp(wp->w_tty, utmp.ut_line, UTLINLEN)) < 0)
 	    wp = wp->w_next;/* find that tty! */
 
-	if (comp == 0) {	/* found the tty... */
+	if (wp->w_next && comp == 0) {	/* found the tty... */
 #ifdef DEAD_PROCESS
 	    if (utmp.ut_type == DEAD_PROCESS) {
 		wp->w_time = utmp.ut_time;
@@ -366,7 +358,7 @@ watch_login()
 	if (eq(*vp, STRany) && eq(*(vp + 1), STRany))
 	    alldone = 1;
 
-	for (wp = wholist; wp != NULL; wp = wp->w_next) {
+	for (wp = whohead.w_next; wp->w_next != NULL; wp = wp->w_next) {
 	    if (wp->w_status & ANNOUNCE ||
 		(!eq(STRany, vp[0]) &&
 		 !Gmatch(str2short(wp->w_name), vp[0]) &&
@@ -414,21 +406,27 @@ debugwholist(new, wp)
 {
     register struct who *a;
 
-    a = wholist;
-    while (a != NULL) {
+    a = whohead.w_next;
+    while (a->w_next != NULL) {
 	xprintf("%s/%s -> ", a->w_name, a->w_tty);
 	a = a->w_next;
     }
-    xprintf("NULL\n");
-    a = wholist;
+    xprintf("TAIL\n");
+    if (a != &whotail) {
+	xprintf("BUG! last element is not whotail!\n");
+	abort();
+    }
+    a = whotail.w_prev;
     xprintf("backward: ");
-    while (a->w_next != NULL)
-	a = a->w_next;
-    while (a != NULL) {
+    while (a->w_prev != NULL) {
 	xprintf("%s/%s -> ", a->w_name, a->w_tty);
 	a = a->w_prev;
     }
-    xprintf("NULL\n");
+    xprintf("HEAD\n");
+    if (a != &whohead) {
+	xprintf("BUG! first element is not whohead!\n");
+	abort();
+    }
     if (new)
 	xprintf("new: %s/%s\n", new->w_name, new->w_tty);
     if (wp)
@@ -471,6 +469,8 @@ print_who(wp)
 		case OFFLINE:
 		    xprintf("%a%s", attributes, wp->w_name);
 		    break;
+		default:
+		    break;
 		}
 		break;
 	    case 'a':
@@ -483,6 +483,8 @@ print_who(wp)
 		    break;
 		case CHANGED:
 		    xprintf("%areplaced %s on", attributes, wp->w_name);
+		    break;
+		default:
 		    break;
 		}
 		break;
@@ -591,10 +593,9 @@ struct command *c;
 	stderror(ERR_NOWATCH);
     blkpr(vp->vec);
     xprintf("\n");
-    watch_period = 0;
-    stlast = 0;
-    wp = wholist;
-    while (wp != NULL) {
+    resetwatch();
+    wp = whohead.w_next;
+    while (wp->w_next != NULL) {
 	wp->w_name[0] = '\0';
 	wp = wp->w_next;
     }

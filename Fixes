@@ -1,4 +1,10 @@
 V6.00.04, ....
+26. (beta-3 11/16/91)
+25. Prompt length checking. 
+24. Michael's fixes for the watching code. Tcsh could core dump when using
+    a corrupted utmp.
+23. overwrite mode flag, and autologout locking code.
+22. overwrite mode would still insert digits!
 21. Get the value of _POSIX_VDISABLE from pathconf...
 20. Hpux 8.0 fixes. Sigstack botches with shared libraries. Ansi mode
     static initialization of structures with prototyped function pointers
