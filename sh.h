@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.0 1991/07/04 23:34:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.1 1991/07/05 19:07:20 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -798,7 +798,9 @@ Char  **STR_environ;
 # else
 #  define __P(a) ()
 #  define const
-#  define volatile
+#  ifndef apollo
+#   define volatile
+#  endif
 # endif
 #endif
 
