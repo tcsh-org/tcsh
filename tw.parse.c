@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.48 1993/05/17 00:11:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.49 1993/06/05 21:09:15 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.48 1993/05/17 00:11:09 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.49 1993/06/05 21:09:15 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1117,12 +1117,12 @@ tw_list_items(looking, numitems, list_max)
 	    max_items = max_items * 10 + *ptr++ - '0';
 	}
 	if ((max_items > 0) && (numitems > max_items) && list_max)
-	    max_rows = numitems;
+	    max_items = numitems;
 	else
-	    max_rows = 0;
+	    max_items = 0;
     }
 
-    if (max_rows == 0 && (ptr = value(STRlistmaxrows)) != STRNULL) {
+    if (max_items == 0 && (ptr = value(STRlistmaxrows)) != STRNULL) {
 	int rows = 0;
 
 	while (*ptr) {
