@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.29 1998/07/07 12:06:10 christos Exp $
+# $Id: complete.tcsh,v 1.30 1999/04/20 07:48:37 christos Exp $
 # example file using the new completion code
 #
 
@@ -449,8 +449,8 @@ if ($?complete) then
   n@old@'`[ -r /usr/man/mano ] && \ls -1 /usr/man/mano | sed s%\\.o.\*\$%%`'@ \
 n@local@'`[ -r /usr/man/manl ] && \ls -1 /usr/man/manl | sed s%\\.l.\*\$%%`'@ \
 n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
-		c/-/"(- f k P s t)"/ n/-f/c/ n/-k/x:'<keyword>'/ n/-P/d/ \
-		N@-P@'`\ls -1 $:-1/man? | sed s%\\..\*\$%%`'@ n/*/c/
+		c/-/"(- f k M P s t)"/ n/-f/c/ n/-k/x:'<keyword>'/ n/-[MP]/d/ \
+		N@-[MP]@'`\ls -1 $:-1/man? | sed s%\\..\*\$%%`'@ n/*/c/
 
     complete ps	        c/-t/x:'<tty>'/ c/-/"(a c C e g k l S t u v w x)"/ \
 			n/-k/x:'<kernel>'/ N/-k/x:'<core_file>'/ n/*/x:'<PID>'/
