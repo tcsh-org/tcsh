@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.48 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.49 1993/07/03 23:47:53 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.48 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.49 1993/07/03 23:47:53 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1974,6 +1974,7 @@ static void
 setttypgrp(pgrp)
     int pgrp;
 {
+#ifdef BSDJOBS
     /*
      * If we are piping out a builtin, eg. 'echo | more' things can go
      * out of sequence, i.e. the more can run before the echo. This
@@ -1988,19 +1989,20 @@ setttypgrp(pgrp)
      *    group again.
      */
     if (tcgetpgrp(FSHTTY) != pgrp) {
-#ifdef POSIXJOBS
+# ifdef POSIXJOBS
         /*
 	 * tcsetpgrp will set SIGTTOU to all the the processes in 
 	 * the background according to POSIX... We ignore this here.
 	 */
 	sigret_t (*old)() = sigset(SIGTTOU, SIG_IGN);
-#endif
+# endif /* POSIXJOBS */
 	(void) tcsetpgrp(FSHTTY, pgrp);
 # ifdef POSIXJOBS
 	(void) sigset(SIGTTOU, old);
-# endif
+# endif /* POSIXJOBS */
 
     }
+#endif /* BSDJOBS */
 }
 
 
