@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.63 2004/09/28 15:38:37 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.64 2004/11/20 18:25:26 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.63 2004/09/28 15:38:37 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.64 2004/11/20 18:25:26 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -870,7 +870,7 @@ doio(t, pipein, pipeout)
 		stderror(ERR_SYSTEM, tmp, strerror(errno));
 	    /* allow input files larger than 2Gb  */
 #ifndef WINNT_NATIVE
-	    (void) fcntl(fd, O_LARGEFILE, 0);
+	    (void) fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_LARGEFILE);
 #endif /*!WINNT_NATIVE*/
 	    (void) dmove(fd, 0);
 	}
@@ -930,7 +930,7 @@ doio(t, pipein, pipeout)
 		stderror(ERR_SYSTEM, tmp, strerror(errno));
 	    /* allow input files larger than 2Gb  */
 #ifndef WINNT_NATIVE
-	    (void) fcntl(fd, O_LARGEFILE, 0);
+	    (void) fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_LARGEFILE);
 #endif /*!WINNT_NATIVE*/
 	}
 	(void) dmove(fd, 1);
