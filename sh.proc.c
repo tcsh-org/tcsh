@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.5 1991/07/18 18:49:38 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.6 1991/07/23 23:20:08 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.proc.c,v 3.5 1991/07/18 18:49:38 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.6 1991/07/23 23:20:08 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -1866,8 +1866,11 @@ pgetty(wanttty, pgrp)
      */
     if (wanttty >= 0)
 	if (setpgid(0, pgrp) == -1) {
-	    xprintf("tcsh: setpgid error.\n");
+#  if !defined(ISC) && !defined(SCO)
+	    /* XXX: Wrong but why? */
+	    xprintf("tcsh: setpgid error (%s).\n", strerror(errno));
 	    xexit(0);
+#  endif /* !ISC && !SCO */
 	}
 # endif /* POSIXJOBS */
 
@@ -1877,8 +1880,11 @@ pgetty(wanttty, pgrp)
 # ifndef POSIXJOBS
     if (wanttty >= 0)
 	if (setpgid(0, pgrp) == -1) {
-	    xprintf("tcsh: setpgid error.\n");
+#  if !defined(ISC) && !defined(SCO)
+	    /* XXX: Wrong but why? */
+	    xprintf("tcsh: setpgid error (%s).\n", strerror(errno));
 	    xexit(0);
+#  endif /* !ISC && !SCO */
 	}
 # else /* POSIXJOBS */
     if (wanttty > 0)
