@@ -1,4 +1,11 @@
 V6.05.00, ... 
+ 50. rewrote srcunit() to use st_save and st_restore. The code was
+     too messy to be useful before.
+ 49. recdirs and rechist patches again!
+ 48. Harris hck port, and ISC imake update
+ 47. Eliminate the x windows :display.screen before looking for the 
+     hostname in REMOTEHOST
+ 46. Patch for CDF filetype() recognition (hpux)
  45. 6.04.04 11/12/93
  44. Made =x obey nonomatch.
  43. Fixed rechist and recdirs not to depend on savehist and savedirs
