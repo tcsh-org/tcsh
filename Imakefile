@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.25 1993/04/09 00:15:37 christos Exp $
+/**/# $Id: Imakefile,v 1.26 1993/04/26 21:13:10 christos Exp christos $
 /**/#
 /**/# Imakefile for for tcsh 6.03
 /**/# Marc Horowitz, MIT SIPB
@@ -27,6 +27,11 @@ ones.  Please send in your fixes and additions! */
 #ifndef ConfigH
 # ifdef UltrixArchitecture
 #  define ConfigH ultrix
+# endif
+
+# ifdef AlphaArchitecture
+#  define ConfigH decosf1
+#  define MyCflags -std1 -Olimit 2000
 # endif
 
 # if defined(VaxArchitecture) && !defined(UltrixArchitecture)

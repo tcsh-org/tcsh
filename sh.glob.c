@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.glob.c,v 3.30 1993/02/12 17:22:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.glob.c,v 3.31 1993/04/26 21:13:10 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.30 1993/02/12 17:22:20 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.31 1993/04/26 21:13:10 christos Exp $")
 
 #include "tc.h"
 
@@ -104,6 +104,8 @@ globtilde(nv, s)
 	continue;
     *b = EOS;
     if (gethdir(gstart)) {
+	if (adrof(STRnonomatch))
+	    return (--u);
 	blkfree(nv);
 	if (*gstart)
 	    stderror(ERR_UNKUSER, short2str(gstart));

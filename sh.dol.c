@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dol.c,v 3.19 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dol.c,v 3.20 1993/04/07 21:39:23 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.19 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.20 1993/04/07 21:39:23 christos Exp $")
 
 /*
  * C shell
@@ -403,7 +403,8 @@ quotspec:
 }
 
 static Char *nulvec[] = { NULL };
-static struct varent nulargv = {nulvec, STRargv, { NULL, NULL, NULL }, 0 };
+static struct varent nulargv = {nulvec, STRargv, VAR_READWRITE, 
+				{ NULL, NULL, NULL }, 0 };
 
 static void
 dolerror(s)

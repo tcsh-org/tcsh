@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.46 1993/04/07 21:39:23 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.47 1993/04/26 21:13:10 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.46 1993/04/07 21:39:23 christos Exp christos $")
+RCSID("$Id: tw.parse.c,v 3.47 1993/04/26 21:13:10 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -125,7 +125,7 @@ static	Char 	 tw_suffix		__P((int, Char *, Char *, Char *,
 static	void 	 tw_fixword		__P((int, Char *, Char *, Char *, int));
 static	void	 tw_list_items		__P((int, int, int));
 static 	void	 add_scroll_tab		__P((Char *));
-static 	void 	 choose_scroll_tab	__P((Char **, Char *, int));
+static 	void 	 choose_scroll_tab	__P((Char **, int));
 static	void	 free_scroll_tab	__P((void));
 
 #ifdef notdef
@@ -211,10 +211,6 @@ tenematch(inputline, num_read, command)
       }
     *wp = 0;
 
-    /* move the word_start after the quote */
-    if (*word_start == qu)
-	word_start++;
-
 #ifdef masscomp
     /*
      * Avoid a nasty message from the RTU 4.1A & RTU 5.0 compiler concerning
@@ -299,6 +295,7 @@ tenematch(inputline, num_read, command)
 	    if (search_ret == 1) {
 		/* get rid of old word */
 		DeleteBack(str_end - word_start);
+		qu = 0;
 		(void) Strcat(wordp, rword);
 		/* insert newly spelled word */
 		if (InsertStr(quote_meta(wordp, qu, 0)) < 0)	
@@ -340,7 +337,7 @@ tenematch(inputline, num_read, command)
 	     * We don't want to quote spelling stuff, otherwise
 	     * $OHME -> \$HOME 
 	     */
-	    if (InsertStr(quote_meta(wordp, qu, 0)) < 0)
+	    if (InsertStr(quote_meta(wordp, 0, 0)) < 0)
 		return -1;	/* error inserting */
 #endif
 	    if (InsertStr(wordp) < 0)
@@ -368,7 +365,7 @@ tenematch(inputline, num_read, command)
 		DeleteBack(str_end - word_start);/* get rid of old word */
 		for (i = 0; i < count; i++)
 		    if (ptr[i] && *ptr[i]) {
-			if (InsertStr(quote_meta(ptr[i], qu, 0)) < 0 ||
+			if (InsertStr(quote_meta(ptr[i], 0, 0)) < 0 ||
 			    InsertStr(STRspace) < 0) {
 			    blkfree(ptr);
 			    return (-1);
@@ -382,7 +379,7 @@ tenematch(inputline, num_read, command)
     case VARS_EXPAND:
 	if (dollar(buffer, wordp)) {
 	    DeleteBack(str_end - word_start);
-	    if (InsertStr(quote_meta(buffer, qu, 0)) < 0)
+	    if (InsertStr(quote_meta(buffer, 0, 0)) < 0)
 		return (-1);
 	    return (1);
 	}
@@ -394,7 +391,7 @@ tenematch(inputline, num_read, command)
 	    (void) Strcpy(buffer, bptr);
 	    xfree((ptr_t) bptr);
 	    DeleteBack(str_end - word_start);
-	    if (InsertStr(quote_meta(buffer, qu, 0)) < 0)
+	    if (InsertStr(quote_meta(buffer, 0, 0)) < 0)
 		return (-1);
 	    return (1);
 	}
@@ -537,6 +534,12 @@ quote_meta(word, qu, trail_space)
 	if (cmap(qu, _ESC))
 	  qu = 0;
     }
+    if (qu && trail_space && wptr > word && *wptr == 0 && wptr[-1] == ' ')
+      {
+        *bptr = bptr[-1];
+        bptr[-1] = qu;
+        bptr++;
+      }
     *bptr = '\0';
     return (buffer);
 } /* end quote_meta */
@@ -922,7 +925,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	} else if (numitems > 1) {
 	    if (curchoice < -1)
 		curchoice = cnt - 1;
-	    choose_scroll_tab(&exp_name, target, cnt);
+	    choose_scroll_tab(&exp_name, cnt);
 	    numitems = 1;
 	}
     }
@@ -1859,23 +1862,22 @@ tgetenv(str)
 
 struct scroll_tab_list *scroll_tab = 0;
 
-void
-add_scroll_tab(entry)
-    Char *entry;
+static void
+add_scroll_tab(item)
+    Char *item;
 {
     struct scroll_tab_list *new_scroll;
 
     new_scroll = (struct scroll_tab_list *) xmalloc((size_t)
 	    sizeof(struct scroll_tab_list));
-    new_scroll->element = Strsave(entry);
+    new_scroll->element = Strsave(item);
     new_scroll->next = scroll_tab;
     scroll_tab = new_scroll;
 }
 
-void
-choose_scroll_tab(exp_name, target, cnt)
+static void
+choose_scroll_tab(exp_name, cnt)
     Char **exp_name;
-    Char *target;
     int cnt;
 {
     struct scroll_tab_list *loop;
@@ -1894,7 +1896,7 @@ choose_scroll_tab(exp_name, target, cnt)
     xfree((ptr_t) ptr);
 }
 
-void
+static void
 free_scroll_tab()
 {
     struct scroll_tab_list *loop;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.inputl.c,v 3.31 1992/11/13 04:19:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.inputl.c,v 3.32 1993/04/26 21:13:10 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,15 +36,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.31 1992/11/13 04:19:10 christos Exp christos $")
+RCSID("$Id: ed.inputl.c,v 3.32 1993/04/26 21:13:10 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 #include "tw.h"			/* for twenex stuff */
 
 #define OKCMD (INBUFSIZE+INBUFSIZE)
-extern CCRETVAL e_up_hist();
-extern CCRETVAL e_expand_history();
 
 /* ed.inputl -- routines to get a single line from the input. */
 
@@ -59,6 +57,8 @@ static	int	GetNextCommand	__P((KEYCMD *, Char *));
 static	int	SpellLine	__P((int));
 static	void	RunCommand	__P((Char *));
 static void 	doeval1		__P((Char **));
+
+static bool rotate = 0;
 
 /* CCRETVAL */
 int
@@ -81,7 +81,7 @@ Inputl()
     COMMAND fn;
     int curlen = 0;
     int newlen;
-    int index;
+    int idx;
 
     if (!MapsAreInited)		/* double extra just in case */
 	ed_InitMaps();
@@ -290,29 +290,33 @@ Inputl()
 		fn = RECOGNIZE;
 		curlen = LastChar - InputBuf;
 		curchoice = -1;
+		rotate = 0;
 		break;
 	    case CC_COMPLETE_ALL:
 		fn = RECOGNIZE_ALL;
 		curlen = LastChar - InputBuf;
 		curchoice = -1;
+		rotate = 0;
 		break;
 	    case CC_COMPLETE_FWD:
 		fn = RECOGNIZE_SCROLL;
 		curchoice++;
+		rotate = 1;
 		break;
 	    case CC_COMPLETE_BACK:
 		fn = RECOGNIZE_SCROLL;
 		curchoice--;
+		rotate = 1;
 		break;
 	    default:
 		abort();
 	    }
-	    if (InputBuf[curlen]) {
+	    if (InputBuf[curlen] && rotate) {
 		newlen = LastChar - InputBuf;
-		for (index = (Cursor - InputBuf); 
-		     index <= newlen; index++)
-			InputBuf[index - newlen + curlen] =
-			InputBuf[index];
+		for (idx = (Cursor - InputBuf); 
+		     idx <= newlen; idx++)
+			InputBuf[idx - newlen + curlen] =
+			InputBuf[idx];
 		LastChar = InputBuf + curlen;
 		Cursor = Cursor - newlen + curlen;
 	    }
@@ -383,12 +387,12 @@ Inputl()
 
 	case CC_LIST_CHOICES:
 	case CC_LIST_ALL:
-	    if (InputBuf[curlen]) {
+	    if (InputBuf[curlen] && rotate) {
 		newlen = LastChar - InputBuf;
-		for (index = (Cursor - InputBuf); 
-		     index <= newlen; index++)
-			InputBuf[index - newlen + curlen] =
-			InputBuf[index];
+		for (idx = (Cursor - InputBuf); 
+		     idx <= newlen; idx++)
+			InputBuf[idx - newlen + curlen] =
+			InputBuf[idx];
 		LastChar = InputBuf + curlen;
 		Cursor = Cursor - newlen + curlen;
 	    }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.hist.c,v 3.6 1992/10/05 02:41:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.hist.c,v 3.7 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.6 1992/10/05 02:41:30 christos Exp christos $")
+RCSID("$Id: sh.hist.c,v 3.7 1993/01/08 22:23:12 christos Exp $")
 
 #include "tc.h"
 
@@ -69,7 +69,7 @@ savehist(sp, mflg)
     Char   *cp;
 
     /* throw away null lines */
-    if (sp->next->word[0] == '\n')
+    if (sp && sp->next->word[0] == '\n')
 	return;
     cp = value(STRhistory);
     if (*cp) {
@@ -88,7 +88,8 @@ savehist(sp, mflg)
 	    hp->Hnext = np->Hnext, hfree(np);
 	else
 	    hp = np;
-    (void) enthist(++eventno, sp, 1, mflg);
+    if (sp)
+	(void) enthist(++eventno, sp, 1, mflg);
 }
 
 static bool

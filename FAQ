@@ -1,6 +1,6 @@
 
 Last Updated: 
-Tue Feb 23 10:44:46 EST 1993
+Sun May 16 20:08:16 EDT 1993
 
 This is for people who do not read the manual!
 
@@ -55,7 +55,7 @@ be able to get ftp it... :-)
 4.  Where can I get csh sources? 
 
     Csh sources are now available with the 4.4BSD networking distributions.
-    You don't need csh sources to compile tcsh-6.00.
+    You don't need csh sources to compile tcsh-6.0x.
 
 5.  I just made tcsh my login shell, and I cannot ftp any more?
 
@@ -81,6 +81,17 @@ be able to get ftp it... :-)
 	1 Don't use suntools
 	2 Use shelltool instead of cmdtool.
 	3 Unset edit in tcsh.
+
+6b. On a SPARCstation running Solaris 2.x and OpenWindows 3.1,
+    inside a cmdtool, the short-cut key sequence to clear log
+    (i.e. Meta-e or Diamond-e) doesn't work: it just echos 'e'
+
+6c. On a SPARCstation running Solaris 2.x and OpenWindows 3.1,
+    maketool (within SPARCworks) doesn't work: it just does
+    a `cd' to the working directory then stops.
+
+    The workaround for 6b and 6c is doing "unset edit."
+    Using shelltool instead of cmdtool doesn't fix 6c.
 
 7.  I rlogin to another machine, and then no matter what I tell 'stty'
     I cannot get it to pass 8 bit characters?

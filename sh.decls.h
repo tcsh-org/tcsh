@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.decls.h,v 3.15 1992/10/27 16:18:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.decls.h,v 3.16 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -316,18 +316,21 @@ extern	void		  mypipe	__P((int *));
 extern	struct varent 	 *adrof1	__P((Char *, struct varent *));
 extern	void		  doset		__P((Char **, struct command *));
 extern	void		  dolet		__P((Char **, struct command *));
+extern	void		  doreadonly	__P((Char **, struct command *));
 extern	Char		 *putn		__P((int));
 extern	int		  getn		__P((Char *));
 extern	Char		 *value1	__P((Char *, struct varent *));
-extern	void		  set		__P((Char *, Char *));
-extern	void		  set1		__P((Char *, Char **, struct varent *));
-extern	void		  setq		__P((Char *, Char **, struct varent *));
+extern	void		  set		__P((Char *, Char *, int));
+extern	void		  set1		__P((Char *, Char **, struct varent *,
+					     int));
+extern	void		  setq		__P((Char *, Char **, struct varent *,
+					     int));
 extern	void		  unset		__P((Char **, struct command *));
 extern	void		  unset1	__P((Char *[], struct varent *));
 extern	void		  unsetv	__P((Char *));
 extern	void		  setNS		__P((Char *));
 extern	void		  shift		__P((Char **, struct command *));
-extern	void		  plist		__P((struct varent *));
+extern	void		  plist		__P((struct varent *, int));
 
 /*
  * sh.time.c

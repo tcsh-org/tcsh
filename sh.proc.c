@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.42 1993/03/05 20:14:33 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.43 1993/04/26 21:13:10 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.42 1993/03/05 20:14:33 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.43 1993/04/26 21:13:10 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -118,6 +118,7 @@ static	void		 pads		__P((Char *));
 static	void		 pkill		__P((Char **, int));
 static	struct process	*pgetcurr	__P((struct process *));
 static	void		 okpcntl	__P((void));
+static	int		 setttypgrp	__P((int, int));
 
 /*
  * pchild - called at interrupt level by the SIGCHLD signal
@@ -293,8 +294,6 @@ loop:
     goto loop;
 #endif /* BSDJOBS */
 found:
-    if (pid == atoi(short2str(value(STRchild))))
-	unsetv(STRchild);
     pp->p_flags &= ~(PRUNNING | PSTOPPED | PREPORTED);
     if (WIFSTOPPED(w)) {
 	pp->p_flags |= PSTOPPED;
@@ -631,7 +630,7 @@ pjwait(pp)
     if ((reason != 0) && (adrof(STRprintexitvalue)) && 
 	(pp->p_flags & PBACKQ) == 0)
 	xprintf("Exit %d\n", reason);
-    set(STRstatus, putn(reason));
+    set(STRstatus, putn(reason), VAR_READWRITE);
     if (reason && exiterr)
 	exitstat();
     pflush(pp);
@@ -1956,6 +1955,52 @@ okpcntl()
 	stderror(ERR_JOBCTRLSUB);
 }
 
+
+static int
+setttypgrp(wanttty, pgrp)
+    int pgrp, wanttty;
+{
+    /*
+     * If we are piping out a builtin, eg. 'echo | more' things can go
+     * out of sequence, i.e. the more can run before the echo. This
+     * can happen even if we have vfork, since the echo will be forked
+     * with the regular fork. In this case, we need to set the tty
+     * pgrp ourselves. If that happens, then the process will be still
+     * alive. And the tty process group will already be set.
+     * This should fix the famous sequent problem as a side effect:
+     *    The controlling terminal is lost if all processes in the
+     *    terminal process group are zombies. In this case tcgetpgrp()
+     *    returns 0. If this happens we must set the terminal process
+     *    group again.
+     */
+
+    int ntpgrp = tcgetpgrp(FSHTTY);
+    if (wanttty == 0) {
+	if (ntpgrp != pgrp)
+	    wanttty = pgrp;
+    }
+    else {
+	if (ntpgrp == pgrp)
+	    wanttty = 0;
+    }
+    if (wanttty > 0) {
+#ifdef POSIXJOBS
+        /*
+	 * tcsetpgrp will set SIGTTOU to all the the processes in 
+	 * the background according to POSIX... We ignore this here.
+	 */
+	sigret_t (*old)() = sigset(SIGTTOU, SIG_IGN);
+#endif
+	(void) tcsetpgrp(FSHTTY, pgrp);
+# ifdef POSIXJOBS
+	(void) sigset(SIGTTOU, old);
+# endif
+
+    }
+    return wanttty;
+}
+
+
 /*
  * if we don't have vfork(), things can still go in the wrong order
  * resulting in the famous 'Stopped (tty output)'. But some systems
@@ -1972,10 +2017,6 @@ pgetty(wanttty, pgrp)
 # if defined(BSDSIGS) && defined(POSIXJOBS)
     sigmask_t omask = 0;
 # endif /* BSDSIGS && POSIXJOBS */
-
-# ifdef JOBDEBUG
-    xprintf("wanttty %d\n", wanttty);
-# endif
 
 # ifdef POSIXJOBS
     /*
@@ -1994,8 +2035,7 @@ pgetty(wanttty, pgrp)
 # endif /* POSIXJOBS */
 
 # ifndef POSIXJOBS
-    if (wanttty > 0)
-	(void) tcsetpgrp(FSHTTY, pgrp);
+    wanttty = setttypgrp(wanttty, pgrp);
 # endif /* !POSIXJOBS */
 
     /*
@@ -2004,7 +2044,7 @@ pgetty(wanttty, pgrp)
      * background jobs process groups Same for the comparison in the other part
      * of the #ifdef
      */
-    if (wanttty >= 0)
+    if (wanttty >= 0) {
 	if (setpgid(0, pgrp) == -1) {
 # ifdef POSIXJOBS
 	    /* Walking process group fix; see above */
@@ -2014,39 +2054,27 @@ pgetty(wanttty, pgrp)
 		xexit(0);
 # ifdef POSIXJOBS
 	    }
-	    wanttty = 1;  /* Now we really want the tty, since we became the
-			   * the process group leader
-			   */
+	    wanttty = pgrp;  /* Now we really want the tty, since we became the
+			      * the process group leader
+			      */
 # endif /* POSIXJOBS */
 	}
+    }
 
 # ifdef POSIXJOBS
-#  ifdef _SEQUENT_
-    /* The controlling terminal is lost if all processes in the
-     * terminal process group are zombies. In this case tcgetpgrp()
-     * returns 0. If this happens we must set the terminal process
-     * group again.
-     */
-    if (wanttty == 0 && tcgetpgrp(FSHTTY) == 0)
-    	wanttty = 1;
-#  endif /* _SEQUENT_ */
-    if (wanttty > 0) {
-        /*
-	 * tcsetpgrp will set SIGTTOU to all the the processes in 
-	 * the background according to POSIX... We ignore this here.
-	 */
-	sigret_t (*old)() = sigset(SIGTTOU, SIG_IGN);
-	(void) tcsetpgrp(FSHTTY, pgrp);
-	(void) sigset(SIGTTOU, old);
-
+    wanttty = setttypgrp(wanttty, pgrp);
 #  ifdef BSDSIGS
-	(void) sigsetmask(omask);
+    (void) sigsetmask(omask);
 #  else /* BSDSIGS */
-	(void) sigrelse(SIGTSTP);
-	(void) sigrelse(SIGTTIN);
+    (void) sigrelse(SIGTSTP);
+    (void) sigrelse(SIGTTIN);
 #  endif /* !BSDSIGS */
-    }
 # endif /* POSIXJOBS */
+
+# ifdef JOBDEBUG
+    xprintf("pid %d pgrp %d tpgrp %d\n", getpid(), mygetpgrp(),
+	    tcgetpgrp(FSHTTY));
+# endif /* JOBDEBUG */
 
     if (tpgrp > 0)
 	tpgrp = 0;		/* gave tty away */

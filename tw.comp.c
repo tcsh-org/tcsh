@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.comp.c,v 1.21 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.comp.c,v 1.22 1993/03/05 20:14:33 christos Exp christos $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.21 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.22 1993/03/05 20:14:33 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -77,7 +77,7 @@ docomplete(v, t)
 	    tw_pr(vp->vec), xputchar('\n');
     }
     else
-	set1(strip(p), saveblk(v), &completions);
+	set1(strip(p), saveblk(v), &completions, VAR_READWRITE);
 } /* end docomplete */
 
 

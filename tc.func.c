@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.func.c,v 3.37 1992/10/27 16:18:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.func.c,v 3.38 1993/01/08 22:23:12 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.37 1992/10/27 16:18:15 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.38 1993/01/08 22:23:12 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -669,7 +669,7 @@ auto_logout()
     if (editing)
 	(void) Cookedmode();
     (void) close(SHIN);
-    set(STRlogout, Strsave(STRautomatic));
+    set(STRlogout, Strsave(STRautomatic), VAR_READWRITE);
     child = 1;
 #ifdef TESLA
     do_logout = 1;
@@ -1139,8 +1139,8 @@ continue_jobs(cp)
 /* The actual "aliasing" of for backgrounds() is done here
    with the aid of insert_we().   */
 static void
-insert(plist, file_args)
-    struct wordent *plist;
+insert(pl, file_args)
+    struct wordent *pl;
     bool    file_args;
 {
     struct wordent *now, *last;
@@ -1149,13 +1149,13 @@ insert(plist, file_args)
     Char   *pause = STRunderpause;
     int     p_len = Strlen(pause);
 
-    cmd_len = Strlen(plist->word);
+    cmd_len = Strlen(pl->word);
     cmd = (Char *) xcalloc(1, (size_t) ((cmd_len + 1) * sizeof(Char)));
-    (void) Strcpy(cmd, plist->word);
+    (void) Strcpy(cmd, pl->word);
 /* Do insertions at beginning, first replace command word */
 
     if (file_args) {
-	now = plist;
+	now = pl;
 	xfree((ptr_t) now->word);
 	now->word = (Char *) xcalloc(1, (size_t) (5 * sizeof(Char)));
 	(void) Strcpy(now->word, STRecho);
@@ -1163,7 +1163,7 @@ insert(plist, file_args)
 	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
 	now->word = (Char *) xcalloc(1, (size_t) (6 * sizeof(Char)));
 	(void) Strcpy(now->word, STRbackqpwd);
-	insert_we(now, plist);
+	insert_we(now, pl);
 
 	for (last = now; *last->word != '\n' && *last->word != ';';
 	     last = last->next)
@@ -1211,7 +1211,7 @@ insert(plist, file_args)
     else {
 	struct wordent *del;
 
-	now = plist;
+	now = pl;
 	xfree((ptr_t) now->word);
 	now->word = (Char *) xcalloc(1, 
 				     (size_t) ((cmd_len + 2) * sizeof(Char)));
@@ -1221,7 +1221,7 @@ insert(plist, file_args)
 	while ((*cp1++ = *cp2++) != '\0')
 	    continue;
 	for (now = now->next;
-	     *now->word != '\n' && *now->word != ';' && now != plist;) {
+	     *now->word != '\n' && *now->word != ';' && now != pl;) {
 	    now->prev->next = now->next;
 	    now->next->prev = now->prev;
 	    xfree((ptr_t) now->word);
@@ -1463,7 +1463,7 @@ doaliases(v, c)
     v++;
     if (*v == 0) {
 	output_raw = 1;
-	plist(&aliases);
+	plist(&aliases, VAR_ALL);
 	output_raw = 0;
 	return;
     }
@@ -1513,7 +1513,7 @@ doaliases(v, c)
 					    (2 * sizeof(Char **)));
 		    vec[0] = Strsave(lp);
 		    vec[1] = NULL;
-		    setq(strip(line), vec, &aliases);
+		    setq(strip(line), vec, &aliases, VAR_READWRITE);
 		    break;
 		}
 	    }
@@ -1553,12 +1553,12 @@ shlvl(val)
 	    Char    buff[BUFSIZE];
 
 	    Itoa(val, buff);
-	    set(STRshlvl, Strsave(buff));
+	    set(STRshlvl, Strsave(buff), VAR_READWRITE);
 	    tsetenv(STRKSHLVL, buff);
 	}
     }
     else {
-	set(STRshlvl, SAVE("1"));
+	set(STRshlvl, SAVE("1"), VAR_READWRITE);
 	tsetenv(STRKSHLVL, str2short("1"));
     }
 }

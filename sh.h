@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.51 1993/04/07 21:39:23 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.52 1993/04/26 21:13:10 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -206,10 +206,6 @@ typedef int sigret_t;
 #  define CSWTCH _POSIX_VDISABLE	/* So job control works */
 # endif /* SYSVREL > 3 */
 #endif /* POSIX */
-#ifdef DGUX
-#  undef CSWTCH
-#  define CSWTCH _POSIX_VDISABLE	/* So job control works */
-#endif /* DGUX */
 
 #ifdef sonyrisc
 # include <sys/ttold.h>
@@ -266,6 +262,11 @@ extern int setpgrp();
 #  include <sys/ioctl.h>
 # endif
 #endif 
+
+#if (defined(__DGUX__) && defined(POSIX)) || defined(DGUX)
+#undef CSWTCH
+#define CSWTCH _POSIX_VDISABLE
+#endif
 
 #if !defined(FIOCLEX) && defined(SUNOS4)
 # include <sys/filio.h>
@@ -546,6 +547,15 @@ EXTERN int   SHOUT;		/* Shell output */
 EXTERN int   SHDIAG;		/* Diagnostic output... shell errs go here */
 EXTERN int   OLDSTD;		/* Old standard input (def for cmds) */
 
+
+#if SYSVREL == 4 && defined(_UTS)
+/* 
+ * From: fadden@uts.amdahl.com (Andy McFadden)
+ * we need sigsetjmp for UTS4, but not UTS2.1
+ */
+# define SIGSETJMP
+#endif
+
 /*
  * Error control
  *
@@ -556,20 +566,32 @@ EXTERN int   OLDSTD;		/* Old standard input (def for cmds) */
 
 #ifdef NO_STRUCT_ASSIGNMENT
 
-typedef jmp_buf jmp_buf_t;
-
-/* bugfix by Jak Kirman @ Brown U.: remove the (void) cast here, see sh.c */
-# define setexit()  setjmp(reslab)
-# define reset()    longjmp(reslab, 1)
+# ifdef SIGSETJMP
+   typedef sigjmp_buf jmp_buf_t;
+   /* bugfix by Jak Kirman @ Brown U.: remove the (void) cast here, see sh.c */
+#  define setexit()  sigsetjmp(reslab)
+#  define reset()    siglongjmp(reslab, 1)
+# else
+   typedef jmp_buf jmp_buf_t;
+   /* bugfix by Jak Kirman @ Brown U.: remove the (void) cast here, see sh.c */
+#  define setexit()  setjmp(reslab)
+#  define reset()    longjmp(reslab, 1)
+# endif
 # define getexit(a) (void) memmove((ptr_t)(a), (ptr_t)reslab, sizeof(reslab))
 # define resexit(a) (void) memmove((ptr_t)reslab, ((ptr_t)(a)), sizeof(reslab))
 
 #else
 
-typedef struct { jmp_buf j; } jmp_buf_t;
+# ifdef SIGSETJMP
+   typedef struct { sigjmp_buf j; } jmp_buf_t;
+#  define setexit()  sigsetjmp(reslab.j)
+#  define reset()    siglongjmp(reslab.j, 1)
+# else
+   typedef struct { jmp_buf j; } jmp_buf_t;
+#  define setexit()  setjmp(reslab.j)
+#  define reset()    longjmp(reslab.j, 1)
+# endif
 
-# define setexit()  setjmp(reslab.j)
-# define reset()    longjmp(reslab.j, 1)
 # define getexit(a) ((a) = reslab)
 # define resexit(a) (reslab = (a))
 
@@ -826,6 +848,10 @@ EXTERN struct whyle {
 EXTERN struct varent {
     Char  **vec;		/* Array of words which is the value */
     Char   *v_name;		/* Name of variable/alias */
+    int	    v_flags;		/* Flags */
+#define VAR_ALL		-1
+#define VAR_READONLY	1
+#define VAR_READWRITE	2
     struct varent *v_link[3];	/* The links, see below */
     int     v_bal;		/* Balance factor */
 }       shvhed, aliases;

@@ -29,8 +29,8 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\" $Id: tcsh.man,v 3.55 1993/03/05 20:14:33 christos Exp $
-.TH TCSH 1 "20 November 1992" "Cornell 6.03.00"
+.\" $Id: tcsh.man,v 3.56 1993/04/26 21:13:10 christos Exp $
+.TH TCSH 1 "16 May 1993" "Cornell 6.03.06"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -177,6 +177,9 @@ directory is changed.
 .sp
 .ti -4
 34) Enhanced file inquiry operator.
+.sp
+.ti -4
+35) Readonly variables.
 .RE
 .sp
 For a description of standard C-shell features, see the
@@ -3149,6 +3152,32 @@ system call. I.e. if you mount a file system read-only, and test
 -w a file, then the test will succeed in POSIX mode, if the permissions
 of the file allow writing.
 
+.SH READONLY VARIABLES
+.I Tcsh
+allows defining variables as readonly. Such variables cannot be cleared or
+modified. E.g.
+.sp
+.RS +.6i
+> set -r x=(1 2 3)
+.br
+> unset x
+.br
+unset: $x is read-only.
+.br
+> set x=5
+.br
+set: $x is read-only.
+.br
+> set -r x=5
+.br
+set: $x is read-only.
+.br
+> echo $x
+.br
+1 2 3
+.RE
+.sp
+In addition 'set -r' will list only the readonly variables.
 .PP
 .SH ENVIRONMENT
 HPATH -- path to look for command documentation
@@ -3477,7 +3506,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.03.00 (Cornell) 92/11/20.
+This man page documents tcsh 6.03.06 (Cornell) 93/05/16.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
@@ -3529,6 +3558,10 @@ James J Dempsey, BBN, 1988, and Paul Placeway, OSU, 1988
 Re-ported tcsh to A/UX.
 .sp
 .SH "BUGFIXES AND ENHANCEMENTS"
+.sp
+Tim P. Starrin, National Aeronautics and Space Administration, Langley Research Center Operations, 1993
+.br
+Readonly variable additions.
 .sp
 Jeff Fink, 1992
 .br

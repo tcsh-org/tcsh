@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.46 1993/04/26 21:58:37 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.47 1993/04/26 22:00:28 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.46 1993/04/26 21:58:37 christos Exp $")
+RCSID("$Id: sh.c,v 3.47 1993/04/26 22:00:28 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -92,9 +92,7 @@ int do_logout;
 #endif /* TESLA */
 
 
-#ifdef convex
 bool    use_fork = 0;		/* use fork() instead of vfork()? */
-#endif /* convex */
 
 /*
  * Magic pointer values. Used to specify other invalid conditions aside
@@ -208,7 +206,8 @@ main(argc, argv)
     word_chars = STR_WORD_CHARS;
     bslash_quote = 0;		/* PWP: do tcsh-style backslash quoting? */
 
-    set(STRhistory, SAVE("100"));	/* Default history size to 100 */
+    /* Default history size to 100 */
+    set(STRhistory, SAVE("100"), VAR_READWRITE);
 
     tempv = argv;
     ffile = SAVE(tempv[0]);
@@ -261,7 +260,7 @@ main(argc, argv)
     }
     if (loginsh) {
 	(void) time(&chktim);
-	set(STRloginsh, Strsave(STRNULL));
+	set(STRloginsh, Strsave(STRNULL), VAR_READWRITE);
     }
 
     AsciiOnly = 1;
@@ -348,12 +347,12 @@ main(argc, argv)
 	 * utmp, so we keep it too.
 	 */
 	if (strncmp(ttyn, "/dev/", 5) == 0)
-	    set(STRtty, cp = SAVE(ttyn + 5));
+	    set(STRtty, cp = SAVE(ttyn + 5), VAR_READWRITE);
 	else
-	    set(STRtty, cp = SAVE(ttyn));
+	    set(STRtty, cp = SAVE(ttyn), VAR_READWRITE);
     }
     else
-	set(STRtty, cp = SAVE(""));
+	set(STRtty, cp = SAVE(""), VAR_READWRITE);
     /*
      * Initialize the shell variables. ARGV and PROMPT are initialized later.
      * STATUS is also munged in several places. CHILD is munged when
@@ -396,7 +395,8 @@ main(argc, argv)
 		  (cp[3] >= 'p' && cp[3] <= 'u'))) {
 		if (getenv("DISPLAY") == NULL) {
 		    /* NOT on X window shells */
-		    set(STRautologout, Strsave(STRdefautologout));
+		    set(STRautologout, Strsave(STRdefautologout), 
+			VAR_READWRITE);
 		}
 	    }
 	}
@@ -405,7 +405,7 @@ main(argc, argv)
 
     (void) sigset(SIGALRM, alrmcatch);
 
-    set(STRstatus, Strsave(STR0));
+    set(STRstatus, Strsave(STR0), VAR_READWRITE);
     fix_version();		/* publish the shell version */
 
     /*
@@ -415,7 +415,7 @@ main(argc, argv)
     set(STRecho_style, Strsave(STRnone));
 #endif /* ECHO_STYLE == NONE_ECHO */
 #if ECHO_STYLE == BSD_ECHO
-    set(STRecho_style, Strsave(STRbsd));
+    set(STRecho_style, Strsave(STRbsd), VAR_READWRITE);
 #endif /* ECHO_STYLE == BSD_ECHO */
 #if ECHO_STYLE == SYSV_ECHO
     set(STRecho_style, Strsave(STRsysv));
@@ -436,7 +436,7 @@ main(argc, argv)
     if (cp == NULL)
 	fast = 1;		/* No home -> can't read scripts */
     else
-	set(STRhome, cp);
+	set(STRhome, cp, VAR_READWRITE);
     dinit(cp);			/* dinit thinks that HOME == cwd in a login
 				 * shell */
     /*
@@ -457,21 +457,21 @@ main(argc, argv)
 #endif /* apollo */
 
 	Itoa(uid, buff);
-	set(STRuid, Strsave(buff));
+	set(STRuid, Strsave(buff), VAR_READWRITE);
 
 	Itoa(gid, buff);
-	set(STRgid, Strsave(buff));
+	set(STRgid, Strsave(buff), VAR_READWRITE);
 
 	cln = getenv("LOGNAME");
 	cus = getenv("USER");
 	if (cus != NULL)
-	    set(STRuser, quote(SAVE(cus)));
+	    set(STRuser, quote(SAVE(cus)), VAR_READWRITE);
 	else if (cln != NULL)
-	    set(STRuser, quote(SAVE(cln)));
+	    set(STRuser, quote(SAVE(cln)), VAR_READWRITE);
 	else if ((pw = getpwuid(uid)) == NULL)
-	    set(STRuser, SAVE("unknown"));
+	    set(STRuser, SAVE("unknown"), VAR_READWRITE);
 	else
-	    set(STRuser, SAVE(pw->pw_name));
+	    set(STRuser, SAVE(pw->pw_name), VAR_READWRITE);
 	if (cln == NULL)
 	    tsetenv(STRLOGNAME, value(STRuser));
 	if (cus == NULL)
@@ -518,7 +518,7 @@ main(argc, argv)
      * Also don't edit if $TERM == wm, for when we're running under an ATK app.
      */
     if ((tcp = getenv("TERM")) != NULL) {
-	set(STRterm, quote(SAVE(tcp)));
+	set(STRterm, quote(SAVE(tcp)), VAR_READWRITE);
 	editing = (strcmp(tcp, "emacs") != 0 && strcmp(tcp, "wm") != 0);
     }
     else 
@@ -529,20 +529,20 @@ main(argc, argv)
      * need a value.  Making it 'emacs' might be confusing. 
      */
     if (editing)
-	set(STRedit, Strsave(STRNULL));
+	set(STRedit, Strsave(STRNULL), VAR_READWRITE);
 
 
     /*
      * still more mutability: make the complete routine automatically add the
      * suffix of file names...
      */
-    set(STRaddsuffix, Strsave(STRNULL));
+    set(STRaddsuffix, Strsave(STRNULL), VAR_READWRITE);
 
     /*
      * Re-initialize path if set in environment
      */
     if ((tcp = getenv("PATH")) == NULL)
-	set1(STRpath, defaultpath(), &shvhed);
+	set1(STRpath, defaultpath(), &shvhed, VAR_READWRITE);
     else
 	/* Importpath() allocates memory for the path, and the
 	 * returned pointer from SAVE() was discarded, so
@@ -566,10 +566,10 @@ main(argc, argv)
 	    (sh_len = strlen(tcp)) >= 5 &&
 	    strcmp(tcp + (sh_len - 5), "/tcsh") == 0)
 	{
-	    set(STRshell, quote(SAVE(tcp)));
+	    set(STRshell, quote(SAVE(tcp)), VAR_READWRITE);
 	}
 	else
-	    set(STRshell, Strsave(STR_SHELLPATH));
+	    set(STRshell, Strsave(STR_SHELLPATH), VAR_READWRITE);
     }
 
     doldol = putn((int) getpid());	/* For $$ */
@@ -750,7 +750,6 @@ main(argc, argv)
 		setNS(STRecho);	/* NOW! */
 		break;
 
-#ifdef convex
 	    case 'F':		/* Undocumented flag */
 		/*
 		 * This will cause children to be created using fork instead of
@@ -758,7 +757,7 @@ main(argc, argv)
 		 */
 		use_fork = 1;
 		break;
-#endif /* convex */
+
 	    default:		/* Unknown command option */
 		exiterr = 1;
 		stderror(ERR_TCSHUSAGE, tcp-1);
@@ -846,16 +845,17 @@ main(argc, argv)
     /*
      * Save the remaining arguments in argv.
      */
-    setq(STRargv, blk2short(tempv), &shvhed);
+    setq(STRargv, blk2short(tempv), &shvhed, VAR_READWRITE);
 
     /*
      * Set up the prompt.
      */
     if (prompt) {
-	set(STRprompt, Strsave(uid == 0 ? STRsymhash : STRsymarrow));
+	set(STRprompt, Strsave(uid == 0 ? STRsymhash : STRsymarrow),
+	    VAR_READWRITE);
 	/* that's a meta-questionmark */
-	set(STRprompt2, Strsave(STRmquestion));
-	set(STRprompt3, Strsave(STRKCORRECT));
+	set(STRprompt2, Strsave(STRmquestion), VAR_READWRITE);
+	set(STRprompt3, Strsave(STRKCORRECT), VAR_READWRITE);
     }
 
     /*
@@ -1192,7 +1192,7 @@ importpath(cp)
 	    dp++;
 	}
     pv[i] = 0;
-    set1(STRpath, pv, &shvhed);
+    set1(STRpath, pv, &shvhed, VAR_READWRITE);
 }
 
 /*
@@ -1348,7 +1348,7 @@ srcunit(unit, onlyown, hflg, av)
 	struct varent *vp;
 	if ((vp = adrof(STRargv)) != NULL)
 	    goargv = saveblk(vp->vec);
-	setq(STRargv, saveblk(av), &shvhed);
+	setq(STRargv, saveblk(av), &shvhed, VAR_READWRITE);
     }
 
     /*
@@ -1406,7 +1406,7 @@ srcunit(unit, onlyown, hflg, av)
 	    HIST = OHIST;
 	if (av != NULL && *av != NULL && **av != '\0') {
 	    if (goargv)
-		setq(STRargv, goargv, &shvhed);
+		setq(STRargv, goargv, &shvhed, VAR_READWRITE);
 	    else
 		unsetv(STRargv);
 	}
@@ -1440,7 +1440,7 @@ goodbye(v, c)
 	(void) signal(SIGTERM, SIG_IGN);
 	setintr = 0;		/* No interrupts after "logout" */
 	if (!(adrof(STRlogout)))
-	    set(STRlogout, STRnormal);
+	    set(STRlogout, STRnormal, VAR_READWRITE);
 #ifdef _PATH_DOTLOGOUT
 	(void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
 #endif

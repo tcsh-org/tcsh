@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.26 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.27 1993/04/07 21:39:23 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.26 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.27 1993/04/07 21:39:23 christos Exp christos $")
 
 #include "patchlevel.h"
 
@@ -460,7 +460,7 @@ gethosttype()
 
 # ifdef eta10
 #  define _havehosttype_
-   /* Bruce Woodcock <woodcock@mentor.cc.purdue.edu> */
+   /* Bruce Sterling Woodcock <sterling@oldcolo.com> */
    hosttype = "eta10";
 # endif /* eta10 */
 
@@ -618,7 +618,7 @@ fix_version()
 	     REV, VERS, PATCHLEVEL, ORIGIN, DATE, gethosttype(),
 	     SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR,
 	     BYESTR, ALSTR, KANSTR, SMSTR, HBSTR, LOCALSTR);
-    set(STRversion, SAVE(version));
+    set(STRversion, SAVE(version), VAR_READWRITE);
     xsprintf(version, "%d.%.2d.%.2d", REV, VERS, PATCHLEVEL);
-    set(STRtcsh, SAVE(version));
+    set(STRtcsh, SAVE(version), VAR_READWRITE);
 }

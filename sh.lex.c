@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.30 1993/03/05 20:14:33 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.31 1993/04/07 21:39:23 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.30 1993/03/05 20:14:33 christos Exp christos $")
+RCSID("$Id: sh.lex.c,v 3.31 1993/04/07 21:39:23 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -456,6 +456,9 @@ getC1(flag)
 	    }
 	    exclp = 0;
 	    exclnxt = 0;
+	    /* this will throw away the dummy history entries */
+	    savehist(NULL, 0);
+
 	}
 	if (exclnxt) {
 	    exclnxt = exclnxt->next;
@@ -1683,7 +1686,7 @@ again:
 			xprintf("Dumping core...");
 			flush();
 			if (fork() == 0)
-			    (void) kill(0, SIGQUIT);
+			    (void) kill(0, 6);
 			xprintf("ok.\n");
 			flush();
 #endif

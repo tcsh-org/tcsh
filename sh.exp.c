@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.exp.c,v 3.17 1993/04/07 21:39:23 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.exp.c,v 3.18 1993/04/26 21:13:10 christos Exp christos $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.17 1993/04/07 21:39:23 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.18 1993/04/26 21:13:10 christos Exp christos $")
 
 /*
  * C shell
@@ -781,7 +781,7 @@ evalav(v)
     struct command *t;
     register struct wordent *wdp = hp;
 
-    set(STRstatus, Strsave(STR0));
+    set(STRstatus, Strsave(STR0), VAR_READWRITE);
     hp->prev = hp->next = hp;
     hp->word = STRNULL;
     while (*v) {

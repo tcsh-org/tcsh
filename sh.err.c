@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.err.c,v 3.16 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.err.c,v 3.17 1993/03/05 20:14:33 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.16 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.17 1993/03/05 20:14:33 christos Exp $")
 
 /*
  * C Shell
@@ -329,7 +329,11 @@ static char *errorlist[] =
     "\nIncomplete %s: \"%s\"",
 #define ERR_MFLAG	129
     "No operand for -m flag",
-#define ERR_INVALID	130
+#define ERR_ULIMUS	130
+    "Usage: unlimit [-fh] [limits]",
+#define ERR_READONLY	131
+    "$%S is read-only",
+#define ERR_INVALID	132
     "Invalid Error"
 };
 
@@ -471,7 +475,7 @@ stderror(va_alist)
      */
     btoeof();
 
-    set(STRstatus, Strsave(STR1));
+    set(STRstatus, Strsave(STR1), VAR_READWRITE);
 #ifdef BSDJOBS
     if (tpgrp > 0)
 	(void) tcsetpgrp(FSHTTY, tpgrp);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.24 1993/04/07 21:39:23 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.25 1993/04/26 21:13:10 christos Exp christos $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.24 1993/04/07 21:39:23 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.25 1993/04/26 21:13:10 christos Exp christos $")
 
 /*
  * C Shell - directory management
@@ -146,7 +146,7 @@ Char *dp;
     vec[0] = Strsave(dp);
     vec[1] = 0;
     (void) Strcpy(olddir, value(STRcwd));
-    setq(STRcwd, vec, &shvhed);
+    setq(STRcwd, vec, &shvhed, VAR_READWRITE);
     tsetenv(STRPWD, dp);
 }
 
@@ -1191,7 +1191,7 @@ dgetstack()
 	for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev, dbp++) 
 	     *dbp = Strsave(dn->di_name);
 	*dbp = NULL;
-	setq(STRdirstack, dblk, &shvhed);
+	setq(STRdirstack, dblk, &shvhed, VAR_READWRITE);
     }
 }
 

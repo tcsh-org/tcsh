@@ -1,4 +1,21 @@
 V6.04.00, ...
+ 67. 6.03.06 05/16/93
+ 66. Pipeline fixes. This should get rid of the dreaded Stopped tty output
+     message.
+ 65. Michael's fix for history buffer cleanup:
+     > alias foo 'echo \!:1:h'
+     > foo a/b
+     a
+     > ^P [nothing happens]
+ 64. Unsigned long rlimit type for 64 bit machines (alpha)
+ 63. Fixed Imakefile for alpha
+ 62. tilde expansion now obeys $nonomatch
+ 61. readonly veriables. 'set -r x=3' will set x to a very sticky 3...
+ 60. Fixed bug in the new tab'ed completion that interfered with old listing.
+ 59. Fixed entry -> item in tw.parse.c
+ 58. Added -f option to unlimit
+ 57. Define __STDC__ in Imakefile for Irix
+ 56. Static redeclarations in tw.parse.c
  55. 6.03.05 04/26/93
  54. Don't echo history expansion in loops:
      > alias junk 'foreach i (\!:2*) \

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.45 1993/03/05 20:14:33 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.46 1993/04/07 21:39:23 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.45 1993/03/05 20:14:33 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.46 1993/04/07 21:39:23 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -216,7 +216,7 @@ dozip(v, c)
 void
 prvars()
 {
-    plist(&shvhed);
+    plist(&shvhed, VAR_ALL);
 }
 
 /*ARGSUSED*/
@@ -231,7 +231,7 @@ doalias(v, c)
     v++;
     p = *v++;
     if (p == 0)
-	plist(&aliases);
+	plist(&aliases, VAR_ALL);
     else if (*v == 0) {
 	vp = adrof1(strip(p), &aliases);
 	if (vp)
@@ -242,7 +242,7 @@ doalias(v, c)
 	    setname(short2str(p));
 	    stderror(ERR_NAME | ERR_DANGER);
 	}
-	set1(strip(p), saveblk(v), &aliases);
+	set1(strip(p), saveblk(v), &aliases, VAR_READWRITE);
 	tw_cmd_free();
     }
 }
@@ -461,7 +461,7 @@ doexit(v, c)
      */
     v++;
     if (*v) {
-	set(STRstatus, putn(expr(&v)));
+	set(STRstatus, putn(expr(&v)), VAR_READWRITE);
 	if (*v)
 	    stderror(ERR_NAME | ERR_EXPRESSION);
     }
@@ -625,7 +625,7 @@ doagain()
 	dobreak(NULL, NULL);
 	return;
     }
-    set(whyles->w_fename, quote(Strsave(*whyles->w_fe++)));
+    set(whyles->w_fename, quote(Strsave(*whyles->w_fe++)), VAR_READWRITE);
     bseek(&whyles->w_start);
 }
 
@@ -1272,7 +1272,7 @@ dosetenv(v, c)
     }
 
     if (eq(vp, STRKTERM)) {
-	set(STRterm, quote(lp));	/* lp memory used here */
+	set(STRterm, quote(lp), VAR_READWRITE);	/* lp memory used here */
 	GotTermCaps = 0;
 	ed_Init();
 	return;
@@ -1283,7 +1283,7 @@ dosetenv(v, c)
 	 * convert to canonical pathname (possibly resolving symlinks)
 	 */
 	lp = dcanon(lp, lp);
-	set(STRhome, quote(lp));	/* cp memory used here */
+	set(STRhome, quote(lp), VAR_READWRITE);	/* cp memory used here */
 
 	/* fix directory stack for new tilde home */
 	dtilde();
@@ -1291,12 +1291,13 @@ dosetenv(v, c)
     }
 
     if (eq(vp, STRKSHLVL)) {
-	set(STRshlvl, quote(lp));	/* lp memory used here */
+	/* lp memory used here */
+	set(STRshlvl, quote(lp), VAR_READWRITE);
 	return;
     }
 
     if (eq(vp, STRKUSER)) {
-	set(STRuser, quote(lp));	/* lp memory used here */
+	set(STRuser, quote(lp), VAR_READWRITE);	/* lp memory used here */
 	return;
     }
 
@@ -1527,7 +1528,7 @@ doumask(v, c)
 #  if defined(BSD4_4) && !defined(__386BSD__) && !defined(bsdi)
     typedef quad_t RLIM_TYPE;
 #  else
-    typedef int RLIM_TYPE;
+    typedef unsigned long RLIM_TYPE;
 #  endif /* BSD4_4 && !__386BSD__ && !defined(bsdi) */
 # endif /* BSDLIMIT */
 
@@ -1547,6 +1548,18 @@ doumask(v, c)
 #   define RLIM_INFINITY	0x7fffffff
 #  endif /* RLIM_INFINITY */
 # endif /* hpux && BSDLIMIT */
+
+# if SYSVREL > 3 && defined(BSDLIMIT)
+/* In order to use rusage, we included "/usr/ucbinclude/sys/resource.h" in */
+/* sh.h.  However, some SVR4 limits are defined in <sys/resource.h>.  Rather */
+/* than include both and get warnings, we define the extra SVR4 limits here. */
+#  ifndef RLIMIT_VMEM
+#   define RLIMIT_VMEM	6
+#  endif
+#  ifndef RLIMIT_AS
+#   define RLIMIT_AS	RLIMIT_VMEM
+#  endif
+# endif /* SYSVREL > 3 && BSDLIMIT */
 
 struct limits limits[] = 
 {
@@ -1581,6 +1594,10 @@ struct limits limits[] =
 # ifdef RLIMIT_RSS
     { RLIMIT_RSS, 	"memoryuse",	1024,	"kbytes"	},
 # endif /* RLIMIT_RSS */
+
+# ifdef RLIMIT_VMEM
+    { RLIMIT_VMEM, 	"vmemoryuse",	1024,	"kbytes"	},
+# endif /* RLIMIT_VMEM */
 
 # ifdef RLIMIT_NOFILE
     { RLIMIT_NOFILE, 	"descriptors", 1,	""		},
@@ -1853,25 +1870,37 @@ dounlimit(v, c)
     struct command *c;
 {
     register struct limits *lp;
-    int     lerr = 0;
+    int    lerr = 0;
     int    hard = 0;
+    int	   force = 0;
 
-    v++;
-    if (*v && eq(*v, STRmh)) {
-	hard = 1;
-	v++;
+    while (*++v && **v == '-') {
+	Char   *vp = *v;
+	while (*++vp)
+	    switch (*vp) {
+	    case 'f':
+		force = 1;
+		break;
+	    case 'h':
+		hard = 1;
+		break;
+	    default:
+		stderror(ERR_ULIMUS);
+		break;
+	    }
     }
+
     if (*v == 0) {
 	for (lp = limits; lp->limconst >= 0; lp++)
 	    if (setlim(lp, hard, (RLIM_TYPE) RLIM_INFINITY) < 0)
 		lerr++;
-	if (lerr)
+	if (!force && lerr)
 	    stderror(ERR_SILENT);
 	return;
     }
     while (*v) {
 	lp = findlim(*v++);
-	if (setlim(lp, hard, (RLIM_TYPE) RLIM_INFINITY) < 0)
+	if (setlim(lp, hard, (RLIM_TYPE) RLIM_INFINITY) < 0 && !force)
 	    stderror(ERR_SILENT);
     }
 }

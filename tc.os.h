@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.42 1993/02/12 19:02:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.43 1993/03/05 20:14:33 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -205,12 +205,10 @@ struct ucred {
  * From: scott@craycos.com (Scott Bolte)
  */
 #ifdef F_SETFD
-# define close_on_exec(fd, v)	\
-    ((v) ? fcntl((fd), F_SETFD, 1) : fcntl((fd), F_SETFD, 0))
+# define close_on_exec(fd, v) fcntl((fd), F_SETFD, v)
 #else /* !F_SETFD */
 # ifdef FIOCLEX
-# define close_on_exec(fd, v)	\
-    ((v) ? ioctl((fd), FIOCLEX, NULL) : ioctl((fd), FIONCLEX, NULL))
+# define close_on_exec(fd, v) ioctl((fd), ((v) ? FIOCLEX : FIONCLEX), NULL)
 # else /* Nothing */
 # define close_on_exec(fd, v)	/* Nothing */
 # endif /* FIOCLEX */
@@ -446,7 +444,7 @@ struct ucred {
 #ifndef POSIX
 # define mygetpgrp()    getpgrp(0)
 #else /* POSIX */
-# if defined(BSD) || defined(SUNOS4) || defined(IRIS4D)
+# if defined(BSD) || defined(SUNOS4) || defined(IRIS4D) || defined(DGUX)
 #  define mygetpgrp()    getpgrp(0)
 # else /* BSD || SUNOS4 || IRIS4D */
 #  define mygetpgrp()    getpgrp()
@@ -521,13 +519,11 @@ extern int gethostname();
 extern int sigvec();
 extern int sigpause();
 #  else	/* _AIX370 || MACH || NeXT || _AIXPS2 || ardent */
-#   if !defined(apollo) || !defined(__STDC__)
-#    ifndef fps500
+#   if (!defined(apollo) || !defined(__STDC__)) && !defined(__DGUX__) && !defined(fps500)
 extern sigret_t sigvec();
 extern void sigpause();
-#    endif /* fps500 */
-#   endif /* !apollo || !__STDC__ */
-#  endif /* _AIX370 || MACH || NeXT || _AIXPS2 */
+#   endif /* (!apollo || !__STDC__) && !__DGUX__ && !fps500 */
+#  endif /* _AIX370 || MACH || NeXT || _AIXPS2 || ardent */
 extern sigmask_t sigblock();
 extern sigmask_t sigsetmask();
 # endif	/* BSDSIGS */
