@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.6 1992/03/28 00:20:04 christos Exp $
+# $Id: complete.tcsh,v 1.10 1992/05/15 22:53:51 christos Exp $
 # example file using the new completion code
 #
 
@@ -18,7 +18,9 @@ endif
 
 if ($?complete) then
     set noglob
-    set hosts=(hyperion phaeton guillemin theory.tc vangogh.cs.berkeley.edu)
+    set hosts=(hyperion.ee.cornell.edu phaeton.ee.cornell.edu \
+	       guillemin.ee.cornell.edu theory.tc.cornell.edu \
+	       vangogh.cs.berkeley.edu)
 
     complete rsh	n/*/\$hosts/	# argument from list in $hosts
     complete ywho  	n/*/\$hosts/
@@ -57,6 +59,8 @@ if ($?complete) then
     complete latex 	n/*/f:*.tex/
     complete tex 	n/*/f:*.tex/
     complete rlogin 	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/ 
+    complete telnet 	n/*/\$hosts/ 
+    complete su		c/-/"(f)"/ n/*/u/
     complete xrsh   	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/ 
     complete cc 	c/-I/d/ c/-L/d/ c/-/"(o l c g L I D U)"/ \
 			n/*/f:*.[coa]/
@@ -100,11 +104,12 @@ if ($?complete) then
 		 	n/*/f:*.{c,C,cc,o,a}/
     complete g++ 	n/*/f:*.{C,cc,o}/
     complete CC 	n/*/f:*.{C,cc,o}/
-    complete rm 	n/*/f:^*.{c,cc,C,h}/	# Protect precious files
+    complete rm 	n/*/f:^*.{c,cc,C,h,in}/	# Protect precious files
     complete vi 	n/*/f:^*.o/
     complete bindkey    N/-a/b/ N/-c/c/ n/-[ascr]/'x:<key-sequence>'/ \
-			n/-[svedl]/n/ c/-[vedl]/n/ c/-/"(a s c v e d l r)"/ \
-			p/2-/b/ p/1/'x:<key-sequence or option>'/
+			n/-[svedl]/n/ c/-[vedl]/n/ c/-/"(a s k c v e d l r)"/ \
+			n/-k/"(left right up down)"/ p/2-/b/ \
+			p/1/'x:<key-sequence or option>'/
 
     complete find 	n/-fstype/"(nfs 4.2)"/ n/-name/f/ \
 		  	n/-type/"(c b d f p l s)"/ n/-user/u/ n/-exec/c/ \
@@ -162,6 +167,9 @@ if ($?complete) then
 			c@+@\`/bin/ls\ -1\ ~/Mail\`@ n/-f/f/ n/*/u/
     complete ar c/[dmpqrtx]/"(c l o u v a b i)"/ p/1/"(d m p q r t x)"// \
 		p/2/f:*.a/ p/*/f:*.o/
+
+    complete {refile,sprev,snext,scan,pick,rmm,inc,folder,show} \
+		c@+@p:$HOME/Mail/@
 
     unset noglob
     unset complete
