@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.26 1993/02/12 17:22:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.27 1993/05/17 00:11:09 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.26 1993/02/12 17:22:20 christos Exp christos $")
+RCSID("$Id: sh.sem.c,v 3.27 1993/05/17 00:11:09 christos Exp $")
 
 #include "tc.h"
 
@@ -131,7 +131,7 @@ execute(t, wanttty, pipein, pipeout)
      * Don't check for wantty > 0...
      */
     if (t->t_dflg & F_AMPERSAND)
-	_gv.wanttty = -1;
+	_gv.wanttty = 0;
     switch (t->t_dtyp) {
 
     case NODE_COMMAND:
@@ -617,8 +617,6 @@ execute(t, wanttty, pipein, pipeout)
 	execute(t->t_dcdr, _gv.wanttty, pv, pipeout);
 	t->t_dcar->t_dflg |= F_PIPEOUT |
 	    (t->t_dflg & (F_PIPEIN | F_AMPERSAND | F_STDERR | F_NOINTERRUPT));
-	if (_gv.wanttty > 0)
-	    _gv.wanttty = 0;	/* got tty already */
 	execute(t->t_dcar, _gv.wanttty, pipein, pv);
 #else /* !BACKPIPE */
 	t->t_dcar->t_dflg |= F_PIPEOUT |
@@ -626,8 +624,6 @@ execute(t, wanttty, pipein, pipeout)
 	execute(t->t_dcar, _gv.wanttty, pipein, pv);
 	t->t_dcdr->t_dflg |= F_PIPEIN | (t->t_dflg &
 			(F_PIPEOUT | F_AMPERSAND | F_NOFORK | F_NOINTERRUPT));
-	if (_gv.wanttty > 0)
-	    _gv.wanttty = 0;	/* got tty already */
 	execute(t->t_dcdr, _gv.wanttty, pv, pipeout);
 #endif /* BACKPIPE */
 	break;

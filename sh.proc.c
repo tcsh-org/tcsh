@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.43 1993/04/26 21:13:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.44 1993/05/17 00:11:09 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.43 1993/04/26 21:13:10 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.44 1993/05/17 00:11:09 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -118,7 +118,7 @@ static	void		 pads		__P((Char *));
 static	void		 pkill		__P((Char **, int));
 static	struct process	*pgetcurr	__P((struct process *));
 static	void		 okpcntl	__P((void));
-static	int		 setttypgrp	__P((int, int));
+static	void		 setttypgrp	__P((int));
 
 /*
  * pchild - called at interrupt level by the SIGCHLD signal
@@ -1956,9 +1956,9 @@ okpcntl()
 }
 
 
-static int
-setttypgrp(wanttty, pgrp)
-    int pgrp, wanttty;
+static void
+setttypgrp(pgrp)
+    int pgrp;
 {
     /*
      * If we are piping out a builtin, eg. 'echo | more' things can go
@@ -1973,17 +1973,7 @@ setttypgrp(wanttty, pgrp)
      *    returns 0. If this happens we must set the terminal process
      *    group again.
      */
-
-    int ntpgrp = tcgetpgrp(FSHTTY);
-    if (wanttty == 0) {
-	if (ntpgrp != pgrp)
-	    wanttty = pgrp;
-    }
-    else {
-	if (ntpgrp == pgrp)
-	    wanttty = 0;
-    }
-    if (wanttty > 0) {
+    if (tcgetpgrp(FSHTTY) != pgrp) {
 #ifdef POSIXJOBS
         /*
 	 * tcsetpgrp will set SIGTTOU to all the the processes in 
@@ -1997,7 +1987,6 @@ setttypgrp(wanttty, pgrp)
 # endif
 
     }
-    return wanttty;
 }
 
 
@@ -2035,7 +2024,8 @@ pgetty(wanttty, pgrp)
 # endif /* POSIXJOBS */
 
 # ifndef POSIXJOBS
-    wanttty = setttypgrp(wanttty, pgrp);
+    if (wanttty > 0)
+	setttypgrp(pgrp);
 # endif /* !POSIXJOBS */
 
     /*
@@ -2062,7 +2052,8 @@ pgetty(wanttty, pgrp)
     }
 
 # ifdef POSIXJOBS
-    wanttty = setttypgrp(wanttty, pgrp);
+    if (wanttty > 0)
+	setttypgrp(pgrp);
 #  ifdef BSDSIGS
     (void) sigsetmask(omask);
 #  else /* BSDSIGS */
