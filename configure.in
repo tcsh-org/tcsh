@@ -256,6 +256,7 @@ fi
 
 dnl Checks for libraries
 AC_SEARCH_LIBS(crypt, crypt)
+AC_SEARCH_LIBS(getspnam, sec)
 AC_SEARCH_LIBS(tgetent, termlib curses ncurses termcap)
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(connect, socket)
@@ -264,7 +265,7 @@ AC_SEARCH_LIBS([iconv], [iconv], [AC_DEFINE([HAVE_ICONV], [1],
 
 dnl Checks for header files
 AC_CHECK_HEADERS([auth.h inttypes.h shadow.h stdint.h])
-AC_CHECK_HEADERS([utmpx.h utmp.h], [break])
+AC_CHECK_HEADERS([utmpx.h utmp.h])
 AC_CHECK_HEADERS([wchar.h],
 	[AC_CHECK_SIZEOF([wchar_t], [], [dnl
 #include <stdio.h>
