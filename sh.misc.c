@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.misc.c,v 3.9 1992/01/29 05:23:23 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.misc.c,v 3.10 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.9 1992/01/29 05:23:23 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.10 1992/03/21 02:46:07 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -454,7 +454,7 @@ prefix(sub, str)
 	    return (1);
 	if (*str == 0)
 	    return (0);
-	if (*sub++ != *str++)
+	if ((*sub++ & TRIM) != (*str++ & TRIM))
 	    return (0);
     }
 }
