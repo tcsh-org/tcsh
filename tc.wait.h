@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.wait.h,v 3.11 2000/11/11 23:03:39 christos Exp $ */
+/* $Header: /u/christos/src/tcsh/tc.wait.h,v 1.1 2002/05/30 15:21:17 christos Exp $ */
 /*
  * tc.wait.h: <sys/wait.h> for machines that don't have it or have it and
  *	      is incorrect.
@@ -94,7 +94,7 @@ union wait {
 #  define w_stopval     w_S.w_Stopval
 #  define w_stopsig     w_S.w_Stopsig
 # else /* _SEQUENT_ */
-#  if defined(vax) || defined(i386) || defined(_I386)
+#  if defined(vax) || defined(__vax__) || defined(i386) || defined(_I386) || defined(__i386__)
     union {
 	struct {
 	    unsigned int w_Termsig:7;
@@ -127,7 +127,7 @@ union wait {
 	    unsigned int w_Stopval:8;
 	}       w_S;
     }       w_P;
-#  endif /* vax || i386 || _I386 */
+#  endif /* vax || __vax__ || i386 || _I386 || __i386__ */
 };
 
 #  define w_termsig	w_P.w_T.w_Termsig
