@@ -208,6 +208,9 @@ see the \fBversion\fR shell variable. (+)
 Non-login shells read only \fI/etc/csh.cshrc\fR and \fI~/.tcshrc\fR
 or \fI~/.cshrc\fR on startup.
 .PP
+For examples of startup files, please consult
+\fIhttp://tcshrc.sourceforge.net\fR.
+.PP
 Commands like \fIstty\fR(1) and \fItset\fR(1),
 which need be run only once per login, usually go in one's \fI~/.login\fR file.
 Users who need to use the same set of files with both \fIcsh\fR(1) and
