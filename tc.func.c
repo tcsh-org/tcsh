@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.14 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.15 1991/11/17 05:59:05 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.14 1991/11/17 05:39:06 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.15 1991/11/17 05:59:05 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -533,7 +533,6 @@ auto_lock()
 	return;
 
     setalarm(0);		/* Not for locking any more */
-    (void) sigset(SIGALRM, alrmcatch);
 #ifdef BSDSIGS
     (void) sigsetmask(sigblock(0) & ~(sigmask(SIGALRM)));
 #else /* !BSDSIGS */
@@ -765,7 +764,6 @@ aliasrun(cnt, s1, s2)
     struct wordent w, *new1, *new2;	/* for holding alias name */
     struct command *t = NULL;
     jmp_buf osetexit;
-    flush();
 
     getexit(osetexit);
     if (seterr) {
