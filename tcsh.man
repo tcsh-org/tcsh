@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.34 1992/03/21 22:34:18 christos Exp $
+.\" $Id: tcsh.man,v 3.35 1992/03/27 01:59:46 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -2639,6 +2639,7 @@ in tcsh. For example some commands like
 .I popd 
 .I mkdir(1)
 .I rmdir(1)
+accept only directories as arguments.
 Normally
 .I tcsh 
 when asked to list or complete an argument for those commands takes
@@ -2759,14 +2760,16 @@ v	Complete any variable
 u	Complete username
 $var	Complete using words from variable
 (...)	Complete using words from list
+`...`	Complete evaluating word list from the output of command.
 .fi
 .RE
 .DT
 .sp
 All the above completion actions, except 
-.I $var
-and
+.I $var,
 .I (...)
+and
+.i `...`
 can have an additional shell pattern which must match the files to be
 completed.
 For example, in the C compiler, it makes sense to complete only files
@@ -2795,7 +2798,6 @@ A better way to do this is to use the
 builtin to protect precious files:
 .sp
 .nf
-> set fignore=(.o)
 > complete rm 'n/*/f:^*.{c,h,cc,C,tex,1,man,l,y}/'
 > ls
 foo.c foo.o
@@ -2805,21 +2807,32 @@ foo.c foo.o
 > rm foo.o
 .fi
 .sp
+Note that 
+.I fignore 
+is not used when a shell pattern is specified in a completion action.
 .PP
 Other commands don't expect files as arguments, so the completion builtin
 can be used to change the list of items to be completed:
 .sp
+.RS +.6i
+.ta 0.5i 1.0i 1.5i 2.0i 2.5i
 .nf
 > complete man 			'n/*/c/'		# complete commands 
 > complete which		'n/*/c/'	
-> complete dbx 			'n/*/c/' 'p/2/(core)/'
+> complete dbx 			'p/2/(core)/' 'n/*/c/'
 > complete alias 		'p/1/a/'		# complete aliases
 > complete set 			'p/1/s/			# complete variables
 > complete finger 		'p/1/u/'		# complete user-names
 .fi
 .sp
+Note that in the 
+.I dbx
+example, the positional completion is specified before the next word 
+completion. Since completions are evaluated from left to right, if
+the next word completion was specified first, it would always match
+and the positional completion would never be executed.
 .pp
-In some cases, the list needs to be customized:
+In some cases, the list needs to be customized or dynamically generated.
 .sp
 .nf
 > set hostnames=(prep.ai.mit.edu tesla.ee.cornell.edu)
@@ -2893,10 +2906,28 @@ For example:
 .sp
 .nf
 > complete rcp 'p/1/$hosts/:' 'c/*:/f/'
-> finger 'p/1/u/@' 'c/*:/f/'
+> finger 'p/1/u/@' 'c/*@/$hosts/'
 .fi
 .sp
-completes from $hosts appending a `:' and then begins expanding files.
+completes from $hosts appending a `:' and then begins expanding files, 
+where finger expands user-names appending an `@' and then begins expanding
+hosts.
+.PP
+Another exotic example that makes use of dynamic command execution is:
+.sp
+.nf
+> complete talk 'p/1/`users | tr " " "\012" | uniq`/' \
+	        'n/*/`who | grep $:1 | cut -d" " -f2`/'
+.fi
+.sp
+Here we want to get a list of the active users, as an argument to talk,
+then we want to pick the user, and find his tty...
+Note that there is no quoting performed inside the completion patterns.
+If the character '/' is used in the matched pattern, then another
+punctuation character can be used as a separator. The only pattern
+recognized is
+.B $:<number>
+which is substituted by the n'th word of the current line.
 .PP
 Notes:
 .TP 
@@ -2906,11 +2937,6 @@ parsing mechanism determines that the completion is a login name,
 or a variable.
 .TP
 2.
-Note that there is no quoting performed inside the completion patterns.
-If the character '/' is used in the matched pattern, then another
-punctuation character can be used as a separator.
-.TP 
-3.
 This is an experimental feature and the syntax/behavior may change in
 future versions.
 .sp
