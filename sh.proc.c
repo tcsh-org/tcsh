@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.proc.c,v 1.3 91/07/14 20:13:06 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.5 1991/07/18 18:45:58 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.proc.c,v 3.5 1991/07/18 18:45:58 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -65,11 +65,7 @@ RCSID("$Id$")
 #  endif /* OREO || IRIS4D || POSIX */
 # endif	/* hpux */
 #else /* SVID == 0 */
-# ifndef _IBMR2 /* IBM RS/6000 headers are broken */
-#  include <sys/wait.h>
-# else
-#  include "tc.wait.h"
-# endif
+# include <sys/wait.h>
 #endif /* SVID == 0 */
 
 #if !defined(NSIG) && defined(SIGMAX)
