@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.func.c,v 3.32 1992/07/11 00:51:25 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.func.c,v 3.33 1992/07/18 01:34:46 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.32 1992/07/11 00:51:25 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.33 1992/07/18 01:34:46 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1580,3 +1580,96 @@ fixio(fd, e)
 	return -1;
     }
 }
+
+/* collate():
+ *	String collation
+ */
+int
+collate(a, b)
+    const Char *a;
+    const Char *b;
+{
+    int rv;
+    /* This actually strips the quote bit */
+    char *sa = strsave(short2str(a));
+    char *sb = strsave(short2str(b));
+
+#if defined(NLS) && !defined(NOSTRCOLL)
+    errno = 0;	/* strcoll sets errno, another brain-damage */
+
+    rv = strcoll(sa, sb);
+
+    if (errno != 0) {
+	xfree((ptr_t) sa);
+	xfree((ptr_t) sb);
+	stderror(ERR_SYSTEM, "strcoll", strerror(errno));
+    }
+#else
+    rv = strcmp(sa, sb);
+#endif /* NLS && !NOSTRCOLL */
+
+    xfree((ptr_t) sa);
+    xfree((ptr_t) sb);
+
+    return rv;
+}
+
+#ifdef HASHBANG
+/*
+ * From: peter@zeus.dialix.oz.au (Peter Wemm)
+ * If exec() fails look first for a #! [word] [word] ....
+ * If it is, splice the header into the argument list and retry.
+ */
+#define HACKBUFSZ 1024		/* Max chars in #! vector */
+#define HACKVECSZ 128		/* Max words in #! vector */
+int
+hashbang(fd, vp)
+    int fd;
+    Char ***vp;
+{
+    unsigned char lbuf[HACKBUFSZ];
+    char *sargv[HACKVECSZ];
+    unsigned char *p, *ws;
+    int sargc = 0;
+
+    if (read(fd, (char *) lbuf, HACKBUFSZ) <= 0)
+	return -1;
+
+    ws = 0;	/* word started = 0 */
+
+    for (p = lbuf; p < &lbuf[HACKBUFSZ]; )
+	switch (*p) {
+	case ' ':
+	case '\t':
+	    if (ws) {	/* a blank after a word.. save it */
+		*p = '\0';
+		sargv[sargc++] = ws;
+		ws = NULL;
+	    }
+	    p++;
+	    continue;
+
+	case '\0':	/* Whoa!! what the hell happened */
+	    return -1;
+
+	case '\n':	/* The end of the line. */
+	    if (ws) {	/* terminate the last word */
+		*p = '\0';
+		sargv[sargc++] = ws;
+		sargv[sargc] = NULL;
+		ws = NULL;
+		*vp = blk2short(sargv);
+		return 0;
+	    }
+	    else
+		return -1;
+
+	default:
+	    if (!ws)	/* Start a new word? */
+		ws = p; 
+	    p++;
+	    break;
+	}
+    return -1;
+}
+#endif /* HASHBANG */

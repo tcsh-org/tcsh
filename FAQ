@@ -1,5 +1,5 @@
 
-Last Updated: Mon Jan  6 17:34:17 EST 1992
+Last Updated: Wed Jul 29 01:34:54 EDT 1992
 
 This is for people that do not read the manual!
 
@@ -120,6 +120,18 @@ be able to get it... :-)
     Make sure that the interrupt character is set to ^C and suspend
     is set to ^Z; 'stty -a' will show you the current stty settings;
     'stty intr ^C susp ^Z' will set them to ^C and ^Z respectively.
+
+13. I am trying to compile tcsh and I am getting compile errors that
+    look like:
+
+    >sh.c:???: `STR???' undeclared, outside of functions [gcc]
+    or
+    >"sh.c", line ???: STR??? undefined [cc]
+
+    You interrupted make, while it was making the automatically
+    generated headers. Type 'make clean; make'
+
+
 
 
 

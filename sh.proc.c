@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.31 1992/07/23 14:42:29 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.32 1992/07/23 15:02:06 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.31 1992/07/23 14:42:29 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.32 1992/07/23 15:02:06 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -299,8 +299,6 @@ found:
     if (WIFSTOPPED(w)) {
 	pp->p_flags |= PSTOPPED;
 	pp->p_reason = WSTOPSIG(w);
-	if (forepid == pp->p_procid)
-	    forepid = 0;
     }
     else {
 	if (pp->p_flags & (PTIME | PPTIME) || adrof(STRtime))
@@ -339,7 +337,7 @@ found:
 	    else
 		pp->p_flags |= PNEXITED;
 	}
-	if (forepid == pp->p_procid)
+	if (forepid == pp->p_jobid)
 	    forepid = 0;
     }
     jobflags = 0;
@@ -1534,14 +1532,12 @@ pkill(v, signum)
 		    err1++;
 		    goto cont;
 		}
-		forepid = 0;
 		break;
 		/*
 		 * suspend a process, kill -CONT %, then type jobs; the shell
 		 * says it is suspended, but it is running; thanks jaap..
 		 */
 	    case SIGCONT:
-		forepid = pp->p_jobid;
 		pstart(pp, 0);
 		goto cont;
 	    default:
@@ -1622,8 +1618,10 @@ pstart(pp, foregnd)
 	pclrcurr(pp);
     (void) pprint(pp, foregnd ? NAME | JOBDIR : NUMBER | NAME | AMPERSAND);
 #ifdef BSDJOBS
-    if (foregnd)
+    if (foregnd) {
 	(void) tcsetpgrp(FSHTTY, pp->p_jobid);
+	forepid = pp->p_jobid;
+    }
     if (jobflags & PSTOPPED)
 	(void) killpg(pp->p_jobid, SIGCONT);
 #endif /* BSDJOBS */
@@ -1988,6 +1986,15 @@ pgetty(wanttty, pgrp)
 	}
 
 # ifdef POSIXJOBS
+#  ifdef _SEQUENT_
+    /* The controlling terminal is lost if all processes in the
+     * terminal process group are zombies. In this case tcgetpgrp()
+     * returns 0. If this happens we must set the terminal process
+     * group again.
+     */
+    if (wanttty == 0 && tcgetpgrp(FSHTTY) == 0)
+    	wanttty = 1;
+#  endif /* _SEQUENT_ */
     if (wanttty > 0) {
         /*
 	 * tcsetpgrp will set SIGTTOU to all the the processes in 
@@ -2008,5 +2015,7 @@ pgetty(wanttty, pgrp)
 
     if (tpgrp > 0)
 	tpgrp = 0;		/* gave tty away */
+    if (wanttty > 0)
+	forepid = pgrp;
 #endif /* BSDJOBS */
 }

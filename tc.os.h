@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.32 1992/07/18 01:34:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.33 1992/07/23 14:42:29 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -39,13 +39,14 @@
 
 #define NEEDstrerror		/* Too hard to find which systems have it */
 
-#if SYSVREL > 3 || defined(linux)
+#ifdef notdef 
 /*
- * for SVR4 we fork pipelines backwards. 
+ * for SVR4 and linux we used to fork pipelines backwards. 
+ * This should not be needed any more.
  * more info in sh.sem.c
  */
 # define BACKPIPE
-#endif /* SYSVREL > 3 || linux */
+#endif /* notdef */
 
 #ifndef NOFILE
 # ifdef OPEN_MAX
@@ -239,6 +240,15 @@ struct ucred {
 # define S_IXUSR S_IEXEC
 #endif /* S_IXUSR */
 
+#ifndef S_ISUID
+# define S_ISUID 0004000 	/* setuid */
+#endif /* S_ISUID */
+#ifndef S_ISGID	
+# define S_ISGID 0002000	/* setgid */
+#endif /* S_ISGID */
+#ifndef S_ISVTX
+# define S_ISVTX 0001000	/* sticky */
+#endif /* S_ISVTX */
 /*
  * Access()
  */
@@ -531,12 +541,12 @@ extern int ioctl __P((int, int, ...));
 extern int readlink __P((const char *, char *, size_t));
 # endif /* SUNOS4 && __GNUC__ == 2 */
 
-#if defined(BSD) || defined(SUNOS4)
+#if (defined(BSD) && !defined(__386BSD__))  || defined(SUNOS4) 
 extern void bcopy	__P((char *, char *, int));
 # define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
 #endif
 
-#if !defined(hpux) && (SYSVREL < 4) && !defined(memmove)
+#if !defined(hpux) && (SYSVREL < 4) && !defined(__386BSD__) && !defined(memmove)
 # define NEEDmemmove
 #endif
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exec.c,v 3.16 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exec.c,v 3.17 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.16 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.17 1992/06/16 20:46:26 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -338,10 +338,10 @@ texec(sf, st)
     register char **t;
     register char *f;
     register struct varent *v;
-    register Char **vp;
+    Char  **vp;
     Char   *lastsh[2];
+    char    pref[2];
     int     fd;
-    unsigned char c;
     Char   *st0, **ost;
 
     /* The order for the conversions is significant */
@@ -376,8 +376,8 @@ texec(sf, st)
 	 * it, don't feed it to the shell if it looks like a binary!
 	 */
 	if ((fd = open(f, O_RDONLY)) != -1) {
-	    if (read(fd, (char *) &c, 1) == 1) {
-		if (!Isprint(c) && (c != '\n' && c != '\t')) {
+	    if (read(fd, (char *) pref, 2) == 2) {
+		if (!Isprint(pref[0]) && (pref[0] != '\n' && pref[0] != '\t')) {
 		    (void) close(fd);
 		    /*
 		     * We *know* what ENOEXEC means.
@@ -386,32 +386,44 @@ texec(sf, st)
 		}
 	    }
 #ifdef _PATH_BSHELL
-	    else
-		c = '#';
+	    else {
+		pref[0] = '#';
+		pref[1] = '\0';
+	    }
 #endif
-	    (void) close(fd);
 	}
+#ifdef HASHBANG
+	if (fd == -1 ||
+	    pref[0] != '#' || pref[1] != '!' || hashbang(fd, &vp) == -1) {
+#endif /* HASHBANG */
 	/*
 	 * If there is an alias for shell, then put the words of the alias in
 	 * front of the argument list replacing the command name. Note no
 	 * interpretation of the words at this point.
 	 */
-	v = adrof1(STRshell, &aliases);
-	if (v == 0) {
-	    vp = lastsh;
-	    vp[0] = adrof(STRshell) ? value(STRshell) : STR_SHELLPATH;
-	    vp[1] = NULL;
+	    v = adrof1(STRshell, &aliases);
+	    if (v == 0) {
+		vp = lastsh;
+		vp[0] = adrof(STRshell) ? value(STRshell) : STR_SHELLPATH;
+		vp[1] = NULL;
 #ifdef _PATH_BSHELL
-	    if (fd != -1 
+		if (fd != -1 
 # ifndef ISC	/* Compatible with ISC's /bin/csh */
-		&& c != '#'
+		    && pref[0] != '#'
 # endif /* ISC */
-		)
-		vp[0] = STR_BSHELL;
+		    )
+		    vp[0] = STR_BSHELL;
 #endif
+		vp = saveblk(vp);
+	    }
+	    else
+		vp = saveblk(v->vec);
+#ifdef HASHBANG
 	}
-	else
-	    vp = v->vec;
+#endif /* HASHBANG */
+	if (fd != -1)
+	    (void) close(fd);
+
 	st0 = st[0];
 	st[0] = sf;
 	ost = st;
@@ -422,6 +434,7 @@ texec(sf, st)
 	t = short2blk(st);
 	f = short2str(sf);
 	xfree((ptr_t) st);
+	blkfree((Char **) vp);
 #ifdef VFORK
 	Vt = t;
 #endif

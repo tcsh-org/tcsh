@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.22 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.23 1992/07/23 14:42:29 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.22 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.23 1992/07/23 14:42:29 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -350,6 +350,14 @@ dosetspath(v, c)
     sitepath_t p[MAXSITE];
     struct sf *st;
 
+    /*
+     * sfname() on AIX G9.9 at least, mallocs too pointers p, q
+     * then does the equivalent of while (*p++ == *q++) continue;
+     * and then tries to free(p,q) them! Congrats to the wizard who
+     * wrote that one. I bet he tested it really well too.
+     * Sooo, we set dont_free :-)
+     */
+    dont_free = 1;
     for (i = 0, v++; *v && *v[0] != '\0'; v++, i++) {
 	s = short2str(*v);
 	if (Isdigit(*s))
@@ -371,6 +379,7 @@ dosetspath(v, c)
     }
     if (setspath(p, i) == -1)
 	stderror(ERR_SYSTEM, "setspath", strerror(errno));
+    dont_free = 0;
 }
 
 /* sitename():
@@ -452,10 +461,15 @@ domigrate(v, c)
 	 * Do the -site.
 	 */
 	s = short2str(&v[0][1]);
+	/*
+	 * see comment in setspath()
+	 */
+	dont_free = 1;
 	if ((st = sfname(s)) == NULL) {
 	    setname(s);
 	    stderror(ERR_NAME | ERR_STRING, "Site not found");
 	}
+	dont_free = 0;
 	new_site = st->sf_id;
 	++v;
     }
@@ -735,6 +749,38 @@ fix_yp_bugs()
 
 #endif /* YPBUGS */
 
+#ifdef STRCOLLBUG
+void
+fix_strcoll_bug()
+{
+#if defined(NLS) && !defined(NOSTRCOLL)
+    /*
+     * SunOS4 checks the file descriptor from openlocale() for <= 0
+     * instead of == -1. Someone should tell sun that file descriptor 0
+     * is valid! Our portable hack: open one so we call it with 0 used...
+     * We have to call this routine every time the locale changes...
+     *
+     * Of course it also tries to free the constant locale "C" it initially
+     * had allocated, with the sequence 
+     * > setenv LANG "fr"
+     * > ls^D
+     * > unsetenv LANG
+     * But we are smarter than that and just print a warning message.
+     */
+    int fd = -1;
+    static char *root = "/";
+
+    if (!didfds)
+	fd = open(root, O_RDONLY);
+
+    (void) strcoll(root, root);
+
+    if (fd != -1)
+	(void) close(fd);
+#endif
+}
+#endif /* STRCOLLBUG */
+
 
 void
 osinit()
@@ -953,7 +999,7 @@ xgetwd(pathname)
 
     struct stat st_root, st_cur, st_next, st_dotdot;
     char    pathbuf[MAXPATHLEN], nextpathbuf[MAXPATHLEN * 2];
-    char   *pathptr, *nextpathptr, cur_name_add;
+    char   *pathptr, *nextpathptr, *cur_name_add;
 
     /* find the inode of root */
     if (stat("/", &st_root) == -1) {

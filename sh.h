@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.38 1992/07/18 01:34:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.39 1992/07/23 14:42:29 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -954,6 +954,8 @@ EXTERN Char   *STR_BSHELL;
 #endif 
 EXTERN Char   *STR_WORD_CHARS;
 EXTERN Char  **STR_environ;
+
+extern int     dont_free;	/* Tell free that we are in danger if we free */
 
 #include "tc.h"
 #include "sh.decls.h"

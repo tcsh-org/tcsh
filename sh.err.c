@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.err.c,v 3.10 1992/05/11 14:23:58 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.err.c,v 3.11 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.10 1992/05/11 14:23:58 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.11 1992/06/16 20:46:26 christos Exp $")
 
 /*
  * C Shell
@@ -407,6 +407,11 @@ stderror(va_alist)
     va_start(va);
     id = va_arg(va, unsigned int);
 #endif
+
+    /*
+     * Reset don't free flag for buggy os's
+     */
+    dont_free = 0;
 
     flags = id & ERR_FLAGS;
     id &= ~ERR_FLAGS;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dir.c,v 3.15 1992/05/02 23:39:58 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dir.c,v 3.16 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.15 1992/05/02 23:39:58 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.16 1992/06/16 20:46:26 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -364,8 +364,9 @@ dnormalize(cp, exp)
 		    if (*cp)
 		        cp++;
 	        }
-	        else 
-	   	    *dp++ = *cp++;
+	        else /* skip to the next path component */
+		    while (*cp != '/' && *cp != '\0')
+			*dp++ = *cp++;
 
 	    *dp = '\0';
 	    while (dotdot > 0) 

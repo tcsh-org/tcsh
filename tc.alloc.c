@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.alloc.c,v 3.13 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.alloc.c,v 3.14 1992/07/06 15:26:18 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.13 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.14 1992/07/06 15:26:18 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -54,6 +54,13 @@ static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
 #undef RCHECK
 #undef DEBUG
 
+/*
+ * Lots of os routines are busted and try to free invalid pointers. 
+ * Although our free routine is smart enough and it will pick bad 
+ * pointers most of the time, in cases where we know we are going to get
+ * a bad pointer, we'd rather leak.
+ */
+int dont_free = 0;
 
 #ifndef NULL
 #define	NULL 0
@@ -280,7 +287,11 @@ free(cp)
     register int size;
     register union overhead *op;
 
-    if (cp == NULL)
+    /*
+     * the don't free flag is there so that we avoid os bugs in routines
+     * that free invalid pointers!
+     */
+    if (cp == NULL || dont_free)
 	return;
     CHECK(!memtop || !membot, "free(%lx) called before any allocations.", cp);
     CHECK(cp > (ptr_t) memtop, "free(%lx) above top of memory.", cp);

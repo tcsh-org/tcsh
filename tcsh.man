@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.45 1992/07/06 15:26:18 christos Exp $
+.\" $Id: tcsh.man,v 3.46 1992/07/18 01:34:46 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -142,7 +142,10 @@ directory is changed.
 32) Enhanced history/variable modifier expansion
 .sp
 .ti -4
-33) Programmable file/user/variable/alias completion.
+33) Programmable completion.
+.sp
+.ti -4
+34) Enhanced file inquiry operator.
 .RE
 .sp
 For a description of standard C-shell features, see the
@@ -1917,6 +1920,7 @@ The current possible values are:
 .sp
 .ta 1.5i
 .nf
+\fI386BSD\fR		an Intel 386, running 386BSD
 \fIaix370\fR		an IBM 370, running aix
 \fIaixESA\fR		an IBM ESA, running aix
 \fIalliant\fR		an Alliant FX series
@@ -3032,6 +3036,60 @@ return from some command in raw, CBREAK, or noecho mode. This behavior
 can be changed using 
 .I setty.
 .PP
+.SH ENHANCED FILE INQUIRIES
+.I Csh
+allows the following file inquiries that can appear as primitive
+operands in expressions. They are for the form 
+.I -l 
+.I <filename>.
+.sp
+.RS +.6i
+.ta 1.2i 1.7i
+.nf
+r	read access
+w	write access
+x	execute access
+e	existence
+o	ownership
+z	zero size
+f	plain file
+d	directory
+l	symbolic link *
+.fi
+.RE
+.DT
+.sp
+.PP
+.I Tcsh
+defines also the following:
+.sp
+.RS +.6i
+.ta 1.2i 1.7i
+.nf
+c	character special file
+b	block special file		
+p	named pipe (fifo) *
+u	set-user-ID bit is set	
+g	set-group-ID bit is set	
+k	sticky bit is set
+s	socket special file *
+t	open file descriptor for terminal device [a number]
+X	executable in the path or shell builtin
+.fi
+.RE
+.DT
+.sp
+.PP
+Notes: On systems without the file types indicated by
+.I *
+the file inquiry operands return false. In the version of 
+.I csh 
+appearing on the Silicon Graphics IRIX, -s is true when the file is not
+zero size.
+.I Tcsh
+is *not* compatible with that. 
+
+.PP
 .SH ENVIRONMENT
 HPATH -- path to look for command documentation
 .br
@@ -3297,6 +3355,8 @@ al	Set if tcsh should determine if autologout
 kan	Set if tcsh is compiled for Kanji. 
 	(ignore the iso character set.) Default is unset.
 sm	Set if tcsh was compiled to use the system's malloc.
+hb	Set if tcsh is emulating #!<program> <args> in
+	shell script execution
 .RE
 .DT
 .fi

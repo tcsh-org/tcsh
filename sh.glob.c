@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.glob.c,v 3.23 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.glob.c,v 3.24 1992/07/23 14:42:29 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.23 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.24 1992/07/23 14:42:29 christos Exp $")
 
 #include "tc.h"
 
@@ -1070,11 +1070,6 @@ int
 sortscmp(a, b)
     register Char **a, **b;
 {
-#if defined(NLS) && !defined(NOSTRCOLL)
-    char    buf[2048];
-
-#endif
-
     if (!a)			/* check for NULL */
 	return (b ? 1 : 0);
     if (!b)
@@ -1085,12 +1080,7 @@ sortscmp(a, b)
     if (!*b)
 	return (-1);
 
-#if defined(NLS) && !defined(NOSTRCOLL)
-    (void) strcpy(buf, short2str(*a));
-    return ((int) strcoll(buf, short2str(*b)));
-#else
-    return ((int) Strcmp(*a, *b));
-#endif
+    return (int) collate(a, b);
 }
 
 #endif

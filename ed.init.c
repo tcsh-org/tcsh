@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.init.c,v 3.29 1992/07/18 01:34:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.init.c,v 3.30 1992/07/23 14:42:29 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.29 1992/07/18 01:34:46 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.30 1992/07/23 14:42:29 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -364,7 +364,7 @@ Rawmode()
 #ifdef DEBUG_TTY
 	xprintf("Rawmode: tty_getty: %s\n", strerror(errno));
 #endif /* DEBUG_TTY */
-	return(errno == EINTR ? 0 : -1);
+	return(-1);
     }
 
     /*
@@ -545,7 +545,7 @@ Rawmode()
 #ifdef DEBUG_TTY
 	xprintf("Rawmode: tty_setty: %s\n", strerror(errno));
 #endif /* DEBUG_TTY */
-	return errno == EINTR ? 0 : -1;
+	return(-1);
     }
     Tty_raw_mode = 1;
     flush();			/* flush any buffered output */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.36 1992/07/18 01:34:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.37 1992/07/23 14:42:29 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.36 1992/07/18 01:34:46 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.37 1992/07/23 14:42:29 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1728,14 +1728,7 @@ int
 fcompare(file1, file2)
     Char  **file1, **file2;
 {
-#if defined(NLS) && !defined(NOSTRCOLL)
-    char    buf[2048];
-
-    (void) strcpy(buf, short2str(*file1));
-    return ((int) strcoll(buf, short2str(*file2)));
-#else
-    return (StrQcmp(*file1, *file2));
-#endif
+    return (int) collate(*file1, *file2);
 } /* end fcompare */
 
 

@@ -227,17 +227,6 @@ ENVIRON	:	n/a
 NOTES	:	none
 VERSION	:	6.00.02
 
-VENDOR	:	alliant
-MODELS	:	FX/8X series
-COMPILER:	pcc
-CFLAGS	:	normal
-LIBES	:	-ltermcap
-OS	:	Concentrix 5.7.00
-CONFIG	:	config.bsd
-ENVIRON	:	n/a
-NOTES	:	n/a
-VERSION	:	6.00.01
-
 VENDOR	:	next
 MODELS	:	any
 COMPILER:	cc
@@ -418,3 +407,25 @@ CONFIG	:	config.sysV68
 ENVIRON	:	n/a
 NOTES	:	none
 VERSION	:	6.01.00, 6.02.00
+
+VENDOR  :       alliant
+MODELS  :       FX/8X series
+COMPILER:       pcc
+CFLAGS  :       normal
+LIBES   :       -ltermcap
+OS      :       Concentrix 6.0.00 beta
+CONFIG  :       config.bsd
+ENVIRON :       n/a
+NOTES   :       Needs to define DIRENT in config.h
+VERSION :       6.02.00
+
+VENDOR	:	alliant
+MODELS	:	FX/8X series
+COMPILER:	pcc
+CFLAGS	:	normal
+LIBES	:	-ltermcap
+OS	:	Concentrix 5.7.00
+CONFIG	:	config.bsd
+ENVIRON	:	n/a
+NOTES	:	n/a
+VERSION	:	6.00.01

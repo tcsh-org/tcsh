@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.sem.c,v 3.20 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.sem.c,v 3.21 1992/07/18 01:34:46 christos Exp christos $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.20 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.21 1992/07/18 01:34:46 christos Exp christos $")
 
 #include "tc.h"
 
@@ -504,18 +504,7 @@ execute(t, wanttty, pipein, pipeout)
 			(void) signal(SIGQUIT, SIG_IGN);
 		    }
 
-# ifdef _SEQUENT_
-		    /*
-		     * On some machines (POSIX) the process group leader
-		     * cannot be a zombie. On those machines, the following
-		     * might help. Note that BACKPIPE will break if the
-		     * last process exits too soon.
-		     * (From Jaap)
-		     */
-		    pgetty(_gv.wanttty ? _gv.wanttty : 1, pgrp);
-# else /* _SEQUENT_ */
 		    pgetty(_gv.wanttty, pgrp);
-# endif /* _SEQUENT_ */
 
 		    if (t->t_dflg & F_NOHUP)
 			(void) signal(SIGHUP, SIG_IGN);
@@ -567,10 +556,8 @@ execute(t, wanttty, pipein, pipeout)
 #endif /* BSDSIGS */
 		nosigchld = 0;
 	    }
-	    if ((t->t_dflg & F_AMPERSAND) == 0) {
-		forepid = pid;
+	    if ((t->t_dflg & F_AMPERSAND) == 0)
 		pwait();
-	    }
 	    break;
 	}
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.decls.h,v 3.16 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.decls.h,v 3.17 1992/07/06 15:26:18 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -97,6 +97,10 @@ extern	Char		 *getusername	__P((Char **));
 extern	void		  doaliases	__P((Char **, struct command *));
 extern	void		  shlvl		__P((int));
 extern	int		  fixio		__P((int, int));
+extern	int		  collate	__P((const Char *, const Char *));
+#ifdef HASHBANG
+extern	int		  hashbang	__P((int, Char ***));
+#endif /* HASHBANG */
 
 
 /*
@@ -141,6 +145,9 @@ extern	int		  xtcsetpgrp	__P((int, int));
 #ifdef YPBUGS
 extern	void	 	  fix_yp_bugs	__P((void));
 #endif /* YPBUGS */
+#ifdef STRCOLLBUG
+extern	void	 	  fix_strcoll_bug	__P((void));
+#endif /* STRCOLLBUG */
 
 extern	void	 	  osinit	__P((void));
 
@@ -239,27 +246,28 @@ extern	sigret_t	  synch_handler	__P((int));
  * tc.str.c:
  */
 #ifdef SHORT_STRINGS
-extern	Char		 *s_strchr	__P((Char *, int));
-extern	Char		 *s_strrchr	__P((Char *, int));
-extern	Char		 *s_strcat	__P((Char *, Char *));
+extern	Char		 *s_strchr	__P((const Char *, int));
+extern	Char		 *s_strrchr	__P((const Char *, int));
+extern	Char		 *s_strcat	__P((Char *, const Char *));
 #ifdef NOTUSED
-extern	Char		 *s_strncat	__P((Char *, Char *, size_t));
+extern	Char		 *s_strncat	__P((Char *, const Char *, size_t));
 #endif
-extern	Char		 *s_strcpy	__P((Char *, Char *));
-extern	Char		 *s_strncpy	__P((Char *, Char *, size_t));
-extern	Char		 *s_strspl	__P((Char *, Char *));
-extern	size_t		  s_strlen	__P((Char *));
-extern	int		  s_strcmp	__P((Char *, Char *));
-extern	int		  s_strncmp	__P((Char *, Char *, size_t));
-extern	Char		 *s_strsave	__P((Char *));
-extern	Char		 *s_strend	__P((Char *));
-extern	Char		 *s_strstr	__P((Char *, Char *));
-extern	Char		 *str2short	__P((char *));
+extern	Char		 *s_strcpy	__P((Char *, const Char *));
+extern	Char		 *s_strncpy	__P((Char *, const Char *, size_t));
+extern	Char		 *s_strspl	__P((const Char *, const Char *));
+extern	size_t		  s_strlen	__P((const Char *));
+extern	int		  s_strcmp	__P((const Char *, const Char *));
+extern	int		  s_strncmp	__P((const Char *, const Char *, 
+					     size_t));
+extern	Char		 *s_strsave	__P((const Char *));
+extern	Char		 *s_strend	__P((const Char *));
+extern	Char		 *s_strstr	__P((const Char *, const Char *));
+extern	Char		 *str2short	__P((const char *));
 extern	Char		**blk2short	__P((char **));
-extern	char		 *short2str	__P((Char *));
+extern	char		 *short2str	__P((const Char *));
 extern	char		**short2blk	__P((Char **));
 #endif
-extern	char		 *short2qstr	__P((Char *));
+extern	char		 *short2qstr	__P((const Char *));
 
 
 /*

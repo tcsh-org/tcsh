@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.34 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.35 1992/07/18 01:34:46 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.34 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.35 1992/07/18 01:34:46 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -154,13 +154,17 @@ doonintr(v, c)
     xfree((ptr_t) cp);
     if (vv == 0) {
 #ifdef BSDSIGS
-	if (setintr)
+	if (setintr) {
 	    (void) sigblock(sigmask(SIGINT));
-	else
+	    (void) signal(SIGINT, pintr);
+	}
+	else 
 	    (void) signal(SIGINT, SIG_DFL);
 #else /* !BSDSIGS */
-	if (setintr)
+	if (setintr) {
 	    (void) sighold(SIGINT);
+	    (void) sigset(SIGINT, pintr);
+	}
 	else
 	    (void) sigset(SIGINT, SIG_DFL);
 #endif /* BSDSIGS */
@@ -1186,10 +1190,20 @@ dosetenv(v, c)
 #ifdef NLS
 	int     k;
 
+# ifdef SETLOCALEBUG
+	dont_free = 1;
+# endif /* SETLOCALEBUG */
 	(void) setlocale(LC_ALL, "");
 # ifdef LC_COLLATE
 	(void) setlocale(LC_COLLATE, "");
 # endif
+# ifdef SETLOCALEBUG
+	dont_free = 0;
+# endif /* SETLOCALEBUG */
+# ifdef STRCOLLBUG
+	fix_strcoll_bug();
+# endif /* STRCOLLBUG */
+	tw_cmd_free();	/* since the collation sequence has changed */
 	for (k = 0200; k <= 0377 && !Isprint(k); k++)
 	    continue;
 	AsciiOnly = k > 0377;
@@ -1228,12 +1242,22 @@ dosetenv(v, c)
     else if (eq(vp, STRUSER))
 	set(STRuser, Strsave(lp));
 #ifdef SIG_WINDOW
+    /*
+     * Load/Update $LINES $COLUMNS
+     */
     else if ((eq(lp, STRNULL) &&
 	      (eq(vp, STRLINES) || eq(vp, STRCOLUMNS))) ||
 	     eq(vp, STRTERMCAP)) {
 	check_window_size(1);
     }
 #endif /* SIG_WINDOW */
+    /*
+     * Change the size to the one directed by $LINES and $COLUMNS
+     */
+    else if (eq(vp, STRLINES) || eq(vp, STRCOLUMNS)) {
+	GotTermCaps = 0;
+	ed_Init();
+    }
     xfree((ptr_t) lp);
 }
 
@@ -1289,10 +1313,20 @@ dounsetenv(v, c)
 #ifdef NLS
 		    int     k;
 
+# ifdef SETLOCALEBUG
+		    dont_free = 1;
+# endif /* SETLOCALEBUG */
 		    (void) setlocale(LC_ALL, "");
 # ifdef LC_COLLATE
 		    (void) setlocale(LC_COLLATE, "");
 # endif
+# ifdef SETLOCALEBUG
+		    dont_free = 0;
+# endif /* SETLOCALEBUG */
+# ifdef STRCOLLBUG
+		    fix_strcoll_bug();
+# endif /* STRCOLLBUG */
+		    tw_cmd_free();/* since the collation sequence has changed */
 		    for (k = 0200; k <= 0377 && !Isprint(k); k++)
 			continue;
 		    AsciiOnly = k > 0377;
@@ -1429,13 +1463,12 @@ doumask(v, c)
 #   define toset(a) ((a) + 1)
 #  endif /* aiws */
 # else /* BSDTIMES */
-#  ifdef BSD4_4
+#  if defined(BSD4_4) && !defined(__386BSD__)
     typedef quad_t RLIM_TYPE;
 #  else
     typedef int RLIM_TYPE;
-#  endif /* BSD4_4 */
+#  endif /* BSD4_4 && !__386BSD__ */
 # endif /* BSDTIMES */
-
 
 struct limits limits[] = 
 {

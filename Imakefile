@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.15 1992/05/15 23:49:22 christos Exp $
+/**/# $Id: Imakefile,v 1.16 1992/07/06 15:26:18 christos Exp christos $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -58,6 +58,9 @@ ones.  Please send in your fixes and additions! */
 
 #ifdef SGIArchitecture
 #define ConfigH sgi
+#ifdef you_are_using_yp
+# define UseSunLib 
+#endif
 #endif
 
 #ifdef IBMArchitecture
@@ -244,7 +247,7 @@ platform, unless you have a really weird architecture. */
 #ifdef MyCC
 CC = MyCC
 #else
-# if defined(HasGcc) || defined(HasGCC)
+# if HasGcc || HasGCC
 #  ifdef HasGcc2
 CC = gcc 
 #  else

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.term.c,v 1.9 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.term.c,v 1.10 1992/06/16 20:46:26 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.9 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.10 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -53,11 +53,11 @@ ttyperm_t ttylist = {
 #else /* GSTTY */
 	{ "nrmal:", (ECHO|CRMOD|ANYP), (CBREAK|RAW|LCASE|VTDELAY|ALLDELAY) },
 	{ "local:", (LCRTBS|LCRTERA|LCRTKIL), (LPRTERA|LFLUSHO) },
-#endif /* TERMIO */
+#endif /* POSIX || TERMIO */
 	{ "chars:", 	0, 0 },
     },
     {
-#ifdef TERMIO
+#if defined(POSIX) || defined(TERMIO)
 	{ "iflag:", (INLCR|ICRNL), IGNCR },
 	{ "oflag:", (OPOST|ONLCR), ONLRET },
 	{ "cflag:", 0, 0 },
@@ -66,7 +66,7 @@ ttyperm_t ttylist = {
 #else /* GSTTY */
 	{ "nrmal:", (CBREAK|CRMOD|ANYP), (RAW|ECHO|LCASE|VTDELAY|ALLDELAY) },
 	{ "local:", (LCRTBS|LCRTERA|LCRTKIL), (LPRTERA|LFLUSHO) },
-#endif /* TERMIO */
+#endif /* POSIX || TERMIO */
 	{ "chars:", (C_SH(C_MIN)|C_SH(C_TIME)|C_SH(C_SWTCH)|C_SH(C_DSWTCH)|
 		     C_SH(C_WERASE)|C_SH(C_REPRINT)|C_SH(C_SUSP)|C_SH(C_DSUSP)|
 		     C_SH(C_EOF)|C_SH(C_EOL)|C_SH(C_DISCARD)|C_SH(C_PGOFF)|
@@ -74,7 +74,7 @@ ttyperm_t ttylist = {
 		     0 }
     },
     {
-#ifdef TERMIO
+#if defined(POSIX) || defined(TERMIO)
 	{ "iflag:", 0, IXON | IXOFF },
 	{ "oflag:", 0, 0 },
 	{ "cflag:", 0, 0 },
@@ -82,7 +82,7 @@ ttyperm_t ttylist = {
 #else /* GSTTY */
 	{ "nrmal:", RAW, CBREAK },
 	{ "local:", 0, 0 },
-#endif /* TERMIO */
+#endif /* POSIX || TERMIO */
 	{ "chars:", 0, 0 },
     }
 };
@@ -92,7 +92,7 @@ static struct tcshmodes {
     int   m_value;
     int   m_type;
 } modelist[] = {
-#ifdef TERMIO
+#if defined(POSIX) || defined(TERMIO)
 
 # ifdef	IGNBRK
     { "ignbrk",	IGNBRK,	M_INPUT },
@@ -442,7 +442,7 @@ static struct tcshmodes {
     { "lnoflsh",LNOFLSH,M_LOCAL },
 # endif /* LNOFLSH */
 
-#endif /* TERMIO */
+#endif /* POSIX || TERMIO */
 # if defined(VINTR) || defined(TIOCGETC)
     { "intr",		C_SH(C_INTR), 	M_CHAR },
 # endif /* VINTR */
@@ -520,6 +520,18 @@ static struct tcshmodes {
 # endif /* VTIME */
     { NULL, 0, -1 },
 };
+
+/* Retry a system call */
+#define RETRY(x) \
+   do \
+	if ((x) == -1) \
+	   if (errno != EINTR) \
+	       return -1; \
+	   else \
+	       continue; \
+	else \
+	   break; \
+   while (1)
 
 /*ARGSUSED*/
 void
@@ -626,19 +638,16 @@ dosetty(v, t)
     }
 } /* end dosetty */
 
-
 int
 tty_getty(fd, td)
    int fd;
    ttydata_t *td;
 {
 #ifdef POSIX
-    if (tcgetattr(fd, &td->d_t) == -1)
-	return -1;
+    RETRY(tcgetattr(fd, &td->d_t));
 #else /* TERMIO || GSTTY */
 # ifdef TERMIO
-    if (ioctl(fd, TCGETA,    (ioctl_t) &td->d_t) == -1)
-	return -1;
+    RETRY(ioctl(fd, TCGETA,    (ioctl_t) &td->d_t));
 # else /* GSTTY */
 #  ifdef TIOCGETP
     if (ioctl(fd, TIOCGETP,  (ioctl_t) &td->d_t) == -1)
@@ -673,12 +682,10 @@ tty_setty(fd, td)
    ttydata_t *td;
 {
 #ifdef POSIX
-    if (tcsetattr(fd, TCSADRAIN, &td->d_t) == -1) 
-	return -1;
+    RETRY(tcsetattr(fd, TCSADRAIN, &td->d_t)); 
 #else
 # ifdef TERMIO
-    if (ioctl(fd, TCSETAW,    (ioctl_t) &td->d_t) == -1)
-	return -1;
+    RETRY(ioctl(fd, TCSETAW,    (ioctl_t) &td->d_t));
 # else
 #  ifdef TIOCSETN
     if (ioctl(fd, TIOCSETN,  (ioctl_t) &td->d_t) == -1)

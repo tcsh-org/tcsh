@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tc.str.c,v 3.5 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.str.c,v 3.6 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.str.c,v 3.5 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.6 1992/03/27 01:59:46 christos Exp $")
 
 #define MALLOC_INCR	128
 
@@ -84,7 +84,7 @@ short2blk(src)
 
 Char   *
 str2short(src)
-    register char *src;
+    register const char *src;
 {
     static Char *sdst;
     static size_t dstsize = 0;
@@ -116,7 +116,7 @@ str2short(src)
 
 char   *
 short2str(src)
-    register Char *src;
+    register const Char *src;
 {
     static char *sdst = NULL;
     static size_t dstsize = 0;
@@ -147,7 +147,8 @@ short2str(src)
 
 Char   *
 s_strcpy(dst, src)
-    register Char *dst, *src;
+    register Char *dst;
+    register const Char *src;
 {
     register Char *sdst;
 
@@ -159,7 +160,8 @@ s_strcpy(dst, src)
 
 Char   *
 s_strncpy(dst, src, n)
-    register Char *dst, *src;
+    register Char *dst;
+    register const Char *src;
     register size_t n;
 {
     register Char *sdst;
@@ -180,7 +182,8 @@ s_strncpy(dst, src, n)
 
 Char   *
 s_strcat(dst, src)
-    register Char *dst, *src;
+    register Char *dst;
+    register const Char *src;
 {
     register short *sdst;
 
@@ -196,7 +199,8 @@ s_strcat(dst, src)
 #ifdef NOTUSED
 Char   *
 s_strncat(dst, src, n)
-    register Char *dst, *src;
+    register Char *dst;
+    register const Char *src;
     register size_t n;
 {
     register Char *sdst;
@@ -224,34 +228,34 @@ s_strncat(dst, src, n)
 
 Char   *
 s_strchr(str, ch)
-    register Char *str;
+    register const Char *str;
     int ch;
 {
     do
 	if (*str == ch)
-	    return (str);
+	    return ((Char *) str);
     while (*str++);
     return (NULL);
 }
 
 Char   *
 s_strrchr(str, ch)
-    register Char *str;
+    register const Char *str;
     int ch;
 {
-    register Char *rstr;
+    register const Char *rstr;
 
     rstr = NULL;
     do
 	if (*str == ch)
 	    rstr = str;
     while (*str++);
-    return (rstr);
+    return ((Char *) rstr);
 }
 
 size_t
 s_strlen(str)
-    register Char *str;
+    register const Char *str;
 {
     register size_t n;
 
@@ -262,7 +266,7 @@ s_strlen(str)
 
 int
 s_strcmp(str1, str2)
-    register Char *str1, *str2;
+    register const Char *str1, *str2;
 {
     for (; *str1 && *str1 == *str2; str1++, str2++)
 	continue;
@@ -283,7 +287,7 @@ s_strcmp(str1, str2)
 
 int
 s_strncmp(str1, str2, n)
-    register Char *str1, *str2;
+    register const Char *str1, *str2;
     register size_t n;
 {
     if (n == 0)
@@ -311,14 +315,14 @@ s_strncmp(str1, str2, n)
 
 Char   *
 s_strsave(s)
-    register Char *s;
+    register const Char *s;
 {
     Char   *n;
     register Char *p;
 
     if (s == 0)
 	s = STRNULL;
-    for (p = s; *p++;)
+    for (p = (Char *) s; *p++;)
 	continue;
     n = p = (Char *) xmalloc((size_t) ((p - s) * sizeof(Char)));
     while ((*p++ = *s++) != '\0')
@@ -328,7 +332,7 @@ s_strsave(s)
 
 Char   *
 s_strspl(cp, dp)
-    Char   *cp, *dp;
+    const Char   *cp, *dp;
 {
     Char   *ep;
     register Char *p, *q;
@@ -337,41 +341,41 @@ s_strspl(cp, dp)
 	cp = STRNULL;
     if (!dp)
 	dp = STRNULL;
-    for (p = cp; *p++;)
+    for (p = (Char *) cp; *p++;)
 	continue;
-    for (q = dp; *q++;)
+    for (q = (Char *) dp; *q++;)
 	continue;
     ep = (Char *) xmalloc((size_t)
 			  (((p - cp) + (q - dp) - 1) * sizeof(Char)));
-    for (p = ep, q = cp; (*p++ = *q++) != '\0';)
+    for (p = ep, q = (Char*) cp; (*p++ = *q++) != '\0';)
 	continue;
-    for (p--, q = dp; (*p++ = *q++) != '\0';)
+    for (p--, q = (Char *) dp; (*p++ = *q++) != '\0';)
 	continue;
     return (ep);
 }
 
 Char   *
 s_strend(cp)
-    register Char *cp;
+    register const Char *cp;
 {
     if (!cp)
-	return (cp);
+	return ((Char *) cp);
     while (*cp)
 	cp++;
-    return (cp);
+    return ((Char *) cp);
 }
 
 Char   *
 s_strstr(s, t)
-    register Char *s, *t;
+    register const Char *s, *t;
 {
     do {
-	register Char *ss = s;
-	register Char *tt = t;
+	register const Char *ss = s;
+	register const Char *tt = t;
 
 	do
 	    if (*tt == '\0')
-		return (s);
+		return ((Char *) s);
 	while (*ss++ == *tt++);
     } while (*s++ != '\0');
     return (NULL);
@@ -381,7 +385,7 @@ s_strstr(s, t)
 
 char   *
 short2qstr(src)
-    register Char *src;
+    register const Char *src;
 {
     static char *sdst = NULL;
     static size_t dstsize = 0;

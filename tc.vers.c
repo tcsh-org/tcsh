@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.19 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.20 1992/07/06 15:26:18 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.19 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.20 1992/07/06 15:26:18 christos Exp christos $")
 
 #include "patchlevel.h"
 
@@ -199,6 +199,11 @@ gethosttype()
     hosttype = "minix";
 # endif /* i386 */
 #endif /* _MINIX */
+
+# ifdef __386BSD__
+# define _havehosttype_
+    hosttype = "386BSD";
+# endif /* __386BSD__ */
 
 # if defined(i386) && SYSVREL > 0
 
@@ -492,16 +497,21 @@ fix_version()
 #else
 # define SMSTR  ""
 #endif 
+#ifdef HASHBANG
+# define HBSTR	",hb"
+#else
+# define HBSTR  ""
+#endif 
 /* if you want your local version to say something */
 #ifndef LOCALSTR
 # define LOCALSTR ""
 #endif /* LOCALSTR */
 
     xsprintf(version,
-	     "tcsh %d.%.2d.%.2d (%s) %s (%s) options %s%s%s%s%s%s%s%s%s%s%s",
+	     "tcsh %d.%.2d.%.2d (%s) %s (%s) options %s%s%s%s%s%s%s%s%s%s%s%s",
 	     REV, VERS, PATCHLEVEL, ORIGIN, DATE, gethosttype(),
 	     SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR,
-	     BYESTR, ALSTR, KANSTR, SMSTR, LOCALSTR);
+	     BYESTR, ALSTR, KANSTR, SMSTR, HBSTR, LOCALSTR);
     set(STRversion, SAVE(version));
     xsprintf(version, "%d.%.2d.%.2d", REV, VERS, PATCHLEVEL);
     set(STRtcsh, SAVE(version));

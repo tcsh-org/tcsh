@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.24 1992/07/07 15:45:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.25 1992/07/18 01:34:46 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.24 1992/07/07 15:45:01 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.25 1992/07/18 01:34:46 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -207,6 +207,14 @@ Inputl()
 			    *LastChar-- = '\0';
 			    Cursor = LastChar;
 			    printprompt(3, NULL);
+			    Refresh();
+			    break;
+			}
+			else if (ch == 'a') {
+			    xprintf("abort\n");
+			    *LastChar = '\0';
+			    Cursor = LastChar;
+			    printprompt(0, NULL);
 			    Refresh();
 			    break;
 			}

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.32 1992/07/18 01:34:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.33 1992/07/23 14:42:29 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.32 1992/07/18 01:34:46 christos Exp $")
+RCSID("$Id: sh.c,v 3.33 1992/07/23 14:42:29 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -234,10 +234,20 @@ main(argc, argv)
     AsciiOnly = 1;
     NoNLSRebind = getenv("NOREBIND") != NULL;
 #ifdef NLS
+# ifdef SETLOCALEBUG
+    dont_free = 1;
+# endif /* SETLOCALEBUG */
     (void) setlocale(LC_ALL, "");
 # ifdef LC_COLLATE
     (void) setlocale(LC_COLLATE, "");
 # endif
+# ifdef SETLOCALEBUG
+    dont_free = 0;
+# endif /* SETLOCALEBUG */
+# ifdef STRCOLLBUG
+    fix_strcoll_bug();
+# endif /* STRCOLLBUG */
+
     {
 	int     k;
 
@@ -1428,12 +1438,11 @@ int snum;
     recdirs(NULL);
 #ifdef POSIXJOBS
     /*
-     * We kill the last foreground process, since under the
-     * new POSIX job control rules SIGHUP is only sent to 
-     * the session leader and the tty driver is not doing it for us
+     * We kill the last foreground process group. It then becomes
+     * responsible to propagate the SIGHUP to its progeny. 
      */
     if (forepid != 0)
-	(void) kill(forepid, SIGHUP);
+	(void) killpg(forepid, SIGHUP);
 #endif
     xexit(snum);
 #ifndef SIGVOID
