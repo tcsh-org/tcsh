@@ -393,3 +393,14 @@ ENVIRON :       bsd4.3
 NOTES   :       would it be preferable to have HOSTTYPE of
 NOTES   :       "esv" instead of "mips"?
 VERSION :       6.01.00
+
+VENDOR  :       masscomp
+MODELS  :       Masscomp 5400
+COMPILER:       cc
+CFLAGS  :       normal
+LIBES   :       -ltermcap -lndir -lsocket -ljobs
+OS      :       RTU 6.0
+CONFIG  :       config.masscomp
+ENVIRON :       Link in the "bsd" universe as opposed to "att".
+NOTES	:	n/a
+VERSION :       6.01.00

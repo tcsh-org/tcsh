@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.12 1992/03/28 00:15:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.12 1992/03/28 00:15:52 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.12 1992/03/28 00:15:01 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.12 1992/03/28 00:15:52 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -234,7 +234,7 @@ tw_tok(str)
 
     for (str = bf; *bf && !Isspace(*bf); bf++) {
 	if (ismeta(*bf))
-	    return NULL;
+	    return (Char *) -1;
 	*bf = *bf & ~QUOTE;
     }
     if (*bf != '\0')
@@ -254,13 +254,13 @@ tw_match(str, pat)
     Char *str, *pat;
 {
     Char *estr;
-    (void) Gnmatch(str, pat, &estr);
+    int rv = Gnmatch(str, pat, &estr);
 #ifdef TDEBUG
     xprintf("Gnmatch(%s, ", short2str(str));
     xprintf("%s, ", short2str(pat));
-    xprintf("%s) = %d\n", short2str(estr), estr - str);
+    xprintf("%s) = %d [%d]\n", short2str(estr), rv, estr - str);
 #endif /* TDEBUG */
-    return (estr - str);
+    return (rv ? estr - str : 0);
 }
 
 
@@ -316,6 +316,9 @@ tw_result(act, pat)
 	break;
     case 'u':
 	looking = TW_USER;
+	break;
+    case 'x':
+	looking = TW_EXPLAIN;
 	break;
 
     case '$':
@@ -410,6 +413,7 @@ tw_dollar(str, wl, nwl, buffer, sep, msg)
  *	c/<pattern>/<completion>/[<suffix>/]	current word ignore pattern
  *	C/<pattern>/<completion>/[<suffix>/]	current word with pattern
  *	n/<pattern>/<completion>/[<suffix>/]	next word
+ *	N/<pattern>/<completion>/[<suffix>/]	next-next word
  */
 int
 tw_complete(line, word, pat, looking, suf)
@@ -418,12 +422,13 @@ tw_complete(line, word, pat, looking, suf)
 {
     Char buf[MAXPATHLEN + 1], **vec, *ptr; 
     Char *wl[MAXPATHLEN/6];
+    static Char nomatch[2] = { 0xff, 0x00 };
     int wordno, n;
 
     copyn(buf, line, MAXPATHLEN);
 
     /* find the command */
-    if ((wl[0] = tw_tok(buf)) == NULL)
+    if ((wl[0] = tw_tok(buf)) == NULL || wl[0] == (Char*) -1)
 	return TW_ZERO;
 
     /*
@@ -434,9 +439,12 @@ tw_complete(line, word, pat, looking, suf)
 	return looking;
 
     /* tokenize the line one more time :-( */
-    for (wordno = 1; (wl[wordno] = tw_tok(NULL)) != NULL; wordno++)
+    for (wordno = 1; (wl[wordno] = tw_tok(NULL)) != NULL &&
+		      wl[wordno] != (Char *) -1; wordno++)
 	continue;
 
+    if (wl[wordno] == (Char *) -1)	/* Found a meta character */
+	return TW_ZERO;			/* de-activate completions */
 #ifdef TDEBUG
     {
 	int i;
@@ -478,12 +486,15 @@ tw_complete(line, word, pat, looking, suf)
 #endif /* TDEBUG */
 
 	switch (cmd = ptr[0]) {
+	case 'N':
+	    pos = (wordno - 3 < 0) ? nomatch : wl[wordno - 3];
+	    break;
 	case 'n':
-	    pos = wl[wordno-2];
+	    pos = (wordno - 2 < 0) ? nomatch : wl[wordno - 2];
 	    break;
 	case 'c':
 	case 'C':
-	    pos = wl[wordno-1];
+	    pos = (wordno - 1 < 0) ? nomatch : wl[wordno - 1];
 	    break;
 	case 'p':
 	    break;
@@ -536,6 +547,7 @@ tw_complete(line, word, pat, looking, suf)
 		continue;
 	    return tw_result(com, pat);
 
+	case 'N':			/* match with the next-next word */
 	case 'n':			/* match with the next word */
 	case 'c':			/* match with the current word */
 	case 'C':

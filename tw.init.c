@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tw.init.c,v 3.8 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.init.c,v 3.9 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.8 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.9 1992/03/27 01:59:46 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -743,6 +743,26 @@ tw_item_add(len)
 {
      return tw_str_add(&tw_item, len);
 } /* tw_item_add */
+
+
+/* tw_item_find():
+ *      Find the string if it exists in the item list 
+ *	end return it.
+ */
+Char *
+tw_item_find(str)
+    Char    *str;
+{
+    int i;
+
+    if (tw_item.list == NULL || str == NULL)
+	return NULL;
+
+    for (i = 0; i < tw_item.nlist; i++)
+	if (tw_item.list[i] != NULL && Strcmp(tw_item.list[i], str) == 0)
+	    return tw_item.list[i];
+    return NULL;
+} /* end tw_item_find */
 
 
 /* tw_vl_start():

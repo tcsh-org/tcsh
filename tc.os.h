@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.os.h,v 3.25 1992/02/21 23:16:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.os.h,v 3.26 1992/03/08 02:17:22 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -474,6 +474,9 @@ extern struct passwd *getpwuid(), *getpwnam(), *getpwent();
 #ifdef PW_SHADOW
 extern struct spwd *getspnam(), *getspent();
 #endif /* PW_SHADOW */
+#ifdef PW_AUTH
+extern struct authorization *getauthuid();
+#endif /* PW_AUTH */
 #endif /* __STDC__ */
 
 # ifndef getwd

@@ -1,6 +1,10 @@
 This file contains visible (incompatible) changes to the users.
 This version of tcsh has the following new things:
 
+6.02
+ignore_symlinks and chase_symlinks are replaced with symlinks=ignore
+and symlinks=chase.
+
 6.01
 * Nothing new.
 

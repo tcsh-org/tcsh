@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/sh.glob.c,v 3.17 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.glob.c,v 3.18 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.17 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.18 1992/03/27 01:59:46 christos Exp $")
 
 #include "tc.h"
 
@@ -681,6 +681,7 @@ dobackp(cp, literal)
     }
 }
 
+
 static void
 backeval(cp, literal)
     Char   *cp;
@@ -698,13 +699,24 @@ backeval(cp, literal)
     icnt = 0;
     quoted = (literal || (cp[0] & QUOTE)) ? QUOTE : 0;
     faket.t_dtyp = NODE_COMMAND;
-    faket.t_dflg = 0;
+    faket.t_dflg = F_BACKQ;
     faket.t_dlef = 0;
     faket.t_drit = 0;
     faket.t_dspr = 0;
     faket.t_dcom = fakecom;
     fakecom[0] = STRfakecom1;
     fakecom[1] = 0;
+
+    if (didfds == 0) {
+	/*
+	 * Make sure that we have some file descriptors to
+	 * play with, so that the processes have at least 0, 1, 2
+	 * open
+	 */
+	(void) dcopy(SHIN, 0);
+	(void) dcopy(SHOUT, 1);
+	(void) dcopy(SHDIAG, 2);
+    }
 
     /*
      * We do the psave job to temporarily change the current job so that the
@@ -727,7 +739,7 @@ backeval(cp, literal)
 
 	(void) close(pvec[0]);
 	(void) dmove(pvec[1], 1);
-	(void) dmove(SHDIAG, 2);
+	(void) dmove(SHDIAG,  2);
 	initdesc();
 	/*
 	 * Bugfix for nested backquotes by Michael Greim <greim@sbsvax.UUCP>,
@@ -877,19 +889,17 @@ Gnmatch(string, pattern, endstr)
     if (endstr == NULL)
 	/* Exact matches only */
 	for (p = blk; *p; p++) 
-	    gres |= pmatch(string, *p, &tstring);
+	    gres |= pmatch(string, *p, &tstring) == 2 ? 1 : 0;
     else {
 	/* partial matches */
 	int minc = 0x7fffffff;
-	for (p = blk; *p; p++) {
-	    int t;
-
-	    (void) pmatch(string, *p, &tstring);
-	    t = tstring - string;
-	    gres |= t ? 1 : 0;
-	    if (minc == -1 || minc > t)
-		minc = t;
-	}
+	for (p = blk; *p; p++) 
+	    if (pmatch(string, *p, &tstring) != 0) {
+		int t = tstring - string;
+		gres |= 1;
+		if (minc == -1 || minc > t)
+		    minc = t;
+	    }
 	*endstr = string + minc;
     }
 
@@ -897,24 +907,30 @@ Gnmatch(string, pattern, endstr)
     return(gres == gpol);
 } 
 
+/* pmatch():
+ *	Return 2 on exact match, 	
+ *	Return 1 on substring match.
+ *	Return 0 on no match.
+ *	*estr will point to the end of the longest exact or substring match.
+ */
 static int
 pmatch(string, pattern, estr)
     register Char *string, *pattern, **estr;
 {
     register Char stringc, patternc;
     int     match, negate_range;
-    Char    rangec;
+    Char    rangec, *oestr, *pestr;
 
     for (;; ++string) {
 	stringc = *string & TRIM;
 	/*
-	 * apollo compiler bug: switch (patternc = *pattern++) { dies
+	 * apollo compiler bug: switch (patternc = *pattern++) dies
 	 */
 	patternc = *pattern++;
 	switch (patternc) {
 	case 0:
 	    *estr = string;
-	    return (stringc == 0);
+	    return (stringc == 0 ? 2 : 1);
 	case '?':
 	    if (stringc == 0)
 		return (0);
@@ -924,13 +940,36 @@ pmatch(string, pattern, estr)
 	    if (!*pattern) {
 		while (*string) string++;
 		*estr = string;
-		return (1);
+		return (2);
 	    }
+	    oestr = *estr;
+	    pestr = NULL;
+
 	    while (*string) {
-		if (pmatch(string++, pattern, estr))
-		    return (1);
+		switch(pmatch(string, pattern, estr)) {
+		case 0:
+		    break;
+		case 1:
+		    pestr = *estr;
+		    break;
+		case 2:
+		    return 2;
+		default:
+		    abort();	/* Cannot happen */
+		}
+		string++;
+		*estr = string;
 	    }
-	    return (0);
+
+	    if (pestr) {
+		*estr = pestr;
+		return 1;
+	    }
+	    else {
+		*estr = oestr;
+		return 0;
+	    }
+
 	case '[':
 	    match = 0;
 	    if ((negate_range = (*pattern == '^')) != 0)
@@ -959,7 +998,6 @@ pmatch(string, pattern, estr)
 		return (0);
 	    *estr = string;
 	    break;
-
 	}
     }
 }

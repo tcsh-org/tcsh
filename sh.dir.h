@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.h,v 3.1 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.dir.h,v 3.2 1992/01/28 19:06:06 christos Exp $ */
 /*
  * sh.dir.h: Directory data structures and globals
  */
@@ -46,10 +46,16 @@ struct directory {
     Char   *di_name;		/* actual name */
 };
 EXTERN struct directory *dcwd;	/* the one we are in now */
+EXTERN int symlinks;
+
+#define SYM_CHASE	1
+#define SYM_IGNORE	2
+#define SYM_EXPAND	3
 
 #define TRM(a) ((a) & TRIM)
-#define ISDOT(c) (TRM((c)[0]) == '.' && ((TRM((c)[1]) == '\0') || \
-		  (TRM((c)[1]) == '/')))
-#define ISDOTDOT(c) (TRM((c)[0]) == '.' && ISDOT(&((c)[1])))
+#define NTRM(a) (a)
+#define ISDOT(c) (NTRM((c)[0]) == '.' && ((NTRM((c)[1]) == '\0') || \
+		  (NTRM((c)[1]) == '/')))
+#define ISDOTDOT(c) (NTRM((c)[0]) == '.' && ISDOT(&((c)[1])))
 
 #endif				/* _h_sh_dir */

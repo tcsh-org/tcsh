@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.h,v 3.3 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.proc.h,v 3.4 1991/11/26 04:28:26 christos Exp $ */
 /*
  * sh.proc.h: Process data structures and variables
  */
@@ -52,7 +52,7 @@ struct process {
     struct process *p_next;	/* next in global "proclist" */
     struct process *p_friends;	/* next in job list (or self) */
     struct directory *p_cwd;	/* cwd of the job (only in head) */
-    short unsigned p_flags;	/* various job status flags */
+    unsigned long p_flags;	/* various job status flags */
     char    p_reason;		/* reason for entering this state */
     int     p_index;		/* shorthand job index */
     pid_t   p_procid;
@@ -104,6 +104,7 @@ struct process {
 #define	PINTERRUPTED	(1<<13)	/* job stopped via interrupt signal */
 #define	PPTIME		(1<<14)	/* time individual process */
 #define	PNEEDNOTE	(1<<15)	/* notify as soon as practical */
+#define PBACKQ		(1<<16)	/* Process is `` evaluation */
 
 #define	PMAXLEN		80
 

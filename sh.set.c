@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/sh.set.c,v 3.11 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.set.c,v 3.12 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.11 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.12 1992/03/27 01:59:46 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -133,7 +133,7 @@ doset(v, c)
 	    dohash(NULL, NULL);
 	}
 	else if (eq(vp, STRhistchars)) {
-	    register Char *pn = value(STRhistchars);
+	    register Char *pn = value(vp);
 
 	    HIST = *pn++;
 	    HISTSUB = *pn;
@@ -148,17 +148,28 @@ doset(v, c)
 	else if (eq(vp, STRwordchars)) {
 	    word_chars = value(vp);
 	}
+	else if (eq(vp, STRsymlinks)) {
+	    register Char *pn = value(vp);
+
+	    if (eq(pn, STRignore))
+		symlinks = SYM_IGNORE;
+	    else if (eq(pn, STRexpand))
+		symlinks = SYM_EXPAND;
+	    else if (eq(pn, STRchase))
+		symlinks = SYM_CHASE;
+	    else
+		symlinks = 0;
+	}
 	else if (eq(vp, STRterm)) {
 #ifdef DOESNT_WORK_RIGHT
 	    register Char *cp;
-
-#endif
+#endif /* DOESNT_WORK_RIGHT */
 	    Setenv(STRTERM, value(vp));
 #ifdef DOESNT_WORK_RIGHT
 	    cp = getenv("TERMCAP");
 	    if (cp && (*cp != '/'))	/* if TERMCAP and not a path */
 		Unsetenv(STRTERMCAP);
-#endif				/* DOESNT_WORK_RIGHT */
+#endif /* DOESNT_WORK_RIGHT */
 	    GotTermCaps = 0;
 	    ed_Init();		/* reset the editor */
 	}
@@ -392,7 +403,7 @@ putn(n)
 	n = 2768;
 #ifdef pdp11
     }
-#else
+#else /* !pdp11 */
     }
     else {
 	num = 4;		/* confuse lint */
@@ -401,7 +412,7 @@ putn(n)
 	    n = 147483648;
 	}
     }
-#endif
+#endif /* pdp11 */
     putn1(n);
     *putp = 0;
     return (Strsave(nbuf));
@@ -577,6 +588,8 @@ unset(v, c)
 	editing = 0;
     if (adrof(STRbackslash_quote) == 0)
 	bslash_quote = 0;
+    if (adrof(STRsymlinks) == 0)
+	symlinks = 0;
     if (did_only && adrof(STRrecognize_only_executables) == 0)
 	tw_cmd_free();
 }
@@ -709,16 +722,18 @@ exportpath(val)
   * Lint thinks these have null effect
   */
  /* macros to do single rotations on node p */
-#define rright(p) (\
+# define rright(p) (\
 	t = (p)->v_left,\
 	(t)->v_parent = (p)->v_parent,\
-	(((p)->v_left = t->v_right) != NULL) ? (t->v_right->v_parent = (p)) : 0,\
+	(((p)->v_left = t->v_right) != NULL) ?\
+	    (t->v_right->v_parent = (p)) : 0,\
 	(t->v_right = (p))->v_parent = t,\
 	(p) = t)
-#define rleft(p) (\
+# define rleft(p) (\
 	t = (p)->v_right,\
 	((t)->v_parent = (p)->v_parent,\
-	((p)->v_right = t->v_left) != NULL) ? (t->v_left->v_parent = (p)) : 0,\
+	((p)->v_right = t->v_left) != NULL) ? \
+		(t->v_left->v_parent = (p)) : 0,\
 	(t->v_left = (p))->v_parent = t,\
 	(p) = t)
 #else
@@ -735,7 +750,7 @@ rright(p)
     return (p);
 }
 
-#endif				/* ! lint */
+#endif /* ! lint */
 
 
 /*
@@ -752,8 +767,7 @@ balance(p, f, d)
 
 #ifndef lint
     register struct varent *t;	/* used by the rotate macros */
-
-#endif
+#endif /* !lint */
     register int ff = 0;
 
     /*
@@ -856,9 +870,9 @@ plist(p)
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else				/* BSDSIGS */
+#else /* !BSDSIGS */
 	(void) sigrelse(SIGINT);
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
 
     for (;;) {
 	while (p->v_left)

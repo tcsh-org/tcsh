@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/sh.c,v 3.25 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.c,v 3.26 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.25 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: sh.c,v 3.26 1992/03/27 01:59:46 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -140,6 +140,18 @@ main(argc, argv)
 #ifdef BSDSIGS
     sigvec_t osv;
 #endif /* BSDSIGS */
+
+#if !defined(BSDTIMES) && defined(POSIX)
+# ifdef CLK_TCK
+    clk_tck = CLK_TCK
+# else /* !CLK_TCK */
+#  ifdef _SC_CLK_TCK
+    clk_tck = (clock_t) sysconf(_SC_CLK_TCK);
+#  else /* ! _SC_CLK_TCK */
+    clk_tck = HZ;
+#  endif /* _SC_CLK_TCK */
+# endif /* CLK_TCK */
+#endif /* !BSDTIMES && POSIX */
 
     settimes();			/* Immed. estab. timing base */
 #ifdef TESLA
@@ -478,11 +490,6 @@ main(argc, argv)
      * suffix of file names...
      */
     set(STRaddsuffix, Strsave(STRNULL));
-
-    /*
-     * don't stat in /afs.  It's too damn slow.
-     */
-    set(STRnostat, Strsave(STRslashafs));
 
     /*
      * Re-initialize path if set in environment

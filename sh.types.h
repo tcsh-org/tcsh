@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.types.h,v 3.17 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.types.h,v 3.18 1992/01/27 04:20:47 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -322,13 +322,22 @@ typedef char * caddr_t;
 #endif /* INTEL */
 
 /***
- *** Concurrent (Masscomp) running RTU 4.1A & RTU 5.0.
+ *** Concurrent (Masscomp) running RTU 4.1A & RTU 5.0. 
+ **** [RTU 6.0 from mike connor]
  *** Added, DAS DEC-90.
  ***/
 #ifdef	masscomp
 # ifndef _SIZE_T
 #  define _SIZE_T
 # endif /* _SIZE_T */
+# ifdef RTU6
+#  ifndef _PID_T
+#   define _PID_T
+#  endif /* _PID_T */
+#  ifndef _SPEED_T
+#   define _SPEED_T
+#  endif /* _SPEED_T */
+#endif /* RTU6 */
 #endif	/* masscomp */
 
 /***

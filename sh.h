@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.h,v 3.28 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.h,v 3.30 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -275,6 +275,9 @@ extern int setpgrp();
 #ifdef PW_SHADOW
 # include <shadow.h>
 #endif /* PW_SHADOW */
+#ifdef PW_AUTH
+# include <auth.h>
+#endif /* PW_AUTH */
 #ifdef BSD
 # include <strings.h>
 # define strchr(a, b) index(a, b)
@@ -440,10 +443,15 @@ EXTERN struct process_stats ru0;
 EXTERN time_t  time0;		/* time at which shell started */
 #  else	/* POSIX */
 EXTERN clock_t time0;		/* time at which shell started */
+EXTERN clock_t clk_tck;
 #  endif /* POSIX */
 EXTERN struct tms shtimes;	/* shell and child times for process timing */
 # endif /* _SEQUENT_ */
 #endif /* BSDTIMES */
+
+#ifndef HZ
+# define HZ	100		/* for division into seconds */
+#endif
 
 /*
  * Miscellany
@@ -651,8 +659,9 @@ struct command {
 #define	F_NICE		(1<<11)	/* t_nice is meaningful 	 */
 #define	F_NOHUP		(1<<12)	/* nohup this command 		 */
 #define	F_TIME		(1<<13)	/* time this command 		 */
+#define F_BACKQ		(1<<14)	/* execute command under SYSTYPE */
 #ifdef apollo
-#define F_VER		(1<<14)	/* execute command under SYSTYPE */
+#define F_VER		(1<<15)	/* execute command under SYSTYPE */
 #endif 
     union {
 	Char   *T_dlef;		/* Input redirect word 		 */

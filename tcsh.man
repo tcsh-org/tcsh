@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.36 1992/03/27 22:18:27 christos Exp $
+.\" $Id: tcsh.man,v 3.37 1992/03/28 00:18:54 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1428,25 +1428,45 @@ will be added when
 is invoked.
 .PP
 The way symbolic links that point to directories are crossed is
-determined by two variables: 
-.I chase_symlinks 
-and 
-.I ignore_symlinks. 
+determined by the 
+.I symlinks
+variable. By default, it is not set to anything and symbolic links
+are not treated specially. However, it can be set to either:
+.I chase,
+.I ignore,
+or
+.I expand.
 If 
-.I chase_symlinks 
-is set, then every time the directory changes, 
+.I symlinks 
+is set to
+.I chase,
+then every time the directory changes, 
 .I $cwd
 reflects the real directory name, and not the name through the link. 
 A notable exception is the user's home directory, but that should
 be fixed. If 
-.I ignore_symlinks 
-is set, then directory change tries to find where
-you came from before you crossed the link to change the directory 
-relatively. If you chdir through a symbolic link
-and then cd .., 
+.I symlinks 
+is set to either
+.I ignore
+or
+.I expand,
+then tcsh
+tries to determing the current directory name relative to the name of the
+current directory before the link was crossed. In simple terms, if you chdir
+through a symbolic link and then cd .., 
 you will end .. relatively to where you were before
 you crossed the link and not .. relatively to 
-where the symbolic link points.
+where the symbolic link points. While 
+.I ignore 
+affects only builtin commands and completion, 
+.I expand 
+affects command execution too, by `fixing' arguments that it considers
+to be path names. Unforunately this does not work in every case, specially
+when file arguments are imbedded in command line options. 
+.I Expand
+also allows to specify the `real' 
+(as opposed to the one determined relatively to 
+.I $cwd), by quoting the file argument.
 .PP
 For example:
 .sp
@@ -1455,33 +1475,50 @@ For example:
 > cd /tmp
 > mkdir from from/src to
 > ln -s ../from/src to/dst
-> echo $cwd 
-/tmp
 
-> unset ignore_symlinks; unset chase_symlinks
-> cd to/dst; echo $cwd 
+> unset symlinks
+> cd /tmp/to/dst; echo $cwd 
 /tmp/to/dst
-> cd ..
+> cd ..; echo $cwd
 /tmp/from
 
-> unset ignore_symlinks; set chase_symlinks
+> set symlinks=chase
 > cd /tmp/to/dst; echo $cwd
 /tmp/from/src
 > cd ..; echo $cwd
 /tmp/from
 
-> set ignore_symlinks; unset chase_symlinks
+> set symlinks=ignore
 > cd /tmp/to/dst; echo $cwd
 /tmp/to/dst
-> cd ..; echo $pwd
+> cd ..; echo $cwd
 /tmp/to
+
+> set symlinks=expand
+> cd /tmp/to/dst; echo $cwd
+/tmp/to/dst
+> cd ..; echo $cwd		# builtin
+/tmp/to
+> cd /tmp/to/dst; echo $cwd
+/tmp/to/dst
+> cd ".."; echo $cwd		# quoted
+/tmp/from
+> /bin/echo ..			# rewrites non builtin commands.
+/tmp/to
+> /bin/echo ".."
+..
 .RE
 .sp
 .fi
-In case you are wondering what happens when you set both, 
-.I ignore_symlinks 
-will override
-.I chase_symlinks.
+While the
+.I expand
+setting is the most convenient, and makes symbolic links invisible, it
+can sometimes be misleading and confusing in cases where it fails to
+recognize arguments. A compromise is to use the 
+.I ignore 
+setting and use the editor functions "normalize-path", bound by default
+to 
+.I ^Xn.
 .PP
 .SH "15. WATCHING FOR LOGINS AND LOGOUTS"
 .I Tcsh
@@ -2758,6 +2795,7 @@ n	Complete nothing
 s	Complete shell variable
 v	Complete any variable
 u	Complete username
+x	Explain what argument when listing is requested.
 $var	Complete using words from variable
 (...)	Complete using words from list
 `...`	Complete evaluating word list from the output of command.
@@ -2769,9 +2807,11 @@ All the above completion actions, except
 .I $var,
 .I (...)
 and
-.i `...`
+.i "`...`"
 can have an additional shell pattern which must match the files to be
-completed.
+completed. The 
+.I 'x'
+completion action takes as argument the explanation string.
 For example, in the C compiler, it makes sense to complete only files
 that the compiler understands:
 .sp
@@ -3008,9 +3048,6 @@ parsing mechanism for tcsh, and it can cause syntax errors in
 .I csh
 scripts.
 .TP 10
-.B chase_symlinks 
-always resolve symbolic links to real names on cd, etc.
-.TP 10
 .B correct 
 automatically try to correct the spelling of commands.
 Must be set to either correct=cmd, only command name will be corrected,
@@ -3063,9 +3100,6 @@ in the tty sessions. It is usually set in .cshrc for interactive shells,
 because history is sourced between .cshrc and .login so that it is available
 from .login.
 .TP 10
-.B ignore_symlinks 
-don't resolve symbolic links to real names on cd, etc.
-.TP 10
 .B inputmode
 Can be set to either
 .I insert
@@ -3097,6 +3131,13 @@ Disables beeping completely.
 .B nokanji
 If kanji support is enable, setting this variable disables it, so that
 the meta key can be used.
+.TP 10
+.B nostat
+An list of directories that should not be stat'ed during a completion
+operation. Some directories e.g. "/afs", can take too much time to
+complete a 
+.I stat(2) 
+operation, making them prime candidates for membership in this list.
 .TP 10
 .B oid
 The organization id number (Domain OS only).
@@ -3142,6 +3183,15 @@ of nested shells.
 .B showdots 
 show hidden files in list and complete operations. If it is set to -A,
 then "." and ".." are not displayed, similarly to the BSD ls -A.
+.TP 10
+.B symlinks
+can be set to: 
+.I "chase",
+in order to resolve the full path names,
+.I "ignore",
+in order to use $cwd to resolve relative directory references for builting.
+.I "follow,
+in order to use $cwd and rewrite the arguments for commands.
 .TP 10
 .B tcsh
 Contains the current version of the shell as R.VV.PP. The 

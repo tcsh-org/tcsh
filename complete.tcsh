@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.4 1992/03/27 01:59:46 christos Exp $
+# $Id: complete.tcsh,v 1.6 1992/03/28 00:20:04 christos Exp $
 # example file using the new completion code
 #
 
@@ -23,9 +23,9 @@ if ($?complete) then
 		  labrea.stanford.edu sumex-aim.stanford.edu \
 		  tut.cis.ohio-state.edu)
 
-    complete rsh	n/*/$hosts/	# argument from list in $hosts
-    complete ywho  	n/*/$hosts/
-    complete ftp 	n/*/$ftphosts/
+    complete rsh	n/*/\$hosts/	# argument from list in $hosts
+    complete ywho  	n/*/\$hosts/
+    complete ftp 	n/*/\$ftphosts/
     complete cd  	p/1/d/		# Directories only
     complete chdir 	p/1/d/
     complete pushd 	p/1/d/
@@ -60,8 +60,8 @@ if ($?complete) then
     complete dvips 	n/*/f:*.dvi/
     complete latex 	n/*/f:*.tex/
     complete tex 	n/*/f:*.tex/
-    complete rlogin 	c/-/"(l 8 e)"/ n/-l/u/ n/*/$hosts/ 
-    complete xrsh   	c/-/"(l 8 e)"/ n/-l/u/ n/*/$hosts/ 
+    complete rlogin 	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/ 
+    complete xrsh   	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/ 
     complete cc 	c/-I/d/ c/-L/d/ c/-/"(o l c g L I D U)"/ \
 			n/*/f:*.[coa]/
     complete acc 	c/-I/d/ c/-L/d/ c/-/"(o l c g L I D U)"/ \
@@ -131,11 +131,18 @@ if ($?complete) then
     complete zcat	n/*/f:*.Z/
     complete nm		n/*/f:^*.{h,C,c,cc}/
 
-    complete rcp c/*:/f/ p/1/$hosts/:
-    complete finger c/*@/$hosts/ p/1/u/@ 
+    complete finger c/*@/\$hosts/ p/1/u/@ 
     complete talk p/1/'`users | tr " " "\012" | uniq`'/ \
 		  n/*/\`who\ \|\ grep\ \$:1\ \|\ awk\ \'\{\ print\ \$2\ \}\'\`/
-    
+    complete rcp c/*:/f/ C@[./]*@f@ n/*/\$hosts/:
+    complete dd c/if=/f/ c/of=/f/ \
+		c/conv=*,/"(ascii ebcdic ibm block unblock \
+			    lcase ucase swap noerror sync)"/,\
+		c/conv=/"(ascii ebcdic ibm block unblock \
+			  lcase ucase swap noerror sync)"/,\
+	        c/*=/x:'<number>'/ \
+		n/*/"(if of conv ibs obs bs cbs files skip file seek count)"/=
+
 
     unset noglob
     unset complete

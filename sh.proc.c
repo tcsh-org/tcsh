@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/sh.proc.c,v 3.24 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.proc.c,v 3.25 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.24 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.25 1992/03/27 01:59:46 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -53,10 +53,6 @@ RCSID("$Id: sh.proc.c,v 3.24 1992/03/21 02:46:07 christos Exp $")
 # undef HZ
 # define HZ 16
 #endif /* aiws */
-
-#ifndef HZ
-# define HZ	100		/* for division into seconds */
-#endif
 
 #if (defined(_BSD) && defined(_BSD_INCLUDES)) || (defined(IRIS4D) && __STDC__)
 # define BSDWAIT
@@ -362,7 +358,7 @@ found:
 #  ifndef POSIX
 	    (fp->p_utime + fp->p_stime) / HZ
 #  else /* POSIX */
-	    (fp->p_utime + fp->p_stime) / CLK_TCK
+	    (fp->p_utime + fp->p_stime) / clk_tck
 #  endif /* POSIX */
 # endif /* !_SEQUENT_ */
 #endif /* !BSDTIMES */
@@ -630,7 +626,12 @@ pjwait(pp)
 	    reason = fp->p_flags & (PSIGNALED | PINTERRUPTED) ?
 		fp->p_reason | META : fp->p_reason;
     } while ((fp = fp->p_friends) != pp);
-    if ((reason != 0) && (adrof(STRprintexitvalue)))	/* PWP */
+    /*
+     * Don't report on backquoted jobs, cause it will mess up 
+     * their output.
+     */
+    if ((reason != 0) && (adrof(STRprintexitvalue)) && 
+	(pp->p_flags & PBACKQ) == 0)
 	xprintf("Exit %d\n", reason);
     set(STRstatus, putn(reason));
     if (reason && exiterr)
@@ -769,9 +770,11 @@ palloc(pid, t)
 
     pp = (struct process *) xcalloc(1, (size_t) sizeof(struct process));
     pp->p_procid = pid;
-    pp->p_flags = t->t_dflg & F_AMPERSAND ? PRUNNING : PRUNNING | PFOREGND;
+    pp->p_flags = ((t->t_dflg & F_AMPERSAND) ? 0 : PFOREGND) | PRUNNING;
     if (t->t_dflg & F_TIME)
 	pp->p_flags |= PPTIME;
+    if (t->t_dflg & F_BACKQ)
+	pp->p_flags |= PBACKQ;
     cmdp = command;
     cmdlen = 0;
     padd(t);

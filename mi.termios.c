@@ -1,12 +1,13 @@
-/* $Header$ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/mi.termios.c,v 1.2 1992/03/28 00:32:16 christos Exp $ */
 /* termios.c - fake termios interface using sgtty interface 
  * 	       by Magnus Doell and Bruce Evans.
  *
  */
 #include "sh.h"
+RCSID("$Id: mi.termios.c,v 1.2 1992/03/28 00:32:16 christos Exp $")
+
 #ifdef _MINIX
 
-RCSID($Id$)
 
 /* Undefine everything that clashes with sgtty.h. */
 #undef B0

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.27 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.28 1992/03/27 22:17:02 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.27 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.28 1992/03/27 22:17:02 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -55,13 +55,13 @@ RCSID("$Id: tw.parse.c,v 3.27 1992/03/27 01:59:46 christos Exp $")
 /*  TW_FILE,	       TW_DIRECTORY,   TW_VARLIST,     TW_USER,		*/
 /*  TW_COMPLETION,     TW_ALIAS,       TW_SHELLVAR,    TW_ENVVAR,	*/
 /*  TW_BINDING,        TW_WORDLIST,    TW_LIMIT,       TW_SIGNAL	*/
-/*  TW_JOB								*/
+/*  TW_JOB,	       TW_EXPLAIN					*/
 static void (*tw_start_entry[]) __P((DIR *, Char *)) = {
     tw_file_start,     tw_cmd_start,   tw_var_start,   tw_logname_start, 
     tw_file_start,     tw_file_start,  tw_vl_start,    tw_logname_start, 
     tw_complete_start, tw_alias_start, tw_var_start,   tw_var_start,     
     tw_bind_start,     tw_wl_start,    tw_limit_start, tw_sig_start,
-    tw_job_start
+    tw_job_start,      tw_file_start
 };
 
 static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
@@ -69,7 +69,7 @@ static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
     tw_file_next,      tw_file_next,   tw_var_next,    tw_logname_next,  
     tw_var_next,       tw_var_next,    tw_shvar_next,  tw_envvar_next,   
     tw_bind_next,      tw_wl_next,     tw_limit_next,  tw_sig_next,
-    tw_job_next
+    tw_job_next,       tw_file_next
 };
 
 static void (*tw_end_entry[]) __P((void)) = {
@@ -77,7 +77,7 @@ static void (*tw_end_entry[]) __P((void)) = {
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_logname_end, 
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
-    tw_dir_end
+    tw_dir_end,	       tw_dir_end
 };
 
 /* #define TDEBUG */
@@ -412,7 +412,8 @@ tenematch(inputline, inputline_size, num_read, command)
 	return (0);
 
     case PATH_NORMALIZE:
-	if ((bptr = dnormalize(wordp, 1)) != NULL) {
+	if ((bptr = dnormalize(wordp, symlinks == SYM_IGNORE ||
+				      symlinks == SYM_EXPAND)) != NULL) {
 	    (void) Strcpy(buffer, bptr);
 	    xfree((ptr_t) bptr);
 	    DeleteBack(str_end - word_start);
@@ -746,6 +747,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
     int ignoring   = flags & TW_IGN_OK;	 /* Use fignore? */
     int d = 4, nd = 0;			 /* Spelling distance */
     Char *entry, *ptr;
+    Char buf[MAXPATHLEN+1];
     struct varent *vp;
     int len;
     flags = 0;
@@ -842,12 +844,29 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    if (gpat && !Gmatch(entry, pat) && !isadirectory(exp_dir, entry))
 		break;
 
+	    /*
+	     * Remove duplicates in command listing and completion
+	     */
+	    if (looking == TW_COMMAND) {
+		if (isadirectory(exp_dir, entry)) {
+		    copyn(ptr = buf, entry, MAXPATHLEN);
+		    len = Strlen(ptr);
+		    ptr[len++] = '/';
+		    buf[len] = '\0';
+
+		}
+		else
+		    ptr = entry;
+		if (tw_item_find(ptr) == NULL)
+		    break;
+	    }
+		    
 	    if (command == LIST) {
 		len = Strlen(entry);
 		/* maximum length 1 (NULL) + 1 (~ or $) + 1 (filetype) */
 		ptr = tw_item_add(len + 3);
+		copyn(ptr, entry, len + 3);
 
-		copyn(ptr, entry, MAXNAMLEN - 2);
 		switch (looking) {
 		case TW_FILE:
 		case TW_DIRECTORY:
@@ -855,6 +874,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		    ptr[len++] = filetype(exp_dir, entry);
 		    ptr[len] = '\0';
 		    break;
+
 		default:
 		    break;
 		}
@@ -1166,6 +1186,15 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 	gpat = 0;	/* pattern holds the name of the variable */
 	break;
 
+    case TW_EXPLAIN:
+	if (command == LIST && pat != NULL) {
+	    xprintf("%s", short2str(pat));
+	    if (Tty_raw_mode)
+		xputchar('\r');
+	    xputchar('\n');
+	}
+	return 2;
+
     default:
 	break;
     }
@@ -1457,7 +1486,8 @@ expand_dir(dir, edir, dfd, cmd)
 
     if ((dollar(tdir, dir) == 0) ||
 	(tilde(edir, tdir) == 0) ||
-	!(nd = dnormalize(*edir ? edir : STRdot, 1)) ||
+	!(nd = dnormalize(*edir ? edir : STRdot, symlinks == SYM_IGNORE ||
+						 symlinks == SYM_EXPAND)) ||
 	((*dfd = opendir(short2str(nd))) == NULL)) {
 	xfree((ptr_t) nd);
 	if (cmd == SPELL || SearchNoDirErr)

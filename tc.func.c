@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tc.func.c,v 3.26 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.func.c,v 3.27 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.26 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.27 1992/03/27 01:59:46 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -272,7 +272,8 @@ dolist(v, c)
 	Char   *dp, *tmp, buf[MAXPATHLEN];
 
 	for (k = 0, i = 0; v[k] != NULL; k++) {
-	    tmp = dnormalize(v[k], 0);
+	    tmp = dnormalize(v[k], symlinks == SYM_IGNORE || 
+				   symlinks == SYM_EXPAND);
 	    dp = &tmp[Strlen(tmp) - 1];
 	    if (*dp == '/' && dp != tmp)
 #ifdef apollo
@@ -487,9 +488,10 @@ fg_proc_entry(pp)
     if (setexit() == 0) {	/* come back here after pjwait */
 	pendjob();
 	pstart(pp, 1);		/* found it. */
+	alarm(0);		/* No autologout */
 	pjwait(pp);
     }
-
+    setalarm(1);		/* Autologout back on */
     resexit(osetexit);
     haderr = ohaderr;
     GettingInput = oGettingInput;
@@ -546,28 +548,52 @@ auto_lock()
 #ifndef NO_CRYPT
 
     int i;
+    char *srpp = NULL;
     struct passwd *pw;
-#ifdef PW_SHADOW
+
+#undef XCRYPT
+
+#if defined(PW_AUTH) && !defined(XCRYPT)
+
+    struct authorization *apw;
+    extern char *crypt16();
+
+# define XCRYPT(a, b) crypt16(a, b)
+
+    if ((pw = getpwuid(geteuid())) != NULL &&	/* effective user passwd  */
+        (apw = getauthuid(geteuid())) != NULL) 	/* enhanced ultrix passwd */
+	srpp = apw->a_password;
+
+#endif /* PW_AUTH && !XCRYPT */
+
+#if defined(PW_SHADOW) && !defined(XCRYPT)
+
     struct spwd *spw;
-#endif /* PW_SHADOW */
     extern char *crypt();
 
+# define XCRYPT(a, b) crypt(a, b)
 
-    /* Get the passwd of our effective user.  */
-    if ((pw = getpwuid(geteuid())) == NULL) {
-      auto_logout();
-      /*NOTREACHED*/
-      return;
-    }
+    if ((pw = getpwuid(geteuid())) != NULL &&	/* effective user passwd  */
+	(spw = getspnam(pw->pw_name)) != NULL)	/* shadowed passwd	  */
+	srpp = spw->sp_pwdp;
 
-#ifdef PW_SHADOW
-    /* Get the shadowed password. */
-    if ((spw = getspnam(pw->pw_name)) == NULL) {
-      auto_logout();
-      /*NOTREACHED*/
-      return;
+#endif /* PW_SHADOW && !XCRYPT */
+
+#ifndef XCRYPT
+    extern char *crypt();
+
+#define XCRYPT(a, b) crypt(a, b)
+
+    if ((pw = getpwuid(geteuid())) != NULL)	/* effective user passwd  */
+	srpp = pw->pw_passwd;
+
+#endif /* !XCRYPT */
+
+    if (srpp == NULL) {
+	auto_logout();
+	/*NOTREACHED*/
+	return;
     }
-#endif /* PW_SHADOW */
 
     setalarm(0);		/* Not for locking any more */
 #ifdef BSDSIGS
@@ -579,13 +605,9 @@ auto_lock()
     for (i = 0; i < 5; i++) {
 	char *crpp, *pp;
 	pp = xgetpass("Password:"); 
-#ifdef PW_SHADOW
-	crpp = crypt(pp, spw->sp_pwdp);
-	if (strcmp(crpp, spw->sp_pwdp) == 0) {
-#else /* !PW_SHADOW */
-	crpp = crypt(pp, pw->pw_passwd);
-	if (strcmp(crpp, pw->pw_passwd) == 0) {
-#endif /* PW_SHADOW */
+
+	crpp = XCRYPT(pp, srpp);
+	if (strcmp(crpp, srpp) == 0) {
 	    if (GettingInput && !just_signaled) {
 		(void) Rawmode();
 		ClearLines();	
@@ -600,6 +622,7 @@ auto_lock()
 #endif /* NO_CRYPT */
     auto_logout();
 }
+
 
 static void
 auto_logout()

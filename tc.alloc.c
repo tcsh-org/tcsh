@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.alloc.c,v 3.8 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.alloc.c,v 3.10 1992/03/21 02:46:07 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.8 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.10 1992/03/21 02:46:07 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -109,7 +109,7 @@ union overhead {
  * smallest allocatable block is 8 bytes.  The overhead information
  * precedes the data area returned to the user.
  */
-#define	NBUCKETS 30
+#define	NBUCKETS ((sizeof(long) << 3) - 3)
 static union overhead *nextf[NBUCKETS];
 
 #ifdef sun
@@ -568,16 +568,18 @@ showall(v, c)
     }
     xprintf("\nused:\t");
     for (i = 0; i < NBUCKETS; i++) {
-	xprintf(" %4d", nmalloc[i]);
+	xprintf(" %4u", nmalloc[i]);
 	totused += nmalloc[i] * (1 << (i + 3));
     }
     xprintf("\n\tTotal in use: %d, total free: %d\n",
 	    totused, totfree);
     xprintf("\tAllocated memory from 0x%lx to 0x%lx.  Real top at 0x%lx\n",
-	    membot, memtop, (char *) sbrk(0));
+	    (unsigned long) membot, (unsigned long) memtop,
+	    (unsigned long) sbrk(0));
 #else
     memtop = (char *) sbrk(0);
     xprintf("Allocated memory from 0x%lx to 0x%lx (%ld).\n",
-	    membot, memtop, memtop - membot);
+	    (unsigned long) membot, (unsigned long) memtop, 
+	    (long) memtop - membot);
 #endif				/* SYSMALLOC */
 }

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.printf.c,v 3.4 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.printf.c,v 3.5 1992/03/21 02:46:07 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.4 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.5 1992/03/21 02:46:07 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -158,7 +158,7 @@ doprnt(addchar, sfmt, ap)
 		if (do_long)
 		    u = va_arg(ap, unsigned long);
 		else
-		    u = (unsigned long) (va_arg(ap, unsigned));
+		    u = (unsigned long) (va_arg(ap, unsigned int));
 		if (fmt == 'u') {	/* unsigned decimal */
 		    do {
 			*bp++ = u % 10 + '0';

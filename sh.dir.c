@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.c,v 3.11 1992/02/13 05:28:51 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.dir.c,v 3.13 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.11 1992/02/13 05:28:51 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.13 1992/03/27 01:59:46 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -272,7 +272,7 @@ dtilde()
 
 
 /* dnormalize():
- *	If the variable ignore_symlinks is set, and the name is
+ *	We are want the path fixed:
  *	1) "..",
  *	2) or starts with "../",
  *	3) or ends with "/..",
@@ -293,23 +293,27 @@ dnormalize(cp, exp)
     Char   *cp;
     int exp;
 {
-    if (exp)
-	exp = adrof(STRignore_symlinks) != NULL ||
-	      adrof(STRexpand_symlinks) != NULL;
-    else
-	exp = adrof(STRignore_symlinks) != NULL &&
-	      adrof(STRexpand_symlinks) == NULL;
+
+/* return true if dp is of the form "../xxx" or "/../xxx" */
+#define HASDOTDOT(sp, p) (ISDOTDOT(p) && ((p) == (sp) || *((p) - 1) == '/'))
+
 #ifdef S_IFLNK
     if (exp) {
  	int     dotdot = 0;
 	Char   *dp, *cwd, *start = cp, buf[MAXPATHLEN];
-#ifdef apollo
+# ifdef apollo
 	bool slashslash;
-#endif
+# endif /* apollo */
 
+	/*
+	 * count the number of "../xxx" or "xxx/../xxx" in the path
+	 */
 	for (dp=start; *dp && *(dp+1); dp++)
-	    if ( ISDOTDOT(dp) && (dp == start || *(dp-1) == '/') )
+	    if (HASDOTDOT(start, dp))
 	        dotdot++;
+	/*
+	 * if none, we are done.
+	 */
         if (dotdot == 0)
 	    return (Strsave(cp));
 
@@ -317,11 +321,15 @@ dnormalize(cp, exp)
 					 sizeof(Char)));
 	(void) Strcpy(cwd, dcwd->di_name);
 
+	/*
+	 * If the path starts with a slash, we are not relative to
+	 * the current working directory.
+	 */
 	if ( *start == '/' )
 	    *cwd = '\0';
-#ifdef apollo
+# ifdef apollo
 	slashslash = cwd[0] == '/' && cwd[1] == '/';
-#endif
+# endif /* apollo */
 
 	/*
 	 * Ignore . and count ..'s
@@ -335,9 +343,8 @@ dnormalize(cp, exp)
 	            if (*++cp)
 	                cp++;
 	        }
-	        else if ( Strlen(cp)>1 && ISDOTDOT(cp) 
-		    && (cp == start || *(cp-1) == '/') ) {
-		    if (*buf)
+	        else if (HASDOTDOT(start, cp)) {
+		    if (buf[0])
 		        break; /* finish analyzing .././../xxx/[..] */
 		    dotdot++;
 		    cp += 2;
@@ -350,10 +357,10 @@ dnormalize(cp, exp)
 	    *dp = '\0';
 	    while (dotdot > 0) 
 	        if ((dp = Strrchr(cwd, '/')) != NULL) {
-#ifdef apollo
+# ifdef apollo
 		    if (dp == &cwd[1]) 
 		        slashslash = 1;
-#endif
+# endif /* apollo */
 		        *dp = '\0';
 		        dotdot--;
 	        }
@@ -362,25 +369,25 @@ dnormalize(cp, exp)
 
 	    if (!*cwd) {	/* too many ..'s, starts with "/" */
 	        cwd[0] = '/';
-#ifdef apollo
+# ifdef apollo
 		cwd[1] = '/';
 		cwd[2] = '\0';
-#else
+# else /* !apollo */
 		cwd[1] = '\0';
-#endif
+# endif /* apollo */
 	    }
-#ifdef apollo
+# ifdef apollo
 	    else if (slashslash && cwd[1] == '\0') {
 		cwd[1] = '/';
 		cwd[2] = '\0';
 	    }
-#endif
+# endif /* apollo */
 
-	    if (*buf) {
+	    if (buf[0]) {
 	        if ((TRM(cwd[(dotdot = Strlen(cwd)) - 1])) != '/')
 		    cwd[dotdot++] = '/';
 	        cwd[dotdot] = '\0';
-	        dp = Strspl(cwd, TRM(*buf) == '/' ? buf+1 : buf);
+	        dp = Strspl(cwd, TRM(buf[0]) == '/' ? &buf[1] : buf);
 	        xfree((ptr_t) cwd);
 	        cwd = dp;
 	        if ((TRM(cwd[(dotdot = Strlen(cwd)) - 1])) == '/')
@@ -391,7 +398,7 @@ dnormalize(cp, exp)
 	}
 	return cwd;
     }
-#endif
+#endif /* S_IFLNK */
     return Strsave(cp);
 }
 
@@ -512,12 +519,13 @@ dfollow(cp)
 	else 
 	    stderror(ERR_SYSTEM, dptr, ebuf);
     }
-#endif
+#endif /* apollo */
 	    
     /*
      * if we are ignoring symlinks, try to fix relatives now.
+     * if we are expading symlinks, it should be done by now.
      */ 
-    dp = dnormalize(cp, 0);
+    dp = dnormalize(cp, symlinks == SYM_IGNORE);
     if (chdir(short2str(dp)) >= 0) {
         xfree((ptr_t) cp);
         return dgoto(dp);
@@ -528,14 +536,6 @@ dfollow(cp)
 	    return dgoto(cp);
 	serrno = errno;
     }
-
-#ifdef notdef
-    /* since we no longer do dnormailize() here, the old code is simplified */
-    if (chdir(short2str(cp)) >= 0) 
-	return dgoto(cp);
-    else 
-	serrno = errno;
-#endif
 
     if (cp[0] != '/' && !prefix(STRdotsl, cp) && !prefix(STRdotdotsl, cp)
 	&& (c = adrof(STRcdpath))) {
@@ -550,13 +550,20 @@ dfollow(cp)
 	    for (p = cp; (*dp++ = *p++) != '\0';)
 		continue;
 	    /*
-	     * if expand_symlinks is set, .. in the cdpath needs to be fixed.
+	     * We always want to fix the directory here
+	     * If we are normalizing symlinks
 	     */
-	    dp = dnormalize(buf, 1);
+	    dp = dnormalize(buf, symlinks == SYM_IGNORE || 
+				 symlinks == SYM_EXPAND);
 	    if (chdir(short2str(dp)) >= 0) {
 		printd = 1;
 		xfree((ptr_t) cp);
 		return dgoto(dp);
+	    }
+	    else if (chdir(short2str(cp)) >= 0) {
+		printd = 1;
+		xfree((ptr_t) cp);
+		return dgoto(cp);
 	    }
 	}
     }
@@ -578,9 +585,9 @@ dfollow(cp)
 	stderror(ERR_SYSTEM, ebuf, strerror(serrno));
     else
 	return (NULL);
-#else
+#else /* !CSHDIRS */
     stderror(ERR_SYSTEM, ebuf, strerror(serrno));
-#endif
+#endif /* CSHDIRS */
     /* NOTREACHED */
     return (NULL);
 }
@@ -776,14 +783,14 @@ dcanon(cp, p)
     bool    slash;
 #ifdef apollo
     bool    slashslash;
-#endif
+#endif /* apollo */
 
 #ifdef S_IFLNK			/* if we have symlinks */
     Char    link[MAXPATHLEN];
     char    tlink[MAXPATHLEN];
     int     cc;
     Char   *newcp;
-#endif				/* S_IFLNK */
+#endif /* S_IFLNK */
 
     /*
      * christos: if the path given does not start with a slash prepend cwd. If
@@ -807,11 +814,11 @@ dcanon(cp, p)
 #ifdef COMMENT
     if (*cp != '/')
 	abort();
-#endif
+#endif /* COMMENT */
 
 #ifdef apollo
     slashslash = (cp[0] == '/' && cp[1] == '/');
-#endif
+#endif /* apollo */
 
     while (*p) {		/* for each component */
 	sp = p;			/* save slash address */
@@ -832,7 +839,7 @@ dcanon(cp, p)
 #ifdef apollo
 	if (&cp[1] == sp && sp[0] == '.' && sp[1] == '.' && sp[2] == '\0')
 	    slashslash = 1;
-#endif
+#endif /* apollo */
 	if (*sp == '\0')	/* if component is null */
 	    if (--sp == cp)	/* if path is one char (i.e. /) */ 
 		break;
@@ -856,7 +863,7 @@ dcanon(cp, p)
 	     */
 	    *--sp = 0;		/* form the pathname for readlink */
 #ifdef S_IFLNK			/* if we have symlinks */
-	    if (sp != cp && !adrof(STRignore_symlinks) &&
+	    if (sp != cp && symlinks != SYM_IGNORE &&
 		(cc = readlink(short2str(cp), tlink,
 			       sizeof tlink)) >= 0) {
 		(void) Strcpy(link, str2short(tlink));
@@ -942,8 +949,7 @@ dcanon(cp, p)
 	else {			/* normal dir name (not . or .. or nothing) */
 
 #ifdef S_IFLNK			/* if we have symlinks */
-	    if (sp != cp && adrof(STRchase_symlinks) &&
-		!adrof(STRignore_symlinks) &&
+	    if (sp != cp && symlinks == SYM_CHASE &&
 		(cc = readlink(short2str(cp), tlink,
 			       sizeof tlink)) >= 0) {
 		(void) Strcpy(link, str2short(tlink));
@@ -1073,7 +1079,7 @@ dcanon(cp, p)
 	    cp = newcp;
 	}
     }
-#endif				/* S_IFLNK */
+#endif /* S_IFLNK */
 
 #ifdef apollo
     if (slashslash) {
@@ -1087,7 +1093,7 @@ dcanon(cp, p)
     }
     if (cp[1] == '/' && cp[2] == '/') 
 	(void) Strcpy(&cp[1], &cp[2]);
-#endif
+#endif /* apollo */
     return cp;
 }
 

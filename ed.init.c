@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/ed.init.c,v 3.25 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.init.c,v 3.26 1992/03/21 22:34:18 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.25 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.26 1992/03/21 22:34:18 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -179,19 +179,19 @@ ed_Setup(rst)
 	long pcret;
 
 	if ((pcret = fpathconf(SHTTY, _PC_VDISABLE)) == -1L)
-	    vdisable = _POSIX_VDISABLE;
+	    vdisable = (unsigned char) _POSIX_VDISABLE;
 	else 
 	    vdisable = (unsigned char) pcret;
-	if (vdisable != _POSIX_VDISABLE && rst != 0)
+	if (vdisable != (unsigned char) _POSIX_VDISABLE && rst != 0)
 	    for (rst = 0; rst < C_NCC; rst++) {
-		if (ttychars[ED_IO][rst] == _POSIX_VDISABLE)
+		if (ttychars[ED_IO][rst] == (unsigned char) _POSIX_VDISABLE)
 		    ttychars[ED_IO][rst] = vdisable;
-		if (ttychars[EX_IO][rst] == _POSIX_VDISABLE)
+		if (ttychars[EX_IO][rst] == (unsigned char) _POSIX_VDISABLE)
 		    ttychars[EX_IO][rst] = vdisable;
 	    }
     }
 #else /* ! POSIX || !_PC_VDISABLE && !defined(BSD4_4) */
-    vdisable = _POSIX_VDISABLE;
+    vdisable = (unsigned char) _POSIX_VDISABLE;
 #endif /* POSIX && _PC_VDISABLE */
 	
     if ((imode = adrof(STRinputmode)) != NULL) {

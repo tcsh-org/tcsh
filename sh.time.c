@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.time.c,v 3.5 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.time.c,v 3.6 1992/02/21 23:16:20 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.5 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.6 1992/02/21 23:16:20 christos Exp $")
 
 #if defined(sun) && ! defined(MACH)
 # include <machine/param.h>
@@ -299,7 +299,7 @@ prusage(bs, es, e, b)
 
 #  else /* POSIX */
     register clock_t t = (es->tms_utime - bs->tms_utime +
-			  es->tms_stime - bs->tms_stime) * 100 / CLK_TCK;
+			  es->tms_stime - bs->tms_stime) * 100 / clk_tck;
 
 #  endif /* POSIX */
 # endif /* _SEQUENT_ */
@@ -325,7 +325,7 @@ prusage(bs, es, e, b)
     time_t  ms = (e - b) * 100 / HZ;
 
 #  else /* POSIX */
-    clock_t ms = (e - b) * 100 / CLK_TCK;
+    clock_t ms = (e - b) * 100 / clk_tck;
 
 #  endif /* POSIX */
     cp = "%Uu %Ss %E %P";
@@ -606,7 +606,7 @@ pdtimet(eval, bval)
 #ifndef POSIX
     val = (eval - bval) * 100 / HZ;
 #else /* POSIX */
-    val = (eval - bval) * 100 / CLK_TCK;
+    val = (eval - bval) * 100 / clk_tck;
 #endif /* POSIX */
 
     xprintf("%ld.%02ld", val / 100, val - (val / 100 * 100));

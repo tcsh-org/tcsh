@@ -1,4 +1,14 @@
 V6.02.00, ...
+61. 6.01.10 (4/3/92)
+68. Fixed Gnmatch.
+67. Removed ignore_symlinks and chase_symlinks. Replaced by symlinks variable.
+66. Backquote from completion was broken for machines with no dup2()
+65. No $printexitvalue for `` jobs.
+64. Added ultrix stuff for PW_AUTH [from Mike Potter mpotter@lampf.lanl.gov]
+63. Fixed bug in Gnmatch(), added 'N' command 'x' completion.
+62. Fixed fg_proc_entry() so autologout gets disabled when a process
+    is foregrounded.
+61. 6.01.09 (3/26/92)
 60. source builtin takes arguments now that are passed in the script e.g.:
     > ./tcsh -i a b c
     > cat test

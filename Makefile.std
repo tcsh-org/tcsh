@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.25 1992/03/20 18:50:05 christos Exp $
+# $Id: Makefile,v 1.26 1992/03/21 22:34:18 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -42,8 +42,12 @@ LFLAGS=$(INCLUDES)
 # add -msoft-float for 68881 machines.
 
 # gcc 2.0
-# On the sparc, don't use -O2 in sh.sem.c; it confuses vfork() [gcc bug]
+# On the sparc, don't use -O2; it breaks setjmp() and vfork()
 CFLAGS=-O $(INCLUDES)
+
+# gcc-2.1
+#CFLAGS=-O2 $(INCLUDES)
+CFLAGS= $(INCLUDES)
 
 #hpux 8.0
 #CFLAGS=  $(INCLUDES) +O3 -Aa
@@ -124,6 +128,9 @@ LIBES= -ltermcap		## BSD style things, hpux
 #LIBES=				## Minix.
 #LIBES= -lcurses		## For a stellar
 #LIBES= -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a ## Stardent Vistra
+#LIBES= -ltermcap -lndir -lsocket -ljobs ## masscomp RTU6.0
+#LIBES= -ltermcap -lauth        ## for Ultrix with Enhanced Security
+
 
 
 # The difficult choice of a c-compiler...

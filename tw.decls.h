@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tw.decls.h,v 3.5 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.decls.h,v 3.6 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -90,6 +90,7 @@ extern	 void		  tw_logname_end	__P((void));
 extern	 Char		 *tw_item_add		__P((int));
 extern	 Char	        **tw_item_get		__P((void));
 extern	 void		  tw_item_free		__P((void));
+extern	 Char		 *tw_item_find		__P((Char *));
 
 /*
  * tw.spell.c
