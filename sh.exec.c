@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.47 1999/04/20 07:48:44 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.48 2000/01/14 22:57:27 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.47 1999/04/20 07:48:44 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.48 2000/01/14 22:57:27 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -893,6 +893,7 @@ cont:
  * Thanks again!!
  */
 
+#ifndef WINNT
 /*
  * executable() examines the pathname obtained by concatenating dir and name
  * (dir may be NULL), and returns 1 either if it is executable by us, or
@@ -907,37 +908,11 @@ executable(dir, name, dir_ok)
     struct stat stbuf;
     Char    path[MAXPATHLEN + 1];
     char   *strname;
-#ifdef WINNT
-    int	    nt_exetype;
-#endif /* WINNT */
     (void) memset(path, 0, sizeof(path));
 
     if (dir && *dir) {
 	copyn(path, dir, MAXPATHLEN);
 	catn(path, name, MAXPATHLEN);
-#ifdef WINNT
-	{
-	    char *ptr = short2str(path);
-	    char *p2 = ptr;
-	    int has_ext = 0;
-
-	    while (*ptr++)
-		continue;
-	    --ptr;
-
-	    while(ptr > p2) { 
-		if (*ptr == '/')
-		    break;
-		if (*ptr == '.') {
-		    has_ext = 1;
-		    break;
-		}
-		ptr--;
-	    }
-	    if (!has_ext && (stat(p2, &stbuf) == -1))
-		catn(path, STRdotEXE, MAXPATHLEN);
-	}
-#endif /* WINNT */
 	strname = short2str(path);
     }
     else
@@ -947,15 +922,11 @@ executable(dir, name, dir_ok)
 	    ((dir_ok && S_ISDIR(stbuf.st_mode)) ||
 	     (S_ISREG(stbuf.st_mode) &&
     /* save time by not calling access() in the hopeless case */
-#ifdef WINNT
-	      (GetBinaryType(strname,&nt_exetype) ||
-	      (stbuf.st_mode & (S_IXOTH | S_IXGRP | S_IXUSR)))
-#else /* !WINNT */
 	      (stbuf.st_mode & (S_IXOTH | S_IXGRP | S_IXUSR)) &&
 	      access(strname, X_OK) == 0
-#endif /* WINNT */
 	)));
 }
+#endif /*!WINNT*/
 
 int
 tellmewhat(lexp, str)
