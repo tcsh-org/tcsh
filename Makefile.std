@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.88 1998/10/02 10:56:47 christos Exp $
+# $Id: Makefile.std,v 1.89 2000/01/14 22:57:25 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -109,6 +109,9 @@ CFLAGS=-O2 $(INCLUDES)
 
 # SINIX RMx00
 #CFLAGS= -O # -D_POSIX_SOURCE # -kansi
+
+# Minix-VMD
+# CFLAGS= -O -D_ANSI_H -I /usr/include/bsdcompat $(INCLUDES)
 
 # Apollo's with cc [apollo builtins don't work with gcc]
 # and apollo should not define __STDC__ if it does not have
