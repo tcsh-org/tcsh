@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.0 1991/07/04 21:49:28 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.1 1991/07/05 02:00:43 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -37,7 +37,7 @@
 #include "config.h"
 #ifndef lint
 static char *rcsid() 
-    { return "$Id: sh.proc.c,v 3.0 1991/07/04 21:49:28 christos Exp christos $"; }
+    { return "$Id: sh.proc.c,v 3.1 1991/07/05 02:00:43 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -83,9 +83,15 @@ static char *rcsid()
 # define HZ	100		/* for division into seconds */
 #endif
 
+#if (defined(_BSD) && defined(_BSD_INCLUDES)) || defined(BSD)
+# define BSDWAIT
+#endif /* (_BSD && _BSD_INCLUDES) || BSD */
+
 #ifndef WTERMSIG
 # define WTERMSIG(w)	(((union wait *) &(w))->w_termsig)
-# define BSDWAIT
+# ifndef BSDWAIT
+#  define BSDWAIT
+# endif /* BSDWAIT */
 #endif /* !WTERMSIG */
 #ifndef WEXITSTATUS
 # define WEXITSTATUS(w)	(((union wait *) &(w))->w_retcode)
