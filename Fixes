@@ -1,3 +1,4 @@
+ 20. Revert #16. It causes worse problems.
  19. Avoid using execl() because the last NULL does not always promoted to
      a pointer because the function is variadic (Harti Brandt)
  18. revert ignoreeof to the 6.11.00 behavior and document it (Martin Godisch)
