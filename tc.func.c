@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.3 1991/07/16 11:11:55 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.3 1991/07/16 11:13:41 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.func.c,v 3.3 1991/07/16 11:11:55 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.3 1991/07/16 11:13:41 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -44,6 +44,7 @@ RCSID("$Id: tc.func.c,v 3.3 1991/07/16 11:11:55 christos Exp $")
 #include "tc.h"
 
 extern time_t t_period;
+extern int do_logout;
 static bool precmd_active = 0;
 static bool periodic_active = 0;
 static bool cwdcmd_active = 0;	/* PWP: for cwd_cmd */

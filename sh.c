@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.c,v 1.4 91/07/14 23:08:28 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,7 +41,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id$")
+RCSID("$Id: sh.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -84,7 +84,7 @@ extern bool NoNLSRebind;
 jmp_buf reslab;
 
 #ifdef TESLA
-static int do_logout;
+int do_logout;
 #endif				/* TESLA */
 
 Char   *dumphist[] = {STRhistory, STRmh, 0, 0};
