@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.os.c,v 3.13 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.os.c,v 3.15 1992/01/27 04:20:47 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.13 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.15 1992/01/27 04:20:47 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -706,10 +706,6 @@ fix_yp_bugs()
 void
 osinit()
 {
-    extern ptr_t membot;
-
-    membot = (ptr_t) sbrk(0);
-
 #ifdef OREO
     set42sig();
     sigignore(SIGIO);		/* ignore SIGIO */
