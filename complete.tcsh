@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.36 2000/11/19 20:50:42 christos Exp $
+# $Id: complete.tcsh,v 1.37 2001/09/02 21:06:02 christos Exp $
 # example file using the new completion code
 #
 
@@ -693,7 +693,7 @@ if ($?_complete) then
       # TW note:  if your version of GNU Emacs supports the "--version" option,
       #           uncomment this line and comment the next to automatically
       #           detect the version, else replace "20.7" with your version.
-      #set _emacs_ver=`emacs --version | head -1 | sed 's%GNU Emacs %%' | cut -d . -f1-2`
+      #set _emacs_ver=`emacs --version | sed -e 's%GNU Emacs %%' -e q | cut -d . -f1-2`
       set _emacs_ver=20.7
       set _emacs_dir=`which emacs | sed s%/bin/emacs%%` 
       complete emacs	c/--/"(batch terminal display no-windows no-init-file \

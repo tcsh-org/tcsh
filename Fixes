@@ -1,3 +1,16 @@
+ 40. V6.11.01 - 20020308
+ 15. Fixes to polish nls locale (Pawe³ Niewiadomski)
+ 14. russian locale fixes (Alexey Dokuchaev)
+ 13. document door support (Shaen)
+ 12. tcsh euc handling extensions (Alexey Zelkin)
+ 11. Make sure that jobcmd does not clobber the current job (Rob McMahon)
+ 10. Make sure that the output of verbose and echo do not end up in the
+     command output (Victor I. Pasko)
+  9. Add %j in prompt [needs more work; is not right the first time
+     after proclist changes] (Hr. Peter Kruse)
+  8. `` commands with embedded newlines would ignore commands following
+     the new line (Victor I. Pasko)
+  7. Re-initialize nls if NLSPATH is changed (Naoki Wakamatsu)
   6. Fix 64 bit compilation with linux and resource limits.
   5. Avoid double globbing when ls-F needs to fork (Joe Townsend)
   4. put back csh filec compatible support.
@@ -10,7 +23,7 @@
  38. make c_insert not static so that it can be used from win32 (amol)
  37. Fix rmstar not to corrupt memory when we say no. (Mark Peek)
  36. V6.10.02 - 20010806
- 35. polish nls locale (Pawe³ New)
+ 35. polish nls locale (Pawe³ Niewiadomski))
  34. Fix a tcsetattr race running background jobs as the last line on an xterm
      window (Andrew Brown)
  33. jobcmd alias (Greg Parker)
