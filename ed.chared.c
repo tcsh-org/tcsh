@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.74 2004/08/04 17:12:27 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.75 2004/11/20 18:23:02 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.74 2004/08/04 17:12:27 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.75 2004/11/20 18:23:02 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1091,12 +1091,12 @@ ColLen(cp)
 
 void
 Setutf8lit(cp, end)
-    Char *cp;
-    Char *end;
+    Char *cp, *end;
 {
-    Char c
+    Char c;
     int w, f;
-    for (end ? cp < end; : *cp != '\0') {
+
+    while (end ? cp < end : *cp != '\0') {
 	c = *cp;
 	if (!Ismbyte1(c)) {
 	    cp++;

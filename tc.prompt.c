@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.49 2004/11/20 17:36:33 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.50 2004/11/20 18:23:03 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,15 +32,10 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.49 2004/11/20 17:36:33 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.50 2004/11/20 18:23:03 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
-
-#ifdef DSPMBYTE
-extern bool dspmbyte_utf8;
-extern void setutf8lit __P((Char *, Char *));
-#endif
 
 /*
  * kfk 21oct1983 -- add @ (time) and / ($cwd) in prompt.
@@ -152,7 +147,7 @@ printprompt(promptno, str)
     tprintf(FMT_PROMPT, PromptBuf, cp, 2 * INBUFSIZE - 2, str, lclock, NULL);
 #ifdef DSPMBYTE
     if (dspmbyte_utf8)
-	setutf8lit(PromptBuf, (Char *)0);
+	Setutf8lit(PromptBuf, NULL);
 #endif
 
     if (!editing) {
@@ -168,7 +163,7 @@ printprompt(promptno, str)
 	tprintf(FMT_PROMPT, RPromptBuf, cp, INBUFSIZE - 2, NULL, lclock, NULL);
 #ifdef DSPMBYTE
 	if (dspmbyte_utf8)
-	    setutf8lit(RPromptBuf, (Char *)0);
+	    Setutf8lit(RPromptBuf, NULL);
 #endif
 
 				/* if not editing, put rprompt after prompt */
