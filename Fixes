@@ -1,4 +1,10 @@
 V6.07.00
+ 34. unset path, unsetenv PATH, ./foo did not work.
+ 33. Add VAR_NOGLOB, and use it to avoid globbing directory names when
+     cd'ing into them.
+ 32. Fix bug introduced in the new tty parsing code.
+ 31. Avoid pushing string back to the parsing string in ${ errors.
+ 30. Patches for the manual page from Dave.
  29. 6.06.01 - 05/24/96
  28. Use sysconf to get NCARGS if available Robert Daniel Kennedy
      <kennedy@b0ru01.fnal.gov>
