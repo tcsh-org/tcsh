@@ -1,15 +1,28 @@
-.\" $Id: tcsh.man,v 3.38 1992/04/03 22:15:14 christos Exp $
+.\" $Id: tcsh.man,v 3.39 1992/04/10 16:38:09 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
 .B tcsh 
 [ 
-.B \-bcdefFilmnqstvVxX 
-.B \-Dname[=value]
+.B \-bcdefimnqstvVxX 
 ] 
 [ 
-.I argument .\|.\|.  
+.I argument .\|.\|.
+]
+.sp
+or
+.br
+.B tcsh -l
+.sp
+OS/Dependent Options
+.br
+.B tcsh 
+[ 
+.B \-F
+]
+[
+.B \-Dname[=value]
 ]
 .SH DESCRIPTION
 .I Tcsh
@@ -924,7 +937,8 @@ however, that the degenerate
 > <Spaces>[^D]
 .RE
 .sp
-does not list all of the commands, but only beeps.
+does not list all of the commands, but only the files in the current working
+directory.
 .PP
 Listing/expanding of words that match a name containing wildcard characters 
 can be done via the list-glob/expand-glob function: 
@@ -1985,6 +1999,9 @@ to believe that the termcap capability `cap' ( as defined in
 ) has the value `value'. No checking for sanity is performed, so beware of
 improper use.
 .PP
+Note that Concept terminal users may have to "settc xn no" to get proper
+wrapping at the rightmost column.
+.PP
 .SH "21. SEARCHING FOR THE VISUAL HISTORY"
 Four new editor functions have been added in emacs mode: Two of them,
 history-search-backward, bound to M-p (and M-P),
@@ -2671,8 +2688,8 @@ and
 .I uncomplete 
 builtins can change the behaviour of the listing and file-completion 
 in tcsh. For example some commands like 
-.I cd, 
-.I pushd, 
+.I cd,
+.I pushd,
 .I popd 
 .I mkdir(1)
 .I rmdir(1)
@@ -2709,14 +2726,14 @@ There are three different completion arguments, modelled after the
 .I sed(1) 
 substitute command and they are of the form:
 .sp
-.B <command>/<matching-pattern>/<completion-action>/[<suffix>|/]
+.B <command>/<match-pattern>/<complete-action>/[<suffix>|/]
 .sp
 The five commands available are:
 .TP 
 .B p
 This specifies position-dependent completion. The matching pattern is
-a numeric range, similar to the one used to index shell variables. 
-If the current word is within that range, then completion action is
+a numeric range similar to the one used to index shell variables. 
+If the current word is within that range, then the completion action is
 taken. For example:
 .sp
 .nf
@@ -2738,18 +2755,19 @@ complete compress
 .sp
 The above command tells the completion mechanism to match any word on
 position 0, that matches the pattern
-.I "co*"
-and replace it with the literal word "complete". Note the leading '-'
-in the pattern that tells the completion, that is pattern is only to be 
-used with ambiguous command completions.
+.I "co*".
+If a match is found, the word is replaced with the literal pattern
+"complete". The leading '-'
+in the pattern signifies that is completion is to be used only with
+ambiguous commands.
 .TP 
 .B n,N
 This command specifies next-word completions. The matching pattern in
 this case is a shell pattern that must match the previous word on
 the command line 
-.I (n), 
+.I (n),
 or the word before that
-.I (N). 
+.I (N).
 For example:
 .sp
 .nf
@@ -2858,25 +2876,27 @@ is not used when a shell pattern is specified in a completion action.
 Other commands don't expect files as arguments, so the completion builtin
 can be used to change the list of items to be completed:
 .sp
-.RS +.6i
-.ta 0.5i 1.0i 1.5i 2.0i 2.5i
+.RS +.2i
+.ta 1.5i 2.0i 4.0i
 .nf
-> complete man 			'n/*/c/'		# complete commands 
-> complete which		'n/*/c/'	
-> complete dbx 			'p/2/(core)/' 'n/*/c/'
-> complete alias 		'p/1/a/'		# complete aliases
-> complete set 			'p/1/s/			# complete variables
-> complete finger 		'p/1/u/'		# complete user-names
+> complete man 	'n/*/c/'		# complete commands 
+> complete which	'n/*/c/'	
+> complete dbx 	'p/2/(core)/' 'n/*/c/'
+> complete alias 	'p/1/a/'		# complete aliases
+> complete set 	'p/1/s/			# complete variables
+> complete finger 	'p/1/u/'		# complete user-names
 .fi
+.RE
 .sp
 Note that in the 
 .I dbx
 example, the positional completion is specified before the next word 
 completion. Since completions are evaluated from left to right, if
-the next word completion was specified first, it would always match
-and the positional completion would never be executed.
-.pp
-In some cases, the list needs to be customized or dynamically generated.
+the next word completion was specified first it would always match
+and the positional completion would never be executed. This is a
+common mistake when defining a completion. 
+.PP
+In some cases the list needs to be customized or dynamically generated.
 .sp
 .nf
 > set hostnames=(prep.ai.mit.edu tesla.ee.cornell.edu)
@@ -2961,7 +2981,7 @@ Another exotic example that makes use of dynamic command execution is:
 .sp
 .nf
 > complete talk p/1/'`users | tr " " "\012" | uniq`'/ \e
-		n/\e*/\e`who\ \e|\e grep\e \e$:1\e \e|\e awk\e \e'\e{\e print\e \e$2\e \e}\e'\e`/
+                      n/\e*/\e`who\ \e|\e grep\e \e$:1\e \e|\e awk\e \e'\e{\e print\e \e$2\e \e}\e'\e`/
 .fi
 .sp
 Here we want to get a list of the active users, as an argument to talk,
@@ -3176,6 +3196,12 @@ in the path that are executable (slow).
 .B rmstar
 Prompt the user before execution of `rm *'.
 .TP 10
+.B savedirs 
+Before exiting, create a file called $HOME/.cshdirs that contains 
+the necessary commands to restore the current directory stack. 
+.I Tcsh
+will read this file during startup and restore the directory stack.
+.TP 10
 .B savehist 
 number of history items to save between login sessions.
 If it is just set, the number of items is taken from $history.
@@ -3299,7 +3325,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.01.00 (Cornell) 12/19/91.
+This man page documents tcsh 6.02.00 (Cornell) 05/01/92.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981

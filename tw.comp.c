@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.14 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.15 1992/04/10 16:48:28 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,16 +36,16 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.14 1992/04/10 16:38:09 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.15 1992/04/10 16:48:28 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
 
-/* #define TDEBUG */
+#define TDEBUG 
 struct varent completions;
 
-static int 	 	  tw_result	__P((Char *, Char *));
+static int 	 	  tw_result	__P((Char *, Char **));
 static Char		**tw_find	__P((Char *, struct varent *, int));
 static Char 		 *tw_tok	__P((Char *));
 static bool	 	  tw_pos	__P((Char *, int));
@@ -273,9 +273,13 @@ tw_match(str, pat)
  */
 static int
 tw_result(act, pat)
-    Char *act, *pat;
+    Char *act, **pat;
 {
     int looking;
+    static Char* res = NULL;
+
+    if (res != NULL)
+	xfree((ptr_t) res), res = NULL;
 
     switch (act[0] & ~QUOTE) {
     case 'C':
@@ -325,23 +329,24 @@ tw_result(act, pat)
 	break;
 
     case '$':
-	copyn(pat, &act[1], MAXPATHLEN);
-	(void) strip(pat);
+	*pat = res = Strsave(&act[1]);
+	(void) strip(res);
 	return(TW_VARLIST);
 
     case '(':
-	copyn(pat, &act[1], MAXPATHLEN);
-	if ((act = Strchr(pat, ')')) != NULL)
+	*pat = res = Strsave(&act[1]);
+	if ((act = Strchr(res, ')')) != NULL)
 	    *act = '\0';
-	(void) strip(pat);
+	(void) strip(res);
 	return TW_WORDLIST;
 
     case '`':
-	copyn(pat, act, MAXPATHLEN);
-	if ((act = Strchr(&pat[1], '`')) != NULL)
+	res = Strsave(act);
+	if ((act = Strchr(&res[1], '`')) != NULL)
 	    *++act = '\0';
-	if ((act = globone(pat, G_APPEND)) != NULL) {
-	    copyn(pat, act, MAXPATHLEN);
+	if ((act = globone(res, G_APPEND)) != NULL) {
+	    xfree((ptr_t) res), res = NULL;
+	    *pat = res = Strsave(act);
 	    xfree((ptr_t) act);
 	    return TW_WORDLIST;
 	}
@@ -354,12 +359,11 @@ tw_result(act, pat)
 
     switch (act[1] & ~QUOTE) {
     case '\0':
-	pat[0] = '\0';
 	return looking;
 
     case ':':
-	copyn(pat, &act[2], MAXPATHLEN);
-	(void) strip(pat);
+	*pat = res = Strsave(&act[2]);
+	(void) strip(res);
 	return looking;
 
     default:
@@ -420,7 +424,7 @@ tw_dollar(str, wl, nwl, buffer, sep, msg)
  */
 int
 tw_complete(line, word, pat, looking, suf)
-    Char *line, **word, *pat;
+    Char *line, **word, **pat;
     int looking, *suf;
 {
     Char buf[MAXPATHLEN + 1], **vec, *ptr; 
@@ -521,6 +525,8 @@ tw_complete(line, word, pat, looking, suf)
 	    else
 		*suf = *ptr;
 	}
+	else
+	    *suf = '\0';
 
 #ifdef TDEBUG
 	xprintf("command:    %c\nseparator:  %c\n", cmd, sep);

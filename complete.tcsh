@@ -102,7 +102,10 @@ if ($?complete) then
     complete CC 	n/*/f:*.{C,cc,o}/
     complete rm 	n/*/f:^*.{c,cc,C,h}/	# Protect precious files
     complete vi 	n/*/f:^*.o/
-    complete bindkey 	p/1/b/
+    complete bindkey    N/-a/b/ N/-c/c/ n/-[ascr]/'x:<key-sequence>'/ \
+			n/-[svedl]/n/ c/-[vedl]/n/ c/-/"(a s c v e d l r)"/ \
+			p/2-/b/ p/1/'x:<key-sequence or option>'/
+
     complete find 	n/-fstype/"(nfs 4.2)"/ n/-name/f/ \
 		  	n/-type/"(c b d f p l s)"/ n/-user/u/ n/-exec/c/ \
 		  	n/-ok/c/ n/-cpio/f/ n/-ncpio/f/ n/-newer/f/ \
@@ -155,8 +158,10 @@ if ($?complete) then
 			n/-l/f:*.{el,elc}/ n/-t/x:'<terminal>'/ n/-u/u/ \
 			n/*/f:^*[\#~]/
     complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
-			n/-f/f/ n/-s/x:'<subject>'/ n/-u/u/ n/*/u/
-
+			n/-s/x:'<subject>'/ n/-u/u/ \
+			c@+@\`/bin/ls\ -1\ ~/Mail\`@ n/-f/f/ n/*/u/
+    complete ar c/[dmpqrtx]/"(c l o u v a b i)"/ p/1/"(d m p q r t x)"// \
+		p/2/f:*.a/ p/*/f:*.o/
 
     unset noglob
     unset complete

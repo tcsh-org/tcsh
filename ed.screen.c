@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/ed.screen.c,v 3.18 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.screen.c,v 3.19 1992/03/27 01:59:46 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.18 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.19 1992/03/27 01:59:46 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -342,8 +342,9 @@ TellTC(what)
 	    Val(T_co), Val(T_li));
     xprintf("\tIt has %s meta key\n", T_HasMeta ? "a" : "no");
     xprintf("\tIt can%suse tabs\n", T_Tabs ? " " : "not ");
-    xprintf("\tIt has %sautomatic margins\n", (T_Margin&MARGIN_AUTO)?"":"no ");
-    xprintf("\tIt has %smagic margins\n", (T_Margin&MARGIN_MAGIC)?"":"no ");
+    xprintf("\tIt %s automatic margins\n", (T_Margin&MARGIN_AUTO)?"has":"does not have");
+    if (T_Margin&MARGIN_AUTO)
+	xprintf("\tIt %s magic margins\n", (T_Margin&MARGIN_MAGIC)?"has":"does not have");
 
     for (t = tstr; t->name != NULL; t++)
 	xprintf("\t%25s (%s) == %s\n", t->long_name, t->name,
@@ -435,7 +436,8 @@ SetTC(what, how)
 	    break;
 
     if (tv->name != NULL) {
-	if (tv == &tval[T_pt] || tv == &tval[T_km]) {
+	if (tv == &tval[T_pt] || tv == &tval[T_km] || 
+	    tv == &tval[T_am] || tv == &tval[T_xn]) {
 	    if (strcmp(how, "yes") == 0)
 		tv->val = 1;
 	    else if (strcmp(how, "no") == 0)
@@ -448,6 +450,8 @@ SetTC(what, how)
 	    T_HasMeta = Val(T_km);
 	    T_Margin = Val(T_am) ? MARGIN_AUTO : 0;
 	    T_Margin |= Val(T_xn) ? MARGIN_MAGIC : 0;
+	    if (tv == &tval[T_am] || tv == &tval[T_xn]) 
+		ChangeSize(Val(T_li), Val(T_co));
 	    return;
 	}
 	else {
@@ -522,12 +526,12 @@ EchoTC(v)
 	flush();
 	return;
     }
-    else if (strcmp(cv, "magic_margin") == 0) {
+    else if (strcmp(cv, "xn") == 0) {
 	xprintf(fmts, T_Margin & MARGIN_MAGIC ? "yes" : "no");
 	flush();
 	return;
     }
-    else if (strcmp(cv, "auto_margin") == 0) {
+    else if (strcmp(cv, "am") == 0) {
 	xprintf(fmts, T_Margin & MARGIN_AUTO ? "yes" : "no");
 	flush();
 	return;

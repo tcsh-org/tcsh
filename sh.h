@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.h,v 3.30 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.h,v 3.31 1992/04/03 22:15:14 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -436,6 +436,7 @@ EXTERN struct timeval time0;	/* Time at which the shell started */
 EXTERN struct rusage ru0;
 #else
 # ifdef _SEQUENT_
+EXTERN clock_t time0;		/* time at which shell started */
 EXTERN timeval_t time0;		/* Time at which the shell started */
 EXTERN struct process_stats ru0;
 # else /* _SEQUENT_ */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.glob.c,v 3.19 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.glob.c,v 3.20 1992/04/10 16:38:09 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.19 1992/04/03 22:15:14 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.20 1992/04/10 16:38:09 christos Exp $")
 
 #include "tc.h"
 
@@ -453,10 +453,12 @@ libglob(vl)
 	ptr = short2qstr(*vl);
 	switch (glob(ptr, gflgs, 0, &globv)) {
 	case GLOB_ABEND:
+	    globfree(&globv);
 	    setname(ptr);
 	    stderror(ERR_NAME | ERR_GLOB);
 	    /* NOTREACHED */
 	case GLOB_NOSPACE:
+	    globfree(&globv);
 	    stderror(ERR_NOMEM);
 	    /* NOTREACHED */
 	default:

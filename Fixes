@@ -1,4 +1,8 @@
 V6.02.00, ...
+79. 6.01.12 (4/24/92) [release version for 6.02]
+78. Autosuffix was not getting reset all the time.
+77. Don't limit completion patterns to 1K.
+76. Naming changes in ed.screen.c from Justin.
 75. 6.01.11 (4/10/92)
 74. Fixed magic-space ! expand bug:
     > echo a b123 45.{6,7}

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.decls.h,v 3.7 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.decls.h,v 3.8 1992/04/10 16:38:09 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -108,5 +108,5 @@ extern	 void		  docomplete		__P((Char **,
 extern	 void		  douncomplete		__P((Char **, 
 						     struct command *));
 extern	 int		  tw_complete		__P((Char *, Char **, 
-						     Char *, int, int *));
+						     Char **, int, int *));
 #endif /* _h_tw_decls */
