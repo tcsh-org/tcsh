@@ -1,6 +1,6 @@
 
 Last Updated: 
-Thu Apr  9 10:22:24 EDT 1998
+Thu Jun 11 21:24:11 EDT 1998
 
 This is for people who do not read the manual!
 
@@ -195,6 +195,12 @@ be able to get ftp it... :-)
 
     Will kill everything, since hup will be sent to all tcsh processes.
     To avoid that you can set stty -hupcl, but it is not recommended.
+
+21. When I rsh the meta key stops working on the remote machine.
+
+    Try using rsh -8; this option is undocumented on some systems,
+    but it works. If that does not work, get and use ssh/sshd. You'll
+    be better off from a security point of view anyway.
 
 christos
 
