@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.53 2001/08/06 23:52:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.54 2002/01/26 23:23:03 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.53 2001/08/06 23:52:03 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.54 2002/01/26 23:23:03 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -88,11 +88,11 @@ static	void		 chkclob	__P((char *));
 
 /*VARARGS 1*/
 void
-execute(t, wanttty, pipein, pipeout, doglob)
+execute(t, wanttty, pipein, pipeout, do_glob)
     register struct command *t;
     int     wanttty;
     int *pipein, *pipeout;
-    bool doglob;
+    bool do_glob;
 {
 #ifdef VFORK
     extern bool use_fork;	/* use fork() instead of vfork()? */
@@ -661,7 +661,7 @@ execute(t, wanttty, pipein, pipeout, doglob)
 	    break;
 	}
 	if (t->t_dtyp != NODE_PAREN) {
-	    doexec(t, doglob);
+	    doexec(t, do_glob);
 	    /* NOTREACHED */
 	}
 	/*
@@ -680,31 +680,31 @@ execute(t, wanttty, pipein, pipeout, doglob)
 	didfds = 0;
 	wanttty = -1;
 	t->t_dspr->t_dflg |= t->t_dflg & F_NOINTERRUPT;
-	execute(t->t_dspr, wanttty, NULL, NULL, TRUE);
+	execute(t->t_dspr, wanttty, NULL, NULL, do_glob);
 	exitstat();
 
     case NODE_PIPE:
 #ifdef BACKPIPE
 	t->t_dcdr->t_dflg |= F_PIPEIN | (t->t_dflg &
 			(F_PIPEOUT | F_AMPERSAND | F_NOFORK | F_NOINTERRUPT));
-	execute(t->t_dcdr, wanttty, pv, pipeout, TRUE);
+	execute(t->t_dcdr, wanttty, pv, pipeout, do_glob);
 	t->t_dcar->t_dflg |= F_PIPEOUT |
 	    (t->t_dflg & (F_PIPEIN | F_AMPERSAND | F_STDERR | F_NOINTERRUPT));
-	execute(t->t_dcar, wanttty, pipein, pv, TRUE);
+	execute(t->t_dcar, wanttty, pipein, pv, do_glob);
 #else /* !BACKPIPE */
 	t->t_dcar->t_dflg |= F_PIPEOUT |
 	    (t->t_dflg & (F_PIPEIN | F_AMPERSAND | F_STDERR | F_NOINTERRUPT));
-	execute(t->t_dcar, wanttty, pipein, pv, TRUE);
+	execute(t->t_dcar, wanttty, pipein, pv, do_glob);
 	t->t_dcdr->t_dflg |= F_PIPEIN | (t->t_dflg &
 			(F_PIPEOUT | F_AMPERSAND | F_NOFORK | F_NOINTERRUPT));
-	execute(t->t_dcdr, wanttty, pv, pipeout, TRUE);
+	execute(t->t_dcdr, wanttty, pv, pipeout, do_glob);
 #endif /* BACKPIPE */
 	break;
 
     case NODE_LIST:
 	if (t->t_dcar) {
 	    t->t_dcar->t_dflg |= t->t_dflg & F_NOINTERRUPT;
-	    execute(t->t_dcar, wanttty, NULL, NULL, TRUE);
+	    execute(t->t_dcar, wanttty, NULL, NULL, do_glob);
 	    /*
 	     * In strange case of A&B make a new job after A
 	     */
@@ -715,7 +715,7 @@ execute(t, wanttty, pipein, pipeout, doglob)
 	if (t->t_dcdr) {
 	    t->t_dcdr->t_dflg |= t->t_dflg &
 		(F_NOFORK | F_NOINTERRUPT);
-	    execute(t->t_dcdr, wanttty, NULL, NULL, TRUE);
+	    execute(t->t_dcdr, wanttty, NULL, NULL, do_glob);
 	}
 	break;
 
@@ -723,7 +723,7 @@ execute(t, wanttty, pipein, pipeout, doglob)
     case NODE_AND:
 	if (t->t_dcar) {
 	    t->t_dcar->t_dflg |= t->t_dflg & F_NOINTERRUPT;
-	    execute(t->t_dcar, wanttty, NULL, NULL, TRUE);
+	    execute(t->t_dcar, wanttty, NULL, NULL, do_glob);
 	    if ((getn(varval(STRstatus)) == 0) !=
 		(t->t_dtyp == NODE_AND)) {
 		return;
@@ -732,7 +732,7 @@ execute(t, wanttty, pipein, pipeout, doglob)
 	if (t->t_dcdr) {
 	    t->t_dcdr->t_dflg |= t->t_dflg &
 		(F_NOFORK | F_NOINTERRUPT);
-	    execute(t->t_dcdr, wanttty, NULL, NULL, TRUE);
+	    execute(t->t_dcdr, wanttty, NULL, NULL, do_glob);
 	}
 	break;
 
