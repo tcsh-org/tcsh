@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.4 1991/07/16 16:16:11 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.5 1991/07/16 17:15:04 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -38,7 +38,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tw.parse.c,v 3.4 1991/07/16 16:16:11 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.5 1991/07/16 17:15:04 christos Exp $")
 
 #include "sh.h"
 #include "tw.h"
@@ -695,8 +695,18 @@ t_search(word, wp, command, max_word_length, looking_for_command, list_max)
 	}
     }
     else if (looking_for_lognames) {	/* Looking for login names? */
-	(void) setpwent();	/* Open passwd file */
+	/*
+	 * Check if the spelling was already correct
+	 * From: Rob McMahon <cudcv@cu.warwick.ac.uk>
+	 */
+	if (command == SPELL && getpwnam(short2str(&word[1])) != NULL) {
+#ifdef YPBUGS
+	    fix_ypbugs();
+#endif /* YPBUGS */
+	    return (0);
+	}
 	copyn(name, &word[1], MAXNAMLEN);	/* name sans ~ */
+	(void) setpwent();	/* Open passwd file */
     }
     else if (looking_for_command) {
 	if (!numcommands)	/* if we have no list of commands */
