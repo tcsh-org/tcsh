@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.glob.c,v 2.1 1991/03/31 13:06:41 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -37,7 +37,7 @@
 #include "config.h"
 #ifndef lint
 static char *rcsid() 
-    { return "$Id: sh.glob.c,v 2.1 1991/03/31 13:06:41 christos Exp $"; }
+    { return "$Id: sh.glob.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -413,13 +413,13 @@ libglob(vl)
 	}
 	if (!nonomatch && (globv.gl_matchc == 0) &&
 	    (globv.gl_flags & GLOB_MAGCHAR)) {
-	    globfree(&globv);
-	    return (NULL);
+	    xfree((ptr_t) globv.gl_pathv[--globv.gl_pathc]);
+	    globv.gl_pathv[globv.gl_pathc] = NULL;
 	}
 	gflgs |= GLOB_APPEND;
     }
     while (*++vl);
-    vl = blk2short(globv.gl_pathv);
+    vl = (globv.gl_pathc == 0) ? NULL : blk2short(globv.gl_pathv);
     globfree(&globv);
     return (vl);
 }
