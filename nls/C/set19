@@ -1,4 +1,6 @@
-$set 19 # tc.alloc.c
+$ $Id$
+$ tc.alloc.c
+$set 19 
 1 nbytes=%d: Out of memory\n
 2 free(%lx) called before any allocations.
 3 free(%lx) above top of memory.

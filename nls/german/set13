@@ -1,4 +1,6 @@
-$set 13 # sh.exec.c
+$ $Id$
+$ sh.exec.c
+$set 13
 1 hash=%-4d dir=%-2d prog=%s\n
 2 %d Hash-Buckets mit jeweils %d Bits\n
 3 debug mask = 0x%08x\n

@@ -1,2 +1,4 @@
-$set 29 # tw.help.c
+$ $Id$
+$ tw.help.c
+$set 29
 1 Keine Hilfe-Datei für %S\n

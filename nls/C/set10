@@ -1,4 +1,6 @@
-$set 10 # ma.setp.c
+$ $Id$
+$ ma.setp.c
+$set 10 
 1 setpath: invalid command '%s'.\n
 2 setpath: insufficient arguments to command '%s'.\n
 3 setpath: value missing in path '%s'\n

@@ -1,13 +1,15 @@
-$set 26 # tc.who.c
+$ $Id$
+$ tc.who.c
+$set 26
 1 Kein Zugriff auf %s.  Bitte "unset watch" eingeben.\n
 2 %s kann nicht geöffnet werden.  Bitte "unset watch" eingeben.\n
 3 FEHLER! letztes Element ist nicht whotail!\n
 4 Zurück: 
 5 FEHLER! erstes Element ist nicht whohead!\n
 6 neu: %s/%s\n
-7 %n hat sich %a auf %l von %m.
-8 %n hat sich %a auf %l.
-9 angemeldet
-10 abgemeldet
-11 ersetzte %s an
+7 %n hat %a auf %l von %m.
+8 %n hat %a auf %l.
+9 sich angemeldet
+10 sich abgemeldet
+11 ersetzte %s
 12 lokal

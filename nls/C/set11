@@ -1,4 +1,6 @@
-$set 11 # sh.c
+$ $Id$
+$ sh.c
+$set 11 
 1 Warning: no access to tty (%s).\n
 2 Thus no job control in this shell.\n
 3 You have %d mail messages.\n

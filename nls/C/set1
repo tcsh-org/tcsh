@@ -1,4 +1,6 @@
-$set 1 # Error messages
+$ $Id$
+$ Error messages
+$set 1 
 1 Syntax Error
 2 %s is not allowed
 3 Word too long

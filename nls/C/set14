@@ -1,4 +1,6 @@
-$set 14 # sh.file.c
+$ $Id$
+$ sh.file.c
+$set 14 
 1 \nYikes!! Too many %s!!\n
 3 names in password file
 3 files

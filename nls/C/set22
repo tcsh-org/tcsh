@@ -1,4 +1,6 @@
-$set 22 # tc.func.c
+$ $Id$
+$ tc.func.c
+$set 22 
 1 %S: \t aliased to 
 2 \nIncorrect passwd for %s\n
 3 Faulty alias 'precmd' removed.\n
@@ -12,3 +14,4 @@ $set 22 # tc.func.c
 11 parsing command line\n
 12 in one of the lists\n
 13 command line now is:\n
+14 yY

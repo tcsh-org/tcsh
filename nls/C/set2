@@ -1,4 +1,6 @@
-$set 2 # Signal names
+$ $Id$
+$ Signal names
+$set 2 
 1 Null signal
 2 Hangup
 3 Interrupt

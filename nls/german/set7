@@ -1,4 +1,6 @@
-$set 7 # ed.screen.c
+$ $Id$
+$ ed.screen.c
+$set 7
 1 \n\tTcsh meint, Ihr Endgerät hat die\n
 2 \tfolgenden Eigenschaften:\n\n
 3 \tEs hat %d Spalten und %d Zeilen\n
@@ -20,7 +22,7 @@ $set 7 # ed.screen.c
 19 StartInsert: num ist lächerlich: %d\r\n
 20 tcsh: Kann /etc/termcap nicht öffnen.\n
 21 tcsh: Kein Eintrag für Terminaltyp "%s"\n
-22 tcsh: benutzer minimalen Terminaleigenschaften.\n
+22 tcsh: benutze minimale Terminaleigenschaften.\n
 23 tcsh: WARNUNG: Ihr Terminal kann den Cursor nicht aufwärts bewegen.\n
 24 Lange Zeilen könnten etwas komisch aussehen.\n
 25 keine EOL Möglichkeit.\n

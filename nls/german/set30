@@ -1,13 +1,16 @@
-$set 30 # tw.parse.c
-1 starting_a_command %d\n
-2 complete %d 
-3 complete %d %S\n
-4 tcsh: Interner Abgleichfehler.\n
+$ $Id$
+$ tw.parse.c
+$set 30
+1 Anfangsbefehl %d\n
+2 vervollst‰ndige %d 
+3 vervollst‰ndige %d %S\n
+4 tcsh: Interner Abgleichsfehler.\n
 5 Objekte
 6 Spalten
-7 Es gibt %d %s, trotzdem anzeigen? [n/y] 
+7 Es gibt %d %s, trotzdem anzeigen? [n/j] 
 8 looking = %d\n
 9 \ntcsh interner Fehler: Ich weiﬂ nicht, wonach ich suche!\n
 10 kein Verzeichnis
 11 nicht gefunden
 12 nicht lesbar
+13 jJyY

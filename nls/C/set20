@@ -1,4 +1,6 @@
-$set 20 # tc.bind.c
+$ $Id$
+$ tc.bind.c
+$set 20 
 1 Invalid key name `%S'\n
 2 Bad key name: %S\n
 3 Bad command name: %S\n

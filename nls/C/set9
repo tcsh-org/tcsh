@@ -1,4 +1,6 @@
-$set 9 # ed.xmap.c
+$ $Id$
+$ ed.xmap.c
+$set 9
 1 AddXkey: Null extended-key not allowed.\n
 2 AddXkey: sequence-lead-in command not allowed\n
 3 DeleteXkey: Null extended-key not allowed.\n

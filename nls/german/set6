@@ -1,4 +1,6 @@
-$set 6 # ed.inputl.c
+$ $Id$
+$ ed.inputl.c
+$set 6
 1 FEHLER: Illegaler Befehl von Taste 0%o\r\n
 2 ja\n
 3 ediere\n

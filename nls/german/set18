@@ -1,2 +1,4 @@
-$set 18 # sh.set.c
+$ $Id$
+$ sh.set.c
+$set 18
 1 Warnung: lächerlich langer PATH abgeschnitten\n

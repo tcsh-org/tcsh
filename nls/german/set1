@@ -1,10 +1,12 @@
-$set 1 # Error messages
+$ $Id$
+$ Error messages
+$set 1
 1 Syntax Fehler
 2 %s nicht erlaubt
 3 Word zu lang
 4 $< Zeile zu lang
 5 Keine Datei für $0
-6 Unvolständiger [] Modifizierer
+6 Unvollständiger [] Modifizierer
 7 $ Ausweitung muß vor ] enden
 8 Schlecht : Modifizierer in $ (%c)
 9 Indexfehler
@@ -34,7 +36,7 @@ $set 1 # Error messages
 33 Keine Jobkontrolle in dieser Shell
 34 Ausdruck nicht korrekt
 35 Kein Startverzeichnis
-36 Kann nicht in das Starverzeichnis wechseln
+36 Kann nicht in das Startverzeichnis wechseln
 37 Ungültiger leerer Befehl
 38 Zuweisung ohne Ausdruck
 39 Unbekannter Operator
@@ -61,7 +63,7 @@ $set 1 # Error messages
 60 Kein vorhergehender Job
 61 Kein Job entspricht dem Muster
 62 Fork nesting > %d; maybe `...` loop
-63 Keine Jobkontrol in Unter-Shells
+63 Keine Jobkontrolle in Unter-Shells
 64 Sync-Fehler: Prozeß %d nicht gefunden
 65 %sDa sind noch angehaltene Jobs
 66 %sDa sind noch angehaltene Jobs
@@ -107,7 +109,7 @@ $set 1 # Error messages
 106 Dateien
 107 Alias-Schleife
 108 Keine $watch-Variable gesetzt
-109 Keine vorgemerkte Befehle (Ereignisse)
+109 Keine vorgemerkten Befehle (Ereignisse)
 110 Benutzung: sched -<item#>.\nBenutzung: sched [+]hh:mm <Befehl>
 111 Nicht so viele vorgemerkte Befehle
 112 Kein Befehl zum ausführen
@@ -134,4 +136,4 @@ $set 1 # Error messages
 133 Kein Operand für -m Option
 134 Benutzung: unlimit [-fh] [Grenzen]
 135 $%S ist nur lesbar
-136 No such job
+136 Kein solcher Job

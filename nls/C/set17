@@ -1,4 +1,6 @@
-$set 17 # sh.proc.c
+$ $Id$
+$ sh.proc.c
+$set 17 
 1 BUG: waiting for background job!\n
 2 Exit %d\n
 3 BUG: process flushed twice

@@ -1,2 +1,4 @@
-$set 12 # sh.dir.c
+$ $Id$
+$ sh.dir.c
+$set 12
 1 tcsh: Versuche von "%s" zu starten.\n

@@ -1,3 +1,5 @@
-$set 21 # tc.disc.c
+$ $Id$
+$ tc.disc.c
+$set 21
 1 Kann lokale Sonderzeichen nicht auslesen.\n
 2 Kann lokale Sonderzeichen nicht setzen.\n

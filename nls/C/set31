@@ -1,4 +1,6 @@
-$set 31 # vms.termcap.c
+$ $Id$
+$ vms.termcap.c
+$set 31 
 1 Can't open TERMCAP: [%s]\n
 2 Can't open %s.\n
 3 Found %s in %s.\n

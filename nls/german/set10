@@ -1,4 +1,6 @@
-$set 10 # ma.setp.c
+$ $Id$
+$ ma.setp.c
+$set 10
 1 setpath: ungültiger Befehl '%s'.\n
 2 setpath: unzureichende Argumente für Befehl '%s'.\n
 3 setpath: Wert fehlt in Pfad '%s'\n

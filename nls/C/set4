@@ -1,4 +1,6 @@
-$set 4 # Termcap strings
+$ $Id$
+$ Termcap strings
+$set 4
 1 add new blank line
 2 audible bell
 3 clear to bottom

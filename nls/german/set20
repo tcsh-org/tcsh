@@ -1,4 +1,6 @@
-$set 20 # tc.bind.c
+$ $Id$
+$ tc.bind.c
+$set 20
 1 Ungültiger Tastenname `%S'\n
 2 Falsche Tastenname: %S\n
 3 Falsche Befehlsname: %S\n

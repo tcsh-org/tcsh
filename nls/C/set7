@@ -1,4 +1,6 @@
-$set 7 # ed.screen.c
+$ $Id$
+$ ed.screen.c
+$set 7
 1 \n\tTcsh thinks your terminal has the\n
 2 \tfollowing characteristics:\n\n
 3 \tIt has %d columns and %d lines\n

@@ -1,2 +1,4 @@
-$set 24 # tc.sched.c
+$ $Id$
+$ tc.sched.c
+$set 24
 1 Hack!

@@ -1,4 +1,6 @@
-$set 16 # sh.lex.c
+$ $Id$
+$ sh.lex.c
+$set 16 
 1 Reset tty pgrp from %d to %d\n
 2 \nUse "logout" to logout.\n
 3 \nUse "exit" to leave tcsh.\n

@@ -1,4 +1,6 @@
-$set 3 # Editor function descriptions
+$ $Id$
+$ Editor function descriptions
+$set 3
 1 Move back a character
 2 Delete the character behind cursor
 3 Cut from beginning of current word to cursor - saved in cut buffer
@@ -15,100 +17,101 @@ $set 3 # Editor function descriptions
 14 Complete current word ignoring programmable completions
 15 Copy current word to cursor
 16 Copy area between mark and cursor to cut buffer
-17 Delete character under cursor
-18 Delete character under cursor or signal end of file on an empty line
-19 Delete character under cursor or list completions if at end of line
-20 Delete character under cursor, list completions or signal end of file
-21 Cut from cursor to end of current word - save in cut buffer
-22 Adds to argument if started or enters digit
-23 Digit that starts argument
-24 Move to next history line
-25 Lowercase the characters from cursor to end of current word
-26 Indicate end of file
-27 Move cursor to end of line
-28 Exchange the cursor and mark
-29 Expand file name wildcards
-30 Expand history escapes
-31 Expand the history escapes in a line
-32 Expand variables
-33 Move forward one character
-34 Move forward to end of current word
-35 Exchange the two characters before the cursor
-36 Search in history backwards for line beginning as current
-37 Search in history forward for line beginning as current
-38 Insert last item of previous command
-39 Incremental search forward
-40 Incremental search backwards
-41 Clear line
-42 Cut to end of line and save in cut buffer
-43 Cut area between mark and cursor and save in cut buffer
-44 Cut the entire line and save in cut buffer
-45 List choices for completion
-46 List choices for completion overriding programmable completion
-47 List file name wildcard matches
-48 List choices for completion or indicate end of file if empty line
-49 Display load average and current process status
-50 Expand history escapes and insert a space
-51 Execute command
-52 Expand pathnames, eliminating leading .'s and ..'s
-53 Expand commands to the resulting pathname or alias
-54 Switch from insert to overwrite mode or vice versa
-55 Add 8th bit to next character typed
-56 Add the next character typed to the line verbatim
-57 Redisplay everything
-58 Restart stopped editor
-59 Look for help on current command
-60 This character is added to the line
-61 This character is the first in a character sequence
-62 Set the mark at cursor
-63 Correct the spelling of current word
-64 Correct the spelling of entire line
-65 Send character to tty in cooked mode
-66 Toggle between literal and lexical current history line
-67 Exchange the character to the left of the cursor with the one under
-68 Exchange the two characters before the cursor
-69 Tty delayed suspend character
-70 Tty flush output character
-71 Tty interrupt character
-72 Tty quit character
-73 Tty suspend character
-74 Tty allow output character
-75 Tty disallow output character
-76 Indicates unbound character
-77 Emacs universal argument (argument times 4)
-78 Move to previous history line
-79 Uppercase the characters from cursor to end of current word
-80 Vi goto the beginning of next word
-81 Vi enter insert mode after the cursor
-82 Vi enter insert mode at end of line
-83 Vi change case of character under cursor and advance one character
-84 Vi change prefix command
-85 Vi change to end of line
-86 Enter vi command mode (use alternative key bindings)
-87 Vi command mode complete current word
-88 Vi move to previous character (backspace)
-89 Vi delete prefix command
-90 Vi move to the end of the current space delimited word
-91 Vi move to the end of the current word
-92 Vi move to the character specified backwards
-93 Vi move to the character specified forward
-94 Vi move up to the character specified backwards
-95 Vi move up to the character specified forward
-96 Enter vi insert mode
-97 Enter vi insert mode at beginning of line
-98 Vi repeat current character search in the same search direction
-99 Vi repeat current character search in the opposite search direction
-100 Vi repeat current search in the same search direction
-101 Vi repeat current search in the opposite search direction
-102 Vi replace character under the cursor with the next character typed
-103 Vi replace mode
-104 Vi search history backwards
-105 Vi search history forward
-106 Vi replace character under the cursor and enter insert mode
-107 Vi replace entire line
-108 Vi move to the previous word
-109 Vi move to the next word
-110 Vi undo last change
-111 Vi goto the beginning of line
-112 Perform which of current command
-113 Paste cut buffer at cursor position
+17 Expand to preceding word for which this is a prefix
+18 Delete character under cursor
+19 Delete character under cursor or signal end of file on an empty line
+20 Delete character under cursor or list completions if at end of line
+21 Delete character under cursor, list completions or signal end of file
+22 Cut from cursor to end of current word - save in cut buffer
+23 Adds to argument if started or enters digit
+24 Digit that starts argument
+25 Move to next history line
+26 Lowercase the characters from cursor to end of current word
+27 Indicate end of file
+28 Move cursor to end of line
+29 Exchange the cursor and mark
+30 Expand file name wildcards
+31 Expand history escapes
+32 Expand the history escapes in a line
+33 Expand variables
+34 Move forward one character
+35 Move forward to end of current word
+36 Exchange the two characters before the cursor
+37 Search in history backwards for line beginning as current
+38 Search in history forward for line beginning as current
+39 Insert last item of previous command
+40 Incremental search forward
+41 Incremental search backwards
+42 Clear line
+43 Cut to end of line and save in cut buffer
+44 Cut area between mark and cursor and save in cut buffer
+45 Cut the entire line and save in cut buffer
+46 List choices for completion
+47 List choices for completion overriding programmable completion
+48 List file name wildcard matches
+49 List choices for completion or indicate end of file if empty line
+50 Display load average and current process status
+51 Expand history escapes and insert a space
+52 Execute command
+53 Expand pathnames, eliminating leading .'s and ..'s
+54 Expand commands to the resulting pathname or alias
+55 Switch from insert to overwrite mode or vice versa
+56 Add 8th bit to next character typed
+57 Add the next character typed to the line verbatim
+58 Redisplay everything
+59 Restart stopped editor
+60 Look for help on current command
+61 This character is added to the line
+62 This character is the first in a character sequence
+63 Set the mark at cursor
+64 Correct the spelling of current word
+65 Correct the spelling of entire line
+66 Send character to tty in cooked mode
+67 Toggle between literal and lexical current history line
+68 Exchange the character to the left of the cursor with the one under
+69 Exchange the two characters before the cursor
+70 Tty delayed suspend character
+71 Tty flush output character
+72 Tty interrupt character
+73 Tty quit character
+74 Tty suspend character
+75 Tty allow output character
+76 Tty disallow output character
+77 Indicates unbound character
+78 Emacs universal argument (argument times 4)
+79 Move to previous history line
+80 Uppercase the characters from cursor to end of current word
+81 Vi goto the beginning of next word
+82 Vi enter insert mode after the cursor
+83 Vi enter insert mode at end of line
+84 Vi change case of character under cursor and advance one character
+85 Vi change prefix command
+86 Vi change to end of line
+87 Enter vi command mode (use alternative key bindings)
+88 Vi command mode complete current word
+89 Vi move to previous character (backspace)
+90 Vi delete prefix command
+91 Vi move to the end of the current space delimited word
+92 Vi move to the end of the current word
+93 Vi move to the character specified backwards
+94 Vi move to the character specified forward
+95 Vi move up to the character specified backwards
+96 Vi move up to the character specified forward
+97 Enter vi insert mode
+98 Enter vi insert mode at beginning of line
+99 Vi repeat current character search in the same search direction
+100 Vi repeat current character search in the opposite search direction
+101 Vi repeat current search in the same search direction
+102 Vi repeat current search in the opposite search direction
+103 Vi replace character under the cursor with the next character typed
+104 Vi replace mode
+105 Vi search history backwards
+106 Vi search history forward
+107 Vi replace character under the cursor and enter insert mode
+108 Vi replace entire line
+109 Vi move to the previous word
+110 Vi move to the next word
+111 Vi undo last change
+112 Vi goto the beginning of line
+113 Perform which of current command
+114 Paste cut buffer at cursor position

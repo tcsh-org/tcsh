@@ -1,4 +1,6 @@
-$set 15 # sh.func.c
+$ $Id$
+$ sh.func.c
+$set 15 
 1 %s: %s: Can't %s%s limit\n
 2 remove
 3 set

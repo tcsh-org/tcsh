@@ -1,4 +1,6 @@
-$set 23 # tc.os.c
+$ $Id$
+$ tc.os.c
+$set 23 
 1 Bad cpu/site name
 2 Site path too long
 3 unknown
