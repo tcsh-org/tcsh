@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.3 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.4 1991/07/16 16:16:11 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -38,7 +38,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tw.parse.c,v 3.3 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.4 1991/07/16 16:16:11 christos Exp $")
 
 #include "sh.h"
 #include "tw.h"
@@ -642,10 +642,8 @@ t_search(word, wp, command, max_word_length, looking_for_command, list_max)
 			!looking_for_shellvar) || Strchr(word, '/');
 
     /* PWP: don't even bother when doing ALL of the commands */
-    if (looking_for_command && (*word == '\0')) {
-	Beep();
+    if (looking_for_command && (*word == '\0')) 
 	return (-1);
-    }
     tilded_dir[0] = '\0';
     dollar_dir[0] = '\0';
 
