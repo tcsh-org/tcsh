@@ -1,19 +1,33 @@
-/* $Header$ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
 /*
- * Copyright (c) 1980 Regents of the University of California.
- * All rights reserved.  The Berkeley Software License Agreement
- * specifies the terms and conditions for redistribution.
+ * Copyright (c) 1989 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+
 #include "config.h"
 
 #ifdef notdef
 static char *sccsid = "%W% (Berkeley) %G%";
 #endif
 #ifndef lint
-static char *rcsid = "$Id$";
+static char *rcsid = "$Id: sh.glob.c,v 2.0 1991/03/26 02:59:29 christos Exp $";
 #endif 
 
 #include "sh.h"
@@ -57,7 +71,9 @@ static Char *globtilde();
 static Char **libglob();
 static Char **globexpand();
 static int globbrace();
-static int sortcmp();
+static void pword();
+static void psave();
+static void backeval();
 
 
 static Char *
@@ -313,6 +329,7 @@ libglob(vl)
 
 	globv.gl_offs = 0;
 	globv.gl_pathv = 0;
+	globv.gl_pathc = 0;
 	nonomatch = adrof(STRnonomatch) != 0;
 	do {
 		glob(short2str(*vl), gappend | GLOB_NOCHECK, 0, &globv);
@@ -504,6 +521,7 @@ oops:			stderror(ERR_UNMATCHED, '`');
 	}
 }
 
+static void
 backeval(cp, literal)
 	Char *cp;
 	bool literal;
@@ -551,7 +569,6 @@ backeval(cp, literal)
 		(void) dmove(pvec[1], 1);
 		(void) dmove(SHDIAG, 2);
 		initdesc();
-#ifdef notdef
 		/*
 		 * Bugfix for nested backquotes by Michael Greim
 		 * <greim@sbsvax.UUCP>, posted to comp.bugs.4bsd
@@ -560,7 +577,6 @@ backeval(cp, literal)
  		if (pargv)		/* mg, 21.dec.88 */
  			blkfree(pargv), pargv = 0, pargsiz = 0;	
 			/* mg, 21.dec.88 */
-#endif
 		arginp = cp;
 		while (*cp)
 			*cp++ &= TRIM;
@@ -587,6 +603,8 @@ backeval(cp, literal)
 	}
 	xfree((ptr_t) cp);
 	(void) close(pvec[1]);
+	c = 0;
+	ip = (Char *) 0;
 	do {
 		int cnt = 0;
 		for (;;) {
@@ -638,6 +656,7 @@ backeval(cp, literal)
 	prestjob();
 }
 
+static void
 psave(c)
 	Char c;
 {
@@ -646,6 +665,7 @@ psave(c)
 	*pargcp++ = c;
 }
 
+static void
 pword()
 {
 	psave(0);
@@ -734,8 +754,8 @@ Gcat(s1, s2)
 	for (p--, q = s2; *p++ = *q++;);
 }
 
-#ifdef notdef
-static int
+#ifdef FILEC
+int
 sortcmp(a, b)
 register Char **a, **b;
 {

@@ -1,11 +1,24 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.20/RCS/sh.c,v 1.26 1991/03/20 19:04:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
 /*
- * Copyright (c) 1980 Regents of the University of California.
- * All rights reserved.  The Berkeley Software License Agreement
- * specifies the terms and conditions for redistribution.
+ * Copyright (c) 1989 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include "config.h"
 
@@ -13,7 +26,7 @@
 static char *sccsid = "@(#)sh.c	5.3 (Berkeley) 3/29/86";
 #endif
 #ifndef lint
-static char *rcsid = "$Id: sh.c,v 1.26 1991/03/20 19:04:50 christos Exp $";
+static char *rcsid = "$Id: sh.c,v 2.0 1991/03/26 02:59:29 christos Exp $";
 #endif
 
 #include "sh.h"
@@ -909,6 +922,7 @@ srcunit(unit, onlyown, hflg)
 	 */
 	insource = 1;
 	getexit(oldexit);
+	omask = 0;
 
 	if (setintr)
 #ifdef BSDSIGS
@@ -943,7 +957,7 @@ srcunit(unit, onlyown, hflg)
 #ifdef BSDSIGS
 	    (void) sigsetmask(omask);
 #else
-	sigrelse(SIGINT);
+	    sigrelse(SIGINT);
 #endif
 #ifdef TELL
 	settell();
@@ -1182,10 +1196,10 @@ void
 process(catch)
 	bool catch;
 {
-	struct command *t;	/* PWP: This might get nuked my longjmp, so */
-				/* don't make it a register var */
 	extern char Expand;
 	jmp_buf osetexit;
+	struct command *t; /* PWP: This might get nuked my longjmp */
+			   /* so don't make it a register var */
 
 	getexit(osetexit);
 	for (;;) {

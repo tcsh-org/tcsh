@@ -1,11 +1,24 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.20/RCS/sh.func.c,v 1.23 1991/03/04 22:06:00 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
 /*
- * Copyright (c) 1980 Regents of the University of California.
- * All rights reserved.  The Berkeley Software License Agreement
- * specifies the terms and conditions for redistribution.
+ * Copyright (c) 1989 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 #include "config.h"
@@ -14,7 +27,7 @@
 static char *sccsid = "@(#)sh.func.c	5.3 (Berkeley) 5/13/86";
 #endif
 #ifndef lint
-static char *rcsid = "$Id: sh.func.c,v 1.23 1991/03/04 22:06:00 christos Exp $";
+static char *rcsid = "$Id: sh.func.c,v 2.0 1991/03/26 02:59:29 christos Exp $";
 #endif
 
 #include "sh.h"
@@ -221,11 +234,11 @@ void
 doaliases(v)
 	Char **v;
 {
-	register Char *p = (Char *) 0, *lp;
-	register int n = 0;
-	register Char **vec;
-	int fd;
 	jmp_buf oldexit;
+	volatile Char *p = (Char *) 0;
+	volatile int n = 0;
+	Char **vec, *lp;
+	int fd;
 	Char buf[BUFSIZ], line[BUFSIZ];
 	char tbuf[BUFSIZ+1];
 	extern bool output_raw;	/* PWP: in sh.print.c */
@@ -1626,7 +1639,7 @@ doeval(v)
 	int otpgrp;
 	jmp_buf osetexit;
 	int my_reenter;
-	Char **gv = 0;
+	Char **gv;
 	int saveIN;
         int saveOUT;
 	int saveDIAG;
@@ -1656,6 +1669,7 @@ doeval(v)
 			stderror(ERR_NOMATCH);
 		v = copyblk(v);
 	} else {
+		gv = (Char **) 0;
 		v = copyblk(v);
 		trim(v);
 	}

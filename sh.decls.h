@@ -1,6 +1,6 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.decls.h,v 2.0 1991/03/26 02:59:29 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.decls.h,v 2.0 1991/03/26 03:15:30 christos Exp $ */
 /*
- * sh.decls.h: Function 
+ * sh.decls.h: External declarations from sh*.c
  */
 #ifndef _h_sh_decls
 #define _h_sh_decls
@@ -148,6 +148,9 @@ extern void rscan();
 extern void tglob();
 extern Char *globone();
 extern Char **dobackp();
+#ifdef FILEC
+extern int sortcmp();
+#endif
 
 
 /*

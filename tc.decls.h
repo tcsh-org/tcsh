@@ -1,4 +1,4 @@
-/* $Header$ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -139,35 +139,28 @@ extern void bsd_sigpause();
 extern sigret_t synch_handler();
 #endif
 
-#ifdef SAVESIGVEC
-extern sigmask_t savesigvec();
-extern void restoresigvec();
-#endif
-
 /*
  * tc.str.c:
  */
 #ifdef SHORT_STRINGS
-Char	*s_strchr();
-Char	*s_strrchr();
-Char	*s_strcat();
-#ifdef notdef
-Char	*s_strncat();
-#endif
-Char	*s_strcpy();
-Char	*s_strncpy();
-Char	*s_strspl();
-int	 s_strlen();
-int	 s_strcmp();
-int	 s_strncmp();
-Char	*s_strsave();
-Char	*s_strend();
-Char	*s_strspl();
-Char	*s_strstr();
-Char	*str2short();
-Char   **blk2short();
-char    *short2str();
-char   **short2blk();
+extern Char	*s_strchr();
+extern Char	*s_strrchr();
+extern Char	*s_strcat();
+extern Char	*s_strncat();
+extern Char	*s_strcpy();
+extern Char	*s_strncpy();
+extern Char	*s_strspl();
+extern int	 s_strlen();
+extern int	 s_strcmp();
+extern int	 s_strncmp();
+extern Char	*s_strsave();
+extern Char	*s_strend();
+extern Char	*s_strspl();
+extern Char	*s_strstr();
+extern Char	*str2short();
+extern Char   **blk2short();
+extern char    *short2str();
+extern char   **short2blk();
 #endif 
 
 

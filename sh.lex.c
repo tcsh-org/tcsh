@@ -1,11 +1,24 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.20/RCS/sh.lex.c,v 1.11 1991/03/02 18:47:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
 /* 
  * sh.lex.c: Lexical analysis into tokens
  */
 /*
- * Copyright (c) 1980 Regents of the University of California.
- * All rights reserved.  The Berkeley Software License Agreement
- * specifies the terms and conditions for redistribution.
+ * Copyright (c) 1989 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted provided
+ * that: (1) source distributions retain this entire copyright notice and
+ * comment, and (2) distributions including binaries display the following
+ * acknowledgement:  ``This product includes software developed by the
+ * University of California, Berkeley and its contributors'' in the
+ * documentation or other materials provided with the distribution and in
+ * all advertising materials mentioning features or use of this software.
+ * Neither the name of the University nor the names of its contributors may
+ * be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 #include "config.h"
@@ -14,7 +27,7 @@
 static char *sccsid = "@(#)sh.lex.c	5.4 (Berkeley) 3/29/86";
 #endif
 #ifndef lint 
-static char *rcsid = "$Id: sh.lex.c,v 1.11 1991/03/02 18:47:14 christos Exp $";
+static char *rcsid = "$Id: sh.lex.c,v 2.0 1991/03/26 02:59:29 christos Exp $";
 #endif
 
 #include "sh.h"
@@ -111,7 +124,7 @@ lex(hp)
 
 	histvalid = 0;
 	histlinep = histline;
-	*histlinep = NULL;
+	*histlinep = '\0';
 
 	lineloc = btell();
 	hp->next = hp->prev = hp;
@@ -144,12 +157,12 @@ lex(hp)
 	} while (wdp->word[0] != '\n');
 	hp->prev = wdp;
 	if (histlinep < histline+BUFSIZ) {
-		*histlinep = NULL;
+		*histlinep = '\0';
 		if (histlinep > histline && histlinep[-1] == '\n') 
-			histlinep[-1] = NULL;
+			histlinep[-1] = '\0';
 		histvalid = 1;
 	} else {
-		histline[BUFSIZ-1] = NULL;
+		histline[BUFSIZ-1] = '\0';
 	}
 	return (hadhist);
 }

@@ -1,10 +1,10 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.20/RCS/sh.rest.c,v 1.7 1991/03/20 19:04:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/tc.sig.c,v 2.0 1991/03/26 02:59:29 christos Exp christos $ */
 /*
  * sh.sig.c: Signal routine emulations
  */
 #include "config.h"
 #ifndef lint
-static char *rcsid = "$Id: sh.rest.c,v 1.7 1991/03/20 19:04:50 christos Exp $";
+static char *rcsid = "$Id: tc.sig.c,v 2.0 1991/03/26 02:59:29 christos Exp christos $";
 
 #endif
 
@@ -339,42 +339,3 @@ synch_handler(sno)
     Synch_Cnt++;
 }
 #endif /* SIGSYNCH */
-
-#ifdef SAVESIGVEC
-sigmask_t
-savesigvec(sv)
-sigvec_t *sv;
-{
-    (void) mysigvec(SIGINT,  (sigvec_t *) 0, &sv[0]);
-    (void) mysigvec(SIGQUIT, (sigvec_t *) 0, &sv[1]);
-    (void) mysigvec(SIGTSTP, (sigvec_t *) 0, &sv[2]);
-    (void) mysigvec(SIGTTIN, (sigvec_t *) 0, &sv[3]);
-    (void) mysigvec(SIGTTOU, (sigvec_t *) 0, &sv[4]);
-    (void) mysigvec(SIGTERM, (sigvec_t *) 0, &sv[5]);
-    (void) mysigvec(SIGHUP,  (sigvec_t *) 0, &sv[6]);
-
-    /*
-     * Can't handle any of these signals until sigvec's
-     * are restored (sg)
-     */
-
-    return(sigblock(sigmask(SIGINT) | sigmask(SIGQUIT) | sigmask(SIGTSTP) | 
-		    sigmask(SIGTTIN) | sigmask(SIGTTOU) | sigmask(SIGTERM) |
-		    sigmask(SIGHUP)));
-} 
-
-void
-restoresigvec(sv, sm)
-sigvec_t *sv;
-sigmask_t sm;
-{
-    (void) mysigvec(SIGINT,  &sv[0], (sigvec_t *) 0);
-    (void) mysigvec(SIGQUIT, &sv[1], (sigvec_t *) 0);
-    (void) mysigvec(SIGTSTP, &sv[2], (sigvec_t *) 0);
-    (void) mysigvec(SIGTTIN, &sv[3], (sigvec_t *) 0);
-    (void) mysigvec(SIGTTOU, &sv[4], (sigvec_t *) 0);
-    (void) mysigvec(SIGTERM, &sv[5], (sigvec_t *) 0);
-    (void) mysigvec(SIGHUP,  &sv[6], (sigvec_t *) 0);
-    (void) sigsetmask(sm);
-}
-#endif /* SAVESIGVEC */
