@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.str.c,v 3.17 2004/12/25 21:15:08 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.str.c,v 3.18 2005/01/05 16:06:15 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,17 +35,13 @@
 
 #include <limits.h>
 
-RCSID("$Id: tc.str.c,v 3.17 2004/12/25 21:15:08 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.18 2005/01/05 16:06:15 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
 #define MALLOC_SURPLUS	MB_LEN_MAX /* Space for one multibyte character */
 #else
 #define MALLOC_SURPLUS	0
-#endif
-
-#if !defined(HAVE_STDINT_H) && !defined(HAVE_INTTYPES_H)
-typedef unsigned long intptr_t;
 #endif
 
 #ifdef WIDE_STRINGS
