@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.parse.c,v 3.19 1992/01/16 13:04:21 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.parse.c,v 3.20 1992/01/27 04:20:47 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.19 1992/01/16 13:04:21 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.20 1992/01/27 04:20:47 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -873,8 +873,7 @@ again:
 	    /*
 	     * Don't match . files on null prefix match
 	     */
-	    if (name_length == 0 && entry[0] == '.' && 
-		command != SPELL && !is_set(STRshowdots))
+	    if (name_length == 0 && entry[0] == '.' && !is_set(STRshowdots))
 		done = TRUE;
 	    break;
 

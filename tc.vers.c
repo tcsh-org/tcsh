@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.vers.c,v 3.12 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.vers.c,v 3.13 1992/01/06 22:36:56 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.12 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.13 1992/01/06 22:36:56 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -96,6 +96,11 @@ gethosttype()
 #  define _havehosttype_
     hosttype = str2short("pyramid");
 # endif /* pyr */
+
+# ifdef tahoe /* tahoe */
+#  define _havehosttype_
+    hosttype = str2short("tahoe");
+# endif /* tahoe */
 
 # ifdef ibm032 /* from Jak Kirman */
 #  define _havehosttype_

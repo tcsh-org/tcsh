@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.27 1992/01/06 22:36:56 christos Exp $
+.\" $Id: tcsh.man,v 3.28 1992/01/27 04:20:47 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1902,6 +1902,7 @@ The current possible values are:
 \fIsun386i\fR		a Sun Microsystems 386i workstation (386 based)
 \fIsun4\fR			a Sun Microsystems series 4 workstation (SPARC based)
 \fIsymmetry\fR		a Sequent Symmetry running DYNIX 3 (386/486 based)
+\fItahoe\fR		a tahoe running 4BSD
 \fItitan\fR		an Stardent Titan
 \fIunixpc\fR		an UNIX/PC running SVR1 att7300 aka att3b1
 \fIvax\fR			a Digital Equipment Corp. Vax (of any flavor)
@@ -2799,6 +2800,9 @@ parsing mechanism for tcsh, and it can cause syntax errors in
 .I csh
 scripts.
 .TP 10
+.B bsd_echo
+On system V based machines makes the builtin echo behave like the BSD one.
+.TP 10
 .B chase_symlinks 
 always resolve symbolic links to real names on cd, etc.
 .TP 10
@@ -2908,6 +2912,9 @@ of nested shells.
 .TP 10
 .B showdots 
 show hidden files in list and complete operations.
+.TP 10
+.B sysv_echo
+On BSD based machines makes the builtin echo behave like the System V one.
 .TP 10
 .B tcsh
 Contains the current version of the shell as R.VV.PP. The 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.21 1992/01/16 13:04:21 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.22 1992/01/27 04:20:47 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.21 1992/01/16 13:04:21 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.22 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -537,6 +537,8 @@ xgetpass(prm)
 static void
 auto_lock()
 {
+#ifdef NO_CRYPT
+
     int i;
     struct passwd *pw;
 #ifdef PW_SHADOW
@@ -589,6 +591,7 @@ auto_lock()
 	}
 	xprintf("\nIncorrect passwd for %s\n", pw->pw_name);
     }
+#endif /* NO_CRYPT */
     auto_logout();
 }
 

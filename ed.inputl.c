@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.inputl.c,v 3.15 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.inputl.c,v 3.16 1992/01/27 04:20:47 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.15 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.16 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -669,7 +669,8 @@ SpellLine(cmdonly)
 	while (ismetahash(*argptr) || iscmdmeta(*argptr))
 	    argptr++;
 	for (Cursor = argptr;
-	     *Cursor != '\0' && !ismetahash(*Cursor) && !iscmdmeta(*Cursor);
+	     *Cursor != '\0' && ((Cursor != argptr && Cursor[-1] == '\\') ||
+				 (!ismetahash(*Cursor) && !iscmdmeta(*Cursor)));
 	     Cursor++);
 	if (*Cursor == '\0') {
 	    Cursor = LastChar;

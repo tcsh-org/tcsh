@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.c,v 3.8 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.c,v 3.9 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.8 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.9 1992/01/27 04:20:47 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -277,12 +277,6 @@ Char   *
 dnormalize(cp)
     Char   *cp;
 {
-
-#define TRM(a) ((a) & TRIM)
-#define ISDOT(c) (TRM((c)[0]) == '.' && ((TRM((c)[1]) == '\0') || \
-		  (TRM((c)[1]) == '/')))
-#define ISDOTDOT(c) (TRM((c)[0]) == '.' && ISDOT(&((c)[1])))
-
     if (TRM(cp[0]) == '/')
 	return (Strsave(cp));
 

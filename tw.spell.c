@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.spell.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.spell.c,v 3.4 1992/01/16 13:04:21 christos Exp $ */
 /*
  * tw.spell.c: Spell check words
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.spell.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tw.spell.c,v 3.4 1992/01/16 13:04:21 christos Exp $")
 
 #include "tw.h"
 
@@ -141,9 +141,12 @@ spdir(extended_name, tilded_dir, entry, name)
     Char   *entry;
     Char   *name;
 {
-    Char    path[1024];
+    Char    path[MAXPATHLEN + 1];
     Char   *s;
     Char    oldch;
+
+    if (ISDOT(entry) || ISDOTDOT(entry))
+	return 0;
 
     for (s = name; *s != 0 && (*s & TRIM) == (*entry & TRIM); s++, entry++);
     if (*s == 0 || s[1] == 0 || *entry != 0)

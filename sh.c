@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.c,v 3.21 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.c,v 3.22 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.21 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: sh.c,v 3.22 1992/01/27 04:20:47 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -139,12 +139,25 @@ main(argc, argv)
 
 #ifdef BSDSIGS
     sigvec_t osv;
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
 
     settimes();			/* Immed. estab. timing base */
 #ifdef TESLA
     do_logout = 0;
-#endif				/* TESLA */
+#endif /* TESLA */
+
+    /*
+     * Make sure we have 0, 1, 2 open
+     * Otherwise `` jobs will not work... (From knaff@poly.polytechnique.fr)
+     */
+    {
+	do 
+	    if ((f = open(_PATH_DEVNULL, O_RDONLY)) == -1 &&
+		(f = open("/", O_RDONLY)) == -1) 
+		exit(1);
+	while (f < 3);
+	(void) close(f);
+    }
 
     osinit();			/* Os dependent initialization */
 

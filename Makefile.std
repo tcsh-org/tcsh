@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.18 1992/01/16 13:04:21 christos Exp $
+# $Id: Makefile,v 1.19 1992/01/27 04:20:47 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -88,6 +88,7 @@ LDFLAGS= 			## The simplest, suitable for all.
 # 				## the network for machines with local
 #				## swap but external /usr/local/bin .
 #LDFLAGS= -s -n -Bstatic	## Without dynamic links. (SunOS)
+#LDFLAGS= -Wl,-s,-n		## Stripped, shared text (Unicos)
 
 ################################################################
 ## LIBES.  Pick one, or roll your own.

@@ -1,5 +1,9 @@
 V6.02.00, ...
-20. Added and documented the first pass for complete.
+24. `` were not working correctly when tcsh is started with 0,1,2 closed.
+23. Correction was picking up the wrong thing in cases like .rhosts hosts
+22. Correction with names with quoted spaces was broken.
+21. Added sysv_echo and bsd_echo.
+20. Added and documented the complete builtin.
 19. Added dunique and cd -.
 18. Per's fix for alarm functions. Things would break if time went backwards.
 17. Realloc bug fix (copy min of old and new size)
