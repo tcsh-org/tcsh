@@ -1,4 +1,12 @@
 V6.06.00, -
+ 87. 6.05.09 - 05/06/95
+ 86. Small memory leak in dosetenv()
+ 85. Make sure that the number of editing functions defined is correct
+     and abort otherwise.
+ 84. Completion Fixes from Tom
+ 83. Don't add yp stuff in the tilde cache [names that start with + or -]
+ 82. Don't let children catclose() in xexit(), because the parent will lose
+     access to the nls catalogs. From Michael.
  81. 6.05.08 - 04/29/95
  80. Update to the newest csh sh.file.c
  79. More completions from Tom.

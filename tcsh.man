@@ -1011,10 +1011,10 @@ e
 Remove all but the extension.
 .TP 8
 u
-Uppercase the first letter.
+Uppercase the first lowercase letter.
 .TP 8
 l
-Lowercase the first letter.
+Lowercase the first uppercase letter.
 .TP 8
 s\fI/l/r/\fR
 Substitute \fIl\fR for \fIr\fR.
@@ -3651,7 +3651,7 @@ are used as flags to \fIls\-F\fR, making it act like `ls \-xF', `ls
 \-Fa', `ls \-FA' or a combination (e.g. `ls \-FxA'): `a' shows all
 files (even if they start with a `.'), `A' shows all files but `.' and
 `..', and `x' sorts across instead of down.  If the second word of
-\fIlistflags\fR is set, it is used as the path to `ls(1)'.
+\fBlistflags\fR is set, it is used as the path to `ls(1)'.
 .TP 8
 .B listjobs \fR(+)
 If set, all jobs are listed when a job is suspended. If set to `long',

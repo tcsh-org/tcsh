@@ -1,5 +1,5 @@
 XCOMM
-XCOMM $Id: Imakefile,v 1.61 1995/03/19 22:33:26 christos Exp christos $
+XCOMM $Id: Imakefile,v 1.62 1995/04/29 22:28:24 christos Exp $
 XCOMM
 XCOMM Imakefile for tcsh 6.06
 XCOMM Marc Horowitz, MIT SIPB
@@ -576,6 +576,6 @@ AINC=ed.defns.h sh.err.h tc.const.h sh.h
 NormalProgramTarget(tcsh, $(OBJS), $(AINC), $(LOCALLIBS), $(ALIB))
 NormalProgramTarget(gethost, gethost.${SUF}, $(AINC), $(LOCALLIBS), $(ALIB))
 
-InstallProgram(tcsh,$(TCSH_BINDIR));
-InstallManPage(tcsh,$(TCSH_MANDIR));
+InstallProgram(tcsh,$(TCSH_BINDIR))
+InstallManPage(tcsh,$(TCSH_MANDIR))
 DependTarget()

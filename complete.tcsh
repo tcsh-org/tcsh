@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.26 1995/03/19 22:33:26 christos Exp christos $
+# $Id: complete.tcsh,v 1.27 1995/04/29 22:28:24 christos Exp christos $
 # example file using the new completion code
 #
 
@@ -24,7 +24,7 @@ if ($?complete) then
     set hosts
     foreach f ($HOME/.hosts /usr/local/etc/csh.hosts $HOME/.rhosts /etc/hosts.equiv)
         if ( -r $f ) then
-	    set hosts=($hosts `cat $f | grep -v +`)
+	    set hosts=($hosts `cut -d " " -f 1 $f | grep -v +`)
 	endif
     end
     if ( -r $HOME/.netrc ) then
@@ -223,7 +223,7 @@ if ($?complete) then
     complete setenv	'p/1/e/' 'c/*:/f/'
 
     # these and method of setting hosts from Kimmo Suominen <kim@tac.nyc.ny.us>
-    if ( -f ~/.mh_profile && -x "`which folders`" ) then 
+    if ( -f $HOME/.mh_profile && -x "`which folders`" ) then 
 
     if ( ! $?FOLDERS ) setenv FOLDERS "`folders -fast -recurse`"
     if ( ! $?MHA )     setenv MHA     "`ali | sed -e '/^ /d' -e 's/:.*//'`"
@@ -417,7 +417,7 @@ if ($?complete) then
         complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
 			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \
 			n@-u@T:$_maildir@ n/-f/f/ \
-			n@*@'`sed -n s/alias//p ~/.mailrc | tr -s " " "	" | cut -f 2`'@
+			n@*@'`sed -n s/alias//p $HOME/.mailrc | tr -s " " "	" | cut -f 2`'@
     else
         complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
 			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \

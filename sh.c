@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.c,v 3.68 1995/03/19 22:33:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.c,v 3.69 1995/04/16 19:15:53 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.68 1995/03/19 22:33:26 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.69 1995/04/16 19:15:53 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2216,7 +2216,13 @@ xexit(i)
     }
     untty();
 #ifdef NLS_CATALOGS
-    (void) catclose(catd);
+    /*
+     * We need to call catclose, because SVR4 leaves symlinks behind otherwise
+     * in the catalog directories. We cannot close on a vforked() child,
+     * because messages will stop working on the parent too.
+     */
+    if (child == 0)
+	(void) catclose(catd);
 #endif /* NLS_CATALOGS */
     _exit(i);
 }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.62 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.func.c,v 3.63 1995/04/16 19:15:53 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.62 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.63 1995/04/16 19:15:53 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1406,6 +1406,7 @@ dosetenv(v, c)
 	return;
     }
 #endif /* SIG_WINDOW */
+    xfree((ptr_t) lp);
 }
 
 /*ARGSUSED*/

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.defns.c,v 3.22 1995/03/19 22:33:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.defns.c,v 3.23 1995/04/29 22:28:24 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.22 1995/03/19 22:33:26 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.23 1995/04/29 22:28:24 christos Exp $")
 
 #include "ed.h"
 
@@ -1719,6 +1719,9 @@ editinit()
     f->name = NULL;
     f->func = 0;
     f->desc = NULL;
+
+    if (f - FuncNames != F_NUM_FNS + 1)
+	abort();
 }
 
 #ifdef DEBUG_EDIT
