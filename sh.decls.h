@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.decls.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.decls.h,v 3.0 1991/07/04 23:34:26 christos Exp $ */
 /*
  * sh.decls	 External declarations from sh*.c
  */
@@ -233,7 +233,7 @@ extern	int		  prefix	__P((Char *, Char *));
 extern	Char		**saveblk	__P((Char **));
 extern	void		  setzero	__P((char *, int));
 extern	Char		 *strip		__P((Char *));
-extern	char		 *strsave	__P((char *));
+extern	char		 *strsave	__P((const char *));
 extern	char		 *strspl	__P((char *, char *));
 #ifndef POSIX
 extern  char   	  	 *strstr	__P((const char *, const char *));
