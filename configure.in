@@ -62,6 +62,9 @@ case "${tcsh_cv_canonical}" in
   *-hp-hpux[89]* )
     tcsh_config_file=hpux8
   ;;
+  *-hp-hpux10* )
+    tcsh_config_file=hpux8
+  ;;
 
   ## IBM AIX systems
   *-ibm-aix*)
@@ -207,4 +210,11 @@ if test $ac_cv_func_connect = no; then
 fi
 AC_SUBST(DFLAGS)
 
-AC_OUTPUT(config.h:config/${tcsh_config_file} Makefile)
+AC_OUTPUT(config.h.new:config/${tcsh_config_file} Makefile)
+
+if cmp -s config.h.new config.h >/dev/null 2>&1; then
+	rm -f config.h.new
+else
+	rm -f config.h
+	mv config.h.new config.h
+fi

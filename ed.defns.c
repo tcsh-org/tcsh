@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.defns.c,v 3.25 1995/05/13 20:49:02 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.defns.c,v 3.26 1996/04/26 19:17:46 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.25 1995/05/13 20:49:02 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.26 1996/04/26 19:17:46 christos Exp $")
 
 #include "ed.h"
 
@@ -1791,7 +1791,7 @@ ed_InitMetaBindings()
 	for (i = 0; i <= 0377 && CcAltMap[i] != F_METANEXT; i++)
 	    continue;
 	if (i > 0377) {
-	    i = 033;
+	    i = CTL_ESC('\033');
 	    if (VImode)
 		map = CcAltMap;
 	}
@@ -1805,7 +1805,11 @@ ed_InitMetaBindings()
     cstr.len = 2;
     for (i = 0200; i <= 0377; i++) {
 	if (map[i] != F_INSERT && map[i] != F_UNASSIGNED && map[i] != F_XKEY) {
+#ifndef _OSD_POSIX
 	    buf[1] = i & ASCII;
+#else
+	    buf[1] = _toebcdic[_toascii[i] & ASCII];
+#endif
 	    AddXkey(&cstr, XmapCmd((int) map[i]), XK_CMD);
 	}
     }
@@ -1846,9 +1850,9 @@ ed_InitEmacsMaps()
     }
     ed_InitMetaBindings();
     ed_InitNLSMaps();
-    buf[0] = 030;
+    buf[0] = CTL_ESC('\030');
     buf[2] = 0;
-    buf[1] = 030;
+    buf[1] = CTL_ESC('\030');
     AddXkey(&cstr, XmapCmd(F_EXCHANGE_MARK), XK_CMD);
     buf[1] = '*';
     AddXkey(&cstr, XmapCmd(F_EXPAND_GLOB),   XK_CMD);
@@ -1866,7 +1870,7 @@ ed_InitEmacsMaps()
     AddXkey(&cstr, XmapCmd(F_COMMAND_NORM),  XK_CMD);
     buf[1] = '\t';
     AddXkey(&cstr, XmapCmd(F_COMPLETE_ALL),  XK_CMD);
-    buf[1] = 004;	/* ^D */
+    buf[1] = CTL_ESC('\004');	/* ^D */
     AddXkey(&cstr, XmapCmd(F_LIST_ALL),      XK_CMD);
     ResetArrowKeys();
     BindArrowKeys();
@@ -1877,6 +1881,32 @@ ed_InitMaps()
 {
     if (MapsAreInited)
 	return;
+#ifdef _OSD_POSIX
+    /* This machine has an EBCDIC charset. The assumptions made for the
+     * initialized keymaps therefore don't hold, since they are based on
+     * ASCII (or ISO8859-1).
+     * Here, we do a one-time transformation to EBCDIC environment
+     * for the key initializations.
+     */
+    {
+	KEYCMD temp[256];
+	static KEYCMD *const list[3] = { CcEmacsMap, CcViMap, CcViCmdMap };
+	register int i, table;
+
+	for (table=0; table<3; ++table)
+	{
+	    /* copy ASCII ordered map to temp table */
+	    for (i = 0; i < 256; i++) {
+		temp[i] = list[table][i];
+	    }
+	    /* write back as EBCDIC ordered map */
+	    for (i = 0; i < 256; i++) {
+		list[table][_toebcdic[i]] = temp[i];
+	    }
+	}
+    }
+#endif /* _OSD_POSIX */
+
 #ifdef VIDEFAULT
     ed_InitVIMaps();
 #else

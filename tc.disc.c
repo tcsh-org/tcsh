@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.disc.c,v 3.9 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.disc.c,v 3.10 1996/04/26 19:20:54 christos Exp $ */
 /*
  * tc.disc.c: Functions to set/clear line disciplines
  *
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.disc.c,v 3.9 1995/03/12 04:49:26 christos Exp $")
+RCSID("$Id: tc.disc.c,v 3.10 1996/04/26 19:20:54 christos Exp $")
 
 #ifdef OREO
 #include <compat.h>
@@ -114,12 +114,12 @@ int     f;
 	    if (ioctl(f, TIOCGLTC, (ioctl_t) & ltcbuf) != 0)
 		xprintf(CGETS(21, 1, "Couldn't get local chars.\n"));
 	    else {
-		ltcbuf.t_suspc = '\032';	/* ^Z */
-		ltcbuf.t_dsuspc = '\031';	/* ^Y */
-		ltcbuf.t_rprntc = '\022';	/* ^R */
-		ltcbuf.t_flushc = '\017';	/* ^O */
-		ltcbuf.t_werasc = '\027';	/* ^W */
-		ltcbuf.t_lnextc = '\026';	/* ^V */
+		ltcbuf.t_suspc = CTL_ESC('\032');        /* ^Z */
+		ltcbuf.t_dsuspc = CTL_ESC('\031');       /* ^Y */
+		ltcbuf.t_rprntc = CTL_ESC('\022');       /* ^R */
+		ltcbuf.t_flushc = CTL_ESC('\017');       /* ^O */
+		ltcbuf.t_werasc = CTL_ESC('\027');       /* ^W */
+		ltcbuf.t_lnextc = CTL_ESC('\026');       /* ^V */
 		if (ioctl(f, TIOCSLTC, (ioctl_t) & ltcbuf) != 0)
 		    xprintf(CGETS(21, 2, "Couldn't set local chars.\n"));
 	    }

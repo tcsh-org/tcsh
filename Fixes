@@ -1,3 +1,15 @@
+ 29. fixed problem where  complete complete  'p/*/t:*.txt/' would not honor
+     the pattern.
+ 28. Port to an EBCDIC machine: BS2000 by Siemens Nixdorf that has an
+     IBM/390 compatible processor (Martin.Kraemer)
+ 27. Detect when we have errors writing to stdout (Vadim Vygonets)
+ 26. Ignore quotes in the comparisons for builtins, so that \builtin works.
+ 25. HPUX, portability fixes; make sure that we have the right config file
+     (Jonathan Kamens)
+ 24. Don't do lookups for x displays and figure out ttys properly 
+     (Leonard N. Zubkoff)
+ 23. make print_by_columns print in a single column when the output is not a tty
+ 22. use rlim_t for Solaris2 (Casper Dik)
  21. V6.07.04 - 05/04/97
  20. set -f -l patch (Michael Veksler)
  19. SGI patches (Tomasz J. Cholewo). Also fix completion code to take into

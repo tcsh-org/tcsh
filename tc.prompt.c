@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.25 1997/02/23 19:03:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.26 1997/05/04 17:52:19 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.25 1997/02/23 19:03:26 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.26 1997/05/04 17:52:19 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -197,8 +197,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			/* prompt stuff */
     static Char *olddir = NULL, *olduser = NULL;
     extern int tlength;	/* cache cleared */
-    int updirs, pdirs;
-    size_t sz;
+    size_t updirs, pdirs, sz;
 
     for (; *cp; cp++) {
 	if (p >= ep)

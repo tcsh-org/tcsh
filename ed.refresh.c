@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.17 1996/04/26 19:18:09 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.18 1997/02/23 19:03:17 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.17 1996/04/26 19:18:09 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.18 1997/02/23 19:03:17 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -147,13 +147,34 @@ Draw(c)				/* draw c, expand tabs, ctl chars */
 	}
     }
     else if (Iscntrl(ch)) {
+#ifndef _OSD_POSIX
 	Vdraw('^');
-	if (ch == '\177') {
+	if (ch == CTL_ESC('\177')) {
 	    Vdraw('?');
 	}
 	else {
 	    /* uncontrolify it; works only for iso8859-1 like sets */
 	    Vdraw((c | 0100));
+#else /*_OSD_POSIX*/
+	if (ch == CTL_ESC('\177')) {
+	    Vdraw('^');
+	    Vdraw('?');
+	}
+	else {
+	    if (Isupper(_toebcdic[_toascii[c]|0100])
+		|| strchr("@[\\]^_", _toebcdic[_toascii[c]|0100]) != NULL)
+	    {
+		Vdraw('^');
+		Vdraw(_toebcdic[_toascii[c]|0100]);
+	    }
+	    else
+	    {
+		Vdraw('\\');
+		Vdraw(((c >> 6) & 7) + '0');
+		Vdraw(((c >> 3) & 7) + '0');
+		Vdraw((c & 7) + '0');
+	    }
+#endif /*_OSD_POSIX*/
 	}
     }
 #ifdef KANJI
@@ -1156,9 +1177,26 @@ RefPlusOne()
     }				/* else (only do at end of line, no TAB) */
 
     if (Iscntrl(c)) {		/* if control char, do caret */
+#ifndef _OSD_POSIX
 	mc = (c == '\177') ? '?' : (c | 0100);
 	PutPlusOne('^');
 	PutPlusOne(mc);
+#else /*_OSD_POSIX*/
+	if (_toascii[c] == '\177' || Isupper(_toebcdic[_toascii[c]|0100])
+		|| strchr("@[\\]^_", _toebcdic[_toascii[c]|0100]) != NULL)
+	{
+	    mc = (_toascii[c] == '\177') ? '?' : _toebcdic[_toascii[c]|0100];
+	    PutPlusOne('^');
+	    PutPlusOne(mc);
+	}
+	else
+	{
+	    PutPlusOne('\\');
+	    PutPlusOne(((c >> 6) & 7) + '0');
+	    PutPlusOne(((c >> 3) & 7) + '0');
+	    PutPlusOne((c & 7) + '0');
+	}
+#endif /*_OSD_POSIX*/
     }
     else if (Isprint(c)) {	/* normal char */
 	PutPlusOne(c);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.77 1997/02/23 19:03:29 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.78 1997/05/04 17:52:21 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.77 1997/02/23 19:03:29 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.78 1997/05/04 17:52:21 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -679,9 +679,7 @@ is_suffix(check, template)
     for (;;) {
 	if (t == template)
 	    return 1;
-	--t;
-	--c;
-	if (c == check || (*t & TRIM) != (*c & TRIM))
+	if (c == check || (*--t & TRIM) != (*--c & TRIM))
 	    return 0;
     }
 } /* end is_suffix */
@@ -972,7 +970,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		break;
 
 	    if (gpat && !Gmatch(item, pat))
-		if (!text_check && !dir_check && !isadirectory(exp_dir, item))
+		if (!dir_check && !isadirectory(exp_dir, item))
 		    break;
 
 	    /*
@@ -1692,7 +1690,7 @@ dollar(new, old)
     Char   *new, *old;
 {
     Char    *p;
-    int     space;
+    size_t   space;
 
     for (space = FILSIZ, p = new; *old && space > 0;)
 	if (*old != '$') {
@@ -1703,7 +1701,7 @@ dollar(new, old)
 	    if (expdollar(&p, &old, &space, QUOTE) == NULL)
 		return NULL;
 	}
-    *new = '\0';
+    *p = '\0';
     return (new);
 } /* end dollar */
 
@@ -1998,7 +1996,7 @@ print_by_column(dir, items, count, no_file_suffix)
 
     maxwidth += no_file_suffix ? 1 : 2;	/* for the file tag and space */
     columns = TermH / maxwidth;		/* PWP: terminal size change */
-    if (!columns)
+    if (!columns || !isatty(didfds ? 1 : SHOUT))
 	columns = 1;
     rows = (count + (columns - 1)) / columns;
 

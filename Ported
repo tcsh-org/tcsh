@@ -931,3 +931,15 @@ CONFIG	:	sysv4
 ENVIRON	:	n/a
 NOTES	:	n/a
 VERSION	:	6.07.02
+
+VENDOR	:	Fujitsu ICL
+MODELS	:	SuperServer Intel based
+COMPILER:	gcc 2.7.2
+CFLAGS	:	normal for gcc 2.1+  ....  -O2 $(INCLUDES)
+LIBES	:	-ltermlib -lsocket -lnsl -lcrypt -lgen
+OS	:	SCO UnixWare 2.1 SysVR4.2 i386 x86at
+CONFIG	:	sysv4
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.06.00
+

@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.17 1997/02/23 19:03:18 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.18 1997/05/04 17:52:14 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.17 1997/02/23 19:03:18 christos Exp $")
+RCSID("$Id: host.defs,v 1.18 1997/05/04 17:52:14 christos Exp $")
 
 endcode	:
 
@@ -947,6 +947,13 @@ machtype: defined(M_mipseb)				: "mipseb"
 machtype:						: "mips"
 enddef	:
 
+newdef	: defined(_OSD_POSIX)
+comment	: Siemens Nixdorf Informationssysteme BS2000 POSIX (mainframe, EBCDIC)
+vendor	:						: "sni"
+hosttype: defined(M_intel)				: "bs2000"
+ostype	: 						: "posix"
+machtype:						: "bs2000"
+enddef	:
 
 newdef  : !defined(SOLARIS2) && (SYSVREL == 4)
 comment : Unix System V Release 4.0
@@ -960,7 +967,7 @@ newdef	: defined(__uxp__) || defined(__uxps__)
 comment	: FUJITSU DS/90 7000
 vendor	:						: "fujitsu"
 hosttype:						: "ds90"
-ostype	:						: "sysv4""
+ostype	:						: "sysv4"
 machtype:						: "sparc"
 enddef	:
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.66 1996/10/05 17:39:17 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.67 1997/05/04 17:52:18 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -60,8 +60,11 @@
 # include <limits.h>
 #endif /* atp vmsposix */
 
-#ifdef DECOSF1
+#if defined(DECOSF1) || defined(HPUXVERSION)
 # include <sys/signal.h>
+#endif /* DECOSF1 || HPUXVERSION */
+
+#ifdef DECOSF1
 # include <sys/ioctl.h>
 #endif /* DECOSF1 */
 
@@ -147,7 +150,7 @@ struct ucred {
 # include <signal.h>
 # if !defined(hp9000s500) && !(defined(SIGRTMAX) || defined(SIGRTMIN))
 /*
- * hpux < 7 || hpux >= 10
+ * hpux < 7
  */
 #  include <sys/bsdtty.h>
 # endif /* !hp9000s500 && !(SIGRTMAX || SIGRTMIN) */

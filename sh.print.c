@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.print.c,v 3.7 1993/06/25 21:17:12 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.8 1996/04/26 19:20:06 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.7 1993/06/25 21:17:12 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.8 1996/04/26 19:20:06 christos Exp $")
 
 #include "ed.h"
 
@@ -196,6 +196,7 @@ flush()
 {
     register int unit;
     static int interrupted = 0;
+    size_t sz;
 
     /* int lmode; */
 
@@ -223,7 +224,10 @@ flush()
     }
 #endif
 #endif
-    (void) write(unit, linbuf, (size_t) (linp - linbuf));
+    sz = (size_t) (linp - linbuf);
+    if (write(unit, linbuf, sz) != sz && !haderr)
+	stderror(ERR_SYSTEM, progname, strerror(errno));
+
     linp = linbuf;
     interrupted = 0;
 }

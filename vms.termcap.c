@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/vms.termcap.c,v 1.3 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/vms.termcap.c,v 1.4 1996/04/26 19:23:29 christos Exp $ */
 /*
  *	termcap.c	1.1	20/7/87		agc	Joypace Ltd
  *
@@ -9,8 +9,8 @@
  *	A public domain implementation of the termcap(3) routines.
  */
 #include "sh.h"
-RCSID("$Id: vms.termcap.c,v 1.3 1995/03/12 04:49:26 christos Exp $")
-#ifdef _VMS_POSIX
+RCSID("$Id: vms.termcap.c,v 1.4 1996/04/26 19:23:29 christos Exp $")
+#if defined(_VMS_POSIX) || defined(_OSD_POSIX)
 /*    efth      1988-Apr-29
 
     - Correct when TERM != name and TERMCAP is defined   [tgetent]
@@ -215,7 +215,7 @@ char	**area;
 				case '\\' :
 					switch(*++cp) {
 					case 'E' :
-						**area = '\033';
+						**area = CTL_ESC('\033');
 						break;
 					case 'n' :
 						**area = '\n';

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.48 1996/10/19 17:53:49 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.49 1997/02/23 19:03:16 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.48 1996/10/19 17:53:49 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.49 1997/02/23 19:03:16 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1091,7 +1091,7 @@ v_search(dir)
     for (ch = 0;ch == 0;) {
 	if (GetNextChar(&ch) != 1)
 	    return(e_send_eof(0));
-	switch (ch) {
+	switch (ASC(ch)) {
 	case 0010:	/* Delete and backspace */
 	case 0177:
 	    if (tmplen > 1) {
@@ -1110,8 +1110,13 @@ v_search(dir)
 	    break;
 
 	case 0033:	/* ESC */
+#ifndef _OSD_POSIX
 	case '\r':	/* Newline */
 	case '\n':
+#else
+	case '\012':    /* Newline */
+	case '\015':    /* Return */
+#endif
 	    break;
 
 	default:

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.69 1996/09/24 16:57:29 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.70 1996/10/05 17:39:16 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.69 1996/09/24 16:57:29 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.70 1996/10/05 17:39:16 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1943,11 +1943,12 @@ getremotehost()
 	else
 	    host = inet_ntoa(saddr.sin_addr);
     }
-#ifdef UTHOST
+#if defined(UTHOST) && !defined(HAVENOUTMP)
     else {
 	char *ptr, *sptr;
 	char *name = utmphost();
-	if (name != NULL && *name != '\0') {
+	/* Avoid empty names and local X displays */
+	if (name != NULL && *name != '\0' && *name != ':') {
 	    /* Look for host:display.screen */
 	    if ((sptr = strchr(name, ':')) != NULL)
 		*sptr = '\0';

@@ -676,6 +676,9 @@ case "${tcsh_cv_canonical}" in
   *-sco3.2v2*)
     tcsh_config_file=sco32v2
   ;;
+  bs2000-sni-posix)
+    tcsh_config_file=bs2000
+  ;;
 
   * )
     { echo "configure: error: Tcsh can't guess the configuration file name
@@ -1482,7 +1485,7 @@ s%\[%\\&%g
 s%\]%\\&%g
 s%\$%$$%g
 EOF
-DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`
+DEFS=`sed -f conftest.defs confdefs.h | tr '\n' ' '`
 rm -f conftest.defs
 
 

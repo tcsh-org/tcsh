@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.char.h,v 3.10 1996/04/26 19:18:55 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.char.h,v 3.11 1997/02/23 19:03:18 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -73,12 +73,33 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 #if defined(SHORT_STRINGS) && defined(KANJI)
 extern Char STRnokanji[];
 
+#define ASC(ch) ch
+#define CTL_ESC(ch) ch
 #define cmap(c, bits)	\
 	((((c) & QUOTE) || ((c & 0x80) && adrof(STRnokanji))) ? \
 	0 : (_cmap[(unsigned char)(c)] & (bits)))
 #else
+#ifndef _OSD_POSIX
+#define ASC(ch) ch
+#define CTL_ESC(ch) ch
 #define cmap(c, bits)	\
 	(((c) & QUOTE) ? 0 : (_cmap[(unsigned char)(c)] & (bits)))
+#else /*_OSD_POSIX*/
+/* "BS2000 OSD" is a POSIX on a main frame using a EBCDIC char set */
+extern unsigned short _toascii[256];
+extern unsigned short _toebcdic[256];
+
+/* mainly for comparisons if (ASC(ch)=='\177')... */
+#define ASC(ch)     _toascii[(unsigned char)ch]
+
+/* Literal escapes ('\010') must be mapped to EBCDIC,
+ * for C-Escapes   ('\b'), the compiler already does it.
+ */
+#define CTL_ESC(ch) _toebcdic[(unsigned char)ch]
+
+#define cmap(c, bits)	\
+	(((c) & QUOTE) ? 0 : (_cmap[_toascii[(unsigned char)(c)]] & (bits)))
+#endif /*_OSD_POSIX*/
 #endif
 
 #define isglob(c)	cmap(c, _GLOB)
@@ -134,13 +155,20 @@ extern Char STRnokanji[];
 # define Isalpha(c)	(cmap(c,_LET) && !(((c) & META) && AsciiOnly))
 # define Islower(c)	(cmap(c,_DOW) && !(((c) & META) && AsciiOnly))
 # define Isupper(c)	(cmap(c, _UP) && !(((c) & META) && AsciiOnly))
+#ifndef _OSD_POSIX
 # define Tolower(c)	(_cmap_lower[(unsigned char)(c)])
 # define Toupper(c)	(_cmap_upper[(unsigned char)(c)])
+#else /*_OSD_POSIX*/
+/* "BS2000 OSD" is a POSIX on a main frame using a EBCDIC char set */
+# define Tolower(c)     (_cmap_lower[_toascii[(unsigned char)(c)]])
+# define Toupper(c)     (_cmap_upper[_toascii[(unsigned char)(c)]])
+#endif /*_OSD_POSIX*/
 # define Isxdigit(c)	cmap(c, _XD)
 # define Isalnum(c)	(cmap(c, _DIG|_LET) && !(((Char)(c) & META) && AsciiOnly))
 # define Iscntrl(c)	(cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
 # define Isprint(c)	(!cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
 # define Ispunct(c)	(cmap(c,_PUN) && !(((c) & META) && AsciiOnly))
+
 #endif /* !NLS */
 
 #endif /* _h_sh_char */

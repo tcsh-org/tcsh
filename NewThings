@@ -1,6 +1,9 @@
 This file contains visible (incompatible) changes to the users.
 This version of tcsh has the following new things:
 
+6.08
+* Autoconf support.
+
 6.07
 * Implicit cd when the variable implicitcd is set or set to verbose
 

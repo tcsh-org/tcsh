@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.bind.c,v 3.24 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.25 1996/04/26 19:20:38 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.24 1995/03/12 04:49:26 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.25 1996/04/26 19:20:38 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -289,7 +289,11 @@ parsebind(s, str)
     switch (*s) {
     case '^':
 	s++;
+#ifndef _OSD_POSIX
 	*b++ = (*s == '?') ? '\177' : ((*s & CHAR) & 0237);
+#else /*_OSD_POSIX*/
+	*b++ = (*s == '?') ? CTL_ESC('\177') : _toebcdic[_toascii[*s & CHAR] & 0237];
+#endif /*_OSD_POSIX*/
 	*b = '\0';
 	break;
 
@@ -304,25 +308,37 @@ parsebind(s, str)
 	s += 2;
 	switch (s[-2]) {
 	case 'F': case 'f':	/* Turn into ^[str */
-	    *b++ = '\033';
+	    *b++ = CTL_ESC('\033');
 	    while ((*b++ = *s++) != '\0')
 		continue;
 	    b--;
 	    break;
 
 	case 'C': case 'c':	/* Turn into ^c */
+#ifndef _OSD_POSIX
 	    *b++ = (*s == '?') ? '\177' : ((*s & CHAR) & 0237);
+#else /*_OSD_POSIX*/
+	    *b++ = (*s == '?') ? CTL_ESC('\177') : _toebcdic[_toascii[*s & CHAR] & 0237];
+#endif /*_OSD_POSIX*/
 	    *b = '\0';
 	    break;
 
 	case 'X' : case 'x':	/* Turn into ^Xc */
+#ifndef _OSD_POSIX
 	    *b++ = 'X' & 0237;
+#else /*_OSD_POSIX*/
+	    *b++ = _toebcdic[_toascii['X'] & 0237];
+#endif /*_OSD_POSIX*/
 	    *b++ = *s;
 	    *b = '\0';
 	    break;
 
 	case 'M' : case 'm':	/* Turn into 0x80|c */
+#ifndef _OSD_POSIX
 	    *b++ = *s | 0x80;
+#else /*_OSD_POSIX*/
+	    *b++ = _toebcdic[_toascii[*s] | 0x80];
+#endif /*_OSD_POSIX*/
 	    *b = '\0';
 	    break;
 
@@ -530,9 +546,13 @@ tocontrol(c)
     else if (c == ' ')
 	c = '@';
     if (c == '?')
-	c = 0177;
+	c = CTL_ESC('\177');
     else
+#ifndef _OSD_POSIX
 	c &= 037;
+#else /* EBCDIC: simulate ASCII-behavior by transforming to ASCII and back */
+	c  = _toebcdic[_toascii[c] & 037];
+#endif
     return (c);
 }
 
@@ -573,6 +593,7 @@ unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
     case '\t':
 	(void) strcpy(cp, "Tab");
 	return (tmp);
+#ifndef _OSD_POSIX
     case '\033':
 	(void) strcpy(cp, "Esc");
 	return (tmp);
@@ -589,6 +610,28 @@ unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
 	}
 	*cp = '\0';
 	return (tmp);
+#else /*_OSD_POSIX*/
+    default:
+        if (*cp == CTL_ESC('\033')) {
+	    (void) strcpy(cp, "Esc");
+	    return (tmp);
+	}
+	else if (*cp == CTL_ESC('\177')) {
+	    (void) strcpy(cp, "Del");
+	    return (tmp);
+	}
+	else if (Isupper(_toebcdic[_toascii[c]|0100])
+		|| strchr("@[\\]^_", _toebcdic[_toascii[c]|0100]) != NULL)
+	{
+	    *cp++ = '^';
+	    *cp++ = _toebcdic[_toascii[c]|0100]
+	}
+	else
+	{
+	    sprintf(cp,"\\%3.3o", c);
+	    cp += 4;
+	}
+#endif /*_OSD_POSIX*/
     }
 }
 
@@ -764,11 +807,11 @@ parsekey(sp)
 	    else if (!strcmp(ts, "tab"))
 		c = '\t';
 	    else if (!strcmp(ts, "escape") || !strcmp(ts, "Esc"))
-		c = '\033';
+		c = CTL_ESC('\033');
 	    else if (!strcmp(ts, "backspace"))
 		c = '\b';
 	    else if (!strcmp(ts, "delete"))
-		c = '\177';
+		c = CTL_ESC('\177');
 	    else {
 		xprintf(CGETS(20, 35,
 			"bad key specification -- unknown name \"%S\"\n"), s);
@@ -824,11 +867,12 @@ dobind(v, dummy)
 
 		if ((c = parsekey(&s)) == -1)
 		    return;
-		if (c == -2) {	/* extented key */
+		if (c == -2) {	/* extended key */
 		    for (i = 0; i < 256; i++) {
-			if (i != 033 && (CcKeyMap[i] == F_XKEY ||
+			if (i != CTL_ESC('\033') && (CcKeyMap[i] == F_XKEY ||
 					 CcAltMap[i] == F_XKEY)) {
 			    p = buf;
+#ifndef _OSD_POSIX /* this is only for ASCII, not for EBCDIC */
 			    if (i > 0177) {
 				*p++ = 033;
 				*p++ = i & ASCII;
@@ -836,6 +880,9 @@ dobind(v, dummy)
 			    else {
 				*p++ = (Char) i;
 			    }
+#else /*_OSD_POSIX*/
+			    *p++ = (Char) i;
+#endif /*_OSD_POSIX*/
 			    for (l = s; *l != 0; l++) {
 				*p++ = *l;
 			    }
@@ -852,7 +899,7 @@ dobind(v, dummy)
 			CcAltMap[c & APOLLO_0377] = fp->func;	
 			/* bind the vi cmd mode key */
 			if (c & META) {
-			    buf[0] = 033;
+			    buf[0] = CTL_ESC('\033');
 			    buf[1] = c & ASCII;
 			    buf[2] = 0;
 			    cstr.buf = buf;
@@ -861,19 +908,19 @@ dobind(v, dummy)
 			}
 		    }
 		    else {
-			buf[0] = 030;	/* ^X */
+			buf[0] = CTL_ESC('\030');	/* ^X */
 			buf[1] = c & APOLLO_0377;
 			buf[2] = 0;
 			cstr.buf = buf;
 			cstr.len = Strlen(buf);
 			AddXkey(&cstr, XmapCmd(fp->func), XK_CMD);
-			CcKeyMap[030] = F_XKEY;
+			CcKeyMap[CTL_ESC('\030')] = F_XKEY;
 		    }
 		}
 		else {
 		    CcKeyMap[c] = fp->func;	/* bind the key */
 		    if (c & META) {
-			buf[0] = 033;
+			buf[0] = CTL_ESC('\033');
 			buf[1] = c & ASCII;
 			buf[2] = 0;
 			cstr.buf = buf;

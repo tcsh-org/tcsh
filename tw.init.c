@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.init.c,v 3.19 1996/04/26 19:23:08 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.init.c,v 3.20 1997/05/04 17:52:21 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.19 1996/04/26 19:23:08 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.20 1997/05/04 17:52:21 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -695,7 +695,7 @@ tw_grpname_start(dfd, pat)
 {
     USE(pat);
     SETDIR(dfd)
-#ifndef _VMS_POSIX
+#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX)
     (void) setgrent();	/* Open group file */
 #endif /* atp vmsposix */
 } /* end tw_grpname_start */
@@ -711,7 +711,7 @@ tw_grpname_next(dir, flags)
     int  *flags;
 {
     static Char retname[MAXPATHLEN];
-    struct group *gr;
+    struct group *gr = NULL;
     /*
      * We don't want to get interrupted inside getgrent()
      * because the yellow pages code is not interruptible,
@@ -721,7 +721,7 @@ tw_grpname_next(dir, flags)
     USE(flags);
     USE(dir);
     TW_HOLD();
-#ifndef _VMS_POSIX
+#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX)
     gr = (struct group *) getgrent();
 #endif /* atp vmsposix */
     TW_RELS();
@@ -746,7 +746,7 @@ tw_grpname_end()
 #ifdef YPBUGS
     fix_yp_bugs();
 #endif
-#ifndef _VMS_POSIX
+#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX)
    (void) endgrent();
 #endif /* atp vmsposix */
 } /* end tw_grpname_end */

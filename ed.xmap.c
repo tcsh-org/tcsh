@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.xmap.c,v 3.16 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.xmap.c,v 3.17 1996/04/26 19:18:24 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.16 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.17 1996/04/26 19:18:24 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -631,11 +631,32 @@ unparsech(cnt, ch)
     }
 
     if (Iscntrl(*ch)) {
+#ifndef _OSD_POSIX
 	printbuf[cnt++] = '^';
-	if (*ch == '\177')
+	if (*ch == CTL_ESC('\177'))
 	    printbuf[cnt] = '?';
 	else
 	    printbuf[cnt] = *ch | 0100;
+#else /*_OSD_POSIX*/
+	if (*ch == CTL_ESC('\177'))
+	{
+		printbuf[cnt++] = '^';
+		printbuf[cnt] = '?';
+	}
+	else if (Isupper(_toebcdic[_toascii[*ch]|0100])
+		|| strchr("@[\\]^_", _toebcdic[_toascii[*ch]|0100]) != NULL)
+	{
+		printbuf[cnt++] = '^';
+		printbuf[cnt] = _toebcdic[_toascii[*ch]|0100];
+	}
+	else
+	{
+		printbuf[cnt++] = '\\';
+		printbuf[cnt++] = ((*ch >> 6) & 7) + '0';
+		printbuf[cnt++] = ((*ch >> 3) & 7) + '0';
+		printbuf[cnt] = (*ch & 7) + '0';
+	}
+#endif /*_OSD_POSIX*/
     }
     else if (*ch == '^') {
 	printbuf[cnt++] = '\\';
@@ -673,28 +694,28 @@ parseescape(ptr)
 	p++;
 	switch (*p & CHAR) {
 	case 'a':
-	    c = '\007';		/* Bell */
+	    c = CTL_ESC('\007');         /* Bell */
 	    break;
 	case 'b':
-	    c = '\010';		/* Backspace */
+	    c = CTL_ESC('\010');         /* Backspace */
 	    break;
 	case 't':
-	    c = '\011';		/* Horizontal Tab */
+	    c = CTL_ESC('\011');         /* Horizontal Tab */
 	    break;
 	case 'n':
-	    c = '\012';		/* New Line */
+	    c = CTL_ESC('\012');         /* New Line */
 	    break;
 	case 'v':
-	    c = '\013';		/* Vertical Tab */
+	    c = CTL_ESC('\013');         /* Vertical Tab */
 	    break;
 	case 'f':
-	    c = '\014';		/* Form Feed */
+	    c = CTL_ESC('\014');         /* Form Feed */
 	    break;
 	case 'r':
-	    c = '\015';		/* Carriage Return */
+	    c = CTL_ESC('\015');         /* Carriage Return */
 	    break;
 	case 'e':
-	    c = '\033';		/* Escape */
+	    c = CTL_ESC('\033');         /* Escape */
 	    break;
 	case '0':
 	case '1':
@@ -720,6 +741,11 @@ parseescape(ptr)
 			    "Octal constant does not fit in a char.\n"));
 		    return 0;
 		}
+#ifdef _OSD_POSIX
+		if (CTL_ESC(val) != val && adrof(STRwarnebcdic))
+		    xprintf(/*CGETS(9, 9, no NLS-String yet!*/
+			    "Warning: Octal constant \\%3.3o is interpreted as EBCDIC value.\n", val/*)*/);
+#endif
 		c = (Char) val;
 		--p;
 	    }
@@ -732,7 +758,14 @@ parseescape(ptr)
     else if ((*p & CHAR) == '^' && (Isalpha(p[1] & CHAR) || 
 				    strchr("@^_?\\|[{]}", p[1] & CHAR))) {
 	p++;
-	c = ((*p & CHAR) == '?') ? '\177' : ((*p & CHAR) & 0237);
+#ifndef _OSD_POSIX
+	c = ((*p & CHAR) == '?') ? CTL_ESC('\177') : ((*p & CHAR) & 0237);
+#else /*_OSD_POSIX*/
+	c = ((*p & CHAR) == '?') ? CTL_ESC('\177') : _toebcdic[_toascii[*p & CHAR] & 0237];
+	if (adrof(STRwarnebcdic))
+	    xprintf(/*CGETS(9, 9, no NLS-String yet!*/
+		"Warning: Control character ^%c may be interpreted differently in EBCDIC.\n", *p & CHAR /*)*/);
+#endif /*_OSD_POSIX*/
     }
     else
 	c = *p;
@@ -758,11 +791,27 @@ unparsestring(str, buf, sep)
     for (l = 0; l < str->len; l++) {
 	p = str->buf[l];
 	if (Iscntrl(p)) {
+#ifndef _OSD_POSIX
 	    *b++ = '^';
-	    if (p == '\177')
+	    if (p == CTL_ESC('\177'))
 		*b++ = '?';
 	    else
 		*b++ = (unsigned char) (p | 0100);
+#else /*_OSD_POSIX*/
+	    if (_toascii[p] == '\177' || Isupper(_toebcdic[_toascii[p]|0100])
+		 || strchr("@[\\]^_", _toebcdic[_toascii[p]|0100]) != NULL)
+	    {
+		*b++ = '^';
+		*b++ = (_toascii[p] == '\177') ? '?' : _toebcdic[_toascii[p]|0100];
+	    }
+	    else
+	    {
+		*b++ = '\\';
+		*b++ = ((p >> 6) & 7) + '0';
+		*b++ = ((p >> 3) & 7) + '0';
+		*b++ = (p & 7) + '0';
+	    }
+#endif /*_OSD_POSIX*/
 	}
 	else if (p == '^' || p == '\\') {
 	    *b++ = '\\';

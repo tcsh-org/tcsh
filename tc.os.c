@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.42 1996/04/26 19:21:08 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.43 1997/02/23 19:03:25 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.42 1996/04/26 19:21:08 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.43 1997/02/23 19:03:25 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -551,7 +551,7 @@ dodmmode(v, c)
     else {
 	if (cp[1] != '\0')
 	    stderror(ERR_NAME | ERR_STRING, 
-		     CGETS(23, 30, "Too many arguments");
+		     CGETS(23, 30, "Too many arguments"));
 	else
 	    switch(*cp) {
 	    case '0':
@@ -562,7 +562,7 @@ dodmmode(v, c)
 		break;
 	    default:
 		stderror(ERR_NAME | ERR_STRING, 
-			 CGETS(23, 31, "Invalid argument");
+			 CGETS(23, 31, "Invalid argument"));
 	    }
     }
 }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.file.c,v 3.13 1996/04/26 19:19:21 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.file.c,v 3.14 1996/06/22 21:44:34 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.13 1996/04/26 19:19:21 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.14 1996/06/22 21:44:34 christos Exp $")
 
 #ifdef FILEC
 
@@ -56,7 +56,7 @@ RCSID("$Id: sh.file.c,v 3.13 1996/04/26 19:19:21 christos Exp $")
 #define FALSE 0
 #endif
 
-#define ESC	'\033'
+#define ESC     CTL_ESC('\033')
 
 typedef enum {
     LIST, RECOGNIZE
@@ -456,7 +456,14 @@ static void
 beep()
 {
     if (adrof(STRnobeep) == 0)
+#ifndef _OSD_POSIX
 	(void) write(SHOUT, "\007", 1);
+#else /*_OSD_POSIX*/
+    {
+	unsigned char beep_ch = CTL_ESC('\007');
+	(void) write(SHOUT, &beep_ch, 1);
+    }
+#endif /*_OSD_POSIX*/
 }
 
 /*

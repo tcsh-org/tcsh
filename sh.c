@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.72 1996/06/22 21:44:25 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.73 1996/10/05 17:39:07 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.72 1996/06/22 21:44:25 christos Exp $")
+RCSID("$Id: sh.c,v 3.73 1996/10/05 17:39:07 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -464,8 +464,8 @@ main(argc, argv)
 	    }
 	    else
 		cp2 = cp;
-	    if (!((Strncmp(cp2, STRtty, 3) == 0) && Isalpha(cp2[3])) ||
-		!((Strncmp(cp, STRpts, 3) == 0) && cp[3] == '/')) {
+	    if (!(((Strncmp(cp2, STRtty, 3) == 0) && Isalpha(cp2[3])) ||
+		  ((Strncmp(cp, STRpts, 3) == 0) && cp[3] == '/'))) {
 		if (getenv("DISPLAY") == NULL) {
 		    /* NOT on X window shells */
 		    set(STRautologout, Strsave(STRdefautologout), 
@@ -1599,7 +1599,8 @@ goodbye(v, c)
 	(void) sigset(SIGHUP, SIG_IGN);
 	setintr = 0;		/* No interrupts after "logout" */
 	/* Trap errors inside .logout */
-	if ((reenter = setexit()) != 0)
+	reenter = setexit();
+	if (reenter != 0)
 	    exitstat();
 	if (!(adrof(STRlogout)))
 	    set(STRlogout, Strsave(STRnormal), VAR_READWRITE);

@@ -417,6 +417,9 @@ EOF
     rs6000:LynxOS:2.[23]*:*)
 	echo rs6000-lynx-lynxos${UNAME_RELEASE}
 	exit 0 ;;
+    BS2000:POSIX-BC:1.0A:A30)
+	echo bs2000-sni-posix
+	exit 0 ;;
     RM*:SINIX-*:*:*)
 	echo mips-sni-sysv4
 	exit 0 ;;

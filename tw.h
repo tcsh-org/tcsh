@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tw.h,v 3.18 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.h,v 3.19 1996/04/26 19:23:05 christos Exp $ */
 /*
  * tw.h: TwENEX functions headers
  */
@@ -78,7 +78,7 @@
 #define ON		1
 #define OFF		0
 #define FILSIZ		512	/* Max reasonable file name length */
-#define ESC		'\033'
+#define ESC             CTL_ESC('\033')
 #define equal(a, b)	(strcmp(a, b) == 0)
 
 #define is_set(var)	adrof(var)
