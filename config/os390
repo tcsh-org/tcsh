@@ -138,9 +138,6 @@
 #define ECHO_STYLE BOTH_ECHO
 
 /****************** local defines *********************/
-#ifndef BSDTIMES
-# define NEEDgethostname
-#endif
 /*
  * Shadow passwd file
  */

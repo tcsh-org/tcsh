@@ -129,9 +129,6 @@
 #define ECHO_STYLE BSD_ECHO	/* BSD options only */
 
 /****************** local defines *********************/
-#ifndef BSDTIMES
-# define NEEDgethostname
-#endif
 /*
  * Shadow passwd file
  */

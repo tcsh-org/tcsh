@@ -130,18 +130,11 @@
 #define ECHO_STYLE BSD_ECHO	/* BSD options only */
 
 /****************** local defines *********************/
-#ifndef BSDTIMES
-# define NEEDgethostname
-#endif
 /*
  * Shadow passwd file
  */
 #define PW_SHADOW
 
 #define NAMEI_BUG
-
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-#include "config_f.h"
 
 #endif /* _h_config */

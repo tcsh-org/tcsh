@@ -111,12 +111,6 @@
 /****************** local defines *********************/
 #define ISC202
 #define PW_SHADOW
-#ifdef notdef
-#define NEEDgethostname 	/* If networking is not installed */
-#endif
-/****************** configurable hacks ****************/
-/* have been moved to config_f.h */
-#include "config_f.h"
 
 #undef NLS
 #undef NLS_CATALOGS
