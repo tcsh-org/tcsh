@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.5 1991/07/18 15:23:37 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.6 1991/07/18 16:24:49 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -73,20 +73,6 @@ typedef void sigret_t;
 typedef int sigret_t;
 #endif /* SIGVOID */
 
-/*
- * ANSIisms...
- */
-#ifndef __P
-# if __STDC__
-#  define __P(a) a
-# else
-#  define __P(a) ()
-#  define const
-#  ifndef apollo
-#   define volatile	/* Apollo 'c' extensions need this */
-#  endif /* apollo */
-# endif 
-#endif 
 
 /*
  * Fundamental definitions which may vary from system to system.
@@ -240,6 +226,24 @@ extern int setpgrp();
 #else
 # include <string.h>
 #endif /* BSD */
+
+
+/*
+ * ANSIisms... These must be *after* the system include and 
+ * *before* our includes, so that BSDreno has time to define __P
+ */
+#ifndef __P
+# if __STDC__
+#  define __P(a) a
+# else
+#  define __P(a) ()
+#  define const
+#  ifndef apollo
+#   define volatile	/* Apollo 'c' extensions need this */
+#  endif /* apollo */
+# endif 
+#endif 
+
 
 typedef int bool;
 
