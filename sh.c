@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.2 1991/07/16 16:21:55 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,7 +41,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: sh.c,v 3.2 1991/07/16 16:21:55 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -1210,7 +1210,8 @@ goodbye(v, c)
 void
 exitstat()
 {
-
+    register Char *cp;
+    register int i;
 #ifdef PROF
     monitor(0);
 #endif
@@ -1220,7 +1221,19 @@ exitstat()
      * unwarrantedly (sic).
      */
     child = 1;
-    xexit(getn(value(STRstatus)));
+
+    /* 
+     * PWP: do this step-by-step because we might get a bus error if
+     * status isn't set, so we call getn(NULL).
+     */
+    cp = value(STRstatus);
+
+    if (!cp)
+	i = 13;
+    else
+	i = getn(cp);
+
+    xexit(i);
 }
 
 /*

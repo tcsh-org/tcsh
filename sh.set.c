@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.set.c,v 1.2 91/07/14 22:23:44 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.set.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.set.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -424,6 +424,9 @@ getn(cp)
     register int n;
     int     sign;
 
+    if (!cp)			/* PWP: extra error checking */
+	stderror(ERR_NAME | ERR_BADNUM);
+
     sign = 0;
     if (cp[0] == '+' && cp[1])
 	cp++;
@@ -447,6 +450,9 @@ value1(var, head)
     struct varent *head;
 {
     register struct varent *vp;
+
+    if (!var || !head)		/* PWP: extra error checking */
+	return (STRNULL);
 
     vp = adrof1(var, head);
     return (vp == 0 || vp->vec[0] == 0 ? STRNULL : vp->vec[0]);
