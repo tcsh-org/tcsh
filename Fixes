@@ -1,3 +1,7 @@
+ 65. V6.09.00 - 19990816
+ 64. Add csh emacs mode (Dan Harkless)
+ 63. Make sure the the glob buffer matches the word buffer size (Brian Biswas)
+ 62. Fix periodic to work without tperiod set (Kenny McCormack)
  61. V6.08.07 - 19990813
  60. Fix e_dabbrev_expand (Bjorn Knutsson)
  59. Make \builtin work again (by calling the command not the builtin)
