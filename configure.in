@@ -270,7 +270,7 @@ AC_SEARCH_LIBS([iconv], [iconv], [AC_DEFINE([HAVE_ICONV], [1],
 	[Define to 1 if you have the iconv () interface])])
 
 AC_CHECK_FUNCS([utmpname wcwidth])
-AC_CHECK_FUNCS([memmove memset getcwd gethostname nice strerror])
+AC_CHECK_FUNCS([memmove memset getcwd gethostname nice strerror setpgid])
 
 dnl This is not good enough; we need sockaddr_storage too.
 dnl See whether we can use IPv6 related functions
