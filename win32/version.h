@@ -5,9 +5,9 @@
 /* remember to change both instance of the version -amol */
 
 #ifdef NTDBG
-#define LOCALSTR ",nt-rev-7.04-debug"
+#define LOCALSTR ",nt-rev-7.05-debug"
 #else
-#define LOCALSTR ",nt-rev-7.04" //changed ordonly test in nt_open
+#define LOCALSTR ",nt-rev-7.05" //changed ordonly test in nt_open
 								//patches
 #endif NTDBG
 

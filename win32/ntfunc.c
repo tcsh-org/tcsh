@@ -886,7 +886,7 @@ int nt_texec(char *prog, char**args ) {
     DWORD type=0;
 	DWORD dwCreationflags;
 	unsigned int priority;
-	char *argv0, *savepath;
+	char *argv0, *savepath = NULL;
 	char *cmdstr,*cmdend ;
 	char *originalPtr = NULL;
 	unsigned int cmdsize,cmdlen;
@@ -1059,7 +1059,8 @@ free_mem:
 	CloseHandle(si.hStdOutput);
 	CloseHandle(si.hStdError);
 
-	restore_path(savepath);
+    if(savepath)
+        restore_path(savepath);
 
 	heap_free(originalPtr);
 	if (argv0)
