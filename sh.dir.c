@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.dir.c,v 3.38 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.dir.c,v 3.39 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.38 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.39 1995/03/12 04:49:26 christos Exp christos $")
 
 /*
  * C Shell - directory management
@@ -1216,7 +1216,7 @@ dgetstack()
 
     for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev, i++) 
 	continue;
-    dbp = dblk = (Char**) xmalloc((i + 1) * sizeof(Char *));
+    dbp = dblk = (Char**) xmalloc((size_t) (i + 1) * sizeof(Char *));
     for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev, dbp++) 
 	 *dbp = Strsave(dn->di_name);
     *dbp = NULL;
@@ -1329,7 +1329,7 @@ recdirs(fname, def)
     }
 
     if ((snum = varval(STRsavedirs)) == STRNULL) 
-	num = ~0;
+	num = (unsigned int) ~0;
     else
 	num = (unsigned int) atoi(short2str(snum));
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.sem.c,v 3.34 1994/03/13 00:46:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.sem.c,v 3.35 1994/09/04 21:54:15 christos Exp christos $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.34 1994/03/13 00:46:35 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.35 1994/09/04 21:54:15 christos Exp christos $")
 
 #include "tc.h"
 
@@ -769,7 +769,7 @@ doio(t, pipein, pipeout)
 {
     register int fd;
     register Char *cp;
-    register int flags = t->t_dflg;
+    register unsigned long flags = t->t_dflg;
 
     if (didfds || (flags & F_REPEAT))
 	return;

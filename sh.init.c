@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.init.c,v 3.38 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.init.c,v 3.39 1995/03/19 22:33:26 christos Exp christos $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.38 1995/03/12 04:49:26 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.39 1995/03/19 22:33:26 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -218,8 +218,10 @@ int nsrchn = sizeof srchn / sizeof *srchn;
 # define NUMSIG 33
 #endif /* POSIX */
 
-int	nsig = NUMSIG - 1;
-struct	mesg mesg[NUMSIG];
+int	nsig = NUMSIG - 1;	/* This should be the number of real signals */
+				/* not counting signal 0 */
+struct	mesg mesg[NUMSIG];	/* Arrays start at [0] so we initialize from */
+				/* 0 to 32 or 64, the max real signal number */
 
 void
 mesginit()
@@ -232,66 +234,66 @@ mesginit()
 	xfree((ptr_t) mesg[i].pname);
 	mesg[i].pname = NULL;
     }
-#endif
+#endif /* NLS_CATALOGS */
 
 #if defined(SIGNULL) || defined(DECOSF1)
 # ifndef SIGNULL
 #  define SIGNULL 0
-# endif
+# endif /* !SIGNULL */
     if (mesg[SIGNULL].pname == NULL) {
 	mesg[SIGNULL].iname = "NULL";
 	mesg[SIGNULL].pname = CSAVS(2, 1, "Null signal");
     }
-#endif
+#endif /* SIGNULL || DECOSF1 */
 
 #ifdef SIGHUP
     if (mesg[SIGHUP].pname == NULL) {
 	mesg[SIGHUP].iname = "HUP"; 
 	mesg[SIGHUP].pname = CSAVS(2, 2, "Hangup");
     }
-#endif
+#endif /* SIGHUP */
 
 #ifdef SIGINT
     if (mesg[SIGINT].pname == NULL) {
 	mesg[SIGINT].iname = "INT";
 	mesg[SIGINT].pname = CSAVS(2, 3, "Interrupt");
     }
-#endif
+#endif /* SIGINT */
 
 #ifdef SIGQUIT
     if (mesg[SIGQUIT].pname == NULL) {
 	mesg[SIGQUIT].iname = "QUIT";
 	mesg[SIGQUIT].pname = CSAVS(2, 4, "Quit");
     }
-#endif
+#endif /* SIGQUIT */
 
 #ifdef SIGILL
     if (mesg[SIGILL].pname == NULL) {
 	mesg[SIGILL].iname = "ILL";
 	mesg[SIGILL].pname = CSAVS(2, 5, "Illegal instruction");
     }
-#endif
+#endif /* SIGILL */
 
 #ifdef SIGTRAP
     if (mesg[SIGTRAP].pname == NULL) {
 	mesg[SIGTRAP].iname = "TRAP";
 	mesg[SIGTRAP].pname = CSAVS(2, 6, "Trace/BPT trap");
     }
-#endif
+#endif /* SIGTRAP */
 
 #ifdef SIGABRT
     if (mesg[SIGABRT].pname == NULL) {
 	mesg[SIGABRT].iname = "ABRT";
 	mesg[SIGABRT].pname = CSAVS(2, 7, "Abort");
     }
-#endif
+#endif /* SIGABRT */
 
 #ifdef SIGIOT
     if (mesg[SIGIOT].pname == NULL) {
 	mesg[SIGIOT].iname = "IOT";
 	mesg[SIGIOT].pname = CSAVS(2, 8, "IOT trap");
     }
-#endif
+#endif /* SIGIOT */
 
 #ifdef SIGDANGER
     /* aiws */
@@ -299,7 +301,7 @@ mesginit()
 	mesg[SIGDANGER].iname = "DANGER";
 	mesg[SIGDANGER].pname = CSAVS(2, 9, "System Crash Imminent");
     }
-#endif
+#endif /* SIGDANGER */
 
 #ifdef SIGERR
     /* _CRAY */
@@ -307,56 +309,56 @@ mesginit()
 	mesg[SIGERR].iname = "ERR";
 	mesg[SIGERR].pname = CSAVS(2, 10, "Error exit");
     }
-#endif
+#endif /* SIGERR */
 
 #ifdef SIGEMT
     if (mesg[SIGEMT].pname == NULL) {
 	mesg[SIGEMT].iname = "EMT";
 	mesg[SIGEMT].pname = CSAVS(2, 11, "EMT trap");
     }
-#endif
+#endif /* SIGEMT */
 
 #ifdef SIGFPE
     if (mesg[SIGFPE].pname == NULL) {
 	mesg[SIGFPE].iname = "FPE";
 	mesg[SIGFPE].pname = CSAVS(2, 12, "Floating exception");
     }
-#endif
+#endif /* SIGFPE */
 
 #ifdef SIGKILL
     if (mesg[SIGKILL].pname == NULL) {
 	mesg[SIGKILL].iname = "KILL";
 	mesg[SIGKILL].pname = CSAVS(2, 13, "Killed");
     }
-#endif
+#endif /* SIGKILL */
 
 #ifdef SIGUSR1
     if (mesg[SIGUSR1].pname == NULL) {
 	mesg[SIGUSR1].iname = "USR1";
 	mesg[SIGUSR1].pname = CSAVS(2, 14, "User signal 1");
     }
-#endif
+#endif /* SIGUSR1 */
 
 #ifdef SIGUSR2
     if (mesg[SIGUSR2].pname == NULL) {
 	mesg[SIGUSR2].iname = "USR2";
 	mesg[SIGUSR2].pname = CSAVS(2, 15, "User signal 2");
     }
-#endif
+#endif /* SIGUSR2 */
 
 #ifdef SIGSEGV
     if (mesg[SIGSEGV].pname == NULL) {
 	mesg[SIGSEGV].iname = "SEGV";
 	mesg[SIGSEGV].pname = CSAVS(2, 16, "Segmentation fault");
     }
-#endif
+#endif /* SIGSEGV */
 
 #ifdef SIGBUS
     if (mesg[SIGBUS].pname == NULL) {
 	mesg[SIGBUS].iname = "BUS";
 	mesg[SIGBUS].pname = CSAVS(2, 17, "Bus error");
     }
-#endif
+#endif /* SIGBUS */
 
 #ifdef SIGPRE
     /* _CRAY || IBMAIX */
@@ -364,7 +366,7 @@ mesginit()
 	mesg[SIGPRE].iname = "PRE";
 	mesg[SIGPRE].pname = CSAVS(2, 18, "Program range error");
     }
-#endif
+#endif /* SIGPRE */
 
 #ifdef SIGORE
     /* _CRAY */
@@ -372,46 +374,63 @@ mesginit()
 	mesg[SIGORE].iname = "ORE";
 	mesg[SIGORE].pname = CSAVS(2, 19, "Operand range error");
     }
-#endif
+#endif /* SIGORE */
 
 #ifdef SIGSYS
     if (mesg[SIGSYS].pname == NULL) {
 	mesg[SIGSYS].iname = "SYS";
 	mesg[SIGSYS].pname = CSAVS(2, 20, "Bad system call");
     }
-#endif
+#endif /* SIGSYS */
 
 #ifdef SIGPIPE
     if (mesg[SIGPIPE].pname == NULL) {
 	mesg[SIGPIPE].iname = "PIPE";
 	mesg[SIGPIPE].pname = CSAVS(2, 21, "Broken pipe");
     }
-#endif
+#endif /* SIGPIPE */
 
 #ifdef SIGALRM
     if (mesg[SIGALRM].pname == NULL) {
 	mesg[SIGALRM].iname = "ALRM";
 	mesg[SIGALRM].pname = CSAVS(2, 22, "Alarm clock");
     }
-#endif
+#endif /* SIGALRM */
 
 #ifdef SIGTERM
     if (mesg[SIGTERM].pname == NULL) {
 	mesg[SIGTERM].iname = "TERM";
 	mesg[SIGTERM].pname = CSAVS(2, 23, "Terminated");
     }
-#endif
+#endif /* SIGTERM */
 
-#ifdef SIGCLD
+/* SIGCLD vs SIGCHLD */
+#if !defined(SIGCHLD) || defined(SOLARIS2) || defined(apollo) || defined(__EMX__)
+    /* If we don't define SIGCHLD, or our OS prefers SIGCLD to SIGCHLD, */
+    /* check for SIGCLD */
+# ifdef SIGCLD
     if (mesg[SIGCLD].pname == NULL) {
 	mesg[SIGCLD].iname = "CLD";
-# ifdef BSDJOBS
+#  ifdef BSDJOBS
 	mesg[SIGCLD].pname = CSAVS(2, 24, "Child status change");
-# else
+#  else /* !BSDJOBS */
 	mesg[SIGCLD].pname = CSAVS(2, 25, "Death of child");
-# endif
+#  endif /* BSDJOBS */
     }
-#endif
+# endif /* SIGCLD */
+#else /* !(!SIGCHLD || SOLARIS2 || apollo || __EMX__) */
+    /* We probably define SIGCHLD */
+# ifdef SIGCHLD
+    if (mesg[SIGCHLD].pname == NULL) {
+	mesg[SIGCHLD].iname = "CHLD";
+#  ifdef BSDJOBS
+	mesg[SIGCHLD].pname = CSAVS(2, 27, "Child stopped or exited");
+#  else /* !BSDJOBS */
+	mesg[SIGCHLD].pname = CSAVS(2, 28, "Child exited");
+#  endif /* BSDJOBS */
+    }
+# endif /* SIGCHLD */
+#endif /* !SIGCHLD || SOLARIS2 || apollo || __EMX__ */
 
 #ifdef SIGAPOLLO
     /* apollo */
@@ -419,32 +438,21 @@ mesginit()
 	mesg[SIGAPOLLO].iname = "APOLLO";
 	mesg[SIGAPOLLO].pname = CSAVS(2, 26, "Apollo-specific fault");
     }
-#endif
-
-#ifdef SIGCHLD
-    if (mesg[SIGCHLD].pname == NULL) {
-	mesg[SIGCHLD].iname = "CHLD";
-# ifdef BSDJOBS
-	mesg[SIGCHLD].pname = CSAVS(2, 27, "Child stopped or exited");
-# else
-	mesg[SIGCHLD].pname = CSAVS(2, 28, "Child exited");
-# endif
-    }
-#endif
+#endif /* SIGAPOLLO */
 
 #ifdef SIGPWR
     if (mesg[SIGPWR].pname == NULL) {
 	mesg[SIGPWR].iname = "PWR";
 	mesg[SIGPWR].pname = CSAVS(2, 29, "Power failure");
     }
-#endif
+#endif /* SIGPWR */
 
 #ifdef SIGLOST
     if (mesg[SIGLOST].pname == NULL) {
 	mesg[SIGLOST].iname = "LOST";
 	mesg[SIGLOST].pname = CSAVS(2, 30, "Resource Lost");
     }
-#endif
+#endif /* SIGLOST */
 
 #ifdef SIGBREAK
     /* __EMX__ */
@@ -452,7 +460,7 @@ mesginit()
 	mesg[SIGBREAK].iname = "BREAK";
 	mesg[SIGBREAK].pname = CSAVS(2, 31, "Break (Ctrl-Break)");
     }
-#endif
+#endif /* SIGBREAK */
 
 #ifdef SIGIO
 # if !defined(SIGPOLL) || SIGPOLL != SIGIO
@@ -460,19 +468,19 @@ mesginit()
 	mesg[SIGIO].iname = "IO";
 #  ifdef cray
 	mesg[SIGIO].pname = CSAVS(2, 32, "Input/output possible signal");
-#  else
+#  else /* !cray */
 	mesg[SIGIO].pname = CSAVS(2, 33, "Asynchronous I/O (select)");
-#  endif
+#  endif /* cray */
     }
-# endif
-#endif
+# endif /* !SIGPOLL || SIGPOLL != SIGIO */
+#endif /* SIGIO */
 
 #ifdef SIGURG
     if (mesg[SIGURG].pname == NULL) {
 	mesg[SIGURG].iname = "URG";
 	mesg[SIGURG].pname = CSAVS(2, 34, "Urgent condition on I/O channel");
     }
-#endif
+#endif /* SIGURG */
 
 #ifdef SIGMT
     /* cray */
@@ -480,7 +488,7 @@ mesginit()
 	mesg[SIGMT].iname = "MT";
 	mesg[SIGMT].pname = CSAVS(2, 35, "Multitasking wake-up");
     }
-#endif
+#endif /* SIGMT */
 
 #ifdef SIGMTKILL
     /* cray */
@@ -488,7 +496,7 @@ mesginit()
 	mesg[SIGMTKILL].iname = "MTKILL";
 	mesg[SIGMTKILL].pname = CSAVS(2, 36, "Multitasking kill");
     }
-#endif
+#endif /* SIGMTKILL */
 
 #ifdef SIGBUFIO
     /* _CRAYCOM */
@@ -497,7 +505,7 @@ mesginit()
 	mesg[SIGBUFIO].pname = CSAVS(2, 37,
 				    "Fortran asynchronous I/O completion");
     }
-#endif
+#endif /* SIGBUFIO */
 
 #ifdef SIGRECOVERY
     /* _CRAYCOM */
@@ -505,7 +513,7 @@ mesginit()
 	mesg[SIGRECOVERY].iname = "RECOVERY";
 	mesg[SIGRECOVERY].pname = CSAVS(2, 38, "Recovery");
     }
-#endif
+#endif /* SIGRECOVERY */
 
 #ifdef SIGUME
     /* _CRAYCOM */
@@ -513,7 +521,7 @@ mesginit()
 	mesg[SIGUME].iname = "UME";
 	mesg[SIGUME].pname = CSAVS(2, 39, "Uncorrectable memory error");
     }
-#endif
+#endif /* SIGUME */
 
 #ifdef SIGCPULIM
     /* _CRAYCOM */
@@ -521,7 +529,7 @@ mesginit()
 	mesg[SIGCPULIM].iname = "CPULIM";
 	mesg[SIGCPULIM].pname = CSAVS(2, 40, "CPU time limit exceeded");
     }
-#endif
+#endif /* SIGCPULIM */
 
 #ifdef SIGSHUTDN
     /* _CRAYCOM */
@@ -529,16 +537,16 @@ mesginit()
 	mesg[SIGSHUTDN].iname = "SHUTDN";
 	mesg[SIGSHUTDN].pname = CSAVS(2, 41, "System shutdown imminent");
     }
-#endif
+#endif /* SIGSHUTDN */
 
 #ifdef SIGNOWAK
     /* _CRAYCOM */
     if (mesg[SIGNOWAK].pname == NULL) {
 	mesg[SIGNOWAK].iname = "NOWAK";
 	mesg[SIGNOWAK].pname = CSAVS(2, 42,
-				    "micro-tasking group-no wakeup flag set");
+				    "Micro-tasking group-no wakeup flag set");
     }
-#endif
+#endif /* SIGNOWAK */
 
 #ifdef SIGTHERR
     /* _CRAYCOM */
@@ -547,7 +555,7 @@ mesginit()
 	mesg[SIGTHERR].pname = CSAVS(2, 43, 
 			    "Thread error - (use cord -T for detailed info)");
     }
-#endif
+#endif /* SIGTHERR */
 
 #ifdef SIGRPE
     /* cray */
@@ -555,65 +563,65 @@ mesginit()
 	mesg[SIGRPE].pname = CSAVS(2, 44, "CRAY Y-MP register parity error");
 	mesg[SIGRPE].iname = "RPE";
     }
-#endif
+#endif /* SIGRPE */
 
 #ifdef SIGINFO
     if (mesg[SIGINFO].pname == NULL) {
 	mesg[SIGINFO].iname = "INFO";
 	mesg[SIGINFO].pname = CSAVS(2, 45, "Information request");
     }
-#endif
+#endif /* SIGINFO */
 
 #ifdef SIGSTOP
     if (mesg[SIGSTOP].pname == NULL) {
 	mesg[SIGSTOP].iname = "STOP";
 # ifdef SUSPENDED
 	mesg[SIGSTOP].pname = CSAVS(2, 46, "Suspended (signal)");
-# else
+# else /* !SUSPENDED */
 	mesg[SIGSTOP].pname = CSAVS(2, 47, "Stopped (signal)");
-# endif
+# endif /* SUSPENDED */
     }
-#endif
+#endif /* SIGSTOP */
 
 #ifdef SIGTSTP
     if (mesg[SIGTSTP].pname == NULL) {
 	mesg[SIGTSTP].iname = "TSTP";
 # ifdef SUSPENDED
 	mesg[SIGTSTP].pname = CSAVS(2, 48, "Suspended");
-# else
+# else /* !SUSPENDED */
 	mesg[SIGTSTP].pname = CSAVS(2, 49, "Stopped");
-# endif
+# endif /* SUSPENDED */
     }
-#endif
+#endif /* SIGTSTP */
 
 #ifdef SIGCONT
     if (mesg[SIGCONT].pname == NULL) {
 	mesg[SIGCONT].iname = "CONT";
 	mesg[SIGCONT].pname = CSAVS(2, 50, "Continued");
     }
-#endif
+#endif /* SIGCONT */
 
 #ifdef SIGTTIN
     if (mesg[SIGTTIN].pname == NULL) {
 	mesg[SIGTTIN].iname = "TTIN";
 # ifdef SUSPENDED
 	mesg[SIGTTIN].pname = CSAVS(2, 51, "Suspended (tty input)");
-# else
+# else /* !SUSPENDED */
 	mesg[SIGTTIN].pname = CSAVS(2, 52, "Stopped (tty input)");
-# endif
+# endif /* SUSPENDED */
     }
-#endif
+#endif /* SIGTTIN */
 
 #ifdef SIGTTOU
     if (mesg[SIGTTOU].pname == NULL) {
 	mesg[SIGTTOU].iname = "TTOU";
 # ifdef SUSPENDED
 	mesg[SIGTTOU].pname = CSAVS(2, 53, "Suspended (tty output)");
-# else
+# else /* SUSPENDED */
 	mesg[SIGTTOU].pname = CSAVS(2, 54, "Stopped (tty output)");
-# endif
+# endif /* SUSPENDED */
     }
-#endif
+#endif /* SIGTTOU */
 
 #ifdef SIGWIND
     /* UNIXPC */
@@ -621,21 +629,21 @@ mesginit()
 	mesg[SIGWIND].iname = "WIND";
 	mesg[SIGWIND].pname = CSAVS(2, 55, "Window status changed");
     }
-#endif
+#endif /* SIGWIND */
 
 #ifdef SIGWINDOW
     if (mesg[SIGWINDOW].pname == NULL) {
 	mesg[SIGWINDOW].iname = "WINDOW";
 	mesg[SIGWINDOW].pname = CSAVS(2, 56, "Window size changed");
     }
-#endif
+#endif /* SIGWINDOW */
 
 #ifdef SIGWINCH
     if (mesg[SIGWINCH].pname == NULL) {
 	mesg[SIGWINCH].iname = "WINCH";
 	mesg[SIGWINCH].pname = CSAVS(2, 56, "Window size changed");
     }
-#endif
+#endif /* SIGWINCH */
 
 #ifdef SIGPHONE
     /* UNIXPC */
@@ -643,35 +651,35 @@ mesginit()
 	mesg[SIGPHONE].iname = "PHONE";
 	mesg[SIGPHONE].pname = CSAVS(2, 57, "Phone status changed");
     }
-# endif /* UNIXPC */
+# endif /* SIGPHONE */
 
 #ifdef SIGXCPU
     if (mesg[SIGXCPU].pname == NULL) {
 	mesg[SIGXCPU].iname = "XCPU";
 	mesg[SIGXCPU].pname = CSAVS(2, 58, "Cputime limit exceeded");
     }
-#endif
+#endif /* SIGXCPU */
 
 #ifdef SIGXFSZ
     if (mesg[SIGXFSZ].pname == NULL) {
 	mesg[SIGXFSZ].iname = "XFSZ";
 	mesg[SIGXFSZ].pname = CSAVS(2, 59, "Filesize limit exceeded");
     }
-#endif
+#endif /* SIGXFSZ */
 
 #ifdef SIGVTALRM
     if (mesg[SIGVTALRM].pname == NULL) {
 	mesg[SIGVTALRM].iname = "VTALRM";
 	mesg[SIGVTALRM].pname = CSAVS(2, 60, "Virtual time alarm");
     }
-#endif
+#endif /* SIGVTALRM */
 
 #ifdef SIGPROF
     if (mesg[SIGPROF].pname == NULL) {
 	mesg[SIGPROF].iname = "PROF";
 	mesg[SIGPROF].pname = CSAVS(2, 61, "Profiling time alarm");
     }
-#endif
+#endif /* SIGPROF */
 
 #ifdef SIGDIL
     /* hpux */
@@ -679,14 +687,14 @@ mesginit()
 	mesg[SIGDIL].iname = "DIL";
 	mesg[SIGDIL].pname = CSAVS(2, 62, "DIL signal");
     }
-#endif
+#endif /* SIGDIL */
 
 #ifdef SIGPOLL
     if (mesg[SIGPOLL].pname == NULL) {
 	mesg[SIGPOLL].iname = "POLL";
 	mesg[SIGPOLL].pname = CSAVS(2, 63, "Pollable event occured");
     }
-#endif
+#endif /* SIGPOLL */
 
 #ifdef SIGWAITING
     /* solaris */
@@ -694,7 +702,7 @@ mesginit()
 	mesg[SIGWAITING].iname = "WAITING";
 	mesg[SIGWAITING].pname = CSAVS(2, 64, "Process's lwps are blocked");
     }
-#endif
+#endif /* SIGWAITING */
 
 #ifdef SIGLWP
     /* solaris */
@@ -702,7 +710,7 @@ mesginit()
 	mesg[SIGLWP].iname = "LWP";
 	mesg[SIGLWP].pname = CSAVS(2, 65, "Special LWP signal");
     }
-#endif
+#endif /* SIGLWP */
 
 #ifdef SIGFREEZE
     /* solaris */
@@ -710,7 +718,7 @@ mesginit()
 	mesg[SIGFREEZE].iname = "FREEZE";
 	mesg[SIGFREEZE].pname = CSAVS(2, 66, "Special CPR Signal");
     }
-#endif
+#endif /* SIGFREEZE */
 
 #ifdef SIGTHAW
     /* solaris */
@@ -718,7 +726,7 @@ mesginit()
 	mesg[SIGTHAW].iname = "THAW";
 	mesg[SIGTHAW].pname = CSAVS(2, 67, "Special CPR Signal");
     }
-#endif
+#endif /* SIGTHAW */
 
 #ifdef SIGRTMIN
     /* solaris */
@@ -741,7 +749,7 @@ mesginit()
 	mesg[SIGRTMIN+3].iname = "RTMIN+3";
 	mesg[SIGRTMIN+3].pname = CSAVS(2, 71, "Fourth Realtime Signal");
     }
-#endif
+#endif /* SIGRTMIN */
 
 #ifdef SIGRTMAX
     /* solaris */
@@ -764,7 +772,7 @@ mesginit()
 	mesg[SIGRTMAX].iname = "RTMAX";
 	mesg[SIGRTMAX].pname = CSAVS(2, 75, "Last Realtime Signal");
     }
-#endif
+#endif /* SIGRTMAX */
 
 
 #ifdef SIGAIO
@@ -773,7 +781,7 @@ mesginit()
 	mesg[SIGAIO].iname = "AIO";
 	mesg[SIGAIO].pname = CSAVS(2, 76, "LAN Asyncronous I/O");
     }
-#endif
+#endif /* SIGAIO */
 
 #ifdef SIGPTY
     /* aiws */
@@ -781,7 +789,7 @@ mesginit()
 	mesg[SIGPTY].iname = "PTY";
 	mesg[SIGPTY].pname = CSAVS(2, 77, "PTY read/write availability");
     }
-#endif
+#endif /* SIGPTY */
 
 #ifdef SIGIOINT
     /* aiws */
@@ -789,7 +797,7 @@ mesginit()
 	mesg[SIGIOINT].iname = "IOINT";
 	mesg[SIGIOINT].pname = CSAVS(2, 78, "I/O intervention required");
     }
-#endif
+#endif /* SIGIOINT */
 
 #ifdef SIGGRANT
     /* aiws */
@@ -797,7 +805,7 @@ mesginit()
 	mesg[SIGGRANT].iname = "GRANT";
 	mesg[SIGGRANT].pname = CSAVS(2, 79, "HFT monitor mode granted");
     }
-#endif
+#endif /* SIGGRANT */
 
 #ifdef SIGRETRACT
     /* aiws */
@@ -806,7 +814,7 @@ mesginit()
 	mesg[SIGRETRACT].pname = CSAVS(2, 80,
 				  "HFT monitor mode should be relinguished");
     }
-#endif
+#endif /* SIGRETRACT */
 
 #ifdef SIGSOUND
     /* aiws */
@@ -814,7 +822,7 @@ mesginit()
 	mesg[SIGSOUND].iname = "SOUND";
 	mesg[SIGSOUND].pname = CSAVS(2, 81, "HFT sound control has completed");
     }
-#endif
+#endif /* SIGSOUND */
 
 #ifdef SIGSMSG
     /* aiws */
@@ -822,7 +830,7 @@ mesginit()
 	mesg[SIGSMSG].iname = "SMSG";
 	mesg[SIGSMSG].pname = CSAVS(2, 82, "Data in HFT ring buffer");
     }
-#endif
+#endif /* SIGMSG */
 
 #ifdef SIGMIGRATE
     /* IBMAIX */
@@ -830,7 +838,7 @@ mesginit()
 	mesg[SIGMIGRATE].iname = "MIGRATE";
 	mesg[SIGMIGRATE].pname = CSAVS(2, 83, "Migrate process");
     }
-#endif
+#endif /* SIGMIGRATE */
 
 #ifdef SIGSAK
     /* IBMAIX */
@@ -838,7 +846,7 @@ mesginit()
 	mesg[SIGSAK].iname = "SAK";
 	mesg[SIGSAK].pname = CSAVS(2, 84, "Secure attention key");
     }
-#endif
+#endif /* SIGSAK */
 
 #ifdef SIGRESCHED
     /* hcx */
@@ -846,7 +854,7 @@ mesginit()
 	mesg[SIGRESCHED].iname = "RESCHED";
 	mesg[SIGRESCHED].pname = CSAVS(2, 85, "Reschedule");
     }
-#endif
+#endif /* SIGRESCHED */
 
 #ifdef SIGDEBUG
     /* VMS_POSIX */
@@ -854,7 +862,7 @@ mesginit()
 	mesg[SIGDEBUG].iname = "DEBUG";
 	mesg[SIGDEBUG].pname = CSAVS(2, 86, "Signaling SS$_DEBUG");
     }
-#endif
+#endif /* SIGDEBUG */
 
 #ifdef SIGPRIO
     /* Lynx */
@@ -862,7 +870,7 @@ mesginit()
 	mesg[SIGPRIO].iname = "PRIO";
 	mesg[SIGPRIO].pname = CSAVS(2, 87, "Priority changed");
     }
-#endif
+#endif /* SIGPRIO */
 
 #ifdef SIGDLK
     /* cray */
@@ -870,7 +878,7 @@ mesginit()
 	mesg[SIGDLK].iname = "DLK";
 	mesg[SIGDLK].pname = CSAVS(2, 88, "True deadlock detected");
     }
-#endif
+#endif /* SIGDLK */
 
 #ifdef SIGTINT
     /* masscomp */
@@ -878,5 +886,5 @@ mesginit()
 	mesg[SIGTINT].iname = "TINT";
 	mesg[SIGTINT].pname = CSAVS(2, 89, "New input character");
     }
-#endif
+#endif /* SIGINT */
 }

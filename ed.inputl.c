@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.inputl.c,v 3.41 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.inputl.c,v 3.42 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.41 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.42 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -188,6 +188,9 @@ Inputl()
 
 	/* save the last command here */
 	LastCmd = cmdnum;
+
+	/* make sure fn is initialized */
+	fn = (retval == CC_COMPLETE_ALL) ? LIST_ALL : LIST;
 
 	/* use any return value */
 	switch (retval) {

@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.05/RCS/host.defs,v 1.8 1994/09/04 21:54:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/host.defs,v 1.9 1995/01/20 23:48:56 christos Exp christos $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.8 1994/09/04 21:54:15 christos Exp $")
+RCSID("$Id: host.defs,v 1.9 1995/01/20 23:48:56 christos Exp christos $")
 
 endcode	:
 
@@ -360,8 +360,10 @@ enddef	:
 newdef	: defined(linux)
 comment	: Linus Torvalds's linux
 vendor	: defined(i386)					: "intel"
+hosttype: defined(i486) || defined(__i486__)		: "i486-linux"
 hosttype: defined(i386)					: "i386-linux"
 ostype	: 						: "linux"
+hosttype: defined(i486) || defined(__i486__)		: "i486"
 machtype: defined(i386)					: "i386"
 enddef	:
 
@@ -475,15 +477,6 @@ vendor	:						: "cmu"
 hosttype: defined(i386)					: "i386-mach"
 ostype	:						: "mach"
 machtype: defined(i386)					: "i386"
-enddef	:
-
-
-newdef  : !defined(SOLARIS2) && (defined(__svr4__) || defined(SVR4))
-comment : Unix System V Release 4.0
-vendor  : defined(DELL)                                 : "dell"
-hosttype: defined(i386)                                 : "i386"
-ostype  :                                               : "svr4"
-machtype: defined(i386)                                 : "i386"
 enddef	:
 
 
@@ -798,6 +791,15 @@ comment	: Clipper Chipset (Intergraph)
 vendor	:						: "intergraph"
 hosttype:						: "clipper"
 machtype:						: "clipper"
+enddef	:
+
+
+newdef  : !defined(SOLARIS2) && (SYSVREL == 4)
+comment : Unix System V Release 4.0
+vendor  : defined(DELL)                                 : "dell"
+hosttype: defined(i386)                                 : "i386"
+ostype  :                                               : "svr4"
+machtype: defined(i386)                                 : "i386"
 enddef	:
 
 

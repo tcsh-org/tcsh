@@ -3682,12 +3682,34 @@ hangup signal (see \fBSignal handling\fR).
 See also the \fBautologout\fR shell variable.
 .TP 8
 .B mail
-The names of the file or files to check for mail. Before each prompt,
-if 10 minutes have passed since the last check, the shell checks each
-file and says `You have new mail.' (or, if \fBmail\fR contains multiple files,
-`New mail in \fIname\fR') if the file has a modification time greater than its
-access time. If the first word of \fBmail\fR is numeric it is taken as
-a different mail checking interval, in seconds.
+The names of the files or directories to check for incoming mail, separated
+by whitespace, and optionally preceeded by a numeric word.
+Before each prompt, if 10 minutes have passed since the last check, the
+shell checks each file and says `You have new mail.' (or, if \fBmail\fR
+contains multiple files, `You have new mail in \fIname\fR.') if the filesize
+is greater than zero in size and has a modification time greater than its
+access time.
+.PP
+.RS +8
+.PD
+.PP
+If you are in a login shell, then no mail file is reported unless it has
+been modified after the time the shell has started up, in order to prevent
+redundant notifications.  Most login programs will tell you whether or not
+you have mail when you log in.
+.PP
+If a file specified in \fBmail\fR is a directory, the shell will count each
+file within that directory as a separate message, and will report `You have
+\fIn\fR mails.' or `You have \fIn\fR mails in \fIname\fR.' as appropriate.
+This functionality is provided primarily for those systems which store mail
+in this manner, such as the Andrew Mail System.
+.PP
+If the first word of \fBmail\fR is numeric it is taken as a different mail
+checking interval, in seconds.
+.PP
+Under very rare circumstances, the shell may report `You have mail.' instead
+of `You have new mail.'
+.RE
 .TP 8
 .B matchbeep \fR(+)
 If set to `never', completion never beeps.
@@ -4742,7 +4764,7 @@ Extended \fIvi\fR fixes and \fIvi\fR delete command
 Marc Horowitz, MIT, 1991
 ANSIfication fixes, new exec hashing code, imake fixes, \fIwhere\fR
 .TP 2
-Bruce Sterling Woodcock, sterling@netcom.com, 1991-1994
+Bruce Sterling Woodcock, sterling@netcom.com, 1991-1995
 ETA and Pyramid port, Makefile and lint fixes, \fBignoreeof\fR=n addition, and
 various other portability changes and bug fixes
 .TP 2

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.exec.c,v 3.32 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.exec.c,v 3.33 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.32 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.33 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "tc.h"
 #include "tw.h"
@@ -979,7 +979,7 @@ tellmewhat(lexp, str)
 	if (str == NULL)
 	    prlex(lexp);
 	else
-	    Strcpy(str, sp->word);
+	    (void) Strcpy(str, sp->word);
 	xfree((ptr_t) sp->word);
     }
     else {
@@ -990,7 +990,7 @@ tellmewhat(lexp, str)
 	    flush();
 	}
 	else {
-	    Strcpy(str, sp->word);
+	    (void) Strcpy(str, sp->word);
 	    return FALSE;
 	}
     }

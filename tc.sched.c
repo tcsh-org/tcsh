@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.sched.c,v 3.11 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.sched.c,v 3.12 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.11 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.12 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -91,7 +91,7 @@ dosched(v, c)
 	    fmt = str2short("%h\t%T\t%R\n");
 	/* print list of scheduled events */
 	for (count = 1, tp = sched_ptr; tp; count++, tp = tp->t_next) {
-	    Char buf[BUFSIZE], sbuf[BUFSIZE], *cp;
+	    Char buf[BUFSIZE], sbuf[BUFSIZE];
 	    blkexpand(tp->t_lex, buf);
 	    tprintf(FMT_SCHED, sbuf, fmt, sizeof(sbuf), 
 		    short2str(buf), tp->t_when, (ptr_t) &count);

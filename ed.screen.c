@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.screen.c,v 3.35 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.screen.c,v 3.36 1995/03/19 22:33:26 christos Exp christos $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.35 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: ed.screen.c,v 3.36 1995/03/19 22:33:26 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -415,7 +415,7 @@ TCalloc(t, cap)
 		continue;
 	    termbuf[tlen++] = '\0';
 	}
-    (void) memmove((ptr_t) termcap_alloc, (ptr_t) termbuf, TC_BUFSIZE);
+    (void) memmove((ptr_t) termcap_alloc, (ptr_t) termbuf, (size_t) TC_BUFSIZE);
     tloc = tlen;
     if (tloc + 3 >= TC_BUFSIZE) {
 	stderror(ERR_NAME | ERR_TCNOSTR);

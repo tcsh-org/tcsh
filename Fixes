@@ -1,4 +1,7 @@
 V6.06.00, -
+ 72. 6.05.07 - 04/19/95
+ 71. More NLS catalog fixes.
+ 70. Bruce's jumbo patch.
  69. 6.05.06 - 03/15/95
  68. make clean does not clobber config.h if Makefile.std is used.
      make veryclean does.

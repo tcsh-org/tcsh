@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.lex.c,v 3.41 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.lex.c,v 3.42 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.41 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.42 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1632,6 +1632,7 @@ reread:
 			reset();
 		} else {
 			/* If we don't have ignoreeof set, just fall through */
+			;	/* EMPTY */
 		}
 	    }
     oops:

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.61 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.62 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.61 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.62 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1626,7 +1626,7 @@ doumask(v, c)
 #  endif /* BSD4_4 && !__386BSD__ && !defined(bsdi) */
 # endif /* BSDLIMIT */
 
-# if defined(hpux) && defined(BSDLIMIT)
+# if (HPUXVERSION > 700) && defined(BSDLIMIT)
 /* Yes hpux8.0 has limits but <sys/resource.h> does not make them public */
 /* Yes, we could have defined _KERNEL, and -I/etc/conf/h, but is that better? */
 #  ifndef RLIMIT_CPU
@@ -1641,7 +1641,7 @@ doumask(v, c)
 #  ifndef RLIM_INFINITY
 #   define RLIM_INFINITY	0x7fffffff
 #  endif /* RLIM_INFINITY */
-# endif /* hpux && BSDLIMIT */
+# endif /* (HPUXVERSION > 700) && BSDLIMIT */
 
 # if SYSVREL > 3 && defined(BSDLIMIT)
 /* In order to use rusage, we included "/usr/ucbinclude/sys/resource.h" in */

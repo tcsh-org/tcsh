@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.60 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.61 1995/03/19 22:33:26 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.60 1995/03/12 04:49:26 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.61 1995/03/19 22:33:26 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -47,21 +47,21 @@ RCSID("$Id: sh.proc.c,v 3.60 1995/03/12 04:49:26 christos Exp $")
 # define HZ 16
 #endif /* aiws */
 
-#if (defined(_BSD) && defined(_BSD_INCLUDES)) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(linux)
+#if defined(_BSD) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(linux)
 # define BSDWAIT
-#endif
+#endif /* _BSD || (IRIS4D && __STDC__) || __lucid || linux */
 #ifndef WTERMSIG
 # define WTERMSIG(w)	(((union wait *) &(w))->w_termsig)
 # ifndef BSDWAIT
 #  define BSDWAIT
-# endif
+# endif /* !BSDWAIT */
 #endif /* !WTERMSIG */
 #ifndef WEXITSTATUS
 # define WEXITSTATUS(w)	(((union wait *) &(w))->w_retcode)
 #endif /* !WEXITSTATUS */
 #ifndef WSTOPSIG
 # define WSTOPSIG(w)	(((union wait *) &(w))->w_stopsig)
-#endif /* WSTOPSIG */
+#endif /* !WSTOPSIG */
 
 #ifndef WCOREDUMP
 # ifdef BSDWAIT
@@ -78,11 +78,11 @@ RCSID("$Id: sh.proc.c,v 3.60 1995/03/12 04:49:26 christos Exp $")
 #define BIGINDEX	9	/* largest desirable job index */
 
 #ifdef BSDTIMES
-# if defined(SUNOS4) || defined(hp9000)
+# if defined(SUNOS4) || defined(hp9000) || (defined(__alpha) && defined(__osf__))
 static struct rusage zru = {{0L, 0L}, {0L, 0L}, 0L, 0L, 0L, 0L,
 			    0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L};
 
-# else /* !SUNOS4 && !hp9000 */
+# else /* !SUNOS4 && !hp9000 && !(__alpha && __osf__) */
 #  ifdef masscomp
 /*
  * Initialization of this structure under RTU 4.1A & RTU 5.0 is problematic
@@ -94,8 +94,8 @@ static struct rusage zru;
 static struct rusage zru = {{0L, 0L}, {0L, 0L}, 0, 0, 0, 0, 0, 0, 0, 
 			    0, 0, 0, 0, 0, 0};
 #  endif /* masscomp */
-# endif	/* !SUNOS4 && !hp9000 */
-#else /* ! BSDTIMES */
+# endif	/* SUNOS4 || hp9000 || (__alpha && __osf__) */
+#else /* !BSDTIMES */
 # ifdef _SEQUENT_
 static struct process_stats zru = {{0L, 0L}, {0L, 0L}, 0, 0, 0, 0, 0, 0, 0,
 				   0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -106,7 +106,7 @@ static struct tms zru = {0L, 0L, 0L, 0L}, lru = {0L, 0L, 0L, 0L};
 
 #ifndef RUSAGE_CHILDREN
 # define	RUSAGE_CHILDREN	-1
-#endif
+#endif /* RUSAGE_CHILDREN */
 
 static	void		 pflushall	__P((void));
 static	void		 pflush		__P((struct process *));
@@ -138,7 +138,7 @@ int snum;
     register int pid;
 #if defined(BSDJOBS) || (!defined(BSDTIMES) && (defined(ODT) || defined(aiws) || defined(uts)))
     extern int insource;
-#endif /* BSDJOBS */
+#endif /* BSDJOBS || (!BSDTIMES && (ODT || aiws || uts)) */
 #ifdef BSDWAIT
     union wait w;
 #else /* !BSDWAIT */
@@ -160,8 +160,8 @@ int snum;
 	timesdone++;
 	(void) times(&shtimes);
     }
-# endif	/* _SEQUENT_ */
-#endif /* BSDTIMES */
+# endif	/* !_SEQUENT_ */
+#endif /* !BSDTIMES */
 
 #ifdef JOBDEBUG
     xprintf("pchild()\n");
@@ -188,7 +188,7 @@ loop:
 #ifdef JOBDEBUG
     xprintf("Waiting...\n");
     flush();
-#endif
+#endif /* JOBDEBUG */
 #ifdef BSDJOBS
 # ifdef BSDTIMES
     /* both a wait3 and rusage */
@@ -227,38 +227,38 @@ loop:
     pid = wait3(&w.w_status, WNOHANG, &ru);
 #  endif /* !hpux */
 # else /* !BSDTIMES */
-# ifdef ODT  /* For Sco Unix 3.2.0 or ODT 1.0 */
-#  define HAVEwait3
-    pid = waitpid(-1, &w,
-	    (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG));
-# endif /* ODT */	    
-# if defined(aiws) || defined(uts)
-#  define HAVEwait3
+#  ifdef ODT  /* For Sco Unix 3.2.0 or ODT 1.0 */
+#   define HAVEwait3
+     pid = waitpid(-1, &w,
+ 	    (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG));
+#  endif /* ODT */	    
+#  if defined(aiws) || defined(uts)
+#   define HAVEwait3
     pid = wait3(&w.w_status, 
 	(setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), 0);
-# endif /* aiws || uts */
-# ifndef HAVEwait3
-#  ifdef UNRELSIGS
-    /* no wait3, therefore no rusage */
-    /* on Sys V, this may hang.  I hope it's not going to be a problem */
-#   ifdef _MINIX
-    pid = wait(&w);
-#   else /* !_MINIX */
-    pid = ourwait(&w.w_status);
-#   endif /* _MINIX */
-#  else	/* UNRELSIGS */
-    /* 
-     * XXX: for greater than 3 we should use waitpid(). 
-     * but then again, SVR4 falls into the POSIX/BSDJOBS category.
-     */
-    pid = wait(&w.w_status);
-#  endif /* SYSVREL >= 3 */
-# endif /* HAVEwait3 */
-# endif	/* BSDTIMES */
+#  endif /* aiws || uts */
+#  ifndef HAVEwait3
+#   ifdef UNRELSIGS
+     /* no wait3, therefore no rusage */
+     /* on Sys V, this may hang.  I hope it's not going to be a problem */
+#    ifdef _MINIX
+      pid = wait(&w);
+#    else /* !_MINIX */
+      pid = ourwait(&w.w_status);
+#    endif /* _MINIX */
+#   else /* !UNRELSIGS */
+     /* 
+      * XXX: for greater than 3 we should use waitpid(). 
+      * but then again, SVR4 falls into the POSIX/BSDJOBS category.
+      */
+     pid = wait(&w.w_status);
+#   endif /* !UNRELSIGS */
+#  endif /* !HAVEwait3 */
+# endif	/* !BSDTIMES */
 # ifndef BSDSIGS
     (void) sigset(SIGCHLD, pchild);
 # endif /* !BSDSIGS */
-#endif /* BSDJOBS */
+#endif /* !BSDJOBS */
 
 #ifdef JOBDEBUG
     xprintf("parent %d pid %d, retval %x termsig %x retcode %x\n",
@@ -269,7 +269,7 @@ loop:
     if (pid <= 0) {
 #ifdef JOBDEBUG
 	xprintf("errno == %d\n", errno);
-#endif
+#endif /* JOBDEBUG */
 	if (errno == EINTR) {
 	    errno = 0;
 	    goto loop;
@@ -279,7 +279,7 @@ loop:
 	return (0);
 #else /* !SIGVOID */
 	return;
-#endif /* SIGVOID */
+#endif /* !SIGVOID */
     }
     for (pp = proclist.p_next; pp != NULL; pp = pp->p_next)
 	if (pid == pp->p_procid)
@@ -305,10 +305,10 @@ found:
 # else	/* !_SEQUENT_ */
 #  ifndef COHERENT
 	    pp->p_etime = times(&proctimes);
-#  else /* !COHERENT */
+#  else /* COHERENT */
 	    pp->p_etime = HZ * time(NULL);
 	    times(&proctimes);
-#  endif /* !COHERENT */
+#  endif /* COHERENT */
 # endif	/* !_SEQUENT_ */
 #else /* BSDTIMES */
 	    (void) gettimeofday(&pp->p_etime, NULL);
@@ -399,7 +399,7 @@ found:
 #ifdef notdef
 		else if ((jobflags & (PTIME|PSTOPPED)) == PTIME)
 		    ptprint(fp);
-#endif
+#endif /* notdef */
 	    }
 	}
 	else {
@@ -425,7 +425,7 @@ found:
 			 * input
 			 */
 			ClearLines();
-#endif
+#endif /* notdef */
 			ClearDisp();
 			Refresh();
 		    }
@@ -518,7 +518,7 @@ pwait()
 # ifdef notdef
     if (setintr)
 	sigignore(SIGINT);
-# endif
+# endif /* notdef */
 #endif /* !BSDSIGS */
     pjwait(pcurrjob);
 }
@@ -1550,7 +1550,7 @@ pkill(v, signum)
     /* Avoid globbing %?x patterns */
     for (vp = v; vp && *vp; vp++)
 	if (**vp == '%')
-	    quote(*vp);
+	    (void) quote(*vp);
 
     gflag = 0, tglob(v);
     if (gflag) {
@@ -1836,7 +1836,7 @@ pfork(t, wanttty)
 #endif /* BSDSIGS */
 #ifdef SIGSYNCH
     sigvec_t osv;
-    static sigvec_t nsv = {synch_handler, ~0, 0};
+    static sigvec_t nsv = {synch_handler, (sigset_t) ~0, 0};
 #endif /* SIGSYNCH */
 
     /*

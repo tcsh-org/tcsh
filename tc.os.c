@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.c,v 3.39 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.c,v 3.40 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.39 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.40 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -120,11 +120,11 @@ dosetpath(arglist, c)
 
     /* note that npaths != 0 */
 
-    spaths = (char **) xmalloc(npaths * sizeof *spaths);
+    spaths = (char **) xmalloc((size_t) npaths * sizeof *spaths);
     setzero((char *) spaths, npaths * sizeof *spaths);
-    cpaths = (char **) xmalloc((npaths + 1) * sizeof *cpaths);
+    cpaths = (char **) xmalloc((size_t) (npaths + 1) * sizeof *cpaths);
     setzero((char *) cpaths, (npaths + 1) * sizeof *cpaths);
-    cmds = (char **) xmalloc((ncmds + 1) * sizeof *cmds);
+    cmds = (char **) xmalloc((size_t) (ncmds + 1) * sizeof *cmds);
     setzero((char *) cmds, (ncmds + 1) * sizeof *cmds);
     for (i = 0; i < npaths; i++) {
 	char   *val = getenv(short2str(pathvars[i]));
@@ -132,8 +132,8 @@ dosetpath(arglist, c)
 	if (val == NULL)
 	    val = "";
 
-	spaths[i] = xmalloc((Strlen(pathvars[i]) + strlen(val)
-			     + 2) * sizeof **spaths);
+	spaths[i] = (char *) xmalloc((size_t) (Strlen(pathvars[i]) +
+				      strlen(val) + 2) * sizeof **spaths);
 	(void) strcpy(spaths[i], short2str(pathvars[i]));
 	(void) strcat(spaths[i], "=");
 	(void) strcat(spaths[i], val);
@@ -145,7 +145,7 @@ dosetpath(arglist, c)
 
 	if (val == NULL)
 	    goto abortpath;
-	cmds[i] = xmalloc(Strlen(val) + 1);
+	cmds[i] = (char *) xmalloc((size_t) Strlen(val) + 1);
 	(void) strcpy(cmds[i], short2str(val));
     }
 
@@ -793,6 +793,7 @@ fix_yp_bugs()
 {
     char   *mydomain;
 
+    extern int yp_get_default_domain();
     /*
      * PWP: The previous version assumed that yp domain was the same as the
      * internet name domain.  This isn't allways true. (Thanks to Mat Landau
@@ -856,7 +857,7 @@ osinit()
 #ifdef aiws
     {
 	struct sigstack inst;
-	inst.ss_sp = xmalloc(4192) + 4192;
+	inst.ss_sp = (char *) xmalloc((size_t) 4192) + 4192;
 	inst.ss_onstack = 0;
 	sigstack(&inst, NULL);
     }

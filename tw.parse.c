@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.71 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.72 1995/03/19 22:33:26 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.71 1995/03/12 04:49:26 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.72 1995/03/19 22:33:26 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -277,7 +277,7 @@ tenematch(inputline, num_read, command)
 #endif
     }
 
-    switch ((int) command) {
+    switch (command) {
 	Char    buffer[FILSIZ + 1], *bptr;
 	Char   *slshp;
 	Char   *items[2], **ptr;
@@ -363,7 +363,7 @@ tenematch(inputline, num_read, command)
 		DeleteBack(str_end - word_start);/* get rid of old word */
 		for (i = 0; i < count; i++)
 		    if (ptr[i] && *ptr[i]) {
-			quote(ptr[i]);
+			(void) quote(ptr[i]);
 			if (insert_meta(0, 0, ptr[i], 0) < 0 ||
 			    InsertStr(STRspace) < 0) {
 			    blkfree(ptr);
@@ -597,7 +597,7 @@ insert_meta(cp, cpend, word, closequotes)
 	    qu = 0;
     }
     if (closequotes && qu && !cmap(qu, _ESC))
-	*bptr++ = qu;
+	*bptr++ = (Char) qu;
     *bptr = '\0';
     if (ndel)
 	DeleteBack(ndel);
@@ -1080,6 +1080,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 /* tw_suffix():
  *	Find and return the appropriate suffix character
  */
+/*ARGSUSED*/
 static Char 
 tw_suffix(looking, exp_dir, exp_name, target, name)
     int looking;
@@ -1088,8 +1089,8 @@ tw_suffix(looking, exp_dir, exp_name, target, name)
     Char *ptr;
     struct varent *vp;
 
-
-    strip(exp_name);
+    USE(name);
+    (void) strip(exp_name);
 
     switch (looking) {
 
@@ -1175,7 +1176,7 @@ tw_fixword(looking, word, dir, exp_name, max_word_length)
 	break;
     }
 
-    quote(exp_name);
+    (void) quote(exp_name);
     catn(word, exp_name, max_word_length);	/* add extended name */
 } /* end tw_fixword */
 
@@ -1917,9 +1918,9 @@ filetype(dir, file)
 		return ('+');
 #endif
 #ifdef S_ISCDF	
-	    strcat(ptr, "+");      /* Must append a '+' and re-stat(). */
+	    (void) strcat(ptr, "+");	/* Must append a '+' and re-stat(). */
 	    if ((stat(ptr, &hpstatb) != -1) && S_ISCDF(hpstatb.st_mode))
-	    	return ('+');        /* Context Dependent Files [hpux] */
+	    	return ('+');		/* Context Dependent Files [hpux] */
 #endif 
 #ifdef S_ISNWK
 	    if (S_ISNWK(statb.st_mode)) /* Network Special [hpux] */
@@ -2187,7 +2188,7 @@ choose_scroll_tab(exp_name, cnt)
     int tmp = cnt;
     Char **ptr;
 
-    ptr = (Char **) xmalloc(sizeof(Char *) * cnt);
+    ptr = (Char **) xmalloc((size_t) sizeof(Char *) * cnt);
 
     for(loop = scroll_tab; loop && (tmp >= 0); loop = loop->next)
 	ptr[--tmp] = loop->element;

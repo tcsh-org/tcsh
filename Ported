@@ -16,15 +16,15 @@ OS	:	sunos 3.5, 4.0, 4.1, 4.1.1, 4.1.2, 4.1.3
 CONFIG	:	sunos*
 ENVIRON	:	n/a
 NOTES	:	Don't compile with /usr/5bin/cc
-VERSION	:	6.04.13
+VERSION	:	6.05.06
 
 VENDOR	:	sun
 MODELS	:	sun4
 COMPILER:	cc, gcc
 CFLAGS	:	normal
 LIBES	:	-lcurses -lsocket -lnsl
-OS	:	solaris 2.x, 2.3
-CONFIG	:	sol2, sol23
+OS	:	solaris 2.1, 2.2, 2.3, 2.4
+CONFIG	:	sol*
 ENVIRON	:	n/a
 NOTES	:	The sunpro compiler cannot compile tcsh with -O, it crashes
 	:	on some files. In any case do not use -O with any of the
@@ -32,7 +32,7 @@ NOTES	:	The sunpro compiler cannot compile tcsh with -O, it crashes
 	:	floating point is already initialized and does not do the
 	:	necessary initializations. This results in weird floating
 	:	point failures of programs exec'ed from tcsh.
-VERSION	:	6.04.13
+VERSION	:	6.05.06
 
 VENDOR	:	sun
 MODELS	:	i386
@@ -44,7 +44,6 @@ CONFIG	:	sol2
 ENVIRON	:	n/a
 NOTES	:	n/a
 VERSION	:	6.04.13
-
 
 VENDOR	:	hp
 MODELS	:	apollo
@@ -68,7 +67,7 @@ ENVIRON	:	n/a
 NOTES	:	Don't use -lBSD; breaks getpgrp(). Config.hp-3.2 obsolete?
 	:	Some versions of the compiler are broken with -O3. Try 'ls *'
 	:	If it does not work, lower the optimization level...
-VERSION	:	6.04.13
+VERSION	:	6.05.06
 
 VENDOR	:	hp
 MODELS	:	hp9000s500
@@ -90,7 +89,7 @@ LIBES	:	-ltermcap
 OS	:	bsd4.3, bsd4.4
 CONFIG	:	bsd*
 ENVIRON	:	n/a
-NOTES	:	cc broken: typedef void sigret_t;
+NOTES	:	cc broken: typedef void sigret_t; typedef void pret_t;
 VERSION	:	6.00.03
 
 VENDOR	:	digital
@@ -101,7 +100,7 @@ LIBES	:	-ltermcap
 OS	:	mtXinu 4.3
 CONFIG	:	mtxinu 
 ENVIRON	:	n/a
-NOTES	:	cc broken: typedef void sigret_t;
+NOTES	:	cc broken: typedef void sigret_t; typedef void pret_t;
 VERSION	:	6.03.09
 
 VENDOR	:	digital
@@ -148,7 +147,7 @@ VERSION	:	6.03.00 (rs6000)
 
 VENDOR	:	ibm
 MODELS	:	rt
-COMPILER:	hc,gcc
+COMPILER:	hc, gcc
 CFLAGS	:	-I. -U__STDC__
 LIBES	:	-ltermcap
 OS	:	aos 4.3
@@ -156,7 +155,20 @@ CONFIG	:	bsd
 ENVIRON	:	n/a
 NOTES	:	Old versions of the compiler break with -O. No ansi include
 NOTES	:	files so we have to undef __STDC__
-VERSION	:	6.03.09
+VERSION	:	6.05.06
+
+VENDOR	:	ibm
+MODELS	:	rt
+COMPILER:	pcc
+CFLAGS	:	-I. -U__STDC__ -DPCC
+LIBES	:	-ltermcap
+OS	:	aos 4.3
+CONFIG	:	bsd
+ENVIRON	:	n/a
+NOTES	:	Old versions of the compiler break with -O. No ansi include
+NOTES	:	files so we have to undef __STDC__
+NOTES	:	pcc broken: typedef void sigret_t; typedef void pret_t;
+VERSION	:	6.05.06
 
 VENDOR	:	ibm
 MODELS	:	rt
@@ -211,7 +223,7 @@ OS	:	bsd 4.3, news-os 3.3,4.1C
 CONFIG	:	bsd
 ENVIRON	:	n/a
 NOTES	:	none
-VERSION	:	6.04.13
+VERSION	:	6.05.06
 
 VENDOR	:	ibm + compatibles
 MODELS	:	i386,i286
@@ -226,14 +238,25 @@ VERSION	:	6.00.01
 
 VENDOR	:	hp
 MODELS	:	hp300
-COMPILER:	gcc/cc
+COMPILER:	cc, gcc
 CFLAGS	:	normal
 LIBES	:	-ltermcap
 OS	:	MORE/bsd 4.3+
 CONFIG	:	mtxinu
 ENVIRON	:	n/a
 NOTES	:	none
-VERSION	:	6.04.13
+VERSION	:	6.05.06
+
+VENDOR	:	hp, motorola
+MODELS	:	hp300, m68k
+COMPILER:	gcc
+CFLAGS	:	normal
+LIBES	:	-ltermcap -lcrypt
+OS	:	NetBSD 1.0A
+CONFIG	:	bsd4.4
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.05.06
 
 VENDOR	:	digital
 MODELS	:	vax
@@ -357,7 +380,18 @@ OS	:	SVR4 (DELL, ESIX, ISC, UHC)
 CONFIG	:	sysv4
 ENVIRON	:	n/a
 NOTES	:	none
-VERSION	:	6.04.13
+VERSION	:	6.05.06
+
+VENDOR	:	ibm + compatibles
+MODELS	:	i386,i486
+COMPILER:	gcc
+CFLAGS	:	normal
+LIBES	:	-ltermcap
+OS	:	linux 0.8x, 0.9x, 1.x
+CONFIG	:	linux
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.05.06
 
 VENDOR	:	ibm + compatibles
 MODELS	:	i386,i486
@@ -430,7 +464,6 @@ NOTES	:	it will build without -lbsd but then job control
 NOTES	:	won't actually work.
 VERSION	:	6.04.00
 
-
 VENDOR  :       alliant
 MODELS  :       FX/2800 series
 COMPILER:       scc
@@ -453,8 +486,8 @@ OS      :	SYSVR4
 CONFIG  :	sysv4
 ENVIRON :       n/a
 NOTES   :	Works like a charm
-
 VERSION :	6.01
+
 VENDOR  :       Evans & Sutherland
 MODELS  :       ESV
 COMPILER:       cc
@@ -719,9 +752,9 @@ MODELS  :	DECstation 3000/400 (alpha)
 COMPILER:	cc
 CFLAGS  :	-O2 -I. -I.. -Olimit 2000
 LIBES   :	-lcurses
-OS      :	OSF1 1.3, 2.0
+OS      :	OSF1 1.3, 2.0, 3.0
 CONFIG  :	decosf1
-VERSION :	6.04.13
+VERSION :	6.05.06
 
 VENDOR  :	Intel
 MODELS  :	Paragon
@@ -756,7 +789,6 @@ CONFIG	:	dgux5.4
 ENVIRON	:	sde m88kdguxelf
 VERSION	:	6.05.00
 
-
 VENDOR	:	Harris
 MODELS	:	Tahoe
 COMPILER:	cc, gcc 1.42
@@ -771,12 +803,13 @@ VERSION :	6.04.00
 VENDOR	:	Multiflow
 MODELS	:	multiflow
 COMPILER:	cc
-CFLAGS	:	-O5 -sb_trace 0
+CFLAGS	:	-O5 -sb_trace 0 -DMULTIFLOW
 LIBES	:	-ltermcap -lcrypt
 OS	:	4.3 BSD TRACE/UNIX
 CONFIG	:	bsd
 ENVIRON :	n/a
 NOTES	:	Lower the optimization or you'll get a 5M binary!
+NOTES	:	cc broken: typedef void sigret_t; typedef void pret_t;
 VERSION :	6.04.00
 
 VENDOR	:	Intergraph
@@ -789,3 +822,4 @@ CONFIG	:	clipper
 ENVIRON :	n/a
 NOTES	:	n/a
 VERSION :	6.05.00
+

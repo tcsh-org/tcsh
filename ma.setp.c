@@ -82,7 +82,7 @@
  **********************************************************************
  */
 #include "sh.h"
-RCSID("$Id: ma.setp.c,v 1.9 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: ma.setp.c,v 1.10 1995/03/12 04:49:26 christos Exp christos $")
 
 #ifdef MACH
 
@@ -358,10 +358,10 @@ char *localsyspath;
 	*new = '\0';
 	if (localsyspath != NULL) {
 	    *new = ':';
-	    strcpy(new + 1, localsyspath);
-	    strcat(new, pe->psuf);
+	    (void) strcpy(new + 1, localsyspath);
+	    (void) strcat(new, pe->psuf);
 	}
-	strcat(new, pe->pdef);
+	(void) strcat(new, pe->pdef);
 	for (n = 0; n < pe->pdirs; n++) {
 	    if (pe->pdir[n] == NULL)
 		continue;
@@ -402,8 +402,8 @@ char *path, *localsyspath;
 	    new = localsyspath;
 	else {
 	    new = newbuf;
-	    strcpy(new, localsyspath);
-	    strcat(new, pe->psuf);
+	    (void) strcpy(new, localsyspath);
+	    (void) strcat(new, pe->psuf);
 	}
 	n = locate(pe, new);
 	if (n >= 0)
@@ -470,8 +470,8 @@ register char *key;
 
     if (sflag) {		/* add suffix */
 	new = newbuf;
-	strcpy(new, key);
-	strcat(new, pe->psuf);
+	(void) strcpy(new, key);
+	(void) strcat(new, pe->psuf);
     } else
 	new = key;
     new = strsave(new);
@@ -582,8 +582,8 @@ register char *key;
 
     if (sflag) {		/* append suffix */
 	new = newbuf;
-	strcpy(new, key);
-	strcat(new, pe->psuf);
+	(void) strcpy(new, key);
+	(void) strcat(new, pe->psuf);
     } else
 	new = key;
     new = strsave(new);
@@ -606,8 +606,8 @@ register char *key;
 
     if (sflag) {
 	realkey = keybuf;
-	strcpy(realkey, key);
-	strcat(realkey, pe->psuf);
+	(void) strcpy(realkey, key);
+	(void) strcat(realkey, pe->psuf);
     } else
 	realkey = key;
     for (i = 0; i < pe->pdirs; i++)

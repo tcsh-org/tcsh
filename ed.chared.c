@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.chared.c,v 3.44 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.chared.c,v 3.45 1995/03/19 22:33:26 christos Exp christos $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.44 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: ed.chared.c,v 3.45 1995/03/19 22:33:26 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1939,7 +1939,7 @@ e_dabbrev_expand(c)
 	oldevent = eventno;
 	start = cp;
 	patlen = Cursor - cp;
-	Strncpy(patbuf, cp, patlen);
+	(void) Strncpy(patbuf, cp, patlen);
 	hist = 0;
 	word = 0;
     }

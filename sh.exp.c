@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.exp.c,v 3.29 1994/06/06 05:04:54 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.exp.c,v 3.30 1995/01/20 23:48:56 christos Exp christos $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.29 1994/06/06 05:04:54 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.30 1995/01/20 23:48:56 christos Exp christos $")
 
 /*
  * C shell
@@ -164,7 +164,7 @@ sh_access(fname, mode)
 #   define GID_T gid_t
 #  endif /* __386BSD__ || BSD4_4 */
 	/* you can be in several groups */
-	int	n;
+	long	n;
 	GID_T	*groups;
 
 	/*
@@ -849,13 +849,13 @@ filetest(cp, vp, ignore)
 		break;
 
 	    case 'I':
-		i =  (int) st->st_ino;
+		i = (int) st->st_ino;
 		break;
 		
 	    case 'F':
 		strdev = putn( (int) st->st_dev);
 		strino = putn( (int) st->st_ino);
-		strF = (Char *) xmalloc((2 + Strlen(strdev) + 
+		strF = (Char *) xmalloc((size_t) (2 + Strlen(strdev) + 
 					 Strlen(strino)) * sizeof(Char));
 		(void) Strcat(Strcat(Strcpy(strF, strdev), STRcolon), strino);
 		xfree((ptr_t) strdev);
@@ -880,7 +880,8 @@ filetest(cp, vp, ignore)
 # define MY_PATH_MAX  2048
 #endif /* PATH_MAX */
 		i = readlink(filnam, string = (char *) 
-		      xmalloc((1 + MY_PATH_MAX) * sizeof(char)), MY_PATH_MAX);
+		      xmalloc((size_t) (1 + MY_PATH_MAX) * sizeof(char)),
+			MY_PATH_MAX);
 		if (i >= 0 && i <= MY_PATH_MAX)
 		    string[i] = '\0'; /* readlink does not null terminate */
 		strF = (i < 0) ? errval : str2short(string);
@@ -900,7 +901,7 @@ filetest(cp, vp, ignore)
 
 	    case 'P':
 		string = string0 + 1;
-		xsprintf(string, "%o", pmask & (unsigned int) 
+		(void) xsprintf(string, "%o", pmask & (unsigned int) 
 		     ((S_IRWXU|S_IRWXG|S_IRWXO|S_ISUID|S_ISGID) & st->st_mode));
 		if (altout && *string != '0')
 		    *--string = '0';

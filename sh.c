@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.c,v 3.67 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.c,v 3.68 1995/03/19 22:33:26 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.67 1995/03/12 04:49:26 christos Exp $")
+RCSID("$Id: sh.c,v 3.68 1995/03/19 22:33:26 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -181,7 +181,7 @@ main(argc, argv)
 
 #if defined(NLS_CATALOGS) && defined(LC_MESSAGES)
     (void) setlocale(LC_MESSAGES, "");
-# endif /* NLS_CATALOGS && LC_MESSAGES */
+#endif /* NLS_CATALOGS && LC_MESSAGES */
 
 #ifdef NLS
 # ifdef LC_CTYPE
@@ -1982,8 +1982,8 @@ process(catch)
 	freesyn(savet), savet = NULL;
 #ifdef SIG_WINDOW
 	if (catch && intty && !whyles && !tellwhat)
-	    window_change(0);	/* for window systems */
-#endif				/* SIG_WINDOW */
+	    (void) window_change(0);	/* for window systems */
+#endif /* SIG_WINDOW */
     }
     savet = t;
     resexit(osetexit);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.func.c,v 3.63 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.func.c,v 3.64 1995/03/19 22:33:26 christos Exp christos $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.63 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: tc.func.c,v 3.64 1995/03/19 22:33:26 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -79,7 +79,9 @@ static	void	 insert_we	__P((struct wordent *, struct wordent *));
 static	int	 inlist		__P((Char *, Char *));
 #endif /* BSDJOBS */
 static  Char    *gethomedir	__P((Char *));
+#ifdef REMOTEHOST
 static	void	 getremotehost	__P((void));
+#endif /* REMOTEHOST */
 
 /*
  * Tops-C shell
@@ -1862,6 +1864,7 @@ hashbang(fd, vp)
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/uio.h>	/* For struct iovec */
 
 static sigret_t
 palarm(snum)

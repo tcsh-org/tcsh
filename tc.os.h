@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.h,v 3.61 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.h,v 3.62 1994/07/08 14:43:50 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -58,7 +58,7 @@
 # define  NEEDgethostname 
 # include <sys/time.h>    /* for time stuff in tc.prompt.c */
 # include <limits.h>
-#endif /*atp vmsposix*/
+#endif /* atp vmsposix */
 
 #if defined(OPEN_MAX) && !defined(NOFILE)
 # define NOFILE OPEN_MAX
@@ -80,8 +80,8 @@
 /* Pyramid's cpp complains about the next line */
 # if defined(BSD) && BSD >= 199306
 #  undef NEEDstrerror
-# endif
-#endif
+# endif /* BSD && BSD >= 199306 */
+#endif /* pyr */
 
 #ifdef OREO
 # include <sys/time.h>
@@ -546,7 +546,7 @@ extern int sigpause();
 extern sigret_t sigvec();
 extern void sigpause();
 #   endif /* (!apollo || !__STDC__) && !__DGUX__ && !fps500 */
-#  endif /* _AIX370 || MACH || NeXT || _AIXPS2 || ardent || SUNOS4 */
+#  endif /* _AIX370 || MACH || NeXT || _AIXPS2 || ardent || SUNOS4 || HPBSD */
 extern sigmask_t sigblock();
 extern sigmask_t sigsetmask();
 # endif	/* BSDSIGS */
@@ -615,7 +615,7 @@ extern void endpwent();
 
 # ifndef __STDC__
 extern struct passwd *getpwuid(), *getpwnam(), *getpwent();
-#  ifdef PW_etgHADOW
+#  ifdef PW_SHADOW
 extern struct spwd *getspnam(), *getspent();
 #  endif /* PW_SHADOW */
 #  ifdef PW_AUTH
@@ -639,7 +639,7 @@ extern char *ttyname();
 
 # ifdef __clipper__
 extern char *ttyname();   
-# endif
+# endif /* __clipper__ */
 
 #endif /* !POSIX || SUNOS4 || UTekV || sysV88 */
 
@@ -661,7 +661,7 @@ extern int getpeername __P((int, struct sockaddr *, int *));
 # if defined(__alpha) && defined(__osf__) && DECOSF1 < 200
 extern void bcopy	__P((const void *, void *, size_t));
 #  define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
-# endif
+# endif /* __alpha && __osf__ && DECOSF1 < 200 */
 #endif /* (BSD && !__386BSD__) || SUNOS4 */
 
 #if !defined(hpux) && !defined(COHERENT) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(__386BSD__) && !defined(memmove)
@@ -670,7 +670,11 @@ extern void bcopy	__P((const void *, void *, size_t));
 
 #if defined(UTek) || defined(pyr)
 # define NEEDmemset
-#endif /* Utek || pyr */
+#else /* !UTek && !pyr */
+# ifdef SUNOS4
+#  include <memory.h>	/* memset should be declared in <string.h> but isn't */
+# endif /* SUNOS4 */
+#endif /* UTek || pyr */
 
 #if SYSVREL == 4
 # ifdef REMOTEHOST
@@ -685,6 +689,7 @@ extern int wait3();	/* I think some bizarre systems still need this */
 # endif /* !IRIS4D && !SOLARIS2 */
 # if defined(SOLARIS2)
 #  undef NEEDstrerror
+extern char *strerror();
 # endif /* SOLARIS2 */
 #endif /* SYSVREL == 4 */
 

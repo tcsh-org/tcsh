@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.dol.c,v 3.28 1995/01/20 23:48:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.dol.c,v 3.29 1995/03/05 03:18:09 christos Exp christos $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.28 1995/01/20 23:48:56 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.29 1995/03/05 03:18:09 christos Exp christos $")
 
 /*
  * C shell
@@ -487,7 +487,7 @@ Dgetdol()
 #ifdef BSDSIGS
 	    sigmask_t omask = sigsetmask(sigblock(0) & ~sigmask(SIGINT));
 #else /* !BSDSIGS */
-	    sigrelse(SIGINT);
+	    (void) sigrelse(SIGINT);
 #endif /* BSDSIGS */
 	    for (np = wbuf; read(OLDSTD, &tnp, 1) == 1; np++) {
 		*np = (unsigned char) tnp;

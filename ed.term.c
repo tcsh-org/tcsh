@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.term.c,v 1.16 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.term.c,v 1.17 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.16 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.17 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -90,7 +90,11 @@ ttyperm_t ttylist = {
 
 static struct tcshmodes {
     char *m_name;
+#ifdef SOLARIS2
+    unsigned long m_value;
+#else /* !SOLARIS2 */
     int   m_value;
+#endif /* SOLARIS2 */
     int   m_type;
 } modelist[] = {
 #if defined(POSIX) || defined(TERMIO)

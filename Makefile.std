@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.76 1995/03/12 04:55:11 christos Exp $
+# $Id: Makefile.std,v 1.77 1995/03/19 22:33:26 christos Exp christos $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -121,8 +121,10 @@ CFLAGS=-O2 $(INCLUDES)
 #DFLAGS = -DUTek -DBSD
 # VMS_POSIX needs:
 #DFLAGS=-D_VMS_POSIX
-# Multiflow
+# Multiflow and PCC compilers don't like void typedefs.
+# You may also need -U__STDC__ if you use pcc (i.e. ibmrt aos4.3).
 #DFLAGS=-DMULTIFLOW
+#DFLAGS=-DPCC
 # DELL SVR4
 #DFLAGS=-DDELL
 DFLAGS=

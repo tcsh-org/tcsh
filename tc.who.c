@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.who.c,v 3.23 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.who.c,v 3.24 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.23 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.24 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "tc.h"
 
@@ -563,7 +563,8 @@ struct command *c;
 
     USE(v);
     USE(c);
-    if ((vp = adrof(STRwatch)) == NULL)
+    vp = adrof(STRwatch);	/* lint insists vp isn't used unless we */
+    if (vp == NULL)		/* unless we assign it outside the if */
 	stderror(ERR_NOWATCH);
     resetwatch();
     wp = whohead.who_next;

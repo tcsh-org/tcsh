@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.h,v 3.66 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.h,v 3.67 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -73,14 +73,15 @@ typedef char Char;
  * throw it away and get gcc or, use the following define
  * and get rid of the typedef.
  * [The 4.2/3BSD vax compiler does not like that]
+ * Both MULTIFLOW and PCC compilers exhbit this bug.  -- sterling@netcom.com
  */
 #ifdef SIGVOID
-# if (defined(vax) || defined(uts)) && !defined(__GNUC__)
+# if (defined(vax) || defined(uts) || defined(MULTIFLOW) || defined(PCC)) && !defined(__GNUC__)
 #  define sigret_t void
-# else
+# else /* !((vax || uts || MULTIFLOW || PCC) && !__GNUC__) */
 typedef void sigret_t;
-# endif 
-#else
+# endif /* (vax || uts || MULTIFLOW || PCC) && !__GNUC__ */
+#else /* !SIGVOID */
 typedef int sigret_t;
 #endif /* SIGVOID */
 
@@ -225,8 +226,8 @@ typedef int sigret_t;
 # include <unistd.h>
 # undef getpgrp
 # undef setpgrp
-extern int getpgrp();
-extern int setpgrp();
+extern pid_t getpgrp();
+extern pid_t setpgrp();
 
 /*
  * the gcc+protoize version of <stdlib.h>
@@ -260,7 +261,7 @@ extern int setpgrp();
 # endif /* !pyr && !stellar */
 #endif /* SYSVREL > 0 ||  _IBMR2 */
 
-#if !((defined(SUNOS4) || defined(_MINIX)) && defined(TERMIO))
+#if !((defined(SUNOS4) || defined(_MINIX) || defined(DECOSF1)) && defined(TERMIO))
 # if !defined(COHERENT) && !defined(_VMS_POSIX)
 #  include <sys/ioctl.h>
 # endif
@@ -366,13 +367,19 @@ extern int setpgrp();
 /* exit normally, allowing purify to trace leaks */
 # define _exit		exit
 typedef  int		pret_t;
-#else
-# ifndef MULTIFLOW
-typedef void		pret_t;
-# else
-/* Multiflow compiler bug */
-#  define pret_t	void
-# endif
+#else /* !PURIFY */
+/*
+ * If your compiler complains, then you can either
+ * throw it away and get gcc or, use the following define
+ * and get rid of the typedef.
+ * [The 4.2/3BSD vax compiler does not like that]
+ * Both MULTIFLOW and PCC compilers exhbit this bug.  -- sterling@netcom.com
+ */
+# if (defined(vax) || defined(uts) || defined(MULTIFLOW) || defined(PCC)) && !defined(__GNUC__)
+#  define pret_t void
+# else /* !((vax || uts || MULTIFLOW || PCC) && !__GNUC__) */
+typedef void pret_t;
+# endif /* (vax || uts || MULTIFLOW || PCC) && !__GNUC__ */
 #endif /* PURIFY */
 
 typedef int bool;

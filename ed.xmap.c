@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.xmap.c,v 3.14 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.xmap.c,v 3.15 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.14 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.15 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -301,8 +301,8 @@ TryNode(ptr, str, val, ntype)
 	case XK_STR:
 	case XK_EXE:
 	    ptr->val.str.len = (val->str.len + 1) * sizeof(Char);
-	    ptr->val.str.buf = (Char *) xmalloc(ptr->val.str.len);
-	    memmove(ptr->val.str.buf, val->str.buf, ptr->val.str.len);
+	    ptr->val.str.buf = (Char *) xmalloc((size_t) ptr->val.str.len);
+	    (void) memmove((ptr_t) ptr->val.str.buf, (ptr_t) val->str.buf, (size_t) ptr->val.str.len);
 	    ptr->val.str.len = val->str.len;
 	    break;
 	default:
@@ -762,14 +762,14 @@ unparsestring(str, buf, sep)
 	    if (p == '\177')
 		*b++ = '?';
 	    else
-		*b++ = p | 0100;
+		*b++ = (unsigned char) (p | 0100);
 	}
 	else if (p == '^' || p == '\\') {
 	    *b++ = '\\';
-	    *b++ = p;
+	    *b++ = (unsigned char) p;
 	}
 	else if (p == ' ' || (Isprint(p) && !Isspace(p))) {
-	    *b++ = p;
+	    *b++ = (unsigned char) p;
 	}
 	else {
 	    *b++ = '\\';

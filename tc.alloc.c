@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.alloc.c,v 3.27 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.alloc.c,v 3.28 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.27 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.28 1995/03/12 04:49:26 christos Exp christos $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -373,7 +373,7 @@ realloc(cp, nbytes)
 #ifndef lint
     register U_int onb;
     union overhead *op;
-    char   *res;
+    ptr_t res;
     register int i;
     int     was_alloced = 0;
 
