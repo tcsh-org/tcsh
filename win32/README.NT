@@ -38,17 +38,17 @@ Microsoft Corporation has nothing to do with this code. It is not supported in
 any fashion by Microsoft.
 
 -----------------------------------------------------------------------------
-This is NOT a cygnus gcc version. It will not compile with their gcc or
-work seamlessly with their apps. Do NOT ask me to hack support for cygnus
+This is NOT a Cygwin gcc version. It will not compile with Cygwin gcc or
+work seamlessly with Cygwin apps. Do NOT ask me to hack support for Cygwin
 'mount points' unless you are willing to provide the translation code.
 
-To prevent cygwin applications from expanding wildcards, set the environment
+To prevent Cygwin applications from expanding wildcards, set the environment
 variable CYGWIN to "noglob".  i.e., in your .tcshrc, put a line like this:
 
 setenv CYGWIN noglob
 
-(cygwin applications assume that if they are not started from a shell
-using the cygwin runtime, the parent shell does not have the ability to glob.
+(Cygwin applications assume that if they are not started from a shell
+using the Cygwin runtime, the parent shell does not have the ability to glob.
 This is visible as tcsh apparently expanding wildcards for quoted arguments.)
 
 -----------------------------------------------------------------------------
@@ -310,7 +310,7 @@ The default action is to shut the machine down.
 
 Notes:
 -----
-* You should probably get the gnu-win32 utilities from http://www.cygnus.com
+* You should probably get the Cygwin utilities from http://cygwin.com
 
   Things like 'ls' and 'cat' are useful, since we don't have a 'type' or 'dir'
   anymore. 'ls' is pretty much a requirement unless you never do  'ls -l'.
@@ -318,11 +318,11 @@ Notes:
 
 * tcsh was compiled with Visual C++ >= 4.2. I don't guarantee it will compile
   with any other compilers, but it should. It will *not* compile with the
-  cygnus gcc port, so don't even tell me about it. 
+  Cygwin gcc port, so don't even tell me about it. 
 
-* It should be pointed out that there is also a cygnus version of tcsh that 
+* It should be pointed out that there is also a Cygwin version of tcsh that 
   will compile with gcc and provide all the other features emulated by the
-  cygnus runtime (like job control, signals, etc.). So, if you are looking for
+  Cygwin runtime (like job control, signals, etc.). So, if you are looking for
   a way to pretend that you are on Unix, you should use that version.
   The same holds true for UWIN as well.
 

@@ -212,7 +212,7 @@ case "${host}" in
     tcsh_config_file=cray
   ;;
 
-  ## Cygnus GNU Win32
+  ## Red Hat Cygwin
   *-cygwin)
     tcsh_config_file=cygwin32
   ;;
@@ -253,13 +253,6 @@ if test "x$GCC" != xyes ; then
   DFLAGS="$DFLAGS $NON_GNU_DFLAGS"
   CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
 fi
-
-case "${host}" in
-  ## Cygnus GNU Win32
-  *-cygwin)
-    CFLAGS="$CFLAGS -mno-win32"
-  ;;
-esac
 
 dnl Checks for libraries
 AC_SEARCH_LIBS(crypt, crypt)
