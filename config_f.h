@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.17 1998/06/27 12:27:03 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.18 1998/09/18 16:08:57 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -117,7 +117,20 @@
  *		be used with SHORT_STRINGS
  *
  */
-#define KANJI
+#undef KANJI
+
+/*
+ * DSPMBYTE	add variable "dspmbyte" and display multi-byte string at
+ *		only output, when "dspmbyte" is set.
+ */
+#define DSPMBYTE
+
+/*
+ * MBYTEDEBUG	when "dspmbyte" is changed, set multi-byte checktable to
+ *		variable "mbytemap".
+ *		(use for multi-byte table check)
+ */
+#define MBYTEDEBUG
 
 /*
  * NEWGRP	Provide a newgrp builtin.
@@ -169,18 +182,5 @@
 #else
 # define RCSID(id)	/* Nothing */
 #endif /* !lint && !SABER */
-
-/*
- * DSPMBYTE	add variable "dspmbyte" and display multi-byte string at
- *		only output, when "dspmbyte" is set.
- */
-#define DSPMBYTE
-
-/*
- * MBYTEDEBUG	when "dspmbyte" is changed, set multi-byte checktable to
- *		variable "mbytemap".
- *		(use for multi-byte table check)
- */
-#define MBYTEDEBUG
 
 #endif /* _h_config_f */

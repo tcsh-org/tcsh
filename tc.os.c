@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.47 1998/04/08 13:59:08 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.48 1998/09/18 16:09:18 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.47 1998/04/08 13:59:08 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.48 1998/09/18 16:09:18 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1217,8 +1217,7 @@ xgetcwd(pathname, pathlen)
 	/* look in the parent for the entry with the same inode */
 	if (DEV_DEV_COMPARE(st_dotdot.st_dev, st_cur.st_dev)) {
 	    /* Parent has same device. No need to stat every member */
-	    for (d = readdir(dp); d != NULL; d = readdir(dp))  {
-		xprintf("a. %d %d %s %s %s\n", st_cur.st_ino, d->d_fileno, d->d_name, pathptr, nextpathptr);
+	    for (d = readdir(dp); d != NULL; d = readdir(dp)) {
 #ifdef __clipper__
 		if (((unsigned long)d->d_fileno & 0xffff) == st_cur.st_ino)
 		    break;
@@ -1236,7 +1235,6 @@ xgetcwd(pathname, pathlen)
 	    for (d = readdir(dp); d != NULL; d = readdir(dp)) {
 		if (ISDOT(d->d_name) || ISDOTDOT(d->d_name))
 		    continue;
-		xprintf("b. %d %d %s %s %s\n", st_cur.st_ino, d->d_fileno, d->d_name, pathptr, nextpathptr);
 		(void)strncpy(cur_name_add, d->d_name,
 		    &nextpathbuf[sizeof(nextpathbuf) - 1] - cur_name_add);
 		if (lstat(nextpathptr, &st_next) == -1) {
