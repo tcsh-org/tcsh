@@ -1,3 +1,4 @@
+ 28. Fix GLOB_QUOTE problem (noted by Per) I introduced in 6.10.01.
  27. Port to concurrent's powermaxos (Matt Majka)
  26. New builtin srcfile (Amol)
  25. Fix bindkey "\\" cmd (reported by Ismail H. Tuncer)
