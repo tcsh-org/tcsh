@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.38 2002/03/08 18:49:55 christos Exp $
+# $Id: complete.tcsh,v 1.39 2002/07/01 20:54:00 christos Exp $
 # example file using the new completion code
 #
 
@@ -21,14 +21,18 @@ endif
 
 if ($?_complete) then
     set noglob
-    set hosts
+    if ( ! $?hosts ) set hosts
     foreach f ($HOME/.hosts /usr/local/etc/csh.hosts $HOME/.rhosts /etc/hosts.equiv)
         if ( -r $f ) then
-	    set hosts = ($hosts `grep -v "+" $f | tr -s " " "	" | cut -f 1`)
+	    set hosts = ($hosts `grep -v "+" $f | grep -E -v "^#" | tr -s " " "	" | cut -f 1`)
 	endif
     end
     if ( -r $HOME/.netrc ) then
 	set f=`awk '/machine/ { print $2 }' < $HOME/.netrc` >& /dev/null
+	set hosts=($hosts $f)
+    endif
+    if ( -r $HOME/.ssh/known_hosts ) then
+	set f=`cat $HOME/.ssh/known_hosts | cut -f 1 -d \ ` >& /dev/null
 	set hosts=($hosts $f)
     endif
     unset f

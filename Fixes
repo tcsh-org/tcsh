@@ -1,4 +1,5 @@
- 46. FreeBSD's sbsize limit (Mark Davies)
+ 47. Completion fixes from FreeBSD (Mark Peek)
+ 46. FreeBSD's sbsize limit (Mark Peek)
  45. Fix repeat 3 repeat 2 echo foo
  44. Fix I/O redirection in scripts (Ian D Allen)
  43. Fix ` \\\n ` evaluation (Jean-Luc Leger)
