@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.init.c,v 1.2 91/07/14 22:23:18 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.1 1991/07/15 19:37:24 christos Exp christos $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -35,9 +35,10 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.init.c,v 3.1 1991/07/15 19:37:24 christos Exp christos $")
 
 #include "sh.h"
+#include "ed.h"
 
 /*
  * C shell
@@ -132,6 +133,7 @@ struct	biltins bfunc[] = {
     { "setspath",	dosetspath,	1,	INF, },
 #endif /* TCF */
     { "settc",	dosettc,	2,	2, },
+    { "setty",  dosetty,	0,      INF },
 #ifdef TCF
     { "setxvers",	dosetxvers,	0,	1, },
 #endif /* TCF */

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.2 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.3 1991/07/18 15:23:16 christos Exp christos $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.init.c,v 3.2 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.3 1991/07/18 15:23:16 christos Exp christos $")
 
 #include "sh.h"
 #define EXTERN			/* intern */
@@ -138,6 +138,446 @@ extern char strPOSIX[];
 #endif				/* _IBMR2 */
 
 static	int	dosetkey __P((char *, char *));
+
+static struct tcshtty {
+    char *t_name;
+    int  t_setmask;
+    int  t_clrmask;
+} ttylist[] = {
+
+#ifdef TERMIO
+# define M_INPUT	0
+    { "iflag", ICRNL, (INLCR|IGNCR) },
+# define M_OUTPUT	1
+    { "oflag", (OPOST|ONLCR), ONLRET },
+# define M_CONTROL	2
+    { "cflag", 0, 0 },
+# define M_LINED	3
+    { "lflag", (ISIG|ICANON|ECHO|ECHOE|ECHOCTL|IEXTEN),
+	       (NOFLSH|ECHOK|ECHONL|EXTPROC|FLUSHO) },
+
+#else /* GSTTY */
+
+# define M_CONTROL	0
+    { "", (ECHO|CRMOD|ANYP), (CBREAK|RAW|LCASE|VTDELAY|ALLDELAY) },
+# define M_LOCAL	1
+    { "", (LCRTBS|LCRTERA|LCRTKIL), (LPRTERA|LFLUSHO) };
+
+#endif /* TERMIO */
+};
+
+static struct tcshmodes {
+    char *m_name;
+    int   m_value;
+    int   m_type;
+} modelist[] = {
+#ifdef TERMIO
+
+# ifdef	IGNBRK
+    { "ignbrk",	IGNBRK,	M_INPUT },
+# endif /* IGNBRK */
+# ifdef	BRKINT
+    { "brkint",	BRKINT,	M_INPUT },
+# endif /* BRKINT */
+# ifdef	IGNPAR
+    { "ignpar",	IGNPAR,	M_INPUT },
+# endif /* IGNPAR */
+# ifdef	PARMRK
+    { "parmrk",	PARMRK,	M_INPUT },
+# endif /* PARMRK */
+# ifdef	INPCK
+    { "inpck",	INPCK,	M_INPUT },
+# endif /* INPCK */
+# ifdef	ISTRIP
+    { "istrip",	ISTRIP,	M_INPUT },
+# endif /* ISTRIP */
+# ifdef	INLCR
+    { "inlcr",	INLCR,	M_INPUT },
+# endif /* INLCR */
+# ifdef	IGNCR
+    { "igncr",	IGNCR,	M_INPUT },
+# endif /* IGNCR */
+# ifdef	ICRNL
+    { "icrnl",	ICRNL,	M_INPUT },
+# endif /* ICRNL */
+# ifdef	IUCLC
+    { "iuclc",	IUCLC,	M_INPUT },
+# endif /* IUCLC */
+# ifdef	IXON
+    { "ixon",	IXON,	M_INPUT },
+# endif /* IXON */
+# ifdef	IXANY
+    { "ixany",	IXANY,	M_INPUT },
+# endif /* IXANY */
+# ifdef	IXOFF
+    { "ixoff",	IXOFF,	M_INPUT },
+# endif /* IXOFF */
+# ifdef  IMAXBEL
+    { "imaxbel",IMAXBEL,M_INPUT },
+# endif /* IMAXBEL */
+
+# ifdef	OPOST
+    { "opost",	OPOST,	M_OUTPUT },
+# endif /* OPOST */
+# ifdef	OLCUC
+    { "olcuc",	OLCUC,	M_OUTPUT },
+# endif /* OLCUC */
+# ifdef	ONLCR
+    { "onlcr",	ONLCR,	M_OUTPUT },
+# endif /* ONLCR */
+# ifdef	OCRNL
+    { "ocrnl",	OCRNL,	M_OUTPUT },
+# endif /* OCRNL */
+# ifdef	ONOCR
+    { "onocr",	ONOCR,	M_OUTPUT },
+# endif /* ONOCR */
+# ifdef	ONLRET
+    { "onlret",	ONLRET,	M_OUTPUT },
+# endif /* ONLRET */
+# ifdef	OFILL
+    { "ofill",	OFILL,	M_OUTPUT },
+# endif /* OFILL */
+# ifdef	OFDEL
+    { "ofdel",	OFDEL,	M_OUTPUT },
+# endif /* OFDEL */
+# ifdef	NLDLY
+    { "nldly",	NLDLY,	M_OUTPUT },
+# endif /* NLDLY */
+# ifdef	CRDLY
+    { "crdly",	CRDLY,	M_OUTPUT },
+# endif /* CRDLY */
+# ifdef	TABDLY
+    { "tabdly",	TABDLY,	M_OUTPUT },
+# endif /* TABDLY */
+# ifdef	XTABS
+    { "xtabs",	XTABS,	M_OUTPUT },
+# endif /* XTABS */
+# ifdef	BSDLY
+    { "bsdly",	BSDLY,	M_OUTPUT },
+# endif /* BSDLY */
+# ifdef	VTDLY
+    { "vtdly",	VTDLY,	M_OUTPUT },
+# endif /* VTDLY */
+# ifdef	FFDLY
+    { "ffdly",	FFDLY,	M_OUTPUT },
+# endif /* FFDLY */
+# ifdef	PAGEOUT
+    { "pageout",PAGEOUT,M_OUTPUT },
+# endif /* PAGEOUT */
+# ifdef	WRAP
+    { "wrap",	WRAP,	M_OUTPUT },
+# endif /* WRAP */
+
+# ifdef	CBAUD
+    { "cbaud",	CBAUD,	M_CONTROL },
+# endif /* CBAUD */
+# ifdef	CSTOPB
+    { "cstopb",	CSTOPB,	M_CONTROL },
+# endif /* CSTOPB */
+# ifdef	CREAD
+    { "cread",	CREAD,	M_CONTROL },
+# endif /* CREAD */
+# ifdef	PARENB
+    { "parenb",	PARENB,	M_CONTROL },
+# endif /* PARENB */
+# ifdef	PARODD
+    { "parodd",	PARODD,	M_CONTROL },
+# endif /* PARODD */
+# ifdef	HUPCL
+    { "hupcl",	HUPCL,	M_CONTROL },
+# endif /* HUPCL */
+# ifdef	CLOCAL
+    { "clocal",	CLOCAL,	M_CONTROL },
+# endif /* CLOCAL */
+# ifdef	LOBLK
+    { "loblk",	LOBLK,	M_CONTROL },
+# endif /* LOBLK */
+# ifdef	CIBAUD
+    { "cibaud",	CIBAUD,	M_CONTROL },
+# endif /* CIBAUD */
+# ifdef	CRTSCTS
+    { "crtscts",CRTSCTS,M_CONTROL },
+# endif /* CRTSCTS */
+
+# ifdef	ISIG
+    { "isig",	ISIG,	M_LINED },
+# endif /* ISIG */
+# ifdef	ICANON
+    { "icanon",	ICANON,	M_LINED },
+# endif /* ICANON */
+# ifdef	XCASE
+    { "xcase",	XCASE,	M_LINED },
+# endif /* XCASE */
+# ifdef	ECHO
+    { "echo",	ECHO,	M_LINED },
+# endif /* ECHO */
+# ifdef	ECHOE
+    { "echoe",	ECHOE,	M_LINED },
+# endif /* ECHOE */
+# ifdef	ECHOK
+    { "echok",	ECHOK,	M_LINED },
+# endif /* ECHOK */
+# ifdef	ECHONL
+    { "echonl",	ECHONL,	M_LINED },
+# endif /* ECHONL */
+# ifdef	NOFLSH
+    { "noflsh",	NOFLSH,	M_LINED },
+# endif /* NOFLSH */
+# ifdef	TOSTOP
+    { "tostop",	TOSTOP,	M_LINED },
+# endif /* TOSTOP */
+# ifdef	ECHOCTL
+    { "echoctl",ECHOCTL,M_LINED },
+# endif /* ECHOCTL */
+# ifdef	ECHOPRT
+    { "echoprt",ECHOPRT,M_LINED },
+# endif /* ECHOPRT */
+# ifdef	ECHOKE
+    { "echoke",	ECHOKE,	M_LINED },
+# endif /* ECHOKE */
+# ifdef	DEFECHO
+    { "defecho",DEFECHO,M_LINED },
+# endif /* DEFECHO */
+# ifdef	FLUSHO
+    { "flusho",	FLUSHO,	M_LINED },
+# endif /* FLUSHO */
+# ifdef	PENDIN
+    { "pendin",	PENDIN,	M_LINED },
+# endif /* PENDIN */
+# ifdef	IEXTEN
+    { "iexten",	IEXTEN,	M_LINED },
+# endif /* IEXTEN */
+
+
+#else /* GSTTY */
+
+
+# ifdef	TANDEM
+    { "tandem",	TANDEM,	M_CONTROL },
+# endif /* TANDEM */
+# ifdef	CBREAK
+    { "cbreak",	CBREAK,	M_CONTROL },
+# endif /* CBREAK */
+# ifdef	LCASE
+    { "lcase",	LCASE,	M_CONTROL },
+# endif /* LCASE */
+# ifdef	ECHO
+    { "echo",	ECHO,	M_CONTROL },
+# endif /* ECHO */	
+# ifdef	CRMOD
+    { "crmod",	CRMOD,	M_CONTROL },
+# endif /* CRMOD */
+# ifdef	RAW
+    { "raw",	RAW,	M_CONTROL },
+# endif /* RAW */
+# ifdef	ODDP
+    { "oddp",	ODDP,	M_CONTROL },
+# endif /* ODDP */
+# ifdef	EVENP
+    { "evenp",	EVENP,	M_CONTROL },
+# endif /* EVENP */
+# ifdef	ANYP
+    { "anyp",	ANYP,	M_CONTROL },
+# endif /* ANYP */
+# ifdef	NLDELAY
+    { "nldelay",NLDELAY,M_CONTROL },
+# endif /* NLDELAY */
+# ifdef	TBDELAY
+    { "tbdelay",TBDELAY,M_CONTROL },
+# endif /* TBDELAY */
+# ifdef	XTABS
+    { "xtabs",	XTABS,	M_CONTROL },
+# endif /* XTABS */
+# ifdef	CRDELAY
+    { "crdelay",CRDELAY,M_CONTROL },
+# endif /* CRDELAY */
+# ifdef	VTDELAY
+    { "vtdelay",VTDELAY,M_CONTROL },
+# endif /* VTDELAY */
+# ifdef	BSDELAY
+    { "bsdelay",BSDELAY,M_CONTROL },
+# endif /* BSDELAY */
+# ifdef	CRTBS
+    { "crtbs",	CRTBS,	M_CONTROL },
+# endif /* CRTBS */
+# ifdef	PRTERA
+    { "prtera",	PRTERA,	M_CONTROL },
+# endif /* PRTERA */
+# ifdef	CRTERA
+    { "crtera",	CRTERA,	M_CONTROL },
+# endif /* CRTERA */
+# ifdef	TILDE
+    { "tilde",	TILDE,	M_CONTROL },
+# endif /* TILDE */
+# ifdef	MDMBUF
+    { "mdmbuf",	MDMBUF,	M_CONTROL },
+# endif /* MDMBUF */
+# ifdef	LITOUT
+    { "litout",	LITOUT,	M_CONTROL },
+# endif /* LITOUT */
+# ifdef	TOSTOP
+    { "tostop",	TOSTOP,	M_CONTROL },
+# endif /* TOSTOP */
+# ifdef	FLUSHO
+    { "flusho",	FLUSHO,	M_CONTROL },
+# endif /* FLUSHO */
+# ifdef	NOHANG
+    { "nohang",	NOHANG,	M_CONTROL },
+# endif /* NOHANG */
+# ifdef	L001000
+    { "l001000",	L001000,	M_CONTROL },
+# endif /* L001000 */
+# ifdef	CRTKIL
+    { "crtkil",	CRTKIL,	M_CONTROL },
+# endif /* CRTKIL */
+# ifdef	PASS8
+    { "pass8",	PASS8,	M_CONTROL },
+# endif /* PASS8 */
+# ifdef	CTLECH
+    { "ctlech",	CTLECH,	M_CONTROL },
+# endif /* CTLECH */
+# ifdef	PENDIN
+    { "pendin",	PENDIN,	M_CONTROL },
+# endif /* PENDIN */
+# ifdef	DECCTQ
+    { "decctq",	DECCTQ,	M_CONTROL },
+# endif /* DECCTQ */
+# ifdef	NOFLSH
+    { "noflsh",	NOFLSH,	M_CONTROL },
+# endif /* NOFLSH */
+
+# ifdef	LCRTBS
+    { "lcrtbs",	LCRTBS,	M_LOCAL },
+# endif /* LCRTBS */
+# ifdef	LPRTERA
+    { "lprtera",	LPRTERA,	M_LOCAL },
+# endif /* LPRTERA */
+# ifdef	LCRTERA
+    { "lcrtera",	LCRTERA,	M_LOCAL },
+# endif /* LCRTERA */
+# ifdef	LTILDE
+    { "ltilde",	LTILDE,	M_LOCAL },
+# endif /* LTILDE */
+# ifdef	LMDMBUF
+    { "lmdmbuf",	LMDMBUF,	M_LOCAL },
+# endif /* LMDMBUF */
+# ifdef	LLITOUT
+    { "llitout",	LLITOUT,	M_LOCAL },
+# endif /* LLITOUT */
+# ifdef	LTOSTOP
+    { "ltostop",	LTOSTOP,	M_LOCAL },
+# endif /* LTOSTOP */
+# ifdef	LFLUSHO
+    { "lflusho",	LFLUSHO,	M_LOCAL },
+# endif /* LFLUSHO */
+# ifdef	LNOHANG
+    { "lnohang",	LNOHANG,	M_LOCAL },
+# endif /* LNOHANG */
+# ifdef	LCRTKIL
+    { "lcrtkil",	LCRTKIL,	M_LOCAL },
+# endif /* LCRTKIL */
+# ifdef	LPASS8
+    { "lpass8",	LPASS8,	M_LOCAL },
+# endif /* LPASS8 */	
+# ifdef	LCTLECH
+    { "lctlech",	LCTLECH,	M_LOCAL },
+# endif /* LCTLECH */
+# ifdef	LPENDIN
+    { "lpendin",	LPENDIN,	M_LOCAL },
+# endif /* LPENDIN */
+# ifdef	LDECCTQ
+    { "ldecctq",	LDECCTQ,	M_LOCAL },
+# endif /* LDECCTQ */
+# ifdef	LNOFLSH
+    { "lnoflsh",	LNOFLSH,	M_LOCAL },
+# endif /* LNOFLSH */
+
+#endif /* TERMIO */
+    { NULL, 0, -1 },
+};
+
+
+void
+dosetty(v, t)
+    Char **v;
+    struct command *t;
+{
+    struct tcshmodes *m;
+    char x, *d;
+    int aflag = 0;
+    Char *s;
+
+    setname(short2str(*v++));
+
+    if (v && *v && v[0][0] == '-' && v[0][1] == 'a' && v[0][2] == '\0') {
+	aflag = 1;
+	v++;
+    }
+    if (!v || !*v) {
+	int i = -1;
+	int len = 0, st = 0, cu;
+	for (m = modelist; m->m_name; m++) {
+	    if (m->m_type != i) {
+		xprintf("%s%s:", i != -1 ? "\n" : "", 
+			ttylist[m->m_type].t_name);
+		i = m->m_type;
+		st = len = strlen(ttylist[m->m_type].t_name) + 1;
+	    }
+
+	    x = (ttylist[i].t_setmask & m->m_value) ? '+' : '\0';
+	    x = (ttylist[i].t_clrmask & m->m_value) ? '-' : x;
+
+	    if (x != '\0' || aflag) {
+		cu = strlen(m->m_name) + (x != '\0') + 1;
+		if (len + cu >= T_Cols) {
+		    xprintf("\n%*s", st, "");
+		    len = st + cu;
+		}
+		else 
+		    len += cu;
+		if (x != '\0')
+		    xprintf("%c%s ", x, m->m_name);
+		else
+		    xprintf("%s ", m->m_name);
+	    }
+	}
+	xprintf("\n");
+	return;
+    }
+    while (v && (s = *v++)) {
+	switch (*s) {
+	case '+':
+	case '-':
+	    x = *s++;
+	    break;
+	default:
+	    x = '\0';
+	    break;
+	}
+	d = short2str(s);
+	for (m = modelist; m->m_name; m++)
+	    if (strcmp(m->m_name, d) == 0)
+		break;
+	if (!m->m_name) 
+	    stderror(ERR_NAME | ERR_SYSTEM, d, "Invalid argument");
+
+	switch (x) {
+	case '+':
+	    ttylist[m->m_type].t_setmask |= m->m_value;
+	    ttylist[m->m_type].t_clrmask &= ~m->m_value;
+	    break;
+	case '-':
+	    ttylist[m->m_type].t_setmask &= ~m->m_value;
+	    ttylist[m->m_type].t_clrmask |= m->m_value;
+	    break;
+	default:
+	    ttylist[m->m_type].t_setmask &= ~m->m_value;
+	    ttylist[m->m_type].t_clrmask &= ~m->m_value;
+	    break;
+	}
+    }
+} /* end dosetty */
+
 
 #ifdef SIG_WINDOW
 void
@@ -295,6 +735,7 @@ ed_Init()
 	    T_Tabs = 1;
 	}
 
+#ifdef notdef
 	nio.c_iflag &= ~(INLCR | IGNCR);
 	nio.c_iflag |= (ICRNL);
 
@@ -303,6 +744,18 @@ ed_Init()
 	/* don't muck with c_cflag */
 	nio.c_lflag &= ~(NOFLSH | ECHOK | ECHONL | EXTPROC | FLUSHO);
 	nio.c_lflag |= (ISIG | ICANON | ECHO | ECHOE | ECHOCTL | IEXTEN);
+#endif
+	nio.c_iflag &= ~ttylist[M_INPUT].t_clrmask;
+	nio.c_iflag |=  ttylist[M_INPUT].t_setmask;
+
+	nio.c_oflag &= ~ttylist[M_OUTPUT].t_clrmask;
+	nio.c_oflag |=  ttylist[M_OUTPUT].t_setmask;
+
+	nio.c_cflag &= ~ttylist[M_CONTROL].t_clrmask;
+	nio.c_cflag |=  ttylist[M_CONTROL].t_setmask;
+
+	nio.c_lflag &= ~ttylist[M_LINED].t_clrmask;
+	nio.c_lflag |=  ttylist[M_LINED].t_setmask;
 
 # ifdef IRIX3_3
 	nio.c_line = NTTYDISC;
@@ -392,15 +845,27 @@ ed_Init()
 	}
 
 	if (T_Tabs) {		/* order of &= and |= is important to XTABS */
+#ifdef notdef
 	    nb.sg_flags &= ~(CBREAK | RAW | LCASE | XTABS | VTDELAY | ALLDELAY);
 	    nb.sg_flags |= (ECHO | CRMOD | ANYP);
+#endif
+	    nb.sg_flags &= ~(ttylist[M_CONTROL].t_clrmask | XTABS);
+	    nb.sg_flags |=  ttylist[M_CONTROL].t_setmask;
 	}
 	else {
+#ifdef notdef
 	    nb.sg_flags &= ~(CBREAK | RAW | LCASE | VTDELAY | ALLDELAY);
 	    nb.sg_flags |= (ECHO | CRMOD | XTABS | ANYP);
+#endif
+	    nb.sg_flags &= ~ttylist[M_CONTROL].t_clrmask;
+	    nb.sg_flags |=  (ttylist[M_CONTROL].t_setmask | XTABS);
 	}
+#ifdef notdef
 	nlb &= ~(LPRTERA);	/* let 8-bit mode stand as set */
 	nlb |= (LCRTBS | LCRTERA | LCRTKIL);
+#endif
+	nlb &= ~ttylist[M_LOCAL].t_clrmask;
+	nlb |=  ttylist[M_LOCAL].t_setmask;
 
 	nb.sg_erase = '\177';	/* del prev. char == DEL */
 	nb.sg_kill = '\025';	/* special case of del region */
@@ -641,6 +1106,9 @@ Rawmode()
     Tty_eight_bit = (testio.c_cflag & CSIZE) == CS8;
     if (testio.c_cflag != nio.c_cflag) { 
 	nio.c_cflag = testio.c_cflag;
+	nio.c_cflag &= ~ttylist[M_CONTROL].t_clrmask;
+	nio.c_cflag |=  ttylist[M_CONTROL].t_setmask;
+
 	xio.c_cflag = testio.c_cflag;
     }
 # ifdef POSIX
@@ -667,10 +1135,14 @@ Rawmode()
 
     if ((testio.c_lflag != nio.c_lflag) &&
 	(testio.c_lflag != xio.c_lflag)) {
-	/* Christos: There was and ifdef here that would set ECHONL!?? */
 	nio.c_lflag = testio.c_lflag;
+#ifdef notdef
 	nio.c_lflag &= ~(NOFLSH | ECHOK | ECHONL | EXTPROC | FLUSHO);
 	nio.c_lflag |= (ISIG | ICANON | IEXTEN | ECHO | ECHOE | ECHOCTL);
+#endif
+	nio.c_lflag &= ~ttylist[M_LINED].t_clrmask;
+	nio.c_lflag |=  ttylist[M_LINED].t_setmask;
+
 	xio.c_lflag = testio.c_lflag;
 	/* don't mask out ECHOE cause programs need it */
 	xio.c_lflag &= ~(NOFLSH | ICANON | IEXTEN | ECHO | ECHOK |
@@ -681,8 +1153,13 @@ Rawmode()
     if ((testio.c_iflag != nio.c_iflag) &&
 	(testio.c_iflag != xio.c_iflag)) {
 	nio.c_iflag = testio.c_iflag;
+#ifdef notdef
 	nio.c_iflag &= ~(INLCR | IGNCR);
 	nio.c_iflag |= (ICRNL);
+#endif
+	nio.c_iflag &= ~ttylist[M_INPUT].t_clrmask;
+	nio.c_iflag |=  ttylist[M_INPUT].t_setmask;
+
 	xio.c_iflag = testio.c_iflag;
 	xio.c_iflag &= ~(INLCR | IGNCR);
 	xio.c_iflag |= (ICRNL);
@@ -692,8 +1169,13 @@ Rawmode()
 	(testio.c_oflag != xio.c_oflag)) {
 	/* Christos: There was and ifdef here that would set ONLRET!?? */
 	nio.c_oflag = testio.c_oflag;
+#ifdef notdef
 	nio.c_oflag &= ~(ONLRET);
 	nio.c_oflag |= (OPOST | ONLCR);
+#endif
+	nio.c_oflag &= ~ttylist[M_OUTPUT].t_clrmask;
+	nio.c_oflag |=  ttylist[M_OUTPUT].t_setmask;
+
 	xio.c_oflag = testio.c_oflag;
 	xio.c_oflag &= ~(ONLRET);
 	xio.c_oflag |= (OPOST | ONLCR);
@@ -864,8 +1346,13 @@ Rawmode()
 	    T_Tabs = CanWeTab();
 	}
 
+#ifdef notdef
 	nb.sg_flags &= ~(CBREAK | RAW | LCASE | VTDELAY | ALLDELAY);
 	nb.sg_flags |= (ECHO | CRMOD | ANYP);
+#endif
+	nb.sg_flags &= ~ttylist[M_CONTROL].t_clrmask;
+	nb.sg_flags |=  ttylist[M_CONTROL].t_setmask;
+
 	if (T_Tabs) {		/* order of &= and |= is important to XTABS */
 	    nb.sg_flags &= ~XTABS;
 	}
@@ -891,8 +1378,12 @@ Rawmode()
  * Montreal (Qc) Canada H3C 3J7		  <bur%iro.udem.cdn@ubc.csnet>
  * Thanks!
  */
+#ifdef notdef
 	nlb &= ~(LPRTERA | LFLUSHO);
 	nlb |= (LCRTBS | LCRTERA | LCRTKIL);
+#endif
+	nlb &= ~ttylist[M_LOCAL].t_clrmask;
+	nlb |=  ttylist[M_LOCAL].t_setmask;
 
 	xlb = nlb;
     }

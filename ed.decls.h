@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/ed.decls.h,v 1.2 91/07/14 22:22:15 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.decls.h,v 3.1 1991/07/15 19:37:24 christos Exp christos $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -46,6 +46,7 @@ extern	void	DeleteBack		__P((int));
 /*
  * ed.init.c
  */
+extern	void	dosetty			__P((Char **, struct command *));
 extern	void	check_window_size	__P((int));
 #ifdef SIG_WINDOW
 extern	sigret_t window_change		__P((int));
