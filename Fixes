@@ -1,7 +1,10 @@
- 61. use strtol() to detect errors in builtin kill (Peter Jeremy)
- 60. Recognize linux systems on mips* (Maciej W. Rozycki)
- 59. Enable complete=igncase on unix (Stephen Krauth)
- 58. Eliminate maxitems (Todd Miller)
+  5. V6.12.01 - 20030208
+  4. use strtol() to detect errors in builtin kill (Peter Jeremy)
+  3. Recognize linux systems on mips* (Maciej W. Rozycki)
+  2. Enable complete=igncase on unix (Stephen Krauth)
+  1. Eliminate maxitems (Todd Miller)
+
+ 58. V6.12.00 - 20020732
  57. misc cleanups.
  56. V6.11.05 - 20020712
  55. We should have socklen_t in the INET6 case, but we leave int otherwise.
