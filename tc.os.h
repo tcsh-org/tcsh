@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.95 2005/03/03 16:49:16 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.96 2005/03/03 19:57:07 kim Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -453,7 +453,7 @@ typedef struct timeval timeval_t;
 # define free tcsh_free
 #endif /* NeXT */
 
-#if defined(HAVE_GETHOSTNAME) && !defined(HAVE_DECL_GETHOSTNAME)
+#if defined(HAVE_GETHOSTNAME) && !HAVE_DECL_GETHOSTNAME
 extern int gethostname __P((char *, int));
 #endif
 
