@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.108 2004/02/21 20:34:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.109 2004/02/21 22:02:37 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.108 2004/02/21 20:34:24 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.109 2004/02/21 22:02:37 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2079,7 +2079,7 @@ plim(lp, hard)
     RLIM_TYPE limit;
     int     div = lp->limdiv;
 
-    xprintf("%s \t", lp->limname);
+    xprintf("%-13.13s", lp->limname);
 
 # ifndef BSDLIMIT
     limit = ulimit(lp->limconst, 0);
