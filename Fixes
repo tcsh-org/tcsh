@@ -1,5 +1,7 @@
 V6.03.00, ...
-91. 6.02.11 10/27/92
+93. 6.02.11 10/27/92
+92. Mach setpath fixes.
+91. Which now globs its arguments
 90. Again POSIX SIGHUP fixes... Maybe we got it right this time...
 89. Increased BUFSIZE to 4K. Smaller machines may want to decrease this.
     [ Now one can edit up to 4K of buffer! ]. From Harald.
