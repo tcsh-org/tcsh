@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.47 1998/10/25 15:10:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.48 1998/11/24 18:17:37 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.47 1998/10/25 15:10:25 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.48 1998/11/24 18:17:37 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -349,7 +349,7 @@ execute(t, wanttty, pipein, pipeout)
 	 * We have to fork for eval too.
 	 */
 	    (bifunc && (t->t_dflg & F_PIPEIN) != 0 &&
-	     bifunc->bfunct == (bfunc_t)doeval))
+	     bifunc->bfunct == (bfunc_t)doeval)) {
 #ifdef VFORK
 	    if (t->t_dtyp == NODE_PAREN ||
 		t->t_dflg & (F_REPEAT | F_AMPERSAND) || bifunc)
@@ -585,6 +585,7 @@ execute(t, wanttty, pipein, pipeout)
 		}
 
 	    }
+	}
 #endif /* VFORK */
 	if (pid != 0) {
 	    /*
