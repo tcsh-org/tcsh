@@ -3577,7 +3577,8 @@ to continue working.  Five incorrect attempts result in automatic logout.
 Set to `60' (automatic logout after 60 minutes, and no locking) by default
 in login and superuser shells, but not if the shell thinks it is running
 under a window system (i.e., the \fBDISPLAY\fR environment variable is set),
-or the shell was not so compiled (see the \fBversion\fR shell variable).
+the tty is a pseudo-tty (pty) or the shell was not so compiled (see the
+\fBversion\fR shell variable).
 See also the \fBafsuser\fR and \fBlogout\fR shell variables.
 .TP 8
 .B backslash_quote \fR(+)
