@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.83 1999/08/12 14:19:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.84 1999/08/13 16:34:19 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.83 1999/08/12 14:19:23 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.84 1999/08/13 16:34:19 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1178,7 +1178,11 @@ xecho(sep, v)
 		    nonl = 1;
 		    goto done;
 		case 'e':
+#if 0			/* Windows does not understand \e */
 		    c = '\e';
+#else
+		    c = '\033';
+#endif
 		    break;
 		case 'f':
 		    c = '\f';
