@@ -1,3 +1,4 @@
+  4. Add rlimit_vmem for linux based on rlimit_as (N KomaZaki)
   3. back out symlink=expand path check.
   2. Add Estonian translation (Toomas Soome)
   1. Accept empty $savedirs to mean infinity.
