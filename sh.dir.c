@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.61 2003/03/12 19:14:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.62 2004/01/23 16:21:33 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.61 2003/03/12 19:14:50 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.62 2004/01/23 16:21:33 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -933,7 +933,7 @@ dcanon(cp, p)
 #ifdef S_IFLNK			/* if we have symlinks */
 	    if (sp != cp && /* symlinks != SYM_IGNORE && */
 		(cc = readlink(short2str(cp), tlink,
-			       sizeof tlink)) >= 0) {
+			       sizeof(tlink) - 1)) >= 0) {
 		tlink[cc] = '\0';
 		(void) Strncpy(link, str2short(tlink),
 		    sizeof(link) / sizeof(Char));
@@ -1024,7 +1024,7 @@ dcanon(cp, p)
 #ifdef S_IFLNK			/* if we have symlinks */
 	    if (sp != cp && symlinks == SYM_CHASE &&
 		(cc = readlink(short2str(cp), tlink,
-			       sizeof tlink)) >= 0) {
+			       sizeof(tlink) - 1)) >= 0) {
 		tlink[cc] = '\0';
 		(void) Strncpy(link, str2short(tlink),
 		    sizeof(link) / sizeof(Char));
