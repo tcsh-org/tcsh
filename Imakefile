@@ -1,5 +1,5 @@
 XCOMM
-XCOMM $Id: Imakefile,v 1.74 1999/02/06 15:01:12 christos Exp $
+XCOMM $Id: Imakefile,v 1.75 1999/05/11 13:07:39 christos Exp $
 XCOMM
 XCOMM Imakefile for tcsh 6.08
 XCOMM Marc Horowitz, MIT SIPB
@@ -117,13 +117,11 @@ DEPENDFLAGS = -o.o
 # endif
 
 # ifdef SGIArchitecture
-#  if (OSMajorVersion <= 5)
-#   define ConfigH irix5
+#   define ConfigH irix
+#   define UseLibBSD
+#  if (OSMajorVersion < 5)
 #   ifdef you_are_using_yp
 #    define UseSunLib 
-#   endif
-#   ifndef UseLibBSD
-#    define UseLibBSD
 #   endif
 #   if !HasGCC
 #    define MyStdc -D__STDC__
@@ -133,12 +131,9 @@ CCOPTIONS=-float	# We don't want -cckr and -prototypes
 #   endif
 #  endif
 #  if (OSMajorVersion == 6)
-#   if (OSMinorVersion == 2)
-#    define ConfigH irix62
-#   endif
-#   if (OSMinorVersion == 5)
-#    define ConfigH irix65
+#   if (OSMinorVersion >= 2)
 #    undef UseLibBSD
+#    define ConfigH irix62
 #   endif
 #  endif
 # endif

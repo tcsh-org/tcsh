@@ -111,24 +111,17 @@ case "${host}" in
 
   ## Silicon Graphics machines
   *-sgi-iri* )
-    tcsh_config_file=sgi
-    NON_GNU_DFLAGS='-D__STDC__'
-    case "${host-os}" in
-      *irix[34]*)
+    tcsh_config_file=irix
+    case "${host_os}" in
+      irix[34]*) # Irix-3.x - Irix 4.x
+        NON_GNU_DFLAGS='-D__STDC__'
         LIBS='-lsun -lbsd -lc_s'
-	tcsh_config_file=irix5
       ;;
-      *irix5*)
-        LIBS='-lsun -lbsd'
-	tcsh_config_file=irix5
+      irix5* | irix6.[01]*) # Irix 5.x, Irix 6.0 - 6.1
+        LIBS='-lbsd'
       ;;
-      *irix62*)
-        LIBS='-lsun -lbsd'
+      irix6.[2-9]*) # Irix 6.2 and later
 	tcsh_config_file=irix62
-      ;;
-      *irix6*)
-        LIBS='-lsun -lbsd'
-	tcsh_config_file=irix65
       ;;
     esac
   ;;
