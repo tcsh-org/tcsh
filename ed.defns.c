@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 3.2 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 3.4 1991/09/10 04:51:46 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.defns.c,v 3.2 1991/09/08 00:45:32 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.4 1991/09/10 04:51:46 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -858,7 +858,7 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* , */	 /* KSH Command exists */
     F_UP_HIST,			/* - */	
     F_UNASSIGNED,		/* . */
-    V_USH_META,			/* / */
+    V_DSH_META,			/* / */
     V_ZERO,			/* 0 */
     F_ARGDIGIT,			/* 1 */
     F_ARGDIGIT,			/* 2 */
@@ -874,7 +874,7 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* < */
     F_UNASSIGNED,		/* = */
     F_UNASSIGNED,		/* > */
-    V_DSH_META,			/* ? */
+    V_USH_META,			/* ? */
     F_UNASSIGNED,		/* @ */
     V_ADDEND,			/* A */
     F_WORDBACK,			/* B */
