@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -37,7 +37,7 @@
 #include "config.h"
 #ifndef lint
 static char *rcsid()
-    { return "$Id: ed.screen.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
+    { return "$Id: ed.screen.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -1112,7 +1112,8 @@ GetTermCaps()
 #ifdef SIG_WINDOW
 /* GetSize():
  *	Return the new window size in lines and cols, and
- *	true if the size was changed.
+ *	true if the size was changed. This can fail if SHIN
+ *	is not a tty, but it will work in most cases.
  */
 int
 GetSize(lins, cols)
@@ -1126,13 +1127,12 @@ GetSize(lins, cols)
     {
 	struct winsize ws;	/* from 4.3 */
 
-	if (ioctl(SHOUT, TIOCGWINSZ, (ioctl_t) & ws) < 0)
-	    return (0);
-
-	if (ws.ws_col)
-	    *cols = ws.ws_col;
-	if (ws.ws_row)
-	    *lins = ws.ws_row;
+	if (ioctl(SHIN, TIOCGWINSZ, (ioctl_t) & ws) != -1) {
+	    if (ws.ws_col)
+		*cols = ws.ws_col;
+	    if (ws.ws_row)
+		*lins = ws.ws_row;
+	}
     }
 # endif
 #else				/* TIOCGWINSZ */
@@ -1140,13 +1140,12 @@ GetSize(lins, cols)
     {
 	struct ttysize ts;	/* from Sun */
 
-	if (ioctl(SHOUT, TIOCGSIZE, (ioctl_t) & ts) < 0)
-	    return;
-
-	if (ts.ts_cols)
-	    *cols = ts.ts_cols;
-	if (ts.ts_lines)
-	    *lins = ts.ts_lines;
+	if (ioctl(SHIN, TIOCGSIZE, (ioctl_t) & ts) != -1) {
+	    if (ts.ts_cols)
+		*cols = ts.ts_cols;
+	    if (ts.ts_lines)
+		*lins = ts.ts_lines;
+	}
     }
 # endif				/* TIOCGSIZE */
 #endif				/* TIOCGWINSZ */
