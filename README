@@ -4,7 +4,7 @@ name completion, listing, etc. and a bunch of small additions to the
 shell itself.
 
 Tcsh runs on BSD 4.2 and 4.3 Unix, Mach, Sun Unix (tested on 3.0, 3.2,
-3.4, 4.0, 4.1), Pyramid OS/X (in the bsd universe), Encore UMAX 4.2,
+3.4, 4.0, 4.1.x), Pyramid OS/X (in the bsd universe), Encore UMAX 4.2,
 Apple A/UX 2.0, AT&T 3b machines under SysV.2 and V.3, HP/UX 6.2 on
 series 300 and 800 machines and all HP machines under HP/UX 6.5, 7.0
 and 8.0 and will probably work with a bit of tinkering on anything else

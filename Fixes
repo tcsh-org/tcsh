@@ -1,5 +1,7 @@
-V6.03.00, ...
-100. 6.02.12 11/12/92
+V6.03.00, 11/20/92
+102. Solaris2 patches, renamed sunosX to sosX to fit in 14 character filenames.
+101. 6.02.12 11/12/92
+100. Decreased BUFSIZE to 1K...
 99. Don't use sbrk() in tc.alloc.c on VMS
 98. EINTR error handling from Michael
 97. Overwrite mode takes effect immediately, not delayed by a command.

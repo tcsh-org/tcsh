@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.21 1992/10/18 00:30:39 christos Exp $
+/**/# $Id: Imakefile,v 1.22 1992/10/27 16:18:15 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.03
 /**/# Marc Horowitz, MIT SIPB
@@ -39,12 +39,16 @@ ones.  Please send in your fixes and additions! */
 
 # if defined(SunArchitecture)
 #  if (OSMajorVersion == 3)
-#   define ConfigH sunos3
+#   define ConfigH sos3
 #  else /* OSMajorVersion == 4 */
 #   if (OSMinorVersion == 0)
-#    define ConfigH sunos40
+#    define ConfigH sos40
 #   else /* OSMinorVersion == 1 */
-#    define ConfigH sunos41
+#    if (OSTeenyVersion == 3)
+#     define ConfigH sos413
+#    else /* OsTeenyVersion in [0,1,2] */
+#     define ConfigH sos41
+#    endif
 #   endif
 #  endif
 # endif

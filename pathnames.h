@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/pathnames.h,v 3.9 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/pathnames.h,v 3.10 1992/10/14 20:19:19 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -69,11 +69,11 @@
 # endif /* !_PATH_DOTCSHRC */
 #endif /* NeXT */
 
-#if defined(sgi) || defined(OREO) || defined(cray) || defined(AMIX)
+#if defined(sgi) || defined(OREO) || defined(cray) || defined(AMIX) || defined(CDC)
 # ifndef _PATH_DOTLOGIN
 #  define _PATH_DOTLOGIN	"/etc/cshrc"
 # endif /* !_PATH_DOTLOGIN */
-#endif /* sgi || OREO || cray || AMIX */
+#endif /* sgi || OREO || cray || AMIX || CDC */
 
 #if defined(_CRAYCOM) && !defined(_PATH_TCSHELL)
 # define _PATH_TCSHELL		"/bin/tcsh"		/* 1st class shell */

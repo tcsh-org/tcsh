@@ -82,12 +82,14 @@
  **********************************************************************
  */
 #include "sh.h"
-RCSID("$Id: ma.setp.c,v 1.5 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: ma.setp.c,v 1.6 1992/10/27 16:18:15 christos Exp christos $")
 
 #ifdef MACH
 
 #define MAXDIRS 64		/* max directories on a path */
-#define NULL 0
+#ifndef NULL
+# define NULL 0
+#endif
 
 static int npaths;		/* # pathlist arguments */
 

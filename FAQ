@@ -17,7 +17,7 @@ be able to get ftp it... :-)
     logged in through a modem line with 7 bits and parity and your terminal 
     has a meta key. Then tcsh 5.19 would set wrongly set pass8.
 
-    If you did like the prevous behavior you can add in /etc/csh.login, or
+    If you did like the previous behavior you can add in /etc/csh.login, or
     in .login:
 
     if ( $?tcsh && $?prompt ) then

@@ -12,10 +12,21 @@ MODELS	:	sun3, sun4, sun386i
 COMPILER:	cc, gcc
 CFLAGS	:	normal
 LIBES	:	-ltermcap
-OS	:	sunos 3.5, 4.0, 4.1, 4.1.1
-CONFIG	:	config.sunos*
+OS	:	sunos 3.5, 4.0, 4.1, 4.1.1, 4.1.2, 4.1.3
+CONFIG	:	config.sos*
 ENVIRON	:	n/a
 NOTES	:	Don't compile with /usr/5bin/cc
+VERSION	:	6.02.12
+
+VENDOR	:	sun
+MODELS	:	sun4
+COMPILER:	cc, gcc
+CFLAGS	:	normal
+LIBES	:	-lcurses
+OS	:	solaris 2.x
+CONFIG	:	config.sol2
+ENVIRON	:	n/a
+NOTES	:	n/a
 VERSION	:	6.00.01
 
 VENDOR	:	hp
@@ -27,7 +38,7 @@ OS	:	domain 10.4.3
 CONFIG	:	config.bsd
 ENVIRON	:	bsd4.3
 NOTES	:	Don't use gcc; breaks tc.os.c
-VERSION	:	6.00.01
+VERSION	:	6.01.00
 
 VENDOR	:	hp
 MODELS	:	hp9000s300, hp9000s700, hp9000s800
@@ -379,7 +390,7 @@ VENDOR  :       stardent
 MODELS  :	Vistra 800
 COMPILER:       /bin/cc
 CFLAGS  :       -O
-LIBES   :       -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a
+LIBES   :     -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a
 OS      :	SYSVR4
 CONFIG  :	config.sysv4
 ENVIRON :       n/a
@@ -587,7 +598,7 @@ COMPILER:	cc
 CFLAGS	:	production
 LIBES	:	-lterm
 OS	:	Coherent 4.0
-CONFIG	:	config.coh386
+CONFIG	:	config.coh3
 ENVIRON	:	gnu tools (see below)
 NOTES	:	The standard make, /bin/sh and sed that come with Coherent are
 NOTES	:	not quite up to the makefile.  Either use gnu make or change 
@@ -600,3 +611,14 @@ NOTES	:	variables.  Coherent's sed, unfortunately, is broken beyond a
 NOTES	:	workaround.  Either get gnu sed or run that portion of the
 NOTES	:	makefile on a machine with a full sed and import the output.
 VERSION	:	6.02.08
+
+VENDOR	:	Control Data Systems
+MODELS	:	CD4680
+COMPILER:	cc, cc2.20 (mips)
+CFLAGS	:	mips systems, DFLAGS=-DCDC
+LIBES	:	-ltermcap
+OS	:	EP/IX 1.4.3 (RiscOS based)     
+CONFIG	:	config.mips
+ENVIRON :	bsd4.3 (if sysv, need "set path=(/usr/bsd43/bin $path)" )
+NOTES	:	n/a
+VERSION :	6.02.00

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.40 1992/10/18 00:43:08 christos Exp $
+# $Id: Makefile,v 1.41 1992/10/27 16:18:15 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -98,6 +98,8 @@ CFLAGS=-O2 $(INCLUDES)
 #DFLAGS = -DUTek
 # VMS_POSIX needs:
 #DFLAGS=-D_VMS_POSIX
+# DEC/osf-1 on the alpha
+#DFLAGS=-D_BSD
 DFLAGS=
 
 
@@ -122,7 +124,7 @@ LIBES= -ltermcap 		## BSD style things, hpux
 #LIBES= -ltermcap -lcs		## Mach
 #LIBES= -lcurses		## Sys V3 w/o networking (and Sys V4)
 #LIBES= -lcurses -lc /usr/ucblib/libucb.a ## Sys V4 with BSDTIMES
-#LIBES= -lcurses		## Sys V4 w/o BSDTIMES
+#LIBES= -lcurses		## Sys V4 w/o BSDTIMES or Solaris 2
 #LIBES= -lcurses -lnet		## Sys V3 with networking
 #LIBES= -lcurses -ldir		## Sys V2 w/o networking [needs directory lib]
 #LIBES= -lcurses -ldir -lnet	## Sys V2 with networking [needs directory lib]
@@ -140,6 +142,7 @@ LIBES= -ltermcap 		## BSD style things, hpux
 #LIBES= -lcurses -lintl		## SCO SysVR3.2v2.0
 #LIBES= -lcurses -lintl -lsocket ## SCO+ODT1.1
 #LIBES= -lposix -ltermcap	## A/UX 2.0
+#LIBES= -ltermcap -lbsd		## DEC osf1 on the alpha
 #LIBES= -ltermcap -lseq		## Sequent's Dynix
 #LIBES= -lcurses -lsocket	## Intel's hypercube and ns32000 based Opus.
 #LIBES= -ldirent -lcurses       ## att3b1 stk cc w/o shared lib & directory lib
