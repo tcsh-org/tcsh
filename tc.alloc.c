@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.2 1991/07/17 21:52:22 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -43,7 +43,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.alloc.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.2 1991/07/17 21:52:22 christos Exp $")
 
 
 #include "sh.h"
@@ -104,15 +104,7 @@ union overhead {
 #endif
 
 
-#ifdef SUNOS4
-/*
- * SunOS localtime() overwrites the 9th byte on an 8 byte malloc()....
- * So we align to 16 bytes...
- */
-#define ROUNDUP 15
-#else
 #define ROUNDUP	7
-#endif
 
 /*
  * nextf[i] is the pointer to the next free block of size 2^(i+3).  The
@@ -169,6 +161,14 @@ malloc(nbytes)
      * hash buckets which satisfies request.  Account for space used per block
      * for accounting.
      */
+#ifdef SUNOS4
+    /*
+     * SunOS localtime() overwrites the 9th byte on an 8 byte malloc()....
+     * so we get one more...
+     */
+    if (nbytes == 8) nbytes++;
+#endif
+
     nbytes = MEMALIGN(MEMALIGN(sizeof(union overhead)) + nbytes + RSLOP);
     shiftr = (nbytes - 1) >> 2;
 
