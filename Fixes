@@ -1,4 +1,5 @@
 V6.00.04, ....
+27. bindkey fixes (-c addition, casting cleanups)
 26. (beta-3 11/16/91)
 25. Prompt length checking. 
 24. Michael's fixes for the watching code. Tcsh could core dump when using

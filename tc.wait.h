@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.wait.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.wait.h,v 3.1 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.wait.h: <sys/wait.h> for machines that don't have it or have it and
  *	      is incorrect.
@@ -66,6 +66,11 @@
 #else /* SVID == 0 */
 # include <sys/wait.h>
 #endif /* SVID == 0 */
+
+#ifdef _MINIX
+# undef NEEDwait
+# include <minix-wait.h>
+#endif /* _MINIX */
 
 #ifdef NEEDwait
 /*

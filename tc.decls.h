@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.7 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.8 1991/11/17 05:39:06 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -59,7 +59,7 @@ extern	void		  showall	__P((Char **, struct command *));
  */
 extern	void		  dobindkey	__P((Char **, struct command *));
 extern	int		  parseescape	__P((Char **));
-extern	unsigned char    *unparsestring	__P((Char *, unsigned char *));
+extern	unsigned char    *unparsestring	__P((Char *, unsigned char *, Char *));
 extern	void		  dobind	__P((Char **, struct command *));
 
 

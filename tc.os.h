@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.19 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.20 1991/11/11 01:56:34 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -63,9 +63,14 @@
 # ifdef ARG_MAX
 #  define NCARGS ARG_MAX
 # else
-#  define NCARGS 1024
+#  ifdef _MINIX
+#   define NCARGS 80
+#  else /* !_MINIX */
+#   define NCARGS 1024
+#  endif /* _MINIX */
 # endif /* ARG_MAX */
 #endif /* NCARGS */
+
 #ifdef titan
 extern int end;
 #endif /* titan */
@@ -314,6 +319,14 @@ struct ucred {
 #  define	NOFILE	64
 # endif	/* NOFILE */
 #endif /* SXA */
+
+#ifdef _MINIX
+# ifndef NOFILE
+#  define NOFILE 64
+# endif /* NOFILE */
+extern int nice();
+#endif /* _MINIX */
+
 
 #ifndef POSIX
 # define mygetpgrp()    getpgrp(0)

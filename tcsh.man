@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.21 1991/11/11 01:56:34 christos Exp $
+.\" $Id: tcsh.man,v 3.22 1991/11/17 05:39:06 christos Exp $
 .TH TCSH 1 "20 October 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -146,7 +146,7 @@ There is a new shell command,
 that allows the user to redefine what any key does, or find out what
 any or all of the keys do.
 .PP
-Syntax: bindkey [ -a ] [ -s ] [ -v ] [ -e ] [ -d ] [ -l ] [ -r ] [ -- ] [ in-string [ out-string | command ]]
+Syntax: bindkey [ -a ] [ -c ] [ -s ] [ -v ] [ -e ] [ -d ] [ -l ] [ -r ] [ -- ] [ in-string [ out-string | command ]]
 .PP
 If no values are given all bindings are listed. If only in-string is given,
 bindings for the in-string is listed.
@@ -165,6 +165,8 @@ Options:
     -a    bind in-string in alternative key map.
 .br
     -s    bind an out-string instead of a command
+.br
+    -c    bind a unix command instead of a command
 .br
     -v    bind for default VI-mode
 .br
@@ -733,6 +735,9 @@ File name completion works equally well when other directories are addressed.
 Additionally, 
 .I tcsh 
 understands the C shell tilde (~) convention for home directories.
+In addition it caches tilde name references for fast access. This cache
+can be flushed by using the builtin 
+.I rehash.
 Thus,
 .sp
 .RS +.6i
@@ -1854,6 +1859,8 @@ The current possible values are:
 \fIm88k\fR			an mc88000 CPU machine
 \fImac2\fR			an Apple Computer Macintosh II, running AUX
 \fImasscomp\fR			a Concurrent (Masscomp), running RTU
+\fIminix386\fR			an i386 running minix
+\fIminix\fR			a mac or an amiga running minix
 \fImips\fR			another mips CPU
 \fImultimax\fR		an Encore Computer Corp. Multimax (32000 based)
 \fInews\fR			a Sony NEWS 800 or 1700 workstation

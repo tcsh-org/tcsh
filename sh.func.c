@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.14 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.15 1991/11/11 01:56:34 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.14 1991/11/04 04:16:33 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.15 1991/11/11 01:56:34 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1798,13 +1798,17 @@ doeval(v, c)
 
     oevalvec = evalvec;
     oevalp = evalp;
-    odidfds = didfds;
+    if (*v == 0) 
+	oSHIN = -1;
+    else {
+	odidfds = didfds;
 #ifndef FIOCLEX
-    odidcch = didcch;
+	odidcch = didcch;
 #endif /* FIOCLEX */
-    oSHIN = SHIN;
-    oSHOUT = SHOUT;
-    oSHDIAG = SHDIAG;
+	oSHIN = SHIN;
+	oSHOUT = SHOUT;
+	oSHDIAG = SHDIAG;
+    }
 
     savegv = gv;
 
@@ -1825,9 +1829,11 @@ doeval(v, c)
 	trim(v);
     }
 
-    saveIN = dcopy(SHIN, -1);
-    saveOUT = dcopy(SHOUT, -1);
-    saveDIAG = dcopy(SHDIAG, -1);
+    if (oSHIN != -1) {
+	saveIN = dcopy(SHIN, -1);
+	saveOUT = dcopy(SHOUT, -1);
+	saveDIAG = dcopy(SHDIAG, -1);
+    }
 
     getexit(osetexit);
 
@@ -1841,29 +1847,33 @@ doeval(v, c)
 #endif /* cray */
 	evalvec = v;
 	evalp = 0;
-	SHIN = dcopy(0, -1);
-	SHOUT = dcopy(1, -1);
-	SHDIAG = dcopy(2, -1);
+	if (oSHIN != -1) {
+	    SHIN = dcopy(0, -1);
+	    SHOUT = dcopy(1, -1);
+	    SHDIAG = dcopy(2, -1);
 #ifndef FIOCLEX
-	didcch = 0;
+	    didcch = 0;
 #endif /* FIOCLEX */
-	didfds = 0;
+	    didfds = 0;
+	}
 	process(0);
     }
 
     evalvec = oevalvec;
     evalp = oevalp;
     doneinp = 0;
+    if (oSHIN != -1) {
 #ifndef FIOCLEX
-    didcch = odidcch;
+	didcch = odidcch;
 #endif /* FIOCLEX */
-    didfds = odidfds;
-    (void) close(SHIN);
-    (void) close(SHOUT);
-    (void) close(SHDIAG);
-    SHIN = dmove(saveIN, oSHIN);
-    SHOUT = dmove(saveOUT, oSHOUT);
-    SHDIAG = dmove(saveDIAG, oSHDIAG);
+	didfds = odidfds;
+	(void) close(SHIN);
+	(void) close(SHOUT);
+	(void) close(SHDIAG);
+	SHIN = dmove(saveIN, oSHIN);
+	SHOUT = dmove(saveOUT, oSHOUT);
+	SHDIAG = dmove(saveDIAG, oSHDIAG);
+    }
 
     if (gv)
 	blkfree(gv);

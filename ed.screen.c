@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.6 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.7 1991/10/28 06:26:50 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.6 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.7 1991/10/28 06:26:50 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -653,7 +653,7 @@ BindArrowKeys()
 	     */
 	    if (p[1] && (dmap[(unsigned char) *p] == map[(unsigned char) *p] ||
 			 map[(unsigned char) *p] == F_XKEY)) {
-		AddXkeyCmd(str2short(p), ar[i].fun);
+		AddXkey(str2short(p), XmapCmd(ar[i].fun), XK_CMD);
 		map[(unsigned char) *p] = F_XKEY;
 	    }
 	    else if (map[(unsigned char) *p] == F_UNASSIGNED) {

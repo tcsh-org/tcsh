@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.8 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.9 1991/11/11 01:56:34 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.8 1991/11/04 04:16:33 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.9 1991/11/11 01:56:34 christos Exp $")
 
 #include "tc.h"
 
@@ -728,8 +728,11 @@ splicepipe(t, cp)
 	}
     }
     else {
-	blk[0] = globone(blk[1] = Dfix1(cp), G_ERROR);
+	Char buf[BUFSIZ];
+
+	(void) Strcpy(buf, blk[1] = Dfix1(cp));
 	xfree((ptr_t) blk[1]);
+	blk[0] = globone(buf, G_ERROR);
     }
     return(blk[0]);
 }

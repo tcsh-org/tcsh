@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.14 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.15 1991/11/17 05:39:06 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.14 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.15 1991/11/17 05:39:06 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2722,11 +2722,19 @@ e_cleardisp(c)
 CCRETVAL
 e_tty_int(c)
     int c;
-{
+{			
+#ifdef _MINIX
+    /* SAK PATCH: erase all of current line, start again */
+    ResetInLine();		/* reset the input pointers */
+    xputchar('\n');
+    ClearDisp();
+    return (CC_REFRESH);
+#else /* !_MINIX */
     /* do no editing */
-    return(CC_NORM);
+    return (CC_NORM);
+#endif /* _MINIX */
 }
-
+  
 /*ARGSUSED*/
 CCRETVAL
 e_insovr(c)

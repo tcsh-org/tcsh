@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.12 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.13 1991/11/04 04:16:33 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -151,6 +151,10 @@ extern int nice();
 extern char *sbrk();
 #endif
 #endif /* __hpux */
+
+#ifdef _MINIX
+typedef char * caddr_t;
+#endif /* _MINIX */
 
 /***
  *** hp9000s500 running hpux-5.2

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.16 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.17 1991/11/11 01:56:34 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.16 1991/11/04 04:16:33 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.17 1991/11/11 01:56:34 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -247,7 +247,11 @@ loop:
 #  ifdef UNRELSIGS
     /* no wait3, therefore no rusage */
     /* on Sys V, this may hang.  I hope it's not going to be a problem */
+#   ifdef _MINIX
+    pid = wait(&w);
+#   else /* !_MINIX */
     pid = ourwait(&w.w_status);
+#   endif /* _MINIX */
 #  else	/* UNRELSIGS */
     /* 
      * XXX: for greater than 3 we should use waitpid(). 

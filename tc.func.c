@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.15 1991/11/17 05:59:05 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.16 1991/11/17 06:32:19 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.15 1991/11/17 05:59:05 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.16 1991/11/17 06:32:19 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -208,10 +208,8 @@ dolist(v, c)
 	/*
 	 * We cannot process a flag therefore we let ls do it right.
 	 */
-	static Char STRls[] =
-	{'l', 's', '\0'};
-	static Char STRmCF[] =
-	{'-', 'C', 'F', '\0'};
+	static Char STRls[] = {'l', 's', '\0'};
+	static Char STRmCF[] = {'-', 'C', 'F', '\0'};
 	struct command *t;
 	struct wordent cmd, *nextword, *lastword;
 	Char   *cp;
@@ -221,9 +219,9 @@ dolist(v, c)
 
 	if (setintr)
 	    omask = sigblock(sigmask(SIGINT)) & ~sigmask(SIGINT);
-#else
+#else /* !BSDSIGS */
 	sighold(SIGINT);
-#endif
+#endif /* BSDSIGS */
 	if (seterr) {
 	    xfree((ptr_t) seterr);
 	    seterr = NULL;
@@ -276,7 +274,7 @@ dolist(v, c)
 	    if (*dp == '/' && dp != tmp)
 #ifdef apollo
 		if (dp != &tmp[1])
-#endif
+#endif /* apollo */
 		*dp = '\0';
 	    if (stat(short2str(tmp), &st) == -1) {
 		if (k != i) {
@@ -571,7 +569,7 @@ auto_logout()
     child = 1;
 #ifdef TESLA
     do_logout = 1;
-#endif				/* TESLA */
+#endif /* TESLA */
     goodbye(NULL, NULL);
 }
 
@@ -596,7 +594,7 @@ int snum;
     setalarm(1);
 #ifndef SIGVOID
     return (snum);
-#endif
+#endif /* !SIGVOID */
 }
 
 /*
@@ -613,13 +611,11 @@ precmd()
 {
 #ifdef BSDSIGS
     sigmask_t omask;
-#endif
 
-#ifdef BSDSIGS
     omask = sigblock(sigmask(SIGINT));
-#else
+#else /* !BSDSIGS */
     (void) sighold(SIGINT);
-#endif
+#endif /* BSDSIGS */
     if (precmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRprecmd);
 	xprintf("Faulty alias 'precmd' removed.\n");
@@ -632,9 +628,9 @@ leave:
     precmd_active = 0;
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
-#else
+#else /* !BSDSIGS */
     (void) sigrelse(SIGINT);
-#endif
+#endif /* BSDSIGS */
 }
 
 /*
@@ -648,13 +644,11 @@ cwd_cmd()
 {
 #ifdef BSDSIGS
     sigmask_t omask;
-#endif
 
-#ifdef BSDSIGS
     omask = sigblock(sigmask(SIGINT));
-#else
+#else /* !BSDSIGS */
     (void) sighold(SIGINT);
-#endif
+#endif /* BSDSIGS */
     if (cwdcmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRcwdcmd);
 	xprintf("Faulty alias 'cwdcmd' removed.\n");
@@ -667,9 +661,9 @@ leave:
     cwdcmd_active = 0;
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
-#else
+#else /* !BSDSIGS */
     (void) sigrelse(SIGINT);
-#endif
+#endif /* BSDSIGS */
 }
 
 /*
@@ -681,13 +675,11 @@ beep_cmd()
 {
 #ifdef BSDSIGS
     sigmask_t omask;
-#endif
 
-#ifdef BSDSIGS
     omask = sigblock(sigmask(SIGINT));
-#else
+#else /* !BSDSIGS */
     (void) sighold(SIGINT);
-#endif
+#endif /* BSDSIGS */
     if (beepcmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRbeepcmd);
 	xprintf("Faulty alias 'beepcmd' removed.\n");
@@ -700,9 +692,9 @@ beep_cmd()
     beepcmd_active = 0;
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
-#else
+#else /* !BSDSIGS */
     (void) sigrelse(SIGINT);
-#endif
+#endif /* BSDSIGS */
 }
 
 
@@ -718,13 +710,11 @@ period_cmd()
     time_t  t, interval;
 #ifdef BSDSIGS
     sigmask_t omask;
-#endif
 
-#ifdef BSDSIGS
     omask = sigblock(sigmask(SIGINT));
-#else
+#else /* !BSDSIGS */
     (void) sighold(SIGINT);
-#endif
+#endif /* BSDSIGS */
     if (periodic_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRperiodic);
 	xprintf("Faulty alias 'periodic' removed.\n");
@@ -746,9 +736,9 @@ leave:
     periodic_active = 0;
 #ifdef BSDSIGS
     (void) sigsetmask(omask);
-#else
+#else /* !BSDSIGS */
     (void) sigrelse(SIGINT);
-#endif
+#endif /* BSDSIGS */
 }
 
 /*
@@ -828,7 +818,7 @@ aliasrun(cnt, s1, s2)
 	    beep_cmd();
 	else if (periodic_active)
 	    period_cmd();
-#endif
+#endif /* notdef */
     }
     /* reset the error catcher to the old place */
     resexit(osetexit);
@@ -847,19 +837,21 @@ setalarm(lck)
 
     if (vp = adrof(STRautologout)) {
 	if (cp = vp->vec[0]) {
-	    alrm_time = atoi(short2str(cp)) * 60;
-	    alm_fun = auto_logout;
+	    if ((alrm_time = atoi(short2str(cp)) * 60) > 0)
+		alm_fun = auto_logout;
 	}
 	if ((cp = vp->vec[1])) {
-	    lock_time = atoi(short2str(cp)) * 60;
-	    if (lck) {
-		if (lock_time < alrm_time) {
-		    alrm_time = lock_time;
-		    alm_fun = auto_lock;
+	    if ((lock_time = atoi(short2str(cp)) * 60) > 0) {
+		if (lck) {
+		    if (alrm_time == 0 || lock_time < alrm_time) {
+			alrm_time = lock_time;
+			alm_fun = auto_lock;
+		    }
 		}
+		else /* lock_time always < alrm_time */
+		    if (alrm_time)
+			alrm_time -= lock_time;
 	    }
-	    else /* lock_time always < alrm_time */
-		alrm_time -= lock_time;
 	}
     }
     if ((nl = sched_next()) != -1) {
@@ -871,7 +863,7 @@ setalarm(lck)
     (void) alarm(alrm_time);	/* Autologout ON */
 }
 
-#define RMDEBUG			/* For now... */
+#undef RMDEBUG			/* For now... */
 
 void
 rmstar(cp)
@@ -881,11 +873,9 @@ rmstar(cp)
     register struct wordent *tmp, *del;
 
 #ifdef RMDEBUG
-    static Char STRrmdebug[] =
-    {'r', 'm', 'd', 'e', 'b', 'u', 'g', '\0'};
+    static Char STRrmdebug[] = {'r', 'm', 'd', 'e', 'b', 'u', 'g', '\0'};
     Char   *tag;
-
-#endif
+#endif /* RMDEBUG */
     Char   *charac;
     char    c;
     int     ask, doit, star = 0, silent = 0;
@@ -894,7 +884,7 @@ rmstar(cp)
 	return;
 #ifdef RMDEBUG
     tag = value(STRrmdebug);
-#endif
+#endif /* RMDEBUG */
     we = cp->next;
     while (*we->word == ';' && we != cp)
 	we = we->next;
@@ -902,7 +892,7 @@ rmstar(cp)
 #ifdef RMDEBUG
 	if (*tag)
 	    xprintf("parsing command line\n");
-#endif
+#endif /* RMDEBUG */
 	if (!Strcmp(we->word, STRrm)) {
 	    args = we->next;
 	    ask = (*args->word != '-');
@@ -926,8 +916,10 @@ rmstar(cp)
 			(void) read(SHIN, &c, 1);
 		    if (!doit) {
 			/* remove the command instead */
+#ifdef RMDEBUG
 			if (*tag)
 			    xprintf("skipping deletion of files!\n");
+#endif /* RMDEBUG */
 			for (tmp = we;
 			     *tmp->word != '\n' &&
 			     *tmp->word != ';' && tmp != cp;) {
@@ -961,7 +953,7 @@ rmstar(cp)
 	for (we = cp->next; we != cp; we = we->next)
 	    xprintf("%s ", short2str(we->word));
     }
-#endif
+#endif /* RMDEBUG */
     return;
 }
 
@@ -969,7 +961,7 @@ rmstar(cp)
 /* Check if command is in continue list
    and do a "aliasing" if it exists as a job in background */
 
-#define CNDEBUG			/* For now */
+#undef CNDEBUG			/* For now */
 void
 continue_jobs(cp)
     struct wordent *cp;
@@ -982,14 +974,13 @@ continue_jobs(cp)
     Char   *tag;
     static Char STRcndebug[] =
     {'c', 'n', 'd', 'e', 'b', 'u', 'g', '\0'};
-
-#endif
+#endif /* CNDEBUG */
     bool    in_cont_list, in_cont_arg_list;
 
 
 #ifdef CNDEBUG
     tag = value(STRcndebug);
-#endif
+#endif /* CNDEBUG */
     continue_list = value(STRcontinue);
     continue_args_list = value(STRcontinue_args);
     if (*continue_list == '\0' && *continue_args_list == '\0')
@@ -1002,7 +993,7 @@ continue_jobs(cp)
 #ifdef CNDEBUG
 	if (*tag)
 	    xprintf("parsing command line\n");
-#endif
+#endif /* CNDEBUG */
 	cmd = we->word;
 	in_cont_list = inlist(continue_list, cmd);
 	in_cont_arg_list = inlist(continue_args_list, cmd);
@@ -1010,7 +1001,7 @@ continue_jobs(cp)
 #ifdef CNDEBUG
 	    if (*tag)
 		xprintf("in one of the lists\n");
-#endif
+#endif /* CNDEBUG */
 	    np = PNULL;
 	    for (pp = proclist.p_next; pp; pp = pp->p_next) {
 		if (prefix(cmd, pp->p_command)) {
@@ -1037,7 +1028,7 @@ continue_jobs(cp)
 	    xprintf("%s ",
 		    short2str(we->word));
     }
-#endif
+#endif /* CNDEBUG */
     return;
 }
 
@@ -1114,7 +1105,8 @@ insert(plist, file_args)
 
 	now = plist;
 	xfree((ptr_t) now->word);
-	now->word = (Char *) xcalloc(1, (size_t) ((cmd_len + 2) * sizeof(Char)));
+	now->word = (Char *) xcalloc(1, 
+				     (size_t) ((cmd_len + 2) * sizeof(Char)));
 	cp1 = now->word;
 	cp2 = cmd;
 	*cp1++ = '%';
@@ -1171,7 +1163,7 @@ inlist(list, name)
     return (0);
 }
 
-#endif				/* BSDJOBS */
+#endif /* BSDJOBS */
 
 
 /*
@@ -1211,7 +1203,7 @@ gethomedir(us)
     pp = getpwnam(short2str(us));
 #ifdef YPBUGS
     fix_yp_bugs();
-#endif
+#endif /* YPBUGS */
     if (pp != NULL)
 	return Strsave(str2short(pp->pw_dir));
 #ifdef HESIOD
@@ -1246,7 +1238,7 @@ gethomedir(us)
 	    free(*res1);
 	return rp;
     }
-#endif
+#endif /* HESIOD */
     return NULL;
 }
 

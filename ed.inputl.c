@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.9 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.10 1991/11/17 05:39:06 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.9 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.10 1991/11/17 05:39:06 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -57,6 +57,7 @@ static Char mismatch[] = {'!', '\\', '^', '-', '%', '\0'};
 
 static	int	GetNextCommand	__P((KEYCMD *, Char *));
 static	int	SpellLine	__P((int));
+static	void	RunCommand	__P((Char *));
 
 /* CCRETVAL */
 int
@@ -424,6 +425,23 @@ PushMacro(str)
     }
 }
 
+static void
+RunCommand(str)
+    Char *str;
+{
+    Char *cmd[3];
+
+    cmd[0] = NULL;	/* Tells eval not to play with file descriptors */
+    cmd[1] = str;
+    cmd[2] = NULL;
+    xprintf("\n");	/* Start on a clean line */
+    doeval(cmd, NULL);
+    ClearLines();
+    ClearDisp();
+    NeedsRedraw = 1;
+    Refresh();
+}
+
 static int
 GetNextCommand(cmdnum, ch)
     KEYCMD *cmdnum;
@@ -431,7 +449,6 @@ GetNextCommand(cmdnum, ch)
 {
     KEYCMD  cmd = 0;
     int     num;
-    Char   *str;
 
     for (; cmd == 0 || cmd == F_XKEY;) {
 	if ((num = GetNextChar(ch)) != 1) {	/* if EOF or error */
@@ -451,14 +468,24 @@ GetNextCommand(cmdnum, ch)
 	}
 	cmd = CurrentKeyMap[(unsigned char) *ch];
 	if (cmd == F_XKEY) {
-	    if (GetXkey(ch, &str))
-		cmd = (KEYCMD) *str;
-	    else
-		PushMacro(str);
+	    XmapVal val;
+	    switch (GetXkey(ch, &val)) {
+	    case XK_CMD:
+		cmd = val.cmd;
+		break;
+	    case XK_STR:
+		PushMacro(val.str);
+		break;
+	    case XK_EXE:
+		RunCommand(val.str);
+		break;
+	    default:
+		abort();
+		break;
+	    }
 	}
-	if (!AltKeyMap) {
+	if (!AltKeyMap) 
 	    CurrentKeyMap = CcKeyMap;
-	}
     }
     *cmdnum = cmd;
     return OKCMD;

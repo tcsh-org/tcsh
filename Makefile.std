@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 1991/11/11 01:56:34 christos Exp $
+# $Id: Makefile,v 1.8 1991/11/17 05:39:06 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -178,7 +178,8 @@ AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	README.imake
 VHSRCS=${PVSRCS} ${AVSRCS}
 
-CONFSRCS=config/config.*
+CONFSRCS=config/config.* 
+MINIXSRCS=minix/*
 
 ALLSRCS=  ${SHSRCS} ${TWSRCS} ${EDSRCS} ${TCSRCS} ${VHSRCS}
 DISTSRCS= ${PSSRCS} ${TWSRCS} ${EDSRCS} ${TCSRCS} ${AVSRCS}
@@ -307,19 +308,22 @@ tags:	/tmp
 tar:
 	rm -f tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION} 
-	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
+	mkdir tcsh-${VERSION} tcsh-${VERSION}/config tcsh-${VERSION}/minix
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
+	cp ${MINIXSRCS} tcsh-${VERSION}/minix
 	tar cvf - tcsh-${VERSION} | compress > tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION}
 
 shar:	
 	rm -f tcsh-*.shar
 	rm -rf tcsh-${VERSION} 
-	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
+	mkdir tcsh-${VERSION} tcsh-${VERSION}/config tcsh-${VERSION}/minix
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
-	MAKESHAR ${VERSION} tcsh-${VERSION}/* tcsh-${VERSION}/config/*
+	cp ${MINIXSRCS} tcsh-${VERSION}/minix
+	MAKESHAR ${VERSION} tcsh-${VERSION}/* tcsh-${VERSION}/config/* \
+		 tcsh-${VERSION}/minix/*
 	rm -rf tcsh-${VERSION}
 
 tcsh-${VERSION}.tar.Z:
@@ -330,7 +334,9 @@ tcsh-${VERSION}.tar.Z:
 	mv DIFFS.1 DIFFS.2 DIFFS.3 tcsh-${VERSION}
 	cp ${DISTSRCS} tcsh-${VERSION}
 	mkdir tcsh-${VERSION}/config
+	mkdir tcsh-${VERSION}/minix
 	cp ${CONFSRCS} tcsh-${VERSION}/config
+	cp ${MINIXSRCS} tcsh-${VERSION}/minix
 	cp Makefile tcsh-${VERSION}/Makefile.new
 	tar cvf - tcsh-${VERSION} | compress > tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION}
@@ -343,7 +349,9 @@ tcsh.tahoe-${VERSION}.tar.Z:
 	mv DIFFS.1 DIFFS.2 DIFFS.3 tcsh.tahoe-${VERSION}
 	cp ${DISTSRCS} tcsh.tahoe-${VERSION}
 	mkdir tcsh.tahoe-${VERSION}/config
+	mkdir tcsh.tahoe-${VERSION}/minix
 	cp ${CONFSRCS} tcsh.tahoe-${VERSION}/config
+	cp ${MINIXSRCS} tcsh-${VERSION}/minix
 	cp Makefile tcsh.tahoe-${VERSION}/Makefile.new
 	tar cvf - tcsh.tahoe-${VERSION} | compress > tcsh.tahoe-${VERSION}.tar.Z
 	rm -rf tcsh.tahoe-${VERSION}
@@ -356,7 +364,9 @@ tcsh.reno-${VERSION}.tar.Z:
 	mv DIFFS.1 DIFFS.2 DIFFS.3 tcsh.reno-${VERSION}
 	cp ${DISTSRCS} tcsh.reno-${VERSION}
 	mkdir tcsh.reno-${VERSION}/config
+	mkdir tcsh.reno-${VERSION}/minix
 	cp ${CONFSRCS} tcsh.reno-${VERSION}/config
+	cp ${MINIXSRCS} tcsh-${VERSION}/minix
 	cp Makefile tcsh.reno-${VERSION}/Makefile.new
 	tar cvf - tcsh.reno-${VERSION} | compress > tcsh.reno-${VERSION}.tar.Z
 	rm -rf tcsh.reno-${VERSION}

@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/ed.defns.c,v 1.3 91/09/24 17:07:37 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 3.8 1991/10/12 04:23:51 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.7 1991/09/15 01:50:04 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.8 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 
@@ -1368,7 +1368,7 @@ ed_InitMetaBindings()
     for (i = 0200; i <= 0377; i++) {
 	if (map[i] != F_INSERT && map[i] != F_UNASSIGNED && map[i] != F_XKEY) {
 	    buf[1] = i & ASCII;
-	    AddXkeyCmd(buf, (Char) map[i]);
+	    AddXkey(buf, XmapCmd((int) map[i]), XK_CMD);
 	}
     }
     map[buf[0]] = F_XKEY;
@@ -1407,15 +1407,15 @@ ed_InitEmacsMaps()
     buf[0] = 030;
     buf[2] = 0;
     buf[1] = 030;
-    AddXkeyCmd(buf, F_EXCHANGE_MARK);
+    AddXkey(buf, XmapCmd(F_EXCHANGE_MARK), XK_CMD);
     buf[1] = '*';
-    AddXkeyCmd(buf, F_EXPAND_GLOB);
+    AddXkey(buf, XmapCmd(F_EXPAND_GLOB),   XK_CMD);
     buf[1] = '$';
-    AddXkeyCmd(buf, F_EXPAND_VARS);
+    AddXkey(buf, XmapCmd(F_EXPAND_VARS),   XK_CMD);
     buf[1] = 'G';
-    AddXkeyCmd(buf, F_LIST_GLOB);
+    AddXkey(buf, XmapCmd(F_LIST_GLOB),     XK_CMD);
     buf[1] = 'g';
-    AddXkeyCmd(buf, F_LIST_GLOB);
+    AddXkey(buf, XmapCmd(F_LIST_GLOB),     XK_CMD);
     BindArrowKeys();
 }
 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.7 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.8 1991/10/13 23:44:48 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.7 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.8 1991/10/13 23:44:48 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -179,6 +179,15 @@ gethosttype()
 #  define _havehosttype_
     hosttype = str2short("att3b2");
 # endif /* u3b2 */
+
+#ifdef _MINIX
+# define _havehosttype_
+# ifdef i386
+    hosttype = str2short("minix386");
+# else /* minix ? amoeba or mac? */
+    hosttype = str2short("minix");
+# endif /* i386 */
+#endif /* _MINIX */
 
 # if defined(i386) && SVID > 0
 
