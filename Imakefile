@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.36 1993/07/07 20:28:30 christos Exp christos $
+/**/# $Id: Imakefile,v 1.37 1993/08/11 16:25:52 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.04
 /**/# Marc Horowitz, MIT SIPB
@@ -437,7 +437,7 @@ tc.const.h: config.h tc.const.c
 	@echo '#define _h_tc_const' >> $@
 	${CC} -E $(INCLUDES) ${DFLAGS} -D_h_tc_const tc.const.c | \
 	    grep 'Char STR' | \
-	    sed -e 's/Char \([a-zA-Z0-9_]*\)\(.*\)/extern Char \1[];/' | \
+	    sed -e 's/Char \([a-zA-Z0-9_]*\)\[.*/extern Char \1[];/' | \
 	    sort >> $@
 	@echo '#endif /* _h_tc_const */' >> $@
 
