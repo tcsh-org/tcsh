@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.decls.h,v 3.28 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.decls.h,v 3.29 1996/04/26 19:18:57 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -243,6 +243,7 @@ extern	Char		**saveblk	__P((Char **));
 extern	void		  setzero	__P((char *, int));
 extern	Char		 *strip		__P((Char *));
 extern	Char		 *quote		__P((Char *));
+extern	Char		 *quote_meta	__P((Char *, const Char *));
 extern	char		 *strsave	__P((const char *));
 extern	void		  udvar		__P((Char *));
 #ifndef POSIX

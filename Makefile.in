@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.2 1996/09/24 16:57:16 christos Exp $
+# $Id: Makefile.in,v 3.3 1996/10/11 17:31:59 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -480,8 +480,10 @@ clean:
 	${RM} -f tcsh.*.m tcsh.*.cat
 
 veryclean: clean
-	${RM} -f config.h
+	${RM} -f config.h config.status config.cache config.log Makefile
 	${RM} -f *~ #*
+
+distclean: veryclean
 
 tags:	/tmp
 	${CTAGS} sh*.c

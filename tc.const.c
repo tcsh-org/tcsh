@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.38 1996/09/24 16:57:27 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.39 1996/10/05 17:39:15 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.38 1996/09/24 16:57:27 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.39 1996/10/05 17:39:15 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -93,6 +93,7 @@ Char STRpath[]		= { 'p', 'a', 't', 'h', '\0' };
 Char STRprompt[]	= { 'p', 'r', 'o', 'm', 'p', 't', '\0' };
 Char STRprompt2[]	= { 'p', 'r', 'o', 'm', 'p', 't', '2', '\0' };
 Char STRprompt3[]	= { 'p', 'r', 'o', 'm', 'p', 't', '3', '\0' };
+Char STRrprompt[]	= { 'r', 'p', 'r', 'o', 'm', 'p', 't', '\0' };
 Char STRellipsis[]	= { 'e', 'l', 'l', 'i', 'p', 's', 'i', 's', '\0' };
 Char STRcwd[]		= { 'c', 'w', 'd', '\0' };
 Char STRowd[]		= { 'o', 'w', 'd', '\0' };

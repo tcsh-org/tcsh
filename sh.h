@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.72 1996/10/05 17:39:11 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.73 1996/10/19 17:54:12 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -565,11 +565,12 @@ EXTERN int     opgrp,		/* Initial pgrp and tty pgrp */
                tpgrp;		/* Terminal process group */
 				/* If tpgrp is -1, leave tty alone! */
 
-EXTERN Char    PromptBuf[INBUFSIZE*2]; /* buffer for the actual printed prompt.
-				       * this must be large enough to contain
-				       * the input line and the prompt, in
-				       * case a correction occured...
-				       */
+EXTERN Char    PromptBuf[INBUFSIZE*2];	/* buffer for the actual printed prompt.
+					 * this must be large enough to contain
+					 * the input line and the prompt, in
+					 * case a correction occurred...
+					 */
+EXTERN Char    RPromptBuf[INBUFSIZE];	/* buffer for right-hand side prompt */
 
 /*
  * To be able to redirect i/o for builtins easily, the shell moves the i/o

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.prompt.c,v 3.23 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.24 1996/04/26 19:21:21 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,17 +36,20 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.23 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: tc.prompt.c,v 3.24 1996/04/26 19:21:21 christos Exp $")
 
 #include "ed.h"
+#include "tw.h"
 
 /*
  * kfk 21oct1983 -- add @ (time) and / ($cwd) in prompt.
  * PWP 4/27/87 -- rearange for tcsh.
  * mrdch@com.tau.edu.il 6/26/89 - added ~, T and .# - rearanged to switch()
  *                 instead of if/elseif
- * Luke Mewburn, <lm@rmit.edu.au>:  6-Sep-91 - changed date format,
- *	   16-Feb-94 - rewrote directory prompt code, added $ellipsis
+ * Luke Mewburn, <lukem@connect.com.au>:
+ *	6-Sep-91	changed date format
+ *	16-Feb-94	rewrote directory prompt code, added $ellipsis
+ *	29-Dec-96	added rprompt support
  */
 
 static char   *month_list[12];
@@ -152,6 +155,21 @@ printprompt(promptno, str)
 	    (void) putraw(*cp++);
 	SetAttributes(0);
 	flush();
+    }
+
+    RPromptBuf[0] = '\0';
+    if (promptno == 0) {	/* determine rprompt if using main prompt */
+	cp = varval(STRrprompt);
+	tprintf(FMT_PROMPT, RPromptBuf, cp, INBUFSIZE - 2, NULL, lclock, NULL);
+
+				/* if not editing, put rprompt after prompt */
+	if (!editing && RPromptBuf[0] != '\0') {
+	    for (cp = RPromptBuf; *cp ; )
+		(void) putraw(*cp++);
+	    SetAttributes(0);
+	    putraw(' ');
+	    flush();
+	}
     }
 }
 
@@ -315,7 +333,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			if (p >= ep) break;
 		break;
 
-			/* lm: new directory prompt code */
+			/* lukem: new directory prompt code */
 	    case '~':
 	    case '/':
 	    case '.':
@@ -403,7 +421,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		for (; *z ; *p++ = attributes | *z++)
 		    if (p >= ep) break;
 		break;
-			/* lm: end of new directory prompt code */
+			/* lukem: end of new directory prompt code */
 
 	    case 'n':
 #ifndef HAVENOUTMP
@@ -514,6 +532,10 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    for (; *z; *p++ = attributes | *z++)
 			if (p >= ep) break;
 		break;
+	    case '$':
+		pdirs = ep - p;
+		(void) expdollar(&p, &cp, &pdirs, attributes);
+		break;
 	    case '%':
 		*p++ = attributes | '%';
 		break;
@@ -562,4 +584,63 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    *p++ = attributes | *cp;	/* normal character */
     }
     *p = '\0';
+}
+
+Char *
+expdollar(dstp, srcp, spp, attr)
+    Char **dstp;
+    Char **srcp;
+    size_t *spp;
+    int	    attr;
+{
+    struct varent *vp;
+    Char var[MAXVARLEN];
+    Char *src = *srcp, *val;
+    Char *dst = *dstp;
+    int i, curly = 0;
+
+    /* found a variable, expand it */
+    for (i = 0; i < MAXVARLEN; i++) {
+	var[i] = *++src & TRIM;
+	if (i == 0 && var[i] == '{') {
+	    curly = 1;
+	    var[i] = *++src & TRIM;
+	}
+	if (!alnum(var[i])) {
+	    
+	    var[i] = '\0';
+	    break;
+	}
+    }
+    if (curly && (*src & TRIM) == '}')
+	src++;
+
+    vp = adrof(var);
+    val = (!vp) ? tgetenv(var) : NULL;
+    if (vp) {
+	for (i = 0; vp->vec[i] != NULL; i++) {
+	    for (val = vp->vec[i]; *spp > 0 && *val; (*spp)--)
+		*dst++ = *val++ | attr;
+	    if (vp->vec[i+1] && *spp > 0) {
+		*dst++ = ' ' | attr;
+		(*spp)--;
+	    }
+	}
+    }
+    else if (val) {
+	for (; *spp > 0 && *val; (*spp)--)
+	    *dst++ = *val++ | attr;
+    }
+    else {
+	**dstp = '\0';
+	*srcp = src;
+	return NULL;
+    }
+    *dst = '\0';
+
+    val = *dstp;
+    *srcp = src;
+    *dstp = dst;
+
+    return val;
 }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.misc.c,v 3.21 1995/03/19 22:33:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.misc.c,v 3.22 1996/04/26 19:20:01 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.21 1995/03/19 22:33:26 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.22 1996/04/26 19:20:01 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -474,6 +474,21 @@ quote(cp)
     while (*dp != '\0')
 	*dp++ |= QUOTE;
     return (cp);
+}
+
+Char   *
+quote_meta(d, s)
+    Char   *d;
+    const Char   *s;
+{
+    Char *r = d;
+    while (*s != '\0') {
+	if (cmap(*s, _META | _DOL | _QF | _QB | _ESC | _GLOB))
+		*d++ = '\\';
+	*d++ = *s++;
+    }
+    *d = '\0';
+    return r;
 }
 
 void

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.proc.h,v 3.6 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.proc.h,v 3.7 1996/04/26 19:20:17 christos Exp $ */
 /*
  * sh.proc.h: Process data structures and variables
  */
@@ -53,7 +53,7 @@ struct process {
     struct process *p_friends;	/* next in job list (or self) */
     struct directory *p_cwd;	/* cwd of the job (only in head) */
     unsigned long p_flags;	/* various job status flags */
-    char    p_reason;		/* reason for entering this state */
+    unsigned char p_reason;	/* reason for entering this state */
     int     p_index;		/* shorthand job index */
     pid_t   p_procid;
     pid_t   p_jobid;		/* pid of job leader */

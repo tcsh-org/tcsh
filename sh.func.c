@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.65 1996/04/26 19:19:24 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.66 1996/10/05 17:39:10 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.65 1996/04/26 19:19:24 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.66 1996/10/05 17:39:10 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1627,11 +1627,11 @@ doumask(v, c)
 #   define toset(a) ((a) + 1)
 #  endif /* aiws */
 # else /* BSDLIMIT */
-#  if defined(BSD4_4) && !defined(__386BSD__) && !defined(bsdi)
+#  if defined(BSD4_4) && !defined(__386BSD__)
     typedef quad_t RLIM_TYPE;
 #  else
     typedef unsigned long RLIM_TYPE;
-#  endif /* BSD4_4 && !__386BSD__ && !defined(bsdi) */
+#  endif /* BSD4_4 && !__386BSD__  */
 # endif /* BSDLIMIT */
 
 # if (HPUXVERSION > 700) && defined(BSDLIMIT)
@@ -1649,6 +1649,12 @@ doumask(v, c)
 #  ifndef RLIM_INFINITY
 #   define RLIM_INFINITY	0x7fffffff
 #  endif /* RLIM_INFINITY */
+   /*
+    * old versions of HP/UX counted limits in 512 bytes
+    */
+#  ifndef SIGRTMIN
+#   define FILESIZE512
+#  endif /* SIGRTMIN */
 # endif /* (HPUXVERSION > 700) && BSDLIMIT */
 
 # if SYSVREL > 3 && defined(BSDLIMIT)
@@ -1941,7 +1947,7 @@ plim(lp, hard)
     limit = hard ? rlim.rlim_max : rlim.rlim_cur;
 # endif /* BSDLIMIT */
 
-# if !defined(BSDLIMIT) || defined(hpux)
+# if !defined(BSDLIMIT) || defined(FILESIZE512)
     /*
      * Christos: filesize comes in 512 blocks. we divide by 2 to get 1024
      * blocks. Note we cannot pre-multiply cause we might overflow (A/UX)
@@ -1952,7 +1958,7 @@ plim(lp, hard)
 	else
 	    div = (div == 1024 ? 2 : 1);
     }
-# endif /* !BSDLIMIT || hpux */
+# endif /* !BSDLIMIT || FILESIZE512 */
 
     if (limit == RLIM_INFINITY)
 	xprintf("unlimited");
@@ -2020,11 +2026,11 @@ setlim(lp, hard, limit)
 
     (void) getrlimit(lp->limconst, &rlim);
 
-#  ifdef hpux
+#  ifdef FILESIZE512
     /* Even though hpux has setrlimit(), it expects fsize in 512 byte blocks */
     if (limit != RLIM_INFINITY && lp->limconst == RLIMIT_FSIZE)
 	limit /= 512;
-#  endif /* hpux */
+#  endif /* FILESIZE512 */
     if (hard)
 	rlim.rlim_max = limit;
     else if (limit == RLIM_INFINITY && euid != 0)

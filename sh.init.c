@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.init.c,v 3.40 1995/04/16 19:15:53 christos Exp christos $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.41 1996/04/26 19:19:40 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.40 1995/04/16 19:15:53 christos Exp christos $")
+RCSID("$Id: sh.init.c,v 3.41 1996/04/26 19:19:40 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -76,9 +76,9 @@ struct	biltins bfunc[] = {
     { "continue",	docontin,	0,	0	},
     { "default",	dozip,		0,	0	},
     { "dirs",		dodirs,		0,	INF	},
-#ifdef _CRAY
+#if defined(_CRAY) && !defined(_CRAYMPP)
     { "dmmode",		dodmmode,	0,	1	},
-#endif /* _CRAY */
+#endif /* _CRAY && !_CRAYMPP */
     { "echo",		doecho,		0,	INF	},
     { "echotc",		doechotc,	0,	INF	},
     { "else",		doelse,		0,	INF	},

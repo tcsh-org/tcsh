@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.char.h,v 3.9 1995/01/20 23:48:56 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.char.h,v 3.10 1996/04/26 19:18:55 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -74,7 +74,7 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 extern Char STRnokanji[];
 
 #define cmap(c, bits)	\
-	((((c) & QUOTE) || (c>127 && adrof(STRnokanji))) ? \
+	((((c) & QUOTE) || ((c & 0x80) && adrof(STRnokanji))) ? \
 	0 : (_cmap[(unsigned char)(c)] & (bits)))
 #else
 #define cmap(c, bits)	\

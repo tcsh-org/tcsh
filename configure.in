@@ -8,7 +8,7 @@ dnl
 dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 dnl
 
-AC_PREREQ(2.10)dnl Minimum Autoconf version required.
+AC_PREREQ(2.12)dnl Minimum Autoconf version required.
 AC_INIT(tc.vers.c)
 
 tcsh_configure_args="$@"
@@ -50,6 +50,11 @@ case "${tcsh_cv_canonical}" in
     tcsh_config_file=decosf1
   ;;
 
+  ## Ultrix
+  *-dec-ultrix* )
+    tcsh_config_file=ultrix
+  ;;
+
   ## HP/UX
   *-hp-hpux7* )
     tcsh_config_file=hpux7
@@ -78,6 +83,21 @@ case "${tcsh_cv_canonical}" in
 
   ## NetBSD systems
   *-*-netbsd*)
+    tcsh_config_file=bsd4.4
+  ;;
+
+  ## FreeBSD systems
+  *-*-freebsd*)
+    tcsh_config_file=bsd4.4
+  ;;
+
+  ## OpenBSD systems
+  *-*-openbsd*)
+    tcsh_config_file=bsd4.4
+  ;;
+
+  ## BSDI systems
+  *-*-bsdi*)
     tcsh_config_file=bsd4.4
   ;;
 
@@ -155,7 +175,10 @@ if test $ac_cv_prog_gcc = no ; then
   CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
 fi
 
-AC_CHECK_LIB(crypt, crypt)
+AC_CHECK_FUNC(crypt)
+if test $ac_cv_func_crypt = no; then
+  AC_CHECK_LIB(crypt, crypt)
+fi
 AC_CHECK_LIB(termlib, tgetent)
 if test $ac_cv_lib_termlib_tgetent = no ; then
   AC_CHECK_LIB(curses, tgetent)
@@ -163,8 +186,14 @@ if test $ac_cv_lib_termlib_tgetent = no ; then
     AC_CHECK_LIB(termcap, tgetent)
   fi
 fi
-AC_CHECK_LIB(nsl, inet_ntoa)
-AC_CHECK_LIB(socket, getpeername)
+AC_CHECK_FUNC(gethostbyname)
+if test $ac_cv_func_gethostbyname = no; then
+      AC_CHECK_LIB(nsl, gethostbyname)
+fi
+AC_CHECK_FUNC(connect)
+if test $ac_cv_func_connect = no; then
+  AC_CHECK_LIB(socket, connect)
+fi
 AC_SUBST(DFLAGS)
 
 AC_OUTPUT(config.h:config/${tcsh_config_file} Makefile)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.41 1996/04/26 19:19:01 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.42 1996/06/22 21:44:28 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.41 1996/04/26 19:19:01 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.42 1996/06/22 21:44:28 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -1310,6 +1310,7 @@ recdirs(fname, def)
     struct directory *dp;
     unsigned int    num;
     Char   *snum;
+    Char    qname[MAXPATHLEN*2];
 
     if (fname == NULL && !def) 
 	return;
@@ -1345,10 +1346,10 @@ recdirs(fname, def)
 
 	if (cdflag == 0) {
 	    cdflag = 1;
-	    xprintf("cd '%S'\n", dp->di_name);
+	    xprintf("cd %S\n", quote_meta(qname, dp->di_name));
 	}
 	else
-	    xprintf("pushd '%S'\n", dp->di_name);
+	    xprintf("pushd %S\n", quote_meta(qname, dp->di_name));
 
 	if (num-- == 0)
 	    break;

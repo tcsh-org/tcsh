@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.15 1996/10/05 17:39:05 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.16 1996/10/11 17:32:11 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.15 1996/10/05 17:39:05 christos Exp $")
+RCSID("$Id: host.defs,v 1.16 1996/10/11 17:32:11 christos Exp $")
 
 endcode	:
 
@@ -71,6 +71,7 @@ newcode	:
  */
 # include <sys/target.h> 
 # include <ctype.h>
+# include <string.h>
 
 /* From: hpa@hook.eecs.nwu.edu (H. Peter Anvin) */
 static char *
@@ -93,6 +94,10 @@ getcray()
 	  *q++ = tolower(p[n]);
 
 	*q = '\0';
+
+	/* replace dashes with underscores if present */
+	while ((q = strchr(hosttype_buf, '-')) != NULL)
+	    *q = '_';
 	return hosttype_buf; 	/* Return in static buffer */
     }
     else
@@ -505,9 +510,15 @@ enddef	:
 newdef	: defined(bsdi)
 comment	: BSDI's unix
 vendor	: defined(M_intel)				: "intel"
-hosttype:						: "bsd386"
+vendor	: defined(sparc)				: "sun"
+vendor	: defined(__powerpc__)				: "motorola"
+hosttype: defined(M_intel)				: "bsd386"
+hosttype: defined(sparc)				: "bsd-sparc"
+hosttype: defined(__powerpc__)				: "bsd-powerpc"
 ostype	:						: "bsdi"
 machtype: defined(M_i386)				: "i386"
+machtype: defined(sparc)				: "sparc"
+machtype: defined(__powerpc__)				: "powerpc"
 enddef	:
 
 
@@ -639,11 +650,29 @@ machtype: defined(_CRAY4)				: "cray4"
 enddef	:
 
 
-newdef	: defined(cray)
-comment	: Cray Research Inc. running UNICOS
+newdef	: defined(cray) && !defined(_CRAYMPP)
+comment	: Cray Research Inc. PVP running UNICOS
 vendor	:						: "cri"
 hosttype:						: getcray()
 ostype	:						: "unicos"
+machtype:						: getcray()
+enddef	:
+
+
+newdef  : defined(cray) && defined(_CRAYT3D)
+comment : Cray Research Inc. running UNICOS MAX
+vendor  :                                               : "cri"
+hosttype:                                               : getcray()
+ostype  :                                               : "unicosmax"
+machtype:                                               : getcray()
+enddef  :
+
+
+newdef	: defined(cray) && defined(_CRAYT3E)
+comment	: Cray Research Inc. running UNICOS/mk
+vendor	:						: "cri"
+hosttype:						: getcray()
+ostype	:						: "unicosmk"
 machtype:						: getcray()
 enddef	:
 

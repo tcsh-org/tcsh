@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.os.c,v 3.41 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.42 1996/04/26 19:21:08 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.41 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.42 1996/04/26 19:21:08 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -531,7 +531,7 @@ done:
 /***
  *** CRAY ddmode <velo@sesun3.epfl.ch> (Martin Ouwehand EPFL-SIC/SE)
  ***/
-#ifdef _CRAY
+#if defined(_CRAY) && !defined(_CRAYMPP)
 void
 dodmmode(v, c)
     Char  **v;
@@ -566,7 +566,7 @@ dodmmode(v, c)
 	    }
     }
 }
-#endif /* _CRAY */
+#endif /* _CRAY && !_CRAYMPP */
 
 
 /***

@@ -20,4 +20,7 @@ NLS catalogs for:
     function descriptions		ed.defns.c
     terminal capability names		ed.screen.c
 
+implicitcd should do implicit pushd too.
+quoting functions for the save dirs.
+
 christos

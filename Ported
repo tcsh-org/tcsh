@@ -312,7 +312,9 @@ OS	:	OSx5.1,6.4
 CONFIG	:	pyr
 ENVIRON	:	n/a
 NOTES	:	If there are problems with the global optimizer, use -OP
-VERSION	:	6.03.09
+NOTES	:	If you only have the AT&T universe, use the pyratt config
+NOTES	:	file and define -D_PID_T -Dpyr.
+VERSION	:	6.06.00
 
 VENDOR	:	next
 MODELS	:	any
@@ -796,9 +798,9 @@ MODELS  :	DECstation 3000/400 (alpha)
 COMPILER:	cc
 CFLAGS  :	-O2 -I. -I.. -Olimit 2000
 LIBES   :	-lcurses
-OS      :	OSF1 1.3, 2.0, 3.0
+OS      :	OSF1 1.3, 2.0, 3.0, 4.0
 CONFIG  :	decosf1
-VERSION :	6.06.00
+VERSION :	6.07.02
 
 VENDOR  :	Intel
 MODELS  :	Paragon
@@ -860,12 +862,12 @@ VENDOR	:	Unixware
 MODELS	:	all
 COMPILER:	cc
 CFLAGS	:	normal
-LIBES	:	-lcrypt -ltermlib -lsocket -lnsl
+LIBES	:	-lcrypt -ltermlib -lsocket -lnsl -lgen
 OS	:	Unixware 2.03 (4.2MP)
 CONFIG	:	svr4
 ENVIRON :	n/a
-NOTES	:	Remove PW_SHADOW from config file.
-VERSION :	6.06.00
+NOTES	:	Remove PW_SHADOW from config file, or add -lgen for getspnam
+VERSION :	6.07.00
 
 VENDOR	:	Intergraph
 MODELS	:	clipper

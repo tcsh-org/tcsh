@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.lex.c,v 3.45 1996/06/22 21:44:37 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.lex.c,v 3.46 1996/10/05 17:39:12 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.45 1996/06/22 21:44:37 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.46 1996/10/05 17:39:12 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -754,6 +754,7 @@ getexcl(sc)
 	uselastevent = 0;
 	lastev = eventno;
     }
+    else
 	lastev = eventno;
     hp = gethent(sc);
     if (hp == 0)

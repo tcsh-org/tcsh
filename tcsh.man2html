@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: tcsh.man2html,v 1.7 1995/03/19 22:33:26 christos Exp $
+# $Id: tcsh.man2html,v 1.8 1996/06/22 21:45:03 christos Exp $
 
 # tcsh.man2html, Dave Schweisguth <dcs@proton.chem.yale.edu>
 #
@@ -847,6 +847,7 @@ $topfile = 'TOPFILEHERE';
 $input = $ENV{'QUERY_STRING'};
 $input =~ s/^input=//;
 $input =~ s/\+/ /g;
+print "Status: 302 Found\n";
 if ($input ne '' && ($key = (grep(/^$input/,  @name))[0] ||
 			    (grep(/^$input/i, @name))[0] ||
 			    (grep( /$input/i, @name))[0]   )) {

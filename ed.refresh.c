@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.refresh.c,v 3.16 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.17 1996/04/26 19:18:09 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.16 1994/05/26 13:11:20 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.17 1996/04/26 19:18:09 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -47,6 +47,7 @@ RCSID("$Id: ed.refresh.c,v 3.16 1994/05/26 13:11:20 christos Exp $")
 
 Char   *litptr[256];
 static int vcursor_h, vcursor_v;
+static int rprompt_h, rprompt_v;
 
 static	void	Draw 			__P((int));
 static	void	Vdraw 			__P((int));
@@ -155,6 +156,12 @@ Draw(c)				/* draw c, expand tabs, ctl chars */
 	    Vdraw((c | 0100));
 	}
     }
+#ifdef KANJI
+    else if (!adrof(STRnokanji)) {
+	Vdraw(c);
+	return;
+    }
+#endif
     else {
 	Vdraw('\\');
 	Vdraw(((c >> 6) & 7) + '0');
@@ -191,37 +198,18 @@ Vdraw(c)			/* draw char c onto V lines */
     }
 }
 
-
 /*
- *  Refresh()
- *	draws the new virtual screen image from the current input
- *  	line, then goes line-by-line changing the real image to the new
- *	virtual image. The routine to re-draw a line can be replaced
- *	easily in hopes of a smarter one being placed there.
+ *  RefreshPromptpart()
+ *	draws a prompt element, expanding literals (we know it's ASCIZ)
  */
-static int OldvcV = 0;
-void
-Refresh()
+static void
+RefreshPromptpart(buf)
+    Char *buf;
 {
-    register int cur_line;
     register Char *cp;
-    int     cur_h, cur_v = 0, new_vcv;
-    Char    oldgetting;
     unsigned int litnum = 0;
 
-#ifdef DEBUG_REFRESH
-    dprintf("PromptBuf = :%s:\r\n", short2str(PromptBuf));
-    dprintf("InputBuf = :%s:\r\n", short2str(InputBuf));
-#endif /* DEBUG_REFRESH */
-    oldgetting = GettingInput;
-    GettingInput = 0;		/* avoid re-entrance via SIGWINCH */
-
-    /* reset the Vdraw cursor */
-    vcursor_h = 0;
-    vcursor_v = 0;
-
-    /* draw prompt, we know it's ASCIZ */
-    for (cp = PromptBuf; *cp; cp++) {
+    for (cp = buf; *cp; cp++) {
 	if (*cp & LITERAL) {
 	    if (litnum < (sizeof(litptr) / sizeof(litptr[0]))) {
 		litptr[litnum] = cp;
@@ -245,6 +233,43 @@ Refresh()
 	else
 	    Draw(*cp);
     }
+}
+
+/*
+ *  Refresh()
+ *	draws the new virtual screen image from the current input
+ *  	line, then goes line-by-line changing the real image to the new
+ *	virtual image. The routine to re-draw a line can be replaced
+ *	easily in hopes of a smarter one being placed there.
+ */
+static int OldvcV = 0;
+void
+Refresh()
+{
+    register int cur_line;
+    register Char *cp;
+    int     cur_h, cur_v = 0, new_vcv;
+    int     rhdiff;
+    Char    oldgetting;
+
+#ifdef DEBUG_REFRESH
+    dprintf("PromptBuf = :%s:\r\n", short2str(PromptBuf));
+    dprintf("InputBuf = :%s:\r\n", short2str(InputBuf));
+#endif /* DEBUG_REFRESH */
+    oldgetting = GettingInput;
+    GettingInput = 0;		/* avoid re-entrance via SIGWINCH */
+
+    /* reset the Vdraw cursor, temporarily draw rprompt to calculate its size */
+    vcursor_h = 0;
+    vcursor_v = 0;
+    RefreshPromptpart(RPromptBuf);
+    rprompt_h = vcursor_h;
+    rprompt_v = vcursor_v;
+
+    /* reset the Vdraw cursor, draw prompt */
+    vcursor_h = 0;
+    vcursor_v = 0;
+    RefreshPromptpart(PromptBuf);
     cur_h = -1;			/* set flag in case I'm not set */
 
     /* draw the current input buffer */
@@ -256,10 +281,27 @@ Refresh()
 	Draw(*cp);
     }
 
-    if (cur_h == -1) {		/* if I havn't been set yet, I'm at the end */
+    if (cur_h == -1) {		/* if I haven't been set yet, I'm at the end */
 	cur_h = vcursor_h;
 	cur_v = vcursor_v;
     }
+
+    rhdiff = TermH - vcursor_h - rprompt_h;
+    if (rprompt_h != 0 && rprompt_v == 0 && vcursor_v == 0 && rhdiff > 1) {
+			/*
+			 * have a right-hand side prompt that will fit on
+			 * the end of the first line with at least one
+			 * character gap to the input buffer.
+			 */
+	while (--rhdiff > 0)		/* pad out with spaces */
+	    Draw(' ');
+	RefreshPromptpart(RPromptBuf);
+    }
+    else {
+	rprompt_h = 0;			/* flag "not using rprompt" */
+	rprompt_v = 0;
+    }
+
     new_vcv = vcursor_v;	/* must be done BEFORE the NUL is written */
     Vdraw('\0');		/* put NUL on end */
 
@@ -1097,14 +1139,19 @@ PutPlusOne(c)
 
 void
 RefPlusOne()
-{				/* we added just one char, handle it fast *//* a
-				 * ssumes that screen cursor == real cursor */
+{				/* we added just one char, handle it fast.
+				 * assumes that screen cursor == real cursor */
     register Char c, mc;
 
     c = Cursor[-1] & CHAR;	/* the char we just added */
 
     if (c == '\t' || Cursor != LastChar) {
 	Refresh();		/* too hard to handle */
+	return;
+    }
+
+    if (rprompt_h != 0 && (TermH - CursorH - rprompt_h < 3)) {
+	Refresh();		/* clear out rprompt if less than one char gap*/
 	return;
     }				/* else (only do at end of line, no TAB) */
 
@@ -1116,6 +1163,11 @@ RefPlusOne()
     else if (Isprint(c)) {	/* normal char */
 	PutPlusOne(c);
     }
+#ifdef KANJI
+    else if (!adrof(STRnokanji)) {
+	PutPlusOne(c);
+    }
+#endif
     else {
 	PutPlusOne('\\');
 	PutPlusOne(((c >> 6) & 7) + '0');

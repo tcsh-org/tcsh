@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.38 1996/06/22 21:44:39 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.39 1996/09/24 16:57:25 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.38 1996/06/22 21:44:39 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.39 1996/09/24 16:57:25 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -51,9 +51,9 @@ RCSID("$Id: sh.sem.c,v 3.38 1996/06/22 21:44:39 christos Exp $")
 #endif /* CLOSE_ON_EXEC */
 
 #if defined(__sparc__) || defined(sparc)
-# if !defined(MACH) && SYSVREL == 0 && !defined(Lynx) && !defined(__NetBSD__)
+# if !defined(MACH) && SYSVREL == 0 && !defined(Lynx) && !defined(BSD4_4) 
 #  include <vfork.h>
-# endif /* !MACH && SYSVREL == 0 && !Lynx && !__NetBSD__ */
+# endif /* !MACH && SYSVREL == 0 && !Lynx && !BSD4_4 */
 #endif /* __sparc__ || sparc */
 
 #ifdef VFORK

@@ -1,3 +1,15 @@
+V6.07.03, 02/23/97
+ 11. Understand %$variable in the prompt.
+ 10. Quote directory names properly in .cshdirs
+  9. USE_ACCESS and autoconfig patches from (Larry Schwimmer)
+  8. Pyramid att config file (Andrew Lister)
+  7. $rprompt code (Luke Mewburn)
+  6. Kanji patches (Huw Rogers)
+  5. Cray T3E port (Jorn Amundsen)
+  4. Avoid html redirects in tcsh.man2html (from Kimmo)
+  3. HP/UX 10.0 fix for filesize resource limit; don't scale by 512 anymore.
+  2. Workaround for TIOCSTAT for NetBSD from lukem@netbsd.org
+  1. Return exit status from 0..255 not -128...127, as POSIX mandates.
 V6.07.02, 10/27/96
  58. More configure fixes from Kaveh.
  57. Fix histdup=erase again: Don't renumber events, or access uninitialized

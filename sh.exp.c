@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.33 1996/10/05 17:39:09 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.34 1996/10/13 22:48:32 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.33 1996/10/05 17:39:09 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.34 1996/10/13 22:48:32 christos Exp $")
 
 /*
  * C shell
@@ -90,7 +90,7 @@ sh_access(fname, mode)
     Char *fname;
     int mode;
 {
-#ifdef POSIX
+#if defined(POSIX) && !defined(USE_ACCESS)
     struct stat     statb;
 #endif /* POSIX */
     char *name = short2str(fname);
@@ -98,7 +98,7 @@ sh_access(fname, mode)
     if (*name == '\0')
 	return 1;
 
-#ifndef POSIX
+#if !defined(POSIX) || defined(USE_ACCESS)
     return access(name, mode);
 #else /* POSIX */
 

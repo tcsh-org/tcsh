@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/config_f.h,v 3.12 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.13 1996/04/26 19:17:30 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -134,6 +134,13 @@
 #else
 # undef SYSMALLOC
 #endif
+
+/*
+ * USE_ACCESS	Use access(2) rather than stat(2) when POSIX is defined.
+ *		POSIX says to use stat, but stat(2) is less accurate
+ *		than access(2) for determining file access.
+ */
+#undef USE_ACCESS
 
 /*
  * REMOTEHOST	Try to determine the remote host that we logged in from

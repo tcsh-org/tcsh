@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.75 1996/06/22 21:45:07 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.76 1996/10/05 17:39:20 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.75 1996/06/22 21:45:07 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.76 1996/10/05 17:39:20 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1691,10 +1691,8 @@ Char *
 dollar(new, old)
     Char   *new, *old;
 {
-    Char    var[MAXVARLEN];
-    Char   *val, *p;
+    Char    *p;
     int     space;
-    int	    i;
 
     for (space = FILSIZ, p = new; *old && space > 0;)
 	if (*old != '$') {
@@ -1702,38 +1700,9 @@ dollar(new, old)
 	    space--;
 	}
 	else {
-	    struct varent *vp;
-
-	    /* found a variable, expand it */
-	    for (i = 0; i < MAXVARLEN; i++) {
-		var[i] = *++old & TRIM;
-		if (!alnum(var[i])) {
-		    var[i] = '\0';
-		    break;
-		}
-	    }
-	    vp = adrof(var);
-	    val = (!vp) ? tgetenv(var) : NULL;
-	    if (vp) {
-		for (i = 0; vp->vec[i] != NULL; i++) {
-		    for (val = vp->vec[i]; space > 0 && *val; space--)
-			*p++ = *val++ | QUOTE;
-		    if (vp->vec[i+1] && space > 0) {
-			*p++ = ' ';	/* | QUOTE ? */
-			space--;
-		    }
-		}
-	    }
-	    else if (val) {
-		for (;space > 0 && *val; space--)
-		    *p++ = *val++ | QUOTE;
-	    }
-	    else {
-		*new = '\0';
-		return (NULL);
-	    }
+	    if (expdollar(&p, &old, &space, QUOTE) == NULL)
+		return NULL;
 	}
-    *p = '\0';
     return (new);
 } /* end dollar */
 
