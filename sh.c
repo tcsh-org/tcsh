@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.49 1993/06/05 21:09:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.50 1993/06/11 20:16:17 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.49 1993/06/05 21:09:15 christos Exp $")
+RCSID("$Id: sh.c,v 3.50 1993/06/11 20:16:17 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -108,7 +108,6 @@ static bool    nverbose = 0;
 static bool    nexececho = 0;
 static bool    quitit = 0;
 static bool    rdirs = 0;
-bool    arun = 0;
 bool    fast = 0;
 static bool    batch = 0;
 static bool    mflag = 0;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.28 1993/05/17 00:11:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.29 1993/06/05 21:09:15 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.28 1993/05/17 00:11:09 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.29 1993/06/05 21:09:15 christos Exp christos $")
 
 #include "patchlevel.h"
 
@@ -443,6 +443,16 @@ gethosttype()
 #  endif
 # endif /* sgi */
 
+# if defined(sysV68)
+#  define _havehosttype_
+    hosttype = "sysV68";
+# endif /* sysV68 */
+
+# if defined(sysV88)
+#  define _havehosttype_
+    hosttype = "sysV88";
+# endif /* sysV88 */
+
 # ifdef uts
 #  define _havehosttype_
     hosttype = "amdahl";
@@ -453,7 +463,7 @@ gethosttype()
     hosttype = "tek4300";
 # endif /* UTek */
 
-# ifdef UTekV
+# ifdef UTekV /* Must appear after sysV88 & m88k or conflicts can occur. */
 #  define _havehosttype_
     hosttype = "tekXD88";
 # endif /* UTekV */
@@ -479,16 +489,6 @@ gethosttype()
    /* B|rje Josefsson <bj@dc.luth.se> */
    hosttype = "nd500";
 # endif /* NDIX */
-
-# if defined(sysV68)
-#  define _havehosttype_
-    hosttype = "sysV68";
-# endif /* sysV68 */
-
-# if defined(sysV88)
-#  define _havehosttype_
-    hosttype = "sysV88";
-# endif /* sysV88 */
 
 # if defined(Lynx)
 #  if defined(i386)

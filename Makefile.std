@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.51 1993/06/05 21:16:14 christos Exp christos $
+# $Id: Makefile.std,v 1.52 1993/06/11 20:53:15 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -152,7 +152,7 @@ LIBES= -ltermcap 		## BSD style things, hpux, pyramid
 #LIBES= -lcurses -lintl -lsocket -lcrypt ## SCO+ODT1.1
 #LIBES= -lposix -ltermcap	## A/UX 2.0
 #LIBES= -lposix -ltermcap -lc_s	## A/UX 3.0
-#LIBES= -ltermcap -lbsd		## DEC osf1 on the alpha and Intel paragon
+#LIBES= -ltermcap -lbsd		## DEC osf1 on the alpha
 #LIBES= -ltermcap -lseq		## Sequent's Dynix
 #LIBES= -lcurses -lsocket	## Intel's hypercube and ns32000 based Opus.
 #LIBES= -ldirent -lcurses       ## att3b1 stk cc w/o shared lib & directory lib
@@ -162,6 +162,7 @@ LIBES= -ltermcap 		## BSD style things, hpux, pyramid
 #LIBES= -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a ## Stardent Vistra
 #LIBES= -ltermcap -lndir -lsocket -ljobs ## masscomp RTU6.0
 #LIBES= -ltermcap -lauth        ## for Ultrix with Enhanced Security
+#LIBES= -ltermcap -lbsd		## Intel Paragon
 
 
 # The difficult choice of a c-compiler...

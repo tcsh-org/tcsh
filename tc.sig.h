@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.sig.h,v 3.14 1992/10/14 20:19:19 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.sig.h,v 3.15 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -47,9 +47,9 @@
 # include <sys/signal.h>
 #endif /* SYSVREL > 0 */
 
-#if defined(SUNOS4) || defined(DGUX) || defined(hp800)
+#if defined(SUNOS4) || defined(DGUX) || defined(hp800) || (SYSVREL > 3 && defined(POSIXSIGS) && defined(VFORK))
 # define SAVESIGVEC
-#endif /* SUNOS4 || DGUX || hp800 */
+#endif /* SUNOS4 || DGUX || hp800 || SVR4 & POSIXSIGS & VFORK */
 
 #if (SYSVREL > 0 && SYSVREL < 3 && !defined(BSDSIGS)) || defined(_MINIX) || defined(COHERENT)
 /*

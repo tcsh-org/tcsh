@@ -672,11 +672,14 @@ OS      :	OSF1 1.2
 CONFIG  :	config.decosf1
 VERSION :	6.03
 
-VENDOR  :	intel
-MODELS  :	Paragon 
-COMPILER:	cc
-CFLAGS  :	Normal
-LIBES   :	-lcurses -lbsd
-OS      :	OSF1 1.?
+VENDOR  :	Intel
+MODELS  :	Paragon
+COMPILER:	icc
+CFLAGS  :	-O2
+LIBES   :	-ltermcap
+OS      :	Paragon OSF/1 Release 1.0.1 Server 1.0 R1.0
 CONFIG  :	config.parosf1
-VERSION :	6.03
+ENVIRON :	n/a
+NOTES   :	I have gotten two different config files that both seem to
+	:	work!
+VERSION : 6.03.00

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.decls.h,v 3.21 1992/10/14 20:19:19 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.decls.h,v 3.22 1993/02/12 17:22:20 christos Exp christos $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -241,7 +241,7 @@ extern	void 		  sigpause	__P((int));
 extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
 # define signal(a, b)	  xsignal(a, b)
 #endif /* NEEDsignal */
-#ifdef _SEQUENT_
+#if defined(_SEQUENT_) || (SYSVREL > 3 && defined(POSIXSIGS))
 extern	sigmask_t	  sigsetmask	__P((sigmask_t));
 extern	sigmask_t	  sigblock	__P((sigmask_t));
 extern	void		  bsd_sigpause	__P((sigmask_t));
