@@ -4400,7 +4400,7 @@ al
 \fBautologout\fR is enabled; default
 .TP 4
 kan
-Kanji is used and the ISO character set is ignored,
+Kanji is used if appropriate according to locale settings,
 unless the \fBnokanji\fR shell variable is set
 .TP 4
 sm
