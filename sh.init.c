@@ -136,6 +136,9 @@ struct	biltins bfunc[] = {
     { "onintr",		doonintr,	0,	2	},
     { "popd",		dopopd,		0,	INF	},
     { "printenv",	doprintenv,	0,	1	},
+#ifdef WINNT
+    { "ps",	dops,	0,	1	},
+#endif /* WINNT */
     { "pushd",		dopushd,	0,	INF	},
     { "rehash",		dohash,		0,	3	},
     { "repeat",		dorepeat,	2,	INF	},
@@ -157,6 +160,9 @@ struct	biltins bfunc[] = {
     { "setxvers",	dosetxvers,	0,	1	},
 #endif /* TCF */
     { "shift",		shift,		0,	1	},
+#ifdef WINNT
+    { "shutdown",	doshutdown,	0,	2	},
+#endif /* WINNT */
     { "source",		dosource,	1,	INF	},
 #ifdef WINNT
     { "start",		dostart,	1,	INF	},

@@ -269,8 +269,15 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		F_COMMAND_NORM	111
     e_dabbrev_expand,
 #define		F_DABBREV_EXPAND	112
+	e_copy_to_clipboard,
+#define		F_COPY_CLIP		113
+	e_paste_from_clipboard,
+#define		F_PASTE_CLIP	114
+	e_dosify_next,
+#define		F_DOSIFY_NEXT	115
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	113
+#define		F_NUM_FNS	116
+
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -1829,6 +1836,19 @@ editinit()
     f->name = "yank";
     f->func = F_YANK_KILL;
     f->desc = CSAVS(3, 114, "Paste cut buffer at cursor position");
+
+    f++;
+    f->name = "e_copy_to_clipboard";
+    f->func = F_COPY_CLIP;
+    f->desc = CSAVS(3, 115, "(win32 only)Copy cut buffer to system clipboard");
+    f++;
+    f->name = "e_paste_from_clipboard";
+    f->func = F_PASTE_CLIP;
+    f->desc = CSAVS(3, 116, "(win32 only)Paste clipboard buffer at cursor position");
+    f++;
+    f->name = "e_dosify_next";
+    f->func = F_DOSIFY_NEXT;
+    f->desc = CSAVS(3, 117, "(win32 only)Convert each '/' in next word to '\\\\'");
 
     f++;
     f->name = NULL;

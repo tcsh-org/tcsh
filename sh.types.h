@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.types.h,v 3.34 1996/04/26 19:20:28 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.types.h,v 3.35 1998/04/08 17:57:31 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -57,6 +57,15 @@
 # ifndef _PID_T
 #  define _PID_T
 # endif /* _PID_T */
+#endif
+
+/***
+ *** MachTen 
+ ***/
+#ifdef __MACHTEN__
+# ifndef _PID_T
+#  define _PID_T
+# endif
 #endif
 
 

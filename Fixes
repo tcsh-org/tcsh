@@ -1,3 +1,7 @@
+ 54. unsigned char vs. char warning fixes (Kaveh)
+ 53. Solaris 64 bit fixes (fix directory offset bug) (Thomas-Martin Kruel)
+ 52. More win32 patches (Amol)
+ 51. autoconf lossage from (Kaveh)
  50. V6.07.06 - 04/08/98
  49. Collation fix for globbing (Andrey A. Chernov)
  48. We might have NLS_CATALOGS and not LC_MESSAGES (Andrey A. Chernov)

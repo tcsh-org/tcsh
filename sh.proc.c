@@ -1646,7 +1646,11 @@ pkill(v, signum)
 	else if (!(Isdigit(*cp) || *cp == '-'))
 	    stderror(ERR_NAME | ERR_JOBARGS);
 	else {
+#ifndef WINNT
 	    pid = atoi(short2str(cp));
+#else
+		pid = strtoul(short2str(cp),NULL,0);
+#endif /* WINNT */
 	    if (kill(pid, signum) < 0) {
 		xprintf("%d: %s\n", pid, strerror(errno));
 		err1++;

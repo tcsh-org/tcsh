@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.71 1998/04/08 13:59:10 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.72 1998/04/08 17:57:33 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -573,7 +573,7 @@ extern void perror();
 #endif
 
 # ifdef BSDSIGS
-#  if defined(_AIX370) || defined(MACH) || defined(NeXT) || defined(_AIXPS2) || defined(ardent) || defined(SUNOS4) || defined(HPBSD)
+#  if defined(_AIX370) || defined(MACH) || defined(NeXT) || defined(_AIXPS2) || defined(ardent) || defined(SUNOS4) || defined(HPBSD) || defined(__MACHTEN__)
 extern int sigvec();
 extern int sigpause();
 #  else	/* !(_AIX370 || MACH || NeXT || _AIXPS2 || ardent || SUNOS4 || HPBSD) */
@@ -621,9 +621,13 @@ extern int strcoll();
 
 # ifdef BSDJOBS
 #  ifdef BSDTIMES
+#   ifdef __MACHTEN__
+extern pid_t wait3();
+#   else
 #   ifndef HPBSD
 extern int wait3();
 #   endif /* HPBSD */
+#   endif /* __MACHTEN__ */
 #  else	/* !BSDTIMES */
 #   if !defined(POSIXJOBS) && !defined(_SEQUENT_)
 extern int wait3();

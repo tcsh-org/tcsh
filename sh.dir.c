@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.43 1997/02/23 19:03:19 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.44 1997/10/27 22:44:25 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.43 1997/02/23 19:03:19 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.44 1997/10/27 22:44:25 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -53,7 +53,7 @@ static  void 			 dextract	__P((struct directory *));
 static  int 			 skipargs	__P((Char ***, char *, char *));
 static	void			 dgetstack	__P((void));
 
-static struct directory dhead;		/* "head" of loop */
+static struct directory dhead INIT_ZERO_STRUCT;		/* "head" of loop */
 static int    printd;			/* force name to be printed */
 
 int     bequiet = 0;		/* do not print dir stack -strike */

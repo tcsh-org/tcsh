@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.71 1998/04/08 13:58:45 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.70 1997/10/28 22:34:24 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.71 1998/04/08 13:58:45 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.70 1997/10/28 22:34:24 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1360,11 +1360,11 @@ dosetenv(v, c)
 	xfree((ptr_t) lp);
 	return;
     }
-    if (eq(vp, STRNTonlystartexes)) {
+    if (eq(vp, STRtcshonlystartexes)) {
 	__nt_only_start_exes = 1;
 	xfree((ptr_t) lp);
 	return;
-    }
+	}
 #endif /* WINNT */
     if (eq(vp, STRKTERM)) {
 	char *t;
@@ -1529,7 +1529,7 @@ dounsetenv(v, c)
 		    nls_dll_unload();
 		    nlsinit();
 		}
-		else if (eq(name,(STRNTonlystartexes))) {
+		else if (eq(name,(STRtcshonlystartexes))) {
 			__nt_only_start_exes = 0;
 		}
 #endif /* WINNT */
@@ -1601,6 +1601,9 @@ Unsetenv(name)
     register Char *cp, *dp;
     Char **oep = ep;
 
+#ifdef WINNT
+	nt_set_env(name,NULL);
+#endif /*WINNT */
     for (; *ep; ep++) {
 	for (cp = name, dp = *ep; *cp && *cp == *dp; cp++, dp++)
 	    continue;

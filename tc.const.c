@@ -259,13 +259,15 @@ Char STRigncase[]	= { 'i', 'g', 'n', 'c', 'a', 's', 'e', '\0' };
 Char STRoldtitle[]	= { 'o', 'l', 'd', 't', 'i', 't', 'l', 'e', '\0' };
 Char STRNTlamepathfix[] = { 'N', 'T', 'l', 'a', 'm', 'e', 'p', 'a', 't', 'h',
 			    'f', 'i','x','\0'};
+#ifdef notdef
 Char STRNTlameargfix[]  = { 'N', 'T', 'l', 'a', 'm', 'e', 'a', 'r', 'g', 'f',
 			    'i', 'x', '\0' };
+#endif
 Char STRtcshlang[]	= { 'T', 'C', 'S', 'H', 'L', 'A', 'N', 'G', '\0' };
 Char STRtcshsubsthb[]	= { 'T', 'C', 'S', 'H', 'S', 'U', 'B', 'S', 'T',
 			    'H', 'B', '\0' };
-Char STRNTonlystartexes[]={ 'N', 'T', 'O', 'N', 'L', 'Y', 'S', 'T', 'A', 'R',
-			    'T', 'E', 'X', 'E', 'S', '\0' };
+Char STRtcshonlystartexes[] = { 'T', 'C', 'S', 'H', 'O', 'N', 'L', 'Y', 'S',
+				'T', 'A', 'R', 'T', 'E', 'X', 'E', 'S', '\0' };
 #endif /* WINNT */
 Char STRautoexpand[]	= { 'a', 'u', 't', 'o', 'e', 'x', 'p', 'a', 'n', 'd',
 			    '\0' };

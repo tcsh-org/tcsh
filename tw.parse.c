@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.81 1998/04/08 13:59:15 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.82 1998/04/08 17:57:45 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.81 1998/04/08 13:59:15 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.82 1998/04/08 17:57:45 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -870,9 +870,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
     struct varent *vp;
     int len, enhanced;
     int cnt = 0;
-#ifdef WINNT
-    int igncase;
-#endif /* WINNT */
+    int igncase = 0;
 
 
     flags = 0;
@@ -973,12 +971,8 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		Strcmp(*(vp->vec), STRigncase) == 0;
 #endif /* WINNT */
 	    enhanced = (vp = adrof(STRcomplete)) != NULL && !Strcmp(*(vp->vec),STRenhance);
-	    if (enhanced
-#ifdef WINNT
-		|| igncase
-#endif /* WINNT */
-	    ) {
-	        if (!is_prefixmatch(target, item, 0)) 
+	    if (enhanced || igncase) {
+	        if (!is_prefixmatch(target, item, igncase)) 
 		    break;
      	    } else {
 	        if (!is_prefix(target, item)) 

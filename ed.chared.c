@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.51 1997/10/27 22:44:19 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.52 1997/10/28 22:34:15 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.51 1997/10/27 22:44:19 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.52 1997/10/28 22:34:15 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -3597,6 +3597,70 @@ v_rsrch_back(c)
 			 F_DOWN_SEARCH_HIST : F_UP_SEARCH_HIST));
 }
 
+#ifndef WINNT
+/* Since ed.defns.h  is generated from ed.defns.c, these empty 
+   functions will keep the F_NUM_FNS consistent
+ */
+CCRETVAL
+e_copy_to_clipboard(c)
+    int c;
+{
+    USE(c);
+    return CC_ERROR;
+}
+
+CCRETVAL
+e_paste_from_clipboard(c)
+    int c;
+{
+    USE(c);
+    return (CC_ERROR);
+}
+
+CCRETVAL
+e_dosify_next(c)
+    int c;
+{
+    USE(c);
+    return (CC_ERROR);
+}
+#else /* WINNT */
+/*ARGSUSED*/
+CCRETVAL
+e_dosify_next(c)
+    int c;
+{
+    register Char *cp, *p, *kp;
+
+    USE(c);
+    if (Cursor == LastChar)
+	return(CC_ERROR);
+    /* else */
+
+	cp = Cursor;
+	while(  cp < LastChar) {
+		if ( (*cp & CHAR == ' ') && (cp[-1] & CHAR != '\\') )
+			break;
+		cp++;
+	}
+
+    for (p = Cursor, kp = KillBuf; p < cp; p++)	{/* save the text */
+	if ( ( *p & CHAR ) == '/') {
+	    *kp++ = '\\';
+	    *kp++ = '\\';
+	}
+	else
+	    *kp++ = *p;
+    }
+    LastKill = kp;
+
+    c_delafter((int)(cp - Cursor));	/* delete after dot */
+    if (Cursor > LastChar)
+	Cursor = LastChar;	/* bounds check */
+    return (e_yank_kill(c));
+}
+#endif /* !WINNT */
+
 #ifdef notdef
 void
 MoveCursor(n)			/* move cursor + right - left char */
@@ -3610,7 +3674,7 @@ MoveCursor(n)			/* move cursor + right - left char */
     return;
 }
 
-Char   *
+Char *
 GetCursor()
 {
     return(Cursor);

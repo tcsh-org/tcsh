@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.19 1997/10/02 16:36:27 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.20 1998/04/08 17:57:19 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.19 1997/10/02 16:36:27 christos Exp $")
+RCSID("$Id: host.defs,v 1.20 1998/04/08 17:57:19 christos Exp $")
 
 endcode	:
 
@@ -795,6 +795,15 @@ vendor	:						: "masscomp"
 hosttype:						: "masscomp"
 ostype	:						: "masscomp"
 enddef	:
+
+newdef	: defined(__MACHTEN__)
+comment	: Machintosh
+vendor	:						: "Tenon"
+hosttype:						: "Macintosh"
+ostype	: 						: "MachTen"
+machtype:						: "Macintosh"
+enddef	:
+
 
 
 newdef	: defined(GOULD_NP1)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.78 1998/04/08 13:58:49 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.77 1997/10/28 22:34:26 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -59,7 +59,6 @@
 # define INIT_ZERO
 # define INIT_ZERO_STRUCT
 #endif /*!WINNT */
-
 /*
  * Sanity
  */
@@ -108,7 +107,7 @@ typedef int sigret_t;
 #ifndef WINNT
 # define ABSOLUTEP(p)	(*(p) == '/')
 #else /* WINNT */
-# define ABSOLUTEP(p)	((p)[0] != '\0' && (p)[1] == ':' && (p)[2] == '/')
+# define ABSOLUTEP(p)	((p)[0] == '/' || ((p)[1] == ':' && (p)[2] == '/'))
 #endif /* WINNT */
 
 /*

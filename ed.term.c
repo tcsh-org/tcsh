@@ -1121,6 +1121,6 @@ int
 tty_cooked_mode(td)
     void *td;
 {
-    return do_nt_check_cooked_mode()
+    return do_nt_check_cooked_mode();
 }
 #endif /* !WINNT */

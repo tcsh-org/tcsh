@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.29 1998/04/08 13:59:11 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.28 1997/10/27 22:44:37 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.29 1998/04/08 13:59:11 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.28 1997/10/27 22:44:37 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -185,9 +185,9 @@ tprintf(what, buf, fmt, siz, str, tim, info)
     Char   *z, *q;
     Char    attributes = 0;
     static int print_prompt_did_ding = 0;
-    const unsigned char   *cz;
+    const char   *cz;
     Char    buff[BUFSIZE];
-    unsigned char    cbuff[BUFSIZE];
+    char    cbuff[BUFSIZE];
 
     Char *p  = buf;
     Char *ep = &p[siz];
@@ -197,8 +197,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			/* prompt stuff */
     static Char *olddir = NULL, *olduser = NULL;
     extern int tlength;	/* cache cleared */
-    size_t sz, pdirs;
-    int updirs;
+    int updirs, pdirs, sz;
 
     for (; *cp; cp++) {
 	if (p >= ep)
@@ -208,9 +207,9 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    switch (*cp) {
 	    case 'R':
 		if (what == FMT_HISTORY)
-		    fmthist('R', info, str = (char *) cbuff, sizeof(cbuff));
+		    fmthist('R', info, str = cbuff, sizeof(cbuff));
 		if (str != NULL)
-		    for (; *str; *p++ = attributes | (unsigned char) *str++)
+		    for (; *str; *p++ = attributes | *str++)
 			if (p >= ep) break;
 		break;
 	    case '#':
@@ -220,13 +219,13 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'h':
 		switch (what) {
 		case FMT_HISTORY:
-		    fmthist('h', info, cbuff, sizeof(cbuff));
+		    fmthist('h', info, (char *) cbuff, sizeof(cbuff));
 		    break;
 		case FMT_SCHED:
-		    (void) xsnprintf(cbuff, sizeof(cbuff), "%d", *(int *)info);
+		    (void) xsnprintf((char *) cbuff, sizeof(cbuff), "%d", *(int *)info);
 		    break;
 		default:
-		    (void) xsnprintf(cbuff, sizeof(cbuff), "%d", eventno + 1);
+		    (void) xsnprintf((char *) cbuff, sizeof(cbuff), "%d", eventno + 1);
 		    break;
 		}
 		for (cz = cbuff; *cz; *p++ = attributes | *cz++)
@@ -306,10 +305,10 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'M':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO)
-		    cz = who_info(info, 'M', cbuff, sizeof(cbuff));
+		    cz = (unsigned char *) who_info(info, 'M', (char *) cbuff, sizeof(cbuff));
 		else 
 #endif /* HAVENOUTMP */
-		    cz = getenv("HOST");
+		    cz = (unsigned char *) getenv("HOST");
 		/*
 		 * Bug pointed out by Laurent Dami <dami@cui.unige.ch>: don't
 		 * derefrence that NULL (if HOST is not set)...
@@ -322,10 +321,10 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'm':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO)
-		    cz = who_info(info, 'm', cbuff, sizeof(cbuff));
+		    cz = (unsigned char *) who_info(info, 'm', (char *) cbuff, sizeof(cbuff));
 		else 
 #endif /* HAVENOUTMP */
-		    cz = getenv("HOST");
+		    cz = (unsigned char *) getenv("HOST");
 
 		if (cz != NULL)
 		    for ( ; *cz && (what == FMT_WHO || *cz != '.')
@@ -364,6 +363,13 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    	*p++ = attributes | *z++;
 		    	*p++ = attributes | *z++;
 		    }
+			if (*z == '/' && z[1] == '/') {
+				*p++ = attributes | *z++;
+				*p++ = attributes | *z++;
+				do {
+					*p++ = attributes | *z++;
+				}while(*z != '/');
+			}
 #endif /* WINNT */
 		    q = z;
 		    while (*z)				/* calc # of /'s */
@@ -419,7 +425,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			    *p++ = attributes | '+';
 			} else
 			    *p++ = attributes | ('0' + updirs);
-			*p++ = attributes | '>';
+			*p++ = attributes | tcsh ? '>' : '%';
 		    }
 		}
 		
@@ -431,7 +437,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'n':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO) {
-		    cz = who_info(info, 'n', cbuff, sizeof(cbuff));
+		    cz = (unsigned char *) who_info(info, 'n', (char *) cbuff, sizeof(cbuff));
 		    for (; cz && *cz ; *p++ = attributes | *cz++)
 			if (p >= ep) break;
 		}
@@ -446,7 +452,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'l':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO) {
-		    cz = who_info(info, 'l', cbuff, sizeof(cbuff));
+		    cz = (unsigned char *) who_info(info, 'l', (char *) cbuff, sizeof(cbuff));
 		    for (; cz && *cz ; *p++ = attributes | *cz++)
 			if (p >= ep) break;
 		}
@@ -459,7 +465,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		}
 		break;
 	    case 'd':
-		for (cz = day_list[t->tm_wday]; *cz; *p++ = attributes | *cz++)
+		for (cz = (unsigned char *) day_list[t->tm_wday]; *cz; *p++ = attributes | *cz++)
 		    if (p >= ep) break;
 		break;
 	    case 'D':
@@ -476,7 +482,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		break;
 	    case 'w':
 		if (p >= ep - 5) break;
-		for (cz = month_list[t->tm_mon]; *cz;)
+		for (cz = (unsigned char *) month_list[t->tm_mon]; *cz;)
 		    *p++ = attributes | *cz++;
 		break;
 	    case 'W':
@@ -561,7 +567,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    default:
 #ifndef HAVENOUTMP
 		if (*cp == 'a' && what == FMT_WHO) {
-		    cz = who_info(info, 'a', cbuff, sizeof(cbuff));
+		    cz = (unsigned char *) who_info(info, 'a', (char *) cbuff, sizeof(cbuff));
 		    for (; cz && *cz; *p++ = attributes | *cz++)
 			if (p >= ep) break;
 		}
@@ -579,9 +585,9 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    *p++ = attributes | parseescape(&cp);
 	else if (*cp == HIST) {	/* EGS: handle '!'s in prompts */
 	    if (what == FMT_HISTORY) 
-		fmthist('h', info, cbuff, sizeof(cbuff));
+		fmthist('h', info, (char *) cbuff, sizeof(cbuff));
 	    else
-		(void) xsnprintf(cbuff, sizeof(cbuff), "%d", eventno + 1);
+		(void) xsnprintf((char *) cbuff, sizeof(cbuff), "%d", eventno + 1);
 	    for (cz = cbuff; *cz; *p++ = attributes | *cz++)
 		if (p >= ep) break;
 	}
