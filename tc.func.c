@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.func.c,v 1.4 91/09/24 18:10:30 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.8 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.7 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.8 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1199,7 +1199,7 @@ gettilde(us)
     tcache[tlength++].hlen = Strlen(hd);
 
     (void) qsort((ptr_t) tcache, (size_t) tlength, sizeof(struct tildecache),
-		 tildecompare);
+		 (int (*) __P((const void *, const void *))) tildecompare);
 
     if (tlength == tsize) {
 	tsize += TILINCR;

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.13 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.14 1991/10/13 23:44:48 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -37,15 +37,17 @@
 #ifndef _h_sh
 #define _h_sh
 
-#ifdef CONFIGH
-# include CONFIGH
-#endif
-
 /* This is separated instead of a #else of above because makedepend is
 easily confused. */
 
 #ifndef CONFIGH
 # include "config.h"
+  /* Hack to make old pre-processors happy... */
+# define CONFIGH "/dev/null"
+#endif
+
+#ifdef CONFIGH
+# include CONFIGH
 #endif
 
 /*
@@ -340,7 +342,7 @@ extern void		DebugFree	__P((ptr_t, char *, int));
  */
 
 #define SIGN_EXTEND_CHAR(a) \
-	((a) & 0x80 ? ((int) (a)) | 0xffffff00 : ((int) a) & 0x000000ff)
+	((int) ((a) & 0x80 ? ((int) (a)) | 0xffffff00 : ((int) a) & 0x000000ff))
 
 
 
@@ -487,7 +489,7 @@ sigret_t (*parterm) ();		/* Parents terminate catch */
 #define		META		0200
 #define		ASCII		0177
 #ifdef SHORT_STRINGS
-# define	QUOTE 		0100000	/* 16nth char bit used for 'ing */
+# define	QUOTE 	((Char)	0100000)/* 16nth char bit used for 'ing */
 # define	TRIM		0077777	/* Mask to strip quote bit */
 # define	UNDER		0040000	/* Underline flag */
 # define	BOLD		0020000	/* Bold flag */
@@ -496,7 +498,7 @@ sigret_t (*parterm) ();		/* Parents terminate catch */
 # define	ATTRIBUTES	0074000	/* The bits used for attributes */
 # define	CHAR		0000377	/* Mask to mask out the character */
 #else
-# define	QUOTE 		0200	/* Eighth char bit used for 'ing */
+# define	QUOTE 	((Char)	0200)	/* Eighth char bit used for 'ing */
 # define	TRIM		0177	/* Mask to strip quote bit */
 # define	UNDER		0000000	/* No extra bits to do both */
 # define	BOLD		0000000	/* Bold flag */
@@ -506,7 +508,7 @@ sigret_t (*parterm) ();		/* Parents terminate catch */
 # define	CHAR		0000177	/* Mask to mask out the character */
 #endif 
 
-int     AsciiOnly;		/* If set only 7 bits is expected in characters */
+int     AsciiOnly;		/* If set only 7 bits expected in characters */
 
 /*
  * Each level of input has a buffered input structure.
