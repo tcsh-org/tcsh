@@ -1,3 +1,4 @@
+  9. Don't go into an infinite loop when tcgetpgrp() returns an error.
   8. Cygwin fixes (Corinna Vinschen)
   7. NLS catclose() bug avoidance (KAJIMOTO Masato)
   6. V6.12.01 - 20030208
