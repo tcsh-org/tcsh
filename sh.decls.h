@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.38 2002/05/16 13:51:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.39 2004/03/21 16:48:14 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -178,7 +178,12 @@ extern	void		  trim		__P((Char **));
 #if defined(FILEC) && defined(TIOCSTI)
 extern	int		  sortscmp	__P((Char **, Char **));
 #endif
+
+#ifdef HAVE_ICONV
+extern	char		 *iconv_catgets	__P((nl_catd, int, int, const char *));
+#endif
 extern	void		  nlsinit	__P((void));
+extern	void	          nlsclose	__P((void));
 extern  int	  	  t_pmatch	__P((Char *, Char *, Char **, int));
 
 /*

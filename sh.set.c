@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.48 2004/03/21 16:48:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.49 2004/05/19 18:51:43 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.48 2004/03/21 16:48:14 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.49 2004/05/19 18:51:43 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -192,7 +192,7 @@ update_vars(vp)
 #endif
 #ifdef NLS_CATALOGS
     else if (eq(vp, STRcatalog)) {
-	(void) catclose(catd);
+	nlsclose();
 	nlsinit();
     }
 #if defined(FILEC) && defined(TIOCSTI)
@@ -779,7 +779,7 @@ unset(v, c)
     update_dspmbyte_vars();
 #endif
 #ifdef NLS_CATALOGS
-    (void) catclose(catd);
+    nlsclose();
     nlsinit();
 #endif /* NLS_CATALOGS */
 }

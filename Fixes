@@ -1,3 +1,4 @@
+ 10. iconv patches (Aleksey Nogin)
   9. cygwin signal fixes; only init 32 signals, don't set bit flag on error;
      breaks SIGHUP. (Corinna Vinschen)
   8. Make sure terminal size change takes effect immediately.

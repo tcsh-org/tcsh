@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.25 2002/11/21 20:02:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.26 2003/03/12 19:14:51 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.25 2002/11/21 20:02:01 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.26 2003/03/12 19:14:51 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -260,7 +260,7 @@ closem()
 
 #ifdef NLS_BUGS
 #ifdef NLS_CATALOGS
-    (void)catclose(catd);
+    nlsclose(catd);
 #endif /* NLS_CATALOGS */
 #endif /* NLS_BUGS */
 #ifdef YPBUGS

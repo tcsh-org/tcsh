@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.110 2004/04/19 11:59:42 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.111 2004/05/13 15:23:39 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.110 2004/04/19 11:59:42 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.111 2004/05/13 15:23:39 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -40,6 +40,11 @@ RCSID("$Id: sh.func.c,v 3.110 2004/04/19 11:59:42 christos Exp $")
 #ifdef WINNT_NATIVE
 #include "nt.const.h"
 #endif /* WINNT_NATIVE */
+
+#ifdef HAVE_ICONV
+#include <langinfo.h>
+static iconv_t catgets_iconv; /* Or (iconv_t)-1 */
+#endif
 
 /*
  * C shell
@@ -1379,16 +1384,16 @@ dosetenv(v, c)
 # ifdef LC_COLLATE
 	(void) setlocale(LC_COLLATE, "");
 # endif
+# ifdef LC_CTYPE
+	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
+# endif /* LC_CTYPE */
 # ifdef NLS_CATALOGS
 #  ifdef LC_MESSAGES
 	(void) setlocale(LC_MESSAGES, "");
 #  endif /* LC_MESSAGES */
-	(void) catclose(catd);
+	nlsclose();
 	nlsinit();
 # endif /* NLS_CATALOGS */
-# ifdef LC_CTYPE
-	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
-# endif /* LC_CTYPE */
 # ifdef SETLOCALEBUG
 	dont_free = 0;
 # endif /* SETLOCALEBUG */
@@ -1412,7 +1417,7 @@ dosetenv(v, c)
 
 #ifdef NLS_CATALOGS
     if (eq(vp, STRNLSPATH)) {
-	(void) catclose(catd);
+	nlsclose();
 	nlsinit();
     }
 #endif
@@ -1571,16 +1576,16 @@ dounsetenv(v, c)
 # ifdef LC_COLLATE
 		    (void) setlocale(LC_COLLATE, "");
 # endif
+# ifdef LC_CTYPE
+	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
+# endif /* LC_CTYPE */
 # ifdef NLS_CATALOGS
 #  ifdef LC_MESSAGES
 		    (void) setlocale(LC_MESSAGES, "");
 #  endif /* LC_MESSAGES */
-		    (void) catclose(catd);
+		    nlsclose();
 		    nlsinit();
 # endif /* NLS_CATALOGS */
-# ifdef LC_CTYPE
-	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
-# endif /* LC_CTYPE */
 # ifdef SETLOCALEBUG
 		    dont_free = 0;
 # endif /* SETLOCALEBUG */
@@ -1613,7 +1618,7 @@ dounsetenv(v, c)
 #endif /* COLOR_LS_F */
 #ifdef NLS_CATALOGS
 		else if (eq(name, STRNLSPATH)) {
-		    (void) catclose(catd);
+		    nlsclose();
 		    nlsinit();
 		}
 #endif
@@ -2435,6 +2440,51 @@ struct command *c;
     flush();
 }
 
+#ifdef HAVE_ICONV
+char *
+iconv_catgets(catd, set_id, msg_id, s)
+nl_catd catd;
+int set_id, msg_id;
+const char *s;
+{
+    static char *buf = NULL;
+    static size_t buf_size = 0;
+  
+    char *orig, *dest, *p;
+    const char *src;
+    size_t src_size, dest_size;
+  
+    orig = catgets(catd, set_id, msg_id, s);
+    if (catgets_iconv == (iconv_t)-1 || orig == s)
+        return orig;
+    src = orig;
+    src_size = strlen(src) + 1;
+    dest = buf;
+    while (src_size != 0) {
+        dest_size = buf + buf_size - dest;
+	if (iconv(catgets_iconv, &src, &src_size, &dest, &dest_size)
+	    == (size_t)-1) {
+	    switch (errno) {
+	    case E2BIG:
+		if (buf == NULL)
+		    p = xmalloc(buf_size = 32);
+		else
+		    p = xrealloc(buf, buf_size *= 2);
+		if (p == NULL)
+		    return orig;
+		dest = p + (dest - buf);
+		buf = p;
+		break;
+		
+	    case EILSEQ: case EINVAL: default:
+		return orig;
+	    }
+	}
+    }
+    return buf;
+}
+#endif
+
 void
 nlsinit()
 {
@@ -2445,6 +2495,11 @@ nlsinit()
         xsnprintf((char *)catalog, sizeof(catalog), "tcsh.%s",
 		  short2str(varval(STRcatalog)));
     catd = catopen(catalog, MCLoadBySet);
+#ifdef HAVE_ICONV
+    /* catgets (), not CGETS, the charset name should be in ASCII anyway. */
+    catgets_iconv = iconv_open (nl_langinfo (CODESET),
+				catgets(catd, 255, 1, "ASCII"));
+#endif /* HAVE_ICONV */
 #endif /* NLS_CATALOGS */
 #ifdef WINNT_NATIVE
     nls_dll_init();
@@ -2454,4 +2509,16 @@ nlsinit()
     dateinit();		/* init the messages for dates */
     editinit();		/* init the editor messages */
     terminit();		/* init the termcap messages */
+}
+
+void
+nlsclose()
+{
+#ifdef HAVE_ICONV
+    if (catgets_iconv != (iconv_t)-1) {
+	iconv_close(catgets_iconv);
+	catgets_iconv = (iconv_t)-1;
+    }
+#endif
+    catclose(catd);
 }
