@@ -1919,13 +1919,14 @@ The shell is eight bit clean
 and thus supports character sets needing this capability.
 NLS support differs depending on whether or not
 the shell was compiled to use the system's NLS (again, see \fBversion\fR).
-In either case, 7-bit ASCII is the default for character classification
-(e.g., which characters are printable) and sorting,
+In either case, 7-bit ASCII is the default character code
+(e.g., the classification of which characters are printable) and sorting,
 and changing the \fBLANG\fR or \fBLC_CTYPE\fR environment variables
 causes a check for possible changes in these respects.
 .PP
 When using the system's NLS, the \fIsetlocale\fR(3) function is called
-to determine appropriate character classification and sorting.
+to determine appropriate character code/classification and sorting
+(e.g., a 'en_CA.UTF-8' would yield "UTF-8" as a character code).
 This function typically examines the \fBLANG\fR and \fBLC_CTYPE\fR
 environment variables; refer to the system documentation for further details.
 When not using the system's NLS, the shell simulates it by assuming that the
@@ -3646,6 +3647,7 @@ but the first element (the current working directory) is always correct.
 See also the \fBcwd\fR and \fBowd\fR shell variables.
 .TP 8
 .B dspmbyte \fR(+)
+Has an affect iff 'dspm' is listed as part of the \fBversion\fR shell variable.
 If set to `euc', it enables display and editing EUC-kanji(Japanese) code.
 If set to `sjis', it enables display and editing Shift-JIS(Japanese) code.
 If set to `big5', it enables display and editing Big5(Chinese) code.
@@ -4437,56 +4439,59 @@ Options which are set by default in the distribution are noted.
 .PP
 .RS +8
 .PD 0
-.TP 4
+.TP 6
 8b
 The shell is eight bit clean; default
-.TP 4
+.TP 6
 7b
 The shell is not eight bit clean
-.TP 4
+.TP 6
+wide
+The shell is multibyte encoding clean (like UTF-8)
+.TP 6
 nls
 The system's NLS is used; default for systems with NLS
-.TP 4
+.TP 6
 lf
 Login shells execute \fI/etc/csh.login\fR before instead of after
 \fI/etc/csh.cshrc\fR and \fI~/.login\fR before instead of after
 \fI~/.tcshrc\fR and \fI~/.history\fR.
-.TP 4
+.TP 6
 dl
 `.' is put last in \fBpath\fR for security; default
-.TP 4
+.TP 6
 nd
 `.' is omitted from \fBpath\fR for security
-.TP 4
+.TP 6
 vi
 \fIvi\fR-style editing is the default rather than \fIemacs\fR
-.TP 4
+.TP 6
 dtr
 Login shells drop DTR when exiting
-.TP 4
+.TP 6
 bye
 \fIbye\fR is a synonym for \fIlogout\fR and \fIlog\fR
 is an alternate name for \fIwatchlog\fR
-.TP 4
+.TP 6
 al
 \fBautologout\fR is enabled; default
-.TP 4
+.TP 6
 kan
 Kanji is used if appropriate according to locale settings,
 unless the \fBnokanji\fR shell variable is set
-.TP 4
+.TP 6
 sm
 The system's \fImalloc\fR(3) is used
-.TP 4
+.TP 6
 hb
 The `#!<program> <args>' convention is emulated when executing shell scripts
-.TP 4
+.TP 6
 ng
 The \fInewgrp\fR builtin is available
-.TP 4
+.TP 6
 rh
 The shell attempts to set the \fBREMOTEHOST\fR environment variable
-.TP 4
+.TP 6
 afs
 The shell verifies your password with the kerberos server if local
 authentication fails.  The \fBafsuser\fR shell variable or the
