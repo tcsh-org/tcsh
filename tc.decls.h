@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.2 1991/07/16 10:45:07 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -145,7 +145,7 @@ extern	int		  vfork		__P((void));
 extern	void		  doinlib	__P((Char **, struct command *));
 extern	void		  dover		__P((Char **, struct command *));
 extern	void		  dorootnode	__P((Char **, struct command *));
-extern	int		  getv		__P((Char **, struct command *));
+extern	int		  getv		__P((Char *));
 #endif
 
 
