@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.27 1992/11/13 04:19:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.28 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.27 1992/11/13 04:19:10 christos Exp christos $")
+RCSID("$Id: sh.lex.c,v 3.28 1993/01/08 22:23:12 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1667,6 +1667,16 @@ again:
 		     * I have not been able to pin it down!
 		     */
 		    if (buf >= fblocks || off > BUFSIZE) {
+#ifdef I_DEBUG
+			xprintf("buf %lx, fblocks %lx, off %lx, BUFSIZE %lx\n",
+				buf, fblocks, off, BUFSIZE);
+			xprintf("Dumping core...");
+			flush();
+			if (fork() == 0)
+			    (void) kill(0, SIGQUIT);
+			xprintf("ok.\n");
+			flush();
+#endif
 			/* start with fresh buffer */
 			feobp = fseekp = fblocks * BUFSIZE;
 			numleft = c;
