@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.term.h,v 1.13 1996/09/24 16:57:20 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.term.h,v 1.14 2002/03/08 17:36:45 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -450,9 +450,10 @@
 /*
  * fix for hpux10 inconsistency: it has VWERASE, but TIOCSLTC returns
  * EINVAL if one tries to change it
+ * Also for RH6.2 on the alpha, defined TIOCGLTC, but does not have
+ * struct ltchars
  */
-#if defined(hpux) && defined(VSUSP) && defined(VDSUSP) && defined(VWERASE) && d
-efined(VLNEXT)
+#if (defined(hpux) || defined(__linux__)) && defined(VSUSP) && defined(VDSUSP) && defined(VWERASE) && defined(VLNEXT)
 # undef TIOCGLTC       /* not really needed */
 # undef TIOCSLTC
 #endif
