@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.22 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.23 1992/07/06 15:26:18 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.22 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.23 1992/07/06 15:26:18 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -593,7 +593,7 @@ GetNextChar(cp)
 	return 0;		/* oops: SHIN was closed */
 
     while ((num_read = read(SHIN, (char *) &tcp, 1)) == -1) 
-	if (!tried && fixio(SHIN, errno) == 0)
+	if (!tried && fixio(SHIN, errno) != -1)
 	    tried = 1;
 	else {
 	    *cp = '\0';

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.21 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.22 1992/07/06 15:26:18 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.21 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.22 1992/07/06 15:26:18 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1644,7 +1644,8 @@ again:
 	    }
 	    if (c >= 0)
 		break;
-	    c = fixio(SHIN, errno);
+	    if ((c = fixio(SHIN, errno)) == -1)
+		break;
 	}
 	if (c <= 0)
 	    return (-1);
