@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.53 2004/08/04 17:12:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.54 2004/09/28 15:08:27 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,10 +32,14 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.53 2004/08/04 17:12:30 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.54 2004/09/28 15:08:27 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
+
+#ifdef HAVE_NL_LANGINFO
+#include <langinfo.h>
+#endif
 
 extern bool GotTermCaps;
 int numeof = 0;
@@ -1258,7 +1262,29 @@ autoset_dspmbyte(pcp)
 	{ STRSTARKUTF8, STRutf8 },
 	{ NULL, NULL }
     };
+#ifdef HAVE_NL_LANGINFO
+    struct dspm_autoset_Table dspmc[] = {
+	{ STRSTARKUTF8, STRKUTF8 },
+	{ STRKEUC, STRKEUC },
+	{ STRGB2312, STRKEUC },
+	{ STRKBIG5, STRKBIG5 },
+	{ NULL, NULL }
+    };
+    Char *codeset;
 
+    codeset = str2short(nl_langinfo(CODESET));
+    if (*codeset != '\0') {
+	for (i = 0; dspmc[i].n; i++) {
+	    Char *estr;
+	    if (dspmc[i].n[0] && t_pmatch(pcp, dspmc[i].n, &estr, 0) > 0) {
+		set(CHECK_MBYTEVAR, Strsave(dspmc[i].v), VAR_READWRITE);
+		update_dspmbyte_vars();
+		return;
+	    }
+	}
+    }
+#endif
+    
     if (*pcp == '\0')
 	return;
 
