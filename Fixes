@@ -1,3 +1,5 @@
+ 30. Add kill -s (Mark Peek)
+ 29. Don't recognize all mips as dec (Bjorn Knutsson)
  28. Fix GLOB_QUOTE problem (noted by Per) I introduced in 6.10.01.
  27. Port to concurrent's powermaxos (Matt Majka)
  26. New builtin srcfile (Amol)
