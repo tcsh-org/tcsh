@@ -1,4 +1,4 @@
-$ $Id: set1,v 1.2 1995/03/23 11:00:10 vansteen Exp $
+$ $Id: set1,v 1.1 1995/04/25 14:04:35 christos Exp $
 $ Messages d 'erreur
 $set 1 
 1 Erreur de syntaxe
@@ -126,9 +126,9 @@ $set 1
 123 !# Boucle dans l'historique
 124 Mauvaise recherche de fichier
 125 Dépassement de capacité de sélecteur
-126 Option inconnue: `-%s'\nSyntaxe: tcsh [ -bcdefilmnqstvVxX -Dnom[=valeur] ] [ argument ... ]
-127 Option inconnue: `-%s'\nSyntaxe: tcsh [ -bcdefFilmnqstvVxX ] [ argument ... ]
-128 Option inconnue: `-%s'\nSyntaxe: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]
+126 Option inconnue: `-%s'\nSyntaxe: %s [ -bcdefilmnqstvVxX -Dnom[=valeur] ] [ argument ... ]
+127 Option inconnue: `-%s'\nSyntaxe: %s [ -bcdefFilmnqstvVxX ] [ argument ... ]
+128 Option inconnue: `-%s'\nSyntaxe: %s [ -bcdefilmnqstvVxX ] [ argument ... ]
 129 \nComplément incorrect: "%s"
 130 \n%s incorrect: '%c'
 131 \nIl manque le séparateur '%c' après %s "%s"

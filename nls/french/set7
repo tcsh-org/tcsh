@@ -1,4 +1,4 @@
-$ $Id: set7,v 1.2 1995/03/19 18:07:15 vansteen Exp $
+$ $Id: set7,v 1.1 1995/04/25 14:04:35 christos Exp $
 $ ed.screen.c
 $set 7
 1 \n\tTcsh a déterminé que votre terminal a les\n
@@ -20,10 +20,10 @@ $set 7
 17 DeleteChars: num est ridicule: %d\r\n
 18 ERREUR: ne peut insérer\r\n
 19 StartInsert: num est ridicule: %d\r\n
-20 tcsh: Ne peut ouvrir /etc/termcap.\n
-21 tcsh: Pas d'entrée pour le type de terminal "%s"\n
-22 tcsh: utilise la configuration d'un terminal banal.\n
-23 tcsh: ATTENTION: Votre terminal ne peut effectuer de déplacement vers le haut.\n
+20 %s: Ne peut ouvrir /etc/termcap.\n
+21 %s: Pas d'entrée pour le type de terminal "%s"\n
+22 %s: utilise la configuration d'un terminal banal.\n
+23 %s: ATTENTION: Votre terminal ne peut effectuer de déplacement vers le haut.\n
 24 L'édition peut être incorrecte pour les longues lignes.\n
 25 pas de capacité d'effacement jusqu'à fin de ligne.\n
 26 pas de capacité d'effacement de caractère.\n

@@ -1,9 +1,9 @@
-$ $Id: set16,v 1.2 1995/03/19 18:07:15 vansteen Exp $
+$ $Id: set16,v 1.1 1995/04/25 14:04:35 christos Exp $
 $ sh.lex.c
 $set 16 
 1 Réinitialise le groupe de processus des terminaux de %d à %d\n
 2 \nUtilisez "logout" pour vous déconnecter.\n
-3 \nUtilisez "exit" pour quitter tcsh.\n
+3 \nUtilisez "exit" pour quitter %s.\n
 4 seek to eval %x %x\n
 5 seek to alias %x %x\n
 6 seek to file %x\n

@@ -1,4 +1,4 @@
-$ $Id: set23,v 1.2 1995/03/19 18:07:15 vansteen Exp $
+$ $Id: set23,v 1.1 1995/04/25 14:04:35 christos Exp $
 $ tc.os.c
 $set 23 
 1 Mauvais nom de cpu/site
@@ -24,8 +24,11 @@ $set 23
 21 getwd: Erreur en lecture dans ".." (%s)
 22 getwd: Ne peut revenir à "." (%s)
 23 getwd: Ne peut effectuer stat "/" (%s)
-24 getwd: Ne peut effectuer stat sur répertoire "%s" (%s)
-25 getwd: Ne peut ouvrir le répertoire "%s" (%s)
-26 getwd: Ne peut trouver "." dans ".." (%s)
-27 Type de système incorrect
-28 Le type de système n'est pas défini
+24 getwd: Ne peut effectuer stat "." (%s)
+25 getwd: Ne peut effectuer stat sur répertoire "%s" (%s)
+26 getwd: Ne peut ouvrir le répertoire "%s" (%s)
+27 getwd: Ne peut trouver "." dans ".." (%s)
+28 Type de système incorrect
+29 Le type de système n'est pas défini
+30 XXX: Too many arguments 
+31 XXX: Invalid argument
