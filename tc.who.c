@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.8 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.9 1991/11/17 06:00:36 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.8 1991/11/17 05:39:06 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.9 1991/11/17 06:00:36 christos Exp $")
 
 #include "tc.h"
 
@@ -155,7 +155,7 @@ resetwatch()
 void
 watch_login()
 {
-    int     utmpfd, comp, alldone;
+    int     utmpfd, comp = -1, alldone;
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif				/* BSDSIGS */
