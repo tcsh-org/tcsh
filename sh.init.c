@@ -1,0 +1,565 @@
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.20/RCS/sh.init.c,v 1.7 1991/02/22 09:04:03 christos Exp $ */
+/*
+ * sh.init.c: Function and signal tables
+ */
+/*
+ * Copyright (c) 1980 Regents of the University of California.
+ * All rights reserved.  The Berkeley Software License Agreement
+ * specifies the terms and conditions for redistribution.
+ */
+
+#include "config.h"
+
+#ifdef notdef
+static char *sccsid = "@(#)sh.init.c	5.2 (Berkeley) 6/6/85";
+#endif
+#ifndef lint
+static char *rcsid = "$Id: sh.init.c,v 1.7 1991/02/22 09:04:03 christos Exp $";
+#endif 
+
+#include "sh.h"
+#include "sh.local.h"
+
+/*
+ * C shell
+ */
+
+#define	INF	1000
+
+struct	biltins bfunc[] = {
+		"@",		dolet,		0,	INF,
+		"alias",	doalias,	0,	INF,
+		"aliases",	doaliases,	0,	1, /* PWP */
+		"alloc",	showall,	0,	1,
+		"bg",		dobg,		0,	INF,
+		"bind",		dobind,		0,	2,
+		"bindkey",	dobindkey,	0,	8,
+		"break",	dobreak,	0,	0,
+		"breaksw",	doswbrk,	0,	0,
+#if defined(IIASA) || defined(KAI)
+		"bye",		goodbye,	0,	0,
+#endif
+		"case",		dozip,		0,	1,
+		"cd",		dochngd,	0,	INF,
+		"chdir",	dochngd,	0,	INF,
+		"continue",	docontin,	0,	0,
+		"default",	dozip,		0,	0,
+		"dirs",		dodirs,		0,	INF,
+		"echo",		doecho,		0,	INF,
+		"echotc",	doechotc,	0,	INF,
+		"else",		doelse,		0,	INF,
+		"end",		doend,		0,	0,
+		"endif",	dozip,		0,	0,
+		"endsw",	dozip,		0,	0,
+		"eval",		doeval,		0,	INF,
+		"exec",		execash,	1,	INF,
+		"exit",		doexit,		0,	INF,
+		"fg",		dofg,		0,	INF,
+		"foreach",	doforeach,	3,	INF,
+#ifdef TCF
+		"getspath", 	dogetspath,	0,	0,
+		"getxvers", 	dogetxvers,	0,	0,
+#endif /* TCF */
+#ifdef IIASA
+		"gd",		dopushd,	0,	INF,
+#endif
+		"glob",		doglob,		0,	INF,
+		"goto",		dogoto,		1,	1,
+#ifdef VFORK
+		"hashstat",	hashstat,	0,	0,
+#endif
+		"history",	dohist,		0,	2,
+		"if",		doif,		1,	INF,
+		"jobs",		dojobs,		0,	1,
+		"kill",		dokill,		1,	INF,
+		"limit",	dolimit,	0,	3,
+		"linedit",	doecho,		0,	INF,
+#ifndef KAI
+		"log",		dolog,		0,	0,
+#endif
+		"login",	dologin,	0,	1,
+		"logout",	dologout,	0,	0,
+		"ls-F",		dolist,		0,	INF,
+#ifdef TCF
+		"migrate",	domigrate,	1,	INF,
+#endif /* TCF */
+#ifdef NEWGRP
+		"newgrp",	donewgrp,	1,	1,
+#endif
+		"nice",		donice,		0,	INF,
+		"nohup",	donohup,	0,	INF,
+		"notify",	donotify,	0,	INF,
+		"onintr",	doonintr,	0,	2,
+		"popd",		dopopd,		0,	INF,
+		"pushd",	dopushd,	0,	INF,
+#ifdef IIASA
+		"rd",		dopopd,		0,	INF,
+#endif
+		"rehash",	dohash,		0,	0,
+		"repeat",	dorepeat,	2,	INF,
+		"sched",	dosched,	0,	INF,
+		"set",		doset,		0,	INF,
+		"setenv",	dosetenv,	0,	2,
+#ifdef MACH
+		"setpath",	dosetpath,	0,	INF,
+#endif	/* MACH */
+#ifdef TCF
+		"setspath",	dosetspath,	1,	INF,
+#endif /* TCF */
+		"settc",	dosettc,	2,	2,
+#ifdef TCF
+		"setxvers",	dosetxvers,	0,	1,
+#endif /* TCF */
+		"shift",	shift,		0,	1,
+		"source",	dosource,	1,	2,
+		"stop",		dostop,		1,	INF,
+		"suspend",	dosuspend,	0,	0,
+		"switch",	doswitch,	1,	INF,
+		"telltc",	dotelltc,	0,	INF,
+		"time",		dotime,		0,	INF,
+		"umask",	doumask,	0,	1,
+		"unalias",	unalias,	1,	INF,
+		"unhash",	dounhash,	0,	0,
+#ifdef masscomp
+		"universe",	douniverse,	0,	1,
+#endif
+		"unlimit",	dounlimit,	0,	INF,
+		"unset",	unset,		1,	INF,
+		"unsetenv",	dounsetenv,	1,	INF,
+		"wait",		dowait,		0,	0,
+#ifdef WARP
+		"warp",		dowarp,		0,	2,
+#endif
+#ifdef KAI
+		"watchlog",	dolog,		0,	0,
+#endif
+		"which",	dowhich,	1,	INF,
+		"while",	dowhile,	1,	INF,
+};
+int nbfunc = sizeof bfunc / sizeof *bfunc;
+
+struct srch srchn[] = {
+		"@",		T_LET,
+		"break",	T_BREAK,
+		"breaksw",	T_BRKSW,
+		"case",		T_CASE,
+		"default", 	T_DEFAULT,
+		"else",		T_ELSE,
+		"end",		T_END,
+		"endif",	T_ENDIF,
+		"endsw",	T_ENDSW,
+		"exit",		T_EXIT,
+		"foreach", 	T_FOREACH,
+		"goto",		T_GOTO,
+		"if",		T_IF,
+		"label",	T_LABEL,
+		"set",		T_SET,
+		"switch",	T_SWITCH,
+		"while",	T_WHILE,
+};
+int nsrchn = sizeof srchn / sizeof *srchn;
+
+/*
+ * Note: For some machines, (hpux eg.)
+ * NSIG = number of signals + 1...
+ * so we define 33 signals for 
+ * everybody
+ */
+struct	mesg mesg[] = {
+/*  0 */	0,		"",
+/*  1 */	"HUP",		"Hangup",
+/*  2 */	"INT",		"Interrupt",	
+/*  3 */	"QUIT",		"Quit",
+/*  4 */	"ILL",		"Illegal instruction",
+/*  5 */	"TRAP",		"Trace/BPT trap",
+/*  6 */	"IOT",		"IOT trap",
+#ifdef aiws
+/*  7 */	"DANGER", 	"System Crash Imminent",
+#else /* aiws */
+/*  7 */	"EMT",		"EMT trap",
+#endif /* aiws */
+/*  8 */	"FPE",		"Floating exception",
+/*  9 */	"KILL",		"Killed",
+/* 10 */	"BUS",		"Bus error",
+/* 11 */	"SEGV",		"Segmentation fault",
+/* 12 */	"SYS",		"Bad system call",
+/* 13 */	"PIPE",		"Broken pipe",
+/* 14 */	"ALRM",		"Alarm clock",
+/* 15 */	"TERM",		"Terminated",
+
+#if (SVID > 0) || defined(DGUX) || defined(IBMAIX)
+
+# ifdef _sigextra_
+#  undef  _sigextra_
+# endif /* _sigextra_ */
+
+#ifndef IBMAIX
+/* these are the real svid signals */
+/* 16 */	"USR1",		"User signal 1",
+/* 17 */	"USR2", 	"User signal 2",
+/* 18 */	"CHLD",		"Child exited",
+/* 19 */	"PWR",  	"Power failure",
+#endif /* IBMAIX */
+
+# ifdef OREO
+#  define _sigextra_
+#  ifdef SUSPENDED
+/* 20 */	"TSTP",		"Suspended",
+/* 21 */	"TTIN", 	"Suspended (tty input)",
+/* 22 */	"TTOU", 	"Suspended (tty output)",
+/* 23 */	"STOP",		"Suspended (signal)",
+#  else
+/* 20 */	"TSTP",		"Stopped",
+/* 21 */	"TTIN", 	"Stopped (tty input)",
+/* 22 */	"TTOU", 	"Stopped (tty output)",
+/* 23 */	"STOP",		"Stopped (signal)",
+#  endif /* SUSPENDED */
+/* 24 */	"XCPU",		"Cputime limit exceeded",
+/* 25 */	"XFSZ", 	"Filesize limit exceeded",
+/* 26 */	"VTALRM", 	"Virtual time alarm",
+/* 27 */	"PROF", 	"Profiling time alarm",
+/* 28 */	"WINCH", 	"Window changed",
+/* 29 */	"CONT",		"Continued",
+/* 30 */	0,		"Signal 30",
+/* 31 */	0,		"Signal 31",
+/* 32 */	0,		"Signal 32",
+# endif /* OREO */
+
+# ifdef hpux
+#  define _sigextra_
+/* 20 */	"VTALRM", 	"Virtual time alarm",
+/* 21 */	"PROF", 	"Profiling time alarm",
+/* 22 */	"IO", 		"Asynchronous I/O (select)",
+/* 23 */	"WINDOW", 	"Window changed",
+#  ifdef SUSPENDED
+/* 24 */	"STOP",		"Suspended (signal)",
+/* 25 */	"TSTP",		"Suspended",
+#  else /* SUSPENDED */
+/* 24 */	"STOP",		"Stopped (signal)",
+/* 25 */	"TSTP",		"Stopped",
+#  endif /* SUSPENDED */
+/* 26 */	"CONT",		"Continued",
+#  ifdef SUSPENDED
+/* 27 */	"TTIN", 	"Suspended (tty input)",
+/* 28 */	"TTOU", 	"Suspended (tty output)",
+#  else /* SUSPENDED */
+/* 27 */	"TTIN", 	"Stopped (tty input)",
+/* 28 */	"TTOU", 	"Stopped (tty output)",
+#  endif /* SUSPENDED */
+/* 29 */	"URG",		"Urgent condition on IO channel",
+/* 30 */	"LOST",		"Remote lock lost (NFS)",
+/* 31 */	0, 		"Reserved", /* Reserved */
+/* 32 */	"DIL",		"DIL signal",
+# endif /* hpux */
+
+# if defined(ISC) && defined(POSIX)
+#  define _sigextra_
+/* 20 */	"WINCH", 	"Window change",
+/* 21 */	0, 		"Unused", /* SIGPHONE used only for UNIXPC */
+/* 22 */	"POLL", 	"Pollable event occured",
+/* 23 */	"CONT", 	"Continued",
+#  ifdef SUSPENDED
+/* 24 */	"STOP",		"Suspended (signal)",
+/* 25 */	"TSTP",		"Suspended",
+/* 26 */	"TTIN", 	"Suspended (tty input)",
+/* 27 */	"TTOU", 	"Suspended (tty output)",
+#  else /* SUSPENDED */
+/* 24 */	"STOP",		"Stopped (signal)",
+/* 25 */	"TSTP",		"Stopped",
+/* 26 */	"TTIN", 	"Stopped (tty input)",
+/* 27 */	"TTOU", 	"Stopped (tty output)",
+#  endif /* SUSPENDED */
+/* 28 */	0,	  	"number of signals",
+/* 29 */	0,		"Reserved", /* Reserved */
+/* 30 */	0,		"Reserved", /* Reserved */
+/* 31 */	0, 		"Reserved", /* Reserved */
+/* 32 */	0,		"Maximum number of signals",
+# endif /* ISC && POSIX */
+
+# ifdef IRIS4D
+#  define _sigextra_
+#  ifdef SUSPENDED
+/* 20 */	"STOP",		"Suspended (signal)",
+/* 21 */	"TSTP",		"Suspended",
+#  else /* SUSPENDED */
+/* 20 */	"STOP",		"Stopped (signal)",
+/* 21 */	"TSTP",		"Stopped",
+#  endif /* SUSPENDED */
+/* 22 */	"POLL", 	"Stream I/O pending",
+/* 23 */	"IO", 		"Asynchronous I/O (select)",
+/* 24 */	"URG",		"Urgent condition on IO channel",
+/* 25 */	"WINCH", 	"Window changed",
+/* 26 */	"VTALRM", 	"Virtual time alarm",
+/* 27 */	"PROF", 	"Profiling time alarm",
+/* 28 */	"CONT",		"Continued",
+#  ifdef SUSPENDED
+/* 29 */	"TTIN", 	"Suspended (tty input)",
+/* 30 */	"TTOU", 	"Suspended (tty output)",
+#  else /* SUSPENDED */
+/* 29 */	"TTIN", 	"Stopped (tty input)",
+/* 30 */	"TTOU", 	"Stopped (tty output)",
+#  endif /* SUSPENDED */
+/* 31 */	0,		"Signal 31",
+/* 32 */	0,		"Signal 32",
+# endif /* IRIS4D */
+
+# ifdef aiws
+#  define _sigextra_
+/* 20 */	0,		"Signal 20",
+/* 21 */	0,		"Signal 21",
+/* 22 */	0,		"Signal 22"
+/* 23 */	"AIO", 		"LAN Asyncronous I/O",
+/* 24 */	"PTY", 		"PTY read/write availability",
+/* 25 */	"IOINT", 	"I/O intervention required",
+/* 26 */	"GRANT", 	"monitor mode granted",
+/* 27 */	"RETRACT", 	"monitor mode retracted",
+/* 28 */	"WINCH","Window size changed",
+/* 29 */	0,		"Signal 29",
+/* 30 */	"SOUND", 	"sound completed",
+/* 31 */	"MSG", 		"input hft data pending",
+/* 32 */	0,		"Signal 32",
+# endif /* aiws */
+
+# ifdef m88k				/* ICON/UXV 4.10 (mday@iconsys.UUCP) */
+#  define _sigextra_
+/* 20 */	"WINCH", 	"Window changed",
+# ifdef DGUX
+/* 21 */	0,		"Signal 21",
+# else
+#  ifdef SUSPENDED
+/* 21 */	"TTIN", 	"Suspended (tty input)",
+#  else /* SUSPENDED */
+/* 21 */	"TTIN", 	"Stopped (tty input)",
+#  endif /* SUSPENDED */
+# endif /* DGUX */
+/* 22 */	"POLL", 	"Stream I/O pending",
+# ifdef SUSPENDED
+/* 23 */	"STOP",		"Suspended (signal)",
+/* 24 */	"TSTP",		"Suspended",
+# else /* SUSPENDED */
+/* 23 */	"STOP",		"Stopped (signal)",
+/* 24 */	"TSTP",		"Stopped",
+# endif /* SUSPENDED */
+/* 25 */	"CONT",		"Continued",
+# ifdef SUSPENDED
+/* 26 */	"TTIN", 	"Suspended (tty input)",
+/* 27 */	"TTOU", 	"Suspended (tty output)",
+# else /* SUSPENDED */
+/* 26 */	"TTIN", 	"Stopped (tty input)",
+/* 27 */	"TTOU", 	"Stopped (tty output)",
+# endif /* SUSPENDED */
+/* 28 */	0,		"Signal 28",
+/* 29 */	0,		"Signal 29",
+/* 30 */	0,		"Signal 30",
+/* 31 */	0,		"Signal 31",
+/* 32 */	0,		"Signal 32",
+/* 33 */	"URG",		"Urgent condition on IO channel",
+/* 34 */	"IO", 		"Asynchronous I/O (select)",
+/* 35 */	"XCPU",		"Cputime limit exceeded",
+/* 36 */	"XFSZ", 	"Filesize limit exceeded",
+/* 37 */	"VTALRM", 	"Virtual time alarm",
+/* 38 */	"PROF",		"Profiling time alarm",
+/* 39 */	0,		"Signal 39",
+/* 40 */	"LOST",		"Resource lost",
+/* 41 */	0,		"Signal 41",
+/* 42 */	0,		"Signal 42",
+/* 43 */	0,		"Signal 43",
+/* 44 */	0,		"Signal 44",
+/* 45 */	0,		"Signal 45",
+/* 46 */	0,		"Signal 46",
+/* 47 */	0,		"Signal 47",
+/* 48 */	0,		"Signal 48",
+/* 49 */	0,		"Signal 49",
+/* 50 */	0,		"Signal 50",
+/* 51 */	0,		"Signal 51",
+/* 52 */	0,		"Signal 52",
+/* 53 */	0,		"Signal 53",
+/* 54 */	0,		"Signal 54",
+/* 55 */	0,		"Signal 55",
+/* 56 */	0,		"Signal 56",
+/* 57 */	0,		"Signal 57",
+/* 58 */	0,		"Signal 58",
+/* 59 */	0,		"Signal 59",
+/* 60 */	0,		"Signal 60",
+/* 61 */	0,		"Signal 61",
+/* 62 */	0,		"Signal 62",
+/* 63 */	0,		"Signal 63",
+/* 64 */	0,		"Signal 64",
+# endif /* m88k */
+
+
+#ifdef IBMAIX
+# define _sigextra_
+
+/* 16 */	"URG",		"Urgent condition on IO channel",
+# ifdef SUSPENDED
+/* 17 */	"STOP",		"Suspended (signal)",
+/* 18 */	"TSTP",		"Suspended",
+# else /* SUSPENDED */
+/* 17 */	"STOP",		"Stopped (signal)",
+/* 18 */	"TSTP",		"Stopped",
+# endif /* SUSPENDED */
+/* 19 */	"CONT",		"Continued",
+/* 20 */	"CHLD",		"Child exited",
+# ifdef SUSPENDED
+/* 21 */	"TTIN", 	"Suspended (tty input)",
+/* 22 */	"TTOU", 	"Suspended (tty output)",
+# else /* SUSPENDED */
+/* 21 */	"TTIN", 	"Stopped (tty input)",
+/* 22 */	"TTOU", 	"Stopped (tty output)",
+# endif /* SUSPENDED */
+/* 23 */	"IO",   	"IO possible interrupt",
+/* 24 */	"XCPU",		"Cputime limit exceeded",
+/* 25 */	"XFSZ", 	"Filesize limit exceeded",
+/* 26 */	0,		"Signal 26",
+/* 27 */	"MSG", 		"Data in HFT ring buffer",
+/* 28 */	"WINCH",	"Window size changed",
+/* 29 */	"PWR",		"Power failure",
+/* 30 */	"USR1",		"User signal 1",
+/* 31 */	"USR2", 	"User signal 2",
+/* 32 */	"PROF",		"Profiling time alarm",
+/* 33 */	"DANGER", 	"System Crash Imminent",
+/* 34 */	"VTALRM", 	"Virtual time alarm",
+/* 35 */	"MIGRATE",	"Migrate process",
+/* 36 */	"PRE",	  	"Programming exception",
+/* 37 */	0,		"Signal 37",
+/* 38 */	0,		"Signal 38",
+/* 39 */	0,		"Signal 39",
+/* 40 */	0,		"Signal 40",
+/* 41 */	0,		"Signal 41",
+/* 42 */	0,		"Signal 42",
+/* 43 */	0,		"Signal 43",
+/* 44 */	0,		"Signal 44",
+/* 45 */	0,		"Signal 45",
+/* 46 */	0,		"Signal 46",
+/* 47 */	0,		"Signal 47",
+/* 48 */	0,		"Signal 48",
+/* 49 */	0,		"Signal 49",
+/* 50 */	0,		"Signal 50",
+/* 51 */	0,		"Signal 51",
+/* 52 */	0,		"Signal 52",
+/* 53 */	0,		"Signal 53",
+/* 54 */	0,		"Signal 54",
+/* 55 */	0,		"Signal 55",
+/* 56 */	0,		"Signal 56",
+/* 57 */	0,		"Signal 57",
+/* 58 */	0,		"Signal 58",
+/* 59 */	0,		"Signal 59",
+/* 60 */	"GRANT", 	"HFT monitor mode granted",
+/* 61 */	"RETRACT", 	"HFT monitor mode should be relinguished",
+/* 62 */	"SOUND",	"HFT sound control has completed",
+#ifdef SIGSAK
+/* 63 */	"SAK",    	"Secure attention key",
+#else
+/* 63 */	0,	    	"Signal 63",
+#endif
+/* 64 */	0,		"Signal 64",
+#endif /* IBMAIX */
+
+# ifdef _SEQUENT_
+#  define _sigextra_
+/* 20 */	"WINCH", 	"Window changed",
+/* 21 */	0,		"Signal 21",
+/* 22 */	"POLL", 	"Stream I/O pending",
+#  ifdef SUSPENDED
+/* 23 */	"STOP",		"Suspended (signal)",
+/* 24 */	"TSTP",		"Suspended",
+/* 25 */	"CONT",		"Continued",
+/* 26 */	"TTIN", 	"Suspended (tty input)",
+/* 27 */	"TTOU", 	"Suspended (tty output)",
+#  else /* SUSPENDED */
+/* 23 */	"STOP",		"Stopped (signal)",
+/* 24 */	"TSTP",		"Stopped",
+/* 25 */	"CONT",		"Continued",
+/* 26 */	"TTIN", 	"Stopped (tty input)",
+/* 27 */	"TTOU", 	"Stopped (tty output)",
+#  endif /* SUSPENDED */
+/* 28 */	0, 		"Signal 28",
+/* 29 */	0,		"Signal 29",
+/* 30 */	0, 		"Signal 30",
+/* 31 */	0, 		"Signal 31",
+/* 32 */	0,		"Signal 32",
+# endif /* _SEQUENT_ */
+
+# ifndef _sigextra_
+/* 20 */	0,		"Signal 20",
+/* 21 */	0,		"Signal 21",
+/* 22 */	0,		"Signal 22",
+/* 23 */	0,		"Signal 23",
+/* 24 */	0,		"Signal 24",
+/* 25 */	0,		"Signal 25",
+/* 26 */	0,		"Signal 26",
+/* 27 */	0,		"Signal 27",
+/* 28 */	0,		"Signal 28",
+/* 29 */	0,		"Signal 29",
+/* 30 */	0,		"Signal 30",
+/* 31 */	0,		"Signal 31",
+/* 32 */	0,		"Signal 32",
+# endif /* _sigextra_ */
+
+
+#else /* bsd */
+
+# ifdef _sigextra_
+#  undef  _sigextra_
+# endif /* _sigextra_ */
+
+/* 16 */	"URG",		"Urgent condition on IO channel",
+# ifdef SUSPENDED
+/* 17 */	"STOP",		"Suspended (signal)",
+/* 18 */	"TSTP",		"Suspended",
+# else /* SUSPENDED */
+/* 17 */	"STOP",		"Stopped (signal)",
+/* 18 */	"TSTP",		"Stopped",
+# endif /* SUSPENDED */
+/* 19 */	"CONT",		"Continued",
+/* 20 */	"CHLD",		"Child exited",
+# ifdef SUSPENDED
+/* 21 */	"TTIN", 	"Suspended (tty input)",
+/* 22 */	"TTOU", 	"Suspended (tty output)",
+# else /* SUSPENDED */
+/* 21 */	"TTIN", 	"Stopped (tty input)",
+/* 22 */	"TTOU", 	"Stopped (tty output)",
+# endif /* SUSPENDED */
+/* 23 */	"IO",   	"IO possible interrupt",
+/* 24 */	"XCPU",		"Cputime limit exceeded",
+/* 25 */	"XFSZ", 	"Filesize limit exceeded",
+/* 26 */	"VTALRM", 	"Virtual time alarm",
+/* 27 */	"PROF",		"Profiling time alarm",
+
+# if defined(sun) || defined(ultrix) || defined(hp9000) || defined(convex) || defined(__convex__)
+#  define _sigextra_
+/* 28 */	"WINCH", 	"Window changed",
+/* 29 */	"LOST",		"Resource lost",
+/* 30 */	"USR1",		"User signal 1",
+/* 31 */	"USR2",		"User signal 2",
+/* 32 */	0,		"Signal 32",
+# endif /* sun */
+
+# ifdef pyr
+#  define _sigextra_
+/* 28 */	"USR1",		"User signal 1",
+/* 29 */	"USR2",		"User signal 2",
+/* 30 */	"PWR",		"Power failure",
+/* 31 */	0,		"Signal 31",
+/* 32 */	0,		"Signal 32",
+# endif /* pyr */
+
+# ifndef _sigextra_
+/* 28 */	"WINCH",	"Window size changed",
+/* 29 */	0,		"Signal 29",
+/* 30 */	"USR1",		"User defined signal 1",
+/* 31 */	"USR2",		"User defined signal 2",
+/* 32 */	0,		"Signal 32",
+# endif /* _sigextra_ */
+
+
+#endif /* (SVID > 0) || DGUX || IBMAIX */
+
+/* These are here for systems with bad NSIG */
+#ifndef POSIX
+/* 33 */	0,		"Signal 33"
+#else /* POSIX */
+/* 65 */	0,		"Signal 65"
+#endif /* POSIX */
+};
