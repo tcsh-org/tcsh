@@ -1,3 +1,8 @@
+ 27. Port to concurrent's powermaxos (Matt Majka)
+ 26. New builtin srcfile (Amol)
+ 25. Fix bindkey "\\" cmd (reported by Ismail H. Tuncer)
+ 24. %0Xc was broken in the prompt if the user's home directory was '/'.
+     (reported by Edward Glowacki)
  23. V6.10.01 - 20010426
  22. LARGEFILE support on Linux.
  21. Add big5 multibyte support (Yen-Ming Lee)
