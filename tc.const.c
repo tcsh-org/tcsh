@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.const.c,v 3.2 1991/07/16 10:45:07 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.const.c,v 3.2 1991/07/16 11:06:33 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.const.c,v 3.2 1991/07/16 10:45:07 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.2 1991/07/16 11:06:33 christos Exp $")
 #include "sh.h"
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
@@ -73,9 +73,10 @@ Char STRcwd[]           = { 'c', 'w', 'd', '\0' };
 Char STRstar[]          = { '*', '\0' };
 Char STRdot[]           = { '.', '\0' };
 Char STRhistory[] 	= { 'h', 'i', 's', 't', 'o', 'r', 'y', '\0' };
+Char STRhistfile[] 	= { 'h', 'i', 's', 't', 'f', 'i', 'l', 'e', '\0' };
 Char STRsource[]        = { 's', 'o', 'u', 'r', 'c', 'e', '\0' };
 Char STRmh[]            = { '-', 'h', '\0' };
-Char STRhistfile[]      = { '~', '/', '.', 'h', 'i', 's', 't', 'o', 'r', 
+Char STRtildothist[]    = { '~', '/', '.', 'h', 'i', 's', 't', 'o', 'r', 
 		            'y', '\0' };
 
 #ifdef CSHDIRS
