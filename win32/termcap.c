@@ -1,3 +1,4 @@
+/*$Header$*/
 /* Work-alike for termcap, plus extra features.
    Copyright (C) 1985, 86, 93, 94, 95 Free Software Foundation, Inc.
 

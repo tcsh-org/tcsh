@@ -1,3 +1,4 @@
+/*$Header$*/
 /*
  * nt.const.c: NT-specific String constants for tcsh.
  */

@@ -1,4 +1,4 @@
-# $Id: Makefile.win32,v 3.5 1998/07/07 12:06:09 christos Exp $
+# $Id: Makefile.win32,v 1.1 2002/05/06 05:56:08 kim Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -104,8 +104,8 @@ TWOBJS=	tw.help.$(SUF) tw.init.$(SUF) tw.parse.$(SUF) tw.spell.$(SUF) \
 	tw.comp.$(SUF) tw.color.$(SUF)
 
 EDSRCS= ed.chared.c ed.decls.h ed.defns.c ed.h ed.init.c ed.inputl.c \
-	ed.refresh.c ed.screen.c ed.xmap.c ed.term.c ed.term.h
-EDOBJS=	ed.chared.$(SUF) ed.refresh.$(SUF) ed.screen.$(SUF) ed.init.$(SUF) \
+	ed.refresh.c ed.xmap.c ed.term.c ed.term.h
+EDOBJS=	ed.chared.$(SUF) ed.refresh.$(SUF) ed.init.$(SUF) \
 	ed.inputl.$(SUF) ed.defns.$(SUF) ed.xmap.$(SUF) ed.term.$(SUF)
 
 TCSRCS= tc.alloc.c tc.bind.c tc.const.c tc.decls.h tc.disc.c \
@@ -118,14 +118,16 @@ TCOBJS=	tc.alloc.$(SUF) tc.bind.$(SUF) tc.const.$(SUF)  \
 	tc.vers.$(SUF) tc.who.$(SUF) 
 
 NTSRCS = win32\io.c win32\stdio.c win32\dirent.c win32\signal.c\
-		win32\support.c win32\termcap.c win32\tparam.c win32\tparse.c\
+		win32\support.c \
+#win32\termcap.c win32\tparam.c win32\tparse.c\
 		win32\nt.char.c win32\bogus.c win32\console.c win32\fork.c \
 		win32\ntfunc.c win32\ntb1.c win32\ntb2.c win32\globals.c \
 		win32\nt.who.c win32\ps.c win32\clip.c win32\nt.const.c \
-		win32\nt.bind.c 
-NTOBJS = io.o stdio.o dirent.o signal.o support.o termcap.o tparam.o tparse.o\
-		nt.char.o bogus.o console.o fork.o ntfunc.o globals.o nt.who.o ps.o \
-		clip.o nt.const.o nt.bind.o
+		win32\nt.bind.c  win32\nt.screen.c
+NTOBJS = io.o stdio.o dirent.o signal.o support.o \
+#termcap.o tparam.o tparse.o\
+	    nt.char.o bogus.o console.o fork.o ntfunc.o globals.o nt.who.o ps.o \
+		clip.o nt.const.o nt.bind.o nt.screen.o
 
 VHSRCS=$(PVSRCS) $(AVSRCS)
 
@@ -307,6 +309,8 @@ nt.const.$(SUF):win32\nt.const.c $(NTH) $(NTH2)
 	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.const.c
 nt.bind.$(SUF):win32\nt.bind.c $(NTH) $(NTH2) ed.defns.h
 	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.bind.c
+nt.screen.$(SUF):win32\nt.screen.c $(NTH) $(NTH2) ed.defns.h
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.screen.c
 
 win32/$(NTRES).res: win32/$(NTRES).rc win32/tcshrc.rc
 	rc -v $(RCFLAGS) -r win32/$(NTRES).rc

@@ -1,3 +1,7 @@
+Rev 7.00
+Sun Aug 11 00:39:38 2002    <amol@AMOLDWHISPHOME>
+	* various files: Remove GPL'ed termcap code. Partial fix for 
+ 	                 horizontal scroll. Fix visiblebell. 
 Sat May 04 22:38:36 2002    <amol@AMOLDWHISPHOME>
 	* ntfunc.c: fixed leak in nt_texec ?? (fast exec path). 
 	            Removed sourcerc and printrc.

@@ -1,3 +1,4 @@
+/*$Header$*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -45,6 +46,10 @@ WORD get_attributes();
 #define	FSHIN	16		/* Preferred desc for shell input */
 #define	FSHOUT	17		/* Preferred desc for shell input */
 
+#define FOREGROUND_BLACK (FOREGROUND_RED |FOREGROUND_GREEN | FOREGROUND_BLUE)
+#define FOREGROUND_WHITE 0
+#define BACKGROUND_BLACK (BACKGROUND_RED |BACKGROUND_GREEN | BACKGROUND_BLUE)
+#define BACKGROUND_WHITE 0
 
 static WORD wNormalAttributes;
 
@@ -57,6 +62,7 @@ static int nt_is_raw;
 //
 HANDLE ghstdout;
 CONSOLE_SCREEN_BUFFER_INFO gscrbuf;
+HANDLE ghReverse;
 
 //
 // This function is called to set the values for above variables.
@@ -64,6 +70,9 @@ CONSOLE_SCREEN_BUFFER_INFO gscrbuf;
 void redo_console(void) {
 
 	HANDLE hTemp= GetStdHandle(STD_OUTPUT_HANDLE);
+	WORD dbga;
+	DWORD wrote;
+	COORD origin = {0,0};
 
 	if (!DuplicateHandle(GetCurrentProcess(),hTemp,GetCurrentProcess(),
 						&ghstdout,0,TRUE,DUPLICATE_SAME_ACCESS) ) {
@@ -71,9 +80,24 @@ void redo_console(void) {
 	}
 
 	if(!GetConsoleScreenBufferInfo(ghstdout, &gscrbuf) ) {
-		;
+		wNormalAttributes = FOREGROUND_BLACK | BACKGROUND_WHITE;
 	}
-	wNormalAttributes = get_attributes();
+	else
+		wNormalAttributes = gscrbuf.wAttributes;
+
+	ghReverse = CreateConsoleScreenBuffer(GENERIC_READ|GENERIC_WRITE,
+			FILE_SHARE_READ | FILE_SHARE_WRITE,
+			NULL,
+			CONSOLE_TEXTMODE_BUFFER,
+			NULL);
+
+	dbga = ((wNormalAttributes & 0x00f0) >> 4) |
+						((wNormalAttributes & 0x000f) << 4) ;
+
+	FillConsoleOutputAttribute(ghReverse,dbga,
+				gscrbuf.dwSize.X*gscrbuf.dwSize.Y,
+				origin,
+				&wrote);
 }
 void nt_term_cleanup(void) {
 	CloseHandle(ghstdout);
@@ -184,6 +208,35 @@ void nt_move_next_tab(void) {
 	}
 
 }
+void NT_VisibleBell(void) {
+
+	if(ghReverse != INVALID_HANDLE_VALUE) {
+		SetConsoleActiveScreenBuffer(ghReverse);
+		Sleep(100);
+		SetConsoleActiveScreenBuffer(ghstdout);
+
+	}
+
+}
+void NT_WrapHorizontal(void) {
+    SMALL_RECT wnd;
+    CONSOLE_SCREEN_BUFFER_INFO scrbuf;
+
+
+    if (ghstdout == INVALID_HANDLE_VALUE){
+	return;
+    }
+    if(!GetConsoleScreenBufferInfo(ghstdout, &scrbuf) ) {
+	return;
+    }
+    //absolute movement
+    wnd.Left =  scrbuf.srWindow.Left ;
+    wnd.Right = scrbuf.srWindow.Right;
+    wnd.Top =  scrbuf.srWindow.Top;
+    wnd.Bottom = scrbuf.srWindow.Bottom;
+
+    SetConsoleWindowInfo(ghstdout,TRUE,&wnd);
+}
 void ScrollBufHorizontal(HANDLE hOut, CONSOLE_SCREEN_BUFFER_INFO *scrbuf,
 		int where) {
 	SMALL_RECT wnd;
@@ -191,17 +244,16 @@ void ScrollBufHorizontal(HANDLE hOut, CONSOLE_SCREEN_BUFFER_INFO *scrbuf,
 	CHAR_INFO chr;
 
 
-	//relative movement
-	wnd.Left = where;
+	//absolute movement
+	wnd.Left = (where - scrbuf->srWindow.Right) + scrbuf->srWindow.Left ;
 	wnd.Right = where;
-	wnd.Top =  0;
-	wnd.Bottom = 0;
+	wnd.Top =  scrbuf->srWindow.Top;
+	wnd.Bottom = scrbuf->srWindow.Bottom;
 
-	//dwMaximumsize is not 0-based, so add 1 to proposed location
-	diff = scrbuf->srWindow.Right + where + 1; 
-	dprintf("\tdiff1 %d\n",diff);
+	//diff = scrbuf->srWindow.Right - where;
+	//dprintf("\tdiff1 %d\n",diff);
 
-	diff = scrbuf->dwSize.X - diff;
+	diff = scrbuf->dwSize.X - where -1;
 
 	if (diff < 0) { //would scroll past console buffer
 
@@ -220,7 +272,7 @@ void ScrollBufHorizontal(HANDLE hOut, CONSOLE_SCREEN_BUFFER_INFO *scrbuf,
 		return;
 	}
 
-	SetConsoleWindowInfo(hOut,FALSE,&wnd);
+	SetConsoleWindowInfo(hOut,TRUE,&wnd);
 }
 // relative movement of "where".  line is 1 if we want to move to a line,
 // or 0 if the movement is horizontal
@@ -247,13 +299,10 @@ void NT_MoveToLineOrChar(int where,int line) {
 			scrbuf.dwCursorPosition.Y += where;
 	}
 	else{
-#if LATER
-		if ( ((scrbuf.dwCursorPosition.X+where)> (scrbuf.srWindow.Right-1))
-				&&( where >0)){
+		if ( ((where)> (scrbuf.srWindow.Right-1)) &&( where >0)){
 			ScrollBufHorizontal(hStdout,&scrbuf,where);
 		}
 		else
-#endif LATER
 			scrbuf.dwCursorPosition.X = where;
 	}
 	if (scrbuf.dwCursorPosition.X < 0 || scrbuf.dwCursorPosition.Y <0)
@@ -331,7 +380,7 @@ BOOL ConsolePageUpOrDown(BOOL Up) {
 
 	return TRUE;
 }
-int nt_getsize(int * lins, int * cols) {
+int nt_getsize(int * lins, int * cols, int *visiblecols) {
 	CONSOLE_SCREEN_BUFFER_INFO scrbuf;
 	HANDLE hStdout = ghstdout;
 
@@ -339,7 +388,11 @@ int nt_getsize(int * lins, int * cols) {
 		;
 	}
 	*lins = scrbuf.srWindow.Bottom -scrbuf.srWindow.Top+1 ;
-	*cols = scrbuf.srWindow.Right -scrbuf.srWindow.Left +1;
+
+	if(visiblecols)
+		*visiblecols = scrbuf.srWindow.Right -scrbuf.srWindow.Left +1;
+
+	*cols = scrbuf.dwSize.X;
 	return 1;
 }
 void nt_set_size(int lins, int cols) {
