@@ -18,6 +18,7 @@ HOW TO RELEASE TCSH
 8)  Remove files that should not be in a release:
     - Announce*
     - Copyright
+    - Makefile.ADMIN
     - RELEASE-PROCEDURE (this file)
 9)  Generate a "diff -urN" between the two directories you
     have exported, save it in patchz.gz (z is PATCHLEVEL)
