@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.72 2001/03/18 19:06:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.73 2001/06/10 02:25:52 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.72 2001/03/18 19:06:30 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.73 2001/06/10 02:25:52 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1562,7 +1562,6 @@ dokill(v, c)
 	else {
 	    for (signum = 0; signum <= nsig; signum++)
 		if (mesg[signum].iname &&
-		    eq(&v[0][1], str2short(mesg[signum].iname)))
  		    eq(sigptr, str2short(mesg[signum].iname)))
 		    goto gotsig;
  	    setname(short2str(sigptr));
