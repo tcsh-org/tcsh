@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.61 2004/05/19 18:51:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.62 2004/08/04 17:12:30 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.61 2004/05/19 18:51:02 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.62 2004/08/04 17:12:30 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -675,6 +675,10 @@ execute(t, wanttty, pipein, pipeout, do_glob)
 	SHIN = -1;
 #ifndef CLOSE_ON_EXEC
 	didcch = 0;
+#else
+	(void) close_on_exec(FSHOUT, 1);
+	(void) close_on_exec(FSHDIAG, 1);
+	(void) close_on_exec(FOLDSTD, 1);
 #endif /* !CLOSE_ON_EXEC */
 	didfds = 0;
 	wanttty = -1;
