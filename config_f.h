@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.31 2005/03/03 16:49:15 kim Exp $ */
+/* $Header: /src/pub/tcsh/config_f.h,v 3.32 2005/03/04 13:46:04 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -44,7 +44,16 @@
  *	         of nls...
  *
  */
-#define SHORT_STRINGS
+#if defined(__NetBSD__)
+# include <sys/param.h>
+# if defined(__NetBSD_Version__) && (__NetBSD_Version__ >= 200000000)
+#  define SHORT_STRINGS
+# else
+#  undef SHORT_STRINGS
+# endif
+#else
+# define SHORT_STRINGS
+#endif
 
 /*
  * WIDE_STRINGS	Represent strings using wide characters
@@ -69,7 +78,11 @@
  *		if you don't have <nl_types.h>, you don't want
  *		to define this.
  */
-#undef NLS_CATALOGS
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+# define NLS_CATALOGS
+#else
+# undef NLS_CATALOGS
+#endif
 
 /*
  * LOGINFIRST   Source ~/.login before ~/.cshrc
