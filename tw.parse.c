@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.92 2002/06/25 19:02:12 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.93 2003/02/08 20:03:26 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.92 2002/06/25 19:02:12 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.93 2003/02/08 20:03:26 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -116,7 +116,7 @@ static	int	 is_prefix		__P((Char *, Char *));
 static	int	 is_prefixmatch		__P((Char *, Char *, int));
 static	int	 is_suffix		__P((Char *, Char *));
 static	int	 recognize		__P((Char *, Char *, int, int, int,
-    int));
+					     int));
 static	int	 ignored		__P((Char *));
 static	int	 isadirectory		__P((Char *, Char *));
 #ifndef __MVS__
@@ -816,12 +816,11 @@ starting_a_command(wordstart, inputline)
 static int
 recognize(exp_name, item, name_length, numitems, enhanced, igncase)
     Char   *exp_name, *item;
-    int     name_length, numitems, enhanced;
+    int     name_length, numitems, enhanced, igncase;
 {
     Char MCH1, MCH2;
     register Char *x, *ent;
     register int len = 0;
-    struct varent *vp;
 
     if (numitems == 1) {	/* 1st match */
 	copyn(exp_name, item, MAXNAMLEN);
@@ -882,7 +881,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
     Char *item, *ptr;
     Char buf[MAXPATHLEN+1];
     struct varent *vp;
-    int len, enhanced;
+    int len, enhanced = 0;
     int cnt = 0;
     int igncase = 0;
 
@@ -921,6 +920,23 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    break;
 
 	case TW_COMMAND:
+#if defined(_UWIN) || defined(__CYGWIN__)
+	    /* Turn foo.{exe,com,bat} into foo since UWIN's readdir returns
+	     * the file with the .exe, .com, .bat extension
+	     */
+	    {
+		size_t ext = strlen((char *)item) - 4;
+		if ((ext > 0) && (strcasecmp((char *)&item[ext], ".exe") == 0 ||
+				  strcasecmp((char *)&item[ext], ".bat") == 0 ||
+				  strcasecmp((char *)&item[ext], ".com") == 0))
+		    {
+			item[ext] = '\0';
+#if defined(__CYGWIN__)
+			strlwr((char *)item);
+#endif /* __CYGWIN__ */
+		    }
+	    }
+#endif /* _UWIN || __CYGWIN__ */
 	    exec_check = flags & TW_EXEC_CHK;
 	    dir_ok = flags & TW_DIR_OK;
 	    break;
@@ -980,15 +996,16 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	case RECOGNIZE_ALL:
 	case RECOGNIZE_SCROLL:
 
- 	    if ((vp = adrof(STRcomplete)) != NULL && vp->vec != NULL) {
-		int i;
-		for (i = 0; vp->vec[i]; i++) {
-		    if (Strcmp(vp->vec[i], STRigncase) == 0)
-			igncase++;
-		    if (Strcmp(vp->vec[i], STRenhance) == 0)
-			enhanced++;
+	    if ((vp = adrof(STRcomplete)) != NULL && vp->vec != NULL) {
+		Char *cp;
+		for (cp = vp->vec; *cp; cp++) {
+		    if (Strcmp(*cp, STRigncase) == 0)
+			igncase = 1;
+		    if (Strcmp(*cp, STRenhance) == 0)
+			enhanced = 1;
 		}
 	    }
+
 	    if (enhanced || igncase) {
 	        if (!is_prefixmatch(target, item, igncase)) 
 		    break;
@@ -1073,8 +1090,8 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 			break;
 		    }
 		}
-		if (recognize(exp_name, item, name_length, ++numitems, enhanced,
-		    igncase)) 
+		if (recognize(exp_name, item, name_length, ++numitems,
+		    enhanced, igncase)) 
 		    if (command != RECOGNIZE_SCROLL)
 			done = TRUE;
 		if (enhanced && (int)Strlen(exp_name) < name_length)

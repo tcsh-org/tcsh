@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.87 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.88 2002/05/16 13:51:26 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -48,6 +48,8 @@
 #endif /* notdef */
 
 #ifdef __CYGWIN__
+#  undef NOFILE
+#  define NOFILE sysconf(_SC_OPEN_MAX)
 #  undef NEEDstrerror
 #endif
 

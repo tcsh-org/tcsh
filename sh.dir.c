@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.59 2002/06/25 19:02:11 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.60 2002/07/08 21:03:04 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.59 2002/06/25 19:02:11 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.60 2002/07/08 21:03:04 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -529,8 +529,13 @@ dgoto(cp)
     else
 	dp = cp;
 
-#ifdef WINNT_NATIVE
+#if defined(WINNT_NATIVE)
     cp = SAVE(getcwd(NULL, 0));
+#elif defined(__CYGWIN__)
+    if (ABSOLUTEP(cp) && cp[1] == ':') /* Only DOS paths are treated that way */
+    	cp = SAVE(getcwd(NULL, 0));
+    else
+    	cp = dcanon(cp, dp);
 #else /* !WINNT_NATIVE */
     cp = dcanon(cp, dp);
 #endif /* WINNT_NATIVE */

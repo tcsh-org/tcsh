@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.24 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.25 2002/11/21 20:02:01 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.24 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.25 2002/11/21 20:02:01 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -258,6 +258,11 @@ closem()
 {
     register int f;
 
+#ifdef NLS_BUGS
+#ifdef NLS_CATALOGS
+    (void)catclose(catd);
+#endif /* NLS_CATALOGS */
+#endif /* NLS_BUGS */
 #ifdef YPBUGS
     /* suggested by Justin Bur; thanks to Karl Kleinpaste */
     fix_yp_bugs();
@@ -276,6 +281,11 @@ closem()
 		(void) open(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE);
 #endif /* NISPLUS */
 	  }
+#ifdef NLS_BUGS
+#ifdef NLS_CATALOGS
+    nlsinit();
+#endif /* NLS_CATALOGS */
+#endif /* NLS_BUGS */
 }
 
 #ifndef CLOSE_ON_EXEC

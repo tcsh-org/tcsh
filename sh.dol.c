@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.50 2002/06/25 19:02:11 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.51 2002/11/21 20:02:00 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.50 2002/06/25 19:02:11 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.51 2002/11/21 20:02:00 christos Exp $")
 
 /*
  * C shell
@@ -1066,6 +1066,12 @@ again:
 #ifdef WINNT_NATIVE
     __dup_stdin = 1;
 #endif /* WINNT_NATIVE */
+#ifdef O_TEXT
+    setmode(1, O_TEXT);
+#endif
+#ifdef O_BINARY
+    setmode(0, O_BINARY);
+#endif
     for (;;) {
 	/*
 	 * Read up a line

@@ -1,3 +1,5 @@
+  8. Cygwin fixes (Corinna Vinschen)
+  7. NLS catclose() bug avoidance (KAJIMOTO Masato)
   6. V6.12.01 - 20030208
   5. Misc NT cleanup. No more GPL code (amol)
   4. use strtol() to detect errors in builtin kill (Peter Jeremy)
