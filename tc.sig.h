@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.h,v 3.0 1991/07/04 23:34:26 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -136,7 +136,7 @@ typedef struct sigvec sigvec_t;
 #if defined(convex) || defined(__convex__)
 # define SIGSYNCH       0
 # ifdef SIGSYNCH
-#  define SYNCHMASK 	(sigmask(SIGCHLD)|sigmask(SYNCH_SIG))
+#  define SYNCHMASK 	(sigmask(SIGCHLD)|sigmask(SIGSYNCH))
 # else
 #  define SYNCHMASK 	(sigmask(SIGCHLD))
 # endif
