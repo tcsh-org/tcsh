@@ -4747,7 +4747,7 @@ ConvexOS, Stellix and Intel use \fI/etc/logout\fR and
 NeXTs use \fI/etc/logout.std\fR.
 A/UX, AMIX, Cray and IRIX have no equivalent in \fIcsh\fR(1),
 but read this file in \fItcsh\fR anyway.
-Solaris 2.x does not have it either, but \fItcsh\fR reads \fI/etc/.cshrc\fR.  (+)
+Solaris 2.x does not have it either, but \fItcsh\fR reads \fI/etc/.logout\fR.  (+)
 .TP 16
 .I ~/.logout
 Read by login shells at logout after \fI/etc/csh.logout\fR or its equivalent.
