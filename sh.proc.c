@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.45 1993/05/17 01:02:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.46 1993/06/05 21:09:15 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.45 1993/05/17 01:02:53 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.46 1993/06/05 21:09:15 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -259,13 +259,9 @@ loop:
 #endif /* BSDJOBS */
 
 #ifdef JOBDEBUG
-    {
-	char    buffer[100];
-	xsprintf(buffer, "pid %d, retval %x termsig %x retcode %x\n",
-		 pid, w, WTERMSIG(w), WEXITSTATUS(w));
-	xprintf(buffer);
-	flush();
-    }
+    xprintf("parent %d pid %d, retval %x termsig %x retcode %x\n",
+	    getpid(), pid, w, WTERMSIG(w), WEXITSTATUS(w));
+    flush();
 #endif /* JOBDEBUG */
 
     if (pid <= 0) {
@@ -564,7 +560,8 @@ pjwait(pp)
 	if ((jobflags & PRUNNING) == 0)
 	    break;
 #ifdef JOBDEBUG
-	xprintf("starting to sigpause for  SIGCHLD on %d\n", fp->p_procid);
+	xprintf("%d starting to sigpause for  SIGCHLD on %d\n",
+		getpid(), fp->p_procid);
 #endif /* JOBDEBUG */
 #ifdef BSDSIGS
 	/* sigpause(sigblock((sigmask_t) 0) &~ sigmask(SIGCHLD)); */
@@ -2013,6 +2010,10 @@ pgetty(wanttty, pgrp)
     sigmask_t omask = 0;
 # endif /* BSDSIGS && POSIXJOBS */
 
+# ifdef JOBDEBUG
+    xprintf("wanttty %d pid %d opgrp%d pgrp %d tpgrp %d\n", 
+	    wanttty, getpid(), pgrp, mygetpgrp(), tcgetpgrp(FSHTTY));
+# endif /* JOBDEBUG */
 # ifdef POSIXJOBS
     /*
      * christos: I am blocking the tty signals till I've set things
@@ -2069,8 +2070,8 @@ pgetty(wanttty, pgrp)
 # endif /* POSIXJOBS */
 
 # ifdef JOBDEBUG
-    xprintf("pid %d pgrp %d tpgrp %d\n", getpid(), mygetpgrp(),
-	    tcgetpgrp(FSHTTY));
+    xprintf("wanttty %d pid %d pgrp %d tpgrp %d\n", 
+	    wanttty, getpid(), mygetpgrp(), tcgetpgrp(FSHTTY));
 # endif /* JOBDEBUG */
 
     if (tpgrp > 0)

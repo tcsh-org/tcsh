@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.48 1993/05/17 00:11:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.49 1993/06/05 21:09:15 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.48 1993/05/17 00:11:09 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.49 1993/06/05 21:09:15 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1456,8 +1456,6 @@ goodbye(v, c)
 void
 exitstat()
 {
-    register Char *cp;
-    register int i;
 #ifdef PROF
     monitor(0);
 #endif
@@ -1468,18 +1466,7 @@ exitstat()
      */
     child = 1;
 
-    /* 
-     * PWP: do this step-by-step because we might get a bus error if
-     * status isn't set, so we call getn(NULL).
-     */
-    cp = value(STRstatus);
-
-    if (!cp)
-	i = 13;
-    else
-	i = getn(cp);
-
-    xexit(i);
+    xexit(getn(value(STRstatus)));
 }
 
 /*
@@ -1630,9 +1617,21 @@ pintr1(wantnl)
 	reset();
     }
     else if (intty && wantnl) {
-	/* xputchar('\n'); *//* Some like this, others don't */
-	(void) putraw('\r');
-	(void) putraw('\n');
+	if (editing) {
+	    /* 
+	     * If we are editing a multi-line input command, and move to
+	     * the beginning of the line, we don't want to trash it when
+	     * we hit ^C
+	     */
+	    PastBottom();
+	    ClearLines();
+	    ClearDisp();
+	}
+	else {
+	    /* xputchar('\n'); *//* Some like this, others don't */
+	    (void) putraw('\r');
+	    (void) putraw('\n');
+	}
     }
     stderror(ERR_SILENT);
 }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.func.c,v 3.38 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.func.c,v 3.39 1993/05/17 00:11:09 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.38 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.39 1993/05/17 00:11:09 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -471,8 +471,10 @@ find_stop_ed()
     else 
 	vp = "vi";
 
-    vpl = strlen(vp);
-    epl = strlen(ep);
+    for (vpl = 0; vp[vpl] && !Isspace(vp[vpl]); vpl++)
+	continue;
+    for (epl = 0; ep[epl] && !Isspace(ep[epl]); epl++)
+	continue;
 
     if (pcurrent == NULL)	/* see if we have any jobs */
 	return NULL;		/* nope */
@@ -853,6 +855,7 @@ aliasrun(cnt, s1, s2)
     struct wordent w, *new1, *new2;	/* for holding alias name */
     struct command *t = NULL;
     jmp_buf_t osetexit;
+    int status;
 
     getexit(osetexit);
     if (seterr) {
@@ -876,6 +879,9 @@ aliasrun(cnt, s1, s2)
 	new1->prev = new2->next = &w;
     }
 
+    /* Save the old status */
+    status = getn(value(STRstatus));
+
     /* expand aliases like process() does. */
     alias(&w);
     /* build a syntax tree for the command. */
@@ -884,6 +890,8 @@ aliasrun(cnt, s1, s2)
 	stderror(ERR_OLD);
 
     psavejob();
+
+
     /* catch any errors here */
     if (setexit() == 0)
 	/* execute the parse tree. */
@@ -923,6 +931,8 @@ aliasrun(cnt, s1, s2)
     resexit(osetexit);
     prestjob();
     pendjob();
+    /* Restore status */
+    set(STRstatus, putn(status), VAR_READWRITE);
 }
 
 void

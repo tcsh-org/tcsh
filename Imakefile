@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.28 1993/06/05 21:09:15 christos Exp christos $
+/**/# $Id: Imakefile,v 1.29 1993/06/05 21:11:21 christos Exp christos $
 /**/#
 /**/# Imakefile for for tcsh 6.03
 /**/# Marc Horowitz, MIT SIPB
@@ -104,7 +104,7 @@ CCOPTIONS=-float	# We don't want -cckr and -prototypes
 #  define ConfigH convex
 # endif
 
-# ifdef SQNTArchitecture
+# if defined(SQNTArchitecture) || defined(SequentArchitecture)
 #  define ConfigH sequent
 # endif
 
@@ -160,14 +160,15 @@ TCSHPATH =
 
 /**** libraries ****/
 
-#if (SystemV == NO) || defined(HPArchitecture) || defined(SQNTArchitecture) || \
+#if (SystemV == NO) || defined(HPArchitecture) || \
+	defined(SQNTArchitecture) || defined(SequentArchitecture) || \
 	defined(MacIIArchitecture) || defined(UseLibTermcap)
 LIBTERMCAP = -ltermcap
 #else
 LIBTERMCAP =
 #endif
 
-#if defined(SQNTArchitecture)
+#if defined(SQNTArchitecture) || defined(SequentArchitecture)
 LIBSQNT=-lseq
 #endif
 
@@ -327,6 +328,10 @@ MANDIR = $(TCSHTOP)/man/man$(MANSUFFIX)
 
 #ifndef MyLibs
 #define MyLibs
+#endif
+
+#ifndef MyStdc
+#define MyStdc
 #endif
 
 #ifdef CDebugFlags

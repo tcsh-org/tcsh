@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.28 1993/05/17 01:02:53 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.29 1993/06/07 14:29:35 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.28 1993/05/17 01:02:53 christos Exp christos $")
+RCSID("$Id: sh.sem.c,v 3.29 1993/06/07 14:29:35 christos Exp $")
 
 #include "tc.h"
 
@@ -112,7 +112,6 @@ execute(t, wanttty, pipein, pipeout)
     int     pid = 0, owanttty;
     int     pv[2];
 #ifdef BSDSIGS
-    static sigmask_t mask;
     static sigmask_t csigmask;
 #endif /* BSDSIGS */
 #ifdef VFORK
@@ -350,20 +349,18 @@ execute(t, wanttty, pipein, pipeout)
 # endif /* SAVESIGVEC */
 		if (_gv.wanttty >= 0 && !nosigchld && !noexec) {
 # ifdef BSDSIGS
-		    mask = csigmask = sigblock(sigmask(SIGCHLD)|sigmask(SIGINT));
+		    csigmask = sigblock(sigmask(SIGCHLD));
 # else /* !BSDSIGS */
 		    (void) sighold(SIGCHLD);
-		    (void) sighold(SIGINT);
 # endif  /* BSDSIGS */
 		    nosigchld = 1;
 		}
-		else {
 # ifdef BSDSIGS
-		    mask = sigmask(SIGINT);
+		omask = sigblock(sigmask(SIGCHLD)|sigmask(SIGINT));
 # else /* !BSDSIGS */
-		    (void) sighold(SIGINT);
+		(void) sighold(SIGCHLD);
+		(void) sighold(SIGINT);
 # endif  /* BSDSIGS */
-		}
 		ochild = child;
 		osetintr = setintr;
 		ohaderr = haderr;
@@ -379,7 +376,6 @@ execute(t, wanttty, pipein, pipeout)
 		oisoutatty = isoutatty;
 		oisdiagatty = isdiagatty;
 # ifdef BSDSIGS
-		omask = mask;
 		ocsigmask = csigmask;
 # endif /* BSDSIGS */
 		onosigchld = nosigchld;
@@ -395,25 +391,15 @@ execute(t, wanttty, pipein, pipeout)
 		    pid = vfork();
 
 		if (pid < 0) {
-# ifdef SAVESIGVEC
+# ifdef BSDSIGS
+#  ifdef SAVESIGVEC
 		    restoresigvec(savesv, savesm);
-# endif /* SAVESIGVEC */
-		    if (nosigchld) {
-# ifdef BSDSIGS
-			(void) sigsetmask(csigmask);
+#  endif /* SAVESIGVEC */
+		    (void) sigsetmask(omask);
 # else /* !BSDSIGS */
-			(void) sigrelse(SIGCHLD);
-			(void) sigrelse(SIGINT);
+		    (void) sigrelse(SIGCHLD);
+		    (void) sigrelse(SIGINT);
 # endif  /* BSDSIGS */
-			nosigchld = 0;
-		    }
-		    else {
-# ifdef BSDSIGS
-			(void) sigsetmask(mask);
-# else /* !BSDSIGS */
-			(void) sigrelse(SIGINT);
-# endif  /* BSDSIGS */
-		    }
 		    stderror(ERR_NOPROC);
 		}
 		_gv.forked++;
@@ -436,7 +422,6 @@ execute(t, wanttty, pipein, pipeout)
 		    isoutatty = oisoutatty;
 		    isdiagatty = oisdiagatty;
 # ifdef BSDSIGS
-		    mask = omask;
 		    csigmask = ocsigmask;
 # endif /* BSDSIGS */
 		    nosigchld = onosigchld;
@@ -451,13 +436,12 @@ execute(t, wanttty, pipein, pipeout)
 		    Vt = 0;
 		    /* this is from pfork() */
 		    palloc(pid, t);
-		    if (!nosigchld) {
 # ifdef BSDSIGS
-			(void) sigsetmask(omask);
+		    (void) sigsetmask(omask);
 # else /* !BSDSIGS */
-			(void) sigrelse(SIGINT);
+		    (void) sigrelse(SIGCHLD);
+		    (void) sigrelse(SIGINT);
 # endif  /* BSDSIGS */
-		    }
 		}
 		else {		/* child */
 		    /* this is from pfork() */
