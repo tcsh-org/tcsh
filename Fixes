@@ -1,3 +1,12 @@
+ 87. Fix prompt formatting (Andrey A. Chernov)
+ 86. Use HostType from Imakefile correctly (Kjetil Torgrim Homme)
+ 85. Handle long and expanded history lines better (Boleslaw Ciesielski)
+ 84. With symlinks=expand expand valid paths only (Martin Kraemer)
+ 83. Make one-byte charsets work with KANJI (Andrey A. Chernov)
+ 82. NT-specific executable detection moved to NT code (amol)
+ 81. New "complete module" (Dan Nicolaescu)
+ 80. Correctly display scaling string in limit error messages (Nathan Ahlstrom)
+ 79. Don't display "unset watch" message when not appropriate (kim)
  78. V6.09.01 - 20000114
  79. Circumvent IRIX4D ESTALE bug by exiting.
  78. IRIS4D de-linting.
