@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.45 2000/11/19 20:50:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.46 2001/03/18 19:06:29 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.45 2000/11/19 20:50:43 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.46 2001/03/18 19:06:29 christos Exp $")
 
 /*
  * C shell
@@ -1043,7 +1043,7 @@ again:
 #ifndef O_EXCL
 # define O_EXCL 0
 #endif
-    if (open(tmp, O_RDWR|O_CREAT|O_EXCL|O_TEMPORARY) == -1) {
+    if (open(tmp, O_RDWR|O_CREAT|O_EXCL|O_TEMPORARY, 0600) == -1) {
 	int oerrno = errno;
 #ifndef WINNT_NATIVE
 	if (errno == EEXIST) {
