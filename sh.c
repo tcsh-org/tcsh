@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.93 2001/01/29 01:28:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.94 2001/02/19 23:30:44 kim Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.93 2001/01/29 01:28:02 christos Exp $")
+RCSID("$Id: sh.c,v 3.94 2001/02/19 23:30:44 kim Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -160,7 +160,11 @@ struct saved_state {
 };
 
 static	int		  srccat	__P((Char *, Char *));
+#ifndef WINNT_NATIVE
 static	int		  srcfile	__P((char *, bool, int, Char **));
+#else
+int		  srcfile	__P((char *, bool, int, Char **));
+#endif /*WINNT_NATIVE*/
 static	sigret_t	  phup		__P((int));
 static	void		  srcunit	__P((int, bool, int, Char **));
 static	void		  mailchk	__P((void));
@@ -1443,7 +1447,11 @@ srccat(cp, dp)
 /*
  * Source to a file putting the file descriptor in a safe place (> 2).
  */
+#ifndef WINNT_NATIVE
 static int
+#else
+int
+#endif /*WINNT_NATIVE*/
 srcfile(f, onlyown, flag, av)
     char   *f;
     bool    onlyown;
