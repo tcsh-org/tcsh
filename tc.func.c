@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.103 2002/06/25 19:02:11 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.104 2002/07/01 20:41:48 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.103 2002/06/25 19:02:11 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.104 2002/07/01 20:41:48 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -2107,7 +2107,7 @@ getremotehost()
     const char *host = NULL;
 #ifdef INET6
     struct sockaddr_storage saddr;
-    int len = sizeof(struct sockaddr_storage);
+    socklen_t len = sizeof(struct sockaddr_storage);
     static char hbuf[NI_MAXHOST];
 #else
     struct hostent* hp;

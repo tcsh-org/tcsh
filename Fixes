@@ -1,3 +1,8 @@
+ 56. V6.11.05 - 20020712
+ 55. We should have socklen_t in the INET6 case, but we leave int otherwise.
+ 54. Fixed for Darwin/Rhapsody (Mark Peek)
+ 53. provide new config.sub and config.guess from ftp://ftp.gnu.org/gnu/config/
+     (Nelson Beebe)
  52. V6.11.04 - 20020709
  51. Dissallow setting of environment variables that do not contain
      alphanumeric names (Ton Voon)

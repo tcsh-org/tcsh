@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.44 2002/05/16 14:05:42 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.45 2002/06/25 19:02:11 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.44 2002/05/16 14:05:42 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.45 2002/06/25 19:02:11 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -196,8 +196,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			/* prompt stuff */
     static Char *olddir = NULL, *olduser = NULL;
     extern int tlength;	/* cache cleared */
-    int updirs, sz;
-    size_t pdirs;
+    int updirs;
+    size_t pdirs, sz;
 
     for (; *cp; cp++) {
 	if (p >= ep)
@@ -529,7 +529,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			if (p >= ep) break;
 		break;
 	    case '$':
-		sz = (int) (ep - p);
+		sz = ep - p;
 		(void) expdollar(&p, &cp, &sz, attributes);
 		/* cp should point the last char of currnet % sequence */
 		cp--;
