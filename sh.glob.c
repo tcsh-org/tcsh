@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.47 2000/11/11 23:03:37 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.48 2001/01/04 18:51:57 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,9 +36,10 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.47 2000/11/11 23:03:37 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.48 2001/01/04 18:51:57 christos Exp $")
 
 #include "tc.h"
+#include "tw.h"
 
 #include "glob.h"
 
@@ -871,7 +872,7 @@ backeval(cp, literal)
 #ifdef SIGTTOU
 	(void) sigignore(SIGTTOU);
 #endif
-	execute(t, -1, NULL, NULL);
+	execute(t, -1, NULL, NULL, TRUE);
 	exitstat();
     }
     xfree((ptr_t) cp);

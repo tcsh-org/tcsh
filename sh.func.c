@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.93 2001/03/13 12:53:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.94 2001/12/17 16:13:00 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.93 2001/03/13 12:53:50 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.94 2001/12/17 16:13:00 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -446,7 +446,7 @@ reexecute(kp)
      * pgrp's as the jobs would then have no way to get the tty (we can't give
      * it to them, and our parent wouldn't know their pgrp, etc.
      */
-    execute(kp, (tpgrp > 0 ? tpgrp : -1), NULL, NULL);
+    execute(kp, (tpgrp > 0 ? tpgrp : -1), NULL, NULL, TRUE);
 }
 
 /*ARGSUSED*/

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.98 2001/09/09 18:46:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.99 2001/10/30 02:43:26 kim Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.98 2001/09/09 18:46:28 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.99 2001/10/30 02:43:26 kim Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -356,7 +356,7 @@ dolist(v, c)
 	/* expand aliases like process() does */
 	/* alias(&cmd); */
 	/* execute the parse tree. */
-	execute(t, tpgrp > 0 ? tpgrp : -1, NULL, NULL);
+	execute(t, tpgrp > 0 ? tpgrp : -1, NULL, NULL, FALSE);
 	/* done. free the lex list and parse tree. */
 	freelex(&cmd), freesyn(t);
 	if (setintr)
@@ -1139,7 +1139,7 @@ aliasrun(cnt, s1, s2)
 	 * From: Michael Schroeder <mlschroe@immd4.informatik.uni-erlangen.de>
 	 * was execute(t, tpgrp);
 	 */
-	execute(t, tpgrp > 0 ? tpgrp : -1, NULL, NULL);	
+	execute(t, tpgrp > 0 ? tpgrp : -1, NULL, NULL, TRUE);
     /* done. free the lex list and parse tree. */
     freelex(&w), freesyn(t);
     if (haderr) {

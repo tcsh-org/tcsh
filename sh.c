@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.94 2001/02/19 23:30:44 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.95 2001/04/27 22:36:39 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.94 2001/02/19 23:30:44 kim Exp $")
+RCSID("$Id: sh.c,v 3.95 2001/04/27 22:36:39 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2122,7 +2122,7 @@ process(catch)
 	 * Execute the parse tree From: Michael Schroeder
 	 * <mlschroe@immd4.informatik.uni-erlangen.de> was execute(t, tpgrp);
 	 */
-	execute(savet, (tpgrp > 0 ? tpgrp : -1), NULL, NULL);
+	execute(savet, (tpgrp > 0 ? tpgrp : -1), NULL, NULL, TRUE);
 
 	/*
 	 * Made it!

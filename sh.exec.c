@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.50 2000/07/15 19:58:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.51 2000/11/11 23:03:36 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.50 2000/07/15 19:58:50 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.51 2000/11/11 23:03:36 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -151,8 +151,9 @@ int	hashname	__P((Char *));
 static	int 	iscommand	__P((Char *));
 
 void
-doexec(t)
+doexec(t, doglob)
     register struct command *t;
+    bool doglob;
 {
     register Char *dp, **pv, **av, *sav;
     register struct varent *v;
@@ -167,7 +168,9 @@ doexec(t)
      */
     blk[0] = t->t_dcom[0];
     blk[1] = 0;
-    gflag = 0, tglob(blk);
+    gflag = 0;
+    if (doglob)
+	tglob(blk);
     if (gflag) {
 	pv = globall(blk);
 	if (pv == 0) {
@@ -199,7 +202,8 @@ doexec(t)
      */
     gflag = 0;
     av = &t->t_dcom[1];
-    tglob(av);
+    if (doglob)
+	tglob(blk);
     if (gflag) {
 	av = globall(av);
 	if (av == 0) {
@@ -620,7 +624,7 @@ execash(t, kp)
 #ifdef WINNT_NATIVE
 	__nt_really_exec=1;
 #endif /* WINNT_NATIVE */
-	doexec(kp);
+	doexec(kp, 1);
     }
 
     (void) sigset(SIGINT, osigint);

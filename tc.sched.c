@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sched.c,v 3.16 1998/10/25 15:10:40 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sched.c,v 3.17 2000/07/04 19:46:23 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -38,9 +38,10 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.16 1998/10/25 15:10:40 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.17 2000/07/04 19:46:23 christos Exp $")
 
 #include "ed.h"
+#include "tw.h"
 #include "tc.h"
 
 extern int just_signaled;
@@ -268,7 +269,7 @@ sched_run(n)
 	if (seterr)
 	    stderror(ERR_OLD);
 	/* execute the parse tree. */
-	execute(t, -1, NULL, NULL);
+	execute(t, -1, NULL, NULL, TRUE);
 	/* done. free the lex list and parse tree. */
 	freelex(&cmd), freesyn(t);
     }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.37 1998/10/25 15:10:09 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exp.c,v 3.38 1998/11/24 18:17:32 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,9 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.37 1998/10/25 15:10:09 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.38 1998/11/24 18:17:32 christos Exp $")
+
+#include "tw.h"
 
 /*
  * C shell
@@ -1017,7 +1019,7 @@ evalav(v)
     t = syntax(paraml1.next, &paraml1, 0);
     if (seterr)
 	stderror(ERR_OLD);
-    execute(t, -1, NULL, NULL);
+    execute(t, -1, NULL, NULL, TRUE);
     freelex(&paraml1), freesyn(t);
 }
 

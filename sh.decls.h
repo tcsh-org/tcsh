@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.34 1999/02/06 15:01:21 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.35 2001/08/06 23:52:03 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -91,7 +91,7 @@ extern	void		  stderror	__P((unsigned int, ...));
 /*
  * sh.exec.c
  */
-extern	void		  doexec	__P((struct command *));
+extern	void		  doexec	__P((struct command *, bool));
 extern	void		  dohash	__P((Char **, struct command *));
 extern	void		  dounhash	__P((Char **, struct command *));
 extern	void		  execash	__P((Char **, struct command *));
@@ -314,7 +314,7 @@ extern  struct process   *pfind		__P((Char *));
  * sh.sem.c
  */
 extern	void		  execute	__P((struct command *, int, int *, 
-					     int *));
+					     int *, bool));
 extern	void		  mypipe	__P((int *));
 
 /*
