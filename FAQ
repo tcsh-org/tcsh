@@ -1,6 +1,6 @@
 
 Last Updated: 
-Sun May 16 20:08:16 EDT 1993
+Mon Apr 18 01:41:44 EDT 1994
 
 This is for people who do not read the manual!
 
@@ -67,7 +67,8 @@ be able to get ftp it... :-)
     shells is either hardcoded or it is usually in a file called
     /etc/shells. If it is hard-coded, then you are out of luck and
     your best bet is to get a newer version of ftpd. Otherwise add
-    tcsh to the list of shells. Remember that the full path is required.
+    tcsh to the list of shells. [For AIX this file is called 
+    /etc/security/login.cfg]. Remember that the full path is required.
     If there is no /etc/shells, and you are creating one, remember to
     add /bin/csh, /bin/sh, and any other valid shells for your system,
     so that other people can ftp too :-)
