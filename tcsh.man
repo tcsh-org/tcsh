@@ -3911,7 +3911,7 @@ of `You have new mail.'
 .B matchbeep \fR(+)
 If set to `never', completion never beeps.
 If set to `nomatch', it beeps only when there is no match.
-If set to `ambiguous, it beeps when there are multiple matches.
+If set to `ambiguous', it beeps when there are multiple matches.
 If set to `notunique', it beeps when there is one exact and other longer matches.
 If unset, `ambiguous' is used.
 .TP 8
