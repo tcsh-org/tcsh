@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.88 2000/06/10 22:06:27 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.89 2000/06/11 02:14:14 kim Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -600,7 +600,9 @@ extern Char   *ffile;		/* Name of shell file for $0 */
 extern bool    dolzero;		/* if $?0 should return true... */
 
 extern char *seterr;		/* Error message from scanner/parser */
+#ifndef BSD4_4
 extern int errno;		/* Error from C library routines */
+#endif
 EXTERN Char   *shtemp IZERO;	/* Temp name for << shell files in /tmp */
 
 #ifdef BSDTIMES
@@ -777,10 +779,10 @@ EXTERN struct Bin {
  */
 struct Ain {
     int type;
-#define I_SEEK -1		/* Invalid seek */
-#define A_SEEK	0		/* Alias seek */
-#define F_SEEK	1		/* File seek */
-#define E_SEEK	2		/* Eval seek */
+#define TCSH_I_SEEK 	 0		/* Invalid seek */
+#define TCSH_A_SEEK	 1		/* Alias seek */
+#define TCSH_F_SEEK	 2		/* File seek */
+#define TCSH_E_SEEK	 3		/* Eval seek */
     union {
 	off_t _f_seek;
 	Char* _c_seek;
