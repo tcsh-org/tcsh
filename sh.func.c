@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.88 2000/07/04 19:42:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.89 2000/07/15 19:58:50 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.88 2000/07/04 19:42:47 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.89 2000/07/15 19:58:50 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1930,7 +1930,7 @@ getval(lp, v)
 	cp++;
     if (*cp == 0) {
 	if (*v == 0)
-	    return f == 0.0 ? (RLIM_TYPE) 0 : restrict_limit((f + 0.5) * lp->limdiv);
+	    return restrict_limit((f * lp->limdiv) + 0.5);
 	cp = *v;
     }
     switch (*cp) {
