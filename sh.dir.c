@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dir.c,v 3.1 1991/07/15 19:37:24 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dir.c,v 3.2 1991/07/18 15:29:06 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.dir.c,v 3.1 1991/07/15 19:37:24 christos Exp christos $")
+RCSID("$Id: sh.dir.c,v 3.2 1991/07/18 15:29:06 christos Exp $")
 
 
 #include "sh.h"
@@ -978,14 +978,7 @@ dcanon(cp, p)
 	    /*
 	     * Use STRhome to make '~' work
 	     */
-	    p2 = cp + Strlen(p2);
-	    sp = newcp = (Char *) xmalloc((size_t)
-					  ((cc + Strlen(p2)) * sizeof(Char)));
-	    while (*p1)
-		*sp++ = *p1++;
-	    while (*p2)
-		*sp++ = *p2++;
-	    *sp = '\0';
+	    newcp = Strspl(p1, cp + Strlen(p2));
 	    xfree((ptr_t) cp);
 	    cp = newcp;
 	}
