@@ -1,3 +1,7 @@
+ 68. V6.07.09 - 19980707
+ 67. Separate the nt builtins (Amold)
+ 66. completion fixes (Tom)
+ 65. color ls fixes (Taga Nayuta)
  64. V6.07.08 - 19980629
  63. add config.h.in (Kaveh)
  62. win32 updates (Amol)

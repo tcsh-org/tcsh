@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.41 1997/10/28 22:34:18 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.42 1998/04/08 13:58:33 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.41 1997/10/28 22:34:18 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.42 1998/04/08 13:58:33 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1619,6 +1619,9 @@ ChangeSize(lins, cols)
     Val(T_co) = (cols < 2) ? 80 : cols;
     Val(T_li) = (lins < 1) ? 24 : lins;
 
+#ifdef WINNT
+      nt_set_size(lins,cols);
+#endif /* WINNT */
 #ifdef KNOWsize
     /*
      * We want to affect the environment only when we have a valid

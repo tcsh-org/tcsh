@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.80 1998/04/21 16:08:45 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.81 1998/06/05 16:19:58 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -921,6 +921,10 @@ extern struct biltins {
     int     minargs, maxargs;
 } bfunc[];
 extern int nbfunc;
+#ifdef WINNT
+extern struct biltins  nt_bfunc[];
+extern int nt_nbfunc;
+#endif /* WINNT*/
 
 extern struct srch {
     char   *s_name;

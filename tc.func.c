@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.76 1998/06/27 12:27:34 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.77 1998/06/28 15:07:26 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.76 1998/06/27 12:27:34 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.77 1998/06/28 15:07:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -44,7 +44,7 @@ RCSID("$Id: tc.func.c,v 3.76 1998/06/27 12:27:34 christos Exp $")
 #include "tc.h"
 #ifdef WINNT
 #include "nt.const.h"
-#endif WINNT
+#endif /* WINNT */
 
 #ifdef AFS
 #define PASSMAX 16

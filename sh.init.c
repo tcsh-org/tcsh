@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.43 1997/10/27 22:44:30 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.45 1998/04/21 16:08:47 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.43 1997/10/27 22:44:30 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.45 1998/04/21 16:08:47 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -72,15 +72,9 @@ struct	biltins bfunc[] = {
     { "case",		dozip,		0,	1	},
     { "cd",		dochngd,	0,	INF	},
     { "chdir",		dochngd,	0,	INF	},
-#ifdef WINNT
-    { "cls",		docls,		0,	0	},
-#endif /* WINNT */
     { "complete",	docomplete,	0,	INF	},
     { "continue",	docontin,	0,	0	},
     { "default",	dozip,		0,	0	},
-#ifdef NTDBG
-    { "debugbreak",	dodebugbreak,	0,	0	},
-#endif /* NTDBG */
     { "dirs",		dodirs,		0,	INF	},
 #if defined(_CRAY) && !defined(_CRAYMPP)
     { "dmmode",		dodmmode,	0,	1	},
@@ -136,9 +130,6 @@ struct	biltins bfunc[] = {
     { "onintr",		doonintr,	0,	2	},
     { "popd",		dopopd,		0,	INF	},
     { "printenv",	doprintenv,	0,	1	},
-#ifdef WINNT
-    { "ps",	dops,	0,	1	},
-#endif /* WINNT */
     { "pushd",		dopushd,	0,	INF	},
     { "rehash",		dohash,		0,	3	},
     { "repeat",		dorepeat,	2,	INF	},
@@ -160,21 +151,12 @@ struct	biltins bfunc[] = {
     { "setxvers",	dosetxvers,	0,	1	},
 #endif /* TCF */
     { "shift",		shift,		0,	1	},
-#ifdef WINNT
-    { "shutdown",	doshutdown,	0,	2	},
-#endif /* WINNT */
     { "source",		dosource,	1,	INF	},
-#ifdef WINNT
-    { "start",		dostart,	1,	INF	},
-#endif /* WINNT */
     { "stop",		dostop,		1,	INF	},
     { "suspend",	dosuspend,	0,	0	},
     { "switch",		doswitch,	1,	INF	},
     { "telltc",		dotelltc,	0,	INF	},
     { "time",		dotime,		0,	INF	},
-#ifdef WINNT
-    { "title",		dotitle,	1,	INF	},
-#endif /* WINNT */
 #if defined(_CX_UX)
     { "ucb",		doucb,		0,	INF	},
 #endif /* _CX_UX */

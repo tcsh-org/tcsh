@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.27 1995/04/29 22:28:24 christos Exp christos $
+# $Id: complete.tcsh,v 1.28 1995/05/06 17:51:58 christos Exp $
 # example file using the new completion code
 #
 
@@ -24,7 +24,7 @@ if ($?complete) then
     set hosts
     foreach f ($HOME/.hosts /usr/local/etc/csh.hosts $HOME/.rhosts /etc/hosts.equiv)
         if ( -r $f ) then
-	    set hosts=($hosts `cut -d " " -f 1 $f | grep -v +`)
+	    set hosts = ($hosts `grep -v "+" $f | tr -s " " "	" | cut -f 1`)
 	endif
     end
     if ( -r $HOME/.netrc ) then
@@ -395,9 +395,9 @@ if ($?complete) then
 
     endif
 
-    # these from Tom Warzeka <waz@quahog.nl.nuwc.navy.mil>
+    # these from Tom Warzeka <waz@quahog.npt.nuwc.navy.mil>
     # you may need to set the following variables for your host
-    set _elispdir = /usr/local/lib/emacs/19.27/lisp  # GNU Emacs lisp directory
+    set _elispdir = /usr/local/share/emacs/20.2/lisp # GNU Emacs lisp directory
     set _maildir = /var/spool/mail  # Post Office: /var/spool/mail or /usr/mail
     set _ypdir  = /var/yp	# directory where NIS (YP) maps are kept
     set _domain = "`domainname`"
@@ -473,17 +473,16 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			n/*/f:*.{gz,Z,z,zip,taz,tgz}/
     complete zgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
 			c/-/"(A b B c C e f h i l n s v V w x)"/ \
-			p/1/x:'<limited_regular_expression>'/ \
+			p/1/x:'<limited_regular_expression>'/ N/-*e/f/ \
 			n/-*e/x:'<limited_regular_expression>'/ n/-*f/f/ n/*/f/
     complete zegrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
 			c/-/"(A b B c C e f h i l n s v V w x)"/ \
-			p/1/x:'<full_regular_expression>'/ \
+			p/1/x:'<full_regular_expression>'/ N/-*e/f/ \
 			n/-*e/x:'<full_regular_expression>'/ n/-*f/f/ n/*/f/
     complete zfgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
 			c/-/"(A b B c C e f h i l n s v V w x)"/ \
-			p/1/x:'<fixed_string>'/ \
+			p/1/x:'<fixed_string>'/ N/-*e/f/ \
 			n/-*e/x:'<fixed_string>'/ n/-*f/f/ n/*/f/
-
     complete znew	c/-/"(f t v 9 P K)"/ n/*/f:*.Z/
     complete zmore	n/*/f:*.{gz,Z,z,zip}/
     complete zfile	n/*/f:*.{gz,Z,z,zip,taz,tgz}/
@@ -492,15 +491,15 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 
     complete grep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
 			c/-/"(A b B c C e f h i l n s v V w x)"/ \
-			p/1/x:'<limited_regular_expression>'/ \
+			p/1/x:'<limited_regular_expression>'/ N/-*e/f/ \
 			n/-*e/x:'<limited_regular_expression>'/ n/-*f/f/ n/*/f/
     complete egrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
 			c/-/"(A b B c C e f h i l n s v V w x)"/ \
-			p/1/x:'<full_regular_expression>'/ \
+			p/1/x:'<full_regular_expression>'/ N/-*e/f/ \
 			n/-*e/x:'<full_regular_expression>'/ n/-*f/f/ n/*/f/
     complete fgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
 			c/-/"(A b B c C e f h i l n s v V w x)"/ \
-			p/1/x:'<fixed_string>'/ \
+			p/1/x:'<fixed_string>'/ N/-*e/f/ \
 			n/-*e/x:'<fixed_string>'/ n/-*f/f/ n/*/f/
 
     complete users	c/--/"(help version)"/ p/1/x:'<accounting_file>'/
@@ -552,7 +551,8 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			R s S T v w x X z Z)"/ \
 			p/1/"(A c d r t u x -A -c -d -r -t -u -x \
 			--catenate --concatenate --create --diff --compare \
-			--delete --append --list --update --extract --get)"/ \
+			--delete --append --list --update --extract --get \
+			--help --version)"/ \
 			c/--/"(catenate concatenate create diff compare \
 			delete append list update extract get atime-preserve \
 			block-size read-full-blocks directory checkpoint file \
@@ -567,7 +567,7 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			files-from null totals verbose label version \
 			interactive confirmation verify exclude exclude-from \
 			compress uncompress gzip ungzip use-compress-program \
-			block-compress)"/ \
+			block-compress help version)"/ \
 			c/-/"(b B C f F g G h i k K l L m M N o O p P R s S \
 			T v V w W X z Z 0 1 2 3 4 5 6 7 -)"/ \
 			n/-c*f/x:'<new_tar_file, device_file, or "-">'/ \
@@ -582,15 +582,27 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			N/{-C,--directory}/'`\ls $:-1`'/ \
 			n/-[0-7]/"(l m h)"/
 
+    # SVR4 filesystems
+    #complete  mount	c/-/"(a F m o O p r v V)"/ n/-p/n/ n/-v/n/ \
+    #			n/-o/x:'<FSType_options>'/ \
+    #			n@-F@'`\ls -1 /usr/lib/fs`'@ \
+    #			n@*@'`grep -v "^#" /etc/vfstab | tr -s " " "	 " | cut -f 3`'@
+    #complete umount	c/-/"(a o V)"/ n/-o/x:'<FSType_options>'/ \
+    #			n/*/'`mount | cut -d " " -f 1`'/
+    #complete  mountall	c/-/"(F l r)"/ n@-F@'`\ls -1 /usr/lib/fs`'@
+    #complete umountall	c/-/"(F h k l r s)"/ n@-F@'`\ls -1 /usr/lib/fs`'@ \
+    #			n/-h/'`df -k | cut -s -d ":" -f 1 | sort -u`'/
     # BSD 4.3 filesystems
-    complete  mount	c/-/"(a h v t r)"/ n/-h/\$hosts/ n/-t/"(4.2 nfs)"/ \
-			n@*@'`cut -d " " -f 2 /etc/fstab`'@
-    complete umount	c/-/"(a h v t)"/   n/-h/\$hosts/ n/-t/"(4.2 nfs)"/ \
+    complete  mount	c/-/"(a r t v)"/ n/-t/"(4.2 nfs)"/ \
+			n@*@'`grep -v "^#" /etc/fstab | tr -s " " "	" | cut -f 2`'@
+    complete umount	c/-/"(a h t v)"/ n/-t/"(4.2 nfs)"/ \
+			n/-h/'`df | cut -s -d ":" -f 1 | sort -u`'/ \
 			n/*/'`mount | cut -d " " -f 3`'/
     # BSD 4.2 filesystems
-    #complete  mount	c/-/"(a h v t r)"/ n/-h/\$hosts/ n/-t/"(ufs nfs)"/ \
+    #complete  mount	c/-/"(a r t v)"/ n/-t/"(ufs nfs)"/ \
     #			n@*@'`cut -d ":" -f 2 /etc/fstab`'@
-    #complete umount	c/-/"(a h v t)"/   n/-h/\$hosts/ n/-t/"(ufs nfs)"/ \
+    #complete umount	c/-/"(a h t v)"/ n/-t/"(ufs nfs)"/ \
+    #			n/-h/'`df | cut -s -d ":" -f 1 | sort -u`'/ \
     #			n/*/'`mount | cut -d " " -f 3`'/
 
     # these deal with NIS (formerly YP); if it's not running you don't need 'em

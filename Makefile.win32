@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.83 1996/10/11 17:32:01 christos Exp $
+# $Id: Makefile.win32,v 3.4 1998/06/28 15:07:12 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -30,7 +30,7 @@ INCLUDES=-I. -I.. -Iwin32 -ID:\mstools\include
 EXTRAFLAGS = -DWINNT -DNO_CRYPT
 
 
-CURRENT_VERSION=5.00
+#CURRENT_VERSION=5.01
 
 !if "$(BLDTYPE)" == ""
 BLDTYPE=retail
@@ -38,16 +38,16 @@ BLDTYPE=retail
 
 !if "$(BLDTYPE)" == "debug"
 
-MY_LOCALSTR=\",nt-rev-$(CURRENT_VERSION)-debug\"
+#MY_LOCALSTR=\",nt-rev-$(CURRENT_VERSION)-debug\"
 
-NTLDFLAGS=  -debug:full -debugtype:both -pdb:none #-profile 
+NTLDFLAGS=  -debug:full -debugtype:both -pdb:none -entry:silly_entry #-profile
 NTCFLAGS = -YX -Zi -DNTDBG  
 LIBES= user32.lib advapi32.lib kernel32.lib libcmtd.lib oldnames.lib  
 
 !else if "$(BLDTYPE)" == "retail"
 
 MY_LOCALSTR=\",nt-rev-$(CURRENT_VERSION)\"
-NTLDFLAGS=  -debug:full
+NTLDFLAGS=  -debug:full -entry:silly_entry
 NTCFLAGS = -Zi -O2 
 LIBES= user32.lib advapi32.lib kernel32.lib libcmt.lib oldnames.lib  
 
@@ -56,8 +56,8 @@ LIBES= user32.lib advapi32.lib kernel32.lib libcmt.lib oldnames.lib
 !ERROR Unknown compilation mode $(BLDTYPE). Set DEBUG or RELEASE
 !endif
 
-CFLAGS= -MT -W3 -WX -Fo$*.$(SUF) $(NTCFLAGS) -DLOCALSTR=$(MY_LOCALSTR) \
-		$(INCLUDES) 
+CFLAGS= -MT -W3 -WX -Fo$*.$(SUF) $(NTCFLAGS) $(INCLUDES) 
+#-DLOCALSTR=$(MY_LOCALSTR) 
 LDFLAGS= -nodefaultlib $(NTLDFLAGS)
 
 
@@ -94,7 +94,7 @@ SHOBJS=	sh.$(SUF) sh.dir.$(SUF) sh.dol.$(SUF) sh.err.$(SUF) sh.exec.$(SUF) \
 TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c \
 	tw.comp.c tw.color.c
 TWOBJS=	tw.help.$(SUF) tw.init.$(SUF) tw.parse.$(SUF) tw.spell.$(SUF) \
-	tw.comp.$(SUF) tw.color.${SUF}
+	tw.comp.$(SUF) tw.color.$(SUF)
 
 EDSRCS= ed.chared.c ed.decls.h ed.defns.c ed.h ed.init.c ed.inputl.c \
 	ed.refresh.c ed.screen.c ed.xmap.c ed.term.c ed.term.h
@@ -243,7 +243,7 @@ EDINC=sh.$(SUF) sh.func.$(SUF) sh.lex.$(SUF) sh.print.$(SUF) sh.proc.$(SUF) \
 $(EDOBJS) $(EDINC) : $(EDH)
 
 # SHH
-$(OBJS): win32\nt.const.h win32\ntport.h config.h $(SHH)
+$(OBJS): win32\nt.const.h win32\ntport.h win32\version.h config.h $(SHH)
 
 # TWH
 TWINC=ed.chared.$(SUF) ed.inputl.$(SUF) sh.exec.$(SUF) sh.func.$(SUF) \

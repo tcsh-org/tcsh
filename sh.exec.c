@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.41 1998/06/27 12:27:18 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.42 1998/06/28 15:07:18 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.41 1998/06/27 12:27:18 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.42 1998/06/28 15:07:18 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -996,6 +996,23 @@ tellmewhat(lexp, str)
 	    return TRUE;
 	}
     }
+#ifdef WINNT
+    for (bptr = nt_bfunc; bptr < &nt_bfunc[nt_nbfunc]; bptr++) {
+	if (eq(sp->word, str2short(bptr->bname))) {
+	    if (str == NULL) {
+		if (aliased)
+		    prlex(lexp);
+		xprintf(CGETS(13, 5, "%S: shell built-in command.\n"),
+			      sp->word);
+		flush();
+	    }
+	    else 
+		(void) Strcpy(str, sp->word);
+	    sp->word = s0;	/* we save and then restore this */
+	    return TRUE;
+	}
+    }
+#endif /* WINNT*/
 
     sp->word = cmd = globone(sp->word, G_IGNORE);
 
@@ -1110,6 +1127,17 @@ find_cmd(cmd, prt)
 		return rval;
 	}
     }
+#ifdef WINNT
+    for (bptr = nt_bfunc; bptr < &nt_bfunc[nt_nbfunc]; bptr++) {
+	if (eq(cmd, str2short(bptr->bname))) {
+	    rval = 1;
+	    if (prt)
+		xprintf(CGETS(13, 9, "%S is a shell built-in\n"), cmd);
+	    else
+		return rval;
+	}
+    }
+#endif /* WINNT*/
 
     /* last, look through the path for the command */
 

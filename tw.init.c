@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.init.c,v 3.22 1997/10/27 22:44:41 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.init.c,v 3.23 1998/04/08 17:57:43 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.22 1997/10/27 22:44:41 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.23 1998/04/08 17:57:43 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -290,6 +290,11 @@ tw_cmd_builtin()
     for (bptr = bfunc; bptr < &bfunc[nbfunc]; bptr++)
 	if (bptr->bname)
 	    tw_cmd_add(str2short(bptr->bname));
+#ifdef WINNT
+    for (bptr = nt_bfunc; bptr < &nt_bfunc[nt_nbfunc]; bptr++)
+	if (bptr->bname)
+	    tw_cmd_add(str2short(bptr->bname));
+#endif /* WINNT*/
 } /* end tw_cmd_builtin */
 
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.74 1998/06/27 12:27:20 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.75 1998/06/28 15:07:20 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,14 +36,14 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.74 1998/06/27 12:27:20 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.75 1998/06/28 15:07:20 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
 #include "tc.h"
 #ifdef WINNT
 #include "nt.const.h"
-#endif WINNT
+#endif /* WINNT */
 
 /*
  * C shell
@@ -118,6 +118,9 @@ isbfunc(t)
 	else
 	    bp1 = bp + 1;
     }
+#ifdef WINNT
+    return nt_check_additional_builtins(cp);
+#endif /*WINNT*/
     return (0);
 }
 
@@ -2317,10 +2320,19 @@ struct command *c;
 		++b;
 	    }
 	}
-	if (Tty_raw_mode)
-	    xputchar('\r');
-	xputchar('\n');
+	if (row < (rows - 1)) {
+	    if (Tty_raw_mode)
+		xputchar('\r');
+	    xputchar('\n');
+	}
     }
+#ifdef WINNT
+    nt_print_builtins(maxwidth);
+#else
+    if (Tty_raw_mode)
+	xputchar('\r');
+    xputchar('\n');
+#endif /* WINNT */
 
     lbuffed = 1;		/* turn back on line buffering */
     flush();

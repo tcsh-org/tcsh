@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.color.c,v 1.1 1998/06/27 12:46:50 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.color.c,v 1.2 1998/06/28 15:07:35 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.1 1998/06/27 12:46:50 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.2 1998/06/28 15:07:35 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -64,25 +64,29 @@ typedef struct {
 } Variable;
 
 static Variable variables[] = {
-    VAR(NOS, "no", "0"),	/* Normal (non-filename) text */
-    VAR(NOS, "fi", "0"),	/* Regular file */
     VAR('/', "di", "01;34"),	/* Directory */
     VAR('@', "ln", "01;36"),	/* Symbolic link */
+    VAR('&', "or", ""),		/* Orphanned symbolic link (defaults to ln) */
     VAR('|', "pi", "33"),	/* Named pipe (FIFO) */
     VAR('=', "so", "01;35"),	/* Socket */
     VAR('#', "bd", "01;33"),	/* Block device */
     VAR('%', "cd", "01;33"),	/* Character device */
     VAR('*', "ex", "01;32"),	/* Executable file */
+    VAR(NOS, "fi", "0"),	/* Regular file */
+    VAR(NOS, "no", "0"),	/* Normal (non-filename) text */
     VAR(NOS, "mi", ""),		/* Missing file (defaults to fi) */
-    VAR('&', "or", ""),		/* Orphanned symbolic link (defaults to ln) */
+#ifdef _OSD_POSIX
+    VAR(NOS, "lc", "\x27["),	/* Left code (EBCDIC)*/
+#else /* _OSD_POSIX */
     VAR(NOS, "lc", "\033["),	/* Left code */
+#endif /* _OSD_POSIX */
     VAR(NOS, "rc", "m"),	/* Right code */
     VAR(NOS, "ec", ""),		/* End code (replaces lc+no+rc) */
 };
 
 enum FileType {
-    VNormal, VFile, VDir, VSym, VPipe, VSock, VBlock, VChr,
-    VExe, VMiss, VOrph, VLeft, VRight, VEnd
+    VDir, VSym, VOrph, VPipe, VSock, VBlock, VChr, VExe,
+    VFile, VNormal, VMiss, VLeft, VRight, VEnd
 };
 
 #define nvariables (sizeof(variables)/sizeof(variables[0]))
@@ -150,7 +154,7 @@ getstring(dp, sp, pd, f)
 	    if ((sc = parseescape(&s)) == -1)
 		return 0;
 	    else
-		*d++ = (Char) sc;
+		*d++ = (char) sc;
 	}
 	else
 	    *d++ = *s++ & CHAR;
@@ -178,8 +182,8 @@ parseLS_COLORS(value)
     Extension *e;		/* pointer in extensions */
 
     /* init */
-    if (colors)
-	xfree((ptr_t) colors);
+    if (extensions)
+        xfree((ptr_t) extensions);
     for (i = 0; i < nvariables; i++)
 	variables[i].color = variables[i].defaultcolor;
     colors = NULL;
@@ -195,8 +199,8 @@ parseLS_COLORS(value)
     for (v = value; *v; v++)
 	if ((*v & CHAR) == ':')
 	    i++;
-    colors = (char *) xmalloc((size_t) (len + i * sizeof(Extension)));
-    extensions = (Extension *) (colors + len);
+    extensions = (Extension *) xmalloc((size_t) (len + i * sizeof(Extension)));
+    colors = i * sizeof(Extension) + (char *)extensions;
     nextensions = 0;
 
     /* init pointers */
@@ -277,35 +281,32 @@ print_color(fname, len, suffix)
     char   *last = filename + len;
     Str    *color = &variables[VFile].color;
 
-    for (i = 0; i < nextensions; i++)
-	if (strncmp(last - extensions[i].extension.len,
-		    extensions[i].extension.s,
-		    extensions[i].extension.len) == 0) {
-	    color = &extensions[i].color;
+    switch (suffix) {
+    case '>':			/* File is a symbolic link pointing to
+				 * a directory */
+        color = &variables[VDir].color;
 	    break;
-	}
-
-    if (i == nextensions) {
+    case '+':			/* File is a hidden directory [aix] or
+				 * context dependent [hpux] */
+    case ':':			/* File is network special [hpux] */
+        break;
+    default:
 	for (i = 0; i < nvariables; i++)
 	    if (variables[i].suffix != NOS &&
 		variables[i].suffix == suffix) {
 		color = &variables[i].color;
 		break;
-
 	    }
 	if (i == nvariables) {
-	    switch (suffix) {
-	    case '>':		/* File is a symbolic link pointing to a
-				 * directory */
-		color = &variables[VDir].color;
-		break;
-	    case '+':		/* File is a hidden directory [aix] or context
-				 * dependent [hpux] */
-	    case ':':		/* File is network special [hpux] */
-	    default:
+	    for (i = 0; i < nextensions; i++)
+	        if (strncmp(last - extensions[i].extension.len,
+			    extensions[i].extension.s,
+			    extensions[i].extension.len) == 0) {
+		  color = &extensions[i].color;
 		break;
 	    }
 	}
+	break;
     }
 
     put_color(&variables[VLeft].color);
