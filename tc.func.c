@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.46 1993/10/30 20:03:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.47 1993/11/13 00:40:56 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.46 1993/10/30 20:03:30 christos Exp christos $")
+RCSID("$Id: tc.func.c,v 3.47 1993/11/13 00:40:56 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1795,7 +1795,6 @@ remhost()
     if (getpeername(SHIN, (struct sockaddr *) &saddr, &len) == -1) {
 #ifdef UTHOST
 	char *name = utmphost();
-	xprintf("utmphost %s\n", name);
 	if (name != NULL) {
 	    if ((hp = gethostbyname(name)) == NULL) {
 		char *ptr = strchr(name, '.');

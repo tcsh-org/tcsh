@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.glob.c,v 3.33 1993/06/25 21:17:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.glob.c,v 3.34 1993/11/13 00:40:56 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.33 1993/06/25 21:17:12 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.34 1993/11/13 00:40:56 christos Exp $")
 
 #include "tc.h"
 
@@ -409,7 +409,7 @@ globexpand(v)
 		    stderror(ERR_DEEP);
 		}
 	    }
-	    if (ns != s) {
+	    if (ns && ns != s) {
 		/* Expansion succeeded */
 		xfree((ptr_t) s);
 		*vl = Strsave(gp);
