@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.prompt.c,v 3.22 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.prompt.c,v 3.23 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.22 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.23 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "ed.h"
 
@@ -239,7 +239,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 
 		    /* "DING!" stuff by Hans also */
 		    if (t->tm_min || print_prompt_did_ding || 
-			what != FMT_PROMPT) {
+			what != FMT_PROMPT || adrof(STRnoding)) {
 			if (t->tm_min)
 			    print_prompt_did_ding = 0;
 			Itoa(hr, buff);
@@ -396,7 +396,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			    *p++ = attributes | '+';
 			} else
 			    *p++ = attributes | ('0' + updirs);
-			*p++ = attributes | '>';
+			*p++ = attributes | tcsh ? '>' : '%';
 		    }
 		}
 		

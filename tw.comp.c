@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.comp.c,v 1.28 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tw.comp.c,v 1.29 1995/03/12 04:49:26 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.28 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.29 1995/03/12 04:49:26 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"

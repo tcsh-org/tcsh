@@ -1671,6 +1671,9 @@ Sticky bit is set (+)
 \fIfile\fR (which must be a digit) is an open file descriptor
 for a terminal device (+)
 .TP 4
+.B R
+Has been migrated (convex only) (+)
+.TP 4
 .B L
 Applies subsequent operators in a multiple-operator test to a symbolic link
 rather than to the file to which the link points (+) *
@@ -1951,7 +1954,10 @@ Under Domain/OS, \fIinlib\fR adds shared libraries to the current environment,
 .PP
 Under Mach, \fIsetpath\fR is equivalent to Mach's \fIsetpath\fR(1).
 .PP
-Under Masscomp/RTU, \fIuniverse\fR sets the universe.
+Under Masscomp/RTU and Harris CX/UX, \fIuniverse\fR sets the universe.
+.PP
+Under Harris CX/UX, \fIucb\fR or \fIatt\fR runs a command under the specified
+universe.
 .PP
 Under Convex/OS, \fIwarp\fR prints or sets the universe.
 .PP
@@ -2724,7 +2730,7 @@ in each component which does not begin with a `/'.
 .PP
 On machines without \fIvfork\fR(2), prints only the number and size of
 hash buckets.
-.B history \fR[\fB\-hr\fR] [\fIn\fR]
+.B history \fR[\fB\-hTr\fR] [\fIn\fR]
 .br
 .B history \-S\fR|\fB\-L|\fB\-M \fR[\fIfilename\fR] (+)
 .PD 0
@@ -2732,8 +2738,9 @@ hash buckets.
 .B history \-c \fR(+)
 The first form prints the history event list.
 If \fIn\fR is given only the \fIn\fR most recent events are printed or saved.
-With \fB\-h\fR, the history list is printed without leading numbers and with
-time-stamps in comment form. (This can be used to
+With \fB\-h\fR, the history list is printed without leading numbers. If
+\fB-T\fR is specified, timestamps are printed also in comment form.
+(This can be used to
 produce files suitable for loading with 'history \-L' or 'source \-h'.)
 With \fB\-r\fR, the order of printing is most recent
 first rather than oldest first.
@@ -3604,7 +3611,9 @@ If set to `all' only unique history events are entered in the history
 list. If set to `prev' and the last history event is the same as the
 current command, then the current command is not entered in the history.
 If set to `erase' and the same event is found in the history list,
-that old event gets erased and the current one gets inserted.
+that old event gets erased and the current one gets inserted. Note that
+the `prev' and `all' options renumber history events so there are no
+gaps.
 .TP 8
 .B histfile \fR(+)
 The default location in which `history \-S' and `history \-L' look for

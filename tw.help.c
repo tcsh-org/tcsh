@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.help.c,v 3.11 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tw.help.c,v 3.12 1995/03/12 04:49:26 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.help.c,v 3.11 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: tw.help.c,v 3.12 1995/03/12 04:49:26 christos Exp $")
 
 #include "tw.h"
 #include "tc.h"
@@ -130,8 +130,13 @@ do_help(command)
 	    if (f != -1) {
 		/* so cat it to the terminal */
 		orig_intr = (sigret_t (*)()) sigset(SIGINT, cleanf);
-		while (f != -1 && (len = read(f, (char *) buf, 512)) != 0)
+		while (f != -1 && (len = read(f, (char *) buf, 512)) > 0)
 		    (void) write(SHOUT, (char *) buf, (size_t) len);
+#ifdef convex
+		/* print error in case file is migrated */
+		if (len == -1)
+		    stderror(ERR_SYSTEM, progname, strerror(errno));
+#endif /* convex */
 		(void) sigset(SIGINT, orig_intr);
 		if (f != -1)
 		    (void) close(f);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.h,v 3.62 1994/07/08 14:43:50 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.os.h,v 3.63 1995/04/16 19:15:53 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -60,6 +60,11 @@
 # include <limits.h>
 #endif /* atp vmsposix */
 
+#ifdef DECOSF1
+# include <sys/signal.h>
+# include <sys/ioctl.h>
+#endif /* DECOSF1 */
+
 #if defined(OPEN_MAX) && !defined(NOFILE)
 # define NOFILE OPEN_MAX
 #endif /* OPEN_MAX && !NOFILE */
@@ -96,16 +101,24 @@
 #endif /* OREO */
 
 #ifndef NCARGS
-# ifdef ARG_MAX
-#  define NCARGS ARG_MAX
-# else /* !ARG_MAX */
-#  ifdef _MINIX
-#   define NCARGS 80
-#  else /* !_MINIX */
-#   define NCARGS 1024
-#  endif /* _MINIX */
-# endif /* ARG_MAX */
+# ifdef _SC_ARG_MAX
+#  define NCARGS sysconf(_SC_ARG_MAX)
+# else /* !_SC_ARG_MAX */
+#  ifdef ARG_MAX
+#   define NCARGS ARG_MAX
+#  else /* !ARG_MAX */
+#   ifdef _MINIX
+#    define NCARGS 80
+#   else /* !_MINIX */
+#    define NCARGS 1024
+#   endif /* _MINIX */
+#  endif /* ARG_MAX */
+# endif /* _SC_ARG_MAX */
 #endif /* NCARGS */
+
+#ifdef convex
+# include <sys/dmon.h>
+#endif /* convex */
 
 #ifdef titan
 extern int end;
@@ -131,9 +144,12 @@ struct ucred {
 #  define CSUSP 032
 # endif	/* CSUSP */
 
-# ifndef hp9000s500
+# if !defined(hp9000s500) && !(defined(SIGRTMAX) || defined(SIGRTMIN))
+/*
+ * hpux < 7 || hpux >= 10
+ */
 #  include <sys/bsdtty.h>
-# endif /* hp9000s500 */
+# endif /* !hp9000s500 && !(SIGRTMAX || SIGRTMIN) */
 
 # ifndef POSIX
 #  ifdef BSDJOBS
@@ -480,6 +496,11 @@ struct ucred {
 # define NEEDgetwd
 #endif /* SYSVREL > 0 && !OREO && !sgi && !linux */
 
+#ifdef SOLARIS2
+# undef NEEDgetwd
+# define getwd(a)	getcwd(a, MAXPATHLEN)
+#endif
+
 #ifndef S_IFLNK
 # define lstat stat
 #endif /* S_IFLNK */
@@ -535,7 +556,9 @@ extern void abort();
 extern void qsort();
 #  endif /* hpux */
 # endif	/* SUNOS4 */
+#ifndef _CX_UX
 extern void perror();
+#endif
 
 # ifdef BSDSIGS
 #  if defined(_AIX370) || defined(MACH) || defined(NeXT) || defined(_AIXPS2) || defined(ardent) || defined(SUNOS4) || defined(HPBSD)
@@ -544,7 +567,9 @@ extern int sigpause();
 #  else	/* !(_AIX370 || MACH || NeXT || _AIXPS2 || ardent || SUNOS4 || HPBSD) */
 #   if (!defined(apollo) || !defined(__STDC__)) && !defined(__DGUX__) && !defined(fps500)
 extern sigret_t sigvec();
+#ifndef _CX_UX
 extern void sigpause();
+#endif /* _CX_UX */
 #   endif /* (!apollo || !__STDC__) && !__DGUX__ && !fps500 */
 #  endif /* _AIX370 || MACH || NeXT || _AIXPS2 || ardent || SUNOS4 || HPBSD */
 extern sigmask_t sigblock();

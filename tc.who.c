@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.who.c,v 3.24 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.who.c,v 3.25 1995/04/16 19:15:53 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.24 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: tc.who.c,v 3.25 1995/04/16 19:15:53 christos Exp $")
 
 #include "tc.h"
 

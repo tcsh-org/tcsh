@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.decls.h,v 3.12 1993/10/08 20:36:28 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.06/RCS/tw.decls.h,v 3.13 1994/09/04 21:54:15 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
