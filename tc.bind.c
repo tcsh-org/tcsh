@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.bind.c,v 3.36 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.bind.c,v 3.37 2004/08/04 17:12:30 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.36 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.37 2004/08/04 17:12:30 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -199,7 +199,7 @@ dobindkey(v, c)
 	    return;
 	if (key) {
 	    if (SetArrowKeys(&in, XmapStr(&out), ntype) == -1)
-		xprintf(CGETS(20, 2, "Bad key name: %S\n"), in);
+		xprintf(CGETS(20, 2, "Bad key name: %S\n"), in.buf);
 	}
 	else
 	    AddXkey(&in, XmapStr(&out), ntype);

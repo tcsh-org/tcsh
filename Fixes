@@ -1,3 +1,4 @@
+ 25. Fix incorrect xprintf() usage (Miloslav Trmac)
  24. Additional architectures support for $HOSTTYPE and $MACHTYPE
      (Miloslav Trmac)
  23. Use nl_langinfo(CODESET) to determine $dspmbyte (Miloslav Trmac)
