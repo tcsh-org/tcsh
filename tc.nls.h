@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.h,v 3.7 2005/01/18 20:05:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.h,v 3.8 2005/02/15 21:09:02 christos Exp $ */
 /*
  * tc.nls.h: NLS support
  *
@@ -55,7 +55,7 @@ extern int NLSStringWidth __P((Char *));
 #else
 # ifdef SHORT_STRINGS
 
-extern int NLSFrom __P((const Char *, int, NLSChar *));
+extern int NLSFrom __P((const Char *, size_t, NLSChar *));
 extern int NLSFinished __P((Char *, size_t, eChar));
 extern int NLSChars __P((Char *));
 extern int NLSStringWidth __P((Char *));
