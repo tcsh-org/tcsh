@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.46 1998/07/07 12:06:23 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.47 1998/10/25 15:10:19 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.46 1998/07/07 12:06:23 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.47 1998/10/25 15:10:19 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -733,6 +733,15 @@ mesginit()
 	mesg[SIGTHAW].pname = CSAVS(2, 67, "Special CPR Signal");
     }
 #endif /* SIGTHAW */
+
+#ifdef SIGCANCEL
+    /* solaris */
+    if (mesg[SIGCANCEL].pname == NULL) {
+	mesg[SIGCANCEL].iname = "CANCEL";
+	mesg[SIGCANCEL].pname = CSAVS(2, 109, 
+	    "Thread cancellation signal used by libthread");
+    }
+#endif /* SIGCANCEL */
 
 /*
  * Careful, some OS's (HP/UX 10.0) define these as -1
