@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.77 1998/04/08 13:58:37 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.78 1998/04/08 17:57:23 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.77 1998/04/08 13:58:37 christos Exp $")
+RCSID("$Id: sh.c,v 3.78 1998/04/08 17:57:23 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -252,7 +252,7 @@ main(argc, argv)
 		t = s;
 	}
 #endif /* WINNT */
-	t = t ? ++t : argv[0];
+	t = t ? t + 1 : argv[0];
 	if (*t == '-') t++;
 	progname = strsave((t && *t) ? t : tcshstr);    /* never want a null */
 	tcsh = strcmp(progname, tcshstr) == 0;
