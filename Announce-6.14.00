@@ -4,12 +4,12 @@ I am pleased to announce that tcsh-6.14 is now available; this version
 fixes a number of bugs and adds the following enhancements:
 
 New Features:
-	* UTF-8 handling for both singe and double width characters
-	* termname builtin for testing whether a terminal type is
-	  available in termcap/terminfo
+    * UTF-8 handling for both singe and double width characters
+    * termname builtin for testing whether a terminal type is
+      available in termcap/terminfo
 
 Bug Fixes:
-	* too many to enumerate here, consult the Fixes file
+    * too many to enumerate here, consult the Fixes file
 
 Tcsh is an enhanced version of the Berkeley C-shell that offers command
 line editing and completion plus many other little things that preserve
@@ -32,7 +32,7 @@ get it from ftp.gnu.org or other GNU mirrors.
 
 I would like to thank:
 
-    o everyone who sent bug reports
-    o the beta team for all their help, bug fixes, and suggestions
+    * everyone who sent bug reports
+    * the beta team for all their help, bug fixes, and suggestions
 
 + Kim
