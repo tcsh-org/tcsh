@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.123 2005/01/18 20:14:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.124 2005/03/03 16:49:16 kim Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.123 2005/01/18 20:14:03 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.124 2005/03/03 16:49:16 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1858,6 +1858,10 @@ struct limits limits[] =
 # ifdef RLIMIT_VMEM
     { RLIMIT_VMEM, 	"vmemoryuse",	1024,	"kbytes"	},
 # endif /* RLIMIT_VMEM */
+
+# if defined(RLIMIT_HEAP) /* found on BS2000/OSD systems */
+    { RLIMIT_HEAP,	"heapsize",	1024,	"kbytes"	},
+# endif /* RLIMIT_HEAP */
 
 # ifdef RLIMIT_NOFILE
     { RLIMIT_NOFILE, 	"descriptors", 1,	""		},

@@ -2883,6 +2883,10 @@ the size of the largest core dump that will be created
 the maximum amount of physical memory a process
 may have allocated to it at a given time
 .TP
+\fIheapsize\fR
+the maximum amount of memory a process
+may allocate per \fIbrk()\fR system call
+.TP
 \fIdescriptors\fR or \fIopenfiles\fR
 the maximum number of open files for this process
 .TP
