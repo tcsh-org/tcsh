@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.5 1991/07/24 22:30:16 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.6 1991/07/25 16:05:01 christos Exp christos $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.init.c,v 3.5 1991/07/24 22:30:16 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.6 1991/07/25 16:05:01 christos Exp christos $")
 
 #include "sh.h"
 #define EXTERN			/* intern */
@@ -158,7 +158,7 @@ static struct tcshtty {
     { "cflag:", 0, 0 },
 # define M_LINED	3
     { "lflag:", (ISIG|ICANON|ECHO|ECHOE|ECHOCTL|IEXTEN),
-	       (NOFLSH|ECHOK|ECHONL|EXTPROC|FLUSHO) },
+	        (NOFLSH|ECHONL|EXTPROC|FLUSHO) },
 
 #else /* GSTTY */
 
