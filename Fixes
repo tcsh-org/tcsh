@@ -1,7 +1,7 @@
  13. make automatic dspmbyte determination case insensitive
  12. V6.13.01 - 20040724
  11. bug fix in automatic dspmbyte setting (Miloslav Trmac)
- 10. iconv patches (Aleksey Nogin)
+ 10. iconv patches (Miloslav Trmac)
   9. cygwin signal fixes; only init 32 signals, don't set bit flag on error;
      breaks SIGHUP. (Corinna Vinschen)
   8. Make sure terminal size change takes effect immediately.
