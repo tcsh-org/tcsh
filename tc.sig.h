@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.h,v 3.9 1992/05/15 23:49:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.h,v 3.10 1992/06/16 20:46:26 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -47,9 +47,9 @@
 # include <sys/signal.h>
 #endif				/* SYSVREL > 0 */
 
-#if defined(sun) || defined(DGUX)
+#if defined(SUNOS4) || defined(DGUX)
 # define SAVESIGVEC
-#endif /* sun || DGUX */
+#endif /* SUNOS4 || DGUX */
 
 #if (SYSVREL > 0 && SYSVREL < 3 && !defined(BSDSIGS)) || defined(_MINIX)
 /*

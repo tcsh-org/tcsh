@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.func.c,v 3.31 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.func.c,v 3.32 1992/07/11 00:51:25 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.31 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.32 1992/07/11 00:51:25 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -274,8 +274,7 @@ dolist(v, c)
 	Char   *dp, *tmp, buf[MAXPATHLEN];
 
 	for (k = 0, i = 0; v[k] != NULL; k++) {
-	    tmp = dnormalize(v[k], symlinks == SYM_IGNORE || 
-				   symlinks == SYM_EXPAND);
+	    tmp = dnormalize(v[k], symlinks == SYM_IGNORE);
 	    dp = &tmp[Strlen(tmp) - 1];
 	    if (*dp == '/' && dp != tmp)
 #ifdef apollo
@@ -1505,7 +1504,10 @@ shlvl(val)
 
     if ((cp = getenv("SHLVL")) != NULL) {
 
-	val += atoi(cp);
+	if (loginsh)
+	    val = 1;
+	else
+	    val += atoi(cp);
 
 	if (val <= 0) {
 	    unsetv(STRshlvl);

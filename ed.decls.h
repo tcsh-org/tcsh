@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.decls.h,v 3.11 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.decls.h,v 3.12 1992/07/06 15:26:18 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -58,7 +58,7 @@ extern	void	ed_set_tty_eight_bit	__P((void));
 
 extern	void	QuoteModeOn		__P((void));
 extern	void	QuoteModeOff		__P((void));
-extern	void	ResetInLine		__P((void));
+extern	void	ResetInLine		__P((int));
 extern	int	Load_input_line		__P((void));
 
 /*

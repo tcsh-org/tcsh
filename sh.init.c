@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.init.c,v 3.15 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.init.c,v 3.16 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.15 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.16 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -724,14 +724,14 @@ struct	mesg mesg[] = {
 /* 32 */	0,		"Signal 32",
 # endif /* RENO || BSD4_4 */
 
-# if (defined(sun) || defined(__sun__) || defined(ultrix) || defined(hp9000) || defined(convex) || defined(__convex__)) && !defined(_sigextra_)
+# if (defined(SUNOS4) || defined(ultrix) || defined(hp9000) || defined(convex) || defined(__convex__)) && !defined(_sigextra_)
 #  define _sigextra_
 /* 28 */	"WINCH", 	"Window changed",
 /* 29 */	"LOST",		"Resource lost",
 /* 30 */	"USR1",		"User signal 1",
 /* 31 */	"USR2",		"User signal 2",
 /* 32 */	0,		"Signal 32",
-# endif /* sun */
+# endif /* various */
 
 # ifdef pyr
 #  define _sigextra_

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.time.c,v 3.8 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.time.c,v 3.9 1992/07/06 15:26:18 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,11 +36,11 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.8 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.9 1992/07/06 15:26:18 christos Exp $")
 
-#if (defined(sun) || defined(__sun__)) && ! defined(MACH) && SYSVREL == 0
+#ifdef SUNOS4
 # include <machine/param.h>
-#endif /* sun */
+#endif /* SUNOS4 */
 
 /*
  * C Shell - routines handling process timing and niceing
@@ -248,11 +248,11 @@ ruadd(ru, ru2)
  * if any other machines return wierd values in the ru_i* stuff, put
  * the adjusting macro here:
  */
-#if defined(sun) || defined(__sun__)
+#ifdef SUNOS4
 # define IADJUST(i)	(pagetok(i)/2)
-#else /* sun */
+#else /* SUNOS4 */
 # define IADJUST(i)	(i)
-#endif /* sun */
+#endif /* SUNOS4 */
 
 void
 prusage(r0, r1, e, b)

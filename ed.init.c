@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.init.c,v 3.27 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.init.c,v 3.28 1992/06/16 20:46:26 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.27 1992/04/03 22:15:14 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.28 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -291,7 +291,7 @@ ed_Setup(rst)
 void
 ed_Init()
 {
-    ResetInLine();		/* reset the input pointers */
+    ResetInLine(1);		/* reset the input pointers */
     GettingInput = 0;		/* just in case */
     LastKill = KillBuf;		/* no kill buffer */
 
@@ -586,7 +586,8 @@ Cookedmode()
 }
 
 void
-ResetInLine()
+ResetInLine(macro)
+    int macro;
 {
     Cursor = InputBuf;		/* reset cursor */
     LastChar = InputBuf;
@@ -602,7 +603,8 @@ ResetInLine()
     LastKill = KillBuf;		/* no kill buffer */
 #endif 
     LastCmd = F_UNASSIGNED;	/* previous command executed */
-    MacroLvl = -1;		/* no currently active macros */
+    if (macro)
+	MacroLvl = -1;		/* no currently active macros */
 }
 
 static Char *Input_Line = NULL;

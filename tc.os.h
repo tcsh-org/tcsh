@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.30 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.31 1992/07/06 15:26:18 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -349,11 +349,11 @@ struct ucred {
 #ifndef POSIX
 # define mygetpgrp()    getpgrp(0)
 #else /* POSIX */
-# if defined(BSD) || defined(sun) || defined(__sun__) || defined(IRIS4D)
+# if defined(BSD) || defined(SUNOS4) || defined(IRIS4D)
 #  define mygetpgrp()    getpgrp(0)
-# else /* BSD || sun || IRIS4D */
+# else /* BSD || SUNOS4 || IRIS4D */
 #  define mygetpgrp()    getpgrp()
-# endif	/* BSD || sun */
+# endif	/* BSD || SUNOS4 */
 #endif /* POSIX */
 
 
@@ -381,13 +381,13 @@ typedef struct timeval timeval_t;
 #endif /* NeXT */
 
 
-#if !defined(POSIX) || defined(sun) || defined(__sun__)
+#if !defined(POSIX) || defined(SUNOS4)
 extern time_t time();
 extern char *getenv();
 extern int atoi();
 extern char *ttyname();
 
-#if defined(sun) || defined(__sun__)
+#if defined(SUNOS4)
 extern int toupper __P((int));
 extern int tolower __P((int));
 extern caddr_t sbrk __P((int));
@@ -406,7 +406,7 @@ extern int qsort();
 extern void abort();
 extern void qsort();
 # endif
-#endif	/* sun */
+#endif	/* SUNOS4 */
 extern void perror();
 
 #ifndef NEEDgethostname
@@ -504,9 +504,9 @@ extern char *getwd();
 # endif	/* getwd */
 #else /* POSIX */
 
-# if ((defined(sun) || defined(__sun__)) && !defined(__GNUC__)) || defined(_IBMR2) || defined(_IBMESA)
+# if (defined(SUNOS4) && !defined(__GNUC__)) || defined(_IBMR2) || defined(_IBMESA)
 extern char *getwd();
-# endif	/* (sun && ! __GNUC__) || _IBMR2 || _IBMESA */
+# endif	/* (SUNOS4 && ! __GNUC__) || _IBMR2 || _IBMESA */
 
 # ifdef SCO
 extern char *ttyname();   
@@ -519,15 +519,15 @@ extern int	killpg	__P((pid_t, int));
 
 #endif /* POSIX */
 
-# if (defined(sun) || defined(__sun__)) && __GNUC__ == 2 && SYSVREL == 0
+# if defined(SUNOS4) && __GNUC__ == 2
 /*
  * Somehow these are missing
  */
 extern int ioctl __P((int, int, ...));
 extern int readlink __P((const char *, char *, size_t));
-# endif /* sun && __GNUC__ == 2 && SYSVREL == 0 */
+# endif /* SUNOS4 && __GNUC__ == 2 */
 
-#if defined(BSD) || (defined(sun) || defined(__sun__))
+#if defined(BSD) || defined(SUNOS4)
 extern void bcopy	__P((char *, char *, int));
 # define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
 #endif

@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.44 1992/06/16 20:46:26 christos Exp $
+.\" $Id: tcsh.man,v 3.45 1992/07/06 15:26:18 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -3230,7 +3230,7 @@ If it is just set, the number of items is taken from $history.
 .TP 10
 .B shlvl
 Integer value indicating the number
-of nested shells. 
+of nested shells. On login shells the level is reset to 1.
 .TP 10
 .B showdots 
 show hidden files in list and complete operations. If it is set to -A,

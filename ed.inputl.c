@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.23 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.24 1992/07/07 15:45:01 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.23 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.24 1992/07/07 15:45:01 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -83,7 +83,7 @@ Inputl()
 	ed_InitMaps();
 
     ClearDisp();		/* reset the display stuff */
-    ResetInLine();		/* reset the input pointers */
+    ResetInLine(0);		/* reset the input pointers */
     if (GettingInput)
 	MacroLvl = -1;		/* editor was interrupted during input */
 
@@ -166,9 +166,6 @@ Inputl()
 	    break;		/* keep going... */
 
 	case CC_EOF:		/* end of file typed */
-#ifdef notdef
-	    PromptBuf[0] = '\0';
-#endif
 	    num = 0;
 	    break;
 
@@ -181,9 +178,6 @@ Inputl()
 	    HistWhich = Hist_num;
 	    Hist_num = 0;	/* for the history commands */
 	    num = LastChar - InputBuf;	/* number characters read */
-#ifdef notdef
-	    ResetInLine();	/* reset the input pointers */
-#endif
 	    break;
 
 	case CC_NEWLINE:	/* normal end of line */
@@ -234,10 +228,6 @@ Inputl()
 		    inputmode = MODE_REPLACE;
 	    }
 	    printprompt(1, NULL);
-#ifdef notdef
-	    ResetInLine();	/* reset the input pointers */
-	    PromptBuf[0] = '\0';
-#endif
 	    break;
 
 	case CC_CORRECT:
@@ -399,7 +389,7 @@ Inputl()
 #endif				/* DEBUG_EDIT */
 	    /* put (real) cursor in a known place */
 	    ClearDisp();	/* reset the display stuff */
-	    ResetInLine();	/* reset the input pointers */
+	    ResetInLine(1);	/* reset the input pointers */
 	    Refresh();		/* print the prompt again */
 	    Argument = 1;
 	    DoingArg = 0;

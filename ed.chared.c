@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.24 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.25 1992/07/06 15:26:18 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.24 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.25 1992/07/06 15:26:18 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1262,7 +1262,7 @@ e_newline(c)
     *LastChar = '\0';		/* just in case */
     if (VImode)
 	InsertPos = InputBuf;	/* Reset editing position */
-    return(CC_NEWLINE);	/* we must do a ResetInLine later */
+    return(CC_NEWLINE);
 }
 
 /*ARGSUSED*/
@@ -1272,9 +1272,6 @@ e_send_eof(c)
 {				/* for when ^D is ONLY send-eof */
     PastBottom();
     *LastChar = '\0';		/* just in case */
-#ifdef notdef
-    ResetInLine();		/* reset the input pointers */
-#endif
     return(CC_EOF);
 }
 
@@ -2693,7 +2690,7 @@ CCRETVAL
 e_startover(c)
     int c;
 {				/* erase all of current line, start again */
-    ResetInLine();		/* reset the input pointers */
+    ResetInLine(0);		/* reset the input pointers */
     return(CC_REFRESH);
 }
 
@@ -2724,7 +2721,7 @@ e_tty_int(c)
 {			
 #ifdef _MINIX
     /* SAK PATCH: erase all of current line, start again */
-    ResetInLine();		/* reset the input pointers */
+    ResetInLine(0);		/* reset the input pointers */
     xputchar('\n');
     ClearDisp();
     return (CC_REFRESH);

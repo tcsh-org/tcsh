@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.28 1992/05/15 23:49:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.29 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.28 1992/05/15 23:49:22 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.29 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -78,11 +78,11 @@ RCSID("$Id: sh.proc.c,v 3.28 1992/05/15 23:49:22 christos Exp $")
 #define BIGINDEX	9	/* largest desirable job index */
 
 #ifdef BSDTIMES
-# if defined(sun) || defined(hp9000)
+# if defined(SUNOS4) || defined(hp9000)
 static struct rusage zru = {{0L, 0L}, {0L, 0L}, 0L, 0L, 0L, 0L,
 			    0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L};
 
-# else /* !sun && !hp9000 */
+# else /* !SUNOS4 && !hp9000 */
 #  ifdef masscomp
 /*
  * Initialization of this structure under RTU 4.1A & RTU 5.0 is problematic
@@ -299,6 +299,8 @@ found:
     if (WIFSTOPPED(w)) {
 	pp->p_flags |= PSTOPPED;
 	pp->p_reason = WSTOPSIG(w);
+	if (forepid == pp->p_procid)
+	    forepid = 0;
     }
     else {
 	if (pp->p_flags & (PTIME | PPTIME) || adrof(STRtime))
@@ -337,6 +339,8 @@ found:
 	    else
 		pp->p_flags |= PNEXITED;
 	}
+	if (forepid == pp->p_procid)
+	    forepid = 0;
     }
     jobflags = 0;
     fp = pp;
@@ -1530,12 +1534,14 @@ pkill(v, signum)
 		    err1++;
 		    goto cont;
 		}
+		forepid = 0;
 		break;
 		/*
 		 * suspend a process, kill -CONT %, then type jobs; the shell
 		 * says it is suspended, but it is running; thanks jaap..
 		 */
 	    case SIGCONT:
+		forepid = pp->p_jobid;
 		pstart(pp, 0);
 		goto cont;
 	    default:
@@ -1863,8 +1869,25 @@ pfork(t, wanttty)
     }
     else {
 #ifdef POSIXJOBS
-	if (wanttty >= 0)
-	    (void) setpgid(pid, pcurrjob ? pcurrjob->p_jobid : pid);
+        if (wanttty >= 0) {
+	    /*
+	     * `Walking' process group fix from Beto Appleton.
+	     * (beto@aixwiz.austin.ibm.com)
+	     * If setpgid fails at this point that means that
+	     * our process leader has died. We flush the current
+	     * job and become the process leader ourselves.
+	     * The parent will figure that out later.
+	     */
+	    pgrp = pcurrjob ? pcurrjob->p_jobid : pid;
+	    if (setpgid(pid, pgrp) == -1 && errno == EPERM) {
+		pflush(pcurrjob);
+		pcurrjob = NULL;
+		if (setpgid(pid, pgrp = pid) == -1) {
+		    stderror(ERR_SYSTEM, "setpgid: %s\n", strerror(errno));
+		    xexit(0);
+		}
+	    }
+	}
 #endif /* POSIXJOBS */
 	palloc(pid, t);
 #ifdef SIGSYNCH
@@ -1951,24 +1974,11 @@ pgetty(wanttty, pgrp)
      */
     if (wanttty >= 0)
 	if (setpgid(0, pgrp) == -1) {
-# ifdef BACKPIPE
-	    /*
-     	     * This usually happens in svr4 when the last command in a pipe
-	     * either couldn't be started, or exits without waiting for input.
-	     * Putting in the xexit() hangs the shell, so leave it out.
-	     * (DHD)
-     	     */
-#  ifdef JOBDEBUG
-	    xprintf("tcsh: setpgid error (%s).\n", strerror(errno));
-	    xprintf("pgrp = %d, shell pid = %d\n",pgrp,getpid());
-#  endif /* JOBDEBUG */
-# else /* !BACKPIPE */
-#  if !defined(ISC) && !defined(SCO) && !defined(cray)
-	    /* XXX: Wrong but why? */
-	    xprintf("tcsh: setpgid error (%s).\n", strerror(errno));
-#  endif /* !ISC && !SCO && !cray */
-	    xexit(0);
-# endif /* BACKPIPE */
+	    /* Walking process group fix; see above */
+	    if (setpgid(0, pgrp = getpid()) == -1) {
+		stderror(ERR_SYSTEM, "setpgid: %s\n", strerror(errno));
+		xexit(0);
+	    }
 	}
 
 # ifdef POSIXJOBS

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.34 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.35 1992/07/06 15:26:18 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.34 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.35 1992/07/06 15:26:18 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -915,13 +915,11 @@ tw_suffix(looking, exp_dir, exp_name, target, name)
 	 * Don't consider array variables or empty variables
 	 */
 	if ((vp = adrof(exp_name)) != NULL) {
-	    if ((ptr = vp->vec[0]) != NULL || vp->vec[0][0] == '\0' ||
-		vp->vec[1]) 
+	    if ((ptr = vp->vec[0]) == NULL || *ptr == '\0' ||
+		vp->vec[1] != NULL) 
 		return ' ';
-	    else
-		ptr = vp->vec[0];
 	}
-	else if ((ptr = Getenv(exp_name)) == NULL)
+	else if ((ptr = Getenv(exp_name)) == NULL || *ptr == '\0')
 	    return ' ';
 	*--target = '\0';
 	(void) Strcat(exp_dir, name);
