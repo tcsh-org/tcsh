@@ -281,7 +281,17 @@ AC_TYPE_MODE_T
 AC_TYPE_SIGNAL
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
+
+AC_DEFUN([AC_TYPE_SOCKLEN_T], [
+AC_CHECK_TYPE(socklen_t,,
+AC_DEFINE(socklen_t, int, [Define to `int' if neither <sys/types.h> nor <sys/socket.h> define.]),
+[
+#include <sys/types.h>
+#include <sys/socket.h>
+])
+])
 AC_TYPE_SOCKLEN_T
+
 
 dnl Checks for structures
 AC_CHECK_MEMBERS([struct dirent.d_ino], , ,
