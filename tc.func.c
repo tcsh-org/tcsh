@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.116 2005/01/18 20:14:04 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.117 2005/01/18 20:24:51 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.116 2005/01/18 20:14:04 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.117 2005/01/18 20:24:51 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -2106,7 +2106,7 @@ getremotehost()
 #else
     struct hostent* hp;
     struct sockaddr_in saddr;
-    int len = sizeof(struct sockaddr_in);
+    socklen_t len = sizeof(struct sockaddr_in);
 #endif
 #ifdef HAVE_STRUCT_UTMP_UT_HOST
     char *sptr = NULL;
