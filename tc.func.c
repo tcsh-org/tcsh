@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.99 2001/10/30 02:43:26 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.100 2002/01/26 23:23:03 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -14,11 +14,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -36,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.99 2001/10/30 02:43:26 kim Exp $")
+RCSID("$Id: tc.func.c,v 3.100 2002/01/26 23:23:03 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1070,8 +1066,11 @@ job_cmd(args)
 	goto leave;
     }
     jobcmd_active = 1;
-    if (!whyles && adrof1(STRjobcmd, &aliases))
+    if (!whyles && adrof1(STRjobcmd, &aliases)) {
+	struct process *pp = pcurrjob; /* put things back after the hook */
 	aliasrun(2, STRjobcmd, args);
+	pcurrjob = pp;
+    }
 leave:
     jobcmd_active = 0;
 #ifdef BSDSIGS
