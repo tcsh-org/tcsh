@@ -128,7 +128,7 @@ make tc.const.h, sh.err.h, ed.defns.h which are automatically generated.
 The easiest way to create them is to make a copy from unix, copying 
 config.minix to config.h, and then 'make sh.err.h tc.const.h ed.defns.h'
 
-The OS/dependent files are in mi.termios.h and mi.wait.h
+The OS/dependent files are in mi.termios.h, mi.wait.h, mi.varargs.h
 
 You will get some warnings, but dont worry about them, just ignore
 them.  After tcsh has compiled and the gcc binary is converted to a
@@ -155,3 +155,29 @@ Scott Krotz
 
 ps.  The termios functions are provided by Magnus Doell and Bruce Evans.
      Thanks, guys!
+
+
+This is for minix 1.5 (straight out of the box from P-H) plus the i386
+patches from Bruce Evans.
+
+I cross-compiled on a Sun using gcc 2.1 with a target of i386-bsd
+(using the minix include files instead of the bsd versions), and then
+linked the resulting object files with similarly compiled crtso.o and
+libc.a on vax (little endian) using a hacked version of ld which I put
+together to generate minix executables instead of bsd a.out format.
+What a kludge ...
+
+I compiled with -O2 -Wall ...  So far I haven't noticed any problems
+with the optimizer.
+
+In case anyone is contemplating compiling tcsh with bcc (Bruce Evan's
+i386 compiler that comes with the minix386 upgrade package), don't bother.
+It is some serious bugs that kill tcsh when compiled for 16-bit characters.
+I can provide more details of bugs that I noticed for brave souls who want
+to try, but it would be hard (and why bother if you can get gcc?).
+
+I can make the binary available to anyone who wants it (for example people
+who can't get access to a cross-compiling environment, and who don't yet
+have gcc running under minix).
+
+Bob Byrnes (byrnes@ee.cornell.edu)

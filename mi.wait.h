@@ -29,7 +29,7 @@
 #define WIFEXITED(s)	(__LOW(s) == 0)		    /* normal exit */
 #define WEXITSTATUS(s)	(__HIGH(s))			    /* exit status */
 #define WTERMSIG(s)	(__LOW(s) & 0177)		    /* sig value */
-#define WIFSIGNALED(s)	(((unsigned int)(s)-1 & 0xFFFF) < 0xFF) /* signaled */
+#define WIFSIGNALED(s)	((((unsigned int)(s)-1) & 0xFFFF) < 0xFF) /* signaled */
 #define WIFSTOPPED(s)	(__LOW(s) == 0177)		    /* stopped */
 #define WSTOPSIG(s)	(__HIGH(s) & 0377)		    /* stop signal */
 

@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.13 1992/05/11 14:23:58 christos Exp $
+/**/# $Id: Imakefile,v 1.14 1992/05/15 21:54:34 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -91,7 +91,7 @@ ones.  Please send in your fixes and additions! */
 
 #ifdef MinixArchitecture
 /* Maybe conditional on MACH? */
-SYSSRCS=mi.termios.c mi.wait.h 
+SYSSRCS=mi.termios.c mi.wait.h mi.varargs.h
 SYSOBJS=mi.termios.${SUF}
 EXTF=ma.setp.c
 #else

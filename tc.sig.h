@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.sig.h,v 3.7 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.sig.h,v 3.8 1992/05/09 04:03:53 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -38,7 +38,7 @@
 #ifndef _h_tc_sig
 #define _h_tc_sig
 
-#if (SYSVREL > 0) || defined(BSD4_4)
+#if (SYSVREL > 0) || defined(BSD4_4) || defined(_MINIX)
 # include <signal.h>
 # ifndef SIGCHLD
 #  define SIGCHLD SIGCLD
@@ -51,7 +51,7 @@
 # define SAVESIGVEC
 #endif /* sun || DGUX */
 
-#if SYSVREL > 0 && SYSVREL < 3 && !defined(BSDSIGS)
+#if (SYSVREL > 0 && SYSVREL < 3 && !defined(BSDSIGS)) || defined(_MINIX)
 /*
  * If we have unreliable signals...
  */
@@ -108,6 +108,13 @@ typedef struct sigvec sigvec_t;
 #include <signal.h>
 #  define killpg(a, b) kill((a), (b))
 #endif /* _MINIX */
+
+#if !defined(NSIG) && defined(SIGMAX)
+# define NSIG (SIGMAX+1)
+#endif /* !NSIG && SIGMAX */
+#if !defined(NSIG) && defined(_NSIG)
+# define NSIG _NSIG
+#endif /* !NSIG && _NSIG */
 
 #ifdef BSDSIGS
 /*

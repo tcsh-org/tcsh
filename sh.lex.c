@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/sh.lex.c,v 3.18 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.lex.c,v 3.19 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.18 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.19 1992/03/27 01:59:46 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1455,7 +1455,9 @@ top:
 	    }
 	    return (c);
 	}
+#ifdef BSDJOBS
 reread:
+#endif /* BSDJOBS */
 	c = bgetc();
 	if (c < 0) {
 #ifndef POSIX
@@ -1484,7 +1486,9 @@ reread:
 #endif /* POSIX */
 	    {
 		/* was 'short' for FILEC */
+#ifdef BSDJOBS
 		int     ctpgrp;
+#endif /* BSDJOBS */
 
 		if (++sincereal > 25)
 		    goto oops;

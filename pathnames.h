@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/pathnames.h,v 3.5 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/pathnames.h,v 3.6 1992/03/08 02:17:22 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -77,7 +77,11 @@
 # define _PATH_CSHELL 		"/bin/csh"
 #endif
 #ifndef _PATH_TCSHELL
+#ifdef	_MINIX
+#define _PATH_TCSHELL		"/local/bin/tcsh"	/* use ram disk */
+#else
 #define _PATH_TCSHELL		"/usr/local/bin/tcsh"
+#endif	/* _MINIX */
 #endif
 
 #define _PATH_LOGIN		"/bin/login"

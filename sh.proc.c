@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.proc.c,v 3.26 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.proc.c,v 3.27 1992/05/09 04:03:53 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,18 +36,11 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.26 1992/04/03 22:15:14 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.27 1992/05/09 04:03:53 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
 #include "tc.wait.h"
-
-#if !defined(NSIG) && defined(SIGMAX)
-# define NSIG (SIGMAX+1)
-#endif /* !NSIG && SIGMAX */
-#if !defined(NSIG) && defined(_NSIG)
-# define NSIG _NSIG
-#endif /* !NSIG && _NSIG */
 
 #ifdef aiws
 # undef HZ
@@ -142,7 +135,9 @@ int snum;
     register struct process *pp;
     register struct process *fp;
     register int pid;
+#if defined(BSDJOBS) || (!defined(BSDTIMES) && (defined(ODT) || defined(aiws) || defined(uts)))
     extern int insource;
+#endif /* BSDJOBS */
 #ifdef BSDWAIT
     union wait w;
 #else /* !BSDWAIT */

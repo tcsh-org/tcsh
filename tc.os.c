@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tc.os.c,v 3.17 1992/02/21 23:16:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.os.c,v 3.18 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.17 1992/02/21 23:16:20 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.18 1992/03/27 01:59:46 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -779,7 +779,10 @@ xgethostname(name, namlen)
 #endif /* gethostname */
 
 #ifdef nice
-# ifdef _MINIX
+# if defined(_MINIX) && defined(NICE)
+#  undef _POSIX_SOURCE	/* redefined in <lib.h> */
+#  undef _MINIX		/* redefined in <lib.h> */
+#  undef HZ		/* redefined in <minix/const.h> */
 #  include <lib.h>
 # endif /* _MINIX */
 int 
@@ -789,7 +792,7 @@ xnice(incr)
 #if defined(_MINIX) && defined(NICE)
     return callm1(MM, NICE, incr, 0, 0, NIL_PTR, NIL_PTR, NIL_PTR);
 #else
-    return incr ? 0 : 0;
+    return /* incr ? 0 : */ 0;
 #endif /* _MINIX && NICE */
 } /* end xnice */
 #endif /* nice */

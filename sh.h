@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.h,v 3.33 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.h,v 3.34 1992/05/15 21:54:34 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -168,7 +168,9 @@ typedef int sigret_t;
 # include <locale.h>
 #endif 
 
+#ifndef _MINIX
 #include <sys/param.h>
+#endif /* _MINIX */
 #include <sys/stat.h>
 
 #ifdef BSDTIMES
@@ -235,6 +237,9 @@ extern int setpgrp();
 #if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX)
 # if !defined(pyr) && !defined(stellar)
 #  include <time.h>
+#  ifdef _MINIX
+#   define HZ CLOCKS_PER_SEC
+#  endif /* _MINIX */
 # endif /* !pyr && !stellar */
 #endif /* SYSVREL > 0 ||  _IBMR2 */
 
@@ -246,8 +251,9 @@ extern int setpgrp();
 # include <sys/filio.h>
 #endif /* !FIOCLEX && sun */
 
-
+#ifndef	_MINIX
 #include <sys/file.h>
+#endif	/* _MINIX */
 
 #if !defined(O_RDONLY) || !defined(O_NDELAY)
 # include <fcntl.h>
@@ -260,7 +266,11 @@ extern int setpgrp();
 #if __STDC__
 # include <stdarg.h>
 #else
+#ifdef	_MINIX
+# include "mi.varargs.h"
+#else
 # include <varargs.h>
+#endif	/* _MINIX */
 #endif 
 
 #ifdef DIRENT

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.func.c,v 3.31 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.func.c,v 3.32 1992/05/15 21:54:34 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.31 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.32 1992/05/15 21:54:34 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1790,9 +1790,11 @@ dosuspend(v, c)
     Char **v;
     struct command *c;
 {
+#ifdef BSDJOBS
     int     ctpgrp;
 
     sigret_t(*old) ();
+#endif /* BSDJOBS */
 
     if (loginsh)
 	stderror(ERR_SUSPLOG);

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.wait.h,v 3.3 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.wait.h,v 3.4 1992/01/06 22:36:56 christos Exp $ */
 /*
  * tc.wait.h: <sys/wait.h> for machines that don't have it or have it and
  *	      is incorrect.
@@ -64,13 +64,13 @@
 #  endif /* OREO || IRIS4D || POSIX */
 # endif	/* hpux */
 #else /* SYSVREL == 0 */
-# include <sys/wait.h>
+# ifdef _MINIX
+#  undef NEEDwait
+#  include "mi.wait.h"
+# else
+#  include <sys/wait.h>
+# endif /* _MINIX */
 #endif /* SYSVREL == 0 */
-
-#ifdef _MINIX
-# undef NEEDwait
-# include "mi.wait.h"
-#endif /* _MINIX */
 
 #ifdef NEEDwait
 /*
