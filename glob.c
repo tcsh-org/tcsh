@@ -174,11 +174,21 @@ Opendir(str)
 {
     char    buf[MAXPATHLEN];
     register char *dc = buf;
+#if defined(hpux) || defined(__hpux)
+    struct stat st;
+#endif
 
     if (!*str)
 	return (opendir("."));
     while ((*dc++ = *str++) != '\0')
 	continue;
+#if defined(hpux) || defined(__hpux)
+    /*
+     * Opendir on some device files hangs, so avoid it
+     */
+    if (stat(buf, &st) == -1 || !S_ISDIR(st.st_mode))
+	return NULL;
+#endif
     return (opendir(buf));
 }
 
