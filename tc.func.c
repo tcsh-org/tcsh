@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.func.c,v 3.27 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.func.c,v 3.28 1992/04/03 22:15:14 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.27 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.28 1992/04/03 22:15:14 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -60,9 +60,11 @@ static	void	 Reverse	__P((Char *));
 static	void	 auto_logout	__P((void));
 static	char	*xgetpass	__P((char *));
 static	void	 auto_lock	__P((void));
+#ifdef BSDJOBS
 static	void	 insert		__P((struct wordent *, bool));
 static	void	 insert_we	__P((struct wordent *, struct wordent *));
 static	int	 inlist		__P((Char *, Char *));
+#endif /* BSDJOBS */
 static  Char    *gethomedir	__P((Char *));
 
 /*

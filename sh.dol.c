@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.dol.c,v 3.12 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.dol.c,v 3.13 1992/04/03 22:15:14 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.12 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.13 1992/04/03 22:15:14 christos Exp $")
 
 /*
  * C shell
@@ -115,18 +115,10 @@ Dfix(t)
 		blkfree(t->t_dcom);
 		t->t_dcom = gargv;
 		gargv = 0;
-		break;
+		return;
 	    }
 	}
-	if (*p)
-	    break;
     }
-
-    if (symlinks == SYM_EXPAND)
-	for (pp = t->t_dcom; (p = *pp) != NULL; pp++) {
-	    *pp = dnormalize(p, 1);
-	    xfree((ptr_t) p);
-	}
 }
 
 /*

@@ -19,13 +19,9 @@ endif
 if ($?complete) then
     set noglob
     set hosts=(hyperion phaeton guillemin theory.tc vangogh.cs.berkeley.edu)
-    set ftphosts=(ftp.uu.net prep.ai.mit.edu export.lcs.mit.edu \
-		  labrea.stanford.edu sumex-aim.stanford.edu \
-		  tut.cis.ohio-state.edu)
 
     complete rsh	n/*/\$hosts/	# argument from list in $hosts
     complete ywho  	n/*/\$hosts/
-    complete ftp 	n/*/\$ftphosts/
     complete cd  	p/1/d/		# Directories only
     complete chdir 	p/1/d/
     complete pushd 	p/1/d/
@@ -50,7 +46,7 @@ if ($?complete) then
     complete xdb	p/1/c/
     complete gdb	p/1/c/
     complete ups	p/1/c/
-    complete set	p/1/s/=		# only shell variables
+    complete set	'c/*=/f/' 'p/1/s/=' 'n/=/f/'
     complete unset	p/1/s/
     complete setenv 	p/1/e/		# only environment variables 
     complete unsetenv 	p/1/e/
@@ -106,8 +102,6 @@ if ($?complete) then
     complete CC 	n/*/f:*.{C,cc,o}/
     complete rm 	n/*/f:^*.{c,cc,C,h}/	# Protect precious files
     complete vi 	n/*/f:^*.o/
-    complete emacs 	n/*/f:^*~/		# dont want to edit a backup
-    complete mail 	p/1/u/			# trade files for users
     complete bindkey 	p/1/b/
     complete find 	n/-fstype/"(nfs 4.2)"/ n/-name/f/ \
 		  	n/-type/"(c b d f p l s)"/ n/-user/u/ n/-exec/c/ \
@@ -132,9 +126,21 @@ if ($?complete) then
     complete nm		n/*/f:^*.{h,C,c,cc}/
 
     complete finger c/*@/\$hosts/ p/1/u/@ 
+
     complete talk p/1/'`users | tr " " "\012" | uniq`'/ \
 		  n/*/\`who\ \|\ grep\ \$:1\ \|\ awk\ \'\{\ print\ \$2\ \}\'\`/
+
+    if ( -f $HOME/.netrc ) then
+	complete ftp    p@1@\`cat\ $HOME/.netrc\ \|\ \ awk\ \'\{\ print\ \$2\ \}\'\`@
+    else
+	set ftphosts=(ftp.uu.net prep.ai.mit.edu export.lcs.mit.edu \
+		      labrea.stanford.edu sumex-aim.stanford.edu \
+		      tut.cis.ohio-state.edu)
+	complete ftp 	n/*/\$ftphosts/
+    endif
+
     complete rcp c/*:/f/ C@[./]*@f@ n/*/\$hosts/:
+
     complete dd c/if=/f/ c/of=/f/ \
 		c/conv=*,/"(ascii ebcdic ibm block unblock \
 			    lcase ucase swap noerror sync)"/,\
@@ -142,6 +148,14 @@ if ($?complete) then
 			  lcase ucase swap noerror sync)"/,\
 	        c/*=/x:'<number>'/ \
 		n/*/"(if of conv ibs obs bs cbs files skip file seek count)"/=
+
+    complete emacs	c/-/"(batch d f funcall i insert kill l load \
+			no-init-file q t u user)"/ c/+/x:'<line_number>'/ \
+			n/-d/x:'<display>'/ n/-f/x:'<lisp_function>'/ n/-i/f/ \
+			n/-l/f:*.{el,elc}/ n/-t/x:'<terminal>'/ n/-u/u/ \
+			n/*/f:^*[\#~]/
+    complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
+			n/-f/f/ n/-s/x:'<subject>'/ n/-u/u/ n/*/u/
 
 
     unset noglob

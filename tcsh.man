@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.37 1992/03/28 00:18:54 christos Exp $
+.\" $Id: tcsh.man,v 3.38 1992/04/03 22:15:14 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -2711,7 +2711,7 @@ substitute command and they are of the form:
 .sp
 .B <command>/<matching-pattern>/<completion-action>/[<suffix>|/]
 .sp
-The four commands available are:
+The five commands available are:
 .TP 
 .B p
 This specifies position-dependent completion. The matching pattern is
@@ -2743,10 +2743,14 @@ and replace it with the literal word "complete". Note the leading '-'
 in the pattern that tells the completion, that is pattern is only to be 
 used with ambiguous command completions.
 .TP 
-.B n
+.B n,N
 This command specifies next-word completions. The matching pattern in
 this case is a shell pattern that must match the previous word on
-the command line. For example:
+the command line 
+.I (n), 
+or the word before that
+.I (N). 
+For example:
 .sp
 .nf
 > complete find 'n/-user/u/'

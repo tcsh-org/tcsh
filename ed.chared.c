@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/ed.chared.c,v 3.21 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.chared.c,v 3.22 1992/03/21 22:34:18 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.21 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.22 1992/03/21 22:34:18 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -522,6 +522,7 @@ excl_sw:
     LastChar += (bend - buf) - (q - op);
     Cursor += (bend - buf) - (q - op);
     c_copy(buf, op, (bend - buf));
+    *LastChar = '\0';
     return(op + (bend - buf));
 excl_err:
     Beep();

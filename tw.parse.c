@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.28 1992/03/27 22:17:02 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.29 1992/04/03 22:15:14 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.28 1992/03/27 22:17:02 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.29 1992/04/03 22:15:14 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -90,7 +90,7 @@ static bool SearchNoDirErr = 0;	/* t_search returns -2 if dir is unreadable */
 
 /* state so if a completion is interrupted, the input line doesn't get
    nuked */
-int InsideCompletion;
+int InsideCompletion = 0;
 
 /* do the expand or list on the command line -- SHOULD BE REPLACED */
 
@@ -100,10 +100,10 @@ extern int TermH;		/* from the editor routines */
 extern int lbuffed;		/* from sh.print.c */
 
 static	void	 extract_dir_and_name	__P((Char *, Char *, Char *));
-static	Char	*quote_meta		__P((Char *, bool));
+static	Char	*quote_meta		__P((Char *, int, bool));
 static	Char	*dollar			__P((Char *, Char *));
 static	Char	*tilde			__P((Char *, Char *));
-static  int      expand_dir		__P((Char *, Char *, DIR  **, int));
+static  int      expand_dir		__P((Char *, Char *, DIR  **, COMMAND));
 static	bool	 nostat			__P((Char *));
 static	Char	 filetype		__P((Char *, Char *));
 static	int	 t_glob			__P((Char ***, int));
@@ -113,7 +113,6 @@ static	int	 is_suffix		__P((Char *, Char *));
 static	int	 recognize		__P((Char *, Char *, int, int));
 static	int	 ignored		__P((Char *));
 static	int	 isadirectory		__P((Char *, Char *));
-static  Char	*Getenv			__P((Char *));
 static  int      tw_collect_items	__P((COMMAND, int, Char *, Char *, 
 					     Char *, Char *, int));
 static  int      tw_collect		__P((COMMAND, int, Char *, Char *, 
@@ -123,13 +122,19 @@ static	Char 	 tw_suffix		__P((int, Char *, Char *, Char *,
 static	void 	 tw_fixword		__P((int, Char *, Char *, Char *, int));
 static	void	 tw_list_items		__P((int, int, int));
 
+#ifdef notdef
 /*
  * If we find a set command, then we break a=b to a= and word becomes
- * b else, we don't break a=b.
+ * b else, we don't break a=b. [don't use that; splits words badly and
+ * messes up tw_complete()]
  */
 #define isaset(c, w) ((w)[-1] == '=' && \
 		      ((c)[0] == 's' && (c)[1] == 'e' && (c)[2] == 't' && \
 		       ((c[3] == ' ' || (c)[3] == '\t'))))
+#endif
+
+#define QLINESIZE (INBUFSIZE + 1)
+
 /* tenematch():
  *	Return:
  *		> 1:    No. of items found
@@ -138,66 +143,72 @@ static	void	 tw_list_items		__P((int, int, int));
  *		< 0:    Error (incl spelling correction impossible)
  */
 int
-tenematch(inputline, inputline_size, num_read, command)
+tenematch(inputline, num_read, command)
     Char   *inputline;		/* match string prefix */
-    int     inputline_size;	/* max size of string */
     int     num_read;		/* # actually in inputline */
     COMMAND command;		/* LIST or RECOGNIZE or PRINT_HELP */
 
 {
-    Char    word[FILSIZ + 1], pat[MAXPATHLEN + 1];
-    register Char *str_end, *word_start, *cp, *wp;
-    Char   *cmd_start, *wordp;
+    Char    qline[QLINESIZE];
+    Char    qu = 0, pat[MAXPATHLEN + 1];
+    Char   *str_end, *cp, *wp, *wordp;
+    Char   *cmd_start, *word_start, *word;
+    Char   *ocmd_start = NULL, *oword_start = NULL, *oword = NULL;
     int	    suf = 0;
     int     space_left;
     int     looking;		/* what we are looking for		*/
     int     search_ret;		/* what search returned for debugging 	*/
-    /* 
-     * XXX: Avoid gcc bug. If in_single and in_double are ints 
-     * then they always stay 0.
-     */
-    Char    in_single, in_double;	/* In single or in_double quotes */
-    int     backq, skp;
+    int     backq = 0;
 
     pat[0] = '\0';
+    if (num_read > QLINESIZE - 1)
+	return -1;
     str_end = &inputline[num_read];
 
-    /*
-     * Check if in backquotes
-     */
-    for (cmd_start = str_end, backq = 0;
-	 cmd_start >= inputline;
-	 backq ^= (*cmd_start-- == '`'))
-	continue;
-    /*
-     * space backward looking for the beginning of this command
-     */
-    for (cmd_start = str_end; cmd_start > inputline; --cmd_start)
-	if ((iscmdmeta(cmd_start[-1]) || (cmd_start[-1] == '`' && backq))
-	    && ((cmd_start - 1 == inputline) || (cmd_start[-2] != '\\')))
-	    break;
-    /* step forward over leading spaces */
-    while (*cmd_start != '\0' && (*cmd_start == ' ' || *cmd_start == '\t'))
-	cmd_start++;
-
-    /*
-     * Find LAST occurence of a delimiter in the inputline. The word start is
-     * one character past it.
-     */
-    for (word_start = str_end, skp = 0; word_start > inputline; --word_start) {
-	if (!backq && word_start[-1] == '`') {
-	    skp ^= 1;
-	    continue;
+    word_start = inputline;
+    word = cmd_start = wp = qline;
+    for (cp = inputline; cp < str_end; cp++) {
+        if (!cmap(qu, _ESC)) {
+	    if (cmap(*cp, _Q|_ESC)) {
+		if (qu == 0 || qu == *cp) {
+		    qu ^= *cp;
+		    continue;
+		}
+	    }
+	    if (qu != '\'' && cmap(*cp, _Q1)) {
+		if (backq ^= 1) {
+		    ocmd_start = cmd_start;
+		    oword_start = word_start;
+		    oword = word;
+		    word_start = cp + 1;
+		    word = cmd_start = wp + 1;
+		}
+		else {
+		    cmd_start = ocmd_start;
+		    word_start = oword_start;
+		    word = oword;
+		}
+		*wp++ = *cp;
+		continue;
+	    }
 	}
-	if (skp)
-	    continue;
-	if ((ismetahash(word_start[-1]) || isaset(cmd_start, word_start)) &&
-	    (word_start[-1] != '$') &&
-	    ((word_start - 1 == inputline) || (word_start[-2] != '\\')))
-	    break;
-    }
+	if (iscmdmeta(*cp))
+	    cmd_start = wp + 1;
+	/* Don't quote '/' to make the recognize stuff work easily */
+	/* Don't quote '$' in double quotes */
+	*wp = *cp | (qu && *cp != '/'  && (*cp != '$' || qu != '"') ? 
+		     QUOTE : 0);
+	if (ismetahash(*wp) /* || isaset(cmd_start, wp + 1) */)
+	    word = wp + 1, word_start = cp + 1;
+	wp++;
+	if (cmap(qu, _ESC))
+	    qu = 0;
+      }
+    *wp = 0;
 
-
+    /* move the word_start after the quote */
+    if (*word_start == qu)
+	word_start++;
 
 #ifdef masscomp
     /*
@@ -206,78 +217,27 @@ tenematch(inputline, inputline_size, num_read, command)
      * incorrect code may be produced unless the offending expression is
      * rewritten. Therefore, we can't just ignore it, DAS DEC-90.
      */
-    space_left = inputline_size;
-    space_left -= word_start - inputline + 1;
+    space_left = QLINESIZE - 1;
+    space_left -= word - qline;
 #else
-    space_left = inputline_size - (word_start - inputline) - 1;
+    space_left = QLINESIZE - 1 - (word - qline);
 #endif
 
-    /*
-     * Quote args
-     */
-    in_double = 0;
-    in_single = 0;
-    for (cp = word_start, wp = word; 
-	 cp < str_end && wp <= word + FILSIZ; cp++) 
-	switch (*cp) {
-	case '\'':
-	    if (!in_double) {
-		if (in_single)
-		    in_single = 0;
-		else
-		    in_single = QUOTE;
-	    }
-	    else
-		*wp++ = *cp | QUOTE;
-	    break;
-	case '"':
-	    if (!in_single) {
-		if (in_double)
-		    in_double = 0;
-		else
-		    in_double = QUOTE;
-	    }
-	    else
-		*wp++ = *cp | QUOTE;
-	    break;
-	case '/':
-	    /*
-	     * This is so that the recognize stuff works easily
-	     */
-	    *wp++ = *cp;
-	    break;
-	case '\\':
-	    if (in_single || in_double)
-		*wp++ = *cp | QUOTE;
-	    else
-		*wp++ = *++cp | QUOTE;
-	    break;
-	default:
-	    *wp++ = *cp | in_single;
-	    break;
-	}
-
-    if (wp > word + FILSIZ)
-	return (-1);
-
-    *wp = '\0';
-
-    /*
-     * Move the word_start further if still in quotes, cause the
-     * quotes so far have no effect.
-     */
-    if ((in_single || in_double) && (*word_start == '\'' || *word_start == '"'))
-	word_start++;
-
-    looking = starting_a_command(word_start - 1, inputline) ? 
+    looking = starting_a_command(word - 1, qline) ? 
 	TW_COMMAND : TW_ZERO;
     wordp = word;
 
 #ifdef TDEBUG
     xprintf("starting_a_command %d\n", looking);
     xprintf("\ncmd_start:%s:\n", short2str(cmd_start));
+    xprintf("qline:%s:\n", short2str(qline));
+    xprintf("qline:");
+    for (wp = qline; *wp; wp++)
+	xprintf("%c", *wp & QUOTE ? '-' : ' ');
+    xprintf(":\n");
     xprintf("word:%s:\n", short2str(word));
     xprintf("word:");
+    /* Must be last, so wp is still pointing to the end of word */
     for (wp = word; *wp; wp++)
 	xprintf("%c", *wp & QUOTE ? '-' : ' ');
     xprintf(":\n");
@@ -325,12 +285,14 @@ tenematch(inputline, inputline_size, num_read, command)
 	    (void) Strcpy(rword, slshp);
 	    if (slshp != STRNULL)
 		*slshp = '\0';
-	    search_ret = spell_me(wordp, sizeof(word) - (wordp - word), 
+	    search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), 
 				  looking == TW_COMMAND);
 	    if (search_ret == 1) {
-		DeleteBack(str_end - word_start);/* get rid of old word */
+		/* get rid of old word */
+		DeleteBack(str_end - word_start);
 		(void) Strcat(wordp, rword);
-		if (InsertStr(wordp) < 0)	/* insert newly spelled word */
+		/* insert newly spelled word */
+		if (InsertStr(quote_meta(wordp, qu, 0)) < 0)	
 		    return -1;	/* error inserting */
 		wp = wordp + Strlen(wordp);
 		search_ret = t_search(wordp, wp, command, space_left,
@@ -344,8 +306,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	 * We don't quote the last space if we had a unique match and 
 	 * addsuffix was set. Otherwise the last space was part of a word.
 	 */
-	if (*wp && InsertStr((in_single || in_double) ?
-			     wp : quote_meta(wp, search_ret == 1 &&
+	if (*wp && InsertStr(quote_meta(wp, qu, search_ret == 1 &&
 					     (bool) is_set(STRaddsuffix))) < 0)
 	    /* put it in the input buffer */
 	    return -1;		/* error inserting */
@@ -360,11 +321,13 @@ tenematch(inputline, inputline_size, num_read, command)
 	    if (isglob(*bptr))
 		return 0;
 	}
-	search_ret = spell_me(wordp, sizeof(word) - (wordp - word), 
+	search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), 
 			      looking == TW_COMMAND);
 	if (search_ret == 1) {
-	    DeleteBack(str_end - word_start);	/* get rid of old word */
-	    if (InsertStr(wordp) < 0)	/* insert newly spelled word */
+	    /* get rid of old word */
+	    DeleteBack(str_end - word_start);	
+	    /* insert newly spelled word */
+	    if (InsertStr(quote_meta(wordp, qu, 0)) < 0)
 		return -1;	/* error inserting */
 	}
 	return search_ret;
@@ -389,8 +352,7 @@ tenematch(inputline, inputline_size, num_read, command)
 		DeleteBack(str_end - word_start);/* get rid of old word */
 		for (i = 0; i < count; i++)
 		    if (ptr[i] && *ptr[i]) {
-			if (InsertStr((in_single || in_double) ?
-				      ptr[i] : quote_meta(ptr[i], 0)) < 0 ||
+			if (InsertStr(quote_meta(ptr[i], qu, 0)) < 0 ||
 			    InsertStr(STRspace) < 0) {
 			    blkfree(ptr);
 			    return (-1);
@@ -404,8 +366,7 @@ tenematch(inputline, inputline_size, num_read, command)
     case VARS_EXPAND:
 	if (dollar(buffer, wordp)) {
 	    DeleteBack(str_end - word_start);
-	    if (InsertStr((in_single || in_double) ?
-			  buffer : quote_meta(buffer, 0)) < 0)
+	    if (InsertStr(quote_meta(buffer, qu, 0)) < 0)
 		return (-1);
 	    return (1);
 	}
@@ -417,8 +378,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	    (void) Strcpy(buffer, bptr);
 	    xfree((ptr_t) bptr);
 	    DeleteBack(str_end - word_start);
-	    if (InsertStr((in_single || in_double) ?
-			  buffer : quote_meta(buffer, 0)) < 0)
+	    if (InsertStr(quote_meta(buffer, qu, 0)) < 0)
 		return (-1);
 	    return (1);
 	}
@@ -471,7 +431,7 @@ t_glob(v, cmd)
 	Char **av = *v, *p;
 	int fwd, i, ac = gargc;
 
-	for (i = 0, fwd = 0; i < ac - 1; i++) 
+	for (i = 0, fwd = 0; i < ac; i++) 
 	    if (!executable(NULL, av[i], 0)) {
 		fwd++;		
 		p = av[i];
@@ -534,19 +494,31 @@ c_glob(v)
  *	return pointer to quoted word in static storage
  */
 static Char *
-quote_meta(word, trail_space)
+quote_meta(word, qu, trail_space)
     Char   *word;
+    int     qu;
     bool    trail_space;
 {
     static Char buffer[2 * FILSIZ + 1], *bptr, *wptr;
 
     for (bptr = buffer, wptr = word; *wptr != '\0';) {
-	if ((cmap(*wptr, _META | _DOL | _Q | _ESC | _GLOB) || *wptr == HIST ||
-	     *wptr == HISTSUB) &&
-	    (*wptr != ' ' || !trail_space || 
-	     *(wptr + 1) != '\0') && *wptr != '#')
+	if (bptr > buffer + 2 * FILSIZ - 4)
+	    break;
+	  
+	if (qu && *wptr == qu) {
+	    *bptr++ = qu;
+	    *bptr++ = '\\';
+	    *bptr++ = qu;
+	}
+	if (!qu &&
+	    (cmap(*wptr, _META | _DOL | _Q | _Q1 | _ESC | _GLOB) ||
+	     *wptr == HIST || *wptr == HISTSUB) &&
+	    (*wptr != ' ' || !trail_space || *(wptr + 1) != '\0') &&
+             *wptr != '#')
 	    *bptr++ = '\\';
 	*bptr++ = *wptr++;
+	if (cmap(qu, _ESC))
+	  qu = 0;
     }
     *bptr = '\0';
     return (buffer);
@@ -857,7 +829,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		}
 		else
 		    ptr = entry;
-		if (tw_item_find(ptr) == NULL)
+		if (tw_item_find(ptr))
 		    break;
 	    }
 		    
@@ -1037,10 +1009,10 @@ tw_collect(command, looking, exp_dir, exp_name, target, pat, flags, dir_fd)
     xprintf("target = %s\n", short2str(target));
 #endif
     ni = 0;
+    getexit(osetexit);
     for (;;) {
 	(*tw_start_entry[looking])(dir_fd, pat);
 	InsideCompletion = 1;
-	getexit(osetexit);
 	if (setexit()) {
 	    /* interrupted, clean up */
 	    resexit(osetexit);
@@ -1477,9 +1449,9 @@ tilde(new, old)
  */
 static int
 expand_dir(dir, edir, dfd, cmd)
-    Char  *dir, *edir;
-    DIR  **dfd;
-    int   cmd;
+    Char   *dir, *edir;
+    DIR   **dfd;
+    COMMAND cmd;
 {
     Char   *nd = NULL;
     Char    tdir[MAXPATHLEN + 1];
@@ -1791,8 +1763,9 @@ copyn(des, src, count)
 
 /* Getenv():
  *	like it's normal string counter-part
+ *	[apollo uses that in tc.os.c, so it cannot be static]
  */
-static Char   *
+Char *
 Getenv(str)
     Char   *str;
 {

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.12 1992/03/28 00:15:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.13 1992/04/03 22:15:14 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,13 +36,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.12 1992/03/28 00:15:52 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.13 1992/04/03 22:15:14 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
 
-/* #define TDEBUG */
+#define TDEBUG 
 struct varent completions;
 
 static int 	 	  tw_result	__P((Char *, Char *));
@@ -197,6 +197,9 @@ tw_pos(ran, wno)
     int	  wno;
 {
     Char *p;
+
+    if (ran[0] == '*' && ran[1] == '\0')
+	return 1;
 
     for (p = ran; *p && *p != '-'; p++)
 	continue;
@@ -422,7 +425,7 @@ tw_complete(line, word, pat, looking, suf)
 {
     Char buf[MAXPATHLEN + 1], **vec, *ptr; 
     Char *wl[MAXPATHLEN/6];
-    static Char nomatch[2] = { 0xff, 0x00 };
+    static Char nomatch[2] = { (Char) -1, 0x00 };
     int wordno, n;
 
     copyn(buf, line, MAXPATHLEN);

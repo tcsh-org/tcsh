@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/sh.func.c,v 3.28 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.func.c,v 3.29 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.28 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.29 1992/03/27 01:59:46 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -937,7 +937,7 @@ void
 wfree()
 {
     struct Ain    o;
-    struct whyle *nwp = NULL;
+    struct whyle *nwp;
 
 #ifdef FDEBUG
     static char foo[] = "IAFE";
@@ -1173,6 +1173,9 @@ dosetenv(v, c)
 	int     k;
 
 	(void) setlocale(LC_ALL, "");
+# ifdef LC_COLLATE
+	(void) setlocale(LC_COLLATE, "");
+# endif
 	for (k = 0200; k <= 0377 && !Isprint(k); k++)
 	    continue;
 	AsciiOnly = k > 0377;
@@ -1264,6 +1267,9 @@ dounsetenv(v, c)
 		    int     k;
 
 		    (void) setlocale(LC_ALL, "");
+# ifdef LC_COLLATE
+		    (void) setlocale(LC_COLLATE, "");
+# endif
 		    for (k = 0200; k <= 0377 && !Isprint(k); k++)
 			continue;
 		    AsciiOnly = k > 0377;

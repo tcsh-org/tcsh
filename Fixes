@@ -1,5 +1,13 @@
 V6.02.00, ...
-61. 6.01.10 (4/3/92)
+75. 6.01.11 (4/10/92)
+74. Fixed magic-space ! expand bug:
+    > echo a b123 45.{6,7}
+    > echo !:2!:3[magic-space]
+73. Work-around for apollo optimizer in tc.bind.c
+72. Problem with setjmp in tw.parse.c
+71. symlinks=expand from Ymin.
+70. tenematch() fixes from Michael;
+69. 6.01.10 (4/3/92)
 68. Fixed Gnmatch.
 67. Removed ignore_symlinks and chase_symlinks. Replaced by symlinks variable.
 66. Backquote from completion was broken for machines with no dup2()

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.decls.h,v 3.6 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.decls.h,v 3.7 1992/04/03 22:15:14 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -45,8 +45,7 @@ extern	void		  do_help		__P((Char *));
 /*
  * tw.parse.c
  */
-extern	 int		  tenematch		__P((Char *, int, int, 
-						     COMMAND));
+extern	 int		  tenematch		__P((Char *, int, COMMAND));
 extern	 int		  t_search		__P((Char *, Char *, COMMAND, 
 						     int, int, int, Char *, 
 						     int));
@@ -57,6 +56,7 @@ extern	 int		  fcompare		__P((Char **, Char **));
 extern	 void		  print_by_column	__P((Char *, Char *[], int, 
 						     int));
 extern	 int		  StrQcmp		__P((Char *, Char *));
+extern	 Char		 *Getenv		__P((Char *));
 
 /*
  * tw.init.c

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.glob.c,v 3.18 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.glob.c,v 3.19 1992/04/03 22:15:14 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.18 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.19 1992/04/03 22:15:14 christos Exp $")
 
 #include "tc.h"
 
@@ -380,6 +380,17 @@ globexpand(v)
 	    break;
 	}
     vl = nv;
+
+    /*
+     * Step 4: expand .. if the variable symlinks==expand is set
+     */
+    if ( symlinks == SYM_EXPAND )
+	for (s = *vl; s; s = *++vl) {
+	    *vl = dnormalize(s, 1);
+	    xfree((ptr_t) s);
+	}
+    vl = nv;
+
     return (vl);
 }
 
@@ -597,7 +608,7 @@ void
 tglob(t)
     register Char **t;
 {
-    register Char *p, c;
+    register Char *p, *c;
 
     while ((p = *t++) != '\0') {
 	if (*p == '~' || *p == '=')
@@ -605,11 +616,11 @@ tglob(t)
 	else if (*p == '{' &&
 		 (p[1] == '\0' || (p[1] == '}' && p[2] == '\0')))
 	    continue;
-	while ((c = *p++) != '\0') {
+	while ( *(c = p++) ) {
 	    /*
 	     * eat everything inside the matching backquotes
 	     */
-	    if (c == '`') {
+	    if (*c == '`') {
 		gflag |= G_CSH;
 		while (*p && *p != '`') 
 		    if (*p++ == '\\') {
@@ -623,10 +634,13 @@ tglob(t)
 		else
 		    break;
 	    }
-	    else if (c == '{')
+	    else if (*c == '{')
 		gflag |= G_CSH;
-	    else if (isglob(c))
+	    else if (isglob(*c))
 		gflag |= G_GLOB;
+	    else if (symlinks == SYM_EXPAND && 
+		*p && ISDOTDOT(c) && (c == *(t-1) || *(c-1) == '/') )
+	    	gflag |= G_CSH;
 	}
     }
 }

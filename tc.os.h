@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.os.h,v 3.26 1992/03/08 02:17:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.os.h,v 3.27 1992/04/03 22:15:14 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -125,8 +125,7 @@ struct ucred {
  * #if (SYSVREL > 0) && defined(TIOCGWINSZ)
  * If that breaks on your machine, let me know.
  */
-#if defined(INTEL) || defined(u3b2) || defined (u3b5) || \
-    defined(ub15) || defined(u3b20d) || defined(ISC) || defined(SCO) 
+#if defined(INTEL) || defined(u3b2) || defined (u3b5) || defined(ub15) || defined(u3b20d) || defined(ISC) || defined(SCO) 
 #ifdef TIOCGWINSZ
 /*
  * for struct winsiz

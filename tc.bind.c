@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.bind.c,v 3.6 1991/12/19 21:40:06 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.bind.c,v 3.7 1992/01/27 04:20:47 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.6 1991/12/19 21:40:06 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.7 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -55,6 +55,20 @@ static	void   list_functions	__P((void));
 static	void   pkeys		__P((int, int));
 
 extern int MapsAreInited;
+
+/*
+ * Unfortunately the apollo optimizer does not like & operations
+ * with 0377, and produces illegal instructions. So we make it
+ * an unsigned char, and hope for the best.
+ * Of-course the compiler is smart enough to produce bad assembly
+ * language instructions, but dumb when it comes to fold the constant :-)
+ */
+#ifdef apollo
+static unsigned char APOLLO_0377 = 0377;
+#else /* sane */
+# define APOLLO_0377    0377
+#endif /* apollo */
+
 
 static int
 tocontrol(c)
@@ -84,7 +98,7 @@ unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
     if (c & 0400) {
 	*cp++ = 'A';
 	*cp++ = '-';
-	c &= 0377;
+	c &= APOLLO_0377;
     }
     if ((c & META) && !(Isprint(c) || (Iscntrl(c) && Isprint(c | 0100)))) {
 	*cp++ = 'M';
@@ -195,7 +209,7 @@ parsekey(sp)
     (void) strip(s);		/* trim to 7 bits. */
 
     if (s[1] == 0)		/* single char */
-	return (s[0] & 0377);
+	return (s[0] & APOLLO_0377);
 
     if ((s[0] == 'F' || s[0] == 'f') && s[1] == '-') {
 	if (s[2] == 0) {
@@ -782,7 +796,7 @@ dobind(v, dummy)
 		}
 		if (c & 0400) {
 		    if (VImode) {
-			CcAltMap[c & 0377] = fp->func;	
+			CcAltMap[c & APOLLO_0377] = fp->func;	
 			/* bind the vi cmd mode key */
 			if (c & META) {
 			    buf[0] = 033;
@@ -793,7 +807,7 @@ dobind(v, dummy)
 		    }
 		    else {
 			buf[0] = 030;	/* ^X */
-			buf[1] = c & 0377;
+			buf[1] = c & APOLLO_0377;
 			buf[2] = 0;
 			AddXkey(buf, XmapCmd(fp->func), XK_CMD);
 			CcKeyMap[030] = F_XKEY;
@@ -865,7 +879,7 @@ dobind(v, dummy)
 	pkeys(prev, i - 1);
 	prev = 0;
 	for (i = 256; i < 512; i++) {
-	    if (CcAltMap[prev & 0377] == CcAltMap[i & 0377])
+	    if (CcAltMap[prev & APOLLO_0377] == CcAltMap[i & APOLLO_0377])
 		continue;
 	    pkeys(prev, i - 1);
 	    prev = i;
@@ -882,36 +896,34 @@ pkeys(first, last)
 {
     register struct KeyFuncs *fp;
     register KEYCMD *map;
+    int mask;
     char    buf[8];
 
     if (last & 0400) {
 	map = CcAltMap;
-	first &= 0377;
-	last &= 0377;
+	first &= APOLLO_0377;
+	last &= APOLLO_0377;
+	mask = 0400;
     }
     else {
 	map = CcKeyMap;
+	mask = 0;
     }
     if (map[first] == F_UNASSIGNED) {
 	if (first == last)
-	    xprintf(" %s\t\tis undefined\n",
-		    unparsekey(map == CcAltMap ? first | 0400 : first));
+	    xprintf(" %s\t\tis undefined\n", unparsekey(first | mask));
 	return;
     }
 
     for (fp = FuncNames; fp->name; fp++) {
 	if (fp->func == map[first]) {
-	    if (first == last) {
-		xprintf(" %s\t\t%s\n",
-		    unparsekey((first & 0377) | (map == CcAltMap ? 0400 : 0)),
-			fp->name);
-	    }
+	    if (first == last) 
+		xprintf(" %s\t\t%s\n", 
+			unparsekey((first & APOLLO_0377) | mask), fp->name);
 	    else {
-		(void) strcpy(buf, unparsekey((first & 0377) |
-					      (map == CcAltMap ? 0400 : 0)));
+		(void) strcpy(buf, unparsekey((first & APOLLO_0377) | mask));
 		xprintf(" %s..%s\t\t%s\n", buf,
-		     unparsekey((last & 0377) | (map == CcAltMap ? 0400 : 0)),
-			fp->name);
+		        unparsekey((last & APOLLO_0377) | mask), fp->name);
 	    }
 	    return;
 	}
