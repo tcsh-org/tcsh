@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.term.h,v 1.11 1994/09/04 21:54:15 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.term.h,v 1.12 1996/04/26 19:18:18 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -450,6 +450,16 @@
 #  endif /* VTIME */
 # endif /* NUMCC */
 #endif /* !POSIX */
+
+/*
+ * fix for hpux10 inconsistency: it has VWERASE, but TIOCSLTC returns
+ * EINVAL if one tries to change it
+ */
+#if defined(hpux) && defined(VSUSP) && defined(VDSUSP) && defined(VWERASE) && d
+efined(VLNEXT)
+# undef TIOCGLTC       /* not really needed */
+# undef TIOCSLTC
+#endif
 
 #define C_INTR		 0
 #define C_QUIT		 1

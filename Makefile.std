@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.79 1995/04/29 22:28:24 christos Exp $
+# $Id: Makefile.std,v 1.80 1996/06/22 21:44:14 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -106,6 +106,9 @@ CFLAGS=-O2 $(INCLUDES)
 # DDE Supermax Unix SYSV Rel III.
 # CFLAGS= -O3
 
+# SINIX RMx00
+CFLAGS= -O # -D_POSIX_SOURCE # -kansi
+
 # Apollo's with cc [apollo builtins don't work with gcc]
 # and apollo should not define __STDC__ if it does not have
 # the standard header files. RT's (aos4.3) need that too;
@@ -139,7 +142,8 @@ LDFLAGS= 			## The simplest, suitable for all.
 #LDFLAGS= -s -n			## Pure executable. Spares paging over
 # 				## the network for machines with local
 #				## swap but external /usr/local/bin .
-#LDFLAGS= -s -n -Bstatic	## Without dynamic links. (SunOS)
+#LDFLAGS= -s -n -Bstatic	## Without dynamic linking. (SunOS/cc)
+#LDFLAGS= -s -n -static		## Without dynamic linking. (SunOS/gcc)
 #LDFLAGS= -Wl,-s,-n		## Stripped, shared text (Unicos)
 #LDFLAGS= -s -static		## Link statically. (linux)
 #LDFLAGS= -s -N			## Impure executable (linux)

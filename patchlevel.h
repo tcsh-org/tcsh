@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/patchlevel.h,v 3.95 1996/04/26 19:18:41 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/patchlevel.h,v 3.96 1996/06/22 21:44:22 christos Exp $ */
 /*
  * patchlevel.h: Our life story.
  */
@@ -7,8 +7,8 @@
 
 #define ORIGIN "D.E.Shaw"
 #define REV 6
-#define VERS 6
-#define PATCHLEVEL 2
-#define DATE "1996-06-22"
+#define VERS 0
+#define PATCHLEVEL 3
+#define DATE "1996-09-24"
 
 #endif /* _h_patchlevel */

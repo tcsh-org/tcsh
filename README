@@ -64,27 +64,30 @@ To install tcsh:
     tcsh.man2html script (requires Perl) to generate an HTML version of
     the manpage which you can read with Mosaic, lynx or other HTML browser.
 
-8)  Test tcsh to see that it has compiled correctly.  The history
-    command should give a time stamp on every entry.  Typing normal
-    characters should echo each exactly once.  Control-A should put the
-    cursor at the beginning of the input line, but after the prompt.
-    Typing characters after that should insert them into the line.
-    If you have job control make sure that stopping and restarting
-    jobs works. Make sure you can ^C in the middle of the input line.
-    Also make sure that pipelines work correctly and there
-    are no races. Try 'echo | cat | cat | cat | cat | more' a couple
-    of times. If you have job control, try this command in the background
-    and bring it in the foreground when it stops for tty output. 
-    Also make sure that the ioctl() modes are preserved.
-    Get into vi, enter and exit input mode and suspend it, background
-    it and foreground it again. After all that, lastly make sure that
-    the tty process group manipulation is happening correctly. Try
-    ftp to some host. If your passwd appears on the screen, you have
-    lost /dev/tty. Otherwise everything is fine. 
+8)  Test tcsh by typing ./tcsh to see that it has compiled correctly.
+    The history command should give a time stamp on every entry.
+    Typing normal characters should echo each exactly once.  Control-A
+    should put the cursor at the beginning of the input line, but after
+    the prompt.  Typing characters after that should insert them into
+    the line.  If you have job control make sure that stopping and
+    restarting jobs works. Make sure you can ^C in the middle of the
+    input line.  Also make sure that pipelines work correctly and there
+    are no races. Try 'echo | cat | cat | cat | cat | more' a couple of
+    times. If you have job control, try this command in the background
+    and bring it in the foreground when it stops for tty output.  Also
+    make sure that the ioctl() modes are preserved.  Get into vi, enter
+    and exit input mode and suspend it, background it and foreground it
+    again. After all that, lastly make sure that the tty process group
+    manipulation is happening correctly. Try ftp to some host. If your
+    passwd appears on the screen, you have lost /dev/tty. Otherwise
+    everything is fine.
 
-9)  Enjoy.
+9)  Once satisfied that tcsh is working correctly, complete the installation
+    by typing "make install".
 
-10) PLEASE send any bug reports (and fixes), code for new features,
+10) Enjoy.
+
+11) PLEASE send any bug reports (and fixes), code for new features,
     comments, questions, etc. (even flames) to:
 
 	     -- Christos Zoulas

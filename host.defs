@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.12 1996/04/26 19:18:32 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.13 1996/06/22 21:44:21 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.12 1996/04/26 19:18:32 christos Exp $")
+RCSID("$Id: host.defs,v 1.13 1996/06/22 21:44:21 christos Exp $")
 
 endcode	:
 
@@ -426,12 +426,16 @@ comment	: Linus Torvalds's linux
 vendor	: defined(i386)	|| defined(i486) || defined(__i486__) : "intel"
 hosttype: defined(i486) || defined(__i486__)		: "i486-linux"
 hosttype: defined(i386)					: "i386-linux"
-ostype	: 						: "linux"
+ostype	: !defined(PPC) 				: "linux"
+ostype	: defined(PPC)					: "mklinux"
 machtype: defined(i486) || defined(__i486__)		: "i486"
 machtype: defined(i386)					: "i386"
 vendor	: defined(__alpha)				: "dec"
+vendor	: defined(PPC)					: "apple"
 hosttype: defined(__alpha)				: "alpha"
+hosttype: defined(PPC)					: "powerpc"
 machtype: defined(__alpha)				: "alpha"
+machtype: defined(PPC)					: "powerpc"
 enddef	:
 
 
@@ -445,7 +449,7 @@ enddef	:
 
 
 newdef	: defined(__NetBSD__) 
-comment	: s NetBSD
+comment	: NetBSD
 vendor	: defined(alpha)				: "digital"
 vendor	: defined(amiga)				: "commodore"
 vendor	: defined(atari)				: "atari"
@@ -455,6 +459,7 @@ vendor	: defined(m68k)					: "motorola"
 vendor	: defined(mac68k)				: "apple"
 vendor	: defined(pc532)				: "national-semi"
 vendor	: defined(pmax)	|| defined(mips)		: "dec"
+vendor	: defined(M_mipsel)				: "dec"
 vendor	: defined(sparc)				: "sun"
 vendor	: defined(sun3)					: "sun"
 vendor	: defined(vax)					: "digital"
@@ -463,7 +468,9 @@ ostype	: 						: "NetBSD"
 machtype: defined(sparc)				: "sparc"
 machtype: defined(mc68020)				: "m68k"
 machtype: defined(i386)					: "i386"
-machtype: defined(pmax) || defined(mips)		: "mips"
+machtype: defined(M_mipsel)				: "mipsel"
+machtype: defined(M_mipseb)				: "mipseb"
+machtype: defined(mips)					: "mips"
 machtype: defined(pc532)				: "pc532"
 machtype: defined(vax)					: "vax"
 machtype: defined(alpha)				: "alpha"
@@ -918,6 +925,14 @@ hosttype: defined(MIPSEB)				: "RM200"
 ostype	: defined(sinix)				: "sinix"
 machtype: defined(M_mipsel)				: "mipsel"
 machtype: defined(M_mipseb)				: "mipseb"
+enddef	:
+
+newdef	: defined(sinix)
+comment	: Siemens Nixdorf Informationssysteme SINIX
+vendor	:						: "sni"
+hosttype:						: "rm400"
+ostype	:						: "svr4"
+machtype:						: "mips"
 enddef	:
 
 newdef	: defined(sparc) || defined(__sparc__)

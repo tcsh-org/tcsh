@@ -1,4 +1,7 @@
 V6.07.00
+ 40. 6.06.03 - 09/24/96
+ 39. undef TIOCGLTC for HP/UX 10.0 from Michael Shroeder
+ 38. Sinix fixes
  37. 6.06.02 - 06/22/96
  36. Added implicitcd
  35. Added configure.in and Makefile.in from Kaveh.

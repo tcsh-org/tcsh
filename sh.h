@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.69 1996/04/26 19:19:33 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.70 1996/06/22 21:44:35 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -267,7 +267,10 @@ extern pid_t setpgrp();
 # endif /* !pyr && !stellar */
 #endif /* SYSVREL > 0 ||  _IBMR2 */
 
-#if !((defined(SUNOS4) || defined(_MINIX) || defined(DECOSF1)) && defined(TERMIO))
+/* In the following ifdef the DECOSF1 has been commented so that later
+ * versions of DECOSF1 will get TIOCGWINSZ. This might break older versions...
+ */
+#if !((defined(SUNOS4) || defined(_MINIX) /* || defined(DECOSF1) */) && defined(TERMIO))
 # if !defined(COHERENT) && !defined(_VMS_POSIX)
 #  include <sys/ioctl.h>
 # endif

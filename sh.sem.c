@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.37 1996/04/26 19:20:19 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.38 1996/06/22 21:44:39 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.37 1996/04/26 19:20:19 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.38 1996/06/22 21:44:39 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -155,11 +155,10 @@ execute(t, wanttty, pipein, pipeout)
 	/* if this is a dir, tack a "cd" on as the first arg */
 	if (stat(short2str(sCName), &stbuf) != -1) {
 	    if (S_ISDIR(stbuf.st_mode)) {
-		Char sCCD[3] = { 'c', 'd', '\0' };
 		Char *vCD[2];
 		Char **ot_dcom = t->t_dcom;
 	    
-		vCD[0] = Strsave(sCCD);
+		vCD[0] = Strsave(STRcd);
 		vCD[1] = NULL;
 		t->t_dcom = blkspl(vCD, ot_dcom);
 		if (implicit_cd > 1) {

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.67 1996/04/26 19:21:00 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.68 1996/06/22 21:44:44 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.67 1996/04/26 19:21:00 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.68 1996/06/22 21:44:44 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -386,7 +386,14 @@ dotelltc(v, c)
     if (!GotTermCaps)
 	GetTermCaps();
 
-    TellTC(v[1] ? short2str(v[1]) : defaulttell);
+    /*
+     * Avoid a compiler bug on hpux 9.05
+     * Writing the following as func(a ? b : c) breaks
+     */
+    if (v[1])
+	TellTC(short2str(v[1]));
+    else
+	TellTC(defaulttell);
 }
 
 /*ARGSUSED*/

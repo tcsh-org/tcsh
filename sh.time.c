@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.time.c,v 3.16 1995/03/05 03:18:09 christos	Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.time.c,v 3.17 1996/04/26 19:20:26 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v	3.16 1995/03/05	03:18:09 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.17 1996/04/26 19:20:26 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -380,8 +380,10 @@ prusage(bs, es,	e, b)
      * maybe I should take it out and let people see more then 100% 
      * utilizations.
      */
+#  if 0
     if (ms < t && ms !=	0)
 	ms = t;
+#  endif
 # endif	/*! _SEQUENT_ */
 #endif /* !BSDTIMES */
 #ifdef TDEBUG

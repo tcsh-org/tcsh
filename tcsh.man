@@ -2253,10 +2253,14 @@ If \fIname\fR is not a subdirectory of the current directory
 \fBcdpath\fR is checked to see if it has a subdirectory \fIname\fR. Finally, if
 all else fails but \fIname\fR is a shell variable whose value
 begins with `/', then this is tried to see if it is a directory.
-.IP "" 8
+.RS +8
+.PP
 With \fB\-p\fR, prints the final directory stack, just like \fIdirs\fR.
 The \fB\-l\fR, \fB\-n\fR and \fB\-v\fR flags have the same effect on \fIcd\fR
 as on \fIdirs\fR, and they imply \fB\-p\fR. (+)
+.PP
+See also the \fBimplicitcd\fR shell variable.
+.RE
 .TP 8
 .B chdir
 A synonym for the \fIcd\fR builtin command.
@@ -3578,13 +3582,14 @@ none
 Recognize neither.
 .PD
 .PP
-Set by default to `both'. The BSD and System V options are described in
-the \fIecho\fR(1) manpages on the appropriate systems.
+Set by default to the local system default. The BSD and System V
+options are described in the \fIecho\fR(1) manpages on the appropriate
+systems.
 .RE
 .TP 8
 .B edit \fR(+)
-If set, the command-line editor is used.
-Set by default in interactive shells.
+If set, the command-line editor is used.  Set by default in interactive
+shells.
 .TP 8
 .B ellipsis \fR(+)
 If set, the `%c'/`%.' and `%C' prompt sequences (see the \fBprompt\fR
@@ -3605,65 +3610,63 @@ The user's real group ID.
 The user's group name.
 .TP 8
 .B histchars
-A string value determining the characters used in
-\fBHistory substitution\fR (q.v.).  The first character of its value is
-used as the history substitution character, replacing the
-default character `!'.  The second character of its value
-replaces the character `^' in quick substitutions.
+A string value determining the characters used in \fBHistory
+substitution\fR (q.v.).  The first character of its value is used as
+the history substitution character, replacing the default character
+`!'.  The second character of its value replaces the character `^' in
+quick substitutions.
 .TP 8
 .B histdup \fR(+)
-Controls handling of duplicate entries in the history list.
-If set to `all' only unique history events are entered in the history
-list. If set to `prev' and the last history event is the same as the
-current command, then the current command is not entered in the history.
-If set to `erase' and the same event is found in the history list,
-that old event gets erased and the current one gets inserted. Note that
-the `prev' and `all' options renumber history events so there are no
-gaps.
+Controls handling of duplicate entries in the history list.  If set to
+`all' only unique history events are entered in the history list. If
+set to `prev' and the last history event is the same as the current
+command, then the current command is not entered in the history.  If
+set to `erase' and the same event is found in the history list, that
+old event gets erased and the current one gets inserted. Note that the
+`prev' and `all' options renumber history events so there are no gaps.
 .TP 8
 .B histfile \fR(+)
 The default location in which `history \-S' and `history \-L' look for
-a history file. If unset, \fI~/.history\fR is used.
-\fBhistfile\fR is useful when sharing the same home directory between
-different machines, or when saving separate histories on different terminals.
-Because only \fI~/.tcshrc\fR is normally sourced before \fI~/.history\fR,
-\fBhistfile\fR should be set in \fI~/.tcshrc\fR rather than \fI~/.login\fR.
+a history file. If unset, \fI~/.history\fR is used.  \fBhistfile\fR is
+useful when sharing the same home directory between different machines,
+or when saving separate histories on different terminals.  Because only
+\fI~/.tcshrc\fR is normally sourced before \fI~/.history\fR,
+\fBhistfile\fR should be set in \fI~/.tcshrc\fR rather than
+\fI~/.login\fR.
 .TP 8
 .B histlit \fR(+)
 If set, builtin and editor commands and the \fBsavehist\fR mechanism
-use the literal (unexpanded) form of lines in the history list.
-See also the \fItoggle-literal-history\fR editor command.
+use the literal (unexpanded) form of lines in the history list.  See
+also the \fItoggle-literal-history\fR editor command.
 .TP 8
 .B history
-The first word indicates the number of history events to save.
-The optional second word (+) indicates the format in which history is printed;
-if not given, `%h\\t%T\\t%R\\n' is used.
-The format sequences are described below under \fBprompt\fR;
-note the variable meaning of `%R'.
-Set to `100' by default.
+The first word indicates the number of history events to save.  The
+optional second word (+) indicates the format in which history is
+printed; if not given, `%h\\t%T\\t%R\\n' is used.  The format sequences
+are described below under \fBprompt\fR; note the variable meaning of
+`%R'.  Set to `100' by default.
 .TP 8
 .B home
-Initialized to the home directory of the invoker.
-The filename expansion of `\fI~\fR' refers to this variable.
+Initialized to the home directory of the invoker.  The filename
+expansion of `\fI~\fR' refers to this variable.
 .TP 8
 .B ignoreeof
 If set to the empty string or `0' and the input device is a terminal,
-the \fIend-of-file\fR command (usually generated by the user by typing `^D'
-on an empty line) causes the shell to print
-`Use "exit" to leave tcsh.' instead of exiting.
-This prevents the shell from accidentally being killed.
-If set to a number \fIn\fR, the shell ignores \fIn\fR - 1 consecutive
-\fIend-of-file\fRs and exits on the \fIn\fRth. (+)
-If unset, `1' is used, i.e. the shell exits on a single `^D'.
+the \fIend-of-file\fR command (usually generated by the user by typing
+`^D' on an empty line) causes the shell to print `Use "exit" to leave
+tcsh.' instead of exiting.  This prevents the shell from accidentally
+being killed.  If set to a number \fIn\fR, the shell ignores \fIn\fR -
+1 consecutive \fIend-of-file\fRs and exits on the \fIn\fRth. (+) If
+unset, `1' is used, i.e. the shell exits on a single `^D'.
 .TP 8
 .B implicitcd \fR(+)
-If set, the shell will treat directory names typed as commands as though
-they were requests to change to that directory. If set to \fIverbose\fR,
-the change of directory will be echoed to the standard output. This behavior
-is inhibited in non-interactive shell scripts, or for command strings with
-more than one word. Changing directory takes precedence over executing a
-a like-named command, but it is done after alias substitutions. Tilde and
-variable expansions work as expected.
+If set, the shell treats a directory name typed as a command as though
+it were a request to change to that directory. If set to \fIverbose\fR,
+the change of directory is echoed to the standard output. This behavior
+is inhibited in non-interactive shell scripts, or for command strings
+with more than one word. Changing directory takes precedence over
+executing a like-named command, but it is done after alias
+substitutions. Tilde and variable expansions work as expected.
 .TP 8
 .B inputmode \fR(+)
 If set to `insert' or `overwrite', puts the editor into that input mode
@@ -3682,36 +3685,35 @@ If set, all jobs are listed when a job is suspended. If set to `long',
 the listing is in long format.
 .TP 8
 .B listlinks \fR(+)
-If set, the \fIls\-F\fR builtin command shows the type of file to which each
-symbolic link points.
+If set, the \fIls\-F\fR builtin command shows the type of file to which
+each symbolic link points.
 .TP 8
 .B listmax \fR(+)
 The maximum number of items which the \fIlist-choices\fR editor command
 will list without asking first.
 .TP 8
 .B listmaxrows \fR(+)
-The maximum number of rows of items which the \fIlist-choices\fR editor command
-will list without asking first.
+The maximum number of rows of items which the \fIlist-choices\fR editor
+command will list without asking first.
 .TP 8
 .B loginsh \fR(+)
-Set by the shell if it is a login shell.
-Setting or unsetting it within a shell has no effect.
-See also \fBshlvl\fR.
+Set by the shell if it is a login shell.  Setting or unsetting it
+within a shell has no effect.  See also \fBshlvl\fR.
 .TP 8
 .B logout \fR(+)
-Set by the shell to `normal' before a normal logout, `automatic'
-before an automatic logout, and `hangup' if the shell was killed by a
-hangup signal (see \fBSignal handling\fR).
-See also the \fBautologout\fR shell variable.
+Set by the shell to `normal' before a normal logout, `automatic' before
+an automatic logout, and `hangup' if the shell was killed by a hangup
+signal (see \fBSignal handling\fR).  See also the \fBautologout\fR
+shell variable.
 .TP 8
 .B mail
-The names of the files or directories to check for incoming mail, separated
-by whitespace, and optionally preceeded by a numeric word.
+The names of the files or directories to check for incoming mail,
+separated by whitespace, and optionally preceeded by a numeric word.
 Before each prompt, if 10 minutes have passed since the last check, the
 shell checks each file and says `You have new mail.' (or, if \fBmail\fR
-contains multiple files, `You have new mail in \fIname\fR.') if the filesize
-is greater than zero in size and has a modification time greater than its
-access time.
+contains multiple files, `You have new mail in \fIname\fR.') if the
+filesize is greater than zero in size and has a modification time
+greater than its access time.
 .PP
 .RS +8
 .PD
@@ -3944,7 +3946,7 @@ Set by default to `%R? ' in interactive shells.
 The string with which to prompt when confirming automatic spelling correction.
 The same format sequences may be used as in \fBprompt\fR (q.v.);
 note the variable meaning of `%R'.
-Set by default to `CORRECT>%R (y|n|e)? ' in interactive shells.
+Set by default to `CORRECT>%R (y|n|e|a)? ' in interactive shells.
 .TP 8
 .B promptchars \fR(+)
 If set (to a two-character string), the `%#' formatting sequence in the

@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.79 1995/04/29 22:28:24 christos Exp $
+# $Id: Makefile.in,v 3.1 1996/06/22 21:44:13 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -132,7 +132,6 @@ CFLAGS = $(INCLUDES) @CFLAGS@		# This is set by autoconf.
 #DFLAGS=-D_PATH_TCSHELL='"${DESTBIN}/tcsh"'
 DFLAGS = @DFLAGS@ @CPPFLAGS@	## This is set by autoconf.
 
-
 ################################################################
 ## LDFLAGS.  Define something here if you need to
 ################################################################
@@ -232,8 +231,11 @@ EXTRALIBS = $(HESLIB) $(AFSLIB)
 # is fixed correctly, otherwise you'll be stopped for tty input, or you
 # will lose the editor and job control.
 
+# This is for setting your C preprocessor value.
+CPP = @CPP@ # This is set by autoconf.
 # The -B tells gcc to use /bin/ld. This is to avoid using the gnu ld, which
 # on the suns does not know how to make dynamically linked binaries.
+#CPP = ${CC} -E # An alternate choice if you dont use autoconf.
 CC = @CC@ # This is set by autoconf.
 #CC=	gcc -Wall -pipe -B/bin/	# -ansi -pedantic
 #CC=	gcc -m486 -pipe -Wall # Generate code for Intel 486 (linux)

@@ -182,6 +182,9 @@ be able to get ftp it... :-)
     You have defined REMOTEHOST and your DNS is not responding. Either
     undefine REMOTEHOST and recompile or fix your DNS.
 
+19. If you need help generating your .cshrc file, check out:
+	http://www.imada.ou.dk/~blackie/dotfile/
+
 christos
 
 Everything else is a bug :-(
