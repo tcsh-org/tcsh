@@ -1,3 +1,4 @@
+ 72. Clamp solaris autologout time
  71. Add support for "limit heapsize" (Martin Kraemer)
  70. Improved autoconf for utmp/utmpx (Miloslav Trmac)
  69. V6.13.09 - 20050303
