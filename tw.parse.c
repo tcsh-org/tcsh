@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.93 2003/02/08 20:03:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.94 2003/03/12 19:14:51 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.93 2003/02/08 20:03:26 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.94 2003/03/12 19:14:51 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -997,7 +997,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	case RECOGNIZE_SCROLL:
 
 	    if ((vp = adrof(STRcomplete)) != NULL && vp->vec != NULL) {
-		Char *cp;
+		Char **cp;
 		for (cp = vp->vec; *cp; cp++) {
 		    if (Strcmp(*cp, STRigncase) == 0)
 			igncase = 1;
