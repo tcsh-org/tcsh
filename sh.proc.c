@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.44 1993/05/17 00:11:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.45 1993/05/17 01:02:53 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.44 1993/05/17 00:11:09 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.45 1993/05/17 01:02:53 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -47,7 +47,7 @@ RCSID("$Id: sh.proc.c,v 3.44 1993/05/17 00:11:09 christos Exp $")
 # define HZ 16
 #endif /* aiws */
 
-#if (defined(_BSD) && defined(_BSD_INCLUDES)) || (defined(IRIS4D) && __STDC__) || defined(__lucid)
+#if (defined(_BSD) && defined(_BSD_INCLUDES)) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(linux)
 # define BSDWAIT
 #endif
 #ifndef WTERMSIG
@@ -190,7 +190,7 @@ loop:
 #ifdef BSDJOBS
 # ifdef BSDTIMES
     /* both a wait3 and rusage */
-#  if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || (defined(IRIS4D) && (__STDC__ || defined(FUNCPROTO)) && SYSVREL <= 3) || defined(__lucid)
+#  if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || defined(linux) || (defined(IRIS4D) && (__STDC__ || defined(FUNCPROTO)) && SYSVREL <= 3) || defined(__lucid)
     pid = wait3(&w,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
 #  else /* BSDWAIT */
@@ -1154,7 +1154,7 @@ prcomd:
 	    if (flag & JOBDIR &&
 		!eq(tp->p_cwd->di_name, dcwd->di_name)) {
 		xprintf(" (wd: ");
-		dtildepr(value(STRhome), tp->p_cwd->di_name);
+		dtildepr(tp->p_cwd->di_name);
 		xprintf(")");
 	    }
 	}
@@ -1185,7 +1185,7 @@ prcomd:
 		xputchar('\n');
 	    if (flag & SHELLDIR && !eq(tp->p_cwd->di_name, dcwd->di_name)) {
 		xprintf("(wd now: ");
-		dtildepr(value(STRhome), dcwd->di_name);
+		dtildepr(dcwd->di_name);
 		xprintf(")\n");
 	    }
 	}
@@ -1782,7 +1782,7 @@ pfork(t, wanttty)
     bool    ignint = 0;
     int     pgrp;
 #ifdef BSDSIGS
-    sigmask_t omask;
+    sigmask_t omask = 0;
 #endif /* BSDSIGS */
 #ifdef SIGSYNCH
     sigvec_t osv;
@@ -1810,27 +1810,30 @@ pfork(t, wanttty)
      */
     if (child == 16)
 	stderror(ERR_NESTING, 16);
-    /*
-     * Hold SIGCHLD until we have the process installed in our table.
-     */
 #ifdef SIGSYNCH
     if (mysigvec(SIGSYNCH, &nsv, &osv))
 	stderror(ERR_SYSTEM, "pfork: sigvec set", strerror(errno));
 #endif /* SIGSYNCH */
+    /*
+     * Hold SIGCHLD until we have the process installed in our table.
+     */
+    if (wanttty < 0) {
 #ifdef BSDSIGS
-    omask = sigblock(sigmask(SIGCHLD));
+	omask = sigblock(sigmask(SIGCHLD));
 #else /* !BSDSIGS */
-    (void) sighold(SIGCHLD);
+	(void) sighold(SIGCHLD);
 #endif /* !BSDSIGS */
+    }
     while ((pid = fork()) < 0)
 	if (setintr == 0)
 	    (void) sleep(FORKSLEEP);
 	else {
+	    if (wanttty < 0)
 #ifdef BSDSIGS
-	    (void) sigsetmask(omask);
+		(void) sigsetmask(omask);
 #else /* !BSDSIGS */
+		(void) sigrelse(SIGCHLD);
 	    (void) sigrelse(SIGINT);
-	    (void) sigrelse(SIGCHLD);
 #endif /* !BSDSIGS */
 	    stderror(ERR_NOPROC);
 	}
@@ -1846,7 +1849,8 @@ pfork(t, wanttty)
 	if (setintr) {
 	    setintr = 0;	/* until I think otherwise */
 #ifndef BSDSIGS
-	    (void) sigrelse(SIGCHLD);
+	    if (wanttty < 0)
+		(void) sigrelse(SIGCHLD);
 #endif /* !BSDSIGS */
 	    /*
 	     * Children just get blown away on SIGINT, SIGQUIT unless "onintr
@@ -1937,11 +1941,13 @@ pfork(t, wanttty)
 		     strerror(errno));
 #endif /* SIGSYNCH */
 
+	if (wanttty < 0) {
 #ifdef BSDSIGS
-	(void) sigsetmask(omask);
+	    (void) sigsetmask(omask);
 #else /* !BSDSIGS */
-	(void) sigrelse(SIGCHLD);
+	    (void) sigrelse(SIGCHLD);
 #endif /* !BSDSIGS */
+	}
     }
     return (pid);
 }

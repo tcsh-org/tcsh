@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.err.c,v 3.17 1993/03/05 20:14:33 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.err.c,v 3.18 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.17 1993/03/05 20:14:33 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.18 1993/05/17 00:11:09 christos Exp christos $")
 
 /*
  * C Shell
@@ -401,7 +401,8 @@ stderror(va_alist)
 {
     va_list va;
     register Char **v;
-    int     flags;
+    int flags;
+    int vareturn;
 
 #if __STDC__
     va_start(va, id);
@@ -420,37 +421,42 @@ stderror(va_alist)
     flags = id & ERR_FLAGS;
     id &= ~ERR_FLAGS;
 
-    if ((flags & ERR_OLD) && seterr == NULL) {
-	va_end(va);
-	return;
-    }
-
-    if (id >= sizeof(errorlist) / sizeof(errorlist[0]))
-	id = ERR_INVALID;
-
-    /*
-     * Must flush before we print as we wish output before the error to go on
-     * (some form of) standard output, while output after goes on (some form
-     * of) diagnostic output. If didfds then output will go to 1/2 else to
-     * FSHOUT/FSHDIAG. See flush in sh.print.c.
+    /* Pyramid's OS/x has a subtle bug in <varargs.h> which prevents calling
+     * va_end more than once in the same function. -- sterling@oldcolo.com
      */
-    flush();
-    haderr = 1;			/* Now to diagnostic output */
-    timflg = 0;			/* This isn't otherwise reset */
+    if (!((flags & ERR_OLD) && seterr == NULL)) {
+	vareturn = 0;	/* Don't return immediately after va_end */
+	if (id >= sizeof(errorlist) / sizeof(errorlist[0]))
+	    id = ERR_INVALID;
+
+	/*
+	 * Must flush before we print as we wish output before the error to go
+	 * on (some form of) standard output, while output after goes on (some
+	 * form of) diagnostic output. If didfds then output will go to 1/2
+	 * else to FSHOUT/FSHDIAG. See flush in sh.print.c.
+	 */
+	flush();
+	haderr = 1;			/* Now to diagnostic output */
+	timflg = 0;			/* This isn't otherwise reset */
 
 
-    if (!(flags & ERR_SILENT)) {
-	if (flags & ERR_NAME)
-	    xprintf("%s: ", bname);
-	if ((flags & ERR_OLD))
-	    /* Old error. */
-	    xprintf("%s.\n", seterr);
-	else {
-	    xvprintf(errorlist[id], va);
-	    xprintf(".\n");
+	if (!(flags & ERR_SILENT)) {
+	    if (flags & ERR_NAME)
+		xprintf("%s: ", bname);
+	    if ((flags & ERR_OLD)) {
+		/* Old error. */
+		xprintf("%s.\n", seterr);
+		} else {
+		   xvprintf(errorlist[id], va);
+		    xprintf(".\n");
+		}
 	}
+    } else {
+	vareturn = 1;	/* Return immediately after va_end */
     }
     va_end(va);
+    if (vareturn)
+	return;
 
     if (seterr) {
 	xfree((ptr_t) seterr);

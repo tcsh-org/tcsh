@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.init.c,v 3.33 1992/10/05 02:41:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.init.c,v 3.34 1993/01/08 22:23:12 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.33 1992/10/05 02:41:30 christos Exp christos $")
+RCSID("$Id: ed.init.c,v 3.34 1993/01/08 22:23:12 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -634,7 +634,15 @@ static Char *Input_Line = NULL;
 int
 Load_input_line()
 {
-    long    chrs = 0;
+#ifdef SUNOS
+    long chrs = 0;
+#else
+    /* 
+     * *Everyone* else has an int, but SunOS wants long!
+     * This breaks where int != long (alpha)
+     */
+    int chrs = 0;
+#endif
 
     if (Input_Line)
 	xfree((ptr_t) Input_Line);

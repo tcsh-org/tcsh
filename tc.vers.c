@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.27 1993/04/07 21:39:23 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.vers.c,v 3.28 1993/05/17 00:11:09 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.27 1993/04/07 21:39:23 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.28 1993/05/17 00:11:09 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -49,6 +49,11 @@ gethosttype()
 #ifdef HOSTTYPE	/* Override any system determined hosttypes */
     hosttype = HOSTTYPE;
 #else
+
+# ifdef __PARAGON__ /* Intel Paragon */
+#  define _havehosttype_
+    hosttype = "paragon";
+# endif /* __PARAGON__ */
 
 # ifdef AMIX /* Amiga UNIX */
 #  define _havehosttype_

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/patchlevel.h,v 3.58 1993/04/26 21:13:10 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/patchlevel.h,v 3.59 1993/05/17 00:11:09 christos Exp $ */
 /*
  * patchlevel.h: Our life story.
  */
@@ -8,7 +8,7 @@
 #define ORIGIN "Cornell"
 #define REV 6
 #define VERS 3
-#define PATCHLEVEL 6
-#define DATE "93/05/16"
+#define PATCHLEVEL 7
+#define DATE "93/06/05"
 
 #endif /* _h_patchlevel */

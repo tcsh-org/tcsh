@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dol.c,v 3.20 1993/04/07 21:39:23 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dol.c,v 3.21 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.20 1993/04/07 21:39:23 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.21 1993/05/17 00:11:09 christos Exp christos $")
 
 /*
  * C shell
@@ -58,7 +58,7 @@ static Char *Dcp, **Dvp;	/* Input vector for Dreadc */
 
 #define	unDgetC(c)	Dpeekc = c
 
-#define QUOTES		(_Q|_Q1|_ESC)	/* \ ' " ` */
+#define QUOTES		(_QF|_QB|_ESC)	/* \ ' " ` */
 
 /*
  * The following variables give the information about the current
@@ -193,7 +193,7 @@ Dpack(wbuf, wp)
 	    Gcat(STRNULL, wbuf);
 	    return (NULL);
 	}
-	if (cmap(c, _SP | _NL | _Q | _Q1)) {	/* sp \t\n'"` */
+	if (cmap(c, _SP | _NL | _QF | _QB)) {	/* sp \t\n'"` */
 	    unDgetC(c);
 	    if (cmap(c, QUOTES))
 		return (wp);

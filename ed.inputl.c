@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.inputl.c,v 3.32 1993/04/26 21:13:10 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.inputl.c,v 3.33 1993/05/17 00:11:09 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.32 1993/04/26 21:13:10 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.33 1993/05/17 00:11:09 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -100,7 +100,15 @@ Inputl()
 
 #if defined(FIONREAD) && !defined(OREO)
     if (!Tty_raw_mode && MacroLvl < 0) {
-	long    chrs = 0;
+# ifdef SUNOS
+	long chrs = 0;
+# else
+	/* 
+	 * *Everyone* else has an int, but SunOS wants long!
+	 * This breaks where int != long (alpha)
+	 */
+	int chrs = 0;
+# endif
 
 	(void) ioctl(SHIN, FIONREAD, (ioctl_t) & chrs);
 	if (chrs == 0) {
@@ -224,6 +232,8 @@ Inputl()
 			    *LastChar-- = '\0';
 			    Cursor = LastChar;
 			    printprompt(3, NULL);
+			    ClearLines();
+			    ClearDisp();
 			    Refresh();
 			    break;
 			}

@@ -16,7 +16,7 @@ OS	:	sunos 3.5, 4.0, 4.1, 4.1.1, 4.1.2, 4.1.3
 CONFIG	:	config.sos*
 ENVIRON	:	n/a
 NOTES	:	Don't compile with /usr/5bin/cc
-VERSION	:	6.02.12
+VERSION	:	6.03.00
 
 VENDOR	:	sun
 MODELS	:	sun4
@@ -27,7 +27,7 @@ OS	:	solaris 2.x
 CONFIG	:	config.sol2
 ENVIRON	:	n/a
 NOTES	:	n/a
-VERSION	:	6.00.01
+VERSION	:	6.03.00
 
 VENDOR	:	hp
 MODELS	:	apollo
@@ -43,15 +43,15 @@ VERSION	:	6.01.00
 VENDOR	:	hp
 MODELS	:	hp9000s300, hp9000s700, hp9000s800
 COMPILER:	cc, gcc
-CFLAGS	:	normal (-Aa -O3 hpux 8.0)
+CFLAGS	:	normal (-Aa -O3 hpux 8.0, 9.05)
 LIBES	:	-ltermcap
-OS	:	hpux 6.5, 7.0.x, 8.0
+OS	:	hpux 6.5, 7.0.x, 8.0, 9.05
 CONFIG	:	config.hpux
 ENVIRON	:	n/a
 NOTES	:	Don't use -lBSD; breaks getpgrp(). Config.hp-3.2 obsolete?
 	:	Some versions of the compiler are broken with -O3. Try 'ls *'
 	:	If it does not work, lower the optimization level...
-VERSION	:	6.00.04
+VERSION	:	6.03.00
 
 VENDOR	:	hp
 MODELS	:	hp9000s500
@@ -127,7 +127,7 @@ ENVIRON	:	n/a
 NOTES	:	aix G9.9 sfname() frees bad pointers. Use TCF with care!
 NOTES	:	aix 3.2 may need NAMEI_BUG
 NOTES	:	aix 3.2 may need _BSD_INCLUDES defined in config.h
-VERSION	:	6.01.00
+VERSION	:	6.03.00 (rs6000)
 
 VENDOR	:	ibm
 MODELS	:	rt
@@ -232,12 +232,12 @@ VERSION	:	6.00.01
 VENDOR	:	pyramid
 MODELS	:	MIS4/2T 
 COMPILER:	cc
-CFLAGS	:	-I. -O -DBSD
+CFLAGS	:	-OG
 LIBES	:	-ltermcap
-OS	:	OSx5.1
-CONFIG	:	config.bsd
+OS	:	OSx5.1,6.4
+CONFIG	:	config.pyr
 ENVIRON	:	n/a
-NOTES	:	none
+NOTES	:	If there are problems with the global optimizer, use -OP
 VERSION	:	6.00.02
 
 VENDOR	:	next
@@ -328,7 +328,7 @@ OS	:	SVR4 (DELL, ESIX, ISC, UHC)
 CONFIG	:	config.sysv4
 ENVIRON	:	n/a
 NOTES	:	none
-VERSION	:	6.00.04
+VERSION	:	6.03.06
 
 VENDOR	:	ibm + compatibles
 MODELS	:	i386,i486
@@ -397,8 +397,10 @@ LIBES   :       -ltermcap
 OS      :       Alliant Concentrix 2800 2.2.00
 CONFIG  :       config.bsd
 ENVIRON :       n/a
-NOTES   :       n/a
-VERSION :       6.01
+NOTES   :       For a newer version of the operating system try defining
+	:	NEW_OS in config.alliant [or better find a way to tell
+	:	them apart.
+VERSION :       6.03.00
 
 VENDOR  :       stardent
 MODELS  :	Vistra 800

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.types.h,v 3.26 1992/10/14 20:19:19 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.types.h,v 3.27 1993/01/08 22:23:12 christos Exp christos $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -262,6 +262,7 @@ typedef char * caddr_t;
 #ifdef pyr
 # ifndef _PID_T
 #  define _PID_T
+   typedef short pid_t;
 # endif /* _PID_T */
 #endif /* pyr */
 

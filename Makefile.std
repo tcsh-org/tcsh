@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.47 1993/04/26 21:13:10 christos Exp $
+# $Id: Makefile.std,v 1.48 1993/05/17 00:11:09 christos Exp christos $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -10,9 +10,6 @@
 SHELL=/bin/sh
 VERSION=6.03
 BUILD=tcsh
-#BUILD=jump	# Build tcsh.a and link it with jump table libraries (linux)
-#BUILD=nojump	# Build tcsh.a and link it with shared libraries (linux)
-#BUILD=static	# Build tcsh.a and link it with static libraries (linux)
 
 ################################################################
 ## CFLAGS.  For various -D things, see config.h
@@ -63,6 +60,9 @@ CFLAGS=-O2 $(INCLUDES) -g
 # Ultrix 4.2a
 #CFLAGS= $(INCLUDES) -O -Olimit 2000
 
+# Intel Paragon OSF/1 with PGI compilers
+CFLAGS=-O -Mnodebug -Mnoperfmon $(INCLUDES)
+
 # for silicon graphics (and other mips compilers) -- use the
 # global optimizer! (-O3).
 # On SGI 4.0+ you need to add -D__STDC__ too.
@@ -86,6 +86,9 @@ CFLAGS=-O2 $(INCLUDES) -g
 
 # Dnix 5.3
 #CFLAGS = -O -X7
+
+# Pyramid OS/x
+#CFLAGS = -OG
 
 # Apollo's with cc [apollo builtins don't work with gcc]
 # and apollo should not define __STDC__ if it does not have
@@ -117,11 +120,13 @@ LDFLAGS= 			## The simplest, suitable for all.
 #				## swap but external /usr/local/bin .
 #LDFLAGS= -s -n -Bstatic	## Without dynamic links. (SunOS)
 #LDFLAGS= -Wl,-s,-n		## Stripped, shared text (Unicos)
+#LDFLAGS= -s -static		## Link statically. (linux)
+#LDFLAGS= -s -N			## Impure executable (linux)
 
 ################################################################
 ## LIBES.  Pick one, or roll your own.
 ################################################################
-LIBES= -ltermcap 		## BSD style things, hpux
+LIBES= -ltermcap 		## BSD style things, hpux, pyramid
 #LIBES= -ltermc			## emx under OS/2
 #LIBES= -ltermcap -lsec		## Tek XD88/10 (UTekV) with PW_SHADOW
 #LIBES= -ltermcap -lsec		## Motorola MPC (sysV88) with PW_SHADOW
@@ -143,11 +148,11 @@ LIBES= -ltermcap 		## BSD style things, hpux
 #LIBES= -lcurses -linet -lsec -lc_s  ## ISC 2.0.2 with networking
 #LIBES= -lcurses -lsec -lc_s    ## ISC 2.0.2 without networking
 #LIBES= -ltermcap -ldir -lx	## Xenix 386 style things
-#LIBES= -lcurses -lintl -lcrypt		## SCO SysVR3.2v2.0
+#LIBES= -lcurses -lintl -lcrypt	## SCO SysVR3.2v2.0
 #LIBES= -lcurses -lintl -lsocket -lcrypt ## SCO+ODT1.1
 #LIBES= -lposix -ltermcap	## A/UX 2.0
 #LIBES= -lposix -ltermcap -lc_s	## A/UX 3.0
-#LIBES= -ltermcap -lbsd		## DEC osf1 on the alpha
+#LIBES= -ltermcap -lbsd		## DEC osf1 on the alpha and Intel paragon
 #LIBES= -ltermcap -lseq		## Sequent's Dynix
 #LIBES= -lcurses -lsocket	## Intel's hypercube and ns32000 based Opus.
 #LIBES= -ldirent -lcurses       ## att3b1 stk cc w/o shared lib & directory lib
@@ -262,19 +267,6 @@ pure:$(P) ${OBJS}
 # OS/2
 tcsh.exe: tcsh
 	emxbind tcsh
-
-# Linux distribution
-jump: tcsh.a
-	${CC} ${LDFLAGS} ${CFLAGS} -o tcsh tcsh.a ${LIBES}
-
-nojump: tcsh.a
-	${CC} ${LDFLAGS} -nojump ${CFLAGS} -o tcsh tcsh.a ${LIBES}
-
-static: tcsh.a
-	${CC} ${LDFLAGS} -static ${CFLAGS} -o tcsh tcsh.a ${LIBES}
-
-tcsh.a:$(P) ${OBJS}
-	$(LD) -x -r -o tcsh.a ${OBJS}
 
 tcsh.ps: tcsh.man
 	rm -f tcsh.ps

@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.17 1993/02/12 17:22:20 christos Exp $
+# $Id: complete.tcsh,v 1.18 1993/04/26 21:13:10 christos Exp $
 # example file using the new completion code
 #
 
@@ -58,7 +58,7 @@ if ($?complete) then
     complete tex 	n/*/f:*.tex/
     complete rlogin 	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/ 
     complete telnet 	n/*/\$hosts/ 
-    complete su		c/-/"(f)"/ n/*/u/
+    complete su		c/-/"(f c)"/ n/-c/c/ n/*/u/
     complete xrsh   	c/-/"(l 8 e)"/ n/-l/u/ n/*/\$hosts/ 
     complete cc 	c/-I/d/ c/-L/d/ \
               c@-l@'`\ls -1 /usr/lib/lib*.a | sed s%^.\*/lib%%\;s%\\.a\$%%`'@ \
@@ -137,7 +137,7 @@ if ($?complete) then
     complete ping	p/1/\$hosts/
     complete traceroute	p/1/\$hosts/
 
-    complete talk	p/1/'`users | tr " " "\012" | uniq`'/ \
+    complete {talk,ntalk,phone}	p/1/'`users | tr " " "\012" | uniq`'/ \
 		n/*/\`who\ \|\ grep\ \$:1\ \|\ awk\ \'\{\ print\ \$2\ \}\'\`/
 
     if ( -f $HOME/.netrc ) then
@@ -217,16 +217,22 @@ n@public@'`[ -r /usr/man/manp ] && \ls -1 /usr/man/manp| sed s%\\.p.\*\$%%`'@ \
     complete xhost	c/[+-]/\$hosts/ n/*/\$hosts/
 
     complete gzcat	c/--/"(help license quiet version)"/ \
-			c/-/"(h L q V)"/ n/*/f:*.{Z,z,zip}/
+			c/-/"(h L q V)"/ n/*/f:*.{gz,Z,z,zip}/
     complete gzip	c/--/"(stdout decompress force help license quiet \
-			       recurse test verbose version fast best)"/ \
-			c/-/"(c d f h L q r t v V 1 2 3 4 5 6 7 8 9)"/ \
-			n/{-d,--decompress}/f:*.{Z,z,zip,taz,tgz}/ \
-			N/{-d,--decompress}/f:*.{Z,z,zip,taz,tgz}/ \
-			n/*/f:^*.{Z,z,zip,taz,tgz}/
+			recurse suffix test verbose version fast best)"/ \
+			c/-/"(c d f h L q r S t v V 1 2 3 4 5 6 7 8 9)"/ \
+			n/{-S,--suffix}/x:'<file_name_suffix>'/ \
+			n/{-d,--decompress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
+			N/{-d,--decompress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
+			n/*/f:^*.{gz,Z,z,zip,taz,tgz}/
     complete {gunzip,ungzip} c/--/"(stdout force help license quiet \
-			            recurse test verbose version)"/ \
-			c/-/"(c f h L q r t v V)"/ n/*/f:*.{Z,z,zip,taz,tgz}/
+			recurse test verbose version)"/ \
+			c/-/"(c f h L q r t v V)"/ \
+			n/*/f:*.{gz,Z,z,zip,taz,tgz}/
+    complete znew	c/-/"(f t v 9 P K)"/ n/*/f:*.Z/
+    complete zmore	n/*/f:*.{gz,Z,z,zip}/
+    complete ztouch	n/*/f:*.{gz,Z,z,zip,taz,tgz}/
+    complete zforce	n/*/f:^*.{gz,tgz}/
 
     complete grep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
 			c/-/"(A b B c C e f h i l n s v V w x)"/ \

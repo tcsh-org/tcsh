@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.const.c,v 3.17 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.const.c,v 3.18 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.17 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.18 1993/05/17 00:11:09 christos Exp christos $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -209,6 +209,8 @@ Char STRhelpcommand[]	= { 'h', 'e', 'l', 'p', 'c', 'o', 'm', 'm', 'a', 'n',
 			    'd', '\0' };
 Char STRfignore[]	= { 'f', 'i', 'g', 'n', 'o', 'r', 'e', '\0' };
 Char STRrecexact[]	= { 'r', 'e', 'c', 'e', 'x', 'a', 'c', 't', '\0' };
+Char STRlistmaxrows[]	= { 'l', 'i', 's', 't', 'm', 'a', 'x', 'r', 'o', 'w',
+			    's', '\0' };
 Char STRlistmax[]	= { 'l', 'i', 's', 't', 'm', 'a', 'x', '\0' };
 Char STRlistlinks[]	= { 'l', 'i', 's', 't', 'l', 'i', 'n', 'k', 's', '\0' };
 Char STRDING[]		= { 'D', 'I', 'N', 'G', '!', '\0' };

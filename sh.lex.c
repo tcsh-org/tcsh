@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.31 1993/04/07 21:39:23 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.32 1993/05/17 00:11:09 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.31 1993/04/07 21:39:23 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.32 1993/05/17 00:11:09 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -386,7 +386,7 @@ loop:
 		break;
 	    }
 	}
-	else if (cmap(c, _META | _Q | _Q1 | _ESC)) {
+	else if (cmap(c, _META | _QF | _QB | _ESC)) {
 	    if (c == '\\') {
 		c = getC(0);
 		if (c == '\n') {
@@ -398,7 +398,7 @@ loop:
 		    *wp++ = '\\', --i;
 		c |= QUOTE;
 	    }
-	    else if (cmap(c, _Q | _Q1)) {	/* '"` */
+	    else if (cmap(c, _QF | _QB)) {	/* '"` */
 		c1 = c;
 		dolflg = c == '"' ? DOALL : DOEXCL;
 	    }
@@ -437,7 +437,7 @@ getC1(flag)
 	    if ((c = *lap++) == 0)
 		lap = 0;
 	    else {
-		if (cmap(c, _META | _Q | _Q1))
+		if (cmap(c, _META | _QF | _QB))
 		    c |= QUOTE;
 		return (c);
 	    }
@@ -1305,7 +1305,7 @@ gethent(sc)
 	    }
 	    np = lhsb;
 	    event = 0;
-	    while (!cmap(c, _ESC | _META | _Q | _Q1) && !any("${}:#", c)) {
+	    while (!cmap(c, _ESC | _META | _QF | _QB) && !any("${}:#", c)) {
 		if (event != -1 && Isdigit(c))
 		    event = event * 10 + c - '0';
 		else

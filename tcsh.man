@@ -29,7 +29,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\" $Id: tcsh.man,v 3.56 1993/04/26 21:13:10 christos Exp $
+.\" $Id: tcsh.man,v 3.57 1993/05/17 00:11:09 christos Exp christos $
 .TH TCSH 1 "16 May 1993" "Cornell 6.03.06"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -2019,6 +2019,7 @@ The current possible values are:
 \fInd500\fR		a Norsk Data ND 500/5000 running Ndix
 \fIns32000\fR		an NS32000 CPU machine
 \fInext\fR			a NeXT computer
+\fIparagon\fR			an intel paragon running osf1
 \fIpfa50\fR			a PFU/Fujitsu A-xx computer
 \fIps2\fR			an IBM PS/2, running aix
 \fIptx\fR			a Sequent Symmetry running DYNIX/ptx (386/486 based)
@@ -3322,6 +3323,10 @@ is shown.
 .TP 10
 .B listmax 
 maximum number of items to list without asking first.
+.TP 10
+.B listmaxrows 
+maximum number of rows of items to list without asking first.
+(local AFEB hack at University of Twente)
 .TP 10
 .B matchbeep
 control beeping on completion.  With matchbeep=nomatch, completion

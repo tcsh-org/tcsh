@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.26 1993/04/26 21:13:10 christos Exp christos $
+/**/# $Id: Imakefile,v 1.27 1993/05/17 00:11:09 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.03
 /**/# Marc Horowitz, MIT SIPB
@@ -75,6 +75,8 @@ ones.  Please send in your fixes and additions! */
 #  ifdef you_are_using_yp
 #   define UseSunLib 
 #  endif
+#  define MyStdc -D__STDC__
+CCOPTIONS=-float	# We don't want -cckr and -prototypes
 # endif
 
 # ifdef IBMArchitecture
@@ -85,6 +87,10 @@ ones.  Please send in your fixes and additions! */
 #   define AOSArchitecture
 #  endif
 # endif
+
+#ifdef AOSArchitecture
+#define MyStdc -U__STDC__
+#endif
 
 # if defined(MipsBsdArchitecture) || defined(MipsSysvArchitecture)
 #  define ConfigH mips
@@ -333,11 +339,6 @@ CDEBUGFLAGS = -O
 # endif
 #endif
 
-#ifdef AOSArchitecture
-#define UStdc -U__STDC__
-#else
-#define UStdc
-#endif
 
 #ifdef HostType
 HTDEF = Concat3(-DHOSTTYPE=\",HostType,\")
@@ -345,7 +346,7 @@ HTDEF = Concat3(-DHOSTTYPE=\",HostType,\")
 HTDEF =
 #endif
 
-DEFINES = $(TCSHPATH) $(HESDEF) $(HTDEF) MyDefines MyCflags UStdc
+DEFINES = $(TCSHPATH) $(HESDEF) $(HTDEF) MyDefines MyCflags MyStdc
 INCLUDES = -I. MyIncludes
 LDLIBS = MyLibs
 

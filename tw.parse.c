@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.47 1993/04/26 21:13:10 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.48 1993/05/17 00:11:09 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.47 1993/04/26 21:13:10 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.48 1993/05/17 00:11:09 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -127,6 +127,7 @@ static	void	 tw_list_items		__P((int, int, int));
 static 	void	 add_scroll_tab		__P((Char *));
 static 	void 	 choose_scroll_tab	__P((Char **, int));
 static	void	 free_scroll_tab	__P((void));
+static	int	 find_rows		__P((Char *[], int, int));
 
 #ifdef notdef
 /*
@@ -174,13 +175,13 @@ tenematch(inputline, num_read, command)
     word = cmd_start = wp = qline;
     for (cp = inputline; cp < str_end; cp++) {
         if (!cmap(qu, _ESC)) {
-	    if (cmap(*cp, _Q|_ESC)) {
+	    if (cmap(*cp, _QF|_ESC)) {
 		if (qu == 0 || qu == *cp) {
 		    qu ^= *cp;
 		    continue;
 		}
 	    }
-	    if (qu != '\'' && cmap(*cp, _Q1)) {
+	    if (qu != '\'' && cmap(*cp, _QB)) {
 		if ((backq ^= 1) != 0) {
 		    ocmd_start = cmd_start;
 		    oword_start = word_start;
@@ -379,7 +380,7 @@ tenematch(inputline, num_read, command)
     case VARS_EXPAND:
 	if (dollar(buffer, wordp)) {
 	    DeleteBack(str_end - word_start);
-	    if (InsertStr(quote_meta(buffer, 0, 0)) < 0)
+	    if (InsertStr(quote_meta(buffer, qu, 0)) < 0)
 		return (-1);
 	    return (1);
 	}
@@ -525,7 +526,7 @@ quote_meta(word, qu, trail_space)
 	    *bptr++ = qu;
 	}
 	if (!qu &&
-	    (cmap(*wptr, _META | _DOL | _Q | _Q1 | _ESC | _GLOB) ||
+	    (cmap(*wptr, _META | _DOL | _QF | _QB | _ESC | _GLOB) ||
 	     *wptr == HIST || *wptr == HISTSUB) &&
 	    (*wptr != ' ' || !trail_space || *(wptr + 1) != '\0') &&
              *wptr != '#')
@@ -848,8 +849,10 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 
 	    /*
 	     * Remove duplicates in command listing and completion
+             * AFEB added code for TW_LOGNAME and TW_USER cases
 	     */
-	    if (looking == TW_COMMAND || command == LIST) {
+	    if (looking == TW_COMMAND || looking == TW_LOGNAME
+		|| looking == TW_USER || command == LIST) {
 		copyn(buf, item, MAXPATHLEN);
 		len = Strlen(buf);
 		switch (looking) {
@@ -871,7 +874,8 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		default:
 		    break;
 		}
-		if (looking == TW_COMMAND && tw_item_find(buf))
+		if ((looking == TW_COMMAND || looking == TW_USER
+                     || looking == TW_LOGNAME) && tw_item_find(buf))
 		    break;
 		else {
 		    /* maximum length 1 (NULL) + 1 (~ or $) + 1 (filetype) */
@@ -1090,6 +1094,11 @@ tw_collect(command, looking, exp_dir, exp_name, target, pat, flags, dir_fd)
 
 /* tw_list_items():
  *	List the items that were found
+ *
+ *	NOTE instead of looking at numerical vars listmax and listmaxrows
+ *	we can look at numerical var listmax, and have a string value
+ *	listmaxtype (or similar) than can have values 'items' and 'rows'
+ *	(by default interpreted as 'items', for backwards compatibility)
  */
 static void
 tw_list_items(looking, numitems, list_max)
@@ -1097,6 +1106,7 @@ tw_list_items(looking, numitems, list_max)
 {
     Char *ptr;
     int max_items = 0;
+    int max_rows = 0;
 
     if ((ptr = value(STRlistmax)) != STRNULL) {
 	while (*ptr) {
@@ -1106,12 +1116,48 @@ tw_list_items(looking, numitems, list_max)
 	    }
 	    max_items = max_items * 10 + *ptr++ - '0';
 	}
+	if ((max_items > 0) && (numitems > max_items) && list_max)
+	    max_rows = numitems;
+	else
+	    max_rows = 0;
     }
 
-    if ((max_items > 0) && (numitems > max_items) && list_max) {
-	char    tc;
+    if (max_rows == 0 && (ptr = value(STRlistmaxrows)) != STRNULL) {
+	int rows = 0;
 
-	xprintf("There are %d items, list them anyway? [n/y] ", numitems);
+	while (*ptr) {
+	    if (!Isdigit(*ptr)) {
+		max_rows = 0;
+		break;
+	    }
+	    max_rows = max_rows * 10 + *ptr++ - '0';
+	}
+	if (max_rows != 0 && looking != TW_JOB)
+	    rows = find_rows(tw_item_get(), numitems, TRUE);
+	else
+	    rows = numitems; /* underestimate for lines wider than the termH */
+	if ((max_rows > 0) && (rows > max_rows) && list_max)
+	    max_rows = rows;
+	else
+	    max_rows = 0;
+    }
+
+
+    if (max_items || max_rows) {
+	char    tc;
+	char*	name;
+	int maxs;
+
+	if (max_items) {
+	    name = "items";
+	    maxs = max_items;
+	}
+	else {
+	    name = "rows";
+	    maxs = max_rows;
+	}
+
+	xprintf("There are %d %s, list them anyway? [n/y] ", maxs, name);
 	flush();
 	/* We should be in Rawmode here, so no \n to catch */
 	(void) read(SHIN, &tc, 1);
@@ -1435,8 +1481,10 @@ static Char *
 dollar(new, old)
     Char   *new, *old;
 {
-    Char   *var, *val, *p, save;
+    Char    var[MAXVARLEN];
+    Char   *val, *p;
     int     space;
+    int	    i;
 
     for (space = FILSIZ, p = new; *old && space > 0;)
 	if (*old != '$') {
@@ -1447,13 +1495,15 @@ dollar(new, old)
 	    struct varent *vp;
 
 	    /* found a variable, expand it */
-	    for (var = ++old; alnum(*old); old++)
-		continue;
-	    save = *old;
-	    *old = '\0';
+	    for (i = 0; i < MAXVARLEN; i++) {
+		var[i] = *++old & TRIM;
+		if (!alnum(var[i])) {
+		    var[i] = '\0';
+		    break;
+		}
+	    }
 	    vp = adrof(var);
 	    val = (!vp) ? tgetenv(var) : NULL;
-	    *old = save;
 	    if (vp) {
 		int i;
 		for (i = 0; vp->vec[i] != NULL; i++) {
@@ -1707,6 +1757,31 @@ isadirectory(dir, file)		/* return 1 if dir/file is a directory */
     }
     return 0;
 } /* end isadirectory */
+
+
+
+/* find_rows():
+ * 	Return how many rows needed to print sorted down columns
+ */
+static int
+find_rows(items, count, no_file_suffix)
+    Char *items[];
+    int     count, no_file_suffix;
+{
+    register int i, columns, rows;
+    unsigned int maxwidth = 0;
+
+    for (i = 0; i < count; i++)	/* find widest string */
+	maxwidth = max(maxwidth, Strlen(items[i]));
+
+    maxwidth += no_file_suffix ? 1 : 2;	/* for the file tag and space */
+    columns = (TermH + 1) / maxwidth;	/* PWP: terminal size change */
+    if (!columns)
+	columns = 1;
+    rows = (count + (columns - 1)) / columns;
+
+    return rows;
+} /* end rows_needed_by_print_by_column */
 
 
 /* print_by_column():

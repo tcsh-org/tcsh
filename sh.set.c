@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.set.c,v 3.19 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.set.c,v 3.20 1993/05/17 00:11:09 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.19 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.20 1993/05/17 00:11:09 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -578,6 +578,7 @@ setq(name, vec, p, flags)
 	    if (c->v_flags & VAR_READONLY)
 		stderror(ERR_READONLY|ERR_NAME, c->v_name);
 	    blkfree(c->vec);
+	    c->v_flags = flags;
 	    trim(c->vec = vec);
 	    return;
 	}

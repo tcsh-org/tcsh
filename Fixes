@@ -1,4 +1,13 @@
 V6.04.00, ...
+ 73. Changed _Q, _Q1 macros in sh.lex.c, sh.dol.c, sh.char.? to _QF and _QB
+     because today 4.4BSD <ctype.h> defined _Q to be ``Phonetics''
+ 72. listmaxrows variable.
+ 71. set -r would not make existing variables readonly.
+ 70. print usernames with ~user where possible in dirs and job cwd's
+ 69. Mika's fixes (missing args in sh.c set(), linux Makefile, SIGCHLD)
+ 68. FIONREAD argument is int everywhere except on SunOS where it is long.
+     Tcsh used to think that it was long, and so it broke on the alpha where
+     sizeof(int) != sizeof(long)
  67. 6.03.06 05/16/93
  66. Pipeline fixes. This should get rid of the dreaded Stopped tty output
      message.

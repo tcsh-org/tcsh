@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.decls.h,v 3.16 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.decls.h,v 3.17 1993/05/17 00:11:09 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -62,7 +62,7 @@ extern	void		  xexit		__P((int));
 extern	void		  dinit		__P((Char *));
 extern	void		  dodirs	__P((Char **, struct command *));
 extern	Char		 *dcanon	__P((Char *, Char *));
-extern	void		  dtildepr	__P((Char *, Char *));
+extern	void		  dtildepr	__P((Char *));
 extern	void		  dtilde	__P((void));
 extern	void		  dochngd	__P((Char **, struct command *));
 extern	Char		 *dnormalize	__P((Char *, int));

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.47 1993/04/26 22:00:28 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.48 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.47 1993/04/26 22:00:28 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.48 1993/05/17 00:11:09 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -412,16 +412,16 @@ main(argc, argv)
      * Publish the selected echo style
      */
 #if ECHO_STYLE == NONE_ECHO
-    set(STRecho_style, Strsave(STRnone));
+    set(STRecho_style, Strsave(STRnone), VAR_READWRITE);
 #endif /* ECHO_STYLE == NONE_ECHO */
 #if ECHO_STYLE == BSD_ECHO
     set(STRecho_style, Strsave(STRbsd), VAR_READWRITE);
 #endif /* ECHO_STYLE == BSD_ECHO */
 #if ECHO_STYLE == SYSV_ECHO
-    set(STRecho_style, Strsave(STRsysv));
+    set(STRecho_style, Strsave(STRsysv), VAR_READWRITE);
 #endif /* ECHO_STYLE == SYSV_ECHO */
 #if ECHO_STYLE == BOTH_ECHO
-    set(STRecho_style, Strsave(STRboth));
+    set(STRecho_style, Strsave(STRboth), VAR_READWRITE);
 #endif /* ECHO_STYLE == BOTH_ECHO */
 
     /*

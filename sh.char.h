@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.char.h,v 3.4 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.char.h,v 3.5 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -49,8 +49,8 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 
 #endif
 
-#define	_Q	0x0001		/* '" */
-#define	_Q1	0x0002		/* ` */
+#define	_QF	0x0001		/* '" (Forward quotes) */
+#define	_QB	0x0002		/* ` (Backquote) */
 #define	_SP	0x0004		/* space and tab */
 #define	_NL	0x0008		/* \n */
 #define	_META	0x0010		/* lex meta characters, sp #'`";&<>()|\t\n */
