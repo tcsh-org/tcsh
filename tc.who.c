@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tc.who.c,v 1.2 91/07/14 22:24:18 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: tc.who.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -89,7 +89,7 @@ struct who {
 #ifdef UTHOST
     char    w_host[UTHOSTLEN + 1];
 #endif /* UTHOST */
-    long    w_time;
+    time_t  w_time;
     int     w_status;
 };
 
