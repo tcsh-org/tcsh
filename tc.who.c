@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.33 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.34 2002/06/25 19:02:11 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.33 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.34 2002/06/25 19:02:11 christos Exp $")
 
 #include "tc.h"
 
@@ -193,7 +193,7 @@ watch_login(force)
 #endif
 
     v = adrof(STRwatch);
-    if (v == NULL && v->vec == NULL && !force) {
+    if ((v == NULL || v->vec == NULL) && !force) {
 #ifdef BSDSIGS
 	(void) sigsetmask(omask);
 #else
