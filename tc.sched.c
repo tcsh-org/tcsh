@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sched.c,v 3.4 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sched.c,v 3.5 1991/11/11 01:56:34 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.4 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.5 1991/11/11 01:56:34 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -75,6 +75,14 @@ dosched(v, c)
     struct tm *ltp;
     char   *timeline;
     char   *ctime();
+
+/* This is a major kludge because of a gcc linker  */
+/* Problem.  It may or may not be needed for you   */
+#ifdef _MINIX
+    char kludge[10];
+    extern char *sprintf();
+    sprintf(kludge,"kludge");
+#endif /* _MINIX */
 
     v++;
     cp = *v++;

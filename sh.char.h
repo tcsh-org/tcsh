@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.char.h,v 2.2 1991/04/01 21:38:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.char.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -39,6 +39,9 @@
 #define _h_sh_char
 #include <ctype.h>
 
+#ifdef _MINIX
+# undef _SP
+#endif /* _MINIX */
 extern unsigned short _cmap[];
 
 #ifndef NLS

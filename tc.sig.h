@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.h,v 3.3 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.h,v 3.4 1991/11/11 01:56:34 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -104,6 +104,10 @@ typedef struct sigvec sigvec_t;
 # endif	/* BSDJOBS */
 #endif /* SVID > 0 */
 
+#ifdef _MINIX
+#include <signal.h>
+#  define killpg(a, b) kill((a), (b))
+#endif /* _MINIX */
 
 #ifdef BSDSIGS
 /*

@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.time.c,v 1.3 91/09/24 17:10:38 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.time.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.2 1991/09/08 00:45:32 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 
 #if defined(sun) && ! defined(MACH)
 # include <machine/param.h>
@@ -544,6 +544,8 @@ prusage(bs, es, e, b)
 		break;
 # endif	/* _SEQUENT_ */
 #endif /* BSDTIMES */
+	    default:
+		break;
 	    }
     xputchar('\n');
 }
