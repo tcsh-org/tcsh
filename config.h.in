@@ -1,19 +1,1 @@
 /* config.h.in.  Generated automatically from configure.in by autoheader.  */
-
-/* Define if you have the crypt library (-lcrypt).  */
-#undef HAVE_LIBCRYPT
-
-/* Define if you have the curses library (-lcurses).  */
-#undef HAVE_LIBCURSES
-
-/* Define if you have the nsl library (-lnsl).  */
-#undef HAVE_LIBNSL
-
-/* Define if you have the socket library (-lsocket).  */
-#undef HAVE_LIBSOCKET
-
-/* Define if you have the termcap library (-ltermcap).  */
-#undef HAVE_LIBTERMCAP
-
-/* Define if you have the termlib library (-ltermlib).  */
-#undef HAVE_LIBTERMLIB
