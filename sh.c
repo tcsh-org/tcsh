@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.103 2002/07/01 21:03:12 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.104 2002/07/02 18:38:43 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.103 2002/07/01 21:03:12 christos Exp $")
+RCSID("$Id: sh.c,v 3.104 2002/07/02 18:38:43 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -132,7 +132,10 @@ extern char **environ;
  */
 struct saved_state {
     int		  insource;
+    int		  OLDSTD;
     int		  SHIN;
+    int		  SHOUT;
+    int		  SHDIAG;
     int		  intty;
     struct whyle *whyles;
     Char 	 *gointr;
@@ -1481,6 +1484,31 @@ st_save(st, unit, hflg, al, av)
 {
     st->insource	= insource;
     st->SHIN		= SHIN;
+    /* Want to preserve the meaning of "source file >output".
+     * Save old descriptors, move new 0,1,2 to safe places and assign
+     * them to SH* and let process() redo 0,1,2 from them.
+     *
+     * The macro returns true if d1 and d2 are good and they point to
+     * different things.  If you don't avoid saving duplicate
+     * descriptors, you really limit the depth of "source" recursion
+     * you can do because of all the open file descriptors.  -IAN!
+     */
+#define NEED_SAVE_FD(d1,d2) \
+    (fstat(d1, &s1) != -1 && fstat(d2, &s2) != -1 \
+	&& (s1.st_ino != s2.st_ino || s1.st_dev != s2.st_dev) )
+
+    st->OLDSTD = st->SHOUT = st->SHDIAG = -1;/* test later to restore these */
+    if (didfds) {
+	    struct stat s1, s2;
+	    if (NEED_SAVE_FD(0,OLDSTD))
+		    st->OLDSTD = OLDSTD, OLDSTD = dmove(0, -1);
+	    if (NEED_SAVE_FD(1,SHOUT))
+		    st->SHOUT = SHOUT, SHOUT = dmove(1, -1);
+	    if (NEED_SAVE_FD(2,SHDIAG))
+		    st->SHDIAG = SHDIAG, SHDIAG = dmove(2, -1);
+	    donefds();
+    }
+
     st->intty		= intty;
     st->whyles		= whyles;
     st->gointr		= gointr;
@@ -1568,6 +1596,12 @@ st_restore(st, av)
 
     insource	= st->insource;
     SHIN	= st->SHIN;
+    if (st->OLDSTD != -1)
+	    (void)close(OLDSTD), OLDSTD = st->OLDSTD;
+    if (st->SHOUT != -1)
+	    (void)close(SHOUT),  SHOUT = st->SHOUT;
+    if (st->SHDIAG != -1)
+	    (void)close(SHDIAG), SHDIAG = st->SHDIAG;
     arginp	= st->arginp;
     onelflg	= st->onelflg;
     evalp	= st->evalp;
@@ -1604,9 +1638,6 @@ srcunit(unit, onlyown, hflg, av)
 
     if (unit < 0)
 	return;
-
-    if (didfds)
-	donefds();
 
     if (onlyown) {
 	struct stat stb;
