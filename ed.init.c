@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.init.c,v 3.24 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/ed.init.c,v 3.25 1992/01/27 04:20:47 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.24 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.25 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -169,6 +169,7 @@ ed_Setup(rst)
     int rst;
 {
     static int havesetup = 0;
+    struct varent *imode;
 
     if (havesetup) 	/* if we have never been called */
 	return(0);
@@ -193,7 +194,14 @@ ed_Setup(rst)
     vdisable = _POSIX_VDISABLE;
 #endif /* POSIX && _PC_VDISABLE */
 	
-    inputmode = MODE_INSERT;	/* start out in insert mode */
+    if ((imode = adrof(STRinputmode)) != NULL) {
+	if (!Strcmp(*(imode->vec), STRinsert))
+	    inputmode = MODE_INSERT;
+	else if (!Strcmp(*(imode->vec), STRoverwrite))
+	    inputmode = MODE_REPLACE;
+    }
+    else
+	inputmode = MODE_INSERT;
     ed_InitMaps();
     Hist_num = 0;
     Expand = 0;

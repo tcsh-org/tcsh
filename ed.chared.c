@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.chared.c,v 3.20 1992/02/13 05:28:51 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/ed.chared.c,v 3.21 1992/03/21 02:46:07 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.20 1992/02/13 05:28:51 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.21 1992/03/21 02:46:07 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -965,8 +965,13 @@ v_search(dir)
 {
     Char ch;
     Char tmpbuf[INBUFSIZE];
+    Char oldbuf[INBUFSIZE];
+    Char *oldlc, *oldc;
     int tmplen;
 
+    copyn(oldbuf, InputBuf, INBUFSIZE);
+    oldlc = LastChar;
+    oldc = Cursor;
     tmplen = 0;
     tmpbuf[tmplen++] = '*';
 
@@ -991,9 +996,9 @@ v_search(dir)
 		tmpbuf[tmplen--] = '\0';
 	    }
 	    else {
-		InputBuf[0] = '\0';
-		LastChar = InputBuf;
-		Cursor = InputBuf;
+		copyn(InputBuf, oldbuf, INBUFSIZE);
+		LastChar = oldlc;
+		Cursor = oldc;
 		return(CC_REFRESH);
 	    }
 	    Refresh();

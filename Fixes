@@ -1,4 +1,7 @@
 V6.02.00, ...
+53. inputmode affects the first line too.
+52. Searches in vi do not destroy the current line.
+51. -drwX test enhancement.
 50. Generalized completion syntax and added more completion builtins.
 49. Don't print '\n' on the right margin if we can avoid it.
 48. 6.01.07 (3/9/92)

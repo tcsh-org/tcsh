@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.exp.c,v 3.5 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.exp.c,v 3.6 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.5 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.6 1992/03/21 02:46:07 christos Exp $")
 
 /*
  * C shell
@@ -486,11 +486,14 @@ exp6(vp, ignore)
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));
     cp = *(*vp)++;
-    if (*cp == '-' && any("erwxfdzoplst", cp[1])) {
+#define FILETESTS "erwxfdzoplstX"
+    if (*cp == '-' && any(FILETESTS, cp[1])) {
 	struct stat stb;
+	Char *ft;
 
-	if (cp[2] != '\0')
-	    stderror(ERR_NAME | ERR_FILEINQ);
+	for (ft = &cp[2]; *ft; ft++) 
+	    if (!any(FILETESTS, *ft))
+		stderror(ERR_NAME | ERR_FILEINQ);
 	/*
 	 * Detect missing file names by checking for operator in the file name
 	 * position.  However, if an operator name appears there, we must make
@@ -505,89 +508,98 @@ exp6(vp, ignore)
 	if (ignore & IGNORE)
 	    return (Strsave(STRNULL));
 	ep = globone(dp, G_ERROR);
-	switch (cp[1]) {
+	ft = &cp[1];
+	do 
+	    switch (*ft) {
 
-	case 'r':
-	    i = !access(short2str(ep), R_OK);
-	    break;
+	    case 'r':
+		i = !access(short2str(ep), R_OK);
+		break;
 
-	case 'w':
-	    i = !access(short2str(ep), W_OK);
-	    break;
+	    case 'w':
+		i = !access(short2str(ep), W_OK);
+		break;
 
-	case 'x':
-	    i = !access(short2str(ep), X_OK);
-	    break;
+	    case 'x':
+		i = !access(short2str(ep), X_OK);
+		break;
 
-	case 't':	/* SGI extension, true when file is a tty */
-	    {
-		int fd;
+	    case 'X':	/* tcsh extension, name is an executable in the path
+			 * or a tcsh builtin command 
+			 */
+		i = find_cmd(ep, 0);
+		break;
 
-		if ((fd = open(short2str(ep), O_RDONLY)) == -1)
+	    case 't':	/* SGI extension, true when file is a tty */
+		{
+		    int fd;
+
+		    if ((fd = open(short2str(ep), O_RDONLY)) == -1)
+			i = 0;
+		    else {
+			i = isatty(fd);
+			(void) close(fd);
+		    }
+		}
+		break;
+
+	    default:
+		if (
+#ifdef S_IFLNK
+		    *ft == 'l' ? lstat(short2str(ep), &stb) :
+#endif
+		    stat(short2str(ep), &stb)) {
+		    xfree((ptr_t) ep);
+		    return (Strsave(STR0));
+		}
+		switch (*ft) {
+
+		case 'f':
+		    i = S_ISREG(stb.st_mode);
+		    break;
+
+		case 'd':
+		    i = S_ISDIR(stb.st_mode);
+		    break;
+
+		case 'p':
+#ifdef S_ISFIFO
+		    i = S_ISFIFO(stb.st_mode);
+#else
 		    i = 0;
-		else {
-		    i = isatty(fd);
-		    (void) close(fd);
+#endif
+		    break;
+
+		case 'l':
+#ifdef S_ISLNK
+		    i = S_ISLNK(stb.st_mode);
+#else
+		    i = 0;
+#endif
+		    break;
+
+		case 's':
+#ifdef S_ISSOCK
+		    i = S_ISSOCK(stb.st_mode);
+#else
+		    i = 0;
+#endif
+		    break;
+
+		case 'z':
+		    i = stb.st_size == 0;
+		    break;
+
+		case 'e':
+		    i = 1;
+		    break;
+
+		case 'o':
+		    i = stb.st_uid == uid;
+		    break;
 		}
 	    }
-	    break;
-
-	default:
-	    if (
-#ifdef S_IFLNK
-		cp[1] == 'l' ? lstat(short2str(ep), &stb) :
-#endif
-		stat(short2str(ep), &stb)) {
-		xfree((ptr_t) ep);
-		return (Strsave(STR0));
-	    }
-	    switch (cp[1]) {
-
-	    case 'f':
-		i = S_ISREG(stb.st_mode);
-		break;
-
-	    case 'd':
-		i = S_ISDIR(stb.st_mode);
-		break;
-
-	    case 'p':
-#ifdef S_ISFIFO
-		i = S_ISFIFO(stb.st_mode);
-#else
-		i = 0;
-#endif
-		break;
-
-	    case 'l':
-#ifdef S_ISLNK
-		i = S_ISLNK(stb.st_mode);
-#else
-		i = 0;
-#endif
-		break;
-
-	    case 's':
-#ifdef S_ISSOCK
-		i = S_ISSOCK(stb.st_mode);
-#else
-		i = 0;
-#endif
-		break;
-
-	    case 'z':
-		i = stb.st_size == 0;
-		break;
-
-	    case 'e':
-		i = 1;
-		break;
-
-	    case 'o':
-		i = stb.st_uid == uid;
-		break;
-	    }
-	}
+	while (*++ft && i);
 #ifdef EDEBUG
 	etraci("exp6 -? i", i, vp);
 #endif

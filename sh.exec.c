@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.exec.c,v 3.12 1992/02/21 23:16:20 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.exec.c,v 3.13 1992/03/21 02:46:07 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.12 1992/02/21 23:16:20 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.13 1992/03/21 02:46:07 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -903,68 +903,85 @@ dowhere(v, c)
     register Char **v;
     struct command *c;
 {
+    for (v++; *v; v++)
+	(void) find_cmd(*v, 1);
+}
+
+int
+find_cmd(cmd, prt)
+    Char *cmd;
+    int prt;
+{
     struct varent *var;
     struct biltins *bptr;
     Char **pv;
     Char *sv;
-    int hashval, i, ex;
+    int hashval, i, ex, rval = 0;
 
-    for (v++; *v; v++) {
-	if (any(short2str(*v), '/')) {
-	    xprintf("where: / in command makes no sense\n");
-	    continue;
-	}
-
-	/* first, look for an alias */
-
-	if (adrof1(*v, &aliases)) {
-	    if ((var = adrof1(*v, &aliases)) != NULL) {
-		xprintf("%s is aliased to ", short2str(*v));
-		blkpr(var->vec);
-		xprintf("\n");
-	    }
-	}
-
-	/* next, look for a shell builtin */
-
-	for (bptr = bfunc; bptr < &bfunc[nbfunc]; bptr++) {
-	    if (eq(*v, str2short(bptr->bname))) {
-		xprintf("%s is a shell built-in\n", short2str(*v));
-		/* flush(); */
-	    }
-	}
-
-	/* last, look through the path for the command */
-
-	var = adrof(STRpath);
-
-	hashval = havhash ? hashname(*v) : 0;
-
-	sv = Strspl(STRslash, *v);
-
-	for (pv = var->vec, i = 0; *pv; pv++, i++) {
-	    if (havhash && !eq(*pv, STRdot)) {
-#ifdef FASTHASH
-		if (!bit(hashval, i))
-		    continue;
-#else /* OLDHASH */
-		int hashval1 = hash(hashval, i);
-		if (!bit(xhash, hashval1))
-		    continue;
-#endif /* FASTHASH */
-	    }
-	    ex = executable(*pv, sv, 0);
-#ifdef FASTHASH
-	    if (!ex && (hashdebug & 2)) {
-		xprintf("hash miss: ");
-		ex = 1;	/* Force printing */
-	    }
-#endif /* FASTHASH */
-	    if (ex) {
-		xprintf("%s/",short2str(*pv));
-		xprintf("%s\n",short2str(*v));
-	    }
-	}
-	xfree((ptr_t) sv);
+    if (any(short2str(cmd), '/') && !prt) {
+	xprintf("where: / in command makes no sense\n");
+	return 0;
     }
+
+    /* first, look for an alias */
+
+    if (adrof1(cmd, &aliases) && !prt) {
+	if ((var = adrof1(cmd, &aliases)) != NULL) {
+	    xprintf("%s is aliased to ", short2str(cmd));
+	    blkpr(var->vec);
+	    xprintf("\n");
+	    rval = 1;
+	}
+    }
+
+    /* next, look for a shell builtin */
+
+    for (bptr = bfunc; bptr < &bfunc[nbfunc]; bptr++) {
+	if (eq(cmd, str2short(bptr->bname))) {
+	    rval = 1;
+	    if (prt)
+		xprintf("%s is a shell built-in\n", short2str(cmd));
+	    else
+		return 1;
+	}
+    }
+
+    /* last, look through the path for the command */
+
+    var = adrof(STRpath);
+
+    hashval = havhash ? hashname(cmd) : 0;
+
+    sv = Strspl(STRslash, cmd);
+
+    for (pv = var->vec, i = 0; *pv; pv++, i++) {
+	if (havhash && !eq(*pv, STRdot)) {
+#ifdef FASTHASH
+	    if (!bit(hashval, i))
+		continue;
+#else /* OLDHASH */
+	    int hashval1 = hash(hashval, i);
+	    if (!bit(xhash, hashval1))
+		continue;
+#endif /* FASTHASH */
+	}
+	ex = executable(*pv, sv, 0);
+#ifdef FASTHASH
+	if (!ex && (hashdebug & 2)) {
+	    xprintf("hash miss: ");
+	    ex = 1;	/* Force printing */
+	}
+#endif /* FASTHASH */
+	if (ex) {
+	    rval = 1;
+	    if (prt) {
+		xprintf("%s/",short2str(*pv));
+		xprintf("%s\n",short2str(cmd));
+	    }
+	    else
+		return 1;
+	}
+    }
+    xfree((ptr_t) sv);
+    return rval;
 }

@@ -380,4 +380,16 @@ OS      :	SYSVR4
 CONFIG  :	config.sysv4
 ENVIRON :       n/a
 NOTES   :	Works like a charm
+
 VERSION :	6.01
+VENDOR  :       Evans & Sutherland
+MODELS  :       ESV
+COMPILER:       cc
+CFLAGS  :       mips systems
+LIBES   :       -ltermcap
+OS      :       ES/os 2.2 (UMIPS mips ATT_V3_0)
+CONFIG  :       config.mips
+ENVIRON :       bsd4.3
+NOTES   :       would it be preferable to have HOSTTYPE of
+NOTES   :       "esv" instead of "mips"?
+VERSION :       6.01.00

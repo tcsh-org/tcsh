@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.parse.c,v 3.22 1992/02/13 05:28:51 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/tw.parse.c,v 3.25 1992/03/21 02:46:07 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.22 1992/02/13 05:28:51 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.25 1992/03/21 02:46:07 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1004,9 +1004,15 @@ again:
 		ptr = tw_item_add(len + 3);
 
 		copyn(ptr, entry, MAXNAMLEN - 2);
-		if (looking == TW_FILE || looking == TW_DIRECTORY) {
+		switch (looking) {
+		case TW_FILE:
+		case TW_DIRECTORY:
+		case TW_COMMAND:
 		    ptr[len++] = filetype(exp_dir, entry);
 		    ptr[len] = '\0';
+		    break;
+		default:
+		    break;
 		}
 		numitems++;
 	    }

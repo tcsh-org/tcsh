@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.decls.h,v 3.7 1991/12/14 20:45:46 christos Exp $ */
+/* $Header: /u/christos/src/beta-6.01/RCS/sh.decls.h,v 3.8 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -102,6 +102,7 @@ extern	void		  xechoit	__P((Char **));
 extern	int		  executable	__P((Char *, Char *, bool));
 extern	void		  tellmewhat	__P((struct wordent *));
 extern	void		  dowhere	__P((Char **, struct command *));
+extern	int		  find_cmd	__P((Char *, int));
 
 /*
  * sh.exp.c

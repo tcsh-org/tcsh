@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.31 1992/02/21 23:16:20 christos Exp $
+.\" $Id: tcsh.man,v 3.33 1992/03/21 02:46:07 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -3009,6 +3009,13 @@ from .login.
 .TP 10
 .B ignore_symlinks 
 don't resolve symbolic links to real names on cd, etc.
+.TP 10
+.B inputmode
+Can be set to either
+.I insert
+or 
+.I overwrite
+to control the line editing behavior, as described in section 1.
 .TP 10
 .B listjobs 
 list all jobs when suspending. set listjobs=long, produces long
