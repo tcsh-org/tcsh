@@ -1,3 +1,10 @@
+ 34. Integrate Amol Deshpande's WINNT fixes to the tcsh source. Note that
+     this is not complete yet; we are missing the NT glue code and the message
+     catalogs.
+ 33. Fix ^T at the first character in the line  (Chuck Silvers)
+ 32. Eliminate xsprintf and xvsprintf
+ 31. Qmail patch from (Matthew Zahorik)
+ 30. Added missing linux signals (Vadim Vygonets)
  29. fixed problem where  complete complete  'p/*/t:*.txt/' would not honor
      the pattern.
  28. Port to an EBCDIC machine: BS2000 by Siemens Nixdorf that has an

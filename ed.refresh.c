@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.18 1997/02/23 19:03:17 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.19 1997/10/02 16:36:26 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.18 1997/02/23 19:03:17 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.19 1997/10/02 16:36:26 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -337,6 +337,9 @@ Refresh()
     for (cur_line = 0; cur_line <= new_vcv; cur_line++) {
 	/* NOTE THAT update_line MAY CHANGE Display[cur_line] */
 	update_line(Display[cur_line], Vdisplay[cur_line], cur_line);
+#ifdef WINNT
+	flush();
+#endif /* WINNT */
 
 	/*
 	 * Copy the new line to be the current one, and pad out with spaces
@@ -365,6 +368,9 @@ Refresh()
     dprintf("\r\nCursorH = %d, CursorV = %d, cur_h = %d, cur_v = %d\r\n",
 	    CursorH, CursorV, cur_h, cur_v);
 #endif /* DEBUG_REFRESH */
+#ifdef WINNT
+    flush();
+#endif /* WINNT */
     MoveToLine(cur_v);		/* go to where the cursor is */
     MoveToChar(cur_h);
     SetAttributes(0);		/* Clear all attributes */

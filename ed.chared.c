@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.49 1997/02/23 19:03:16 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.50 1997/10/02 16:36:24 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.49 1997/02/23 19:03:16 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.50 1997/10/02 16:36:24 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -44,10 +44,10 @@ RCSID("$Id: ed.chared.c,v 3.49 1997/02/23 19:03:16 christos Exp $")
 
 /* #define SDEBUG */
 
-#define NOP    	  0x00
-#define DELETE 	  0x01
-#define INSERT 	  0x02
-#define CHANGE 	  0x04
+#define TCSHOP_NOP    	  0x00
+#define TCSHOP_DELETE 	  0x01
+#define TCSHOP_INSERT 	  0x02
+#define TCSHOP_CHANGE 	  0x04
 
 #define CHAR_FWD	0
 #define CHAR_BACK	1
@@ -62,7 +62,7 @@ RCSID("$Id: ed.chared.c,v 3.49 1997/02/23 19:03:16 christos Exp $")
 
 static Char *InsertPos = InputBuf; /* Where insertion starts */
 static Char *ActionPos = 0;	   /* Where action begins  */
-static int  ActionFlag = NOP;	   /* What delayed action to take */
+static int  ActionFlag = TCSHOP_NOP;	   /* What delayed action to take */
 /*
  * Word search state
  */
@@ -150,7 +150,7 @@ c_delafter(num)
     if (num > 0) {			/* if I can delete anything */
 	if (VImode) {
 	    kp = UndoBuf;		/* Set Up for VI undo command */
-	    UndoAction = INSERT;
+	    UndoAction = TCSHOP_INSERT;
 	    UndoSize = num;
 	    UndoPtr  = Cursor;
 	    for (cp = Cursor; cp <= LastChar; cp++) {
@@ -186,7 +186,7 @@ c_delbefore(num)		/* delete before dot, with bounds checking */
     if (num > 0) {			/* if I can delete anything */
 	if (VImode) {
 	    kp = UndoBuf;		/* Set Up for VI undo command */
-	    UndoAction = INSERT;
+	    UndoAction = TCSHOP_INSERT;
 	    UndoSize = num;
 	    UndoPtr  = Cursor - num;
 	    for (cp = Cursor - num; cp <= LastChar; cp++) {
@@ -624,7 +624,7 @@ excl_sw:
     *LastChar = '\0';
     return(op + (bend - buf));
 excl_err:
-    Beep();
+    SoundBeep();
     return(op + 1);
 }
 
@@ -704,15 +704,15 @@ c_delfini()		/* Finish up delete action */
 {
     register int Size;
 
-    if (ActionFlag & INSERT)
+    if (ActionFlag & TCSHOP_INSERT)
 	c_alternativ_key_map(0);
 
-    ActionFlag = NOP;
+    ActionFlag = TCSHOP_NOP;
 
     if (ActionPos == 0) 
 	return;
 
-    UndoAction = INSERT;
+    UndoAction = TCSHOP_INSERT;
 
     if (Cursor > ActionPos) {
 	Size = (int) (Cursor-ActionPos);
@@ -911,7 +911,7 @@ e_inc_search(dir)
 	case F_DIGIT:
 	case F_MAGIC_SPACE:
 	    if (patlen > INBUFSIZE - 3)
-		Beep();
+		SoundBeep();
 	    else {
 		patbuf[patlen++] = ch;
 		*LastChar++ = ch;
@@ -934,7 +934,7 @@ e_inc_search(dir)
 	    if (patlen > 1)
 		done++;
 	    else 
-		Beep();
+		SoundBeep();
 	    break;
 
 	default:
@@ -952,7 +952,7 @@ e_inc_search(dir)
 			cp = c_next_word(Cursor, LastChar, 1);
 			while (Cursor < cp && *Cursor != '\n') {
 			    if (patlen > INBUFSIZE - 3) {
-				Beep();
+				SoundBeep();
 				break;
 			    }
 			    patbuf[patlen++] = *Cursor;
@@ -963,7 +963,7 @@ e_inc_search(dir)
 			Refresh();
 			break;
 		    } else if (isglob(*cp)) {
-			Beep();
+			SoundBeep();
 			break;
 		    }
 		break;
@@ -1021,7 +1021,7 @@ e_inc_search(dir)
 		}
 		patbuf[--patlen] = '\0';
 		if (ret == CC_ERROR) {
-		    Beep();
+		    SoundBeep();
 		    if (Hist_num != oldHist_num) {
 			Hist_num = oldHist_num;
 			if (c_get_histline() == CC_ERROR)
@@ -1121,7 +1121,7 @@ v_search(dir)
 
 	default:
 	    if (tmplen >= INBUFSIZE)
-		Beep();
+		SoundBeep();
 	    else {
 		tmpbuf[tmplen++] = ch;
 		*Cursor++ = ch;
@@ -1192,7 +1192,7 @@ v_cmd_mode(c)
 {
     USE(c);
     InsertPos = 0;
-    ActionFlag = NOP;	/* [Esc] cancels pending action */
+    ActionFlag = TCSHOP_NOP;	/* [Esc] cancels pending action */
     ActionPos = 0;
     DoingArg = 0;
     if (UndoPtr > Cursor)
@@ -1220,7 +1220,7 @@ e_unassigned(c)
     int c;
 {				/* bound to keys that arn't really assigned */
     USE(c);
-    Beep();
+    SoundBeep();
     flush();
     return(CC_NORM);
 }
@@ -1383,7 +1383,7 @@ v_zero(c)			/* command mode 0 for vi */
     }
     else {			/* else starting an argument */
 	Cursor = InputBuf;
-	if (ActionFlag & DELETE) {
+	if (ActionFlag & TCSHOP_DELETE) {
 	   c_delfini();
 	   return(CC_REFRESH);
         }
@@ -1534,7 +1534,7 @@ e_up_hist(c)
     Char    beep = 0;
 
     USE(c);
-    UndoAction = NOP;
+    UndoAction = TCSHOP_NOP;
     *LastChar = '\0';		/* just in case */
 
     if (Hist_num == 0) {	/* save the current buffer away */
@@ -1562,7 +1562,7 @@ e_down_hist(c)
     int c;
 {
     USE(c);
-    UndoAction = NOP;
+    UndoAction = TCSHOP_NOP;
     *LastChar = '\0';		/* just in case */
 
     Hist_num -= Argument;
@@ -1623,8 +1623,8 @@ e_up_search_hist(c)
     bool    found = 0;
 
     USE(c);
-    ActionFlag = NOP;
-    UndoAction = NOP;
+    ActionFlag = TCSHOP_NOP;
+    UndoAction = TCSHOP_NOP;
     *LastChar = '\0';		/* just in case */
     if (Hist_num < 0) {
 #ifdef DEBUG_EDIT
@@ -1690,8 +1690,8 @@ e_down_search_hist(c)
     bool    found = 0;
 
     USE(c);
-    ActionFlag = NOP;
-    UndoAction = NOP;
+    ActionFlag = TCSHOP_NOP;
+    UndoAction = TCSHOP_NOP;
     *LastChar = '\0';		/* just in case */
 
     if (Hist_num == 0)
@@ -2275,7 +2275,7 @@ e_toend(c)
     USE(c);
     Cursor = LastChar;
     if (VImode)
-	if (ActionFlag & DELETE) {
+	if (ActionFlag & TCSHOP_DELETE) {
 	    c_delfini();
 	    return(CC_REFRESH);
 	}
@@ -2294,7 +2294,7 @@ e_tobeg(c)
     if (VImode) {
        while (Isspace(*Cursor)) /* We want FIRST non space character */
 	Cursor++;
-	if (ActionFlag & DELETE) {
+	if (ActionFlag & TCSHOP_DELETE) {
 	    c_delfini();
 	    return(CC_REFRESH);
 	}
@@ -2425,24 +2425,19 @@ e_charswitch(cc)
     register Char c;
 
     USE(cc);
-    if (Cursor < LastChar) {
-	if (LastChar <= &InputBuf[1]) {
-	    return(CC_ERROR);
-	}
-	else {
-	    Cursor++;
-	}
-    }
-    if (Cursor > &InputBuf[1]) {/* must have at least two chars entered */
-	c = Cursor[-2];
-	Cursor[-2] = Cursor[-1];
-	Cursor[-1] = c;
-	return(CC_REFRESH);
-    }
-    else {
-	Cursor--;		/* Restore cursor position */
+
+    /* do nothing if we are at beginning of line or have only one char */
+    if (Cursor == &InputBuf[0] || LastChar == &InputBuf[1]) {
 	return(CC_ERROR);
     }
+
+    if (Cursor < LastChar) {
+	Cursor++;
+    }
+    c = Cursor[-2];
+    Cursor[-2] = Cursor[-1];
+    Cursor[-1] = c;
+    return(CC_REFRESH);
 }
 
 /*ARGSUSED*/
@@ -2476,7 +2471,7 @@ e_charback(c)
 	    Cursor = InputBuf;
 
 	if (VImode)
-	    if (ActionFlag & DELETE) {
+	    if (ActionFlag & TCSHOP_DELETE) {
 		c_delfini();
 		return(CC_REFRESH);
 	    }
@@ -2501,7 +2496,7 @@ v_wordback(c)
 
     Cursor = c_preword(Cursor, InputBuf, Argument); /* bounds check */
 
-    if (ActionFlag & DELETE) {
+    if (ActionFlag & TCSHOP_DELETE) {
 	c_delfini();
 	return(CC_REFRESH);
     }
@@ -2523,7 +2518,7 @@ e_wordback(c)
     Cursor = c_prev_word(Cursor, InputBuf, Argument); /* bounds check */
 
     if (VImode) 
-	if (ActionFlag & DELETE) {
+	if (ActionFlag & TCSHOP_DELETE) {
 	    c_delfini();
 	    return(CC_REFRESH);
 	}
@@ -2544,7 +2539,7 @@ e_charfwd(c)
 	    Cursor = LastChar;
 
 	if (VImode)
-	    if (ActionFlag & DELETE) {
+	    if (ActionFlag & TCSHOP_DELETE) {
 		c_delfini();
 		return(CC_REFRESH);
 	    }
@@ -2570,7 +2565,7 @@ e_wordfwd(c)
     Cursor = c_next_word(Cursor, LastChar, Argument);
 
     if (VImode)
-	if (ActionFlag & DELETE) {
+	if (ActionFlag & TCSHOP_DELETE) {
 	    c_delfini();
 	    return(CC_REFRESH);
 	}
@@ -2592,7 +2587,7 @@ v_wordfwd(c)
     Cursor = c_nexword(Cursor, LastChar, Argument);
 
     if (VImode)
-	if (ActionFlag & DELETE) {
+	if (ActionFlag & TCSHOP_DELETE) {
 	    c_delfini();
 	    return(CC_REFRESH);
 	}
@@ -2616,7 +2611,7 @@ v_wordbegnext(c)
 	Cursor++;
 
     if (VImode)
-	if (ActionFlag & DELETE) {
+	if (ActionFlag & TCSHOP_DELETE) {
 	    c_delfini();
 	    return(CC_REFRESH);
 	}
@@ -2673,7 +2668,7 @@ v_csearch_back(ch, count, tflag)
 
     Cursor = cp;
 
-    if (ActionFlag & DELETE) {
+    if (ActionFlag & TCSHOP_DELETE) {
 	Cursor++;
 	c_delfini();
 	return(CC_REFRESH);
@@ -2705,7 +2700,7 @@ v_csearch_fwd(ch, count, tflag)
 
     Cursor = cp;
 
-    if (ActionFlag & DELETE) {
+    if (ActionFlag & TCSHOP_DELETE) {
 	Cursor++;
 	c_delfini();
 	return(CC_REFRESH);
@@ -2721,8 +2716,8 @@ v_action(c)
 {
     register Char *cp, *kp;
 
-    if (ActionFlag == DELETE) {
-	ActionFlag = NOP;
+    if (ActionFlag == TCSHOP_DELETE) {
+	ActionFlag = TCSHOP_NOP;
 	ActionPos = 0;
 	
 	UndoSize = 0;
@@ -2732,17 +2727,17 @@ v_action(c)
 	    UndoSize++;
 	}
 		
-	UndoAction = INSERT;
+	UndoAction = TCSHOP_INSERT;
 	UndoPtr  = InputBuf;
 	LastChar = InputBuf;
 	Cursor   = InputBuf;
-	if (c & INSERT)
+	if (c & TCSHOP_INSERT)
 	    c_alternativ_key_map(0);
 	    
 	return(CC_REFRESH);
     }
 #ifdef notdef
-    else if (ActionFlag == NOP) {
+    else if (ActionFlag == TCSHOP_NOP) {
 #endif
 	ActionPos = Cursor;
 	ActionFlag = c;
@@ -2938,7 +2933,7 @@ v_insbeg(c)
     InsertPos = Cursor;
 
     UndoPtr  = Cursor;
-    UndoAction = DELETE;
+    UndoAction = TCSHOP_DELETE;
 
     RefCursor();		/* move the cursor */
     c_alternativ_key_map(0);
@@ -2953,7 +2948,7 @@ v_replone(c)
     USE(c);
     c_alternativ_key_map(0);
     inputmode = MODE_REPLACE_1;
-    UndoAction = CHANGE;	/* Set Up for VI undo command */
+    UndoAction = TCSHOP_CHANGE;	/* Set Up for VI undo command */
     UndoPtr = Cursor;
     UndoSize = 0;
     return(CC_NORM);
@@ -2967,7 +2962,7 @@ v_replmode(c)
     USE(c);
     c_alternativ_key_map(0);
     inputmode = MODE_REPLACE;
-    UndoAction = CHANGE;	/* Set Up for VI undo command */
+    UndoAction = TCSHOP_CHANGE;	/* Set Up for VI undo command */
     UndoPtr = Cursor;
     UndoSize = 0;
     return(CC_NORM);
@@ -3016,7 +3011,7 @@ v_insert(c)
 
     InsertPos = Cursor;
     UndoPtr = Cursor;
-    UndoAction = DELETE;
+    UndoAction = TCSHOP_DELETE;
 
     return(CC_NORM);
 }
@@ -3038,7 +3033,7 @@ v_add(c)
 
     InsertPos = Cursor;
     UndoPtr = Cursor;
-    UndoAction = DELETE;
+    UndoAction = TCSHOP_DELETE;
 
     return(CC_NORM);
 }
@@ -3054,7 +3049,7 @@ v_addend(c)
 
     InsertPos = LastChar;	/* Mark where insertion begins */
     UndoPtr = LastChar;
-    UndoAction = DELETE;
+    UndoAction = TCSHOP_DELETE;
 
     RefCursor();
     return(CC_NORM);
@@ -3069,7 +3064,11 @@ v_change_case(cc)
 
     USE(cc);
     if (Cursor < LastChar) {
+#ifndef WINNT
 	c = *Cursor;
+#else
+	c = CHAR & *Cursor;
+#endif /* WINNT */
 	if (Isupper(c))
 	    *Cursor++ = Tolower(c);
 	else if (Islower(c))
@@ -3139,16 +3138,16 @@ e_tty_int(c)
     int c;
 {			
     USE(c);
-#ifdef _MINIX
+#if defined(_MINIX) || defined(WINNT)
     /* SAK PATCH: erase all of current line, start again */
     ResetInLine(0);		/* reset the input pointers */
     xputchar('\n');
     ClearDisp();
     return (CC_REFRESH);
-#else /* !_MINIX */
+#else /* !_MINIX && !WINNT */
     /* do no editing */
     return (CC_NORM);
-#endif /* _MINIX */
+#endif /* _MINIX || WINNT */
 }
 
 /*
@@ -3346,7 +3345,7 @@ v_chgmeta(c)
      * Delete with insert == change: first we delete and then we leave in
      * insert mode.
      */
-    return(v_action(DELETE|INSERT));
+    return(v_action(TCSHOP_DELETE|TCSHOP_INSERT));
 }
 
 /*ARGSUSED*/
@@ -3355,7 +3354,7 @@ v_delmeta(c)
     int c;
 {
     USE(c);
-    return(v_action(DELETE));
+    return(v_action(TCSHOP_DELETE));
 }
 
 
@@ -3371,7 +3370,7 @@ v_endword(c)
 
     Cursor = c_endword(Cursor, LastChar, Argument);
 
-    if (ActionFlag & DELETE)
+    if (ActionFlag & TCSHOP_DELETE)
     {
 	Cursor++;
 	c_delfini();
@@ -3394,7 +3393,7 @@ v_eword(c)
 
     Cursor = c_eword(Cursor, LastChar, Argument);
 
-    if (ActionFlag & DELETE) {
+    if (ActionFlag & TCSHOP_DELETE) {
 	Cursor++;
 	c_delfini();
 	return(CC_REFRESH);
@@ -3506,8 +3505,8 @@ v_undo(c)
 
     USE(c);
     switch (UndoAction) {
-    case DELETE|INSERT:
-    case DELETE:
+    case TCSHOP_DELETE|TCSHOP_INSERT:
+    case TCSHOP_DELETE:
 	if (UndoSize == 0) return(CC_NORM);
 	cp = UndoPtr;
 	kp = UndoBuf;
@@ -3520,10 +3519,10 @@ v_undo(c)
 	LastChar -= UndoSize;
 	Cursor   =  UndoPtr;
 	
-	UndoAction = INSERT;
+	UndoAction = TCSHOP_INSERT;
 	break;
 
-    case INSERT:
+    case TCSHOP_INSERT:
 	if (UndoSize == 0) return(CC_NORM);
 	cp = UndoPtr;
 	Cursor = UndoPtr;
@@ -3532,10 +3531,10 @@ v_undo(c)
 	for (loop = 0; loop < UndoSize; loop++)	/* copy the chars */
 	    *cp++ = *kp++;
 
-	UndoAction = DELETE;
+	UndoAction = TCSHOP_DELETE;
 	break;
 
-    case CHANGE:
+    case TCSHOP_CHANGE:
 	if (UndoSize == 0) return(CC_NORM);
 	cp = UndoPtr;
 	Cursor = UndoPtr;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.dir.h,v 3.3 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dir.h,v 3.4 1996/04/26 19:19:04 christos Exp $ */
 /*
  * sh.dir.h: Directory data structures and globals
  */
@@ -45,7 +45,7 @@ struct directory {
     unsigned short *di_count;	/* refcount of processes */
     Char   *di_name;		/* actual name */
 };
-EXTERN struct directory *dcwd;	/* the one we are in now */
+EXTERN struct directory *dcwd IZERO_STRUCT;	/* the one we are in now */
 EXTERN int symlinks;
 
 #define SYM_CHASE	1

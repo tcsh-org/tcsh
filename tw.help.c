@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tw.help.c,v 3.12 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.help.c,v 3.13 1996/04/26 19:23:07 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.help.c,v 3.12 1995/03/12 04:49:26 christos Exp $")
+RCSID("$Id: tw.help.c,v 3.13 1996/04/26 19:23:07 christos Exp $")
 
 #include "tw.h"
 #include "tc.h"
@@ -62,7 +62,7 @@ do_help(command)
     Char   *cmd_p, *ep;
     char  **sp;
 
-    sigret_t(*orig_intr) ();
+    sigret_t(*orig_intr) __P((int));
     Char    curdir[MAXPATHLEN];	/* Current directory being looked at */
     register Char *hpath;	/* The environment parameter */
     Char    full[MAXPATHLEN];
@@ -129,7 +129,7 @@ do_help(command)
 	    }
 	    if (f != -1) {
 		/* so cat it to the terminal */
-		orig_intr = (sigret_t (*)()) sigset(SIGINT, cleanf);
+		orig_intr = (sigret_t (*) __P((int))) sigset(SIGINT, cleanf);
 		while (f != -1 && (len = read(f, (char *) buf, 512)) > 0)
 		    (void) write(SHOUT, (char *) buf, (size_t) len);
 #ifdef convex

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.defns.c,v 3.26 1996/04/26 19:17:46 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.defns.c,v 3.27 1997/10/02 16:36:25 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.26 1996/04/26 19:17:46 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.27 1997/10/02 16:36:25 christos Exp $")
 
 #include "ed.h"
 
@@ -539,7 +539,45 @@ KEYCMD  CcEmacsMap[] = {
     F_UNASSIGNED,		/* M-| */
     F_UNASSIGNED,		/* M-} */
     F_UNASSIGNED,		/* M-~ */
+#ifndef WINNT
     F_DELWORDPREV		/* M-^? */
+#else /* WINNT */
+    F_DELWORDPREV,		/* M-^? */
+    F_UNASSIGNED,		/* f-1 */
+    F_UNASSIGNED,		/* f-2 */
+    F_UNASSIGNED,		/* f-3 */
+    F_UNASSIGNED,		/* f-4 */
+    F_UNASSIGNED,		/* f-5 */
+    F_UNASSIGNED,		/* f-6 */
+    F_UNASSIGNED,		/* f-7 */
+    F_UNASSIGNED,		/* f-8 */
+    F_UNASSIGNED,		/* f-9 */
+    F_UNASSIGNED,		/* f-10 */
+    F_UNASSIGNED,		/* f-11 */
+    F_UNASSIGNED,		/* f-12 */
+    F_UNASSIGNED,		/* f-13 */
+    F_UNASSIGNED,		/* f-14 */
+    F_UNASSIGNED,		/* f-15 */
+    F_UNASSIGNED,		/* f-16 */
+    F_UNASSIGNED,		/* f-17 */
+    F_UNASSIGNED,		/* f-18 */
+    F_UNASSIGNED,		/* f-19 */
+    F_UNASSIGNED,		/* f-20 */
+    F_UNASSIGNED,		/* f-21 */
+    F_UNASSIGNED,		/* f-22 */
+    F_UNASSIGNED,		/* f-23 */
+    F_UNASSIGNED,		/* f-24 */
+    F_UNASSIGNED,		/* PgUp */
+    F_UNASSIGNED,		/* PgDn */
+    F_UNASSIGNED,		/* end */
+    F_UNASSIGNED,		/* home */
+    F_UNASSIGNED,		/* LEFT */
+    F_UNASSIGNED,		/* UP */
+    F_UNASSIGNED,		/* RIGHT */
+    F_UNASSIGNED,		/* DOWN */
+    F_UNASSIGNED,		/* INS */
+    F_UNASSIGNED		/* DEL */
+#endif /* WINNT */
 };
 
 /*
@@ -839,7 +877,45 @@ static KEYCMD  CcViMap[] = {
     F_UNASSIGNED,		/* M-| */
     F_UNASSIGNED,		/* M-} */
     F_UNASSIGNED,		/* M-~ */
+#ifndef WINNT
     F_UNASSIGNED		/* M-^? */
+#else /* WINNT */
+    F_UNASSIGNED,		/* M-^? */
+    F_UNASSIGNED,		/* f-1 */
+    F_UNASSIGNED,		/* f-2 */
+    F_UNASSIGNED,		/* f-3 */
+    F_UNASSIGNED,		/* f-4 */
+    F_UNASSIGNED,		/* f-5 */
+    F_UNASSIGNED,		/* f-6 */
+    F_UNASSIGNED,		/* f-7 */
+    F_UNASSIGNED,		/* f-8 */
+    F_UNASSIGNED,		/* f-9 */
+    F_UNASSIGNED,		/* f-10 */
+    F_UNASSIGNED,		/* f-11 */
+    F_UNASSIGNED,		/* f-12 */
+    F_UNASSIGNED,		/* f-13 */
+    F_UNASSIGNED,		/* f-14 */
+    F_UNASSIGNED,		/* f-15 */
+    F_UNASSIGNED,		/* f-16 */
+    F_UNASSIGNED,		/* f-17 */
+    F_UNASSIGNED,		/* f-18 */
+    F_UNASSIGNED,		/* f-19 */
+    F_UNASSIGNED,		/* f-20 */
+    F_UNASSIGNED,		/* f-21 */
+    F_UNASSIGNED,		/* f-22 */
+    F_UNASSIGNED,		/* f-23 */
+    F_UNASSIGNED,		/* f-24 */
+    F_UNASSIGNED,		/* PgUp */
+    F_UNASSIGNED,		/* PgDn */
+    F_UNASSIGNED,		/* end */
+    F_UNASSIGNED,		/* home */
+    F_UNASSIGNED,		/* LEFT */
+    F_UNASSIGNED,		/* UP */
+    F_UNASSIGNED,		/* RIGHT */
+    F_UNASSIGNED,		/* DOWN */
+    F_UNASSIGNED,		/* INS */
+    F_UNASSIGNED		/* DEL */
+#endif /* !WINNT */
 };
 
 KEYCMD  CcViCmdMap[] = {
@@ -1098,7 +1174,45 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* M-| */
     F_UNASSIGNED,		/* M-} */
     F_UNASSIGNED,		/* M-~ */
+#ifndef WINNT
     F_UNASSIGNED		/* M-^? */
+#else /* WINNT */
+    F_UNASSIGNED,		/* M-^? */
+    F_UNASSIGNED,		/* f-1 */
+    F_UNASSIGNED,		/* f-2 */
+    F_UNASSIGNED,		/* f-3 */
+    F_UNASSIGNED,		/* f-4 */
+    F_UNASSIGNED,		/* f-5 */
+    F_UNASSIGNED,		/* f-6 */
+    F_UNASSIGNED,		/* f-7 */
+    F_UNASSIGNED,		/* f-8 */
+    F_UNASSIGNED,		/* f-9 */
+    F_UNASSIGNED,		/* f-10 */
+    F_UNASSIGNED,		/* f-11 */
+    F_UNASSIGNED,		/* f-12 */
+    F_UNASSIGNED,		/* f-13 */
+    F_UNASSIGNED,		/* f-14 */
+    F_UNASSIGNED,		/* f-15 */
+    F_UNASSIGNED,		/* f-16 */
+    F_UNASSIGNED,		/* f-17 */
+    F_UNASSIGNED,		/* f-18 */
+    F_UNASSIGNED,		/* f-19 */
+    F_UNASSIGNED,		/* f-20 */
+    F_UNASSIGNED,		/* f-21 */
+    F_UNASSIGNED,		/* f-22 */
+    F_UNASSIGNED,		/* f-23 */
+    F_UNASSIGNED,		/* f-24 */
+    F_UNASSIGNED,		/* PgUp */
+    F_UNASSIGNED,		/* PgDn */
+    F_UNASSIGNED,		/* end */
+    F_UNASSIGNED,		/* home */
+    F_UNASSIGNED,		/* LEFT */
+    F_UNASSIGNED,		/* UP */
+    F_UNASSIGNED,		/* RIGHT */
+    F_UNASSIGNED,		/* DOWN */
+    F_UNASSIGNED,		/* INS */
+    F_UNASSIGNED		/* DEL */
+#endif /* !WINNT */
 };
 
 
@@ -1107,7 +1221,7 @@ editinit()
 {
     struct KeyFuncs *f;
 
-#ifdef NLS_CATALOGS
+#if defined(NLS_CATALOGS) || defined(WINNT)
     int i;
 
     for (i = 0; i < F_NUM_FUNCNAMES; i++)
@@ -1730,27 +1844,27 @@ editinit()
 void
 CheckMaps()
 {		/* check the size of the key maps */
-    int     c1 = (256 * sizeof(KEYCMD));
+    int     c1 = (NT_NUM_KEYS * sizeof(KEYCMD));
 
     if ((sizeof(CcKeyMap)) != c1)
-	xprintf("CcKeyMap should be 256 entries, but is %d.\r\n",
-		(sizeof(CcKeyMap) / sizeof(KEYCMD)));
+	xprintf("CcKeyMap should be %d entries, but is %d.\r\n",
+		NT_NUM_KEYS, sizeof(CcKeyMap) / sizeof(KEYCMD)));
 
     if ((sizeof(CcAltMap)) != c1)
-	xprintf("CcAltMap should be 256 entries, but is %d.\r\n",
-		(sizeof(CcAltMap) / sizeof(KEYCMD)));
+	xprintf("CcAltMap should be %d entries, but is %d.\r\n",
+		NT_NUM_KEYS, (sizeof(CcAltMap) / sizeof(KEYCMD)));
 
     if ((sizeof(CcEmacsMap)) != c1)
-	xprintf("CcEmacsMap should be 256 entries, but is %d.\r\n",
-		(sizeof(CcEmacsMap) / sizeof(KEYCMD)));
+	xprintf("CcEmacsMap should be %d entries, but is %d.\r\n",
+		NT_NUM_KEYS, (sizeof(CcEmacsMap) / sizeof(KEYCMD)));
 
     if ((sizeof(CcViMap)) != c1)
-	xprintf("CcViMap should be 256 entries, but is %d.\r\n",
-		(sizeof(CcViMap) / sizeof(KEYCMD)));
+	xprintf("CcViMap should be %d entries, but is %d.\r\n",
+		NT_NUM_KEYS, (sizeof(CcViMap) / sizeof(KEYCMD)));
 
     if ((sizeof(CcViCmdMap)) != c1)
-	xprintf("CcViCmdMap should be 256 entries, but is %d.\r\n",
-		(sizeof(CcViCmdMap) / sizeof(KEYCMD)));
+	xprintf("CcViCmdMap should be %d entries, but is %d.\r\n",
+		NT_NUM_KEYS, (sizeof(CcViCmdMap) / sizeof(KEYCMD)));
 }
 
 #endif
@@ -1823,7 +1937,7 @@ ed_InitVIMaps()
 
     VImode = 1;
     ResetXmap();
-    for (i = 0; i < 256; i++) {
+    for (i = 0; i < NT_NUM_KEYS; i++) {
 	CcKeyMap[i] = CcViMap[i];
 	CcAltMap[i] = CcViCmdMap[i];
     }
@@ -1844,7 +1958,7 @@ ed_InitEmacsMaps()
 
     VImode = 0;
     ResetXmap();
-    for (i = 0; i < 256; i++) {
+    for (i = 0; i < NT_NUM_KEYS; i++) {
 	CcKeyMap[i] = CcEmacsMap[i];
 	CcAltMap[i] = F_UNASSIGNED;
     }
@@ -1889,18 +2003,18 @@ ed_InitMaps()
      * for the key initializations.
      */
     {
-	KEYCMD temp[256];
+	KEYCMD temp[NT_NUM_KEYS];
 	static KEYCMD *const list[3] = { CcEmacsMap, CcViMap, CcViCmdMap };
 	register int i, table;
 
 	for (table=0; table<3; ++table)
 	{
 	    /* copy ASCII ordered map to temp table */
-	    for (i = 0; i < 256; i++) {
+	    for (i = 0; i < NT_NUM_KEYS; i++) {
 		temp[i] = list[table][i];
 	    }
 	    /* write back as EBCDIC ordered map */
-	    for (i = 0; i < 256; i++) {
+	    for (i = 0; i < NT_NUM_KEYS; i++) {
 		list[table][_toebcdic[i]] = temp[i];
 	    }
 	}

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.67 1997/05/04 17:52:18 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.68 1997/10/02 16:36:32 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -231,15 +231,19 @@ struct ucred {
  *
  * From: scott@craycos.com (Scott Bolte)
  */
-#ifdef F_SETFD
-# define close_on_exec(fd, v) fcntl((fd), F_SETFD, v)
-#else /* !F_SETFD */
-# ifdef FIOCLEX
-# define close_on_exec(fd, v) ioctl((fd), ((v) ? FIOCLEX : FIONCLEX), NULL)
-# else /* !FIOCLEX */
-# define close_on_exec(fd, v)	/* Nothing */
-# endif /* FIOCLEX */
-#endif /* F_SETFD */
+#ifndef WINNT
+# ifdef F_SETFD
+#  define close_on_exec(fd, v) fcntl((fd), F_SETFD, v)
+# else /* !F_SETFD */
+#  ifdef FIOCLEX
+#   define close_on_exec(fd, v) ioctl((fd), ((v) ? FIOCLEX : FIONCLEX), NULL)
+#  else /* !FIOCLEX */
+#   define close_on_exec(fd, v)	/* Nothing */
+#  endif /* FIOCLEX */
+# endif /* F_SETFD */
+#else /* WINNT */
+# define close_on_exec(fd, v) nt_close_on_exec((fd),(v))
+#endif /* !WINNT */
 
 /*
  * Stat
@@ -548,17 +552,19 @@ extern caddr_t sbrk __P((int));
 extern int qsort();
 #  endif /* SYSVREL == 0 && !__lucid */
 # else /* !SUNOS4 */
-#  ifndef hpux
-#   if __GNUC__ != 2
+#  ifndef WINNT
+#   ifndef hpux
+#    if __GNUC__ != 2
 extern int abort();
-#   endif /* __GNUC__ != 2 */
-#   ifndef fps500
+#    endif /* __GNUC__ != 2 */
+#    ifndef fps500
 extern int qsort();
-#   endif /* !fps500 */
-#  else /* !hpux */
+#    endif /* !fps500 */
+#   else /* !hpux */
 extern void abort();
 extern void qsort();
-#  endif /* hpux */
+#   endif /* hpux */
+#  endif /* !WINNT */
 # endif	/* SUNOS4 */
 #ifndef _CX_UX
 extern void perror();

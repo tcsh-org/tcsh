@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.h,v 3.25 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.h,v 3.26 1996/04/26 19:17:53 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -43,6 +43,13 @@
 
 #define TABSIZE		8	/* usually 8 spaces/tab */
 #define MAXMACROLEVELS	10	/* max number of nested kbd macros */
+
+#ifdef WINNT
+/* 256 + 24 (fkeys) +  4 (arrow) + 2 (ins/del) +2 (pgup/dn) +2 (home/end) */
+# define NT_NUM_KEYS	290
+#else /* !WINNT */
+# define NT_NUM_KEYS	256
+#endif /* !WINNT */
 
 extern int errno;
 
@@ -186,29 +193,33 @@ EXTERN Char T_HasMeta;		/* true if we have a meta key */
  * Terminal dependend data structures
  */
 typedef struct {
-#if defined(POSIX) || defined(TERMIO)
-# ifdef POSIX
+#ifdef WINNT
+    int dummy;
+#else /* !WINNT */
+# if defined(POSIX) || defined(TERMIO)
+#  ifdef POSIX
     struct termios d_t;
-# else
+#  else
     struct termio d_t;
-# endif /* POSIX */
-#else /* SGTTY */
-# ifdef TIOCGETP
+#  endif /* POSIX */
+# else /* SGTTY */
+#  ifdef TIOCGETP
     struct sgttyb d_t;
-# endif /* TIOCGETP */
-# ifdef TIOCGETC
+#  endif /* TIOCGETP */
+#  ifdef TIOCGETC
     struct tchars d_tc;
-# endif /* TIOCGETC */
-# ifdef TIOCGPAGE
+#  endif /* TIOCGETC */
+#  ifdef TIOCGPAGE
     struct ttypagestat d_pc;
-# endif /* TIOCGPAGE */
-# ifdef TIOCLGET
+#  endif /* TIOCGPAGE */
+#  ifdef TIOCLGET
     int d_lb;
-# endif /* TIOCLGET */
-#endif /* POSIX || TERMIO */
-#ifdef TIOCGLTC
+#  endif /* TIOCLGET */
+# endif /* POSIX || TERMIO */
+# ifdef TIOCGLTC
     struct ltchars d_ltc;
-#endif /* TIOCGLTC */
+# endif /* TIOCGLTC */
+#endif /* WINNT */
 } ttydata_t;
 
 #define MODE_INSERT	0

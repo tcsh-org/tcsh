@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.alloc.c,v 3.29 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.alloc.c,v 3.30 1996/04/26 19:20:34 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,12 +44,19 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.29 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.30 1996/04/26 19:20:34 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
 
 int dont_free = 0;
+
+#ifdef WINNT
+# define malloc		fmalloc
+# define free		ffree
+# define calloc		fcalloc
+# define realloc	frealloc
+#endif /* WINNT */
 
 #ifndef SYSMALLOC
 

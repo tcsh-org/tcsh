@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.wait.h,v 3.8 1992/10/14 20:19:19 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.wait.h,v 3.9 1996/04/26 19:21:48 christos Exp $ */
 /*
  * tc.wait.h: <sys/wait.h> for machines that don't have it or have it and
  *	      is incorrect.
@@ -68,7 +68,9 @@
 #  undef NEEDwait
 #  include "mi.wait.h"
 # else
-#  include <sys/wait.h>
+#  ifndef WINNT
+#   include <sys/wait.h>
+#  endif /* WINNT */
 # endif /* _MINIX */
 #endif /* SYSVREL == 0 || linux */
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.32 1996/06/22 21:44:31 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.33 1997/05/04 17:52:15 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.32 1996/06/22 21:44:31 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.33 1997/05/04 17:52:15 christos Exp $")
 
 /*
  * C shell
@@ -489,6 +489,9 @@ Dgetdol()
 #else /* !BSDSIGS */
 	    (void) sigrelse(SIGINT);
 #endif /* BSDSIGS */
+#ifdef WINNT
+# define read force_read
+#endif /* WINNT */
 	    for (np = wbuf; read(OLDSTD, &tnp, 1) == 1; np++) {
 		*np = (unsigned char) tnp;
 		if (np >= &wbuf[BUFSIZE - 1])
@@ -999,10 +1002,17 @@ heredoc(term)
     bool    quoted;
     char   *tmp;
 
-    if (creat(tmp = short2str(shtemp), 0600) < 0)
+    tmp = short2str(shtemp);
+#ifndef O_CREAT
+# define O_CREAT 0
+    if (creat(tmp, 0600) < 0)
 	stderror(ERR_SYSTEM, tmp, strerror(errno));
+#endif
     (void) close(0);
-    if (open(tmp, O_RDWR) < 0) {
+#ifndef O_TEMPORARY
+# define O_TEMPORARY 0
+#endif
+    if (open(tmp, O_RDWR|O_CREAT|O_TEMPORARY) < 0) {
 	int     oerrno = errno;
 
 	(void) unlink(tmp);
@@ -1019,6 +1029,9 @@ heredoc(term)
     ocnt = BUFSIZE;
     obp = obuf;
     inheredoc = 1;
+#ifdef WINNT
+    __dup_stdin = 1;
+#endif /* WINNT */
     for (;;) {
 	/*
 	 * Read up a line

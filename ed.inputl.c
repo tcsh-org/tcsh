@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.inputl.c,v 3.43 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.inputl.c,v 3.44 1996/04/26 19:18:05 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.43 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.44 1996/04/26 19:18:05 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -240,7 +240,7 @@ Inputl()
 		    *Strchr(Change, '\n') = '\0';
 		    CorrChar = LastChar;	/* Save the corrected end */
 		    LastChar = InputBuf;	/* Null the current line */
-		    Beep();
+		    SoundBeep();
 		    printprompt(2, short2str(Change));
 		    Refresh();
 		    if (read(SHIN, (char *) &tch, 1) < 0)
@@ -334,13 +334,13 @@ Inputl()
 
 	case CC_CORRECT:
 	    if (tenematch(InputBuf, Cursor - InputBuf, SPELL) < 0)
-		Beep();		/* Beep = No match/ambiguous */
+		SoundBeep();		/* Beep = No match/ambiguous */
 	    curlen = Repair();
 	    break;
 
 	case CC_CORRECT_L:
 	    if (SpellLine(FALSE) < 0)
-		Beep();		/* Beep = No match/ambiguous */
+		SoundBeep();		/* Beep = No match/ambiguous */
 	    curlen = Repair();
 	    break;
 
@@ -399,31 +399,31 @@ Inputl()
 	    case 1:
 		if (non_unique_match && matchbeep &&
 		    (Strcmp(*(matchbeep->vec), STRnotunique) == 0))
-		    Beep();
+		    SoundBeep();
 		break;
 	    case 0:
 		if (matchbeep) {
 		    if (Strcmp(*(matchbeep->vec), STRnomatch) == 0 ||
 			Strcmp(*(matchbeep->vec), STRambiguous) == 0 ||
 			Strcmp(*(matchbeep->vec), STRnotunique) == 0)
-			Beep();
+			SoundBeep();
 		}
 		else
-		    Beep();
+		    SoundBeep();
 		break;
 	    default:
 		if (matchval < 0) {	/* Error from tenematch */
 		    curchoice = -1;
-		    Beep();
+		    SoundBeep();
 		    break;
 		}
 		if (matchbeep) {
 		    if ((Strcmp(*(matchbeep->vec), STRambiguous) == 0 ||
 			 Strcmp(*(matchbeep->vec), STRnotunique) == 0))
-			Beep();
+			SoundBeep();
 		}
 		else
-		    Beep();
+		    SoundBeep();
 		/*
 		 * Addition by David C Lawrence <tale@pawl.rpi.edu>: If an 
 		 * attempted completion is ambiguous, list the choices.  
@@ -467,7 +467,7 @@ Inputl()
 	    fn = (retval == CC_LIST_ALL) ? LIST_ALL : LIST;
 	    /* should catch ^C here... */
 	    if (tenematch(InputBuf, Cursor - InputBuf, fn) < 0)
-		Beep();
+		SoundBeep();
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
@@ -476,31 +476,31 @@ Inputl()
 
 	case CC_LIST_GLOB:
 	    if (tenematch(InputBuf, Cursor - InputBuf, GLOB) < 0)
-		Beep();
+		SoundBeep();
 	    curlen = Repair();
 	    break;
 
 	case CC_EXPAND_GLOB:
 	    if (tenematch(InputBuf, Cursor - InputBuf, GLOB_EXPAND) <= 0)
-		Beep();		/* Beep = No match */
+		SoundBeep();		/* Beep = No match */
 	    curlen = Repair();
 	    break;
 
 	case CC_NORMALIZE_PATH:
 	    if (tenematch(InputBuf, Cursor - InputBuf, PATH_NORMALIZE) <= 0)
-		Beep();		/* Beep = No match */
+		SoundBeep();		/* Beep = No match */
 	    curlen = Repair();
 	    break;
 
 	case CC_EXPAND_VARS:
 	    if (tenematch(InputBuf, Cursor - InputBuf, VARS_EXPAND) <= 0)
-		Beep();		/* Beep = No match */
+		SoundBeep();		/* Beep = No match */
 	    curlen = Repair();
 	    break;
 
 	case CC_NORMALIZE_COMMAND:
 	    if (tenematch(InputBuf, Cursor - InputBuf, COMMAND_NORMALIZE) <= 0)
-		Beep();		/* Beep = No match */
+		SoundBeep();		/* Beep = No match */
 	    curlen = Repair();
 	    break;
 
@@ -533,7 +533,7 @@ Inputl()
 	default:		/* functions we don't know about */
 	    DoingArg = 0;
 	    Argument = 1;
-	    Beep();
+	    SoundBeep();
 	    flush();
 	    curchoice = -1;
 	    curlen = LastChar - InputBuf;
@@ -555,7 +555,7 @@ PushMacro(str)
 	KeyMacro[MacroLvl] = str;
     }
     else {
-	Beep();
+	SoundBeep();
 	flush();
     }
 }
@@ -672,7 +672,13 @@ GetNextCommand(cmdnum, ch)
 	    MetaNext = 0;
 	    *ch |= META;
 	}
-	cmd = CurrentKeyMap[(unsigned char) *ch];
+	/* XXX: This needs to be fixed so that we don't just truncate
+	 * the character, we unquote it.
+	 */
+	if (*ch < NT_NUM_KEYS)
+	    cmd = CurrentKeyMap[*ch];
+	else
+	    cmd = CurrentKeyMap[(unsigned char) *ch];
 	if (cmd == F_XKEY) {
 	    XmapVal val;
 	    CStr cstr;
@@ -727,6 +733,9 @@ GetNextChar(cp)
     if (Rawmode() < 0)		/* make sure the tty is set up correctly */
 	return 0;		/* oops: SHIN was closed */
 
+#ifdef WINNT
+    __nt_want_vcode = 1;
+#endif /* WINNT */
     while ((num_read = read(SHIN, (char *) &tcp, 1)) == -1) {
 	if (errno == EINTR)
 	    continue;
@@ -738,11 +747,22 @@ GetNextChar(cp)
             if (errno != EINTR)
                 stderror(ERR_SYSTEM, progname, strerror(errno));
 #endif  /* convex */
+#ifdef WINNT
+	    __nt_want_vcode = 0;
+#endif /* WINNT */
 	    *cp = '\0';
 	    return -1;
 	}
     }
+#ifdef WINNT
+    if (__nt_want_vcode == 2)
+	*cp = __nt_vcode;
+    else
+	*cp = tcp;
+    __nt_want_vcode = 0;
+#else
     *cp = tcp;
+#endif /* WINNT */
     return num_read;
 }
 
@@ -786,17 +806,24 @@ SpellLine(cmdonly)
 	mismatch[1] = HISTSUB;
 	if (!Strchr(mismatch, *argptr) &&
 	    (!cmdonly || starting_a_command(argptr, InputBuf))) {
-	    switch (tenematch(InputBuf, Cursor - InputBuf, SPELL)) {
-	    case 1:		/* corrected */
-		matchval = 1;
-		break;
-	    case -1:		/* couldn't be corrected */
-		if (!matchval)
-		    matchval = -1;
-		break;
-	    default:		/* was correct */
-		break;
-	    }
+#ifdef WINNT
+	    /*
+	     * This hack avoids correcting drive letter changes
+	     */
+	    if((Cursor - InputBuf) != 2 || (char)InputBuf[1] != ':')
+#endif /* WINNT */
+		switch (tenematch(InputBuf, Cursor - InputBuf, SPELL)) {
+		case 1:		/* corrected */
+		    matchval = 1;
+		    break;
+		case -1:		/* couldn't be corrected */
+		    if (!matchval)
+			matchval = -1;
+		    break;
+		default:		/* was correct */
+		    break;
+		}
+
 	    if (LastChar != OldLastChar) {
 		if (argptr < OldCursor)
 		    OldCursor += (LastChar - OldLastChar);

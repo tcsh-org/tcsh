@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.sig.c,v 3.20 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.sig.c,v 3.21 1996/04/26 19:21:31 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.20 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.21 1996/04/26 19:21:31 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -369,23 +369,23 @@ bsd_sigpause(mask)
  *
  * Emulate bsd style signal()
  */
-sigret_t (*bsd_signal(sig, func))()
+sigret_t (*bsd_signal(sig, func)) ()
         int sig;
-        sigret_t (*func)();
+        sigret_t (*func) __P((int));
 {
         struct sigaction act, oact;
         sigset_t set;
-        sigret_t (*r_func)();
+        sigret_t (*r_func) __P((int));
 
         if (sig < 0 || sig > MAXSIG) {
                 xprintf(CGETS(25, 2,
 			"error: bsd_signal(%d) signal out of range\n"), sig);
-                return((sigret_t(*)()) SIG_IGN);
+                return((sigret_t(*) __P((int))) SIG_IGN);
         }
 
         (void) sigemptyset(&set);
 
-        act.sa_handler = (sigret_t(*)()) func;      /* user function */
+        act.sa_handler = (sigret_t(*) __P((int))) func; /* user function */
         act.sa_mask = set;                      /* signal mask */
         act.sa_flags = 0;                       /* no special actions */
 
@@ -393,10 +393,10 @@ sigret_t (*bsd_signal(sig, func))()
                 xprintf(CGETS(25, 3,
 			"error: bsd_signal(%d) - sigaction failed, errno %d\n"),
 			sig, errno);
-                return((sigret_t(*)()) SIG_IGN);
+                return((sigret_t(*) __P((int))) SIG_IGN);
         }
 
-        r_func = (sigret_t(*)()) oact.sa_handler;
+        r_func = (sigret_t(*) __P((int))) oact.sa_handler;
         return(r_func);
 }
 #endif /* POSIXSIG */

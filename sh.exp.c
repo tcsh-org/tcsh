@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.34 1996/10/13 22:48:32 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.35 1997/02/23 19:03:20 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,14 +36,14 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.34 1996/10/13 22:48:32 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.35 1997/02/23 19:03:20 christos Exp $")
 
 /*
  * C shell
  */
 
-#define IGNORE	1	/* in ignore, it means to ignore value, just parse */
-#define NOGLOB	2	/* in ignore, it means not to globone */
+#define TEXP_IGNORE 1	/* in ignore, it means to ignore value, just parse */
+#define TEXP_NOGLOB 2	/* in ignore, it means not to globone */
 
 #define	ADDOP	1
 #define	MULOP	2
@@ -221,7 +221,7 @@ exp0(vp, ignore)
 	register int p2;
 
 	(*vp)++;
-	p2 = exp0(vp, (ignore & IGNORE) || p1);
+	p2 = exp0(vp, (ignore & TEXP_IGNORE) || p1);
 #ifdef EDEBUG
 	etraci("exp0 p2", p2, vp);
 #endif /* EDEBUG */
@@ -244,7 +244,7 @@ exp1(vp, ignore)
 	register int p2;
 
 	(*vp)++;
-	p2 = exp1(vp, (ignore & IGNORE) || !p1);
+	p2 = exp1(vp, (ignore & TEXP_IGNORE) || !p1);
 #ifdef EDEBUG
 	etraci("exp1 p2", p2, vp);
 #endif /* EDEBUG */
@@ -337,12 +337,12 @@ exp2c(vp, ignore)
     if ((i = isa(**vp, EQOP)) != 0) {
 	(*vp)++;
 	if (i == EQMATCH || i == NOTEQMATCH)
-	    ignore |= NOGLOB;
+	    ignore |= TEXP_NOGLOB;
 	p2 = exp3(vp, ignore);
 #ifdef EDEBUG
 	etracc("exp2c p2", p2, vp);
 #endif /* EDEBUG */
-	if (!(ignore & IGNORE))
+	if (!(ignore & TEXP_IGNORE))
 	    switch (i) {
 
 	    case EQEQ:
@@ -390,7 +390,7 @@ exp3(vp, ignore)
 #ifdef EDEBUG
 	etracc("exp3 p2", p2, vp);
 #endif /* EDEBUG */
-	if (!(ignore & IGNORE))
+	if (!(ignore & TEXP_IGNORE))
 	    switch (i) {
 
 	    case GTR:
@@ -465,7 +465,7 @@ exp4(vp, ignore)
 #ifdef EDEBUG
 	etracc("exp4 p2", p2, vp);
 #endif /* EDEBUG */
-	if (!(ignore & IGNORE))
+	if (!(ignore & TEXP_IGNORE))
 	    switch (op[0]) {
 
 	    case '+':
@@ -498,7 +498,7 @@ exp5(vp, ignore)
 
     if (isa(**vp, MULOP)) {
 	register Char *op = *(*vp)++;
-	if ((ignore & NOGLOB) != 0) 
+	if ((ignore & TEXP_NOGLOB) != 0) 
 	    /* 
 	     * We are just trying to get the right side of
 	     * a =~ or !~ operator 
@@ -509,7 +509,7 @@ exp5(vp, ignore)
 #ifdef EDEBUG
 	etracc("exp5 p2", p2, vp);
 #endif /* EDEBUG */
-	if (!(ignore & IGNORE))
+	if (!(ignore & TEXP_IGNORE))
 	    switch (op[0]) {
 
 	    case '*':
@@ -597,7 +597,7 @@ exp6(vp, ignore)
 	    if (eq(*(*vp)++, STRRbrace))
 		break;
 	}
-	if (ignore & IGNORE)
+	if (ignore & TEXP_IGNORE)
 	    return (Strsave(STRNULL));
 	psavejob();
 	if (pfork(&faket, -1) == 0) {
@@ -626,7 +626,7 @@ exp6(vp, ignore)
 #ifdef EDEBUG
     etracc("exp6 default", cp, vp);
 #endif /* EDEBUG */
-    return (ignore & NOGLOB ? Strsave(cp) : globone(cp, G_APPEND));
+    return (ignore & TEXP_NOGLOB ? Strsave(cp) : globone(cp, G_APPEND));
 }
 
 
@@ -709,7 +709,7 @@ filetest(cp, vp, ignore)
 	stderror(ERR_NAME | ERR_FILENAME);
 
     dp = *(*vp)++;
-    if (ignore & IGNORE)
+    if (ignore & TEXP_IGNORE)
 	return (Strsave(STRNULL));
     ep = globone(dp, G_APPEND);
     ft = &cp[1];
@@ -926,8 +926,9 @@ filetest(cp, vp, ignore)
 
 	    case 'P':
 		string = string0 + 1;
-		(void) xsprintf(string, "%o", pmask & (unsigned int) 
-		     ((S_IRWXU|S_IRWXG|S_IRWXO|S_ISUID|S_ISGID) & st->st_mode));
+		(void) xsnprintf(string, sizeof(string0) - 1, "%o",
+		    pmask & (unsigned int) 
+		    ((S_IRWXU|S_IRWXG|S_IRWXO|S_ISUID|S_ISGID) & st->st_mode));
 		if (altout && *string != '0')
 		    *--string = '0';
 		xfree((ptr_t) ep);

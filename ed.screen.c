@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.38 1996/04/26 19:18:13 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.39 1997/10/02 16:36:26 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.38 1996/04/26 19:18:13 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.39 1997/10/02 16:36:26 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1056,7 +1056,7 @@ void
 MoveToLine(where)		/* move to line <where> (first line == 0) */
     int     where;		/* as efficiently as possible; */
 {
-    int     del, i;
+    int     del;
 
     if (where == CursorV)
 	return;
@@ -1069,7 +1069,10 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
 	return;
     }
 
-    if ((del = where - CursorV) > 0) {
+    del = where - CursorV;
+
+#ifndef WINNT
+    if (del > 0) {
 	while (del > 0) {
 	    if ((T_Margin & MARGIN_AUTO) && Display[CursorV][0] != '\0') {
 		/* move without newline */
@@ -1094,11 +1097,15 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
 	if (GoodStr(T_UP) && (-del > 1 || !GoodStr(T_up)))
 	    (void) tputs(tgoto(Str(T_UP), -del, -del), -del, putpure);
 	else {
+	    int i;
 	    if (GoodStr(T_up))
 		for (i = 0; i < -del; i++)
 		    (void) tputs(Str(T_up), 1, putpure);
 	}
     }
+#else /* WINNT */
+    NT_MoveToLineOrChar(del, 1);
+#endif /* !WINNT */
     CursorV = where;		/* now where is here */
 }
 
@@ -1106,9 +1113,11 @@ void
 MoveToChar(where)		/* move to character position (where) */
     int     where;
 {				/* as efficiently as possible */
-    int     del, i;
+#ifndef WINNT
+    int     del;
 
 mc_again:
+#endif /* WINNT */
     if (where == CursorH)
 	return;
 
@@ -1126,12 +1135,14 @@ mc_again:
 	return;
     }
 
+#ifndef WINNT
     del = where - CursorH;
 
     if ((del < -4 || del > 4) && GoodStr(T_ch))
 	/* go there directly */
 	(void) tputs(tgoto(Str(T_ch), where, where), where, putpure);
     else {
+	int i;
 	if (del > 0) {		/* moving forward */
 	    if ((del > 4) && GoodStr(T_RI))
 		(void) tputs(tgoto(Str(T_RI), del, del), del, putpure);
@@ -1171,6 +1182,9 @@ mc_again:
 	    }
 	}
     }
+#else /* WINNT */
+    NT_MoveToLineOrChar(where, 0);
+#endif /* !WINNT */
     CursorH = where;		/* now where is here */
 }
 
@@ -1199,8 +1213,21 @@ so_write(cp, n)
 	    xprintf("so: litnum %d, litptr %x\r\n",
 		    *cp & CHAR, litptr[*cp & CHAR]);
 #endif /* DEBUG_LITERAL */
+#ifdef WINNT
+	    {
+		extern void ParseAnsi __P((char *));
+		extern void set_cons_attr __P((char *));
+		char buf[256], *ptr = &buf[0];
+		for (d = litptr[*cp++ & CHAR]; *d & LITERAL; d++)
+		    *ptr++ = (*d & CHAR);
+		flush();
+		ParseAnsi(buf);
+		set_cons_attr(buf);
+	    }
+#else /* !WINNT */
 	    for (d = litptr[*cp++ & CHAR]; *d & LITERAL; d++)
 		(void) putraw(*d & CHAR);
+#endif /* WINNT */
 	    (void) putraw(*d);
 
 	}
@@ -1365,7 +1392,7 @@ ClearScreen()
 }
 
 void
-Beep()
+SoundBeep()
 {				/* produce a sound */
     beep_cmd ();
     if (adrof(STRnobeep))
@@ -1377,7 +1404,11 @@ Beep()
 	/* what termcap says we should use */
 	(void) tputs(Str(T_bl), 1, putpure);
     else
+#ifndef WINNT
 	(void) putraw(CTL_ESC('\007'));	/* an ASCII bell; ^G */
+#else /* WINNT */
+	MessageBeep(MB_ICONQUESTION);
+#endif /* !WINNT */
 }
 
 void

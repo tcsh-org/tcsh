@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.who.c,v 3.25 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.who.c,v 3.26 1996/04/26 19:21:50 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.25 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.26 1996/04/26 19:21:50 christos Exp $")
 
 #include "tc.h"
 
@@ -59,7 +59,9 @@ RCSID("$Id: tc.who.c,v 3.25 1995/04/16 19:15:53 christos Exp $")
 # define utmp utmpx
 # define ut_time ut_xtime
 #else /* !HAVEUTMPX */
-# include <utmp.h>
+# ifndef WINNT
+#  include <utmp.h>
+# endif /* WINNT */
 #endif /* HAVEUTMPX */
 
 #ifndef BROKEN_CC
@@ -167,6 +169,9 @@ watch_login(force)
     Char  **vp = NULL;
     time_t  t, interval = MAILINTVL;
     struct stat sta;
+#ifdef WINNT
+    static int ncbs_posted = 0;
+#endif /* WINNT */
 #if defined(UTHOST) && defined(_SEQUENT_)
     char   *host, *ut_find_host();
 #endif
@@ -196,6 +201,19 @@ watch_login(force)
 	interval = 0;
 	
     (void) time(&t);
+#ifdef WINNT
+	/*
+	 * Since NCB_ASTATs take time, start em async at least 90 secs
+	 * before we are due -amol 6/5/97
+	 */
+	if (!ncbs_posted) {
+	    unsigned long tdiff = t - watch_period;
+	    if (!watch_period || ((tdiff  > 0) && (tdiff > (interval - 90)))) {
+		start_ncbs(vp);
+ 		ncbs_posted = 1;
+	    }
+	}
+#endif /* WINNT */
     if (t - watch_period < interval) {
 #ifdef BSDSIGS
 	(void) sigsetmask(omask);
@@ -205,6 +223,9 @@ watch_login(force)
 	return;			/* not long enough yet... */
     }
     watch_period = t;
+#ifdef WINNT
+    ncbs_posted = 0;
+#else /* !WINNT */
 
     /*
      * From: Michael Schroeder <mlschroe@immd4.informatik.uni-erlangen.de>
@@ -213,30 +234,30 @@ watch_login(force)
     if (stat(_PATH_UTMP, &sta)) {
 	xprintf(CGETS(26, 1, "cannot stat %s.  Please \"unset watch\".\n"),
 		_PATH_UTMP);
-#ifdef BSDSIGS
+# ifdef BSDSIGS
 	(void) sigsetmask(omask);
-#else
+# else
 	(void) sigrelse(SIGINT);
-#endif
+# endif
 	return;
     }
     if (stlast == sta.st_mtime) {
-#ifdef BSDSIGS
+# ifdef BSDSIGS
 	(void) sigsetmask(omask);
-#else
+# else
 	(void) sigrelse(SIGINT);
-#endif
+# endif
 	return;
     }
     stlast = sta.st_mtime;
     if ((utmpfd = open(_PATH_UTMP, O_RDONLY)) < 0) {
 	xprintf(CGETS(26, 2, "%s cannot be opened.  Please \"unset watch\".\n"),
 		_PATH_UTMP);
-#ifdef BSDSIGS
+# ifdef BSDSIGS
 	(void) sigsetmask(omask);
-#else
+# else
 	(void) sigrelse(SIGINT);
-#endif
+# endif
 	return;
     }
 
@@ -255,35 +276,35 @@ watch_login(force)
      */
     while (read(utmpfd, (char *) &utmp, sizeof utmp) == sizeof utmp) {
 
-#ifdef DEAD_PROCESS
-# ifndef IRIS4D
+# ifdef DEAD_PROCESS
+#  ifndef IRIS4D
 	if (utmp.ut_type != USER_PROCESS)
 	    continue;
-# else
+#  else
 	/* Why is that? Cause the utmp file is always corrupted??? */
 	if (utmp.ut_type != USER_PROCESS && utmp.ut_type != DEAD_PROCESS)
 	    continue;
-# endif /* IRIS4D */
-#endif /* DEAD_PROCESS */
+#  endif /* IRIS4D */
+# endif /* DEAD_PROCESS */
 
 	if (utmp.ut_name[0] == '\0' && utmp.ut_line[0] == '\0')
 	    continue;	/* completely void entry */
-#ifdef DEAD_PROCESS
+# ifdef DEAD_PROCESS
 	if (utmp.ut_type == DEAD_PROCESS && utmp.ut_line[0] == '\0')
 	    continue;
-#endif /* DEAD_PROCESS */
+# endif /* DEAD_PROCESS */
 	wp = whohead.who_next;
 	while (wp->who_next && (comp = strncmp(wp->who_tty, utmp.ut_line, UTLINLEN)) < 0)
 	    wp = wp->who_next;/* find that tty! */
 
 	if (wp->who_next && comp == 0) {	/* found the tty... */
-#ifdef DEAD_PROCESS
+# ifdef DEAD_PROCESS
 	    if (utmp.ut_type == DEAD_PROCESS) {
 		wp->who_time = utmp.ut_time;
 		wp->who_status = OFFLINE;
 	    }
 	    else
-#endif /* DEAD_PROCESS */
+# endif /* DEAD_PROCESS */
 	    if (utmp.ut_name[0] == '\0') {
 		wp->who_time = utmp.ut_time;
 		wp->who_status = OFFLINE;
@@ -295,17 +316,17 @@ watch_login(force)
 	    }
 	    else {
 		(void) strncpy(wp->who_new, utmp.ut_name, UTNAMLEN);
-#ifdef UTHOST
-# ifdef _SEQUENT_
+# ifdef UTHOST
+#  ifdef _SEQUENT_
 		host = ut_find_host(wp->who_tty);
 		if (host)
 		    (void) strncpy(wp->who_host, host, UTHOSTLEN);
 		else
 		    wp->who_host[0] = 0;
-# else
+#  else
 		(void) strncpy(wp->who_host, utmp.ut_host, UTHOSTLEN);
-# endif
-#endif /* UTHOST */
+#  endif
+# endif /* UTHOST */
 		wp->who_time = utmp.ut_time;
 		if (wp->who_name[0] == '\0')
 		    wp->who_status = ONLINE;
@@ -316,32 +337,32 @@ watch_login(force)
 	else {		/* new tty in utmp */
 	    wpnew = (struct who *) xcalloc(1, sizeof *wpnew);
 	    (void) strncpy(wpnew->who_tty, utmp.ut_line, UTLINLEN);
-#ifdef UTHOST
-# ifdef _SEQUENT_
+# ifdef UTHOST
+#  ifdef _SEQUENT_
 	    host = ut_find_host(wpnew->who_tty);
 	    if (host)
 		(void) strncpy(wpnew->who_host, host, UTHOSTLEN);
 	    else
 		wpnew->who_host[0] = 0;
-# else
+#  else
 	    (void) strncpy(wpnew->who_host, utmp.ut_host, UTHOSTLEN);
-# endif
-#endif /* UTHOST */
+#  endif
+# endif /* UTHOST */
 	    wpnew->who_time = utmp.ut_time;
-#ifdef DEAD_PROCESS
+# ifdef DEAD_PROCESS
 	    if (utmp.ut_type == DEAD_PROCESS)
 		wpnew->who_status = OFFLINE;
 	    else
-#endif /* DEAD_PROCESS */
+# endif /* DEAD_PROCESS */
 	    if (utmp.ut_name[0] == '\0')
 		wpnew->who_status = OFFLINE;
 	    else {
 		(void) strncpy(wpnew->who_new, utmp.ut_name, UTNAMLEN);
 		wpnew->who_status = ONLINE;
 	    }
-#ifdef WHODEBUG
+# ifdef WHODEBUG
 	    debugwholist(wpnew, wp);
-#endif /* WHODEBUG */
+# endif /* WHODEBUG */
 
 	    wpnew->who_next = wp;	/* link in a new 'who' */
 	    wpnew->who_prev = wp->who_prev;
@@ -350,9 +371,10 @@ watch_login(force)
 	}
     }
     (void) close(utmpfd);
-#if defined(UTHOST) && defined(_SEQUENT_)
+# if defined(UTHOST) && defined(_SEQUENT_)
     endutent();
-#endif
+# endif
+#endif /* !WINNT */
 
     if (force || vp == NULL)
 	return;
@@ -472,10 +494,11 @@ print_who(wp)
 
 
 const char *
-who_info(ptr, c, wbuf)
+who_info(ptr, c, wbuf, wbufsiz)
     ptr_t ptr;
     int c;
     char *wbuf;
+    size_t wbufsiz;
 {
     struct who *wp = (struct who *) ptr;
 #ifdef UTHOST
@@ -504,7 +527,8 @@ who_info(ptr, c, wbuf)
 	case OFFLINE:
 	    return CGETS(26, 10, "logged off");
 	case CHANGED:
-	    xsprintf(wbuf, CGETS(26, 11, "replaced %s on"), wp->who_name);
+	    xsnprintf(wbuf, wbufsiz, CGETS(26, 11, "replaced %s on"),
+		      wp->who_name);
 	    return wbuf;
 	default:
 	    break;
@@ -593,4 +617,59 @@ utmphost()
     return host;
 }
 # endif /* UTHOST */
+
+#ifdef WINNT
+void add_to_who_list(name, mach_nm)
+    char *name;
+    char *mach_nm;
+{
+
+    struct who *wp, *wpnew;
+    int comp = -1;
+
+    wp = whohead.who_next;
+    while (wp->who_next && (comp = strncmp(wp->who_tty,mach_nm,UTLINLEN)) < 0)
+	wp = wp->who_next;/* find that tty! */
+
+    if (wp->who_next && comp == 0) {	/* found the tty... */
+
+	if (*name == '\0') {
+	    wp->who_time = 0;
+	    wp->who_status = OFFLINE;
+	}
+	else if (strncmp(name, wp->who_name, UTNAMLEN) == 0) {
+	    /* someone is logged in */ 
+	    wp->who_time = 0;
+	    wp->who_status = 0;	/* same guy */
+	}
+	else {
+	    (void) strncpy(wp->who_new, name, UTNAMLEN);
+	    wp->who_time = 0;
+	    if (wp->who_name[0] == '\0')
+		wp->who_status = ONLINE;
+	    else
+		wp->who_status = CHANGED;
+	}
+    }
+    else {
+	wpnew = (struct who *) xcalloc(1, sizeof *wpnew);
+	(void) strncpy(wpnew->who_tty, mach_nm, UTLINLEN);
+	wpnew->who_time = 0;
+	if (*name == '\0')
+	    wpnew->who_status = OFFLINE;
+	else {
+	    (void) strncpy(wpnew->who_new, name, UTNAMLEN);
+	    wpnew->who_status = ONLINE;
+	}
+#ifdef WHODEBUG
+	debugwholist(wpnew, wp);
+#endif /* WHODEBUG */
+
+	wpnew->who_next = wp;	/* link in a new 'who' */
+	wpnew->who_prev = wp->who_prev;
+	wpnew->who_prev->who_next = wpnew;
+	wp->who_prev = wpnew;	/* linked in now */
+    }
+}
+#endif /* WINNT */
 #endif /* HAVENOUTMP */

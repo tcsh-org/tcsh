@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.init.c,v 3.20 1997/05/04 17:52:21 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.init.c,v 3.21 1997/10/02 16:36:35 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.20 1997/05/04 17:52:21 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.21 1997/10/02 16:36:35 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -626,9 +626,9 @@ tw_logname_start(dfd, pat)
 {
     USE(pat);
     SETDIR(dfd)
-#ifndef _VMS_POSIX
+#if !defined(_VMS_POSIX) && !defined(WINNT)
     (void) setpwent();	/* Open passwd file */
-#endif /* atp vmsposix */
+#endif /* !_VMS_POSIX && !WINNT */
 } /* end tw_logname_start */
 
 
@@ -652,10 +652,12 @@ tw_logname_next(dir, flags)
     USE(flags);
     USE(dir);
     TW_HOLD();
-#ifndef _VMS_POSIX
+#if !defined(_VMS_POSIX) && !defined(WINNT)
     /* ISC does not declare getpwent()? */
     pw = (struct passwd *) getpwent();
-#endif /* atp vmsposix */
+#else /* _VMS_POSIX || WINNT */
+    pw = NULL;
+#endif /* !_VMS_POSIX && !WINNT */
     TW_RELS();
 
     if (pw == NULL) {
@@ -678,9 +680,9 @@ tw_logname_end()
 #ifdef YPBUGS
     fix_yp_bugs();
 #endif
-#ifndef _VMS_POSIX
+#if !defined(_VMS_POSIX) && !defined(WINNT)
    (void) endpwent();
-#endif /* atp vmsposix */
+#endif /* !_VMS_POSIX && !WINNT */
 } /* end tw_logname_end */
 
 
@@ -695,9 +697,9 @@ tw_grpname_start(dfd, pat)
 {
     USE(pat);
     SETDIR(dfd)
-#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX)
+#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX) && !defined(WINNT)
     (void) setgrent();	/* Open group file */
-#endif /* atp vmsposix */
+#endif /* !_VMS_POSIX && !_OSD_POSIX && !WINNT */
 } /* end tw_grpname_start */
 
 
@@ -711,7 +713,7 @@ tw_grpname_next(dir, flags)
     int  *flags;
 {
     static Char retname[MAXPATHLEN];
-    struct group *gr = NULL;
+    struct group *gr;
     /*
      * We don't want to get interrupted inside getgrent()
      * because the yellow pages code is not interruptible,
@@ -721,9 +723,11 @@ tw_grpname_next(dir, flags)
     USE(flags);
     USE(dir);
     TW_HOLD();
-#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX)
+#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX) && !defined(WINNT)
     gr = (struct group *) getgrent();
-#endif /* atp vmsposix */
+#else /* _VMS_POSIX || _OSD_POSIX || WINNT */
+    gr = NULL;
+#endif /* !_VMS_POSIX && !_OSD_POSIX && !WINNT */
     TW_RELS();
 
     if (gr == NULL) {
@@ -746,9 +750,9 @@ tw_grpname_end()
 #ifdef YPBUGS
     fix_yp_bugs();
 #endif
-#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX)
+#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX) && !defined(WINNT)
    (void) endgrent();
-#endif /* atp vmsposix */
+#endif /* !_VMS_POSIX && !_OSD_POSIX && !WINNT */
 } /* end tw_grpname_end */
 
 /* tw_file_start():

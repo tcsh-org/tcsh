@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.40 1997/02/23 19:03:24 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.41 1997/05/04 17:52:16 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.40 1997/02/23 19:03:24 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.41 1997/05/04 17:52:16 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -87,7 +87,7 @@ static struct {
     int wanttty;
     struct biltins *bifunc;
     bool forked;
-} _gv;
+} _gv IZERO_STRUCT;
 
 #define VOL_SAVE()	( bifunc = _gv.bifunc, \
 			  forked = _gv.forked, \
@@ -133,6 +133,7 @@ execute(t, wanttty, pipein, pipeout)
 	Char sCName[MAXPATHLEN];
 	Char *pCN;
 	struct stat stbuf;
+	char *pathname;
 
 	dollar(sCName, t->t_dcom[0]);
 	pCN = sCName;
@@ -152,21 +153,24 @@ execute(t, wanttty, pipein, pipeout)
 	    (void) Strcpy(sCName, sCPath);
 	}
     
+	pathname = short2str(sCName);
 	/* if this is a dir, tack a "cd" on as the first arg */
-	if (stat(short2str(sCName), &stbuf) != -1) {
-	    if (S_ISDIR(stbuf.st_mode)) {
-		Char *vCD[2];
-		Char **ot_dcom = t->t_dcom;
-	    
-		vCD[0] = Strsave(STRcd);
-		vCD[1] = NULL;
-		t->t_dcom = blkspl(vCD, ot_dcom);
-		if (implicit_cd > 1) {
-		    blkpr(t->t_dcom);
-		    xputchar( '\n' );
-		}
-		xfree((ptr_t) ot_dcom);
+	if ((stat(pathname, &stbuf) != -1 && S_ISDIR(stbuf.st_mode))
+#ifdef WINNT
+	    || (pathname[0] && pathname[1] == ':' && pathname[2] == '\0')
+#endif /* WINNT */
+	) {
+	    Char *vCD[2];
+	    Char **ot_dcom = t->t_dcom;
+	
+	    vCD[0] = Strsave(STRcd);
+	    vCD[1] = NULL;
+	    t->t_dcom = blkspl(vCD, ot_dcom);
+	    if (implicit_cd > 1) {
+		blkpr(t->t_dcom);
+		xputchar( '\n' );
 	    }
+	    xfree((ptr_t) ot_dcom);
 	}
     }
 
@@ -286,18 +290,18 @@ execute(t, wanttty, pipein, pipeout)
 		/*
 		 * Continue for builtins that are part of the scripting language
 		 */
-		if (_gv.bifunc->bfunct != (void (*)())dobreak	&&
-		    _gv.bifunc->bfunct != (void (*)())docontin	&&
-		    _gv.bifunc->bfunct != (void (*)())doelse	&&
-		    _gv.bifunc->bfunct != (void (*)())doend	&&
-		    _gv.bifunc->bfunct != (void (*)())doforeach	&&
-		    _gv.bifunc->bfunct != (void (*)())dogoto	&&
-		    _gv.bifunc->bfunct != (void (*)())doif	&&
-		    _gv.bifunc->bfunct != (void (*)())dorepeat	&&
-		    _gv.bifunc->bfunct != (void (*)())doswbrk	&&
-		    _gv.bifunc->bfunct != (void (*)())doswitch	&&
-		    _gv.bifunc->bfunct != (void (*)())dowhile	&&
-		    _gv.bifunc->bfunct != (void (*)())dozip)
+		if (_gv.bifunc->bfunct != (bfunc_t)dobreak	&&
+		    _gv.bifunc->bfunct != (bfunc_t)docontin	&&
+		    _gv.bifunc->bfunct != (bfunc_t)doelse	&&
+		    _gv.bifunc->bfunct != (bfunc_t)doend	&&
+		    _gv.bifunc->bfunct != (bfunc_t)doforeach	&&
+		    _gv.bifunc->bfunct != (bfunc_t)dogoto	&&
+		    _gv.bifunc->bfunct != (bfunc_t)doif		&&
+		    _gv.bifunc->bfunct != (bfunc_t)dorepeat	&&
+		    _gv.bifunc->bfunct != (bfunc_t)doswbrk	&&
+		    _gv.bifunc->bfunct != (bfunc_t)doswitch	&&
+		    _gv.bifunc->bfunct != (bfunc_t)dowhile	&&
+		    _gv.bifunc->bfunct != (bfunc_t)dozip)
 		    break;
 	    }
 	}
@@ -326,9 +330,9 @@ execute(t, wanttty, pipein, pipeout)
 	if (t->t_dflg & F_PIPEIN)
 	    t->t_dflg &= ~(F_NOFORK);
 #endif /* BACKPIPE */
-	if (_gv.bifunc && (_gv.bifunc->bfunct == (void(*)())dochngd ||
-			   _gv.bifunc->bfunct == (void(*)())dopushd ||
-			   _gv.bifunc->bfunct == (void(*)())dopopd))
+	if (_gv.bifunc && (_gv.bifunc->bfunct == (bfunc_t)dochngd ||
+			   _gv.bifunc->bfunct == (bfunc_t)dopushd ||
+			   _gv.bifunc->bfunct == (bfunc_t)dopopd))
 	    t->t_dflg &= ~(F_NICE);
 	if (((t->t_dflg & F_TIME) || ((t->t_dflg & F_NOFORK) == 0 &&
 	     (!_gv.bifunc || t->t_dflg &
@@ -337,7 +341,7 @@ execute(t, wanttty, pipein, pipeout)
 	 * We have to fork for eval too.
 	 */
 	    (_gv.bifunc && (t->t_dflg & F_PIPEIN) != 0 &&
-	     _gv.bifunc->bfunct == (void(*)())doeval))
+	     _gv.bifunc->bfunct == (bfunc_t)doeval))
 #ifdef VFORK
 	    if (t->t_dtyp == NODE_PAREN ||
 		t->t_dflg & (F_REPEAT | F_AMPERSAND) || _gv.bifunc)

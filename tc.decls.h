@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.36 1996/04/26 19:20:49 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.37 1997/02/23 19:03:25 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -41,11 +41,12 @@
  * tc.alloc.c
  */
 #ifndef SYSMALLOC
+#ifndef WINNT
 extern	void		  free		__P((ptr_t));
 extern	memalign_t	  malloc	__P((size_t));
 extern	memalign_t	  realloc	__P((ptr_t, size_t));
 extern	memalign_t	  calloc	__P((size_t, size_t));
-
+#endif /* !WINNT */
 #else /* SYSMALLOC */
 extern	void		  sfree		__P((ptr_t));
 extern	memalign_t	  smalloc	__P((size_t));
@@ -218,9 +219,10 @@ extern	int		  getv		__P((Char *));
  * tc.printf.h
  */
 extern	pret_t		  xprintf	__P((const char *, ...));
-extern	pret_t		  xsprintf	__P((char *, const char *, ...));
+extern	pret_t		  xsnprintf	__P((char *, size_t, const char *, ...));
 extern	pret_t		  xvprintf	__P((const char *, va_list));
-extern	pret_t		  xvsprintf	__P((char *, const char *, va_list));
+extern	pret_t		  xvsnprintf	__P((char *, size_t, const char *,
+					     va_list));
 
 /*
  * tc.prompt.c
@@ -268,11 +270,11 @@ extern	void 		  sigpause	__P((int));
 extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
 # define signal(a, b)	  xsignal(a, b)
 #endif /* NEEDsignal */
-#if defined(_SEQUENT_) || ((SYSVREL > 3 || defined(_DGUX_SOURCE)) && defined(POSIXSIGS)) || (defined(_AIX) && defined(POSIXSIGS))
+#if defined(_SEQUENT_) || ((SYSVREL > 3 || defined(_DGUX_SOURCE)) && defined(POSIXSIGS)) || (defined(_AIX) && defined(POSIXSIGS)) || defined(WINNT)
 extern	sigmask_t	  sigsetmask	__P((sigmask_t));
 extern	sigmask_t	  sigblock	__P((sigmask_t));
 extern	void		  bsd_sigpause	__P((sigmask_t));
-extern  sigret_t        (*bsd_signal    __P((int, sigret_t (*)(int)))) ();
+extern  sigret_t        (*bsd_signal    __P((int, sigret_t (*)(int)))) __P((int));
 #endif /* _SEQUENT_ */
 #ifdef SIGSYNCH
 extern	sigret_t	  synch_handler	__P((int));
@@ -319,7 +321,7 @@ extern	void		  fix_version	__P((void));
 extern	void		  initwatch	__P((void));
 extern	void		  resetwatch	__P((void));
 extern	void		  watch_login	__P((int));
-extern	const char 	 *who_info	__P((ptr_t, int, char *));
+extern	const char 	 *who_info	__P((ptr_t, int, char *, size_t));
 extern	void		  dolog		__P((Char **, struct command *));
 # ifdef UTHOST
 extern	char		 *utmphost	__P((void));

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.proc.c,v 3.63 1996/04/26 19:20:11 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.proc.c,v 3.64 1996/10/05 17:39:13 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,12 +36,16 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.63 1996/04/26 19:20:11 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.64 1996/10/05 17:39:13 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
 #include "tc.wait.h"
 
+#ifdef WINNT
+#undef POSIX
+#define POSIX
+#endif /* WINNT */
 #ifdef aiws
 # undef HZ
 # define HZ 16
@@ -203,82 +207,90 @@ loop:
     xprintf("Waiting...\n");
     flush();
 #endif /* JOBDEBUG */
-#ifdef BSDJOBS
-# ifdef BSDTIMES
-#  ifdef convex
+#ifndef WINNT
+# ifdef BSDJOBS
+#  ifdef BSDTIMES
+#   ifdef convex
     /* use 'cvxwait' to get parallel statistics */
     pid = cvxwait(&w,
         (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
-#  else
+#   else
     /* both a wait3 and rusage */
-#   if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || defined(linux) || (defined(IRIS4D) && (__STDC__ || defined(FUNCPROTO)) && SYSVREL <= 3) || defined(__lucid) || defined(__osf__)
+#    if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || defined(linux) || (defined(IRIS4D) && (__STDC__ || defined(FUNCPROTO)) && SYSVREL <= 3) || defined(__lucid) || defined(__osf__)
     pid = wait3(&w,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
-#   else /* BSDWAIT */
+#    else /* BSDWAIT */
     pid = wait3(&w.w_status,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
-#   endif /* BSDWAIT */
-#  endif /* convex */
-# else /* !BSDTIMES */
-#  ifdef _SEQUENT_
+#    endif /* BSDWAIT */
+#   endif /* convex */
+#  else /* !BSDTIMES */
+#   ifdef _SEQUENT_
     (void) get_process_stats(&tv, PS_SELF, 0, &cpst1);
     pid = waitpid(-1, &w,
 	    (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG));
     (void) get_process_stats(&tv, PS_SELF, 0, &cpst2);
     pr_stat_sub(&cpst2, &cpst1, &ru);
-#  else	/* !_SEQUENT_ */
-#   ifndef POSIX
+#   else	/* !_SEQUENT_ */
+#    ifndef POSIX
     /* we have a wait3, but no rusage stuff */
     pid = wait3(&w.w_status,
 	 (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), 0);
-#   else /* POSIX */
+#    else /* POSIX */
     pid = waitpid(-1, &w,
 	    (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG));
-#   endif /* POSIX */
-#  endif /* !_SEQUENT_ */
-# endif	/* !BSDTIMES */
-#else /* !BSDJOBS */
-# ifdef BSDTIMES
-#  define HAVEwait3
-    /* both a wait3 and rusage */
-#  ifdef hpux
-    pid = wait3(&w.w_status, WNOHANG, 0);
-#  else	/* !hpux */
-    pid = wait3(&w.w_status, WNOHANG, &ru);
-#  endif /* !hpux */
-# else /* !BSDTIMES */
-#  ifdef ODT  /* For Sco Unix 3.2.0 or ODT 1.0 */
+#    endif /* POSIX */
+#   endif /* !_SEQUENT_ */
+#  endif	/* !BSDTIMES */
+# else /* !BSDJOBS */
+#  ifdef BSDTIMES
 #   define HAVEwait3
+    /* both a wait3 and rusage */
+#   ifdef hpux
+    pid = wait3(&w.w_status, WNOHANG, 0);
+#   else	/* !hpux */
+    pid = wait3(&w.w_status, WNOHANG, &ru);
+#   endif /* !hpux */
+#  else /* !BSDTIMES */
+#   ifdef ODT  /* For Sco Unix 3.2.0 or ODT 1.0 */
+#    define HAVEwait3
      pid = waitpid(-1, &w,
  	    (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG));
-#  endif /* ODT */	    
-#  if defined(aiws) || defined(uts)
-#   define HAVEwait3
+#   endif /* ODT */	    
+#   if defined(aiws) || defined(uts)
+#    define HAVEwait3
     pid = wait3(&w.w_status, 
 	(setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), 0);
-#  endif /* aiws || uts */
-#  ifndef HAVEwait3
-#   ifdef UNRELSIGS
+#   endif /* aiws || uts */
+#   ifndef HAVEwait3
+#    ifdef UNRELSIGS
      /* no wait3, therefore no rusage */
      /* on Sys V, this may hang.  I hope it's not going to be a problem */
-#    ifdef _MINIX
+#     ifdef _MINIX
       pid = wait(&w);
-#    else /* !_MINIX */
+#     else /* !_MINIX */
       pid = ourwait(&w.w_status);
-#    endif /* _MINIX */
-#   else /* !UNRELSIGS */
+#     endif /* _MINIX */
+#    else /* !UNRELSIGS */
      /* 
       * XXX: for greater than 3 we should use waitpid(). 
       * but then again, SVR4 falls into the POSIX/BSDJOBS category.
       */
      pid = wait(&w.w_status);
-#   endif /* !UNRELSIGS */
-#  endif /* !HAVEwait3 */
-# endif	/* !BSDTIMES */
-# ifndef BSDSIGS
+#    endif /* !UNRELSIGS */
+#   endif /* !HAVEwait3 */
+#  endif	/* !BSDTIMES */
+#  ifndef BSDSIGS
     (void) sigset(SIGCHLD, pchild);
-# endif /* !BSDSIGS */
-#endif /* !BSDJOBS */
+#  endif /* !BSDSIGS */
+# endif /* !BSDJOBS */
+#else /* WINNT */
+    {
+	extern int insource;
+	pid = waitpid(-1, &w,
+	    (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG));
+    }
+#endif /* WINNT */
 
 #ifdef JOBDEBUG
     xprintf("parent %d pid %d, retval %x termsig %x retcode %x\n",
@@ -286,7 +298,7 @@ loop:
     flush();
 #endif /* JOBDEBUG */
 
-    if (pid <= 0) {
+    if ((pid == 0) || (pid == -1)) {
 #ifdef JOBDEBUG
 	xprintf("errno == %d\n", errno);
 #endif /* JOBDEBUG */
@@ -304,13 +316,13 @@ loop:
     for (pp = proclist.p_next; pp != NULL; pp = pp->p_next)
 	if (pid == pp->p_procid)
 	    goto found;
-#ifndef BSDJOBS
+#if !defined(BSDJOBS) && !defined(WINNT)
     /* this should never have happened */
     stderror(ERR_SYNC, pid);
     xexit(0);
-#else /* BSDJOBS */
+#else /* BSDJOBS || WINNT */
     goto loop;
-#endif /* BSDJOBS */
+#endif /* !BSDJOBS && !WINNT */
 found:
     pp->p_flags &= ~(PRUNNING | PSTOPPED | PREPORTED);
     if (WIFSTOPPED(w)) {
@@ -1147,8 +1159,8 @@ pprint(pp, flag)
 			char buf[1024];
 
 			if ((ptr = mesg[pp->p_reason & ASCII].pname) == NULL)
-			    xsprintf(ptr = buf, "%s %d", CGETS(17, 5, "Signal"),
-				     pp->p_reason & ASCII);
+			    xsnprintf(ptr = buf, sizeof(buf), "%s %d",
+				CGETS(17, 5, "Signal"), pp->p_reason & ASCII);
 			xprintf(format, ptr);
 		    }
 		    else
@@ -1894,7 +1906,7 @@ pfork(t, wanttty)
 	(void) sighold(SIGCHLD);
 #endif /* !BSDSIGS */
     }
-    while ((pid = fork()) < 0)
+    while ((pid = fork()) == -1)
 	if (setintr == 0)
 	    (void) sleep(FORKSLEEP);
 	else {

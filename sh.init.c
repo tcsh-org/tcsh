@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.41 1996/04/26 19:19:40 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.init.c,v 3.42 1997/02/23 19:03:22 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.41 1996/04/26 19:19:40 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.42 1997/02/23 19:03:22 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -72,9 +72,15 @@ struct	biltins bfunc[] = {
     { "case",		dozip,		0,	1	},
     { "cd",		dochngd,	0,	INF	},
     { "chdir",		dochngd,	0,	INF	},
+#ifdef WINNT
+    { "cls",		docls,		0,	0	},
+#endif /* WINNT */
     { "complete",	docomplete,	0,	INF	},
     { "continue",	docontin,	0,	0	},
     { "default",	dozip,		0,	0	},
+#ifdef NTDBG
+    { "debugbreak",	dodebugbreak,	0,	0	},
+#endif /* NTDBG */
     { "dirs",		dodirs,		0,	INF	},
 #if defined(_CRAY) && !defined(_CRAYMPP)
     { "dmmode",		dodmmode,	0,	1	},
@@ -152,6 +158,9 @@ struct	biltins bfunc[] = {
 #endif /* TCF */
     { "shift",		shift,		0,	1	},
     { "source",		dosource,	1,	INF	},
+#ifdef WINNT
+    { "start",		dostart,	1,	INF	},
+#endif /* WINNT */
     { "stop",		dostop,		1,	INF	},
     { "suspend",	dosuspend,	0,	0	},
     { "switch",		doswitch,	1,	INF	},
@@ -907,5 +916,19 @@ mesginit()
 	mesg[SIGTINT].iname = "TINT";
 	mesg[SIGTINT].pname = CSAVS(2, 89, "New input character");
     }
-#endif /* SIGINT */
+#endif /* SIGTINT */
+
+#ifdef SIGSTKFLT
+    if (mesg[SIGSTKFLT].pname == NULL) {
+	mesg[SIGSTKFLT].iname = "STKFLT";
+	mesg[SIGSTKFLT].pname = CSAVS(2, 90, "Stack limit exceeded");
+    }
+#endif /* SIGSTKFLT */
+
+#ifdef SIGUNUSED
+    if (mesg[SIGUNUSED].pname == NULL) {
+	mesg[SIGUNUSED].iname = "UNUSED";
+	mesg[SIGUNUSED].pname = CSAVS(2, 91, "Stack limit exceeded");
+    }
+#endif /* SIGUNUSED */
 }

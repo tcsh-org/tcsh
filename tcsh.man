@@ -4851,6 +4851,13 @@ added \fBellipsis\fR and \fBrprompt\fR.
 .TP 2
 Edward Hutchins, Silicon Graphics Inc., 1996
 Added implicit cd.
+.TP 2
+Martin Kraemer, 1997
+Ported to Siemens Nixdorf EBCDIC machine
+.TP 2
+Amol Deshpande, Microsoft, 1997
+Ported to WIN32 (Windows/95 and Windows/NT); wrote all the missing library
+and message catalog code to interface to Windows.
 .PD
 .PP
 .SH "THANKS TO"

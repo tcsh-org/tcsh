@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.char.h,v 3.11 1997/02/23 19:03:18 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.char.h,v 3.12 1997/10/02 16:36:28 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -43,13 +43,14 @@
 # include <ctype.h>
 #endif
 
+typedef unsigned char tcshuc;
 #ifdef _MINIX
 # undef _SP
 #endif /* _MINIX */
 extern unsigned short _cmap[];
 
 #ifndef NLS
-extern unsigned char _cmap_lower[], _cmap_upper[];
+extern tcshuc _cmap_lower[], _cmap_upper[];
 
 #endif
 
@@ -77,28 +78,28 @@ extern Char STRnokanji[];
 #define CTL_ESC(ch) ch
 #define cmap(c, bits)	\
 	((((c) & QUOTE) || ((c & 0x80) && adrof(STRnokanji))) ? \
-	0 : (_cmap[(unsigned char)(c)] & (bits)))
+	0 : (_cmap[(tcshuc)(c)] & (bits)))
 #else
 #ifndef _OSD_POSIX
 #define ASC(ch) ch
 #define CTL_ESC(ch) ch
 #define cmap(c, bits)	\
-	(((c) & QUOTE) ? 0 : (_cmap[(unsigned char)(c)] & (bits)))
+	(((c) & QUOTE) ? 0 : (_cmap[(tcshuc)(c)] & (bits)))
 #else /*_OSD_POSIX*/
 /* "BS2000 OSD" is a POSIX on a main frame using a EBCDIC char set */
 extern unsigned short _toascii[256];
 extern unsigned short _toebcdic[256];
 
 /* mainly for comparisons if (ASC(ch)=='\177')... */
-#define ASC(ch)     _toascii[(unsigned char)ch]
+#define ASC(ch)     _toascii[(tcshuc)ch]
 
 /* Literal escapes ('\010') must be mapped to EBCDIC,
  * for C-Escapes   ('\b'), the compiler already does it.
  */
-#define CTL_ESC(ch) _toebcdic[(unsigned char)ch]
+#define CTL_ESC(ch) _toebcdic[(tcshuc)ch]
 
 #define cmap(c, bits)	\
-	(((c) & QUOTE) ? 0 : (_cmap[_toascii[(unsigned char)(c)]] & (bits)))
+	(((c) & QUOTE) ? 0 : (_cmap[_toascii[(tcshuc)(c)]] & (bits)))
 #endif /*_OSD_POSIX*/
 #endif
 
@@ -107,9 +108,9 @@ extern unsigned short _toebcdic[256];
 #define ismeta(c)	cmap(c, _META)
 #define iscmdmeta(c)	cmap(c, _CMD)
 #define letter(c)	(((Char)(c) & QUOTE) ? 0 : \
-			 (isalpha((unsigned char) (c)) || (c) == '_'))
+			 (isalpha((tcshuc) (c)) || (c) == '_'))
 #define alnum(c)	(((Char)(c) & QUOTE) ? 0 : \
-		         (isalnum((unsigned char) (c)) || (c) == '_'))
+		         (isalnum((tcshuc) (c)) || (c) == '_'))
 #ifdef NLS
 # ifdef NeXT
 #  define Isspace(c)	(((Char)(c) & QUOTE) ? 0 : NXIsSpace((unsigned) (c)))
@@ -125,29 +126,44 @@ extern unsigned short _toebcdic[256];
 #  define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsPrint((unsigned) (c)))
 #  define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsPunct((unsigned) (c)))
 # else /* !NeXT */
-#  define Isspace(c)	(((Char)(c) & QUOTE) ? 0 : isspace((unsigned char) (c)))
-#  define Isdigit(c)	(((Char)(c) & QUOTE) ? 0 : isdigit((unsigned char) (c)))
-#  define Isalpha(c)	(((Char)(c) & QUOTE) ? 0 : isalpha((unsigned char) (c)))
-#  define Islower(c)	(((Char)(c) & QUOTE) ? 0 : islower((unsigned char) (c)))
-#  define Isupper(c)	(((Char)(c) & QUOTE) ? 0 : isupper((unsigned char) (c)))
-#  define Tolower(c) 	(((Char)(c) & QUOTE) ? 0 : tolower((unsigned char) (c)))
-#  define Toupper(c) 	(((Char)(c) & QUOTE) ? 0 : toupper((unsigned char) (c)))
-#  define Isxdigit(c)	(((Char)(c) & QUOTE) ? 0 : isxdigit((unsigned char) (c)))
-#  define Isalnum(c)	(((Char)(c) & QUOTE) ? 0 : isalnum((unsigned char) (c)))
-#  define Iscntrl(c) 	(((Char)(c) & QUOTE) ? 0 : iscntrl((unsigned char) (c)))
-#  if SOLARIS2 == 24
+#  ifndef WINNT
+#   define Isspace(c)	(((Char)(c) & QUOTE) ? 0 : isspace((tcshuc) (c)))
+#   define Isdigit(c)	(((Char)(c) & QUOTE) ? 0 : isdigit((tcshuc) (c)))
+#   define Isalpha(c)	(((Char)(c) & QUOTE) ? 0 : isalpha((tcshuc) (c)))
+#   define Islower(c)	(((Char)(c) & QUOTE) ? 0 : islower((tcshuc) (c)))
+#   define Isupper(c)	(((Char)(c) & QUOTE) ? 0 : isupper((tcshuc) (c)))
+#   define Tolower(c) 	(((Char)(c) & QUOTE) ? 0 : tolower((tcshuc) (c)))
+#   define Toupper(c) 	(((Char)(c) & QUOTE) ? 0 : toupper((tcshuc) (c)))
+#   define Isxdigit(c)	(((Char)(c) & QUOTE) ? 0 : isxdigit((tcshuc) (c)))
+#   define Isalnum(c)	(((Char)(c) & QUOTE) ? 0 : isalnum((tcshuc) (c)))
+#   define Iscntrl(c) 	(((Char)(c) & QUOTE) ? 0 : iscntrl((tcshuc) (c)))
+#   if SOLARIS2 == 24
     /* 
      * From <casper@fwi.uva.nl> Casper Dik:
      * In Solaris 2.4, isprint('\t') returns true after setlocal(LC_ALL,"").
      * This breaks commandline editing when you include tabs.
      * (This is in the en_US locale).
      */
-#   define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : \
-				(isprint((unsigned char) (c)) && (c) != '\t'))
-#  else
-#   define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : isprint((unsigned char) (c)))
-#  endif /* SOLARIS2 == 24 */
-#   define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : ispunct((unsigned char) (c)))
+#    define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : \
+				(isprint((tcshuc) (c)) && (c) != '\t'))
+#   else
+#    define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : isprint((tcshuc) (c)))
+#   endif /* SOLARIS2 == 24 */
+#    define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : ispunct((tcshuc) (c)))
+#  else /* WINNT */
+#   define Isspace(c) (((Char)(c) & QUOTE) ? 0 : isspace( oem_it((tcshuc)(c))))
+#   define Isdigit(c) (((Char)(c) & QUOTE) ? 0 : isdigit( oem_it((tcshuc)(c))))
+#   define Isalpha(c) (((Char)(c) & QUOTE) ? 0 : isalpha( oem_it((tcshuc)(c))))
+#   define Islower(c) (((Char)(c) & QUOTE) ? 0 : islower( oem_it((tcshuc)(c))))
+#   define Isupper(c) (((Char)(c) & QUOTE) ? 0 : isupper( oem_it((tcshuc)(c))))
+#   define Tolower(c) (((Char)(c) & QUOTE) ? 0 : tolower( oem_it((tcshuc)(c))))
+#   define Toupper(c) (((Char)(c) & QUOTE) ? 0 : toupper( oem_it((tcshuc)(c))))
+#   define Isxdigit(c)(((Char)(c) & QUOTE) ? 0 : isxdigit(oem_it((tcshuc)(c))))
+#   define Isalnum(c) (((Char)(c) & QUOTE) ? 0 : isalnum( oem_it((tcshuc)(c))))
+#   define Ispunct(c) (((Char)(c) & QUOTE) ? 0 : ispunct( oem_it((tcshuc)(c))))
+#   define Iscntrl(c) (((Char)(c) & QUOTE) ? 0 : iscntrl( oem_it((tcshuc)(c))))
+#   define Isprint(c) (((Char)(c) & QUOTE) ? 0 : isprint( oem_it((tcshuc)(c))))
+#  endif /* WINNT */
 # endif /* !NeXT */
 #else /* !NLS */
 # define Isspace(c)	cmap(c, _SP|_NL)
@@ -156,12 +172,12 @@ extern unsigned short _toebcdic[256];
 # define Islower(c)	(cmap(c,_DOW) && !(((c) & META) && AsciiOnly))
 # define Isupper(c)	(cmap(c, _UP) && !(((c) & META) && AsciiOnly))
 #ifndef _OSD_POSIX
-# define Tolower(c)	(_cmap_lower[(unsigned char)(c)])
-# define Toupper(c)	(_cmap_upper[(unsigned char)(c)])
+# define Tolower(c)	(_cmap_lower[(tcshuc)(c)])
+# define Toupper(c)	(_cmap_upper[(tcshuc)(c)])
 #else /*_OSD_POSIX*/
 /* "BS2000 OSD" is a POSIX on a main frame using a EBCDIC char set */
-# define Tolower(c)     (_cmap_lower[_toascii[(unsigned char)(c)]])
-# define Toupper(c)     (_cmap_upper[_toascii[(unsigned char)(c)]])
+# define Tolower(c)     (_cmap_lower[_toascii[(tcshuc)(c)]])
+# define Toupper(c)     (_cmap_upper[_toascii[(tcshuc)(c)]])
 #endif /*_OSD_POSIX*/
 # define Isxdigit(c)	cmap(c, _XD)
 # define Isalnum(c)	(cmap(c, _DIG|_LET) && !(((Char)(c) & META) && AsciiOnly))

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.42 1996/06/22 21:44:28 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.43 1997/02/23 19:03:19 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.42 1996/06/22 21:44:28 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.43 1997/02/23 19:03:19 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -347,7 +347,7 @@ dnormalize(cp, exp)
 	 * If the path starts with a slash, we are not relative to
 	 * the current working directory.
 	 */
-	if ( *start == '/' )
+	if (ABSOLUTEP(start))
 	    *cwd = '\0';
 # ifdef apollo
 	slashslash = cwd[0] == '/' && cwd[1] == '/';
@@ -486,7 +486,8 @@ dgoto(cp)
 {
     Char   *dp;
 
-    if (*cp != '/') {
+    if (!ABSOLUTEP(cp))
+    {
 	register Char *p, *q;
 	int     cwdlen;
 
@@ -512,7 +513,11 @@ dgoto(cp)
     else
 	dp = cp;
 
+#ifdef WINNT
+    cp = SAVE(getwd(NULL));
+#else /* !WINNT */
     cp = dcanon(cp, dp);
+#endif /* WINNT */
     return cp;
 }
 
@@ -820,7 +825,7 @@ dcanon(cp, p)
      * christos: if the path given does not start with a slash prepend cwd. If
      * cwd does not start with a slash or the result would be too long abort().
      */
-    if (*cp != '/') {
+    if (!ABSOLUTEP(cp)) {
 	Char    tmpdir[MAXPATHLEN];
 
 	p1 = varval(STRcwd);

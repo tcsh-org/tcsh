@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.printf.c,v 3.15 1996/04/26 19:21:18 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.printf.c,v 3.16 1997/05/04 17:52:18 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.15 1996/04/26 19:21:18 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.16 1997/05/04 17:52:18 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -267,21 +267,24 @@ lcase_s:
 }
 
 
-static char *xstring;
+static char *xstring, *xestring;
 static void
 xaddchar(c)
     int     c;
 {
-    *xstring++ = (char) c;
+    if (xestring == xstring)
+	*xstring = '\0';
+    else
+	*xstring++ = (char) c;
 }
 
 
 pret_t
 /*VARARGS*/
 #ifdef FUNCPROTO
-xsprintf(char *str, const char *fmt, ...)
+xsnprintf(char *str, size_t size, const char *fmt, ...)
 #else
-xsprintf(va_alist)
+xsnprintf(va_alist)
     va_dcl
 #endif
 {
@@ -290,13 +293,16 @@ xsprintf(va_alist)
     va_start(va, fmt);
 #else
     char *str, *fmt;
+    size_t size;
 
     va_start(va);
     str = va_arg(va, char *);
+    size = va_arg(va, size_t);
     fmt = va_arg(va, char *);
 #endif
 
-    xstring = (char *) str;
+    xstring = str;
+    xestring = str + size - 1;
     doprnt(xaddchar, fmt, va);
     va_end(va);
     *xstring++ = '\0';
@@ -304,7 +310,6 @@ xsprintf(va_alist)
     return 1;
 #endif
 }
-
 
 pret_t
 /*VARARGS*/
@@ -344,12 +349,14 @@ xvprintf(fmt, va)
 }
 
 pret_t
-xvsprintf(str, fmt, va)
+xvsnprintf(str, size, fmt, va)
     char   *str;
+    size_t size;
     const char   *fmt;
     va_list va;
 {
-    xstring = (char *) str;
+    xstring = str;
+    xestring = str + size - 1;
     doprnt(xaddchar, fmt, va);
     *xstring++ = '\0';
 #ifdef PURIFY

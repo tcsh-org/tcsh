@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.70 1996/10/05 17:39:16 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.71 1997/10/02 16:36:31 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.70 1996/10/05 17:39:16 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.71 1997/10/02 16:36:31 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -319,6 +319,10 @@ dolist(v, c)
     }
     else {
 	Char   *dp, *tmp, buf[MAXPATHLEN];
+#ifdef WINNT
+	char is_it_unc[3];
+	int yes_it_is = 0;
+#endif /* WINNT */
 
 	for (k = 0, i = 0; v[k] != NULL; k++) {
 	    tmp = dnormalize(v[k], symlinks == SYM_IGNORE);
@@ -328,7 +332,19 @@ dolist(v, c)
 		if (dp != &tmp[1])
 #endif /* apollo */
 		*dp = '\0';
-	    if (stat(short2str(tmp), &st) == -1) {
+#ifdef WINNT
+ 		is_it_unc[0] = (char)tmp[0];
+ 		is_it_unc[1] = (char)tmp[1];
+ 		is_it_unc[2] = 0;
+ 		yes_it_is = lstrcmp(is_it_unc,"//") == 0 ||
+			    lstrcmp(is_it_unc,"\\\\") == 0;
+#endif /* WINNT */
+	    if (
+#ifdef WINNT
+		((char)tmp[1] != ':') &&
+		(!yes_it_is) &&
+#endif /* WINNT */
+		stat(short2str(tmp), &st) == -1) {
 		if (k != i) {
 		    if (i != 0)
 			xputchar('\n');
@@ -337,7 +353,12 @@ dolist(v, c)
 		xprintf("%S: %s.\n", tmp, strerror(errno));
 		i = k + 1;
 	    }
-	    else if (S_ISDIR(st.st_mode)) {
+	    else if (
+#ifdef WINNT
+		((char)tmp[1] != ':') &&
+		(!yes_it_is) &&
+#endif /* WINNT */
+		S_ISDIR(st.st_mode)) {
 		Char   *cp;
 
 		if (k != i) {
@@ -350,7 +371,11 @@ dolist(v, c)
 		xprintf("%S:\n", tmp);
 		for (cp = tmp, dp = buf; *cp; *dp++ = (*cp++ | QUOTE))
 		    continue;
-		if (dp[-1] != (Char) ('/' | QUOTE))
+		if (
+#ifdef WINNT
+		    (dp[-1] != (Char) (':' | QUOTE)) &&
+#endif /* WINNT */
+		    (dp[-1] != (Char) ('/' | QUOTE)))
 		    *dp++ = '/';
 		else 
 		    dp[-1] &= TRIM;
@@ -635,9 +660,9 @@ xgetpass(prm)
 {
     static char pass[PASSMAX + 1];
     int fd, i;
-    sigret_t (*sigint)();
+    sigret_t (*sigint) __P((int));
 
-    sigint = (sigret_t (*)()) sigset(SIGINT, SIG_IGN);
+    sigint = (sigret_t (*) __P((int))) sigset(SIGINT, SIG_IGN);
     (void) Rawmode();	/* Make sure, cause we want echo off */
     if ((fd = open("/dev/tty", O_RDWR)) == -1)
 	fd = SHIN;
@@ -1854,6 +1879,10 @@ hashbang(fd, vp)
     char *sargv[HACKVECSZ];
     unsigned char *p, *ws;
     int sargc = 0;
+#ifdef WINNT
+    int fw = 0; 	/* found at least one word */
+    int first_word = 0;
+#endif /* WINNT */
 
     if (read(fd, (char *) lbuf, HACKBUFSZ) <= 0)
 	return -1;
@@ -1864,11 +1893,26 @@ hashbang(fd, vp)
 	switch (*p) {
 	case ' ':
 	case '\t':
+#ifdef NEW_CRLF
+	case '\r':
+#endif NEW_CRLF
 	    if (ws) {	/* a blank after a word.. save it */
 		*p = '\0';
+#ifndef WINNT
 		if (sargc < HACKVECSZ - 1)
 		    sargv[sargc++] = ws;
 		ws = NULL;
+#else /* WINNT */
+		if (sargc < HACKVECSZ - 1) {
+		    sargv[sargc] = first_word ? NULL: hb_subst(ws);
+		    if (sargv[sargc] == NULL)
+			sargv[sargc] = ws;
+		    sargc++;
+		}
+		ws = NULL;
+	    	fw = 1;
+		first_word = 1;
+#endif /* WINNT */
 	    }
 	    p++;
 	    continue;
@@ -1877,10 +1921,23 @@ hashbang(fd, vp)
 	    return -1;
 
 	case '\n':	/* The end of the line. */
-	    if (ws) {	/* terminate the last word */
+	    if (
+#ifdef WINNT
+		fw ||
+#endif /* WINNT */
+		ws) {	/* terminate the last word */
 		*p = '\0';
+#ifndef WINNT
 		if (sargc < HACKVECSZ - 1)
 		    sargv[sargc++] = ws;
+#else /* WINNT */
+		if (sargc < HACKVECSZ - 1) { /* deal with the 1-word case */
+		    sargv[sargc] = first_word? NULL : hb_subst(ws);
+		    if (sargv[sargc] == NULL)
+			sargv[sargc] = ws;
+		    sargc++;
+		}
+#endif /* !WINNT */
 		sargv[sargc] = NULL;
 		ws = NULL;
 		*vp = blk2short(sargv);

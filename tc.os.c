@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.43 1997/02/23 19:03:25 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.44 1997/10/02 16:36:32 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.43 1997/02/23 19:03:25 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.44 1997/10/02 16:36:32 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -860,6 +860,7 @@ xmemmove(vdst, vsrc, len)
 #endif /* NEEDmemmove */
 
 
+#ifndef WINNT
 #ifdef tcgetpgrp
 int
 xtcgetpgrp(fd)
@@ -887,6 +888,7 @@ xtcsetpgrp(fd, pgrp)
 }
 
 #endif	/* tcgetpgrp */
+#endif /* WINNT */
 
 
 #ifdef YPBUGS
@@ -980,23 +982,24 @@ xstrerror(i)
     if (i >= 0 && i < sys_nerr) {
 	return sys_errlist[i];
     } else {
-	(void) xsprintf(errbuf, CGETS(23, 13, "Unknown Error: %d"), i);
+	(void) xsnprintf(errbuf, sizeof(buf),
+	    CGETS(23, 13, "Unknown Error: %d"), i);
 	return errbuf;
     }
 }
 #endif /* strerror */
     
 #ifdef gethostname
-# if !defined(_MINIX) && !defined(__EMX__)
+# if !defined(_MINIX) && !defined(__EMX__) && !defined(WINNT)
 #  include <sys/utsname.h>
-# endif /* !_MINIX && !__EMX__ */
+# endif /* !_MINIX && !__EMX__ && !WINNT */
 
 int
 xgethostname(name, namlen)
     char   *name;
     int     namlen;
 {
-# if !defined(_MINIX) && !defined(__EMX__)
+# if !defined(_MINIX) && !defined(__EMX__) && !defined(WINNT)
     int     i, retval;
     struct utsname uts;
 
@@ -1092,13 +1095,13 @@ xgetwd(pathname)
 		if (d.st_ino == rino && d.st_dev == rdev && d.st_size == rsize)
 			break;		/* reached root directory */
 		if ((dirp = opendir("..")) == NULL) {
-        		(void) xsprintf(pathname, CGETS(23, 19,
+        		(void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 19,
 					"getwd: Cannot open \"..\" (%s)"),
 					strerror(errno));
 			goto fail;
 		}
 		if (chdir("..") < 0) {
-        		(void) xsprintf(pathname, CGETS(23, 20,
+        		(void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 20,
 					"getwd: Cannot chdir to \"..\" (%s)"),
 					strerror(errno));
 			goto fail;
@@ -1106,9 +1109,10 @@ xgetwd(pathname)
 		do {
 			if((dir = readdir(dirp)) == NULL) {
 				closedir(dirp);
-        			(void) xsprintf(pathname, CGETS(23, 21,
-					    "getwd: Read error in \"..\" (%s)"),
-					    strerror(errno));
+        			(void) xsnprintf(pathname, MAXPATHLEN, 
+				    CGETS(23, 21,
+				    "getwd: Read error in \"..\" (%s)"),
+				    strerror(errno));
 				goto fail;
 			}
 			stat(dir->d_name, &dd);
@@ -1125,7 +1129,7 @@ xgetwd(pathname)
 	else {
 		(void) strcpy(pathname, pnptr);
 		if (chdir(pnptr) < 0) {
-        		(void) xsprintf(pathname, CGETS(23, 22,
+        		(void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 22,
 				"getwd: Cannot change back to \".\" (%s)"),
 				strerror(errno));
 			return (NULL);
@@ -1158,7 +1162,7 @@ prepend(dirname, pathname)
 
 # else /* ! hp9000s500 */
 
-#if (SYSVREL != 0 && !defined(d_fileno)) || defined(_VMS_POSIX)
+#if (SYSVREL != 0 && !defined(d_fileno)) || defined(_VMS_POSIX) || defined(WINNT)
 # define d_fileno d_ino
 #endif
 
@@ -1176,7 +1180,7 @@ xgetwd(pathname)
 
     /* find the inode of root */
     if (stat("/", &st_root) == -1) {
-	(void) xsprintf(pathname, CGETS(23, 23, 
+	(void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 23, 
 			"getwd: Cannot stat \"/\" (%s)"),
 			strerror(errno));
 	return (NULL);
@@ -1188,9 +1192,9 @@ xgetwd(pathname)
 
     /* find the inode of the current directory */
     if (lstat(".", &st_cur) == -1) {
-	(void) xsprintf(pathname, CGETS(23, 24,
-					"getwd: Cannot stat \".\" (%s)"),
-			strerror(errno));
+	(void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 24,
+			 "getwd: Cannot stat \".\" (%s)"),
+			 strerror(errno));
 	return (NULL);
     }
     nextpathptr = strrcpy(nextpathptr, "../");
@@ -1207,15 +1211,15 @@ xgetwd(pathname)
 
 	/* open the parent directory */
 	if (stat(nextpathptr, &st_dotdot) == -1) {
-	    (void) xsprintf(pathname, CGETS(23, 25,
-			    "getwd: Cannot stat directory \"%s\" (%s)"),
-			    nextpathptr, strerror(errno));
+	    (void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 25,
+			     "getwd: Cannot stat directory \"%s\" (%s)"),
+			     nextpathptr, strerror(errno));
 	    return (NULL);
 	}
 	if ((dp = opendir(nextpathptr)) == NULL) {
-	    (void) xsprintf(pathname, CGETS(23, 26,
-			    "getwd: Cannot open directory \"%s\" (%s)"),
-			    nextpathptr, strerror(errno));
+	    (void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 26,
+			     "getwd: Cannot open directory \"%s\" (%s)"),
+			     nextpathptr, strerror(errno));
 	    return (NULL);
 	}
 
@@ -1258,9 +1262,9 @@ xgetwd(pathname)
 	    }
 	}
 	if (d == NULL) {
-	    (void) xsprintf(pathname, CGETS(23, 27,
-			    "getwd: Cannot find \".\" in \"..\" (%s)"),
-			    strerror(save_errno ? save_errno : ENOENT));
+	    (void) xsnprintf(pathname, MAXPATHLEN, CGETS(23, 27,
+			     "getwd: Cannot find \".\" in \"..\" (%s)"),
+			     strerror(save_errno ? save_errno : ENOENT));
 	    (void) closedir(dp);
 	    return (NULL);
 	}
@@ -1313,7 +1317,7 @@ apperr(st)
     e_sub[e_subl] = '\0';
     e_code[e_codel] = '\0';
     e_mod[e_modl] = '\0';
-    (void) xsprintf(buf, "%s (%s/%s)", e_code, e_sub, e_mod);
+    (void) xsnprintf(buf, sizeof(buf), "%s (%s/%s)", e_code, e_sub, e_mod);
 
     return(buf);
 }

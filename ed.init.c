@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.init.c,v 3.37 1994/09/04 21:54:15 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.init.c,v 3.38 1996/04/26 19:17:57 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.37 1994/09/04 21:54:15 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.38 1996/04/26 19:17:57 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -174,7 +174,8 @@ ed_Setup(rst)
     if (havesetup) 	/* if we have never been called */
 	return(0);
 
-#if defined(POSIX) && defined(_PC_VDISABLE) && !defined(BSD4_4)
+#if defined(POSIX) && defined(_PC_VDISABLE) && !defined(BSD4_4) && \
+    !defined(WINNT)
     { 
 	long pcret;
 
@@ -190,9 +191,9 @@ ed_Setup(rst)
 		    ttychars[EX_IO][rst] = vdisable;
 	    }
     }
-#else /* ! POSIX || !_PC_VDISABLE && !defined(BSD4_4) */
+#else /* ! POSIX || !_PC_VDISABLE || BSD4_4 || WINNT */
     vdisable = (unsigned char) _POSIX_VDISABLE;
-#endif /* POSIX && _PC_VDISABLE */
+#endif /* POSIX && _PC_VDISABLE && !BSD4_4 && !WINNT */
 	
     if ((imode = adrof(STRinputmode)) != NULL) {
 	if (!Strcmp(*(imode->vec), STRinsert))
@@ -206,10 +207,11 @@ ed_Setup(rst)
     Hist_num = 0;
     Expand = 0;
 
+#ifndef WINNT
     if (tty_getty(SHTTY, &extty) == -1) {
-#ifdef DEBUG_TTY
+# ifdef DEBUG_TTY
 	xprintf("ed_Setup: tty_getty: %s\n", strerror(errno));
-#endif /* DEBUG_TTY */
+# endif /* DEBUG_TTY */
 	return(-1);
     }
 
@@ -219,7 +221,7 @@ ed_Setup(rst)
     T_Tabs = tty_gettabs(&extty);
     Tty_eight_bit = tty_geteightbit(&extty);
 
-#if defined(POSIX) || defined(TERMIO)
+# if defined(POSIX) || defined(TERMIO)
     extty.d_t.c_iflag &= ~ttylist[EX_IO][M_INPUT].t_clrmask;
     extty.d_t.c_iflag |=  ttylist[EX_IO][M_INPUT].t_setmask;
 
@@ -232,11 +234,11 @@ ed_Setup(rst)
     extty.d_t.c_lflag &= ~ttylist[EX_IO][M_LINED].t_clrmask;
     extty.d_t.c_lflag |=  ttylist[EX_IO][M_LINED].t_setmask;
 
-# if defined(IRIX3_3) && SYSVREL < 4
+#  if defined(IRIX3_3) && SYSVREL < 4
     extty.d_t.c_line = NTTYDISC;
-# endif /* IRIX3_3 && SYSVREL < 4 */
+#  endif /* IRIX3_3 && SYSVREL < 4 */
 
-#else	/* GSTTY */		/* V7, Berkeley style tty */
+# else	/* GSTTY */		/* V7, Berkeley style tty */
 
     if (T_Tabs) {	/* order of &= and |= is important to XTABS */
 	extty.d_t.sg_flags &= ~(ttylist[EX_IO][M_CONTROL].t_clrmask|XTABS);
@@ -250,7 +252,7 @@ ed_Setup(rst)
     extty.d_lb &= ~ttylist[EX_IO][M_LOCAL].t_clrmask;
     extty.d_lb |=  ttylist[EX_IO][M_LOCAL].t_setmask;
 
-#endif /* GSTTY */
+# endif /* GSTTY */
     /*
      * Reset the tty chars to reasonable defaults
      * If they are disabled, then enable them.
@@ -272,9 +274,9 @@ ed_Setup(rst)
 	}
 	tty_setchar(&extty, ttychars[EX_IO]);
 	if (tty_setty(SHTTY, &extty) == -1) {
-#ifdef DEBUG_TTY
+# ifdef DEBUG_TTY
 	    xprintf("ed_Setup: tty_setty: %s\n", strerror(errno));
-#endif /* DEBUG_TTY */
+# endif /* DEBUG_TTY */
 	    return(-1);
 	}
     }
@@ -284,6 +286,12 @@ ed_Setup(rst)
 # ifdef SIG_WINDOW
     (void) sigset(SIG_WINDOW, window_change);	/* for window systems */
 # endif 
+#else /* WINNT */
+# ifdef DEBUG
+    if (rst)
+	xprintf("rst received in ed_Setup() %d\n", rst);
+# endif
+#endif /* WINNT */
     havesetup = 1;
     return(0);
 }
@@ -311,7 +319,8 @@ ed_Init()
 	GetTermCaps();		/* does the obvious, but gets term type each
 				 * time */
 
-#if defined(TERMIO) || defined(POSIX)
+#ifndef WINNT
+# if defined(TERMIO) || defined(POSIX)
     edtty.d_t.c_iflag &= ~ttylist[ED_IO][M_INPUT].t_clrmask;
     edtty.d_t.c_iflag |=  ttylist[ED_IO][M_INPUT].t_setmask;
 
@@ -325,11 +334,11 @@ ed_Init()
     edtty.d_t.c_lflag |=  ttylist[ED_IO][M_LINED].t_setmask;
 
 
-# if defined(IRIX3_3) && SYSVREL < 4
+#  if defined(IRIX3_3) && SYSVREL < 4
     edtty.d_t.c_line = NTTYDISC;
-# endif /* IRIX3_3 && SYSVREL < 4 */
+#  endif /* IRIX3_3 && SYSVREL < 4 */
 
-#else /* GSTTY */
+# else /* GSTTY */
 
     if (T_Tabs) {	/* order of &= and |= is important to XTABS */
 	edtty.d_t.sg_flags &= ~(ttylist[ED_IO][M_CONTROL].t_clrmask | XTABS);
@@ -342,9 +351,10 @@ ed_Init()
 
     edtty.d_lb &= ~ttylist[ED_IO][M_LOCAL].t_clrmask;
     edtty.d_lb |=  ttylist[ED_IO][M_LOCAL].t_setmask;
-#endif /* POSIX || TERMIO */
+# endif /* POSIX || TERMIO */
 
     tty_setchar(&edtty, ttychars[ED_IO]);
+#endif /* WINNT */
 }
 
 /* 
@@ -356,14 +366,17 @@ Rawmode()
     if (Tty_raw_mode)
 	return (0);
 
-#ifdef _IBMR2
+#ifdef WINNT
+    do_nt_raw_mode();
+#else /* !WINNT */
+# ifdef _IBMR2
     tty_setdisc(SHTTY, ED_IO);
-#endif /* _IBMR2 */
+# endif /* _IBMR2 */
 
     if (tty_getty(SHTTY, &tstty) == -1) {
-#ifdef DEBUG_TTY
+# ifdef DEBUG_TTY
 	xprintf("Rawmode: tty_getty: %s\n", strerror(errno));
-#endif /* DEBUG_TTY */
+# endif /* DEBUG_TTY */
 	return(-1);
     }
 
@@ -371,11 +384,11 @@ Rawmode()
      * We always keep up with the eight bit setting and the speed of the
      * tty. But only we only believe changes that are made to cooked mode!
      */
-#if defined(POSIX) || defined(TERMIO)
+# if defined(POSIX) || defined(TERMIO)
     Tty_eight_bit = tty_geteightbit(&tstty);
     T_Speed = tty_getspeed(&tstty);
 
-# ifdef POSIX
+#  ifdef POSIX
     /*
      * Fix from: Steven (Steve) B. Green <xrsbg@charney.gsfc.nasa.gov>
      * Speed was not being set up correctly under POSIX.
@@ -386,8 +399,8 @@ Rawmode()
 	(void) cfsetispeed(&edtty.d_t, T_Speed);
 	(void) cfsetospeed(&edtty.d_t, T_Speed);
     }
-# endif /* POSIX */
-#else /* GSTTY */
+#  endif /* POSIX */
+# else /* GSTTY */
 
     T_Speed = tty_getspeed(&tstty);
     Tty_eight_bit = tty_geteightbit(&tstty);
@@ -401,7 +414,7 @@ Rawmode()
 	extty.d_t.sg_ospeed = tstty.d_t.sg_ospeed;
 	edtty.d_t.sg_ospeed = tstty.d_t.sg_ospeed;
     }
-#endif /* POSIX || TERMIO */
+# endif /* POSIX || TERMIO */
 
     if (tty_cooked_mode(&tstty)) {
 	/*
@@ -413,7 +426,7 @@ Rawmode()
 	else 
 	    T_Tabs = CanWeTab();
 
-#if defined(POSIX) || defined(TERMIO)
+# if defined(POSIX) || defined(TERMIO)
 	extty.d_t.c_cflag  = tstty.d_t.c_cflag;
 	extty.d_t.c_cflag &= ~ttylist[EX_IO][M_CONTROL].t_clrmask;
 	extty.d_t.c_cflag |=  ttylist[EX_IO][M_CONTROL].t_setmask;
@@ -446,7 +459,7 @@ Rawmode()
 	edtty.d_t.c_oflag &= ~ttylist[ED_IO][M_OUTPUT].t_clrmask;
 	edtty.d_t.c_oflag |=  ttylist[ED_IO][M_OUTPUT].t_setmask;
 
-#else /* GSTTY */
+# else /* GSTTY */
 
 	extty.d_t.sg_flags = tstty.d_t.sg_flags;
 
@@ -522,11 +535,12 @@ Rawmode()
 	}
     }
     if (tty_setty(SHTTY, &edtty) == -1) {
-#ifdef DEBUG_TTY
+# ifdef DEBUG_TTY
 	xprintf("Rawmode: tty_setty: %s\n", strerror(errno));
-#endif /* DEBUG_TTY */
+# endif /* DEBUG_TTY */
 	return(-1);
     }
+#endif /* WINNT */
     Tty_raw_mode = 1;
     flush();			/* flush any buffered output */
     return (0);
@@ -535,20 +549,23 @@ Rawmode()
 int
 Cookedmode()
 {				/* set tty in normal setup */
+#ifdef WINNT
+    do_nt_cooked_mode();
+#else
     sigret_t(*orig_intr) ();
 
-#ifdef _IBMR2
+# ifdef _IBMR2
     tty_setdisc(SHTTY, EX_IO);
-#endif /* _IBMR2 */
+# endif /* _IBMR2 */
 
     if (!Tty_raw_mode)
 	return (0);
 
     /* hold this for reseting tty */
-#ifdef BSDSIGS
+# ifdef BSDSIGS
     orig_intr = (sigret_t (*)()) signal(SIGINT, SIG_IGN);
-#else
-# ifdef SIG_HOLD
+# else
+#  ifdef SIG_HOLD
     /*
      * sigset doesn't return the previous handler if the signal is held,
      * it will return SIG_HOLD instead. So instead of restoring the
@@ -566,25 +583,27 @@ Cookedmode()
     orig_intr = (sigret_t (*)()) sigset(SIGINT, SIG_HOLD);
     if (orig_intr != SIG_HOLD)
 	(void) sigset(SIGINT, SIG_IGN); /* returns SIG_HOLD */
-# else /* !SIG_HOLD */
+#  else /* !SIG_HOLD */
     /*
      * No SIG_HOLD; probably no reliable signals as well.
      */
     orig_intr = (sigret_t (*)()) sigset(SIGINT, SIG_IGN);
-# endif /* SIG_HOLD */
-#endif /* BSDSIGS */
+#  endif /* SIG_HOLD */
+# endif /* BSDSIGS */
     if (tty_setty(SHTTY, &extty) == -1) {
-#ifdef DEBUG_TTY
+# ifdef DEBUG_TTY
 	xprintf("Cookedmode: tty_setty: %s\n", strerror(errno));
-#endif /* DEBUG_TTY */
+# endif /* DEBUG_TTY */
 	return -1;
     }
-    Tty_raw_mode = 0;
-#ifdef BSDSIGS
+# ifdef BSDSIGS
     (void) signal(SIGINT, orig_intr);	/* take these again */
-#else
+# else
     (void) sigset(SIGINT, orig_intr);	/* take these again */
-#endif /* BSDSIGS */
+# endif /* BSDSIGS */
+#endif /* WINNT */
+
+    Tty_raw_mode = 0;
     return (0);
 }
 
@@ -667,6 +686,7 @@ QuoteModeOn()
     if (MacroLvl >= 0)
 	return;
 
+#ifndef WINNT
     qutty = edtty;
 
 #if defined(TERMIO) || defined(POSIX)
@@ -694,6 +714,7 @@ QuoteModeOn()
 #endif /* DEBUG_TTY */
 	return;
     }
+#endif /* !WINNT */
     Tty_quote_mode = 1;
     return;
 }

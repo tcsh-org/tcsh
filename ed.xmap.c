@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.xmap.c,v 3.17 1996/04/26 19:18:24 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.xmap.c,v 3.18 1997/10/02 16:36:26 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.17 1996/04/26 19:18:24 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.18 1997/10/02 16:36:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -786,7 +786,11 @@ unparsestring(str, buf, sep)
 
     b = buf;
     if (sep[0])
+#ifndef WINNT
 	*b++ = sep[0];
+#else /* WINNT */
+	*b++ = CHAR & sep[0];
+#endif /* !WINNT */
 
     for (l = 0; l < str->len; l++) {
 	p = str->buf[l];
@@ -828,7 +832,11 @@ unparsestring(str, buf, sep)
 	}
     }
     if (sep[0] && sep[1])
+#ifndef WINNT
 	*b++ = sep[1];
+#else /* WINNT */
+	*b++ = CHAR & sep[1];
+#endif /* !WINNT */
     *b++ = 0;
     return buf;			/* should check for overflow */
 }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.decls.h,v 3.23 1995/03/19 22:33:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.decls.h,v 3.24 1996/04/26 19:17:42 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -99,7 +99,7 @@ extern	void	DefaultArrowKeys	__P((void));
 extern	int 	ClearArrowKeys		__P((CStr *));
 extern	void 	PrintArrowKeys		__P((CStr *));
 extern	void	BindArrowKeys		__P((void));
-extern	void	Beep			__P((void));
+extern	void	SoundBeep		__P((void));
 extern	int	CanWeTab		__P((void));
 extern	void	ChangeSize		__P((int, int));
 #ifdef SIG_WINDOW

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.term.c,v 1.18 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.term.c,v 1.19 1996/04/26 19:18:16 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -34,9 +34,10 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+#ifndef WINNT
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.18 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.19 1996/04/26 19:18:16 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -1115,3 +1116,12 @@ tty_printchar(s)
     xputchar('\n');
 }
 #endif /* DEBUG_TTY */
+#else /* WINNT */
+int
+tty_cooked_mode(td)
+    void *td;
+{
+    extern int do_nt_check_cooked_mode(void);
+    return do_nt_check_cooked_mode()
+}
+#endif /* !WINNT */

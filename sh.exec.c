@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.36 1996/06/22 21:44:32 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.37 1996/10/05 17:39:08 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.36 1996/06/22 21:44:32 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.37 1996/10/05 17:39:08 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -271,7 +271,7 @@ doexec(t)
 	 * one at a time, as the user enters them.  This is kinda like Korn
 	 * Shell's "tracked aliases".
 	 */
-	if (!slash && pv[0][0] == '/' && havhash) {
+	if (!slash && ABSOLUTEP(pv[0]) && havhash) {
 #ifdef FASTHASH
 	    if (!bit(hashval, i))
 		goto cont;
@@ -428,6 +428,13 @@ texec(sf, st)
     switch (errno) {
 
     case ENOEXEC:
+#ifdef WINNT
+	{
+		extern int nt_feed_to_cmd(char *,char**);
+		int rc;
+		rc = nt_feed_to_cmd(f,t);
+	}
+#endif /* WINNT */
 	/*
 	 * From: casper@fwi.uva.nl (Casper H.S. Dik) If we could not execute
 	 * it, don't feed it to the shell if it looks like a binary!
@@ -558,7 +565,8 @@ execash(t, kp)
 #ifndef CLOSE_ON_EXEC
     int	    odidcch;
 #endif /* CLOSE_ON_EXEC */
-    sigret_t (*osigint)(), (*osigquit)(), (*osigterm)();
+    sigret_t (*osigint) __P((int)), (*osigquit) __P((int)), 
+	(*osigterm) __P((int));
 
     USE(t);
     if (chkstop == 0 && setintr)
@@ -611,6 +619,9 @@ execash(t, kp)
 	 * Decrement the shell level
 	 */
 	shlvl(-1);
+#ifdef WINNT
+	__nt_really_exec=1;
+#endif /* WINNT */
 	doexec(kp);
     }
 
@@ -664,6 +675,9 @@ dohash(vv, c)
     struct varent *v = adrof(STRpath);
     Char  **pv;
     int hashval;
+#ifdef WINNT
+    int is_windir; /* check if it is the windows directory */
+#endif /* WINNT */
 
     USE(c);
 #ifdef FASTHASH
@@ -713,7 +727,7 @@ dohash(vv, c)
     if (v == NULL)
 	return;
     for (pv = v->vec; *pv; pv++, i++) {
-	if (pv[0][0] != '/')
+	if (!ABSOLUTEP(pv[0]))
 	    continue;
 	dirp = opendir(short2str(*pv));
 	if (dirp == NULL)
@@ -725,6 +739,9 @@ dohash(vv, c)
 	    continue;
 	}
 #endif
+#ifdef WINNT
+	is_windir = nt_check_if_windir(short2str(*pv));
+#endif /* WINNT */
 	while ((dp = readdir(dirp)) != NULL) {
 	    if (dp->d_ino == 0)
 		continue;
@@ -732,17 +749,21 @@ dohash(vv, c)
 		(dp->d_name[1] == '\0' ||
 		 (dp->d_name[1] == '.' && dp->d_name[2] == '\0')))
 		continue;
-#ifdef FASTHASH
+#ifdef WINNT
+	    nt_check_name_and_hash(is_windir, dp->d_name, i);
+#else /* !WINNT */
+# ifdef FASTHASH
 	    hashval = hashname(str2short(dp->d_name));
 	    bis(hashval, i);
 	    if (hashdebug & 1)
 	        xprintf(CGETS(13, 1, "hash=%-4d dir=%-2d prog=%s\n"),
 		        hashname(str2short(dp->d_name)), i, dp->d_name);
-#else /* OLD HASH */
+# else /* OLD HASH */
 	    hashval = hash(hashname(str2short(dp->d_name)), i);
 	    bis(xhash, hashval);
-#endif /* FASTHASH */
+# endif /* FASTHASH */
 	    /* tw_add_comm_name (dp->d_name); */
+#endif /* WINNT */
 	}
 	(void) closedir(dirp);
     }
@@ -875,10 +896,31 @@ executable(dir, name, dir_ok)
     struct stat stbuf;
     Char    path[MAXPATHLEN + 1];
     char   *strname;
+#ifdef WINNT
+    int	    nt_exetype;
+#endif /* WINNT */
+    (void) memset(path, 0, sizeof(path));
 
     if (dir && *dir) {
 	copyn(path, dir, MAXPATHLEN);
 	catn(path, name, MAXPATHLEN);
+#ifdef WINNT
+	{
+	    char *ptr = short2str(path);
+	    char *p2;
+	    int has_ext = 0;
+	    p2 = ptr;
+	    while (*ptr) { 
+		if (*ptr == '.') {
+		    has_ext = 1;
+		    break;
+		}
+		ptr++;
+	    }
+	    if (!has_ext && (stat(p2, &stbuf) == -1))
+		catn(path, str2short(".EXE"), MAXPATHLEN);
+	}
+#endif /* WINNT */
 	strname = short2str(path);
     }
     else
@@ -888,8 +930,14 @@ executable(dir, name, dir_ok)
 	    ((dir_ok && S_ISDIR(stbuf.st_mode)) ||
 	     (S_ISREG(stbuf.st_mode) &&
     /* save time by not calling access() in the hopeless case */
+#ifdef WINNT
+	      (GetBinaryType(strname,&nt_exetype) ||
+	      (stbuf.st_mode & (S_IXOTH | S_IXGRP | S_IXUSR)))
+#else /* !WINNT */
 	      (stbuf.st_mode & (S_IXOTH | S_IXGRP | S_IXUSR)) &&
-	      access(strname, X_OK) == 0)));
+	      access(strname, X_OK) == 0
+#endif /* WINNT */
+	)));
 }
 
 int
@@ -1107,3 +1155,52 @@ find_cmd(cmd, prt)
     xfree((ptr_t) sv);
     return rval;
 }
+
+#ifdef WINNT
+int
+nt_check_if_windir(path)
+    char *path;
+{
+    char windir[MAX_PATH];
+
+    (void)GetWindowsDirectory(windir, sizeof(windir));
+    windir[2] = '/';
+
+    return (strstr(path, windir) != NULL);
+}
+
+void
+nt_check_name_and_hash(is_windir, file, i)
+    int is_windir;
+    char *file;
+    int i;
+{
+    char name_only[MAX_PATH];
+    char *tmp = (char *)strrchr(file, '.');
+    char uptmp[5], *nameptr, *np2;
+    int icount, hashval;
+
+    if(!tmp || tmp[4]) 
+	goto nodot;
+
+    for (icount = 0; icount < 4; icount++)
+	uptmp[icount] = toupper(tmp[icount]);
+    uptmp[4]=0;
+
+    if (is_windir)
+	if((uptmp[1] != 'E') || (uptmp[2] != 'X') || (uptmp[3] != 'E'))
+	    return;
+    (void) memset(name_only, 0, MAX_PATH);
+    nameptr = file;
+    np2 = name_only;
+    while(nameptr != tmp) {
+	*np2++= tolower(*nameptr);
+	nameptr++;
+    }
+    hashval = hashname(str2short(name_only));
+    bis(hashval, i);
+nodot:
+    hashval = hashname(str2short(file));
+    bis(hashval, i);
+}
+#endif /* WINNT */

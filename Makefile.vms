@@ -1,4 +1,4 @@
-# $Id: Makefile.vms,v 1.28 1996/06/22 21:44:16 christos Exp $
+# $Id: Makefile.vms,v 1.29 1996/10/11 17:32:03 christos Exp $
 #	Makefile.vms	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -294,7 +294,7 @@ TCOBJS=	tc.alloc.${SUF} tc.bind.${SUF} tc.const.${SUF} tc.defs.${SUF} \
 	tc.prompt.${SUF} tc.sched.${SUF} tc.sig.${SUF} tc.str.${SUF} \
 	tc.vers.${SUF} tc.who.${SUF} 
 
-PVSRCS= Makefile.std Makefile.vms Makefile.in
+PVSRCS= Makefile.std Makefile.vms Makefile.in Makefile.win32
 AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \

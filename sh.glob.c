@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.glob.c,v 3.37 1995/01/20 23:58:22 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.glob.c,v 3.38 1996/04/26 19:19:30 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.37 1995/01/20 23:58:22 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.38 1996/04/26 19:19:30 christos Exp $")
 
 #include "tc.h"
 
@@ -866,6 +866,10 @@ backeval(cp, literal)
 	    c = (*ip++ & TRIM);
 	    if (c == 0)
 		break;
+#ifdef NEW_CRLF
+	    if (c == '\r')
+	    	c = ' ';
+#endif /* NEW_CRLF */
 	    if (c == '\n') {
 		/*
 		 * Continue around the loop one more time, so that we can eat

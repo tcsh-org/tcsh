@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.decls.h,v 3.29 1996/04/26 19:18:57 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.decls.h,v 3.30 1997/02/23 19:03:19 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -190,7 +190,7 @@ extern	void		  nlsinit	__P((void));
 extern	void	 	  dohist	__P((Char **, struct command *));
 extern  struct Hist 	 *enthist	__P((int, struct wordent *, bool, bool));
 extern	void	 	  savehist	__P((struct wordent *, bool));
-extern	void		  fmthist	__P((int, ptr_t, char *));
+extern	void		  fmthist	__P((int, ptr_t, char *, size_t));
 extern	void		  rechist	__P((Char *, int));
 extern	void		  loadhist	__P((Char *, bool));
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.25 1996/04/26 19:20:38 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.26 1997/10/02 16:36:30 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.25 1996/04/26 19:20:38 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.26 1997/10/02 16:36:30 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -79,7 +79,7 @@ dobindkey(v, c)
     CStr    out;
     Char    inbuf[200];
     Char    outbuf[200];
-    unsigned char ch;
+    unsigned short ch;
     in.buf = inbuf;
     out.buf = outbuf;
     in.len = 0;
@@ -162,7 +162,12 @@ dobindkey(v, c)
 	}
     }
 
+#ifndef WINNT
+    /* XXX: Fixme to work with more than 1 byte chars */
     ch = (unsigned char) in.buf[0];
+#else /* WINNT */
+    ch = in.buf[0];
+#endif /* !WINNT */
 
     if (remove) {
 	if (key) {
@@ -301,6 +306,9 @@ parsebind(s, str)
     case 'M':
     case 'X':
     case 'C':
+#ifdef WINNT
+    case 'N':
+#endif WINNT
 	if (s[1] != '-' || s[2] == '\0') {
 	    bad_spec(s);
 	    return NULL;
@@ -341,6 +349,54 @@ parsebind(s, str)
 #endif /*_OSD_POSIX*/
 	    *b = '\0';
 	    break;
+#ifdef WINNT
+	case 'N' : case 'n':	/* NT */
+		{
+			extern int lstricmp(char*,char*);
+			char *str = short2str(s);
+			short fkey;
+			fkey = atoi(str);
+			if (fkey !=0) {
+				*b++ = 255+fkey;
+				*b = '\0';
+			}
+			else {
+				if (!lstrcmpi("pgup",str)) {
+					*b++ = 255+24+1;
+				}
+				else if (!lstrcmpi("pgdn",str)) {
+					*b++ = 255+24+2;
+				}
+				else if (!lstrcmpi("end",str)) {
+					*b++ = 255+24+3;
+				}
+				else if (!lstrcmpi("home",str)) {
+					*b++ = 255+24+4;
+				}
+				else if (!lstrcmpi("left",str)) {
+					*b++ = 255+24+5;
+				}
+				else if (!lstrcmpi("up",str)) {
+					*b++ = 255+24+6;
+				}
+				else if (!lstrcmpi("right",str)) {
+					*b++ = 255+24+7;
+				}
+				else if (!lstrcmpi("down",str)) {
+					*b++ = 255+24+8;
+				}
+				else if (!lstrcmpi("ins",str)) {
+					*b++ = 255+24+9;
+				}
+				else if (!lstrcmpi("del",str)) {
+					*b++ = 255+24+10;
+				}
+				else
+					bad_spec(s);
+			}
+		}
+	    break;
+#endif /* WINNT */
 
 	default:
 	    abort();
@@ -621,14 +677,12 @@ unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
 	    return (tmp);
 	}
 	else if (Isupper(_toebcdic[_toascii[c]|0100])
-		|| strchr("@[\\]^_", _toebcdic[_toascii[c]|0100]) != NULL)
-	{
+		|| strchr("@[\\]^_", _toebcdic[_toascii[c]|0100]) != NULL) {
 	    *cp++ = '^';
 	    *cp++ = _toebcdic[_toascii[c]|0100]
 	}
-	else
-	{
-	    sprintf(cp,"\\%3.3o", c);
+	else {
+	    xsnprintf(cp, 3, "\\%3.3o", c);
 	    cp += 4;
 	}
 #endif /*_OSD_POSIX*/
