@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.42 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.43 1993/09/24 16:48:57 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.42 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.43 1993/09/24 16:48:57 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1629,7 +1629,7 @@ fixio(fd, e)
 
 	e &= ~(O_NDELAY|O_NONBLOCK|FNBIO|FNONBIO|FNDELAY);
 
-	if (fcntl(fd, F_SETFL, e &) == -1)
+	if (fcntl(fd, F_SETFL, e) == -1)
 	    return -1;
 	else 
 	    e = 1;

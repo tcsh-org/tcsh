@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.const.c,v 3.20 1993/06/11 20:53:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.const.c,v 3.21 1993/08/11 16:25:52 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.20 1993/06/11 20:53:15 christos Exp christos $")
+RCSID("$Id: tc.const.c,v 3.21 1993/08/11 16:25:52 christos Exp $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -101,8 +101,7 @@ Char STRsavehist[]      = { 's', 'a', 'v', 'e', 'h', 'i', 's', 't', '\0' };
 Char STRnormal[]        = { 'n', 'o', 'r', 'm', 'a', 'l', '\0' };
 Char STRsldtlogout[]    = { '/', '.', 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRjobs[]          = { 'j', 'o', 'b', 's', '\0' };
-Char STRsymhash[]       = { '#', ' ', '\0' };
-Char STRsymarrow[]      = { '>', ' ', '\0' };
+Char STRdefprompt[]     = { '%', '#', ' ', '\0' };
 Char STRmquestion[]     = { '%', 'R', '?' | QUOTE, ' ', '\0' };
 Char STRKCORRECT[]      = { 'C', 'O', 'R', 'R', 'E', 'C', 'T', '>', '%', 'R', 
 			    ' ', '(', 'y', '|', 'n', '|', 'e', '|', 'a', ')', 

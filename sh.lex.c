@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.lex.c,v 3.34 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.lex.c,v 3.35 1993/08/11 16:25:52 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.34 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: sh.lex.c,v 3.35 1993/08/11 16:25:52 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -841,6 +841,8 @@ getsub(en)
 	case 'r':
 	case 't':
 	case 'e':
+	case 'u':
+	case 'l':
 	    break;
 
 	case '&':

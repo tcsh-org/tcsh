@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.34 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.35 1993/08/11 16:25:52 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.34 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.35 1993/08/11 16:25:52 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -555,11 +555,38 @@ excl_sw:
      */
     if (q[1] == ':') {
 	*bend = '\0';
-	omodbuf = buf;
-	while (q[1] == ':' && (modbuf = domod(omodbuf, (int) q[2])) != NULL) {
-	    if (omodbuf != buf)
-		xfree((ptr_t) omodbuf);
-	    omodbuf = modbuf;
+	modbuf = omodbuf = buf;
+	while (q[1] == ':' && modbuf != NULL) {
+	    switch (q[2]) {
+	    case 'r':
+	    case 'e':
+	    case 'h':
+	    case 't':
+	    case 'q':
+	    case 'x':
+	    case 'u':
+	    case 'l':
+		if ((modbuf = domod(omodbuf, (int) q[2])) != NULL) {
+		    if (omodbuf != buf)
+			xfree((ptr_t) omodbuf);
+		    omodbuf = modbuf;
+		}
+		break;
+
+	    case 'a':
+	    case 'g':
+		/* Not implemented; this needs to be done before expanding
+		 * lex. We don't have the words available to us anymore.
+		 */
+		break;
+
+	    case 'p':
+		/* Ok */
+		break;
+
+	    default:
+		break;
+	    }
 	    q += 2;
 	}
 	if (omodbuf != buf) {

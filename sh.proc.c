@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.50 1993/07/07 20:53:55 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.51 1993/08/11 16:25:52 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.50 1993/07/07 20:53:55 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.51 1993/08/11 16:25:52 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -383,9 +383,9 @@ found:
 	    pclrcurr(fp);
 	if (jobflags & PFOREGND) {
 	    if (!(jobflags & (PSIGNALED | PSTOPPED | PPTIME) ||
-#ifdef IIASA
+#ifdef notdef
 		jobflags & PAEXITED ||
-#endif /* IIASA */
+#endif /* notdef */
 		!eq(dcwd->di_name, fp->p_cwd->di_name))) {
 	    /* PWP: print a newline after ^C */
 		if (jobflags & PINTERRUPTED) {

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.bind.c,v 3.14 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.bind.c,v 3.15 1993/07/03 23:47:53 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.14 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: tc.bind.c,v 3.15 1993/07/03 23:47:53 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -443,8 +443,10 @@ dobindkey(v, c)
     case XK_EXE:
 	if ((out = parsestring(v[no], outbuf)) == NULL)
 	    return;
-	if (key)
-	    (void) SetArrowKeys(in, XmapStr(out), ntype);
+	if (key) {
+	    if (SetArrowKeys(in, XmapStr(out), ntype) == -1)
+		xprintf("Bad key name: %S\n", in);
+	}
 	else
 	    AddXkey(in, XmapStr(out), ntype);
 	map[(unsigned char) *in] = F_XKEY;

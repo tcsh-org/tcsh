@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dol.c,v 3.23 1993/06/11 20:20:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dol.c,v 3.24 1993/06/25 21:17:12 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.23 1993/06/11 20:20:15 christos Exp christos $")
+RCSID("$Id: sh.dol.c,v 3.24 1993/06/25 21:17:12 christos Exp $")
 
 /*
  * C shell
@@ -547,14 +547,25 @@ Dgetdol()
 		}
 		if (ffile == 0)
 		    stderror(ERR_DOLZERO);
-		fixDolMod();
-		setDolp(ffile);
+		if (length) {
+		    Char *cp;
+		    length = Strlen(ffile);
+		    cp = putn(length);
+		    addla(cp);
+		    xfree((ptr_t) cp);
+		}
+		else {
+		    fixDolMod();
+		    setDolp(ffile);
+		}
 		goto eatbrac;
 	    }
+#if 0
 	    if (bitset)
 		stderror(ERR_NOTALLOWED, "$?<num>");
 	    if (length)
 		stderror(ERR_NOTALLOWED, "$%<num>");
+#endif
 	    vp = adrof(STRargv);
 	    if (vp == 0) {
 		vp = &nulargv;
@@ -684,6 +695,7 @@ Dgetdol()
 	Char   *cp;
 	for (i = lwb - 1, length = 0; i < upb; i++)
 	    length += Strlen(vp->vec[i]);
+	length += i - 1;	/* Add the number of spaces in */
 	cp = putn(length);
 	addla(cp);
 	xfree((ptr_t) cp);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.53 1993/07/03 23:47:53 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.54 1993/08/11 16:25:52 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.53 1993/07/03 23:47:53 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.54 1993/08/11 16:25:52 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -849,8 +849,7 @@ main(argc, argv)
      * Set up the prompt.
      */
     if (prompt) {
-	set(STRprompt, Strsave(uid == 0 ? STRsymhash : STRsymarrow),
-	    VAR_READWRITE);
+	set(STRprompt, Strsave(STRdefprompt), VAR_READWRITE);
 	/* that's a meta-questionmark */
 	set(STRprompt2, Strsave(STRmquestion), VAR_READWRITE);
 	set(STRprompt3, Strsave(STRKCORRECT), VAR_READWRITE);
@@ -1140,8 +1139,10 @@ main(argc, argv)
 	    xprintf("exit\n");
 	}
     }
-    recdirs(NULL);
-    rechist(NULL);
+    if (!fast) {
+	recdirs(NULL);
+	rechist(NULL);
+    }
     exitstat();
     return (0);
 }
@@ -1432,8 +1433,10 @@ goodbye(v, c)
     struct command *c;
 {
     USE(c);
-    rechist(NULL);
-    recdirs(NULL);
+    if (!fast) {
+	rechist(NULL);
+	recdirs(NULL);
+    }
 
     if (loginsh) {
 	(void) signal(SIGQUIT, SIG_IGN);
@@ -1481,8 +1484,10 @@ int snum;
     if (snum)
 	(void) sigset(snum, SIG_IGN);
 #endif /* UNRELSIGS */
-    rechist(NULL);
-    recdirs(NULL);
+    if (!fast) {
+	rechist(NULL);
+	recdirs(NULL);
+    }
 
 #ifdef POSIXJOBS 
     /*

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.init.c,v 3.15 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.init.c,v 3.16 1993/07/03 23:47:53 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.15 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: tw.init.c,v 3.16 1993/07/03 23:47:53 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -671,7 +671,7 @@ tw_logname_next(dir, flags)
 
 
 /* tw_logname_end():
- *	Close the passwd file to finish th logname list
+ *	Close the passwd file to finish the logname list
  */
 void
 tw_logname_end()
@@ -684,6 +684,73 @@ tw_logname_end()
 #endif /* atp vmsposix */
 } /* end tw_logname_end */
 
+
+/* tw_grpname_start():
+ *	Initialize grpnames to the beginning of the list
+ */
+/*ARGSUSED*/
+void 
+tw_grpname_start(dfd, pat)
+    DIR *dfd;
+    Char *pat;
+{
+    USE(pat);
+    SETDIR(dfd)
+#ifndef _VMS_POSIX
+    (void) setgrent();	/* Open group file */
+#endif /* atp vmsposix */
+} /* end tw_grpname_start */
+
+
+/* tw_grpname_next():
+ *	Return the next entry from the group file
+ */
+/*ARGSUSED*/
+Char *
+tw_grpname_next(dir, flags)
+    Char *dir;
+    int  *flags;
+{
+    static Char retname[MAXPATHLEN];
+    struct group *gr;
+    /*
+     * We don't want to get interrupted inside getgrent()
+     * because the yellow pages code is not interruptible,
+     * and if we call endgrent() immediatetely after
+     * (in pintr()) we may be freeing an invalid pointer
+     */
+    USE(flags);
+    USE(dir);
+    TW_HOLD();
+#ifndef _VMS_POSIX
+    gr = (struct group *) getgrent();
+#endif /* atp vmsposix */
+    TW_RELS();
+
+    if (pw == NULL) {
+#ifdef YPBUGS
+	fix_yp_bugs();
+#endif
+	return (NULL);
+    }
+    (void) Strcpy(retname, str2short(gr->gr_name));
+    return (retname);
+} /* end tw_grpname_next */
+
+
+/* tw_grpname_end():
+ *	Close the group file to finish the groupname list
+ */
+void
+tw_grpname_end()
+{
+#ifdef YPBUGS
+    fix_yp_bugs();
+#endif
+#ifndef _VMS_POSIX
+   (void) endgrent();
+#endif /* atp vmsposix */
+} /* end tw_grpname_end */
 
 /* tw_file_start():
  *	Initialize the directory for the file list

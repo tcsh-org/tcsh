@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dir.c,v 3.30 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dir.c,v 3.31 1993/08/11 16:25:52 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.30 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.31 1993/08/11 16:25:52 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -1280,14 +1280,10 @@ recdirs(fname)
 {
     int     fp, ftmp, oldidfds;
     int     cdflag = 0;
-    extern int fast;
     extern struct directory *dcwd;
     struct directory *dp;
 
     if (fname == NULL) {
-	if (fast || !adrof(STRsavedirs))
-	    return;
-
 	if ((fname = value(STRdirsfile)) == STRNULL)
 	    fname = Strspl(value(STRhome), &STRtildotdirs[1]);
 	else

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.comp.c,v 1.23 1993/05/17 00:11:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.comp.c,v 1.24 1993/07/03 23:47:53 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.23 1993/05/17 00:11:09 christos Exp christos $")
+RCSID("$Id: tw.comp.c,v 1.24 1993/07/03 23:47:53 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -307,6 +307,9 @@ tw_result(act, pat)
 	break;
     case 'f':
 	looking = TW_FILE;
+	break;
+    case 'g':
+	looking = TW_GRPNAME;
 	break;
     case 'j':
 	looking = TW_JOB;

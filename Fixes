@@ -1,4 +1,14 @@
 V6.05.00, ...
+ 20. 6.04.02, 10/08/93
+ 19. changed default prompt to %#
+ 18. New group 'g' completion.
+ 17. removed IIASA defs.
+ 16. fix for history -SL and dirs -SL to work when savedirs and savehist are
+     not set.
+ 15. fix magic-space to understand :p
+ 14. make :u,:l work for history.
+ 13. Fixes for non-blocking i/o recovery. trap all non blocking styles under
+     sunos.
  12. 6.04.01, 08/10/93
  11. Vi mode word moves [they work like vi and don't obey wordchars anymore].
  10. New file operators and stat builtin

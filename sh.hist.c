@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.hist.c,v 3.9 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.hist.c,v 3.10 1993/07/03 23:47:53 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.9 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: sh.hist.c,v 3.10 1993/07/03 23:47:53 christos Exp $")
 
 #include "tc.h"
 
@@ -341,62 +341,59 @@ rechist(fname)
 {
     Char    buf[BUFSIZE], hbuf[BUFSIZE];
     int     fp, ftmp, oldidfds;
-    extern  int fast;
     struct  varent *shist;
     static Char   *dumphist[] = {STRhistory, STRmh, 0, 0};
 
-    if (!fast) {
-	/*
-	 * If $savehist is just set, we use the value of $history
-	 * else we use the value in $savehist
-	 */
-	if ((shist = adrof(STRsavehist)) != NULL) {
-	    if (shist->vec[0][0] != '\0')
-		(void) Strcpy(hbuf, shist->vec[0]);
-	    else if ((shist = adrof(STRhistory)) != 0 && 
-		     shist->vec[0][0] != '\0')
-		(void) Strcpy(hbuf, shist->vec[0]);
-	    else
-		return;
-	}
+    /*
+     * If $savehist is just set, we use the value of $history
+     * else we use the value in $savehist
+     */
+    if ((shist = adrof(STRsavehist)) != NULL) {
+	if (shist->vec[0][0] != '\0')
+	    (void) Strcpy(hbuf, shist->vec[0]);
+	else if ((shist = adrof(STRhistory)) != 0 && 
+		 shist->vec[0][0] != '\0')
+	    (void) Strcpy(hbuf, shist->vec[0]);
 	else
 	    return;
-
-	if (fname == NULL) 
-	    if ((fname = value(STRhistfile)) == STRNULL) {
-		fname = Strcpy(buf, value(STRhome));
-		(void) Strcat(buf, &STRtildothist[1]);
-	    }
-
-	/*
-	 * The 'savehist merge' feature is intended for an environment
-	 * with numerous shells beeing in simultaneous use. Imagine
-	 * any kind of window system. All these shells 'share' the same 
-	 * ~/.history file for recording their command line history. 
-	 * Currently the automatic merge can only succeed when the shells
-	 * nicely quit one after another. 
-	 *
-	 * Users that like to nuke their environment require here an atomic
-	 * 	loadhist-creat-dohist(dumphist)-close
-	 * sequence.
-	 *
-	 * jw.
-	 */ 
-	if (shist->vec[1] && eq(shist->vec[1], STRmerge))
-	  loadhist(fname, 1);
-	fp = creat(short2str(fname), 0600);
-	if (fp == -1) 
-	    return;
-	oldidfds = didfds;
-	didfds = 0;
-	ftmp = SHOUT;
-	SHOUT = fp;
-	dumphist[2] = hbuf;
-	dohist(dumphist, NULL);
-	(void) close(fp);
-	SHOUT = ftmp;
-	didfds = oldidfds;
     }
+    else
+	return;
+
+    if (fname == NULL) 
+	if ((fname = value(STRhistfile)) == STRNULL) {
+	    fname = Strcpy(buf, value(STRhome));
+	    (void) Strcat(buf, &STRtildothist[1]);
+	}
+
+    /*
+     * The 'savehist merge' feature is intended for an environment
+     * with numerous shells beeing in simultaneous use. Imagine
+     * any kind of window system. All these shells 'share' the same 
+     * ~/.history file for recording their command line history. 
+     * Currently the automatic merge can only succeed when the shells
+     * nicely quit one after another. 
+     *
+     * Users that like to nuke their environment require here an atomic
+     * 	loadhist-creat-dohist(dumphist)-close
+     * sequence.
+     *
+     * jw.
+     */ 
+    if (shist->vec[1] && eq(shist->vec[1], STRmerge))
+      loadhist(fname, 1);
+    fp = creat(short2str(fname), 0600);
+    if (fp == -1) 
+	return;
+    oldidfds = didfds;
+    didfds = 0;
+    ftmp = SHOUT;
+    SHOUT = fp;
+    dumphist[2] = hbuf;
+    dohist(dumphist, NULL);
+    (void) close(fp);
+    SHOUT = ftmp;
+    didfds = oldidfds;
 }
 
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.55 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.56 1993/08/11 16:25:52 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -343,11 +343,13 @@ extern int setpgrp();
 #  define __P(a) a
 # else
 #  define __P(a) ()
-#  define const
-#  ifndef apollo
-#   define volatile	/* Apollo 'c' extensions need this */
-#  endif /* apollo */
-# endif 
+#  if !__STDC__
+#   define const
+#   ifndef apollo
+#    define volatile	/* Apollo 'c' extensions need this */
+#   endif /* apollo */
+#  endif 
+# endif
 #endif 
 
 
