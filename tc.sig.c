@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.sig.c,v 3.16 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.sig.c,v 3.17 1993/08/11 16:25:52 christos Exp christos $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.16 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: tc.sig.c,v 3.17 1993/08/11 16:25:52 christos Exp christos $")
 
 #include "tc.wait.h"
 
@@ -161,7 +161,7 @@ ourwait(w)
     pid_t pid;
 
 #  ifdef JOBDEBUG
-    xprintf("our wait %d\n", stk_ptr);
+    xprintf(catgets(catd, 1, 1176, "our wait %d\n", stk_ptr));
     flush();
 #  endif /* JOBDEBUG */
 
@@ -378,7 +378,7 @@ sigret_t (*bsd_signal(sig, func))()
         sigret_t (*r_func)();
 
         if (sig < 0 || sig > MAXSIG) {
-                xprintf("error: bsd_signal(%d) signal out of range\n", sig);
+                xprintf(catgets(catd, 1, 1177, "error: bsd_signal(%d) signal out of range\n"), sig);
                 return((sigret_t(*)()) SIG_IGN);
         }
 
@@ -389,7 +389,7 @@ sigret_t (*bsd_signal(sig, func))()
         act.sa_flags = 0;                       /* no special actions */
 
         if (sigaction(sig, &act, &oact)) {
-                xprintf("error: bsd_signal(%d) - sigaction failed, errno %d\n",
+                xprintf(catgets(catd, 1, 1178, "error: bsd_signal(%d) - sigaction failed, errno %d\n"),
                     sig, errno);
                 return((sigret_t(*)()) SIG_IGN);
         }

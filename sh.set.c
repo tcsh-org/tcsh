@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.set.c,v 3.25 1994/04/12 15:46:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.set.c,v 3.26 1994/07/08 14:43:50 christos Exp christos $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.25 1994/04/12 15:46:46 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.26 1994/07/08 14:43:50 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -80,6 +80,9 @@ update_vars(vp)
     else if (eq(vp, STRuser)) {
 	tsetenv(STRKUSER, varval(vp));
 	tsetenv(STRLOGNAME, varval(vp));
+    }
+    else if (eq(vp, STRgroup)) {
+	tsetenv(STRKGROUP, varval(vp));
     }
     else if (eq(vp, STRwordchars)) {
 	word_chars = varval(vp);
@@ -750,7 +753,8 @@ exportpath(val)
     if (val)
 	while (*val) {
 	    if (Strlen(*val) + Strlen(exppath) + 2 > BUFSIZE) {
-		xprintf("Warning: ridiculously long PATH truncated\n");
+		xprintf(catgets(catd, 1, 1076,
+				"Warning: ridiculously long PATH truncated\n"));
 		break;
 	    }
 	    (void) Strcat(exppath, *val++);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.lex.c,v 3.39 1994/05/26 13:11:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.lex.c,v 3.40 1994/06/06 05:04:54 christos Exp christos $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.39 1994/05/26 13:11:20 christos Exp christos $")
+RCSID("$Id: sh.lex.c,v 3.40 1994/06/06 05:04:54 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1597,7 +1597,9 @@ reread:
 		     * is now obsolete. As the foreground process group
 		     * changes, the shell needs to adjust. Well too bad.
 		     */
-		    xprintf("Reset tty pgrp from %d to %d\n", ctpgrp, tpgrp);
+		    xprintf(catgets(catd, 1, 1046,
+				    "Reset tty pgrp from %d to %d\n"),
+			    ctpgrp, tpgrp);
 # endif /* notdef */
 		    goto reread;
 		}
@@ -1622,9 +1624,11 @@ reread:
 		if (adrof(STRignoreeof)) {
 			/* If so, tell the user to use exit or logout */
 		    if (loginsh) {
-				xprintf("\nUse \"logout\" to logout.\n");
+				xprintf(catgets(catd, 1, 1047,
+					"\nUse \"logout\" to logout.\n"));
 		   	} else {
-				xprintf("\nUse \"exit\" to leave tcsh.\n");
+				xprintf(catgets(catd, 1, 1048,
+					"\nUse \"exit\" to leave tcsh.\n"));
 			}
 			reset();
 		} else {
@@ -1812,7 +1816,7 @@ struct Ain *l;
 #endif
 	return;
     default:
-	xprintf("Bad seek type %d\n", aret);
+	xprintf(catgets(catd, 1, 1057, "Bad seek type %d\n"), aret);
 	abort();
     }
 }

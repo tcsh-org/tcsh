@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.const.c,v 3.31 1994/05/26 13:11:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.const.c,v 3.32 1994/07/08 14:43:50 christos Exp christos $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.31 1994/05/26 13:11:20 christos Exp christos $")
+RCSID("$Id: tc.const.c,v 3.32 1994/07/08 14:43:50 christos Exp christos $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -59,6 +59,7 @@ Char STRNULL[]          = { '\0' };
 Char STRtcsh[]          = { 't', 'c', 's', 'h', '\0' };
 Char STRhome[]          = { 'h', 'o', 'm', 'e', '\0' };
 Char STRuser[]          = { 'u', 's', 'e', 'r', '\0' };
+Char STRgroup[]         = { 'g', 'r', 'o', 'u', 'p', '\0' };
 #ifdef AFS
 Char STRafsuser[]          = { 'a', 'f', 's', 'u', 's', 'e', 'r', '\0' };
 #endif /* AFS */
@@ -114,6 +115,7 @@ Char STRsavedirs[]      = { 's', 'a', 'v', 'e', 'd', 'i', 'r', 's', '\0' };
 Char STRloginsh[]       = { 'l', 'o', 'g', 'i', 'n', 's', 'h', '\0' };
 Char STRdirstack[]      = { 'd', 'i', 'r', 's', 't', 'a', 'c', 'k', '\0' };
 Char STRargv[]          = { 'a', 'r', 'g', 'v', '\0' };
+Char STRcommand[]       = { 'c', 'o', 'm', 'm', 'a', 'n', 'd', '\0' };
 Char STRsavehist[]      = { 's', 'a', 'v', 'e', 'h', 'i', 's', 't', '\0' };
 Char STRnormal[]        = { 'n', 'o', 'r', 'm', 'a', 'l', '\0' };
 Char STRsldtlogout[]    = { '/', '.', 'l', 'o', 'g', 'o', 'u', 't', '\0' };
@@ -206,6 +208,7 @@ Char STRhistchars[]	= { 'h', 'i', 's', 't', 'c', 'h', 'a', 'r', 's', '\0' };
 Char STRhistlit[]	= { 'h', 'i', 's', 't', 'l', 'i', 't', '\0' };
 Char STRKUSER[]		= { 'U', 'S', 'E', 'R', '\0' };
 Char STRLOGNAME[]	= { 'L', 'O', 'G', 'N', 'A', 'M', 'E', '\0' };
+Char STRKGROUP[]	= { 'G', 'R', 'O', 'U', 'P', '\0' };
 Char STRwordchars[]	= { 'w', 'o', 'r', 'd', 'c', 'h', 'a', 'r', 's', '\0' };
 Char STRKTERM[]		= { 'T', 'E', 'R', 'M', '\0' };
 Char STRKHOME[]		= { 'H', 'O', 'M', 'E', '\0' };

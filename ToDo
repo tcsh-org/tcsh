@@ -16,4 +16,8 @@ add a bindkey -C that does not redisplay the prompt.
 
 cd var works, but cd envvar does not
 
+NLS catalogs for:
+    function descriptions		ed.defns.c
+    terminal capability names		ed.screen.c
+
 christos

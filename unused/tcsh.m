@@ -3309,44 +3309,44 @@ $ #1102 Original Message:(%-15s->  is undefined\n)
 $ #1103 Original Message:(BUG!!! %s isn't bound to anything.\n)
 # BUG!!! %s isn't bound to anything.\n
 
-$ #1104 Original Message:(Usage: bindkey [options] [--] [in-string [out-string | command]]\n)
-# Usage: bindkey [options] [--] [in-string [out-string | command]]\n
+$ #1104 Original Message:(Usage: bindkey [options] [--] [KEY [COMMAND]]\n)
+# Usage: bindkey [options] [--] [KEY [COMMAND]]\n
 
-$ #1105 Original Message:(    -a   bind key in alternative key binding\n)
-#     -a   bind key in alternative key binding\n
+$ #1105 Original Message:(    -a   list or bind KEY in alternative key map\n)
+#    -a   list or bind KEY in alternative key map\n
 
-$ #1106 Original Message:(    -b   accept symbolic key definitions\n)
-#     -b   accept symbolic key definitions\n
+$ #1106 Original Message:(    -b   interpret KEY as a C-, M-, F- or X- key name\n)
+#    -b   interpret KEY as a C-, M-, F- or X- key name\n
 
-$ #1107 Original Message:(    -s   bind an out-string instead of a command\n)
-#     -s   bind an out-string instead of a command\n
+$ #1107 Original Message:(    -s   interpret COMMAND as a literal string to be output\n)
+#    -s   interpret COMMAND as a literal string to be output\n
 
-$ #1108 Original Message:(    -c   bind a unix-command instead of a command\n)
-#     -c   bind a unix-command instead of a command\n
+$ #1108 Original Message:(    -c   interpret COMMAND as a builtin or external command\n)
+#     -c   interpret COMMAND as a builtin or external command\n
 
-$ #1109 Original Message:(    -v   initialized maps to default vi bindings\n)
-#     -v   initialized maps to default vi bindings\n
+$ #1109 Original Message:(    -v   bind all keys to vi bindings\n)
+#     -v   bind all keys to vi bindings\n
 
-$ #1110 Original Message:(    -e   initialized maps to default emacs bindings\n)
-#     -e   initialized maps to default emacs bindings\n
+$ #1110 Original Message:(    -e   bind all keys to emacs bindings\n)
+#     -e   bind all keys to emacs bindings\n
 
-$ #1111 Original Message:(    -d   initialized maps to default bindings\n)
-#     -d   initialized maps to default bindings\n
+$ #1111 Original Message:(    -d   bind all keys to default editor's bindings\n)
+#     -d   bind all keys to default editor's bindings\n
 
-$ #1112 Original Message:(    -l   list available functions with descriptions\n)
-#     -l   list available functions with descriptions\n
+$ #1112 Original Message:(    -l   list editor commands with descriptions\n)
+#     -l   list editor commands with descriptions\n
 
-$ #1113 Original Message:(    -r   remove the binding of in-string\n)
-#     -r   remove the binding of in-string\n
+$ #1113 Original Message:(    -r   remove KEY's binding\n)
+#     -r   remove KEY's binding\n
 
-$ #1114 Original Message:(    -k   bind arrow key with name in in-string\n)
-#     -k   bind arrow key with name in in-string\n
+$ #1114 Original Message:(    -k   interpret KEY as a symbolic arrow-key name\n)
+#     -k   interpret KEY as a symbolic arrow-key name\n
 
-$ #1115 Original Message:(\nIn no out-string or command is given, the binding for in-string\n)
-# \nIn no out-string or command is given, the binding for in-string\n
+$ #1115 Original Message:(Without KEY or COMMAND, prints all bindings\n)
+# Without KEY or COMMAND, prints all bindings\n
 
-$ #1116 Original Message:(is printed or all bindings if in-strings is not given.\n)
-# is printed or all bindings if in-strings is not given.\n
+$ #1116 Original Message:(Without COMMAND, prints the binding for KEY.\n)
+# Without COMMAND, prints the binding for KEY.\n
 
 $ #1117 Original Message:(bad key specification -- null string\n)
 # bad key specification -- null string\n
@@ -3668,3 +3668,39 @@ $ #1222 Original Message:(Found %s in %s.\n)
 
 $ #1223 Original Message:(No match found for %s in file %s\n)
 # No match found for %s in file %s\n
+
+$ #1224 Original Message:(new)
+# new 
+
+$ #1225 Original Message:(a)
+# a
+
+$ #1226 Original Message:(no)
+# no
+
+$ #1227 Original Message:( no)
+#  no
+
+$ #1228 Original Message:(has)
+# has
+
+$ #1229 Original Message:(does not have)
+# does not have
+
+$ #1230 Original Message:(items)
+# items
+
+$ #1231 Original Message:(rows)
+# rows
+
+$ #1232 Original Message:(    --   force a break from option processing\n)
+#    --   force a break from option processing\n
+
+$ #1233 Original Message:(    -u   (or any invalid option) this message\n)
+#    -u   (or any invalid option) this message\n
+
+$ #1234 Original Message:(range)
+# range
+
+$ #1235 Original Message:(No such job)
+# No such job

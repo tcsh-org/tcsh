@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.decls.h,v 3.31 1994/07/08 14:43:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.decls.h,v 3.32 1995/01/20 23:48:56 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -220,6 +220,7 @@ extern	pret_t		  xvsprintf	__P((char *, const char *, va_list));
 /*
  * tc.prompt.c
  */
+extern	void		  dateinit	__P((void));
 extern	void		  printprompt	__P((int, char *));
 extern	void		  tprintf	__P((int, Char *, Char *, size_t, 
 					     char *, time_t, ptr_t));

@@ -1,4 +1,4 @@
-/* $Header$ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/vms.termcap.c,v 1.1 1992/10/05 02:39:59 christos Exp christos $ */
 /*
  *	termcap.c	1.1	20/7/87		agc	Joypace Ltd
  *
@@ -9,7 +9,7 @@
  *	A public domain implementation of the termcap(3) routines.
  */
 #include "sh.h"
-RCSID("$Id$")
+RCSID("$Id: vms.termcap.c,v 1.1 1992/10/05 02:39:59 christos Exp christos $")
 #ifdef _VMS_POSIX
 /*    efth      1988-Apr-29
 
@@ -62,8 +62,10 @@ char	*name;
 	if (termfile == NULL ) termfile = "/etc/termcap";
 
 	if ((fp = fopen(termfile, "r")) == (FILE *) NULL) {
-		fprintf(stderr,"Can't open TERMCAP: [%s]\n", termfile);
-		fprintf(stderr,"Can't open %s.\n",termfile);
+		fprintf(stderr,catgets(catd, 1, 1220,
+				       "Can't open TERMCAP: [%s]\n"), termfile);
+		fprintf(stderr,catgets(catd, 1, 1221,
+				       "Can't open %s.\n"),termfile);
 		sleep(1);
 		return(-1);
 	}
@@ -89,7 +91,8 @@ sscanf to look at aliases.  These are delimited by '|'. */
 		if (strncmp(name, tmp, len) == 0) {
 			fclose(fp);
 #ifdef DEBUG
-	fprintf(stderr,"Found %s in %s.\n", name, termfile);
+	fprintf(stderr,catgets(catd, 1, 1222, "Found %s in %s.\n"),
+		name, termfile);
 	sleep(1);
 #endif /* DEBUG */
 			return(1);
@@ -102,7 +105,8 @@ sscanf to look at aliases.  These are delimited by '|'. */
 			if (strncmp(name, tmp, len) == 0) {
 				fclose(fp);
 #ifdef DEBUG
-	fprintf(stderr,"Found %s in %s.\n", name, termfile);
+	fprintf(stderr,catgets(catd, 1, 1222,
+			       "Found %s in %s.\n"), name, termfile);
 	sleep(1);
 #endif /* DEBUG */
 				return(1);
@@ -112,7 +116,8 @@ sscanf to look at aliases.  These are delimited by '|'. */
 	/* If we get here, then we haven't found a match. */
 	fclose(fp);
 #ifdef DEBUG
-	fprintf(stderr,"No match found for %s in file %s\n",
+	fprintf(stderr,catgets(catd, 1, 1223,
+			       "No match found for %s in file %s\n"),
 		name, termfile);
 	sleep(1);
 #endif /* DEBUG */

@@ -76,7 +76,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "17 January 1995" "Cornell 6.05.03"
+.TH TCSH 1 "3 March 1995" "Cornell 6.05.04"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -971,10 +971,13 @@ an argument selector beginning with `\-' will be interpreted as an event
 specification.
 .PP
 A history reference may have a word designator but no event specification.
-This form references the previous command, unless a previous history reference
+It then references the previous command.
+.ig \" Not true, but we thought it was for a long time ...
+, unless a previous history reference
 occurred on the same line in which case this form repeats the previous
 reference.  Thus `!?foo?^ !$' gives the first and last arguments from the
 command matching `?foo?'.
+..
 Continuing our `diff' example, we could have said simply `diff
 !^.old !^' or, to get the arguments in the opposite order, just `diff !*'.
 .PP
@@ -2233,7 +2236,7 @@ as on \fIdirs\fR, and they imply \fB\-p\fR. (+)
 .B chdir
 A synonym for the \fIcd\fR builtin command.
 .TP 8
-.B complete \fR[\fIcommand\fR [\fIword\fB/\fIpattern\fB/\fIlist\fR[\fB:\fIselect\fR]\fB/\fR[\fIsuffix\fR] ...]] (+)
+.B complete \fR[\fIcommand\fR [\fIword\fB/\fIpattern\fB/\fIlist\fR[\fB:\fIselect\fR]\fB/\fR[[\fIsuffix\fR]\fB/\fR] ...]] (+)
 Without arguments, lists all completions.
 With \fIcommand\fR, lists completions for \fIcommand\fR.
 With \fIcommand\fR and \fIword\fR etc., defines completions.
@@ -2362,7 +2365,10 @@ The last three types of completion may not have a \fIselect\fR
 pattern, and \fBx\fR uses \fIselect\fR as an explanatory message when
 the \fIlist-choices\fR editor command is used.
 .PP
-\fIsuffix\fR is a single character to be appended to a successful completion.
+\fIsuffix\fR is a single character to be appended to a successful
+completion.  If null, no character is appended. If omitted (in which
+case the fourth delimiter can also be omitted), a slash is appended to
+directories and a space to other words.
 .PP
 Now for some examples. Some commands take only directories as arguments,
 so there's no point completing plain files.
@@ -2403,7 +2409,7 @@ Different \fIlist\fRs are useful with different commands.
 .IP "" 4
 > complete alias 'p/1/a/'
 .br
-> complete man 'n/*/c/'
+> complete man 'p/*/c/'
 .br
 > complete set 'p/1/s/'
 .br
@@ -2414,14 +2420,9 @@ and `set' with shell variables.
 `true' doesn't have any options, so \fBx\fR does nothing when completion
 is attempted and prints `Truth has no options.' when completion choices are listed.
 .PP
-Note that because the \fIpattern\fR `*' matches any word, the \fIman\fR
-example could equally well have used \fBC\fR-type completion.  However,
-because `*' does not match an empty word, the \fBC\fR-type completion
-wouldn't match an empty word but the \fBn\fR-type completion (which
-asks the `*' pattern to match the command `man') would. One wouldn't
-actually want to \fIcomplete\fR an empty word, but one might want to
-\fIlist-choices\fR on it. Several other examples below use \fBn\fR-type
-completion for this reason.
+The \fIman\fR example, and several other examples below, use
+\fBp\fR-type completion, rather than \fBC\fR- or \fBn\fR-type, so that
+`*' will match an empty word.
 .PP
 Words can be completed from a variable evaluated at completion time,
 .IP "" 4
@@ -2443,7 +2444,7 @@ rtfm.mit.edu tesla.ee.cornell.edu uunet.uu.net
 .PP
 or from a command run at completion time:
 .IP "" 4
-> complete kill 'n/*/`ps | awk \\{print\\ \\$1\\}`/'
+> complete kill 'p/*/`ps | awk \\{print\\ \\$1\\}`/'
 .br
 > kill \-9 [^D]
 .br
@@ -2454,7 +2455,7 @@ so the braces, space and `$' in `{print $1}' must be quoted explicitly.
 .PP
 One command can have multiple completions:
 .IP "" 4
-> complete dbx 'p/2/(core)/' 'n/*/c/'
+> complete dbx 'p/2/(core)/' 'p/*/c/'
 .PP
 completes the second argument to `dbx' with the word `core' and all other
 arguments with commands. Note that the positional completion is specified
@@ -2467,13 +2468,13 @@ common mistake when defining a completion.
 The \fIselect\fR pattern is useful when a command takes only files with
 particular forms as arguments. For example,
 .IP "" 4
-> complete cc 'n/*/f:*.[cao]/'
+> complete cc 'p/*/f:*.[cao]/'
 .PP
 completes `cc' arguments only to files ending in `.c', `.a', or `.o'.
 \fIselect\fR can also exclude files, using negation of a glob-pattern as
 described under \fBFilename substitution\fR. One might use
 .IP "" 4
-> complete rm 'n/*/f:^*.{c,h,cc,C,tex,1,man,l,y}/'
+> complete rm 'p/*/f:^*.{c,h,cc,C,tex,1,man,l,y}/'
 .PP
 to exclude precious source code from `rm' completion. Of course, one
 could still type excluded names manually or override the completion
@@ -2522,7 +2523,7 @@ ls mtime nogroup nouser perm print prune \e
 .br
 size xdev)/' \e
 .br
-\'n/*/d/'
+\'p/*/d/'
 .PP
 This completes words following `\-name', `\-newer', `\-cpio' or `ncpio'
 (note the pattern which matches both) to files,
@@ -4201,6 +4202,9 @@ afs
 The shell verifies your password with the kerberos server if local
 authentication fails. The \fBafsuser\fR shell variable or the
 \fBAFSUSER\fR environment variable override your local username if set.
+.TP 4
+nd
+Don't put `.' in the \fBpath\fR for security
 .PD
 .PP
 An administrator may enter additional strings to indicate differences
@@ -4577,7 +4581,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.05.03 (Cornell) 1995-01-17.
+This manual documents tcsh 6.05.04 (Cornell) 1995-03-03.
 .SH AUTHORS
 .PD 0
 .TP 2

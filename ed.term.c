@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.term.c,v 1.14 1993/05/17 00:11:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.term.c,v 1.15 1993/07/03 23:47:53 christos Exp christos $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.14 1993/05/17 00:11:09 christos Exp christos $")
+RCSID("$Id: ed.term.c,v 1.15 1993/07/03 23:47:53 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -575,7 +575,7 @@ dosetty(v, t)
 	    break;
 	default:
 	    stderror(ERR_NAME | ERR_SYSTEM, short2str(v[0]), 
-		     "Unknown switch");
+		     catgets(catd, 1, 221, "Unknown switch"));
 	    break;
 	}
 
@@ -626,7 +626,8 @@ dosetty(v, t)
 	    if (strcmp(m->m_name, d) == 0)
 		break;
 	if (!m->m_name) 
-	    stderror(ERR_NAME | ERR_SYSTEM, d, "Invalid argument");
+	    stderror(ERR_NAME | ERR_SYSTEM, d,
+		     catgets(catd, 1, 222, "Invalid argument"));
 
 	switch (x) {
 	case '+':

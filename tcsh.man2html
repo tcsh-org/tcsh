@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: tcsh.man2html,v 1.2 1994/06/19 20:46:44 christos Exp $
+# $Id: tcsh.man2html,v 1.4 1995/01/20 23:48:56 christos Exp christos $
 
 # tcsh.man2html, Dave Schweisguth <dcs@proton.chem.yale.edu>
 #
@@ -534,6 +534,7 @@ sub printsectionbody {
 		    
 		    s/\\(e|\\)/\\/g;			# \e, \\
 		    s/\\-/-/g;				# \-
+		    s/^\\'/'/;				# leading \'
 		    s/^\\(\s)/$1/;			# leading space escape
 		    s/^\\&amp\;//;			# leading dot escape
 

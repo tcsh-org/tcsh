@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.57 1994/09/22 19:09:29 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.58 1995/01/20 23:48:56 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.57 1994/09/22 19:09:29 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.58 1995/01/20 23:48:56 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -546,7 +546,8 @@ pjwait(pp)
 
     do {
 	if ((fp->p_flags & (PFOREGND | PRUNNING)) == PRUNNING)
-	    xprintf("BUG: waiting for background job!\n");
+	    xprintf(catgets(catd, 1, 1060,
+			    "BUG: waiting for background job!\n"));
     } while ((fp = fp->p_friends) != pp);
     /*
      * Now keep pausing as long as we are not interrupted (SIGINT), and the
@@ -637,7 +638,7 @@ pjwait(pp)
      */
     if ((reason != 0) && (adrof(STRprintexitvalue)) && 
 	(pp->p_flags & PBACKQ) == 0)
-	xprintf("Exit %d\n", reason);
+	xprintf(catgets(catd, 1, 1062, "Exit %d\n"), reason);
     set(STRstatus, putn(reason), VAR_READWRITE);
     if (reason && exiterr)
 	exitstat();
@@ -715,7 +716,7 @@ pflush(pp)
     register int idx;
 
     if (pp->p_procid == 0) {
-	xprintf("BUG: process flushed twice");
+	xprintf(catgets(catd, 1, 1063, "BUG: process flushed twice"));
 	return;
     }
     while (pp->p_procid != pp->p_jobid)
@@ -1090,11 +1091,7 @@ pprint(pp, flag)
 	    }
 	    if (flag & (REASON | AREASON)) {
 		if (flag & NAME)
-#ifdef SUSPENDED
-		    format = "%-23s";
-#else /* !SUSPENDED */
-		    format = "%-21s";
-#endif /* !SUSPENDED */
+		    format = "%-30s";
 		else
 		    format = "%s";
 		if (pstatus == status)
@@ -1111,7 +1108,7 @@ pprint(pp, flag)
 		switch (status) {
 
 		case PRUNNING:
-		    xprintf(format, "Running ");
+		    xprintf(format, catgets(catd, 1, 1064, "Running "));
 		    break;
 
 		case PINTERRUPTED:
@@ -1136,17 +1133,15 @@ pprint(pp, flag)
 		case PAEXITED:
 		    if (flag & REASON)
 			if (pp->p_reason)
-#ifdef SUSPENDED
-			    xprintf("Exit %-18d", pp->p_reason);
-#else /* SUSPENDED */
-			    xprintf("Exit %-16d", pp->p_reason);
-#endif /* SUSPENDED */
+			    xprintf(catgets(catd, 1, 1065, "Exit %-25d"),
+				    pp->p_reason);
 			else
-			    xprintf(format, "Done");
+			    xprintf(format, catgets(catd, 1, 1067, "Done"));
 		    break;
 
 		default:
-		    xprintf("BUG: status=%-9o", status);
+		    xprintf(catgets(catd, 1, 1068, "BUG: status=%-9o"),
+			    status);
 		}
 	    }
 	}
@@ -1159,13 +1154,13 @@ prcomd:
 		xprintf("&");
 	}
 	if (flag & (REASON | AREASON) && pp->p_flags & PDUMPED)
-	    xprintf(" (core dumped)");
+	    xprintf(catgets(catd, 1, 1069, " (core dumped)"));
 	if (tp == pp->p_friends) {
 	    if (flag & AMPERSAND)
 		xprintf(" &");
 	    if (flag & JOBDIR &&
 		!eq(tp->p_cwd->di_name, dcwd->di_name)) {
-		xprintf(" (wd: ");
+		xprintf(catgets(catd, 1, 1070, " (wd: "));
 		dtildepr(tp->p_cwd->di_name);
 		xprintf(")");
 	    }
@@ -1196,7 +1191,7 @@ prcomd:
 	    if (linp != linbuf)
 		xputchar('\n');
 	    if (flag & SHELLDIR && !eq(tp->p_cwd->di_name, dcwd->di_name)) {
-		xprintf("(wd now: ");
+		xprintf(catgets(catd, 1, 1071, "(wd now: "));
 		dtildepr(dcwd->di_name);
 		xprintf(")\n");
 	    }
@@ -1572,9 +1567,11 @@ pkill(v, signum)
 	    case SIGTTOU:
 		if ((jobflags & PRUNNING) == 0) {
 # ifdef SUSPENDED
-		    xprintf("%S: Already suspended\n", cp);
+		    xprintf(catgets(catd, 1, 1072,
+				    "%S: Already suspended\n"), cp);
 # else /* !SUSPENDED */
-		    xprintf("%S: Already stopped\n", cp);
+		    xprintf(catgets(catd, 1, 1073,
+				    "%S: Already stopped\n"), cp);
 # endif /* !SUSPENDED */
 		    err1++;
 		    goto cont;

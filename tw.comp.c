@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.comp.c,v 1.26 1994/03/31 22:36:44 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.comp.c,v 1.27 1994/07/08 14:43:50 christos Exp christos $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.26 1994/03/31 22:36:44 christos Exp christos $")
+RCSID("$Id: tw.comp.c,v 1.27 1994/07/08 14:43:50 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -265,7 +265,7 @@ tw_match(str, pat)
     xprintf("%s, ", short2str(pat));
     xprintf("%s) = %d [%d]\n", short2str(estr), rv, estr - str);
 #endif /* TDEBUG */
-    return (rv ? estr - str : 0);
+    return (rv ? estr - str : -1);
 }
 
 
@@ -546,18 +546,28 @@ tw_complete(line, word, pat, looking, suf)
 	case 'p':
 	    break;
 	default:
-	    stderror(ERR_COMPINV, "command", cmd);
+	    stderror(ERR_COMPINV, catgets(catd, 1, 1196, "command"), cmd);
 	    return TW_ZERO;
 	}
 
 	sep = ptr[1];
 	if (!Ispunct(sep)) {
-	    stderror(ERR_COMPINV, "separator", sep);
+	    stderror(ERR_COMPINV, catgets(catd, 1, 1197, "separator"), sep);
 	    return TW_ZERO;
 	}
 
-	ptr = tw_dollar(&ptr[2], wl, wordno, ran, sep, "pattern");
-	ptr = tw_dollar(ptr, wl, wordno, com, sep, "completion"); 
+	ptr = tw_dollar(&ptr[2], wl, wordno, ran, sep,
+			catgets(catd, 1, 1198, "pattern"));
+	if (ran[0] == '\0')	/* check for empty pattern (disallowed) */
+	{
+	    stderror(ERR_COMPINC, cmd == 'p' ?
+		     catgets(catd, 1, 1234, "range") :
+		     catgets(catd, 1, 1198, "pattern"), "");
+	    return TW_ZERO;
+	}
+
+	ptr = tw_dollar(ptr, wl, wordno, com, sep,
+			catgets(catd, 1, 1199, "completion")); 
 
 	if (*ptr != '\0') {
 	    if (*ptr == sep)
@@ -603,7 +613,7 @@ tw_complete(line, word, pat, looking, suf)
 #ifdef TDEBUG
 	    xprintf("%c: ", cmd);
 #endif /* TDEBUG */
-	    if ((n = tw_match(pos, ran)) == 0)
+	    if ((n = tw_match(pos, ran)) < 0)
 		continue;
 	    if (cmd == 'c')
 		*word += n;

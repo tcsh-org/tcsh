@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.screen.c,v 3.32 1994/06/19 20:46:44 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.screen.c,v 3.33 1994/07/08 14:43:50 christos Exp christos $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.32 1994/06/19 20:46:44 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.33 1994/07/08 14:43:50 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -335,19 +335,27 @@ TellTC(what)
     struct termcapstr *t;
 
     USE(what);
-    xprintf("\n\tTcsh thinks your terminal has the\n");
-    xprintf("\tfollowing characteristics:\n\n");
-    xprintf("\tIt has %d columns and %d lines\n",
+    xprintf(catgets(catd, 1, 198, "\n\tTcsh thinks your terminal has the\n"));
+    xprintf(catgets(catd, 1, 199, "\tfollowing characteristics:\n\n"));
+    xprintf(catgets(catd, 1, 200, "\tIt has %d columns and %d lines\n"),
 	    Val(T_co), Val(T_li));
-    xprintf("\tIt has %s meta key\n", T_HasMeta ? "a" : "no");
-    xprintf("\tIt can%suse tabs\n", T_Tabs ? " " : "not ");
-    xprintf("\tIt %s automatic margins\n", (T_Margin&MARGIN_AUTO)?"has":"does not have");
+    xprintf(catgets(catd, 1, 201, "\tIt has %s meta key\n"), T_HasMeta ?
+	    catgets(catd, 1, 1225, "a") : catgets(catd, 1, 1226, "no"));
+    xprintf(catgets(catd, 1, 202, "\tIt can%s use tabs\n"), T_Tabs ?
+	    "" : catgets(catd, 1, 1227, " not"));
+    xprintf(catgets(catd, 1, 203, "\tIt %s automatic margins\n"),
+		    (T_Margin&MARGIN_AUTO)?
+		    catgets(catd, 1, 1228, "has"):
+		    catgets(catd, 1, 1229, "does not have"));
     if (T_Margin&MARGIN_AUTO)
-	xprintf("\tIt %s magic margins\n", (T_Margin&MARGIN_MAGIC)?"has":"does not have");
+	xprintf(catgets(catd, 1, 204, "\tIt %s magic margins\n"),
+			(T_Margin&MARGIN_MAGIC)?
+			catgets(catd, 1, 1228, "has"):
+			catgets(catd, 1, 1229, "does not have"));
 
     for (t = tstr; t->name != NULL; t++)
 	xprintf("\t%25s (%s) == %s\n", t->long_name, t->name,
-		t->str && *t->str ? t->str : "(empty)");
+		t->str && *t->str ? t->str : catgets(catd, 1, 1181, "(empty)"));
     xputchar('\n');
 }
 
@@ -509,22 +517,26 @@ EchoTC(v)
 	return;
     (void) strcpy(cv, short2str(*v));
     if (strcmp(cv, "tabs") == 0) {
-	xprintf(fmts, T_Tabs ? "yes" : "no");
+	xprintf(fmts, T_Tabs ? catgets(catd, 1, 205, "yes") :
+		catgets(catd, 1, 206, "no"));
 	flush();
 	return;
     }
     else if (strcmp(cv, "meta") == 0) {
-	xprintf(fmts, Val(T_km) ? "yes" : "no");
+	xprintf(fmts, Val(T_km) ? catgets(catd, 1, 205, "yes") :
+		catgets(catd, 1, 206, "no"));
 	flush();
 	return;
     }
     else if (strcmp(cv, "xn") == 0) {
-	xprintf(fmts, T_Margin & MARGIN_MAGIC ? "yes" : "no");
+	xprintf(fmts, T_Margin & MARGIN_MAGIC ? catgets(catd, 1, 205, "yes") :
+		catgets(catd, 1, 206, "no"));
 	flush();
 	return;
     }
     else if (strcmp(cv, "am") == 0) {
-	xprintf(fmts, T_Margin & MARGIN_AUTO ? "yes" : "no");
+	xprintf(fmts, T_Margin & MARGIN_AUTO ? catgets(catd, 1, 205, "yes") :
+		catgets(catd, 1, 206, "no"));
 	flush();
 	return;
     }
@@ -565,7 +577,7 @@ EchoTC(v)
 	scap = tgetstr(cv, &area);
     if (!scap || scap[0] == '\0') {
 	if (tgetflag(cv)) {
-	    xprintf("yes\n");
+	    xprintf(catgets(catd, 1, 125, "yes\n"));
 	    return;
 	}
 	if (silent)
@@ -1112,7 +1124,7 @@ DeleteChars(num)		/* deletes <num> characters */
 
     if (!T_CanDel) {
 #ifdef DEBUG_EDIT
-	xprintf("   ERROR: cannot delete   \n");
+	xprintf(catgets(catd, 1, 209, "   ERROR: cannot delete   \n"));
 #endif /* DEBUG_EDIT */
 	flush();
 	return;
@@ -1120,7 +1132,7 @@ DeleteChars(num)		/* deletes <num> characters */
 
     if (num > TermH) {
 #ifdef DEBUG_SCREEN
-	xprintf("DeleteChars: num is riduculous: %d\r\n", num);
+	xprintf(catgets(catd, 1, 210, "DeleteChars: num is riduculous: %d\r\n"), num);
 	flush();
 #endif /* DEBUG_SCREEN */
 	return;
@@ -1152,7 +1164,7 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 	return;
     if (!T_CanIns) {
 #ifdef DEBUG_EDIT
-	xprintf("   ERROR: cannot insert   \n");
+	xprintf(catgets(catd, 1, 211, "   ERROR: cannot insert   \n"));
 #endif /* DEBUG_EDIT */
 	flush();
 	return;
@@ -1160,7 +1172,8 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 
     if (num > TermH) {
 #ifdef DEBUG_SCREEN
-	xprintf("StartInsert: num is riduculous: %d\r\n", num);
+	xprintf(catgets(catd, 1, 212,
+			"StartInsert: num is riduculous: %d\r\n"), num);
 	flush();
 #endif /* DEBUG_SCREEN */
 	return;
@@ -1313,14 +1326,15 @@ GetTermCaps()
     if (i <= 0) {
 	if (i == -1) {
 #if (SYSVREL == 0) || defined(IRIS3D)
-	    xprintf("tcsh: Cannot open /etc/termcap.\n");
+	    xprintf(catgets(catd, 1, 213, "tcsh: Cannot open /etc/termcap.\n"));
 	}
 	else if (i == 0) {
 #endif /* SYSVREL */
-	    xprintf("tcsh: No entry for terminal type \"%s\"\n",
+	    xprintf(catgets(catd, 1, 214,
+			    "tcsh: No entry for terminal type \"%s\"\n"),
 		    getenv("TERM"));
 	}
-	xprintf("tcsh: using dumb terminal settings.\n");
+	xprintf(catgets(catd, 1, 215, "tcsh: using dumb terminal settings.\n"));
 	Val(T_co) = 80;		/* do a dumb terminal */
 	Val(T_pt) = Val(T_km) = Val(T_li) = 0;
 	for (t = tstr; t->name != NULL; t++)
@@ -1364,15 +1378,17 @@ GetTermCaps()
 
 #ifdef DEBUG_SCREEN
     if (!T_CanUP) {
-	xprintf("tcsh: WARNING: Your terminal cannot move up.\n");
-	xprintf("Editing may be odd for long lines.\n");
+	xprintf(catgets(catd, 1, 216,
+			"tcsh: WARNING: Your terminal cannot move up.\n"));
+	xprintf(catgets(catd, 1, 217,
+			"Editing may be odd for long lines.\n"));
     }
     if (!T_CanCEOL)
-	xprintf("no clear EOL capability.\n");
+	xprintf(catgets(catd, 1, 218, "no clear EOL capability.\n"));
     if (!T_CanDel)
-	xprintf("no delete char capability.\n");
+	xprintf(catgets(catd, 1, 219, "no delete char capability.\n"));
     if (!T_CanIns)
-	xprintf("no insert char capability.\n");
+	xprintf(catgets(catd, 1, 220, "no insert char capability.\n"));
 #endif /* DEBUG_SCREEN */
 
 

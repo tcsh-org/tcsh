@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.68 1994/09/04 21:54:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.69 1995/01/20 23:48:56 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.68 1994/09/04 21:54:15 christos Exp christos $")
+RCSID("$Id: tw.parse.c,v 3.69 1995/01/20 23:48:56 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -250,7 +250,7 @@ tenematch(inputline, num_read, command)
     wordp = word;
 
 #ifdef TDEBUG
-    xprintf("looking for %d\n", looking);
+    xprintf(catgets(catd, 1, 1208, "starting_a_command %d\n"), looking);
     xprintf("\ncmd_start:%S:\n", cmd_start);
     xprintf("qline:%S:\n", qline);
     xprintf("qline:");
@@ -269,11 +269,11 @@ tenematch(inputline, num_read, command)
         (command == RECOGNIZE || command == LIST || command == SPELL ||
 	 command == RECOGNIZE_SCROLL || command == RECOGNIZE_ALL)) {
 #ifdef TDEBUG
-	xprintf("complete %d ", looking);
+	xprintf(catgets(catd, 1, 1209, "complete %d "), looking);
 #endif
 	looking = tw_complete(cmd_start, &wordp, &pat, looking, &suf);
 #ifdef TDEBUG
-	xprintf("complete %d %S\n", looking, pat);
+	xprintf(catgets(catd, 1, 1210, "complete %d %S\n"), looking, pat);
 #endif
     }
 
@@ -408,7 +408,7 @@ tenematch(inputline, num_read, command)
 	return search_ret;
 
     default:
-	xprintf("tcsh: Internal match error.\n");
+	xprintf(catgets(catd, 1, 1211, "tcsh: Internal match error.\n"));
 	return 1;
 
     }
@@ -1308,15 +1308,17 @@ tw_list_items(looking, numitems, list_max)
 	int maxs;
 
 	if (max_items) {
-	    name = "items";
+	    name = catgets(catd, 1, 1230, "items");
 	    maxs = max_items;
 	}
 	else {
-	    name = "rows";
+	    name = catgets(catd, 1, 1231, "rows");
 	    maxs = max_rows;
 	}
 
-	xprintf("There are %d %s, list them anyway? [n/y] ", maxs, name);
+	xprintf(catgets(catd, 1, 1212,
+			"There are %d %s, list them anyway? [n/y] "),
+		maxs, name);
 	flush();
 	/* We should be in Rawmode here, so no \n to catch */
 	(void) read(SHIN, &tc, 1);
@@ -1467,7 +1469,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
     flags |= (gpat == 0) ? TW_IGN_OK : TW_PAT_OK;
 
 #ifdef TDEBUG
-    xprintf("looking = %d\n", looking);
+    xprintf(catgets(catd, 1, 1215, "looking = %d\n"), looking);
 #endif
 
     switch (looking) {
@@ -1594,7 +1596,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 	break;
 
     default:
-	xprintf("\ntcsh internal error: I don't know what I'm looking for!\n");
+	xprintf(catgets(catd, 1, 1216, "\ntcsh internal error: I don't know what I'm looking for!\n"));
 	NeedsRedraw = 1;
 	return (-1);
     }
@@ -1793,8 +1795,9 @@ expand_dir(dir, edir, dfd, cmd)
 	xprintf("\n%S %s\n",
 		*edir ? edir :
 		(*tdir ? tdir : dir),
-		(errno == ENOTDIR ? "not a directory" :
-		(errno == ENOENT ? "not found" : "unreadable")));
+		(errno == ENOTDIR ? catgets(catd, 1, 1217, "not a directory") :
+		(errno == ENOENT ? catgets(catd, 1, 1218, "not found") :
+		 catgets(catd, 1, 1219, "unreadable"))));
 	NeedsRedraw = 1;
 	return (-1);
     }

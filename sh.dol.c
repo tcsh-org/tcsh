@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.dol.c,v 3.27 1993/12/16 16:51:24 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.dol.c,v 3.28 1995/01/20 23:48:56 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.27 1993/12/16 16:51:24 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.28 1995/01/20 23:48:56 christos Exp $")
 
 /*
  * C shell
@@ -1003,6 +1003,7 @@ heredoc(term)
     quoted = gflag;
     ocnt = BUFSIZE;
     obp = obuf;
+    inheredoc = 1;
     for (;;) {
 	/*
 	 * Read up a line
@@ -1029,6 +1030,7 @@ heredoc(term)
 	if (c < 0 || eq(lbuf, term)) {
 	    (void) write(0, short2str(obuf), (size_t) (BUFSIZE - ocnt));
 	    (void) lseek(0, 0l, L_SET);
+	    inheredoc = 0;
 	    return;
 	}
 

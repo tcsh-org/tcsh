@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.func.c,v 3.60 1994/09/22 19:07:17 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.func.c,v 3.61 1995/01/20 23:48:56 christos Exp christos $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.60 1994/09/22 19:07:17 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.61 1995/01/20 23:48:56 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -49,10 +49,13 @@ RCSID("$Id: tc.func.c,v 3.60 1994/09/22 19:07:17 christos Exp $")
 
 #ifdef AFS
 #define PASSMAX 16
+#include <afs/stds.h>
 #include <afs/kautils.h>
 long ka_UserAuthenticateGeneral();
 #else
+#ifndef PASSMAX
 #define PASSMAX 8
+#endif
 #endif /* AFS */
 
 #ifdef TESLA
@@ -425,7 +428,7 @@ cmd_expand(cmd, str)
 
     if ((vp = adrof1(cmd, &aliases)) != NULL) {
 	if (str == NULL) {
-	    xprintf("%S: \t aliased to ", cmd);
+	    xprintf(catgets(catd, 1, 410, "%S: \t aliased to "), cmd);
 	    blkpr(vp->vec);
 	    xputchar('\n');
 	}
@@ -711,7 +714,8 @@ auto_lock()
 	    just_signaled = 0;
 	    return;
 	}
-	xprintf("\nIncorrect passwd for %s\n", pw->pw_name);
+	xprintf(catgets(catd, 1, 1131, "\nIncorrect passwd for %s\n"),
+		pw->pw_name);
     }
 #endif /* NO_CRYPT */
     auto_logout();
@@ -774,7 +778,7 @@ precmd()
 #endif /* BSDSIGS */
     if (precmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRprecmd);
-	xprintf("Faulty alias 'precmd' removed.\n");
+	xprintf(catgets(catd, 1, 1132, "Faulty alias 'precmd' removed.\n"));
 	goto leave;
     }
     precmd_active = 1;
@@ -807,7 +811,7 @@ cwd_cmd()
 #endif /* BSDSIGS */
     if (cwdcmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRcwdcmd);
-	xprintf("Faulty alias 'cwdcmd' removed.\n");
+	xprintf(catgets(catd, 1, 1133, "Faulty alias 'cwdcmd' removed.\n"));
 	goto leave;
     }
     cwdcmd_active = 1;
@@ -838,7 +842,7 @@ beep_cmd()
 #endif /* BSDSIGS */
     if (beepcmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRbeepcmd);
-	xprintf("Faulty alias 'beepcmd' removed.\n");
+	xprintf(catgets(catd, 1, 1134, "Faulty alias 'beepcmd' removed.\n"));
     }
     else {
 	beepcmd_active = 1;
@@ -873,7 +877,7 @@ period_cmd()
 #endif /* BSDSIGS */
     if (periodic_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRperiodic);
-	xprintf("Faulty alias 'periodic' removed.\n");
+	xprintf(catgets(catd, 1, 1135, "Faulty alias 'periodic' removed.\n"));
 	goto leave;
     }
     periodic_active = 1;
@@ -1059,7 +1063,7 @@ rmstar(cp)
     while (we != cp) {
 #ifdef RMDEBUG
 	if (*tag)
-	    xprintf("parsing command line\n");
+	    xprintf(catgets(catd, 1, 1136, "parsing command line\n"));
 #endif /* RMDEBUG */
 	if (!Strcmp(we->word, STRrm)) {
 	    args = we->next;
@@ -1076,7 +1080,8 @@ rmstar(cp)
 		    if (!Strcmp(args->word, STRstar))
 			star = 1;
 		if (ask && star) {
-		    xprintf("Do you really want to delete all files? [n/y] ");
+		    xprintf(catgets(catd, 1, 1137,
+				    "Do you really want to delete all files? [n/y] "));
 		    flush();
 		    (void) read(SHIN, &c, 1);
 		    doit = (c == 'Y' || c == 'y');
@@ -1086,7 +1091,8 @@ rmstar(cp)
 			/* remove the command instead */
 #ifdef RMDEBUG
 			if (*tag)
-			    xprintf("skipping deletion of files!\n");
+			    xprintf(catgets(catd, 1, 1138,
+					    "skipping deletion of files!\n"));
 #endif /* RMDEBUG */
 			for (tmp = we;
 			     *tmp->word != '\n' &&
@@ -1118,7 +1124,7 @@ rmstar(cp)
     }
 #ifdef RMDEBUG
     if (*tag) {
-	xprintf("command line now is:\n");
+	xprintf(catgets(catd, 1, 1139, "command line now is:\n"));
 	for (we = cp->next; we != cp; we = we->next)
 	    xprintf("%S ", we->word);
     }
@@ -1161,7 +1167,7 @@ continue_jobs(cp)
     while (we != cp) {
 #ifdef CNDEBUG
 	if (*tag)
-	    xprintf("parsing command line\n");
+	    xprintf(catgets(catd, 1, 1140, "parsing command line\n"));
 #endif /* CNDEBUG */
 	cmd = we->word;
 	in_cont_list = inlist(continue_list, cmd);
@@ -1169,7 +1175,7 @@ continue_jobs(cp)
 	if (in_cont_list || in_cont_arg_list) {
 #ifdef CNDEBUG
 	    if (*tag)
-		xprintf("in one of the lists\n");
+		xprintf(catgets(catd, 1, 1141, "in one of the lists\n"));
 #endif /* CNDEBUG */
 	    np = NULL;
 	    for (pp = proclist.p_next; pp; pp = pp->p_next) {
@@ -1193,7 +1199,7 @@ continue_jobs(cp)
     }
 #ifdef CNDEBUG
     if (*tag) {
-	xprintf("command line now is:\n");
+	xprintf(catgets(catd, 1, 1142, "command line now is:\n"));
 	for (we = cp->next; we != cp; we = we->next)
 	    xprintf("%S ", we->word);
     }

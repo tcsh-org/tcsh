@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.59 1994/09/04 21:54:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.60 1995/01/20 23:48:56 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.59 1994/09/04 21:54:15 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.60 1995/01/20 23:48:56 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -766,6 +766,12 @@ srchx(cp)
     register i;
 
     /*
+     * Ignore keywords inside heredocs
+     */
+    if (inheredoc)
+	return -1;
+
+    /*
      * Binary search Sp1 is the beginning of the current search range. Sp2 is
      * one past the end.
      */
@@ -1307,6 +1313,17 @@ dosetenv(v, c)
 # ifdef LC_COLLATE
 	(void) setlocale(LC_COLLATE, "");
 # endif
+# if defined(NLS_CATALOGS) && defined(LC_MESSAGES)
+	(void) setlocale(LC_MESSAGES, "");
+	catclose(catd);
+	catd = catopen("tcsh", MCLoadBySet);
+	errinit();		/* init the errorlist in correct locale */
+	mesginit();		/* init the messages for signals */
+	dateinit();		/* init the messages for dates */
+# endif /* NLS_CATALOGS && LC_MESSAGES */
+# ifdef LC_CTYPE
+	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
+# endif /* LC_CTYPE */
 # ifdef SETLOCALEBUG
 	dont_free = 0;
 # endif /* SETLOCALEBUG */
@@ -1361,6 +1378,11 @@ dosetenv(v, c)
 
     if (eq(vp, STRKUSER)) {
 	set(STRuser, quote(lp), VAR_READWRITE);	/* lp memory used here */
+	return;
+    }
+
+    if (eq(vp, STRKGROUP)) {
+	set(STRgroup, quote(lp), VAR_READWRITE);	/* lp memory used here */
 	return;
     }
 
@@ -1449,6 +1471,19 @@ dounsetenv(v, c)
 # ifdef LC_COLLATE
 		    (void) setlocale(LC_COLLATE, "");
 # endif
+# if defined(NLS_CATALOGS) && defined(LC_MESSAGES)
+		    (void) setlocale(LC_MESSAGES, "");
+		    catclose(catd);
+		    catd = catopen("tcsh", MCLoadBySet);
+		    errinit(0);	/* init the errorlist in correct locale */
+		    mesginit(0); /* init the messages for signals */
+		    promptMonthDayInit(0); /* init the month and day names
+					   * depending on the locale, if any
+					   */
+# endif /* NLS_CATALOGS && LC_MESSAGES */
+# ifdef LC_CTYPE
+	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
+# endif /* LC_CTYPE */
 # ifdef SETLOCALEBUG
 		    dont_free = 0;
 # endif /* SETLOCALEBUG */
@@ -2007,8 +2042,10 @@ setlim(lp, hard, limit)
 # endif /* aiws */
     if (ulimit(toset(lp->limconst), limit) < 0) {
 # endif /* BSDLIMIT */
-	xprintf("%s: %s: Can't %s%s limit\n", bname, lp->limname,
-		limit == RLIM_INFINITY ? "remove" : "set",
+	xprintf(catgets(catd, 1, 438,
+			"%s: %s: Can't %s%s limit\n"), bname, lp->limname,
+		limit == RLIM_INFINITY ? catgets(catd, 1, 439, "remove") :
+		catgets(catd, 1, 440, "set"),
 		hard ? " hard" : "");
 	return (-1);
     }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.xmap.c,v 3.12 1994/07/08 15:01:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.xmap.c,v 3.13 1994/09/04 21:54:15 christos Exp christos $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.12 1994/07/08 15:01:15 christos Exp christos $")
+RCSID("$Id: ed.xmap.c,v 3.13 1994/09/04 21:54:15 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -231,12 +231,14 @@ AddXkey(Xkey, val, ntype)
     cs.buf = Xkey->buf;
     cs.len = Xkey->len;
     if (Xkey->len == 0) {
-	xprintf("AddXkey: Null extended-key not allowed.\n");
+	xprintf(catgets(catd, 1, 223,
+			"AddXkey: Null extended-key not allowed.\n"));
 	return;
     }
 
     if (ntype == XK_CMD && val->cmd == F_XKEY) {
-	xprintf("AddXkey: sequence-lead-in command not allowed\n");
+	xprintf(catgets(catd, 1, 224,
+			"AddXkey: sequence-lead-in command not allowed\n"));
 	return;
     }
 
@@ -336,7 +338,8 @@ DeleteXkey(Xkey)
     CStr   *Xkey;
 {
     if (Xkey->len == 0) {
-	xprintf("DeleteXkey: Null extended-key not allowed.\n");
+	xprintf(catgets(catd, 1, 225,
+			"DeleteXkey: Null extended-key not allowed.\n"));
 	return (-1);
     }
 
@@ -463,16 +466,23 @@ PrintXkey(key)
     CStr   *key;
 {
     CStr cs;
-    cs.buf = key->buf;
-    cs.len = key->len;
+
+    if (key) {
+	cs.buf = key->buf;
+	cs.len = key->len;
+    }
+    else {
+	cs.buf = STRNULL;
+	cs.len = 0;
+    }
     /* do nothing if Xmap is empty and null key specified */
-    if (Xmap == NULL && key->len == 0)
+    if (Xmap == NULL && cs.len == 0)
 	return;
 
     printbuf[0] =  '"';
     if (Lookup(&cs, Xmap, 1) <= -1)
 	/* key is not bound */
-	xprintf("Unbound extended key \"%S\"\n", key->buf);
+	xprintf(catgets(catd, 1, 226, "Unbound extended key \"%S\"\n"), cs.buf);
     return;
 }
 
@@ -543,14 +553,15 @@ Enumerate(ptr, cnt)
     if (cnt >= MAXXKEY - 5) {	/* buffer too small */
 	printbuf[++cnt] = '"';
 	printbuf[++cnt] = '\0';
-	xprintf("Some extended keys too long for internal print buffer");
+	xprintf(catgets(catd, 1, 227,
+		"Some extended keys too long for internal print buffer"));
 	xprintf(" \"%S...\"\n", printbuf);
 	return (0);
     }
 
     if (ptr == NULL) {
 #ifdef DEBUG_EDIT
-	xprintf("Enumerate: BUG!! Null ptr passed\n!");
+	xprintf(catgets(catd, 1, 228, "Enumerate: BUG!! Null ptr passed\n!"));
 #endif
 	return (-1);
     }
@@ -607,7 +618,7 @@ printOne(key, val, ntype)
 	    break;
 	}
     else
-	xprintf(fmt, "no input");
+	xprintf(fmt, key, catgets(catd, 1, 229, "no input"));
     return (0);
 }
 
@@ -658,7 +669,7 @@ parseescape(ptr)
     p = *ptr;
 
     if ((p[1] & CHAR) == 0) {
-	xprintf("Something must follow: %c\n", *p);
+	xprintf(catgets(catd, 1, 1095, "Something must follow: %c\n"), *p);
 	return -1;
     }
     if ((*p & CHAR) == '\\') {
@@ -708,7 +719,8 @@ parseescape(ptr)
 		    val = (val << 3) | (ch - '0');
 		}
 		if ((val & 0xffffff00) != 0) {
-		    xprintf("Octal constant does not fit in a char.\n");
+		    xprintf(catgets(catd, 1, 1096,
+			    "Octal constant does not fit in a char.\n"));
 		    return 0;
 		}
 		c = (Char) val;
@@ -723,7 +735,7 @@ parseescape(ptr)
     else if ((*p & CHAR) == '^' && (Isalpha(p[1] & CHAR) || 
 				    strchr("@^_?\\|[{]}", p[1] & CHAR))) {
 	p++;
-	c = (*p == '?') ? '\177' : ((*p & CHAR) & 0237);
+	c = ((*p & CHAR) == '?') ? '\177' : ((*p & CHAR) & 0237);
     }
     else
 	c = *p;

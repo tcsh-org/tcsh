@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.bind.c,v 3.21 1994/09/04 21:54:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.bind.c,v 3.22 1995/01/20 23:48:56 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.21 1994/09/04 21:54:15 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.22 1995/01/20 23:48:56 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -51,6 +51,7 @@ static	void   pkeys		__P((int, int));
 
 static	void   printkey		__P((KEYCMD *, CStr *));
 static	KEYCMD parsecmd		__P((Char *));
+static  void   bad_spec		__P((Char *));
 static	CStr  *parsestring	__P((Char *, CStr *));
 static	CStr  *parsebind	__P((Char *, CStr *));
 static	void   print_all_keys	__P((void));
@@ -146,7 +147,7 @@ dobindkey(v, c)
 
     if (key) {
 	if (!IsArrowKey(v[no]))
-	    xprintf("Invalid key name `%S'\n", v[no]);
+	    xprintf(catgets(catd, 1, 1091, "Invalid key name `%S'\n"), v[no]);
 	in.buf = v[no++];
 	in.len = Strlen(in.buf);
     }
@@ -198,7 +199,7 @@ dobindkey(v, c)
 	    return;
 	if (key) {
 	    if (SetArrowKeys(&in, XmapStr(&out), ntype) == -1)
-		xprintf("Bad key name: %S\n", in.buf);
+		xprintf(catgets(catd, 1, 1092, "Bad key name: %S\n"), in);
 	}
 	else
 	    AddXkey(&in, XmapStr(&out), ntype);
@@ -259,8 +260,16 @@ parsecmd(str)
 	    return (KEYCMD) fp->func;
 	}
     }
-    xprintf("Bad command name: %S\n", str);
+    xprintf(catgets(catd, 1, 1093, "Bad command name: %S\n"), str);
     return 0;
+}
+
+
+static void
+bad_spec(str)
+    Char *str;
+{
+    xprintf(catgets(catd, 1, 1094, "Bad key spec %S\n"), str);
 }
 
 static CStr *
@@ -268,8 +277,15 @@ parsebind(s, str)
     Char *s;
     CStr *str;
 {
-    static const char badspec[] = "Bad key spec %S\n";
     Char *b = str->buf;
+
+    if (Iscntrl(*s)) {
+	*b++ = *s;
+	*b = '\0';
+	str->len = b - str->buf;
+	return str;
+    }
+
     switch (*s) {
     case '^':
 	s++;
@@ -282,7 +298,7 @@ parsebind(s, str)
     case 'X':
     case 'C':
 	if (s[1] != '-' || s[2] == '\0') {
-	    xprintf(badspec, s);
+	    bad_spec(s);
 	    return NULL;
 	}
 	s += 2;
@@ -307,15 +323,17 @@ parsebind(s, str)
 	case 'M' : case 'm':	/* Turn into 0x80|c */
 	    *b++ = *s | 0x80;
 	    *b = '\0';
+	    break;
 
 	default:
 	    abort();
 	    /*NOTREACHED*/
 	    return NULL;
 	}
+	break;
 
     default:
-	xprintf(badspec, s);
+	bad_spec(s);
 	return NULL;
     }
 
@@ -335,7 +353,7 @@ parsestring(str, buf)
 
     b = buf->buf;
     if (*str == 0) {
-	xprintf("Null string specification\n");
+	xprintf(catgets(catd, 1, 1097, "Null string specification\n"));
 	return NULL;
     }
 
@@ -363,7 +381,7 @@ print_all_keys()
     nilstr.len = 0;
 
 
-    xprintf("Standard key bindings\n");
+    xprintf(catgets(catd, 1, 1098, "Standard key bindings\n"));
     prev = 0;
     for (i = 0; i < 256; i++) {
 	if (CcKeyMap[prev] == CcKeyMap[i])
@@ -373,7 +391,7 @@ print_all_keys()
     }
     printkeys(CcKeyMap, prev, i - 1);
 
-    xprintf("Alternative key bindings\n");
+    xprintf(catgets(catd, 1, 1099, "Alternative key bindings\n"));
     prev = 0;
     for (i = 0; i < 256; i++) {
 	if (CcAltMap[prev] == CcAltMap[i])
@@ -382,9 +400,9 @@ print_all_keys()
 	prev = i;
     }
     printkeys(CcAltMap, prev, i - 1);
-    xprintf("Multi-character bindings\n");
-    PrintXkey(&nilstr);	/* print all Xkey bindings */
-    xprintf("Arrow key bindings\n");
+    xprintf(catgets(catd, 1, 1100, "Multi-character bindings\n"));
+    PrintXkey(NULL);	/* print all Xkey bindings */
+    xprintf(catgets(catd, 1, 1101, "Arrow key bindings\n"));
     PrintArrowKeys(&nilstr);
 }
 
@@ -409,7 +427,7 @@ printkeys(map, first, last)
 
     if (map[first] == F_UNASSIGNED) {
 	if (first == last)
-	    xprintf("%-15s->  is undefined\n",
+	    xprintf(catgets(catd, 1, 1102, "%-15s->  is undefined\n"),
 		    unparsestring(&fb, unparsbuf, STRQQ));
 	return;
     }
@@ -429,12 +447,12 @@ printkeys(map, first, last)
 	}
     }
     if (map == CcKeyMap) {
-	xprintf("BUG!!! %s isn't bound to anything.\n",
+	xprintf(catgets(catd, 1, 1103, "BUG!!! %s isn't bound to anything.\n"),
 		unparsestring(&fb, unparsbuf, STRQQ));
 	xprintf("CcKeyMap[%d] == %d\n", first, CcKeyMap[first]);
     }
     else {
-	xprintf("BUG!!! %s isn't bound to anything.\n",
+	xprintf(catgets(catd, 1, 1103, "BUG!!! %s isn't bound to anything.\n"),
 		unparsestring(&fb, unparsbuf, STRQQ));
 	xprintf("CcAltMap[%d] == %d\n", first, CcAltMap[first]);
     }
@@ -443,22 +461,37 @@ printkeys(map, first, last)
 static void
 bindkey_usage()
 {
-    xprintf("Usage: bindkey [options] [--] [KEY [COMMAND]]\n");
-    xprintf("    -l   list editor commands with descriptions\n");
-    xprintf("    -d   bind all keys to default editor's bindings\n");
-    xprintf("    -e   bind all keys to emacs bindings\n");
-    xprintf("    -v   bind all keys to vi bindings\n");
-    xprintf("    -a   list or bind KEY in alternative key map\n");
-    xprintf("    -b   interpret KEY as a C-, M-, F- or X- key name\n");
-    xprintf("    -k   interpret KEY as a symbolic arrow-key name\n");
-    xprintf("    -r   remove KEY's binding\n");
-    xprintf("    -c   interpret COMMAND as a builtin or external command\n");
-    xprintf("    -s   interpret COMMAND as a literal string to be output\n");
-    xprintf("    --   force a break from option processing\n");
-    xprintf("    -u   (or any invalid option) this message\n");
+    xprintf(catgets(catd, 1, 1104,
+	    "Usage: bindkey [options] [--] [KEY [COMMAND]]\n"));
+    xprintf(catgets(catd, 1, 1105,
+    	    "    -a   list or bind KEY in alternative key map\n"));
+    xprintf(catgets(catd, 1, 1106,
+	    "    -b   interpret KEY as a C-, M-, F- or X- key name\n"));
+    xprintf(catgets(catd, 1, 1107,
+            "    -s   interpret COMMAND as a literal string to be output\n"));
+    xprintf(catgets(catd, 1, 1108,
+            "    -c   interpret COMMAND as a builtin or external command\n"));
+    xprintf(catgets(catd, 1, 1109,
+	    "    -v   bind all keys to vi bindings\n"));
+    xprintf(catgets(catd, 1, 1110,
+	    "    -e   bind all keys to emacs bindings\n"));
+    xprintf(catgets(catd, 1, 1111,
+	    "    -d   bind all keys to default editor's bindings\n"));
+    xprintf(catgets(catd, 1, 1112,
+	    "    -l   list editor commands with descriptions\n"));
+    xprintf(catgets(catd, 1, 1113,
+	    "    -r   remove KEY's binding\n"));
+    xprintf(catgets(catd, 1, 1114,
+	    "    -k   interpret KEY as a symbolic arrow-key name\n"));
+    xprintf(catgets(catd, 1, 1232,
+	    "    --   force a break from option processing\n"));
+    xprintf(catgets(catd, 1, 1233,
+	    "    -u   (or any invalid option) this message\n"));
     xprintf("\n");
-    xprintf("Without KEY or COMMAND, prints all bindings.\n");
-    xprintf("Without COMMAND, prints the binding for KEY.\n");
+    xprintf(catgets(catd, 1, 1115,
+	    "Without KEY or COMMAND, prints all bindings\n"));
+    xprintf(catgets(catd, 1, 1116,
+	    "Without COMMAND, prints the binding for KEY.\n"));
 }
 
 static void
@@ -614,11 +647,11 @@ parsekey(sp)
     KEYCMD  keycmd;
 
     if (s == NULL) {
-	xprintf("bad key specification -- null string\n");
+	xprintf(catgets(catd, 1, 1117, "bad key specification -- null string\n"));
 	return -1;
     }
     if (*s == 0) {
-	xprintf("bad key specification -- empty string\n");
+	xprintf(catgets(catd, 1, 1118, "bad key specification -- empty string\n"));
 	return -1;
     }
 
@@ -629,7 +662,8 @@ parsekey(sp)
 
     if ((s[0] == 'F' || s[0] == 'f') && s[1] == '-') {
 	if (s[2] == 0) {
-	    xprintf("Bad function-key specification.  Null key not allowed\n");
+	    xprintf(catgets(catd, 1, 1119,
+		   "Bad function-key specification.  Null key not allowed\n"));
 	    return (-1);
 	}
 	*sp = s + 2;
@@ -641,7 +675,7 @@ parsekey(sp)
 	for (s += 2; *s; s++) {	/* convert to hex; skip the first 0 */
 	    c *= 16;
 	    if (!Isxdigit(*s)) {
-		xprintf("bad key specification -- malformed hex number\n");
+		xprintf(catgets(catd, 1, 1120, "bad key specification -- malformed hex number\n"));
 		return -1;	/* error */
 	    }
 	    if (Isdigit(*s))
@@ -656,7 +690,8 @@ parsekey(sp)
 	c = 0;
 	for (s++; *s; s++) {	/* convert to octal; skip the first 0 */
 	    if (!Isdigit(*s) || *s == '8' || *s == '9') {
-		xprintf("bad key specification -- malformed octal number\n");
+		xprintf(catgets(catd, 1, 1121,
+			"bad key specification -- malformed octal number\n"));
 		return -1;	/* error */
 	    }
 	    c = (c * 8) + *s - '0';
@@ -666,7 +701,8 @@ parsekey(sp)
 	c = 0;
 	for (; *s; s++) {	/* convert to octal; skip the first 0 */
 	    if (!Isdigit(*s)) {
-		xprintf("bad key specification -- malformed decimal number\n");
+		xprintf(catgets(catd, 1, 1122,
+		       "bad key specification -- malformed decimal number\n"));
 		return -1;	/* error */
 	    }
 	    c = (c * 10) + *s - '0';
@@ -702,8 +738,9 @@ parsekey(sp)
 
 	if (keycmd == F_XKEY) {
 	    if (*s == 0) {
-		xprintf("Bad function-key specification.\n");
-		xprintf("Null key not allowed\n");
+		xprintf(catgets(catd, 1, 1123,
+				"Bad function-key specification.\n"));
+		xprintf(catgets(catd, 1, 1124, "Null key not allowed\n"));
 		return (-1);
 	    }
 	    *sp = s;
@@ -731,7 +768,7 @@ parsekey(sp)
 	    else if (!strcmp(ts, "delete"))
 		c = '\177';
 	    else {
-		xprintf("bad key specification -- unknown name \"%S\"\n", s);
+		xprintf(catgets(catd, 1, 1125, "bad key specification -- unknown name \"%S\"\n", s));
 		return -1;	/* error */
 	    }
 	}
@@ -773,7 +810,7 @@ dobind(v, dummy)
 
     if (v[1] && v[2] && v[3]) {
 	xprintf(
-	   "usage: bind [KEY | COMMAND KEY | \"emacs\" | \"vi\" | \"-a\"]\n");
+	   catgets(catd, 1, 1126, "usage: bind [KEY | COMMAND KEY | \"emacs\" | \"vi\" | \"-a\"]\n"));
 	return;
     }
 
@@ -844,7 +881,8 @@ dobind(v, dummy)
 		return;
 	    }
 	}
-	stderror(ERR_NAME | ERR_STRING, "Invalid function");
+	stderror(ERR_NAME | ERR_STRING, catgets(catd, 1, 1127,
+						"Invalid function"));
     }
     else if (v[1]) {
 	char   *cv = short2str(v[1]);
@@ -934,7 +972,9 @@ pkeys(first, last)
     }
     if (map[first] == F_UNASSIGNED) {
 	if (first == last)
-	    xprintf(" %s\t\tis undefined\n", unparsekey(first | mask));
+	    xprintf(catgets(catd, 1, 1128,
+			    " %s\t\tis undefined\n"),
+		    unparsekey(first | mask));
 	return;
     }
 
@@ -952,11 +992,12 @@ pkeys(first, last)
 	}
     }
     if (map == CcKeyMap) {
-	xprintf("BUG!!! %s isn't bound to anything.\n", unparsekey(first));
+	xprintf(catgets(catd, 1, 1103, "BUG!!! %s isn't bound to anything.\n"),
+		unparsekey(first));
 	xprintf("CcKeyMap[%d] == %d\n", first, CcKeyMap[first]);
     }
     else {
-	xprintf("BUG!!! %s isn't bound to anything.\n",
+	xprintf(catgets(catd, 1, 1103, "BUG!!! %s isn't bound to anything.\n"),
 		unparsekey(first & 0400));
 	xprintf("CcAltMap[%d] == %d\n", first, CcAltMap[first]);
     }

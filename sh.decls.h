@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.decls.h,v 3.25 1994/05/07 18:51:25 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.decls.h,v 3.26 1994/09/22 19:07:30 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -84,6 +84,7 @@ extern	void		  heredoc	__P((Char *));
 /*
  * sh.err.c
  */
+extern	void		  errinit	__P((void));
 extern	void		  seterror	__P((unsigned int, ...));
 extern	void		  stderror	__P((unsigned int, ...));
 
@@ -191,6 +192,10 @@ extern	void		  fmthist	__P((int, ptr_t, char *));
 extern	void		  rechist	__P((Char *, int));
 extern	void		  loadhist	__P((Char *, bool));
 
+/*
+ * sh.init.c
+ */
+extern	void		  mesginit	__P((void));
 
 /*
  * sh.lex.c

@@ -1,4 +1,18 @@
 V6.06.00, -
+ 48. 6.05.04 - 03/03/95
+ 47. Add NODOT config, $command [that holds the command passed with -c]
+     $GROUP and $group
+ 46. AFS fixes from Larry Schwimmer <rosebud@cyclone.Stanford.EDU>
+ 45. Real NLS catalogs from Michael Schmidt <michael@muc.de>
+ 44. patch to allow ^? binding.
+ 43. completion patch from Paul DuBois.
+ 42. Don't spell check in here docs.
+ 41. Incorrect normalization of usec in sh.time.c
+ 40. directory printing and option parsing fixes [from Paul DuBois]
+ 39. realloc_searchlen should be static to avoid conflicts with OS's that
+     use the same malloc package.
+ 38. LOGINFIRST now applies to /etc/csh.login
+ 37. Fixes in bind compatibility code to bindkey.
  36. 6.05.03 - 01/17/95
  35. Don't print the whole watchlist on startup. One can use explicitly
      the log builtin for that.

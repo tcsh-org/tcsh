@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.err.c,v 3.23 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.err.c,v 3.24 1994/09/22 19:07:06 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.23 1994/05/26 13:11:20 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.24 1994/09/22 19:07:06 christos Exp $")
 
 /*
  * C Shell
@@ -55,290 +55,314 @@ char   *seterr = NULL;	/* Holds last error if there was one */
 #define ERR_SILENT	0x20000000
 #define ERR_OLD		0x40000000
 
-static char *errorlist[] = 
-{
 #define ERR_SYNTAX	0
-    "Syntax Error",
 #define ERR_NOTALLOWED	1
-    "%s is not allowed",
 #define ERR_WTOOLONG	2
-    "Word too long",
 #define ERR_LTOOLONG	3
-    "$< line too long",
 #define ERR_DOLZERO	4
-    "No file for $0",
 #define ERR_INCBR	5
-    "Incomplete [] modifier",
 #define ERR_EXPORD	6
-    "$ expansion must end before ]",
 #define ERR_BADMOD	7
-    "Bad : modifier in $ (%c)",
 #define ERR_SUBSCRIPT	8
-    "Subscript error",
 #define ERR_BADNUM	9
-    "Badly formed number",
 #define ERR_NOMORE	10
-    "No more words",
 #define ERR_FILENAME	11
-    "Missing file name",
 #define ERR_GLOB	12
-    "Internal glob error",
 #define ERR_COMMAND	13
-    "Command not found",
 #define ERR_TOOFEW	14
-    "Too few arguments",
 #define ERR_TOOMANY	15
-    "Too many arguments",
 #define ERR_DANGER	16
-    "Too dangerous to alias that",
 #define ERR_EMPTYIF	17
-    "Empty if",
 #define ERR_IMPRTHEN	18
-    "Improper then",
 #define ERR_NOPAREN	19
-    "Words not parenthesized",
 #define ERR_NOTFOUND	20
-    "%s not found",
 #define ERR_MASK	21
-    "Improper mask",
 #define ERR_LIMIT	22
-    "No such limit",
 #define ERR_TOOLARGE	23
-    "Argument too large",
 #define ERR_SCALEF	24
-    "Improper or unknown scale factor",
 #define ERR_UNDVAR	25
-    "Undefined variable",
 #define ERR_DEEP	26
-    "Directory stack not that deep",
 #define ERR_BADSIG	27
-    "Bad signal number",
 #define ERR_UNKSIG	28
-    "Unknown signal; kill -l lists signals",
 #define ERR_VARBEGIN	29
-    "Variable name must begin with a letter",
 #define ERR_VARTOOLONG	30
-    "Variable name too long",
 #define ERR_VARALNUM	31
-    "Variable name must contain alphanumeric characters",
 #define ERR_JOBCONTROL	32
-    "No job control in this shell",
 #define ERR_EXPRESSION	33
-    "Expression Syntax",
 #define ERR_NOHOMEDIR	34
-    "No home directory",
 #define ERR_CANTCHANGE	35
-    "Can't change to home directory",
 #define ERR_NULLCOM	36
-    "Invalid null command",
 #define ERR_ASSIGN	37
-    "Assignment missing expression",
 #define ERR_UNKNOWNOP	38
-    "Unknown operator",
 #define ERR_AMBIG	39
-    "Ambiguous",
 #define ERR_EXISTS	40
-    "%s: File exists",
 #define ERR_ARGC	41
-    "Argument for -c ends in backslash",
 #define ERR_INTR	42
-    "Interrupted",
 #define ERR_RANGE	43
-    "Subscript out of range",
 #define ERR_OVERFLOW	44
-    "Line overflow",
 #define ERR_NOSUCHJOB	45
-    "No such job",
 #define ERR_TERMINAL	46
-    "Can't from terminal",
 #define ERR_NOTWHILE	47
-    "Not in while/foreach",
 #define ERR_NOPROC	48
-    "No more processes",
 #define ERR_NOMATCH	49
-    "No match",
 #define ERR_MISSING	50
-    "Missing %c",
 #define ERR_UNMATCHED	51
-    "Unmatched %c",
 #define ERR_NOMEM	52
-    "Out of memory",
 #define ERR_PIPE	53
-    "Can't make pipe",
 #define ERR_SYSTEM	54
-    "%s: %s",
 #define ERR_STRING	55
-    "%s",
 #define ERR_JOBS	56
-    "Usage: jobs [ -l ]",
 #define ERR_JOBARGS	57
-    "Arguments should be jobs or process id's",
 #define ERR_JOBCUR	58
-    "No current job",
 #define ERR_JOBPREV	59
-    "No previous job",
 #define ERR_JOBPAT	60
-    "No job matches pattern",
 #define ERR_NESTING	61
-    "Fork nesting > %d; maybe `...` loop",
 #define ERR_JOBCTRLSUB	62
-    "No job control in subshells",
 #define ERR_SYNC	63
-    "Sunc fault: Process %d not found",
 #define ERR_STOPPED	64
-#ifdef SUSPENDED
-    "%sThere are suspended jobs",
-#else
-    "%sThere are stopped jobs",
-#endif				/* SUSPENDED */
 #define ERR_NODIR	65
-    "No other directory",
 #define ERR_EMPTY	66
-    "Directory stack empty",
 #define ERR_BADDIR	67
-    "Bad directory",
 #define ERR_DIRUS	68
-    "Usage: %s [-%s]%s",
 #define ERR_HFLAG	69
-    "No operand for -h flag",
 #define ERR_NOTLOGIN	70
-    "Not a login shell",
 #define ERR_DIV0	71
-    "Division by 0",
 #define ERR_MOD0	72
-    "Mod by 0",
 #define ERR_BADSCALE	73
-    "Bad scaling; did you mean \"%s\"?",
 #define ERR_SUSPLOG	74
-    "Can't suspend a login shell (yet)",
 #define ERR_UNKUSER	75
-    "Unknown user: %s",
 #define ERR_NOHOME	76
-    "No $home variable set",
 #define ERR_HISTUS	77
-    "Usage: history [-%s] [# number of events]",
 #define ERR_SPDOLLT	78
-    "$, ! or < not allowed with $# or $?",
 #define ERR_NEWLINE	79
-    "Newline in variable name",
 #define ERR_SPSTAR	80
-    "* not allowed with $# or $?",
 #define ERR_DIGIT	81
-    "$?<digit> or $#<digit> not allowed",
 #define ERR_VARILL	82
-    "Illegal variable name",
 #define ERR_NLINDEX	83
-    "Newline in variable index",
 #define ERR_EXPOVFL	84
-    "Expansion buffer overflow",
 #define ERR_VARSYN	85
-    "Variable syntax",
 #define ERR_BADBANG	86
-    "Bad ! form",
 #define ERR_NOSUBST	87
-    "No previous substitute",
 #define ERR_BADSUBST	88
-    "Bad substitute",
 #define ERR_LHS		89
-    "No previous left hand side",
 #define ERR_RHSLONG	90
-    "Right hand side too long",
 #define ERR_BADBANGMOD	91
-    "Bad ! modifier: %c",
 #define ERR_MODFAIL	92
-    "Modifier failed",
 #define ERR_SUBOVFL	93
-    "Substitution buffer overflow",
 #define ERR_BADBANGARG	94
-    "Bad ! arg selector",
 #define ERR_NOSEARCH	95
-    "No prev search",
 #define ERR_NOEVENT	96
-    "%s: Event not found",
 #define ERR_TOOMANYRP	97
-    "Too many )'s",
 #define ERR_TOOMANYLP	98
-    "Too many ('s",
 #define ERR_BADPLP	99
-    "Badly placed (",
 #define ERR_MISRED	100
-    "Missing name for redirect",
 #define ERR_OUTRED	101
-    "Ambiguous output redirect",
 #define ERR_REDPAR	102
-    "Can't << within ()'s",
 #define ERR_INRED	103
-    "Ambiguous input redirect",
 #define ERR_BADPLPS	104
-    "Badly placed ()'s",
 #define ERR_ALIASLOOP	105
-    "Alias loop",
 #define ERR_NOWATCH	106
-    "No $watch variable set",
 #define ERR_NOSCHED	107
-    "No scheduled events",
 #define ERR_SCHEDUSAGE	108
-    "Usage: sched -<item#>.\nUsage: sched [+]hh:mm <command>",
 #define ERR_SCHEDEV	109
-    "Not that many scheduled events",
 #define ERR_SCHEDCOM	110
-    "No command to run",
 #define ERR_SCHEDTIME	111
-    "Invalid time for event",
 #define ERR_SCHEDREL	112
-    "Relative time inconsistent with am/pm",
 #define ERR_TCNOSTR	113
-    "Out of termcap string space",
 #define ERR_SETTCUS	114
-    "Usage: settc %s [yes|no]",
 #define ERR_TCCAP	115
-    "Unknown capability `%s'",
 #define ERR_TCPARM	116
-    "Unknown termcap parameter `%%%c'",
 #define ERR_TCARGS	117
-    "Too many arguments for `%s' (%d)",
 #define ERR_TCNARGS	118
-    "`%s' requires %d arguments",
 #define ERR_TCUSAGE	119
-    "Usage: echotc [-v|-s] [<capability> [<args>]]",
 #define ERR_ARCH	120
-    "%s: %s. Wrong Architecture",
 #define ERR_HISTLOOP	121
-    "!# History loop",
 #define ERR_FILEINQ	122
-    "Malformed file inquiry",
 #define ERR_SELOVFL	123
-    "Selector overflow",
 #define ERR_TCSHUSAGE   124
+#define ERR_COMPCOM	125
+#define ERR_COMPINV	126
+#define ERR_COMPMIS	127
+#define ERR_COMPINC	128
+#define ERR_MFLAG	129
+#define ERR_ULIMUS	130
+#define ERR_READONLY	131
+#define ERR_BADJOB	132
+#define ERR_INVALID	133
+#define NO_ERRORS	133
+
+static char *elst[NO_ERRORS];
+
+/*
+   Make elst entries
+*/
+#define MSGSAVE(i, s)	strsave(catgets(catd, 1, i, s))
+
+/*
+   Init the elst depending on the locale
+*/
+void
+errinit()
+{
+    int i;
+    for (i = 0; i < NO_ERRORS; i++)
+	xfree((ptr_t) elst[i]);
+
+    elst[ERR_SYNTAX] = MSGSAVE(260, "Syntax Error");
+    elst[ERR_NOTALLOWED] = MSGSAVE(261, "%s is not allowed");
+    elst[ERR_WTOOLONG] = MSGSAVE(262, "Word too long");
+    elst[ERR_LTOOLONG] = MSGSAVE(263, "$< line too long");
+    elst[ERR_DOLZERO] = MSGSAVE(264, "No file for $0");
+    elst[ERR_INCBR] = MSGSAVE(265, "Incomplete [] modifier");
+    elst[ERR_EXPORD] = MSGSAVE(266, "$ expansion must end before ]");
+    elst[ERR_BADMOD] = MSGSAVE(267, "Bad : modifier in $ (%c)");
+    elst[ERR_SUBSCRIPT] = MSGSAVE(268, "Subscript error");
+    elst[ERR_BADNUM] = MSGSAVE(269, "Badly formed number");
+    elst[ERR_NOMORE] = MSGSAVE(270, "No more words");
+    elst[ERR_FILENAME] = MSGSAVE(271, "Missing file name");
+    elst[ERR_GLOB] = MSGSAVE(272, "Internal glob error");
+    elst[ERR_COMMAND] = MSGSAVE(273, "Command not found");
+    elst[ERR_TOOFEW] = MSGSAVE(274, "Too few arguments");
+    elst[ERR_TOOMANY] = MSGSAVE(275, "Too many arguments");
+    elst[ERR_DANGER] = MSGSAVE(276, "Too dangerous to alias that");
+    elst[ERR_EMPTYIF] = MSGSAVE(277, "Empty if");
+    elst[ERR_IMPRTHEN] = MSGSAVE(278, "Improper then");
+    elst[ERR_NOPAREN] = MSGSAVE(279, "Words not parenthesized");
+    elst[ERR_NOTFOUND] = MSGSAVE(280, "%s not found");
+    elst[ERR_MASK] = MSGSAVE(281, "Improper mask");
+    elst[ERR_LIMIT] = MSGSAVE(282, "No such limit");
+    elst[ERR_TOOLARGE] = MSGSAVE(283, "Argument too large");
+    elst[ERR_SCALEF] = MSGSAVE(284, "Improper or unknown scale factor");
+    elst[ERR_UNDVAR] = MSGSAVE(285, "Undefined variable");
+    elst[ERR_DEEP] = MSGSAVE(286, "Directory stack not that deep");
+    elst[ERR_BADSIG] = MSGSAVE(287, "Bad signal number");
+    elst[ERR_UNKSIG] = MSGSAVE(288, "Unknown signal; kill -l lists signals");
+    elst[ERR_VARBEGIN] = MSGSAVE(289, "Variable name must begin with a letter");
+    elst[ERR_VARTOOLONG] = MSGSAVE(290, "Variable name too long");
+    elst[ERR_VARALNUM] = MSGSAVE(291,
+	"Variable name must contain alphanumeric characters");
+    elst[ERR_JOBCONTROL] = MSGSAVE(292, "No job control in this shell");
+    elst[ERR_EXPRESSION] = MSGSAVE(293, "Expression Syntax");
+    elst[ERR_NOHOMEDIR] = MSGSAVE(294, "No home directory");
+    elst[ERR_CANTCHANGE] = MSGSAVE(295, "Can't change to home directory");
+    elst[ERR_NULLCOM] = MSGSAVE(296, "Invalid null command");
+    elst[ERR_ASSIGN] = MSGSAVE(297, "Assignment missing expression");
+    elst[ERR_UNKNOWNOP] = MSGSAVE(298, "Unknown operator");
+    elst[ERR_AMBIG] = MSGSAVE(299, "Ambiguous");
+    elst[ERR_EXISTS] = MSGSAVE(300, "%s: File exists");
+    elst[ERR_ARGC] = MSGSAVE(301, "Argument for -c ends in backslash");
+    elst[ERR_INTR] = MSGSAVE(302, "Interrupted");
+    elst[ERR_RANGE] = MSGSAVE(303, "Subscript out of range");
+    elst[ERR_OVERFLOW] = MSGSAVE(304, "Line overflow");
+    elst[ERR_NOSUCHJOB] = MSGSAVE(305, "No such job");
+    elst[ERR_TERMINAL] = MSGSAVE(306, "Can't from terminal");
+    elst[ERR_NOTWHILE] = MSGSAVE(307, "Not in while/foreach");
+    elst[ERR_NOPROC] = MSGSAVE(308, "No more processes");
+    elst[ERR_NOMATCH] = MSGSAVE(309, "No match");
+    elst[ERR_MISSING] = MSGSAVE(310, "Missing %c");
+    elst[ERR_UNMATCHED] = MSGSAVE(311, "Unmatched %c");
+    elst[ERR_NOMEM] = MSGSAVE(312, "Out of memory");
+    elst[ERR_PIPE] = MSGSAVE(313, "Can't make pipe");
+    elst[ERR_SYSTEM] = "%s: %s"; elst[ERR_STRING] = "%s";
+    elst[ERR_JOBS] = MSGSAVE(314, "Usage: jobs [ -l ]");
+    elst[ERR_JOBARGS] = MSGSAVE(315,
+	"Arguments should be jobs or process id's");
+    elst[ERR_JOBCUR] = MSGSAVE(316, "No current job");
+    elst[ERR_JOBPREV] = MSGSAVE(317, "No previous job");
+    elst[ERR_JOBPAT] = MSGSAVE(318, "No job matches pattern");
+    elst[ERR_NESTING] = MSGSAVE(319, "Fork nesting > %d; maybe `...` loop");
+    elst[ERR_JOBCTRLSUB] = MSGSAVE(320, "No job control in subshells");
+    elst[ERR_SYNC] = MSGSAVE(321, "Sunc fault: Process %d not found");
+    elst[ERR_STOPPED] =
+#ifdef SUSPENDED
+	MSGSAVE(322, "%sThere are suspended jobs");
+#else
+	MSGSAVE(323, "%sThere are stopped jobs");
+#endif				/* SUSPENDED */
+    elst[ERR_NODIR] = MSGSAVE(324, "No other directory");
+    elst[ERR_EMPTY] = MSGSAVE(325, "Directory stack empty");
+    elst[ERR_BADDIR] = MSGSAVE(326, "Bad directory");
+    elst[ERR_DIRUS] = MSGSAVE(327, "Usage: %s [-%s]%s");
+    elst[ERR_HFLAG] = MSGSAVE(328, "No operand for -h flag");
+    elst[ERR_NOTLOGIN] = MSGSAVE(329, "Not a login shell");
+    elst[ERR_DIV0] = MSGSAVE(330, "Division by 0");
+    elst[ERR_MOD0] = MSGSAVE(331, "Mod by 0");
+    elst[ERR_BADSCALE] = MSGSAVE(332, "Bad scaling; did you mean \"%s\"?");
+    elst[ERR_SUSPLOG] = MSGSAVE(333, "Can't suspend a login shell (yet)");
+    elst[ERR_UNKUSER] = MSGSAVE(334, "Unknown user: %s");
+    elst[ERR_NOHOME] = MSGSAVE(335, "No $home variable set");
+    elst[ERR_HISTUS] = MSGSAVE(336,
+	"Usage: history [-%s] [# number of events]");
+    elst[ERR_SPDOLLT] = MSGSAVE(337, "$, ! or < not allowed with $# or $?");
+    elst[ERR_NEWLINE] = MSGSAVE(338, "Newline in variable name");
+    elst[ERR_SPSTAR] = MSGSAVE(339, "* not allowed with $# or $?");
+    elst[ERR_DIGIT] = MSGSAVE(340, "$?<digit> or $#<digit> not allowed");
+    elst[ERR_VARILL] = MSGSAVE(341, "Illegal variable name");
+    elst[ERR_NLINDEX] = MSGSAVE(342, "Newline in variable index");
+    elst[ERR_EXPOVFL] = MSGSAVE(343, "Expansion buffer overflow");
+    elst[ERR_VARSYN] = MSGSAVE(344, "Variable syntax");
+    elst[ERR_BADBANG] = MSGSAVE(345, "Bad ! form");
+    elst[ERR_NOSUBST] = MSGSAVE(346, "No previous substitute");
+    elst[ERR_BADSUBST] = MSGSAVE(347, "Bad substitute");
+    elst[ERR_LHS] = MSGSAVE(348, "No previous left hand side");
+    elst[ERR_RHSLONG] = MSGSAVE(349, "Right hand side too long");
+    elst[ERR_BADBANGMOD] = MSGSAVE(350, "Bad ! modifier: %c");
+    elst[ERR_MODFAIL] = MSGSAVE(351, "Modifier failed");
+    elst[ERR_SUBOVFL] = MSGSAVE(352, "Substitution buffer overflow");
+    elst[ERR_BADBANGARG] = MSGSAVE(353, "Bad ! arg selector");
+    elst[ERR_NOSEARCH] = MSGSAVE(354, "No prev search");
+    elst[ERR_NOEVENT] = MSGSAVE(355, "%s: Event not found");
+    elst[ERR_TOOMANYRP] = MSGSAVE(356, "Too many )'s");
+    elst[ERR_TOOMANYLP] = MSGSAVE(356, "Too many ('s");
+    elst[ERR_BADPLP] = MSGSAVE(358, "Badly placed (");
+    elst[ERR_MISRED] = MSGSAVE(359, "Missing name for redirect");
+    elst[ERR_OUTRED] = MSGSAVE(360, "Ambiguous output redirect");
+    elst[ERR_REDPAR] = MSGSAVE(361, "Can't << within ()'s");
+    elst[ERR_INRED] = MSGSAVE(362, "Ambiguous input redirect");
+    elst[ERR_BADPLPS] = MSGSAVE(358, "Badly placed ()'s");
+    elst[ERR_ALIASLOOP] = MSGSAVE(364, "Alias loop");
+    elst[ERR_NOWATCH] = MSGSAVE(365, "No $watch variable set");
+    elst[ERR_NOSCHED] = MSGSAVE(366, "No scheduled events");
+    elst[ERR_SCHEDUSAGE] = MSGSAVE(367,
+	"Usage: sched -<item#>.\nUsage: sched [+]hh:mm <command>");
+    elst[ERR_SCHEDEV] = MSGSAVE(368, "Not that many scheduled events");
+    elst[ERR_SCHEDCOM] = MSGSAVE(369, "No command to run");
+    elst[ERR_SCHEDTIME] = MSGSAVE(370, "Invalid time for event");
+    elst[ERR_SCHEDREL] = MSGSAVE(371, "Relative time inconsistent with am/pm");
+    elst[ERR_TCNOSTR] = MSGSAVE(372, "Out of termcap string space");
+    elst[ERR_SETTCUS] = MSGSAVE(373, "Usage: settc %s [yes|no]");
+    elst[ERR_TCCAP] = MSGSAVE(374, "Unknown capability `%s'");
+    elst[ERR_TCPARM] = MSGSAVE(375, "Unknown termcap parameter `%%%c'");
+    elst[ERR_TCARGS] = MSGSAVE(376, "Too many arguments for `%s' (%d)");
+    elst[ERR_TCNARGS] = MSGSAVE(377, "`%s' requires %d arguments");
+    elst[ERR_TCUSAGE] = MSGSAVE(378,
+	"Usage: echotc [-v|-s] [<capability> [<args>]]");
+    elst[ERR_ARCH] = MSGSAVE(379, "%s: %s. Wrong Architecture");
+    elst[ERR_HISTLOOP] = MSGSAVE(380, "!# History loop");
+    elst[ERR_FILEINQ] = MSGSAVE(381, "Malformed file inquiry");
+    elst[ERR_SELOVFL] = MSGSAVE(382, "Selector overflow");
 #ifdef apollo
-    "Unknown option: `-%s'\nUsage: tcsh [ -bcdefilmnqstvVxX -Dname[=value] ] [ argument ... ]",
+    elst[ERR_TCSHUSAGE] = MSGSAVE(383,
+"Unknown option: `-%s'\nUsage: tcsh [ -bcdefilmnqstvVxX -Dname[=value] ] [ argument ... ]");
 #else /* !apollo */
 # ifdef convex
-    "Unknown option: `-%s'\nUsage: tcsh [ -bcdefFilmnqstvVxX ] [ argument ... ]",
+    elst[ERR_TCSHUSAGE] = MSGSAVE(384,
+"Unknown option: `-%s'\nUsage: tcsh [ -bcdefFilmnqstvVxX ] [ argument ... ]");
 # else /* rest */
-    "Unknown option: `-%s'\nUsage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]",
+    elst[ERR_TCSHUSAGE] = MSGSAVE(385,
+"Unknown option: `-%s'\nUsage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]");
 # endif /* convex */
 #endif /* apollo */
-#define ERR_COMPCOM	125
-    "\nInvalid completion: \"%s\"",
-#define ERR_COMPINV	126
-    "\nInvalid %s: '%c'",
-#define ERR_COMPMIS	127
-    "\nMissing separator '%c' after %s \"%s\"",
-#define ERR_COMPINC	128
-    "\nIncomplete %s: \"%s\"",
-#define ERR_MFLAG	129
-    "No operand for -m flag",
-#define ERR_ULIMUS	130
-    "Usage: unlimit [-fh] [limits]",
-#define ERR_READONLY	131
-    "$%S is read-only",
-#define ERR_BADJOB	132
-    "Cannot restart %S (%s)",
-#define ERR_INVALID	133
-    "Invalid Error"
-};
-
+    elst[ERR_COMPCOM] = MSGSAVE(386, "\nInvalid completion: \"%s\"");
+    elst[ERR_COMPINV] = MSGSAVE(387, "\nInvalid %s: '%c'");
+    elst[ERR_COMPMIS] = MSGSAVE(388,
+	"\nMissing separator '%c' after %s \"%s\"");
+    elst[ERR_COMPINC] = MSGSAVE(389, "\nIncomplete %s: \"%s\"");
+    elst[ERR_MFLAG] = MSGSAVE(390, "No operand for -m flag");
+    elst[ERR_ULIMUS] = MSGSAVE(391, "Usage: unlimit [-fh] [limits]");
+    elst[ERR_READONLY] = MSGSAVE(392, "$%S is read-only");
+    elst[ERR_BADJOB] = MSGSAVE(1235, "No such job");
+}
 /*
  * The parser and scanner set up errors for later by calling seterr,
  * which sets the variable err as a side effect; later to be tested,
@@ -365,9 +389,9 @@ seterror(va_alist)
 	id = va_arg(va, unsigned int);
 #endif
 
-	if (id >= sizeof(errorlist) / sizeof(errorlist[0]))
+	if (id >= sizeof(elst) / sizeof(elst[0]))
 	    id = ERR_INVALID;
-	xvsprintf(berr, errorlist[id], va);
+	xvsprintf(berr, elst[id], va);
 	va_end(va);
 
 	seterr = strsave(berr);
@@ -428,7 +452,7 @@ stderror(va_alist)
      */
     if (!((flags & ERR_OLD) && seterr == NULL)) {
 	vareturn = 0;	/* Don't return immediately after va_end */
-	if (id >= sizeof(errorlist) / sizeof(errorlist[0]))
+	if (id >= sizeof(elst) / sizeof(elst[0]))
 	    id = ERR_INVALID;
 
 	/*
@@ -449,7 +473,7 @@ stderror(va_alist)
 		/* Old error. */
 		xprintf("%s.\n", seterr);
 		} else {
-		   xvprintf(errorlist[id], va);
+		   xvprintf(elst[id], va);
 		    xprintf(".\n");
 		}
 	}
@@ -470,6 +494,7 @@ stderror(va_alist)
     if ((v = gargv) != 0)
 	gargv = 0, blkfree(v);
 
+    inheredoc = 0; 		/* Not anymore in a heredoc */
     didfds = 0;			/* Forget about 0,1,2 */
     /*
      * Go away if -e or we are a child shell

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.c,v 3.37 1994/09/04 21:54:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.c,v 3.38 1995/01/20 23:48:56 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.37 1994/09/04 21:54:15 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.38 1995/01/20 23:48:56 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -373,10 +373,12 @@ dosetspath(v, c)
 	    p[i] = st->sf_id;
 	else {
 	    setname(s);
-	    stderror(ERR_NAME | ERR_STRING, "Bad cpu/site name");
+	    stderror(ERR_NAME | ERR_STRING,
+		     catgets(catd, 1, 1143, "Bad cpu/site name"));
 	}
 	if (i == MAXSITE - 1)
-	    stderror(ERR_NAME | ERR_STRING, "Site path too long");
+	    stderror(ERR_NAME | ERR_STRING,
+		     catgets(catd, 1, 1144, "Site path too long"));
     }
     if (setspath(p, i) == -1)
 	stderror(ERR_SYSTEM, "setspath", strerror(errno));
@@ -394,7 +396,7 @@ sitename(pid)
     struct sf *st;
 
     if ((ss = site(pid)) == -1 || (st = sfnum(ss)) == NULL)
-	return ("unknown");
+	return (catgets(catd, 1, 1145, "unknown");B)
     else
 	return (st->sf_sname);
 }
@@ -416,15 +418,15 @@ migratepid(pid, new_site)
 
     if (need_local) {
 	if ((new_site = site(0)) == -1) {
-	    xprintf("site: %s\n", strerror(errno));
+	    xprintf(catgets(catd, 1, 1146, "site: %s\n"), strerror(errno));
 	    return (-1);
 	}
 	if ((st = sfnum(new_site)) == NULL) {
-	    xprintf("%d: Site not found\n", new_site);
+	    xprintf(catgets(catd, 1, 1147, "%d: Site not found\n"), new_site);
 	    return (-1);
 	}
 	if (setlocal(st->sf_local, strlen(st->sf_local)) == -1) {
-	    xprintf("setlocal: %s: %s\n", st->sf_local, strerror(errno));
+	    xprintf(catgets(catd, 1, 1148, "setlocal: %s: %s\n"), st->sf_local, strerror(errno));
 	    return (-1);
 	}
     }
@@ -469,7 +471,8 @@ domigrate(v, c)
 	dont_free = 1;
 	if ((st = sfname(s)) == NULL) {
 	    setname(s);
-	    stderror(ERR_NAME | ERR_STRING, "Site not found");
+	    stderror(ERR_NAME | ERR_STRING,
+		     catgets(catd, 1, 1149, "Site not found"));
 	}
 	dont_free = 0;
 	new_site = st->sf_id;
@@ -600,7 +603,8 @@ dowarp(v, c)
     if (setjmp(sigsys_buf)) {
 	signal(SIGSYS, old_sigsys_handler);
 	stderror(ERR_NAME | ERR_STRING, 
-		 "You're trapped in a universe you never made");
+		 catgets(catd, 1, 1150,
+			 "You're trapped in a universe you never made"));
 	return;
     }
     old_sigsys_handler = signal(SIGSYS, catch_sigsys);
@@ -610,7 +614,8 @@ dowarp(v, c)
     v++;
     if (*v == 0) {		/* display warp value */
 	if (warp < 0)
-	    stderror(ERR_NAME | ERR_STRING, "Getwarp failed");
+	    stderror(ERR_NAME | ERR_STRING,
+		     catgets(catd, 1, 1151, "Getwarp failed"));
 	we = getwarpbyvalue(warp);
 	if (we)
 	    printf("%s\n", we->w_name);
@@ -630,10 +635,12 @@ dowarp(v, c)
 		warp = -1;
 	}
 	if ((warp < 0) || (warp >= WARP_MAXLINK))
-	    stderror(ERR_NAME | ERR_STRING, "Invalid warp");
+	    stderror(ERR_NAME | ERR_STRING,
+		     catgets(catd, 1, 1152, "Invalid warp"));
 	if ((setwarp(warp) < 0) || (getwarp() != warp)) {
 	    (void) setwarp(oldwarp);
-	    stderror(ERR_NAME | ERR_STRING, "Setwarp failed");
+	    stderror(ERR_NAME | ERR_STRING,
+		     catgets(catd, 1, 1153, "Setwarp failed"));
 	}
     }
     signal(SIGSYS, old_sigsys_handler);
@@ -660,7 +667,8 @@ douniverse(v, c)
 	xprintf("%s\n", ubuf);
     }
     else if (*cp == '\0' || setuniverse(short2str(cp)) != 0)
-	stderror(ERR_NAME | ERR_STRING, "Illegal universe");
+	stderror(ERR_NAME | ERR_STRING, catgets(catd, 1, 1154,
+						"Illegal universe"));
 }
 #endif /* masscomp || hcx */
 
@@ -876,7 +884,8 @@ xstrerror(i)
     if (i >= 0 && i < sys_nerr) {
 	return sys_errlist[i];
     } else {
-	(void) xsprintf(errbuf, "Unknown Error: %d", i);
+	(void) xsprintf(errbuf,
+			catgets(catd, 1, 1155, "Unknown Error: %d"), i);
 	return errbuf;
     }
 }
@@ -899,11 +908,11 @@ xgethostname(name, namlen)
     retval = uname(&uts);
 
 #  ifdef DEBUG
-    xprintf("sysname:  %s\n", uts.sysname);
-    xprintf("nodename: %s\n", uts.nodename);
-    xprintf("release:  %s\n", uts.release);
-    xprintf("version:  %s\n", uts.version);
-    xprintf("machine:  %s\n", uts.machine);
+    xprintf(catgets(catd, 1, 1156, "sysname:  %s\n"), uts.sysname);
+    xprintf(catgets(catd, 1, 1157, "nodename: %s\n"), uts.nodename);
+    xprintf(catgets(catd, 1, 1158, "release:  %s\n"), uts.release);
+    xprintf(catgets(catd, 1, 1159, "version:  %s\n"), uts.version);
+    xprintf(catgets(catd, 1, 1160, "machine:  %s\n"), uts.machine);
 #  endif /* DEBUG */
     i = strlen(uts.nodename) + 1;
     (void) strncpy(name, uts.nodename, i < namlen ? i : namlen);
@@ -989,19 +998,24 @@ xgetwd(pathname)
 			break;		/* reached root directory */
 		if ((dirp = opendir("..")) == NULL) {
         		(void) xsprintf(pathname,
-                        "getwd: Cannot open \"..\" (%s)", strerror(errno));
+                        catgets(catd, 1, 1161,
+				"getwd: Cannot open \"..\" (%s)"),
+					strerror(errno));
 			goto fail;
 		}
 		if (chdir("..") < 0) {
         		(void) xsprintf(pathname,
-                        "getwd: Cannot chdir to \"..\" (%s)", strerror(errno));
+                        catgets(catd, 1, 1162,
+				"getwd: Cannot chdir to \"..\" (%s)"),
+					strerror(errno));
 			goto fail;
 		}
 		do {
 			if((dir = readdir(dirp)) == NULL) {
 				closedir(dirp);
         			(void) xsprintf(pathname,
-                        	"getwd: Read error in \"..\" (%s)",
+                        	catgets(catd, 1, 1163,
+					"getwd: Read error in \"..\" (%s)"),
 				strerror(errno));
 				goto fail;
 			}
@@ -1020,7 +1034,8 @@ xgetwd(pathname)
 		(void) strcpy(pathname, pnptr);
 		if (chdir(pnptr) < 0) {
         		(void) xsprintf(pathname,
-                        "getwd: Cannot change back to \".\" (%s)",
+                        catgets(catd, 1, 1164,
+				"getwd: Cannot change back to \".\" (%s)"),
 			strerror(errno));
 			return (NULL);
 		}
@@ -1071,7 +1086,9 @@ xgetwd(pathname)
     /* find the inode of root */
     if (stat("/", &st_root) == -1) {
 	(void) xsprintf(pathname,
-			"getwd: Cannot stat \"/\" (%s)", strerror(errno));
+			catgets(catd, 1, 1165,
+				"getwd: Cannot stat \"/\" (%s)"),
+			strerror(errno));
 	return (NULL);
     }
     pathbuf[MAXPATHLEN - 1] = '\0';
@@ -1082,7 +1099,9 @@ xgetwd(pathname)
     /* find the inode of the current directory */
     if (lstat(".", &st_cur) == -1) {
 	(void) xsprintf(pathname,
-			"getwd: Cannot stat \".\" (%s)", strerror(errno));
+			catgets(catd, 1, 1207,
+				"getwd: Cannot stat \".\" (%s)"),
+			strerror(errno));
 	return (NULL);
     }
     nextpathptr = strrcpy(nextpathptr, "../");
@@ -1100,13 +1119,15 @@ xgetwd(pathname)
 	/* open the parent directory */
 	if (stat(nextpathptr, &st_dotdot) == -1) {
 	    (void) xsprintf(pathname,
-			    "getwd: Cannot stat directory \"%s\" (%s)",
+			    catgets(catd, 1, 1166,
+				    "getwd: Cannot stat directory \"%s\" (%s)"),
 			    nextpathptr, strerror(errno));
 	    return (NULL);
 	}
 	if ((dp = opendir(nextpathptr)) == NULL) {
 	    (void) xsprintf(pathname,
-			    "getwd: Cannot open directory \"%s\" (%s)",
+			    catgets(catd, 1, 1167,
+				    "getwd: Cannot open directory \"%s\" (%s)"),
 			    nextpathptr, strerror(errno));
 	    return (NULL);
 	}
@@ -1150,7 +1171,9 @@ xgetwd(pathname)
 	    }
 	}
 	if (d == NULL) {
-	    (void) xsprintf(pathname, "getwd: Cannot find \".\" in \"..\" (%s)",
+	    (void) xsprintf(pathname,
+			    catgets(catd, 1, 1168,
+				    "getwd: Cannot find \".\" in \"..\" (%s)"),
 			    strerror(save_errno ? save_errno : ENOENT));
 	    (void) closedir(dp);
 	    return (NULL);
@@ -1255,7 +1278,8 @@ getv(v)
     else if (eq(v, STRsys53))
 	return(0);
     else 
-	stderror(ERR_NAME | ERR_SYSTEM, short2str(v), "Invalid system type");
+	stderror(ERR_NAME | ERR_SYSTEM, short2str(v),
+		 catgets(catd, 1, 1170, "Invalid system type"));
     /*NOTREACHED*/
     return(0);
 }
@@ -1271,7 +1295,8 @@ dover(v, c)
     setname(short2str(*v++));
     if (!*v) {
 	if (!(p = tgetenv(STRSYSTYPE)))
-	    stderror(ERR_NAME | ERR_STRING, "System type is not set");
+	    stderror(ERR_NAME | ERR_STRING,
+		     catgets(catd, 1, 1170, "System type is not set"));
 	xprintf("%S\n", p);
     }
     else {

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.file.c,v 3.8 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.file.c,v 3.9 1994/03/13 00:46:35 christos Exp christos $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.8 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: sh.file.c,v 3.9 1994/03/13 00:46:35 christos Exp christos $")
 
 #ifdef FILEC
 
@@ -618,9 +618,10 @@ again:				/* search for matches */
 	    continue;
 	if (command == LIST) {
 	    if (numitems >= MAXITEMS) {
-		xprintf("\nYikes!! Too many %s!!\n",
+		xprintf(catgets(catd, 1, 413, "\nYikes!! Too many %s!!\n"),
 			looking_for_lognames ?
-			"names in password file" : "files");
+			catgets(catd, 1, 414, "names in password file") :
+			catgets(catd, 1, 363, "files");
 		break;
 	    }
 	    /*

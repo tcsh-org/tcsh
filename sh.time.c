@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.time.c,v 3.14 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.time.c,v 3.15 1993/07/03 23:47:53 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.14 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: sh.time.c,v 3.15 1993/07/03 23:47:53 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -581,7 +581,7 @@ tvadd(tsum, t0)
 
     tsum->tv_sec += t0->tv_sec;
     tsum->tv_usec += t0->tv_usec;
-    if (tsum->tv_usec > 1000000)
+    if (tsum->tv_usec >= 1000000)
 	tsum->tv_sec++, tsum->tv_usec -= 1000000;
 }
 

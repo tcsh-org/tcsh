@@ -3306,46 +3306,45 @@ $ #1101 Original Message:(Arrow key bindings\n)
 $ #1102 Original Message:(%-15s->  is undefined\n)
 # %-15s->  ist undefiniert\n
 
-$ #1103 Original Message:(BUG!!! %s isn't bound to anything.\n)
-# BUG!!! %s ist mit nichts belegt.\n
+$ #1103 Original Message:(BUG!!! %s isn't bound to anything.\n) # BUG!!! %s ist mit nichts belegt.\n
 
-$ #1104 Original Message:(Usage: bindkey [options] [--] [in-string [out-string | command]]\n)
-# Benutzung: bindkey [Optionen] [--] [in-string [out-string | Befehl]]\n
+$ #1104 Original Message:(Usage: bindkey [options] [--] [KEY [COMMAND]]\n)
+# Benutzung: bindkey [Optionen] [--] [TASTE [BEFEHL]]\n
 
-$ #1105 Original Message:(    -a   bind key in alternative key binding\n)
+$ #1105 Original Message:(    -a   list or bind KEY in alternative key map\n)
 #     -a   belege Taste in alternativer Tastenbelegung\n
 
-$ #1106 Original Message:(    -b   accept symbolic key definitions\n)
+$ #1106 Original Message:(    -b   interpret KEY as a C-, M-, F- or X- key name\n)
 #     -b   akzeptiere symbolische Tastendefinitionen\n
 
-$ #1107 Original Message:(    -s   bind an out-string instead of a command\n)
+$ #1107 Original Message:(    -s   interpret COMMAND as a literal string to be output\n)
 #     -s   belege einen Out-String anstelle eines Befehls\n
 
-$ #1108 Original Message:(    -c   bind a unix-command instead of a command\n)
+$ #1108 Original Message:(    -c   interpret COMMAND as a builtin or external command\n)
 #     -c   belege einen Unix-Befehl anstelle eines Befehls\n
 
-$ #1109 Original Message:(    -v   initialized maps to default vi bindings\n)
+$ #1109 Original Message:(    -v   bind all keys to vi bindings\n)
 #     -v   initialisiere Belegungen mit Standard-Vi-Belegungen\n
 
-$ #1110 Original Message:(    -e   initialized maps to default emacs bindings\n)
+$ #1110 Original Message:(    -e   bind all keys to emacs bindings\n)
 #     -e   initialisiere Belegungen mit Standard-Emacs-Belegungen\n
 
-$ #1111 Original Message:(    -d   initialized maps to default bindings\n)
-#     -e   initialisiere Belegungen mit Standard-Belegungen\n
+$ #1111 Original Message:(    -d   bind all keys to default editor's bindings\n)
+#     -d   initialisiere Belegungen mit Standard-Belegungen\n
 
-$ #1112 Original Message:(    -l   list available functions with descriptions\n)
+$ #1112 Original Message:(    -l   list editor commands with descriptions\n)
 #     -l   zeige verfügbare Funktionen mit Beschreibungen an\n
 
-$ #1113 Original Message:(    -r   remove the binding of in-string\n)
-#     -r   entferne Belegung eines In-Strings\n
+$ #1113 Original Message:(    -r   remove KEY's binding\n)
+#     -r   entferne Belegung eines Tastes\n
 
-$ #1114 Original Message:(    -k   bind arrow key with name in in-string\n)
+$ #1114 Original Message:(    -k   interpret KEY as a symbolic arrow-key name\n)
 #     -k   belege Pfeiltaste mit Namen in In-String\n
 
-$ #1115 Original Message:(\nIn no out-string or command is given, the binding for in-string\n)
+$ #1115 Original Message:(Without KEY or COMMAND, prints all bindings\n)
 # \nWenn kein Out-String oder Befehl angegeben wurde, wir die Belegung für\n
 
-$ #1116 Original Message:(is printed or all bindings if in-strings is not given.\n)
+$ #1116 Original Message:(Without COMMAND, prints the binding for KEY.\n)
 # den In-String ausgegeben oder alle Belegungen, falls kein in-String gegeben.\n
 
 $ #1117 Original Message:(bad key specification -- null string\n)
@@ -3669,26 +3668,38 @@ $ #1222 Original Message:(Found %s in %s.\n)
 $ #1223 Original Message:(No match found for %s in file %s\n)
 # Kein Eintrag für %s in Datei %s gefunden\n
 
-$ #1224 (new)
+$ #1224 Original Message:(new)
 # neue 
 
-$ #1225 (a)
+$ #1225 Original Message:(a)
 # eine
 
-$ #1226 (no)
+$ #1226 Original Message:(no)
 # keine
 
-$ #1227 ( no)
+$ #1227 Original Message:( no)
 #  keine
 
-$ #1228 (has)
+$ #1228 Original Message:(has)
 # hat
 
-$ #1229 (does not have)
+$ #1229 Original Message:(does not have)
 # hat nicht
 
-$ #1230 (items)
+$ #1230 Original Message:(items)
 # Objekte
 
-$ #1231 (rows)
+$ #1231 Original Message:(rows)
 # Spalten
+
+$ #1232 Original Message:(    --   force a break from option processing\n)
+#    --   force a break from option processing\n
+
+$ #1233 Original Message:(    -u   (or any invalid option) this message\n)
+#    -u   (or any invalid option) this message\n
+
+$ #1234 Original Message:(range)
+# Bereichs
+
+$ #1235 Original Message:(No such job)
+# No such job

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.sched.c,v 3.9 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.sched.c,v 3.10 1994/05/26 13:11:20 christos Exp christos $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.9 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.10 1994/05/26 13:11:20 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -80,7 +80,7 @@ dosched(v, c)
 #ifdef _MINIX
     char kludge[10];
     extern char *sprintf();
-    sprintf(kludge,"kludge");
+    sprintf(kludge,catgets(catd, 1, 1175, "kludge"));
 #endif /* _MINIX */
 
     v++;

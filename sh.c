@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.c,v 3.64 1994/07/08 14:43:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.c,v 3.65 1995/01/20 23:48:56 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.64 1994/07/08 14:43:50 christos Exp $")
+RCSID("$Id: sh.c,v 3.65 1995/01/20 23:48:56 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -178,6 +178,22 @@ main(argc, argv)
 #ifdef BSDSIGS
     sigvec_t osv;
 #endif /* BSDSIGS */
+
+#if defined(NLS_CATALOGS) && defined(LC_MESSAGES)
+    (void) setlocale(LC_MESSAGES, "");
+    catd = catopen("tcsh", MCLoadBySet);
+# endif /* NLS_CATALOGS && LC_MESSAGES */
+
+#ifdef NLS
+# ifdef LC_CTYPE
+    (void) setlocale(LC_CTYPE, ""); /* for iscntrl */
+# endif /* LC_CTYPE */
+#endif /* NLS */
+
+    errinit();			/* init the errorlist in correct locale */
+    mesginit();			/* init the messages for signals */
+    dateinit();			/* init the date related messages */
+
 
 #ifdef MALLOC_TRACE
      mal_setstatsfile(fdopen(dup2(open("/tmp/tcsh.trace", 
@@ -483,9 +499,10 @@ main(argc, argv)
      * everything??
      */
     {
-	char *cln, *cus;
+	char *cln, *cus, *cgr;
 	Char    buff[BUFSIZE];
 	struct passwd *pw;
+	struct group *gr;
 
 
 #ifdef apollo
@@ -515,6 +532,16 @@ main(argc, argv)
 	    tsetenv(STRLOGNAME, varval(STRuser));
 	if (cus == NULL)
 	    tsetenv(STRKUSER, varval(STRuser));
+	
+	cgr = getenv("GROUP");
+	if (cgr != NULL)
+	    set(STRgroup, quote(SAVE(cgr)), VAR_READWRITE);
+	else if ((gr = getgrgid(gid)) == NULL)
+	    set(STRgroup, SAVE("unknown"), VAR_READWRITE);
+	else
+	    set(STRgroup, SAVE(gr->gr_name), VAR_READWRITE);
+	if (cgr == NULL)
+	    tsetenv(STRKGROUP, varval(STRgroup));
     }
 
     /*
@@ -700,6 +727,13 @@ main(argc, argv)
 		  }
 #endif
 		arginp = SAVE(tempv[0]);
+
+		/*
+		 * we put the command into a variable
+		 */
+		if (arginp != NULL)
+		  set(STRcommand, arginp, VAR_READWRITE);
+
 		/*
 		 * * Give an error on -c arguments that end in * backslash to
 		 * ensure that you don't make * nonportable csh scripts.
@@ -1042,8 +1076,10 @@ main(argc, argv)
 	    }
 	    if (tpgrp == -1) {
 	notty:
-		xprintf("Warning: no access to tty (%s).\n", strerror(errno));
-		xprintf("Thus no job control in this shell.\n");
+		xprintf(catgets(catd,
+				1, 249, "Warning: no access to tty (%s).\n"),
+			strerror(errno));
+		xprintf(catgets(catd, 1, 250, "Thus no job control in this shell.\n"));
 		/*
 		 * Fix from:Sakari Jalovaara <sja@sirius.hut.fi> if we don't
 		 * have access to tty, disable editing too
@@ -1110,14 +1146,23 @@ main(argc, argv)
 #endif
 	    setintr = 0;
 	    parintr = SIG_IGN;	/* onintr in /etc/ files has no effect */
+#ifdef LOGINFIRST
+#ifdef _PATH_DOTLOGIN
+	    if (loginsh)
+	      (void) srcfile(_PATH_DOTLOGIN, 0, 0, NULL);
+#endif
+#endif
+
 #ifdef _PATH_DOTCSHRC
 	    (void) srcfile(_PATH_DOTCSHRC, 0, 0, NULL);
 #endif
 	    if (!arginp && !onelflg && !havhash)
 		dohash(NULL,NULL);
+#ifndef LOGINFIRST
 #ifdef _PATH_DOTLOGIN
 	    if (loginsh)
 		(void) srcfile(_PATH_DOTLOGIN, 0, 0, NULL);
+#endif
 #endif
 #ifdef BSDSIGS
 	    (void) sigsetmask(omask);
@@ -2044,12 +2089,14 @@ mailchk()
 		continue;
 
 	    if (cnt == 1) {
-		xprintf("You have %d piece%s of mail.\n", mailcount,
-			  mailcount == 1 ? "" : "s");
+		xprintf(catgets(catd, 1, 253,
+				"You have %d mails.\n"),
+			mailcount);
 	    }
 	    else {
-		xprintf("You have %d piece%s of mail in %s.\n",
-			  mailcount, mailcount == 1 ? "" : "s", filename);
+		xprintf(catgets(catd, 1, 254,
+				"You have %d mails in %s.\n"),
+			  mailcount, filename);
 	    }
 	}
 	else {
@@ -2058,10 +2105,13 @@ mailchk()
 		(loginsh && !new))
 		continue;
 	    if (cnt == 1)
-		xprintf("You have %smail.\n", new ? "new " : "");
+		xprintf(catgets(catd, 1, 255,
+				"You have %smail.\n"),
+			new ? catgets(catd, 1, 1224, "new ") : "");
 	    else
-		xprintf("You have %smail in %s.\n", new ? "new " : "",
-			filename);
+	        xprintf(catgets(catd, 1, 256,
+				"You have %smail in %s.\n"),
+			new ? catgets(catd, 1, 1224, "new ") : "");
 	}
     }
     chktim = t;
@@ -2180,8 +2230,10 @@ defaultpath()
 
     blkp = blk = (Char **) xmalloc((size_t) sizeof(Char *) * 10);
 
-#ifndef DOTLAST
+#ifndef NODOT
+# ifndef DOTLAST
     *blkp++ = Strsave(STRdot);
+# endif
 #endif
 
 #define DIRAPPEND(a)  \
@@ -2210,8 +2262,10 @@ defaultpath()
 
 #undef DIRAPPEND
 
-#ifdef DOTLAST
+#ifndef NODOT
+# ifdef DOTLAST
     *blkp++ = Strsave(STRdot);
+# endif
 #endif
     *blkp = NULL;
     return (blk);
