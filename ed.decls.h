@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.decls.h,v 3.2 1991/07/24 21:46:36 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.decls.h,v 3.3 1991/09/08 00:45:32 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -185,7 +185,8 @@ extern  CCRETVAL        v_eword			__P((int));
 extern  CCRETVAL        v_undo			__P((int));
 extern  CCRETVAL        v_ush_meta		__P((int));
 extern  CCRETVAL        v_dsh_meta		__P((int));
-extern  CCRETVAL        v_repeat_srch		__P((int));
+extern  CCRETVAL        v_rsrch_fwd		__P((int));
+extern  CCRETVAL        v_rsrch_rev		__P((int));
 
 /*
  * ed.inputl.c

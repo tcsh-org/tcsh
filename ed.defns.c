@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 3.2 1991/09/08 00:45:32 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.defns.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.2 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -225,10 +225,12 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		V_USH_META	89
     v_dsh_meta,
 #define		V_DSH_META	90
-    v_repeat_srch,
-#define		V_REPEAT_SRCH	91
+    v_rsrch_fwd,
+#define		V_RSRCH_FWD	91
+    v_rsrch_rev,
+#define		V_RSRCH_REV	92
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	92
+#define		F_NUM_FNS	93
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -533,7 +535,7 @@ KEYCMD  CcViMap[] = {
     F_INSERT,			/* ^X */
     F_INSERT,			/* ^Y */
     F_INSERT,			/* ^Z */
-    V_CMD_MODE,			/* ^[ */  /* [ Esc ] key
+    V_CMD_MODE,			/* ^[ */  /* [ Esc ] key */
     F_TTY_QUIT,			/* ^\ */
     F_INSERT,			/* ^] */
     F_INSERT,			/* ^^ */
@@ -877,7 +879,7 @@ KEYCMD  CcViCmdMap[] = {
     F_UP_SEARCH_HIST,		/* K */
     F_UNASSIGNED,		/* L */
     F_UNASSIGNED,		/* M */
-    F_UNASSIGNED,		/* N */
+    V_RSRCH_REV,		/* N */
     F_XKEY,			/* O */
     F_UNASSIGNED,		/* P */
     F_UNASSIGNED,		/* Q */
@@ -909,7 +911,7 @@ KEYCMD  CcViCmdMap[] = {
     F_UP_HIST,			/* k */
     F_CHARFWD,			/* l */
     F_UNASSIGNED,		/* m */
-    V_REPEAT_SRCH,		/* n */
+    V_RSRCH_FWD,		/* n */
     F_UNASSIGNED,		/* o */
     F_UNASSIGNED,		/* p */
     F_UNASSIGNED,		/* q */
@@ -1222,8 +1224,10 @@ struct KeyFuncs FuncNames[] = {
     "Enter vi insert mode",
     "vi-insert-at-bol", V_INSBEG,
     "Enter vi insert mode at beginning of line",
-    "vi-repeat", V_REPEAT_SRCH,
-    "Vi repeat current search",
+    "vi-search-fwd", V_RSRCH_FWD,
+    "Vi repeat current search in the same search direction",
+    "vi-search-rev", V_RSRCH_REV,
+    "Vi repeat current search in the opposite search direction",
     "vi-replace-char", V_REPLONE,
     "Vi replace character under the cursor with the next character typed",
     "vi-replace-mode", V_REPLMODE,

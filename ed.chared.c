@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.2 1991/09/08 00:45:32 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -35,12 +35,14 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.chared.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.2 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
 #include "tw.h"
 #include "ed.defns.h"
+
+/* #define SDEBUG */
 
 #define NOP    0
 #define DELETE 1
@@ -52,6 +54,7 @@ RCSID("$Id: ed.chared.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 static Char *InsertPos = InputBuf; /* Where insertion starts */
 static Char *ActionPos = 0;	   /* Where action begins  */
 static int  ActionFlag = 0;	   /* What delayed action to take */
+static int  searchdir = UP_SEARCH; /* Direction of last search */
 
 /* all routines that start with c_ are private to this set of routines */
 static	void	 c_alternativ_key_map	__P((int));
@@ -73,10 +76,10 @@ static	void	 c_get_word		__P((Char **, Char **));
 #endif
 static	void	 c_delafter_save	__P((int));
 static	void	 c_delbefore_save	__P((int));
-static	void	 c_delend		__P((void));
 static	Char	*c_preword		__P((Char *, Char *, int));
 static	Char	*c_endword		__P((Char *, Char *, int));
 static	Char	*c_eword		__P((Char *, Char *, int));
+static  CCRETVAL v_repeat_srch		__P((int));
 
 static void
 c_alternativ_key_map(state)
@@ -922,7 +925,7 @@ e_newline(c)
 	    if (Cursor != InputBuf + 1)
 		c_hsetpat();
 	    LastCmd = F_UP_SEARCH_HIST;  /* Hack to stop c_hsetpat */
-	    LastChar = InputBuf;
+/*	    LastChar = InputBuf; */
 	    return( e_up_search_hist(c));
 	}
 	else if ( ActionFlag == DN_SEARCH ) {
@@ -930,7 +933,7 @@ e_newline(c)
 	    if (Cursor != InputBuf + 1) 
 		c_hsetpat();
 	    LastCmd = F_DOWN_SEARCH_HIST;  /* Hack to stop c_hsetpat */
-	    LastChar = InputBuf;
+/*	    LastChar = InputBuf; */
 	    return( e_down_search_hist(c));
 	}
     }
@@ -1198,6 +1201,8 @@ c_hsetpat()
 	    (void) Strncpy(patbuf, cp, patlen);
 	    patbuf[patlen] = '\0';
 	}
+	else
+	    patlen = Strlen(patbuf);
     }
 #ifdef SDEBUG
     xprintf("\nHist_num = %d\n", Hist_num);
@@ -1254,12 +1259,17 @@ e_up_search_hist(c)
 	hp = hp->Hnext;
     }
 
+    if (VImode)
+	ActionFlag = 0;
     if (!found) {
 	if (VImode) {
 	    LastChar = InputBuf;
 	    Cursor   = InputBuf;
 	    Refresh();
 	}
+#ifdef SDEBUG
+	xprintf("not found\n"); 
+#endif
 	return (CC_ERROR);
     }
 
@@ -1326,6 +1336,10 @@ e_down_search_hist(c)
 	}
 	hp = hp->Hnext;
     }
+
+    if (VImode)
+	ActionFlag = 0;
+
     if (!found) {		/* is it the current history number? */
 	if (c_hmatch(HistBuf)) {
 	    copyn(InputBuf, HistBuf, INBUFSIZ);
@@ -1339,6 +1353,9 @@ e_down_search_hist(c)
 	    return (CC_REFRESH);
 	}
 	else {
+#ifdef SDEBUG
+	    xprintf("not found\n"); 
+#endif
 	    return (CC_ERROR);
 	}
     }
@@ -2029,6 +2046,30 @@ v_wordbegnext(c)
     return (CC_NORM);
 }
 
+/*ARGSUSED*/
+static CCRETVAL
+v_repeat_srch(c)
+    int c;
+{
+#ifdef SDEBUG
+    xprintf("dir %d patlen %d patbuf %s\n", 
+	    c, patlen, short2str(patbuf));
+#endif
+
+    if (c == DN_SEARCH) {
+	LastCmd = F_DOWN_SEARCH_HIST;  /* Hack to stop c_hsetpat */
+	LastChar = InputBuf;
+	return(e_down_search_hist(c));
+    }
+    else if (c == UP_SEARCH) {
+	LastCmd = F_UP_SEARCH_HIST;  /* Hack to stop c_hsetpat */
+	LastChar = InputBuf;
+	return(e_up_search_hist(c));
+    }
+    else 
+	return(CC_ERROR);
+}
+
 #ifdef COMMENT
 /* by: Brian Allison <uiucdcs!convex!allison@RUTGERS.EDU> */
 static void
@@ -2665,7 +2706,7 @@ CCRETVAL
 v_ush_meta(c)
     int c;
 {
-    ActionFlag = UP_SEARCH;
+    searchdir = ActionFlag = UP_SEARCH;
     LastChar = InputBuf;
     Cursor   = InputBuf;
     InsertPos = InputBuf;
@@ -2681,7 +2722,7 @@ CCRETVAL
 v_dsh_meta(c)
     int c;
 {
-    ActionFlag = DN_SEARCH;
+    searchdir = ActionFlag = DN_SEARCH;
     LastChar = InputBuf;
     Cursor   = InputBuf;
     InsertPos = InputBuf;
@@ -2694,30 +2735,21 @@ v_dsh_meta(c)
 
 /*ARGSUSED*/
 CCRETVAL
-v_repeat_srch(c)
+v_rsrch_fwd(c)
     int c;
 {
     if ( patlen == 0 ) return(CC_ERROR);
-
-
-    if ( ActionFlag == DN_SEARCH )
-    {
-	LastCmd = F_DOWN_SEARCH_HIST;  /* Hack to stop c_hsetpat */
-	LastChar = InputBuf;
-	return( e_down_search_hist(c));
-    }
-    else if ( ActionFlag == UP_SEARCH )
-    {
-	LastCmd = F_UP_SEARCH_HIST;  /* Hack to stop c_hsetpat */
-	LastChar = InputBuf;
-	return( e_up_search_hist(c));
-    }
-    else
-    {
-	return(CC_ERROR);
-    }
+    return (v_repeat_srch(searchdir));
 }
 
+/*ARGSUSED*/
+CCRETVAL
+v_rsrch_rev(c)
+    int c;
+{
+    if ( patlen == 0 ) return(CC_ERROR);
+    return (v_repeat_srch(searchdir == DN_SEARCH ? UP_SEARCH : DN_SEARCH));
+}
 
 #ifdef notdef
 void
