@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set1,v 1.2 1995/03/19 18:09:24 christos Exp $
 $ Error messages
 $set 1
 1 Syntax Fehler
@@ -126,9 +126,9 @@ $set 1
 123 !# History-Schleife
 124 Falsche Dateianforderung
 125 Selector-Überlauf
-126 Unbekannte Option: `-%s'\nBenutzung: tcsh [ -bcdefilmnqstvVxX -Dname[=Wert] ] [ Argument ... ]
-127 Ubekannte Option: `-%s'\nBenutzung: tcsh [ -bcdefFilmnqstvVxX ] [ Argument ... ]
-128 Unbekannte Option: `-%s'\nBenutzung: tcsh [ -bcdefilmnqstvVxX ] [ Argument ... ]
+126 Unbekannte Option: `-%s'\nBenutzung: %s [ -bcdefilmnqstvVxX -Dname[=Wert] ] [ Argument ... ]
+127 Ubekannte Option: `-%s'\nBenutzung: %s [ -bcdefFilmnqstvVxX ] [ Argument ... ]
+128 Unbekannte Option: `-%s'\nBenutzung: %s [ -bcdefilmnqstvVxX ] [ Argument ... ]
 129 \nUngültige Vervollständigung: "%s"
 130 \nUngültig (%s): '%c'
 131 \nFehlende Trennung '%c' nach %s "%s"

@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set23,v 1.2 1995/03/19 18:09:24 christos Exp $
 $ tc.os.c
 $set 23
 1 Falscher Cpu/Site-Name
@@ -24,8 +24,11 @@ $set 23
 21 getwd: Lesefehler in ".." (%s)
 22 getwd: Kann nicht zurück zu "." wechseln (%s)
 23 getwd: Kann kein stat auf "/" machen (%s)
-24 getwd: Kann kein stat auf Verzeichnis "%s" machen (%s)
-25 getwd: Kann Verzeichnis "%s" nicht öffnen (%s)
-26 getwd: Kann "." nicht in ".." finden (%s)
-27 Ungültiger Systemtyp
-28 Systemtyp ist nicht gesetzt
+24 getwd: Kann kein stat auf "." machen (%s)
+25 getwd: Kann kein stat auf Verzeichnis "%s" machen (%s)
+26 getwd: Kann Verzeichnis "%s" nicht öffnen (%s)
+27 getwd: Kann "." nicht in ".." finden (%s)
+28 Ungültiger Systemtyp
+29 Systemtyp ist nicht gesetzt
+30 Too many arguments
+31 Invalid argument

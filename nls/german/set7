@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set7,v 1.2 1995/03/19 18:09:24 christos Exp $
 $ ed.screen.c
 $set 7
 1 \n\tTcsh meint, Ihr Endgerät hat die\n
@@ -20,10 +20,10 @@ $set 7
 17 DeleteChars: num ist lächerlich: %d\r\n
 18 FEHLER: kann nicht einfügen\r\n
 19 StartInsert: num ist lächerlich: %d\r\n
-20 tcsh: Kann /etc/termcap nicht öffnen.\n
-21 tcsh: Kein Eintrag für Terminaltyp "%s"\n
-22 tcsh: benutze minimale Terminaleigenschaften.\n
-23 tcsh: WARNUNG: Ihr Terminal kann den Cursor nicht aufwärts bewegen.\n
+20 %s: Kann /etc/termcap nicht öffnen.\n
+21 %s: Kein Eintrag für Terminaltyp "%s"\n
+22 %s: benutze minimale Terminaleigenschaften.\n
+23 %s: WARNUNG: Ihr Terminal kann den Cursor nicht aufwärts bewegen.\n
 24 Lange Zeilen könnten etwas komisch aussehen.\n
 25 keine EOL Möglichkeit.\n
 26 keine Möglichkeit Zeichen zu löschen.\n

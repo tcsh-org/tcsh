@@ -1,5 +1,5 @@
 
-SUBDIRS=	C german french
+SUBDIRS=	C german french greek
 #GENCAT=	gencat -new
 GENCAT=		gencat
 
