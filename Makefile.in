@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.7 1998/04/21 16:08:29 christos Exp $
+# $Id: Makefile.in,v 3.8 1998/06/27 12:26:59 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -269,7 +269,9 @@ SCCS=	/usr/local/sccs
 PARALLEL=12				# Make the multi-max run fast.
 #P=&					# Use Sequent's parallel make
 P=
-DESTDIR=@prefix@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+DESTDIR=${prefix}
 #DESTDIR=/usr/contrib
 MANSECT=1
 DESTBIN=@bindir@

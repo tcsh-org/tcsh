@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.53 1998/04/21 16:08:34 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.54 1998/09/04 21:16:36 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.53 1998/04/21 16:08:34 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.54 1998/09/04 21:16:36 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -146,7 +146,7 @@ c_delafter(num)
 {
     register Char *cp, *kp;
 
-    if (Cursor + num > LastChar)
+    if (num > LastChar - Cursor)
 	num = LastChar - Cursor;	/* bounds check */
 
     if (num > 0) {			/* if I can delete anything */
@@ -182,7 +182,7 @@ c_delbefore(num)		/* delete before dot, with bounds checking */
 {
     register Char *cp, *kp;
 
-    if (Cursor - num < InputBuf)
+    if (num > Cursor - InputBuf)
 	num = Cursor - InputBuf;	/* bounds check */
 
     if (num > 0) {			/* if I can delete anything */
@@ -1312,9 +1312,10 @@ DeleteBack(n)			/* delete the n characters before . */
 	return;
     if (Cursor >= &InputBuf[n]) {
 	c_delbefore(n);		/* delete before dot */
-	Cursor -= n;
-	if (Cursor < InputBuf)
+	if (n > Cursor - InputBuf)
 	    Cursor = InputBuf;	/* bounds check */
+	else
+	    Cursor -= n;
     }
 }
 
@@ -2045,7 +2046,7 @@ v_delprev(c) 		/* Backspace key in insert mode */
     rc = CC_ERROR;
 
     if (InsertPos != 0) {
-	if (InsertPos <= Cursor - Argument) {
+	if (Argument <= Cursor - InsertPos) {
 	    c_delbefore(Argument);	/* delete before */
 	    Cursor -= Argument;
 	    rc = CC_REFRESH;
@@ -2062,9 +2063,10 @@ e_delprev(c)
     USE(c);
     if (Cursor > InputBuf) {
 	c_delbefore(Argument);	/* delete before dot */
-	Cursor -= Argument;
-	if (Cursor < InputBuf)
+	if (Argument > Cursor - InputBuf)
 	    Cursor = InputBuf;	/* bounds check */
+	else
+	    Cursor -= Argument;
 	return(CC_REFRESH);
     }
     else {
@@ -2468,9 +2470,10 @@ e_charback(c)
 {
     USE(c);
     if (Cursor > InputBuf) {
-	Cursor -= Argument;
-	if (Cursor < InputBuf)
+	if (Argument > Cursor - InputBuf)
 	    Cursor = InputBuf;
+	else
+	    Cursor -= Argument;
 
 	if (VImode)
 	    if (ActionFlag & TCSHOP_DELETE) {

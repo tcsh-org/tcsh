@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.13 1998/06/27 12:27:22 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.14 1998/09/04 21:16:55 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.13 1998/06/27 12:27:22 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.14 1998/09/04 21:16:55 christos Exp $")
 
 #include "ed.h"
 
@@ -244,8 +244,8 @@ flush()
 #ifdef ENOTTY
 	case ENOTTY:
 #endif
-#ifdef EBADF:
-	case EBADF::
+#ifdef EBADF
+	case EBADF:
 #endif
 	/* Nothing to do, but die */
 	    xexit(1);

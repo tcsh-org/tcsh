@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.defns.c,v 3.30 1998/04/21 16:08:37 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.defns.c,v 3.31 1998/09/04 21:16:40 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.30 1998/04/21 16:08:37 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.31 1998/09/04 21:16:40 christos Exp $")
 
 #include "ed.h"
 
@@ -275,8 +275,10 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		F_PASTE_CLIP	114
 	e_dosify_next,
 #define		F_DOSIFY_NEXT	115
+	e_dosify_prev,
+#define		F_DOSIFY_PREV	116
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	116
+#define		F_NUM_FNS	117
 
 };
 
