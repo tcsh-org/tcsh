@@ -1,2 +1,2 @@
-/*$Header$*/
+/*$Header: /src/pub/tcsh/win32/BSDLOGO.RC,v 1.2 2002/08/11 07:58:12 amold Exp $*/
 IDI_ICON1               ICON    DISCARDABLE     "win32/BSDLOGO.ICO"

@@ -1,4 +1,4 @@
-/*$Header$*/
+/*$Header: /src/pub/tcsh/win32/console.c,v 1.5 2002/09/13 05:27:10 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
