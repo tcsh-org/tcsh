@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.89 1999/08/13 16:32:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.90 2000/01/14 22:57:27 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.89 1999/08/13 16:32:51 christos Exp $")
+RCSID("$Id: sh.c,v 3.90 2000/01/14 22:57:27 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1998,7 +1998,7 @@ process(catch)
 	     * read fresh stuff. Otherwise, we are rereading input and don't
 	     * need or want to prompt.
 	     */
-	    if (fseekp == feobp && aret == F_SEEK)
+	    if (fseekp == feobp && aret == TCSH_F_SEEK)
 		printprompt(0, NULL);
 	    flush();
 	    setalarm(1);

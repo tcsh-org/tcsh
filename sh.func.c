@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.86 2000/01/14 22:57:27 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.87 2000/06/09 19:43:43 kim Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.86 2000/01/14 22:57:27 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.87 2000/06/09 19:43:43 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -484,7 +484,7 @@ gotolab(lab)
      */
     zlast = TC_GOTO;
     for (wp = whyles; wp; wp = wp->w_next)
-	if (wp->w_end.type == F_SEEK && wp->w_end.f_seek == 0) {
+	if (wp->w_end.type == TCSH_F_SEEK && wp->w_end.f_seek == 0) {
 	    search(TC_BREAK, 0, NULL);
 	    btell(&wp->w_end);
 	}
@@ -600,7 +600,7 @@ doforeach(v, c)
     btell(&nwp->w_start);
     nwp->w_fename = Strsave(cp);
     nwp->w_next = whyles;
-    nwp->w_end.type = F_SEEK;
+    nwp->w_end.type = TCSH_F_SEEK;
     whyles = nwp;
     /*
      * Pre-read the loop so as to be more comprehensible to a terminal user.
@@ -639,7 +639,7 @@ dowhile(v, c)
 	(struct whyle *) xcalloc(1, sizeof(*nwp));
 
 	nwp->w_start = lineloc;
-	nwp->w_end.type = F_SEEK;
+	nwp->w_end.type = TCSH_F_SEEK;
 	nwp->w_end.f_seek = 0;
 	nwp->w_next = whyles;
 	whyles = nwp;
@@ -661,7 +661,7 @@ dowhile(v, c)
 static void
 preread()
 {
-    whyles->w_end.type = I_SEEK;
+    whyles->w_end.type = TCSH_I_SEEK;
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
@@ -836,12 +836,12 @@ search(type, level, goal)
     Sgoal = goal;
     if (type == TC_GOTO) {
 	struct Ain a;
-	a.type = F_SEEK;
+	a.type = TCSH_F_SEEK;
 	a.f_seek = 0;
 	bseek(&a);
     }
     do {
-	if (intty && fseekp == feobp && aret == F_SEEK)
+	if (intty && fseekp == feobp && aret == TCSH_F_SEEK)
 	    printprompt(1, isrchx(type == TC_BREAK ? zlast : type));
 	/* xprintf("? "), flush(); */
 	aword[0] = 0;
@@ -1020,7 +1020,7 @@ past:
 static void
 toend()
 {
-    if (whyles->w_end.type == F_SEEK && whyles->w_end.f_seek == 0) {
+    if (whyles->w_end.type == TCSH_F_SEEK && whyles->w_end.f_seek == 0) {
 	search(TC_BREAK, 0, NULL);
 	btell(&whyles->w_end);
 	whyles->w_end.f_seek--;
@@ -1066,9 +1066,9 @@ wfree()
 	/*
 	 * XXX: We free loops that have different seek types.
 	 */
-	if (wp->w_end.type != I_SEEK && wp->w_start.type == wp->w_end.type &&
+	if (wp->w_end.type != TCSH_I_SEEK && wp->w_start.type == wp->w_end.type &&
 	    wp->w_start.type == o.type) {
-	    if (wp->w_end.type == F_SEEK) {
+	    if (wp->w_end.type == TCSH_F_SEEK) {
 		if (o.f_seek >= wp->w_start.f_seek && 
 		    (wp->w_end.f_seek == 0 || o.f_seek < wp->w_end.f_seek))
 		    break;
