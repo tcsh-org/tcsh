@@ -11,6 +11,7 @@ dnl
 AC_PREREQ(2.10)dnl Minimum Autoconf version required.
 AC_INIT(tc.vers.c)
 
+tcsh_configure_args="$@"
 # Shift out arguments leaving the optional platform name.
 while test -n "$1" ; do
  case "$1" in
@@ -20,15 +21,25 @@ while test -n "$1" ; do
 done
 
 AC_MSG_CHECKING(for the canonical name of this system)
-AC_CACHE_VAL(tcsh_cv_canonical,
 if test "$1" = '' ; then
-  new_canonical=`$srcdir/config.guess`
+  PATH=$srcdir:$PATH # Prefer the tcsh source directory, it might be there.
+  export PATH
+  new_canonical=`(config.guess) 2>/dev/null` || new_canonical=unknown
 else
   new_canonical="$1"
 fi
-tcsh_cv_canonical="$new_canonical"
-)
+AC_CACHE_VAL(tcsh_cv_canonical, tcsh_cv_canonical=${new_canonical})
 AC_MSG_RESULT($tcsh_cv_canonical)
+
+if test  "$tcsh_cv_canonical" != "$new_canonical"
+then
+  AC_MSG_WARN([Cache configured for \`${tcsh_cv_canonical}'.])
+  AC_MSG_WARN([This system is \`${new_canonical}'.])
+  AC_MSG_WARN([Assuming invalid cache - removing \`${cache_file}'.])
+  AC_MSG_WARN([Restarting...])
+  rm -f "$cache_file"
+  exec ${CONFIG_SHELL-/bin/sh} $0 "$tcsh_configure_args"
+fi
 
 changequote(, )dnl
 
@@ -110,7 +121,7 @@ case "${tcsh_cv_canonical}" in
   changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name
 for \`${tcsh_cv_canonical}' systems.
-Check tcsh's \`Ported' file for configuration instructions.])
+Check tcsh's \`Ported' file for manual configuration instructions.])
   changequote(, )dnl
   ;;
 
