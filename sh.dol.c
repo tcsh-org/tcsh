@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.46 2001/03/18 19:06:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.47 2001/07/25 15:48:04 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.46 2001/03/18 19:06:29 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.47 2001/07/25 15:48:04 christos Exp $")
 
 /*
  * C shell
@@ -585,10 +585,8 @@ Dgetdol()
 		c = DgetC(0);
 	    } while (Isdigit(c));
 	    unDredc(c);
-	    if (subscr < 0) {
-		dolerror(vp->v_name);
-		return;
-	    }
+	    if (subscr < 0)
+		stderror(ERR_RANGE);
 	    if (subscr == 0) {
 		if (bitset) {
 		    dolp = dolzero ? STR1 : STR0;
