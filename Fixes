@@ -1,3 +1,4 @@
+ 31. Fix SHORT_STRINGS compilation (Daniel Trinkle)
  30. Add kill -s (Mark Peek)
  29. Don't recognize all mips as dec (Bjorn Knutsson)
  28. Fix GLOB_QUOTE problem (noted by Per) I introduced in 6.10.01.
