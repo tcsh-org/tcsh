@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.18 1998/09/18 16:08:57 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.19 1998/09/19 14:45:15 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -123,14 +123,14 @@
  * DSPMBYTE	add variable "dspmbyte" and display multi-byte string at
  *		only output, when "dspmbyte" is set.
  */
-#define DSPMBYTE
+#undef DSPMBYTE
 
 /*
  * MBYTEDEBUG	when "dspmbyte" is changed, set multi-byte checktable to
  *		variable "mbytemap".
  *		(use for multi-byte table check)
  */
-#define MBYTEDEBUG
+#undef MBYTEDEBUG
 
 /*
  * NEWGRP	Provide a newgrp builtin.
