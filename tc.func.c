@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.107 2003/05/16 18:10:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.108 2004/05/19 18:51:43 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.107 2003/05/16 18:10:29 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.108 2004/05/19 18:51:43 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -2267,6 +2267,7 @@ remotehost()
 }
 #endif /* REMOTEHOST */
 
+#ifndef WINNT_NATIVE
 /*
  * indicate if a terminal type is defined in terminfo/termcap
  * (by default the current term type). This allows ppl to look
@@ -2309,3 +2310,4 @@ dotermname(v, c)
 	set(STRstatus, Strsave(STR1), VAR_READWRITE);
     }
 }
+#endif /* WINNT_NATIVE */
