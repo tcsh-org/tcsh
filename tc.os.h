@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.10 1991/07/23 23:30:02 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.11 1991/07/29 21:22:46 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -99,8 +99,8 @@ struct ucred {
  * #if (SVID > 0) && defined(TIOCGWINSZ)
  * If that breaks on your machine, let me know.
  */
-#if defined(HYPERCUBE) || defined(u3b2) || defined (u3b5) || \
-    defined(ub15) || defined(u3b20d) || defined(ISC202) || defined(SCO)
+#if defined(INTEL) || defined(u3b2) || defined (u3b5) || \
+    defined(ub15) || defined(u3b20d) || defined(ISC) || defined(SCO) 
 #ifdef TIOCGWINSZ
 /*
  * for struct winsiz
@@ -109,7 +109,7 @@ struct ucred {
 # include <sys/ptem.h>
 #endif /* TIOCGWINSZ */
 # define NEEDgethostname
-#endif /* HYPERCUBE || att || isc || sco */
+#endif /* INTEL || att || isc || sco */
 
 #ifdef IRIS4D
 # include <sys/time.h>
