@@ -76,15 +76,15 @@ case "${tcsh_cv_canonical}" in
     tcsh_config_file=sysV88
   ;;
 
+  ## NetBSD systems
+  *-*-netbsd*)
+    tcsh_config_file=bsd4.4
+  ;;
+
   ## Silicon Graphics machines
   *-sgi-iri* )
     tcsh_config_file=sgi
     NON_GNU_DFLAGS='-D__STDC__'
-  ;;
-
-  ## Stardent Vistra i860-SVR4
-  i860-*-sysv4* )
-    tcsh_config_file=sysv4
   ;;
 
   ## Suns
@@ -100,21 +100,28 @@ case "${tcsh_cv_canonical}" in
   *-sun-sunos4.1.[3456]* )
     tcsh_config_file=sunos413
   ;;
-  *-sun-solaris2.[01]* )
+  *-*-solaris2.[01]* ) # Should handle sparc or x86
     tcsh_config_file=sol2
   ;;
-  *-sun-solaris2.2* )
+  *-sun-solaris2.2* ) # Sparc only release
     tcsh_config_file=sol22
   ;;
-  *-sun-solaris2.3* )
+  *-sun-solaris2.3* ) # Sparc only release
     tcsh_config_file=sol23
   ;;
-  *-sun-solaris2.[456]* )
+  *-*-solaris2.[456]* ) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol24
   ;;
 
-  *-*-netbsd*)
-    tcsh_config_file=bsd4.4
+  ## Dell SVR4
+  *-dell-sysv4* )
+    tcsh_config_file=sysv4
+    DFLAGS="$DFLAGS -DDELL"
+  ;;
+
+  ## SVR4 (Generic and otherwise)
+  *-*-sysv4* )
+    tcsh_config_file=sysv4
   ;;
 
   ## Tektronix systems
@@ -152,9 +159,12 @@ AC_CHECK_LIB(crypt, crypt)
 AC_CHECK_LIB(termlib, tgetent)
 if test $ac_cv_lib_termlib_tgetent = no ; then
   AC_CHECK_LIB(curses, tgetent)
+  if test $ac_cv_lib_curses_tgetent = no ; then
+    AC_CHECK_LIB(termcap, tgetent)
+  fi
 fi
-AC_CHECK_LIB(socket, getpeername)
 AC_CHECK_LIB(nsl, inet_ntoa)
+AC_CHECK_LIB(socket, getpeername)
 AC_SUBST(DFLAGS)
 
 AC_OUTPUT(config.h:config/${tcsh_config_file} Makefile)

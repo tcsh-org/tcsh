@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.hist.c,v 3.21 1996/04/26 19:19:38 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.hist.c,v 3.22 1996/10/19 17:53:24 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.21 1996/04/26 19:19:38 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.22 1996/10/19 17:53:24 christos Exp $")
 
 #include "tc.h"
 
@@ -134,8 +134,8 @@ enthist(event, lp, docopy, mflg)
 		    px->Hnext = p->Hnext;
 		    n = p->Hnum + 1;
 		    hfree(p);
-		    for (;p != NULL; p = p->Hnext)
-			p->Href = p->Hnum = n--;
+		    for (p = px->Hnext; p != NULL; p = p->Hnext)
+			p->Href = n--;
 		    break;
 		}
 	}

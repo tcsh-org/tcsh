@@ -1,4 +1,8 @@
-V6.07.01, 10/19/96
+V6.07.02, 10/27/96
+ 58. More configure fixes from Kaveh.
+ 57. Fix histdup=erase again: Don't renumber events, or access uninitialized
+     storage.
+ 56. 6.07.01 - 10/19/96
  55. Fix histdup=erase, where after some repetitions, we would get negative
      history events (kim@gw.com)
  54. NLS fixes and typo in sh.err.c (Martin.Kraemer@deejai.mch.sni.de)
