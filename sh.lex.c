@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.lex.c,v 3.35 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.lex.c,v 3.36 1993/10/08 19:14:01 christos Exp christos $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.35 1993/08/11 16:25:52 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.36 1993/10/08 19:14:01 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1467,7 +1467,7 @@ readc(wanteof)
     }
 
     /* Compute the value of EOFs */
-    if ((ptr = value(STRignoreeof)) != STRNULL) {
+    if ((ptr = varval(STRignoreeof)) != STRNULL) {
 	while (*ptr) {
 	    if (!Isdigit(*ptr)) {
 		numeof = 0;

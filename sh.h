@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.61 1993/12/16 16:51:24 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.62 1994/02/10 14:36:00 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -878,7 +878,7 @@ EXTERN struct varent {
 #define v_parent	v_link[2]
 
 #define adrof(v)	adrof1(v, &shvhed)
-#define value(v)	value1(v, &shvhed)
+#define varval(v)	value1(v, &shvhed)
 
 /*
  * The following are for interfacing redo substitution in
@@ -955,16 +955,6 @@ EXTERN int     lastev;		/* Last event reference (default) */
 
 EXTERN Char    HIST;		/* history invocation character */
 EXTERN Char    HISTSUB;		/* auto-substitute character */
-
-/*
- * To print system call errors...
- */
-#ifndef linux
-#ifdef NEEDstrerror
-extern char *sys_errlist[];
-#endif
-extern int errno, sys_nerr;
-#endif /* !linux */
 
 /*
  * For operating systems with single case filenames (OS/2)
@@ -1060,5 +1050,15 @@ extern Char    **INVPPTR;
 
 #include "tc.h"
 #include "sh.decls.h"
+
+/*
+ * To print system call errors...
+ */
+#ifndef linux
+#ifdef NEEDstrerror
+extern char *sys_errlist[];
+#endif
+extern int errno, sys_nerr;
+#endif /* !linux */
 
 #endif /* _h_sh */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dir.c,v 3.35 1993/12/12 19:55:08 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dir.c,v 3.36 1993/12/16 16:51:24 christos Exp christos $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.35 1993/12/12 19:55:08 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.36 1993/12/16 16:51:24 christos Exp christos $")
 
 /*
  * C Shell - directory management
@@ -141,7 +141,7 @@ Char *dp;
      * Don't call set() directly cause if the directory contains ` or
      * other junk characters glob will fail. 
      */
-    set(STRowd, Strsave(value(STRcwd)), VAR_READWRITE);
+    set(STRowd, Strsave(varval(STRcwd)), VAR_READWRITE);
     set(STRcwd, Strsave(dp), VAR_READWRITE);
 
     tsetenv(STRPWD, dp);
@@ -426,10 +426,10 @@ dochngd(v, c)
 
     USE(c);
     printd = 0;
-    cp = (dflag & DIR_OLD) ? value(STRowd) : *v;
+    cp = (dflag & DIR_OLD) ? varval(STRowd) : *v;
 
     if (cp == NULL) {
-	if ((cp = value(STRhome)) == STRNULL || *cp == 0)
+	if ((cp = varval(STRhome)) == STRNULL || *cp == 0)
 	    stderror(ERR_NAME | ERR_NOHOMEDIR);
 	if (chdir(short2str(cp)) < 0)
 	    stderror(ERR_NAME | ERR_CANTCHANGE);
@@ -583,7 +583,7 @@ dfollow(cp)
 	    }
 	}
     }
-    dp = value(cp);
+    dp = varval(cp);
     if ((dp[0] == '/' || dp[0] == '.') && chdir(short2str(dp)) >= 0) {
 	xfree((ptr_t) cp);
 	cp = Strsave(dp);
@@ -621,11 +621,11 @@ dopushd(v, c)
     
     USE(c);
     printd = 1;
-    cp = (dflag & DIR_OLD) ? value(STRowd) : *v;
+    cp = (dflag & DIR_OLD) ? varval(STRowd) : *v;
 
     if (cp == NULL) {
 	if (adrof(STRpushdtohome)) {
-	    if ((cp = value(STRhome)) == STRNULL || *cp == 0)
+	    if ((cp = varval(STRhome)) == STRNULL || *cp == 0)
 		stderror(ERR_NAME | ERR_NOHOMEDIR);
 	    if (chdir(short2str(cp)) < 0)
 		stderror(ERR_NAME | ERR_CANTCHANGE);
@@ -736,7 +736,7 @@ dopopd(v, c)
 
     USE(c);
     printd = 1;
-    cp = (dflag & DIR_OLD) ? value(STRowd) : *v;
+    cp = (dflag & DIR_OLD) ? varval(STRowd) : *v;
 
     if (cp == NULL)
 	dp = dcwd;
@@ -817,7 +817,7 @@ dcanon(cp, p)
     if (*cp != '/') {
 	Char    tmpdir[MAXPATHLEN];
 
-	p1 = value(STRcwd);
+	p1 = varval(STRcwd);
 	if (p1 == STRNULL || *p1 != '/')
 	    abort();
 	if (Strlen(p1) + Strlen(cp) + 1 >= MAXPATHLEN)
@@ -1060,7 +1060,7 @@ dcanon(cp, p)
      * fix home...
      */
 #ifdef S_IFLNK
-    p1 = value(STRhome);
+    p1 = varval(STRhome);
     cc = (int) Strlen(p1);
     /*
      * See if we're not in a subdir of STRhome
@@ -1271,7 +1271,7 @@ loaddirs(fname)
     bequiet = 1;
     if (fname) 
 	loaddirs_cmd[1] = fname;
-    else if ((fname = value(STRdirsfile)) != STRNULL)
+    else if ((fname = varval(STRdirsfile)) != STRNULL)
 	loaddirs_cmd[1] = fname;
     else
 	loaddirs_cmd[1] = STRtildotdirs;
@@ -1302,8 +1302,8 @@ recdirs(fname, def)
 	return;
 
     if (fname == NULL) {
-	if ((fname = value(STRdirsfile)) == STRNULL)
-	    fname = Strspl(value(STRhome), &STRtildotdirs[1]);
+	if ((fname = varval(STRdirsfile)) == STRNULL)
+	    fname = Strspl(varval(STRhome), &STRtildotdirs[1]);
 	else
 	    fname = Strsave(fname);
     }
@@ -1315,7 +1315,7 @@ recdirs(fname, def)
 	return;
     }
 
-    if ((snum = value(STRsavedirs)) == STRNULL) 
+    if ((snum = varval(STRsavedirs)) == STRNULL) 
 	num = ~0;
     else
 	num = (unsigned int) atoi(short2str(snum));

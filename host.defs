@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.04/RCS/host.def,v 1.1 1994/02/10 12:12:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/host.defs,v 1.2 1994/02/10 14:36:00 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,10 +37,12 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.def,v 1.1 1994/02/10 12:12:20 christos Exp christos $")
+RCSID("$Id: host.defs,v 1.2 1994/02/10 14:36:00 christos Exp $")
 
 endcode	:
 
+macro	: M_mipsel : (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))
+macro	: M_mipseb : (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))
 
 newdef	: defined(ns32000)
 newcode	:
@@ -207,7 +209,7 @@ hosttype: defined(sparc) || defined(__sparc__)		: "sun4"
 hosttype: 						: "sun"
 ostype	: defined(SUNOS3)				: "sunos3"
 ostype	: defined(SUNOS4)				: "sunos4"
-ostype	: defined(SOLARIS)				: "solaris"
+ostype	: defined(SOLARIS2)				: "solaris"
 machtype: defined(mc68010) || defined(__mc68010__)	: "m68k"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
 machtype: defined(sparc) || defined(__sparc__)		: "sparc"
@@ -443,7 +445,8 @@ newdef	: defined(ISC) || defined(ISC202)
 comment	: Interactive Unix
 vendor	:						: "isc"
 hosttype:						: "isc386"
-ostype	:						: "isc_unix"
+ostype	: defined(POSIX)				: "POSIX"
+ostype	: 						: "SVR3"
 machtype: defined(i386)					: "i386"
 enddef	:
 
@@ -515,10 +518,10 @@ enddef	:
 
 newdef	: defined(iconuxv)
 comment	: Icon 88k running Unix
-vendor	:						: icon
-hosttype:						: icon
-ostype	:						: iconuxv
-machtype: defined(m88k) || defined(__m88k__)		: m88k
+vendor	:						: "icon"
+hosttype:						: "icon"
+ostype	:						: "iconuxv"
+machtype: defined(m88k) || defined(__m88k__)		: "m88k"
 enddef	:
 
 
@@ -573,19 +576,19 @@ vendor	:						: "sony"
 hosttype: defined(mips)					: "news_mips"
 ostype	:						: "News"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
-machtype: (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))		: "mipsel"
-machtype: (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))		: "mipseb"
+machtype: defined(M_mipsel)				: "mipsel"
+machtype: defined(M_mipseb)				: "mipseb"
 enddef	:
 
 newdef	: defined(sgi)
 comment	: Silicon Graphics
 vendor	:						: "sgi"
-hosttype: (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))		: "iris4d"
-hosttype: (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))		: "iris4d"
+hosttype: defined(M_mipsel)				: "iris4d"
+hosttype: defined(M_mipseb)				: "iris4d"
 hosttype: defined(mc68000) 				: "iris3d"
 ostype	:						: "irix"
-machtype: (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))		: "mipsel"
-machtype: (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))		: "mipseb"
+machtype: defined(M_mipsel)				: "mipsel"
+machtype: defined(M_mipseb)				: "mipseb"
 machtype: defined(mc68000) 				: "mc68000"
 enddef	:
 
@@ -593,22 +596,22 @@ enddef	:
 newdef	: defined(ultrix) || defined(__ultrix)
 comment	: Digital's Ultrix 
 vendor	:						: "dec"
-hosttype: (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))		: "decstation"
-hosttype: (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))		: "decmips"
+hosttype: defined(M_mipsel)				: "decstation"
+hosttype: defined(M_mipseb)				: "decmips"
 ostype	:						: "ultrix"
-machtype: (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))		: "mipsel"
-machtype: (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))		: "mipseb"
+machtype: defined(M_mipsel)				: "mipsel"
+machtype: defined(M_mipseb)				: "mipseb"
 enddef	:
 
 
 newdef	: defined(MIPS)
 comment	: Mips OS
 vendor	:						: "mips"
-hosttype: (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))		: "mips"
-hosttype: (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))		: "mips"
+hosttype: defined(M_mipsel) 				: "mips"
+hosttype: defined(M_mipseb)				: "mips"
 ostype	:						: "mips"
-machtype: (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))		: "mipsel"
-machtype: (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))		: "mipseb"
+machtype: defined(M_mipsel)				: "mipsel"
+machtype: defined(M_mipseb)				: "mipseb"
 enddef	:
 
 
@@ -624,8 +627,8 @@ enddef	:
 newdef	: defined(Lynx)
 comment	: Lynx OS 2.1
 vendor	:						: "Lynx"
-hosttype: (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))		: "lynxos-mips"
-hosttype: (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))		: "lynxos-mips"
+hosttype: defined(M_mipsel)				: "lynxos-mips"
+hosttype: defined(M_mipseb)				: "lynxos-mips"
 hosttype: defined(i386) || defined(__i386__)		: "lynxos-i386"
 hosttype: defined(i860) || defined(__i860__)		: "lynxos-i860"
 hosttype: defined(m68k)					: "lynxos-m68k"
@@ -633,8 +636,8 @@ hosttype: defined(m88k)					: "lynxos-m88k"
 hosttype: defined(sparc)				: "lynxos-sparc"
 hosttype: 						: "lynxos-unknown"
 ostype	:						: "LynxOS"
-machtype: (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))		: "mipsel"
-machtype: (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))		: "mipseb"
+machtype: defined(M_mipsel)				: "mipsel"
+machtype: defined(M_mipseb)				: "mipseb"
 machtype: defined(i386) || defined(__i386__)		: "i386"
 machtype: defined(i860) || defined(__i860__)		: "i860"
 machtype: defined(m68k)					: "m68k"

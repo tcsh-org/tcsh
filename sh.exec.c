@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.26 1993/11/13 01:36:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.27 1994/02/04 15:12:06 christos Exp christos $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.26 1993/11/13 01:36:09 christos Exp christos $")
+RCSID("$Id: sh.exec.c,v 3.27 1994/02/04 15:12:06 christos Exp christos $")
 
 #include "tc.h"
 #include "tw.h"
@@ -453,7 +453,7 @@ texec(sf, st)
 	    v = adrof1(STRshell, &aliases);
 	    if (v == 0) {
 		vp = lastsh;
-		vp[0] = adrof(STRshell) ? value(STRshell) : STR_SHELLPATH;
+		vp[0] = adrof(STRshell) ? varval(STRshell) : STR_SHELLPATH;
 		vp[1] = NULL;
 #ifdef _PATH_BSHELL
 		if (fd != -1 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/gethost.c,v 1.1 1994/02/10 12:12:23 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/gethost.c,v 1.2 1994/02/10 14:36:00 christos Exp $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -36,13 +36,18 @@
  */
 #include "sh.h"
 
-RCSID("$Id: gethost.c,v 1.1 1994/02/10 12:12:23 christos Exp christos $")
+RCSID("$Id: gethost.c,v 1.2 1994/02/10 14:36:00 christos Exp $")
 
 #include <stdio.h>
 #include <ctype.h>
 
 #define ISSPACE(p)	(isspace((unsigned char) (p)) && (p) != '\n')
 
+/* 
+ * We cannot do that, because some compilers like #line and others
+ * like # <lineno>
+ * #define LINEDIRECTIVE 
+ */
 
 static const char *keyword[] =
 {
@@ -64,8 +69,10 @@ static const char *keyword[] =
 #define T_ENDCODE	7
     "comment",
 #define T_COMMENT	8
+    "macro",
+#define T_MACRO		9
     NULL
-#define T_NONE		9
+#define T_NONE		10
 };
 
 #define S_DISCARD	0
@@ -97,10 +104,10 @@ findtoken(ptr)
  *	Get : delimited token and remove leading/trailing blanks/newlines
  */
 static char *
-gettoken(pptr)
+gettoken(pptr, token)
     char **pptr;
+    char  *token;
 {
-    static char token[INBUFSIZE];
     char *ptr = *pptr;
     char *tok = token;
 
@@ -133,7 +140,9 @@ main(argc, argv)
     char line[INBUFSIZE];
     char *pname;
     char *fname = "stdin";
-    char *defs, *ptr;
+    char *ptr, *tok;
+    char defs[INBUFSIZE];
+    char stmt[INBUFSIZE];
     FILE *fp = stdin;
     int lineno = 0;
     int inprocess = 0;
@@ -160,7 +169,7 @@ main(argc, argv)
 
     while ((ptr = fgets(line, sizeof(line), fp)) != NULL) {
 	lineno++;
-	switch (token = findtoken(defs = gettoken(&ptr))) {
+	switch (token = findtoken(gettoken(&ptr, defs))) {
 	case T_NEWCODE:
 	    state = S_CODE;
 	    break;
@@ -197,6 +206,21 @@ main(argc, argv)
 	    state = S_KEYWORD;
 	    break;
 
+	case T_MACRO:
+	    if (gettoken(&ptr, defs) == NULL) {
+		(void) fprintf(stderr, "%s: \"%s\", %d: Missing macro name\n",
+			       pname, fname, lineno);
+		break;
+	    }
+	    if (gettoken(&ptr, stmt) == NULL) {
+		(void) fprintf(stderr, "%s: \"%s\", %d: Missing macro body\n",
+			       pname, fname, lineno);
+		break;
+	    }
+	    (void) fprintf(stdout, "\n#if %s\n# define %s\n#endif\n\n", stmt,
+			   defs);
+	    break;
+
 	case T_NONE:
 	    if (state != S_CODE && defs && *defs != '\0') {
 		(void) fprintf(stderr, "%s: \"%s\", %d: Discarded\n",
@@ -225,32 +249,34 @@ main(argc, argv)
 	    break;
 
 	case S_KEYWORD:
-	    defs = gettoken(&ptr);
+	    tok = gettoken(&ptr, defs);
 	    if (token == T_NEWDEF) {
 		if (inprocess) {
 		    (void) fprintf(stderr, "%s: \"%s\", %d: Missing enddef\n",
 				   pname, fname, lineno);
 		    return 1;
 		}
-		if (defs == NULL) {
+		if (tok == NULL) {
 		    (void) fprintf(stderr, "%s: \"%s\", %d: No defs\n",
 				   pname, fname, lineno);
 		    return 1;
 		}
-		(void) fprintf(stdout, "\n\n# %d \"%s\"\n", lineno + 1, fname);
+		(void) fprintf(stdout, "\n\n");
+#ifdef LINEDIRECTIVE
+		(void) fprintf(stdout, "# %d \"%s\"\n", lineno + 1, fname);
+#endif /* LINEDIRECTIVE */
 		(void) fprintf(stdout, "#if %s\n", defs);
 		inprocess = 1;
 	    }
 	    else {
-		char *stmt;
-		if (defs && *defs)
+		if (tok && *tok)
 		    (void) fprintf(stdout, "# if (%s) && !defined(_%s_)\n",
 				   defs, keyword[token]);
 		else
 		    (void) fprintf(stdout, "# if !defined(_%s_)\n", 
 				   keyword[token]);
 
-		if ((stmt = gettoken(&ptr)) == NULL) {
+		if (gettoken(&ptr, stmt) == NULL) {
 		    (void) fprintf(stderr, "%s: \"%s\", %d: No statement\n",
 				   pname, fname, lineno);
 		    return 1;
@@ -262,14 +288,16 @@ main(argc, argv)
 	    break;
 
 	case S_COMMENT:
-	    defs = gettoken(&ptr);
-	    if (defs)
+	    if (gettoken(&ptr, defs))
 		(void) fprintf(stdout, "    /* %s */\n", defs);
 	    break;
 
 	case S_CODE:
-	    if (token == T_NEWCODE)
+	    if (token == T_NEWCODE) {
+#ifdef LINEDIRECTIVE
 		(void) fprintf(stdout, "# %d \"%s\"\n", lineno + 1, fname);
+#endif /* LINEDIRECTIVE */
+	    }
 	    break;
 
 	default:

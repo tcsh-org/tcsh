@@ -1,4 +1,13 @@
 V6.05.00, ... 
+ 78. 6.04.09 03/12/94
+ 77. Alarm race with remotehost.
+ 76. If you have in your .cshrc 
+	set savehist=(100 merge)
+	and execute
+	#!./tcsh
+	exec ps
+     you get no output; [fixed]
+ 75. setenv SHLVL -1; tcsh = Segmentation fault [fixed]
  74. 6.04.08 02/10/94
  73. new machtype, ostype, vendor
  72. execute .logout on hangup.

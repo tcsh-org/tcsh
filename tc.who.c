@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.who.c,v 3.19 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.who.c,v 3.20 1993/10/30 19:50:16 christos Exp christos $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.19 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.20 1993/10/30 19:50:16 christos Exp christos $")
 
 #include "tc.h"
 
@@ -571,7 +571,7 @@ struct command *c;
 char *
 utmphost()
 {
-    char *tty = short2str(value(STRtty));
+    char *tty = short2str(varval(STRtty));
     struct who *wp;
     char *host = NULL;
 

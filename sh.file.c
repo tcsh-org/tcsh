@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.file.c,v 3.7 1993/03/05 20:14:33 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.file.c,v 3.8 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.7 1993/03/05 20:14:33 christos Exp christos $")
+RCSID("$Id: sh.file.c,v 3.8 1993/06/25 21:17:12 christos Exp christos $")
 
 #ifdef FILEC
 
@@ -101,12 +101,12 @@ setup_tty(on)
     static struct termio tchars;
 # endif /* POSIX */
 
-    if (on) {
 # ifdef POSIX
-	(void) tcgetattr(SHIN, &tchars);
+    (void) tcgetattr(SHIN, &tchars);
 # else
-        (void) ioctl(SHIN, TCGETA, (ioctl_t) &tchars);
+    (void) ioctl(SHIN, TCGETA, (ioctl_t) &tchars);
 # endif /* POSIX */
+    if (on) {
 	tchars.c_cc[VEOL] = ESC;
 	if (tchars.c_lflag & ICANON)
 # ifdef POSIX
@@ -123,20 +123,20 @@ setup_tty(on)
 	    tchars.c_lflag |= ICANON;
     
 	}
-#ifdef POSIX
-        (void) tcsetattr(SHIN, on, &tchars);
-#else
-        (void) ioctl(SHIN, on, (ioctl_t) &tchars);
-#endif /* POSIX */
     }
     else {
 	tchars.c_cc[VEOL] = _POSIX_VDISABLE;
 # ifdef POSIX
-	(void) tcsetattr(SHIN, TCSANOW, &tchars);
+	on = TCSANOW;
 # else
-        (void) ioctl(SHIN, TCSETAW, (ioctl_t) &tchars);
+        on = TCSETAW;
 # endif /* POSIX */
     }
+# ifdef POSIX
+    (void) tcsetattr(SHIN, on, &tchars);
+# else
+    (void) ioctl(SHIN, on, (ioctl_t) &tchars);
+# endif /* POSIX */
 #else
     struct sgttyb sgtty;
     static struct tchars tchars;/* INT, QUIT, XON, XOFF, EOF, BRK */
@@ -410,7 +410,7 @@ tilde(new, old)
     for (p = person, o = &old[1]; *o && *o != '/'; *p++ = *o++);
     *p = '\0';
     if (person[0] == '\0')
-	(void) Strcpy(new, value(STRhome));
+	(void) Strcpy(new, varval(STRhome));
     else {
 	pw = getpwnam(short2str(person));
 	if (pw == NULL)

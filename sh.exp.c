@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.21 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.22 1993/10/30 19:56:51 christos Exp christos $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.21 1993/10/30 19:50:16 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.22 1993/10/30 19:56:51 christos Exp christos $")
 
 /*
  * C shell
@@ -597,9 +597,9 @@ exp6(vp, ignore)
 	pwait();
 	prestjob();
 #ifdef EDEBUG
-	etraci("exp6 {} status", egetn(value(STRstatus)), vp);
+	etraci("exp6 {} status", egetn(varval(STRstatus)), vp);
 #endif /* EDEBUG */
-	return (putn(egetn(value(STRstatus)) == 0));
+	return (putn(egetn(varval(STRstatus)) == 0));
     }
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));

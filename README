@@ -29,10 +29,11 @@ To install tcsh:
     compilation flags.
 
 2)  Copy the appropriate for your machine and OS config file from the
-    config subdirectory into config.h. If you are trying to compile
-    tcsh on a machine for which there is no config file yet, you will
-    need to create a config file using as a template one of the
-    supplied ones.  If you get tcsh working on a new machine, I'd
+    config subdirectory into config.h.  Consult the file "Ported" for
+    settings known to work on various machines.  If you are trying to
+    compile tcsh on a machine for which there is no config file yet,
+    you will need to create a config file using as a template one of
+    the supplied ones.  If you get tcsh working on a new machine, I'd
     appreciate a copy of the config file plus additional information
     about the architecture/OS.  If you are creating a new config file,
     look very hard at BSDJOBS, BSDSIGS, and BSDTIMES if you are running

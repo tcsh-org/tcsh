@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.32 1993/11/13 00:40:56 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.33 1993/12/12 19:55:08 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.32 1993/11/13 00:40:56 christos Exp christos $")
+RCSID("$Id: tc.os.c,v 3.33 1993/12/12 19:55:08 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -572,7 +572,7 @@ dowarp(v, c)
     if (*v == 0) {		/* display warp value */
 	if (warp < 0)
 	    stderror(ERR_NAME | ERR_STRING, "Getwarp failed");
-	we = getwarpbyvalue(warp);
+	we = getwarpbyvarval(warp);
 	if (we)
 	    printf("%s\n", we->w_name);
 	else
@@ -1132,7 +1132,6 @@ strrcpy(ptr, str)
 /***
  *** Domain/OS
  ***/
-#undef value			/* XXX: Careful here */
 #include <apollo/base.h>
 #include <apollo/loader.h>
 #include <apollo/error.h>

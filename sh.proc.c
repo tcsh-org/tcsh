@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.52 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.53 1993/10/30 19:50:16 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.52 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.53 1993/10/30 19:50:16 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -357,7 +357,7 @@ found:
 #  endif /* POSIX */
 # endif /* !_SEQUENT_ */
 #endif /* !BSDTIMES */
-	    >= atoi(short2str(value(STRtime))))
+	    >= atoi(short2str(varval(STRtime))))
 	    fp->p_flags |= PTIME;
 	jobflags |= fp->p_flags;
     } while ((fp = fp->p_friends) != pp);
@@ -592,7 +592,7 @@ pjwait(pp)
 		Char   *jobcommand[3];
 
 		jobcommand[0] = STRjobs;
-		if (eq(value(STRlistjobs), STRlong))
+		if (eq(varval(STRlistjobs), STRlong))
 		    jobcommand[1] = STRml;
 		else
 		    jobcommand[1] = NULL;

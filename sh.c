@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.58 1993/12/12 19:55:08 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.59 1994/02/10 14:36:00 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.58 1993/12/12 19:55:08 christos Exp $")
+RCSID("$Id: sh.c,v 3.59 1994/02/10 14:36:00 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -512,9 +512,9 @@ main(argc, argv)
 	else
 	    set(STRuser, SAVE(pw->pw_name), VAR_READWRITE);
 	if (cln == NULL)
-	    tsetenv(STRLOGNAME, value(STRuser));
+	    tsetenv(STRLOGNAME, varval(STRuser));
 	if (cus == NULL)
-	    tsetenv(STRKUSER, value(STRuser));
+	    tsetenv(STRKUSER, varval(STRuser));
     }
 
     /*
@@ -1090,7 +1090,7 @@ main(argc, argv)
     reenter = setexit();	/* PWP */
     haderr = 0;			/* In case second time through */
     if (!fast && reenter == 0) {
-	/* Will have value(STRhome) here because set fast if don't */
+	/* Will have varval(STRhome) here because set fast if don't */
 	{
 	    int     osetintr = setintr;
 	    sigret_t (*oparintr)() = parintr;
@@ -1121,11 +1121,11 @@ main(argc, argv)
 	}
 #ifdef LOGINFIRST
 	if (loginsh)
-	    (void) srccat(value(STRhome), STRsldotlogin);
+	    (void) srccat(varval(STRhome), STRsldotlogin);
 #endif
 	/* upward compat. */
-	if (!srccat(value(STRhome), STRsldottcshrc))
-	    (void) srccat(value(STRhome), STRsldotcshrc);
+	if (!srccat(varval(STRhome), STRsldottcshrc))
+	    (void) srccat(varval(STRhome), STRsldotcshrc);
 
 	if (!fast && !arginp && !onelflg && !havhash)
 	    dohash(NULL,NULL);
@@ -1136,7 +1136,7 @@ main(argc, argv)
 	loadhist(NULL, 0);
 #ifndef LOGINFIRST
 	if (loginsh)
-	    (void) srccat(value(STRhome), STRsldotlogin);
+	    (void) srccat(varval(STRhome), STRsldotlogin);
 #endif
 	if (!fast && (loginsh || rdirs))
 	    loaddirs(NULL);
@@ -1500,7 +1500,7 @@ goodbye(v, c)
 	(void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
 #endif
 	if (adrof(STRhome))
-	    (void) srccat(value(STRhome), STRsldtlogout);
+	    (void) srccat(varval(STRhome), STRsldtlogout);
 #ifdef TESLA
 	do_logout = 1;
 #endif /* TESLA */
@@ -1521,7 +1521,7 @@ exitstat()
      */
     child = 1;
 
-    xexit(getn(value(STRstatus)));
+    xexit(getn(varval(STRstatus)));
 }
 
 /*
@@ -1541,7 +1541,7 @@ int snum;
     (void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
 #endif
     if (adrof(STRhome))
-	(void) srccat(value(STRhome), STRsldtlogout);
+	(void) srccat(varval(STRhome), STRsldtlogout);
 
     record();
 
@@ -2058,7 +2058,7 @@ gethdir(home)
      * Is it us?
      */
     if (*home == '\0') {
-	if ((h = value(STRhome)) != STRNULL) {
+	if ((h = varval(STRhome)) != STRNULL) {
 	    (void) Strcpy(home, h);
 	    return 0;
 	}

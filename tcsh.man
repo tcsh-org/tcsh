@@ -50,10 +50,9 @@
 .\"   Remember to note OS-specific things in "OS variant support", new features
 .\"   in NEW FEATURES and referenced external commands in SEE ALSO.
 .\" 
-.TH TCSH 1 "10 February 1994" "Cornell 6.04.08"
+.TH TCSH 1 "12 March 1994" "Cornell 6.04.09"
 .SH NAME
-.B tcsh
-- C shell with file name completion and command line editing
+tcsh - C shell with file name completion and command line editing
 .SH SYNOPSIS
 .B tcsh
 [\fB-bcdefFimnqstvVxX\fR] [\fB-Dname\fR[\fB=value\fR]] [arg ...]
@@ -1884,15 +1883,24 @@ Under Masscomp/RTU, \fIuniverse\fR sets the universe.
 .PP
 Under Convex/OS, \fIwarp\fR prints or sets the universe.
 .PP
-The \fBOSTYPE\fR environment variable indicates what operating
-system the shell thinks it is running on. The \fBMACHTYPE\fR environment
-variable indicates the hardware (microprocessor class or machine model).
-The \fBVENDOR\fB indicates the distributor of the machine.
-Finally the \fBversion\fR shell
+The \fBVENDOR\fR, \fBOSTYPE\fR and \fBMACHTYPE\fR environment variables
+indicate respectively the vendor, operating system and machine type
+(microprocessor class or machine model) of the
+system on which the shell thinks it is running.
+These are particularly useful when sharing one's home directory between several
+types of machines; one can, for example,
+.IP "" 4
+set path = (~/bin.$MACHTYPE /usr/ucb /bin /usr/bin .)
+.PP
+in one's \fI~/.login\fR and put executables compiled for each machine in the
+appropriate directory.
+.PP
+The \fBversion\fR shell
 variable indicates what options were chosen when the shell was compiled.
+.PP
 Note also the \fInewgrp\fR builtin, the \fBafsuser\fR and
 \fBecho_style\fR shell variables and the system-dependent locations of
-shell input files described in the \fBFILES\fR section.
+the shell's input files (see \fBFILES\fR).
 .SS "Signal handling"
 Login shells ignore interrupts when reading the file \fI~/.logout\fR.
 The shell ignores quit signals unless started with \fB-q\fR.
@@ -1904,10 +1912,10 @@ In shell scripts, the shell's handling of interrupt and terminate signals
 can be controlled with \fIonintr\fR, and its handling of hangups can be
 controlled with \fIhup\fR and \fInohup\fR.
 .PP
-By default, the shell's children exit on a hangup (as does the shell) but the
-shell does not send them a hangup when it exits.  \fIhup\fR can be used to
-arrange for the shell to send a hangup to its children when it exits and
-\fInohup\fR can be used to set a child to ignore hangups.
+The shell exits on a hangup (see also the \fBlogout\fR shell variable).  By
+default, the shell's children do too, but the shell does not send them a
+hangup when it exits.  \fIhup\fR arranges for the shell to send a hangup to
+a child when it exits, and \fInohup\fR sets a child to ignore hangups.
 .SS "Terminal management (+)"
 The shell uses three different sets of terminal (``tty'') modes:
 `edit', used when editing, `quote', used when quoting literal characters,
@@ -2596,9 +2604,20 @@ first rather than oldest first.
 .RS +8
 .PP
 With \fB-S\fR, the second form saves the history list to \fIfilename\fR.
-If the \fBsavehist\fR shell variable contains a number, only that many lines
-of the history list are saved.
+If the first word \fBsavehist\fR shell variable contains a number,
+only that many lines of the history list are saved.
 (\fBsavehist\fR must be less than or equal to \fBhistory\fR.)
+.PP
+When the second word of the 
+\fBsavehist\fR
+shell variable is set to 
+\fBmerge\fR
+the current history will be merged with the history file on save 
+(according to time stamps). This feature is intended for an 
+environment with numerous shells being in simultaneous use (like 
+X-windows). Currently the automatic merge can
+only succeed when the shells nicely quit one after another.
+.PP
 With \fB-L\fR, the shell appends \fIfilename\fR, which is presumably a
 history list saved by the \fB-S\fR option or the \fBsavehist\fR mechanism,
 to the history list.
@@ -2627,7 +2646,7 @@ exits.
 Note that commands may set their own response to hangups, overriding \fIhup\fR.
 Without an argument (allowed only in a shell script), causes the shell to
 exit on a hangup for the remainder of the script.
-See also the \fInohup\fR builtin command.
+See also \fBSignal handling\fR and the \fInohup\fR builtin command.
 .TP 8
 .B if (\fIexpr\fB) \fIcommand
 If \fIexpr\fR (an expression, as described under \fBExpressions\fR)
@@ -2836,7 +2855,7 @@ With \fIcommand\fR, runs \fIcommand\fR such that it will ignore hangup signals.
 Note that commands may set their own response to hangups, overriding \fInohup\fR.
 Without an argument (allowed only in a shell script), causes the shell to
 ignore hangups for the remainder of the script.
-See also the \fIhup\fR builtin command.
+See also \fBSignal handling\fR and the \fIhup\fR builtin command.
 .TP 8
 .B notify \fR[\fB%\fIjob\fR ...]
 Causes the shell to notify the user asynchronously when the status of any
@@ -3413,6 +3432,10 @@ the \fIecho\fR(1) manpages on the appropriate systems.
 If set, the command-line editor is used.
 Set by default in interactive shells.
 .TP 8
+.B ellipsis \fR(+)
+Causes ellipsis (`\&.\&.\&.') to be displayed in the \fBprompt\fR instead
+of the number of skipped components if the `%[.cC]0n' syntax is used.
+.TP 8
 .B fignore \fR(+)
 Lists file name suffixes to be ignored by completion.
 .TP 8
@@ -3498,7 +3521,8 @@ See also \fBshlvl\fR.
 .TP 8
 .B logout \fR(+)
 Set by the shell to `normal' before a normal logout, `automatic'
-before an automatic logout, and `hangup' if the shell was killed by SIGHUP.
+before an automatic logout, and `hangup' if the shell was killed by a
+hangup signal (see \fBSignal Handling\fR).
 See also the \fBautologout\fR shell variable.
 .TP 8
 .B mail
@@ -3596,15 +3620,19 @@ that part of the directory is replaced by with `~\fIuser\fR'. The latter
 substitution happens only if the shell has already used `~\fIuser\fR' in a
 pathname in the current session.
 .TP 4
-%c[\fIn\fR], %.[\fIn\fR]
+%c[0][\fIn\fR], %.[0][\fIn\fR]
 The trailing component of the current working directory, \fIn\fR
-trailing components if a digit \fIn\fR is given, or the number of skipped
-components and the trailing component, reported as `/<\fIskipped\fR>path',
-if \fIn\fR is 0.
-If it starts with \fBhome\fR, that part is replaced by `~'.
+trailing components if a digit \fIn\fR is given.
+If \fIn\fR is prefixed with a 0, the number of skipped components and the
+trailing component is reported as `/<\fIskipped\fR>path', unless the shell
+variable \fBellipsis\fR is set - in which case it is reported as
+`\&.\&.\&.path'.
+`~' substitution is performed in a similar way to `%~' above, except that
+the `~[user]/' component is not counted when the trailing component
+calculation is made.
 .TP 4
 %C
-Like %c, but without \fBhome\fR substitution.
+Like %c, but without `~' substitution.
 .TP 4
 %h, %!, !
 The current history event number.
@@ -3738,7 +3766,10 @@ If set, the shell does `dirs -S' before exiting.
 .TP 8
 .B savehist
 If set, the shell does `history -S' before exiting.
-If set to a number, at most that many lines are saved.
+If the first word is set to a number, at most that many lines are saved.
+If the second word is set to \fBmerge\fR, then the contents of the history
+file are merged with the current history, and the most recent events are
+retained.
 .TP 8
 .B shell
 The file in which the shell resides.  This is used in forking
@@ -3988,8 +4019,8 @@ Set by the \fB-v\fR command line option.
 .TP 8
 .B version \fR(+)
 The version ID stamp. It contains the shell's version number (see \fBtcsh\fR),
-origin, release date, vendor, os, and machine (see \fBVENDOR\fR, 
-\fBOSTYPE\fR, \fBMACHTYPE\fB) and a comma-separated
+origin, release date, vendor, operating system and machine (see \fBVENDOR\fR, 
+\fBOSTYPE\fR and \fBMACHTYPE\fB) and a comma-separated
 list of options which were set at compile time.
 Options which are set by default in the distribution are noted.
 .PP
@@ -4139,17 +4170,7 @@ is running, as determined by the \fIgethostname\fR(2) system call.
 .B HOSTTYPE \fR(+)
 Initialized to the type of machine on which the shell
 is running, as determined at compile time. This variable is obsolete and
-will be removed in future versions.
-.PP
-.RS +8
-This is particularly useful when sharing one's home directory between several
-types of machines; one can, for example,
-.IP "" 4
-set path = (~/bin.$HOSTTYPE /usr/ucb /bin /usr/bin .)
-.RE
-.PP
-in one's \fI~/.login\fR and put executables compiled for each machine in the
-appropriate directory.
+will be removed in a future version.
 .TP 8
 .B HPATH \fR(+)
 A colon-separated list of directories in which the \fIrun-help\fR editor
@@ -4167,14 +4188,14 @@ See \fBNative Language System support\fR.
 The number of lines in the terminal. See \fBTerminal management\fR.
 .TP 8
 .B MACHTYPE \fR(+)
-Indicates the CPU class of the machine.
+The machine type (microprocessor class or machine model), as determined at compile time.
 .TP 8
 .B NOREBIND \fR(+)
 If set, printable characters are not rebound to \fIself-insert-command\fR.
 See \fBNative Language System support\fR.
 .TP 8
 .B OSTYPE \fR(+)
-Operating system name as determined at compile time.
+The operating system, as determined at compile time.
 .TP 8
 .B PATH
 A colon-separated list of directories in which to look for executables.
@@ -4201,7 +4222,7 @@ The terminal capability string. See \fBTerminal management\fR.
 Equivalent to the \fBuser\fR shell variable.
 .TP 8
 .B VENDOR \fR(+)
-Vendor name as determined at compile time.
+The vendor, as determined at compile time.
 .SH FILES
 .PD 0
 .TP 16
@@ -4319,8 +4340,8 @@ printenv, which\fR and \fIwhere\fR (q.v.).
 .PP
 New variables that make useful information easily available to the shell.
 See the \fBgid, loginsh, oid, shlvl, tcsh, tty, uid\fR and \fBversion\fR
-shell variables and the \fBHOST\fR, \fBOSTYPE\fR, \fBMACHTYPE\fR, \fBVENDOR\fR,
-and \fBREMOTEHOST\fR environment variables.
+shell variables and the \fBHOST\fR, \fBREMOTEHOST\fR, \fBVENDOR\fR,
+\fBOSTYPE\fR and \fBMACHTYPE\fR environment variables.
 .PP
 A new syntax for including useful information in the prompt string
 (see \fBprompt\fR).
@@ -4390,7 +4411,7 @@ access(2), execve(2), fork(2), killpg(2), pipe(2), setrlimit(2),
 sigvec(2), stat(2), umask(2), vfork(2), wait(2), malloc(3), setlocale(3), tty(4),
 a.out(5), termcap(5), environ(7), termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.08 (Cornell) 94/02/10.
+This man page documents tcsh 6.04.09 (Cornell) 94/03/12.
 .SH AUTHORS
 .PD 0
 .TP 2
@@ -4539,6 +4560,9 @@ New manpage
 .TP 2
 Larry Schwimmer, Stanford University, 1993
 AFS and HESIOD patches.
+.TP
+Luke Mewburn, RMIT University, 1994
+Enhanced directory printing in prompt
 .PD
 .PP
 .SH "THANKS TO"

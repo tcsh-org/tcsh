@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.hist.c,v 3.17 1993/12/16 17:14:42 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.hist.c,v 3.18 1994/02/04 15:16:59 christos Exp christos $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.17 1993/12/16 17:14:42 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.18 1994/02/04 15:16:59 christos Exp christos $")
 
 #include "tc.h"
 
@@ -71,7 +71,7 @@ savehist(sp, mflg)
     /* throw away null lines */
     if (sp && sp->next->word[0] == '\n')
 	return;
-    cp = value(STRhistory);
+    cp = varval(STRhistory);
     if (*cp) {
 	register Char *p = cp;
 
@@ -124,7 +124,7 @@ enthist(event, lp, docopy, mflg)
     register struct Hist *np;
     Char *dp;
     
-    if ((dp = value(STRhistdup)) != STRNULL) {
+    if ((dp = varval(STRhistdup)) != STRNULL) {
 	if (eq(dp, STRall)) {
 	    for (p = pp; (p = p->Hnext) != NULL;)
 		if (heq(lp, &(p->Hlex)))
@@ -212,7 +212,7 @@ dohist(vp, c)
     int     n, hflg = 0;
 
     USE(c);
-    if (getn(value(STRhistory)) == 0)
+    if (getn(varval(STRhistory)) == 0)
 	return;
     if (setintr)
 #ifdef BSDSIGS
@@ -266,7 +266,7 @@ dohist(vp, c)
     if (*vp)
 	n = getn(*vp);
     else {
-	n = getn(value(STRhistory));
+	n = getn(varval(STRhistory));
     }
     dohist1(Histlist.Hnext, &n, hflg);
 }
@@ -370,14 +370,14 @@ rechist(fname, ref)
      * If $savehist is just set, we use the value of $history
      * else we use the value in $savehist
      */
-    if (((snum = value(STRsavehist)) == STRNULL) &&
-	((snum = value(STRhistory)) == STRNULL))
+    if (((snum = varval(STRsavehist)) == STRNULL) &&
+	((snum = varval(STRhistory)) == STRNULL))
 	snum = STRmaxint;
 
 
     if (fname == NULL) {
-	if ((fname = value(STRhistfile)) == STRNULL)
-	    fname = Strspl(value(STRhome), &STRtildothist[1]);
+	if ((fname = varval(STRhistfile)) == STRNULL)
+	    fname = Strspl(varval(STRhome), &STRtildothist[1]);
 	else
 	    fname = Strsave(fname);
     }
@@ -398,14 +398,21 @@ rechist(fname, ref)
      *
      * jw.
      */ 
+    /*
+     * We need the didfds stuff before loadhist otherwise
+     * exec in a script will fail to print if merge is set.
+     * From: mveksler@iil.intel.com (Veksler Michael)
+     */
+    oldidfds = didfds;
+    didfds = 0;
     if ((shist = adrof(STRsavehist)) != NULL)
 	if (shist->vec[1] && eq(shist->vec[1], STRmerge))
 	    loadhist(fname, 1);
     fp = creat(short2str(fname), 0600);
-    if (fp == -1) 
+    if (fp == -1) {
+	didfds = oldidfds;
 	return;
-    oldidfds = didfds;
-    didfds = 0;
+    }
     ftmp = SHOUT;
     SHOUT = fp;
     dumphist[2] = snum;
@@ -427,7 +434,7 @@ loadhist(fname, mflg)
 
     if (fname != NULL)
 	loadhist_cmd[2] = fname;
-    else if ((fname = value(STRhistfile)) != STRNULL)
+    else if ((fname = varval(STRhistfile)) != STRNULL)
 	loadhist_cmd[2] = fname;
     else
 	loadhist_cmd[2] = STRtildothist;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.sem.c,v 3.32 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.sem.c,v 3.33 1993/10/30 19:50:16 christos Exp christos $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.32 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.33 1993/10/30 19:50:16 christos Exp christos $")
 
 #include "tc.h"
 
@@ -646,7 +646,7 @@ execute(t, wanttty, pipein, pipeout)
 	if (t->t_dcar) {
 	    t->t_dcar->t_dflg |= t->t_dflg & F_NOINTERRUPT;
 	    execute(t->t_dcar, _gv.wanttty, NULL, NULL);
-	    if ((getn(value(STRstatus)) == 0) !=
+	    if ((getn(varval(STRstatus)) == 0) !=
 		(t->t_dtyp == NODE_AND)) {
 		VOL_RESTORE();
 		return;

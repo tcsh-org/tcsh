@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.55 1994/02/04 15:20:04 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.56 1994/02/10 14:36:00 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -72,11 +72,10 @@
 # define NOFILE 256
 #endif /* NOFILE */
 
-#ifdef linux
+#if defined(linux) || defined(NetBSD) || SYSVREL >= 4 
 # undef NEEDstrerror
-#endif /* linux */
-
-#ifdef NetBSD
+#endif /* linux || NetBSD || SYSVREL >= 4 */
+#if defined(BSD) && BSD >= 199306
 # undef NEEDstrerror
 #endif
 
@@ -676,6 +675,9 @@ extern int setrlimit();
 # if !defined(IRIS4D) || !defined(SOLARIS2)
 extern int wait3();	/* I think some bizarre systems still need this */
 # endif /* !IRIS4D || !SOLARIS2 */
+# if defined(SOLARIS2)
+#  undef NEEDstrerror
+# endif /* SOLARIS2 */
 #endif /* SYSVREL == 4 */
 
 #if defined(__osf__) && defined(__alpha)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.51 1993/12/19 21:38:00 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.52 1994/01/31 16:04:49 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.51 1993/12/19 21:38:00 christos Exp christos $")
+RCSID("$Id: tc.func.c,v 3.52 1994/01/31 16:04:49 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -660,7 +660,7 @@ auto_lock()
 	char *afsname;
 	Char *safs;
 
-	if ((safs = value(STRafsuser)) != STRNULL)
+	if ((safs = varval(STRafsuser)) != STRNULL)
 	    afsname = short2str(safs);
 	else
 	    if ((afsname = getenv("AFSUSER")) == NULL)
@@ -859,7 +859,7 @@ period_cmd()
     }
     periodic_active = 1;
     if (!whyles && adrof1(STRperiodic, &aliases)) {
-	vp = value(STRtperiod);
+	vp = varval(STRtperiod);
 	if (vp == STRNULL)
 	    return;
 	interval = getn(vp);
@@ -916,7 +916,7 @@ aliasrun(cnt, s1, s2)
     }
 
     /* Save the old status */
-    status = getn(value(STRstatus));
+    status = getn(varval(STRstatus));
 
     /* expand aliases like process() does. */
     alias(&w);
@@ -1032,7 +1032,7 @@ rmstar(cp)
     if (!adrof(STRrmstar))
 	return;
 #ifdef RMDEBUG
-    tag = value(STRrmdebug);
+    tag = varval(STRrmdebug);
 #endif /* RMDEBUG */
     we = cp->next;
     while (*we->word == ';' && we != cp)
@@ -1129,10 +1129,10 @@ continue_jobs(cp)
 
 
 #ifdef CNDEBUG
-    tag = value(STRcndebug);
+    tag = varval(STRcndebug);
 #endif /* CNDEBUG */
-    continue_list = value(STRcontinue);
-    continue_args_list = value(STRcontinue_args);
+    continue_list = varval(STRcontinue);
+    continue_args_list = varval(STRcontinue_args);
     if (*continue_list == '\0' && *continue_args_list == '\0')
 	return;
 
@@ -1472,7 +1472,7 @@ getusername(hm)
 	tcache = NULL;
 	return NULL;
     }
-    if (((h = value(STRhome)) != STRNULL) &&
+    if (((h = varval(STRhome)) != STRNULL) &&
 	(Strncmp(p = *hm, h, (size_t) (j = (int) Strlen(h))) == 0) &&
 	(p[j] == '/' || p[j] == '\0')) {
 	*hm = &p[j];
@@ -1595,7 +1595,8 @@ shlvl(val)
 	    val += atoi(cp);
 
 	if (val <= 0) {
-	    unsetv(STRshlvl);
+	    if (adrof(STRshlvl) != NULL)
+		unsetv(STRshlvl);
 	    Unsetenv(STRKSHLVL);
 	}
 	else {
@@ -1812,6 +1813,10 @@ hashbang(fd, vp)
 
 #ifdef REMOTEHOST
 
+#ifdef ISC
+# undef MAXHOSTNAMELEN	/* Busted headers? */
+#endif
+
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -1876,6 +1881,7 @@ remotehost()
 	}
     }
 #endif
+    alarm(0);
     (void) signal(SIGALRM, osig);
 
     if (host)
