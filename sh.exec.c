@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.39 1997/10/28 22:34:23 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.40 1998/04/08 13:58:43 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.39 1997/10/28 22:34:23 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.40 1998/04/08 13:58:43 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -430,7 +430,7 @@ texec(sf, st)
     case ENOEXEC:
 #ifdef WINNT
 	{
-		extern int nt_feed_to_cmd(char *,char**);
+		extern int nt_feed_to_cmd __P((char *, char **));
 		int rc;
 		rc = nt_feed_to_cmd(f,t);
 	}

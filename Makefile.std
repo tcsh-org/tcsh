@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.85 1997/10/27 22:44:18 christos Exp $
+# $Id: Makefile.std,v 1.86 1998/04/21 16:08:30 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -131,6 +131,8 @@ CFLAGS=-O2 $(INCLUDES)
 #DFLAGS=-DPCC
 # DELL SVR4
 #DFLAGS=-DDELL
+# SCO_SV
+#DFLAGS=-D_SPEED_T -DSCO
 DFLAGS=
 #DFLAGS=-D_PATH_TCSHELL='"${DESTBIN}/tcsh"'
 
@@ -148,6 +150,7 @@ LDFLAGS= 			## The simplest, suitable for all.
 #LDFLAGS= -Wl,-s,-n		## Stripped, shared text (Unicos)
 #LDFLAGS= -s -static		## Link statically. (linux)
 #LDFLAGS= -s -N			## Impure executable (linux)
+#LDFLAGS= -Bdynamic -dy		## SCO_SV
 
 ################################################################
 ## LIBES.  Pick one, or roll your own.
@@ -187,6 +190,7 @@ LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -lcurses -linet -lsec -lc_s	 ## ISC 2.0.2 with networking
 #LIBES= -lcurses -lintl -lcrypt		 ## SCO SysVR3.2v2.0
 #LIBES= -lcurses -lintl -lsocket -lcrypt ## SCO+ODT1.1
+#LIBES= -lcurses -lsocket -lcrypt	 ## SCO_SV
 #LIBES= -lposix -ltermcap		 ## A/UX 2.0
 #LIBES= -lposix -ltermcap -lc_s		 ## A/UX 3.0
 #LIBES= -ldirent -lcurses		 ## att3b1 cc w/o shared lib & dirlib
@@ -251,13 +255,17 @@ CC=	gcc -Wall -pipe -B/bin/	# -ansi -pedantic
 #CC=	/opt/SUNWspro/bin/cc	# Solaris 2.1
 #CC=	scc 	# Alliant fx2800
 #CC=	lcc	-wa 
+#CC=	cc -b elf -Kpic # SCO_SV
 ED=	ed
 AS=	as
 RM=	rm
 CXREF=	/usr/ucb/cxref
+#CXREF=	/bin/cxref			# SCO_SV
 VGRIND=	csh /usr/ucb/vgrind
 CTAGS=	/usr/ucb/ctags
+#CTAGS=	/usr/bin/ctags			# SCO_SV
 #XSTR= /usr/ucb/xstr
+#XSTR= /usr/bin/xstr			# SCO_SV
 SCCS=	/usr/local/sccs
 PARALLEL=12				# Make the multi-max run fast.
 #P=&					# Use Sequent's parallel make
@@ -287,9 +295,9 @@ SHOBJS=	sh.${SUF} sh.dir.${SUF} sh.dol.${SUF} sh.err.${SUF} sh.exec.${SUF} \
 	ma.setp.${SUF} vms.termcap.${SUF}
 
 TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c \
-	tw.comp.c
+	tw.comp.c tw.color.c
 TWOBJS=	tw.help.${SUF} tw.init.${SUF} tw.parse.${SUF} tw.spell.${SUF} \
-	tw.comp.${SUF}
+	tw.comp.${SUF} tw.color.${SUF}
 
 EDSRCS= ed.chared.c ed.decls.h ed.defns.c ed.h ed.init.c ed.inputl.c \
 	ed.refresh.c ed.screen.c ed.xmap.c ed.term.c ed.term.h
@@ -595,7 +603,7 @@ EDH=ed.h ed.decls.h
 # EDH
 EDINC=sh.${SUF} sh.func.${SUF} sh.lex.${SUF} sh.print.${SUF} sh.proc.${SUF} \
       sh.set.${SUF} tc.bind.${SUF} tc.os.${SUF} tc.prompt.${SUF} \
-      tc.sched.${SUF} tw.parse.${SUF}
+      tc.sched.${SUF} tw.parse.${SUF} tw.color.${SUF}
 ${EDOBJS} ${EDINC} : ${EDH}
 
 # SHH
@@ -603,7 +611,7 @@ ${OBJS}: config.h ${SHH}
 
 # TWH
 TWINC=ed.chared.${SUF} ed.inputl.${SUF} sh.exec.${SUF} sh.func.${SUF} \
-      sh.set.${SUF} tc.func.${SUF}
+      sh.set.${SUF} tc.func.${SUF} tw.color.${SUF}
 ${TWOBJS} ${TWINC}: ${TWH}
 
 # glob.h

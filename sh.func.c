@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.70 1997/10/28 22:34:24 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.73 1998/04/21 16:08:43 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.70 1997/10/28 22:34:24 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.73 1998/04/21 16:08:43 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -940,11 +940,12 @@ getword(wp)
 	    c = readc(1);
 	    if (c == '\\' && (c = readc(1)) == '\n')
 		c = ' ';
-	    if (c == '\'' || c == '"')
+	    if (c == '\'' || c == '"') {
 		if (d == 0)
 		    d = c;
 		else if (d == c)
 		    d = 0;
+	    }
 	    if (c < 0)
 		goto past;
 	    if (wp) {
@@ -1408,6 +1409,13 @@ dosetenv(v, c)
 	return;
     }
 
+#ifdef COLOR_LS_F
+    if (eq(vp, STRLS_COLORS)) {
+        parseLS_COLORS(lp);
+	return;
+    }
+#endif /* COLOR_LS_F */
+
 #ifdef SIG_WINDOW
     /*
      * Load/Update $LINES $COLUMNS
@@ -1533,6 +1541,10 @@ dounsetenv(v, c)
 			__nt_only_start_exes = 0;
 		}
 #endif /* WINNT */
+#ifdef COLOR_LS_F
+		else if (eq(name, STRLS_COLORS))
+		    parseLS_COLORS(n);
+#endif /* COLOR_LS_F */
 		/*
 		 * start again cause the environment changes
 		 */

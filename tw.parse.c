@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.82 1998/04/08 17:57:45 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.83 1998/04/21 16:08:57 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.82 1998/04/08 17:57:45 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.83 1998/04/21 16:08:57 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1714,7 +1714,8 @@ extract_dir_and_name(path, dir, name)
  */
 Char *
 dollar(new, old)
-    Char   *new, *old;
+    Char   *new;
+    const Char *old;
 {
     Char    *p;
     size_t   space;
@@ -2035,6 +2036,19 @@ print_by_column(dir, items, count, no_file_suffix)
 	    if (i < count) {
 		w = (unsigned int) Strlen(items[i]);
 
+#ifdef COLOR_LS_F
+		if (no_file_suffix) {
+		    /* Print the command name */
+		    Char f = items[i][w - 1];
+		    items[i][w - 1] = 0;
+		    print_with_color(items[i], w - 1, f);
+		}
+		else {
+		    /* Print filename followed by '/' or '*' or ' ' */
+		    print_with_color(items[i], w, filetype(dir, items[i]));
+		    w++;
+		}
+#else /* ifndef COLOR_LS_F */
 		if (no_file_suffix) {
 		    /* Print the command name */
 		    xprintf("%S", items[i]);
@@ -2045,6 +2059,7 @@ print_by_column(dir, items, count, no_file_suffix)
 			    filetype(dir, items[i]));
 		    w++;
 		}
+#endif /* COLOR_LS_F */
 
 		if (c < (columns - 1))	/* Not last column? */
 		    for (; w < maxwidth; w++)

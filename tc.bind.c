@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.27 1997/10/27 22:44:34 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.28 1998/04/08 13:59:02 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.27 1997/10/27 22:44:34 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.28 1998/04/08 13:59:02 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -421,7 +421,7 @@ parsestring(str, buf)
     CStr   *buf;
 {
     Char   *b;
-    Char   *p;
+    const Char   *p;
     int    es;
 
     b = buf->buf;

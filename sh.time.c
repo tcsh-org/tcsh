@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.time.c,v 3.17 1996/04/26 19:20:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.time.c,v 3.18 1996/09/24 16:57:26 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.17 1996/04/26 19:20:26 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.18 1996/09/24 16:57:26 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -365,12 +365,13 @@ prusage(bs, es,	e, b)
     cp = "%Uu %Ss %E %P	%I+%Oio	%Fpf+%Ww";
 # else /* !_SEQUENT_ */
 #  ifndef POSIX
-    time_t  ms = (e - b) * 100 / HZ;
-
+    time_t ms = ((time_t)((e - b) / HZ) * 100) +
+		 (time_t)(((e - b) % HZ) * 100) / HZ;
 #  else	/* POSIX */
-    clock_t ms = (e - b) * 100 / clk_tck;
-
+    clock_t ms = ((clock_t)((e - b) / clk_tck) * 100) +
+		  (clock_t)(((e - b) % clk_tck) * 100) / clk_tck;
 #  endif /* POSIX */
+
     cp = "%Uu %Ss %E %P";
 
     /*

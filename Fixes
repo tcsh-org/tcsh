@@ -1,3 +1,8 @@
+ 59. Fast execute by-pass for win32 (Amol Deshpande)
+ 58. Clean up const usage a bit, and fix gcc 2.8.1 warnings.
+ 57. Use @bindir@ for DESTBIN in Makefile.in (Edgar Hoch)
+ 56. Avoid overflow in time builtin computation (Nobue Adachi)
+ 55. Color ls additions (Taga Nayuta)
  54. unsigned char vs. char warning fixes (Kaveh)
  53. Solaris 64 bit fixes (fix directory offset bug) (Thomas-Martin Kruel)
  52. More win32 patches (Amol)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.term.c,v 1.20 1997/10/27 22:44:23 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.term.c,v 1.22 1998/04/21 16:08:39 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -37,7 +37,7 @@
 #include "sh.h"
 #ifndef WINNT
 
-RCSID("$Id: ed.term.c,v 1.20 1997/10/27 22:44:23 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.22 1998/04/21 16:08:39 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -536,11 +536,12 @@ static struct tcshmodes {
 /* Retry a system call */
 #define RETRY(x) \
    for (;;) \
-	if ((x) == -1) \
+	if ((x) == -1) { \
 	   if (errno != EINTR) \
 	       return -1; \
 	   else \
 	       continue; \
+	} \
 	else \
 	   break \
 

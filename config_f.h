@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.15 1997/10/02 16:36:23 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.16 1997/10/28 22:34:14 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -149,6 +149,12 @@
  *		host
  */
 #define REMOTEHOST
+
+/*
+ * COLOR_LS_F Do you want to use builtin color ls-F ?
+ *
+ */
+#define COLOR_LS_F
 
 /*
  * RCSID	This defines if we want rcs strings in the binary or not

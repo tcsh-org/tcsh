@@ -1,4 +1,4 @@
-$ $Id: set1,v 1.4 1996/10/19 17:52:31 christos Exp $
+$ $Id: set1,v 1.1 1998/04/08 17:59:50 christos Exp $
 $ Mensajes de Error
 $set 1 
 1 Error de sintaxis
@@ -137,3 +137,4 @@ $set 1
 134 Uso: unlimit [-fh] [límites]
 135 $%S es de sólo-lectura
 136 No existe ese trabajo
+137 Unknown colorls variable `%c%c'

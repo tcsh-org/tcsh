@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.decls.h,v 3.14 1996/04/26 19:23:04 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.decls.h,v 3.15 1996/06/22 21:45:04 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -45,7 +45,7 @@ extern	void		  do_help		__P((Char *));
 /*
  * tw.parse.c
  */
-extern	 Char		 *dollar		__P((Char *, Char *));
+extern	 Char		 *dollar		__P((Char *, const Char *));
 extern	 int		  tenematch		__P((Char *, int, COMMAND));
 extern	 int		  t_search		__P((Char *, Char *, COMMAND, 
 						     int, int, int, Char *, 
@@ -114,4 +114,13 @@ extern	 void		  douncomplete		__P((Char **,
 						     struct command *));
 extern	 int		  tw_complete		__P((Char *, Char **, 
 						     Char **, int, int *));
+#ifdef COLOR_LS_F
+/*
+ * tw.color.c
+ */
+extern	 void		  set_color_context	__P((void));
+extern	 void		  print_with_color	__P((Char *, size_t, int));
+extern	 void		  parseLS_COLORS	__P((Char *));
+#endif /* COLOR_LS_F */
+
 #endif /* _h_tw_decls */

@@ -1,4 +1,4 @@
-$ $Id: set1,v 1.2 1995/03/19 18:07:15 christos Exp $
+$ $Id: set1,v 1.1 1996/04/26 19:24:07 christos Exp $
 $ Error messages
 $set 1 
 1 Λάθος σύνταξη
@@ -137,3 +137,4 @@ $set 1
 134 Χρήση: unlimit [-fh] [όρια]
 135 Tο $%S είναι μόνο γιά διάβασμα
 136 Δεν υπάρχει τέτοια εργασία
+137 Unknown colorls variable `%c%c'

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.34 1997/10/27 22:44:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.35 1998/04/08 13:58:40 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.34 1997/10/27 22:44:26 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.35 1998/04/08 13:58:40 christos Exp $")
 
 /*
  * C shell
@@ -703,11 +703,12 @@ Dgetdol()
 	    stderror(ERR_SYNTAX);
     }
     else {
-	if (subscr > 0)
+	if (subscr > 0) {
 	    if (subscr > upb)
 		lwb = 1, upb = 0;
 	    else
 		lwb = upb = subscr;
+	}
 	unDredc(c);
     }
     if (dimen) {

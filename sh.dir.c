@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.44 1997/10/27 22:44:25 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.45 1998/04/21 16:08:42 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.44 1997/10/27 22:44:25 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.45 1998/04/21 16:08:42 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -870,11 +870,12 @@ dcanon(cp, p)
 	if (&cp[1] == sp && sp[0] == '.' && sp[1] == '.' && sp[2] == '\0')
 	    slashslash = 1;
 #endif /* apollo */
-	if (*sp == '\0')	/* if component is null */
+	if (*sp == '\0') {	/* if component is null */
 	    if (--sp == cp)	/* if path is one char (i.e. /) */ 
 		break;
 	    else
 		*sp = '\0';
+	}
 	else if (sp[0] == '.' && sp[1] == 0) {
 	    if (slash) {
 		for (p1 = sp, p2 = p + 1; (*p1++ = *p2++) != '\0';)

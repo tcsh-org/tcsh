@@ -148,8 +148,11 @@ case "${tcsh_cv_canonical}" in
   *-sun-solaris2.3* ) # Sparc only release
     tcsh_config_file=sol23
   ;;
-  *-*-solaris2.[456]* ) # Should handle sparc, x86 and powerpc
+  *-*-solaris2.[45]* ) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol24
+  ;;
+  *-*-solaris2.6* ) # Should handle sparc, x86 and powerpc
+    tcsh_config_file=sol26
   ;;
 
   ## Dell SVR4

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.11 1998/04/08 17:57:30 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.12 1998/06/05 16:20:33 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.11 1998/04/08 17:57:30 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.12 1998/06/05 16:20:33 christos Exp $")
 
 #include "ed.h"
 
@@ -194,7 +194,7 @@ draino()
 void
 flush()
 {
-    int unit, nw;
+    int unit;
     static int interrupted = 0;
     size_t sz;
 

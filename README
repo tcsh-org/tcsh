@@ -83,7 +83,8 @@ To install tcsh:
     everything is fine.
 
 9)  Once satisfied that tcsh is working correctly, complete the installation
-    by typing "make install".
+    by typing "make install" to install the binary, and "make install.man" to
+    install the documentation.
 
 10) Enjoy.
 

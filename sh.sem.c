@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.42 1997/10/27 22:44:33 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.43 1998/04/08 13:58:59 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.42 1997/10/27 22:44:33 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.43 1998/04/08 13:58:59 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -112,6 +112,17 @@ execute(t, wanttty, pipein, pipeout)
 
     if (t == 0) 
 	return;
+
+#ifdef WINNT
+    {
+        if (!t->t_dcdr && !t->t_dcar && !t->t_dflg && !didfds &&
+            (intty || intact) && (t->t_dtyp == NODE_COMMAND)
+                && !isbfunc(t)) {
+            if (nt_try_fast_exec(t) == 0)
+                return;
+        }
+    }
+#endif /* WINNT */
 
     /*
      * Ed hutchins@sgi.com & Dominic dbg@sgi.com
@@ -210,9 +221,9 @@ execute(t, wanttty, pipein, pipeout)
 	 * parsed.
 	 */
 	while (t->t_dtyp == NODE_COMMAND)
-	    if (eq(t->t_dcom[0], STRnice))
-		if (t->t_dcom[1])
-		    if (strchr("+-", t->t_dcom[1][0]))
+	    if (eq(t->t_dcom[0], STRnice)) {
+		if (t->t_dcom[1]) {
+		    if (strchr("+-", t->t_dcom[1][0])) {
 			if (t->t_dcom[2]) {
 			    setname("nice");
 			    t->t_nice =
@@ -222,34 +233,40 @@ execute(t, wanttty, pipein, pipeout)
 			}
 			else
 			    break;
+		    }
 		    else {
 			t->t_nice = 4;
 			lshift(t->t_dcom, 1);
 			t->t_dflg |= F_NICE;
 		    }
+		}
 		else
 		    break;
-	    else if (eq(t->t_dcom[0], STRnohup))
+	    }
+	    else if (eq(t->t_dcom[0], STRnohup)) {
 		if (t->t_dcom[1]) {
 		    t->t_dflg |= F_NOHUP;
 		    lshift(t->t_dcom, 1);
 		}
 		else
 		    break;
-	    else if (eq(t->t_dcom[0], STRhup))
+	    }
+	    else if (eq(t->t_dcom[0], STRhup)) {
 		if (t->t_dcom[1]) {
 		    t->t_dflg |= F_HUP;
 		    lshift(t->t_dcom, 1);
 		}
 		else
 		    break;
-	    else if (eq(t->t_dcom[0], STRtime))
+	    }
+	    else if (eq(t->t_dcom[0], STRtime)) {
 		if (t->t_dcom[1]) {
 		    t->t_dflg |= F_TIME;
 		    lshift(t->t_dcom, 1);
 		}
 		else
 		    break;
+	    }
 #ifdef F_VER
 	    else if (eq(t->t_dcom[0], STRver))
 		if (t->t_dcom[1] && t->t_dcom[2]) {

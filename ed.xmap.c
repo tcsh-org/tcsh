@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.xmap.c,v 3.18 1997/10/02 16:36:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.xmap.c,v 3.19 1997/10/27 22:44:23 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.18 1997/10/02 16:36:26 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.19 1997/10/27 22:44:23 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -302,7 +302,8 @@ TryNode(ptr, str, val, ntype)
 	case XK_EXE:
 	    ptr->val.str.len = (val->str.len + 1) * sizeof(Char);
 	    ptr->val.str.buf = (Char *) xmalloc((size_t) ptr->val.str.len);
-	    (void) memmove((ptr_t) ptr->val.str.buf, (ptr_t) val->str.buf, (size_t) ptr->val.str.len);
+	    (void) memmove((ptr_t) ptr->val.str.buf, (ptr_t) val->str.buf,
+			   (size_t) ptr->val.str.len);
 	    ptr->val.str.len = val->str.len;
 	    break;
 	default:
@@ -680,9 +681,10 @@ unparsech(cnt, ch)
 
 int
 parseescape(ptr)
-    Char  **ptr;
+    const Char  **ptr;
 {
-    Char   *p, c;
+    const Char *p;
+    Char c;
 
     p = *ptr;
 

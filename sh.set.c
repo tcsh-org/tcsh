@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.31 1996/10/05 17:39:14 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.32 1997/05/04 17:52:17 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.31 1996/10/05 17:39:14 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.32 1997/05/04 17:52:17 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -168,6 +168,11 @@ update_vars(vp)
     else if (eq(vp, STRimplicitcd)) {
 	implicit_cd = ((eq(varval(vp), STRverbose)) ? 2 : 1);
     }
+#ifdef COLOR_LS_F
+    else if (eq(vp, STRcolor)) {
+	set_color_context();
+    }
+#endif /* COLOR_LS_F */
 }
 
 
@@ -387,11 +392,12 @@ dolet(v, dummy)
 		p = xset(p, &v);
 	    }
 	}
-	if (op == '=')
+	if (op == '=') {
 	    if (hadsub)
 		asx(vp, subscr, p);
 	    else
 		set(vp, p, VAR_READWRITE);
+	}
 	else if (hadsub) {
 	    struct varent *gv = getvx(vp, subscr);
 
@@ -727,6 +733,10 @@ unset(v, c)
 	noediting = 0;
     if (did_roe && adrof(STRrecognize_only_executables) == 0)
 	tw_cmd_free();
+#ifdef COLOR_LS_F
+    if (adrof(STRcolor) == 0)
+	set_color_context();
+#endif /* COLOR_LS_F */
 }
 
 void

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.78 1998/04/08 17:57:23 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.79 1998/04/21 11:41:08 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,10 +43,11 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.78 1998/04/08 17:57:23 christos Exp $")
+RCSID("$Id: sh.c,v 3.79 1998/04/21 11:41:08 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
+#include "tw.h"
 
 extern bool MapsAreInited;
 extern bool NLSMapsAreInited;
@@ -694,6 +695,11 @@ main(argc, argv)
 	if (sh_len == 0)
 	    set(STRshell, Strsave(STR_SHELLPATH), VAR_READWRITE);
     }
+
+#ifdef COLOR_LS_F
+    if ((tcp = getenv("LS_COLORS")) != NULL)
+	parseLS_COLORS(str2short(tcp));
+#endif /* COLOR_LS_F */
 
     doldol = putn((int) getpid());	/* For $$ */
 #ifdef WINNT

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.err.c,v 3.29 1997/10/27 22:44:27 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.err.c,v 3.30 1998/04/08 13:58:41 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.29 1997/10/27 22:44:27 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.30 1998/04/08 13:58:41 christos Exp $")
 
 /*
  * C Shell
@@ -189,7 +189,8 @@ char   *seterr = NULL;	/* Holds last error if there was one */
 #define ERR_READONLY	131
 #define ERR_BADJOB	132
 #define ERR_INVALID	133
-#define NO_ERRORS	133
+#define ERR_BADCOLORVAR	134
+#define NO_ERRORS	134
 
 static char *elst[NO_ERRORS] INIT_ZERO_STRUCT;
 
@@ -360,6 +361,7 @@ errinit()
     elst[ERR_ULIMUS] = CSAVS(1, 134, "Usage: unlimit [-fh] [limits]");
     elst[ERR_READONLY] = CSAVS(1, 135, "$%S is read-only");
     elst[ERR_BADJOB] = CSAVS(1, 136, "No such job");
+    elst[ERR_BADCOLORVAR] = CSAVS(1, 137, "Unknown colorls variable `%c%c'");
 }
 /*
  * The parser and scanner set up errors for later by calling seterr,

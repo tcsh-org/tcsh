@@ -1,5 +1,5 @@
 XCOMM
-XCOMM $Id: Imakefile,v 1.69 1997/05/04 17:52:12 christos Exp $
+XCOMM $Id: Imakefile,v 1.70 1997/10/27 22:44:17 christos Exp $
 XCOMM
 XCOMM Imakefile for tcsh 6.07
 XCOMM Marc Horowitz, MIT SIPB
@@ -90,7 +90,11 @@ ones.  Please send in your fixes and additions! */
 #     if (OSMinorVersion < 4)
 #      define ConfigH sol23
 #     else
-#      define ConfigH sol24
+#      if (OSMinorVersion < 6)
+#       define ConfigH sol24
+#      else
+#       define ConfigH sol26
+#      endif
 #     endif
 #    endif
 #    define NoCombineRegs
@@ -478,9 +482,9 @@ SHOBJS=	sh.${SUF} sh.dir.${SUF} sh.dol.${SUF} sh.err.${SUF} sh.exec.${SUF} \
 	sh.set.${SUF} sh.time.${SUF} glob.${SUF} ${SYSOBJS}
 
 TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c \
-	tw.comp.c
+	tw.comp.c tw.color.c
 TWOBJS=	tw.help.${SUF} tw.init.${SUF} tw.parse.${SUF} tw.spell.${SUF} \
-	tw.comp.${SUF}
+	tw.comp.${SUF} tw.color.${SUF}
 
 EDSRCS= ed.chared.c ed.decls.h ed.defns.c ed.h ed.init.c ed.inputl.c \
 	ed.refresh.c ed.screen.c ed.xmap.c ed.term.c ed.term.h

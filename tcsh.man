@@ -2973,6 +2973,10 @@ On machines where `ls \-C' is not the default, \fIls\-F\fR acts like `ls \-CF',
 unless \fBlistflags\fR contains an `x', in which case it acts like `ls \-xF'.
 \fIls\-F\fR passes its arguments to \fIls\fR(1) if it is given any switches,
 so `alias ls ls\-F' generally does the right thing.
+.PP
+The \fBls\-F\fR builtin can list files using different colors depending on the
+filetype or extension. See the \fBcolor\fR \fItcsh\fR variable and the
+\fBLS_COLORS\fR environment variable.
 .RE
 .PP
 .B migrate \fR[\fB\-\fIsite\fR] \fIpid\fR|\fB%\fIjobid\fR ... (+)
@@ -3517,6 +3521,12 @@ scripts.
 .B cdpath
 A list of directories in which \fIcd\fR should search for
 subdirectories if they aren't found in the current directory.
+.TP 8
+.B color
+If set, it enables color display for the builtin \fBls\-F\fR and it passes
+\fB\-\-color=auto\fR to \fBls\fR. Alternatively, it can be set to only
+\fBls\-F\fR or only \fBls\fR to enable color only to one command. Setting
+it to nothing is equivalent to setting it to \fB(ls\-F ls)\fR.
 .TP 8
 .B command \fR(+)
 If set, the command which was passed to the shell with the \fB-c\fR flag (q.v.).
@@ -4427,6 +4437,133 @@ See \fBNative Language System support\fR.
 .B LINES
 The number of lines in the terminal. See \fBTerminal management\fR.
 .TP 8
+.B LS_COLORS
+The format of this variable is reminicent of the \fBtermcap(5)\fR
+file format; a colon-separated list of expressions of the form
+"\fIxx=string\fR", where "\fIxx\fR" is a two-character variable name.  The
+variables with their associated defaults are:
+.PP
+.RS +8
+.nf
+no	0	Normal (non-filename) text
+fi	0	Regular file
+di	01;34	Directory
+ln	01;36	Symbolic link
+pi	33	Named pipe (FIFO)
+so	01;35	Socket
+bd	01;33	Block device
+cd	01;32	Character device
+ex	01;32	Executable file
+mi	(none)	Missing file (defaults to fi)
+or	(none)	Orphanned symbolic link (defaults to ln)
+lc	^[[	Left code
+rc	m	Right code
+ec	(none)	End code (replaces lc+no+rc)
+.fi
+.PP
+You only need to include the variables you want to change from
+the default.
+.PP
+File names can also be colorized based on filename extension.
+This is specified in the \fBLS_COLORS\fR variable using the syntax
+\fB"*ext=string"\fR.  For example, using ISO 6429 codes, to color
+all C\-language source files blue you would specify \fB"*.c=34"\fR.
+This would color all files ending in \fB.c\fR in blue (34) color.
+.PP
+Control characters can be written either in C\-style\-escaped
+notation, or in stty\-like ^\-notation.  The C\-style notation
+adds \fB^[\fR for Escape, \fB\_\fR for a normal space characer,
+and \fB?\fR for Delete.  In addition, the \fB^[\fR escape character
+can be used to override the default interpretation of \fB^[\fR,
+\fB^\fR, \fB:\fR and \fB=\fR.
+.PP
+Each file will be written as \fB<lc>\fR \fB<color-code>\fR
+\fB<rc>\fR \fB<filename>\fR \fB<ec>\fR. If the \fB<ec>\fR
+code is undefined, the sequence \fB<lc>\fR \fB<no>
+\fB<rc>\fR will be used instead.  This is generally more convenient
+to use, but less general.  The left, right and end codes are
+provided so you don't have to type common parts over and over
+again and to support weird terminals; you will generally not
+need to change them at all unless your terminal does not use
+ISO 6429 color sequences but a different system.
+.PP
+If your terminal does use ISO 6429 color codes, you can
+compose the type codes (i.e. all except the \fBlc\fR, \fBrc\fR,
+and \fBec\fR codes) from numerical commands separated by semicolons.  The
+most common commands are:
+.PP
+.RS +8
+.PD 0
+.TP 4
+0
+to restore default color
+.TP 4
+1
+for brighter colors
+.TP 4
+4
+for underlined text
+.TP 4
+5
+for flashing text
+.TP 4
+30
+for black foreground
+.TP 4
+31
+for red foreground
+.TP 4
+32
+for green foreground
+.TP 4
+33
+for yellow (or brown) foreground
+.TP 4
+34
+for blue foreground
+.TP 4
+35
+for purple foreground
+.TP 4
+36
+for cyan foreground
+.TP 4
+37
+for white (or gray) foreground
+.TP 4
+40
+for black background
+.TP 4
+41
+for red background
+.TP 4
+42
+for green background
+.TP 4
+43
+for yellow (or brown) background
+.TP 4
+44
+for blue background
+.TP 4
+45
+for purple background
+.TP 4
+46
+for cyan background
+.TP 4
+47
+for white (or gray) background
+.RE
+.PP
+Not all commands will work on all systems or display devices.
+.PP
+A few terminal programs do not recognize the default end code
+properly.  If all text gets colorized after you do a directory
+listing, try changing the \fBno\fR and \fBfi\fR codes from 0 to the
+numerical codes for your standard fore- and background colors.
+.RE
+.TP 8
 .B MACHTYPE \fR(+)
 The machine type (microprocessor class or machine model), as determined at compile time.
 .TP 8
@@ -4695,7 +4832,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.07.06 (Astron) 1998-04-08.
+This manual documents tcsh 6.07.07 (Astron) 1998-06-06.
 .SH AUTHORS
 .PD 0
 .TP 2
@@ -4858,6 +4995,9 @@ Ported to Siemens Nixdorf EBCDIC machine
 Amol Deshpande, Microsoft, 1997
 Ported to WIN32 (Windows/95 and Windows/NT); wrote all the missing library
 and message catalog code to interface to Windows.
+.TP 2
+Taga Nayuta, 1998
+Color ls additions.
 .PD
 .PP
 .SH "THANKS TO"

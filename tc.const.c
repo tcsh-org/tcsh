@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.43 1997/10/27 22:44:34 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.45 1998/04/21 16:08:53 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.43 1997/10/27 22:44:34 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.45 1998/04/21 16:08:53 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -255,6 +255,8 @@ Char STRprev[]		= { 'p', 'r', 'e', 'v', '\0' };
 Char STRcomplete[]	= { 'c', 'o', 'm', 'p', 'l', 'e', 't', 'e', '\0' };
 Char STRenhance[]	= { 'e', 'n', 'h', 'a', 'n', 'c', 'e', '\0' };
 #ifdef WINNT
+Char STRNTslowexec[]	= { 'N', 'T', 's', 'l', 'o', 'w', 'e', 'x', 'e', 'c',
+			    '\0' };
 Char STRigncase[]	= { 'i', 'g', 'n', 'c', 'a', 's', 'e', '\0' };
 Char STRoldtitle[]	= { 'o', 'l', 'd', 't', 'i', 't', 'l', 'e', '\0' };
 Char STRNTlamepathfix[] = { 'N', 'T', 'l', 'a', 'm', 'e', 'p', 'a', 't', 'h',
@@ -347,6 +349,14 @@ Char STRver[]		= { 'v', 'e', 'r', '\0' };
 #ifdef _OSD_POSIX
 Char STRwarnebcdic[]    = { 'w', 'a', 'r', 'n', 'e', 'b', 'c', 'd', 'i', 'c', '\0' };
 #endif
+
+#ifdef COLOR_LS_F
+Char STRls[]		= { 'l', 's', '\0' };
+Char STRlsmF[]		= { 'l', 's', '-', 'F', '\0' };
+Char STRcolor[]		= { 'c', 'o', 'l', 'o', 'r', '\0' };
+Char STRmmcolormauto[]	= {'-', '-', 'c', 'o', 'l', 'o', 'r', '=', 'a', 'u', 't', 'o', '\0' };
+Char STRLS_COLORS[]	= { 'L', 'S', '_', 'C', 'O', 'L', 'O', 'R', 'S', '\0' };
+#endif /* COLOR_LS_F */
 
 Char STRup[]		= { 'u', 'p', '\0' };
 Char STRdown[]		= { 'd', 'o', 'w', 'n', '\0' };

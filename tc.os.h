@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.72 1998/04/08 17:57:33 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.73 1998/04/21 16:08:54 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -530,9 +530,11 @@ typedef struct timeval timeval_t;
 # define free tcsh_free
 #endif /* NeXT */
 
+#ifndef BSD4_4
 #ifndef NEEDgethostname
 extern int gethostname __P((char *, int));
 #endif /* NEEDgethostname */
+#endif /* BDS4_4 */
 
 #if !defined(POSIX) || defined(SUNOS4) || defined(UTekV) || defined(sysV88)
 extern time_t time();

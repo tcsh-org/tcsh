@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.28 1997/10/27 22:44:37 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.31 1998/04/21 16:08:55 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.28 1997/10/27 22:44:37 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.31 1998/04/21 16:08:55 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -176,7 +176,8 @@ printprompt(promptno, str)
 void
 tprintf(what, buf, fmt, siz, str, tim, info)
     int what;
-    Char *buf, *fmt;
+    Char *buf;
+    const Char *fmt;
     size_t siz;
     char *str;
     time_t tim;
@@ -191,7 +192,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 
     Char *p  = buf;
     Char *ep = &p[siz];
-    Char *cp = fmt, Scp;
+    const Char *cp = fmt;
+    Char Scp;
     struct tm *t = localtime(&tim);
 
 			/* prompt stuff */
@@ -600,13 +602,14 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 Char *
 expdollar(dstp, srcp, spp, attr)
     Char **dstp;
-    Char **srcp;
+    const Char **srcp;
     size_t *spp;
     int	    attr;
 {
     struct varent *vp;
     Char var[MAXVARLEN];
-    Char *src = *srcp, *val;
+    const Char *src = *srcp;
+    Char *val;
     Char *dst = *dstp;
     int i, curly = 0;
 

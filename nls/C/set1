@@ -1,4 +1,4 @@
-$ $Id: set1,v 1.3 1996/04/26 20:31:50 christos Exp $
+$ $Id: set1,v 1.4 1996/10/19 17:52:31 christos Exp $
 $ Error messages
 $set 1 
 1 Syntax Error
@@ -137,3 +137,4 @@ $set 1
 134 Usage: unlimit [-fh] [limits]
 135 $%S is read-only
 136 No such job
+137 Unknown colorls variable `%c%c'
