@@ -368,6 +368,16 @@ NOTES	:	something like:
 NOTES	:	's/Char \([a-zA-Z0-9_]*\) *\[ *\].*/extern Char \1[];/'
 VERSION	:	6.04.00
   
+VENDOR	:	Apple
+MODELS	:	any
+COMPILER:	cc
+CFLAGS	:	-O3 -pipe -g -arch ppc -arch i386 -UNeXT
+OS	:	Rhapsody 5
+CONFIG	:	rhapsody
+ENVIRON	:	n/a
+NOTES	:	CFLAGS="-O3 -pipe -g -arch ppc -arch i386 -UNeXT" configure && make
+VERSION	:	6.08.00
+
 VENDOR	:	Heurikon
 MODELS	:	HK68
 COMPILER:	gcc (Green Hills C-68000)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.31 1998/09/26 12:28:31 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.32 1998/10/25 15:10:29 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.31 1998/09/26 12:28:31 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.32 1998/10/25 15:10:29 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -359,48 +359,13 @@ parsebind(s, str)
 #ifdef WINNT
 	case 'N' : case 'n':	/* NT */
 		{
-			extern int lstricmp(char*,char*);
-			char *str = short2str(s);
-			short fkey;
-			fkey = atoi(str);
-			if (fkey !=0) {
-				*b++ = 255+fkey;
-				*b = '\0';
-			}
-			else {
-				if (!lstrcmpi("pgup",str)) {
-					*b++ = 255+24+1;
-				}
-				else if (!lstrcmpi("pgdn",str)) {
-					*b++ = 255+24+2;
-				}
-				else if (!lstrcmpi("end",str)) {
-					*b++ = 255+24+3;
-				}
-				else if (!lstrcmpi("home",str)) {
-					*b++ = 255+24+4;
-				}
-				else if (!lstrcmpi("left",str)) {
-					*b++ = 255+24+5;
-				}
-				else if (!lstrcmpi("up",str)) {
-					*b++ = 255+24+6;
-				}
-				else if (!lstrcmpi("right",str)) {
-					*b++ = 255+24+7;
-				}
-				else if (!lstrcmpi("down",str)) {
-					*b++ = 255+24+8;
-				}
-				else if (!lstrcmpi("ins",str)) {
-					*b++ = 255+24+9;
-				}
-				else if (!lstrcmpi("del",str)) {
-					*b++ = 255+24+10;
-				}
-				else
-					bad_spec(s);
-			}
+			Char bnt;
+
+			bnt = nt_translate_bindkey(s);
+			if (bnt != 0)
+				*b++ = bnt;
+			else
+				bad_spec(s);
 		}
 	    break;
 #endif /* WINNT */

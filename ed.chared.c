@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.56 1998/09/18 16:08:59 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.57 1998/10/25 15:09:49 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.56 1998/09/18 16:08:59 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.57 1998/10/25 15:09:49 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -169,6 +169,8 @@ c_delafter(num)
 	    for (wkcp = Cursor ; wkcp < Cursor + num; wkcp++) {
 		if (extdel == 0)
 		    extdel = Ismbyte1(*wkcp); /* check to 1st. byte */
+		else
+		    extdel = 0;	/* if 2nd. byte, force set to 0 */
 	    }
 	}
 #endif
@@ -252,6 +254,8 @@ c_delbefore(num)		/* delete before dot, with bounds checking */
 	    for (wkcp = InputBuf; wkcp < nowcur; wkcp++) {
 		if(extdel == 0)
 		    extdel = Ismbyte1(*wkcp); /* check to 1st. byte */
+		else
+		    extdel = 0;	/* if 2nd. byte, force set to 0 */
 	    }
 	    if (extdel && Ismbyte2(delc)) {
 		if( VImode ) {

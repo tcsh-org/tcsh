@@ -1,3 +1,13 @@
+ 24. V6.08.02 - 19981124
+ 23. document continue and continue_args
+ 22. wrong test in slowexec made NT optimization a noop (Amol)
+ 21. Rhapsody fixes + separate CFLAGS/CPPFLAGS (Wilfredo Sanchez)
+ 20. literals in both prompt at rprompt did not work properly (Taga Nayuta)
+ 19. multibyte deletion fixes (Yoshiyuki.Sakakibara)
+ 18. clean up key binding stuff for NT by moving the nt dependent code to
+     the NT source (amol)
+ 17. dspmbyte fixes for AIX, typos in man page and nls (Yoshiyuki Sakakibara)
+ 16. Convex fixes (Ron Echeverri)
  15. V6.08.01 - 19981025
  14. SX4 port; this adds many casts for machines where ptrdiff_t is 64 bits.
      (Andreas Schott)

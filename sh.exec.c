@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.44 1998/10/02 10:56:55 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.45 1998/10/25 15:10:08 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.44 1998/10/02 10:56:55 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.45 1998/10/25 15:10:08 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -452,7 +452,7 @@ texec(sf, st)
 	    else if (nread < 0 && errno != EINTR) {
 #ifdef convex
 		/* need to print error incase the file is migrated */
-		stderror(ERR_SYSTEM, CMDname, strerror(errno));
+		stderror(ERR_SYSTEM, f, strerror(errno));
 #endif
 	    }
 #ifdef _PATH_BSHELL

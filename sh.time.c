@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.time.c,v 3.18 1996/09/24 16:57:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.time.c,v 3.19 1998/06/27 12:27:28 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.18 1996/09/24 16:57:26 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.19 1998/06/27 12:27:28 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -71,8 +71,8 @@ settimes()
 #ifdef BSDTIMES
     struct sysrusage ruch;
 #ifdef convex
-    memset(ru0, 0, sizeof(ru0));
-    memset(ruch, 0, sizeof(ruch));
+    memset(&ru0, 0, sizeof(ru0));
+    memset(&ruch, 0, sizeof(ruch));
 #endif /* convex */
 
     (void) gettimeofday(&time0,	NULL);
@@ -114,8 +114,8 @@ dotime(v, c)
     timeval_t timedol;
     struct sysrusage ru1, ruch;
 #ifdef convex
-    memset(ru1, 0, sizeof(ru1));
-    memset(ruch, 0, sizeof(ruch));
+    memset(&ru1, 0, sizeof(ru1));
+    memset(&ruch, 0, sizeof(ruch));
 #endif /* convex */
 
     (void) getrusage(RUSAGE_SELF, (struct rusage *) &ru1);

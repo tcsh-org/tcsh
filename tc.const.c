@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.48 1998/09/18 16:09:16 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.49 1998/10/25 15:10:31 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,12 +36,15 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.48 1998/09/18 16:09:16 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.49 1998/10/25 15:10:31 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
 			    '\0' };
 Char STRdefautologout[] = { '6', '0', '\0' };
+#ifdef convex
+Char STRrootdefautologout[] = { '1', '5', '\0' };
+#endif
 Char STRautomatic[]	= { 'a', 'u', 't', 'o', 'm', 'a', 't', 'i', 'c',
 			    '\0' };
 Char STRhangup[]	= { 'h', 'a', 'n', 'g', 'u', 'p', '\0' };
@@ -125,13 +128,15 @@ Char STRmbytemap[]	= { 'm', 'b', 'y', 't', 'e', 'm', 'a', 'p', '\0' };
 /* dspmbyte autoset trap */
 /* STRLANGEUC,STRLANGEUCB = EUC Trap */
 /* STRLANGSJIS,STRLANGSJISB = SJIS Trap */
-#  if defined(__FreeBSD__) || defined(__uxps__) || defined(linux) || defined(sgi) /* linux? */
+#  if defined(__FreeBSD__) || defined(__uxps__) || defined(linux) || defined(sgi)  || defined(aix) /* linux? */
 Char STRLANGEUC[]	= { 'j', 'a', '_', 'J', 'P', '.', 'E', 'U', 'C', '\0' };
 #   if defined(__uxps__)
 Char STRLANGEUCB[]	= { 'j', 'a', 'p', 'a', 'n', '\0' };
 #   elif defined(linux)
 Char STRLANGEUCB[]	= { 'j', 'a', '_', 'J', 'P', '.', 'u', 'j', 'i', 's',
 			    '\0' };
+#   elif defined(aix)
+Char STRLANGEUCB[]	= { 'j', 'a', '_', 'J', 'P', '\0' };
 #   else
 Char STRLANGEUCB[]	= { '\0' };
 #   endif

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.46 1998/09/04 21:16:56 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.47 1998/10/25 15:10:25 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.46 1998/09/04 21:16:56 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.47 1998/10/25 15:10:25 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -118,7 +118,7 @@ execute(t, wanttty, pipein, pipeout)
 
 #ifdef WINNT
     {
-        if ((varval(STRNTslowexec) != STRNULL) &&
+        if ((varval(STRNTslowexec) == STRNULL) &&
             !t->t_dcdr && !t->t_dcar && !t->t_dflg && !didfds &&
             (intty || intact) && (t->t_dtyp == NODE_COMMAND) &&
 	    !isbfunc(t)) {

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.83 1998/09/26 12:28:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.84 1998/10/25 15:10:00 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.83 1998/09/26 12:28:26 christos Exp $")
+RCSID("$Id: sh.c,v 3.84 1998/10/25 15:10:00 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -467,12 +467,12 @@ main(argc, argv)
 # ifdef convex
     if (uid == 0) {
 	/*  root always has a 15 minute autologout  */
-	set(STRautologout, Strsave(STRrootdefautologout));
+	set(STRautologout, Strsave(STRrootdefautologout), VAR_READWRITE);
     }
     else
 	if (loginsh)
 	    /*  users get autologout set to 0  */
-	    set(STRautologout, Strsave(STR0));
+	    set(STRautologout, Strsave(STR0), VAR_READWRITE);
 # else /* convex */
     if (loginsh || (uid == 0)) {
 	if (*cp) {

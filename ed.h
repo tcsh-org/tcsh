@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.h,v 3.26 1996/04/26 19:17:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.h,v 3.27 1997/10/27 22:44:21 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -44,12 +44,9 @@
 #define TABSIZE		8	/* usually 8 spaces/tab */
 #define MAXMACROLEVELS	10	/* max number of nested kbd macros */
 
-#ifdef WINNT
-/* 256 + 24 (fkeys) +  4 (arrow) + 2 (ins/del) +2 (pgup/dn) +2 (home/end) */
-# define NT_NUM_KEYS	290
-#else /* !WINNT */
+#ifndef WINNT
 # define NT_NUM_KEYS	256
-#endif /* !WINNT */
+#endif /* WINNT */
 
 extern int errno;
 

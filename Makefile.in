@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.10 1998/10/02 10:56:45 christos Exp $
+# $Id: Makefile.in,v 1.10 1998/11/05 21:48:05 wsanchez Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -23,52 +23,52 @@ srcdir=@srcdir@
 SUF=o
 CF=-c
 
-INCLUDES=-I. -I$(srcdir)
+CPPFLAGS=-I. -I$(srcdir)
 
-LFLAGS=$(INCLUDES)
-#LFLAGS=$(INCLUDES) -Zn10000		# hpux lint
+LFLAGS=
+#LFLAGS= -Zn10000		# hpux lint
 
 
-CFLAGS = $(INCLUDES) @CFLAGS@		# This is set by autoconf.
-#CFLAGS= $(INCLUDES) -g			# debug
-#CFLAGS= $(INCLUDES) -O			# production
-#CFLAGS= $(INCLUDES) 			# Broken optimizers....
+CFLAGS = @CFLAGS@		# This is set by autoconf.
+#CFLAGS= -g			# debug
+#CFLAGS= -O			# production
+#CFLAGS= 			# Broken optimizers....
 
-#CFLAGS= -g -pg $(INCLUDES) -DPROF
-#CFLAGS= -O -pg $(INCLUDES) -DPROF
+#CFLAGS= -g -pg -DPROF
+#CFLAGS= -O -pg -DPROF
 
 # gcc 1.00-1.37
-#CFLAGS=-O $(INCLUDES) -finline-functions -fstrength-reduce 
+#CFLAGS= -O -finline-functions -fstrength-reduce 
 
 # gcc 1.37-1.40
-#CFLAGS=-O $(INCLUDES) -fcombine-regs -finline-functions -fstrength-reduce 
+#CFLAGS= -O -fcombine-regs -finline-functions -fstrength-reduce 
 # add -msoft-float for 68881 machines.
 
 # gcc 2.0
 # On the sparc, don't use -O2; it breaks setjmp() and vfork()
-#CFLAGS=-O $(INCLUDES)
+#CFLAGS= -O
 
 # gcc-2.1+
-#CFLAGS=-O2 $(INCLUDES)
+#CFLAGS= -O2
 
 # lucid c on suns
-#CFLAGS=-O5 $(INCLUDES)
+#CFLAGS= -O5
 
 # gcc 2.1 on linux
-#CFLAGS=-O6 -fomit-frame-pointer $(INCLUDES)
+#CFLAGS= -O6 -fomit-frame-pointer
 
 # HP/UX 8.0, 9.0
-#CFLAGS= $(INCLUDES) +O3 -Aa
+#CFLAGS= +O3 -Aa
 
 # Ultrix 4.2a
-#CFLAGS= $(INCLUDES) -O -Olimit 2000
+#CFLAGS= -O -Olimit 2000
 
 # Intel Paragon OSF/1 with PGI compilers
-#CFLAGS=-O -Mnodebug -Mnoperfmon $(INCLUDES)
+#CFLAGS= -O -Mnodebug -Mnoperfmon
 
 # DEC Alpha OSF/1
-#CFLAGS= -O2 $(INCLUDES) -Olimit 2000	## Normal Optimization
-#CFLAGS= -O3 $(INCLUDES) -Olimit 2000	## Full Optimization - may not work
+#CFLAGS= -O2 -Olimit 2000	## Normal Optimization
+#CFLAGS= -O3 -Olimit 2000	## Full Optimization - may not work
 #CF=-j
 #SUF=u
 #.SUFFIXES: .u
@@ -76,26 +76,26 @@ CFLAGS = $(INCLUDES) @CFLAGS@		# This is set by autoconf.
 # for silicon graphics (and other mips compilers) -- use the
 # global optimizer! (-O3).
 # On SGI 4.0+ you need to add -D__STDC__ too.
-#CFLAGS= -O3 $(INCLUDES) 
-#CFLAGS= -O3 $(INCLUDES) -Olimit 2000	## Ultrix 4.2a
+#CFLAGS= -O3
+#CFLAGS= -O3 -Olimit 2000	## Ultrix 4.2a
 #CF=-j
 #SUF=u
 #.SUFFIXES: .u 				## Ultrix and gnu-make need that
 
 # mips systems
-# CFLAGS= $(INCLUDES) -O -systype bsd43 -Wf,-XNd5000 -Wf,-XNp6000 -Olimit 2000
+# CFLAGS= -O -systype bsd43 -Wf,-XNd5000 -Wf,-XNp6000 -Olimit 2000
 
 # for at&t machines
-#CFLAGS= -O -Ksd $(INCLUDES)
+#CFLAGS= -O -Ksd
 
 # Stardent Titan
-#CFLAGS = $(INCLUDES) -O -43
+#CFLAGS = -O -43
 
 # Stardent Stellar or sunos4 /bin/cc or Solaris2.1 /opt/SUNWspro/bin/cc
-#CFLAGS = $(INCLUDES) -O4
+#CFLAGS = -O4
 
 # Intergraph clipper CLIX 3.1
-#CFLAGS= -w -O2 $(INCLUDES)
+#CFLAGS= -w -O2
 
 # Dnix 5.3
 #CFLAGS = -O -X7
@@ -272,7 +272,7 @@ bindir=@bindir@
 mandir=@mandir@
 MANSECT=1
 DESTBIN=${DESTDIR}${bindir}
-DESTMAN=${DESTDIR}${mandir}/man/man${MANSECT}
+DESTMAN=${DESTDIR}${mandir}/man${MANSECT}
 # DESTMAN=${DESTDIR}/catman/man${MANSECT}	 # A/UX
 # DESTMAN=${DESTDIR}/usr/share/man/man${MANSECT} # Stardent Vistra (SysVR4)
 # DESTMAN=/usr/catman/1l			 # Amiga unix (SysVR4)
@@ -334,19 +334,19 @@ all: ${BUILD}
 
 tcsh:$(P) ${OBJS} 
 	rm -f tcsh core
-	${CC} -o tcsh ${LDFLAGS} ${CFLAGS} ${OBJS} ${LIBES} ${EXTRALIBS}
+	${CC} -o tcsh ${LDFLAGS} ${CFLAGS} ${CPPFLAGS} ${OBJS} ${LIBES} ${EXTRALIBS}
 
 # Purify
 pure:$(P) ${OBJS} 
 	rm -f tcsh core
-	purify `echo ${CC} | sed -e s,-B/bin/,,` -o tcsh ${LDFLAGS} ${CFLAGS} ${OBJS} ${LIBES} ${EXTRALIBS}
+	purify `echo ${CC} | sed -e s,-B/bin/,,` -o tcsh ${LDFLAGS} ${CFLAGS} ${CPPFLAGS} ${OBJS} ${LIBES} ${EXTRALIBS}
 # OS/2
 tcsh.exe: tcsh
 	emxbind tcsh
 
 gethost:  gethost.c sh.err.h tc.const.h sh.h
 	rm -f gethost
-	${CC} -o gethost ${LDFLAGS} ${CFLAGS} ${DFLAGS} $(srcdir)/gethost.c ${LIBES} ${EXTRALIBS}
+	${CC} -o gethost ${LDFLAGS} ${CFLAGS} ${CPPFLAGS} ${DFLAGS} $(srcdir)/gethost.c ${LIBES} ${EXTRALIBS}
 
 tc.defs.c:	gethost host.defs
 	@rm -f $@
@@ -359,13 +359,13 @@ tcsh.ps: tcsh.man
 
 
 .c.${SUF}:
-	${CC} ${CF} ${CFLAGS} ${DFLAGS} ${EXTRAFLAGS} $<
+	${CC} ${CF} ${CFLAGS} ${CPPFLAGS} ${DFLAGS} ${EXTRAFLAGS} $<
 
 # _VMS_POSIX #module addition
 #.c.${SUF}:
 #	@(echo '#module '`echo $< | sed -e 's/\./_/g'`; cat $<) > $*..c
-#	@echo ${CC} ${CF} ${CFLAGS} ${DFLAGS} ${EXTRAFLAGS} $*.c
-#	@${CC} ${CF} ${CFLAGS} ${DFLAGS} ${EXTRAFLAGS} $*..c
+#	@echo ${CC} ${CF} ${CFLAGS} ${CPPFLAGS} ${DFLAGS} ${EXTRAFLAGS} $*.c
+#	@${CC} ${CF} ${CFLAGS} ${CPPFLAGS} ${DFLAGS} ${EXTRAFLAGS} $*..c
 #	@mv $*..o $*.o
 #	@rm -f $*..c
 
@@ -373,14 +373,14 @@ tcsh.ps: tcsh.man
 # Don't do any special massaging of C files for sharing of strings!!
 # it causes weird segmentation faults on some systems.
 #.c.o:
-#	${CPP} ${CFLAGS} $*.c | ${XSTR} -c -
-#	${CC} ${CF} ${CFLAGS} x.c 
+#	${CPP} ${CFLAGS} ${CPPFLAGS} $*.c | ${XSTR} -c -
+#	${CC} ${CF} ${CFLAGS} ${CPPFLAGS} x.c 
 #	mv -f x.o $*.o
 #	rm -f x.c
 
 #ed.init.o: ed.init.c
-#	${CPP} ${CFLAGS} $*.c | ${XSTR} -c -
-#	${CC} -R ${CF} ${CF} x.c 
+#	${CPP} ${CFLAGS} ${CPPFLAGS} $*.c | ${XSTR} -c -
+#	${CC} -R ${CF} ${CFLAGS} ${CPPFLAGS} x.c 
 #	mv -f x.o $*.o
 #	rm -f x.c
 
@@ -417,7 +417,7 @@ tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
 	@echo '/* Do not edit this file, make creates it. */' > $@
 	@echo '#ifndef _h_tc_const' >> $@
 	@echo '#define _h_tc_const' >> $@
-	${CPP} $(INCLUDES) ${DFLAGS} ${EXTRAFLAGS} -D_h_tc_const\
+	${CPP} $(CPPFLAGS) ${DFLAGS} ${EXTRAFLAGS} -D_h_tc_const\
 	    $(srcdir)/tc.const.c | grep 'Char STR' | \
 	    sed -e 's/Char \([a-zA-Z0-9_]*\)\[\].*/extern Char \1[];/' | \
 	    sort >> $@
@@ -429,13 +429,13 @@ csh.prof: ${OBJS} sh.prof.${SUF} mcrt0.${SUF}
 
 sh.prof.${SUF}:
 	cp sh.c sh.prof.c
-	${CC} ${CF} ${CFLAGS} -DPROF sh.prof.c
+	${CC} ${CF} ${CFLAGS} ${CPPFLAGS} -DPROF sh.prof.c
 
 lint: tc.const.h ed.defns.h
-	lint ${DFLAGS} ${LFLAGS} sh*.c tw*.c ed*.c tc.*.c ${LIBES}
+	lint ${DFLAGS} ${CPPFLAGS} ${LFLAGS} sh*.c tw*.c ed*.c tc.*.c ${LIBES}
 
 alint: tc.const.h ed.defns.h
-	alint ${DFLAGS} ${LFLAGS} sh*.c tw*.c ed*.c tc.*.c ${LIBES}
+	alint ${DFLAGS} ${CPPFLAGS} ${LFLAGS} sh*.c tw*.c ed*.c tc.*.c ${LIBES}
 
 print:
 	@pr READ_ME
@@ -460,13 +460,17 @@ vgrind:
 	@for i in *.c; do vgrind -t -h "C Shell" $$i >/crp/bill/csh/$$i.t; done
 	@vgrind -t -x -h Index index >/crp/bill/csh/index.t
 
+install-strip: install
+
 install: tcsh 
+	mkdir -p ${DESTBIN}
 	-mv -f ${DESTBIN}/tcsh  ${DESTBIN}/tcsh.old
 	cp tcsh ${DESTBIN}/tcsh
 	-strip ${DESTBIN}/tcsh
 	chmod 555 ${DESTBIN}/tcsh
 
 install.man: tcsh.man
+	mkdir -p ${DESTMAN}
 	-rm -f ${DESTMAN}/tcsh.${MANSECT}
 	cp $(srcdir)/tcsh.man ${DESTMAN}/tcsh.${MANSECT}
 	chmod 444 ${DESTMAN}/tcsh.${MANSECT}

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.36 1997/10/27 22:44:28 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.37 1998/10/25 15:10:09 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.36 1997/10/27 22:44:28 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.37 1998/10/25 15:10:09 christos Exp $")
 
 /*
  * C shell
@@ -742,18 +742,30 @@ filetest(cp, vp, ignore)
 
 #ifdef S_IFLNK
 	    if (tolower(*ft) == 'l') {
-		if (!lst && TCSH_LSTAT(short2str(ep), lst = &lstb) == -1) {
-		    xfree((ptr_t) ep);
-		    return (Strsave(errval));
+		/* 
+		 * avoid convex compiler bug.
+		 */
+		if (!lst) {
+		    lst = &lstb;
+		    if (TCSH_LSTAT(short2str(ep), lst) == -1) {
+			xfree((ptr_t) ep);
+			return (Strsave(errval));
+		    }
 		}
 		if (*ft == 'L')
 		    st = lst;
 	    }
 	    else 
 #endif /* S_IFLNK */
-		if (!st && TCSH_STAT(short2str(ep), st = &stb) == -1) {
-		    xfree((ptr_t) ep);
-		    return (Strsave(errval));
+		/* 
+		 * avoid convex compiler bug.
+		 */
+		if (!st) {
+		    st = &stb;
+		    if (TCSH_STAT(short2str(ep), st) == -1) {
+			xfree((ptr_t) ep);
+			return (Strsave(errval));
+		    }
 		}
 
 	    switch (*ft) {

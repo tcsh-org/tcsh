@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.22 1998/06/27 15:29:33 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.23 1998/10/25 15:09:57 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.22 1998/06/27 15:29:33 christos Exp $")
+RCSID("$Id: host.defs,v 1.23 1998/10/25 15:09:57 christos Exp $")
 
 endcode	:
 
@@ -698,14 +698,28 @@ enddef	:
 
 
 newdef	: defined(NeXT)
-comment	: NeXT
+comment	: NeXTStep
 vendor	:						: "next"
-hosttype:						: "next"
-ostype	:						: "mach"
+hosttype: defined(mc68020) || defined(__mc68020__)	: "next"
+hosttype: defined(M_i386)  || defined(__i386__)		: "intel-pc"
+hosttype: defined(hppa)    || defined(__hppa__)		: "hp"
+hosttype: defined(sparc)   || defined(__sparc__)	: "sun"
+ostype	:						: "nextstep"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
-machtype: defined(M_i386)				: "i386"
-machtype: defined(hppa) || defined(__hppa__)		: "hppa"
-machtype: defined(sparc) || defined(__sparc__)		: "sparc"
+machtype: defined(M_i386)  || defined(__i386__)		: "i386"
+machtype: defined(hppa)    || defined(__hppa__)		: "hppa"
+machtype: defined(sparc)   || defined(__sparc__)	: "sparc"
+enddef	:
+
+
+newdef	: defined(__APPLE__)
+comment	: Rhapsody
+vendor	:						: "apple"
+hosttype: defined(__i386__)				: "intel-pc"
+hosttype: defined(__ppc__)				: "macintosh"
+ostype	:						: "rhapsody"
+machtype: defined(__i386__)				: "i386"
+machtype: defined(__ppc__)				: "powerpc"
 enddef	:
 
 

@@ -119,6 +119,11 @@ case "${tcsh_cv_canonical}" in
     tcsh_config_file=bsd4.4
   ;;
 
+  ## Mac OS X Server
+  *-*-rhapsody* )
+    tcsh_config_file=bsd4.4
+  ;;
+
   ## Silicon Graphics machines
   *-sgi-iri* )
     tcsh_config_file=sgi
@@ -197,6 +202,12 @@ case "${tcsh_cv_canonical}" in
   bs2000-siemens-posix)
     tcsh_config_file=bs2000
   ;;
+
+  ## Convex
+  *-convex*)
+    tcsh_config_file=convex
+  ;;
+
   ## Cray
   *-cray-unicos*)
     tcsh_config_file=cray

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.23 1998/09/18 16:09:01 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.24 1998/10/25 15:09:54 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.23 1998/09/18 16:09:01 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.24 1998/10/25 15:09:54 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -232,7 +232,12 @@ RefreshPromptpart(buf)
     Char *buf;
 {
     register Char *cp;
-    unsigned int litnum = 0;
+    static unsigned int litnum = 0;
+    if (buf == NULL)
+    {
+      litnum = 0;
+      return;
+    }
 
     for (cp = buf; *cp; cp++) {
 	if (*cp & LITERAL) {
@@ -287,6 +292,7 @@ Refresh()
     /* reset the Vdraw cursor, temporarily draw rprompt to calculate its size */
     vcursor_h = 0;
     vcursor_v = 0;
+    RefreshPromptpart(NULL);
     RefreshPromptpart(RPromptBuf);
     rprompt_h = vcursor_h;
     rprompt_v = vcursor_v;
@@ -294,6 +300,7 @@ Refresh()
     /* reset the Vdraw cursor, draw prompt */
     vcursor_h = 0;
     vcursor_v = 0;
+    RefreshPromptpart(NULL);
     RefreshPromptpart(PromptBuf);
     cur_h = -1;			/* set flag in case I'm not set */
 
@@ -1275,7 +1282,7 @@ RefPlusOne()
 void
 ClearDisp()
 {
-    register int i, j;
+    register int i;
 
     CursorV = 0;		/* clear the display buffer */
     CursorH = 0;
