@@ -1,0 +1,22 @@
+HOW TO RELEASE TCSH
+
+1)  Update version number and date in patchlevel.h
+2)  Note the new version and date in Fixes
+3)  Updated tcsh.man to have the new version and date also
+    (two separate lines, with the date in different formats)
+4)  Commit changes into CVS
+5)  Tag the release with TCSHx_yy_zz where
+	x  == REV
+	yy == VERS
+	zz == PATCHLEVEL
+    from patchlevel.h (the new values you picked)
+6)  Generate a patch between the previous version and the
+    new version (e.g. run "cvs rdiff" using tags) and mail
+    the patch to tcsh-diffs@mx.gw.com
+7)  Create patchz.gz (z is PATCHLEVEL)
+8)  Export the code using the new tag you created.  Rename
+    the directory from "tcsh" to "tcsh-x.yy.zz" and create
+    tcsh-x.yy.zz.tar.gz (or tcsh-x.yy.tar.gz for public
+    releases where zz [PATCHLEVEL] is zero)
+9)  Mail an announcement to tcsh@mx.gw.com
+10) Make the patch and the source tarball available on ftp
