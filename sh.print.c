@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.18 1999/05/11 13:07:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.print.c,v 3.19 2000/01/14 22:57:28 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.18 1999/05/11 13:07:51 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.19 2000/01/14 22:57:28 christos Exp $")
 
 #include "ed.h"
 
@@ -136,17 +136,17 @@ xputchar(c)
 	    if (c != '\t' && c != '\n' && (xlate_cr || c != '\r')) {
 #endif
 		xputchar('^' | atr);
-#ifndef _OSD_POSIX
+#ifdef IS_ASCII
 		if (c == ASCII)
 		    c = '?';
 		else
 		    c |= 0100;
-#else /*_OSD_POSIX*/
+#else
 		if (c == CTL_ESC('\177'))
 		    c = '?';
 		else
 		    c =_toebcdic[_toascii[c]|0100];
-#endif /*_OSD_POSIX*/
+#endif
 
 	    }
 	}

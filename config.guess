@@ -828,6 +828,9 @@ EOF
     BePC:BeOS:*:*)	# BeOS running on Intel PC compatible.
 	echo i586-pc-beos
 	exit 0 ;;
+    *:OS/390:*:*)
+	echo s390-ibm-os390
+	exit 0 ;;
 esac
 
 #echo '(No uname command or uname output not recognized.)' 1>&2

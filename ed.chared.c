@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.59 1999/08/13 16:34:57 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.60 2000/06/10 22:07:55 kim Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -76,7 +76,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.59 1999/08/13 16:34:57 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.60 2000/06/10 22:07:55 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1258,12 +1258,12 @@ v_search(dir)
 	    break;
 
 	case 0033:	/* ESC */
-#ifndef _OSD_POSIX
+#ifdef IS_ASCII
 	case '\r':	/* Newline */
 	case '\n':
 #else
-	case '\012':    /* Newline */
-	case '\015':    /* Return */
+	case '\012':    /* ASCII Line feed */
+	case '\015':    /* ASCII (or EBCDIC) Return */
 #endif
 	    break;
 

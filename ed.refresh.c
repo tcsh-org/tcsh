@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.25 1998/11/24 18:17:22 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.26 2000/06/10 20:14:57 kim Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.25 1998/11/24 18:17:22 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.26 2000/06/10 20:14:57 kim Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -151,7 +151,7 @@ Draw(c)				/* draw c, expand tabs, ctl chars */
 	}
     }
     else if (Iscntrl(ch)) {
-#ifndef _OSD_POSIX
+#ifdef IS_ASCII
 	Vdraw('^');
 	if (ch == CTL_ESC('\177')) {
 	    Vdraw('?');
@@ -159,7 +159,7 @@ Draw(c)				/* draw c, expand tabs, ctl chars */
 	else {
 	    /* uncontrolify it; works only for iso8859-1 like sets */
 	    Vdraw((c | 0100));
-#else /*_OSD_POSIX*/
+#else
 	if (ch == CTL_ESC('\177')) {
 	    Vdraw('^');
 	    Vdraw('?');
@@ -178,7 +178,7 @@ Draw(c)				/* draw c, expand tabs, ctl chars */
 		Vdraw(((c >> 3) & 7) + '0');
 		Vdraw((c & 7) + '0');
 	    }
-#endif /*_OSD_POSIX*/
+#endif
 	}
     }
 #ifdef KANJI
@@ -1243,11 +1243,11 @@ RefPlusOne()
     }				/* else (only do at end of line, no TAB) */
 
     if (Iscntrl(c)) {		/* if control char, do caret */
-#ifndef _OSD_POSIX
+#ifdef IS_ASCII
 	mc = (c == '\177') ? '?' : (c | 0100);
 	PutPlusOne('^');
 	PutPlusOne(mc);
-#else /*_OSD_POSIX*/
+#else
 	if (_toascii[c] == '\177' || Isupper(_toebcdic[_toascii[c]|0100])
 		|| strchr("@[\\]^_", _toebcdic[_toascii[c]|0100]) != NULL)
 	{
@@ -1262,7 +1262,7 @@ RefPlusOne()
 	    PutPlusOne(((c >> 3) & 7) + '0');
 	    PutPlusOne((c & 7) + '0');
 	}
-#endif /*_OSD_POSIX*/
+#endif
     }
     else if (Isprint(c)) {	/* normal char */
 	PutPlusOne(c);

@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /src/pub/tcsh/host.defs,v 1.25 1999/04/20 07:48:41 christos Exp $ */
+/* $Header: /src/pub/tcsh/host.defs,v 1.26 2000/06/10 18:48:09 kim Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.25 1999/04/20 07:48:41 christos Exp $")
+RCSID("$Id: host.defs,v 1.26 2000/06/10 18:48:09 kim Exp $")
 
 endcode	:
 
@@ -1002,6 +1002,14 @@ vendor	:						: "sni"
 hosttype: defined(M_intel)				: "bs2000"
 ostype	: 						: "posix"
 machtype:						: "bs2000"
+enddef	:
+
+newdef	: defined(__MVS__)
+comment	: ibm uss s/390 (mainframe, EBCDIC)
+vendor	:						: "ibm"
+hosttype:					 	: "s390"
+ostype	: 						: "os390"
+machtype:						: "s390"
 enddef	:
 
 newdef	: defined(_SX)

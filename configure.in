@@ -71,6 +71,12 @@ case "${host}" in
     tcsh_config_file=superux8
   ;;
 
+  ## IBM OS/390 systems
+  *-ibm-os390*)
+    CC='c89'
+    tcsh_config_file=os390
+  ;;
+
   ## Linux
   *-*-linux* )
     tcsh_config_file=linux

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.88 2000/06/10 22:05:39 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.89 2000/06/10 22:40:16 kim Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.88 2000/06/10 22:05:39 kim Exp $")
+RCSID("$Id: tc.func.c,v 3.89 2000/06/10 22:40:16 kim Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -766,8 +766,10 @@ auto_lock(n)
 
 #define XCRYPT(a, b) crypt(a, b)
 
+#if !defined(__MVS__)
     if ((pw = getpwuid(euid)) != NULL)	/* effective user passwd  */
 	srpp = pw->pw_passwd;
+#endif /* !MVS */
 
 #endif /* !XCRYPT */
 

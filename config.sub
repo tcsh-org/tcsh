@@ -351,6 +351,10 @@ case $basic_machine in
 		basic_machine=i370-ibm
 		os=-mvs
 		;;
+	s390-ibm* )
+		basic_machine=s390-ibm
+		os=-os390
+		;;
 # I'm not sure what "Sysv32" means.  Should this be sysv3.2?
 	i[34567]86v32)
 		basic_machine=`echo $1 | sed -e 's/86.*/86-pc/'`
@@ -777,6 +781,9 @@ case $os in
 	-xenix)
 		os=-xenix
 		;;
+	-os390*)
+		os=-os390
+		;;
 	-none)
 		;;
 	*)
@@ -938,6 +945,9 @@ case $basic_machine in
 				vendor=ns
 				;;
 			-mvs*)
+				vendor=ibm
+				;;
+			-os390*)
 				vendor=ibm
 				;;
 			-ptx*)

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.87 2000/01/14 22:57:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.88 2000/06/10 22:06:27 kim Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -216,14 +216,14 @@ typedef int sigret_t;
 #endif /* NLS */
 
 
-#if !defined(_MINIX) && !defined(_VMS_POSIX) && !defined(WINNT)
+#if !defined(_MINIX) && !defined(_VMS_POSIX) && !defined(WINNT) && !defined(__MVS__)
 # include <sys/param.h>
-#endif /* !_MINIX && !_VMS_POSIX && !WINNT */
+#endif /* !_MINIX && !_VMS_POSIX && !WINNT && !__MVS__ */
 #include <sys/stat.h>
 
 #if defined(BSDTIMES) || defined(BSDLIMIT)
 # include <sys/time.h>
-# if SYSVREL>3 && !defined(SCO) && !defined(sgi) && !defined(SNI) && !defined(sun) && !(defined(__alpha) && defined(__osf__)) && !defined(_SX)
+# if SYSVREL>3 && !defined(SCO) && !defined(sgi) && !defined(SNI) && !defined(sun) && !(defined(__alpha) && defined(__osf__)) && !defined(_SX) && !defined(__MVS__)
 #  include "/usr/ucbinclude/sys/resource.h"
 # else
 #  ifdef convex
@@ -320,7 +320,7 @@ typedef int sigret_t;
 #define CSWTCH _POSIX_VDISABLE
 #endif
 
-#if (!defined(FIOCLEX) && defined(SUNOS4)) || ((SYSVREL == 4) && !defined(_SEQUENT_) && !defined(SCO) && !defined(_SX))
+#if (!defined(FIOCLEX) && defined(SUNOS4)) || ((SYSVREL == 4) && !defined(_SEQUENT_) && !defined(SCO) && !defined(_SX)) && !defined(__MVS__)
 # include <sys/filio.h>
 #endif /* (!FIOCLEX && SUNOS4) || (SYSVREL == 4 && !_SEQUENT_ && !SCO && !_SX ) */
 
@@ -439,6 +439,15 @@ typedef void pret_t;
 #endif /* PURIFY */
 
 typedef int bool;
+
+/*
+ * ASCII vs. EBCDIC
+ */
+#if 'Z' - 'A' == 25
+# ifndef IS_ASCII
+#  define IS_ASCII
+# endif
+#endif
 
 #include "sh.types.h"
 

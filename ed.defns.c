@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.defns.c,v 3.32 1998/09/09 10:29:18 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.defns.c,v 3.33 1998/11/24 18:17:18 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.32 1998/09/09 10:29:18 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.33 1998/11/24 18:17:18 christos Exp $")
 
 #include "ed.h"
 
@@ -1837,7 +1837,7 @@ ed_InitMetaBindings()
     cstr.len = 2;
     for (i = 0200; i <= 0377; i++) {
 	if (map[i] != F_INSERT && map[i] != F_UNASSIGNED && map[i] != F_XKEY) {
-#ifndef _OSD_POSIX
+#ifdef IS_ASCII
 	    buf[1] = i & ASCII;
 #else
 	    buf[1] = _toebcdic[_toascii[i] & ASCII];
@@ -1913,7 +1913,7 @@ ed_InitMaps()
 {
     if (MapsAreInited)
 	return;
-#ifdef _OSD_POSIX
+#ifndef IS_ASCII
     /* This machine has an EBCDIC charset. The assumptions made for the
      * initialized keymaps therefore don't hold, since they are based on
      * ASCII (or ISO8859-1).
@@ -1937,7 +1937,7 @@ ed_InitMaps()
 	    }
 	}
     }
-#endif /* _OSD_POSIX */
+#endif /* !IS_ASCII */
 
 #ifdef VIDEFAULT
     ed_InitVIMaps();

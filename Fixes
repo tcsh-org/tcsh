@@ -1,3 +1,4 @@
+ 88. IBM OS/390 Unix Systems Services support (Peter Prymmer)
  87. Fix prompt formatting (Andrey A. Chernov)
  86. Use HostType from Imakefile correctly (Kjetil Torgrim Homme)
  85. Handle long and expanded history lines better (Boleslaw Ciesielski)

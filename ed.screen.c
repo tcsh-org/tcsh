@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.45 1998/10/25 15:09:55 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.46 1999/02/06 15:18:56 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.45 1998/10/25 15:09:55 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.46 1999/02/06 15:18:56 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -843,7 +843,7 @@ DefaultArrowKeys()
     static Char stOD[] = {033, 'O', 'D', '\0'};
 
     CStr cs;
-#ifdef _OSD_POSIX
+#ifndef IS_ASCII
     if (strA[0] == 033)
     {
 	strA[0] = CTL_ESC('\033');
