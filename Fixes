@@ -1370,3 +1370,11 @@ V5.19.02, 10/23/90.
  1. Added IRIX3.3.1 support.
 
 V5.19.01, 9/26/90.
+ 7. Brought the README file up-to-date, and changed the bug report
+    address to point to me.
+ 6. sh.lex.c. In addla(), overflow computation was wrong.
+ 5. Fixed SHELLPATH, to be set correctly when $SHELL is not set.
+ 4. Fixed print statement in sh.proc.c that contained \215.
+ 3. Fixed the Makefile and MAKEDIFFS so that a tahoe diff can be made.
+ 2. RS6000: hacked around execv bug, and ed.init.c warning.
+ 1. Editor should not be enabled when we don't have a tty.
