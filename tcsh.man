@@ -3855,6 +3855,10 @@ If set, restrictions are placed on output redirection to insure that files
 are not accidentally destroyed and that `>>' redirections refer to existing
 files, as described in the \fBInput/output\fR section.
 .TP 8
+.B noding
+If set, disable the printing of `DING!' in the \fBprompt\fR time
+specifiers at the change of hour.
+.TP 8
 .B noglob
 If set, \fBFilename substitution\fR and \fBDirectory stack substitution\fR
 (q.v.) are inhibited.  This is most useful in shell scripts which do not deal
@@ -4037,6 +4041,10 @@ superuser shell.  For example,
 > set prompt = "%m [%h] %B[%@]%b [%/] you rang? "
 .br
 tut [37] \fB[2:54pm]\fR [/usr/accts/sys] you rang? _
+.PP
+If `%t', `%@', `%T', `%p', or `%P' is used, and \fBnoding\fR is not set,
+then print `DING!' on the change of hour (i.e, `:00' minutes) instead of
+the actual time.
 .PP
 Set by default to `%# ' in interactive shells.
 .RE
