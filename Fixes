@@ -1,3 +1,4 @@
+  4. put back csh filec compatible support.
   3. add support for quads in xprintf in the presence of gcc.
   2. unlimit should set rlim.rlim_max to rlim.rlim_cur if max < cur.
   1. Make ~user work again when the home directory is '/'.

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.15 1997/10/02 16:36:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.16 2000/06/11 02:14:14 kim Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.15 1997/10/02 16:36:29 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.16 2000/06/11 02:14:14 kim Exp $")
 
 #ifdef FILEC
 
@@ -77,6 +77,7 @@ static	void	 extract_dir_and_name	__P((Char *, Char *, Char *));
 static	Char	*getitem		__P((DIR *, int));
 static	void	 free_items		__P((Char **));
 static	int	 tsearch		__P((Char *, COMMAND, int));
+static	int	 compare		__P((const ptr_t, const ptr_t));
 static	int	 recognize		__P((Char *, Char *, int, int));
 static	int	 is_prefix		__P((Char *, Char *));
 static	int	 is_suffix		__P((Char *, Char *));
@@ -628,7 +629,7 @@ again:				/* search for matches */
 		xprintf(CGETS(14, 1, "\nYikes!! Too many %s!!\n"),
 			looking_for_lognames ?
 			CGETS(14, 2, "names in password file") :
-			CGETS(14, 3, "files");
+			CGETS(14, 3, "files"));
 		break;
 	    }
 	    /*
@@ -687,13 +688,28 @@ again:				/* search for matches */
 	return (numitems);
     }
     else {			/* LIST */
-	qsort((ptr_t) items, (size_t) numitems, sizeof(items[0]), sortscmp);
+	qsort((ptr_t) items, (size_t) numitems, sizeof(items[0]), 
+	    (int (*) __P((const void *, const void *))) compare);
 	print_by_column(looking_for_lognames ? NULL : tilded_dir,
 			items, numitems);
 	if (items != NULL)
 	    FREE_ITEMS(items);
     }
     return (0);
+}
+
+
+static int
+compare(p, q)
+    const ptr_t  p, q;
+{
+#if defined(NLS) && !defined(NOSTRCOLL)
+    errno = 0;  /* strcoll sets errno, another brain-damage */
+ 
+    return (strcoll(*(char **) p, *(char **) q));
+#else
+    return (strcmp(*(char **) p, *(char **) q));
+#endif /* NLS && !NOSTRCOLL */
 }
 
 /*

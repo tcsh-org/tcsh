@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.51 2000/07/04 19:42:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.52 2000/11/11 23:03:37 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.51 2000/07/04 19:42:47 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.52 2000/11/11 23:03:37 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1740,8 +1740,17 @@ bgetc()
     }
 
     while (fseekp >= feobp) {
-	if (editing && intty) {		/* then use twenex routine */
+	if ((editing
+#ifdef FILEC
+	    || filec
+#endif /* FILEC */
+	    ) && intty) {		/* then use twenex routine */
 	    fseekp = feobp;		/* where else? */
+#ifdef FILEC
+	    if (!editing)
+		c = numleft = tenex(InputBuf, BUFSIZE);
+	    else
+#endif /* FILEC */
 	    c = numleft = Inputl();	/* PWP: get a line */
 	    while (numleft > 0) {
 		off = (int) feobp % BUFSIZE;
@@ -1750,12 +1759,13 @@ bgetc()
 		roomleft = BUFSIZE - off;
 		if (roomleft > numleft)
 		    roomleft = numleft;
-		(void) memmove((ptr_t) (fbuf[buf] + off), (ptr_t) (InputBuf + c - numleft), (size_t) (roomleft * sizeof(Char)));
+		(void) memmove((ptr_t) (fbuf[buf] + off),
+		    (ptr_t) (InputBuf + c - numleft),
+		    (size_t) (roomleft * sizeof(Char)));
 		numleft -= roomleft;
 		feobp += roomleft;
 	    }
-	}
-	else {
+	} else {
 	    off = (int) feobp % BUFSIZE;
 	    buf = (int) feobp / BUFSIZE;
 	    balloc(buf);

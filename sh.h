@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.96 2001/03/18 19:06:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.97 2001/12/17 16:09:42 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -607,6 +607,10 @@ EXTERN Char   *arginp IZERO;	/* Argument input for sh -c and internal `xx` */
 EXTERN int     onelflg IZERO;	/* 2 -> need line for -t, 1 -> exit on read */
 extern Char   *ffile;		/* Name of shell file for $0 */
 extern bool    dolzero;		/* if $?0 should return true... */
+
+#ifdef FILEC
+extern bool    filec;
+#endif /* FILEC */
 
 extern char *seterr;		/* Error message from scanner/parser */
 #ifndef BSD4_4

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.22 1999/05/11 13:07:42 christos Exp $ */
+/* $Header: /src/pub/tcsh/config_f.h,v 3.23 2000/06/11 02:14:10 kim Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -175,6 +175,11 @@
  *
  */
 #undef COLORCAT
+
+/*
+ * FILEC    support for old style file completion
+ */
+#define FILEC
 
 /*
  * RCSID	This defines if we want rcs strings in the binary or not
