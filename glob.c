@@ -63,7 +63,6 @@ static char sccsid[] = "@(#)glob.c	5.12 (Berkeley) 6/24/91";
 #undef QUOTE
 #undef TILDE
 #undef META
-#undef CHAR
 #undef ismeta
 #undef Strchr
 
@@ -120,7 +119,7 @@ static	void	 qprintf	__P((Char *));
 #define	M_MASK		0xffff
 #define	M_ASCII		0x00ff
 
-#define	CHAR(c)		((c)&M_ASCII)
+#define	LCHAR(c)	((c)&M_ASCII)
 #define	META(c)		((c)|M_META)
 #define	M_ALL		META('*')
 #define	M_END		META(']')
@@ -427,11 +426,11 @@ glob(pattern, flags, errfunc, pglob)
 		*bufnext++ = m_not;
 	    c = *qpatnext++;
 	    do {
-		*bufnext++ = CHAR(c);
+		*bufnext++ = LCHAR(c);
 		if (*qpatnext == RANGE &&
 		    (c = qpatnext[1]) != RBRACKET) {
 		    *bufnext++ = M_RNG;
-		    *bufnext++ = CHAR(c);
+		    *bufnext++ = LCHAR(c);
 		    qpatnext += 2;
 		}
 	    } while ((c = *qpatnext++) != RBRACKET);
@@ -450,7 +449,7 @@ glob(pattern, flags, errfunc, pglob)
 		*bufnext++ = M_ALL;
 	    break;
 	default:
-	    *bufnext++ = CHAR(c);
+	    *bufnext++ = LCHAR(c);
 	    break;
 	}
     }
@@ -699,7 +698,7 @@ One_mbtowc(NLSChar *pwc, const Char *s, size_t n)
     if (n > MB_LEN_MAX)
 	n = MB_LEN_MAX;
     p = buf;
-    while (p < buf + n && (*p++ = CHAR(*s++)) != 0)
+    while (p < buf + n && (*p++ = LCHAR(*s++)) != 0)
 	;
     return one_mbtowc(pwc, buf, n);
 #else
