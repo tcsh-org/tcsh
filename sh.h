@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.94 2001/02/21 18:03:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.95 2001/02/21 18:11:19 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -544,7 +544,7 @@ extern void		DebugFree	__P((ptr_t, char *, int));
 # if defined(SCO) && (SYSVREL > 3)
 #  include <sys/socket.h>
 # else
-#  define MAXHOSTNAMELEN 255
+#  define MAXHOSTNAMELEN 256
 # endif
 #endif /* MAXHOSTNAMELEN */
 

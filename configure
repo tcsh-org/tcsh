@@ -773,6 +773,11 @@ case "${host}" in
     tcsh_config_file=sysv4
   ;;
 
+  ## Apollo Domain/OS
+  *-apollo-*)
+    tcsh_config_file=apollo
+  ;;
+
   * )
     { echo "configure: error: Tcsh can't guess the configuration file name
 for \`${host}' systems.

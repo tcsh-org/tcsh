@@ -217,6 +217,11 @@ case "${host}" in
     tcsh_config_file=sysv4
   ;;
 
+  ## Apollo Domain/OS
+  *-apollo-*)
+    tcsh_config_file=apollo
+  ;;
+
   * )
   changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name

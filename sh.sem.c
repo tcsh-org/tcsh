@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.50 2000/07/15 17:08:57 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.51 2000/11/11 23:03:38 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.50 2000/07/15 17:08:57 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.51 2000/11/11 23:03:38 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -571,7 +571,9 @@ execute(t, wanttty, pipein, pipeout)
 		    if (t->t_dflg & F_NICE) {
 			int nval = SIGN_EXTEND_CHAR(t->t_nice);
 # ifdef BSDNICE
-			(void) setpriority(PRIO_PROCESS, 0, nval);
+			if (setpriority(PRIO_PROCESS, 0, nval) == -1 && errno)
+				stderror(ERR_SYSTEM, "setpriority",
+				    strerror(errno));
 # else /* !BSDNICE */
 			(void) nice(nval);
 # endif /* BSDNICE */

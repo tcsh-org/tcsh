@@ -1,6 +1,6 @@
 
 Last Updated: 
-Fri Aug 25 13:27:45 EDT 2000
+Sun Mar 18 13:44:14 EST 2001
 
 This is for people who do not read the manual!
 
@@ -209,6 +209,11 @@ be able to get ftp it... :-)
 22. Tcsh compiled under hp/ux-10.x does not pass resource limits correctly
     when ran on hp/ux-11.x systems. This is a problem with lack of ABI
     compatibility between the two systems. The only solution is to recompile.
+
+23. Refreshing in command line editing can appear broken on some OS's because
+    the termcap/terminfo description lies about the ability of the terminal
+    to use tabs. At least on Compaq/DEC Alpha OSF/1 3.x and 4.x systems,
+    stty -tabs will cause problems.
 
 christos
 

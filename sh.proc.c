@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.70 1998/10/25 15:10:22 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.71 2000/11/11 23:03:37 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.70 1998/10/25 15:10:22 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.71 2000/11/11 23:03:37 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1986,7 +1986,8 @@ pfork(t, wanttty)
 	if (t->t_dflg & F_NICE) {
 	    int nval = SIGN_EXTEND_CHAR(t->t_nice);
 #ifdef BSDNICE
-	    (void) setpriority(PRIO_PROCESS, 0, nval);
+	    if (setpriority(PRIO_PROCESS, 0, nval) == -1 && errno)
+		    stderror(ERR_SYSTEM, "setpriority", strerror(errno));
 #else /* !BSDNICE */
 	    (void) nice(nval);
 #endif /* !BSDNICE */

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.44 2000/11/11 23:03:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.45 2000/11/19 20:50:43 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.44 2000/11/11 23:03:36 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.45 2000/11/19 20:50:43 christos Exp $")
 
 /*
  * C shell
@@ -114,7 +114,7 @@ Dfix(t)
 	    if (Ismbyte1(*p) && *(p + 1))
 		p ++;
 	    else
-#endif DSPMBYTE
+#endif /* DSPMBYTE */
 	    if (cmap(*p, _DOL | QUOTES)) {	/* $, \, ', ", ` */
 		Dfix2(t->t_dcom);	/* found one */
 		blkfree(t->t_dcom);
