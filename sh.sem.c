@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.3 1991/07/23 23:20:08 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.4 1991/09/08 00:45:32 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -36,7 +36,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.sem.c,v 3.3 1991/07/23 23:20:08 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.4 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -216,9 +216,9 @@ execute(t, wanttty, pipein, pipeout)
 		       bifunc->bfunct == dopushd ||
 		       bifunc->bfunct == dopopd))
 	    t->t_dflg &= ~(F_NICE);
-	if (((t->t_dflg & F_TIME) || (t->t_dflg & F_NOFORK) == 0 &&
+	if (((t->t_dflg & F_TIME) || ((t->t_dflg & F_NOFORK) == 0 &&
 	     (!bifunc || t->t_dflg &
-	      (F_PIPEOUT | F_AMPERSAND | F_NICE | F_NOHUP))) ||
+	      (F_PIPEOUT | F_AMPERSAND | F_NICE | F_NOHUP)))) ||
 	/*
 	 * We have to fork for eval too.
 	 */
@@ -400,10 +400,8 @@ execute(t, wanttty, pipein, pipeout)
 		    }
 
 		    if (setintr)
-			ignint =
-			    (tpgrp == -1 &&
-			     (t->t_dflg & F_NOINTERRUPT))
-			    || gointr && eq(gointr, STRminus);
+			ignint = (tpgrp == -1 && (t->t_dflg & F_NOINTERRUPT))
+				|| (gointr && eq(gointr, STRminus));
 		    pgrp = pcurrjob ? pcurrjob->p_jobid : getpid();
 		    child++;
 		    if (setintr) {

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 3.8 1991/08/02 06:28:40 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 3.9 1991/08/06 01:00:15 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.glob.c,v 3.8 1991/08/02 06:28:40 christos Exp christos $")
+RCSID("$Id: sh.glob.c,v 3.9 1991/08/06 01:00:15 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -569,7 +569,7 @@ tglob(t)
 	if (*p == '~' || *p == '=')
 	    gflag |= G_CSH;
 	else if (*p == '{' &&
-		 (p[1] == '\0' || p[1] == '}' && p[2] == '\0'))
+		 (p[1] == '\0' || (p[1] == '}' && p[2] == '\0')))
 	    continue;
 	while (c = *p++)
 	    if (isglob(c))

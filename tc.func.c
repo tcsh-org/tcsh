@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.5 1991/07/17 13:21:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.6 1991/09/08 00:45:32 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.func.c,v 3.5 1991/07/17 13:21:49 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.6 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -108,7 +108,7 @@ expand_lex(buf, bufsiz, sp0, from, to)
 		 */
 		if ((*s & QUOTE)
 		    && (((*s & TRIM) == HIST) ||
-			((*s & TRIM) == '\\') && (prev_c != '\\'))) {
+			(((*s & TRIM) == '\\') && (prev_c != '\\')))) {
 		    *d++ = '\\';
 		}
 		*d++ = (*s & TRIM);
@@ -771,8 +771,8 @@ setalarm()
     if ((nl = sched_next()) != -1) {
 	(void) time(&cl);
 	sched_dif = nl - cl;
-	if ((alrm_time == 0) || (sched_dif < alrm_time))
-	    alrm_time = ((int) sched_dif) + 1;
+	if ((alrm_time == 0) || ((unsigned) sched_dif < alrm_time))
+	    alrm_time = ((unsigned) sched_dif) + 1;
     }
     (void) alarm(alrm_time);	/* Autologout ON */
 }
@@ -817,7 +817,7 @@ rmstar(cp)
 		    silent = (*charac == 'i' || *charac == 'f');
 		args = args->next;
 	    }
-	    ask = (ask || !ask && !silent);
+	    ask = (ask || (!ask && !silent));
 	    if (ask) {
 		for (; !star && *args->word != ';'
 		     && args != cp; args = args->next)

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.err.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.err.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. There are lots of them
  *	     and none does the right thing!
@@ -36,7 +36,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.err.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #define _h_tc_err		/* Don't redefine the errors	 */
 #include "sh.h"
@@ -322,7 +322,7 @@ static char *errorlist[] =
 void
 /*VARARGS1*/
 #if __STDC__
-seterror(int id, ...)
+seterror(unsigned int id, ...)
 #else
 seterror(va_alist)
     va_dcl
@@ -335,9 +335,9 @@ seterror(va_alist)
 #if __STDC__
 	va_start(va, id);
 #else
-	int id;
+	unsigned int id;
 	va_start(va);
-	id = va_arg(va, int);
+	id = va_arg(va, unsigned int);
 #endif
 
 	if (id < 0 || id > sizeof(errorlist) / sizeof(errorlist[0]))
@@ -370,7 +370,7 @@ seterror(va_alist)
 void
 /*VARARGS*/
 #if __STDC__
-stderror(int id, ...)
+stderror(unsigned int id, ...)
 #else
 stderror(va_alist)
     va_dcl
@@ -383,10 +383,10 @@ stderror(va_alist)
 #if __STDC__
     va_start(va, id);
 #else
-    int	    id;
+    unsigned int id;
 
     va_start(va);
-    id = va_arg(va, int);
+    id = va_arg(va, unsigned int);
 #endif
 
     flags = id & ERR_FLAGS;

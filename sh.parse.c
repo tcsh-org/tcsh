@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.parse.c,v 3.1 1991/07/09 13:41:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.parse.c,v 3.2 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.parse.c: Interpret a list of tokens
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.parse.c,v 3.2 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 
@@ -598,7 +598,7 @@ again:
 		seterror(ERR_MISRED);
 		continue;
 	    }
-	    if ((flags & P_OUT) && (flags & P_DIAG) == 0 || t->t_drit)
+	    if (((flags & P_OUT) && (flags & P_DIAG) == 0) || t->t_drit)
 		seterror(ERR_OUTRED);
 	    else
 		t->t_drit = Strsave(p->word);

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.9 1991/08/05 23:02:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.10 1991/09/08 00:45:32 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.proc.c,v 3.9 1991/08/05 23:02:13 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.10 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -1001,7 +1001,7 @@ pprint(pp, flag)
 	jobflags |= pp->p_flags;
 	pstatus = pp->p_flags & PALLSTATES;
 	if (tp != pp && linp != linbuf && !(flag & FANCY) &&
-	    (pstatus == status && pp->p_reason == reason ||
+	    ((pstatus == status && pp->p_reason == reason) ||
 	     !(flag & REASON)))
 	    xprintf(" ");
 	else {

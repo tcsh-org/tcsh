@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.3 1991/07/24 17:38:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.4 1991/09/08 00:45:32 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.lex.c,v 3.3 1991/07/24 17:38:12 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.4 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -1148,7 +1148,7 @@ gethent(sc)
 	    }
 	    np = lhsb;
 	    event = 0;
-	    while (!cmap(c, _META | _Q | _Q1) && !any("{}:", c)) {
+	    while (!cmap(c, _ESC | _META | _Q | _Q1) && !any("{}:", c)) {
 		if (event != -1 && Isdigit(c))
 		    event = event * 10 + c - '0';
 		else

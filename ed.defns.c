@@ -229,8 +229,18 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		V_RSRCH_FWD	91
     v_rsrch_rev,
 #define		V_RSRCH_REV	92
+    v_char_fwd,
+#define		V_CHAR_FWD	93
+    v_char_back,
+#define		V_CHAR_BACK	94
+    v_chgmeta,
+#define		V_CHGMETA	95
+    e_inc_fwd,
+#define		F_INC_FWD	96
+    e_inc_rev,
+#define		F_INC_REV	97
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	93
+#define		F_NUM_FNS	98
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -871,7 +881,7 @@ KEYCMD  CcViCmdMap[] = {
     V_CHGTOEND,			/* C */
     F_KILLEND,			/* D */
     V_ENDWORD,			/* E */
-    F_UNASSIGNED,		/* F */   /* Need code here */ 
+    V_CHAR_BACK,		/* F */
     F_UNASSIGNED,		/* G */
     F_UNASSIGNED,		/* H */
     V_INSBEG,			/* I */
@@ -900,10 +910,10 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* ` */
     V_ADD,			/* a */
     V_WORDBACK,			/* b */
-    F_UNASSIGNED,		/* c */
+    V_CHGMETA,			/* c */
     V_DELMETA,			/* d */
     V_EWORD,			/* e */
-    F_UNASSIGNED,		/* f */  /* Need code for KSH */
+    V_CHAR_FWD,			/* f */
     F_UNASSIGNED,		/* g */
     F_CHARBACK,			/* h */
     V_INSERT,			/* i */
@@ -1061,8 +1071,6 @@ KEYCMD  CcViCmdMap[] = {
 
 
 struct KeyFuncs FuncNames[] = {
-    "load-average", F_LOAD_AVERAGE,
-    "Display load average and current process status",
     "backward-char", F_CHARBACK,
     "Move back a character",
     "backward-delete-char", F_DELPREV,
@@ -1129,6 +1137,10 @@ struct KeyFuncs FuncNames[] = {
     "Search in history forward for line beginning as current",
     "insert-last-word", F_LAST_ITEM,
     "Insert last item of previous command",
+    "i-search-fwd", F_INC_FWD,
+    "Forward Incremental search",
+    "i-search-rev", F_INC_REV,
+    "Reverse Incremental search",
     "keyboard-quit", F_STARTOVER,
     "Clear line",
     "kill-line", F_KILLEND,
@@ -1143,6 +1155,8 @@ struct KeyFuncs FuncNames[] = {
     "List file name wildcard matches",
     "list-or-eof", F_LIST_EOF,
     "List choices for completion or indicate end of file if empty line",
+    "load-average", F_LOAD_AVERAGE,
+    "Display load average and current process status",
     "magic-space", F_MAGIC_SPACE,
     "Expand history escapes and insert a space",
     "newline", F_NEWLINE,
@@ -1206,6 +1220,8 @@ struct KeyFuncs FuncNames[] = {
     "Vi enter insert mode at end of line",
     "vi-chg-case", V_CHGCASE,
     "Vi change case of character under cursor and advance one character",
+    "vi-chg-meta", V_CHGMETA,
+    "Vi change prefix command",
     "vi-chg-to-eol", V_CHGTOEND,
     "Vi change to end of line",
     "vi-cmd-mode", V_CMD_MODE,
@@ -1220,6 +1236,10 @@ struct KeyFuncs FuncNames[] = {
     "Vi move to the end of the current space delimited word",
     "vi-eword", V_EWORD,
     "Vi move to the end of the current word",
+    "vi-back-char", V_CHAR_BACK,
+    "Vi move to the character specified backwards",
+    "vi-fwd-char", V_CHAR_FWD,
+    "Vi move to the character specified forward",
     "vi-insert", V_INSERT,
     "Enter vi insert mode",
     "vi-insert-at-bol", V_INSBEG,

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.5 1991/08/06 03:00:23 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.6 1991/09/08 00:45:32 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "config.h"
 
-RCSID("$Id: sh.func.c,v 3.5 1991/08/06 03:00:23 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.6 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -768,8 +768,8 @@ search(type, level, goal)
 	    if (lastchr(aword) != ':')
 		break;
 	    aword[Strlen(aword) - 1] = 0;
-	    if (type == T_GOTO && eq(aword, goal) ||
-		type == T_SWITCH && eq(aword, STRdefault))
+	    if ((type == T_GOTO && eq(aword, goal)) ||
+		(type == T_SWITCH && eq(aword, STRdefault)))
 		level = -1;
 	    break;
 
@@ -836,8 +836,8 @@ getword(wp)
 		*wp++ = c;
 		*wp = 0;	/* end the string b4 test */
 	    }
-	} while ((d || !(kwd = keyword(owp)) && c != ' '
-		  && c != '\t') && c != '\n');
+	} while ((d || (!(kwd = keyword(owp)) && c != ' '
+		  && c != '\t')) && c != '\n');
     } while (wp == 0);
 
     /*

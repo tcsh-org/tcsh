@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tc.bind.c,v 1.2 91/07/14 22:23:54 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.bind.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: tc.bind.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -99,7 +99,7 @@ unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
 	*cp++ = '-';
 	c &= 0377;
     }
-    if ((c & META) && !(Isprint(c) || Iscntrl(c) && Isprint(c | 0100))) {
+    if ((c & META) && !(Isprint(c) || (Iscntrl(c) && Isprint(c | 0100)))) {
 	*cp++ = 'M';
 	*cp++ = '-';
 	c &= ASCII;

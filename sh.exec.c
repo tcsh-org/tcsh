@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.exec.c,v 1.2 91/07/14 20:13:22 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.exec.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -80,7 +80,7 @@ static Char *expath;		/* Path for exerr */
 #define HSHMUL		243
 static char xhash[HSHSIZ / 8];
 
-#define hash(a, b)	((a) * HSHMUL + (b) & HSHMASK)
+#define hash(a, b)	(((a) * HSHMUL + (b)) & HSHMASK)
 #define bit(h, b)	((h)[(b) >> 3] & 1 << ((b) & 7))	/* bit test */
 #define bis(h, b)	((h)[(b) >> 3] |= 1 << ((b) & 7))	/* bit set */
 #ifdef VFORK
@@ -447,7 +447,7 @@ dohash(vv, c)
 #endif
     DIR    *dirp;
     register struct dirent *dp;
-    register int cnt;
+    register unsigned int cnt;
     int     i = 0;
     struct varent *v = adrof(STRpath);
     Char  **pv;
@@ -478,7 +478,7 @@ dohash(vv, c)
 		continue;
 	    if (dp->d_name[0] == '.' &&
 		(dp->d_name[1] == '\0' ||
-		 dp->d_name[1] == '.' && dp->d_name[2] == '\0'))
+		 (dp->d_name[1] == '.' && dp->d_name[2] == '\0')))
 		continue;
 	    hashval = hash(hashname(str2short(dp->d_name)), i);
 	    bis(xhash, hashval);

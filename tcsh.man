@@ -425,6 +425,7 @@ VI Command Mode functions
 "C"	->  change-till-end-of-line
 "D"	->  kill-line
 "E"	->  vi-endword
+"F"	->  vi-char-back
 "I"	->  vi-insert-at-bol
 "J"	->  history-search-forward
 "K"	->  history-search-backward
@@ -444,6 +445,7 @@ VI Command Mode functions
 "c"	->  is undefined
 "d"	->  vi-delmeta
 "e"	->  vi-eword
+"f"	->  vi-char-fwd
 "h"	->  backward-char
 "i"	->  vi-insert
 "j"	->  down-history

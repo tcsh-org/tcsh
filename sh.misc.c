@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.misc.c,v 3.4 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.misc.c,v 3.5 1991/09/08 00:45:32 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.misc.c,v 3.4 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.5 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 
@@ -319,7 +319,7 @@ dcopy(i, j)
     register int i, j;
 {
 
-    if (i == j || i < 0 || j < 0 && i > 2)
+    if (i == j || i < 0 || (j < 0 && i > 2))
 	return (i);
 #ifdef HAVEDUP2
     if (j >= 0) {

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.xmap.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.xmap.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: ed.xmap.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -207,7 +207,8 @@ TraverseMap(ptr, ch, code)
 		return (TraverseMap(ptr->next, ch, code));
 	    }
 	    else {
-		CurCmd.code[0] = (Char) ptr->code;
+		int tmpc = (int) ptr->code;
+		CurCmd.code[0] = (Char) tmpc;
 		*code = CurCmd.code;
 		return 1;
 	    }

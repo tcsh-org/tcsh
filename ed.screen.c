@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.3 1991/07/18 18:00:02 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.4 1991/09/08 00:45:32 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.screen.c,v 3.3 1991/07/18 18:00:02 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.4 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -663,9 +663,9 @@ SetAttributes(atr)
     atr &= ATTRIBUTES;
     if (atr != cur_atr) {
 	if (me_all && GoodStr(T_me)) {
-	    if ((cur_atr & BOLD) && !(atr & BOLD) ||
-		(cur_atr & UNDER) && !(atr & UNDER) ||
-		(cur_atr & STANDOUT) && !(atr & STANDOUT)) {
+	    if (((cur_atr & BOLD) && !(atr & BOLD)) ||
+		((cur_atr & UNDER) && !(atr & UNDER)) ||
+		((cur_atr & STANDOUT) && !(atr & STANDOUT))) {
 		(void) tputs(Str(T_me), 1, putpure);
 		cur_atr = 0;
 	    }

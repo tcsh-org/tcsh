@@ -503,8 +503,7 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob, no_match)
 
     if (!(dirp = Opendir(pathbuf)))
 	/* todo: don't call for ENOENT or ENOTDIR? */
-	if (pglob->gl_errfunc &&
-	    (*pglob->gl_errfunc) (pathbuf, errno) ||
+	if ((pglob->gl_errfunc && (*pglob->gl_errfunc) (pathbuf, errno)) ||
 	    (pglob->gl_flags & GLOB_ERR))
 	    return (GLOB_ABEND);
 	else

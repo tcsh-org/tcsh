@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.9 1991/08/06 07:16:11 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.10 1991/09/08 00:45:32 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,7 +41,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.9 1991/08/06 07:16:11 christos Exp $")
+RCSID("$Id: sh.c,v 3.10 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -658,7 +658,7 @@ main(argc, argv)
      * Note that in only the login shell is it likely that parent may have set
      * signals to be ignored
      */
-    if (loginsh || intact || intty && isatty(SHOUT))
+    if (loginsh || intact || (intty && isatty(SHOUT)))
 	setintr = 1;
     settell();
     /*
@@ -1491,7 +1491,7 @@ process(catch)
 	 * Echo not only on VERBOSE, but also with history expansion. If there
 	 * is a lexical error then we forego history echo.
 	 */
-	if (lex(&paraml) && !seterr && intty && !tellwhat && !Expand ||
+	if ((lex(&paraml) && !seterr && intty && !tellwhat && !Expand) ||
 	    adrof(STRverbose)) {
 	    haderr = 1;
 	    prlex(&paraml);
@@ -1516,7 +1516,7 @@ process(catch)
 	 * PWP: entry of items in the history list while in a while loop is done
 	 * elsewhere...
 	 */
-	if (enterhist || catch && intty && !whyles && !tellwhat)
+	if (enterhist || (catch && intty && !whyles && !tellwhat))
 	    savehist(&paraml);
 
 	if (Expand && seterr)
@@ -1649,7 +1649,7 @@ mailchk()
 #endif
 	if (stb.st_size == 0 || stb.st_atime > stb.st_mtime ||
 	    (stb.st_atime <= chktim && stb.st_mtime <= chktim) ||
-	    loginsh && !new)
+	    (loginsh && !new))
 	    continue;
 	if (cnt == 1)
 	    xprintf("You have %smail.\n", new ? "new " : "");

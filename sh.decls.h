@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.decls.h,v 3.2 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.decls.h,v 3.3 1991/09/08 00:45:32 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -86,8 +86,8 @@ extern	void		  heredoc	__P((Char *));
 /*
  * sh.err.c
  */
-extern	void		  seterror	__P((int, ...));
-extern	void		  stderror	__P((int, ...));
+extern	void		  seterror	__P((unsigned int, ...));
+extern	void		  stderror	__P((unsigned int, ...));
 
 /*
  * sh.exec.c

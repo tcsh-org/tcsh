@@ -1,4 +1,4 @@
-/* $Header: /tmp_mnt/home/ragmanns/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.3 91/07/19 01:31:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.4 1991/09/08 00:45:32 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -43,7 +43,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.alloc.c,v 3.3 91/07/19 01:31:14 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.4 1991/09/08 00:45:32 christos Exp $")
 
 
 #include "sh.h"
@@ -130,21 +130,19 @@ static	void	morecore	__P((int));
 
 
 #ifdef DEBUG
-#define CHECK(a, str, p) \
+# define CHECK(a, str, p) \
     if (a) { \
 	xprintf(str, p);	\
 	xprintf("memtop = %lx membot = %lx.\n", memtop, membot);	\
 	abort(); \
-    }	\
-    else
+    }
 #else
-#define CHECK(a, str, p) \
+# define CHECK(a, str, p) \
     if (a) { \
 	xprintf(str, p);	\
 	xprintf("memtop = %lx membot = %lx.\n", memtop, membot);	\
 	return; \
-    }	\
-    else
+    }
 #endif
 
 memalign_t
@@ -410,7 +408,8 @@ realloc(cp, nbytes)
     onb = MEMALIGN(nbytes + MEMALIGN(sizeof(union overhead)) + RSLOP);
 
     /* avoid the copy if same size block */
-    if (was_alloced && (onb < (1 << (i + 3))) && (onb >= (1 << (i + 2))))
+    if (was_alloced && (onb < (U_int) (1 << (i + 3))) && 
+	(onb >= (U_int) (1 << (i + 2))))
 	return ((memalign_t) cp);
     if ((res = malloc(nbytes)) == NULL)
 	return ((memalign_t) NULL);
