@@ -76,7 +76,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "24 November 1998" "Astron 6.08.02"
+.TH TCSH 1 "11 February 1999" "Astron 6.08.03"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -716,7 +716,9 @@ can do this even more easily.
 Searches for documentation on the current command, using the same notion of
 `current command' as the completion routines, and prints it. There is no way
 to use a pager; \fIrun-help\fR is designed for short help files.
-Documentation should be in a file named \fIcommand\fR.help, \fIcommand\fR.1,
+If the special alias \fBhelpcommand\fR is defined, it is run with the
+command name as a sole argument. Else,
+documentation should be in a file named \fIcommand\fR.help, \fIcommand\fR.1,
 \fIcommand\fR.6, \fIcommand\fR.8 or \fIcommand\fR, which should be in one
 of the directories listed in the \fBHPATH\fR environment variable.
 If there is more than one help file only the first is printed.
@@ -3421,6 +3423,20 @@ may cause an infinite loop. It is the author's opinion that anyone doing
 so will get what they deserve.
 .RE
 .TP 8
+.B helpcommand
+Invoked by the \fBrun-help\fR editor command. The command name for which help
+is sought is passed as sole argument. 
+For example, if one does
+.RS +8
+.IP "" 4
+> alias helpcommand '\e!:1 --help'
+.PP
+then the help display of the command itself will be invoked, using the GNU
+help calling convention.
+Currently there is no easy way to account for various calling conventions (eg
+the customary Unix `-h'), except by using a table of many commands.
+.RE
+.TP 8
 .B periodic 
 Runs every \fBtperiod\fR minutes. This provides a convenient means for
 checking on common but infrequent changes such as new mail. For example,
@@ -4878,7 +4894,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.08.02 (Astron) 1998-11-24.
+This manual documents tcsh 6.08.03 (Astron) 1999-02-11.
 .SH AUTHORS
 .PD 0
 .TP 2

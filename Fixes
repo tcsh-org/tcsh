@@ -1,3 +1,5 @@
+ 33. V6.08.03 - 19990211
+ 32. Helpcommand documentation (Vladimir Alexiev)
  31. small Y2K fix [%y in prompt would be formatted as 10 not 00 at year 2000],
      and new Itoa() code (Chris Torek)
  30. OpenBSD m68k patches (Paul DuBois)
