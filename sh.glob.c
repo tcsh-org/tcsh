@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.55 2004/03/21 16:48:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.56 2004/05/19 18:27:53 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.55 2004/03/21 16:48:14 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.56 2004/05/19 18:27:53 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -80,7 +80,7 @@ static	Char	**globexpand	__P((Char **));
 static	int	  globbrace	__P((Char *, Char *, Char ***));
 static  void	  expbrace	__P((Char ***, Char ***, int));
 static	void	  pword		__P((int));
-static	void	  psave		__P((int));
+static	void	  psave		__P((Char));
 static	void	  backeval	__P((Char *, bool));
 
 static Char *
@@ -652,10 +652,10 @@ ginit()
 
 void
 rscan(t, f)
-    register Char **t;
-    void    (*f) __P((int));
+    Char **t;
+    void    (*f) __P((Char));
 {
-    register Char *p;
+    Char *p;
 
     while ((p = *t++) != '\0')
 	while (*p)
@@ -664,9 +664,9 @@ rscan(t, f)
 
 void
 trim(t)
-    register Char **t;
+    Char **t;
 {
-    register Char *p;
+    Char *p;
 
     while ((p = *t++) != '\0')
 	while (*p)
@@ -675,9 +675,9 @@ trim(t)
 
 void
 tglob(t)
-    register Char **t;
+    Char **t;
 {
-    register Char *p, *c;
+    Char *p, *c;
 
     while ((p = *t++) != '\0') {
 	if (*p == '~' || *p == '=')
@@ -734,7 +734,7 @@ dobackp(cp, literal)
     Char   *cp;
     bool    literal;
 {
-    register Char *lp, *rp;
+    Char *lp, *rp;
     Char   *ep, word[LONGBSIZE];
 
     if (pargv) {
@@ -788,8 +788,8 @@ backeval(cp, literal)
     Char   *cp;
     bool    literal;
 {
-    register int icnt, c;
-    register Char *ip;
+    int icnt;
+    Char c, *ip;
     struct command faket;
     bool    hadnl;
     int     pvec[2], quoted;
@@ -880,21 +880,55 @@ backeval(cp, literal)
     ip = NULL;
     do {
 	int     cnt = 0;
+	char   *tmp;
 
+	tmp = tibuf;
 	for (;;) {
 	    if (icnt == 0) {
-		int     i;
+		int     i, eof;
 
 		ip = ibuf;
 		do
-		    icnt = read(pvec[0], tibuf, BUFSIZE);
+		    icnt = read(pvec[0], tmp, tibuf + BUFSIZE - tmp);
 		while (icnt == -1 && errno == EINTR);
+		eof = 0;
 		if (icnt <= 0) {
-		    c = -1;
-		    break;
+		    if (tmp == tibuf) {
+		        c = -1;
+			break;
+		    }
+		    icnt = 0;
+		    eof = 1;
 		}
+		icnt += tmp - tibuf;
+#ifdef WIDE_STRINGS
+		i = 0;
+		tmp = tibuf;
+		while (tmp < tibuf + icnt) {
+		    int len;
+
+		    len = mbtowc(&ip[i], tmp, tibuf + icnt - tmp);
+		    if (len == -1) {
+		        mbtowc(NULL, NULL, 0);
+		        if (!eof && (size_t)(tibuf + icnt - tmp) < MB_CUR_MAX) {
+			    break; /* Maybe a partial character */
+			}
+			ip[i] = (unsigned char) *tmp; /* Error */
+		    }
+		    if (len <= 0)
+		        len = 1;
+		    i++;
+		    tmp += len;
+		}
+		if (tmp != tibuf) {
+		    memmove (tibuf, tmp, tibuf + icnt - tmp);
+		    tmp = tibuf + (tibuf + icnt - tmp);
+		}
+		icnt = i;
+#else /* not WIDE_STRINGS */
 		for (i = 0; i < icnt; i++)
 		    ip[i] = (unsigned char) tibuf[i];
+#endif
 	    }
 	    if (hadnl)
 		break;
@@ -936,7 +970,7 @@ backeval(cp, literal)
 
 static void
 psave(c)
-    int    c;
+    Char   c;
 {
     if (--pnleft <= 0)
 	stderror(ERR_WTOOLONG);
@@ -1107,7 +1141,7 @@ void
 Gcat(s1, s2)
     Char   *s1, *s2;
 {
-    register Char *p, *q;
+    Char *p, *q;
     int     n;
 
     for (p = s1; *p++;)
@@ -1131,7 +1165,7 @@ Gcat(s1, s2)
 #if defined(FILEC) && defined(TIOCSTI)
 int
 sortscmp(a, b)
-    register Char **a, **b;
+    Char **a, **b;
 {
     if (!a)			/* check for NULL */
 	return (b ? 1 : 0);

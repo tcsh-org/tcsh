@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.96 2004/01/23 16:21:33 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.97 2004/08/04 14:28:24 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.96 2004/01/23 16:21:33 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.97 2004/08/04 14:28:24 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -96,11 +96,6 @@ static bool SearchNoDirErr = 0;	/* t_search returns -2 if dir is unreadable */
 int InsideCompletion = 0;
 
 /* do the expand or list on the command line -- SHOULD BE REPLACED */
-
-extern Char NeedsRedraw;	/* from ed.h */
-extern int Tty_raw_mode;
-extern int TermH;		/* from the editor routines */
-extern int lbuffed;		/* from sh.print.c */
 
 static	void	 extract_dir_and_name	__P((Char *, Char *, Char *));
 static	int	 insert_meta		__P((Char *, Char *, Char *, bool));
@@ -423,7 +418,7 @@ tenematch(inputline, num_read, command)
  */
 static int
 t_glob(v, cmd)
-    register Char ***v;
+    Char ***v;
     int cmd;
 {
     jmp_buf_t osetexit;
@@ -477,7 +472,7 @@ t_glob(v, cmd)
  */
 static int
 c_glob(v)
-    register Char ***v;
+    Char ***v;
 {
     Char *pat = **v, *cmd, **av;
     Char dir[MAXPATHLEN+1];
@@ -527,7 +522,7 @@ insert_meta(cp, cpend, word, closequotes)
 {
     Char buffer[2 * FILSIZ + 1], *bptr, *wptr;
     int in_sync = (cp != NULL);
-    int qu = 0;
+    Char qu = 0;
     int ndel = (int) (cp ? cpend - cp : 0);
     Char w, wq;
 #ifdef DSPMBYTE
@@ -635,7 +630,7 @@ insert_meta(cp, cpend, word, closequotes)
  */
 static int
 is_prefix(check, template)
-    register Char *check, *template;
+    Char *check, *template;
 {
     for (; *check; check++, template++)
 	if ((*check & TRIM) != (*template & TRIM))
@@ -695,9 +690,9 @@ is_prefixmatch(check, template, igncase)
  */
 static int
 is_suffix(check, template)
-    register Char *check, *template;
+    Char *check, *template;
 {
-    register Char *t, *c;
+    Char *t, *c;
 
     for (t = template; *t++;)
 	continue;
@@ -717,10 +712,10 @@ is_suffix(check, template)
  */
 static int
 ignored(item)
-    register Char *item;
+    Char *item;
 {
     struct varent *vp;
-    register Char **cp;
+    Char **cp;
 
     if ((vp = adrof(STRfignore)) == NULL || (cp = vp->vec) == NULL)
 	return (FALSE);
@@ -737,9 +732,9 @@ ignored(item)
  */
 int
 starting_a_command(wordstart, inputline)
-    register Char *wordstart, *inputline;
+    Char *wordstart, *inputline;
 {
-    register Char *ptr, *ncmdstart;
+    Char *ptr, *ncmdstart;
     int     count;
     static  Char
             cmdstart[] = {'`', ';', '&', '(', '|', '\0'},
@@ -819,8 +814,8 @@ recognize(exp_name, item, name_length, numitems, enhanced, igncase)
     int     name_length, numitems, enhanced, igncase;
 {
     Char MCH1, MCH2;
-    register Char *x, *ent;
-    register int len = 0;
+    Char *x, *ent;
+    int len = 0;
 
     if (numitems == 1) {	/* 1st match */
 	copyn(exp_name, item, MAXNAMLEN);
@@ -1733,7 +1728,7 @@ static void
 extract_dir_and_name(path, dir, name)
     Char   *path, *dir, *name;
 {
-    register Char *p;
+    Char *p;
 
     p = Strrchr(path, '/');
 #ifdef WINNT_NATIVE
@@ -1786,7 +1781,7 @@ static Char *
 tilde(new, old)
     Char   *new, *old;
 {
-    register Char *o, *p;
+    Char *o, *p;
 
     switch (old[0]) {
     case '~':
@@ -1896,7 +1891,7 @@ nostat(dir)
      Char *dir;
 {
     struct varent *vp;
-    register Char **cp;
+    Char **cp;
 
     if ((vp = adrof(STRnostat)) == NULL || (cp = vp->vec) == NULL)
 	return FALSE;
@@ -2033,7 +2028,7 @@ find_rows(items, count, no_file_suffix)
     Char *items[];
     int     count, no_file_suffix;
 {
-    register int i, columns, rows;
+    int i, columns, rows;
     unsigned int maxwidth = 0;
 
     for (i = 0; i < count; i++)	/* find widest string */
@@ -2056,10 +2051,10 @@ find_rows(items, count, no_file_suffix)
  */
 void
 print_by_column(dir, items, count, no_file_suffix)
-    register Char *dir, *items[];
+    Char *dir, *items[];
     int     count, no_file_suffix;
 {
-    register int i, r, c, columns, rows;
+    int i, r, c, columns, rows;
     unsigned int w, maxwidth = 0;
     Char *val;
     bool across;
@@ -2134,7 +2129,7 @@ print_by_column(dir, items, count, no_file_suffix)
  */
 int
 StrQcmp(str1, str2)
-    register Char *str1, *str2;
+    Char *str1, *str2;
 {
     for (; *str1 && samecase(*str1 & TRIM) == samecase(*str2 & TRIM); 
 	 str1++, str2++)
@@ -2173,7 +2168,7 @@ fcompare(file1, file2)
  */
 void
 catn(des, src, count)
-    register Char *des, *src;
+    Char *des, *src;
     int count;
 {
     while (--count >= 0 && *des)
@@ -2191,7 +2186,7 @@ catn(des, src, count)
  */
 void
 copyn(des, src, count)
-    register Char *des, *src;
+    Char *des, *src;
     int count;
 {
     while (--count >= 0)

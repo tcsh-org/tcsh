@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.51 2002/06/25 19:02:11 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.52 2004/05/21 18:50:36 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.51 2002/06/25 19:02:11 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.52 2004/05/21 18:50:36 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -42,9 +42,7 @@ RCSID("$Id: ed.inputl.c,v 3.51 2002/06/25 19:02:11 christos Exp $")
 
 /* ed.inputl -- routines to get a single line from the input. */
 
-extern bool tellwhat;
 extern bool MapsAreInited;
-extern bool Tty_raw_mode;
 
 /* mismatched first character */
 static Char mismatch[] = 
@@ -81,7 +79,6 @@ Inputl()
 {
     CCRETVAL retval;
     KEYCMD  cmdnum = 0;
-    extern KEYCMD NumFuns;
     unsigned char tch;		/* the place where read() goes */
     Char    ch;
     int     num;		/* how many chars we have read at NL */
@@ -649,7 +646,7 @@ RunCommand(str)
 static int
 GetNextCommand(cmdnum, ch)
     KEYCMD *cmdnum;
-    register Char *ch;
+    Char *ch;
 {
     KEYCMD  cmd = 0;
     int     num;
@@ -662,6 +659,8 @@ GetNextCommand(cmdnum, ch)
 	if (
 #ifdef DSPMBYTE
 	     _enable_mbdisp &&
+#else
+	     MB_LEN_MAX == 1 &&
 #endif
 	     !adrof(STRnokanji) && (*ch & META)) {
 	    MetaNext = 0;
@@ -680,7 +679,11 @@ GetNextCommand(cmdnum, ch)
 	if (*ch < NT_NUM_KEYS)
 	    cmd = CurrentKeyMap[*ch];
 	else
+#ifdef WINNT_NATIVE
 	    cmd = CurrentKeyMap[(unsigned char) *ch];
+#else
+	    cmd = F_INSERT;
+#endif
 	if (cmd == F_XKEY) {
 	    XmapVal val;
 	    CStr cstr;
@@ -710,11 +713,16 @@ GetNextCommand(cmdnum, ch)
 
 int
 GetNextChar(cp)
-    register Char *cp;
+    Char *cp;
 {
-    register int num_read;
+    int num_read;
     int     tried = 0;
+#ifdef WIDE_STRINGS
+    char cbuf[MB_LEN_MAX];
+    size_t cbp;
+#else
     unsigned char tcp;
+#endif
 
     for (;;) {
 	if (MacroLvl < 0) {
@@ -742,33 +750,64 @@ GetNextChar(cp)
     if (windowchg)
 	(void) check_window_size(0);	/* for window systems */
 #endif /* SIG_WINDOW */
+#ifdef WIDE_STRINGS
+    /* This is the part that doesn't work with WINNT_NATIVE */
+    cbp = 0;
+    for (;;) {
+	while ((num_read = read(SHIN, cbuf + cbp, 1)) == -1) {
+	    if (errno == EINTR)
+		continue;
+	    if (!tried && fixio(SHIN, errno) != -1)
+		tried = 1;
+	    else {
+# ifdef convex
+		/* need to print error message in case the file is migrated */
+		if (errno != EINTR)
+		    stderror(ERR_SYSTEM, progname, strerror(errno));
+# endif  /* convex */
+		*cp = '\0'; /* Loses possible partial character */
+		return -1;
+	    }
+	}
+	cbp++;
+	if (mbtowc(cp, cbuf, cbp) == -1) {
+	    mbtowc(NULL, NULL, 0);
+	    if (cbp < MB_LEN_MAX)
+		continue; /* Maybe a partial character */
+	    /* And drop the following bytes, if any */
+	    *cp = (unsigned char)*cbuf;
+	}
+	break;
+    }
+#else /* not WIDE_STRINGS */
     while ((num_read = read(SHIN, (char *) &tcp, 1)) == -1) {
 	if (errno == EINTR)
 	    continue;
 	if (!tried && fixio(SHIN, errno) != -1)
 	    tried = 1;
 	else {
-#ifdef convex
+# ifdef convex
             /* need to print error message in case the file is migrated */
             if (errno != EINTR)
                 stderror(ERR_SYSTEM, progname, strerror(errno));
-#endif  /* convex */
-#ifdef WINNT_NATIVE
+# endif  /* convex */
+# ifdef WINNT_NATIVE
 	    __nt_want_vcode = 0;
-#endif /* WINNT_NATIVE */
+# endif /* WINNT_NATIVE */
 	    *cp = '\0';
 	    return -1;
 	}
     }
-#ifdef WINNT_NATIVE
+# ifdef WINNT_NATIVE
     if (__nt_want_vcode == 2)
 	*cp = __nt_vcode;
     else
 	*cp = tcp;
     __nt_want_vcode = 0;
-#else
+# else
     *cp = tcp;
-#endif /* WINNT_NATIVE */
+# endif /* WINNT_NATIVE */
+#endif /* not WIDE_STRINGS */
     return num_read;
 }
 

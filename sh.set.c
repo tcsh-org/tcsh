@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.51 2004/07/24 21:59:27 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.52 2004/07/25 05:18:28 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,12 +32,11 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.51 2004/07/24 21:59:27 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.52 2004/07/25 05:18:28 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
 
-extern Char HistLit;
 extern bool GotTermCaps;
 int numeof = 0;
 
@@ -66,13 +65,13 @@ update_vars(vp)
 	dohash(NULL, NULL);
     }
     else if (eq(vp, STRhistchars)) {
-	register Char *pn = varval(vp);
+	Char *pn = varval(vp);
 
 	HIST = *pn++;
 	HISTSUB = *pn;
     }
     else if (eq(vp, STRpromptchars)) {
-	register Char *pn = varval(vp);
+	Char *pn = varval(vp);
 
 	PRCH = *pn++;
 	PRCHROOT = *pn;
@@ -94,7 +93,7 @@ update_vars(vp)
 	loginsh = 1;
     }
     else if (eq(vp, STRsymlinks)) {
-	register Char *pn = varval(vp);
+	Char *pn = varval(vp);
 
 	if (eq(pn, STRignore))
 	    symlinks = SYM_IGNORE;
@@ -206,10 +205,10 @@ update_vars(vp)
 /*ARGSUSED*/
 void
 doset(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register Char *p;
+    Char *p;
     Char   *vp, op;
     Char  **vecp;
     bool    hadsub;
@@ -276,7 +275,7 @@ doset(v, c)
 	if (op && op != '=')
 	    stderror(ERR_NAME | ERR_SYNTAX);
 	if (eq(p, STRLparen)) {
-	    register Char **e = v;
+	    Char **e = v;
 
 	    if (hadsub)
 		stderror(ERR_NAME | ERR_SYNTAX);
@@ -309,8 +308,8 @@ doset(v, c)
 
 static Char *
 getinx(cp, ip)
-    register Char *cp;
-    register int *ip;
+    Char *cp;
+    int *ip;
 {
     *ip = 0;
     *cp++ = 0;
@@ -327,7 +326,7 @@ asx(vp, subscr, p)
     int     subscr;
     Char   *p;
 {
-    register struct varent *v = getvx(vp, subscr);
+    struct varent *v = getvx(vp, subscr);
 
     if (v->v_flags & VAR_READONLY)
 	stderror(ERR_READONLY|ERR_NAME, v->v_name);
@@ -340,7 +339,7 @@ getvx(vp, subscr)
     Char   *vp;
     int     subscr;
 {
-    register struct varent *v = adrof(vp);
+    struct varent *v = adrof(vp);
 
     if (v == 0)
 	udvar(vp);
@@ -355,7 +354,7 @@ dolet(v, dummy)
     Char  **v;
     struct command *dummy;
 {
-    register Char *p;
+    Char *p;
     Char   *vp, c, op;
     bool    hadsub;
     int     subscr;
@@ -443,7 +442,7 @@ static Char *
 xset(cp, vp)
     Char   *cp, ***vp;
 {
-    register Char *dp;
+    Char *dp;
 
     if (*cp) {
 	dp = Strsave(cp);
@@ -461,9 +460,9 @@ operate(op, vp, p)
 {
     Char    opr[2];
     Char   *vec[5];
-    register Char **v = vec;
+    Char **v = vec;
     Char  **vecp = v;
-    register int i;
+    int i;
 
     if (op != '=') {
 	if (*vp)
@@ -486,7 +485,7 @@ static Char *putp, nbuf[50];
 
 Char   *
 putn(n)
-    register int n;
+    int n;
 {
     int     num;
 
@@ -518,7 +517,7 @@ putn(n)
 
 static void
 putn1(n)
-    register int n;
+    int n;
 {
     if (n > 9)
 	putn1(n / 10);
@@ -527,9 +526,9 @@ putn1(n)
 
 int
 getn(cp)
-    register Char *cp;
+    Char *cp;
 {
-    register int n;
+    int n;
     int     sign;
 
     if (!cp)			/* PWP: extra error checking */
@@ -557,7 +556,7 @@ value1(var, head)
     Char   *var;
     struct varent *head;
 {
-    register struct varent *vp;
+    struct varent *vp;
 
     if (!var || !head)		/* PWP: extra error checking */
 	return (STRNULL);
@@ -570,9 +569,9 @@ value1(var, head)
 static struct varent *
 madrof(pat, vp)
     Char   *pat;
-    register struct varent *vp;
+    struct varent *vp;
 {
-    register struct varent *vp1;
+    struct varent *vp1;
 
     for (vp = vp->v_left; vp; vp = vp->v_right) {
 	if (vp->v_left && (vp1 = madrof(pat, vp)) != NULL)
@@ -585,8 +584,8 @@ madrof(pat, vp)
 
 struct varent *
 adrof1(name, v)
-    register Char *name;
-    register struct varent *v;
+    Char *name;
+    struct varent *v;
 {
     int cmp;
 
@@ -608,7 +607,7 @@ set(var, val, flags)
     Char   *var, *val;
     int	   flags;
 {
-    register Char **vec = (Char **) xmalloc((size_t) (2 * sizeof(Char **)));
+    Char **vec = (Char **) xmalloc((size_t) (2 * sizeof(Char **)));
 
     vec[0] = val;
     vec[1] = 0;
@@ -621,7 +620,7 @@ set1(var, vec, head, flags)
     struct varent *head;
     int flags;
 {
-    register Char **oldv = vec;
+    Char **oldv = vec;
 
     if ((flags & VAR_NOGLOB) == 0) {
 	gflag = 0;
@@ -693,11 +692,11 @@ set1(var, vec, head, flags)
 void
 setq(name, vec, p, flags)
     Char   *name, **vec;
-    register struct varent *p;
+    struct varent *p;
     int flags;
 {
-    register struct varent *c;
-    register int f;
+    struct varent *c;
+    int f;
 
     f = 0;			/* tree hangs off the header's left link */
     while ((c = p->v_link[f]) != 0) {
@@ -786,11 +785,11 @@ unset(v, c)
 
 void
 unset1(v, head)
-    register Char *v[];
+    Char *v[];
     struct varent *head;
 {
-    register struct varent *vp;
-    register int cnt;
+    struct varent *vp;
+    int cnt;
 
     while (*++v) {
 	cnt = 0;
@@ -808,7 +807,7 @@ void
 unsetv(var)
     Char   *var;
 {
-    register struct varent *vp;
+    struct varent *vp;
 
     if ((vp = adrof1(var, &shvhed)) == 0)
 	udvar(var);
@@ -817,10 +816,10 @@ unsetv(var)
 
 static void
 unsetv1(p)
-    register struct varent *p;
+    struct varent *p;
 {
-    register struct varent *c, *pp;
-    register int f;
+    struct varent *c, *pp;
+    int f;
 
     /*
      * Free associated memory first to avoid complications.
@@ -870,11 +869,11 @@ setNS(cp)
 /*ARGSUSED*/
 void
 shift(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register struct varent *argv;
-    register Char *name;
+    struct varent *argv;
+    Char *name;
 
     USE(c);
     v++;
@@ -966,15 +965,15 @@ rright(p)
  */
 static void
 balance(p, f, d)
-    register struct varent *p;
-    register int f, d;
+    struct varent *p;
+    int f, d;
 {
-    register struct varent *pp;
+    struct varent *pp;
 
 #ifndef lint
-    register struct varent *t;	/* used by the rotate macros */
+    struct varent *t;	/* used by the rotate macros */
 #endif /* !lint */
-    register int ff;
+    int ff;
 #ifdef lint
     ff = 0;	/* Sun's lint is dumb! */
 #endif
@@ -1071,11 +1070,11 @@ balance(p, f, d)
 
 void
 plist(p, what)
-    register struct varent *p;
+    struct varent *p;
     int what;
 {
-    register struct varent *c;
-    register int len;
+    struct varent *c;
+    int len;
 
     if (setintr)
 #ifdef BSDSIGS

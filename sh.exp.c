@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exp.c,v 3.40 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exp.c,v 3.41 2004/08/01 20:45:10 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.40 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.41 2004/08/01 20:45:10 christos Exp $")
 
 #include "tw.h"
 
@@ -200,23 +200,23 @@ sh_access(fname, mode)
 
 int
 expr(vp)
-    register Char ***vp;
+    Char ***vp;
 {
     return (exp0(vp, 0));
 }
 
 int
 exp0(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
-    register int p1 = exp1(vp, ignore);
+    int p1 = exp1(vp, ignore);
 
 #ifdef EDEBUG
     etraci("exp0 p1", p1, vp);
 #endif /* EDEBUG */
     if (**vp && eq(**vp, STRor2)) {
-	register int p2;
+	int p2;
 
 	(*vp)++;
 	p2 = exp0(vp, (ignore & TEXP_IGNORE) || p1);
@@ -230,16 +230,16 @@ exp0(vp, ignore)
 
 static int
 exp1(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
-    register int p1 = exp2x(vp, ignore);
+    int p1 = exp2x(vp, ignore);
 
 #ifdef EDEBUG
     etraci("exp1 p1", p1, vp);
 #endif /* EDEBUG */
     if (**vp && eq(**vp, STRand2)) {
-	register int p2;
+	int p2;
 
 	(*vp)++;
 	p2 = exp1(vp, (ignore & TEXP_IGNORE) || !p1);
@@ -253,16 +253,16 @@ exp1(vp, ignore)
 
 static int
 exp2x(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
-    register int p1 = exp2a(vp, ignore);
+    int p1 = exp2a(vp, ignore);
 
 #ifdef EDEBUG
     etraci("exp3 p1", p1, vp);
 #endif /* EDEBUG */
     if (**vp && eq(**vp, STRor)) {
-	register int p2;
+	int p2;
 
 	(*vp)++;
 	p2 = exp2x(vp, ignore);
@@ -276,16 +276,16 @@ exp2x(vp, ignore)
 
 static int
 exp2a(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
-    register int p1 = exp2b(vp, ignore);
+    int p1 = exp2b(vp, ignore);
 
 #ifdef EDEBUG
     etraci("exp2a p1", p1, vp);
 #endif /* EDEBUG */
     if (**vp && eq(**vp, STRcaret)) {
-	register int p2;
+	int p2;
 
 	(*vp)++;
 	p2 = exp2a(vp, ignore);
@@ -299,16 +299,16 @@ exp2a(vp, ignore)
 
 static int
 exp2b(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
-    register int p1 = exp2c(vp, ignore);
+    int p1 = exp2c(vp, ignore);
 
 #ifdef EDEBUG
     etraci("exp2b p1", p1, vp);
 #endif /* EDEBUG */
     if (**vp && eq(**vp, STRand)) {
-	register int p2;
+	int p2;
 
 	(*vp)++;
 	p2 = exp2b(vp, ignore);
@@ -322,12 +322,12 @@ exp2b(vp, ignore)
 
 static int
 exp2c(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
-    register Char *p1 = exp3(vp, ignore);
-    register Char *p2;
-    register int i;
+    Char *p1 = exp3(vp, ignore);
+    Char *p2;
+    int i;
 
 #ifdef EDEBUG
     etracc("exp2c p1", p1, vp);
@@ -370,11 +370,11 @@ exp2c(vp, ignore)
 
 static Char *
 exp3(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
-    register Char *p1, *p2;
-    register int i;
+    Char *p1, *p2;
+    int i;
 
     p1 = exp3a(vp, ignore);
 #ifdef EDEBUG
@@ -416,11 +416,11 @@ exp3(vp, ignore)
 
 static Char *
 exp3a(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
-    register Char *p1, *p2, *op;
-    register int i;
+    Char *p1, *p2, *op;
+    int i;
 
     p1 = exp4(vp, ignore);
 #ifdef EDEBUG
@@ -446,18 +446,18 @@ exp3a(vp, ignore)
 
 static Char *
 exp4(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
-    register Char *p1, *p2;
-    register int i = 0;
+    Char *p1, *p2;
+    int i = 0;
 
     p1 = exp5(vp, ignore);
 #ifdef EDEBUG
     etracc("exp4 p1", p1, vp);
 #endif /* EDEBUG */
     if (isa(**vp, ADDOP)) {
-	register Char *op = *(*vp)++;
+	Char *op = *(*vp)++;
 
 	p2 = exp4(vp, ignore);
 #ifdef EDEBUG
@@ -483,11 +483,11 @@ exp4(vp, ignore)
 
 static Char *
 exp5(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
-    register Char *p1, *p2;
-    register int i = 0;
+    Char *p1, *p2;
+    int i = 0;
 
     p1 = exp6(vp, ignore);
 #ifdef EDEBUG
@@ -495,7 +495,7 @@ exp5(vp, ignore)
 #endif /* EDEBUG */
 
     if (isa(**vp, MULOP)) {
-	register Char *op = *(*vp)++;
+	Char *op = *(*vp)++;
 	if ((ignore & TEXP_NOGLOB) != 0) 
 	    /* 
 	     * We are just trying to get the right side of
@@ -537,11 +537,11 @@ exp5(vp, ignore)
 
 static Char *
 exp6(vp, ignore)
-    register Char ***vp;
+    Char ***vp;
     bool    ignore;
 {
     int     ccode, i = 0;
-    register Char *cp;
+    Char *cp;
 
     if (**vp == 0)
 	stderror(ERR_NAME | ERR_EXPRESSION);
@@ -577,7 +577,7 @@ exp6(vp, ignore)
 	return (putn(ccode));
     }
     if (eq(**vp, STRLbrace)) {
-	register Char **v;
+	Char **v;
 	struct command faket;
 	Char   *fakecom[2];
 
@@ -990,18 +990,18 @@ filetest(cp, vp, ignore)
 
 static void
 evalav(v)
-    register Char **v;
+    Char **v;
 {
     struct wordent paraml1;
-    register struct wordent *hp = &paraml1;
+    struct wordent *hp = &paraml1;
     struct command *t;
-    register struct wordent *wdp = hp;
+    struct wordent *wdp = hp;
 
     set(STRstatus, Strsave(STR0), VAR_READWRITE);
     hp->prev = hp->next = hp;
     hp->word = STRNULL;
     while (*v) {
-	register struct wordent *new =
+	struct wordent *new =
 	(struct wordent *) xcalloc(1, sizeof *wdp);
 
 	new->prev = wdp;
@@ -1021,8 +1021,8 @@ evalav(v)
 
 static int
 isa(cp, what)
-    register Char *cp;
-    register int what;
+    Char *cp;
+    int what;
 {
     if (cp == 0)
 	return ((what & RESTOP) != 0);
@@ -1072,7 +1072,7 @@ isa(cp, what)
 
 static int
 egetn(cp)
-    register Char *cp;
+    Char *cp;
 {
     if (*cp && *cp != '-' && !Isdigit(*cp))
 	stderror(ERR_NAME | ERR_EXPRESSION);

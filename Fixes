@@ -1,3 +1,6 @@
+ 18. de-register, de-extern, de-shadow, and const poison.
+ 17. WIDE_STRINGS support (Miloslav Trmac)
+ 16. warning cleanups (Miloslav Trmac)
  15. nlsclose() arg passing, exp2 is now a gcc builtin (Mark Peek)
  14. iconv malloc portability fix.
  13. make automatic dspmbyte determination case insensitive

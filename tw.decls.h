@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.decls.h,v 3.17 2000/06/11 02:14:16 kim Exp $ */
+/* $Header: /src/pub/tcsh/tw.decls.h,v 3.18 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -117,7 +117,7 @@ extern	 int		  tw_complete		__P((Char *, Char **,
  * tw.color.c
  */
 extern	 void		  set_color_context	__P((void));
-extern	 void		  print_with_color	__P((Char *, size_t, int));
+extern	 void		  print_with_color	__P((Char *, size_t, Char));
 extern	 void		  parseLS_COLORS	__P((Char *));
 #endif /* COLOR_LS_F */
 

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.116 2004/07/24 21:52:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.117 2004/08/04 14:28:23 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -82,12 +82,29 @@
 #endif
 
 #ifdef SHORT_STRINGS
+# ifdef WIDE_STRINGS
+/* This belongs in config_f.h, but SIZEOF_WCHAR_T is only defined after
+   including config_h.h */
+#  if SIZEOF_WCHAR_T < 4
+#   error "wchar_t must be at least 4 bytes for WIDE_STRINGS"
+#  endif
+#include <wchar.h>
+typedef wchar_t Char;
+typedef unsigned long uChar;
+typedef wint_t eChar; /* Can contain any Char value or CHAR_ERR */
+#define CHAR_ERR WEOF /* Pretty please, use bit 31... */
+# else
 typedef short Char;
 typedef unsigned short uChar;
+typedef int eChar;
+#define CHAR_ERR (-1)
+# endif
 # define SAVE(a) (Strsave(str2short(a)))
 #else
 typedef char Char;
 typedef unsigned char uChar;
+typedef int eChar;
+#define CHAR_ERR (-1)
 # define SAVE(a) (strsave(a))
 #endif 
 
@@ -663,9 +680,9 @@ EXTERN int     backpid;		/* pid of the last background job */
  * uid_t and gid_t are not defined in all the systems so I would have to
  * make special cases for them. In the future...
  */
-EXTERN int     uid, euid, 	/* Invokers real and effective */
-	       gid, egid;	/* User and group ids */
-EXTERN int     opgrp,		/* Initial pgrp and tty pgrp */
+EXTERN uid_t   uid, euid; 	/* Invokers real and effective */
+EXTERN gid_t   gid, egid;	/* User and group ids */
+EXTERN pid_t   opgrp,		/* Initial pgrp and tty pgrp */
                shpgrp,		/* Pgrp of shell */
                tpgrp;		/* Terminal process group */
 				/* If tpgrp is -1, leave tty alone! */
@@ -760,7 +777,17 @@ extern signalfun_t parterm;	/* Parents terminate catch */
  */
 #define		META		0200
 #define		ASCII		0177
-#ifdef SHORT_STRINGS
+#ifdef WIDE_STRINGS		/* Implies SHORT_STRINGS */
+/* 31st char bit used for 'ing (not 32nd, we want all values nonnegative) */
+# define	QUOTE		0x40000000
+# define	TRIM		0x3FFFFFFF /* Mask to strip quote bit */
+# define	UNDER		0x20000000 /* Underline flag */
+# define	BOLD		0x10000000 /* Bold flag */
+# define	STANDOUT	0x08000000 /* Standout flag */
+# define	LITERAL		0x04000000 /* Literal character flag */
+# define	ATTRIBUTES	0x3C000000 /* The bits used for attributes */
+# define	CHAR		0x001FFFFF /* Mask to mask out the character */
+#elif defined (SHORT_STRINGS)
 # define	QUOTE 	((Char)	0100000)/* 16nth char bit used for 'ing */
 # define	TRIM		0077777	/* Mask to strip quote bit */
 # define	UNDER		0040000	/* Underline flag */
@@ -790,11 +817,15 @@ EXTERN int     AsciiOnly;	/* If set only 7 bits expected in characters */
  * in the buffer.
  */
 EXTERN struct Bin {
-    off_t   Bfseekp;		/* Seek pointer */
+    off_t   Bfseekp;		/* Seek pointer, generally != lseek() value */
     off_t   Bfbobp;		/* Seekp of beginning of buffers */
     off_t   Bfeobp;		/* Seekp of end of buffers */
     int     Bfblocks;		/* Number of buffer blocks */
     Char  **Bfbuf;		/* The array of buffer blocks */
+#ifdef WIDE_STRINGS
+    /* Number of bytes in each character if (cantell) */
+    unsigned char Bfclens[BUFSIZE + 1];
+#endif
 }       B;
 
 /*
@@ -825,6 +856,7 @@ extern int aret;		/* Type of last char returned */
 #define	feobp	B.Bfeobp
 #define	fblocks	B.Bfblocks
 #define	fbuf	B.Bfbuf
+#define fclens  B.Bfclens
 
 /*
  * The shell finds commands in loops by reseeking the input
@@ -965,7 +997,7 @@ typedef void (*bfunc_t) __P((Char **, struct command *));
 #endif /* hpux && __STDC__ && !__GNUC__ */
 
 extern struct biltins {
-    char   *bname;
+    const char   *bname;
     bfunc_t bfunct;
     int     minargs, maxargs;
 } bfunc[];
@@ -974,11 +1006,12 @@ extern int nbfunc;
 extern struct biltins  nt_bfunc[];
 extern int nt_nbfunc;
 #endif /* WINNT_NATIVE*/
+extern int bequiet;
 
 extern struct srch {
-    char   *s_name;
-    int     s_value;
-}       srchn[];
+    const char *s_name;
+    int  s_value;
+} srchn[];
 extern int nsrchn;
 
 /*
@@ -1053,10 +1086,10 @@ EXTERN int   gflag;		/* After tglob -> is globbing needed? */
  * resource limits
  */
 extern struct limits {
-    int     limconst;
-    char   *limname;
-    int     limdiv;
-    char   *limscale;
+    int         limconst;
+    const char *limname;
+    int         limdiv;
+    const char *limscale;
 } limits[];
 #endif /* !HAVENOLIMIT */
 
@@ -1107,8 +1140,12 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
  * For operating systems with single case filenames (OS/2)
  */
 #ifdef CASE_INSENSITIVE
-# define samecase(x) (isupper((unsigned char)(x)) ? \
-		      tolower((unsigned char)(x)) : (x))
+# ifdef WIDE_STRINGS
+#  define samecase(x) (towlower(x))
+# else
+#  define samecase(x) (isupper((unsigned char)(x)) ? \
+		       tolower((unsigned char)(x)) : (x))
+# endif
 #else
 # define samecase(x) (x)
 #endif /* CASE_INSENSITIVE */
@@ -1138,6 +1175,17 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 #define short2blk(a) 		saveblk(a)
 #define short2str(a) 		strip(a)
 #else
+#ifdef WIDE_STRINGS
+#define Strchr(a, b)		wcschr(a, b)
+#define Strrchr(a, b)		wcsrchr(a, b)
+#define Strcat(a, b)  		wcscat(a, b)
+#define Strncat(a, b, c) 	wcsncat(a, b, c)
+#define Strcpy(a, b)  		wcscpy(a, b)
+#define Strncpy(a, b, c)	wcsncpy(a, b, c)
+#define Strlen(a)		wcslen(a)
+#define Strcmp(a, b)		wcscmp(a, b)
+#define Strncmp(a, b, c)	wcsncmp(a, b, c)
+#else
 #define Strchr(a, b)		s_strchr(a, b)
 #define Strrchr(a, b) 		s_strrchr(a, b)
 #define Strcat(a, b)  		s_strcat(a, b)
@@ -1147,6 +1195,7 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 #define Strlen(a)		s_strlen(a)
 #define Strcmp(a, b)		s_strcmp(a, b)
 #define Strncmp(a, b, c)	s_strncmp(a, b, c)
+#endif
 #define Strcasecmp(a, b)	s_strcasecmp(a, b)
 
 #define Strspl(a, b)		s_strspl(a, b)
@@ -1158,7 +1207,7 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 /*
  * setname is a macro to save space (see sh.err.c)
  */
-EXTERN char   *bname;
+EXTERN const char   *bname;
 
 #define	setname(a)	(bname = (a))
 
@@ -1173,9 +1222,9 @@ EXTERN Char  **evalvec;
 EXTERN Char   *evalp;
 
 extern struct mesg {
-    char   *iname;		/* name from /usr/include */
-    char   *pname;		/* print name */
-}       mesg[];
+    const char   *iname;	/* name from /usr/include */
+    char *pname;		/* print name */
+} mesg[];
 
 /* word_chars is set by default to WORD_CHARS but can be overridden by
    the worchars variable--if unset, reverts to WORD_CHARS */
@@ -1199,6 +1248,20 @@ extern Char    **INVPPTR;
 
 extern char    *progname;
 extern int	tcsh;
+extern bool	xlate_cr;
+extern bool	output_raw;
+extern int	lbuffed;
+extern time_t	Htime;
+extern int	numeof;
+extern int 	insource;
+extern char	linbuf[];
+extern char 	*linp;
+extern int	nsig;
+#ifdef VFORK
+extern bool	use_fork;
+#endif
+extern bool	tellwhat;
+extern bool	NoNLSRebind;
 
 #include "tc.h"
 

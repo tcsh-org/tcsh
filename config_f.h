@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.25 2002/03/08 17:36:45 christos Exp $ */
+/* $Header: /src/pub/tcsh/config_f.h,v 3.26 2004/03/21 16:48:14 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -39,12 +39,28 @@
 #define _h_config_f
 
 /*
- * SHORT_STRINGS Use 16 bit characters instead of 8 bit chars
+ * SHORT_STRINGS Use at least 16 bit characters instead of 8 bit chars
  * 	         This fixes up quoting problems and eases implementation
  *	         of nls...
  *
  */
 #define SHORT_STRINGS
+
+/*
+ * WIDE_STRINGS	Represent strings using wide characters
+ *		Allows proper function in multibyte encodings like UTF-8
+ */
+#define WIDE_STRINGS
+
+#ifdef WIDE_STRINGS
+# ifdef WINNT_NATIVE
+#  error "WIDE_STRINGS cannot be used together with WINNT_NATIVE"
+# endif
+
+# ifndef SHORT_STRINGS
+#  error "SHORT_STRINGS must be defined if WIDE_STRINGS is defined"
+# endif
+#endif
 
 /*
  * NLS:		Use Native Language System
@@ -53,6 +69,10 @@
  *		to define this.
  */
 #define NLS
+
+#if defined(WIDE_STRINGS) && !defined (NLS)
+# error "NLS must be defined if WIDE_STRINGS is defined"
+#endif
 
 /*
  * NLS_CATALOGS:Use Native Language System catalogs for
@@ -110,7 +130,7 @@
 
 /*
  * KANJI	Ignore meta-next, and the ISO character set. Should
- *		be used with SHORT_STRINGS
+ *		be used with SHORT_STRINGS (or WIDE_STRINGS)
  *
  */
 #define KANJI
@@ -120,7 +140,11 @@
  *		only output, when "dspmbyte" is set. Should be used with
  *		KANJI
  */
-#define DSPMBYTE
+#undef DSPMBYTE
+
+#if defined (WIDE_STRINGS) && defined (DSPMBYTE)
+# error "DSPMBYTE must not be defined if WIDE_STRINGS is defined"
+#endif
 
 /*
  * MBYTEDEBUG	when "dspmbyte" is changed, set multi-byte checktable to

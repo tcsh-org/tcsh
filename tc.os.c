@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.c,v 3.54 2002/11/21 20:02:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.c,v 3.55 2004/02/21 20:34:25 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.54 2002/11/21 20:02:01 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.55 2004/02/21 20:34:25 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -362,7 +362,7 @@ dosetspath(v, c)
     dont_free = 1;
     for (i = 0, v++; *v && *v[0] != '\0'; v++, i++) {
 	s = short2str(*v);
-	if (Isdigit(*s))
+	if (isdigit(*s))
 	    p[i] = atoi(s);
 	else if (strcmp(s, "LOCAL") == 0)
 	    p[i] = NULLSITE;
@@ -653,14 +653,14 @@ dowarp(v, c)
 /*ARGSUSED*/
 void
 douniverse(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register Char *cp = v[1];
-    register Char *cp2;		/* dunno how many elements v comes in with */
+    Char *cp = v[1];
+    Char *cp2;		/* dunno how many elements v comes in with */
     char    ubuf[100];
 #ifdef BSDSIGS
-    register sigmask_t omask = 0;
+    sigmask_t omask = 0;
 #endif /* BSDSIGS */
 
     if (cp == 0) {
@@ -799,11 +799,11 @@ bs2cmdlist(char *str)
 /*ARGSUSED*/
 void
 dobs2cmd(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register Char *cp;
-    register int  i = 0, len = 0;
+    Char *cp;
+    int  i = 0, len = 0;
     char *cmd = NULL;
     int     pvec[2];
     struct command faket;
@@ -840,7 +840,7 @@ dobs2cmd(v, c)
     /* 2nd round: fill cmd buffer */
     i = 0;
     while ((cp = *v++) != 0) {
-	register int c;
+	int c;
 	while (c = *cp++)
 	    cmd[i++] = (char)c;
         if (*v)
@@ -909,13 +909,13 @@ dobs2cmd(v, c)
 /*ARGSUSED*/
 void
 doatt(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register Char *cp = v[1];
+    Char *cp = v[1];
     char    ubuf[100];
 #ifdef BSDSIGS
-    register sigmask_t omask = 0;
+    sigmask_t omask = 0;
 #endif /* BSDSIGS */
 
     if (cp == 0)
@@ -944,13 +944,13 @@ doatt(v, c)
 /*ARGSUSED*/
 void
 doucb(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register Char *cp = v[1];
+    Char *cp = v[1];
     char    ubuf[100];
 #ifdef BSDSIGS
-    register sigmask_t omask = 0;
+    sigmask_t omask = 0;
 #endif /* BSDSIGS */
 
     if (cp == 0)
@@ -1495,10 +1495,10 @@ xgetcwd(pathname, pathlen)
  */
 static char *
 strnrcpy(ptr, str, siz)
-    register char *ptr, *str;
+    char *ptr, *str;
     size_t siz;
 {
-    register int len = strlen(str);
+    int len = strlen(str);
     if (siz == 0)
 	return ptr;
 

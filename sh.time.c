@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.time.c,v 3.24 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.time.c,v 3.25 2002/06/25 19:02:11 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.24 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.25 2002/06/25 19:02:11 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -160,10 +160,10 @@ dotime(v, c)
 /*ARGSUSED*/
 void
 donice(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register Char *cp;
+    Char *cp;
     int	    nval = 0;
 
     USE(c);
@@ -183,7 +183,7 @@ donice(v, c)
 #ifdef BSDTIMES
 void
 ruadd(ru, ru2)
-    register struct sysrusage *ru,	*ru2;
+    struct sysrusage *ru,	*ru2;
 {
     tvadd(&ru->ru_utime, &ru2->ru_utime);
     tvadd(&ru->ru_stime, &ru2->ru_stime);
@@ -217,7 +217,7 @@ ruadd(ru, ru2)
 # ifdef	_SEQUENT_
 void
 ruadd(ru, ru2)
-    register struct process_stats *ru, *ru2;
+    struct process_stats *ru, *ru2;
 {
     tvadd(&ru->ps_utime, &ru2->ps_utime);
     tvadd(&ru->ps_stime, &ru2->ps_stime);
@@ -289,14 +289,14 @@ ruadd(ru, ru2)
 
 void
 prusage(r0, r1,	e, b)
-    register struct sysrusage *r0,	*r1;
+    struct sysrusage *r0,	*r1;
     timeval_t *e, *b;
 
 #else /* BSDTIMES */
 # ifdef	_SEQUENT_
 void
 prusage(r0, r1,	e, b)
-    register struct process_stats *r0, *r1;
+    struct process_stats *r0, *r1;
     timeval_t *e, *b;
 
 # else /* _SEQUENT_ */
@@ -315,7 +315,7 @@ prusage(bs, es,	e, b)
 #endif /* BSDTIMES */
 {
 #ifdef BSDTIMES
-    register time_t t =
+    time_t t =
     (r1->ru_utime.tv_sec - r0->ru_utime.tv_sec)	* 100 +
     (r1->ru_utime.tv_usec - r0->ru_utime.tv_usec) / 10000 +
     (r1->ru_stime.tv_sec - r0->ru_stime.tv_sec)	* 100 +
@@ -323,7 +323,7 @@ prusage(bs, es,	e, b)
 
 #else
 # ifdef	_SEQUENT_
-    register time_t t =
+    time_t t =
     (r1->ps_utime.tv_sec - r0->ps_utime.tv_sec)	* 100 +
     (r1->ps_utime.tv_usec - r0->ps_utime.tv_usec) / 10000 +
     (r1->ps_stime.tv_sec - r0->ps_stime.tv_sec)	* 100 +
@@ -331,20 +331,20 @@ prusage(bs, es,	e, b)
 
 # else /* _SEQUENT_ */
 #  ifndef POSIX
-    register time_t t =	(es->tms_utime - bs->tms_utime +
+    time_t t =	(es->tms_utime - bs->tms_utime +
 			 es->tms_stime - bs->tms_stime)	* 100 /	HZ;
 
 #  else	/* POSIX */
-    register clock_t t = (es->tms_utime	- bs->tms_utime	+
+    clock_t t = (es->tms_utime	- bs->tms_utime	+
 			  es->tms_stime	- bs->tms_stime) * 100 / clk_tck;
 
 #  endif /* POSIX */
 # endif	/* _SEQUENT_ */
 #endif /* BSDTIMES */
 
-    register char *cp;
-    register long i;
-    register struct varent *vp = adrof(STRtime);
+    const char *cp;
+    long i;
+    struct varent *vp = adrof(STRtime);
 
 #ifdef BSDTIMES
 # ifdef	convex

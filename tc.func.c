@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.109 2004/07/02 03:07:22 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.110 2004/08/04 14:28:24 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.109 2004/07/02 03:07:22 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.110 2004/08/04 14:28:24 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -67,7 +67,7 @@ static bool beepcmd_active = 0;
 static signalfun_t alm_fun = NULL;
 
 static	void	 auto_logout	__P((int));
-static	char	*xgetpass	__P((char *));
+static	char	*xgetpass	__P((const char *));
 static	void	 auto_lock	__P((int));
 #ifdef BSDJOBS
 static	void	 insert		__P((struct wordent *, bool));
@@ -109,10 +109,10 @@ expand_lex(buf, bufsiz, sp0, from, to)
     struct  wordent *sp0;
     int     from, to;
 {
-    register struct wordent *sp;
-    register Char *s, *d, *e;
-    register Char prev_c;
-    register int i;
+    struct wordent *sp;
+    Char *s, *d, *e;
+    Char prev_c;
+    int i;
 
     /*
      * Make sure we have enough space to expand into.  E.g. we may have
@@ -227,17 +227,11 @@ Itoa(n, s, min_digits, attributes)
 /*ARGSUSED*/
 void
 dolist(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
     int     i, k;
     struct stat st;
-#if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
-    extern bool dspmbyte_ls;
-#endif
-#ifdef COLOR_LS_F
-    extern bool color_context_ls;
-#endif /* COLOR_LS_F */
 
     USE(c);
     if (*++v == NULL) {
@@ -260,8 +254,6 @@ dolist(v, c)
 	/*
 	 * We cannot process a flag therefore we let ls do it right.
 	 */
-	static Char STRls[] = {'l', 's', '\0'};
-	static Char STRmCF[] = {'-', 'C', 'F', '\0', '\0' };
 	Char *lspath;
 	struct command *t;
 	struct wordent cmd, *nextword, *lastword;
@@ -423,13 +415,13 @@ dolist(v, c)
     }
 }
 
-static char *defaulttell = "ALL";
+static const char *defaulttell = "ALL";
 extern bool GotTermCaps;
 
 /*ARGSUSED*/
 void
 dotelltc(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
     USE(c);
@@ -449,7 +441,7 @@ dotelltc(v, c)
 /*ARGSUSED*/
 void
 doechotc(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
     USE(c);
@@ -523,7 +515,7 @@ cmd_expand(cmd, str)
 /*ARGSUSED*/
 void
 dowhich(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
     int rv = TRUE;
@@ -566,8 +558,9 @@ dowhich(v, c)
 struct process *
 find_stop_ed()
 {
-    register struct process *pp, *retp;
-    register char *ep, *vp, *cp, *p;
+    struct process *pp, *retp;
+    const char *ep, *vp;
+    char *cp, *p;
     int     epl, vpl, pstatus;
 
     if ((ep = getenv("EDITOR")) != NULL) {	/* if we have a value */
@@ -584,9 +577,9 @@ find_stop_ed()
     else 
 	vp = "vi";
 
-    for (vpl = 0; vp[vpl] && !Isspace(vp[vpl]); vpl++)
+    for (vpl = 0; vp[vpl] && !isspace(vp[vpl]); vpl++)
 	continue;
-    for (epl = 0; ep[epl] && !Isspace(ep[epl]); epl++)
+    for (epl = 0; ep[epl] && !isspace(ep[epl]); epl++)
 	continue;
 
     if (pcurrent == NULL)	/* see if we have any jobs */
@@ -638,7 +631,7 @@ find_stop_ed()
 
 void
 fg_proc_entry(pp)
-    register struct process *pp;
+    struct process *pp;
 {
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -683,7 +676,7 @@ fg_proc_entry(pp)
 
 static char *
 xgetpass(prm)
-    char *prm;
+    const char *prm;
 {
     static char pass[PASSMAX + 1];
     int fd, i;
@@ -711,6 +704,12 @@ xgetpass(prm)
     return(pass);
 }
 	
+#ifndef NO_CRYPT
+#ifndef __STDC__
+    extern char *crypt __P(());
+#endif
+#endif
+
 /*
  * Ask the user for his login password to continue working
  * On systems that have a shadow password, this will only 
@@ -729,11 +728,6 @@ auto_lock(n)
     int i;
     char *srpp = NULL;
     struct passwd *pw;
-#ifdef POSIX
-    extern char *crypt __P((const char *, const char *));
-#else
-    extern char *crypt __P(());
-#endif
 
 #undef XCRYPT
 
@@ -1007,7 +1001,7 @@ beep_cmd()
 void
 period_cmd()
 {
-    register Char *vp;
+    Char *vp;
     time_t  t, interval;
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -1228,7 +1222,7 @@ rmstar(cp)
     struct wordent *cp;
 {
     struct wordent *we, *args;
-    register struct wordent *tmp, *del;
+    struct wordent *tmp, *del;
 
 #ifdef RMDEBUG
     static Char STRrmdebug[] = {'r', 'm', 'd', 'e', 'b', 'u', 'g', '\0'};
@@ -1335,7 +1329,7 @@ continue_jobs(cp)
     struct wordent *cp;
 {
     struct wordent *we;
-    register struct process *pp, *np;
+    struct process *pp, *np;
     Char   *cmd, *continue_list, *continue_args_list;
 
 #ifdef CNDEBUG
@@ -1410,8 +1404,8 @@ insert(pl, file_args)
     struct wordent *now, *last;
     Char   *cmd, *bcmd, *cp1, *cp2;
     int     cmd_len;
-    Char   *pause = STRunderpause;
-    int     p_len = (int) Strlen(pause);
+    Char   *upause = STRunderpause;
+    int     p_len = (int) Strlen(upause);
 
     cmd_len = (int) Strlen(pl->word);
     cmd = (Char *) xcalloc(1, (size_t) ((cmd_len + 1) * sizeof(Char)));
@@ -1453,7 +1447,7 @@ insert(pl, file_args)
 	while ((*cp1++ = *cp2++) != '\0')
 	    continue;
 	cp1--;
-	cp2 = pause;
+	cp2 = upause;
 	while ((*cp1++ = *cp2++) != '\0')
 	    continue;
 	insert_we(now, last->prev);
@@ -1511,7 +1505,7 @@ static int
 inlist(list, name)
     Char   *list, *name;
 {
-    register Char *l, *n;
+    Char *l, *n;
 
     l = list;
     n = name;
@@ -1567,7 +1561,7 @@ static Char *
 gethomedir(us)
     Char   *us;
 {
-    register struct passwd *pp;
+    struct passwd *pp;
 #ifdef HESIOD
     char **res, **res1, *cp;
     Char *rp;
@@ -1646,7 +1640,7 @@ gettilde(us)
      * Binary search
      */
     for (bp1 = tcache, bp2 = tcache + tlength; bp1 < bp2;) {
-	register int i;
+	int i;
 
 	bp = bp1 + ((bp2 - bp1) >> 1);
 	if ((i = *us - *bp->user) == 0 && (i = Strcmp(us, bp->user)) == 0)

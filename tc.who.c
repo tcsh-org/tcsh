@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.36 2002/09/15 16:58:52 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.37 2002/11/21 20:02:01 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.36 2002/09/15 16:58:52 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.37 2002/11/21 20:02:01 christos Exp $")
 
 #include "tc.h"
 
@@ -453,9 +453,9 @@ watch_login(force)
 #ifdef WHODEBUG
 static void
 debugwholist(new, wp)
-    register struct who *new, *wp;
+    struct who *new, *wp;
 {
-    register struct who *a;
+    struct who *a;
 
     a = whohead.who_next;
     while (a->who_next != NULL) {
@@ -503,7 +503,7 @@ print_who(wp)
 
     tprintf(FMT_WHO, buf, cp, BUFSIZE, NULL, wp->who_time, (ptr_t) wp);
     for (cp = buf; *cp;)
-	xputchar(*cp++);
+	xputwchar(*cp++);
     xputchar('\n');
 } /* end print_who */
 
@@ -556,13 +556,13 @@ who_info(ptr, c, wbuf, wbufsiz)
 	    return CGETS(26, 12, "local");
 	else {
 	    /* the ':' stuff is for <host>:<display>.<screen> */
-	    for (pb = wp->who_host, flg = Isdigit(*pb) ? '\0' : '.';
+	    for (pb = wp->who_host, flg = isdigit(*pb) ? '\0' : '.';
 		 *pb != '\0' &&
 		 (*pb != flg || ((pb = strchr(pb, ':')) != 0));
 		 pb++) {
 		if (*pb == ':')
 		    flg = '\0';
-		*wb++ = Isupper(*pb) ? Tolower(*pb) : *pb;
+		*wb++ = isupper(*pb) ? tolower(*pb) : *pb;
 	    }
 	    *wb = '\0';
 	    return wbuf;
@@ -573,7 +573,7 @@ who_info(ptr, c, wbuf, wbufsiz)
 	    return CGETS(26, 12, "local");
 	else {
 	    for (pb = wp->who_host; *pb != '\0'; pb++)
-		*wb++ = Isupper(*pb) ? Tolower(*pb) : *pb;
+		*wb++ = isupper(*pb) ? tolower(*pb) : *pb;
 	    *wb = '\0';
 	    return wbuf;
 	}

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.20 2000/06/11 02:14:15 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.print.c,v 3.21 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,13 +32,11 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.20 2000/06/11 02:14:15 kim Exp $")
+RCSID("$Id: sh.print.c,v 3.21 2002/03/08 17:36:46 christos Exp $")
 
 #include "ed.h"
 
 extern int Tty_eight_bit;
-extern int Tty_raw_mode;
-extern Char GettingInput;
 
 int     lbuffed = 1;		/* true if line buffered */
 
@@ -53,7 +51,7 @@ void
 psecs(l)
     long    l;
 {
-    register int i;
+    int i;
 
     i = (int) (l / 3600);
     if (i) {
@@ -84,7 +82,7 @@ pcsecs(l)			/* PWP: print mm:ss.dd, l is in sec*100 */
 # endif /* POSIX */
 #endif /* BSDTIMES */
 {
-    register int i;
+    int i;
 
     i = (int) (l / 360000);
     if (i) {
@@ -105,7 +103,7 @@ minsec:
 
 static void 
 p2dig(i)
-    register int i;
+    int i;
 {
 
     xprintf("%d%d", i / 10, i % 10);
@@ -116,16 +114,40 @@ char   *linp = linbuf;
 bool    output_raw = 0;		/* PWP */
 bool    xlate_cr   = 0;		/* HE */
 
+#ifdef WIDE_STRINGS
+void
+putwraw(Char c)
+{
+    char buf[MB_LEN_MAX];
+    size_t i, len;
+    
+    len = one_wctomb(buf, c & CHAR);
+    for (i = 0; i < len; i++)
+	putraw((unsigned char)buf[i] | (c & ~CHAR));
+}
+
+void
+xputwchar(Char c)
+{
+    char buf[MB_LEN_MAX];
+    size_t i, len;
+    
+    len = one_wctomb(buf, c & CHAR);
+    for (i = 0; i < len; i++)
+	xputchar((unsigned char)buf[i] | (c & ~CHAR));
+}
+#endif
+
 void
 xputchar(c)
-    register int c;
+    int c;
 {
     int     atr = 0;
 
     atr |= c & ATTRIBUTES & TRIM;
     c &= CHAR | QUOTE;
     if (!output_raw && (c & QUOTE) == 0) {
-	if (Iscntrl(c)) {
+	if (iscntrl(c)) {
 #ifdef COLORCAT
 	    if (c != '\t' && c != '\n' && !(adrof(STRcolorcat) && c=='\033') && (xlate_cr || c != '\r')) {
 #else
@@ -133,7 +155,7 @@ xputchar(c)
 #endif
 		xputchar('^' | atr);
 #ifdef IS_ASCII
-		if (c == ASCII)
+		if (c == 0177)
 		    c = '?';
 		else
 		    c |= 0100;
@@ -146,7 +168,7 @@ xputchar(c)
 
 	    }
 	}
-	else if (!Isprint(c)) {
+	else if (!isprint(c) && (c < 0x80 || MB_CUR_MAX == 1)) {
 	    xputchar('\\' | atr);
 	    xputchar((((c >> 6) & 7) + '0') | atr);
 	    xputchar((((c >> 3) & 7) + '0') | atr);
@@ -167,7 +189,7 @@ xputchar(c)
 
 int
 putraw(c)
-    register int c;
+    int c;
 {
     if (haderr ? (didfds ? is2atty : isdiagatty) :
 	(didfds ? is1atty : isoutatty)) {
@@ -183,7 +205,7 @@ putraw(c)
 
 int
 putpure(c)
-    register int c;
+    int c;
 {
     c &= CHAR;
 

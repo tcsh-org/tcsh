@@ -266,7 +266,7 @@ AC_SEARCH_LIBS([iconv], [iconv], [AC_DEFINE([HAVE_ICONV], [1],
 
 dnl This is not good enough; we need sockaddr_storage too.
 dnl See whether we can use IPv6 related functions
-dnl AC_DEFUN(IPv6_CHECK_FUNC, [
+dnl AC_DEFUN([IPv6_CHECK_FUNC], [
 dnl changequote(, )dnl
 dnl ac_tr_lib=HAVE_`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
 dnl   -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
@@ -336,6 +336,11 @@ if test "$hesiod" != no; then
 fi
 AC_SUBST(HESDEF)
 AC_SUBST(HESLIB)
+
+AC_CHECK_HEADERS([wchar.h],
+	[AC_CHECK_SIZEOF([wchar_t], [], [dnl
+#include <stdio.h>
+#include <wchar.h>])])
 
 AC_EXEEXT
 

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.33 2002/07/06 22:28:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.34 2004/08/01 20:49:47 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -54,10 +54,10 @@
 #define KEYCMD   unsigned char	/* size needed to index into CcFuncTbl */
  /* Must be unsigned 		       */
 
-typedef CCRETVAL(*PFCmd) __P((int));	/* pointer to function returning CCRETVAL */
+typedef CCRETVAL(*PFCmd) __P((Char));	/* pointer to function returning CCRETVAL */
 
 struct KeyFuncs {		/* for the "bind" shell command */
-    char   *name;		/* function name for bind command */
+    const char *name;		/* function name for bind command */
     int     func;		/* function numeric value */
     char   *desc;		/* description of function */
 };
@@ -149,11 +149,14 @@ EXTERN int HistWhich;		/* Hist_num is saved in this */
 EXTERN char Expand;		/* true if we are expanding a line */
 extern Char HistLit;		/* true if history lines are shown literal */
 EXTERN Char CurrentHistLit;	/* Literal status of current show history line */
+EXTERN int Tty_raw_mode;
 
 /*
  * These are truly extern
  */
 extern int MacroLvl;
+extern Char *litptr[];
+extern int didsetty;
 
 EXTERN Char *KeyMacro[MAXMACROLEVELS];
 
@@ -207,7 +210,7 @@ EXTERN Char T_HasMeta;		/* true if we have a meta key */
 # define M_NN		3
 #endif /* TERMIO */
 typedef struct { 
-    char *t_name;
+    const char *t_name;
     int  t_setmask;
     int  t_clrmask;
 } ttyperm_t[NN_IO][M_NN];
@@ -228,12 +231,12 @@ extern char *tgoto	__P(());
 # define PUTPURE putpure
 # define PUTRAW putraw
 #else
-extern int   tgetent	__P((char *, char *));
-extern char *tgetstr	__P((char *, char **));
-extern int   tgetflag	__P((char *));
-extern int   tgetnum	__P((char *));
-extern char *tgoto	__P((char *, int, int));
-extern void  tputs	__P((char *, int, void (*)(int)));
+extern int   tgetent	__P((char *, const char *));
+extern char *tgetstr	__P((const char *, char **));
+extern int   tgetflag	__P((const char *));
+extern int   tgetnum	__P((const char *));
+extern char *tgoto	__P((const char *, int, int));
+extern void  tputs	__P((const char *, int, void (*)(int)));
 # define PUTPURE ((void (*)__P((int))) putpure)
 # define PUTRAW ((void (*)__P((int))) putraw)
 #endif

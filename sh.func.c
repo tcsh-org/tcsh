@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.114 2004/08/01 20:44:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.115 2004/08/04 14:28:23 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.114 2004/08/01 20:44:48 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.115 2004/08/04 14:28:23 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -54,7 +54,6 @@ extern char **environ;
 
 extern bool MapsAreInited;
 extern bool NLSMapsAreInited;
-extern bool NoNLSRebind;
 extern bool GotTermCaps;
 
 static int zlast = -1;
@@ -62,7 +61,7 @@ static int zlast = -1;
 static	void	islogin		__P((void));
 static	void	preread		__P((void));
 static	void	doagain		__P((void));
-static  char   *isrchx		__P((int));
+static  const char *isrchx	__P((int));
 static	void	search		__P((int, int, Char *));
 static	int	getword		__P((Char *));
 static	void	toend		__P((void));
@@ -74,8 +73,8 @@ struct biltins *
 isbfunc(t)
     struct command *t;
 {
-    register Char *cp = t->t_dcom[0];
-    register struct biltins *bp, *bp1, *bp2;
+    Char *cp = t->t_dcom[0];
+    struct biltins *bp, *bp1, *bp2;
     static struct biltins label = {"", dozip, 0, 0};
     static struct biltins foregnd = {"%job", dofg1, 0, 0};
     static struct biltins backgnd = {"%job &", dobg1, 0, 0};
@@ -136,8 +135,8 @@ isbfunc(t)
 
 void
 func(t, bp)
-    register struct command *t;
-    register struct biltins *bp;
+    struct command *t;
+    struct biltins *bp;
 {
     int     i;
 
@@ -157,8 +156,8 @@ doonintr(v, c)
     Char  **v;
     struct command *c;
 {
-    register Char *cp;
-    register Char *vv = v[1];
+    Char *cp;
+    Char *vv = v[1];
 
     USE(c);
     if (parintr == SIG_IGN)
@@ -294,11 +293,11 @@ prvars()
 /*ARGSUSED*/
 void
 doalias(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register struct varent *vp;
-    register Char *p;
+    struct varent *vp;
+    Char *p;
 
     USE(c);
     v++;
@@ -406,8 +405,8 @@ doif(v, kp)
     Char  **v;
     struct command *kp;
 {
-    register int i;
-    register Char **vv;
+    int i;
+    Char **vv;
 
     v++;
     i = expr(&v);
@@ -443,7 +442,7 @@ doif(v, kp)
  */
 void
 reexecute(kp)
-    register struct command *kp;
+    struct command *kp;
 {
     kp->t_dflg &= F_SAVE;
     kp->t_dflg |= F_REPEAT;
@@ -483,7 +482,7 @@ void
 gotolab(lab)
     Char *lab;
 {
-    register struct whyle *wp;
+    struct whyle *wp;
     /*
      * While we still can, locate any unknown ends of existing loops. This
      * obscure code is the WORST result of the fact that we don't really parse.
@@ -507,10 +506,10 @@ gotolab(lab)
 /*ARGSUSED*/
 void
 doswitch(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register Char *cp, *lp;
+    Char *cp, *lp;
 
     USE(c);
     v++;
@@ -569,11 +568,11 @@ doexit(v, c)
 /*ARGSUSED*/
 void
 doforeach(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register Char *cp, *sp;
-    register struct whyle *nwp;
+    Char *cp, *sp;
+    struct whyle *nwp;
 
     USE(c);
     v++;
@@ -623,8 +622,8 @@ dowhile(v, c)
     Char  **v;
     struct command *c;
 {
-    register int status;
-    register bool again = whyles != 0 && 
+    int status;
+    bool again = whyles != 0 && 
 			  SEEKEQ(&whyles->w_start, &lineloc) &&
 			  whyles->w_fename == 0;
 
@@ -641,7 +640,7 @@ dowhile(v, c)
     if (*v)
 	stderror(ERR_NAME | ERR_EXPRESSION);
     if (!again) {
-	register struct whyle *nwp =
+	struct whyle *nwp =
 	(struct whyle *) xcalloc(1, sizeof(*nwp));
 
 	nwp->w_start = lineloc;
@@ -740,7 +739,7 @@ dorepeat(v, kp)
     int i = 1;
 
 #ifdef BSDSIGS
-    register sigmask_t omask = 0;
+    sigmask_t omask = 0;
 #endif /* BSDSIGS */
 
     do {
@@ -814,11 +813,11 @@ srchx(cp)
     return (-1);
 }
 
-static char *
+static const char *
 isrchx(n)
-    register int n;
+    int n;
 {
-    register struct srch *sp, *sp2;
+    struct srch *sp, *sp2;
 
     for (sp = srchn, sp2 = srchn + nsrchn; sp < sp2; sp++)
 	if (sp->s_value == n)
@@ -833,12 +832,12 @@ static Char *Sgoal;
 static void
 search(type, level, goal)
     int     type;
-    register int level;
+    int level;
     Char   *goal;
 {
     Char    wordbuf[BUFSIZE];
-    register Char *aword = wordbuf;
-    register Char *cp;
+    Char *aword = wordbuf;
+    Char *cp;
     struct whyle *wp;
     int wlevel = 0;
 
@@ -947,10 +946,10 @@ search(type, level, goal)
 
 static int
 getword(wp)
-    register Char *wp;
+    Char *wp;
 {
     int found = 0, first;
-    int c, d;
+    eChar c, d;
 
     c = readc(1);
     d = 0;
@@ -960,8 +959,8 @@ getword(wp)
 	if (c == '#')
 	    do
 		c = readc(1);
-	    while (c >= 0 && c != '\n');
-	if (c < 0)
+	    while (c != CHAR_ERR && c != '\n');
+	if (c == CHAR_ERR)
 	    goto past;
 	if (c == '\n') {
 	    if (wp)
@@ -981,7 +980,7 @@ getword(wp)
 		else if (d == c)
 		    d = 0;
 	    }
-	    if (c < 0)
+	    if (c == CHAR_ERR)
 		goto past;
 	    if (wp) {
 		*wp++ = (Char) c;
@@ -1084,7 +1083,7 @@ wfree()
 #endif /* FDEBUG */
 
     for (; whyles; whyles = nwp) {
-	register struct whyle *wp = whyles;
+	struct whyle *wp = whyles;
 	nwp = wp->w_next;
 
 #ifdef FDEBUG
@@ -1140,9 +1139,9 @@ doglob(v, c)
 static void
 xecho(sep, v)
     int    sep;
-    register Char **v;
+    Char **v;
 {
-    register Char *cp;
+    Char *cp;
     int     nonl = 0;
 #ifdef ECHO_STYLE
     int	    echo_style = ECHO_STYLE;
@@ -1191,7 +1190,7 @@ xecho(sep, v)
 	nonl++, v++;
 
     while ((cp = *v++) != 0) {
-	register int c;
+	Char c;
 
 	while ((c = *cp++) != 0) {
 	    if ((echo_style & SYSV_ECHO) != 0 && c == '\\') {
@@ -1248,7 +1247,7 @@ xecho(sep, v)
 		    break;
 		}
 	    }
-	    xputchar(c | QUOTE);
+	    xputwchar(c | QUOTE);
 
 	}
 	if (*v)
@@ -1278,7 +1277,7 @@ islocale_var(var)
 	STRLANG,	STRLC_ALL, 	STRLC_CTYPE,	STRLC_NUMERIC,
 	STRLC_TIME,	STRLC_COLLATE,	STRLC_MESSAGES,	STRLC_MONETARY, 0
     };
-    register Char **v;
+    Char **v;
 
     for (v = locale_vars; *v; ++v)
 	if (eq(var, *v))
@@ -1289,12 +1288,10 @@ islocale_var(var)
 /*ARGSUSED*/
 void
 doprintenv(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
     Char   *e;
-    extern bool output_raw;
-    extern bool xlate_cr;
 
     USE(c);
     if (setintr)
@@ -1306,7 +1303,7 @@ doprintenv(v, c)
 
     v++;
     if (*v == 0) {
-	register Char **ep;
+	Char **ep;
 
 	xlate_cr = 1;
 	for (ep = STR_environ; *ep; ep++)
@@ -1328,7 +1325,7 @@ doprintenv(v, c)
 /*ARGSUSED*/
 void
 dosetenv(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
     Char   *vp, *lp;
@@ -1404,7 +1401,7 @@ dosetenv(v, c)
 	tw_cmd_free();	/* since the collation sequence has changed */
 	for (k = 0200; k <= 0377 && !Isprint(k); k++)
 	    continue;
-	AsciiOnly = k > 0377;
+	AsciiOnly = MB_CUR_MAX == 1 && k > 0377;
 #else /* !NLS */
 	AsciiOnly = 0;
 #endif /* NLS */
@@ -1516,7 +1513,7 @@ dosetenv(v, c)
 /*ARGSUSED*/
 void
 dounsetenv(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
     Char  **ep, *p, *n;
@@ -1596,7 +1593,7 @@ dounsetenv(v, c)
 		    tw_cmd_free();/* since the collation sequence has changed */
 		    for (k = 0200; k <= 0377 && !Isprint(k); k++)
 			continue;
-		    AsciiOnly = k > 0377;
+		    AsciiOnly = MB_CUR_MAX == 1 && k > 0377;
 #else /* !NLS */
 		    AsciiOnly = getenv("LANG") == NULL &&
 			getenv("LC_CTYPE") == NULL;
@@ -1651,8 +1648,8 @@ tsetenv(name, val)
     (void) strcpy(nameBuf, cname);
     setenv(nameBuf, short2str(val), 1);
 #else /* !SETENV_IN_LIB */
-    register Char **ep = STR_environ;
-    register Char *cp, *dp;
+    Char **ep = STR_environ;
+    Char *cp, *dp;
     Char   *blk[2];
     Char  **oep = ep;
 
@@ -1692,8 +1689,8 @@ void
 Unsetenv(name)
     Char   *name;
 {
-    register Char **ep = STR_environ;
-    register Char *cp, *dp;
+    Char **ep = STR_environ;
+    Char *cp, *dp;
     Char **oep = ep;
 
 #ifdef WINNT_NATIVE
@@ -1719,11 +1716,11 @@ Unsetenv(name)
 /*ARGSUSED*/
 void
 doumask(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register Char *cp = v[1];
-    register int i;
+    Char *cp = v[1];
+    int i;
 
     USE(c);
     if (cp == 0) {
@@ -1885,7 +1882,7 @@ struct limits limits[] =
 
 static struct limits *findlim	__P((Char *));
 static RLIM_TYPE getval		__P((struct limits *, Char **));
-static void limtail		__P((Char *, char*));
+static void limtail		__P((Char *, const char *));
 static void plim		__P((struct limits *, int));
 static int setlim		__P((struct limits *, int, RLIM_TYPE));
 
@@ -1913,7 +1910,7 @@ static struct limits *
 findlim(cp)
     Char   *cp;
 {
-    register struct limits *lp, *res;
+    struct limits *lp, *res;
 
     res = (struct limits *) NULL;
     for (lp = limits; lp->limconst >= 0; lp++)
@@ -1932,11 +1929,11 @@ findlim(cp)
 /*ARGSUSED*/
 void
 dolimit(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register struct limits *lp;
-    register RLIM_TYPE limit;
+    struct limits *lp;
+    RLIM_TYPE limit;
     int    hard = 0;
 
     USE(c);
@@ -1962,13 +1959,10 @@ dolimit(v, c)
 
 static  RLIM_TYPE
 getval(lp, v)
-    register struct limits *lp;
+    struct limits *lp;
     Char  **v;
 {
-    register float f;
-#ifndef atof	/* This can be a macro on linux */
-    extern double  atof __P((const char *));
-#endif /* atof */
+    float f;
     Char   *cp = *v++;
 
     f = atof(short2str(cp));
@@ -2066,9 +2060,9 @@ badscal:
 static void
 limtail(cp, str)
     Char   *cp;
-    char   *str;
+    const char   *str;
 {
-    char *sp;
+    const char *sp;
 
     sp = str;
     while (*cp && *cp == *str)
@@ -2081,14 +2075,14 @@ limtail(cp, str)
 /*ARGSUSED*/
 static void
 plim(lp, hard)
-    register struct limits *lp;
+    struct limits *lp;
     int hard;
 {
 # ifdef BSDLIMIT
     struct rlimit rlim;
 # endif /* BSDLIMIT */
     RLIM_TYPE limit;
-    int     div = lp->limdiv;
+    int     xdiv = lp->limdiv;
 
     xprintf("%-13.13s", lp->limname);
 
@@ -2112,7 +2106,7 @@ plim(lp, hard)
 	if (limit >= (RLIM_INFINITY / 512))
 	    limit = RLIM_INFINITY;
 	else
-	    div = (div == 1024 ? 2 : 1);
+	    xdiv = (xdiv == 1024 ? 2 : 1);
     }
 # endif /* !BSDLIMIT || FILESIZE512 */
 
@@ -2124,17 +2118,17 @@ plim(lp, hard)
 	psecs((long) limit);
     else
 # endif /* RLIMIT_CPU */
-	xprintf("%ld %s", (long) (limit / div), lp->limscale);
+	xprintf("%ld %s", (long) (limit / xdiv), lp->limscale);
     xputchar('\n');
 }
 
 /*ARGSUSED*/
 void
 dounlimit(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
-    register struct limits *lp;
+    struct limits *lp;
     int    lerr = 0;
     int    hard = 0;
     int	   force = 0;
@@ -2173,7 +2167,7 @@ dounlimit(v, c)
 
 static int
 setlim(lp, hard, limit)
-    register struct limits *lp;
+    struct limits *lp;
     int    hard;
     RLIM_TYPE limit;
 {
@@ -2390,12 +2384,8 @@ struct command *c;
     /* would use print_by_column() in tw.parse.c but that assumes
      * we have an array of Char * to pass.. (sg)
      */
-    extern int Tty_raw_mode;
-    extern int TermH;		/* from the editor routines */
-    extern int lbuffed;		/* from sh.print.c */
-
-    register struct biltins *b;
-    register int row, col, columns, rows;
+    struct biltins *b;
+    int row, col, columns, rows;
     unsigned int w, maxwidth;
 
     USE(c);
@@ -2443,18 +2433,23 @@ struct command *c;
 
 #ifdef HAVE_ICONV
 char *
-iconv_catgets(catd, set_id, msg_id, s)
-nl_catd catd;
+iconv_catgets(ctd, set_id, msg_id, s)
+nl_catd ctd;
 int set_id, msg_id;
 const char *s;
 {
     static char *buf = NULL;
     static size_t buf_size = 0;
   
-    char *src, *orig, *dest, *p;
+    char *orig, *dest, *p;
+#ifdef __NetBSD__
+    const char *src;
+#else
+    char *src;
+#endif
     size_t src_size, dest_size;
   
-    orig = catgets(catd, set_id, msg_id, s);
+    orig = catgets(ctd, set_id, msg_id, s);
     if (catgets_iconv == (iconv_t)-1 || orig == s)
         return orig;
     src = orig;

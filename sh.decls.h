@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.39 2004/03/21 16:48:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.40 2004/07/24 21:52:48 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -172,7 +172,7 @@ extern	int		  Gmatch	__P((Char *, Char *));
 extern	int		  Gnmatch	__P((Char *, Char *, Char **));
 extern	void		  ginit		__P((void));
 extern	Char		**globall	__P((Char **));
-extern	void		  rscan		__P((Char **, void (*)(int)));
+extern	void		  rscan		__P((Char **, void (*)(Char)));
 extern	void		  tglob		__P((Char **));
 extern	void		  trim		__P((Char **));
 #if defined(FILEC) && defined(TIOCSTI)
@@ -210,19 +210,19 @@ extern	void		  btell		__P((struct Ain *));
 extern	void		  btoeof	__P((void));
 extern	void		  copylex	__P((struct wordent *, 
 					     struct wordent *));
-extern	Char		 *domod		__P((Char *, int));
+extern	Char		 *domod		__P((Char *, Char));
 extern	void		  freelex	__P((struct wordent *));
 extern	int		  lex		__P((struct wordent *));
 extern	void		  prlex		__P((struct wordent *));
-extern	int		  readc		__P((bool));
+extern	eChar		  readc		__P((bool));
 extern	void		  settell	__P((void));
-extern	void		  unreadc	__P((int));
+extern	void		  unreadc	__P((Char));
 
 
 /*
  * sh.misc.c
  */
-extern	int		  any		__P((char *, int));
+extern	int		  any		__P((const char *, Char));
 extern	Char		**blkcpy	__P((Char **, Char **));
 extern	void		  blkfree	__P((Char **));
 extern	int		  blklen	__P((Char **));
@@ -284,6 +284,13 @@ extern	void		  psecs		__P((long));
 extern	int		  putpure	__P((int));
 extern	int		  putraw	__P((int));
 extern	void		  xputchar	__P((int));
+#ifdef WIDE_STRINGS
+extern	void		  putwraw	__P((Char));
+extern	void		  xputwchar	__P((Char));
+#else
+# define putwraw(C) putraw(C)
+# define xputwchar(C) xputchar(C)
+#endif
 
 
 /*

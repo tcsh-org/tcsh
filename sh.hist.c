@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.hist.c,v 3.28 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.hist.c,v 3.29 2002/06/25 19:02:11 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.28 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.29 2002/06/25 19:02:11 christos Exp $")
 
 #include "tc.h"
 
@@ -62,8 +62,8 @@ savehist(sp, mflg)
     struct wordent *sp;
     bool mflg;
 {
-    register struct Hist *hp, *np;
-    register int histlen = 0;
+    struct Hist *hp, *np;
+    int histlen = 0;
     Char   *cp;
 
     /* throw away null lines */
@@ -71,7 +71,7 @@ savehist(sp, mflg)
 	return;
     cp = varval(STRhistory);
     if (*cp) {
-	register Char *p = cp;
+	Char *p = cp;
 
 	while (*p) {
 	    if (!Isdigit(*p)) {
@@ -112,14 +112,13 @@ heq(a0, b0)
 struct Hist *
 enthist(event, lp, docopy, mflg)
     int     event;
-    register struct wordent *lp;
+    struct wordent *lp;
     bool    docopy;
     bool    mflg;
 {
-    extern time_t Htime;
     struct Hist *p = NULL, *pp = &Histlist;
     int n, r;
-    register struct Hist *np;
+    struct Hist *np;
     Char *dp;
     
     if ((dp = varval(STRhistdup)) != STRNULL) {
@@ -210,7 +209,7 @@ enthist(event, lp, docopy, mflg)
 
 static void
 hfree(hp)
-    register struct Hist *hp;
+    struct Hist *hp;
 {
 
     freelex(&hp->Hlex);
@@ -313,10 +312,9 @@ dohist1(hp, np, hflg)
 
 static void
 phist(hp, hflg)
-    register struct Hist *hp;
+    struct Hist *hp;
     int     hflg;
 {
-    extern bool output_raw;
     if (hflg & HIST_ONLY) {
        /*
         * Control characters have to be written as is (output_raw).
@@ -349,7 +347,7 @@ phist(hp, hflg)
 
 	tprintf(FMT_HISTORY, buf, cp, INBUFSIZE, NULL, hp->Htime, (ptr_t) hp);
 	for (cp = buf; *cp;)
-	    xputchar(*cp++);
+	    xputwchar(*cp++);
     }
 }
 
@@ -373,8 +371,25 @@ fmthist(fmt, ptr, buf, bufsiz)
 	    Char ibuf[INBUFSIZE], *ip;
 	    char *p;
 	    (void) sprlex(ibuf, sizeof(ibuf) / sizeof(Char), &hp->Hlex);
-	    for (p = buf, ip = ibuf; (*p++ = (CHAR & *ip++)) != '\0'; )
+	    p = buf;
+	    ip = ibuf;
+#ifdef WIDE_STRINGS
+	    do {
+	        char xbuf[MB_LEN_MAX];
+		size_t len;
+
+		len = one_wctomb(xbuf, CHAR & *ip);
+		if ((size_t)((p - xbuf) + len) >= bufsiz)
+		    break;
+		memcpy(p, xbuf, len);
+		p += len;
+	    } while ((CHAR & *ip++) != 0);
+#else	    
+	    while (p < buf + bufsiz - 1 && (*p++ = (CHAR & *ip++)) != '\0')
 		continue;
+#endif
+	    if (p <= buf + bufsiz - 1)
+	        *p = '\0';
 	}
 	break;
     default:

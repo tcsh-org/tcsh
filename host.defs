@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /src/pub/tcsh/host.defs,v 1.35 2002/07/23 16:13:21 christos Exp $ */
+/* $Header: /src/pub/tcsh/host.defs,v 1.36 2003/02/08 20:03:25 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.35 2002/07/23 16:13:21 christos Exp $")
+RCSID("$Id: host.defs,v 1.36 2003/02/08 20:03:25 christos Exp $")
 
 endcode	:
 
@@ -174,10 +174,10 @@ newcode	:
 void
 getmachine()
 {
-     char *hosttype;
-     char *ostype;
-     char *vendor;
-     char *machtype;
+     const char *hosttype;
+     const char *ostype;
+     const char *vendor;
+     const char *machtype;
 
 endcode	:
 

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.char.h,v 3.19 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.char.h,v 3.20 2002/07/01 20:50:21 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -37,6 +37,9 @@
 # include <appkit/NXCType.h>
 #else
 # include <ctype.h>
+# ifdef WIDE_STRINGS
+#  include <wctype.h>
+# endif
 #endif
 
 typedef unsigned char tcshuc;
@@ -45,7 +48,6 @@ typedef unsigned char tcshuc;
 #endif /* _MINIX */
 extern unsigned short _cmap[];
 #if defined(DSPMBYTE)
-extern unsigned short _mbmap[];
 # define CHECK_MBYTEVAR	STRdspmbyte
 #endif
 extern unsigned short _cmap_c[];
@@ -75,18 +77,23 @@ extern tcshuc _cmap_lower[], _cmap_upper[];
 #define	_ESC	0x0040		/* \ */
 #define	_DOL	0x0080		/* $ */
 #define	_DIG  	0x0100		/* 0-9 */
-#define	_LET  	0x0200		/* a-z, A-Z, _ */
-#define	_UP   	0x0400		/* A-Z */
-#define	_DOW  	0x0800		/* a-z */
+#define	_LET  	0x0200		/* a-z, A-Z, _, or locale-specific */
+#define	_UP   	0x0400		/* A-Z, or locale-specific */
+#define	_DOW  	0x0800		/* a-z, or locale-specific */
 #define	_XD 	0x1000		/* 0-9, a-f, A-F */
 #define	_CMD	0x2000		/* lex end of command chars, ;&(|` */
 #define _CTR	0x4000		/* control */
 #define _PUN	0x8000		/* punctuation */
 
-#if defined(SHORT_STRINGS) && defined(KANJI)
+#ifdef WIDE_STRINGS
+#  define ASC(ch) ch
+#  define CTL_ESC(ch) ch
+#  define cmap(c, bits)	\
+	(((c) & QUOTE) || (c) >= 0x0080 ? 0 : (_cmap[(tcshuc)(c)] & (bits)))
+#elif defined(SHORT_STRINGS) && defined(KANJI)
 # define ASC(ch) ch
 # define CTL_ESC(ch) ch
-# define cmap(c, bits)	\
+# define cmap(c, bits) \
 	((((c) & QUOTE) || ((c & 0x80) && adrof(STRnokanji))) ? \
 	0 : (_cmap[(tcshuc)(c)] & (bits)))
 #else /* SHORT_STRINGS && KANJI */
@@ -118,17 +125,37 @@ extern unsigned short _toebcdic[256];
 #define isspc(c)	cmap(c, _SP)
 #define ismeta(c)	cmap(c, _META)
 #define iscmdmeta(c)	cmap(c, _CMD)
-#define letter(c)	(((Char)(c) & QUOTE) ? 0 : \
+#ifdef WIDE_STRINGS
+#define letter(c)	(((c) & QUOTE) ? 0 :  \
+			 (iswalpha((tcshuc) (c)) || (c) == '_'))
+#define alnum(c)	(((c) & QUOTE) ? 0 :  \
+		         (iswalnum((tcshuc) (c)) || (c) == '_'))
+#else
+#define letter(c)	(((Char)(c) & QUOTE) ? 0 :  \
 			 (isalpha((tcshuc) (c)) || (c) == '_'))
-#define alnum(c)	(((Char)(c) & QUOTE) ? 0 : \
+#define alnum(c)	(((Char)(c) & QUOTE) ? 0 :  \
 		         (isalnum((tcshuc) (c)) || (c) == '_'))
+#endif
 
 #if defined(DSPMBYTE)
 # define IsmbyteU(c)	(Ismbyte1((Char)(c))||(Ismbyte2((Char)(c))&&((c)&0200)))
 #endif
 
 #ifdef NLS
-# ifdef NeXT
+# ifdef WIDE_STRINGS
+#  define Isspace(c)	(((c) & QUOTE) ? 0 : iswspace(c))
+#  define Isdigit(c)	(((c) & QUOTE) ? 0 : iswdigit(c))
+#  define Isalpha(c)	(((c) & QUOTE) ? 0 : iswalpha(c))
+#  define Islower(c)	(((c) & QUOTE) ? 0 : iswlower(c))
+#  define Isupper(c)	(((c) & QUOTE) ? 0 : iswupper(c))
+#  define Tolower(c) 	(((c) & QUOTE) ? 0 : (wchar_t)towlower(c))
+#  define Toupper(c) 	(((c) & QUOTE) ? 0 : (wchar_t)towupper(c))
+#  define Isxdigit(c)	(((c) & QUOTE) ? 0 : iswxdigit(c))
+#  define Isalnum(c)	(((c) & QUOTE) ? 0 : iswalnum(c))
+#  define Iscntrl(c) 	(((c) & QUOTE) ? 0 : iswcntrl(c))
+#  define Isprint(c) 	(((c) & QUOTE) ? 0 : iswprint(c))
+#  define Ispunct(c) 	(((c) & QUOTE) ? 0 : iswpunct(c))
+# elif defined (NeXT)
 #  define Isspace(c)	(((Char)(c) & QUOTE) ? 0 : NXIsSpace((unsigned) (c)))
 #  define Isdigit(c)	(((Char)(c) & QUOTE) ? 0 : NXIsDigit((unsigned) (c)))
 #  define Isalpha(c)	(((Char)(c) & QUOTE) ? 0 : NXIsAlpha((unsigned) (c)))

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.12 2004/01/23 16:21:33 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.13 2004/08/04 14:28:24 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.12 2004/01/23 16:21:33 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.13 2004/08/04 14:28:24 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -41,7 +41,7 @@ RCSID("$Id: tw.color.c,v 1.12 2004/01/23 16:21:33 christos Exp $")
 #ifdef COLOR_LS_F
 
 typedef struct {
-    char   *s;
+    const char   *s;
     int     len;
 } Str;
 
@@ -103,7 +103,7 @@ static bool  color_context_lsmF = FALSE;	/* do colored ls-F */
 
 static bool getstring __P((char **, const Char **, Str *, int));
 static void put_color __P((Str *));
-static void print_color __P((Char *, size_t, int));
+static void print_color __P((Char *, size_t, Char));
 
 /* set_color_context():
  */
@@ -143,17 +143,20 @@ getstring(dp, sp, pd, f)
 {
     const Char *s = *sp;
     char *d = *dp;
-    int sc;
+    eChar sc;
 
     while (*s && (*s & CHAR) != f && (*s & CHAR) != ':') {
 	if ((*s & CHAR) == '\\' || (*s & CHAR) == '^') {
-	    if ((sc = parseescape(&s)) == -1)
+	    if ((sc = parseescape(&s)) == CHAR_ERR)
 		return 0;
-	    else
-		*d++ = (char) sc;
 	}
 	else
-	    *d++ = *s++ & CHAR;
+	    sc = *s++ & CHAR;
+#ifdef WIDE_STRINGS
+	d += one_wctomb(d, sc);
+#else
+	*d++ = sc;
+#endif
     }
 
     pd->s = *dp;
@@ -263,9 +266,8 @@ static void
 put_color(color)
     Str    *color;
 {
-    extern bool output_raw;	/* PWP: in sh.print.c */
     size_t  i;
-    char   *c = color->s;
+    const char   *c = color->s;
     bool    original_output_raw = output_raw;
 
     output_raw = TRUE;
@@ -281,7 +283,7 @@ static void
 print_color(fname, len, suffix)
     Char   *fname;
     size_t  len;
-    int     suffix;
+    Char    suffix;
 {
     size_t  i;
     char   *filename = short2str(fname);
@@ -328,7 +330,7 @@ void
 print_with_color(filename, len, suffix)
     Char   *filename;
     size_t  len;
-    int    suffix;
+    Char    suffix;
 {
     if (color_context_lsmF &&
 	(haderr ? (didfds ? is2atty : isdiagatty) :
@@ -342,10 +344,10 @@ print_with_color(filename, len, suffix)
 	    put_color(&variables[VNormal].color);
 	    put_color(&variables[VRight].color);
 	}
-	xputchar(suffix);
     }
     else
-	xprintf("\045S%c", filename, suffix);
+	xprintf("\045S", filename);
+    xputwchar(suffix);
 }
 
 

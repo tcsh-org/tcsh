@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.52 2004/08/01 20:49:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.53 2004/08/04 14:28:23 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.52 2004/08/01 20:49:47 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.53 2004/08/04 14:28:23 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -54,7 +54,7 @@ RCSID("$Id: ed.screen.c,v 3.52 2004/08/01 20:49:47 christos Exp $")
 #define Val(a) tval[a].val
 
 static struct {
-    char   *b_name;
+    const char   *b_name;
     speed_t b_rate;
 }       baud_rate[] = {
 
@@ -164,7 +164,7 @@ static struct {
 #define T_at7   37
 #define T_str   38
 static struct termcapstr {
-    char   *name;
+    const char   *name;
     char   *long_name;
     char   *str;
 } tstr[T_str + 1];
@@ -178,7 +178,7 @@ static struct termcapstr {
 #define T_xn	5
 #define T_val	6
 static struct termcapval {
-    char   *name;
+    const char   *name;
     char   *long_name;
     int     val;
 } tval[T_val + 1];
@@ -423,7 +423,7 @@ TCalloc(t, cap)
 /*ARGSUSED*/
 void
 TellTC(what)
-    char   *what;
+    const char   *what;
 {
     struct termcapstr *t;
 
@@ -456,7 +456,7 @@ TellTC(what)
 static void
 ReBufferDisplay()
 {
-    register int i;
+    int i;
     Char  **b;
     Char  **bufp;
 
@@ -572,7 +572,7 @@ EchoTC(v)
     int     arg_need, arg_cols, arg_rows;
     int     verbose = 0, silent = 0;
     char   *area;
-    static char *fmts = "%s\n", *fmtd = "%d\n";
+    static const char *fmts = "%s\n", *fmtd = "%d\n";
     struct termcapstr *t;
     char    buf[TC_BUFSIZE];
 
@@ -1093,8 +1093,8 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
 	while (del > 0) {
 	    if ((T_Margin & MARGIN_AUTO) && Display[CursorV][0] != '\0') {
 		/* move without newline */
-#ifdef DSPMBYTE
 		MoveToChar(TermH - 1);
+#ifdef DSPMBYTE
 		if (Ismbyte2(Display[CursorV][CursorH])) {
 		    MoveToChar(TermH - 2);
 		    so_write(&Display[CursorV][CursorH], 2); /* updates CursorH/V*/
@@ -1212,8 +1212,8 @@ mc_again:
 
 void
 so_write(cp, n)
-    register Char *cp;
-    register int n;
+    Char *cp;
+    int n;
 {
     if (n <= 0)
 	return;			/* catch bugs */
@@ -1228,20 +1228,19 @@ so_write(cp, n)
 
     do {
 	if (*cp & LITERAL) {
-	    extern Char *litptr[];
 	    Char   *d;
 
 #ifdef DEBUG_LITERAL
 	    xprintf("so: litnum %d, litptr %x\r\n",
-		    *cp & CHAR, litptr[*cp & CHAR]);
+		    (int)(*cp & CHAR), litptr[*cp & CHAR]);
 #endif /* DEBUG_LITERAL */
 	    for (d = litptr[*cp++ & CHAR]; *d & LITERAL; d++)
-		(void) putraw(*d & CHAR);
-	    (void) putraw(*d);
+	        (void) putwraw(*d & CHAR);
+	    (void) putwraw(*d);
 
 	}
 	else
-	    (void) putraw(*cp++);
+	    (void) putwraw(*cp++);
 	CursorH++;
     } while (--n);
 
@@ -1314,8 +1313,8 @@ DeleteChars(num)		/* deletes <num> characters */
 
 void
 Insert_write(cp, num)		/* Puts terminal in insert character mode, */
-    register Char *cp;
-    register int num;		/* or inserts num characters in the line */
+    Char *cp;
+    int num;		/* or inserts num characters in the line */
 {
     if (num <= 0)
 	return;
@@ -1371,7 +1370,7 @@ void
 ClearEOL(num)			/* clear to end of line.  There are num */
     int     num;		/* characters to clear */
 {
-    register int i;
+    int i;
 
     if (num <= 0)
 	return;
@@ -1430,8 +1429,8 @@ ClearToBottom()
 void
 GetTermCaps()
 {				/* read in the needed terminal capabilites */
-    register int i;
-    char   *ptr;
+    int i;
+    const char   *ptr;
     char    buf[TC_BUFSIZE];
     static char bp[TC_BUFSIZE];
     char   *area;

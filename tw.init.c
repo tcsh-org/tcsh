@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.init.c,v 3.28 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.init.c,v 3.29 2002/06/25 19:02:12 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.28 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.29 2002/06/25 19:02:12 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -188,7 +188,7 @@ static Char *
 tw_dir_next(dfd)
     DIR *dfd;
 {
-    register struct dirent *dirp;
+    struct dirent *dirp;
 
     if (dfd == NULL)
 	return NULL;
@@ -232,10 +232,10 @@ tw_cmd_free()
 static void
 tw_cmd_cmd()
 {
-    register DIR *dirp;
-    register struct dirent *dp;
-    register Char *dir = NULL, *name;
-    register Char **pv;
+    DIR *dirp;
+    struct dirent *dp;
+    Char *dir = NULL, *name;
+    Char **pv;
     struct varent *v = adrof(STRpath);
     struct varent *recexec = adrof(STRrecognize_only_executables);
     int len;
@@ -291,7 +291,7 @@ tw_cmd_cmd()
 static void
 tw_cmd_builtin()
 {
-    register struct biltins *bptr;
+    struct biltins *bptr;
 
     for (bptr = bfunc; bptr < &bfunc[nbfunc]; bptr++)
 	if (bptr->bname)
@@ -310,8 +310,8 @@ tw_cmd_builtin()
 static void
 tw_cmd_alias()
 {
-    register struct varent *p;
-    register struct varent *c;
+    struct varent *p;
+    struct varent *c;
 
     p = &aliases;
     for (;;) {
@@ -501,9 +501,9 @@ tw_shvar_next(dir, flags)
     Char *dir;
     int	 *flags;
 {
-    register struct varent *p;
-    register struct varent *c;
-    register Char *cp;
+    struct varent *p;
+    struct varent *c;
+    Char *cp;
 
     USE(flags);
     USE(dir);
@@ -602,8 +602,6 @@ tw_complete_start(dfd, pat)
     DIR *dfd;
     Char *pat;
 {
-    extern struct varent completions;
-
     USE(pat);
     SETDIR(dfd)
     tw_vptr_start(&completions);
@@ -953,7 +951,7 @@ tw_bind_next(dir, flags)
     Char *dir;
     int *flags;
 {
-    char *ptr;
+    const char *ptr;
     USE(flags);
     if (tw_bind && tw_bind->name) {
 	for (ptr = tw_bind->name, dir = tw_retname;
@@ -993,7 +991,7 @@ tw_limit_next(dir, flags)
     int *flags;
 {
 #ifndef HAVENOLIMIT
-    char *ptr;
+    const char *ptr;
     if (tw_limit && tw_limit->limname) {
 	for (ptr = tw_limit->limname, dir = tw_retname; 
 	     (*dir++ = (Char) *ptr++) != '\0';)
@@ -1031,8 +1029,7 @@ tw_sig_next(dir, flags)
     Char *dir;
     int *flags;
 {
-    char *ptr;
-    extern int nsig;
+    const char *ptr;
     USE(flags);
     for (;tw_index < nsig; tw_index++) {
 

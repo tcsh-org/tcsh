@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.init.c,v 3.48 2002/07/06 22:28:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.init.c,v 3.49 2004/05/21 18:51:25 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.48 2002/07/06 22:28:13 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.49 2004/05/21 18:51:25 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -55,7 +55,6 @@ extern bool GotTermCaps;
 static ttydata_t extty, edtty, tstty;
 #define qutty tstty
 
-extern int insource;
 #define SHTTY (insource ? OLDSTD : SHIN)
 
 #define uc unsigned char
@@ -513,7 +512,6 @@ Rawmode()
 # endif /* TERMIO || POSIX */
 
 	{
-	    extern int didsetty;
 	    int i;
 
 	    tty_getchar(&tstty, ttychars[TS_IO]);

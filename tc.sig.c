@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.c,v 3.26 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.c,v 3.27 2004/06/18 16:28:09 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.26 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.27 2004/06/18 16:28:09 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -277,7 +277,7 @@ sigsetmask(mask)
 {
     sigset_t set, oset;
     int     m;
-    register int i;
+    int i;
 
     (void) sigemptyset(&set);
     (void) sigemptyset(&oset);
@@ -313,7 +313,7 @@ sigblock(mask)
 {
     sigset_t set, oset;
     int     m;
-    register int i;
+    int i;
 
     (void) sigemptyset(&set);
     (void) sigemptyset(&oset);
@@ -352,7 +352,7 @@ bsd_sigpause(mask)
     sigmask_t     mask;
 {
     sigset_t set;
-    register int i;
+    int i;
 
     (void) sigemptyset(&set);
 

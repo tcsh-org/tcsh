@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.46 2002/07/12 13:16:19 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.47 2002/07/25 17:14:59 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.46 2002/07/12 13:16:19 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.47 2002/07/25 17:14:59 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -48,8 +48,8 @@ RCSID("$Id: tc.prompt.c,v 3.46 2002/07/12 13:16:19 christos Exp $")
  *	29-Dec-96	added rprompt support
  */
 
-static char   *month_list[12];
-static char   *day_list[7];
+static const char   *month_list[12];
+static const char   *day_list[7];
 
 void
 dateinit()
@@ -110,10 +110,10 @@ dateinit()
 void
 printprompt(promptno, str)
     int     promptno;
-    char   *str;
+    const char   *str;
 {
     static  Char *ocp = NULL;
-    static  char *ostr = NULL;
+    static  const char *ostr = NULL;
     time_t  lclock = time(NULL);
     Char   *cp;
 
@@ -148,7 +148,7 @@ printprompt(promptno, str)
 
     if (!editing) {
 	for (cp = PromptBuf; *cp ; )
-	    (void) putraw(*cp++);
+	    (void) putwraw(*cp++);
 	SetAttributes(0);
 	flush();
     }
@@ -161,7 +161,7 @@ printprompt(promptno, str)
 				/* if not editing, put rprompt after prompt */
 	if (!editing && RPromptBuf[0] != '\0') {
 	    for (cp = RPromptBuf; *cp ; )
-		(void) putraw(*cp++);
+		(void) putwraw(*cp++);
 	    SetAttributes(0);
 	    putraw(' ');
 	    flush();
@@ -175,7 +175,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
     Char *buf;
     const Char *fmt;
     size_t siz;
-    char *str;
+    const char *str;
     time_t tim;
     ptr_t info;
 {
@@ -195,7 +195,6 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 
 			/* prompt stuff */
     static Char *olddir = NULL, *olduser = NULL;
-    extern int tlength;	/* cache cleared */
     int updirs;
     size_t pdirs, sz;
 
@@ -214,13 +213,20 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    cp++;
 	    switch (*cp) {
 	    case 'R':
-		if (what == FMT_HISTORY)
-		    fmthist('R', info, (char *) (cz = cbuff), sizeof(cbuff));
-		else
-		    cz = (unsigned char *) str;
+		if (what == FMT_HISTORY) {
+		    fmthist('R', info, (char *) cbuff, sizeof(cbuff));
+		    cz = cbuff;
+		} else
+		    cz = (const unsigned char *) str;
 		if (cz != NULL)
-		    for (; *cz; *p++ = attributes | *cz++)
-			if (p >= ep) break;
+		    for (; *cz && p < ep; p++) {
+#ifdef WIDE_STRINGS
+			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			*p |= attributes;
+#else
+			*p = attributes | *cz++;
+#endif
+		    }
 		break;
 	    case '#':
 		*p++ = attributes | ((uid == 0) ? PRCHROOT : PRCH);
@@ -240,8 +246,14 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			eventno + 1);
 		    break;
 		}
-		for (cz = cbuff; *cz; *p++ = attributes | *cz++)
-		    if (p >= ep) break;
+		for (cz = cbuff; *cz && p < ep; p++) {
+#ifdef WIDE_STRINGS
+		    cz += one_mbtowc(p, cz, MB_LEN_MAX);
+		    *p |= attributes;
+#else
+		    *p = attributes | *cz++;
+#endif
+		}
 		break;
 	    case 'T':		/* 24 hour format	 */
 	    case '@':
@@ -298,33 +310,45 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'M':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO)
-		    cz = (unsigned char *) who_info(info, 'M',
+		    cz = (const unsigned char *) who_info(info, 'M',
 			(char *) cbuff, sizeof(cbuff));
 		else 
 #endif /* HAVENOUTMP */
-		    cz = (unsigned char *) getenv("HOST");
+		    cz = (const unsigned char *) getenv("HOST");
 		/*
 		 * Bug pointed out by Laurent Dami <dami@cui.unige.ch>: don't
 		 * derefrence that NULL (if HOST is not set)...
 		 */
 		if (cz != NULL)
-		    for (; *cz ; *p++ = attributes | *cz++)
-			if (p >= ep) break;
+		    for (; *cz && p < ep; p++) {
+#ifdef WIDE_STRINGS
+			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			*p |= attributes;
+#else
+			*p = attributes | *cz++;
+#endif
+		    }
 		break;
 
 	    case 'm':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO)
-		    cz = (unsigned char *) who_info(info, 'm', (char *) cbuff,
-			sizeof(cbuff));
+		    cz = (const unsigned char *) who_info(info, 'm',
+			(char *) cbuff, sizeof(cbuff));
 		else 
 #endif /* HAVENOUTMP */
-		    cz = (unsigned char *) getenv("HOST");
+		    cz = (const unsigned char *) getenv("HOST");
 
 		if (cz != NULL)
-		    for ( ; *cz && (what == FMT_WHO || *cz != '.')
-			  ; *p++ = attributes | *cz++ )
-			if (p >= ep) break;
+		    for (; *cz && (what == FMT_WHO || *cz != '.') && p < ep;
+			 p++) {
+#ifdef WIDE_STRINGS
+			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			*p |= attributes;
+#else
+			*p = attributes | *cz++;
+#endif
+		    }
 		break;
 
 			/* lukem: new directory prompt code */
@@ -432,10 +456,16 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'n':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO) {
-		    cz = (unsigned char *) who_info(info, 'n',
+		    cz = (const unsigned char *) who_info(info, 'n',
 			(char *) cbuff, sizeof(cbuff));
-		    for (; cz && *cz ; *p++ = attributes | *cz++)
-			if (p >= ep) break;
+		    for (; *cz && p < ep; p++) {
+#ifdef WIDE_STRINGS
+			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			*p |= attributes;
+#else
+			*p = attributes | *cz++;
+#endif
+		    }
 		}
 		else  
 #endif /* HAVENOUTMP */
@@ -448,10 +478,16 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'l':
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO) {
-		    cz = (unsigned char *) who_info(info, 'l',
+		    cz = (const unsigned char *) who_info(info, 'l',
 			(char *) cbuff, sizeof(cbuff));
-		    for (; cz && *cz ; *p++ = attributes | *cz++)
-			if (p >= ep) break;
+		    for (; *cz && p < ep; p++) {
+#ifdef WIDE_STRINGS
+			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			*p |= attributes;
+#else
+			*p = attributes | *cz++;
+#endif
+		    }
 		}
 		else  
 #endif /* HAVENOUTMP */
@@ -462,9 +498,15 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		}
 		break;
 	    case 'd':
-		for (cz = (unsigned char *) day_list[t->tm_wday]; *cz;
-		    *p++ = attributes | *cz++)
-		    if (p >= ep) break;
+		for (cz = (const unsigned char *) day_list[t->tm_wday];
+		     *cz && p < ep; p++) {
+#ifdef WIDE_STRINGS
+		    cz += one_mbtowc(p, cz, MB_LEN_MAX);
+		    *p |= attributes;
+#else
+		    *p = attributes | *cz++;
+#endif
+		}
 		break;
 	    case 'D':
 		if (p >= ep - 3) break;
@@ -472,9 +514,15 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		break;
 	    case 'w':
 		if (p >= ep - 5) break;
-		for (cz = (unsigned char *) month_list[t->tm_mon]; *cz;
-		    *p++ = attributes | *cz++)
-		    if (p >= ep) break;
+		for (cz = (const unsigned char *) month_list[t->tm_mon];
+		    *cz && p < ep; p++) {
+#ifdef WIDE_STRINGS
+		    cz += one_mbtowc(p, cz, MB_LEN_MAX);
+		    *p |= attributes;
+#else
+		    *p = attributes | *cz++;
+#endif
+		}
 		break;
 	    case 'W':
 		if (p >= ep - 3) break;
@@ -512,14 +560,14 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 
 	    case 'j':
 		{
-		    Char buf[128], *ebuf, *q;
+		    Char xbuf[128], *ebuf, *xq;
 		    int njobs = -1;
 		    struct process *pp;
 		    for (pp = proclist.p_next; pp; pp = pp->p_next)
 			njobs++;
 		    /* make sure we have space */
 		    ebuf = Itoa(njobs, buf, 1, attributes);
-		    for (q = buf; q < ebuf; *p++ = *q++)
+		    for (xq = xbuf; xq < ebuf; *p++ = *xq++)
 			if (p >= ep) break;
 		    break;
 		}
@@ -554,10 +602,16 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    default:
 #ifndef HAVENOUTMP
 		if (*cp == 'a' && what == FMT_WHO) {
-		    cz = (unsigned char *) who_info(info, 'a', (char *) cbuff,
-			sizeof(cbuff));
-		    for (; cz && *cz; *p++ = attributes | *cz++)
-			if (p >= ep) break;
+		    cz = (const unsigned char *) who_info(info, 'a',
+			(char *) cbuff, sizeof(cbuff));
+		    for (; *cz && p < ep; p++) {
+#ifdef WIDE_STRINGS
+			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			*p |= attributes;
+#else
+			*p = attributes | *cz++;
+#endif
+		    }
 		}
 		else 
 #endif /* HAVENOUTMP */
@@ -576,8 +630,14 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		fmthist('h', info, (char *) cbuff, sizeof(cbuff));
 	    else
 		(void) xsnprintf((char *) cbuff, sizeof(cbuff), "%d", eventno + 1);
-	    for (cz = cbuff; *cz; *p++ = attributes | *cz++)
-		if (p >= ep) break;
+	    for (cz = cbuff; *cz && p < ep; p++) {
+#ifdef WIDE_STRINGS
+		cz += one_mbtowc(p, cz, MB_LEN_MAX);
+		*p |= attributes;
+#else
+		*p = attributes | *cz++;
+#endif
+	    }
 	}
 	else 
 	    *p++ = attributes | *cp;	/* normal character */

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.defns.c,v 3.38 2001/04/26 19:07:47 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.defns.c,v 3.39 2002/03/08 17:36:45 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.38 2001/04/26 19:07:47 kim Exp $")
+RCSID("$Id: ed.defns.c,v 3.39 2002/03/08 17:36:45 christos Exp $")
 
 #include "ed.h"
 
@@ -1819,7 +1819,7 @@ bool    NoNLSRebind;
 void
 ed_InitNLSMaps()
 {
-    register int i;
+    int i;
 
     if (AsciiOnly)
 	return;
@@ -1876,7 +1876,7 @@ ed_InitMetaBindings()
 void
 ed_InitVIMaps()
 {
-    register int i;
+    int i;
 
     VImode = 1;
     ResetXmap();
@@ -1948,7 +1948,7 @@ ed_InitMaps()
     {
 	KEYCMD temp[NT_NUM_KEYS];
 	static KEYCMD *const list[3] = { CcEmacsMap, CcViMap, CcViCmdMap };
-	register int i, table;
+	int i, table;
 
 	for (table=0; table<3; ++table)
 	{

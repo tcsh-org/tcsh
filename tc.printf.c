@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.printf.c,v 3.23 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.printf.c,v 3.24 2003/12/02 17:59:30 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -34,7 +34,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.23 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.24 2003/12/02 17:59:30 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -44,6 +44,7 @@ RCSID("$Id: tc.printf.c,v 3.23 2002/03/08 17:36:47 christos Exp $")
 #define INF	32766		/* should be bigger than any field to print */
 
 static char buf[128];
+static char snil[] = "(nil)";
 
 static	void	xaddchar	__P((int));
 static	void	doprnt		__P((void (*) __P((int)), const char *, va_list));
@@ -96,9 +97,9 @@ doprnt(addchar, sfmt, ap)
 		f_width = va_arg(ap, int);
 		f++;
 	    }
-	    else if (Isdigit((unsigned char) *f)) {
+	    else if (isdigit((unsigned char) *f)) {
 		f_width = atoi(f);
-		while (Isdigit((unsigned char) *f))
+		while (isdigit((unsigned char) *f))
 		    f++;	/* skip the digits */
 	    }
 
@@ -108,9 +109,9 @@ doprnt(addchar, sfmt, ap)
 		    prec = va_arg(ap, int);
 		    f++;
 		}
-		else if (Isdigit((unsigned char) *f)) {
-		    prec = atoi((char *) f);
-		    while (Isdigit((unsigned char) *f))
+		else if (isdigit((unsigned char) *f)) {
+		    prec = atoi(f);
+		    while (isdigit((unsigned char) *f))
 			f++;	/* skip the digits */
 		}
 	    }
@@ -130,9 +131,9 @@ doprnt(addchar, sfmt, ap)
 	    }
 
 	    fmt = (unsigned char) *f;
-	    if (fmt != 'S' && fmt != 'Q' && Isupper(fmt)) {
+	    if (fmt != 'S' && fmt != 'Q' && isupper(fmt)) {
 		do_long = 1;
-		fmt = Tolower(fmt);
+		fmt = tolower(fmt);
 	    }
 	    bp = buf;
 	    switch (fmt) {	/* do the format */
@@ -253,9 +254,21 @@ doprnt(addchar, sfmt, ap)
 		    while (f_width-- > 0)
 			(*addchar) ((int) (pad | attributes));
 		for (i = 0; *Bp && i < prec; i++) {
+#ifdef WIDE_STRINGS
+		    char cbuf[MB_LEN_MAX];
+		    size_t pos, len;
+#endif
+
 		    if (fmt == 'Q' && *Bp & QUOTE)
 			(*addchar) ((int) ('\\' | attributes));
+#ifdef WIDE_STRINGS
+		    len = one_wctomb(cbuf, *Bp & CHAR);
+		    for (pos = 0; pos < len; pos++)
+			(*addchar) ((int) ((unsigned char)cbuf[pos]
+					   | attributes | (*Bp & ATTRIBUTES)));
+#else
 		    (*addchar) ((int) ((*Bp & TRIM) | attributes));
+#endif
 		    Bp++;
 		}
 		if (flush_left)
@@ -269,7 +282,7 @@ doprnt(addchar, sfmt, ap)
 		bp = va_arg(ap, char *);
 lcase_s:
 		if (!bp)
-		    bp = "(nil)";
+		    bp = snil;
 		f_width = f_width - strlen((char *) bp);
 		if (!flush_left)
 		    while (f_width-- > 0)

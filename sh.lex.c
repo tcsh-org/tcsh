@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.58 2004/05/19 18:51:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.59 2004/05/21 18:50:36 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,9 +32,11 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.58 2004/05/19 18:51:43 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.59 2004/05/21 18:50:36 christos Exp $")
 
 #include "ed.h"
+
+#include <assert.h>
 /* #define DEBUG_INP */
 /* #define DEBUG_SEEK */
 
@@ -48,20 +50,21 @@ RCSID("$Id: sh.lex.c,v 3.58 2004/05/19 18:51:43 christos Exp $")
  * of input buffering, and especially because of history substitution.
  */
 static	Char		*word		__P((int));
-static	int	 	 getC1		__P((int));
+static	eChar	 	 getC1		__P((int));
 static	void	 	 getdol		__P((void));
-static	void	 	 getexcl	__P((int));
+static	void	 	 getexcl	__P((Char));
 static	struct Hist 	*findev		__P((Char *, bool));
 static	void	 	 setexclp	__P((Char *));
-static	int	 	 bgetc		__P((void));
+static	eChar	 	 bgetc		__P((void));
 static	void		 balloc		__P((int));
 static	void	 	 bfree		__P((void));
-static	struct wordent	*gethent	__P((int));
+static	struct wordent	*gethent	__P((Char));
 static	int	 	 matchs		__P((Char *, Char *));
 static	int	 	 getsel		__P((int *, int *, int));
 static	struct wordent	*getsub		__P((struct wordent *));
-static	Char 		*subword	__P((Char *, int, bool *));
-static	struct wordent	*dosub		__P((int, struct wordent *, bool));
+static	Char 		*subword	__P((Char *, Char, bool *));
+static	struct wordent	*dosub		__P((Char, struct wordent *, bool));
+static	ssize_t		 wide_read	__P((int, Char *, size_t, int));
 
 /*
  * Peekc is a peek character for getC, peekread for readc.
@@ -126,7 +129,7 @@ static Char *histlinep = NULL;	/* current pointer into histline */
 
 static Char getCtmp;
 
-#define getC(f)		(((getCtmp = peekc) != '\0') ? (peekc = 0, getCtmp) : getC1(f))
+#define getC(f)		(((getCtmp = peekc) != '\0') ? (peekc = 0, (eChar)getCtmp) : getC1(f))
 #define	ungetC(c)	peekc = (Char) c
 #define	ungetD(c)	peekd = (Char) c
 
@@ -153,7 +156,7 @@ lex(hp)
     struct wordent *hp;
 {
     struct wordent *wdp;
-    int     c;
+    eChar    c;
     int     parsehtime = enterhist;
 
 
@@ -169,7 +172,7 @@ lex(hp)
     do
 	c = readc(0);
     while (c == ' ' || c == '\t');
-    if (c == HISTSUB && intty)
+    if (c == (eChar)HISTSUB && intty)
 	/* ^lef^rit	from tty is short !:s^lef^rit */
 	getexcl(c);
     else
@@ -206,8 +209,8 @@ lex(hp)
 }
 
 static time_t
-a2time_t(word)
-    Char *word;
+a2time_t(wordx)
+    Char *wordx;
 {
     /* Attempt to distinguish timestamps from other possible entries.
      * Format: "+NNNNNNNNNN" (10 digits, left padded with ascii '0') */
@@ -216,7 +219,7 @@ a2time_t(word)
     Char *s;
     int ct;
 
-    if (!word || *(s = word) != '+')
+    if (!wordx || *(s = wordx) != '+')
 	return (time_t)0;
 
     for (++s, ret = 0, ct = 0; *s; ++s, ++ct)
@@ -292,7 +295,7 @@ static Char *
 word(parsehtime)
     int parsehtime;
 {
-    Char c, c1;
+    eChar c, c1;
     Char *wp;
     Char    wbuf[BUFSIZE];
     Char    hbuf[12];
@@ -355,7 +358,7 @@ loop:
 		    onelflg = 2;
 		goto loop;
 	    }
-	    if (c != HIST)
+	    if (c != (eChar)HIST)
 		*wp++ = '\\', --i;
 	    c |= QUOTE;
 	default:
@@ -385,7 +388,7 @@ loop:
  *
  * Actually, all I really want to be able to say is 'foo\'bar' --> foo'bar
  */
-		if (c == HIST)
+		if (c == (eChar)HIST)
 		    c |= QUOTE;
 		else {
 		    if (bslash_quote &&
@@ -418,7 +421,7 @@ loop:
 			onelflg = 2;
 		    break;
 		}
-		if (c != HIST)
+		if (c != (eChar)HIST)
 		    *wp++ = '\\', --i;
 		c |= QUOTE;
 	    }
@@ -446,11 +449,11 @@ ret:
     return (Strsave(wbuf));
 }
 
-static int
+static eChar
 getC1(flag)
     int flag;
 {
-    Char c;
+    eChar c;
 
     for (;;) {
 	if ((c = peekc) != 0) {
@@ -497,7 +500,7 @@ getC1(flag)
 	    getdol();
 	    continue;
 	}
-	if (c == HIST && (flag & DOEXCL)) {
+	if (c == (eChar)HIST && (flag & DOEXCL)) {
 	    getexcl(0);
 	    continue;
 	}
@@ -511,8 +514,8 @@ getdol()
 {
     Char *np, *ep;
     Char    name[4 * MAXVARLEN + 1];
-    int c;
-    int     sc;
+    eChar c;
+    eChar   sc;
     bool    special = 0, toolong;
 
     np = name, *np++ = '$';
@@ -674,7 +677,7 @@ getdol()
 	    /* scan s// [eichin:19910926.0512EST] */
 	    if (c == 's') {
 		int delimcnt = 2;
-		int delim = getC(0);
+		eChar delim = getC(0);
 		*np++ = (Char) delim;
 		
 		if (!delim || letter(delim)
@@ -682,7 +685,7 @@ getdol()
 		    seterror(ERR_BADSUBST);
 		    break;
 		}	
-		while ((c = getC(0)) != (-1)) {
+		while ((c = getC(0)) != CHAR_ERR) {
 		    *np++ = (Char) c;
 		    if(c == delim) delimcnt--;
 		    if(!delimcnt) break;
@@ -751,11 +754,11 @@ static int quesarg;
 
 static void
 getexcl(sc)
-    int    sc;
+    Char    sc;
 {
     struct wordent *hp, *ip;
     int     left, right, dol;
-    int c;
+    eChar c;
 
     if (sc == 0) {
 	sc = getC(0);
@@ -837,9 +840,9 @@ getsub(en)
     struct wordent *en;
 {
     Char *cp;
-    int     delim;
-    int c;
-    int     sc;
+    eChar   delim;
+    eChar   c;
+    eChar   sc;
     bool global;
     Char    orhsb[sizeof(rhsb) / sizeof(Char)];
 
@@ -963,7 +966,7 @@ getsub(en)
 	default:
 	    if (c == '\n')
 		unreadc(c);
-	    seterror(ERR_BADBANGMOD, c);
+	    seterror(ERR_BADBANGMOD, (int)c);
 	    return (en);
 	}
 	(void) Strcpy(slhs, lhsb);
@@ -990,7 +993,7 @@ getsub(en)
 #define HIST_PURGE -50000000
 static struct wordent *
 dosub(sc, en, global)
-    int     sc;
+    Char   sc;
     struct wordent *en;
     bool global;
 {
@@ -1051,7 +1054,7 @@ dosub(sc, en, global)
 static Char *
 subword(cp, type, adid)
     Char   *cp;
-    int     type;
+    Char    type;
     bool   *adid;
 {
     Char    wbuf[BUFSIZE];
@@ -1127,7 +1130,7 @@ subword(cp, type, adid)
 Char   *
 domod(cp, type)
     Char   *cp;
-    int     type;
+    Char    type;
 {
     Char *wp, *xp;
     int c;
@@ -1205,7 +1208,7 @@ getsel(al, ar, dol)
     int *al, *ar;
     int     dol;
 {
-    int c = getC(0);
+    eChar c = getC(0);
     int i;
     bool    first = *al < 0;
 
@@ -1288,16 +1291,16 @@ getsel(al, ar, dol)
 
 static struct wordent *
 gethent(sc)
-    int     sc;
+    Char   sc;
 {
     struct Hist *hp;
     Char *np;
-    int c;
+    eChar c;
     int     event;
     bool    back = 0;
 
-    c = sc == HISTSUB ? HIST : getC(0);
-    if (c == HIST) {
+    c = sc == HISTSUB ? (eChar)HIST : getC(0);
+    if (c == (eChar)HIST) {
 	if (alhistp)
 	    return (alhistp);
 	event = eventno;
@@ -1475,18 +1478,17 @@ setexclp(cp)
 
 void
 unreadc(c)
-    int    c;
+    Char    c;
 {
     peekread = (Char) c;
 }
 
-int
+eChar
 readc(wanteof)
     bool    wanteof;
 {
-    int c;
+    eChar c;
     static  int sincereal;	/* Number of real EOFs we've seen */
-    extern int numeof;
 
 #ifdef DEBUG_INP
     xprintf("readc\n");
@@ -1552,7 +1554,7 @@ top:
     do {
 	if (arginp == INVPTR || onelflg == 1) {
 	    if (wanteof)
-		return (-1);
+		return CHAR_ERR;
 	    exitstat();
 	}
 	if (arginp) {
@@ -1566,7 +1568,7 @@ top:
 reread:
 #endif /* BSDJOBS */
 	c = bgetc();
-	if (c < 0) {
+	if (c == CHAR_ERR) {
 #ifndef WINNT_NATIVE
 # ifndef POSIX
 #  ifdef TERMIO
@@ -1579,7 +1581,7 @@ reread:
 # endif /* POSIX */
 #endif /* !WINNT_NATIVE */
 	    if (wanteof)
-		return (-1);
+		return CHAR_ERR;
 	    /* was isatty but raw with ignoreeof yields problems */
 #ifndef WINNT_NATIVE
 # ifndef POSIX
@@ -1690,12 +1692,79 @@ balloc(buf)
     }
 }
 
-static int
+static ssize_t
+wide_read(fildes, buf, nchars, use_fclens)
+    int fildes;
+    Char *buf;
+    size_t nchars;
+    int use_fclens;
+{
+    char cbuf[BUFSIZE + 1];
+    ssize_t res;
+#ifdef WIDE_STRINGS
+    ssize_t r;
+    size_t partial;
+#endif
+    
+    assert (nchars <= sizeof(cbuf)/sizeof(*cbuf));
+#ifdef WIDE_STRINGS
+    res = 0;
+    partial = 0;
+    do {
+	size_t i;
+	
+	do
+	    r = read(fildes, cbuf + partial,
+		     nchars > partial ? nchars - partial : 1);
+	while (partial != 0 && r < 0 && errno == EINTR);
+	if (partial == 0 && r <= 0)
+	    break;
+	partial += r;
+	i = 0;
+	while (i < partial) {
+	    int len;
+
+	    len = mbtowc(buf + res, cbuf + i, partial - i);
+	    if (len == -1) {
+		if (partial < MB_LEN_MAX && r > 0)
+		    /* Maybe a partial character and there is still a chance
+		       to read more */
+		    break;
+		buf[res] = (unsigned char)cbuf[i];
+	    }
+	    if (len <= 0)
+		len = 1;
+	    if (use_fclens)
+		fclens[res] = len;
+	    i += len;
+	    res++;
+	    nchars--;
+	}
+	if (i != partial)
+	    memmove(cbuf, cbuf + i, partial - i);
+	partial -= i;
+    } while (partial != 0);
+    /* Throwing away possible partial multibyte characters on error */
+    return res != 0 ? res : r;
+#else /* not WIDE_STRINGS */
+    USE(use_fclens);
+    res = read(fildes, cbuf, nchars);
+    if (res > 0) {
+	size_t i;
+	
+	for (i = 0; i < (size_t)res; i++)
+	    buf[i] = (unsigned char) cbuf[i];
+    }
+    return res;
+#endif
+}
+
+static eChar
 bgetc()
 {
+    Char ch;
     int c, off, buf;
     int numleft = 0, roomleft;
-    char    tbuf[BUFSIZE + 1];
 
     if (cantell) {
 	if (fseekp < fbobp || fseekp > feobp) {
@@ -1703,32 +1772,28 @@ bgetc()
 	    (void) lseek(SHIN, fseekp, L_SET);
 	}
 	if (fseekp == feobp) {
-	    int     i;
-
 	    fbobp = feobp;
 	    do
-		c = read(SHIN, tbuf, BUFSIZE);
+		c = wide_read(SHIN, fbuf[0], BUFSIZE, 1);
 	    while (c < 0 && errno == EINTR);
 #ifdef convex
 	    if (c < 0)
 		stderror(ERR_SYSTEM, progname, strerror(errno));
 #endif /* convex */
 	    if (c <= 0)
-		return (-1);
-	    for (i = 0; i < c; i++)
-		fbuf[0][i] = (unsigned char) tbuf[i];
+		return CHAR_ERR;
 	    feobp += c;
 	}
 #ifndef WINNT_NATIVE
-	c = fbuf[0][fseekp - fbobp];
+	ch = fbuf[0][fseekp - fbobp];
 	fseekp++;
 #else
 	do {
-	    c = fbuf[0][fseekp - fbobp];
+	    ch = fbuf[0][fseekp - fbobp];
 	    fseekp++;
-	} while(c == '\r');
+	} while(ch == '\r');
 #endif /* !WINNT_NATIVE */
-	return (c);
+	return (ch);
     }
 
     while (fseekp >= feobp) {
@@ -1762,33 +1827,27 @@ bgetc()
 	    buf = (int) feobp / BUFSIZE;
 	    balloc(buf);
 	    roomleft = BUFSIZE - off;
-	    c = read(SHIN, tbuf, (size_t) roomleft);
-	    if (c > 0) {
-		int     i;
-		Char   *ptr = fbuf[buf] + off;
-
-		for (i = 0; i < c; i++)
-		    ptr[i] = (unsigned char) tbuf[i];
+	    c = wide_read(SHIN, fbuf[buf] + off, (size_t) roomleft, 0);
+	    if (c > 0)
 		feobp += c;
-	    }
 	}
 	if (c == 0 || (c < 0 && fixio(SHIN, errno) == -1))
-	    return (-1);
+	    return CHAR_ERR;
     }
 #ifdef SIG_WINDOW
     if (windowchg)
 	(void) check_window_size(0);	/* for window systems */
 #endif /* SIG_WINDOW */
 #ifndef WINNT_NATIVE
-    c = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
+    ch = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
     fseekp++;
 #else
     do {
-	c = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
+	ch = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
 	fseekp++;
-    } while(c == '\r');
+    } while(ch == '\r');
 #endif /* !WINNT_NATIVE */
-    return (c);
+    return (ch);
 }
 
 static void
@@ -1835,6 +1894,28 @@ bseek(l)
 	xprintf(CGETS(16, 6, "seek to file %x\n"), fseekp);
 #endif
 	fseekp = l->f_seek;
+#ifdef WIDE_CHARS
+	if (cantell) {
+	    if (fseekp >= fbobp) {
+		size_t i;
+		off_t o;
+
+		o = fbobp;
+		for (i = 0; i < feobp - fbobp; i++) {
+		    if (fseekp == o) {
+			fseekp = fbobp + i;
+			return;
+		    }
+		    o += fclens[i];
+		}
+		if (fseekp == o) {
+		    fseekp = feobp;
+		    return;
+		}
+	    }
+	    fbobp = feobp = fseekp + 1; /* To force lseek() */
+	}
+#endif
 	return;
     default:
 	xprintf(CGETS(16, 7, "Bad seek type %d\n"), aret);
@@ -1863,8 +1944,17 @@ struct Ain *l;
 #endif
 	return;
     case TCSH_F_SEEK:
-	/*SUPPRESS 112*/
-	l->f_seek = fseekp;
+#ifdef WIDE_STRINGS
+	if (cantell && fseekp >= fbobp && fseekp < feobp) {
+	    size_t i;
+	    
+	    l->f_seek = fbobp;
+	    for (i = 0; i < fseekp - fbobp; i++)
+		l->f_seek += fclens[i];
+	} else
+#endif
+	    /*SUPPRESS 112*/
+	    l->f_seek = fseekp;
 	l->a_seek = NULL;
 #ifdef DEBUG_SEEK
 	xprintf(CGETS(16, 10, "tell file %x\n"), fseekp);

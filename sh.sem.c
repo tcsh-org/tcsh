@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.60 2004/02/23 15:04:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.61 2004/05/19 18:51:02 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.60 2004/02/23 15:04:36 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.61 2004/05/19 18:51:02 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -85,15 +85,11 @@ static	void		 chkclob	__P((char *));
 /*VARARGS 1*/
 void
 execute(t, wanttty, pipein, pipeout, do_glob)
-    register struct command *t;
+    struct command *t;
     int     wanttty;
     int *pipein, *pipeout;
     bool do_glob;
 {
-#ifdef VFORK
-    extern bool use_fork;	/* use fork() instead of vfork()? */
-#endif
-
     bool    forked = 0;
     struct biltins *bifunc;
     int     pid = 0;
@@ -759,7 +755,7 @@ static sigret_t
 vffree(snum)
 int snum;
 {
-    register Char **v;
+    Char **v;
 
     USE(snum);
     if ((v = gargv) != 0) {
@@ -797,7 +793,7 @@ int snum;
  */
 static Char *
 splicepipe(t, cp)
-    register struct command *t;
+    struct command *t;
     Char *cp;	/* word after < or > */
 {
     Char *blk[2];
@@ -843,12 +839,12 @@ splicepipe(t, cp)
  */
 static void
 doio(t, pipein, pipeout)
-    register struct command *t;
+    struct command *t;
     int    *pipein, *pipeout;
 {
-    register int fd;
-    register Char *cp;
-    register unsigned long flags = t->t_dflg;
+    int fd;
+    Char *cp;
+    unsigned long flags = t->t_dflg;
 
     if (didfds || (flags & F_REPEAT))
 	return;
@@ -967,7 +963,7 @@ doio(t, pipein, pipeout)
 
 void
 mypipe(pv)
-    register int *pv;
+    int *pv;
 {
 
     if (pipe(pv) < 0)
@@ -982,7 +978,7 @@ oops:
 
 static void
 chkclob(cp)
-    register char *cp;
+    char *cp;
 {
     struct stat stb;
 

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.err.c,v 3.35 2000/11/11 23:03:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.err.c,v 3.36 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -33,7 +33,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.35 2000/11/11 23:03:36 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.36 2002/03/08 17:36:46 christos Exp $")
 
 /*
  * C Shell
@@ -427,7 +427,7 @@ stderror(va_alist)
 #endif
 {
     va_list va;
-    register Char **v;
+    Char **v;
     int flags;
     int vareturn;
 

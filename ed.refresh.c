@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.30 2003/02/08 20:03:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.31 2004/05/19 18:51:42 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.30 2003/02/08 20:03:25 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.31 2004/05/19 18:51:42 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -45,7 +45,7 @@ Char   *litptr[512];
 static int vcursor_h, vcursor_v;
 static int rprompt_h, rprompt_v;
 
-static	void	Draw 			__P((int));
+static	void	Draw 			__P((Char));
 static	void	Vdraw 			__P((int));
 static	void	RefreshPromptpart	__P((Char *));
 static	void	update_line 		__P((Char *, Char *, int));
@@ -57,7 +57,7 @@ static
 #else
 extern
 #endif
-	void    PutPlusOne      __P((int));
+	void    PutPlusOne      __P((Char));
 static	void	cpy_pad_spaces		__P((Char *, Char *, int));
 #if defined(DSPMBYTE)
 static	Char 	*update_line_fix_mbyte_point __P((Char *, Char *, int));
@@ -121,9 +121,9 @@ dprintf(va_list)
 
 static void
 Draw(c)				/* draw c, expand tabs, ctl chars */
-    register int c;
+    Char c;
 {
-    register Char ch = c & CHAR;
+    Char ch = c & CHAR;
 
     if (Isprint(ch)) {
 	Vdraw(c);
@@ -192,7 +192,7 @@ Draw(c)				/* draw c, expand tabs, ctl chars */
 	return;
     }
 #endif
-    else {
+    else { /* If WIDE_STRINGS, truncates characters above U+00FF */
 	Vdraw('\\');
 	Vdraw(((c >> 6) & 7) + '0');
 	Vdraw(((c >> 3) & 7) + '0');
@@ -202,7 +202,7 @@ Draw(c)				/* draw c, expand tabs, ctl chars */
 
 static void
 Vdraw(c)			/* draw char c onto V lines */
-    register int c;
+    int c;
 {
 #ifdef DEBUG_REFRESH
 # ifdef SHORT_STRINGS
@@ -237,7 +237,7 @@ static void
 RefreshPromptpart(buf)
     Char *buf;
 {
-    register Char *cp;
+    Char *cp;
     if (buf == NULL)
     {
       litnum = 0;
@@ -285,8 +285,8 @@ int OldvcV = 0;
 void
 Refresh()
 {
-    register int cur_line;
-    register Char *cp;
+    int cur_line;
+    Char *cp;
     int     cur_h, cur_v = 0, new_vcv;
     int     rhdiff;
     Char    oldgetting;
@@ -449,12 +449,12 @@ PastBottom()
    maximum length of d is dlen */
 static void
 str_insert(d, dat, dlen, s, num)
-    register Char *d;
-    register int dat, dlen;
-    register Char *s;
-    register int num;
+    Char *d;
+    int dat, dlen;
+    Char *s;
+    int num;
 {
-    register Char *a, *b;
+    Char *a, *b;
 
     if (num <= 0)
 	return;
@@ -495,10 +495,10 @@ str_insert(d, dat, dlen, s, num)
 /* delete num characters d at dat, maximum length of d is dlen */
 static void
 str_delete(d, dat, dlen, num)
-    register Char *d;
-    register int dat, dlen, num;
+    Char *d;
+    int dat, dlen, num;
 {
-    register Char *a, *b;
+    Char *a, *b;
 
     if (num <= 0)
 	return;
@@ -528,8 +528,8 @@ str_delete(d, dat, dlen, num)
 
 static void
 str_cp(a, b, n)
-    register Char *a, *b;
-    register int n;
+    Char *a, *b;
+    int n;
 {
     while (n-- && *b)
 	*a++ = *b++;
@@ -583,10 +583,10 @@ new:	eddie> Oh, my little buggy says to me, as lurgid as
 
 static void			/* could be changed to make it smarter */
 update_line(old, new, cur_line)
-    register Char *old, *new;
+    Char *old, *new;
     int     cur_line;
 {
-    register Char *o, *n, *p, c;
+    Char *o, *n, *p, c;
     Char   *ofd, *ols, *oe, *nfd, *nls, *ne;
     Char   *osb, *ose, *nsb, *nse;
     int     fx, sx;
@@ -1126,10 +1126,10 @@ update_line(old, new, cur_line)
 
 static void
 cpy_pad_spaces(dst, src, width)
-    register Char *dst, *src;
-    register int width;
+    Char *dst, *src;
+    int width;
 {
-    register int i;
+    int i;
 
     for (i = 0; i < width; i++) {
 	if (*src == (Char) 0)
@@ -1147,8 +1147,8 @@ cpy_pad_spaces(dst, src, width)
 void
 RefCursor()
 {				/* only move to new cursor pos */
-    register Char *cp, c;
-    register int h, th, v;
+    Char *cp, c;
+    int h, th, v;
 
     /* first we must find where the cursor is... */
     h = 0;
@@ -1258,9 +1258,9 @@ RefCursor()
 #ifndef WINTT_NATIVE
 static void
 PutPlusOne(c)
-    int    c;
+    Char   c;
 {
-    (void) putraw(c);
+    (void) putwraw(c);
     Display[CursorV][CursorH++] = (Char) c;
     if (CursorH >= TermH) {	/* if we must overflow */
 	CursorH = 0;
@@ -1284,7 +1284,7 @@ void
 RefPlusOne()
 {				/* we added just one char, handle it fast.
 				 * assumes that screen cursor == real cursor */
-    register Char c, mc;
+    Char c, mc;
 
     c = Cursor[-1] & CHAR;	/* the char we just added */
 
@@ -1332,7 +1332,7 @@ RefPlusOne()
 	PutPlusOne(c);
     }
 #endif
-    else {
+    else { /* If WIDE_STRINGS, truncates characters above U+00FF */
 	PutPlusOne('\\');
 	PutPlusOne(((c >> 6) & 7) + '0');
 	PutPlusOne(((c >> 3) & 7) + '0');
@@ -1346,7 +1346,7 @@ RefPlusOne()
 void
 ClearDisp()
 {
-    register int i;
+    int i;
 
     CursorV = 0;		/* clear the display buffer */
     CursorH = 0;
@@ -1358,7 +1358,7 @@ ClearDisp()
 void
 ClearLines()
 {				/* Make sure all lines are *really* blank */
-    register int i;
+    int i;
 
     if (T_CanCEOL) {
 	/*

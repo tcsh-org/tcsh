@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.113 2004/08/01 20:45:10 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.114 2004/08/04 14:28:23 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.113 2004/08/01 20:45:10 christos Exp $")
+RCSID("$Id: sh.c,v 3.114 2004/08/04 14:28:23 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -47,7 +47,6 @@ RCSID("$Id: sh.c,v 3.113 2004/08/01 20:45:10 christos Exp $")
 
 extern bool MapsAreInited;
 extern bool NLSMapsAreInited;
-extern bool NoNLSRebind;
 
 /*
  * C Shell
@@ -160,9 +159,9 @@ struct saved_state {
 
 static	int		  srccat	__P((Char *, Char *));
 #ifndef WINNT_NATIVE
-static	int		  srcfile	__P((char *, bool, int, Char **));
+static	int		  srcfile	__P((const char *, bool, int, Char **));
 #else
-int		  srcfile	__P((char *, bool, int, Char **));
+int		  srcfile	__P((const char *, bool, int, Char **));
 #endif /*WINNT_NATIVE*/
 static	sigret_t	  phup		__P((int));
 static	void		  srcunit	__P((int, bool, int, Char **));
@@ -182,13 +181,13 @@ main(argc, argv)
     int     argc;
     char  **argv;
 {
-    register Char *cp;
+    Char *cp;
 #ifdef AUTOLOGOUT
-    register Char *cp2;
+    Char *cp2;
 #endif
-    register char *tcp, *ttyn;
-    register int f;
-    register char **tempv;
+    char *tcp, *ttyn;
+    int f;
+    char **tempv;
     int osetintr;
     signalfun_t oparintr;
 
@@ -364,7 +363,7 @@ main(argc, argv)
 
 	for (k = 0200; k <= 0377 && !Isprint(k); k++)
 	    continue;
-	AsciiOnly = k > 0377;
+	AsciiOnly = MB_CUR_MAX == 1 && k > 0377;
     }
 #else
     AsciiOnly = getenv("LANG") == NULL && getenv("LC_CTYPE") == NULL;
@@ -856,7 +855,7 @@ main(argc, argv)
 		 * ensure that you don't make * nonportable csh scripts.
 		 */
 		{
-		    register int count;
+		    int count;
 
 		    cp = arginp + Strlen(arginp);
 		    count = 0;
@@ -877,7 +876,7 @@ main(argc, argv)
 #ifdef apollo
 	    case 'D':		/* -D	Define environment variable */
 		{
-		    register Char *dp;
+		    Char *dp;
 
 		    cp = str2short(tcp);
 		    if (dp = Strchr(cp, '=')) {
@@ -1391,9 +1390,9 @@ void
 importpath(cp)
     Char   *cp;
 {
-    register int i = 0;
-    register Char *dp;
-    register Char **pv;
+    int i = 0;
+    Char *dp;
+    Char **pv;
     int     c;
 
     for (dp = cp; *dp; dp++)
@@ -1438,7 +1437,7 @@ srccat(cp, dp)
     if (cp[0] == '/' && cp[1] == '\0') 
 	return srcfile(short2str(dp), (mflag ? 0 : 1), 0, NULL);
     else {
-	register Char *ep;
+	Char *ep;
 	char   *ptr;
 	int rv;
 
@@ -1468,12 +1467,12 @@ static int
 int
 #endif /*WINNT_NATIVE*/
 srcfile(f, onlyown, flag, av)
-    char   *f;
+    const char   *f;
     bool    onlyown;
     int flag;
     Char **av;
 {
-    register int unit;
+    int unit;
 
     if ((unit = open(f, O_RDONLY|O_LARGEFILE)) == -1) 
 	return 0;
@@ -1596,9 +1595,9 @@ st_restore(st, av)
 
     /* Reset input arena */
     {
-	register int i;
-	register Char** nfbuf = fbuf;
-	register int nfblocks = fblocks;
+	int i;
+	Char** nfbuf = fbuf;
+	int nfblocks = fblocks;
 
 	fblocks = 0;
 	fbuf = NULL;
@@ -1644,7 +1643,7 @@ st_restore(st, av)
  */
 static void
 srcunit(unit, onlyown, hflg, av)
-    register int unit;
+    int unit;
     bool    onlyown;
     int hflg;
     Char **av;
@@ -1886,7 +1885,7 @@ void
 pintr1(wantnl)
     bool    wantnl;
 {
-    register Char **v;
+    Char **v;
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif
@@ -1909,15 +1908,11 @@ pintr1(wantnl)
     }
     /* MH - handle interrupted completions specially */
     {
-	extern int InsideCompletion;
-
 	if (InsideCompletion)
 	    stderror(ERR_SILENT);
     }
     /* JV - Make sure we shut off inputl */
     {
-	extern Char GettingInput;
-
 	(void) Cookedmode();
 	GettingInput = 0;
     }
@@ -1986,7 +1981,6 @@ void
 process(catch)
     bool    catch;
 {
-    extern char Expand;
     jmp_buf_t osetexit;
     /* PWP: This might get nuked my longjmp so don't make it a register var */
     struct command *t = savet;
@@ -2195,12 +2189,11 @@ process(catch)
 /*ARGSUSED*/
 void
 dosource(t, c)
-    register Char **t;
+    Char **t;
     struct command *c;
 {
-    register Char *f;
+    Char *f;
     bool    hflg = 0;
-    extern int bequiet;
     char    buf[BUFSIZE];
 
     USE(c);
@@ -2254,8 +2247,8 @@ dosource(t, c)
 static void
 mailchk()
 {
-    register struct varent *v;
-    register Char **vp;
+    struct varent *v;
+    Char **vp;
     time_t  t;
     int     intvl, cnt;
     struct stat stb;

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.52 2004/02/21 20:34:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.53 2004/05/19 18:51:43 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -231,11 +231,11 @@ extern	pret_t		  xvsnprintf	__P((char *, size_t, const char *,
  * tc.prompt.c
  */
 extern	void		  dateinit	__P((void));
-extern	void		  printprompt	__P((int, char *));
+extern	void		  printprompt	__P((int, const char *));
 extern  Char 		 *expdollar	__P((Char **, const Char **, size_t *,
 					     int));
 extern	void		  tprintf	__P((int, Char *, const Char *, size_t, 
-					     char *, time_t, ptr_t));
+					     const char *, time_t, ptr_t));
 
 /*
  * tc.sched.c
@@ -290,6 +290,10 @@ extern	sigret_t	  synch_handler	__P((int));
 /*
  * tc.str.c:
  */
+#ifdef WIDE_STRINGS
+extern	size_t		  one_mbtowc	__P((wchar_t *, const char *, size_t));
+extern	size_t		  one_wctomb	__P((char *, wchar_t));
+#endif
 #ifdef SHORT_STRINGS
 extern	Char		 *s_strchr	__P((const Char *, int));
 extern	Char		 *s_strrchr	__P((const Char *, int));

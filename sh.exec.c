@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.58 2003/03/12 19:14:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.59 2004/08/04 14:28:23 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.58 2003/03/12 19:14:51 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.59 2004/08/04 14:28:23 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -148,7 +148,7 @@ static	int 	iscommand	__P((Char *));
 
 void
 doexec(t, do_glob)
-    register struct command *t;
+    struct command *t;
     bool do_glob;
 {
     Char *dp, **pv, **av, *sav;
@@ -385,11 +385,11 @@ pexerr()
 static void
 texec(sf, st)
     Char   *sf;
-    register Char **st;
+    Char **st;
 {
-    register char **t;
-    register char *f;
-    register struct varent *v;
+    char **t;
+    char *f;
+    struct varent *v;
     Char  **vp;
     Char   *lastsh[2];
     char    pref[2];
@@ -444,7 +444,7 @@ texec(sf, st)
 	    setmode(fd, O_TEXT);
 #endif
 	    if ((nread = read(fd, (char *) pref, 2)) == 2) {
-		if (!Isprint(pref[0]) && (pref[0] != '\n' && pref[0] != '\t')) {
+		if (!isprint(pref[0]) && (pref[0] != '\n' && pref[0] != '\t')) {
 		    (void) close(fd);
 		    /*
 		     * We *know* what ENOEXEC means.
@@ -554,7 +554,7 @@ texec(sf, st)
 void
 execash(t, kp)
     Char  **t;
-    register struct command *kp;
+    struct command *kp;
 {
     int     saveIN, saveOUT, saveDIAG, saveSTD;
     int     oSHIN;
@@ -675,7 +675,7 @@ dohash(vv, c)
     struct stat stb;
 #endif
     DIR    *dirp;
-    register struct dirent *dp;
+    struct dirent *dp;
     int     i = 0;
     struct varent *v = adrof(STRpath);
     Char  **pv;
@@ -839,9 +839,9 @@ hashstat(v, c)
  */
 int
 hashname(cp)
-    register Char *cp;
+    Char *cp;
 {
-    register unsigned long h;
+    unsigned long h;
 
     for (h = 0; *cp; cp++)
 	h = hash(h, *cp);
@@ -852,11 +852,11 @@ static int
 iscommand(name)
     Char   *name;
 {
-    register Char **pv;
-    register Char *sav;
-    register struct varent *v;
-    register bool slash = any(short2str(name), '/');
-    register int hashval, i;
+    Char **pv;
+    Char *sav;
+    struct varent *v;
+    bool slash = any(short2str(name), '/');
+    int hashval, i;
 
     v = adrof(STRpath);
     if (v == NULL || v->vec == NULL || v->vec[0] == NULL || slash)
@@ -947,9 +947,9 @@ tellmewhat(lexp, str)
     struct wordent *lexp;
     Char *str;
 {
-    register int i;
-    register struct biltins *bptr;
-    register struct wordent *sp = lexp->next;
+    int i;
+    struct biltins *bptr;
+    struct wordent *sp = lexp->next;
     bool    aliased = 0, found;
     Char   *s0, *s1, *s2, *cmd;
     Char    qc;
@@ -1023,8 +1023,8 @@ tellmewhat(lexp, str)
     sp->word = cmd = globone(sp->word, G_IGNORE);
 
     if ((i = iscommand(sp->word)) != 0) {
-	register Char **pv;
-	register struct varent *v;
+	Char **pv;
+	struct varent *v;
 	bool    slash = any(short2str(sp->word), '/');
 
 	v = adrof(STRpath);
@@ -1083,7 +1083,7 @@ tellmewhat(lexp, str)
 /*ARGSUSED*/
 void
 dowhere(v, c)
-    register Char **v;
+    Char **v;
     struct command *c;
 {
     int found = 1;
