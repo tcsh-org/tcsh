@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.38 2004/08/04 17:12:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.39 2004/11/21 04:34:22 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.38 2004/08/04 17:12:32 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.39 2004/11/21 04:34:22 christos Exp $")
 
 #include "tc.h"
 
@@ -65,6 +65,12 @@ RCSID("$Id: tc.who.c,v 3.38 2004/08/04 17:12:32 christos Exp $")
 # else
 #  define ut_time ut_xtime
 # endif /* __MVS__ */
+# ifdef HAVE_UTMPNAME
+#  define getutent getutxent
+#  define setutent setutxent
+#  define endutent endutxent
+#  define utmpname utmpxname
+# endif /* HAVE_UTMPNAME */
 #else /* !HAVEUTMPX */
 # ifndef WINNT_NATIVE
 #  include <utmp.h>
