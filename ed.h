@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.42 2005/01/18 20:43:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.43 2005/03/03 16:57:01 kim Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -215,8 +215,8 @@ EXTERN Char T_HasMeta;		/* true if we have a meta key */
 #endif /* TERMIO */
 typedef struct { 
     const char *t_name;
-    int  t_setmask;
-    int  t_clrmask;
+    unsigned int  t_setmask;
+    unsigned int  t_clrmask;
 } ttyperm_t[NN_IO][M_NN];
 
 extern ttyperm_t ttylist;
