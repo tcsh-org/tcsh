@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.102 2002/07/08 20:43:55 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.103 2002/07/09 12:56:55 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.102 2002/07/08 20:43:55 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.103 2002/07/09 12:56:55 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2224,6 +2224,8 @@ dosuspend(v, c)
     if (tpgrp != -1) {
 retry:
 	ctpgrp = tcgetpgrp(FSHTTY);
+	if (ctpgrp == -1)
+	    stderror(ERR_SYSTEM, "tcgetpgrp", strerror(errno));
 	if (ctpgrp != opgrp) {
 	    old = signal(SIGTTIN, SIG_DFL);
 	    (void) kill(0, SIGTTIN);
