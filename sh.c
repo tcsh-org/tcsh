@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.121 2005/01/18 20:14:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.122 2005/01/18 20:24:50 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.121 2005/01/18 20:14:03 christos Exp $")
+RCSID("$Id: sh.c,v 3.122 2005/01/18 20:24:50 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -802,6 +802,11 @@ main(argc, argv)
 
     if (argc > 1 && strcmp(argv[1], "--version") == 0) {
 	xprintf("%S\n", varval(STRversion));
+	xexit(0);
+    }
+    if (argc > 1 && strcmp(argv[1], "--help") == 0) {
+	xprintf("%S\n\n", varval(STRversion));
+	xprintf(CGETS(11, 8, HELP_STRING));
 	xexit(0);
     }
     /*
@@ -2336,7 +2341,7 @@ mailchk()
 	    if (cnt == 1)
 		xprintf(CGETS(11, 5, "You have %smail.\n"), type);
 	    else
-	        xprintf(CGETS(11, 7, "You have %smail in %s.\n"), type);
+	        xprintf(CGETS(11, 7, "You have %smail in %s.\n"), type, filename);
 	    xfree(type);
 	}
     }

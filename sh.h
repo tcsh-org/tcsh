@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.130 2005/03/03 16:49:16 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.131 2005/03/03 17:13:06 kim Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -1308,6 +1308,32 @@ extern int    filec;
  * as unsigned and sign extend them where we need.
  */
 #define SIGN_EXTEND_CHAR(a)	(((a) & 0x80) ? ((a) | ~0x7f) : (a))
+
+/*
+ * explanation for use by the "--help" option
+ */
+#define HELP_STRING "\
+-b file		batch mode, read and execute commands from `file' \n\
+-c command	run `command' from next argument \n\
+-d		load directory stack from `~/.cshdirs' \n\
+-Dname[=value]	define environment variable `name' to `value' (DomainOS only) \n\
+-e		exit on any error \n\
+-f		start faster by ignoring the start-up file \n\
+-F		use fork() instead of vfork() when spawning (ConvexOS only) \n\
+-i		interactive, even when input is not from a terminal \n\
+-l		act as a login shell, must be the only option specified \n\
+-m		load the start-up file, whether or not owned by effective user \n\
+-n file		no execute mode, just check syntax of the following `file' \n\
+-q		accept SIGQUIT for running under a debugger \n\
+-s		read commands from standard input \n\
+-t		read one line from standard input \n\
+-v		echo commands after history substitution \n\
+-V		like -v but including commands read from the start-up file \n\
+-x		echo commands immediately before execution \n\
+-X		like -x but including commands read from the start-up file \n\
+--help		print this message and exit \n\
+--version	print the version shell variable and exit \n\
+\nSee the tcsh(1) manual page for detailed information.\n"
 
 #include "tc.nls.h"
 
