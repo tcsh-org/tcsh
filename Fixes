@@ -1,3 +1,4 @@
+ 60. V6.13.08 - 20050303
  59. Add test for socklen_t in autoconf.
  58. Fix problems with NLSFrom prototype.
  57. Deal with AIX's utmpx lossage
@@ -69,7 +70,7 @@
      (Eric D. Hendrickson)
   2. vc++ 7.1 compilation fix (Steve Schockley)
   1. UTF-8 handling for both single and double width characters, but
-     no conbining character support. (Michael Schroeder)
+     no combining character support. (Michael Schroeder)
 
  36. V6.13.00 - 20040519
  35. V6.12.03 - 20040322

@@ -1,0 +1,38 @@
+Hello,
+
+I am pleased to announce that tcsh-6.14 is now available; this version
+fixes a number of bugs and adds the following enhancements:
+
+New Features:
+	* UTF-8 handling for both singe and double width characters
+	* termname builtin for testing whether a terminal type is
+	  available in termcap/terminfo
+
+Bug Fixes:
+	* too many to enumerate here, consult the Fixes file
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most UNIX machines, VMS_POSIX, OS/2 EMX, WIN32, Amiga...
+
+You can get tcsh from ftp://ftp.astron.com/pub/tcsh/tcsh-6.14.00.tar.gz
+or from the mirrors:
+
+    ftp://ftp.gw.com/pub/unix/tcsh/tcsh-6.14.00.tar.gz [US]
+    ftp://ftp.funet.fi/pub/unix/shells/tcsh/tcsh-6.14.00.tar.gz [Finland]
+
+    MD5 (tcsh-6.14.00.tar.gz) = XXX
+    RMD160 (tcsh-6.14.00.tar.gz) = XXX
+    SHA1 (tcsh-6.14.00.tar.gz) = XXX
+
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you can
+get it from ftp.gnu.org or other GNU mirrors.
+
+I would like to thank:
+
+    o everyone who sent bug reports
+    o the beta team for all their help, bug fixes, and suggestions
+
++ Kim
