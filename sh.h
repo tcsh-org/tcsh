@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.126 2005/01/18 20:24:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.127 2005/01/18 20:43:31 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -244,7 +244,7 @@ typedef int NLSChar;
 #endif /* !_MINIX && !_VMS_POSIX && !WINNT_NATIVE && !__MVS__ */
 #include <sys/stat.h>
 
-#if defined(BSDTIMES) || defined(BSDLIMIT)
+#if defined(BSDTIMES) || defined(BSDLIMIT) || defined(__CYGWIN__)
 # include <sys/time.h>
 # if SYSVREL>3 && !defined(SCO) && !defined(sgi) && !defined(SNI) && !defined(sun) && !(defined(__alpha) && defined(__osf__)) && !defined(_SX) && !defined(__MVS__)
 #  include "/usr/ucbinclude/sys/resource.h"
