@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.107 2002/07/12 13:16:18 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.108 2002/07/23 16:13:22 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -335,6 +335,9 @@ typedef int sigret_t;
 #if !defined(O_RDONLY) || !defined(O_NDELAY)
 # include <fcntl.h>
 #endif 
+#ifndef O_LARGEFILE
+# define O_LARGEFILE 0
+#endif
 
 #include <errno.h>
 

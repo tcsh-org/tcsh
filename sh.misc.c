@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.23 1997/02/23 19:03:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.24 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.23 1997/02/23 19:03:23 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.24 2002/03/08 17:36:46 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -273,7 +273,7 @@ closem()
 	    (void) close(f);
 #ifdef NISPLUS
 	    if(f < 3)
-		(void) open(_PATH_DEVNULL, O_RDONLY);
+		(void) open(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE);
 #endif /* NISPLUS */
 	  }
 }
@@ -315,7 +315,7 @@ donefds()
     didfds = 0;
 #ifdef NISPLUS
     {
-	int fd = open(_PATH_DEVNULL, O_RDONLY);
+	int fd = open(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE);
 	(void) dup2(fd, 1);
 	(void) dup2(fd, 2);
 	if (fd != 0) {

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.c,v 3.52 2000/11/11 23:03:39 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.c,v 3.53 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.52 2000/11/11 23:03:39 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.53 2002/03/08 17:36:47 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -935,7 +935,7 @@ fix_strcoll_bug()
     static char *root = "/";
 
     if (!didfds)
-	fd = open(root, O_RDONLY);
+	fd = open(root, O_RDONLY|O_LARGEFILE);
 
     (void) strcoll(root, root);
 

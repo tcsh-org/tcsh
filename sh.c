@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.104 2002/07/02 18:38:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.105 2002/07/05 16:28:16 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.104 2002/07/02 18:38:43 christos Exp $")
+RCSID("$Id: sh.c,v 3.105 2002/07/05 16:28:16 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -211,7 +211,8 @@ main(argc, argv)
 
 #ifdef MALLOC_TRACE
      mal_setstatsfile(fdopen(dup2(open("/tmp/tcsh.trace", 
-				       O_WRONLY|O_CREAT, 0666), 25), "w"));
+				       O_WRONLY|O_CREAT|O_LARGEFILE, 0666), 25),
+				       "w"));
      mal_trace(1);
 #endif /* MALLOC_TRACE */
 
@@ -238,8 +239,8 @@ main(argc, argv)
      */
     {
 	do 
-	    if ((f = open(_PATH_DEVNULL, O_RDONLY)) == -1 &&
-		(f = open("/", O_RDONLY)) == -1) 
+	    if ((f = open(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE)) == -1 &&
+		(f = open("/", O_RDONLY|O_LARGEFILE)) == -1) 
 		exit(1);
 	while (f < 3);
 	(void) close(f);
@@ -395,7 +396,7 @@ main(argc, argv)
      if (loginsh && isatty(SHIN)) {
 	 ttyn = (char *) ttyname(SHIN);
 	 (void) close(SHIN);
-	 SHIN = open(ttyn, O_RDWR);
+	 SHIN = open(ttyn, O_RDWR|O_LARGEFILE);
 	 shpgrp = getpid();
 	 (void) ioctl (SHIN, TIOCSPGRP, (ioctl_t) &shpgrp);
 	 (void) setpgid(0, shpgrp);
@@ -969,7 +970,7 @@ main(argc, argv)
      * read commands.
      */
     if (nofile == 0 && argc > 0) {
-	nofile = open(tempv[0], O_RDONLY);
+	nofile = open(tempv[0], O_RDONLY|O_LARGEFILE);
 	if (nofile < 0) {
 	    child = 1;		/* So this ... */
 	    /* ... doesn't return */
@@ -1462,7 +1463,7 @@ srcfile(f, onlyown, flag, av)
 {
     register int unit;
 
-    if ((unit = open(f, O_RDONLY)) == -1) 
+    if ((unit = open(f, O_RDONLY|O_LARGEFILE)) == -1) 
 	return 0;
     unit = dmove(unit, -1);
 

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.55 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.56 2002/06/25 19:02:11 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.55 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.56 2002/06/25 19:02:11 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -438,7 +438,7 @@ texec(sf, st)
 	 * From: casper@fwi.uva.nl (Casper H.S. Dik) If we could not execute
 	 * it, don't feed it to the shell if it looks like a binary!
 	 */
-	if ((fd = open(f, O_RDONLY)) != -1) {
+	if ((fd = open(f, O_RDONLY|O_LARGEFILE)) != -1) {
 	    int nread;
 	    if ((nread = read(fd, (char *) pref, 2)) == 2) {
 		if (!Isprint(pref[0]) && (pref[0] != '\n' && pref[0] != '\t')) {
