@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.44 2000/01/14 22:57:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.45 2000/06/10 20:25:54 kim Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.44 2000/01/14 22:57:28 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.45 2000/06/10 20:25:54 kim Exp $")
 
 #include "tc.h"
 
@@ -453,7 +453,7 @@ globexpand(v)
     if ( symlinks == SYM_EXPAND )
 	for (s = *vl; s; s = *++vl) {
 	    char *path = short2str(s);
-	    if (strstr(path,"..") != NULL && access(path, F_OK) == 0) {
+	    if (strstr(path, "..") != NULL && access(path, F_OK) == 0) {
 		*vl = dnormalize(s, 1);
 		xfree((ptr_t) s);
 	    }
