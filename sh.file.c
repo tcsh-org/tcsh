@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.18 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.19 2002/03/08 18:55:17 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -32,9 +32,9 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.18 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.19 2002/03/08 18:55:17 christos Exp $")
 
-#ifdef FILEC
+#if defined(FILEC) && defined(TIOCSTI)
 
 /*
  * Tenex style file name recognition, .. and more.
@@ -858,4 +858,4 @@ ignored(item)
 	    return (TRUE);
     return (FALSE);
 }
-#endif	/* FILEC */
+#endif	/* FILEC && TIOCSTI */

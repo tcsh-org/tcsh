@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.50 2002/03/08 16:35:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.51 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.50 2002/03/08 16:35:30 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.51 2002/03/08 17:36:46 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -1125,7 +1125,7 @@ Gcat(s1, s2)
 	continue;
 }
 
-#ifdef FILEC
+#if defined(FILEC) && defined(TIOCSTI)
 int
 sortscmp(a, b)
     register Char **a, **b;

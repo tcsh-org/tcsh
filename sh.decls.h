@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.36 2002/01/26 23:23:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.37 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -108,7 +108,7 @@ extern	int		  exp0		__P((Char ***, bool));
 /*
  * sh.file.c
  */
-#ifdef FILEC
+#if defined(FILEC) && defined(TIOCSTI)
 extern	int		  tenex		__P((Char *, int));
 #endif
 
@@ -175,7 +175,7 @@ extern	Char		**globall	__P((Char **));
 extern	void		  rscan		__P((Char **, void (*)(int)));
 extern	void		  tglob		__P((Char **));
 extern	void		  trim		__P((Char **));
-#ifdef FILEC
+#if defined(FILEC) && defined(TIOCSTI)
 extern	int		  sortscmp	__P((Char **, Char **));
 #endif
 extern	void		  nlsinit	__P((void));

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.56 2001/01/29 01:28:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.57 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.56 2001/01/29 01:28:02 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.57 2002/03/08 17:36:46 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -410,6 +410,18 @@ dnormalize(cp, exp)
 	        cwd = dp;
 	        if ((TRM(cwd[(dotdot = (int) Strlen(cwd)) - 1])) == '/')
 		    cwd[--dotdot] = '\0';
+	    }
+	    /* Reduction of ".." following the stuff we collected in buf
+	     * only makes sense if the directory item in buf really exists.
+	     * Avoid reduction of "-I../.." (typical compiler call) to ""
+	     * or "/usr/nonexistant/../bin" to "/usr/bin":
+	     */
+	    if (cwd[0]) {
+	        struct stat exists;
+		if (0 != stat(short2str(cwd), &exists)) {
+		    xfree((ptr_t) cwd);
+		    return Strsave(start);
+		}
 	    }
 	    if (!*cp)
 	        break;

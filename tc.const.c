@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.const.c,v 3.63 2002/01/07 03:19:04 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.const.c,v 3.64 2002/03/08 17:36:47 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.63 2002/01/07 03:19:04 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.64 2002/03/08 17:36:47 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -317,9 +317,9 @@ Char STRcontinue_args[] = { 'c', 'o', 'n', 't', 'i', 'n', 'u', 'e', '_', 'a',
 Char STRunderpause[]	= { '_', 'p', 'a', 'u', 's', 'e', '\0' };
 #endif
 Char STRbackqpwd[]	= { '`', 'p', 'w', 'd', '`', '\0' };
-#ifdef FILEC
+#if defined(FILEC) && defined(TIOCSTI)
 Char STRfilec[]		= { 'f', 'i', 'l', 'e', 'c', '\0' };
-#endif /* FILEC */
+#endif /* FILEC && TIOCSTI */
 Char STRhistchars[]	= { 'h', 'i', 's', 't', 'c', 'h', 'a', 'r', 's', '\0' };
 Char STRpromptchars[]	= { 'p', 'r', 'o', 'm', 'p', 't', 'c', 'h', 'a', 'r',
 			    's', '\0' };

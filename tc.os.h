@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.86 2000/11/11 23:03:39 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.87 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -163,6 +163,9 @@ struct ucred {
 #   define setpgrp(a, b) setpgrp2(a, b)
 #  endif /* BSDJOBS */
 # endif	/* POSIX */
+# ifndef TIOCSTI
+#  include <sys/strtio.h>
+# endif
 #endif /* hpux */
 
 /*

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.vers.c,v 3.47 2002/01/07 03:19:04 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.vers.c,v 3.48 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "tw.h"
 
-RCSID("$Id: tc.vers.c,v 3.47 2002/01/07 03:19:04 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.48 2002/03/08 17:36:47 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -135,7 +135,7 @@ fix_version()
 #else
 # define CCATSTR ""
 #endif
-#ifdef FILEC
+#if defined(FILEC) && defined(TIOCSTI)
 # define FILECSTR ",filec"
 #else
 # define FILECSTR ""

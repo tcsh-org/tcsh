@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.40 2002/01/07 03:19:04 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.41 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.40 2002/01/07 03:19:04 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.41 2002/03/08 17:36:46 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -182,7 +182,7 @@ update_vars(vp)
 	(void) catclose(catd);
 	nlsinit();
     }
-#ifdef FILEC
+#if defined(FILEC) && defined(TIOCSTI)
     else if (eq(vp, STRfilec))
 	filec = 1;
 #endif
@@ -722,10 +722,10 @@ unset(v, c)
     did_edit = adrof(STRedit) != NULL;
     unset1(v, &shvhed);
 
-#ifdef FILEC
+#if defined(FILEC) && defined(TIOCSTI)
     if (adrof(STRfilec) == 0)
 	filec = 0;
-#endif /* FILEC */
+#endif /* FILEC && TIOCSTI */
 
     if (adrof(STRhistchars) == 0) {
 	HIST = '!';
