@@ -1,3 +1,5 @@
+ 42. add --version (Nelson Beebe)
+ 41. portability fixes for sed (Nelson Beebe)
  40. undef sv_handler for AIX's benefit. (Nelson Beebe)
  39. Add a test for ss_family that disables IPV6 (linux/ppc, osf/1 have
      problems) (Nelson Beebe)
