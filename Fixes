@@ -1,3 +1,4 @@
+ 21. Handle breaksw that jumps out of loops.
  20. Revert #16. It causes worse problems.
  19. Avoid using execl() because the last NULL does not always promoted to
      a pointer because the function is variadic (Harti Brandt)
