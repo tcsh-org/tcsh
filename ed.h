@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/ed.h,v 1.2 91/07/14 22:22:23 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -38,7 +38,7 @@
 #define _h_ed
 
 #ifndef EXTERN
-#define EXTERN extern
+# define EXTERN extern
 #endif
 
 #define TABSIZE		8	/* usually 8 spaces/tab */
@@ -99,19 +99,18 @@ EXTERN KEYCMD NumFuns;		/* number of KEYCMDs in above table */
 
 
 #ifndef POSIX
-#ifdef TERMIO
+# ifdef TERMIO
 EXTERN struct termio nio;
 EXTERN struct termio xio;
 EXTERN struct termio testio;
 
-#if defined(OREO) || defined(hpux) || defined(_IBMR2)
+#  if defined(OREO) || defined(hpux) || defined(_IBMR2)
 EXTERN struct ltchars nlc;
 EXTERN struct ltchars xlc;
 EXTERN struct ltchars testlc;
+#  endif /* OREO || hpux || _IBMR2 */
 
-#endif				/* OREO || hpux || _IBMR2 */
-
-#else				/* GSTTY */
+# else /* GSTTY */
 EXTERN struct sgttyb nb;	/* original setup tty bits */
 EXTERN struct tchars ntc;
 EXTERN struct ltchars nlc;
@@ -127,28 +126,24 @@ EXTERN int testnlb;		/* test local mode word */
 EXTERN struct tchars testtc;
 EXTERN struct ltchars testlc;
 
-#ifdef TIOCGPAGE
+#  ifdef TIOCGPAGE
 EXTERN struct ttypagestat npc;
 EXTERN struct ttypagestat xpc;
 EXTERN struct ttypagestat testpc;
 
-#endif				/* TIOCGPAGE */
-
-#endif				/* TERMIO */
-#else				/* POSIX */
+#  endif /* TIOCGPAGE */
+# endif	/* TERMIO */
+#else /* POSIX */
 EXTERN struct termios nio;
 EXTERN struct termios xio;
 EXTERN struct termios testio;
 
-#if defined(hpux)
+# if defined(OREO) || defined(hpux) || defined(_IBMR2)
 EXTERN struct ltchars nlc;
 EXTERN struct ltchars xlc;
 EXTERN struct ltchars testlc;
-
-#endif				/* hpux */
-#endif				/* POSIX */
-
-
+# endif /* OREO || hpux || _IBMR2 */
+#endif /* POSIX */
 
 /****************************/
 /* Editor state and buffers */
@@ -210,11 +205,11 @@ EXTERN Char T_CanCEOL;		/* true if we can clear to end of line */
 EXTERN Char T_CanUP;		/* true if this term can do reverse linefeen */
 EXTERN Char T_HasMeta;		/* true if we have a meta key */
 
-/* note the extra characters in the index() call in this macro */
+/* note the extra characters in the Strchr() call in this macro */
 #define isword(c)	(Isalpha(c)||Isdigit(c)||Strchr(word_chars,c))
 #define min(x,y)	(((x)<(y))?(x):(y))
 #define max(x,y)	(((x)>(y))?(x):(y))
 
 #include "ed.decls.h"
 
-#endif				/* _h_ed */
+#endif /* _h_ed */
