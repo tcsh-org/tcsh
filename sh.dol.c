@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.39 2000/01/14 22:57:27 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.40 2000/06/10 21:36:06 kim Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.39 2000/01/14 22:57:27 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.40 2000/06/10 21:36:06 kim Exp $")
 
 /*
  * C shell
@@ -1017,7 +1017,7 @@ void
 heredoc(term)
     Char   *term;
 {
-    register int c;
+    int c = 0;
     Char   *Dv[2];
     Char    obuf[BUFSIZE], lbuf[BUFSIZE], mbuf[BUFSIZE];
     int     ocnt, lcnt, mcnt;
@@ -1036,10 +1036,16 @@ heredoc(term)
 #ifndef O_TEMPORARY
 # define O_TEMPORARY 0
 #endif
-    if (open(tmp, O_RDWR|O_CREAT|O_TEMPORARY) < 0) {
+#ifndef O_EXCL
+# define O_EXCL 0
+#endif
+again:
+    if (open(tmp, O_RDWR|O_CREAT|O_EXCL|O_TEMPORARY) == -1) {
 	int     oerrno = errno;
 
 	(void) unlink(tmp);
+	if (errno == EEXIST && c++ == 0)
+		goto again;
 	errno = oerrno;
 	stderror(ERR_SYSTEM, tmp, strerror(errno));
     }
