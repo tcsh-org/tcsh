@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.106 2003/11/05 04:41:58 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.107 2003/12/02 18:00:08 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.106 2003/11/05 04:41:58 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.107 2003/12/02 18:00:08 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1746,7 +1746,7 @@ doumask(v, c)
 #   define toset(a) ((a) + 1)
 #  endif /* aiws */
 # else /* BSDLIMIT */
-#  if (defined(BSD4_4) || defined(__linux__)) && !defined(__386BSD__)
+#  if (defined(BSD4_4) || defined(__linux__) || (HPUXVERSION >= 1100)) && !defined(__386BSD__)
     typedef rlim_t RLIM_TYPE;
 #  else
 #   if defined(SOLARIS2) || (defined(sgi) && SYSVREL > 3)
@@ -1761,7 +1761,7 @@ doumask(v, c)
 #  endif /* BSD4_4 && !__386BSD__  */
 # endif /* BSDLIMIT */
 
-# if (HPUXVERSION > 700) && defined(BSDLIMIT)
+# if (HPUXVERSION > 700) && (HPUXVERSION < 1100) && defined(BSDLIMIT)
 /* Yes hpux8.0 has limits but <sys/resource.h> does not make them public */
 /* Yes, we could have defined _KERNEL, and -I/etc/conf/h, but is that better? */
 #  ifndef RLIMIT_CPU
@@ -1782,7 +1782,7 @@ doumask(v, c)
 #  ifndef SIGRTMIN
 #   define FILESIZE512
 #  endif /* SIGRTMIN */
-# endif /* (HPUXVERSION > 700) && BSDLIMIT */
+# endif /* (HPUXVERSION > 700) && (HPUXVERSION < 1100) && BSDLIMIT */
 
 # if SYSVREL > 3 && defined(BSDLIMIT) && !defined(_SX)
 /* In order to use rusage, we included "/usr/ucbinclude/sys/resource.h" in */

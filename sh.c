@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.107 2003/03/12 19:14:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.108 2003/05/26 07:11:06 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.107 2003/03/12 19:14:50 christos Exp $")
+RCSID("$Id: sh.c,v 3.108 2003/05/26 07:11:06 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -189,6 +189,8 @@ main(argc, argv)
     register char *tcp, *ttyn;
     register int f;
     register char **tempv;
+    int osetintr;
+    signalfun_t oparintr;
 
 #ifdef BSDSIGS
     sigvec_t osv;
@@ -1260,15 +1262,14 @@ main(argc, argv)
      * Set an exit here in case of an interrupt or error reading the shell
      * start-up scripts.
      */
+    osetintr = setintr;
+    oparintr = parintr;
     reenter = setexit();	/* PWP */
     exitset++;
     haderr = 0;			/* In case second time through */
     if (!fast && reenter == 0) {
 	/* Will have varval(STRhome) here because set fast if don't */
 	{
-	    int     osetintr = setintr;
-	    signalfun_t oparintr = parintr;
-
 #ifdef BSDSIGS
 	    sigmask_t omask = sigblock(sigmask(SIGINT));
 #else
@@ -1324,6 +1325,10 @@ main(argc, argv)
 	if (!fast && (loginsh || rdirs))
 	    loaddirs(NULL);
     }
+    /* Reset interrupt flag */
+    setintr = osetintr;
+    parintr = oparintr;
+
     /* Initing AFTER .cshrc is the Right Way */
     if (intty && !arginp) {	/* PWP setup stuff */
 	ed_Init();		/* init the new line editor */

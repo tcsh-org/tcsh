@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.112 2003/07/29 21:19:44 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.113 2004/02/11 20:57:45 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -617,10 +617,6 @@ EXTERN Char   *arginp IZERO;	/* Argument input for sh -c and internal `xx` */
 EXTERN int     onelflg IZERO;	/* 2 -> need line for -t, 1 -> exit on read */
 extern Char   *ffile;		/* Name of shell file for $0 */
 extern bool    dolzero;		/* if $?0 should return true... */
-
-#if defined(FILEC)
-extern bool    filec;
-#endif /* FILEC */
 
 extern char *seterr;		/* Error message from scanner/parser */
 #if !defined(BSD4_4) && !defined(__linux__)
@@ -1259,6 +1255,10 @@ EXTERN nl_catd catd;
 # define CGETS(b, c, d)	nt_cgets( b, c, d)
 # define CSAVS(b, c, d)	strsave(CGETS(b, c, d))
 #endif /* WINNT_NATIVE */
+
+#if defined(FILEC)
+extern bool    filec;
+#endif /* FILEC */
 
 /*
  * Since on some machines characters are unsigned, and the signed

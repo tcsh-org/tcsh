@@ -1,3 +1,14 @@
+ 30. V6.12.02 - 20040221
+ 29. Glob completion listing addition (Tom Warzeka)
+ 28. BS2000 bs2cmd builtin. (Martin Kraemer)
+ 27. Fix interrupt resetting code when /etc startup scripts have syntax errors
+     (Mark A. Grondona)
+ 26. Clarification of kill-ring commands (Per Hederland)
+ 25. Debian completion additions (Martin Godisch)
+ 24. Japanese character set fixes (Juehiro-san) from debian
+ 23. NLS charset fixes; disabled since they only work with gnu gencat
+     (Martin Godisch)
+ 22. Fix HPUX >= 11 resource (Jack Cummings)
  21. Handle breaksw that jumps out of loops.
  20. Revert #16. It causes worse problems.
  19. Avoid using execl() because the last NULL does not always promoted to

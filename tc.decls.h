@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.50 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.51 2003/07/29 21:19:44 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -140,6 +140,10 @@ extern	void 		  dodmmode	__P((Char **, struct command *));
 #if defined(masscomp) || defined(hcx)
 extern	void		  douniverse	__P((Char **, struct command *));
 #endif /* masscomp */
+
+#if defined(_OSD_POSIX) /* BS2000 */
+extern	void		  dobs2cmd	__P((Char **, struct command *));
+#endif /* _OSD_POSIX */
 
 #if defined(hcx)
 extern	void		  doatt		__P((Char **, struct command *));

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.str.c,v 3.11 2003/07/29 21:19:44 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.str.c,v 3.12 2003/10/23 02:21:39 amold Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.str.c,v 3.11 2003/07/29 21:19:44 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.12 2003/10/23 02:21:39 amold Exp $")
 
 #define MALLOC_INCR	128
 
@@ -315,7 +315,8 @@ s_strcasecmp(str1, str2)
 {
     unsigned char c1, c2, l1 = 0, l2 = 0;
     for (; *str1 && ((*str1 == *str2 && (l1 = l2 = 0) == 0) || 
-	((c1 = (char)*str1) == *str1 && (c2 = (char)*str2) == *str2 &&
+	((c1 = (unsigned char)*str1) == *str1 &&
+	 (c2 = (unsigned char)*str2) == *str2 &&
 	(l1 = tolower(c1)) == (l2 = tolower(c2)))); str1++, str2++)
 	continue;
     /*

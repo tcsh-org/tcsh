@@ -1,7 +1,23 @@
 #
-# $Id: complete.tcsh,v 1.40 2002/07/07 15:37:20 christos Exp $
+# $Id: complete.tcsh,v 1.41 2003/01/31 17:19:31 christos Exp $
 # example file using the new completion code
 #
+# Debian GNU/Linux
+# /usr/share/doc/tcsh/examples/complete.gz
+#
+# This file may be read from user's ~/.cshrc or ~/.tcsh file by
+# decompressing it into the home directory as ~/.complete and
+# then adding the line "source ~/.complete" and maybe defining
+# some of the shell variables described below.
+#
+# Added two Debian-specific completions: dpkg and dpkg-deb (who
+# wrote them?). Changed completions of several commands. The ones
+# are evaluated if the `traditional_complete' shell variable is
+# defined.
+#
+# Debian enhancements by Vadim Vygonets <vadik@cs.huji.ac.il>.
+# Bugfixes and apt completions by Miklos Quartus <miklos.quartus@nokia.com>.
+# Cleanup by Martin A. Godisch <martin@godisch.de>.
 
 onintr -
 if (! $?prompt) goto end
@@ -78,7 +94,11 @@ if ($?_complete) then
     complete unalias	n/*/a/
     complete xdvi 	n/*/f:*.dvi/	# Only files that match *.dvi
     complete dvips 	n/*/f:*.dvi/
+if ($?traditional_complete) then
     complete tex 	n/*/f:*.tex/	# Only files that match *.tex
+else
+    complete tex 	n/*/f:*.{tex,texi}/	# Files that match *.tex and *.texi
+endif
     complete latex 	n/*/f:*.{tex,ltx}/
     complete su		c/--/"(login fast preserve-environment command shell \
 			help version)"/	c/-/"(f l m p c s -)"/ \
@@ -158,7 +178,12 @@ if ($?_complete) then
 
     complete -co*	p/0/"(compress)"/	# make compress completion
 						# not ambiguous
+if ($?traditional_complete) then
     complete zcat	n/*/f:*.Z/
+else
+    complete zcat	c/--/"(force help license quiet version)"/ \
+			c/-/"(f h L q V -)"/ n/*/f:*.{gz,Z,z,zip}/
+endif
 
     complete finger	c/*@/\$hosts/ n/*/u/@ 
     complete ping	p/1/\$hosts/
@@ -189,7 +214,7 @@ if ($?_complete) then
 		p/2/f:*.a/ p/*/f:*.o/
 
     # these should be merged with the MH completion hacks below - jgotts
-    complete {sprev,snext} \
+    complete {refile,sprev,snext,scan,pick,rmm,inc,folder,show} \
 		c@+@F:$HOME/Mail/@
 
     # these and interrupt handling from Jaap Vermeulen <jaap@sequent.com>
@@ -213,6 +238,7 @@ if ($?_complete) then
 
     # these from E. Jay Berkenbilt <ejb@ERA.COM>
     # = isn't always followed by a filename or a path anymore - jgotts
+if ($?traditional_complete) then
     complete ./configure 'c/--*=/f/' 'c/--{cache-file,prefix,exec-prefix,\
     				bindir,sbindir,libexecdir,datadir,\
 				sysconfdir,sharedstatedir,localstatedir,\
@@ -223,6 +249,19 @@ if ($?_complete) then
 				sharedstatedir localstatedir libdir \
 				includedir oldincludedir infodir mandir \
 				srcdir)//'
+else
+	complete ./configure \
+			'c@--{prefix,exec-prefix,bindir,sbindir,libexecdir,datadir,sysconfdir,sharedstatedir,localstatedir,infodir,mandir,srcdir,x-includes,x-libraries}=*@x:<directory e.g. /usr/local>'@ \
+ 			'c/--cachefile=*/x:<filename>/' \
+  			'c/--{enable,disable,with}-*/x:<feature>//' \
+ 			'c/--*=/x:<directory>//' \
+  			'c/--/(prefix= exec-prefix= bindir= \
+			sbindir= libexecdir= datadir= sysconfdir= \
+   			sharedstatedir= localstatedir= infodir= \
+			mandir= srcdir= x-includes= x-libraries= cachefile= \
+ 			enable- disable- with- \
+ 			help no-create quiet silent version verbose )//'
+endif
     complete gs 'c/-sDEVICE=/(x11 cdjmono cdj550 epson eps9high epsonc \
 			      dfaxhigh dfaxlow laserjet ljet4 sparc pbm \
 			      pbmraw pgm pgmraw ppm ppmraw bit)/' \
@@ -544,11 +583,23 @@ if ($?_complete) then
 			n@*@'`cat ${HOME}/.muttrc-alias | awk '"'"'{print $2 }'"'"\`@
     complete ndc	'n/*/(status dumpdb reload stats trace notrace \
 			querylog start stop restart )/'
+	if ($?traditional_complete) then
     complete nm		'c/--/(debug-syms defined-only demangle dynamic \
 			extern-only format= help line-numbers no-demangle \
 			no-sort numeric-sort portability print-armap \
 			print-file-name reverse-sort size-sort undefined-only \
 			version)/' 'p/*/f:^*.{h,C,c,cc}/'
+	else
+	complete nm	'c/--radix=/x:<radix: _o_ctal _d_ecimal he_x_adecimal>/' \
+		'c/--target=/x:<bfdname>/' \
+		'c/--format=/(bsd sysv posix)/n/' \
+		'c/--/(debugsyms extern-only demangle dynamic print-armap \
+			print-file-name numeric-sort no-sort reverse-sort \
+			size-sort undefined-only portability target= radix= \
+			format= defined-only\ line-numbers no-demangle version \
+			help)//' \
+		'n/*/f:^*.{h,c,cc,s,S}/'
+	endif
     complete nmap	'n@-e@`ifconfig -l`@' 'p/*/$hostnames/'
     complete perldoc 	'n@*@`\ls -1 /usr/libdata/perl/5.*/pod | sed s%\\.pod.\*\$%%`@'
     complete postfix    'n/*/(start stop reload abort flush check)/'
@@ -639,11 +690,7 @@ if ($?_complete) then
     endif
     complete unsetenv	n/*/e/
 
-    if (-r /var/spool/mail) then
-      set _maildir = /var/spool/mail
-    else
-      set _maildir = /usr/mail
-    endif
+    set _maildir = /var/mail
     if (-r $HOME/.mailrc) then
         complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
 			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \
@@ -664,6 +711,7 @@ if ($?_complete) then
 	endif
     endif
 
+	if ($?traditional_complete) then
     # use of $MANPATH from Dan Nicolaescu <dann@ics.uci.edu>
     # use of 'find' adapted from Lubomir Host <host8@kepler.fmph.uniba.sk>
     complete man \
@@ -686,6 +734,24 @@ if ($?_complete) then
 	    'n@-[sS]@`\ls -1 $MANPATH:as%:% % |& sed -n s%^man%%p | sort -u`@'\
 	    'n@*@`find $MANPATH:as%:% % \( -type f -o -type l \) -printf "%f " |& sed -e "s%find: .*: No such file or directory%%" -e "s%\([^\.]\+\)\.\([^ ]*\) %\1 %g"`@'
 	    #n@*@c@ # old way -- commands only
+	else
+    complete man	    n@1@'`\ls -1 /usr/man/man1 | sed s%\\.1.\*\$%%`'@ \
+			    n@2@'`\ls -1 /usr/man/man2 | sed s%\\.2.\*\$%%`'@ \
+			    n@3@'`\ls -1 /usr/man/man3 | sed s%\\.3.\*\$%%`'@ \
+			    n@4@'`\ls -1 /usr/man/man4 | sed s%\\.4.\*\$%%`'@ \
+			    n@5@'`\ls -1 /usr/man/man5 | sed s%\\.5.\*\$%%`'@ \
+			    n@6@'`\ls -1 /usr/man/man6 | sed s%\\.6.\*\$%%`'@ \
+			    n@7@'`\ls -1 /usr/man/man7 | sed s%\\.7.\*\$%%`'@ \
+			    n@8@'`\ls -1 /usr/man/man8 | sed s%\\.8.\*\$%%`'@ \
+    n@9@'`[ -r /usr/man/man9 ] && \ls -1 /usr/man/man9 | sed s%\\.9.\*\$%%`'@ \
+    n@0@'`[ -r /usr/man/man0 ] && \ls -1 /usr/man/man0 | sed s%\\.0.\*\$%%`'@ \
+  n@new@'`[ -r /usr/man/mann ] && \ls -1 /usr/man/mann | sed s%\\.n.\*\$%%`'@ \
+  n@old@'`[ -r /usr/man/mano ] && \ls -1 /usr/man/mano | sed s%\\.o.\*\$%%`'@ \
+n@local@'`[ -r /usr/man/manl ] && \ls -1 /usr/man/manl | sed s%\\.l.\*\$%%`'@ \
+n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
+		c/-/"(- f k P s t)"/ n/-f/c/ n/-k/x:'<keyword>'/ n/-P/d/ \
+		N@-P@'`\ls -1 $:-1/man? | sed s%\\..\*\$%%`'@ n/*/c/
+	endif
 
     complete ps	        c/-t/x:'<tty>'/ c/-/"(a c C e g k l S t u v w x)"/ \
 			n/-k/x:'<kernel>'/ N/-k/x:'<core_file>'/ n/*/x:'<PID>'/
@@ -762,6 +828,11 @@ if ($?_complete) then
     complete zfile	n/*/f:*.{gz,Z,z,zip,taz,tgz}/
     complete ztouch	n/*/f:*.{gz,Z,z,zip,taz,tgz}/
     complete zforce	n/*/f:^*.{gz,tgz}/
+
+    complete dcop 'p/1/`$:0`/ /' \
+	'p/2/`$:0 $:1 | awk \{print\ \$1\}`/ /' \
+	'p/3/`$:0 $:1 $:2 | sed "s%.* \(.*\)(.*%\1%"`/ /'
+
 
     complete grep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
 			c/--/"(extended-regexp fixed-regexp basic-regexp \
@@ -864,6 +935,7 @@ if ($?_complete) then
 			n/{-m,--mode}/x:'<mode>'/ n/*/d/
     complete rmdir	c/--/"(ignore-fail-on-non-empty parents verbose help \
     			version)"/ c/-/"(p -)"/ n/*/d/
+    complete env 	'c/*=/f/' 'p/1/e/=/' 'p/2/c/'
 
     complete tar	c/-[Acru]*/"(b B C f F g G h i l L M N o P \
 			R S T v V w W X z Z)"/ \
@@ -961,6 +1033,12 @@ if ($?_complete) then
 	complete dvilj	'p/*/f:*.dvi/'
     endif
 
+    # From Alphonse Bendt
+    complete ant \
+	 'n/-f/f:*.xml/' \
+	      'n@*@`cat build.xml | sed -n -e "s/[ \t]*<target[
+	      \t\n]*name=.\([a-zA-Z0-9_:]*\).*/\1/p"`@'
+
     if ($?P4CLIENT && -X perl) then
 	# This is from Greg Allen.
 	set p4cmds=(add branch branches commands change changes client clients \
@@ -980,8 +1058,88 @@ if ($?_complete) then
     endif
 
 
+	if (! $?traditional_complete) then
+    uncomplete vi
+    uncomplete vim
+    complete {vi,vim,gvim,nvi,elvis} 	n/*/f:^*.{o,a,so,sa,aux,dvi,log,fig,bbl,blg,bst,idx,ilg,ind,toc}/
+    complete {ispell,spell,spellword}	'n@-d@`ls /usr/lib/ispell/*.aff | sed -e "s/\.aff//" `@' 'n/*/f:^*.{o,a,so,sa,aux,dvi,log,fig,bbl,blg,bst,idx,ilg,ind,toc}/'
+    complete elm	'n/-[Ai]/f/' 'c@=@F:$HOME/Mail/@' 'n/-s/x:\<subject\>/'
+    complete ncftp	'n@*@`sed -e '1,2d' $HOME/.ncftp/bookmarks | cut -f 1,2 -d "," | tr "," "\012" | sort | uniq ` '@
+    complete bibtex	'n@*@`ls *.aux | sed -e "s/\.aux//"`'@
+    complete dvi2tty	n/*/f:*.dvi/	# Only files that match *.dvi
+	uncomplete gv
+	uncomplete ghostview
+    complete {gv,ghostview}	'n/*/f:*.{ps,eps,epsi}/'
+    complete enscript \
+		'c/--/(columns= pages= header= no-header truncate-lines \
+			line-numbers setpagedevice= escapes font= \
+			header-font= fancy-header no-job-header \
+			highlight-bars indent= filter= borders page-prefeed \
+			no-page-prefeed lineprinter lines-per-page= mail \
+			media= copies= newline= output= missing-characters \
+			printer= quiet silent landscape portrait \
+			baselineskip= statusdict= title= tabsize= underlay= \
+			verbose version encoding pass-through download-font= \
+			filter-stdin= help highlight-bar-gray= list-media \
+			list-options non-printable-format= page-label-format= \
+			printer-options= ul-angle= ul-font= ul-gray= \
+			ul-position= ul-style= \
+		     )/'
+	endif
+
+complete dpkg	'c/--{admindir,instdir,root}=/d/' \
+		'c/--debug=/n/' \
+		'c/--{admindir,debug,instdir,root}/(=)//' \
+		'c/--/(admindir= debug= instdir= root= \
+			assert-support-predepends assert-working-epoch \
+			audit auto-deconfigure clear-avail \
+			compare-versions configure contents control \
+			extract force-bad-path field \
+			force-configure-any force-conflicts \
+			force-depends force-depends-version force-help \
+			force-hold force-non-root \
+			force-overwrite-diverted \
+			force-remove-essential force-remove-reinstreq \
+			forget-old-unavail fsys-tarfile get-selections \
+			help ignore-depends info install largemem \
+			license list listfiles merge-avail no-act \
+			pending predep-package print-architecture \
+			print-gnu-build-architecture \
+			print-installation-architecture print-avail \
+			purge record-avail recursive refuse-downgrade \
+			remove search set-selections selected-only \
+			skip-same-version smallmem status unpack \
+			update-avail version vextract \
+		      )//' \
+		'n/{-l}/`dpkg -l|awk \{print\ \$2\}`/' \
+		'n/*/f:*.deb'/
+complete dpkg-deb 'c/--{build}=/d/' \
+			   'c/--/(build contents info field control extract \
+				 vextract fsys-tarfile help version \
+				 license)//' \
+			   'n/*/f:*.deb/'
+complete apt-get 'c/--/(build config-file diff-only download-only \
+		   fix-broken fix-missing force-yes help ignore-hold no-download \
+		   no-upgrade option print-uris purge reinstall quiet simulate \
+		   show-upgraded target-release tar-only version yes )/' \
+	    	'c/-/(b c= d f h m o= q qq s t x y )/' \
+ 		'n/{source,build-dep}/x:<pkgname>/' \
+ 		'n/{remove}/`dpkg -l|grep ^ii|awk \{print\ \$2\}`/' \
+ 		'n/{install}/`apt-cache pkgnames | sort`/' \
+ 		'C/*/(update upgrade dselect-upgrade source \
+		   build-dep check clean autoclean install remove)/'
+complete apt-cache \
+ 		'c/--/(all-versions config-file generate full help important \
+ 		names-only option pkg-cache quiet recurse src-cache version )/' \
+ 	    	'c/-/(c= h i o= p= q s= v)/' \
+  		'n/{search}/x:<regex>/' \
+ 		'n/{pkgnames,policy,show,showpkg,depends,dotty}/`apt-cache pkgnames | sort`/' \
+ 		'C/*/(add gencaches showpkg stats dump dumpavail unmet show \
+ 		search depends pkgnames dotty policy )/'
+
     unset noglob
     unset _complete
+    unset traditional_complete
 endif
 
 end:
