@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.h,v 1.3 1991/12/05 18:26:54 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.h,v 1.4 1991/12/05 18:33:51 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -257,11 +257,12 @@
  * ttychars > NCC are defined. So we undefine them.
  */
 #if defined(TERMIO) || defined(POSIX)
-# if defined(TERMIO) && defined(NCC)
-#  define NUMCC	NCC
-# endif /* TERMIO && NCC */
 # if defined(POSIX) && defined(NCCS)
-#  define NUMCC	NCCS
+#  define NUMCC		NCCS
+# else
+#  ifdef NCC
+#   define NUMCC	NCC
+#  endif /* NCC */
 # endif /* POSIX && NCCS */
 # ifdef NUMCC
 #  ifdef VINTR
