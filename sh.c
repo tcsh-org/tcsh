@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.119 2005/01/05 16:06:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.120 2005/01/06 16:52:32 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.119 2005/01/05 16:06:13 christos Exp $")
+RCSID("$Id: sh.c,v 3.120 2005/01/06 16:52:32 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2335,16 +2335,18 @@ mailchk()
 			mailcount, filename);
 	}
 	else {
+	    char *type;
+	    
 	    if (stb.st_size == 0 || stb.st_atime > stb.st_mtime ||
 		(stb.st_atime <= chktim && stb.st_mtime <= chktim) ||
 		(loginsh && !new))
 		continue;
+	    type = strsave(new ? CGETS(11, 6, "new ") : "");
 	    if (cnt == 1)
-		xprintf(CGETS(11, 5, "You have %smail.\n"),
-			new ? CGETS(11, 6, "new ") : "");
+		xprintf(CGETS(11, 5, "You have %smail.\n"), type);
 	    else
-	        xprintf(CGETS(11, 7, "You have %smail in %s.\n"),
-			new ? CGETS(11, 6, "new ") : "", filename);
+	        xprintf(CGETS(11, 7, "You have %smail in %s.\n"), type);
+	    xfree(type);
 	}
     }
     chktim = t;

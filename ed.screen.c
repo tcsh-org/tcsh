@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.60 2005/01/05 16:06:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.61 2005/01/18 20:12:14 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.60 2005/01/05 16:06:13 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.61 2005/01/18 20:12:14 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -422,33 +422,36 @@ TCalloc(t, cap)
 
 /*ARGSUSED*/
 void
-TellTC(what)
-    const char   *what;
+TellTC()
 {
     struct termcapstr *t;
+    char *s;
 
-    USE(what);
     xprintf(CGETS(7, 1, "\n\tTcsh thinks your terminal has the\n"));
     xprintf(CGETS(7, 2, "\tfollowing characteristics:\n\n"));
     xprintf(CGETS(7, 3, "\tIt has %d columns and %d lines\n"),
 	    Val(T_co), Val(T_li));
-    xprintf(CGETS(7, 4, "\tIt has %s meta key\n"), T_HasMeta ?
-	    CGETS(7, 5, "a") : CGETS(7, 6, "no"));
-    xprintf(CGETS(7, 7, "\tIt can%s use tabs\n"), T_Tabs ?
-	    "" : CGETS(7, 8, " not"));
-    xprintf(CGETS(7, 9, "\tIt %s automatic margins\n"),
-		    (T_Margin&MARGIN_AUTO)?
-		    CGETS(7, 10, "has"):
-		    CGETS(7, 11, "does not have"));
-    if (T_Margin & MARGIN_AUTO)
-	xprintf(CGETS(7, 12, "\tIt %s magic margins\n"),
-			(T_Margin & MARGIN_MAGIC) ?
-			CGETS(7, 10, "has"):
-			CGETS(7, 11, "does not have"));
-
-    for (t = tstr; t->name != NULL; t++)
-	xprintf("\t%36s (%s) == %s\n", t->long_name, t->name,
-		t->str && *t->str ? t->str : CGETS(7, 13, "(empty)"));
+    s = strsave(T_HasMeta ? CGETS(7, 5, "a") : CGETS(7, 6, "no"));
+    xprintf(CGETS(7, 4, "\tIt has %s meta key\n"), s);
+    xfree(s);
+    s = strsave(T_Tabs ? "" : CGETS(7, 8, " not"));
+    xprintf(CGETS(7, 7, "\tIt can%s use tabs\n"), s);
+    xfree(s);
+    s = strsave((T_Margin&MARGIN_AUTO) ?
+		CGETS(7, 10, "has") : CGETS(7, 11, "does not have"));
+    xprintf(CGETS(7, 9, "\tIt %s automatic margins\n"), s);
+    xfree(s);
+    if (T_Margin & MARGIN_AUTO) {
+        s = strsave((T_Margin & MARGIN_MAGIC) ?
+			CGETS(7, 10, "has") : CGETS(7, 11, "does not have"));
+	xprintf(CGETS(7, 12, "\tIt %s magic margins\n"), s);
+	xfree(s);
+    }
+    for (t = tstr; t->name != NULL; t++) {
+        s = strsave(t->str && *t->str ? t->str : CGETS(7, 13, "(empty)"));
+	xprintf("\t%36s (%s) == %s\n", t->long_name, t->name, s);
+	xfree(s);
+    }
     xputchar('\n');
 }
 

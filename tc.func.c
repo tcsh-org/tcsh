@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.114 2004/11/23 02:10:49 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.115 2004/12/25 21:15:08 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.114 2004/11/23 02:10:49 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.115 2004/12/25 21:15:08 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -428,7 +428,6 @@ dolist(v, c)
     }
 }
 
-static const char *defaulttell = "ALL";
 extern int GotTermCaps;
 
 /*ARGSUSED*/
@@ -437,18 +436,11 @@ dotelltc(v, c)
     Char **v;
     struct command *c;
 {
+    USE(v);
     USE(c);
     if (!GotTermCaps)
 	GetTermCaps();
-
-    /*
-     * Avoid a compiler bug on hpux 9.05
-     * Writing the following as func(a ? b : c) breaks
-     */
-    if (v[1])
-	TellTC(short2str(v[1]));
-    else
-	TellTC(defaulttell);
+    TellTC();
 }
 
 /*ARGSUSED*/

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.121 2004/11/23 02:10:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.122 2004/12/25 21:15:07 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.121 2004/11/23 02:10:48 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.122 2004/12/25 21:15:07 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2204,10 +2204,17 @@ setlim(lp, hard, limit)
 # endif /* aiws */
     if (ulimit(toset(lp->limconst), limit) < 0) {
 # endif /* BSDLIMIT */
+        int err;
+        char *op, *type;
+
+	err = errno;
+	op = strsave(limit == RLIM_INFINITY ? CGETS(15, 2, "remove") :
+		     	CGETS(15, 3, "set"));
+	type = strsave(hard ? CGETS(14, 4, " hard") : "");
 	xprintf(CGETS(15, 1, "%s: %s: Can't %s%s limit (%s)\n"), bname,
-	    lp->limname, limit == RLIM_INFINITY ? CGETS(15, 2, "remove") :
-	    CGETS(15, 3, "set"), hard ? CGETS(14, 4, " hard") : "",
-	    strerror(errno));
+	    lp->limname, op, type, strerror(err));
+	xfree(type);
+	xfree(op);
 	return (-1);
     }
     return (0);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.decls.h,v 3.36 2004/12/25 21:15:05 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.decls.h,v 3.37 2005/01/05 16:06:12 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -86,7 +86,7 @@ extern	void	MoveToChar		__P((int));
 extern	void	ClearEOL		__P((int));
 extern	void	Insert_write		__P((Char *, int));
 extern	void	DeleteChars		__P((int));
-extern	void	TellTC			__P((const char *));
+extern	void	TellTC			__P((void));
 extern	void	SetTC			__P((char *, char *));
 extern	void	EchoTC			__P((Char **));
 extern	int 	SetArrowKeys		__P((CStr *, XmapVal *, int));
