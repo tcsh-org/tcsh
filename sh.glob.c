@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 3.4 1991/07/26 17:58:07 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 3.5 1991/07/28 17:44:11 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.glob.c,v 3.4 1991/07/26 17:58:07 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.5 1991/07/28 17:44:11 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -291,7 +291,7 @@ globexpand(v)
 	Char   *b;
 	Char  **vp, **bp;
 
-	if ((b = Strchr(s, LBRC)) && b[1] != '\0' && b[1] != '}') {
+	if ((b = Strchr(s, LBRC)) && b[1] != '\0' && b[1] != RBRC) {
 	    Char  **bl;
 	    int     len;
 
