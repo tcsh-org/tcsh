@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.31 2004/11/23 01:48:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.32 2005/01/05 16:06:14 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.31 2004/11/23 01:48:34 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.32 2005/01/05 16:06:14 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -320,12 +320,9 @@ donefds()
 #ifdef NISPLUS
     {
 	int fd = open(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE);
-	(void) dup2(fd, 1);
-	(void) dup2(fd, 2);
-	if (fd != 0) {
-	    (void) dup2(fd, 0);
-	    (void) close(fd);
-	}
+	(void)dcopy(fd, 1);
+	(void)dcopy(fd, 2);
+	(void)dmove(fd, 0);
     }
 #endif /*NISPLUS*/    
 }
@@ -333,7 +330,7 @@ donefds()
 /*
  * Move descriptor i to j.
  * If j is -1 then we just want to get i to a safe place,
- * i.e. to a unit > 2.  This also happens in dcopy.
+ * i.e. to a unit > FSAFE.  This also happens in dcopy.
  */
 int
 dmove(i, j)
@@ -361,7 +358,7 @@ dcopy(i, j)
     int i, j;
 {
 
-    if (i == j || i < 0 || (j < 0 && i > 2))
+    if (i == j || i < 0 || (j < 0 && i > FSAFE))
 	return (i);
     if (j >= 0) {
 #ifdef HAVEDUP2
@@ -382,7 +379,7 @@ renum(i, j)
 
     if (k < 0)
 	return (-1);
-    if (j == -1 && k > 2)
+    if (j == -1 && k > FSAFE)
 	return (k);
     if (k != j) {
 	j = renum(k, j);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.122 2004/12/25 21:15:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.123 2005/01/05 16:06:14 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -187,6 +187,7 @@ typedef int sigret_t;
  * 0, 1, and 2 so that it is easy to set up these standards for invoked
  * commands.
  */
+#define	FSAFE	5		/* We keep the first 5 descriptors untouched */
 #define	FSHTTY	15		/* /dev/tty when manip pgrps */
 #define	FSHIN	16		/* Preferred desc for shell input */
 #define	FSHOUT	17		/* ... shell output */
