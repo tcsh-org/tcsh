@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.7 1991/07/25 18:50:54 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.8 1991/08/05 23:02:13 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.init.c,v 3.7 1991/07/25 18:50:54 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.8 1991/08/05 23:02:13 christos Exp $")
 
 #include "sh.h"
 #define EXTERN			/* intern */
@@ -120,11 +120,14 @@ RCSID("$Id: ed.init.c,v 3.7 1991/07/25 18:50:54 christos Exp $")
  * XCASE!
  */
 # ifdef ISC
-#  ifdef IEXTEN
-#   undef IEXTEN
-#  endif /* IEXTEN */
-#  define IEXTEN 0
+#  if defined(IEXTEN) && defined(XCASE)
+#   if IEXTEN == XCASE
+#    undef IEXTEN
+#    define IEXTEN 0
+#   endif /* IEXTEN == XCASE */
+#  endif /* IEXTEN && XCASE */
 # endif /* ISC */
+
 #endif /* TERMIO || POSIX */
 
 
