@@ -3629,7 +3629,7 @@ is set to number 0,1,2 and 3.  Each number has the following meaning:
   2 ... used for the second byte of a multi-byte character.
 .br
   3 ... used for both the first byte and second byte of a multi-byte character.
-.\" SHK: I tried my best to get the following to be gramatically correct.
+.\" SHK: I tried my best to get the following to be grammatically correct.
 .\" However, I still don't understand what's going on here.  In the
  \" following example, there are three bytes, but the text seems to refer to
  \" each nybble as a character.  What's going on here?  It this 3-byte code
