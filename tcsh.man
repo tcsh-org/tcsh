@@ -29,45 +29,63 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\" 
-.\" Style notes:
+.\" Style notes for the tcsh manpage:
 .\" 
-.\" - Boldface section headings, variables and, in tags only, commands
-.\"   (externals, builtins, aliases, editor commands).
-.\" - Underline arguments ("metasyntactic variables") in syntax summaries and
-.\"   commands (externals, builtins, aliases, editor commands) everywhere else.
+.\" - Tags in lists are bold, except in the FILES section where they are
+.\"   italic.
+.\" 
+.\" - References are bold for section headings and environment and shell
+.\"   variables and italic for commands (externals, builtins, aliases, and
+.\"   editor commands) and arguments to commands.
+.\" 
 .\" - Indent in multiples of 4, usually 8.
+.\" 
 .\" - Use `', not '' or "", except of course in shell syntax examples.
 .\"   '' at the beginning of a line will vanish!
-.\" - Use the simple present tense. `The shell uses', not `The shell will use'.
+.\" 
+.\" - Include the tilde when naming dotfiles. `~/.login', not `.login'.
+.\" 
+.\" - Refer to external commands in manpage format, e.g. `csh(1)'. However,
+.\"   tcsh is `tcsh', not `tcsh(1)', because this is the tcsh manpage (and
+.\"   see the next note anyway).
+.\" 
 .\" - Say `the shell', not `tcsh', unless distinguishing between tcsh and csh.
+.\" 
 .\" - Say `shell variable'/`environment variable' instead of `variable'
 .\"   and `builtin command'/`editor command' instead of `builtin' or `command'
-.\"   unless meaning is absolutely clear from context.
-.\" - Cross-reference as much as possible. Commands, variables, etc. in the
-.\"   reference section should be mentioned in the appropriate descriptive
-.\"   section, or at least in the reference-section description of another
-.\"   command (or whatever) which is mentioned in a description section.
-.\"   Remember to note OS-specific things in "OS variant support", new features
-.\"   in NEW FEATURES and referenced external commands in SEE ALSO.
+.\"   unless the distinction is absolutely clear from context.
 .\" 
-.TH TCSH 1 "6 June 1994" "Cornell 6.04.16"
+.\" - Use the simple present tense. `The shell uses', not `The shell will use'.
+.\" 
+.\" - IMPORTANT: Cross-reference as much as possible. Commands, variables,
+.\"   etc. in the reference section should be mentioned in the appropriate
+.\"   descriptive section, or at least in the reference-section description
+.\"   of another command (or whatever) which is mentioned in a description
+.\"   section. Remember to note OS-specific things in "OS variant support",
+.\"   new features in NEW FEATURES and referenced external commands in SEE
+.\"   ALSO.
+.\" 
+.\" - The nroff-to-HTML conversion script depends heavily on the specific
+.\"   nroff commands used in the manpage when the script was written.
+.\"   Please stick closely to the style used here if you can. In particular,
+.\"   please avoid introducing nroff commands not already used herein.
+.\" 
+.TH TCSH 1 "18 June 1994" "Cornell 6.04.17"
 .SH NAME
 tcsh - C shell with file name completion and command line editing
 .SH SYNOPSIS
-.B tcsh
-[\fB-bcdefFimnqstvVxX\fR] [\fB-Dname\fR[\fB=value\fR]] [arg ...]
+.B tcsh \fR[\fB-bcdefFimnqstvVxX\fR] [\fB-Dname\fR[\fB=value\fR]] [arg ...]
 .br
 .B tcsh -l
 .SH DESCRIPTION
-.I tcsh
-is an enhanced but completely compatible version of the Berkeley UNIX C shell,
-\fIcsh\fR(1).
+\fItcsh\fR is an enhanced but completely compatible version of the Berkeley
+UNIX C shell, \fIcsh\fR(1).
 It is a command language interpreter usable both as an interactive login
 shell and a shell script command processor.
 It includes a command-line editor (see \fBThe command-line editor\fR),
 programmable word completion (see \fBCompletion and listing\fR),
 spelling correction (see \fBSpelling correction\fR),
-a history mechanism (see \fBHistory Substitution\fR),
+a history mechanism (see \fBHistory substitution\fR),
 job control (see \fBJobs\fR)
 and a C-like syntax.
 The \fBNEW FEATURES\fR section describes major enhancements of \fItcsh\fR
@@ -76,7 +94,7 @@ throughout this manual.
 .SS "Argument list processing"
 If the first argument (argument 0) to the shell is `-' then it is a
 login shell.  A login shell can be also specified by invoking the shell with
-the `\fB-l\fR' flag as the only argument.
+the \fB-l\fR flag as the only argument.
 .PP
 The rest of the flag arguments are interpreted as follows:
 .TP 4
@@ -92,8 +110,8 @@ Commands are read from the (single) following argument which must be
 present.  Any remaining arguments are placed in the \fBargv\fR shell variable.
 .TP 4
 .B -d
-The shell loads the directory stack as described under \fBsavedirs\fR,
-whether or not it is a login shell. (+)
+The shell loads the directory stack from \fI~/.cshdirs\fR as described under
+\fBStartup and shutdown\fR, whether or not it is a login shell. (+)
 .TP 4
 .B -D\fIname\fR[=\fIvalue\fR]
 Sets the environment variable \fIname\fR to \fIvalue\fR. (Domain/OS only) (+)
@@ -152,13 +170,15 @@ Is to \fB-x\fR as \fB-V\fR is to \fB-v\fR.
 .PP
 After processing of flag arguments, if arguments remain but none of the
 \fB-c\fR, \fB-i\fR, \fB-s\fR, or \fB-t\fR options were given, the first
-argument is taken as the name of a file of commands to be executed.  The shell
-opens this file, and saves its name for possible resubstitution by `$0'.  Since
-many systems use either the standard version 6 or version 7 shells whose shell
-scripts are not compatible with this shell, the shell will execute such a
-`standard' shell if the first character of a script is not a `#', i.e. if the
-script does not start with a comment.  Remaining arguments initialize the
-variable \fBargv\fR.
+argument is taken as the name of a file of commands, or ``script'', to
+be executed.  The shell opens this file and saves its name for possible
+resubstitution by `$0'.  Since many systems use either the standard
+version 6 or version 7 shells whose shell scripts are not compatible
+with this shell, the shell uses such a `standard' shell to execute a script
+whose first character is not a `#', i.e. which does not start with a
+comment.
+.PP
+Remaining arguments are placed in the \fBargv\fR shell variable.
 .SS "Startup and shutdown"
 A login shell begins by executing commands from the system files
 \fI/etc/csh.cshrc\fR and \fI/etc/csh.login\fR.
@@ -226,16 +246,16 @@ environment variable) to
 .RS +4
 .TP 8
 down
-.I down-history
+\fIdown-history\fR
 .TP 8
 up
-.I up-history
+\fIup-history\fR
 .TP 8
 left
-.I backward-char
+\fIbackward-char\fR
 .TP 8
 right
-.I forward-char
+\fIforward-char\fR
 .PD
 .RE
 .PP
@@ -252,11 +272,8 @@ commands with a short description of each.
 Note that editor commands do not have the same notion of a "word" as does the
 shell. The editor delimits words with any non-alphanumeric characters not in
 the shell variable \fBwordchars\fR, while the shell recognizes only whitespace
-and some of the characters with special meanings to it, listed under \fBLexical
-structure\fR.
-.PP
-\fBinputmode\fR is another shell variable, not yet mentioned, that affects
-the editor.
+and some of the characters with special meanings to it, listed under
+\fBLexical structure\fR.
 .SS "Completion and listing (+)"
 The shell is often able to complete words when given a unique abbreviation.
 Type part of a word (for example `ls /usr/lost') and hit the tab key to
@@ -428,7 +445,7 @@ another `o',
 .PP
 the completion completes on `foo', even though `food' and `foonly'
 also match.
-\fBautoexpand\fR can be set to run the \fBexpand-history\fR editor command
+\fBautoexpand\fR can be set to run the \fIexpand-history\fR editor command
 before each completion attempt, \fBautocorrect\fR can be set to
 spelling-correct the word to be completed (see \fBSpelling correction\fR)
 before each completion attempt and \fBcorrect\fR can be set to complete
@@ -488,10 +505,6 @@ Suggestions and improvements are welcome.
 `bindkey' lists key bindings and `bindkey -l' lists and briefly describes
 editor commands.
 Only new or especially interesting editor commands are described here.
-Editor commands which perform functions similar to history, variable,
-and filename substitution are referenced in the appropriate sections.
-Editor commands which do miscellaneous useful things and are not referenced
-elsewhere include \fIrun-help\fR, \fIrun-fg-editor\fR and \fIwhich-command\fR.
 See \fIemacs\fR(1) and \fIvi\fR(1) for descriptions of each editor's
 key bindings.
 .PP
@@ -635,7 +648,7 @@ See also \fIdelete-char-or-list-or-eof\fR and \fIlist-choices-raw\fR.
 Like \fIlist-choices\fR, but ignores user-defined completions.
 .TP 8
 .B list-glob \fR(^X-g, ^X-G)
-Lists (via the \fBls-F\fR builtin) matches to the glob-pattern
+Lists (via the \fIls-F\fR builtin) matches to the glob-pattern
 (see \fBFilename substitution\fR) to the left of the cursor.
 .TP 8
 .B list-or-eof \fR(not bound)
@@ -685,7 +698,7 @@ If there is more than one help file only the first is printed.
 In insert mode (the default), inserts the typed character into the input line after the character under the cursor.
 In overwrite mode, replaces the character under the cursor with the typed character.
 The input mode is normally preserved between lines, but the
-\fBinputmode\fR variable can be set to `insert' or `overwrite' to put the
+\fBinputmode\fR shell variable can be set to `insert' or `overwrite' to put the
 editor in that mode at the beginning of each line.
 See also \fIoverwrite-mode\fR.
 .TP 8
@@ -753,18 +766,18 @@ backward (``') quotes. When not otherwise quoted a newline preceded by a `\\'
 is equivalent to a blank, but inside quotes this sequence results in a
 newline.
 .PP
-Furthermore, all \fBSubstitutions\fR (see below) except \fBHistory
-substitution\fR can be prevented by enclosing the strings (or parts of strings)
+Furthermore, all \fBSubstitutions\fR (see below) except \fBHistory substitution\fR
+can be prevented by enclosing the strings (or parts of strings)
 in which they appear with single quotes or by quoting the crucial character(s)
-(e.g. `$' or ``' for \fBVariable\fR or \fBCommand substitution\fR respectively)
+(e.g. `$' or ``' for \fBVariable substitution\fR or \fBCommand substitution\fR respectively)
 with `\\'. \fBHistory substitution\fRs are quoted in the same way by
 backslashes but not by single quotes.  Strings quoted with double or backward
-quotes undergo \fBVariable\fR and \fBCommand substitution\fR, but other
+quotes undergo \fBVariable substitution\fR and \fBCommand substitution\fR, but other
 substitutions are prevented.
 .PP
 Text inside single or double quotes becomes a single word (or part of one).
 Metacharacters in these strings, including blanks and tabs, do not form
-separate words.  Only in one special case (see \fBCommand substitition\fR
+separate words.  Only in one special case (see \fBCommand substitution\fR
 below) can a double-quoted string yield parts of more than one word;
 single-quoted strings never do. Backward quotes are special: they signal
 \fBCommand substitution\fR (q.v.), which may result in more than one word.
@@ -1074,7 +1087,7 @@ Thus if the alias for `ls' were `ls -l' the command `ls /usr' would become `ls
 were `grep !^ /etc/passwd' then `lookup bill' would become `grep bill
 /etc/passwd'.  Aliases can be used to introduce parser metasyntax.  For
 example, `alias print 'pr \e!* | lpr'' defines a ``command'' (`print') which
-\fIpr\fR's its arguments to the line printer.
+\fIpr\fR(1)s its arguments to the line printer.
 .PP
 Alias substitution is repeated until the first word of the command has no
 alias. If an alias substitution does not change the first word (as in the
@@ -1322,9 +1335,9 @@ used to interactively expand individual filename substitutions.
 The directory stack is a list of directories, numbered from zero, used by the
 \fIpushd\fR, \fIpopd\fR and \fIdirs\fR builtin commands (q.v.).
 \fIdirs\fR can print, store in a file, restore and clear the directory stack
-at any time, and the \fBsavedirs\fR and \fBdirsfile\fR variables can be set to
+at any time, and the \fBsavedirs\fR and \fBdirsfile\fR shell variables can be set to
 store the directory stack automatically on logout and restore it on login.
-The \fBdirstack\fR variable can be examined to see the directory stack and
+The \fBdirstack\fR shell variable can be examined to see the directory stack and
 set to put arbitrary directories into the directory stack.
 .PP
 The character `=' followed by one or more digits expands to an entry in
@@ -1406,10 +1419,10 @@ attempts to execute the command via \fIexecve\fR(2).  Each word in the variable
 \fBpath\fR names a directory in which the shell will look for the
 command.  If it is given neither a \fB-c\fR nor a \fB-t\fR option, the shell
 hashes the names in these directories into an internal table so that it will
-only try an \fBexec\fR in a directory if there is a possibility that the
+only try an \fIexecve\fR(2) in a directory if there is a possibility that the
 command resides there.  This greatly speeds command location when a large
 number of directories are present in the search path.  If this mechanism has
-been turned off (via \fBunhash\fR), if the shell was given a \fB-c\fR or
+been turned off (via \fIunhash\fR), if the shell was given a \fB-c\fR or
 \fB-t\fR argument or in any case for each directory component of \fBpath\fR
 which does not begin with a `/', the shell concatenates the current working
 directory with the given command name to form a path name of a file which it
@@ -1523,9 +1536,10 @@ a loop is being read and performs seeks in this internal buffer to
 accomplish the rereading implied by the loop.  (To the extent that this
 allows, backward \fIgoto\fRs will succeed on non-seekable inputs.)
 .SS Expressions
-A number of the builtin commands (\fIexit, if\fR and \fIwhile\fR, all
-described later) use expressions with a common syntax. They can include any
-of the operators described in the next three sections.
+The \fIif\fR, \fIwhile\fR and \fIexit\fR builtin commands
+use expressions with a common syntax. The expressions can include any
+of the operators described in the next three sections. Note that the \fI@\fR
+builtin command (q.v.) has its own separate syntax.
 .SS "Logical, arithmetical and comparison operators"
 These operators are similar to those of C and have the same precedence.
 They include
@@ -1539,9 +1553,9 @@ Here the precedence increases to the right, `==' `!=' `=~' and `!~', `<='
 groups, at the same level.  The `==' `!=' `=~' and `!~' operators compare
 their arguments as strings; all others operate on numbers.  The operators
 `=~' and `!~' are like `!=' and `==' except that the right hand side is a
-glob-pattern (see \fBFilename substitution\fR) against
-which the left hand operand is matched.  This reduces the need for use of
-the \fIswitch\fR command in shell scripts when all that is really needed is
+glob-pattern (see \fBFilename substitution\fR) against which the left hand
+operand is matched.  This reduces the need for use of the \fIswitch\fR
+builtin command in shell scripts when all that is really needed is
 pattern matching.
 .PP
 Strings which begin with `0' are considered octal numbers.  Null or
@@ -1825,7 +1839,7 @@ variables and special aliases.
 The \fIsched\fR builtin command puts commands in a scheduled-event list,
 to be executed by the shell at a given time.
 .PP
-The \fIbeepcmd, cwdcmd, periodic\fR and \fIprecmd\fR special
+The \fIbeepcmd\fR, \fIcwdcmd\fR, \fIperiodic\fR and \fIprecmd\fR special
 aliases can be set, respectively, to execute commands when the shell wants
 to ring the bell, when the working directory changes, every \fBtperiod\fR
 minutes and before each prompt.
@@ -1841,7 +1855,7 @@ of commands which exit with a status other than zero.
 The \fBrmstar\fR shell variable can be set to ask the user, when `rm *' is
 typed, if that is really what was meant.
 .PP
-The \fBtime\fR shell variable can be set to execute the \fItime\fR builitin
+The \fBtime\fR shell variable can be set to execute the \fItime\fR builtin
 command after the completion of any process that takes more than a given
 number of CPU seconds.
 .PP
@@ -1888,7 +1902,7 @@ never changes the 7/8 bit mode of the tty and tracks user-initiated
 changes of 7/8 bit mode. NLS users (or, for that matter, those who want to
 use a meta key) may need to explicitly set
 the tty in 8 bit mode through the appropriate \fIstty\fR(1)
-command in, e.g., the .login file.
+command in, e.g., the \fI~/.login\fR file.
 .SS "OS variant support (+)"
 A number of new builtin commands are provided to support features in
 particular operating systems. All are described in detail in the
@@ -1962,16 +1976,16 @@ adapts to window resizing automatically and adjusts the environment
 variables \fBLINES\fR and \fBCOLUMNS\fR if set. If the environment
 variable \fBTERMCAP\fR contains li# and co# fields, the shell adjusts
 them to reflect the new window size.
-.SS Reference
-The last sections of this manual describe all of the available
+.SH REFERENCE
+The next sections of this manual describe all of the available
 \fBBuiltin commands\fR, \fBSpecial aliases\fR and
 \fBSpecial shell variables\fR.
 .SS "Builtin commands"
 .TP 8
-.B %\fR\fIjob\fR
+.B %\fIjob
 A synonym for the \fIfg\fR builtin command.
 .TP 8
-.B %\fR\fIjob\fR \fB&
+.B %\fIjob \fB&
 A synonym for the \fIbg\fR builtin command.
 .TP 8
 .B :
@@ -1979,11 +1993,11 @@ Does nothing, successfully.
 .PP
 .B @
 .br
-\fB@\fIname\fB= \fIexpr
+.B @\fIname\fB= \fIexpr
 .PD 0
 .TP 8
-\fB@\fIname[index]\fB= \fIexpr
-The first form prints the values of all the shell variables.
+.B @\fIname\fR[\fIindex\fR]\fB= \fIexpr
+The first form prints the values of all shell variables.
 The second form sets the specified \fIname\fR to the value of \fIexpr\fR.
 If \fIexpr\fR contains `<', `>', `&' or `' then at least that part of
 \fIexpr\fR must be placed within `()'.
@@ -1993,13 +2007,16 @@ Both \fIname\fR and its \fIindex\fR'th component must already exist.
 .PD
 .RS +8
 .PP
-\fIexpr\fR may contain the operators `*=', `+=', etc. as in C.
+\fIexpr\fR may contain the operators `*', `+', etc. as in C.
 The space separating the name from the assignment operator is optional.
 Spaces are, however, mandatory in separating components of \fIexpr\fR
 which would otherwise be single words.
 .PP
 Special postfix `++' and `--' operators increment and decrement \fIname\fR
 respectively, e.g. `@ i++'.
+.PP
+Note that the syntax of \fIexpr\fR has nothing to do with that described
+under \fBExpressions\fR.
 .RE
 .PD
 .TP 8
@@ -2009,7 +2026,7 @@ With \fIname\fR, prints the alias for name.
 With \fIname\fR and \fIwordlist\fR, assigns
 \fIwordlist\fR as the alias of \fIname\fR.
 \fIwordlist\fR is command and filename substituted.
-\fIname\fR may not be \fIalias\fR or \fIunalias\fR.
+\fIname\fR may not be `alias' or `unalias'.
 See also the \fIunalias\fR builtin command.
 .ig \" Obsolete tcsh command
 .TP 8
@@ -2051,10 +2068,10 @@ bound to \fIsequence-lead-in\fR and \fIstring\fR must not contain that prefix.
 .PP
 .B bindkey \fR[\fB-l\fR|\fB-e\fR|\fB-v\fR] (+)
 .br
-.B bindkey \fR[\fB-a\fR] [\fB-k\fR] [\fB-d\fR|\fB-r\fR] \fIkey \fR(+)
+.B bindkey \fR[\fB-a\fR] [\fB-b\fR\ [\fB-k\fR] [\fB-d\fR|\fB-r\fR] \fIkey \fR(+)
 .PD 0
 .TP 8
-.B bindkey \fR[\fB-a\fR] [\fB-k\fR] [\fB-c\fR|\fB-s\fR] \fIkey command \fR(+)
+.B bindkey \fR[\fB-a\fR] [\fB-b\fR\] [\fB-k\fR] [\fB-c\fR|\fB-s\fR] \fIkey command \fR(+)
 Without options, the first form lists all bound keys and the editor command to which each is bound,
 the second form lists the editor command to which \fIkey\fR is bound and
 the third form binds the editor command \fIcommand\fR to \fIkey\fR.
@@ -2083,6 +2100,14 @@ This is the key map used in \fIvi\fR command mode.
 .B -k
 \fIkey\fR is interpreted as a symbolic arrow key name, which may be one of
 `down', `up', `left' or `right'.
+.TP 4
+.B -b
+\fIkey\fR is interpreted as 
+a control character written ^\fIcharacter\fR (e.g. `^A') or
+C-\fIcharacter\fR (e.g. `C-A'),
+a meta character written M-\fIcharacter\fR (e.g. `M-A'),
+a function key written F-\fIstring\fR (e.g. `F-string'),
+or an extended prefix key written X-\fIcharacter\fR (e.g. `X-A').
 .TP 4
 .B -c
 \fIcommand\fR is interpreted as a shell or external command instead of as an
@@ -2139,7 +2164,7 @@ Horizontal tab
 Vertical tab
 .TP 8
 .B \e\fInnn
-The ASCII character corresponding to the octal number \fInnn
+The ASCII character corresponding to the octal number \fInnn\fR
 .PD
 .RE
 .PP
@@ -2587,7 +2612,7 @@ The shell exits either with the value of the specified \fIexpr\fR
 (an expression, as described under \fBExpressions\fR)
 or, without \fIexpr\fR, with the value of the \fBstatus\fR variable.
 .TP 8
-\fBfg \fR[\fB%\fIjob\fR ...]
+.B fg \fR[\fB%\fIjob\fR ...]
 Brings the specified jobs (or, without arguments, the current job)
 into the foreground, continuing each if it is stopped.
 \fIjob\fR may be a number, a string, `', `%', `+' or `-' as described
@@ -2749,7 +2774,7 @@ the TERM (terminate) signal) to the specified jobs or processes.
 \fIjob\fR may be a number, a string, `', `%', `+' or `-' as described
 under \fBJobs\fR.
 Signals are either given by number or by name (as given in
-\fI/usr/include/signal.h,\fR stripped of the prefix `SIG').
+\fI/usr/include/signal.h\fR, stripped of the prefix `SIG').
 There is no default \fIjob\fR; saying just `kill' does not send a signal
 to the current job.  If the signal being sent is TERM (terminate)
 or HUP (hangup), then the job or process will be sent a
@@ -3047,9 +3072,9 @@ based on the time of day.
 .br
 .B set \fIname\fR\fB=\fIword\fR ...
 .br
-.B set \fIname\fR\fB=(\fIwordlist\fR) ...
+.B set \fIname\fR\fB=(\fIwordlist\fB)\fR ...
 .br
-.B set \fIname[index]\fR\fB=\fIword ...
+.B set \fIname[index]\fR\fB=\fIword\fR ...
 .br
 .B set -r \fR(+)
 .br
@@ -3058,12 +3083,12 @@ based on the time of day.
 .B set -r \fIname\fR\fB=\fIword\fR ... (+)
 .PD 0
 .TP 8
-.B set -r \fIname\fR\fB=(\fIwordlist\fR)\fR ... (+)
+.B set -r \fIname\fR\fB=(\fIwordlist\fB)\fR ... (+)
 The first form of the command prints the value of all shell variables.
 Variables which contain more than a single word print as a
 parenthesized word list.
 The second form sets \fIname\fR to the null string.
-The third form sets \fIname\fR to the single \fBword\fR. 
+The third form sets \fIname\fR to the single \fIword\fR. 
 The fourth form sets \fIname\fR to the list of words in
 \fIwordlist\fR. In all cases the value is command and filename expanded.
 The fifth form sets the \fIindex\fR'th component of name to \fIword\fR;
@@ -3101,7 +3126,7 @@ Concept terminal users may have to `settc xn no' to get proper
 wrapping at the rightmost column.
 .TP 8
 .B setty \fR[\fB-d\fR|\fB-q\fR|\fB-x\fR] [\fB-a\fR] [[\fB+\fR|\fB-\fR]\fImode\fR] (+)
-Controls which tty modes (see \fBTerminal Management\fR)
+Controls which tty modes (see \fBTerminal management\fR)
 the shell does not allow to change.
 \fB-d\fR, \fB-q\fR or \fB-x\fR tells \fIsetty\fR to act
 on the `edit', `quote' or `execute' set of tty modes respectively; without
@@ -3262,7 +3287,7 @@ executables in \fBpath\fR.
 .B which\fR \fIcommand\fR (+)
 Displays the command that will be executed by the shell after substitutions,
 \fBpath\fR searching, etc.
-The builtin version is just like \fIwhich\fR, but it correctly reports
+The builtin command is just like \fIwhich\fR(1), but it correctly reports
 \fItcsh\fR aliases and builtins and is 10 to 100 times faster.
 See also the \fIwhich-command\fR editor command.
 .PP
@@ -3305,7 +3330,7 @@ A fancier way to do that is
 This will put the hostname and working directory on the title bar but
 only the hostname in the icon manager menu.
 .PP
-Note that putting a \fIcd, pushd\fR or \fIpopd\fR in \fIcwdcmd\fR
+Note that putting a \fIcd\fR, \fIpushd\fR or \fIpopd\fR in \fIcwdcmd\fR
 may cause an infinite loop. It is the author's opinion that anyone doing
 so will get what they deserve.
 .RE
@@ -3331,7 +3356,7 @@ Runs just before each prompt is printed. For example, if one does
 .IP "" 4
 > alias precmd date
 .PP
-then \fIdate\fR runs just before the shell prompts for each command.
+then \fIdate\fR(1) runs just before the shell prompts for each command.
 There are no limits on what \fIprecmd\fR can be set to do, but discretion
 should be used.
 .RE
@@ -3343,19 +3368,21 @@ desired interpreter (e.g. `/bin/csh' or `/usr/local/bin/tcsh').
 .SS "Special shell variables"
 The variables described in this section have special meaning to the shell.
 .PP
-The shell sets \fBaddsuffix, argv, autologout, echo_style, edit, gid, home,
-loginsh, oid, path, prompt, prompt2, prompt3, shell, shlvl, tcsh, term,
-tty, uid, user\fR and \fBversion\fR at startup; they do not change thereafter
-unless changed by the user. The shell updates \fBcwd\fR, \fBdirstack\fR,
-\fBowd\fR and \fBstatus\fR when necessary, and sets \fBlogout\fR on logout.
+The shell sets \fBaddsuffix\fR, \fBargv\fR, \fBautologout\fR, \fBecho_style\fR,
+\fBedit\fR, \fBgid\fR, \fBhome\fR, \fBloginsh\fR, \fBoid\fR, \fBpath\fR,
+\fBprompt\fR, \fBprompt2\fR, \fBprompt3\fR, \fBshell\fR, \fBshlvl\fR,
+\fBtcsh\fR, \fBterm\fR, \fBtty\fR, \fBuid\fR, \fBuser\fR and \fBversion\fR at
+startup; they do not change thereafter unless changed by the user. The shell
+updates \fBcwd\fR, \fBdirstack\fR, \fBowd\fR and \fBstatus\fR when necessary,
+and sets \fBlogout\fR on logout.
 .PP
-The shell synchronizes \fBafsuser, home, path, shlvl, term\fR and \fBuser\fR
-with the environment variables of the same names: whenever the environment
-variable changes the shell changes the corresponding shell variable to match
-(unless the shell variable is read-only) and vice versa. Note that although
-\fBcwd\fR and \fBPWD\fR have identical meanings, they are not synchronized in
-this manner, and that the shell automatically interconverts the different
-formats of \fBpath\fR and \fBPATH\fR.
+The shell synchronizes \fBafsuser\fR, \fBhome\fR, \fBpath\fR, \fBshlvl\fR,
+\fBterm\fR and \fBuser\fR with the environment variables of the same names:
+whenever the environment variable changes the shell changes the corresponding
+shell variable to match (unless the shell variable is read-only) and vice
+versa. Note that although \fBcwd\fR and \fBPWD\fR have identical meanings, they
+are not synchronized in this manner, and that the shell automatically
+interconverts the different formats of \fBpath\fR and \fBPATH\fR.
 .TP 8
 .B addsuffix \fR(+)
 If set, filename completion adds `/' to the end of directories and a space
@@ -3574,7 +3601,7 @@ See also \fBshlvl\fR.
 .B logout \fR(+)
 Set by the shell to `normal' before a normal logout, `automatic'
 before an automatic logout, and `hangup' if the shell was killed by a
-hangup signal (see \fBSignal Handling\fR).
+hangup signal (see \fBSignal handling\fR).
 See also the \fBautologout\fR shell variable.
 .TP 8
 .B mail
@@ -3632,27 +3659,27 @@ The default is to present job completions just before printing a prompt.
 The user's real organization ID. (Domain/OS only)
 .TP 8
 .B owd \fR(+)
-The old working directory, equivalent to the `-' used by \fIcd\fI and \fIpushd\fR.
+The old working directory, equivalent to the `-' used by \fIcd\fR and \fIpushd\fR.
 See also the \fBcwd\fR and \fBdirstack\fR shell variables.
 .TP 8
 .B path
 A list of directories in which to look for executable commands.
 A null word specifies the current directory.
-If there is no \fIpath\fR variable then only full path names will execute.
+If there is no \fBpath\fR variable then only full path names will execute.
 \fBpath\fR is set by the shell at startup from the \fBPATH\fR environment
 variable or, if \fBPATH\fR does not exist, to a system-dependent default
 something like `(/usr/local/bin /usr/bsd /bin /usr/bin .)'.
 The shell may put `.' first or last in \fBpath\fR depending on how it
 was compiled; see the \fBversion\fR shell variable.
 A shell which is given neither the \fB-c\fR nor the \fB-t\fR option
-hashes the contents of the directories in the \fIpath\fR variable after
-reading \fI~/.tcshrc\fR and each time the \fBpath\fR variable is reset.
-If new commands are added to these directories while the shell is active,
-it may be necessary to do a \fIrehash\fR or the commands may not be found.
+hashes the contents of the directories in \fBpath\fR after
+reading \fI~/.tcshrc\fR and each time \fBpath\fR is reset.
+If one adds a new command are to a directory in \fBpath\fR while the shell
+is active, one may need to do a \fIrehash\fR for the shell to find it.
 .TP 8
 .B printexitvalue \fR(+)
 If set and an interactive program exits with a non-zero status, the shell
-prints `Exit \fIstatus\fR'.
+prints `Exit \fBstatus\fR'.
 .TP 8
 .B prompt
 The string which is printed before reading each command from the terminal.
@@ -3668,7 +3695,7 @@ The current working directory.
 %~
 The current working directory, but with one's home directory
 represented by `~' and other users' home directories represented by
-`~user' as per \fBFilename Substitution\fR. `~user' substitution
+`~user' as per \fBFilename substitution\fR. `~user' substitution
 happens only if the shell has already used `~\fIuser\fR' in a pathname
 in the current session.
 .TP 4
@@ -4078,7 +4105,7 @@ Set by the \fB-v\fR command line option.
 .B version \fR(+)
 The version ID stamp. It contains the shell's version number (see \fBtcsh\fR),
 origin, release date, vendor, operating system and machine (see \fBVENDOR\fR, 
-\fBOSTYPE\fR and \fBMACHTYPE\fB) and a comma-separated
+\fBOSTYPE\fR and \fBMACHTYPE\fR) and a comma-separated
 list of options which were set at compile time.
 Options which are set by default in the distribution are noted.
 .PP
@@ -4119,7 +4146,7 @@ Kanji is used and the ISO character set is ignored,
 unless the \fBnokanji\fR shell variable is set
 .TP 4
 sm
-The system's \fImalloc\fR(2) is used
+The system's \fImalloc\fR(3) is used
 .TP 4
 hb
 The `#!<program> <args>' convention is emulated when executing shell scripts
@@ -4133,16 +4160,15 @@ The shell attempts to set the \fBREMOTEHOST\fR environment variable
 afs
 The shell verifies your password with the kerberos server if local
 authentication fails. The \fBafsuser\fR shell variable or the
-\fBAFSUSER\fR environment variable AFSUSER override your local username
-if set.
+\fBAFSUSER\fR environment variable override your local username if set.
 .PD
 .PP
-In addition to the above strings, administrators can 
-enter local strings to indicate differences in the local version.
+An administrator may enter additional strings to indicate differences
+in the local version.
 .RE
 .TP 8
 .B visiblebell \fR(+)
-If set, the visible bell (screen flash) is used rather than the audible bell.
+If set, a screen flash is used rather than the audible bell.
 See also \fBnobeep\fR.
 .TP 8
 .B watch \fR(+)
@@ -4166,9 +4192,9 @@ set watch = (1 any any)
 .PP
 reports any login/logout once every minute. For the impatient, the \fIlog\fR
 builtin command triggers a \fBwatch\fR report at any time. All current logins
-are reported (as with the \fBlog\fR builtin) when \fBwatch\fR is first set.
+are reported (as with the \fIlog\fR builtin) when \fBwatch\fR is first set.
 .PP
-The \fBwho\fR variable controls the format of \fBwatch\fR reports.
+The \fBwho\fR shell variable controls the format of \fBwatch\fR reports.
 .RE
 .TP 8
 .B who \fR(+)
@@ -4218,6 +4244,11 @@ The number of columns in the terminal. See \fBTerminal management\fR.
 Used by X-windows (see \fIx\fR(1)).
 If set, the shell does not set \fBautologout\fR (q.v.).
 .TP 8
+.B EDITOR
+The pathname to a default editor.
+See also the \fBVISUAL\fR environment variable
+and the \fIrun-fg-editor\fR editor command.
+.TP 8
 .B HOME
 Equivalent to the \fBhome\fR shell variable.
 .TP 8
@@ -4259,6 +4290,10 @@ The operating system, as determined at compile time.
 A colon-separated list of directories in which to look for executables.
 Equivalent to the \fBpath\fR shell variable, but in a different format.
 .TP 8
+.B PWD \fR(+)
+Equivalent to the \fBcwd\fR shell variable, but not synchronized to it;
+updated only after an actual directory change.
+.TP 8
 .B REMOTEHOST \fR(+)
 The host from which the user has logged in remotely, if this is the case and
 the shell is able to determine it. Set only if the shell was so compiled;
@@ -4281,6 +4316,11 @@ Equivalent to the \fBuser\fR shell variable.
 .TP 8
 .B VENDOR \fR(+)
 The vendor, as determined at compile time.
+.TP 8
+.B VISUAL
+The pathname to a default full-screen editor.
+See also the \fBEDITOR\fR environment variable
+and the \fIrun-fg-editor\fR editor command.
 .SH FILES
 .PD 0
 .TP 16
@@ -4367,12 +4407,12 @@ An enhanced history mechanism. Events in the history list are time-stamped.
 See also the \fIhistory\fR command and its associated shell variables,
 the previously undocumented `#' event specifier and new modifiers
 under \fBHistory substitution\fR,
-the \fI*-history, history-search-*, i-search-*, vi-search-*\fR and
+the \fI*-history\fR, \fIhistory-search-*\fR, \fIi-search-*\fR, \fIvi-search-*\fR and
 \fItoggle-literal-history\fR editor commands
 and the \fBhistlit\fR shell variable.
 .PP
 Enhanced directory parsing and directory stack handling.
-See the \fIcd, pushd, popd\fR and \fIdirs\fR commands and their associated
+See the \fIcd\fR, \fIpushd\fR, \fIpopd\fR and \fIdirs\fR commands and their associated
 shell variables, the description of \fBDirectory stack substitution\fR,
 the \fBdirstack\fR, \fBowd\fR and \fBsymlinks\fR shell variables and
 the \fInormalize-command\fR and \fInormalize-path\fR editor commands.
@@ -4394,13 +4434,14 @@ and system-dependent file locations (see \fBFILES\fR).
 .PP
 Extensive terminal-managment capabilities. See \fBTerminal management\fR.
 .PP
-New builtin commands including \fIbuiltins, hup, ls-F, newgrp,
-printenv, which\fR and \fIwhere\fR (q.v.).
+New builtin commands including \fIbuiltins\fR, \fIhup\fR, \fIls-F\fR,
+\fInewgrp\fR, \fIprintenv\fR, \fIwhich\fR and \fIwhere\fR (q.v.).
 .PP
 New variables that make useful information easily available to the shell.
-See the \fBgid, loginsh, oid, shlvl, tcsh, tty, uid\fR and \fBversion\fR
-shell variables and the \fBHOST\fR, \fBREMOTEHOST\fR, \fBVENDOR\fR,
-\fBOSTYPE\fR and \fBMACHTYPE\fR environment variables.
+See the \fBgid\fR, \fBloginsh\fR, \fBoid\fR, \fBshlvl\fR, \fBtcsh\fR,
+\fBtty\fR, \fBuid\fR and \fBversion\fR shell variables and the \fBHOST\fR,
+\fBREMOTEHOST\fR, \fBVENDOR\fR, \fBOSTYPE\fR and \fBMACHTYPE\fR environment
+variables.
 .PP
 A new syntax for including useful information in the prompt string
 (see \fBprompt\fR).
@@ -4447,7 +4488,7 @@ are not negated correctly.
 The single-command form of \fIif\fR does output redirection even if
 the expression is false and the command is not executed.
 .PP
-\fBls-F\fR includes file identification characters when sorting filenames.
+\fIls-F\fR includes file identification characters when sorting filenames.
 .PP
 New bugs should be sent to Christos Zoulas <christos@ee.cornell.edu>,
 preferably with fixes.
@@ -4462,7 +4503,7 @@ limited to 1/6th the number of characters allowed in an argument list.
 Command substitutions may substitute no more characters than are allowed in
 an argument list.
 .PP
-To detect looping, the shell restricts the number of \fBalias\fR
+To detect looping, the shell restricts the number of \fIalias\fR
 substitutions on a single line to 20.
 .SH "SEE ALSO"
 csh(1), emacs(1), ls(1), newgrp(1), sh(1), setpath(1), stty(1), su(1),
@@ -4471,7 +4512,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.16 (Cornell) 94/06/06.
+This manual documents tcsh 6.04.17 (Cornell) 94/18/06.
 .SH AUTHORS
 .PD 0
 .TP 2
@@ -4620,7 +4661,7 @@ New manpage
 .TP 2
 Larry Schwimmer, Stanford University, 1993
 AFS and HESIOD patches.
-.TP
+.TP 2
 Luke Mewburn, RMIT University, 1994
 Enhanced directory printing in prompt
 .PD

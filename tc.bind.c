@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.bind.c,v 3.17 1993/11/13 00:40:56 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.bind.c,v 3.18 1994/05/26 13:11:20 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.17 1993/11/13 00:40:56 christos Exp christos $")
+RCSID("$Id: tc.bind.c,v 3.18 1994/05/26 13:11:20 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -52,6 +52,7 @@ static	void   pkeys		__P((int, int));
 static	void   printkey		__P((KEYCMD *, Char *));
 static	KEYCMD parsecmd		__P((Char *));
 static	Char  *parsestring	__P((Char *, Char *));
+static	Char  *parsebind	__P((Char *, Char *));
 static	void   print_all_keys	__P((void));
 static	void   printkeys	__P((KEYCMD *, int, int));
 static	void   bindkey_usage	__P((void));
@@ -69,7 +70,7 @@ dobindkey(v, c)
     struct command *c;
 {
     KEYCMD *map;
-    int     ntype, no, remove, key;
+    int     ntype, no, remove, key, bind;
     Char   *par;
     Char    p;
     Char    inbuf[200];
@@ -84,13 +85,16 @@ dobindkey(v, c)
 
     map = CcKeyMap;
     ntype = XK_CMD;
-    key = remove = 0;
+    key = remove = bind = 0;
     for (no = 1, par = v[no]; 
 	 par != NULL && (*par++ & CHAR) == '-'; no++, par = v[no]) {
 	if ((p = (*par & CHAR)) == '-')
 	    break;
 	else 
 	    switch (p) {
+	    case 'b':
+		bind = 1;
+		break;
 	    case 'k':
 		key = 1;
 		break;
@@ -133,11 +137,21 @@ dobindkey(v, c)
 	return;
     }
 
-    if (key) 
+    if (key) {
+	if (!IsArrowKey(v[no]))
+	    xprintf("Invalid key name `%S'\n", v[no]);
 	in = v[no++];
-    else
-	if ((in = parsestring(v[no++], inbuf)) == NULL)
-	    return;
+    }
+    else {
+	if (bind) {
+	    if ((in = parsebind(v[no++], inbuf)) == NULL)
+		return;
+	}
+	else {
+	    if ((in = parsestring(v[no++], inbuf)) == NULL)
+		return;
+	}
+    }
 
     if (remove) {
 	if (key) {
@@ -238,6 +252,64 @@ parsecmd(str)
     xprintf("Bad command name: %S\n", str);
     return 0;
 }
+
+static Char *
+parsebind(s, b)
+    Char *s;
+    Char *b;
+{
+    static const char badspec[] = "Bad key spec %S\n";
+    Char *buf = b;
+    switch (*s) {
+    case '^':
+	s++;
+	*b++ = (*s == '?') ? '\177' : ((*s & CHAR) & 0237);
+	*b = '\0';
+	return buf;
+
+    case 'F':
+    case 'M':
+    case 'X':
+    case 'C':
+	if (s[1] != '-' || s[2] == '\0') {
+	    xprintf(badspec, s);
+	    return NULL;
+	}
+	s += 2;
+	switch (s[-2]) {
+	case 'F': case 'f':	/* Turn into ^[str */
+	    *b++ = '\033';
+	    Strcpy(b, s);
+	    return buf;
+
+	case 'C': case 'c':	/* Turn into ^c */
+	    *b++ = (*s == '?') ? '\177' : ((*s & CHAR) & 0237);
+	    *b = '\0';
+	    return buf;
+
+	case 'X' : case 'x':	/* Turn into ^Xc */
+	    *b++ = 'X' & 0237;
+	    *b++ = *s;
+	    *b = '\0';
+	    return buf;
+
+	case 'M' : case 'm':	/* Turn into 0x80|c */
+	    *b++ = *s | 0x80;
+	    *b = '\0';
+	    return buf;
+
+	default:
+	    abort();
+	    /*NOTREACHED*/
+	    return NULL;
+	}
+
+    default:
+	xprintf(badspec, s);
+	return NULL;
+    }
+}
+
 
 int
 parseescape(ptr)
@@ -478,6 +550,7 @@ bindkey_usage()
     xprintf(
 	"Usage: bindkey [options] [--] [in-string [out-string | command]]\n");
     xprintf("    -a   bind key in alternative key binding\n");
+    xprintf("    -b   accept symbolic key definitions\n");
     xprintf("    -s   bind an out-string instead of a command\n");
     xprintf("    -c   bind a unix-command instead of a command\n");
     xprintf("    -v   initialized maps to default vi bindings\n");

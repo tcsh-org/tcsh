@@ -1,4 +1,9 @@
 V6.05.00, ... 
+113. 6.04.17 08/18/94
+112. Realloc debug fix from John.
+111. Completion fixes from Bruce.
+110. Added -b option to bind.
+109. Added tcsh.man2html from Dave. Looks great!
 108. 6.04.16 06/06/94
 107. Allow multi word glob in "`foo`" expressions.
      > if ("`ls`" == "a b c") then
