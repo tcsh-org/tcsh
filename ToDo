@@ -1,0 +1,6 @@
+Fix things like expand variables and history search to include the 
+character under the cursor.
+
+2 commands with the same name should not be ambiguous.
+
+Check arguments for limits limit file 6000M

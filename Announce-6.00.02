@@ -1,0 +1,21 @@
+Hello again,
+
+Tcsh-6.00.02 is now available from tesla.ee.cornell.edu. A couple of
+globbing bugs have been fixed, and a few enhancements have been added:
+
+
+V6.00.02, 08/05/91
+8.  tcsh will always set $LOGNAME and $USER if not already set in the
+    environment.
+7.  added $histfile.
+6.  echo `echo` * and  echo ~ {} were broken
+5.  setty builtin addition
+4.  Multiple : modifiers [experimental, disabled with -DCOMPAT]
+3.  7 bit fixes, and hp9000s500.
+2.  #undef DEBUG in tc.alloc.c, so we continue if we get a bad free() 
+1.  getn() is now protected against NULL strings.
+
+You can get the whole distribution (/pub/tcsh-6.00/tcsh-6.00.02.tar.Z) 
+or a patch from 6.00.01 to 6.00.02 (/pub/tcsh-6.00/tcsh-6.00.01-6.00.02.patch.Z)
+
+christos

@@ -1,0 +1,22 @@
+Hello everyone,
+
+This is the release announcement of tcsh version 6.00.  Tcsh is a
+version of the Berkeley C-Shell, with the addition of: a command line
+editor, command and file name completion, listing, etc. and a bunch of
+small additions to the shell itself.
+
+Tcsh can now be distributed in full under the Berkeley Copywrite
+Agreement.  I wish to thank Keith Bostic at Berkeley for all the help
+in freeing the sources of most unix utilities for 4.4BSD.
+
+I also wish to thank the people from all around the world :-), who
+helped the beta testing, and followed all 28 patches of tcsh-5.99!
+
+You should be able to compile and run tcsh in most popular unix machines,
+and with a bit of tinkering it should run on anything that calls itself *ix.
+
+You can grab a copy of tcsh, from tesla.ee.cornell.edu:/pub/tcsh-6.00.tar.Z.
+
+Have fun, 
+
+christos
