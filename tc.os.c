@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.c,v 3.56 2004/08/04 17:12:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.c,v 3.57 2005/01/05 16:06:14 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.56 2004/08/04 17:12:31 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.57 2005/01/05 16:06:14 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -583,7 +583,7 @@ dodmmode(v, c)
 
 static jmp_buf sigsys_buf;
 
-static  sigret_t
+static RETSIGTYPE
 catch_sigsys()
 {
     longjmp(sigsys_buf, 1);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.55 2004/12/25 21:15:08 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.56 2005/01/05 16:06:14 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -87,7 +87,7 @@ extern	int		  cmd_expand	__P((Char *, Char *));
 extern	void		  dowhich	__P((Char **, struct command *));
 extern	struct process	 *find_stop_ed	__P((void));
 extern	void		  fg_proc_entry	__P((struct process *));
-extern	sigret_t	  alrmcatch	__P((int));
+extern	RETSIGTYPE	  alrmcatch	__P((int));
 extern	void		  precmd	__P((void));
 extern	void		  postcmd	__P((void));
 extern	void		  cwd_cmd	__P((void));
@@ -250,10 +250,10 @@ extern	void		  sched_run	__P((int));
 #ifndef BSDSIGS
 # ifdef UNRELSIGS
 #  ifdef COHERENT
-extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
+extern	RETSIGTYPE	(*xsignal	__P((int, RETSIGTYPE (*)(int)))) ();
 #   define signal(x,y)	  xsignal(x,y)
 #  endif /* COHERENT */
-extern	sigret_t	(*xsigset	__P((int, sigret_t (*)(int)))) ();
+extern	RETSIGTYPE	(*xsigset	__P((int, RETSIGTYPE (*)(int)))) ();
 #  define sigset(x,y)	  xsigset(x,y)
 extern	void		  xsigrelse	__P((int));
 #  define sigrelse(x)	  xsigrelse(x)
@@ -271,7 +271,7 @@ extern	void 		  sigpause	__P((int));
 #endif /* !BSDSIGS */
 
 #ifdef NEEDsignal
-extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
+extern	RETSIGTYPE	(*xsignal	__P((int, RETSIGTYPE (*)(int)))) ();
 # define signal(a, b)	  xsignal(a, b)
 #endif /* NEEDsignal */
 #if defined(_SEQUENT_) || ((SYSVREL > 3 || defined(_DGUX_SOURCE)) && defined(POSIXSIGS)) || ((defined(_AIX) || defined(__CYGWIN__)) && defined(POSIXSIGS)) || defined(WINNT_NATIVE)
@@ -280,10 +280,10 @@ extern	sigmask_t	  sigsetmask	__P((sigmask_t));
 extern	sigmask_t	  sigblock	__P((sigmask_t));
 # endif /* !DGUX */
 extern	void		  bsd_sigpause	__P((sigmask_t));
-extern  sigret_t        (*bsd_signal    __P((int, sigret_t (*)(int)))) __P((int));
+extern  RETSIGTYPE        (*bsd_signal    __P((int, RETSIGTYPE (*)(int)))) __P((int));
 #endif /* _SEQUENT_ */
 #ifdef SIGSYNCH
-extern	sigret_t	  synch_handler	__P((int));
+extern	RETSIGTYPE	  synch_handler	__P((int));
 #endif /* SIGSYNCH */
 
 
@@ -333,16 +333,18 @@ extern	void		  fix_version	__P((void));
 /*
  * tc.who.c
  */
-#ifndef HAVENOUTMP
+#if defined (HAVE_UTMP_H) || defined (HAVE_UTMPX_H) || defined (WINNT_NATIVE)
 extern	void		  initwatch	__P((void));
 extern	void		  resetwatch	__P((void));
 extern	void		  watch_login	__P((int));
 extern	const char 	 *who_info	__P((ptr_t, int, char *, size_t));
 extern	void		  dolog		__P((Char **, struct command *));
-# ifdef UTHOST
+# ifdef HAVE_STRUCT_UTMP_UT_HOST
 extern	char		 *utmphost	__P((void));
 extern	size_t		  utmphostsize	__P((void));
-# endif /* UTHOST */
-#endif /* HAVENOUTMP */
+# endif /* HAVE_STRUCT_UTMP_UT_HOST */
+#else
+# define HAVENOUTMP
+#endif
 
 #endif /* _h_tc_decls */

@@ -101,30 +101,6 @@
  */
 #define SYSVREL	3
 
-/*
- * SIGVOID	Define this if your signal handlers return void.  On older
- *		systems, signal returns int, but on newer ones, it returns void.
- */
-#define SIGVOID 
-
-/*
- * HAVEDUP2	Define this if your system supports dup2().
- */
-#define HAVEDUP2
-
-/*
- * UTHOST	Does the utmp file have a host field?
- */
-#ifdef __hpux
-# define UTHOST
-#else
-# undef UTHOST
-#endif /* __hpux */
-
-/*
- * DIRENT	Your system has <dirent.h> instead of <sys/dir.h>
- */
-#define DIRENT
 /****************** local defines *********************/
 #ifdef __hpux
 # define NAMEI_BUG	/* Great! you broke that one too */

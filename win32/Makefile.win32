@@ -1,4 +1,4 @@
-# $Id: Makefile.win32,v 1.2 2002/08/11 07:58:12 amold Exp $
+# $Id: Makefile.win32,v 1.3 2002/09/13 05:27:10 amold Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -26,7 +26,7 @@ INCLUDES=-I. -I.. -Iwin32
 
 
 #RCFLAGS = -D LOADABLE_RC
-EXTRAFLAGS = -DWINNT_NATIVE -DNO_CRYPT -DHASH_SPELL_CHECK 
+EXTRAFLAGS = -DWINNT_NATIVE -DNO_CRYPT -DHASH_SPELL_CHECK -DHAVE_DIRENT_H
 
 !if "$(PROCESSOR_ARCHITECTURE)" == "x86"
 ARCH = i386

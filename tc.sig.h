@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.h,v 3.26 2002/07/12 13:16:19 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.h,v 3.27 2004/11/23 02:20:02 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -190,7 +190,7 @@ typedef struct sigvec sigvec_t;
 # else
 #  define SYNCHMASK 	(sigmask(SIGCHLD))
 # endif
-extern sigret_t synch_handler();
+extern RETSIGTYPE synch_handler();
 #endif /* convex */
 
 #ifdef SAVESIGVEC

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.43 2004/11/23 01:40:08 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.44 2004/11/23 02:10:48 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -42,7 +42,7 @@ extern	void		  exitstat	__P((void));
 extern	void		  goodbye	__P((Char **, struct command *));
 extern	void		  importpath	__P((Char *));
 extern	void		  initdesc	__P((void));
-extern	sigret_t	  pintr		__P((int));
+extern	RETSIGTYPE	  pintr		__P((int));
 extern	void		  pintr1	__P((int));
 extern	void		  process	__P((int));
 extern	void		  untty		__P((void));
@@ -311,7 +311,7 @@ extern	void		  dostop	__P((Char **, struct command *));
 extern	void		  dowait	__P((Char **, struct command *));
 extern	void		  palloc	__P((int, struct command *));
 extern	void		  panystop	__P((int));
-extern	sigret_t	  pchild	__P((int));
+extern	RETSIGTYPE	  pchild	__P((int));
 extern	void		  pendjob	__P((void));
 extern	int		  pfork		__P((struct command *, int));
 extern	void		  pgetty	__P((int, int));

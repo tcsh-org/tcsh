@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.124 2005/01/06 16:52:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.125 2005/01/06 16:55:59 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -63,7 +63,7 @@ typedef unsigned long intptr_t;
 #endif /* IZERO */
 #ifndef IZERO_STRUCT
 # define IZERO_STRUCT
-# endif /* IZERO_STRUCT */
+#endif /* IZERO_STRUCT */
 
 #ifndef WINNT_NATIVE
 # define INIT_ZERO
@@ -121,22 +121,6 @@ typedef int NLSChar;
 
 /* Elide unused argument warnings */
 #define USE(a)	(void) (a)
-/*
- * If your compiler complains, then you can either
- * throw it away and get gcc or, use the following define
- * and get rid of the typedef.
- * [The 4.2/3BSD vax compiler does not like that]
- * Both MULTIFLOW and PCC compilers exhbit this bug.  -- sterling@netcom.com
- */
-#ifdef SIGVOID
-# if (defined(vax) || defined(uts) || defined(MULTIFLOW) || defined(PCC)) && !defined(__GNUC__)
-#  define sigret_t void
-# else /* !((vax || uts || MULTIFLOW || PCC) && !__GNUC__) */
-typedef void sigret_t;
-# endif /* (vax || uts || MULTIFLOW || PCC) && !__GNUC__ */
-#else /* !SIGVOID */
-typedef int sigret_t;
-#endif /* SIGVOID */
 
 /*
  * Return true if the path is absolute
@@ -379,16 +363,16 @@ typedef int sigret_t;
 #endif	/* _MINIX */
 #endif 
 
-#ifdef DIRENT
+#ifdef HAVE_DIRENT_H
 # include <dirent.h>
 #else
-# ifdef hp9000s500
+# ifdef HAVE_NDIR_H
 #  include <ndir.h>
 # else
 #  include <sys/dir.h>
 # endif
 # define dirent direct
-#endif /* DIRENT */
+#endif /* HAVE_DIRENT_H */
 #ifndef HAVE_STRUCT_DIRENT_D_INO
 # define d_ino d_fileno
 #endif
@@ -399,12 +383,12 @@ typedef int sigret_t;
 #include <pwd.h>
 #include <grp.h>
 #endif /* WINNT_NATIVE */
-#ifdef PW_SHADOW
+#ifdef HAVE_SHADOW_H
 # include <shadow.h>
-#endif /* PW_SHADOW */
-#ifdef PW_AUTH
+#endif /* HAVE_SHADOW_H */
+#ifdef HAVE_AUTH_H
 # include <auth.h>
-#endif /* PW_AUTH */
+#endif /* HAVE_AUTH_H */
 #if defined(BSD) && !defined(POSIX)
 # include <strings.h>
 # define strchr(a, b) index(a, b)
@@ -429,7 +413,7 @@ typedef int sigret_t;
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <sys/socket.h>
-# if (defined(_SS_SIZE) || defined(_SS_MAXSIZE)) && !defined(NO_SS_FAMILY)
+# if (defined(_SS_SIZE) || defined(_SS_MAXSIZE)) && defined(HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY)
 #  if !defined(__APPLE__) /* Damnit, where is getnameinfo() folks? */
 #   if !defined(sgi)
 #    define INET6
@@ -449,12 +433,6 @@ typedef int sigret_t;
 #  define __P(a) a
 # else
 #  define __P(a) ()
-#  if !defined(__STDC__)
-#   define const
-#   ifndef apollo
-#    define volatile	/* Apollo 'c' extensions need this */
-#   endif /* apollo */
-#  endif 
 # endif
 #endif 
 
@@ -497,7 +475,7 @@ extern pid_t getpgrp __P((void));
 # endif
 #endif /* !WINNT_NATIVE */
 
-typedef sigret_t (*signalfun_t) __P((int));
+typedef RETSIGTYPE (*signalfun_t) __P((int));
 
 #ifndef lint
 typedef ptr_t memalign_t;

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.39 2004/11/21 04:34:22 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.40 2004/11/23 01:39:35 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.39 2004/11/21 04:34:22 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.40 2004/11/23 01:39:35 christos Exp $")
 
 #include "tc.h"
 
@@ -42,7 +42,7 @@ RCSID("$Id: tc.who.c,v 3.39 2004/11/21 04:34:22 christos Exp $")
  */
 #include <ctype.h>
 
-#ifdef HAVEUTMPX
+#ifdef HAVE_UTMPX_H
 # include <utmpx.h>
 /* I just redefine a few words here.  Changing every occurrence below
  * seems like too much of work.  All UTMP functions have equivalent
@@ -59,7 +59,7 @@ RCSID("$Id: tc.who.c,v 3.39 2004/11/21 04:34:22 christos Exp $")
 #  endif /* __UTMPX_FILE && !UTMPX_FILE */
 # endif /* _PATH_UTMP */
 # define utmp utmpx
-# ifdef __MVS__
+# if defined (__MVS__) || defined (linux)
 #  define ut_time ut_tv.tv_sec
 #  define ut_name ut_user
 # else
@@ -71,35 +71,35 @@ RCSID("$Id: tc.who.c,v 3.39 2004/11/21 04:34:22 christos Exp $")
 #  define endutent endutxent
 #  define utmpname utmpxname
 # endif /* HAVE_UTMPNAME */
-#else /* !HAVEUTMPX */
-# ifndef WINNT_NATIVE
+#else /* !HAVE_UTMPX_H */
+# ifdef HAVE_UTMP_H
 #  include <utmp.h>
 # endif /* WINNT_NATIVE */
-#endif /* HAVEUTMPX */
+#endif /* HAVE_UTMPX_H */
 
 #ifndef BROKEN_CC
 # define UTNAMLEN	sizeof(((struct utmp *) 0)->ut_name)
 # define UTLINLEN	sizeof(((struct utmp *) 0)->ut_line)
-# ifdef UTHOST
+# ifdef HAVE_STRUCT_UTMP_UT_HOST
 #  ifdef _SEQUENT_
 #   define UTHOSTLEN	100
 #  else
 #   define UTHOSTLEN	sizeof(((struct utmp *) 0)->ut_host)
 #  endif
-# endif	/* UTHOST */
+# endif	/* HAVE_STRUCT_UTMP_UT_HOST */
 #else
 /* give poor cc a little help if it needs it */
 struct utmp __ut;
 
 # define UTNAMLEN	sizeof(__ut.ut_name)
 # define UTLINLEN	sizeof(__ut.ut_line)
-# ifdef UTHOST
+# ifdef HAVE_STRUCT_UTMP_UT_HOST
 #  ifdef _SEQUENT_
 #   define UTHOSTLEN	100
 #  else
 #   define UTHOSTLEN	sizeof(__ut.ut_host)
 #  endif
-# endif /* UTHOST */
+# endif /* HAVE_STRUCT_UTMP_UT_HOST */
 #endif /* BROKEN_CC */
 
 #ifndef _PATH_UTMP
@@ -117,9 +117,9 @@ struct who {
     char    who_name[UTNAMLEN + 1];
     char    who_new[UTNAMLEN + 1];
     char    who_tty[UTLINLEN + 1];
-#ifdef UTHOST
+#ifdef HAVE_STRUCT_UTMP_UT_HOST
     char    who_host[UTHOSTLEN + 1];
-#endif /* UTHOST */
+#endif /* HAVE_STRUCT_UTMP_UT_HOST */
     time_t  who_time;
     int     who_status;
 };
@@ -187,7 +187,7 @@ watch_login(force)
     Char  **vp = NULL;
     time_t  t, interval = MAILINTVL;
     struct stat sta;
-#if defined(UTHOST) && defined(_SEQUENT_)
+#if defined(HAVE_STRUCT_UTMP_UT_HOST) && defined(_SEQUENT_)
     char   *host, *ut_find_host();
 #endif
 #ifdef WINNT_NATIVE
@@ -352,7 +352,7 @@ watch_login(force)
 	    }
 	    else {
 		(void) strncpy(wp->who_new, utmp.ut_name, UTNAMLEN);
-# ifdef UTHOST
+# ifdef HAVE_STRUCT_UTMP_UT_HOST
 #  ifdef _SEQUENT_
 		host = ut_find_host(wp->who_tty);
 		if (host)
@@ -362,7 +362,7 @@ watch_login(force)
 #  else
 		(void) strncpy(wp->who_host, utmp.ut_host, UTHOSTLEN);
 #  endif
-# endif /* UTHOST */
+# endif /* HAVE_STRUCT_UTMP_UT_HOST */
 		wp->who_time = utmp.ut_time;
 		if (wp->who_name[0] == '\0')
 		    wp->who_status = ONLINE;
@@ -373,7 +373,7 @@ watch_login(force)
 	else {		/* new tty in utmp */
 	    wpnew = (struct who *) xcalloc(1, sizeof *wpnew);
 	    (void) strncpy(wpnew->who_tty, utmp.ut_line, UTLINLEN);
-# ifdef UTHOST
+# ifdef HAVE_STRUCT_UTMP_UT_HOST
 #  ifdef _SEQUENT_
 	    host = ut_find_host(wpnew->who_tty);
 	    if (host)
@@ -383,7 +383,7 @@ watch_login(force)
 #  else
 	    (void) strncpy(wpnew->who_host, utmp.ut_host, UTHOSTLEN);
 #  endif
-# endif /* UTHOST */
+# endif /* HAVE_STRUCT_UTMP_UT_HOST */
 	    wpnew->who_time = utmp.ut_time;
 # ifdef DEAD_PROCESS
 	    if (utmp.ut_type == DEAD_PROCESS)
@@ -411,7 +411,7 @@ watch_login(force)
 #else
     (void) close(utmpfd);
 #endif
-# if defined(UTHOST) && defined(_SEQUENT_)
+# if defined(HAVE_STRUCT_UTMP_UT_HOST) && defined(_SEQUENT_)
     endutent();
 # endif
 #endif /* !WINNT_NATIVE */
@@ -515,11 +515,11 @@ static void
 print_who(wp)
     struct who *wp;
 {
-#ifdef UTHOST
+#ifdef HAVE_STRUCT_UTMP_UT_HOST
     Char   *cp = str2short(CGETS(26, 7, "%n has %a %l from %m."));
 #else
     Char   *cp = str2short(CGETS(26, 8, "%n has %a %l."));
-#endif /* UTHOST */
+#endif /* HAVE_STRUCT_UTMP_UT_HOST */
     struct varent *vp = adrof(STRwho);
     Char buf[BUFSIZE];
 
@@ -541,11 +541,11 @@ who_info(ptr, c, wbuf, wbufsiz)
     size_t wbufsiz;
 {
     struct who *wp = (struct who *) ptr;
-#ifdef UTHOST
+#ifdef HAVE_STRUCT_UTMP_UT_HOST
     char *wb = wbuf;
     int flg;
     char *pb;
-#endif /* UTHOST */
+#endif /* HAVE_STRUCT_UTMP_UT_HOST */
 
     switch (c) {
     case 'n':		/* user name */
@@ -575,7 +575,7 @@ who_info(ptr, c, wbuf, wbufsiz)
 	}
 	break;
 
-#ifdef UTHOST
+#ifdef HAVE_STRUCT_UTMP_UT_HOST
     case 'm':
 	if (wp->who_host[0] == '\0')
 	    return CGETS(26, 12, "local");
@@ -604,7 +604,7 @@ who_info(ptr, c, wbuf, wbufsiz)
 	    *wb = '\0';
 	    return wbuf;
 	}
-#endif /* UTHOST */
+#endif /* HAVE_STRUCT_UTMP_UT_HOST */
 
     case 'l':
 	return wp->who_tty;
@@ -640,7 +640,7 @@ struct command *c;
     }
 }
 
-# ifdef UTHOST
+# ifdef HAVE_STRUCT_UTMP_UT_HOST
 size_t
 utmphostsize()
 {
@@ -664,7 +664,7 @@ utmphost()
     resetwatch();
     return host;
 }
-# endif /* UTHOST */
+# endif /* HAVE_STRUCT_UTMP_UT_HOST */
 
 #ifdef WINNT_NATIVE
 void add_to_who_list(name, mach_nm)

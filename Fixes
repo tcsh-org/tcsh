@@ -1,3 +1,5 @@
+ 54. iconv fixes (Miloslav Trmac)
+ 53. literal code cleanups (Miloslav Trmac)
  52. move intptr_t definition to sh.h and include both stdint.h and inttypes.h
  51. Fix dup2() issues, and introduce FSAFE as the highest file descriptor
      to be left untouched. This is to avoid closing hesiod/nis etc file

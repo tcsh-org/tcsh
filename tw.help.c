@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.help.c,v 3.19 2002/11/21 20:02:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.help.c,v 3.20 2004/08/04 17:12:32 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -35,14 +35,14 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.help.c,v 3.19 2002/11/21 20:02:01 christos Exp $")
+RCSID("$Id: tw.help.c,v 3.20 2004/08/04 17:12:32 christos Exp $")
 
 #include "tw.h"
 #include "tc.h"
 
 
 static int f = -1;
-static	sigret_t	 cleanf		__P((int));
+static	RETSIGTYPE	 cleanf		__P((int));
 static	Char    	*skipslist	__P((Char *));
 static	void		 nextslist 	__P((Char *, Char *));
 
@@ -143,7 +143,7 @@ do_help(command)
     }
 }
 
-static  sigret_t
+static RETSIGTYPE
 /*ARGSUSED*/
 cleanf(snum)
 int snum;
@@ -156,9 +156,6 @@ int snum;
     if (f != -1)
 	(void) close(f);
     f = -1;
-#ifndef SIGVOID
-    return (snum);
-#endif
 }
 
 /* these next two are stolen from CMU's man(1) command for looking down

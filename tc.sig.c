@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.c,v 3.27 2004/06/18 16:28:09 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.c,v 3.28 2004/08/04 17:12:31 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.27 2004/06/18 16:28:09 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.28 2004/08/04 17:12:31 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -54,7 +54,7 @@ static int stk_ptr = -1;
 
 /* queue child signals
  */
-static sigret_t
+static RETSIGTYPE
 sig_ch_queue()
 {
 #  ifdef JOBDEBUG
@@ -65,14 +65,11 @@ sig_ch_queue()
     stk[stk_ptr].s_pid = (pid_t) wait(&stk[stk_ptr].s_w);
     stk[stk_ptr].s_errno = errno;
     (void) signal(SIGCHLD, sig_ch_queue);
-#  ifndef SIGVOID
-    return(0);
-#  endif /* SIGVOID */
 }
 
 /* process all awaiting child signals
  */
-static sigret_t
+static RETSIGTYPE
 sig_ch_rel()
 {
     while (stk_ptr > -1)
@@ -81,14 +78,11 @@ sig_ch_rel()
     xprintf("signal(SIGCHLD, pchild);\n");
 #  endif /* JOBDEBUG */
     (void) signal(SIGCHLD, pchild);
-#  ifndef SIGVOID
-    return(0);
-#  endif /* SIGVOID */
 }
 
 
 /* libc.a contains these functions in SYSVREL >= 3. */
-sigret_t
+RETSIGTYPE
 (*xsigset(a, b)) ()
     int     a;
     signalfun_t  b;
@@ -181,7 +175,7 @@ ourwait(w)
 
 #  ifdef COHERENT
 #   undef signal
-sigret_t
+RETSIGTYPE
 (*xsignal(a, b)) ()
     int     a;
     signalfun_t  b;
@@ -221,7 +215,7 @@ sigpause(what)
 
 #ifdef NEEDsignal
 /* turn into bsd signals */
-sigret_t
+RETSIGTYPE
 (*xsignal(s, a)) ()
     int     s;
     signalfun_t a;
@@ -367,7 +361,7 @@ bsd_sigpause(mask)
  *
  * Emulate bsd style signal()
  */
-sigret_t (*bsd_signal(sig, func)) ()
+RETSIGTYPE (*bsd_signal(sig, func)) ()
         int sig;
         signalfun_t func;
 {
@@ -403,7 +397,7 @@ sigret_t (*bsd_signal(sig, func)) ()
 #ifdef SIGSYNCH
 static long Synch_Cnt = 0;
 
-sigret_t
+RETSIGTYPE
 synch_handler(sno)
 int sno;
 {

@@ -90,30 +90,6 @@
  */
 #undef YPBUGS
 
-/*
- * SIGVOID	Define this if your signal handlers return void.  On older
- *		systems, signal returns int, but on newer ones, it returns void.
- */
-#if !defined(NeXT) && !defined(__STRICT_BSD__)
-# define SIGVOID 
-#else
-# undef SIGVOID 
-#endif
-
-/*
- * HAVEDUP2	Define this if your system supports dup2().
- */
-#define HAVEDUP2
-
-/*
- * UTHOST	Does the utmp file have a host field?
- */
-#define UTHOST
-
-/*
- * DIRENT	Your system has <dirent.h> instead of <sys/dir.h>
- */
-#undef DIRENT
 /****************** local defines *********************/
 #ifdef NeXT
 # define environ _environ

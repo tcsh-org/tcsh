@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.32 2005/01/05 16:06:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.33 2005/01/06 16:52:32 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.32 2005/01/05 16:06:14 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.33 2005/01/06 16:52:32 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -339,7 +339,7 @@ dmove(i, j)
 
     if (i == j || i < 0)
 	return (i);
-#ifdef HAVEDUP2
+#ifdef HAVE_DUP2
     if (j >= 0) {
 	(void) dup2(i, j);
 	if (j != i)
@@ -361,7 +361,7 @@ dcopy(i, j)
     if (i == j || i < 0 || (j < 0 && i > FSAFE))
 	return (i);
     if (j >= 0) {
-#ifdef HAVEDUP2
+#ifdef HAVE_DUP2
 	(void) dup2(i, j);
 	return (j);
 #else

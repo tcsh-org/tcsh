@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.67 2004/12/25 21:15:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.68 2005/01/05 16:06:14 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.67 2004/12/25 21:15:07 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.68 2005/01/05 16:06:14 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -56,7 +56,7 @@ RCSID("$Id: sh.sem.c,v 3.67 2004/12/25 21:15:07 christos Exp $")
 #endif /* __sparc__ || sparc */
 
 #ifdef VFORK
-static	sigret_t	vffree	__P((int));
+static	RETSIGTYPE	vffree	__P((int));
 #endif 
 static	Char		*splicepipe	__P((struct command *, Char *));
 static	void		 doio		__P((struct command *, int *, int *));
@@ -754,7 +754,7 @@ execute(t, wanttty, pipein, pipeout, do_glob)
 }
 
 #ifdef VFORK
-static sigret_t
+static RETSIGTYPE
 /*ARGSUSED*/
 vffree(snum)
 int snum;
@@ -773,10 +773,6 @@ int snum;
     }
 
     _exit(1);
-#ifndef SIGVOID
-    /*NOTREACHED*/
-    return(0);
-#endif /* SIGVOID */
 }
 #endif /* VFORK */
 

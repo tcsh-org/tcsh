@@ -122,35 +122,6 @@
 #endif /* _SEQUENT_ */
   
 /*
- * SIGVOID	Define this if your signal handlers return void.  On older
- *		systems, signal returns int, but on newer ones, it returns void.
- */
-#ifdef _SEQUENT_
-# define SIGVOID 
-#else /* _SEQUENT_ */
-# undef SIGVOID 
-#endif /* _SEQUENT_ */
-
-/*
- * HAVEDUP2	Define this if your system supports dup2().
- */
-#define HAVEDUP2
-
-/*
- * UTHOST	Does the utmp file have a host field?
- */
-#define UTHOST
-
-/*
- * DIRENT	Your system has <dirent.h> instead of <sys/dir.h>
- */
-#ifdef _SEQUENT_
-#define DIRENT
-#else /* _SEQUENT_ */
-#undef DIRENT
-#endif /* _SEQUENT_ */
-
-/*
  * BSD	Your system has <strings.h> instead of <string.h>
  */
 #ifdef _SEQUENT_

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.decls.h,v 3.37 2005/01/05 16:06:12 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.decls.h,v 3.38 2005/01/18 20:14:04 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -45,7 +45,7 @@ extern	void	SetKillRing		__P((int));
  */
 #ifdef SIG_WINDOW
 extern	void	check_window_size	__P((int));
-extern	sigret_t window_change		__P((int));
+extern	RETSIGTYPE window_change	__P((int));
 #endif /* SIG_WINDOW */
 extern	int	ed_Setup		__P((int));
 extern	void	ed_Init			__P((void));

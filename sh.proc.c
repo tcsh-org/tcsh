@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.85 2004/12/25 21:15:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.86 2005/01/05 16:06:14 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.85 2004/12/25 21:15:07 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.86 2005/01/05 16:06:14 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -146,7 +146,7 @@ static	void		 setttypgrp	__P((int));
  *	childs status.  Top level routines (like pwait) must be sure
  *	to mask interrupts when playing with the proclist data structures!
  */
-sigret_t
+RETSIGTYPE
 /*ARGSUSED*/
 pchild(snum)
 int snum;
@@ -304,11 +304,7 @@ loop:
 	    goto loop;
 	}
 	pnoprocesses = pid == -1;
-#ifndef SIGVOID
-	return (0);
-#else /* !SIGVOID */
-	return;
-#endif /* !SIGVOID */
+	goto end;
     }
     for (pp = proclist.p_next; pp != NULL; pp = pp->p_next)
 	if (pid == pp->p_procid)
@@ -467,6 +463,8 @@ found:
 #if defined(BSDJOBS) || defined(HAVEwait3)
     goto loop;
 #endif /* BSDJOBS || HAVEwait3 */
+ end:
+    ;
 }
 
 void

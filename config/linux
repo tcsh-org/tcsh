@@ -91,27 +91,6 @@
 #undef YPBUGS
 
 /*
- * SIGVOID	Define this if your signal handlers return void.  On older
- *		systems, signal returns int, but on newer ones, it returns void.
- */
-#define SIGVOID 
-
-/*
- * HAVEDUP2	Define this if your system supports dup2().
- */
-#define HAVEDUP2
-
-/*
- * UTHOST	Does the utmp file have a host field?
- */
-#define UTHOST
-
-/*
- * DIRENT	Your system has <dirent.h> instead of <sys/dir.h>
- */
-#define DIRENT
-
-/*
  * Get the name space we want.
  *
  * The more recent defaults for gcc (e.g. on Red Hat 7.0)
@@ -123,6 +102,7 @@
 #define _SVID_SOURCE
 #define _POSIX_SOURCE
 #define _XOPEN_SOURCE 500
+#define _GNU_SOURCE
 
 /*
  * Large file support from <features.h>
@@ -133,7 +113,6 @@
 #define _FILE_OFFSET_BITS 64
 
 /****************** local defines *********************/
-#undef PW_SHADOW
 #ifndef _PATH_TCSHELL
 #define _PATH_TCSHELL "/bin/tcsh"
 #endif

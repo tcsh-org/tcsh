@@ -116,43 +116,6 @@
 #define YPBUGS
 
 /*
- * SIGVOID	Define this if your signal handlers return void.  On older
- *		systems, signal returns int, but on newer ones, it returns void.
- */
-#ifdef mips
-# define SIGVOID 
-#else
-# undef SIGVOID 
-#endif
-
-/*
- * HAVEDUP2	Define this if your system supports dup2().
- */
-#ifdef mips
-# define HAVEDUP2
-#else
-# undef HAVEDUP2
-#endif
-
-/*
- * HAVEUTMPX	Define if you have extended utmp (utmpx).
- *		(common for svr4 systems)
- * UTHOST	Does the utmp file have a host field?
- */
-#if SYSVREL > 3
-# define HAVEUTMPX
-# define UTHOST
-#else
-# undef UTHOST
-#endif /* SVR4 */
-
-
-/*
- * DIRENT	Your system has <dirent.h> instead of <sys/dir.h>
- */
-#define DIRENT
-
-/*
  * ECHO_STYLE	Optionally change the behavior of the builtin echo
  *		BOTH_ECHO: Support both bsd options (-n) and sysv escapes (\nnn)
  *		BSD_ECHO:  Support only -n
