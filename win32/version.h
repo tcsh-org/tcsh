@@ -1,13 +1,13 @@
-/*$Header: /src/pub/tcsh/win32/version.h,v 1.2 2002/08/11 07:58:13 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/version.h,v 1.7 2003/11/04 01:37:44 amold Exp $*/
 #ifndef VERSION_H
 #define VERSION_H
 
 /* remember to change both instance of the version -amol */
 
 #ifdef NTDBG
-#define LOCALSTR ",nt-rev-7.06-debug"
+#define LOCALSTR ",nt-rev-7.07-debug"
 #else
-#define LOCALSTR ",nt-rev-7.06" //changed ordonly test in nt_open
+#define LOCALSTR ",nt-rev-7.07" //changed ordonly test in nt_open
 								//patches
 #endif NTDBG
 
