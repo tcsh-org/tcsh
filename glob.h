@@ -83,7 +83,7 @@ typedef struct {
 #define	GLOB_LIMIT	0x0400	/* Limit memory used by matches to ARG_MAX */
 #define	GLOB_TILDE	0x0800	/* Expand tilde names from the passwd file. */
 #define	GLOB_ALTNOT     0x1000	/* use alternate glob character [^ not !] */ 
-#define	GLOB_QUOTE	0		/* source compatibility */
+#define	GLOB_QUOTE	0x2000	/* XXX: source compatibility */
 
 #define	GLOB_ABEND	GLOB_ABORTED	/* source compatibility */
 #endif
