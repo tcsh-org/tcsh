@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.40 1992/10/14 20:19:19 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.41 1992/10/27 16:18:15 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.40 1992/10/14 20:19:19 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.41 1992/10/27 16:18:15 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1492,7 +1492,7 @@ doumask(v, c)
 #  endif /* RLIMIT_CPU */
 #  ifndef RLIM_INFINITY
 #   define RLIM_INFINITY	0x7fffffff
-#  endif RLIM_INFINITY
+#  endif /* RLIM_INFINITY */
 # endif /* hpux && BSDLIMIT */
 
 struct limits limits[] = 

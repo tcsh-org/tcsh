@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.37 1992/10/14 20:19:19 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.38 1992/10/27 16:18:15 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.37 1992/10/14 20:19:19 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.38 1992/10/27 16:18:15 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -306,7 +306,12 @@ found:
 # ifdef _SEQUENT_
 	    (void) get_process_stats(&pp->p_etime, PS_SELF, NULL, NULL);
 # else	/* !_SEQUENT_ */
+#  ifndef COHERENT
 	    pp->p_etime = times(&proctimes);
+#  else /* !COHERENT */
+	    pp->p_etime = HZ * time(NULL);
+	    times(&proctimes);
+#  endif /* !COHERENT */
 # endif	/* !_SEQUENT_ */
 #else /* BSDTIMES */
 	    (void) gettimeofday(&pp->p_etime, NULL);
@@ -828,7 +833,12 @@ palloc(pid, t)
     {
 	struct tms tmptimes;
 
+#  ifndef COHERENT
 	pp->p_btime = times(&tmptimes);
+#  else /* !COHERENT */
+	pp->p_btime = HZ * time(NULL);
+	times(&tmptimes);
+#  endif /* !COHERENT */
     }
 # endif /* !_SEQUENT_ */
 #endif /* !BSDTIMES */

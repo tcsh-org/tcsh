@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.39 1992/10/18 00:43:08 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.40 1992/10/27 16:18:15 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.39 1992/10/18 00:43:08 christos Exp $")
+RCSID("$Id: sh.c,v 3.40 1992/10/27 16:18:15 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1345,11 +1345,13 @@ srcunit(unit, onlyown, hflg, av)
     if (oSHIN >= 0) {
 	register int i;
 
-	/* We made it to the new state... free up its storage */
-	/* This code could get run twice but xfree doesn't care */
-	for (i = 0; i < fblocks; i++)
-	    xfree((ptr_t) fbuf[i]);
-	xfree((ptr_t) fbuf);
+	register Char** nfbuf = fbuf;
+	register int nfblocks = fblocks;
+	fblocks = 0;
+	fbuf = NULL;
+	for (i = 0; i < nfblocks; i++)
+	    xfree((ptr_t) nfbuf[i]);
+	xfree((ptr_t) nfbuf);
 
 	/* Reset input arena */
 #ifdef NO_STRUCT_ASSIGNMENT
@@ -1461,10 +1463,28 @@ int snum;
      * responsible to propagate the SIGHUP to its progeny. 
      */
     {
-	struct process *pp;
-	for (pp = proclist.p_next; pp; pp = pp->p_next)
-	    if (pp->p_procid == pp->p_jobid && (pp->p_flags & PFOREGND) != 0)
+	struct process *pp, *np;
+	int foregnd;
+
+	for (pp = proclist.p_next; pp; pp = pp->p_next) {
+	    foregnd = 0;
+	    np = pp;
+	    /* 
+	     * Find if this job is in the foreground. It could be that
+	     * the process leader has exited and the foreground flag
+	     * is cleared for it.
+	     */
+	    do
+		if ((np->p_flags & PFOREGND) != 0) {
+		    foregnd = 1;
+		    break;
+		}
+	    while ((np = np->p_friends) != pp);
+
+	    /* Kill the leader of the foreground job */
+	    if (foregnd && pp->p_procid == pp->p_jobid)
 		(void) killpg (pp->p_jobid, SIGHUP);
+	}
     }
 #endif /* POSIXJOBS */
 

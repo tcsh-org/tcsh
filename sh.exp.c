@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exp.c,v 3.13 1992/10/05 02:41:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.exp.c,v 3.14 1992/10/10 18:17:34 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.13 1992/10/05 02:41:30 christos Exp christos $")
+RCSID("$Id: sh.exp.c,v 3.14 1992/10/10 18:17:34 christos Exp $")
 
 /*
  * C shell
@@ -159,6 +159,9 @@ sh_access(fname, mode)
 	 *   3) getgroups(0, unused)
 	 * Then allocate and scan the groups array if one of these worked.
 	 */
+#  ifdef __386BSD__
+#   undef _SC_NGROUPS_MAX	/* 386/BSD does not have sysconf! */
+#  endif /* __386BSD__ */
 #  ifdef _SC_NGROUPS_MAX
 	if ((n = sysconf(_SC_NGROUPS_MAX)) == -1)
 #  endif /* _SC_NGROUPS_MAX */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.25 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.26 1992/10/14 20:19:19 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.25 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.26 1992/10/14 20:19:19 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -142,9 +142,9 @@ static time_t a2time_t __P((Char *));
 
 int
 lex(hp)
-    register struct wordent *hp;
+    struct wordent *hp;
 {
-    register struct wordent *wdp;
+    struct wordent *wdp;
     int     c;
 
 
@@ -170,7 +170,7 @@ lex(hp)
      * be ready and rarin to go even if it is interrupted.
      */
     do {
-	register struct wordent *new;
+	struct wordent *new;
 
 	new = (struct wordent *) xmalloc((size_t) sizeof(*wdp));
 	new->word = STRNULL;
@@ -201,9 +201,9 @@ a2time_t(word)
     /* Attempt to distinguish timestamps from other possible entries.
      * Format: "+NNNNNNNNNN" (10 digits, left padded with ascii '0') */
 
-    register time_t ret;
-    register Char *s;
-    register int ct;
+    time_t ret;
+    Char *s;
+    int ct;
 
     if (!word || *(s = word) != '+')
 	return (time_t)0;
@@ -225,7 +225,7 @@ void
 prlex(sp0)
     struct wordent *sp0;
 {
-    register struct wordent *sp = sp0->next;
+    struct wordent *sp = sp0->next;
 
     for (;;) {
 	xprintf("%S", sp->word);
@@ -239,15 +239,15 @@ prlex(sp0)
 
 void
 copylex(hp, fp)
-    register struct wordent *hp;
-    register struct wordent *fp;
+    struct wordent *hp;
+    struct wordent *fp;
 {
-    register struct wordent *wdp;
+    struct wordent *wdp;
 
     wdp = hp;
     fp = fp->next;
     do {
-	register struct wordent *new;
+	struct wordent *new;
 	
 	new = (struct wordent *) xmalloc((size_t) sizeof(*wdp));
 	new->word = STRNULL;
@@ -263,9 +263,9 @@ copylex(hp, fp)
 
 void
 freelex(vp)
-    register struct wordent *vp;
+    struct wordent *vp;
 {
-    register struct wordent *fp;
+    struct wordent *fp;
 
     while (vp->next != vp) {
 	fp = vp->next;
@@ -280,12 +280,12 @@ freelex(vp)
 static Char *
 word()
 {
-    register Char c, c1;
-    register Char *wp;
+    Char c, c1;
+    Char *wp;
     Char    wbuf[BUFSIZE];
     Char    hbuf[12], h;
-    register bool dolflg;
-    register int i;
+    bool dolflg;
+    int i;
 
     wp = wbuf;
     i = BUFSIZE - 4;
@@ -423,9 +423,9 @@ ret:
 
 static int
 getC1(flag)
-    register int flag;
+    int flag;
 {
-    register Char c;
+    Char c;
 
     for (;;) {
 	if ((c = peekc) != 0) {
@@ -481,9 +481,9 @@ getC1(flag)
 static void
 getdol()
 {
-    register Char *np, *ep;
+    Char *np, *ep;
     Char    name[4 * MAXVARLEN + 1];
-    register int c;
+    int c;
     int     sc;
     bool    special = 0, toolong;
 
@@ -724,9 +724,9 @@ static void
 getexcl(sc)
     int    sc;
 {
-    register struct wordent *hp, *ip;
+    struct wordent *hp, *ip;
     int     left, right, dol;
-    register int c;
+    int c;
 
     if (sc == 0) {
 	sc = getC(0);
@@ -801,9 +801,9 @@ static struct wordent *
 getsub(en)
     struct wordent *en;
 {
-    register Char *cp;
+    Char *cp;
     int     delim;
-    register int c;
+    int c;
     int     sc;
     bool global;
     Char    orhsb[sizeof(rhsb) / sizeof(Char)];
@@ -960,13 +960,13 @@ dosub(sc, en, global)
     struct wordent lexi;
     bool    didsub = 0, didone = 0;
     struct wordent *hp = &lexi;
-    register struct wordent *wdp;
-    register int i = exclc;
+    struct wordent *wdp;
+    int i = exclc;
     struct Hist *hst;
 
     wdp = hp;
     while (--i >= 0) {
-	register struct wordent *new = 
+	struct wordent *new = 
 		(struct wordent *) xcalloc(1, sizeof *wdp);
 
 	new->word = 0;
@@ -1018,8 +1018,8 @@ subword(cp, type, adid)
     bool   *adid;
 {
     Char    wbuf[BUFSIZE];
-    register Char *wp, *mp, *np;
-    register int i;
+    Char *wp, *mp, *np;
+    int i;
 
     *adid = 0;
     switch (type) {
@@ -1092,8 +1092,8 @@ domod(cp, type)
     Char   *cp;
     int     type;
 {
-    register Char *wp, *xp;
-    register int c;
+    Char *wp, *xp;
+    int c;
 
     switch (type) {
 
@@ -1156,7 +1156,7 @@ domod(cp, type)
 
 static int
 matchs(str, pat)
-    register Char *str, *pat;
+    Char *str, *pat;
 {
     while (*str && *pat && *str == *pat)
 	str++, pat++;
@@ -1165,11 +1165,11 @@ matchs(str, pat)
 
 static int
 getsel(al, ar, dol)
-    register int *al, *ar;
+    int *al, *ar;
     int     dol;
 {
-    register int c = getC(0);
-    register int i;
+    int c = getC(0);
+    int i;
     bool    first = *al < 0;
 
     switch (c) {
@@ -1253,9 +1253,9 @@ static struct wordent *
 gethent(sc)
     int     sc;
 {
-    register struct Hist *hp;
-    register Char *np;
-    register int c;
+    struct Hist *hp;
+    Char *np;
+    int c;
     int     event;
     bool    back = 0;
 
@@ -1380,12 +1380,12 @@ findev(cp, anyarg)
     Char   *cp;
     bool    anyarg;
 {
-    register struct Hist *hp;
+    struct Hist *hp;
 
     for (hp = Histlist.Hnext; hp; hp = hp->Hnext) {
 	Char   *dp;
-	register Char *p, *q;
-	register struct wordent *lp = hp->Hlex.next;
+	Char *p, *q;
+	struct wordent *lp = hp->Hlex.next;
 	int     argno = 0;
 
 	/*
@@ -1429,7 +1429,7 @@ findev(cp, anyarg)
 
 static void
 setexclp(cp)
-    register Char *cp;
+    Char *cp;
 {
     if (cp && cp[0] == '\n')
 	return;
@@ -1447,7 +1447,7 @@ int
 readc(wanteof)
     bool    wanteof;
 {
-    register int c;
+    int c;
     static  sincereal;
 
 #ifdef DEBUG_INP
@@ -1596,9 +1596,9 @@ reread:
 static int
 bgetc()
 {
-    register int buf, off;
+    int buf;
     int c;
-    register int numleft = 0, roomleft;
+    int numleft = 0, roomleft;
     extern Char InputBuf[];
     char    tbuf[BUFSIZE + 1];
 
@@ -1627,7 +1627,7 @@ bgetc()
 again:
     buf = (int) fseekp / BUFSIZE;
     if (buf >= fblocks) {
-	register Char **nfbuf =
+	Char **nfbuf =
 	(Char **) xcalloc((size_t) (fblocks + 2),
 			  sizeof(Char **));
 
@@ -1642,8 +1642,9 @@ again:
 	    goto again;
     }
     if (fseekp >= feobp) {
-	buf = (int) feobp / BUFSIZE;
+	int off;
 	off = (int) feobp % BUFSIZE;
+	buf = (int) feobp / BUFSIZE;
 	roomleft = BUFSIZE - off;
 	for (;;) {
 	    if (editing && intty) {	/* then use twenex routine */
@@ -1654,9 +1655,25 @@ again:
 		    numleft = c;
 		    goto again;
 		}
-		if (c > 0)
+		if (c > 0) {
+		    /* 
+		     * Cannot really happen, but it does! 
+		     * I really cannot explain why the following if 
+		     * statement can get executed, but at least when it
+		     * does we are not going to core-dump any more.
+		     * It has something to do with a weird interaction
+		     * with run-fg-editor or interrupts I think, but 
+		     * I have not been able to pin it down!
+		     */
+		    if (buf >= fblocks || off > BUFSIZE) {
+			/* start with fresh buffer */
+			feobp = fseekp = fblocks * BUFSIZE;
+			numleft = c;
+			goto again;
+		    }
 		    (void) memmove((ptr_t) (fbuf[buf] + off), (ptr_t) InputBuf,
 				   (size_t) (c * sizeof(Char)));
+		}
 		numleft = 0;
 	    }
 	    else {
@@ -1688,7 +1705,7 @@ again:
 static void
 bfree()
 {
-    register int sb, i;
+    int sb, i;
 
     if (cantell)
 	return;
@@ -1787,14 +1804,15 @@ btoeof()
 void
 settell()
 {
+    off_t x;
     cantell = 0;
     if (arginp || onelflg || intty)
 	return;
-    if (lseek(SHIN, (off_t) 0, L_INCR) < 0 || errno == ESPIPE)
+    if ((x = lseek(SHIN, (off_t) 0, L_INCR)) == -1)
 	return;
     fbuf = (Char **) xcalloc(2, sizeof(Char **));
     fblocks = 1;
     fbuf[0] = (Char *) xcalloc(BUFSIZE, sizeof(Char));
-    fseekp = fbobp = feobp = lseek(SHIN, (off_t) 0, L_INCR);
+    fseekp = fbobp = feobp = x;
     cantell = 1;
 }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.alloc.c,v 3.17 1992/10/10 18:17:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.alloc.c,v 3.18 1992/10/18 00:30:39 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.17 1992/10/10 18:17:34 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.18 1992/10/18 00:30:39 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -469,8 +469,10 @@ smalloc(n)
 
     n = n ? n : 1;
 
+#ifndef _VMS_POSIX
     if (membot == NULL)
 	membot == (char*) sbrk(0);
+#endif /* !_VMS_POSIX */
 
     if ((ptr = malloc(n)) == (ptr_t) 0) {
 	child++;

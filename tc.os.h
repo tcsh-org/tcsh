@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.37 1992/10/10 18:17:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.38 1992/10/14 20:19:19 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -416,7 +416,7 @@ struct ucred {
 /*
  * Minix does not have these, so...
  */
-# define getpgrp()		getpid()
+# define getpgrp		getpid
 #endif /* _MINIX || __EMX__ */
 
 #ifdef __EMX__
@@ -463,7 +463,9 @@ typedef struct timeval timeval_t;
 extern time_t time();
 extern char *getenv();
 extern int atoi();
+#ifndef __EMX__
 extern char *ttyname();
+#endif
 
 #if defined(SUNOS4)
 # ifndef toupper

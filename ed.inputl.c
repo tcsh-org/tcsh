@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.inputl.c,v 3.29 1992/10/14 20:19:19 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.inputl.c,v 3.30 1992/10/27 16:18:15 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.29 1992/10/14 20:19:19 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.30 1992/10/27 16:18:15 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -87,6 +87,13 @@ Inputl()
     ResetInLine(0);		/* reset the input pointers */
     if (GettingInput)
 	MacroLvl = -1;		/* editor was interrupted during input */
+
+    if (imode) {
+	if (!Strcmp(*(imode->vec), STRinsert))
+	    inputmode = MODE_INSERT;
+	else if (!Strcmp(*(imode->vec), STRoverwrite))
+	    inputmode = MODE_REPLACE;
+    }
 
 #if defined(FIONREAD) && !defined(OREO)
     if (!Tty_raw_mode && MacroLvl < 0) {
@@ -230,12 +237,6 @@ Inputl()
 	    /*
 	     * For continuation lines, we set the prompt to prompt 2
 	     */
-	    if (imode) {
-		if (!Strcmp(*(imode->vec), STRinsert))
-		    inputmode = MODE_INSERT;
-		else if (!Strcmp(*(imode->vec), STRoverwrite))
-		    inputmode = MODE_REPLACE;
-	    }
 	    printprompt(1, NULL);
 	    break;
 
@@ -603,13 +604,16 @@ GetNextChar(cp)
     if (Rawmode() < 0)		/* make sure the tty is set up correctly */
 	return 0;		/* oops: SHIN was closed */
 
-    while ((num_read = read(SHIN, (char *) &tcp, 1)) == -1) 
+    while ((num_read = read(SHIN, (char *) &tcp, 1)) == -1) {
+	if (errno == EINTR)
+	    continue;
 	if (!tried && fixio(SHIN, errno) != -1)
 	    tried = 1;
 	else {
 	    *cp = '\0';
 	    return -1;
 	}
+    }
     *cp = tcp;
     return num_read;
 }

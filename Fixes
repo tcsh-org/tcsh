@@ -1,4 +1,11 @@
 V6.03.00, ...
+100. 6.02.12 11/12/92
+99. Don't use sbrk() in tc.alloc.c on VMS
+98. EINTR error handling from Michael
+97. Overwrite mode takes effect immediately, not delayed by a command.
+96. Emx fixes.
+95. SIGHUP gain...
+94. Coherent times()/ <sys/file.h> fixes.
 93. 6.02.11 10/27/92
 92. Mach setpath fixes.
 91. Which now globs its arguments

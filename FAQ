@@ -1,5 +1,6 @@
 
-Last Updated: Thu Oct  8 18:38:00 EDT 1992
+Last Updated: 
+Thu Nov 12 22:43:19 EST 1992
 
 This is for people that do not read the manual!
 
@@ -132,6 +133,15 @@ be able to get ftp it... :-)
 
     You interrupted make, while it was making the automatically
     generated headers. Type 'make clean; make'
+
+14. On the cray, sometimes the CR/LF mapping gets screwed up.
+
+    You are probably logged in to the cray via telnet. Cray's
+    telnetd implements line mode selection, but many telnet 
+    clients do not do that correctly, and the tty settings 
+    do not get propagated correctly. You can either compile
+    a new telnet client (from the BSD net2 tape), or at least
+    on the suns use: 'mode character'.
 
 christos
 

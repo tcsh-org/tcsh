@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.44 1992/10/14 20:19:19 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.45 1992/10/27 16:18:15 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -98,12 +98,12 @@ typedef int sigret_t;
  *	MAILINTVL	How often to mailcheck; more often is more expensive
  */
 #ifdef BUFSIZE
-# if	   BUFSIZE < 4096
+# if	   BUFSIZE < 2048
 #  undef   BUFSIZE
-#  define  BUFSIZE	4096	/* buffer size should be no less than this */
+#  define  BUFSIZE	2048	/* buffer size should be no less than this */
 # endif
 #else
-# define   BUFSIZE	4096
+# define   BUFSIZE	2048
 #endif /* BUFSIZE */
 
 #define FORKSLEEP	10	/* delay loop on non-interactive fork failure */
@@ -279,9 +279,9 @@ extern int setpgrp();
 # include <sys/filio.h>
 #endif /* !FIOCLEX && SUNOS4 */
 
-#ifndef	_MINIX
-#include <sys/file.h>
-#endif	/* _MINIX */
+#if !defined(_MINIX) && !defined(COHERENT)
+# include <sys/file.h>
+#endif	/* !_MINIX && !COHERENT */
 
 #if !defined(O_RDONLY) || !defined(O_NDELAY)
 # include <fcntl.h>
