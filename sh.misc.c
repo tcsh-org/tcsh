@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.misc.c,v 1.3 91/09/24 17:09:58 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.misc.c,v 3.7 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,9 +36,11 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.6 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.7 1991/10/12 04:23:51 christos Exp $")
 
 static	int	renum	__P((int, int));
+static  Char  **blkend	__P((Char **));
+static  Char  **blkcat	__P((Char **, Char **));
 
 /*
  * C Shell
@@ -83,7 +85,7 @@ strsave(s)
     return (n);
 }
 
-Char  **
+static Char  **
 blkend(up)
     register Char **up;
 {

@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.26 1991/12/19 21:40:06 christos Exp $
+.\" $Id: tcsh.man,v 3.27 1992/01/06 22:36:56 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -127,6 +127,9 @@ directory is changed.
 .sp
 .ti -4
 32) Enhanced history/variable modifier expansion
+.sp
+.ti -4
+33) Enhanced history/variable modifier expansion
 .RE
 .sp
 For a description of standard C-shell features, see the
@@ -1349,6 +1352,13 @@ Print the stack entries one in each line, preceded by the stack number.
 Note that popd +n can be used to pop out stack entries of directories that
 do not exist any more.
 .PP
+.I Tcsh 
+always saves the last directory visited. Changing to the previous directory
+can be done by using 
+.I 'cd -' 
+or 
+.I 'pushd -'.
+.PP
 .I Tcsh
 will now allow the user to access all elements in the directory stack directly.
 The syntax "=<digit>" is recognized by 
@@ -1409,6 +1419,13 @@ pushed onto the top of the stack.  Example:
 /usr/spool/uucp /sys/src /usr/net/bin ~
 .RE
 .fi
+.PP 
+In addition, if the shell variable 
+.I dunique 
+is set, only directories that are not already in the directory stack
+will be added when 
+.I push 
+is invoked.
 .PP
 The way symbolic links that point to directories are crossed is
 determined by two variables: 
@@ -2593,7 +2610,127 @@ implementation when used with the
 .I s
 modifier. For example :as/f/ff/ will never terminate. This behavior
 might change in the future.
-
+.sp
+.SH "33. PROGRAMMABLE FILE COMPLETION"
+The new 
+.I complete
+and 
+.I uncomplete 
+builtins can change the behaviour of the listing and file-completion 
+in tcsh. For example some commands like 
+.I cd, 
+.I pushd, 
+.I popd 
+etc, expect only directories as arguments. In addition
+.I mkdir(1)
+and 
+.I rmdir(1)
+don't accept a trailing slash in a path component. Normally
+builtin, 
+.I tcsh 
+when asked to list or complete an argument for those commands takes
+into account all the files and not only directories. This behavior
+can be changed by telling 
+.I tcsh
+that these commands only expect directory arguments:
+.sp
+.nf
+> complete cd =d
+.fi
+.sp
+.PP 
+The syntax for the
+.I complete 
+and
+.I uncomplete
+builtins is:
+.sp
+.I complete [<command>] [<pattern>|<string>|<escape>]*
+.br
+.I uncomplete <command>
+.PP
+Recognized escapes are:
+.sp
+.RS +.6i
+.ta 1.2i 1.7i
+.nf
+=f	Complete file or path component
+=v	Complete variable
+=d	Complete directory
+=u	Complete username
+=c	Complete command
+=a	Complete aliases
+=$var	Complete using words from variable
+.fi
+.RE
+.DT
+.sp
+All the above escapes, except 
+.I $var
+can have an additional shell pattent which must match the files to be
+completed.
+For example, in the C compiler, it makes sense to complete only files
+that the compiler understands:
+.sp
+.br
+> complete cc =f:*.[cao]
+.br
+.PP
+It is also useful to exclude files from the completion list. Normally
+.I tcsh 
+will expand the following command:
+.sp
+.nf
+> set fignore=(.o)
+> ls
+foo.c foo.o
+> vi f<tab>
+> vi foo.c
+> rm f<tab>
+> rm foo.c
+.fi
+.sp
+A better way to do this is to use the
+.I complete
+builtin to protect precious files:
+.sp
+.nf
+> set fignore=(.o)
+> complete rm =f:^*.{c,h,cc,C,tex,1,man,l,y}
+> ls
+foo.c foo.o
+> vi f<tab>
+> vi foo.c
+> rm f<tab>
+> rm foo.o
+.fi
+.sp
+.PP
+Other commands don't expect files as arguments, so the completion builtin
+can be used to change the list of items to be completed:
+.sp
+.ta 1.2i 3.0i
+.nf
+> complete man =c	# complete commands 
+> complete which =c	
+> complete dbx =c core
+> complete alias =a	# complete aliases
+> complete set =v	# complete variables
+> complete finger =u	# complete user-names
+.fi
+.sp
+.pp
+Finally in some cases, the list needs to be customized:
+.sp
+.nf
+> set hostnames=(prep.ai.mit.edu tesla.ee.cornell.edu)
+> complete rlogin =$hostnames -l =u
+.fi
+.sp
+.PP
+This is an experimental feature and the syntax/behavior may change in
+future versions.
+.sp
 .SH FYI
 This shell uses cbreak mode but takes typed-ahead characters anyway.
 You can still use
@@ -2673,6 +2810,9 @@ or correct=all, the whole line will be corrected.
 .B dextract 
 extract a directory on pushd rather than rotating.
 .TP 10
+.B dunique 
+Push only directories that are not already in the directory stack.
+.TP 10
 .B edit 
 use the input editor, set by default.
 .TP 10
@@ -2720,6 +2860,10 @@ never beeps.
 .TP 10
 .B nobeep 
 Disables beeping completely.
+.TP 10
+.B nokanji
+If kanji support is enable, setting this variable disables it, so that
+the meta key can be used.
 .TP 10
 .B oid
 The organization id number (Domain OS only).

@@ -74,7 +74,7 @@ typedef void * ptr_t;
 #undef ismeta
 #undef Strchr
 
-#include <glob.h>
+#include "glob.h"
 
 #ifndef S_ISDIR
 #define S_ISDIR(a)	(((a) & S_IFMT) == S_IFDIR)
@@ -304,14 +304,14 @@ glob(pattern, flags, errfunc, pglob)
 		    c = QUOTE;
 		    --patnext;
 		}
-		*bufnext++ = c | M_PROTECT;
+		*bufnext++ = (Char) (c | M_PROTECT);
 	    }
 	    else
-		*bufnext++ = c;
+		*bufnext++ = (Char) c;
     }
     else 
 	while (bufnext < bufend && (c = *patnext++) != EOS) 
-	    *bufnext++ = c;
+	    *bufnext++ = (Char) c;
     *bufnext = EOS;
 
     bufnext = patbuf;
@@ -519,7 +519,7 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob, no_match)
 	if (dp->d_name[0] == DOT && *pattern != DOT)
 	    continue;
 	for (sc = (unsigned char *) dp->d_name, dc = pathend; *dc++ = *sc++;);
-	if (match(pathend, pattern, restpattern, m_not) == no_match) {
+	if (match(pathend, pattern, restpattern, (int) m_not) == no_match) {
 	    *pathend = EOS;
 	    continue;
 	}
@@ -560,8 +560,8 @@ globextend(path, pglob)
 
     newsize = sizeof(*pathv) * (2 + pglob->gl_pathc + pglob->gl_offs);
     pathv = (char **) (pglob->gl_pathv ?
-		       realloc((ptr_t) pglob->gl_pathv, newsize) :
-		       malloc((size_t) newsize));
+		       xrealloc((ptr_t) pglob->gl_pathv, (size_t) newsize) :
+		       xmalloc((size_t) newsize));
     if (pathv == NULL)
 	return (GLOB_NOSPACE);
 
@@ -617,7 +617,7 @@ match(name, pat, patend, m_not)
 	    ok = 0;
 	    if ((k = *name++) == EOS)
 		return (0);
-	    if (negate_range = ((*pat & M_MASK) == m_not))
+	    if ((negate_range = ((*pat & M_MASK) == m_not)) != 0)
 		++pat;
 	    while (((c = *pat++) & M_MASK) != M_END) {
 		if ((*pat & M_MASK) == M_RNG) {
@@ -652,7 +652,7 @@ globfree(pglob)
 	pp = pglob->gl_pathv + pglob->gl_offs;
 	for (i = pglob->gl_pathc; i--; ++pp)
 	    if (*pp)
-		free((ptr_t) *pp), *pp = NULL;
-	free((ptr_t) pglob->gl_pathv), pglob->gl_pathv = NULL;
+		xfree((ptr_t) *pp), *pp = NULL;
+	xfree((ptr_t) pglob->gl_pathv), pglob->gl_pathv = NULL;
     }
 }

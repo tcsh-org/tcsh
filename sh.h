@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.h,v 3.26 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.h,v 3.27 1992/01/06 22:36:56 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -215,9 +215,9 @@ extern int setpgrp();
 #endif /* POSIX */
 
 #if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX)
-# if !defined(pyr) && !defined(aiws) && !defined(stellar)
+# if !defined(pyr) && !defined(stellar)
 #  include <time.h>
-# endif /* !aiws && !pyr && !stellar */
+# endif /* !pyr && !stellar */
 #endif /* SYSVREL > 0 ||  _IBMR2 */
 
 #if !((defined(sun) || defined(_MINIX)) && defined(TERMIO))
@@ -437,7 +437,6 @@ EXTERN struct tms shtimes;	/* shell and child times for process timing */
  */
 EXTERN Char   *doldol;		/* Character pid for $$ */
 EXTERN int     backpid;		/* pid of the last background job */
-EXTERN time_t  chktim;		/* Time mail last checked */
 
 /*
  * Ideally these should be uid_t, gid_t, pid_t. I cannot do that right now
@@ -446,7 +445,6 @@ EXTERN time_t  chktim;		/* Time mail last checked */
  * make special cases for them. In the future...
  */
 EXTERN int     uid;		/* Invokers uid */
-EXTERN int     gid;		/* Invokers gid */
 EXTERN int     opgrp,		/* Initial pgrp and tty pgrp */
                shpgrp,		/* Pgrp of shell */
                tpgrp;		/* Terminal process group */
@@ -777,7 +775,6 @@ extern long gargc;		/* Number args in gargv */
  * Variables for command expansion.
  */
 extern Char **pargv;		/* Pointer to the argv list space */
-extern long pargc;		/* Count of arguments in pargv */
 EXTERN Char   *pargs;		/* Pointer to start current word */
 EXTERN long    pnleft;		/* Number of chars left in pargs */
 EXTERN Char   *pargcp;		/* Current index into pargs */

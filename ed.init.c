@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.init.c,v 3.23 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.init.c,v 3.24 1992/01/06 22:36:56 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.23 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.24 1992/01/06 22:36:56 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -180,7 +180,7 @@ ed_Setup(rst)
 	if ((pcret = fpathconf(SHTTY, _PC_VDISABLE)) == -1L)
 	    vdisable = _POSIX_VDISABLE;
 	else 
-	    vdisable = pcret;
+	    vdisable = (unsigned char) pcret;
 	if (vdisable != _POSIX_VDISABLE && rst != 0)
 	    for (rst = 0; rst < C_NCC; rst++) {
 		if (ttychars[ED_IO][rst] == _POSIX_VDISABLE)

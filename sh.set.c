@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.set.c,v 3.7 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.set.c,v 3.8 1992/01/16 13:04:21 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.7 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.8 1992/01/16 13:04:21 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -93,7 +93,7 @@ doset(v, c)
 	    hadsub++;
 	    p = getinx(p, &subscr);
 	}
-	if (op = *p) {
+	if ((op = *p) != 0) {
 	    *p++ = 0;
 	    if (*p == 0 && *v && **v == '(')
 		p = *v++;
@@ -272,7 +272,7 @@ dolet(v, dummy)
 	}
 	if (*p == 0 && *v)
 	    p = *v++;
-	if (op = *p)
+	if ((op = *p) != 0)
 	    *p++ = 0;
 	else
 	    stderror(ERR_NAME | ERR_ASSIGN);
@@ -481,7 +481,8 @@ adrof1(name, v)
     register cmp;
 
     v = v->v_left;
-    while (v && ((cmp = *name - *v->v_name) || (cmp = Strcmp(name, v->v_name))))
+    while (v && ((cmp = *name - *v->v_name) != 0 || 
+		 (cmp = Strcmp(name, v->v_name)) != 0))
 	if (cmp < 0)
 	    v = v->v_left;
 	else
@@ -535,7 +536,7 @@ setq(name, vec, p)
     register f;
 
     f = 0;			/* tree hangs off the header's left link */
-    while (c = p->v_link[f]) {
+    while ((c = p->v_link[f]) != 0) {
 	if ((f = *name - *c->v_name) == 0 &&
 	    (f = Strcmp(name, c->v_name)) == 0) {
 	    blkfree(c->vec);
@@ -641,7 +642,7 @@ unsetv1(p)
      */
     pp = p->v_parent;
     f = pp->v_right == p;
-    if (pp->v_link[f] = c)
+    if ((pp->v_link[f] = c) != 0)
 	c->v_parent = pp;
     /*
      * Free the deleted node, and rebalance.
@@ -719,13 +720,13 @@ exportpath(val)
 	(t->v_left = (p))->v_parent = t,\
 	(p) = t)
 #else
-struct varent *
+static struct varent *
 rleft(p)
     struct varent *p;
 {
     return (p);
 }
-struct varent *
+static struct varent *
 rright(p)
     struct varent *p;
 {
@@ -751,14 +752,14 @@ balance(p, f, d)
     register struct varent *t;	/* used by the rotate macros */
 
 #endif
-    register ff;
+    register int ff = 0;
 
     /*
      * Ok, from here on, p is the node we're operating on; pp is it's parent; f
      * is the branch of p from which we have come; ff is the branch of pp which
      * is p.
      */
-    for (; pp = p->v_parent; p = pp, f = ff) {
+    for (; (pp = p->v_parent) != 0; p = pp, f = ff) {
 	ff = pp->v_right == p;
 	if (f ^ d) {		/* right heavy */
 	    switch (p->v_bal) {

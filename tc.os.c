@@ -41,10 +41,7 @@ RCSID("$Id: tc.os.c,v 3.13 1991/12/19 22:34:14 christos Exp $")
 #include "tw.h"
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
-
-#ifdef titan
-int     end;
-#endif				/* titan */
+#include "sh.decls.h"
 
 /***
  *** MACH
@@ -66,10 +63,10 @@ int     end;
 static Char STRCPATH[] = {'C', 'P', 'A', 'T', 'H', '\0'};
 static Char STRLPATH[] = {'L', 'P', 'A', 'T', 'H', '\0'};
 static Char STRMPATH[] = {'M', 'P', 'A', 'T', 'H', '\0'};
-#if EPATH
+# if EPATH
 static Char STREPATH[] = {'E', 'P', 'A', 'T', 'H', '\0'};
-#endif
-#endif				/* MACH */
+# endif
+#endif /* MACH */
 
 static Char *syspaths[] = {STRPATH, STRCPATH, STRLPATH, STRMPATH, 
 #if EPATH
@@ -176,14 +173,15 @@ abortpath:
     }
 
     for (i = 0; i < npaths; i++) {
-	char	*val;
+	Char	*val, *name;
 
-	for (val = cpaths[i]; val && *val && *val != '='; val++);
+	name = str2short(cpaths[i]);
+	for (val = str2short(cpaths[i]); val && *val && *val != '='; val++);
 	if (val && *val == '=') {
 	    *val++ = '\0';
-	    setenv(cpaths[i], val, 1);
-	    if (Strcmp(str2short(cpaths[i]), STRPATH) == 0) {
-		importpath(str2short(val));
+	    Setenv(name, val);
+	    if (Strcmp(name, STRPATH) == 0) {
+		importpath(val);
 		if (havhash)
 		    dohash(NULL, NULL);
 	    }
@@ -725,10 +723,6 @@ osinit()
 	sigstack(&inst, NULL);
     }
 #endif /* aiws */
-
-#ifdef titan
-    end = sbrk(0);
-#endif	/* titan */
 
 #ifdef apollo
     (void) isapad();

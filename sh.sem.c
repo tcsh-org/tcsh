@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.sem.c,v 3.14 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.sem.c,v 3.15 1992/01/06 22:36:56 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.14 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.15 1992/01/06 22:36:56 christos Exp $")
 
 #include "tc.h"
 
@@ -50,7 +50,9 @@ RCSID("$Id: sh.sem.c,v 3.14 1991/12/19 22:34:14 christos Exp $")
 #endif /* FIOCLEX */
 
 #ifdef sparc
-# include <vfork.h>
+# ifndef MACH
+#  include <vfork.h>
+# endif /* !MACH */
 #endif /* sparc */
 
 #ifdef VFORK
@@ -123,7 +125,7 @@ execute(t, wanttty, pipein, pipeout)
 	    Dfix(t);		/* $ " ' \ */
 	if (t->t_dcom[0] == 0)
 	    return;
-	/* fall into... */
+	/*FALLTHROUGH*/
 
     case NODE_PAREN:
 #ifdef BACKPIPE
@@ -672,14 +674,12 @@ int snum;
 {
     register Char **v;
 
-    if (v = gargv) {
-	gargv = 0;
-	xfree((ptr_t) v);
-    }
-    if (v = pargv) {
-	pargv = 0;
-	xfree((ptr_t) v);
-    }
+    if ((v = gargv) != 0)
+	gargv = 0, xfree((ptr_t) v);
+
+    if ((v = pargv) != 0)
+	pargv = 0, xfree((ptr_t) v);
+
     _exit(1);
 #ifndef SIGVOID
     /*NOTREACHED*/
@@ -816,14 +816,17 @@ doio(t, pipein, pipeout)
 	 */
 	(void) dcopy(SHOUT, 1);
 	(void) dcopy(SHDIAG, 2);
-	if ((flags & F_APPEND) &&
+	if ((flags & F_APPEND) != 0) {
 #ifdef O_APPEND
-	    (fd = open(tmp, O_WRONLY | O_APPEND)) >= 0);
+	    fd = open(tmp, O_WRONLY | O_APPEND);
 #else /* !O_APPEND */
-	    (fd = open(tmp, O_WRONLY)) >= 0)
+	    fd = open(tmp, O_WRONLY);
 	    (void) lseek(1, (off_t) 0, L_XTND);
 #endif /* O_APPEND */
-	else {
+	}
+	else
+	    fd = 0;
+	if ((flags && F_APPEND) == 0 || fd == -1) {
 	    if (!(flags & F_OVERWRITE) && adrof(STRnoclobber)) {
 		if (flags & F_APPEND)
 		    stderror(ERR_SYSTEM, tmp, strerror(errno));

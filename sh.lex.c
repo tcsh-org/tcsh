@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.lex.c,v 3.14 1991/12/19 21:40:06 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.lex.c,v 3.15 1991/12/19 22:34:14 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.14 1991/12/19 21:40:06 christos Exp christos $")
+RCSID("$Id: sh.lex.c,v 3.15 1991/12/19 22:34:14 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -130,8 +130,8 @@ static Char *histlinep = NULL;	/* current pointer into histline */
 static Char getCtmp;
 
 #define getC(f)		((getCtmp = peekc) ? (peekc = 0, getCtmp) : getC1(f))
-#define	ungetC(c)	peekc = c
-#define	ungetD(c)	peekd = c
+#define	ungetC(c)	peekc = (Char) c
+#define	ungetD(c)	peekd = (Char) c
 
 int
 lex(hp)
@@ -277,7 +277,7 @@ loop:
 	    } while (c != '\n');
 	    if (c1 == '\\')
 		goto loop;
-	    /* fall into ... */
+	    /*FALLTHROUGH*/
 
 	case ';':
 	case '(':
@@ -383,8 +383,8 @@ getC1(flag)
 {
     register Char c;
 
-    while (1) {
-	if (c = peekc) {
+    for (;;) {
+	if ((c = peekc) != 0) {
 	    peekc = 0;
 	    return (c);
 	}
@@ -397,12 +397,12 @@ getC1(flag)
 		return (c);
 	    }
 	}
-	if (c = peekd) {
+	if ((c = peekd) != 0) {
 	    peekd = 0;
 	    return (c);
 	}
 	if (exclp) {
-	    if (c = *exclp++)
+	    if ((c = *exclp++) != 0)
 		return (c);
 	    if (exclnxt && --exclc >= 0) {
 		exclnxt = exclnxt->next;
@@ -451,10 +451,10 @@ getdol()
 	return;
     }
     if (c == '{')
-	*np++ = c, c = getC(DOEXCL);
+	*np++ = (Char) c, c = getC(DOEXCL);
     if (c == '#' || c == '?')
-	special++, *np++ = c, c = getC(DOEXCL);
-    *np++ = c;
+	special++, *np++ = (Char) c, c = getC(DOEXCL);
+    *np++ = (Char) c;
     switch (c) {
 
     case '<':
@@ -495,11 +495,11 @@ getdol()
 #endif
 	    /* we know that np < &name[4] */
 	    ep = &np[MAXVARLEN];
-	    while (c = getC(DOEXCL)) {
+	    while ((c = getC(DOEXCL)) != 0) {
 		if (!Isdigit(c))
 		    break;
 		if (np < ep)
-		    *np++ = c;
+		    *np++ = (Char) c;
 		else
 		    toolong = 1;
 	    }
@@ -508,12 +508,12 @@ getdol()
 	    /* we know that np < &name[4] */
 	    ep = &np[MAXVARLEN];
 	    toolong = 0;
-	    while (c = getC(DOEXCL)) {
+	    while ((c = getC(DOEXCL)) != 0) {
 		/* Bugfix for ${v123x} from Chris Torek, DAS DEC-90. */
 		if (!letter(c) && !Isdigit(c))
 		    break;
 		if (np < ep)
-		    *np++ = c;
+		    *np++ = (Char) c;
 		else
 		    toolong = 1;
 	    }
@@ -533,7 +533,7 @@ getdol()
 	break;
     }
     if (c == '[') {
-	*np++ = c;
+	*np++ = (Char) c;
 	/*
 	 * Name up to here is a max of MAXVARLEN + 8.
 	 */
@@ -553,7 +553,7 @@ getdol()
 		return;
 	    }
 	    if (np < ep)
-		*np++ = c;
+		*np++ = (Char) c;
 	} while (c != ']');
 	*np = '\0';
 	if (np >= ep) {
@@ -577,22 +577,22 @@ getdol()
 #ifndef COMPAT
 	do {
 #endif /* COMPAT */
-	    *np++ = c, c = getC(DOEXCL);
+	    *np++ = (Char) c, c = getC(DOEXCL);
 	    if (c == 'g' || c == 'a') {
 		if (c == 'g')
 		    gmodflag++;
 		else
 		    amodflag++;
-		*np++ = c; c = getC(DOEXCL);
+		*np++ = (Char) c; c = getC(DOEXCL);
 	    }
 	    if ((c == 'g' && !gmodflag) || (c == 'a' && !amodflag)) {
 		if (c == 'g')
 		    gmodflag++;
 		else
 		    amodflag++;
-		*np++ = c; c = getC(DOEXCL);
+		*np++ = (Char) c; c = getC(DOEXCL);
 	    }
-	    *np++ = c;
+	    *np++ = (Char) c;
 	    /* scan s// [eichin:19910926.0512EST] */
 	    if (c == 's') {
 		int delimcnt = 2;
@@ -605,7 +605,7 @@ getdol()
 		    break;
 		}	
 		while ((c = getC(0)) != (-1)) {
-		    *np++ = c;
+		    *np++ = (Char) c;
 		    if(c == delim) delimcnt--;
 		    if(!delimcnt) break;
 		}
@@ -640,7 +640,7 @@ getdol()
 	    addla(name);
 	    return;
 	}
-	*np++ = c;
+	*np++ = (Char) c;
     }
     *np = 0;
     addla(name);
@@ -782,8 +782,7 @@ getsub(en)
 	case 'x':
 	case 'q':
 	    global |= 1;
-
-	    /* fall into ... */
+	    /*FALLTHROUGH*/
 
 	case 'h':
 	case 'r':
@@ -833,7 +832,7 @@ getsub(en)
 		    if (c != delim && c != '\\')
 			*cp++ = '\\';
 		}
-		*cp++ = c;
+		*cp++ = (Char) c;
 	    }
 	    if (cp != lhsb)
 		*cp++ = 0;
@@ -870,7 +869,7 @@ getsub(en)
 		    if (c != delim /* && c != '~' */ )
 			*cp++ = '\\';
 		}
-		*cp++ = c;
+		*cp++ = (Char) c;
 	    }
 	    *cp++ = 0;
 	    break;
@@ -965,6 +964,8 @@ subword(cp, type, adid)
     case 't':
     case 'q':
     case 'x':
+    case 'u':
+    case 'l':
 	wp = domod(cp, type);
 	if (wp == 0)
 	    return (Strsave(cp));
@@ -1033,10 +1034,21 @@ domod(cp, type)
     case 'x':
     case 'q':
 	wp = Strsave(cp);
-	for (xp = wp; c = *xp; xp++)
+	for (xp = wp; (c = *xp) != 0; xp++)
 	    if ((c != ' ' && c != '\t') || type == 'q')
 		*xp |= QUOTE;
 	return (wp);
+
+    case 'l':
+	wp = Strsave(cp);
+	*wp =  Isupper(*wp) ? Tolower(*wp) : *wp;
+	return (wp);
+
+    case 'u':
+	wp = Strsave(cp);
+	*wp =  Islower(*wp) ? Toupper(*wp) : *wp;
+	return (wp);
+
 
     case 'h':
     case 't':
@@ -1222,7 +1234,7 @@ gethent(sc)
 		else
 		    event = -1;
 		if (np < &lhsb[sizeof(lhsb) / sizeof(Char) - 2])
-		    *np++ = c;
+		    *np++ = (Char) c;
 		c = getC(0);
 	    }
 	    unreadc(c);
@@ -1262,7 +1274,7 @@ gethent(sc)
 		if (c == '?')
 		    break;
 		if (np < &lhsb[sizeof(lhsb) / sizeof(Char) - 2])
-		    *np++ = c;
+		    *np++ = (Char) c;
 	    }
 	    if (np == lhsb) {
 		if (lhsb[0] == 0) {
@@ -1367,7 +1379,7 @@ readc(wanteof)
 #ifdef DEBUG_INP
     xprintf("readc\n");
 #endif
-    if (c = peekread) {
+    if ((c = peekread) != 0) {
 	peekread = 0;
 	return (c);
     }
@@ -1378,7 +1390,7 @@ top:
 	xprintf("alvecp %c\n", *alvecp & 0xff);
 #endif
 	aret = A_SEEK;
-	if (c = *alvecp++)
+	if ((c = *alvecp++) != 0)
 	    return (c);
 	if (alvec && *alvec) {
 		alvecp = *alvec++;
@@ -1391,7 +1403,7 @@ top:
 	}
     }
     if (alvec) {
-	if (alvecp = *alvec) {
+	if ((alvecp = *alvec) != 0) {
 	    alvec++;
 	    goto top;
 	}
@@ -1400,7 +1412,7 @@ top:
     }
     if (evalp) {
 	aret = E_SEEK;
-	if (c = *evalp++)
+	if ((c = *evalp++) != 0)
 	    return (c);
 	if (evalvec && *evalvec) {
 	    evalp = *evalvec++;
@@ -1414,7 +1426,7 @@ top:
 	    doneinp = 1;
 	    reset();
 	}
-	if (evalp = *evalvec) {
+	if ((evalp = *evalvec) != 0) {
 	    evalvec++;
 	    goto top;
 	}
@@ -1496,7 +1508,7 @@ reread:
 	    onelflg--;
     } while (c == 0);
     if (histlinep < histline + BUFSIZE)
-	*histlinep++ = c;
+	*histlinep++ = (Char) c;
     return (c);
 }
 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 3.9 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.defns.c,v 3.10 1991/11/26 04:28:26 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.9 1991/11/22 02:28:12 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.10 1991/11/26 04:28:26 christos Exp $")
 
 #include "ed.h"
 
@@ -528,7 +528,7 @@ KEYCMD  CcEmacsMap[] = {
  * insert mode characters are in the normal keymap, and command mode
  * in the extended keymap.
  */
-KEYCMD  CcViMap[] = {
+static KEYCMD  CcViMap[] = {
 #ifdef KSHVI
     F_UNASSIGNED,		/* ^@ */
     F_INSERT,			/* ^A */
@@ -1367,7 +1367,7 @@ ed_InitMetaBindings()
 	    map = CcAltMap;
 	}
     }
-    buf[0] = i;
+    buf[0] = (Char) i;
     buf[2] = 0;
     for (i = 0200; i <= 0377; i++) {
 	if (map[i] != F_INSERT && map[i] != F_UNASSIGNED && map[i] != F_XKEY) {
@@ -1384,13 +1384,13 @@ ed_InitVIMaps()
     register int i;
 
     VImode = 1;
-    (void) ResetXmap(VImode);
+    ResetXmap(VImode);
     for (i = 0; i < 256; i++) {
 	CcKeyMap[i] = CcViMap[i];
 	CcAltMap[i] = CcViCmdMap[i];
     }
     ed_InitMetaBindings();
-    (void) ed_InitNLSMaps();
+    ed_InitNLSMaps();
     BindArrowKeys();
 }
 
@@ -1401,13 +1401,13 @@ ed_InitEmacsMaps()
     Char    buf[3];
 
     VImode = 0;
-    (void) ResetXmap(VImode);
+    ResetXmap(VImode);
     for (i = 0; i < 256; i++) {
 	CcKeyMap[i] = CcEmacsMap[i];
 	CcAltMap[i] = F_UNASSIGNED;
     }
     ed_InitMetaBindings();
-    (void) ed_InitNLSMaps();
+    ed_InitNLSMaps();
     buf[0] = 030;
     buf[2] = 0;
     buf[1] = 030;

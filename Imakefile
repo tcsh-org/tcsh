@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.5 1991/11/26 04:28:26 christos Exp $
+/**/# $Id: Imakefile,v 1.6 1992/01/16 13:04:21 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -82,6 +82,17 @@ ones.  Please send in your fixes and additions! */
 #define ConfigH sequent
 #endif
 
+#ifdef MinixArchitecture
+/* Maybe conditional on MACH? */
+SYSSRCS=mi.termios.c mi.wait.h 
+SYSOBJS=mi.termios.${SUF}
+EXTF=ma.setp.c
+#else
+/* Maybe conditional on MACH? */
+SYSSRCS=ma.setp.c
+SYSOBJS=ma.setp.${SUF}
+EXTF=mi.termios.c mi.wait.h
+#endif
 /* generic os's */
 
 #ifndef ConfigH
@@ -312,12 +323,12 @@ SHSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.exp.c sh.file.c sh.func.c sh.glob.c sh.hist.c sh.init.c \
 	sh.lex.c sh.misc.c sh.parse.c sh.print.c sh.proc.c sh.sem.c \
 	sh.set.c sh.time.c sh.char.h sh.dir.h sh.proc.h sh.h \
-	sh.decls.h glob.c glob.h mi.wait.h mi.termios.c
+	sh.decls.h glob.c glob.h ${SYSSRCS}
 SHOBJS=	sh.${SUF} sh.dir.${SUF} sh.dol.${SUF} sh.err.${SUF} sh.exec.${SUF} \
 	sh.char.${SUF} sh.exp.${SUF} sh.func.${SUF} sh.glob.${SUF} \
 	sh.hist.${SUF} sh.init.${SUF} sh.lex.${SUF} sh.misc.${SUF} \
 	sh.parse.${SUF} sh.print.${SUF} sh.proc.${SUF} sh.sem.${SUF} \
-	sh.set.${SUF} sh.time.${SUF} glob.${SUF} mi.termios.${SUF}
+	sh.set.${SUF} sh.time.${SUF} glob.${SUF} ${SYSOBJS}
 
 TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c \
 	tw.comp.c
@@ -341,14 +352,14 @@ TCOBJS=	tc.alloc.${SUF} tc.bind.${SUF} tc.const.${SUF} tc.disc.${SUF} \
 MISCF = Makefile Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
-	README.imake
+	README.imake 
 CONFSRCS=config/config.*
 
 
 SRCS = $(SHSRCS) $(TWSRCS) $(EDSRCS) $(TCSRCS)
 OBJS = $(SHOBJS) $(TWOBJS) $(EDOBJS) $(TCOBJS)
 
-ALLSRCS= $(MISCF) $(SRCS)
+ALLSRCS= $(MISCF) $(SRCS) $(EXTF)
 
 all:: tcsh
 

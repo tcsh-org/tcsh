@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.6 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.alloc.c,v 3.7 1991/10/28 06:26:50 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,10 +44,10 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.6 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.7 1991/10/28 06:26:50 christos Exp $")
 
-char   *memtop = NULL;		/* PWP: top of current memory */
-char   *membot = NULL;		/* PWP: bottom of allocatable memory */
+static char   *memtop = NULL;		/* PWP: top of current memory */
+static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
 
 #ifndef SYSMALLOC
 
@@ -123,22 +123,24 @@ extern char *sbrk();
  */
 static U_int nmalloc[NBUCKETS];
 
+#ifndef lint
 static	int	findbucket	__P((union overhead *, int));
 static	void	morecore	__P((int));
+#endif
 
 
 #ifdef DEBUG
 # define CHECK(a, str, p) \
     if (a) { \
 	xprintf(str, p);	\
-	xprintf("memtop = %lx membot = %lx.\n", memtop, membot);	\
+	xprintf(" (memtop = %lx membot = %lx)\n", memtop, membot);	\
 	abort(); \
     }
 #else
 # define CHECK(a, str, p) \
     if (a) { \
 	xprintf(str, p);	\
-	xprintf("memtop = %lx membot = %lx.\n", memtop, membot);	\
+	xprintf(" (memtop = %lx membot = %lx)\n", memtop, membot);	\
 	return; \
     }
 #endif
@@ -222,7 +224,7 @@ malloc(nbytes)
  */
 static void
 morecore(bucket)
-    register bucket;
+    register int bucket;
 {
     register union overhead *op;
     register int rnu;		/* 2^rnu bytes will be requested */
@@ -287,7 +289,7 @@ free(cp)
 	return;
     CHECK(!memtop || !membot, "free(%lx) called before any allocations.", cp);
     CHECK(cp > (ptr_t) memtop, "free(%lx) above top of memory.", cp);
-    CHECK(cp < (ptr_t) membot, "free(%lx) above top of memory.", cp);
+    CHECK(cp < (ptr_t) membot, "free(%lx) below bottom of memory.", cp);
     op = (union overhead *) (((caddr_t) cp) - MEMALIGN(sizeof(union overhead)));
     CHECK(op->ov_magic != MAGIC, "free(%lx) bad block.", cp);
 
@@ -337,7 +339,7 @@ calloc(i, j)
 static void
 mybcopy(from, to, len)
     char   *from, *to;
-    register unsigned len;
+    size_t len;
 {
     register char *sp, *dp;
 
@@ -404,7 +406,7 @@ realloc(cp, nbytes)
 	 */
 	if ((i = findbucket(op, 1)) < 0 &&
 	    (i = findbucket(op, realloc_srchlen)) < 0)
-	i = 0;
+	    i = 0;
 
     onb = MEMALIGN(nbytes + MEMALIGN(sizeof(union overhead)) + RSLOP);
 
@@ -414,8 +416,14 @@ realloc(cp, nbytes)
 	return ((memalign_t) cp);
     if ((res = malloc(nbytes)) == NULL)
 	return ((memalign_t) NULL);
-    if (cp != res)		/* common optimization */
-	mybcopy(cp, res, nbytes);
+    if (cp != res) {		/* common optimization */
+	/* 
+	 * christos: this used to copy nbytes! It should copy the 
+	 * smaller of the old and new size
+	 */
+	onb = (1 << (i + 3)) - MEMALIGN(sizeof(union overhead)) - RSLOP;
+	mybcopy(cp, res, onb < nbytes ? onb : nbytes);
+    }
     if (was_alloced)
 	free(cp);
     return ((memalign_t) res);
@@ -568,7 +576,8 @@ showall(v, c)
     xprintf("\tAllocated memory from 0x%lx to 0x%lx.  Real top at 0x%lx\n",
 	    membot, memtop, (char *) sbrk(0));
 #else
+    memtop = (char *) sbrk(0);
     xprintf("Allocated memory from 0x%lx to 0x%lx (%ld).\n",
-	    membot, memtop = (char *) sbrk(0), memtop - membot);
+	    membot, memtop, memtop - membot);
 #endif				/* SYSMALLOC */
 }

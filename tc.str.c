@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.str.c,v 1.3 91/09/24 17:11:43 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.str.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.str.c,v 3.2 1991/07/19 01:06:11 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 
 #define MALLOC_INCR	128
 
@@ -93,7 +93,7 @@ str2short(src)
 
     if (sdst == (NULL)) {
 	dstsize = MALLOC_INCR;
-	sdst = (Char *) xmalloc((size_t) dstsize * sizeof(Char));
+	sdst = (Char *) xmalloc((size_t) (dstsize * sizeof(Char)));
     }
 
     dst = sdst;
@@ -103,7 +103,7 @@ str2short(src)
 	if (dst == edst) {
 	    dstsize += MALLOC_INCR;
 	    sdst = (Char *) xrealloc((ptr_t) sdst,
-				     (size_t) dstsize * sizeof(Char));
+				     (size_t) (dstsize * sizeof(Char)));
 	    edst = &sdst[dstsize];
 	    dst = &edst[-MALLOC_INCR];
 	}
@@ -125,7 +125,7 @@ short2str(src)
 
     if (sdst == NULL) {
 	dstsize = MALLOC_INCR;
-	sdst = (char *) xmalloc((size_t) dstsize * sizeof(char));
+	sdst = (char *) xmalloc((size_t) (dstsize * sizeof(char)));
     }
     dst = sdst;
     edst = &dst[dstsize];
@@ -134,7 +134,7 @@ short2str(src)
 	if (dst == edst) {
 	    dstsize += MALLOC_INCR;
 	    sdst = (char *) xrealloc((ptr_t) sdst,
-				     (size_t) dstsize * sizeof(char));
+				     (size_t) (dstsize * sizeof(char)));
 	    edst = &sdst[dstsize];
 	    dst = &edst[-MALLOC_INCR];
 	}
@@ -377,7 +377,7 @@ short2qstr(src)
 
     if (sdst == NULL) {
 	dstsize = MALLOC_INCR;
-	sdst = (char *) xmalloc((size_t) dstsize * sizeof(char));
+	sdst = (char *) xmalloc((size_t) (dstsize * sizeof(char)));
     }
     dst = sdst;
     edst = &dst[dstsize];
@@ -387,7 +387,7 @@ short2qstr(src)
 	    if (dst == edst) {
 		dstsize += MALLOC_INCR;
 		sdst = (char *) xrealloc((ptr_t) sdst,
-					 (size_t) dstsize * sizeof(char));
+					 (size_t) (dstsize * sizeof(char)));
 		edst = &sdst[dstsize];
 		dst = &edst[-MALLOC_INCR];
 	    }
@@ -396,7 +396,7 @@ short2qstr(src)
 	if (dst == edst) {
 	    dstsize += MALLOC_INCR;
 	    sdst = (char *) xrealloc((ptr_t) sdst,
-				     (size_t) dstsize * sizeof(char));
+				     (size_t) (dstsize * sizeof(char)));
 	    edst = &sdst[dstsize];
 	    dst = &edst[-MALLOC_INCR];
 	}

@@ -1,4 +1,10 @@
 V6.02.00, ...
+20. Added and documented the first pass for complete.
+19. Added dunique and cd -.
+18. Per's fix for alarm functions. Things would break if time went backwards.
+17. Realloc bug fix (copy min of old and new size)
+16. Fix for csh compatible braces.
+15. Brace globbing and negation globbing for Gmatch.
 14. 6.01.02 (1/16/92)
 13. Completion builtin, new tw* files.
 12. 6.01.01 (1/6/92)

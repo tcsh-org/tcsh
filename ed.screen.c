@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.11 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.12 1992/01/06 22:36:56 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.11 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.12 1992/01/06 22:36:56 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -594,6 +594,7 @@ EchoTC(v)
 	/* This is wrong, but I will ignore it... */
 	if (verbose)
 	    stderror(ERR_NAME | ERR_TCARGS, cv, arg_need);
+	/*FALLTHROUGH*/
     case 2:
 	v++;
 	if (!*v || *v[0] == '\0') {
@@ -1059,7 +1060,6 @@ GetTermCaps()
     char    buf[TC_BUFSIZE];
     static char bp[TC_BUFSIZE];
     char   *area;
-    extern char *getenv();
     struct termcapstr *t;
 
 
@@ -1084,7 +1084,7 @@ GetTermCaps()
     ptr = getenv("TERM");
 
 #ifdef apollo
-    /*
+    /* 
      * If we are on a pad, we pretend that we are dumb. Otherwise the termcap
      * library will put us in a weird screen mode, thinking that we are going
      * to use curses

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.h,v 3.11 1991/11/26 04:28:26 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.h,v 3.12 1991/12/19 22:34:14 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -68,7 +68,6 @@ extern PFCmd CcFuncTbl[];	/* table of available commands */
 extern KEYCMD CcKeyMap[];	/* keymap table, each index into above tbl */
 extern KEYCMD CcAltMap[];	/* Alt keymap table */
 extern KEYCMD CcEmacsMap[];	/* keymap table for Emacs default bindings */
-extern KEYCMD CcViMap[];	/* keymap table for Vi input mode defaults */
 extern KEYCMD CcViCmdMap[];	/* for Vi command mode defaults */
 extern struct KeyFuncs FuncNames[];	/* string names vs. CcFuncTbl indices */
 

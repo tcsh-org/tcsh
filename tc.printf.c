@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.printf.c,v 3.2 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.printf.c,v 3.3 1991/11/26 04:41:23 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.2 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.3 1991/11/26 04:41:23 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -243,7 +243,7 @@ static void
 xaddchar(c)
     int     c;
 {
-    *xstring++ = c;
+    *xstring++ = (char) c;
 }
 
 

@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/ed.refresh.c,v 1.3 91/09/24 17:07:58 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.refresh.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.2 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -174,13 +174,13 @@ Vdraw(c)			/* draw char c onto V lines */
 	Vdisplay[vcursor_v][TermH] = '\0';	/* assure end of line */
 	vcursor_h = 0;		/* reset it. */
 	vcursor_v++;
-	if (vcursor_v >= TermV) {	/* should NEVER happen. */
 #ifdef DEBUG_REFRESH
+	if (vcursor_v >= TermV) {	/* should NEVER happen. */
 	    dprintf("\r\nVdraw: vcursor_v overflow! Vcursor_v == %d > %d\r\n",
 		    vcursor_v, TermV);
 	    abort();
-#endif /* DEBUG_REFRESH */
 	}
+#endif /* DEBUG_REFRESH */
     }
 }
 
@@ -231,7 +231,7 @@ Refresh()
 	    while (*cp & LITERAL)
 		cp++;
 	    if (*cp)
-		Vdraw(litnum++ | LITERAL);
+		Vdraw((int) (litnum++ | LITERAL));
 	    else {
 		/*
 		 * XXX: This is a bug, we lose the last literal, if it is not

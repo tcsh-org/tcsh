@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.c,v 3.7 1991/11/11 01:56:34 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.c,v 3.8 1991/12/19 22:34:14 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.7 1991/11/11 01:56:34 christos Exp christos $")
+RCSID("$Id: sh.dir.c,v 3.8 1991/12/19 22:34:14 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -48,9 +48,11 @@ static	void 	 	 	 printdirs	__P((void));
 static	Char 			*dgoto		__P((Char *));
 static	void 	 	 	 dnewcwd	__P((struct directory *));
 static	void 	 	 	 dset		__P((Char *));
+static  void 			 dextract	__P((struct directory *));
 
-struct directory dhead;		/* "head" of loop */
-int     printd;			/* force name to be printed */
+static struct directory dhead;		/* "head" of loop */
+static int    printd;			/* force name to be printed */
+static Char   olddir[MAXPATHLEN+1];	/* old directory */
 
 #ifdef CSHDIRS
 int     bequiet = 0;		/* do not print dir stack -strike */
@@ -72,12 +74,12 @@ dinit(hp)
     static char *emsg = "tcsh: Trying to start from \"%s\"\n";
 
     /* Don't believe the login shell home, because it may be a symlink */
-    tcp = getwd(path);		/* see ngetwd.c for System V version */
+    tcp = (char *) getwd(path);		/* see ngetwd.c for System V version */
     if (tcp == NULL || *tcp == '\0') {
-	(void) xprintf("tcsh: %s\n", path);
+	xprintf("tcsh: %s\n", path);
 	if (hp && *hp) {
 	    tcp = short2str(hp);
-	    (void) xprintf(emsg, tcp);
+	    xprintf(emsg, tcp);
 	    if (chdir(tcp) == -1)
 		cp = NULL;
 	    else
@@ -86,7 +88,7 @@ dinit(hp)
 	else
 	    cp = NULL;
 	if (cp == NULL) {
-	    (void) xprintf(emsg, "/");
+	    xprintf(emsg, "/");
 	    if (chdir("/") == -1)
 		/* I am not even try to print an error message! */
 		xexit(1);
@@ -145,6 +147,7 @@ Char *dp;
 
     vec[0] = Strsave(dp);
     vec[1] = 0;
+    (void) Strcpy(olddir, value(STRcwd));
     setq(STRcwd, vec, &shvhed);
     Setenv(STRPWD, dp);
 }
@@ -152,6 +155,7 @@ Char *dp;
 #define DIR_LONG 1
 #define DIR_VERT 2
 #define DIR_LINE 4
+#define DIR_OLD	 8
 
 static void
 skipargs(v, str)
@@ -161,22 +165,27 @@ skipargs(v, str)
     Char  **n = *v, *s;
 
     dirflag = 0;
-    for (n++; *n != NULL && (*n)[0] == '-'; n++)
-	for (s = &((*n)[1]); *s; s++)
-	    switch (*s) {
-	    case 'l':
-		dirflag |= DIR_LONG;
-		break;
-	    case 'v':
-		dirflag |= DIR_VERT;
-		break;
-	    case 'n':
-		dirflag |= DIR_LINE;
-		break;
-	    default:
-		stderror(ERR_DIRUS, short2str(**v), str);
-		break;
-	    }
+    for (n++; *n != NULL && (*n)[0] == '-'; n++) 
+	if (*(s = &((*n)[1])) == '\0')
+	    dirflag |= DIR_OLD;
+	else
+	    for (; *s; s++)
+		switch (*s) {
+		case 'l':
+		    dirflag |= DIR_LONG;
+		    break;
+		case 'v':
+		    dirflag |= DIR_VERT;
+		    break;
+		case 'n':
+		    dirflag |= DIR_LINE;
+		    break;
+		default:
+		    stderror(ERR_DIRUS, short2str(**v), str);
+		    break;
+		}
+    if (*n && (dirflag & DIR_OLD))
+	stderror(ERR_DIRUS, short2str(**v), str);
     *v = n;
 }
 
@@ -191,7 +200,7 @@ dodirs(v, c)
 {
     skipargs(&v, "");
 
-    if (*v != NULL)
+    if (*v != NULL || (dirflag & DIR_OLD))
 	stderror(ERR_DIRUS, "dirs", "");
     printdirs();
 }
@@ -364,21 +373,23 @@ dochngd(v, c)
     register Char *cp;
     register struct directory *dp;
 
-    skipargs(&v, " [<dir>]");
+    skipargs(&v, "[-|<dir>]");
     printd = 0;
-    if (*v == NULL) {
+    cp = (dirflag & DIR_OLD) ? olddir : *v;
+
+    if (cp == NULL) {
 	if ((cp = value(STRhome)) == NULL || *cp == 0)
 	    stderror(ERR_NAME | ERR_NOHOMEDIR);
 	if (chdir(short2str(cp)) < 0)
 	    stderror(ERR_NAME | ERR_CANTCHANGE);
 	cp = Strsave(cp);
     }
-    else if (v[1] != NULL) {
+    else if ((dirflag & DIR_OLD) == 0 && v[1] != NULL) {
 	stderror(ERR_NAME | ERR_TOOMANY);
 	/* NOTREACHED */
 	return;
     }
-    else if ((dp = dfind(*v)) != 0) {
+    else if ((dp = dfind(cp)) != 0) {
 	char   *tmp;
 
 	printd = 1;
@@ -391,7 +402,7 @@ dochngd(v, c)
 	return;
     }
     else
-	if ((cp = dfollow(*v)) == NULL)
+	if ((cp = dfollow(cp)) == NULL)
 	    return;
     dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
     dp->di_name = cp;
@@ -537,9 +548,11 @@ dopushd(v, c)
     register struct directory *dp;
     register Char *cp;
 
-    skipargs(&v, " [<dir>|+<n>]");
+    skipargs(&v, " [-|<dir>|+<n>]");
     printd = 1;
-    if (*v == NULL) {
+    cp = (dirflag & DIR_OLD) ? olddir : *v;
+
+    if (cp == NULL) {
 	if (adrof(STRpushdtohome)) {
 	    if ((cp = value(STRhome)) == NULL || *cp == 0)
 		stderror(ERR_NAME | ERR_NOHOMEDIR);
@@ -573,12 +586,12 @@ dopushd(v, c)
 	    dcwd->di_next = dp;
 	}
     }
-    else if (v[1] != NULL) {
+    else if ((dirflag & DIR_OLD) == 0 && v[1] != NULL) {
 	stderror(ERR_NAME | ERR_TOOMANY);
 	/* NOTREACHED */
 	return;
     }
-    else if (dp = dfind(*v)) {
+    else if (dp = dfind(cp)) {
 	char   *tmp;
 
 	if (chdir(tmp = short2str(dp->di_name)) < 0)
@@ -592,7 +605,7 @@ dopushd(v, c)
     else {
 	register Char *ccp;
 
-	if ((ccp = dfollow(*v)) == NULL)
+	if ((ccp = dfollow(cp)) == NULL)
 	    return;
 	dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
 	dp->di_name = ccp;
@@ -644,18 +657,21 @@ dopopd(v, c)
     Char  **v;
     struct command *c;
 {
+    Char *cp;
     register struct directory *dp, *p = NULL;
 
-    skipargs(&v, " [+<n>]");
+    skipargs(&v, " [-|+<n>]");
     printd = 1;
-    if (*v == NULL)
+    cp = (dirflag & DIR_OLD) ? olddir : *v;
+
+    if (cp == NULL)
 	dp = dcwd;
-    else if (v[1] != NULL) {
+    else if ((dirflag & DIR_OLD) == 0 && v[1] != NULL) {
 	stderror(ERR_NAME | ERR_TOOMANY);
 	/* NOTREACHED */
 	return;
     }
-    else if ((dp = dfind(*v)) == 0)
+    else if ((dp = dfind(cp)) == 0)
 	stderror(ERR_NAME | ERR_BADDIR);
     if (dp->di_prev == &dhead && dp->di_next == &dhead)
 	stderror(ERR_NAME | ERR_EMPTY);
@@ -948,7 +964,7 @@ dcanon(cp, p)
      */
     if (p1 && *p1 == '/' &&
 	(Strncmp(p1, cp, cc) != 0 || (cp[cc] != '/' && cp[cc] != '\0'))) {
-	static ino_t home_ino = -1;
+	static ino_t home_ino = (ino_t) -1;
 	static dev_t home_dev = -1;
 	static Char *home_ptr = NULL;
 	struct stat statbuf;
@@ -1013,6 +1029,15 @@ static void
 dnewcwd(dp)
     register struct directory *dp;
 {
+    if (adrof(STRdunique)) {
+	struct directory *dn;
+	for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev) 
+	    if (dn != dp && Strcmp(dn->di_name, dp->di_name) == 0) {
+		dn->di_next->di_prev = dn->di_prev;
+		dn->di_prev->di_next = dn->di_next;
+		dfree(dn);
+	    }
+    }
     dcwd = dp;
     dset(dcwd->di_name);
     if (printd && !(adrof(STRpushdsilent))	/* PWP: pushdsilent */
@@ -1062,7 +1087,7 @@ getstakd(s, cnt)
  * lets the user have the nth dir extracted from its current
  * position, and pushes it onto the top.
  */
-void
+static void
 dextract(dp)
     struct directory *dp;
 {

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.time.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.time.c,v 3.4 1991/11/26 04:41:23 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.4 1991/11/26 04:41:23 christos Exp $")
 
 #if defined(sun) && ! defined(MACH)
 # include <machine/param.h>
@@ -54,6 +54,7 @@ RCSID("$Id: sh.time.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 struct tms times0;
 #endif /* BSDTIMES */
 
+static 	void tvadd	__P((timeval_t *, timeval_t *));
 #if !defined(BSDTIMES) && !defined(_SEQUENT_)
 # ifdef POSIX
 static	void	pdtimet	__P((clock_t, clock_t));
@@ -561,7 +562,7 @@ pdeltat(t1, t0)
     xprintf("%ld.%03ld", td.tv_sec, td.tv_usec / 1000L);
 }
 
-void
+static void
 tvadd(tsum, t0)
     timeval_t *tsum, *t0;
 {

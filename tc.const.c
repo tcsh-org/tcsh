@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.const.c,v 3.6 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.const.c,v 3.7 1991/11/22 02:28:12 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.6 1991/11/17 05:39:06 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.7 1991/11/22 02:28:12 christos Exp $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -79,6 +79,10 @@ Char STRmh[]            = { '-', 'h', '\0' };
 Char STRtildothist[]    = { '~', '/', '.', 'h', 'i', 's', 't', 'o', 'r', 
 		            'y', '\0' };
 
+#ifdef KANJI
+Char STRnokanji[]       = { 'n', 'o', 'k', 'a', 'n', 'j', 'i', '\0' };
+#endif
+
 #ifdef CSHDIRS
 Char STRdirfile[]     = { '~', '/', '.', 'c', 's', 'h', 'd', 'i', 'r',
                           's', '\0' };
@@ -114,6 +118,7 @@ Char STRpushdtohome[]	= { 'p', 'u', 's', 'h', 'd', 't', 'o', 'h', 'o', 'm',
 Char STRpushdsilent[]	= { 'p', 'u', 's', 'h', 'd', 's', 'i', 'l', 'e', 'n',
 			    't', '\0' };
 Char STRdextract[]	= { 'd', 'e', 'x', 't', 'r', 'a', 'c', 't', '\0' };
+Char STRdunique[]	= { 'd', 'u', 'n', 'i', 'q', 'u', 'e', '\0' };
 Char STRignore_symlinks[] = { 'i', 'g', 'n', 'o', 'r', 'e', '_', 's', 'y', 'm',
 			    'l', 'i', 'n', 'k', 's', '\0' };
 Char STRchase_symlinks[] = { 'c', 'h', 'a', 's', 'e', '_', 's', 'y', 'm', 'l', 
@@ -226,8 +231,6 @@ Char STRoverwrite[]	= { 'o', 'v', 'e', 'r', 'w', 'r', 'i', 't', 'e', '\0' };
 Char STRinsert[]	= { 'i', 'n', 's', 'e', 'r', 't', '\0' };
 Char STRnohup[]		= { 'n', 'o', 'h', 'u', 'p', '\0' };
 Char STRnice[]		= { 'n', 'i', 'c', 'e', '\0' };
-Char STRlistpathnum[]	= { 'l', 'i', 's', 't', 'p', 'a', 't', 'h', 'n', 'u', 
-			    'm', '\0' };
 Char STRshowdots[]	= { 's', 'h', 'o', 'w', 'd', 'o', 't', 's', '\0' };
 Char STRthen[]		= { 't', 'h', 'e', 'n', '\0' };
 Char STReof[]		= { '^', 'D', '\b', '\b', '\0' };

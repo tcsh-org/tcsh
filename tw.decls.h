@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.decls.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.decls.h,v 3.1 1992/01/16 13:04:21 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -56,11 +56,11 @@ extern	 int		  fcompare		__P((Char **, Char **));
 extern	 void		  print_by_column	__P((Char *, Char *[], int, 
 						     int));
 extern	 int		  StrQcmp		__P((Char *, Char *));
-extern   Char		 *Getenv		__P((Char *));
 
 /*
  * tw.init.c
  */
+extern	 void		  tw_alias_start	__P((DIR *, Char *));
 extern	 void		  tw_cmd_start		__P((DIR *, Char *));
 extern	 void		  tw_logname_start	__P((DIR *, Char *));
 extern	 void		  tw_var_start		__P((DIR *, Char *));
@@ -68,6 +68,8 @@ extern	 void		  tw_file_start		__P((DIR *, Char *));
 extern	 void		  tw_vl_start		__P((DIR *, Char *));
 extern	 Char		 *tw_cmd_next		__P((Char *, int *));
 extern	 Char		 *tw_logname_next	__P((Char *, int *));
+extern	 Char		 *tw_shvar_next		__P((Char *, int *));
+extern	 Char		 *tw_envvar_next	__P((Char *, int *));
 extern	 Char		 *tw_var_next		__P((Char *, int *));
 extern	 Char		 *tw_file_next		__P((Char *, int *));
 extern	 void		  tw_dir_end		__P((void));

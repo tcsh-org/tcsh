@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.20 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.21 1992/01/16 13:04:21 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.20 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.21 1992/01/16 13:04:21 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -63,7 +63,7 @@ static	void	 auto_lock	__P((void));
 static	void	 insert		__P((struct wordent *, bool));
 static	void	 insert_we	__P((struct wordent *, struct wordent *));
 static	int	 inlist		__P((Char *, Char *));
-
+static  Char    *gethomedir	__P((Char *));
 
 /*
  * Tops-C shell
@@ -116,6 +116,8 @@ expand_lex(buf, bufsiz, sp0, from, to)
 		 */
 		if ((*s & QUOTE)
 		    && (((*s & TRIM) == HIST) ||
+			(((*s & TRIM) == '\'') && (prev_c != '\\')) ||
+			(((*s & TRIM) == '\"') && (prev_c != '\\')) ||
 			(((*s & TRIM) == '\\') && (prev_c != '\\')))) {
 		    *d++ = '\\';
 		}
@@ -503,7 +505,7 @@ xgetpass(prm)
     sigret_t (*sigint)();
 
     sigint = (sigret_t (*)()) sigset(SIGINT, SIG_IGN);
-    Rawmode();	/* Make sure, cause we want echo off */
+    (void) Rawmode();	/* Make sure, cause we want echo off */
     if ((fd = open("/dev/tty", O_RDWR)) == -1)
 	fd = SHIN;
 
@@ -611,19 +613,13 @@ sigret_t
 alrmcatch(snum)
 int snum;
 {
-    time_t  cl, nl;
 #ifdef UNRELSIGS
     if (snum)
 	(void) sigset(SIGALRM, alrmcatch);
 #endif /* UNRELSIGS */
 
-    if ((nl = sched_next()) == -1)
-	(*alm_fun)();		/* no other possibility - logout */
-    (void) time(&cl);
-    if (nl <= cl + 1)
-	sched_run();
-    else
-	(*alm_fun)();
+    (*alm_fun)();
+
     setalarm(1);
 #ifndef SIGVOID
     return (snum);
@@ -865,15 +861,17 @@ setalarm(lck)
 {
     struct varent *vp;
     Char   *cp;
-    unsigned alrm_time = 0, lock_time;
+    unsigned alrm_time = 0, logout_time, lock_time;
     time_t cl, nl, sched_dif;
 
     if (vp = adrof(STRautologout)) {
-	if (cp = vp->vec[0]) {
-	    if ((alrm_time = atoi(short2str(cp)) * 60) > 0)
+	if ((cp = vp->vec[0]) != 0) {
+	    if ((logout_time = atoi(short2str(cp)) * 60) > 0) {
+		alrm_time = logout_time;
 		alm_fun = auto_logout;
+	    }
 	}
-	if ((cp = vp->vec[1])) {
+	if ((cp = vp->vec[1]) != 0) {
 	    if ((lock_time = atoi(short2str(cp)) * 60) > 0) {
 		if (lck) {
 		    if (alrm_time == 0 || lock_time < alrm_time) {
@@ -889,9 +887,11 @@ setalarm(lck)
     }
     if ((nl = sched_next()) != -1) {
 	(void) time(&cl);
-	sched_dif = nl - cl;
-	if ((alrm_time == 0) || ((unsigned) sched_dif < alrm_time))
+	sched_dif = nl > cl ? nl - cl : 0;
+	if ((alrm_time == 0) || ((unsigned) sched_dif < alrm_time)) {
 	    alrm_time = ((unsigned) sched_dif) + 1;
+	    alm_fun = sched_run;
+	}
     }
     (void) alarm(alrm_time);	/* Autologout ON */
 }
@@ -1223,7 +1223,7 @@ tildecompare(p1, p2)
     return Strcmp(p1->user, p2->user);
 }
 
-Char   *
+static Char *
 gethomedir(us)
     Char   *us;
 {
@@ -1313,8 +1313,8 @@ gettilde(us)
     tcache[tlength].home = hd;
     tcache[tlength++].hlen = Strlen(hd);
 
-    (void) qsort((ptr_t) tcache, (size_t) tlength, sizeof(struct tildecache),
-		 (int (*) __P((const void *, const void *))) tildecompare);
+    qsort((ptr_t) tcache, (size_t) tlength, sizeof(struct tildecache),
+	  (int (*) __P((const void *, const void *))) tildecompare);
 
     if (tlength == tsize) {
 	tsize += TILINCR;

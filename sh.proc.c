@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.proc.c,v 3.19 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.proc.c,v 3.20 1992/01/06 22:36:56 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.19 1991/11/26 04:28:26 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.20 1992/01/06 22:36:56 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -129,6 +129,7 @@ static	void		 pads		__P((Char *));
 static	void		 pkill		__P((Char **, int));
 static	struct process	*pgetcurr	__P((struct process *));
 static	void		 okpcntl	__P((void));
+static  struct process  *pfind		__P((Char *));
 
 /*
  * pchild - called at interrupt level by the SIGCHLD signal
@@ -198,7 +199,7 @@ loop:
 #ifdef BSDJOBS
 # ifdef BSDTIMES
     /* both a wait3 and rusage */
-#  if !defined(BSDWAIT) || defined(NeXT) || (defined(IRIS4D) && __STDC__)
+#  if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || (defined(IRIS4D) && __STDC__)
     pid = wait3(&w,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
 #  else /* BSDWAIT */
@@ -390,24 +391,24 @@ found:
 	else
 	    pclrcurr(fp);
 	if (jobflags & PFOREGND) {
-	    if (jobflags & (PSIGNALED | PSTOPPED | PPTIME) ||
+	    if (!(jobflags & (PSIGNALED | PSTOPPED | PPTIME) ||
 #ifdef IIASA
 		jobflags & PAEXITED ||
 #endif /* IIASA */
-		!eq(dcwd->di_name, fp->p_cwd->di_name)) {
-		;		/* print in pjwait */
-	    }
+		!eq(dcwd->di_name, fp->p_cwd->di_name))) {
 	    /* PWP: print a newline after ^C */
-	    else if (jobflags & PINTERRUPTED)
+		if (jobflags & PINTERRUPTED) {
 #ifdef SHORT_STRINGS
-		xputchar('\r' | QUOTE), xputchar('\n');
+		    xputchar('\r' | QUOTE), xputchar('\n');
 #else /* !SHORT_STRINGS */
-		xprintf("\215\n");	/* \215 is a quoted ^M */
+		    xprintf("\215\n");	/* \215 is a quoted ^M */
 #endif /* !SHORT_STRINGS */
+		}
 #ifdef notdef
 		else if ((jobflags & (PTIME|PSTOPPED)) == PTIME)
-				ptprint(fp);
+		    ptprint(fp);
 #endif
+	    }
 	}
 	else {
 	    if (jobflags & PNOTIFY || adrof(STRnotify)) {
@@ -1637,7 +1638,7 @@ panystop(neednl)
 	    stderror(ERR_STOPPED, neednl ? "\n" : "");
 }
 
-struct process *
+static struct process *
 pfind(cp)
     Char   *cp;
 {
@@ -1683,7 +1684,7 @@ pfind(cp)
 	}
     if (np)
 	return (np);
-    stderror(ERR_NAME | cp[1] == '?' ? ERR_JOBPAT : ERR_NOSUCHJOB);
+    stderror(ERR_NAME | (cp[1] == '?' ? ERR_JOBPAT : ERR_NOSUCHJOB));
     /* NOTREACHED */
     return (0);
 }

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.h,v 3.2 1991/12/14 20:45:46 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.h,v 3.3 1992/01/16 13:04:21 christos Exp $ */
 /*
  * tw.h: TwENEX functions headers
  */
@@ -39,13 +39,16 @@
 
 #define TW_ZERO		-1
 #define TW_COMMAND	0
-#define TW_SHELLVAR	1
+#define TW_VARIABLE	1
 #define TW_LOGNAME	2
 #define TW_FILE		3
 #define TW_DIRECTORY	4
 #define TW_VARLIST	5
 #define TW_USER		6
 #define TW_LITERAL	7
+#define TW_ALIAS	8
+#define TW_SHELLVAR	9
+#define TW_ENVVAR	10
 
 #define TW_EXEC_OK	1
 #define TW_DIR_OK	2

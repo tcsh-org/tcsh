@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sched.c,v 3.5 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.sched.c,v 3.6 1991/11/26 04:41:23 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.5 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.6 1991/11/26 04:41:23 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -74,7 +74,6 @@ dosched(v, c)
     bool    relative;		/* time specified as +hh:mm */
     struct tm *ltp;
     char   *timeline;
-    char   *ctime();
 
 /* This is a major kludge because of a gcc linker  */
 /* Problem.  It may or may not be needed for you   */
@@ -89,7 +88,7 @@ dosched(v, c)
     if (cp == NULL) {
 	/* print list of scheduled events */
 	for (count = 1, tp = sched_ptr; tp; count++, tp = tp->t_next) {
-	    timeline = ctime(&tp->t_when);
+	    timeline = (char *) ctime(&tp->t_when);
 	    timeline[16] = '\0';
 	    xprintf("%6d\t%s\t", count, timeline);
 	    blkpr(tp->t_lex);

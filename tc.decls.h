@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.decls.h,v 3.10 1991/12/14 20:45:46 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.decls.h,v 3.11 1992/01/06 22:36:56 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -169,7 +169,7 @@ extern	void		  xvsprintf	__P((char *, char *, va_list));
 /*
  * tc.prompt.c
  */
-extern	void		  printprompt	__P((int, Char *));
+extern	void		  printprompt	__P((int, char *));
 
 /*
  * tc.sched.c

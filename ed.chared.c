@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.chared.c,v 3.17 1991/11/26 04:28:26 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.chared.c,v 3.18 1991/12/19 22:34:14 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.17 1991/11/26 04:28:26 christos Exp christos $")
+RCSID("$Id: ed.chared.c,v 3.18 1991/12/19 22:34:14 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -368,7 +368,7 @@ excl_sw:
 	break;
 
     case '$':
-	if ((l = (h->Hlex).prev))
+	if ((l = (h->Hlex).prev) != 0)
 	    bend = expand_lex(buf, INBUFSIZE, l->prev->prev, 0, 0);
 	break;
 
@@ -425,7 +425,7 @@ excl_sw:
 	    }
 	    else {
 		for (i = q - p; h; h = h->Hnext) {
-		    if ((l = &h->Hlex)) {
+		    if ((l = &h->Hlex) != 0) {
 			if (!Strncmp(p + 1, l->next->word, i))
 			    break;
 		    }
@@ -453,7 +453,7 @@ excl_sw:
 	     * Dval will be fed to number.
 	     */
 	    dval = 0;
-	    if ((l = h->Hlex.prev)) {
+	    if ((l = h->Hlex.prev) != 0) {
 		for (l = l->prev; l != h->Hlex.next; l = l->prev, dval++);
 	    }
 	    if (!dval)
@@ -860,7 +860,7 @@ e_inc_search(dir)
 	    default:		/* Terminate and execute cmd */
 		endcmd[0] = ch;
 		PushMacro(endcmd);
-		/* fall through */
+		/*FALLTHROUGH*/
 
 	    case 0033:		/* ESC: Terminate */
 		ret = CC_REFRESH;
@@ -899,7 +899,7 @@ e_inc_search(dir)
 		patbuf[patlen] = '\0';
 		if (Cursor < InputBuf || Cursor > LastChar ||
 		    (ret = c_search_line(&patbuf[1], newdir)) == CC_ERROR) {
-		    LastCmd = newdir; /* avoid c_hsetpat */
+		    LastCmd = (KEYCMD) newdir; /* avoid c_hsetpat */
 		    ret = newdir == F_UP_SEARCH_HIST ?
 			e_up_search_hist(0) : e_down_search_hist(0);
 		    if (ret != CC_ERROR) {
@@ -1038,7 +1038,7 @@ v_search(dir)
 	(void) Strcpy(patbuf, tmpbuf);
 	patlen = tmplen;
     }
-    LastCmd = dir; /* avoid c_hsetpat */
+    LastCmd = (KEYCMD) dir; /* avoid c_hsetpat */
     Cursor = LastChar = InputBuf;
     if ((dir == F_UP_SEARCH_HIST ? e_up_search_hist(0) : 
 				   e_down_search_hist(0)) == CC_ERROR) {
@@ -2256,7 +2256,7 @@ v_repeat_srch(c)
 	    c, patlen, short2str(patbuf));
 #endif
 
-    LastCmd = c;  /* Hack to stop c_hsetpat */
+    LastCmd = (KEYCMD) c;  /* Hack to stop c_hsetpat */
     LastChar = InputBuf;
     switch (c) {
     case F_DOWN_SEARCH_HIST:

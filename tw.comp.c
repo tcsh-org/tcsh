@@ -1,4 +1,4 @@
-/* $Header$ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.comp.c,v 1.1 1992/01/16 13:07:59 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 3.18 1991/12/19 21:40:06 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.1 1992/01/16 13:07:59 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -48,6 +48,9 @@ static struct varent completions;
 static int 	tw_result	__P((Char *, Char *));
 static void	tw_tok		__P((Char **, Char *));
 
+/* docomplete():
+ *	Add or list completions in the completion list
+ */
 /*ARGSUSED*/
 void
 docomplete(v, t)
@@ -68,8 +71,12 @@ docomplete(v, t)
     }
     else
 	set1(strip(p), saveblk(v), &completions);
-}
+} /* end docomplete */
 
+
+/* douncomplete():
+ *	Remove completions from the completion list
+ */
 /*ARGSUSED*/
 void
 douncomplete(v, t)
@@ -77,7 +84,8 @@ douncomplete(v, t)
     struct command *t;
 {
     unset1(v, &completions);
-}
+} /* end douncomplete */
+
 
 /* tw_tok():
  *	Return the next word from string, unquoteing it.
@@ -110,14 +118,23 @@ tw_result(act, pat)
 
     if ((act[0] & ~QUOTE) == '=') {
 	switch (act[1] & ~QUOTE) {
+	case 'a':
+	    looking = TW_ALIAS;
+	    break;
+	case 'e':
+	    looking = TW_ENVVAR;
+	    break;
+	case 's':
+	    looking = TW_SHELLVAR;
+	    break;
+	case 'v':
+	    looking = TW_VARIABLE;
+	    break;
 	case 'f':
 	    looking = TW_FILE;
 	    break;
 	case 'd':
 	    looking = TW_DIRECTORY;
-	    break;
-	case 'v':
-	    looking = TW_SHELLVAR;
 	    break;
 	case 'u':
 	    looking = TW_USER;
@@ -127,21 +144,21 @@ tw_result(act, pat)
 	    break;
 	case '$':
 	    copyn(pat, &act[2], MAXPATHLEN);
-	    strip(pat);
+	    (void) strip(pat);
 	    return(TW_VARLIST);
 	default:
 	    copyn(pat, act, MAXPATHLEN);
-	    strip(pat);
+	    (void) strip(pat);
 	    return(TW_LITERAL);
 	}
 	if ((act[2] & ~QUOTE) == ':') {
 	    copyn(pat, &act[3], MAXPATHLEN);
-	    strip(pat);
+	    (void) strip(pat);
 	}
 	return looking;
     }
     copyn(pat, act, MAXPATHLEN);
-    strip(pat);
+    (void) strip(pat);
     return(TW_LITERAL);
 } /* end tw_result */
 		

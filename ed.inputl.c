@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.inputl.c,v 3.14 1991/12/19 21:40:06 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.inputl.c,v 3.15 1991/12/19 22:34:14 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.14 1991/12/19 21:40:06 christos Exp christos $")
+RCSID("$Id: ed.inputl.c,v 3.15 1991/12/19 22:34:14 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -156,11 +156,11 @@ Inputl()
 
 	case CC_REFRESH:
 	    Refresh();
-	    /* fall through */
+	    /*FALLTHROUGH*/
 	case CC_NORM:		/* normal char */
 	    Argument = 1;
 	    DoingArg = 0;
-	    /* fall through */
+	    /*FALLTHROUGH*/
 	case CC_ARGHACK:	/* Suggested by Rich Salz */
 	    /* <rsalz@pineapple.bbn.com> */
 	    break;		/* keep going... */
@@ -197,7 +197,7 @@ Inputl()
 		    CorrChar = LastChar;	/* Save the corrected end */
 		    LastChar = InputBuf;	/* Null the current line */
 		    Beep();
-		    printprompt(2, Change);
+		    printprompt(2, short2str(Change));
 		    Refresh();
 		    (void) read(SHIN, (char *) &tch, 1);
 		    ch = tch;
@@ -206,7 +206,7 @@ Inputl()
 			xprintf("yes\n");
 		    }
 		    else {
-			(void) copyn(InputBuf, Origin, INBUFSIZE);
+			copyn(InputBuf, Origin, INBUFSIZE);
 			LastChar = SaveChar;
 			if (ch == 'e') {
 			    xprintf("edit\n");
@@ -534,7 +534,7 @@ GetNextCommand(cmdnum, ch)
 	    return num;
 	}
 #ifdef	KANJI
-	if (*ch & META) {
+	if (!adrof(STRnokanji) && (*ch & META)) {
 	    MetaNext = 0;
 	    cmd = CcViMap[' '];
 	    break;

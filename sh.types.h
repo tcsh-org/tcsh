@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.types.h,v 3.16 1991/12/14 20:45:46 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.types.h,v 3.17 1992/01/06 22:36:56 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -78,14 +78,16 @@
 #  define _SPEED_T
 # endif /* _SPEED_T */
 # ifndef SUNOS4
-#  ifndef _UID_T
-#   define _UID_T
-     typedef int uid_t;
-#  endif /* _UID_T */
-#  ifndef _GID_T
-#   define _GID_T
-     typedef int gid_t;
-#  endif /* _GID_T */
+#  ifndef MACH
+#   ifndef _UID_T
+#    define _UID_T
+      typedef int uid_t;
+#   endif /* _UID_T */
+#   ifndef _GID_T
+#    define _GID_T
+      typedef int gid_t;
+#   endif /* _GID_T */
+#  endif /* !MACH */
 # endif /* !SUNOS4 */
 #endif /* sun */
 

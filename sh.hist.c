@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.hist.c,v 1.3 91/09/24 17:09:36 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.hist.c,v 3.2 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.2 1991/10/12 04:23:51 christos Exp $")
 
 #include "tc.h"
 
@@ -75,7 +75,7 @@ savehist(sp)
 	    histlen = histlen * 10 + *p++ - '0';
 	}
     }
-    for (hp = &Histlist; np = hp->Hnext;)
+    for (hp = &Histlist; (np = hp->Hnext) != NULL;)
 	if (eventno - np->Href >= histlen || histlen == 0)
 	    hp->Hnext = np->Hnext, hfree(np);
 	else

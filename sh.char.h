@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.char.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.char.h,v 3.1 1991/11/26 04:41:23 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -65,8 +65,14 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 #define	_CMD	0x2000		/* lex end of command chars, ;&(|` */
 #define _CTR	0x4000		/* control */
 
+#if defined(SHORT_STRINGS) && defined(KANJI)
+#define cmap(c, bits)	\
+	((((c) & QUOTE) || (c>127 && adrof(STRnokanji))) ? \
+	0 : (_cmap[(unsigned char)(c)] & (bits)))
+#else
 #define cmap(c, bits)	\
 	(((c) & QUOTE) ? 0 : (_cmap[(unsigned char)(c)] & (bits)))
+#endif
 
 #define isglob(c)	cmap(c, _GLOB)
 #define isspc(c)	cmap(c, _SP)

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.c,v 3.20 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.c,v 3.21 1992/01/06 22:36:56 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.20 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: sh.c,v 3.21 1992/01/06 22:36:56 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -88,30 +88,32 @@ jmp_buf reslab;
 int do_logout;
 #endif				/* TESLA */
 
-Char   *dumphist[] = {STRhistory, STRmh, 0, 0};
-Char   *loadhist[] = {STRsource, STRmh, STRtildothist, 0};
+static Char   *dumphist[] = {STRhistory, STRmh, 0, 0};
+static Char   *loadhist[] = {STRsource, STRmh, STRtildothist, 0};
 
 #ifdef CSHDIRS
-Char   *loaddirs[] = {STRsource, STRdirfile, 0};
-bool    dflag = 0;
+static Char   *loaddirs[] = {STRsource, STRdirfile, 0};
+static bool    dflag = 0;
 #endif
 
 #if defined(convex) || defined(__convex__)
 bool    use_fork = 0;		/* use fork() instead of vfork()? */
 #endif
 
-int     nofile = 0;
-bool    reenter = 0;
-bool    nverbose = 0;
-bool    nexececho = 0;
-bool    quitit = 0;
+static int     nofile = 0;
+static bool    reenter = 0;
+static bool    nverbose = 0;
+static bool    nexececho = 0;
+static bool    quitit = 0;
 bool    fast = 0;
-bool    batch = 0;
-bool    mflag = 0;
-bool    prompt = 1;
-bool    enterhist = 0;
+static bool    batch = 0;
+static bool    mflag = 0;
+static bool    prompt = 1;
+static bool    enterhist = 0;
 bool    tellwhat = 0;
 time_t  t_period;
+static time_t  chktim;		/* Time mail last checked */
+static int     gid;		/* Invokers gid */
 
 extern char **environ;
 
@@ -172,6 +174,15 @@ main(argc, argv)
 	quitit = 1;
     uid = getuid();
     gid = getgid();
+#ifdef OREO
+    /*
+     * We are a login shell if: 1. we were invoked as -<something> with
+     * optional arguments 2. or we were invoked only with the -l flag
+     */
+    loginsh = (**tempv == '-') || (argc == 2 &&
+				   tempv[1][0] == '-' && tempv[1][1] == 'l' &&
+						tempv[1][2] == '\0');
+#else
     /*
      * We are a login shell if: 1. we were invoked as -<something> and we had
      * no arguments 2. or we were invoked only with the -l flag
@@ -179,6 +190,7 @@ main(argc, argv)
     loginsh = (**tempv == '-' && argc == 1) || (argc == 2 &&
 				   tempv[1][0] == '-' && tempv[1][1] == 'l' &&
 						tempv[1][2] == '\0');
+#endif
     if (loginsh && **tempv != '-') {
 	/*
 	 * Mangle the argv space
@@ -1275,7 +1287,8 @@ rechist()
 	if (shist = adrof(STRsavehist)) {
 	    if (shist->vec[0][0] != '\0')
 		(void) Strcpy(hbuf, shist->vec[0]);
-	    else if ((shist = adrof(STRhistory)) && shist->vec[0][0] != '\0')
+	    else if ((shist = adrof(STRhistory)) != 0 && 
+		     shist->vec[0][0] != '\0')
 		(void) Strcpy(hbuf, shist->vec[0]);
 	    else
 		return;
@@ -1387,7 +1400,7 @@ int snum;
 #endif
 }
 
-Char   *jobargv[2] = {STRjobs, 0};
+static Char   *jobargv[2] = {STRjobs, 0};
 
 /*
  * Catch an interrupt, e.g. during lexical input.
@@ -1466,9 +1479,9 @@ pintr1(wantnl)
     if (gointr) {
 	gotolab(gointr);
 	timflg = 0;
-	if (v = pargv)
+	if ((v = pargv) != 0)
 	    pargv = 0, blkfree(v);
-	if (v = gargv)
+	if ((v = gargv) != 0)
 	    gargv = 0, blkfree(v);
 	reset();
     }
@@ -1494,7 +1507,7 @@ pintr1(wantnl)
  * Note that if catch is not set then we will unwind on any error.
  * If an end-of-file occurs, we return.
  */
-struct command *savet = NULL;
+static struct command *savet = NULL;
 void
 process(catch)
     bool    catch;
