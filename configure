@@ -1392,139 +1392,6 @@ fi
 
 
 
-ac_tr_lib=HAVE_`echo getaddrinfo | sed -e 's/[^a-zA-Z0-9_]/_/g' \
-  -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-echo $ac_n "checking for getaddrinfo""... $ac_c" 1>&6
-echo "configure:1399: checking for getaddrinfo" >&5
-if eval "test \"`echo '$''{'ac_cv_func_getaddrinfo'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  cat > conftest.$ac_ext <<EOF
-#line 1404 "configure"
-#include "confdefs.h"
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char getaddrinfo(); below.  */
-#include <assert.h>
-/* Override any gcc2 internal prototype to avoid an error.  */
-/* We use char because int might match the return type of a gcc2
-    builtin and then its argument prototype would still apply.  */
-char getaddrinfo();
-
-int main() {
-
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub_getaddrinfo) || defined (__stub___getaddrinfo)
-choke me
-#else
-getaddrinfo();
-#endif
-
-; return 0; }
-EOF
-if { (eval echo configure:1427: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
-  rm -rf conftest*
-  eval "ac_cv_func_getaddrinfo=yes"
-else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  eval "ac_cv_func_getaddrinfo=no"
-fi
-rm -f conftest*
-fi
-
-if eval "test \"`echo '$ac_cv_func_'getaddrinfo`\" = yes"; then
-  echo "$ac_t""yes" 1>&6
-    cat >> confdefs.h <<EOF
-#define $ac_tr_lib 1
-EOF
-
-  ac_cv_lib_inet6_getaddrinfo=no
-else
-  echo "$ac_t""no" 1>&6
-  echo $ac_n "checking whether your system has IPv6 directory""... $ac_c" 1>&6
-echo "configure:1449: checking whether your system has IPv6 directory" >&5
-  if eval "test \"`echo '$''{'ipv6_cv_dir'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-      for ipv6_cv_dir in /usr/local/v6 /usr/inet6 no; do
-      if test $ipv6_cv_dir = no -o -d $ipv6_cv_dir; then
-	break
-      fi
-    done
-fi
-  echo "$ac_t""$ipv6_cv_dir" 1>&6
-  if test $ipv6_cv_dir = no; then
-    ac_cv_lib_inet6_getaddrinfo=no
-  else
-    if test x$ipv6_libinet6 = x; then
-      ipv6_libinet6=no
-      SAVELDFLAGS="$LDFLAGS"
-      LDFLAGS="-L$ipv6_cv_dir/lib"
-    fi
-    echo $ac_n "checking for getaddrinfo in -linet6""... $ac_c" 1>&6
-echo "configure:1469: checking for getaddrinfo in -linet6" >&5
-ac_lib_var=`echo inet6'_'getaddrinfo | sed 'y%./+-%__p_%'`
-if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  ac_save_LIBS="$LIBS"
-LIBS="-linet6  $LIBS"
-cat > conftest.$ac_ext <<EOF
-#line 1477 "configure"
-#include "confdefs.h"
-/* Override any gcc2 internal prototype to avoid an error.  */
-/* We use char because int might match the return type of a gcc2
-    builtin and then its argument prototype would still apply.  */
-char getaddrinfo();
-
-int main() {
-getaddrinfo()
-; return 0; }
-EOF
-if { (eval echo configure:1488: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
-  rm -rf conftest*
-  eval "ac_cv_lib_$ac_lib_var=yes"
-else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  eval "ac_cv_lib_$ac_lib_var=no"
-fi
-rm -f conftest*
-LIBS="$ac_save_LIBS"
-
-fi
-if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
-  echo "$ac_t""yes" 1>&6
-        cat >> confdefs.h <<EOF
-#define $ac_tr_lib 1
-EOF
-
-      if test $ipv6_libinet6 = no; then
-	ipv6_libinet6=yes
-	LIBS="$LIBS -linet6"
-      fi
-else
-  echo "$ac_t""no" 1>&6
-fi
-    if test $ipv6_libinet6 = no; then
-      LDFLAGS="$SAVELDFLAGS"
-    fi
-  fi
-fi
-if test $ac_cv_func_getaddrinfo = yes -o $ac_cv_lib_inet6_getaddrinfo = yes
-then
-  ipv6_cv_getaddrinfo=yes
-  DFLAGS="$DFLAGS -DINET6"
-else
-  ipv6_cv_getaddrinfo=no
-  :
-fi
-
-
 
 # Check whether --with-hesiod or --without-hesiod was given.
 if test "${with_hesiod+set}" = set; then
@@ -1537,12 +1404,12 @@ fi
 if test "$hesiod" != no; then
   HESLIB="-lhesiod"
   echo $ac_n "checking for res_send""... $ac_c" 1>&6
-echo "configure:1541: checking for res_send" >&5
+echo "configure:1408: checking for res_send" >&5
 if eval "test \"`echo '$''{'ac_cv_func_res_send'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1546 "configure"
+#line 1413 "configure"
 #include "confdefs.h"
 /* System header to define __stub macros and hopefully few prototypes,
     which can conflict with char res_send(); below.  */
@@ -1565,7 +1432,7 @@ res_send();
 
 ; return 0; }
 EOF
-if { (eval echo configure:1569: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1436: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_func_res_send=yes"
 else
@@ -1583,7 +1450,7 @@ if eval "test \"`echo '$ac_cv_func_'res_send`\" = yes"; then
 else
   echo "$ac_t""no" 1>&6
 echo $ac_n "checking for res_send in -lresolv""... $ac_c" 1>&6
-echo "configure:1587: checking for res_send in -lresolv" >&5
+echo "configure:1454: checking for res_send in -lresolv" >&5
 ac_lib_var=`echo resolv'_'res_send | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1591,7 +1458,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lresolv  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1595 "configure"
+#line 1462 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1602,7 +1469,7 @@ int main() {
 res_send()
 ; return 0; }
 EOF
-if { (eval echo configure:1606: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1473: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else

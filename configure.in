@@ -247,50 +247,51 @@ AC_SEARCH_LIBS(tgetent, termlib curses termcap)
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(connect, socket)
 
+dnl This is not good enough; we need sockaddr_storage too.
 dnl See whether we can use IPv6 related functions
-AC_DEFUN(IPv6_CHECK_FUNC, [
-changequote(, )dnl
-ac_tr_lib=HAVE_`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
-  -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-changequote([, ])dnl
-AC_CHECK_FUNC($1, [dnl
-  AC_DEFINE_UNQUOTED($ac_tr_lib)
-  ac_cv_lib_inet6_$1=no], [dnl
-  AC_MSG_CHECKING([whether your system has IPv6 directory])
-  AC_CACHE_VAL(ipv6_cv_dir, [dnl
-    for ipv6_cv_dir in /usr/local/v6 /usr/inet6 no; do
-      if test $ipv6_cv_dir = no -o -d $ipv6_cv_dir; then
-	break
-      fi
-    done])dnl
-  AC_MSG_RESULT($ipv6_cv_dir)
-  if test $ipv6_cv_dir = no; then
-    ac_cv_lib_inet6_$1=no
-  else
-    if test x$ipv6_libinet6 = x; then
-      ipv6_libinet6=no
-      SAVELDFLAGS="$LDFLAGS"
-      LDFLAGS="-L$ipv6_cv_dir/lib"
-    fi
-    AC_CHECK_LIB(inet6, $1, [dnl
-      AC_DEFINE_UNQUOTED($ac_tr_lib)
-      if test $ipv6_libinet6 = no; then
-	ipv6_libinet6=yes
-	LIBS="$LIBS -linet6"
-      fi],)dnl
-    if test $ipv6_libinet6 = no; then
-      LDFLAGS="$SAVELDFLAGS"
-    fi
-  fi])dnl
-if test $ac_cv_func_$1 = yes -o $ac_cv_lib_inet6_$1 = yes
-then
-  ipv6_cv_$1=yes
-  ifelse([$2], , :, [$2])
-else
-  ipv6_cv_$1=no
-  ifelse([$3], , :, [$3])
-fi])
-IPv6_CHECK_FUNC(getaddrinfo, DFLAGS="$DFLAGS -DINET6")
+dnl AC_DEFUN(IPv6_CHECK_FUNC, [
+dnl changequote(, )dnl
+dnl ac_tr_lib=HAVE_`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
+dnl   -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+dnl changequote([, ])dnl
+dnl AC_CHECK_FUNC($1, [dnl
+dnl   AC_DEFINE_UNQUOTED($ac_tr_lib)
+dnl   ac_cv_lib_inet6_$1=no], [dnl
+dnl   AC_MSG_CHECKING([whether your system has IPv6 directory])
+dnl   AC_CACHE_VAL(ipv6_cv_dir, [dnl
+dnl     for ipv6_cv_dir in /usr/local/v6 /usr/inet6 no; do
+dnl       if test $ipv6_cv_dir = no -o -d $ipv6_cv_dir; then
+dnl 	break
+dnl       fi
+dnl     done])dnl
+dnl   AC_MSG_RESULT($ipv6_cv_dir)
+dnl   if test $ipv6_cv_dir = no; then
+dnl     ac_cv_lib_inet6_$1=no
+dnl   else
+dnl     if test x$ipv6_libinet6 = x; then
+dnl       ipv6_libinet6=no
+dnl       SAVELDFLAGS="$LDFLAGS"
+dnl       LDFLAGS="-L$ipv6_cv_dir/lib"
+dnl     fi
+dnl     AC_CHECK_LIB(inet6, $1, [dnl
+dnl       AC_DEFINE_UNQUOTED($ac_tr_lib)
+dnl       if test $ipv6_libinet6 = no; then
+dnl 	ipv6_libinet6=yes
+dnl 	LIBS="$LIBS -linet6"
+dnl       fi],)dnl
+dnl     if test $ipv6_libinet6 = no; then
+dnl       LDFLAGS="$SAVELDFLAGS"
+dnl     fi
+dnl   fi])dnl
+dnl if test $ac_cv_func_$1 = yes -o $ac_cv_lib_inet6_$1 = yes
+dnl then
+dnl   ipv6_cv_$1=yes
+dnl   ifelse([$2], , :, [$2])
+dnl else
+dnl   ipv6_cv_$1=no
+dnl   ifelse([$3], , :, [$3])
+dnl fi])
+dnl IPv6_CHECK_FUNC(getaddrinfo, DFLAGS="$DFLAGS -DINET6")
 
 AC_SUBST(DFLAGS)
 

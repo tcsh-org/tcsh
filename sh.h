@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.90 2000/07/04 19:41:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.91 2000/11/11 23:03:37 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -393,6 +393,9 @@ typedef int sigret_t;
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <sys/socket.h>
+# if defined(_SS_SIZE) || defined(_SS_MAXSIZE)
+#  define INET6
+# endif
 # include <sys/uio.h>	/* For struct iovec */
 #endif /* REMOTEHOST */
 
