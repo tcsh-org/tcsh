@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.decls.h,v 3.33 2004/11/20 18:23:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.decls.h,v 3.34 2004/11/21 04:38:03 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -81,7 +81,7 @@ extern	void	tty_setdisc		__P((int, int));
  * ed.screen.c
  */
 extern	void	terminit		__P((void));
-extern	void	SetAttributes		__P((int));
+extern	void	SetAttributes		__P((Char));
 extern	void	so_write		__P((eChar *, int));
 extern	void	ClearScreen		__P((void));
 extern	void	MoveToLine		__P((int));

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.76 2004/11/20 20:30:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.77 2004/11/21 04:38:03 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.76 2004/11/20 20:30:46 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.77 2004/11/21 04:38:03 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -139,9 +139,9 @@ static  CCRETVAL c_search_line		__P((Char *, int));
 static  CCRETVAL v_repeat_srch		__P((int));
 static	CCRETVAL e_inc_search		__P((int));
 static	CCRETVAL v_search		__P((int));
-static	CCRETVAL v_csearch_fwd		__P((int, int, int));
+static	CCRETVAL v_csearch_fwd		__P((Char, int, int));
 static	CCRETVAL v_action		__P((int));
-static	CCRETVAL v_csearch_back		__P((int, int, int));
+static	CCRETVAL v_csearch_back		__P((Char, int, int));
 
 #if defined(DSPMBYTE)
 static	void 	 e_charfwd_mbyte	__P((int));
@@ -861,7 +861,7 @@ c_endword(p, high, n, delim)
     Char *p, *high, *delim;
     int n;
 {
-    int inquote = 0;
+    Char inquote = 0;
     p++;
 
     while (n--) {
@@ -3189,7 +3189,8 @@ v_repeat_srch(c)
 
 static CCRETVAL
 v_csearch_back(ch, count, tflag)
-    int ch, count, tflag;
+    Char ch;
+    int count, tflag;
 {
     Char *cp;
 
@@ -3221,7 +3222,8 @@ v_csearch_back(ch, count, tflag)
 
 static CCRETVAL
 v_csearch_fwd(ch, count, tflag)
-    int ch, count, tflag;
+    Char ch;
+    int count, tflag;
 {
     Char *cp;
 

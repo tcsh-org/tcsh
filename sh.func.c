@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.117 2004/08/08 06:42:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.118 2004/11/20 18:25:26 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.117 2004/08/08 06:42:28 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.118 2004/11/20 18:25:26 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2066,7 +2066,7 @@ limtail(cp, str)
     const char *sp;
 
     sp = str;
-    while (*cp && *cp == *str)
+    while (*cp && *cp == (Char)*str)
 	cp++, str++;
     if (*cp)
 	stderror(ERR_BADSCALE, sp);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.29 2004/08/04 17:12:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.30 2004/08/08 06:42:28 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.29 2004/08/04 17:12:30 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.30 2004/08/08 06:42:28 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -50,7 +50,7 @@ any(s, c)
     if (!s)
 	return (0);		/* Check for nil pointer */
     while (*s)
-	if (*s++ == c)
+	if ((Char)*s++ == c)
 	    return (1);
     return (0);
 }

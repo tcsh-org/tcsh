@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.55 2004/08/04 17:17:40 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.56 2004/11/21 04:38:03 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.55 2004/08/04 17:17:40 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.56 2004/11/21 04:38:03 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -998,7 +998,7 @@ static Char cur_atr = 0;	/* current attributes */
 
 void
 SetAttributes(atr)
-    int     atr;
+    Char     atr;
 {
     atr &= ATTRIBUTES;
     if (atr != cur_atr) {

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.58 2004/11/20 17:40:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.59 2004/11/21 04:29:39 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.58 2004/11/20 17:40:36 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.59 2004/11/21 04:29:39 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -927,7 +927,7 @@ backeval(cp, literal)
 		eof = 0;
 		if (icnt <= 0) {
 		    if (tmp == tibuf) {
-		        c = -1;
+		        c = 0;
 			break;
 		    }
 		    icnt = 0;
@@ -992,10 +992,10 @@ backeval(cp, literal)
 	 * If we didn't make empty words here when literal was set then we
 	 * would lose blank lines.
 	 */
-	if (c != -1 && (cnt || literal))
+	if (c != 0 && (cnt || literal))
 	    pword(BUFSIZE);
 	hadnl = 0;
-    } while (c >= 0);
+    } while (c > 0);
     (void) close(pvec[0]);
     pwait();
     prestjob();
