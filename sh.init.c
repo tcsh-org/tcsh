@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.2 1991/07/24 21:46:36 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.3 1991/07/29 21:22:46 christos Exp christos $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.init.c,v 3.2 1991/07/24 21:46:36 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.3 1991/07/29 21:22:46 christos Exp christos $")
 
 #include "sh.h"
 #include "ed.h"
@@ -44,7 +44,7 @@ RCSID("$Id: sh.init.c,v 3.2 1991/07/24 21:46:36 christos Exp $")
  * C shell
  */
 
-#define	INF	1000
+#define	INF	0x7fffffff
 
 struct	biltins bfunc[] = {
     { "@",	dolet,		0,	INF, },
