@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.22 1993/10/30 19:56:51 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.24 1994/04/19 13:42:12 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.22 1993/10/30 19:56:51 christos Exp christos $")
+RCSID("$Id: sh.exp.c,v 3.24 1994/04/19 13:42:12 christos Exp $")
 
 /*
  * C shell
@@ -149,7 +149,7 @@ sh_access(fname, mode)
 
 # ifdef NGROUPS_MAX
     else {
-#  if defined(__386BSD__) || defined(BSD4_4)
+#  if (defined(__386BSD__) || defined(BSD4_4)) && !defined(__NetBSD__)
     /*
      * These two decided that setgroup() should take an array of int's
      * and they define _SC_NGROUPS_MAX without having sysconf
