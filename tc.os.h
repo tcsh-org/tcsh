@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.0 1991/07/05 00:06:03 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -209,7 +209,6 @@ struct ucred {
 #endif /* L_XTND */
 
 #ifdef _SEQUENT_
-# include <sys/procstats.h>
 # define NEEDgethostname
 #endif /* _SEQUENT_ */
 
