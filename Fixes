@@ -1,4 +1,5 @@
 V6.04.00, ...
+ 54. 6.03.05 04/26/93
  53. Added complete-word-fwd and complete-word-back that scroll through
      the list of possible completions... Neat addition from 
      jfink@csugrad.cs.vt.edu (Jeff "$DOTDIR" Fink)
