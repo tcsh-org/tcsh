@@ -1,3 +1,4 @@
+ 21. V6.07.04 - 05/04/97
  20. set -f -l patch (Michael Veksler)
  19. SGI patches (Tomasz J. Cholewo). Also fix completion code to take into
      account aliases that start with a period.
