@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.38 1992/10/14 20:19:19 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.39 1992/11/13 04:19:10 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -607,7 +607,7 @@ extern int readlink __P((const char *, char *, size_t));
 # endif /* SUNOS4 && __GNUC__ == 2 */
 
 #if (defined(BSD) && !defined(__386BSD__))  || defined(SUNOS4) 
-extern void bcopy	__P((char *, char *, int));
+extern void bcopy	__P((const void *, void *, size_t));
 # define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
 #endif
 
