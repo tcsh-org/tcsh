@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.51 2004/11/20 20:30:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.52 2004/12/25 21:15:08 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.51 2004/11/20 20:30:47 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.52 2004/12/25 21:15:08 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -218,7 +218,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    cz = (const unsigned char *) str;
 		if (cz != NULL)
 		    for (; *cz && p < ep; p++) {
-			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			cz += one_mbtowc(p, (const char *)cz, MB_LEN_MAX);
 			*p |= attributes;
 		    }
 		break;
@@ -241,7 +241,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    break;
 		}
 		for (cz = cbuff; *cz && p < ep; p++) {
-		    cz += one_mbtowc(p, cz, MB_LEN_MAX);
+		    cz += one_mbtowc(p, (const char *)cz, MB_LEN_MAX);
 		    *p |= attributes;
 		}
 		break;
@@ -311,7 +311,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		 */
 		if (cz != NULL)
 		    for (; *cz && p < ep; p++) {
-			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			cz += one_mbtowc(p, (const char *)cz, MB_LEN_MAX);
 			*p |= attributes;
 		    }
 		break;
@@ -328,7 +328,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		if (cz != NULL)
 		    for (; *cz && (what == FMT_WHO || *cz != '.') && p < ep;
 			 p++) {
-			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			cz += one_mbtowc(p, (const char *)cz, MB_LEN_MAX);
 			*p |= attributes;
 		    }
 		break;
@@ -454,7 +454,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    cz = (const unsigned char *) who_info(info, 'n',
 			(char *) cbuff, sizeof(cbuff));
 		    for (; *cz && p < ep; p++) {
-			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			cz += one_mbtowc(p, (const char *)cz, MB_LEN_MAX);
 			*p |= attributes;
 		    }
 		}
@@ -472,7 +472,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    cz = (const unsigned char *) who_info(info, 'l',
 			(char *) cbuff, sizeof(cbuff));
 		    for (; *cz && p < ep; p++) {
-			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			cz += one_mbtowc(p, (const char *)cz, MB_LEN_MAX);
 			*p |= attributes;
 		    }
 		}
@@ -487,7 +487,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'd':
 		for (cz = (const unsigned char *) day_list[t->tm_wday];
 		     *cz && p < ep; p++) {
-		    cz += one_mbtowc(p, cz, MB_LEN_MAX);
+		    cz += one_mbtowc(p, (const char *)cz, MB_LEN_MAX);
 		    *p |= attributes;
 		}
 		break;
@@ -499,7 +499,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		if (p >= ep - 5) break;
 		for (cz = (const unsigned char *) month_list[t->tm_mon];
 		    *cz && p < ep; p++) {
-		    cz += one_mbtowc(p, cz, MB_LEN_MAX);
+		    cz += one_mbtowc(p, (const char *)cz, MB_LEN_MAX);
 		    *p |= attributes;
 		}
 		break;
@@ -584,7 +584,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    cz = (const unsigned char *) who_info(info, 'a',
 			(char *) cbuff, sizeof(cbuff));
 		    for (; *cz && p < ep; p++) {
-			cz += one_mbtowc(p, cz, MB_LEN_MAX);
+			cz += one_mbtowc(p, (const char *)cz, MB_LEN_MAX);
 			*p |= attributes;
 		    }
 		}
@@ -606,7 +606,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    else
 		(void) xsnprintf((char *) cbuff, sizeof(cbuff), "%d", eventno + 1);
 	    for (cz = cbuff; *cz && p < ep; p++) {
-		cz += one_mbtowc(p, cz, MB_LEN_MAX);
+		cz += one_mbtowc(p, (const char *)cz, MB_LEN_MAX);
 		*p |= attributes;
 	    }
 	}

@@ -388,7 +388,7 @@ glob(pattern, flags, errfunc, pglob)
 #ifdef WIDE_STRINGS
 	    int len;
 	    
-	    len = mblen(patnext - 1, MB_LEN_MAX);
+	    len = mblen((const char *)(patnext - 1), MB_LEN_MAX);
 	    if (len == -1)
 		mblen(NULL, 0);
 	    if (len > 1) {
