@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.70 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.71 1995/03/12 04:49:26 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.70 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.71 1995/03/12 04:49:26 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -267,7 +267,7 @@ tenematch(inputline, num_read, command)
 
     if ((looking == TW_COMMAND || looking == TW_ZERO) &&
         (command == RECOGNIZE || command == LIST || command == SPELL ||
-	 command == RECOGNIZE_SCROLL || command == RECOGNIZE_ALL)) {
+	 command == RECOGNIZE_SCROLL)) {
 #ifdef TDEBUG
 	xprintf(CGETS(30, 2, "complete %d "), looking);
 #endif
@@ -283,11 +283,9 @@ tenematch(inputline, num_read, command)
 	Char   *items[2], **ptr;
 	int     i, count;
 
-    case RECOGNIZE_ALL:
-	pat = NULL;
-	/*FALLTHROUGH*/
     case RECOGNIZE:
     case RECOGNIZE_SCROLL:
+    case RECOGNIZE_ALL:
 	if (adrof(STRautocorrect)) {
 	    if ((slshp = Strrchr(wordp, '/')) != NULL && slshp[1] != '\0') {
 		SearchNoDirErr = 1;
@@ -403,10 +401,8 @@ tenematch(inputline, num_read, command)
 	    return -1;		/* error inserting */
 	return 1;
 
-    case LIST_ALL:
-	pat = NULL;
-	/*FALLTHROUGH*/
     case LIST:
+    case LIST_ALL:
 	search_ret = t_search(wordp, wp, LIST, space_left, looking, 1, 
 			      pat, suf);
 	return search_ret;
@@ -867,15 +863,19 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 
     flags = 0;
 
-    if ((vp = adrof(STRshowdots)) != NULL) {
-	if (vp->vec[0][0] == '-' && vp->vec[0][1] == 'A' &&
-	    vp->vec[0][2] == '\0')
-	    showdots = DOT_NOT;
-	else
-	    showdots = DOT_ALL;
-    }
-    else
-	showdots = DOT_NONE;
+    showdots = DOT_NONE;
+    if ((ptr = varval(STRlistflags)) != STRNULL)
+	while (*ptr) 
+	    switch (*ptr++) {
+	    case 'a':
+		showdots = DOT_ALL;
+		break;
+	    case 'A':
+		showdots = DOT_NOT;
+		break;
+	    default:
+		break;
+	    }
 
     while (!done && (item = (*tw_next_entry[looking])(exp_dir, &flags))) {
 #ifdef TDEBUG
@@ -1326,7 +1326,11 @@ tw_list_items(looking, numitems, list_max)
 	/* We should be in Rawmode here, so no \n to catch */
 	(void) read(SHIN, &tc, 1);
 	xprintf("%c\r\n", tc);	/* echo the char, do a newline */
-	if ((tc != 'y') && (tc != 'Y'))
+	/* 
+	 * Perhaps we should use the yesexpr from the
+	 * actual locale
+	 */
+	if (strchr(CGETS(30, 13, "Yy"), tc) == NULL)
 	    return;
     }
 
@@ -1998,7 +2002,9 @@ find_rows(items, count, no_file_suffix)
 
 
 /* print_by_column():
- * 	Print sorted down columns
+ * 	Print sorted down columns or across columns when the first
+ *	word of $listflags shell variable contains 'x'.
+ *
  */
 void
 print_by_column(dir, items, count, no_file_suffix)
@@ -2007,8 +2013,14 @@ print_by_column(dir, items, count, no_file_suffix)
 {
     register int i, r, c, columns, rows;
     unsigned int w, maxwidth = 0;
+    Char *val;
+    bool across;
 
     lbuffed = 0;		/* turn off line buffering */
+
+    
+    across = ((val = varval(STRlistflags)) != STRNULL) && 
+	     (Strchr(val, 'x') != NULL);
 
     for (i = 0; i < count; i++)	/* find widest string */
 	maxwidth = max(maxwidth, (unsigned int) Strlen(items[i]));
@@ -2019,9 +2031,10 @@ print_by_column(dir, items, count, no_file_suffix)
 	columns = 1;
     rows = (count + (columns - 1)) / columns;
 
+    i = -1;
     for (r = 0; r < rows; r++) {
 	for (c = 0; c < columns; c++) {
-	    i = c * rows + r;
+	    i = across ? (i + 1) : (c * rows + r);
 
 	    if (i < count) {
 		w = (unsigned int) Strlen(items[i]);
@@ -2041,6 +2054,8 @@ print_by_column(dir, items, count, no_file_suffix)
 		    for (; w < maxwidth; w++)
 			xputchar(' ');
 	    }
+	    else if (across)
+		break;
 	}
 	if (Tty_raw_mode)
 	    xputchar('\r');

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.misc.c,v 3.19 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.misc.c,v 3.20 1994/05/07 18:51:25 christos Exp christos $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.19 1993/08/11 16:25:52 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.20 1994/05/07 18:51:25 christos Exp christos $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -265,7 +265,7 @@ closem()
 #ifdef YPBUGS
     /* suggested by Justin Bur; thanks to Karl Kleinpaste */
     fix_yp_bugs();
-#endif
+#endif /* YPBUGS */
     for (f = 0; f < NOFILE; f++)
 	if (f != SHIN && f != SHOUT && f != SHDIAG && f != OLDSTD &&
 	    f != FSHTTY 
@@ -273,7 +273,13 @@ closem()
 	    && f != 25
 #endif /* MALLOC_TRACE */
 	    )
+	  {
 	    (void) close(f);
+#ifdef NISPLUS
+	    if(f < 3)
+		(void) open(_PATH_DEVNULL, O_RDONLY);
+#endif /* NISPLUS */
+	  }
 }
 
 #ifndef CLOSE_ON_EXEC
@@ -311,6 +317,17 @@ donefds()
     (void) close(1);
     (void) close(2);
     didfds = 0;
+#ifdef NISPLUS
+    {
+	int fd = open(_PATH_DEVNULL, O_RDONLY);
+	(void) dup2(fd, 1);
+	(void) dup2(fd, 2);
+	if (fd != 0) {
+	    (void) dup2(fd, 0);
+	    (void) close(fd);
+	}
+    }
+#endif /*NISPLUS*/    
 }
 
 /*

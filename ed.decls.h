@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.decls.h,v 3.21 1994/07/08 14:43:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.decls.h,v 3.22 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -233,6 +233,7 @@ extern  CCRETVAL        e_list_all		__P((int));
 extern  CCRETVAL        e_complete_all		__P((int));
 extern  CCRETVAL        e_complete_fwd		__P((int));
 extern  CCRETVAL        e_complete_back		__P((int));
+extern  CCRETVAL        e_dabbrev_expand	__P((int));
 
 /*
  * ed.inputl.c

@@ -1,4 +1,20 @@
 V6.06.00, -
+ 69. 6.05.06 - 03/15/95
+ 68. make clean does not clobber config.h if Makefile.std is used.
+     make veryclean does.
+ 67. New config define NISPLUS. Reportedly fixes vanishing output of ~expansion
+     on solaris 2.4.
+ 66. showdots has been removed; use listflags instead. [handles -x too]
+ 65. more nls catalog fixes.
+ 64. set histchars=,. did not have any effect in .cshrc
+ 63. fix "-c command" new core dump.
+ 62. more completions from Tom
+ 61. call catclose() before exiting, so that svr4 cleans up the symlinks before
+     exiting.
+ 60. Per's fix for insert-last-word
+ 59. Per's emacs abbreviation mode.
+ 58. Makefile fixes for catalog stuff.
+ 57. fixed again complete-word-raw and list-word-raw
  56. 6.05.05 - 03/11/95
  55. Made %?str work again
  54. IRIX sigalarm problem should be fixed

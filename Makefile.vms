@@ -1,4 +1,4 @@
-# $Id: Makefile.vms,v 1.24 1995/03/12 04:49:26 christos Exp christos $
+# $Id: Makefile.vms,v 1.25 1995/03/12 04:55:11 christos Exp christos $
 #	Makefile.vms	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -228,8 +228,8 @@ EXTRALIBS = $(HESLIB) $(AFSLIB)
 
 # The -B tells gcc to use /bin/ld. This is to avoid using the gnu ld, which
 # on the suns does not know how to make dynamically linked binaries.
-#CC=	gcc -Wall -B/bin/	# -ansi -pedantic
-#CC=	gcc -m486 -Wall # Generate code for Intel 486 (linux)
+#CC=	gcc -Wall -pipe -B/bin/	# -ansi -pedantic
+#CC=	gcc -m486 -pipe -Wall # Generate code for Intel 486 (linux)
 #CC=	cc
 #CC=	occ
 #CC=	acc
@@ -299,7 +299,7 @@ AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
 	README.imake complete.tcsh vmsreadme.txt termcap.vms snames.h \
-	host.defs gethost.c tcsh.man2html tcsh.m tcsh.german.m
+	host.defs gethost.c tcsh.man2html
 
 VHSRCS=${PVSRCS} ${AVSRCS}
 
@@ -468,9 +468,10 @@ install.man: tcsh.man
 clean:
 	${RM} -f a.out strings x.c xs.c tcsh tcsh.a _MAKE_LOG core gethost
 	${RM} -f *.${SUF} sh.prof.c ed.defns.h tc.const.h sh.err.h tc.defs.c
-	${RM} -f config.h
+	${RM} -f tcsh.*.m tcsh.*.cat
 
 veryclean: clean
+	${RM} -f config.h
 	${RM} -f *~ #*
 
 tags:	/tmp
@@ -482,7 +483,7 @@ tar.Z:
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
-	tar cf - nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
+	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
 	tar cvf - tcsh-${VERSION} | compress > tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION}
 
@@ -492,7 +493,7 @@ tar.gz:
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
-	tar cf - nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
+	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
 	tar cvf - tcsh-${VERSION} | gzip > tcsh-${VERSION}.tar.gz
 	rm -rf tcsh-${VERSION}
 
@@ -502,21 +503,14 @@ shar:
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
-	tar cf - nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
+	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
 	MAKESHAR -v -n tcsh-${VERSION} tcsh-${VERSION} \
 		 tcsh-${VERSION}/?* tcsh-${VERSION}/config/?* \
 		 tcsh-${VERSION}/?*/set?*
 	rm -rf tcsh-${VERSION}
 
 catalogs:
-	@cd nls
-	@for i in *; \
-	do \
-	    echo "$i"; \
-	    cd $i; \
-	    cat set? set?? > ../../tcsh.$i.m \
-	    cd ..; \
-	done
+	@(cd nls; make catalogs)
 
 tcsh-${VERSION}.tar.Z:
 	rm -rf tcsh-${VERSION} 
@@ -528,7 +522,7 @@ tcsh-${VERSION}.tar.Z:
 	mkdir tcsh-${VERSION}/config
 	cp ${CONFSRCS} tcsh-${VERSION}/config
 	cp Makefile tcsh-${VERSION}/Makefile.new
-	tar cf - nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
+	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
 	tar cvf - tcsh-${VERSION} | compress > tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION}
 
@@ -542,7 +536,7 @@ tcsh.tahoe-${VERSION}.tar.Z:
 	mkdir tcsh.tahoe-${VERSION}/config
 	cp ${CONFSRCS} tcsh.tahoe-${VERSION}/config
 	cp Makefile tcsh.tahoe-${VERSION}/Makefile.new
-	tar cf - nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
+	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
 	tar cvf - tcsh.tahoe-${VERSION} | compress > tcsh.tahoe-${VERSION}.tar.Z
 	rm -rf tcsh.tahoe-${VERSION}
 
@@ -556,7 +550,7 @@ tcsh.reno-${VERSION}.tar.Z:
 	mkdir tcsh.reno-${VERSION}/config
 	cp ${CONFSRCS} tcsh.reno-${VERSION}/config
 	cp Makefile tcsh.reno-${VERSION}/Makefile.new
-	tar cf - nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
+	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
 	tar cvf - tcsh.reno-${VERSION} | compress > tcsh.reno-${VERSION}.tar.Z
 	rm -rf tcsh.reno-${VERSION}
 

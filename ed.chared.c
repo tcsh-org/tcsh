@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.chared.c,v 3.43 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.chared.c,v 3.44 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.43 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.44 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1867,6 +1867,7 @@ e_last_item(c)
     register struct Hist *hp;
     register struct wordent *wp, *firstp;
     register int i;
+    Char buf[INBUFSIZE];
 
     USE(c);
     if (Argument <= 0)
@@ -1884,25 +1885,101 @@ e_last_item(c)
 
     firstp = (hp->Hlex).next;
 
-    for (i = 0; i < Argument; i++) {	/* back up arg words in lex */
+    /* back up arg words in lex */
+    for (i = 0; i < Argument && wp != firstp; i++) {
 	wp = wp->prev;
-	if (wp == firstp)
-	    break;
     }
 
-    while (i > 0) {
-	cp = wp->word;
+    cp = expand_lex(buf, INBUFSIZE, wp->prev, 0, i - 1);
+    *cp = '\0';
+    if (InsertStr(buf))
+	return(CC_ERROR);
 
-	if (!cp)
-	    return(CC_ERROR);
+    return(CC_REFRESH);
+}
 
-	if (InsertStr(cp))
-	    return(CC_ERROR);
+/*ARGSUSED*/
+CCRETVAL
+e_dabbrev_expand(c)
+    int c;
+{				/* expand to preceding word matching prefix */
+    register Char *cp, *ncp, *bp;
+    register struct Hist *hp;
+    register int arg = 0, len = 0, i; /* len = 0 to shut up gcc -Wall */
+    register bool found = 0;
+    Char hbuf[INBUFSIZE];
+    static int oldevent, hist, word;
+    static Char *start, *oldcursor;
 
-	wp = wp->next;
-	i--;
+    USE(c);
+    if (Argument <= 0)
+	return(CC_ERROR);
+
+    cp = c_preword(Cursor, InputBuf, 1);
+    if (cp == Cursor || Isspace(*cp))
+	return(CC_ERROR);
+
+    hp = Histlist.Hnext;
+    bp = InputBuf;
+    if (Argument == 1 && eventno == oldevent && cp == start &&
+	Cursor == oldcursor && patlen > 0 && Strncmp(patbuf, cp, patlen) == 0){
+	/* continue previous search - go to last match (hist/word) */
+	if (hist != 0) {		/* need to move up history */
+	    for (i = 1; i < hist && hp != NULL; i++)
+		hp = hp->Hnext;
+	    if (hp == NULL)	/* "can't happen" */
+		return(CC_ERROR);
+	    cp = expand_lex(hbuf, INBUFSIZE, &hp->Hlex, 0, NCARGS);
+	    *cp = '\0';
+	    bp = hbuf;
+	    hp = hp->Hnext;
+	}
+	cp = c_preword(cp, bp, word);
+    } else {			/* starting new search */
+	oldevent = eventno;
+	start = cp;
+	patlen = Cursor - cp;
+	Strncpy(patbuf, cp, patlen);
+	hist = 0;
+	word = 0;
     }
 
+    while (!found) {
+	ncp = c_preword(cp, bp, 1);
+	if (ncp == cp || Isspace(*ncp)) { /* beginning of line */
+	    hist++;
+	    word = 0;
+	    if (hp == NULL)
+		return(CC_ERROR);
+	    cp = expand_lex(hbuf, INBUFSIZE, &hp->Hlex, 0, NCARGS);
+	    *cp = '\0';
+	    bp = hbuf;
+	    hp = hp->Hnext;
+	    continue;
+	} else {
+	    word++;
+	    len = c_endword(ncp, cp, 1) - ncp + 1;
+	    cp = ncp;
+	}
+	if (len > patlen && Strncmp(cp, patbuf, patlen) == 0) {
+	    /* We don't fully check distinct matches as Gnuemacs does: */
+	    if (Argument > 1) {	/* just count matches */
+		if (++arg >= Argument)
+		    found++;
+	    } else {		/* match if distinct from previous */
+		if (len != Cursor - start || Strncmp(cp, start, len) != 0)
+		    found++;
+	    }
+	}
+    }
+
+    if (LastChar + len - (Cursor - start) >= InputLim)
+	return(CC_ERROR);	/* no room */
+    DeleteBack(Cursor - start);
+    c_insert(len);
+    while (len--)
+	*Cursor++ = *cp++;
+    oldcursor = Cursor;
     return(CC_REFRESH);
 }
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.59 1995/03/05 03:18:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.60 1995/03/12 04:49:26 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.59 1995/03/05 03:18:09 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.60 1995/03/12 04:49:26 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1548,7 +1548,7 @@ pkill(v, signum)
 #endif /* !BSDSIGS */
 
     /* Avoid globbing %?x patterns */
-    for (vp = v && vp && *vp; vp++)
+    for (vp = v; vp && *vp; vp++)
 	if (**vp == '%')
 	    quote(*vp);
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.screen.c,v 3.34 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.screen.c,v 3.35 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.34 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.35 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -454,7 +454,7 @@ TellTC(what)
 			CGETS(7, 11, "does not have"));
 
     for (t = tstr; t->name != NULL; t++)
-	xprintf("\t%25s (%s) == %s\n", t->long_name, t->name,
+	xprintf("\t%36s (%s) == %s\n", t->long_name, t->name,
 		t->str && *t->str ? t->str : CGETS(7, 13, "(empty)"));
     xputchar('\n');
 }

@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: tcsh.man2html,v 1.5 1995/03/05 03:18:09 christos Exp $
+# $Id: tcsh.man2html,v 1.6 1995/03/12 04:49:26 christos Exp $
 
 # tcsh.man2html, Dave Schweisguth <dcs@proton.chem.yale.edu>
 #
@@ -76,7 +76,7 @@ $topfile	= 'top';	# Top-level HTML file *
 
 while ($#ARGV > -1 && (($first, $rest) = ($ARGV[0] =~ /^-(.)(.*)/))) {
     # Perl 5 lossage alert
-    if ($first =~ /[Cdh]/) {	# Switches with arguments
+    if ($first =~ /[CdDGh]/) {	# Switches with arguments
     	shift;
     	$arg = $rest ne '' ? $rest : $ARGV[0] ne '' ? shift :
       	    &usage("$whatami: -$first requires an argument.\n");
@@ -89,6 +89,8 @@ while ($#ARGV > -1 && (($first, $rest) = ($ARGV[0] =~ /^-(.)(.*)/))) {
     elsif ($first eq 'c')   { $cgibin = 1; }
     elsif ($first eq 'C')   { $cgibindir = $arg; }
     elsif ($first eq 'd')   { $updir = $arg; }
+    elsif ($first eq 'D')   { $dir = $arg; }
+    elsif ($first eq 'G')   { $cgifile = $arg; }
     elsif ($first eq 'h')   { $host = $arg; }
     elsif ($first eq 'i')   { $index = 1; }
     elsif ($first eq 's')   { $shortfiles = 1; }
@@ -162,7 +164,8 @@ close MAN;
 
 # Link top.html to index.html in case someone looks at tcsh.html/
 
-(system("ln -sf $topfile $dir/$indexfile") >> 8)
+system("rm -f $dir/$indexfile");    # Some systems can't ln -sf
+(system("ln -s $topfile $dir/$indexfile") >> 8)
     && die "$whatami: Can't link $topfile to $dir/$indexfile!\n";
 
 ### Get title and section headings
@@ -184,17 +187,25 @@ foreach (@man) {
 	$comment = 0;
     } elsif (! $comment) {	    # Not in .ig'ed section; do stuff
 	
+	# nroff special characters
+	
+	s/\\-/-/g;		    # \-
+	s/\\^//g;		    # \^
+	s/^\\'/'/;		    # leading ' escape
+	s/^\\(\s)/$1/;		    # leading space escape
+	s/\\(e|\\)/\\/g;	    # \e, \\; must do this after other escapes
+
+	# HTML special characters; deal with these before adding more
+	
+	s/&/&amp\;/g;
+	s/>/&gt\;/g;
+	s/</&lt\;/g;
+	
 	# Get title
 	
 	if (/^\.TH\s+(\w+)\s+(\w+)\s+\"([^\"]*)\"\s+\"([^\"]*)\"/) {
 	    $title = "$1($2) $4 ($3) $1($2)";
 	}
-	
-	# HTML special characters; deal with these before adding more!
-	
-	s/&/&amp\;/g;
-	s/>/&gt\;/g;
-	s/</&lt\;/g;
 	
 	# Build per-section info arrays
 	
@@ -530,14 +541,11 @@ sub printsectionbody {
 
 		    s/^\.br.*/<BR>/;
 
-		    # nroff special characters
-		    
-		    s/\\(e|\\)/\\/g;			# \e, \\
-		    s/\\-/-/g;				# \-
-		    s/\\^//g;				# \^
-		    s/^\\'/'/;				# leading \'
-		    s/^\\(\s)/$1/;			# leading space escape
-		    s/^\\&amp\;//;			# leading dot escape
+		    # More nroff special characters
+
+		    s/^\\&amp\;//;	    # leading dot escape; save until
+					    #   now so leading dots aren't
+					    #   confused with ends of .igs
 
 		    &make_hrefs(*name, *_);			
 		}
@@ -765,6 +773,10 @@ Without [file], reads from tcsh.man or stdin.
 	    Meaningless without -c.
 -d dir	    Uses /dir/tcsh.html instead of /tcsh.html as the HTML dir.
 	    Meaningless without -c.
+-D dir	    Uses /dir.html instead of /tcsh.html as the HTML dir.
+	    Meaningless without -c.
+-G name	    Uses name instead of tcsh.cgi as the name of the CGI script.
+	    Meaningless without -c or -i.
 -h host	    Uses host as the host:port part of the URL to the entry point.
 	    Meaningless without -c.
 -s	    Filenames are shorter (max 8 + 3) but less descriptive.

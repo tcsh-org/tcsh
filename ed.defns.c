@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.defns.c,v 3.20 1994/07/08 14:43:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.defns.c,v 3.21 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.20 1994/07/08 14:43:50 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.21 1995/03/12 04:49:26 christos Exp christos $")
 
 #include "ed.h"
 
@@ -267,8 +267,10 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		F_DELNEXT_LIST	110
     e_normalize_command,
 #define		F_COMMAND_NORM	111
+    e_dabbrev_expand,
+#define		F_DABBREV_EXPAND	112
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	112
+#define		F_NUM_FNS	113
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -456,7 +458,7 @@ KEYCMD  CcEmacsMap[] = {
     F_UNASSIGNED,		/* M-, */
     F_UNASSIGNED,		/* M-- */
     F_UNASSIGNED,		/* M-. */
-    F_UNASSIGNED,		/* M-/ */
+    F_DABBREV_EXPAND,		/* M-/ */
     F_ARGDIGIT,			/* M-0 */
     F_ARGDIGIT,			/* M-1 */
     F_ARGDIGIT,			/* M-2 */
@@ -1197,515 +1199,521 @@ editinit()
     f->desc = CSAVS(3, 16, "Copy area between mark and cursor to cut buffer");
 
     f++;
+    f->name = "dabbrev-expand";
+    f->func = F_DABBREV_EXPAND;
+    f->desc = CSAVS(3, 17,
+		    "Expand to preceding word for which this is a prefix");
+
+    f++;
     f->name = "delete-char";
     f->func = F_DELNEXT;
-    f->desc = CSAVS(3, 17, "Delete character under cursor");
+    f->desc = CSAVS(3, 18, "Delete character under cursor");
 
     f++;
     f->name = "delete-char-or-eof";
     f->func = F_DELNEXT_EOF;
-    f->desc = CSAVS(3, 18,
+    f->desc = CSAVS(3, 19,
 	"Delete character under cursor or signal end of file on an empty line");
 
     f++;
     f->name = "delete-char-or-list";
     f->func = F_DELNEXT_LIST;
-    f->desc = CSAVS(3, 19,
+    f->desc = CSAVS(3, 20,
 	"Delete character under cursor or list completions if at end of line");
 
     f++;
     f->name = "delete-char-or-list-or-eof";
     f->func = F_DELNEXT_LIST_EOF;
-    f->desc = CSAVS(3, 20,
+    f->desc = CSAVS(3, 21,
     "Delete character under cursor, list completions or signal end of file");
 
     f++;
     f->name = "delete-word";
     f->func = F_DELWORDNEXT;
-    f->desc = CSAVS(3, 21,
+    f->desc = CSAVS(3, 22,
 	"Cut from cursor to end of current word - save in cut buffer");
 
     f++;
     f->name = "digit";
     f->func = F_DIGIT;
-    f->desc = CSAVS(3, 22, "Adds to argument if started or enters digit");
+    f->desc = CSAVS(3, 23, "Adds to argument if started or enters digit");
 
     f++;
     f->name = "digit-argument";
     f->func = F_ARGDIGIT;
-    f->desc = CSAVS(3, 23, "Digit that starts argument");
+    f->desc = CSAVS(3, 24, "Digit that starts argument");
 
     f++;
     f->name = "down-history";
     f->func = F_DOWN_HIST;
-    f->desc = CSAVS(3, 24, "Move to next history line");
+    f->desc = CSAVS(3, 25, "Move to next history line");
 
     f++;
     f->name = "downcase-word";
     f->func = F_CASELOWER;
-    f->desc = CSAVS(3, 25,
+    f->desc = CSAVS(3, 26,
 	"Lowercase the characters from cursor to end of current word");
 
     f++;
     f->name = "end-of-file";
     f->func = F_SEND_EOF;
-    f->desc = CSAVS(3, 26, "Indicate end of file");
+    f->desc = CSAVS(3, 27, "Indicate end of file");
 
     f++;
     f->name = "end-of-line";
     f->func = F_TOEND;
-    f->desc = CSAVS(3, 27, "Move cursor to end of line");
+    f->desc = CSAVS(3, 28, "Move cursor to end of line");
 
     f++;
     f->name = "exchange-point-and-mark";
     f->func = F_EXCHANGE_MARK;
-    f->desc = CSAVS(3, 28, "Exchange the cursor and mark");
+    f->desc = CSAVS(3, 29, "Exchange the cursor and mark");
 
     f++;
     f->name = "expand-glob";
     f->func = F_EXPAND_GLOB;
-    f->desc = CSAVS(3, 29, "Expand file name wildcards");
+    f->desc = CSAVS(3, 30, "Expand file name wildcards");
 
     f++;
     f->name = "expand-history";
     f->func = F_EXPAND_HISTORY;
-    f->desc = CSAVS(3, 30, "Expand history escapes");
+    f->desc = CSAVS(3, 31, "Expand history escapes");
 
     f++;
     f->name = "expand-line";
     f->func = F_EXPAND;
-    f->desc = CSAVS(3, 31, "Expand the history escapes in a line");
+    f->desc = CSAVS(3, 32, "Expand the history escapes in a line");
 
     f++;
     f->name = "expand-variables";
     f->func = F_EXPAND_VARS;
-    f->desc = CSAVS(3, 32, "Expand variables");
+    f->desc = CSAVS(3, 33, "Expand variables");
 
     f++;
     f->name = "forward-char";
     f->func = F_CHARFWD;
-    f->desc = CSAVS(3, 33, "Move forward one character");
+    f->desc = CSAVS(3, 34, "Move forward one character");
 
     f++;
     f->name = "forward-word";
     f->func = F_WORDFWD;
-    f->desc = CSAVS(3, 34, "Move forward to end of current word");
+    f->desc = CSAVS(3, 35, "Move forward to end of current word");
 
     f++;
     f->name = "gosmacs-transpose-chars";
     f->func = F_GCHARSWITCH;
-    f->desc = CSAVS(3, 35, "Exchange the two characters before the cursor");
+    f->desc = CSAVS(3, 36, "Exchange the two characters before the cursor");
 
     f++;
     f->name = "history-search-backward";
     f->func = F_UP_SEARCH_HIST;
-    f->desc = CSAVS(3, 36,
+    f->desc = CSAVS(3, 37,
 	"Search in history backwards for line beginning as current");
 
     f++;
     f->name = "history-search-forward";
     f->func = F_DOWN_SEARCH_HIST;
-    f->desc = CSAVS(3, 37,
+    f->desc = CSAVS(3, 38,
 	"Search in history forward for line beginning as current");
 
     f++;
     f->name = "insert-last-word";
     f->func = F_LAST_ITEM;
-    f->desc = CSAVS(3, 38, "Insert last item of previous command");
+    f->desc = CSAVS(3, 39, "Insert last item of previous command");
 
     f++;
     f->name = "i-search-fwd";
     f->func = F_INC_FWD;
-    f->desc = CSAVS(3, 39, "Incremental search forward");
+    f->desc = CSAVS(3, 40, "Incremental search forward");
 
     f++;
     f->name = "i-search-back";
     f->func = F_INC_BACK;
-    f->desc = CSAVS(3, 40, "Incremental search backwards");
+    f->desc = CSAVS(3, 41, "Incremental search backwards");
 
     f++;
     f->name = "keyboard-quit";
     f->func = F_STARTOVER;
-    f->desc = CSAVS(3, 41, "Clear line");
+    f->desc = CSAVS(3, 42, "Clear line");
 
     f++;
     f->name = "kill-line";
     f->func = F_KILLEND;
-    f->desc = CSAVS(3, 42, "Cut to end of line and save in cut buffer");
+    f->desc = CSAVS(3, 43, "Cut to end of line and save in cut buffer");
 
     f++;
     f->name = "kill-region";
     f->func = F_KILLREGION;
-    f->desc = CSAVS(3, 43,
+    f->desc = CSAVS(3, 44,
 	"Cut area between mark and cursor and save in cut buffer");
 
     f++;
     f->name = "kill-whole-line";
     f->func = F_KILLALL;
-    f->desc = CSAVS(3, 44, "Cut the entire line and save in cut buffer");
+    f->desc = CSAVS(3, 45, "Cut the entire line and save in cut buffer");
 
     f++;
     f->name = "list-choices";
     f->func = F_LIST_CHOICES;
-    f->desc = CSAVS(3, 45, "List choices for completion");
+    f->desc = CSAVS(3, 46, "List choices for completion");
 
     f++;
     f->name = "list-choices-raw";
     f->func = F_LIST_ALL;
-    f->desc = CSAVS(3, 46,
+    f->desc = CSAVS(3, 47,
 	"List choices for completion overriding programmable completion");
 
     f++;
     f->name = "list-glob";
     f->func = F_LIST_GLOB;
-    f->desc = CSAVS(3, 47, "List file name wildcard matches");
+    f->desc = CSAVS(3, 48, "List file name wildcard matches");
 
     f++;
     f->name = "list-or-eof";
     f->func = F_LIST_EOF;
-    f->desc = CSAVS(3, 48,
+    f->desc = CSAVS(3, 49,
 	"List choices for completion or indicate end of file if empty line");
 
     f++;
     f->name = "load-average";
     f->func = F_LOAD_AVERAGE;
-    f->desc = CSAVS(3, 49, "Display load average and current process status");
+    f->desc = CSAVS(3, 50, "Display load average and current process status");
 
     f++;
     f->name = "magic-space";
     f->func = F_MAGIC_SPACE;
-    f->desc = CSAVS(3, 50, "Expand history escapes and insert a space");
+    f->desc = CSAVS(3, 51, "Expand history escapes and insert a space");
 
     f++;
     f->name = "newline";
     f->func = F_NEWLINE;
-    f->desc = CSAVS(3, 51, "Execute command");
+    f->desc = CSAVS(3, 52, "Execute command");
 
     f++;
     f->name = "normalize-path";
     f->func = F_PATH_NORM;
-    f->desc = CSAVS(3, 52, 
+    f->desc = CSAVS(3, 53, 
 		    "Expand pathnames, eliminating leading .'s and ..'s");
 
     f++;
     f->name = "normalize-command";
     f->func = F_COMMAND_NORM;
-    f->desc = CSAVS(3, 53, 
+    f->desc = CSAVS(3, 54, 
 		    "Expand commands to the resulting pathname or alias");
 
     f++;
     f->name = "overwrite-mode";
     f->func = F_INSOVR;
-    f->desc = CSAVS(3, 54,
+    f->desc = CSAVS(3, 55,
 		    "Switch from insert to overwrite mode or vice versa");
 
     f++;
     f->name = "prefix-meta";
     f->func = F_METANEXT;
-    f->desc = CSAVS(3, 55, "Add 8th bit to next character typed");
+    f->desc = CSAVS(3, 56, "Add 8th bit to next character typed");
 
     f++;
     f->name = "quoted-insert";
     f->func = F_QUOTE;
-    f->desc = CSAVS(3, 56, "Add the next character typed to the line verbatim");
+    f->desc = CSAVS(3, 57, "Add the next character typed to the line verbatim");
 
     f++;
     f->name = "redisplay";
     f->func = F_REDISP;
-    f->desc = CSAVS(3, 57, "Redisplay everything");
+    f->desc = CSAVS(3, 58, "Redisplay everything");
 
     f++;
     f->name = "run-fg-editor";
     f->func = F_RUN_FG_EDITOR;
-    f->desc = CSAVS(3, 58, "Restart stopped editor");
+    f->desc = CSAVS(3, 59, "Restart stopped editor");
 
     f++;
     f->name = "run-help";
     f->func = F_HELPME;
-    f->desc = CSAVS(3, 59, "Look for help on current command");
+    f->desc = CSAVS(3, 60, "Look for help on current command");
 
     f++;
     f->name = "self-insert-command";
     f->func = F_INSERT;
-    f->desc = CSAVS(3, 60, "This character is added to the line");
+    f->desc = CSAVS(3, 61, "This character is added to the line");
 
     f++;
     f->name = "sequence-lead-in";
     f->func = F_XKEY;
-    f->desc = CSAVS(3, 61,
+    f->desc = CSAVS(3, 62,
 	"This character is the first in a character sequence");
 
     f++;
     f->name = "set-mark-command";
     f->func = F_SET_MARK;
-    f->desc = CSAVS(3, 62, "Set the mark at cursor");
+    f->desc = CSAVS(3, 63, "Set the mark at cursor");
 
     f++;
     f->name = "spell-word";
     f->func = F_CORRECT;
-    f->desc = CSAVS(3, 63, "Correct the spelling of current word");
+    f->desc = CSAVS(3, 64, "Correct the spelling of current word");
 
     f++;
     f->name = "spell-line";
     f->func = F_CORRECT_L;
-    f->desc = CSAVS(3, 64, "Correct the spelling of entire line");
+    f->desc = CSAVS(3, 65, "Correct the spelling of entire line");
 
     f++;
     f->name = "stuff-char";
     f->func = F_STUFF_CHAR;
-    f->desc = CSAVS(3, 65, "Send character to tty in cooked mode");
+    f->desc = CSAVS(3, 66, "Send character to tty in cooked mode");
 
     f++;
     f->name = "toggle-literal-history";
     f->func = F_TOGGLE_HIST;
-    f->desc = CSAVS(3, 66,
+    f->desc = CSAVS(3, 67,
 	"Toggle between literal and lexical current history line");
 
     f++;
     f->name = "transpose-chars";
     f->func = F_CHARSWITCH;
-    f->desc = CSAVS(3, 67,
+    f->desc = CSAVS(3, 68,
 	"Exchange the character to the left of the cursor with the one under");
 
     f++;
     f->name = "transpose-gosling";
     f->func = F_GCHARSWITCH;
-    f->desc = CSAVS(3, 68, "Exchange the two characters before the cursor");
+    f->desc = CSAVS(3, 69, "Exchange the two characters before the cursor");
 
     f++;
     f->name = "tty-dsusp";
     f->func = F_TTY_DSUSP;
-    f->desc = CSAVS(3, 69, "Tty delayed suspend character");
+    f->desc = CSAVS(3, 70, "Tty delayed suspend character");
 
     f++;
     f->name = "tty-flush-output";
     f->func = F_TTY_FLUSHO;
-    f->desc = CSAVS(3, 70, "Tty flush output character");
+    f->desc = CSAVS(3, 71, "Tty flush output character");
 
     f++;
     f->name = "tty-sigintr";
     f->func = F_TTY_INT;
-    f->desc = CSAVS(3, 71, "Tty interrupt character");
+    f->desc = CSAVS(3, 72, "Tty interrupt character");
 
     f++;
     f->name = "tty-sigquit";
     f->func = F_TTY_QUIT;
-    f->desc = CSAVS(3, 72, "Tty quit character");
+    f->desc = CSAVS(3, 73, "Tty quit character");
 
     f++;
     f->name = "tty-sigtsusp";
     f->func = F_TTY_TSUSP;
-    f->desc = CSAVS(3, 73, "Tty suspend character");
+    f->desc = CSAVS(3, 74, "Tty suspend character");
 
     f++;
     f->name = "tty-start-output";
     f->func = F_TTY_STARTO;
-    f->desc = CSAVS(3, 74, "Tty allow output character");
+    f->desc = CSAVS(3, 75, "Tty allow output character");
 
     f++;
     f->name = "tty-stop-output";
     f->func = F_TTY_STOPO;
-    f->desc = CSAVS(3, 75, "Tty disallow output character");
+    f->desc = CSAVS(3, 76, "Tty disallow output character");
 
     f++;
     f->name = "undefined-key";
     f->func = F_UNASSIGNED;
-    f->desc = CSAVS(3, 76, "Indicates unbound character");
+    f->desc = CSAVS(3, 77, "Indicates unbound character");
 
     f++;
     f->name = "universal-argument";
     f->func = F_ARGFOUR;
-    f->desc = CSAVS(3, 77, "Emacs universal argument (argument times 4)");
+    f->desc = CSAVS(3, 78, "Emacs universal argument (argument times 4)");
 
     f++;
     f->name = "up-history";
     f->func = F_UP_HIST;
-    f->desc = CSAVS(3, 78, "Move to previous history line");
+    f->desc = CSAVS(3, 79, "Move to previous history line");
 
     f++;
     f->name = "upcase-word";
     f->func = F_CASEUPPER;
-    f->desc = CSAVS(3, 79,
+    f->desc = CSAVS(3, 80,
 	"Uppercase the characters from cursor to end of current word");
 
     f++;
     f->name = "vi-beginning-of-next-word";
     f->func = V_WORDBEGNEXT;
-    f->desc = CSAVS(3, 80, "Vi goto the beginning of next word");
+    f->desc = CSAVS(3, 81, "Vi goto the beginning of next word");
 
     f++;
     f->name = "vi-add";
     f->func = V_ADD;
-    f->desc = CSAVS(3, 81, "Vi enter insert mode after the cursor");
+    f->desc = CSAVS(3, 82, "Vi enter insert mode after the cursor");
 
     f++;
     f->name = "vi-add-at-eol";
     f->func = V_ADDEND;
-    f->desc = CSAVS(3, 82, "Vi enter insert mode at end of line");
+    f->desc = CSAVS(3, 83, "Vi enter insert mode at end of line");
 
     f++;
     f->name = "vi-chg-case";
     f->func = V_CHGCASE;
-    f->desc = CSAVS(3, 83,
+    f->desc = CSAVS(3, 84,
 	"Vi change case of character under cursor and advance one character");
 
     f++;
     f->name = "vi-chg-meta";
     f->func = V_CHGMETA;
-    f->desc = CSAVS(3, 84, "Vi change prefix command");
+    f->desc = CSAVS(3, 85, "Vi change prefix command");
 
     f++;
     f->name = "vi-chg-to-eol";
     f->func = V_CHGTOEND;
-    f->desc = CSAVS(3, 85, "Vi change to end of line");
+    f->desc = CSAVS(3, 86, "Vi change to end of line");
 
     f++;
     f->name = "vi-cmd-mode";
     f->func = V_CMD_MODE;
-    f->desc = CSAVS(3, 86,
+    f->desc = CSAVS(3, 87,
 	"Enter vi command mode (use alternative key bindings)");
 
     f++;
     f->name = "vi-cmd-mode-complete";
     f->func = V_CM_COMPLETE;
-    f->desc = CSAVS(3, 87, "Vi command mode complete current word");
+    f->desc = CSAVS(3, 88, "Vi command mode complete current word");
 
     f++;
     f->name = "vi-delprev";
     f->func = V_DELPREV;
-    f->desc = CSAVS(3, 88, "Vi move to previous character (backspace)");
+    f->desc = CSAVS(3, 89, "Vi move to previous character (backspace)");
 
     f++;
     f->name = "vi-delmeta";
     f->func = V_DELMETA;
-    f->desc = CSAVS(3, 89, "Vi delete prefix command");
+    f->desc = CSAVS(3, 90, "Vi delete prefix command");
 
     f++;
     f->name = "vi-endword";
     f->func = V_ENDWORD;
-    f->desc = CSAVS(3, 90,
+    f->desc = CSAVS(3, 91,
 	"Vi move to the end of the current space delimited word");
 
     f++;
     f->name = "vi-eword";
     f->func = V_EWORD;
-    f->desc = CSAVS(3, 91, "Vi move to the end of the current word");
+    f->desc = CSAVS(3, 92, "Vi move to the end of the current word");
 
     f++;
     f->name = "vi-char-back";
     f->func = V_CHAR_BACK;
-    f->desc = CSAVS(3, 92, "Vi move to the character specified backwards");
+    f->desc = CSAVS(3, 93, "Vi move to the character specified backwards");
 
     f++;
     f->name = "vi-char-fwd";
     f->func = V_CHAR_FWD;
-    f->desc = CSAVS(3, 93, "Vi move to the character specified forward");
+    f->desc = CSAVS(3, 94, "Vi move to the character specified forward");
 
     f++;
     f->name = "vi-charto-back";
     f->func = V_CHARTO_BACK;
-    f->desc = CSAVS(3, 94, "Vi move up to the character specified backwards");
+    f->desc = CSAVS(3, 95, "Vi move up to the character specified backwards");
 
     f++;
     f->name = "vi-charto-fwd";
     f->func = V_CHARTO_FWD;
-    f->desc = CSAVS(3, 95, "Vi move up to the character specified forward");
+    f->desc = CSAVS(3, 96, "Vi move up to the character specified forward");
 
     f++;
     f->name = "vi-insert";
     f->func = V_INSERT;
-    f->desc = CSAVS(3, 96, "Enter vi insert mode");
+    f->desc = CSAVS(3, 97, "Enter vi insert mode");
 
     f++;
     f->name = "vi-insert-at-bol";
     f->func = V_INSBEG;
-    f->desc = CSAVS(3, 97, "Enter vi insert mode at beginning of line");
+    f->desc = CSAVS(3, 98, "Enter vi insert mode at beginning of line");
 
     f++;
     f->name = "vi-repeat-char-fwd";
     f->func = V_RCHAR_FWD;
-    f->desc = CSAVS(3, 98,
+    f->desc = CSAVS(3, 99,
 	"Vi repeat current character search in the same search direction");
 
     f++;
     f->name = "vi-repeat-char-back";
     f->func = V_RCHAR_BACK;
-    f->desc = CSAVS(3, 99,
+    f->desc = CSAVS(3, 100,
 	"Vi repeat current character search in the opposite search direction");
 
     f++;
     f->name = "vi-repeat-search-fwd";
     f->func = V_RSRCH_FWD;
-    f->desc = CSAVS(3, 100,
+    f->desc = CSAVS(3, 101,
 	"Vi repeat current search in the same search direction");
 
     f++;
     f->name = "vi-repeat-search-back";
     f->func = V_RSRCH_BACK;
-    f->desc = CSAVS(3, 101,
+    f->desc = CSAVS(3, 102,
 	"Vi repeat current search in the opposite search direction");
 
     f++;
     f->name = "vi-replace-char";
     f->func = V_REPLONE;
-    f->desc = CSAVS(3, 102,
+    f->desc = CSAVS(3, 103,
 	"Vi replace character under the cursor with the next character typed");
 
     f++;
     f->name = "vi-replace-mode";
     f->func = V_REPLMODE;
-    f->desc = CSAVS(3, 103, "Vi replace mode");
+    f->desc = CSAVS(3, 104, "Vi replace mode");
 
     f++;
     f->name = "vi-search-back";
     f->func = V_USH_META;
-    f->desc = CSAVS(3, 104, "Vi search history backwards");
+    f->desc = CSAVS(3, 105, "Vi search history backwards");
 
     f++;
     f->name = "vi-search-fwd";
     f->func = V_DSH_META;
-    f->desc = CSAVS(3, 105, "Vi search history forward");
+    f->desc = CSAVS(3, 106, "Vi search history forward");
 
     f++;
     f->name = "vi-substitute-char";
     f->func = V_SUBSTCHAR;
-    f->desc = CSAVS(3, 106,
+    f->desc = CSAVS(3, 107,
 	"Vi replace character under the cursor and enter insert mode");
 
     f++;
     f->name = "vi-substitute-line";
     f->func = V_SUBSTLINE;
-    f->desc = CSAVS(3, 107, "Vi replace entire line");
+    f->desc = CSAVS(3, 108, "Vi replace entire line");
 
     f++;
     f->name = "vi-word-back";
     f->func = V_WORDBACK;
-    f->desc = CSAVS(3, 108, "Vi move to the previous word");
+    f->desc = CSAVS(3, 109, "Vi move to the previous word");
 
     f++;
     f->name = "vi-word-fwd";
     f->func = V_WORDFWD;
-    f->desc = CSAVS(3, 109, "Vi move to the next word");
+    f->desc = CSAVS(3, 110, "Vi move to the next word");
 
     f++;
     f->name = "vi-undo";
     f->func = V_UNDO;
-    f->desc = CSAVS(3, 110, "Vi undo last change");
+    f->desc = CSAVS(3, 111, "Vi undo last change");
 
     f++;
     f->name = "vi-zero";
     f->func = V_ZERO;
-    f->desc = CSAVS(3, 111, "Vi goto the beginning of line");
+    f->desc = CSAVS(3, 112, "Vi goto the beginning of line");
 
     f++;
     f->name = "which-command";
     f->func = F_WHICH;
-    f->desc = CSAVS(3, 112, "Perform which of current command");
+    f->desc = CSAVS(3, 113, "Perform which of current command");
 
     f++;
     f->name = "yank";
     f->func = F_YANK_KILL;
-    f->desc = CSAVS(3, 113, "Paste cut buffer at cursor position");
+    f->desc = CSAVS(3, 114, "Paste cut buffer at cursor position");
 
     f++;
     f->name = NULL;

@@ -76,7 +76,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "3 March 1995" "Cornell 6.05.04"
+.TH TCSH 1 "19 March 1995" "Cornell 6.05.06"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -219,7 +219,7 @@ The rest of this manual uses `\fI~/.tcshrc\fR' to mean `\fI~/.tcshrc\fR or,
 if \fI~/.tcshrc\fR is not found, \fI~/.cshrc\fR'.
 .PP
 In the normal case, the shell begins reading commands from the terminal,
-prompting with `% '.  (Processing of arguments and the use of the shell to
+prompting with `> '.  (Processing of arguments and the use of the shell to
 process files containing command scripts are described later.)
 The shell repeatedly reads a line of command input, breaks it into words,
 places it on the command history list, parses it and executes each command
@@ -551,6 +551,14 @@ Like \fIcomplete\fR, but ignores user-defined completions.
 .B copy-prev-word \fR(M-^_)
 Copies the previous word in the current line into the input buffer.
 See also \fIinsert-last-word\fR.
+.TP 8
+.B dabbrev-expand \fR(M-/)
+Expand the current word to the most recent preceding one for which
+the current is a leading substring, wrapping around the history list
+(once) if necessary.
+Repeating \fIdabbrev-expand\fR without any intervening typing will
+change to the next previous word etc, skipping identical matches
+much like \fIhistory-search-backward\fR does.
 .TP 8
 .B delete-char \fR(not bound)
 Deletes the character under the cursor.
@@ -2714,6 +2722,8 @@ internal hash table has been at locating commands (and avoiding
 \fBpath\fR where the hash function indicates a possible hit, and
 in each component which does not begin with a `/'.
 .PP
+On machines without \fIvfork\fR(2), prints only the number and size of
+hash buckets.
 .B history \fR[\fB\-hr\fR] [\fIn\fR]
 .br
 .B history \-S\fR|\fB\-L|\fB\-M \fR[\fIfilename\fR] (+)
@@ -2932,16 +2942,19 @@ Symbolic link to a directory
 Symbolic link to nowhere
 .PD
 .PP
-\fBlistlinks\fR also slows down \fBls\-F\fR and causes partitions holding
+\fBlistlinks\fR also slows down \fIls\-F\fR and causes partitions holding
 files pointed to by symbolic links to be mounted.
 .PP
-If \fBshowdots\fR is set, \fBls\-F\fR acts like `ls \-aF';
-if \fBshowdots\fR is set to `\-A', it acts like `ls \-AF'.
-On machines where `ls \-C' is not the default, \fBls\-F\fR acts like `ls \-CF'
-(or `ls \-aCF' or `ls \-ACF', depending on \fBshowdots\fR).
-\fBls\-F\fR passes its arguments to \fIls\fR(1) if it is given any switches,
+If variable \fBlistflags\fR is be set to the `x', `a', or `A' or a combination
+of those flags (eg. `xA'), then these flags are added to \fIls\-F\fR,
+making it act like `ls \-xF', `ls \-Fa', or `ls \-FA', or the combination of
+those (eg. `ls \-xFA').
+On machines where `ls \-C' is not the default, \fIls\-F\fR acts like `ls \-CF',
+unless the \fBlistflags\fR variable contains an `x', where it behaves like
+`ls \-xF'.
+\fIls\-F\fR passes its arguments to \fIls\fR(1) if it is given any switches,
 so `alias ls ls\-F' generally does the right thing.
-\fBls\-F\fR includes file identification characters when sorting filenames;
+\fIls\-F\fR includes file identification characters when sorting filenames;
 this is a bug.
 .RE
 .PP
@@ -3201,7 +3214,7 @@ less than one word as value. With \fIvariable\fR, performs the
 same function on \fIvariable\fR.
 .TP 8
 .B source \fR[\fB\-h\fR] \fIname\fR [\fIargs\fR ...]
-The shell reads and executes commands from \fBname\fR.
+The shell reads and executes commands from \fIname\fR.
 The commands are not placed on the history list.
 If any \fIargs\fR are given, they are placed in \fBargv\fR. (+)
 \fIsource\fR commands may be nested;
@@ -3231,7 +3244,7 @@ stop shells started by \fIsu\fR(1).
 \&...
 .br
 .B breaksw
-.br
+.PP
 \&...
 .PP
 .B default:
@@ -3249,7 +3262,7 @@ of the labels match before a `default' label is found, then
 the execution begins after the default label.  Each case
 label and the default label must appear at the beginning of
 a line.  The command \fIbreaksw\fR causes execution to continue
-after the \fBendsw\fR. Otherwise control may fall through case
+after the \fIendsw\fR. Otherwise control may fall through case
 labels and default labels as in C.  If no label matches and
 there is no default, execution continues after the \fIendsw\fR.
 .PD
@@ -3633,6 +3646,14 @@ If unset, `1' is used, i.e. the shell exits on a single `^D'.
 If set to `insert' or `overwrite', puts the editor into that input mode
 at the beginning of each line.
 .TP 8
+.B listflags \fR(+)
+If it contains a combination of `A', `a', and `x', these flags
+are added to \fIls\-F\fR, making it behave like the correcponding flags
+of `ls(1)': `a' shows all files [even if they start with a `.'], `A' shows
+all files but `.' and `..', and `x' sorts across instead of down.
+If the second word of \fIlistflags\fR is set, it is used as the path
+to `ls(1)'.
+.TP 8
 .B listjobs \fR(+)
 If set, all jobs are listed when a job is suspended. If set to `long',
 the listing is in long format.
@@ -3835,7 +3856,9 @@ The shell's tty.
 Clears from the end of the prompt to end of the display or the end of the line.
 .TP 4
 %#
-`#' if the user is the superuser, `>' if not.
+`>' (or the first character of the \fBpromptchars\fR shell variable)
+for normal users, `#' (or the second character of \fBpromptchars\fR)
+for the superuser.
 .TP 4
 %{\fIstring\fR%}
 Includes \fIstring\fR as a literal escape sequence.
@@ -3877,6 +3900,11 @@ The string with which to prompt when confirming automatic spelling correction.
 The same format sequences may be used as in \fBprompt\fR (q.v.);
 note the variable meaning of `%R'.
 Set by default to `CORRECT>%R (y|n|e)? ' in interactive shells.
+.TP 8
+.B promptchars \fR(+)
+If set (to a two-character string), the `%#' formatting sequence in the
+\fBprompt\fR shell variable is replaced with the first character for
+normal users and the second character for the superuser.
 .TP 8
 .B pushdtohome \fR(+)
 If set, \fIpushd\fR without arguments does `pushd ~', like \fIcd\fR.
@@ -3923,10 +3951,6 @@ of \fBBuiltin and non-builtin command execution\fR.)  Initialized to the
 The number of nested shells.
 Reset to 1 in login shells.
 See also \fBloginsh\fR.
-.TP 8
-.B showdots \fR(+)
-If set, the \fIls\-F\fR builtin command shows hidden files.
-If set to `\-A', `.' and `..' are not displayed as with `ls \-A'.
 .TP 8
 .B status
 The status returned by the last command.  If it terminated
@@ -4533,9 +4557,11 @@ Alias substitution is most often used to clumsily simulate shell procedures;
 shell procedures should be provided rather than aliases.
 .PP
 Commands within loops are not placed in the history
-list.  Control structure should be parsed rather than being recognized as
+list.  Control structures should be parsed rather than being recognized as
 built-in commands.  This would allow control commands to be placed anywhere,
 to be combined with `|', and to be used with `&' and `;' metasyntax.
+.PP
+\fIforeach\fR doesn't ignore here documents when looking for its \fIend\fR.
 .PP
 It should be possible to use the `:' modifiers on the output of command
 substitutions.
@@ -4604,7 +4630,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.05.04 (Cornell) 1995-03-03.
+This manual documents tcsh 6.05.06 (Cornell) 1995-03-19.
 .SH AUTHORS
 .PD 0
 .TP 2
