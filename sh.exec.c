@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.22 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.23 1993/07/03 23:47:53 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.22 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: sh.exec.c,v 3.23 1993/07/03 23:47:53 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -94,21 +94,26 @@ static int hashdebug = 0;
 # define hash(a, b)	(((a) * HSHMUL + (b)) % (hashlength))
 # define widthof(t)	(sizeof(t) * BITS_PER_BYTE)
 # define tbit(f, i, t)	(((t *) xhash)[(f)] &  \
-			 1 << (i & (widthof(t) - 1)))
+			 (1L << (i & (widthof(t) - 1))))
 # define tbis(f, i, t)	(((t *) xhash)[(f)] |= \
-			 1 << (i & (widthof(t) - 1)))
+			 (1L << (i & (widthof(t) - 1))))
 # define cbit(f, i)	tbit(f, i, unsigned char)
 # define cbis(f, i)	tbis(f, i, unsigned char)
 # define sbit(f, i)	tbit(f, i, unsigned short)
 # define sbis(f, i)	tbis(f, i, unsigned short)
+# define ibit(f, i)	tbit(f, i, unsigned int)
+# define ibis(f, i)	tbis(f, i, unsigned int)
 # define lbit(f, i)	tbit(f, i, unsigned long)
 # define lbis(f, i)	tbis(f, i, unsigned long)
 
 # define bit(f, i) (hashwidth==sizeof(unsigned char)  ? cbit(f,i) : \
- 		   (hashwidth==sizeof(unsigned short) ? sbit(f,i) : lbit(f,i)))
+ 		    ((hashwidth==sizeof(unsigned short) ? sbit(f,i) : \
+		     ((hashwidth==sizeof(unsigned int)   ? ibit(f,i) : \
+		     lbit(f,i))))))
 # define bis(f, i) (hashwidth==sizeof(unsigned char)  ? cbis(f,i) : \
-		   (hashwidth==sizeof(unsigned short) ? sbis(f,i) : lbis(f,i)))
-
+ 		    ((hashwidth==sizeof(unsigned short) ? sbis(f,i) : \
+		     ((hashwidth==sizeof(unsigned int)   ? ibis(f,i) : \
+		     lbis(f,i))))))
 #else /* OLDHASH */
 /*
  * Xhash is an array of HSHSIZ bits (HSHSIZ / 8 chars), which are used
@@ -661,6 +666,8 @@ dohash(vv, c)
 	    hashwidth = sizeof(unsigned char);
         else if (hashwidth <= widthof(unsigned short))
 	    hashwidth = sizeof(unsigned short);
+        else if (hashwidth <= widthof(unsigned int))
+	    hashwidth = sizeof(unsigned int);
 	else
 	    hashwidth = sizeof(unsigned long);
     }

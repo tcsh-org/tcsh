@@ -1,4 +1,7 @@
 V6.04.00, 07/03/93
+ 92. Alpha prototypes, for gcc -Wall clean compile.
+ 91. Fixed alpha hashing. Did not work for directories > 31, Thanks to
+     Dan Mosedale <mosedale@genome.Stanford.EDU> for all the help!
  90. Added USE(a) for unused parameters, to avoid compiler warnings.
  89. 6.03.10, 06/25/93
  88. Makefile and lint patches from Bruce.

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.46 1993/06/25 21:17:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.47 1993/07/06 21:32:33 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -641,5 +641,14 @@ extern int gettimeofday();
 extern int wait3();
 # endif
 #endif /* SYSVREL == 4 */
+
+#if defined(__osf__) && defined(__alpha)
+extern int gethostname __P((char *, int));
+extern void *sbrk __P((ssize_t));
+extern int ioctl __P((int, unsigned long, char *));
+extern pid_t vfork __P((void));
+extern int killpg __P((pid_t, int));
+extern char *getwd __P((char *));
+#endif /* __osf__ && __alpha */
 
 #endif /* _h_tc_os */
