@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.53 1994/03/13 00:46:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.54 1994/04/12 15:46:46 christos Exp christos $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.53 1994/03/13 00:46:35 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.54 1994/04/12 15:46:46 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1644,7 +1644,7 @@ fixio(fd, e)
  * I hope that will cover everything.
  * I added some more defines... many systems have different defines.
  * Rather than dealing with getting the right includes, we'll just
- * cover all the known possibilities here.  -- sterling@oldcolo.com
+ * cover all the known possibilities here.  -- sterling@netcom.com
  */
 #  ifndef O_NONBLOCK
 #   define O_NONBLOCK 0

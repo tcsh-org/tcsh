@@ -1,4 +1,7 @@
 V6.05.00, ... 
+ 92. 6.04.12 04/28/94
+ 91. Ignoreeof patch from Bruce.
+ 90. Dan's completion fix.
  89. 6.04.11 04/12/94
  88. Don't source .logout when killed with -HUP unless we are a login shell.
      [ actually $loginsh controls the behavior now ]

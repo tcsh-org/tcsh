@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.63 1994/03/31 22:36:44 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.64 1994/04/12 15:46:46 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.63 1994/03/31 22:36:44 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.64 1994/04/12 15:46:46 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -253,6 +253,7 @@ tenematch(inputline, num_read, command)
 	xprintf("complete %d ", looking);
 #endif
 	looking = tw_complete(cmd_start, &wordp, &pat, looking, &suf);
+	word_start += wordp - word;
 #ifdef TDEBUG
 	xprintf("complete %d %S\n", looking, pat);
 #endif
@@ -916,8 +917,9 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    if (text_check && isadirectory(exp_dir, item))
 		break;
 
-	    if (gpat && !Gmatch(item, pat) && !isadirectory(exp_dir, item))
-		break;
+	    if (gpat && !Gmatch(item, pat))
+		if (!text_check && !dir_check && !isadirectory(exp_dir, item))
+		    break;
 
 	    /*
 	     * Remove duplicates in command listing and completion

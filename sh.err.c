@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.err.c,v 3.20 1993/06/25 21:17:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.err.c,v 3.21 1993/10/30 19:50:16 christos Exp christos $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.20 1993/06/25 21:17:12 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.21 1993/10/30 19:50:16 christos Exp christos $")
 
 /*
  * C Shell
@@ -422,7 +422,7 @@ stderror(va_alist)
     id &= ~ERR_FLAGS;
 
     /* Pyramid's OS/x has a subtle bug in <varargs.h> which prevents calling
-     * va_end more than once in the same function. -- sterling@oldcolo.com
+     * va_end more than once in the same function. -- sterling@netcom.com
      */
     if (!((flags & ERR_OLD) && seterr == NULL)) {
 	vareturn = 0;	/* Don't return immediately after va_end */

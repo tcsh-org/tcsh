@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.57 1994/03/13 00:46:35 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.58 1994/04/12 15:46:46 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -684,6 +684,9 @@ extern int wait3();	/* I think some bizarre systems still need this */
 # endif /* SOLARIS2 */
 #endif /* SYSVREL == 4 */
 
+#ifdef notdef
+/* These are ok for 1.3, but conflict with the header files for 2.0 */
+/* can someone fix them so the work for both? */
 #if defined(__osf__) && defined(__alpha)
 extern int gethostname __P((char *, int));
 extern void *sbrk __P((ssize_t));
@@ -692,5 +695,6 @@ extern pid_t vfork __P((void));
 extern int killpg __P((pid_t, int));
 extern char *getwd __P((char *));
 #endif /* __osf__ && __alpha */
+#endif
 
 #endif /* _h_tc_os */

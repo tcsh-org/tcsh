@@ -50,7 +50,7 @@
 .\"   Remember to note OS-specific things in "OS variant support", new features
 .\"   in NEW FEATURES and referenced external commands in SEE ALSO.
 .\" 
-.TH TCSH 1 "12 April 1994" "Cornell 6.04.11"
+.TH TCSH 1 "28 April 1994" "Cornell 6.04.12"
 .SH NAME
 tcsh - C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -387,6 +387,26 @@ Note that a `\\' was needed in front of `~' to prevent it from being
 expanded to \fBhome\fR as described under \fBFilename substitution\fR.
 \fBfignore\fR is ignored if only one completion is possible.
 .PP
+If the \fBcomplete\fR shell variable is set to `enhance', completion
+1) ignores case and 2) considers periods, hyphens and underscores
+(`.', `-' and `_') to be word separators and hyphens and underscores to
+be equivalent. If you had the following files
+.IP "" 4
+comp.lang.c      comp.lang.perl   comp.std.c++
+.br
+comp.lang.c++    comp.std.c
+.PP
+and typed `mail -f c.l.c[tab]', it would be completed to
+`mail -f comp.lang.c', and ^D would list `comp.lang.c' and `comp.lang.c++'.
+`mail -f c..c++[^D]' would list `comp.lang.c++' and `comp.std.c++'. Typing
+`rm a--file[^D]' in the following directory
+.IP "" 4
+A_silly_file    a-hyphenated-file    another_silly_file
+.PP
+would list all three files, because case is ignored and hyphens and
+underscores are equivalent. Periods, however, are not equivalent to
+hyphens or underscores.
+.PP
 Completion and listing are affected by several other shell variables:
 \fBrecexact\fR can be set to complete on the shortest possible unique
 match, even if more typing might result in a longer match:
@@ -485,9 +505,6 @@ convenience.
 .B complete \fR(tab)
 Completes a word as described under \fBCompletion and listing\fR.
 .TP 8
-.B complete-raw \fR(^X-tab)
-Like \fIcomplete\fR, but ignores user-defined completions.
-.TP 8
 .B complete-word-back \fR(not bound)
 Like \fIcomplete-word-fwd\fR, but steps up from the end of the list.
 .TP 8
@@ -495,6 +512,9 @@ Like \fIcomplete-word-fwd\fR, but steps up from the end of the list.
 Replaces the current word with the first word in the list of possible
 completions. May be repeated to step down through the list.
 At the end of the list, beeps and reverts to the incomplete word.
+.TP 8
+.B complete-word-raw \fR(^X-tab)
+Like \fIcomplete\fR, but ignores user-defined completions.
 .TP 8
 .B copy-prev-word \fR(M-^_)
 Copies the previous word in the current line into the input buffer.
@@ -2386,9 +2406,10 @@ described under \fBFilename substitution\fR. One might use
 .IP "" 4
 > complete rm 'n/*/f:^*.{c,h,cc,C,tex,1,man,l,y}/'
 .PP
-to exclude precious source code from `rm' completion. Of course, one could
-still type excluded names manually or override the completion mechanism 
-using [^X^I] (\fIcomplete-word-raw\fR) or [^X^D]  (\FIlist-choices-raw\fR).
+to exclude precious source code from `rm' completion. Of course, one
+could still type excluded names manually or override the completion
+mechanism using the \fIcomplete-word-raw\fR or \fIlist-choices-raw\fR
+editor commands (q.v.).
 .PP
 The `C', `D', `F' and `T' \fIlist\fRs are like `c', `d', `f' and `t'
 respectively, but they use the \fIselect\fR argument in a different way: to
@@ -3379,6 +3400,11 @@ scripts.
 .B cdpath
 A list of directories in which \fIcd\fR should search for
 subdirectories if they aren't found in the current directory.
+.TP 8
+.B complete \fR(+)
+If set to `enhance', completion 1) ignores case and 2) considers
+periods, hyphens and underscores (`.', `-' and `_') to be word
+separators and hyphens and underscores to be equivalent.
 .TP 8
 .B correct \fR(+)
 If set to `cmd', commands are automatically spelling-corrected.
@@ -4427,7 +4453,7 @@ access(2), execve(2), fork(2), killpg(2), pipe(2), setrlimit(2),
 sigvec(2), stat(2), umask(2), vfork(2), wait(2), malloc(3), setlocale(3), tty(4),
 a.out(5), termcap(5), environ(7), termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.11 (Cornell) 94/04/12.
+This man page documents tcsh 6.04.12 (Cornell) 94/04/28.
 .SH AUTHORS
 .PD 0
 .TP 2
@@ -4539,7 +4565,7 @@ Extended \fIvi\fR fixes and \fIvi\fR delete command
 Marc Horowitz, MIT, 1991
 ANSIfication fixes, new exec hashing code, imake fixes, \fIwhere\fR
 .TP 2
-Bruce Sterling Woodcock, sterling@oldcolo.com, 1991-1993
+Bruce Sterling Woodcock, sterling@netcom.com, 1991-1994
 ETA and Pyramid port, Makefile and lint fixes, \fBignoreeof\fR=n addition, and
 various other portability changes and bug fixes
 .TP 2
