@@ -1,3 +1,4 @@
+ 27. window change can cause free to be re-entered causing abort (Mark Peek)
  26. vp->vec vetting, suggested by Ian Dall.
  25. V6.11.02 - 20020516
  24. Fix prompt bugs in $var and %c0n (TAKAI Kousuke)

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.102 2002/03/08 19:04:35 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.103 2002/05/16 13:51:25 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -595,6 +595,7 @@ EXTERN bool    is2atty IZERO;	/* is file descriptor 2 a tty (didfds mode) */
 EXTERN bool    arun IZERO;	/* Currently running multi-line-aliases */
 EXTERN int     implicit_cd IZERO;/* implicit cd enabled?(1=enabled,2=verbose) */
 EXTERN bool    inheredoc IZERO;	/* Currently parsing a heredoc */
+EXTERN bool    windowchg IZERO;	/* We received a window change event */
 
 /*
  * Global i/o info

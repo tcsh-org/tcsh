@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.init.c,v 3.45 2002/03/08 17:36:45 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.init.c,v 3.46 2002/06/25 19:02:10 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.45 2002/03/08 17:36:45 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.46 2002/06/25 19:02:10 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -141,7 +141,7 @@ int snum;
     if (snum > 0)
       sigset(snum, window_change);
 #endif /* UNRELSIGS */
-    check_window_size(0);
+    windowchg = 1;
 #ifndef SIGVOID
     return (snum);
 #endif 
