@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.4 1991/07/18 15:24:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.5 1991/07/18 23:44:21 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -94,7 +94,7 @@ struct ucred {
 # endif	/* CSUSP */
 #endif /* ISC */
 #if defined(HYPERCUBE) || defined(u3b2) || defined (u3b5) || \
-    defined(ub15) || defined(u3b20d)
+    defined(ub15) || defined(u3b20d) || defined(ISC202)
 #ifdef TIOCGWINSZ
 /*
  * for struct winsiz

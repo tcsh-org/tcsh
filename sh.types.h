@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.5 1991/07/18 15:50:42 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.6 1991/07/18 23:05:30 christos Exp christos $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -188,6 +188,15 @@ extern char *sbrk();
 
 #endif
 
+
+/***
+ *** Intel 386, ISC 386/ix v2.0.2
+ ***/
+#ifdef ISC202
+# ifndef _SIZE_T
+#  define _SIZE_T
+# endif /* _SIZE_T */
+#endif /* ISC202 */
 
 /***
  *** a PFU/Fujitsu A-xx computer SX/A Edition 60 or later
