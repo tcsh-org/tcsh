@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.xmap.c,v 3.9 1992/10/14 20:19:19 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.xmap.c,v 3.10 1993/06/25 21:17:12 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -12,7 +12,7 @@
  *	      following externally visible functions.
  *
  *		int GetXkey(ch,val);
- *		Char *ch;
+ *		CStr *ch;
  *		XmapVal *val;
  *
  *	      Looks up *ch in map and then reads characters until a
@@ -22,7 +22,7 @@
  *	      The last character read is returned in *ch.
  *
  *		void AddXkey(Xkey, val, ntype);
- *		Char *Xkey;
+ *		CStr *Xkey;
  *		XmapVal *val;
  *		int ntype;
  *
@@ -32,7 +32,7 @@
  *	      out string or a unix command.
  *
  *	        int DeleteXkey(Xkey);
- *	        Char *Xkey;
+ *	        CStr *Xkey;
  *
  *	      Delete the Xkey and all longer Xkeys staring with Xkey, if
  *	      they exists.
@@ -48,7 +48,7 @@
  *	      Removes all entries from Xmap and resets the defaults.
  *
  *		void PrintXkey(Xkey);
- *		Char *Xkey;
+ *		CStr *Xkey;
  *
  *	      Prints all extended keys prefixed by Xkey and their associated
  *	      commands.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.9 1992/10/14 20:19:19 christos Exp christos $")
+RCSID("$Id: ed.xmap.c,v 3.10 1993/06/25 21:17:12 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -121,12 +121,12 @@ static Char printbuf[MAXXKEY];	/* buffer for printing */
 
 
 /* Some declarations of procedures */
-static	int       TraverseMap	__P((XmapNode *, Char *, XmapVal *));
-static	int       TryNode	__P((XmapNode *, Char *, XmapVal *, int));
-static	XmapNode *GetFreeNode	__P((Char *));
+static	int       TraverseMap	__P((XmapNode *, CStr *, XmapVal *));
+static	int       TryNode	__P((XmapNode *, CStr *, XmapVal *, int));
+static	XmapNode *GetFreeNode	__P((CStr *));
 static	void	  PutFreeNode	__P((XmapNode *));
-static	int	  TryDeleteNode	__P((XmapNode **, Char *));
-static	int	  Lookup	__P((Char *, XmapNode *, int));
+static	int	  TryDeleteNode	__P((XmapNode **, CStr *));
+static	int	  Lookup	__P((CStr *, XmapNode *, int));
 static	int	  Enumerate	__P((XmapNode *, int));
 static	int	  unparsech	__P((int, Char *));
 
@@ -142,10 +142,11 @@ XmapCmd(cmd)
 
 XmapVal *
 XmapStr(str)
-    Char  *str;
+    CStr  *str;
 {
     static XmapVal xm;
-    xm.str = str;
+    xm.str.len = str->len;
+    xm.str.buf = str->buf;
     return &xm;
 }
 
@@ -169,7 +170,7 @@ ResetXmap()
  */
 int
 GetXkey(ch, val)
-    Char     *ch;
+    CStr     *ch;
     XmapVal  *val;
 {
     return (TraverseMap(Xmap, ch, val));
@@ -182,12 +183,12 @@ GetXkey(ch, val)
 static int
 TraverseMap(ptr, ch, val)
     XmapNode *ptr;
-    Char     *ch;
+    CStr     *ch;
     XmapVal  *val;
 {
     Char    tch;
 
-    if (ptr->ch == *ch) {
+    if (ptr->ch == *(ch->buf)) {
 	/* match found */
 	if (ptr->next) {
 	    /* Xkey not complete so get next char */
@@ -195,13 +196,13 @@ TraverseMap(ptr, ch, val)
 		val->cmd = F_SEND_EOF;
 		return XK_CMD;/* PWP: Pretend we just read an end-of-file */
 	    }
-	    *ch = tch;
+	    *(ch->buf) = tch;
 	    return (TraverseMap(ptr->next, ch, val));
 	}
 	else {
 	    *val = ptr->val;
 	    if (ptr->type != XK_CMD)
-		*ch = '\0';
+		*(ch->buf) = '\0';
 	    return ptr->type;
 	}
     }
@@ -213,7 +214,8 @@ TraverseMap(ptr, ch, val)
 	}
 	else {
 	    /* no next sibling -- mismatch */
-	    val->str = NULL;
+	    val->str.buf = NULL;
+	    val->str.len = 0;
 	    return XK_STR;
 	}
     }
@@ -221,11 +223,14 @@ TraverseMap(ptr, ch, val)
 
 void
 AddXkey(Xkey, val, ntype)
-    Char    *Xkey;
+    CStr    *Xkey;
     XmapVal *val;
     int      ntype;
 {
-    if (Xkey[0] == '\0') {
+    CStr cs;
+    cs.buf = Xkey->buf;
+    cs.len = Xkey->len;
+    if (Xkey->len == 0) {
 	xprintf("AddXkey: Null extended-key not allowed.\n");
 	return;
     }
@@ -237,35 +242,37 @@ AddXkey(Xkey, val, ntype)
 
     if (Xmap == NULL)
 	/* tree is initially empty.  Set up new node to match Xkey[0] */
-	Xmap = GetFreeNode(Xkey);	/* it is properly initialized */
+	Xmap = GetFreeNode(&cs);	/* it is properly initialized */
 
     /* Now recurse through Xmap */
-    (void) TryNode(Xmap, Xkey, val, ntype);	
+    (void) TryNode(Xmap, &cs, val, ntype);	
     return;
 }
 
 static int
-TryNode(ptr, string, val, ntype)
+TryNode(ptr, str, val, ntype)
     XmapNode *ptr;
-    Char     *string;
+    CStr     *str;
     XmapVal  *val;
     int       ntype;
 {
     /*
      * Find a node that matches *string or allocate a new one
      */
-    if (ptr->ch != *string) {
+    if (ptr->ch != *(str->buf)) {
 	XmapNode *xm;
 
 	for (xm = ptr; xm->sibling != NULL; xm = xm->sibling)
-	    if (xm->sibling->ch == *string)
+	    if (xm->sibling->ch == *(str->buf))
 		break;
 	if (xm->sibling == NULL)
-	    xm->sibling = GetFreeNode(string);	/* setup new node */
+	    xm->sibling = GetFreeNode(str);	/* setup new node */
 	ptr = xm->sibling;
     }
 
-    if (*++string == '\0') {
+    str->buf++;
+    str->len--;
+    if (str->len == 0) {
 	/* we're there */
 	if (ptr->next != NULL) {
 	    PutFreeNode(ptr->next);	/* lose longer Xkeys with this prefix */
@@ -275,8 +282,9 @@ TryNode(ptr, string, val, ntype)
 	switch (ptr->type) {
 	case XK_STR:
 	case XK_EXE:
-	    if (ptr->val.str != NULL)
-		xfree((ptr_t) ptr->val.str);
+	    if (ptr->val.str.buf != NULL)
+		xfree((ptr_t) ptr->val.str.buf);
+	    ptr->val.str.len = 0;
 	    break;
 	case XK_NOD:
 	case XK_CMD:
@@ -292,7 +300,9 @@ TryNode(ptr, string, val, ntype)
 	    break;
 	case XK_STR:
 	case XK_EXE:
-	    ptr->val.str = Strsave(val->str);
+	    ptr->val.str.buf = xmalloc(val->str.len * sizeof(Char));
+	    memcpy(ptr->val.str.buf, val->str.buf, val->str.len * sizeof(Char));
+	    ptr->val.str.len = val->str.len;
 	    break;
 	default:
 	    abort();
@@ -302,8 +312,8 @@ TryNode(ptr, string, val, ntype)
     else {
 	/* still more chars to go */
 	if (ptr->next == NULL)
-	    ptr->next = GetFreeNode(string);	/* setup new node */
-	(void) TryNode(ptr->next, string, val, ntype);
+	    ptr->next = GetFreeNode(str);	/* setup new node */
+	(void) TryNode(ptr->next, str, val, ntype);
     }
     return (0);
 }
@@ -311,19 +321,20 @@ TryNode(ptr, string, val, ntype)
 void
 ClearXkey(map, in)
     KEYCMD *map;
-    Char   *in;
+    CStr   *in;
 {
-    if ((map[(unsigned char) *in] == F_XKEY) &&
-	((map == CcKeyMap && CcAltMap[(unsigned char) *in] != F_XKEY) ||
-	 (map == CcAltMap && CcKeyMap[(unsigned char) *in] != F_XKEY)))
+    unsigned char c = (unsigned char) *(in->buf);
+    if ((map[c] == F_XKEY) &&
+	((map == CcKeyMap && CcAltMap[c] != F_XKEY) ||
+	 (map == CcAltMap && CcKeyMap[c] != F_XKEY)))
 	(void) DeleteXkey(in);
 }
 
 int
 DeleteXkey(Xkey)
-    Char   *Xkey;
+    CStr   *Xkey;
 {
-    if (Xkey[0] == '\0') {
+    if (Xkey->len == 0) {
 	xprintf("DeleteXkey: Null extended-key not allowed.\n");
 	return (-1);
     }
@@ -336,9 +347,9 @@ DeleteXkey(Xkey)
 }
 
 static int
-TryDeleteNode(inptr, string)
+TryDeleteNode(inptr, str)
     XmapNode **inptr;
-    Char   *string;
+    CStr   *str;
 {
     XmapNode *ptr;
     XmapNode *prev_ptr = NULL;
@@ -347,11 +358,11 @@ TryDeleteNode(inptr, string)
     /*
      * Find a node that matches *string or allocate a new one
      */
-    if (ptr->ch != *string) {
+    if (ptr->ch != *(str->buf)) {
 	XmapNode *xm;
 
 	for (xm = ptr; xm->sibling != NULL; xm = xm->sibling)
-	    if (xm->sibling->ch == *string)
+	    if (xm->sibling->ch == *(str->buf))
 		break;
 	if (xm->sibling == NULL)
 	    return (0);
@@ -359,7 +370,10 @@ TryDeleteNode(inptr, string)
 	ptr = xm->sibling;
     }
 
-    if (*++string == '\0') {
+    str->buf++;
+    str->len--;
+
+    if (str->len == 0) {
 	/* we're there */
 	if (prev_ptr == NULL)
 	    *inptr = ptr->sibling;
@@ -369,7 +383,7 @@ TryDeleteNode(inptr, string)
 	PutFreeNode(ptr);
 	return (1);
     }
-    else if (ptr->next != NULL && TryDeleteNode(&ptr->next, string) == 1) {
+    else if (ptr->next != NULL && TryDeleteNode(&ptr->next, str) == 1) {
 	if (ptr->next != NULL)
 	    return (0);
 	if (prev_ptr == NULL)
@@ -408,8 +422,8 @@ PutFreeNode(ptr)
 	break;
     case XK_EXE:
     case XK_STR:
-	if (ptr->val.str != NULL)
-	    xfree((ptr_t) ptr->val.str);
+	if (ptr->val.str.buf != NULL)
+	    xfree((ptr_t) ptr->val.str.buf);
 	break;
     default:
 	abort();
@@ -424,14 +438,15 @@ PutFreeNode(ptr)
  */
 static XmapNode *
 GetFreeNode(ch)
-    Char *ch;
+    CStr *ch;
 {
     XmapNode *ptr;
 
     ptr = (XmapNode *) xmalloc((size_t) sizeof(XmapNode));
-    ptr->ch = *ch;
+    ptr->ch = ch->buf[0];
     ptr->type = XK_NOD;
-    ptr->val.str = NULL;
+    ptr->val.str.buf = NULL;
+    ptr->val.str.len = 0;
     ptr->next = NULL;
     ptr->sibling = NULL;
     return (ptr);
@@ -444,16 +459,19 @@ GetFreeNode(ch)
  */
 void
 PrintXkey(key)
-    Char   *key;
+    CStr   *key;
 {
+    CStr cs;
+    cs.buf = key->buf;
+    cs.len = key->len;
     /* do nothing if Xmap is empty and null key specified */
-    if (Xmap == NULL && *key == 0)
+    if (Xmap == NULL && key->len == 0)
 	return;
 
     printbuf[0] =  '"';
-    if (Lookup(key, Xmap, 1) <= -1)
+    if (Lookup(&cs, Xmap, 1) <= -1)
 	/* key is not bound */
-	xprintf("Unbound extended key \"%S\"\n", key);
+	xprintf("Unbound extended key \"%S\"\n", key->buf);
     return;
 }
 
@@ -462,8 +480,8 @@ PrintXkey(key)
  *	Print if last node
  */
 static int
-Lookup(string, ptr, cnt)
-    Char   *string;
+Lookup(str, ptr, cnt)
+    CStr   *str;
     XmapNode *ptr;
     int     cnt;
 {
@@ -472,25 +490,32 @@ Lookup(string, ptr, cnt)
     if (ptr == NULL)
 	return (-1);		/* cannot have null ptr */
 
-    if (*string == 0) {
+    if (str->len == 0) {
 	/* no more chars in string.  Enumerate from here. */
 	(void) Enumerate(ptr, cnt);
 	return (0);
     }
     else {
 	/* If match put this char into printbuf.  Recurse */
-	if (ptr->ch == *string) {
+	if (ptr->ch == *(str->buf)) {
 	    /* match found */
 	    ncnt = unparsech(cnt, &ptr->ch);
-	    if (ptr->next != NULL)
+	    if (ptr->next != NULL) {
 		/* not yet at leaf */
-		return (Lookup(string + 1, ptr->next, ncnt + 1));
+		CStr tstr;
+		tstr.buf = str->buf + 1;
+		tstr.len = str->len - 1;
+		return (Lookup(&tstr, ptr->next, ncnt + 1));
+	    }
 	    else {
 		/* next node is null so key should be complete */
-		if (string[1] == 0) {
+		if (str->len == 1) {
+		    CStr pb;
 		    printbuf[ncnt + 1] = '"';
 		    printbuf[ncnt + 2] = '\0';
-		    (void) printOne(printbuf, &ptr->val, ptr->type);
+		    pb.buf = printbuf;
+		    pb.len = ncnt + 2;
+		    (void) printOne(&pb, &ptr->val, ptr->type);
 		    return (0);
 		}
 		else
@@ -500,7 +525,7 @@ Lookup(string, ptr, cnt)
 	else {
 	    /* no match found try sibling */
 	    if (ptr->sibling)
-		return (Lookup(string, ptr->sibling, cnt));
+		return (Lookup(str, ptr->sibling, cnt));
 	    else
 		return (-1);
 	}
@@ -531,10 +556,13 @@ Enumerate(ptr, cnt)
 
     ncnt = unparsech(cnt, &ptr->ch); /* put this char at end of string */
     if (ptr->next == NULL) {
+	CStr pb;
 	/* print this Xkey and function */
-	printbuf[ncnt + 1] = '"';
-	printbuf[ncnt + 2] = '\0';
-	(void) printOne(printbuf, &ptr->val, ptr->type);
+	printbuf[++ncnt] = '"';
+	printbuf[++ncnt] = '\0';
+	pb.buf = printbuf;
+	pb.len = ncnt;
+	(void) printOne(&pb, &ptr->val, ptr->type);
     }
     else
 	(void) Enumerate(ptr->next, ncnt + 1);
@@ -552,42 +580,42 @@ Enumerate(ptr, cnt)
  */
 int
 printOne(key, val, ntype)
-    Char    *key;
+    CStr    *key;
     XmapVal *val;
     int      ntype;
 {
     struct KeyFuncs *fp;
     unsigned char unparsbuf[200];
-    static char *fmt = "%-15S->  %s\n";
+    static char *fmt = "%s\n";
 
+    xprintf("%-15S-> ", key->buf);
     if (val != NULL)
 	switch (ntype) {
 	case XK_STR:
 	case XK_EXE:
-	    xprintf(fmt, key, 
-		    unparsestring(val->str, unparsbuf, 
-				  ntype == XK_STR ? STRQQ : STRBB));
+	    xprintf(fmt, unparsestring(&val->str, unparsbuf, 
+				       ntype == XK_STR ? STRQQ : STRBB));
 	    break;
 	case XK_CMD:
 	    for (fp = FuncNames; fp->name; fp++)
 		if (val->cmd == fp->func)
-		    xprintf(fmt, key, fp->name);
+		    xprintf(fmt, fp->name);
 		break;
 	default:
 	    abort();
 	    break;
 	}
     else
-	xprintf(fmt, key, "no input");
+	xprintf(fmt, "no input");
     return (0);
 }
 
 static int
 unparsech(cnt, ch)
-    int     cnt;
-    Char   *ch;
+    int   cnt;
+    Char  *ch;
 {
-    if (*ch == 0) {
+    if (ch == 0) {
 	printbuf[cnt++] = '^';
 	printbuf[cnt] = '@';
 	return cnt;
@@ -613,9 +641,135 @@ unparsech(cnt, ch)
     }
     else {
 	printbuf[cnt++] = '\\';
-	printbuf[cnt++] = (*ch >> 6) & (7 + '0');
-	printbuf[cnt++] = (*ch >> 3) & (7 + '0');
-	printbuf[cnt] = *ch & (7 + '0');
+	printbuf[cnt++] = ((*ch >> 6) & 7) + '0';
+	printbuf[cnt++] = ((*ch >> 3) & 7) + '0';
+	printbuf[cnt] = (*ch & 7) + '0';
     }
     return cnt;
+}
+
+int
+parseescape(ptr)
+    Char  **ptr;
+{
+    Char   *p, c;
+
+    p = *ptr;
+
+    if ((p[1] & CHAR) == 0) {
+	xprintf("Something must follow: %c\n", *p);
+	return -1;
+    }
+    if ((*p & CHAR) == '\\') {
+	p++;
+	switch (*p & CHAR) {
+	case 'a':
+	    c = '\007';		/* Bell */
+	    break;
+	case 'b':
+	    c = '\010';		/* Backspace */
+	    break;
+	case 't':
+	    c = '\011';		/* Horizontal Tab */
+	    break;
+	case 'n':
+	    c = '\012';		/* New Line */
+	    break;
+	case 'v':
+	    c = '\013';		/* Vertical Tab */
+	    break;
+	case 'f':
+	    c = '\014';		/* Form Feed */
+	    break;
+	case 'r':
+	    c = '\015';		/* Carriage Return */
+	    break;
+	case 'e':
+	    c = '\033';		/* Escape */
+	    break;
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	case '5':
+	case '6':
+	case '7':
+	    {
+		register int cnt, val, ch;
+
+		for (cnt = 0, val = 0; cnt < 3; cnt++) {
+		    ch = *p++ & CHAR;
+		    if (ch < '0' || ch > '7') {
+			p--;
+			break;
+		    }
+		    val = (val << 3) | (ch - '0');
+		}
+		if ((val & 0xffffff00) != 0) {
+		    xprintf("Octal constant does not fit in a char.\n");
+		    return 0;
+		}
+		c = (Char) val;
+		--p;
+	    }
+	    break;
+	default:
+	    c = *p;
+	    break;
+	}
+    }
+    else if ((*p & CHAR) == '^' && (Isalpha(p[1] & CHAR) || 
+				    strchr("@^_?\\|[{]}", p[1] & CHAR))) {
+	p++;
+	c = (*p == '?') ? '\177' : ((*p & CHAR) & 0237);
+    }
+    else
+	c = *p;
+    *ptr = p;
+    return (c);
+}
+
+
+unsigned char *
+unparsestring(str, buf, sep)
+    CStr   *str;
+    unsigned char *buf;
+    Char   *sep;
+{
+    unsigned char *b;
+    Char   p;
+    int l;
+
+    b = buf;
+    if (sep[0])
+	*b++ = sep[0];
+
+    for (l = 0; l < str->len; l++) {
+	p = str->buf[l];
+	if (Iscntrl(p)) {
+	    *b++ = '^';
+	    if (p == '\177')
+		*b++ = '?';
+	    else
+		*b++ = p | 0100;
+	}
+	else if (p == '^' || p == '\\') {
+	    *b++ = '\\';
+	    *b++ = p;
+	}
+	else if (p == ' ' || (Isprint(p) && !Isspace(p))) {
+	    *b++ = p;
+	}
+	else {
+	    *b++ = '\\';
+	    *b++ = ((p >> 6) & 7) + '0';
+	    *b++ = ((p >> 3) & 7) + '0';
+	    *b++ = (p & 7) + '0';
+	}
+    }
+    if (sep[0] && sep[1])
+	*b++ = sep[1];
+    *b++ = 0;
+    return buf;			/* should check for overflow */
 }

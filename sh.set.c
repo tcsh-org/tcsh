@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.set.c,v 3.24 1994/03/13 00:46:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.set.c,v 3.25 1994/04/12 15:46:46 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.24 1994/03/13 00:46:35 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.25 1994/04/12 15:46:46 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -686,6 +686,7 @@ unsetv1(p)
 	for (c = p->v_left; c->v_right; c = c->v_right)
 	    continue;
 	p->v_name = c->v_name;
+	p->v_flags = c->v_flags;
 	p->vec = c->vec;
 	p = c;
 	c = p->v_left;

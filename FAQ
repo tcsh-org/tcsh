@@ -157,7 +157,7 @@ be able to get ftp it... :-)
     you are using does not implement telnet line mode.
     This cause the Cray's telnetd to try to use KLUDGELINEMODE.
     You can turn off telnet line mode from the cray side by 
-    doing a "stty extproc", or you can get the Cray AIC to build
+    doing a "stty -extproc", or you can get the Cray AIC to build
     a telnetd without KLUDGELINEMODE, or you can compile
     a new telnet client (from the BSD net2 tape), or at least
     on the suns use: 'mode character'.

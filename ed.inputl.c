@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.inputl.c,v 3.38 1994/03/31 22:36:44 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.inputl.c,v 3.39 1994/05/07 18:51:25 christos Exp christos $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.38 1994/03/31 22:36:44 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.39 1994/05/07 18:51:25 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -662,15 +662,18 @@ GetNextCommand(cmdnum, ch)
 	cmd = CurrentKeyMap[(unsigned char) *ch];
 	if (cmd == F_XKEY) {
 	    XmapVal val;
-	    switch (GetXkey(ch, &val)) {
+	    CStr cstr;
+	    cstr.buf = ch;
+	    cstr.len = Strlen(ch);
+	    switch (GetXkey(&cstr, &val)) {
 	    case XK_CMD:
 		cmd = val.cmd;
 		break;
 	    case XK_STR:
-		PushMacro(val.str);
+		PushMacro(val.str.buf);
 		break;
 	    case XK_EXE:
-		RunCommand(val.str);
+		RunCommand(val.str.buf);
 		break;
 	    default:
 		abort();

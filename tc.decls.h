@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.decls.h,v 3.29 1994/05/07 18:51:25 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.decls.h,v 3.30 1994/05/26 13:11:20 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -58,8 +58,6 @@ extern	void		  showall	__P((Char **, struct command *));
  * tc.bind.c
  */
 extern	void		  dobindkey	__P((Char **, struct command *));
-extern	int		  parseescape	__P((Char **));
-extern	unsigned char    *unparsestring	__P((Char *, unsigned char *, Char *));
 #ifdef OBSOLETE
 extern	void		  dobind	__P((Char **, struct command *));
 #endif /* OBSOLETE */

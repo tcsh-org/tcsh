@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.defns.c,v 3.18 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.defns.c,v 3.19 1994/05/07 18:51:25 christos Exp christos $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.18 1993/10/30 19:50:16 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.19 1994/05/07 18:51:25 christos Exp christos $")
 
 #include "ed.h"
 
@@ -1383,7 +1383,8 @@ static void
 ed_InitMetaBindings()
 {
     Char    buf[3];
-    register int i;
+    int     i;
+    CStr    cstr;
     KEYCMD *map;
 
     map = CcKeyMap;
@@ -1403,10 +1404,12 @@ ed_InitMetaBindings()
     }
     buf[0] = (Char) i;
     buf[2] = 0;
+    cstr.buf = buf;
+    cstr.len = 2;
     for (i = 0200; i <= 0377; i++) {
 	if (map[i] != F_INSERT && map[i] != F_UNASSIGNED && map[i] != F_XKEY) {
 	    buf[1] = i & ASCII;
-	    AddXkey(buf, XmapCmd((int) map[i]), XK_CMD);
+	    AddXkey(&cstr, XmapCmd((int) map[i]), XK_CMD);
 	}
     }
     map[buf[0]] = F_XKEY;
@@ -1432,8 +1435,11 @@ ed_InitVIMaps()
 void
 ed_InitEmacsMaps()
 {
-    register int i;
+    int     i;
     Char    buf[3];
+    CStr    cstr;
+    cstr.buf = buf;
+    cstr.len = 2;
 
     VImode = 0;
     ResetXmap();
@@ -1446,25 +1452,25 @@ ed_InitEmacsMaps()
     buf[0] = 030;
     buf[2] = 0;
     buf[1] = 030;
-    AddXkey(buf, XmapCmd(F_EXCHANGE_MARK), XK_CMD);
+    AddXkey(&cstr, XmapCmd(F_EXCHANGE_MARK), XK_CMD);
     buf[1] = '*';
-    AddXkey(buf, XmapCmd(F_EXPAND_GLOB),   XK_CMD);
+    AddXkey(&cstr, XmapCmd(F_EXPAND_GLOB),   XK_CMD);
     buf[1] = '$';
-    AddXkey(buf, XmapCmd(F_EXPAND_VARS),   XK_CMD);
+    AddXkey(&cstr, XmapCmd(F_EXPAND_VARS),   XK_CMD);
     buf[1] = 'G';
-    AddXkey(buf, XmapCmd(F_LIST_GLOB),     XK_CMD);
+    AddXkey(&cstr, XmapCmd(F_LIST_GLOB),     XK_CMD);
     buf[1] = 'g';
-    AddXkey(buf, XmapCmd(F_LIST_GLOB),     XK_CMD);
+    AddXkey(&cstr, XmapCmd(F_LIST_GLOB),     XK_CMD);
     buf[1] = 'n';
-    AddXkey(buf, XmapCmd(F_PATH_NORM),     XK_CMD);
+    AddXkey(&cstr, XmapCmd(F_PATH_NORM),     XK_CMD);
     buf[1] = 'N';
-    AddXkey(buf, XmapCmd(F_PATH_NORM),     XK_CMD);
+    AddXkey(&cstr, XmapCmd(F_PATH_NORM),     XK_CMD);
     buf[1] = '?';
-    AddXkey(buf, XmapCmd(F_COMMAND_NORM),  XK_CMD);
+    AddXkey(&cstr, XmapCmd(F_COMMAND_NORM),  XK_CMD);
     buf[1] = '\t';
-    AddXkey(buf, XmapCmd(F_COMPLETE_ALL),  XK_CMD);
+    AddXkey(&cstr, XmapCmd(F_COMPLETE_ALL),  XK_CMD);
     buf[1] = 004;	/* ^D */
-    AddXkey(buf, XmapCmd(F_LIST_ALL),  	   XK_CMD);
+    AddXkey(&cstr, XmapCmd(F_LIST_ALL),      XK_CMD);
     ResetArrowKeys();
     BindArrowKeys();
 }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.char.c,v 3.6 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.char.c,v 3.7 1993/06/05 21:09:15 christos Exp $ */
 /*
  * sh.char.c: Character classification tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.char.c,v 3.6 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.char.c,v 3.7 1993/06/05 21:09:15 christos Exp $")
 
 #include "sh.char.h"
 
@@ -166,7 +166,7 @@ unsigned short _cmap[256] = {
 	_CTR,		_CTR,		_CTR,		_CTR,
 
 /*	160 nobreakspace 161 exclamdown	162 cent	163 sterling	*/
-	_SP,		_PUN,		_PUN,		_PUN,
+	_PUN, /* XXX */	_PUN,		_PUN,		_PUN,
 
 /*	164 currency	165 yen		166 brokenbar	167 section	*/
 	_PUN,		_PUN,		_PUN,		_PUN,

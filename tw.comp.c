@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.comp.c,v 1.25 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.comp.c,v 1.26 1994/03/31 22:36:44 christos Exp christos $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.25 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.26 1994/03/31 22:36:44 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -613,5 +613,6 @@ tw_complete(line, word, pat, looking, suf)
 	    return TW_ZERO;	/* Cannot happen */
 	}
     }
+    *suf = '\0';
     return TW_ZERO;
 } /* end tw_complete */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.60 1994/05/07 18:51:25 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.os.h,v 3.61 1994/05/26 13:11:20 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -72,11 +72,15 @@
 # define NOFILE 256
 #endif /* NOFILE */
 
-#if defined(linux) || defined(NetBSD) || SYSVREL >= 4 
+#if defined(linux) || defined(__NetBSD__) || defined(__FreeBSD__) || SYSVREL >= 4 
 # undef NEEDstrerror
-#endif /* linux || NetBSD || SYSVREL >= 4 */
-#if defined(BSD) && BSD >= 199306
-# undef NEEDstrerror
+#endif /* linux || __NetBSD__ || __FreeBSD__ || SYSVREL >= 4 */
+
+#ifndef pyr
+/* Pyramid's cpp complains about the next line */
+# if defined(BSD) && BSD >= 199306
+#  undef NEEDstrerror
+# endif
 #endif
 
 #ifdef OREO
@@ -664,9 +668,9 @@ extern void bcopy	__P((const void *, void *, size_t));
 # define NEEDmemmove
 #endif /* !hpux && !COHERENT && (SYSVREL < 4 || _SEQUENT_) && !__386BSD__ && !memmove */
 
-#if defined(UTek)
+#if defined(UTek) || defined(pyr)
 # define NEEDmemset
-#endif /* Utek */
+#endif /* Utek || pyr */
 
 #if SYSVREL == 4
 # ifdef REMOTEHOST
@@ -676,9 +680,9 @@ extern int getpeername();
 extern int getrlimit();
 extern int setrlimit();
 # endif /* !BSDTIMES */
-# if !defined(IRIS4D) || !defined(SOLARIS2)
+# if !defined(IRIS4D) && !defined(SOLARIS2)
 extern int wait3();	/* I think some bizarre systems still need this */
-# endif /* !IRIS4D || !SOLARIS2 */
+# endif /* !IRIS4D && !SOLARIS2 */
 # if defined(SOLARIS2)
 #  undef NEEDstrerror
 # endif /* SOLARIS2 */

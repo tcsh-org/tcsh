@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.04/RCS/host.defs,v 1.5 1994/05/07 18:51:25 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/host.defs,v 1.6 1994/05/26 13:11:20 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.5 1994/05/07 18:51:25 christos Exp christos $")
+RCSID("$Id: host.defs,v 1.6 1994/05/26 13:11:20 christos Exp $")
 
 endcode	:
 
@@ -375,7 +375,7 @@ machtype: defined(i386)					: "i386"
 enddef	:
 
 
-newdef	: defined(__NetBSD__) || defined(__BSD_NET2__)
+newdef	: defined(__NetBSD__) 
 comment	: Chris Demetriou's NetBSD
 vendor	: defined(amiga)				: "commodore"
 vendor	: defined(hp300)				: "hp"
@@ -386,13 +386,22 @@ vendor	: defined(pc532)				: "national-semi"
 vendor	: defined(pmax)					: "dec"
 vendor	: defined(sparc)				: "sun"
 vendor	: defined(sun3)					: "sun"
-hosttype:						: "NetBSD"
-ostype	:						: "NetBSD"
+hosttype: 						: "NetBSD"
+ostype	: 						: "NetBSD"
 machtype: defined(sparc)				: "sparc"
 machtype: defined(mc68020)				: "m68k"
 machtype: defined(i386)					: "i386"
 machtype: defined(pmax)					: "i860"
 machtype: defined(pc532)				: "pc532"
+enddef	:
+
+
+newdef	: defined(__FreeBSD__) 
+comment	: Free BSD
+vendor	: defined(i386)					: "ibm"
+hosttype:						: "FreeBSD"
+ostype	:						: "FreeBSD"
+machtype:						: "i386"
 enddef	:
 
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.62 1994/05/07 18:51:25 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.c,v 3.63 1994/05/26 13:11:20 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.62 1994/05/07 18:51:25 christos Exp $")
+RCSID("$Id: sh.c,v 3.63 1994/05/26 13:11:20 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1326,6 +1326,8 @@ st_save(st, unit, hflg, al, av)
     else
 	st->argv = NULL;
 
+    SHIN	= unit;	/* Do this first */
+
     /* Establish new input arena */
     {
 	fbuf = NULL;
@@ -1333,7 +1335,6 @@ st_save(st, unit, hflg, al, av)
 	settell();
     }
 
-    SHIN	= unit;
     arginp	= 0;
     onelflg	= 0;
     intty	= isatty(SHIN);
@@ -1498,12 +1499,13 @@ goodbye(v, c)
     record();
 
     if (loginsh) {
-	(void) signal(SIGQUIT, SIG_IGN);
+	(void) sigset(SIGQUIT, SIG_IGN);
 	(void) sigset(SIGINT, SIG_IGN);
-	(void) signal(SIGTERM, SIG_IGN);
+	(void) sigset(SIGTERM, SIG_IGN);
+	(void) sigset(SIGHUP, SIG_IGN);
 	setintr = 0;		/* No interrupts after "logout" */
 	if (!(adrof(STRlogout)))
-	    set(STRlogout, STRnormal, VAR_READWRITE);
+	    set(STRlogout, Strsave(STRnormal), VAR_READWRITE);
 #ifdef _PATH_DOTLOGOUT
 	(void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
 #endif
@@ -1539,13 +1541,24 @@ static  sigret_t
 phup(snum)
 int snum;
 {
+    /*
+     * There is no return from here,
+     * so we are not going to release SIGHUP
+     * anymore
+     */
 #ifdef UNRELSIGS
     if (snum)
 	(void) sigset(snum, SIG_IGN);
+#else
+# ifdef BSDSIGS
+    (void) sigblock(sigmask(SIGHUP));
+# else
+    (void) sighold(SIGHUP);
+# endif /* BSDSIGS */
 #endif /* UNRELSIGS */
 
     if (loginsh) {
-	set(STRlogout, STRhangup, VAR_READWRITE);
+	set(STRlogout, Strsave(STRhangup), VAR_READWRITE);
 #ifdef _PATH_DOTLOGOUT
 	(void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
 #endif
@@ -2144,7 +2157,9 @@ xexit(i)
 		if ((np->p_flags & PHUP) && np->p_jobid != shpgrp)
 		    if (killpg(np->p_jobid, SIGHUP) != -1) {
 			/* In case the job was suspended... */
+#ifdef SIGCONT
 			(void) killpg(np->p_jobid, SIGCONT);
+#endif
 			break;
 		    }
 	    while ((np = np->p_friends) != pp);

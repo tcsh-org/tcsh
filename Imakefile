@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.51 1994/06/19 20:46:44 christos Exp $
+/**/# $Id: Imakefile,v 1.52 1994/06/22 14:09:34 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.05
 /**/# Marc Horowitz, MIT SIPB
@@ -70,7 +70,7 @@ ones.  Please send in your fixes and additions! */
 # endif
 
 # ifdef HPArchitecture
-#  if (OSMajorVersion == 8)
+#  if (OSMajorVersion >= 8)
 #   define ConfigH hpux8
 #  else
 #   define ConfigH hpux7
@@ -304,7 +304,7 @@ platform, unless you have a really weird architecture. */
 #ifdef MyCC
 CC = MyCC
 #else
-# if HasGcc || HasGCC
+# if HasGcc || defined(HasGCC)
 #  if HasGcc2
 CC = gcc 
 #  else
@@ -377,10 +377,6 @@ TCSH_MANDIR = $(TCSHTOP)/man/man$(MANSUFFIX)
 #define MyIncludes
 #endif
 
-#ifndef MyLibs
-#define MyLibs
-#endif
-
 #ifndef MyStdc
 #define MyStdc
 #endif
@@ -404,7 +400,9 @@ HTDEF =
 
 DEFINES = $(TCSHPATH) $(HESDEF) $(AFSDEF) $(HTDEF) MyDefines MyCflags MyStdc
 INCLUDES = -I. MyIncludes
+#ifdef MyLibs
 LDLIBS = MyLibs
+#endif
 
 SUF = o
 VERSION = 6.05

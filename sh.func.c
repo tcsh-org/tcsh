@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.56 1994/03/31 22:36:44 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.57 1994/05/26 13:11:20 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.56 1994/03/31 22:36:44 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.57 1994/05/26 13:11:20 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -62,7 +62,6 @@ static	void	doagain		__P((void));
 static  char   *isrchx		__P((int));
 static	void	search		__P((int, int, Char *));
 static	int	getword		__P((Char *));
-static	int	keyword		__P((Char *));
 static	void	toend		__P((void));
 static	void	xecho		__P((int, Char **));
 
@@ -904,10 +903,8 @@ static int
 getword(wp)
     register Char *wp;
 {
-    register int found = 0;
-    register int c, d;
-    int     kwd = 0;
-    Char   *owp = wp;
+    int found = 0, first;
+    int c, d;
 
     c = readc(1);
     d = 0;
@@ -927,6 +924,7 @@ getword(wp)
 	}
 	unreadc(c);
 	found = 1;
+	first = 1;
 	do {
 	    c = readc(1);
 	    if (c == '\\' && (c = readc(1)) == '\n')
@@ -940,21 +938,24 @@ getword(wp)
 		goto past;
 	    if (wp) {
 		*wp++ = (Char) c;
-		*wp = 0;	/* end the string b4 test */
+		*wp = '\0';
 	    }
-	} while ((d || (!(kwd = keyword(owp)) && c != ' '
-		  && c != '\t')) && c != '\n');
+	    if (!first && !d && c == '(') {
+		if (wp) {
+		    unreadc(c);
+		    *--wp = '\0';
+		    return found;
+		}
+		else 
+		    break;
+	    }
+	    first = 0;
+	} while ((d || (c != ' ' && c != '\t')) && c != '\n');
     } while (wp == 0);
 
-    /*
-     * if we have read a keyword ( "if", "switch" or "while" ) then we do not
-     * need to unreadc the look-ahead char
-     */
-    if (!kwd) {
-	unreadc(c);
-	if (found)
-	    *--wp = 0;
-    }
+    unreadc(c);
+    if (found)
+	*--wp = '\0';
 
     return (found);
 
@@ -987,33 +988,6 @@ past:
 	break;
     }
     /* NOTREACHED */
-    return (0);
-}
-
-/*
- * keyword(wp) determines if wp is one of the built-n functions if,
- * switch or while. It seems that when an if statement looks like
- * "if(" then getword above sucks in the '(' and so the search routine
- * never finds what it is scanning for. Rather than rewrite doword, I hack
- * in a test to see if the string forms a keyword. Then doword stops
- * and returns the word "if" -strike
- */
-
-static int
-keyword(wp)
-    Char   *wp;
-{
-    static Char STRif[] = {'i', 'f', '\0'};
-    static Char STRwhile[] = {'w', 'h', 'i', 'l', 'e', '\0'};
-    static Char STRswitch[] = {'s', 'w', 'i', 't', 'c', 'h', '\0'};
-
-    if (!wp)
-	return (0);
-
-    if ((Strcmp(wp, STRif) == 0) || (Strcmp(wp, STRwhile) == 0)
-	|| (Strcmp(wp, STRswitch) == 0))
-	return (1);
-
     return (0);
 }
 
@@ -1202,7 +1176,8 @@ xecho(sep, v)
 			c = c * 8 + *cp++ - '0';
 		    break;
 		case '\0':
-		    c = *--cp;
+		    c = '\\';
+		    cp--;
 		    break;
 		default:
 		    xputchar('\\' | QUOTE);
