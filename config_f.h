@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.26 2004/03/21 16:48:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/config_f.h,v 3.27 2004/08/04 17:12:26 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -140,7 +140,7 @@
  *		only output, when "dspmbyte" is set. Should be used with
  *		KANJI
  */
-#undef DSPMBYTE
+#define DSPMBYTE
 
 #if defined (WIDE_STRINGS) && defined (DSPMBYTE)
 # error "DSPMBYTE must not be defined if WIDE_STRINGS is defined"
