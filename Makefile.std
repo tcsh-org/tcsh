@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.20 1992/01/28 19:06:06 christos Exp $
+# $Id: Makefile,v 1.21 1992/02/21 23:16:20 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -191,7 +191,7 @@ PVSRCS= Makefile
 AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
-	README.imake
+	README.imake complete.tcsh
 VHSRCS=${PVSRCS} ${AVSRCS}
 
 CONFSRCS=config/config.* 
