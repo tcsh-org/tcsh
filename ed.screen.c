@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.3 1991/07/16 10:45:07 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -35,13 +35,11 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid()
-    { return "$Id: ed.screen.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
-#endif
+RCSID("$Id: ed.screen.c,v 3.3 1991/07/16 10:45:07 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
+#include "tc.h"
 #include "ed.defns.h"
 
 /*
@@ -425,8 +423,8 @@ SetTC(what, how)
 	    tv->val = atoi(how);
 	    T_Cols = Val(T_co);
 	    T_Lines = Val(T_li);
-	    if (tv == &tval[T_co])
-		ReBufferDisplay();
+	    if (tv == &tval[T_co] || tv == &tval[T_li])
+		ChangeSize(Val(T_li), Val(T_co));
 	    return;
 	}
     }
@@ -707,7 +705,7 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
 #ifdef DEBUG_SCREEN
 	xprintf("MoveToLine: where is ridiculous: %d\r\n", where);
 	flush();
-#endif
+#endif /* DEBUG_SCREEN */
 	return;
     }
 
@@ -746,7 +744,7 @@ mc_again:
 #ifdef DEBUG_SCREEN
 	xprintf("MoveToChar: where is riduculous: %d\r\n", where);
 	flush();
-#endif
+#endif /* DEBUG_SCREEN */
 	return;
     }
 
@@ -812,7 +810,7 @@ so_write(cp, n)
 #ifdef DEBUG_SCREEN
 	xprintf("so_write: n is riduculous: %d\r\n", n);
 	flush();
-#endif
+#endif /* DEBUG_SCREEN */
 	return;
     }
 
@@ -824,7 +822,7 @@ so_write(cp, n)
 #ifdef DEBUG_LITERAL
 	    xprintf("so: litnum %d, litptr %x\r\n",
 		    *cp & CHAR, litptr[*cp & CHAR]);
-#endif
+#endif /* DEBUG_LITERAL */
 	    for (d = litptr[*cp++ & CHAR]; *d & LITERAL; d++)
 		(void) putraw(*d & CHAR);
 	    (void) putraw(*d);
@@ -847,7 +845,7 @@ DeleteChars(num)		/* deletes <num> characters */
     if (!T_CanDel) {
 #ifdef DEBUG_EDIT
 	xprintf("   ERROR: cannot delete   \n");
-#endif
+#endif /* DEBUG_EDIT */
 	flush();
 	return;
     }
@@ -856,7 +854,7 @@ DeleteChars(num)		/* deletes <num> characters */
 #ifdef DEBUG_SCREEN
 	xprintf("DeleteChars: num is riduculous: %d\r\n", num);
 	flush();
-#endif
+#endif /* DEBUG_SCREEN */
 	return;
     }
 
@@ -884,11 +882,10 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 {
     if (num <= 0)
 	return;
-
     if (!T_CanIns) {
 #ifdef DEBUG_EDIT
 	xprintf("   ERROR: cannot insert   \n");
-#endif
+#endif /* DEBUG_EDIT */
 	flush();
 	return;
     }
@@ -897,7 +894,7 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 #ifdef DEBUG_SCREEN
 	xprintf("StartInsert: num is riduculous: %d\r\n", num);
 	flush();
-#endif
+#endif /* DEBUG_SCREEN */
 	return;
     }
 
@@ -908,8 +905,20 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 	    return;
 	}
 
-    if (GoodStr(T_im))		/* if I have insert mode */
+    if (GoodStr(T_im) && GoodStr(T_ei)) { /* if I have insert mode */
 	(void) tputs(Str(T_im), 1, putpure);
+
+	CursorH += num;
+	do 
+	    (void) putraw(*cp++);
+	while (--num);
+
+	if (GoodStr(T_ip))	/* have to make num chars insert */
+	    (void) tputs(Str(T_ip), 1, putpure);
+
+	(void) tputs(Str(T_ei), 1, putpure);
+	return;
+    }
 
     do {
 	if (GoodStr(T_ic))	/* have to make num chars insert */
@@ -924,8 +933,6 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 
     } while (--num);
 
-    if (GoodStr(T_ei))
-	(void) tputs(Str(T_ei), 1, putpure);
 }
 
 void
@@ -963,6 +970,7 @@ ClearScreen()
 void
 Beep()
 {				/* produce a sound */
+    beep_cmd ();
     if (adrof(STRnobeep))
 	return;
 
@@ -997,24 +1005,25 @@ GetTermCaps()
 
 
 #ifdef SIG_WINDOW
-#ifdef BSDSIGS
+# ifdef BSDSIGS
     sigmask_t omask;
-#endif				/* BSDSIGS */
+# endif /* BSDSIGS */
     int     lins, cols;
 
     /* don't want to confuse things here */
-#ifdef BSDSIGS
+# ifdef BSDSIGS
     omask = sigblock(sigmask(SIG_WINDOW)) & ~sigmask(SIG_WINDOW);
-#else				/* BSDSIGS */
+# else /* BSDSIGS */
     (void) sighold(SIG_WINDOW);
-#endif				/* BSDSIGS */
-#endif				/* SIG_WINDOW */
+# endif /* BSDSIGS */
+#endif /* SIG_WINDOW */
     area = buf;
 
     GotTermCaps = 1;
 
     setname("gettermcaps");
     ptr = getenv("TERM");
+
 #ifdef apollo
     /*
      * If we are on a pad, we pretend that we are dumb. Otherwise the termcap
@@ -1023,7 +1032,8 @@ GetTermCaps()
      */
     if (isapad())
 	ptr = "dumb";
-#endif
+#endif /* apollo */
+
     if (!ptr || !ptr[0])
 	ptr = "dumb";
 
@@ -1032,11 +1042,11 @@ GetTermCaps()
     i = tgetent(bp, ptr);
     if (i <= 0) {
 	if (i == -1) {
-#if SVID == 0
+#if (SVID == 0) || defined(IRIS3D)
 	    xprintf("tcsh: Cannot open /etc/termcap.\n");
 	}
 	else if (i == 0) {
-#endif				/* SVID */
+#endif /* SVID */
 	    xprintf("tcsh: No entry for terminal type \"%s\"\n",
 		    getenv("TERM"));
 	}
@@ -1089,7 +1099,7 @@ GetTermCaps()
 	xprintf("no delete char capability.\n");
     if (!T_CanIns)
 	xprintf("no insert char capability.\n");
-#endif				/* DEBUG_SCREEN */
+#endif /* DEBUG_SCREEN */
 
 
 
@@ -1099,12 +1109,12 @@ GetTermCaps()
 
 # ifdef BSDSIGS
     (void) sigsetmask(omask);	/* can change it again */
-# else				/* BSDSIGS */
+# else /* BSDSIGS */
     (void) sigrelse(SIG_WINDOW);
-# endif				/* BSDSIGS */
-#else				/* SIG_WINDOW */
+# endif /* BSDSIGS */
+#else /* SIG_WINDOW */
     ChangeSize(Val(T_li), Val(T_co));
-#endif				/* SIG_WINDOW */
+#endif /* SIG_WINDOW */
 
     BindArrowKeys();
 }
@@ -1127,49 +1137,56 @@ GetSize(lins, cols)
     {
 	struct winsize ws;	/* from 4.3 */
 
-	if (ioctl(SHIN, TIOCGWINSZ, (ioctl_t) & ws) != -1) {
+	if (ioctl(SHIN, TIOCGWINSZ, (ioctl_t) &ws) != -1) {
 	    if (ws.ws_col)
 		*cols = ws.ws_col;
 	    if (ws.ws_row)
 		*lins = ws.ws_row;
 	}
     }
-# endif
-#else				/* TIOCGWINSZ */
+# endif /* !lint */
+#else /* TIOCGWINSZ */
 # ifdef TIOCGSIZE
     {
 	struct ttysize ts;	/* from Sun */
 
-	if (ioctl(SHIN, TIOCGSIZE, (ioctl_t) & ts) != -1) {
+	if (ioctl(SHIN, TIOCGSIZE, (ioctl_t) &ts) != -1) {
 	    if (ts.ts_cols)
 		*cols = ts.ts_cols;
 	    if (ts.ts_lines)
 		*lins = ts.ts_lines;
 	}
     }
-# endif				/* TIOCGSIZE */
-#endif				/* TIOCGWINSZ */
-
-    if (*cols < 2)
-	*cols = 80;		/* just in case */
-    if (*lins < 1)
-	*lins = 24;
+# endif /* TIOCGSIZE */
+#endif /* TIOCGWINSZ */
 
     return (Val(T_co) != *cols || Val(T_li) != *lins);
 }
 
-#endif				/* SIGWINDOW */
+#endif /* SIGWINDOW */
 
 void
 ChangeSize(lins, cols)
     int     lins, cols;
 {
-
-    Val(T_co) = cols;
-    Val(T_li) = lins;
+    /*
+     * Just in case
+     */
+    Val(T_co) = (cols < 2) ? 80 : cols;
+    Val(T_li) = (lins < 1) ? 24 : lins;
 
 #ifdef SIG_WINDOW
-    {
+    /*
+     * We want to affect the environment only when we have a valid
+     * setup, not when we get bad settings. Consider the following scenario:
+     * We just logged in, and we have not initialized the editor yet.
+     * We reset termcap with tset, and not $TERMCAP has the right
+     * terminal size. But since the editor is not initialized yet, and
+     * the kernel's notion of the terminal size might be wrong we arrive
+     * here with lines = columns = 0. If we reset the environment we lose
+     * our only chance to get the window size right.
+     */
+    if (Val(T_co) == cols && Val(T_li) == lins) {
 	Char    buf[10];
 	char   *tptr;
 
@@ -1229,7 +1246,7 @@ ChangeSize(lins, cols)
 	    Setenv(STRTERMCAP, termcap);
 	}
     }
-#endif				/* SIG_WINDOW */
+#endif /* SIG_WINDOW */
 
     ReBufferDisplay();		/* re-make display buffers */
     ClearDisp();
