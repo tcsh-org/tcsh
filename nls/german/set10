@@ -1,9 +1,9 @@
-$ $Id$
+$ $Id: set10,v 1.2 1995/03/19 18:09:24 christos Exp $
 $ ma.setp.c
 $set 10
 1 setpath: ungültiger Befehl '%s'.\n
 2 setpath: unzureichende Argumente für Befehl '%s'.\n
 3 setpath: Wert fehlt in Pfad '%s'\n
 4 setpath: %s nicht in %s gefunden\n
-5 setpath: %d keine gültige Postion in %s\n
+5 setpath: %d keine gültige Position in %s\n
 

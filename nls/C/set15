@@ -1,7 +1,7 @@
-$ $Id$
+$ $Id: set15,v 1.2 1995/03/19 18:07:15 christos Exp $
 $ sh.func.c
 $set 15 
 1 %s: %s: Can't %s%s limit\n
 2 remove
 3 set
-4 \020hard
+4 \040hard

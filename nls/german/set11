@@ -1,4 +1,4 @@
-$ $Id: set11,v 1.2 1995/03/19 18:09:24 christos Exp christos $
+$ $Id: set11,v 1.3 1995/04/25 14:08:04 christos Exp $
 $ sh.c
 $set 11
 1 Warnung: kein Zugriff auf Tty (%s).\n
@@ -6,5 +6,5 @@ $set 11
 3 Sie haben %d Mails.\n
 4 Sie haben %d Mails in %s.\n
 5 Sie haben %sMail.\n
-6 neue 
+6 neue\040
 7 Sie haben %sMail in %s.\n

@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set26,v 1.2 1995/03/19 18:09:24 christos Exp $
 $ tc.who.c
 $set 26
 1 Kein Zugriff auf %s.  Bitte "unset watch" eingeben.\n
@@ -7,9 +7,9 @@ $set 26
 4 Zurück: 
 5 FEHLER! erstes Element ist nicht whohead!\n
 6 neu: %s/%s\n
-7 %n hat %a auf %l von %m.
-8 %n hat %a auf %l.
+7 %n hat %a an %l von %m.
+8 %n hat %a an %l.
 9 sich angemeldet
 10 sich abgemeldet
-11 ersetzte %s
+11 %s ersetzt
 12 lokal

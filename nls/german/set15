@@ -1,7 +1,7 @@
-$ $Id$
+$ $Id: set15,v 1.2 1995/03/19 18:09:24 christos Exp $
 $ sh.func.c
 $set 15
-1 %s: %s: Kann Begrenzung nicht %s (%s)\n
+1 %s: %s: Kann Begrenzung nicht %s%s\n
 2 löschen
 3 setzen
-4 \020hard
+4 \040(hard limit)

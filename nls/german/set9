@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set9,v 1.2 1995/03/19 18:09:24 christos Exp $
 $ ed.xmap.c
 $set 9
 1 AddXkey: Null extended-key not allowed.\n
@@ -9,4 +9,4 @@ $set 9
 6 Enumerate: BUG!! Null ptr passed\n!
 7 keine Eingabe
 8 Es muﬂ noch etwas folgen: %c\n
-9 Octal-Konstante paﬂt nicht in ein Zeichen.\n
+9 Oktal-Konstante paﬂt nicht in ein Zeichen.\n
