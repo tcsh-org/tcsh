@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.5 1991/07/18 18:45:58 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.5 1991/07/18 18:49:38 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.proc.c,v 3.5 1991/07/18 18:45:58 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.5 1991/07/18 18:49:38 christos Exp christos $")
 
 #include "sh.h"
 #include "ed.h"
@@ -1772,7 +1772,7 @@ pfork(t, wanttty)
 #ifdef F_VER
         if (t->t_dflg & F_VER) {
 	    Setenv(STRSYSTYPE, t->t_systype ? STRbsd43 : STRsys53);
-	    dohash();
+	    dohash(NULL, NULL);
 	}
 #endif /* F_VER */
 #ifdef SIGSYNCH

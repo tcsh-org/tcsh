@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.2 1991/07/18 16:19:48 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -36,7 +36,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.sem.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.2 1991/07/18 16:19:48 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -55,7 +55,7 @@ RCSID("$Id: sh.sem.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #ifdef VFORK
 static	sigret_t	vffree	__P((int));
-#endif
+#endif 
 static	void		doio	__P((struct command *, int *, int *));
 static	void		chkclob	__P((char *));
 
@@ -70,7 +70,7 @@ execute(t, wanttty, pipein, pipeout)
 {
 #if defined(convex) || defined(__convex__)
     extern bool use_fork;	/* use fork() instead of vfork()? */
-#endif
+#endif 
 
     bool    forked = 0;
     struct biltins *bifunc;
@@ -81,7 +81,7 @@ execute(t, wanttty, pipein, pipeout)
     static sigmask_t csigmask;
 # ifdef VFORK
     static sigmask_t ocsigmask;
-# endif	/* VFORK */
+# endif /* VFORK */
 #endif /* BSDSIGS */
 #ifdef VFORK
     static int onosigchld = 0;
@@ -175,7 +175,7 @@ execute(t, wanttty, pipein, pipeout)
 		}
 		else
 		    break;
-#endif
+#endif  /* F_VER */
 	    else
 		break;
 
@@ -215,7 +215,7 @@ execute(t, wanttty, pipein, pipeout)
 #ifdef VFORK
 	    if (t->t_dtyp == NODE_PAREN ||
 		t->t_dflg & (F_REPEAT | F_AMPERSAND) || bifunc)
-#endif
+#endif /* VFORK */
 	    {
 		forked++;
 		/*
@@ -225,9 +225,9 @@ execute(t, wanttty, pipein, pipeout)
 		if (wanttty >= 0 && !nosigchld) {
 #ifdef BSDSIGS
 		    csigmask = sigblock(sigmask(SIGCHLD));
-#else
+#else /* !BSDSIGS */
 		    sighold(SIGCHLD);
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
 
 		    nosigchld = 1;
 		}
@@ -236,9 +236,9 @@ execute(t, wanttty, pipein, pipeout)
 		if (pid == 0 && nosigchld) {
 #ifdef BSDSIGS
 		    (void) sigsetmask(csigmask);
-#else
+#else /* !BSDSIGS */
 		    (void) sigrelse(SIGCHLD);
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
 		    nosigchld = 0;
 		}
 	    }
@@ -249,13 +249,13 @@ execute(t, wanttty, pipein, pipeout)
 		int     oSHIN, oSHOUT, oSHDIAG, oOLDSTD, otpgrp;
 		int     oisoutatty, oisdiagatty;
 
-#ifndef FIOCLEX
+# ifndef FIOCLEX
 		int     odidcch;
 
-#endif
-#ifdef BSDSIGS
+# endif  /* !FIOCLEX */
+# ifdef BSDSIGS
 		sigmask_t omask;
-#endif				/* BSDSIGS */
+# endif /* BSDSIGS */
 
 		/*
 		 * Prepare for the vfork by saving everything that the child
@@ -265,37 +265,33 @@ execute(t, wanttty, pipein, pipeout)
 		 * the current sigvec's for the signals the child touches
 		 * before it exec's.
 		 */
-#ifdef BSDSIGS
+# ifdef BSDSIGS
 
 		/*
 		 * Sooooo true... If this is a Sun, save the sigvec's. (Skip
 		 * Gilbrech - 11/22/87)
 		 */
-#ifdef SAVESIGVEC
+#  ifdef SAVESIGVEC
 		sigvec_t savesv[NSIGSAVED];
 		sigmask_t savesm;
 
-#endif				/* SAVESIGVEC */
+#  endif /* SAVESIGVEC */
 		if (wanttty >= 0 && !nosigchld && !noexec) {
-#ifdef BSDSIGS
 		    csigmask = sigblock(sigmask(SIGCHLD));
-#else
-		    sighold(SIGCHLD);
-#endif				/* BSDSIGS */
 		    nosigchld = 1;
 		}
 		omask = sigblock(sigmask(SIGCHLD) | sigmask(SIGINT));
-#else
+# else /* !BSDSIGS */
 		(void) sighold(SIGCHLD);
 		(void) sighold(SIGINT);
-#endif
+# endif  /* !BSDSIGS */
 		ochild = child;
 		osetintr = setintr;
 		ohaderr = haderr;
 		odidfds = didfds;
-#ifndef FIOCLEX
+# ifndef FIOCLEX
 		odidcch = didcch;
-#endif
+# endif /* !FIOCLEX */
 		oSHIN = SHIN;
 		oSHOUT = SHOUT;
 		oSHDIAG = SHDIAG;
@@ -303,61 +299,61 @@ execute(t, wanttty, pipein, pipeout)
 		otpgrp = tpgrp;
 		oisoutatty = isoutatty;
 		oisdiagatty = isdiagatty;
-#ifdef BSDSIGS
+# ifdef BSDSIGS
 		ocsigmask = csigmask;
-#endif				/* BSDSIGS */
+# endif /* BSDSIGS */
 		onosigchld = nosigchld;
 		Vsav = Vdp = 0;
 		Vexpath = 0;
 		Vt = 0;
-#ifdef SAVESIGVEC
+# ifdef SAVESIGVEC
 		savesm = savesigvec(savesv);
-#endif				/* SAVESIGVEC */
-#if defined(convex) || defined(__convex__)
+# endif /* SAVESIGVEC */
+# if defined(convex) || defined(__convex__)
 		if (use_fork)
 		    pid = fork();
 		else
 		    pid = vfork();
-#else
+# else /* !convex && !__convex__ */
 		pid = vfork();
-#endif
+# endif /* convex || __CONVEX__ */
 
 		if (pid < 0) {
-#ifdef BSDSIGS
-#ifdef SAVESIGVEC
+# ifdef BSDSIGS
+#  ifdef SAVESIGVEC
 		    restoresigvec(savesv, savesm);
-#endif				/* SAVESIGVEC */
+#  endif /* SAVESIGVEC */
 		    (void) sigsetmask(omask);
-#else
+# else /* !BSDSIGS */
 		    (void) sigrelse(SIGCHLD);
 		    (void) sigrelse(SIGINT);
-#endif
+#endif  /* BSDSIGS */
 		    stderror(ERR_NOPROC);
 		}
 		forked++;
 		if (pid) {	/* parent */
-#ifdef BSDSIGS
-#ifdef SAVESIGVEC
+# ifdef BSDSIGS
+#  ifdef SAVESIGVEC
 		    restoresigvec(savesv, savesm);
-#endif				/* SAVESIGVEC */
-#endif				/* BSDSIGS */
+#  endif /* SAVESIGVEC */
+# endif /* BSDSIGS */
 		    child = ochild;
 		    setintr = osetintr;
 		    haderr = ohaderr;
 		    didfds = odidfds;
 		    SHIN = oSHIN;
-#ifndef FIOCLEX
+# ifndef FIOCLEX
 		    didcch = odidcch;
-#endif
+# endif /* !FIOCLEX */
 		    SHOUT = oSHOUT;
 		    SHDIAG = oSHDIAG;
 		    OLDSTD = oOLDSTD;
 		    tpgrp = otpgrp;
 		    isoutatty = oisoutatty;
 		    isdiagatty = oisdiagatty;
-#ifdef BSDSIGS
+# ifdef BSDSIGS
 		    csigmask = ocsigmask;
-#endif				/* BSDSIGS */
+# endif /* BSDSIGS */
 		    nosigchld = onosigchld;
 
 		    xfree((ptr_t) Vsav);
@@ -370,12 +366,12 @@ execute(t, wanttty, pipein, pipeout)
 		    Vt = 0;
 		    /* this is from pfork() */
 		    palloc(pid, t);
-#ifdef BSDSIGS
+# ifdef BSDSIGS
 		    (void) sigsetmask(omask);
-#else
+# else /* !BSDSIGS */
 		    (void) sigrelse(SIGCHLD);
 		    (void) sigrelse(SIGINT);
-#endif
+# endif  /* BSDSIGS */
 		}
 		else {		/* child */
 		    /* this is from pfork() */
@@ -383,11 +379,11 @@ execute(t, wanttty, pipein, pipeout)
 		    bool    ignint = 0;
 
 		    if (nosigchld) {
-#ifdef BSDSIGS
+# ifdef BSDSIGS
 			(void) sigsetmask(csigmask);
-#else
+# else /* !BSDSIGS */
 			(void) sigrelse(SIGCHLD);
-#endif				/* BSDSIGS */
+# endif /* BSDSIGS */
 			nosigchld = 0;
 		    }
 
@@ -400,9 +396,9 @@ execute(t, wanttty, pipein, pipeout)
 		    child++;
 		    if (setintr) {
 			setintr = 0;
-#ifdef notdef
+# ifdef notdef
 			(void) signal(SIGCHLD, SIG_DFL);
-#endif
+# endif 
 /*
  * casts made right for SunOS 4.0 by Douglas C. Schmidt
  * <schmidt%sunshine.ics.uci.edu@ROME.ICS.UCI.EDU>
@@ -434,31 +430,31 @@ execute(t, wanttty, pipein, pipeout)
 			(void) signal(SIGQUIT, SIG_IGN);
 		    }
 
-#ifdef _SEQUENT_
+# ifdef _SEQUENT_
 		    pgetty(wanttty ? wanttty : 1, pgrp);
-#else				/* _SEQUENT_ */
+# else /* _SEQUENT_ */
 		    pgetty(wanttty, pgrp);
-#endif				/* _SEQUENT_ */
+# endif /* _SEQUENT_ */
 
 		    if (t->t_dflg & F_NOHUP)
 			(void) signal(SIGHUP, SIG_IGN);
 		    if (t->t_dflg & F_NICE)
-#ifdef BSDNICE
+# ifdef BSDNICE
 			(void) setpriority(PRIO_PROCESS,
 					   0, t->t_nice);
-#else				/* BSDNICE */
+# else /* !BSDNICE */
 			(void) nice(t->t_nice);
-#endif				/* BSDNICE */
-#ifdef F_VER
+# endif /* BSDNICE */
+# ifdef F_VER
 		    if (t->t_dflg & F_VER) {
 			Setenv(STRSYSTYPE, t->t_systype ? STRbsd43 : STRsys53);
-			dohash();
+			dohash(NULL, NULL);
 		    }
-#endif
+# endif /* F_VER */
 		}
 
 	    }
-#endif				/* VFORK */
+#endif /* VFORK */
 	if (pid != 0) {
 	    /*
 	     * It would be better if we could wait for the whole job when we
@@ -474,9 +470,9 @@ execute(t, wanttty, pipein, pipeout)
 		if (nosigchld) {
 #ifdef BSDSIGS
 		    (void) sigsetmask(csigmask);
-#else
+#else /* !BSDSIGS */
 		    (void) sigrelse(SIGCHLD);
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
 		    nosigchld = 0;
 		}
 		if ((t->t_dflg & F_AMPERSAND) == 0)
@@ -515,7 +511,7 @@ execute(t, wanttty, pipein, pipeout)
 	SHIN = -1;
 #ifndef FIOCLEX
 	didcch = 0;
-#endif
+#endif /* !FIOCLEX */
 	didfds = 0;
 	wanttty = -1;
 	t->t_dspr->t_dflg |= t->t_dflg & F_NOINTERRUPT;
@@ -600,8 +596,7 @@ int snum;
     return(0);
 #endif /* SIGVOID */
 }
-
-#endif
+#endif /* VFORK */
 
 /*
  * Perform io redirection.
@@ -651,17 +646,16 @@ doio(t, pipein, pipeout)
 	    (void) close(0);
 	    (void) dup(OLDSTD);
 #ifdef FIOCLEX
-#ifdef CLEX_DUPS
+# ifdef CLEX_DUPS
 	    /*
 	     * PWP: Unlike Bezerkeley 4.3, FIONCLEX for Pyramid is preserved
 	     * across dup()s, so we have to UNSET it here or else we get a
 	     * command with NO stdin, stdout, or stderr at all (a bad thing
 	     * indeed)
 	     */
-
 	    (void) ioctl(0, FIONCLEX, NULL);
-#endif				/* CLEX_DUPS */
-#endif				/* FIONCLEX */
+# endif /* CLEX_DUPS */
+#endif /* FIONCLEX */
 	}
     }
     if (cp = t->t_drit) {
@@ -680,10 +674,10 @@ doio(t, pipein, pipeout)
 	if ((flags & F_APPEND) &&
 #ifdef O_APPEND
 	    (fd = open(tmp, O_WRONLY | O_APPEND)) >= 0);
-#else
+#else /* !O_APPEND */
 	    (fd = open(tmp, O_WRONLY)) >= 0)
 	    (void) lseek(1, (off_t) 0, L_XTND);
-#endif
+#endif /* O_APPEND */
 	else {
 	    if (!(flags & F_OVERWRITE) && adrof(STRnoclobber)) {
 		if (flags & F_APPEND)
@@ -706,10 +700,10 @@ doio(t, pipein, pipeout)
 	(void) dup(SHOUT);
 	is1atty = isoutatty;
 #ifdef FIOCLEX
-#ifdef CLEX_DUPS
+# ifdef CLEX_DUPS
 	(void) ioctl(1, FIONCLEX, NULL);
-#endif				/* CLEX_DUPS */
-#endif				/* FIONCLEX */
+# endif /* CLEX_DUPS */
+#endif /* FIONCLEX */
     }
 
     (void) close(2);
@@ -721,10 +715,10 @@ doio(t, pipein, pipeout)
 	(void) dup(SHDIAG);
 	is2atty = isdiagatty;
 #ifdef FIOCLEX
-#ifdef CLEX_DUPS
+# ifdef CLEX_DUPS
 	(void) ioctl(2, FIONCLEX, NULL);
-#endif				/* CLEX_DUPS */
-#endif				/* FIONCLEX */
+# endif /* CLEX_DUPS */
+#endif /* FIONCLEX */
     }
     didfds = 1;
 }

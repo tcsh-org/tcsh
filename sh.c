@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.2 1991/07/16 16:21:55 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.3 1991/07/17 21:52:22 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,7 +41,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.2 1991/07/16 16:21:55 christos Exp $")
+RCSID("$Id: sh.c,v 3.3 1991/07/17 21:52:22 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -807,7 +807,7 @@ main(argc, argv)
 #ifdef _PATH_DOTCSHRC
 	    (void) srcfile(_PATH_DOTCSHRC, 0, 0);
 #endif
-	    if (!fast && !arginp && !onelflg)
+	    if (!arginp && !onelflg && !havhash)
 		dohash(NULL,NULL);
 #ifdef _PATH_DOTLOGIN
 	    if (loginsh)
