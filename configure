@@ -3159,7 +3159,7 @@ fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 if test "$ac_cv_search_tgetent" = no; then
-  for ac_lib in termlib curses ncurses termcap; do
+  for ac_lib in termlib termcap curses ncurses; do
     LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
     cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
