@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.char.h,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.char.h,v 2.1 1991/03/31 13:06:41 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -56,8 +56,10 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 #define isspc(c)	cmap(c, _SP)
 #define ismeta(c)	cmap(c, _META)
 #define iscmdmeta(c)	cmap(c, _CMD)
-#define letter(c)	(isalpha(c) || c == '_')
-#define alnum(c)	(isalnum(c) || c == '_')
+#define letter(c)	(((c) & QUOTE) ? 0 : \
+			 (isalpha((unsigned char) (c)) || (c) == '_'))
+#define alnum(c)	(((c) & QUOTE) ? 0 : \
+		         (isalnum((unsigned char) (c)) || (c) == '_'))
 #ifdef NLS
 #    include <ctype.h>
 #else
