@@ -671,3 +671,12 @@ LIBES   :	-lcurses
 OS      :	OSF1 1.2
 CONFIG  :	config.decosf1
 VERSION :	6.03
+
+VENDOR  :	intel
+MODELS  :	Paragon 
+COMPILER:	cc
+CFLAGS  :	Normal
+LIBES   :	-lcurses -lbsd
+OS      :	OSF1 1.?
+CONFIG  :	config.parosf1
+VERSION :	6.03

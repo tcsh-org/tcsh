@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.const.c,v 3.18 1993/05/17 00:11:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.const.c,v 3.19 1993/06/05 21:09:15 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.18 1993/05/17 00:11:09 christos Exp christos $")
+RCSID("$Id: tc.const.c,v 3.19 1993/06/05 21:09:15 christos Exp $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -152,7 +152,6 @@ Char STRnoglob[]	= { 'n', 'o', 'g', 'l', 'o', 'b', '\0' };
 Char STRnonomatch[]	= { 'n', 'o', 'n', 'o', 'm', 'a', 't', 'c', 'h', '\0' };
 Char STRfakecom1[]	= { '`', ' ', '.', '.', '.', ' ', '`', '\0' };
 Char STRampm[]		= { 'a', 'm', 'p', 'm', '\0' };
-Char STRchild[]		= { 'c', 'h', 'i', 'l', 'd', '\0' };
 Char STRtime[]		= { 't', 'i', 'm', 'e', '\0' };
 Char STRnotify[]	= { 'n', 'o', 't', 'i', 'f', 'y', '\0' };
 Char STRprintexitvalue[] = { 'p', 'r', 'i', 'n', 't', 'e', 'x', 'i', 't', 'v', 
@@ -194,7 +193,6 @@ Char STRKHOME[]		= { 'H', 'O', 'M', 'E', '\0' };
 Char STRbackslash_quote[] = { 'b', 'a', 'c', 'k', 's', 'l', 'a', 's', 'h', '_',
 			     'q', 'u', 'o', 't', 'e', '\0' };
 Char STRRparen[]	= { ')', '\0' };
-Char STRcolon[]		= { ':', '\0' };
 Char STRmail[]		= { 'm', 'a', 'i', 'l', '\0' };
 #ifndef HAVENOUTMP
 Char STRwatch[]		= { 'w', 'a', 't', 'c', 'h', '\0' };

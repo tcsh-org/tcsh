@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.sig.c,v 3.13 1992/10/14 20:19:19 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.sig.c,v 3.14 1993/06/07 14:29:35 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.13 1992/10/14 20:19:19 christos Exp christos $")
+RCSID("$Id: tc.sig.c,v 3.14 1993/06/07 14:29:35 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -271,6 +271,7 @@ char   *show_sig_mask();
 
 int     debug_signals = 0;
 
+#ifndef __PARAGON__
 /*
  * sigsetmask(mask)
  *
@@ -302,6 +303,7 @@ sigsetmask(mask)
 
     return (m);
 }
+#endif /* __PARAGON__ */
 
 /*
  * sigblock(mask)

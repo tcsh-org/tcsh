@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.49 1993/06/05 21:09:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.50 1993/06/11 20:15:04 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.49 1993/06/05 21:09:15 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.50 1993/06/11 20:15:04 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1075,7 +1075,17 @@ tw_collect(command, looking, exp_dir, exp_name, target, pat, flags, dir_fd)
 	    resexit(osetexit);
 	    InsideCompletion = 0;
 	    haderr = 0;
+
+#if defined(SOLARIS2) && defined(i386)
+	    /* Compiler bug? (from PWP) */
+	    if ((looking == 3) || (looking == 7))
+		tw_logname_end();
+	    else
+		tw_dir_end();
+#else /* !(SOLARIS2 && i386) */
 	    (*tw_end_entry[looking])();
+#endif /* !(SOLARIS2 && i386) */
+
 	    /* flag error */
 	    return(-1);
 	}
@@ -1085,7 +1095,17 @@ tw_collect(command, looking, exp_dir, exp_name, target, pat, flags, dir_fd)
 					flags & ~TW_IGN_OK)) >= 0) {
 	    resexit(osetexit);
 	    InsideCompletion = 0;
+
+#if defined(SOLARIS2) && defined(i386)
+	    /* Compiler bug? (from PWP) */
+	    if ((looking == 3) || (looking == 7))
+		tw_logname_end();
+	    else
+		    tw_dir_end();
+    #else /* !(SOLARIS2 && i386) */
 	    (*tw_end_entry[looking])();
+#endif /* !(SOLARIS2 && i386) */
+
 	    return(ni);
 	}
     }
