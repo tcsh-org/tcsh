@@ -1294,6 +1294,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
   if test -f $ac_dir/install-sh; then
@@ -1603,8 +1604,11 @@ Check tcsh's \`Ported' file for manual configuration instructions." >&2;}
 esac
 
 echo "Tcsh will use configuration file \`$tcsh_config_file'."
+cp config/${tcsh_config_file} config_p.h
 
-          ac_config_headers="$ac_config_headers config.h:config/${tcsh_config_file}:config.h.in"
+
+
+          ac_config_headers="$ac_config_headers config.h"
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -2838,7 +2842,7 @@ echo "${ECHO_T}$ac_cv_prog_gcc_traditional" >&6
 fi
 
 
-if test $ac_cv_c_compiler_gnu = no ; then
+if test "x$GCC" != xyes ; then
   DFLAGS="$DFLAGS $NON_GNU_DFLAGS"
   CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
 fi
@@ -4548,6 +4552,7 @@ done
 
 
           ac_config_files="$ac_config_files Makefile"
+
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -5073,7 +5078,7 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-  "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h:config/${tcsh_config_file}:config.h.in" ;;
+  "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
