@@ -116,6 +116,24 @@
 #define DIRENT
 /****************** local defines *********************/
 /****************** configurable hacks ****************/
+
 /* have been moved to config_f.h */
 #include "config_f.h"
+
+#ifdef __bsdi__
+/*
+ * _PATH_TCSHELL      if you've change the installation location (vix)
+ */
+# ifdef _BSDI_VERSION >= 199701
+#  define _PATH_TCSHELL "/bin/tcsh"
+#  undef SYSMALLOC
+#  define SYSMALLOC
+# else
+#  define _PATH_TCSHELL "/usr/contrib/bin/tcsh"
+# endif
+
+# undef NLS
+# undef NLS_CATALOGS
+#endif
+
 #endif /* _h_config */

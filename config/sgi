@@ -107,11 +107,11 @@
  *		you are running. Or set it to 0 if you are not SYSV based
  */
 #ifdef mips
-# ifdef _SYSTYPE_SVR4
+# if defined(SYSTYPE_SVR4) || defined(_SYSTYPE_SVR4)
 #  define SYSVREL	4
 # else
 #  define SYSVREL	3
-# endif /* _SYSTYPE_SVR4 */
+# endif /* SYSTYPE_SVR4 || _SYSTYPE_SVR4 */
 #else
 /* 
  * For the 3000:
@@ -204,6 +204,9 @@
 /* have been moved to config_f.h */
 #include "config_f.h"
 
+#ifdef notdef
+/* You can put these back if your os does not really support nls */
 #undef NLS
 #undef NLS_CATALOGS
+#endif
 #endif /* _h_config */
