@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.53 2004/08/04 14:28:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.54 2004/08/04 17:12:28 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.53 2004/08/04 14:28:23 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.54 2004/08/04 17:12:28 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1252,17 +1252,16 @@ so_write(cp, n)
 		/* force the wrap to avoid the "magic" situation */
 		Char c;
 		if ((c = Display[CursorV][CursorH]) != '\0') {
-		    so_write(&Display[CursorV][CursorH], 1);
+		    so_write(&c, 1);
 #ifdef DSPMBYTE
 		    if (CursorH > 0 && (c = Display[CursorV][CursorH]) != 0)
 			if (Ismbyte2(c))
-			    so_write(&Display[CursorV][CursorH], 1);
+			    so_write(&c, 1);
 #endif
 		}
-		else {
+		else
 		    (void) putraw(' ');
-		    CursorH = 1;
-		}
+		CursorH = 1;
 	    }
 	}
 	else			/* no wrap, but cursor stays on screen */
