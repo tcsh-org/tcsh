@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.24 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.h,v 3.25 1991/12/14 20:45:46 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -93,19 +93,19 @@ typedef int sigret_t;
 /*
  * Fundamental definitions which may vary from system to system.
  *
- *	BUFSIZ		The i/o buffering size; also limits word size
+ *	BUFSIZE		The i/o buffering size; also limits word size
  *	MAILINTVL	How often to mailcheck; more often is more expensive
  */
-#ifndef BUFSIZ
-#define	BUFSIZ	1024		/* default buffer size */
-#endif /* BUFSIZ */
+#ifndef BUFSIZE
+#define	BUFSIZE	1024		/* default buffer size */
+#endif /* BUFSIZE */
 
 #define FORKSLEEP	10	/* delay loop on non-interactive fork failure */
 #define	MAILINTVL	600	/* 10 minutes */
 
-#ifndef INBUFSIZ
-# define INBUFSIZ	1024	/* Num input characters on the command line */
-#endif /* INBUFSIZ */
+#ifndef INBUFSIZE
+# define INBUFSIZE	1024	/* Num input characters on the command line */
+#endif /* INBUFSIZE */
 /*
  * The shell moves std in/out/diag and the old std input away from units
  * 0, 1, and 2 so that it is easy to set up these standards for invoked
@@ -251,7 +251,7 @@ extern int setpgrp();
 # endif
 # define dirent direct
 #endif /* DIRENT */
-#ifdef hpux
+#if defined(hpux) || defined(sgi)
 # include <stdio.h>	/* So the fgetpwent() prototypes work */
 #endif 
 #include <pwd.h>
@@ -448,7 +448,7 @@ EXTERN int     opgrp,		/* Initial pgrp and tty pgrp */
                tpgrp;		/* Terminal process group */
 				/* If tpgrp is -1, leave tty alone! */
 
-EXTERN Char    PromptBuf[INBUFSIZ*2]; /* buffer for the actual printed prompt.
+EXTERN Char    PromptBuf[INBUFSIZE*2]; /* buffer for the actual printed prompt.
 				       * this must be large enough to contain
 				       * the input line and the prompt, in
 				       * case a correction occured...

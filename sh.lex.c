@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.13 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.lex.c,v 3.14 1991/12/19 21:40:06 christos Exp christos $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.13 1991/11/26 04:28:26 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.14 1991/12/19 21:40:06 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -105,7 +105,7 @@ int aret = F_SEEK;
  * process id's from `$$', and modified variable values (from qualifiers
  * during expansion in sh.dol.c) here.
  */
-static Char labuf[BUFSIZ];
+static Char labuf[BUFSIZE];
 
 /*
  * Lex returns to its caller not only a wordlist (as a "var" parameter)
@@ -121,7 +121,7 @@ static bool hadhist = 0;
  */
 int     hleft;
 
-Char    histline[BUFSIZ + 2];	/* last line input */
+Char    histline[BUFSIZE + 2];	/* last line input */
 
  /* The +2 is to fool hp's optimizer */
 bool    histvalid = 0;		/* is histline valid */
@@ -173,14 +173,14 @@ lex(hp)
 	wdp->word = word();
     } while (wdp->word[0] != '\n');
     hp->prev = wdp;
-    if (histlinep < histline + BUFSIZ) {
+    if (histlinep < histline + BUFSIZE) {
 	*histlinep = '\0';
 	if (histlinep > histline && histlinep[-1] == '\n')
 	    histlinep[-1] = '\0';
 	histvalid = 1;
     }
     else {
-	histline[BUFSIZ - 1] = '\0';
+	histline[BUFSIZE - 1] = '\0';
     }
 
     return (hadhist);
@@ -245,12 +245,12 @@ word()
 {
     register Char c, c1;
     register Char *wp;
-    Char    wbuf[BUFSIZ];
+    Char    wbuf[BUFSIZE];
     register bool dolflg;
     register int i;
 
     wp = wbuf;
-    i = BUFSIZ - 4;
+    i = BUFSIZE - 4;
 loop:
     while ((c = getC(DOALL)) == ' ' || c == '\t');
     if (cmap(c, _META | _ESC))
@@ -651,7 +651,7 @@ void
 addla(cp)
     Char   *cp;
 {
-    Char    buf[BUFSIZ];
+    Char    buf[BUFSIZE];
 
     if (Strlen(cp) + (lap ? Strlen(lap) : 0) >=
 	(sizeof(labuf) - 4) / sizeof(Char)) {
@@ -952,7 +952,7 @@ subword(cp, type, adid)
     int     type;
     bool   *adid;
 {
-    Char    wbuf[BUFSIZ];
+    Char    wbuf[BUFSIZE];
     register Char *wp, *mp, *np;
     register int i;
 
@@ -973,7 +973,7 @@ subword(cp, type, adid)
 
     default:
 	wp = wbuf;
-	i = BUFSIZ - 4;
+	i = BUFSIZE - 4;
 	for (mp = cp; *mp; mp++)
 	    if (matchs(mp, lhsb)) {
 		for (np = cp; np < mp;)
@@ -1495,7 +1495,7 @@ reread:
 	if (c == '\n' && onelflg)
 	    onelflg--;
     } while (c == 0);
-    if (histlinep < histline + BUFSIZ)
+    if (histlinep < histline + BUFSIZE)
 	*histlinep++ = c;
     return (c);
 }
@@ -1507,7 +1507,7 @@ bgetc()
     int c;
     register int numleft = 0, roomleft;
     extern Char InputBuf[];
-    char    tbuf[BUFSIZ + 1];
+    char    tbuf[BUFSIZE + 1];
 
     if (cantell) {
 	if (fseekp < fbobp || fseekp > feobp) {
@@ -1519,7 +1519,7 @@ bgetc()
 
 	    fbobp = feobp;
 	    do
-		c = read(SHIN, tbuf, BUFSIZ);
+		c = read(SHIN, tbuf, BUFSIZE);
 	    while (c < 0 && errno == EINTR);
 	    if (c <= 0)
 		return (-1);
@@ -1532,7 +1532,7 @@ bgetc()
 	return (c);
     }
 again:
-    buf = (int) fseekp / BUFSIZ;
+    buf = (int) fseekp / BUFSIZE;
     if (buf >= fblocks) {
 	register Char **nfbuf =
 	(Char **) xcalloc((size_t) (fblocks + 2),
@@ -1543,21 +1543,21 @@ again:
 	    xfree((ptr_t) fbuf);
 	}
 	fbuf = nfbuf;
-	fbuf[fblocks] = (Char *) xcalloc(BUFSIZ, sizeof(Char));
+	fbuf[fblocks] = (Char *) xcalloc(BUFSIZE, sizeof(Char));
 	fblocks++;
 	if (!intty)
 	    goto again;
     }
     if (fseekp >= feobp) {
-	buf = (int) feobp / BUFSIZ;
-	off = (int) feobp % BUFSIZ;
-	roomleft = BUFSIZ - off;
+	buf = (int) feobp / BUFSIZE;
+	off = (int) feobp % BUFSIZE;
+	roomleft = BUFSIZE - off;
 	for (;;) {
 	    if (editing && intty) {	/* then use twenex routine */
 		c = numleft ? numleft : Inputl();	/* PWP: get a line */
 		if (c > roomleft) {	/* No room in this buffer? */
 		    /* start with fresh buffer */
-		    feobp = fseekp = fblocks * BUFSIZ;
+		    feobp = fseekp = fblocks * BUFSIZE;
 		    numleft = c;
 		    goto again;
 		}
@@ -1619,7 +1619,7 @@ again:
 	if (editing && !intty)
 	    goto again;
     }
-    c = fbuf[buf][(int) fseekp % BUFSIZ];
+    c = fbuf[buf][(int) fseekp % BUFSIZE];
     fseekp++;
     return (c);
 }
@@ -1633,13 +1633,13 @@ bfree()
 	return;
     if (whyles)
 	return;
-    sb = (int) (fseekp - 1) / BUFSIZ;
+    sb = (int) (fseekp - 1) / BUFSIZE;
     if (sb > 0) {
 	for (i = 0; i < sb; i++)
 	    xfree((ptr_t) fbuf[i]);
 	(void) blkcpy(fbuf, &fbuf[sb]);
-	fseekp -= BUFSIZ * sb;
-	feobp -= BUFSIZ * sb;
+	fseekp -= BUFSIZE * sb;
+	feobp -= BUFSIZE * sb;
 	fblocks -= sb;
     }
 }
@@ -1732,7 +1732,7 @@ settell()
 	return;
     fbuf = (Char **) xcalloc(2, sizeof(Char **));
     fblocks = 1;
-    fbuf[0] = (Char *) xcalloc(BUFSIZ, sizeof(Char));
+    fbuf[0] = (Char *) xcalloc(BUFSIZE, sizeof(Char));
     fseekp = fbobp = feobp = lseek(SHIN, (off_t) 0, L_INCR);
     cantell = 1;
 }

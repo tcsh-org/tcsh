@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.10 1991/12/05 18:26:54 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.vers.c,v 3.11 1991/12/14 20:45:46 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.10 1991/12/05 18:26:54 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.11 1991/12/14 20:45:46 christos Exp christos $")
 
 #include "patchlevel.h"
 
@@ -407,7 +407,7 @@ gethosttype()
 void
 fix_version()
 {
-    char    version[BUFSIZ];
+    char    version[BUFSIZE];
 
 #ifdef SHORT_STRINGS
 # define SSSTR "8b"

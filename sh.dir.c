@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dir.c,v 3.6 1991/10/28 06:26:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.c,v 3.7 1991/11/11 01:56:34 christos Exp christos $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.6 1991/10/28 06:26:50 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.7 1991/11/11 01:56:34 christos Exp christos $")
 
 /*
  * C Shell - directory management
@@ -1090,7 +1090,7 @@ recdirs()
     int     fp, ftmp, oldidfds;
     int     cdflag = 0;
     extern int fast;
-    Char    buf[BUFSIZ];
+    Char    buf[BUFSIZE];
 
     if (!fast) {
 	if (!adrof(STRsavedirs))/* does it exist */

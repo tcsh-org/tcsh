@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.16 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.chared.c,v 3.17 1991/11/26 04:28:26 christos Exp christos $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.16 1991/11/22 02:28:12 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.17 1991/11/26 04:28:26 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -59,7 +59,7 @@ static int  ActionFlag = NOP;	   /* What delayed action to take */
  * Word search state
  */
 static int  searchdir = F_UP_SEARCH_HIST; 	/* Direction of last search */
-static Char patbuf[INBUFSIZ];			/* Search target */
+static Char patbuf[INBUFSIZE];			/* Search target */
 static int patlen = 0;
 /*
  * Char search state
@@ -354,7 +354,7 @@ c_expand(p)
     bool    all_dig;
     bool    been_once = 0;
     Char   *op = p;
-    Char    buf[INBUFSIZ];
+    Char    buf[INBUFSIZE];
     Char   *bend = buf;
     Char   *modbuf, *omodbuf;
 
@@ -364,22 +364,22 @@ excl_sw:
     switch (*(q = p + 1)) {
 
     case '^':
-	bend = expand_lex(buf, INBUFSIZ, &h->Hlex, 1, 1);
+	bend = expand_lex(buf, INBUFSIZE, &h->Hlex, 1, 1);
 	break;
 
     case '$':
 	if ((l = (h->Hlex).prev))
-	    bend = expand_lex(buf, INBUFSIZ, l->prev->prev, 0, 0);
+	    bend = expand_lex(buf, INBUFSIZE, l->prev->prev, 0, 0);
 	break;
 
     case '*':
-	bend = expand_lex(buf, INBUFSIZ, &h->Hlex, 1, NCARGS);
+	bend = expand_lex(buf, INBUFSIZE, &h->Hlex, 1, NCARGS);
 	break;
 
     default:
 	if (been_once) {	/* unknown argument */
 	    /* assume it's a modifier, e.g. !foo:h, and get whole cmd */
-	    bend = expand_lex(buf, INBUFSIZ, &h->Hlex, 0, NCARGS);
+	    bend = expand_lex(buf, INBUFSIZE, &h->Hlex, 0, NCARGS);
 	    q -= 2;
 	    break;
 	}
@@ -478,10 +478,10 @@ excl_sw:
 	    }
 	    if (from < 0 || to < from)
 		goto excl_err;
-	    bend = expand_lex(buf, INBUFSIZ, &h->Hlex, from, to);
+	    bend = expand_lex(buf, INBUFSIZE, &h->Hlex, from, to);
 	}
 	else {			/* get whole cmd */
-	    bend = expand_lex(buf, INBUFSIZ, &h->Hlex, 0, NCARGS);
+	    bend = expand_lex(buf, INBUFSIZE, &h->Hlex, 0, NCARGS);
 	}
 	break;
     }
@@ -676,7 +676,7 @@ c_get_histline()
     int     h;
 
     if (Hist_num == 0) {	/* if really the current line */
-	copyn(InputBuf, HistBuf, INBUFSIZ);
+	copyn(InputBuf, HistBuf, INBUFSIZE);
 	LastChar = InputBuf + (LastHist - HistBuf);
 
 #ifdef KSHVI
@@ -702,7 +702,7 @@ c_get_histline()
     }
 
     if (HistLit && hp->histline) {
-	copyn(InputBuf, hp->histline, INBUFSIZ);
+	copyn(InputBuf, hp->histline, INBUFSIZE);
 	CurrentHistLit = 1;
     }
     else {
@@ -799,7 +799,7 @@ e_inc_search(dir)
 	case F_INSERT:
 	case F_DIGIT:
 	case F_MAGIC_SPACE:
-	    if (patlen > INBUFSIZ - 3)
+	    if (patlen > INBUFSIZE - 3)
 		Beep();
 	    else {
 		patbuf[patlen++] = ch;
@@ -840,7 +840,7 @@ e_inc_search(dir)
 			Cursor += patlen - 1;
 			cp = c_next_word(Cursor, LastChar, 1);
 			while (Cursor < cp && *Cursor != '\n') {
-			    if (patlen > INBUFSIZ - 3) {
+			    if (patlen > INBUFSIZE - 3) {
 				Beep();
 				break;
 			    }
@@ -957,7 +957,7 @@ v_search(dir)
     int dir;
 {
     Char ch;
-    Char tmpbuf[INBUFSIZ];
+    Char tmpbuf[INBUFSIZE];
     int tmplen;
 
     tmplen = 0;
@@ -999,7 +999,7 @@ v_search(dir)
 	    break;
 
 	default:
-	    if (tmplen >= INBUFSIZ)
+	    if (tmplen >= INBUFSIZE)
 		Beep();
 	    else {
 		tmpbuf[tmplen++] = ch;
@@ -1332,7 +1332,7 @@ e_toggle_hist(c)
 
     if (!CurrentHistLit) {
 	if (hp->histline) {
-	    copyn(InputBuf, hp->histline, INBUFSIZ);
+	    copyn(InputBuf, hp->histline, INBUFSIZE);
 	    CurrentHistLit = 1;
 	}
 	else {
@@ -1375,7 +1375,7 @@ e_up_hist(c)
     *LastChar = '\0';		/* just in case */
 
     if (Hist_num == 0) {	/* save the current buffer away */
-	copyn(HistBuf, InputBuf, INBUFSIZ);
+	copyn(HistBuf, InputBuf, INBUFSIZE);
 	LastHist = HistBuf + (LastChar - InputBuf);
     }
 
@@ -1433,7 +1433,7 @@ c_hsetpat()
 {
     if (LastCmd != F_UP_SEARCH_HIST && LastCmd != F_DOWN_SEARCH_HIST) {
 	patlen = Cursor - InputBuf;
-	if (patlen >= INBUFSIZ) patlen = INBUFSIZ -1;
+	if (patlen >= INBUFSIZE) patlen = INBUFSIZE -1;
 	if (patlen >= 0)  {
 	    (void) Strncpy(patbuf, InputBuf, patlen);
 	    patbuf[patlen] = '\0';
@@ -1471,7 +1471,7 @@ e_up_search_hist(c)
 
     if (Hist_num == 0)
     {
-	copyn(HistBuf, InputBuf, INBUFSIZ);
+	copyn(HistBuf, InputBuf, INBUFSIZE);
 	LastHist = HistBuf + (LastChar - InputBuf);
     }
 
@@ -1487,7 +1487,7 @@ e_up_search_hist(c)
 
     while (hp != NULL) {
 	if (hp->histline == NULL) {
-	    Char sbuf[BUFSIZ];
+	    Char sbuf[BUFSIZE];
 	    hp->histline = Strsave(sprlex(sbuf, &hp->Hlex));
 	}
 #ifdef SDEBUG
@@ -1537,7 +1537,7 @@ e_down_search_hist(c)
 
     for (h = 1; h < Hist_num && hp; h++) {
 	if (hp->histline == NULL) {
-	    Char sbuf[BUFSIZ];
+	    Char sbuf[BUFSIZE];
 	    hp->histline = Strsave(sprlex(sbuf, &hp->Hlex));
 	}
 #ifdef SDEBUG
@@ -1601,7 +1601,7 @@ e_run_fg_editor(c)
     if ((pp = find_stop_ed()) != NULL) {
 	/* save our editor state so we can restore it */
 	tellwhat = 1;
-	copyn(WhichBuf, InputBuf, INBUFSIZ);
+	copyn(WhichBuf, InputBuf, INBUFSIZE);
 	LastWhich = WhichBuf + (LastChar - InputBuf);
 	CursWhich = WhichBuf + (Cursor - InputBuf);
 	HistWhich = Hist_num;

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.18 1991/12/05 18:26:54 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.18 1991/12/05 18:26:54 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -705,7 +705,7 @@ search(type, level, goal)
     register int level;
     Char   *goal;
 {
-    Char    wordbuf[BUFSIZ];
+    Char    wordbuf[BUFSIZE];
     register Char *aword = wordbuf;
     register Char *cp;
 
@@ -1245,7 +1245,7 @@ Setenv(name, val)
  * it is not needed anymore.
  */
 #undef setenv
-    char    nameBuf[BUFSIZ];
+    char    nameBuf[BUFSIZE];
     char   *cname = short2str(name);
 
     if (cname == NULL)

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.18 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.18 1991/11/26 04:28:26 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -142,7 +142,7 @@ sprlex(buf, sp0)
 {
     Char   *cp;
 
-    cp = expand_lex(buf, INBUFSIZ, sp0, 0, NCARGS);
+    cp = expand_lex(buf, INBUFSIZE, sp0, 0, NCARGS);
     *cp = '\0';
     return (buf);
 }
@@ -353,7 +353,7 @@ dosettc(v, c)
     Char  **v;
     struct command *c;
 {
-    char    tv[2][BUFSIZ];
+    char    tv[2][BUFSIZE];
 
     if (!GotTermCaps)
 	GetTermCaps();
@@ -1380,8 +1380,8 @@ doaliases(v, c)
     jmp_buf oldexit;
     Char  **vec, *lp;
     int     fd;
-    Char    buf[BUFSIZ], line[BUFSIZ];
-    char    tbuf[BUFSIZ + 1], *tmp;
+    Char    buf[BUFSIZE], line[BUFSIZE];
+    char    tbuf[BUFSIZE + 1], *tmp;
     extern bool output_raw;	/* PWP: in sh.print.c */
 
     v++;
@@ -1416,7 +1416,7 @@ doaliases(v, c)
 		if (n <= 0) {
 		    int     i;
 
-		    if ((n = read(fd, tbuf, BUFSIZ)) <= 0)
+		    if ((n = read(fd, tbuf, BUFSIZE)) <= 0)
 			goto eof;
 		    for (i = 0; i < n; i++)
 			buf[i] = tbuf[i];
@@ -1471,7 +1471,7 @@ shlvl(val)
 	    Unsetenv(STRSHLVL);
 	}
 	else {
-	    Char    buff[BUFSIZ];
+	    Char    buff[BUFSIZE];
 
 	    Itoa(val, buff);
 	    set(STRshlvl, Strsave(buff));

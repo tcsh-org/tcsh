@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.c,v 1.6 1991/12/05 18:26:54 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.term.c,v 1.7 1991/12/14 20:45:46 christos Exp christos $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.6 1991/12/05 18:26:54 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.7 1991/12/14 20:45:46 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -532,7 +532,7 @@ dosetty(v, t)
     int aflag = 0;
     Char *s;
     int z = EX_IO;
-    char cmdname[BUFSIZ];
+    char cmdname[BUFSIZE];
 
     setname(strcpy(cmdname, short2str(*v++)));
 

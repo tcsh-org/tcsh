@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.file.c,v 1.3 91/09/24 17:09:09 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.file.c,v 3.2 1991/10/12 04:23:51 christos Exp christos $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -37,7 +37,7 @@
 #ifdef FILEC
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.2 1991/10/12 04:23:51 christos Exp christos $")
 
 /*
  * Tenex style file name recognition, .. and more.
@@ -733,12 +733,12 @@ tenex(inputline, inputline_size)
     int     inputline_size;
 {
     register int numitems, num_read;
-    char    tinputline[BUFSIZ];
+    char    tinputline[BUFSIZE];
 
 
     setup_tty(ON);
 
-    while ((num_read = read(SHIN, tinputline, BUFSIZ)) > 0) {
+    while ((num_read = read(SHIN, tinputline, BUFSIZE)) > 0) {
 	int     i;
 	static Char delims[] = {' ', '\'', '"', '\t', ';', '&', '<',
 	'>', '(', ')', '|', '^', '%', '\0'};

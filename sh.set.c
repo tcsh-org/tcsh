@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.set.c,v 3.5 1991/10/14 20:42:30 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.set.c,v 3.6 1991/11/11 01:56:34 christos Exp christos $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.5 1991/10/14 20:42:30 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.6 1991/11/11 01:56:34 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -684,12 +684,12 @@ static void
 exportpath(val)
     Char  **val;
 {
-    Char    exppath[BUFSIZ];
+    Char    exppath[BUFSIZE];
 
     exppath[0] = 0;
     if (val)
 	while (*val) {
-	    if (Strlen(*val) + Strlen(exppath) + 2 > BUFSIZ) {
+	    if (Strlen(*val) + Strlen(exppath) + 2 > BUFSIZE) {
 		xprintf("Warning: ridiculously long PATH truncated\n");
 		break;
 	    }

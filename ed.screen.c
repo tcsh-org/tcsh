@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.9 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.10 1991/12/14 20:45:46 christos Exp christos $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.9 1991/11/26 04:28:26 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.10 1991/12/14 20:45:46 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -62,7 +62,7 @@ extern int tgetnum();
  * assumption...
  */
 
-#define TC_BUFSIZ 2048
+#define TC_BUFSIZE 2048
 
 #define GoodStr(a) (tstr[a].str != NULL && tstr[a].str[0] != '\0')
 #define Str(a) tstr[a].str
@@ -249,8 +249,8 @@ TCalloc(t, cap)
     struct termcapstr *t;
     char   *cap;
 {
-    static char termcap_alloc[TC_BUFSIZ];
-    char    termbuf[TC_BUFSIZ];
+    static char termcap_alloc[TC_BUFSIZE];
+    char    termbuf[TC_BUFSIZE];
     struct termcapstr *ts;
     static int tloc = 0;
     int     tlen, clen;
@@ -278,7 +278,7 @@ TCalloc(t, cap)
     /*
      * New string is longer; see if we have enough space to append
      */
-    if (tloc + 3 < TC_BUFSIZ) {
+    if (tloc + 3 < TC_BUFSIZE) {
 	(void) strcpy(t->str = &termcap_alloc[tloc], cap);
 	tloc += clen + 1;	/* one for \0 */
 	return;
@@ -296,9 +296,9 @@ TCalloc(t, cap)
 	    for (ptr = ts->str; *ptr != '\0'; termbuf[tlen++] = *ptr++);
 	    termbuf[tlen++] = '\0';
 	}
-    copy(termcap_alloc, termbuf, TC_BUFSIZ);
+    copy(termcap_alloc, termbuf, TC_BUFSIZE);
     tloc = tlen;
-    if (tloc + 3 >= TC_BUFSIZ) {
+    if (tloc + 3 >= TC_BUFSIZE) {
 	stderror(ERR_NAME | ERR_TCNOSTR);
 	return;
     }
@@ -352,7 +352,7 @@ ReBufferDisplay()
     }
     /* make this public, -1 to avoid wraps */
     TermH = Val(T_co) - 1;
-    TermV = (INBUFSIZ * 4) / TermH + 1;
+    TermV = (INBUFSIZE * 4) / TermH + 1;
     b = (Char **) xmalloc((size_t) (sizeof(Char *) * (TermV + 1)));
     for (i = 0; i < TermV; i++)
 	b[i] = (Char *) xmalloc((size_t) (sizeof(Char) * (TermH + 1)));
@@ -440,12 +440,12 @@ void
 EchoTC(v)
     Char  **v;
 {
-    char   *cap, *scap, cv[BUFSIZ];
+    char   *cap, *scap, cv[BUFSIZE];
     int     arg_need, arg_cols, arg_rows;
     int     verbose = 0, silent = 0;
     char   *area;
     static char *fmts = "%s\n", *fmtd = "%d\n";
-    char    buf[TC_BUFSIZ];
+    char    buf[TC_BUFSIZE];
 
     area = buf;
 
@@ -1045,8 +1045,8 @@ GetTermCaps()
 {				/* read in the needed terminal capabilites */
     register int i;
     char   *ptr;
-    char    buf[TC_BUFSIZ];
-    static char bp[TC_BUFSIZ];
+    char    buf[TC_BUFSIZE];
+    static char bp[TC_BUFSIZE];
     char   *area;
     extern char *getenv();
     struct termcapstr *t;
@@ -1085,7 +1085,7 @@ GetTermCaps()
     if (!ptr || !ptr[0])
 	ptr = "dumb";
 
-    setzero(bp, TC_BUFSIZ);
+    setzero(bp, TC_BUFSIZE);
 
     i = tgetent(bp, ptr);
     if (i <= 0) {

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.10 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.h,v 3.11 1991/11/26 04:28:26 christos Exp christos $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -111,7 +111,7 @@ EXTERN KEYCMD *CurrentKeyMap;	/* current command key map */
 EXTERN int inputmode;		/* insert, replace, replace1 mode */
 EXTERN Char GettingInput;	/* true if getting an input line (mostly) */
 EXTERN Char NeedsRedraw;	/* for editor and twenex error messages */
-EXTERN Char InputBuf[INBUFSIZ];	/* the real input data */
+EXTERN Char InputBuf[INBUFSIZE];	/* the real input data */
 EXTERN Char *LastChar, *Cursor;	/* point to the next open space */
 EXTERN Char *InputLim;		/* limit of size of InputBuf */
 EXTERN Char MetaNext;		/* flags for ^V and ^[ functions */
@@ -121,18 +121,18 @@ EXTERN Char *Mark;		/* the emacs "mark" (dot is Cursor) */
 EXTERN Char DoingArg;		/* true if we have an argument */
 EXTERN int Argument;		/* "universal" argument value */
 EXTERN KEYCMD LastCmd;		/* previous command executed */
-EXTERN Char KillBuf[INBUFSIZ];	/* kill buffer */
+EXTERN Char KillBuf[INBUFSIZE];	/* kill buffer */
 EXTERN Char *LastKill;		/* points to end of kill buffer */
 
-EXTERN Char UndoBuf[INBUFSIZ];
+EXTERN Char UndoBuf[INBUFSIZE];
 EXTERN Char *UndoPtr;
 EXTERN int  UndoSize;
 EXTERN int  UndoAction;
 
-EXTERN Char HistBuf[INBUFSIZ];	/* history buffer */
+EXTERN Char HistBuf[INBUFSIZE];	/* history buffer */
 EXTERN Char *LastHist;		/* points to end of history buffer */
 EXTERN int Hist_num;		/* what point up the history we are at now. */
-EXTERN Char WhichBuf[INBUFSIZ];	/* buffer for which command */
+EXTERN Char WhichBuf[INBUFSIZE];	/* buffer for which command */
 EXTERN Char *LastWhich;		/* points to end of which buffer */
 EXTERN Char *CursWhich;		/* points to the cursor point in which buf */
 EXTERN int HistWhich;		/* Hist_num is saved in this */

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.err.c,v 3.5 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.err.c,v 3.6 1991/10/28 06:26:50 christos Exp christos $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_tc_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.5 1991/10/21 17:24:49 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.6 1991/10/28 06:26:50 christos Exp christos $")
 
 /*
  * C Shell
@@ -344,7 +344,7 @@ seterror(va_alist)
 
     if (seterr == 0) {
 	va_list va;
-	char    berr[BUFSIZ];
+	char    berr[BUFSIZE];
 #if __STDC__
 	va_start(va, id);
 #else

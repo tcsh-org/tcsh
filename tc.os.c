@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.11 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.os.c,v 3.12 1991/12/14 20:45:46 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.11 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.12 1991/12/14 20:45:46 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1006,7 +1006,7 @@ static char *
 apperr(st)
     status_$t *st;
 {
-    static char buf[BUFSIZ];
+    static char buf[BUFSIZE];
     short e_subl, e_modl, e_codel;
     error_$string_t e_sub, e_mod, e_code;
 

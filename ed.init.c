@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.21 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.init.c,v 3.22 1991/12/14 20:45:46 christos Exp christos $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.21 1991/11/26 04:28:26 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.22 1991/12/14 20:45:46 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -582,7 +582,7 @@ ResetInLine()
 {
     Cursor = InputBuf;		/* reset cursor */
     LastChar = InputBuf;
-    InputLim = &InputBuf[INBUFSIZ - 2];
+    InputLim = &InputBuf[INBUFSIZE - 2];
     Mark = InputBuf;
     MetaNext = 0;
     CurrentKeyMap = CcKeyMap;
@@ -613,9 +613,9 @@ Load_input_line()
 #ifdef FIONREAD
     (void) ioctl(SHIN, FIONREAD, &chrs);
     if (chrs > 0) {
-	char    buf[BUFSIZ];
+	char    buf[BUFSIZE];
 
-	chrs = read(SHIN, buf, (size_t) min(chrs, BUFSIZ - 1));
+	chrs = read(SHIN, buf, (size_t) min(chrs, BUFSIZE - 1));
 	if (chrs > 0) {
 	    buf[chrs] = '\0';
 	    Input_Line = Strsave(str2short(buf));

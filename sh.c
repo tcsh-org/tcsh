@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.18 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.18 1991/11/17 05:39:06 christos Exp $")
+RCSID("$Id: sh.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -316,7 +316,7 @@ main(argc, argv)
      */
     {
 	char *cln, *cus;
-	Char    buff[BUFSIZ];
+	Char    buff[BUFSIZE];
 	struct passwd *pw;
 
 
@@ -912,7 +912,7 @@ main(argc, argv)
 	 */
 	{
 	    extern int bequiet;	/* make dirs shut up */
-	    Char    cshd[BUFSIZ];
+	    Char    cshd[BUFSIZE];
 	    struct stat st;
 
 	    (void) Strcpy(cshd, value(STRhome));
@@ -1224,7 +1224,7 @@ srcunit(unit, onlyown, hflg)
 void
 rechist()
 {
-    Char    buf[BUFSIZ], *hfile;
+    Char    buf[BUFSIZE], *hfile;
     int     fp, ftmp, oldidfds;
 
     if (!fast) {
@@ -1638,7 +1638,7 @@ dosource(t, c)
 {
     register Char *f;
     bool    hflg = 0;
-    char    buf[BUFSIZ];
+    char    buf[BUFSIZE];
 
     t++;
     if (*t && eq(*t, STRmh)) {

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.13 1991/12/14 20:45:46 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.inputl.c,v 3.14 1991/12/19 21:40:06 christos Exp christos $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,13 +36,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.13 1991/12/14 20:45:46 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.14 1991/12/19 21:40:06 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 #include "tw.h"			/* for twenex stuff */
 
-#define OKCMD (INBUFSIZ+INBUFSIZ)
+#define OKCMD (INBUFSIZE+INBUFSIZE)
 extern CCRETVAL e_up_hist();
 extern CCRETVAL e_expand_history();
 
@@ -76,7 +76,7 @@ Inputl()
     struct varent *matchbeep = adrof(STRmatchbeep);
     struct varent *imode = adrof(STRinputmode);
     Char   *SaveChar, *CorrChar;
-    Char    Origin[INBUFSIZ], Change[INBUFSIZ];
+    Char    Origin[INBUFSIZE], Change[INBUFSIZE];
     int     matchval;		/* from tenematch() */
 
     if (!MapsAreInited)		/* double extra just in case */
@@ -103,7 +103,7 @@ Inputl()
     NeedsRedraw = 0;
 
     if (tellwhat) {
-	copyn(InputBuf, WhichBuf, INBUFSIZ);
+	copyn(InputBuf, WhichBuf, INBUFSIZE);
 	LastChar = InputBuf + (LastWhich - WhichBuf);
 	Cursor = InputBuf + (CursWhich - WhichBuf);
 	tellwhat = 0;
@@ -125,8 +125,8 @@ Inputl()
 	    xprintf("Cursor > InputLim\r\n");
 	if (LastChar > InputLim)
 	    xprintf("LastChar > InputLim\r\n");
-	if (InputLim != &InputBuf[INBUFSIZ - 2])
-	    xprintf("InputLim != &InputBuf[INBUFSIZ-2]\r\n");
+	if (InputLim != &InputBuf[INBUFSIZE - 2])
+	    xprintf("InputLim != &InputBuf[INBUFSIZE-2]\r\n");
 	if ((!DoingArg) && (Argument != 1))
 	    xprintf("(!DoingArg) && (Argument != 1)\r\n");
 	if (CcKeyMap[0] == 0)
@@ -174,7 +174,7 @@ Inputl()
 
 	case CC_WHICH:		/* tell what this command does */
 	    tellwhat = 1;
-	    copyn(WhichBuf, InputBuf, INBUFSIZ);
+	    copyn(WhichBuf, InputBuf, INBUFSIZE);
 	    LastWhich = WhichBuf + (LastChar - InputBuf);
 	    CursWhich = WhichBuf + (Cursor - InputBuf);
 	    *LastChar++ = '\n';	/* for the benifit of CSH */
@@ -189,10 +189,10 @@ Inputl()
 	case CC_NEWLINE:	/* normal end of line */
 	    if (crct && (!Strcmp(*(crct->vec), STRcmd) ||
 			 !Strcmp(*(crct->vec), STRall))) {
-		copyn(Origin, InputBuf, INBUFSIZ);
+		copyn(Origin, InputBuf, INBUFSIZE);
 		SaveChar = LastChar;
 		if (SpellLine(!Strcmp(*(crct->vec), STRcmd)) == 1) {
-		    copyn(Change, InputBuf, INBUFSIZ);
+		    copyn(Change, InputBuf, INBUFSIZE);
 		    *Strchr(Change, '\n') = '\0';
 		    CorrChar = LastChar;	/* Save the corrected end */
 		    LastChar = InputBuf;	/* Null the current line */
@@ -206,7 +206,7 @@ Inputl()
 			xprintf("yes\n");
 		    }
 		    else {
-			(void) copyn(InputBuf, Origin, INBUFSIZ);
+			(void) copyn(InputBuf, Origin, INBUFSIZE);
 			LastChar = SaveChar;
 			if (ch == 'e') {
 			    xprintf("edit\n");
@@ -241,7 +241,7 @@ Inputl()
 	    break;
 
 	case CC_CORRECT:
-	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf,
+	    if (tenematch(InputBuf, INBUFSIZE, Cursor - InputBuf,
 			  SPELL) < 0)
 		Beep();		/* Beep = No match/ambiguous */
 	    if (NeedsRedraw) {
@@ -278,7 +278,7 @@ Inputl()
 	     */
 	    expnum = Cursor - InputBuf;
 	    switch (matchval = 
-		    tenematch(InputBuf, INBUFSIZ, Cursor-InputBuf, RECOGNIZE)) {
+		    tenematch(InputBuf, INBUFSIZE, Cursor-InputBuf, RECOGNIZE)) {
 	    case 1:
 		if (non_unique_match && matchbeep &&
 		    (Strcmp(*(matchbeep->vec), STRnotunique) == 0))
@@ -315,7 +315,7 @@ Inputl()
 		if (autol && (Strcmp(*(autol->vec), STRambiguous) != 0 || 
 				     expnum == Cursor - InputBuf)) {
 		    PastBottom();
-		    (void) tenematch(InputBuf, INBUFSIZ, Cursor-InputBuf, LIST);
+		    (void) tenematch(InputBuf, INBUFSIZE, Cursor-InputBuf, LIST);
 		}
 		break;
 	    }
@@ -332,7 +332,7 @@ Inputl()
 
 	case CC_LIST_CHOICES:
 	    /* should catch ^C here... */
-	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf, LIST) < 0)
+	    if (tenematch(InputBuf, INBUFSIZE, Cursor - InputBuf, LIST) < 0)
 		Beep();
 	    Refresh();
 	    Argument = 1;
@@ -340,7 +340,7 @@ Inputl()
 	    break;
 
 	case CC_LIST_GLOB:
-	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf, GLOB) < 0)
+	    if (tenematch(InputBuf, INBUFSIZE, Cursor - InputBuf, GLOB) < 0)
 		Beep();
 	    Refresh();
 	    Argument = 1;
@@ -348,7 +348,7 @@ Inputl()
 	    break;
 
 	case CC_EXPAND_GLOB:
-	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf,
+	    if (tenematch(InputBuf, INBUFSIZE, Cursor - InputBuf,
 			  GLOB_EXPAND) <= 0)
 		Beep();		/* Beep = No match */
 	    if (NeedsRedraw) {
@@ -362,7 +362,7 @@ Inputl()
 	    break;
 
 	case CC_NORMALIZE_PATH:
-	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf,
+	    if (tenematch(InputBuf, INBUFSIZE, Cursor - InputBuf,
 			  PATH_NORMALIZE) <= 0)
 		Beep();		/* Beep = No match */
 	    if (NeedsRedraw) {
@@ -376,7 +376,7 @@ Inputl()
 	    break;
 
 	case CC_EXPAND_VARS:
-	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf,
+	    if (tenematch(InputBuf, INBUFSIZE, Cursor - InputBuf,
 			  VARS_EXPAND) <= 0)
 		Beep();		/* Beep = No match */
 	    if (NeedsRedraw) {
@@ -392,7 +392,7 @@ Inputl()
 	case CC_HELPME:
 	    xputchar('\n');
 	    /* should catch ^C here... */
-	    (void) tenematch(InputBuf, INBUFSIZ, LastChar - InputBuf,
+	    (void) tenematch(InputBuf, INBUFSIZE, LastChar - InputBuf,
 			     PRINT_HELP);
 	    Refresh();
 	    Argument = 1;
@@ -679,7 +679,7 @@ SpellLine(cmdonly)
 	}
 	if (!Strchr(mismatch, *argptr) &&
 	    (!cmdonly || starting_a_command(argptr, InputBuf))) {
-	    switch (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf, SPELL)) {
+	    switch (tenematch(InputBuf, INBUFSIZE, Cursor - InputBuf, SPELL)) {
 	    case 1:		/* corrected */
 		matchval = 1;
 		break;

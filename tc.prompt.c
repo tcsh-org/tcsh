@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.prompt.c,v 3.7 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.prompt.c,v 3.8 1991/12/19 21:40:06 christos Exp christos $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.7 1991/11/17 05:39:06 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.8 1991/12/19 21:40:06 christos Exp christos $")
 
 #include "ed.h"
 
@@ -62,7 +62,7 @@ printprompt(promptno, str)
     register char *cz;
     struct tm *t;
     time_t  lclock;
-    Char    buff[BUFSIZ];
+    Char    buff[BUFSIZE];
     static  Char *ocp = NULL, *ostr = NULL;
 
     (void) time(&lclock);
@@ -70,7 +70,7 @@ printprompt(promptno, str)
 
     PromptBuf[0] = '\0';
     p = PromptBuf;
-    ep = &PromptBuf[2*INBUFSIZ - 2];
+    ep = &PromptBuf[2*INBUFSIZE - 2];
     switch (promptno) {
     default:
     case 0:
