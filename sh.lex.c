@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.60 2004/08/04 17:12:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.61 2004/11/23 02:10:49 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.60 2004/08/04 17:12:30 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.61 2004/11/23 02:10:49 christos Exp $")
 
 #include "ed.h"
 
@@ -296,15 +296,12 @@ word(parsehtime)
     int parsehtime;
 {
     eChar c, c1;
-    Char *wp;
+    Char *wp, *unfinished = 0;
     Char    wbuf[BUFSIZE];
     Char    hbuf[12];
     int	    h;
     int dolflg;
     int i;
-#if defined(DSPMBYTE)
-    int mbytepos = 1;
-#endif /* DSPMBYTE */
 
     wp = wbuf;
     i = BUFSIZE - 4;
@@ -367,13 +364,6 @@ loop:
     c1 = 0;
     dolflg = DOALL;
     for (;;) {
-#if defined(DSPMBYTE)
-        if (mbytepos == 2)
-	    mbytepos = 1;
-	else if (mbytepos == 1 && Ismbyte1(c) && 2 <= i)
-	    mbytepos = 2;
-	else
-#endif /* DSPMBYTE */
 	if (c1) {
 	    if (c == c1) {
 		c1 = 0;
@@ -437,6 +427,17 @@ loop:
 	if (--i > 0) {
 	    *wp++ = c;
 	    c = getC(dolflg);
+	    if (!unfinished)
+		unfinished = wp - 1;
+	    switch (NLSFinished(unfinished, wp - unfinished, c)) {
+		case 1:
+		case 0:
+		    c |= QUOTE;
+		    break;
+		default:
+		    unfinished = 0;
+		    break;
+	    }
 	}
 	else {
 	    seterror(ERR_WTOOLONG);
@@ -742,6 +743,7 @@ addla(cp)
     if (lap)
 	(void) Strcpy(buf, lap);
     (void) Strcpy(labuf, cp);
+    NLSQuote(labuf);
     if (lap)
 	(void) Strcat(labuf, buf);
     lap = labuf;
@@ -1146,22 +1148,12 @@ domod(cp, type)
 	return (wp);
 
     case 'l':
-	wp = Strsave(cp);
-	for (cp = wp; *cp; cp++) 
-	    if (Isupper(*cp)) {
-		*cp = Tolower(*cp);
-		return wp;
-	    }
-	return wp;
+	wp = NLSChangeCase(cp, 1);
+	return wp ? wp : Strsave(cp);
 
     case 'u':
-	wp = Strsave(cp);
-	for (cp = wp; *cp; cp++) 
-	    if (Islower(*cp)) {
-		*cp = Toupper(*cp);
-		return wp;
-	    }
-	return wp;
+	wp = NLSChangeCase(cp, 0);
+	return wp ? wp : Strsave(cp);
 
     case 'h':
     case 't':
@@ -1700,14 +1692,11 @@ wide_read(fildes, buf, nchars, use_fclens)
     int use_fclens;
 {
     char cbuf[BUFSIZE + 1];
-    ssize_t res;
-#ifdef WIDE_STRINGS
-    ssize_t r;
+    ssize_t res, r;
     size_t partial;
-#endif
     
     assert (nchars <= sizeof(cbuf)/sizeof(*cbuf));
-#ifdef WIDE_STRINGS
+    USE(use_fclens);
     res = 0;
     partial = 0;
     do {
@@ -1724,18 +1713,21 @@ wide_read(fildes, buf, nchars, use_fclens)
 	while (i < partial) {
 	    int len;
 
-	    len = mbtowc(buf + res, cbuf + i, partial - i);
+	    len = normal_mbtowc(buf + res, cbuf + i, partial - i);
 	    if (len == -1) {
+	        reset_mbtowc();
 		if (partial < MB_LEN_MAX && r > 0)
 		    /* Maybe a partial character and there is still a chance
 		       to read more */
 		    break;
-		buf[res] = (unsigned char)cbuf[i];
+		buf[res] = (unsigned char)cbuf[i] | INVALID_BYTE;
 	    }
 	    if (len <= 0)
 		len = 1;
+#ifdef WIDE_STRINGS
 	    if (use_fclens)
 		fclens[res] = len;
+#endif
 	    i += len;
 	    res++;
 	    nchars--;
@@ -1746,17 +1738,6 @@ wide_read(fildes, buf, nchars, use_fclens)
     } while (partial != 0);
     /* Throwing away possible partial multibyte characters on error */
     return res != 0 ? res : r;
-#else /* not WIDE_STRINGS */
-    USE(use_fclens);
-    res = read(fildes, cbuf, nchars);
-    if (res > 0) {
-	size_t i;
-	
-	for (i = 0; i < (size_t)res; i++)
-	    buf[i] = (unsigned char) cbuf[i];
-    }
-    return res;
-#endif
 }
 
 static eChar
@@ -1894,7 +1875,7 @@ bseek(l)
 	xprintf(CGETS(16, 6, "seek to file %x\n"), fseekp);
 #endif
 	fseekp = l->f_seek;
-#ifdef WIDE_CHARS
+#ifdef WIDE_STRINGS
 	if (cantell) {
 	    if (fseekp >= fbobp) {
 		size_t i;

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.25 2004/08/04 17:12:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.26 2004/11/23 02:10:48 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.file.c,v 3.25 2004/08/04 17:12:29 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.26 2004/11/23 02:10:48 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -226,9 +226,6 @@ pushback(string)
     Char   *string;
 {
     Char *p;
-#ifndef WIDE_STRINGS
-    char    c;
-#endif
 #ifdef TERMIO
 # ifdef POSIX
     struct termios tty, tty_normal;
@@ -259,7 +256,6 @@ pushback(string)
     (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty);
 # endif /* POSIX */
 
-# ifdef WIDE_STRINGS
     for (p = string; *p != '\0'; p++) {
 	char buf[MB_LEN_MAX];
 	size_t i, len;
@@ -268,10 +264,6 @@ pushback(string)
 	for (i = 0; i < len; i++)
 	    (void) ioctl(SHOUT, TIOCSTI, (ioctl_t) &buf[i]);
     }
-# else
-    for (p = string; (c = *p) != '\0'; p++)
-	(void) ioctl(SHOUT, TIOCSTI, (ioctl_t) & c);
-# endif
 # ifdef POSIX
     (void) tcsetattr(SHOUT, TCSANOW, &tty_normal);
 # else

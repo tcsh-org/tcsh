@@ -3348,6 +3348,8 @@ Removes the limitation on \fIresource\fR or, if no \fIresource\fR is
 specified, all \fIresource\fR limitations.
 With \fB\-h\fR, the corresponding hard limits are removed.
 Only the super-user may do this.
+Note that \fBunlimit\fR may not exit successful, since most systems
+do not allow \fIdescriptors\fR to be unlimited.
 .TP 8
 .B unset \fIpattern
 Removes all variables whose names match \fIpattern\fR, unless they are read-only.

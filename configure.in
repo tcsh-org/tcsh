@@ -77,7 +77,7 @@ case "${host}" in
   ;;
 
   ## Linux
-  *-*-linux* )
+  *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
     tcsh_config_file=linux
   ;;
 
@@ -344,7 +344,8 @@ AC_SUBST(HESLIB)
 AC_CHECK_HEADERS([wchar.h],
 	[AC_CHECK_SIZEOF([wchar_t], [], [dnl
 #include <stdio.h>
-#include <wchar.h>])])
+#include <wchar.h>])
+	AC_CHECK_HEADERS([wctype.h])])
 
 AC_EXEEXT
 

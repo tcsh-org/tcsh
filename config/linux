@@ -51,7 +51,7 @@
  *		Note: POSIX systems should not define this unless they
  *		have sigvec() and friends (ie: 4.3BSD-RENO, HP-UX).
  */
-#define BSDSIGS
+#undef BSDSIGS
 
 /*
  * BSDTIMES	You have BSD-style process time stuff (like rusage)
@@ -128,6 +128,7 @@
 #define _BSD_SOURCE
 #define _SVID_SOURCE
 #define _POSIX_SOURCE
+#define _XOPEN_SOURCE 500
 
 /*
  * Large file support from <features.h>
@@ -143,9 +144,6 @@
 #define _PATH_TCSHELL "/bin/tcsh"
 #endif
 #define ECHO_STYLE      BOTH_ECHO
-#ifdef BSDSIGS
-# define __USE_BSD_SIGNAL
-#endif
 
 /****************** configurable hacks ****************/
 /* have been moved to config_f.h */

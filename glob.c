@@ -147,11 +147,11 @@ static	void	 qprintf	__P((Char *));
 
 int
 globcharcoll(c1, c2, cs)
-    __Char c1, c2;
+    NLSChar c1, c2;
     int cs;
 {
 #if defined(NLS) && defined(LC_COLLATE) && !defined(NOSTRCOLL)
-# ifdef WIDE_STRINGS
+# if defined(SHORT_STRINGS)
     wchar_t s1[2], s2[2];
 
     if (c1 == c2)
@@ -171,7 +171,7 @@ globcharcoll(c1, c2, cs)
     s2[0] = c2;
     s1[1] = s2[1] = '\0';
     return wcscoll(s1, s2);
-# else /* not WIDE_STRINGS */
+# else /* not SHORT_STRINGS */
     char s1[2], s2[2];
 
     if (c1 == c2)
@@ -394,16 +394,9 @@ glob(pattern, flags, errfunc, pglob)
 	    if (len > 1) {
 		*bufnext++ = (Char) c;
 		while (--len != 0)
-		    *bufnext++ = (Char) *patnext++;
+		    *bufnext++ = (Char) (*patnext++ | M_PROTECT);
 	    } else
-#elif defined (DSPMBYTE)
-	    if (Ismbyte1(c) && *patnext != EOS)
-	    {
-	      *bufnext++ = (Char) c;
-	      *bufnext++ = (Char) *patnext++;
-	    }
-	    else
-#endif /* DSPMBYTE */
+#endif /* WIDE_STRINGS */
 	    if (c == QUOTE) {
 		if ((c = *patnext++) == EOS) {
 		    c = QUOTE;
@@ -424,28 +417,6 @@ glob(pattern, flags, errfunc, pglob)
     qpatnext = patbuf;
     /* we don't need to check for buffer overflow any more */
     while ((c = *qpatnext++) != EOS) {
-#ifdef WIDE_STRINGS
-	int len;
-
-	/* patbuf contains unmodified characters from pattern except that it 
-	   may contain additional flags, so we can check the original string
-	   here. */
-	len = mblen(pattern + ((qpatnext - 1) - patbuf), MB_LEN_MAX);
-	if (len == -1)
-	    mblen(NULL, 0);
-	if (len > 1) {
-	    *bufnext++ = CHAR(c);
-	    while (--len != 0)
-		*bufnext++ = CHAR(*qpatnext++);
-	} else
-#elif defined (DSPMBYTE)
-	if (Ismbyte1(c) && *qpatnext != EOS)
-	{
-	  *bufnext++ = CHAR(c);
-	  *bufnext++ = CHAR(*qpatnext++);
-	}
-	else
-#endif /* DSPMBYTE */
 	switch (c) {
 	case LBRACKET:
 	    c = *qpatnext;
@@ -727,10 +698,10 @@ globextend(path, pglob)
 }
 
 
-#ifdef WIDE_STRINGS
 static size_t
-One_mbtowc(wchar_t *pwc, const Char *s, size_t n)
+One_mbtowc(NLSChar *pwc, const Char *s, size_t n)
 {
+#ifdef WIDE_STRINGS
     char buf[MB_LEN_MAX], *p;
 
     if (n > MB_LEN_MAX)
@@ -739,8 +710,10 @@ One_mbtowc(wchar_t *pwc, const Char *s, size_t n)
     while (p < buf + n && (*p++ = CHAR(*s++)) != 0)
 	;
     return one_mbtowc(pwc, buf, n);
-}
+#else
+    return NLSFrom(s, n, pwc);
 #endif
+}
 
 /*
  * pattern matching function for filenames.  Each occurrence of the *
@@ -755,17 +728,13 @@ match(name, pat, patend, m_not)
     Char c, k;
 
     while (pat < patend) {
-#ifdef WIDE_STRINGS
 	size_t lwk;
-	__Char wc, wk;
+	NLSChar wc, wk;
 
 	USE(k);
 	c = *pat; /* Only for M_MASK bits */
 	pat += One_mbtowc(&wc, pat, MB_LEN_MAX);
 	lwk = One_mbtowc(&wk, name, MB_LEN_MAX);
-#else /* not WIDE_STRINGS */
-	c = *pat++;
-#endif
 	switch (c & M_MASK) {
 	case M_ALL:
 	    if (pat == patend)
@@ -775,40 +744,26 @@ match(name, pat, patend, m_not)
 		    return (1);
 		if (*name == EOS)
 		    break;
-#ifdef WIDE_STRINGS
 		name += lwk;
 		lwk = One_mbtowc(&wk, name, MB_LEN_MAX);
-#else
-		name++;
-#endif
 	    }
 	    return (0);
 	case M_ONE:
 	    if (*name == EOS)
 		return (0);
-#ifdef WIDE_STRINGS
 	    name += lwk;
-#else
-	    name++;
-#endif
 	    break;
 	case M_SET:
 	    ok = 0;
-#ifdef WIDE_STRINGS
 	    if (*name == EOS)
 		return (0);
 	    name += lwk;
-#else
-	    if ((k = *name++) == EOS)
-		return (0);
-#endif
 	    if ((negate_range = ((*pat & M_MASK) == m_not)) != 0)
 		++pat;
-#ifdef WIDE_STRINGS
 	    while ((*pat & M_MASK) != M_END) {
 		pat += One_mbtowc(&wc, pat, MB_LEN_MAX);
 		if ((*pat & M_MASK) == M_RNG) {
-		    __Char wc2;
+		    NLSChar wc2;
 		    
 		    pat++;
 		    pat += One_mbtowc(&wc2, pat, MB_LEN_MAX);
@@ -819,31 +774,13 @@ match(name, pat, patend, m_not)
 		    ok = 1;
 	    }
 	    pat += One_mbtowc(&wc, pat, MB_LEN_MAX);
-#else /* WIDE_STRINGS */
-	    while (((c = *pat++) & M_MASK) != M_END) {
-		if ((*pat & M_MASK) == M_RNG) {
-		    if (globcharcoll(CHAR(c), CHAR(k), 0) <= 0 &&
-			globcharcoll(CHAR(k), CHAR(pat[1]), 0) <= 0)
-			ok = 1;
-		    pat += 2;
-		}
-		else if (c == k)
-		    ok = 1;
-	    }
-#endif
 	    if (ok == negate_range)
 		return (0);
 	    break;
 	default:
-#ifdef WIDE_STRINGS
 	    name += lwk;
 	    if (samecase(wk) != samecase(wc))
 		return (0);
-#else
-	    k = *name++;
-	    if (samecase(k) != samecase(c))
-		return (0);
-#endif
 	    break;
 	}
     }

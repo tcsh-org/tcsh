@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.25 2002/03/08 17:36:45 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.26 2004/08/04 17:12:28 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -88,7 +88,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.25 2002/03/08 17:36:45 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.26 2004/08/04 17:12:28 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -823,13 +823,8 @@ unparsestring(str, buf, sep)
 	    *b++ = '\\';
 	    *b++ = (unsigned char) p;
 	}
-	else if (p == ' ' || (Isprint(p) && !Isspace(p))) {
-#ifdef WIDE_STRINGS
+	else if (p == ' ' || (Isprint(p) && !Isspace(p)))
 	    b += one_wctomb(b, p & CHAR);
-#else
-	    *b++ = (unsigned char) p;
-#endif
-	}
 	else {
 	    *b++ = '\\';
 	    *b++ = ((p >> 6) & 7) + '0';

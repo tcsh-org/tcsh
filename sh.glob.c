@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.60 2004/11/23 01:48:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.61 2004/11/23 02:10:49 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.60 2004/11/23 01:48:34 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.61 2004/11/23 02:10:49 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -186,19 +186,9 @@ globbrace(s, p, bl)
 
     /* check for balanced braces */
     for (i = 0, pe = ++p; *pe; pe++)
-#ifdef DSPMBYTE
-	if (Ismbyte1(*pe) && *(pe + 1) != EOS)
-	    pe ++;
-	else
-#endif /* DSPMBYTE */
 	if (*pe == LBRK) {
 	    /* Ignore everything between [] */
 	    for (++pe; *pe != RBRK && *pe != EOS; pe++)
-#ifdef DSPMBYTE
-	      if (Ismbyte1(*pe) && *(pe + 1) != EOS)
-		pe ++;
-	      else
-#endif /* DSPMBYTE */
 		continue;
 	    if (*pe == EOS) {
 		blkfree(nv);
@@ -219,19 +209,9 @@ globbrace(s, p, bl)
     }
 
     for (i = 0, pl = pm = p; pm <= pe; pm++)
-#ifdef DSPMBYTE
-	if (Ismbyte1(*pm) && pm + 1 <= pe)
-	    pm ++;
-	else
-#endif /* DSPMBYTE */
 	switch (*pm) {
 	case LBRK:
 	    for (++pm; *pm != RBRK && *pm != EOS; pm++)
-#ifdef DSPMBYTE
-	      if (Ismbyte1(*pm) && *(pm + 1) != EOS)
-		pm ++;
-	      else
-#endif /* DSPMBYTE */
 		continue;
 	    if (*pm == EOS) {
 		*vl = NULL;
@@ -303,12 +283,6 @@ expbrace(nvp, elp, size)
 	    Char  **bl;
 	    int     len;
 
-#if defined (DSPMBYTE)
-	    if (b != s && Ismbyte2(*b) && Ismbyte1(*(b-1))) {
-		/* The "{" is the 2nd byte of a MB character */
-		continue;
-	    }
-#endif /* DSPMBYTE */
 	    if ((len = globbrace(s, b, &bl)) < 0) {
 		xfree((ptr_t) nv);
 		stderror(ERR_MISSING, -len);
@@ -750,15 +724,7 @@ dobackp(cp, literal)
     pargc = 0;
     pnleft = LONGBSIZE - 4;
     for (;;) {
-#if defined(DSPMBYTE)
-	for (lp = cp;; lp++) { /* } */
-	    if (*lp == '`' &&
-		(lp-1 < cp || !Ismbyte2(*lp) || !Ismbyte1(*(lp-1)))) {
-		break;
-	    }
-#else /* DSPMBYTE */
 	for (lp = cp; *lp != '`'; lp++) {
-#endif /* DSPMBYTE */
 	    if (*lp == 0) {
 		if (pargcp != pargs)
 		    pword(LONGBSIZE);
@@ -917,7 +883,7 @@ backeval(cp, literal)
 
 	tmp = tibuf;
 	for (;;) {
-	    if (icnt == 0) {
+	    while (icnt == 0) {
 		int     i, eof;
 
 		ip = ibuf;
@@ -926,42 +892,34 @@ backeval(cp, literal)
 		while (icnt == -1 && errno == EINTR);
 		eof = 0;
 		if (icnt <= 0) {
-		    if (tmp == tibuf) {
-		        c = 0;
-			break;
-		    }
+		    if (tmp == tibuf)
+			goto eof;
 		    icnt = 0;
 		    eof = 1;
 		}
 		icnt += tmp - tibuf;
-#ifdef WIDE_STRINGS
 		i = 0;
 		tmp = tibuf;
 		while (tmp < tibuf + icnt) {
 		    int len;
 
-		    len = mbtowc(&ip[i], tmp, tibuf + icnt - tmp);
+		    len = normal_mbtowc(&ip[i], tmp, tibuf + icnt - tmp);
 		    if (len == -1) {
-		        mbtowc(NULL, NULL, 0);
+		        reset_mbtowc();
 		        if (!eof && (size_t)(tibuf + icnt - tmp) < MB_CUR_MAX) {
 			    break; /* Maybe a partial character */
 			}
-			ip[i] = (unsigned char) *tmp; /* Error */
+			ip[i] = (unsigned char) *tmp | INVALID_BYTE; /* Error */
 		    }
 		    if (len <= 0)
 		        len = 1;
 		    i++;
 		    tmp += len;
 		}
-		if (tmp != tibuf) {
+		if (tmp != tibuf)
 		    memmove (tibuf, tmp, tibuf + icnt - tmp);
-		    tmp = tibuf + (tibuf + icnt - tmp);
-		}
+		tmp = tibuf + (tibuf + icnt - tmp);
 		icnt = i;
-#else /* not WIDE_STRINGS */
-		for (i = 0; i < icnt; i++)
-		    ip[i] = (unsigned char) tibuf[i];
-#endif
 	    }
 	    if (hadnl)
 		break;
@@ -996,6 +954,7 @@ backeval(cp, literal)
 	    pword(BUFSIZE);
 	hadnl = 0;
     } while (c > 0);
+ eof:
     (void) close(pvec[0]);
     pwait();
     prestjob();
@@ -1020,6 +979,7 @@ pword(bufsiz)
 	pargv = (Char **) xrealloc((ptr_t) pargv,
 				   (size_t) (pargsiz * sizeof(Char *)));
     }
+    NLSQuote(pargs);
     pargv[pargc++] = Strsave(pargs);
     pargv[pargc] = NULL;
     pargcp = pargs;
@@ -1083,16 +1043,18 @@ t_pmatch(string, pattern, estr, cs)
     Char *string, *pattern, **estr;
     int cs;
 {
-    Char    stringc, patternc;
+    NLSChar stringc, patternc, rangec;
     int     match, negate_range;
-    Char    rangec, *oestr, *pestr;
+    Char    *oestr, *pestr, *nstring;
 
-    for (;; ++string) {
-	stringc = *string & TRIM;
+    for (nstring = string;; string = nstring) {
+	stringc = *nstring++;
+	TRIM_AND_EXTEND(nstring, stringc);
 	/*
 	 * apollo compiler bug: switch (patternc = *pattern++) dies
 	 */
 	patternc = *pattern++;
+	TRIM_AND_EXTEND(pattern, patternc);
 	switch (patternc) {
 	case '\0':
 	    *estr = string;
@@ -1111,7 +1073,7 @@ t_pmatch(string, pattern, estr, cs)
 	    oestr = *estr;
 	    pestr = NULL;
 
-	    do {
+	    for (;;) {
 		switch(t_pmatch(string, pattern, estr, cs)) {
 		case 0:
 		    break;
@@ -1124,8 +1086,11 @@ t_pmatch(string, pattern, estr, cs)
 		    abort();	/* Cannot happen */
 		}
 		*estr = string;
+		stringc = *string++;
+		if (!stringc)
+		    break;
+		TRIM_AND_EXTEND(string, stringc);
 	    }
-	    while (*string++);
 
 	    if (pestr) {
 		*estr = pestr;
@@ -1145,13 +1110,17 @@ t_pmatch(string, pattern, estr, cs)
 		    break;
 		if (match)
 		    continue;
-		if (rangec == '-' && *(pattern-2) != '[' && *pattern  != ']') {
-		    match = (globcharcoll(stringc, *pattern & TRIM, 0) <= 0 &&
-		    globcharcoll(*(pattern-2) & TRIM, stringc, 0) <= 0);
+		TRIM_AND_EXTEND(pattern, rangec);
+		if (*pattern == '-' && pattern[1] != ']') {
+		    NLSChar rangec2;
 		    pattern++;
+		    rangec2 = *pattern++;
+		    TRIM_AND_EXTEND(pattern, rangec2);
+		    match = (globcharcoll(stringc, rangec2, 0) <= 0 &&
+			globcharcoll(rangec, stringc, 0) <= 0);
 		}
 		else 
-		    match = (stringc == (rangec & TRIM));
+		    match = (stringc == rangec);
 	    }
 	    if (rangec == '\0')
 		stderror(ERR_NAME | ERR_MISSING, ']');
@@ -1162,8 +1131,13 @@ t_pmatch(string, pattern, estr, cs)
 	    *estr = string;
 	    break;
 	default:
-	    if (cs ? (patternc & TRIM) != stringc
-		: Tolower(patternc & TRIM) != Tolower(stringc))
+	    TRIM_AND_EXTEND(pattern, patternc);
+	    if (cs ? patternc  != stringc
+#if defined (NLS) && defined (SHORT_STRINGS)
+		: towlower(patternc) != towlower(stringc))
+#else
+		: Tolower(patternc) != Tolower(stringc))
+#endif
 		return (0);
 	    *estr = string;
 	    break;

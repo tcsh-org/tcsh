@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.15 2004/11/23 01:48:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.16 2004/11/23 02:10:50 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.15 2004/11/23 01:48:34 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.16 2004/11/23 02:10:50 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -152,11 +152,7 @@ getstring(dp, sp, pd, f)
 	}
 	else
 	    sc = *s++ & CHAR;
-#ifdef WIDE_STRINGS
 	d += one_wctomb(d, sc);
-#else
-	*d++ = sc;
-#endif
     }
 
     pd->s = *dp;
@@ -177,7 +173,7 @@ parseLS_COLORS(value)
     size_t  i, len;
     const Char   *v;		/* pointer in value */
     char   *c;			/* pointer in colors */
-    Extension *e;		/* pointer in extensions */
+    Extension *volatile e;	/* pointer in extensions */
     jmp_buf_t osetexit;
 
     (void) &e;

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.100 2004/11/20 18:23:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.101 2004/11/23 02:10:50 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,16 +35,11 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.100 2004/11/20 18:23:03 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.101 2004/11/23 02:10:50 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
-
-#ifdef DSPMBYTE
-extern int dspmbyte_utf8;
-extern int ColLen __P((Char *));
-#endif
 
 #ifdef WINNT_NATIVE
 #include "nt.const.h"
@@ -530,9 +525,7 @@ insert_meta(cp, cpend, word, closequotes)
     Char qu = 0;
     int ndel = (int) (cp ? cpend - cp : 0);
     Char w, wq;
-#ifdef DSPMBYTE
-    int mbytepos = 1;
-#endif /* DSPMBYTE */
+    int l;
 
     for (bptr = buffer, wptr = word;;) {
 	if (bptr > buffer + 2 * FILSIZ - 5)
@@ -540,9 +533,6 @@ insert_meta(cp, cpend, word, closequotes)
 	  
 	if (cp >= cpend)
 	    in_sync = 0;
-#ifdef DSPMBYTE
-	if (mbytepos == 1)
-#endif /* DSPMBYTE */
 	if (in_sync && !cmap(qu, _ESC) && cmap(*cp, _QF|_ESC))
 	    if (qu == 0 || qu == *cp) {
 		qu ^= *cp;
@@ -556,10 +546,6 @@ insert_meta(cp, cpend, word, closequotes)
 	wq = w & QUOTE;
 	w &= ~QUOTE;
 
-#ifdef DSPMBYTE
-	if (mbytepos == 2)
-	  goto mbyteskip;
-#endif /* DSPMBYTE */
 	if (cmap(w, _ESC | _QF))
 	    wq = QUOTE;		/* quotes are always quoted */
 
@@ -601,18 +587,17 @@ insert_meta(cp, cpend, word, closequotes)
 	    *bptr++ = '\\';
 	    *bptr++ = w;
 	} else {
-#ifdef DSPMBYTE
-	  mbyteskip:
-#endif /* DSPMBYTE */
 	    if (in_sync && *cp++ != w)
 		in_sync = 0;
 	    *bptr++ = w;
-#ifdef DSPMBYTE
-	    if (mbytepos == 1 && Ismbyte1(w))
-	      mbytepos = 2;
-	    else
-	      mbytepos = 1;
-#endif /* DSPMBYTE */
+	    l = NLSSize(wptr, -1);
+	    while (--l > 0) {
+		wptr++;
+		w = *wptr & ~QUOTE;
+		if (in_sync && *cp++ != w)
+		    in_sync = 0;
+		*bptr++ = w;
+	    }
 	}
 	wptr++;
 	if (cmap(qu, _ESC))
@@ -740,7 +725,7 @@ starting_a_command(wordstart, inputline)
     Char *wordstart, *inputline;
 {
     Char *ptr, *ncmdstart;
-    int     count;
+    int     count, bsl;
     static  Char
             cmdstart[] = {'`', ';', '&', '(', '|', '\0'},
             cmdalive[] = {' ', '\t', '\'', '"', '<', '>', '\0'};
@@ -770,8 +755,14 @@ starting_a_command(wordstart, inputline)
     for (count = 0; wordstart >= inputline; wordstart--) {
 	if (*wordstart == '\0')
 	    continue;
-	if (Strchr(ncmdstart, *wordstart))
-	    break;
+	if (Strchr(ncmdstart, *wordstart)) {
+	    for (ptr = wordstart, bsl = 0; *(--ptr) == '\\'; bsl++);
+	    if (bsl & 1) {
+		wordstart--;
+		continue;
+	    } else
+		break;
+	}
 	/*
 	 * found white space
 	 */
@@ -2060,7 +2051,7 @@ print_by_column(dir, items, count, no_file_suffix)
     int     count, no_file_suffix;
 {
     int i, r, c, columns, rows;
-    unsigned int w, maxwidth = 0;
+    unsigned int w, wx, maxwidth = 0;
     Char *val;
     int across;
 
@@ -2071,13 +2062,7 @@ print_by_column(dir, items, count, no_file_suffix)
 	     (Strchr(val, 'x') != NULL);
 
     for (i = 0; i < count; i++)	{ /* find widest string */
-#ifdef DSPMBYTE
-	if (dspmbyte_utf8) {
-	    maxwidth = max(maxwidth, (unsigned int) ColLen(items[i]));
-	    continue;
-	}
-#endif
-	maxwidth = max(maxwidth, (unsigned int) Strlen(items[i]));
+	maxwidth = max(maxwidth, (unsigned int) NLSStringWidth(items[i]));
     }
 
     maxwidth += no_file_suffix ? 1 : 2;	/* for the file tag and space */
@@ -2092,6 +2077,7 @@ print_by_column(dir, items, count, no_file_suffix)
 	    i = across ? (i + 1) : (c * rows + r);
 
 	    if (i < count) {
+		wx = 0;
 		w = (unsigned int) Strlen(items[i]);
 
 #ifdef COLOR_LS_F
@@ -2104,7 +2090,7 @@ print_by_column(dir, items, count, no_file_suffix)
 		else {
 		    /* Print filename followed by '/' or '*' or ' ' */
 		    print_with_color(items[i], w, filetype(dir, items[i]));
-		    w++;
+		    wx++;
 		}
 #else /* ifndef COLOR_LS_F */
 		if (no_file_suffix) {
@@ -2115,15 +2101,12 @@ print_by_column(dir, items, count, no_file_suffix)
 		    /* Print filename followed by '/' or '*' or ' ' */
 		    xprintf("\045S%c", items[i],
 			    filetype(dir, items[i]));
-		    w++;
+		    wx++;
 		}
 #endif /* COLOR_LS_F */
 
 		if (c < (columns - 1)) {	/* Not last column? */
-#ifdef DSPMBYTE
-		    if (dspmbyte_utf8)
-			w = (unsigned int) ColLen(items[i]);
-#endif
+		    w = (unsigned int) NLSStringWidth(items[i]) + wx;
 		    for (; w < maxwidth; w++)
 			xputchar(' ');
 		}

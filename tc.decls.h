@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.53 2004/05/19 18:51:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.54 2004/08/04 17:12:31 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -293,6 +293,10 @@ extern	sigret_t	  synch_handler	__P((int));
 #ifdef WIDE_STRINGS
 extern	size_t		  one_mbtowc	__P((wchar_t *, const char *, size_t));
 extern	size_t		  one_wctomb	__P((char *, wchar_t));
+#else
+#define one_mbtowc(PWC, S, N) \
+	((void)(N), *(PWC) = (unsigned char)*(S), (size_t)1)
+#define one_wctomb(S, WCHAR) (*(S) = (WCHAR), (size_t)1)
 #endif
 #ifdef SHORT_STRINGS
 extern	Char		 *s_strchr	__P((const Char *, int));

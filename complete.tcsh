@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.43 2004/02/22 15:57:15 christos Exp $
+# $Id: complete.tcsh,v 1.44 2004/05/19 18:51:42 christos Exp $
 # example file using the new completion code
 #
 # Debian GNU/Linux
@@ -1020,7 +1020,7 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
     complete  mount	c/-/"(a F m o O p r v V)"/ n/-p/n/ n/-v/n/ \
     			n/-o/x:'<FSType_options>'/ \
     			n@-F@'`\ls -1 /usr/lib/fs`'@ \
-    			n@*@'`grep -v "^#" /etc/vfstab | tr -s " " "	 " | cut -f 3`'@
+    			n@*@'`grep -v "^#" /etc/fstab | tr -s " " "	 " | cut -f 2`'@
     complete umount	c/-/"(a o V)"/ n/-o/x:'<FSType_options>'/ \
     			n/*/'`mount | cut -d " " -f 1`'/
     complete  mountall	c/-/"(F l r)"/ n@-F@'`\ls -1 /usr/lib/fs`'@

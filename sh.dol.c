@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.53 2004/08/04 17:12:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.54 2004/11/23 02:10:48 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.53 2004/08/04 17:12:28 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.54 2004/11/23 02:10:48 christos Exp $")
 
 /*
  * C shell
@@ -107,11 +107,6 @@ Dfix(t)
     /* Note that t_dcom isn't trimmed thus !...:q's aren't lost */
     for (pp = t->t_dcom; (p = *pp++) != NULL;) {
 	for (; *p; p++) {
-#ifdef DSPMBYTE
-	    if (Ismbyte1(*p) && *(p + 1))
-		p ++;
-	    else
-#endif /* DSPMBYTE */
 	    if (cmap(*p, _DOL | QUOTES)) {	/* $, \, ', ", ` */
 		Dfix2(t->t_dcom);	/* found one */
 		blkfree(t->t_dcom);
@@ -173,28 +168,9 @@ Dpack(wbuf, wp)
 {
     eChar c;
     int i = MAXWLEN - (int) (wp - wbuf);
-#if defined(DSPMBYTE)
-    int mbytepos = 1;
-#endif /* DSPMBYTE */
 
     for (;;) {
 	c = DgetC(DODOL);
-#if defined(DSPMBYTE)
-	if (mbytepos == 1 && Ismbyte1(c)) {
-	    /* An MB1 byte that may be followed by a MB2 byte */
-	    mbytepos = 2;
-	}
-	else {
-	    /* check if MB1 byte followed by an MB2 byte */
-	    if (mbytepos == 2 && Ismbyte2(c)) {
-		/* MB1 + MB2 make the character */
-		mbytepos = 1; /* reset */
-		goto mbyteskip;
-	    }
-	    mbytepos = 1; /* reset */
-	    /* wasn't followed, so the two bytes make two characters */
-	}
-#endif /* DSPMBYTE */
 	if (c == '\\') {
 	    c = DgetC(0);
 	    if (c == DEOF) {
@@ -222,9 +198,6 @@ Dpack(wbuf, wp)
 	    Gcat(STRNULL, wbuf);
 	    return (NULL);
 	}
-#if defined(DSPMBYTE)
-mbyteskip:
-#endif /* DSPMBYTE */
 	if (--i <= 0)
 	    stderror(ERR_WTOOLONG);
 	*wp++ = (Char) c;
@@ -493,7 +466,7 @@ Dgetdol()
     /* Coherent compiler doesn't allow case-labels that are not 
        constant-expressions */
 #ifdef WIDE_STRINGS
-    case 0x8000003C:		/* Does Coherent have 32-bit int at all? */
+    case 0x4000003C:		/* Does Coherent have 32-bit int at all? */
 #elif defined (SHORT_STRINGS)
     case 0100074:
 #else /* !SHORT_STRINGS */
@@ -509,29 +482,24 @@ Dgetdol()
 	if (length)
 	    stderror(ERR_NOTALLOWED, "$%<");
 	{
-#ifdef WIDE_STRINGS
 	    char cbuf[MB_LEN_MAX];
 	    size_t cbp = 0;
-#else
-	    char tnp;
-#endif
 
 #ifdef BSDSIGS
 	    sigmask_t omask = sigsetmask(sigblock(0) & ~sigmask(SIGINT));
 #else /* !BSDSIGS */
 	    (void) sigrelse(SIGINT);
 #endif /* BSDSIGS */
-#ifdef WIDE_STRINGS
 	    np = wbuf;
 	    while (force_read(OLDSTD, cbuf + cbp++, 1) == 1) {
 	        int len;
 
-		len = mbtowc(np, cbuf, cbp);
+		len = normal_mbtowc(np, cbuf, cbp);
 		if (len == -1) {
-		    mbtowc(NULL, NULL, 0);
+		    reset_mbtowc();
 		    if (cbp < MB_LEN_MAX)
 		        continue; /* Maybe a partial character */
-		    *np = (unsigned char)*cbuf;
+		    *np = (unsigned char)*cbuf | INVALID_BYTE;
 		}
 		if (len <= 0)
 		    len = 1;
@@ -554,15 +522,6 @@ Dgetdol()
 		cbp--;
 		memmove(cbuf, cbuf + 1, cbp);
 	    }
-#else
-	    for (np = wbuf; force_read(OLDSTD, &tnp, 1) == 1; np++) {
-		*np = (unsigned char) tnp;
-		if (np >= &wbuf[BUFSIZE - 1])
-		    stderror(ERR_LTOOLONG);
-		if (tnp == '\n')
-		    break;
-	    }
-#endif
 	    *np = 0;
 #ifdef BSDSIGS
 	    (void) sigsetmask(omask);
@@ -636,7 +595,7 @@ Dgetdol()
 		    stderror(ERR_DOLZERO);
 		if (length) {
 		    Char *cp;
-		    length = Strlen(ffile);
+		    length = NLSChars(ffile);
 		    cp = putn(length);
 		    addla(cp);
 		    xfree((ptr_t) cp);
@@ -794,7 +753,7 @@ Dgetdol()
 	int i;
 	Char   *cp;
 	for (i = lwb - 1, length = 0; i < upb; i++)
-	    length += Strlen(vp->vec[i]);
+	    length += NLSChars(vp->vec[i]);
 #ifdef notdef
 	/* We don't want that, since we can always compute it by adding $#xxx */
 	length += i - 1;	/* Add the number of spaces in */
@@ -899,6 +858,12 @@ setDolp(cp)
 #else
     if (dolnmod == 0 || dolmcnt == 0) {
 #endif /* COMPAT */
+	for (dp = cp; *dp; dp++) {
+	    if (NLSSize(dp, -1) != 1) {
+		addla(cp);
+		return;
+	    }
+	}
 	dolp = cp;
 	return;
     }

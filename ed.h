@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.37 2004/11/21 04:38:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.38 2004/11/23 02:10:47 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -156,20 +156,21 @@ EXTERN int Tty_raw_mode;
  */
 extern int MacroLvl;
 extern Char *litptr[];
+extern int litlen[];
 extern int didsetty;
 
 EXTERN Char *KeyMacro[MAXMACROLEVELS];
 
-/* CHAR_ERR in Display and Vdisplay means the non-first column of a character
+/* CHAR_DBWIDTH in Display and Vdisplay means the non-first column of a character
    that is wider than one "regular" position. The cursor should never point
    in the middle of a multiple-column character. */
-EXTERN eChar **Display;		/* display buffer seed vector */
+EXTERN Char **Display;		/* display buffer seed vector */
 EXTERN int CursorV,		/* real cursor vertical (line) */
         CursorH,		/* real cursor horisontal (column) */
         TermV,			/* number of real screen lines
 				 * (sizeof(DisplayBuf) / width */
         TermH;			/* screen width */
-EXTERN eChar **Vdisplay;	/* new buffer */
+EXTERN Char **Vdisplay;	/* new buffer */
 
 /* Variables that describe terminal ability */
 EXTERN int T_Lines, T_Cols;	/* Rows and Cols of the terminal */
@@ -242,10 +243,6 @@ extern char *tgoto	__P((const char *, int, int));
 extern void  tputs	__P((const char *, int, void (*)(int)));
 # define PUTPURE ((void (*)__P((int))) putpure)
 # define PUTRAW ((void (*)__P((int))) putraw)
-#endif
-
-#ifdef DSPMBYTE
-extern int dspmbyte_utf8;
 #endif
 
 #endif /* _h_ed */

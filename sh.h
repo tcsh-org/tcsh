@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.120 2004/11/20 18:23:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.121 2004/11/23 02:10:49 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -35,6 +35,7 @@
 
 #include "config.h"
 
+#include <stddef.h>
 #ifdef HAVE_ICONV
 #include <iconv.h>
 #endif
@@ -82,17 +83,21 @@
 #endif
 
 #ifdef SHORT_STRINGS
-# ifdef WIDE_STRINGS
 #include <wchar.h>
+# ifdef WIDE_STRINGS
 typedef wchar_t Char;
 typedef unsigned long uChar;
 typedef wint_t eChar; /* Can contain any Char value or CHAR_ERR */
 #define CHAR_ERR WEOF /* Pretty please, use bit 31... */
+#define normal_mbtowc(PWC, S, N) mbtowc(PWC, S, N)
+#define reset_mbtowc() mbtowc(NULL, NULL, 0)
 # else
 typedef short Char;
 typedef unsigned short uChar;
 typedef int eChar;
 #define CHAR_ERR (-1)
+#define normal_mbtowc(PWC, S, N) ((void)(N), *(PWC) = (unsigned char)*(S), 1)
+#define reset_mbtowc() ((void)0)
 # endif
 # define SAVE(a) (Strsave(str2short(a)))
 #else
@@ -100,8 +105,16 @@ typedef char Char;
 typedef unsigned char uChar;
 typedef int eChar;
 #define CHAR_ERR (-1)
+#define normal_mbtowc(PWC, S, N) ((void)(N), *(PWC) = (unsigned char)*(S), 1)
+#define reset_mbtowc() ((void)0)
 # define SAVE(a) (strsave(a))
 #endif 
+#if SIZEOF_WCHAR_T >= 4
+typedef wchar_t NLSChar;
+#else
+/* Assumes sizeof (int) >= 4, unlike some parts of tcsh */
+typedef int NLSChar;
+#endif
 
 /* Elide unused argument warnings */
 #define USE(a)	(void) (a)
@@ -303,10 +316,10 @@ typedef int sigret_t;
  * redefines malloc(), so we define the following
  * to avoid it.
  */
-# if defined(SYSMALLOC) || defined(linux) || defined(sgi) || defined(_OSD_POSIX)
+# if defined(SYSMALLOC) || defined(linux) || defined(__GNU__) || defined(__GLIBC__) || defined(sgi) || defined(_OSD_POSIX)
 #  define NO_FIX_MALLOC
 #  include <stdlib.h>
-# else /* linux */
+# else /* glibc */
 #  define _GNU_STDLIB_H
 #  define malloc __malloc
 #  define free __free
@@ -317,11 +330,11 @@ typedef int sigret_t;
 #  undef free
 #  undef calloc
 #  undef realloc
-# endif /* linux || sgi */
+# endif /* glibc || sgi */
 # include <limits.h>
 #endif /* POSIX && !WINNT_NATIVE */
 
-#if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX) || defined(linux)
+#if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX) || defined(linux) || defined(__GNU__) || defined(__GLIBC__)
 # if !defined(pyr) && !defined(stellar)
 #  include <time.h>
 #  ifdef _MINIX
@@ -635,7 +648,7 @@ extern Char   *ffile;		/* Name of shell file for $0 */
 extern int    dolzero;		/* if $?0 should return true... */
 
 extern char *seterr;		/* Error message from scanner/parser */
-#if !defined(BSD4_4) && !defined(__linux__)
+#ifndef errno
 extern int errno;		/* Error from C library routines */
 #endif
 extern int exitset;
@@ -782,7 +795,8 @@ extern signalfun_t parterm;	/* Parents terminate catch */
 # define	STANDOUT	0x08000000 /* Standout flag */
 # define	LITERAL		0x04000000 /* Literal character flag */
 # define	ATTRIBUTES	0x3C000000 /* The bits used for attributes */
-# define	CHAR		0x001FFFFF /* Mask to mask out the character */
+# define	INVALID_BYTE	0x00200000 /* Invalid character on input */
+# define	CHAR		0x003FFFFF /* Mask to mask out the character */
 #elif defined (SHORT_STRINGS)
 # define	QUOTE 	((Char)	0100000)/* 16nth char bit used for 'ing */
 # define	TRIM		0073777	/* Mask to strip quote/lit bit */
@@ -791,6 +805,7 @@ extern signalfun_t parterm;	/* Parents terminate catch */
 # define	STANDOUT	0010000	/* Standout flag */
 # define	LITERAL		0004000	/* Literal character flag */
 # define	ATTRIBUTES	0074000	/* The bits used for attributes */
+# define	INVALID_BYTE	0
 # define	CHAR		0000377	/* Mask to mask out the character */
 #else
 # define	QUOTE 	((Char)	0200)	/* Eighth char bit used for 'ing */
@@ -800,8 +815,10 @@ extern signalfun_t parterm;	/* Parents terminate catch */
 # define	STANDOUT	META	/* Standout flag */
 # define	LITERAL		0000000	/* Literal character flag */
 # define	ATTRIBUTES	0200	/* The bits used for attributes */
+# define	INVALID_BYTE	0
 # define	CHAR		0000177	/* Mask to mask out the character */
 #endif 
+#define		CHAR_DBWIDTH	(LITERAL|(LITERAL-1))
 
 EXTERN int     AsciiOnly;	/* If set only 7 bits expected in characters */
 
@@ -1261,23 +1278,9 @@ extern int	NoNLSRebind;
 
 #include "tc.h"
 
-/*
- * To print system call errors...
- */
-#ifdef BSD4_4
-# include <errno.h>
-#else
-# ifndef linux
-#  ifdef NEEDstrerror
-extern char *sys_errlist[];
-#  endif
-extern int errno, sys_nerr;
-# endif /* !linux */
-#endif
-
 #ifndef WINNT_NATIVE
 # ifdef NLS_CATALOGS
-#  ifdef linux
+#  if defined(linux) || defined(__GNU__) || defined(__GLIBC__)
 #   include <locale.h>
 #   ifdef notdef
 #    include <localeinfo.h>	/* Has this changed ? */
@@ -1332,5 +1335,7 @@ extern int    filec;
  * as unsigned and sign extend them where we need.
  */
 #define SIGN_EXTEND_CHAR(a)	(((a) & 0x80) ? ((a) | ~0x7f) : (a))
+
+#include "tc.nls.h"
 
 #endif /* _h_sh */

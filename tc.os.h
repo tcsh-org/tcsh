@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.90 2004/01/23 16:21:10 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.91 2004/09/28 15:37:29 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -86,9 +86,9 @@
 # define NOFILE 256
 #endif /* NOFILE */
 
-#if defined(linux) || defined(__NetBSD__) || defined(__FreeBSD__) || SYSVREL >= 4  || defined(_MINIX_VMD)
+#if defined(linux) || defined(__GNU__) || defined(__GLIBC__) || defined(__NetBSD__) || defined(__FreeBSD__) || SYSVREL >= 4  || defined(_MINIX_VMD)
 # undef NEEDstrerror
-#endif /* linux || __NetBSD__ || __FreeBSD__ || SYSVREL >= 4 || _MINIX_VMD */
+#endif /* glibc || __NetBSD__ || __FreeBSD__ || SYSVREL >= 4 || _MINIX_VMD */
 
 #if !defined(pyr) && !defined(sinix)
 /* Pyramid's cpp complains about the next line */
@@ -197,10 +197,10 @@ struct ucred {
  * #if (SYSVREL > 0) && defined(TIOCGWINSZ)
  * If that breaks on your machine, let me know.
  *
- * It would break on linux, where all this is
+ * It would break on glibc, where all this is
  * defined in <termios.h>. Wrapper added.
  */
-#if !defined(linux) && !defined(_VMS_POSIX)
+#if !defined(linux) && !defined(__GNU__) && !defined(__GLIBC__) && !defined(_VMS_POSIX)
 # if defined(INTEL) || defined(u3b2) || defined (u3b5) || defined(ub15) || defined(u3b20d) || defined(ISC) || defined(SCO) || defined(tower32)
 #  ifdef TIOCGWINSZ
 /*
@@ -213,7 +213,7 @@ struct ucred {
 #   define NEEDgethostname
 #  endif /* ODT */
 # endif /* INTEL || u3b2 || u3b5 || ub15 || u3b20d || ISC || SCO || tower32 */
-#endif /* !linux && !_VMS_POSIX */
+#endif /* !glibc && !_VMS_POSIX */
 
 #if defined(UNIXPC) || defined(COHERENT)
 # define NEEDgethostname
@@ -513,9 +513,9 @@ struct ucred {
 
 
 #if !defined(SOLARIS2) && !defined(sinix) && !defined(BSD4_4) && !defined(WINNT_NATIVE)
-# if (SYSVREL > 0 && !defined(OREO) && !defined(sgi) && !defined(linux) && !defined(sinix) && !defined(_AIX) &&!defined(_UWIN)) || defined(NeXT)
+# if (SYSVREL > 0 && !defined(OREO) && !defined(sgi) && !defined(linux) && !defined(__GNU__) && !defined(__GLIBC__) && !defined(sinix) && !defined(_AIX) &&!defined(_UWIN)) || defined(NeXT)
 #  define NEEDgetcwd
-# endif /* (SYSVREL > 0 && !OREO && !sgi && !linux && !sinix && !_AIX && !_UWIN) || NeXT */
+# endif /* (SYSVREL > 0 && !OREO && !sgi && !glibc && !sinix && !_AIX && !_UWIN) || NeXT */
 #endif
 
 #ifndef S_IFLNK
@@ -537,12 +537,12 @@ typedef struct timeval timeval_t;
 # define free tcsh_free
 #endif /* NeXT */
 
-#if !defined(BSD4_4) && !defined(__linux__) && !defined(__hpux) && \
+#if !defined(BSD4_4) && !defined(__linux__) && !defined(__GNU__) && !defined(__GLIBC__) && !defined(__hpux) && \
     !defined(sgi) && !defined(_AIX) && !defined(__CYGWIN__)
 #ifndef NEEDgethostname
 extern int gethostname __P((char *, int));
 #endif /* NEEDgethostname */
-#endif /* !BDS4_4 && !__linux__ && !__hpux && !sgi */
+#endif /* !BDS4_4 && !glibc && !__hpux && !sgi */
 
 #if !defined(POSIX) || defined(SUNOS4) || defined(UTekV) || defined(sysV88)
 extern time_t time();

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.char.h,v 3.21 2004/08/04 17:12:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.char.h,v 3.22 2004/11/23 12:58:54 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -37,8 +37,8 @@
 # include <appkit/NXCType.h>
 #else
 # include <ctype.h>
-# ifdef WIDE_STRINGS
-#  include <wchar.h>
+# ifdef SHORT_STRINGS
+#  include <wctype.h>
 # endif
 #endif
 
@@ -267,6 +267,14 @@ extern unsigned short _toebcdic[256];
 # define Ispunct(c)	(cmap(c,_PUN) && !(((c) & META) && AsciiOnly))
 
 #endif /* !NLS */
+
+#if defined (SHORT_STRINGS) && defined (NLS)
+# define Iswcntrl(c) 	(((c) & QUOTE) ? 0 : iswcntrl(c))
+# define Iswprint(c) 	(((c) & QUOTE) ? 0 : iswprint(c))
+#else
+# define Iswcntrl(c) 	Iscntrl(c)
+# define Iswprint(c) 	Isprint(c)
+#endif
 
 #if defined(DSPMBYTE)
 # define Ismbyte1(c)	((_mbmap[(c) & 0377] & _MB1) ? 1 : 0)

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.str.c,v 3.15 2004/11/23 02:12:44 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.str.c,v 3.16 2004/11/23 13:01:46 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$Id: tc.str.c,v 3.15 2004/11/23 02:12:44 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.16 2004/11/23 13:01:46 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -57,7 +57,7 @@ one_mbtowc(wchar_t *pwc, const char *s, size_t n)
     len = mbtowc(pwc, s, n);
     if (len == -1) {
         mbtowc(NULL, NULL, 0);
-	*pwc = (unsigned char)*s;
+	*pwc = (unsigned char)*s | INVALID_BYTE;
     }
     if (len <= 0)
 	len = 1;
@@ -69,11 +69,16 @@ one_wctomb(char *s, wchar_t wchar)
 {
     int len;
 
-    len = wctomb(s, wchar);
-    if (len == -1)
-	s[0] = wchar;
-    if (len <= 0)
+    if (wchar & INVALID_BYTE) {
+	s[0] = wchar & 0xFF;
 	len = 1;
+    } else {
+	len = wctomb(s, wchar);
+	if (len == -1)
+	    s[0] = wchar;
+	if (len <= 0)
+	    len = 1;
+    }
     return len;
 }
 #endif
@@ -138,12 +143,8 @@ str2short(src)
     dst = sdst;
     edst = &dst[dstsize];
     while ((unsigned char) *src) {
-#ifdef WIDE_STRINGS
 	src += one_mbtowc(dst, src, MB_LEN_MAX);
 	dst++;
-#else
-	*dst++ = (Char) ((unsigned char) *src++);
-#endif
 	if (dst == edst) {
 	    dstsize += MALLOC_INCR;
 	    sdst = (Char *) xrealloc((ptr_t) sdst,
@@ -175,12 +176,8 @@ short2str(src)
     dst = sdst;
     edst = &dst[dstsize];
     while (*src) {
-#ifdef WIDE_STRINGS
 	dst += one_wctomb(dst, *src & CHAR);
 	src++;
-#else
-	*dst++ = (char) *src++;
-#endif
 	if (dst >= edst) {
 	    dstsize += MALLOC_INCR;
 	    sdst = (char *) xrealloc((ptr_t) sdst,
@@ -371,7 +368,7 @@ s_strcasecmp(str1, str2)
 #ifdef WIDE_STRINGS
     wchar_t l1 = 0, l2 = 0;
     for (; *str1 && ((*str1 == *str2 && (l1 = l2 = 0) == 0) || 
-	(l1 = tolower(*str1)) == (l2 = tolower(*str2))); str1++, str2++)
+	(l1 = towlower(*str1)) == (l2 = towlower(*str2))); str1++, str2++)
 	continue;
     
 #else
@@ -501,12 +498,8 @@ short2qstr(src)
 		dst = &edst[-MALLOC_INCR];
 	    }
 	}
-#ifdef WIDE_STRINGS
 	dst += one_wctomb(dst, *src & CHAR);
 	src++;
-#else
-	*dst++ = (char) *src++;
-#endif
 	if (dst >= edst) {
 	    dstsize += MALLOC_INCR;
 	    sdst = (char *) xrealloc((ptr_t) sdst,

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.50 2004/11/20 18:23:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.51 2004/11/20 20:30:47 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.50 2004/11/20 18:23:03 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.51 2004/11/20 20:30:47 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -145,11 +145,6 @@ printprompt(promptno, str)
 
     PromptBuf[0] = '\0';
     tprintf(FMT_PROMPT, PromptBuf, cp, 2 * INBUFSIZE - 2, str, lclock, NULL);
-#ifdef DSPMBYTE
-    if (dspmbyte_utf8)
-	Setutf8lit(PromptBuf, NULL);
-#endif
-
     if (!editing) {
 	for (cp = PromptBuf; *cp ; )
 	    (void) putwraw(*cp++);
@@ -161,11 +156,6 @@ printprompt(promptno, str)
     if (promptno == 0) {	/* determine rprompt if using main prompt */
 	cp = varval(STRrprompt);
 	tprintf(FMT_PROMPT, RPromptBuf, cp, INBUFSIZE - 2, NULL, lclock, NULL);
-#ifdef DSPMBYTE
-	if (dspmbyte_utf8)
-	    Setutf8lit(RPromptBuf, NULL);
-#endif
-
 				/* if not editing, put rprompt after prompt */
 	if (!editing && RPromptBuf[0] != '\0') {
 	    for (cp = RPromptBuf; *cp ; )
@@ -205,18 +195,18 @@ tprintf(what, buf, fmt, siz, str, tim, info)
     static Char *olddir = NULL, *olduser = NULL;
     int updirs;
     size_t pdirs, sz;
+    int l;
 
     for (; *cp; cp++) {
 	if (p >= ep)
 	    break;
-#ifdef DSPMBYTE
-	if (Ismbyte1(*cp) && ! (cp[1] == '\0'))
-	{
-	    *p++ = attributes | *cp++;	/* normal character */
-	    *p++ = attributes | *cp;	/* normal character */
+	l = NLSSize(cp, -1);
+	if (l > 1) {
+	    while (l--)
+		*p++ = attributes | *cp++;
+	    cp--;
+	    continue;
 	}
-	else
-#endif /* DSPMBYTE */
 	if ((*cp == '%') && ! (cp[1] == '\0')) {
 	    cp++;
 	    switch (*cp) {
@@ -228,12 +218,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    cz = (const unsigned char *) str;
 		if (cz != NULL)
 		    for (; *cz && p < ep; p++) {
-#ifdef WIDE_STRINGS
 			cz += one_mbtowc(p, cz, MB_LEN_MAX);
 			*p |= attributes;
-#else
-			*p = attributes | *cz++;
-#endif
 		    }
 		break;
 	    case '#':
@@ -255,12 +241,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    break;
 		}
 		for (cz = cbuff; *cz && p < ep; p++) {
-#ifdef WIDE_STRINGS
 		    cz += one_mbtowc(p, cz, MB_LEN_MAX);
 		    *p |= attributes;
-#else
-		    *p = attributes | *cz++;
-#endif
 		}
 		break;
 	    case 'T':		/* 24 hour format	 */
@@ -329,12 +311,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		 */
 		if (cz != NULL)
 		    for (; *cz && p < ep; p++) {
-#ifdef WIDE_STRINGS
 			cz += one_mbtowc(p, cz, MB_LEN_MAX);
 			*p |= attributes;
-#else
-			*p = attributes | *cz++;
-#endif
 		    }
 		break;
 
@@ -350,12 +328,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		if (cz != NULL)
 		    for (; *cz && (what == FMT_WHO || *cz != '.') && p < ep;
 			 p++) {
-#ifdef WIDE_STRINGS
 			cz += one_mbtowc(p, cz, MB_LEN_MAX);
 			*p |= attributes;
-#else
-			*p = attributes | *cz++;
-#endif
 		    }
 		break;
 
@@ -480,12 +454,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    cz = (const unsigned char *) who_info(info, 'n',
 			(char *) cbuff, sizeof(cbuff));
 		    for (; *cz && p < ep; p++) {
-#ifdef WIDE_STRINGS
 			cz += one_mbtowc(p, cz, MB_LEN_MAX);
 			*p |= attributes;
-#else
-			*p = attributes | *cz++;
-#endif
 		    }
 		}
 		else  
@@ -502,12 +472,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    cz = (const unsigned char *) who_info(info, 'l',
 			(char *) cbuff, sizeof(cbuff));
 		    for (; *cz && p < ep; p++) {
-#ifdef WIDE_STRINGS
 			cz += one_mbtowc(p, cz, MB_LEN_MAX);
 			*p |= attributes;
-#else
-			*p = attributes | *cz++;
-#endif
 		    }
 		}
 		else  
@@ -521,12 +487,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'd':
 		for (cz = (const unsigned char *) day_list[t->tm_wday];
 		     *cz && p < ep; p++) {
-#ifdef WIDE_STRINGS
 		    cz += one_mbtowc(p, cz, MB_LEN_MAX);
 		    *p |= attributes;
-#else
-		    *p = attributes | *cz++;
-#endif
 		}
 		break;
 	    case 'D':
@@ -537,12 +499,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		if (p >= ep - 5) break;
 		for (cz = (const unsigned char *) month_list[t->tm_mon];
 		    *cz && p < ep; p++) {
-#ifdef WIDE_STRINGS
 		    cz += one_mbtowc(p, cz, MB_LEN_MAX);
 		    *p |= attributes;
-#else
-		    *p = attributes | *cz++;
-#endif
 		}
 		break;
 	    case 'W':
@@ -626,12 +584,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    cz = (const unsigned char *) who_info(info, 'a',
 			(char *) cbuff, sizeof(cbuff));
 		    for (; *cz && p < ep; p++) {
-#ifdef WIDE_STRINGS
 			cz += one_mbtowc(p, cz, MB_LEN_MAX);
 			*p |= attributes;
-#else
-			*p = attributes | *cz++;
-#endif
 		    }
 		}
 		else 
@@ -652,12 +606,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    else
 		(void) xsnprintf((char *) cbuff, sizeof(cbuff), "%d", eventno + 1);
 	    for (cz = cbuff; *cz && p < ep; p++) {
-#ifdef WIDE_STRINGS
 		cz += one_mbtowc(p, cz, MB_LEN_MAX);
 		*p |= attributes;
-#else
-		*p = attributes | *cz++;
-#endif
 	    }
 	}
 	else 

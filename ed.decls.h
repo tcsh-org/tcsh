@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.decls.h,v 3.34 2004/11/21 04:38:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.decls.h,v 3.35 2004/11/23 01:48:34 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -39,9 +39,6 @@
 extern	int	InsertStr		__P((Char *));
 extern	void	DeleteBack		__P((int));
 extern	void	SetKillRing		__P((int));
-#ifdef DSPMBYTE
-extern	void	Setutf8lit		__P((Char *, Char *)); 
-#endif
 
 /*
  * ed.init.c
@@ -82,12 +79,12 @@ extern	void	tty_setdisc		__P((int, int));
  */
 extern	void	terminit		__P((void));
 extern	void	SetAttributes		__P((Char));
-extern	void	so_write		__P((eChar *, int));
+extern	void	so_write		__P((Char *, int));
 extern	void	ClearScreen		__P((void));
 extern	void	MoveToLine		__P((int));
 extern	void	MoveToChar		__P((int));
 extern	void	ClearEOL		__P((int));
-extern	void	Insert_write		__P((eChar *, int));
+extern	void	Insert_write		__P((Char *, int));
 extern	void	DeleteChars		__P((int));
 extern	void	TellTC			__P((const char *));
 extern	void	SetTC			__P((char *, char *));
@@ -247,6 +244,7 @@ extern  CCRETVAL	e_yank_pop		__P((Char));
  */
 extern	int	Inputl			__P((void));
 extern	int	GetNextChar		__P((Char *));
+extern	void    UngetNextChar		__P((Char));
 extern	void	PushMacro		__P((Char *));
 
 /*

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.57 2004/11/23 01:48:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.58 2004/11/23 02:10:48 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.57 2004/11/23 01:48:34 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.58 2004/11/23 02:10:48 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -457,8 +457,8 @@ static void
 ReBufferDisplay()
 {
     int i;
-    eChar **b;
-    eChar **bufp;
+    Char **b;
+    Char **bufp;
 
     b = Display;
     Display = NULL;
@@ -476,14 +476,14 @@ ReBufferDisplay()
     }
     TermH = Val(T_co);
     TermV = (INBUFSIZE * 4) / TermH + 1;
-    b = (eChar **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
+    b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
     for (i = 0; i < TermV; i++)
-	b[i] = (eChar *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
+	b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
     b[TermV] = NULL;
     Display = b;
-    b = (eChar **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
+    b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
     for (i = 0; i < TermV; i++)
-	b[i] = (eChar *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
+	b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
     b[TermV] = NULL;
     Vdisplay = b;
 }
@@ -1094,17 +1094,12 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
 	    if ((T_Margin & MARGIN_AUTO) && Display[CursorV][0] != '\0') {
 		size_t h;
 
-		for (h = TermH - 1; h > 0 && Display[CursorV][h] == CHAR_ERR;
+		for (h = TermH - 1; h > 0 && Display[CursorV][h] == CHAR_DBWIDTH;
 		     h--)
 		    ;
 		/* move without newline */
 		MoveToChar(h);
-#ifdef DSPMBYTE
-		if (h > 0 && Ismbyte2(Display[CursorV][CursorH]))
-		    MoveToChar(h - 1);
-#else
 		so_write(&Display[CursorV][CursorH], TermH - CursorH); /* updates CursorH/V*/
-#endif
 		del--;
 	    }
 	    else {
@@ -1169,13 +1164,9 @@ mc_again:
 		(void) tputs(tgoto(Str(T_RI), del, del), del, PUTPURE);
 	    else {
 		/* if I can do tabs, use them */
-		if (T_Tabs
-#ifdef DSPMBYTE
-		    && !_enable_mbdisp
-#endif /* DSPMBYTE */
-		) {
+		if (T_Tabs) {
 		    if ((CursorH & 0370) != (where & ~0x7)
-			&& Display[CursorV][where & ~0x7] != CHAR_ERR) {
+			&& Display[CursorV][where & ~0x7] != CHAR_DBWIDTH) {
 			/* if not within tab stop */
 			for (i = (CursorH & 0370); i < (where & ~0x7); i += 8)
 			    (void) putraw('\t');	/* then tab over */
@@ -1214,7 +1205,7 @@ mc_again:
 
 void
 so_write(cp, n)
-    eChar *cp;
+    Char *cp;
     int n;
 {
     if (n <= 0)
@@ -1229,17 +1220,18 @@ so_write(cp, n)
     }
 
     do {
-	if (*cp != CHAR_ERR) {
+	if (*cp != CHAR_DBWIDTH) {
 	    if (*cp & LITERAL) {
 		Char   *d;
+		int    i;
 		
 #ifdef DEBUG_LITERAL
 		xprintf("so: litnum %d, litptr %x\r\n",
 			(int)(*cp & CHAR), litptr[*cp & CHAR]);
 #endif /* DEBUG_LITERAL */
-		for (d = litptr[*cp & CHAR]; *d & LITERAL; d++)
-		    (void) putwraw(*d & CHAR);
-		(void) putwraw(*d);
+		d = litptr[*cp & CHAR];
+		for (i = litlen[*cp & CHAR]; i > 0; i--, d++)
+		    (void) putwraw(*d);
 	    }
 	    else
 		(void) putwraw(*cp);
@@ -1254,15 +1246,10 @@ so_write(cp, n)
 	    CursorV++;
 	    if (T_Margin & MARGIN_MAGIC) {
 		/* force the wrap to avoid the "magic" situation */
-		eChar c;
+		Char c;
 		if ((c = Display[CursorV][CursorH]) != '\0') {
 		    so_write(&c, 1);
-#ifdef DSPMBYTE
-		    if (CursorH > 0 && (c = Display[CursorV][CursorH]) != 0)
-			if (Ismbyte2(c))
-			    so_write(&c, 1);
-#endif
-		    while(Display[CursorV][CursorH] == CHAR_ERR)
+		    while(Display[CursorV][CursorH] == CHAR_DBWIDTH)
 			CursorH++;
 		}
 		else {
@@ -1319,7 +1306,7 @@ DeleteChars(num)		/* deletes <num> characters */
 
 void
 Insert_write(cp, num)		/* Puts terminal in insert character mode, */
-    eChar *cp;
+    Char *cp;
     int num;		/* or inserts num characters in the line */
 {
     if (num <= 0)
@@ -1650,7 +1637,7 @@ ChangeSize(lins, cols)
 	if ((tptr = getenv("TERMCAP")) != NULL) {
 	    /* Leave 64 characters slop in case we enlarge the termcap string */
 	    Char    termcap[1024+64], backup[1024+64], *ptr;
-	    int     i;
+	    size_t len;
 
 	    ptr = str2short(tptr);
 	    (void) Strncpy(termcap, ptr, 1024);
@@ -1665,11 +1652,11 @@ ChangeSize(lins, cols)
 		(void) Strcpy(backup, termcap);
 	    }
 	    else {
-		i = (int) (ptr - termcap + Strlen(buf));
-		(void) Strncpy(backup, termcap, (size_t) i);
-		backup[i] = '\0';
+		size_t len = (ptr - termcap) + Strlen(buf);
+		(void) Strncpy(backup, termcap, len);
+		backup[len] = '\0';
 		(void) Itoa(Val(T_co), buf, 0, 0);
-		(void) Strcat(backup + i, buf);
+		(void) Strcat(backup + len, buf);
 		ptr = Strchr(ptr, ':');
 		(void) Strcat(backup, ptr);
 	    }
@@ -1683,9 +1670,9 @@ ChangeSize(lins, cols)
 		(void) Strcpy(termcap, backup);
 	    }
 	    else {
-		i = (int) (ptr - backup + Strlen(buf));
-		(void) Strncpy(termcap, backup, (size_t) i);
-		termcap[i] = '\0';
+		len = (ptr - backup) + Strlen(buf);
+		(void) Strncpy(termcap, backup, len);
+		termcap[len] = '\0';
 		(void) Itoa(Val(T_li), buf, 0, 0);
 		(void) Strcat(termcap, buf);
 		ptr = Strchr(ptr, ':');

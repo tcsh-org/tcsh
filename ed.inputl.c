@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.55 2004/11/20 20:30:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.56 2004/11/23 02:10:48 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.55 2004/11/20 20:30:46 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.56 2004/11/23 02:10:48 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -61,10 +61,6 @@ static int rotate = 0;
 static int
 Repair()
 {
-#ifdef DSPMBYTE
-    if (dspmbyte_utf8)
-	Setutf8lit(InputBuf, LastChar);
-#endif
     if (NeedsRedraw) {
 	ClearLines();
 	ClearDisp();
@@ -437,10 +433,6 @@ Inputl()
 		}
 		break;
 	    }
-#ifdef DSPMBYTE
-	    if (dspmbyte_utf8)
-		Setutf8lit(InputBuf, LastChar);
-#endif
 	    if (NeedsRedraw) {
 		PastBottom();
 		ClearLines();
@@ -719,19 +711,30 @@ GetNextCommand(cmdnum, ch)
     return OKCMD;
 }
 
+static Char ungetchar;
+static int haveungetchar;
+
+void
+UngetNextChar(Char cp)
+{
+    ungetchar = cp;
+    haveungetchar = 1;
+}
+
 int
 GetNextChar(cp)
     Char *cp;
 {
     int num_read;
     int     tried = 0;
-#ifdef WIDE_STRINGS
     char cbuf[MB_LEN_MAX];
     size_t cbp;
-#else
-    unsigned char tcp;
-#endif
 
+    if (haveungetchar) {
+	haveungetchar = 0;
+	*cp = ungetchar;
+	return 1;
+    }
     for (;;) {
 	if (MacroLvl < 0) {
 	    if (!Load_input_line())
@@ -758,8 +761,6 @@ GetNextChar(cp)
     if (windowchg)
 	(void) check_window_size(0);	/* for window systems */
 #endif /* SIG_WINDOW */
-#ifdef WIDE_STRINGS
-    /* This is the part that doesn't work with WINNT_NATIVE */
     cbp = 0;
     for (;;) {
 	while ((num_read = read(SHIN, cbuf + cbp, 1)) == -1) {
@@ -773,49 +774,29 @@ GetNextChar(cp)
 		if (errno != EINTR)
 		    stderror(ERR_SYSTEM, progname, strerror(errno));
 # endif  /* convex */
+# ifdef WINNT_NATIVE
+		__nt_want_vcode = 0;
+# endif /* WINNT_NATIVE */
 		*cp = '\0'; /* Loses possible partial character */
 		return -1;
 	    }
 	}
 	cbp++;
-	if (mbtowc(cp, cbuf, cbp) == -1) {
-	    mbtowc(NULL, NULL, 0);
+	if (normal_mbtowc(cp, cbuf, cbp) == -1) {
+	    reset_mbtowc();
 	    if (cbp < MB_LEN_MAX)
 		continue; /* Maybe a partial character */
 	    /* And drop the following bytes, if any */
-	    *cp = (unsigned char)*cbuf;
+	    *cp = (unsigned char)*cbuf | INVALID_BYTE;
 	}
 	break;
     }
-#else /* not WIDE_STRINGS */
-    while ((num_read = read(SHIN, (char *) &tcp, 1)) == -1) {
-	if (errno == EINTR)
-	    continue;
-	if (!tried && fixio(SHIN, errno) != -1)
-	    tried = 1;
-	else {
-# ifdef convex
-            /* need to print error message in case the file is migrated */
-            if (errno != EINTR)
-                stderror(ERR_SYSTEM, progname, strerror(errno));
-# endif  /* convex */
-# ifdef WINNT_NATIVE
-	    __nt_want_vcode = 0;
-# endif /* WINNT_NATIVE */
-	    *cp = '\0';
-	    return -1;
-	}
-    }
-# ifdef WINNT_NATIVE
+#ifdef WINNT_NATIVE
+    /* This is the part that doesn't work with WIDE_STRINGS */
     if (__nt_want_vcode == 2)
 	*cp = __nt_vcode;
-    else
-	*cp = tcp;
     __nt_want_vcode = 0;
-# else
-    *cp = tcp;
-# endif /* WINNT_NATIVE */
-#endif /* not WIDE_STRINGS */
+#endif /* WINNT_NATIVE */
     return num_read;
 }
 
