@@ -131,10 +131,16 @@
 #define _POSIX_SOURCE
 #define _MINIX
 
+/*
+ * define if you are on vmd system
+ */
+#undef _MINIX_VMD
+
 /****************** configurable hacks ****************/
 /* have been moved to config_f.h */
 #include "config_f.h"
 
 #undef NLS
 #undef NLS_CATALOGS
+#undef REMOTEHOST
 #endif /* _h_config */

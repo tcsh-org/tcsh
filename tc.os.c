@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.49 1998/09/19 14:45:19 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.c,v 3.50 1998/10/25 15:10:35 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.49 1998/09/19 14:45:19 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.50 1998/10/25 15:10:35 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1164,7 +1164,7 @@ fail:
 
 # else /* ! hp9000s500 */
 
-#  if (SYSVREL != 0 && !defined(d_fileno)) || defined(_VMS_POSIX) || defined(WINNT)
+#  if (SYSVREL != 0 && !defined(d_fileno)) || defined(_VMS_POSIX) || defined(WINNT) || defined(_MINIX_VMD)
 #   define d_fileno d_ino
 #  endif
 
