@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.h,v 3.27 1997/10/27 22:44:21 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.28 1998/11/24 18:17:21 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -47,8 +47,6 @@
 #ifndef WINNT
 # define NT_NUM_KEYS	256
 #endif /* WINNT */
-
-extern int errno;
 
 /****************************************************************************/
 /* stuff for the different states returned by the character editor routines */
