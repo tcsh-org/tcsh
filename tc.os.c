@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.34 1994/03/13 00:46:35 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.35 1994/04/12 15:46:46 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.34 1994/03/13 00:46:35 christos Exp christos $")
+RCSID("$Id: tc.os.c,v 3.35 1994/04/12 15:46:46 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -672,7 +672,7 @@ pr_stat_sub(p2, p1, pr)
 #ifdef NEEDmemset
 /* This is a replacement for a missing memset function */
 ptr_t xmemset(loc, value, len)
-    ptr_t *loc;
+    ptr_t loc;
     int len;
     size_t value;
 {
