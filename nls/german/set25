@@ -1,0 +1,4 @@
+$set 25 # tc.sig.c
+1 our wait %d\n
+2 Fehler: bsd_signal(%d) Signal auﬂerhalb der Grenzen\n
+3 Fehler: bsd_signal(%d) - sigaction fehlerhaft, errno %d\n
