@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.52 2002/05/16 13:51:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.53 2002/07/01 21:00:56 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.52 2002/05/16 13:51:25 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.53 2002/07/01 21:00:56 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -843,7 +843,7 @@ backeval(cp, literal)
 	for (arginp = cp; *cp; cp++) {
 	    *cp &= TRIM;
 	    if (*cp == '\n' || *cp == '\r')
-		*cp = ';';
+		*cp = ' ';
 	}
 
         /*
