@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.35 2004/12/25 21:15:06 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.36 2005/01/05 16:06:13 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.35 2004/12/25 21:15:06 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.36 2005/01/05 16:06:13 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -45,6 +45,7 @@ Char   *litptr;
 static int vcursor_h, vcursor_v;
 static int rprompt_h, rprompt_v;
 
+static	int	MakeLiteral		__P((Char *, int, Char));
 static	int	Draw 			__P((Char *, int));
 static	void	Vdraw 			__P((Char, int));
 static	void	RefreshPromptpart	__P((Char *));
@@ -130,32 +131,31 @@ static void ResetLiterals()
 static int MakeLiteral(str, len, addlit)
     Char *str;
     int len;
-    int addlit;
+    Char addlit;
 {
     int i, addlitlen = 0;
-    Char *addlitptr = 0, addlitbuf;
+    Char *addlitptr = 0;
     if (addlit) {
 	if ((addlit & LITERAL) != 0) {
-	    addlitptr = litptr + ((addlit & ~LITERAL) << 2);
+	    addlitptr = litptr + (addlit & ~LITERAL) * LIT_FACTOR;
 	    addlitlen = Strlen(addlitptr);
 	} else {
-	    addlitbuf = addlit;
-	    addlitptr = &addlitbuf;
+	    addlitptr = &addlit;
 	    addlitlen = 1;
 	}
-	for (i = 0; i < litlen; i += 4)
+	for (i = 0; i < litlen; i += LIT_FACTOR)
 	    if (!Strncmp(addlitptr, litptr + i, addlitlen) && !Strncmp(str, litptr + i + addlitlen, len) && litptr[i + addlitlen + len] == 0)
-		return (i >> 2) | LITERAL;
+		return (i / LIT_FACTOR) | LITERAL;
     } else {
 	addlitlen = 0;
-	for (i = 0; i < litlen; i += 4)
+	for (i = 0; i < litlen; i += LIT_FACTOR)
 	    if (!Strncmp(str, litptr + i, len) && litptr[i + len] == 0)
-		return (i >> 2) | LITERAL;
+		return (i / LIT_FACTOR) | LITERAL;
     }
-    if (litlen + addlitlen + len + 1 > litalloc) {
+    if (litlen + addlitlen + len + 1 + (LIT_FACTOR - 1) > litalloc) {
 	Char *newlitptr;
 	int add = 256;
-	while (len + addlitlen + 1 > add)
+	while (len + addlitlen + 1 + (LIT_FACTOR - 1) > add)
 	    add *= 2;
 	if (litptr)
 	    newlitptr = (Char *)xrealloc(litptr, (litalloc + add) * sizeof(Char));
@@ -165,10 +165,10 @@ static int MakeLiteral(str, len, addlit)
 	    return '?';
 	litptr = newlitptr;
 	litalloc += add;
-	if (addlitptr && addlitptr != &addlitbuf)
-	    addlitptr = litptr + ((addlit & ~LITERAL) << 2);
+	if (addlitptr && addlitptr != &addlit)
+	    addlitptr = litptr + (addlit & ~LITERAL) * LIT_FACTOR;
     }
-    i = litlen >> 2;
+    i = litlen / LIT_FACTOR;
     if (i >= LITERAL || i == CHAR_DBWIDTH)
 	return '?';
     if (addlitptr) {
@@ -179,7 +179,7 @@ static int MakeLiteral(str, len, addlit)
     litlen += len;
     do
 	litptr[litlen++] = 0;
-    while (litlen & 3);
+    while (litlen % LIT_FACTOR);
     return i | LITERAL;
 }
 
@@ -207,7 +207,7 @@ Draw(cp, nocomb)	/* draw char at cp, expand tabs, ctl chars */
 	    } while ((vcursor_h & 07) != 0);
 	    break;
 	case NLSCLASS_CTRL:
-	    Vdraw('^', 1);
+	    Vdraw('^' | attr, 1);
 	    if (c == CTL_ESC('\177')) {
 		Vdraw('?' | attr, 1);
 	    } else {
@@ -220,11 +220,11 @@ Draw(cp, nocomb)	/* draw char at cp, expand tabs, ctl chars */
 	    }
 	    break;
 	case NLSCLASS_ILLEGAL:
-	    c = *cp;
+	    ch = *cp & CHAR;
 	    Vdraw('\\' | attr, 1);
-	    Vdraw((((c >> 6) & 7) + '0') | attr, 1);
-	    Vdraw((((c >> 3) & 7) + '0') | attr, 1);
-	    Vdraw(((c & 7) + '0') | attr, 1);
+	    Vdraw((((ch >> 6) & 7) + '0') | attr, 1);
+	    Vdraw((((ch >> 3) & 7) + '0') | attr, 1);
+	    Vdraw(((ch & 7) + '0') | attr, 1);
 	    break;
 	case NLSCLASS_ILLEGAL2:
 	case NLSCLASS_ILLEGAL3:
@@ -232,9 +232,8 @@ Draw(cp, nocomb)	/* draw char at cp, expand tabs, ctl chars */
 	    Vdraw('\\' | attr, 1);
 	    Vdraw('U' | attr, 1);
 	    Vdraw('+' | attr, 1);
-	    i = 6 * NLSCLASS_ILLEGAL_SIZE(w);
 	    for (i = 8 * NLSCLASS_ILLEGAL_SIZE(w) - 4; i >= 0; i -= 4)
-		Vdraw("0123456789ABCDEF"[i ? (c >> i) & 15 : c & 15] | attr, 1);
+		Vdraw("0123456789ABCDEF"[(c >> i) & 15] | attr, 1);
 	    break;
 	case 0:
 	    lv = vcursor_v;
@@ -253,11 +252,11 @@ Draw(cp, nocomb)	/* draw char at cp, expand tabs, ctl chars */
 	    if (lv < 0) {
 		int l2 = l;
 		for (; l2-- > 0; cp++) {
-		    c = *cp;
+		    ch = *cp & CHAR;
 		    Vdraw('\\' | attr, 1);
-		    Vdraw((((c >> 6) & 7) + '0') | attr, 1);
-		    Vdraw((((c >> 3) & 7) + '0') | attr, 1);
-		    Vdraw(((c & 7) + '0') | attr, 1);
+		    Vdraw((((ch >> 6) & 7) + '0') | attr, 1);
+		    Vdraw((((ch >> 3) & 7) + '0') | attr, 1);
+		    Vdraw(((ch & 7) + '0') | attr, 1);
 		}
 		return l;
 	    }
@@ -365,8 +364,6 @@ Refresh()
     int     cur_h, cur_v = 0, new_vcv;
     int     rhdiff;
     Char    oldgetting;
-    int     l, w;
-    NLSChar c;
 
 #ifdef DEBUG_REFRESH
     dprintf("PromptBuf = :%s:\r\n", short2str(PromptBuf));
@@ -1254,11 +1251,11 @@ PutPlusOne(c, width)
     Char   c;
     int    width;
 {
-    while (width > 1 && CursorH + width > (size_t)TermH)
+    while (width > 1 && CursorH + width > TermH)
 	PutPlusOne(' ', 1);
     if ((c & LITERAL) != 0) {
 	Char *d;
-	for (d = litptr + ((c & ~LITERAL) << 2); *d; d++)
+	for (d = litptr + (c & ~LITERAL) * LIT_FACTOR; *d; d++)
 	    (void) putwraw(*d);
     } else {
 	(void) putwraw(c);
@@ -1288,7 +1285,7 @@ void
 RefPlusOne(int l)
 {				/* we added just one char, handle it fast.
 				 * assumes that screen cursor == real cursor */
-    Char mc, *cp;
+    Char *cp;
     int w;
     NLSChar c;
 

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.39 2004/12/25 21:15:05 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.40 2005/01/05 16:06:13 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -155,7 +155,8 @@ EXTERN int Tty_raw_mode;
  * These are truly extern
  */
 extern int MacroLvl;
-extern Char *litptr;
+extern Char *litptr;	 /* Entries start at offsets divisible by LIT_FACTOR */
+#define LIT_FACTOR 4
 extern int didsetty;
 
 EXTERN Char *KeyMacro[MAXMACROLEVELS];

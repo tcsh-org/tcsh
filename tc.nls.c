@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.2 2005/01/05 16:06:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.3 2005/01/18 20:01:10 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <wchar.h>
 
-RCSID("$Id: tc.nls.c,v 3.2 2005/01/05 16:06:14 christos Exp $")
+RCSID("$Id: tc.nls.c,v 3.3 2005/01/18 20:01:10 christos Exp $")
 
 #ifdef SHORT_STRINGS
 int
@@ -283,9 +283,9 @@ NLSClassify(c, nocomb)
     if (c & NLS_ILLEGAL)
 	return NLSCLASS_ILLEGAL;
     w = NLSWidth(c);
-    if (w > 0 || (Isprint(c) && !nocomb))
+    if (w > 0 || (Iswprint(c) && !nocomb))
 	return w;
-    if (Iscntrl(c) && c < 0x100) {
+    if (Iswcntrl(c) && c < 0x100) {
 	if (c == '\n')
 	    return NLSCLASS_NL;
 	if (c == '\t')

@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.3 2004/11/23 02:10:50 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.4 2005/01/05 16:06:19 christos Exp $*/
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -338,13 +338,11 @@ so_write(cp, n)
 
 	do {
 		if (*cp & LITERAL) {
-			extern Char *litptr[];
 			Char   *d;
 
-			for (d = litptr[*cp++ & CHAR]; *d & LITERAL; d++)
-				(void) putraw(*d & CHAR);
-			(void) putraw(*d);
-
+			for (d = litptr + (*cp++ & ~LITERAL) * LIT_FACTOR; *d;
+			     d++)
+				(void) putraw(*d);
 		}
 		else
 			(void) putraw(*cp++);
@@ -529,7 +527,7 @@ PutPlusOne(c, width)
 		PutPlusOne(' ', 1);
 	if ((c & LITERAL) != 0) { 
 		Char *d;
-		for (d = litptr + ((c & ~LITERAL) << 2); *d; d++)
+		for (d = litptr + (c & ~LITERAL) * LIT_FACTOR; *d; d++)
 			(void) putwraw(*d);
 	} else {
 		(void) putwraw(c);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.59 2004/12/25 21:15:06 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.60 2005/01/05 16:06:13 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.59 2004/12/25 21:15:06 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.60 2005/01/05 16:06:13 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1226,7 +1226,7 @@ so_write(cp, n)
 #ifdef DEBUG_LITERAL
 		xprintf("so: litnum %d\r\n", (int)(*cp & ~LITERAL));
 #endif /* DEBUG_LITERAL */
-		for (d = litptr + ((*cp & ~LITERAL) << 2); *d; d++)
+		for (d = litptr + (*cp & ~LITERAL) * LIT_FACTOR; *d; d++)
 		    (void) putwraw(*d);
 	    }
 	    else
