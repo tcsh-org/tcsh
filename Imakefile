@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.34 1993/06/25 21:32:48 christos Exp $
+/**/# $Id: Imakefile,v 1.35 1993/07/07 19:16:17 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.04
 /**/# Marc Horowitz, MIT SIPB
@@ -123,7 +123,7 @@ EXTF=ma.setp.c vms.termcap.c
 /* Maybe conditional on MACH? */
 SYSSRCS=ma.setp.c
 SYSOBJS=ma.setp.${SUF}
-EXTF=mi.termios.c mi.wait.h vms.termcap.c
+EXTF=mi.termios.c mi.wait.h mi.varargs.h vms.termcap.c
 # endif
 #endif /* !ConfigH */
 
