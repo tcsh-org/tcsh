@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.0 1991/07/04 23:38:32 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -162,8 +162,10 @@ extern char *sbrk();
  */
 # ifndef _SIZE_T
 #  define _SIZE_T
-   typedef unsigned int size_t;
 # endif /* _SIZE_T */
+# ifndef _PID_T
+#  define _PID_T
+# endif /* _PID_T */
 #endif
 
 
