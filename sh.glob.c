@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.57 2004/08/04 17:12:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.58 2004/11/20 17:40:36 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.57 2004/08/04 17:12:29 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.58 2004/11/20 17:40:36 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -1054,12 +1054,12 @@ Gnmatch(string, pattern, endstr)
     if (endstr == NULL)
 	/* Exact matches only */
 	for (p = blk; *p; p++) 
-	    gres |= t_pmatch(string, *p, &tstring, 0) == 2 ? 1 : 0;
+	    gres |= t_pmatch(string, *p, &tstring, 1) == 2 ? 1 : 0;
     else {
 	/* partial matches */
 	int minc = 0x7fffffff;
 	for (p = blk; *p; p++) 
-	    if (t_pmatch(string, *p, &tstring, 0) != 0) {
+	    if (t_pmatch(string, *p, &tstring, 1) != 0) {
 		int t = (int) (tstring - string);
 		gres |= 1;
 		if (minc == -1 || minc > t)
@@ -1146,8 +1146,8 @@ t_pmatch(string, pattern, estr, cs)
 		if (match)
 		    continue;
 		if (rangec == '-' && *(pattern-2) != '[' && *pattern  != ']') {
-		    match = (globcharcoll(stringc, *pattern & TRIM, cs) <= 0 &&
-		    globcharcoll(*(pattern-2) & TRIM, stringc, cs) <= 0);
+		    match = (globcharcoll(stringc, *pattern & TRIM, 0) <= 0 &&
+		    globcharcoll(*(pattern-2) & TRIM, stringc, 0) <= 0);
 		    pattern++;
 		}
 		else 
@@ -1162,7 +1162,8 @@ t_pmatch(string, pattern, estr, cs)
 	    *estr = string;
 	    break;
 	default:
-	    if ((patternc & TRIM) != stringc)
+	    if (cs ? (patternc & TRIM) != stringc
+		: Tolower(patternc & TRIM) != Tolower(stringc))
 		return (0);
 	    *estr = string;
 	    break;
