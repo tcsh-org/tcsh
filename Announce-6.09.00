@@ -1,0 +1,38 @@
+Hello,
+
+I am pleased to announce that tcsh-6.09 is finally available; this version
+fixes a lot of bugs and adds the following enhancements:
+
+New Features:
+	* color NLS messages			Yoshiyuki Sakakibara
+	* $_ variable				Christos Zoulas
+	* postcmd hook				Christos Zoulas
+
+New Ports:
+	* amiga with Geek Gadgets port		Arto Huusko
+	* Rhapsody port				Wildfredo Sanchez
+	* SX4 port				Andreas Schott
+	* U/WIN port				Chris Jones
+	* Cygwin32 port				Raj Menon
+
+Bug Fixes:
+	* %y y2k fix				Chris Torek
+	* many more (consult the Fixes file)	various
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most unix machines, VMS_POSIX, OS/2 EMX, WIN32, Amiga
+
+You can get tcsh from ftp.astron.com:/pub/tcsh/tcsh-6.09.tar.gz
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you
+can get it from prep.ai.mit.edu or other GNU mirrors, or ask ftp to
+unpack it on the fly using 'get tcsh-6.09.tar'.
+
+I would like to thank:
+
+    o everyone who sent bug reports
+    o the beta team for all their help, bug fixes, and suggestions
+
+christos
