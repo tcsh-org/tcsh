@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.19 1997/10/02 16:36:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.20 1997/10/27 22:44:22 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.19 1997/10/02 16:36:26 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.20 1997/10/27 22:44:22 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -51,6 +51,7 @@ static int rprompt_h, rprompt_v;
 
 static	void	Draw 			__P((int));
 static	void	Vdraw 			__P((int));
+static	void	RefreshPromptpart	__P((Char *));
 static	void	update_line 		__P((Char *, Char *, int));
 static	void	str_insert		__P((Char *, int, int, Char *, int));
 static	void	str_delete		__P((Char *, int, int, int));

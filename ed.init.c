@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.init.c,v 3.38 1996/04/26 19:17:57 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.init.c,v 3.39 1997/10/27 22:44:21 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.38 1996/04/26 19:17:57 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.39 1997/10/27 22:44:21 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -552,7 +552,7 @@ Cookedmode()
 #ifdef WINNT
     do_nt_cooked_mode();
 #else
-    sigret_t(*orig_intr) ();
+    signalfun_t orig_intr;
 
 # ifdef _IBMR2
     tty_setdisc(SHTTY, EX_IO);
@@ -563,7 +563,7 @@ Cookedmode()
 
     /* hold this for reseting tty */
 # ifdef BSDSIGS
-    orig_intr = (sigret_t (*)()) signal(SIGINT, SIG_IGN);
+    orig_intr = (signalfun_t) signal(SIGINT, SIG_IGN);
 # else
 #  ifdef SIG_HOLD
     /*
@@ -580,14 +580,14 @@ Cookedmode()
      *
      * Casper Dik (casper@fwi.uva.nl)
      */
-    orig_intr = (sigret_t (*)()) sigset(SIGINT, SIG_HOLD);
+    orig_intr = (signalfun_t) sigset(SIGINT, SIG_HOLD);
     if (orig_intr != SIG_HOLD)
 	(void) sigset(SIGINT, SIG_IGN); /* returns SIG_HOLD */
 #  else /* !SIG_HOLD */
     /*
      * No SIG_HOLD; probably no reliable signals as well.
      */
-    orig_intr = (sigret_t (*)()) sigset(SIGINT, SIG_IGN);
+    orig_intr = (signalfun_t) sigset(SIGINT, SIG_IGN);
 #  endif /* SIG_HOLD */
 # endif /* BSDSIGS */
     if (tty_setty(SHTTY, &extty) == -1) {

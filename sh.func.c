@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.68 1997/10/02 16:36:29 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.69 1997/10/27 22:44:28 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.68 1997/10/02 16:36:29 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.69 1997/10/27 22:44:28 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -63,6 +63,7 @@ static	void	search		__P((int, int, Char *));
 static	int	getword		__P((Char *));
 static	void	toend		__P((void));
 static	void	xecho		__P((int, Char **));
+static	bool	islocale_var	__P((Char *));
 
 struct biltins *
 isbfunc(t)
@@ -1216,8 +1217,9 @@ done:
 }
 
 /* check whether an environment variable should invoke 'set_locale()' */
-static bool islocale_var(var)
-register Char *var;
+static bool
+islocale_var(var)
+    Char *var;
 {
     static Char *locale_vars[] = {
 	STRLANG,	STRLC_CTYPE,	STRLC_NUMERIC,	STRLC_TIME,
@@ -2091,7 +2093,7 @@ dosuspend(v, c)
 #ifdef BSDJOBS
     int     ctpgrp;
 
-    sigret_t (*old) ();
+    signalfun_t old;
 #endif /* BSDJOBS */
     
     USE(c);

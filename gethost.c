@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/gethost.c,v 1.5 1996/04/26 19:18:28 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/gethost.c,v 1.6 1996/10/11 17:32:08 christos Exp $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: gethost.c,v 1.5 1996/04/26 19:18:28 christos Exp $")
+RCSID("$Id: gethost.c,v 1.6 1996/10/11 17:32:08 christos Exp $")
 
 #ifdef SCO
 # define perror __perror
@@ -98,6 +98,11 @@ static const char *keyword[] =
 #define S_COMMENT	1
 #define S_CODE		2
 #define S_KEYWORD	3
+
+static int findtoken __P((char *));
+static char *gettoken __P((char **, char  *));
+
+int main __P((int, char *[]));
 
 /* findtoken():
  *	Return the token number of the given token

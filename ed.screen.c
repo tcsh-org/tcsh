@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.39 1997/10/02 16:36:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.40 1997/10/27 22:44:23 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,21 +36,33 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.39 1997/10/02 16:36:26 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.40 1997/10/27 22:44:23 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
 #include "ed.defns.h"
 
+#ifndef POSIX
 /*
  * We don't prototype these, cause some systems have them wrong!
  */
-extern char *tgoto();
-extern char *tgetstr();
-extern int tputs();
-extern int tgetent();
-extern int tgetflag();
-extern int tgetnum();
+extern int   tgetent	__P(());
+extern char *tgetstr	__P(());
+extern int   tgetflag	__P(());
+extern int   tgetnum	__P(());
+extern char *tgoto	__P(());
+# define PUTPURE putpure
+# define PUTRAW putraw
+#else
+extern int   tgetent	__P((char *, char *));
+extern char *tgetstr	__P((char *, char **));
+extern int   tgetflag	__P((char *));
+extern int   tgetnum	__P((char *));
+extern char *tgoto	__P((char *, int, int));
+extern void  tputs	__P((char *, int, void (*)(int)));
+# define PUTPURE ((void (*)__P((int))) putpure)
+# define PUTRAW ((void (*)__P((int))) putraw)
+#endif
 
 
 /* #define DEBUG_LITERAL */
@@ -726,7 +738,7 @@ EchoTC(v)
 	    else
 		stderror(ERR_NAME | ERR_TCARGS, cv, arg_need);
 	}
-	(void) tputs(scap, 1, putraw);
+	(void) tputs(scap, 1, PUTRAW);
 	break;
     case 1:
 	v++;
@@ -741,7 +753,7 @@ EchoTC(v)
 	    else
 		stderror(ERR_NAME | ERR_TCARGS, cv, arg_need);
 	}
-	(void) tputs(tgoto(scap, arg_cols, arg_rows), 1, putraw);
+	(void) tputs(tgoto(scap, arg_cols, arg_rows), 1, PUTRAW);
 	break;
     default:
 	/* This is wrong, but I will ignore it... */
@@ -772,7 +784,7 @@ EchoTC(v)
 	    else
 		stderror(ERR_NAME | ERR_TCARGS, cv, arg_need);
 	}
-	(void) tputs(tgoto(scap, arg_cols, arg_rows), arg_rows, putraw);
+	(void) tputs(tgoto(scap, arg_cols, arg_rows), arg_rows, PUTRAW);
 	break;
     }
     flush();
@@ -988,26 +1000,26 @@ SetAttributes(atr)
 	    if (((cur_atr & BOLD) && !(atr & BOLD)) ||
 		((cur_atr & UNDER) && !(atr & UNDER)) ||
 		((cur_atr & STANDOUT) && !(atr & STANDOUT))) {
-		(void) tputs(Str(T_me), 1, putpure);
+		(void) tputs(Str(T_me), 1, PUTPURE);
 		cur_atr = 0;
 	    }
 	}
 	if ((atr & BOLD) != (cur_atr & BOLD)) {
 	    if (atr & BOLD) {
 		if (GoodStr(T_md) && GoodStr(T_me)) {
-		    (void) tputs(Str(T_md), 1, putpure);
+		    (void) tputs(Str(T_md), 1, PUTPURE);
 		    cur_atr |= BOLD;
 		}
 	    }
 	    else {
 		if (GoodStr(T_md) && GoodStr(T_me)) {
-		    (void) tputs(Str(T_me), 1, putpure);
+		    (void) tputs(Str(T_me), 1, PUTPURE);
 		    if ((cur_atr & STANDOUT) && GoodStr(T_se)) {
-			(void) tputs(Str(T_se), 1, putpure);
+			(void) tputs(Str(T_se), 1, PUTPURE);
 			cur_atr &= ~STANDOUT;
 		    }
 		    if ((cur_atr & UNDER) && GoodStr(T_ue)) {
-			(void) tputs(Str(T_ue), 1, putpure);
+			(void) tputs(Str(T_ue), 1, PUTPURE);
 			cur_atr &= ~UNDER;
 		    }
 		    cur_atr &= ~BOLD;
@@ -1017,13 +1029,13 @@ SetAttributes(atr)
 	if ((atr & STANDOUT) != (cur_atr & STANDOUT)) {
 	    if (atr & STANDOUT) {
 		if (GoodStr(T_so) && GoodStr(T_se)) {
-		    (void) tputs(Str(T_so), 1, putpure);
+		    (void) tputs(Str(T_so), 1, PUTPURE);
 		    cur_atr |= STANDOUT;
 		}
 	    }
 	    else {
 		if (GoodStr(T_se)) {
-		    (void) tputs(Str(T_se), 1, putpure);
+		    (void) tputs(Str(T_se), 1, PUTPURE);
 		    cur_atr &= ~STANDOUT;
 		}
 	    }
@@ -1031,13 +1043,13 @@ SetAttributes(atr)
 	if ((atr & UNDER) != (cur_atr & UNDER)) {
 	    if (atr & UNDER) {
 		if (GoodStr(T_us) && GoodStr(T_ue)) {
-		    (void) tputs(Str(T_us), 1, putpure);
+		    (void) tputs(Str(T_us), 1, PUTPURE);
 		    cur_atr |= UNDER;
 		}
 	    }
 	    else {
 		if (GoodStr(T_ue)) {
-		    (void) tputs(Str(T_ue), 1, putpure);
+		    (void) tputs(Str(T_ue), 1, PUTPURE);
 		    cur_atr &= ~UNDER;
 		}
 	    }
@@ -1082,7 +1094,7 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
 	    }
 	    else {
 		if ((del > 1) && GoodStr(T_DO)) {
-		    (void) tputs(tgoto(Str(T_DO), del, del), del, putpure);
+		    (void) tputs(tgoto(Str(T_DO), del, del), del, PUTPURE);
 		    del = 0;
 		}
 		else {
@@ -1095,12 +1107,12 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
     }
     else {			/* del < 0 */
 	if (GoodStr(T_UP) && (-del > 1 || !GoodStr(T_up)))
-	    (void) tputs(tgoto(Str(T_UP), -del, -del), -del, putpure);
+	    (void) tputs(tgoto(Str(T_UP), -del, -del), -del, PUTPURE);
 	else {
 	    int i;
 	    if (GoodStr(T_up))
 		for (i = 0; i < -del; i++)
-		    (void) tputs(Str(T_up), 1, putpure);
+		    (void) tputs(Str(T_up), 1, PUTPURE);
 	}
     }
 #else /* WINNT */
@@ -1140,12 +1152,12 @@ mc_again:
 
     if ((del < -4 || del > 4) && GoodStr(T_ch))
 	/* go there directly */
-	(void) tputs(tgoto(Str(T_ch), where, where), where, putpure);
+	(void) tputs(tgoto(Str(T_ch), where, where), where, PUTPURE);
     else {
 	int i;
 	if (del > 0) {		/* moving forward */
 	    if ((del > 4) && GoodStr(T_RI))
-		(void) tputs(tgoto(Str(T_RI), del, del), del, putpure);
+		(void) tputs(tgoto(Str(T_RI), del, del), del, PUTPURE);
 	    else {
 		if (T_Tabs) {	/* if I can do tabs, use them */
 		    if ((CursorH & 0370) != (where & 0370)) {
@@ -1168,7 +1180,7 @@ mc_again:
 	}
 	else {			/* del < 0 := moving backward */
 	    if ((-del > 4) && GoodStr(T_LE))
-		(void) tputs(tgoto(Str(T_LE), -del, -del), -del, putpure);
+		(void) tputs(tgoto(Str(T_LE), -del, -del), -del, PUTPURE);
 	    else {		/* can't go directly there */
 		/* if the "cost" is greater than the "cost" from col 0 */
 		if (T_Tabs ? (-del > ((where >> 3) + (where & 07)))
@@ -1281,19 +1293,19 @@ DeleteChars(num)		/* deletes <num> characters */
 
     if (GoodStr(T_DC))		/* if I have multiple delete */
 	if ((num > 1) || !GoodStr(T_dc)) {	/* if dc would be more expen. */
-	    (void) tputs(tgoto(Str(T_DC), num, num), num, putpure);
+	    (void) tputs(tgoto(Str(T_DC), num, num), num, PUTPURE);
 	    return;
 	}
 
     if (GoodStr(T_dm))		/* if I have delete mode */
-	(void) tputs(Str(T_dm), 1, putpure);
+	(void) tputs(Str(T_dm), 1, PUTPURE);
 
     if (GoodStr(T_dc))		/* else do one at a time */
 	while (num--)
-	    (void) tputs(Str(T_dc), 1, putpure);
+	    (void) tputs(Str(T_dc), 1, PUTPURE);
 
     if (GoodStr(T_ed))		/* if I have delete mode */
-	(void) tputs(Str(T_ed), 1, putpure);
+	(void) tputs(Str(T_ed), 1, PUTPURE);
 }
 
 void
@@ -1321,13 +1333,13 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 
     if (GoodStr(T_IC))		/* if I have multiple insert */
 	if ((num > 1) || !GoodStr(T_ic)) {	/* if ic would be more expen. */
-	    (void) tputs(tgoto(Str(T_IC), num, num), num, putpure);
+	    (void) tputs(tgoto(Str(T_IC), num, num), num, PUTPURE);
 	    so_write(cp, num);	/* this updates CursorH/V */
 	    return;
 	}
 
     if (GoodStr(T_im) && GoodStr(T_ei)) { /* if I have insert mode */
-	(void) tputs(Str(T_im), 1, putpure);
+	(void) tputs(Str(T_im), 1, PUTPURE);
 
 	CursorH += num;
 	do 
@@ -1335,22 +1347,22 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 	while (--num);
 
 	if (GoodStr(T_ip))	/* have to make num chars insert */
-	    (void) tputs(Str(T_ip), 1, putpure);
+	    (void) tputs(Str(T_ip), 1, PUTPURE);
 
-	(void) tputs(Str(T_ei), 1, putpure);
+	(void) tputs(Str(T_ei), 1, PUTPURE);
 	return;
     }
 
     do {
 	if (GoodStr(T_ic))	/* have to make num chars insert */
-	    (void) tputs(Str(T_ic), 1, putpure);	/* insert a char */
+	    (void) tputs(Str(T_ic), 1, PUTPURE);	/* insert a char */
 
 	(void) putraw(*cp++);
 
 	CursorH++;
 
 	if (GoodStr(T_ip))	/* have to make num chars insert */
-	    (void) tputs(Str(T_ip), 1, putpure);/* pad the inserted char */
+	    (void) tputs(Str(T_ip), 1, PUTPURE);/* pad the inserted char */
 
     } while (--num);
 
@@ -1366,7 +1378,7 @@ ClearEOL(num)			/* clear to end of line.  There are num */
 	return;
 
     if (T_CanCEOL && GoodStr(T_ce))
-	(void) tputs(Str(T_ce), 1, putpure);
+	(void) tputs(Str(T_ce), 1, PUTPURE);
     else {
 	for (i = 0; i < num; i++)
 	    (void) putraw(' ');
@@ -1379,11 +1391,11 @@ ClearScreen()
 {				/* clear the whole screen and home */
     if (GoodStr(T_cl))
 	/* send the clear screen code */
-	(void) tputs(Str(T_cl), Val(T_li), putpure);
+	(void) tputs(Str(T_cl), Val(T_li), PUTPURE);
     else if (GoodStr(T_ho) && GoodStr(T_cd)) {
-	(void) tputs(Str(T_ho), Val(T_li), putpure);	/* home */
+	(void) tputs(Str(T_ho), Val(T_li), PUTPURE);	/* home */
 	/* clear to bottom of screen */
-	(void) tputs(Str(T_cd), Val(T_li), putpure);
+	(void) tputs(Str(T_cd), Val(T_li), PUTPURE);
     }
     else {
 	(void) putraw('\r');
@@ -1399,10 +1411,10 @@ SoundBeep()
 	return;
 
     if (GoodStr(T_vb) && adrof(STRvisiblebell))
-	(void) tputs(Str(T_vb), 1, putpure);	/* visible bell */
+	(void) tputs(Str(T_vb), 1, PUTPURE);	/* visible bell */
     else if (GoodStr(T_bl))
 	/* what termcap says we should use */
-	(void) tputs(Str(T_bl), 1, putpure);
+	(void) tputs(Str(T_bl), 1, PUTPURE);
     else
 #ifndef WINNT
 	(void) putraw(CTL_ESC('\007'));	/* an ASCII bell; ^G */
@@ -1415,9 +1427,9 @@ void
 ClearToBottom()
 {				/* clear to the bottom of the screen */
     if (GoodStr(T_cd))
-	(void) tputs(Str(T_cd), Val(T_li), putpure);
+	(void) tputs(Str(T_cd), Val(T_li), PUTPURE);
     else if (GoodStr(T_ce))
-	(void) tputs(Str(T_ce), Val(T_li), putpure);
+	(void) tputs(Str(T_ce), Val(T_li), PUTPURE);
 }
 
 void

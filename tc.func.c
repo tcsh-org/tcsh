@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.71 1997/10/02 16:36:31 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.72 1997/10/27 22:44:35 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.71 1997/10/02 16:36:31 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.72 1997/10/27 22:44:35 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -67,19 +67,22 @@ static bool precmd_active = 0;
 static bool periodic_active = 0;
 static bool cwdcmd_active = 0;	/* PWP: for cwd_cmd */
 static bool beepcmd_active = 0;
-static void (*alm_fun)() = NULL;
+static signalfun_t alm_fun = NULL;
 
 static	void	 Reverse	__P((Char *));
-static	void	 auto_logout	__P((void));
+static	void	 auto_logout	__P((int));
 static	char	*xgetpass	__P((char *));
-static	void	 auto_lock	__P((void));
+static	void	 auto_lock	__P((int));
 #ifdef BSDJOBS
 static	void	 insert		__P((struct wordent *, bool));
 static	void	 insert_we	__P((struct wordent *, struct wordent *));
 static	int	 inlist		__P((Char *, Char *));
 #endif /* BSDJOBS */
+struct tildecache;
+static	int	 tildecompare	__P((struct tildecache *, struct tildecache *));
 static  Char    *gethomedir	__P((Char *));
 #ifdef REMOTEHOST
+static	sigret_t palarm		__P((int));
 static	void	 getremotehost	__P((void));
 #endif /* REMOTEHOST */
 
@@ -660,9 +663,9 @@ xgetpass(prm)
 {
     static char pass[PASSMAX + 1];
     int fd, i;
-    sigret_t (*sigint) __P((int));
+    signalfun_t sigint;
 
-    sigint = (sigret_t (*) __P((int))) sigset(SIGINT, SIG_IGN);
+    sigint = (signalfun_t) sigset(SIGINT, SIG_IGN);
     (void) Rawmode();	/* Make sure, cause we want echo off */
     if ((fd = open("/dev/tty", O_RDWR)) == -1)
 	fd = SHIN;
@@ -692,21 +695,28 @@ xgetpass(prm)
  * If we fail to get the password, then we log the user out
  * immediately
  */
+/*ARGSUSED*/
 static void
-auto_lock()
+auto_lock(n)
+	int n;
 {
 #ifndef NO_CRYPT
 
     int i;
     char *srpp = NULL;
     struct passwd *pw;
+#ifdef POSIX
+    extern char *crypt __P((const char *, const char *));
+#else
+    extern char *crypt __P(());
+#endif
 
 #undef XCRYPT
 
 #if defined(PW_AUTH) && !defined(XCRYPT)
 
     struct authorization *apw;
-    extern char *crypt16();
+    extern char *crypt16 __P((const char *, const char *));
 
 # define XCRYPT(a, b) crypt16(a, b)
 
@@ -719,7 +729,6 @@ auto_lock()
 #if defined(PW_SHADOW) && !defined(XCRYPT)
 
     struct spwd *spw;
-    extern char *crypt();
 
 # define XCRYPT(a, b) crypt(a, b)
 
@@ -730,7 +739,6 @@ auto_lock()
 #endif /* PW_SHADOW && !XCRYPT */
 
 #ifndef XCRYPT
-    extern char *crypt();
 
 #define XCRYPT(a, b) crypt(a, b)
 
@@ -740,7 +748,7 @@ auto_lock()
 #endif /* !XCRYPT */
 
     if (srpp == NULL) {
-	auto_logout();
+	auto_logout(0);
 	/*NOTREACHED*/
 	return;
     }
@@ -794,13 +802,16 @@ auto_lock()
 	xprintf(CGETS(22, 2, "\nIncorrect passwd for %s\n"), pw->pw_name);
     }
 #endif /* NO_CRYPT */
-    auto_logout();
+    auto_logout(0);
+    USE(n);
 }
 
 
 static void
-auto_logout()
+auto_logout(n)
+    int n;
 {
+    USE(n);
     xprintf("auto-logout\n");
     /* Don't leave the tty in raw mode */
     if (editing)
@@ -825,7 +836,7 @@ int snum;
 	(void) sigset(SIGALRM, alrmcatch);
 #endif /* UNRELSIGS */
 
-    (*alm_fun)();
+    (*alm_fun)(0);
 
     setalarm(1);
 #ifndef SIGVOID
@@ -1958,15 +1969,6 @@ hashbang(fd, vp)
 
 #ifdef REMOTEHOST
 
-#ifdef ISC
-# undef MAXHOSTNAMELEN	/* Busted headers? */
-#endif
-
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <sys/uio.h>	/* For struct iovec */
-
 static sigret_t
 palarm(snum)
     int snum;
@@ -2040,7 +2042,7 @@ void
 remotehost()
 {
     /* Don't get stuck if the resolver does not work! */
-    sigret_t (*osig)() = sigset(SIGALRM, palarm);
+    signalfun_t osig = sigset(SIGALRM, palarm);
 
     jmp_buf_t osetexit;
     getexit(osetexit);

@@ -44,7 +44,8 @@ typedef struct {
 	int gl_matchc;		/* count of paths matching pattern */
 	int gl_offs;		/* reserved at beginning of gl_pathv */
 	int gl_flags;		/* copy of flags parameter to glob() */
-	int (*gl_errfunc)();	/* copy of errfunc parameter to glob() */
+				/* copy of errfunc parameter to glob() */
+	int (*gl_errfunc) __P((const char *, int));
 	char **gl_pathv;	/* list of paths matching pattern */
 } glob_t;
 
@@ -63,7 +64,7 @@ typedef struct {
 #define	GLOB_NOSPACE	(-1)	/* malloc call failed */
 #define	GLOB_ABEND	(-2)	/* unignored error */
 
-int glob __P((const char *, int, int (*)(char *, int), glob_t *));
+int glob __P((const char *, int, int (*)(const char *, int), glob_t *));
 void globfree __P((glob_t *));
 
 #endif /* !_GLOB_H_ */

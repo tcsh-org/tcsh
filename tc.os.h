@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.68 1997/10/02 16:36:32 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.69 1997/10/27 22:44:36 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -529,7 +529,7 @@ typedef struct timeval timeval_t;
 #endif /* NeXT */
 
 #ifndef NEEDgethostname
-extern int gethostname();
+extern int gethostname __P((char *, int));
 #endif /* NEEDgethostname */
 
 #if !defined(POSIX) || defined(SUNOS4) || defined(UTekV) || defined(sysV88)
@@ -713,18 +713,19 @@ extern void bcopy	__P((const void *, void *, size_t));
 
 #if SYSVREL == 4
 # ifdef REMOTEHOST
-extern int getpeername();
+struct sockaddr;
+extern int getpeername __P((int, struct sockaddr *, int *));
 # endif /* REMOTEHOST */
 # ifndef BSDTIMES
-extern int getrlimit();
-extern int setrlimit();
+extern int getrlimit __P((int, struct rlimit *));
+extern int setrlimit __P((int, const struct rlimit *));
 # endif /* !BSDTIMES */
 # if !defined(IRIS4D) && !defined(SOLARIS2)
 extern int wait3();	/* I think some bizarre systems still need this */
 # endif /* !IRIS4D && !SOLARIS2 */
 # if defined(SOLARIS2)
 #  undef NEEDstrerror
-extern char *strerror();
+extern char *strerror __P((int));
 # endif /* SOLARIS2 */
 #endif /* SYSVREL == 4 */
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.37 1996/10/05 17:39:08 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.38 1997/10/27 22:44:27 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.37 1996/10/05 17:39:08 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.38 1997/10/27 22:44:27 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -565,8 +565,7 @@ execash(t, kp)
 #ifndef CLOSE_ON_EXEC
     int	    odidcch;
 #endif /* CLOSE_ON_EXEC */
-    sigret_t (*osigint) __P((int)), (*osigquit) __P((int)), 
-	(*osigterm) __P((int));
+    signalfun_t osigint, osigquit, osigterm;
 
     USE(t);
     if (chkstop == 0 && setintr)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.75 1997/05/04 17:52:16 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.76 1997/10/27 22:44:29 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -254,8 +254,6 @@ typedef int sigret_t;
 # include <unistd.h>
 # undef getpgrp
 # undef setpgrp
-extern pid_t getpgrp();
-extern pid_t setpgrp();
 
 /*
  * the gcc+protoize version of <stdlib.h>
@@ -368,6 +366,17 @@ extern pid_t setpgrp();
 # include <sys/cdefs.h>
 #endif /* sgi && SYSVREL > 3 */
 
+#ifdef REMOTEHOST
+# ifdef ISC
+#  undef MAXHOSTNAMELEN	/* Busted headers? */
+# endif
+
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <sys/socket.h>
+# include <sys/uio.h>	/* For struct iovec */
+#endif /* REMOTEHOST */
+
 /*
  * ANSIisms... These must be *after* the system include and 
  * *before* our includes, so that BSDreno has time to define __P
@@ -413,6 +422,19 @@ typedef void pret_t;
 typedef int bool;
 
 #include "sh.types.h"
+
+#ifndef POSIX
+extern pid_t getpgrp __P((int));
+#else /* POSIX */
+# if defined(BSD) || defined(SUNOS4) || defined(IRIS4D) || defined(DGUX)
+extern pid_t getpgrp __P((int));
+# else /* !(BSD || SUNOS4 || IRIS4D || DGUX) */
+extern pid_t getpgrp __P((void));
+# endif	/* BSD || SUNOS4 || IRISD || DGUX */
+#endif /* POSIX */
+extern pid_t setpgrp __P((pid_t, pid_t));
+
+typedef sigret_t (*signalfun_t) __P((int));
 
 #ifndef lint
 typedef ptr_t memalign_t;
@@ -666,8 +688,8 @@ extern jmp_buf_t reslab;
 
 EXTERN Char   *gointr;		/* Label for an onintr transfer */
 
-extern sigret_t (*parintr) __P((int));	/* Parents interrupt catch */
-extern sigret_t (*parterm) __P((int));	/* Parents terminate catch */
+extern signalfun_t parintr;	/* Parents interrupt catch */
+extern signalfun_t parterm;	/* Parents terminate catch */
 
 /*
  * Lexical definitions.

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.14 1997/02/23 19:03:15 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.15 1997/10/02 16:36:23 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -158,7 +158,7 @@
 # ifndef __GNUC__
 #  define RCSID(id) static char *rcsid = (id);
 # else
-#  define RCSID(id) static char *rcsid() { return rcsid(id); }
+#  define RCSID(id) static char *rcsid(const char *a) { return rcsid(a = id); }
 # endif /* !__GNUC__ */
 #else
 # define RCSID(id)	/* Nothing */

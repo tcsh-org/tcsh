@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.sched.c,v 3.13 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.sched.c,v 3.14 1996/04/26 19:21:25 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.13 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.14 1996/04/26 19:21:25 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -193,8 +193,10 @@ dosched(v, c)
 /*
  * Execute scheduled events
  */
+/*ARGSUSED*/
 void
-sched_run()
+sched_run(n)
+    int n;
 {
     time_t   cur_time;
     register struct sched_event *tp, *tp1;
@@ -202,7 +204,6 @@ sched_run()
     struct command *t;
     Char  **v, *cp;
     extern Char GettingInput;
-
 #ifdef BSDSIGS
     sigmask_t omask;
 
@@ -210,6 +211,8 @@ sched_run()
 #else
     (void) sighold(SIGINT);
 #endif
+
+    USE(n);
 
     (void) time(&cur_time);
     tp = sched_ptr;

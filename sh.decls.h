@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.decls.h,v 3.30 1997/02/23 19:03:19 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.decls.h,v 3.31 1997/10/27 22:44:25 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -176,7 +176,7 @@ extern	int		  Gmatch	__P((Char *, Char *));
 extern	int		  Gnmatch	__P((Char *, Char *, Char **));
 extern	void		  ginit		__P((void));
 extern	Char		**globall	__P((Char **));
-extern	void		  rscan		__P((Char **, void (*)()));
+extern	void		  rscan		__P((Char **, void (*)(int)));
 extern	void		  tglob		__P((Char **));
 extern	void		  trim		__P((Char **));
 #ifdef FILEC

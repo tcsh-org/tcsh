@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.sig.c,v 3.21 1996/04/26 19:21:31 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.sig.c,v 3.22 1997/10/27 22:44:38 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.21 1996/04/26 19:21:31 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.22 1997/10/27 22:44:38 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -95,7 +95,7 @@ sig_ch_rel()
 sigret_t
 (*xsigset(a, b)) ()
     int     a;
-    sigret_t  (*b) __P((int));
+    signalfun_t  b;
 {
     return (signal(a, b));
 }
@@ -188,7 +188,7 @@ ourwait(w)
 sigret_t
 (*xsignal(a, b)) ()
     int     a;
-    sigret_t  (*b) __P((int));
+    signalfun_t  b;
 {
     if (a == SIGCHLD)
 	return SIG_DFL;
@@ -225,10 +225,10 @@ sigpause(what)
 
 #ifdef NEEDsignal
 /* turn into bsd signals */
-sigret_t(*
-	 xsignal(s, a)) ()
+sigret_t
+(*xsignal(s, a)) ()
     int     s;
-    sigret_t (*a) __P((int));
+    signalfun_t a;
 {
     sigvec_t osv, sv;
 
@@ -371,21 +371,21 @@ bsd_sigpause(mask)
  */
 sigret_t (*bsd_signal(sig, func)) ()
         int sig;
-        sigret_t (*func) __P((int));
+        signalfun_t func;
 {
         struct sigaction act, oact;
         sigset_t set;
-        sigret_t (*r_func) __P((int));
+        signalfun_t r_func;
 
         if (sig < 0 || sig > MAXSIG) {
                 xprintf(CGETS(25, 2,
 			"error: bsd_signal(%d) signal out of range\n"), sig);
-                return((sigret_t(*) __P((int))) SIG_IGN);
+                return((signalfun_t) SIG_IGN);
         }
 
         (void) sigemptyset(&set);
 
-        act.sa_handler = (sigret_t(*) __P((int))) func; /* user function */
+        act.sa_handler = (signalfun_t) func; /* user function */
         act.sa_mask = set;                      /* signal mask */
         act.sa_flags = 0;                       /* no special actions */
 
@@ -393,10 +393,10 @@ sigret_t (*bsd_signal(sig, func)) ()
                 xprintf(CGETS(25, 3,
 			"error: bsd_signal(%d) - sigaction failed, errno %d\n"),
 			sig, errno);
-                return((sigret_t(*) __P((int))) SIG_IGN);
+                return((signalfun_t) SIG_IGN);
         }
 
-        r_func = (sigret_t(*) __P((int))) oact.sa_handler;
+        r_func = (signalfun_t) oact.sa_handler;
         return(r_func);
 }
 #endif /* POSIXSIG */

@@ -106,6 +106,7 @@ static 	DIR	*Opendir	__P((Char *));
 #ifdef S_IFLNK
 static	int	 Lstat		__P((Char *, struct stat *));
 #endif
+static	int	 Stat		__P((Char *, struct stat *sb));
 static 	Char 	*Strchr		__P((Char *, int));
 #ifdef DEBUG
 static	void	 qprintf	__P((Char *));
@@ -270,7 +271,7 @@ int
 glob(pattern, flags, errfunc, pglob)
     const char *pattern;
     int     flags;
-    int     (*errfunc) __P((char *, int));
+    int     (*errfunc) __P((const char *, int));
     glob_t *pglob;
 {
     int     err, oldpathc;

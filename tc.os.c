@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.44 1997/10/02 16:36:32 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.c,v 3.45 1997/10/27 22:44:36 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.44 1997/10/02 16:36:32 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.45 1997/10/27 22:44:36 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -897,14 +897,14 @@ fix_yp_bugs()
 {
     char   *mydomain;
 
-    extern int yp_get_default_domain();
+    extern int yp_get_default_domain __P((char **));
     /*
      * PWP: The previous version assumed that yp domain was the same as the
      * internet name domain.  This isn't allways true. (Thanks to Mat Landau
      * <mlandau@bbn.com> for the original version of this.)
      */
     if (yp_get_default_domain(&mydomain) == 0) {	/* if we got a name */
-	extern void yp_unbind();
+	extern void yp_unbind __P((const char *));
 
 	yp_unbind(mydomain);
     }
@@ -1049,7 +1049,7 @@ xnice(incr)
 } /* end xnice */
 #endif /* nice */
 
-#ifdef getwd
+#ifdef NEEDgetwd
 static char *strrcpy __P((char *, char *));
 
 /* xgetwd():
@@ -1162,11 +1162,11 @@ prepend(dirname, pathname)
 
 # else /* ! hp9000s500 */
 
-#if (SYSVREL != 0 && !defined(d_fileno)) || defined(_VMS_POSIX) || defined(WINNT)
-# define d_fileno d_ino
-#endif
+#  if (SYSVREL != 0 && !defined(d_fileno)) || defined(_VMS_POSIX) || defined(WINNT)
+#   define d_fileno d_ino
+#  endif
 
-char   *
+char *
 xgetwd(pathname)
     char   *pathname;
 {

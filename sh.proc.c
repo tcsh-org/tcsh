@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.proc.c,v 3.64 1996/10/05 17:39:13 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.proc.c,v 3.65 1997/10/27 22:44:31 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.64 1996/10/05 17:39:13 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.65 1997/10/27 22:44:31 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -570,7 +570,7 @@ pjwait(pp)
     sigmask_t omask;
 #endif /* BSDSIGS */
 #ifdef UNRELSIGS
-    sigret_t (*inthandler)();
+    signalfun_t inthandler;
 #endif /* UNRELSIGS */
     while (pp->p_procid != pp->p_jobid)
 	pp = pp->p_friends;
@@ -2069,7 +2069,7 @@ setttypgrp(pgrp)
 	 * tcsetpgrp will set SIGTTOU to all the the processes in 
 	 * the background according to POSIX... We ignore this here.
 	 */
-	sigret_t (*old)() = sigset(SIGTTOU, SIG_IGN);
+	signalfun_t old = sigset(SIGTTOU, SIG_IGN);
 #endif
 	(void) tcsetpgrp(FSHTTY, pgrp);
 # ifdef POSIXJOBS

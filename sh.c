@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.74 1997/10/02 16:36:27 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.75 1997/10/27 22:44:24 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.74 1997/10/02 16:36:27 christos Exp $")
+RCSID("$Id: sh.c,v 3.75 1997/10/27 22:44:24 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -89,8 +89,8 @@ static const char tcshstr[] = "tcsh";
 static const char tcshstr_nt[] = "tcsh.exe";
 #endif /* WINNT */
 
-sigret_t (*parintr) __P((int)) = 0;	/* Parents interrupt catch */
-sigret_t (*parterm) __P((int)) = 0;	/* Parents terminate catch */
+signalfun_t parintr = 0;	/* Parents interrupt catch */
+signalfun_t parterm = 0;	/* Parents terminate catch */
 
 #ifdef TESLA
 int do_logout = 0;
@@ -166,7 +166,9 @@ static	Char	 	**defaultpath	__P((void));
 static	void		  record	__P((void));
 static	void		  st_save	__P((struct saved_state *, int, int,
 					     Char **, Char **));
-static void		  st_restore	__P((struct saved_state *, Char **));
+static	void		  st_restore	__P((struct saved_state *, Char **));
+
+	int		  main		__P((int, char **));
 
 int
 main(argc, argv)
@@ -719,9 +721,9 @@ main(argc, argv)
     setzero((char*) &osv, sizeof(osv));
     /* parents interruptibility */
     (void) mysigvec(SIGINT, NULL, &osv);
-    parintr = (sigret_t(*) __P((int))) osv.sv_handler;
+    parintr = (signalfun_t) osv.sv_handler;
     (void) mysigvec(SIGTERM, NULL, &osv);
-    parterm = (sigret_t(*) __P((int))) osv.sv_handler;
+    parterm = (signalfun_t) osv.sv_handler;
 #else				/* BSDSIGS */
     parintr = signal(SIGINT, SIG_IGN);	/* parents interruptibility */
     (void) sigset(SIGINT, parintr);	/* ... restore */
@@ -1013,7 +1015,7 @@ main(argc, argv)
     shpgrp = mygetpgrp();
     opgrp = tpgrp = -1;
     if (setintr) {
-	sigret_t (*osig) __P((int));
+	signalfun_t osig;
 	**argv = '-';
 	if (!quitit)		/* Wary! */
 	    (void) signal(SIGQUIT, SIG_IGN);
@@ -1081,7 +1083,7 @@ main(argc, argv)
     retry:
 	    if ((tpgrp = tcgetpgrp(f)) != -1) {
 		if (tpgrp != shpgrp) {
-		    sigret_t(*old) () = signal(SIGTTIN, SIG_DFL);
+		    signalfun_t old = signal(SIGTTIN, SIG_DFL);
 		    (void) kill(0, SIGTTIN);
 		    (void) signal(SIGTTIN, old);
 		    goto retry;
@@ -1202,7 +1204,7 @@ main(argc, argv)
 	/* Will have varval(STRhome) here because set fast if don't */
 	{
 	    int     osetintr = setintr;
-	    sigret_t (*oparintr) __P((int)) = parintr;
+	    signalfun_t oparintr = parintr;
 
 #ifdef BSDSIGS
 	    sigmask_t omask = sigblock(sigmask(SIGINT));
@@ -1962,7 +1964,7 @@ process(catch)
 #ifndef HAVENOUTMP
 	    watch_login(0);
 #endif /* !HAVENOUTMP */
-	    sched_run();
+	    sched_run(0);
 	    period_cmd();
 	    precmd();
 	    /*

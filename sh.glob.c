@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.glob.c,v 3.38 1996/04/26 19:19:30 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.glob.c,v 3.39 1997/10/27 22:44:29 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.38 1996/04/26 19:19:30 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.39 1997/10/27 22:44:29 christos Exp $")
 
 #include "tc.h"
 
@@ -77,6 +77,7 @@ static int pargc = 0;
  *
  */
 static	Char	 *globtilde	__P((Char **, Char *));
+static	Char     *handleone	__P((Char *, Char **, int));
 static	Char	**libglob	__P((Char **));
 static	Char	**globexpand	__P((Char **));
 static	int	  globbrace	__P((Char *, Char *, Char ***));
@@ -629,7 +630,7 @@ ginit()
 void
 rscan(t, f)
     register Char **t;
-    void    (*f) ();
+    void    (*f) __P((int));
 {
     register Char *p;
 

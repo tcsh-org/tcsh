@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.37 1997/02/23 19:03:25 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.38 1997/10/27 22:44:35 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -238,7 +238,7 @@ extern	void		  tprintf	__P((int, Char *, Char *, size_t,
  */
 extern	time_t		  sched_next	__P((void));
 extern	void		  dosched	__P((Char **, struct command *));
-extern	void		  sched_run	__P((void));
+extern	void		  sched_run	__P((int));
 
 /*
  * tc.sig.c
