@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.h,v 3.2 2005/01/05 16:06:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.h,v 3.3 2005/01/05 17:53:51 christos Exp $ */
 /*
  * tc.nls.h: NLS support
  *
@@ -84,7 +84,7 @@ extern void NLSQuote __P((Char *));
 
 extern int NLSExtend __P((Char *, int, int));
 extern Char *NLSChangeCase __P((Char *, int));
-/* $Header: /src/pub/tcsh/tc.nls.h,v 3.2 2005/01/05 16:06:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.h,v 3.3 2005/01/05 17:53:51 christos Exp $ */
 /*
  * tc.nls.h: NLS support
  *
@@ -180,4 +180,4 @@ extern int NLSClassify __P((NLSChar, int));
 #define NLSCLASS_ILLEGAL3	-6
 #define NLSCLASS_ILLEGAL4	-7
 
-#define NLSCLASS_ILLEGAL_SIZE(x) (-(x) - (- NLSCLASS_ILLEGAL - 1))
+#define NLSCLASS_ILLEGAL_SIZE(x) (-(x) - (-(NLSCLASS_ILLEGAL) - 1))
