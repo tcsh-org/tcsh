@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.str.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tc.str.c,v 1.2 91/07/09 02:25:24 marc Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -36,14 +36,13 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifdef SHORT_STRINGS
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: tc.str.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 
+#define MALLOC_INCR	1024
+
+#ifdef SHORT_STRINGS
 Char  **
 blk2short(src)
     register char **src;
@@ -82,7 +81,6 @@ short2blk(src)
     return (sdst);
 }
 
-#define MALLOC_INCR	1024
 Char   *
 str2short(src)
     register char *src;
@@ -115,46 +113,6 @@ str2short(src)
     return (sdst);
 }
 
-char   *
-short2qstr(src)
-    register Char *src;
-{
-    static char *sdst = NULL;
-    static size_t dstsize = 0;
-    register char *dst, *edst;
-
-    if (src == NULL)
-	return (NULL);
-
-    if (sdst == NULL) {
-	dstsize = MALLOC_INCR;
-	sdst = (char *) xmalloc((size_t) dstsize * sizeof(char));
-    }
-    dst = sdst;
-    edst = &dst[dstsize];
-    while (*src) {
-	if (*src & QUOTE) {
-	    *dst++ = '\\';
-	    if (dst == edst) {
-		dstsize += MALLOC_INCR;
-		sdst = (char *) xrealloc((ptr_t) sdst,
-					 (size_t) dstsize * sizeof(char));
-		edst = &sdst[dstsize];
-		dst = &edst[-MALLOC_INCR];
-	    }
-	}
-	*dst++ = (char) *src++;
-	if (dst == edst) {
-	    dstsize += MALLOC_INCR;
-	    sdst = (char *) xrealloc((ptr_t) sdst,
-				     (size_t) dstsize * sizeof(char));
-	    edst = &sdst[dstsize];
-	    dst = &edst[-MALLOC_INCR];
-	}
-    }
-    *dst = 0;
-    return (sdst);
-}
 char   *
 short2str(src)
     register Char *src;
@@ -335,7 +293,6 @@ s_strncmp(str1, str2, n)
 		return (1);
 	    else
 		return (*str1 - *str2);
-	    break;
 	}
         if (*str1 == '\0')
 	    return(0);
@@ -407,3 +364,44 @@ s_strstr(s, t)
 }
 
 #endif				/* SHORT_STRINGS */
+
+char   *
+short2qstr(src)
+    register Char *src;
+{
+    static char *sdst = NULL;
+    static size_t dstsize = 0;
+    register char *dst, *edst;
+
+    if (src == NULL)
+	return (NULL);
+
+    if (sdst == NULL) {
+	dstsize = MALLOC_INCR;
+	sdst = (char *) xmalloc((size_t) dstsize * sizeof(char));
+    }
+    dst = sdst;
+    edst = &dst[dstsize];
+    while (*src) {
+	if (*src & QUOTE) {
+	    *dst++ = '\\';
+	    if (dst == edst) {
+		dstsize += MALLOC_INCR;
+		sdst = (char *) xrealloc((ptr_t) sdst,
+					 (size_t) dstsize * sizeof(char));
+		edst = &sdst[dstsize];
+		dst = &edst[-MALLOC_INCR];
+	    }
+	}
+	*dst++ = (char) *src++;
+	if (dst == edst) {
+	    dstsize += MALLOC_INCR;
+	    sdst = (char *) xrealloc((ptr_t) sdst,
+				     (size_t) dstsize * sizeof(char));
+	    edst = &sdst[dstsize];
+	    dst = &edst[-MALLOC_INCR];
+	}
+    }
+    *dst = 0;
+    return (sdst);
+}

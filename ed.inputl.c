@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/ed.inputl.c,v 1.2 91/07/14 22:22:30 marc Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -35,10 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid()
-    { return "$Id: ed.inputl.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 #include "ed.h"
@@ -108,7 +105,7 @@ Inputl()
 	Hist_num = HistWhich;
     }
     if (Expand) {
-	(void) e_up_hist();
+	(void) e_up_hist(0);
 	Expand = 0;
     }
     Refresh();			/* print the prompt */
@@ -254,7 +251,7 @@ Inputl()
 
 	case CC_COMPLETE:
 	    if (adrof(STRautoexpand))
-		(void) e_expand_history();
+		(void) e_expand_history(0);
 	    /*
 	     * Modified by Martin Boyer (gamin@ireq-robot.hydro.qc.ca):
 	     * A separate variable now controls beeping after

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -43,10 +43,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: tc.alloc.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 
 #include "sh.h"
@@ -189,7 +186,7 @@ malloc(nbytes)
 #ifndef DEBUG
 	stderror(ERR_NOMEM);
 #else
-	showall();
+	showall(NULL, NULL);
 	xprintf("nbytes=%d: Out of memory\n", nbytes);
 	abort();
 #endif
@@ -544,8 +541,11 @@ Free(p)
  * for each size category, the second showing the number of mallocs -
  * frees for each size category.
  */
+/*ARGSUSED*/
 void
-showall()
+showall(v, c)
+    Char **v;
+    struct command *c;
 {
 #ifndef SYSMALLOC
     register int i, j;

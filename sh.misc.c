@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.misc.c,v 3.2 1991/07/05 02:23:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.misc.c,v 3.3 1991/07/08 05:08:00 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -35,10 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: sh.misc.c,v 3.2 1991/07/05 02:23:28 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 
@@ -303,7 +300,7 @@ dmove(i, j)
 
     if (i == j || i < 0)
 	return (i);
-#ifdef DUP2
+#ifdef HAVEDUP2
     if (j >= 0) {
 	(void) dup2(i, j);
 	if (j != i)
@@ -324,7 +321,7 @@ dcopy(i, j)
 
     if (i == j || i < 0 || j < 0 && i > 2)
 	return (i);
-#ifdef DUP2
+#ifdef HAVEDUP2
     if (j >= 0) {
 	(void) dup2(i, j);
 	return (j);

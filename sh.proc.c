@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.1 1991/07/05 02:00:43 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.proc.c,v 1.3 91/07/14 20:13:06 marc Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -35,13 +35,11 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: sh.proc.c,v 3.1 1991/07/05 02:00:43 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 #include "ed.h"
+#include "tc.h"
 
 /*
  * a little complicated #include <sys/wait.h>! :-(
@@ -67,7 +65,11 @@ static char *rcsid()
 #  endif /* OREO || IRIS4D || POSIX */
 # endif	/* hpux */
 #else /* SVID == 0 */
-# include <sys/wait.h>
+# ifndef _IBMR2 /* IBM RS/6000 headers are broken */
+#  include <sys/wait.h>
+# else
+#  include "tc.wait.h"
+# endif
 #endif /* SVID == 0 */
 
 #if !defined(NSIG) && defined(SIGMAX)
@@ -151,7 +153,7 @@ static	void		 padd		__P((struct command *));
 static	int		 pprint		__P((struct process *, int));
 static	void		 ptprint	__P((struct process *));
 static	void		 pads		__P((Char *));
-static	void		 pkill		__P((Char **v, int));
+static	void		 pkill		__P((Char **, int));
 static	struct process	*pgetcurr	__P((struct process *));
 static	void		 okpcntl	__P((void));
 
@@ -257,7 +259,7 @@ loop:
     pid = wait3(&w.w_status, WNOHANG, &ru);
 #  endif /* !hpux */
 # else /* !BSDTIMES */
-#  if SVID < 3
+#  if (SVID > 0) && (SVID < 3)
     /* no wait3, therefore no rusage */
     /* on Sys V, this may hang.  I hope it's not going to be a problem */
     pid = ourwait(&w.w_status);
@@ -536,6 +538,9 @@ pjwait(pp)
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif /* BSDSIGS */
+#if (SVID > 0) && (SVID < 3)
+    sigret_t (*inthandler)();
+#endif /* (SVID > 0) && (SVID < 3) */
 
     while (pp->p_pid != pp->p_jobid)
 	pp = pp->p_friends;
@@ -553,6 +558,10 @@ pjwait(pp)
 #ifdef BSDSIGS
     omask = sigblock(sigmask(SIGCHLD));
 #endif /* BSDSIGS */
+#if (SVID > 0) && (SVID < 3)
+    if (setintr)
+        inthandler = signal(SIGINT, SIG_IGN);
+#endif /* (SVID > 0) && (SVID < 3) */
     for (;;) {
 #ifndef BSDSIGS
 	(void) sighold(SIGCHLD);
@@ -578,6 +587,10 @@ pjwait(pp)
 #else /* !BSDSIGS */
     (void) sigrelse(SIGCHLD);
 #endif /* !BSDSIGS */
+#if (SVID > 0) && (SVID < 3)
+    if (setintr)
+        (void) signal(SIGINT, inthandler);
+#endif /* (SVID > 0) && (SVID < 3) */
 #ifdef BSDJOBS
     if (tpgrp > 0)		/* get tty back */
 	(void) tcsetpgrp(FSHTTY, tpgrp);
@@ -596,7 +609,7 @@ pjwait(pp)
 		    jobcommand[1] = NULL;
 		jobcommand[2] = NULL;
 
-		dojobs(jobcommand);
+		dojobs(jobcommand, NULL);
 		(void) pprint(pp, SHELLDIR);
 	    }
 	    else
@@ -625,14 +638,17 @@ pjwait(pp)
     if (reason && exiterr)
 	exitstat();
     pflush(pp);
-    /* cwd_cmd(); *//* (PWP) this is what pre_cmd is for! */
 }
 
 /*
  * dowait - wait for all processes to finish
  */
+
+/*ARGSUSED*/
 void
-dowait()
+dowait(v, c)
+    Char **v;
+    struct command *c;
 {
     register struct process *pp;
 #ifdef BSDSIGS
@@ -1209,9 +1225,11 @@ ptprint(tp)
 /*
  * dojobs - print all jobs
  */
+/*ARGSUSED*/
 void
-dojobs(v)
+dojobs(v, c)
     Char  **v;
+    struct command *c;
 {
     register struct process *pp;
     register int flag = NUMBER | NAME | REASON;
@@ -1237,9 +1255,11 @@ dojobs(v)
 /*
  * dofg - builtin - put the job into the foreground
  */
+/*ARGSUSED*/
 void
-dofg(v)
+dofg(v, c)
     Char  **v;
+    struct command *c;
 {
     register struct process *pp;
 
@@ -1261,9 +1281,11 @@ dofg(v)
 /*
  * %... - builtin - put the job into the foreground
  */
+/*ARGSUSED*/
 void
-dofg1(v)
+dofg1(v, c)
     Char  **v;
+    struct command *c;
 {
     register struct process *pp;
 
@@ -1282,9 +1304,11 @@ dofg1(v)
 /*
  * dobg - builtin - put the job into the background
  */
+/*ARGSUSED*/
 void
-dobg(v)
+dobg(v, c)
     Char  **v;
+    struct command *c;
 {
     register struct process *pp;
 
@@ -1299,9 +1323,11 @@ dobg(v)
 /*
  * %... & - builtin - put the job into the background
  */
+/*ARGSUSED*/
 void
-dobg1(v)
+dobg1(v, c)
     Char  **v;
+    struct command *c;
 {
     register struct process *pp;
 
@@ -1312,9 +1338,11 @@ dobg1(v)
 /*
  * dostop - builtin - stop the job
  */
+/*ARGSUSED*/
 void
-dostop(v)
+dostop(v, c)
     Char  **v;
+    struct command *c;
 {
 #ifdef BSDJOBS
     pkill(++v, SIGSTOP);
@@ -1324,9 +1352,11 @@ dostop(v)
 /*
  * dokill - builtin - superset of kill (1)
  */
+/*ARGSUSED*/
 void
-dokill(v)
+dokill(v, c)
     Char  **v;
+    struct command *c;
 {
     register int signum, len = 0;
     register char *name;
@@ -1611,9 +1641,11 @@ pgetcurr(pp)
 /*
  * donotify - flag the job so as to report termination asynchronously
  */
+/*ARGSUSED*/
 void
-donotify(v)
+donotify(v, c)
     Char  **v;
+    struct command *c;
 {
     register struct process *pp;
 

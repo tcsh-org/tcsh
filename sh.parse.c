@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.parse.c,v 3.1 1991/07/09 12:01:38 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.parse.c,v 3.1 1991/07/09 13:41:24 christos Exp $ */
 /*
  * sh.parse.c: Interpret a list of tokens
  */
@@ -35,10 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: sh.parse.c,v 3.1 1991/07/09 12:01:38 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 

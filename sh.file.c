@@ -1,6 +1,6 @@
-/* $Header: /a/guest/christos/src/csh-8/RCS/sh.file.c,v 1.1 91/05/04 00:26:07 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.file.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
- * sh.file.c: File completion for csh.
+ * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
@@ -36,10 +36,7 @@
  */
 #ifdef FILEC
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: sh.file.c,v 1.1 91/05/04 00:26:07 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 
@@ -97,23 +94,48 @@ static void
 setup_tty(on)
     int     on;
 {
-#ifdef TERMIOS
+#ifdef TERMIO
+# ifdef POSIX
     static struct termios tchars;
+# else
+    static struct termio tchars;
+# endif /* POSIX */
 
     if (on) {
+# ifdef POSIX
 	(void) tcgetattr(SHIN, &tchars);
+# else
+        (void) ioctl(SHIN, TCGETA, (ioctl_t) &tchars);
+# endif /* POSIX */
 	tchars.c_cc[VEOL] = ESC;
 	if (tchars.c_lflag & ICANON)
+# ifdef POSIX
 	    on = TCSANOW;
+# else
+	    on = TCSETAW;
+# endif /* POSIX */
 	else {
+# ifdef POSIX
 	    on = TCSAFLUSH;
+# else
+	    on = TCSETAF;
+# endif /* POSIX */
 	    tchars.c_lflag |= ICANON;
+    
 	}
+#ifdef POSIX
         (void) tcsetattr(SHIN, on, &tchars);
+#else
+        (void) ioctl(SHIN, on, (ioctl_t) &tchars);
+#endif /* POSIX */
     }
     else {
 	tchars.c_cc[VEOL] = _POSIX_VDISABLE;
+# ifdef POSIX
 	(void) tcsetattr(SHIN, TCSANOW, &tchars);
+# else
+        (void) ioctl(SHIN, TCSETAW, (ioctl_t) &tchars);
+# endif /* POSIX */
     }
 #else
     struct sgttyb sgtty;
@@ -137,7 +159,7 @@ setup_tty(on)
 	tchars.t_brkc = -1;
 	(void) ioctl(SHIN, TIOCSETC, (ioctl_t) & tchars);
     }
-#endif
+#endif /* TERMIO */
 }
 
 /*
@@ -146,32 +168,56 @@ setup_tty(on)
 static void
 back_to_col_1()
 {
-#ifdef TERMIOS
+#ifdef TERMIO
+# ifdef POSIX
     struct termios tty, tty_normal;
-    int     omask;
+# else
+    struct termio tty, tty_normal;
+# endif /* POSIX */
+#else
+    struct sgttyb tty, tty_normal;
+#endif /* TERMIO */
 
-    omask = sigblock(sigmask(SIGINT));
+# ifdef BSDSIGS
+    sigmask_t omask = sigblock(sigmask(SIGINT));
+# else
+    sighold(SIGINT);
+# endif /* BSDSIGS */
+
+#ifdef TERMIO
+# ifdef POSIX
     (void) tcgetattr(SHOUT, &tty);
+# else
+    (void) ioctl(SHOUT, TCGETA, (ioctl_t) &tty_normal);
+# endif /* POSIX */
     tty_normal = tty;
     tty.c_iflag &= ~INLCR;
     tty.c_oflag &= ~ONLCR;
+# ifdef POSIX
     (void) tcsetattr(SHOUT, TCSANOW, &tty);
+# else
+    (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty);
+# endif /* POSIX */
     (void) write(SHOUT, "\r", 1);
+# ifdef POSIX
     (void) tcsetattr(SHOUT, TCSANOW, &tty_normal);
-    (void) sigsetmask(omask);
+# else
+    (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty_normal);
+# endif /* POSIX */
 #else
-    struct sgttyb tty, tty_normal;
-    int     omask;
-
-    omask = sigblock(sigmask(SIGINT));
     (void) ioctl(SHIN, TIOCGETP, (ioctl_t) & tty);
     tty_normal = tty;
     tty.sg_flags &= ~CRMOD;
     (void) ioctl(SHIN, TIOCSETN, (ioctl_t) & tty);
     (void) write(SHOUT, "\r", 1);
     (void) ioctl(SHIN, TIOCSETN, (ioctl_t) & tty_normal);
+#endif /* TERMIO */
+
+# ifdef BSDSIGS
     (void) sigsetmask(omask);
-#endif
+# else
+    (void) sigrelse(SIGINT);
+# endif /* BSDISGS */
 }
 
 /*
@@ -181,29 +227,47 @@ static void
 pushback(string)
     Char   *string;
 {
-#ifdef TERMIOS
     register Char *p;
-    struct termios tty, tty_normal;
-    int     omask;
     char    c;
+#ifdef TERMIO
+# ifdef POSIX
+    struct termios tty, tty_normal;
+# else
+    struct termio tty, tty_normal;
+# endif /* POSIX */
+#else
+    struct sgttyb tty, tty_normal;
+#endif /* TERMIO */
 
-    omask = sigblock(sigmask(SIGINT));
+#ifdef BSDSIGS
+    sigmask_t omask = sigblock(sigmask(SIGINT));
+#else
+    sighold(SIGINT);
+#endif /* BSDSIGS */
+
+#ifdef TERMIO
+# ifdef POSIX
     (void) tcgetattr(SHOUT, &tty);
+# else
+    (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty);
+# endif /* POSIX */
     tty_normal = tty;
     tty.c_lflag &= ~(ECHOKE | ECHO | ECHOE | ECHOK | ECHONL | ECHOPRT | ECHOCTL);
+# ifdef POSIX
     (void) tcsetattr(SHOUT, TCSANOW, &tty);
+# else
+    (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty);
+# endif /* POSIX */
 
     for (p = string; c = *p; p++)
 	(void) ioctl(SHOUT, TIOCSTI, (ioctl_t) & c);
+# ifdef POSIX
     (void) tcsetattr(SHOUT, TCSANOW, &tty_normal);
+# else
+    (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty_normal);
+# endif /* POSIX */
     (void) sigsetmask(omask);
 #else
-    register Char *p;
-    struct sgttyb tty, tty_normal;
-    int     omask;
-    char    c;
-
-    omask = sigblock(sigmask(SIGINT));
     (void) ioctl(SHOUT, TIOCGETP, (ioctl_t) & tty);
     tty_normal = tty;
     tty.sg_flags &= ~ECHO;
@@ -212,8 +276,13 @@ pushback(string)
     for (p = string; c = *p; p++)
 	(void) ioctl(SHOUT, TIOCSTI, (ioctl_t) & c);
     (void) ioctl(SHOUT, TIOCSETN, (ioctl_t) & tty_normal);
+#endif /* TERMIO */
+
+# ifdef BSDSIGS
     (void) sigsetmask(omask);
-#endif
+# else
+    (void) sigrelse(SIGINT);
+# endif /* BSDISGS */
 }
 
 /*
@@ -358,17 +427,29 @@ tilde(new, old)
 static void
 retype()
 {
-#ifdef TERMIOS
+#ifdef TERMIO
+# ifdef POSIX
     struct termios tty;
 
     (void) tcgetattr(SHOUT, &tty);
+# else
+    struct termio tty;
+
+    (void) ioctl(SHOUT, TCGETA, (ioctl_t) &tty);
+# endif /* POSIX */
+
     tty.c_lflag |= PENDIN;
+
+# ifdef POSIX
     (void) tcsetattr(SHOUT, TCSANOW, &tty);
+# else
+    (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty);
+# endif /* POSIX */
 #else
     int     pending_input = LPENDIN;
 
     (void) ioctl(SHOUT, TIOCLBIS, (ioctl_t) & pending_input);
-#endif
+#endif /* TERMIO */
 }
 
 static void
@@ -461,14 +542,23 @@ free_items(items)
     xfree((ptr_t) items);
 }
 
-#define FREE_ITEMS(items) { \
-	int omask;\
+#ifdef BSDSIGS
+# define FREE_ITEMS(items) { \
+	sigmask_t omask;\
 \
 	omask = sigblock(sigmask(SIGINT));\
 	free_items(items);\
 	items = NULL;\
 	(void) sigsetmask(omask);\
 }
+#else
+# define FREE_ITEMS(items) { \
+	(void) sighold(SIGINT);\
+	free_items(items);\
+	items = NULL;\
+	(void) sigrelse(SIGINT);\
+}
+#endif /* BSDSIGS */
 
 /*
  * Perform a RECOGNIZE or LIST command on string "word".
@@ -723,4 +813,4 @@ ignored(entry)
 	    return (TRUE);
     return (FALSE);
 }
-#endif				/* FILEC */
+#endif	/* FILEC */

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.set.c,v 2.1 1991/03/31 13:06:41 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.set.c,v 1.2 91/07/14 22:23:44 marc Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -35,10 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: sh.set.c,v 2.1 1991/03/31 13:06:41 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 #include "ed.h"
@@ -62,9 +59,11 @@ static	void		 balance	__P((struct varent *, int, int));
  * C Shell
  */
 
+/*ARGSUSED*/
 void
-doset(v)
+doset(v, c)
     register Char **v;
+    struct command *c;
 {
     register Char *p;
     Char   *vp, op;
@@ -131,7 +130,7 @@ doset(v)
 	    set(vp, Strsave(p));
 	if (eq(vp, STRpath)) {
 	    exportpath(adrof(STRpath)->vec);
-	    dohash();
+	    dohash(NULL, NULL);
 	}
 	else if (eq(vp, STRhistchars)) {
 	    register Char *pn = value(STRhistchars);
@@ -240,9 +239,11 @@ getvx(vp, subscr)
     return (v);
 }
 
+/*ARGSUSED*/
 void
-dolet(v)
+dolet(v, dummy)
     Char  **v;
+    struct command *dummy;
 {
     register Char *p;
     Char   *vp, c, op;
@@ -321,7 +322,7 @@ dolet(v)
 	    set(vp, operate(op, value(vp), p));
 	if (eq(vp, STRpath)) {
 	    exportpath(adrof(STRpath)->vec);
-	    dohash();
+	    dohash(NULL, NULL);
 	}
 	xfree((ptr_t) vp);
 	if (c != '=')
@@ -346,7 +347,8 @@ xset(cp, vp)
 
 static Char *
 operate(op, vp, p)
-    Char    op, *vp, *p;
+    int     op;
+    Char    *vp, *p;
 {
     Char    opr[2];
     Char   *vec[5];
@@ -547,9 +549,11 @@ found:
     trim(c->vec = vec);
 }
 
+/*ARGSUSED*/
 void
-unset(v)
-    Char   *v[];
+unset(v, c)
+    Char   **v;
+    struct command *c;
 {
     register bool did_only;
 
@@ -648,9 +652,11 @@ setNS(cp)
     set(cp, Strsave(STRNULL));
 }
 
+/*ARGSUSED*/
 void
-shift(v)
+shift(v, c)
     register Char **v;
+    struct command *c;
 {
     register struct varent *argv;
     register Char *name;

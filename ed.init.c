@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/ed.init.c,v 1.2 91/07/14 22:22:26 marc Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -35,14 +35,12 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid()
-    { return "$Id: ed.init.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 #define EXTERN			/* intern */
 #include "ed.h"
+#include "tc.h"
 #include "ed.defns.h"
 
 #if defined(TERMIO) || defined(POSIX)
@@ -188,6 +186,11 @@ sigret_t
 window_change(snum)
 int snum;
 {
+#if (SVID > 0) && (SVID < 3)
+    /* If we were called as a signal handler, restore it. */
+    if (snum > 0)
+      sigset(snum, window_change);
+#endif /* SVID > 0 && SVID < 3 */
     check_window_size(0);
 #ifndef SIGVOID
     return (snum);
@@ -454,7 +457,8 @@ ed_Init()
     xio.c_oflag &= ~(ONLRET);
     xio.c_oflag |= (OPOST | ONLCR);
 
-    xio.c_lflag &= ~(NOFLSH | ICANON | ECHO | ECHOE | ECHOK | ECHONL | 
+    /* don't mask out ECHOE cause programs need it */
+    xio.c_lflag &= ~(NOFLSH | ICANON | ECHO | ECHOK | ECHONL | 
 		     EXTPROC | IEXTEN | FLUSHO);
     xio.c_lflag |= (ISIG);
 
@@ -668,7 +672,8 @@ Rawmode()
 	nio.c_lflag &= ~(NOFLSH | ECHOK | ECHONL | EXTPROC | FLUSHO);
 	nio.c_lflag |= (ISIG | ICANON | IEXTEN | ECHO | ECHOE | ECHOCTL);
 	xio.c_lflag = testio.c_lflag;
-	xio.c_lflag &= ~(NOFLSH | ICANON | IEXTEN | ECHO | ECHOE | ECHOK |
+	/* don't mask out ECHOE cause programs need it */
+	xio.c_lflag &= ~(NOFLSH | ICANON | IEXTEN | ECHO | ECHOK |
 			 ECHONL | ECHOCTL | EXTPROC | FLUSHO);
 	xio.c_lflag |= (ISIG);
     }
@@ -1028,7 +1033,7 @@ Load_input_line()
 
 	chrs = read(SHIN, buf, (size_t) min(chrs, BUFSIZ - 1));
 	if (chrs > 0) {
-	    buf[chrs] = NULL;
+	    buf[chrs] = '\0';
 	    Input_Line = Strsave(str2short(buf));
 	    PushMacro(Input_Line);
 	}

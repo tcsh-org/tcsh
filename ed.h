@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/ed.h,v 1.2 91/07/14 22:22:23 marc Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -57,7 +57,7 @@ extern int errno;
 #define KEYCMD   unsigned char	/* size needed to index into CcFuncTbl */
  /* Must be unsigned 		       */
 
-typedef CCRETVAL(*PFCmd) ();	/* pointer to function returning CCRETVAL */
+typedef CCRETVAL(*PFCmd) __P((int));	/* pointer to function returning CCRETVAL */
 
 struct KeyFuncs {		/* for the "bind" shell command */
     char   *name;		/* function name for bind command */

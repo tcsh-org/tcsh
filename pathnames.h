@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/pathnames.h,v 2.0 1991/03/26 03:23:55 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/pathnames.h,v 3.0 1991/07/04 21:54:11 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -54,9 +54,9 @@
 # define _PATH_DOTCSHRC		"/etc/cshrc"
 #endif /* convex || __convex__ */
 
-#if defined(IRIS4D) || defined(OREO)
+#if defined(sgi) || defined(OREO)
 # define _PATH_DOTLOGIN		"/etc/cshrc"
-#endif /* IRIS4D || OREO */
+#endif /* sgi || OREO */
 
 #ifndef _PATH_DOTLOGIN
 # define _PATH_DOTCSHRC		"/etc/csh.cshrc"

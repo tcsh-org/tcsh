@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.1 1991/07/08 05:22:44 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tw.parse.c,v 1.3 91/07/14 22:24:26 marc Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -38,14 +38,12 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: tw.parse.c,v 3.1 1991/07/08 05:22:44 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 #include "tw.h"
 #include "ed.h"
+#include "tc.h"
 
 /* #define TENEDEBUG */
 
@@ -242,7 +240,7 @@ tenematch(inputline, inputline_size, num_read, command)
 
     case RECOGNIZE:
 	if (adrof(STRautocorrect)) {
-	    if ((slshp = Strrchr(word, '/')) != NULL && slshp[1] != NULL) {
+	    if ((slshp = Strrchr(word, '/')) != NULL && slshp[1] != '\0') {
 		SearchNoDirErr = 1;
 		for (bptr = word; bptr < slshp; bptr++) {
 		    /*
@@ -266,7 +264,7 @@ tenematch(inputline, inputline_size, num_read, command)
 
 	    (void) Strcpy(rword, slshp);
 	    if (slshp != STRNULL)
-		*slshp = NULL;
+		*slshp = '\0';
 	    if ((search_ret = spell_me(word, sizeof(word), is_a_cmd)) == 1) {
 		DeleteBack(str_end - word_start);/* get rid of old word */
 		(void) Strcat(word, rword);
@@ -1123,8 +1121,23 @@ getentry(dir_fd, looking_for_lognames)
     register struct dirent *dirp;
 
     if (looking_for_lognames) {	/* Is it login names we want? */
-
+	/*
+	 * We don't want to get interrupted inside getpwent()
+	 * because the yellow pages code is not interruptible,
+	 * and if we call endpwent() immediatetely after
+	 * (in pintr()) we may be freeing an invalid pointer
+	 */
+#ifdef BSDSIGS
+	sigmask_t omask = sigblock(sigmask(SIGINT));
+#else
+	(void) sighold(SIGINT);
+#endif /* BSDSIGS */
 	pw = getpwent();
+#ifdef BSDSIGS
+	(void) sigsetmask(omask);
+#else
+	(void) sigrelse(SIGINT);
+#endif /* BSDSIGS */
 
 	if (pw == NULL) {
 #ifdef YPBUGS

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.lex.c,v 1.2 91/07/14 22:23:21 marc Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -35,10 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: sh.lex.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 #include "ed.h"
@@ -628,7 +625,7 @@ static int quesarg;
 
 static void
 getexcl(sc)
-    Char    sc;
+    int    sc;
 {
     register struct wordent *hp, *ip;
     int     left, right, dol;
@@ -1260,7 +1257,7 @@ setexclp(cp)
 
 void
 unreadc(c)
-    Char    c;
+    int    c;
 {
     peekread = c;
 }

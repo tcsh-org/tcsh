@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.init.c,v 2.1 1991/03/31 13:06:41 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.init.c,v 1.2 91/07/14 22:23:18 marc Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -35,10 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: sh.init.c,v 2.1 1991/03/31 13:06:41 christos Exp $"; }
-#endif 
+RCSID("$Id$")
 
 #include "sh.h"
 
@@ -49,144 +46,144 @@ static char *rcsid()
 #define	INF	1000
 
 struct	biltins bfunc[] = {
-    "@",	dolet,		0,	INF,
-    "alias",	doalias,	0,	INF,
-    "aliases",	doaliases,	0,	1, /* PWP */
-    "alloc",	showall,	0,	1,
-    "bg",	dobg,		0,	INF,
-    "bind",	dobind,		0,	2,
-    "bindkey",	dobindkey,	0,	8,
-    "break",	dobreak,	0,	0,
-    "breaksw",	doswbrk,	0,	0,
+    { "@",	dolet,		0,	INF, },
+    { "alias",	doalias,	0,	INF, },
+    { "aliases",	doaliases,	0,	1, /* PWP */ },
+    { "alloc",	showall,	0,	1, },
+    { "bg",	dobg,		0,	INF, },
+    { "bind",	dobind,		0,	2, },
+    { "bindkey",	dobindkey,	0,	8, },
+    { "break",	dobreak,	0,	0, },
+    { "breaksw",	doswbrk,	0,	0, },
 #if defined(IIASA) || defined(KAI)
-    "bye",	goodbye,	0,	0,
+    { "bye",	goodbye,	0,	0, },
 #endif
-    "case",	dozip,		0,	1,
-    "cd",	dochngd,	0,	INF,
-    "chdir",	dochngd,	0,	INF,
-    "continue",	docontin,	0,	0,
-    "default",	dozip,		0,	0,
-    "dirs",	dodirs,		0,	INF,
-    "echo",	doecho,		0,	INF,
-    "echotc",	doechotc,	0,	INF,
-    "else",	doelse,		0,	INF,
-    "end",	doend,		0,	0,
-    "endif",	dozip,		0,	0,
-    "endsw",	dozip,		0,	0,
-    "eval",	doeval,		0,	INF,
-    "exec",	execash,	1,	INF,
-    "exit",	doexit,		0,	INF,
-    "fg",	dofg,		0,	INF,
-    "foreach",	doforeach,	3,	INF,
+    { "case",	dozip,		0,	1, },
+    { "cd",	dochngd,	0,	INF, },
+    { "chdir",	dochngd,	0,	INF, },
+    { "continue",	docontin,	0,	0, },
+    { "default",	dozip,		0,	0, },
+    { "dirs",	dodirs,		0,	INF, },
+    { "echo",	doecho,		0,	INF, },
+    { "echotc",	doechotc,	0,	INF, },
+    { "else",	doelse,		0,	INF, },
+    { "end",	doend,		0,	0, },
+    { "endif",	dozip,		0,	0, },
+    { "endsw",	dozip,		0,	0, },
+    { "eval",	doeval,		0,	INF, },
+    { "exec",	execash,	1,	INF, },
+    { "exit",	doexit,		0,	INF, },
+    { "fg",	dofg,		0,	INF, },
+    { "foreach",	doforeach,	3,	INF, },
 #ifdef TCF
-    "getspath",	dogetspath,	0,	0,
-    "getxvers", dogetxvers,	0,	0,
+    { "getspath",	dogetspath,	0,	0, },
+    { "getxvers", dogetxvers,	0,	0, },
 #endif /* TCF */
 #ifdef IIASA
-    "gd",	dopushd,	0,	INF,
+    { "gd",	dopushd,	0,	INF, },
 #endif
-    "glob",	doglob,		0,	INF,
-    "goto",	dogoto,		1,	1,
+    { "glob",	doglob,		0,	INF, },
+    { "goto",	dogoto,		1,	1, },
 #ifdef VFORK
-    "hashstat",	hashstat,	0,	0,
+    { "hashstat",	hashstat,	0,	0, },
 #endif
-    "history",	dohist,		0,	2,
-    "if",	doif,		1,	INF,
+    { "history",	dohist,		0,	2, },
+    { "if",	doif,		1,	INF, },
 #ifdef apollo
-    "inlib",    doinlib,	1,	INF,
+    { "inlib",    doinlib,	1,	INF, },
 #endif
-    "jobs",	dojobs,		0,	1,
-    "kill",	dokill,		1,	INF,
-    "limit",	dolimit,	0,	3,
-    "linedit",	doecho,		0,	INF,
+    { "jobs",	dojobs,		0,	1, },
+    { "kill",	dokill,		1,	INF, },
+    { "limit",	dolimit,	0,	3, },
+    { "linedit",	doecho,		0,	INF, },
 #ifndef KAI
-    "log",	dolog,		0,	0,
+    { "log",	dolog,		0,	0, },
 #endif
-    "login",	dologin,	0,	1,
-    "logout",	dologout,	0,	0,
-    "ls-F",	dolist,		0,	INF,
+    { "login",	dologin,	0,	1, },
+    { "logout",	dologout,	0,	0, },
+    { "ls-F",	dolist,		0,	INF, },
 #ifdef TCF
-    "migrate",	domigrate,	1,	INF,
+    { "migrate",	domigrate,	1,	INF, },
 #endif /* TCF */
 #ifdef NEWGRP
-    "newgrp",	donewgrp,	1,	1,
+    { "newgrp",	donewgrp,	1,	1, },
 #endif
-    "nice",	donice,		0,	INF,
-    "nohup",	donohup,	0,	INF,
-    "notify",	donotify,	0,	INF,
-    "onintr",	doonintr,	0,	2,
-    "popd",	dopopd,		0,	INF,
-    "pushd",	dopushd,	0,	INF,
+    { "nice",	donice,		0,	INF, },
+    { "nohup",	donohup,	0,	INF, },
+    { "notify",	donotify,	0,	INF, },
+    { "onintr",	doonintr,	0,	2, },
+    { "popd",	dopopd,		0,	INF, },
+    { "pushd",	dopushd,	0,	INF, },
 #ifdef IIASA
-    "rd",	dopopd,		0,	INF,
+    { "rd",	dopopd,		0,	INF, },
 #endif
-    "rehash",	dohash,		0,	0,
-    "repeat",	dorepeat,	2,	INF,
+    { "rehash",	dohash,		0,	0, },
+    { "repeat",	dorepeat,	2,	INF, },
 #ifdef apollo
-    "rootnode", dorootnode,	1,	1,
+    { "rootnode", dorootnode,	1,	1, },
 #endif
-    "sched",	dosched,	0,	INF,
-    "set",	doset,		0,	INF,
-    "setenv",	dosetenv,	0,	2,
+    { "sched",	dosched,	0,	INF, },
+    { "set",	doset,		0,	INF, },
+    { "setenv",	dosetenv,	0,	2, },
 #ifdef MACH
-    "setpath",	dosetpath,	0,	INF,
+    { "setpath",	dosetpath,	0,	INF, },
 #endif	/* MACH */
 #ifdef TCF
-    "setspath",	dosetspath,	1,	INF,
+    { "setspath",	dosetspath,	1,	INF, },
 #endif /* TCF */
-    "settc",	dosettc,	2,	2,
+    { "settc",	dosettc,	2,	2, },
 #ifdef TCF
-    "setxvers",	dosetxvers,	0,	1,
+    { "setxvers",	dosetxvers,	0,	1, },
 #endif /* TCF */
-    "shift",	shift,		0,	1,
-    "source",	dosource,	1,	2,
-    "stop",	dostop,		1,	INF,
-    "suspend",	dosuspend,	0,	0,
-    "switch",	doswitch,	1,	INF,
-    "telltc",	dotelltc,	0,	INF,
-    "time",	dotime,		0,	INF,
-    "umask",	doumask,	0,	1,
-    "unalias",	unalias,	1,	INF,
-    "unhash",	dounhash,	0,	0,
+    { "shift",	shift,		0,	1, },
+    { "source",	dosource,	1,	2, },
+    { "stop",	dostop,		1,	INF, },
+    { "suspend",	dosuspend,	0,	0, },
+    { "switch",	doswitch,	1,	INF, },
+    { "telltc",	dotelltc,	0,	INF, },
+    { "time",	dotime,		0,	INF, },
+    { "umask",	doumask,	0,	1, },
+    { "unalias",	unalias,	1,	INF, },
+    { "unhash",	dounhash,	0,	0, },
 #ifdef masscomp
-    "universe",	douniverse,	0,	1,
+    { "universe",	douniverse,	0,	1, },
 #endif
-    "unlimit",	dounlimit,	0,	INF,
-    "unset",	unset,		1,	INF,
-    "unsetenv",	dounsetenv,	1,	INF,
+    { "unlimit",	dounlimit,	0,	INF, },
+    { "unset",	unset,		1,	INF, },
+    { "unsetenv",	dounsetenv,	1,	INF, },
 #ifdef apollo
-    "ver",	dover,		0,	INF,
+    { "ver",	dover,		0,	INF, },
 #endif
-    "wait",	dowait,		0,	0,
+    { "wait",	dowait,		0,	0, },
 #ifdef WARP
-    "warp",	dowarp,		0,	2,
+    { "warp",	dowarp,		0,	2, },
 #endif
 #ifdef KAI
-    "watchlog",	dolog,		0,	0,
+    { "watchlog",	dolog,		0,	0, },
 #endif
-    "which",	dowhich,	1,	INF,
-    "while",	dowhile,	1,	INF,
+    { "which",	dowhich,	1,	INF, },
+    { "while",	dowhile,	1,	INF, },
 };
 int nbfunc = sizeof bfunc / sizeof *bfunc;
 
 struct srch srchn[] = {
-    "@",	T_LET,
-    "break",	T_BREAK,
-    "breaksw",	T_BRKSW,
-    "case",	T_CASE,
-    "default", 	T_DEFAULT,
-    "else",	T_ELSE,
-    "end",	T_END,
-    "endif",	T_ENDIF,
-    "endsw",	T_ENDSW,
-    "exit",	T_EXIT,
-    "foreach", 	T_FOREACH,
-    "goto",	T_GOTO,
-    "if",	T_IF,
-    "label",	T_LABEL,
-    "set",	T_SET,
-    "switch",	T_SWITCH,
-    "while",	T_WHILE,
+    { "@",	T_LET, },
+    { "break",	T_BREAK, },
+    { "breaksw",	T_BRKSW, },
+    { "case",	T_CASE, },
+    { "default", 	T_DEFAULT, },
+    { "else",	T_ELSE, },
+    { "end",	T_END, },
+    { "endif",	T_ENDIF, },
+    { "endsw",	T_ENDSW, },
+    { "exit",	T_EXIT, },
+    { "foreach", 	T_FOREACH, },
+    { "goto",	T_GOTO, },
+    { "if",	T_IF, },
+    { "label",	T_LABEL, },
+    { "set",	T_SET, },
+    { "switch",	T_SWITCH, },
+    { "while",	T_WHILE, },
 };
 int nsrchn = sizeof srchn / sizeof *srchn;
 
@@ -288,7 +285,7 @@ struct	mesg mesg[] = {
 /* 32 */	"DIL",		"DIL signal",
 # endif /* hpux */
 
-# if defined(ISC) && defined(POSIX)
+# if (defined(ISC) || defined(SCO)) && defined(POSIX) 
 #  define _sigextra_
 /* 20 */	"WINCH", 	"Window change",
 /* 21 */	0, 		"Unused", /* SIGPHONE used only for UNIXPC */
@@ -338,6 +335,23 @@ struct	mesg mesg[] = {
 /* 31 */	0,		"Signal 31",
 /* 32 */	0,		"Signal 32",
 # endif /* IRIS4D */
+
+# ifdef IRIS3D
+#  define _sigextra_
+/* 20 */	0,		"Signal 20",
+/* 21 */	0,		"Signal 21",
+/* 22 */	0,		"Signal 22",
+/* 23 */	0,		"Signal 23",
+/* 24 */	0,		"Signal 24",
+/* 25 */	"WINCH", 	"Window changed",
+/* 26 */	"IO", 		"Asynchronous I/O (select)",
+/* 27 */	"URG",		"Urgent condition on IO channel",
+/* 28 */	"POLL", 	"Stream I/O pending",
+/* 29 */	0,		"Signal 29",
+/* 30 */	0,		"Signal 30",
+/* 31 */	0,		"Signal 31",
+/* 32 */	0,		"Signal 32",
+# endif /* IRIS3D */
 
 # ifdef apollo
 #  define _sigextra_

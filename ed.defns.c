@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/ed.defns.c,v 1.4 91/07/15 01:25:52 marc Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -35,97 +35,10 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid()
-    { return "$Id: ed.defns.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 #include "ed.h"
-
-extern  CCRETVAL	e_unassigned		__P((void));
-extern	CCRETVAL	e_insert		__P((void));
-extern	CCRETVAL	e_newline		__P((void));
-extern	CCRETVAL	e_delprev		__P((void));
-extern	CCRETVAL	e_delnext		__P((void));
-extern	CCRETVAL	e_list_delnext		__P((void));	/* for ^D */
-extern	CCRETVAL	e_toend			__P((void));
-extern	CCRETVAL	e_tobeg			__P((void));
-extern	CCRETVAL	e_charback		__P((void));
-extern	CCRETVAL	e_charfwd		__P((void));
-extern	CCRETVAL	e_quote			__P((void));
-extern	CCRETVAL	e_startover		__P((void));
-extern	CCRETVAL	e_redisp		__P((void));
-extern	CCRETVAL	e_wordback		__P((void));
-extern	CCRETVAL	e_wordfwd		__P((void));
-extern	CCRETVAL	v_wordbegnext		__P((void));
-extern	CCRETVAL	e_uppercase		__P((void));
-extern	CCRETVAL	e_lowercase		__P((void));
-extern	CCRETVAL	e_capitolcase		__P((void));
-extern	CCRETVAL	e_cleardisp		__P((void));
-extern	CCRETVAL	e_complete		__P((void));
-extern	CCRETVAL	e_correct		__P((void));
-extern	CCRETVAL	e_correctl		__P((void));
-extern	CCRETVAL	e_up_hist		__P((void));
-extern	CCRETVAL	e_down_hist		__P((void));
-extern	CCRETVAL	e_up_search_hist	__P((void));
-extern	CCRETVAL	e_down_search_hist	__P((void));
-extern	CCRETVAL	e_helpme		__P((void));
-extern	CCRETVAL	e_list_choices		__P((void));
-extern	CCRETVAL	e_delwordprev		__P((void));
-extern	CCRETVAL	e_delwordnext		__P((void));
-extern	CCRETVAL	e_digit			__P((void));
-extern	CCRETVAL	e_argdigit		__P((void));
-extern	CCRETVAL	v_zero			__P((void));
-extern	CCRETVAL	e_killend		__P((void));
-extern	CCRETVAL	e_killbeg		__P((void));
-extern	CCRETVAL	e_metanext		__P((void));
-#ifdef notdef
-extern	CCRETVAL	e_extendnext		__P((void));
-#endif
-extern	CCRETVAL	e_send_eof		__P((void));
-extern	CCRETVAL	e_charswitch		__P((void));
-extern	CCRETVAL	e_gcharswitch		__P((void));
-extern	CCRETVAL	e_which			__P((void));
-extern	CCRETVAL	e_yank_kill		__P((void));
-extern	CCRETVAL	e_tty_dsusp		__P((void));
-extern	CCRETVAL	e_tty_flusho		__P((void));
-extern	CCRETVAL	e_tty_quit		__P((void));
-extern	CCRETVAL	e_tty_tsusp		__P((void));
-extern	CCRETVAL	e_tty_stopo		__P((void));
-extern	CCRETVAL	e_tty_starto		__P((void));
-extern	CCRETVAL	e_argfour		__P((void));
-extern	CCRETVAL	e_set_mark		__P((void));
-extern	CCRETVAL	e_exchange_mark		__P((void));
-extern	CCRETVAL	e_last_item		__P((void));
-extern	CCRETVAL	v_cmd_mode		__P((void));
-extern	CCRETVAL	v_insert		__P((void));
-extern	CCRETVAL	v_replmode		__P((void));
-extern	CCRETVAL	v_replone		__P((void));
-extern	CCRETVAL	v_substline		__P((void));
-extern	CCRETVAL	v_substchar		__P((void));
-extern	CCRETVAL	v_add			__P((void));
-extern	CCRETVAL	v_addend		__P((void));
-extern	CCRETVAL	v_insbeg		__P((void));
-extern	CCRETVAL	v_chgtoend		__P((void));
-extern	CCRETVAL	e_killregion		__P((void));
-extern	CCRETVAL	e_killall		__P((void));
-extern	CCRETVAL	e_copyregion		__P((void));
-extern	CCRETVAL	e_tty_int		__P((void));
-extern	CCRETVAL	e_run_fg_editor		__P((void));
-extern	CCRETVAL	e_list_eof		__P((void));
-extern	CCRETVAL	e_expand_history	__P((void));
-extern	CCRETVAL	e_magic_space		__P((void));
-extern	CCRETVAL	e_list_glob		__P((void));
-extern	CCRETVAL	e_expand_glob		__P((void));
-extern	CCRETVAL	e_insovr		__P((void));
-extern	CCRETVAL	v_cm_complete		__P((void));
-extern	CCRETVAL	e_copyprev		__P((void));
-extern	CCRETVAL	v_change_case		__P((void));
-extern	CCRETVAL	e_expand		__P((void));
-extern	CCRETVAL	e_expand_vars		__P((void));
-extern	CCRETVAL	e_toggle_hist		__P((void));
-
 
 static	void		ed_InitMetaBindings 	__P((void));
 
@@ -236,7 +149,7 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		F_GCHARSWITCH	51
     e_run_fg_editor,
 #define		F_RUN_FG_EDITOR	52
-    e_unassigned,		/* place holder for sequence lead in character */
+    e_unassigned,	/* place holder for sequence lead in character */
 #define		F_XKEY		53
     e_uppercase,
 #define         F_CASEUPPER     54
@@ -291,11 +204,13 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
     e_toggle_hist,
 #define		F_TOGGLE_HIST	79
     v_change_case,
-#define	V_CHGCASE	80
+#define		V_CHGCASE	80
     e_expand,
-#define	F_EXPAND	81
+#define		F_EXPAND	81
+    e_load_average,
+#define		F_LOAD_AVERAGE	82
     0				/* DUMMY VALUE */
-#define	F_NUM_FNS	82
+#define		F_NUM_FNS	83
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -1091,6 +1006,8 @@ KEYCMD  CcViCmdMap[] = {
 
 
 struct KeyFuncs FuncNames[] = {
+    "load-average", F_LOAD_AVERAGE,
+    "Display load average and current process status",
     "backward-char", F_CHARBACK,
     "Move back a character",
     "backward-delete-char", F_DELPREV,

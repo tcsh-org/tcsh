@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.decls.h,v 3.0 1991/07/04 23:34:26 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.decls.h,v 1.2 91/07/14 22:22:47 marc Exp $ */
 /*
  * sh.decls	 External declarations from sh*.c
  */
@@ -41,9 +41,9 @@
  * sh.c
  */
 extern	int	 	  gethdir	__P((Char *));
-extern	void		  dosource	__P((Char **));
+extern	void		  dosource	__P((Char **, struct command *));
 extern	void		  exitstat	__P((void));
-extern	void		  goodbye	__P((void));
+extern	void		  goodbye	__P((Char **, struct command *));
 extern	void		  importpath	__P((Char *));
 extern	void		  initdesc	__P((void));
 extern	sigret_t	  pintr		__P((int));
@@ -61,14 +61,14 @@ extern	void		  xexit		__P((int));
  * sh.dir.c
  */
 extern	void		  dinit		__P((Char *));
-extern	void		  dodirs	__P((Char **));
+extern	void		  dodirs	__P((Char **, struct command *));
 extern	Char		 *dcanon	__P((Char *, Char *));
 extern	void		  dtildepr	__P((Char *, Char *));
 extern	void		  dtilde	__P((void));
-extern	void		  dochngd	__P((Char **));
+extern	void		  dochngd	__P((Char **, struct command *));
 extern	Char		 *dnormalize	__P((Char *));
-extern	void		  dopushd	__P((Char **));
-extern	void		  dopopd	__P((Char **));
+extern	void		  dopushd	__P((Char **, struct command *));
+extern	void		  dopopd	__P((Char **, struct command *));
 extern	void		  dfree		__P((struct directory *));
 extern	int		  getstakd	__P((Char *, int));
 extern	void		  dextract	__P((struct directory *));
@@ -93,11 +93,11 @@ extern	void		  stderror	__P((int, ...));
  * sh.exec.c
  */
 extern	void		  doexec	__P((struct command *));
-extern	void		  dohash	__P((void));
-extern	void		  dounhash	__P((void));
-extern	void		  execash	__P((char **, struct command *));
+extern	void		  dohash	__P((Char **, struct command *));
+extern	void		  dounhash	__P((Char **, struct command *));
+extern	void		  execash	__P((Char **, struct command *));
 #ifdef VFORK
-extern	void		  hashstat	__P((void));
+extern	void		  hashstat	__P((Char **, struct command *));
 #endif
 extern	void		  xechoit	__P((Char **));
 extern	int		  iscommand	__P((Char *));
@@ -121,43 +121,43 @@ extern	int		  tenex		__P((Char *, int));
  * sh.func.c
  */
 extern	void		  Setenv	__P((Char *, Char *));
-extern	void		  doalias	__P((Char **));
-extern	void		  dobreak	__P((void));
-extern	void		  docontin	__P((void));
-extern	void		  doecho	__P((Char **));
-extern	void		  doelse	__P((void));
-extern	void		  doend		__P((void));
-extern	void		  doeval	__P((Char **));
-extern	void		  doexit	__P((Char **));
-extern	void		  doforeach	__P((Char **));
-extern	void		  doglob	__P((Char **));
-extern	void		  dogoto	__P((Char **));
+extern	void		  doalias	__P((Char **, struct command *));
+extern	void		  dobreak	__P((Char **, struct command *));
+extern	void		  docontin	__P((Char **, struct command *));
+extern	void		  doecho	__P((Char **, struct command *));
+extern	void		  doelse	__P((Char **, struct command *));
+extern	void		  doend		__P((Char **, struct command *));
+extern	void		  doeval	__P((Char **, struct command *));
+extern	void		  doexit	__P((Char **, struct command *));
+extern	void		  doforeach	__P((Char **, struct command *));
+extern	void		  doglob	__P((Char **, struct command *));
+extern	void		  dogoto	__P((Char **, struct command *));
 extern	void		  doif		__P((Char **, struct command *));
-extern	void		  dolimit	__P((Char **));
-extern	void		  dologin	__P((Char **));
-extern	void		  dologout	__P((void));
+extern	void		  dolimit	__P((Char **, struct command *));
+extern	void		  dologin	__P((Char **, struct command *));
+extern	void		  dologout	__P((Char **, struct command *));
 #ifdef NEWGRP
-extern	void		  donewgrp	__P((Char **));
+extern	void		  donewgrp	__P((Char **, struct command *));
 #endif
-extern	void		  donohup	__P((void));
-extern	void		  doonintr	__P((Char **));
+extern	void		  donohup	__P((Char **, struct command *));
+extern	void		  doonintr	__P((Char **, struct command *));
 extern	void		  dorepeat	__P((Char **, struct command *));
-extern	void		  dosetenv	__P((Char **));
-extern	void		  dosuspend	__P((void));
-extern	void		  doswbrk	__P((void));
-extern	void		  doswitch	__P((Char **));
-extern	void		  doumask	__P((Char **));
-extern	void		  dounlimit	__P((Char **));
-extern	void		  dounsetenv	__P((Char **));
-extern	void		  dowhile	__P((Char **));
-extern	void		  dozip		__P((void));
+extern	void		  dosetenv	__P((Char **, struct command *));
+extern	void		  dosuspend	__P((Char **, struct command *));
+extern	void		  doswbrk	__P((Char **, struct command *));
+extern	void		  doswitch	__P((Char **, struct command *));
+extern	void		  doumask	__P((Char **, struct command *));
+extern	void		  dounlimit	__P((Char **, struct command *));
+extern	void		  dounsetenv	__P((Char **, struct command *));
+extern	void		  dowhile	__P((Char **, struct command *));
+extern	void		  dozip		__P((Char **, struct command *));
 extern	void		  func		__P((struct command *, 
 					     struct biltins *));
 extern struct biltins 	 *isbfunc	__P((struct command *));
 extern	void		  prvars	__P((void));
 extern	void		  search	__P((int, int, Char *));
 extern	int		  srchx		__P((Char *));
-extern	void		  unalias	__P((Char **));
+extern	void		  unalias	__P((Char **, struct command *));
 extern	void		  wfree		__P((void));
 
 /*
@@ -179,7 +179,7 @@ extern	int		  sortscmp	__P((Char **, Char **));
 /*
  * sh.hist.c
  */
-extern	void	 	  dohist	__P((Char **));
+extern	void	 	  dohist	__P((Char **, struct command *));
 extern struct Hist 	 *enthist	__P((int, struct wordent *, bool));
 extern	void	 	  savehist	__P((struct wordent *));
 
@@ -276,15 +276,15 @@ extern	void		  xputchar	__P((int));
 /*
  * sh.proc.c
  */
-extern	void		  dobg		__P((Char **));
-extern	void		  dobg1		__P((Char **));
-extern	void		  dofg		__P((Char **));
-extern	void		  dofg1		__P((Char **));
-extern	void		  dojobs	__P((Char **));
-extern	void		  dokill	__P((Char **));
-extern	void		  donotify	__P((Char **));
-extern	void		  dostop	__P((Char **));
-extern	void		  dowait	__P((void));
+extern	void		  dobg		__P((Char **, struct command *));
+extern	void		  dobg1		__P((Char **, struct command *));
+extern	void		  dofg		__P((Char **, struct command *));
+extern	void		  dofg1		__P((Char **, struct command *));
+extern	void		  dojobs	__P((Char **, struct command *));
+extern	void		  dokill	__P((Char **, struct command *));
+extern	void		  donotify	__P((Char **, struct command *));
+extern	void		  dostop	__P((Char **, struct command *));
+extern	void		  dowait	__P((Char **, struct command *));
 extern	void		  palloc	__P((int, struct command *));
 extern	void		  panystop	__P((bool));
 extern	sigret_t	  pchild	__P((int));
@@ -310,26 +310,26 @@ extern	void		  mypipe	__P((int *));
  * sh.set.c
  */
 extern	struct varent 	 *adrof1	__P((Char *, struct varent *));
-extern	void		  doset		__P((Char **));
-extern	void		  dolet		__P((Char **));
+extern	void		  doset		__P((Char **, struct command *));
+extern	void		  dolet		__P((Char **, struct command *));
 extern	Char		 *putn		__P((int));
 extern	int		  getn		__P((Char *));
 extern	Char		 *value1	__P((Char *, struct varent *));
 extern	void		  set		__P((Char *, Char *));
 extern	void		  set1		__P((Char *, Char **, struct varent *));
 extern	void		  setq		__P((Char *, Char **, struct varent *));
-extern	void		  unset		__P((Char *[]));
+extern	void		  unset		__P((Char **, struct command *));
 extern	void		  unset1	__P((Char *[], struct varent *));
 extern	void		  unsetv	__P((Char *));
 extern	void		  setNS		__P((Char *));
-extern	void		  shift		__P((Char **));
+extern	void		  shift		__P((Char **, struct command *));
 extern	void		  plist		__P((struct varent *));
 
 /*
  * sh.time.c
  */
-extern	void		  donice	__P((Char **));
-extern	void		  dotime	__P((void));
+extern	void		  donice	__P((Char **, struct command *));
+extern	void		  dotime	__P((Char **, struct command *));
 #ifdef BSDTIMES
 extern	void		  prusage	__P((struct rusage *, struct rusage *, 
 					     timeval_t *, timeval_t *));

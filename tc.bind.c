@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.bind.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tc.bind.c,v 1.2 91/07/14 22:23:54 marc Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -35,10 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: tc.bind.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 #include "ed.h"
@@ -340,9 +337,11 @@ parsekey(sp)
 }
 
 
+/*ARGSUSED*/
 void
-dobindkey(v)
+dobindkey(v, c)
     Char  **v;
+    struct command *c;
 {
     KEYCMD *map;
     int     string, no, remove;
@@ -738,9 +737,11 @@ list_functions()
     }
 }
 
+/*ARGSUSED*/
 void
-dobind(v)
+dobind(v, dummy)
     register Char **v;
+    struct command *dummy;
 {
     register int c;
     register struct KeyFuncs *fp;

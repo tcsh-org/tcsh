@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.exec.c,v 2.1 1991/03/31 13:06:41 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.exec.c,v 1.2 91/07/14 20:13:22 marc Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -35,12 +35,10 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: sh.exec.c,v 2.1 1991/03/31 13:06:41 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
+#include "tc.h"
 #include "tw.h"
 
 /*
@@ -403,7 +401,7 @@ texec(sf, st)
 /*ARGSUSED*/
 void
 execash(t, kp)
-    char  **t;
+    Char  **t;
     register struct command *kp;
 {
     if (chkstop == 0 && setintr)
@@ -438,9 +436,11 @@ xechoit(t)
     }
 }
 
-/*VARARGS0*/
+/*ARGSUSED*/
 void
-dohash()
+dohash(vv, c)
+    Char **vv;
+    struct command *c;
 {
 #ifdef COMMENT
     struct stat stb;
@@ -453,6 +453,7 @@ dohash()
     Char  **pv;
     int     hashval;
 
+    (void) getusername(NULL);	/* flush the tilde cashe */
     tw_clear_comm_list();
     havhash = 1;
     for (cnt = 0; cnt < sizeof xhash; cnt++)
@@ -487,15 +488,21 @@ dohash()
     }
 }
 
+/*ARGSUSED*/
 void
-dounhash()
+dounhash(v, c)
+    Char **v;
+    struct command *c;
 {
     havhash = 0;
 }
 
 #ifdef VFORK
+/*ARGSUSED*/
 void
-hashstat()
+hashstat(v, c)
+    Char **v;
+    struct command *c;
 {
     if (hits + misses)
 	xprintf("%d hits, %d misses, %d%%\n",

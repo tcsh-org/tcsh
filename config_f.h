@@ -1,4 +1,4 @@
-/* $Header$ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/config_f.h,v 3.0 1991/07/04 21:54:11 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -116,5 +116,20 @@
  *		provided.
  */
 #undef SYSMALLOC
+
+
+/*
+ * RCSID	This defines if we want rcs strings in the binary or not
+ *
+ */
+#if !defined(lint) && !defined(SABER)
+# ifndef __GNUC__
+#  define RCSID(id) static char *rcsid = (id);
+# else
+#  define RCSID(id) static char *rcsid() { return (id); }
+# endif /* !__GNUC__ */
+#else
+# define RCSID(id)	/* Nothing */
+#endif /* !lint && !SABER */
 
 #endif /* _h_config_f */

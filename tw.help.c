@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/tw.help.c,v 2.1 1991/03/31 13:06:41 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tw.help.c,v 1.2 91/07/14 22:24:22 marc Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -38,13 +38,11 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: tw.help.c,v 2.1 1991/03/31 13:06:41 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 #include "tw.h"
+#include "tc.h"
 
 
 static int f = -1;
@@ -144,6 +142,9 @@ static  sigret_t
 cleanf(snum)
 int snum;
 {
+#if (SVID > 0) && (SVID < 3)
+    (void) sigset(SIGINT, cleanf);
+#endif /* SVID > 0 && SVID < 3 */
     if (f != -1)
 	(void) close(f);
     f = -1;

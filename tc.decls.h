@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tc.decls.h,v 1.2 91/07/14 22:23:59 marc Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -52,15 +52,15 @@ extern	memalign_t	  Malloc	__P((size_t));
 extern	memalign_t	  Realloc	__P((ptr_t, size_t));
 extern	memalign_t	  Calloc	__P((size_t, size_t));
 #endif /* SYSMALLOC */
-extern	void		  showall	__P((void));
+extern	void		  showall	__P((Char **, struct command *));
 
 /*
  * tc.bind.c
  */
-extern	void		  dobindkey	__P((Char **));
+extern	void		  dobindkey	__P((Char **, struct command *));
 extern	int		  parseescape	__P((Char **));
 extern	unsigned char    *unparsestring	__P((Char *, unsigned char *));
-extern	void		  dobind	__P((Char **));
+extern	void		  dobind	__P((Char **, struct command *));
 
 
 /*
@@ -76,11 +76,11 @@ extern	Char		 *expand_lex	__P((Char *, int, struct wordent *,
 					     int, int));
 extern	Char		 *sprlex	__P((Char *, struct wordent *));
 extern	void		  Itoa		__P((int, Char *));
-extern	void		  dolist	__P((Char **));
-extern	void		  dotelltc	__P((Char **));
-extern	void		  doechotc	__P((Char **));
-extern	void		  dosettc	__P((Char **));
-extern	void		  dowhich	__P((Char **));
+extern	void		  dolist	__P((Char **, struct command *));
+extern	void		  dotelltc	__P((Char **, struct command *));
+extern	void		  doechotc	__P((Char **, struct command *));
+extern	void		  dosettc	__P((Char **, struct command *));
+extern	void		  dowhich	__P((Char **, struct command *));
 extern	struct process	 *find_stop_ed	__P((void));
 extern	void		  fg_proc_entry	__P((struct process *));
 extern	sigret_t	  alrmcatch	__P((int));
@@ -93,28 +93,28 @@ extern	void		  rmstar	__P((struct wordent *));
 extern	void		  continue_jobs	__P((struct wordent *));
 extern	Char		 *gettilde	__P((Char *));
 extern	Char		 *getusername	__P((Char **));
-extern	void		  doaliases	__P((Char **));
+extern	void		  doaliases	__P((Char **, struct command *));
 
 
 /*
  * tc.os.c
  */
 #ifdef MACH
-extern	void		  dosetpath	__P((Char **));
+extern	void		  dosetpath	__P((Char **, struct command *));
 #endif
 #ifdef TCF
-extern	void		  dogetxvers	__P((Char **));
-extern	void		  dosetxvers	__P((Char **));
-extern	void		  dogetspath	__P((Char **));
-extern	void		  dosetspath	__P((Char **));
+extern	void		  dogetxvers	__P((Char **, struct command *));
+extern	void		  dosetxvers	__P((Char **, struct command *));
+extern	void		  dogetspath	__P((Char **, struct command *));
+extern	void		  dosetspath	__P((Char **, struct command *));
 extern	char		 *sitename	__P((pid_t));
-extern	void		  domigrate	__P((Char **));
+extern	void		  domigrate	__P((Char **, struct command *));
 #endif
 #ifdef WARP
-extern	void 		  dowarp	__P((Char **));
+extern	void 		  dowarp	__P((Char **, struct command *));
 #endif
 #ifdef masscomp
-extern	void		  douniverse	__P((Char **));
+extern	void		  douniverse	__P((Char **, struct command *));
 #endif
 #ifdef _SEQUENT_
 extern	void	 	  pr_stat_sub	__P((struct process_stats *, 
@@ -141,10 +141,10 @@ extern	int	 	  gethostname	__P((char *, int));
 extern	int		  vfork		__P((void));
 #endif
 #ifdef apollo
-extern	void		  doinlib	__P((Char **));
-extern	void		  dover		__P((Char **));
-extern	void		  dorootnode	__P((Char **));
-extern	int		  getv		__P((Char *));
+extern	void		  doinlib	__P((Char **, struct command *));
+extern	void		  dover		__P((Char **, struct command *));
+extern	void		  dorootnode	__P((Char **, struct command *));
+extern	int		  getv		__P((Char **, struct command *));
 #endif
 
 
@@ -165,29 +165,27 @@ extern	void		  printprompt	__P((int, Char *));
  * tc.sched.c
  */
 extern	time_t		  sched_next	__P((void));
-extern	void		  dosched	__P((Char **));
+extern	void		  dosched	__P((Char **, struct command *));
 extern	void		  sched_run	__P((void));
 
 /*
  * tc.sig.c
  */
 #ifndef BSDSIGS
-# if SVID < 3
-#  ifdef UNIXPC
-extern	sigret_t	(*sigset	__P((int, sigret_t (*)())) ();
+# if SVID < 3 || defined(UNIXPC)
+extern	sigret_t	(*sigset	__P((int, sigret_t (*)(int)))) ();
 extern	void		  sigrelse	__P((int));
 extern	void		  sighold	__P((int));
 extern	void		  sigignore	__P((int));
 extern	void 		  sigpause	__P((int));
-#  endif				/* UNIXPC */
-extern	int 		  ourwait	__P((int *));
 # endif
 # ifdef SXA
 extern	void 		  sigpause	__P((int));
 # endif
+extern	int 		  ourwait	__P((int *));
 #endif
 #ifdef NEEDsignal
-extern	sigret_t	(*xsignal	__P((int, sigret_t (*)()))) ();
+extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
 #define signal(a, b)	  xsignal(a, b)
 #endif
 #ifdef _SEQUENT_
@@ -224,9 +222,9 @@ extern	Char		 *s_strstr	__P((Char *, Char *));
 extern	Char		 *str2short	__P((char *));
 extern	Char		**blk2short	__P((char **));
 extern	char		 *short2str	__P((Char *));
-extern	char		 *short2qstr	__P((Char *));
 extern	char		**short2blk	__P((Char **));
 #endif
+extern	char		 *short2qstr	__P((Char *));
 
 
 /*
@@ -241,6 +239,6 @@ extern	Char		 *gethosttype	__P((void));
 extern	void		  initwatch	__P((void));
 extern	void		  resetwatch	__P((void));
 extern	void		  watch_login	__P((void));
-extern	void		  dolog		__P((Char **));
+extern	void		  dolog		__P((Char **, struct command *));
 
 #endif				/* _h_tc_decls */

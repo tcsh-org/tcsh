@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.decls.h,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/ed.decls.h,v 1.2 91/07/14 22:22:15 marc Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -93,6 +93,90 @@ extern	void	ed_InitMaps		__P((void));
 extern	void	ed_InitEmacsMaps	__P((void));
 extern	void	ed_InitVIMaps		__P((void));
 
+extern  CCRETVAL	e_unassigned		__P((int));
+extern	CCRETVAL	e_insert		__P((int));
+extern	CCRETVAL	e_newline		__P((int));
+extern	CCRETVAL	e_delprev		__P((int));
+extern	CCRETVAL	e_delnext		__P((int));
+extern	CCRETVAL	e_list_delnext		__P((int));	/* for ^D */
+extern	CCRETVAL	e_toend			__P((int));
+extern	CCRETVAL	e_tobeg			__P((int));
+extern	CCRETVAL	e_charback		__P((int));
+extern	CCRETVAL	e_charfwd		__P((int));
+extern	CCRETVAL	e_quote			__P((int));
+extern	CCRETVAL	e_startover		__P((int));
+extern	CCRETVAL	e_redisp		__P((int));
+extern	CCRETVAL	e_wordback		__P((int));
+extern	CCRETVAL	e_wordfwd		__P((int));
+extern	CCRETVAL	v_wordbegnext		__P((int));
+extern	CCRETVAL	e_uppercase		__P((int));
+extern	CCRETVAL	e_lowercase		__P((int));
+extern	CCRETVAL	e_capitolcase		__P((int));
+extern	CCRETVAL	e_cleardisp		__P((int));
+extern	CCRETVAL	e_complete		__P((int));
+extern	CCRETVAL	e_correct		__P((int));
+extern	CCRETVAL	e_correctl		__P((int));
+extern	CCRETVAL	e_up_hist		__P((int));
+extern	CCRETVAL	e_down_hist		__P((int));
+extern	CCRETVAL	e_up_search_hist	__P((int));
+extern	CCRETVAL	e_down_search_hist	__P((int));
+extern	CCRETVAL	e_helpme		__P((int));
+extern	CCRETVAL	e_list_choices		__P((int));
+extern	CCRETVAL	e_delwordprev		__P((int));
+extern	CCRETVAL	e_delwordnext		__P((int));
+extern	CCRETVAL	e_digit			__P((int));
+extern	CCRETVAL	e_argdigit		__P((int));
+extern	CCRETVAL	v_zero			__P((int));
+extern	CCRETVAL	e_killend		__P((int));
+extern	CCRETVAL	e_killbeg		__P((int));
+extern	CCRETVAL	e_metanext		__P((int));
+#ifdef notdef
+extern	CCRETVAL	e_extendnext		__P((int));
+#endif
+extern	CCRETVAL	e_send_eof		__P((int));
+extern	CCRETVAL	e_charswitch		__P((int));
+extern	CCRETVAL	e_gcharswitch		__P((int));
+extern	CCRETVAL	e_which			__P((int));
+extern	CCRETVAL	e_yank_kill		__P((int));
+extern	CCRETVAL	e_tty_dsusp		__P((int));
+extern	CCRETVAL	e_tty_flusho		__P((int));
+extern	CCRETVAL	e_tty_quit		__P((int));
+extern	CCRETVAL	e_tty_tsusp		__P((int));
+extern	CCRETVAL	e_tty_stopo		__P((int));
+extern	CCRETVAL	e_tty_starto		__P((int));
+extern	CCRETVAL	e_argfour		__P((int));
+extern	CCRETVAL	e_set_mark		__P((int));
+extern	CCRETVAL	e_exchange_mark		__P((int));
+extern	CCRETVAL	e_last_item		__P((int));
+extern	CCRETVAL	v_cmd_mode		__P((int));
+extern	CCRETVAL	v_insert		__P((int));
+extern	CCRETVAL	v_replmode		__P((int));
+extern	CCRETVAL	v_replone		__P((int));
+extern	CCRETVAL	v_substline		__P((int));
+extern	CCRETVAL	v_substchar		__P((int));
+extern	CCRETVAL	v_add			__P((int));
+extern	CCRETVAL	v_addend		__P((int));
+extern	CCRETVAL	v_insbeg		__P((int));
+extern	CCRETVAL	v_chgtoend		__P((int));
+extern	CCRETVAL	e_killregion		__P((int));
+extern	CCRETVAL	e_killall		__P((int));
+extern	CCRETVAL	e_copyregion		__P((int));
+extern	CCRETVAL	e_tty_int		__P((int));
+extern	CCRETVAL	e_run_fg_editor		__P((int));
+extern	CCRETVAL	e_list_eof		__P((int));
+extern	CCRETVAL	e_expand_history	__P((int));
+extern	CCRETVAL	e_magic_space		__P((int));
+extern	CCRETVAL	e_list_glob		__P((int));
+extern	CCRETVAL	e_expand_glob		__P((int));
+extern	CCRETVAL	e_insovr		__P((int));
+extern	CCRETVAL	v_cm_complete		__P((int));
+extern	CCRETVAL	e_copyprev		__P((int));
+extern	CCRETVAL	v_change_case		__P((int));
+extern	CCRETVAL	e_expand		__P((int));
+extern	CCRETVAL	e_expand_vars		__P((int));
+extern	CCRETVAL	e_toggle_hist		__P((int));
+extern  CCRETVAL        e_load_average		__P((int));
+
 /*
  * ed.inputl.c
  */
@@ -121,4 +205,4 @@ extern	void	ResetXmap		__P((int));
 extern	int	DeleteXkey		__P((Char *));
 extern	void	PrintXkey		__P((Char *));
 
-#endif				/* _h_ed_decls */
+#endif /* _h_ed_decls */

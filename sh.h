@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.2 1991/07/08 00:09:43 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.h,v 1.2 91/07/14 22:23:11 marc Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -43,11 +43,11 @@
  */
 #if defined(_POSIX_SOURCE) && !defined(POSIX)
 # define POSIX
-#endif
+#endif 
 
 #if defined(POSIXJOBS) && !defined(BSDJOBS)
 # define BSDJOBS
-#endif
+#endif 
 
 #ifdef SHORT_STRINGS
 typedef short Char;
@@ -55,7 +55,7 @@ typedef short Char;
 #else
 typedef char Char;
 # define SAVE(a) (strsave(a))
-#endif
+#endif 
 
 /*
  * If your compiler complains, then you can either
@@ -68,10 +68,25 @@ typedef char Char;
 #  define sigret_t void
 # else
 typedef void sigret_t;
-# endif
+# endif 
 #else
 typedef int sigret_t;
-#endif				/* SIGVOID */
+#endif /* SIGVOID */
+
+/*
+ * ANSIisms...
+ */
+#ifndef __P
+# if __STDC__
+#  define __P(a) a
+# else
+#  define __P(a) ()
+#  define const
+#  ifndef apollo
+#   define volatile	/* Apollo 'c' extensions need this */
+#  endif /* apollo */
+# endif 
+#endif 
 
 /*
  * Fundamental definitions which may vary from system to system.
@@ -81,7 +96,7 @@ typedef int sigret_t;
  */
 #ifndef BUFSIZ
 #define	BUFSIZ	1024		/* default buffer size */
-#endif				/* BUFSIZ */
+#endif /* BUFSIZ */
 
 #define FORKSLEEP	10	/* delay loop on non-interactive fork failure */
 #define	MAILINTVL	600	/* 10 minutes */
@@ -99,7 +114,7 @@ typedef int sigret_t;
 
 #ifdef PROF
 #define	xexit(n)	done(n)
-#endif
+#endif 
 
 #include <sys/types.h>
 #ifdef _SEQUENT_
@@ -107,11 +122,11 @@ typedef int sigret_t;
 #endif /* _SEQUENT_ */
 #if defined(POSIX) || SVID > 0
 # include <sys/times.h>
-#endif				/* POSIX || SVID > 0 */
+#endif /* POSIX || SVID > 0 */
 
 #ifdef NLS
 # include <locale.h>
-#endif
+#endif 
 
 #include <sys/param.h>
 #include <sys/stat.h>
@@ -119,7 +134,7 @@ typedef int sigret_t;
 #ifdef BSDTIMES
 # include <sys/time.h>
 # include <sys/resource.h>
-#endif				/* BSDTIMES */
+#endif /* BSDTIMES */
 
 #ifndef POSIX
 # ifdef TERMIO
@@ -127,19 +142,19 @@ typedef int sigret_t;
  /* Aix redefines NOFLSH when _BSD_INCLUDES is defined! */
 #   undef _BSD
 #   undef _BSD_INCLUDES
-#  endif				/* _IBMR2 */
+#  endif /* _IBMR2 */
 #  include <termio.h>
 #  ifdef _IBMR2
  /* but we need it.  */
 #   define _BSD
 #   define _BSD_INCLUDES
-#  endif				/* _IBMR2 */
+#  endif /* _IBMR2 */
 # else
 #  include <sgtty.h>
-# endif				/* TERMIO */
+# endif /* TERMIO */
 #else				/* POSIX */
 # include <termios.h>
-#endif				/* POSIX */
+#endif /* POSIX */
 
 #ifdef POSIX
 /*
@@ -171,28 +186,28 @@ extern int setpgrp();
 # undef calloc
 # undef realloc
 # include <limits.h>
-#endif				/* POSIX */
+#endif /* POSIX */
 
 #if SVID > 0
 # if !defined(pyr) || !defined(aiws)
 #  include <time.h>
-# endif				/* !aiws || !pyr */
-#endif				/* SVID > 0 */
+# endif /* !aiws || !pyr */
+#endif /* SVID > 0 */
 
 #if !(defined(sun) && defined(TERMIO))
 # include <sys/ioctl.h>
-#endif
+#endif 
 
 #if !defined(FIOCLEX) && defined(sun)
 # include <sys/filio.h>
-#endif				/* !FIOCLEX && sun */
+#endif /* !FIOCLEX && sun */
 
 
 #include <sys/file.h>
 
 #if !defined(O_RDONLY) || !defined(O_NDELAY)
 # include <fcntl.h>
-#endif
+#endif 
 
 #include <errno.h>
 
@@ -202,17 +217,17 @@ extern int setpgrp();
 # include <stdarg.h>
 #else
 # include <varargs.h>
-#endif
+#endif 
 
 #ifdef DIRENT
 # include <dirent.h>
 #else
 # include <sys/dir.h>
 # define dirent direct
-#endif				/* DIRENT */
+#endif /* DIRENT */
 #ifdef hpux
 # include <stdio.h>	/* So the fgetpwent() prototypes work */
-#endif
+#endif 
 #include <pwd.h>
 #ifdef BSD
 # include <strings.h>
@@ -220,7 +235,7 @@ extern int setpgrp();
 # define strrchr(a, b) rindex(a, b)
 #else
 # include <string.h>
-#endif				/* BSD */
+#endif /* BSD */
 
 typedef int bool;
 
@@ -242,7 +257,7 @@ typedef union {
 # define free		lint_free
 # define realloc	lint_realloc
 # define calloc		lint_calloc
-#endif
+#endif 
 
 #ifdef SYSMALLOC
 # define xmalloc(i)  	Malloc(i)
@@ -280,11 +295,11 @@ typedef union {
 
 #if !defined(MAXNAMLEN) && defined(_D_NAME_MAX)
 # define MAXNAMLEN _D_NAME_MAX
-#endif				/* MAXNAMLEN */
+#endif /* MAXNAMLEN */
 
 #ifndef MAXHOSTNAMELEN
 # define MAXHOSTNAMELEN	255
-#endif				/* MAXHOSTNAMELEN */
+#endif /* MAXHOSTNAMELEN */
 
 
 
@@ -302,7 +317,7 @@ bool    chkstop;		/* Warned of stopped jobs... allow exit */
 
 #ifndef FIOCLEX
 bool    didcch;			/* Have closed unused fd's for child */
-#endif
+#endif 
 
 bool    didfds;			/* Have setup i/o fd's for child */
 bool    doneinp;		/* EOF indicator after reset from readc */
@@ -349,10 +364,10 @@ struct process_stats ru0;
 time_t  time0;			/* time at which shell started */
 #  else				/* POSIX */
 clock_t time0;			/* time at which shell started */
-#  endif			/* POSIX */
+#  endif /* POSIX */
 struct tms shtimes;		/* shell and child times for process timing */
-# endif				/* _SEQUENT_ */
-#endif				/* BSDTIMES */
+# endif /* _SEQUENT_ */
+#endif /* BSDTIMES */
 
 /*
  * Miscellany
@@ -369,24 +384,6 @@ int     opgrp;			/* Initial pgrp and tty pgrp */
 
 Char    PromptBuf[256];		/* buffer for the actual printed prompt. this
 				 * is used in tenex.c and sh.c for pegets.c */
-
-/*
- * These are declared here because they want to be
- * initialized in sh.init.c (to allow them to be made readonly)
- */
-
-extern struct biltins {
-    char   *bname;
-    void    (*bfunct) ();
-    short   minargs, maxargs;
-}       bfunc[];
-extern int nbfunc;
-
-extern struct srch {
-    char   *s_name;
-    short   s_value;
-}       srchn[];
-extern int nsrchn;
 
 /*
  * To be able to redirect i/o for builtins easily, the shell moves the i/o
@@ -409,7 +406,7 @@ short   OLDSTD;			/* Old standard input (def for cmds) */
  * Because of source commands and .cshrc we need nested error catches.
  */
 
-jmp_buf reslab;
+extern jmp_buf reslab;
 
 /* bugfix by Jak Kirman @ Brown U.: remove the (void) cast here, see sh.c */
 #define	setexit()	(setjmp(reslab))
@@ -450,7 +447,7 @@ sigret_t (*parterm) ();		/* Parents terminate catch */
 # define	LITERAL		0000000	/* Literal character flag */
 # define	ATTRIBUTES	0200	/* The bits used for attributes */
 # define	CHAR		0000177	/* Mask to mask out the character */
-#endif
+#endif 
 
 int     AsciiOnly;		/* If set only 7 bits is expected in characters */
 
@@ -539,7 +536,7 @@ struct command {
 #define	F_SAVE	(F_NICE|F_TIME|F_NOHUP)	
 #else
 #define	F_SAVE	(F_NICE|F_TIME|F_NOHUP|F_VER)
-#endif
+#endif 
 #define	F_AMPERSAND	(1<<0)	/* executes in background	 */
 #define	F_APPEND	(1<<1)	/* output is redirected >>	 */
 #define	F_PIPEIN	(1<<2)	/* input is a pipe		 */
@@ -556,7 +553,7 @@ struct command {
 #define	F_TIME		(1<<13)	/* time this command 		 */
 #ifdef apollo
 #define F_VER		(1<<14)	/* execute command under SYSTYPE */
-#endif
+#endif 
     union {
 	Char   *T_dlef;		/* Input redirect word 		 */
 	struct command *T_dcar;	/* Left part of list/pipe 	 */
@@ -574,7 +571,7 @@ struct command {
     short   t_nice;
 #ifdef F_VER
     short   t_systype;
-#endif
+#endif 
 };
 
 
@@ -600,6 +597,24 @@ struct command {
 #define	T_TEST		16
 #define	T_THEN		17
 #define	T_WHILE		18
+
+/*
+ * These are declared here because they want to be
+ * initialized in sh.init.c (to allow them to be made readonly)
+ */
+
+extern struct biltins {
+    char   *bname;
+    void    (*bfunct) __P((Char **, struct command *));
+    short   minargs, maxargs;
+}       bfunc[];
+extern int nbfunc;
+
+extern struct srch {
+    char   *s_name;
+    short   s_value;
+}       srchn[];
+extern int nsrchn;
 
 /*
  * Structure defining the existing while/foreach loops at this
@@ -652,11 +667,11 @@ short   gflag;			/* After tglob -> is globbing needed? */
 
 #ifndef MAXPATHLEN
 # define MAXPATHLEN 2048
-#endif				/* MAXPATHLEN */
+#endif /* MAXPATHLEN */
 
 #ifndef MAXNAMLEN
 # define MAXNAMLEN 512
-#endif				/* MAXNAMLEN */
+#endif /* MAXNAMLEN */
 
 /*
  * Variables for filename expansion
@@ -732,7 +747,6 @@ extern int errno, sys_nerr;
 #define blk2short(a) 		saveblk(a)
 #define short2blk(a) 		saveblk(a)
 #define short2str(a) 		(a)
-#define short2qstr(a)		(a)
 #else
 #define Strchr(a, b)   	s_strchr(a, b)
 #define Strrchr(a, b) 		s_strrchr(a, b)
@@ -748,7 +762,7 @@ extern int errno, sys_nerr;
 #define Strsave(a)		s_strsave(a)
 #define Strend(a)		s_strend(a)
 #define Strstr(a, b)		s_strstr(a, b)
-#endif
+#endif 
 
 #define	NOSTR	((Char *) 0)
 /*
@@ -764,7 +778,7 @@ Char   *Vdp;
 Char   *Vexpath;
 char  **Vt;
 
-#endif				/* VFORK */
+#endif /* VFORK */
 
 Char  **evalvec;
 Char   *evalp;
@@ -785,26 +799,11 @@ Char   *STR_SHELLPATH;
 
 #ifdef _PATH_BSHELL
 Char   *STR_BSHELL;
-#endif
+#endif 
 Char   *STR_WORD_CHARS;
 Char  **STR_environ;
-
-/*
- * ANSIisms...
- */
-#ifndef __P
-# if __STDC__
-#  define __P(a) a
-# else
-#  define __P(a) ()
-#  define const
-#  ifndef apollo
-#   define volatile
-#  endif
-# endif
-#endif
 
 #include "tc.h"
 #include "sh.decls.h"
 
-#endif				/* _h_sh */
+#endif /* _h_sh */

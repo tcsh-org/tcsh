@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/ed.chared.c,v 1.3 91/07/15 01:26:09 marc Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -35,10 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: ed.chared.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
 #include "ed.h"
@@ -510,9 +507,10 @@ c_substitute()
  * CcFuncTbl array.
  */
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_cmd_mode()
+v_cmd_mode(c)
+    int c;
 {
     replacemode = 0;
     c_alternativ_key_map(1);
@@ -522,19 +520,19 @@ v_cmd_mode()
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_unassigned()
+e_unassigned(c)
+    int c;
 {				/* bound to keys that arn't really assigned */
     Beep();
     flush();
     return (CC_NORM);
 }
 
-/*VARARGS*/
 CCRETVAL
 e_insert(c)
-    register Char c;
+    register int c;
 {
 #ifndef SHORT_STRINGS
     c &= ASCII;			/* no meta chars ever */
@@ -556,7 +554,7 @@ e_insert(c)
 	DoingArg = 0;		/* just in case */
 	RefPlusOne();		/* fast refresh for one char. */
 	if (replacemode == 2)
-	    (void) v_cmd_mode();
+	    (void) v_cmd_mode(0);
     }
     else {
 	if (replacemode == 1)
@@ -568,7 +566,7 @@ e_insert(c)
 	    *Cursor++ = c;
 	Refresh();
 	if (replacemode == 2)
-	    (void) v_cmd_mode();
+	    (void) v_cmd_mode(0);
     }
     return (CC_NORM);
 }
@@ -604,10 +602,9 @@ DeleteBack(n)			/* delete the n characters before . */
     }
 }
 
-/*VARARGS*/
 CCRETVAL
 e_digit(c)			/* gray magic here */
-    register Char c;
+    register int c;
 {
     if (!Isdigit(c))
 	return (CC_ERROR);	/* no NULs in the input ever!! */
@@ -634,10 +631,9 @@ e_digit(c)			/* gray magic here */
     return (CC_NORM);
 }
 
-/*VARARGS*/
 CCRETVAL
 e_argdigit(c)			/* for ESC-n */
-    register Char c;
+    register int c;
 {
     c &= ASCII;
 
@@ -656,10 +652,9 @@ e_argdigit(c)			/* for ESC-n */
     return (CC_ARGHACK);
 }
 
-/*VARARGS*/
 CCRETVAL
 v_zero(c)			/* command mode 0 for vi */
-    register Char c;
+    register int c;
 {
     if (DoingArg) {		/* if doing an arg, add this in... */
 	if (Argument > 1000000)
@@ -674,9 +669,10 @@ v_zero(c)			/* command mode 0 for vi */
     }
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_newline()
+e_newline(c)
+    int c;
 {				/* always ignore argument */
     PastBottom();
     *LastChar++ = '\n';		/* for the benifit of CSH */
@@ -684,9 +680,10 @@ e_newline()
     return (CC_NEWLINE);	/* we must do a ResetInLine later */
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_send_eof()
+e_send_eof(c)
+    int c;
 {				/* for when ^D is ONLY send-eof */
     PastBottom();
     *LastChar = '\0';		/* just in case */
@@ -696,17 +693,19 @@ e_send_eof()
     return (CC_EOF);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_complete()
+e_complete(c)
+    int c;
 {
     *LastChar = '\0';		/* just in case */
     return (CC_COMPLETE);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_cm_complete()
+v_cm_complete(c)
+    int c;
 {
     if (Cursor < LastChar)
 	Cursor++;
@@ -714,9 +713,10 @@ v_cm_complete()
     return (CC_COMPLETE);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_toggle_hist()
+e_toggle_hist(c)
+    int c;
 {
     struct Hist *hp;
     int     h;
@@ -762,9 +762,10 @@ e_toggle_hist()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_up_hist()
+e_up_hist(c)
+    int c;
 {
     struct Hist *hp;
     int     hnumcntr;
@@ -818,9 +819,10 @@ e_up_hist()
 	return (CC_NORM);	/* was CC_UP_HIST */
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_down_hist()
+e_down_hist(c)
+    int c;
 {
     struct Hist *hp;
     int     hnumcntr;
@@ -910,9 +912,10 @@ c_hsetpat()
 #endif
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_up_search_hist()
+e_up_search_hist(c)
+    int c;
 {
     struct Hist *hp;
     int h;
@@ -979,9 +982,10 @@ e_up_search_hist()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_down_search_hist()
+e_down_search_hist(c)
+    int c;
 {
     struct Hist *hp, *hpt = NULL;
     int h;
@@ -1050,34 +1054,38 @@ e_down_search_hist()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_helpme()
+e_helpme(c)
+    int c;
 {
     PastBottom();
     *LastChar = '\0';		/* just in case */
     return (CC_HELPME);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_correct()
+e_correct(c)
+    int c;
 {
     *LastChar = '\0';		/* just in case */
     return (CC_CORRECT);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_correctl()
+e_correctl(c)
+    int c;
 {
     *LastChar = '\0';		/* just in case */
     return (CC_CORRECT_L);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_run_fg_editor()
+e_run_fg_editor(c)
+    int c;
 {
     register struct process *pp;
     extern bool tellwhat;
@@ -1105,52 +1113,58 @@ e_run_fg_editor()
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_list_choices()
+e_list_choices(c)
+    int c;
 {
     PastBottom();
     *LastChar = '\0';		/* just in case */
     return (CC_LIST_CHOICES);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_list_glob()
+e_list_glob(c)
+    int c;
 {
     PastBottom();
     *LastChar = '\0';		/* just in case */
     return (CC_LIST_GLOB);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_expand_glob()
+e_expand_glob(c)
+    int c;
 {
     *LastChar = '\0';		/* just in case */
     return (CC_EXPAND_GLOB);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_expand_vars()
+e_expand_vars(c)
+    int c;
 {
     *LastChar = '\0';		/* just in case */
     return (CC_EXPAND_VARS);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_which()
+e_which(c)
+    int c;
 {				/* do a fast command line which(1) */
     PastBottom();
     *LastChar = '\0';		/* just in case */
     return (CC_WHICH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_last_item()
+e_last_item(c)
+    int c;
 {				/* insert the last element of the prev. cmd */
     register Char *cp;
     register struct Hist *hp;
@@ -1194,9 +1208,10 @@ e_last_item()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_yank_kill()
+e_yank_kill(c)
+    int c;
 {				/* almost like GnuEmacs */
     register Char *kp, *cp;
 
@@ -1220,9 +1235,10 @@ e_yank_kill()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_delprev()
+e_delprev(c)
+    int c;
 {
     if (Cursor > InputBuf) {
 	c_delbefore(Argument);	/* delete before dot */
@@ -1236,9 +1252,10 @@ e_delprev()
     }
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_delwordprev()
+e_delwordprev(c)
+    int c;
 {
     register Char *cp, *p, *kp;
 
@@ -1259,9 +1276,10 @@ e_delwordprev()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_delnext()
+e_delnext(c)
+    int c;
 {
     if (Cursor == LastChar) {	/* if I'm at the end */
 	if (Cursor == InputBuf && !VImode) {	
@@ -1282,9 +1300,10 @@ e_delnext()
     }
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_list_delnext()
+e_list_delnext(c)
+    int c;
 {
     if (Cursor == LastChar) {	/* if I'm at the end */
 	if (Cursor == InputBuf) {	/* if I'm also at the beginning */
@@ -1307,7 +1326,8 @@ e_list_delnext()
 }
 
 CCRETVAL
-e_list_eof()
+e_list_eof(c)
+    int c;
 {
     if (Cursor == LastChar && Cursor == InputBuf) {
 	so_write(STReof, 4);	/* then do a EOF */
@@ -1321,9 +1341,10 @@ e_list_eof()
     }
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_delwordnext()
+e_delwordnext(c)
+    int c;
 {
     register Char *cp, *p, *kp;
 
@@ -1344,27 +1365,30 @@ e_delwordnext()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_toend()
+e_toend(c)
+    int c;
 {
     Cursor = LastChar;
     RefCursor();		/* move the cursor */
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_tobeg()
+e_tobeg(c)
+    int c;
 {
     Cursor = InputBuf;
     RefCursor();		/* move the cursor */
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_killend()
+e_killend(c)
+    int c;
 {
     register Char *kp, *cp;
 
@@ -1378,9 +1402,10 @@ e_killend()
 }
 
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_killbeg()
+e_killbeg(c)
+    int c;
 {
     register Char *kp, *cp;
 
@@ -1394,9 +1419,10 @@ e_killbeg()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_killall()
+e_killall(c)
+    int c;
 {
     register Char *kp, *cp;
 
@@ -1410,9 +1436,10 @@ e_killall()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_killregion()
+e_killregion(c)
+    int c;
 {
     register Char *kp, *cp;
 
@@ -1439,9 +1466,10 @@ e_killregion()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_copyregion()
+e_copyregion(c)
+    int c;
 {
     register Char *kp, *cp;
 
@@ -1465,9 +1493,10 @@ e_copyregion()
     return (CC_NORM);		/* don't even need to Refresh() */
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_charswitch()
+e_charswitch(cc)
+    int cc;
 {
     register Char c;
 
@@ -1490,9 +1519,10 @@ e_charswitch()
     }
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_gcharswitch()
+e_gcharswitch(cc)
+    int cc;
 {				/* gosmacs style ^T */
     register Char c;
 
@@ -1507,9 +1537,10 @@ e_gcharswitch()
     }
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_charback()
+e_charback(c)
+    int c;
 {
     if (Cursor > InputBuf) {
 	Cursor -= Argument;
@@ -1523,9 +1554,10 @@ e_charback()
     }
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_wordback()
+e_wordback(c)
+    int c;
 {
     if (Cursor == InputBuf)
 	return (CC_ERROR);
@@ -1537,9 +1569,10 @@ e_wordback()
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_charfwd()
+e_charfwd(c)
+    int c;
 {
     if (Cursor < LastChar) {
 	Cursor += Argument;
@@ -1553,9 +1586,10 @@ e_charfwd()
     }
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_wordfwd()
+e_wordfwd(c)
+    int c;
 {
     if (Cursor == LastChar)
 	return (CC_ERROR);
@@ -1567,9 +1601,10 @@ e_wordfwd()
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_wordbegnext()
+v_wordbegnext(c)
+    int c;
 {
     if (Cursor == LastChar)
 	return (CC_ERROR);
@@ -1602,9 +1637,10 @@ c_get_word(begin, end)
 }
 #endif				/* COMMENT */
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_uppercase()
+e_uppercase(c)
+    int c;
 {
     Char   *cp, *end;
 
@@ -1621,9 +1657,10 @@ e_uppercase()
 }
 
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_capitolcase()
+e_capitolcase(c)
+    int c;
 {
     Char   *cp, *end;
 
@@ -1648,9 +1685,10 @@ e_capitolcase()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_lowercase()
+e_lowercase(c)
+    int c;
 {
     Char   *cp, *end;
 
@@ -1667,17 +1705,19 @@ e_lowercase()
 }
 
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_set_mark()
+e_set_mark(c)
+    int c;
 {
     Mark = Cursor;
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_exchange_mark()
+e_exchange_mark(c)
+    int c;
 {
     register Char *cp;
 
@@ -1688,9 +1728,10 @@ e_exchange_mark()
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_argfour()
+e_argfour(c)
+    int c;
 {				/* multiply current argument by 4 */
     if (Argument > 1000000)
 	return CC_ERROR;
@@ -1699,9 +1740,10 @@ e_argfour()
     return (CC_ARGHACK);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_quote()
+e_quote(c)
+    int c;
 {
     Char    ch;
     int     num;
@@ -1712,21 +1754,23 @@ e_quote()
     if (num == 1)
 	return e_insert(ch);
     else
-	return e_send_eof();
+	return e_send_eof(0);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_metanext()
+e_metanext(c)
+    int c;
 {
     MetaNext = 1;
     return (CC_ARGHACK);	/* preserve argument */
 }
 
 #ifdef notdef
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_extendnext()
+e_extendnext(c)
+    int c;
 {
     CurrentKeyMap = CcAltMap;
     return (CC_ARGHACK);	/* preserve argument */
@@ -1734,9 +1778,10 @@ e_extendnext()
 
 #endif
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_insbeg()
+v_insbeg(c)
+    int c;
 {				/* move to beginning of line and start vi
 				 * insert mode */
     Cursor = InputBuf;
@@ -1745,62 +1790,69 @@ v_insbeg()
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_replone()
+v_replone(c)
+    int c;
 {				/* vi mode overwrite one character */
     c_alternativ_key_map(0);
     replacemode = 2;
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_replmode()
+v_replmode(c)
+    int c;
 {				/* vi mode start overwriting */
     c_alternativ_key_map(0);
     replacemode = 1;
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_substchar()
+v_substchar(c)
+    int c;
 {				/* vi mode substitute for one char */
     c_delafter(Argument);
     c_alternativ_key_map(0);
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_substline()
+v_substline(c)
+    int c;
 {				/* vi mode replace whole line */
-    (void) e_killall();
+    (void) e_killall(0);
     c_alternativ_key_map(0);
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_chgtoend()
+v_chgtoend(c)
+    int c;
 {				/* vi mode change to end of line */
-    (void) e_killend();
+    (void) e_killend(0);
     c_alternativ_key_map(0);
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_insert()
+v_insert(c)
+    int c;
 {				/* vi mode start inserting */
     c_alternativ_key_map(0);
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_add()
+v_add(c)
+    int c;
 {				/* vi mode start adding */
     c_alternativ_key_map(0);
     if (Cursor < LastChar) {
@@ -1812,9 +1864,10 @@ v_add()
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_addend()
+v_addend(c)
+    int c;
 {				/* vi mode to add at end of line */
     c_alternativ_key_map(0);
     Cursor = LastChar;
@@ -1822,9 +1875,10 @@ v_addend()
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-v_change_case()
+v_change_case(cc)
+    int cc;
 {
     char    c;
 
@@ -1842,9 +1896,10 @@ v_change_case()
     return (CC_ERROR);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_expand()
+e_expand(c)
+    int c;
 {
     register Char *p;
     extern bool justpr;
@@ -1855,112 +1910,125 @@ e_expand()
 
     justpr++;
     Expand++;
-    return (e_newline());
+    return (e_newline(0));
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_startover()
+e_startover(c)
+    int c;
 {				/* erase all of current line, start again */
     ResetInLine();		/* reset the input pointers */
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_redisp()
+e_redisp(c)
+    int c;
 {
     ClearLines();
     ClearDisp();
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_cleardisp()
+e_cleardisp(c)
+    int c;
 {
     ClearScreen();		/* clear the whole real screen */
     ClearDisp();		/* reset everything */
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_tty_int()
+e_tty_int(c)
+    int c;
 {
     /* do no editing */
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_insovr()
+e_insovr(c)
+    int c;
 {
     replacemode = !replacemode;
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_tty_dsusp()
+e_tty_dsusp(c)
+    int c;
 {
     /* do no editing */
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_tty_flusho()
+e_tty_flusho(c)
+    int c;
 {
     /* do no editing */
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_tty_quit()
+e_tty_quit(c)
+    int c;
 {
     /* do no editing */
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_tty_tsusp()
+e_tty_tsusp(c)
+    int c;
 {
     /* do no editing */
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_tty_stopo()
+e_tty_stopo(c)
+    int c;
 {
     /* do no editing */
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_expand_history()
+e_expand_history(c)
+    int c;
 {
     *LastChar = '\0';		/* just in case */
     c_substitute();
     return (CC_NORM);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_magic_space()
+e_magic_space(c)
+    int c;
 {
     *LastChar = '\0';		/* just in case */
     c_substitute();
     return (e_insert(' '));
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_copyprev()
+e_copyprev(c)
+    int c;
 {
     register Char *cp, *oldc, *dp;
 
@@ -1981,12 +2049,26 @@ e_copyprev()
     return (CC_REFRESH);
 }
 
-/*VARARGS*/
+/*ARGSUSED*/
 CCRETVAL
-e_tty_starto()
+e_tty_starto(c)
+    int c;
 {
     /* do no editing */
     return (CC_NORM);
+}
+
+/*ARGSUSED*/
+CCRETVAL
+e_load_average(c)
+    int c;
+{
+    PastBottom();
+#ifdef TIOCSTAT
+    if (ioctl(SHIN, TIOCSTAT, 0) < 0) 
+	xprintf("Load average unavailable");
+#endif
+    return (CC_REFRESH);
 }
 
 #ifdef notdef

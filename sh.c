@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.c,v 1.4 91/07/14 23:08:28 marc Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,12 +41,10 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-#ifndef lint
-static char *rcsid() 
-    { return "$Id: sh.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
-#endif
+RCSID("$Id$")
 
 #include "sh.h"
+#include "tc.h"
 #include "ed.h"
 
 extern bool MapsAreInited;
@@ -82,6 +80,8 @@ extern bool NoNLSRebind;
  *
  * ported to Apple Unix (TM) (OREO)  26 -- 29 Jun 1987
  */
+
+jmp_buf reslab;
 
 #ifdef TESLA
 static int do_logout;
@@ -126,7 +126,10 @@ main(argc, argv)
     int     argc;
     char  **argv;
 {
-    register Char *cp, *cp2;
+    register Char *cp;
+#ifdef AUTOLOGOUT
+    register Char *cp2;
+#endif
     register char *tcp, *ttyn;
     register int f;
     register char **tempv;
@@ -322,8 +325,6 @@ main(argc, argv)
      */
     if ((tcp = getenv("LOGNAME")) != NULL || (tcp = getenv("USER")) != NULL)
 	set(STRuser, SAVE(tcp));
-    if ((tcp = getenv("TERM")) != NULL)
-	set(STRterm, SAVE(tcp));
 
     /*
      * set usefull environment things for the user
@@ -374,18 +375,28 @@ main(argc, argv)
     /*
      * set editing on by default, unless running under Emacs as an inferior
      * shell.
+     * We try to do this intelligently. If $TERM is available, then it
+     * should determine if we should edit or not. $TERM is preserved
+     * across rlogin sessions, so we will not get confused if we rlogin
+     * under an emacs shell. Another advantage is that if we run an
+     * xterm under an emacs shell, then the $TERM will be set to 
+     * xterm, so we are going to want to edit. Unfortunately emacs
+     * does not restore all the tty modes, so xterm is not very well
+     * set up. But this is not the shell's fault.
      */
-    if ((tcp = getenv("EMACS")) == NULL || strcmp(tcp, "t") != 0) {
-	/* not running under Emacs */
-	/* The 'edit' variable is either set or unset.  It doesn't */
-	/* need a value.  Making it 'emacs' might be confusing.    */
+    if ((tcp = getenv("TERM")) != NULL) {
+	set(STRterm, SAVE(tcp));
+	editing = (strcmp(tcp, "emacs") != 0);
+    }
+    else 
+	editing = ((tcp = getenv("EMACS")) == NULL || strcmp(tcp, "t") != 0);
+
+    /* 
+     * The 'edit' variable is either set or unset.  It doesn't 
+     * need a value.  Making it 'emacs' might be confusing. 
+     */
+    if (editing)
 	set(STRedit, Strsave(STRNULL));
-	editing = 1;
-    }
-    else {			/* running under Emacs */
-	/* we don't set edit to anything */
-	editing = 0;
-    }
 
 
     /*
@@ -797,7 +808,7 @@ main(argc, argv)
 	    (void) srcfile(_PATH_DOTCSHRC, 0, 0);
 #endif
 	    if (!fast && !arginp && !onelflg)
-		dohash();
+		dohash(NULL,NULL);
 #ifdef _PATH_DOTLOGIN
 	    if (loginsh)
 		(void) srcfile(_PATH_DOTLOGIN, 0, 0);
@@ -818,11 +829,11 @@ main(argc, argv)
 	    (void) srccat(value(STRhome), STRsldotcshrc);
 
 	if (!fast && !arginp && !onelflg && !havhash)
-	    dohash();
+	    dohash(NULL,NULL);
 	/*
 	 * Source history before .login so that it is available in .login
 	 */
-	dosource(loadhist);
+	dosource(loadhist, NULL);
 #ifndef LOGINFIRST
 	if (loginsh)
 	    (void) srccat(value(STRhome), STRsldotlogin);
@@ -843,7 +854,7 @@ main(argc, argv)
 	    if (!stat(short2str(cshd), &st) &&
 		(dflag || loginsh) && !fast) {
 		bequiet = 1;
-		dosource(loaddirs);
+		dosource(loaddirs, NULL);
 		bequiet = 0;
 	    }
 	}
@@ -883,7 +894,7 @@ main(argc, argv)
 #ifdef TESLA
 	    do_logout = 1;
 #endif				/* TESLA */
-	    goodbye();
+	    goodbye(NULL, NULL);
 	}
 	else {
 	    xprintf("exit\n");
@@ -1158,15 +1169,18 @@ rechist()
 	SHOUT = fp;
 	(void) Strcpy(buf, value(STRsavehist));
 	dumphist[2] = buf;
-	dohist(dumphist);
+	dohist(dumphist, NULL);
 	(void) close(fp);
 	SHOUT = ftmp;
 	didfds = oldidfds;
     }
 }
 
+/*ARGSUSED*/
 void
-goodbye()
+goodbye(v, c)
+    Char **v;
+    struct command *c;
 {
     rechist();
 
@@ -1216,6 +1230,9 @@ static  sigret_t
 phup(i)
 int i;
 {
+#if (SVID > 0) && (SVID < 3)
+    (void) sigset(i, SIG_IGN);
+#endif /* SVID > 0 && SVID < 3 */
     rechist();
 #ifdef CSHDIRS
     /*
@@ -1240,10 +1257,16 @@ Char   *jobargv[2] = {STRjobs, 0};
  */
 int     just_signaled;		/* bugfix by Michael Bloom (mg@ttidca.TTI.COM) */
 
+#ifdef SIGVOID
+/*ARGSUSED*/
+#endif
 sigret_t
 pintr(i)
 int i;
 {
+#if (SVID > 0) && (SVID < 3)
+    (void) sigset(i, pintr);
+#endif /* SVID > 0 && SVID < 3 */
     just_signaled = 1;
     pintr1(1);
 #ifndef SIGVOID
@@ -1272,7 +1295,7 @@ pintr1(wantnl)
 	if (pjobs) {
 	    pjobs = 0;
 	    xprintf("\n");
-	    dojobs(jobargv);
+	    dojobs(jobargv, NULL);
 	    stderror(ERR_NAME | ERR_INTR);
 	}
     }
@@ -1518,9 +1541,11 @@ process(catch)
     resexit(osetexit);
 }
 
+/*ARGSUSED*/
 void
-dosource(t)
+dosource(t, c)
     register Char **t;
+    struct command *c;
 {
     register Char *f;
     bool    hflg = 0;
