@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.os.c,v 1.3 91/09/24 17:11:15 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.8 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.7 1991/09/08 00:45:32 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.8 1991/10/12 04:23:51 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -656,6 +656,19 @@ xtcgetpgrp(fd)
     if (ioctl(fd, TIOCGPGRP, (ioctl_t) & pgrp) < 0)
 	return (-1);
     return (pgrp);
+}
+
+/*
+ * XXX: tcsetpgrp is not a macro any more cause on some systems,
+ * pid_t is a short, but the ioctl() takes a pointer to int (pyr)
+ * Thanks to Simon Day (simon@pharaoh.cyborg.bt.co.uk) for pointing
+ * this out.
+ */
+int
+xtcsetpgrp(fd, pgrp)
+    int fd, pgrp;
+{
+    return ioctl(fd, TIOCSPGRP, (ioctl_t) &pgrp);
 }
 
 #endif	/* tcgetpgrp */

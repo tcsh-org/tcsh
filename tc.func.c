@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.9 1991/10/14 20:42:30 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.10 1991/10/18 16:27:13 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.9 1991/10/14 20:42:30 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.10 1991/10/18 16:27:13 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -508,9 +508,10 @@ alrmcatch(snum)
 int snum;
 {
     time_t  cl, nl;
-#if (SVID > 0) && (SVID < 3)
-    (void) sigset(SIGALRM, alrmcatch);
-#endif /* SVID > 0 && SVID < 3 */
+#ifdef UNRELSIGS
+    if (snum)
+	(void) sigset(SIGALRM, alrmcatch);
+#endif /* UNRELSIGS */
 
     if ((nl = sched_next()) == -1)
 	auto_logout();		/* no other possibility - logout */

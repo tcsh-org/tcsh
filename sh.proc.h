@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.h,v 3.0 1991/07/04 21:49:28 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.h,v 3.1 1991/08/05 23:13:11 christos Exp $ */
 /*
  * sh.proc.h: Process data structures and variables
  */
@@ -118,19 +118,19 @@ struct process {
 #define	JOBDIR		0100	/* print job's dir if not the same */
 #define	AREASON		0200
 
-struct process proclist;	/* list head of all processes */
-bool    pnoprocesses;		/* pchild found nothing to wait for */
+EXTERN struct process proclist;	/* list head of all processes */
+EXTERN bool    pnoprocesses;	/* pchild found nothing to wait for */
 
-struct process *pholdjob;	/* one level stack of current jobs */
+EXTERN struct process *pholdjob;/* one level stack of current jobs */
 
-struct process *pcurrjob;	/* current job */
-struct process *pcurrent;	/* current job in table */
-struct process *pprevious;	/* previous job in table */
+EXTERN struct process *pcurrjob;/* current job */
+EXTERN struct process *pcurrent;/* current job in table */
+EXTERN struct process *pprevious;/* previous job in table */
 
-int   pmaxindex;		/* current maximum job index */
+EXTERN int   pmaxindex;		/* current maximum job index */
 
 #ifndef BSDTIMES
-bool    timesdone;		/* shtimes buffer full ? */
+EXTERN bool    timesdone;	/* shtimes buffer full ? */
 #endif /* BSDTIMES */
 
 #endif /* _h_sh_proc */

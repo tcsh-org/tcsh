@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.13 1991/10/13 23:44:48 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.14 1991/10/18 16:27:13 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -28,7 +28,7 @@
  * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTSION)
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTS_ION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
@@ -36,9 +36,8 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.13 1991/10/13 23:44:48 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.14 1991/10/18 16:27:13 christos Exp $")
 
-#define EXTERN			/* intern */
 #include "ed.h"
 #include "ed.term.h"
 #include "tc.h"
@@ -62,7 +61,7 @@ static ttydata_t extty, edtty, tstty;
 extern int insource;
 #define SHTTY (insource ? OLDSTD : SHIN)
 
-static unsigned char ttychars[NNIO][C_NCC] = {
+static unsigned char ttychars[NN_IO][C_NCC] = {
     {
 	CINTR,		 CQUIT, 	 CERASE, 	   CKILL,	
 	CEOF, 		 CEOL, 		 CEOL2, 	   CSWTCH, 
@@ -88,8 +87,6 @@ static unsigned char ttychars[NNIO][C_NCC] = {
 	0,		 0,		  0
     }
 };
-
-static int	ed_Setup	__P((void));
 
 #ifdef SIG_WINDOW
 void
@@ -136,11 +133,11 @@ sigret_t
 window_change(snum)
 int snum;
 {
-#if (SVID > 0) && (SVID < 3)
+#ifdef UNRELSIGS 
     /* If we were called as a signal handler, restore it. */
     if (snum > 0)
       sigset(snum, window_change);
-#endif /* SVID > 0 && SVID < 3 */
+#endif /* UNRELSIGS */
     check_window_size(0);
 #ifndef SIGVOID
     return (snum);
@@ -162,8 +159,9 @@ ed_set_tty_eight_bit()
 }
 
 			
-static int
-ed_Setup()
+int
+ed_Setup(rst)
+    int rst;
 {
     static int havesetup = 0;
 
@@ -177,7 +175,7 @@ ed_Setup()
 
     if (tty_getty(SHTTY, &extty) == -1) {
 #ifdef DEBUG_TTY
-	xprintf("ed_Init: tty_getty: %s\n", strerror(errno));
+	xprintf("ed_Setup: tty_getty: %s\n", strerror(errno));
 #endif /* DEBUG_TTY */
 	return(-1);
     }
@@ -189,17 +187,17 @@ ed_Setup()
     Tty_eight_bit = tty_geteightbit(&extty);
 
 #if defined(POSIX) || defined(TERMIO)
-    extty.d_t.c_iflag &= ~ttylist[EXIO][M_INPUT].t_clrmask;
-    extty.d_t.c_iflag |=  ttylist[EXIO][M_INPUT].t_setmask;
+    extty.d_t.c_iflag &= ~ttylist[EX_IO][M_INPUT].t_clrmask;
+    extty.d_t.c_iflag |=  ttylist[EX_IO][M_INPUT].t_setmask;
 
-    extty.d_t.c_oflag &= ~ttylist[EXIO][M_OUTPUT].t_clrmask;
-    extty.d_t.c_oflag |=  ttylist[EXIO][M_OUTPUT].t_setmask;
+    extty.d_t.c_oflag &= ~ttylist[EX_IO][M_OUTPUT].t_clrmask;
+    extty.d_t.c_oflag |=  ttylist[EX_IO][M_OUTPUT].t_setmask;
 
-    extty.d_t.c_cflag &= ~ttylist[EXIO][M_CONTROL].t_clrmask;
-    extty.d_t.c_cflag |=  ttylist[EXIO][M_CONTROL].t_setmask;
+    extty.d_t.c_cflag &= ~ttylist[EX_IO][M_CONTROL].t_clrmask;
+    extty.d_t.c_cflag |=  ttylist[EX_IO][M_CONTROL].t_setmask;
 
-    extty.d_t.c_lflag &= ~ttylist[EXIO][M_LINED].t_clrmask;
-    extty.d_t.c_lflag |=  ttylist[EXIO][M_LINED].t_setmask;
+    extty.d_t.c_lflag &= ~ttylist[EX_IO][M_LINED].t_clrmask;
+    extty.d_t.c_lflag |=  ttylist[EX_IO][M_LINED].t_setmask;
 
 # ifdef IRIX3_3
     extty.d_t.c_line = NTTYDISC;
@@ -208,20 +206,39 @@ ed_Setup()
 #else	/* GSTTY */		/* V7, Berkeley style tty */
 
     if (T_Tabs) {	/* order of &= and |= is important to XTABS */
-	extty.d_t.sg_flags &= ~(ttylist[EXIO][M_CONTROL].t_clrmask|XTABS);
-	extty.d_t.sg_flags |=   ttylist[EXIO][M_CONTROL].t_setmask;
+	extty.d_t.sg_flags &= ~(ttylist[EX_IO][M_CONTROL].t_clrmask|XTABS);
+	extty.d_t.sg_flags |=   ttylist[EX_IO][M_CONTROL].t_setmask;
     }
     else {
-	extty.d_t.sg_flags &= ~ttylist[EXIO][M_CONTROL].t_clrmask;
-	extty.d_t.sg_flags |= (ttylist[EXIO][M_CONTROL].t_setmask|XTABS);
+	extty.d_t.sg_flags &= ~ttylist[EX_IO][M_CONTROL].t_clrmask;
+	extty.d_t.sg_flags |= (ttylist[EX_IO][M_CONTROL].t_setmask|XTABS);
     }
 
-    extty.d_lb &= ~ttylist[EXIO][M_LOCAL].t_clrmask;
-    extty.d_lb |=  ttylist[EXIO][M_LOCAL].t_setmask;
+    extty.d_lb &= ~ttylist[EX_IO][M_LOCAL].t_clrmask;
+    extty.d_lb |=  ttylist[EX_IO][M_LOCAL].t_setmask;
 
 #endif /* GSTTY */
-
-    tty_setchar(&extty, ttychars[EXIO]);
+    /*
+     * Reset the tty chars to reasonable defaults
+     * If they are disabled, then enable them.
+     */
+    if (rst) {
+	if (tty_cooked_mode(&tstty)) {
+	    tty_getchar(&extty, ttychars[TS_IO]);
+	    for (rst = 0; rst < C_NCC; rst++)
+		if (ttychars[TS_IO][rst] != _POSIX_VDISABLE)
+		    ttychars[EX_IO][rst] = ttychars[TS_IO][rst];
+	}
+	tty_setchar(&extty, ttychars[EX_IO]);
+	if (tty_setty(SHTTY, &extty) == -1) {
+#ifdef DEBUG_TTY
+	    xprintf("ed_Setup: tty_setty: %s\n", strerror(errno));
+#endif /* DEBUG_TTY */
+	    return(-1);
+	}
+    }
+    else
+	tty_setchar(&extty, ttychars[EX_IO]);
 
 # ifdef SIG_WINDOW
     (void) sigset(SIG_WINDOW, window_change);	/* for window systems */
@@ -241,7 +258,7 @@ ed_Init()
     CheckMaps();		/* do a little error checking on key maps */
 #endif 
 
-    if (ed_Setup() == -1)
+    if (ed_Setup(0) == -1)
 	return;
 
     /*
@@ -254,17 +271,17 @@ ed_Init()
 				 * time */
 
 #if defined(TERMIO) || defined(POSIX)
-    edtty.d_t.c_iflag &= ~ttylist[EDIO][M_INPUT].t_clrmask;
-    edtty.d_t.c_iflag |=  ttylist[EDIO][M_INPUT].t_setmask;
+    edtty.d_t.c_iflag &= ~ttylist[ED_IO][M_INPUT].t_clrmask;
+    edtty.d_t.c_iflag |=  ttylist[ED_IO][M_INPUT].t_setmask;
 
-    edtty.d_t.c_oflag &= ~ttylist[EDIO][M_OUTPUT].t_clrmask;
-    edtty.d_t.c_oflag |=  ttylist[EDIO][M_OUTPUT].t_setmask;
+    edtty.d_t.c_oflag &= ~ttylist[ED_IO][M_OUTPUT].t_clrmask;
+    edtty.d_t.c_oflag |=  ttylist[ED_IO][M_OUTPUT].t_setmask;
 
-    edtty.d_t.c_cflag &= ~ttylist[EDIO][M_CONTROL].t_clrmask;
-    edtty.d_t.c_cflag |=  ttylist[EDIO][M_CONTROL].t_setmask;
+    edtty.d_t.c_cflag &= ~ttylist[ED_IO][M_CONTROL].t_clrmask;
+    edtty.d_t.c_cflag |=  ttylist[ED_IO][M_CONTROL].t_setmask;
 
-    edtty.d_t.c_lflag &= ~ttylist[EDIO][M_LINED].t_clrmask;
-    edtty.d_t.c_lflag |=  ttylist[EDIO][M_LINED].t_setmask;
+    edtty.d_t.c_lflag &= ~ttylist[ED_IO][M_LINED].t_clrmask;
+    edtty.d_t.c_lflag |=  ttylist[ED_IO][M_LINED].t_setmask;
 
 
 # ifdef IRIX3_3
@@ -274,19 +291,19 @@ ed_Init()
 #else /* GSTTY */
 
     if (T_Tabs) {	/* order of &= and |= is important to XTABS */
-	edtty.d_t.sg_flags &= ~(ttylist[EDIO][M_CONTROL].t_clrmask | XTABS);
-	edtty.d_t.sg_flags |=   ttylist[EDIO][M_CONTROL].t_setmask;
+	edtty.d_t.sg_flags &= ~(ttylist[ED_IO][M_CONTROL].t_clrmask | XTABS);
+	edtty.d_t.sg_flags |=   ttylist[ED_IO][M_CONTROL].t_setmask;
     }
     else {
-	edtty.d_t.sg_flags &= ~ttylist[EDIO][M_CONTROL].t_clrmask;
-	edtty.d_t.sg_flags |= (ttylist[EDIO][M_CONTROL].t_setmask | XTABS);
+	edtty.d_t.sg_flags &= ~ttylist[ED_IO][M_CONTROL].t_clrmask;
+	edtty.d_t.sg_flags |= (ttylist[ED_IO][M_CONTROL].t_setmask | XTABS);
     }
 
-    edtty.d_lb &= ~ttylist[EDIO][M_LOCAL].t_clrmask;
-    edtty.d_lb |=  ttylist[EDIO][M_LOCAL].t_setmask;
+    edtty.d_lb &= ~ttylist[ED_IO][M_LOCAL].t_clrmask;
+    edtty.d_lb |=  ttylist[ED_IO][M_LOCAL].t_setmask;
 #endif /* POSIX || TERMIO */
 
-    tty_setchar(&edtty, ttychars[EDIO]);
+    tty_setchar(&edtty, ttychars[ED_IO]);
 }
 
 /* 
@@ -299,7 +316,7 @@ Rawmode()
 	return (0);
 
 #ifdef _IBMR2
-    tty_setdisc(SHTTY, EDIO);
+    tty_setdisc(SHTTY, ED_IO);
 #endif /* _IBMR2 */
 
     if (tty_getty(SHTTY, &tstty) == -1) {
@@ -309,19 +326,15 @@ Rawmode()
 	return(-1);
     }
 
+    /*
+     * We always keep up with the eight bit setting and the speed of the
+     * tty. But only we only believe changes that are made to cooked mode!
+     */
 #if defined(POSIX) || defined(TERMIO)
     Tty_eight_bit = tty_geteightbit(&tstty);
-    if (tstty.d_t.c_cflag != extty.d_t.c_cflag) { 
-	extty.d_t.c_cflag  = tstty.d_t.c_cflag;
-	extty.d_t.c_cflag &= ~ttylist[EXIO][M_CONTROL].t_clrmask;
-	extty.d_t.c_cflag |=  ttylist[EXIO][M_CONTROL].t_setmask;
+    T_Speed = tty_getspeed(&tstty);
 
-	edtty.d_t.c_cflag  = tstty.d_t.c_cflag;
-	edtty.d_t.c_cflag &= ~ttylist[EDIO][M_CONTROL].t_clrmask;
-	edtty.d_t.c_cflag |=  ttylist[EDIO][M_CONTROL].t_setmask;
-    }
 # ifdef POSIX
-    T_Speed = tty_getspeed(&extty);
     /*
      * Fix from: Steven (Steve) B. Green <xrsbg@charney.gsfc.nasa.gov>
      * Speed was not being set up correctly under POSIX.
@@ -333,48 +346,7 @@ Rawmode()
 	(void) cfsetospeed(&edtty.d_t, T_Speed);
     }
 # endif /* POSIX */
-
-
-    if ((tstty.d_t.c_lflag != extty.d_t.c_lflag) &&
-	(tstty.d_t.c_lflag != edtty.d_t.c_lflag)) {
-	extty.d_t.c_lflag = tstty.d_t.c_lflag;
-	extty.d_t.c_lflag &= ~ttylist[EXIO][M_LINED].t_clrmask;
-	extty.d_t.c_lflag |=  ttylist[EXIO][M_LINED].t_setmask;
-
-	edtty.d_t.c_lflag = tstty.d_t.c_lflag;
-	edtty.d_t.c_lflag &= ~ttylist[EDIO][M_LINED].t_clrmask;
-	edtty.d_t.c_lflag |=  ttylist[EDIO][M_LINED].t_setmask;
-    }
-
-    if ((tstty.d_t.c_iflag != extty.d_t.c_iflag) &&
-	(tstty.d_t.c_iflag != edtty.d_t.c_iflag)) {
-	extty.d_t.c_iflag = tstty.d_t.c_iflag;
-	extty.d_t.c_iflag &= ~ttylist[EXIO][M_INPUT].t_clrmask;
-	extty.d_t.c_iflag |=  ttylist[EXIO][M_INPUT].t_setmask;
-
-	edtty.d_t.c_iflag = tstty.d_t.c_iflag;
-	edtty.d_t.c_iflag &= ~ttylist[EDIO][M_INPUT].t_clrmask;
-	edtty.d_t.c_iflag |=  ttylist[EDIO][M_INPUT].t_setmask;
-    }
-
-    if ((tstty.d_t.c_oflag != extty.d_t.c_oflag) &&
-	(tstty.d_t.c_oflag != edtty.d_t.c_oflag)) {
-	tstty.d_t.c_oflag = tstty.d_t.c_oflag;
-	tstty.d_t.c_oflag &= ~ttylist[EXIO][M_OUTPUT].t_clrmask;
-	tstty.d_t.c_oflag |=  ttylist[EXIO][M_OUTPUT].t_setmask;
-
-	edtty.d_t.c_oflag = tstty.d_t.c_oflag;
-	edtty.d_t.c_oflag &= ~ttylist[EDIO][M_OUTPUT].t_clrmask;
-	edtty.d_t.c_oflag |=  ttylist[EDIO][M_OUTPUT].t_setmask;
-    }
-
-    if (tty_gettabs(&extty) == 0) 
-	T_Tabs = 0;
-    else 
-	T_Tabs = CanWeTab();
-
-
-#else /* GSTTY */		/* for BSD... */
+#else /* GSTTY */
 
     T_Speed = tty_getspeed(&tstty);
     Tty_eight_bit = tty_geteightbit(&tstty);
@@ -388,91 +360,145 @@ Rawmode()
 	extty.d_t.sg_ospeed = tstty.d_t.sg_ospeed;
 	edtty.d_t.sg_ospeed = tstty.d_t.sg_ospeed;
     }
+#endif /* POSIX || TERMIO */
 
-    /* If they have changed any tty settings, we have to keep up with them. */
-    /* PWP: but only believe them if changes are made to cooked mode! */
-    if (((tstty.d_t.sg_flags != extty.d_t.sg_flags) || 
-	 (tstty.d_lb != extty.d_lb)) &&
-	((tstty.d_t.sg_flags != edtty.d_t.sg_flags) || 
-	 (tstty.d_lb != edtty.d_lb)) &&
-	!(tstty.d_t.sg_flags & (RAW | CBREAK))) {
+    if (tty_cooked_mode(&tstty)) {
+#if defined(POSIX) || defined(TERMIO)
+	if (tstty.d_t.c_cflag != extty.d_t.c_cflag) { 
+	    extty.d_t.c_cflag  = tstty.d_t.c_cflag;
+	    extty.d_t.c_cflag &= ~ttylist[EX_IO][M_CONTROL].t_clrmask;
+	    extty.d_t.c_cflag |=  ttylist[EX_IO][M_CONTROL].t_setmask;
 
-	extty.d_t.sg_flags = tstty.d_t.sg_flags;
+	    edtty.d_t.c_cflag  = tstty.d_t.c_cflag;
+	    edtty.d_t.c_cflag &= ~ttylist[ED_IO][M_CONTROL].t_clrmask;
+	    edtty.d_t.c_cflag |=  ttylist[ED_IO][M_CONTROL].t_setmask;
+	}
 
-	/*
-	 * re-test for some things here (like maybe the user typed "stty -tabs"
-	 */
-	if (tty_gettabs(&extty) == 0)
+	if ((tstty.d_t.c_lflag != extty.d_t.c_lflag) &&
+	    (tstty.d_t.c_lflag != edtty.d_t.c_lflag)) {
+	    extty.d_t.c_lflag = tstty.d_t.c_lflag;
+	    extty.d_t.c_lflag &= ~ttylist[EX_IO][M_LINED].t_clrmask;
+	    extty.d_t.c_lflag |=  ttylist[EX_IO][M_LINED].t_setmask;
+
+	    edtty.d_t.c_lflag = tstty.d_t.c_lflag;
+	    edtty.d_t.c_lflag &= ~ttylist[ED_IO][M_LINED].t_clrmask;
+	    edtty.d_t.c_lflag |=  ttylist[ED_IO][M_LINED].t_setmask;
+	}
+
+	if ((tstty.d_t.c_iflag != extty.d_t.c_iflag) &&
+	    (tstty.d_t.c_iflag != edtty.d_t.c_iflag)) {
+	    extty.d_t.c_iflag = tstty.d_t.c_iflag;
+	    extty.d_t.c_iflag &= ~ttylist[EX_IO][M_INPUT].t_clrmask;
+	    extty.d_t.c_iflag |=  ttylist[EX_IO][M_INPUT].t_setmask;
+
+	    edtty.d_t.c_iflag = tstty.d_t.c_iflag;
+	    edtty.d_t.c_iflag &= ~ttylist[ED_IO][M_INPUT].t_clrmask;
+	    edtty.d_t.c_iflag |=  ttylist[ED_IO][M_INPUT].t_setmask;
+	}
+
+	if ((tstty.d_t.c_oflag != extty.d_t.c_oflag) &&
+	    (tstty.d_t.c_oflag != edtty.d_t.c_oflag)) {
+	    tstty.d_t.c_oflag = tstty.d_t.c_oflag;
+	    tstty.d_t.c_oflag &= ~ttylist[EX_IO][M_OUTPUT].t_clrmask;
+	    tstty.d_t.c_oflag |=  ttylist[EX_IO][M_OUTPUT].t_setmask;
+
+	    edtty.d_t.c_oflag = tstty.d_t.c_oflag;
+	    edtty.d_t.c_oflag &= ~ttylist[ED_IO][M_OUTPUT].t_clrmask;
+	    edtty.d_t.c_oflag |=  ttylist[ED_IO][M_OUTPUT].t_setmask;
+	}
+
+	if (tty_gettabs(&extty) == 0) 
 	    T_Tabs = 0;
 	else 
 	    T_Tabs = CanWeTab();
 
-	extty.d_t.sg_flags &= ~ttylist[EXIO][M_CONTROL].t_clrmask;
-	extty.d_t.sg_flags |=  ttylist[EXIO][M_CONTROL].t_setmask;
+#else /* GSTTY */
 
-	if (T_Tabs) 		/* order of &= and |= is important to XTABS */
-	    extty.d_t.sg_flags &= ~XTABS;
-	else 
-	    extty.d_t.sg_flags |= XTABS;
+	if (((tstty.d_t.sg_flags != extty.d_t.sg_flags) || 
+	     (tstty.d_lb != extty.d_lb)) &&
+	    ((tstty.d_t.sg_flags != edtty.d_t.sg_flags) || 
+	     (tstty.d_lb != edtty.d_lb))) {
 
-	extty.d_lb = tstty.d_lb;
-	extty.d_lb &= ~ttylist[EXIO][M_LOCAL].t_clrmask;
-	extty.d_lb |= ttylist[EXIO][M_LOCAL].t_setmask;
+	    extty.d_t.sg_flags = tstty.d_t.sg_flags;
 
-	edtty.d_t.sg_flags = extty.d_t.sg_flags;
-	if (T_Tabs) {	/* order of &= and |= is important to XTABS */
-	    edtty.d_t.sg_flags &= ~(ttylist[EDIO][M_CONTROL].t_clrmask|XTABS);
-	    edtty.d_t.sg_flags |=   ttylist[EDIO][M_CONTROL].t_setmask;
-	}
-	else {
-	    edtty.d_t.sg_flags &= ~ttylist[EDIO][M_CONTROL].t_clrmask;
-	    edtty.d_t.sg_flags |= (ttylist[EDIO][M_CONTROL].t_setmask|XTABS);
-	}
-
-	edtty.d_lb = tstty.d_lb;
-	edtty.d_lb &= ~ttylist[EDIO][M_LOCAL].t_clrmask;
-	edtty.d_lb |= ttylist[EDIO][M_LOCAL].t_setmask;
-    }
-# endif /* TERMIO || POSIX */
-    {
-	extern int didsetty;
-	int i;
-
-	tty_getchar(&tstty, ttychars[TSIO]);
-	/*
-	 * Check if the user made any changes.
-	 * If he did, then propagate the changes to the
-	 * edit and execute data structures.
-	 */
-	for (i = 0; i < C_NCC; i++)
-	    if (ttychars[TSIO][i] != ttychars[EXIO][i])
-		break;
-	    
-	if (i != C_NCC || didsetty) {
-	    didsetty = 0;
 	    /*
-	     * Propagate changes only to the unprotected chars
-	     * that have been modified just now.
+	     * re-test for some things here (like maybe the user typed 
+	     * "stty -tabs"
 	     */
-	    for (i = 0; i < C_NCC; i++) {
-		if (!((ttylist[EDIO][M_CHAR].t_setmask & C_SH(i))) &&
-		    (ttychars[TSIO][i] != ttychars[EXIO][i]))
-		    ttychars[EDIO][i] = ttychars[TSIO][i];
-		if (ttylist[EDIO][M_CHAR].t_clrmask & C_SH(i))
-		    ttychars[EDIO][i] = _POSIX_VDISABLE;
-	    }
-	    tty_setchar(&edtty, ttychars[EDIO]);
+	    if (tty_gettabs(&extty) == 0)
+		T_Tabs = 0;
+	    else 
+		T_Tabs = CanWeTab();
 
-	    for (i = 0; i < C_NCC; i++) {
-		if (!((ttylist[EXIO][M_CHAR].t_setmask & C_SH(i))) &&
-		    (ttychars[TSIO][i] != ttychars[EXIO][i]))
-		    ttychars[EXIO][i] = ttychars[TSIO][i];
-		if (ttylist[EXIO][M_CHAR].t_clrmask & C_SH(i))
-		    ttychars[EXIO][i] = _POSIX_VDISABLE;
+	    extty.d_t.sg_flags &= ~ttylist[EX_IO][M_CONTROL].t_clrmask;
+	    extty.d_t.sg_flags |=  ttylist[EX_IO][M_CONTROL].t_setmask;
+
+	    if (T_Tabs)		/* order of &= and |= is important to XTABS */
+		extty.d_t.sg_flags &= ~XTABS;
+	    else 
+		extty.d_t.sg_flags |= XTABS;
+
+	    extty.d_lb = tstty.d_lb;
+	    extty.d_lb &= ~ttylist[EX_IO][M_LOCAL].t_clrmask;
+	    extty.d_lb |= ttylist[EX_IO][M_LOCAL].t_setmask;
+
+	    edtty.d_t.sg_flags = extty.d_t.sg_flags;
+	    if (T_Tabs) {	/* order of &= and |= is important to XTABS */
+		edtty.d_t.sg_flags &= 
+			~(ttylist[ED_IO][M_CONTROL].t_clrmask|XTABS);
+		edtty.d_t.sg_flags |=   ttylist[ED_IO][M_CONTROL].t_setmask;
 	    }
-	    tty_setchar(&extty, ttychars[EXIO]);
+	    else {
+		edtty.d_t.sg_flags &= ~ttylist[ED_IO][M_CONTROL].t_clrmask;
+		edtty.d_t.sg_flags |= 
+			(ttylist[ED_IO][M_CONTROL].t_setmask|XTABS);
+	    }
+
+	    edtty.d_lb = tstty.d_lb;
+	    edtty.d_lb &= ~ttylist[ED_IO][M_LOCAL].t_clrmask;
+	    edtty.d_lb |= ttylist[ED_IO][M_LOCAL].t_setmask;
 	}
+# endif /* TERMIO || POSIX */
+	{
+	    extern int didsetty;
+	    int i;
 
+	    tty_getchar(&tstty, ttychars[TS_IO]);
+	    /*
+	     * Check if the user made any changes.
+	     * If he did, then propagate the changes to the
+	     * edit and execute data structures.
+	     */
+	    for (i = 0; i < C_NCC; i++)
+		if (ttychars[TS_IO][i] != ttychars[EX_IO][i])
+		    break;
+		
+	    if (i != C_NCC || didsetty) {
+		didsetty = 0;
+		/*
+		 * Propagate changes only to the unprotected chars
+		 * that have been modified just now.
+		 */
+		for (i = 0; i < C_NCC; i++) {
+		    if (!((ttylist[ED_IO][M_CHAR].t_setmask & C_SH(i))) &&
+			(ttychars[TS_IO][i] != ttychars[EX_IO][i]))
+			ttychars[ED_IO][i] = ttychars[TS_IO][i];
+		    if (ttylist[ED_IO][M_CHAR].t_clrmask & C_SH(i))
+			ttychars[ED_IO][i] = _POSIX_VDISABLE;
+		}
+		tty_setchar(&edtty, ttychars[ED_IO]);
+
+		for (i = 0; i < C_NCC; i++) {
+		    if (!((ttylist[EX_IO][M_CHAR].t_setmask & C_SH(i))) &&
+			(ttychars[TS_IO][i] != ttychars[EX_IO][i]))
+			ttychars[EX_IO][i] = ttychars[TS_IO][i];
+		    if (ttylist[EX_IO][M_CHAR].t_clrmask & C_SH(i))
+			ttychars[EX_IO][i] = _POSIX_VDISABLE;
+		}
+		tty_setchar(&extty, ttychars[EX_IO]);
+	    }
+
+	}
     }
     if (tty_setty(SHTTY, &edtty) == -1) {
 #ifdef DEBUG_TTY
@@ -491,7 +517,7 @@ Cookedmode()
     sigret_t(*orig_intr) ();
 
 #ifdef _IBMR2
-    tty_setdisc(SHTTY, EXIO);
+    tty_setdisc(SHTTY, EX_IO);
 #endif /* _IBMR2 */
 
     if (!Tty_raw_mode)
@@ -585,22 +611,22 @@ QuoteModeOn()
     qutty = edtty;
 
 #if defined(TERMIO) || defined(POSIX)
-    qutty.d_t.c_iflag &= ~ttylist[QUIO][M_INPUT].t_clrmask;
-    qutty.d_t.c_iflag |=  ttylist[QUIO][M_INPUT].t_setmask;
+    qutty.d_t.c_iflag &= ~ttylist[QU_IO][M_INPUT].t_clrmask;
+    qutty.d_t.c_iflag |=  ttylist[QU_IO][M_INPUT].t_setmask;
 
-    qutty.d_t.c_oflag &= ~ttylist[QUIO][M_OUTPUT].t_clrmask;
-    qutty.d_t.c_oflag |=  ttylist[QUIO][M_OUTPUT].t_setmask;
+    qutty.d_t.c_oflag &= ~ttylist[QU_IO][M_OUTPUT].t_clrmask;
+    qutty.d_t.c_oflag |=  ttylist[QU_IO][M_OUTPUT].t_setmask;
 
-    qutty.d_t.c_cflag &= ~ttylist[QUIO][M_CONTROL].t_clrmask;
-    qutty.d_t.c_cflag |=  ttylist[QUIO][M_CONTROL].t_setmask;
+    qutty.d_t.c_cflag &= ~ttylist[QU_IO][M_CONTROL].t_clrmask;
+    qutty.d_t.c_cflag |=  ttylist[QU_IO][M_CONTROL].t_setmask;
 
-    qutty.d_t.c_lflag &= ~ttylist[QUIO][M_LINED].t_clrmask;
-    qutty.d_t.c_lflag |=  ttylist[QUIO][M_LINED].t_setmask;
+    qutty.d_t.c_lflag &= ~ttylist[QU_IO][M_LINED].t_clrmask;
+    qutty.d_t.c_lflag |=  ttylist[QU_IO][M_LINED].t_setmask;
 #else /* GSTTY */
-    qutty.d_t.sg_flags &= ~ttylist[QUIO][M_CONTROL].t_clrmask;
-    qutty.d_t.sg_flags |= ttylist[QUIO][M_CONTROL].t_setmask;
-    qutty.d_lb &= ~ttylist[QUIO][M_LOCAL].t_clrmask;
-    qutty.d_lb |= ttylist[QUIO][M_LOCAL].t_setmask;
+    qutty.d_t.sg_flags &= ~ttylist[QU_IO][M_CONTROL].t_clrmask;
+    qutty.d_t.sg_flags |= ttylist[QU_IO][M_CONTROL].t_setmask;
+    qutty.d_lb &= ~ttylist[QU_IO][M_LOCAL].t_clrmask;
+    qutty.d_lb |= ttylist[QU_IO][M_LOCAL].t_setmask;
 
 #endif /* TERMIO || POSIX */
     if (tty_setty(SHTTY, &qutty) == -1) {

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.14 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.15 1991/10/18 16:27:13 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -44,6 +44,14 @@
  */
 # define BACKPIPE
 #endif /* SVID > 3 */
+
+
+#if SVID > 0 && SVID < 3 && !defined(BSDSIGS)
+/*
+ * If we have unreliable signals...
+ */
+# define UNRELSIG
+#endif /* SVID > 0 && SVID < 3 && !BSDSIGS */
 
 #ifdef OREO
 # include <sys/time.h>
@@ -271,18 +279,13 @@ struct ucred {
 # if !defined(_AIX370) && !defined(_AIXPS2)
 #  define setpgid(pid, pgrp)	setpgrp(pid, pgrp)
 # endif /* !_AIX370 && !_AIXPS2 */
-# define tcsetpgrp(fd, pgrp)	ioctl((fd), TIOCSPGRP, (ioctl_t) &(pgrp))
 # define NEEDtcgetpgrp
 #endif /* BSDJOBS && !(POSIX && POSIXJOBS) */
 
 #ifdef notdef /* RENO */
 /*
  * Older versions of RENO had this broken. It is fixed now. 
- * In any case, we cannot use ours. The problem is that ansi
- * headers define tcgetpgrp(int, pid_t) and this screws up
- * argument passing
  */
-# define tcsetpgrp(fd, pgrp)	ioctl((fd), TIOCSPGRP, (ioctl_t) &(pgrp))
 # define NEEDtcgetpgrp
 #endif /* notdef */ /* RENO */
 

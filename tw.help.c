@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tw.help.c,v 1.3 91/09/24 17:12:01 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.help.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.help.c,v 3.2 1991/09/08 00:45:32 christos Exp $")
+RCSID("$Id: tw.help.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 
 #include "tw.h"
 #include "tc.h"
@@ -142,9 +142,10 @@ static  sigret_t
 cleanf(snum)
 int snum;
 {
-#if (SVID > 0) && (SVID < 3)
-    (void) sigset(SIGINT, cleanf);
-#endif /* SVID > 0 && SVID < 3 */
+#ifdef UNRELSIGS
+    if (snum)
+	(void) sigset(SIGINT, cleanf);
+#endif /* UNRELSIGS */
     if (f != -1)
 	(void) close(f);
     f = -1;

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.5 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.6 1991/10/12 04:23:51 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -73,7 +73,7 @@ extern KEYCMD CcViMap[];	/* keymap table for Vi input mode defaults */
 extern KEYCMD CcViCmdMap[];	/* for Vi command mode defaults */
 extern struct KeyFuncs FuncNames[];	/* string names vs. CcFuncTbl indices */
 
-EXTERN KEYCMD NumFuns;		/* number of KEYCMDs in above table */
+extern KEYCMD NumFuns;		/* number of KEYCMDs in above table */
 
 #define	CC_ERROR		100	/* there should NOT be 100 different... */
 #define CC_FATAL		101	/* fatal error: inconsistant, must
@@ -192,11 +192,11 @@ typedef struct {
 #endif /* TIOCGLTC */
 } ttydata_t;
 
-#define EXIO	0	/* while we are executing	*/
-#define EDIO	1	/* while we are editing		*/
-#define TSIO	2	/* new mode from terminal	*/
-#define QUIO	2	/* used only for quoted chars	*/
-#define NNIO	3	/* The number of entries	*/
+#define EX_IO	0	/* while we are executing	*/
+#define ED_IO	1	/* while we are editing		*/
+#define TS_IO	2	/* new mode from terminal	*/
+#define QU_IO	2	/* used only for quoted chars	*/
+#define NN_IO	3	/* The number of entries	*/
 
 #if defined(POSIX) || defined(TERMIO)
 # define M_INPUT	0
@@ -215,7 +215,7 @@ typedef struct {
     char *t_name;
     int  t_setmask;
     int  t_clrmask;
-} ttyperm_t[NNIO][M_NN];
+} ttyperm_t[NN_IO][M_NN];
 
 extern ttyperm_t ttylist;
 #include "ed.decls.h"

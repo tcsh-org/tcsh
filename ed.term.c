@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.c,v 1.1 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.c,v 1.2 1991/10/13 23:44:48 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.1 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.2 1991/10/13 23:44:48 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -494,7 +494,7 @@ static struct tcshmodes {
     { "pgoff",		C_SH(C_PGOFF), 	M_CHAR },
 # endif /* VPGOFF */
 # if defined(VBRK) || defined(TIOCGETC)
-    { "min",		C_SH(C_BRK), 	M_CHAR },
+    { "brk",		C_SH(C_BRK), 	M_CHAR },
 # endif /* VBRK */
 # if defined(VMIN)
     { "min",		C_SH(C_MIN), 	M_CHAR },
@@ -514,7 +514,7 @@ dosetty(v, t)
     char x, *d;
     int aflag = 0;
     Char *s;
-    int z = EXIO;
+    int z = EX_IO;
     char cmdname[BUFSIZ];
 
     setname(strcpy(cmdname, short2str(*v++)));
@@ -527,15 +527,15 @@ dosetty(v, t)
 	    break;
 	case 'd':
 	    v++;
-	    z = EDIO;
+	    z = ED_IO;
 	    break;
 	case 'x':
 	    v++;
-	    z = EXIO;
+	    z = EX_IO;
 	    break;
 	case 'q':
 	    v++;
-	    z = QUIO;
+	    z = QU_IO;
 	    break;
 	default:
 	    stderror(ERR_NAME | ERR_SYSTEM, short2str(v[0]), 
@@ -1001,6 +1001,16 @@ tty_geteightbit(td)
 #endif /* POSIX || TERMIO */
 } /* end tty_geteightbit */
 
+int
+tty_cooked_mode(td)
+    ttydata_t *td;
+{
+#if defined(POSIX) || defined(TERMIO)
+    return (td->d_t.c_lflag & ICANON);
+#else /* SGTTY */
+    return !(td->d_t.sg_flags & (RAW | CBREAK));
+#endif /* POSIX || TERMIO */
+} /* end tty_cooked_mode */
 
 #ifdef _IBMR2
 void
@@ -1013,7 +1023,7 @@ tty_setdisc(fd, dis)
     extern char strPOSIX[];
 
     switch (dis) {
-    case EXIO:
+    case EX_IO:
 	if (edit_discipline) {
 	    if (ioctl(fd, TXSETLD, (ioctl_t) & tx_disc) == -1)
 		return;
@@ -1021,7 +1031,7 @@ tty_setdisc(fd, dis)
 	}
 	return;
 
-    case EDIO:
+    case ED_IO:
 	tx_disc.tx_which = 0;
 	if (ioctl(fd, TXGETLD, (ioctl_t) & tx_disc) == -1)
 	    return;

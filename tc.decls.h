@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.4 1991/08/05 23:02:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.5 1991/09/08 00:45:32 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -124,7 +124,9 @@ extern	void	 	  pr_stat_sub	__P((struct process_stats *,
 #endif
 #ifdef NEEDtcgetpgrp
 extern	int	 	  xtcgetpgrp	__P((int));
-#define tcgetpgrp(a) xtcgetpgrp(a)
+extern	int		  xtcsetpgrp	__P((int, int));
+# define tcgetpgrp(a) 	  xtcgetpgrp(a)
+# define tcsetpgrp(a, b)  xtcsetpgrp(a, b)
 #endif
 #ifdef YPBUGS
 extern	void	 	  fix_yp_bugs	__P((void));

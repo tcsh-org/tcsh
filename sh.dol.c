@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.4 1991/10/18 16:27:13 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.4 1991/10/18 16:27:13 christos Exp $")
 
 /*
  * C shell
@@ -418,7 +418,7 @@ Dgetdol()
 	    stderror(ERR_SYNTAX);
 	if (backpid != 0) {
 	    if (dolbang) 
-		xfree((pid_t) dolbang);
+		xfree((ptr_t) dolbang);
 	    setDolp(dolbang = putn(backpid));
 	}
 	goto eatbrac;

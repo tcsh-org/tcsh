@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.15 1991/10/14 20:42:30 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.16 1991/10/18 16:27:13 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -41,15 +41,14 @@
 easily confused. */
 
 #ifndef CONFIGH
-# include "config.h"
-  /* Hack to make old pre-processors happy... */
-# define CONFIGH "/dev/null"
+# define CONFIGH "config.h"
 #endif
 
-#ifdef CONFIGH
-# include CONFIGH
-#endif
+#include CONFIGH
 
+#ifndef EXTERN
+# define EXTERN extern
+#endif /* EXTERN */
 /*
  * Sanity
  */
@@ -157,18 +156,8 @@ typedef int sigret_t;
 
 #ifndef POSIX
 # ifdef TERMIO
-#  ifdef _IBMR2
- /* Aix redefines NOFLSH when _BSD_INCLUDES is defined! */
-#   undef _BSD
-#   undef _BSD_INCLUDES
-#  endif /* _IBMR2 */
 #  include <termio.h>
-#  ifdef _IBMR2
- /* but we need it.  */
-#   define _BSD
-#   define _BSD_INCLUDES
-#  endif /* _IBMR2 */
-# else
+# else /* SGTTY */
 #  include <sgtty.h>
 # endif /* TERMIO */
 #else /* POSIX */
@@ -207,11 +196,11 @@ extern int setpgrp();
 # include <limits.h>
 #endif /* POSIX */
 
-#if SVID > 0 || __STDC__
+#if SVID > 0 || defined(_IBMR2)
 # if !defined(pyr) || !defined(aiws)
 #  include <time.h>
 # endif /* !aiws || !pyr */
-#endif /* SVID > 0 || __STDC__ */
+#endif /* SVID > 0 ||  _IBMR2 */
 
 #if !(defined(sun) && defined(TERMIO))
 # include <sys/ioctl.h>
@@ -366,68 +355,68 @@ extern void		DebugFree	__P((ptr_t, char *, int));
 /*
  * Global flags
  */
-bool    chkstop;		/* Warned of stopped jobs... allow exit */
+EXTERN bool    chkstop;		/* Warned of stopped jobs... allow exit */
 
 #ifndef FIOCLEX
-bool    didcch;			/* Have closed unused fd's for child */
+EXTERN bool    didcch;		/* Have closed unused fd's for child */
 #endif 
 
-bool    didfds;			/* Have setup i/o fd's for child */
-bool    doneinp;		/* EOF indicator after reset from readc */
-bool    exiterr;		/* Exit if error or non-zero exit status */
-bool    child;			/* Child shell ... errors cause exit */
-bool    haderr;			/* Reset was because of an error */
-bool    intty;			/* Input is a tty */
-bool    intact;			/* We are interactive... therefore prompt */
-bool    justpr;			/* Just print because of :p hist mod */
-bool    loginsh;		/* We are a loginsh -> .login/.logout */
-bool    neednote;		/* Need to pnotify() */
-bool    noexec;			/* Don't execute, just syntax check */
-bool    pjobs;			/* want to print jobs if interrupted */
-bool    setintr;		/* Set interrupts on/off -> Wait intr... */
-bool    timflg;			/* Time the next waited for command */
-bool    havhash;		/* path hashing is available */
-bool    editing;		/* doing filename expansion and line editing */
-bool    bslash_quote;		/* PWP: tcsh-style quoting?  (in sh.c) */
-bool    isoutatty;		/* is SHOUT a tty */
-bool    isdiagatty;		/* is SHDIAG a tty */
-bool    is1atty;		/* is file descriptor 1 a tty (didfds mode) */
-bool    is2atty;		/* is file descriptor 2 a tty (didfds mode) */
+EXTERN bool    didfds;		/* Have setup i/o fd's for child */
+EXTERN bool    doneinp;		/* EOF indicator after reset from readc */
+EXTERN bool    exiterr;		/* Exit if error or non-zero exit status */
+EXTERN bool    child;		/* Child shell ... errors cause exit */
+EXTERN bool    haderr;		/* Reset was because of an error */
+EXTERN bool    intty;		/* Input is a tty */
+EXTERN bool    intact;		/* We are interactive... therefore prompt */
+EXTERN bool    justpr;		/* Just print because of :p hist mod */
+EXTERN bool    loginsh;		/* We are a loginsh -> .login/.logout */
+EXTERN bool    neednote;	/* Need to pnotify() */
+EXTERN bool    noexec;		/* Don't execute, just syntax check */
+EXTERN bool    pjobs;		/* want to print jobs if interrupted */
+EXTERN bool    setintr;		/* Set interrupts on/off -> Wait intr... */
+EXTERN bool    timflg;		/* Time the next waited for command */
+EXTERN bool    havhash;		/* path hashing is available */
+EXTERN bool    editing;		/* doing filename expansion and line editing */
+EXTERN bool    bslash_quote;	/* PWP: tcsh-style quoting?  (in sh.c) */
+EXTERN bool    isoutatty;	/* is SHOUT a tty */
+EXTERN bool    isdiagatty;	/* is SHDIAG a tty */
+EXTERN bool    is1atty;		/* is file descriptor 1 a tty (didfds mode) */
+EXTERN bool    is2atty;		/* is file descriptor 2 a tty (didfds mode) */
 
 /*
  * Global i/o info
  */
-Char   *arginp;			/* Argument input for sh -c and internal `xx` */
-int     onelflg;		/* 2 -> need line for -t, 1 -> exit on read */
-Char   *ffile;			/* Name of shell file for $0 */
+EXTERN Char   *arginp;		/* Argument input for sh -c and internal `xx` */
+EXTERN int     onelflg;		/* 2 -> need line for -t, 1 -> exit on read */
+EXTERN Char   *ffile;		/* Name of shell file for $0 */
 
 extern char *seterr;		/* Error message from scanner/parser */
 extern int errno;		/* Error from C library routines */
-Char   *shtemp;			/* Temp name for << shell files in /tmp */
+EXTERN Char   *shtemp;		/* Temp name for << shell files in /tmp */
 
 #ifdef BSDTIMES
-struct timeval time0;		/* Time at which the shell started */
-struct rusage ru0;
+EXTERN struct timeval time0;	/* Time at which the shell started */
+EXTERN struct rusage ru0;
 #else
 # ifdef _SEQUENT_
-timeval_t time0;		/* Time at which the shell started */
-struct process_stats ru0;
-# else				/* _SEQUENT_ */
+EXTERN timeval_t time0;		/* Time at which the shell started */
+EXTERN struct process_stats ru0;
+# else /* _SEQUENT_ */
 #  ifndef POSIX
-time_t  time0;			/* time at which shell started */
-#  else				/* POSIX */
-clock_t time0;			/* time at which shell started */
+EXTERN time_t  time0;		/* time at which shell started */
+#  else	/* POSIX */
+EXTERN clock_t time0;		/* time at which shell started */
 #  endif /* POSIX */
-struct tms shtimes;		/* shell and child times for process timing */
+EXTERN struct tms shtimes;	/* shell and child times for process timing */
 # endif /* _SEQUENT_ */
 #endif /* BSDTIMES */
 
 /*
  * Miscellany
  */
-Char   *doldol;			/* Character pid for $$ */
-int	backpid;		/* pid of the last background job */
-time_t  chktim;			/* Time mail last checked */
+EXTERN Char   *doldol;		/* Character pid for $$ */
+EXTERN int     backpid;		/* pid of the last background job */
+EXTERN time_t  chktim;		/* Time mail last checked */
 
 /*
  * Ideally these should be uid_t, gid_t, pid_t. I cannot do that right now
@@ -435,14 +424,14 @@ time_t  chktim;			/* Time mail last checked */
  * uid_t and gid_t are not defined in all the systems so I would have to
  * make special cases for them. In the future...
  */
-int     uid;			/* Invokers uid */
-int     gid;			/* Invokers gid */
-int     opgrp,			/* Initial pgrp and tty pgrp */
-        shpgrp,			/* Pgrp of shell */
-        tpgrp;			/* Terminal process group */
+EXTERN int     uid;		/* Invokers uid */
+EXTERN int     gid;		/* Invokers gid */
+EXTERN int     opgrp,		/* Initial pgrp and tty pgrp */
+               shpgrp,		/* Pgrp of shell */
+               tpgrp;		/* Terminal process group */
 				/* If tpgrp is -1, leave tty alone! */
 
-Char    PromptBuf[256];		/* buffer for the actual printed prompt. this
+EXTERN Char    PromptBuf[256];	/* buffer for the actual printed prompt. this
 				 * is used in tenex.c and sh.c for pegets.c */
 
 /*
@@ -453,10 +442,10 @@ Char    PromptBuf[256];		/* buffer for the actual printed prompt. this
  * The desired initial values for these descriptors are defined in
  * sh.local.h.
  */
-int   SHIN;			/* Current shell input (script) */
-int   SHOUT;			/* Shell output */
-int   SHDIAG;			/* Diagnostic output... shell errs go here */
-int   OLDSTD;			/* Old standard input (def for cmds) */
+EXTERN int   SHIN;		/* Current shell input (script) */
+EXTERN int   SHOUT;		/* Shell output */
+EXTERN int   SHDIAG;		/* Diagnostic output... shell errs go here */
+EXTERN int   OLDSTD;		/* Old standard input (def for cmds) */
 
 /*
  * Error control
@@ -475,10 +464,10 @@ extern jmp_buf reslab;
 #define	getexit(a)	copy((char *)(a), (char *)reslab, sizeof reslab)
 #define	resexit(a)	copy((char *)reslab, ((char *)(a)), sizeof reslab)
 
-Char   *gointr;			/* Label for an onintr transfer */
+EXTERN Char   *gointr;		/* Label for an onintr transfer */
 
-sigret_t (*parintr) ();		/* Parents interrupt catch */
-sigret_t (*parterm) ();		/* Parents terminate catch */
+EXTERN sigret_t (*parintr) ();	/* Parents interrupt catch */
+EXTERN sigret_t (*parterm) ();	/* Parents terminate catch */
 
 /*
  * Lexical definitions.
@@ -509,7 +498,7 @@ sigret_t (*parterm) ();		/* Parents terminate catch */
 # define	CHAR		0000177	/* Mask to mask out the character */
 #endif 
 
-int     AsciiOnly;		/* If set only 7 bits expected in characters */
+EXTERN int     AsciiOnly;	/* If set only 7 bits expected in characters */
 
 /*
  * Each level of input has a buffered input structure.
@@ -518,7 +507,7 @@ int     AsciiOnly;		/* If set only 7 bits expected in characters */
  * In other cases, the shell buffers enough blocks to keep all loops
  * in the buffer.
  */
-struct Bin {
+EXTERN struct Bin {
     off_t   Bfseekp;		/* Seek pointer */
     off_t   Bfbobp;		/* Seekp of beginning of buffers */
     off_t   Bfeobp;		/* Seekp of end of buffers */
@@ -555,9 +544,9 @@ extern int aret;		/* Type of last char returned */
  * For whiles, in particular, it reseeks to the beginning of the
  * line the while was on; hence the while placement restrictions.
  */
-struct Ain lineloc;
+EXTERN struct Ain lineloc;
 
-bool    cantell;		/* Is current source tellable ? */
+EXTERN bool    cantell;		/* Is current source tellable ? */
 
 /*
  * Input lines are parsed into doubly linked circular
@@ -589,7 +578,7 @@ struct wordent {
  * process id's from `$$', and modified variable values (from qualifiers
  * during expansion in sh.dol.c) here.
  */
-Char   *lap;
+EXTERN Char   *lap;
 
 /*
  * Parser structure
@@ -697,7 +686,7 @@ extern int nsrchn;
  * source level.  Loops are implemented by seeking back in the
  * input.  For foreach (fe), the word list is attached here.
  */
-struct whyle {
+EXTERN struct whyle {
     struct Ain   w_start;	/* Point to restart loop */
     struct Ain   w_end;		/* End of loop (0 if unknown) */
     Char  **w_fe, **w_fe0;	/* Current/initial wordlist for fe */
@@ -710,7 +699,7 @@ struct whyle {
  *
  * Aliases and variables are stored in AVL balanced binary trees.
  */
-struct varent {
+EXTERN struct varent {
     Char  **vec;		/* Array of words which is the value */
     Char   *v_name;		/* Name of variable/alias */
     struct varent *v_link[3];	/* The links, see below */
@@ -721,7 +710,7 @@ struct varent {
 #define v_right		v_link[1]
 #define v_parent	v_link[2]
 
-struct varent *adrof1();
+extern struct varent *adrof1();
 
 #define adrof(v)	adrof1(v, &shvhed)
 #define value(v)	value1(v, &shvhed)
@@ -730,14 +719,14 @@ struct varent *adrof1();
  * The following are for interfacing redo substitution in
  * aliases to the lexical routines.
  */
-struct wordent *alhistp;	/* Argument list (first) */
-struct wordent *alhistt;	/* Node after last in arg list */
-Char  **alvec;			/* The (remnants of) alias vector */
+EXTERN struct wordent *alhistp;	/* Argument list (first) */
+EXTERN struct wordent *alhistt;	/* Node after last in arg list */
+EXTERN Char  **alvec;		/* The (remnants of) alias vector */
 
 /*
  * Filename/command name expansion variables
  */
-int   gflag;			/* After tglob -> is globbing needed? */
+EXTERN int   gflag;		/* After tglob -> is globbing needed? */
 
 #define MAXVARLEN 30		/* Maximum number of char in a variable name */
 
@@ -760,9 +749,9 @@ extern long gargc;		/* Number args in gargv */
  */
 extern Char **pargv;		/* Pointer to the argv list space */
 extern long pargc;		/* Count of arguments in pargv */
-Char   *pargs;			/* Pointer to start current word */
-long    pnleft;			/* Number of chars left in pargs */
-Char   *pargcp;			/* Current index into pargs */
+EXTERN Char   *pargs;		/* Pointer to start current word */
+EXTERN long    pnleft;		/* Number of chars left in pargs */
+EXTERN Char   *pargcp;		/* Current index into pargs */
 
 /*
  * History list
@@ -775,7 +764,7 @@ Char   *pargcp;			/* Current index into pargs */
  * when history substitution includes modifiers, and thrown away
  * at the next discarding since their event numbers are very negative.
  */
-struct Hist {
+EXTERN struct Hist {
     struct wordent Hlex;
     int     Hnum;
     int     Href;
@@ -784,12 +773,12 @@ struct Hist {
     struct Hist *Hnext;
 }       Histlist;
 
-struct wordent paraml;		/* Current lexical word list */
-int     eventno;		/* Next events number */
-int     lastev;			/* Last event reference (default) */
+EXTERN struct wordent paraml;	/* Current lexical word list */
+EXTERN int     eventno;		/* Next events number */
+EXTERN int     lastev;		/* Last event reference (default) */
 
-Char    HIST;			/* history invocation character */
-Char    HISTSUB;		/* auto-substitute character */
+EXTERN Char    HIST;		/* history invocation character */
+EXTERN Char    HISTSUB;		/* auto-substitute character */
 
 /*
  * To print system call errors...
@@ -847,20 +836,19 @@ extern int errno, sys_nerr;
 /*
  * setname is a macro to save space (see sh.err.c)
  */
-char   *bname;
+EXTERN char   *bname;
 
 #define	setname(a)	(bname = (a))
 
 #ifdef VFORK
-Char   *Vsav;
-Char   *Vdp;
-Char   *Vexpath;
-char  **Vt;
-
+EXTERN Char   *Vsav;
+EXTERN Char   *Vdp;
+EXTERN Char   *Vexpath;
+EXTERN char  **Vt;
 #endif /* VFORK */
 
-Char  **evalvec;
-Char   *evalp;
+EXTERN Char  **evalvec;
+EXTERN Char   *evalp;
 
 extern struct mesg {
     char   *iname;		/* name from /usr/include */
@@ -870,17 +858,17 @@ extern struct mesg {
 /* word_chars is set by default to WORD_CHARS but can be overridden by
    the worchars variable--if unset, reverts to WORD_CHARS */
 
-Char   *word_chars;
+EXTERN Char   *word_chars;
 
 #define WORD_CHARS "*?_-.[]~="	/* default chars besides alnums in words */
 
-Char   *STR_SHELLPATH;
+EXTERN Char   *STR_SHELLPATH;
 
 #ifdef _PATH_BSHELL
-Char   *STR_BSHELL;
+EXTERN Char   *STR_BSHELL;
 #endif 
-Char   *STR_WORD_CHARS;
-Char  **STR_environ;
+EXTERN Char   *STR_WORD_CHARS;
+EXTERN Char  **STR_environ;
 
 #include "tc.h"
 #include "sh.decls.h"

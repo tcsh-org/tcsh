@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.12 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.13 1991/10/18 16:27:13 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.12 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.13 1991/10/18 16:27:13 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -240,11 +240,11 @@ loop:
 	(setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), 0);
 # endif /* aiws */
 # ifndef HAVEwait
-#  if SVID < 3 && !defined(BSDSIGS)
+#  ifdef UNRELSIGS
     /* no wait3, therefore no rusage */
     /* on Sys V, this may hang.  I hope it's not going to be a problem */
     pid = ourwait(&w.w_status);
-#  else	/* SVID >= 3 && !defined(BSDSIGS) */
+#  else	/* UNRELSIGS */
     /* 
      * XXX: for greater than 3 we should use waitpid(). 
      * but then again, SVR4 falls into the POSIX/BSDJOBS category.
@@ -520,9 +520,9 @@ pjwait(pp)
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif /* BSDSIGS */
-#if (SVID > 0) && (SVID < 3)
+#ifdef UNRELSIGS
     sigret_t (*inthandler)();
-#endif /* (SVID > 0) && (SVID < 3) */
+#endif /* UNRELSIGS */
 
     while (pp->p_pid != pp->p_jobid)
 	pp = pp->p_friends;
@@ -540,10 +540,10 @@ pjwait(pp)
 #ifdef BSDSIGS
     omask = sigblock(sigmask(SIGCHLD));
 #endif /* BSDSIGS */
-#if (SVID > 0) && (SVID < 3)
+#ifdef UNRELSIGS
     if (setintr)
         inthandler = signal(SIGINT, SIG_IGN);
-#endif /* (SVID > 0) && (SVID < 3) */
+#endif /* UNRELSIGS */
     for (;;) {
 #ifndef BSDSIGS
 	(void) sighold(SIGCHLD);
@@ -569,10 +569,10 @@ pjwait(pp)
 #else /* !BSDSIGS */
     (void) sigrelse(SIGCHLD);
 #endif /* !BSDSIGS */
-#if (SVID > 0) && (SVID < 3)
+#ifdef UNRELSIGS
     if (setintr)
         (void) signal(SIGINT, inthandler);
-#endif /* (SVID > 0) && (SVID < 3) */
+#endif /* UNRELSIGS */
 #ifdef BSDJOBS
     if (tpgrp > 0)		/* get tty back */
 	(void) tcsetpgrp(FSHTTY, tpgrp);

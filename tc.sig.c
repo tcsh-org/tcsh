@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.sig.c,v 1.3 91/09/24 17:11:34 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.c,v 3.4 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.3 1991/08/06 01:49:53 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.4 1991/10/12 04:23:51 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -54,7 +54,7 @@ static struct mysigstack {
 static int stk_ptr = -1;
 
 
-#if SVID < 3 || defined(UNIXPC)
+#ifdef UNRELSIGS
 /* queue child signals
  */
 static sigret_t
@@ -166,7 +166,7 @@ sigpause(what)
 
 }
 
-#endif /* SVID < 3 || (UNIXPC) */
+#endif /* UNRELSIGS */
 
 #ifdef SXA
 /*

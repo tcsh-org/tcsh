@@ -61,7 +61,6 @@ OS	:	bsd4.3
 CONFIG	:	config.bsd 
 ENVIRON	:	n/a
 NOTES	:	cc broken: typedef void sigret_t;
-NOTES	:	time.h is broken for ansi compilers. Use gcc -traditional
 VERSION	:	6.00.00
 
 VENDOR	:	digital
@@ -73,7 +72,6 @@ OS	:	mtXinu 4.3
 CONFIG	:	config.mtxinu 
 ENVIRON	:	n/a
 NOTES	:	cc broken: typedef void sigret_t;
-NOTES	:	time.h is broken for ansi compilers. Use gcc -traditional
 VERSION	:	6.00.00
 
 VENDOR	:	digital
@@ -191,7 +189,6 @@ OS	:	MORE/bsd 4.3+
 CONFIG	:	config.mtxinu
 ENVIRON	:	n/a
 NOTES	:	none
-NOTES	:	time.h is broken for ansi compilers. Use gcc -traditional
 VERSION	:	6.00.02
 
 VENDOR	:	digital
@@ -219,15 +216,15 @@ NOTES	:	none
 VERSION	:	6.00.01
 
 VENDOR	:	pyramid
-MODELS	:	?
+MODELS	:	MIS4/2T 
 COMPILER:	cc
 CFLAGS	:	-I. -O -DBSD
 LIBES	:	-ltermcap
-OS	:	?
+OS	:	OSx5.1
 CONFIG	:	config.bsd
 ENVIRON	:	n/a
 NOTES	:	none
-VERSION	:	6.00.01
+VERSION	:	6.00.02
 
 VENDOR	:	alliant
 MODELS	:	FX/8X series
@@ -309,8 +306,7 @@ VERSION :       6.00.03
 VENDOR	:	SGI
 MODELS	:	4D, 3000
 COMPILER:	cc
-CFLAGS	:	-D__STDC__ (??? through 3.3.x)
-CFLAGS	:	-D__STDC__ -cckr (>= 4.0)
+CFLAGS	:	-D__STDC__
 LIBES	:	-lcurses -lsun -lbsd -lc_s
 OS	:	IRIX (3.?) 3.2 3.3 4.0
 CONFIG	:	config.sgi
