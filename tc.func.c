@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.68 1996/06/22 21:44:44 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.69 1996/09/24 16:57:29 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.68 1996/06/22 21:44:44 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.69 1996/09/24 16:57:29 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -474,6 +474,7 @@ dowhich(v, c)
     register Char **v;
     struct command *c;
 {
+    int rv = TRUE;
     USE(c);
 
 #ifdef notdef
@@ -495,7 +496,10 @@ dowhich(v, c)
 #endif
 
     while (*++v) 
-	(void) cmd_expand(*v, NULL);
+	rv &= cmd_expand(*v, NULL);
+
+    if (!rv)
+	set(STRstatus, Strsave(STR1), VAR_READWRITE);
 
 #ifdef notdef
     /* Again look at the comment above; since we don't glob, we don't free */

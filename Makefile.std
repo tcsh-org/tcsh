@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.80 1996/06/22 21:44:14 christos Exp $
+# $Id: Makefile.std,v 1.81 1996/09/24 16:57:17 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -236,6 +236,7 @@ EXTRALIBS = $(HESLIB) $(AFSLIB)
 # on the suns does not know how to make dynamically linked binaries.
 CC=	gcc -Wall -pipe -B/bin/	# -ansi -pedantic
 #CC=	gcc -m486 -pipe -Wall # Generate code for Intel 486 (linux)
+#CC=	shlicc 	# BSDI2.1 w/ shared libraries
 #CC=	cc
 #CC=	occ
 #CC=	acc
@@ -259,6 +260,7 @@ PARALLEL=12				# Make the multi-max run fast.
 #P=&					# Use Sequent's parallel make
 P=
 DESTDIR=/usr/local
+#DESTDIR=/usr/contrib
 MANSECT=1
 DESTBIN=${DESTDIR}/bin
 DESTMAN=${DESTDIR}/man/man${MANSECT}

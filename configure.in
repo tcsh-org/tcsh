@@ -129,8 +129,11 @@ if test $ac_cv_prog_gcc = no ; then
 fi
 
 AC_CHECK_LIB(termlib, tgetent)
+if test $ac_cv_lib_termlib_tgetent = no ; then
+  AC_CHECK_LIB(curses, tgetent)
+fi
 AC_CHECK_LIB(socket, getpeername)
 AC_CHECK_LIB(nsl, inet_ntoa)
 AC_SUBST(DFLAGS)
 
-AC_OUTPUT(config.h:config/${tcsh_config_file} Makefile:Makefile.std)
+AC_OUTPUT(config.h:config/${tcsh_config_file} Makefile)

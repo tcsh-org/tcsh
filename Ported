@@ -878,3 +878,17 @@ ENVIRON :	n/a
 NOTES	:	n/a
 VERSION :	6.05.00
 
+VENDOR  :       SNI (Siemens Nixdorf Information Systems)
+MODELS  :       rm400  (R4000 mips)
+COMPILER:       /usr/bin/cc
+CFLAGS  :       -kansi; xmkmf (=>  -DSVR4 -DSNI -DSMSINFO -DR3000)
+LIBES   :       -ltermcap -lc -L/usr/ucblib -lucb
+OS      :       SINIX 5.42
+CONFIG  :       sysv4
+ENVIRON :
+NOTES   :       This is a POSIX (XPG-4) system.
+NOTES   :       Make sure that -lucb is included _last_ (even after -lc)
+NOTES   :       so use: -ltermcap -lc -L/usr/ucblib -lucb
+NOTES   :       In config.h, set HAVEUTMPX und unset BSDSIGS and BSDTIMES
+NOTES   :
+VERSION :       6.06.03

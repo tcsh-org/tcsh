@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.13 1996/06/22 21:44:21 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.14 1996/09/24 16:57:22 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.13 1996/06/22 21:44:21 christos Exp $")
+RCSID("$Id: host.defs,v 1.14 1996/09/24 16:57:22 christos Exp $")
 
 endcode	:
 
@@ -173,6 +173,7 @@ getmachine()
      char *machtype;
 
 endcode	:
+
 
 newdef	: defined(__PARAGON__)
 comment	: Intel Paragon running OSF/1
@@ -657,6 +658,7 @@ hosttype:						: "butterfly"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
 enddef	:
 
+
 newdef	: defined(NeXT)
 comment	: NeXT
 vendor	:						: "next"
@@ -667,6 +669,7 @@ machtype: defined(i386) || defined(__i386__)		: "i386"
 machtype: defined(hppa) || defined(__hppa__)		: "hppa"
 machtype: defined(sparc) || defined(__sparc__)		: "sparc"
 enddef	:
+
 
 newdef	: defined(sony_news)
 comment	: Sony NEWS 800 or 1700 workstation
@@ -679,6 +682,7 @@ machtype: defined(M_mipsel)				: "mipsel"
 machtype: defined(M_mipseb)				: "mipseb"
 enddef	:
 
+
 newdef	: defined(sgi)
 comment	: Silicon Graphics
 vendor	:						: "sgi"
@@ -690,7 +694,6 @@ machtype: defined(M_mipsel)				: "mipsel"
 machtype: defined(M_mipseb)				: "mipseb"
 machtype: defined(mc68000) 				: "mc68000"
 enddef	:
-
 
 
 newdef	: defined(ultrix) || defined(__ultrix)
@@ -765,6 +768,7 @@ hosttype:						: "gould_np1"
 machtype:						: "gould"
 enddef	:
 
+
 newdef	: defined(MULTIFLOW)
 comment	: Multiflow running 4.3BSD
 vendor	:						: "multiflow"
@@ -797,6 +801,7 @@ vendor	:						: "stellar"
 hosttype:						: "stellar"
 ostype	:						: "stellix"
 enddef	:
+
 
 newdef	: defined(atari)
 comment	: Atari TT running SVR4. This machine was never
@@ -867,12 +872,14 @@ hosttype: 						: "sysV68"
 machtype:						: "m68k"
 enddef	:
 
+
 newdef	: defined(supermax)
 comment	: DDE Supermax running System V/68 R3 (SVR3/68020 based)
 vendor	:						: "supermax"
 hosttype: 						: "supermax"
 machtype:						: "m68k"
 enddef	:
+
 
 newdef	: defined(sysV88)
 comment	: Motorola MPC running System V/88 R32V2 (SVR3/88100 based)
@@ -887,6 +894,20 @@ comment	: Clipper Chipset (Intergraph)
 vendor	:						: "intergraph"
 hosttype:						: "clipper"
 machtype:						: "clipper"
+enddef	:
+
+
+newdef	: defined(SNI) || defined(sinix)
+comment	: Siemens Nixdorf Informationssysteme SINIX
+vendor	:						: "sni"
+hosttype: defined(i486) || defined(__i486__) || defined(i386) : "wx200i"
+hosttype: defined(MIPSEB)				: "rm400"
+ostype	: defined(sinix)				: "sinix"
+machtype: defined(i486) || defined(__i486__)		: "i486"
+machtype: defined(i386)					: "i386"
+machtype: defined(M_mipsel)				: "mipsel"
+machtype: defined(M_mipseb)				: "mipseb"
+machtype:						: "mips"
 enddef	:
 
 
@@ -918,36 +939,23 @@ vendor	: defined(i386)					: "intel"
 machtype:						: "i386"
 enddef	:
 
-newdef	: defined(SNI)
-comment	: Siemens-Nixdorf
-vendor	:						: "SNI"
-hosttype: defined(MIPSEB)				: "RM200"
-ostype	: defined(sinix)				: "sinix"
-machtype: defined(M_mipsel)				: "mipsel"
-machtype: defined(M_mipseb)				: "mipseb"
-enddef	:
-
-newdef	: defined(sinix)
-comment	: Siemens Nixdorf Informationssysteme SINIX
-vendor	:						: "sni"
-hosttype:						: "rm400"
-ostype	:						: "svr4"
-machtype:						: "mips"
-enddef	:
 
 newdef	: defined(sparc) || defined(__sparc__)
 hosttype:						: "sparc"
 machtype:						: "sparc"
 enddef	:
 
+
 newdef	: defined(i860) || defined(__i860__)
 hosttype:						: "i860"
 machtype:						: "i860"
 enddef	:
 
+
 newdef	: defined(osf1)
 ostype	:						: "osf1"
 enddef	:
+
 
 newdef	: SYSVREL == 0
 ostype	: defined(BSD4_4)				: "bsd44"
@@ -956,21 +964,26 @@ ostype	: defined(POSIX)				: "posix"
 ostype	: defined(unix) || defined(__unix__)		: "unix"
 enddef	:
 
+
 newdef	: SYSVREL == 1
 ostype	: 						: "svr1"
 enddef	:
+
 
 newdef	: SYSVREL == 2
 ostype	: 						: "svr2"
 enddef	:
 
+
 newdef	: SYSVREL == 3
 ostype	: 						: "svr3"
 enddef	:
 
+
 newdef	: SYSVREL == 4
 ostype	: 						: "svr4"
 enddef	:
+
 
 newcode	:
 #ifndef _hosttype_

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.74 1996/04/26 19:23:13 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.75 1996/06/22 21:45:07 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.74 1996/04/26 19:23:13 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.75 1996/06/22 21:45:07 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -2113,7 +2113,7 @@ fcompare(file1, file2)
 void
 catn(des, src, count)
     register Char *des, *src;
-    register count;
+    int count;
 {
     while (--count >= 0 && *des)
 	des++;
@@ -2131,7 +2131,7 @@ catn(des, src, count)
 void
 copyn(des, src, count)
     register Char *des, *src;
-    register count;
+    int count;
 {
     while (--count >= 0)
 	if ((*des++ = *src++) == 0)

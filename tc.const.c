@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.37 1996/06/22 21:44:42 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.38 1996/09/24 16:57:27 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.37 1996/06/22 21:44:42 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.38 1996/09/24 16:57:27 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -70,6 +70,8 @@ Char STRversion[]	= { 'v', 'e', 'r', 's', 'i', 'o', 'n', '\0' };
 Char STRuid[]		= { 'u', 'i', 'd', '\0' };
 Char STRgid[]		= { 'g', 'i', 'd', '\0' };
 Char STRunknown[]	= { 'u', 'n', 'k', 'n', 'o', 'w', 'n', '\0' };
+Char STRnetwork[]	= { 'n', 'e', 't', 'w', 'o', 'r', 'k', '\0' };
+Char STRdumb[]		= { 'd', 'u', 'm', 'b', '\0' };
 Char STRHOST[]		= { 'H', 'O', 'S', 'T', '\0' };
 #ifdef REMOTEHOST
 Char STRREMOTEHOST[]	= { 'R', 'E', 'M', 'O', 'T', 'E', 'H', 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.29 1996/04/26 19:20:23 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.30 1996/06/22 21:44:41 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.29 1996/04/26 19:20:23 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.30 1996/06/22 21:44:41 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -109,16 +109,20 @@ update_vars(vp)
 	    symlinks = 0;
     }
     else if (eq(vp, STRterm)) {
-#ifdef DOESNT_WORK_RIGHT
-	register Char *cp;
-#endif /* DOESNT_WORK_RIGHT */
-	tsetenv(STRKTERM, varval(vp));
+	Char *cp = varval(vp);
+	tsetenv(STRKTERM, cp);
 #ifdef DOESNT_WORK_RIGHT
 	cp = getenv("TERMCAP");
 	if (cp && (*cp != '/'))	/* if TERMCAP and not a path */
 	    Unsetenv(STRTERMCAP);
 #endif /* DOESNT_WORK_RIGHT */
 	GotTermCaps = 0;
+	if (noediting && Strcmp(cp, STRnetwork) != 0 &&
+	    Strcmp(cp, STRunknown) != 0 && Strcmp(cp, STRdumb) != 0) {
+	    editing = 1;
+	    noediting = 0;
+	    set(STRedit, Strsave(STRNULL), VAR_READWRITE);
+	}
 	ed_Init();		/* reset the editor */
     }
     else if (eq(vp, STRhome)) {
@@ -141,6 +145,7 @@ update_vars(vp)
     }
     else if (eq(vp, STRedit)) {
 	editing = 1;
+	noediting = 0;
 	/* PWP: add more stuff in here later */
     }
     else if (eq(vp, STRshlvl)) {
@@ -527,7 +532,7 @@ adrof1(name, v)
     register Char *name;
     register struct varent *v;
 {
-    register cmp;
+    int cmp;
 
     v = v->v_left;
     while (v && ((cmp = *name - *v->v_name) != 0 || 
@@ -587,7 +592,7 @@ setq(name, vec, p, flags)
     int flags;
 {
     register struct varent *c;
-    register f;
+    register int f;
 
     f = 0;			/* tree hangs off the header's left link */
     while ((c = p->v_link[f]) != 0) {
@@ -619,10 +624,11 @@ unset(v, c)
     Char   **v;
     struct command *c;
 {
-    bool did_only;
+    bool did_roe, did_edit;
 
     USE(c);
-    did_only = adrof(STRrecognize_only_executables) != NULL;
+    did_roe = adrof(STRrecognize_only_executables) != NULL;
+    did_edit = adrof(STRedit) != NULL;
     unset1(v, &shvhed);
     if (adrof(STRhistchars) == 0) {
 	HIST = '!';
@@ -646,7 +652,9 @@ unset(v, c)
 	symlinks = 0;
     if (adrof(STRimplicitcd) == 0)
 	implicit_cd = 0;
-    if (did_only && adrof(STRrecognize_only_executables) == 0)
+    if (did_edit && noediting && adrof(STRedit) == 0)
+	noediting = 0;
+    if (did_roe && adrof(STRrecognize_only_executables) == 0)
 	tw_cmd_free();
 }
 
@@ -686,7 +694,7 @@ unsetv1(p)
     register struct varent *p;
 {
     register struct varent *c, *pp;
-    register f;
+    register int f;
 
     /*
      * Free associated memory first to avoid complications.
@@ -941,7 +949,7 @@ plist(p, what)
     int what;
 {
     register struct varent *c;
-    register len;
+    register int len;
 
     if (setintr)
 #ifdef BSDSIGS

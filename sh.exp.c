@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.exp.c,v 3.31 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.32 1996/04/26 19:19:19 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.31 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.32 1996/04/26 19:19:19 christos Exp $")
 
 /*
  * C shell
@@ -155,7 +155,7 @@ sh_access(fname, mode)
      * and they define _SC_NGROUPS_MAX without having sysconf
      */
 #   undef _SC_NGROUPS_MAX	
-#   if defined(__NetBSD__) || defined(__FreeBSD__)
+#   if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__bsdi__)
 #    define GID_T gid_t
 #   else
 #    define GID_T int

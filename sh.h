@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.70 1996/06/22 21:44:35 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.71 1996/09/24 16:57:24 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -502,6 +502,7 @@ EXTERN bool    setintr;		/* Set interrupts on/off -> Wait intr... */
 EXTERN bool    timflg;		/* Time the next waited for command */
 EXTERN bool    havhash;		/* path hashing is available */
 EXTERN bool    editing;		/* doing filename expansion and line editing */
+EXTERN bool    noediting;	/* initial $term defaulted to noedit */
 EXTERN bool    bslash_quote;	/* PWP: tcsh-style quoting?  (in sh.c) */
 EXTERN bool    isoutatty;	/* is SHOUT a tty */
 EXTERN bool    isdiagatty;	/* is SHDIAG a tty */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.lex.c,v 3.44 1996/04/26 19:19:51 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.lex.c,v 3.45 1996/06/22 21:44:37 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.44 1996/04/26 19:19:51 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.45 1996/06/22 21:44:37 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1321,7 +1321,7 @@ gethent(sc)
 	    }
 	    np = lhsb;
 	    event = 0;
-	    while (!cmap(c, _ESC | _META | _QF | _QB) && !any("^*0-%${}:#", c)) {
+	    while (!cmap(c, _ESC | _META | _QF | _QB) && !any("^*-%${}:#", c)) {
 		if (event != -1 && Isdigit(c))
 		    event = event * 10 + c - '0';
 		else
@@ -1468,9 +1468,9 @@ readc(wanteof)
     bool    wanteof;
 {
     int c;
-    static  sincereal;	/* Number of real EOFs we've seen */
-    Char *ptr;		/* For STRignoreeof */
-    int numeof = 0;	/* Value of STRignoreeof */
+    static  int sincereal;	/* Number of real EOFs we've seen */
+    Char *ptr;			/* For STRignoreeof */
+    int numeof = 0;		/* Value of STRignoreeof */
 
 #ifdef DEBUG_INP
     xprintf("readc\n");

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.71 1996/04/26 19:18:46 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.72 1996/06/22 21:44:25 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.71 1996/04/26 19:18:46 christos Exp $")
+RCSID("$Id: sh.c,v 3.72 1996/06/22 21:44:25 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -612,14 +612,23 @@ main(argc, argv)
      * Also don't edit if $TERM == wm, for when we're running under an ATK app.
      * Finally, emacs compiled under terminfo, sets the terminal to dumb,
      * so disable editing for that too.
+     * 
+     * Unfortunately, in some cases the initial $TERM setting is "unknown",
+     * "dumb", or "network" which is then changed in the user's startup files.
+     * We fix this by setting noediting here if $TERM is unknown/dumb and
+     * if noediting is set, we switch on editing if $TERM is changed.
      */
     if ((tcp = getenv("TERM")) != NULL) {
 	set(STRterm, quote(SAVE(tcp)), VAR_READWRITE);
+	noediting = strcmp(tcp, "unknown") == 0 || strcmp(tcp, "dumb") == 0 ||
+		    strcmp(tcp, "network") == 0;
 	editing = strcmp(tcp, "emacs") != 0 && strcmp(tcp, "wm") != 0 &&
-		  strcmp(tcp, "unknown") != 0 && strcmp(tcp, "dumb");
+		  !noediting;
     }
-    else 
+    else {
+	noediting = 0;
 	editing = ((tcp = getenv("EMACS")) == NULL || strcmp(tcp, "t") != 0);
+    }
 
     /* 
      * The 'edit' variable is either set or unset.  It doesn't 

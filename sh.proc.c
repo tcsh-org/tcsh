@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.proc.c,v 3.62 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.proc.c,v 3.63 1996/04/26 19:20:11 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.62 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.63 1996/04/26 19:20:11 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1030,7 +1030,7 @@ pprint(pp, flag)
     register struct process *pp;
     bool    flag;
 {
-    register status, reason;
+    int status, reason;
     struct process *tp;
     extern char *linp, linbuf[];
     int     jobflags, pstatus, pcond;
