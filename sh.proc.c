@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.17 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.18 1991/11/22 02:28:12 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.17 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.18 1991/11/22 02:28:12 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -291,7 +291,7 @@ loop:
 	return;
 #endif /* SIGVOID */
     }
-    for (pp = proclist.p_next; pp != PNULL; pp = pp->p_next)
+    for (pp = proclist.p_next; pp != NULL; pp = pp->p_next)
 	if (pid == pp->p_procid)
 	    goto found;
 #ifndef BSDJOBS
@@ -452,7 +452,7 @@ pnote()
 #endif /* BSDSIGS */
 
     neednote = 0;
-    for (pp = proclist.p_next; pp != PNULL; pp = pp->p_next) {
+    for (pp = proclist.p_next; pp != NULL; pp = pp->p_next) {
 	if (pp->p_flags & PNEEDNOTE) {
 #ifdef BSDSIGS
 	    omask = sigblock(sigmask(SIGCHLD));
@@ -492,7 +492,7 @@ pwait()
 #else /* !BSDSIGS */
     (void) sighold(SIGCHLD);
 #endif /* !BSDSIGS */
-    for (pp = (fp = &proclist)->p_next; pp != PNULL; pp = (fp = pp)->p_next)
+    for (pp = (fp = &proclist)->p_next; pp != NULL; pp = (fp = pp)->p_next)
 	if (pp->p_procid == 0) {
 	    fp->p_next = pp->p_next;
 	    xfree((ptr_t) pp->p_command);
@@ -681,7 +681,7 @@ pflushall()
 {
     register struct process *pp;
 
-    for (pp = proclist.p_next; pp != PNULL; pp = pp->p_next)
+    for (pp = proclist.p_next; pp != NULL; pp = pp->p_next)
 	if (pp->p_procid)
 	    pflush(pp);
 }
@@ -730,7 +730,7 @@ pclrcurr(pp)
     register struct process *pp;
 {
     if (pp == pcurrent)
-	if (pprevious != PNULL) {
+	if (pprevious != NULL) {
 	    pcurrent = pprevious;
 	    pprevious = pgetcurr(pp);
 	}
@@ -807,9 +807,9 @@ palloc(pid, t)
 	tryagain:;
 	    }
 	}
-	if (pcurrent == PNULL)
+	if (pcurrent == NULL)
 	    pcurrent = pp;
-	else if (pprevious == PNULL)
+	else if (pprevious == NULL)
 	    pprevious = pp;
     }
     pp->p_next = proclist.p_next;
@@ -930,7 +930,7 @@ void
 psavejob()
 {
     pholdjob = pcurrjob;
-    pcurrjob = PNULL;
+    pcurrjob = NULL;
 }
 
 /*
@@ -941,7 +941,7 @@ void
 prestjob()
 {
     pcurrjob = pholdjob;
-    pholdjob = PNULL;
+    pholdjob = NULL;
 }
 
 /*
@@ -1644,12 +1644,12 @@ pfind(cp)
     register struct process *pp, *np;
 
     if (cp == 0 || cp[1] == 0 || eq(cp, STRcent2) || eq(cp, STRcentplus)) {
-	if (pcurrent == PNULL)
+	if (pcurrent == NULL)
 	    stderror(ERR_NAME | ERR_JOBCUR);
 	return (pcurrent);
     }
     if (eq(cp, STRcentminus) || eq(cp, STRcenthash)) {
-	if (pprevious == PNULL)
+	if (pprevious == NULL)
 	    stderror(ERR_NAME | ERR_JOBPREV);
 	return (pprevious);
     }
@@ -1661,7 +1661,7 @@ pfind(cp)
 		return (pp);
 	stderror(ERR_NAME | ERR_NOSUCHJOB);
     }
-    np = PNULL;
+    np = NULL;
     for (pp = proclist.p_next; pp; pp = pp->p_next)
 	if (pp->p_procid == pp->p_jobid) {
 	    if (cp[1] == '?') {
@@ -1697,14 +1697,14 @@ pgetcurr(pp)
     register struct process *pp;
 {
     register struct process *np;
-    register struct process *xp = PNULL;
+    register struct process *xp = NULL;
 
     for (np = proclist.p_next; np; np = np->p_next)
 	if (np != pcurrent && np != pp && np->p_procid &&
 	    np->p_procid == np->p_jobid) {
 	    if (np->p_flags & PSTOPPED)
 		return (np);
-	    if (xp == PNULL)
+	    if (xp == NULL)
 		xp = np;
 	}
     return (xp);
@@ -1797,7 +1797,7 @@ pfork(t, wanttty)
 	settimes();
 	pgrp = pcurrjob ? pcurrjob->p_jobid : getpid();
 	pflushall();
-	pcurrjob = PNULL;
+	pcurrjob = NULL;
 #if !defined(BSDTIMES) && !defined(_SEQUENT_) 
 	timesdone = 0;
 #endif /* !defined(BSDTIMES) && !defined(_SEQUENT_) */

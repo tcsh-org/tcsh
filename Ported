@@ -312,3 +312,14 @@ ENVIRON	:	n/a
 NOTES	:	AUTOLOGOUT is probably best undef'ed
 NOTES	:	For 4.0, the NLS define in config.h can be enabled.
 VERSION	:	6.00.03
+
+VENDOR	:	ibm + compatibles
+MODELS	:	i386,i486
+COMPILER:	/bin/cc
+CFLAGS	:	normal
+LIBES	:	-lcurses -lc /usr/ucblib/libucb.a
+OS	:	SVR4 (DELL, ESIX, ISC, UHC)
+CONFIG	:	config.sysv4
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.00.04

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.13 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.14 1991/11/11 01:56:34 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.13 1991/10/18 16:27:13 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.14 1991/11/11 01:56:34 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -348,6 +348,18 @@ tenematch(inputline, inputline_size, num_read, command)
 
     case VARS_EXPAND:
 	if (dollar(buffer, word)) {
+	    DeleteBack(str_end - word_start);
+	    if (InsertStr((in_single || in_double) ?
+			  buffer : quote_meta(buffer, 0)) < 0)
+		return (-1);
+	    return (1);
+	}
+	return (0);
+
+    case PATH_NORMALIZE:
+	if ((bptr = dnormalize(word)) != NULL) {
+	    (void) Strcpy(buffer, bptr);
+	    xfree((ptr_t) bptr);
 	    DeleteBack(str_end - word_start);
 	    if (InsertStr((in_single || in_double) ?
 			  buffer : quote_meta(buffer, 0)) < 0)

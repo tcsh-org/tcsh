@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.15 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.16 1991/11/22 02:28:12 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.15 1991/11/17 05:39:06 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.16 1991/11/22 02:28:12 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1598,7 +1598,7 @@ e_run_fg_editor(c)
     register struct process *pp;
     extern bool tellwhat;
 
-    if ((pp = find_stop_ed()) != PNULL) {
+    if ((pp = find_stop_ed()) != NULL) {
 	/* save our editor state so we can restore it */
 	tellwhat = 1;
 	copyn(WhichBuf, InputBuf, INBUFSIZ);
@@ -1650,6 +1650,14 @@ e_expand_glob(c)
     return(CC_EXPAND_GLOB);
 }
 
+/*ARGSUSED*/
+CCRETVAL
+e_normalize_path(c)
+    int c;
+{
+    *LastChar = '\0';		/* just in case */
+    return(CC_NORMALIZE_PATH);
+}
 /*ARGSUSED*/
 CCRETVAL
 e_expand_vars(c)

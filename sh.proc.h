@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.h,v 3.2 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.h,v 3.3 1991/11/04 04:16:33 christos Exp $ */
 /*
  * sh.proc.h: Process data structures and variables
  */
@@ -105,7 +105,6 @@ struct process {
 #define	PPTIME		(1<<14)	/* time individual process */
 #define	PNEEDNOTE	(1<<15)	/* notify as soon as practical */
 
-#define	PNULL		(struct process *)0
 #define	PMAXLEN		80
 
 /* defines for arguments to pprint */

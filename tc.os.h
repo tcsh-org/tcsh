@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.20 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.21 1991/11/22 02:28:12 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -324,9 +324,14 @@ struct ucred {
 # ifndef NOFILE
 #  define NOFILE 64
 # endif /* NOFILE */
-extern int nice();
+/*
+ * Minix does not have these, so...
+ */
+# define nice(a)		/**/
+# define ulimit(a, b)		(0x003fffff)
+# define getpgrp()		getpid()
+# define gethostname(a, b)	(strncpy((a), "minix") == NULL)
 #endif /* _MINIX */
-
 
 #ifndef POSIX
 # define mygetpgrp()    getpgrp(0)
@@ -462,6 +467,9 @@ extern void endpwent();
 
 #ifndef __STDC__
 extern struct passwd *getpwuid(), *getpwnam(), *getpwent();
+#ifdef PW_SHADOW
+extern struct spwd *getspnam(), *getspent();
+#endif /* PW_SHADOW */
 #endif /* __STDC__ */
 
 # ifndef getwd
@@ -477,9 +485,6 @@ extern char *getwd();
 extern char *ttyname();   
 # endif /* SCO */
 
-# ifdef RENO
-extern void perror();		/* Reno declares that in stdio.h :-( */
-# endif	/* RENO */
 #endif /* POSIX */
 
 #endif /* _h_tc_os */

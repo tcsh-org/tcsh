@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.22 1991/11/17 05:39:06 christos Exp $
+.\" $Id: tcsh.man,v 3.23 1991/11/22 02:28:12 christos Exp $
 .TH TCSH 1 "20 October 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -347,6 +347,8 @@ EMACS Multi-character and 8 bit bindings
 "^X$"	->  expand-variables
 "^XG"	->  list-glob
 "^Xg"	->  list-glob
+"^Xn	->  normalize-path
+"^XN	->  normalize-path
 .sp
 .PP
 VI Insert Mode functions
@@ -2912,6 +2914,10 @@ James J Dempsey, BBN, 1988, and Paul Placeway, OSU, 1988
 Re-ported tcsh to A/UX.
 .sp
 .SH "BUGFIXES AND ENHANCEMENTS"
+Scott Krotz, Motorola, 1991
+.br
+Minix port.
+.sp
 David Dawes, Sydney U. Australia, Physics dept., 1991
 .br
 SVR4 job control fixes. (reverse pipeline startup code, and signal fixes).

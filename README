@@ -97,11 +97,14 @@ To install tcsh:
 
 Various:
 
+***************************************************************************
+
 On sysv versions < 3.0 (not hpux) the public domain directory 
 manipulation library has to be installed.
 If the network is not installed, then there is a gethostname()
 routine is tc.os.c.
 
+***************************************************************************
 
 On BSDreno, in ttyname() closedir() is called twice and so the same
 pointer gets free'd twice. tcsh's malloc is picky and it prints an
@@ -124,3 +127,40 @@ error message to that effect. If you don't like the message:
 
 Or: Comment the error printing out in tc.alloc.c
 Or: Compile -DSYSMALLOC
+
+
+***************************************************************************
+
+Tcsh has been ported to minix by  Scott Krotz (krotz@honey.rtsg.mot.com).
+Unfortunately the minix sed is broken, so you'll have to find a way to
+make tc.const.h, sh.err.h, ed.defns.h which are automatically generated.
+The easiest way to create them is to make a copy from unix, copying 
+config.minix to config.h, and then 'make sh.err.h tc.const.h ed.defns.h'
+
+The OS/dependent files are in mi.termios.h and mi.wait.h
+
+You will get some warnings, but dont worry about them, just ignore
+them.  After tcsh has compiled and the gcc binary is converted to a
+minix binary, remember to chmem it to give it more memory - it will
+need it!  How much you need depends on how many aliases you have, etc..
+Add at least 50000 to it.
+
+One last thing.  You might have to make some links for include files so
+that they are in the directories that tcsh is expecting while compiling.
+I forget if I had to do this or not, but it should be fairly easy to sort
+out.  If it cant find any include files this is probably the reason.
+
+If you have any problems, please tell me.  I can be contacted through
+e-mail at:
+
+krotz@honey.rtsg.mot.com
+
+I also read comp.os.minix on a regular basis, so a note there will get
+my attention also.
+
+Have fun!
+
+Scott Krotz
+
+ps.  The termios functions are provided by Magnus Doell and Bruce Evans.
+     Thanks, guys!

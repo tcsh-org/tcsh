@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.decls.h,v 3.9 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.decls.h,v 3.10 1991/11/22 02:28:12 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -213,6 +213,7 @@ extern	CCRETVAL	v_rchar_fwd		__P((int));
 extern	CCRETVAL	v_rchar_back		__P((int));
 extern  CCRETVAL        v_charto_fwd		__P((int));
 extern  CCRETVAL        v_charto_back		__P((int));
+extern  CCRETVAL        e_normalize_path	__P((int));
 
 /*
  * ed.inputl.c

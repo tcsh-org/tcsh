@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.xmap.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.xmap.c,v 3.4 1991/11/22 02:28:12 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.4 1991/11/22 02:28:12 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -418,6 +418,7 @@ PutFreeNode(ptr)
 
     switch (ptr->type) {
     case XK_CMD:
+    case XK_NOD:
 	break;
     case XK_EXE:
     case XK_STR:

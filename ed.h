@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.9 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.10 1991/11/22 02:28:12 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -91,6 +91,7 @@ extern KEYCMD NumFuns;		/* number of KEYCMDs in above table */
 #define CC_CORRECT_L		13
 #define CC_REFRESH		14
 #define CC_EXPAND_VARS		15
+#define CC_NORMALIZE_PATH	16
 
 typedef union Xmapval {		/* value passed to the Xkey routines */
     KEYCMD cmd;

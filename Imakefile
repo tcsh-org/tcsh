@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.3 1991/10/28 06:26:50 christos Exp $
+/**/# $Id: Imakefile,v 1.4 1991/11/11 01:56:34 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -312,12 +312,12 @@ SHSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.exp.c sh.file.c sh.func.c sh.glob.c sh.hist.c sh.init.c \
 	sh.lex.c sh.misc.c sh.parse.c sh.print.c sh.proc.c sh.sem.c \
 	sh.set.c sh.time.c sh.char.h sh.dir.h sh.proc.h sh.h \
-	sh.decls.h glob.c glob.h
+	sh.decls.h glob.c glob.h mi.wait.h mi.termios.c
 SHOBJS=	sh.${SUF} sh.dir.${SUF} sh.dol.${SUF} sh.err.${SUF} sh.exec.${SUF} \
 	sh.char.${SUF} sh.exp.${SUF} sh.func.${SUF} sh.glob.${SUF} \
 	sh.hist.${SUF} sh.init.${SUF} sh.lex.${SUF} sh.misc.${SUF} \
 	sh.parse.${SUF} sh.print.${SUF} sh.proc.${SUF} sh.sem.${SUF} \
-	sh.set.${SUF} sh.time.${SUF} glob.${SUF}
+	sh.set.${SUF} sh.time.${SUF} glob.${SUF} mi.termios.${SUF}
 
 TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c
 TWOBJS=	tw.help.${SUF} tw.init.${SUF} tw.parse.${SUF} tw.spell.${SUF}

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.16 1991/11/17 06:32:19 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.17 1991/11/22 02:28:12 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.16 1991/11/17 06:32:19 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.17 1991/11/22 02:28:12 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -432,8 +432,8 @@ find_stop_ed()
     vpl = strlen(vp);
     epl = strlen(ep);
 
-    if (pcurrent == PNULL)	/* see if we have any jobs */
-	return PNULL;		/* nope */
+    if (pcurrent == NULL)	/* see if we have any jobs */
+	return NULL;		/* nope */
 
     for (pp = proclist.p_next; pp; pp = pp->p_next)
 	if (pp->p_procid == pp->p_jobid) {
@@ -448,7 +448,7 @@ find_stop_ed()
 		return pp;
 	}
 
-    return PNULL;		/* didn't find a job */
+    return NULL;		/* didn't find a job */
 }
 
 void
@@ -496,7 +496,7 @@ xgetpass(prm)
     int fd, i;
     sigret_t (*sigint)();
 
-    sigint = sigset(SIGINT, SIG_IGN);
+    sigint = (sigret_t (*)()) sigset(SIGINT, SIG_IGN);
     Rawmode();	/* Make sure, cause we want echo off */
     if ((fd = open("/dev/tty", O_RDWR)) == -1)
 	fd = SHIN;
@@ -505,11 +505,11 @@ xgetpass(prm)
     for (i = 0;;)  {
 	if (read(fd, &pass[i], 1) < 1 || pass[i] == '\n') 
 	    break;
-	if (i < 9)
+	if (i < 8)
 	    i++;
     }
 	
-    pass[8] = '\0';
+    pass[i] = '\0';
 
     if (fd != SHIN)
 	(void) close(fd);
@@ -518,17 +518,40 @@ xgetpass(prm)
     return(pass);
 }
 	
+/*
+ * Ask the user for his login password to continue working
+ * On systems that have a shadow password, this will only 
+ * work for root, but what can we do?
+ *
+ * If we fail to get the password, then we log the user out
+ * immediately
+ */
 static void
 auto_lock()
 {
     int i;
     struct passwd *pw;
+#ifdef PW_SHADOW
+    struct spwd *spw;
+#endif /* PW_SHADOW */
     extern char *crypt();
 
 
     /* Get the passwd of our effective user.  */
-    if ((pw = getpwuid(geteuid())) == NULL)
-	return;
+    if ((pw = getpwuid(geteuid())) == NULL) {
+      auto_logout();
+      /*NOTREACHED*/
+      return;
+    }
+
+#ifdef PW_SHADOW
+    /* Get the shadowed password. */
+    if ((spw = getspnam(pw->pw_name)) == NULL) {
+      auto_logout();
+      /*NOTREACHED*/
+      return;
+    }
+#endif /* PW_SHADOW */
 
     setalarm(0);		/* Not for locking any more */
 #ifdef BSDSIGS
@@ -540,8 +563,13 @@ auto_lock()
     for (i = 0; i < 5; i++) {
 	char *crpp, *pp;
 	pp = xgetpass("Password:"); 
+#ifdef PW_SHADOW
+	crpp = crypt(pp, spw->sp_pwdp);
+	if (strcmp(crpp, spw->sp_pwdp) == 0) {
+#else /* !PW_SHADOW */
 	crpp = crypt(pp, pw->pw_passwd);
 	if (strcmp(crpp, pw->pw_passwd) == 0) {
+#endif /* PW_SHADOW */
 	    if (GettingInput && !just_signaled) {
 		(void) Rawmode();
 		ClearLines();	
@@ -554,7 +582,6 @@ auto_lock()
 	xprintf("\nIncorrect passwd for %s\n", pw->pw_name);
     }
     auto_logout();
-    Refresh();
 }
 
 static void
@@ -1002,7 +1029,7 @@ continue_jobs(cp)
 	    if (*tag)
 		xprintf("in one of the lists\n");
 #endif /* CNDEBUG */
-	    np = PNULL;
+	    np = NULL;
 	    for (pp = proclist.p_next; pp; pp = pp->p_next) {
 		if (prefix(cmd, pp->p_command)) {
 		    if (pp->p_index) {

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.22 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.23 1991/11/22 02:28:12 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -255,6 +255,9 @@ extern int setpgrp();
 # include <stdio.h>	/* So the fgetpwent() prototypes work */
 #endif 
 #include <pwd.h>
+#ifdef PW_SHADOW
+# include <shadow.h>
+#endif /* PW_SHADOW */
 #ifdef BSD
 # include <strings.h>
 # define strchr(a, b) index(a, b)

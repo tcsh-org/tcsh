@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.h,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * tw.h: TwENEX functions headers
  */
@@ -99,7 +99,7 @@ extern Char PromptBuf[];
 
 typedef enum {
     LIST, RECOGNIZE, PRINT_HELP, SPELL, GLOB, GLOB_EXPAND,
-    VARS_EXPAND
+    VARS_EXPAND, PATH_NORMALIZE
 }       COMMAND;
 
 
