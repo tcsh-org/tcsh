@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.24 2004/11/23 02:10:49 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.print.c,v 3.25 2005/01/06 02:31:01 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.24 2004/11/23 02:10:49 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.25 2005/01/06 02:31:01 christos Exp $")
 
 #include "ed.h"
 
@@ -49,7 +49,7 @@ static	void	p2dig	__P((int));
 #if defined(BSDLIMIT) || defined(RLIMIT_CPU)
 void
 psecs(l)
-    long    l;
+    unsigned long    l;
 {
     int i;
 
@@ -73,7 +73,7 @@ minsec:
 void
 pcsecs(l)			/* PWP: print mm:ss.dd, l is in sec*100 */
 #ifdef BSDTIMES
-    long    l;
+    unsigned long    l;
 #else /* BSDTIMES */
 # ifndef POSIX
     time_t  l;
@@ -103,7 +103,7 @@ minsec:
 
 static void 
 p2dig(i)
-    int i;
+    unsigned int i;
 {
 
     xprintf("%d%d", i / 10, i % 10);

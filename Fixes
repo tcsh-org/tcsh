@@ -1,3 +1,4 @@
+ 67. Fix erroneous sign extension when printing huge numbers (Martin Kraemer)
  66. Handle delay in termcap entries (Martin Kraemer)
  65. EBCDIC and BS2000 fixes (Martin Kraemer)
  64. Avoid the SCCS percent-S-percent sequence differently (Kimmo Suominen)
