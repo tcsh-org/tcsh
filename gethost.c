@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/gethost.c,v 1.4 1995/04/16 19:15:53 christos Exp christos $ */
+/* $Header: /u/christos/cvsroot/tcsh/gethost.c,v 1.5 1996/04/26 19:18:28 christos Exp $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -36,9 +36,22 @@
  */
 #include "sh.h"
 
-RCSID("$Id: gethost.c,v 1.4 1995/04/16 19:15:53 christos Exp christos $")
+RCSID("$Id: gethost.c,v 1.5 1996/04/26 19:18:28 christos Exp $")
 
+#ifdef SCO
+# define perror __perror
+# define rename __rename
+# define getopt __getopt
+# define system __system
+#endif
 #include <stdio.h>
+#ifdef SCO
+# undef perror
+# undef rename
+# undef getopt
+# undef system
+#endif
+
 #include <ctype.h>
 
 /* Some people don't bother to declare these */

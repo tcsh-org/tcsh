@@ -1,4 +1,6 @@
-V6.07.00
+V6.07.00, 10/11/96
+ 50. Avoid stdio.h inclusion problem in SCO (gethost.c).
+ 49. A bit of housekeeping in host.defs
  48. 6.06.04 - 10/05/96
  47. Fix tellmewhat() code to return true if found.
  46. Change register foo to register int foo to avoid compiler warnings.
@@ -62,6 +64,8 @@ V6.07.00
   3. Bug setting listflags... Workaround: set listflags=(A /bin/ls)
   2. Typo in Imakefile (# comment instead of c comment)
   1. Typo in ma.setp.c (missing parenthesis)
+
+
 V6.06.00, 05/13/95
  88. Cleanup off-by-one error ed.defns.c.
  87. 6.05.09 - 05/06/95
@@ -182,6 +186,7 @@ V6.06.00, 05/13/95
   3. Pyramid fixes.
   2. Fixed '\' in sysv echo (from Mika)
   1. Missed fix_yp_bugs() when setting REMOTEHOST (From Casper)
+
 
 V6.05.00, 06/19/94
 113. 6.04.17 06/18/94

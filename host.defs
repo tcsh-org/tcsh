@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.14 1996/09/24 16:57:22 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.15 1996/10/05 17:39:05 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,12 +37,16 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.14 1996/09/24 16:57:22 christos Exp $")
+RCSID("$Id: host.defs,v 1.15 1996/10/05 17:39:05 christos Exp $")
 
 endcode	:
 
 macro	: M_mipsel : (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))
 macro	: M_mipseb : (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))
+macro	: M_i386 : (defined(i386) || defined(__i386__))
+macro	: M_i486 : (defined(i486) || defined(__i486__))
+macro	: M_i586 : (defined(i586) || defined(__i586__))
+macro	: M_intel : (defined(M_i386) || defined(M_i486) || defined(M_i586))
 
 newdef	: defined(ns32000)
 newcode	:
@@ -180,7 +184,7 @@ comment	: Intel Paragon running OSF/1
 vendor	:						: "intel"
 hosttype:						: "paragon"
 ostype	:						: "osf1"
-machtype: defined(i386) || defined(__i386__)		: "i386"
+machtype: defined(M_i386) 				: "i386"
 enddef	:
 
 
@@ -267,7 +271,7 @@ comment	: Sun Microsystems series 3 workstation (68020 based)
 comment	: Sun Microsystems 386i workstation (386 based)
 comment	: Sun Microsystems series 4 workstation (SPARC based)
 vendor	:						: "sun"
-hosttype: defined(i386) || defined(__i386__)		: "sun386i"
+hosttype: defined(M_i386)				: "sun386i"
 hosttype: defined(mc68010) || defined(__mc68010__)	: "sun2"
 hosttype: defined(mc68020) || defined(__mc68020__)	: "sun3"
 hosttype: defined(sparc) || defined(__sparc__)		: "sun4"
@@ -278,7 +282,7 @@ ostype	: defined(SOLARIS2)				: "solaris"
 machtype: defined(mc68010) || defined(__mc68010__)	: "m68k"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
 machtype: defined(sparc) || defined(__sparc__)		: "sparc"
-machtype: defined(i386) || defined(__i386__)		: "i386"
+machtype: defined(M_i386)				: "i386"
 enddef	:
 
 
@@ -414,23 +418,25 @@ enddef	:
 
 newdef	: defined(_MINIX)
 comment	: Andy Tanenbaum's minix
-vendor	: defined(i386)					: "intel"
-hosttype: defined(i386)					: "minix386"
+vendor	: defined(M_i386)				: "intel"
+hosttype: defined(M_i386)				: "minix386"
 hosttype:						: "minix"
 ostype	:						: "minix"
-machtype: defined(i386)					: "i386"
+machtype: defined(M_i386)				: "i386"
 enddef	:
 
 
 newdef	: defined(linux)
 comment	: Linus Torvalds's linux
-vendor	: defined(i386)	|| defined(i486) || defined(__i486__) : "intel"
-hosttype: defined(i486) || defined(__i486__)		: "i486-linux"
-hosttype: defined(i386)					: "i386-linux"
+vendor	: defined(M_intel)				: "intel"
+hosttype: defined(M_i586) 				: "i586-linux"
+hosttype: defined(M_i486) 				: "i486-linux"
+hosttype: defined(M_i386)				: "i386-linux"
 ostype	: !defined(PPC) 				: "linux"
 ostype	: defined(PPC)					: "mklinux"
-machtype: defined(i486) || defined(__i486__)		: "i486"
-machtype: defined(i386)					: "i386"
+machtype: defined(M_i586) 				: "i586"
+machtype: defined(M_i486) 				: "i486"
+machtype: defined(M_i386)				: "i386"
 vendor	: defined(__alpha)				: "dec"
 vendor	: defined(PPC)					: "apple"
 hosttype: defined(__alpha)				: "alpha"
@@ -442,10 +448,10 @@ enddef	:
 
 newdef	: defined(__EMX__)
 comment	: OS/2 EMX [unix emulation under OS/2]
-vendor	: defined(i386)					: "intel"
-hosttype: defined(i386)					: "i386-emx"
+vendor	: defined(M_intel)				: "intel"
+hosttype: defined(M_i386)				: "i386-emx"
 ostype	:						: "os2"
-machtype: defined(i386)					: "i386"
+machtype: defined(M_i386)				: "i386"
 enddef	:
 
 
@@ -455,7 +461,7 @@ vendor	: defined(alpha)				: "digital"
 vendor	: defined(amiga)				: "commodore"
 vendor	: defined(atari)				: "atari"
 vendor	: defined(hp300)				: "hp"
-vendor	: defined(i386)					: "intel"
+vendor	: defined(M_intel)				: "intel"
 vendor	: defined(m68k)					: "motorola"
 vendor	: defined(mac68k)				: "apple"
 vendor	: defined(pc532)				: "national-semi"
@@ -468,7 +474,7 @@ hosttype: 						: "NetBSD"
 ostype	: 						: "NetBSD"
 machtype: defined(sparc)				: "sparc"
 machtype: defined(mc68020)				: "m68k"
-machtype: defined(i386)					: "i386"
+machtype: defined(M_i386)				: "i386"
 machtype: defined(M_mipsel)				: "mipsel"
 machtype: defined(M_mipseb)				: "mipseb"
 machtype: defined(mips)					: "mips"
@@ -480,7 +486,7 @@ enddef	:
 
 newdef	: defined(__FreeBSD__) 
 comment	: FreeBSD
-vendor	: defined(i386)					: "intel"
+vendor	: defined(M_intel)				: "intel"
 hosttype:						: "FreeBSD"
 ostype	:						: "FreeBSD"
 machtype:						: "i386"
@@ -489,7 +495,7 @@ enddef	:
 
 newdef	: defined(__386BSD__)
 comment	: Bill Jolitz's 386BSD
-vendor	: defined(i386)					: "intel"
+vendor	: defined(M_intel)				: "intel"
 hosttype:						: "386BSD"
 ostype	:						: "386BSD"
 machtype:						: "i386"
@@ -498,10 +504,10 @@ enddef	:
 
 newdef	: defined(bsdi)
 comment	: BSDI's unix
-vendor	: defined(i386)					: "intel"
+vendor	: defined(M_intel)				: "intel"
 hosttype:						: "bsd386"
 ostype	:						: "bsdi"
-machtype: defined(i386)					: "i386"
+machtype: defined(M_i386)				: "i386"
 enddef	:
 
 
@@ -538,7 +544,7 @@ vendor	:						: "isc"
 hosttype:						: "isc386"
 ostype	: defined(POSIX)				: "POSIX"
 ostype	: 						: "SVR3"
-machtype: defined(i386)					: "i386"
+machtype: defined(M_i386)				: "i386"
 enddef	:
 
 
@@ -547,16 +553,16 @@ comment	: Intel Unix
 vendor	:						: "intel"
 hosttype:						: "intel386"
 ostype	:						: "intel_unix"
-machtype: defined(i386)					: "i386"
+machtype: defined(M_i386)				: "i386"
 enddef	:
 
 
 newdef	: defined(MACH)
 comment	: cmu's mach
 vendor	:						: "cmu"
-hosttype: defined(i386)					: "i386-mach"
+hosttype: defined(M_i386)				: "i386-mach"
 ostype	:						: "mach"
-machtype: defined(i386)					: "i386"
+machtype: defined(M_i386)				: "i386"
 enddef	:
 
 
@@ -590,12 +596,12 @@ comment	: Sequent Balance (32000 based)
 comment	: Sequent Symmetry running DYNIX/ptx (386/486 based)
 comment	: Sequent Symmetry running DYNIX 3 (386/486 based)
 vendor	:						: "sequent"
-hosttype: defined(i386)	&& defined(sequent)		: "symmetry"
-hosttype: defined(i386)					: "ptx"
+hosttype: defined(M_i386) && defined(sequent)		: "symmetry"
+hosttype: defined(M_i386)				: "ptx"
 hosttype: 						: "balance"
-ostype	: defined(i386)	&& !defined(sequent)		: "ptx"
+ostype	: defined(M_i386) && !defined(sequent)		: "ptx"
 ostype	: 						: "dynix3"
-machtype: defined(i386)					: "i386"
+machtype: defined(M_i386)				: "i386"
 machtype: defined(ns32000)				: "ns32000"
 enddef	:
 
@@ -665,7 +671,7 @@ vendor	:						: "next"
 hosttype:						: "next"
 ostype	:						: "mach"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
-machtype: defined(i386) || defined(__i386__)		: "i386"
+machtype: defined(M_i386)				: "i386"
 machtype: defined(hppa) || defined(__hppa__)		: "hppa"
 machtype: defined(sparc) || defined(__sparc__)		: "sparc"
 enddef	:
@@ -736,7 +742,7 @@ comment	: Lynx OS 2.1
 vendor	:						: "Lynx"
 hosttype: defined(M_mipsel)				: "lynxos-mips"
 hosttype: defined(M_mipseb)				: "lynxos-mips"
-hosttype: defined(i386) || defined(__i386__)		: "lynxos-i386"
+hosttype: defined(M_i386)				: "lynxos-i386"
 hosttype: defined(i860) || defined(__i860__)		: "lynxos-i860"
 hosttype: defined(m68k)					: "lynxos-m68k"
 hosttype: defined(m88k)					: "lynxos-m88k"
@@ -745,7 +751,7 @@ hosttype: 						: "lynxos-unknown"
 ostype	:						: "LynxOS"
 machtype: defined(M_mipsel)				: "mipsel"
 machtype: defined(M_mipseb)				: "mipseb"
-machtype: defined(i386) || defined(__i386__)		: "i386"
+machtype: defined(M_i386)				: "i386"
 machtype: defined(i860) || defined(__i860__)		: "i860"
 machtype: defined(m68k)					: "m68k"
 machtype: defined(m88k)					: "m88k"
@@ -900,11 +906,12 @@ enddef	:
 newdef	: defined(SNI) || defined(sinix)
 comment	: Siemens Nixdorf Informationssysteme SINIX
 vendor	:						: "sni"
-hosttype: defined(i486) || defined(__i486__) || defined(i386) : "wx200i"
+hosttype: defined(M_intel)				: "wx200i"
 hosttype: defined(MIPSEB)				: "rm400"
 ostype	: defined(sinix)				: "sinix"
-machtype: defined(i486) || defined(__i486__)		: "i486"
-machtype: defined(i386)					: "i386"
+machtype: defined(M_i586)				: "i586"
+machtype: defined(M_i486)				: "i486"
+machtype: defined(M_i386)				: "i386"
 machtype: defined(M_mipsel)				: "mipsel"
 machtype: defined(M_mipseb)				: "mipseb"
 machtype:						: "mips"
@@ -913,10 +920,10 @@ enddef	:
 
 newdef  : !defined(SOLARIS2) && (SYSVREL == 4)
 comment : Unix System V Release 4.0
-vendor  : defined(DELL)                                 : "dell"
-hosttype: defined(i386)                                 : "i386"
-ostype  :                                               : "svr4"
-machtype: defined(i386)                                 : "i386"
+vendor  : defined(DELL)					: "dell"
+hosttype: defined(M_i386)				: "i386"
+ostype  :						: "svr4"
+machtype: defined(M_i386)				: "i386"
 enddef	:
 
 
@@ -933,10 +940,14 @@ machtype:						: "m88k"
 enddef	:
 
 
-newdef	: defined(i386) || defined(__i386__)
-hosttype:						: "i386"
-vendor	: defined(i386)					: "intel"
-machtype:						: "i386"
+newdef	: defined(M_intel)
+hosttype: defined(M_i586)				: "i586"
+hosttype: defined(M_i486)				: "i486"
+hosttype: defined(M_i386)				: "i386"
+vendor	: 						: "intel"
+machtype: defined(M_i586)				: "i586"
+machtype: defined(M_i486)				: "i486"
+machtype: defined(M_i386)				: "i386"
 enddef	:
 
 
