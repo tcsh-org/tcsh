@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.91 2000/11/11 23:03:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.92 2001/01/22 03:19:25 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.91 2000/11/11 23:03:36 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.92 2001/01/22 03:19:25 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1147,7 +1147,7 @@ xecho(sep, v)
 #endif /* BSDSIGS */
     v++;
     if (*v == 0)
-	return;
+	goto done;
     gflag = 0, tglob(v);
     if (gflag) {
 	v = globall(v);

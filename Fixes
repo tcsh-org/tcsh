@@ -1,3 +1,4 @@
+  9. fix echo;echo;echo; not outputing anything (Andrey A. Chernov)
   8. Fix shell word parsing in dabbrev-expand (Per Hedeland)
   7. hpux fixes (Chienting Lin)
   6. Implement kill ring (Per Hedeland)
