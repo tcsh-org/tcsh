@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.30 2004/08/08 06:42:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/config_f.h,v 3.31 2005/03/03 16:49:15 kim Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -204,28 +204,28 @@
 /* Consistency checks */
 #ifdef WIDE_STRINGS
 # if SIZEOF_WCHAR_T < 4
-#  error "wchar_t must be at least 4 bytes for WIDE_STRINGS"
+    #error "wchar_t must be at least 4 bytes for WIDE_STRINGS"
 # endif
 
 # ifdef WINNT_NATIVE
-#  error "WIDE_STRINGS cannot be used together with WINNT_NATIVE"
+    #error "WIDE_STRINGS cannot be used together with WINNT_NATIVE"
 # endif
 
 # ifndef SHORT_STRINGS
-#  error "SHORT_STRINGS must be defined if WIDE_STRINGS is defined"
+    #error "SHORT_STRINGS must be defined if WIDE_STRINGS is defined"
 # endif
 
 # ifndef NLS
-#  error "NLS must be defined if WIDE_STRINGS is defined"
+    #error "NLS must be defined if WIDE_STRINGS is defined"
 # endif
 
 # ifdef DSPMBYTE
-#  error "DSPMBYTE must not be defined if WIDE_STRINGS is defined"
+    #error "DSPMBYTE must not be defined if WIDE_STRINGS is defined"
 # endif
 #endif
 
 #if !defined (SHORT_STRINGS) && defined (DSPMBYTE)
-# error "SHORT_STRINGS must be defined if DSPMBYTE is defined"
+    #error "SHORT_STRINGS must be defined if DSPMBYTE is defined"
 #endif
 
 #endif /* _h_config_f */
