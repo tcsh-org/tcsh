@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.10 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.11 1991/12/05 18:26:54 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.10 1991/11/22 02:28:12 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.11 1991/12/05 18:26:54 christos Exp $")
 
 #include "tc.h"
 
@@ -465,12 +465,13 @@ execute(t, wanttty, pipein, pipeout)
 			    (void) signal(SIGINT,  vffree);
 			    (void) signal(SIGQUIT, SIG_DFL);
 			}
-
+# ifdef BSDJOBS
 			if (wanttty >= 0) {
 			    (void) signal(SIGTSTP, SIG_DFL);
 			    (void) signal(SIGTTIN, SIG_DFL);
 			    (void) signal(SIGTTOU, SIG_DFL);
 			}
+# endif /* BSDJOBS */
 
 			(void) signal(SIGTERM, parterm);
 		    }
