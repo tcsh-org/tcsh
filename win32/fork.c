@@ -1,4 +1,4 @@
-/*$Header$*/
+/*$Header: /src/pub/tcsh/win32/fork.c,v 1.4 2002/08/15 04:39:13 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -424,6 +424,7 @@ int fork(void) {
 	rc = ResumeThread(hThread);
 
 	__forked=0;
+    dprintf("forked process %d\n",pi.dwProcessId);
 	start_sigchild_thread(hProc,pi.dwProcessId);
 	close_copied_fds();
 

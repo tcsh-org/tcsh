@@ -1003,10 +1003,10 @@ int nt_texec(char *prog, char**args ) {
 			retries++;
 		}while(retries < 3);
 	}
-re_cp:
-	//dprintf("cmdstr %s\n",cmdstr);
-
 	savepath = fix_path_for_child();
+re_cp:
+	dprintf("nt_texec cmdstr %s\n",cmdstr);
+
 
 	if (!CreateProcess(argv0,
 					   cmdstr,

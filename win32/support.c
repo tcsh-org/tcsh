@@ -375,9 +375,10 @@ win95_directly_here:
 	if(!concat_args_and_quote(args,&originalPtr,&cmdstr,&cmdlen,&cmdend,
 				&cmdsize))
 	{
+        dprintf("concat_args_and_quote failed\n");
 		heap_free(originalPtr);
 		errno = ENOMEM;
-		return;
+		goto fail_return;
 	}
 
 	*cmdend = 0;
@@ -395,7 +396,7 @@ win95_directly_here:
 
 
 re_cp:
-	//dprintf("argv0 %s cmdstr %s\n",argv0,cmdstr);
+	dprintf("argv0 %s cmdstr %s\n",argv0,cmdstr);
 	bRet = CreateProcessA(argv0, cmdstr,
 			NULL, NULL,
 			TRUE, // need this for redirecting std handles
@@ -469,6 +470,11 @@ re_cp:
 			ExitProcess(exitcode);
 		}
 	}
+fail_return:
+    CloseHandle(si.hStdInput);
+    CloseHandle(si.hStdOutput);
+    CloseHandle(si.hStdError);
+    return;
 }
 /* This function from  Mark Tucker (mtucker@fiji.sidefx.com) */
 int quoteProtect(char *dest, char *src,unsigned long destsize) {
@@ -885,7 +891,7 @@ char *concat_args_and_quote(char **args, char **poriginalPtr,char **cstr,
 	heap_free(tempquotedbuf);
 
 
-	return cmdstr-1;
+	return cmdstr;
 }
 char *fix_path_for_child(void) {
 
