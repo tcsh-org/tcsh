@@ -1,4 +1,6 @@
 V6.04.00, ...
+ 89. 6.03.10, 06/25/93
+ 88. Makefile and lint patches from Bruce.
  87. Posixsig patch from Peter for svr4
  86. 6.03.09, 06/11/93
  85. signal handling broke with the last job control patch...
@@ -109,7 +111,7 @@ V6.04.00, ...
  24. NEC SX3 "entry" is a reserved word!, changed entry to item...
      [this is as bad as cray typedefining "word" to int. Next thing I know,
       I'll have to prefix all the variables with tcsh_!]
- 23. 6.03.02 12/02/93
+ 23. xxx
  22. Protected all include files to avoid warnings from lcc.
  21. Finally resolved the job control problems with linux and ISC (from Beto)
  20. More HUP,XFSZ,XCPU fixes. (with Beto)

@@ -1,6 +1,19 @@
 This file contains visible (incompatible) changes to the users.
 This version of tcsh has the following new things:
 
+6.04
+* Variable modifiers do not stop processing after the first one fails
+     > set i=aabbcc
+     > echo $i:s/a/A/:s/b/B/
+     AaBbcc
+     > echo $i:s/x/A/:s/b/B/
+     aabbcc
+* set -r makes variables readonly
+* set nonomatch, echo ~notaser returns ~notauser instead of an error
+* file operators: Changed -s == !-z and -S == socket
+* $?0 returns false now on interactive shells for csh compatibility.
+* %p%P include seconds in prompt strings.
+
 6.03
 * $%var contains the number of characters in $var.
 * Shell -w -x are now POSIX compliant on POSIX machines.

@@ -1,7 +1,7 @@
 /**/#
-/**/# $Id: Imakefile,v 1.32 1993/06/24 15:29:37 christos Exp $
+/**/# $Id: Imakefile,v 1.33 1993/06/25 21:20:57 christos Exp $
 /**/#
-/**/# Imakefile for for tcsh 6.03
+/**/# Imakefile for for tcsh 6.04
 /**/# Marc Horowitz, MIT SIPB
 /**/#
 

@@ -1,4 +1,4 @@
-# $Id: Makefile.vms,v 1.10 1993/06/05 21:16:14 christos Exp christos $
+# $Id: Makefile.vms,v 1.11 1993/06/11 20:53:15 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -8,7 +8,7 @@
 # things; Paul Placeway, CIS Dept., Ohio State University
 #
 SHELL=/bin/sh
-VERSION=6.03
+VERSION=6.04
 BUILD=tcsh
 
 ################################################################
@@ -123,42 +123,47 @@ LDFLAGS= 			## The simplest, suitable for all.
 ################################################################
 ## LIBES.  Pick one, or roll your own.
 ################################################################
-#LIBES= -ltermcap 		## BSD style things, hpux
-#LIBES= -ltermc			## emx under OS/2
-#LIBES= -ltermcap -lsec		## Tek XD88/10 (UTekV) with PW_SHADOW
-#LIBES= -ltermcap -lsec		## Motorola MPC (sysV88) with PW_SHADOW
-#LIBES= -ltermcap -lcs		## Mach
-#LIBES= -lcurses		## Sys V3 w/o networking (and Sys V4)
-#LIBES= -lcurses -lc /usr/ucblib/libucb.a ## Sys V4 with BSDTIMES
-#LIBES= -lcurses		## Sys V4 w/o BSDTIMES or Solaris 2
-#LIBES= -lcurses -lnet		## Sys V3 with networking
-#LIBES= -lcurses -ldir		## Sys V2 w/o networking [needs directory lib]
-#LIBES= -lcurses -ldir -lnet	## Sys V2 with networking [needs directory lib]
-#LIBES= -lcurses -lsocket -lbsd	## Amdahl UTS 2.1
-#LIBES= -lcurses -lbsd		## For Irix3.1 on SGI-IRIS4D or ETA10
-#LIBES= -lcurses -lsun -lbsd -lc_s ## For Irix3.3 on SGI-IRIS4D (w/ yp)
-#LIBES= -lcurses -lbsd -lc_s	## For Irix3.3 on SGI-IRIS4D (wo/ yp)
-#LIBES= -lcurses -lbsd		## For aix on an IBM 370 or rs6000 or ps2
-#LIBES= -lcurses		## For aix on the rt
-#LIBES= -lcurses -lcposix	## ISC 2.2 
-#LIBES= -lcposix -lc_s -lcurses -linet ## ISC 2.2 with networking
-#LIBES= -lcurses -linet -lsec -lc_s  ## ISC 2.0.2 with networking
-#LIBES= -lcurses -lsec -lc_s    ## ISC 2.0.2 without networking
-#LIBES= -ltermcap -ldir -lx	## Xenix 386 style things
-#LIBES= -lcurses -lintl -lcrypt		## SCO SysVR3.2v2.0
-#LIBES= -lcurses -lintl -lsocket -lcrypt ## SCO+ODT1.1
-#LIBES= -lposix -ltermcap	## A/UX 2.0
-#LIBES= -lposix -ltermcap -lc_s	## A/UX 3.0
-#LIBES= -ltermcap -lbsd		## DEC osf1 on the alpha and Intel paragon
-#LIBES= -ltermcap -lseq		## Sequent's Dynix
-#LIBES= -lcurses -lsocket	## Intel's hypercube and ns32000 based Opus.
-#LIBES= -ldirent -lcurses       ## att3b1 stk cc w/o shared lib & directory lib
-#LIBES= -shlib -ldirent -lcurses ## att3b1 gcc1.40 w/ shared lib & directory lib
-LIBES=				## Minix, VMS_POSIX
-#LIBES= -lcurses		## For a stellar
-#LIBES= -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a ## Stardent Vistra
+#LIBES= -ltermcap 			 ## BSD style things
+#LIBES= -ltermcap			 ## SunOS, HP-UX, pyramid
+#LIBES= -ltermcap -lcs			 ## Mach
+#LIBES= -ltermcap -lsec			 ## Tek XD88/10 (UTekV) with PW_SHADOW
+#LIBES= -ltermcap -lsec			 ## Motorola MPC (sysV88) with PW_SHADOW
+#LIBES= -ltermcap -lbsd			 ## DEC osf1 on the alpha
+#LIBES= -ltermcap -lbsd			 ## Intel paragon
+#LIBES= -ltermcap -lseq			 ## Sequent's Dynix
+#LIBES= -ltermcap -lauth		 ## Ultrix with Enhanced Security
+#LIBES= -ltermcap -ldir -lx		 ## Xenix 386 style things
 #LIBES= -ltermcap -lndir -lsocket -ljobs ## masscomp RTU6.0
-#LIBES= -ltermcap -lauth        ## for Ultrix with Enhanced Security
+#LIBES= -ltermc				 ## emx under OS/2
+#LIBES= -lcurses			 ## AIX on the rt
+#LIBES= -lcurses			 ## TitanOS on the stellar
+#LIBES= -lcurses			 ## SysV4 w/o BSDTIMES or Solaris 2
+#LIBES= -lcurses			 ## SysV3 w/o networking
+#LIBES= -lcurses -lnet			 ## SysV3 with networking
+#LIBES= -lcurses -ldir			 ## SysV2 w/o networking & dirlib
+#LIBES= -lcurses -ldir -lnet		 ## SysV2 with networking & dirlib
+#LIBES= -lcurses -lbsd			 ## AIX on the IBM 370 or rs6000 or ps2
+#LIBES= -lcurses -lbsd			 ## ETA10
+#LIBES= -lcurses -lbsd			 ## Irix3.1 on the SGI-IRIS4D
+#LIBES= -lcurses -lbsd -lc_s		 ## Irix3.3 on the SGI-IRIS4D w/o yp
+#LIBES= -lcurses -lsun -lbsd -lc_s	 ## Irix3.3 on the SGI-IRIS4D with yp
+#LIBES= -lcurses -lsocket -lbsd		 ## Amdahl UTS 2.1
+#LIBES= -lcurses -lsocket		 ## Intel's hypercube.
+#LIBES= -lcurses -lsocket		 ## ns32000 based Opus.
+#LIBES= -lcurses -lcposix		 ## ISC 2.2 without networking
+#LIBES= -lcposix -lc_s -lcurses -linet	 ## ISC 2.2 with networking
+#LIBES= -lcurses -lsec -lc_s		 ## ISC 2.0.2 without networking
+#LIBES= -lcurses -linet -lsec -lc_s	 ## ISC 2.0.2 with networking
+#LIBES= -lcurses -lintl -lcrypt		 ## SCO SysVR3.2v2.0
+#LIBES= -lcurses -lintl -lsocket -lcrypt ## SCO+ODT1.1
+#LIBES= -lposix -ltermcap		 ## A/UX 2.0
+#LIBES= -lposix -ltermcap -lc_s		 ## A/UX 3.0
+#LIBES= -ldirent -lcurses		 ## att3b1 cc w/o shared lib & dirlib
+#LIBES= -shlib -ldirent -lcurses	 ## att3b1 gcc with shared lib & dirlib
+#LIBES= -lcurses -lc /usr/ucblib/libucb.a		 ## SysV4 with BSDTIMES
+#LIBES= -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a ## Stardent Vistra
+#LIBES= -ltermc				 ## emx under OS/2
+LIBES=					 ## Minix, VMS_POSIX
 
 
 # The difficult choice of a c-compiler...
