@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.3 1991/07/16 11:13:41 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.4 1991/07/16 16:21:55 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.func.c,v 3.3 1991/07/16 11:13:41 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.4 1991/07/16 16:21:55 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -762,7 +762,7 @@ setalarm()
     struct varent *vp;
     Char   *cp;
     unsigned alrm_time = 0;
-    long    cl, nl, sched_dif;
+    time_t cl, nl, sched_dif;
 
     if (vp = adrof(STRautologout)) {
 	if (cp = vp->vec[0])
