@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.init.c,v 3.14 1993/03/05 20:14:33 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.init.c,v 3.15 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.14 1993/03/05 20:14:33 christos Exp christos $")
+RCSID("$Id: tw.init.c,v 3.15 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -361,6 +361,7 @@ tw_cmd_start(dfd, pat)
     Char *pat;
 {
     static Char *defpath[] = { STRNULL, 0 };
+    USE(pat);
     SETDIR(dfd)
     if ((tw_cmd_got & TW_FL_CMD) == 0) {
 	tw_cmd_free();
@@ -491,6 +492,8 @@ tw_shvar_next(dir, flags)
     register struct varent *c;
     register Char *cp;
 
+    USE(flags);
+    USE(dir);
     if ((p = tw_vptr) == NULL)
 	return (NULL);		/* just in case */
 
@@ -532,6 +535,8 @@ tw_envvar_next(dir, flags)
 {
     Char   *ps, *pd;
 
+    USE(flags);
+    USE(dir);
     if (tw_env == NULL || *tw_env == NULL)
 	return (NULL);
     for (ps = *tw_env, pd = tw_retname;
@@ -552,6 +557,7 @@ tw_var_start(dfd, pat)
     DIR *dfd;
     Char *pat;
 {
+    USE(pat);
     SETDIR(dfd)
     tw_vptr_start(&shvhed);
     tw_env = STR_environ;
@@ -567,6 +573,7 @@ tw_alias_start(dfd, pat)
     DIR *dfd;
     Char *pat;
 {
+    USE(pat);
     SETDIR(dfd)
     tw_vptr_start(&aliases);
     tw_env = NULL;
@@ -583,6 +590,8 @@ tw_complete_start(dfd, pat)
     Char *pat;
 {
     extern struct varent completions;
+
+    USE(pat);
     SETDIR(dfd)
     tw_vptr_start(&completions);
     tw_env = NULL;
@@ -616,6 +625,7 @@ tw_logname_start(dfd, pat)
     DIR *dfd;
     Char *pat;
 {
+    USE(pat);
     SETDIR(dfd)
 #ifndef _VMS_POSIX
     (void) setpwent();	/* Open passwd file */
@@ -640,6 +650,8 @@ tw_logname_next(dir, flags)
      * and if we call endpwent() immediatetely after
      * (in pintr()) we may be freeing an invalid pointer
      */
+    USE(flags);
+    USE(dir);
     TW_HOLD();
 #ifndef _VMS_POSIX
     /* ISC does not declare getpwent()? */
@@ -683,6 +695,7 @@ tw_file_start(dfd, pat)
     Char *pat;
 {
     struct varent *vp;
+    USE(pat);
     SETDIR(dfd)
     if ((vp = adrof(STRcdpath)) != NULL)
 	tw_env = vp->vec;
@@ -818,6 +831,7 @@ tw_wl_next(dir, flags)
     Char *dir;
     int *flags;
 {
+    USE(flags);
     if (tw_word == NULL || tw_word[0] == '\0')
 	return NULL;
     
@@ -840,6 +854,7 @@ tw_bind_start(dfd, pat)
     DIR *dfd;
     Char *pat;
 {
+    USE(pat);
     SETDIR(dfd)
     tw_bind = FuncNames;
 } /* end tw_bind_start */
@@ -855,6 +870,7 @@ tw_bind_next(dir, flags)
     int *flags;
 {
     char *ptr;
+    USE(flags);
     if (tw_bind && tw_bind->name) {
 	for (ptr = tw_bind->name, dir = tw_retname;
 	     (*dir++ = (Char) *ptr++) != '\0';)
@@ -875,6 +891,7 @@ tw_limit_start(dfd, pat)
     DIR *dfd;
     Char *pat;
 {
+    USE(pat);
     SETDIR(dfd)
 #ifndef HAVENOLIMIT
     tw_limit = limits;
@@ -901,6 +918,7 @@ tw_limit_next(dir, flags)
 	return(tw_retname);
     }
 #endif /* ! HAVENOLIMIT */
+    USE(flags);
     return NULL;
 } /* end tw_limit_next */
 
@@ -914,6 +932,7 @@ tw_sig_start(dfd, pat)
     DIR *dfd;
     Char *pat;
 {
+    USE(pat);
     SETDIR(dfd)
     tw_index = 0;
 } /* end tw_sig_start */
@@ -930,6 +949,7 @@ tw_sig_next(dir, flags)
 {
     char *ptr;
     extern int nsig;
+    USE(flags);
     for (;tw_index < nsig; tw_index++) {
 
 	if (mesg[tw_index].iname == NULL)
@@ -954,6 +974,7 @@ tw_job_start(dfd, pat)
     DIR *dfd;
     Char *pat;
 {
+    USE(pat);
     SETDIR(dfd)
     tw_index = 1;
 } /* end tw_job_start */
@@ -970,6 +991,8 @@ tw_job_next(dir, flags)
 {
     Char *ptr;
     struct process *j;
+
+    USE(flags);
     for (;tw_index <= pmaxindex; tw_index++) {
 	for (j = proclist.p_next; j != NULL; j = j->p_next)
 	    if (j->p_index == tw_index && j->p_procid == j->p_jobid)

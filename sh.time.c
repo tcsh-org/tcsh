@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.time.c,v 3.13 1992/11/13 04:19:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.time.c,v 3.14 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.13 1992/11/13 04:19:10 christos Exp christos $")
+RCSID("$Id: sh.time.c,v 3.14 1993/06/25 21:17:12 christos Exp christos $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -145,6 +145,8 @@ dotime(v, c)
     prusage(&times0, &times_dol, timedol, time0);
 # endif	/* _SEQUENT_ */
 #endif /* BSDTIMES */
+    USE(c);
+    USE(v);
 }
 
 /*
@@ -159,6 +161,7 @@ donice(v, c)
     register Char *cp;
     int     nval = 0;
 
+    USE(c);
     v++, cp = *v++;
     if (cp == 0)
 	nval = 4;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.47 1993/05/17 00:11:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.48 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.47 1993/05/17 00:11:09 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.48 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -145,6 +145,7 @@ doonintr(v, c)
     register Char *cp;
     register Char *vv = v[1];
 
+    USE(c);
     if (parintr == SIG_IGN)
 	return;
     if (setintr && intty)
@@ -194,6 +195,8 @@ donohup(v, c)
     Char **v;
     struct command *c;
 {
+    USE(c);
+    USE(v);
     if (intty)
 	stderror(ERR_NAME | ERR_TERMINAL);
     if (setintr == 0) {
@@ -210,7 +213,8 @@ dozip(v, c)
     Char **v;
     struct command *c;
 {
-    ;
+    USE(c);
+    USE(v);
 }
 
 void
@@ -228,6 +232,7 @@ doalias(v, c)
     register struct varent *vp;
     register Char *p;
 
+    USE(c);
     v++;
     p = *v++;
     if (p == 0)
@@ -253,6 +258,7 @@ unalias(v, c)
     Char  **v;
     struct command *c;
 {
+    USE(c);
     unset1(v, &aliases);
     tw_cmd_free();
 }
@@ -263,6 +269,8 @@ dologout(v, c)
     Char **v;
     struct command *c;
 {
+    USE(c);
+    USE(v);
     islogin();
     goodbye(NULL, NULL);
 }
@@ -273,6 +281,7 @@ dologin(v, c)
     Char  **v;
     struct command *c;
 {
+    USE(c);
     islogin();
     rechist(NULL);
     (void) signal(SIGTERM, parterm);
@@ -376,6 +385,8 @@ doelse (v, c)
     Char **v;
     struct command *c;
 {
+    USE(c);
+    USE(v);
     search(TC_ELSE, 0, NULL);
 }
 
@@ -387,6 +398,7 @@ dogoto(v, c)
 {
     Char   *lp;
 
+    USE(c);
     gotolab(lp = globone(v[1], G_ERROR));
     xfree((ptr_t) lp);
 }
@@ -424,6 +436,7 @@ doswitch(v, c)
 {
     register Char *cp, *lp;
 
+    USE(c);
     v++;
     if (!*v || *(*v++) != '(')
 	stderror(ERR_SYNTAX);
@@ -442,6 +455,8 @@ dobreak(v, c)
     Char **v;
     struct command *c;
 {
+    USE(v);
+    USE(c);
     if (whyles)
 	toend();
     else
@@ -454,6 +469,7 @@ doexit(v, c)
     Char  **v;
     struct command *c;
 {
+    USE(c);
     if (chkstop == 0 && (intty || intact) && evalvec == 0)
 	panystop(0);
     /*
@@ -479,6 +495,7 @@ doforeach(v, c)
     register Char *cp, *sp;
     register struct whyle *nwp;
 
+    USE(c);
     v++;
     sp = cp = strip(*v);
     if (!letter(*sp))
@@ -527,9 +544,11 @@ dowhile(v, c)
     struct command *c;
 {
     register int status;
-    register bool again = whyles != 0 && SEEKEQ(&whyles->w_start, &lineloc) &&
-    whyles->w_fename == 0;
+    register bool again = whyles != 0 && 
+			  SEEKEQ(&whyles->w_start, &lineloc) &&
+			  whyles->w_fename == 0;
 
+    USE(c);
     v++;
     /*
      * Implement prereading here also, taking care not to evaluate the
@@ -591,6 +610,8 @@ doend(v, c)
     Char **v;
     struct command *c;
 {
+    USE(v);
+    USE(c);
     if (!whyles)
 	stderror(ERR_NAME | ERR_NOTWHILE);
     btell(&whyles->w_end);
@@ -603,6 +624,8 @@ docontin(v, c)
     Char **v;
     struct command *c;
 {
+    USE(v);
+    USE(c);
     if (!whyles)
 	stderror(ERR_NAME | ERR_NOTWHILE);
     doagain();
@@ -674,6 +697,8 @@ doswbrk(v, c)
     Char **v;
     struct command *c;
 {
+    USE(v);
+    USE(c);
     search(TC_BRKSW, 0, NULL);
 }
 
@@ -1013,6 +1038,7 @@ doecho(v, c)
     Char  **v;
     struct command *c;
 {
+    USE(c);
     xecho(' ', v);
 }
 
@@ -1022,6 +1048,7 @@ doglob(v, c)
     Char  **v;
     struct command *c;
 {
+    USE(c);
     xecho(0, v);
     flush();
 }
@@ -1173,6 +1200,7 @@ doprintenv(v, c)
     extern bool output_raw;
     extern bool xlate_cr;
 
+    USE(c);
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
@@ -1207,6 +1235,7 @@ dosetenv(v, c)
 {
     Char   *vp, *lp;
 
+    USE(c);
     if (*++v == 0) {
 	doprintenv(--v, 0);
 	return;
@@ -1334,6 +1363,7 @@ dounsetenv(v, c)
     int     i, maxi;
     static Char *name = NULL;
 
+    USE(c);
     if (name)
 	xfree((ptr_t) name);
     /*
@@ -1493,6 +1523,7 @@ doumask(v, c)
     register Char *cp = v[1];
     register int i;
 
+    USE(c);
     if (cp == 0) {
 	i = umask(0);
 	(void) umask(i);
@@ -1678,6 +1709,7 @@ dolimit(v, c)
     register RLIM_TYPE limit;
     int    hard = 0;
 
+    USE(c);
     v++;
     if (*v && eq(*v, STRmh)) {
 	hard = 1;
@@ -1874,6 +1906,7 @@ dounlimit(v, c)
     int    hard = 0;
     int	   force = 0;
 
+    USE(c);
     while (*++v && **v == '-') {
 	Char   *vp = *v;
 	while (*++vp)
@@ -1957,8 +1990,11 @@ dosuspend(v, c)
 #ifdef BSDJOBS
     int     ctpgrp;
 
-    sigret_t(*old) ();
+    sigret_t (*old) ();
 #endif /* BSDJOBS */
+    
+    USE(c);
+    USE(v);
 
     if (loginsh)
 	stderror(ERR_SUSPLOG);
@@ -2023,6 +2059,7 @@ doeval(v, c)
     int     saveIN, saveOUT, saveDIAG;
     int     oSHIN, oSHOUT, oSHDIAG;
 
+    USE(c);
     oevalvec = evalvec;
     oevalp = evalp;
     odidfds = didfds;
@@ -2122,6 +2159,8 @@ struct command *c;
     register int row, col, columns, rows;
     unsigned int w, maxwidth;
 
+    USE(c);
+    USE(v);
     lbuffed = 0;		/* turn off line buffering */
 
     /* find widest string */

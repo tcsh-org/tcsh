@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.screen.c,v 3.28 1993/02/12 17:22:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.screen.c,v 3.29 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.28 1993/02/12 17:22:20 christos Exp christos $")
+RCSID("$Id: ed.screen.c,v 3.29 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -334,6 +334,7 @@ TellTC(what)
 {
     struct termcapstr *t;
 
+    USE(what);
     xprintf("\n\tTcsh thinks your terminal has the\n");
     xprintf("\tfollowing characteristics:\n\n");
     xprintf("\tIt has %d columns and %d lines\n",

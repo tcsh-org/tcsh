@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.19 1993/06/05 21:09:15 christos Exp $
+# $Id: complete.tcsh,v 1.20 1993/06/07 22:21:41 christos Exp $
 # example file using the new completion code
 #
 
@@ -216,19 +216,34 @@ n@public@'`[ -r /usr/man/manp ] && \ls -1 /usr/man/manp| sed s%\\.p.\*\$%%`'@ \
     complete touch 	c/-/"(a c f m)"/ n/*/f/
     complete xhost	c/[+-]/\$hosts/ n/*/\$hosts/
 
-    complete gzcat	c/--/"(help license quiet version)"/ \
-			c/-/"(h L q V)"/ n/*/f:*.{gz,Z,z,zip}/
-    complete gzip	c/--/"(stdout decompress force help license quiet \
-			recurse suffix test verbose version fast best)"/ \
-			c/-/"(c d f h L q r S t v V 1 2 3 4 5 6 7 8 9)"/ \
+    complete gzcat	c/--/"(force help license quiet version)"/ \
+			c/-/"(f h L q V)"/ n/*/f:*.{gz,Z,z,zip}/
+    complete gzip	c/--/"(stdout to-stdout decompress uncompress \
+			force help list license no-name quiet recurse \
+			suffix test verbose version fast best)"/ \
+			c/-/"(c d f h l L n q r S t v V 1 2 3 4 5 6 7 8 9)"/ \
 			n/{-S,--suffix}/x:'<file_name_suffix>'/ \
-			n/{-d,--decompress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
-			N/{-d,--decompress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
+			n/{-d,--{de,un}compress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
+			N/{-d,--{de,un}compress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
 			n/*/f:^*.{gz,Z,z,zip,taz,tgz}/
-    complete {gunzip,ungzip} c/--/"(stdout force help license quiet \
-			recurse test verbose version)"/ \
-			c/-/"(c f h L q r t v V)"/ \
+    complete {gunzip,ungzip} c/--/"(stdout to-stdout force help list license \
+			no-name quiet recurse suffix test verbose version)"/ \
+			c/-/"(c f h l L n q r S t v V)"/ \
+			n/{-S,--suffix}/x:'<file_name_suffix>'/ \
 			n/*/f:*.{gz,Z,z,zip,taz,tgz}/
+    complete zgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			p/1/x:'<limited_regular_expression>'/ \
+			n/-*e/x:'<limited_regular_expression>'/ n/-*f/f/ n/*/f/
+    complete zegrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			p/1/x:'<full_regular_expression>'/ \
+			n/-*e/x:'<full_regular_expression>'/ n/-*f/f/ n/*/f/
+    complete zfgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			p/1/x:'<fixed_string>'/ \
+			n/-*e/x:'<fixed_string>'/ n/-*f/f/ n/*/f/
+
     complete znew	c/-/"(f t v 9 P K)"/ n/*/f:*.Z/
     complete zmore	n/*/f:*.{gz,Z,z,zip}/
     complete ztouch	n/*/f:*.{gz,Z,z,zip,taz,tgz}/

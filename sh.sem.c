@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.30 1993/06/11 20:19:16 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.sem.c,v 3.31 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.30 1993/06/11 20:19:16 christos Exp christos $")
+RCSID("$Id: sh.sem.c,v 3.31 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "tc.h"
 
@@ -673,6 +673,7 @@ int snum;
 {
     register Char **v;
 
+    USE(snum);
     if ((v = gargv) != 0) {
 	gargv = 0;
 	xfree((ptr_t) v);

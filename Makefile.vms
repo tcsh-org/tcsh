@@ -1,4 +1,4 @@
-# $Id: Makefile.vms,v 1.11 1993/06/11 20:53:15 christos Exp $
+# $Id: Makefile.vms,v 1.12 1993/06/25 21:31:05 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -104,7 +104,7 @@ LFLAGS=$(INCLUDES)
 #DFLAGS=-D_VMS_POSIX
 # DEC/osf-1 on the alpha
 #DFLAGS=-D_BSD
-DFLAGS=-DI_DEBUG	# Only for beta
+DFLAGS=
 
 
 ################################################################

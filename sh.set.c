@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.set.c,v 3.21 1993/06/05 21:09:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.set.c,v 3.22 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.21 1993/06/05 21:09:15 christos Exp christos $")
+RCSID("$Id: sh.set.c,v 3.22 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -164,7 +164,7 @@ doset(v, c)
     int     subscr;
     int	    flags = VAR_READWRITE;
 
-
+    USE(c);
     v++;
     /*
      * Readonly addition From: Tim P. Starrin <noid@cyborg.larc.nasa.gov>
@@ -286,6 +286,7 @@ dolet(v, dummy)
     bool    hadsub;
     int     subscr;
 
+    USE(dummy);
     v++;
     p = *v++;
     if (p == 0) {
@@ -603,6 +604,7 @@ unset(v, c)
 {
     bool did_only;
 
+    USE(c);
     did_only = adrof(STRrecognize_only_executables) != NULL;
     unset1(v, &shvhed);
     if (adrof(STRhistchars) == 0) {
@@ -714,6 +716,7 @@ shift(v, c)
     register struct varent *argv;
     register Char *name;
 
+    USE(c);
     v++;
     name = *v;
     if (name == 0)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.who.c,v 3.17 1993/04/07 21:39:23 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.who.c,v 3.18 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.17 1993/04/07 21:39:23 christos Exp christos $")
+RCSID("$Id: tc.who.c,v 3.18 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "tc.h"
 
@@ -544,6 +544,8 @@ struct command *c;
     struct who *wp;
     struct varent *vp;
 
+    USE(v);
+    USE(c);
     if ((vp = adrof(STRwatch)) == NULL)
 	stderror(ERR_NOWATCH);
     blkpr(vp->vec);

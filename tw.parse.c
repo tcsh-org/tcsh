@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.52 1993/06/12 16:59:24 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.53 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.52 1993/06/12 16:59:24 christos Exp christos $")
+RCSID("$Id: tw.parse.c,v 3.53 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1236,6 +1236,8 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
             name[MAXNAMLEN + 1],	/* f part in /d/d/d/f name */
            *target;			/* Target to expand/correct/list */
     DIR    *dir_fd = NULL;	
+
+    USE(wp);
 
     /*
      * bugfix by Marty Grossman (grossman@CC5.BBN.COM): directory listing can

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.func.c,v 3.40 1993/06/11 20:18:52 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.41 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.40 1993/06/11 20:18:52 christos Exp christos $")
+RCSID("$Id: tc.func.c,v 3.41 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -196,6 +196,7 @@ dolist(v, c)
     int     i, k;
     struct stat st;
 
+    USE(c);
     if (*++v == NULL) {
 	(void) t_search(STRNULL, NULL, LIST, 0, TW_ZERO, 0, STRNULL, 0);
 	return;
@@ -351,7 +352,7 @@ dotelltc(v, c)
     register Char **v;
     struct command *c;
 {
-
+    USE(c);
     if (!GotTermCaps)
 	GetTermCaps();
 
@@ -403,6 +404,7 @@ dowhich(v, c)
     struct wordent lexp[3];
     struct varent *vp;
 
+    USE(c);
     lexp[0].next = &lexp[1];
     lexp[1].next = &lexp[2];
     lexp[2].next = &lexp[0];
@@ -1473,6 +1475,7 @@ doaliases(v, c)
     char    tbuf[BUFSIZE + 1], *tmp;
     extern bool output_raw;	/* PWP: in sh.print.c */
 
+    USE(c);
     v++;
     if (*v == 0) {
 	output_raw = 1;

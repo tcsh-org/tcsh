@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.term.c,v 1.13 1993/02/12 19:02:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.term.c,v 1.14 1993/05/17 00:11:09 christos Exp christos $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.13 1993/02/12 19:02:22 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.14 1993/05/17 00:11:09 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -552,6 +552,7 @@ dosetty(v, t)
     int z = EX_IO;
     char cmdname[BUFSIZE];
 
+    USE(t);
     setname(strcpy(cmdname, short2str(*v++)));
 
     while (v && *v && v[0][0] == '-' && v[0][2] == '\0') 

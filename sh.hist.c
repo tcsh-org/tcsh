@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.hist.c,v 3.8 1993/05/17 00:11:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.hist.c,v 3.9 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.8 1993/05/17 00:11:09 christos Exp christos $")
+RCSID("$Id: sh.hist.c,v 3.9 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "tc.h"
 
@@ -192,6 +192,7 @@ dohist(vp, c)
 {
     int     n, hflg = 0;
 
+    USE(c);
     if (getn(value(STRhistory)) == 0)
 	return;
     if (setintr)

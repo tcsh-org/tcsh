@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.54 1993/06/25 21:17:12 christos Exp $
+# $Id: Makefile.std,v 1.55 1993/06/25 21:31:05 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -107,7 +107,7 @@ CFLAGS=-O2 $(INCLUDES) -g
 #DFLAGS=-D_VMS_POSIX
 # DEC/osf-1 on the alpha
 #DFLAGS=-D_BSD
-DFLAGS=-DI_DEBUG	# Only for beta
+DFLAGS=
 
 
 ################################################################

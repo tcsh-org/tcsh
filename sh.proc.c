@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.47 1993/06/11 20:20:02 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.48 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.47 1993/06/11 20:20:02 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.48 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -154,6 +154,7 @@ int snum;
 # else /* !_SEQUENT_ */
     struct tms proctimes;
 
+    USE(snum);
     if (!timesdone) {
 	timesdone++;
 	(void) times(&shtimes);
@@ -648,6 +649,8 @@ dowait(v, c)
     sigmask_t omask;
 #endif /* BSDSIGS */
 
+    USE(c);
+    USE(v);
     pjobs++;
 #ifdef BSDSIGS
     omask = sigblock(sigmask(SIGCHLD));
@@ -1322,6 +1325,7 @@ dojobs(v, c)
     register int flag = NUMBER | NAME | REASON;
     int     i;
 
+    USE(c);
     if (chkstop)
 	chkstop = 2;
     if (*++v) {
@@ -1350,6 +1354,7 @@ dofg(v, c)
 {
     register struct process *pp;
 
+    USE(c);
     okpcntl();
     ++v;
     do {
@@ -1376,6 +1381,7 @@ dofg1(v, c)
 {
     register struct process *pp;
 
+    USE(c);
     okpcntl();
     pp = pfind(v[0]);
     pstart(pp, 1);
@@ -1399,6 +1405,7 @@ dobg(v, c)
 {
     register struct process *pp;
 
+    USE(c);
     okpcntl();
     ++v;
     do {
@@ -1418,6 +1425,7 @@ dobg1(v, c)
 {
     register struct process *pp;
 
+    USE(c);
     pp = pfind(v[0]);
     pstart(pp, 0);
 }
@@ -1431,6 +1439,7 @@ dostop(v, c)
     Char  **v;
     struct command *c;
 {
+    USE(c);
 #ifdef BSDJOBS
     pkill(++v, SIGSTOP);
 #endif /* BSDJOBS */
@@ -1450,6 +1459,7 @@ dokill(v, c)
     extern int T_Cols;
     extern int nsig;
 
+    USE(c);
     v++;
     if (v[0] && v[0][0] == '-') {
 	if (v[0][1] == 'l') {
@@ -1754,6 +1764,7 @@ donotify(v, c)
 {
     register struct process *pp;
 
+    USE(c);
     pp = pfind(*++v);
     pp->p_flags |= PNOTIFY;
 }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.51 1993/06/24 15:29:37 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.52 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.51 1993/06/24 15:29:37 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.52 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1429,6 +1429,7 @@ goodbye(v, c)
     Char **v;
     struct command *c;
 {
+    USE(c);
     rechist(NULL);
     recdirs(NULL);
 
@@ -1863,6 +1864,7 @@ dosource(t, c)
     extern int bequiet;
     char    buf[BUFSIZE];
 
+    USE(c);
     t++;
     if (*t && eq(*t, STRmh)) {
 	if (*++t == NULL)

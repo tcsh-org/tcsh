@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.53 1993/05/17 00:11:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.54 1993/06/25 21:17:12 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -66,6 +66,8 @@ typedef char Char;
 # define SAVE(a) (strsave(a))
 #endif 
 
+/* Elide unused argument warnings */
+#define USE(a)	((void) (a))
 /*
  * If your compiler complains, then you can either
  * throw it away and get gcc or, use the following define

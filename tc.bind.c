@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.bind.c,v 3.13 1993/02/12 17:22:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.bind.c,v 3.14 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.13 1993/02/12 17:22:20 christos Exp christos $")
+RCSID("$Id: tc.bind.c,v 3.14 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -349,6 +349,7 @@ dobindkey(v, c)
     Char   *out;
     KEYCMD  cmd;
 
+    USE(c);
     if (!MapsAreInited)
 	ed_InitMaps();
 
@@ -500,7 +501,7 @@ parsecmd(str)
 
     for (fp = FuncNames; fp->name; fp++) {
 	if (strcmp(short2str(str), fp->name) == 0) {
-	    return fp->func;
+	    return (KEYCMD) fp->func;
 	}
     }
     xprintf("Bad command name: %S\n", str);
@@ -781,6 +782,7 @@ dobind(v, dummy)
     Char   *p, *l;
     Char    buf[1000];
 
+    USE(dummy);
     /*
      * Assume at this point that i'm given 2 or 3 args - 'bind', the f-name,
      * and the key; or 'bind' key to print the func for that key.

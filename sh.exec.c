@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.exec.c,v 3.21 1992/10/27 16:18:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.22 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.21 1992/10/27 16:18:15 christos Exp christos $")
+RCSID("$Id: sh.exec.c,v 3.22 1993/06/25 21:17:12 christos Exp christos $")
 
 #include "tc.h"
 #include "tw.h"
@@ -534,6 +534,7 @@ execash(t, kp)
 #endif /* CLOSE_ON_EXEC */
     sigret_t (*osigint)(), (*osigquit)(), (*osigterm)();
 
+    USE(t);
     if (chkstop == 0 && setintr)
 	panystop(0);
     /*
@@ -638,6 +639,7 @@ dohash(vv, c)
     Char  **pv;
     int hashval;
 
+     USE(c);
 #ifdef FASTHASH
     if (vv && vv[1]) {
         hashlength = atoi(short2str(vv[1]));
@@ -718,6 +720,8 @@ dounhash(v, c)
     Char **v;
     struct command *c;
 {
+    USE(c);
+    USE(v);
     havhash = 0;
 #ifdef FASTHASH
     if (xhash) {
@@ -734,6 +738,8 @@ hashstat(v, c)
     Char **v;
     struct command *c;
 {
+    USE(c);
+    USE(v);
 #ifdef FASTHASH 
    if (havhash && hashlength && hashwidth)
       xprintf("%d hash buckets of %d bits each\n",
@@ -960,6 +966,7 @@ dowhere(v, c)
     register Char **v;
     struct command *c;
 {
+    USE(c);
     for (v++; *v; v++)
 	(void) find_cmd(*v, 1);
 }

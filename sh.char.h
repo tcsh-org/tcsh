@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.char.h,v 3.5 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.char.h,v 3.6 1993/06/05 21:09:15 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -79,23 +79,23 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 #define isspc(c)	cmap(c, _SP)
 #define ismeta(c)	cmap(c, _META)
 #define iscmdmeta(c)	cmap(c, _CMD)
-#define letter(c)	(((c) & QUOTE) ? 0 : \
+#define letter(c)	(((Char)(c) & QUOTE) ? 0 : \
 			 (isalpha((unsigned char) (c)) || (c) == '_'))
-#define alnum(c)	(((c) & QUOTE) ? 0 : \
+#define alnum(c)	(((Char)(c) & QUOTE) ? 0 : \
 		         (isalnum((unsigned char) (c)) || (c) == '_'))
 #ifdef NLS
-# define Isspace(c)	(((c) & QUOTE) ? 0 : isspace((unsigned char) (c)))
-# define Isdigit(c)	(((c) & QUOTE) ? 0 : isdigit((unsigned char) (c)))
-# define Isalpha(c)	(((c) & QUOTE) ? 0 : isalpha((unsigned char) (c)))
-# define Islower(c)	(((c) & QUOTE) ? 0 : islower((unsigned char) (c)))
-# define Isupper(c)	(((c) & QUOTE) ? 0 : isupper((unsigned char) (c)))
-# define Tolower(c) 	(((c) & QUOTE) ? 0 : tolower((unsigned char) (c)))
-# define Toupper(c) 	(((c) & QUOTE) ? 0 : toupper((unsigned char) (c)))
-# define Isxdigit(c)	(((c) & QUOTE) ? 0 : isxdigit((unsigned char) (c)))
-# define Isalnum(c)	(((c) & QUOTE) ? 0 : isalnum((unsigned char) (c)))
-# define Iscntrl(c) 	(((c) & QUOTE) ? 0 : iscntrl((unsigned char) (c)))
-# define Isprint(c) 	(((c) & QUOTE) ? 0 : isprint((unsigned char) (c)))
-# define Ispunct(c) 	(((c) & QUOTE) ? 0 : ispunct((unsigned char) (c)))
+# define Isspace(c)	(((Char)(c) & QUOTE) ? 0 : isspace((unsigned char) (c)))
+# define Isdigit(c)	(((Char)(c) & QUOTE) ? 0 : isdigit((unsigned char) (c)))
+# define Isalpha(c)	(((Char)(c) & QUOTE) ? 0 : isalpha((unsigned char) (c)))
+# define Islower(c)	(((Char)(c) & QUOTE) ? 0 : islower((unsigned char) (c)))
+# define Isupper(c)	(((Char)(c) & QUOTE) ? 0 : isupper((unsigned char) (c)))
+# define Tolower(c) 	(((Char)(c) & QUOTE) ? 0 : tolower((unsigned char) (c)))
+# define Toupper(c) 	(((Char)(c) & QUOTE) ? 0 : toupper((unsigned char) (c)))
+# define Isxdigit(c)	(((Char)(c) & QUOTE) ? 0 : isxdigit((unsigned char) (c)))
+# define Isalnum(c)	(((Char)(c) & QUOTE) ? 0 : isalnum((unsigned char) (c)))
+# define Iscntrl(c) 	(((Char)(c) & QUOTE) ? 0 : iscntrl((unsigned char) (c)))
+# define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : isprint((unsigned char) (c)))
+# define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : ispunct((unsigned char) (c)))
 #else
 # define Isspace(c)	cmap(c, _SP|_NL)
 # define Isdigit(c)	cmap(c, _DIG)
@@ -105,7 +105,7 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 # define Tolower(c)	(_cmap_lower[(unsigned char)(c)])
 # define Toupper(c)	(_cmap_upper[(unsigned char)(c)])
 # define Isxdigit(c)	cmap(c, _XD)
-# define Isalnum(c)	(cmap(c, _DIG|_LET) && !(((c) & META) && AsciiOnly))
+# define Isalnum(c)	(cmap(c, _DIG|_LET) && !(((Char)(c) & META) && AsciiOnly))
 # define Iscntrl(c)	(cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
 # define Isprint(c)	(!cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
 # define Ispunct(c)	(cmap(c,_PUN) && !(((c) & META) && AsciiOnly))
