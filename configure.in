@@ -190,6 +190,10 @@ case "${tcsh_cv_canonical}" in
   bs2000-sni-posix)
     tcsh_config_file=bs2000
   ;;
+  ## Cray
+  *-cray-unicos*)
+    tcsh_config_file=cray
+  ;;
 
   * )
   changequote([, ])dnl
