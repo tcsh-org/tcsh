@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.16 2004/11/23 02:10:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.17 2004/12/25 21:15:09 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.16 2004/11/23 02:10:50 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.17 2004/12/25 21:15:09 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -342,7 +342,7 @@ print_with_color(filename, len, suffix)
 	}
     }
     else
-	xprintf("\045S", filename);
+	xprintf("%S", filename);
     xputwchar(suffix);
 }
 

@@ -1,9 +1,10 @@
+ 64. Avoid the SCCS percent-S-percent sequence differently (Kimmo Suominen)
  63. Mark position update fixes (Martin Kraemer)
  62. Define BSDLIMIT and BSDTIMES for Cygwin (Corinna Vinschen)
  61. Fix NLSFrom prototype (Martin Kraemer)
  60. V6.13.08 - 20050303
- 59. Add test for socklen_t in autoconf.
- 58. Fix problems with NLSFrom prototype.
+ 59. Add test for socklen_t in autoconf
+ 58. Fix problems with NLSFrom prototype
  57. Deal with AIX's utmpx lossage
  56. V6.13.07 - 20050118
  55. constifications, XXX: duplicate prototype on setpgrp().

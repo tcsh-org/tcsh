@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.103 2005/01/18 20:14:04 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.104 2005/01/18 20:43:31 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.103 2005/01/18 20:14:04 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.104 2005/01/18 20:43:31 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -2101,7 +2101,7 @@ print_by_column(dir, items, count, no_file_suffix)
 		}
 		else {
 		    /* Print filename followed by '/' or '*' or ' ' */
-		    xprintf("\045S%c", items[i],
+		    xprintf("%-S%c", items[i],
 			    filetype(dir, items[i]));
 		    wx++;
 		}
