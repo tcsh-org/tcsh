@@ -143,6 +143,12 @@ static	void	 qprintf	__P((Char *));
 #define	M_SET		META('[')
 #define	ismeta(c)	(((c)&M_META) != 0)
 
+#ifndef BUFSIZE
+#define GLOBBUFLEN	MAXPATHLEN
+#else
+#define GLOBBUFLEN	BUFSIZE
+#endif
+
 int
 globcharcoll(c1, c2)
     int c1, c2;
@@ -172,7 +178,7 @@ static DIR *
 Opendir(str)
     register Char *str;
 {
-    char    buf[MAXPATHLEN];
+    char    buf[GLOBBUFLEN];
     register char *dc = buf;
 #if defined(hpux) || defined(__hpux)
     struct stat st;
@@ -198,7 +204,7 @@ Lstat(fn, sb)
     register Char *fn;
     struct stat *sb;
 {
-    char    buf[MAXPATHLEN];
+    char    buf[GLOBBUFLEN];
     register char *dc = buf;
 
     while ((*dc++ = *fn++) != '\0')
@@ -225,7 +231,7 @@ Stat(fn, sb)
     register Char *fn;
     struct stat *sb;
 {
-    char    buf[MAXPATHLEN];
+    char    buf[GLOBBUFLEN];
     register char *dc = buf;
 
     while ((*dc++ = *fn++) != '\0')
@@ -306,7 +312,7 @@ glob(pattern, flags, errfunc, pglob)
     Char *bufnext, *bufend, *compilebuf, m_not;
     const unsigned char *compilepat, *patnext;
     int     c, not;
-    Char patbuf[MAXPATHLEN + 1], *qpatnext;
+    Char patbuf[GLOBBUFLEN + 1], *qpatnext;
     int     no_match;
 
     patnext = (unsigned char *) pattern;
@@ -331,7 +337,7 @@ glob(pattern, flags, errfunc, pglob)
     }
 
     bufnext = patbuf;
-    bufend = bufnext + MAXPATHLEN;
+    bufend = bufnext + GLOBBUFLEN;
     compilebuf = bufnext;
     compilepat = patnext;
 
@@ -459,7 +465,7 @@ glob1(pattern, pglob, no_match)
     glob_t *pglob;
     int     no_match;
 {
-    Char pathbuf[MAXPATHLEN + 1];
+    Char pathbuf[GLOBBUFLEN + 1];
 
     /*
      * a null pathname is invalid -- POSIX 1003.1 sect. 2.4.
@@ -545,7 +551,7 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob, no_match)
     struct dirent *dp;
     int     err;
     Char m_not = (pglob->gl_flags & GLOB_ALTNOT) ? M_ALTNOT : M_NOT;
-    char cpathbuf[MAXPATHLEN], *ptr;;
+    char cpathbuf[GLOBBUFLEN], *ptr;;
 
     *pathend = EOS;
     errno = 0;
