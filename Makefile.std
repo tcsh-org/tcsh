@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.23 1992/03/08 02:17:22 christos Exp $
+# $Id: Makefile,v 1.24 1992/03/10 04:02:07 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -61,9 +61,6 @@ CFLAGS=-O $(INCLUDES)
 
 # for at&t machines
 #CFLAGS= -O -Ksd $(INCLUDES)
-
-# for convexen
-#CFLAGS= $(INCLUDES) -ext -tm c1
 
 # Stardent Titan
 #CFLAGS = $(INCLUDES) -O -43

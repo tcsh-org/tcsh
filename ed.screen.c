@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.15 1992/03/08 02:17:22 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.16 1992/03/10 04:02:22 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.15 1992/03/08 02:17:22 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.16 1992/03/10 04:02:22 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -354,7 +354,7 @@ ReBufferDisplay()
 	xfree((ptr_t) b);
     }
     TermH = Val(T_co);
-    if (adrof(STRmargin_bug) != NULL || ! T_Margin)
+    if (! T_Margin)
 	/* make this public, -1 to avoid wraps */
 	TermH--;
     TermV = (INBUFSIZE * 4) / TermH + 1;
@@ -422,7 +422,7 @@ SetTC(what, how)
 	    }
 	    T_Tabs = Val(T_pt);
 	    T_HasMeta = Val(T_km);
-	    T_Margin = !Val(T_am);
+	    T_Margin = !Val(T_am) && (adrof(STRmargin_bug) == NULL);
 	    return;
 	}
 	else {

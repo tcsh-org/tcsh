@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.char.h,v 3.1 1991/11/26 04:41:23 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.char.h,v 3.2 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -64,6 +64,7 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 #define	_XD 	0x1000		/* 0-9, a-f, A-F */
 #define	_CMD	0x2000		/* lex end of command chars, ;&(|` */
 #define _CTR	0x4000		/* control */
+#define _PUN	0x8000		/* punctuation */
 
 #if defined(SHORT_STRINGS) && defined(KANJI)
 #define cmap(c, bits)	\
@@ -94,6 +95,7 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 # define Isalnum(c)	(((c) & QUOTE) ? 0 : isalnum((unsigned char) (c)))
 # define Iscntrl(c) 	(((c) & QUOTE) ? 0 : iscntrl((unsigned char) (c)))
 # define Isprint(c) 	(((c) & QUOTE) ? 0 : isprint((unsigned char) (c)))
+# define Ispunct(c) 	(((c) & QUOTE) ? 0 : ispunct((unsigned char) (c)))
 #else
 # define Isspace(c)	cmap(c, _SP|_NL)
 # define Isdigit(c)	cmap(c, _DIG)
@@ -106,6 +108,7 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 # define Isalnum(c)	(cmap(c, _DIG|_LET) && !(((c) & META) && AsciiOnly))
 # define Iscntrl(c)	(cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
 # define Isprint(c)	(!cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
+# define Ispunct(c)	(!cmap(c,_PUN) && !(((c) & META) && AsciiOnly))
 #endif
 
 #endif /* _h_sh_char */

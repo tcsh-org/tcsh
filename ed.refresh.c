@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.refresh.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.refresh.c,v 3.4 1992/01/27 04:20:47 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.4 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -1097,8 +1097,10 @@ PutPlusOne(c)
 	CursorH = 0;
 	CursorV++;
 	OldvcV++;
-	(void) putraw('\r');
-	(void) putraw('\n');
+	if (!T_Margin) {
+	    (void) putraw('\r');
+	    (void) putraw('\n');
+	}
     }
 }
 
