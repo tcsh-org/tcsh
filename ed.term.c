@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.term.c,v 1.11 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.term.c,v 1.12 1992/10/05 02:41:30 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.11 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.12 1992/10/05 02:41:30 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -48,8 +48,8 @@ ttyperm_t ttylist = {
 	{ "iflag:", ICRNL, (INLCR|IGNCR) },
 	{ "oflag:", (OPOST|ONLCR), ONLRET },
 	{ "cflag:", 0, 0 },
-	{ "lflag:", (ISIG|ICANON|ECHO|ECHOE|ECHOCTL|IEXTEN|IDEFAULT),
-		    (NOFLSH|ECHONL|EXTPROC|FLUSHO) },
+	{ "lflag:", (ISIG|ICANON|ECHO|ECHOE|ECHOCTL|IEXTEN),
+		    (NOFLSH|ECHONL|EXTPROC|FLUSHO|IDEFAULT) },
 #else /* GSTTY */
 	{ "nrmal:", (ECHO|CRMOD|ANYP), (CBREAK|RAW|LCASE|VTDELAY|ALLDELAY) },
 	{ "local:", (LCRTBS|LCRTERA|LCRTKIL), (LPRTERA|LFLUSHO) },

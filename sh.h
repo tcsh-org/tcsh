@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.47 1992/11/13 08:47:03 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.h,v 3.48 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -65,14 +65,6 @@ typedef char Char;
 # define SAVE(a) (strsave(a))
 #endif 
 
-#ifdef PURIFY
-/* Re-define those, cause purify might use them */
-# define xprintf 	printf
-# define xsprintf	sprintf
-# define xvprintf	vprintf
-/* exit normally, allowing purify to trace leaks */
-# define _exit		exit
-#endif /* PURIFY */
 
 /*
  * If your compiler complains, then you can either
@@ -354,6 +346,19 @@ extern int setpgrp();
 #endif 
 
 
+#ifdef PURIFY
+/* Re-define those, cause purify might use them */
+# define xprintf 	printf
+# define xsprintf	sprintf
+# define xvprintf	vprintf
+# define xvsprintf	vsprintf
+/* exit normally, allowing purify to trace leaks */
+# define _exit		exit
+typedef  int		pret_t;
+#else
+typedef void		pret_t;
+#endif /* PURIFY */
+
 typedef int bool;
 
 #include "sh.types.h"
@@ -571,8 +576,8 @@ extern jmp_buf_t reslab;
 
 EXTERN Char   *gointr;		/* Label for an onintr transfer */
 
-EXTERN sigret_t (*parintr) ();	/* Parents interrupt catch */
-EXTERN sigret_t (*parterm) ();	/* Parents terminate catch */
+extern sigret_t (*parintr) ();	/* Parents interrupt catch */
+extern sigret_t (*parterm) ();	/* Parents terminate catch */
 
 /*
  * Lexical definitions.
@@ -909,6 +914,16 @@ extern int errno, sys_nerr;
 #endif /* !linux */
 
 /*
+ * For operating systems with single case filenames (OS/2)
+ */
+#ifdef CASE_INSENSITIVE
+# define samecase(x) (isupper((unsigned char)(x)) ? \
+		      tolower((unsigned char)(x)) : (x))
+#else
+# define samecase(x) (x)
+#endif /* CASE_INSENSITIVE */
+
+/*
  * strings.h:
  */
 #ifndef SHORT_STRINGS
@@ -932,7 +947,7 @@ extern int errno, sys_nerr;
 #define short2blk(a) 		saveblk(a)
 #define short2str(a) 		strip(a)
 #else
-#define Strchr(a, b)   	s_strchr(a, b)
+#define Strchr(a, b)		s_strchr(a, b)
 #define Strrchr(a, b) 		s_strrchr(a, b)
 #define Strcat(a, b)  		s_strcat(a, b)
 #define Strncat(a, b, c) 	s_strncat(a, b, c)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.42 1992/10/18 00:30:39 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.43 1993/01/08 22:23:12 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.42 1992/10/18 00:30:39 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.43 1993/01/08 22:23:12 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1730,7 +1730,8 @@ int
 StrQcmp(str1, str2)
     register Char *str1, *str2;
 {
-    for (; *str1 && (*str1 & TRIM) == (*str2 & TRIM); str1++, str2++)
+    for (; *str1 && samecase(*str1 & TRIM) == samecase(*str2 & TRIM); 
+	 str1++, str2++)
 	continue;
     /*
      * The following case analysis is necessary so that characters which look
