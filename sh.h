@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.59 1993/10/30 19:55:13 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.60 1993/12/12 19:55:08 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -435,6 +435,10 @@ extern void		DebugFree	__P((ptr_t, char *, int));
 #if !defined(MAXNAMLEN) && defined(_D_NAME_MAX)
 # define MAXNAMLEN _D_NAME_MAX
 #endif /* MAXNAMLEN */
+
+#ifdef REMOTEHOST
+# include <netdb.h>
+#endif /* REMOTEHOST */
 
 #ifndef MAXHOSTNAMELEN
 # define MAXHOSTNAMELEN	255

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.48 1993/11/13 01:27:28 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.49 1993/12/12 19:55:08 christos Exp christos $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.48 1993/11/13 01:27:28 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.49 1993/12/12 19:55:08 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1697,7 +1697,12 @@ collate(a, b)
 
     rv = strcoll(sa, sb);
 
-    if (errno != 0) {
+    /*
+     * We should be checking for errno != 0, but some systems
+     * forget to reset errno to 0. So we only check for the 
+     * only documented valid errno value for strcoll [EINVAL]
+     */
+    if (errno == EINVAL) {
 	xfree((ptr_t) sa);
 	xfree((ptr_t) sb);
 	stderror(ERR_SYSTEM, "strcoll", strerror(errno));
@@ -1779,7 +1784,6 @@ hashbang(fd, vp)
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <netdb.h>
 
 /*
  * From: <lesv@ppvku.ericsson.se> (Lennart Svensson)

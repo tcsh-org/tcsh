@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dir.c,v 3.34 1993/11/13 00:40:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dir.c,v 3.35 1993/12/12 19:55:08 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.34 1993/11/13 00:40:56 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.35 1993/12/12 19:55:08 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -208,9 +208,12 @@ dodirs(v, c)
 	dp->di_next = dp->di_prev = &dhead;
     }
     if ((dflag & DIR_LOAD) != 0) 
-	loaddirs(*v++);
+	loaddirs(*v);
     else if ((dflag & DIR_SAVE) != 0)
-	recdirs(*v++, 1);
+	recdirs(*v, 1);
+
+    if (*v && (dflag & (DIR_SAVE|DIR_LOAD)))
+	v++;
 
     if (*v != NULL || (dflag & DIR_OLD))
 	stderror(ERR_DIRUS, "dirs", flags, "");

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/pathnames.h,v 3.12 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/pathnames.h,v 3.13 1993/07/08 04:51:54 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -64,6 +64,19 @@
 #  define _PATH_DOTCSHRC	"/etc/cshrc.std"
 # endif /* !_PATH_DOTCSHRC */
 #endif /* NeXT */
+
+/* for sunos5.  */
+#if ((defined(sun) || defined(__sun__)) && (SYSVREL == 4))
+# ifndef _PATH_DOTLOGIN
+#  define _PATH_DOTLOGIN	"/etc/.login"
+# endif /* !_PATH_DOTLOGIN */
+# ifndef _PATH_DOTLOGOUT
+#  define _PATH_DOTLOGOUT	"/etc/.logout"
+# endif /* !_PATH_DOTLOGOUT */
+# ifndef _PATH_DOTCSHRC
+#  define _PATH_DOTCSHRC	"/etc/.cshrc"
+# endif /* !_PATH_DOTCSHRC */
+#endif /* sun & SVR4 */
 
 #if defined(sgi) || defined(OREO) || defined(cray) || defined(AMIX) || defined(CDC)
 # ifndef _PATH_DOTLOGIN

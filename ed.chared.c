@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.37 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.38 1993/11/13 00:40:56 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.37 1993/10/30 19:50:16 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.38 1993/11/13 00:40:56 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -811,8 +811,10 @@ c_get_histline()
     if (LastChar > InputBuf) {
 	if (LastChar[-1] == '\n')
 	    LastChar--;
+#if 0
 	if (LastChar[-1] == ' ')
 	    LastChar--;
+#endif
 	if (LastChar < InputBuf)
 	    LastChar = InputBuf;
     }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.const.c,v 3.25 1993/11/13 00:40:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.const.c,v 3.26 1993/12/12 19:55:08 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.25 1993/11/13 00:40:56 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.26 1993/12/12 19:55:08 christos Exp $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -84,6 +84,7 @@ Char STRowd[]           = { 'o', 'w', 'd', '\0' };
 Char STRstar[]          = { '*', '\0' };
 Char STRdot[]           = { '.', '\0' };
 Char STRhistory[]       = { 'h', 'i', 's', 't', 'o', 'r', 'y', '\0' };
+Char STRhistdup[]	= { 'h', 'i', 's', 't', 'd', 'u', 'p', '\0' };
 Char STRhistfile[]      = { 'h', 'i', 's', 't', 'f', 'i', 'l', 'e', '\0' };
 Char STRsource[]        = { 's', 'o', 'u', 'r', 'c', 'e', '\0' };
 Char STRmh[]            = { '-', 'h', '\0' };
@@ -225,6 +226,7 @@ Char STRQNULL[]		= { '\0' | QUOTE, '\0' };
 Char STRcorrect[]	= { 'c', 'o', 'r', 'r', 'e', 'c', 't', '\0' };
 Char STRcmd[]		= { 'c', 'm', 'd', '\0' };
 Char STRall[]		= { 'a', 'l', 'l', '\0' };
+Char STRprev[]		= { 'p', 'r', 'e', 'v', '\0' };
 Char STRcomplete[]	= { 'c', 'o', 'm', 'p', 'l', 'e', 't', 'e', '\0' };
 Char STRenhance[]	= { 'e', 'n', 'h', 'a', 'n', 'c', 'e', '\0' };
 Char STRautoexpand[]	= { 'a', 'u', 't', 'o', 'e', 'x', 'p', 'a', 'n', 'd',

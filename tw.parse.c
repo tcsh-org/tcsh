@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.58 1993/11/13 00:40:56 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.59 1993/12/12 19:55:08 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.58 1993/11/13 00:40:56 christos Exp christos $")
+RCSID("$Id: tw.parse.c,v 3.59 1993/12/12 19:55:08 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1813,7 +1813,7 @@ filetype(dir, file)
 	    if (S_ISDIR(statb.st_mode))	/* normal Directory */
 		return ('/');
 #endif
-	    if (statb.st_mode & S_IXUSR|S_IXGRP|S_IXOTH)
+	    if (statb.st_mode & (S_IXUSR|S_IXGRP|S_IXOTH))
 		return ('*');
 	}
     }

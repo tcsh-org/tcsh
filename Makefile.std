@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.59 1993/11/13 00:40:56 christos Exp $
+# $Id: Makefile.std,v 1.60 1993/12/12 19:55:08 christos Exp christos $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -144,7 +144,7 @@ LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -ltermcap -lndir -lsocket -ljobs ## masscomp RTU6.0
 #LIBES= -lcurses			 ## AIX on the rt
 #LIBES= -lcurses			 ## TitanOS on the stellar
-#LIBES= -ltermlib			 ## SysV4 w/o BSDTIMES or Solaris 2
+#LIBES= -ltermlib -lsocket -lnsl	 ## SysV4 w/o BSDTIMES or Solaris 2
 #LIBES= -lcurses			 ## SysV3 w/o networking
 #LIBES= -lcurses -lnet			 ## SysV3 with networking
 #LIBES= -lcurses -ldir			 ## SysV2 w/o networking & dirlib
@@ -167,7 +167,7 @@ LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -lposix -ltermcap -lc_s		 ## A/UX 3.0
 #LIBES= -ldirent -lcurses		 ## att3b1 cc w/o shared lib & dirlib
 #LIBES= -shlib -ldirent -lcurses	 ## att3b1 gcc with shared lib & dirlib
-#LIBES= -lcurses -lc /usr/ucblib/libucb.a		 ## SysV4 with BSDTIMES
+#LIBES= -ltermlib -lsocket -lnsl -lc /usr/ucblib/libucb.a ## SysV4 with BSDTIMES
 #LIBES= -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a ## Stardent Vistra
 #LIBES= -ltermc				 ## emx under OS/2
 #LIBES=					 ## Minix, VMS_POSIX

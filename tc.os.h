@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.51 1993/11/13 00:40:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.52 1993/12/12 19:55:08 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -531,10 +531,10 @@ extern void qsort();
 extern void perror();
 
 # ifdef BSDSIGS
-#  if defined(_AIX370) || defined(MACH) || defined(NeXT) || defined(_AIXPS2) || defined(ardent) || defined(SUNOS4)
+#  if defined(_AIX370) || defined(MACH) || defined(NeXT) || defined(_AIXPS2) || defined(ardent) || defined(SUNOS4) || defined(HPBSD)
 extern int sigvec();
 extern int sigpause();
-#  else	/* !(_AIX370 || MACH || NeXT || _AIXPS2 || ardent || SUNOS4) */
+#  else	/* !(_AIX370 || MACH || NeXT || _AIXPS2 || ardent || SUNOS4 || HPBSD) */
 #   if (!defined(apollo) || !defined(__STDC__)) && !defined(__DGUX__) && !defined(fps500)
 extern sigret_t sigvec();
 extern void sigpause();
@@ -577,7 +577,9 @@ extern int strcoll();
 
 # ifdef BSDJOBS
 #  ifdef BSDTIMES
+#   ifndef HPBSD
 extern int wait3();
+#   endif /* HPBSD */
 #  else	/* !BSDTIMES */
 #   if !defined(POSIXJOBS) && !defined(_SEQUENT_)
 extern int wait3();
@@ -599,7 +601,7 @@ extern int setpriority();
 extern int nice();
 # endif	/* BSDNICE */
 
-# if (!defined(fps500) && !defined(apollo) && !defined(__lucid))
+# if (!defined(fps500) && !defined(apollo) && !defined(__lucid) && !defined(HPBSD))
 extern void setpwent();
 extern void endpwent();
 # endif /* !fps500 && !apollo && !__lucid */
@@ -658,6 +660,9 @@ extern void bcopy	__P((const void *, void *, size_t));
 #endif /* !hpux && !COHERENT && (SYSVREL < 4 || _SEQUENT_) && !__386BSD__ && !memmove */
 
 #if SYSVREL == 4
+# ifdef REMOTEHOST
+extern int getpeername();
+# endif /* REMOTEHOST */
 # ifndef BSDTIMES
 extern int getrlimit();
 extern int setrlimit();

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dol.c,v 3.25 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dol.c,v 3.26 1993/10/30 19:50:16 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.25 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.26 1993/10/30 19:50:16 christos Exp $")
 
 /*
  * C shell
@@ -480,14 +480,28 @@ Dgetdol()
 	    stderror(ERR_NOTALLOWED, "$#<");
 	if (length)
 	    stderror(ERR_NOTALLOWED, "$%<");
-	for (np = wbuf; read(OLDSTD, &tnp, 1) == 1; np++) {
-	    *np = (unsigned char) tnp;
-	    if (np >= &wbuf[BUFSIZE - 1])
-		stderror(ERR_LTOOLONG);
-	    if (tnp == '\n')
-		break;
+	{
+#ifdef BSDSIGS
+	    sigmask_t omask = sigsetmask(sigblock(0) & ~sigmask(SIGINT));
+#else /* !BSDSIGS */
+	    sigrelse(SIGINT);
+#endif /* BSDSIGS */
+	    for (np = wbuf; read(OLDSTD, &tnp, 1) == 1; np++) {
+		*np = (unsigned char) tnp;
+		if (np >= &wbuf[BUFSIZE - 1])
+		    stderror(ERR_LTOOLONG);
+		if (tnp == '\n')
+		    break;
+	    }
+	    *np = 0;
+#ifdef BSDSIGS
+	    (void) sigsetmask(omask);
+#else /* !BSDSIGS */
+	    (void) sighold(SIGINT);
+#endif /* BSDSIGS */
 	}
-	*np = 0;
+
+#ifdef COMPAT
 	/*
 	 * KLUDGE: dolmod is set here because it will cause setDolp to call
 	 * domod and thus to copy wbuf. Otherwise setDolp would use it
@@ -495,12 +509,17 @@ Dgetdol()
 	 * it. The actual function of the 'q' causes filename expansion not to
 	 * be done on the interpolated value.
 	 */
-#ifdef COMPAT
-	dolmod = 'q';
-#else
-	dolmod[dolnmod++] = 'q';
-#endif /* COMPAT */
+	/* 
+	 * If we do that, then other modifiers don't work.
+	 * in addition, let the user specify :q if wanted
+	 * [christos]
+	 */
+/*old*/	dolmod = 'q';
+/*new*/	dolmod[dolnmod++] = 'q';
 	dolmcnt = 10000;
+#endif /* COMPAT */
+
+	fixDolMod();
 	setDolp(wbuf);
 	goto eatbrac;
 
@@ -1061,7 +1080,7 @@ heredoc(term)
 	 * If any ` in line do command substitution
 	 */
 	mbp = mbuf;
-	if (any(short2str(mbp), '`')) {
+	if (Strchr(mbp, '`') != NULL) {
 	    /*
 	     * 1 arg to dobackp causes substitution to be literal. Words are
 	     * broken only at newlines so that all blanks and tabs are

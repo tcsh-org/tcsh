@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.types.h,v 3.27 1993/01/08 22:23:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.types.h,v 3.28 1993/06/05 21:09:15 christos Exp christos $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -253,6 +253,17 @@ typedef char * caddr_t;
    typedef unsigned int speed_t; 
 # endif /* _SPEED_T */
 #endif /* RENO */
+
+
+/***
+ *** Utah's HPBSD
+ *** some posix & 4.4 BSD changes (pid_t is a short)
+ ***/
+#ifdef HPBSD
+# ifndef _PID_T
+#  define _PID_T
+# endif /* _PID_T */
+#endif /* HPBSD */
 
 
 /***

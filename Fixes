@@ -1,4 +1,12 @@
 V6.05.00, ... 
+ 58. Modifiers now work with $< and $< does not do :q by default.
+     [incompatibility with csh] and $< can be interrupted.
+ 57. Added $histdup.
+ 56. source /etc/.login for Solaris 2.x
+ 55. don't remove trailing spaces in history searches.
+ 54. dirs -L and dirs -S spurious warning elimination.
+ 53. man page fixes from David.
+ 52. Kimmo's patch [makefile, gcc warning, netdb.h include]
  51. 6.04.05 12/12/93
  50. rewrote srcunit() to use st_save and st_restore. The code was
      too messy to be useful before.
