@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.6 1991/07/25 16:05:01 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.7 1991/07/25 18:50:54 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.init.c,v 3.6 1991/07/25 16:05:01 christos Exp christos $")
+RCSID("$Id: ed.init.c,v 3.7 1991/07/25 18:50:54 christos Exp $")
 
 #include "sh.h"
 #define EXTERN			/* intern */
@@ -54,6 +54,10 @@ RCSID("$Id: ed.init.c,v 3.6 1991/07/25 16:05:01 christos Exp christos $")
 # if defined(VDISCRD) && !defined(VDISCARD)
 #  define VDISCARD VDISCRD
 # endif /* VDISCRD && !VDISCARD */
+
+# if defined(VFLUSHO) && !defined(VDISCARD)
+#  define VDISCARD VFLUSHO
+# endif  /* VFLUSHO && VDISCARD */
 
 # if defined(VSTRT) && !defined(VSTART)
 #  define VSTART VSTRT
@@ -796,6 +800,9 @@ ed_Init()
 # ifdef VSWTCH
 	nio.c_cc[VSWTCH] = _POSIX_VDISABLE;
 # endif /* VSWTCH */
+# ifdef VERASE2
+	nio.c_cc[VERASE2] = _POSIX_VDISABLE;
+# endif /* VERASE2 */
 # ifdef VSTART
 	nio.c_cc[VSTART] = '\021';	/* ^Q */
 # endif /* VSTART */
