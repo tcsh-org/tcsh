@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.93 2000/11/19 20:50:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.94 2001/02/21 18:03:51 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -297,7 +297,7 @@ typedef int sigret_t;
 # include <limits.h>
 #endif /* POSIX && !WINNT_NATIVE */
 
-#if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX)
+#if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX) || defined(linux)
 # if !defined(pyr) && !defined(stellar)
 #  include <time.h>
 #  ifdef _MINIX
