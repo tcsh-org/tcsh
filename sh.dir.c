@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.dir.c,v 1.2 91/07/14 22:22:49 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dir.c,v 3.1 1991/07/15 19:37:24 christos Exp christos $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.dir.c,v 3.1 1991/07/15 19:37:24 christos Exp christos $")
 
 
 #include "sh.h"
@@ -268,11 +268,12 @@ dnormalize(cp)
     Char   *cp;
 {
 
-#define UC (unsigned char)
-#define ISDOT(c) (UC(c)[0] == '.' && ((UC(c)[1] == '\0') || (UC(c)[1] == '/')))
-#define ISDOTDOT(c) (UC(c)[0] == '.' && ISDOT(&((c)[1])))
+#define TRM(a) ((a) & TRIM)
+#define ISDOT(c) (TRM((c)[0]) == '.' && ((TRM((c)[1]) == '\0') || \
+		  (TRM((c)[1]) == '/')))
+#define ISDOTDOT(c) (TRM((c)[0]) == '.' && ISDOT(&((c)[1])))
 
-    if ((unsigned char) cp[0] == '/')
+    if (TRM(cp[0]) == '/')
 	return (Strsave(cp));
 
 #ifdef S_IFLNK
@@ -320,7 +321,7 @@ dnormalize(cp)
 		break;
 
 	if (*cp) {
-	    if (((unsigned char) cwd[(dotdot = Strlen(cwd)) - 1]) != '/')
+	    if ((TRM(cwd[(dotdot = Strlen(cwd)) - 1])) != '/')
 		cwd[dotdot++] = '/';
 	    cwd[dotdot] = '\0';
 	    dp = Strspl(cwd, cp);
