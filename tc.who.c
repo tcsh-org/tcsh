@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.5 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.6 1991/10/14 20:42:30 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.5 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.6 1991/10/14 20:42:30 christos Exp $")
 
 #include "tc.h"
 
@@ -195,7 +195,7 @@ watch_login()
 #endif
 	return;			/* no names to watch */
     }
-    vp = v->vec;
+    trim(vp = v->vec);
     if (blklen(vp) % 2)		/* odd # args: 1st == # minutes. */
 	interval = (number(*vp)) ? getn(*vp++) : MAILINTVL;
     (void) time(&t);
@@ -368,11 +368,11 @@ watch_login()
 
 	for (wp = wholist; wp != NULL; wp = wp->w_next) {
 	    if (wp->w_status & ANNOUNCE ||
-		(!eq(*vp, STRany) &&
-		 !eq(*vp, str2short(wp->w_name)) &&
-		 !eq(*vp, str2short(wp->w_new))) ||
-		(!eq(*(vp + 1), str2short(wp->w_tty)) &&
-		 !eq(*(vp + 1), STRany)))
+		(!eq(STRany, vp[0]) &&
+		 !Gmatch(str2short(wp->w_name), vp[0]) &&
+		 !Gmatch(str2short(wp->w_new),  vp[0])) ||
+		(!Gmatch(str2short(wp->w_tty),  vp[1]) &&
+		 !eq(STRany, vp[1])))
 		continue;	/* entry doesn't qualify */
 	    /* already printed or not right one to print */
 

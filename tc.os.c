@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.8 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.9 1991/10/20 01:38:14 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.8 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.9 1991/10/20 01:38:14 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -728,6 +728,22 @@ osinit()
 #endif
 }
 
+#ifdef strerror
+char *
+xstrerror(i)
+    int i;
+{
+    static char errbuf[40]; /* 64 bit num */
+
+    if (i >= 0 && i < sys_nerr) 
+	return sys_errlist[i];
+    else {
+	xsprintf(errbuf, "Unknown Error: %d", i);
+	return errbuf;
+    }
+}
+#endif /* strerror */
+    
 #ifdef gethostname
 #include <sys/utsname.h>
 

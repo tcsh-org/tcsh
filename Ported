@@ -38,7 +38,7 @@ OS	:	hpux 6.5, 7.0.x, 8.0
 CONFIG	:	config.hpux
 ENVIRON	:	n/a
 NOTES	:	Don't use -lBSD; breaks getpgrp(). Config.hp-3.2 obsolete?
-VERSION	:	6.00.01
+VERSION	:	6.00.03
 
 VENDOR	:	hp
 MODELS	:	hp9000s500
@@ -102,11 +102,11 @@ NOTES	:	are the changes that are needed to compile in POSIX mode
 VERSION	:	6.00.01
 
 VENDOR	:	ibm
-MODELS	:	ps/2, rs6000, rt, ibm370, ibmESA
+MODELS	:	ps/2, rs6000, ibm370, ibmESA
 COMPILER:	cc
 CFLAGS	:	normal
 LIBES	:	-lcurses -lbsd
-OS	:	aix 3.1 (rs6000) aix 1.1 (ps/2) aix 2.2.1 (rt) aix G9.9 (ibm370)
+OS	:	aix 3.1 (rs6000) aix 1.1 (ps/2) aix G9.9 (ibm370)
 	:	aix (ibmESA)
 CONFIG	:	config.aix
 ENVIRON	:	n/a
@@ -130,7 +130,7 @@ MODELS	:	rt
 COMPILER:	cc
 CFLAGS	:	-I. -Nd4000 -Nn3000
 LIBES	:	-lcurses
-OS	:	aix 2.1.2
+OS	:	aix 2.2.1
 CONFIG	:	config.aix
 ENVIRON	:	n/a
 NOTES	:	Stacksize limit is 1K off?

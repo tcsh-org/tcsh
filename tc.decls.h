@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.5 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.6 1991/10/20 01:38:14 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -125,7 +125,9 @@ extern	void	 	  pr_stat_sub	__P((struct process_stats *,
 #ifdef NEEDtcgetpgrp
 extern	int	 	  xtcgetpgrp	__P((int));
 extern	int		  xtcsetpgrp	__P((int, int));
+# undef tcgetpgrp
 # define tcgetpgrp(a) 	  xtcgetpgrp(a)
+# undef tcsetpgrp
 # define tcsetpgrp(a, b)  xtcsetpgrp(a, b)
 #endif
 #ifdef YPBUGS
@@ -134,11 +136,18 @@ extern	void	 	  fix_yp_bugs	__P((void));
 extern	void	 	  osinit	__P((void));
 #ifdef NEEDgetwd
 extern	char		 *xgetwd	__P((char *));
+#undef getwd
 #define getwd(a) xgetwd(a)
 #endif
 #ifdef NEEDgethostname
-extern	int	 	  gethostname	__P((char *, int));
+extern	int	 	  xgethostname	__P((char *, int));
+#undef gethostname
 #define gethostname(a, b) xgethostname(a, b)
+#endif
+#ifdef NEEDstrerror
+extern	char	 	 *xstrerror	__P((int));
+#undef strerror
+#define strerror(a) 	  xstrerror(a)
 #endif
 #ifdef apollo
 extern	void		  doinlib	__P((Char **, struct command *));

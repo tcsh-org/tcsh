@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.4 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.5 1991/10/20 01:38:14 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.4 1991/10/18 16:27:13 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.5 1991/10/20 01:38:14 christos Exp $")
 
 /*
  * C shell
@@ -80,6 +80,7 @@ static Char dolmod[MAXMOD];	/* : modifier character */
 static int dolnmod;		/* Number of modifiers */
 #endif /* COMPAT */
 static int dolmcnt;		/* :gx -> 10000, else 1 */
+static int dolwcnt;		/* :ax -> 10000, else 1 */
 
 static	void	 Dfix2		__P((Char **));
 static	Char 	*Dpack		__P((Char *, Char *));
@@ -400,9 +401,9 @@ Dgetdol()
     static Char *dolbang = NULL;
 
 #ifdef COMPAT
-    dolmod = dolmcnt = 0;
+    dolmod = dolmcnt = dolwcnt = 0;
 #else
-    dolnmod = dolmcnt = 0;
+    dolnmod = dolmcnt = dolwcnt = 0;
 #endif /* COMPAT */
     c = sc = DgetC(0);
     if (c == '{')
@@ -634,9 +635,23 @@ fixDolMod()
 #ifndef COMPAT
 	do {
 #endif /* COMPAT */
-	    c = DgetC(0), dolmcnt = 1;
-	    if (c == 'g')
-		c = DgetC(0), dolmcnt = 10000;
+	    c = DgetC(0), dolmcnt = 1, dolwcnt = 1;
+	    if (c == 'g' || c == 'a') {
+		if (c == 'g')
+		    dolmcnt = 10000;
+		else
+		    dolwcnt = 10000;
+		c = DgetC(0);
+	    }
+	    if ((c == 'g' && dolmcnt != 10000) || 
+		(c == 'a' && dolwcnt != 10000)) {
+		if (c == 'g')
+		    dolmcnt = 10000;
+		else
+		    dolwcnt = 10000;
+		c = DgetC(0); 
+	    }
+
 	    if (c == 's') {	/* [eichin:19910926.0755EST] */
 		int delimcnt = 2;
 		int delim = DgetC(0);
@@ -705,6 +720,7 @@ setDolp(cp)
 	    int delim;
 	    Char *lhsub, *rhsub, *np;
 	    size_t lhlen = 0, rhlen = 0;
+	    int didmod = 0;
 		
 	    delim = dolmod[++i];
 	    if (!delim || letter(delim)
@@ -723,27 +739,51 @@ setDolp(cp)
 	    }
 	    dolmod[i] = 0;
 
-	    dp = Strstr(cp, lhsub);
-	    if(dp) {
-		np = (Char *) xmalloc((size_t)
-				      ((Strlen(cp) + 1 - lhlen + rhlen)*sizeof(Char)));
-		Strncpy(np,cp,dp-cp);
-		Strcpy(np+(dp-cp),rhsub);
-		Strcpy(np+(dp-cp)+rhlen,dp+lhlen);
+	    do {
+		dp = Strstr(cp, lhsub);
+		if (dp) {
+		    np = (Char *) xmalloc((size_t)
+					  ((Strlen(cp) + 1 - lhlen + rhlen) *
+					  sizeof(Char)));
+		    (void) Strncpy(np, cp, dp - cp);
+		    (void) Strcpy(np + (dp - cp), rhsub);
+		    (void) Strcpy(np + (dp - cp) + rhlen, dp + lhlen);
 
-		xfree((ptr_t) cp);
-		dp = cp = np;
-	    } else {
-		/* should this do a seterror? */
+		    xfree((ptr_t) cp);
+		    dp = cp = np;
+		    didmod = 1;
+		} else {
+		    /* should this do a seterror? */
+		    break;
+		}
 	    }
-        } else if ((dp = domod(cp, dolmod[i]))) {
-	    xfree((ptr_t) cp);
-	    cp = dp;
-	    dolmcnt--;
-	}
-	else {
+	    while (dolwcnt == 10000);
+	    /*
+	     * restore dolmod for additional words
+	     */
+	    dolmod[i] = rhsub[-1] = delim;
+	    if (didmod)
+		dolmcnt--;
+	    else
+		break;
+        } else {
+	    int didmod = 0;
+
+	    do {
+		if ((dp = domod(cp, dolmod[i]))) {
+		    xfree((ptr_t) cp);
+		    cp = dp;
+		    didmod = 1;
+		}
+		else
+		    break;
+	    }
+	    while (dolwcnt == 10000);
 	    dp = cp;
-	    break;
+	    if (didmod)
+		dolmcnt--;
+	    else
+		break;
 	}
     }
 #endif /* COMPAT */

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.14 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.15 1991/10/20 01:38:14 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.14 1991/10/18 16:27:13 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.15 1991/10/20 01:38:14 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -224,10 +224,18 @@ ed_Setup(rst)
      */
     if (rst) {
 	if (tty_cooked_mode(&tstty)) {
-	    tty_getchar(&extty, ttychars[TS_IO]);
-	    for (rst = 0; rst < C_NCC; rst++)
-		if (ttychars[TS_IO][rst] != _POSIX_VDISABLE)
+	    tty_getchar(&tstty, ttychars[TS_IO]);
+	    /*
+	     * Don't affect CMIN and CTIME
+	     */
+	    for (rst = 0; rst < C_NCC - 2; rst++) {
+		if (ttychars[TS_IO][rst] != _POSIX_VDISABLE &&
+		    ttychars[EX_IO][rst] != _POSIX_VDISABLE)
 		    ttychars[EX_IO][rst] = ttychars[TS_IO][rst];
+		if (ttychars[TS_IO][rst] != _POSIX_VDISABLE &&
+		    ttychars[ED_IO][rst] != _POSIX_VDISABLE)
+		    ttychars[ED_IO][rst] = ttychars[TS_IO][rst];
+	    }
 	}
 	tty_setchar(&extty, ttychars[EX_IO]);
 	if (tty_setty(SHTTY, &extty) == -1) {

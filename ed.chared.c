@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.10 1991/10/14 20:42:30 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.11 1991/10/18 16:27:13 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.10 1991/10/14 20:42:30 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.11 1991/10/18 16:27:13 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1844,6 +1844,7 @@ e_list_delnext(c)
     }
 }
 
+/*ARGSUSED*/
 CCRETVAL
 e_list_eof(c)
     int c;

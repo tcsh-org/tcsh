@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.15 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.16 1991/10/20 01:38:14 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -36,6 +36,8 @@
  */
 #ifndef _h_tc_os
 #define _h_tc_os
+
+#define NEEDstrerror		/* Too hard to find which systems have it */
 
 #if SVID > 3
 /*

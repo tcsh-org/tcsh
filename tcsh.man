@@ -1,5 +1,5 @@
-.\" $Id: tcsh.man,v 3.17 1991/10/13 23:44:48 christos Exp $
-.TH TCSH 1 "18 October 1991" "Cornell"
+.\" $Id: tcsh.man,v 3.18 1991/10/18 16:27:13 christos Exp $
+.TH TCSH 1 "20 October 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -1430,7 +1430,7 @@ has a mechanism so that the user can watch for login and logout
 activity of any user or terminal in the system.
 This is accomplished using the new special shell variable
 .I watch,
-which contains login/terminal name pairs to be checked for activity.
+which contains login/terminal pattern pairs to be checked for activity.
 For example:
 .nf
 .sp
@@ -1446,13 +1446,13 @@ either a user's or a terminal's name, thus allowing
 .nf
 .sp
 .RS +.6i
-> set watch=(brad any any ttyh0)
+> set watch=('b*' any any ttyh0)
 .RE
 .sp
 .fi
-which will check for user "brad" logging in or out of the system on any
-terminal, as well as anyone logging in to /dev/ttyh0.
-Naturally, the completely general case
+which will check for users that match the pattern 'b*' logging in 
+or out of the system on any terminal, as well as anyone logging in 
+to /dev/ttyh0. Naturally, the completely general case
 .nf
 .sp
 .RS +.6i
@@ -2098,7 +2098,7 @@ a colon, and the full current working directory.
 A more fancy way to do that is:
 .sp
 .RS +.6i
-> alias cwdcmd 'echo -n "]2;${HOST}:$cwd]1;${HOST}"'
+> alias cwdcmd 'echo -n "^[]2;${HOST}:$cwd^G^[]1;${HOST}^G"'
 .RE
 .sp
 This will put the hostname and working directory on the title bar but
@@ -2487,6 +2487,64 @@ re-written as:
 .RE
 .fi
 .sp
+Also 
+.I tcsh 
+has an additional : character
+.I a
+which applies the current modifier multiple times in the same word, in
+the same way
+.I g
+applies the modifier once in each word:
+.sp
+.nf
+.RS +.6in
+> set foo=(a:b:c d:e:f)
+> echo $foo:s/:/ /
+a b:c d:e:f
+> echo $foo:gs/:/ /
+a b:c d e:f
+> echo $foo:as/:/ /
+a b c d:e:f
+> echo $foo:ags/:/ /
+a b c d e f
+.RE
+.fi
+.sp
+The 
+.I csh 
+expert will notice in the above example another
+.I tcsh 
+enhancement. In 
+.I csh
+the 
+.I s
+modifier does not work for variables.
+.sp
+The 
+.I a 
+character works correctly with other modifiers, for example:
+.sp
+.nf
+.RS +.6in
+> echo $host
+tesla.ee.cornell.edu
+> echo $host:r
+tesla.ee.cornell
+> echo $host:ar
+tesla
+.RE
+.fi
+.sp
+.I Note:
+The 
+.I a
+character causes a modifier to be applied to a word repeatedly until
+the modifier fails. This can lead to an infinite loop in the current
+implementation when used with the
+.I s
+modifier. For example :as/f/ff/ will never terminate. This behavior
+might change in the future.
+
 .SH FYI
 This shell uses cbreak mode but takes typed-ahead characters anyway.
 You can still use
@@ -2755,7 +2813,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.00.03 (Cornell) 10/18/91.
+This man page documents tcsh 6.00.03 (Cornell) 10/20/91.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
@@ -2808,14 +2866,17 @@ Re-ported tcsh to A/UX.
 .sp
 .SH "BUGFIXES AND ENHANCEMENTS"
 David Dawes, Sydney U. Australia, Physics dept., 1991
+.br
 SVR4 job control fixes. (reverse pipeline startup code, and signal fixes).
-.br
+.sp
 Jose Sousa, Interactive Systems Corp., 1991
+.br
 Extended vi fixes. Added delete command in vi.
-.br
+.sp
 Marc Horowitz, MIT, 1991
-Ansification fixes, new exec hashing code, imake fixes, where builtin.
 .br
+Ansification fixes, new exec hashing code, imake fixes, where builtin.
+.sp
 Eric Schnoebelen, Convex, 1990
 .br
 Convex support, lots of csh bug fixes, save and restore of directory stack.

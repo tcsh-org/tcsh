@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.c,v 1.2 1991/10/13 23:44:48 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.c,v 1.3 1991/10/20 01:38:14 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.2 1991/10/13 23:44:48 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.3 1991/10/20 01:38:14 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -505,6 +505,7 @@ static struct tcshmodes {
     { NULL, 0, -1 },
 };
 
+/*ARGSUSED*/
 void
 dosetty(v, t)
     Char **v;
