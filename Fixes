@@ -1,3 +1,6 @@
+ 50. forward<->reverse char conversion verification (Miloslav Trmac)
+ 49. japanese locale additions (Yoshiyuki Sakakibara)
+ 48. wide character/utf 8 cleanups (Michael Schroeder)
  47. V6.13.06 - 20050105
  46. autoconf cleanup (Miloslav Trmac)
  45. Fix literal refresh code (Michael Schroeder)
