@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.42 2002/03/08 17:06:17 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.43 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.42 2002/03/08 17:06:17 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.43 2002/03/08 17:36:47 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -420,7 +420,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			    *p++ = attributes | '+';
 			} else
 			    *p++ = attributes | ('0' + updirs);
-			*p++ = attributes | tcsh ? '>' : '%';
+			*p++ = attributes | '>';
 		    }
 		}
 		
@@ -531,6 +531,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case '$':
 		sz = (int) (ep - p);
 		(void) expdollar(&p, &cp, &sz, attributes);
+		/* cp should point the last char of currnet % sequence */
+		cp--;
 		break;
 	    case '%':
 		*p++ = attributes | '%';
