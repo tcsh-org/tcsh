@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.37 2000/01/14 22:57:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.38 2000/04/18 19:40:46 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.37 2000/01/14 22:57:29 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.38 2000/04/18 19:40:46 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -222,7 +222,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    fmthist('R', info, (char *) (cz = cbuff), sizeof(cbuff));
 		else
 		    cz = (unsigned char *) str;
-		if (str != NULL)
+		if (cz != NULL)
 		    for (; *cz; *p++ = attributes | *cz++)
 			if (p >= ep) break;
 		break;
@@ -477,7 +477,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'w':
 		if (p >= ep - 5) break;
 		for (cz = (unsigned char *) month_list[t->tm_mon]; *cz;
-		    *p++ = attributes | *cz++);
+		    *p++ = attributes | *cz++)
 		    if (p >= ep) break;
 		break;
 	    case 'W':
