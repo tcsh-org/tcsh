@@ -1,4 +1,9 @@
 V6.00.04, ....
+34. (beta-5 11/25/91)
+33. Simplify code in BindArrowKeys()
+32. Get rid of the PNULL's
+31. Support for shadow password in locking code. (From Kimmo)
+30. Normalize-path editor function.
 29. (beta-4 11/21/91)
 28. minix additions
 27. bindkey fixes (-c addition, casting cleanups)

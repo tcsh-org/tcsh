@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.10 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.11 1991/11/22 02:28:12 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.10 1991/11/17 05:39:06 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.11 1991/11/22 02:28:12 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -58,6 +58,7 @@ static Char mismatch[] = {'!', '\\', '^', '-', '%', '\0'};
 static	int	GetNextCommand	__P((KEYCMD *, Char *));
 static	int	SpellLine	__P((int));
 static	void	RunCommand	__P((Char *));
+static void 	doeval1		__P((Char **));
 
 /* CCRETVAL */
 int
@@ -360,6 +361,20 @@ Inputl()
 	    DoingArg = 0;
 	    break;
 
+	case CC_NORMALIZE_PATH:
+	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf,
+			  PATH_NORMALIZE) <= 0)
+		Beep();		/* Beep = No match */
+	    if (NeedsRedraw) {
+		ClearLines();
+		ClearDisp();
+		NeedsRedraw = 0;
+	    }
+	    Refresh();
+	    Argument = 1;
+	    DoingArg = 0;
+	    break;
+
 	case CC_EXPAND_VARS:
 	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf,
 			  VARS_EXPAND) <= 0)
@@ -425,17 +440,81 @@ PushMacro(str)
     }
 }
 
+/*
+ * Like eval, only using the current file descriptors
+ */
+static Char **gv = NULL;
+
+static void
+doeval1(v)
+    Char **v;
+{
+    Char  **oevalvec;
+    Char   *oevalp;
+    int     my_reenter;
+    Char  **savegv;
+    jmp_buf osetexit;
+
+    oevalvec = evalvec;
+    oevalp = evalp;
+    savegv = gv;
+
+
+    gflag = 0, tglob(v);
+    if (gflag) {
+	gv = v = globall(v);
+	gargv = 0;
+	if (v == 0)
+	    stderror(ERR_NOMATCH);
+	v = copyblk(v);
+    }
+    else {
+	gv = NULL;
+	v = copyblk(v);
+	trim(v);
+    }
+
+    getexit(osetexit);
+
+    /* PWP: setjmp/longjmp bugfix for optimizing compilers */
+#ifdef cray
+    my_reenter = 1;             /* assume non-zero return val */
+    if (setexit() == 0) {
+        my_reenter = 0;         /* Oh well, we were wrong */
+#else /* !cray */
+    if ((my_reenter = setexit()) == 0) {
+#endif /* cray */
+	evalvec = v;
+	evalp = 0;
+	process(0);
+    }
+
+    evalvec = oevalvec;
+    evalp = oevalp;
+    doneinp = 0;
+
+    if (gv)
+	blkfree(gv);
+
+    gv = savegv;
+    resexit(osetexit);
+    if (my_reenter)
+	stderror(ERR_SILENT);
+}
+
 static void
 RunCommand(str)
     Char *str;
 {
-    Char *cmd[3];
+    Char *cmd[2];
 
-    cmd[0] = NULL;	/* Tells eval not to play with file descriptors */
-    cmd[1] = str;
-    cmd[2] = NULL;
     xprintf("\n");	/* Start on a clean line */
-    doeval(cmd, NULL);
+
+    cmd[0] = str;
+    cmd[1] = NULL;
+
+    doeval1(cmd);
+    
     ClearLines();
     ClearDisp();
     NeedsRedraw = 1;
