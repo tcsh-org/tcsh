@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.92 2000/11/11 23:03:35 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.93 2001/01/29 01:28:02 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.92 2000/11/11 23:03:35 christos Exp $")
+RCSID("$Id: sh.c,v 3.93 2001/01/29 01:28:02 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -674,6 +674,11 @@ main(argc, argv)
      * suffix of file names...
      */
     set(STRaddsuffix, Strsave(STRNULL), VAR_READWRITE);
+
+    /*
+     * Random default kill ring size
+     */
+    set(STRkillring, SAVE("30"), VAR_READWRITE);
 
     /*
      * Re-initialize path if set in environment

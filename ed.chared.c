@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.62 2000/07/15 19:58:49 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.63 2000/11/11 23:03:33 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -76,7 +76,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.62 2000/07/15 19:58:49 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.63 2000/11/11 23:03:33 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -137,6 +137,7 @@ static	Char	*c_preword		__P((Char *, Char *, int));
 static	Char	*c_nexword		__P((Char *, Char *, int));
 static	Char	*c_endword		__P((Char *, Char *, int));
 static	Char	*c_eword		__P((Char *, Char *, int));
+static	void	 c_push_kill		__P((Char *, Char *));
 static  CCRETVAL c_get_histline		__P((void));
 static  CCRETVAL c_search_line		__P((Char *, int));
 static  CCRETVAL v_repeat_srch		__P((int));
@@ -920,6 +921,73 @@ c_eword(p, high, n)
 
     p--;
     return(p);
+}
+
+/* Set the max length of the kill ring */
+void
+SetKillRing(max)
+    int max;
+{
+    CStr *new;
+    int count, i, j;
+
+    if (max < 1)
+	max = 1;		/* no ring, but always one buffer */
+    if (max == KillRingMax)
+	return;
+    new = (CStr *)xcalloc((size_t) max, sizeof(CStr));
+    if (KillRing != NULL) {
+	if (KillRingLen != 0) {
+	    if (max >= KillRingLen) {
+		count = KillRingLen;
+		j = KillPos;
+	    } else {
+		count = max;
+		j = (KillPos - count + KillRingLen) % KillRingLen;
+	    }
+	    for (i = 0; i < KillRingLen; i++) {
+		if (i < count)	/* copy latest */
+		    new[i] = KillRing[j];
+		else		/* free the others */
+		    xfree(KillRing[j].buf);
+		j = (j + 1) % KillRingLen;
+	    }
+	    KillRingLen = count;
+	    KillPos = count % max;
+	    YankPos = count - 1;
+	}
+	xfree(KillRing);
+    }
+    KillRing = new;
+    KillRingMax = max;
+}
+
+/* Push string from start upto (but not including) end onto kill ring */
+static void
+c_push_kill(start, end)
+    Char *start, *end;
+{
+    CStr *pos;
+    Char *cp, *kp;
+    int len = end - start + 1;
+
+    YankPos = KillPos;
+    if (KillRingLen < KillRingMax)
+	KillRingLen++;
+    pos = &KillRing[KillPos];
+    KillPos = (KillPos + 1) % KillRingMax;
+    if (pos->len < len) {
+	if (pos->buf == NULL)
+	    pos->buf = (Char *) xmalloc(len * sizeof(Char));
+	else
+	    pos->buf = (Char *) xrealloc((ptr_t) pos->buf, len * sizeof(Char));
+	pos->len = len;
+    }
+    cp = start;
+    kp = pos->buf;
+    while (cp < end)
+	*kp++ = *cp++;
+    *kp = '\0';
 }
 
 static CCRETVAL
@@ -2215,25 +2283,90 @@ CCRETVAL
 e_yank_kill(c)
     int c;
 {				/* almost like GnuEmacs */
+    register int len;
     register Char *kp, *cp;
 
     USE(c);
-    if (LastKill == KillBuf)	/* if zero content */
+    if (KillRingLen == 0)	/* nothing killed */
 	return(CC_ERROR);
-
-    if (LastChar + (LastKill - KillBuf) >= InputLim)
+    len = Strlen(KillRing[YankPos].buf);
+    if (LastChar + len >= InputLim)
 	return(CC_ERROR);	/* end of buffer space */
 
     /* else */
-    Mark = Cursor;		/* set the mark */
     cp = Cursor;		/* for speed */
 
-    c_insert((int)(LastKill - KillBuf));	/* open the space, */
-    for (kp = KillBuf; kp < LastKill; kp++)	/* copy the chars */
+    c_insert(len);		/* open the space, */
+    for (kp = KillRing[YankPos].buf; *kp; kp++)	/* copy the chars */
 	*cp++ = *kp;
 
-    if (Argument == 1)		/* if an arg, cursor at beginning */
-	Cursor = cp;		/* else cursor at end */
+    if (Argument == 1) {	/* if no arg */
+	Mark = Cursor;		/* mark at beginning, cursor at end */
+	Cursor = cp;
+    } else {
+	Mark = cp;		/* else cursor at beginning, mark at end */
+    }
+
+    return(CC_REFRESH);
+}
+
+/*ARGSUSED*/
+CCRETVAL
+e_yank_pop(c)
+    int c;
+{				/* almost like GnuEmacs */
+    register int m_bef_c, del_len, ins_len;
+    register Char *kp, *cp;
+
+    USE(c);
+
+#if 0
+    /* XXX This "should" be here, but doesn't work, since LastCmd
+       gets set on CC_ERROR and CC_ARGHACK, which it shouldn't(?).
+       (But what about F_ARGFOUR?) I.e. if you hit M-y twice the
+       second one will "succeed" even if the first one wasn't preceded
+       by a yank, and giving an argument is impossible. Now we "succeed"
+       regardless of previous command, which is wrong too of course. */
+    if (LastCmd != F_YANK_KILL && LastCmd != F_YANK_POP)
+	return(CC_ERROR);
+#endif
+
+    if (KillRingLen == 0)	/* nothing killed */
+	return(CC_ERROR);
+    YankPos -= Argument;
+    while (YankPos < 0)
+	YankPos += KillRingLen;
+    YankPos %= KillRingLen;
+
+    if (Cursor > Mark) {
+	del_len = Cursor - Mark;
+	m_bef_c = 1;
+    } else {
+	del_len = Mark - Cursor;
+	m_bef_c = 0;
+    }
+    ins_len = Strlen(KillRing[YankPos].buf);
+    if (LastChar + ins_len - del_len >= InputLim)
+	return(CC_ERROR);	/* end of buffer space */
+
+    if (m_bef_c) {
+	c_delbefore(del_len);
+	Cursor = Mark;
+    } else {
+	c_delafter(del_len);
+    }
+    cp = Cursor;		/* for speed */
+
+    c_insert(ins_len);		/* open the space, */
+    for (kp = KillRing[YankPos].buf; *kp; kp++)	/* copy the chars */
+	*cp++ = *kp;
+
+    if (m_bef_c) {
+	Mark = Cursor;		/* mark at beginning, cursor at end */
+	Cursor = cp;
+    } else {
+	Mark = cp;		/* else cursor at beginning, mark at end */
+    }
 
     return(CC_REFRESH);
 }
@@ -2294,7 +2427,7 @@ CCRETVAL
 e_delwordprev(c)
     int c;
 {
-    register Char *cp, *p, *kp;
+    register Char *cp, *p;
 
     USE(c);
     if (Cursor == InputBuf)
@@ -2303,9 +2436,7 @@ e_delwordprev(c)
 
     cp = c_prev_word(Cursor, InputBuf, Argument);
 
-    for (p = cp, kp = KillBuf; p < Cursor; p++)	/* save the text */
-	*kp++ = *p;
-    LastKill = kp;
+    c_push_kill(cp, Cursor);	/* save the text */
 
     c_delbefore((int)(Cursor - cp));	/* delete before dot */
     Cursor = cp;
@@ -2467,7 +2598,7 @@ CCRETVAL
 e_delwordnext(c)
     int c;
 {
-    register Char *cp, *p, *kp;
+    register Char *cp, *p;
 
     USE(c);
     if (Cursor == LastChar)
@@ -2476,9 +2607,7 @@ e_delwordnext(c)
 
     cp = c_next_word(Cursor, LastChar, Argument);
 
-    for (p = Cursor, kp = KillBuf; p < cp; p++)	/* save the text */
-	*kp++ = *p;
-    LastKill = kp;
+    c_push_kill(Cursor, cp);	/* save the text */
 
     c_delafter((int)(cp - Cursor));	/* delete after dot */
     if (Cursor > LastChar)
@@ -2528,14 +2657,8 @@ CCRETVAL
 e_killend(c)
     int c;
 {
-    register Char *kp, *cp;
-
     USE(c);
-    cp = Cursor;
-    kp = KillBuf;
-    while (cp < LastChar)
-	*kp++ = *cp++;		/* copy it */
-    LastKill = kp;
+    c_push_kill(Cursor, LastChar); /* copy it */
     LastChar = Cursor;		/* zap! -- delete to end */
     return(CC_REFRESH);
 }
@@ -2546,14 +2669,8 @@ CCRETVAL
 e_killbeg(c)
     int c;
 {
-    register Char *kp, *cp;
-
     USE(c);
-    cp = InputBuf;
-    kp = KillBuf;
-    while (cp < Cursor)
-	*kp++ = *cp++;		/* copy it */
-    LastKill = kp;
+    c_push_kill(InputBuf, Cursor); /* copy it */
     c_delbefore((int)(Cursor - InputBuf));
     Cursor = InputBuf;		/* zap! */
     return(CC_REFRESH);
@@ -2564,14 +2681,8 @@ CCRETVAL
 e_killall(c)
     int c;
 {
-    register Char *kp, *cp;
-
     USE(c);
-    cp = InputBuf;
-    kp = KillBuf;
-    while (cp < LastChar)
-	*kp++ = *cp++;		/* copy it */
-    LastKill = kp;
+    c_push_kill(InputBuf, LastChar); /* copy it */
     LastChar = InputBuf;	/* zap! -- delete all of it */
     Cursor = InputBuf;
     return(CC_REFRESH);
@@ -2582,26 +2693,18 @@ CCRETVAL
 e_killregion(c)
     int c;
 {
-    register Char *kp, *cp;
+    register Char *cp;
 
     USE(c);
     if (!Mark)
 	return(CC_ERROR);
 
     if (Mark > Cursor) {
-	cp = Cursor;
-	kp = KillBuf;
-	while (cp < Mark)
-	    *kp++ = *cp++;	/* copy it */
-	LastKill = kp;
+	c_push_kill(Cursor, Mark); /* copy it */
 	c_delafter((int)(cp - Cursor));	/* delete it - UNUSED BY VI mode */
     }
     else {			/* mark is before cursor */
-	cp = Mark;
-	kp = KillBuf;
-	while (cp < Cursor)
-	    *kp++ = *cp++;	/* copy it */
-	LastKill = kp;
+	c_push_kill(Mark, Cursor); /* copy it */
 	c_delbefore((int)(cp - Mark));
 	Cursor = Mark;
     }
@@ -2613,25 +2716,15 @@ CCRETVAL
 e_copyregion(c)
     int c;
 {
-    register Char *kp, *cp;
-
     USE(c);
     if (!Mark)
 	return(CC_ERROR);
 
     if (Mark > Cursor) {
-	cp = Cursor;
-	kp = KillBuf;
-	while (cp < Mark)
-	    *kp++ = *cp++;	/* copy it */
-	LastKill = kp;
+	c_push_kill(Cursor, Mark); /* copy it */
     }
     else {			/* mark is before cursor */
-	cp = Mark;
-	kp = KillBuf;
-	while (cp < Cursor)
-	    *kp++ = *cp++;	/* copy it */
-	LastKill = kp;
+	c_push_kill(Mark, Cursor); /* copy it */
     }
     return(CC_NORM);		/* don't even need to Refresh() */
 }

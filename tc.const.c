@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.const.c,v 3.56 2000/11/11 23:03:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.const.c,v 3.57 2000/11/19 20:50:44 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.56 2000/11/11 23:03:38 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.57 2000/11/19 20:50:44 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -374,6 +374,7 @@ Char STRrm[]		= { 'r', 'm', '\0' };
 
 Char STRimplicitcd[] = { 'i', 'm', 'p', 'l', 'i', 'c', 'i', 't',
                          'c', 'd', '\0' };
+Char STRkillring[] 	= { 'k', 'i', 'l', 'l', 'r', 'i', 'n', 'g', '\0' };
 Char STRshlvl[]		= { 's', 'h', 'l', 'v', 'l', '\0' };
 Char STRKSHLVL[]	= { 'S', 'H', 'L', 'V', 'L', '\0' };
 Char STRLANG[]		= { 'L', 'A', 'N', 'G', '\0' };

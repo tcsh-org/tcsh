@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.defns.c,v 3.35 2000/07/15 19:58:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.defns.c,v 3.36 2000/11/11 23:03:33 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.35 2000/07/15 19:58:50 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.36 2000/11/11 23:03:33 christos Exp $")
 
 #include "ed.h"
 
@@ -270,7 +270,7 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
     e_dabbrev_expand,
 #define		F_DABBREV_EXPAND	112
 	e_copy_to_clipboard,
-#define		F_COPY_CLIP		113
+#define		F_COPY_CLIP	113
 	e_paste_from_clipboard,
 #define		F_PASTE_CLIP	114
 	e_dosify_next,
@@ -278,11 +278,13 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 	e_dosify_prev,
 #define		F_DOSIFY_PREV	116
 	e_page_up,
-#define		F_PAGE_UP		117
+#define		F_PAGE_UP	117
 	e_page_down,
-#define		F_PAGE_DOWN		118
+#define		F_PAGE_DOWN	118
+    e_yank_pop,
+#define		F_YANK_POP	119
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	119
+#define		F_NUM_FNS	120
 
 };
 
@@ -519,7 +521,7 @@ KEYCMD  CcEmacsMap[] = {
     F_UNASSIGNED,		/* M-V */
     F_COPYREGION,		/* M-W */
     F_UNASSIGNED,		/* M-X */
-    F_UNASSIGNED,		/* M-Y */
+    F_YANK_POP,			/* M-Y */
     F_UNASSIGNED,		/* M-Z */
     F_XKEY,			/* M-[ *//* extended key esc -mf Oct 87 */
     F_UNASSIGNED,		/* M-\ */
@@ -551,7 +553,7 @@ KEYCMD  CcEmacsMap[] = {
     F_UNASSIGNED,		/* M-v */
     F_COPYREGION,		/* M-w */
     F_UNASSIGNED,		/* M-x */
-    F_UNASSIGNED,		/* M-y */
+    F_YANK_POP,			/* M-y */
     F_UNASSIGNED,		/* M-z */
     F_UNASSIGNED,		/* M-{ */
     F_UNASSIGNED,		/* M-| */
@@ -1759,6 +1761,10 @@ editinit()
     f->name = "e_page_down";
     f->func = F_PAGE_DOWN;
     f->desc = CSAVS(3, 118, "(win32 only)Page visible console window down");
+    f++;
+    f->name = "yank-pop";
+    f->func = F_YANK_POP;
+    f->desc = CSAVS(3, 119, "Replace just-yanked text with yank from earlier kill");
 
 
     f++;

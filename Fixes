@@ -1,3 +1,4 @@
+  6. Implement kill ring (Per Hedeland)
   5. Avoid core-dumping when a very long $HOME gets passed in (Kris Kennaway)
   4. Add rlimit_vmem for linux based on rlimit_as (N KomaZaki)
   3. back out symlink=expand path check.
