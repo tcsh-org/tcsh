@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.105 2003/05/26 07:11:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.106 2003/11/05 04:41:58 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.105 2003/05/26 07:11:07 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.106 2003/11/05 04:41:58 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -63,6 +63,7 @@ static	int	getword		__P((Char *));
 static	void	toend		__P((void));
 static	void	xecho		__P((int, Char **));
 static	bool	islocale_var	__P((Char *));
+static	void	wpfree		__P((struct whyle *));
 
 struct biltins *
 isbfunc(t)
@@ -831,6 +832,7 @@ search(type, level, goal)
     Char    wordbuf[BUFSIZE];
     register Char *aword = wordbuf;
     register Char *cp;
+    struct whyle *wp;
 
     Stype = (Char) type;
     Sgoal = goal;
@@ -873,6 +875,13 @@ search(type, level, goal)
 	    break;
 
 	case TC_END:
+	    if (type == TC_BRKSW) {
+		wp = whyles;
+		if (wp) {
+			whyles = wp->w_next;
+			wpfree(wp);
+		}
+	    }
 	    if (type == TC_BREAK)
 		level--;
 	    break;
@@ -1031,6 +1040,17 @@ toend()
     wfree();
 }
 
+static void
+wpfree(wp)
+    struct whyle *wp;
+{
+	if (wp->w_fe0)
+	    blkfree(wp->w_fe0);
+	if (wp->w_fename)
+	    xfree((ptr_t) wp->w_fename);
+	xfree((ptr_t) wp);
+}
+
 void
 wfree()
 {
@@ -1080,11 +1100,7 @@ wfree()
 	    }
 	}
 
-	if (wp->w_fe0)
-	    blkfree(wp->w_fe0);
-	if (wp->w_fename)
-	    xfree((ptr_t) wp->w_fename);
-	xfree((ptr_t) wp);
+	wpfree(wp);
     }
 }
 
