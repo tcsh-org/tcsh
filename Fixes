@@ -1,5 +1,8 @@
 V6.01.00, ...
-6.  (V6.00.06 beta 12/05/91)
+11. (V6.00.07 beta 12/08/91)
+10. Allow use of vfork() on systems that do not have job control.
+9.  Avoid NUMCC from being defined twice.
+8.  (V6.00.06 beta 12/05/91)
 7.  SunOS3's FIOCLEX dups...
 6.  Yet another globbing bug fix from Michael (echo .[^.])
 5.  Ultrix now wants __ before cpp symbols.
