@@ -1,4 +1,8 @@
-V6.01.00, ...
+V6.01.00, 12/19/91 [for comp.sources.unix]
+22. Restore the original prompt in automatic correction when the user
+    asks to re-edit the command.
+21. Better error for unreadable files in tw.parse.c
+20. Sequent patches.
 19. (V6.00.08 beta 12/14/91)
 18. Filenames containing # were spelled/expanded incorrectly.
 17. Stellar/stellix port.

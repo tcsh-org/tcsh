@@ -1,6 +1,7 @@
 Hello,
 
 Tcsh-6.00.03 is now available from tesla.ee.cornell.edu. 
+				   [128.84.253.11,128.84.224.11]
 
 Tcsh 6.00.03 now supports SVR4 machines (David Dawes),
 has a full vi editor (Jose Souza), 
@@ -8,53 +9,12 @@ has emacs i-search functions (Per Hederland),
 supports imake (Marc Horowitz),
 and can accept csh constructs in aliases.
 
-For example:
+I wish to thank all the people who beta tested this version and their
+users who suffered through it...
 
-> alias foo 'foreach i (\!$) \
-echo $i \
-end'
-
-> foo 1 2 3
-1 
-2
-3
-
-
-V6.00.03, 10/21/91
-31. watch code now accepts shell patterns.
-30. new hashing code portability fixes.
-29. $foo:gs/:/ / fix and 'a' modifier addition.
-28. Added $! (the pid of the last background job forked)
-27. exec does not kill the shell when it fails.
-26. Irix4.0 decls.
-25. SVR4 uthost fixes from Kimmo Suominen
-24. Imake addition from marc
-23. New i-search from Per.
-22. ibmesa fixes
-21. convex fixes.
-20. t command for vi.
-19. SVR4 fixes (reverse pipeline and sigaction()) from David Dawes.
-18. New hashing from Marc
-17. Added : to the ~name separators so ~foo:~bar works.
-16. New ed.init.c. Added ed.term.c
-15. Still can't get the history exactly csh-like... !-2$ was broken...
-14. vi character searches.
-13. -Dvar=name command line option for the apollos.
-12. Prompt format changes for date/directory.
-11. Vi searches.
-10. Emacs i-search. [currently not bound]
-9.  Vi additions ([dc]-{w,$,f<c>},Undo)
-8.  tcsh -n parses now builtin structures.
-7.  seek to the end on errors in loops.
-6.  echotc -s was broken
-5.  Better !event parsing. !foo;!bar was broken.
-4.  foreach loops and if statements in aliases.
-3.  .cshdirs would corrupt the heap if some directories were not there.
-2.  System V echo was broken with \
-1.  Fixed echo '!-1', history would eat the quote.
-
-
-You can get the whole distribution (/pub/tcsh-6.00/tcsh-6.00.03.tar.Z) 
-or a patch from 6.00.02 to 6.00.03 (/pub/tcsh-6.00/tcsh-6.00.02-6.00.03.patch.Z)
+The whole distribution is in /pub/tcsh-6.00/tcsh-6.00.03.tar.Z
+A patch from 6.00.02 to 6.00.03 is also available in
+/pub/tcsh-6.00/tcsh-6.00.02-6.00.03.patch.Z, but it is 200K, so you might
+be better off getting the whole thing.
 
 christos
