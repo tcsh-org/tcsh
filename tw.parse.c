@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.95 2003/05/26 07:14:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.96 2004/01/23 16:21:33 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.95 2003/05/26 07:14:13 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.96 2004/01/23 16:21:33 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -2210,9 +2210,10 @@ tgetenv(str)
     Char   *str;
 {
     Char  **var;
-    int     len, res;
+    size_t  len;
+    int     res;
 
-    len = (int) Strlen(str);
+    len = Strlen(str);
     /* Search the STR_environ for the entry matching str. */
     for (var = STR_environ; var != NULL && *var != NULL; var++)
 	if (Strlen(*var) >= len && (*var)[len] == '=') {

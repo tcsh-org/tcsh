@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.80 2003/06/03 13:11:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.81 2003/11/09 03:02:46 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.80 2003/06/03 13:11:43 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.81 2003/11/09 03:02:46 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -173,7 +173,6 @@ int snum;
 # else /* !_SEQUENT_ */
     struct tms proctimes;
 
-    USE(snum);
     if (!timesdone) {
 	timesdone++;
 	(void) times(&shtimes);
@@ -181,6 +180,7 @@ int snum;
 # endif	/* !_SEQUENT_ */
 #endif /* !BSDTIMES */
 
+    USE(snum);
 #ifdef JOBDEBUG
     xprintf("pchild()\n");
 #endif	/* JOBDEBUG */

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.11 2002/06/25 19:02:11 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.12 2004/01/23 16:21:33 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.11 2002/06/25 19:02:11 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.12 2004/01/23 16:21:33 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -95,7 +95,7 @@ typedef struct {
 } Extension;
 
 static Extension *extensions = NULL;
-static int nextensions = 0;
+static size_t nextensions = 0;
 
 static char *colors = NULL;
 bool	     color_context_ls = FALSE;	/* do colored ls */
@@ -171,8 +171,7 @@ void
 parseLS_COLORS(value)
     Char   *value;		/* LS_COLOR variable's value */
 {
-    int     i;
-    size_t  len;
+    size_t  i, len;
     const Char   *v;		/* pointer in value */
     char   *c;			/* pointer in colors */
     Extension *e;		/* pointer in extensions */
@@ -284,7 +283,7 @@ print_color(fname, len, suffix)
     size_t  len;
     int     suffix;
 {
-    int     i;
+    size_t  i;
     char   *filename = short2str(fname);
     char   *last = filename + len;
     Str    *color = &variables[VFile].color;

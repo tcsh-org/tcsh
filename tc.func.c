@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.108 2004/05/19 18:51:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.109 2004/07/02 03:07:22 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.108 2004/05/19 18:51:43 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.109 2004/07/02 03:07:22 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -201,7 +201,7 @@ Itoa(n, s, min_digits, attributes)
     unsigned int un;	/* handle most negative # too */
     int pad = (min_digits != 0);
 
-    if (sizeof(buf) - 1 < min_digits)
+    if ((int)(sizeof(buf) - 1) < min_digits)
 	min_digits = sizeof(buf) - 1;
 
     un = n;
@@ -452,6 +452,7 @@ doechotc(v, c)
     register Char **v;
     struct command *c;
 {
+    USE(c);
     if (!GotTermCaps)
 	GetTermCaps();
     EchoTC(++v);
@@ -465,6 +466,7 @@ dosettc(v, c)
 {
     char    tv[2][BUFSIZE];
 
+    USE(c);
     if (!GotTermCaps)
 	GetTermCaps();
 
@@ -855,6 +857,7 @@ sigret_t
 alrmcatch(snum)
 int snum;
 {
+    USE(snum);
 #ifdef UNRELSIGS
     if (snum)
 	(void) sigset(SIGALRM, alrmcatch);
@@ -2286,6 +2289,7 @@ dotermname(v, c)
      */
     char termcap_buffer[2048];
 
+    USE(c);
     /* try to find which entry we should be looking for */
     termtype = (v[1] == NULL ? getenv("TERM") : short2str(v[1]));
     if (termtype == NULL) {

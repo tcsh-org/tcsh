@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.57 2002/11/21 20:02:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.58 2003/03/12 19:14:51 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.57 2002/11/21 20:02:01 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.58 2003/03/12 19:14:51 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -93,9 +93,9 @@ static int hashdebug = 0;
 # define hash(a, b)	(((a) * HSHMUL + (b)) % (hashlength))
 # define widthof(t)	(sizeof(t) * BITS_PER_BYTE)
 # define tbit(f, i, t)	(((t *) xhash)[(f)] &  \
-			 (1L << (i & (widthof(t) - 1))))
+			 (1UL << (i & (widthof(t) - 1))))
 # define tbis(f, i, t)	(((t *) xhash)[(f)] |= \
-			 (1L << (i & (widthof(t) - 1))))
+			 (1UL << (i & (widthof(t) - 1))))
 # define cbit(f, i)	tbit(f, i, unsigned char)
 # define cbis(f, i)	tbis(f, i, unsigned char)
 # define sbit(f, i)	tbit(f, i, unsigned short)

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.22 2002/07/01 20:53:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.23 2003/02/08 20:03:26 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.file.c,v 3.22 2002/07/01 20:53:00 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.23 2003/02/08 20:03:26 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -65,7 +65,7 @@ static	void	 pushback		__P((Char *));
 static	void	 catn			__P((Char *, Char *, int));
 static	void	 copyn			__P((Char *, Char *, int));
 static	Char	 filetype		__P((Char *, Char *));
-static	void	 print_by_column	__P((Char *, Char *[], int));
+static	void	 print_by_column	__P((Char *, Char *[], size_t));
 static	Char 	*tilde			__P((Char *, Char *));
 static	void	 retype			__P((void));
 static	void	 beep			__P((void));
@@ -75,7 +75,7 @@ static	Char	*getitem		__P((DIR *, int));
 static	void	 free_items		__P((Char **, size_t));
 static	int	 tsearch		__P((Char *, COMMAND, int));
 static	int	 compare		__P((const ptr_t, const ptr_t));
-static	int	 recognize		__P((Char *, Char *, int, int));
+static	int	 recognize		__P((Char *, Char *, int, size_t));
 static	int	 is_prefix		__P((Char *, Char *));
 static	int	 is_suffix		__P((Char *, Char *));
 static	int	 ignored		__P((Char *));
@@ -354,9 +354,10 @@ static struct winsize win;
 static void
 print_by_column(dir, items, count)
     Char   *dir, *items[];
-    int     count;
+    size_t  count;
 {
-    int i, rows, r, c, maxwidth = 0, columns;
+    size_t i;
+    int rows, r, c, maxwidth = 0, columns;
 
     if (ioctl(SHOUT, TIOCGWINSZ, (ioctl_t) & win) < 0 || win.ws_col == 0)
 	win.ws_col = 80;
@@ -581,13 +582,13 @@ tsearch(word, command, max_word_length)
     COMMAND command;
 {
     DIR *dir_fd;
-    int numitems = 0, ignoring = TRUE, nignored = 0;
+    int ignoring = TRUE, nignored = 0;
     int name_length, looking_for_lognames;
     Char    tilded_dir[MAXPATHLEN + 1], dir[MAXPATHLEN + 1];
     Char    name[MAXNAMLEN + 1], extended_name[MAXNAMLEN + 1];
     Char   *item;
     Char **items = NULL;
-    size_t maxitems = 0;
+    size_t numitems = 0, maxitems = 0;
 
     looking_for_lognames = (*word == '~') && (Strchr(word, '/') == NULL);
     if (looking_for_lognames) {
@@ -669,7 +670,7 @@ again:				/* search for matches */
 	return (numitems);
     }
     else {			/* LIST */
-	qsort((ptr_t) items, (size_t) numitems, sizeof(items[0]), 
+	qsort((ptr_t) items, numitems, sizeof(items[0]), 
 	    (int (*) __P((const void *, const void *))) compare);
 	print_by_column(looking_for_lognames ? NULL : tilded_dir,
 			items, numitems);
@@ -704,7 +705,8 @@ compare(p, q)
 static int
 recognize(extended_name, item, name_length, numitems)
     Char   *extended_name, *item;
-    int     name_length, numitems;
+    int     name_length;
+    size_t  numitems;
 {
     if (numitems == 1)		/* 1st match */
 	copyn(extended_name, item, MAXNAMLEN);

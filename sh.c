@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.112 2004/07/24 21:52:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.113 2004/08/01 20:45:10 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.112 2004/07/24 21:52:48 christos Exp $")
+RCSID("$Id: sh.c,v 3.113 2004/08/01 20:45:10 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1731,6 +1731,7 @@ goodbye(v, c)
     Char **v;
     struct command *c;
 {
+    USE(v);
     USE(c);
     record();
 
@@ -1869,6 +1870,7 @@ sigret_t
 pintr(snum)
 int snum;
 {
+    USE(snum);
 #ifdef UNRELSIGS
     if (snum)
 	(void) sigset(snum, pintr);

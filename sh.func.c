@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.113 2004/07/25 15:10:54 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.114 2004/08/01 20:44:48 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.113 2004/07/25 15:10:54 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.114 2004/08/01 20:44:48 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -255,6 +255,7 @@ dofiletest(v, c)
 {
     Char **fileptr, *ftest, *res;
 
+    USE(c);
     if (*(ftest = *++v) != '-')
 	stderror(ERR_NAME | ERR_FILEINQ);
     ++v;

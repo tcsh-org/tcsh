@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.115 2004/05/27 13:47:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.116 2004/07/24 21:52:48 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -483,7 +483,6 @@ extern pid_t getpgrp __P((int));
 extern pid_t getpgrp __P((void));
 #  endif	/* BSD || SUNOS4 || IRISD || DGUX */
 # endif /* POSIX */
-extern pid_t setpgrp __P((pid_t, pid_t));
 #endif /* !WINNT_NATIVE */
 
 typedef sigret_t (*signalfun_t) __P((int));

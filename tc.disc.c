@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.disc.c,v 3.12 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.disc.c,v 3.13 2002/07/06 22:28:13 christos Exp $ */
 /*
  * tc.disc.c: Functions to set/clear line disciplines
  *
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.disc.c,v 3.12 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tc.disc.c,v 3.13 2002/07/06 22:28:13 christos Exp $")
 
 #ifdef OREO
 #include <compat.h>
@@ -165,6 +165,7 @@ int     f;
     else
 	return (-1);
 # else
+    USE(f);
     return (0);
 # endif	/* TIOCGETD && NTTYDISC */
 #endif	/* !HAVE_DISC */
@@ -192,5 +193,6 @@ int f;
 # endif /* TIOCSETD && NTTYDISC */
 #endif /* !HAVE_DISC */
     }
+    USE(f);
     return (0);
 } /* end resetdisc */
