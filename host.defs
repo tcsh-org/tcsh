@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.20 1998/04/08 17:57:19 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.21 1998/04/21 16:08:40 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.20 1998/04/08 17:57:19 christos Exp $")
+RCSID("$Id: host.defs,v 1.21 1998/04/21 16:08:40 christos Exp $")
 
 endcode	:
 
@@ -463,6 +463,7 @@ enddef	:
 
 newdef	: defined(__NetBSD__) 
 comment	: NetBSD
+vendor	: defined(arm32)				: "acorn"
 vendor	: defined(alpha)				: "digital"
 vendor	: defined(amiga)				: "commodore"
 vendor	: defined(atari)				: "atari"
@@ -478,6 +479,7 @@ vendor	: defined(sun3)					: "sun"
 vendor	: defined(vax)					: "digital"
 hosttype: 						: "NetBSD"
 ostype	: 						: "NetBSD"
+machtype: defined(arm32)				: "arm32"
 machtype: defined(sparc)				: "sparc"
 machtype: defined(mc68020)				: "m68k"
 machtype: defined(M_i386)				: "i386"
