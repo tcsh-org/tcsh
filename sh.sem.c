@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.59 2004/02/21 20:34:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.60 2004/02/23 15:04:36 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.59 2004/02/21 20:34:25 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.60 2004/02/23 15:04:36 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -654,6 +654,13 @@ execute(t, wanttty, pipein, pipeout, do_glob)
 	    func(t, bifunc);
 	    if (forked)
 		exitstat();
+	    else {
+		if (adrof(STRprintexitvalue)) {
+		    int rv = getn(varval(STRstatus));
+		    if (rv != 0)
+			xprintf(CGETS(17, 2, "Exit %d\n"), rv);
+		}
+	    }
 	    break;
 	}
 	if (t->t_dtyp != NODE_PAREN) {
