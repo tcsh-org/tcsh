@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.16 1991/12/05 18:26:54 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.17 1991/12/14 20:45:46 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.16 1991/12/05 18:26:54 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.17 1991/12/14 20:45:46 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -689,9 +689,15 @@ t_search(word, wp, command, max_word_length, looking_for_command, list_max)
 	    xfree((ptr_t) nd);
 	    if (command == SPELL || SearchNoDirErr)
 		return (-2);
-	    xprintf("\n%s unreadable\n",
+	    /*
+	     * From: Amos Shapira <amoss@cs.huji.ac.il>
+	     * Print a better message when completion fails
+	     */
+	    xprintf("\n%s %s\n",
 		    *tilded_dir ? short2str(tilded_dir) :
-		    (*dollar_dir ? short2str(dollar_dir) : short2str(dir)));
+		    (*dollar_dir ? short2str(dollar_dir) : short2str(dir)),
+		    (errno == ENOTDIR ? "not a directory" :
+		    (errno == ENOENT ? "not found" : "unreadable")));
 	    NeedsRedraw = 1;
 	    return (-1);
 	}

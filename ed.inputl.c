@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.12 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.13 1991/12/14 20:45:46 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.12 1991/11/26 04:28:26 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.13 1991/12/14 20:45:46 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -212,7 +212,7 @@ Inputl()
 			    xprintf("edit\n");
 			    *LastChar-- = '\0';
 			    Cursor = LastChar;
-			    printprompt(0, NULL);
+			    printprompt(3, NULL);
 			    Refresh();
 			    break;
 			}
@@ -631,9 +631,6 @@ GetNextChar(cp)
 	    *cp = tcp;
 	    return (num_read);
 #endif /* TRY_AGAIN */
-#ifdef _SEQUENT_
-	case EBADF:
-#endif /* _SEQUENT_ */
 	case EINTR:
 	    break;
 	default:

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.bind.c,v 3.4 1991/11/04 04:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.bind.c,v 3.5 1991/11/22 02:28:12 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.4 1991/11/04 04:16:33 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.5 1991/11/22 02:28:12 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -908,12 +908,8 @@ pkeys(first, last)
     }
     if (map[first] == F_UNASSIGNED) {
 	if (first == last)
-#ifdef _SEQUENT_
 	    xprintf(" %s\t\tis undefined\n",
 		    unparsekey(map == CcAltMap ? first | 0400 : first));
-#else				/* _SEQUENT_ */
-	    xprintf(" %s\t\tis undefined\n", unparsekey(first));
-#endif				/* _SEQUENT_ */
 	return;
     }
 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.12 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.13 1991/11/26 04:28:26 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.12 1991/11/17 05:39:06 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.13 1991/11/26 04:28:26 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1603,9 +1603,6 @@ again:
 # endif	/* (F_SETFL && O_NDELAY) || FIONBIO */
 		break;
 #endif /* TRY_AGAIN */
-#ifdef _SEQUENT_
-	    case EBADF:
-#endif	/* _SEQUENT_ */
 	    case EINTR:
 		c = 0;
 		break;

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.11 1991/12/05 18:26:54 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.sem.c,v 3.12 1991/12/08 17:17:06 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.11 1991/12/05 18:26:54 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.12 1991/12/08 17:17:06 christos Exp $")
 
 #include "tc.h"
 
@@ -482,6 +482,13 @@ execute(t, wanttty, pipein, pipeout)
 		    }
 
 # ifdef _SEQUENT_
+		    /*
+		     * On some machines (POSIX) the process group leader
+		     * cannot be a zombie. On those machines, the following
+		     * might help. Note that BACKPIPE will break if the
+		     * last process exits too soon.
+		     * (From Jaap)
+		     */
 		    pgetty(wanttty ? wanttty : 1, pgrp);
 # else /* _SEQUENT_ */
 		    pgetty(wanttty, pgrp);
