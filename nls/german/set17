@@ -1,0 +1,14 @@
+$set 17 # sh.proc.c
+1 FEHLER: Warte auf Hintergrund-Job!\n
+2 Beendet %d\n
+3 FEHLER: Prozeﬂ "flushed" zum zweitenmal
+4 Laufend 
+5 Signal 
+6 Beendet %-25d
+7 Erfolgreich beendet
+8 FEHLER: Status=%-9o
+9 \020(core dumped)
+10 \020(Verzeichnis: 
+11 (Verzeichnis jetzt: 
+12 %S: Bereits angehalten\n
+13 %S: Bereits angehalten\n

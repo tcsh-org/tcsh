@@ -1,0 +1,5 @@
+$set 15 # sh.func.c
+1 %s: %s: Kann Begrenzung nicht %s (%s)\n
+2 löschen
+3 setzen
+4 \020hard

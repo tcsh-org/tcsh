@@ -1,0 +1,8 @@
+$set 11 # sh.c
+1 Warning: no access to tty (%s).\n
+2 Thus no job control in this shell.\n
+3 You have %d mail messages.\n
+4 You have %d mail messages in %s.\n
+5 You have %smail.\n
+6 new 
+7 You have %smail in %s.\n
