@@ -1,4 +1,5 @@
 V6.05.00, ... 
+ 51. 6.04.05 12/12/93
  50. rewrote srcunit() to use st_save and st_restore. The code was
      too messy to be useful before.
  49. recdirs and rechist patches again!

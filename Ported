@@ -708,3 +708,13 @@ ENVIRON :	n/a
 NOTES   :	n/a
 VERSION :	6.04.00
 
+VENDOR	:	Harris
+MODELS	:	Tahoe
+COMPILER:	cc, gcc 1.42
+CFLAGS	:	-O
+LIBES	:	-ltermcap
+OS	:	CX/UX 5.1
+CONFIG	:	config.hcx
+ENVIRON :	universe bsd
+NOTES	:	n/a
+VERSION :	6.04.00

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.50 1993/10/30 19:50:16 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.51 1993/11/13 00:40:56 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -220,13 +220,16 @@ struct ucred {
 #ifdef ISC
 /* these are not defined for _POSIX_SOURCE under ISC 2.2 */
 # ifndef S_IFMT
-#  define S_IFMT  0170000		/* type of file */
-#  define S_IFDIR 0040000		/* directory */
-#  define S_IFCHR 0020000		/* character special */
-#  define S_IFBLK 0060000		/* block special */
-#  define S_IFREG 0100000		/* regular */
-#  define S_IFIFO 0010000		/* fifo */
-#  define S_IFNAM 0050000		/* special named file */
+#  define S_IFMT	0170000		/* type of file */
+#  define S_IFDIR	0040000		/* directory */
+#  define S_IFCHR	0020000		/* character special */
+#  define S_IFBLK	0060000		/* block special */
+#  define S_IFREG	0100000		/* regular */
+#  define S_IFIFO	0010000		/* fifo */
+#  define S_IFNAM	0050000		/* special named file */
+#  ifndef ISC202
+#   define S_IFLNK	0120000		/* symbolic link */
+#  endif /* ISC202 */
 # endif /* S_IFMT */
 #endif /* ISC */
 
@@ -639,10 +642,10 @@ extern int ioctl __P((int, int, ...));
 extern int readlink __P((const char *, char *, size_t));
 extern void setgrent __P((void));
 extern void endgrent __P((void));
-# ifdef REMHOST
+# ifdef REMOTEHOST
 struct sockaddr;
 extern int getpeername __P((int, struct sockaddr *, int *));
-# endif /* REMHOST */
+# endif /* REMOTEHOST */
 #endif /* SUNOS4 && __GNUC__ == 2 */
 
 #if (defined(BSD) && !defined(__386BSD__)) || defined(SUNOS4) 

@@ -172,6 +172,11 @@ be able to get ftp it... :-)
     If this happens complain to your vendor, to get a new version of NIS.
     You can fix that in tcsh by defining YPBUGS in config.h
 
+17. Script on SGI 4.0.5 does not give us a tty, so we cannot have job
+    control. Their csh does not have job control either. Try:
+	% script
+	% cat > /dev/tty
+
 christos
 
 Everything else is a bug :-(

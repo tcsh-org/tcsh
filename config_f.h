@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/config_f.h,v 3.6 1992/10/18 00:43:08 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/config_f.h,v 3.7 1993/10/30 19:50:16 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -122,12 +122,12 @@
 #endif
 
 /*
- * REMHOST	Try to determine the remote host that we logged in from
+ * REMOTEHOST	Try to determine the remote host that we logged in from
  *		using first getpeername, and then the utmp file. If
- *		successful, set $REMHOST to the name or address of the
+ *		successful, set $REMOTEHOST to the name or address of the
  *		host
  */
-#define REMHOST
+#define REMOTEHOST
 
 /*
  * RCSID	This defines if we want rcs strings in the binary or not

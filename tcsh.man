@@ -2616,8 +2616,10 @@ maximum number of cpu-seconds to be used by each process),
 \fIfilesize\fR (the largest single file which can be created),
 \fIdatasize\fR (the maximum growth of the data+stack region via
 sbrk(2) beyond the end of the program text), \fIstacksize\fR (the
-maximum size of the automatically-extended stack region), and
-\fIcoredumpsize\fR (the size of the largest core dump that will be created).
+maximum size of the automatically-extended stack region),
+\fIcoredumpsize\fR (the size of the largest core dump that will be created),
+and \fImemoryuse\fR, the maximum amount of physical memory a process
+may have allocated to it at a given time.
 .PP
 \fImaximum-use\fR may be given as a (floating point or
 integer) number followed by a scale factor.  For all limits
@@ -3917,7 +3919,7 @@ ng
 The \fInewgrp\fR builtin is available
 .TP 4
 rh
-The shell attempts to set the \fBREMHOST\fR environment variable
+The shell attempts to set the \fBREMOTEHOST\fR environment variable
 .PD
 .PP
 In addition to the above strings, administrators can 
@@ -4086,6 +4088,9 @@ ETA 10 running SVR3
 .TP 16
 gould-np1
 Gould NP1
+.TP 16
+hkc
+Harris Tahoe running CX/UX
 .TP 16
 hk68
 Heurikon HK68 running Uniplus+ 5.0
@@ -4303,7 +4308,7 @@ See \fBNative Language System support\fR.
 A colon-separated list of directories in which to look for executables.
 Equivalent to the \fBpath\fR shell variable, but in a different format.
 .TP 8
-.B REMHOST \fR(+)
+.B REMOTEHOST \fR(+)
 The host from which the user has logged in remotely, if this is the case and
 the shell is able to determine it.
 .TP 8
@@ -4434,7 +4439,7 @@ printenv, which\fR and \fIwhere\fR (q.v.).
 .PP
 New variables that make useful information easily available to the shell.
 See the \fBgid, loginsh, oid, shlvl, tcsh, tty, uid\fR and \fBversion\fR
-shell variables and the \fBHOST\fR, \fBHOSTTYPE\fR and \fBREMHOST\fR environment variables.
+shell variables and the \fBHOST\fR, \fBHOSTTYPE\fR and \fBREMOTEHOST\fR environment variables.
 .PP
 A new syntax for including useful information in the prompt string
 (see \fBprompt\fR).

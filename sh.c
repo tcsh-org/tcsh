@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.56 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.57 1993/11/13 00:40:56 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.56 1993/10/30 19:50:16 christos Exp $")
+RCSID("$Id: sh.c,v 3.57 1993/11/13 00:40:56 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -117,9 +117,39 @@ bool    tellwhat = 0;
 time_t  t_period;
 Char  *ffile = NULL;
 bool	dolzero = 0;
+int	insource = 0;
 static time_t  chktim;		/* Time mail last checked */
 
 extern char **environ;
+
+/*
+ * This preserves the input state of the shell. It is used by
+ * st_save and st_restore to manupulate shell state.
+ */
+struct saved_state {
+    int		  insource;
+    int		  SHIN;
+    int		  intty;
+    struct whyle *whyles;
+    Char 	 *gointr;
+    Char 	 *arginp;
+    Char	 *evalp;
+    Char	**evalvec;
+    Char	 *alvecp;
+    Char	**alvec;
+    int		  onelflg;
+    bool	  enterhist;
+    Char	**argv;
+    Char	  HIST;
+    bool	  cantell;
+    struct Bin	  B;
+    /* These keep signal state and setjump state */
+#ifdef BSDSIGS
+    sigmask_t	  mask;
+#endif
+    jmp_buf_t	  oldexit;
+    int		  reenter;
+};
 
 static	int		  srccat	__P((Char *, Char *));
 static	int		  srcfile	__P((char *, bool, int, Char **));
@@ -128,6 +158,9 @@ static	void		  srcunit	__P((int, bool, int, Char **));
 static	void		  mailchk	__P((void));
 static	Char	 	**defaultpath	__P((void));
 static	void		  record	__P((void));
+static	void		  st_save	__P((struct saved_state *, int, int,
+					     Char **, Char **));
+static void		  st_restore	__P((struct saved_state *, Char **));
 
 int
 main(argc, argv)
@@ -502,7 +535,7 @@ main(argc, argv)
     /*
      * Try to determine the remote host we were logged in from.
      */
-    remhost();
+    remotehost();
 #endif /* REMOTEHOST */
  
 #ifdef apollo
@@ -1240,12 +1273,125 @@ srcfile(f, onlyown, flag, av)
     return 1;
 }
 
+
+/*
+ * Save the shell state, and establish new argument vector, and new input
+ * fd.
+ */
+static void
+st_save(st, unit, hflg, al, av)
+    struct saved_state *st;
+    int unit, hflg;
+    Char **al, **av;
+{
+    st->insource	= insource;
+    st->SHIN		= SHIN;
+    st->intty		= intty;
+    st->whyles		= whyles;
+    st->gointr		= gointr;
+    st->arginp		= arginp;
+    st->evalp		= evalp;
+    st->evalvec		= evalvec;
+    st->alvecp		= alvecp;
+    st->alvec		= alvec;
+    st->onelflg		= onelflg;
+    st->enterhist	= enterhist;
+    st->HIST		= HIST;
+    st->cantell		= cantell;
+    cpybin(st->B, B);
+
+    /*
+     * we can now pass arguments to source. 
+     * For compatibility we do that only if arguments were really
+     * passed, otherwise we keep the old, global $argv like before.
+     */
+    if (av != NULL) {
+	struct varent *vp;
+	if ((vp = adrof(STRargv)) != NULL)
+	    st->argv = saveblk(vp->vec);
+	else
+	    st->argv = NULL;
+	setq(STRargv, saveblk(av), &shvhed, VAR_READWRITE);
+    }
+    else
+	st->argv = NULL;
+
+    /* Establish new input arena */
+    {
+	fbuf = NULL;
+	fseekp = feobp = fblocks = 0;
+	settell();
+    }
+
+    SHIN	= unit;
+    arginp	= 0;
+    onelflg	= 0;
+    intty	= isatty(SHIN);
+    whyles	= 0;
+    gointr	= 0;
+    evalvec	= 0;
+    evalp	= 0;
+    alvec	= al;
+    alvecp	= 0;
+    enterhist	= hflg;
+    if (enterhist)
+	HIST	= '\0';
+    insource	= 1;
+}
+
+
+/*
+ * Restore the shell to a saved state
+ */
+static void
+st_restore(st, av)
+    struct saved_state *st;
+    Char **av;
+{
+    if (st->SHIN == -1)
+	return;
+
+    /* Reset input arena */
+    {
+	register int i;
+	register Char** nfbuf = fbuf;
+	register int nfblocks = fblocks;
+
+	fblocks = 0;
+	fbuf = NULL;
+	for (i = 0; i < nfblocks; i++)
+	    xfree((ptr_t) nfbuf[i]);
+	xfree((ptr_t) nfbuf);
+    }
+    cpybin(B, st->B);
+
+    (void) close(SHIN);
+
+    insource	= st->insource;
+    SHIN	= st->SHIN;
+    arginp	= st->arginp;
+    onelflg	= st->onelflg;
+    evalp	= st->evalp;
+    evalvec	= st->evalvec;
+    alvecp	= st->alvecp;
+    alvec	= st->alvec;
+    intty	= st->intty;
+    whyles	= st->whyles;
+    gointr	= st->gointr;
+    HIST	= st->HIST;
+    enterhist	= st->enterhist;
+    cantell	= st->cantell;
+
+    if (st->argv != NULL)
+	setq(STRargv, st->argv, &shvhed, VAR_READWRITE);
+    else if (av != NULL && adrof(STRargv) != NULL)
+	unsetv(STRargv);
+}
+
 /*
  * Source to a unit.  If onlyown it must be our file or our group or
  * we don't chance it.	This occurs on ".cshrc"s and the like.
  */
-int     insource;
-static  Char **goargv = NULL;
 static void
 srcunit(unit, onlyown, hflg, av)
     register int unit;
@@ -1253,44 +1399,15 @@ srcunit(unit, onlyown, hflg, av)
     int hflg;
     Char **av;
 {
-    /*
-     * PWP: this is arranged like this so that an optimizing compiler won't go
-     * and put things like oSHIN in a register that longjmp() restores.  The
-     * problem is that on my Sun 3/50, gcc will put oSHIN in a register.  That
-     * would be OK, but setjmp() saves ALL of the registers and longjmp()
-     * restores ALL of them, thus if you do a setjmp(), set oSHIN to something
-     * (like SHIN), then do a longjmp(), the value of oSHIN will magically
-     * become -1 again.
-     * 
-     * Perhaps setjmp() should only save the stack pointer, frame pointer, and
-     * program counter...
-     */
-
-    /* We have to push down a lot of state here */
-    /* All this could go into a structure */
-    int     oSHIN = -1, oldintty = intty, oinsource = insource;
-    struct whyle *oldwhyl = whyles;
-    Char   *ogointr = gointr, *oarginp = arginp;
-    Char   *oevalp = evalp, **oevalvec = evalvec;
-    int     oonelflg = onelflg;
-    bool    oenterhist = enterhist;
-    Char    OHIST = HIST;
-    bool    otell = cantell;
-    Char **oargv;
-    struct Bin saveB;
-#ifdef BSDSIGS
-    volatile sigmask_t omask = (sigmask_t) 0;
-#endif
-    jmp_buf_t oldexit;
-
-    /* The (few) real local variables */
-    int     my_reenter;
-
+    struct saved_state st;
+    st.SHIN = -1;	/* st_restore checks this */
 
     if (unit < 0)
 	return;
+
     if (didfds)
 	donefds();
+
     if (onlyown) {
 	struct stat stb;
 
@@ -1300,62 +1417,17 @@ srcunit(unit, onlyown, hflg, av)
 	}
     }
 
-    /*
-     * There is a critical section here while we are pushing down the input
-     * stream since we have stuff in different structures. If we weren't
-     * careful an interrupt could corrupt SHIN's Bin structure and kill the
-     * shell.
-     * 
-     * We could avoid the critical region by grouping all the stuff in a single
-     * structure and pointing at it to move it all at once.  This is less
-     * efficient globally on many variable references however.
-     */
-    insource = 1;
-    getexit(oldexit);
+    getexit(st.oldexit);
 
     if (setintr)
 #ifdef BSDSIGS
-	omask = sigblock(sigmask(SIGINT));
+	st.mask = sigblock(sigmask(SIGINT));
 #else
 	(void) sighold(SIGINT);
 #endif
-    /*
-     * Bugfix for running out of memory by: Jak Kirman
-     * <jak%cs.brown.edu@RELAY.CS.NET>.  Solution: pay attention to what
-     * setexit() is returning because my_reenter _may_ be in a register, and
-     * thus restored to 0 on a longjump(). (PWP: insert flames about
-     * compiler-dependant code here) PWP: THANKS LOTS !!!
-     */
-    /* Setup the new values of the state stuff saved above */
 
-#ifdef NO_STRUCT_ASSIGNMENT
-    (void) memmove((ptr_t) &(saveB), (ptr_t) &B, sizeof(B));
-#else
-    saveB = B;
-#endif
-    fbuf = NULL;
-    fseekp = feobp = fblocks = 0;
-    oSHIN = SHIN, SHIN = unit, arginp = 0, onelflg = 0;
-    intty = isatty(SHIN), whyles = 0, gointr = 0;
-    evalvec = 0;
-    evalp = 0;
-    enterhist = hflg;
-    if (enterhist)
-	HIST = '\0';
-    /*
-     * we can now pass arguments to source. 
-     * For compatibility we do that only if arguments were really
-     * passed, otherwise we keep the old, global $argv like before.
-     */
-
-    oargv = goargv;
-    goargv = NULL;
-    if (av != NULL && *av != NULL && **av != '\0') {
-	struct varent *vp;
-	if ((vp = adrof(STRargv)) != NULL)
-	    goargv = saveblk(vp->vec);
-	setq(STRargv, saveblk(av), &shvhed, VAR_READWRITE);
-    }
+    /* Save the current state and move us to a new state */
+    st_save(&st, unit, hflg, NULL, av);
 
     /*
      * Now if we are allowing commands to be interrupted, we let ourselves be
@@ -1363,71 +1435,46 @@ srcunit(unit, onlyown, hflg, av)
      */
     if (setintr)
 #ifdef BSDSIGS
-	(void) sigsetmask(omask);
+	(void) sigsetmask(st.mask);
 #else
 	(void) sigrelse(SIGINT);
 #endif
-    settell();
 
-/* PWP: think of this as like a LISP (unwind-protect ...) */
-/* thanks to Diana Smetters for pointing out how this _should_ be written */
+    /*
+     * Bugfix for running out of memory by: Jak Kirman
+     * <jak%cs.brown.edu@RELAY.CS.NET>.  Solution: pay attention to what
+     * setexit() is returning because reenter _may_ be in a register, and
+     * thus restored to 0 on a longjump(). (PWP: insert flames about
+     * compiler-dependant code here) PWP: THANKS LOTS !!!
+     *
+     * PWP: think of this as like a LISP (unwind-protect ...)
+     * thanks to Diana Smetters for pointing out how this _should_ be written
+     */
 #ifdef cray
-    my_reenter = 1;		/* assume non-zero return val */
+    st.reenter = 1;		/* assume non-zero return val */
     if (setexit() == 0) {
-	my_reenter = 0;		/* Oh well, we were wrong */
+	st.reenter = 0;		/* Oh well, we were wrong */
 #else
-    if ((my_reenter = setexit()) == 0) {
+    if ((st.reenter = setexit()) == 0) {
 #endif
 	process(0);		/* 0 -> blow away on errors */
     }
 
     if (setintr)
 #ifdef BSDSIGS
-	(void) sigsetmask(omask);
+	(void) sigsetmask(st.mask);
 #else
 	(void) sigrelse(SIGINT);
 #endif
-    if (oSHIN >= 0) {
-	register int i;
 
-	register Char** nfbuf = fbuf;
-	register int nfblocks = fblocks;
-	fblocks = 0;
-	fbuf = NULL;
-	for (i = 0; i < nfblocks; i++)
-	    xfree((ptr_t) nfbuf[i]);
-	xfree((ptr_t) nfbuf);
-
-	/* Reset input arena */
-#ifdef NO_STRUCT_ASSIGNMENT
-	(void) memmove((ptr_t) &B, (ptr_t) &(saveB), sizeof(B));
-#else
-	B = saveB;
-#endif
-	(void) close(SHIN), SHIN = oSHIN;
-	arginp = oarginp, onelflg = oonelflg;
-	evalp = oevalp, evalvec = oevalvec;
-	intty = oldintty, whyles = oldwhyl, gointr = ogointr;
-	if (enterhist)
-	    HIST = OHIST;
-	if (av != NULL && *av != NULL && **av != '\0') {
-	    if (goargv)
-		setq(STRargv, goargv, &shvhed, VAR_READWRITE);
-	    else
-		unsetv(STRargv);
-	}
-	enterhist = oenterhist;
-	cantell = otell;
-    }
-
-    resexit(oldexit);
-    goargv = oargv;
+    /* Restore the old state */
+    st_restore(&st, av);
+    resexit(st.oldexit);
     /*
      * If process reset() (effectively an unwind) then we must also unwind.
      */
-    if (my_reenter)
+    if (st.reenter)
 	stderror(ERR_SILENT);
-    insource = oinsource;
 }
 
 

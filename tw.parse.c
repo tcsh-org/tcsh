@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.57 1993/10/08 20:36:28 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.58 1993/11/13 00:40:56 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.57 1993/10/08 20:36:28 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.58 1993/11/13 00:40:56 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1750,6 +1750,13 @@ filetype(dir, file)
 	Char    path[512];
 	char   *ptr;
 	struct stat statb;
+#ifdef S_ISCDF
+	/* 
+	 * From: veals@crchh84d.bnr.ca (Percy Veals)
+	 * An extra stat is required for HPUX CDF files.
+	 */
+	struct stat hpstatb;
+#endif /* S_ISCDF */
 
 	if (nostat(dir)) return(' ');
 
@@ -1786,8 +1793,9 @@ filetype(dir, file)
 		return ('+');
 #endif
 #ifdef S_ISCDF	
-	    if (S_ISCDF(statb.st_mode))	/* Context Dependent Files [hpux] */
-		return ('+');
+	    strcat(ptr, "+");      /* Must append a '+' and re-stat(). */
+	    if ((stat(ptr, &hpstatb) != -1) && S_ISCDF(hpstatb.st_mode))
+	    	return ('+');        /* Context Dependent Files [hpux] */
 #endif 
 #ifdef S_ISNWK
 	    if (S_ISNWK(statb.st_mode)) /* Network Special [hpux] */
@@ -1805,7 +1813,7 @@ filetype(dir, file)
 	    if (S_ISDIR(statb.st_mode))	/* normal Directory */
 		return ('/');
 #endif
-	    if (statb.st_mode & 0111)
+	    if (statb.st_mode & S_IXUSR|S_IXGRP|S_IXOTH)
 		return ('*');
 	}
     }

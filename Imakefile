@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.38 1993/10/30 16:58:18 christos Exp $
+/**/# $Id: Imakefile,v 1.39 1993/11/13 00:40:56 christos Exp christos $
 /**/#
 /**/# Imakefile for for tcsh 6.04
 /**/# Marc Horowitz, MIT SIPB
@@ -130,6 +130,16 @@ SYSSRCS=ma.setp.c
 SYSOBJS=ma.setp.${SUF}
 EXTF=mi.termios.c mi.wait.h mi.varargs.h vms.termcap.c
 # endif
+
+# ifdef i386Isc
+#  if IscVersion != 202
+#   define ConfigH isc
+#   define UseLibCposix
+#  else
+#   define ConfigH isc202
+#  endif
+# endif /* i386Isc */
+
 #endif /* !ConfigH */
 
 /* generic os's */
@@ -314,15 +324,16 @@ MANSUFFIX = 1
 #ifndef ManSuffix
 #define ManSuffix $(MANSUFFIX)
 #endif
+
 #ifdef DestBin
-BINDIR = DestBin
+TCSH_BINDIR = DestBin
 #else
-BINDIR = $(TCSHTOP)/bin
+TCSH_BINDIR = $(TCSHTOP)/bin
 #endif
 #ifdef DestMan
-MANDIR = DestMan
+TCSH_MANDIR = DestMan
 #else
-MANDIR = $(TCSHTOP)/man/man$(MANSUFFIX)
+TCSH_MANDIR = $(TCSHTOP)/man/man$(MANSUFFIX)
 #endif
 
 #ifndef MyCflags
@@ -485,6 +496,6 @@ depend:: config.h ed.defns.h sh.err.h tc.const.h $(SRCS)
 NormalProgramTarget(tcsh, $(OBJS), ed.defns.h sh.err.h tc.const.h, \
 			/*LOCALLIBS*/, $(HESLIB) $(SYSLIBS))
 
-InstallProgram(tcsh, $(BINDIR));
-InstallManPage(tcsh, $(MANDIR));
+InstallProgram(tcsh, $(TCSH_BINDIR));
+InstallManPage(tcsh, $(TCSH_MANDIR));
 DependTarget()

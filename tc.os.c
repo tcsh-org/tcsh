@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.31 1993/08/11 16:25:52 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.c,v 3.32 1993/11/13 00:40:56 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.31 1993/08/11 16:25:52 christos Exp christos $")
+RCSID("$Id: tc.os.c,v 3.32 1993/11/13 00:40:56 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -603,10 +603,10 @@ dowarp(v, c)
 #endif /* WARP */
 
 /***
- *** Masscomp
+ *** Masscomp or HCX
  ***/
 /* Added, DAS DEC-90. */
-#ifdef masscomp
+#if defined(masscomp) || defined(hcx)
 /*ARGSUSED*/
 void
 douniverse(v, c)
@@ -623,7 +623,7 @@ douniverse(v, c)
     else if (*cp == '\0' || setuniverse(short2str(cp)) != 0)
 	stderror(ERR_NAME | ERR_STRING, "Illegal universe");
 }
-#endif /* masscomp */
+#endif /* masscomp || hcx */
 
 
 #ifdef _SEQUENT_

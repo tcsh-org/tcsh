@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.init.c,v 3.30 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.init.c,v 3.31 1993/11/13 00:40:56 christos Exp christos $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.30 1993/10/30 19:50:16 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.31 1993/11/13 00:40:56 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -157,7 +157,7 @@ struct	biltins bfunc[] = {
     { "unalias",	unalias,	1,	INF	},
     { "uncomplete",	douncomplete,	1,	INF	},
     { "unhash",		dounhash,	0,	0	},
-#ifdef masscomp
+#if defined(masscomp) || defined(hcx)
     { "universe",	douniverse,	0,	1	},
 #endif
 #ifndef HAVENOLIMIT
@@ -264,7 +264,7 @@ struct	mesg mesg[] = {
 /* 14 */	{ "ALRM",	"Alarm clock"		},
 /* 15 */	{ "TERM",	"Terminated"		},
 
-#if (SYSVREL > 0) || defined(DGUX) || defined(IBMAIX) || defined(apollo) || defined(masscomp) || defined(ardent) || defined(linux)
+#if (SYSVREL > 0) || defined(DGUX) || defined(IBMAIX) || defined(apollo) || defined(masscomp) || defined(ardent) || defined(linux) || defined(hcx)
 
 # ifdef _sigextra_
 #  undef  _sigextra_
@@ -737,6 +737,55 @@ struct	mesg mesg[] = {
 /* 31 */	{ 0,		"Signal 31"		},
 /* 32 */	{ 0,		"Signal 32"		},
 # endif /* linux */
+
+# ifdef hcx
+#  define _64sig_	/* just for the sake of SIGRESCHED */
+#  define _sigextra_
+/* 20 */	{ "URG",	"Urgent condition on IO channel"},
+/* 21 */	{ "STOP",	MSG_STOP		},
+/* 22 */	{ "TSTP",	MSG_TSTP		},
+/* 23 */	{ "CONT",	"Continued"		},
+/* 24 */	{ "TTIN", 	MSG_TTIN		},
+/* 25 */	{ "TTOU", 	MSG_TTOU		},
+/* 26 */	{ "IO", 	"Asynchronous I/O (select)"},
+/* 27 */	{ "XCPU",	"Cputime limit exceeded"},
+/* 28 */	{ "XFSZ", 	"Filesize limit exceeded"},
+/* 29 */	{ "VTALRM", 	"Virtual time alarm"	},
+/* 30 */	{ "PROF", 	"Profiling time alarm"	},
+/* 31 */	{ "LOST", 	"Resource lost"		},
+/* 32 */	{ "WINCH", 	"Window changed"	},
+/* 33 */	{ "RESCHED",	"Reschedule"		},
+/* 34 */	{ 0,   		"Signal 34"		},
+/* 35 */	{ 0,   		"Signal 35"		},
+/* 36 */	{ 0,   		"Signal 36"		},
+/* 37 */	{ 0,   		"Signal 37"		},
+/* 38 */	{ 0,   		"Signal 38"		},
+/* 39 */	{ 0,   		"Signal 39"		},
+/* 40 */	{ 0,   		"Signal 40"		},
+/* 41 */	{ 0,   		"Signal 41"		},
+/* 42 */	{ 0,   		"Signal 42"		},
+/* 43 */	{ 0,   		"Signal 43"		},
+/* 44 */	{ 0,   		"Signal 44"		},
+/* 45 */	{ 0,   		"Signal 45"		},
+/* 46 */	{ 0,   		"Signal 46"		},
+/* 47 */	{ 0,   		"Signal 47"		},
+/* 48 */	{ 0,   		"Signal 48"		},
+/* 49 */	{ 0,   		"Signal 49"		},
+/* 50 */	{ 0,   		"Signal 50"		},
+/* 51 */	{ 0,   		"Signal 51"		},
+/* 52 */	{ 0,   		"Signal 52"		},
+/* 53 */	{ 0,   		"Signal 53"		},
+/* 54 */	{ 0,   		"Signal 54"		},
+/* 55 */	{ 0,   		"Signal 55"		},
+/* 56 */	{ 0,   		"Signal 56"		},
+/* 57 */	{ 0,   		"Signal 57"		},
+/* 58 */	{ 0,   		"Signal 58"		},
+/* 59 */	{ 0,   		"Signal 59"		},
+/* 60 */	{ 0,   		"Signal 60"		},
+/* 61 */	{ 0,   		"Signal 61"		},
+/* 62 */	{ 0,   		"Signal 62"		},
+/* 63 */	{ 0,   		"Signal 63"		},
+# endif /* hcx */
 
 # ifndef _sigextra_
 #  ifndef UNIXPC

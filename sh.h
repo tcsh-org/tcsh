@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.58 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.59 1993/10/30 19:55:13 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -585,8 +585,10 @@ EXTERN int   OLDSTD;		/* Old standard input (def for cmds) */
 #  define setexit()  setjmp(reslab)
 #  define reset()    longjmp(reslab, 1)
 # endif
-# define getexit(a) (void) memmove((ptr_t)(a), (ptr_t)reslab, sizeof(reslab))
-# define resexit(a) (void) memmove((ptr_t)reslab, ((ptr_t)(a)), sizeof(reslab))
+# define getexit(a) (void) memmove((ptr_t)&(a), (ptr_t)&reslab, sizeof(reslab))
+# define resexit(a) (void) memmove((ptr_t)&reslab, (ptr_t)&(a), sizeof(reslab))
+
+# define cpybin(a, b) (void) memmove((ptr_t)&(a), (ptr_t)&(b), sizeof(Bin))
 
 #else
 
@@ -600,8 +602,10 @@ EXTERN int   OLDSTD;		/* Old standard input (def for cmds) */
 #  define reset()    longjmp(reslab.j, 1)
 # endif
 
-# define getexit(a) ((a) = reslab)
-# define resexit(a) (reslab = (a))
+# define getexit(a) (void) ((a) = reslab)
+# define resexit(a) (void) (reslab = (a))
+
+# define cpybin(a, b) (void) ((a) = (b))
 
 #endif	/* NO_STRUCT_ASSIGNMENT */
 

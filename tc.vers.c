@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.34 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.35 1993/11/13 00:40:56 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.34 1993/10/30 19:50:16 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.35 1993/11/13 00:40:56 christos Exp christos $")
 
 #include "patchlevel.h"
 
@@ -579,6 +579,11 @@ gethosttype()
 #   define _havehosttype_
      hosttype = "clipper";	/* Clipper Chipset (Intergraph) */
 #  endif 
+# endif
+
+# ifdef hcx
+#  define _havehosttype_
+    hosttype = "hcx";	/* Harris Tahoe running CX/UX */
 # endif
 
 # ifndef _havehosttype_
