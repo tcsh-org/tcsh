@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.49 1993/12/12 19:55:08 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.50 1993/12/16 16:51:24 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.49 1993/12/12 19:55:08 christos Exp christos $")
+RCSID("$Id: tc.func.c,v 3.50 1993/12/16 16:51:24 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1785,6 +1785,21 @@ hashbang(fd, vp)
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
+static sigret_t
+palarm(snum)
+    int snum;
+{
+#ifdef UNRELSIGS
+    if (snum)
+	(void) sigset(snum, SIG_IGN);
+#endif /* UNRELSIGS */
+    alarm(0);
+
+#ifndef SIGVOID
+    return (snum);
+#endif
+}
+
 /*
  * From: <lesv@ppvku.ericsson.se> (Lennart Svensson)
  */
@@ -1797,10 +1812,14 @@ remotehost()
     int len = sizeof(struct sockaddr_in);
 
     if (getpeername(SHIN, (struct sockaddr *) &saddr, &len) != -1) {
+	/* Don't get stuck if the resolver does not work! */
+	sigret_t (*osig)() = signal(SIGALRM, palarm);
+	alarm(2);
 	if ((hp = gethostbyaddr((char *)&saddr.sin_addr, len, AF_INET)) != NULL)
 	    host = hp->h_name;
 	else
 	    host = inet_ntoa(saddr.sin_addr);
+	(void) signal(SIGALRM, osig);
     }
 #ifdef UTHOST
     else {

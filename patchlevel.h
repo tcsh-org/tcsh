@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/patchlevel.h,v 3.69 1993/12/12 19:56:42 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/patchlevel.h,v 3.70 1993/12/16 16:51:24 christos Exp $ */
 /*
  * patchlevel.h: Our life story.
  */
@@ -9,6 +9,6 @@
 #define REV 6
 #define VERS 4
 #define PATCHLEVEL 6
-#define DATE "93/12/16"
+#define DATE "93/12/19"
 
 #endif /* _h_patchlevel */

@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.40 1993/12/12 19:55:08 christos Exp $
+/**/# $Id: Imakefile,v 1.41 1993/12/16 16:55:13 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.04
 /**/# Marc Horowitz, MIT SIPB
@@ -265,6 +265,12 @@ LIBINTL = -lintl
 LIBINTL =
 #endif
 
+#if defined(HasLibCrypt)
+LIBCRYPT = -lcrypt
+#else
+LIBCRYPT =
+#endif
+
 #if defined(MacIIArchitecture) || defined(UseLibPosix)
 LIBPOSIX = -lposix
 #else
@@ -282,7 +288,7 @@ LIBDIRECTENT =
 
 SYSLIBS = $(LIBPOSIX) $(LIBDIRECTENT) $(LIBTERMCAP) $(LIBCURSES) \
 	$(LIBNET) $(LIBINTL) $(LIBSOCKET) $(LIBSUN) $(LIBBSD) $(LIBCPOSIX) \
-	$(LIBINET) $(LIBDIRECT) $(LIBX) $(LIBC_S) $(LIBSQNT)
+	$(LIBINET) $(LIBDIRECT) $(LIBX) $(LIBC_S) $(LIBSQNT) $(LIBCRYPT)
 
 /* Past here, nothing should need to be changed to compile on a different
 platform, unless you have a really weird architecture. */
@@ -452,7 +458,7 @@ tc.const.h: config.h tc.const.c
 	@echo '#define _h_tc_const' >> $@
 	${CC} -E $(INCLUDES) ${DFLAGS} -D_h_tc_const tc.const.c | \
 	    grep 'Char STR' | \
-	    sed -e 's/Char \([a-zA-Z0-9_]*\)\[.*/extern Char \1[];/' | \
+	    sed -e 's/Char \([a-zA-Z0-9_]*\)\[\].*/extern Char \1[];/' | \
 	    sort >> $@
 	@echo '#endif /* _h_tc_const */' >> $@
 
