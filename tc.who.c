@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.who.c,v 3.14 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.who.c,v 3.15 1992/09/18 20:56:35 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.14 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.15 1992/09/18 20:56:35 christos Exp $")
 
 #include "tc.h"
 
@@ -463,9 +463,11 @@ who_info(ptr, c, wbuf)
     char *wbuf;
 {
     struct who *wp = (struct who *) ptr;
+#ifdef UTHOST
     char *wb = wbuf;
     int flg;
     char *pb;
+#endif /* UTHOST */
 
     switch (c) {
     case 'n':		/* user name */

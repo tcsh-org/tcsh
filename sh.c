@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.34 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.35 1992/09/18 20:56:35 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.34 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: sh.c,v 3.35 1992/09/18 20:56:35 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -108,7 +108,6 @@ bool    tellwhat = 0;
 time_t  t_period;
 Char  *ffile = NULL;
 static time_t  chktim;		/* Time mail last checked */
-static int     gid;		/* Invokers gid */
 
 extern char **environ;
 
@@ -195,6 +194,8 @@ main(argc, argv)
 	quitit = 1;
     uid = getuid();
     gid = getgid();
+    euid = geteuid();
+    egid = getegid();
 #ifdef OREO
     /*
      * We are a login shell if: 1. we were invoked as -<something> with
@@ -440,10 +441,9 @@ main(argc, argv)
 	else
 	    set(STRuser, SAVE(pw->pw_name));
 	if (cln == NULL)
-	    Setenv(STRLOGNAME, value(STRuser));
+	    tsetenv(STRLOGNAME, value(STRuser));
 	if (cus == NULL)
-	    Setenv(STRUSER, value(STRuser));
-	    
+	    tsetenv(STRKUSER, value(STRuser));
     }
 
     /*
@@ -455,17 +455,17 @@ main(argc, argv)
 
 	if (gethostname(cbuff, sizeof(cbuff)) >= 0) {
 	    cbuff[sizeof(cbuff) - 1] = '\0';	/* just in case */
-	    Setenv(STRHOST, str2short(cbuff));
+	    tsetenv(STRHOST, str2short(cbuff));
 	}
 	else
-	    Setenv(STRHOST, str2short("unknown"));
+	    tsetenv(STRHOST, str2short("unknown"));
     }
-
 
     /*
      * HOSTTYPE, too. Just set it again.
      */
-    Setenv(STRHOSTTYPE, str2short(gethosttype()));
+    tsetenv(STRHOSTTYPE, str2short(gethosttype()));
+ 
 #ifdef apollo
     if ((tcp = getenv("SYSTYPE")) == NULL)
 	tcp = "bsd4.3";
@@ -771,9 +771,7 @@ main(argc, argv)
 		stderror(ERR_SYSTEM, tempv[0], strerror(errno));
 		break;
 	    }
-#ifdef FIOCLEX
-	(void) ioctl(SHIN, FIOCLEX, NULL);
-#endif
+	(void) close_on_exec(SHIN, 1);
 	prompt = 0;
 	 /* argc not used any more */ tempv++;
     }
@@ -790,7 +788,7 @@ main(argc, argv)
     }
     intty |= intact;
     if (intty || (intact && isatty(SHOUT))) {
-	if (!batch && (uid != geteuid() || gid != getegid())) {
+	if (!batch && (uid != euid || gid != egid)) {
 	    errno = EACCES;
 	    child = 1;		/* So this ... */
 	    /* ... doesn't return */
@@ -821,7 +819,7 @@ main(argc, argv)
 	set(STRprompt, Strsave(uid == 0 ? STRsymhash : STRsymarrow));
 	/* that's a meta-questionmark */
 	set(STRprompt2, Strsave(STRmquestion));
-	set(STRprompt3, Strsave(STRCORRECT));
+	set(STRprompt3, Strsave(STRKCORRECT));
     }
 
     /*
@@ -926,11 +924,7 @@ main(argc, argv)
 		    else
 			(void) setpgid(0, shpgrp);
 #endif
-#ifdef FIOCLEX
-		    (void) ioctl(dcopy(f, FSHTTY), FIOCLEX, NULL);
-#else				/* FIOCLEX */
-		    (void) dcopy(f, FSHTTY);
-#endif				/* FIOCLEX */
+		    (void) close_on_exec(dcopy(f, FSHTTY), 1);
 		}
 		else
 		    tpgrp = -1;
@@ -1111,7 +1105,7 @@ importpath(cp)
     int     c;
 
     for (dp = cp; *dp; dp++)
-	if (*dp == ':')
+	if (*dp == PATHSEP)
 	    i++;
     /*
      * i+2 where i is the number of colons in the path. There are i+1
@@ -1122,12 +1116,12 @@ importpath(cp)
     i = 0;
     if (*dp)
 	for (;;) {
-	    if ((c = *dp) == ':' || c == 0) {
+	    if ((c = *dp) == PATHSEP || c == 0) {
 		*dp = 0;
 		pv[i++] = Strsave(*cp ? cp : STRdot);
 		if (c) {
 		    cp = dp + 1;
-		    *dp = ':';
+		    *dp = PATHSEP;
 		}
 		else
 		    break;
@@ -1171,9 +1165,7 @@ srcfile(f, onlyown, flag, av)
 	return 0;
     unit = dmove(unit, -1);
 
-#ifdef FIOCLEX
-    (void) ioctl(unit, FIOCLEX, NULL);
-#endif
+    (void) close_on_exec(unit, 1);
     srcunit(unit, onlyown, flag, av);
     return 1;
 }
@@ -1231,9 +1223,7 @@ srcunit(unit, onlyown, hflg, av)
     if (onlyown) {
 	struct stat stb;
 
-	if (fstat(unit, &stb) < 0
-	/* || (stb.st_uid != uid && stb.st_gid != gid) */
-	    ) {
+	if (fstat(unit, &stb) < 0) {
 	    (void) close(unit);
 	    return;
 	}
@@ -1528,7 +1518,9 @@ pintr1(wantnl)
     (void) sigrelse(SIGCHLD);
 #endif
     draino();
+#ifndef _VMS_POSIX
     (void) endpwent();
+#endif /*atp vmsposix */
 
     /*
      * If we have an active "onintr" then we search for the label. Note that if
@@ -1887,20 +1879,15 @@ initdesc()
 {
 
     didfds = 0;			/* 0, 1, 2 aren't set up */
-#ifdef FIOCLEX
-    (void) ioctl(SHIN = dcopy(0, FSHIN), FIOCLEX, NULL);
-    (void) ioctl(SHOUT = dcopy(1, FSHOUT), FIOCLEX, NULL);
-    (void) ioctl(SHDIAG = dcopy(2, FSHDIAG), FIOCLEX, NULL);
-    (void) ioctl(OLDSTD = dcopy(SHIN, FOLDSTD), FIOCLEX, NULL);
-#else
+    (void) close_on_exec(SHIN = dcopy(0, FSHIN), 1);
+    (void) close_on_exec(SHOUT = dcopy(1, FSHOUT), 1);
+    (void) close_on_exec(SHDIAG = dcopy(2, FSHDIAG), 1);
+    (void) close_on_exec(OLDSTD = dcopy(SHIN, FOLDSTD), 1);
+#ifndef CLOSE_ON_EXEC
     didcch = 0;			/* Havent closed for child */
-    SHIN = dcopy(0, FSHIN);
-    SHOUT = dcopy(1, FSHOUT);
-    isoutatty = isatty(SHOUT);
-    SHDIAG = dcopy(2, FSHDIAG);
+#endif /* CLOSE_ON_EXEC */
     isdiagatty = isatty(SHDIAG);
-    OLDSTD = dcopy(SHIN, FOLDSTD);
-#endif
+    isoutatty = isatty(SHOUT);
     closem();
 }
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dol.c,v 3.15 1992/05/15 21:54:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dol.c,v 3.16 1992/09/18 20:56:35 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.15 1992/05/15 21:54:34 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.16 1992/09/18 20:56:35 christos Exp $")
 
 /*
  * C shell
@@ -297,7 +297,18 @@ Dword()
 	    if ((wp = Dpack(wbuf, wp)) == NULL)
 		return (1);
 	    else {
+#ifdef masscomp
+    /*
+     * Avoid a nasty message from the RTU 4.1A & RTU 5.0 compiler concerning
+     * the "overuse of registers". According to the compiler release notes,
+     * incorrect code may be produced unless the offending expression is
+     * rewritten. Therefore, we can't just ignore it, DAS DEC-90.
+     */
+		i = MAXWLEN;
+		i -= (wp - wbuf);
+#else /* !masscomp */
 		i = MAXWLEN - (wp - wbuf);
+#endif /* masscomp */
 		done = 0;
 	    }
 	    break;
@@ -320,7 +331,18 @@ Dword()
 	    if ((wp = Dpack(wbuf, wp)) == NULL)
 		return (1);
 	    else {
+#ifdef masscomp
+    /*
+     * Avoid a nasty message from the RTU 4.1A & RTU 5.0 compiler concerning
+     * the "overuse of registers". According to the compiler release notes,
+     * incorrect code may be produced unless the offending expression is
+     * rewritten. Therefore, we can't just ignore it, DAS DEC-90.
+     */
+		i = MAXWLEN;
+		i -= (wp - wbuf);
+#else /* !masscomp */
 		i = MAXWLEN - (wp - wbuf);
+#endif /* masscomp */
 		done = 0;
 	    }
 	}
@@ -401,9 +423,9 @@ Dgetdol()
     register Char *np;
     register struct varent *vp = NULL;
     Char    name[4 * MAXVARLEN + 1];
-    int     c, sc, oc = -1;
+    int     c, sc;
     int     subscr = 0, lwb = 1, upb = 0;
-    bool    dimen = 0, bitset = 0;
+    bool    dimen = 0, bitset = 0, length = 0;
     char    tnp;
     Char    wbuf[BUFSIZE];
     static Char *dolbang = NULL;
@@ -420,10 +442,12 @@ Dgetdol()
 	dimen++, c = DgetC(0);	/* $# takes dimension */
     else if (c == '?')
 	bitset++, c = DgetC(0);	/* $? tests existence */
+    else if (c == '%')
+	length++, c = DgetC(0); /* $% returns length in chars */
     switch (c) {
 
     case '!':
-	if (dimen || bitset)
+	if (dimen || bitset || length)
 	    stderror(ERR_SYNTAX);
 	if (backpid != 0) {
 	    if (dolbang) 
@@ -433,7 +457,7 @@ Dgetdol()
 	goto eatbrac;
 
     case '$':
-	if (dimen || bitset)
+	if (dimen || bitset || length)
 	    stderror(ERR_SYNTAX);
 	setDolp(doldol);
 	goto eatbrac;
@@ -442,7 +466,9 @@ Dgetdol()
 	if (bitset)
 	    stderror(ERR_NOTALLOWED, "$?<");
 	if (dimen)
-	    stderror(ERR_NOTALLOWED, "$?#");
+	    stderror(ERR_NOTALLOWED, "$#<");
+	if (length)
+	    stderror(ERR_NOTALLOWED, "$%<");
 	for (np = wbuf; read(OLDSTD, &tnp, 1) == 1; np++) {
 	    *np = (unsigned char) tnp;
 	    if (np >= &wbuf[BUFSIZE - 1])
@@ -475,17 +501,18 @@ Dgetdol()
 
     case DEOF:
     case '\n':
-	if (dimen) 
-	    setDolp(STRargv);
-	else if (bitset) {
+	np = dimen ? STRargv : (bitset ? STRstatus : NULL);
+	if (np) {
 	    bitset = 0;
-	    setDolp(STRstatus);
+	    (void) Strcpy(name, np);
+	    vp = adrof(np);
+	    subscr = -1;		/* Prevent eating [...] */
+	    unDredc(c);
+	    break;
 	}
 	else
 	    stderror(ERR_SYNTAX);
-	oc = c;
-	c = DgetC(0);
-	/*FALLTHROUGH*/
+	/*NOTREACHED*/
 
     default:
 	np = name;
@@ -514,7 +541,9 @@ Dgetdol()
 		goto eatbrac;
 	    }
 	    if (bitset)
-		stderror(ERR_DOLQUEST);
+		stderror(ERR_NOTALLOWED, "$?<num>");
+	    if (length)
+		stderror(ERR_NOTALLOWED, "$%<num>");
 	    vp = adrof(STRargv);
 	    if (vp == 0) {
 		vp = &nulargv;
@@ -523,19 +552,18 @@ Dgetdol()
 	    break;
 	}
 	if (!alnum(c)) {
-	    if (dimen) 
-		setDolp(STRargv);
-	    else if (bitset) {
+	    np = dimen ? STRargv : (bitset ? STRstatus : NULL);
+	    if (np) {
 		bitset = 0;
-		setDolp(STRstatus);
+		(void) Strcpy(name, np);
+		vp = adrof(np);
+		subscr = -1;		/* Prevent eating [...] */
+		unDredc(c);
+		break;
 	    }
 	    else
 		stderror(ERR_VARALNUM);
-	    oc = c;
-	    c = DgetC(0);
 	}
-	else
-	    oc = -1;
 	for (;;) {
 	    *np++ = c;
 	    c = DgetC(0);
@@ -545,18 +573,13 @@ Dgetdol()
 		stderror(ERR_VARTOOLONG);
 	}
 	*np++ = 0;
-	if (oc == -1)
-	    unDredc(c);
-	else
-	    unDredc(oc);
+	unDredc(c);
 	vp = adrof(name);
     }
     if (bitset) {
 	dolp = (vp || getenv(short2str(name))) ? STR1 : STR0;
 	goto eatbrac;
     }
-    if (oc != -1)
-	goto eatbrac;
     if (vp == 0) {
 	np = str2short(getenv(short2str(name)));
 	if (np) {
@@ -642,6 +665,15 @@ Dgetdol()
     if (dimen) {
 	Char   *cp = putn(upb - lwb + 1);
 
+	addla(cp);
+	xfree((ptr_t) cp);
+    }
+    else if (length) {
+	int i;
+	Char   *cp;
+	for (i = lwb - 1, length = 0; i < upb; i++)
+	    length += Strlen(vp->vec[i]);
+	cp = putn(length);
 	addla(cp);
 	xfree((ptr_t) cp);
     }

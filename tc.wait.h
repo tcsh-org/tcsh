@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.wait.h,v 3.5 1992/05/15 23:49:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.wait.h,v 3.6 1992/09/18 20:56:35 christos Exp christos $ */
 /*
  * tc.wait.h: <sys/wait.h> for machines that don't have it or have it and
  *	      is incorrect.
@@ -57,7 +57,7 @@
 #   include <sys/wait.h> /* 7.0 fixed it again */
 #  endif /* __hpux */
 # else /* hpux */
-#  if defined(OREO) || defined(IRIS4D) || defined(POSIX)
+#  if (defined(OREO) || defined(IRIS4D) || defined(POSIX)) && !defined(_VMS_POSIX)
 #   include <sys/wait.h>
 #  else	/* OREO || IRIS4D || POSIX */
 #   define NEEDwait
@@ -111,15 +111,20 @@ union wait {
 	}       w_S;
     }       w_P;
 #  else /* mc68000 || sparc || ??? */
+#    if defined(_CRAY) || defined(ANY_OTHER_64BIT_MACHINE)
+#      define DUMMY_BITS	48
+#    else /* _CRAY */
+#      define DUMMY_BITS	16
+#    endif /* _CRAY */
     union {
 	struct {
-	    unsigned int w_Dummy:16;
+	    unsigned int w_Dummy:DUMMY_BITS;
 	    unsigned int w_Retcode:8;
 	    unsigned int w_Coredump:1;
 	    unsigned int w_Termsig:7;
 	}       w_T;
 	struct {
-	    unsigned int w_Dummy:16;
+	    unsigned int w_Dummy:DUMMY_BITS;
 	    unsigned int w_Stopsig:8;
 	    unsigned int w_Stopval:8;
 	}       w_S;

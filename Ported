@@ -330,7 +330,7 @@ NOTES	:	we need to define BACKPIPE
 VERSION	:	6.00.04
 
 VENDOR	:	stardent
-MODELS	:	titan
+MODELS	:	titan 3000 series
 COMPILER:	/bin/cc
 CFLAGS	:	-O -43
 LIBES	:	-ltermcap
@@ -339,6 +339,18 @@ CONFIG	:	config.bsd
 ENVIRON	:	n/a
 NOTES	:	Kernel bug with SIGTTIN, Try vi, ^Z, bg, fg....
 VERSION	:	6.01.01
+
+VENDOR	:	stardent
+MODELS	:	titan 1500 series
+COMPILER:	cc
+CFLAGS	:	-O -43
+LIBES	:	-ltermcap
+OS	:	OS 2.5
+CONFIG	:	config.bsd
+ENVIRON	:	n/a
+NOTES	:	Kernel bug with SIGTTIN, Try vi, ^Z, bg, fg....
+NOTES	:	You can add -w to the CFLAGS to suppress the warnings.
+VERSION	:	6.02.07
 
 VENDOR  :       SGI
 MODELS  :       INDIGO
@@ -387,6 +399,20 @@ NOTES   :       "esv" instead of "mips"?
 VERSION :       6.01.00
 
 VENDOR  :       masscomp
+MODELS  :       Masscomp 6000
+COMPILER:       cc
+CFLAGS  :       production
+LIBES   :       -ltermcap
+OS      :       RTU 5.0
+CONFIG  :       config.masscomp
+ENVIRON :       Link in the "bsd" universe as opposed to "att".
+NOTES	:	For pre RTU 6.0, remember to remove the #define RTU6 in the
+NOTES	:	config.masscomp file.
+NOTES	:	As of tcsh v6.02.07, try putting "bindkey ^t stuff-char"
+NOTES	:	in your /etc/csh.cshrc for masscomp kernel (ctrl-t) status.
+VERSION :       6.02.07
+
+VENDOR  :       masscomp
 MODELS  :       Masscomp 5400
 COMPILER:       cc
 CFLAGS  :       normal
@@ -396,6 +422,17 @@ CONFIG  :       config.masscomp
 ENVIRON :       Link in the "bsd" universe as opposed to "att".
 NOTES	:	n/a
 VERSION :       6.01.00
+
+VENDOR	:	Cray Computer
+MODELS	:	CRAY-2 & CRAY-3
+COMPILER:	cc
+CFLAGS	:	normal
+LIBES	:	-lcurses -lnet
+OS	:	CSOS 1.0
+CONFIG	:	config.csos
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.02
 
 VENDOR	:	Motorola
 MODELS	:	Delta 3000/Delta 4000
@@ -407,6 +444,19 @@ CONFIG	:	config.sysV68
 ENVIRON	:	n/a
 NOTES	:	none
 VERSION	:	6.01.00, 6.02.00
+
+VENDOR	:	Motorola
+MODELS	:	MPC 3062
+COMPILER:	cc
+CFLAGS	:	Broken optimizers...
+LIBES	:	-lcurses -lsec
+OS	:	System V/88 R32V2
+CONFIG	:	config.sysV88
+ENVIRON	:	n/a
+NOTES   :       If you're using the bundled Greenhills compiler, don't use -O.
+NOTES   :       One error -O causes is failure to exec scripts with /bin/sh
+NOTES   :       if they don't have a #! header on top.
+VERSION	:	6.02.07
 
 VENDOR  :       alliant
 MODELS  :       FX/8X series
@@ -484,3 +534,39 @@ CONFIG	:	config.sysv3
 ENVIRON	:	n/a
 NOTES	:	n/a
 VERSION	:	6.02.00
+
+VENDOR	:	tektronix
+MODELS	:	XD88/10
+COMPILER:	cc
+CFLAGS	:	Broken optimizers...
+LIBES	:	-ltermcap -lsec
+OS	:	UTekV 3.2e
+CONFIG	:	config.tekXD88
+ENVIRON	:	n/a
+NOTES   :	If you're using the bundled Greenhills compiler, don't use -O.
+NOTES   :	One error -O causes is failure to exec scripts with /bin/sh
+NOTES   :	if they don't have a #! header on top.
+VERSION	:	6.02.07
+
+VENDOR	:	tektronix
+MODELS	:	4300
+COMPILER:	cc
+CFLAGS	:	production
+LIBES	:	-ltermcap
+OS	:	UTek 4.0 (BSD 4.2)
+CONFIG	:	config.bsd
+ENVIRON	:	n/a
+NOTES	:	set DFLAGS = -DUTek in the Makefile
+VERSION	:	6.02.07
+
+VENDOR	:	BBN
+MODELS	:	butterfly gp1000
+COMPILER:	cc
+CFLAGS	:	production
+LIBES	:	-ltermcap
+OS	:	Mach 1000 version 2.5
+CONFIG	:	config.mach
+ENVIRON	:	n/a
+NOTES	:	n/a
+VERSION	:	6.02.07
+

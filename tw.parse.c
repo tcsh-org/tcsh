@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.38 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.39 1992/09/18 20:56:35 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.38 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.39 1992/09/18 20:56:35 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -242,13 +242,15 @@ tenematch(inputline, num_read, command)
     xprintf(":\n");
 #endif
 
+    if (command == RECOGNIZE || command == LIST || command == SPELL) {
 #ifdef TDEBUG
-    xprintf("complete %d ", looking);
+	xprintf("complete %d ", looking);
 #endif
-    looking = tw_complete(cmd_start, &wordp, &pat, looking, &suf);
+	looking = tw_complete(cmd_start, &wordp, &pat, looking, &suf);
 #ifdef TDEBUG
-    xprintf("complete %d %S\n", looking, pat);
+	xprintf("complete %d %S\n", looking, pat);
 #endif
+    }
 
     switch ((int) command) {
 	Char    buffer[FILSIZ + 1], *bptr;
@@ -257,6 +259,7 @@ tenematch(inputline, num_read, command)
 	int     i, count;
 
     case RECOGNIZE:
+    case RECOGNIZE_ALL:
 	if (adrof(STRautocorrect)) {
 	    if ((slshp = Strrchr(wordp, '/')) != NULL && slshp[1] != '\0') {
 		SearchNoDirErr = 1;
@@ -274,7 +277,7 @@ tenematch(inputline, num_read, command)
 	}
 	else
 	    slshp = STRNULL;
-	search_ret = t_search(wordp, wp, command, space_left, looking, 1, 
+	search_ret = t_search(wordp, wp, RECOGNIZE, space_left, looking, 1, 
 			      pat, suf);
 	SearchNoDirErr = 0;
 
@@ -293,7 +296,7 @@ tenematch(inputline, num_read, command)
 		if (InsertStr(quote_meta(wordp, qu, 0)) < 0)	
 		    return -1;	/* error inserting */
 		wp = wordp + Strlen(wordp);
-		search_ret = t_search(wordp, wp, command, space_left,
+		search_ret = t_search(wordp, wp, RECOGNIZE, space_left,
 				      looking, 1, pat, suf);
 	    }
 	}
@@ -390,7 +393,8 @@ tenematch(inputline, num_read, command)
 	return (0);
 
     case LIST:
-	search_ret = t_search(wordp, wp, command, space_left, looking, 1, 
+    case LIST_ALL:
+	search_ret = t_search(wordp, wp, LIST, space_left, looking, 1, 
 			      pat, suf);
 	return search_ret;
 
@@ -919,7 +923,7 @@ tw_suffix(looking, exp_dir, exp_name, target, name)
 		vp->vec[1] != NULL) 
 		return ' ';
 	}
-	else if ((ptr = Getenv(exp_name)) == NULL || *ptr == '\0')
+	else if ((ptr = tgetenv(exp_name)) == NULL || *ptr == '\0')
 	    return ' ';
 	*--target = '\0';
 	(void) Strcat(exp_dir, name);
@@ -1395,7 +1399,7 @@ dollar(new, old)
 	    save = *old;
 	    *old = '\0';
 	    vp = adrof(var);
-	    val = (!vp) ? Getenv(var) : NULL;
+	    val = (!vp) ? tgetenv(var) : NULL;
 	    *old = save;
 	    if (vp) {
 		int i;
@@ -1775,12 +1779,12 @@ copyn(des, src, count)
 } /* end copyn */
 
 
-/* Getenv():
+/* tgetenv():
  *	like it's normal string counter-part
  *	[apollo uses that in tc.os.c, so it cannot be static]
  */
 Char *
-Getenv(str)
+tgetenv(str)
     Char   *str;
 {
     Char  **var;
@@ -1796,4 +1800,4 @@ Getenv(str)
 		return (&((*var)[len + 1]));
 	}
     return (NULL);
-} /* end Getenv */
+} /* end tgetenv */

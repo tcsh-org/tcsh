@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.36 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.37 1992/08/14 13:56:09 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.36 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.37 1992/08/14 13:56:09 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -289,11 +289,18 @@ donewgrp(v, c)
     Char  **v;
     struct command *c;
 {
+    char **p;
     if (chkstop == 0 && setintr)
 	panystop(0);
     (void) signal(SIGTERM, parterm);
-    (void) execl(_PATH_BIN_NEWGRP, "newgrp", short2str(v[1]), NULL);
-    (void) execl(_PATH_USRBIN_NEWGRP, "newgrp", short2str(v[1]), NULL);
+    p = short2blk(&v[1]);
+    /*
+     * From Beto Appleton (beto@aixwiz.austin.ibm.com)
+     * Newgrp can take 2 arguments...
+     */
+    (void) execv(_PATH_BIN_NEWGRP, "newgrp", p, NULL);
+    (void) execv(_PATH_USRBIN_NEWGRP, "newgrp", p, NULL);
+    blkfree((Char **) p);
     untty();
     xexit(1);
 }
@@ -331,7 +338,7 @@ doif(v, kp)
 	 * following code.
 	 */
 	if (!i)
-	    search(T_IF, 0, NULL);
+	    search(TC_IF, 0, NULL);
 	return;
     }
     /*
@@ -369,7 +376,7 @@ doelse (v, c)
     Char **v;
     struct command *c;
 {
-    search(T_ELSE, 0, NULL);
+    search(TC_ELSE, 0, NULL);
 }
 
 /*ARGSUSED*/
@@ -393,16 +400,16 @@ gotolab(lab)
      * While we still can, locate any unknown ends of existing loops. This
      * obscure code is the WORST result of the fact that we don't really parse.
      */
-    zlast = T_GOTO;
+    zlast = TC_GOTO;
     for (wp = whyles; wp; wp = wp->w_next)
 	if (wp->w_end.type == F_SEEK && wp->w_end.f_seek == 0) {
-	    search(T_BREAK, 0, NULL);
+	    search(TC_BREAK, 0, NULL);
 	    btell(&wp->w_end);
 	}
 	else {
 	    bseek(&wp->w_end);
 	}
-    search(T_GOTO, 0, lab);
+    search(TC_GOTO, 0, lab);
     /*
      * Eliminate loops which were exited.
      */
@@ -425,7 +432,7 @@ doswitch(v, c)
 	v--;
     if (*v)
 	stderror(ERR_SYNTAX);
-    search(T_SWITCH, 0, lp = globone(cp, G_ERROR));
+    search(TC_SWITCH, 0, lp = globone(cp, G_ERROR));
     xfree((ptr_t) lp);
 }
 
@@ -501,7 +508,7 @@ doforeach(v, c)
     /*
      * Pre-read the loop so as to be more comprehensible to a terminal user.
      */
-    zlast = T_FOREACH;
+    zlast = TC_FOREACH;
     if (intty)
 	preread();
     doagain();
@@ -537,7 +544,7 @@ dowhile(v, c)
 	nwp->w_end.f_seek = 0;
 	nwp->w_next = whyles;
 	whyles = nwp;
-	zlast = T_WHILE;
+	zlast = TC_WHILE;
 	if (intty) {
 	    /*
 	     * The tty preread
@@ -562,7 +569,7 @@ preread()
 #else /* !BSDSIGS */
 	(void) sigrelse (SIGINT);
 #endif /* BSDSIGS */
-    search(T_BREAK, 0, NULL);		/* read the expression in */
+    search(TC_BREAK, 0, NULL);		/* read the expression in */
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigblock(sigmask(SIGINT));
@@ -661,7 +668,7 @@ doswbrk(v, c)
     Char **v;
     struct command *c;
 {
-    search(T_BRKSW, 0, NULL);
+    search(TC_BRKSW, 0, NULL);
 }
 
 int
@@ -716,7 +723,7 @@ search(type, level, goal)
 
     Stype = type;
     Sgoal = goal;
-    if (type == T_GOTO) {
+    if (type == TC_GOTO) {
 	struct Ain a;
 	a.type = F_SEEK;
 	a.f_seek = 0;
@@ -724,69 +731,69 @@ search(type, level, goal)
     }
     do {
 	if (intty && fseekp == feobp && aret == F_SEEK)
-	    printprompt(1, isrchx(type == T_BREAK ? zlast : type));
+	    printprompt(1, isrchx(type == TC_BREAK ? zlast : type));
 	/* xprintf("? "), flush(); */
 	aword[0] = 0;
 	(void) getword(aword);
 	switch (srchx(aword)) {
 
-	case T_ELSE:
-	    if (level == 0 && type == T_IF)
+	case TC_ELSE:
+	    if (level == 0 && type == TC_IF)
 		return;
 	    break;
 
-	case T_IF:
+	case TC_IF:
 	    while (getword(aword))
 		continue;
-	    if ((type == T_IF || type == T_ELSE) &&
+	    if ((type == TC_IF || type == TC_ELSE) &&
 		eq(aword, STRthen))
 		level++;
 	    break;
 
-	case T_ENDIF:
-	    if (type == T_IF || type == T_ELSE)
+	case TC_ENDIF:
+	    if (type == TC_IF || type == TC_ELSE)
 		level--;
 	    break;
 
-	case T_FOREACH:
-	case T_WHILE:
-	    if (type == T_BREAK)
+	case TC_FOREACH:
+	case TC_WHILE:
+	    if (type == TC_BREAK)
 		level++;
 	    break;
 
-	case T_END:
-	    if (type == T_BREAK)
+	case TC_END:
+	    if (type == TC_BREAK)
 		level--;
 	    break;
 
-	case T_SWITCH:
-	    if (type == T_SWITCH || type == T_BRKSW)
+	case TC_SWITCH:
+	    if (type == TC_SWITCH || type == TC_BRKSW)
 		level++;
 	    break;
 
-	case T_ENDSW:
-	    if (type == T_SWITCH || type == T_BRKSW)
+	case TC_ENDSW:
+	    if (type == TC_SWITCH || type == TC_BRKSW)
 		level--;
 	    break;
 
-	case T_LABEL:
-	    if (type == T_GOTO && getword(aword) && eq(aword, goal))
+	case TC_LABEL:
+	    if (type == TC_GOTO && getword(aword) && eq(aword, goal))
 		level = -1;
 	    break;
 
 	default:
-	    if (type != T_GOTO && (type != T_SWITCH || level != 0))
+	    if (type != TC_GOTO && (type != TC_SWITCH || level != 0))
 		break;
 	    if (lastchr(aword) != ':')
 		break;
 	    aword[Strlen(aword) - 1] = 0;
-	    if ((type == T_GOTO && eq(aword, goal)) ||
-		(type == T_SWITCH && eq(aword, STRdefault)))
+	    if ((type == TC_GOTO && eq(aword, goal)) ||
+		(type == TC_SWITCH && eq(aword, STRdefault)))
 		level = -1;
 	    break;
 
-	case T_CASE:
-	    if (type != T_SWITCH || level != 0)
+	case TC_CASE:
+	    if (type != TC_SWITCH || level != 0)
 		break;
 	    (void) getword(aword);
 	    if (lastchr(aword) == ':')
@@ -797,8 +804,8 @@ search(type, level, goal)
 	    xfree((ptr_t) cp);
 	    break;
 
-	case T_DEFAULT:
-	    if (type == T_SWITCH && level == 0)
+	case TC_DEFAULT:
+	    if (type == TC_SWITCH && level == 0)
 		level = -1;
 	    break;
 	}
@@ -867,24 +874,24 @@ getword(wp)
 past:
     switch (Stype) {
 
-    case T_IF:
+    case TC_IF:
 	stderror(ERR_NAME | ERR_NOTFOUND, "then/endif");
 	break;
 
-    case T_ELSE:
+    case TC_ELSE:
 	stderror(ERR_NAME | ERR_NOTFOUND, "endif");
 	break;
 
-    case T_BRKSW:
-    case T_SWITCH:
+    case TC_BRKSW:
+    case TC_SWITCH:
 	stderror(ERR_NAME | ERR_NOTFOUND, "endsw");
 	break;
 
-    case T_BREAK:
+    case TC_BREAK:
 	stderror(ERR_NAME | ERR_NOTFOUND, "end");
 	break;
 
-    case T_GOTO:
+    case TC_GOTO:
 	setname(short2str(Sgoal));
 	stderror(ERR_NAME | ERR_NOTFOUND, "label");
 	break;
@@ -927,7 +934,7 @@ static void
 toend()
 {
     if (whyles->w_end.type == F_SEEK && whyles->w_end.f_seek == 0) {
-	search(T_BREAK, 0, NULL);
+	search(TC_BREAK, 0, NULL);
 	btell(&whyles->w_end);
 	whyles->w_end.f_seek--;
     }
@@ -1177,8 +1184,9 @@ dosetenv(v, c)
     }
     if ((lp = *v++) == 0)
 	lp = STRNULL;
-    Setenv(vp, lp = globone(lp, G_APPEND));
-    if (eq(vp, STRPATH)) {
+
+    tsetenv(vp, lp = globone(lp, G_APPEND));
+    if (eq(vp, STRKPATH)) {
 	importpath(lp);
 	dohash(NULL, NULL);
     }
@@ -1218,13 +1226,13 @@ dosetenv(v, c)
     else if (eq(vp, STRNOREBIND)) {
 	NoNLSRebind = 1;
     }
-    else if (eq(vp, STRTERM)) {
+    else if (eq(vp, STRKTERM)) {
 	set(STRterm, Strsave(lp));
 	GotTermCaps = 0;
 	ed_Init();
     }
-    else if (eq(vp, STRHOME)) {
-	Char *cp = Strsave(value(vp));	/* get the old value back */
+    else if (eq(vp, STRKHOME)) {
+ 	Char *cp = Strsave(value(vp));	/* get the old value back */
 
 	/*
 	 * convert to canonical pathname (possibly resolving symlinks)
@@ -1237,9 +1245,9 @@ dosetenv(v, c)
 	dtilde();
 	xfree((ptr_t) cp);
     }
-    else if (eq(vp, STRSHLVL)) 
+    else if (eq(vp, STRKSHLVL)) 
 	set(STRshlvl, Strsave(lp));
-    else if (eq(vp, STRUSER))
+    else if (eq(vp, STRKUSER))
 	set(STRuser, Strsave(lp));
 #ifdef SIG_WINDOW
     /*
@@ -1349,7 +1357,7 @@ dounsetenv(v, c)
 }
 
 void
-Setenv(name, val)
+tsetenv(name, val)
     Char   *name, *val;
 {
 #ifdef SETENV_IN_LIB
@@ -1817,7 +1825,7 @@ setlim(lp, hard, limit)
 
     if (hard)
 	rlim.rlim_max = limit;
-    else if (limit == RLIM_INFINITY && geteuid() != 0)
+    else if (limit == RLIM_INFINITY && euid != 0)
 	rlim.rlim_cur = rlim.rlim_max;
     else
 	rlim.rlim_cur = limit;
@@ -1908,9 +1916,9 @@ doeval(v, c)
     Char  **oevalvec;
     Char   *oevalp;
     int     odidfds;
-#ifndef FIOCLEX
+#ifndef CLOSE_ON_EXEC
     int     odidcch;
-#endif /* FIOCLEX */
+#endif /* CLOSE_ON_EXEC */
     jmp_buf_t osetexit;
     int     my_reenter;
     Char  **savegv;
@@ -1920,9 +1928,9 @@ doeval(v, c)
     oevalvec = evalvec;
     oevalp = evalp;
     odidfds = didfds;
-#ifndef FIOCLEX
+#ifndef CLOSE_ON_EXEC
     odidcch = didcch;
-#endif /* FIOCLEX */
+#endif /* CLOSE_ON_EXEC */
     oSHIN = SHIN;
     oSHOUT = SHOUT;
     oSHDIAG = SHDIAG;
@@ -1966,9 +1974,9 @@ doeval(v, c)
 	SHIN = dcopy(0, -1);
 	SHOUT = dcopy(1, -1);
 	SHDIAG = dcopy(2, -1);
-#ifndef FIOCLEX
+#ifndef CLOSE_ON_EXEC
 	didcch = 0;
-#endif /* FIOCLEX */
+#endif /* CLOSE_ON_EXEC */
 	didfds = 0;
 	process(0);
     }
@@ -1976,9 +1984,9 @@ doeval(v, c)
     evalvec = oevalvec;
     evalp = oevalp;
     doneinp = 0;
-#ifndef FIOCLEX
+#ifndef CLOSE_ON_EXEC
     didcch = odidcch;
-#endif /* FIOCLEX */
+#endif /* CLOSE_ON_EXEC */
     didfds = odidfds;
     (void) close(SHIN);
     (void) close(SHOUT);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.term.c,v 1.10 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.term.c,v 1.11 1992/08/09 00:13:36 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.10 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.11 1992/08/09 00:13:36 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -48,7 +48,7 @@ ttyperm_t ttylist = {
 	{ "iflag:", ICRNL, (INLCR|IGNCR) },
 	{ "oflag:", (OPOST|ONLCR), ONLRET },
 	{ "cflag:", 0, 0 },
-	{ "lflag:", (ISIG|ICANON|ECHO|ECHOE|ECHOCTL|IEXTEN),
+	{ "lflag:", (ISIG|ICANON|ECHO|ECHOE|ECHOCTL|IEXTEN|IDEFAULT),
 		    (NOFLSH|ECHONL|EXTPROC|FLUSHO) },
 #else /* GSTTY */
 	{ "nrmal:", (ECHO|CRMOD|ANYP), (CBREAK|RAW|LCASE|VTDELAY|ALLDELAY) },
@@ -62,7 +62,8 @@ ttyperm_t ttylist = {
 	{ "oflag:", (OPOST|ONLCR), ONLRET },
 	{ "cflag:", 0, 0 },
 	{ "lflag:", ISIG,
-		    (NOFLSH|ICANON|ECHO|ECHOK|ECHONL|EXTPROC|IEXTEN|FLUSHO) },
+		    (NOFLSH|ICANON|ECHO|ECHOK|ECHONL|EXTPROC|IEXTEN|FLUSHO|
+		     IDEFAULT) },
 #else /* GSTTY */
 	{ "nrmal:", (CBREAK|CRMOD|ANYP), (RAW|ECHO|LCASE|VTDELAY|ALLDELAY) },
 	{ "local:", (LCRTBS|LCRTERA|LCRTKIL), (LPRTERA|LFLUSHO) },
@@ -136,6 +137,9 @@ static struct tcshmodes {
 # ifdef  IMAXBEL
     { "imaxbel",IMAXBEL,M_INPUT },
 # endif /* IMAXBEL */
+# ifdef  IDELETE
+    { "idelete",IDELETE,M_INPUT },
+# endif /* IDELETE */
 
 # ifdef	OPOST
     { "opost",	OPOST,	M_OUTPUT },
@@ -299,6 +303,9 @@ static struct tcshmodes {
 # ifdef	EXTPROC
     { "extproc",EXTPROC,M_LINED },
 # endif /* EXTPROC */
+# ifdef IDEFAULT
+    { "idefault",IDEFAULT,M_LINED },
+# endif /* IDEFAULT */
 
 #else /* GSTTY */
 

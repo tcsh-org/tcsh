@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exp.c,v 3.11 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exp.c,v 3.12 1992/09/18 20:56:35 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.11 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.12 1992/09/18 20:56:35 christos Exp $")
 
 /*
  * C shell
@@ -59,24 +59,114 @@ RCSID("$Id: sh.exp.c,v 3.11 1992/08/09 00:13:36 christos Exp $")
 #define EQMATCH 7
 #define NOTEQMATCH 8
 
-static	int	 exp1	__P((Char ***, bool));
-static	int	 exp2	__P((Char ***, bool));
-static	int	 exp2a	__P((Char ***, bool));
-static	int	 exp2b	__P((Char ***, bool));
-static	int	 exp2c	__P((Char ***, bool));
-static	Char 	*exp3	__P((Char ***, bool));
-static	Char 	*exp3a	__P((Char ***, bool));
-static	Char 	*exp4	__P((Char ***, bool));
-static	Char 	*exp5	__P((Char ***, bool));
-static	Char 	*exp6	__P((Char ***, bool));
-static	void	 evalav	__P((Char **));
-static	int	 isa	__P((Char *, int));
-static	int	 egetn	__P((Char *));
+static	int	 sh_access	__P((Char *, int));
+static	int	 exp1		__P((Char ***, bool));
+static	int	 exp2		__P((Char ***, bool));
+static	int	 exp2a		__P((Char ***, bool));
+static	int	 exp2b		__P((Char ***, bool));
+static	int	 exp2c		__P((Char ***, bool));
+static	Char 	*exp3		__P((Char ***, bool));
+static	Char 	*exp3a		__P((Char ***, bool));
+static	Char 	*exp4		__P((Char ***, bool));
+static	Char 	*exp5		__P((Char ***, bool));
+static	Char 	*exp6		__P((Char ***, bool));
+static	void	 evalav		__P((Char **));
+static	int	 isa		__P((Char *, int));
+static	int	 egetn		__P((Char *));
 
 #ifdef EDEBUG
-static	void	 etracc	__P((char *, Char *, Char ***));
-static	void	 etraci	__P((char *, int, Char ***));
+static	void	 etracc		__P((char *, Char *, Char ***));
+static	void	 etraci		__P((char *, int, Char ***));
 #endif
+
+
+/*
+ * shell access function according to POSIX and non POSIX
+ * From Beto Appleton (beto@aixwiz.aix.ibm.com)
+ */
+static int
+sh_access(fname, mode)
+    Char *fname;
+    int mode;
+{
+#ifdef POSIX
+    struct stat     statb;
+#endif /* POSIX */
+    char *name = short2str(fname);
+
+    if (*name == '\0')
+	return 1;
+
+#ifndef POSIX
+    return access(name, mode);
+#else /* POSIX */
+
+    /*
+     * POSIX 1003.2-d11.2 
+     *	-r file		True if file exists and is readable. 
+     *	-w file		True if file exists and is writable. 
+     *			True shall indicate only that the write flag is on. 
+     *			The file shall not be writable on a read-only file
+     *			system even if this test indicates true.
+     *	-x file		True if file exists and is executable. 
+     *			True shall indicate only that the execute flag is on. 
+     *			If file is a directory, true indicates that the file 
+     *			can be searched.
+     */
+    if (mode != W_OK && mode != X_OK)
+	return access(name, mode);
+
+    if (stat(name, &statb) == -1) 
+	return 1;
+
+    if (access(name, mode) == 0) {
+#ifdef S_ISDIR
+	if (S_ISDIR(statb.st_mode) && mode == X_OK)
+	    return 0;
+#endif /* S_ISDIR */
+
+	/* root needs permission for someone */
+	switch (mode) {
+	case W_OK:
+	    mode = S_IWUSR | S_IWGRP | S_IWOTH;
+	    break;
+	case X_OK:
+	    mode = S_IXUSR | S_IXGRP | S_IXOTH;
+	    break;
+	default:
+	    abort();
+	    break;
+	}
+
+    } 
+
+    else if (euid == statb.st_uid)
+	mode <<= 6;
+
+    else if (egid == statb.st_gid)
+	mode <<= 3;
+
+# ifdef NGROUPS_MAX
+    else {
+	/* you can be in several groups */
+	int             n = NGROUPS_MAX;
+	gid_t           groups[NGROUPS_MAX];
+
+	n = getgroups(n, groups);
+	while (--n >= 0)
+	    if (groups[n] == statb.st_gid) {
+		mode <<= 3;
+		break;
+	    }
+    }
+# endif /* NGROUPS_MAX */
+
+    if (statb.st_mode & mode)
+	return 0;
+    else
+	return 1;
+#endif /* !POSIX */
+}
 
 int
 expr(vp)
@@ -513,15 +603,15 @@ exp6(vp, ignore)
 	    switch (*ft) {
 
 	    case 'r':
-		i = !access(short2str(ep), R_OK);
+		i = !sh_access(ep, R_OK);
 		break;
 
 	    case 'w':
-		i = !access(short2str(ep), W_OK);
+		i = !sh_access(ep, W_OK);
 		break;
 
 	    case 'x':
-		i = !access(short2str(ep), X_OK);
+		i = !sh_access(ep, X_OK);
 		break;
 
 	    case 'X':	/* tcsh extension, name is an executable in the path

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.decls.h,v 3.18 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.decls.h,v 3.19 1992/09/18 20:56:35 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -47,10 +47,10 @@ extern	memalign_t	  realloc	__P((ptr_t, size_t));
 extern	memalign_t	  calloc	__P((size_t, size_t));
 
 #else /* SYSMALLOC */
-extern	void		  Free		__P((ptr_t));
-extern	memalign_t	  Malloc	__P((size_t));
-extern	memalign_t	  Realloc	__P((ptr_t, size_t));
-extern	memalign_t	  Calloc	__P((size_t, size_t));
+extern	void		  sfree		__P((ptr_t));
+extern	memalign_t	  smalloc	__P((size_t));
+extern	memalign_t	  srealloc	__P((ptr_t, size_t));
+extern	memalign_t	  scalloc	__P((size_t, size_t));
 #endif /* SYSMALLOC */
 extern	void		  showall	__P((Char **, struct command *));
 

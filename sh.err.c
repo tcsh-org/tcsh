@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.err.c,v 3.12 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.err.c,v 3.13 1992/09/18 20:56:35 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.12 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.13 1992/09/18 20:56:35 christos Exp $")
 
 /*
  * C Shell
@@ -67,251 +67,249 @@ static char *errorlist[] =
     "$< line too long",
 #define ERR_DOLZERO	4
     "No file for $0",
-#define ERR_DOLQUEST	5
-    "$? not allowed here",
-#define ERR_INCBR	6
+#define ERR_INCBR	5
     "Incomplete [] modifier",
-#define ERR_EXPORD	7
+#define ERR_EXPORD	6
     "$ expansion must end before ]",
-#define ERR_BADMOD	8
+#define ERR_BADMOD	7
     "Bad : modifier in $ (%c)",
-#define ERR_SUBSCRIPT	9
+#define ERR_SUBSCRIPT	8
     "Subscript error",
-#define ERR_BADNUM	10
+#define ERR_BADNUM	9
     "Badly formed number",
-#define ERR_NOMORE	11
+#define ERR_NOMORE	10
     "No more words",
-#define ERR_FILENAME	12
+#define ERR_FILENAME	11
     "Missing file name",
-#define ERR_GLOB	13
+#define ERR_GLOB	12
     "Internal glob error",
-#define ERR_COMMAND	14
+#define ERR_COMMAND	13
     "Command not found",
-#define ERR_TOOFEW	15
+#define ERR_TOOFEW	14
     "Too few arguments",
-#define ERR_TOOMANY	16
+#define ERR_TOOMANY	15
     "Too many arguments",
-#define ERR_DANGER	17
+#define ERR_DANGER	16
     "Too dangerous to alias that",
-#define ERR_EMPTYIF	18
+#define ERR_EMPTYIF	17
     "Empty if",
-#define ERR_IMPRTHEN	19
+#define ERR_IMPRTHEN	18
     "Improper then",
-#define ERR_NOPAREN	20
+#define ERR_NOPAREN	19
     "Words not parenthesized",
-#define ERR_NOTFOUND	21
+#define ERR_NOTFOUND	20
     "%s not found",
-#define ERR_MASK	22
+#define ERR_MASK	21
     "Improper mask",
-#define ERR_LIMIT	23
+#define ERR_LIMIT	22
     "No such limit",
-#define ERR_TOOLARGE	24
+#define ERR_TOOLARGE	23
     "Argument too large",
-#define ERR_SCALEF	25
+#define ERR_SCALEF	24
     "Improper or unknown scale factor",
-#define ERR_UNDVAR	26
+#define ERR_UNDVAR	25
     "Undefined variable",
-#define ERR_DEEP	27
+#define ERR_DEEP	26
     "Directory stack not that deep",
-#define ERR_BADSIG	28
+#define ERR_BADSIG	27
     "Bad signal number",
-#define ERR_UNKSIG	29
+#define ERR_UNKSIG	28
     "Unknown signal; kill -l lists signals",
-#define ERR_VARBEGIN	30
+#define ERR_VARBEGIN	29
     "Variable name must begin with a letter",
-#define ERR_VARTOOLONG	31
+#define ERR_VARTOOLONG	30
     "Variable name too long",
-#define ERR_VARALNUM	32
+#define ERR_VARALNUM	31
     "Variable name must contain alphanumeric characters",
-#define ERR_JOBCONTROL	33
+#define ERR_JOBCONTROL	32
     "No job control in this shell",
-#define ERR_EXPRESSION	34
+#define ERR_EXPRESSION	33
     "Expression Syntax",
-#define ERR_NOHOMEDIR	35
+#define ERR_NOHOMEDIR	34
     "No home directory",
-#define ERR_CANTCHANGE	36
+#define ERR_CANTCHANGE	35
     "Can't change to home directory",
-#define ERR_NULLCOM	37
+#define ERR_NULLCOM	36
     "Invalid null command",
-#define ERR_ASSIGN	38
+#define ERR_ASSIGN	37
     "Assignment missing expression",
-#define ERR_UNKNOWNOP	39
+#define ERR_UNKNOWNOP	38
     "Unknown operator",
-#define ERR_AMBIG	40
+#define ERR_AMBIG	39
     "Ambiguous",
-#define ERR_EXISTS	41
+#define ERR_EXISTS	40
     "%s: File exists",
-#define ERR_ARGC	42
+#define ERR_ARGC	41
     "Argument for -c ends in backslash",
-#define ERR_INTR	43
+#define ERR_INTR	42
     "Interrupted",
-#define ERR_RANGE	44
+#define ERR_RANGE	43
     "Subscript out of range",
-#define ERR_OVERFLOW	45
+#define ERR_OVERFLOW	44
     "Line overflow",
-#define ERR_NOSUCHJOB	46
+#define ERR_NOSUCHJOB	45
     "No such job",
-#define ERR_TERMINAL	47
+#define ERR_TERMINAL	46
     "Can't from terminal",
-#define ERR_NOTWHILE	48
+#define ERR_NOTWHILE	47
     "Not in while/foreach",
-#define ERR_NOPROC	49
+#define ERR_NOPROC	48
     "No more processes",
-#define ERR_NOMATCH	50
+#define ERR_NOMATCH	49
     "No match",
-#define ERR_MISSING	51
+#define ERR_MISSING	50
     "Missing %c",
-#define ERR_UNMATCHED	52
+#define ERR_UNMATCHED	51
     "Unmatched %c",
-#define ERR_NOMEM	53
+#define ERR_NOMEM	52
     "Out of memory",
-#define ERR_PIPE	54
+#define ERR_PIPE	53
     "Can't make pipe",
-#define ERR_SYSTEM	55
+#define ERR_SYSTEM	54
     "%s: %s",
-#define ERR_STRING	56
+#define ERR_STRING	55
     "%s",
-#define ERR_JOBS	57
+#define ERR_JOBS	56
     "Usage: jobs [ -l ]",
-#define ERR_JOBARGS	58
+#define ERR_JOBARGS	57
     "Arguments should be jobs or process id's",
-#define ERR_JOBCUR	59
+#define ERR_JOBCUR	58
     "No current job",
-#define ERR_JOBPREV	60
+#define ERR_JOBPREV	59
     "No previous job",
-#define ERR_JOBPAT	61
+#define ERR_JOBPAT	60
     "No job matches pattern",
-#define ERR_NESTING	62
+#define ERR_NESTING	61
     "Fork nesting > %d; maybe `...` loop",
-#define ERR_JOBCTRLSUB	63
+#define ERR_JOBCTRLSUB	62
     "No job control in subshells",
-#define ERR_SYNC	64
+#define ERR_SYNC	63
     "Sunc fault: Process %d not found",
-#define ERR_STOPPED	65
+#define ERR_STOPPED	64
 #ifdef SUSPENDED
     "%sThere are suspended jobs",
 #else
     "%sThere are stopped jobs",
 #endif				/* SUSPENDED */
-#define ERR_NODIR	66
+#define ERR_NODIR	65
     "No other directory",
-#define ERR_EMPTY	67
+#define ERR_EMPTY	66
     "Directory stack empty",
-#define ERR_BADDIR	68
+#define ERR_BADDIR	67
     "Bad directory",
-#define ERR_DIRUS	69
+#define ERR_DIRUS	68
     "Usage: %s [-%s]%s",
-#define ERR_HFLAG	70
+#define ERR_HFLAG	69
     "No operand for -h flag",
-#define ERR_NOTLOGIN	71
+#define ERR_NOTLOGIN	70
     "Not a login shell",
-#define ERR_DIV0	72
+#define ERR_DIV0	71
     "Division by 0",
-#define ERR_MOD0	73
+#define ERR_MOD0	72
     "Mod by 0",
-#define ERR_BADSCALE	74
+#define ERR_BADSCALE	73
     "Bad scaling; did you mean \"%s\"?",
-#define ERR_SUSPLOG	75
+#define ERR_SUSPLOG	74
     "Can't suspend a login shell (yet)",
-#define ERR_UNKUSER	76
+#define ERR_UNKUSER	75
     "Unknown user: %s",
-#define ERR_NOHOME	77
+#define ERR_NOHOME	76
     "No $home variable set",
-#define ERR_HISTUS	78
+#define ERR_HISTUS	77
     "Usage: history [-%s] [# number of events]",
-#define ERR_SPDOLLT	79
+#define ERR_SPDOLLT	78
     "$, ! or < not allowed with $# or $?",
-#define ERR_NEWLINE	80
+#define ERR_NEWLINE	79
     "Newline in variable name",
-#define ERR_SPSTAR	81
+#define ERR_SPSTAR	80
     "* not allowed with $# or $?",
-#define ERR_DIGIT	82
+#define ERR_DIGIT	81
     "$?<digit> or $#<digit> not allowed",
-#define ERR_VARILL	83
+#define ERR_VARILL	82
     "Illegal variable name",
-#define ERR_NLINDEX	84
+#define ERR_NLINDEX	83
     "Newline in variable index",
-#define ERR_EXPOVFL	85
+#define ERR_EXPOVFL	84
     "Expansion buffer overflow",
-#define ERR_VARSYN	86
+#define ERR_VARSYN	85
     "Variable syntax",
-#define ERR_BADBANG	87
+#define ERR_BADBANG	86
     "Bad ! form",
-#define ERR_NOSUBST	88
+#define ERR_NOSUBST	87
     "No previous substitute",
-#define ERR_BADSUBST	89
+#define ERR_BADSUBST	88
     "Bad substitute",
-#define ERR_LHS		90
+#define ERR_LHS		89
     "No previous left hand side",
-#define ERR_RHSLONG	91
+#define ERR_RHSLONG	90
     "Right hand side too long",
-#define ERR_BADBANGMOD	92
+#define ERR_BADBANGMOD	91
     "Bad ! modifier: %c",
-#define ERR_MODFAIL	93
+#define ERR_MODFAIL	92
     "Modifier failed",
-#define ERR_SUBOVFL	94
+#define ERR_SUBOVFL	93
     "Substitution buffer overflow",
-#define ERR_BADBANGARG	95
+#define ERR_BADBANGARG	94
     "Bad ! arg selector",
-#define ERR_NOSEARCH	96
+#define ERR_NOSEARCH	95
     "No prev search",
-#define ERR_NOEVENT	97
+#define ERR_NOEVENT	96
     "%s: Event not found",
-#define ERR_TOOMANYRP	98
+#define ERR_TOOMANYRP	97
     "Too many )'s",
-#define ERR_TOOMANYLP	99
+#define ERR_TOOMANYLP	98
     "Too many ('s",
-#define ERR_BADPLP	100
+#define ERR_BADPLP	99
     "Badly placed (",
-#define ERR_MISRED	101
+#define ERR_MISRED	100
     "Missing name for redirect",
-#define ERR_OUTRED	102
+#define ERR_OUTRED	101
     "Ambiguous output redirect",
-#define ERR_REDPAR	103
+#define ERR_REDPAR	102
     "Can't << within ()'s",
-#define ERR_INRED	104
+#define ERR_INRED	103
     "Ambiguous input redirect",
-#define ERR_BADPLPS	105
+#define ERR_BADPLPS	104
     "Badly placed ()'s",
-#define ERR_ALIASLOOP	106
+#define ERR_ALIASLOOP	105
     "Alias loop",
-#define ERR_NOWATCH	107
+#define ERR_NOWATCH	106
     "No $watch variable set",
-#define ERR_NOSCHED	108
+#define ERR_NOSCHED	107
     "No scheduled events",
-#define ERR_SCHEDUSAGE	109
+#define ERR_SCHEDUSAGE	108
     "Usage: sched -<item#>.\nUsage: sched [+]hh:mm <command>",
-#define ERR_SCHEDEV	110
+#define ERR_SCHEDEV	109
     "Not that many scheduled events",
-#define ERR_SCHEDCOM	111
+#define ERR_SCHEDCOM	110
     "No command to run",
-#define ERR_SCHEDTIME	112
+#define ERR_SCHEDTIME	111
     "Invalid time for event",
-#define ERR_SCHEDREL	113
+#define ERR_SCHEDREL	112
     "Relative time inconsistent with am/pm",
-#define ERR_TCNOSTR	114
+#define ERR_TCNOSTR	113
     "Out of termcap string space",
-#define ERR_SETTCUS	115
+#define ERR_SETTCUS	114
     "Usage: settc %s [yes|no]",
-#define ERR_TCCAP	116
+#define ERR_TCCAP	115
     "Unknown capability `%s'",
-#define ERR_TCPARM	117
+#define ERR_TCPARM	116
     "Unknown termcap parameter `%%%c'",
-#define ERR_TCARGS	118
+#define ERR_TCARGS	117
     "Too many arguments for `%s' (%d)",
-#define ERR_TCNARGS	119
+#define ERR_TCNARGS	118
     "`%s' requires %d arguments",
-#define ERR_TCUSAGE	120
+#define ERR_TCUSAGE	119
     "Usage: echotc [-v|-s] [<capability> [<args>]]",
-#define ERR_ARCH	121
+#define ERR_ARCH	120
     "%s: %s. Wrong Architecture",
-#define ERR_HISTLOOP	122
+#define ERR_HISTLOOP	121
     "!# History loop",
-#define ERR_FILEINQ	123
+#define ERR_FILEINQ	122
     "Malformed file inquiry",
-#define ERR_SELOVFL	124
+#define ERR_SELOVFL	123
     "Selector overflow",
-#define ERR_TCSHUSAGE   125
+#define ERR_TCSHUSAGE   124
 #ifdef apollo
     "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX -Dname[=value] ] [ argument ... ]",
 #else /* !apollo */
@@ -321,13 +319,13 @@ static char *errorlist[] =
     "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]",
 # endif /* __convex__ || convex */
 #endif /* apollo */
-#define ERR_COMPCOM	126
+#define ERR_COMPCOM	125
     "Illegal completion: \"%s\"",
-#define ERR_COMPILL	127
+#define ERR_COMPILL	126
     "Illegal %s: '%c'",
-#define ERR_COMPINC	128
+#define ERR_COMPINC	127
     "Incomplete %s: \"%s\"",
-#define ERR_INVALID	129
+#define ERR_INVALID	128
     "Invalid Error"
 };
 

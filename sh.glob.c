@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.glob.c,v 3.24 1992/07/23 14:42:29 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.glob.c,v 3.25 1992/08/09 00:13:36 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.24 1992/07/23 14:42:29 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.25 1992/08/09 00:13:36 christos Exp $")
 
 #include "tc.h"
 
@@ -983,7 +983,7 @@ pmatch(string, pattern, estr)
 	    oestr = *estr;
 	    pestr = NULL;
 
-	    while (*string) {
+	    do {
 		switch(pmatch(string, pattern, estr)) {
 		case 0:
 		    break;
@@ -995,9 +995,9 @@ pmatch(string, pattern, estr)
 		default:
 		    abort();	/* Cannot happen */
 		}
-		string++;
 		*estr = string;
 	    }
+	    while (*string++);
 
 	    if (pestr) {
 		*estr = pestr;

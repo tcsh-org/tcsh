@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.file.c,v 3.4 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.file.c,v 3.5 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.4 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.5 1992/06/16 20:46:26 christos Exp $")
 
 #ifdef FILEC
 
@@ -512,7 +512,11 @@ extract_dir_and_name(path, dir, name)
 	copyn(dir, path, p - path);
     }
 }
-
+/* atp vmsposix - I need to remove all the setpwent 
+ *		  getpwent endpwent stuff. VMS_POSIX has getpwnam getpwuid
+ *		  and getlogin. This needs fixing. (There is no access to 
+ *		  pw->passwd in VMS - a secure system benefit :-| )
+ */
 static Char *
 getentry(dir_fd, looking_for_lognames)
     DIR    *dir_fd;
@@ -522,9 +526,13 @@ getentry(dir_fd, looking_for_lognames)
     register struct dirent *dirp;
 
     if (looking_for_lognames) {
+#ifdef _VMS_POSIX
+	    return (NULL);
+#else
 	if ((pw = getpwent()) == NULL)
 	    return (NULL);
 	return (str2short(pw->pw_name));
+#endif /* atp vmsposix */
     }
     if (dirp = readdir(dir_fd))
 	return (str2short(dirp->d_name));
@@ -584,7 +592,9 @@ tsearch(word, command, max_word_length)
 
     looking_for_lognames = (*word == '~') && (Strchr(word, '/') == NULL);
     if (looking_for_lognames) {
+#ifndef _VMS_POSIX
 	(void) setpwent();
+#endif /*atp vmsposix */
 	copyn(name, &word[1], MAXNAMLEN);	/* name sans ~ */
 	dir_fd = NULL;
     }
@@ -613,8 +623,18 @@ again:				/* search for matches */
 			"names in password file" : "files");
 		break;
 	    }
+	    /*
+	     * From Beto Appleton (beto@aixwiz.austin.ibm.com)
+	     *	typing "./control-d" will cause the csh to core-dump.
+	     *	the problem can be reproduce as following:
+	     *	 1. set ignoreeof
+	     *	 2. set filec
+	     *	 3. create a directory with 1050 files
+	     *	 4. typing "./control-d" will cause the csh to core-dump
+	     * Solution: Add + 1 to MAXITEMS
+	     */
 	    if (items == NULL)
-		items = (Char **) xcalloc(sizeof(items[0]), MAXITEMS);
+		items = (Char **) xcalloc(sizeof(items[0]), MAXITEMS + 1);
 	    items[numitems] = (Char *) xmalloc((size_t) (Strlen(entry) + 1) *
 					       sizeof(Char));
 	    copyn(items[numitems], entry, MAXNAMLEN);
@@ -632,14 +652,18 @@ again:				/* search for matches */
 	ignoring = FALSE;
 	nignored = 0;
 	if (looking_for_lognames)
+#ifndef _VMS_POSIX
 	    (void) setpwent();
+#endif /* atp vmsposix */
 	else
 	    rewinddir(dir_fd);
 	goto again;
     }
 
     if (looking_for_lognames)
+#ifndef _VMS_POSIX
 	(void) endpwent();
+#endif /*atp vmsposix */
     else
 	(void) closedir(dir_fd);
     if (numitems == 0)

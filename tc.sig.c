@@ -1,6 +1,6 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.c,v 3.10 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.c,v 3.11 1992/09/18 20:56:35 christos Exp $ */
 /*
- * sh.sig.c: Signal routine emulations
+ * tc.sig.c: Signal routine emulations
  */
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.10 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.11 1992/09/18 20:56:35 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -318,8 +318,8 @@ sigblock(mask)
     int     m;
     register int i;
 
-    set = 0;
-    oset = 0;
+    sigemptyset(&set);
+    sigemptyset(&oset);
 
     /* Get present set of signals. */
     if (sigprocmask(SIG_SETMASK, NULL, &set))

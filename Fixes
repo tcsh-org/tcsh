@@ -1,4 +1,32 @@
 V6.03.00, ...
+67. Added $%var, which == strlen(var)
+66. Added ^X^I and ^X^D to override programmable listing+completion
+65. Added case insensitive globbing for OS/2
+64. FIOCLEX and FIONCLEX are only used if we don't have FD_CLOEXEC.
+63. Added emx termio support, and emx pathsep support; emx compiles and runs:
+    needs job-debugging and finishing touches.
+62. Horrible bug with the lex linked list; from Loic Grenie, grenie@ens.fr
+    > echo a !#
+    echoed 'echo a echo a echo'!
+61. Shell -w,-x were incompatible with the same for test [POSIX] (beto)
+60. builtin newgrp did not accept the - argument.
+59. FIOCLEX for the masses (POSIX FD_CLOEXEC addition)
+58. Old style csh completion bug fix [not used] (beto)
+57. A background process waiting for input from tty
+    blocks when being foregrounded doesn't read its input and
+    doesn't get <cntl-c> and <cntl-z> signals.
+    It can only be killed from another session. (beto)
+    > cat > foo
+    #!/bin/csh -f
+    echo ">>>>>>"
+    set x = $<
+    echo $x
+    ^D
+    > chmod +x foo
+    > foo &
+    > fg
+    ^Z,^C # Nothing happens
+56. history > 1000 fix (beto)
 55. 6.02.07 9/18/92
 54. Added e_stuff_char() to put back a character in cooked mode in
     the input stream... Useful for status (^T)

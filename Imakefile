@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.16 1992/07/06 15:26:18 christos Exp christos $
+/**/# $Id: Imakefile,v 1.17 1992/08/09 00:13:36 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -96,12 +96,12 @@ ones.  Please send in your fixes and additions! */
 /* Maybe conditional on MACH? */
 SYSSRCS=mi.termios.c mi.wait.h mi.varargs.h
 SYSOBJS=mi.termios.${SUF}
-EXTF=ma.setp.c
+EXTF=ma.setp.c vms.termcap.c
 #else
 /* Maybe conditional on MACH? */
 SYSSRCS=ma.setp.c
 SYSOBJS=ma.setp.${SUF}
-EXTF=mi.termios.c mi.wait.h
+EXTF=mi.termios.c mi.wait.h vms.termcap.c
 #endif
 
 /* generic os's */
@@ -370,7 +370,7 @@ TCOBJS=	tc.alloc.${SUF} tc.bind.${SUF} tc.const.${SUF} tc.disc.${SUF} \
 MISCF = Makefile Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
-	README.imake complete.tcsh
+	README.imake complete.tcsh vmsposix.tex Makefile.vms
 CONFSRCS=config/config.*
 
 

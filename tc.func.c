@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.func.c,v 3.34 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.func.c,v 3.35 1992/09/18 20:56:35 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.34 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.35 1992/09/18 20:56:35 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -561,8 +561,8 @@ auto_lock()
 
 # define XCRYPT(a, b) crypt16(a, b)
 
-    if ((pw = getpwuid(geteuid())) != NULL &&	/* effective user passwd  */
-        (apw = getauthuid(geteuid())) != NULL) 	/* enhanced ultrix passwd */
+    if ((pw = getpwuid(euid)) != NULL &&	/* effective user passwd  */
+        (apw = getauthuid(euid)) != NULL) 	/* enhanced ultrix passwd */
 	srpp = apw->a_password;
 
 #endif /* PW_AUTH && !XCRYPT */
@@ -574,7 +574,7 @@ auto_lock()
 
 # define XCRYPT(a, b) crypt(a, b)
 
-    if ((pw = getpwuid(geteuid())) != NULL &&	/* effective user passwd  */
+    if ((pw = getpwuid(euid)) != NULL &&	/* effective user passwd  */
 	(spw = getspnam(pw->pw_name)) != NULL)	/* shadowed passwd	  */
 	srpp = spw->sp_pwdp;
 
@@ -585,7 +585,7 @@ auto_lock()
 
 #define XCRYPT(a, b) crypt(a, b)
 
-    if ((pw = getpwuid(geteuid())) != NULL)	/* effective user passwd  */
+    if ((pw = getpwuid(euid)) != NULL)	/* effective user passwd  */
 	srpp = pw->pw_passwd;
 
 #endif /* !XCRYPT */
@@ -1511,19 +1511,19 @@ shlvl(val)
 
 	if (val <= 0) {
 	    unsetv(STRshlvl);
-	    Unsetenv(STRSHLVL);
+	    Unsetenv(STRKSHLVL);
 	}
 	else {
 	    Char    buff[BUFSIZE];
 
 	    Itoa(val, buff);
 	    set(STRshlvl, Strsave(buff));
-	    Setenv(STRSHLVL, buff);
+	    tsetenv(STRKSHLVL, buff);
 	}
     }
     else {
 	set(STRshlvl, SAVE("1"));
-	Setenv(STRSHLVL, str2short("1"));
+	tsetenv(STRKSHLVL, str2short("1"));
     }
 }
 

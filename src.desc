@@ -66,4 +66,7 @@ tw.comp.c:	File completion builtin
 
 OS/Dependent files
 mi.termios.c:	Minix termios emulation
+mi.varargs.h:	Minix varargs
+mi.wait.h:	Minix wait.
 ma.setp.c:	MACH's setpath() library function
+atp.termcap.c:  Termcap routines for vmsposix 

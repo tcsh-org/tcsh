@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.40 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.41 1992/09/18 20:56:35 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -40,16 +40,22 @@
 /* This is separated instead of a #else of above because makedepend is
 easily confused. */
 
-#ifndef CONFIGH
-# define CONFIGH "config.h"
-#endif
+#ifndef _VMS_POSIX
+# ifndef CONFIGH
+#  define CONFIGH "config.h"
+# endif
+#endif /* atp vmsposix */
 
 /*
  * Avoid cpp bugs (CONFIGH is always defined at this point)
  */
-#ifdef CONFIGH
-# include CONFIGH
-#endif
+#ifndef _VMS_POSIX
+# ifdef CONFIGH
+#  include CONFIGH
+# endif
+#else 
+# include "config.h"
+#endif /* vmsposix atp */
 
 #ifndef EXTERN
 # define EXTERN extern
@@ -153,6 +159,17 @@ typedef int sigret_t;
 # undef word
 #endif 
 
+/* 
+ * Path separator in environment variables
+ */
+#ifndef PATHSEP
+# ifdef __EMX__
+#  define PATHSEP ';'
+# else /* unix */
+#  define PATHSEP ':'
+# endif /* __EMX__ */
+#endif /* !PATHSEP */
+
 /*
  * This macro compares the st_dev field of struct stat. On aix on ibmESA
  * st_dev is a structure, so comparison does not work. 
@@ -172,14 +189,14 @@ typedef int sigret_t;
 # include <locale.h>
 #endif 
 
-#ifndef _MINIX
+#if !defined(_MINIX) && !defined(_VMS_POSIX)
 #include <sys/param.h>
-#endif /* _MINIX */
+#endif /* _MINIX && vmsposix atp */
 #include <sys/stat.h>
 
-#ifdef BSDTIMES
+#if defined(BSDTIMES) || defined(BSDLIMIT)
 # include <sys/time.h>
-# if SYSVREL>3
+# if SYSVREL>3 && !defined(sgi)
 #  include "/usr/ucbinclude/sys/resource.h"
 # else
 #  include <sys/resource.h>
@@ -253,7 +270,9 @@ extern int setpgrp();
 #endif /* SYSVREL > 0 ||  _IBMR2 */
 
 #if !((defined(SUNOS4) || defined(_MINIX)) && defined(TERMIO))
+#ifndef _VMS_POSIX
 # include <sys/ioctl.h>
+#endif
 #endif 
 
 #if !defined(FIOCLEX) && defined(SUNOS4)
@@ -310,6 +329,13 @@ extern int setpgrp();
 # include <string.h>
 #endif /* BSD */
 
+/*
+ * IRIX-5.0 has <sys/cdefs.h>, but most system include files do not
+ * include it yet, so we include it here
+ */
+#if defined(sgi) && SYSVREL > 3
+# include <sys/cdefs.h>
+#endif /* sgi && SYSVREL > 3 */
 
 /*
  * ANSIisms... These must be *after* the system include and 
@@ -362,15 +388,15 @@ extern void		DebugFree	__P((ptr_t, char *, int));
 # define xfree(p)    	if (p) DebugFree(p, __FILE__, __LINE__); else
 #else
 # ifdef SYSMALLOC
-#  define xmalloc(i)  	Malloc(i)
-#  define xrealloc(p, i)Realloc(p, i)
-#  define xcalloc(n, s)	Calloc(n, s)
-#  define xfree(p)    	Free(p)
+#  define xmalloc(i)		smalloc(i)
+#  define xrealloc(p, i)	srealloc(p, i)
+#  define xcalloc(n, s)		scalloc(n, s)
+#  define xfree(p)		sfree(p)
 # else
-# define xmalloc(i)  	malloc(i)
-# define xrealloc(p, i)	realloc(p, i)
-# define xcalloc(n, s)	calloc(n, s)
-# define xfree(p)    	free(p)
+#  define xmalloc(i)  		malloc(i)
+#  define xrealloc(p, i)	realloc(p, i)
+#  define xcalloc(n, s)		calloc(n, s)
+#  define xfree(p)    		free(p)
 # endif /* SYSMALLOC */
 #endif /* MDEBUG */
 #include "sh.char.h"
@@ -413,9 +439,11 @@ extern void		DebugFree	__P((ptr_t, char *, int));
  */
 EXTERN bool    chkstop;		/* Warned of stopped jobs... allow exit */
 
-#ifndef FIOCLEX
+#if (defined(FIOCLEX) && defined(FIONCLEX)) || (defined(FD_CLOEXEC) && defined(F_SETFD))
+# define CLOSE_ON_EXEC
+#else
 EXTERN bool    didcch;		/* Have closed unused fd's for child */
-#endif 
+#endif /* (FIOCLEX && FIONCLEX) || (FD_CLOEXEC && F_SETFD) */
 
 EXTERN bool    didfds;		/* Have setup i/o fd's for child */
 EXTERN bool    doneinp;		/* EOF indicator after reset from readc */
@@ -485,7 +513,8 @@ EXTERN int     forepid;		/* pid of the last foreground job */
  * uid_t and gid_t are not defined in all the systems so I would have to
  * make special cases for them. In the future...
  */
-EXTERN int     uid;		/* Invokers uid */
+EXTERN int     uid, euid, 	/* Invokers real and effective */
+	       gid, egid;	/* User and group ids */
 EXTERN int     opgrp,		/* Initial pgrp and tty pgrp */
                shpgrp,		/* Pgrp of shell */
                tpgrp;		/* Terminal process group */
@@ -721,25 +750,25 @@ struct command {
 /*
  * The keywords for the parser
  */
-#define	T_BREAK		0
-#define	T_BRKSW		1
-#define	T_CASE		2
-#define	T_DEFAULT 	3
-#define	T_ELSE		4
-#define	T_END		5
-#define	T_ENDIF		6
-#define	T_ENDSW		7
-#define	T_EXIT		8
-#define	T_FOREACH	9
-#define	T_GOTO		10
-#define	T_IF		11
-#define	T_LABEL		12
-#define	T_LET		13
-#define	T_SET		14
-#define	T_SWITCH	15
-#define	T_TEST		16
-#define	T_THEN		17
-#define	T_WHILE		18
+#define	TC_BREAK	0
+#define	TC_BRKSW	1
+#define	TC_CASE		2
+#define	TC_DEFAULT 	3
+#define	TC_ELSE		4
+#define	TC_END		5
+#define	TC_ENDIF	6
+#define	TC_ENDSW	7
+#define	TC_EXIT		8
+#define	TC_FOREACH	9
+#define	TC_GOTO		10
+#define	TC_IF		11
+#define	TC_LABEL	12
+#define	TC_LET		13
+#define	TC_SET		14
+#define	TC_SWITCH	15
+#define	TC_TEST		16
+#define	TC_THEN		17
+#define	TC_WHILE	18
 
 /*
  * These are declared here because they want to be

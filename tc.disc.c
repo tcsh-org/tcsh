@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.disc.c,v 3.3 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.disc.c,v 3.4 1992/09/18 20:56:35 christos Exp $ */
 /*
  * tc.disc.c: Functions to set/clear line disciplines
  *
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.disc.c,v 3.3 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: tc.disc.c,v 3.4 1992/09/18 20:56:35 christos Exp $")
 
 #ifdef OREO
 #include <compat.h>
@@ -79,8 +79,12 @@ int     f;
 
     if (ioctl(f, TCGETA, (ioctl_t) & termiob) == 0) {
 	otermiob = termiob;
-	if (termiob.c_line != NTTYDISC || termiob.c_cc[VSWTCH] == 0) {
+#if SYSVREL < 4
+	if (termiob.c_line != NTTYDISC || termiob.c_cc[VSWTCH] == 0) { /*}*/
 	    termiob.c_line = NTTYDISC;
+#else
+	if (termiob.c_cc[VSWTCH] == 0) {
+#endif
 	    termiob.c_cc[VSWTCH] = CSWTCH;
 	    if (ioctl(f, TCSETA, (ioctl_t) & termiob) != 0)
 		return (-1);
@@ -90,7 +94,7 @@ int     f;
 	return (-1);
     add_discipline = 1;
     return (0);
-#endif				/* IRIS4D */
+#endif /* IRIS4D */
 
 
 #ifdef OREO

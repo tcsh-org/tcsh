@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.parse.c,v 3.6 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.parse.c,v 3.7 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.parse.c: Interpret a list of tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.parse.c,v 3.6 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.parse.c,v 3.7 1992/06/16 20:46:26 christos Exp $")
 
 /*
  * C shell
@@ -507,19 +507,19 @@ syn3(p1, p2, flags)
 again:
 	switch (srchx(p->word)) {
 
-	case T_ELSE:
+	case TC_ELSE:
 	    p = p->next;
 	    if (p != p2)
 		goto again;
 	    break;
 
-	case T_EXIT:
-	case T_FOREACH:
-	case T_IF:
-	case T_LET:
-	case T_SET:
-	case T_SWITCH:
-	case T_WHILE:
+	case TC_EXIT:
+	case TC_FOREACH:
+	case TC_IF:
+	case TC_LET:
+	case TC_SET:
+	case TC_SWITCH:
+	case TC_WHILE:
 	    specp = 1;
 	    break;
 	default:

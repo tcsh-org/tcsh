@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.23 1992/07/07 15:45:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.24 1992/09/18 20:56:35 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.23 1992/07/07 15:45:01 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.24 1992/09/18 20:56:35 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -173,14 +173,14 @@ lex(hp)
 	register struct wordent *new;
 
 	new = (struct wordent *) xmalloc((size_t) sizeof(*wdp));
-	new->word = 0;
+	new->word = STRNULL;
 	new->prev = wdp;
 	new->next = hp;
 	wdp->next = new;
+	hp->prev = new;
 	wdp = new;
 	wdp->word = word();
     } while (wdp->word[0] != '\n');
-    hp->prev = wdp;
     if (histlinep < histline + BUFSIZE) {
 	*histlinep = '\0';
 	if (histlinep > histline && histlinep[-1] == '\n')
@@ -494,7 +494,7 @@ getdol()
     }
     if (c == '{')
 	*np++ = (Char) c, c = getC(DOEXCL);
-    if (c == '#' || c == '?')
+    if (c == '#' || c == '?' || c == '%')
 	special++, *np++ = (Char) c, c = getC(DOEXCL);
     *np++ = (Char) c;
     switch (c) {
@@ -564,6 +564,12 @@ getdol()
 	else {
 	    if (!special)
 		seterror(ERR_VARILL);
+	    else {
+		ungetD(c);
+		*--np = 0;
+		addla(name);
+		return;
+	    }
 	}
 	if (toolong) {
 	    seterror(ERR_VARTOOLONG);
@@ -932,6 +938,17 @@ getsub(en)
     return (en);
 }
 
+/*
+ * 
+ * From Beto Appleton (beto@aixwiz.austin.ibm.com)
+ *
+ * when using history substitution, and the variable
+ * 'history' is set to a value higher than 1000,
+ * the shell might either freeze (hang) or core-dump.
+ * We raise the limit to 50000000
+ */
+
+#define HIST_PURGE -50000000
 static struct wordent *
 dosub(sc, en, global)
     int     sc;
@@ -943,6 +960,7 @@ dosub(sc, en, global)
     struct wordent *hp = &lexi;
     register struct wordent *wdp;
     register int i = exclc;
+    struct Hist *hst;
 
     wdp = hp;
     while (--i >= 0) {
@@ -983,7 +1001,12 @@ dosub(sc, en, global)
     if (didsub == 0)
 	seterror(ERR_MODFAIL);
     hp->prev = wdp;
-    return &enthist(-1000, &lexi, 0)->Hlex;
+    /* 
+     * ANSI mode HP/UX compiler chokes on
+     * return &enthist(HIST_PURGE, &lexi, 0)->Hlex;
+     */
+    hst = enthist(HIST_PURGE, &lexi, 0);
+    return &(hst->Hlex);
 }
 
 static Char *
@@ -1537,6 +1560,9 @@ reread:
 		    (ctpgrp = tcgetpgrp(FSHTTY)) != -1 &&
 		    tpgrp != ctpgrp) {
 		    (void) tcsetpgrp(FSHTTY, tpgrp);
+# ifdef _SEQUENT_
+		    if (ctpgrp)
+# endif /* _SEQUENT */
 		    (void) killpg((pid_t) ctpgrp, SIGHUP);
 		    xprintf("Reset tty pgrp from %d to %d\n", ctpgrp, tpgrp);
 		    goto reread;

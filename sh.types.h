@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.types.h,v 3.22 1992/07/18 01:34:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.types.h,v 3.23 1992/09/18 20:56:35 christos Exp christos $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -149,9 +149,9 @@ extern char *sbrk();
 #endif
 #endif /* __hpux */
 
-#if defined(_MINIX) || defined(emx)
+#if defined(_MINIX) || defined(__EMX__)
 typedef char * caddr_t;
-#endif /* _MINIX || emx */
+#endif /* _MINIX || __EMX__ */
 
 /***
  *** hp9000s500 running hpux-5.2
@@ -364,6 +364,18 @@ typedef char * caddr_t;
 #endif /* IRIS3D */
 
 /* 
+ * Motorola MPC running R32V2 (sysV88)
+ */
+#ifdef sysV88
+# ifndef _SIZE_T
+#  define _SIZE_T
+# endif /* _SIZE_T */
+# ifndef _PID_T
+#  define _PID_T
+# endif /* _PID_T */
+#endif /* sysV88 */
+ 
+/* 
  * Amdahl running UTS (Sys V3)
  */
 #ifdef uts
@@ -374,6 +386,27 @@ typedef char * caddr_t;
 #  define _PID_T
 # endif /* _PID_T */
 #endif /* uts */
+
+/* 
+ * Tektronix 4300 running UTek 4.0 (BSD 4.2)
+ */
+#ifdef UTek
+# ifndef _SIZE_T
+#  define _SIZE_T
+# endif /* _SIZE_T */
+#endif /* UTek */
+
+/* 
+ * Tektronix XD88/10 running UTekV (Sys V3)
+ */
+#ifdef UTekV
+# ifndef _SIZE_T
+#  define _SIZE_T
+# endif /* _SIZE_T */
+# ifndef _PID_T
+#  define _PID_T
+# endif /* _PID_T */
+#endif /* UTekV*/
 
 /*
  * UnixPC aka u3b1
@@ -394,6 +427,15 @@ typedef char * caddr_t;
 #  define _SIZE_T
 # endif /* _SIZE_T */
 #endif /* OPUS */
+
+/*
+ * BBN Butterfly gp1000
+ */
+#ifdef butterfly
+# ifndef _PID_T
+#  define _PID_T
+# endif /* _PID_T */
+#endif /* butterfly */
 
 /*
  * Convex
@@ -432,7 +474,14 @@ typedef char * caddr_t;
 # endif /* _PID_T */
 #endif /* apollo */
 
-
+/*
+ *  Vax running VMS_POSIX
+ */
+#ifdef _VMS_POSIX
+# ifndef _SIZE_T
+#  define _SIZE_T
+# endif /* _SIZE_T */
+#endif /* _VMS_POSIX */
 
 /***
  *** Catch all for non POSIX and/or non ANSI systems.

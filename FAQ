@@ -43,6 +43,8 @@ be able to get it... :-)
     the tty. A work-around is:
 
     dbxtool < /dev/null >& /dev/null &
+    or
+    /usr/etc/setsid dbxtool &
 
 3.  I tried to compile tcsh and it cannot find <locale.h>?
 

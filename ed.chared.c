@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.27 1992/08/14 13:56:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.28 1992/09/18 20:56:35 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.27 1992/08/14 13:56:09 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.28 1992/09/18 20:56:35 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1286,6 +1286,15 @@ e_complete(c)
 
 /*ARGSUSED*/
 CCRETVAL
+e_complete_all(c)
+    int c;
+{
+    *LastChar = '\0';		/* just in case */
+    return(CC_COMPLETE_ALL);
+}
+
+/*ARGSUSED*/
+CCRETVAL
 v_cm_complete(c)
     int c;
 {
@@ -1620,6 +1629,16 @@ e_list_choices(c)
     PastBottom();
     *LastChar = '\0';		/* just in case */
     return(CC_LIST_CHOICES);
+}
+
+/*ARGSUSED*/
+CCRETVAL
+e_list_all(c)
+    int c;
+{
+    PastBottom();
+    *LastChar = '\0';		/* just in case */
+    return(CC_LIST_ALL);
 }
 
 /*ARGSUSED*/

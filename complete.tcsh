@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.12 1992/09/18 20:56:35 christos Exp $
+# $Id: complete.tcsh,v 1.13 1992/09/18 21:23:53 christos Exp $
 # example file using the new completion code
 #
 
@@ -33,8 +33,8 @@ if ($?complete) then
     complete mkdir 	p/1/d/
     complete rmdir 	p/1/d/
     complete man 	p/1/c/		# only commands
-    complete complete 	p/1/c/
-    complete uncomplete p/1/c/
+    complete complete 	p/1/C/
+    complete uncomplete p/1/C/
     complete exec 	p/1/c/
     complete trace 	p/1/c/
     complete strace 	p/1/c/
@@ -120,7 +120,7 @@ if ($?complete) then
 			n/*/d/
 
     complete kill	c/-/S/ c/%/j/
-    complete %*		c/%/j/			# fill in the jobs builtin
+    complete -%*	c/%/j/			# fill in the jobs builtin
     complete fg		c/%/j/
     complete bg		c/%/j/
     complete stop	c/%/j/
@@ -133,10 +133,12 @@ if ($?complete) then
     complete zcat	n/*/f:*.Z/
     complete nm		n/*/f:^*.{h,C,c,cc}/
 
-    complete finger c/*@/\$hosts/ p/1/u/@ 
+    complete finger	c/*@/\$hosts/ p/1/u/@ 
+    complete ping	p/1/\$hosts/
+    complete traceroute	p/1/\$hosts/
 
-    complete talk p/1/'`users | tr " " "\012" | uniq`'/ \
-		  n/*/\`who\ \|\ grep\ \$:1\ \|\ awk\ \'\{\ print\ \$2\ \}\'\`/
+    complete talk	p/1/'`users | tr " " "\012" | uniq`'/ \
+		n/*/\`who\ \|\ grep\ \$:1\ \|\ awk\ \'\{\ print\ \$2\ \}\'\`/
 
     if ( -f $HOME/.netrc ) then
 	complete ftp    p@1@\`cat\ $HOME/.netrc\ \|\ \ awk\ \'\{\ print\ \$2\ \}\'\`@
@@ -187,8 +189,9 @@ if ($?complete) then
     complete cat	c/-/"(b e n s t u v)"/ n/*/f/
     complete mv		c/-/"(f i)"/ n/-*/f/ N/-*/x:'<destination>'/ \
 			p/1/f/ p/2/x:'<destination>'/
-    complete cp		c/-/"(i p r)"/ n/-*r*/d/ N/-*r*/d/ n/-*/f/ \
-			N/-*/x:'<destination>'/ p/1/f/ p/2/x:'<destination>'/
+    complete cp		c/-/"(i p r)"/ n/-*r*/d/ n/-*/f/ N/-*/d/ \
+			p/1/f/ p/2/d/ n/*/f/
+
     complete ln		c/-/"(f s)"/ n/-*/f/ N/-*/x:'<link_name>'/ \
 			p/1/f/ p/2/x:'<link_name>'/
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/ed.term.h,v 1.7 1992/03/08 02:17:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.term.h,v 1.8 1992/03/27 01:59:46 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -86,6 +86,17 @@
 # ifndef IEXTEN
 #  define IEXTEN 0
 # endif /* IEXTEN */
+
+/*
+ * emx garbage
+ */
+# ifndef IDEFAULT
+#  define IDEFAULT 0
+# endif /* IDEFAULT */
+
+# ifndef IDELETE
+#  define IDELETE 0
+# endif /* IDELETE */
 
 # ifndef ECHOCTL
 #  define ECHOCTL 0

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.set.c,v 3.16 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.set.c,v 3.17 1992/09/18 20:56:35 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.16 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.17 1992/09/18 20:56:35 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -78,8 +78,8 @@ update_vars(vp)
 	HistLit = 1;
     }
     else if (eq(vp, STRuser)) {
-	Setenv(STRUSER, value(vp));
-	Setenv(STRLOGNAME, value(vp));
+	tsetenv(STRKUSER, value(vp));
+	tsetenv(STRLOGNAME, value(vp));
     }
     else if (eq(vp, STRwordchars)) {
 	word_chars = value(vp);
@@ -100,7 +100,7 @@ update_vars(vp)
 #ifdef DOESNT_WORK_RIGHT
 	register Char *cp;
 #endif /* DOESNT_WORK_RIGHT */
-	Setenv(STRTERM, value(vp));
+	tsetenv(STRKTERM, value(vp));
 #ifdef DOESNT_WORK_RIGHT
 	cp = getenv("TERMCAP");
 	if (cp && (*cp != '/'))	/* if TERMCAP and not a path */
@@ -122,7 +122,7 @@ update_vars(vp)
 	set(vp, Strsave(cp));	/* have to save the new val */
 
 	/* and now mirror home with HOME */
-	Setenv(STRHOME, cp);
+	tsetenv(STRKHOME, cp);
 	/* fix directory stack for new tilde home */
 	dtilde();
 	xfree((ptr_t) cp);
@@ -132,7 +132,7 @@ update_vars(vp)
 	/* PWP: add more stuff in here later */
     }
     else if (eq(vp, STRshlvl)) {
-	Setenv(STRSHLVL, value(vp));
+	tsetenv(STRKSHLVL, value(vp));
     }
     else if (eq(vp, STRbackslash_quote)) {
 	bslash_quote = 1;
@@ -708,6 +708,8 @@ shift(v, c)
     update_vars(name);
 }
 
+static Char STRsep[2] = { PATHSEP, '\0' };
+
 static void
 exportpath(val)
     Char  **val;
@@ -724,9 +726,9 @@ exportpath(val)
 	    (void) Strcat(exppath, *val++);
 	    if (*val == 0 || eq(*val, STRRparen))
 		break;
-	    (void) Strcat(exppath, STRcolon);
+	    (void) Strcat(exppath, STRsep);
 	}
-    Setenv(STRPATH, exppath);
+    tsetenv(STRKPATH, exppath);
 }
 
 #ifndef lint

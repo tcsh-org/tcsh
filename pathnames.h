@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/pathnames.h,v 3.7 1992/05/15 23:49:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/pathnames.h,v 3.8 1992/06/16 20:46:26 christos Exp christos $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -37,61 +37,116 @@
 #ifndef _h_pathnames
 #define _h_pathnames
 
-#ifdef CMUCS
-#define _PATH_LOCAL		"/usr/cs/bin"
-#else
-#define _PATH_LOCAL		"/usr/local/bin"
-#endif
+#if defined(CMUCS) && !defined(_PATH_LOCAL)
+# define _PATH_LOCAL		"/usr/cs/bin"
+#endif /* CMUCS && !_PATH_LOCAL */
 
-#define _PATH_USRBIN		"/usr/bin"
-#define _PATH_USRUCB		"/usr/ucb"
-#define _PATH_USRBSD		"/usr/bsd"
-#define _PATH_BIN		"/bin"
+#if defined(_CRAYCOM) && !defined(_PATH_LOCAL)
+# define _PATH_LOCAL		"/usr/lbin"
+#endif /* _CRAYCOM && !_PATH_LOCAL */
 
 #if defined(convex) || defined(__convex__) || defined(stellar) || defined(INTEL)
-# define _PATH_DOTLOGIN		"/etc/login"
-# define _PATH_DOTLOGOUT	"/etc/logout"
-# define _PATH_DOTCSHRC		"/etc/cshrc"
+# ifndef _PATH_DOTLOGIN
+#  define _PATH_DOTLOGIN	"/etc/login"
+# endif /* !_PATH_DOTLOGIN */
+# ifndef _PATH_DOTLOGOUT
+#  define _PATH_DOTLOGOUT	"/etc/logout"
+# endif /* !_PATH_DOTLOGOUT */
+# ifndef _PATH_DOTCSHRC
+#  define _PATH_DOTCSHRC	"/etc/cshrc"
+# endif /* !_PATH_DOTCSHRC */
 #endif /* convex || __convex__ || stellar || INTEL */
 
+#ifdef NeXT
+# ifndef _PATH_DOTLOGIN
+#  define _PATH_DOTLOGIN	"/etc/login.std"
+# endif /* !_PATH_DOTLOGIN */
+# ifndef _PATH_DOTLOGOUT
+#  define _PATH_DOTLOGOUT	"/etc/logout.std"
+# endif /* !_PATH_DOTLOGOUT */
+# ifndef _PATH_DOTCSHRC
+#  define _PATH_DOTCSHRC	"/etc/cshrc.std"
+# endif /* !_PATH_DOTCSHRC */
+#endif /* NeXT */
+
 #if defined(sgi) || defined(OREO) || defined(cray) || defined(AMIX)
-# define _PATH_DOTLOGIN		"/etc/cshrc"
+# ifndef _PATH_DOTLOGIN
+#  define _PATH_DOTLOGIN	"/etc/cshrc"
+# endif /* !_PATH_DOTLOGIN */
 #endif /* sgi || OREO || cray || AMIX */
 
-#if defined(NeXT)
-# define _PATH_DOTLOGIN		"/etc/login.std"
-# define _PATH_DOTLOGOUT	"/etc/logout.std"
-# define _PATH_DOTCSHRC		"/etc/cshrc.std"
-#endif /* NeXT */
+#if defined(_CRAYCOM) && !defined(_PATH_TCSHELL)
+# define _PATH_TCSHELL		"/bin/tcsh"		/* 1st class shell */
+#endif /* _CRAYCOM && !_PATH_TCSHELL */
+
+#if defined(_MINIX) && !defined(_PATH_TCSHELL)
+# define _PATH_TCSHELL		"/local/bin/tcsh"	/* use ram disk */
+#endif /* _MINIX && !_PATH_TCSHELL */
+
+#if defined(__EMX__) && !defined(_PATH_DEVNULL)
+# define _PATH_DEVNULL		"nul"
+#endif /* __EMX__ && !_PATH_DEVNULL */
+
+#ifndef _PATH_LOCAL
+# define _PATH_LOCAL		"/usr/local/bin"
+#endif /* !_PATH_LOCAL */
+
+#ifndef _PATH_USRBIN
+# define _PATH_USRBIN		"/usr/bin"
+#endif /* !_PATH_USRBIN */
+
+#ifndef _PATH_USRUCB
+# define _PATH_USRUCB		"/usr/ucb"
+#endif /* !_PATH_USRUCB */
+
+#ifndef _PATH_USRBSD
+# define _PATH_USRBSD		"/usr/bsd"
+#endif /* !_PATH_USRBSD */
+
+#ifndef _PATH_BIN
+# define _PATH_BIN		"/bin"
+#endif /* !_PATH_BIN */
 
 #ifndef _PATH_DOTCSHRC
 # define _PATH_DOTCSHRC		"/etc/csh.cshrc"
-#endif
+#endif /* !_PATH_DOTCSHRC */
+
 #ifndef _PATH_DOTLOGIN
 # define _PATH_DOTLOGIN		"/etc/csh.login"
-#endif
+#endif /* !_PATH_DOTLOGIN */
+
 #ifndef _PATH_DOTLOGOUT
 # define _PATH_DOTLOGOUT	"/etc/csh.logout"
-#endif
+#endif /* !_PATH_DOTLOGOUT */
 
-#define _PATH_DEVNULL		"/dev/null"
+#ifndef _PATH_DEVNULL
+# define _PATH_DEVNULL		"/dev/null"
+#endif /* !_PATH_DEVNULL */
 
-#define _PATH_BSHELL		"/bin/sh"
-#ifdef notdef
+#ifndef _PATH_BSHELL
+# define _PATH_BSHELL		"/bin/sh"
+#endif /* !_PATH_BSHELL */
+
+#ifndef _PATH_CSHELL
 # define _PATH_CSHELL 		"/bin/csh"
-#endif
-#ifndef _PATH_TCSHELL
-#ifdef	_MINIX
-#define _PATH_TCSHELL		"/local/bin/tcsh"	/* use ram disk */
-#else
-#define _PATH_TCSHELL		"/usr/local/bin/tcsh"
-#endif	/* _MINIX */
-#endif
+#endif /* !_PATH_CSHELL */
 
-#define _PATH_LOGIN		"/bin/login"
-#ifdef NEWGRP
+#ifndef _PATH_TCSHELL
+#  define _PATH_TCSHELL		"/usr/local/bin/tcsh"
+#endif /* !_PATH_TCSHELL */
+
+#ifndef _PATH_LOGIN
+# define _PATH_LOGIN		"/bin/login"
+#endif /* !_PATH_LOGIN */
+
+#ifndef _PATH_BIN_NEWGRP
 # define _PATH_BIN_NEWGRP	"/bin/newgrp"
+#endif /* _PATH_BIN_NEWGRP */
+
+#ifndef _PATH_USRBIN_NEWGRP
 # define _PATH_USRBIN_NEWGRP	"/usr/bin/newgrp"
-#endif
+#endif /* _PATH_USRBIN_NEWGRP */
+
+
 
 #endif /* _h_pathnames */

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.35 1992/08/09 00:13:36 christos Exp $
+# $Id: Makefile,v 1.36 1992/09/18 20:56:35 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -49,7 +49,7 @@ LFLAGS=$(INCLUDES)
 #CFLAGS=-O $(INCLUDES)
 
 # gcc-2.1
-CFLAGS=-O2 $(INCLUDES) -B/bin/
+CFLAGS=-O2 $(INCLUDES)
 
 # gcc 2.1 on linux
 #CFLAGS=-O6 -fomit-frame-pointer $(INCLUDES)
@@ -94,13 +94,15 @@ CFLAGS=-O2 $(INCLUDES) -B/bin/
 #DFLAGS=-Nd4000 -Nn3000
 # AU/X 2.0 needs a flag for POSIX (read the config file)
 #DFLAGS=-Zp
+# VMS_POSIX needs:
+#DFLAGS=-D_VMS_POSIX
 DFLAGS=
 
 
 ################################################################
 ## LDLAGS.  Define something here if you need to
 ################################################################
-#LDFLAGS= 			## The simplest, suitable for all.
+LDFLAGS= 			## The simplest, suitable for all.
 #LDFLAGS= -s			## Stripped. Takes less space on disk.
 #LDFLAGS= -s -n			## Pure executable. Spares paging over
 # 				## the network for machines with local
@@ -112,6 +114,8 @@ DFLAGS=
 ## LIBES.  Pick one, or roll your own.
 ################################################################
 LIBES= -ltermcap		## BSD style things, hpux
+#LIBES= -ltermc			## emx under OS/2
+#LIBES= -ltermcap -lsec		## Motorola MPC (sysV88) with PW_SHADOW
 #LIBES= -ltermcap -lcs		## Mach
 #LIBES= -lcurses		## Sys V3 w/o networking (and Sys V4)
 #LIBES= -lcurses -lc /usr/ucblib/libucb.a ## Sys V4 with BSDTIMES
@@ -137,12 +141,11 @@ LIBES= -ltermcap		## BSD style things, hpux
 #LIBES= -lcurses -lsocket	## Intel's hypercube and ns32000 based Opus.
 #LIBES= -ldirent -lcurses       ## att3b1 stk cc w/o shared lib & directory lib
 #LIBES= -shlib -ldirent -lcurses ## att3b1 gcc1.40 w/ shared lib & directory lib
-#LIBES=				## Minix.
+#LIBES=				## Minix, VMS_POSIX
 #LIBES= -lcurses		## For a stellar
 #LIBES= -lcurses -lnsl -lsocket -lc /usr/ucblib/libucb.a ## Stardent Vistra
 #LIBES= -ltermcap -lndir -lsocket -ljobs ## masscomp RTU6.0
 #LIBES= -ltermcap -lauth        ## for Ultrix with Enhanced Security
-
 
 
 # The difficult choice of a c-compiler...
@@ -152,16 +155,20 @@ LIBES= -ltermcap		## BSD style things, hpux
 # If you want to take out -traditional, make sure that your sys/ioctl.h
 # is fixed correctly, otherwise you'll be stopped for tty input, or you
 # will lose the editor and job control.
-CC=	gcc -Wall
-#CC=	gcc -m486 -Wall # linux
+
+# The -B tells gcc to use /bin/ld. This is to avoid using the gnu ld, which
+# on the suns does not know how to make dynamically linked binaries.
+CC=	gcc -Wall -B/bin/	
+#CC=	gcc -m486 -Wall # Generate code for Intel 486 (linux)
 #CC=	cc
 #CC=	occ
 #CC=	acc
+#CC=	c89	# For VMS/POSIX
 #CC=	/bin/cc	# For suns, w/o gcc and SVR4
 #CC=	/usr/lib/sun.compile/cc  # FPS 500 (+FPX) with Sun C compiler
-ED=	-ed
-AS=	-as
-RM=	-rm
+ED=	ed
+AS=	as
+RM=	rm
 CXREF=	/usr/ucb/cxref
 VGRIND=	csh /usr/ucb/vgrind
 CTAGS=	/usr/ucb/ctags
@@ -183,14 +190,15 @@ ASSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.exp.c sh.file.c sh.func.c sh.glob.c sh.hist.c sh.init.c \
 	sh.lex.c sh.misc.c sh.parse.c sh.print.c sh.proc.c sh.sem.c \
 	sh.set.c sh.time.c sh.char.h sh.dir.h sh.proc.h sh.h 
-PSSRCS= sh.decls.h glob.c glob.h mi.termios.c mi.wait.h mi.varargs.h ma.setp.c
+PSSRCS= sh.decls.h glob.c glob.h mi.termios.c mi.wait.h mi.varargs.h ma.setp.c \
+	vms.termcap.c
 SHSRCS= ${ASSRCS} ${PSSRCS}
 SHOBJS=	sh.${SUF} sh.dir.${SUF} sh.dol.${SUF} sh.err.${SUF} sh.exec.${SUF} \
 	sh.char.${SUF} sh.exp.${SUF} sh.func.${SUF} sh.glob.${SUF} \
 	sh.hist.${SUF} sh.init.${SUF} sh.lex.${SUF} sh.misc.${SUF} \
 	sh.parse.${SUF} sh.print.${SUF} sh.proc.${SUF} sh.sem.${SUF} \
 	sh.set.${SUF} sh.time.${SUF} glob.${SUF} mi.termios.${SUF} \
-	ma.setp.${SUF}
+	ma.setp.${SUF} vms.termcap.${SUF}
 
 TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c \
 	tw.comp.c
@@ -211,11 +219,11 @@ TCOBJS=	tc.alloc.${SUF} tc.bind.${SUF} tc.const.${SUF} tc.disc.${SUF} \
 	tc.prompt.${SUF} tc.sched.${SUF} tc.sig.${SUF} tc.str.${SUF} \
 	tc.vers.${SUF} tc.who.${SUF} 
 
-PVSRCS= Makefile
+PVSRCS= Makefile Makefile.vms
 AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
-	README.imake complete.tcsh
+	README.imake complete.tcsh vmsposix.tex
 VHSRCS=${PVSRCS} ${AVSRCS}
 
 CONFSRCS=config/config.* 
@@ -253,6 +261,14 @@ tcsh.ps: tcsh.man
 
 .c.${SUF}:
 	${CC} ${CF} ${CFLAGS} ${DFLAGS} $<
+
+# _VMS_POSIX #module addition
+#.c.${SUF}:
+#	@(echo '#module '`echo $< | sed -e 's/\./_/g'`; cat $<) > $*..c
+#	${CC} ${CF} ${CFLAGS} ${DFLAGS} $*..c
+#	@mv $*..o $*.o
+#	@rm -f $*..c
+
 
 # Don't do any special massaging of C files for sharing of strings!!
 # it causes weird segmentation faults on some systems.

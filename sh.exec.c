@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exec.c,v 3.17 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exec.c,v 3.18 1992/08/09 00:13:36 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.17 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.18 1992/08/09 00:13:36 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -215,7 +215,7 @@ doexec(t)
 	pexerr();
 
     xechoit(av);		/* Echo command if -x */
-#ifdef FIOCLEX
+#ifdef CLOSE_ON_EXEC
     /*
      * Since all internal file descriptors are set to close on exec, we don't
      * need to close them explicitly here.  Just reorient ourselves for error
@@ -485,9 +485,9 @@ execash(t, kp)
     jmp_buf_t osetexit;
     int	    my_reenter;
     int     odidfds;
-#ifndef FIOCLEX
+#ifndef CLOSE_ON_EXEC
     int	    odidcch;
-#endif /* FIOCLEX */
+#endif /* CLOSE_ON_EXEC */
     sigret_t (*osigint)(), (*osigquit)(), (*osigterm)();
 
     if (chkstop == 0 && setintr)
@@ -504,9 +504,9 @@ execash(t, kp)
     osigterm = signal(SIGTERM, parterm);
 
     odidfds = didfds;
-#ifndef FIOCLEX
+#ifndef CLOSE_ON_EXEC
     odidcch = didcch;
-#endif /* FIOCLEX */
+#endif /* CLOSE_ON_EXEC */
     oSHIN = SHIN;
     oSHOUT = SHOUT;
     oSHDIAG = SHDIAG;
@@ -532,9 +532,9 @@ execash(t, kp)
 	SHIN = dcopy(0, -1);
 	SHOUT = dcopy(1, -1);
 	SHDIAG = dcopy(2, -1);
-#ifndef FIOCLEX
+#ifndef CLOSE_ON_EXEC
 	didcch = 0;
-#endif /* FIOCLEX */
+#endif /* CLOSE_ON_EXEC */
 	didfds = 0;
 	/*
 	 * Decrement the shell level
@@ -548,9 +548,9 @@ execash(t, kp)
     (void) sigset(SIGTERM, osigterm);
 
     doneinp = 0;
-#ifndef FIOCLEX
+#ifndef CLOSE_ON_EXEC
     didcch = odidcch;
-#endif /* FIOCLEX */
+#endif /* CLOSE_ON_EXEC */
     didfds = odidfds;
     (void) close(SHIN);
     (void) close(SHOUT);

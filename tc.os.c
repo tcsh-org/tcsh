@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.24 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.25 1992/09/18 20:56:35 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.24 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.25 1992/09/18 20:56:35 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -67,8 +67,8 @@ static Char STRMPATH[] = {'M', 'P', 'A', 'T', 'H', '\0'};
 static Char STREPATH[] = {'E', 'P', 'A', 'T', 'H', '\0'};
 # endif
 #endif /* MACH */
+static Char *syspaths[] = {STRKPATH, STRCPATH, STRLPATH, STRMPATH, 
 
-static Char *syspaths[] = {STRPATH, STRCPATH, STRLPATH, STRMPATH, 
 #if EPATH
 	STREPATH,
 #endif
@@ -179,8 +179,9 @@ abortpath:
 	for (val = str2short(cpaths[i]); val && *val && *val != '='; val++);
 	if (val && *val == '=') {
 	    *val++ = '\0';
-	    Setenv(name, val);
-	    if (Strcmp(name, STRPATH) == 0) {
+
+	    tsetenv(name, val);
+	    if (Strcmp(name, STRKPATH) == 0) {
 		importpath(val);
 		if (havhash)
 		    dohash(NULL, NULL);
@@ -826,39 +827,43 @@ xstrerror(i)
 #endif /* strerror */
     
 #ifdef gethostname
-# ifndef _MINIX
+# if !defined(_MINIX) && !defined(__EMX__)
 #  include <sys/utsname.h>
-# endif
+# endif /* !_MINIX && !__EMX__ */
 
 int
 xgethostname(name, namlen)
     char   *name;
     int     namlen;
 {
-#ifndef _MINIX
+# if !defined(_MINIX) && !defined(__EMX__)
     int     i, retval;
     struct utsname uts;
 
     retval = uname(&uts);
 
-# ifdef DEBUG
+#  ifdef DEBUG
     xprintf("sysname:  %s\n", uts.sysname);
     xprintf("nodename: %s\n", uts.nodename);
     xprintf("release:  %s\n", uts.release);
     xprintf("version:  %s\n", uts.version);
     xprintf("machine:  %s\n", uts.machine);
-# endif	/* DEBUG */
+#  endif /* DEBUG */
     i = strlen(uts.nodename) + 1;
     (void) strncpy(name, uts.nodename, i < namlen ? i : namlen);
 
     return retval;
-#else /* _MINIX */
+# else /* !_MINIX && !__EMX__ */
     if (namlen > 0) {
+#  ifdef __EMX__
+	(void) strncpy(name, "OS/2", namlen);
+#  else /* _MINIX */
 	(void) strncpy(name, "minix", namlen);
+#  endif /* __EMX__ */
 	name[namlen-1] = '\0';
     }
     return(0);
-#endif /* _MINIX */
+#endif /* _MINIX && !__EMX__ */
 } /* end xgethostname */
 #endif /* gethostname */
 
@@ -868,7 +873,7 @@ xgethostname(name, namlen)
 #  undef _MINIX		/* redefined in <lib.h> */
 #  undef HZ		/* redefined in <minix/const.h> */
 #  include <lib.h>
-# endif /* _MINIX */
+# endif /* _MINIX && NICE */
 int 
 xnice(incr)
     int incr;
@@ -991,7 +996,7 @@ prepend(dirname, pathname)
 
 # else /* ! hp9000s500 */
 
-#if SYSVREL != 0 && !defined(d_fileno)
+#if (SYSVREL != 0 && !defined(d_fileno)) !! defined(_VMS_POSIX)
 # define d_fileno d_ino
 #endif
 
@@ -1196,12 +1201,12 @@ dover(v, c)
 
     setname(short2str(*v++));
     if (!*v) {
-	if (!(p = Getenv(STRSYSTYPE)))
+	if (!(p = tgetenv(STRSYSTYPE)))
 	    stderror(ERR_NAME | ERR_STRING, "System type is not set");
 	xprintf("%S\n", p);
     }
     else {
-	Setenv(STRSYSTYPE, getv(*v) ? STRbsd43 : STRsys53);
+	tsetenv(STRSYSTYPE, getv(*v) ? STRbsd43 : STRsys53);
 	dohash(NULL, NULL);
     }
 }

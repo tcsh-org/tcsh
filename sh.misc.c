@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.misc.c,v 3.14 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.misc.c,v 3.15 1992/09/18 20:56:35 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.14 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.15 1992/09/18 20:56:35 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -254,7 +254,7 @@ closem()
 	    (void) close(f);
 }
 
-#ifndef FIOCLEX
+#ifndef CLOSE_ON_EXEC
 /*
  * Close files before executing a file.
  * We could be MUCH more intelligent, since (on a version 7 system)
@@ -279,7 +279,7 @@ closech()
 	(void) close(f);
 }
 
-#endif
+#endif /* CLOSE_ON_EXEC */
 
 void
 donefds()
@@ -409,7 +409,7 @@ strend(cp)
     return (cp);
 }
 
-#endif				/* SHORT_STRINGS */
+#endif /* SHORT_STRINGS */
 
 Char   *
 strip(cp)

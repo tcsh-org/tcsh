@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.init.c,v 3.11 1992/05/02 23:39:58 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.init.c,v 3.12 1992/05/15 23:49:22 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.11 1992/05/02 23:39:58 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.12 1992/05/15 23:49:22 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -617,7 +617,9 @@ tw_logname_start(dfd, pat)
     Char *pat;
 {
     SETDIR(dfd)
+#ifndef _VMS_POSIX
     (void) setpwent();	/* Open passwd file */
+#endif /* atp vmsposix */
 } /* end tw_logname_start */
 
 
@@ -639,8 +641,10 @@ tw_logname_next(dir, flags)
      * (in pintr()) we may be freeing an invalid pointer
      */
     TW_HOLD();
+#ifndef _VMS_POSIX
     /* ISC does not declare getpwent()? */
     pw = (struct passwd *) getpwent();
+#endif /* atp vmsposix */
     TW_RELS();
 
     if (pw == NULL) {
@@ -663,7 +667,9 @@ tw_logname_end()
 #ifdef YPBUGS
     fix_yp_bugs();
 #endif
+#ifndef _VMS_POSIX
    (void) endpwent();
+#endif /* atp vmsposix */
 } /* end tw_logname_end */
 
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.init.c,v 3.31 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.init.c,v 3.32 1992/09/18 20:56:35 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.31 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.32 1992/09/18 20:56:35 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -232,9 +232,9 @@ ed_Setup(rst)
     extty.d_t.c_lflag &= ~ttylist[EX_IO][M_LINED].t_clrmask;
     extty.d_t.c_lflag |=  ttylist[EX_IO][M_LINED].t_setmask;
 
-# ifdef IRIX3_3
+# if defined(IRIX3_3) && SYSVREL < 4
     extty.d_t.c_line = NTTYDISC;
-# endif /* IRIX3_3 */
+# endif /* IRIX3_3 && SYSVREL < 4 */
 
 #else	/* GSTTY */		/* V7, Berkeley style tty */
 
@@ -325,9 +325,9 @@ ed_Init()
     edtty.d_t.c_lflag |=  ttylist[ED_IO][M_LINED].t_setmask;
 
 
-# ifdef IRIX3_3
+# if defined(IRIX3_3) && SYSVREL < 4
     edtty.d_t.c_line = NTTYDISC;
-# endif /* IRIX3_3 */
+# endif /* IRIX3_3 && SYSVREL < 4 */
 
 #else /* GSTTY */
 

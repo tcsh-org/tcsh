@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.34 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.35 1992/09/18 20:56:35 christos Exp christos $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -39,6 +39,7 @@
 
 #define NEEDstrerror		/* Too hard to find which systems have it */
 
+
 #ifdef notdef 
 /*
  * for SVR4 and linux we used to fork pipelines backwards. 
@@ -47,6 +48,17 @@
  */
 # define BACKPIPE
 #endif /* notdef */
+
+#ifdef   _VMS_POSIX
+# ifndef  NOFILE 
+#  define  NOFILE 64
+# endif
+# define  nice(a)       setprio((getpid()),a)
+# undef   NEEDstrerror    /* won't get sensible error messages otherwise */
+# define  NEEDgethostname 
+# include <sys/time.h>    /* for time stuff in tc.prompt.c */
+# include <limits.h>
+#endif /*atp vmsposix*/
 
 #ifndef NOFILE
 # ifdef OPEN_MAX
@@ -64,9 +76,6 @@
 # include <sys/time.h>
 # include <sys/resource.h>
 # ifdef POSIX
-#  ifdef T_BREAK
-#   undef T_BREAK
-#  endif /* T_BREAK */
 #  include <sys/tty.h>
 #  include <termios.h>
 # endif /* POSIX */
@@ -141,7 +150,7 @@ struct ucred {
  * It would break on linux, where all this is
  * defined in <termios.h>. Wrapper added.
  */
-#ifndef linux
+#if !defined(linux) && !defined(_VMS_POSIX)
 # if defined(INTEL) || defined(u3b2) || defined (u3b5) || defined(ub15) || defined(u3b20d) || defined(ISC) || defined(SCO) 
 #  ifdef TIOCGWINSZ
 /*
@@ -154,7 +163,7 @@ struct ucred {
 #   define NEEDgethostname
 #  endif /* ODT */
 # endif /* INTEL || att || isc || sco */
-#endif /* !linux */
+#endif /* !linux && !_VMS_POSIX */
 
 #ifdef UNIXPC
 # define NEEDgethostname
@@ -173,6 +182,27 @@ struct ucred {
 #endif /* IRIS4D */
 
 /*
+ * For some versions of system V software, specially ones that use the 
+ * Wollongong Software TCP/IP, the FIOCLEX, FIONCLEX, FIONBIO calls
+ * might not work correctly for file descriptors [they work only for
+ * sockets]. So we try to use first the fcntl() and we only use the
+ * ioctl() form, only if we don't have the fcntl() one.
+ *
+ * From: scott@craycos.com (Scott Bolte)
+ */
+#ifdef FD_CLOEXEC
+# define close_on_exec(fd, v)	\
+    ((v) ? fcntl((fd), F_SETFD, 1) : fcntl((fd), F_SETFD, 0))
+#else /* !FD_CLOEXEC */
+# ifdef FIOCLEX
+# define close_on_exec(fd, v)	\
+    ((v) ? ioctl((fd), FIOCLEX, NULL) : ioctl((fd), FIONCLEX, NULL))
+# else /* Nothing */
+# define close_on_exec(fd, v)	/* Nothing */
+# endif /* FIOCLEX */
+#endif /* FD_CLOEXEC */
+
+/*
  * Stat
  */
 #ifdef ISC
@@ -188,12 +218,18 @@ struct ucred {
 # endif /* S_IFMT */
 #endif /* ISC */
 
-#ifdef uts
+#if defined(uts) || defined(UTekV) || defined(sysV88)
 /*
  * The uts 2.1.2 macros (Amdahl) are busted!
  * You should fix <sys/stat.h>, cause other programs will break too!
  *
  * From: creiman@ncsa.uiuc.edu (Charlie Reiman)
+ */
+
+/*
+ * The same applies to Motorola MPC (System V/88 R32V2, UTekV 3.2e) 
+ * workstations, the stat macros are broken.
+ * Kaveh Ghazi (ghazi@caip.rutgers.edu)
  */
 # undef S_ISDIR
 # undef S_ISCHR
@@ -203,7 +239,7 @@ struct ucred {
 # undef S_ISNAM
 # undef S_ISLNK
 # undef S_ISSOCK
-#endif /* uts */
+#endif /* uts || UTekV */
 
 #ifdef S_IFMT
 # if !defined(S_ISDIR) && defined(S_IFDIR)
@@ -232,6 +268,33 @@ struct ucred {
 # endif	/* ! S_ISSOCK && S_IFSOCK */
 #endif /* S_IFMT */
 
+
+#ifndef S_IREAD
+# define S_IREAD 0000400
+#endif /* S_IREAD */
+#ifndef S_IROTH
+# define S_IROTH (S_IREAD >> 6)
+#endif /* S_IROTH */
+#ifndef S_IRGRP
+# define S_IRGRP (S_IREAD >> 3)
+#endif /* S_IRGRP */
+#ifndef S_IRUSR
+# define S_IRUSR S_IREAD
+#endif /* S_IRUSR */
+
+#ifndef S_IWRITE
+# define S_IWRITE 0000200
+#endif /* S_IWRITE */
+#ifndef S_IWOTH
+# define S_IWOTH (S_IWRITE >> 6)
+#endif /* S_IWOTH */
+#ifndef S_IWGRP
+# define S_IWGRP (S_IWRITE >> 3)
+#endif /* S_IWGRP */
+#ifndef S_IWUSR
+# define S_IWUSR S_IWRITE
+#endif /* S_IWUSR */
+
 #ifndef S_IEXEC
 # define S_IEXEC 0000100
 #endif /* S_IEXEC */
@@ -254,6 +317,7 @@ struct ucred {
 #ifndef S_ISVTX
 # define S_ISVTX 0001000	/* sticky */
 #endif /* S_ISVTX */
+
 /*
  * Access()
  */
@@ -345,15 +409,20 @@ struct ucred {
 # endif	/* _BSDX_ */
 #endif /* SXA */
 
-#ifdef _MINIX
+#if defined(_MINIX) || defined(__EMX__)
 # define NEEDgethostname
 # define NEEDnice
+# define HAVENOLIMIT
 /*
  * Minix does not have these, so...
  */
-# define ulimit(a, b)		(0x003fffff)
 # define getpgrp()		getpid()
-#endif /* _MINIX */
+#endif /* _MINIX || __EMX__ */
+
+#ifdef __EMX__
+/* XXX: How can we get the tty name in emx? */
+# define ttyname(fd) (isatty(fd) ? "/dev/tty" : NULL)
+#endif /* __EMX__ */
 
 #ifndef POSIX
 # define mygetpgrp()    getpgrp(0)
@@ -390,7 +459,7 @@ typedef struct timeval timeval_t;
 #endif /* NeXT */
 
 
-#if !defined(POSIX) || defined(SUNOS4)
+#if !defined(POSIX) || defined(SUNOS4) || defined(UTekV)
 extern time_t time();
 extern char *getenv();
 extern int atoi();

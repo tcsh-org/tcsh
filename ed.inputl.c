@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.26 1992/08/09 00:13:36 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.27 1992/09/18 20:56:35 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.26 1992/08/09 00:13:36 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.27 1992/09/18 20:56:35 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -78,6 +78,7 @@ Inputl()
     Char   *SaveChar, *CorrChar;
     Char    Origin[INBUFSIZE], Change[INBUFSIZE];
     int     matchval;		/* from tenematch() */
+    COMMAND fn;
 
     if (!MapsAreInited)		/* double extra just in case */
 	ed_InitMaps();
@@ -266,6 +267,8 @@ Inputl()
 
 
 	case CC_COMPLETE:
+	case CC_COMPLETE_ALL:
+	    fn = (retval == CC_COMPLETE_ALL) ? RECOGNIZE_ALL : RECOGNIZE;
 	    if (adrof(STRautoexpand))
 		(void) e_expand_history(0);
 	    /*
@@ -274,7 +277,7 @@ Inputl()
 	     * completion, independently of autolisting.
 	     */
 	    expnum = Cursor - InputBuf;
-	    switch (matchval = tenematch(InputBuf, Cursor-InputBuf, RECOGNIZE)){
+	    switch (matchval = tenematch(InputBuf, Cursor-InputBuf, fn)){
 	    case 1:
 		if (non_unique_match && matchbeep &&
 		    (Strcmp(*(matchbeep->vec), STRnotunique) == 0))
@@ -311,7 +314,8 @@ Inputl()
 		if (autol && (Strcmp(*(autol->vec), STRambiguous) != 0 || 
 				     expnum == Cursor - InputBuf)) {
 		    PastBottom();
-		    (void) tenematch(InputBuf, Cursor-InputBuf, LIST);
+		    fn = (retval == CC_COMPLETE_ALL) ? LIST_ALL : LIST;
+		    (void) tenematch(InputBuf, Cursor-InputBuf, fn);
 		}
 		break;
 	    }
@@ -327,13 +331,16 @@ Inputl()
 	    break;
 
 	case CC_LIST_CHOICES:
+	case CC_LIST_ALL:
+	    fn = (retval == CC_LIST_ALL) ? LIST_ALL : LIST;
 	    /* should catch ^C here... */
-	    if (tenematch(InputBuf, Cursor - InputBuf, LIST) < 0)
+	    if (tenematch(InputBuf, Cursor - InputBuf, fn) < 0)
 		Beep();
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
 	    break;
+
 
 	case CC_LIST_GLOB:
 	    if (tenematch(InputBuf, Cursor - InputBuf, GLOB) < 0)

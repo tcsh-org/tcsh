@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.hist.c,v 3.4 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.hist.c,v 3.5 1992/09/18 20:56:35 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.4 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.5 1992/09/18 20:56:35 christos Exp $")
 
 #include "tc.h"
 
@@ -269,7 +269,7 @@ fmthist(fmt, ptr, buf)
 	break;
     case 'R':
 	if (HistLit && hp->histline)
-	    xsprintf(buf, "%S\n", hp->histline);
+	    xsprintf(buf, "%S", hp->histline);
 	else {
 	    Char ibuf[BUFSIZE], *ip;
 	    char *p;
@@ -338,14 +338,14 @@ void
 loadhist(fname)
     Char *fname;
 {
-    static Char   *loadhist[] = {STRsource, STRmh, NULL, NULL};
+    static Char   *loadhist_cmd[] = {STRsource, STRmh, NULL, NULL};
 
     if (fname != NULL)
-	loadhist[2] = fname;
+	loadhist_cmd[2] = fname;
     else if ((fname = value(STRhistfile)) != STRNULL)
-	loadhist[2] = fname;
+	loadhist_cmd[2] = fname;
     else
-	loadhist[2] = STRtildothist;
+	loadhist_cmd[2] = STRtildothist;
 
-    dosource(loadhist, NULL);
+    dosource(loadhist_cmd, NULL);
 }
