@@ -1,9 +1,9 @@
-$ $Id$
+$ $Id: set16,v 1.2 1995/03/19 18:07:15 christos Exp $
 $ sh.lex.c
 $set 16 
 1 Reset tty pgrp from %d to %d\n
 2 \nUse "logout" to logout.\n
-3 \nUse "exit" to leave tcsh.\n
+3 \nUse "exit" to leave %s.\n
 4 seek to eval %x %x\n
 5 seek to alias %x %x\n
 6 seek to file %x\n

@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set23,v 1.2 1995/03/19 18:07:15 christos Exp $
 $ tc.os.c
 $set 23 
 1 Bad cpu/site name
@@ -24,8 +24,11 @@ $set 23
 21 getwd: Read error in ".." (%s)
 22 getwd: Cannot change back to "." (%s)
 23 getwd: Cannot stat "/" (%s)
-24 getwd: Cannot stat directory "%s" (%s)
-25 getwd: Cannot open directory "%s" (%s)
-26 getwd: Cannot find "." in ".." (%s)
-27 Invalid system type
-28 System type is not set
+24 getwd: Cannot stat "." (%s)
+25 getwd: Cannot stat directory "%s" (%s)
+26 getwd: Cannot open directory "%s" (%s)
+27 getwd: Cannot find "." in ".." (%s)
+28 Invalid system type
+29 System type is not set
+30 Too many arguments
+31 Invalid argument

@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set7,v 1.2 1995/03/19 18:07:15 christos Exp $
 $ ed.screen.c
 $set 7
 1 \n\tTcsh thinks your terminal has the\n
@@ -20,10 +20,10 @@ $set 7
 17 DeleteChars: num is riduculous: %d\r\n
 18 ERROR: cannot insert\r\n
 19 StartInsert: num is riduculous: %d\r\n
-20 tcsh: Cannot open /etc/termcap.\n
-21 tcsh: No entry for terminal type "%s"\n
-22 tcsh: using dumb terminal settings.\n
-23 tcsh: WARNING: Your terminal cannot move up.\n
+20 %s: Cannot open /etc/termcap.\n
+21 %s: No entry for terminal type "%s"\n
+22 %s: using dumb terminal settings.\n
+23 %s: WARNING: Your terminal cannot move up.\n
 24 Editing may be odd for long lines.\n
 25 no clear EOL capability.\n
 26 no delete char capability.\n

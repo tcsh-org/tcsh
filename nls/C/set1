@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set1,v 1.2 1995/03/19 18:07:15 christos Exp $
 $ Error messages
 $set 1 
 1 Syntax Error
@@ -126,9 +126,9 @@ $set 1
 123 !# History loop
 124 Malformed file inquiry
 125 Selector overflow
-126 Unknown option: `-%s'\nUsage: tcsh [ -bcdefilmnqstvVxX -Dname[=value] ] [ argument ... ]
-127 Unknown option: `-%s'\nUsage: tcsh [ -bcdefFilmnqstvVxX ] [ argument ... ]
-128 Unknown option: `-%s'\nUsage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]
+126 Unknown option: `-%s'\nUsage: %s [ -bcdefilmnqstvVxX -Dname[=value] ] [ argument ... ]
+127 Unknown option: `-%s'\nUsage: %s [ -bcdefFilmnqstvVxX ] [ argument ... ]
+128 Unknown option: `-%s'\nUsage: %s [ -bcdefilmnqstvVxX ] [ argument ... ]
 129 \nInvalid completion: "%s"
 130 \nInvalid %s: '%c'
 131 \nMissing separator '%c' after %s "%s"
