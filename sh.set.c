@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.47 2004/02/21 20:34:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.48 2004/03/21 16:48:14 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.47 2004/02/21 20:34:25 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.48 2004/03/21 16:48:14 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1112,6 +1112,10 @@ x:
     }
 }
 
+#ifdef DSPMBYTE
+bool dspmbyte_utf8;
+#endif
+
 #if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
 bool dspmbyte_ls;
 
@@ -1142,6 +1146,7 @@ update_dspmbyte_vars()
 	       "Warning: unknown multibyte display; using default(euc(JP))\n"));
 	    iskcode = 2;
 	}
+	dspmbyte_utf8 = iskcode == 4;
 	if (dstr1 && vp->vec[1] && eq(vp->vec[1], STRls))
 	  dspmbyte_ls = 1;
 	else

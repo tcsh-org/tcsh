@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.51 2003/07/29 21:19:44 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.52 2004/02/21 20:34:25 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -79,6 +79,7 @@ extern	Char		 *expand_lex	__P((Char *, size_t, struct wordent *,
 extern	Char		 *sprlex	__P((Char *, size_t, struct wordent *));
 extern	Char		 *Itoa		__P((int, Char *, int, int));
 extern	void		  dolist	__P((Char **, struct command *));
+extern	void		  dotermname	__P((Char **, struct command *));
 extern	void		  dotelltc	__P((Char **, struct command *));
 extern	void		  doechotc	__P((Char **, struct command *));
 extern	void		  dosettc	__P((Char **, struct command *));

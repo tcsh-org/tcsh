@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.108 2003/05/26 07:11:06 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.109 2004/02/21 20:34:24 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.108 2003/05/26 07:11:06 christos Exp $")
+RCSID("$Id: sh.c,v 3.109 2004/02/21 20:34:24 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -114,7 +114,7 @@ bool    fast = 0;
 static bool    batch = 0;
 static bool    mflag = 0;
 static bool    prompt = 1;
-static int     enterhist = 0;
+int     enterhist = 0;
 bool    tellwhat = 0;
 time_t  t_period;
 Char  *ffile = NULL;

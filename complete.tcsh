@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.42 2004/02/21 20:34:24 christos Exp $
+# $Id: complete.tcsh,v 1.43 2004/02/22 15:57:15 christos Exp $
 # example file using the new completion code
 #
 # Debian GNU/Linux
@@ -49,6 +49,7 @@ if ($?_complete) then
     endif
     if ( -r $HOME/.ssh/known_hosts ) then
 	set f=`cat $HOME/.ssh/known_hosts | cut -f 1 -d \ ` >& /dev/null
+	set f=`cat $HOME/.ssh/known_hosts | cut -f 1 -d \ | sed -e 's/,/ /g'` >& /dev/null
 	set hosts=($hosts $f)
     endif
     unset f

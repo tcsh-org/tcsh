@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.29 2002/03/08 17:36:45 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.30 2003/02/08 20:03:25 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.29 2002/03/08 17:36:45 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.30 2003/02/08 20:03:25 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -41,7 +41,7 @@ RCSID("$Id: ed.refresh.c,v 3.29 2002/03/08 17:36:45 christos Exp $")
 
 /* refresh.c -- refresh the current set of lines on the screen */
 
-Char   *litptr[256];
+Char   *litptr[512];
 static int vcursor_h, vcursor_v;
 static int rprompt_h, rprompt_v;
 
@@ -228,6 +228,7 @@ Vdraw(c)			/* draw char c onto V lines */
     }
 }
 
+static unsigned int litnum = 0;
 /*
  *  RefreshPromptpart()
  *	draws a prompt element, expanding literals (we know it's ASCIZ)
@@ -237,7 +238,6 @@ RefreshPromptpart(buf)
     Char *buf;
 {
     register Char *cp;
-    static unsigned int litnum = 0;
     if (buf == NULL)
     {
       litnum = 0;
@@ -315,11 +315,39 @@ Refresh()
 
     /* draw the current input buffer */
     for (cp = InputBuf; (cp < LastChar); cp++) {
+#if defined(DSPMBYTE)
+	if (vcursor_h + 1 >= TermH && Ismbyte1(*cp)) {
+	    extern bool dspmbyte_utf8;
+	    if (dspmbyte_utf8) {
+		int i;
+		for (i = 1 ; cp + i < LastChar; i++)
+		    if (!Ismbyte2(cp[i]))
+			break;
+		if (i > 1 && !(cp[i - 2] & LITERAL))
+		    Vdraw(' ');
+	    } else {
+		Vdraw(' ');
+	    }
+	}
+# endif
 	if (cp == Cursor) {
 	    cur_h = vcursor_h;	/* save for later */
 	    cur_v = vcursor_v;
 	}
-	Draw(*cp);
+	if (*cp & LITERAL) {
+	    Char *litstart = cp;
+	    int i;
+	    for (i = 1; cp + i < LastChar; i++)
+		if (!(cp[i] & LITERAL))
+		    break;
+	    if (cp + i < LastChar && litnum < sizeof(litptr)/sizeof(*litptr)) {
+		litptr[litnum] = litstart;
+		Vdraw((int) (litnum++ | LITERAL));
+	    }
+	    cp += i;
+	} else {
+	    Draw(*cp);
+	}
     }
 
     if (cur_h == -1) {		/* if I haven't been set yet, I'm at the end */
@@ -615,8 +643,12 @@ update_line(old, new, cur_line)
      */
     while ((o > ofd) && (n > nfd) && (*--o == *--n))
 	continue;
-    ols = ++o;
-    nls = ++n;
+    if (*o != *n) {
+	o++;
+	n++;
+    }
+    ols = o;
+    nls = n;
 
     /*
      * find same begining and same end
@@ -1165,6 +1197,8 @@ RefCursor()
     }
 
     for (cp = InputBuf; cp < Cursor; cp++) {	/* do input buffer to Cursor */
+	if (*cp & LITERAL)
+	    continue;
 	c = *cp & CHAR;		/* extra speed plus strip the inverse */
 	h++;			/* all chars at least this long */
 
@@ -1193,6 +1227,21 @@ RefCursor()
 		}
 	    }
 	}
+
+#if defined(DSPMBYTE)
+        if (h + 1 >= th && cp + 1 < LastChar && Ismbyte1(cp[1])) {
+            extern bool dspmbyte_utf8;
+            if (dspmbyte_utf8) {
+                int i;
+                for (i = 2 ; cp + i < LastChar; i++)
+                    if (!Ismbyte2(cp[i]))
+                        break;
+                if (i > 2 && !(cp[i - 2] & LITERAL))
+		    h++;
+            } else
+		h++;
+        }
+#endif
 
 	if (h >= th) {		/* check, extra long tabs picked up here also */
 	    h = 0;

@@ -1,3 +1,14 @@
+  7. Obey $printexitvalue for builtins.
+  6. FreeBSD PR/66420: Allow history parsing to be special so that it
+     can handle inline # characters (Oliver Eikemeier)
+  5. new termname builtin from (Andrew ?)
+  4. if ($var =~ *[^0-9]*) echo not numeric, fix (Andrew ?)
+  3. completion fix to avoid dup hosts from ssh_known_hosts
+     (Eric D. Hendrickson)
+  2. vc++ 7.1 compilation fix (Steve Schockley)
+  1. UTF-8 handling for both single and double width characters, but
+     no conbining character support. (Michael Schroeder)
+
  36. V6.13.00 - 20040519
  35. V6.12.03 - 20040322
  34. turn on kanji and dspmbyte by default; add check for utf8 locales,

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.70 2001/09/02 21:06:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.71 2002/03/08 17:36:45 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.70 2001/09/02 21:06:02 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.71 2002/03/08 17:36:45 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -146,8 +146,10 @@ static	CCRETVAL v_csearch_back		__P((int, int, int));
 #if defined(DSPMBYTE)
 static	void 	 e_charfwd_mbyte	__P((int));
 static	void 	 e_charback_mbyte	__P((int));
-static  int extdel;
-static  int extins = 0;
+static  void	 setutf8lit		__P((void));
+static  int	 extdel;
+static  int	 extins = 0;
+extern  bool	 dspmbyte_utf8;
 #endif
 
 static void
@@ -206,8 +208,17 @@ c_delafter(num)
 	    for (wkcp = Cursor ; wkcp < Cursor + num; wkcp++) {
 		if (extdel == 0)
 		    extdel = Ismbyte1(*wkcp); /* check to 1st. byte */
+		else if (dspmbyte_utf8 && Ismbyte1(*wkcp))
+		    extdel = 1;
+		else if (dspmbyte_utf8 && Ismbyte2(*wkcp))
+		    extdel++;
 		else
 		    extdel = 0;	/* if 2nd. byte, force set to 0 */
+	    }
+	    while (extdel && num < LastChar - Cursor && Ismbyte2(Cursor[num])) {
+		num++;
+		if (!dspmbyte_utf8)
+		    break;
 	    }
 	}
 #endif
@@ -225,20 +236,6 @@ c_delafter(num)
 	    for (cp = Cursor; cp <= LastChar; cp++)
 		*cp = cp[num];
 	LastChar -= num;
-#if defined(DSPMBYTE)
-	if (_enable_mbdisp && extdel && Ismbyte2(*Cursor)) {
-	    if( VImode ) {
-		UndoSize++;
-		*kp++ = *Cursor; /* Save deleted chars into undobuf */
-	    }
-	    for (cp = Cursor; cp <= LastChar; cp++)
-		*cp = cp[1];
-	    LastChar--;
-	    e_redisp( 1 );
-	}
-	else
-	    extdel = 0;
-#endif
     }
 #ifdef notdef
     else {
@@ -259,7 +256,6 @@ c_delbefore(num)		/* delete before dot, with bounds checking */
 
 #if defined(DSPMBYTE)
     Char *nowcur, *wkcp;
-    Char delc;
 
     extdel = 0;
 #endif
@@ -270,7 +266,25 @@ c_delbefore(num)		/* delete before dot, with bounds checking */
     if (num > 0) {			/* if I can delete anything */
 #if defined(DSPMBYTE)
 	nowcur = Cursor - num;
-	delc = *nowcur;
+#endif
+
+#if defined(DSPMBYTE)
+	if (_enable_mbdisp) {
+	    for (wkcp = InputBuf; wkcp < nowcur; wkcp++) {
+		if(extdel == 0)
+		    extdel = Ismbyte1(*wkcp); /* check to 1st. byte */
+		else if (dspmbyte_utf8 && Ismbyte1(*wkcp))
+		    extdel = 1;
+		else if (dspmbyte_utf8 && Ismbyte2(*wkcp))
+		    extdel++;
+		else
+		    extdel = 0;	/* if 2nd. byte, force set to 0 */
+	    }
+	    if (extdel && Ismbyte2(*nowcur)) {
+		num += extdel;
+	    } else
+		extdel = 0;
+	}
 #endif
 	if (VImode) {
 	    kp = UndoBuf;		/* Set Up for VI undo command */
@@ -286,29 +300,6 @@ c_delbefore(num)		/* delete before dot, with bounds checking */
 	    for (cp = Cursor - num; cp <= LastChar; cp++)
 		*cp = cp[num];
 	LastChar -= num;
-#if defined(DSPMBYTE)
-	if (_enable_mbdisp) {
-	    for (wkcp = InputBuf; wkcp < nowcur; wkcp++) {
-		if(extdel == 0)
-		    extdel = Ismbyte1(*wkcp); /* check to 1st. byte */
-		else
-		    extdel = 0;	/* if 2nd. byte, force set to 0 */
-	    }
-	    if (extdel && Ismbyte2(delc)) {
-		if( VImode ) {
-		    UndoSize++;
-		    UndoPtr--;
-		    *kp++ = *(nowcur-1);
-				/* Save deleted chars into undobuf */
-		}
-		for (cp = nowcur - 1; cp <= LastChar; cp++)
-		    *cp = cp[1];
-		LastChar--;
-	    }
-	}
-	else
-	    extdel = 0;
-#endif
     }
 }
 
@@ -846,7 +837,9 @@ c_delfini()		/* Finish up delete action */
 	Cursor = ActionPos;
 #if defined(DSPMBYTE)
 	if (_enable_mbdisp && extdel) {
-	    Cursor--;
+	    Cursor -= extdel;
+	    if (Cursor < InputBuf)
+		Cursor = InputBuf;
 	    e_redisp(1);
 	}
 #endif
@@ -1021,6 +1014,66 @@ c_push_kill(start, end)
     *kp = '\0';
 }
 
+#if defined(DSPMBYTE)
+
+static void
+setutf8lit()
+{
+    Char c, *cp;
+    int f = 0, n = 0;
+    for (cp = InputBuf; cp < LastChar; cp++) {
+	c = *cp;
+	if (n == 0) {
+	    if (!Ismbyte1(c))
+		continue;
+	    n = 1;
+	    if ((c & 0xfe) == 0xfc)
+		n = 5;
+	    else if ((c & 0xfc) == 0xf8)
+		n = 4;
+	    else if ((c & 0xf8) == 0xf0)
+		n = 3;
+	    else if ((c & 0xf0) == 0xe0)
+		n = 2;
+	    f = 0;
+	    *cp |= LITERAL;
+	    continue;
+	}
+	if (!Ismbyte2(c)) {
+	    n = f = 0;
+	    cp--;
+	    continue;
+	}
+	if (++f < n) {
+	    *cp |= LITERAL;
+	    continue;
+	}
+	f = 0;
+	if (n == 2) {
+	    /* range 0x800 - 0xffff */
+	    int u;
+	    u = (cp[-2] & 0x0f) << 12 | (cp[-1] & 0x3f) << 6 | (c & 0x3f);
+	    if (u >= 0x1100 &&
+		 (u <= 0x115f ||                    /* Hangul Jamo init. consonants */
+		  (u >= 0x2e80 && u <= 0xa4cf && (u & ~0x0011) != 0x300a &&
+		   u != 0x303f) ||                  /* CJK ... Yi */
+		  (u >= 0xac00 && u <= 0xd7a3) || /* Hangul Syllables */
+		  (u >= 0xdf00 && u <= 0xdfff) || /* dw combining sequence */ 
+		  (u >= 0xf900 && u <= 0xfaff) || /* CJK Compatibility Ideographs */
+		  (u >= 0xfe30 && u <= 0xfe6f) || /* CJK Compatibility Forms */
+		  (u >= 0xff00 && u <= 0xff5f) || /* Fullwidth Forms */
+		  (u >= 0xffe0 && u <= 0xffe6)))
+		cp[-1] &= ~LITERAL;
+	} else if (n == 3) {
+	    /* check for 0x20000 - 0x2ffff */
+	    if ((cp[-3] & 7) == 1 && (cp[-2] & 0x20) == 0x00)
+		cp[-1] &= ~LITERAL;
+	}
+    }
+}
+
+#endif
+
 static CCRETVAL
 c_get_histline()
 {
@@ -1073,6 +1126,9 @@ c_get_histline()
 	if (LastChar < InputBuf)
 	    LastChar = InputBuf;
     }
+  
+    if (dspmbyte_utf8)
+	setutf8lit();
 
 #ifdef KSHVI
     if (VImode)
@@ -1520,12 +1576,55 @@ e_insert(c)
 	    *Cursor++ = (Char) ' ';
 	}
 	else if (_enable_mbdisp && extins && Ismbyte2(c)) {
-	    *(Cursor-1) = savec;
-	    *Cursor++ = (Char) c;
-	    extins = 0;
-	    e_redisp(1);
-	    Refresh();
-	    ret = CC_REFRESH;
+	    if (dspmbyte_utf8) {
+		int n = 1;
+		if ((savec & 0xfe) == 0xfc)
+		    n = 5;
+		else if ((savec & 0xfc) == 0xf8)
+		    n = 4;
+		else if ((savec & 0xf8) == 0xf0)
+		    n = 3;
+		else if ((savec & 0xf0) == 0xe0)
+		    n = 2;
+		if (extins < n) {
+		    *Cursor++ = (Char ) c | LITERAL;
+		    extins++;
+		} else {
+		    *(Cursor-extins) = savec | LITERAL;
+		    if (n == 2) {
+			/* range 0x800 - 0xffff */
+			int u;
+			u = (savec & 0x0f) << 12 | (Cursor[-1] & 0x3f) << 6 | (c & 0x3f);
+			if (u >= 0x1100 &&
+			     (u <= 0x115f ||                    /* Hangul Jamo init. consonants */
+			      (u >= 0x2e80 && u <= 0xa4cf && (u & ~0x0011) != 0x300a &&
+			       u != 0x303f) ||                  /* CJK ... Yi */
+			      (u >= 0xac00 && u <= 0xd7a3) || /* Hangul Syllables */
+			      (u >= 0xdf00 && u <= 0xdfff) || /* dw combining sequence */ 
+			      (u >= 0xf900 && u <= 0xfaff) || /* CJK Compatibility Ideographs */
+			      (u >= 0xfe30 && u <= 0xfe6f) || /* CJK Compatibility Forms */
+			      (u >= 0xff00 && u <= 0xff5f) || /* Fullwidth Forms */
+			      (u >= 0xffe0 && u <= 0xffe6)))
+			    Cursor[-1] &= ~LITERAL;
+		    } else if (n == 3) {
+			/* check for 0x20000 - 0x2ffff */
+			if ((savec & 7) == 1 && (Cursor[-2] & 0x20) == 0x00)
+			    Cursor[-1] &= ~LITERAL;
+		    }
+		    *Cursor++ = (Char ) c;
+		    extins = 0;
+		    e_redisp(1);
+		    Refresh();
+		    ret = CC_REFRESH;
+		}
+	    } else {
+		*(Cursor-1) = savec;
+		*Cursor++ = (Char) c;
+		extins = 0;
+		e_redisp(1);
+		Refresh();
+		ret = CC_REFRESH;
+	    }
 	}
 	else
 	    *Cursor++ = (Char) c;
@@ -1610,7 +1709,9 @@ DeleteBack(n)			/* delete the n characters before . */
 	    Cursor -= n;
 #if defined(DSPMBYTE)
 	if(_enable_mbdisp && extdel && Cursor > InputBuf) {
-	    Cursor--;
+	    Cursor -= extdel;
+	    if (Cursor < InputBuf)
+		Cursor = InputBuf;
 	    e_redisp(1);
 	}
 #endif
@@ -1816,6 +1917,9 @@ e_toggle_hist(c)
 	if (LastChar < InputBuf)
 	    LastChar = InputBuf;
     }
+
+    if (dspmbyte_utf8)
+	setutf8lit();
 
 #ifdef KSHVI
     if (VImode)
@@ -2418,7 +2522,9 @@ v_delprev(c) 		/* Backspace key in insert mode */
 	    Cursor -= Argument;
 #if defined(DSPMBYTE)
 	if (_enable_mbdisp && extdel) {
-	    Cursor--;
+	    Cursor -= extdel;
+	    if (Cursor < InputBuf)
+		Cursor = InputBuf;
 	    e_redisp(c);
 	}
 #endif
@@ -2442,7 +2548,9 @@ e_delprev(c)
 	    Cursor -= Argument;
 #if defined(DSPMBYTE)
 	if (_enable_mbdisp && extdel && Cursor > InputBuf) {
-	    Cursor--;
+	    Cursor -= extdel;
+	    if (Cursor < InputBuf)
+		Cursor = InputBuf;
 	    e_redisp(c);
 	}
 #endif
@@ -2815,6 +2923,9 @@ e_charback_mbyte(argument)
     }
     else {
 	while (0 < argument && Cursor > InputBuf) {
+	    /* utf8 has more then one mbyte2 byte */
+	    while (dspmbyte_utf8 && Cursor - 1 > InputBuf && Ismbyte2(*(Cursor - 2)) && Ismbyte2(*(Cursor - 1)))
+		Cursor--;
 	    if (Cursor - 1 != InputBuf &&
 		Ismbyte1(*(Cursor - 2)) && Ismbyte2(*(Cursor - 1))) {
 		Cursor--;
@@ -2909,10 +3020,13 @@ e_charfwd_mbyte(argument)
 	Cursor += argument;
     else
 	while (0 < argument && Cursor < LastChar) {
+	    /* utf8 has more then one mbyte2 byte */
 	    if (Cursor + 1 != LastChar &&
 		Ismbyte1(*Cursor) && Ismbyte2(*(Cursor + 1))) {
 		Cursor++;
 	    }
+	    while (dspmbyte_utf8 && Cursor + 1 < LastChar && Ismbyte2(*Cursor) && Ismbyte2(*(Cursor + 1)))
+		Cursor++;
 	    Cursor++;
 	    argument--;
 	}

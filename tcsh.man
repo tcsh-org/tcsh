@@ -3299,6 +3299,12 @@ there is no default, execution continues after the \fIendsw\fR.
 .B telltc \fR(+)
 Lists the values of all terminal capabilities (see \fItermcap\fR(5)).
 .TP 8
+.B termname \fR[\fIterminal type\fR] \fR(+)
+Tests if \fIterminal type\fR (or the current value of \fBTERM\fR if no
+\fIterminal type\fR is given) has an entry in the hosts termcap(5) or
+terminfo(5) database. Prints the terminal type to stdout and returns 0
+if an entry is present otherwise returns 1.
+.TP 8
 .B time \fR[\fIcommand\fR]
 Executes \fIcommand\fR (which must be a simple command, not an alias,
 a pipeline, a command list or a parenthesized command list)

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.106 2002/11/21 20:02:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.107 2003/05/16 18:10:29 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.106 2002/11/21 20:02:01 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.107 2003/05/16 18:10:29 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -2266,3 +2266,46 @@ remotehost()
 
 }
 #endif /* REMOTEHOST */
+
+/*
+ * indicate if a terminal type is defined in terminfo/termcap
+ * (by default the current term type). This allows ppl to look
+ * for a working term type automatically in their login scripts
+ * when using a terminal known as different things on different
+ * platforms
+ */
+void
+dotermname(v, c)
+    Char **v;
+    struct command *c;
+{
+    char *termtype;
+    /*
+     * Maximum size of a termcap record. We make it twice as large.
+     */
+    char termcap_buffer[2048];
+
+    /* try to find which entry we should be looking for */
+    termtype = (v[1] == NULL ? getenv("TERM") : short2str(v[1]));
+    if (termtype == NULL) {
+	/* no luck - the user didn't provide one and none is 
+	 * specified in the environment
+	 */
+	set(STRstatus, Strsave(STR1), VAR_READWRITE);
+	return;
+    }
+
+    /*
+     * we use the termcap function - if we are using terminfo we 
+     * will end up with it's compatibility function
+     * terminfo/termcap will be initialized with the new
+     * type but we don't care because tcsh has cached all the things
+     * it needs.
+     */
+    if (tgetent(termcap_buffer, termtype) == 1) {
+	xprintf("%s\n", termtype);
+	set(STRstatus, Strsave(STR0), VAR_READWRITE);
+    } else {
+	set(STRstatus, Strsave(STR1), VAR_READWRITE);
+    }
+}

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.56 2002/07/08 20:57:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.57 2003/08/04 16:19:13 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.56 2002/07/08 20:57:32 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.57 2003/08/04 16:19:13 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -47,7 +47,7 @@ RCSID("$Id: sh.lex.c,v 3.56 2002/07/08 20:57:32 christos Exp $")
  * There is some involved processing here, because of the complications
  * of input buffering, and especially because of history substitution.
  */
-static	Char		*word		__P((void));
+static	Char		*word		__P((int));
 static	int	 	 getC1		__P((int));
 static	void	 	 getdol		__P((void));
 static	void	 	 getexcl	__P((int));
@@ -137,6 +137,11 @@ time_t Htime = (time_t)0;
 static time_t a2time_t __P((Char *));
 
 /*
+ * special parsing rules apply for source -h
+ */
+extern int enterhist;
+
+/*
  * for history event processing
  * in the command 'echo !?foo?:1 !$' we want the !$ to expand from the line
  * 'foo' was found instead of the last command
@@ -149,6 +154,7 @@ lex(hp)
 {
     struct wordent *wdp;
     int     c;
+    int     parsehtime = enterhist;
 
 
     uselastevent = 1;
@@ -183,7 +189,8 @@ lex(hp)
 	wdp->next = new;
 	hp->prev = new;
 	wdp = new;
-	wdp->word = word();
+	wdp->word = word(parsehtime);
+	parsehtime = 0;
     } while (wdp->word[0] != '\n');
     if (histlinep < histline + BUFSIZE) {
 	*histlinep = '\0';
@@ -282,7 +289,8 @@ freelex(vp)
 }
 
 static Char *
-word()
+word(parsehtime)
+    int parsehtime;
 {
     Char c, c1;
     Char *wp;
@@ -315,18 +323,20 @@ loop:
 	    goto ret;
 
 	case '#':
-	    if (intty)
+	    if (intty || (enterhist && !parsehtime))
 		break;
 	    c = 0;
 	    h = 0;
 	    do {
 		c1 = c;
 		c = getC(0);
-		if (h < 12)
+		if (h < 11 && parsehtime)
 		    hbuf[h++] = c;
 	    } while (c != '\n');
-	    hbuf[11] = '\0';
-	    Htime = a2time_t(hbuf); 
+	    if (parsehtime) {
+		hbuf[11] = '\0';
+		Htime = a2time_t(hbuf); 
+	    }
 	    if (c1 == '\\')
 		goto loop;
 	    /*FALLTHROUGH*/
@@ -416,7 +426,7 @@ loop:
 		c1 = c;
 		dolflg = c == '"' ? DOALL : DOEXCL;
 	    }
-	    else if (c != '#' || !intty) {
+	    else if (c != '#' || (!intty && !enterhist)) {
 		ungetC(c);
 		break;
 	    }
