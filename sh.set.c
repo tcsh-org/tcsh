@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.52 2004/07/25 05:18:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.53 2004/08/04 17:12:30 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.52 2004/07/25 05:18:28 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.53 2004/08/04 17:12:30 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1129,13 +1129,13 @@ update_dspmbyte_vars()
     if ((vp = adrof(CHECK_MBYTEVAR)) && !adrof(STRnokanji)) {
 	_enable_mbdisp = 1;
 	dstr1 = vp->vec[0];
-	if(eq (dstr1, STRKSJIS))
+	if(eq (dstr1, STRsjis))
 	    iskcode = 1;
-	else if (eq(dstr1, STRKEUC))
+	else if (eq(dstr1, STReuc))
 	    iskcode = 2;
-	else if (eq(dstr1, STRKBIG5))
+	else if (eq(dstr1, STRbig5))
 	    iskcode = 3;
-	else if (eq(dstr1, STRKUTF8))
+	else if (eq(dstr1, STRutf8))
 	    iskcode = 4;
 	else if ((dstr1[0] - '0') >= 0 && (dstr1[0] - '0') <= 3) {
 	    iskcode = 0;
@@ -1243,19 +1243,19 @@ autoset_dspmbyte(pcp)
 	Char *n;
 	Char *v;
     } dspmt[] = {
-	{ STRLANGEUCJP, STRKEUC },
-	{ STRLANGEUCKR, STRKEUC },
-	{ STRLANGEUCZH, STRKEUC },
-	{ STRLANGEUCJPB, STRKEUC },
-	{ STRLANGEUCKRB, STRKEUC },
-	{ STRLANGEUCZHB, STRKEUC },
+	{ STRLANGEUCJP, STReuc },
+	{ STRLANGEUCKR, STReuc },
+	{ STRLANGEUCZH, STReuc },
+	{ STRLANGEUCJPB, STReuc },
+	{ STRLANGEUCKRB, STReuc },
+	{ STRLANGEUCZHB, STReuc },
 #ifdef linux
-	{ STRLANGEUCJPC, STRKEUC },
+	{ STRLANGEUCJPC, STReuc },
 #endif
-	{ STRLANGSJIS, STRKSJIS },
-	{ STRLANGSJISB, STRKSJIS },
-	{ STRLANGBIG5, STRKBIG5 },
-	{ STRSTARKUTF8, STRKUTF8 },
+	{ STRLANGSJIS, STRsjis },
+	{ STRLANGSJISB, STRsjis },
+	{ STRLANGBIG5, STRbig5 },
+	{ STRSTARKUTF8, STRutf8 },
 	{ NULL, NULL }
     };
 
