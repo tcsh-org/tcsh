@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.28 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.lex.c,v 3.29 1993/02/12 17:28:49 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.28 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.29 1993/02/12 17:28:49 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1497,7 +1497,7 @@ top:
 	evalp = 0;
     }
     if (evalvec) {
-	if (evalvec == (Char **) 1) {
+	if (evalvec == INVPTR) {
 	    doneinp = 1;
 	    reset();
 	}
@@ -1505,18 +1505,18 @@ top:
 	    evalvec++;
 	    goto top;
 	}
-	evalvec = (Char **) 1;
+	evalvec = INVPTR;
 	return ('\n');
     }
     do {
-	if (arginp == (Char *) 1 || onelflg == 1) {
+	if (arginp == INVPTR || onelflg == 1) {
 	    if (wanteof)
 		return (-1);
 	    exitstat();
 	}
 	if (arginp) {
 	    if ((c = *arginp++) == 0) {
-		arginp = (Char *) 1;
+		arginp = INVPTR;
 		return ('\n');
 	    }
 	    return (c);
@@ -1567,7 +1567,14 @@ reread:
 		    if (ctpgrp)
 # endif /* _SEQUENT */
 		    (void) killpg((pid_t) ctpgrp, SIGHUP);
+# ifdef notdef
+		    /*
+		     * With the walking process group fix, this message
+		     * is now obsolete. As the foreground process group
+		     * changes, the shell needs to adjust. Well too bad.
+		     */
 		    xprintf("Reset tty pgrp from %d to %d\n", ctpgrp, tpgrp);
+# endif /* notdef */
 		    goto reread;
 		}
 #endif /* BSDJOBS */

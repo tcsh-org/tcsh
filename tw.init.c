@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.init.c,v 3.12 1992/05/15 23:49:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.init.c,v 3.13 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.12 1992/05/15 23:49:22 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.13 1992/10/05 02:41:30 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -928,7 +928,8 @@ tw_sig_next(dir, flags)
     int *flags;
 {
     char *ptr;
-    for (;tw_index < NSIG; tw_index++) {
+    extern int nsig;
+    for (;tw_index < nsig; tw_index++) {
 
 	if (mesg[tw_index].iname == NULL)
 	    continue;

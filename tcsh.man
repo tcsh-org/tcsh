@@ -29,7 +29,7 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\" $Id: tcsh.man,v 3.53 1992/11/20 08:56:38 christos Exp $
+.\" $Id: tcsh.man,v 3.54 1993/01/08 22:23:12 christos Exp $
 .TH TCSH 1 "20 November 1992" "Cornell 6.03.00"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1307,6 +1307,8 @@ The available sequences are:
 %t or %@	Current time of day, in 12-hour, am/pm format.
 %T	Current time of day, in 24-hour format. 
 	(But see the \fIampm\fP shell variable below.)
+%p	Current time in 12-hour format, am/pm format with seconds.
+%P	Current time in 24-hour format, with seconds.
 \ec	`c' is parsed the same way as in bindkey.
 ^c	`c' is parsed the same way as in bindkey.
 %%	A single %.

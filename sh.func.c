@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.43 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.44 1993/02/12 17:22:20 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.43 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.44 1993/02/12 17:22:20 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1221,12 +1221,19 @@ dosetenv(v, c)
     if (eq(vp, STRKPATH)) {
 	importpath(lp);
 	dohash(NULL, NULL);
+	xfree((ptr_t) lp);
+	return;
     }
+
 #ifdef apollo
-    else if (eq(vp, STRSYSTYPE))
+    if (eq(vp, STRSYSTYPE)) {
 	dohash(NULL, NULL);
+	xfree((ptr_t) lp);
+	return;
+    }
 #endif /* apollo */
-    else if (islocale_var(vp)) {
+
+    if (islocale_var(vp)) {
 #ifdef NLS
 	int     k;
 
@@ -1254,51 +1261,68 @@ dosetenv(v, c)
 	ed_Init();
 	if (MapsAreInited && !NLSMapsAreInited)
 	    ed_InitNLSMaps();
+	xfree((ptr_t) lp);
+	return;
     }
-    else if (eq(vp, STRNOREBIND)) {
+
+    if (eq(vp, STRNOREBIND)) {
 	NoNLSRebind = 1;
+	xfree((ptr_t) lp);
+	return;
     }
-    else if (eq(vp, STRKTERM)) {
-	set(STRterm, Strsave(lp));
+
+    if (eq(vp, STRKTERM)) {
+	set(STRterm, quote(lp));	/* lp memory used here */
 	GotTermCaps = 0;
 	ed_Init();
+	return;
     }
-    else if (eq(vp, STRKHOME)) {
- 	Char *cp = Strsave(value(vp));	/* get the old value back */
 
+    if (eq(vp, STRKHOME)) {
 	/*
 	 * convert to canonical pathname (possibly resolving symlinks)
 	 */
-	cp = dcanon(cp, cp);
+	Char *cp = dcanon(lp, lp);
 
-	set(STRhome, Strsave(cp));	/* have to save the new val */
+	set(STRhome, quote(cp));	/* cp memory used here */
 
 	/* fix directory stack for new tilde home */
 	dtilde();
-	xfree((ptr_t) cp);
+	xfree((ptr_t) lp);
+	return;
     }
-    else if (eq(vp, STRKSHLVL)) 
-	set(STRshlvl, Strsave(lp));
-    else if (eq(vp, STRKUSER))
-	set(STRuser, Strsave(lp));
+
+    if (eq(vp, STRKSHLVL)) {
+	set(STRshlvl, quote(lp));	/* lp memory used here */
+	return;
+    }
+
+    if (eq(vp, STRKUSER)) {
+	set(STRuser, quote(lp));	/* lp memory used here */
+	return;
+    }
+
 #ifdef SIG_WINDOW
     /*
      * Load/Update $LINES $COLUMNS
      */
-    else if ((eq(lp, STRNULL) &&
-	      (eq(vp, STRLINES) || eq(vp, STRCOLUMNS))) ||
-	     eq(vp, STRTERMCAP)) {
+    if ((eq(lp, STRNULL) && (eq(vp, STRLINES) || eq(vp, STRCOLUMNS))) ||
+	eq(vp, STRTERMCAP)) {
 	check_window_size(1);
+	xfree((ptr_t) lp);
+	return;
     }
+
     /*
      * Change the size to the one directed by $LINES and $COLUMNS
      */
-    else if (eq(vp, STRLINES) || eq(vp, STRCOLUMNS)) {
+    if (eq(vp, STRLINES) || eq(vp, STRCOLUMNS)) {
 	GotTermCaps = 0;
 	ed_Init();
+	xfree((ptr_t) lp);
+	return;
     }
 #endif /* SIG_WINDOW */
-    xfree((ptr_t) lp);
 }
 
 /*ARGSUSED*/

@@ -316,7 +316,8 @@ CONFIG	:	config.sgi
 ENVIRON	:	n/a
 NOTES	:	AUTOLOGOUT is probably best undef'ed
 NOTES	:	For 4.0, the NLS define in config.h can be enabled.
-VERSION	:	6.00.03
+NOTES	:	4.0.5a cc does not have -O3 anymore.
+VERSION	:	6.03.00
 
 VENDOR	:	ibm + compatibles
 MODELS	:	i386,i486

@@ -1,8 +1,8 @@
 
 Last Updated: 
-Thu Nov 12 22:43:19 EST 1992
+Tue Feb 23 10:44:46 EST 1993
 
-This is for people that do not read the manual!
+This is for people who do not read the manual!
 
 So far people who don't read manuals don't read this either... I may
 call it README.*PLEASE* in the future, but then the same people won't
@@ -138,11 +138,21 @@ be able to get ftp it... :-)
 14. On the cray, sometimes the CR/LF mapping gets screwed up.
 
     You are probably logged in to the cray via telnet. Cray's
-    telnetd implements line mode selection, but many telnet 
-    clients do not do that correctly, and the tty settings 
-    do not get propagated correctly. You can either compile
+    telnetd implements line mode selection the telnet client
+    you are using does not implement telnet line mode.
+    This cause the Cray's telnetd to try to use KLUDGELINEMODE.
+    You can turn off telnet line mode from the cray side by 
+    doing a "stty extproc", or you can get the Cray AIC to build
+    a telnetd without KLUDGELINEMODE, or you can compile
     a new telnet client (from the BSD net2 tape), or at least
     on the suns use: 'mode character'.
+
+
+15. On AU/X, I made tcsh my startup shell, but the mac desktop is not
+    starting up (no X11 or Finder), and I only get console emulation.
+
+    This is another manifestation of item 5. Just add the pathname
+    to tcsh in /etc/shells and everything should work fine.
 
 christos
 

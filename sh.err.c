@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.err.c,v 3.15 1992/10/14 20:19:19 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.err.c,v 3.16 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.15 1992/10/14 20:19:19 christos Exp christos $")
+RCSID("$Id: sh.err.c,v 3.16 1993/01/08 22:23:12 christos Exp $")
 
 /*
  * C Shell
@@ -320,14 +320,16 @@ static char *errorlist[] =
 # endif /* convex */
 #endif /* apollo */
 #define ERR_COMPCOM	125
-    "Illegal completion: \"%s\"",
-#define ERR_COMPILL	126
-    "Illegal %s: '%c'",
-#define ERR_COMPINC	127
-    "Incomplete %s: \"%s\"",
-#define ERR_MFLAG	128
+    "\nInvalid completion: \"%s\"",
+#define ERR_COMPINV	126
+    "\nInvalid %s: '%c'",
+#define ERR_COMPMIS	127
+    "\nMissing separator '%c' after %s \"%s\"",
+#define ERR_COMPINC	128
+    "\nIncomplete %s: \"%s\"",
+#define ERR_MFLAG	129
     "No operand for -m flag",
-#define ERR_INVALID	129
+#define ERR_INVALID	130
     "Invalid Error"
 };
 

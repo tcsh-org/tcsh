@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.43 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tw.parse.c,v 3.44 1993/02/12 19:02:22 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.43 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.44 1993/02/12 19:02:22 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -308,7 +308,7 @@ tenematch(inputline, num_read, command)
 	 * addsuffix was set. Otherwise the last space was part of a word.
 	 */
 	if (*wp && InsertStr(quote_meta(wp, qu, search_ret == 1 &&
-					     (bool) is_set(STRaddsuffix))) < 0)
+			     is_set(STRaddsuffix) != NULL)) < 0)
 	    /* put it in the input buffer */
 	    return -1;		/* error inserting */
 	return search_ret;
@@ -577,11 +577,11 @@ is_suffix(check, template)
 
 
 /* ignored():
- *	Return true if this is an ignored entry
+ *	Return true if this is an ignored item
  */
 static int
-ignored(entry)
-    register Char *entry;
+ignored(item)
+    register Char *item;
 {
     struct varent *vp;
     register Char **cp;
@@ -589,7 +589,7 @@ ignored(entry)
     if ((vp = adrof(STRfignore)) == NULL || (cp = vp->vec) == NULL)
 	return (FALSE);
     for (; *cp != NULL; cp++)
-	if (is_suffix(entry, *cp))
+	if (is_suffix(item, *cp))
 	    return (TRUE);
     return (FALSE);
 } /* end ignored */
@@ -672,23 +672,23 @@ starting_a_command(wordstart, inputline)
 /* recognize():
  *	Object: extend what user typed up to an ambiguity.
  *	Algorithm:
- *	On first match, copy full entry (assume it'll be the only match)
+ *	On first match, copy full item (assume it'll be the only match)
  *	On subsequent matches, shorten exp_name to the first
- *	character mismatch between exp_name and entry.
+ *	character mismatch between exp_name and item.
  *	If we shorten it back to the prefix length, stop searching.
  */
 static int
-recognize(exp_name, entry, name_length, numitems)
-    Char   *exp_name, *entry;
+recognize(exp_name, item, name_length, numitems)
+    Char   *exp_name, *item;
     int     name_length, numitems;
 {
     if (numitems == 1)		/* 1st match */
-	copyn(exp_name, entry, MAXNAMLEN);
+	copyn(exp_name, item, MAXNAMLEN);
     else {			/* 2nd and subsequent matches */
 	register Char *x, *ent;
 	register int len = 0;
 
-	for (x = exp_name, ent = entry;
+	for (x = exp_name, ent = item;
 	     *x && (*x & TRIM) == (*ent & TRIM); x++, len++, ent++)
 	    continue;
 	*x = '\0';		/* Shorten at 1st char diff */
@@ -728,7 +728,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
     int gpat       = flags & TW_PAT_OK;	 /* Match against a pattern */
     int ignoring   = flags & TW_IGN_OK;	 /* Use fignore? */
     int d = 4, nd;			 /* Spelling distance */
-    Char *entry, *ptr;
+    Char *item, *ptr;
     Char buf[MAXPATHLEN+1];
     struct varent *vp;
     int len;
@@ -744,9 +744,9 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
     else
 	showdots = DOT_NONE;
 
-    while (!done && (entry = (*tw_next_entry[looking])(exp_dir, &flags))) {
+    while (!done && (item = (*tw_next_entry[looking])(exp_dir, &flags))) {
 #ifdef TDEBUG
-	xprintf("entry = %S\n", entry);
+	xprintf("item = %S\n", item);
 #endif
 	switch (looking) {
 	case TW_FILE:
@@ -755,9 +755,9 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    /*
 	     * Don't match . files on null prefix match
 	     */
-	    if (showdots == DOT_NOT && (ISDOT(entry) || ISDOTDOT(entry)))
+	    if (showdots == DOT_NOT && (ISDOT(item) || ISDOTDOT(item)))
 		done = TRUE;
-	    if (name_length == 0 && entry[0] == '.' && showdots == DOT_NONE)
+	    if (name_length == 0 && item[0] == '.' && showdots == DOT_NONE)
 		done = TRUE;
 	    break;
 
@@ -784,19 +784,19 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		done = TRUE;
 		break;
 	    }
-	    if (gpat && !Gmatch(entry, pat))
+	    if (gpat && !Gmatch(item, pat))
 		break;
-	    nd = spdist(entry, target);	/* test the entry against original */
+	    nd = spdist(item, target);	/* test the item against original */
 	    if (nd <= d && nd != 4) {
-		if (!(exec_check && !executable(exp_dir, entry, dir_ok))) {
-		    (void) Strcpy(exp_name, entry);
+		if (!(exec_check && !executable(exp_dir, item, dir_ok))) {
+		    (void) Strcpy(exp_name, item);
 		    d = nd;
 		    if (d == 0)	/* if found it exactly */
 			done = TRUE;
 		}
 	    }
 	    else if (nd == 4) {
-		if (spdir(exp_name, exp_dir, entry, target)) {
+		if (spdir(exp_name, exp_dir, item, target)) {
 		    if (exec_check && !executable(exp_dir, exp_name, dir_ok)) 
 			break;
 #ifdef notdef
@@ -815,32 +815,32 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	case LIST:
 	case RECOGNIZE:
 
-	    if (!is_prefix(target, entry)) 
+	    if (!is_prefix(target, item)) 
 		break;
 
-	    if (exec_check && !executable(exp_dir, entry, dir_ok))
+	    if (exec_check && !executable(exp_dir, item, dir_ok))
 		break;
 
-	    if (dir_check && !isadirectory(exp_dir, entry))
+	    if (dir_check && !isadirectory(exp_dir, item))
 		break;
 	    
-	    if (text_check && isadirectory(exp_dir, entry))
+	    if (text_check && isadirectory(exp_dir, item))
 		break;
 
-	    if (gpat && !Gmatch(entry, pat) && !isadirectory(exp_dir, entry))
+	    if (gpat && !Gmatch(item, pat) && !isadirectory(exp_dir, item))
 		break;
 
 	    /*
 	     * Remove duplicates in command listing and completion
 	     */
 	    if (looking == TW_COMMAND || command == LIST) {
-		copyn(buf, entry, MAXPATHLEN);
+		copyn(buf, item, MAXPATHLEN);
 		len = Strlen(buf);
 		switch (looking) {
 		case TW_COMMAND:
 		    if (!(dir_ok && exec_check))
 			break;
-		    if (filetype(exp_dir, entry) == '/') {
+		    if (filetype(exp_dir, item) == '/') {
 			buf[len++] = '/';
 			buf[len] = '\0';
 		    }
@@ -848,7 +848,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 
 		case TW_FILE:
 		case TW_DIRECTORY:
-		    buf[len++] = filetype(exp_dir, entry);
+		    buf[len++] = filetype(exp_dir, item);
 		    buf[len] = '\0';
 		    break;
 
@@ -867,20 +867,20 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    }
 		    
 	    if (command == RECOGNIZE) {
-		if (ignoring && ignored(entry)) {
+		if (ignoring && ignored(item)) {
 		    nignored++;
 		    break;
 		}
 		if (is_set(STRrecexact)) {
-		    if (StrQcmp(target, entry) == 0) {	/* EXACT match */
-			copyn(exp_name, entry, MAXNAMLEN);
+		    if (StrQcmp(target, item) == 0) {	/* EXACT match */
+			copyn(exp_name, item, MAXNAMLEN);
 			numitems = 1;	/* fake into expanding */
 			non_unique_match = TRUE;
 			done = TRUE;
 			break;
 		    }
 		}
-		if (recognize(exp_name, entry, name_length, ++numitems)) 
+		if (recognize(exp_name, item, name_length, ++numitems)) 
 		    done = TRUE;
 	    }
 	    break;
@@ -889,7 +889,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    break;
 	}
 #ifdef TDEBUG
-	xprintf("done entry = %S\n", entry);
+	xprintf("done item = %S\n", item);
 #endif
     }
     if (command == SPELL)

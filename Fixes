@@ -1,4 +1,19 @@
 V6.04.00, ...
+ 34. 6.03.03 03/04/93
+ 33. Eliminate 'Reset tty pgrp error message'. It is normal for the
+     walking process group stuff. Check about the killpg() above?
+ 32. More portability for 64 bit machines.
+ 31. Improved completion error messages.
+ 30. Fix bug with double globbing expansion on mirrored variables:
+	> setenv TERM '?vt100'
+ 29. Avoid hanging when writing to pipes etc. (From Paul Close)
+ 28. Typo in the $HOME->$home mirroring.
+ 27. %p %P 'p'recise time formats that include seconds for prompt strings.
+ 26. Signal list fixes from Paul Close. nsig is now a variable.
+ 25. 6.03.02 02/12/93
+ 24. NEC SX3 "entry" is a reserved word!, changed entry to item...
+     [this is as bad as cray typedefining "word" to int. Next thing I know,
+      I'll have to prefix all the variables with tcsh_!]
  23. 6.03.02 12/02/93
  22. Protected all include files to avoid warnings from lcc.
  21. Finally resolved the job control problems with linux and ISC (from Beto)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.alloc.c,v 3.20 1993/01/08 22:23:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.alloc.c,v 3.21 1993/02/12 17:22:20 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.20 1993/01/08 22:23:12 christos Exp christos $")
+RCSID("$Id: tc.alloc.c,v 3.21 1993/02/12 17:22:20 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -56,6 +56,9 @@ int dont_free = 0;
 #undef RCHECK
 #undef DEBUG
 
+#ifdef SX
+extern void* sbrk();
+#endif
 /*
  * Lots of os routines are busted and try to free invalid pointers. 
  * Although our free routine is smart enough and it will pick bad 
@@ -70,6 +73,7 @@ int dont_free = 0;
 typedef unsigned char U_char;	/* we don't really have signed chars */
 typedef unsigned int U_int;
 typedef unsigned short U_short;
+typedef unsigned long U_long;
 
 
 /*
@@ -244,9 +248,9 @@ morecore(bucket)
     memtop = (char *) op;
     if (membot == NULL)
 	membot = memtop;
-    if ((int) op & 0x3ff) {
-	memtop = (char *) sbrk(1024 - ((int) op & 0x3ff));
-	memtop += 1024 - ((int) op & 0x3ff);
+    if ((long) op & 0x3ff) {
+	memtop = (char *) sbrk(1024 - ((long) op & 0x3ff));
+	memtop += (long) (1024 - ((long) op & 0x3ff));
     }
 
     /* take 2k unless the block is bigger than that */
@@ -254,16 +258,16 @@ morecore(bucket)
     nblks = 1 << (rnu - (bucket + 3));	/* how many blocks to get */
     memtop = (char *) sbrk(1 << rnu);	/* PWP */
     op = (union overhead *) memtop;
-    memtop += 1 << rnu;
+    memtop += (long) (1 << rnu);
     /* no more room! */
-    if ((int) op == -1)
+    if ((long) op == -1)
 	return;
     /*
      * Round up to minimum allocation size boundary and deduct from block count
      * to reflect.
      */
-    if (((U_int) op) & ROUNDUP) {
-	op = (union overhead *) (((U_int) op + (ROUNDUP + 1)) & ~ROUNDUP);
+    if (((U_long) op) & ROUNDUP) {
+	op = (union overhead *) (((U_long) op + (ROUNDUP + 1)) & ~ROUNDUP);
 	nblks--;
     }
     /*

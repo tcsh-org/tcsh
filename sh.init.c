@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.init.c,v 3.25 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.init.c,v 3.26 1993/02/12 17:22:20 christos Exp christos $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.25 1993/01/08 22:23:12 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.26 1993/02/12 17:22:20 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -505,7 +505,7 @@ struct	mesg mesg[] = {
 /* 32 */	{ 0,		"Maximum number of signals"},
 # endif /* SCO && POSIX */
 
-# ifdef IRIS4D
+# if defined(IRIS4D) && (SYSVREL < 4)
 #  define _sigextra_
 /* 20 */	{ "STOP",	MSG_STOP		},
 /* 21 */	{ "TSTP",	MSG_TSTP		},
@@ -522,7 +522,7 @@ struct	mesg mesg[] = {
 /* 32 */	{ 0,		"Signal 32"		},
 # endif /* IRIS4D */
 
-# ifdef IRIS3D
+# if defined(IRIS3D) && (SYSVREL < 4)
 #  define _sigextra_
 /* 20 */	{ 0,		"Signal 20"		},
 /* 21 */	{ 0,		"Signal 21"		},
@@ -884,3 +884,5 @@ struct	mesg mesg[] = {
 /* 33 */	{ 0,		"Signal 33"		}
 #endif /* POSIX */
 };
+
+int	nsig = (sizeof(mesg) / sizeof(mesg[0])) - 1;

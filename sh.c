@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.42 1993/01/08 22:23:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.43 1993/02/12 17:22:20 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.42 1993/01/08 22:23:12 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.43 1993/02/12 17:22:20 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -96,6 +96,14 @@ int do_logout;
 bool    use_fork = 0;		/* use fork() instead of vfork()? */
 #endif /* convex */
 
+/*
+ * Magic pointer values. Used to specify other invalid conditions aside
+ * from null.
+ */
+static Char	INVCHAR;
+Char    *INVPTR = &INVCHAR;
+Char    **INVPPTR = &INVPTR;
+
 static int     nofile = 0;
 static bool    reenter = 0;
 static bool    nverbose = 0;
@@ -111,7 +119,6 @@ bool    tellwhat = 0;
 time_t  t_period;
 Char  *ffile = NULL;
 static time_t  chktim;		/* Time mail last checked */
-
 
 extern char **environ;
 

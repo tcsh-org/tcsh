@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.20 1992/10/10 18:17:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.21 1993/02/12 17:22:20 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.20 1992/10/10 18:17:34 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.21 1993/02/12 17:22:20 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -1055,6 +1055,7 @@ dcanon(cp, p)
 	static dev_t home_dev = -1;
 	static Char *home_ptr = NULL;
 	struct stat statbuf;
+	int found;
 
 	/*
 	 * Get dev and ino of STRhome
@@ -1069,10 +1070,11 @@ dcanon(cp, p)
 	 * Start comparing dev & ino backwards
 	 */
 	p2 = Strcpy(link, cp);
+	found = 0;
 	for (sp = NULL; *p2 && stat(short2str(p2), &statbuf) != -1;) {
 	    if (DEV_DEV_COMPARE(statbuf.st_dev, home_dev) &&
 			statbuf.st_ino == home_ino) {
-			sp = (Char *) - 1;
+			found = 0;
 			break;
 	    }
 	    if ((sp = Strrchr(p2, '/')) != NULL)
@@ -1081,7 +1083,7 @@ dcanon(cp, p)
 	/*
 	 * See if we found it
 	 */
-	if (*p2 && sp == (Char *) -1) {
+	if (*p2 && found) {
 	    /*
 	     * Use STRhome to make '~' work
 	     */

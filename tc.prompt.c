@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.prompt.c,v 3.15 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.prompt.c,v 3.16 1992/10/14 20:19:19 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.15 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.16 1992/10/14 20:19:19 christos Exp $")
 
 #include "ed.h"
 
@@ -151,6 +151,8 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    case 'T':		/* 24 hour format	 */
 	    case '@':
 	    case 't':		/* 12 hour am/pm format */
+	    case 'p':		/* With seconds	*/
+	    case 'P':
 		{
 		    char    ampm = 'a';
 		    int     hr = t->tm_hour;
@@ -159,7 +161,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 
 		    /* addition by Hans J. Albertsson */
 		    /* and another adapted from Justin Bur */
-		    if (adrof(STRampm) || *cp != 'T') {
+		    if (adrof(STRampm) || (*cp != 'T' && *cp != 'P')) {
 			if (hr >= 12) {
 			    if (hr > 12)
 				hr -= 12;
@@ -188,7 +190,19 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			    *p++ = attributes | '0';
 			    *p++ = attributes | buff[0];
 			}
-			if (adrof(STRampm) || *cp != 'T') {
+			if (*cp == 'p' || *cp == 'P') {
+			    *p++ = attributes | ':';
+			    Itoa(t->tm_sec, buff);
+			    if (buff[1]) {
+				*p++ = attributes | buff[0];
+				*p++ = attributes | buff[1];
+			    }
+			    else {
+				*p++ = attributes | '0';
+				*p++ = attributes | buff[0];
+			    }
+			}
+			if (adrof(STRampm) || (*cp != 'T' && *cp != 'P')) {
 			    *p++ = attributes | ampm;
 			    *p++ = attributes | 'm';
 			}

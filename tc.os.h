@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.41 1993/01/08 22:23:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.h,v 3.42 1993/02/12 19:02:22 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -78,7 +78,10 @@
 
 #ifdef OREO
 # include <sys/time.h>
-# include <sys/resource.h>
+# ifdef notdef
+  /* Don't include it, because it defines things we don't really have */
+#  include <sys/resource.h>	
+# endif
 # ifdef POSIX
 #  include <sys/tty.h>
 #  include <termios.h>
