@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.prompt.c,v 3.1 1991/07/08 05:22:44 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.prompt.c,v 3.2 1991/07/15 19:37:24 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: tc.prompt.c,v 3.2 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -173,13 +173,14 @@ printprompt(promptno, str)
 	    case '~':		/* show ~ whenever possible - a la dirs */
 		{
 		    static Char *olddir = 0, *olduser = 0, *oldpath = 0;
+		    extern int tlength;	/* cache cleared */
 
 		    if (!(z = value(STRcwd)))
 			break;	/* no cwd, so don't do anything */
 		    /*
 		     * Have we changed directory?
 		     */
-		    if (olddir != z) {
+		    if (tlength == 0 || olddir != z) {
 			oldpath = olddir = z;
 			olduser = getusername(&oldpath);
 		    }

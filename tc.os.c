@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.5 1991/07/18 13:17:30 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.6 1991/07/18 15:24:09 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.os.c,v 3.5 1991/07/18 13:17:30 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.6 1991/07/18 15:24:09 christos Exp $")
 
 #include "sh.h"
 #include "tw.h"
@@ -687,7 +687,7 @@ osinit()
 {
     extern ptr_t membot;
 
-    membot = (char *) sbrk(0);
+    membot = (ptr_t) sbrk(0);
 
 #ifdef OREO
     set42sig();
@@ -948,18 +948,6 @@ strrcpy(ptr, str)
 } /* end strrcpy */
 # endif /* hp9000s500 */
 #endif /* getwd */
-
-#ifdef iconuxv
-#include <sys/vendor.h>
-#include <sys/bsd_syscall.h>
-
-int
-vfork()
-{
-    return sys_local(VEND_ICON_BSD, 66);
-}
-
-#endif				/* iconuxv */
 
 #ifdef apollo
 /***

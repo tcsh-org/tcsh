@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tw.help.c,v 1.2 91/07/14 22:24:22 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.help.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -38,7 +38,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: tw.help.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "tw.h"
@@ -124,7 +124,7 @@ do_help(command)
 	    }
 	    if (f != -1) {
 		/* so cat it to the terminal */
-		orig_intr = sigset(SIGINT, cleanf);
+		orig_intr = (sigret_t (*)()) sigset(SIGINT, cleanf);
 		while (f != -1 && (len = read(f, (char *) buf, 512)) != 0)
 		    (void) write(SHOUT, (char *) buf, (size_t) len);
 		(void) sigset(SIGINT, orig_intr);

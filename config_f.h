@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/config_f.h,v 3.0 1991/07/04 21:54:11 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/config_f.h,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -116,7 +116,6 @@
  *		provided.
  */
 #undef SYSMALLOC
-
 
 /*
  * RCSID	This defines if we want rcs strings in the binary or not

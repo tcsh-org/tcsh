@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.3 1991/07/18 15:23:05 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.4 1991/07/29 22:41:12 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -165,6 +165,12 @@ EXTERN int Argument;		/* "universal" argument value */
 EXTERN KEYCMD LastCmd;		/* previous command executed */
 EXTERN Char KillBuf[INBUFSIZ];	/* kill buffer */
 EXTERN Char *LastKill;		/* points to end of kill buffer */
+
+EXTERN Char UndoBuf[INBUFSIZ];
+EXTERN Char *UndoPtr;
+EXTERN int  UndoSize;
+EXTERN int  UndoAction;
+
 EXTERN Char HistBuf[INBUFSIZ];	/* history buffer */
 EXTERN Char *LastHist;		/* points to end of history buffer */
 EXTERN int Hist_num;		/* what point up the history we are at now. */

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.4 1991/07/24 15:36:18 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.5 1991/08/06 01:50:07 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.vers.c,v 3.4 1991/07/24 15:36:18 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.5 1991/08/06 01:50:07 christos Exp $")
 
 #include "sh.h"
 #include "patchlevel.h"
@@ -140,11 +140,11 @@ gethosttype()
 #   define _havehosttype_
    hosttype = str2short("hp9000s300");
 #  endif /* hp9000s300 */
-#  ifndef _havehosttype_
 # if defined(hp9000s500) && !defined(_havehosttype_)
 #  define _havehosttype_
    hosttype = str2short("hp9000s500");
 # endif /* hp9000s500 */
+#  ifndef _havehosttype_
 #   define _havehosttype_
    hosttype = str2short("hp");
 #  endif /* _havehosttype_ */
@@ -343,11 +343,26 @@ gethosttype()
 #  endif
 # endif /* sgi */
 
-#ifdef uts
-# define _havehosttype_
+# ifdef uts
+#  define _havehosttype_
     hosttype = str2short("amdahl");
-#endif /* uts */
+# endif /* uts */
   
+# ifdef OPUS
+#  define _havehosttype_
+    hosttype = str2short("opus");
+# endif /* OPUS */
+
+# ifdef eta10
+#  define _havehosttype_
+   /* Bruce Woodcock <woodcock@mentor.cc.purdue.edu> */
+   hosttype = str2short("eta10");
+# endif /* eta10 */
+
+# ifdef cray
+#  define _havehosttype_
+   hosttype = str2short("cray");
+# endif /* cray */
 
 # ifndef _havehosttype_
 #  define _havehosttype_

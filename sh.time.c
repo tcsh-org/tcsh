@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.time.c,v 1.2 91/07/14 22:23:46 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.time.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -35,12 +35,12 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.time.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #if defined(sun) && ! defined(MACH)
 # include <machine/param.h>
-#endif				/* sun */
+#endif /* sun */
 
 /*
  * C Shell - routines handling process timing and niceing
@@ -49,21 +49,20 @@ RCSID("$Id$")
 # ifndef RUSAGE_SELF
 #  define	RUSAGE_SELF	0
 #  define	RUSAGE_CHILDREN	-1
-# endif				/* RUSAGE_SELF */
-#else				/* BSDTIMES */
+# endif	/* RUSAGE_SELF */
+#else /* BSDTIMES */
 struct tms times0;
-
-#endif				/* BSDTIMES */
+#endif /* BSDTIMES */
 
 #if !defined(BSDTIMES) && !defined(_SEQUENT_)
-#ifdef POSIX
+# ifdef POSIX
 static	void	pdtimet	__P((clock_t, clock_t));
-#else				/* POSIX */
+# else /* ! POSIX */
 static	void	pdtimet	__P((time_t, time_t));
-#endif				/* POSIX */
-#else
+# endif /* ! POSIX */
+#else /* BSDTIMES || _SEQUENT_ */
 static	void	pdeltat	__P((timeval_t *, timeval_t *));
-#endif
+#endif /* BSDTIMES || _SEQUENT_ */
 
 void
 settimes()
@@ -81,14 +80,14 @@ settimes()
 
     (void) get_process_stats(&time0, PS_SELF, &ru0, &ruch);
     ruadd(&ru0, &ruch);
-# else				/* _SEQUENT_ */
-            time0 = times(&times0);
+# else	/* _SEQUENT_ */
+    time0 = times(&times0);
     times0.tms_stime += times0.tms_cstime;
     times0.tms_utime += times0.tms_cutime;
     times0.tms_cstime = 0;
     times0.tms_cutime = 0;
-# endif				/* _SEQUENT_ */
-#endif				/* BSDTIMES */
+# endif	/* _SEQUENT_ */
+#endif /* BSDTIMES */
 }
 
 /*
@@ -118,12 +117,12 @@ dotime(v, c)
     (void) get_process_stats(&timedol, PS_SELF, &ru1, &ruch);
     ruadd(&ru1, &ruch);
     prusage(&ru0, &ru1, &timedol, &time0);
-# else				/* _SEQUENT_ */
+# else /* _SEQUENT_ */
 #  ifndef POSIX
     time_t  timedol;
-#  else				/* POSIX */
+#  else /* POSIX */
     clock_t timedol;
-#  endif				/* POSIX */
+#  endif /* POSIX */
 
     struct tms times_dol;
 
@@ -133,8 +132,8 @@ dotime(v, c)
     times_dol.tms_cstime = 0;
     times_dol.tms_cutime = 0;
     prusage(&times0, &times_dol, timedol, time0);
-# endif				/* _SEQUENT_ */
-#endif				/* BSDTIMES */
+# endif	/* _SEQUENT_ */
+#endif /* BSDTIMES */
 }
 
 /*
@@ -156,9 +155,9 @@ donice(v, c)
 	nval = getn(cp);
 #ifdef BSDNICE
     (void) setpriority(PRIO_PROCESS, 0, nval);
-#else				/* BSDNICE */
+#else /* BSDNICE */
     (void) nice(nval);
-#endif				/* BSDNICE */
+#endif /* BSDNICE */
 }
 
 #ifdef BSDTIMES
@@ -186,7 +185,7 @@ ruadd(ru, ru2)
     ru->ru_nivcsw += ru2->ru_nivcsw;
 }
 
-#else				/* BSDTIMES */
+#else /* BSDTIMES */
 # ifdef _SEQUENT_
 void
 ruadd(ru, ru2)
@@ -215,8 +214,8 @@ ruadd(ru, ru2)
     ru->ps_phwrite += ru2->ps_phwrite;
 }
 
-# endif				/* _SEQUENT_ */
-#endif				/* BSDTIMES */
+# endif	/* _SEQUENT_ */
+#endif /* BSDTIMES */
 
 #ifdef BSDTIMES
 
@@ -246,23 +245,23 @@ ruadd(ru, ru2)
  */
 #ifdef sun
 # define IADJUST(i)	(pagetok(i)/2)
-#else				/* sun */
+#else /* sun */
 # define IADJUST(i)	(i)
-#endif				/* sun */
+#endif /* sun */
 
 void
 prusage(r0, r1, e, b)
     register struct rusage *r0, *r1;
     timeval_t *e, *b;
 
-#else				/* BSDTIMES */
+#else /* BSDTIMES */
 # ifdef _SEQUENT_
 void
 prusage(r0, r1, e, b)
     register struct process_stats *r0, *r1;
     timeval_t *e, *b;
 
-# else				/* _SEQUENT_ */
+# else /* _SEQUENT_ */
 void
 prusage(bs, es, e, b)
     struct tms *bs, *es;
@@ -270,12 +269,12 @@ prusage(bs, es, e, b)
 #  ifndef POSIX
     time_t  e, b;
 
-#  else				/* POSIX */
+#  else	/* POSIX */
     clock_t e, b;
 
-#  endif				/* POSIX */
-# endif				/* _SEQUENT_ */
-#endif				/* BSDTIMES */
+#  endif /* POSIX */
+# endif	/* _SEQUENT_ */
+#endif /* BSDTIMES */
 {
 #ifdef BSDTIMES
     register time_t t =
@@ -292,18 +291,18 @@ prusage(bs, es, e, b)
     (r1->ps_stime.tv_sec - r0->ps_stime.tv_sec) * 100 +
     (r1->ps_stime.tv_usec - r0->ps_stime.tv_usec) / 10000;
 
-# else				/* _SEQUENT_ */
+# else /* _SEQUENT_ */
 #  ifndef POSIX
     register time_t t = (es->tms_utime - bs->tms_utime +
 			 es->tms_stime - bs->tms_stime) * 100 / HZ;
 
-#  else				/* POSIX */
+#  else /* POSIX */
     register clock_t t = (es->tms_utime - bs->tms_utime +
 			  es->tms_stime - bs->tms_stime) * 100 / CLK_TCK;
 
-#  endif				/* POSIX */
-# endif				/* _SEQUENT_ */
-#endif				/* BSDTIMES */
+#  endif /* POSIX */
+# endif /* _SEQUENT_ */
+#endif /* BSDTIMES */
 
     register char *cp;
     register long i;
@@ -320,14 +319,14 @@ prusage(bs, es, e, b)
     (e->tv_sec - b->tv_sec) * 100 + (e->tv_usec - b->tv_usec) / 10000;
 
     cp = "%Uu %Ss %E %P %I+%Oio %Fpf+%Ww";
-# else				/* _SEQUENT_ */
+# else /* _SEQUENT_ */
 #  ifndef POSIX
     time_t  ms = (e - b) * 100 / HZ;
 
-#  else				/* POSIX */
+#  else /* POSIX */
     clock_t ms = (e - b) * 100 / CLK_TCK;
 
-#  endif				/* POSIX */
+#  endif /* POSIX */
     cp = "%Uu %Ss %E %P";
 
     /*
@@ -339,8 +338,8 @@ prusage(bs, es, e, b)
      */
     if (ms < t && ms != 0)
 	ms = t;
-# endif				/* _SEQUENT_ */
-#endif				/* BSDTIMES */
+# endif /* _SEQUENT_ */
+#endif /* BSDTIMES */
 #ifdef TDEBUG
     xprintf("es->tms_utime %lu bs->tms_utime %lu\n",
 	    es->tms_utime, bs->tms_utime);
@@ -348,7 +347,7 @@ prusage(bs, es, e, b)
 	    es->tms_stime, bs->tms_stime);
     xprintf("ms %lu e %lu b %lu\n", ms, e, b);
     xprintf("t %lu\n", t);
-#endif				/* TDEBUG */
+#endif /* TDEBUG */
 
     if (vp && vp->vec[0] && vp->vec[1])
 	cp = short2str(vp->vec[1]);
@@ -364,14 +363,14 @@ prusage(bs, es, e, b)
 #else
 # ifdef _SEQUENT_
 		pdeltat(&r1->ps_utime, &r0->ps_utime);
-# else				/* _SEQUENT_ */
+# else /* _SEQUENT_ */
 #  ifndef POSIX
 		pdtimet(es->tms_utime, bs->tms_utime);
-#  else				/* POSIX */
+#  else /* POSIX */
 		pdtimet(es->tms_utime, bs->tms_utime);
-#  endif				/* POSIX */
-# endif				/* _SEQUENT_ */
-#endif				/* BSDTIMES */
+#  endif /* POSIX */
+# endif /* _SEQUENT_ */
+#endif /* BSDTIMES */
 		break;
 
 	    case 'S':		/* system CPU time used */
@@ -380,22 +379,22 @@ prusage(bs, es, e, b)
 #else
 # ifdef _SEQUENT_
 		pdeltat(&r1->ps_stime, &r0->ps_stime);
-# else				/* _SEQUENT_ */
+# else /* _SEQUENT_ */
 #  ifndef POSIX
 		pdtimet(es->tms_stime, bs->tms_stime);
-#  else				/* POSIX */
+#  else /* POSIX */
 		pdtimet(es->tms_stime, bs->tms_stime);
-#  endif				/* POSIX */
-# endif				/* _SEQUENT_ */
-#endif				/* BSDTIMES */
+#  endif /* POSIX */
+# endif /* _SEQUENT_ */
+#endif /* BSDTIMES */
 		break;
 
 	    case 'E':		/* elapsed (wall-clock) time */
 #ifdef BSDTIMES
 		pcsecs((long) ms);
-#else				/* BSDTIMES */
+#else /* BSDTIMES */
 		pcsecs(ms);
-#endif				/* BSDTIMES */
+#endif /* BSDTIMES */
 		break;
 
 	    case 'P':		/* percent time spent running */
@@ -429,7 +428,9 @@ prusage(bs, es, e, b)
 
 	    case 'M':		/* max. Resident Set Size */
 #ifdef sun
-		/* xprintf("%ld", r1->ru_maxrss * 1024L/(long) getpagesize()); */
+# ifdef notdef
+		xprintf("%ld", r1->ru_maxrss * 1024L/(long) getpagesize());
+# endif
 		xprintf("%ld", pagetok(r1->ru_maxrss));
 #else
 		xprintf("%ld", r1->ru_maxrss / 2L);
@@ -460,18 +461,18 @@ prusage(bs, es, e, b)
 		xprintf("%ld", r1->ru_msgsnd - r0->ru_msgsnd);
 		break;
 
-	    case 'k':		/* PWP: number of signals recieved */
+	    case 'k':		/* PWP: signals received */
 		xprintf("%ld", r1->ru_nsignals - r0->ru_nsignals);
 		break;
 
-	    case 'w':		/* PWP: num. voluntary context switches (waits) */
+	    case 'w':		/* PWP: voluntary context switches (waits) */
 		xprintf("%ld", r1->ru_nvcsw - r0->ru_nvcsw);
 		break;
 
-	    case 'c':		/* PWP: num. involuntary context switches */
+	    case 'c':		/* PWP: involuntary context switches */
 		xprintf("%ld", r1->ru_nivcsw - r0->ru_nivcsw);
 		break;
-#else				/* BSDTIMES */
+#else /* BSDTIMES */
 # ifdef _SEQUENT_
 	    case 'W':		/* number of swaps */
 		i = r1->ps_swap - r0->ps_swap;
@@ -541,8 +542,8 @@ prusage(bs, es, e, b)
 	    case 'q':
 		xprintf("%ld", r1->ps_phwrite - r0->ps_phwrite);
 		break;
-# endif				/* _SEQUENT_ */
-#endif				/* BSDTIMES */
+# endif	/* _SEQUENT_ */
+#endif /* BSDTIMES */
 	    }
     xputchar('\n');
 }
@@ -555,7 +556,7 @@ pdeltat(t1, t0)
     timeval_t td;
 
     tvsub(&td, t1, t0);
-    xprintf("%d.%01d", td.tv_sec, td.tv_usec / 100000);
+    xprintf("%ld.%03ld", td.tv_sec, td.tv_usec / 1000L);
 }
 
 void
@@ -580,32 +581,31 @@ tvsub(tdiff, t1, t0)
 	tdiff->tv_sec--, tdiff->tv_usec += 1000000;
 }
 
-#else				/* !BSDTIMES && !_SEQUENT_ */
+#else /* !BSDTIMES && !_SEQUENT_ */
 static void
 pdtimet(eval, bval)
 #ifndef POSIX
     time_t  eval, bval;
 
-#else				/* POSIX */
+#else /* POSIX */
     clock_t eval, bval;
 
-#endif				/* POSIX */
+#endif /* POSIX */
 {
 #ifndef POSIX
     time_t  val;
 
-#else				/* POSIX */
+#else /* POSIX */
     clock_t val;
 
-#endif				/* POSIX */
+#endif /* POSIX */
 
 #ifndef POSIX
     val = (eval - bval) * 100 / HZ;
-#else				/* POSIX */
+#else /* POSIX */
     val = (eval - bval) * 100 / CLK_TCK;
-#endif				/* POSIX */
+#endif /* POSIX */
 
     xprintf("%ld.%02ld", val / 100, val - (val / 100 * 100));
 }
-
-#endif				/* BSDTIMES || _SEQUENT_ */
+#endif /* BSDTIMES || _SEQUENT_ */

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.10 1991/07/29 22:38:56 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.11 1991/08/05 23:02:13 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -267,17 +267,29 @@ typedef union {
 # define calloc		lint_calloc
 #endif 
 
-#ifdef SYSMALLOC
-# define xmalloc(i)  	Malloc(i)
-# define xrealloc(p, i)	Realloc(p, i)
-# define xcalloc(n, s)	Calloc(n, s)
-# define xfree(p)    	Free(p)
+#ifdef MDEBUG
+extern memalign_t	DebugMalloc	__P((unsigned, char *, int));
+extern memalign_t	DebugRealloc	__P((ptr_t, unsigned, char *, int));
+extern memalign_t	DebugCalloc	__P((unsigned, unsigned, char *, int));
+extern void		DebugFree	__P((ptr_t, char *, int));
+# define xmalloc(i)  	DebugMalloc(i, __FILE__, __LINE__)
+# define xrealloc(p, i)((p) ? DebugRealloc(p, i, __FILE__, __LINE__) : \
+			      DebugMalloc(i, __FILE__, __LINE__))
+# define xcalloc(n, s)	DebugCalloc(n, s, __FILE__, __LINE__)
+# define xfree(p)    	if (p) DebugFree(p, __FILE__, __LINE__); else
 #else
+# ifdef SYSMALLOC
+#  define xmalloc(i)  	Malloc(i)
+#  define xrealloc(p, i)Realloc(p, i)
+#  define xcalloc(n, s)	Calloc(n, s)
+#  define xfree(p)    	Free(p)
+# else
 # define xmalloc(i)  	malloc(i)
 # define xrealloc(p, i)	realloc(p, i)
 # define xcalloc(n, s)	calloc(n, s)
 # define xfree(p)    	free(p)
-#endif /* SYSMALLOC */
+# endif /* SYSMALLOC */
+#endif /* MDEBUG */
 #include "sh.char.h"
 #include "sh.err.h"
 #include "sh.dir.h"
@@ -480,20 +492,36 @@ struct Bin {
     Char  **Bfbuf;		/* The array of buffer blocks */
 }       B;
 
+/*
+ * This structure allows us to seek inside aliases
+ */
+struct Ain {
+    int type;
+#define I_SEEK -1		/* Invalid seek */
+#define A_SEEK	0		/* Alias seek */
+#define F_SEEK	1		/* File seek */
+#define E_SEEK	2		/* Eval seek */
+    off_t f_seek;
+    Char **a_seek;
+} ;
+
+extern int aret;		/* Type of last char returned */
+#define SEEKEQ(a, b) ((a)->type == (b)->type && \
+		      (a)->f_seek == (b)->f_seek && \
+		      (a)->a_seek == (b)->a_seek)
+
 #define	fseekp	B.Bfseekp
 #define	fbobp	B.Bfbobp
 #define	feobp	B.Bfeobp
 #define	fblocks	B.Bfblocks
 #define	fbuf	B.Bfbuf
 
-#define btell()	fseekp
-
 /*
  * The shell finds commands in loops by reseeking the input
  * For whiles, in particular, it reseeks to the beginning of the
  * line the while was on; hence the while placement restrictions.
  */
-off_t   lineloc;
+struct Ain lineloc;
 
 bool    cantell;		/* Is current source tellable ? */
 
@@ -636,8 +664,8 @@ extern int nsrchn;
  * input.  For foreach (fe), the word list is attached here.
  */
 struct whyle {
-    off_t   w_start;		/* Point to restart loop */
-    off_t   w_end;		/* End of loop (0 if unknown) */
+    struct Ain   w_start;	/* Point to restart loop */
+    struct Ain   w_end;		/* End of loop (0 if unknown) */
     Char  **w_fe, **w_fe0;	/* Current/initial wordlist for fe */
     Char   *w_fename;		/* Name for fe */
     struct whyle *w_next;	/* Next (more outer) loop */

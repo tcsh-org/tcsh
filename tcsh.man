@@ -1,4 +1,4 @@
-\" $Id: tcsh.man,v 3.9 1991/08/02 04:29:41 christos Exp christos $
+.\" $Id: tcsh.man,v 3.10 1991/08/06 02:00:24 christos Exp $
 .TH TCSH 1 "5 August 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -346,30 +346,36 @@ EMACS Multi-character and 8 bit bindings
 .PP
 VI Insert Mode functions
 .sp
+"^@"	->  is undefined
+"^A"	->  beginning-of-line
+"^B"	->  backward-char
 "^C"	->  tty-sigintr
 "^D"	->  list-or-eof
+"^E"	->  end-of-line
+"^F"	->  forward-char
+"^G"	->  list-glob
 "^H"	->  backward-delete-char
 "^I"	->  complete-word
 "^J"	->  newline
 "^K"	->  kill-line
 "^L"	->  clear-screen
 "^M"	->  newline
-"^N"	->  is undefined
+"^N"	->  down-history
 "^O"	->  tty-flush-output
-"^P"	->  is undefined
+"^P"	->  up-history
 "^Q"	->  tty-start-output
 "^R"	->  redisplay
 "^S"	->  tty-stop-output
-"^T"	->  is undefined
+"^T"	->  transpose-chars
 "^U"	->  backward-kill-line
 "^V"	->  quoted-insert
 "^W"	->  backward-delete-word
-"^X"	->  is undefined
+"^X"	->  expand-line
 "^Y"	->  tty-dsusp
 "^Z"	->  tty-sigtsusp
 "^["	->  vi-cmd-mode
 "^\e"	->  tty-sigquit
-" "  to "~"	->  self-insert-command
+" " to "~"	->  self-insert-command
 "^?"	->  backward-delete-char
 .PP
 VI Command Mode functions
@@ -382,7 +388,7 @@ VI Command Mode functions
 "^E"	->  end-of-line
 "^F"	->  is undefined
 "^G"	->  list-glob
-"^H"	->  backward-delete-char
+"^H"	->  backward-char
 "^I"	->  vi-cmd-mode-complete
 "^J"	->  newline
 "^K"	->  kill-line
@@ -405,14 +411,20 @@ VI Command Mode functions
 "!"	->  expand-history
 "$"	->  end-of-line
 "*"	->  expand-glob
+"+"	->  down-history
+","	->  is undefined
+"-"	->  up-history
+"."	->  is undefined
+"/"	->  vi-search-back
 "0"	->  vi-zero
-"1"  to "9"	->  digit-argument
-"?"	->  which-command
+"1" to "9"	->  digit-argument
+"?"	->  vi-search-fwd
 "@"	->  is undefined
 "A"	->  vi-add-at-eol
 "B"	->  backward-word
-"C"	->  vi-chg-to-eol
+"C"	->  change-till-end-of-line
 "D"	->  kill-line
+"E"	->  vi-endword
 "I"	->  vi-insert-at-bol
 "J"	->  history-search-forward
 "K"	->  history-search-backward
@@ -420,23 +432,28 @@ VI Command Mode functions
 "R"	->  vi-replace-mode
 "S"	->  vi-substitute-line
 "T"	->  toggle-literal-history
+"U"	->  is undefined
 "V"	->  expand-variables
 "W"	->  forward-word
 "X"	->  backward-delete-char
 "["	->  sequence-lead-in
 "\e^"	->  beginning-of-line
 "a"	->  vi-add
-"b"	->  backward-word
+"b"	->  vi-wordback
 "c"	->  is undefined
-"d"	->  delete-word
+"d"	->  vi-delmeta
+"e"	->  vi-eword
 "h"	->  backward-char
 "i"	->  vi-insert
 "j"	->  down-history
 "k"	->  up-history
 "l"	->  forward-char
+"m"	->  is undefined
+"n"	->  vi-repeat
 "r"	->  vi-replace-char
 "s"	->  vi-substitute-char
 "t"	->  toggle-literal-history
+"u"	->  vi-undo
 "v"	->  expand-variables
 "w"	->  vi-beginning-of-next-word
 "x"	->  delete-char
@@ -1752,7 +1769,9 @@ The current possible values are:
 \fIbalance\fR		a Sequent Balance (32000 based)
 \fIbutterfly\fR		a BBN Computer Butterfly 1000
 \fIconvex\fR		a Convex
+\fIcray\fR		a Cray running Unicos
 \fIdecstation\fR	a DecStation XXXX
+\fIeta10\fR		an ETA 10 running SVR3
 \fIgould-np1\fR		a Gould NP1
 \fIhk68\fR		a Heurikon HK68 running Uniplus+ 5.0
 \fIhp300\fR		an HP 9000, series 300, running mtXinu
@@ -2686,6 +2705,9 @@ James J Dempsey, BBN, 1988, and Paul Placeway, OSU, 1988
 Re-ported tcsh to A/UX.
 .sp
 .SH "BUGFIXES AND ENHANCEMENTS"
+Jose Sousa, Interactive Systems Corp., 1991
+Extended vi fixes. Added delete command in vi.
+.br
 Marc Horowitz, MIT, 1991
 Ansification fixes
 .br
@@ -2714,7 +2736,7 @@ Johan Widen, SICS Sweden, 1990
 .br
 Shell level variable, mach support, correct-line, 8-bit printing.
 .sp
-Matthew T. Day, Sanyo/ICON, 1990
+Matt Day, Sanyo Icon, 1990
 .br
 Added POSIX termio support; Fixed limit stuff for SysV.
 .sp

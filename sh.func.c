@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.4 1991/08/05 23:02:13 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.5 1991/08/06 03:00:23 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "config.h"
 
-RCSID("$Id: sh.func.c,v 3.4 1991/08/05 23:02:13 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.5 1991/08/06 03:00:23 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -314,7 +314,7 @@ doif(v, kp)
     register Char **vv;
 
     v++;
-    i = exp(&v);
+    i = expr(&v);
     vv = v;
     if (*vv == NOSTR)
 	stderror(ERR_NAME | ERR_EMPTYIF);
@@ -383,12 +383,13 @@ dogoto(v, c)
      */
     zlast = T_GOTO;
     for (wp = whyles; wp; wp = wp->w_next)
-	if (wp->w_end == 0) {
+	if (wp->w_end.type == I_SEEK) {
 	    search(T_BREAK, 0, NOSTR);
-	    wp->w_end = btell();
+	    btell(&wp->w_end);
 	}
-	else
-	    bseek(wp->w_end);
+	else {
+	    bseek(&wp->w_end);
+	}
     search(T_GOTO, 0, lp = globone(v[1], G_ERROR));
     xfree((ptr_t) lp);
     /*
@@ -442,7 +443,7 @@ doexit(v, c)
      */
     v++;
     if (*v) {
-	set(STRstatus, putn(exp(&v)));
+	set(STRstatus, putn(expr(&v)));
 	if (*v)
 	    stderror(ERR_NAME | ERR_EXPRESSION);
     }
@@ -481,7 +482,7 @@ doforeach(v, c)
     nwp = (struct whyle *) xcalloc(1, sizeof *nwp);
     nwp->w_fe = nwp->w_fe0 = v;
     gargv = 0;
-    nwp->w_start = btell();
+    btell(&nwp->w_start);
     nwp->w_fename = Strsave(cp);
     nwp->w_next = whyles;
     whyles = nwp;
@@ -501,7 +502,7 @@ dowhile(v, c)
     struct command *c;
 {
     register int status;
-    register bool again = whyles != 0 && whyles->w_start == lineloc &&
+    register bool again = whyles != 0 && SEEKEQ(&whyles->w_start, &lineloc) &&
     whyles->w_fename == 0;
 
     v++;
@@ -512,7 +513,7 @@ dowhile(v, c)
     if (intty && !again)
 	status = !exp0(&v, 1);
     else
-	status = !exp(&v);
+	status = !expr(&v);
     if (*v)
 	stderror(ERR_NAME | ERR_EXPRESSION);
     if (!again) {
@@ -520,7 +521,7 @@ dowhile(v, c)
 	(struct whyle *) xcalloc(1, sizeof(*nwp));
 
 	nwp->w_start = lineloc;
-	nwp->w_end = 0;
+	nwp->w_end.type = I_SEEK;
 	nwp->w_next = whyles;
 	whyles = nwp;
 	zlast = T_WHILE;
@@ -541,7 +542,7 @@ dowhile(v, c)
 static void
 preread()
 {
-    whyles->w_end = -1;
+    whyles->w_end.type = I_SEEK;
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
@@ -555,7 +556,7 @@ preread()
 #else /* !BSDSIGS */
 	(void) sighold(SIGINT);
 #endif /* BSDSIGS */
-    whyles->w_end = btell();
+    btell(&whyles->w_end);
 }
 
 /*ARGSUSED*/
@@ -566,7 +567,7 @@ doend(v, c)
 {
     if (!whyles)
 	stderror(ERR_NAME | ERR_NOTWHILE);
-    whyles->w_end = btell();
+    btell(&whyles->w_end);
     doagain();
 }
 
@@ -586,7 +587,7 @@ doagain()
 {
     /* Repeating a while is simple */
     if (whyles->w_fename == 0) {
-	bseek(whyles->w_start);
+	bseek(&whyles->w_start);
 	return;
     }
     /*
@@ -599,7 +600,7 @@ doagain()
 	return;
     }
     set(whyles->w_fename, Strsave(*whyles->w_fe++));
-    bseek(whyles->w_start);
+    bseek(&whyles->w_start);
 }
 
 void
@@ -702,10 +703,14 @@ search(type, level, goal)
 
     Stype = type;
     Sgoal = goal;
-    if (type == T_GOTO)
-	bseek((off_t) 0);
+    if (type == T_GOTO) {
+	struct Ain a;
+	a.type = F_SEEK;
+	a.f_seek = 0;
+	bseek(&a);
+    }
     do {
-	if (intty && fseekp == feobp)
+	if (intty && fseekp == feobp && aret == F_SEEK)
 	    printprompt(1, str2short(isrchx(type == T_BREAK ?
 					    zlast : type)));
 	/* xprintf("? "), flush(); */
@@ -901,32 +906,40 @@ keyword(wp)
 static void
 toend()
 {
-    if (whyles->w_end == 0) {
+    if (whyles->w_end.type == I_SEEK) {
 	search(T_BREAK, 0, NOSTR);
-	whyles->w_end = btell() - 1;
+	btell(&whyles->w_end);
+	whyles->w_end.f_seek--;
     }
-    else
-	bseek(whyles->w_end);
+    else {
+	bseek(&whyles->w_end);
+    }
     wfree();
 }
 
 void
 wfree()
 {
-    long    o = btell();
+    struct Ain    o;
+    struct whyle *nwp;
+    btell(&o);
+    if (o.type != F_SEEK)
+	return;
 
-    while (whyles) {
+    for (; whyles; whyles = nwp) {
 	register struct whyle *wp = whyles;
-	register struct whyle *nwp = wp->w_next;
+	nwp = wp->w_next;
+	if (wp->w_start.type != F_SEEK || wp->w_end.type != F_SEEK)
+	    continue;
 
-	if (o >= wp->w_start && (wp->w_end == 0 || o < wp->w_end))
+	if (o.f_seek >= wp->w_start.f_seek && 
+	    (wp->w_end.f_seek == 0 || o.f_seek < wp->w_end.f_seek))
 	    break;
 	if (wp->w_fe0)
 	    blkfree(wp->w_fe0);
 	if (wp->w_fename)
 	    xfree((ptr_t) wp->w_fename);
 	xfree((ptr_t) wp);
-	whyles = nwp;
     }
 }
 
@@ -1009,6 +1022,7 @@ xecho(sep, v)
 		    break;
 		case '\\':
 		    c = '\\';
+		    --cp;
 		    break;
 		case '0':
 		    c = 0;
@@ -1020,7 +1034,8 @@ xecho(sep, v)
 			c = c * 8 + *cp++ - '0';
 		    break;
 		case '\0':
-		    c = *--cp;
+		    c = '\\';
+		    --cp;
 		    break;
 		default:
 		    xputchar('\\' | QUOTE);
@@ -1178,7 +1193,7 @@ dounsetenv(v, c)
 		Unsetenv(name);
 		break;
 	    }
-    xfree((ptr_t) name), name = NULL;
+    xfree((ptr_t) name); name = NULL;
 }
 
 void
@@ -1517,6 +1532,8 @@ badscal:
 # if defined(convex) || defined(__convex__)
     return ((RLIM_TYPE) restrict_limit((f + 0.5)));
 # else
+    if ((f + 0.5) >= (float) 0x7fffffff || (f + 0.5) < (float) 0x80000000)
+	stderror(ERR_NAME | ERR_SCALEF);
     return ((RLIM_TYPE) (f + 0.5));
 # endif /* convex */
 }

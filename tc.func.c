@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.4 1991/07/16 16:21:55 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.5 1991/07/17 13:21:49 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.func.c,v 3.4 1991/07/16 16:21:55 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.5 1991/07/17 13:21:49 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -406,40 +406,40 @@ struct process *
 find_stop_ed()
 {
     register struct process *pp;
-    register char *ep, *vp, *p;
+    register char *ep, *vp, *cp, *p;
     int     epl, vpl;
 
     if ((ep = getenv("EDITOR")) != NULL) {	/* if we have a value */
-	if ((p = strrchr(ep, '/')) != NULL) {	/* if it has a path */
+	if ((p = strrchr(ep, '/')) != NULL) 	/* if it has a path */
 	    ep = p + 1;		/* then we want only the last part */
-	}
     }
-    else {
+    else 
 	ep = "ed";
-    }
+
     if ((vp = getenv("VISUAL")) != NULL) {	/* if we have a value */
-	if ((p = strrchr(vp, '/')) != NULL) {	/* and it has a path */
+	if ((p = strrchr(vp, '/')) != NULL) 	/* and it has a path */
 	    vp = p + 1;		/* then we want only the last part */
-	}
     }
-    else {
+    else 
 	vp = "vi";
-    }
+
     vpl = strlen(vp);
     epl = strlen(ep);
 
     if (pcurrent == PNULL)	/* see if we have any jobs */
 	return PNULL;		/* nope */
 
-    for (pp = proclist.p_next; pp; pp = pp->p_next) {
+    for (pp = proclist.p_next; pp; pp = pp->p_next)
 	if (pp->p_pid == pp->p_jobid) {
 	    p = short2str(pp->p_command);
+	    if ((cp = strrchr(p, '/')) != NULL)	/* and it has a path */
+		cp = cp + 1;		/* then we want only the last part */
 	    /* if we find either in the current name, fg it */
-	    if (strncmp(ep, p, (size_t) epl) == 0 ||
-		strncmp(vp, p, (size_t) vpl) == 0)
+	    if (strncmp(ep, cp, (size_t) epl) == 0 ||
+		strncmp(vp, cp, (size_t) vpl) == 0)
 		return pp;
 	}
-    }
+
     return PNULL;		/* didn't find a job */
 }
 
@@ -1094,7 +1094,8 @@ static struct tildecache {
 }      *tcache = NULL;
 
 #define TILINCR 10
-static int tlength = 0, tsize = TILINCR;
+int tlength = 0;
+static int tsize = TILINCR;
 
 static int
 tildecompare(p1, p2)

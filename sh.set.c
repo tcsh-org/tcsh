@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.set.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.set.c,v 3.2 1991/07/17 21:52:22 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.set.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.2 1991/07/17 21:52:22 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -342,7 +342,7 @@ xset(cp, vp)
 	xfree((ptr_t) ** vp);
 	**vp = dp;
     }
-    return (putn(exp(vp)));
+    return (putn(expr(vp)));
 }
 
 static Char *
@@ -367,7 +367,7 @@ operate(op, vp, p)
     }
     *v++ = p;
     *v++ = 0;
-    i = exp(&vecp);
+    i = expr(&vecp);
     if (*vecp)
 	stderror(ERR_NAME | ERR_EXPRESSION);
     return (putn(i));

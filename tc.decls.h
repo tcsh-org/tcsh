@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.3 1991/07/17 13:18:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.4 1991/08/05 23:02:13 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -137,9 +137,6 @@ extern	char		 *xgetwd	__P((char *));
 #ifdef NEEDgethostname
 extern	int	 	  gethostname	__P((char *, int));
 #define gethostname(a, b) xgethostname(a, b)
-#endif
-#ifdef iconuxv
-extern	int		  vfork		__P((void));
 #endif
 #ifdef apollo
 extern	void		  doinlib	__P((Char **, struct command *));

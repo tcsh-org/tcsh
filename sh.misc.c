@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.misc.c,v 3.3 1991/07/08 05:08:00 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.misc.c,v 3.4 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.misc.c,v 3.4 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 
@@ -371,10 +371,10 @@ lshift(v, c)
     register Char **v;
     register int c;
 {
-    register Char **u = v;
+    register Char **u;
 
-    while (*u && --c >= 0)
-	xfree((ptr_t) * u++);
+    for (u = v; *u && --c >= 0; u++)
+	xfree((ptr_t) *u);
     (void) blkcpy(v, u);
 }
 

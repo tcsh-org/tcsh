@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.char.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.char.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.char.c: Character classification tables
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.char.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.char.h"
 
@@ -113,7 +113,7 @@ unsigned short _cmap[256] = {
 	_ESC,		0,		0,		0,
 
 /*	`		a		b		c	*/
-  _Q1|_GLOB|_CMD|_META,	_LET|_LOW|_XD,	_LET|_LOW|_XD,	_LET|_LOW|_XD,
+  _Q1|_GLOB|_META,	_LET|_LOW|_XD,	_LET|_LOW|_XD,	_LET|_LOW|_XD,
 
 /*	d		e		f		g	*/
 	_LET|_LOW|_XD,	_LET|_LOW|_XD,	_LET|_LOW|_XD,	_LET|_LOW,

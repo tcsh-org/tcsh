@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.7 1991/07/19 16:49:54 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.8 1991/07/23 23:20:08 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -38,7 +38,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tw.parse.c,v 3.7 1991/07/19 16:49:54 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.8 1991/07/23 23:20:08 christos Exp $")
 
 #include "sh.h"
 #include "tw.h"
@@ -119,14 +119,21 @@ tenematch(inputline, inputline_size, num_read, command)
     int     is_a_cmd;		/* UNIX command rather than filename */
     int     search_ret;		/* what search returned for debugging */
     int     in_single, in_double;	/* In single or in_double quotes */
+    int     backq, skp;
 
     str_end = &inputline[num_read];
 
     /*
+     * Check if in backquotes
+     */
+    for (cmd_st = str_end, backq = 0;
+	 cmd_st >= inputline;
+	 backq ^= (*cmd_st-- == '`'));
+    /*
      * space backward looking for the beginning of this command
      */
     for (cmd_st = str_end; cmd_st > inputline; --cmd_st)
-	if (iscmdmeta(cmd_st[-1])
+	if ((iscmdmeta(cmd_st[-1]) || cmd_st[-1] == '`' && backq)
 	    && ((cmd_st - 1 == inputline) || (cmd_st[-2] != '\\')))
 	    break;
     /* step forward over leading spaces */
@@ -137,7 +144,13 @@ tenematch(inputline, inputline_size, num_read, command)
      * Find LAST occurence of a delimiter in the inputline. The word start is
      * one character past it.
      */
-    for (word_start = str_end; word_start > inputline; --word_start) {
+    for (word_start = str_end, skp = 0; word_start > inputline; --word_start) {
+	if (!backq && word_start[-1] == '`') {
+	    skp ^= 1;
+	    continue;
+	}
+	if (skp)
+	    continue;
 	if ((ismeta(word_start[-1]) || isaset(cmd_st, word_start)) &&
 	    (word_start[-1] != '#') && (word_start[-1] != '$') &&
 	    ((word_start - 1 == inputline) || (word_start[-2] != '\\')))
@@ -159,7 +172,7 @@ tenematch(inputline, inputline_size, num_read, command)
     space_left = inputline_size - (word_start - inputline) - 1;
 #endif
 
-    is_a_cmd = starting_a_command(word_start, inputline);
+    is_a_cmd = starting_a_command(word_start - 1, inputline);
 #ifdef TENEDEBUG
     xprintf("starting_a_command %d\n", is_a_cmd);
 #endif
@@ -177,12 +190,6 @@ tenematch(inputline, inputline_size, num_read, command)
 		    in_single = 0;
 		else
 		    in_single = QUOTE;
-		/*
-		 * Move the word_start further, cause the quotes so far have no
-		 * effect.
-		 */
-		if (cmd_start == word_start)
-		    word_start++;
 	    }
 	    else
 		*wp++ = *cmd_start | QUOTE;
@@ -193,12 +200,6 @@ tenematch(inputline, inputline_size, num_read, command)
 		    in_double = 0;
 		else
 		    in_double = QUOTE;
-		/*
-		 * Move the word_start further, cause the quotes so far have no
-		 * effect.
-		 */
-		if (cmd_start == word_start)
-		    word_start++;
 	    }
 	    else
 		*wp++ = *cmd_start | QUOTE;
@@ -222,6 +223,12 @@ tenematch(inputline, inputline_size, num_read, command)
     if (wp > word + FILSIZ)
 	return (-1);
     *wp = '\0';
+    /*
+     * Move the word_start further if still in quotes, cause the
+     * quotes so far have no effect.
+     */
+    if ((in_single || in_double) && (*word_start == '\'' || *word_start == '"'))
+	word_start++;
 
 
 #ifdef TENEDEBUG
@@ -279,9 +286,11 @@ tenematch(inputline, inputline_size, num_read, command)
 	/*
 	 * Change by Christos Zoulas: if the name has metachars in it, quote
 	 * the metachars, but only if we are outside quotes.
+	 * We don't quote the last space if we had a unique match and 
+	 * addsuffix was set. Otherwise the last space was part of a word.
 	 */
 	if (*wp && InsertStr((in_single || in_double) ?
-			     wp : quote_meta(wp,
+			     wp : quote_meta(wp, search_ret == 1 &&
 					     (bool) is_set(STRaddsuffix))) < 0)
 	    /* put it in the input buffer */
 	    return -1;		/* error inserting */
@@ -1142,7 +1151,8 @@ getentry(dir_fd, looking_for_lognames)
 #else
 	(void) sighold(SIGINT);
 #endif /* BSDSIGS */
-	pw = getpwent();
+	/* ISC does not declare getpwent()? */
+	pw = (struct passwd *) getpwent();
 #ifdef BSDSIGS
 	(void) sigsetmask(omask);
 #else

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.8 1991/08/05 23:02:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.9 1991/08/06 01:45:29 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.init.c,v 3.8 1991/08/05 23:02:13 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.9 1991/08/06 01:45:29 christos Exp $")
 
 #include "sh.h"
 #define EXTERN			/* intern */
@@ -126,6 +126,11 @@ RCSID("$Id: ed.init.c,v 3.8 1991/08/05 23:02:13 christos Exp $")
 #    define IEXTEN 0
 #   endif /* IEXTEN == XCASE */
 #  endif /* IEXTEN && XCASE */
+#  if defined(IEXTEN) && !defined(XCASE)
+#   define XCASE IEXTEN
+#   undef IEXTEN
+#   define IEXTEN 0
+#  endif /* IEXTEN && !XCASE */
 # endif /* ISC */
 
 #endif /* TERMIO || POSIX */
@@ -1238,9 +1243,11 @@ Rawmode()
 	(void) dosetkey((char *) &testio.c_cc[VEOL], (char *) &nio.c_cc[VEOL]);
     }
 # ifdef VSWTCH
-    if (dosetkey((char *) &testio.c_cc[VSWTCH], (char *) &nio.c_cc[VSWTCH]))
-	(void) dosetkey((char *) &testio.c_cc[VSWTCH],
-			(char *) &xio.c_cc[VSWTCH]);
+    /*
+     * Changing the VSWTCH char in the xio struct breaks key bindings,
+     * at least under Irix 3.3.   (Jim Diamond)
+     */
+    dosetkey((char *) &testio.c_cc[VSWTCH], (char *) &nio.c_cc[VSWTCH]);
 # endif /* VSWTCH */
 # ifdef VEOL2
     if (dosetkey((char *) &testio.c_cc[VEOL2], (char *) &nio.c_cc[VEOL2]))
@@ -1474,10 +1481,11 @@ Cookedmode()
     if (!Tty_raw_mode)
 	return (0);
 
+    /* hold this for reseting tty */
 #ifdef BSDSIGS
-    orig_intr = signal(SIGINT, SIG_IGN);	/* hold this for reseting tty */
+    orig_intr = (sigret_t (*)()) signal(SIGINT, SIG_IGN);
 #else
-    orig_intr = sigset(SIGINT, SIG_IGN);	/* hold this for reseting tty */
+    orig_intr = (sigret_t (*)()) sigset(SIGINT, SIG_IGN);
 #endif /* BSDSIGS */
 #ifndef POSIX
 # ifdef TERMIO

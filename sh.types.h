@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.8 1991/07/24 15:36:18 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.9 1991/08/06 01:49:40 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -128,7 +128,7 @@ extern uid_t getuid(), geteuid();
 extern gid_t getgid(), getegid();
 extern sigmask_t sigblock();
 extern sigmask_t sigsetmask();
-#ifndef __hp9000s700
+#ifdef notdef	/* XXX: Not true for 8.0 */
 extern void sigpause();
 extern sigmask_t sigspace();
 #endif
@@ -141,7 +141,7 @@ extern void qsort();
 extern void free();
 extern unsigned int alarm();
 extern unsigned int sleep();
-#ifndef __hp9000s700
+#ifdef notdef	/* XXX: Not true for 8.0 */
 extern int lstat();
 extern int readlink();
 extern int sigvector();
@@ -352,6 +352,26 @@ extern char *sbrk();
 #  define _PID_T
 # endif /* _PID_T */
 #endif /* uts */
+
+/*
+ * UnixPC aka u3b1
+ */
+#ifdef UNIXPC
+# ifdef types_h
+#  ifndef _SIZE_T
+#   define _SIZE_T
+#  endif /* _SIZE_T */
+# endif /* types_h */
+#endif /* UNIXPC */
+
+/*
+ * NS32000 OPUS
+ */
+#ifdef OPUS
+# ifndef _SIZE_T
+#  define _SIZE_T
+# endif /* _SIZE_T */
+#endif /* OPUS */
 
 /***
  *** Catch all for non POSIX systems.

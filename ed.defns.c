@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/ed.defns.c,v 1.4 91/07/15 01:25:52 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: ed.defns.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -209,8 +209,26 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		F_EXPAND	81
     e_load_average,
 #define		F_LOAD_AVERAGE	82
+    v_delprev,
+#define		V_DELPREV	83
+    v_delmeta,
+#define		V_DELMETA	84
+    v_wordback,
+#define		V_WORDBACK	85
+    v_endword,
+#define		V_ENDWORD	86
+    v_eword,
+#define		V_EWORD		87
+    v_undo,
+#define		V_UNDO		88
+    v_ush_meta,
+#define		V_USH_META	89
+    v_dsh_meta,
+#define		V_DSH_META	90
+    v_repeat_srch,
+#define		V_REPEAT_SRCH	91
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	83
+#define		F_NUM_FNS	92
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -376,14 +394,14 @@ KEYCMD  CcEmacsMap[] = {
     F_UNASSIGNED,		/* M-^W */
     F_UNASSIGNED,		/* M-^X */
     F_UNASSIGNED,		/* M-^Y */
-    F_RUN_FG_EDITOR,	/* M-^Z */
+    F_RUN_FG_EDITOR,		/* M-^Z */
     F_COMPLETE,			/* M-^[ */
     F_UNASSIGNED,		/* M-^\ */
     F_UNASSIGNED,		/* M-^] */
     F_UNASSIGNED,		/* M-^^ */
     F_COPYPREV,			/* M-^_ */
-    F_EXPAND_HISTORY,	/* M-SPACE */
-    F_EXPAND_HISTORY,	/* M-! */
+    F_EXPAND_HISTORY,		/* M-SPACE */
+    F_EXPAND_HISTORY,		/* M-! */
     F_UNASSIGNED,		/* M-" */
     F_UNASSIGNED,		/* M-# */
     F_CORRECT_L,		/* M-$ */
@@ -487,16 +505,50 @@ KEYCMD  CcEmacsMap[] = {
  * in the extended keymap.
  */
 KEYCMD  CcViMap[] = {
+#ifdef KSHVI
     F_UNASSIGNED,		/* ^@ */
-    F_TOBEG,			/* ^A */
-    F_CHARBACK,			/* ^B */
-    F_TTY_INT,			/* ^C */
-    F_LIST_EOF,			/* ^D */
-    F_TOEND,			/* ^E */
+    F_INSERT,			/* ^A */
+    F_INSERT,			/* ^B */
+    F_INSERT,			/* ^C */
+    F_INSERT,			/* ^D */
+    F_INSERT,			/* ^E */
+    F_INSERT,			/* ^F */
+    F_INSERT,			/* ^G */
+    V_DELPREV,			/* ^H */   /* BackSpace key */
+    F_COMPLETE,			/* ^I */   /* Tab Key  */
+    F_NEWLINE,			/* ^J */
+    F_INSERT,			/* ^K */
+    F_INSERT,			/* ^L */
+    F_NEWLINE,			/* ^M */
+    F_INSERT,			/* ^N */
+    F_INSERT,			/* ^O */
+    F_INSERT,			/* ^P */
+    F_TTY_STARTO,		/* ^Q */
+    F_INSERT,			/* ^R */
+    F_INSERT,			/* ^S */
+    F_INSERT,			/* ^T */
+    F_INSERT,			/* ^U */
+    F_QUOTE,			/* ^V */
+    F_DELWORDPREV,		/* ^W */  /* Only until start edit pos */
+    F_INSERT,			/* ^X */
+    F_INSERT,			/* ^Y */
+    F_INSERT,			/* ^Z */
+    V_CMD_MODE,			/* ^[ */  /* [ Esc ] key
+    F_TTY_QUIT,			/* ^\ */
+    F_INSERT,			/* ^] */
+    F_INSERT,			/* ^^ */
+    F_INSERT,			/* ^_ */
+#else /* !KSHVI */
+    F_UNASSIGNED,		/* ^@ */   /* NOTE: These mapping do NOT */
+    F_TOBEG,			/* ^A */   /* Correspond well to the KSH */
+    F_CHARBACK,			/* ^B */   /* VI editting assignments    */
+    F_TTY_INT,			/* ^C */   /* On the other hand they are */
+    F_LIST_EOF,			/* ^D */   /* convenient any many people */
+    F_TOEND,			/* ^E */   /* have gotten used to them   */
     F_CHARFWD,			/* ^F */
     F_LIST_GLOB,		/* ^G */
-    F_DELPREV,			/* ^H */
-    F_COMPLETE,			/* ^I */
+    F_DELPREV,			/* ^H */   /* BackSpace key */
+    F_COMPLETE,			/* ^I */   /* Tab Key */
     F_NEWLINE,			/* ^J */
     F_KILLEND,			/* ^K */
     F_CLEARDISP,		/* ^L */
@@ -519,6 +571,7 @@ KEYCMD  CcViMap[] = {
     F_UNASSIGNED,		/* ^] */
     F_UNASSIGNED,		/* ^^ */
     F_UNASSIGNED,		/* ^_ */
+#endif  /* KSHVI */
     F_INSERT,			/* SPACE */
     F_INSERT,			/* ! */
     F_INSERT,			/* " */
@@ -754,7 +807,7 @@ KEYCMD  CcViCmdMap[] = {
     F_TOEND,			/* ^E */
     F_UNASSIGNED,		/* ^F */
     F_LIST_GLOB,		/* ^G */
-    F_DELPREV,			/* ^H */
+    F_CHARBACK,			/* ^H */
     V_CM_COMPLETE,		/* ^I */
     F_NEWLINE,			/* ^J */
     F_KILLEND,			/* ^K */
@@ -779,7 +832,7 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* ^^ */
     F_UNASSIGNED,		/* ^_ */
     F_CHARFWD,			/* SPACE */
-    F_EXPAND_HISTORY,	/* ! */
+    F_EXPAND_HISTORY,		/* ! */
     F_UNASSIGNED,		/* " */
     F_UNASSIGNED,		/* # */
     F_TOEND,			/* $ */
@@ -789,11 +842,11 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* ( */
     F_UNASSIGNED,		/* ) */
     F_EXPAND_GLOB,		/* * */
-    F_UNASSIGNED,		/* + */
-    F_UNASSIGNED,		/* , */
-    F_UNASSIGNED,		/* - */
+    F_DOWN_HIST,		/* + */
+    F_UNASSIGNED,		/* , */	 /* KSH Command exists */
+    F_UP_HIST,			/* - */	
     F_UNASSIGNED,		/* . */
-    F_UNASSIGNED,		/* / */
+    V_USH_META,			/* / */
     V_ZERO,			/* 0 */
     F_ARGDIGIT,			/* 1 */
     F_ARGDIGIT,			/* 2 */
@@ -809,14 +862,14 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* < */
     F_UNASSIGNED,		/* = */
     F_UNASSIGNED,		/* > */
-    F_WHICH,			/* ? */
+    V_DSH_META,			/* ? */
     F_UNASSIGNED,		/* @ */
     V_ADDEND,			/* A */
     F_WORDBACK,			/* B */
     V_CHGTOEND,			/* C */
     F_KILLEND,			/* D */
-    F_UNASSIGNED,		/* E */
-    F_UNASSIGNED,		/* F */
+    V_ENDWORD,			/* E */
+    F_UNASSIGNED,		/* F */   /* Need code here */ 
     F_UNASSIGNED,		/* G */
     F_UNASSIGNED,		/* H */
     V_INSBEG,			/* I */
@@ -844,11 +897,11 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* _ */
     F_UNASSIGNED,		/* ` */
     V_ADD,			/* a */
-    F_WORDBACK,			/* b */
+    V_WORDBACK,			/* b */
     F_UNASSIGNED,		/* c */
-    F_DELWORDNEXT,		/* d */
-    F_UNASSIGNED,		/* e */
-    F_UNASSIGNED,		/* f */
+    V_DELMETA,			/* d */
+    V_EWORD,			/* e */
+    F_UNASSIGNED,		/* f */  /* Need code for KSH */
     F_UNASSIGNED,		/* g */
     F_CHARBACK,			/* h */
     V_INSERT,			/* i */
@@ -856,14 +909,14 @@ KEYCMD  CcViCmdMap[] = {
     F_UP_HIST,			/* k */
     F_CHARFWD,			/* l */
     F_UNASSIGNED,		/* m */
-    F_UNASSIGNED,		/* n */
+    V_REPEAT_SRCH,		/* n */
     F_UNASSIGNED,		/* o */
     F_UNASSIGNED,		/* p */
     F_UNASSIGNED,		/* q */
     V_REPLONE,			/* r */
     V_SUBSTCHAR,		/* s */
     F_TOGGLE_HIST,		/* t */
-    F_UNASSIGNED,		/* u */
+    V_UNDO,			/* u */
     F_EXPAND_VARS,		/* v */
     V_WORDBEGNEXT,		/* w */
     F_DELNEXT,			/* x */
@@ -1157,18 +1210,36 @@ struct KeyFuncs FuncNames[] = {
     "Enter vi command mode (use alternative key bindings)",
     "vi-cmd-mode-complete", V_CM_COMPLETE,
     "Vi command mode complete current word",
+    "vi-delprev", V_DELPREV,
+    "Vi move to previous character (backspace)",
+    "vi-delmeta", V_DELMETA,
+    "Vi delete prefix command",
+    "vi-endword", V_ENDWORD,
+    "Vi move to the end of the current space delimited word",
+    "vi-eword", V_EWORD,
+    "Vi move to the end of the current word",
     "vi-insert", V_INSERT,
     "Enter vi insert mode",
     "vi-insert-at-bol", V_INSBEG,
     "Enter vi insert mode at beginning of line",
+    "vi-repeat", V_REPEAT_SRCH,
+    "Vi repeat current search",
     "vi-replace-char", V_REPLONE,
     "Vi replace character under the cursor with the next character typed",
     "vi-replace-mode", V_REPLMODE,
     "Vi replace mode",
+    "vi-search-back", V_USH_META,
+    "Vi search history backwards",
+    "vi-search-fwd", V_DSH_META,
+    "Vi search history forward",
     "vi-substitute-char", V_SUBSTCHAR,
     "Vi replace character under the cursor and enter insert mode",
     "vi-substitute-line", V_SUBSTLINE,
     "Vi replace entire line",
+    "vi-wordback", V_WORDBACK,
+    "Vi move to the previous word",
+    "vi-undo", V_UNDO,
+    "Vi undo last change",
     "vi-zero", V_ZERO,
     "Vi goto the beginning of line",
     "which-command", F_WHICH,

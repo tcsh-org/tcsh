@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.5 1991/08/05 23:02:13 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.6 1991/08/06 01:08:03 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.init.c,v 3.5 1991/08/05 23:02:13 christos Exp christos $")
+RCSID("$Id: sh.init.c,v 3.6 1991/08/06 01:08:03 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -227,7 +227,7 @@ struct	mesg mesg[] = {
 #  undef  _sigextra_
 # endif /* _sigextra_ */
 
-#ifndef IBMAIX
+#if !defined(IBMAIX) && !defined(cray)
 /* these are the real svid signals */
 /* 16 */	"USR1",		"User signal 1",
 /* 17 */	"USR2", 	"User signal 2",
@@ -240,6 +240,68 @@ struct	mesg mesg[] = {
 # endif /* apollo */
 #endif /* IBMAIX */
 
+# ifdef cray
+# define _sigextra_
+/* 16 */	"IO",		"Input/output possible signal",
+/* 17 */	"URG",		"Urgent condition on I/O channel",
+/* 18 */	"CHLD",		"Child exited",
+/* 19 */	"PWR",		"Power failure",
+/* 20 */	"MT",		"Multitasking wake-up",
+/* 21 */	"MTKILL",	"Multitasking kill",
+/* 22 */	"BUFIO",	"Fortran asynchronous I/O completion",
+/* 23 */	"RECOVERY",	"Recovery",
+/* 24 */	"UME",		"Uncorrectable memory error",
+/* 25 */	"DLK",		"True deadlock detected",
+/* 26 */	"CPULIM",	"CPU time limit exceeded",
+/* 27 */	"SHUTDN",	"System shutdown imminent",
+# ifdef SUSPENDED
+/* 28 */	"STOP", 	"Suspended",
+/* 29 */	"TSTP", 	"Suspended",
+# else /* SUSPENDED */
+/* 28 */	"STOP", 	"Stopped",
+/* 29 */	"TSTP", 	"Stopped",
+# endif /* SUSPENDED */
+/* 30 */	"CONT",   	"Continue",
+# ifdef SUSPENDED
+/* 31 */	"TTIN",		"Suspended (tty input)",
+/* 32 */	"TTOU",		"Suspended (tty output)",
+# else /* SUSPENDED */
+/* 31 */	"TTIN",		"Stopped (tty input)",
+/* 32 */	"TTOU",		"Stopped (tty output)",
+# endif /* SUSPENDED */
+/* 33 */	"WINCH",	"Window size changed",
+/* 34 */	"RPE",		"CRAY Y-MP register parity error",
+/* 35 */	0,		"Signal 35",
+/* 36 */	0,		"Signal 36",
+/* 37 */	0,		"Signal 37",
+/* 38 */	0,		"Signal 38",
+/* 39 */	0,		"Signal 39",
+/* 40 */	0,		"Signal 40",
+/* 41 */	0,		"Signal 41",
+/* 42 */	0,		"Signal 42",
+/* 43 */	0,		"Signal 43",
+/* 44 */	0,		"Signal 44",
+/* 45 */	0,		"Signal 45",
+/* 46 */	0,		"Signal 46",
+/* 47 */	0,		"Signal 47",
+/* 48 */	"INFO",		"Information signal",
+/* 49 */	"USR1",		"User-defined signal 1",
+/* 50 */	"USR2",		"User-defined signal 2",
+/* 51 */	0,		"Signal 51",
+/* 52 */	0,		"Signal 52",
+/* 53 */	0,		"Signal 53",
+/* 54 */	0,		"Signal 54",
+/* 55 */	0,		"Signal 55",
+/* 56 */	0,		"Signal 56",
+/* 57 */	0,		"Signal 57",
+/* 58 */	0,		"Signal 58",
+/* 59 */	0,		"Signal 59",
+/* 60 */	0,		"Signal 60",
+/* 61 */	0,		"Signal 61",
+/* 62 */	0,		"Signal 62",
+/* 63 */	0,	    	"Signal 63",
+/* 64 */	0,		"Signal 64",
+# endif /* cray */
 
 /*
 **  In the UNIXpc these signal *ARE* used!!
@@ -248,7 +310,6 @@ struct	mesg mesg[] = {
 /* 20 */	"WIND",		"Window status changed",
 /* 21 */	"PHONE", 	"Phone status changed",
 #endif
-
 
 # ifdef OREO
 #  define _sigextra_
@@ -438,7 +499,7 @@ struct	mesg mesg[] = {
 /* 32 */	0,		"Signal 32",
 # endif /* aiws */
 
-# ifdef m88k				/* ICON/UXV 4.10 (mday@iconsys.UUCP) */
+# ifdef m88k				/* Motorola 88100: POSIX/BCS signals */
 #  define _sigextra_
 /* 20 */	"WINCH", 	"Window changed",
 # ifdef DGUX

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.2 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.3 1991/07/24 17:38:12 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -35,10 +35,12 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.lex.c,v 3.2 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.3 1991/07/24 17:38:12 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
+/* #define DEBUG_INP */
+/* #define DEBUG_SEEK */
 
 /*
  * C shell
@@ -95,6 +97,7 @@ static int exclc = 0;
 
 /* "Globp" for alias resubstitution */
 static Char *alvecp = NULL;
+int aret = F_SEEK;
 
 /*
  * Labuf implements a general buffer for lookahead during lexical operations.
@@ -142,10 +145,10 @@ lex(hp)
     histlinep = histline;
     *histlinep = '\0';
 
-    lineloc = btell();
+    btell(&lineloc);
     hp->next = hp->prev = hp;
     hp->word = STRNULL;
-    alvecp = 0, hadhist = 0;
+    hadhist = 0;
     do
 	c = readc(0);
     while (c == ' ' || c == '\t');
@@ -1145,7 +1148,7 @@ gethent(sc)
 	    }
 	    np = lhsb;
 	    event = 0;
-	    while (!any(": \t\\\n}", c)) {
+	    while (!cmap(c, _META | _Q | _Q1) && !any("{}:", c)) {
 		if (event != -1 && Isdigit(c))
 		    event = event * 10 + c - '0';
 		else
@@ -1286,17 +1289,30 @@ readc(wanteof)
     register int c;
     static  sincereal;
 
+#ifdef DEBUG_INP
+    xprintf("readc\n");
+#endif
     if (c = peekread) {
 	peekread = 0;
 	return (c);
     }
 top:
+    aret = F_SEEK;
     if (alvecp) {
+#ifdef DEBUG_INP
+	xprintf("alvecp %c\n", *alvecp & 0xff);
+#endif
+	aret = A_SEEK;
 	if (c = *alvecp++)
 	    return (c);
-	if (*alvec) {
-	    alvecp = *alvec++;
-	    return (' ');
+	if (alvec && *alvec) {
+		alvecp = *alvec++;
+		return (' ');
+	}
+	else {
+	    alvecp = NULL;
+	    aret = F_SEEK;
+	    return('\n');
 	}
     }
     if (alvec) {
@@ -1308,12 +1324,14 @@ top:
 	return ('\n');
     }
     if (evalp) {
+	aret = E_SEEK;
 	if (c = *evalp++)
 	    return (c);
-	if (*evalvec) {
+	if (evalvec && *evalvec) {
 	    evalp = *evalvec++;
 	    return (' ');
 	}
+	aret = F_SEEK;
 	evalp = 0;
     }
     if (evalvec) {
@@ -1562,44 +1580,78 @@ bfree()
 
 void
 bseek(l)
-    off_t   l;
+    struct Ain   *l;
 {
-
-    fseekp = l;
-    if (!cantell) {
-#ifdef notdef
-	register struct whyle *wp;
+    switch (aret = l->type) {
+    case E_SEEK:
+	evalvec = l->a_seek;
+	evalp = (Char *) l->f_seek;
+#ifdef DEBUG_SEEK
+	xprintf("seek to eval %x %x\n", evalvec, evalp);
 #endif
-	if (!whyles)
-	    return;
-#ifdef notdef
-	/*
-	 * Christos: I don't understand this? both wp and l are local. What is
-	 * this used for? I suspect the author meant fseek = wp->w_start
-	 */
-	for (wp = whyles; wp->w_next; wp = wp->w_next)
-	    continue;
-	if (wp->w_start > l)
-	    l = wp->w_start;
+	return;
+    case A_SEEK:
+	alvec = l->a_seek;
+	alvecp = (Char *) l->f_seek;
+#ifdef DEBUG_SEEK
+	xprintf("seek to alias %x %x\n", alvec, alvecp);
 #endif
+	return;
+    case F_SEEK:	
+#ifdef DEBUG_SEEK
+	xprintf("seek to file %x\n", fseekp);
+#endif
+	fseekp = l->f_seek;
+	return;
+    default:
+	xprintf("Bad seek type %d\n", aret);
+	abort();
     }
 }
 
 /* any similarity to bell telephone is purely accidental */
-#ifndef btell
-off_t
-btell()
+void
+btell(l)
+struct Ain *l;
 {
-    return (fseekp);
-}
-
+    switch (l->type = aret) {
+    case E_SEEK:
+	l->a_seek = evalvec;
+	l->f_seek = (off_t) evalp;
+#ifdef DEBUG_SEEK
+	xprintf("tell eval %x %x\n", evalvec, evalp);
 #endif
+	return;
+    case A_SEEK:
+	l->a_seek = alvec;
+	l->f_seek = (off_t) alvecp;
+#ifdef DEBUG_SEEK
+	xprintf("tell alias %x %x\n", alvec, alvecp);
+#endif
+	return;
+    case F_SEEK:
+	l->f_seek = fseekp;
+	l->a_seek = NULL;
+#ifdef DEBUG_SEEK
+	xprintf("tell file %x\n", fseekp);
+#endif
+	return;
+    default:
+	xprintf("Bad seek type %d\n", aret);
+	abort();
+    }
+}
 
 void
 btoeof()
 {
     (void) lseek(SHIN, (off_t) 0, L_XTND);
+    aret = F_SEEK;
     fseekp = feobp;
+    alvec = NULL;
+    alvecp = NULL;
+    evalvec = NULL;
+    evalp = NULL;
     wfree();
     bfree();
 }

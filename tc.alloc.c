@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.2 1991/07/17 21:52:22 christos Exp $ */
+/* $Header: /tmp_mnt/home/ragmanns/mu/christos/src/sys/tcsh-6.00/RCS/tc.alloc.c,v 3.3 91/07/19 01:31:14 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -43,7 +43,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.alloc.c,v 3.2 1991/07/17 21:52:22 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.3 91/07/19 01:31:14 christos Exp $")
 
 
 #include "sh.h"
@@ -324,7 +324,7 @@ calloc(i, j)
 	    *cp++ = 0;
 	while (--i);
 
-    return (scp);
+    return ((memalign_t) scp);
 #else
     if (i && j)
 	return ((memalign_t) 0);
@@ -413,12 +413,12 @@ realloc(cp, nbytes)
     if (was_alloced && (onb < (1 << (i + 3))) && (onb >= (1 << (i + 2))))
 	return ((memalign_t) cp);
     if ((res = malloc(nbytes)) == NULL)
-	return (NULL);
+	return ((memalign_t) NULL);
     if (cp != res)		/* common optimization */
 	mybcopy(cp, res, nbytes);
     if (was_alloced)
 	free(cp);
-    return (res);
+    return ((memalign_t) res);
 #else
     if (cp && nbytes)
 	return ((memalign_t) 0);

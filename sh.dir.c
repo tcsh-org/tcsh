@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dir.c,v 3.2 1991/07/18 15:29:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dir.c,v 3.3 1991/07/31 07:12:20 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.dir.c,v 3.2 1991/07/18 15:29:06 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.3 1991/07/31 07:12:20 christos Exp $")
 
 
 #include "sh.h"
@@ -390,7 +390,8 @@ dochngd(v, c)
 	return;
     }
     else
-	cp = dfollow(*v);
+	if ((cp = dfollow(*v)) == NOSTR)
+	    return;
     dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
     dp->di_name = cp;
     dp->di_count = 0;
@@ -544,7 +545,8 @@ dopushd(v, c)
 	    if (chdir(short2str(cp)) < 0)
 		stderror(ERR_NAME | ERR_CANTCHANGE);
 	    cp = Strsave(cp);	/* hmmm... PWP */
-	    cp = dfollow(cp);
+	    if ((cp = dfollow(cp)) == NOSTR)
+		return;
 	    dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
 	    dp->di_name = cp;
 	    dp->di_count = 0;
@@ -589,7 +591,8 @@ dopushd(v, c)
     else {
 	register Char *ccp;
 
-	ccp = dfollow(*v);
+	if ((ccp = dfollow(*v)) == NOSTR)
+	    return;
 	dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
 	dp->di_name = ccp;
 	dp->di_count = 0;

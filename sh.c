@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.8 1991/08/05 23:02:13 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.9 1991/08/06 07:16:11 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,7 +41,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.8 1991/08/05 23:02:13 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.9 1991/08/06 07:16:11 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -1131,7 +1131,13 @@ srcunit(unit, onlyown, hflg)
 
 /* PWP: think of this as like a LISP (unwind-protect ...) */
 /* thanks to Diana Smetters for pointing out how this _should_ be written */
+#ifdef cray
+    my_reenter = 1;		/* assume non-zero return val */
+    if (setexit() == 0) {
+	my_reenter = 0;		/* Oh well, we were wrong */
+#else
     if ((my_reenter = setexit()) == 0) {
+#endif
 	process(0);		/* 0 -> blow away on errors */
     }
 
@@ -1471,7 +1477,7 @@ process(catch)
 	     * read fresh stuff. Otherwise, we are rereading input and don't
 	     * need or want to prompt.
 	     */
-	    if (fseekp == feobp)
+	    if (fseekp == feobp && aret == F_SEEK)
 		printprompt(0, NULL);
 	    flush();
 	    setalarm();

@@ -1,6 +1,6 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.decls.h,v 1.2 91/07/14 22:22:47 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.decls.h,v 3.2 1991/07/15 19:37:24 christos Exp $ */
 /*
- * sh.decls	 External declarations from sh*.c
+ * sh.decls.h	 External declarations from sh*.c
  */
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
@@ -107,7 +107,7 @@ extern	void		  tellmewhat	__P((struct wordent *));
 /*
  * sh.exp.c
  */
-extern	int	 	  exp		__P((Char ***));
+extern	int	 	  expr		__P((Char ***));
 extern	int		  exp0		__P((Char ***, bool));
 
 /*
@@ -188,10 +188,8 @@ extern	void	 	  savehist	__P((struct wordent *));
  * sh.lex.c
  */
 extern	void		  addla		__P((Char *));
-extern	void		  bseek		__P((off_t));
-#ifndef btell
-extern	off_t		  btell		__P((void));
-#endif
+extern	void		  bseek		__P((struct Ain *));
+extern	void		  btell		__P((struct Ain *));
 extern	void		  btoeof	__P((void));
 extern	void		  copylex	__P((struct wordent *, 
 					     struct wordent *));
