@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.3 1991/07/16 10:45:07 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.2 1991/07/16 11:06:33 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.screen.c,v 3.3 1991/07/16 10:45:07 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.2 1991/07/16 11:06:33 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -450,6 +450,17 @@ EchoTC(v)
     area = buf;
 
     setname("echotc");
+
+    tglob(v);
+    if (gflag) {
+	v = globall(v);
+	if (v == 0)
+	    stderror(ERR_NAME | ERR_NOMATCH);
+    }
+    else
+	v = gargv = saveblk(v);
+    trim(v);
+
     if (!*v || *v[0] == '\0')
 	return;
     if (v[0][0] == '-') {
@@ -577,6 +588,10 @@ EchoTC(v)
 	break;
     }
     flush();
+    if (gargv) {
+	blkfree(gargv);
+	gargv = 0;
+    }
 }
 
 bool    GotTermCaps = 0;
