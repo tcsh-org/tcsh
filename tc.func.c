@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.44 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.45 1993/10/30 19:50:16 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.44 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.45 1993/10/30 19:50:16 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1607,31 +1607,46 @@ fixio(fd, e)
 # ifdef F_SETFL
 /*
  * Great! we have on suns 3 flavors and 5 names...
- * I hope that will cover everything
+ * I hope that will cover everything.
+ * I added some more defines... many systems have different defines.
+ * Rather than dealing with getting the right includes, we'll just
+ * cover all the known possibilities here.  -- sterling@oldcolo.com
  */
 #  ifndef O_NONBLOCK
 #   define O_NONBLOCK 0
-#  endif
+#  endif /* O_NONBLOCK */
 #  ifndef O_NDELAY
 #   define O_NDELAY 0
-#  endif
+#  endif /* O_NDELAY */
 #  ifndef FNBIO
 #   define FNBIO 0
-#  endif
+#  endif /* FNBIO */
+#  ifndef _FNBIO
+#   define _FNBIO 0
+#  endif /* _FNBIO */
 #  ifndef FNONBIO
 #   define FNONBIO 0
-#  endif
+#  endif /* FNONBIO */
 #  ifndef FNONBLOCK
 #   define FNONBLOCK 0
-#  endif
+#  endif /* FNONBLOCK */
+#  ifndef _FNONBLOCK
+#   define _FNONBLOCK 0
+#  endif /* _FNONBLOCK */
 #  ifndef FNDELAY
 #   define FNDELAY 0
-#  endif
+#  endif /* FNDELAY */
+#  ifndef _FNDELAY
+#   define _FNDELAY 0
+#  endif /* _FNDELAY */
+#  ifndef FNDLEAY	/* Some linux versions have this typo */
+#   define FNDLEAY 0
+#  endif /* FNDLEAY */
 	if ((e = fcntl(fd, F_GETFL, 0)) == -1)
 	    return -1;
 
-	e &= ~(O_NDELAY|O_NONBLOCK|FNONBLOCK|FNBIO|FNONBIO|FNDELAY);
-
+	e &= ~(O_NDELAY|O_NONBLOCK|FNBIO|_FNBIO|FNONBIO|FNONBLOCK|_FNONBLOCK|
+	       FNDELAY|_FNDELAY|FNDLEAY);	/* whew! */
 	if (fcntl(fd, F_SETFL, e) == -1)
 	    return -1;
 	else 
