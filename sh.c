@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.101 2002/07/01 20:39:19 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.102 2002/07/01 21:00:56 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.101 2002/07/01 20:39:19 christos Exp $")
+RCSID("$Id: sh.c,v 3.102 2002/07/01 21:00:56 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -499,18 +499,20 @@ main(argc, argv)
     /*
      * Publish the selected echo style
      */
-#if ECHO_STYLE == NONE_ECHO
-    set(STRecho_style, Strsave(STRnone), VAR_READWRITE);
-#endif /* ECHO_STYLE == NONE_ECHO */
-#if ECHO_STYLE == BSD_ECHO
-    set(STRecho_style, Strsave(STRbsd), VAR_READWRITE);
-#endif /* ECHO_STYLE == BSD_ECHO */
-#if ECHO_STYLE == SYSV_ECHO
-    set(STRecho_style, Strsave(STRsysv), VAR_READWRITE);
-#endif /* ECHO_STYLE == SYSV_ECHO */
-#if ECHO_STYLE == BOTH_ECHO
-    set(STRecho_style, Strsave(STRboth), VAR_READWRITE);
-#endif /* ECHO_STYLE == BOTH_ECHO */
+#if ECHO_STYLE != BSD_ECHO
+    if (tcsh) {
+# if ECHO_STYLE == NONE_ECHO
+	set(STRecho_style, Strsave(STRnone), VAR_READWRITE);
+# endif /* ECHO_STYLE == NONE_ECHO */
+# if ECHO_STYLE == SYSV_ECHO
+	set(STRecho_style, Strsave(STRsysv), VAR_READWRITE);
+# endif /* ECHO_STYLE == SYSV_ECHO */
+# if ECHO_STYLE == BOTH_ECHO
+	set(STRecho_style, Strsave(STRboth), VAR_READWRITE);
+# endif /* ECHO_STYLE == BOTH_ECHO */
+    } else
+#endif /* ECHO_STYLE != BSD_ECHO */
+	set(STRecho_style, Strsave(STRbsd), VAR_READWRITE);
 
     /*
      * increment the shell level.

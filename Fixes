@@ -1,3 +1,4 @@
+ 34. If we are invoked as csh, default to bsd echo (Matej Vela)
  33. Don't close file descriptors too early because setuid scripts fail.
      (Jill Pryse-Davies)
  32. Completion updates (Tom Warzeka)
