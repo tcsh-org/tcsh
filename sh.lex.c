@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.lex.c,v 3.19 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.20 1992/05/15 23:49:22 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.19 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.20 1992/05/15 23:49:22 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -133,12 +133,20 @@ static Char getCtmp;
 #define	ungetC(c)	peekc = (Char) c
 #define	ungetD(c)	peekd = (Char) c
 
+/* Use Htime to store timestamps picked up from history file for enthist()
+ * if reading saved history (sg)
+ */
+time_t Htime = (time_t)0;
+static time_t a2time_t __P((Char *));
+
+
 int
 lex(hp)
     register struct wordent *hp;
 {
     register struct wordent *wdp;
     int     c;
+
 
     histvalid = 0;
     histlinep = histline;
@@ -186,6 +194,33 @@ lex(hp)
     return (hadhist);
 }
 
+static time_t
+a2time_t(word)
+    Char * word;
+{
+    /* Attempt to distinguish timestamps from other possible entries.
+     * Format: "+NNNNNNNNNN" (10 digits, left padded with ascii '0') */
+
+    register time_t ret;
+    register Char *s;
+    register int ct;
+
+    if (!word || *(s = word) != '+')
+	return (time_t)0;
+
+    for (++s, ret = 0, ct = 0; *s; ++s, ++ct)
+    {
+	if (!isdigit((unsigned char)*s))
+	    return (time_t)0;
+	ret = ret * 10 + (time_t)((unsigned char)*s - '0');
+    }
+
+    if (ct != 10)
+	return (time_t)0;
+
+    return ret;
+}
+
 void
 prlex(sp0)
     struct wordent *sp0;
@@ -193,7 +228,7 @@ prlex(sp0)
     register struct wordent *sp = sp0->next;
 
     for (;;) {
-	xprintf("%s", short2str(sp->word));
+	xprintf("%S", sp->word);
 	sp = sp->next;
 	if (sp == sp0)
 	    break;
@@ -246,6 +281,7 @@ word()
     register Char c, c1;
     register Char *wp;
     Char    wbuf[BUFSIZE];
+    Char    hbuf[12], h;
     register bool dolflg;
     register int i;
 
@@ -272,10 +308,15 @@ loop:
 	    if (intty)
 		break;
 	    c = 0;
+	    h = 0;
 	    do {
 		c1 = c;
 		c = getC(0);
+		if (h < 12)
+		    hbuf[h++] = c;
 	    } while (c != '\n');
+	    hbuf[11] = '\0';
+	    Htime = a2time_t(hbuf); 
 	    if (c1 == '\\')
 		goto loop;
 	    /*FALLTHROUGH*/
@@ -943,7 +984,7 @@ dosub(sc, en, global)
     if (didsub == 0)
 	seterror(ERR_MODFAIL);
     hp->prev = wdp;
-    return (&enthist(-1000, &lexi, 0)->Hlex);
+    return &enthist(-1000, &lexi, 0)->Hlex;
 }
 
 static Char *

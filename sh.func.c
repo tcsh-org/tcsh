@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.func.c,v 3.32 1992/05/15 21:54:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.33 1992/05/15 23:49:22 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.32 1992/05/15 21:54:34 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.33 1992/05/15 23:49:22 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -270,7 +270,7 @@ dologin(v, c)
     struct command *c;
 {
     islogin();
-    rechist();
+    rechist(NULL);
     (void) signal(SIGTERM, parterm);
     (void) execl(_PATH_LOGIN, "login", short2str(v[1]), NULL);
     untty();
@@ -1130,6 +1130,22 @@ done:
 	blkfree(gargv), gargv = 0;
 }
 
+/* check whether an environment variable should invoke 'set_locale()' */
+static bool islocale_var(var)
+register Char *var;
+{
+    static Char *locale_vars[] = {
+	STRLANG,	STRLC_CTYPE,	STRLC_NUMERIC,	STRLC_TIME,
+	STRLC_COLLATE,	STRLC_MESSAGES,	STRLC_MONETARY, 0
+    };
+    register Char **v;
+
+    for (v = locale_vars; *v; ++v)
+	if (eq(var, *v))
+	    return 1;
+    return 0;
+}
+
 /* from "Karl Berry." <karl%mote.umb.edu@relay.cs.net> -- for NeXT things
    (and anything else with a modern compiler) */
 
@@ -1152,7 +1168,7 @@ dosetenv(v, c)
 	    (void) sigrelse (SIGINT);
 #endif /* BSDSIGS */
 	for (ep = STR_environ; *ep; ep++)
-	    xprintf("%s\n", short2str(*ep));
+	    xprintf("%S\n", *ep);
 	return;
     }
     if ((lp = *v++) == 0)
@@ -1166,7 +1182,7 @@ dosetenv(v, c)
     else if (eq(vp, STRSYSTYPE))
 	dohash(NULL, NULL);
 #endif /* apollo */
-    else if (eq(vp, STRLANG) || eq(vp, STRLC_CTYPE)) {
+    else if (islocale_var(vp)) {
 #ifdef NLS
 	int     k;
 
@@ -1254,13 +1270,22 @@ dounsetenv(v, c)
 		if (!Gmatch(name, *v))
 		    continue;
 		maxi = 1;
+
+		/* Unset the name. This wasn't being done until
+		 * later but most of the stuff following won't
+		 * work (particularly the setlocale() and getenv()
+		 * stuff) as intended until the name is actually
+		 * removed. (sg)
+		 */
+		Unsetenv(name);
+
 		if (eq(name, STRNOREBIND))
 		    NoNLSRebind = 0;
 #ifdef apollo
 		else if (eq(name, STRSYSTYPE))
 		    dohash(NULL, NULL);
 #endif /* apollo */
-		else if (eq(name, STRLANG) || eq(name, STRLC_CTYPE)) {
+		else if (islocale_var(name)) {
 #ifdef NLS
 		    int     k;
 
@@ -1282,9 +1307,8 @@ dounsetenv(v, c)
 
 		}
 		/*
-		 * Delete name, and start again cause the environment changes
+		 * start again cause the environment changes
 		 */
-		Unsetenv(name);
 		break;
 	    }
     xfree((ptr_t) name); name = NULL;
@@ -1405,7 +1429,11 @@ doumask(v, c)
 #   define toset(a) ((a) + 1)
 #  endif /* aiws */
 # else /* BSDTIMES */
-   typedef int RLIM_TYPE;
+#  ifdef BSD4_4
+    typedef quad_t RLIM_TYPE;
+#  else
+    typedef int RLIM_TYPE;
+#  endif /* BSD4_4 */
 # endif /* BSDTIMES */
 
 
@@ -1853,7 +1881,7 @@ doeval(v, c)
 #ifndef FIOCLEX
     int     odidcch;
 #endif /* FIOCLEX */
-    jmp_buf osetexit;
+    jmp_buf_t osetexit;
     int     my_reenter;
     Char  **savegv;
     int     saveIN, saveOUT, saveDIAG;
@@ -1936,4 +1964,56 @@ doeval(v, c)
     resexit(osetexit);
     if (my_reenter)
 	stderror(ERR_SILENT);
+}
+
+/*************************************************************************/
+/* print list of builtin commands */
+
+/*ARGSUSED*/
+void
+dobuiltins(v, c)
+Char **v;
+struct command *c;
+{
+    /* would use print_by_column() in tw.parse.c but that assumes
+     * we have an array of Char * to pass.. (sg)
+     */
+    extern int Tty_raw_mode;
+    extern int TermH;		/* from the editor routines */
+    extern int lbuffed;		/* from sh.print.c */
+
+    register struct biltins *b;
+    register int row, col, columns, rows;
+    unsigned int w, maxwidth;
+
+    lbuffed = 0;		/* turn off line buffering */
+
+    /* find widest string */
+    for (maxwidth = 0, b = bfunc; b < &bfunc[nbfunc]; ++b)
+	maxwidth = max(maxwidth, strlen(b->bname));
+    ++maxwidth;					/* for space */
+
+    columns = (TermH + 1) / maxwidth;	/* PWP: terminal size change */
+    if (!columns)
+	columns = 1;
+    rows = (nbfunc + (columns - 1)) / columns;
+
+    for (b = bfunc, row = 0; row < rows; row++) {
+	for (col = 0; col < columns; col++) {
+	    if (b < &bfunc[nbfunc]) {
+		w = strlen(b->bname);
+		xprintf("%s", b->bname);
+		if (col < (columns - 1))	/* Not last column? */
+		    for (; w < maxwidth; w++)
+			xputchar(' ');
+		++b;
+	    }
+	}
+	if (Tty_raw_mode)
+	    xputchar('\r');
+	xputchar('\n');
+    }
+
+    lbuffed = 1;		/* turn back on line buffering */
+    flush();
 }

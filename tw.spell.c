@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tw.spell.c,v 3.6 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.spell.c,v 3.7 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tw.spell.c: Spell check words
  */
@@ -36,15 +36,15 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.spell.c,v 3.6 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: tw.spell.c,v 3.7 1992/03/27 01:59:46 christos Exp $")
 
 #include "tw.h"
 
 /* spell_me : return corrrectly spelled filename.  From K&P spname */
 int
-spell_me(oldname, oldsize, looking_for_cmd)
+spell_me(oldname, oldsize, looking)
     Char   *oldname;
-    int     oldsize, looking_for_cmd;
+    int     oldsize, looking;
 {
     /* The +1 is to fool hp's optimizer */
     Char    guess[FILSIZ + 1], newname[FILSIZ + 1];
@@ -84,8 +84,8 @@ spell_me(oldname, oldsize, looking_for_cmd)
 	 */
 	/* (*should* say "looking for directory" whenever '/' is next...) */
 	retval = t_search(guess, p, SPELL, FILSIZ,
-			  looking_for_cmd && (foundslash || *old != '/') ?
-			  TW_COMMAND : TW_ZERO, 1, STRNULL, 0);
+			  looking == TW_COMMAND && (foundslash || *old != '/') ?
+			  TW_COMMAND : looking, 1, STRNULL, 0);
 	if (retval >= 4 || retval < 0)
 	    return -1;		/* hopeless */
 	for (p = ws; (*new = *p++) != '\0'; new++)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.bind.c,v 3.7 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.bind.c,v 3.8 1992/04/10 16:38:09 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.7 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.8 1992/04/10 16:38:09 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -480,7 +480,7 @@ parsecmd(str)
 	    return fp->func;
 	}
     }
-    xprintf("Bad command name: %s\n", short2str(str));
+    xprintf("Bad command name: %S\n", str);
     return 0;
 }
 
@@ -555,7 +555,7 @@ parseescape(ptr)
 	    break;
 	}
     }
-    else if ((*p & CHAR) == '^') {
+    else if ((*p & CHAR) == '^' && Isalpha(p[1])) {
 	p++;
 	c = (*p == '?') ? '\177' : ((*p & CHAR) & 0237);
     }

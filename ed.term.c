@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/ed.term.c,v 1.8 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.term.c,v 1.9 1992/03/27 01:59:46 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.term.c,v 1.8 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.9 1992/03/27 01:59:46 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -677,7 +677,7 @@ tty_setty(fd, td)
 	return -1;
 #else
 # ifdef TERMIO
-    if (ioctl(fd, TCSETA,    (ioctl_t) &td->d_t) == -1)
+    if (ioctl(fd, TCSETAW,    (ioctl_t) &td->d_t) == -1)
 	return -1;
 # else
 #  ifdef TIOCSETN

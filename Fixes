@@ -1,4 +1,29 @@
-V6.02.00, ...
+V6.03.00, ...
+20. 6.02.01 6/16/92
+19. Fix automatic correction to work with the new completion.
+18. Globbing bug with brace expansion, when arguments need to be realloced...
+    e.g. echo 134{6,7}{0,1,2,3,4,5,6,7,8,9}{0,1,2,3,4,5,6,7,8,9}
+17. shift and left operators update variables correcly ('shift path' did not 
+    work)
+16. apollo fixes for cd.
+15. STRNULL <-> NULL bug fixes.
+14. %S in xprintf for short strings.
+13. history -LSc, dirs -LSc additions, builtins builtin [oxymoron]
+12. history formatting string, who formatting string, prompt formatting
+    all use tprintf() now.
+11. $history accepts a second formatting argument..
+10. History timestamps preserved in .history
+9.  Backquotes were broken: echo hi | cat > `echo foo`
+8.  SGI -t operator problem.
+7.  Dnix fixes.
+6.  Fix history file writing bug when autologout.
+5.  Change from TCSETA to TCSETAW, since we affect the output.
+4.  Per's fixes for display margin bugs.
+3.  Linux fixes.
+2.  Collapse adjacent stars in glob.c to avoid exponential behavior.
+1.  Fixed parseescape to put ^ literally if not followed by alpha.
+
+V6.02.00, 5/15/92
 94. Default echo_style was not being set correctly.
 93. $< did not work correctly with NLS chars.
 92. 6.01.15 (5/11/92)

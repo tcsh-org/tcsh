@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.h,v 3.34 1992/05/15 21:54:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.35 1992/05/15 23:49:22 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -221,16 +221,21 @@ extern int setpgrp();
  * redefines malloc(), so we define the following
  * to avoid it.
  */
-# define _GNU_STDLIB_H
-# define malloc __malloc
-# define free __free
-# define calloc __calloc
-# define realloc __realloc
-# include <stdlib.h>
-# undef malloc
-# undef free
-# undef calloc
-# undef realloc
+# ifdef linux
+#  define NO_FIX_MALLOC
+#  include <stdlib.h>
+# else /* linux */
+#  define _GNU_STDLIB_H
+#  define malloc __malloc
+#  define free __free
+#  define calloc __calloc
+#  define realloc __realloc
+#  include <stdlib.h>
+#  undef malloc
+#  undef free
+#  undef calloc
+#  undef realloc
+# endif /* linux */
 # include <limits.h>
 #endif /* POSIX */
 
@@ -243,11 +248,11 @@ extern int setpgrp();
 # endif /* !pyr && !stellar */
 #endif /* SYSVREL > 0 ||  _IBMR2 */
 
-#if !((defined(sun) || defined(_MINIX)) && defined(TERMIO))
+#if !((defined(sun) || defined(__sun__) || defined(_MINIX)) && defined(TERMIO))
 # include <sys/ioctl.h>
 #endif 
 
-#if !defined(FIOCLEX) && defined(sun)
+#if !defined(FIOCLEX) && (defined(sun) || defined(__sun__))
 # include <sys/filio.h>
 #endif /* !FIOCLEX && sun */
 
@@ -508,14 +513,29 @@ EXTERN int   OLDSTD;		/* Old standard input (def for cmds) */
  * Because of source commands and .cshrc we need nested error catches.
  */
 
-extern jmp_buf reslab;
+#ifdef NO_STRUCT_ASSIGNMENT
+
+typedef jmp_buf jmp_buf_t;
 
 /* bugfix by Jak Kirman @ Brown U.: remove the (void) cast here, see sh.c */
-#define	setexit()	(setjmp(reslab))
+#define	setexit()	setjmp(reslab)
 #define	reset()		longjmp(reslab, 1)
  /* Should use structure assignment here */
 #define	getexit(a)	copy((char *)(a), (char *)reslab, sizeof reslab)
 #define	resexit(a)	copy((char *)reslab, ((char *)(a)), sizeof reslab)
+
+#else
+
+typedef struct { jmp_buf j; } jmp_buf_t;
+
+#define	setexit()	setjmp(reslab.j)
+#define	reset()		longjmp(reslab.j, 1)
+#define	getexit(a)	((a) = reslab)
+#define	resexit(a)	(reslab = (a))
+
+#endif	/* NO_STRUCT_ASSIGNMENT */
+
+extern jmp_buf_t reslab;
 
 EXTERN Char   *gointr;		/* Label for an onintr transfer */
 
@@ -853,8 +873,10 @@ EXTERN Char    HISTSUB;		/* auto-substitute character */
 /*
  * To print system call errors...
  */
+#ifndef linux
 extern char *sys_errlist[];
 extern int errno, sys_nerr;
+#endif /* !linux */
 
 /*
  * strings.h:

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.exp.c,v 3.7 1992/03/21 22:34:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exp.c,v 3.8 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.7 1992/03/21 22:34:18 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.8 1992/03/27 01:59:46 christos Exp $")
 
 /*
  * C shell
@@ -531,16 +531,7 @@ exp6(vp, ignore)
 		break;
 
 	    case 't':	/* SGI extension, true when file is a tty */
-		{
-		    int fd;
-
-		    if ((fd = open(short2str(ep), O_RDONLY)) == -1)
-			i = 0;
-		    else {
-			i = isatty(fd);
-			(void) close(fd);
-		    }
-		}
+		i = isatty(atoi(short2str(ep)));
 		break;
 
 	    default:

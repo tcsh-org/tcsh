@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.inputl.c,v 3.21 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.21 1992/04/10 16:45:27 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.21 1992/04/10 16:38:09 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.21 1992/04/10 16:45:27 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -87,7 +87,7 @@ Inputl()
     if (GettingInput)
 	MacroLvl = -1;		/* editor was interrupted during input */
 
-#ifdef FIONREAD
+#if defined(FIONREAD) && !defined(linux) && !defined(OREO)
     if (!Tty_raw_mode && MacroLvl < 0) {
 	long    chrs = 0;
 
@@ -447,7 +447,7 @@ doeval1(v)
     Char   *oevalp;
     int     my_reenter;
     Char  **savegv;
-    jmp_buf osetexit;
+    jmp_buf_t osetexit;
 
     oevalvec = evalvec;
     oevalp = evalp;
@@ -531,7 +531,7 @@ GetNextCommand(cmdnum, ch)
 #ifdef	KANJI
 	if (!adrof(STRnokanji) && (*ch & META)) {
 	    MetaNext = 0;
-	    cmd = CcViMap[' '];
+	    cmd = F_INSERT;
 	    break;
 	}
 	else
@@ -607,9 +607,9 @@ GetNextChar(cp)
 	case EWOULDBLOCK:
 #endif /* EWOULDBLOCK */
 #if defined(POSIX) && defined(EAGAIN)
-# if defined(EWOULDBLOCK) && EAGAIN != EWOULDBLOCK
+# if !defined(EWOULDBLOCK) || EAGAIN != EWOULDBLOCK
 	case EAGAIN:
-# endif /* EWOULDBLOCK && EAGAIN != EWOULDBLOCK */
+# endif /* !EWOULDBLOCK || EAGAIN != EWOULDBLOCK */
 #endif /* POSIX && EAGAIN */
 #ifdef TRY_AGAIN
 	    if (!tried) {

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tc.who.c,v 3.11 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.who.c,v 3.12 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.11 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.12 1992/03/27 01:59:46 christos Exp $")
 
 #include "tc.h"
 
@@ -438,145 +438,102 @@ print_who(wp)
     struct who *wp;
 {
 #ifdef UTHOST
-    char   *cp = "%n has %a %l from %m.";
-    char   *ptr, flg;
+    Char   *cp = str2short("%n has %a %l from %m.");
 #else
-    char   *cp = "%n has %a %l.";
+    Char   *cp = str2short("%n has %a %l.");
 #endif /* UTHOST */
-
     struct varent *vp = adrof(STRwho);
-    struct tm *t;
-    char    ampm = 'a';
-    int     attributes = 0;
+    Char buf[BUFSIZE];
 
-    t = localtime(&wp->who_time);
     if (vp && vp->vec[0])
-	cp = short2str(vp->vec[0]);
+	cp = vp->vec[0];
 
-    for (; *cp; cp++)
-	if (*cp != '%')
-	    xputchar(*cp | attributes);
-	else
-	    switch (*++cp) {
-	    case 'n':		/* user name */
-		switch (wp->who_status & STMASK) {
-		case ONLINE:
-		case CHANGED:
-		    xprintf("%a%s", attributes, wp->who_new);
-		    break;
-		case OFFLINE:
-		    xprintf("%a%s", attributes, wp->who_name);
-		    break;
-		default:
-		    break;
-		}
-		break;
-	    case 'a':
-		switch (wp->who_status & STMASK) {
-		case ONLINE:
-		    xprintf("%a%s", attributes, "logged on");
-		    break;
-		case OFFLINE:
-		    xprintf("%a%s", attributes, "logged off");
-		    break;
-		case CHANGED:
-		    xprintf("%areplaced %s on", attributes, wp->who_name);
-		    break;
-		default:
-		    break;
-		}
-		break;
-	    case 'S':		/* start standout */
-		attributes |= STANDOUT;
-		break;
-	    case 'B':		/* start bold */
-		attributes |= BOLD;
-		break;
-	    case 'U':		/* start underline */
-		attributes |= UNDER;
-		break;
-	    case 's':		/* end standout */
-		attributes &= ~STANDOUT;
-		break;
-	    case 'b':		/* end bold */
-		attributes &= ~BOLD;
-		break;
-	    case 'u':		/* end underline */
-		attributes &= ~UNDER;
-		break;
-	    case 't':
-	    case 'T':
-	    case '@':
-		if (adrof(STRampm) || *cp != 'T') {
-		    int     hr = t->tm_hour;
-
-		    if (hr >= 12) {
-			if (hr > 12)
-			    hr -= 12;
-			ampm = 'p';
-		    }
-		    else if (hr == 0)
-			hr = 12;
-		    xprintf("%a%d:%02d%cm", attributes, hr, t->tm_min, ampm);
-		}
-		else
-		    xprintf("%a%d:%02d", attributes, t->tm_hour, t->tm_min);
-		break;
-	    case 'd':
-		xprintf("%a%02d", attributes, day_list[t->tm_wday]);
-		break;
-	    case 'D':
-		xprintf("%a%02d", attributes, t->tm_mday);
-		break;
-	    case 'w':
-		xprintf("%a%s", attributes, month_list[t->tm_mon]);
-		break;
-	    case 'W':
-		xprintf("%a%02d", attributes, t->tm_mon + 1);
-		break;
-	    case 'y':
-		xprintf("%a%02d", attributes, t->tm_year);
-		break;
-	    case 'Y':
-		xprintf("%a%04d", attributes, t->tm_year + 1900);
-		break;
-	    case 'l':
-		xprintf("%a%s", attributes, wp->who_tty);
-		break;
-#ifdef UTHOST
-	    case 'm':
-		if (wp->who_host[0] == '\0')
-		    xprintf("%alocal", attributes);
-		else
-		    /* the ':' stuff is for <host>:<display>.<screen> */
-		    for (ptr = wp->who_host, flg = Isdigit(*ptr) ? '\0' : '.';
-			 *ptr != '\0' &&
-			 (*ptr != flg || ((ptr = strchr(ptr, ':')) != 0));
-			 ptr++) {
-			if (*ptr == ':')
-			    flg = '\0';
-			xputchar((int)
-				 ((Isupper(*ptr) ? Tolower(*ptr) : *ptr) |
-				  attributes));
-		    }
-		break;
-	    case 'M':
-		if (wp->who_host[0] == '\0')
-		    xprintf("%alocal", attributes);
-		else
-		    for (ptr = wp->who_host; *ptr != '\0'; ptr++)
-			xputchar((int)
-				 ((Isupper(*ptr) ? Tolower(*ptr) : *ptr) |
-				  attributes));
-		break;
-#endif /* UTHOST */
-	    default:
-		xputchar('%' | attributes);
-		xputchar(*cp | attributes);
-		break;
-	    }
+    tprintf(FMT_WHO, buf, cp, BUFSIZE, NULL, wp->who_time, (ptr_t) wp);
+    for (cp = buf; *cp;)
+	xputchar(*cp++);
     xputchar('\n');
 } /* end print_who */
+
+
+char *
+who_info(ptr, c, wbuf)
+    ptr_t ptr;
+    int c;
+    char *wbuf;
+{
+    struct who *wp = (struct who *) ptr;
+    char *wb = wbuf;
+    int flg;
+    char *pb;
+
+    switch (c) {
+    case 'n':		/* user name */
+	switch (wp->who_status & STMASK) {
+	case ONLINE:
+	case CHANGED:
+	    return wp->who_new;
+	case OFFLINE:
+	    return wp->who_name;
+	default:
+	    break;
+	}
+	break;
+
+    case 'a':
+	switch (wp->who_status & STMASK) {
+	case ONLINE:
+	    return "logged on";
+	case OFFLINE:
+	    return "logged off";
+	case CHANGED:
+	    xsprintf(wbuf, "replaced %s on", wp->who_name);
+	    return wbuf;
+	default:
+	    break;
+	}
+	break;
+
+#ifdef UTHOST
+    case 'm':
+	if (wp->who_host[0] == '\0')
+	    return "local";
+	else
+	    /* the ':' stuff is for <host>:<display>.<screen> */
+	    for (pb = wp->who_host, flg = Isdigit(*pb) ? '\0' : '.';
+		 *pb != '\0' &&
+		 (*pb != flg || ((pb = strchr(pb, ':')) != 0));
+		 pb++) {
+		if (*pb == ':')
+		    flg = '\0';
+		*wb++ = Isupper(*pb) ? Tolower(*pb) : *pb;
+	    }
+	    *wb = '\0';
+	    return wbuf;
+	break;
+
+    case 'M':
+	if (wp->who_host[0] == '\0')
+	    return "local";
+	else {
+	    for (pb = wp->who_host; *pb != '\0'; pb++)
+		*wb++ = Isupper(*pb) ? Tolower(*pb) : *pb;
+	    *wb = '\0';
+	    return wbuf;
+	}
+	break;
+#endif /* UTHOST */
+
+    case 'l':
+	return wp->who_tty;
+
+    default:
+	wbuf[0] = '%';
+	wbuf[1] = c;
+	wbuf[2] = '\0';
+	return wbuf;
+    }
+    return NULL;
+}
 
 void
 /*ARGSUSED*/

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.alloc.c,v 3.11 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.alloc.c,v 3.12 1992/05/02 23:39:58 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.11 1992/04/03 22:15:14 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.12 1992/05/02 23:39:58 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -111,10 +111,6 @@ union overhead {
  */
 #define	NBUCKETS ((sizeof(long) << 3) - 3)
 static union overhead *nextf[NBUCKETS];
-
-#ifdef sun
-extern ptr_t sbrk __P((int));
-#endif
 
 /*
  * nmalloc[i] is the difference between the number of mallocs and frees

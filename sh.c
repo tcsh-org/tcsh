@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.c,v 3.28 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.29 1992/05/09 04:03:53 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.28 1992/04/10 16:38:09 christos Exp $")
+RCSID("$Id: sh.c,v 3.29 1992/05/09 04:03:53 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -82,19 +82,12 @@ extern bool NoNLSRebind;
  * ported to Apple Unix (TM) (OREO)  26 -- 29 Jun 1987
  */
 
-jmp_buf reslab;
+jmp_buf_t reslab;
 
 #ifdef TESLA
 int do_logout;
 #endif				/* TESLA */
 
-static Char   *dumphist[] = {STRhistory, STRmh, 0, 0};
-static Char   *loadhist[] = {STRsource, STRmh, STRtildothist, 0};
-
-#ifdef CSHDIRS
-static Char   *loaddirs[] = {STRsource, STRdirfile, 0};
-static bool    dflag = 0;
-#endif
 
 #if defined(convex) || defined(__convex__)
 bool    use_fork = 0;		/* use fork() instead of vfork()? */
@@ -230,8 +223,10 @@ main(argc, argv)
 	*++tcp = '-';
 	argc--;
     }
-    if (loginsh)
+    if (loginsh) {
 	(void) time(&chktim);
+	set(STRloginsh, Strsave(STRNULL));
+    }
 
     AsciiOnly = 1;
     NoNLSRebind = getenv("NOREBIND") != NULL;
@@ -357,7 +352,7 @@ main(argc, argv)
 	    }
 	}
     }
-#endif				/* AUTOLOGOUT */
+#endif /* AUTOLOGOUT */
 
     (void) sigset(SIGALRM, alrmcatch);
 
@@ -454,12 +449,12 @@ main(argc, argv)
     /*
      * HOSTTYPE, too. Just set it again.
      */
-    Setenv(STRHOSTTYPE, gethosttype());
+    Setenv(STRHOSTTYPE, str2short(gethosttype()));
 #ifdef apollo
     if ((tcp = getenv("SYSTYPE")) == NULL)
 	tcp = "bsd4.3";
     Setenv(STRSYSTYPE, str2short(tcp));
-#endif				/* apollo */
+#endif /* apollo */
 
     /*
      * set editing on by default, unless running under Emacs as an inferior
@@ -500,9 +495,33 @@ main(argc, argv)
     if ((tcp = getenv("PATH")) == NULL)
 	set1(STRpath, defaultpath(), &shvhed);
     else
-	importpath(SAVE(tcp));
+	/* Importpath() allocates memory for the path, and the
+	 * returned pointer from SAVE() was discarded, so
+	 * this was a memory leak.. (sg)
+	 *
+	 * importpath(SAVE(tcp));
+	 */
+	importpath(str2short(tcp));
 
-    set(STRshell, Strsave(STR_SHELLPATH));
+
+    {
+	/* If the SHELL environment variable ends with "tcsh", set
+	 * STRshell to the same path.  This is to facilitate using
+	 * the executable in environments where the compiled-in
+	 * default isn't appropriate (sg).
+	 */
+
+	int sh_len;
+
+	if ((tcp = getenv("SHELL")) != (char *)0 &&
+	    (sh_len = strlen(tcp)) >= 5 &&
+	    strcmp(tcp + (sh_len - 5), "/tcsh") == 0)
+	{
+	    set(STRshell, SAVE(tcp));
+	}
+	else
+	    set(STRshell, Strsave(STR_SHELLPATH));
+    }
 
     doldol = putn((int) getpid());	/* For $$ */
     shtemp = Strspl(STRtmpsh, doldol);	/* For << */
@@ -524,22 +543,28 @@ main(argc, argv)
     (void) sigset(SIGINT, parintr);	/* ... restore */
     parterm = signal(SIGTERM, SIG_IGN);	/* parents terminability */
     (void) sigset(SIGTERM, parterm);	/* ... restore */
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
 
+    /* No reason I can see not to save history on all these events..
+     * Most usual occurrence is in a window system, where we're not a login
+     * shell, but might as well be... (sg)
+     * But there might be races when lots of shells exit together...
+     * [this is also incompatible].
+     */
     if (loginsh) {
 	(void) signal(SIGHUP, phup);	/* exit processing on HUP */
 #ifdef SIGXCPU
 	(void) signal(SIGXCPU, phup);	/* ...and on XCPU */
-#endif				/* SIGXCPU */
+#endif
 #ifdef SIGXFSZ
 	(void) signal(SIGXFSZ, phup);	/* ...and on XFSZ */
-#endif				/* SIGXFSZ */
+#endif
     }
 
 #ifdef TCF
     /* Enable process migration on ourselves and our progeny */
     (void) signal(SIGMIGRATE, SIG_DFL);
-#endif				/* TCF */
+#endif /* TCF */
 
     /*
      * Process the arguments.
@@ -547,9 +572,9 @@ main(argc, argv)
      * Note that processing of -v/-x is actually delayed till after script
      * processing.
      * 
-     * We set the first character of our name to be '-' if we are a shell running
-     * interruptible commands.  Many programs which examine ps'es use this to
-     * filter such shells out.
+     * We set the first character of our name to be '-' if we are a shell 
+     * running interruptible commands.  Many programs which examine ps'es 
+     * use this to filter such shells out.
      */
     argc--, tempv++;
     while (argc > 0 && (tcp = tempv[0])[0] == '-' &&
@@ -621,13 +646,6 @@ main(argc, argv)
 		*tcp = '\0'; 	/* done with this argument */
 		break;
 #endif /* apollo */
-
-#ifdef CSHDIRS
-	    case 'd':		/* -d   Force load of ~/.cshdirs */
-		dflag++;
-		break;
-#endif
-
 
 	    case 'e':		/* -e	Exit on any error */
 		exiterr = 1;
@@ -991,37 +1009,17 @@ main(argc, argv)
 
 	if (!fast && !arginp && !onelflg && !havhash)
 	    dohash(NULL,NULL);
+
 	/*
 	 * Source history before .login so that it is available in .login
 	 */
-	if ((cp = value(STRhistfile)) != STRNULL)
-	    loadhist[2] = cp;
-	dosource(loadhist, NULL);
+	loadhist(NULL);
 #ifndef LOGINFIRST
 	if (loginsh)
 	    (void) srccat(value(STRhome), STRsldotlogin);
 #endif
-#ifdef CSHDIRS
-	/*
-	 * if dflag then source ~/.cshdirs, but if fast ALWAYS skip the dirs
-	 * restoring. (dflag used to get non-login shells to source the save
-	 * dirs file). Of course, ~/.cshdirs must exist. -strike
-	 */
-	{
-	    extern int bequiet;	/* make dirs shut up */
-	    Char    cshd[BUFSIZE];
-	    struct stat st;
-
-	    (void) Strcpy(cshd, value(STRhome));
-	    (void) Strcat(cshd, STRsldtdirs);
-	    if (!stat(short2str(cshd), &st) &&
-		(dflag || loginsh) && !fast) {
-		bequiet = 1;
-		dosource(loaddirs, NULL);
-		bequiet = 0;
-	    }
-	}
-#endif
+	if (!fast)
+	    loaddirs(NULL);
     }
     /* Initing AFTER .cshrc is the Right Way */
     if (intty && !arginp) {	/* PWP setup stuff */
@@ -1064,13 +1062,8 @@ main(argc, argv)
 	    xprintf("exit\n");
 	}
     }
-#ifdef CSHDIRS
-    /*
-     * save the directory stack -strike
-     */
-    recdirs();
-#endif
-    rechist();
+    recdirs(NULL);
+    rechist(NULL);
     exitstat();
     return (0);
 }
@@ -1204,7 +1197,7 @@ srcunit(unit, onlyown, hflg, av)
 #ifdef BSDSIGS
     volatile sigmask_t omask = (sigmask_t) 0;
 #endif
-    jmp_buf oldexit;
+    jmp_buf_t oldexit;
 
     /* The (few) real local variables */
     int     my_reenter;
@@ -1252,7 +1245,12 @@ srcunit(unit, onlyown, hflg, av)
      * compiler-dependant code here) PWP: THANKS LOTS !!!
      */
     /* Setup the new values of the state stuff saved above */
+
+#ifdef NO_STRUCT_ASSIGNMENT
     copy((char *) &(saveB), (char *) &B, sizeof(B));
+#else
+    saveB = B;
+#endif
     fbuf = NULL;
     fseekp = feobp = fblocks = 0;
     oSHIN = SHIN, SHIN = unit, arginp = 0, onelflg = 0;
@@ -1317,8 +1315,11 @@ srcunit(unit, onlyown, hflg, av)
 	xfree((ptr_t) fbuf);
 
 	/* Reset input arena */
+#ifdef NO_STRUCT_ASSIGNMENT
 	copy((char *) &B, (char *) &(saveB), sizeof(B));
-
+#else
+	B = saveB;
+#endif
 	(void) close(SHIN), SHIN = oSHIN;
 	arginp = oarginp, onelflg = oonelflg;
 	evalp = oevalp, evalvec = oevalvec;
@@ -1345,49 +1346,6 @@ srcunit(unit, onlyown, hflg, av)
     insource = oinsource;
 }
 
-void
-rechist()
-{
-    Char    buf[BUFSIZE], hbuf[BUFSIZE], *hfile;
-    int     fp, ftmp, oldidfds;
-    struct  varent *shist;
-
-    if (!fast) {
-	/*
-	 * If $savehist is just set, we use the value of $history
-	 * else we use the value in $savehist
-	 */
-	if ((shist = adrof(STRsavehist)) != NULL) {
-	    if (shist->vec[0][0] != '\0')
-		(void) Strcpy(hbuf, shist->vec[0]);
-	    else if ((shist = adrof(STRhistory)) != 0 && 
-		     shist->vec[0][0] != '\0')
-		(void) Strcpy(hbuf, shist->vec[0]);
-	    else
-		return;
-	}
-	else
-	    return;
-
-	if ((hfile = value(STRhistfile)) == STRNULL) {
-	    hfile = Strcpy(buf, value(STRhome));
-	    (void) Strcat(buf, STRsldthist);
-	}
-
-	fp = creat(short2str(hfile), 0600);
-	if (fp == -1) 
-	    return;
-	oldidfds = didfds;
-	didfds = 0;
-	ftmp = SHOUT;
-	SHOUT = fp;
-	dumphist[2] = hbuf;
-	dohist(dumphist, NULL);
-	(void) close(fp);
-	SHOUT = ftmp;
-	didfds = oldidfds;
-    }
-}
 
 /*ARGSUSED*/
 void
@@ -1395,11 +1353,8 @@ goodbye(v, c)
     Char **v;
     struct command *c;
 {
-    rechist();
-
-#ifdef CSHDIRS
-    recdirs();
-#endif
+    rechist(NULL);
+    recdirs(NULL);
 
     if (loginsh) {
 	(void) signal(SIGQUIT, SIG_IGN);
@@ -1415,7 +1370,7 @@ goodbye(v, c)
 	    (void) srccat(value(STRhome), STRsldtlogout);
 #ifdef TESLA
 	do_logout = 1;
-#endif				/* TESLA */
+#endif /* TESLA */
     }
     exitstat();
 }
@@ -1460,13 +1415,8 @@ int snum;
     if (snum)
 	(void) sigset(snum, SIG_IGN);
 #endif /* UNRELSIGS */
-    rechist();
-#ifdef CSHDIRS
-    /*
-     * save the directory stack on HUP - strike
-     */
-    recdirs();
-#endif
+    rechist(NULL);
+    recdirs(NULL);
     xexit(snum);
 #ifndef SIGVOID
     return (snum);
@@ -1593,7 +1543,7 @@ process(catch)
     bool    catch;
 {
     extern char Expand;
-    jmp_buf osetexit;
+    jmp_buf_t osetexit;
     /* PWP: This might get nuked my longjmp so don't make it a register var */
     struct command *t = savet;
 
@@ -1602,6 +1552,18 @@ process(catch)
     for (;;) {
 
 	pendjob();
+
+	/* This was leaking memory badly, particularly when sourcing
+	 * files, etc.. For whatever reason we were arriving here with
+	 * allocated pointers still active, and the code was simply
+	 * overwriting them.  I can't say I fully understand the
+	 * control flow here, but according to Purify this particular
+	 * leak has been plugged, and I haven't noticed any ill
+	 * effects.. (sg)
+	 */
+	if (paraml.next && paraml.next != &paraml)
+	    freelex(&paraml);
+
 	paraml.next = paraml.prev = &paraml;
 	paraml.word = STRNULL;
 	(void) setexit();
@@ -1784,6 +1746,7 @@ dosource(t, c)
 {
     register Char *f;
     bool    hflg = 0;
+    extern int bequiet;
     char    buf[BUFSIZE];
 
     t++;
@@ -1795,7 +1758,7 @@ dosource(t, c)
     f = globone(*t++, G_ERROR);
     (void) strcpy(buf, short2str(f));
     xfree((ptr_t) f);
-    if ((!srcfile(buf, 0, hflg, t)) && (!hflg))
+    if ((!srcfile(buf, 0, hflg, t)) && (!hflg) && (!bequiet))
 	stderror(ERR_SYSTEM, buf, strerror(errno));
 }
 
@@ -1844,8 +1807,7 @@ mailchk()
 	if (cnt == 1)
 	    xprintf("You have %smail.\n", new ? "new " : "");
 	else
-	    xprintf("%s in %s.\n", new ? "New mail" : "Mail",
-		    short2str(*vp));
+	    xprintf("%s in %S.\n", new ? "New mail" : "Mail", *vp);
     }
     chktim = t;
 }
@@ -1866,7 +1828,7 @@ gethdir(home)
      * Is it us?
      */
     if (*home == '\0') {
-	if ((h = value(STRhome)) != NULL) {
+	if ((h = value(STRhome)) != STRNULL) {
 	    (void) Strcpy(home, h);
 	    return 0;
 	}

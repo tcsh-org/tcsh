@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.exec.c,v 3.15 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exec.c,v 3.16 1992/05/09 04:03:53 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.15 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.16 1992/05/09 04:03:53 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -469,7 +469,7 @@ execash(t, kp)
     int     oSHOUT;
     int     oSHDIAG;
     int     oOLDSTD;
-    jmp_buf osetexit;
+    jmp_buf_t osetexit;
     int	    my_reenter;
     int     odidfds;
 #ifndef FIOCLEX
@@ -483,7 +483,7 @@ execash(t, kp)
      * Hmm, we don't really want to do that now because we might
      * fail, but what is the choice
      */
-    rechist();
+    rechist(NULL);
 
 
     osigint  = signal(SIGINT, parintr);
@@ -843,7 +843,7 @@ tellmewhat(lex)
 	if (eq(sp->word, str2short(bptr->bname))) {
 	    if (aliased)
 		prlex(lex);
-	    xprintf("%s: shell built-in command.\n", short2str(sp->word));
+	    xprintf("%S: shell built-in command.\n", sp->word);
 	    flush();
 	    sp->word = s0;	/* we save and then restore this */
 	    return;
@@ -883,7 +883,7 @@ tellmewhat(lex)
     else {
 	if (aliased)
 	    prlex(lex);
-	xprintf("%s: Command not found.\n", short2str(sp->word));
+	xprintf("%S: Command not found.\n", sp->word);
 	flush();
     }
     sp->word = s0;		/* we save and then restore this */
@@ -927,7 +927,7 @@ find_cmd(cmd, prt)
 
     if (prt && adrof1(cmd, &aliases)) {
 	if ((var = adrof1(cmd, &aliases)) != NULL) {
-	    xprintf("%s is aliased to ", short2str(cmd));
+	    xprintf("%S is aliased to ", cmd);
 	    blkpr(var->vec);
 	    xputchar('\n');
 	    rval = 1;
@@ -940,7 +940,7 @@ find_cmd(cmd, prt)
 	if (eq(cmd, str2short(bptr->bname))) {
 	    rval = 1;
 	    if (prt)
-		xprintf("%s is a shell built-in\n", short2str(cmd));
+		xprintf("%S is a shell built-in\n", cmd);
 	    else
 		return 1;
 	}
@@ -975,8 +975,8 @@ find_cmd(cmd, prt)
 	if (ex) {
 	    rval = 1;
 	    if (prt) {
-		xprintf("%s/",short2str(*pv));
-		xprintf("%s\n",short2str(cmd));
+		xprintf("%S/", *pv);
+		xprintf("%S\n", cmd);
 	    }
 	    else
 		return 1;

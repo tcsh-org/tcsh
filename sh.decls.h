@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.decls.h,v 3.10 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.decls.h,v 3.11 1992/05/02 23:39:58 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -49,7 +49,6 @@ extern	void		  initdesc	__P((void));
 extern	sigret_t	  pintr		__P((int));
 extern	void		  pintr1	__P((bool));
 extern	void		  process	__P((bool));
-extern	void		  rechist	__P((void));
 extern	void		  untty		__P((void));
 #ifdef PROF
 extern	void		  done		__P((int));
@@ -71,9 +70,8 @@ extern	void		  dopushd	__P((Char **, struct command *));
 extern	void		  dopopd	__P((Char **, struct command *));
 extern	void		  dfree		__P((struct directory *));
 extern	int		  getstakd	__P((Char *, int));
-#ifdef	CSHDIRS
-extern	void		  recdirs	__P((void));
-#endif
+extern	void		  recdirs	__P((Char *));
+extern	void		  loaddirs	__P((Char *));
 
 /*
  * sh.dol.c
@@ -160,6 +158,7 @@ extern	void		  prvars	__P((void));
 extern	int		  srchx		__P((Char *));
 extern	void		  unalias	__P((Char **, struct command *));
 extern	void		  wfree		__P((void));
+extern	void		  dobuiltins	__P((Char **, struct command *));
 
 /*
  * sh.glob.c
@@ -183,8 +182,11 @@ extern	int		  sortscmp	__P((Char **, Char **));
  * sh.hist.c
  */
 extern	void	 	  dohist	__P((Char **, struct command *));
-extern struct Hist 	 *enthist	__P((int, struct wordent *, bool));
+extern  struct Hist 	 *enthist	__P((int, struct wordent *, bool));
 extern	void	 	  savehist	__P((struct wordent *));
+extern	void		  fmthist	__P((int, ptr_t, char *));
+extern	void		  rechist	__P((Char *));
+extern	void		  loadhist	__P((Char *));
 
 
 /*
@@ -296,6 +298,7 @@ extern	void		  prestjob	__P((void));
 extern	void		  psavejob	__P((void));
 extern	void		  pstart	__P((struct process *, int));
 extern	void		  pwait		__P((void));
+extern  struct process   *pfind		__P((Char *));
 
 /*
  * sh.sem.c

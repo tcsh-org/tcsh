@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.time.c,v 3.6 1992/02/21 23:16:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.time.c,v 3.7 1992/04/03 22:15:14 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,9 +36,9 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.6 1992/02/21 23:16:20 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.7 1992/04/03 22:15:14 christos Exp $")
 
-#if defined(sun) && ! defined(MACH)
+#if (defined(sun) || defined(__sun__)) && ! defined(MACH)
 # include <machine/param.h>
 #endif /* sun */
 
@@ -233,18 +233,22 @@ ruadd(ru, ru2)
 #ifndef PGSHIFT
 # define pagetok(size)   ((size) << 1)
 #else
-# if PGSHIFT>10
+#ifdef __alpha__	/* PGSHIFT is a variable, so can't ifdef on it */
+#define pagetok(size)   ((size) << (PGSHIFT - LOG1024))
+#else
+#if PGSHIFT>10
 #  define pagetok(size)   ((size) << (PGSHIFT - LOG1024))
 # else
 #  define pagetok(size)   ((size) >> (LOG1024 - PGSHIFT))
 # endif
+#endif
 #endif
 
 /*
  * if any other machines return wierd values in the ru_i* stuff, put
  * the adjusting macro here:
  */
-#ifdef sun
+#if defined(sun) || defined(__sun__)
 # define IADJUST(i)	(pagetok(i)/2)
 #else /* sun */
 # define IADJUST(i)	(i)
@@ -428,7 +432,7 @@ prusage(bs, es, e, b)
 		break;
 
 	    case 'M':		/* max. Resident Set Size */
-#ifdef sun
+#if defined(sun) || defined(__sun__)
 # ifdef notdef
 		xprintf("%ld", r1->ru_maxrss * 1024L/(long) getpagesize());
 # endif

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.func.c,v 3.28 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.func.c,v 3.29 1992/04/10 16:38:09 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.28 1992/04/03 22:15:14 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.29 1992/04/10 16:38:09 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -288,7 +288,7 @@ dolist(v, c)
 			xputchar('\n');
 		    print_by_column(STRNULL, &v[i], k - i, FALSE);
 		}
-		xprintf("%s: %s.\n", short2str(tmp), strerror(errno));
+		xprintf("%S: %s.\n", tmp, strerror(errno));
 		i = k + 1;
 	    }
 	    else if (S_ISDIR(st.st_mode)) {
@@ -301,7 +301,7 @@ dolist(v, c)
 		}
 		if (k != 0 && v[1] != NULL)
 		    xputchar('\n');
-		xprintf("%s:\n", short2str(tmp));
+		xprintf("%S:\n", tmp);
 		for (cp = tmp, dp = buf; *cp; *dp++ = (*cp++ | QUOTE))
 		    continue;
 		if (dp[-1] != (Char) ('/' | QUOTE))
@@ -401,7 +401,7 @@ dowhich(v, c)
 
     while (*++v) {
 	if ((vp = adrof1(*v, &aliases)) != NULL) {
-	    xprintf("%s: \t aliased to ", short2str(*v));
+	    xprintf("%S: \t aliased to ", *v);
 	    blkpr(vp->vec);
 	    xputchar('\n');
 	}
@@ -471,7 +471,7 @@ fg_proc_entry(pp)
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif
-    jmp_buf osetexit;
+    jmp_buf_t osetexit;
     bool    ohaderr;
     bool    oGettingInput;
 
@@ -639,6 +639,7 @@ auto_logout()
 #ifdef TESLA
     do_logout = 1;
 #endif /* TESLA */
+    GettingInput = FALSE; /* make flush() work to write hist files. Huber*/
     goodbye(NULL, NULL);
 }
 
@@ -786,7 +787,7 @@ period_cmd()
     periodic_active = 1;
     if (!whyles && adrof1(STRperiodic, &aliases)) {
 	vp = value(STRtperiod);
-	if (vp == NULL)
+	if (vp == STRNULL)
 	    return;
 	interval = getn(vp);
 	(void) time(&t);
@@ -816,7 +817,7 @@ aliasrun(cnt, s1, s2)
 {
     struct wordent w, *new1, *new2;	/* for holding alias name */
     struct command *t = NULL;
-    jmp_buf osetexit;
+    jmp_buf_t osetexit;
 
     getexit(osetexit);
     if (seterr) {
@@ -1019,7 +1020,7 @@ rmstar(cp)
     if (*tag) {
 	xprintf("command line now is:\n");
 	for (we = cp->next; we != cp; we = we->next)
-	    xprintf("%s ", short2str(we->word));
+	    xprintf("%S ", we->word);
     }
 #endif /* RMDEBUG */
     return;
@@ -1094,8 +1095,7 @@ continue_jobs(cp)
     if (*tag) {
 	xprintf("command line now is:\n");
 	for (we = cp->next; we != cp; we = we->next)
-	    xprintf("%s ",
-		    short2str(we->word));
+	    xprintf("%S ", we->word);
     }
 #endif /* CNDEBUG */
     return;
@@ -1391,7 +1391,7 @@ getusername(hm)
 	tcache = NULL;
 	return NULL;
     }
-    if (((h = value(STRhome)) != NULL) &&
+    if (((h = value(STRhome)) != STRNULL) &&
 	(Strncmp(p = *hm, h, j = Strlen(h)) == 0) &&
 	(p[j] == '/' || p[j] == '\0')) {
 	*hm = &p[j];
@@ -1418,7 +1418,7 @@ doaliases(v, c)
     Char  **v;
     struct command *c;
 {
-    jmp_buf oldexit;
+    jmp_buf_t oldexit;
     Char  **vec, *lp;
     int     fd;
     Char    buf[BUFSIZE], line[BUFSIZE];

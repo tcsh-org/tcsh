@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.31 1992/05/15 21:54:34 christos Exp $
+# $Id: Makefile,v 1.32 1992/05/15 23:49:22 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -10,6 +10,8 @@
 SHELL=/bin/sh
 VERSION=6.02
 BUILD=tcsh
+#BUILD=shared	# Build tcsh.a and link it with shared libraries (linux)
+#BUILD=static	# Build tcsh.a and link it with static libraries (linux)
 
 ################################################################
 ## CFLAGS.  For various -D things, see config.h
@@ -43,13 +45,13 @@ LFLAGS=$(INCLUDES)
 
 # gcc 2.0
 # On the sparc, don't use -O2; it breaks setjmp() and vfork()
-CFLAGS=-O $(INCLUDES)
+#CFLAGS=-O $(INCLUDES)
 
 # gcc-2.1
 CFLAGS=-O2 $(INCLUDES)
 
-# gcc 2.0+ on linux
-#CFLAGS=-O6 $(INCLUDES) -finline-functions -fstrength-reduce
+# gcc 2.1 on linux
+#CFLAGS=-O6 $(INCLUDES)
 
 #hpux 8.0
 #CFLAGS= $(INCLUDES) +O3 -Aa
@@ -77,6 +79,9 @@ CFLAGS=-O2 $(INCLUDES)
 # Stardent Stellar or sunos4 w/o gcc
 #CFLAGS = $(INCLUDES) -O4
 
+# Dnix 5.3
+#CFLAGS = -O -X7
+
 # Apollo's with cc [apollo builtins don't work with gcc]
 # and apollo should not define __STDC__ if it does not have
 # the standard header files. RT's (aos4.3) need that too;
@@ -94,8 +99,7 @@ DFLAGS=
 ################################################################
 ## LDLAGS.  Define something here if you need to
 ################################################################
-LDFLAGS= 			## The simplest, suitable for all.
-#LDFLAGS= -static -s		## Stripped. No shared libs. (linux)
+#LDFLAGS= 			## The simplest, suitable for all.
 #LDFLAGS= -s			## Stripped. Takes less space on disk.
 #LDFLAGS= -s -n			## Pure executable. Spares paging over
 # 				## the network for machines with local
@@ -122,7 +126,8 @@ LIBES= -ltermcap		## BSD style things, hpux
 #LIBES= -lcurses		## For aix on the rt
 #LIBES= -lcurses -lcposix	## ISC 2.2 
 #LIBES= -lcposix -lc_s -lcurses -linet ## ISC 2.2 with networking
-#LIBES= -lcurses -linet -lc_s   ## ISC 2.0.2 with networking
+#LIBES= -lcurses -linet -lsec -lc_s  ## ISC 2.0.2 with networking
+#LIBES= -lcurses -lsec -lc_s    ## ISC 2.0.2 without networking
 #LIBES= -ltermcap -ldir -lx	## Xenix 386 style things
 #LIBES= -lcurses -lintl		## SCO SysVR3.2v2.0
 #LIBES= -lcurses -lintl -lsocket ## SCO+ODT1.1
@@ -146,7 +151,7 @@ LIBES= -ltermcap		## BSD style things, hpux
 # If you want to take out -traditional, make sure that your sys/ioctl.h
 # is fixed correctly, otherwise you'll be stopped for tty input, or you
 # will lose the editor and job control.
-CC=	gcc -Wall 
+CC=	gcc -Wall -ansi -pedantic 
 #CC=	cc
 #CC=	occ
 #CC=	acc
@@ -167,8 +172,9 @@ DESTDIR=/usr/local
 MANSECT=1
 DESTBIN=${DESTDIR}/bin
 DESTMAN=${DESTDIR}/man/man${MANSECT}
+# DESTMAN=${DESTDIR}/catman/man${MANSECT}	 # A/UX
 # DESTMAN=${DESTDIR}/usr/share/man/man${MANSECT} # Stardent Vistra (SysVR4)
-# DESTMAN=/usr/catman/1l	# Amiga unix (SysVR4)
+# DESTMAN=/usr/catman/1l			 # Amiga unix (SysVR4)
 FTPAREA=/usr/spool/ftp
 
 ASSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
@@ -224,6 +230,16 @@ all: ${BUILD}
 tcsh:$(P) ${OBJS} 
 	rm -f tcsh core
 	${CC} ${LDFLAGS} ${CFLAGS} ${OBJS} -o tcsh ${LIBES}
+
+# Linux distribution
+shared: tcsh.a
+	${CC} ${LDFLAGS} ${CFLAGS} -o tcsh tcsh.a ${LIBES}
+
+static: tcsh.a
+	${CC} ${LDFLAGS} -static ${CFLAGS} -o tcsh tcsh.a ${LIBES}
+
+tcsh.a:$(P) ${OBJS}
+	$(LD) -x -r -o tcsh.a ${OBJS}
 
 tcsh.ps: tcsh.1
 	rm -f tcsh.ps
@@ -336,8 +352,14 @@ manpage: tcsh.man
 #	cp tcsh.man.Z ${DESTMAN}/tcsh.Z
 #	chmod 444 ${DESTMAN}/tcsh.Z
 
+# Apple A/UX
+#manpage: tcsh.man
+#	-rm -f ${DESTMAN}/tcsh.${MANSECT}.Z
+#	nroff -man tcsh.man | compress > ${DESTMAN}/tcsh.${MANSECT}.Z
+#	chmod 444 ${DESTMAN}/tcsh.${MANSECT}.Z
+
 clean:
-	${RM} -f a.out strings x.c xs.c tcsh _MAKE_LOG core
+	${RM} -f a.out strings x.c xs.c tcsh tcsh.a _MAKE_LOG core
 	${RM} -f *.${SUF} sh.prof.c ed.defns.h tc.const.h sh.err.h
 
 veryclean: clean

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.refresh.c,v 3.9 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.refresh.c,v 3.10 1992/05/11 14:23:58 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.9 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.10 1992/05/11 14:23:58 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -293,12 +293,7 @@ Refresh()
 #endif /* DEBUG_REFRESH */
     if (OldvcV > new_vcv) {
 	for (; cur_line <= OldvcV; cur_line++) {
-	    MoveToLine(cur_line);
-	    MoveToChar(0);
-	    ClearEOL(Strlen(Display[cur_line]));
-#ifdef DEBUG_REFRESH
-	    so_write(str2short("C\b"), 2);
-#endif /* DEBUG_REFRESH */
+	    update_line(Display[cur_line], STRNULL, cur_line);
 	    *Display[cur_line] = '\0';
 	}
     }

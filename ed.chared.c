@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.chared.c,v 3.22 1992/03/21 22:34:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.23 1992/04/10 16:38:09 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.22 1992/03/21 22:34:18 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.23 1992/04/10 16:38:09 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1457,7 +1457,7 @@ c_hsetpat()
 #ifdef SDEBUG
     xprintf("\nHist_num = %d\n", Hist_num);
     xprintf("patlen = %d\n", patlen);
-    xprintf("patbuf = \"%s\"\n", short2str(patbuf));
+    xprintf("patbuf = \"%S\"\n", patbuf);
     xprintf("Cursor %d LastChar %d\n", Cursor - InputBuf, LastChar - InputBuf);
 #endif
 }
@@ -1504,7 +1504,7 @@ e_up_search_hist(c)
 	    hp->histline = Strsave(sprlex(sbuf, &hp->Hlex));
 	}
 #ifdef SDEBUG
-	xprintf("Comparing with \"%s\"\n", short2str(hp->histline));
+	xprintf("Comparing with \"%S\"\n", hp->histline);
 #endif
 	if ((Strncmp(hp->histline, InputBuf, LastChar-InputBuf) || hp->histline[LastChar-InputBuf]) && c_hmatch(hp->histline)) {
 	    found++;
@@ -1554,7 +1554,7 @@ e_down_search_hist(c)
 	    hp->histline = Strsave(sprlex(sbuf, &hp->Hlex));
 	}
 #ifdef SDEBUG
-	xprintf("Comparing with \"%s\"\n", short2str(hp->histline));
+	xprintf("Comparing with \"%S\"\n", hp->histline);
 #endif
 	if ((Strncmp(hp->histline, InputBuf, LastChar-InputBuf) || hp->histline[LastChar-InputBuf]) && c_hmatch(hp->histline))
 	    found = h;
@@ -2265,8 +2265,8 @@ v_repeat_srch(c)
     int c;
 {
 #ifdef SDEBUG
-    xprintf("dir %d patlen %d patbuf %s\n", 
-	    c, patlen, short2str(patbuf));
+    xprintf("dir %d patlen %d patbuf %S\n", 
+	    c, patlen, patbuf);
 #endif
 
     LastCmd = (KEYCMD) c;  /* Hack to stop c_hsetpat */

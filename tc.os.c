@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.os.c,v 3.18 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.19 1992/05/15 23:49:22 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.18 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.19 1992/05/15 23:49:22 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -480,7 +480,7 @@ domigrate(v, c)
 	    if (*cp == '%') {
 		pp = pfind(cp);
 		if (kill3((pid_t) - pp->p_jobid, SIGMIGRATE, new_site) < 0) {
-		    xprintf("%s: %s\n", short2str(cp), strerror(errno));
+		    xprintf("%S: %s\n", cp, strerror(errno));
 		    err1++;
 		}
 	    }
@@ -1092,7 +1092,7 @@ dover(v, c)
     if (!*v) {
 	if (!(p = Getenv(STRSYSTYPE)))
 	    stderror(ERR_NAME | ERR_STRING, "System type is not set");
-	xprintf("%s\n", short2str(p));
+	xprintf("%S\n", p);
     }
     else {
 	Setenv(STRSYSTYPE, getv(*v) ? STRbsd43 : STRsys53);

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/tcsh-6.01/RCS/config_f.h,v 3.2 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/config_f.h,v 3.3 1992/02/13 05:31:36 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -72,11 +72,6 @@
  * KAI          use "bye" command and rename "log" to "watchlog"
  */
 #undef KAI
-
-/*
- * CSHDIRS    save a history like stack of directories
- */
-#define CSHDIRS
 
 /*
  * TESLA	drops DTR on logout. Historical note:

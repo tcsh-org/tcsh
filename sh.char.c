@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.char.c,v 3.4 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.char.c,v 3.5 1992/03/20 18:50:05 christos Exp $ */
 /*
  * sh.char.c: Character classification tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.char.c,v 3.4 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.char.c,v 3.5 1992/03/20 18:50:05 christos Exp $")
 
 #include "sh.char.h"
 
@@ -114,25 +114,25 @@ unsigned short _cmap[256] = {
 	_ESC|_PUN,	_PUN,		_PUN,		_PUN,
 
 /*	 96 `		 97 a		 98 b		 99 c	*/
-  _Q1|_GLOB|_META|_PUN,	_LET|_LOW|_XD,	_LET|_LOW|_XD,	_LET|_LOW|_XD,
+  _Q1|_GLOB|_META|_PUN,	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW|_XD,
 
 /*	100 d		101 e		102 f		103 g	*/
-	_LET|_LOW|_XD,	_LET|_LOW|_XD,	_LET|_LOW|_XD,	_LET|_LOW,
+	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW|_XD,	_LET|_DOW,
 
 /*	104 h		105 i		106 j		107 k	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 
 /*	108 l		109 m		110 n		111 o	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 
 /*	112 p		113 q		114 r		115 s	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 
 /*	116 t		117 u		118 v		119 w	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 
 /*	120 x		121 y		122 z		123 {	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_GLOB|_PUN,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_GLOB|_PUN,
 
 /*	124 |		125 }		126 ~		127 del	*/
 	_META|_CMD|_PUN,_PUN,		_PUN,		_CTR,
@@ -211,31 +211,31 @@ unsigned short _cmap[256] = {
 	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_UP,
 
 /*	220 Udiaeresis	221 Yacute	222 THORN	223 ssharp	*/
-	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_LOW,
+	_LET|_UP,	_LET|_UP,	_LET|_UP,	_LET|_DOW,
 
 /*	224 agrave	225 aacute	226 acircumflex	227 atilde	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 
 /*	228 adiaeresis	229 aring	230 ae		231 ccedilla	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 
 /*	232 egrave	233 eacute	234 ecircumflex	235 ediaeresis	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 
 /*	236 igrave	237 iacute	238 icircumflex	239 idiaeresis	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 
 /*	240 eth		241 ntilde	242 ograve	243 oacute	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 
 /*	244 ocircumflex	245 otilde	246 odiaeresis	247 division	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_PUN,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_PUN,
 
 /*	248 oslash	249 ugrave	250 uacute	251 ucircumflex	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 
 /*	252 udiaeresis	253 yacute	254 thorn	255 ydiaeresis	*/
-	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,	_LET|_LOW,
+	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,	_LET|_DOW,
 #endif /* SHORT_STRINGS */
 };
 

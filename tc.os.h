@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.os.h,v 3.28 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.29 1992/05/09 04:03:53 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -39,13 +39,25 @@
 
 #define NEEDstrerror		/* Too hard to find which systems have it */
 
-#if SYSVREL > 3
+#if SYSVREL > 3 || defined(linux)
 /*
  * for SVR4 we fork pipelines backwards. 
  * more info in sh.sem.c
  */
 # define BACKPIPE
-#endif /* SYSVREL > 3 */
+#endif /* SYSVREL > 3 || linux */
+
+#ifndef NOFILE
+# ifdef OPEN_MAX
+#  define NOFILE OPEN_MAX
+# else
+#  define NOFILE 256
+# endif
+#endif /* NOFILE */
+
+#ifdef linux
+# undef NEEDstrerror
+#endif /* linux */
 
 #ifdef OREO
 # include <sys/time.h>
@@ -337,7 +349,7 @@ struct ucred {
 #ifndef POSIX
 # define mygetpgrp()    getpgrp(0)
 #else /* POSIX */
-# if defined(BSD) || defined(sun) || defined(IRIS4D)
+# if defined(BSD) || defined(sun) || defined(__sun__) || defined(IRIS4D)
 #  define mygetpgrp()    getpgrp(0)
 # else /* BSD || sun || IRIS4D */
 #  define mygetpgrp()    getpgrp()
@@ -369,12 +381,18 @@ typedef struct timeval timeval_t;
 #endif /* NeXT */
 
 
-#if !defined(POSIX) || defined(sun)
+#if !defined(POSIX) || defined(sun) || defined(__sun__)
 extern time_t time();
 extern char *getenv();
 extern int atoi();
 extern char *ttyname();
 
+#if defined(sun) || defined(__sun__)
+extern int toupper __P((int));
+extern int tolower __P((int));
+extern caddr_t sbrk __P((int));
+extern int qsort();
+#else
 # ifndef hpux
 #  if __GNUC__ != 2
 extern int abort();
@@ -386,6 +404,7 @@ extern int qsort();
 extern void abort();
 extern void qsort();
 # endif
+#endif	/* sun */
 extern void perror();
 
 #ifndef NEEDgethostname
@@ -463,7 +482,7 @@ extern int setpriority();
 extern int nice();
 # endif	/* !BSDNICE */
 
-# ifndef fps500
+# if (!defined(fps500) && !defined(apollo))
 extern void setpwent();
 extern void endpwent();
 # endif /* fps500 */
@@ -483,7 +502,7 @@ extern char *getwd();
 # endif	/* getwd */
 #else /* POSIX */
 
-# if (defined(sun) && !defined(__GNUC__)) || defined(_IBMR2) || defined(_IBMESA)
+# if ((defined(sun) || defined(__sun__)) && !defined(__GNUC__)) || defined(_IBMR2) || defined(_IBMESA)
 extern char *getwd();
 # endif	/* (sun && ! __GNUC__) || _IBMR2 || _IBMESA */
 
@@ -491,22 +510,19 @@ extern char *getwd();
 extern char *ttyname();   
 # endif /* SCO */
 
+#ifdef linux
+extern int	killpg	__P((pid_t, int));
+#endif /* linux */
+
 
 #endif /* POSIX */
 
-# if defined(sun) && __GNUC__ == 2
+# if (defined(sun) || defined(__sun__)) && __GNUC__ == 2
 /*
  * Somehow these are missing
  */
 extern int ioctl __P((int, int, ...));
 extern int readlink __P((const char *, char *, size_t));
 # endif /* sun && __GNUC__ == 2 */
-
-#ifdef linux
-extern int		tcgetpgrp	__P((int));
-extern int		tcsetpgrp	__P((int, int));
-extern int		gethostname	__P((char *, int));
-extern int		readlink	__P(());
-#endif /* linux */
 
 #endif /* _h_tc_os */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.sig.c,v 3.8 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.c,v 3.9 1992/05/09 04:03:53 christos Exp $ */
 /*
  * sh.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.8 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.9 1992/05/09 04:03:53 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -273,7 +273,7 @@ char   *show_sig_mask();
 int     debug_signals = 0;
 
 /*
- * igsetmask(mask)
+ * sigsetmask(mask)
  *
  * Set a new signal mask.  Return old mask.
  */
@@ -292,14 +292,14 @@ sigsetmask(mask)
 	if (ISSET(mask, i))
 	    sigaddset(&set, i);
 
-#ifdef linux	/* sigprocmask returns old mask! */
-    (void) sigprocmask(SIG_SETMASK, &set, &oset);
-#else /* !linux */
+#ifdef linux	/* sigprocmask returns old mask on success! */
+    if (sigprocmask(SIG_SETMASK, &set, &oset) == -1)
+#else /* linux */
     if (sigprocmask(SIG_SETMASK, &set, &oset))
+#endif /* linux */
 	xprintf("sigsetmask(0x%x) - sigprocmask failed, errno %d",
 		mask, errno);
 
-#endif /* linux */
     m = 0;
     for (i = 1; i <= MAXSIG; i++)
 	if (sigismember(&oset, i))
@@ -373,7 +373,7 @@ bsd_sigpause(mask)
  *
  * Emulate bsd style signal()
  */
-void (*bsd_signal(sig, func))()
+sigret_t (*bsd_signal(sig, func))()
         int sig;
         sigret_t (*func)();
 {
@@ -382,8 +382,8 @@ void (*bsd_signal(sig, func))()
         sigret_t (*r_func)();
 
         if (sig < 0 || sig > MAXSIG) {
-                printf("error: bsd_signal(%d) signal out of range\n", sig);
-                return;
+                xprintf("error: bsd_signal(%d) signal out of range\n", sig);
+                return((sigret_t(*)()) SIG_IGN);
         }
 
         sigemptyset(&set);
@@ -393,7 +393,7 @@ void (*bsd_signal(sig, func))()
         act.sa_flags = 0;                       /* no special actions */
 
         if (sigaction(sig, &act, &oact)) {
-                printf("error: bsd_signal(%d) - sigaction failed, errno %d\n",
+                xprintf("error: bsd_signal(%d) - sigaction failed, errno %d\n",
                     sig, errno);
                 return((sigret_t(*)()) SIG_IGN);
         }

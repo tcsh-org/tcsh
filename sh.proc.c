@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.proc.c,v 3.27 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.28 1992/05/15 23:49:22 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.27 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.28 1992/05/15 23:49:22 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -118,7 +118,6 @@ static	void		 pads		__P((Char *));
 static	void		 pkill		__P((Char **, int));
 static	struct process	*pgetcurr	__P((struct process *));
 static	void		 okpcntl	__P((void));
-static  struct process  *pfind		__P((Char *));
 
 /*
  * pchild - called at interrupt level by the SIGCHLD signal
@@ -277,11 +276,6 @@ loop:
 	    goto loop;
 	}
 	pnoprocesses = pid == -1;
-#ifdef linux
-# ifdef UNRELSIGS
-	(void) sigset(SIGCHLD, pchild);
-# endif /* UNRELSIGS */
-#endif /* linux */
 #ifndef SIGVOID
 	return (0);
 #else /* !SIGVOID */
@@ -1137,7 +1131,7 @@ pprint(pp, flag)
 	}
 prcomd:
 	if (flag & NAME) {
-	    xprintf("%s", short2str(pp->p_command));
+	    xprintf("%S", pp->p_command);
 	    if (pp->p_flags & PPOU)
 		xprintf(" |");
 	    if (pp->p_flags & PDIAG)
@@ -1529,11 +1523,9 @@ pkill(v, signum)
 	    case SIGTTOU:
 		if ((jobflags & PRUNNING) == 0) {
 # ifdef SUSPENDED
-		    xprintf("%s: Already suspended\n",
-			    short2str(cp));
+		    xprintf("%S: Already suspended\n", cp);
 # else /* !SUSPENDED */
-		    xprintf("%s: Already stopped\n",
-			    short2str(cp));
+		    xprintf("%S: Already stopped\n", cp);
 # endif /* !SUSPENDED */
 		    err1++;
 		    goto cont;
@@ -1551,7 +1543,7 @@ pkill(v, signum)
 	    }
 #endif /* BSDJOBS */
 	    if (killpg(pp->p_jobid, signum) < 0) {
-		xprintf("%s: %s\n", short2str(cp), strerror(errno));
+		xprintf("%S: %s\n", cp, strerror(errno));
 		err1++;
 	    }
 #ifdef BSDJOBS
@@ -1648,7 +1640,7 @@ panystop(neednl)
 	    stderror(ERR_STOPPED, neednl ? "\n" : "");
 }
 
-static struct process *
+struct process *
 pfind(cp)
     Char   *cp;
 {

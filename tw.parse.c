@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.32 1992/05/02 23:39:58 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.33 1992/05/09 04:03:53 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.32 1992/05/02 23:39:58 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.33 1992/05/09 04:03:53 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -228,13 +228,13 @@ tenematch(inputline, num_read, command)
 
 #ifdef TDEBUG
     xprintf("starting_a_command %d\n", looking);
-    xprintf("\ncmd_start:%s:\n", short2str(cmd_start));
-    xprintf("qline:%s:\n", short2str(qline));
+    xprintf("\ncmd_start:%S:\n", cmd_start);
+    xprintf("qline:%S:\n", qline);
     xprintf("qline:");
     for (wp = qline; *wp; wp++)
 	xprintf("%c", *wp & QUOTE ? '-' : ' ');
     xprintf(":\n");
-    xprintf("word:%s:\n", short2str(word));
+    xprintf("word:%S:\n", word);
     xprintf("word:");
     /* Must be last, so wp is still pointing to the end of word */
     for (wp = word; *wp; wp++)
@@ -247,7 +247,7 @@ tenematch(inputline, num_read, command)
 #endif
     looking = tw_complete(cmd_start, &wordp, &pat, looking, &suf);
 #ifdef TDEBUG
-    xprintf("complete %d %s\n", looking, short2str(pat));
+    xprintf("complete %d %S\n", looking, pat);
 #endif
 
     switch ((int) command) {
@@ -284,8 +284,7 @@ tenematch(inputline, num_read, command)
 	    (void) Strcpy(rword, slshp);
 	    if (slshp != STRNULL)
 		*slshp = '\0';
-	    search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), 
-				  looking == TW_COMMAND);
+	    search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), looking);
 	    if (search_ret == 1) {
 		/* get rid of old word */
 		DeleteBack(str_end - word_start);
@@ -320,8 +319,7 @@ tenematch(inputline, num_read, command)
 	    if (isglob(*bptr))
 		return 0;
 	}
-	search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), 
-			      looking == TW_COMMAND);
+	search_ret = spell_me(wordp, QLINESIZE - (wordp - qline), looking);
 	if (search_ret == 1) {
 	    /* get rid of old word */
 	    DeleteBack(str_end - word_start);	
@@ -404,7 +402,7 @@ t_glob(v, cmd)
     register Char ***v;
     int cmd;
 {
-    jmp_buf osetexit;
+    jmp_buf_t osetexit;
 
     if (**v == 0)
 	return (0);
@@ -735,7 +733,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 
     while (!done && (entry = (*tw_next_entry[looking])(exp_dir, &flags))) {
 #ifdef TDEBUG
-	xprintf("entry = %s\n", short2str(entry));
+	xprintf("entry = %S\n", entry);
 #endif
 	switch (looking) {
 	case TW_FILE:
@@ -874,7 +872,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    break;
 	}
 #ifdef TDEBUG
-	xprintf("done entry = %s\n", short2str(entry));
+	xprintf("done entry = %S\n", entry);
 #endif
     }
     if (command == SPELL)
@@ -1002,10 +1000,10 @@ tw_collect(command, looking, exp_dir, exp_name, target, pat, flags, dir_fd)
     DIR *dir_fd;
 {
     static int ni;	/* static so we don't get clobbered */
-    jmp_buf osetexit;
+    jmp_buf_t osetexit;
 
 #ifdef TDEBUG
-    xprintf("target = %s\n", short2str(target));
+    xprintf("target = %S\n", target);
 #endif
     ni = 0;
     getexit(osetexit);
@@ -1044,7 +1042,7 @@ tw_list_items(looking, numitems, list_max)
     Char *ptr;
     int max_items = 0;
 
-    if ((ptr = value(STRlistmax)) != NULL) {
+    if ((ptr = value(STRlistmax)) != STRNULL) {
 	while (*ptr) {
 	    if (!Isdigit(*ptr)) {
 		max_items = 0;
@@ -1080,7 +1078,7 @@ tw_list_items(looking, numitems, list_max)
 	Char **w = tw_item_get();
 
 	for (i = 0; i < numitems; i++) {
-	    xprintf("%s", short2str(w[i]));
+	    xprintf("%S", w[i]);
 	    if (Tty_raw_mode)
 		xputchar('\r');
 	    xputchar('\n');
@@ -1159,7 +1157,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 
     case TW_EXPLAIN:
 	if (command == LIST && pat != NULL) {
-	    xprintf("%s", short2str(pat));
+	    xprintf("%S", pat);
 	    if (Tty_raw_mode)
 		xputchar('\r');
 	    xputchar('\n');
@@ -1468,9 +1466,9 @@ expand_dir(dir, edir, dfd, cmd)
 	 * From: Amos Shapira <amoss@cs.huji.ac.il>
 	 * Print a better message when completion fails
 	 */
-	xprintf("\n%s %s\n",
-		*edir ? short2str(edir) :
-		(*tdir ? short2str(tdir) : short2str(dir)),
+	xprintf("\n%S %s\n",
+		*edir ? edir :
+		(*tdir ? tdir : dir),
 		(errno == ENOTDIR ? "not a directory" :
 		(errno == ENOENT ? "not found" : "unreadable")));
 	NeedsRedraw = 1;
@@ -1659,11 +1657,11 @@ print_by_column(dir, items, count, no_file_suffix)
 
 		if (no_file_suffix) {
 		    /* Print the command name */
-		    xprintf("%s", short2str(items[i]));
+		    xprintf("%S", items[i]);
 		}
 		else {
 		    /* Print filename followed by '/' or '*' or ' ' */
-		    xprintf("%s%c", short2str(items[i]),
+		    xprintf("%S%c", items[i],
 			    filetype(dir, items[i]));
 		    w++;
 		}

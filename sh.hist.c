@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.hist.c,v 3.2 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.hist.c,v 3.3 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,17 +36,23 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.2 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.3 1992/01/27 04:20:47 christos Exp $")
 
 #include "tc.h"
 
 extern bool histvalid;
 extern Char histline[];
-static Char HistLit = 0;
+Char HistLit = 0;
 
 static	void	hfree	__P((struct Hist *));
-static	void	dohist1	__P((struct Hist *, int *, int, int, int));
-static	void	phist	__P((struct Hist *, int, int));
+static	void	dohist1	__P((struct Hist *, int *, int));
+static	void	phist	__P((struct Hist *, int));
+
+#define HIST_ONLY	0x01
+#define HIST_SAVE	0x02
+#define HIST_LOAD	0x04
+#define HIST_REV	0x08
+#define HIST_CLEAR	0x10
 
 /*
  * C shell
@@ -89,10 +95,17 @@ enthist(event, lp, docopy)
     register struct wordent *lp;
     bool    docopy;
 {
-    register struct Hist *np;
+    extern time_t Htime;
+    register struct Hist *np = (struct Hist *) xmalloc((size_t) sizeof(*np));
 
-    np = (struct Hist *) xmalloc((size_t) sizeof(*np));
-    (void) time(&(np->Htime));
+    /* Pick up timestamp set by lex() in Htime if reading saved history */
+    if (Htime != (time_t) 0) {
+	np->Htime = Htime;
+	Htime = 0;
+    }
+    else
+	(void) time(&(np->Htime));
+
     np->Hnum = np->Href = event;
     if (docopy) {
 	copylex(&np->Hlex, lp);
@@ -124,13 +137,14 @@ hfree(hp)
     xfree((ptr_t) hp);
 }
 
+
 /*ARGSUSED*/
 void
 dohist(vp, c)
     Char  **vp;
     struct command *c;
 {
-    int     n, rflg = 0, hflg = 0, tflg = 0;
+    int     n, hflg = 0;
 
     if (getn(value(STRhistory)) == 0)
 	return;
@@ -145,80 +159,193 @@ dohist(vp, c)
 
 	while (*++vp2)
 	    switch (*vp2) {
+	    case 'c':
+		hflg |= HIST_CLEAR;
+		break;
 	    case 'h':
-		hflg++;
+		hflg |= HIST_ONLY;
 		break;
 	    case 'r':
-		rflg++;
+		hflg |= HIST_REV;
 		break;
-	    case 't':
-		tflg++;
+	    case 'S':
+		hflg |= HIST_SAVE;
 		break;
-	    case '-':		/* ignore multiple '-'s */
+	    case 'L':
+		hflg |= HIST_LOAD;
 		break;
 	    default:
-		stderror(ERR_HISTUS);
+		stderror(ERR_HISTUS, "chrSL");
 		break;
 	    }
+    }
+
+    if (hflg & HIST_CLEAR) {
+	struct Hist *np, *hp;
+	for (hp = &Histlist; (np = hp->Hnext) != NULL;)
+	    hp->Hnext = np->Hnext, hfree(np);
+    }
+
+    if (hflg & HIST_LOAD) {
+	loadhist(*vp);
+	return;
+    }
+    else if (hflg & HIST_SAVE) {
+	rechist(*vp);
+	return;
     }
     if (*vp)
 	n = getn(*vp);
     else {
 	n = getn(value(STRhistory));
     }
-    dohist1(Histlist.Hnext, &n, rflg, hflg, tflg);
+    dohist1(Histlist.Hnext, &n, hflg);
 }
 
 static void
-dohist1(hp, np, rflg, hflg, tflg)
+dohist1(hp, np, hflg)
     struct Hist *hp;
-    int    *np, rflg, hflg, tflg;
+    int    *np, hflg;
 {
     bool    print = (*np) > 0;
 
     for (; hp != 0; hp = hp->Hnext) {
 	(*np)--;
 	hp->Href++;
-	if (rflg == 0) {
-	    dohist1(hp->Hnext, np, rflg, hflg, tflg);
+	if ((hflg & HIST_REV) == 0) {
+	    dohist1(hp->Hnext, np, hflg);
 	    if (print)
-		phist(hp, hflg, tflg);
+		phist(hp, hflg);
 	    return;
 	}
 	if (*np >= 0)
-	    phist(hp, hflg, tflg);
+	    phist(hp, hflg);
     }
 }
 
 static void
-phist(hp, hflg, tflg)
+phist(hp, hflg)
     register struct Hist *hp;
-    int     hflg, tflg;
+    int     hflg;
 {
-    struct tm *t;
-    char    ampm = 'a';
 
-    if (hflg == 0) {
-	xprintf("%6d\t", hp->Hnum);
-	if (tflg == 0) {
-	    t = localtime(&hp->Htime);
-	    if (adrof(STRampm)) {	/* addition by Hans J. Albertsson */
-		if (t->tm_hour >= 12) {
-		    if (t->tm_hour > 12)
-			t->tm_hour -= 12;
-		    ampm = 'p';
-		}
-		else if (t->tm_hour == 0)
-		    t->tm_hour = 12;
-		xprintf("%2d:%02d%cm\t", t->tm_hour, t->tm_min, ampm);
-	    }
-	    else {
-		xprintf("%2d:%02d\t", t->tm_hour, t->tm_min);
-	    }
-	}
+    if (hflg != HIST_ONLY) {
+	Char   *cp = str2short("%h\t%@\t%R\n");
+	Char buf[BUFSIZE];
+	struct varent *vp = adrof(STRhistory);
+
+	if (vp && vp->vec[0] && vp->vec[1])
+	    cp = vp->vec[1];
+
+	tprintf(FMT_HISTORY, buf, cp, BUFSIZE, NULL, hp->Htime, (ptr_t) hp);
+	for (cp = buf; *cp;)
+	    xputchar(*cp++);
     }
-    if (HistLit && hp->histline)
-	xprintf("%s\n", short2str(hp->histline));
+    else {
+	/* 
+	 * Make file entry with history time in format:
+	 * "+NNNNNNNNNN" (10 digits, left padded with ascii '0') 
+	 */
+	xprintf("#+%010lu\n", hp->Htime);
+
+	if (HistLit && hp->histline)
+	    xprintf("%S\n", hp->histline);
+	else
+	    prlex(&hp->Hlex);
+    }
+}
+
+
+void
+fmthist(fmt, ptr, buf)
+    int fmt;
+    ptr_t ptr;
+    char *buf;
+{
+    struct Hist *hp = (struct Hist *) ptr;
+    switch (fmt) {
+    case 'h':
+	xsprintf(buf, "%6d", hp->Hnum);
+	break;
+    case 'R':
+	if (HistLit && hp->histline)
+	    xsprintf(buf, "%S\n", hp->histline);
+	else {
+	    Char ibuf[BUFSIZE], *ip;
+	    char *p;
+	    (void) sprlex(ibuf, &hp->Hlex);
+	    for (p = buf, ip = ibuf; (*p++ = *ip++) != '\0'; )
+		continue;
+	}
+	break;
+    default:
+	buf[0] = '\0';
+	break;
+    }
+	
+}
+
+void
+rechist(fname)
+    Char *fname;
+{
+    Char    buf[BUFSIZE], hbuf[BUFSIZE];
+    int     fp, ftmp, oldidfds;
+    extern  int fast;
+    struct  varent *shist;
+    static Char   *dumphist[] = {STRhistory, STRmh, 0, 0};
+
+    if (!fast) {
+	/*
+	 * If $savehist is just set, we use the value of $history
+	 * else we use the value in $savehist
+	 */
+	if ((shist = adrof(STRsavehist)) != NULL) {
+	    if (shist->vec[0][0] != '\0')
+		(void) Strcpy(hbuf, shist->vec[0]);
+	    else if ((shist = adrof(STRhistory)) != 0 && 
+		     shist->vec[0][0] != '\0')
+		(void) Strcpy(hbuf, shist->vec[0]);
+	    else
+		return;
+	}
+	else
+	    return;
+
+	if (fname == NULL) 
+	    if ((fname = value(STRhistfile)) == STRNULL) {
+		fname = Strcpy(buf, value(STRhome));
+		(void) Strcat(buf, &STRtildothist[1]);
+	    }
+
+	fp = creat(short2str(fname), 0600);
+	if (fp == -1) 
+	    return;
+	oldidfds = didfds;
+	didfds = 0;
+	ftmp = SHOUT;
+	SHOUT = fp;
+	dumphist[2] = hbuf;
+	dohist(dumphist, NULL);
+	(void) close(fp);
+	SHOUT = ftmp;
+	didfds = oldidfds;
+    }
+}
+
+
+void
+loadhist(fname)
+    Char *fname;
+{
+    static Char   *loadhist[] = {STRsource, STRmh, NULL, NULL};
+
+    if (fname != NULL)
+	loadhist[2] = fname;
+    else if ((fname = value(STRhistfile)) != STRNULL)
+	loadhist[2] = fname;
     else
-	prlex(&hp->Hlex);
+	loadhist[2] = STRtildothist;
+
+    dosource(loadhist, NULL);
 }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.const.c,v 3.11 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.const.c,v 3.12 1992/04/03 22:15:14 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.11 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.12 1992/04/03 22:15:14 christos Exp $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -84,16 +84,16 @@ Char STRtildothist[]    = { '~', '/', '.', 'h', 'i', 's', 't', 'o', 'r',
 Char STRnokanji[]       = { 'n', 'o', 'k', 'a', 'n', 'j', 'i', '\0' };
 #endif
 
-#ifdef CSHDIRS
-Char STRdirfile[]     = { '~', '/', '.', 'c', 's', 'h', 'd', 'i', 'r',
+Char STRtildotdirs[]  = { '~', '/', '.', 'c', 's', 'h', 'd', 'i', 'r',
                           's', '\0' };
-Char STRsldtdirs[]    = { '/', '.', 'c', 's', 'h', 'd', 'i', 'r', 's', '\0' };
+Char STRdirsfile[]    = { 'd', 'i', 'r', 's', 'f', 'i', 'l', 'e', '\0' };
 Char STRsavedirs[]    = { 's', 'a', 'v', 'e', 'd', 'i', 'r', 's', '\0' };
-#endif
+
+Char STRloginsh[]       = { 'l', 'o', 'g', 'i', 'n', 's', 'h', '\0' };
+Char STRdirs_nl[]       = { 'd', 'i', 'r', 's', '_', 'n', 'l', '\0' };
 
 Char STRargv[]          = { 'a', 'r', 'g', 'v', '\0' };
 Char STRsavehist[]      = { 's', 'a', 'v', 'e', 'h', 'i', 's', 't', '\0' };
-Char STRsldthist[]      = { '/', '.', 'h', 'i', 's', 't', 'o', 'r', 'y', '\0' };
 Char STRnormal[]        = { 'n', 'o', 'r', 'm', 'a', 'l', '\0' };
 Char STRsldtlogout[]    = { '/', '.', 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRjobs[]          = { 'j', 'o', 'b', 's', '\0' };
@@ -249,8 +249,17 @@ Char STRrm[]            = { 'r', 'm', '\0' };
 Char STRshlvl[]		= { 's', 'h', 'l', 'v', 'l', '\0' };
 Char STRSHLVL[]		= { 'S', 'H', 'L', 'V', 'L', '\0' };
 
-Char STRLANG[]  = { 'L', 'A', 'N', 'G', '\0' };
-Char STRLC_CTYPE[] = { 'L', 'C', '_', 'C', 'T', 'Y', 'P', 'E' ,'\0' };
+Char STRLANG[]		= { 'L', 'A', 'N', 'G', '\0' };
+Char STRLC_CTYPE[]	= { 'L', 'C', '_', 'C', 'T', 'Y', 'P', 'E' ,'\0' };
+Char STRLC_NUMERIC[]	= { 'L', 'C', '_', 'N', 'U', 'M', 'E', 'R', 'I',
+			    'C', '\0' };
+Char STRLC_TIME[]	= { 'L', 'C', '_', 'T', 'I', 'M', 'E', '\0' };
+Char STRLC_COLLATE[]	= { 'L', 'C', '_', 'C', 'O', 'L', 'L', 'A', 'T',
+			    'E', '\0' };
+Char STRLC_MESSAGES[]	= { 'L', 'C', '_', 'M', 'E', 'S', 'S', 'A', 'G',
+			    'E', 'S', '\0' };
+Char STRLC_MONETARY[]	= { 'L', 'C', '_', 'M', 'O', 'N', 'E', 'T', 'A',
+			    'R', 'Y', '\0' };
 Char STRNOREBIND[] = { 'N', 'O', 'R', 'E', 'B', 'I', 'N', 'D', '\0' };
 
 #ifdef SIG_WINDOW

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.printf.c,v 3.5 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.printf.c,v 3.6 1992/04/03 22:15:14 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.5 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.6 1992/04/03 22:15:14 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -59,6 +59,7 @@ doprnt(addchar, sfmt, ap)
     va_list ap;
 {
     register char *f, *bp;
+    register Char *Bp;
     register long l;
     register unsigned long u;
     register int i;
@@ -121,7 +122,7 @@ doprnt(addchar, sfmt, ap)
 	    }
 
 	    fmt = (unsigned char) *f;
-	    if (Isupper(fmt)) {
+	    if (fmt != 'S' && Isupper(fmt)) {
 		do_long = 1;
 		fmt = Tolower(fmt);
 	    }
@@ -201,8 +202,35 @@ doprnt(addchar, sfmt, ap)
 		(*addchar) ((int) (i | attributes));
 		break;
 
+#ifdef SHORT_STRINGS
+	    case 'S':
+		Bp = va_arg(ap, Char *);
+		if (!Bp) {
+		    bp = NULL;
+		    goto lcase_s;
+	        }
+		f_width = f_width - Strlen(Bp);
+		if (!flush_left)
+		    while (f_width-- > 0)
+			(*addchar) ((int) (pad | attributes));
+		for (i = 0; *Bp && i < prec; i++) {
+		    (*addchar) ((int) ((unsigned char)*Bp | attributes));
+		    Bp++;
+		}
+		if (flush_left)
+		    while (f_width-- > 0)
+			(*addchar) ((int) (' ' | attributes));
+		break;
+#else
+		bp = va_arg(ap, Char *);
+		if (bp)
+		    (void) strip((Char *) bp);
+		goto lcase_s;
+#endif /* SHORT_STRINGS */
+
 	    case 's':
 		bp = va_arg(ap, char *);
+lcase_s:
 		if (!bp)
 		    bp = "(nil)";
 		f_width = f_width - strlen((char *) bp);
@@ -315,3 +343,91 @@ xvsprintf(str, fmt, va)
     doprnt(xaddchar, fmt, va);
     *xstring++ = '\0';
 }
+
+
+
+#ifdef PURIFY
+/* Purify uses (some of..) the following functions to output memory-use
+ * debugging info.  Given all the messing with file descriptors that
+ * tcsh does, the easiest way I could think of to get it (Purify) to
+ * print anything was by replacing some standard functions with
+ * ones that do tcsh output directly - see dumb hook in doreaddirs()
+ * (sh.dir.c) -sg
+ */
+
+#include <stdio.h>
+
+int printf(va_alist)
+va_dcl
+{
+    va_list va;
+    char   *fmt;
+    va_start(va);
+    fmt = va_arg(va, char *);
+    doprnt(xputchar, fmt, va);
+    va_end(va);
+    return 1;
+}
+
+int vprintf(fmt, va)
+char   *fmt;
+va_list va;
+{
+    doprnt(xputchar, fmt, va);
+    return 1;
+}
+
+int fprintf(va_alist)
+va_dcl
+{
+    va_list va;
+
+    FILE *fp;
+    char   *fmt;
+    va_start(va);
+    fp = va_arg(va, FILE *);
+    fmt = va_arg(va, char *);
+    doprnt(xputchar, fmt, va);
+    va_end(va);
+    return 1;
+}
+
+int vfprintf(fp, fmt, va)
+FILE *fp;
+char   *fmt;
+va_list va;
+{
+    doprnt(xputchar, fmt, va);
+    return 1;
+}
+
+char * sprintf(va_alist)
+va_dcl
+{
+    va_list va;
+    char *str, *fmt;
+
+    va_start(va);
+    str = va_arg(va, char *);
+    fmt = va_arg(va, char *);
+    xstring = (unsigned char *) str;
+    doprnt(xaddchar, fmt, va);
+    va_end(va);
+    *xstring++ = '\0';
+
+    return str;
+}
+
+char * vsprintf(str, fmt, va)
+char   *str;
+char   *fmt;
+va_list va;
+{
+    xstring = (unsigned char *) str;
+    doprnt(xaddchar, fmt, va);
+    *xstring++ = '\0';
+
+    return str;
+}
+
+#endif	/* PURIFY */

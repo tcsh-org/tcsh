@@ -407,3 +407,14 @@ CONFIG  :       config.masscomp
 ENVIRON :       Link in the "bsd" universe as opposed to "att".
 NOTES	:	n/a
 VERSION :       6.01.00
+
+VENDOR	:	Motorola
+MODELS	:	Delta 3000/Delta 4000
+COMPILER:	cc
+CFLAGS	:	normal
+LIBES	:	-lcurses
+OS	:	System V/68 R3V6.2, R3V7
+CONFIG	:	config.sysV68
+ENVIRON	:	n/a
+NOTES	:	none
+VERSION	:	6.01.00, 6.02.00

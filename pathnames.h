@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/pathnames.h,v 3.6 1992/03/08 02:17:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/pathnames.h,v 3.7 1992/05/15 23:49:22 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -64,9 +64,13 @@
 # define _PATH_DOTCSHRC		"/etc/cshrc.std"
 #endif /* NeXT */
 
-#ifndef _PATH_DOTLOGIN
+#ifndef _PATH_DOTCSHRC
 # define _PATH_DOTCSHRC		"/etc/csh.cshrc"
+#endif
+#ifndef _PATH_DOTLOGIN
 # define _PATH_DOTLOGIN		"/etc/csh.login"
+#endif
+#ifndef _PATH_DOTLOGOUT
 # define _PATH_DOTLOGOUT	"/etc/csh.logout"
 #endif
 

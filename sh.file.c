@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.file.c,v 3.3 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.file.c,v 3.4 1992/05/09 04:03:53 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.3 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.4 1992/05/09 04:03:53 christos Exp $")
 
 #ifdef FILEC
 
@@ -376,7 +376,7 @@ print_by_column(dir, items, count)
 	    if (i < count) {
 		register int w;
 
-		xprintf("%s", short2str(items[i]));
+		xprintf("%S", items[i]);
 		xputchar(dir ? filetype(dir, items[i]) : ' ');
 		if (c < columns - 1) {	/* last column? */
 		    w = Strlen(items[i]) + 1;
@@ -480,13 +480,13 @@ print_recognized_stuff(recognized_part)
 	break;
 
     case 1:			/* overstrike the ^, erase the [ */
-	xprintf("%s", short2str(recognized_part));
+	xprintf("%S", recognized_part);
 	putraw(' ');
 	putraw('\b');
 	break;
 
     default:			/* overstrike both Characters ^[ */
-	xprintf("%s", short2str(recognized_part));
+	xprintf("%S", recognized_part);
 	break;
     }
     flush();

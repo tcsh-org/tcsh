@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.xmap.c,v 3.5 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.xmap.c,v 3.6 1992/01/27 04:20:47 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.5 1991/11/26 04:28:26 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.6 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -467,7 +467,7 @@ PrintXkey(key)
     printbuf[0] =  '"';
     if (Lookup(key, Xmap, 1) <= -1)
 	/* key is not bound */
-	xprintf("Unbound extended key \"%s\"\n", short2str(key));
+	xprintf("Unbound extended key \"%S\"\n", key);
     return;
 }
 
@@ -532,7 +532,7 @@ Enumerate(ptr, cnt)
 	printbuf[++cnt] = '"';
 	printbuf[++cnt] = '\0';
 	xprintf("Some extended keys too long for internal print buffer");
-	xprintf(" \"%s...\"\n", short2str(printbuf));
+	xprintf(" \"%S...\"\n", printbuf);
 	return (0);
     }
 
@@ -572,27 +572,27 @@ printOne(key, val, ntype)
 {
     struct KeyFuncs *fp;
     unsigned char unparsbuf[200];
-    static char *fmt = "%-15s->  %s\n";
+    static char *fmt = "%-15S->  %s\n";
 
     if (val != NULL)
 	switch (ntype) {
 	case XK_STR:
 	case XK_EXE:
-	    xprintf(fmt, short2str(key), 
+	    xprintf(fmt, key, 
 		    unparsestring(val->str, unparsbuf, 
 				  ntype == XK_STR ? STRQQ : STRBB));
 	    break;
 	case XK_CMD:
 	    for (fp = FuncNames; fp->name; fp++)
 		if (val->cmd == fp->func)
-		    xprintf(fmt, short2str(key), fp->name);
+		    xprintf(fmt, key, fp->name);
 		break;
 	default:
 	    abort();
 	    break;
 	}
     else
-	xprintf(fmt, short2str(key), "no input");
+	xprintf(fmt, key, "no input");
     return (0);
 }
 

@@ -1,11 +1,11 @@
-.\" $Id: tcsh.man,v 3.42 1992/05/09 04:03:53 christos Exp $
+.\" $Id: tcsh.man,v 3.43 1992/05/15 21:54:34 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
 .B tcsh 
 [ 
-.B \-bcdefimnqstvVxX 
+.B \-bcefimnqstvVxX 
 ] 
 [ 
 .I argument .\|.\|.
@@ -1348,6 +1348,19 @@ available in \fIcsh\fR); thus, on logging back in, all the saved history
 events will be recorded with the login time as their time stamp.
 The time stamp printouts can be omitted from the history list by adding the
 -t switch to the \fIhistory\fR command.
+.pp
+.I Tcsh 
+provides a way to save, restore and clear the history list in a file.
+.sp
+.I history -S [<filename>] 
+.br
+.I history -L [<filename>]
+.br
+.I history -c
+.sp
+The 'S' flag saves the current history, the 'L' flags loads
+the history, and the 'c' flag clears the history.
+If a filename is not specified, then $HOME/.history is used.
 .PP
 .SH "14. DIRECTORY ACCESS"
 .I Tcsh 
@@ -1433,6 +1446,19 @@ pushed onto the top of the stack.  Example:
 /usr/spool/uucp /sys/src /usr/net/bin ~
 .RE
 .fi
+.PP
+.I Tcsh 
+provides a way to save, restore and clear the directory stack in a file.
+.sp
+.I dirs -S [<filename>] 
+.br
+.I dirs -L [<filename>]
+.br
+.I dirs -c
+.sp
+The 'S' flag saves the current directory stack, the 'L' flags loads
+the directory stack, and the 'c' flag clears the directory stack.
+If a filename is not specified, then $HOME/.cshdirs is used.
 .PP 
 In addition, if the shell variable 
 .I dunique 
@@ -1614,7 +1640,8 @@ since it allows the user to see who is on when he first logs in.
 .PP
 The format of the printouts can be tailored via setting of the variable
 .I who.
-The following sequences are available for the format specification:
+In addition to the standard prompt % escapes, the
+following sequences are available for the format specification:
 .sp
 .RS +.6i
 .ta 1.2i 1.7i
@@ -1623,25 +1650,12 @@ The following sequences are available for the format specification:
 %a	The observed action, i.e. "logged on", 
 	"logged off", or "replaced <olduser> on".
 %l	The line (tty) the user is logged on.
-%S (%s)	Start (stop) standout mode.
-%B (%b)	Start (stop) boldfacing mode. (Only if 
-	tcsh was compiled to be eight bit clean)
-%U (%u)	Start (stop) underline mode. (Only if 
-	tcsh was compiled to be eight bit clean)
 %M	The full hostname of the remote host ("local" 
 	if non-remote).
 %m	The hostname up to the first ".". If only 
 	the ip address is available or the utmp 
 	field contains the name of an x-windows 
 	display, the whole name is printed.
-%t or %@	The time, in 12-hour, am/pm format (logout 
-	time is approximated if unavailable).
-%T	The time, in 24-hour format. (but see 
-	the "ampm" shell variable below).
-%D	The day in dd format.
-%w	The month in <Mon> format.
-%W	The month in mm format.
-%Y	The year in yy format.
 .RE
 .DT
 .fi
@@ -1904,6 +1918,7 @@ The current possible values are:
 \fIaix370\fR		an IBM 370, running aix
 \fIaixESA\fR		an IBM ESA, running aix
 \fIalliant\fR		an Alliant FX series
+\fIalpha\fR		an DEC Alpha running OSF/1
 \fIamdahl\fR		an Amdahl running uts 2.1
 \fIamiga\fR		an amiga running amix 2.02
 \fIapollo\fR		an Apollo running DomainOS
@@ -2542,11 +2557,6 @@ or present only in
 (+)
 .sp
 .TP 4
-.I \-d
-Load ~/.cshdirs (If 
-.I tcsh 
-was compiled with CSHDIRS enabled)(+)
-.TP 4
 .I \-Dname[=value]
 Set environment variable name to value. (Domain/OS only) (+)
 .TP 4
@@ -3125,6 +3135,11 @@ in the tty sessions. It is usually set in .cshrc for interactive shells,
 because history is sourced between .cshrc and .login so that it is available
 from .login.
 .TP 10
+.B history
+The first word of the history variable indicates the number of history
+events to be saved. The optional second words indicates the format
+history is printed (Defaults to "%h\t%@\t%R\n").
+.TP 10
 .B inputmode
 Can be set to either
 .I insert
@@ -3273,8 +3288,6 @@ bye	Set if tcsh should accept bye in addition
 	Default is unset.
 al	Set if tcsh should determine if autologout 
 	should be enabled. The default is set.
-dir	Set if tcsh should save and restore the directory
-	stack.
 kan	Set if tcsh is compiled for Kanji. 
 	(ignore the iso character set.) Default is unset.
 sm	Set if tcsh was compiled to use the system's malloc.

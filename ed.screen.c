@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.screen.c,v 3.21 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.screen.c,v 3.22 1992/05/11 14:23:58 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.21 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.22 1992/05/11 14:23:58 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -563,6 +563,10 @@ EchoTC(v)
     if (t->name == NULL)
 	scap = tgetstr(cv, &area);
     if (!scap || scap[0] == '\0') {
+	if (tgetflag(cv, &area)) {
+	    xprintf("yes\n");
+	    return;
+	}
 	if (silent)
 	    return;
 	else
@@ -878,11 +882,10 @@ mc_again:
 			for (i = (CursorH & 0370); i < (where & 0370); i += 8)
 			    (void) putraw('\t');	/* then tab over */
 			CursorH = where & 0370;
-			if (CursorH < where && where == (TermH - 1)) {
-			    /* optimize: we can tab to the last column */
-			    (void) putraw('\t');
-			    CursorH = where;
-			}
+			/* Note: considering that we often want to go to
+			   TermH - 1 for the wrapping, it would be nice to
+			   optimize this case by tabbing to the last column
+			   - but this doesn't work for all terminals! */
 		    }
 		}
 		/* it's usually cheaper to just write the chars, so we do. */

@@ -355,7 +355,11 @@ glob(pattern, flags, errfunc, pglob)
 	    break;
 	case STAR:
 	    pglob->gl_flags |= GLOB_MAGCHAR;
-	    *bufnext++ = M_ALL;
+	    /* collapse adjacent stars to one, to avoid
+	     * exponential behavior
+	     */
+	    if (bufnext == patbuf || bufnext[-1] != M_ALL)
+		*bufnext++ = M_ALL;
 	    break;
 	default:
 	    *bufnext++ = CHAR(c);

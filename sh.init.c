@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.init.c,v 3.14 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.init.c,v 3.15 1992/05/09 04:03:53 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.14 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.15 1992/05/09 04:03:53 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -57,6 +57,7 @@ struct	biltins bfunc[] = {
     { "bindkey",	dobindkey,	0,	8, },
     { "break",		dobreak,	0,	0, },
     { "breaksw",	doswbrk,	0,	0, },
+    { "builtins", dobuiltins,	0,	0, },
 #if defined(IIASA) || defined(KAI)
     { "bye",		goodbye,	0,	0, },
 #endif
@@ -257,7 +258,7 @@ struct	mesg mesg[] = {
 #  undef  _sigextra_
 # endif /* _sigextra_ */
 
-#if !defined(IBMAIX) && !defined(cray) && !defined(linux)
+#if !defined(IBMAIX) && !defined(cray)
 /* these are the real svid signals */
 /* 16 */	"USR1",		"User signal 1",
 /* 17 */	"USR2", 	"User signal 2",
@@ -268,28 +269,7 @@ struct	mesg mesg[] = {
 /* 18 */	"CHLD",		"Child exited",
 /* 19 */	"PWR",  	"Power failure",
 # endif /* apollo */
-#endif /* IBMAIX && cray && linux */
-
-#ifdef linux
-# define _sigextra_
-/* 16 */	0,		"Signal 16",
-/* 17 */	"CHLD",		"Child exited",
-/* 18 */	"CONT",		"Continued",
-/* 19 */	"STOP",		MSG_STOP,
-/* 20 */	"TSTP",		MSG_TSTP,
-/* 21 */	"TTIN", 	MSG_TTIN,
-/* 22 */	"TTOU", 	MSG_TTOU,
-/* 23 */	0,   		"Signal 23",
-/* 24 */	0,		"Signal 24",
-/* 25 */	0, 		"Signal 25",
-/* 26 */	0,	 	"Signal 26",
-/* 27 */	0,		"Signal 27",
-/* 28 */	"WINCH", 	"Window changed",
-/* 29 */	0,		"Signal 29",
-/* 30 */	0,		"Signal 30",
-/* 31 */	0,		"Signal 31",
-/* 32 */	0,		"Signal 32",
-#endif /* linux */
+#endif /* !IBMAIX && !cray */
 
 # ifdef cray
 # define _sigextra_
@@ -701,6 +681,26 @@ struct	mesg mesg[] = {
 #  undef  _sigextra_
 # endif /* _sigextra_ */
 
+#ifdef linux
+# define _sigextra_
+/* 16 */	0,		"Signal 16",
+/* 17 */	"CHLD",		"Child exited",
+/* 18 */	"CONT",		"Continued",
+/* 19 */	"STOP",		MSG_STOP,
+/* 20 */	"TSTP",		MSG_TSTP,
+/* 21 */	"TTIN", 	MSG_TTIN,
+/* 22 */	"TTOU", 	MSG_TTOU,
+/* 23 */	0,   		"Signal 23",
+/* 24 */	0,		"Signal 24",
+/* 25 */	0, 		"Signal 25",
+/* 26 */	0,	 	"Signal 26",
+/* 27 */	0,		"Signal 27",
+/* 28 */	"WINCH", 	"Window changed",
+/* 29 */	0,		"Signal 29",
+/* 30 */	0,		"Signal 30",
+/* 31 */	0,		"Signal 31",
+/* 32 */	0,		"Signal 32",
+#else /* linux */
 /* 16 */	"URG",		"Urgent condition on IO channel",
 /* 17 */	"STOP",		MSG_STOP,
 /* 18 */	"TSTP",		MSG_TSTP,
@@ -713,6 +713,7 @@ struct	mesg mesg[] = {
 /* 25 */	"XFSZ", 	"Filesize limit exceeded",
 /* 26 */	"VTALRM", 	"Virtual time alarm",
 /* 27 */	"PROF",		"Profiling time alarm",
+#endif /* linux */
 
 # if defined(RENO) || defined(BSD4_4)
 # define _sigextra_
@@ -723,7 +724,7 @@ struct	mesg mesg[] = {
 /* 32 */	0,		"Signal 32",
 # endif /* RENO || BSD4_4 */
 
-# if (defined(sun) || defined(ultrix) || defined(hp9000) || defined(convex) || defined(__convex__)) && !defined(_sigextra_)
+# if (defined(sun) || defined(__sun__) || defined(ultrix) || defined(hp9000) || defined(convex) || defined(__convex__)) && !defined(_sigextra_)
 #  define _sigextra_
 /* 28 */	"WINCH", 	"Window changed",
 /* 29 */	"LOST",		"Resource lost",

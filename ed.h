@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.h,v 3.15 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.h,v 3.16 1992/05/11 14:23:58 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -136,7 +136,7 @@ EXTERN Char *LastWhich;		/* points to end of which buffer */
 EXTERN Char *CursWhich;		/* points to the cursor point in which buf */
 EXTERN int HistWhich;		/* Hist_num is saved in this */
 EXTERN char Expand;		/* true if we are expanding a line */
-EXTERN Char HistLit;		/* true if history lines are shown literal */
+extern Char HistLit;		/* true if history lines are shown literal */
 EXTERN Char CurrentHistLit;	/* Literal status of current show history line */
 
 /*

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.glob.c,v 3.21 1992/04/24 21:50:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.glob.c,v 3.22 1992/05/02 23:39:58 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.21 1992/04/24 21:50:47 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.22 1992/05/02 23:39:58 christos Exp $")
 
 #include "tc.h"
 
@@ -292,10 +292,8 @@ expbrace(nvp, elp, size)
 		xfree((ptr_t) bl);
 		continue;
 	    }
-	    len = blklen(bl);
 	    if (&el[len] >= &nv[size]) {
 		int     l, e;
-
 		l = &el[len] - &nv[size];
 		size += GLOBSPACE > l ? GLOBSPACE : l;
 		l = vl - nv;
@@ -305,12 +303,24 @@ expbrace(nvp, elp, size)
 		vl = nv + l;
 		el = nv + e;
 	    }
+	    /* nv vl   el     bl
+	     * |  |    |      |
+	     * -.--..--	      x--
+	     *   |            len
+	     *   vp
+	     */
 	    vp = vl--;
 	    *vp = *bl;
 	    len--;
 	    for (bp = el; bp != vp; bp--)
 		bp[len] = *bp;
 	    el += len;
+	    /* nv vl    el bl
+	     * |  |     |  |
+	     * -.-x  ---    --
+	     *   |len
+	     *   vp
+	     */
 	    vp++;
 	    for (bp = bl + 1; *bp; *vp++ = *bp++)
 		continue;
@@ -374,8 +384,7 @@ globexpand(v)
      * Step 2: expand braces
      */
     el = vl;
-    vl = nv;
-    expbrace(&vl, &el, size);
+    expbrace(&nv, &el, size);
 
 
     /*
@@ -746,17 +755,6 @@ backeval(cp, literal)
     faket.t_dcom = fakecom;
     fakecom[0] = STRfakecom1;
     fakecom[1] = 0;
-
-    if (didfds == 0) {
-	/*
-	 * Make sure that we have some file descriptors to
-	 * play with, so that the processes have at least 0, 1, 2
-	 * open
-	 */
-	(void) dcopy(SHIN, 0);
-	(void) dcopy(SHOUT, 1);
-	(void) dcopy(SHDIAG, 2);
-    }
 
     /*
      * We do the psave job to temporarily change the current job so that the

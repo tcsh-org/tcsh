@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.vers.c,v 3.17 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.18 1992/05/15 21:54:34 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,167 +36,167 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.17 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.18 1992/05/15 21:54:34 christos Exp $")
 
 #include "patchlevel.h"
 
 
-Char *
+char *
 gethosttype()
 {
-    Char *hosttype;
+    char *hosttype;
     
 #ifdef HOSTTYPE	/* Override any system determined hosttypes */
-    hosttype = str2short(HOSTTYPE);
+    hosttype = HOSTTYPE;
 #else
 
 # ifdef AMIX /* Amiga UNIX */
 #  define _havehosttype_
-    hosttype = str2short("amiga");
+    hosttype = "amiga";
 # endif /* AMIX */
 
 # if defined(vax) || defined(__vax)
 #  define _havehosttype_
-    hosttype = str2short("vax");
+    hosttype = "vax";
 # endif /* vax || __vax */
 
 # ifdef hp9000 /* hp9000 running MORE/bsd */
 #  ifdef hp300
 #   define _havehosttype_
-    hosttype = str2short("hp300");
+    hosttype = "hp300";
 #  endif 
 #  ifdef hp800
 #   define _havehosttype_
-    hosttype = str2short("hp800");
+    hosttype = "hp800";
 #  endif 
 #  ifndef _havehosttype_
 #   define _havehosttype_
-    hosttype = str2short("hp9000");	
+    hosttype = "hp9000";	
 #  endif 
 # endif /* hp9000 */
 
-# ifdef sun
-#  ifdef mc68010
+# if defined(sun) || defined(__sun__)
+#  if defined(mc68010) || defined(__mc68010__)
 #   define _havehosttype_
-    hosttype = str2short("sun2");
+    hosttype = "sun2";
 #  endif /* mc68010 */
-#  ifdef mc68020
+#  if defined(mc68020) || defined(__mc68010__)
 #   define _havehosttype_
-    hosttype = str2short("sun3");
+    hosttype = "sun3";
 #  endif /* mc68020 */
-#  ifdef sparc
+#  if defined(sparc) || defined(__sparc__)
 #   define _havehosttype_
-    hosttype = str2short("sun4");
+    hosttype = "sun4";
 #  endif /* sparc */
-#  ifdef i386
+#  if defined(i386) || defined(__i386__)
 #   define _havehosttype_
-    hosttype = str2short("sun386i");
+    hosttype = "sun386i";
 #  endif /* i386 */
 #  ifndef _havehosttype_
 #   define _havehosttype_
-    hosttype = str2short("sun");	
+    hosttype = "sun";	
 #  endif 
 # endif /* sun */
 
 # ifdef pyr /* pyramid */
 #  define _havehosttype_
-    hosttype = str2short("pyramid");
+    hosttype = "pyramid";
 # endif /* pyr */
 
 # ifdef tahoe /* tahoe */
 #  define _havehosttype_
-    hosttype = str2short("tahoe");
+    hosttype = "tahoe";
 # endif /* tahoe */
 
 # ifdef ibm032 /* from Jak Kirman */
 #  define _havehosttype_
-    hosttype = str2short("rt");
+    hosttype = "rt";
 # endif /* ibm032 */
 
 # ifdef aiws /* not to be confused with the above */
 #  define _havehosttype_
-    hosttype = str2short("rtpc");
+    hosttype = "rtpc";
 # endif /* aiws */
 
 # ifdef _AIX370
 #  define _havehosttype_
-    hosttype = str2short("aix370");
+    hosttype = "aix370";
 # endif /* _AIX370 */
 
 # ifdef _IBMESA
 #  define _havehosttype_
-    hosttype = str2short("aixESA");
+    hosttype = "aixESA";
 # endif /* _IBMESA */
 
 # ifdef _IBMR2
 #  define _havehosttype_
-    hosttype = str2short("rs6000");
+    hosttype = "rs6000";
 # endif /* _IBMR2 */
 
 # ifdef _AIXPS2 /* AIX on a PS/2 */
 #  define _havehosttype_
-    hosttype = str2short("ps2");
+    hosttype = "ps2";
 # endif /* _AIXPS2 */
 
 # ifdef OREO
 #  define _havehosttype_
-    hosttype = str2short("mac2");
+    hosttype = "mac2";
 # endif /* OREO */
 
 # ifdef hpux
 #  if defined(__hp9000s700) && !defined(_havehosttype_)
 #   define _havehosttype_
-   hosttype = str2short("hp9000s700");
+   hosttype = "hp9000s700";
 #  endif /* __hp9000s700 */
 #  if (defined(__hp9000s800) || defined(hp9000s800)) && !defined(_havehosttype_)
 #   define _havehosttype_
-   hosttype = str2short("hp9000s800");	/* maybe "spectrum" */
+   hosttype = "hp9000s800";	/* maybe "spectrum" */
 #  endif /* __hp9000s800 || hp9000s800 */
 #  if (defined(__hp9000s300) || defined(hp9000s300)) && !defined(_havehosttype_)
 #   define _havehosttype_
-   hosttype = str2short("hp9000s300");
+   hosttype = "hp9000s300";
 #  endif /* __hp9000s800 || hp9000s300 */
 # if defined(hp9000s500) && !defined(_havehosttype_)
 #  define _havehosttype_
-   hosttype = str2short("hp9000s500");
+   hosttype = "hp9000s500";
 # endif /* hp9000s500 */
 #  ifndef _havehosttype_
 #   define _havehosttype_
-   hosttype = str2short("hp");
+   hosttype = "hp";
 #  endif /* _havehosttype_ */
 # endif /* hpux */
 
 # ifdef apollo
 #  define _havehosttype_
-    hosttype = str2short("apollo");
+    hosttype = "apollo";
 # endif 
 
 # ifdef u3b20d
 #  define _havehosttype_
-    hosttype = str2short("att3b20");
+    hosttype = "att3b20";
 # endif /* u3b20d */
 
 # ifdef u3b15
 #  define _havehosttype_
-    hosttype = str2short("att3b15");
+    hosttype = "att3b15";
 # endif /* u3b15 */
 
 # ifdef u3b5
 #  define _havehosttype_
-    hosttype = str2short("att3b5");
+    hosttype = "att3b5";
 # endif /* u3b5 */
 
 # ifdef u3b2
 #  define _havehosttype_
-    hosttype = str2short("att3b2");
+    hosttype = "att3b2";
 # endif /* u3b2 */
 
 #ifdef _MINIX
 # define _havehosttype_
 # ifdef i386
-    hosttype = str2short("minix386");
+    hosttype = "minix386";
 # else /* minix ? amoeba or mac? */
-    hosttype = str2short("minix");
+    hosttype = "minix";
 # endif /* i386 */
 #endif /* _MINIX */
 
@@ -204,57 +204,57 @@ gethosttype()
 
 #  if !defined(_havehosttype_) && (defined(ISC) || defined(ISC202))
 #   define _havehosttype_
-    hosttype = str2short("isc386");
+    hosttype = "isc386";
 #  endif /* !_havehosttype_ && (ISC || ISC202) */
 
 #  if !defined(_havehosttype_) && defined(SCO)
 #   define _havehosttype_
-    hosttype = str2short("sco386");
+    hosttype = "sco386";
 #  endif /* !_havehosttype_ && SCO */
 
 #  if !defined(_havehosttype_) && defined(INTEL)
 #   define _havehosttype_
-    hosttype = str2short("intel386");
+    hosttype = "intel386";
 #  endif /* !_havehosttype_ && INTEL */
 
 #  ifndef _havehosttype_
 #   define _havehosttype_
-    hosttype = str2short("i386");
+    hosttype = "i386";
 #  endif /* _havehosttype_ */
 
 # endif 
 
 #ifdef UNIXPC
 # define _havehosttype_
-    hosttype = str2short("unixpc");
+    hosttype = "unixpc";
 #endif /* UNIXPC/att3b1/att7300 */
 
 # ifdef alliant
 #  define _havehosttype_
-    hosttype = str2short("alliant");	/* for Alliant FX Series */
+    hosttype = "alliant";	/* for Alliant FX Series */
 # endif 
 
 # if defined(i386) && defined(MACH)
 #  define _havehosttype_
-    hosttype = str2short("i386-mach");
+    hosttype = "i386-mach";
 # endif 
 
 # if defined(sequent) || defined(_SEQUENT_)
 #  define _havehosttype_
 #  ifdef i386
 #   ifdef sequent
-    hosttype = str2short("symmetry");	/* Sequent Symmetry Dynix/3 */
+    hosttype = "symmetry";	/* Sequent Symmetry Dynix/3 */
 #    ifndef LOCALSTR
 #     define LOCALSTR	" (Dynix/3)"
 #    endif /* LOCALSTR */
 #   else
-    hosttype = str2short("ptx");	/* Sequent Symmetry Dynix/ptx */
+    hosttype = "ptx";	/* Sequent Symmetry Dynix/ptx */
 #    ifndef LOCALSTR
 #     define LOCALSTR	" (Dynix/ptx)"
 #    endif /* LOCALSTR */
 #   endif 
 #  else
-    hosttype = str2short("balance");	/* for Sequent Balance Series */
+    hosttype = "balance";	/* for Sequent Balance Series */
 #   ifndef LOCALSTR
 #    define LOCALSTR	" (Dynix/3)"
 #   endif /* LOCALSTR */
@@ -263,10 +263,9 @@ gethosttype()
 #  ifdef ns32000
 #   define _havehosttype_
 #   ifdef CMUCS			/* hack for Mach (in the true spirit of CMU) */
-    hosttype = str2short("multimax");
+    hosttype = "multimax";
 #   else /* CMUCS */
-    hosttype = str2short((!access("/Umax.image", F_OK) ? 
-			 "multimax" : "ns32000"));
+    hosttype = (!access("/Umax.image", F_OK) ? "multimax" : "ns32000";
 #   endif /* CMUCS */
 #  endif /* ns32000 */
 # endif /* sequent */
@@ -274,27 +273,27 @@ gethosttype()
 # if defined(convex) || defined(__convex__)
 #  define _havehosttype_
     /* From: Brian Allison <uiucdcs!convex!allison@RUTGERS.EDU> */
-    hosttype = str2short("convex");
+    hosttype = "convex";
 # endif /* convex */
 
 # ifdef butterfly
 #  define _havehosttype_
     /* this will work _until_ the bfly with 88000s comes out */
-    hosttype = str2short("butterfly");	/* BBN Butterfly 1000 */
+    hosttype = "butterfly";	/* BBN Butterfly 1000 */
 # endif /* butterfly */
 
 # ifdef NeXT
 #  define _havehosttype_
-    hosttype = str2short("next");
+    hosttype = "next";
 # endif /* NeXT */
 
 /* From Kazuhiro Honda <honda@mt.cs.keio.ac.jp> */
 # ifdef sony_news
 #  define _havehosttype_
 #  ifdef mips /* Sony NEWS based on a r3000 */
-    hosttype = str2short("news_mips");
+    hosttype = "news_mips";
 #  else
-    hosttype = str2short("news");
+    hosttype = "news";
 #  endif 
 # endif /* sony_news */
 
@@ -302,46 +301,51 @@ gethosttype()
 #  define _havehosttype_
 #  if defined(MIPSEL) || defined(__MIPSEL)
 #   if defined(ultrix) || defined(__ultrix)
-    hosttype = str2short("decstation");
+    hosttype = "decstation";
 #   else
-    hosttype = str2short("mips");
+    hosttype = "mips";
 #   endif /* ultrix || __ultrix */
 #  endif /* MIPSEL || __MIPSEL */
 #  if defined(MIPSEB) || defined(__MIPSEB)
 #   if defined(ultrix) || defined(__ultrix)
-    hosttype = str2short("decmips");
+    hosttype = "decmips";
 #   else
 #    ifdef sgi /* sgi iris 4d */
-    hosttype = str2short("iris4d");
+    hosttype = "iris4d";
 #    else
 #     ifdef sony_news
-    hosttype = str2short("news_mips");
+    hosttype = "news_mips";
 #     else
-    hosttype = str2short("mips");
+    hosttype = "mips";
 #     endif /* sony_news */
 #    endif /* sgi */
 #   endif /* ultrix || __ultrix */
 #  endif /* MIPSEB || __MIPSEB */
 # endif /* mips || __mips */
 
+#if defined(__alpha__)
+#  define _havehosttype_
+    hosttype = "alpha";
+#endif
+
 # if defined(m88k) || defined(__m88k__)
 #  define _havehosttype_
-    hosttype = str2short("m88k");	/* Motorola 88100 system */
+    hosttype = "m88k";	/* Motorola 88100 system */
 # endif 
 
 # ifdef masscomp			/* Added, DAS DEC-90. */
 #  define _havehosttype_
-    hosttype = str2short("masscomp");/* masscomp == concurrent */
+    hosttype = "masscomp";/* masscomp == concurrent */
 # endif /* masscomp */
 
 # ifdef GOULD_NP1
 #  define _havehosttype_
-    hosttype = str2short("gould_np1");
+    hosttype = "gould_np1";
 # endif /* GOULD_NP1 */
 
 # ifdef SXA
 #  define _havehosttype_
-    hosttype = str2short("pfa50");
+    hosttype = "pfa50";
 #  ifdef  _BSDX_
 #   ifndef LOCALSTR
 #    define LOCALSTR	" (SX/A E60+BSDX)"
@@ -356,12 +360,12 @@ gethosttype()
 # ifdef titan
 #  define _havehosttype_
     /* Ken Laprade <laprade@trantor.harris-atd.com> */
-    hosttype = str2short("titan");
+    hosttype = "titan";
 # endif /* titan */
 
 # ifdef stellar
 #  define _havehosttype_
-    hosttype = str2short("stellar");
+    hosttype = "stellar";
 # endif /* stellar */
 
 # ifdef sgi
@@ -369,54 +373,59 @@ gethosttype()
 #  ifdef m68000
 #   define _havehosttype_
     /* Vince Del Vecchio <vd09@andrew.cmu.edu> */
-    hosttype = str2short("iris3d");
+    hosttype = "iris3d";
 #  endif
 # endif /* sgi */
 
 # ifdef uts
 #  define _havehosttype_
-    hosttype = str2short("amdahl");
+    hosttype = "amdahl";
 # endif /* uts */
   
 # ifdef OPUS
 #  define _havehosttype_
-    hosttype = str2short("opus");
+    hosttype = "opus";
 # endif /* OPUS */
 
 # ifdef eta10
 #  define _havehosttype_
    /* Bruce Woodcock <woodcock@mentor.cc.purdue.edu> */
-   hosttype = str2short("eta10");
+   hosttype = "eta10";
 # endif /* eta10 */
 
 # ifdef cray
 #  define _havehosttype_
-   hosttype = str2short("cray");
+   hosttype = "cray";
 # endif /* cray */
 
 # ifdef NDIX
 #  define _havehosttype_
    /* B|rje Josefsson <bj@dc.luth.se> */
-   hosttype = str2short("nd500");
+   hosttype = "nd500";
 # endif /* NDIX */
+
+# if defined(sysV68)
+#  define _havehosttype_
+    hosttype = "sysV68";
+# endif /* sysV68 */
 
 # if defined(i860) && !defined(_havehosttype_)
 #  define _havehosttype_
    /* Tasos Kotsikonas <tasos@avs.com> */
-   hosttype = str2short("vistra800"); /* Stardent Vistra */
+   hosttype = "vistra800"; /* Stardent Vistra */
 # endif /* i860  && !_havehosttype_ */
 
 # ifndef _havehosttype_
 #  if defined(mc68000) || defined(__mc68000__) || defined(mc68k32)
 #   define _havehosttype_
-     hosttype = str2short("m68k");	/* Motorola 68000 system */
+     hosttype = "m68k";	/* Motorola 68000 system */
 #  endif 
 # endif
 
 # ifndef _havehosttype_
 #  define _havehosttype_
     /* Default to something reasonable */
-    hosttype = str2short("unknown");
+    hosttype = "unknown";
 # endif 
 # undef _havehosttype_
 #endif /* HOSTTYPE */
@@ -473,11 +482,6 @@ fix_version()
 #else
 # define ALSTR ""
 #endif 
-#ifdef CSHDIRS
-# define DIRSTR ",dir"
-#else
-# define DIRSTR ""
-#endif 
 #ifdef KANJI
 # define KANSTR ",kan"
 #else
@@ -494,10 +498,10 @@ fix_version()
 #endif /* LOCALSTR */
 
     xsprintf(version,
-	       "tcsh %d.%.2d.%.2d (%s) %s options %s%s%s%s%s%s%s%s%s%s%s%s",
-	       REV, VERS, PATCHLEVEL, ORIGIN, DATE,
-	       SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR,
-	       BYESTR, ALSTR, DIRSTR, KANSTR, SMSTR, LOCALSTR);
+	     "tcsh %d.%.2d.%.2d (%s) %s (%s) options %s%s%s%s%s%s%s%s%s%s%s",
+	     REV, VERS, PATCHLEVEL, ORIGIN, DATE, gethosttype(),
+	     SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR,
+	     BYESTR, ALSTR, KANSTR, SMSTR, LOCALSTR);
     set(STRversion, SAVE(version));
     xsprintf(version, "%d.%.2d.%.2d", REV, VERS, PATCHLEVEL);
     set(STRtcsh, SAVE(version));

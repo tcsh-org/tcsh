@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.set.c,v 3.14 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.set.c,v 3.15 1992/05/09 04:03:53 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.14 1992/04/10 16:38:09 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.15 1992/05/09 04:03:53 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -44,6 +44,7 @@ RCSID("$Id: sh.set.c,v 3.14 1992/04/10 16:38:09 christos Exp $")
 extern Char HistLit;
 extern bool GotTermCaps;
 
+static	void		 update_vars	__P((Char *));
 static	Char		*getinx		__P((Char *, int *));
 static	void		 asx		__P((Char *, int, Char *));
 static	struct varent 	*getvx		__P((Char *, int));
@@ -58,6 +59,92 @@ static	void		 balance	__P((struct varent *, int, int));
 /*
  * C Shell
  */
+
+static void
+update_vars(vp)
+    Char *vp;
+{
+    if (eq(vp, STRpath)) {
+	exportpath(adrof(STRpath)->vec);
+	dohash(NULL, NULL);
+    }
+    else if (eq(vp, STRhistchars)) {
+	register Char *pn = value(vp);
+
+	HIST = *pn++;
+	HISTSUB = *pn;
+    }
+    else if (eq(vp, STRhistlit)) {
+	HistLit = 1;
+    }
+    else if (eq(vp, STRuser)) {
+	Setenv(STRUSER, value(vp));
+	Setenv(STRLOGNAME, value(vp));
+    }
+    else if (eq(vp, STRwordchars)) {
+	word_chars = value(vp);
+    }
+    else if (eq(vp, STRsymlinks)) {
+	register Char *pn = value(vp);
+
+	if (eq(pn, STRignore))
+	    symlinks = SYM_IGNORE;
+	else if (eq(pn, STRexpand))
+	    symlinks = SYM_EXPAND;
+	else if (eq(pn, STRchase))
+	    symlinks = SYM_CHASE;
+	else
+	    symlinks = 0;
+    }
+    else if (eq(vp, STRterm)) {
+#ifdef DOESNT_WORK_RIGHT
+	register Char *cp;
+#endif /* DOESNT_WORK_RIGHT */
+	Setenv(STRTERM, value(vp));
+#ifdef DOESNT_WORK_RIGHT
+	cp = getenv("TERMCAP");
+	if (cp && (*cp != '/'))	/* if TERMCAP and not a path */
+	    Unsetenv(STRTERMCAP);
+#endif /* DOESNT_WORK_RIGHT */
+	GotTermCaps = 0;
+	ed_Init();		/* reset the editor */
+    }
+    else if (eq(vp, STRhome)) {
+	register Char *cp;
+
+	cp = Strsave(value(vp));	/* get the old value back */
+
+	/*
+	 * convert to cononical pathname (possibly resolving symlinks)
+	 */
+	cp = dcanon(cp, cp);
+
+	set(vp, Strsave(cp));	/* have to save the new val */
+
+	/* and now mirror home with HOME */
+	Setenv(STRHOME, cp);
+	/* fix directory stack for new tilde home */
+	dtilde();
+	xfree((ptr_t) cp);
+    }
+    else if (eq(vp, STRedit)) {
+	editing = 1;
+	/* PWP: add more stuff in here later */
+    }
+    else if (eq(vp, STRshlvl)) {
+	Setenv(STRSHLVL, value(vp));
+    }
+    else if (eq(vp, STRbackslash_quote)) {
+	bslash_quote = 1;
+    }
+    else if (eq(vp, STRrecognize_only_executables)) {
+	tw_cmd_free();
+    }
+    else if (eq(vp, STRwatch)) {
+	resetwatch();
+    }
+}
+
 
 /*ARGSUSED*/
 void
@@ -128,85 +215,7 @@ doset(v, c)
 	    asx(vp, subscr, Strsave(p));
 	else
 	    set(vp, Strsave(p));
-	if (eq(vp, STRpath)) {
-	    exportpath(adrof(STRpath)->vec);
-	    dohash(NULL, NULL);
-	}
-	else if (eq(vp, STRhistchars)) {
-	    register Char *pn = value(vp);
-
-	    HIST = *pn++;
-	    HISTSUB = *pn;
-	}
-	else if (eq(vp, STRhistlit)) {
-	    HistLit = 1;
-	}
-	else if (eq(vp, STRuser)) {
-	    Setenv(STRUSER, value(vp));
-	    Setenv(STRLOGNAME, value(vp));
-	}
-	else if (eq(vp, STRwordchars)) {
-	    word_chars = value(vp);
-	}
-	else if (eq(vp, STRsymlinks)) {
-	    register Char *pn = value(vp);
-
-	    if (eq(pn, STRignore))
-		symlinks = SYM_IGNORE;
-	    else if (eq(pn, STRexpand))
-		symlinks = SYM_EXPAND;
-	    else if (eq(pn, STRchase))
-		symlinks = SYM_CHASE;
-	    else
-		symlinks = 0;
-	}
-	else if (eq(vp, STRterm)) {
-#ifdef DOESNT_WORK_RIGHT
-	    register Char *cp;
-#endif /* DOESNT_WORK_RIGHT */
-	    Setenv(STRTERM, value(vp));
-#ifdef DOESNT_WORK_RIGHT
-	    cp = getenv("TERMCAP");
-	    if (cp && (*cp != '/'))	/* if TERMCAP and not a path */
-		Unsetenv(STRTERMCAP);
-#endif /* DOESNT_WORK_RIGHT */
-	    GotTermCaps = 0;
-	    ed_Init();		/* reset the editor */
-	}
-	else if (eq(vp, STRhome)) {
-	    register Char *cp;
-
-	    cp = Strsave(value(vp));	/* get the old value back */
-
-	    /*
-	     * convert to cononical pathname (possibly resolving symlinks)
-	     */
-	    cp = dcanon(cp, cp);
-
-	    set(vp, Strsave(cp));	/* have to save the new val */
-
-	    /* and now mirror home with HOME */
-	    Setenv(STRHOME, cp);
-	    /* fix directory stack for new tilde home */
-	    dtilde();
-	    xfree((ptr_t) cp);
-	}
-	else if (eq(vp, STRedit)) {
-	    editing = 1;
-	    /* PWP: add more stuff in here later */
-	}
-	else if (eq(vp, STRshlvl)) {
-	    Setenv(STRSHLVL, value(vp));
-	}
-	else if (eq(vp, STRbackslash_quote)) {
-	    bslash_quote = 1;
-	}
-	else if (eq(vp, STRrecognize_only_executables)) {
-	    tw_cmd_free();
-	}
-	else if (eq(vp, STRwatch)) {
-	    resetwatch();
-	}
+	update_vars(vp);
     } while ((p = *v++) != NULL);
 }
 
@@ -331,10 +340,7 @@ dolet(v, dummy)
 	}
 	else
 	    set(vp, operate(op, value(vp), p));
-	if (eq(vp, STRpath)) {
-	    exportpath(adrof(STRpath)->vec);
-	    dohash(NULL, NULL);
-	}
+	update_vars(vp);
 	xfree((ptr_t) vp);
 	if (c != '=')
 	    xfree((ptr_t) p);
@@ -694,6 +700,7 @@ shift(v, c)
     if (argv->vec[0] == 0)
 	stderror(ERR_NAME | ERR_NOMORE);
     lshift(argv->vec, 1);
+    update_vars(name);
 }
 
 static void
@@ -884,7 +891,7 @@ x:
 	if (p->v_parent == 0)	/* is it the header? */
 	    return;
 	len = blklen(p->vec);
-	xprintf("%s\t", short2str(p->v_name));
+	xprintf("%S\t", p->v_name);
 	if (len != 1)
 	    xputchar('(');
 	blkpr(p->vec);
