@@ -1,4 +1,7 @@
-/* $Header$ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.h,v 1.3 1991/12/05 18:26:54 christos Exp christos $ */
+/*
+ * ed.term.h: Local terminal header
+ */
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
