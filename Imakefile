@@ -1,5 +1,5 @@
 XCOMM
-XCOMM $Id: Imakefile,v 1.80 2002/07/23 16:13:21 christos Exp $
+XCOMM $Id: Imakefile,v 1.81 2002/07/23 16:18:31 christos Exp $
 XCOMM
 XCOMM Imakefile for tcsh 6.12
 XCOMM Marc Horowitz, MIT SIPB
@@ -488,10 +488,10 @@ SHSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.set.c sh.time.c sh.char.h sh.dir.h sh.proc.h sh.h \
 	sh.decls.h glob.c glob.h ${SYSSRCS}
 SHOBJS=	sh.${SUF} sh.dir.${SUF} sh.dol.${SUF} sh.err.${SUF} sh.exec.${SUF} \
-	sh.char.${SUF} sh.exp.${SUF} sh.func.${SUF} sh.glob.${SUF} \
-	sh.hist.${SUF} sh.init.${SUF} sh.lex.${SUF} sh.misc.${SUF} \
-	sh.parse.${SUF} sh.print.${SUF} sh.proc.${SUF} sh.sem.${SUF} \
-	sh.set.${SUF} sh.time.${SUF} glob.${SUF} ${SYSOBJS}
+	sh.char.${SUF} sh.exp.${SUF} sh.file.${SUF} sh.func.${SUF} \
+	sh.glob.${SUF} sh.hist.${SUF} sh.init.${SUF} sh.lex.${SUF} \
+	sh.misc.${SUF} sh.parse.${SUF} sh.print.${SUF} sh.proc.${SUF} \
+	sh.sem.${SUF} sh.set.${SUF} sh.time.${SUF} glob.${SUF} ${SYSOBJS}
 
 TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c \
 	tw.comp.c tw.color.c
