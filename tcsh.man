@@ -3783,6 +3783,18 @@ substitutions.  Tilde and variable expansions work as expected.
 If set to `insert' or `overwrite', puts the editor into that input mode
 at the beginning of each line.
 .TP 8
+.B killdup \fR(+)
+Controls handling of duplicate entries in the kill ring.  If set to
+`all' only unique strings are entered in the kill ring.  If set to
+`prev' and the last killed string is the same as the current killed
+string, then the current string is not entered in the ring.  If set
+to `erase' and the same string is found in the kill ring, the old
+string is erased and the current one is inserted.
+.TP 8
+.B killring \fR(+)
+Indicates the number of killed strings to keep in memory.  Set to `30'
+by default.
+.TP 8
 .B listflags \fR(+)
 If set to `x', `a' or `A', or any combination thereof (e.g., `xA'), they
 are used as flags to \fIls\-F\fR, making it act like `ls \-xF', `ls
