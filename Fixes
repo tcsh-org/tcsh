@@ -1,4 +1,7 @@
 V6.05.00, ... 
+ 51. 6.04.06 12/19/93
+ 60. Alarm for resolver timeouts (untested)
+ 59. Fixes for Henry Spenser's regex in the Makefiles
  58. Modifiers now work with $< and $< does not do :q by default.
      [incompatibility with csh] and $< can be interrupted.
  57. Added $histdup.
