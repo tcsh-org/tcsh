@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/globals.c,v 1.3 2002/08/11 07:58:12 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/globals.c,v 1.4 2004/05/19 18:22:28 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -82,8 +82,9 @@ int fork_copy_user_mem(HANDLE hproc) {
 	return 0;
 }
 /*
-How To Determine Whether an Application is Console or GUI     [win32sdk]
-ID: Q90493     CREATED: 15-OCT-1992   MODIFIED: 16-DEC-1996
+ * Inspired by Microsoft KB article ID: Q90493 
+ *
+ * returns 0 (false) if app is non-gui, 1 otherwise.
 */
 #include <winnt.h>
 #include <ntport.h>
@@ -95,93 +96,68 @@ int is_gui(char *exename) {
 	HANDLE hImage;
 
 	DWORD  bytes;
-	DWORD  SectionOffset;
-	DWORD  CoffHeaderOffset;
-	DWORD  MoreDosHeader[16];
+    OVERLAPPED overlap;
 
 	ULONG  ntSignature;
 
-	IMAGE_DOS_HEADER      image_dos_header;
-	IMAGE_FILE_HEADER     image_file_header;
-	IMAGE_OPTIONAL_HEADER image_optional_header;
+    struct DosHeader{
+        IMAGE_DOS_HEADER     doshdr;
+        DWORD                extra[16];
+    };
+
+    struct DosHeader dh;
+	IMAGE_OPTIONAL_HEADER optionalhdr;
+
+    int retCode = 0;
+
+    memset(&overlap,0,sizeof(overlap));
 
 
 	hImage = CreateFile(exename, GENERIC_READ, FILE_SHARE_READ, NULL,
-			OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-
+			OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL| FILE_FLAG_OVERLAPPED, NULL);
 	if (INVALID_HANDLE_VALUE == hImage) {
 		return 0;
 	}
 
-	/*
-	 *  Read the MS-DOS image header.
-	 */
-	if (!ReadFile(hImage, &image_dos_header, sizeof(IMAGE_DOS_HEADER),
-			&bytes,NULL)){
-		CloseHandle(hImage);
-		return 0;
+	if (!ReadFile(hImage, &dh, sizeof(struct DosHeader), &bytes,&overlap)){
+
+        if(GetLastError() != ERROR_IO_PENDING)
+            goto done;
+
+	}
+    if(!GetOverlappedResult(hImage,&overlap,&bytes,TRUE) ) {
+        goto done;
+    }
+
+	if (IMAGE_DOS_SIGNATURE != dh.doshdr.e_magic) {
+		goto done;
 	}
 
-	if (IMAGE_DOS_SIGNATURE != image_dos_header.e_magic) {
-		CloseHandle(hImage);
-		return 0;
+    // read from the coffheaderoffset;
+    overlap.Offset = dh.doshdr.e_lfanew;
+
+	if (!ReadFile (hImage, &ntSignature, sizeof(ULONG), &bytes,&overlap)){
+        goto done;
 	}
-
-	/*
-	 *  Read more MS-DOS header.       */
-	if (!ReadFile(hImage, MoreDosHeader, sizeof(MoreDosHeader),
-			&bytes,NULL)){
-		CloseHandle(hImage);
-		return 0;
-	}
-
-	/*
-	 *  Get actual COFF header.
-	 */
-	CoffHeaderOffset = SetFilePointer(hImage, image_dos_header.e_lfanew,
-			NULL,FILE_BEGIN);
-
-	if (CoffHeaderOffset == (DWORD) -1){
-		CloseHandle(hImage);
-		return 0;
-	}
-
-	CoffHeaderOffset += sizeof(ULONG);
-
-	if (!ReadFile (hImage, &ntSignature, sizeof(ULONG),
-			&bytes,NULL)){
-		CloseHandle(hImage);
-		return 0;
-	}
-
+    if(!GetOverlappedResult(hImage,&overlap,&bytes,TRUE) ) {
+        goto done;
+    }
 	if (IMAGE_NT_SIGNATURE != ntSignature) {
-		CloseHandle(hImage);
-		return 0;
+		goto done;
+	}
+    overlap.Offset = dh.doshdr.e_lfanew + sizeof(ULONG) +
+                            sizeof(IMAGE_FILE_HEADER);
+
+	if (!ReadFile(hImage, &optionalhdr,IMAGE_SIZEOF_NT_OPTIONAL_HEADER,
+                &bytes,&overlap)) {
+		goto done;
 	}
 
-	SectionOffset = CoffHeaderOffset + IMAGE_SIZEOF_FILE_HEADER +
-		IMAGE_SIZEOF_NT_OPTIONAL_HEADER;
-
-	if (!ReadFile(hImage, &image_file_header, IMAGE_SIZEOF_FILE_HEADER,
-			&bytes, NULL)){
-		CloseHandle(hImage);
-		return 0;
-	}
-
-	/*
-	 *  Read optional header.
-	 */
-	if (!ReadFile(hImage, &image_optional_header, 
-			IMAGE_SIZEOF_NT_OPTIONAL_HEADER,&bytes,NULL)) {
-		CloseHandle(hImage);
-		return 0;
-	}
-
-	CloseHandle(hImage);
-
-	if (image_optional_header.Subsystem ==IMAGE_SUBSYSTEM_WINDOWS_GUI)
-		return 1;
-	return 0;
+	if (optionalhdr.Subsystem ==IMAGE_SUBSYSTEM_WINDOWS_GUI)
+		retCode =  1;
+done:
+    CloseHandle(hImage);
+	return retCode;
 }
 int is_9x_gui(char *prog) {
 	
