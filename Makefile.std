@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.69 1994/06/14 02:30:55 christos Exp $
+# $Id: Makefile.std,v 1.70 1994/06/19 20:46:44 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -54,7 +54,7 @@ CFLAGS=-O2 $(INCLUDES)
 # gcc 2.1 on linux
 #CFLAGS=-O6 -fomit-frame-pointer $(INCLUDES)
 
-#hpux 8.0, careful about the +O3... breaks globbing in some versions
+# HP/UX 8.0, 9.0
 #CFLAGS= $(INCLUDES) +O3 -Aa
 
 # Ultrix 4.2a
