@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.6 1991/07/18 23:05:30 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.7 1991/07/19 01:52:38 christos Exp christos $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -340,6 +340,18 @@ extern char *sbrk();
 #  define _SIZE_T
 # endif /* _SIZE_T */
 #endif /* IRIS3D */
+
+/* 
+ * Amdahl running UTS (Sys V3)
+ */
+#ifdef uts
+# ifndef _SIZE_T
+#  define _SIZE_T
+# endif /* _SIZE_T */
+# ifndef _PID_T
+#  define _PID_T
+# endif /* _PID_T */
+#endif /* uts */
 
 /***
  *** Catch all for non POSIX systems.

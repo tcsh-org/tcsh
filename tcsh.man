@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.5 1991/07/19 14:31:34 christos Exp christos $
+.\" $Id: tcsh.man,v 3.6 1991/07/19 18:50:11 christos Exp christos $
 .TH TCSH 1 "17 July 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1688,6 +1688,7 @@ The current possible values are:
 .nf
 \fIaix370\fR		an IBM 370, running aix
 \fIalliant\fR		an Alliant FX series
+\fIamdahl\fR		an Amdahl running uts 2.1
 \fIapollo\fR		an Apollo running DomainOS
 \fIatt3b15\fR		an AT&T 3b15
 \fIatt3b20\fR		an AT&T 3b20

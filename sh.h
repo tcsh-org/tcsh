@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.6 1991/07/18 16:24:49 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.7 1991/07/20 01:44:54 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -64,7 +64,7 @@ typedef char Char;
  * [The 4.2/3BSD vax compiler does not like that]
  */
 #ifdef SIGVOID
-# if defined(vax) && !defined(__GNUC__)
+# if (defined(vax) || defined(uts)) && !defined(__GNUC__)
 #  define sigret_t void
 # else
 typedef void sigret_t;
