@@ -35,8 +35,8 @@ $set 1
 32 Muutuja nimi võib koosneda ainult tähtedest ja numbritest
 33 Sellel käsuinterpretaatoril puudub töökontroll
 34 Avaldises on süntaksi viga
-35 Kadukataloogi pole
-36 Kadukataloogi ei saa minna
+35 Kodukataloogi pole
+36 Kodukataloogi ei saa minna
 37 Vigane tühi käsk
 38 Omistamisel pole avaldist
 39 Tundmatu operaator
