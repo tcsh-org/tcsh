@@ -30,6 +30,9 @@
 /* Define to 1 if you have the `getpwent' function. */
 #undef HAVE_GETPWENT
 
+/* Define to 1 if you have the `getutent' function. */
+#undef HAVE_GETUTENT
+
 /* Define to 1 if you have the iconv () interface */
 #undef HAVE_ICONV
 
@@ -96,6 +99,15 @@
 /* Define to 1 if `ut_host' is member of `struct utmp'. */
 #undef HAVE_STRUCT_UTMP_UT_HOST
 
+/* Define to 1 if `ut_tv' is member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_TV
+
+/* Define to 1 if `ut_user' is member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_USER
+
+/* Define to 1 if `ut_xtime' is member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_XTIME
+
 /* Define to 1 if you have the `sysconf' function. */
 #undef HAVE_SYSCONF
 
@@ -115,9 +127,6 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
-
-/* Define to 1 if you have the `utmpname' function. */
-#undef HAVE_UTMPNAME
 
 /* Define to 1 if you have the <utmpx.h> header file. */
 #undef HAVE_UTMPX_H

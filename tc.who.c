@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.42 2005/02/15 21:05:45 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.43 2005/03/03 22:58:39 kim Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.42 2005/02/15 21:05:45 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.43 2005/03/03 22:58:39 kim Exp $")
 
 #include "tc.h"
 
@@ -58,22 +58,19 @@ RCSID("$Id: tc.who.c,v 3.42 2005/02/15 21:05:45 christos Exp $")
 # endif /* __UTMPX_FILE && !UTMPX_FILE */
 # ifdef TCSH_PATH_UTMP
 #  define utmp utmpx
-#  if defined (__MVS__) || defined (linux)
+#  if defined(HAVE_STRUCT_UTMP_UT_TV)
 #   define ut_time ut_tv.tv_sec
-#   define ut_name ut_user
-#  elif defined (__CYGWIN__)
-#   define ut_name ut_user
-#  else
+#  elif defined(HAVE_STRUCT_UTMP_UT_XTIME)
 #   define ut_time ut_xtime
-#  endif /* __MVS__ */
-#  ifdef HAVE_UTMPNAME
+#  endif
+#  ifdef HAVE_STRUCT_UTMP_UT_USER
+#   define ut_name ut_user
+#  endif
+#  ifdef HAVE_GETUTENT
 #   define getutent getutxent
 #   define setutent setutxent
 #   define endutent endutxent
-#   if !defined(__CYGWIN__)
-#    define utmpname utmpxname
-#   endif /* !__CYGWIN */
-#  endif /* HAVE_UTMPNAME */
+#  endif /* HAVE_GETUTENT */
 # else
 #  ifdef HAVE_UTMP_H
 #   include <utmp.h>
@@ -183,7 +180,7 @@ watch_login(force)
 {
     int     comp = -1, alldone;
     int	    firsttime = stlast == 1;
-#ifdef HAVE_UTMPNAME
+#ifdef HAVE_GETUTENT
     struct utmp *uptr;
 #else
     int utmpfd;
@@ -284,8 +281,7 @@ watch_login(force)
 	return;
     }
     stlast = sta.st_mtime;
-#ifdef HAVE_UTMPNAME
-    utmpname(TCSH_PATH_UTMP);
+#ifdef HAVE_GETUTENT
     setutent();
 #else
     if ((utmpfd = open(TCSH_PATH_UTMP, O_RDONLY|O_LARGEFILE)) < 0) {
@@ -315,7 +311,7 @@ watch_login(force)
      * Read in the utmp file, sort the entries, and update existing entries or
      * add new entries to the status list.
      */
-#ifdef HAVE_UTMPNAME
+#ifdef HAVE_GETUTENT
     while ((uptr = getutent()) != NULL) {
         memcpy(&utmp, uptr, sizeof (utmp));
 #else
@@ -416,7 +412,7 @@ watch_login(force)
 	    wp->who_prev = wpnew;	/* linked in now */
 	}
     }
-#ifdef HAVE_UTMPNAME
+#ifdef HAVE_GETUTENT
     endutent();
 #else
     (void) close(utmpfd);

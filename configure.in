@@ -306,12 +306,13 @@ AC_CHECK_MEMBERS([struct dirent.d_ino], , ,
 # endif
 # define dirent direct
 #endif])
-AC_CHECK_MEMBERS([struct utmp.ut_host], , ,
-[#ifdef HAVE_UTMP_H
-#include <utmp.h>
-#elif defined HAVE_UTMPX_H
+AC_CHECK_MEMBERS([struct utmp.ut_host, struct utmp.ut_user, struct utmp.ut_tv,
+		  struct utmp.ut_xtime], , ,
+[#ifdef HAVE_UTMPX_H
 #include <utmpx.h>
 #define utmp utmpx
+#elif defined HAVE_UTMP_H
+#include <utmp.h>
 #endif])
 AC_CHECK_MEMBERS([struct sockaddr_storage.ss_family], , ,
 [#include <sys/types.h>
@@ -324,9 +325,9 @@ AC_C_VOLATILE
 
 dnl checks for library functions
 AC_CHECK_DECLS([gethostname])
-AC_CHECK_FUNCS([dup2 getcwd gethostname getpwent memmove memset nice] dnl
-	[nl_langinfo sbrk setpgid setpriority strerror strstr sysconf] dnl
-	[utmpname wcwidth])
+AC_CHECK_FUNCS([dup2 getcwd gethostname getpwent getutent memmove memset] dnl
+	[nice nl_langinfo sbrk setpgid setpriority strerror strstr sysconf] dnl
+	[wcwidth])
 AC_FUNC_GETPGRP
 AC_FUNC_SETPGRP
 
