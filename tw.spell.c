@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.spell.c,v 3.11 1994/09/04 21:54:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.spell.c,v 3.12 1994/09/04 22:03:09 christos Exp $ */
 /*
  * tw.spell.c: Spell check words
  */
@@ -36,13 +36,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.spell.c,v 3.11 1994/09/04 21:54:15 christos Exp $")
+RCSID("$Id: tw.spell.c,v 3.12 1994/09/04 22:03:09 christos Exp $")
 
 #include "tw.h"
 
 /* spell_me : return corrrectly spelled filename.  From K&P spname */
 int
-spell_me(oldname, oldsize, looking)
+spell_me(oldname, oldsize, looking, pat, suf)
     Char   *oldname;
     int     oldsize, looking;
     Char   *pat;
