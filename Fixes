@@ -1,3 +1,8 @@
+ 35. polish nls locale (Pawe³ New)
+ 34. Fix a tcsetattr race running background jobs as the last line on an xterm
+     window (Andrew Brown)
+ 33. jobcmd alias (Greg Parker)
+ 32. hpux11 support (Joshua Weage)
  31. Fix SHORT_STRINGS compilation (Daniel Trinkle)
  30. Add kill -s (Mark Peek)
  29. Don't recognize all mips as dec (Bjorn Knutsson)
