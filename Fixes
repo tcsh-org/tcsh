@@ -1,4 +1,10 @@
 V6.05.00, ... 
+108. 6.04.16 06/06/94
+107. Allow multi word glob in "`foo`" expressions.
+     > if ("`ls`" == "a b c") then
+106. Michaels lex() buffer patch version 2.
+     the previous version core-dumped with
+     > sleep | echo
 105. Fix seg fault in find_cmd, when path is unset.
 104. 6.04.15 05/28/94
 103. the previous =~ fix, was a bit broken.

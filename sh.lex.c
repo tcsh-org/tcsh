@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.lex.c,v 3.38 1994/04/28 13:28:46 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.lex.c,v 3.39 1994/05/26 13:11:20 christos Exp christos $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.38 1994/04/28 13:28:46 christos Exp christos $")
+RCSID("$Id: sh.lex.c,v 3.39 1994/05/26 13:11:20 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -58,6 +58,7 @@ static	void	 	 getexcl	__P((int));
 static	struct Hist 	*findev		__P((Char *, bool));
 static	void	 	 setexclp	__P((Char *));
 static	int	 	 bgetc		__P((void));
+static	void		 balloc		__P((int));
 static	void	 	 bfree		__P((void));
 static	struct wordent	*gethent	__P((int));
 static	int	 	 matchs		__P((Char *, Char *));
@@ -1643,14 +1644,31 @@ reread:
     return (c);
 }
 
+static void
+balloc(buf)
+    int buf;
+{
+    Char **nfbuf;
+
+    while (buf >= fblocks) {
+	nfbuf = (Char **) xcalloc((size_t) (fblocks + 2),
+			  sizeof(Char **));
+	if (fbuf) {
+	    (void) blkcpy(nfbuf, fbuf);
+	    xfree((ptr_t) fbuf);
+	}
+	fbuf = nfbuf;
+	fbuf[fblocks] = (Char *) xcalloc(BUFSIZE, sizeof(Char));
+	fblocks++;
+    }
+}
+
 static int
 bgetc()
 {
-    int buf;
-    int c;
+    int c, off, buf;
     int numleft = 0, roomleft;
     char    tbuf[BUFSIZE + 1];
-    off_t   ofseekp;
 
     if (cantell) {
 	if (fseekp < fbobp || fseekp > feobp) {
@@ -1674,97 +1692,42 @@ bgetc()
 	fseekp++;
 	return (c);
     }
-    ofseekp = fseekp;
-again:
-    buf = (int) fseekp / BUFSIZE;
-    if (buf >= fblocks) {
-	Char **nfbuf =
-	(Char **) xcalloc((size_t) (fblocks + 2),
-			  sizeof(Char **));
 
-	if (fbuf) {
-	    (void) blkcpy(nfbuf, fbuf);
-	    xfree((ptr_t) fbuf);
+    while (fseekp >= feobp) {
+	if (editing && intty) {		/* then use twenex routine */
+	    fseekp = feobp;		/* where else? */
+	    c = numleft = Inputl();	/* PWP: get a line */
+	    while (numleft > 0) {
+		off = (int) feobp % BUFSIZE;
+		buf = (int) feobp / BUFSIZE;
+		balloc(buf);
+		roomleft = BUFSIZE - off;
+		if (roomleft > numleft)
+		    roomleft = numleft;
+		(void) memmove((ptr_t) (fbuf[buf] + off), (ptr_t) (InputBuf + c - numleft), (size_t) (roomleft * sizeof(Char)));
+		numleft -= roomleft;
+		feobp += roomleft;
+	    }
 	}
-	fbuf = nfbuf;
-	fbuf[fblocks] = (Char *) xcalloc(BUFSIZE, sizeof(Char));
-	fblocks++;
-	if (!intty)
-	    goto again;
-    }
-    if (fseekp >= feobp) {
-	int off;
-	off = (int) feobp % BUFSIZE;
-	buf = (int) feobp / BUFSIZE;
-	roomleft = BUFSIZE - off;
-	for (;;) {
-	    if (editing && intty) {	/* then use twenex routine */
-		if (numleft == 0)
-		    numleft = Inputl();	/* PWP: get a line */
-		c = numleft > roomleft ? roomleft : numleft;
-		if (c) {
-		    /* 
-		     * Cannot really happen, but it does! 
-		     * I really cannot explain why the following if 
-		     * statement can get executed, but at least when it
-		     * does we are not going to core-dump any more.
-		     * It has something to do with a weird interaction
-		     * with run-fg-editor or interrupts I think, but 
-		     * I have not been able to pin it down!
-		     */
-		    if (buf >= fblocks || off > BUFSIZE) {
-#ifdef I_DEBUG
-			xprintf("buf %lx, fblocks %lx, off %lx, BUFSIZE %lx\n",
-				buf, fblocks, off, BUFSIZE);
-			xprintf("Dumping core...");
-			flush();
-			if (fork() == 0)
-			    (void) kill(0, 6);
-			xprintf("ok.\n");
-			flush();
-#endif
-			/* start with fresh buffer */
-			feobp = fseekp = fblocks * BUFSIZE;
-			goto again;
-		    }
-		    (void) memmove((ptr_t) (fbuf[buf] + off), (ptr_t) InputBuf,
-				   (size_t) (c * sizeof(Char)));
-		    if (c < numleft)
-			(void) memmove((ptr_t) InputBuf, (ptr_t) (InputBuf + c),
-			               (size_t) ((numleft - c) * sizeof(Char)));
-		    numleft -= c;
-		}
+	else {
+	    off = (int) feobp % BUFSIZE;
+	    buf = (int) feobp / BUFSIZE;
+	    balloc(buf);
+	    roomleft = BUFSIZE - off;
+	    c = read(SHIN, tbuf, (size_t) roomleft);
+	    if (c > 0) {
+		int     i;
+		Char   *ptr = fbuf[buf] + off;
+
+		for (i = 0; i < c; i++)
+		    ptr[i] = (unsigned char) tbuf[i];
 		feobp += c;
-	        if (numleft) {
-		    fseekp = feobp;
-		    goto again;
-		}
-		c = feobp - ofseekp;
-		fseekp = feobp = ofseekp;
-		buf = (int) fseekp / BUFSIZE;
 	    }
-	    else {
-		c = read(SHIN, tbuf, (size_t) roomleft);
-		if (c > 0) {
-		    int     i;
-		    Char   *ptr = fbuf[buf] + off;
-
-		    for (i = 0; i < c; i++)
-			ptr[i] = (unsigned char) tbuf[i];
-		}
-	    }
-	    if (c >= 0)
-		break;
-	    if ((c = fixio(SHIN, errno)) == -1)
-		break;
 	}
-	if (c <= 0)
+	if (c == 0 || (c < 0 && fixio(SHIN, errno) == -1))
 	    return (-1);
-	feobp += c;
-	if (editing && !intty)
-	    goto again;
     }
-    c = fbuf[buf][(int) fseekp % BUFSIZE];
+    c = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
     fseekp++;
     return (c);
 }

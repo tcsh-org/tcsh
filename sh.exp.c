@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.27 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.28 1994/05/28 15:44:57 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.27 1994/05/26 13:11:20 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.28 1994/05/28 15:44:57 christos Exp $")
 
 /*
  * C shell
@@ -622,7 +622,7 @@ exp6(vp, ignore)
 #ifdef EDEBUG
     etracc("exp6 default", cp, vp);
 #endif /* EDEBUG */
-    return (ignore & NOGLOB ? Strsave(cp) : globone(cp, G_ERROR));
+    return (ignore & NOGLOB ? Strsave(cp) : globone(cp, G_APPEND));
 }
 
 
@@ -692,7 +692,7 @@ filetest(cp, vp, ignore)
     dp = *(*vp)++;
     if (ignore & IGNORE)
 	return (Strsave(STRNULL));
-    ep = globone(dp, G_ERROR);
+    ep = globone(dp, G_APPEND);
     ft = &cp[1];
     do 
 	switch (*ft) {

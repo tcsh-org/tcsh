@@ -50,7 +50,7 @@
 .\"   Remember to note OS-specific things in "OS variant support", new features
 .\"   in NEW FEATURES and referenced external commands in SEE ALSO.
 .\" 
-.TH TCSH 1 "28 May 1994" "Cornell 6.04.15"
+.TH TCSH 1 "6 June 1994" "Cornell 6.04.16"
 .SH NAME
 tcsh - C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -4465,12 +4465,13 @@ an argument list.
 To detect looping, the shell restricts the number of \fBalias\fR
 substitutions on a single line to 20.
 .SH "SEE ALSO"
-csh(1), emacs(1), ls(1), newgrp(1), sh(1), setpath(1), stty(1), su(1), tset(1), vi(1), x(1),
-access(2), execve(2), fork(2), killpg(2), pipe(2), setrlimit(2),
-sigvec(2), stat(2), umask(2), vfork(2), wait(2), malloc(3), setlocale(3), tty(4),
-a.out(5), termcap(5), environ(7), termio(7), Introduction to the C Shell
+csh(1), emacs(1), ls(1), newgrp(1), sh(1), setpath(1), stty(1), su(1),
+tset(1), vi(1), x(1), access(2), execve(2), fork(2), killpg(2),
+pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
+malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
+termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.15 (Cornell) 94/05/28.
+This man page documents tcsh 6.04.16 (Cornell) 94/06/06.
 .SH AUTHORS
 .PD 0
 .TP 2
