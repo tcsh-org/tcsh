@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.6 1991/07/23 23:20:08 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.proc.c,v 3.7 1991/07/29 21:22:46 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.proc.c,v 3.6 1991/07/23 23:20:08 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.7 1991/07/29 21:22:46 christos Exp christos $")
 
 #include "sh.h"
 #include "ed.h"
@@ -255,7 +255,7 @@ loop:
     pid = wait3(&w.w_status, WNOHANG, &ru);
 #  endif /* !hpux */
 # else /* !BSDTIMES */
-#  if (SVID > 0) && (SVID < 3)
+#  if SVID < 3
     /* no wait3, therefore no rusage */
     /* on Sys V, this may hang.  I hope it's not going to be a problem */
     pid = ourwait(&w.w_status);
