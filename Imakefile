@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.12 1992/05/09 04:03:53 christos Exp $
+/**/# $Id: Imakefile,v 1.13 1992/05/11 14:23:58 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -7,6 +7,9 @@
 
 #ifdef DestDir
 #undef DestDir
+#endif
+#ifdef ManSuffix
+#undef ManSuffix
 #endif
 
 /* All config options go in a separate file. */
@@ -270,21 +273,24 @@ HESDEF =
 and it shouldn't hurt to have it here, so here it is */
 PARALLEL=12				# Make the multi-max run fast.
 
-#ifndef DestDir
-#define DestDir /usr/local
+#ifndef TcshTop
+#define TcshTop /usr/local
 #endif
 
-DESTDIR = DestDir
+TCSHTOP = TcshTop
 MANSUFFIX = 1
+#ifndef ManSuffix
+#define ManSuffix $(MANSUFFIX)
+#endif
 #ifdef DestBin
 BINDIR = DestBin
 #else
-BINDIR = $(DESTDIR)/bin
+BINDIR = $(TCSHTOP)/bin
 #endif
 #ifdef DestMan
 MANDIR = DestMan
 #else
-MANDIR = $(DESTDIR)/man/man$(MANSUFFIX)
+MANDIR = $(TCSHTOP)/man/man$(MANSUFFIX)
 #endif
 
 #ifndef MyCflags

@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.41 1992/05/02 23:39:58 christos Exp $
+.\" $Id: tcsh.man,v 3.42 1992/05/09 04:03:53 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -3326,7 +3326,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.02.00 (Cornell) 05/01/92.
+This man page documents tcsh 6.02.00 (Cornell) 05/15/92.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981

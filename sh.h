@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.h,v 3.32 1992/04/24 21:50:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.h,v 3.33 1992/05/09 04:03:53 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -111,6 +111,11 @@ typedef int sigret_t;
 /*
  * What our builtin echo looks like
  */
+#define NONE_ECHO	0
+#define BSD_ECHO	1
+#define SYSV_ECHO	2
+#define BOTH_ECHO	(BSD_ECHO|SYSV_ECHO)
+
 #ifndef ECHO_STYLE
 # if SYSVREL > 0
 #  define ECHO_STYLE SYSV_ECHO
@@ -366,11 +371,6 @@ extern void		DebugFree	__P((ptr_t, char *, int));
  * Jim Kulp, IIASA, Laxenburg Austria
  * April, 1980
  */
-
-#define SIGN_EXTEND_CHAR(a) \
-	((int) ((a) & 0x80 ? ((int) (a)) | 0xffffff00 : ((int) a) & 0x000000ff))
-
-
 
 #if !defined(MAXNAMLEN) && defined(_D_NAME_MAX)
 # define MAXNAMLEN _D_NAME_MAX

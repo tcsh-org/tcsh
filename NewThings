@@ -2,8 +2,27 @@ This file contains visible (incompatible) changes to the users.
 This version of tcsh has the following new things:
 
 6.02
-ignore_symlinks and chase_symlinks are replaced with symlinks=ignore
-and symlinks=chase.
+* ignore_symlinks and chase_symlinks are replaced with symlinks=ignore
+  and symlinks=chase; symlinks=expand addition
+* complete and uncomplete builtins; user-programmable completion additions.
+* Tcsh now uses the rightmost column of the terminal, allowing cut-and-paste
+  operations in terminal emulators that work [xterm R5 not R4]
+* echo_style controls now the behaviour of the builtin echo; the default
+  should match the builtin echo of /bin/csh; if your system does not
+  come with csh, then the default echo should match /bin/echo.
+* cd -; changes to the previous directory.
+* setting dunique variable pushes only unique directories on the directory
+  stack.
+* source builtin allows additional arguments that get passed in $argv in
+  the sourced script.
+* tcsh now mirrors correctly all exported csh variables [term=TERM,path=PATH
+  etc.]
+* showdots=-A makes listing behave like ls -A. 
+* directory stack access =<num> allows for entries > 9.
+* $a:u uppercase the first character in $a, $a:l downcases the first
+  character in $a.
+* Shorthand for file tests in 'if' expressions ( -dx file ) is the
+  same as ( -d file && -x file )
 
 6.01
 * Nothing new.

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.func.c,v 3.30 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.func.c,v 3.31 1992/05/09 04:03:53 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.30 1992/04/10 16:38:09 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.31 1992/05/09 04:03:53 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1008,11 +1008,6 @@ doglob(v, c)
     xecho(0, v);
     flush();
 }
-
-#define NONE_ECHO	0
-#define BSD_ECHO	1
-#define SYSV_ECHO	2
-#define BOTH_ECHO	(BSD_ECHO|SYSV_ECHO)
 
 static void
 xecho(sep, v)

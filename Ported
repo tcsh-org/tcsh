@@ -79,7 +79,7 @@ MODELS	:	vax, decstation
 COMPILER:	cc
 CFLAGS	:	normal
 LIBES	:	-ltermcap
-OS	:	ultrix 3.0 (vax), 3.5, 4.0, 4.1, 4.2
+OS	:	ultrix 3.0 (vax), 4.0, 4.1, 4.2
 CONFIG	:	config.ultrix 
 ENVIRON	:	n/a
 NOTES	:	pcc broken: typedef void sigret_t (vax); 
@@ -113,6 +113,7 @@ CONFIG	:	config.aix
 ENVIRON	:	n/a
 NOTES	:	aix G9.9 sfname() frees bad pointers. Use TCF with care!
 NOTES	:	aix 3.2 may need NAMEI_BUG
+NOTES	:	aix 3.2 may need _BSD_INCLUDES defined in config.h
 VERSION	:	6.01.00
 
 VENDOR	:	ibm

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.dol.c,v 3.13 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.dol.c,v 3.14 1992/04/10 16:38:09 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.13 1992/04/03 22:15:14 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.14 1992/04/10 16:38:09 christos Exp $")
 
 /*
  * C shell
@@ -444,10 +444,10 @@ Dgetdol()
 	if (dimen)
 	    stderror(ERR_NOTALLOWED, "$?#");
 	for (np = wbuf; read(OLDSTD, &tnp, 1) == 1; np++) {
-	    *np = tnp;
+	    *np = (unsigned char) tnp;
 	    if (np >= &wbuf[BUFSIZE - 1])
 		stderror(ERR_LTOOLONG);
-	    if (SIGN_EXTEND_CHAR(tnp) <= 0 || tnp == '\n')
+	    if (tnp == '\n')
 		break;
 	}
 	*np = 0;

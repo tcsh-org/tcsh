@@ -27,10 +27,6 @@
 	Subscript out of bounds.
 	> echo $a:[2-20]
 	Subscript out of bounds.
-	> echo $a:l
-	this is a string
-	> echo $a:u
-	THIS IS A STRING
 	> echo $a:[1-1]:u$a:[2-].
 	This is a string.
 

@@ -1,7 +1,12 @@
 V6.02.00, ...
+94. Default echo_style was not being set correctly.
+93. $< did not work correctly with NLS chars.
+92. 6.01.15 (5/11/92)
+91. Minor cleanups in refresh code.
+90. 6.01.14 (5/8/92)
 89. Print \n in the right margin always to be consistent.
 88. Linux patches.
-87. 6.01.13 (5/02/92) 
+87. 6.01.13 (5/2/92) 
 86. Fixes in listing and completion of non-unique commands.
 85. Fix =stack entries > 9... from Bill Petro
 84. Fix for last character at margin. [on terminals that have am & xm move

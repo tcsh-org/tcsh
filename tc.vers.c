@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tc.vers.c,v 3.16 1992/03/08 02:17:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.vers.c,v 3.17 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.16 1992/03/08 02:17:22 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.17 1992/03/27 01:59:46 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -404,12 +404,14 @@ gethosttype()
 #  define _havehosttype_
    /* Tasos Kotsikonas <tasos@avs.com> */
    hosttype = str2short("vistra800"); /* Stardent Vistra */
-#endif /* i860  && !_havehosttype_ */
+# endif /* i860  && !_havehosttype_ */
 
-# if (defined(mc68000) || defined(__mc68000__)) && !defined(_havehosttype_)
-#  define _havehosttype_
-    hosttype = str2short("m68k");	/* Motorola 68000 system */
-# endif 
+# ifndef _havehosttype_
+#  if defined(mc68000) || defined(__mc68000__) || defined(mc68k32)
+#   define _havehosttype_
+     hosttype = str2short("m68k");	/* Motorola 68000 system */
+#  endif 
+# endif
 
 # ifndef _havehosttype_
 #  define _havehosttype_
