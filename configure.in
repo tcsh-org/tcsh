@@ -308,6 +308,15 @@ dnl   ifelse([$3], , :, [$3])
 dnl fi])
 dnl IPv6_CHECK_FUNC(getnameinfo, DFLAGS="$DFLAGS -DINET6")
 
+AC_CACHE_CHECK([ss_family in sockaddr_storage], ac_cv_ss_family,
+[AC_TRY_COMPILE([#include <sys/types.h>
+#include <sys/socket.h>], [struct sockaddr_storage ss; ss.ss_family;],
+  ac_cv_ss_family=yes, ac_cv_ss_family=no)]
+if test "$ac_cv_ss_family" = no; then
+  DFLAGS="$DFLAGS -DNO_SS_FAMILY"
+fi
+)
+
 AC_SUBST(DFLAGS)
 
 AC_ARG_WITH(hesiod,
