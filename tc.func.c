@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.95 2001/04/27 22:25:54 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.96 2001/08/06 23:52:04 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.95 2001/04/27 22:25:54 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.96 2001/08/06 23:52:04 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1296,8 +1296,11 @@ rmstar(cp)
 			    tmp->next->prev = tmp->prev;
 			    xfree((ptr_t) tmp->word);
 			    del = tmp;
+			    tmp = tmp->next;
 			    xfree((ptr_t) del);
 			}
+			we = tmp;
+			continue;
 		    }
 		}
 	    }
