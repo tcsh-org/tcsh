@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.53 2000/07/04 19:39:22 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.54 2000/11/11 23:03:36 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.53 2000/07/04 19:39:22 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.54 2000/11/11 23:03:36 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -1348,7 +1348,7 @@ recdirs(fname, def)
 	return;
     }
 
-    if ((snum = varval(STRsavedirs)) == STRNULL) 
+    if ((snum = varval(STRsavedirs)) == STRNULL || snum[0] == '\0') 
 	num = (unsigned int) ~0;
     else
 	num = (unsigned int) atoi(short2str(snum));
