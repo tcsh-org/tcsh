@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.parse.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.parse.c,v 2.1 1991/03/31 13:06:41 christos Exp christos $ */
 /*
  * sh.parse.c: Interpret a list of tokens
  */
@@ -27,7 +27,7 @@
 static char *sccsid = "@(#)sh.parse.c	5.3 (Berkeley) 5/13/86";
 #endif
 #ifndef lint
-static char *rcsid = "$Id: sh.parse.c,v 2.0 1991/03/26 02:59:29 christos Exp $";
+static char *rcsid = "$Id: sh.parse.c,v 2.1 1991/03/31 13:06:41 christos Exp christos $";
 #endif
 
 #include "sh.h"
@@ -56,7 +56,7 @@ void
 alias(lex)
 	register struct wordent *lex;
 {
-	volatile int aleft = 21;
+	int aleft = 21;
 	jmp_buf osetexit;
 
 	getexit(osetexit);

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.func.c,v 2.1 1991/03/31 13:06:41 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -27,7 +27,7 @@
 static char *sccsid = "@(#)sh.func.c	5.3 (Berkeley) 5/13/86";
 #endif
 #ifndef lint
-static char *rcsid = "$Id: sh.func.c,v 2.0 1991/03/26 02:59:29 christos Exp $";
+static char *rcsid = "$Id: sh.func.c,v 2.1 1991/03/31 13:06:41 christos Exp christos $";
 #endif
 
 #include "sh.h"
@@ -235,8 +235,8 @@ doaliases(v)
 	Char **v;
 {
 	jmp_buf oldexit;
-	volatile Char *p = (Char *) 0;
-	volatile int n = 0;
+	Char *p = (Char *) 0;
+	int n = 0;
 	Char **vec, *lp;
 	int fd;
 	Char buf[BUFSIZ], line[BUFSIZ];

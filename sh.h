@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/sh.h,v 2.1 1991/03/31 13:06:41 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -26,9 +26,6 @@
 #ifndef _h_sh
 #define _h_sh
 
-#ifndef __STDC__
-# define volatile
-#endif /* __STDC__ */
 /*
  * Sanity
  */
