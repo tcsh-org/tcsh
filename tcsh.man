@@ -1,11 +1,11 @@
-.\" $Id: tcsh.man,v 1.22 1991/03/20 19:04:50 christos Exp $
-.TH TCSH 1 "22 Feb 1991" "Cornell"
+.\" $Id: tcsh.man,v 2.0 1991/03/26 02:59:29 christos Exp $
+.TH TCSH 1 "4 July 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
 .B tcsh 
 [ 
-.B \-bcefinstvVxX 
+.B \-bcdefilmnqstvVxX 
 ] 
 [ 
 .I argument .\|.\|.  
@@ -40,7 +40,7 @@ except for the added utilities of:
 7)  Lookup of command documentation in the middle of a typed command.
 .sp
 .ti -4
-8)  History saved between logouts.
+8)  Enhanced history mechanism.
 .sp
 .ti -4
 9)  Automatic logout after long periods of idle time.
@@ -77,7 +77,7 @@ executed at given times.
 .sp
 .ti -4
 18) An addition to the file expression syntax for a character not
-in a set of characters.
+in a set of characters and the ability to negate a regular expression.
 .sp
 .ti -4
 19) New automatically initialized environment variables \fIHOST\fR and
@@ -111,13 +111,16 @@ directory is changed.
 27) Automatic process time reporting.
 .sp
 .ti -4
-28) Transparent Computing Facility support
+28) OS Dependent Builtin Support
 .sp
-.it -4
+.ti -4
 29) Automatic window size adjustment
 .sp
-.it -4
+.ti -4
 30) Input files
+.sp
+.ti -4
+31) Additional/Undocumented Options
 .RE
 .sp
 For a description of standard C-shell features, see the
@@ -525,8 +528,12 @@ history.
 .PP
 Another way to recall (parts of) history commands is via the 'expand-history'
 function. A variation of the 'expand-history' function is called 'magic-space'.
-This function expands csh history, and always appends a space. Magic-space
-thus can be bound to <space>, to automatically expand csh history.
+This function expands 
+.I csh 
+history, and always appends a space. Magic-space
+thus can be bound to <space>, to automatically expand 
+.I csh 
+history.
 Expand-history is normally bound to
 .I M-<space>
 and magic-space is not bound.
@@ -561,7 +568,9 @@ is set.  The name may
 be partially completed if the prefix matches several longer names.  If
 this is the case, the name is extended up to the point of ambiguity,
 and the bell is rung.  This works for file names, command names, shell 
-variables and the (csh) ~ user name convention.
+variables and the 
+.I( csh) 
+\~ user name convention.
 The variable
 .I fignore
 may be set to a list of suffixes to be disregarded during completion.
@@ -634,6 +643,36 @@ Command names may also be completed, for example,
 .sp
 will expand to "gnumacs" (assuming that there are no other commands
 that begin with "gnum").
+.sp
+Shell and environment variables are recognized also and in addition
+they can be expanded:
+.sp
+.RS +.6i
+> set local=/usr/local
+.br
+> echo $lo[TAB]
+.RE
+.sp
+will expand to "$local/". Note that a slash is appended because the
+expanded variable points to a directory. Also:
+.sp
+.RS +.6i
+> set local=/usr/local
+.br
+> echo $local/[^D]
+.br
+bin/ etc/ lib/ man/ src/ 
+.RE
+.sp
+will correctly list the contents of /usr/local. Shell and environment
+variables can also be expanded via the expand-variables function:
+.sp
+.RS +.6i
+> echo $local/[^X$]
+.br
+> echo /usr/local/
+.RE
+
 .PP
 Completion also works when the cursor is in the middle of the line,
 rather than just the end.  All of the text after the cursor will be
@@ -675,15 +714,23 @@ variable is set, invoking completion when several choices are possible
 will automatically list the choices, effectively merging the functionality
 described in the next section into the completion mechanism.
 The "noise level" can be controlled by the value that
-.I autolist
-is set to: With autolist=beepnone, completion will only beep if there are
-no matching names; with autolist=beepnever, completion will never beep.
-Any other value (or no value) gives the default beeping behavior above.
+.I matchbeep
+is set to: With matchbeep=nomatch, completion will only beep if there are
+no matching names; with matchbeep=ambiguous, completion will
+.I also
+beep if there are many possible matches; with matchbeep=notunique,
+completion will
+.I also
+beep when there is an exact match but there are other, longer, matches
+(see recexact).  With matchbeep=never or set to any other value completion 
+will never beep. If matchbeep is not set it defaults to ambiquous.
 .PP
 If the
 .I autoexpand
 variable is set, the expand-history function will be invoked automatically
-before the completion attempt, expanding normal csh history substitutions.
+before the completion attempt, expanding normal 
+.I csh 
+history substitutions.
 .PP
 For covert operation, the variable
 .I nobeep
@@ -691,6 +738,10 @@ can be set; it will prevent the completion mechanism,
 as well as 
 .I tcsh 
 in general, from actually beeping.
+Finally, if the
+.I autocorrect
+variable is set, the spelling correction is attempted for any path components
+up to the completion point.
 .PP
 .SH "5. LISTING OF POSSIBLE NAMES"
 At any point in typing a command, you may request "what names are
@@ -858,6 +909,10 @@ Answering 'y' or <space> at the prompt
 will cause the corrected line to be used,
 anything else will leave the original line unchanged.
 .PP
+Automatic correction is not guaranteed to work the way the user intended.
+Command line parsing is done in a rudimentary fashion. It is mostly provided
+as an experimental feature. Suggestions and improvements are welcome.
+.PP
 .SH "7. DOCUMENTATION LOOKUP"
 The editor function
 .I "run-help"
@@ -871,7 +926,7 @@ way.  This is because
 is meant to be used to look up short help files,
 not manual pages (although it can do manual pages also).
 .PP
-.SH "8. HISTORY SAVING"
+.SH "8. ENHANCED HISTORY MECHANISM"
 .I Tcsh
 will save the history list between login sessions.  It does this by
 writing the current list to the file "~/.history" on logout, and
@@ -914,6 +969,48 @@ Modifier failed.
 .fi
 .RE
 .sp
+.I Tcsh
+also supports the history escape 
+.I !#.
+This undocumented 
+.I csh 
+escape holds the words of the current line. This is useful in renaming
+commands:
+.sp
+.RS +.6i
+.nf
+> mv foo bar!#:1
+mv foo barfoo
+.fi
+.RE
+.sp
+Care should be taken when using this history expansion in 
+.I csh
+since there is no check for recursion. In 
+.I tcsh
+up to 10 levels of recursion are allowed.
+.PP
+Another difference between 
+.I tcsh
+and
+.I csh
+history expansion, is the treatment of history arguments. In
+.I csh
+.I "!3d" 
+expands to event 3 with the letter "d" appended to it. 
+There is no way to repeat a command that begins with a number using
+the name of the command in the history escape. In 
+.I tcsh 
+only numeric arguments are treated as
+event numbers; therefore
+.I "!3d" 
+is interpreted as: repeat the last command that
+started with the string "3d". To mimick the 
+.I csh
+behavior
+.I "!3\ed" 
+can be used. 
+
 .PP
 .SH "9. AUTOMATIC LOGOUT"
 The automatic logout time is controlled by the variable
@@ -995,7 +1092,12 @@ The available sequences are:
 .nf
 %d or %/	Current working directory.
 %~	cwd.  If it starts with $HOME, that part is 
-	replaced by a ~.
+	replaced by a ~. In addition if a directory
+	name prefix matches a user's home directory,
+	that part of the directory will be substituted
+	with ~user. NOTE: The ~user substitution will
+	only happen if the shell has performed a ~
+	expansion for that user name in this session.
 %c or %.	Trailing component of cwd, may be 
 	followed by by a digit to get more than one 
 	component, if it starts with $HOME, that 
@@ -1102,6 +1204,9 @@ Don't print \~ but print the whole path
 .TP 4
 .I "-v"
 Print the stack entries one in each line, preceeded by the stack number.
+.PP 
+Note that popd +n can be used to pop out stack entries of directories that
+do not exist any more.
 .PP
 .I Tcsh
 will now allow the user to access all elements in the directory stack directly.
@@ -1136,10 +1241,13 @@ Not that many dir stack entries.
 .RE
 .sp
 .fi
-Tcsh will complain if you ask for a directory stack item
+.I Tcsh 
+will complain if you ask for a directory stack item
 which does not exist.
 .PP
-In the normal csh, saying "pushd +2" would rotate the entire stack
+In the normal 
+.I csh,
+saying "pushd +2" would rotate the entire stack
 around through 2 stack elements, placing the entry found there
 at the top of the stack.
 If, however, the new shell variable
@@ -1192,7 +1300,7 @@ For example:
 > echo $cwd 
 /tmp
 
-> unset ignore_symlinks; set chase_symlinks
+> unset ignore_symlinks; unset chase_symlinks
 > cd to/dst; echo $cwd 
 /tmp/to/dst
 > cd ..
@@ -1213,9 +1321,9 @@ For example:
 .sp
 .fi
 In case you are wondering what happens when you set both, 
-.I chase_symlinks 
+.I ignore_symlinks 
 will override
-.I ignore_symlinks.
+.I chase_symlinks.
 .PP
 .SH "15. WATCHING FOR LOGINS AND LOGOUTS"
 .I Tcsh
@@ -1458,15 +1566,6 @@ appends the following characters depending on the file type:
 .RS +.6i
 .ta 1.2i 1.7i
 .nf
-@	File is a symbolic link pointing
-	to a non-directory
-	[if system supports symbolic links]
->	File is a symbolic link pointing
-	to a directory
-	[if system supports symbolic links]
-&	File is a symbolic link pointing
-	to nowhere.
-	[if system supports symbolic links]
 =	File is an AF_UNIX domain socket.
 	[if system supports sockets]
 |	File is a named pipe (fifo)
@@ -1475,12 +1574,45 @@ appends the following characters depending on the file type:
 #	File is a block device
 /	File is a directory
 *	File is executable
++	File is a hidden directory [aix]
+	or context dependent [hpux]
+:	File is network special [hpux]
 .RE
 .DT
 .fi
 .sp
+On systems that support symbolic links the variable
+.I listlinks 
+controls the way symbolic links are identified. If 
+.I listlinks 
+is not set then the character '@' is appended to
+the file. If 
+.I listlinks 
+is set then the following characters are appended to the
+filename depending on the type of file the symbolic links
+points to:
+.sp
+.RS +.6i
+.ta 1.2i 1.7i
+.nf
+@	File is a symbolic link pointing
+	to a non-directory
+>	File is a symbolic link pointing
+	to a directory 
+&	File is a symbolic link pointing
+	to nowhere
+.RE
+.DT
+.fi
+.sp
+While setting 
+.I listlinks
+can be helpful while navigating around the filesystem, it slows down
+.I ls-F 
+and it causes mounting of filesystems if the symbolic links point
+to an NFS automounted partition.
 .PP
-.SH "18. CHAR IN RANGE SYNTAX CHANGE"
+.SH "18. GLOBBING SYNTAX ADDITIONS"
 The syntax for any character in a range (for example ".[a-z]*") has
 been extended so as to conform with standard Unix regular expression
 syntax (see
@@ -1502,6 +1634,20 @@ specified.  For example:
 .sp
 Note that the second form includes .Xdefaults and .Xinit because 'X'
 (and all the lower case letters) are outside of the range of a single '.'.
+.PP
+Also the ability to negate a regular expression has been added:
+.sp
+.nf
+.RS +.6i
+> echo *
+foo foobar bar barfoo
+> echo ^foo*
+bar barfoo
+.RE
+.fi
+.sp
+Note that this does not work correctly if the expression does not have
+any wildcard characters (?*[]) or if the expression has braces {}.
 .PP
 .SH "19. NEW ENVIRONMENT AND SHELL VARIABLES"
 On startup,
@@ -1542,11 +1688,12 @@ The current possible values are:
 .nf
 \fIaix370\fR		an IBM 370, running aix
 \fIalliant\fR		an Alliant FX series
+\fIapollo\fR		an Apollo running DomainOS
 \fIatt3b15\fR		an AT&T 3b15
 \fIatt3b20\fR		an AT&T 3b20
 \fIatt3b2\fR		an AT&T 3b2
 \fIatt3b5\fR		an AT&T 3b5
-\fIbalance\fR		a Sequent Ballance (32000 based)
+\fIbalance\fR		a Sequent Balance (32000 based)
 \fIbutterfly\fR		a BBN Computer Butterfly 1000
 \fIconvex\fR		a Convex
 \fIdecstation\fR	a DecStation XXXX
@@ -1554,6 +1701,7 @@ The current possible values are:
 \fIhp300\fR		an HP 9000, series 300, running mtXinu
 \fIhp800\fR		an HP 9000, series 800, running mtXinu
 \fIhp9000s300\fR	an HP 9000, series 300, running hpux
+\fIhp9000s700\fR	an HP 9000, series 700, running hpux
 \fIhp9000s800\fR	an HP 9000, series 800, running hpux
 \fIhp\fR			an HP, running hpux
 \fIi386-mach\fR		an Intel 386, running mach
@@ -1569,6 +1717,7 @@ The current possible values are:
 \fIns32000\fR		an NS32000 CPU machine
 \fIpfa50\fR			a PFU/Fujitsu A-xx computer
 \fIps2\fR			an IBM PS/2, running aix
+\fIptx\fR			a Sequent Symmetry running DYNIX/ptx (386/486 based)
 \fIpyramid\fR		a Pyramid Technology computer (of any flavor)
 \fIrs6000\fR		an IBM RS6000, running aix 
 \fIrt\fR			an IBM PC/RT, running BSD (AOS 4.3) or mach
@@ -1578,7 +1727,8 @@ The current possible values are:
 \fIsun3\fR			a Sun Microsystems series 3 workstation (68020 based)
 \fIsun4\fR			a Sun Microsystems series 4 workstation (SPARC based)
 \fIsun\fR			a Sun workstation of none of the above types
-\fIsymmetry\fR		a Sequent Symmetry (386 based)
+\fIsymmetry\fR		a Sequent Symmetry running DYNIX 3 (386/486 based)
+\fItitan\fR		an Stardent Titan
 \fIvax\fR			a Digital Equipment Corp. Vax (of any flavor)
 .DT
 .fi
@@ -1592,7 +1742,11 @@ also initializes the shell variables
 and
 .I gid
 to the value of the current real user ID/GID.  This is useful for telling
-what user/group the shell is running as.
+what user/group the shell is running as. Under Domain/OS 
+.I tcsh
+will also set 
+.I oid
+indicating the current real organization id.
 .PP
 .SH "20. COMMANDS FOR DEBUGGING"
 Only two such commands are available at this point, both concerned with
@@ -1634,7 +1788,10 @@ and then types "echo<ESC>p", the shell will place "echo bar" in the
 editing buffer.  If another \fIM-p\fR was entered, the editing buffer
 would change to "echo foo".  This capability is compatible with the
 plain visual history; if the user were to then enter \fI^P\fR the
-editing buffer would be changed to "ls".
+editing buffer would be changed to "ls". The pattern used to search
+through the history is defined by the characters from the beginning of
+the line up to the current cursor position and may contain a shell globbing
+pattern. Successive history searches use the same pattern.
 .PP
 .SH "22. BUILTIN WHICH(1) COMMAND"
 There is now a builtin version of the
@@ -1733,6 +1890,15 @@ example that places the date in the status line:
 .RS +.6i
 > echo -n "$tosl";date; echo -n "$frsl"
 .RE
+.sp
+.I Echotc
+accepts two flags. The flag
+.I \-v 
+enables verbose messages and the flag
+.I \-s 
+ignores any errors and returns the empty string if the capability is not
+found.
+
 .PP
 .SH "25. EXECUTION OF A COMMAND AFTER CHANGING THE CURRENT WORKING DIRECTORY"
 .I Tcsh
@@ -1816,8 +1982,9 @@ the tty in 8 bit mode through the appropriate
 command in e.g. the .login file.
 .PP
 .SH "27. AUTOMATIC PROCESS TIME REPORTING"
-Automatic process time reporting is a feature that exists in csh, but
-it is usually not documented. In addition
+Automatic process time reporting is a feature that exists in 
+.I csh, 
+but it is usually not documented. In addition
 .I tcsh 
 provides a slightly enriched syntax. Process time reports are controlled
 via the 
@@ -1875,11 +2042,40 @@ The default time format is "%Uu %Ss %E %P %X+%Dk %I+%Oio %Fpf+%Ww" for
 systems that support resource usage reporting and "%Uu %Ss %E %P" for
 systems that do not.
 .PP
-.SH "28. TRANSPARENT COMPUTING FACILITY SUPPORT"
+For Sequent's DYNIX/ptx %X, %D, %K, %r and %s are not supported.
+However, the following additional sequences are available.
+.sp
+.RS +.6i
+.ta 1.2i 1.7i
+.nf
+%Y	The number of system calls performed.
+%Z	The number of pages which are zero-filled
+	on demand.
+%i	The number of times a process' resident
+	set size was increased by the kernel.
+%d	The number of times a process' resident
+	set size was decreased by the kernel.
+%l	The number of read system calls performed.
+%m	The number of write system calls performed.
+%p	the number of reads from raw disk devices.
+%q	the number of writes to raw disk devices.
+.RE
+.DT
+.fi
+.sp
+The default time format for Sequent's DYNIX/ptx is
+"%Uu %Ss $E %P %I+%Oio %Fpf+%Ww". Also note that the
+CPU percentage can be higher than 100% on multi-processors.
+.PP
+.SH "28. OS/DEPENDENT BUILTIN SUPPORT"
+.sp
+.br
+.I "TRANSPARENT COMPUTING FACILITY"
+.PP
 On systems that support TCF (aix-ibm370, aix-ps2) the following builtins
 have been added:
 .TP 10
-getspath
+.B getspath
 Print the current system execution path.
 .TP 10
 .B setspath LOCAL|<site>|<cpu> ...
@@ -1905,12 +2101,68 @@ default site determined by the system path.
 The second form, is equivalent to 'migrate -<site> $$', i.e. migrates the
 current process to the site specified. Note: migrating 
 .I tcsh
-itself can cause unexpected behavior, since tcsh does not like to lose 
-its tty.
+itself can cause unexpected behavior, since the shell
+does not like to lose its tty.
 .sp
 .PP
 In addition, jobs will print the site the job is executing.
 .PP
+.sp
+.br
+.I "Domain/OS Support"
+.PP
+.TP 
+.B inlib <shared-library> ...
+Inlib adds shared libraries to the current enviroment. There is no way
+to remove them...
+.TP
+.B rootnode //<nodename>
+Change the name of the current rootnode. From now on, 
+.I / 
+will resolve to
+.I //<rootnode>
+.TP
+.B ver [<systype>] [<command>]
+Without arguments, print 
+.I $SYSTYPE;
+with the 
+.I <systype> 
+provided, set 
+.I SYSTYPE
+to the one provided. Valid systypes are bsd4.3 and sys5.3. If a
+.I <command>
+is
+argument is given, then 
+.I <command> 
+is executed under the 
+.I <systype> 
+specified.
+.PP
+.sp
+.br
+.I "Mach"
+.PP
+.TP 
+.B setpath <path-spec> ...
+XXX: What does it do?
+.PP
+.sp
+.br
+.I "Masscomp/RTU"
+.PP
+.TP 
+.B universe <universe-spec> ...
+Sets the current universe to the specified parameter.
+.PP
+.sp
+.br
+.I "Convex/OS"
+.PP
+.TP 
+.B warp [<universe-spec>] ...
+Without arguments prints the current value of the universe. With a universe
+argument it sets the current universe to the value of the argument.
+.sp
 .SH "29. WINDOW SIZE TRACKING"
 On systems that support SIGWINCH or SIGWINDOW,
 .I tcsh
@@ -1944,16 +2196,49 @@ and then
 if the shell was a login shell.
 .sp
 Note: On 
-.I irix
-and
 .I convexos
 the names of the system default files are
 .I "/etc/cshrc",
 .I "/etc/login"
 and
 .I "/etc/logout"
-respectively.
+respectively and on
+.I irix
+or
+.I A/UX
+only the file
+.I "/etc/cshrc"
+is executed if the shell is a login shell. 
 
+.SH "31. COMMAND LINE OPTIONS"
+This section describes options that are either undocumented in 
+.I csh
+(*)
+or present only in 
+.I tcsh.
+(+)
+.sp
+.TP 4
+.I \-d
+Load ~/.cshdirs (If 
+.I tcsh 
+was compiled with CSHDIRS enabled)(+)
+.TP 4
+.I \-l
+Make 
+.I tcsh 
+behave like a login shell.  (+)
+.TP 4
+.I \-m 
+Allow reading of a .cshrc that does not belong to the effective
+user. Newer versions of
+.I su(1) 
+can pass that to the shell. (some versions of csh have it) (+*)
+.TP 4
+.I \-q 
+Make the shell accept SIGQUIT, and behave when it is used under a debugger.
+Job control is disabled. (*)
+.sp
 .SH FYI
 This shell uses cbreak mode but takes typed-ahead characters anyway.
 You can still use
@@ -1983,6 +2268,8 @@ LINES -- Number of lines in terminal (see WINDOW SIZE)
 COLUMNS -- Number of columns in terminal (see WINDOW SIZE)
 .br
 TERMCAP -- Terminal capability string (see WINDOW SIZE)
+.br
+SYSTYPE -- The current system type (Domain OS only)
 .PP
 .SH "NEW SHELL VARIABLES"
 .br
@@ -1995,13 +2282,15 @@ If unset don't add anything extra.
 .B ampm
 show all times in 12 hour, AM/PM format.
 .TP 10
+.B autocorrect
+Correct mis-spelled path components automatically before attempting
+completion.
+.TP 10
 .B autoexpand
 invoke the expand-history function automatically on completion.
 .TP 10
 .B autolist 
 list possibilities on an ambiguous completion.
-With autolist=beepnone, listing only beeps when there is no match,
-with autolist=beepnever, it never beeps.
 .TP 10
 .B autologout 
 number of minutes of inactivity before automatic logout.
@@ -2040,11 +2329,25 @@ don't resolve symbolic links to real names on cd, etc.
 list all jobs when suspending. set listjobs=long, produces long
 format.
 .TP 10
+.B listlinks 
+Resolve symbolic links when listing files so that the correct filetype
+is shown.
+.TP 10
 .B listmax 
 maximum number of items to list without asking first.
 .TP 10
+.B matchbeep
+control beeping on completion.  With matchbeep=nomatch, completion
+only beeps when there is no match, with matchbeep=ambiguous, beeps also
+when there are multiple matches, with matchbeep=notunique, beeps when
+there is one exact and other longer matches, with matchbeep=never, it
+never beeps.
+.TP 10
 .B nobeep 
-do not beep on non-unique expansion or excess edit.
+Disables beeping completely.
+.TP 10
+.B oid
+The organization id number (Domain OS only).
 .TP 10
 .B printexitvalue 
 if an interactive program exits non-zero, print the
@@ -2087,7 +2390,7 @@ of nested shells.
 show hidden files in list and complete operations.
 .TP 10
 .B tcsh
-Contains the current version of tcsh as R.VV.PP. The 
+Contains the current version of the shell as R.VV.PP. The 
 .I R
 indicates the major release number, the 
 .I VV 
@@ -2139,6 +2442,7 @@ dir	Set if tcsh should save and restore the directory
 	stack.
 kan	Set if tcsh is compiled for Kanji. 
 	(ignore the iso character set.) Default is unset.
+sm	Set if tcsh was compiled to use the system's malloc.
 .RE
 .DT
 .fi
@@ -2182,7 +2486,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 5.20.02 (Cornell) 02/22/91.
+This man page documents tcsh 6.00.00 (Cornell) 07/04/91.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
@@ -2300,6 +2604,12 @@ David C Lawrence, Rensselaer Polytechnic Institute, 1989
 .br
 Added "autolist" variable and code to list possibilities on ambiguous
 completion.
+.sp
+Martin Boyer, Institut de recherche d'Hydro-Quebec, 1991.
+.br
+Modified "autolist" variable and code to give options on beeping
+behavior.  Modified the history search to search for the whole string
+from the beginning of the line to the cursor.
 .sp
 Alec Wolman, DEC, 1989
 .br
