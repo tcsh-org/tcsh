@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.32 1996/04/26 19:19:19 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exp.c,v 3.33 1996/10/05 17:39:09 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.32 1996/04/26 19:19:19 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.33 1996/10/05 17:39:09 christos Exp $")
 
 /*
  * C shell
@@ -641,18 +641,18 @@ filetest(cp, vp, ignore)
 {
 #ifdef convex
     struct cvxstat stb, *st = NULL;
-# define STAT	stat64
+# define TCSH_STAT	stat64
 #else
-# define STAT	stat
+# define TCSH_STAT	stat
     struct stat stb, *st = NULL;
 #endif /* convex */
 
 #ifdef S_IFLNK
 # ifdef convex
     struct cvxstat lstb, *lst = NULL;
-#  define LSTAT lstat64
+#  define TCSH_LSTAT lstat64
 # else
-#  define LSTAT lstat
+#  define TCSH_LSTAT lstat
     struct stat lstb, *lst = NULL;
 # endif /* convex */
     char *filnam;
@@ -705,7 +705,7 @@ filetest(cp, vp, ignore)
      * globbing into account.
      */
 
-    if (isa(**vp, ANYOP) && STAT(short2str(**vp), &stb))
+    if (isa(**vp, ANYOP) && TCSH_STAT(short2str(**vp), &stb))
 	stderror(ERR_NAME | ERR_FILENAME);
 
     dp = *(*vp)++;
@@ -742,7 +742,7 @@ filetest(cp, vp, ignore)
 
 #ifdef S_IFLNK
 	    if (tolower(*ft) == 'l') {
-		if (!lst && LSTAT(short2str(ep), lst = &lstb) == -1) {
+		if (!lst && TCSH_LSTAT(short2str(ep), lst = &lstb) == -1) {
 		    xfree((ptr_t) ep);
 		    return (Strsave(errval));
 		}
@@ -751,7 +751,7 @@ filetest(cp, vp, ignore)
 	    }
 	    else 
 #endif /* S_IFLNK */
-		if (!st && STAT(short2str(ep), st = &stb) == -1) {
+		if (!st && TCSH_STAT(short2str(ep), st = &stb) == -1) {
 		    xfree((ptr_t) ep);
 		    return (Strsave(errval));
 		}
