@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.37 2002/11/21 20:02:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.38 2004/08/04 17:12:32 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.37 2002/11/21 20:02:01 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.38 2004/08/04 17:12:32 christos Exp $")
 
 #include "tc.h"
 
@@ -165,8 +165,13 @@ void
 watch_login(force)
     int force;
 {
-    int     utmpfd, comp = -1, alldone;
+    int     comp = -1, alldone;
     int	    firsttime = stlast == 1;
+#ifdef HAVE_UTMPNAME
+    struct utmp *uptr;
+#else
+    int utmpfd;
+#endif
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif				/* BSDSIGS */
@@ -263,6 +268,10 @@ watch_login(force)
 	return;
     }
     stlast = sta.st_mtime;
+#ifdef HAVE_UTMPNAME
+    utmpname(_PATH_UTMP);
+    setutent();
+#else
     if ((utmpfd = open(_PATH_UTMP, O_RDONLY|O_LARGEFILE)) < 0) {
 	if (!force)
 	    xprintf(CGETS(26, 2,
@@ -275,6 +284,7 @@ watch_login(force)
 # endif
 	return;
     }
+#endif
 
     /*
      * xterm clears the entire utmp entry - mark everyone on the status list
@@ -289,7 +299,12 @@ watch_login(force)
      * Read in the utmp file, sort the entries, and update existing entries or
      * add new entries to the status list.
      */
+#ifdef HAVE_UTMPNAME
+    while ((uptr = getutent()) != NULL) {
+        memcpy(&utmp, uptr, sizeof (utmp));
+#else
     while (read(utmpfd, (char *) &utmp, sizeof utmp) == sizeof utmp) {
+#endif
 
 # ifdef DEAD_PROCESS
 #  ifndef IRIS4D
@@ -385,7 +400,11 @@ watch_login(force)
 	    wp->who_prev = wpnew;	/* linked in now */
 	}
     }
+#ifdef HAVE_UTMPNAME
+    endutent();
+#else
     (void) close(utmpfd);
+#endif
 # if defined(UTHOST) && defined(_SEQUENT_)
     endutent();
 # endif
@@ -556,13 +575,14 @@ who_info(ptr, c, wbuf, wbufsiz)
 	    return CGETS(26, 12, "local");
 	else {
 	    /* the ':' stuff is for <host>:<display>.<screen> */
-	    for (pb = wp->who_host, flg = isdigit(*pb) ? '\0' : '.';
-		 *pb != '\0' &&
-		 (*pb != flg || ((pb = strchr(pb, ':')) != 0));
+	    for (pb = wp->who_host,
+		flg = isdigit((unsigned char)*pb) ? '\0' : '.';
+		*pb != '\0' && (*pb != flg || ((pb = strchr(pb, ':')) != 0));
 		 pb++) {
 		if (*pb == ':')
 		    flg = '\0';
-		*wb++ = isupper(*pb) ? tolower(*pb) : *pb;
+		*wb++ = isupper((unsigned char)*pb) ?
+		    tolower((unsigned char)*pb) : *pb;
 	    }
 	    *wb = '\0';
 	    return wbuf;
@@ -573,7 +593,8 @@ who_info(ptr, c, wbuf, wbufsiz)
 	    return CGETS(26, 12, "local");
 	else {
 	    for (pb = wp->who_host; *pb != '\0'; pb++)
-		*wb++ = isupper(*pb) ? tolower(*pb) : *pb;
+		*wb++ = isupper((unsigned char)*pb) ?
+		    tolower((unsigned char)*pb) : *pb;
 	    *wb = '\0';
 	    return wbuf;
 	}
