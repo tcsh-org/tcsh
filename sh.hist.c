@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.hist.c,v 3.30 2004/08/04 17:12:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.hist.c,v 3.31 2004/11/23 02:10:49 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.30 2004/08/04 17:12:29 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.31 2004/11/23 02:10:49 christos Exp $")
 
 #include "tc.h"
 
@@ -379,7 +379,7 @@ fmthist(fmt, ptr, buf, bufsiz)
 		size_t len;
 
 		len = one_wctomb(xbuf, CHAR & *ip);
-		if ((size_t)((p - xbuf) + len) >= bufsiz)
+		if ((size_t)((p - buf) + len) >= bufsiz)
 		    break;
 		memcpy(p, xbuf, len);
 		p += len;
