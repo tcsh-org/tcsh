@@ -58,17 +58,22 @@ case "${tcsh_cv_canonical}" in
     tcsh_config_file=hpux8
   ;;
 
+  ## IBM AIX systems
+  *-ibm-aix*)
+    tcsh_config_file=aix
+  ;;
+
+  ## Linux
+  *-*-linux* )
+    tcsh_config_file=linux
+  ;;
+
   ## Motorola systems
   m68k-motorola-sysv* )
     tcsh_config_file=sysV68
   ;;
   m88k-motorola-sysv3* )
     tcsh_config_file=sysV88
-  ;;
-
-  ## Linux
-  *-*-linux* )
-    tcsh_config_file=linux
   ;;
 
   ## Silicon Graphics machines
@@ -108,6 +113,10 @@ case "${tcsh_cv_canonical}" in
     tcsh_config_file=sol24
   ;;
 
+  *-*-netbsd*)
+    tcsh_config_file=bsd4.4
+  ;;
+
   ## Tektronix systems
   m68k-tektronix-bsd* )
     tcsh_config_file=bsd
@@ -139,6 +148,7 @@ if test $ac_cv_prog_gcc = no ; then
   CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
 fi
 
+AC_CHECK_LIB(crypt, crypt)
 AC_CHECK_LIB(termlib, tgetent)
 if test $ac_cv_lib_termlib_tgetent = no ; then
   AC_CHECK_LIB(curses, tgetent)

@@ -1,4 +1,10 @@
 V6.07.00, 10/11/96
+ 55. Fix histdup=erase, where after some repetitions, we would get negative
+     history events (kim@gw.com)
+ 54. NLS fixes and typo in sh.err.c (Martin.Kraemer@deejai.mch.sni.de)
+ 53. Output history in raw format in the history file (mveksler@VNET.IBM.COM)
+ 52. Fix possible core dump when !:<tab> in autoexpand mode (rbrown@ERA.COM)
+ 51. 6.07.00 - 10/11/96
  50. Avoid stdio.h inclusion problem in SCO (gethost.c).
  49. A bit of housekeeping in host.defs
  48. 6.06.04 - 10/05/96

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.err.c,v 3.26 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.err.c,v 3.27 1996/04/26 19:19:08 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.26 1995/03/12 04:49:26 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.27 1996/04/26 19:19:08 christos Exp $")
 
 /*
  * C Shell
@@ -270,7 +270,7 @@ errinit()
     elst[ERR_JOBPAT] = CSAVS(1, 61, "No job matches pattern");
     elst[ERR_NESTING] = CSAVS(1, 62, "Fork nesting > %d; maybe `...` loop");
     elst[ERR_JOBCTRLSUB] = CSAVS(1, 63, "No job control in subshells");
-    elst[ERR_SYNC] = CSAVS(1, 64, "Sunc fault: Process %d not found");
+    elst[ERR_SYNC] = CSAVS(1, 64, "Sync fault: Process %d not found");
     elst[ERR_STOPPED] =
 #ifdef SUSPENDED
 	CSAVS(1, 65, "%sThere are suspended jobs");
