@@ -1,3 +1,4 @@
+ 54. V6.08.06 - 19990701
  53. module command completion (Dan Nicolaescu)
  52. Man command completion enhancement (Tom)
  51. Fixes for irix configuration (Kaveh)

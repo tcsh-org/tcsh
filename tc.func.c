@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.84 1999/02/14 13:43:20 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.85 1999/04/20 07:48:51 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.84 1999/02/14 13:43:20 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.85 1999/04/20 07:48:51 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -69,7 +69,6 @@ static bool cwdcmd_active = 0;	/* PWP: for cwd_cmd */
 static bool beepcmd_active = 0;
 static signalfun_t alm_fun = NULL;
 
-static	void	 Reverse	__P((Char *));
 static	void	 auto_logout	__P((int));
 static	char	*xgetpass	__P((char *));
 static	void	 auto_lock	__P((int));
