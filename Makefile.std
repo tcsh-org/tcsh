@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.48 1993/05/17 00:11:09 christos Exp christos $
+# $Id: Makefile.std,v 1.49 1993/06/05 21:09:15 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -417,13 +417,13 @@ tar.Z:
 	tar cvf - tcsh-${VERSION} | compress > tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION}
 
-tar.z:
-	rm -f tcsh-${VERSION}.tar.z
+tar.gz:
+	rm -f tcsh-${VERSION}.tar.gz
 	rm -rf tcsh-${VERSION} 
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
-	tar cvf - tcsh-${VERSION} | gzip > tcsh-${VERSION}.tar.z
+	tar cvf - tcsh-${VERSION} | gzip > tcsh-${VERSION}.tar.gz
 	rm -rf tcsh-${VERSION}
 
 shar:	
