@@ -1,3 +1,4 @@
+ 52. V6.11.04 - 20020709
  51. Dissallow setting of environment variables that do not contain
      alphanumeric names (Ton Voon)
  50. Don't expand path components that don't resolve to path names (Jonathan
