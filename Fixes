@@ -1,3 +1,4 @@
+ 31. Fix compilation issue on SunOS4 with _POSIX_VDISABLE (Tom Warzeka)
  30. ukrainian update (Olexander Kunytsa)
  29. DSPMBYTE=utf8 patch (Jean-Luc Leger)
  28. fix ipv4 only compilation, remove extra sigsetmask() call (Takayuki Nakao)
