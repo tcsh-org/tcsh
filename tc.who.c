@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.who.c,v 3.27 1997/10/27 22:44:39 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.28 1998/04/08 13:59:13 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.27 1997/10/27 22:44:39 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.28 1998/04/08 13:59:13 christos Exp $")
 
 #include "tc.h"
 
@@ -236,8 +236,10 @@ watch_login(force)
      * Don't open utmp all the time, stat it first...
      */
     if (stat(_PATH_UTMP, &sta)) {
-	xprintf(CGETS(26, 1, "cannot stat %s.  Please \"unset watch\".\n"),
-		_PATH_UTMP);
+	if (!force)
+	    xprintf(CGETS(26, 1,
+			  "cannot stat %s.  Please \"unset watch\".\n"),
+		    _PATH_UTMP);
 # ifdef BSDSIGS
 	(void) sigsetmask(omask);
 # else
@@ -255,8 +257,10 @@ watch_login(force)
     }
     stlast = sta.st_mtime;
     if ((utmpfd = open(_PATH_UTMP, O_RDONLY)) < 0) {
-	xprintf(CGETS(26, 2, "%s cannot be opened.  Please \"unset watch\".\n"),
-		_PATH_UTMP);
+	if (!force)
+	    xprintf(CGETS(26, 2,
+			  "%s cannot be opened.  Please \"unset watch\".\n"),
+		    _PATH_UTMP);
 # ifdef BSDSIGS
 	(void) sigsetmask(omask);
 # else
