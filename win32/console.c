@@ -299,7 +299,7 @@ void NT_MoveToLineOrChar(int where,int line) {
 			scrbuf.dwCursorPosition.Y += where;
 	}
 	else{
-		if ( ((where)> (scrbuf.srWindow.Right-1)) &&( where >0)){
+		if ( (where> (scrbuf.srWindow.Right)) &&( where >0)){
 			ScrollBufHorizontal(hStdout,&scrbuf,where);
 		}
 		else
