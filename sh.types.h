@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.7 1991/07/19 01:52:38 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.8 1991/07/24 15:36:18 christos Exp christos $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -304,11 +304,11 @@ extern char *sbrk();
 /***
  *** Intel 386, Hypercube
  ***/
-#ifdef HYPERCUBE
+#ifdef INTEL
 # ifndef _SIZE_T
 #  define _SIZE_T
 # endif /* _SIZE_T */
-#endif /* HYPERCUBE */
+#endif /* INTEL */
 
 /***
  *** Concurrent (Masscomp) running RTU 4.1A & RTU 5.0.
