@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.56 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.57 2002/11/21 20:02:01 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.56 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.57 2002/11/21 20:02:01 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -861,7 +861,7 @@ doio(t, pipein, pipeout)
 	    xfree((ptr_t) cp);
 	    if ((fd = open(tmp, O_RDONLY|O_LARGEFILE)) < 0)
 		stderror(ERR_SYSTEM, tmp, strerror(errno));
-#ifdef O_LARGEFILE
+#if O_LARGEFILE
 	    /* allow input files larger than 2Gb  */
 	    (void) fcntl(fd, O_LARGEFILE, 0);
 #endif /* O_LARGEFILE */
@@ -921,7 +921,7 @@ doio(t, pipein, pipeout)
 	    }
 	    if ((fd = creat(tmp, 0666)) < 0)
 		stderror(ERR_SYSTEM, tmp, strerror(errno));
-#ifdef O_LARGEFILE
+#if O_LARGEFILE
 	    /* allow input files larger than 2Gb  */
 	    (void) fcntl(fd, O_LARGEFILE, 0);
 #endif /* O_LARGEFILE */
