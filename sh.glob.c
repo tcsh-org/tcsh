@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.51 2002/03/08 17:36:46 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.52 2002/05/16 13:51:25 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.51 2002/03/08 17:36:46 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.52 2002/05/16 13:51:25 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -831,6 +831,7 @@ backeval(cp, literal)
 	(void) dmove(pvec[1], 1);
 	(void) dmove(SHDIAG,  2);
 	initdesc();
+	closem();
 	/*
 	 * Bugfix for nested backquotes by Michael Greim <greim@sbsvax.UUCP>,
 	 * posted to comp.bugs.4bsd 12 Sep. 1989.

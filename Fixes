@@ -1,3 +1,5 @@
+ 33. Don't close file descriptors too early because setuid scripts fail.
+     (Jill Pryse-Davies)
  32. Completion updates (Tom Warzeka)
  31. Fix compilation issue on SunOS4 with _POSIX_VDISABLE (Tom Warzeka)
  30. ukrainian update (Olexander Kunytsa)

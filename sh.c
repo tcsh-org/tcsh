@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.100 2002/06/25 19:02:11 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.101 2002/07/01 20:39:19 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.100 2002/06/25 19:02:11 christos Exp $")
+RCSID("$Id: sh.c,v 3.101 2002/07/01 20:39:19 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -994,6 +994,13 @@ main(argc, argv)
 	 /* argc not used any more */ tempv++;
     }
 
+    /* 
+     * Call to closem() used to be part of initdesc(). Now called below where
+     * the script name argument has become stdin. Kernel may have used a file
+     * descriptor to hold the name of the script (setuid case) and this name
+     * mustn't be lost by closing the fd too soon.
+     */
+    closem();
 
     /*
      * Consider input a tty if it really is or we are interactive. but not for
@@ -2332,7 +2339,6 @@ initdesc()
 #endif /* CLOSE_ON_EXEC */
     isdiagatty = isatty(SHDIAG);
     isoutatty = isatty(SHOUT);
-    closem();
 #ifdef NLS_BUGS
 #ifdef NLS_CATALOGS
     nlsinit();
