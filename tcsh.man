@@ -4387,7 +4387,7 @@ The number of reads from raw disk devices.
 The number of writes to raw disk devices.
 .PD
 .PP
-and the default time format is `%Uu %Ss $E %P %I+%Oio %Fpf+%Ww'.
+and the default time format is `%Uu %Ss %E %P %I+%Oio %Fpf+%Ww'.
 Note that the CPU percentage can be higher than 100% on multi-processors.
 .RE
 .TP 8
