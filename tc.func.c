@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.78 1998/07/07 12:06:25 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.79 1998/09/13 13:51:12 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.78 1998/07/07 12:06:25 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.79 1998/09/13 13:51:12 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -2004,6 +2004,9 @@ getremotehost()
     struct hostent* hp;
     struct sockaddr_in saddr;
     int len = sizeof(struct sockaddr_in);
+#if defined(UTHOST) && !defined(HAVENOUTMP)
+    char *sptr = NULL;
+#endif
 
     if (getpeername(SHIN, (struct sockaddr *) &saddr, &len) != -1) {
 #if 0
@@ -2016,32 +2019,30 @@ getremotehost()
     }
 #if defined(UTHOST) && !defined(HAVENOUTMP)
     else {
-	char *ptr, *sptr;
+	char *ptr;
 	char *name = utmphost();
 	/* Avoid empty names and local X displays */
 	if (name != NULL && *name != '\0' && *name != ':') {
+	    /* Look for host:display.screen */
+	    if ((sptr = strchr(name, ':')) != NULL)
+		*sptr = '\0';
 	    /* Leave IP address as is */
 	    if (isdigit(*name))
 		host = name;
 	    else {
-	    /* Look for host:display.screen */
-	    if ((sptr = strchr(name, ':')) != NULL)
-		*sptr = '\0';
-	    if (sptr != name) {
-		if ((hp = gethostbyname(name)) == NULL) {
-		    /* Try again eliminating the trailing domain */
-		    if ((ptr = strchr(name, '.')) != NULL) {
-			*ptr = '\0';
-			if ((hp = gethostbyname(name)) != NULL)
-			    host = hp->h_name;
-			*ptr = '.';
+		if (sptr != name) {
+		    if ((hp = gethostbyname(name)) == NULL) {
+			/* Try again eliminating the trailing domain */
+			if ((ptr = strchr(name, '.')) != NULL) {
+			    *ptr = '\0';
+			    if ((hp = gethostbyname(name)) != NULL)
+				host = hp->h_name;
+			    *ptr = '.';
+			}
 		    }
+		    else
+			host = hp->h_name;
 		}
-		else
-		    host = hp->h_name;
-	    }
-	    if (sptr)
-		*sptr = ':';
 	    }
 	}
     }
@@ -2049,6 +2050,11 @@ getremotehost()
 
     if (host)
 	tsetenv(STRREMOTEHOST, str2short(host));
+
+#if defined(UTHOST) && !defined(HAVENOUTMP)
+    if (sptr)
+	*sptr = ':';
+#endif
 }
 
 

@@ -38,3 +38,5 @@
   command.
 
 * Change getwd -> getcwd
+
+* Add instructions for using configure in the README file.

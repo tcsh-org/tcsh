@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.char.h,v 3.12 1997/10/02 16:36:28 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.char.h,v 3.13 1997/10/27 22:44:25 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -72,7 +72,6 @@ extern tcshuc _cmap_lower[], _cmap_upper[];
 #define _PUN	0x8000		/* punctuation */
 
 #if defined(SHORT_STRINGS) && defined(KANJI)
-extern Char STRnokanji[];
 
 #define ASC(ch) ch
 #define CTL_ESC(ch) ch

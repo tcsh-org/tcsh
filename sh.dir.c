@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.46 1998/06/27 12:27:14 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.47 1998/09/04 21:16:50 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.46 1998/06/27 12:27:14 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.47 1998/09/04 21:16:50 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -549,7 +549,8 @@ dfollow(cp)
     }
 #endif /* apollo */
 	    
-    (void) strcpy(ebuf, short2str(cp));
+    (void) strncpy(ebuf, short2str(cp), MAXPATHLEN);
+    ebuf[MAXPATHLEN-1] = '\0';
     /*
      * if we are ignoring symlinks, try to fix relatives now.
      * if we are expading symlinks, it should be done by now.
@@ -820,6 +821,12 @@ dcanon(cp, p)
     int     cc;
     Char   *newcp;
 #endif /* S_IFLNK */
+
+    /*
+     * kim: if the path given is too long abort().
+     */
+    if (Strlen(cp) >= MAXPATHLEN)
+	abort();
 
     /*
      * christos: if the path given does not start with a slash prepend cwd. If

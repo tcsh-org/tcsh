@@ -1,9 +1,9 @@
-$ $Id: set16,v 1.2 1995/03/19 18:07:15 christos Exp $
+$ $Id: set16,v 1.1 1996/04/26 19:24:19 christos Exp $
 $ sh.lex.c
 $set 16 
 1 Μηδενισμός του γκρουπ διεργασιών του tty από %d σε %d\n
-2 \nΔώστε \"logout\" γιά να βγείτε.\n
-3 \nΔώστε \"exit\" γιά να τερματίσετε το %s.\n
+2 \nΔώστε "logout" γιά να βγείτε.\n
+3 \nΔώστε "exit" γιά να τερματίσετε το %s.\n
 4 seek to eval %x %x\n
 5 seek to alias %x %x\n
 6 seek to file %x\n
