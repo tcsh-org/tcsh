@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.3 1991/07/29 22:27:35 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.4 1991/08/05 23:02:13 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "config.h"
 
-RCSID("$Id: sh.func.c,v 3.3 1991/07/29 22:27:35 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.4 1991/08/05 23:02:13 christos Exp christos $")
 
 #include "sh.h"
 #include "ed.h"
@@ -99,7 +99,7 @@ isbfunc(t)
     if (eq(STRwarp, cp) && !checkwarp()) {
 	return (0);		/* this builtin disabled */
     }
-#endif 
+#endif /* WARP */
     /*
      * Binary search Bp1 is the beginning of the current search range. Bp2 is
      * one past the end.
@@ -113,7 +113,7 @@ isbfunc(t)
 	    return bp;
 	if (i < 0)
 	    bp2 = bp;
-	else 
+	else
 	    bp1 = bp + 1;
     }
     return (0);
@@ -156,31 +156,31 @@ doonintr(v, c)
 #ifdef BSDSIGS
 	if (setintr)
 	    (void) sigblock(sigmask(SIGINT));
-	else 
+	else
 	    (void) signal(SIGINT, SIG_DFL);
-#else 
+#else /* !BSDSIGS */
 	if (setintr)
 	    (void) sighold(SIGINT);
-	else 
+	else
 	    (void) sigset(SIGINT, SIG_DFL);
-#endif 
+#endif /* BSDSIGS */
 	gointr = 0;
     }
     else if (eq((vv = strip(vv)), STRminus)) {
 #ifdef BSDSIGS
 	(void) signal(SIGINT, SIG_IGN);
-#else 
+#else /* !BSDSIGS */
 	(void) sigset(SIGINT, SIG_IGN);
-#endif 
+#endif /* BSDSIGS */
 	gointr = Strsave(STRminus);
     }
     else {
 	gointr = Strsave(vv);
 #ifdef BSDSIGS
 	(void) signal(SIGINT, pintr);
-#else 
+#else /* !BSDSIGS */
 	(void) sigset(SIGINT, pintr);
-#endif 
+#endif /* BSDSIGS */
     }
 }
 
@@ -196,7 +196,7 @@ donohup(v, c)
 	(void) signal(SIGHUP, SIG_IGN);
 #ifdef CC
 	submit(getpid());
-#endif 
+#endif /* CC */
     }
 }
 
@@ -293,7 +293,7 @@ donewgrp(v, c)
     untty();
     xexit(1);
 }
-#endif 
+#endif /* NEWGRP */
 
 static void
 islogin()
@@ -387,7 +387,7 @@ dogoto(v, c)
 	    search(T_BREAK, 0, NOSTR);
 	    wp->w_end = btell();
 	}
-	else 
+	else
 	    bseek(wp->w_end);
     search(T_GOTO, 0, lp = globone(v[1], G_ERROR));
     xfree((ptr_t) lp);
@@ -425,7 +425,7 @@ dobreak(v, c)
 {
     if (whyles)
 	toend();
-    else 
+    else
 	stderror(ERR_NAME | ERR_NOTWHILE);
 }
 
@@ -511,7 +511,7 @@ dowhile(v, c)
      */
     if (intty && !again)
 	status = !exp0(&v, 1);
-    else 
+    else
 	status = !exp(&v);
     if (*v)
 	stderror(ERR_NAME | ERR_EXPRESSION);
@@ -545,16 +545,16 @@ preread()
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else 
+#else /* !BSDSIGS */
 	(void) sigrelse (SIGINT);
-#endif 
+#endif /* BSDSIGS */
     search(T_BREAK, 0, NOSTR);		/* read the expression in */
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigblock(sigmask(SIGINT));
-#else 
+#else /* !BSDSIGS */
 	(void) sighold(SIGINT);
-#endif 
+#endif /* BSDSIGS */
     whyles->w_end = btell();
 }
 
@@ -612,23 +612,23 @@ dorepeat(v, kp)
 #ifdef BSDSIGS
     register sigmask_t omask = 0;
 
-#endif 
+#endif /* BSDSIGS */
 
     i = getn(v[1]);
     if (setintr)
 #ifdef BSDSIGS
 	omask = sigblock(sigmask(SIGINT)) & ~sigmask(SIGINT);
-#else 
+#else /* !BSDSIGS */
 	(void) sighold(SIGINT);
-#endif 
+#endif /* BSDSIGS */
     lshift(v, 2);
     while (i > 0) {
 	if (setintr)
 #ifdef BSDSIGS
 	    (void) sigsetmask(omask);
-#else 
+#else /* !BSDSIGS */
 	    (void) sigrelse (SIGINT);
-#endif 
+#endif /* BSDSIGS */
 	reexecute(kp);
 	--i;
     }
@@ -636,9 +636,9 @@ dorepeat(v, kp)
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigsetmask(omask);
-#else 
+#else /* !BSDSIGS */
 	(void) sigrelse (SIGINT);
-#endif 
+#endif /* BSDSIGS */
 }
 
 /*ARGSUSED*/
@@ -668,7 +668,7 @@ srchx(cp)
 	    return sp->s_value;
 	if (i < 0)
 	    sp2 = sp;
-	else 
+	else
 	    sp1 = sp + 1;
     }
     return (-1);
@@ -851,10 +851,10 @@ past:
     switch (Stype) {
 
     case T_IF:
-	stderror(ERR_NAME | ERR_NOTFOUND, "then/endif ");
+	stderror(ERR_NAME | ERR_NOTFOUND, "then/endif");
 
     case T_ELSE:
-	stderror(ERR_NAME | ERR_NOTFOUND, "endif ");
+	stderror(ERR_NAME | ERR_NOTFOUND, "endif");
 
     case T_BRKSW:
     case T_SWITCH:
@@ -905,7 +905,7 @@ toend()
 	search(T_BREAK, 0, NOSTR);
 	whyles->w_end = btell() - 1;
     }
-    else 
+    else
 	bseek(whyles->w_end);
     wfree();
 }
@@ -960,9 +960,9 @@ xecho(sep, v)
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else 
+#else /* !BSDSIGS */
 	(void) sigrelse (SIGINT);
-#endif 
+#endif /* BSDSIGS */
     v++;
     if (*v == 0)
 	return;
@@ -1042,14 +1042,14 @@ done:
 #endif /* SVID > 0 */
     if (sep && nonl == 0)
 	xputchar('\n');
-    else 
+    else
 	flush();
     if (setintr)
 #ifdef BSDSIGS
 	(void) sigblock(sigmask(SIGINT));
-#else 
+#else /* !BSDSIGS */
 	(void) sighold(SIGINT);
-#endif 
+#endif /* BSDSIGS */
     if (gargv)
 	blkfree(gargv), gargv = 0;
 }
@@ -1072,9 +1072,9 @@ dosetenv(v, c)
 	if (setintr)
 #ifdef BSDSIGS
 	    (void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else 
+#else /* !BSDSIGS */
 	    (void) sigrelse (SIGINT);
-#endif 
+#endif /* BSDSIGS */
 	for (ep = STR_environ; *ep; ep++)
 	    xprintf("%s\n", short2str(*ep));
 	return;
@@ -1097,7 +1097,7 @@ dosetenv(v, c)
 	(void) setlocale(LC_ALL, "");
 	for (k = 0200; k <= 0377 && !Isprint(k); k++);
 	AsciiOnly = k > 0377;
-#else 
+#else /* !NLS */
 	AsciiOnly = 0;
 #endif /* NLS */
 	NLSMapsAreInited = 0;
@@ -1162,7 +1162,7 @@ dounsetenv(v, c)
 		    (void) setlocale(LC_ALL, "");
 		    for (k = 0200; k <= 0377 && !Isprint(k); k++);
 		    AsciiOnly = k > 0377;
-#else 
+#else /* !NLS */
 		    AsciiOnly = getenv("LANG") == NULL &&
 			getenv("LC_CTYPE") == NULL;
 #endif /* NLS */
@@ -1194,7 +1194,7 @@ Setenv(name, val)
 	return;
     (void) strcpy(nameBuf, cname);
     setenv(nameBuf, short2str(val), 1);
-#else 
+#else /* !SETENV_IN_LIB */
     register Char **ep = STR_environ;
     register Char *cp, *dp;
     Char   *blk[2];
@@ -1324,23 +1324,23 @@ static struct limits {
 
 # ifdef RLIMIT_NOFILE
     RLIMIT_NOFILE, 	"descriptors", 1,	"",
-# endif 
+# endif /* RLIMIT_NOFILE */
 
 # ifdef RLIMIT_CONCUR
     RLIMIT_CONCUR, 	"concurrency", 1,	"thread(s)",
-# endif 
+# endif /* RLIMIT_CONCUR */
 
 # ifdef RLIMIT_MEMLOCK
     RLIMIT_MEMLOCK,	"memorylocked",	1024,	"kbytes",
-# endif 
+# endif /* RLIMIT_MEMLOCK */
 
 # ifdef RLIMIT_NPROC
     RLIMIT_NPROC,	"maxproc",	1,	"",
-# endif 
+# endif /* RLIMIT_NPROC */
 
 # ifdef RLIMIT_OFILE
     RLIMIT_OFILE,	"openfiles",	1,	"",
-# endif 
+# endif /* RLIMIT_OFILE */
 
     -1, 		NULL, 		0, 	NULL
 };
@@ -1363,7 +1363,7 @@ restrict_limit(value)
 	return (INT_MAX);
     else if (value < (double) INT_MIN)
 	return (INT_MIN);
-    else 
+    else
 	return ((int) value);
 }
 #endif /* convex */
@@ -1516,9 +1516,9 @@ badscal:
     }
 # if defined(convex) || defined(__convex__)
     return ((RLIM_TYPE) restrict_limit((f + 0.5)));
-# else 
+# else
     return ((RLIM_TYPE) (f + 0.5));
-# endif 
+# endif /* convex */
 }
 
 static void
@@ -1559,7 +1559,7 @@ plim(lp, hard)
     else if (lp->limconst == RLIMIT_CPU)
 	psecs((long) limit);
 # endif /* RLIMIT_CPU */
-    else 
+    else
 # ifndef BSDTIMES
     if (lp->limconst == RLIMIT_FSIZE)
 	/*
@@ -1567,7 +1567,7 @@ plim(lp, hard)
 	 * blocks. Note we cannot pre-multiply cause we might overflow (A/UX)
 	 */
 	xprintf("%ld %s", (long) (limit / 2), lp->limscale);
-    else 
+    else
 # endif /* BSDTIMES */
 	xprintf("%ld %s", (long) (limit / lp->limdiv), lp->limscale);
     xprintf("\n");
@@ -1618,7 +1618,7 @@ setlim(lp, hard, limit)
 	rlim.rlim_max = limit;
     else if (limit == RLIM_INFINITY && geteuid() != 0)
 	rlim.rlim_cur = rlim.rlim_max;
-    else 
+    else
 	rlim.rlim_cur = limit;
 
     if (setrlimit(lp->limconst, &rlim) < 0) {
@@ -1656,7 +1656,7 @@ dosuspend(v, c)
     (void) kill(0, SIGTSTP);
     /* the shell stops here */
     (void) signal(SIGTSTP, old);
-#else 
+#else /* !BSDJOBS */
     stderror(ERR_JOBCONTROL);
 #endif /* BSDJOBS */
 
