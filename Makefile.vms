@@ -1,4 +1,4 @@
-# $Id: Makefile.vms,v 1.8 1993/06/05 21:09:15 christos Exp christos $
+# $Id: Makefile.vms,v 1.9 1993/06/05 21:11:21 christos Exp christos $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -61,7 +61,7 @@ LFLAGS=$(INCLUDES)
 #CFLAGS= $(INCLUDES) -O -Olimit 2000
 
 # Intel Paragon OSF/1 with PGI compilers
-CFLAGS=-O -Mnodebug -Mnoperfmon $(INCLUDES)
+#CFLAGS=-O -Mnodebug -Mnoperfmon $(INCLUDES)
 
 # for silicon graphics (and other mips compilers) -- use the
 # global optimizer! (-O3).
