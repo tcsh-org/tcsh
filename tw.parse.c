@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.91 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.92 2002/06/25 19:02:12 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.91 2002/03/08 17:36:47 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.92 2002/06/25 19:02:12 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -115,7 +115,8 @@ static	int	 c_glob			__P((Char ***));
 static	int	 is_prefix		__P((Char *, Char *));
 static	int	 is_prefixmatch		__P((Char *, Char *, int));
 static	int	 is_suffix		__P((Char *, Char *));
-static	int	 recognize		__P((Char *, Char *, int, int, int));
+static	int	 recognize		__P((Char *, Char *, int, int, int,
+    int));
 static	int	 ignored		__P((Char *));
 static	int	 isadirectory		__P((Char *, Char *));
 #ifndef __MVS__
@@ -813,29 +814,20 @@ starting_a_command(wordstart, inputline)
  *	If we shorten it back to the prefix length, stop searching.
  */
 static int
-recognize(exp_name, item, name_length, numitems, enhanced)
+recognize(exp_name, item, name_length, numitems, enhanced, igncase)
     Char   *exp_name, *item;
     int     name_length, numitems, enhanced;
 {
     Char MCH1, MCH2;
     register Char *x, *ent;
     register int len = 0;
-#ifdef WINNT_NATIVE
     struct varent *vp;
-    int igncase;
-    igncase = (vp = adrof(STRcomplete)) != NULL && vp->vec != NULL &&
-	Strcmp(*(vp->vec), STRigncase) == 0;
-#endif /* WINNT_NATIVE */
 
     if (numitems == 1) {	/* 1st match */
 	copyn(exp_name, item, MAXNAMLEN);
 	return (0);
     }
-    if (!enhanced
-#ifdef WINNT_NATIVE
-	&& !igncase
-#endif /* WINNT_NATIVE */
-    ) {
+    if (!enhanced && !igncase) {
 	for (x = exp_name, ent = item; *x && (*x & TRIM) == (*ent & TRIM); x++, ent++)
 	    len++;
     } else {
@@ -988,11 +980,15 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	case RECOGNIZE_ALL:
 	case RECOGNIZE_SCROLL:
 
-#ifdef WINNT_NATIVE
- 	    igncase = (vp = adrof(STRcomplete)) != NULL && vp->vec != NULL &&
-		Strcmp(*(vp->vec), STRigncase) == 0;
-#endif /* WINNT_NATIVE */
-	    enhanced = (vp = adrof(STRcomplete)) != NULL && !Strcmp(*(vp->vec),STRenhance);
+ 	    if ((vp = adrof(STRcomplete)) != NULL && vp->vec != NULL) {
+		int i;
+		for (i = 0; vp->vec[i]; i++) {
+		    if (Strcmp(vp->vec[i], STRigncase) == 0)
+			igncase++;
+		    if (Strcmp(vp->vec[i], STRenhance) == 0)
+			enhanced++;
+		}
+	    }
 	    if (enhanced || igncase) {
 	        if (!is_prefixmatch(target, item, igncase)) 
 		    break;
@@ -1077,7 +1073,8 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 			break;
 		    }
 		}
-		if (recognize(exp_name, item, name_length, ++numitems, enhanced)) 
+		if (recognize(exp_name, item, name_length, ++numitems, enhanced,
+		    igncase)) 
 		    if (command != RECOGNIZE_SCROLL)
 			done = TRUE;
 		if (enhanced && (int)Strlen(exp_name) < name_length)

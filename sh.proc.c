@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.75 2001/08/06 23:52:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.76 2002/03/08 17:36:46 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.75 2001/08/06 23:52:03 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.76 2002/03/08 17:36:46 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1536,6 +1536,7 @@ dokill(v, c)
     register int signum, len = 0;
     register char *name;
     Char *sigptr;
+    char *ep;
     extern int T_Cols;
     extern int nsig;
 
@@ -1566,8 +1567,8 @@ dokill(v, c)
  	    }
  	}
  	if (Isdigit(*sigptr)) {
- 	    signum = atoi(short2str(sigptr));
-	    if (signum < 0 || signum > (MAXSIG-1))
+ 	    signum = strtol(short2str(sigptr), &ep, 10);
+	    if (signum < 0 || signum > (MAXSIG-1) || *ep)
 		stderror(ERR_NAME | ERR_BADSIG);
 	}
 	else {
@@ -1598,6 +1599,7 @@ pkill(v, signum)
     sigmask_t omask;
 #endif /* BSDSIGS */
     Char   *cp, **vp;
+    char   *ep;
 
 #ifdef BSDSIGS
     omask = sigmask(SIGCHLD);
@@ -1678,11 +1680,16 @@ pkill(v, signum)
 	    stderror(ERR_NAME | ERR_JOBARGS);
 	else {
 #ifndef WINNT_NATIVE
-	    pid = atoi(short2str(cp));
+	    pid = strtol(short2str(cp), &ep, 10);
 #else
-		pid = strtoul(short2str(cp),NULL,0);
+		pid = strtoul(short2str(cp),&ep,0);
 #endif /* WINNT_NATIVE */
-	    if (kill(pid, signum) < 0) {
+	    if (*ep) {
+		xprintf(CGETS(17, 14, "%S: Badly formed number\n"), cp);
+		err1++;
+		goto cont;
+	    }
+	    else if (kill(pid, signum) < 0) {
 		xprintf("%d: %s\n", pid, strerror(errno));
 		err1++;
 		goto cont;

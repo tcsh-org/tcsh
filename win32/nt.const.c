@@ -1,4 +1,4 @@
-/*$Header$*/
+/*$Header: /src/pub/tcsh/win32/nt.const.c,v 1.3 2002/08/11 07:58:12 amold Exp $*/
 /*
  * nt.const.c: NT-specific String constants for tcsh.
  */
@@ -33,7 +33,6 @@
 #define _h_tc_const
 #include "sh.h"
 #ifdef WINNT_NATIVE
-Char STRigncase[]	= { 'i', 'g', 'n', 'c', 'a', 's', 'e', '\0' };
 Char STRoldtitle[]	= { 'o', 'l', 'd', 't', 'i', 't', 'l', 'e', '\0' };
 Char STRNTlamepathfix[] = { 'N', 'T', 'l', 'a', 'm', 'e', 'p', 'a', 't', 'h',
 			    'f', 'i','x','\0'};
