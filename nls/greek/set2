@@ -1,4 +1,4 @@
-$ $Id: set2,v 1.2 1995/03/19 18:07:15 christos Exp $
+$ $Id: set2,v 1.1 1996/04/26 19:24:28 christos Exp $
 $ Signal names
 $set 2 
 1 Μηδενικό signal
@@ -90,3 +90,5 @@ $set 2
 87 Αλλαγή προτεραιότητας
 88 Ανιχνεύθηκε πραγματικό αδιέξοδο
 89 Νέος χαρακτήρας εισόδου
+90 Stack limit exceeded
+91 Unused signal

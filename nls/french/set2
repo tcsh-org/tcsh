@@ -1,4 +1,4 @@
-$ $Id: set2,v 1.2 1995/03/24 14:00:00 vansteen Exp $
+$ $Id: set2,v 1.1 1995/04/25 14:04:35 christos Exp $
 $ Messages Signaux
 $set 2
 1 Signal nul
@@ -90,3 +90,5 @@ $set 2
 87 Priorité modifiée
 88 detecté
 89 Nouveau caractère d'entrée
+90 Stack limit exceeded
+91 Unused signal

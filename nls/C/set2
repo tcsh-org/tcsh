@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set2,v 1.2 1995/03/19 18:07:15 christos Exp $
 $ Signal names
 $set 2 
 1 Null signal
@@ -90,3 +90,5 @@ $set 2
 87 Priority changed
 88 True deadlock detected
 89 New input character
+90 Stack limit exceeded
+91 Unused signal

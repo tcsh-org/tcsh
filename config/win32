@@ -3,7 +3,7 @@
  *
  * All source files should #include this FIRST.
  *
- * Edit this to match your system type.
+ * This is the config file for Linux systems
  */
 
 #ifndef _h_config
@@ -18,12 +18,12 @@
  * POSIXJOBS	This system supports the optional IEEE Std 1003.1-1988 (POSIX)
  *		job control facilities.
  */
-#define POSIXJOBS
+//#define POSIXJOBS
 
 /*
  * POSIXSIGS	Use the POSIX signal facilities to emulate BSD signals.
  */
-#undef POSIXSIGS
+#define POSIXSIGS
 
 /*
  * VFORK	This machine has a vfork().  
@@ -44,36 +44,36 @@
  * BSDJOBS	You have BSD-style job control (both process groups and
  *		a tty that deals correctly
  */
-#define BSDJOBS
+//#define BSDJOBS
 
 /*
  * BSDSIGS	You have 4.2-style signals, rather than USG style.
  *		Note: POSIX systems should not define this unless they
  *		have sigvec() and friends (ie: 4.3BSD-RENO, HP-UX).
  */
-#undef BSDSIGS
+//#define BSDSIGS
 
 /*
  * BSDTIMES	You have BSD-style process time stuff (like rusage)
  *		This may or may not be true.  For example, Apple Unix
  *		(OREO) has BSDJOBS and BSDSIGS but not BSDTIMES.
  */
-#undef BSDTIMES
+//#define BSDTIMES
 
 /*
  * BSDLIMIT	You have BSD-style resource limit stuff (getrlimit/setrlimit)
  */
-#define BSDLIMIT
+//#define BSDLIMIT
 
 /*
  * BSDNICE	Your system uses setpriority() instead of nice, to
  *		change a processes scheduling priority
  */
-#undef BSDNICE
+//#define BSDNICE
 
 /*
  * TERMIO	You have struct termio instead of struct sgttyb.
- * 		This is usually the case for SYSV systems, where
+ * 		This is usually the case for SVID systems, where
  *		BSD uses sgttyb. POSIX systems should define this
  *		anyway, even though they use struct termios.
  */
@@ -83,22 +83,18 @@
  * SYSVREL	Your machine is SYSV based (HPUX, A/UX)
  *		NOTE: don't do this if you are on a Pyramid -- tcsh is
  *		built in a BSD universe.
- *		Set SYSVREL to 1, 2, or 3, depending the version of System V
+ *		Set SYSVREL to 1, 2, 3, or 4, depending the version of System V
  *		you are running. Or set it to 0 if you are not SYSV based
+ *
+ *		Note: Linux should work with any SYSVREL < 3.
  */
-#define SYSVREL	4
+#define SYSVREL	0
 
 /*
  * YPBUGS	Work around Sun YP bugs that cause expansion of ~username
- *		to send command output to /dev/null [they are back!]
+ *		to send command output to /dev/null
  */
-#define YPBUGS
-
-/*
- * NISPLUS    Make sure that fd's 0, 1, and 2 always are open so that
- *            Sun's NIS+ doesn't get them, making ~-expansion hang.
- */
-#define NISPLUS
+#undef YPBUGS
 
 /*
  * SIGVOID	Define this if your signal handlers return void.  On older
@@ -112,52 +108,36 @@
 #define HAVEDUP2
 
 /*
- * HAVEUTMPX	Define if you have extended utmp (utmpx).
- *		(common for svr4 systems)
- */
-#define HAVEUTMPX
-
-/*
  * UTHOST	Does the utmp file have a host field?
  */
-#ifdef HAVEUTMPX
-# define UTHOST
-#else
-# undef UTHOST
-#endif /* HAVEUTMPX */
+#define UTHOST
 
 /*
  * DIRENT	Your system has <dirent.h> instead of <sys/dir.h>
  */
 #define DIRENT
-
-/*
- * ECHO_STYLE	Optionally change the behavior of the builtin echo
- *		BOTH_ECHO: Support both bsd options (-n) and sysv escapes (\nnn)
- *		BSD_ECHO:  Support only -n
- *		SYSV_ECHO: Support only sysv escapes (\nnn)
- *		NONE_ECHO: Pure echo.
- */
-#define ECHO_STYLE BSD_ECHO	/* BSD options only */
-
 /****************** local defines *********************/
-#ifndef BSDTIMES
-# define NEEDgethostname
+
+#undef PW_SHADOW
+#define _PATH_TCSHELL "/bin/tcsh"
+#define ECHO_STYLE      BOTH_ECHO
+#ifdef BSDSIGS
+# define __USE_BSD_SIGNAL
 #endif
-/*
- * Shadow passwd file
- */
-#define PW_SHADOW
-
-#define SOLARIS2 23
-
-/*
- * lookupname/namei ignores tailing '/' on files
- */
-#define NAMEI_BUG
 
 /****************** configurable hacks ****************/
 /* have been moved to config_f.h */
 #include "config_f.h"
+
+/* that gives too long startup delays for me */
+
+#undef REMOTEHOST
+
+#define CASE_INSENSITIVE
+#define HASHBANG
+#undef AUTOLOGOUT
+#undef NLS_CATALOGS
+
+#include <ntport.h>
 
 #endif /* _h_config */

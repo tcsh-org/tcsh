@@ -151,6 +151,11 @@
 
 #define SOLARIS2 24
 
+/*
+ * lookupname/namei ignores tailing '/' on files
+ */
+#define NAMEI_BUG
+
 /****************** configurable hacks ****************/
 /* have been moved to config_f.h */
 #include "config_f.h"
