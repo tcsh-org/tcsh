@@ -127,6 +127,8 @@
 #endif
 # define DECOSF1	200	/* For version 2.00 */
 
+#define YPBUGS
+
 /****************** configurable hacks ****************/
 /* have been moved to config_f.h */
 #include "config_f.h"
