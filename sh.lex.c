@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.lex.c,v 3.43 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.lex.c,v 3.44 1996/04/26 19:19:51 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.43 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.44 1996/04/26 19:19:51 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -580,10 +580,11 @@ getdol()
 		seterror(ERR_VARILL);
 	    else {
 		ungetD(c);
-		*--np = 0;
-		addla(name);
-		return;
+		--np;
 	    }
+	    *np = 0;
+	    addla(name);
+	    return;
 	}
 	if (toolong) {
 	    seterror(ERR_VARTOOLONG);

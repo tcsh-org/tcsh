@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.func.c,v 3.66 1995/05/06 22:00:08 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.67 1996/04/26 19:21:00 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.66 1995/05/06 22:00:08 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.67 1996/04/26 19:21:00 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -670,7 +670,7 @@ auto_lock()
 #if defined(PW_AUTH) && !defined(XCRYPT)
 
     struct authorization *apw;
-    extern const char *crypt16();
+    extern char *crypt16();
 
 # define XCRYPT(a, b) crypt16(a, b)
 
@@ -683,7 +683,7 @@ auto_lock()
 #if defined(PW_SHADOW) && !defined(XCRYPT)
 
     struct spwd *spw;
-    extern const char *crypt();
+    extern char *crypt();
 
 # define XCRYPT(a, b) crypt(a, b)
 
@@ -694,7 +694,7 @@ auto_lock()
 #endif /* PW_SHADOW && !XCRYPT */
 
 #ifndef XCRYPT
-    extern const char *crypt();
+    extern char *crypt();
 
 #define XCRYPT(a, b) crypt(a, b)
 

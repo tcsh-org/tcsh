@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.c,v 3.70 1995/05/06 17:51:58 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.71 1996/04/26 19:18:46 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.70 1995/05/06 17:51:58 christos Exp $")
+RCSID("$Id: sh.c,v 3.71 1996/04/26 19:18:46 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -462,6 +462,8 @@ main(argc, argv)
 	    if ((cp2 = Strrchr(cp, (Char) '/')) != NULL) {
 		cp = cp2 + 1;
 	    }
+	    else
+		cp2 = cp;
 	    if (!((Strncmp(cp2, STRtty, 3) == 0) && Isalpha(cp2[3])) ||
 		!((Strncmp(cp, STRpts, 3) == 0) && cp[3] == '/')) {
 		if (getenv("DISPLAY") == NULL) {

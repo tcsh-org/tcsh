@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.06/RCS/host.defs,v 1.11 1995/04/29 22:28:24 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.12 1996/04/26 19:18:32 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.11 1995/04/29 22:28:24 christos Exp $")
+RCSID("$Id: host.defs,v 1.12 1996/04/26 19:18:32 christos Exp $")
 
 endcode	:
 
@@ -412,7 +412,7 @@ enddef	:
 
 
 newdef	: defined(_MINIX)
-comment	: Andy Teitelbaum's minix
+comment	: Andy Tanenbaum's minix
 vendor	: defined(i386)					: "intel"
 hosttype: defined(i386)					: "minix386"
 hosttype:						: "minix"
@@ -423,11 +423,11 @@ enddef	:
 
 newdef	: defined(linux)
 comment	: Linus Torvalds's linux
-vendor	: defined(i386)					: "intel"
+vendor	: defined(i386)	|| defined(i486) || defined(__i486__) : "intel"
 hosttype: defined(i486) || defined(__i486__)		: "i486-linux"
 hosttype: defined(i386)					: "i386-linux"
 ostype	: 						: "linux"
-hosttype: defined(i486) || defined(__i486__)		: "i486"
+machtype: defined(i486) || defined(__i486__)		: "i486"
 machtype: defined(i386)					: "i386"
 vendor	: defined(__alpha)				: "dec"
 hosttype: defined(__alpha)				: "alpha"
@@ -445,7 +445,7 @@ enddef	:
 
 
 newdef	: defined(__NetBSD__) 
-comment	: Chris Demetriou's NetBSD
+comment	: s NetBSD
 vendor	: defined(alpha)				: "digital"
 vendor	: defined(amiga)				: "commodore"
 vendor	: defined(atari)				: "atari"
@@ -471,7 +471,7 @@ enddef	:
 
 
 newdef	: defined(__FreeBSD__) 
-comment	: Free BSD
+comment	: FreeBSD
 vendor	: defined(i386)					: "intel"
 hosttype:						: "FreeBSD"
 ostype	:						: "FreeBSD"

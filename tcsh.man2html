@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: tcsh.man2html,v 1.6 1995/03/12 04:49:26 christos Exp $
+# $Id: tcsh.man2html,v 1.7 1995/03/19 22:33:26 christos Exp $
 
 # tcsh.man2html, Dave Schweisguth <dcs@proton.chem.yale.edu>
 #
@@ -368,11 +368,11 @@ print <<EOP;
 Here are the <A HREF="$outfile">nroff manpage</A> (175K)
 from which this HTML version was generated,
 the <A HREF="$script">Perl script</A> which did the conversion
-and the <A HREF="file://tesla.ee.cornell.edu/pub/tcsh/">
+and the <A HREF="file://ftp.deshaw.com/pub/tcsh/">
 complete source code</A> for <I>tcsh</I>.
 <HR>
 <I>tcsh</I> is maintained by
-Christos Zoulas <A HREF="mailto:christos\@ee.cornell.edu">&lt;christos\@ee.cornell.edu&gt;</A>
+Christos Zoulas <A HREF="mailto:christos\@gw.com">&lt;christos\@gw.com&gt;</A>
 and the <A HREF="$listsfile"><I>tcsh</I> maintainers' mailing list</A>.
 Dave Schweisguth <A HREF="mailto:dcs\@proton.chem.yale.edu">&lt;dcs\@proton.chem.yale.edu&gt;</A>
 wrote the manpage and the HTML conversion script.

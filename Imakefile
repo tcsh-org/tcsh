@@ -1,5 +1,5 @@
 XCOMM
-XCOMM $Id: Imakefile,v 1.63 1995/05/06 17:51:58 christos Exp $
+XCOMM $Id: Imakefile,v 1.64 1996/04/26 19:17:22 christos Exp $
 XCOMM
 XCOMM Imakefile for tcsh 6.06
 XCOMM Marc Horowitz, MIT SIPB
@@ -491,7 +491,7 @@ MISCF = Makefile.std Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
 	README.imake complete.tcsh vmsreadme.txt Makefile.vms termcap.vms \
-	snames.h host.defs gethost.c tcsh.man2html
+	snames.h host.defs gethost.c tcsh.man2html Makefile.in configure.in
 CONFSRCS=config/[a-z]*
 
 

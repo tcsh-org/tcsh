@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.h,v 3.68 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.69 1996/04/26 19:19:33 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -505,6 +505,7 @@ EXTERN bool    isdiagatty;	/* is SHDIAG a tty */
 EXTERN bool    is1atty;		/* is file descriptor 1 a tty (didfds mode) */
 EXTERN bool    is2atty;		/* is file descriptor 2 a tty (didfds mode) */
 EXTERN bool    arun;		/* Currently running multi-line-aliases */
+EXTERN int     implicit_cd;	/* implicit cd enabled? (1=enabled,2=verbose) */
 EXTERN bool    inheredoc;	/* Currently parsing a heredoc */
 
 /*
@@ -889,6 +890,7 @@ EXTERN struct varent {
 #define VAR_ALL		-1
 #define VAR_READONLY	1
 #define VAR_READWRITE	2
+#define VAR_NOGLOB	4
     struct varent *v_link[3];	/* The links, see below */
     int     v_bal;		/* Balance factor */
 }       shvhed, aliases;

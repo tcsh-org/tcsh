@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.dol.c,v 3.30 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.31 1996/04/26 19:19:06 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.30 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.31 1996/04/26 19:19:06 christos Exp $")
 
 /*
  * C shell
@@ -709,6 +709,18 @@ Dgetdol()
     if (dimen) {
 	Char   *cp = putn(upb - lwb + 1);
 
+	/* this is a kludge. It prevents Dgetdol() from */
+	/* pushing erroneous ${#<error> values into the labuf. */
+	if (sc == '{') {
+	    c = Dredc();
+	    if (c != '}')
+	    {
+		xfree((ptr_t) cp);
+		stderror(ERR_MISSING, '}');
+	        return;
+	    }
+	    unDredc(c);
+	}
 	addla(cp);
 	xfree((ptr_t) cp);
     }

@@ -1,0 +1,136 @@
+dnl Autoconf script for tcsh
+dnl To rebuild the `configure' script from this, execute the command
+dnl 	autoconf
+dnl in the directory containing this script.
+dnl
+dnl You'll also need a version of config.guess from a gnu package
+dnl
+dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
+dnl
+
+AC_PREREQ(2.10)dnl Minimum Autoconf version required.
+AC_INIT(tc.vers.c)
+
+# Shift out arguments leaving the optional platform name.
+while test -n "$1" ; do
+ case "$1" in
+  -*) shift ;;
+  *) break ;;
+ esac
+done
+
+AC_MSG_CHECKING(for the canonical name of this system)
+AC_CACHE_VAL(tcsh_cv_canonical,
+if test "$1" = '' ; then
+  new_canonical=`$srcdir/config.guess`
+else
+  new_canonical="$1"
+fi
+tcsh_cv_canonical="$new_canonical"
+)
+AC_MSG_RESULT($tcsh_cv_canonical)
+
+changequote(, )dnl
+
+case "${tcsh_cv_canonical}" in
+
+  ## Alpha (DEC) machines.
+  alpha-dec-osf* )
+    tcsh_config_file=decosf1
+  ;;
+
+  ## HP/UX
+  *-hp-hpux7* )
+    tcsh_config_file=hpux7
+  ;;
+  *-hp-hpux[89]* )
+    tcsh_config_file=hpux8
+  ;;
+
+  ## Motorola systems
+  m68k-motorola-sysv* )
+    tcsh_config_file=sysV68
+  ;;
+  m88k-motorola-sysv3* )
+    tcsh_config_file=sysV88
+  ;;
+
+  ## Linux
+  *-*-linux* )
+    tcsh_config_file=linux
+  ;;
+
+  ## Silicon Graphics machines
+  *-sgi-iri* )
+    tcsh_config_file=sgi
+    NON_GNU_DFLAGS='-D__STDC__'
+  ;;
+
+  ## Stardent Vistra i860-SVR4
+  i860-*-sysv4* )
+    tcsh_config_file=sysv4
+  ;;
+
+  ## Suns
+  *-sun-sunos3* )
+    tcsh_config_file=sunos35
+  ;;
+  *-sun-sunos4.0* )
+    tcsh_config_file=sunos40
+  ;;
+  *-sun-sunos4.1.[12]* )
+    tcsh_config_file=sunos41
+  ;;
+  *-sun-sunos4.1.[3456]* )
+    tcsh_config_file=sunos413
+  ;;
+  *-sun-solaris2.[01]* )
+    tcsh_config_file=sol2
+  ;;
+  *-sun-solaris2.2* )
+    tcsh_config_file=sol22
+  ;;
+  *-sun-solaris2.3* )
+    tcsh_config_file=sol23
+  ;;
+  *-sun-solaris2.[456]* )
+    tcsh_config_file=sol24
+  ;;
+
+  ## Tektronix systems
+  m68k-tektronix-bsd* )
+    tcsh_config_file=bsd
+    NON_GNU_DFLAGS='-DBSD -DUTek'
+  ;;
+  m88k-tektronix-sysv3* )
+    tcsh_config_file=tekXD88
+  ;;
+
+  * )
+  changequote([, ])dnl
+  AC_MSG_ERROR([Tcsh can't guess the configuration file name
+for \`${tcsh_cv_canonical}' systems.
+Check tcsh's \`Ported' file for configuration instructions.])
+  changequote(, )dnl
+  ;;
+
+esac
+
+echo "Tcsh will use configuration file \`$tcsh_config_file'."
+changequote([, ])dnl
+
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_GCC_TRADITIONAL
+
+if test $ac_cv_prog_gcc = no ; then
+  DFLAGS="$DFLAGS $NON_GNU_DFLAGS"
+  CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
+fi
+
+AC_CHECK_LIB(termlib, tgetent)
+AC_CHECK_LIB(socket, getpeername)
+AC_CHECK_LIB(nsl, inet_ntoa)
+AC_SUBST(DFLAGS)
+
+AC_OUTPUT(config.h:config/${tcsh_config_file} Makefile:Makefile.std)

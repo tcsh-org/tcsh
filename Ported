@@ -322,6 +322,10 @@ OS	:	next os 2.x, 3.x
 CONFIG	:	mach
 ENVIRON	:	n/a
 NOTES	:	NeXTSTeP 3.3 on intel defines speed_t so compile with -D_SPEED_T
+NOTES	:	NeXT's cc -E adds spaces before and after array brackets!
+NOTES	:	You'll need to change the sed expression in the Makefile to
+NOTES	:	something like:
+NOTES	:	's/Char \([a-zA-Z0-9_]*\) *\[ *\].*/extern Char \1[];/'
 VERSION	:	6.04.00
   
 VENDOR	:	Heurikon
@@ -850,6 +854,17 @@ ENVIRON :	n/a
 NOTES	:	Lower the optimization or you'll get a 5M binary!
 NOTES	:	cc broken: typedef void sigret_t; typedef void pret_t;
 VERSION :	6.04.00
+
+VENDOR	:	Unixware
+MODELS	:	all
+COMPILER:	cc
+CFLAGS	:	normal
+LIBES	:	-lcrypt -ltermlib -lsocket -lnsl
+OS	:	Unixware 2.03 (4.2MP)
+CONFIG	:	svr4
+ENVIRON :	n/a
+NOTES	:	Remove PW_SHADOW from config file.
+VERSION :	6.06.00
 
 VENDOR	:	Intergraph
 MODELS	:	clipper

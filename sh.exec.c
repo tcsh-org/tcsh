@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.exec.c,v 3.34 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.exec.c,v 3.35 1996/04/26 19:19:14 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.34 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.35 1996/04/26 19:19:14 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -185,7 +185,7 @@ doexec(t)
 #endif /* VFORK */
 
     v = adrof(STRpath);
-    if (v == 0 && expath[0] != '/') {
+    if (v == 0 && expath[0] != '/' && expath[0] != '.') {
 	blkfree(pv);
 	pexerr();
     }

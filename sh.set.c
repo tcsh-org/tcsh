@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.set.c,v 3.28 1995/03/12 04:49:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.set.c,v 3.29 1996/04/26 19:20:23 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.28 1995/03/12 04:49:26 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.29 1996/04/26 19:20:23 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -160,6 +160,9 @@ update_vars(vp)
 	resetwatch();
     }
 #endif /* HAVENOUTMP */
+    else if (eq(vp, STRimplicitcd)) {
+	implicit_cd = ((eq(varval(vp), STRverbose)) ? 2 : 1);
+    }
 }
 
 
@@ -559,17 +562,19 @@ set1(var, vec, head, flags)
 {
     register Char **oldv = vec;
 
-    gflag = 0;
-    tglob(oldv);
-    if (gflag) {
-	vec = globall(oldv);
-	if (vec == 0) {
+    if ((flags & VAR_NOGLOB) == 0) {
+	gflag = 0;
+	tglob(oldv);
+	if (gflag) {
+	    vec = globall(oldv);
+	    if (vec == 0) {
+		blkfree(oldv);
+		stderror(ERR_NAME | ERR_NOMATCH);
+		return;
+	    }
 	    blkfree(oldv);
-	    stderror(ERR_NAME | ERR_NOMATCH);
-	    return;
+	    gargv = 0;
 	}
-	blkfree(oldv);
-	gargv = 0;
     }
     setq(var, vec, head, flags);
 }
@@ -639,6 +644,8 @@ unset(v, c)
 	bslash_quote = 0;
     if (adrof(STRsymlinks) == 0)
 	symlinks = 0;
+    if (adrof(STRimplicitcd) == 0)
+	implicit_cd = 0;
     if (did_only && adrof(STRrecognize_only_executables) == 0)
 	tw_cmd_free();
 }

@@ -1,4 +1,7 @@
 V6.07.00
+ 37. 6.06.02 - 06/22/96
+ 36. Added implicitcd
+ 35. Added configure.in and Makefile.in from Kaveh.
  34. unset path, unsetenv PATH, ./foo did not work.
  33. Add VAR_NOGLOB, and use it to avoid globbing directory names when
      cd'ing into them.

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tw.parse.c,v 3.73 1995/04/16 19:15:53 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.74 1996/04/26 19:23:13 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.73 1995/04/16 19:15:53 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.74 1996/04/26 19:23:13 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -105,7 +105,6 @@ extern int lbuffed;		/* from sh.print.c */
 
 static	void	 extract_dir_and_name	__P((Char *, Char *, Char *));
 static	int	 insert_meta		__P((Char *, Char *, Char *, bool));
-static	Char	*dollar			__P((Char *, Char *));
 static	Char	*tilde			__P((Char *, Char *));
 static  int      expand_dir		__P((Char *, Char *, DIR  **, COMMAND));
 static	bool	 nostat			__P((Char *));
@@ -1688,7 +1687,7 @@ extract_dir_and_name(path, dir, name)
  * 	expand "/$old1/$old2/old3/"
  * 	to "/value_of_old1/value_of_old2/old3/"
  */
-static Char *
+Char *
 dollar(new, old)
     Char   *new, *old;
 {

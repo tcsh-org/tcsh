@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/tc.const.c,v 3.35 1995/03/19 22:33:26 christos Exp christos $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.36 1996/04/26 19:20:43 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.35 1995/03/19 22:33:26 christos Exp christos $")
+RCSID("$Id: tc.const.c,v 3.36 1996/04/26 19:20:43 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -287,6 +287,9 @@ Char STRwho[]		= { 'w', 'h', 'o', '\0' };
 Char STRsched[]		= { 's', 'c', 'h', 'e', 'd', '\0' };
 Char STRrmstar[]	= { 'r', 'm', 's', 't', 'a', 'r', '\0' };
 Char STRrm[]		= { 'r', 'm', '\0' };
+
+Char STRimplicitcd[] = { 'i', 'm', 'p', 'l', 'i', 'c', 'i', 't',
+                         'c', 'd', '\0' };
 Char STRshlvl[]		= { 's', 'h', 'l', 'v', 'l', '\0' };
 Char STRKSHLVL[]	= { 'S', 'H', 'L', 'V', 'L', '\0' };
 Char STRLANG[]		= { 'L', 'A', 'N', 'G', '\0' };

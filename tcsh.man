@@ -76,7 +76,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "29 April 1995" "Cornell 6.06.00"
+.TH TCSH 1 "22 June 1996" "Cornell 6.06.02"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -740,8 +740,8 @@ unless bound to another command.
 .B spell-line \fR(M-$)
 Attempts to correct the spelling of each word in the input buffer, like
 \fIspell-word\fR, but ignores words whose first character is one of
-`!', `.', `\\', `^', `\-', `*' or `%' to avoid problems with switches,
-substitutions and the like.
+`\-', `!', `^' or `%', or which contain `\\', `*' or `?', to avoid problems
+with switches, substitutions and the like.
 See \fBSpelling correction\fR.
 .TP 8
 .B spell-word \fR(M-s, M-S)
@@ -797,7 +797,10 @@ Furthermore, all \fBSubstitutions\fR (see below) except \fBHistory substitution\
 can be prevented by enclosing the strings (or parts of strings)
 in which they appear with single quotes or by quoting the crucial character(s)
 (e.g. `$' or ``' for \fBVariable substitution\fR or \fBCommand substitution\fR respectively)
-with `\\'. \fBHistory substitution\fRs are quoted in the same way by
+with `\\'. (\fBAlias substitution\fR is no exception: quoting in any way any
+character of a word for which an \fIalias\fR has been defined prevents
+substitution of the alias. The usual way of quoting an alias is to precede it
+with a backslash.) \fBHistory substitution\fR is prevented by
 backslashes but not by single quotes.  Strings quoted with double or backward
 quotes undergo \fBVariable substitution\fR and \fBCommand substitution\fR, but other
 substitutions are prevented.
@@ -2032,29 +2035,34 @@ Does nothing, successfully.
 .B @
 .br
 .B @ \fIname\fB = \fIexpr
+.br
+.B @ \fIname\fR[\fIindex\fR]\fB = \fIexpr
+.br
+.B @ \fIname\fB++\fR|\fB--
 .PD 0
 .TP 8
-.B @ \fIname\fR[\fIindex\fR]\fB = \fIexpr
+.B @ \fIname\fR[\fIindex\fR]\fB++\fR|\fB--
 The first form prints the values of all shell variables.
-The second form sets the specified \fIname\fR to the value of \fIexpr\fR.
-If \fIexpr\fR contains `<', `>', `&' or `' then at least that part of
-\fIexpr\fR must be placed within `()'.
-The third form assigns the value of \fIexpr\fR to the \fIindex\fR'th
-argument of \fIname\fR.
-Both \fIname\fR and its \fIindex\fR'th component must already exist.
 .PD
 .RS +8
 .PP
+The second form assigns the value of \fIexpr\fR to \fIname\fR.
+The third form assigns the value of \fIexpr\fR to the \fIindex\fR'th
+component of \fIname\fR; both \fIname\fR and its \fIindex\fR'th component
+must already exist.
+.PP
 \fIexpr\fR may contain the operators `*', `+', etc. as in C.
-The space separating the name from the assignment operator is optional.
-Spaces are, however, mandatory in separating components of \fIexpr\fR
-which would otherwise be single words.
-.PP
-Special postfix `++' and `\-\-' operators increment and decrement \fIname\fR
-respectively, e.g. `@ i++'.
-.PP
+If \fIexpr\fR contains `<', `>', `&' or `' then at least that part of
+\fIexpr\fR must be placed within `()'.
 Note that the syntax of \fIexpr\fR has nothing to do with that described
 under \fBExpressions\fR.
+.PP
+The fourth and fifth forms increment (`++') or decrement (`\-\-') \fIname\fR
+or its \fIindex\fR'th component.
+.PP
+The space between `@' and \fIname\fR is required.  The spaces between
+\fIname\fR and `=' and between `=' and \fIexpr\fR are optional.  Components of
+\fIexpr\fR must be separated by spaces.
 .RE
 .PD
 .TP 8
@@ -2960,8 +2968,6 @@ On machines where `ls \-C' is not the default, \fIls\-F\fR acts like `ls \-CF',
 unless \fBlistflags\fR contains an `x', in which case it acts like `ls \-xF'.
 \fIls\-F\fR passes its arguments to \fIls\fR(1) if it is given any switches,
 so `alias ls ls\-F' generally does the right thing.
-\fIls\-F\fR includes file identification characters when sorting filenames;
-this is a bug.
 .RE
 .PP
 .B migrate \fR[\fB\-\fIsite\fR] \fIpid\fR|\fB%\fIjobid\fR ... (+)
@@ -3649,6 +3655,15 @@ This prevents the shell from accidentally being killed.
 If set to a number \fIn\fR, the shell ignores \fIn\fR - 1 consecutive
 \fIend-of-file\fRs and exits on the \fIn\fRth. (+)
 If unset, `1' is used, i.e. the shell exits on a single `^D'.
+.TP 8
+.B implicitcd \fR(+)
+If set, the shell will treat directory names typed as commands as though
+they were requests to change to that directory. If set to \fIverbose\fR,
+the change of directory will be echoed to the standard output. This behavior
+is inhibited in non-interactive shell scripts, or for command strings with
+more than one word. Changing directory takes precedence over executing a
+a like-named command, but it is done after alias substitutions. Tilde and
+variable expansions work as expected.
 .TP 8
 .B inputmode \fR(+)
 If set to `insert' or `overwrite', puts the editor into that input mode
@@ -4607,7 +4622,9 @@ are not negated correctly.
 The single-command form of \fIif\fR does output redirection even if
 the expression is false and the command is not executed.
 .PP
-\fIls\-F\fR includes file identification characters when sorting filenames.
+\fIls\-F\fR includes file identification characters when sorting filenames
+and does not handle control characters in filenames well. It cannot be
+interrupted.
 .PP
 Report bugs to tcsh-bugs@mx.gw.com, preferably with fixes. If you want to
 help maintain and test tcsh, send mail to listserv@mx.gw.com with the text
@@ -4660,7 +4677,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.06.00 (Cornell) 1995-04-29.
+This manual documents tcsh 6.06.02 (D.E.Shaw) 1996-06-22.
 .SH AUTHORS
 .PD 0
 .TP 2
@@ -4812,6 +4829,9 @@ AFS and HESIOD patches
 .TP 2
 Luke Mewburn, RMIT University, 1994
 Enhanced directory printing in prompt
+.TP 2
+Edward Hutchins, Silicon Graphics Inc., 1996
+Added implicit cd.
 .PD
 .PP
 .SH "THANKS TO"
