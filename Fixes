@@ -1,4 +1,7 @@
-V6.00.03, ....
+V6.00.03, 10/21/91
+31. watch code now accepts shell patterns.
+30. new hashing code portability fixes.
+29. $foo:gs/:/ / fix and 'a' modifier addition.
 28. Added $! (the pid of the last background job forked)
 27. exec does not kill the shell when it fails.
 26. Irix4.0 decls.
