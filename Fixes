@@ -1,4 +1,13 @@
 V6.06.00, -
+ 81. 6.05.08 - 04/29/95
+ 80. Update to the newest csh sh.file.c
+ 79. More completions from Tom.
+ 78. Fix the Imakefile to use XCOMM
+ 77. Update for AIX 3.2.
+ 76. French catalog from J.M.Vansteene@frcl.bull.fr (fwd Michael Schmidt)
+ 75. Nls fixes and small typos from Michael
+ 74. PDP11 BSD type fixes.
+ 73. More manual page fixes.
  72. 6.05.07 - 04/19/95
  71. More NLS catalog fixes.
  70. Bruce's jumbo patch.

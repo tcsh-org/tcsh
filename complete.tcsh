@@ -1,7 +1,10 @@
 #
-# $Id: complete.tcsh,v 1.25 1995/01/20 23:48:56 christos Exp christos $
+# $Id: complete.tcsh,v 1.26 1995/03/19 22:33:26 christos Exp christos $
 # example file using the new completion code
 #
+
+onintr -
+if (! $?prompt) goto end
 
 if ($?tcsh) then
     if ($tcsh != 1) then
@@ -16,26 +19,30 @@ if ($?tcsh) then
     unset rev rel pat
 endif
 
-# method of setting hosts and ftphosts from Kimmo Suominen <kim@tac.nyc.ny.us>
-
 if ($?complete) then
     set noglob
-    foreach f ( ~/.hosts /usr/local/etc/csh.hosts ~/.rhosts /etc/hosts.equiv )
+    set hosts
+    foreach f ($HOME/.hosts /usr/local/etc/csh.hosts $HOME/.rhosts /etc/hosts.equiv)
         if ( -r $f ) then
-	    set hosts=(`cat $f`)
-	    break
+	    set hosts=($hosts `cat $f | grep -v +`)
 	endif
     end
+    if ( -r $HOME/.netrc ) then
+	set f=`awk '/machine/ { print $2 }' < $HOME/.netrc` >& /dev/null
+	set hosts=($hosts $f)
+    endif
     unset f
     if ( ! $?hosts ) then
 	set hosts=(hyperion.ee.cornell.edu phaeton.ee.cornell.edu \
-		   guillemin.ee.cornell.edu theory.tc.cornell.edu \
-		   vangogh.cs.berkeley.edu)
+		   guillemin.ee.cornell.edu vangogh.cs.berkeley.edu \
+		   ftp.uu.net prep.ai.mit.edu export.lcs.mit.edu \
+		   labrea.stanford.edu sumex-aim.stanford.edu \
+		   tut.cis.ohio-state.edu)
     endif
 
     complete ywho  	n/*/\$hosts/	# argument from list in $hosts
-    complete rsh	p/1/\$hosts/ c/-/"(l n)"/   n/-l/u/ n/*/c/
-    complete xrsh   	p/1/\$hosts/ c/-/"(l 8 e)"/ n/-l/u/ n/*/c/
+    complete rsh	p/1/\$hosts/ c/-/"(l n)"/   n/-l/u/ N/-l/c/ n/-/c/ p/2/c/ p/*/f/
+    complete xrsh	p/1/\$hosts/ c/-/"(l 8 e)"/ n/-l/u/ N/-l/c/ n/-/c/ p/2/c/ p/*/f/
     complete rlogin 	p/1/\$hosts/ c/-/"(l 8 e)"/ n/-l/u/
     complete telnet 	p/1/\$hosts/ p/2/x:'<port>'/ n/*/n/
 
@@ -66,17 +73,18 @@ if ($?complete) then
     complete unalias	n/*/a/
     complete xdvi 	n/*/f:*.dvi/	# Only files that match *.dvi
     complete dvips 	n/*/f:*.dvi/
-    complete latex 	n/*/f:*.tex/	# Only files that match *.tex
-    complete tex 	n/*/f:*.{tex,ltx}/
+    complete tex 	n/*/f:*.tex/	# Only files that match *.tex
+    complete latex 	n/*/f:*.{tex,ltx}/
     complete su		c/--/"(login fast preserve-environment command shell \
-			help version)"/	c/-/"(f l m p c s)"/ n/{-c,--command}/c/\
+			help version)"/	c/-/"(f l m p c s -)"/ \
+			n/{-c,--command}/c/ \
 			n@{-s,--shell}@'`cat /etc/shells`'@ n/*/u/
     complete cc 	c/-[IL]/d/ \
               c@-l@'`\ls -1 /usr/lib/lib*.a | sed s%^.\*/lib%%\;s%\\.a\$%%`'@ \
-			c/-/"(o l c g L I D U)"/ n/*/f:*.[coas]/
+			c/-/"(o l c g L I D U)"/ n/*/f:*.[coasi]/
     complete acc 	c/-[IL]/d/ \
        c@-l@'`\ls -1 /usr/lang/SC1.0/lib*.a | sed s%^.\*/lib%%\;s%\\.a\$%%`'@ \
-			c/-/"(o l c g L I D U)"/ n/*/f:*.[coas]/
+			c/-/"(o l c g L I D U)"/ n/*/f:*.[coasi]/
     complete gcc 	c/-[IL]/d/ \
 		 	c/-f/"(caller-saves cse-follow-jumps delayed-branch \
 		               elide-constructors expensive-optimizations \
@@ -112,11 +120,11 @@ if ($?complete) then
 			      I D U O O2 C E H B b V M MD MM i dynamic \
 			      nodtdlib static nostdinc undef)"/ \
 		 	c/-l/f:*.a/ \
-		 	n/*/f:*.{c,C,cc,o,a,s}/
-    complete g++ 	n/*/f:*.{C,cc,o,s}/
-    complete CC 	n/*/f:*.{C,cc,o,s}/
+		 	n/*/f:*.{c,C,cc,o,a,s,i}/
+    complete g++ 	n/*/f:*.{C,cc,o,s,i}/
+    complete CC 	n/*/f:*.{C,cc,o,s,i}/
     complete rm 	c/--/"(directory force interactive verbose \
-			recursive help version)"/ c/-/"(d f i v r R)"/ \
+			recursive help version)"/ c/-/"(d f i v r R -)"/ \
 			n/*/f:^*.{c,cc,C,h,in}/	# Protect precious files
     complete vi 	n/*/f:^*.[oa]/
     complete bindkey    N/-a/b/ N/-c/c/ n/-[ascr]/'x:<key-sequence>'/ \
@@ -137,7 +145,6 @@ if ($?complete) then
 			     print0 printf not a and o or)"/ \
 			     n/*/d/
 
-    complete kill	c/-/S/ c/%/j/
     complete -%*	c/%/j/			# fill in the jobs builtin
     complete {fg,bg,stop}	c/%/j/ p/1/"(%)"//
 
@@ -156,27 +163,11 @@ if ($?complete) then
     complete {talk,ntalk,phone}	p/1/'`users | tr " " "\012" | uniq`'/ \
 		n/*/\`who\ \|\ grep\ \$:1\ \|\ awk\ \'\{\ print\ \$2\ \}\'\`/
 
-    if ( -f $HOME/.netrc ) then
-	complete ftp    p@1@'`cat $HOME/.netrc | awk '"'"'{print $2 }'"'"\`@
-    else
-	foreach f ( ~/.ftphosts ~/.hosts /usr/local/etc/csh.hosts ~/.rhosts /etc/hosts.equiv )
-	    if ( -r $f ) then
-	        set ftphosts=(`cat $f`)
-	        break
-	    endif
-	end
-	unset f
-	if ( ! $?ftphosts ) then
-	    set ftphosts=(ftp.uu.net prep.ai.mit.edu export.lcs.mit.edu \
-			  labrea.stanford.edu sumex-aim.stanford.edu \
-			  tut.cis.ohio-state.edu)
-	    complete ftp 	n/*/\$ftphosts/
-	endif
-    endif
+    complete ftp	c/-/"(d i g n v)"/ n/-/\$hosts/ p/1/\$hosts/ n/*/n/
 
     # this one is simple...
     #complete rcp c/*:/f/ C@[./\$~]*@f@ n/*/\$hosts/:
-    # From Michael Schroeder: 
+    # From Michael Schroeder <mlschroe@immd4.informatik.uni-erlangen.de> 
     # This one will rsh to the file to fetch the list of files!
     complete rcp 'c%*@*:%`set q=$:-0;set q="$q:s/@/ /";set q="$q:s/:/ /";set q=($q " ");rsh $q[2] -l $q[1] ls -dp $q[3]\*`%' 'c%*:%`set q=$:-0;set q="$q:s/:/ /";set q=($q " ");rsh $q[1] ls -dp $q[2]\*`%' 'c%*@%$hosts%:' 'C@[./$~]*@f@'  'n/*/$hosts/:'
 
@@ -196,12 +187,220 @@ if ($?complete) then
     complete {refile,sprev,snext,scan,pick,rmm,inc,folder,show} \
 		c@+@F:$HOME/Mail/@
 
-    # More completions from waz@quahog.nl.nuwc.navy.mil (Tom Warzeka)
+    # these and interrupt handling from Jaap Vermeulen <jaap@sequent.com>
+    complete {rexec,rxexec,rxterm,rmterm} \
+			'p/1/$hosts/' 'c/-/(l L E)/' 'n/-l/u/' 'n/-L/f/' \
+			'n/-E/e/' 'n/*/c/'
+    complete kill	'c/-/S/' 'c/%/j/' \
+			'n/*/`ps -u $LOGNAME | awk '"'"'{print $1}'"'"'`/'
+
+    # these from Marc Horowitz <marc@cam.ov.com>
+    complete attach 'n/-mountpoint/d/' 'n/-m/d/' 'n/-type/(afs nfs rvd ufs)/' \
+		    'n/-t/(afs nfs rvd ufs)/' 'n/-user/u/' 'n/-U/u/' \
+		    'c/-/(verbose quiet force printpath lookup debug map \
+			  nomap remap zephyr nozephyr readonly write \
+			  mountpoint noexplicit explicit type mountoptions \
+			  nosetuid setuid override skipfsck lock user host)/' \
+		    'n/-e/f/' 'n/*/()/'
+    complete hesinfo	'p/1/u/' \
+			'p/2/(passwd group uid grplist pcap pobox cluster \
+			      filsys sloc service)/'
+
+    # these from E. Jay Berkenbilt <ejb@ERA.COM>
+    complete ./configure 'c/--*=/f/' 'c/--{cache-file,prefix,srcdir}/(=)//' \
+			 'c/--/(cache-file verbose prefix srcdir)//'
+    complete gs 'c/-sDEVICE=/(x11 cdjmono cdj550 epson eps9high epsonc \
+			      dfaxhigh dfaxlow laserjet ljet4 sparc pbm \
+			      pbmraw pgm pgmraw ppm ppmraw bit)/' \
+		'c/-sOutputFile=/f/' 'c/-s/(DEVICE OutputFile)/=' \
+		'c/-d/(NODISPLAY NOPLATFONTS NOPAUSE)/' 'n/*/f/'
+    complete perl	'n/-S/c/'
+    complete printenv	'n/*/e/'
+    complete sccs	p/1/"(admin cdc check clean comb deledit delget \
+			delta diffs edit enter fix get help info \
+			print prs prt rmdel sccsdiff tell unedit \
+			unget val what)"/
+    complete setenv	'p/1/e/' 'c/*:/f/'
+
+    # these and method of setting hosts from Kimmo Suominen <kim@tac.nyc.ny.us>
+    if ( -f ~/.mh_profile && -x "`which folders`" ) then 
+
+    if ( ! $?FOLDERS ) setenv FOLDERS "`folders -fast -recurse`"
+    if ( ! $?MHA )     setenv MHA     "`ali | sed -e '/^ /d' -e 's/:.*//'`"
+
+    set folders = ( $FOLDERS )
+    set mha = ( $MHA )
+
+    complete ali \
+        'c/-/(alias nolist list nonormalize normalize nouser user help)/' \
+        'n,-alias,f,'
+
+    complete anno \
+        'c/-/(component noinplace inplace nodate date text help)/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete burst \
+        'c/-/(noinplace inplace noquiet quiet noverbose verbose help)/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete comp \
+        'c/-/(draftfolder draftmessage nodraftfolder editor noedit file form nouse use whatnowproc nowhatnowproc help)/' \
+        'c,+,$folders,'  \
+        'n,-whatnowproc,c,'  \
+        'n,-file,f,'\
+        'n,-form,f,'\
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete dist \
+        'c/-/(noannotate annotate draftfolder draftmessage nodraftfolder editor noedit form noinplace inplace whatnowproc nowhatnowproc help)/' \
+        'c,+,$folders,'  \
+        'n,-whatnowproc,c,'  \
+        'n,-form,f,'\
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete folder \
+        'c/-/(all nofast fast noheader header nopack pack noverbose verbose norecurse recurse nototal total noprint print nolist list push pop help)/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete folders \
+        'c/-/(all nofast fast noheader header nopack pack noverbose verbose norecurse recurse nototal total noprint print nolist list push pop help)/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete forw \
+        'c/-/(noannotate annotate draftfolder draftmessage nodraftfolder editor noedit filter form noformat format noinplace inplace digest issue volume whatnowproc nowhatnowproc help)/' \
+        'c,+,$folders,'  \
+        'n,-whatnowproc,c,'  \
+        'n,-filter,f,'\
+        'n,-form,f,'\
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete inc \
+        'c/-/(audit file noaudit nochangecur changecur file form format nosilent silent notruncate truncate width help)/' \
+        'c,+,$folders,'  \
+        'n,-audit,f,'\
+        'n,-form,f,'
+
+    complete mark \
+        'c/-/(add delete list sequence nopublic public nozero zero help)/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete mhmail \
+        'c/-/(body cc from subject help)/' \
+        'n,-cc,$mha,'  \
+        'n,-from,$mha,'  \
+        'n/*/$mha/'
+
+    complete mhpath \
+        'c/-/(help)/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete msgchk \
+        'c/-/(nodate date nonotify notify help)/' 
+
+    complete msh \
+        'c/-/(prompt noscan scan notopcur topcur help)/' 
+
+    complete next \
+        'c/-/(draft form moreproc nomoreproc length width showproc noshowproc header noheader help)/' \
+        'c,+,$folders,'  \
+        'n,-moreproc,c,'  \
+        'n,-showproc,c,'  \
+        'n,-form,f,'
+
+    complete packf \
+        'c/-/(file help)/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete pick \
+        'c/-/(and or not lbrace rbrace cc date from search subject to othercomponent after before datefield sequence nopublic public nozero zero nolist list help)/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete prev \
+        'c/-/(draft form moreproc nomoreproc length width showproc noshowproc header noheader help)/' \
+        'c,+,$folders,'  \
+        'n,-moreproc,c,'  \
+        'n,-showproc,c,'  \
+        'n,-form,f,'
+
+    complete prompter \
+        'c/-/(erase kill noprepend prepend norapid rapid nodoteof doteof help)/' 
+
+    complete refile \
+        'c/-/(draft nolink link nopreserve preserve src file help)/' \
+        'c,+,$folders,'  \
+        'n,-file,f,'\
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete rmf \
+        'c/-/(nointeractive interactive help)/' \
+        'c,+,$folders,'  
+
+    complete rmm \
+        'c/-/(help)/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete scan \
+        'c/-/(noclear clear form format noheader header width noreverse reverse file help)/' \
+        'c,+,$folders,'  \
+        'n,-form,f,'\
+        'n,-file,f,'\
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete send \
+        'c/-/(alias draft draftfolder draftmessage nodraftfolder filter nofilter noformat format noforward forward nomsgid msgid nopush push noverbose verbose nowatch watch width help)/' \
+        'n,-alias,f,'\
+        'n,-filter,f,'
+
+    complete show \
+        'c/-/(draft form moreproc nomoreproc length width showproc noshowproc header noheader help)/' \
+        'c,+,$folders,'  \
+        'n,-moreproc,c,'  \
+        'n,-showproc,c,'  \
+        'n,-form,f,'\
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete sortm \
+        'c/-/(datefield textfield notextfield limit nolimit noverbose verbose help)/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete vmh \
+        'c/-/(prompt vmhproc novmhproc help)/' \
+        'n,-vmhproc,c,'  
+
+    complete whatnow \
+        'c/-/(draftfolder draftmessage nodraftfolder editor noedit prompt help)/' 
+
+    complete whom \
+        'c/-/(alias nocheck check draft draftfolder draftmessage nodraftfolder help)/' \
+        'n,-alias,f,'
+
+    complete plum \
+        'c/-/()/' \
+        'c,+,$folders,'  \
+        'n,*,`(mark | sed "s/:.*//";echo next cur prev first last)|tr " " "\12" | sort -u`,'
+
+    complete mail \
+        'c/-/()/' \
+        'n/*/$mha/'
+
+    endif
+
+    # these from Tom Warzeka <waz@quahog.nl.nuwc.navy.mil>
     # you may need to set the following variables for your host
     set _elispdir = /usr/local/lib/emacs/19.27/lisp  # GNU Emacs lisp directory
     set _maildir = /var/spool/mail  # Post Office: /var/spool/mail or /usr/mail
     set _ypdir  = /var/yp	# directory where NIS (YP) maps are kept
-    set _domain = `domainname`
+    set _domain = "`domainname`"
 
     # this one works but is slow and doesn't descend into subdirectories
     # complete	cd	C@[./\$~]*@d@ \
@@ -214,9 +413,16 @@ if ($?complete) then
     endif
     complete unsetenv	n/*/e/
 
-    complete mail       c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
+    if (-r $HOME/.mailrc) then
+        complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
+			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \
+			n@-u@T:$_maildir@ n/-f/f/ \
+			n@*@'`sed -n s/alias//p ~/.mailrc | tr -s " " "	" | cut -f 2`'@
+    else
+        complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
 			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \
 			n@-u@T:$_maildir@ n/-f/f/ n/*/u/
+    endif
 
     complete man	    n@1@'`\ls -1 /usr/man/man1 | sed s%\\.1.\*\$%%`'@ \
 			    n@2@'`\ls -1 /usr/man/man2 | sed s%\\.2.\*\$%%`'@ \
@@ -251,18 +457,18 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			n/-u/u/ n/*/f:^*[\#~]/
 
     complete gzcat	c/--/"(force help license quiet version)"/ \
-			c/-/"(f h L q V)"/ n/*/f:*.{gz,Z,z,zip}/
+			c/-/"(f h L q V -)"/ n/*/f:*.{gz,Z,z,zip}/
     complete gzip	c/--/"(stdout to-stdout decompress uncompress \
 			force help list license no-name quiet recurse \
 			suffix test verbose version fast best)"/ \
-			c/-/"(c d f h l L n q r S t v V 1 2 3 4 5 6 7 8 9)"/ \
+			c/-/"(c d f h l L n q r S t v V 1 2 3 4 5 6 7 8 9 -)"/\
 			n/{-S,--suffix}/x:'<file_name_suffix>'/ \
 			n/{-d,--{de,un}compress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
 			N/{-d,--{de,un}compress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
 			n/*/f:^*.{gz,Z,z,zip,taz,tgz}/
     complete {gunzip,ungzip} c/--/"(stdout to-stdout force help list license \
 			no-name quiet recurse suffix test verbose version)"/ \
-			c/-/"(c f h l L n q r S t v V)"/ \
+			c/-/"(c f h l L n q r S t v V -)"/ \
 			n/{-S,--suffix}/x:'<file_name_suffix>'/ \
 			n/*/f:*.{gz,Z,z,zip,taz,tgz}/
     complete zgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
@@ -299,58 +505,93 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 
     complete users	c/--/"(help version)"/ p/1/x:'<accounting_file>'/
     complete who	c/--/"(heading mesg idle count help message version \
-			writable)"/ c/-/"(H T w i u m q s)"/ \
+			writable)"/ c/-/"(H T w i u m q s -)"/ \
 			p/1/x:'<accounting_file>'/ n/am/"(i)"/ n/are/"(you)"/
 
     complete chown	c/--/"(changes silent quiet verbose recursive help \
-			version)"/ c/-/"(c f v R)"/ C@[./\$~]@f@ c/*[.:]/g/ \
+			version)"/ c/-/"(c f v R -)"/ C@[./\$~]@f@ c/*[.:]/g/ \
 			n/-/u/. p/1/u/. n/*/f/
     complete chgrp	c/--/"(changes silent quiet verbose recursive help \
-			version)"/ c/-/"(c f v R)"/ n/-/g/ p/1/g/ n/*/f/
+			version)"/ c/-/"(c f v R -)"/ n/-/g/ p/1/g/ n/*/f/
 
     complete cat	c/--/"(number-nonblank number squeeze-blank show-all \
 			show-nonprinting show-ends show-tabs help version)"/ \
-			c/-/"(b e n s t u v A E T)"/ n/*/f/
+			c/-/"(b e n s t u v A E T -)"/ n/*/f/
     complete mv		c/--/"(backup force interactive update verbose suffix \
-			version-control help version)"/ c/-/"(b f i u v S V)"/\
+			version-control help version)"/ \
+			c/-/"(b f i u v S V -)"/ \
 			n/{-S,--suffix}/x:'<suffix>'/ \
 			n/{-V,--version-control}/"(t numbered nil existing \
 			never simple)"/ n/-/f/ N/-/d/ p/1/f/ p/2/d/ n/*/f/
     complete cp		c/--/"(archive backup no-dereference force interactive \
 			link preserve symbolic-link update verbose parents \
 			one-file-system recursive suffix version-control help \
-			version)"/ c/-/"(a b d f i l p r s u v x P R S V)"/ \
+			version)"/ c/-/"(a b d f i l p r s u v x P R S V -)"/ \
 			n/-*r/d/ n/{-S,--suffix}/x:'<suffix>'/ \
 			n/{-V,--version-control}/"(t numbered nil existing \
 			never simple)"/ n/-/f/ N/-/d/ p/1/f/ p/2/d/ n/*/f/
     complete ln		c/--/"(backup directory force interactive symbolic \
 			verbose suffix version-control help version)"/ \
-			c/-/"(b d F f i s v S V)"/ \
+			c/-/"(b d F f i s v S V -)"/ \
 			n/{-S,--suffix}/x:'<suffix>'/ \
 			n/{-V,--version-control}/"(t numbered nil existing \
 			never simple)"/ n/-/f/ N/-/x:'<link_name>'/ \
 			p/1/f/ p/2/x:'<link_name>'/
     complete touch	c/--/"(date file help time version)"/ \
-			c/-/"(a c d f m r t)"/ \
+			c/-/"(a c d f m r t -)"/ \
 			n/{-d,--date}/x:'<date_string>'/ \
 			c/--time/"(access atime mtime modify use)"/ \
 			n/{-r,--file}/f/ n/-t/x:'<time_stamp>'/ n/*/f/
-    complete mkdir	c/--/"(parents help version mode)"/ c/-/"(p m)"/ \
+    complete mkdir	c/--/"(parents help version mode)"/ c/-/"(p m -)"/ \
 			n/{-m,--mode}/x:'<mode>'/ n/*/d/
-    complete rmdir	c/--/"(parents help version)"/ c/-/"(p)"/ n/*/d/
+    complete rmdir	c/--/"(parents help version)"/ c/-/"(p -)"/ n/*/d/
 
-    complete tar 	c/-[cru]*/"(b B C f F FF h i l m o p v w)"/ \
-			c/-[tx]*/"(   B C f F FF h i l m o p v w)"/ \
-			p/1/"(-c -r -t -u -x c r t u x)"/ \
-			c/-/"(b B C f F FF h i l m o p v w)"/ \
-			n/-c*f/x:'<new_tar_file or "-">'/ n/-*f/f:*.tar/ \
-			n/-[cru]*b/x:'<block_size>'/ n/-b/x:'<block_size>'/ \
-			n/-C/d/ N/-C/'`\ls $:-1`'/ n/*/f/
+    complete tar	c/-[Acru]*/"(b B C f F g G h i l L M N o P \
+			R S T v V w W X z Z)"/ \
+			c/-[dtx]*/"( B C f F g G i k K m M O p P \
+			R s S T v w x X z Z)"/ \
+			p/1/"(A c d r t u x -A -c -d -r -t -u -x \
+			--catenate --concatenate --create --diff --compare \
+			--delete --append --list --update --extract --get)"/ \
+			c/--/"(catenate concatenate create diff compare \
+			delete append list update extract get atime-preserve \
+			block-size read-full-blocks directory checkpoint file \
+			force-local info-script new-volume-script incremental \
+			listed-incremental dereference ignore-zeros \
+			ignore-failed-read keep-old-files starting-file \
+			one-file-system tape-length modification-time \
+			multi-volume after-date newer old-archive portability \
+			to-stdout same-permissions preserve-permissions \
+			absolute-paths preserve record-number remove-files \
+			same-order preserve-order same-owner sparse \
+			files-from null totals verbose label version \
+			interactive confirmation verify exclude exclude-from \
+			compress uncompress gzip ungzip use-compress-program \
+			block-compress)"/ \
+			c/-/"(b B C f F g G h i k K l L m M N o O p P R s S \
+			T v V w W X z Z 0 1 2 3 4 5 6 7 -)"/ \
+			n/-c*f/x:'<new_tar_file, device_file, or "-">'/ \
+			n/{-[Adrtux]*f,--file}/f:*.tar/ \
+			N/{-x*f,--file}/'`tar -tf $:-1`'/ \
+			n/--use-compress-program/c/ \
+			n/{-b,--block-size}/x:'<block_size>'/ \
+			n/{-V,--label}/x:'<volume_label>'/ \
+			n/{-N,--{after-date,newer}}/x:'<date>'/ \
+			n/{-L,--tape-length}/x:'<tape_length_in_kB>'/ \
+			n/{-C,--directory}/d/ \
+			N/{-C,--directory}/'`\ls $:-1`'/ \
+			n/-[0-7]/"(l m h)"/
 
+    # BSD 4.3 filesystems
     complete  mount	c/-/"(a h v t r)"/ n/-h/\$hosts/ n/-t/"(4.2 nfs)"/ \
 			n@*@'`cut -d " " -f 2 /etc/fstab`'@
     complete umount	c/-/"(a h v t)"/   n/-h/\$hosts/ n/-t/"(4.2 nfs)"/ \
 			n/*/'`mount | cut -d " " -f 3`'/
+    # BSD 4.2 filesystems
+    #complete  mount	c/-/"(a h v t r)"/ n/-h/\$hosts/ n/-t/"(ufs nfs)"/ \
+    #			n@*@'`cut -d ":" -f 2 /etc/fstab`'@
+    #complete umount	c/-/"(a h v t)"/   n/-h/\$hosts/ n/-t/"(ufs nfs)"/ \
+    #			n/*/'`mount | cut -d " " -f 3`'/
 
     # these deal with NIS (formerly YP); if it's not running you don't need 'em
     complete domainname	p@1@D:$_ypdir@" " n@*@n@
@@ -358,8 +599,7 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 	    N@-d@\`\\ls\ -1\ $_ypdir/\$:-1\ \|\ sed\ -n\ s%\\\\.pag\\\$%%p\`@ \
 	  n@*@\`\\ls\ -1\ $_ypdir/$_domain\ \|\ sed\ -n\ s%\\\\.pag\\\$%%p\`@
     complete ypmatch	c@-@"(d k t x)"@ n@-x@n@ n@-d@D:$_ypdir@" " \
-			n@-@x:'<key ...>'@ p@1@x:'<key ...>'@ \
-	    N@-d@\`\\ls\ -1\ $_ypdir/\$:-1\ \|\ sed\ -n\ s%\\\\.pag\\\$%%p\`@ \
+	            N@-d@x:'<key ...>'@ n@-@x:'<key ...>'@ p@1@x:'<key ...>'@ \
 	  n@*@\`\\ls\ -1\ $_ypdir/$_domain\ \|\ sed\ -n\ s%\\\\.pag\\\$%%p\`@
     complete ypwhich	c@-@"(d m t x V1 V2)"@ n@-x@n@ n@-d@D:$_ypdir@" " \
 	 n@-m@\`\\ls\ -1\ $_ypdir/$_domain\ \|\ sed\ -n\ s%\\\\.pag\\\$%%p\`@ \
@@ -381,11 +621,11 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 	complete lprm   'c/-P/$printers/'
 	complete lpquota        'p/1/(-Qprlogger)/' 'c/-P/$printers/'
 	complete dvips  'c/-P/$printers/' 'n/-o/f:*.{ps,PS}/' 'n/*/f:*.dvi/'
-
     endif
-
-
 
     unset noglob
     unset complete
 endif
+
+end:
+	onintr

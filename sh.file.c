@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.file.c,v 3.10 1995/03/05 03:18:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.file.c,v 3.11 1995/03/12 04:49:26 christos Exp christos $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.10 1995/03/05 03:18:09 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.11 1995/03/12 04:49:26 christos Exp christos $")
 
 #ifdef FILEC
 
@@ -96,9 +96,9 @@ setup_tty(on)
 {
 #ifdef TERMIO
 # ifdef POSIX
-    static struct termios tchars;
+    struct termios tchars;
 # else
-    static struct termio tchars;
+    struct termio tchars;
 # endif /* POSIX */
 
 # ifdef POSIX
@@ -110,9 +110,9 @@ setup_tty(on)
 	tchars.c_cc[VEOL] = ESC;
 	if (tchars.c_lflag & ICANON)
 # ifdef POSIX
-	    on = TCSANOW;
+	    on = TCSADRAIN;
 # else
-	    on = TCSETAW;
+	    on = TCSETA;
 # endif /* POSIX */
 	else {
 # ifdef POSIX
@@ -127,9 +127,9 @@ setup_tty(on)
     else {
 	tchars.c_cc[VEOL] = _POSIX_VDISABLE;
 # ifdef POSIX
-	on = TCSANOW;
+	on = TCSADRAIN;
 # else
-        on = TCSETAW;
+        on = TCSETA;
 # endif /* POSIX */
     }
 # ifdef POSIX

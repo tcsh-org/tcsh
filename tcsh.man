@@ -76,7 +76,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "19 March 1995" "Cornell 6.05.06"
+.TH TCSH 1 "29 April 1995" "Cornell 6.06.00"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -290,7 +290,7 @@ and some of the characters with special meanings to it, listed under
 .SS "Completion and listing (+)"
 The shell is often able to complete words when given a unique abbreviation.
 Type part of a word (for example `ls /usr/lost') and hit the tab key to
-run the \fIcomplete\fR editor command.
+run the \fIcomplete-word\fR editor command.
 The shell completes the filename `/usr/lost' to `/usr/lost+found/',
 replacing the incomplete word with the complete word in the input buffer.
 (Note the terminal `/'; completion adds a `/' to the
@@ -534,7 +534,7 @@ on terminals without a meta key. Case counts, but commands which are bound
 to letters by default are bound to both lower- and uppercase letters for
 convenience.
 .TP 8
-.B complete \fR(tab)
+.B complete-word \fR(tab)
 Completes a word as described under \fBCompletion and listing\fR.
 .TP 8
 .B complete-word-back \fR(not bound)
@@ -546,18 +546,18 @@ completions. May be repeated to step down through the list.
 At the end of the list, beeps and reverts to the incomplete word.
 .TP 8
 .B complete-word-raw \fR(^X-tab)
-Like \fIcomplete\fR, but ignores user-defined completions.
+Like \fIcomplete-word\fR, but ignores user-defined completions.
 .TP 8
 .B copy-prev-word \fR(M-^_)
 Copies the previous word in the current line into the input buffer.
 See also \fIinsert-last-word\fR.
 .TP 8
 .B dabbrev-expand \fR(M-/)
-Expand the current word to the most recent preceding one for which
+Expands the current word to the most recent preceding one for which
 the current is a leading substring, wrapping around the history list
 (once) if necessary.
-Repeating \fIdabbrev-expand\fR without any intervening typing will
-change to the next previous word etc, skipping identical matches
+Repeating \fIdabbrev-expand\fR without any intervening typing
+changes to the next previous word etc., skipping identical matches
 much like \fIhistory-search-backward\fR does.
 .TP 8
 .B delete-char \fR(not bound)
@@ -2025,10 +2025,10 @@ Does nothing, successfully.
 .PP
 .B @
 .br
-.B @\fIname\fB= \fIexpr
+.B @ \fIname\fB = \fIexpr
 .PD 0
 .TP 8
-.B @\fIname\fR[\fIindex\fR]\fB= \fIexpr
+.B @ \fIname\fR[\fIindex\fR]\fB = \fIexpr
 The first form prints the values of all shell variables.
 The second form sets the specified \fIname\fR to the value of \fIexpr\fR.
 If \fIexpr\fR contains `<', `>', `&' or `' then at least that part of
@@ -2945,13 +2945,12 @@ Symbolic link to nowhere
 \fBlistlinks\fR also slows down \fIls\-F\fR and causes partitions holding
 files pointed to by symbolic links to be mounted.
 .PP
-If variable \fBlistflags\fR is be set to the `x', `a', or `A' or a combination
-of those flags (eg. `xA'), then these flags are added to \fIls\-F\fR,
-making it act like `ls \-xF', `ls \-Fa', or `ls \-FA', or the combination of
-those (eg. `ls \-xFA').
+If the \fBlistflags\fR shell variable is set to `x', `a' or `A', or any
+combination thereof (e.g. `xA'), they are used as flags to \fIls\-F\fR,
+making it act like `ls \-xF', `ls \-Fa', `ls \-FA' or a combination
+(e.g. `ls \-FxA').
 On machines where `ls \-C' is not the default, \fIls\-F\fR acts like `ls \-CF',
-unless the \fBlistflags\fR variable contains an `x', where it behaves like
-`ls \-xF'.
+unless \fBlistflags\fR contains an `x', in which case it acts like `ls \-xF'.
 \fIls\-F\fR passes its arguments to \fIls\fR(1) if it is given any switches,
 so `alias ls ls\-F' generally does the right thing.
 \fIls\-F\fR includes file identification characters when sorting filenames;
@@ -3647,12 +3646,12 @@ If set to `insert' or `overwrite', puts the editor into that input mode
 at the beginning of each line.
 .TP 8
 .B listflags \fR(+)
-If it contains a combination of `A', `a', and `x', these flags
-are added to \fIls\-F\fR, making it behave like the correcponding flags
-of `ls(1)': `a' shows all files [even if they start with a `.'], `A' shows
-all files but `.' and `..', and `x' sorts across instead of down.
-If the second word of \fIlistflags\fR is set, it is used as the path
-to `ls(1)'.
+If set to `x', `a' or `A', or any combination thereof (e.g. `xA'), they
+are used as flags to \fIls\-F\fR, making it act like `ls \-xF', `ls
+\-Fa', `ls \-FA' or a combination (e.g. `ls \-FxA'): `a' shows all
+files (even if they start with a `.'), `A' shows all files but `.' and
+`..', and `x' sorts across instead of down.  If the second word of
+\fIlistflags\fR is set, it is used as the path to `ls(1)'.
 .TP 8
 .B listjobs \fR(+)
 If set, all jobs are listed when a job is suspended. If set to `long',
@@ -4652,7 +4651,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.05.06 (Cornell) 1995-03-19.
+This manual documents tcsh 6.06.00 (Cornell) 1995-04-29.
 .SH AUTHORS
 .PD 0
 .TP 2

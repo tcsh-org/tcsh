@@ -1,9 +1,9 @@
-/**/#
-/**/# $Id: Imakefile,v 1.60 1995/03/12 04:59:19 christos Exp $
-/**/#
-/**/# Imakefile for tcsh 6.05
-/**/# Marc Horowitz, MIT SIPB
-/**/#
+XCOMM
+XCOMM $Id: Imakefile,v 1.61 1995/03/19 22:33:26 christos Exp christos $
+XCOMM
+XCOMM Imakefile for tcsh 6.06
+XCOMM Marc Horowitz, MIT SIPB
+XCOMM
 
 #ifdef DestDir
 #undef DestDir
@@ -103,13 +103,22 @@ ones.  Please send in your fixes and additions! */
 #  ifdef you_are_using_yp
 #   define UseSunLib 
 #  endif
+#  ifndef UseLibBSD
+#   define UseLibBSD
+#  endif
 #  define MyStdc -D__STDC__
 CCOPTIONS=-float	# We don't want -cckr and -prototypes
 # endif
 
 # ifdef IBMArchitecture
+#  undef UseLibBSD
 #  if (SystemV == YES)
 #   define ConfigH aix
+#   if OSMajorVersion < 3 
+#    if OSMinorVersion < 2
+#     define UseLibBSD
+#    endif
+#   endif
 #  else
 #   define ConfigH bsd
 #   define AOSArchitecture
@@ -218,9 +227,7 @@ LIBSOCKET = -lsocket
 LIBSOCKET =
 #endif
 
-#if defined(SGIArchitecture) || defined(_IBMR2) || \
-	(!defined(RtArchitecture) && defined(AIXArchitecture)) || \
-	defined(UseLibBSD)
+#if defined(UseLibBSD)
 LIBBSD = -lbsd
 #else
 LIBBSD = 
@@ -390,6 +397,8 @@ TCSH_MANDIR = DestMan
 TCSH_MANDIR = $(TCSHTOP)/man/man$(MANSUFFIX)
 #endif
 
+LOCALLIBS =
+
 #ifndef MyCflags
 #define MyCflags
 #endif
@@ -431,7 +440,7 @@ LDLIBS = MyLibs
 #endif
 
 SUF = o
-VERSION = 6.05
+VERSION = 6.06
 
 SHSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.exp.c sh.file.c sh.func.c sh.glob.c sh.hist.c sh.init.c \
@@ -564,8 +573,8 @@ tc.defs.c:	gethost host.defs
 ALIB=$(HESLIB) $(AFSLIB) $(SYSLIBS)
 AINC=ed.defns.h sh.err.h tc.const.h sh.h
 
-NormalProgramTarget(tcsh, $(OBJS), $(AINC), /*LOCALLIBS*/, $(ALIB))
-NormalProgramTarget(gethost, gethost.${SUF}, $(AINC), /*LOCALLIBS*/, $(ALIB))
+NormalProgramTarget(tcsh, $(OBJS), $(AINC), $(LOCALLIBS), $(ALIB))
+NormalProgramTarget(gethost, gethost.${SUF}, $(AINC), $(LOCALLIBS), $(ALIB))
 
 InstallProgram(tcsh,$(TCSH_BINDIR));
 InstallManPage(tcsh,$(TCSH_MANDIR));

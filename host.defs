@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.05/RCS/host.defs,v 1.9 1995/01/20 23:48:56 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/host.defs,v 1.10 1995/04/16 19:15:53 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.9 1995/01/20 23:48:56 christos Exp christos $")
+RCSID("$Id: host.defs,v 1.10 1995/04/16 19:15:53 christos Exp $")
 
 endcode	:
 
@@ -492,6 +492,19 @@ machtype: defined(i860)					: "i860"
 enddef	:
 
 
+newdef	: defined(_FTX)
+comment	: Stratus Computer, Inc FTX2 (i860 based)
+comment	: Stratus Computer, Inc FTX3 (HPPA based)
+vendor	:						: "stratus"
+hosttype: defined(i860) && defined(_FTX)		: "atlantic"
+hosttype: defined(__hppa) && defined(_FTX)		: "continuum"
+ostype	: defined(i860) && defined(_FTX)		: "ftx2"
+ostype	: defined(__hppa) && defined(_FTX)		: "ftx3"
+machtype: defined(i860)					: "i860"
+machtype: defined(__hppa)				: "hppa"
+enddef	:
+
+
 newdef	: defined(sequent) || defined(_SEQUENT_)
 comment	: Sequent Balance (32000 based)
 comment	: Sequent Symmetry running DYNIX/ptx (386/486 based)
@@ -570,6 +583,7 @@ vendor	:						: "next"
 hosttype:						: "next"
 ostype	:						: "mach"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
+machtype: defined(i386) || defined(__i386__)		: "i386"
 enddef	:
 
 newdef	: defined(sony_news)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.defns.c,v 3.21 1995/03/12 04:49:26 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.defns.c,v 3.22 1995/03/19 22:33:26 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.21 1995/03/12 04:49:26 christos Exp christos $")
+RCSID("$Id: ed.defns.c,v 3.22 1995/03/19 22:33:26 christos Exp $")
 
 #include "ed.h"
 
@@ -1159,7 +1159,7 @@ editinit()
 
     f++;
     f->name = "change-till-end-of-line";
-    f->func = V_CHGTOEND,	/* backwards compat. */
+    f->func = V_CHGTOEND;	/* backward compat. */
     f->desc = CSAVS(3, 9, "Vi change to end of line");
 
     f++;
@@ -1180,7 +1180,7 @@ editinit()
     f++;
     f->name = "complete-word-back";
     f->func = F_COMPLETE_BACK;
-    f->desc = CSAVS(3, 13, "Tab backwards through files");
+    f->desc = CSAVS(3, 13, "Tab backward through files");
 
     f++;
     f->name = "complete-word-raw";
@@ -1308,7 +1308,7 @@ editinit()
     f->name = "history-search-backward";
     f->func = F_UP_SEARCH_HIST;
     f->desc = CSAVS(3, 37,
-	"Search in history backwards for line beginning as current");
+	"Search in history backward for line beginning as current");
 
     f++;
     f->name = "history-search-forward";
@@ -1329,7 +1329,7 @@ editinit()
     f++;
     f->name = "i-search-back";
     f->func = F_INC_BACK;
-    f->desc = CSAVS(3, 41, "Incremental search backwards");
+    f->desc = CSAVS(3, 41, "Incremental search backward");
 
     f++;
     f->name = "keyboard-quit";
@@ -1602,7 +1602,7 @@ editinit()
     f++;
     f->name = "vi-char-back";
     f->func = V_CHAR_BACK;
-    f->desc = CSAVS(3, 93, "Vi move to the character specified backwards");
+    f->desc = CSAVS(3, 93, "Vi move to the character specified backward");
 
     f++;
     f->name = "vi-char-fwd";
@@ -1612,7 +1612,7 @@ editinit()
     f++;
     f->name = "vi-charto-back";
     f->func = V_CHARTO_BACK;
-    f->desc = CSAVS(3, 95, "Vi move up to the character specified backwards");
+    f->desc = CSAVS(3, 95, "Vi move up to the character specified backward");
 
     f++;
     f->name = "vi-charto-fwd";
@@ -1667,7 +1667,7 @@ editinit()
     f++;
     f->name = "vi-search-back";
     f->func = V_USH_META;
-    f->desc = CSAVS(3, 105, "Vi search history backwards");
+    f->desc = CSAVS(3, 105, "Vi search history backward");
 
     f++;
     f->name = "vi-search-fwd";
