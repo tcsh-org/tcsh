@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.20 1992/07/06 15:26:18 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.21 1992/08/09 00:13:36 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.20 1992/07/06 15:26:18 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.21 1992/08/09 00:13:36 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -200,10 +200,20 @@ gethosttype()
 # endif /* i386 */
 #endif /* _MINIX */
 
+#if defined(i386) && defined(linux)
+# define _havehosttype_
+    hosttype = "i386-linux";
+#endif
+
 # ifdef __386BSD__
 # define _havehosttype_
     hosttype = "386BSD";
 # endif /* __386BSD__ */
+
+# if defined(i386) && defined(bsdi)
+#  define _havehosttype_
+   hosttype = "bsd386"; /* BSD/386*/
+# endif /* i386 && bsdi */
 
 # if defined(i386) && SYSVREL > 0
 
@@ -270,7 +280,7 @@ gethosttype()
 #   ifdef CMUCS			/* hack for Mach (in the true spirit of CMU) */
     hosttype = "multimax";
 #   else /* CMUCS */
-    hosttype = (!access("/Umax.image", F_OK) ? "multimax" : "ns32000";
+    hosttype = !access("/Umax.image", F_OK) ? "multimax" : "ns32000";
 #   endif /* CMUCS */
 #  endif /* ns32000 */
 # endif /* sequent */

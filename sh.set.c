@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.set.c,v 3.15 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.set.c,v 3.16 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.15 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.16 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -137,12 +137,17 @@ update_vars(vp)
     else if (eq(vp, STRbackslash_quote)) {
 	bslash_quote = 1;
     }
+    else if (eq(vp, STRdirstack)) {
+	dsetstack();
+    }
     else if (eq(vp, STRrecognize_only_executables)) {
 	tw_cmd_free();
     }
+#ifndef HAVENOUTMP
     else if (eq(vp, STRwatch)) {
 	resetwatch();
     }
+#endif /* HAVENOUTMP */
 }
 
 

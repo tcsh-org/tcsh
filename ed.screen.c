@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.screen.c,v 3.23 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.screen.c,v 3.24 1992/07/06 15:26:18 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.23 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.24 1992/07/06 15:26:18 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -676,25 +676,30 @@ static struct {
     int     key;
     XmapVal fun;
     int	    type;
-} arrow[4];
+} arrow[] = {
+#define A_K_DN	0
+    { STRdown,	T_kd },
+#define A_K_UP	1
+    { STRup,	T_ku },
+#define A_K_LT	2
+    { STRleft,	T_kl },
+#define A_K_RT	3
+    { STRright,	T_kr }
+};
 
 
 void
 ResetArrowKeys()
 {
-    arrow[A_K_DN].name    = STRdown;
     arrow[A_K_DN].fun.cmd = F_DOWN_HIST;
     arrow[A_K_DN].type    = XK_CMD;
 
-    arrow[A_K_UP].name    = STRup;
     arrow[A_K_UP].fun.cmd = F_UP_HIST;
     arrow[A_K_UP].type    = XK_CMD;
 
-    arrow[A_K_LT].name    = STRleft;
     arrow[A_K_LT].fun.cmd = F_CHARBACK;
     arrow[A_K_LT].type    = XK_CMD;
 
-    arrow[A_K_RT].name    = STRright;
     arrow[A_K_RT].fun.cmd = F_CHARFWD;
     arrow[A_K_RT].type    = XK_CMD;
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.misc.c,v 3.13 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.misc.c,v 3.14 1992/07/06 15:26:18 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.13 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.14 1992/07/06 15:26:18 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -324,13 +324,14 @@ dcopy(i, j)
 
     if (i == j || i < 0 || (j < 0 && i > 2))
 	return (i);
-#ifdef HAVEDUP2
     if (j >= 0) {
+#ifdef HAVEDUP2
 	(void) dup2(i, j);
 	return (j);
-    }
+#else
+	(void) close(j);
 #endif
-    (void) close(j);
+    }
     return (renum(i, j));
 }
 
@@ -420,6 +421,19 @@ strip(cp)
 	return (cp);
     while (*dp++ &= TRIM)
 	continue;
+    return (cp);
+}
+
+Char   *
+quote(cp)
+    Char   *cp;
+{
+    register Char *dp = cp;
+
+    if (!cp)
+	return (cp);
+    while (*dp != '\0')
+	*dp++ |= QUOTE;
     return (cp);
 }
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.const.c,v 3.13 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.const.c,v 3.14 1992/07/06 15:26:18 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.13 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.14 1992/07/06 15:26:18 christos Exp $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -84,14 +84,12 @@ Char STRtildothist[]    = { '~', '/', '.', 'h', 'i', 's', 't', 'o', 'r',
 Char STRnokanji[]       = { 'n', 'o', 'k', 'a', 'n', 'j', 'i', '\0' };
 #endif
 
-Char STRtildotdirs[]  = { '~', '/', '.', 'c', 's', 'h', 'd', 'i', 'r',
-                          's', '\0' };
-Char STRdirsfile[]    = { 'd', 'i', 'r', 's', 'f', 'i', 'l', 'e', '\0' };
-Char STRsavedirs[]    = { 's', 'a', 'v', 'e', 'd', 'i', 'r', 's', '\0' };
-
+Char STRtildotdirs[]    = { '~', '/', '.', 'c', 's', 'h', 'd', 'i', 'r',
+			    's', '\0' };
+Char STRdirsfile[]      = { 'd', 'i', 'r', 's', 'f', 'i', 'l', 'e', '\0' };
+Char STRsavedirs[]      = { 's', 'a', 'v', 'e', 'd', 'i', 'r', 's', '\0' };
 Char STRloginsh[]       = { 'l', 'o', 'g', 'i', 'n', 's', 'h', '\0' };
-Char STRdirs_nl[]       = { 'd', 'i', 'r', 's', '_', 'n', 'l', '\0' };
-
+Char STRdirstack[]      = { 'd', 'i', 'r', 's', 't', 'a', 'c', 'k', '\0' };
 Char STRargv[]          = { 'a', 'r', 'g', 'v', '\0' };
 Char STRsavehist[]      = { 's', 'a', 'v', 'e', 'h', 'i', 's', 't', '\0' };
 Char STRnormal[]        = { 'n', 'o', 'r', 'm', 'a', 'l', '\0' };
@@ -195,7 +193,9 @@ Char STRbackslash_quote[] = { 'b', 'a', 'c', 'k', 's', 'l', 'a', 's', 'h', '_',
 Char STRRparen[]	= { ')', '\0' };
 Char STRcolon[]		= { ':', '\0' };
 Char STRmail[]		= { 'm', 'a', 'i', 'l', '\0' };
+#ifndef HAVENOUTMP
 Char STRwatch[]		= { 'w', 'a', 't', 'c', 'h', '\0' };
+#endif /* HAVENOUTMP */
 
 Char STRsldottcshrc[]	= { '/', '.', 't', 'c', 's', 'h', 'r', 'c', '\0' };
 Char STRsldotcshrc[]	= { '/', '.', 'c', 's', 'h', 'r', 'c', '\0' };

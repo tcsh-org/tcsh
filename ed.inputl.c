@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.25 1992/07/18 01:34:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.26 1992/08/09 00:13:36 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.25 1992/07/18 01:34:46 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.26 1992/08/09 00:13:36 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -87,7 +87,7 @@ Inputl()
     if (GettingInput)
 	MacroLvl = -1;		/* editor was interrupted during input */
 
-#if defined(FIONREAD) && !defined(linux) && !defined(OREO)
+#if defined(FIONREAD) && !defined(OREO)
     if (!Tty_raw_mode && MacroLvl < 0) {
 	long    chrs = 0;
 
@@ -97,7 +97,7 @@ Inputl()
 		return 0;
 	}
     }
-#endif
+#endif /* FIONREAD && !OREO */
 
     GettingInput = 1;
     NeedsRedraw = 0;

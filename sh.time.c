@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.time.c,v 3.10 1992/07/18 01:34:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.time.c,v 3.11 1992/07/23 14:42:29 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.10 1992/07/18 01:34:46 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.11 1992/07/23 14:42:29 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -434,7 +434,7 @@ prusage(bs, es, e, b)
 		xprintf("%ld", pagetok(r1->ru_maxrss));
 #else
 		xprintf("%ld", r1->ru_maxrss / 2L);
-#endif				/* sun */
+#endif /* SUNOS4 */
 		break;
 
 	    case 'F':		/* page faults */

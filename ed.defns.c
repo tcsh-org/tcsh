@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.defns.c,v 3.12 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.defns.c,v 3.13 1992/07/06 15:26:18 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.12 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.13 1992/07/06 15:26:18 christos Exp $")
 
 #include "ed.h"
 
@@ -251,8 +251,12 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		V_CHARTO_BACK	102
     e_normalize_path,
 #define		F_PATH_NORM	103
+    e_delnext_eof,		/* added by mtk@ari.ncl.omron.co.jp (920818) */
+#define		F_DELNEXT_EOF	104
+    e_stuff_char,		
+#define		F_STUFF_CHAR	105
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	104
+#define		F_NUM_FNS	106	
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -1111,6 +1115,8 @@ struct KeyFuncs FuncNames[] = {
     "Copy area between mark and cursor to cut buffer",
     "delete-char", F_DELNEXT,
     "Delete character under cursor",
+    "delete-char-or-eof", F_DELNEXT_EOF,
+    "Delete character under cursor or end of file if there is no character",	
     "delete-char-or-list", F_LIST_DELNEXT,
     "Delete character under cursor or list completions if at end of line",
     "delete-word", F_DELWORDNEXT,
@@ -1197,6 +1203,8 @@ struct KeyFuncs FuncNames[] = {
     "Correct the spelling of current word",
     "spell-line", F_CORRECT_L,
     "Correct the spelling of entire line",
+    "stuff-char", F_STUFF_CHAR,
+    "Send character to tty in cooked mode",
     "toggle-literal-history", F_TOGGLE_HIST,
     "Toggle between literal and lexical current history line",
     "transpose-chars", F_CHARSWITCH,

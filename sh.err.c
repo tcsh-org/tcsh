@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.err.c,v 3.11 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.err.c,v 3.12 1992/08/09 00:13:36 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.11 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.12 1992/08/09 00:13:36 christos Exp $")
 
 /*
  * C Shell
@@ -273,47 +273,45 @@ static char *errorlist[] =
     "Ambiguous input redirect",
 #define ERR_BADPLPS	105
     "Badly placed ()'s",
-#define ERR_VARMOD	106
-    "Unknown variable modifier",
-#define ERR_ALIASLOOP	107
+#define ERR_ALIASLOOP	106
     "Alias loop",
-#define ERR_NOWATCH	108
+#define ERR_NOWATCH	107
     "No $watch variable set",
-#define ERR_NOSCHED	109
+#define ERR_NOSCHED	108
     "No scheduled events",
-#define ERR_SCHEDUSAGE	110
+#define ERR_SCHEDUSAGE	109
     "Usage: sched -<item#>.\nUsage: sched [+]hh:mm <command>",
-#define ERR_SCHEDEV	111
+#define ERR_SCHEDEV	110
     "Not that many scheduled events",
-#define ERR_SCHEDCOM	112
+#define ERR_SCHEDCOM	111
     "No command to run",
-#define ERR_SCHEDTIME	113
+#define ERR_SCHEDTIME	112
     "Invalid time for event",
-#define ERR_SCHEDREL	114
+#define ERR_SCHEDREL	113
     "Relative time inconsistent with am/pm",
-#define ERR_TCNOSTR	115
+#define ERR_TCNOSTR	114
     "Out of termcap string space",
-#define ERR_SETTCUS	116
+#define ERR_SETTCUS	115
     "Usage: settc %s [yes|no]",
-#define ERR_TCCAP	117
+#define ERR_TCCAP	116
     "Unknown capability `%s'",
-#define ERR_TCPARM	118
+#define ERR_TCPARM	117
     "Unknown termcap parameter `%%%c'",
-#define ERR_TCARGS	119
+#define ERR_TCARGS	118
     "Too many arguments for `%s' (%d)",
-#define ERR_TCNARGS	120
+#define ERR_TCNARGS	119
     "`%s' requires %d arguments",
-#define ERR_TCUSAGE	121
+#define ERR_TCUSAGE	120
     "Usage: echotc [-v|-s] [<capability> [<args>]]",
-#define ERR_ARCH	122
+#define ERR_ARCH	121
     "%s: %s. Wrong Architecture",
-#define ERR_HISTLOOP	123
+#define ERR_HISTLOOP	122
     "!# History loop",
-#define ERR_FILEINQ	124
+#define ERR_FILEINQ	123
     "Malformed file inquiry",
-#define ERR_SELOVFL	125
+#define ERR_SELOVFL	124
     "Selector overflow",
-#define ERR_TCSHUSAGE   126
+#define ERR_TCSHUSAGE   125
 #ifdef apollo
     "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX -Dname[=value] ] [ argument ... ]",
 #else /* !apollo */
@@ -323,13 +321,13 @@ static char *errorlist[] =
     "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]",
 # endif /* __convex__ || convex */
 #endif /* apollo */
-#define ERR_COMPCOM	127
+#define ERR_COMPCOM	126
     "Illegal completion: \"%s\"",
-#define ERR_COMPILL	128
+#define ERR_COMPILL	127
     "Illegal %s: '%c'",
-#define ERR_COMPINC	129
+#define ERR_COMPINC	128
     "Incomplete %s: \"%s\"",
-#define ERR_INVALID	130
+#define ERR_INVALID	129
     "Invalid Error"
 };
 

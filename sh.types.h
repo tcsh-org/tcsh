@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.types.h,v 3.21 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.types.h,v 3.22 1992/07/18 01:34:46 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -149,9 +149,9 @@ extern char *sbrk();
 #endif
 #endif /* __hpux */
 
-#ifdef _MINIX
+#if defined(_MINIX) || defined(emx)
 typedef char * caddr_t;
-#endif /* _MINIX */
+#endif /* _MINIX || emx */
 
 /***
  *** hp9000s500 running hpux-5.2

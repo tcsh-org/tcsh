@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.who.c,v 3.13 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.who.c,v 3.14 1992/07/06 15:26:18 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,10 +36,11 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.13 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.14 1992/07/06 15:26:18 christos Exp $")
 
 #include "tc.h"
 
+#ifndef HAVENOUTMP
 /*
  * kfk 26 Jan 1984 - for login watch functions.
  */
@@ -554,3 +555,4 @@ struct command *c;
 	wp = wp->who_next;
     }
 }
+#endif /* HAVENOUTMP */

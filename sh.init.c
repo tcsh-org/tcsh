@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.init.c,v 3.16 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.init.c,v 3.17 1992/07/18 01:34:46 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.16 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.17 1992/07/18 01:34:46 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -102,9 +102,9 @@ struct	biltins bfunc[] = {
     { "limit",		dolimit,	0,	3, },
 #endif /* ! HAVENOLIMIT */
     { "linedit",	doecho,		0,	INF, },
-#ifndef KAI
+#if !defined(HAVENOUTMP) && !defined(KAI)
     { "log",		dolog,		0,	0, },
-#endif
+#endif /* !HAVENOUTMP && !KAI */
     { "login",		dologin,	0,	1, },
     { "logout",		dologout,	0,	0, },
     { "ls-F",		dolist,		0,	INF, },
@@ -168,9 +168,9 @@ struct	biltins bfunc[] = {
 #ifdef WARP
     { "warp",		dowarp,		0,	2, },
 #endif
-#ifdef KAI
+#if !defined(HAVENOUTMP) && defined(KAI)
     { "watchlog",	dolog,		0,	0, },
-#endif
+#endif /* !HAVENOUTMP && KAI */
     { "where",		dowhere,	1,	INF, },
     { "which",		dowhich,	1,	INF, },
     { "while",		dowhile,	1,	INF, },
@@ -222,7 +222,7 @@ struct	mesg mesg[] = {
 /*  3 */	"QUIT",		"Quit",
 /*  4 */	"ILL",		"Illegal instruction",
 /*  5 */	"TRAP",		"Trace/BPT trap",
-#if SYSVREL > 3
+#if SYSVREL > 3 || defined(emx)
 /*  6 */	"ABRT",		"Abort",
 #else /* SYSVREL > 3 */
 /*  6 */	"IOT",		"IOT trap",
@@ -258,7 +258,7 @@ struct	mesg mesg[] = {
 #  undef  _sigextra_
 # endif /* _sigextra_ */
 
-#if !defined(IBMAIX) && !defined(cray)
+#if !defined(IBMAIX) && !defined(cray) && !defined(emx)
 /* these are the real svid signals */
 /* 16 */	"USR1",		"User signal 1",
 /* 17 */	"USR2", 	"User signal 2",
@@ -269,7 +269,17 @@ struct	mesg mesg[] = {
 /* 18 */	"CHLD",		"Child exited",
 /* 19 */	"PWR",  	"Power failure",
 # endif /* apollo */
-#endif /* !IBMAIX && !cray */
+#endif /* !IBMAIX && !cray && !emx */
+
+# ifdef emx
+# define _sigextra_
+/* 16 */	0,		"Signal 16",
+/* 17 */	0,		"Signal 17",
+/* 18 */	"CLD",		"Child exited",
+/* 19 */	0,		"Signal 19",
+/* 20 */	0,		"Signal 20",
+/* 21 */	"BREAK",	"Break (Ctrl-Break)"
+# endif /* emx */
 
 # ifdef cray
 # define _sigextra_

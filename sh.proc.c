@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.32 1992/07/23 15:02:06 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.33 1992/08/09 00:13:36 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.32 1992/07/23 15:02:06 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.33 1992/08/09 00:13:36 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -94,7 +94,7 @@ static struct rusage zru;
 static struct rusage zru = {{0L, 0L}, {0L, 0L}, 0, 0, 0, 0, 0, 0, 0, 
 			    0, 0, 0, 0, 0, 0};
 #  endif /* masscomp */
-# endif	/* !sun && !hp9000 */
+# endif	/* !SUNOS4 && !hp9000 */
 #else /* ! BSDTIMES */
 # ifdef _SEQUENT_
 static struct process_stats zru = {{0L, 0L}, {0L, 0L}, 0, 0, 0, 0, 0, 0, 0,
@@ -1241,7 +1241,7 @@ ptprint(tp)
 # ifdef _SEQUENT_
 #  define timercmp(tvp, uvp, cmp) \
       ((tvp)->tv_sec cmp (uvp)->tv_sec || \
-       (tvp)->tv_sec == (uvp)->tv_sec && (tvp)->tv_usec cmp (uvp)->tv_usec)
+       ((tvp)->tv_sec == (uvp)->tv_sec && (tvp)->tv_usec cmp (uvp)->tv_usec))
     timeval_t tetime, diff;
     static timeval_t ztime;
     struct process_stats ru;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.23 1992/07/23 14:42:29 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.24 1992/08/09 00:13:36 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.23 1992/07/23 14:42:29 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.24 1992/08/09 00:13:36 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -782,11 +782,16 @@ fix_strcoll_bug()
 #endif /* STRCOLLBUG */
 
 
+#ifdef OREO
+#include <compat.h>
+#endif /* OREO */
+
 void
 osinit()
 {
 #ifdef OREO
     set42sig();
+    setcompat(getcompat() & ~COMPAT_EXEC);
     sigignore(SIGIO);		/* ignore SIGIO */
 #endif /* OREO */
 

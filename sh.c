@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.33 1992/07/23 14:42:29 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.34 1992/08/09 00:13:36 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.33 1992/07/23 14:42:29 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.34 1992/08/09 00:13:36 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -267,7 +267,9 @@ main(argc, argv)
      * tty list for login-watch.
      */
     (void) time(&t_period);
+#ifndef HAVENOUTMP
     initwatch();
+#endif /* !HAVENOUTMP */
 
 #if defined(alliant)
     /*
@@ -395,7 +397,7 @@ main(argc, argv)
     shlvl(1);
 
     if ((tcp = getenv("HOME")) != NULL)
-	cp = SAVE(tcp);
+	cp = quote(SAVE(tcp));
     else
 	cp = NULL;
     if (cp == NULL)
@@ -430,9 +432,9 @@ main(argc, argv)
 	cln = getenv("LOGNAME");
 	cus = getenv("USER");
 	if (cus != NULL)
-	    set(STRuser, SAVE(cus));
+	    set(STRuser, quote(SAVE(cus)));
 	else if (cln != NULL)
-	    set(STRuser, SAVE(cln));
+	    set(STRuser, quote(SAVE(cln)));
 	else if ((pw = getpwuid(uid)) == NULL)
 	    set(STRuser, SAVE("unknown"));
 	else
@@ -467,7 +469,7 @@ main(argc, argv)
 #ifdef apollo
     if ((tcp = getenv("SYSTYPE")) == NULL)
 	tcp = "bsd4.3";
-    Setenv(STRSYSTYPE, str2short(tcp));
+    Setenv(STRSYSTYPE, quote(str2short(tcp)));
 #endif /* apollo */
 
     /*
@@ -483,7 +485,7 @@ main(argc, argv)
      * set up. But this is not the shell's fault.
      */
     if ((tcp = getenv("TERM")) != NULL) {
-	set(STRterm, SAVE(tcp));
+	set(STRterm, quote(SAVE(tcp)));
 	editing = (strcmp(tcp, "emacs") != 0);
     }
     else 
@@ -531,7 +533,7 @@ main(argc, argv)
 	    (sh_len = strlen(tcp)) >= 5 &&
 	    strcmp(tcp + (sh_len - 5), "/tcsh") == 0)
 	{
-	    set(STRshell, SAVE(tcp));
+	    set(STRshell, quote(SAVE(tcp)));
 	}
 	else
 	    set(STRshell, Strsave(STR_SHELLPATH));
@@ -1648,7 +1650,9 @@ process(catch)
 	     * previously using "sched." Then execute periodic commands.
 	     * Following that, the prompt precmd is run.
 	     */
+#ifndef HAVENOUTMP
 	    watch_login();
+#endif /* !HAVENOUTMP */
 	    sched_run();
 	    period_cmd();
 	    precmd();

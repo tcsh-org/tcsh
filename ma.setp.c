@@ -82,7 +82,7 @@
  **********************************************************************
  */
 #include "sh.h"
-RCSID("$Id$")
+RCSID("$Id: ma.setp.c,v 1.4 1992/03/28 00:32:37 christos Exp $")
 
 #ifdef MACH
 
@@ -229,20 +229,20 @@ static int
 initpaths(paths)
 register char **paths;
 {
-    register char *path, *value, *p, *q;
+    register char *path, *val, *p, *q;
     register int i, done;
     register struct pelem *pe, *pathend;
 
     freepaths();
     for (npaths = 0; path = paths[npaths]; npaths++) {
-	value = index(path, '=');
-	if (value == NULL) {
+	val = index(path, '=');
+	if (val == NULL) {
 	    if (eflag)
 		xprintf("setpath: value missing in path '%s'\n", path);
 	    freepaths();
 	    return(-1);
 	}
-	*value++ = '\0';
+	*val++ = '\0';
 	pe = (struct pelem *)xmalloc((unsigned)(sizeof(struct pelem)));
 	setzero((char *) pe, sizeof(struct pelem));
 	if (pathhead == NULL)
@@ -261,7 +261,7 @@ register char **paths;
 		pe->pdef = syspath[i].defalt;
 		break;
 	    }
-	q = value;
+	q = val;
 	for (;;) {
 	    q = index(p = q, ':');
 	    done = (*q == '\0');

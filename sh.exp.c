@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exp.c,v 3.10 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exp.c,v 3.11 1992/08/09 00:13:36 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.10 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.11 1992/08/09 00:13:36 christos Exp $")
 
 /*
  * C shell
@@ -546,11 +546,19 @@ exp6(vp, ignore)
 		switch (*ft) {
 
 		case 'f':
+#ifdef S_ISREG
 		    i = S_ISREG(stb.st_mode);
+#else
+		    i = 0;
+#endif
 		    break;
 
 		case 'd':
+#ifdef S_ISDIR
 		    i = S_ISDIR(stb.st_mode);
+#else
+		    i = 0;
+#endif
 		    break;
 
 		case 'p':

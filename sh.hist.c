@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.hist.c,v 3.3 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.hist.c,v 3.4 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.3 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.4 1992/06/16 20:46:26 christos Exp $")
 
 #include "tc.h"
 
@@ -230,7 +230,7 @@ phist(hp, hflg)
 {
 
     if (hflg != HIST_ONLY) {
-	Char   *cp = str2short("%h\t%@\t%R\n");
+	Char   *cp = str2short("%h\t%T\t%R\n");
 	Char buf[BUFSIZE];
 	struct varent *vp = adrof(STRhistory);
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.decls.h,v 3.11 1992/05/02 23:39:58 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.decls.h,v 3.12 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -69,6 +69,7 @@ extern	Char		 *dnormalize	__P((Char *, int));
 extern	void		  dopushd	__P((Char **, struct command *));
 extern	void		  dopopd	__P((Char **, struct command *));
 extern	void		  dfree		__P((struct directory *));
+extern	void		  dsetstack	__P((void));
 extern	int		  getstakd	__P((Char *, int));
 extern	void		  recdirs	__P((Char *));
 extern	void		  loaddirs	__P((Char *));
@@ -234,6 +235,7 @@ extern	int		  prefix	__P((Char *, Char *));
 extern	Char		**saveblk	__P((Char **));
 extern	void		  setzero	__P((char *, int));
 extern	Char		 *strip		__P((Char *));
+extern	Char		 *quote		__P((Char *));
 extern	char		 *strsave	__P((const char *));
 extern	char		 *strspl	__P((char *, char *));
 #ifndef POSIX
@@ -334,11 +336,14 @@ extern	void		  dotime	__P((Char **, struct command *));
 #ifdef BSDTIMES
 extern	void		  prusage	__P((struct rusage *, struct rusage *, 
 					     timeval_t *, timeval_t *));
+extern	void		  ruadd		__P((struct rusage *, struct rusage *));
 #else /* BSDTIMES */
 # ifdef _SEQUENT_
 extern	void		  prusage	__P((struct process_stats *,
 					     struct process_stats *, 
 					     timeval_t *, timeval_t *));
+extern	void		  ruadd		__P((struct process_stats *,
+					     struct process_stats *));
 # else /* !_SEQUENT_ */
 #  ifdef POSIX
 extern	void		  prusage	__P((struct tms *, struct tms *, 
@@ -351,7 +356,6 @@ extern	void		  prusage	__P((struct tms *, struct tms *,
 #endif /* BSDTIMES */
 extern	void		  settimes	__P((void));
 #if defined(BSDTIMES) || defined(_SEQUENT_)
-extern	void		  ruadd		__P((struct rusage *, struct rusage *));
 extern	void		  tvsub		__P((struct timeval *, 
 					     struct timeval *, 
 					     struct timeval *));

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.help.c,v 3.7 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.help.c,v 3.8 1992/06/16 20:46:26 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.help.c,v 3.7 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: tw.help.c,v 3.8 1992/06/16 20:46:26 christos Exp $")
 
 #include "tw.h"
 #include "tc.h"
@@ -71,13 +71,18 @@ do_help(command)
     Char   *thpath;
 
 
+    /* trim off the whitespace at the beginning */
+    for (cmd_p = command; *cmd_p == ' ' || *cmd_p == '\t'; cmd_p++)
+	continue;
+		
     /* copy the string to a safe place */
-    copyn(name, command, FILSIZ + 1);
+    copyn(name, cmd_p, FILSIZ + 1);
 
-    /* trim off the garbage that may be at the end */
-    for (cmd_p = name; *cmd_p != '\0'; cmd_p++)
-	if (*cmd_p == ' ' || *cmd_p == '\t')
-	    *cmd_p = '\0';
+    /* trim off the whitespace that may be at the end */
+    for (cmd_p = name; 
+	 *cmd_p != ' ' && *cmd_p != '\t' && *cmd_p != '\0'; cmd_p++)
+	continue;
+    *cmd_p = '\0';
 
     /* if nothing left, return */
     if (*name == '\0')

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.33 1992/07/23 14:42:29 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.34 1992/08/09 00:13:36 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -137,19 +137,24 @@ struct ucred {
  * XXX: This will be changed soon to 
  * #if (SYSVREL > 0) && defined(TIOCGWINSZ)
  * If that breaks on your machine, let me know.
+ *
+ * It would break on linux, where all this is
+ * defined in <termios.h>. Wrapper added.
  */
-#if defined(INTEL) || defined(u3b2) || defined (u3b5) || defined(ub15) || defined(u3b20d) || defined(ISC) || defined(SCO) 
-#ifdef TIOCGWINSZ
+#ifndef linux
+# if defined(INTEL) || defined(u3b2) || defined (u3b5) || defined(ub15) || defined(u3b20d) || defined(ISC) || defined(SCO) 
+#  ifdef TIOCGWINSZ
 /*
  * for struct winsiz
  */
-# include <sys/stream.h>
-# include <sys/ptem.h>
-#endif /* TIOCGWINSZ */
-# ifndef ODT
-#  define NEEDgethostname
-# endif /* ODT */
-#endif /* INTEL || att || isc || sco */
+#   include <sys/stream.h>
+#   include <sys/ptem.h>
+#  endif /* TIOCGWINSZ */
+#  ifndef ODT
+#   define NEEDgethostname
+#  endif /* ODT */
+# endif /* INTEL || att || isc || sco */
+#endif /* !linux */
 
 #ifdef UNIXPC
 # define NEEDgethostname
@@ -338,15 +343,9 @@ struct ucred {
 #  define setrlimit 	bsd_setrlimit
 #  define getrlimit	bsd_getrlimit
 # endif	/* _BSDX_ */
-# ifndef NOFILE
-#  define	NOFILE	64
-# endif	/* NOFILE */
 #endif /* SXA */
 
 #ifdef _MINIX
-# ifndef NOFILE
-#  define NOFILE 64
-# endif /* NOFILE */
 # define NEEDgethostname
 # define NEEDnice
 /*
@@ -367,9 +366,9 @@ struct ucred {
 #endif /* POSIX */
 
 
-#if SYSVREL > 0 && !defined(OREO) && !defined(sgi)
+#if SYSVREL > 0 && !defined(OREO) && !defined(sgi) && !defined(linux)
 # define NEEDgetwd
-#endif /* SYSVREL > 0 && !OREO && !sgi */
+#endif /* SYSVREL > 0 && !OREO && !sgi && !linux */
 
 #ifndef S_IFLNK
 # define lstat stat
@@ -526,11 +525,6 @@ extern char *getwd();
 extern char *ttyname();   
 # endif /* SCO */
 
-#ifdef linux
-extern int	killpg	__P((pid_t, int));
-#endif /* linux */
-
-
 #endif /* POSIX */
 
 # if defined(SUNOS4) && __GNUC__ == 2
@@ -546,7 +540,7 @@ extern void bcopy	__P((char *, char *, int));
 # define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
 #endif
 
-#if !defined(hpux) && (SYSVREL < 4) && !defined(__386BSD__) && !defined(memmove)
+#if !defined(hpux) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(__386BSD__) && !defined(memmove)
 # define NEEDmemmove
 #endif
 

@@ -1,4 +1,20 @@
 V6.03.00, ...
+55. 6.02.07 9/18/92
+54. Added e_stuff_char() to put back a character in cooked mode in
+    the input stream... Useful for status (^T)
+53. $? == $status and $# == $#argv like in the bourne shell.
+52. Added $dirstack. Problems: off by one since =0 == $cwd, but 
+    $dirstack[1] == $cwd... Suggestions welcome.
+51. Leading spaces would confuse the run-help function.
+50. Don't expand imported environment variables:
+    > setenv HOME \*
+    > tcsh
+    > echo "$home"
+    > echo "$HOME"
+49. %C0n displays the number of directories omitted as /usr/local/bin /<2>bin/
+48. Added POSIXSIGS as a configuration option.
+47. Per's fixes for history format and arrow key binding.
+46. Expand-variables expands array variables too
 45. 6.02.06 8/14/92 
 44. Separated limit stuff from BSDTIMES and added BSDLIMIT
 43. History searching inconsistent with HistLit:

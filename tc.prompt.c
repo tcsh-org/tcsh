@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.prompt.c,v 3.13 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.prompt.c,v 3.14 1992/07/23 14:42:29 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.13 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.14 1992/07/23 14:42:29 christos Exp $")
 
 #include "ed.h"
 
@@ -206,9 +206,11 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		break;
 
 	    case 'M':
+#ifndef HAVENOUTMP
 		if (what == FMT_WHO)
 		    cz = who_info(info, 'M', cbuff);
 		else 
+#endif /* HAVENOUTMP */
 		    cz = getenv("HOST");
 		/*
 		 * Bug pointed out by Laurent Dami <dami@cui.unige.ch>: don't
@@ -222,9 +224,11 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		break;
 
 	    case 'm':
+#ifndef HAVENOUTMP
 		if (what == FMT_WHO)
 		    cz = who_info(info, 'm', cbuff);
 		else 
+#endif /* HAVENOUTMP */
 		    cz = getenv("HOST");
 
 		if (cz != NULL)
@@ -274,8 +278,16 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    register int j, k;
 		    Char    scp;
 
+		    /* modified RWM 8/6/92 - indicate dirs ignored */
+		    register int updirs;
+		    int pdirs = 0;
+		    
 		    scp = *cp;
 		    /* option to determine fix number of dirs from path */
+		    if (*(cp + 1) == '0') {
+			pdirs = 1;
+			cp++;
+		    }
 		    if (*(cp + 1) >= '1' && *(cp + 1) <= '9') {
 			j = *(cp + 1) - '0';
 			cp++;
@@ -294,11 +306,22 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			    (buff[k] == '/' || buff[k] == '\0')) {
 			    buff[--k] = '~';
 			    q = &buff[k];
+			    /* RWM - reset the path length */
+			    updirs = 0;
 			}
-			else
+			else {
 			    q = buff;
-			for (z = q; *z; z++)
+			    /* RWM - in case first char is not '/' */
+			    if (*q == '/') updirs = 0; else updirs = 1;
+			}
+			/* RWM - calculate elements in the path */
+			for (z = q; *z; z++) {
+			    if (*z == '/') updirs++;
 			    continue;	/* find the end */
+			}
+			/* RWM - the ones we will skip can be found here */
+			updirs -= j;
+			
 			while (j-- > 0) {
 			    while ((z > q) && (*z != '/'))
 				z--;	/* back up */
@@ -307,6 +330,26 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			}
 			if (*z == '/' && z != q)
 			    z++;
+
+			/* RWM - if *q == '~' and *z != '~' then print */
+			/*       out the '~' ahead of the partial path */
+			if ((*q == '~') && (*z != '~'))
+			    *p++ = attributes | '~';
+			
+			/* RWM - tell you how many dirs we've ignored */
+			/*       and add '/' at front of this         */
+			if (updirs > 0 && pdirs) {
+			    *p++ = attributes | '/';
+			    *p++ = attributes | '<';
+			    if (updirs > 9) {
+				*p++ = attributes | '9';
+				*p++ = attributes | '+';
+			    } else
+				*p++ = attributes | ('0' + updirs);
+			    *p++ = attributes | '>';
+			}
+			/* RWM - end of added code */
+
 			while (*z) {
 			    *p++ = attributes | *z++;
 			    if (p >= ep) break;
@@ -315,6 +358,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		}
 		break;
 	    case 'n':
+#ifndef HAVENOUTMP
 		if (what == FMT_WHO) {
 		    if ((cz = who_info(info, 'n', cbuff)) != NULL)
 			while (*cz) {
@@ -322,7 +366,9 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			    if (p >= ep) break;
 			}
 		}
-		else  {
+		else  
+#endif /* HAVENOUTMP */
+		{
 		    if ((z = value(STRuser)) != STRNULL)
 			while (*z) {
 			    *p++ = attributes | *z++;
@@ -331,6 +377,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		}
 		break;
 	    case 'l':
+#ifndef HAVENOUTMP
 		if (what == FMT_WHO) {
 		    if ((cz = who_info(info, 'l', cbuff)) != NULL)
 			while (*cz) {
@@ -338,7 +385,9 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			    if (p >= ep) break;
 			}
 		}
-		else  {
+		else  
+#endif /* HAVENOUTMP */
+		{
 		    if ((z = value(STRtty)) != STRNULL)
 			while (*z) {
 			    *p++ = attributes | *z++;
@@ -447,6 +496,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		attributes &= ~LITERAL;
 		break;
 	    default:
+#ifndef HAVENOUTMP
 		if (*cp == 'a' && what == FMT_WHO) {
 		    cz = who_info(info, 'a', cbuff);
 		    while (*cz) {
@@ -454,7 +504,9 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			if (p >= ep) break;
 		    }
 		}
-		else {
+		else 
+#endif /* HAVENOUTMP */
+		{
 		    if (p >= ep - 3) break;
 		    *p++ = attributes | '%';
 		    *p++ = attributes | *cp;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.wait.h,v 3.4 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.wait.h,v 3.5 1992/05/15 23:49:22 christos Exp $ */
 /*
  * tc.wait.h: <sys/wait.h> for machines that don't have it or have it and
  *	      is incorrect.
@@ -43,7 +43,7 @@
  * We try to use the system's wait.h when we can...
  */
 
-#if SYSVREL > 0
+#if SYSVREL > 0 && !defined(linux)
 # ifdef hpux
 #  ifndef __hpux
 #   define NEEDwait
@@ -63,14 +63,14 @@
 #   define NEEDwait
 #  endif /* OREO || IRIS4D || POSIX */
 # endif	/* hpux */
-#else /* SYSVREL == 0 */
+#else /* SYSVREL == 0 || linux */
 # ifdef _MINIX
 #  undef NEEDwait
 #  include "mi.wait.h"
 # else
 #  include <sys/wait.h>
 # endif /* _MINIX */
-#endif /* SYSVREL == 0 */
+#endif /* SYSVREL == 0 || linux */
 
 #ifdef NEEDwait
 /*

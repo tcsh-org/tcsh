@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.h,v 3.10 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.h,v 3.11 1992/07/18 01:34:46 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -47,9 +47,9 @@
 # include <sys/signal.h>
 #endif				/* SYSVREL > 0 */
 
-#if defined(SUNOS4) || defined(DGUX)
+#if defined(SUNOS4) || defined(DGUX) || defined(hp800)
 # define SAVESIGVEC
-#endif /* SUNOS4 || DGUX */
+#endif /* SUNOS4 || DGUX || hp800 */
 
 #if (SYSVREL > 0 && SYSVREL < 3 && !defined(BSDSIGS)) || defined(_MINIX)
 /*
@@ -127,10 +127,10 @@ typedef struct sigvec sigvec_t;
 #  undef sigmask
 # endif				/* sigmask */
 # define	sigmask(s)	(1 << ((s)-1))
-# if defined(_SEQUENT_) || defined(linux)
+# ifdef POSIXSIGS
 #  define 	sigpause(a)	bsd_sigpause(a)
 #  define 	signal(a, b)	bsd_signal(a, b)
-# endif /* _SEQUENT_ */
+# endif /* POSIXSIGS */
 # ifndef _SEQUENT_
 #  define	sighold(s)	sigblock(sigmask(s))
 #  define	sigignore(s)	signal(s, SIG_IGN)

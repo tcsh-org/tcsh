@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.c,v 3.9 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.sig.c,v 3.10 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.9 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.10 1992/06/16 20:46:26 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -250,7 +250,7 @@ sigret_t(*
 
 #endif /* NEEDsignal */
 
-#if defined(_SEQUENT_) || defined(linux)
+#ifdef POSIXSIGS
 /*
  * Support for signals.
  */
@@ -292,11 +292,7 @@ sigsetmask(mask)
 	if (ISSET(mask, i))
 	    sigaddset(&set, i);
 
-#ifdef linux	/* sigprocmask returns old mask on success! */
-    if (sigprocmask(SIG_SETMASK, &set, &oset) == -1)
-#else /* linux */
     if (sigprocmask(SIG_SETMASK, &set, &oset))
-#endif /* linux */
 	xprintf("sigsetmask(0x%x) - sigprocmask failed, errno %d",
 		mask, errno);
 
@@ -401,7 +397,7 @@ sigret_t (*bsd_signal(sig, func))()
         r_func = (sigret_t(*)()) oact.sa_handler;
         return(r_func);
 }
-#endif /* _SEQUENT_ */
+#endif /* POSIXSIG */
 
 
 #ifdef SIGSYNCH

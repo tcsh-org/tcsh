@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.init.c,v 3.30 1992/07/23 14:42:29 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.init.c,v 3.31 1992/08/09 00:13:36 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.30 1992/07/23 14:42:29 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.31 1992/08/09 00:13:36 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -620,7 +620,7 @@ Load_input_line()
     if (Tty_raw_mode)
 	return 0;
 
-#if defined(FIONREAD) && !defined(linux) && !defined(OREO)
+#if defined(FIONREAD) && !defined(OREO)
     (void) ioctl(SHIN, FIONREAD, &chrs);
     if (chrs > 0) {
 	char    buf[BUFSIZE];
@@ -632,7 +632,7 @@ Load_input_line()
 	    PushMacro(Input_Line);
 	}
     }
-#endif  /* FIONREAD */
+#endif  /* FIONREAD && !OREO */
     return chrs > 0;
 }
 

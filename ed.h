@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.h,v 3.17 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.h,v 3.18 1992/07/06 15:26:18 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -96,11 +96,6 @@ typedef union Xmapval {		/* value passed to the Xkey routines */
     KEYCMD cmd;
     Char *str;
 } XmapVal;
-
-#define A_K_DN	0
-#define A_K_UP	1
-#define A_K_LT	2
-#define A_K_RT	3
 
 #define XK_NOD	-1		/* Internal tree node */
 #define XK_CMD	 0		/* X-key was an editor command */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.37 1992/07/23 14:42:29 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.38 1992/08/09 00:13:36 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.37 1992/07/23 14:42:29 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.38 1992/08/09 00:13:36 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1397,23 +1397,25 @@ dollar(new, old)
 	    vp = adrof(var);
 	    val = (!vp) ? Getenv(var) : NULL;
 	    *old = save;
-	    /*
-	     * Don't expand array variables
-	     */
 	    if (vp) {
-		if (!vp->vec[0] || vp->vec[1]) {
-		    *new = '\0';
-		    return (NULL);
+		int i;
+		for (i = 0; vp->vec[i] != NULL; i++) {
+		    for (val = vp->vec[i]; space > 0 && *val; space--)
+			*p++ = *val++;
+		    if (vp->vec[i+1] && space > 0) {
+			*p++ = ' ';
+			space--;
+		    }
 		}
-		else
-		    val = vp->vec[0];
 	    }
-	    else if (!val) {
+	    else if (val) {
+		for (;space > 0 && *val; space--)
+		    *p++ = *val++;
+	    }
+	    else {
 		*new = '\0';
 		return (NULL);
 	    }
-	    for (; space > 0 && *val; space--)
-		*p++ = *val++;
 	}
     *p = '\0';
     return (new);
@@ -1596,12 +1598,18 @@ filetype(dir, file)
 	    if (S_ISNWK(statb.st_mode)) /* Network Special [hpux] */
 		return (':');
 #endif
+#ifdef S_ISCHR
 	    if (S_ISCHR(statb.st_mode))	/* char device */
 		return ('%');
+#endif
+#ifdef S_ISBLK
 	    if (S_ISBLK(statb.st_mode))	/* block device */
 		return ('#');
+#endif
+#ifdef S_ISDIR
 	    if (S_ISDIR(statb.st_mode))	/* normal Directory */
 		return ('/');
+#endif
 	    if (statb.st_mode & 0111)
 		return ('*');
 	}

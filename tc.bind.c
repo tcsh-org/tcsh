@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.bind.c,v 3.9 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.bind.c,v 3.10 1992/07/06 15:26:18 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.9 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.10 1992/07/06 15:26:18 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -578,7 +578,8 @@ parseescape(ptr)
 	    break;
 	}
     }
-    else if ((*p & CHAR) == '^' && Isalpha(p[1] & CHAR)) {
+    else if ((*p & CHAR) == '^' && (Isalpha(p[1] & CHAR) || 
+				    strchr("@^_?\\|[{]}", p[1] & CHAR))) {
 	p++;
 	c = (*p == '?') ? '\177' : ((*p & CHAR) & 0237);
     }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.dol.c,v 3.14 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dol.c,v 3.15 1992/05/15 21:54:34 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.14 1992/04/10 16:38:09 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.15 1992/05/15 21:54:34 christos Exp $")
 
 /*
  * C shell
@@ -401,7 +401,7 @@ Dgetdol()
     register Char *np;
     register struct varent *vp = NULL;
     Char    name[4 * MAXVARLEN + 1];
-    int     c, sc;
+    int     c, sc, oc = -1;
     int     subscr = 0, lwb = 1, upb = 0;
     bool    dimen = 0, bitset = 0;
     char    tnp;
@@ -467,17 +467,25 @@ Dgetdol()
 	setDolp(wbuf);
 	goto eatbrac;
 
-    case DEOF:
-    case '\n':
-	stderror(ERR_SYNTAX);
-	/* NOTREACHED */
-	break;
-
     case '*':
 	(void) Strcpy(name, STRargv);
 	vp = adrof(STRargv);
 	subscr = -1;		/* Prevent eating [...] */
 	break;
+
+    case DEOF:
+    case '\n':
+	if (dimen) 
+	    setDolp(STRargv);
+	else if (bitset) {
+	    bitset = 0;
+	    setDolp(STRstatus);
+	}
+	else
+	    stderror(ERR_SYNTAX);
+	oc = c;
+	c = DgetC(0);
+	/*FALLTHROUGH*/
 
     default:
 	np = name;
@@ -514,8 +522,20 @@ Dgetdol()
 	    }
 	    break;
 	}
-	if (!alnum(c))
-	    stderror(ERR_VARALNUM);
+	if (!alnum(c)) {
+	    if (dimen) 
+		setDolp(STRargv);
+	    else if (bitset) {
+		bitset = 0;
+		setDolp(STRstatus);
+	    }
+	    else
+		stderror(ERR_VARALNUM);
+	    oc = c;
+	    c = DgetC(0);
+	}
+	else
+	    oc = -1;
 	for (;;) {
 	    *np++ = c;
 	    c = DgetC(0);
@@ -525,13 +545,18 @@ Dgetdol()
 		stderror(ERR_VARTOOLONG);
 	}
 	*np++ = 0;
-	unDredc(c);
+	if (oc == -1)
+	    unDredc(c);
+	else
+	    unDredc(oc);
 	vp = adrof(name);
     }
     if (bitset) {
 	dolp = (vp || getenv(short2str(name))) ? STR1 : STR0;
 	goto eatbrac;
     }
+    if (oc != -1)
+	goto eatbrac;
     if (vp == 0) {
 	np = str2short(getenv(short2str(name)));
 	if (np) {

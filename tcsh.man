@@ -1,5 +1,5 @@
-.\" $Id: tcsh.man,v 3.46 1992/07/18 01:34:46 christos Exp $
-.TH TCSH 1 "19 December 1991" "Cornell"
+.\" $Id: tcsh.man,v 3.47 1992/08/09 00:13:36 christos Exp $
+.TH TCSH 1 "17 September 1992" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -165,7 +165,7 @@ There is a new shell command,
 that allows the user to redefine what any key does, or find out what
 any or all of the keys do.
 .PP
-Syntax: bindkey [ -a ] [ -c ] [ -s ] [ -v ] [ -e ] [ -d ] [ -l ] [ -r ] [ -- ] [ in-string [ out-string | command ]]
+Syntax: bindkey [ -a ] [ -c ] [ -s ] [ -v ] [ -e ] [ -d ] [ -k ] [ -l ] [ -r ] [ -- ] [ [ in-string | key-name ] [ out-string | command ]]
 .PP
 If no values are given all bindings are listed. If only in-string is given,
 bindings for the in-string is listed.
@@ -191,7 +191,7 @@ Options:
 .br
     -e    bind for default emacs-mode
 .br
-    -k    interpret in-string as a symbolic key name
+    -k    interpret in-string as a symbolic arrow key name.
 .br
     -d    bind to compiled in default
 .br
@@ -1305,6 +1305,10 @@ The available sequences are:
 .DT
 .fi
 .sp
+On %C, %c and %., if the optional digit is 0, then then next digit is
+interpreted as the number of directory components to be skipped, and
+the number of components skipped are reported as: /<num-skipped>path/path.
+.sp
 The sequences for standout are often used to indicate that this is an
 enabled (running as root) shell.
 An example:
@@ -1933,6 +1937,7 @@ The current possible values are:
 \fIatt3b20\fR		an AT&T 3b20
 \fIatt3b5\fR		an AT&T 3b5
 \fIbalance\fR		a Sequent Balance (32000 based)
+\fIbsd386\fR		an Intel 386, running BSDI's bsd386
 \fIbutterfly\fR		a BBN Computer Butterfly 1000
 \fIconvex\fR		a Convex
 \fIcray\fR		a Cray running Unicos
@@ -1949,6 +1954,7 @@ The current possible values are:
 \fIhp\fR			an HP, running hpux
 \fIi386\fR		an Intel 386, generic
 \fIi386-mach\fR		an Intel 386, running mach
+\fIi386-linux\fR	an Intel 386, running Linux
 \fIintel386\fR		an Intel 386, running INTEL's SVR3
 \fIiris3d\fR		a Silicon Graphics Iris 3000
 \fIiris4d\fR		a Silicon Graphics Iris 4D
@@ -3155,6 +3161,18 @@ or correct=all, the whole line will be corrected.
 .B dextract 
 extract a directory on pushd rather than rotating.
 .TP 10
+.B dirsfile 
+If set, it contains the full path-name where a directory stack file is 
+read/written.
+It defaults to $home/.cshdirs. This file is executed last after .cshrc
+and .login to restore the directory stack.
+.TP 10
+.B dirstack
+If set, it contains an array of all the directories on the directory
+stack. $dirstack[1] is the current working directory, $dirstack[2]
+the first directory on the stack etc. Setting $dirstack resets all
+the stack entries, but the current working directory which is preserved.
+.TP 10
 .B dunique 
 Push only directories that are not already in the directory stack.
 .TP 10
@@ -3201,8 +3219,8 @@ from .login.
 .TP 10
 .B history
 The first word of the history variable indicates the number of history
-events to be saved. The optional second words indicates the format
-history is printed (Defaults to "%h\t%@\t%R\n").
+events to be saved. The optional second word indicates the format
+history is printed (Defaults to "%h\et%T\et%R\en").
 .TP 10
 .B inputmode
 Can be set to either
@@ -3405,7 +3423,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.02.00 (Cornell) 05/15/92.
+This man page documents tcsh 6.02.07 (Cornell) 92/09/17.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
@@ -3447,7 +3465,7 @@ Chris Grevstad, TRW, 1987
 .br
 Ported the 4.3 csh sources to tcsh.
 .sp
-Christos S. Zoulas, Cornell U. EE dept., 1987-91
+Christos S. Zoulas, Cornell U. EE dept., 1987-92
 .br
 ported tcsh to HPUX, and System V rel. 2 and 3 and wrote a SysV version of
 getwd.c. Added SHORT_STRINGS support. New version of sh.glob.c.

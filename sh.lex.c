@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.22 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.23 1992/07/07 15:45:01 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.22 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.23 1992/07/07 15:45:01 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -511,7 +511,8 @@ getdol()
     case '\n':
 	ungetD(c);
 	np--;
-	seterror(ERR_NEWLINE);
+	if (!special)
+	    seterror(ERR_NEWLINE);
 	*np = 0;
 	addla(name);
 	return;
@@ -561,10 +562,8 @@ getdol()
 	    }
 	}
 	else {
-	    *np = 0;
-	    seterror(ERR_VARILL);
-	    addla(name);
-	    return;
+	    if (!special)
+		seterror(ERR_VARILL);
 	}
 	if (toolong) {
 	    seterror(ERR_VARTOOLONG);
@@ -660,7 +659,7 @@ getdol()
 	    if (!any("htrqxesul", c)) {
 		if ((amodflag || gmodflag) && c == '\n')
 		    stderror(ERR_VARSYN);	/* strike */
-		seterror(ERR_VARMOD, c);
+		seterror(ERR_BADMOD, c);
 		*np = 0;
 		addla(name);
 		return;

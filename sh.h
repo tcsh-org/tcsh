@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.39 1992/07/23 14:42:29 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.40 1992/08/09 00:13:36 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -64,6 +64,10 @@ easily confused. */
 #if defined(POSIXJOBS) && !defined(BSDJOBS)
 # define BSDJOBS
 #endif 
+
+#if defined(POSIXSIGS) && !defined(BSDSIGS)
+# define BSDSIGS
+#endif
 
 #ifdef SHORT_STRINGS
 typedef short Char;
@@ -788,8 +792,6 @@ EXTERN struct varent {
 #define v_left		v_link[0]
 #define v_right		v_link[1]
 #define v_parent	v_link[2]
-
-extern struct varent *adrof1();
 
 #define adrof(v)	adrof1(v, &shvhed)
 #define value(v)	value1(v, &shvhed)

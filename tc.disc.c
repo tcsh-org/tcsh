@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tc.disc.c,v 3.2 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.disc.c,v 3.3 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tc.disc.c: Functions to set/clear line disciplines
  *
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.disc.c,v 3.2 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: tc.disc.c,v 3.3 1992/03/27 01:59:46 christos Exp $")
 
 #ifdef OREO
 #include <compat.h>
@@ -103,9 +103,10 @@ int     f;
     struct ltchars ltcbuf;
 
     if (ioctl(f, TCGETA, (ioctl_t) & termiob) == 0) {
+	int comp = getcompat(COMPAT_BSDTTY);
 	otermiob = termiob;
-	if ((getcompat(COMPAT_BSDTTY) & COMPAT_BSDTTY) != COMPAT_BSDTTY) {
-	    setcompat(COMPAT_BSDTTY);
+	if ((comp & COMPAT_BSDTTY) != COMPAT_BSDTTY) {
+	    (void) setcompat(comp | COMPAT_BSDTTY);
 	    if (ioctl(f, TIOCGLTC, (ioctl_t) & ltcbuf) != 0)
 		xprintf("Couldn't get local chars.\n");
 	    else {

@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.10 1992/05/15 22:53:51 christos Exp $
+# $Id: complete.tcsh,v 1.11 1992/07/06 15:43:33 christos Exp $
 # example file using the new completion code
 #
 
@@ -170,6 +170,44 @@ if ($?complete) then
 
     complete {refile,sprev,snext,scan,pick,rmm,inc,folder,show} \
 		c@+@p:$HOME/Mail/@
+
+    # More completions from waz@quahog.nusc.navy.mil (Tom Warzeka)
+
+    complete users	p/1/x:'<accounting_file>'/
+    complete who	p/1/x:'<accounting_file>'/ n/am/"(i)"/ n/are/"(you)"/
+    complete ps	        c/-t/x:'<tty>'/ c/-/"(a c C e g k l S t u v w x)"/ \
+			n/-k/x:'<kernel>'/ N/-k/x:'<core_file>'/ n/*/x:'<PID>'/
+
+    complete chgrp	c/-/"(f R)"/ n/-*/x:'<group>'/ p/1/x:'<group>'/ n/*/f/
+    complete chown	c/-/"(f R)"/ n/-*/u/           p/1/u/           n/*/f/
+
+    complete cat	c/-/"(b e n s t u v)"/ n/*/f/
+    complete mv		c/-/"(f i)"/ n/-*/f/ N/-*/x:'<destination>'/ \
+			p/1/f/ p/2/x:'<destination>'/
+    complete cp		c/-/"(i p r)"/ n/-*r*/d/ N/-*r*/d/ n/-*/f/ \
+			N/-*/x:'<destination>'/ p/1/f/ p/2/x:'<destination>'/
+    complete ln		c/-/"(f s)"/ n/-*/f/ N/-*/x:'<link_name>'/ \
+			p/1/f/ p/2/x:'<link_name>'/
+
+    complete tar 	c/-[cru]*/"(b B C f F FF h i l m o p v w)"/ \
+			c/-[tx]*/"(   B C f F FF h i l m o p v w)"/ \
+			p/1/"(-c -r -t -u -x c r t u x)"/ \
+			c/-/"(b B C f F FF h i l m o p v w)"/ \
+			n/-c*f/x:'<new_tar_file or "-">'/ n/-*f/f:*.tar/ \
+			n/-[cru]*b/x:'<block_size>'/ n/-b/x:'<block_size>'/ \
+			n/-C/d/ N/-C/x:'<file or ".">'/ n/*/f/
+
+    complete compress	c/-/"(c f v b)"/ n/-b/x:'<max_bits>'/ n/*/f:^*.Z/
+    complete uncompress	c/-/"(c f v)"/                        n/*/f:*.Z/
+
+    complete man n@1@p:/usr/man/man1@     n@2@p:/usr/man/man2@ \
+		 n@3@p:/usr/man/man3@     n@4@p:/usr/man/man4@ \
+		 n@5@p:/usr/man/man5@     n@6@p:/usr/man/man6@ \
+		 n@7@p:/usr/man/man7@     n@8@p:/usr/man/man8@ \
+		 n@0@p:/usr/man/man0@     n@9@p:/usr/man/man9@ \
+	         n@new@p:/usr/man/mann@   n@old@p:/usr/man/mano@ \
+	         n@local@p:/usr/man/manl@ n@public@p:/usr/man/manp@ \
+	     c/-/"(- f k P s t)"/ n/-f/c/ n/-k/x:'<keyword>'/ n/-P/d/ n/*/c/
 
     unset noglob
     unset complete

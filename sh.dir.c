@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dir.c,v 3.16 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dir.c,v 3.17 1992/08/09 00:13:36 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.16 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.17 1992/08/09 00:13:36 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -50,6 +50,7 @@ static	void 	 	 	 dnewcwd	__P((struct directory *, int));
 static	void 	 	 	 dset		__P((Char *));
 static  void 			 dextract	__P((struct directory *));
 static  int 			 skipargs	__P((Char ***, char *, char *));
+static	void			 dgetstack	__P((void));
 
 static struct directory dhead;		/* "head" of loop */
 static int    printd;			/* force name to be printed */
@@ -285,21 +286,13 @@ dtilde()
 
 
 /* dnormalize():
- *	We are want the path fixed:
- *	1) "..",
+ *	The path will be normalized if it
+ *	1) is "..",
  *	2) or starts with "../",
  *	3) or ends with "/..",
  *	4) or contains the string "/../",
  *	then it will be normalized, unless those strings are quoted. 
  *	Otherwise, a copy is made and sent back.
- *
- *	The old dnormalize() was not quite right. For example, if aaa is
- *	a symbolically linked directory, then names contain 
- *	/whatever/aaa/..
- *	../aaa/..
- *	bbb/../.. (where bbb is a subdir of aaa)
- *	would not be normalized correctly.
- *	From ymy@ams.sunysb.edu (Yumin Yang)
  */
 Char   *
 dnormalize(cp, exp)
@@ -308,7 +301,8 @@ dnormalize(cp, exp)
 {
 
 /* return true if dp is of the form "../xxx" or "/../xxx" */
-#define HASDOTDOT(sp, p) (ISDOTDOT(p) && ((p) == (sp) || *((p) - 1) == '/'))
+#define IS_DOTDOT(sp, p) (ISDOTDOT(p) && ((p) == (sp) || *((p) - 1) == '/'))
+#define IS_DOT(sp, p) (ISDOT(p) && ((p) == (sp) || *((p) - 1) == '/'))
 
 #ifdef S_IFLNK
     if (exp) {
@@ -322,7 +316,7 @@ dnormalize(cp, exp)
 	 * count the number of "../xxx" or "xxx/../xxx" in the path
 	 */
 	for (dp=start; *dp && *(dp+1); dp++)
-	    if (HASDOTDOT(start, dp))
+	    if (IS_DOTDOT(start, dp))
 	        dotdot++;
 	/*
 	 * if none, we are done.
@@ -352,11 +346,11 @@ dnormalize(cp, exp)
 	    buf[0] = '\0';
 	    dp = buf; 
 	    while (*cp) 
-	        if (ISDOT(cp)) {
+	        if (IS_DOT(start, cp)) {
 	            if (*++cp)
 	                cp++;
 	        }
-	        else if (HASDOTDOT(start, cp)) {
+	        else if (IS_DOTDOT(start, cp)) {
 		    if (buf[0])
 		        break; /* finish analyzing .././../xxx/[..] */
 		    dotdot++;
@@ -364,8 +358,7 @@ dnormalize(cp, exp)
 		    if (*cp)
 		        cp++;
 	        }
-	        else /* skip to the next path component */
-		    while (*cp != '/' && *cp != '\0')
+	        else 
 			*dp++ = *cp++;
 
 	    *dp = '\0';
@@ -1124,8 +1117,10 @@ dnewcwd(dp, dflag)
     register struct directory *dp;
     int dflag;
 {
+
     if (adrof(STRdunique)) {
 	struct directory *dn;
+
 	for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev) 
 	    if (dn != dp && Strcmp(dn->di_name, dp->di_name) == 0) {
 		dn->di_next->di_prev = dn->di_prev;
@@ -1136,10 +1131,64 @@ dnewcwd(dp, dflag)
     }
     dcwd = dp;
     dset(dcwd->di_name);
+    dgetstack();
     if (printd && !(adrof(STRpushdsilent))	/* PWP: pushdsilent */
 	&& !bequiet)		/* be quite while restoring stack -strike */
 	printdirs(dflag);
     cwd_cmd();			/* PWP: run the defined cwd command */
+}
+
+void
+dsetstack()
+{
+    Char **cp;
+    struct varent *vp;
+    struct directory *dn, *dp;
+
+    if ((vp = adrof(STRdirstack)) == NULL)
+	return;
+
+    /* Free the whole stack */
+    while ((dn = dhead.di_prev) != &dhead) {
+	dn->di_next->di_prev = dn->di_prev;
+	dn->di_prev->di_next = dn->di_next;
+	if (dn != dcwd)
+	    dfree(dn);
+    }
+
+    /* thread the current working directory */
+    dhead.di_prev = dhead.di_next = dcwd;
+    dcwd->di_next = dcwd->di_prev = &dhead;
+
+    /* put back the stack */
+    for (cp = vp->vec; cp && *cp && **cp; cp++) {
+	dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
+	dp->di_name = Strsave(*cp);
+	dp->di_count = 0;
+	dp->di_prev = dcwd;
+	dp->di_next = dcwd->di_next;
+	dcwd->di_next = dp;
+	dp->di_next->di_prev = dp;
+    }
+    dgetstack();	/* Make $dirstack reflect the current state */
+}
+
+static void
+dgetstack()
+{
+    if (adrof(STRdirstack)) {
+	int i = 0;
+	Char **dblk, **dbp;
+	struct directory *dn;
+
+	for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev, i++) 
+	    continue;
+	dbp = dblk = (Char**) xmalloc((i + 1) * sizeof(Char *));
+	for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev, dbp++) 
+	     *dbp = Strsave(dn->di_name);
+	*dbp = NULL;
+	setq(STRdirstack, dblk, &shvhed);
+    }
 }
 
 /*
@@ -1262,3 +1311,5 @@ recdirs(fname)
 	didfds = oldidfds;
     }
 }
+
+
