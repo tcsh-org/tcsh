@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.comp.c,v 1.34 2004/02/21 20:34:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.comp.c,v 1.35 2004/08/04 17:12:32 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.34 2004/02/21 20:34:25 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.35 2004/08/04 17:12:32 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -245,7 +245,7 @@ tw_tok(str)
 	continue;
 
     for (str = bf; *bf && !Isspace(*bf); bf++) {
-	if (ismeta(*bf))
+	if (ismetahash(*bf))
 	    return INVPTR;
 	*bf = *bf & ~QUOTE;
     }
