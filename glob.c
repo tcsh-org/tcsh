@@ -158,6 +158,12 @@ globcharcoll(c1, c2)
 
     if (c1 == c2)
 	return (0);
+    /*
+     * From kevin lyda <kevin@suberic.net>:
+     * strcoll does not guarantee case sorting, so we pre-process now:
+     */
+    if (islower(c1) && isupper(c2))
+	return (1);
     s1[0] = c1;
     s2[0] = c2;
     s1[1] = s2[1] = '\0';
@@ -452,7 +458,7 @@ glob(pattern, flags, errfunc, pglob)
 	}
 	return (globextend(patbuf, pglob));
     }
-    else if (!(flags & GLOB_NOSORT))
+    else if (!(flags & GLOB_NOSORT) && (pglob->gl_pathc != oldpathc))
 	qsort((char *) (pglob->gl_pathv + pglob->gl_offs + oldpathc),
 	      pglob->gl_pathc - oldpathc, sizeof(char *),
 	      (int (*) __P((const void *, const void *))) compare);
