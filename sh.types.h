@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.types.h,v 3.40 2003/06/18 19:32:44 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.types.h,v 3.41 2005/01/18 20:24:51 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -141,12 +141,6 @@ extern unsigned int sleep();
 # if HPUXVERSION < 800	/* XXX: Not true for 8.0 */
 extern void sigpause();
 extern sigmask_t sigspace();
-extern int lstat();
-extern int readlink();
-extern int sigvector();
-extern int gethostname();
-extern int ioctl();
-extern int nice();
 extern char *sbrk();
 # endif /* HPUXVERSION < 800 */
 #endif /* __hpux */

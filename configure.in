@@ -322,6 +322,7 @@ AC_C_PROTOTYPES
 AC_C_VOLATILE
 
 dnl checks for library functions
+AC_CHECK_DECLS([gethostname])
 AC_CHECK_FUNCS([dup2 getcwd gethostname getpwent memmove memset nice] dnl
 	[nl_langinfo sbrk setpgid setpriority strerror strstr sysconf] dnl
 	[utmpname wcwidth])

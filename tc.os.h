@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.94 2005/01/18 20:24:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.95 2005/03/03 16:49:16 kim Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -453,12 +453,9 @@ typedef struct timeval timeval_t;
 # define free tcsh_free
 #endif /* NeXT */
 
-#if !defined(BSD4_4) && !defined(__linux__) && !defined(__GNU__) && !defined(__GLIBC__) && !defined(__hpux) && \
-    !defined(sgi) && !defined(_AIX) && !defined(__CYGWIN__) && !defined(_OSD_POSIX)
-#ifdef HAVE_GETHOSTNAME
+#if defined(HAVE_GETHOSTNAME) && !defined(HAVE_DECL_GETHOSTNAME)
 extern int gethostname __P((char *, int));
-#endif /* HAVE_GETHOSTNAME */
-#endif /* !BDS4_4 && !glibc && !__hpux && !sgi */
+#endif
 
 #ifndef GETPGRP_VOID
 # define mygetpgrp()    getpgrp(0)
@@ -612,7 +609,6 @@ extern char *strerror __P((int));
 
 #if defined(__alpha) && defined(__osf__) && DECOSF1 < 200
 /* These are ok for 1.3, but conflict with the header files for 2.0 */
-extern int gethostname __P((char *, int));
 extern char *sbrk __P((ssize_t));
 extern int ioctl __P((int, unsigned long, char *));
 extern pid_t vfork __P((void));

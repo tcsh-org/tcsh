@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.88 2005/01/18 20:43:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.89 2005/03/03 16:49:16 kim Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.88 2005/01/18 20:43:31 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.89 2005/03/03 16:49:16 kim Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -91,27 +91,7 @@ static struct cvxrusage zru = {{0L, 0L}, {0L, 0L}, 0L, 0L, 0L, 0L,
 				{0L, 0L}, 0LL, 0LL, 0LL, 0LL, 0L, 0L, 0L,
 				0LL, 0LL, {0L, 0L, 0L, 0L, 0L}};
 # else
-#  if defined(SUNOS4) || defined(hp9000) || (defined(__alpha) && defined(__osf__))
-static struct rusage zru = {{0L, 0L}, {0L, 0L}, 0L, 0L, 0L, 0L,
-			    0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L};
-
-#  else /* !SUNOS4 && !hp9000 && !(__alpha && __osf__) */
-#   ifdef masscomp
-/*
- * Initialization of this structure under RTU 4.1A & RTU 5.0 is problematic
- * because the first two elements are unions of a time_t and a struct timeval.
- * So we'll just have to trust the loader to do the "right thing", DAS DEC-90.
- */
 static struct rusage zru;
-#   else	/* masscomp */
-static struct rusage zru = {{0L, 0L}, {0L, 0L}
-#ifndef _OSD_POSIX /* BS2000 has fewer resource fields */
-			   ,0, 0, 0, 0, 0, 0, 0, 
-			    0, 0, 0, 0, 0, 0
-#endif
-};
-#   endif /* masscomp */
-#  endif	/* SUNOS4 || hp9000 || (__alpha && __osf__) */
 # endif /* convex */
 #else /* !BSDTIMES */
 # ifdef _SEQUENT_
