@@ -1,0 +1,577 @@
+#!/usr/local/bin/perl
+# $Id$
+
+# tcsh.man2html
+# Dave Schweisguth <dcs@proton.chem.yale.edu>
+
+# Usage: tcsh.man2html [name of tcsh manpage]
+#
+# Reads from pipe or looks for default 'tcsh.man' if no file given
+# Creates tcsh.html; tcsh.html/top.html is the entry point
+
+# History:
+#
+# 11 Jun 94	First release
+
+# Notes:
+#
+# Designed for tcsh manpage. Guaranteed not to work on manpages not written
+# in the exact same style of nroff -man, i.e. any other manpage.
+#
+# Makes links FROM items which are both a) in particular sections (see
+# Configuration) and b) marked with .B or .I. Makes links TO items which
+# are marked with \fB ... \fR or \fI ... \fR.
+#
+# Designed with X Mosaic in mind and tested lightly with lynx. I've punted on
+# HTML's lack of a .PD equivalent and lynx's different <menu> handling.
+
+### Constants
+
+# Setup
+
+($whatami = $0)	=~ s|.*/||;		# `basename $0`
+$isatty		= -t STDIN;
+
+# Configuration
+
+$dir		= 'tcsh.html';		# Directory in which to put the pieces
+$outfile	= 'tcsh.man';		# Default input file and copy of input file
+$script		= $whatami;		# Copy of script
+$topfile	= 'top.html';		# Top-level HTML file
+
+# Sections to inline in the top page
+
+%inline_me	= ('NAME',	1,
+		   'SYNOPSIS',	1);
+
+# Sections in which to put name anchors and the font in which to look for
+# links to those anchors
+
+%link_me	= ('Editor commands',		'I',
+		   'Builtin commands',		'I',
+		   'Special aliases',		'I',
+		   'Special shell variables',	'B',
+		   'ENVIRONMENT',		'B',
+		   'FILES',			'I');
+
+### Arguments and error-checking
+
+# Parse args
+
+if (@ARGV == 0) {
+    if ($isatty) {
+        $infile = $outfile;		# Default input file if interactive
+    } else {
+	$infile = 'STDIN';		# Read STDIN if no args and not a tty
+    }
+} elsif (@ARGV == 1) {
+    $infile = $ARGV[0];
+} else {
+    die "$whatami: Please specify one and only one file.\n";
+}
+
+# Check for input file
+
+unless ($infile eq 'STDIN') {
+    die "$whatami: $infile doesn't exist!\n"	unless -e $infile;
+    die "$whatami: $infile is unreadable!\n"	unless -r _;
+    die "$whatami: $infile is empty!\n"		unless -s _;
+}
+
+# Check for output directory and create if necessary
+
+if (-e $dir) {
+    -d _ || die "$whatami: $dir is not a directory!\n";
+    -r _ && -w _ && -x _ || die "$whatami: $dir is inaccessible!\n"
+} else {
+    mkdir($dir, 0755) || die "$whatami: Can't create $dir!\n";
+}
+
+# Slurp manpage
+
+if ($infile eq 'STDIN') {
+    @man = <STDIN>;
+} else {
+    open(MAN, $infile) || die "$whatami: Error opening $infile!\n";
+    @man = <MAN>;
+    close MAN;
+}
+
+# Print manpage to HTML directory (can't use cp if we're reading from STDIN)
+
+open(MAN, ">$dir/$outfile") || die "$whatami: Can't open $dir/$outfile!\n";
+print MAN @man;
+close MAN;
+
+# Copy script to HTML directory
+
+(system("cp $0 $dir") >> 8) && die "$whatami: Can't copy $0 to $dir!\n";
+
+### Get title and section headings
+
+$comment = 0;			    # 0 for text, 1 for ignored text
+@sectionlines = (0);		    # First line of section
+@sectiontypes = (0);		    # H or S
+@sectiontexts = ('header');	    # Text of section heading
+@sectionfiles = ('header.html');    # Filename in which to store section
+%name = ();			    # Array of name anchors
+$font = '';		    	    # '' to not make names, 'B' or 'I' to do so
+
+$line = 0;
+foreach (@man) {
+    if (/^\.ig/) {			# Start ignoring
+	$comment = 1;
+    } elsif (/^\.\./) {			# Stop ignoring
+	$comment = 0;
+    } elsif (! $comment) {		# Not in .ig'ed section; do stuff
+	
+	# Get title
+	
+	if (/^\.TH\s+(\w+)\s+(\w+)\s+\"([^\"]*)\"\s+\"([^\"]*)\"/) {
+	    $title = "$1($2) $4 ($3) $1($2)";
+	}
+	
+	# HTML special characters; deal with these before adding more!
+	
+	s/&/&amp\;/g;
+	s/>/&gt\;/g;
+	s/</&lt\;/g;
+	
+	# Build per-section info arrays
+	
+	if (($type, $text) = /^\.S([HS])\s+\"?([^\"]*)\"?/) {
+
+	    push(@sectionlines, $line);	    # Index of first line of section
+	    push(@sectiontypes, $type eq 'H' ? 0 : 1);	# Type of section
+	    $text =~ s/\s*$//;		    # Remove trailing whitespace
+	    push(@sectiontexts, $text);	    # Title of section (key for href)
+	    $text =~ s/\s*\(\+\)$//;	    # Remove (+)
+	    $file = "$text.html";
+	    $file =~ s/[\s\/]+/_/g;	    # Replace whitespace and / with _
+	    push(@sectionfiles, $file);	    # File in which to store section
+	    $name{"$text B"} = $file;	    # Nucleus of href anchor
+	    
+	    # Look for anchors in the rest of this section if $link_me{$text}
+	    # is non-null, and mark them with the font which is its value
+
+	    $font = $link_me{$text};
+    	}
+	&make_name(*name, *font, *file, *_) if $font;
+    }
+    $line++;
+}
+
+### Make top page
+
+open(TOP, ">$dir/$topfile");
+select TOP;
+
+# Top page header
+
+print <<EOP;
+<HEAD>
+<TITLE>$title</TITLE>
+</HEAD>
+<BODY>
+<H1>$title</H1>
+<HR>
+<H2>
+EOP
+
+# Top page body
+
+foreach $section (1 .. $#sectionlines) {
+    if ($sectiontypes[$section - 1] < $sectiontypes[$section]) {
+	print "</H2> <menu>\n";	    # Indent, smaller font
+    } elsif ($sectiontypes[$section - 1] > $sectiontypes[$section]) {
+	print "</menu> <H2>\n";	    # Outdent, larger font
+    }
+    if ($inline_me{$sectiontexts[$section]}) {    # Section is in %inline_me
+	
+	# Print section inline
+	
+	print "$sectiontexts[$section]\n";
+	print "</H2> <menu>\n";	    # Indent, smaller font
+	&printsectionbody(*man, *sectionlines, *section, *name);
+	print "</menu> <H2>\n";	    # Outdent, larger font
+    } else {
+	
+	# Print link to section
+	
+	print "<A HREF=\"$sectionfiles[$section]\">$sectiontexts[$section]</A><BR>\n";
+    }
+}
+
+# Top page trailer
+
+print <<EOP;
+</H2>
+<HR>
+Here are the <A HREF="$outfile">original nroff manpage</A> (175K),
+the <A HREF="$script">Perl script</A> which converted it to HTML
+and the <A HREF="file://tesla.ee.cornell.edu/pub/tcsh/">
+complete source code</A> for <I>tcsh</I>.
+<HR>
+<I>tcsh</I> is maintained by Christos Zoulas &lt;christos@ee.cornell.edu&gt;
+and the <I>tcsh</I> mailing list &lt;listserv@lut.fi&gt;.
+Dave Schweisguth &lt;dcs@proton.chem.yale.edu&gt;
+wrote the <A HREF="$outfile">manpage</A>
+and the HTML conversion <A HREF="$script">script</A>.
+</BODY>
+EOP
+close TOP;
+
+### Make sections
+
+foreach $section (0 .. $#sectionlines) {
+
+    # Skip inlined sections
+
+    next if $inline_me{$sectiontexts[$section]};
+    
+    # Make pointer line for header and trailer
+    
+    $pointers  = "<A HREF=\"$topfile\">Up</A>";
+    $pointers .= "\n<A HREF=\"$sectionfiles[$section + 1]\">Next</A>"
+	if ($section < $#sectionlines) &&
+	! $inline_me{$sectiontexts[$section + 1]};
+    $pointers .= "\n<A HREF=\"$sectionfiles[$section - 1]\">Previous</A>"
+	if ($section > 1) &&		# section 0 is initial comments
+	! $inline_me{$sectiontexts[$section - 1]};
+    
+    # Header
+    
+    open(OUT, ">$dir/$sectionfiles[$section]");
+    select OUT;
+    print <<EOP;
+<HEAD>
+<TITLE>$sectiontexts[$section]</TITLE>
+</HEAD>
+<BODY>
+$pointers
+<H2>$sectiontexts[$section]</H2>
+EOP
+    &printsectionbody(*man, *sectionlines, *section, *name);
+
+    # Trailer
+
+    print <<EOP;
+$pointers
+</BODY>
+EOP
+
+}
+
+### Subroutines
+
+# Process and print the body of a section
+
+sub printsectionbody {
+
+    local(*man, *sectionlines, *sline, *name) = @_;	# Number of section
+    local($sfirst, $slast, @paralines, @paratypes, $comment, $dl, $pline,
+	  $comment, $pfirst, $plast, @para, @tag, $changeindent);
+
+    # Define section boundaries
+
+    $sfirst = $sectionlines[$sline] + 1;
+    if ($sline == $#sectionlines) {
+	$slast = $#man;
+    } else {
+	$slast = $sectionlines[$sline + 1] - 1;
+    }
+
+    # Find paragraph markers, ignoring those between '.ig' and '..'
+
+    if ($man[$sfirst] =~ /^\.[PIT]P/) {
+	@paralines = ();
+	@paratypes = ();
+    } else {
+	@paralines = ($sfirst - 1);		# .P follows .S[HS] by default
+	@paratypes = ('P');
+    }
+    $comment = 0;
+    foreach ($sfirst .. $slast) {
+	if ($man[$_] =~ /^\.ig/) {		# Start ignoring
+	    $comment = 1;
+	} elsif ($man[$_] =~ /^\.\./) {		# Stop ignoring
+	    $comment = 0;
+	} elsif (! $comment && $man[$_] =~ /^\.([PIT])P/) {
+	    push(@paralines, $_);
+	    push(@paratypes, $1);
+	}
+    }
+
+    # Process paragraphs
+
+    $changeindent = 0;
+    $dl = 0;
+    foreach $pline (0 .. $#paralines) {
+
+	@para = ();
+	$comment = 0;
+
+	# Define para boundaries
+
+	$pfirst = $paralines[$pline] + 1;
+	if ($pline == $#paralines) {
+	    $plast = $slast;
+	} else {
+	    $plast = $paralines[$pline + 1] - 1;
+	}
+
+	foreach (@man[$pfirst .. $plast]) {
+	    if (/^\.ig/) {		    # nroff begin ignore
+		if ($comment == 0) {
+		    $comment = 2;
+		    push(@para, "<!--\n");
+		} elsif ($comment == 1) {
+		    $comment = 2;
+		} elsif ($comment == 2) {
+		    s/--/-/g;		    # Remove double-dashes in comments
+		    push(@para, $_);
+		}
+	    } elsif (/^\.\./) {		    # nroff end ignore
+		if ($comment == 0) {
+		    ;
+		} elsif ($comment == 1) {
+		    ;
+		} elsif ($comment == 2) {
+		    $comment = 1;
+		}
+	    } elsif (/^\.\\\"/) {	    # nroff comment
+		if ($comment == 0) {
+		    $comment = 1;
+		    push(@para, "<!--\n");
+		    s/^\.\\\"//;
+		} elsif ($comment == 1) {
+		    s/^\.\\\"//;
+		} elsif ($comment == 2) {
+		    ;
+		}
+		s/--/-/g;		    # Remove double-dashes in comments
+		push(@para, $_);
+	    } else {			    # Nothing to do with comments
+		if ($comment == 0) {
+		    ;
+    		} elsif ($comment == 1) {
+		    $comment = 0;
+		    push(@para, "-->\n");
+		} elsif ($comment == 2) {
+		    s/--/-/g;		    # Remove double-dashes in comments
+		}
+
+		unless ($comment) {
+		
+		    if (/^\.TH/) {	    # Title; got this already
+			next;
+		    } elsif (/^\.PD/) {	    # Para spacing; unimplemented
+			next;
+		    } elsif (/^\.RS/) {	    # Indent (one width only)
+			$changeindent = 1;
+			next;
+		    } elsif (/^\.RE/) {	    # Outdent
+			$changeindent = -1;
+			next;
+		    }
+
+		    # Line break
+
+		    s/^\.br.*/<BR>/;
+
+		    # nroff special characters
+		    
+		    s/\\(e|\\)/\\/g;			# \e, \\
+		    s/^\\&amp\;//;			# leading dot escape
+
+		    &make_hrefs(*name, *_);			
+		}
+		push(@para, $_);
+	    }
+	}
+	
+	push(@para, "-->\n") if $comment;   # Close open comment
+	
+    	# Print paragraph
+
+	if ($paratypes[$pline] eq 'P') {
+	    &font(*para);
+	    print   @para;
+	} elsif ($paratypes[$pline] eq 'I') {
+	    &font(*para);
+	    print   "<menu>\n",
+		    @para,
+		    "</menu>\n";
+	} else {			# T
+	    @tag = shift(@para);
+	    &font(*tag);
+	    &font(*para);
+	    print   "<DL compact>\n" unless $dl;
+	    print   "<DT>\n",
+		    @tag,
+		    "<DD>\n",
+		    @para;
+	    if ($paratypes[$pline + 1] ne 'T') {    # Next para not defn list
+		$dl = 0;		    # Close open defn list
+		print "</DL>\n";
+	    } else {
+		$dl = 1;		    # Leave defn list open
+	    }
+	}
+	print "<P>\n";
+	
+	# Indent/outdent the *next* para
+	
+	if ($changeindent == 1) {
+	    print "<menu>\n";
+	    $changeindent = 0;
+	} elsif ($changeindent == -1) {
+	    print "</menu>\n";
+	    $changeindent = 0;
+	}
+    }
+    1;
+}
+
+# Make one name anchor in a line; cue on fonts (.B or .I) but leave them alone
+
+sub make_name {
+
+    local(*name, *font, *file, *line) = @_;
+    local($text);
+
+    if (($text) = ($line =~ /^\.[BI]\s+([^\s\\]+)/)) {	# Found pattern
+	if ($text !~ /^-/		    # Avoid lists of options
+	&&  length($text) > 1		    # and history escapes
+	||  $text =~ /^[%:@]$/) {	    # Special pleading for %, :, @
+    
+	    # Record link unless there's already one with that name
+	    
+	    $name{"$text $font"} = "$file#$text" unless $name{"$text $font"};
+    
+	    # Put in the name anchor
+    
+	    $line =~ s/^(\.[BI]\s+)([^\s\\]+)/$1<A NAME=\"$text\">$2<\/A>/;
+	}
+    }
+    $line;
+}
+
+# Make all the href anchors in a line; cue on fonts (\fB ... \fR or
+# \fI ... \fR) but leave them alone
+
+sub make_hrefs {
+
+    local(*name, *line) = @_;
+    local(@pieces, $piece);
+
+    @pieces = split(/(\\f[BI][^\\]*\\fR)/, $line);
+    
+    $piece = 0;
+    foreach (@pieces) {
+	if (/\\f([BI])([^\\]*)\\fR/	# Found a possibility
+
+	# It's not followed by (, i.e. it's not a manpage reference
+
+	&& substr($pieces[$piece + 1], 0, 1) ne '(') {
+	    $key = "$2 $1";
+	    if ($name{$key}) {			# If there's a matching name
+		s/(\\f[BI])([^\\]*)(\\fR)/$1<A HREF=\"$name{$key}\">$2<\/A>$3/;
+	    }
+	}
+	$piece++;
+    }
+    $line = join('', @pieces);
+}
+
+# Convert nroff font escapes to HTML
+# Expects comments and breaks to be in HTML form already
+
+sub font {
+
+    local(*para) = @_;
+    local($i, $j, @begin, @end, $part, @pieces, $bold, $italic);
+
+    # Find beginning and end of each part between HTML comments
+
+    $i = 0;
+    @begin = ();
+    @end = ();
+    foreach (@para) {
+	push(@begin, $i + 1) if /^-->/ && $i != $#para;
+	push(@end, $i - 1) if /^<!--/ && $i != 0;
+	push(@begin, $i + 1) if /^<BR>/ && $i != $#para;
+	push(@end, $i - 1) if /^<BR>/ && $i != 0;
+	$i++;
+    }
+    unshift(@begin, 0) if $begin[0] > $end[0] || ! @begin;
+    push(@end, $#para) if $begin[$#begin] > $end[$#end] || ! @end;
+
+    # Fontify each part
+
+    $bold = $italic = 0;
+    foreach $i (0 .. $#begin) {
+	$* = 1;
+	$part = join('', @para[$begin[$i] .. $end[$i]]);
+	$part =~ s/^\.([BI])\s+(.*)$/\\f$1$2\\fR/g;	    # .B, .I
+	@pieces = split(/(\\f[BIR])/, $part);
+	$part = '';
+	foreach $j (@pieces) {
+	    if ($j eq '\fB') {
+		if ($italic) {
+		    $italic = 0;
+		    $part .= '</I>';
+		}
+		unless ($bold) {
+		    $bold = 1;
+		    $part .= '<B>';
+		}
+	    } elsif ($j eq '\fI') {
+		if ($bold) {
+		    $bold = 0;
+		    $part .= '</B>';
+		}
+		unless ($italic) {
+		    $italic = 1;
+		    $part .= '<I>';
+		}
+	    } elsif ($j eq '\fR') {
+		if ($bold) {
+		    $bold = 0;
+		    $part .= '</B>';
+		} elsif ($italic) {
+		    $italic = 0;
+		    $part .= '</I>';
+		}
+	    } else {
+		$part .= $j;	
+	    }
+	}
+	$* = 0;
+
+	# Close bold/italic before break
+
+	if ($para[$end[$i] + 1] =~ /^<BR>/) {
+	    if ($bold) {
+		$bold = 0;
+		$part =~ s/(\n)?$/<\/B>$1\n/;
+	    } elsif ($italic) {
+		$italic = 0;
+		$part =~ s/(\n)?$/<\/I>$1\n/;
+	    }
+	}
+
+	# Rebuild this section of @para
+
+	foreach $j ($begin[$i] .. $end[$i]) {
+	    $part =~ s/^([^\n]*(\n|$))//;
+	    $para[$j] = $1;
+	}
+    }
+
+    # Close bold/italic on last non-comment line
+    # Do this only here because fonts pass through comments
+
+    $para[$end[$#end]] =~ s/(\n)?$/<\/B>$1/ if $bold;
+    $para[$end[$#end]] =~ s/(\n)?$/<\/I>$1/ if $italic;
+}
