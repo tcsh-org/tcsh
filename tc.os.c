@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.2 1991/07/15 19:37:24 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.3 1991/07/17 13:17:16 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.os.c,v 3.2 1991/07/15 19:37:24 christos Exp christos $")
+RCSID("$Id: tc.os.c,v 3.3 1991/07/17 13:17:16 christos Exp christos $")
 
 #include "sh.h"
 #include "tw.h"
@@ -787,9 +787,7 @@ xgetwd(pathname)
 	/* look if we found root yet */
 	if (st_cur.st_ino == st_root.st_ino &&
 	    st_cur.st_dev == st_root.st_dev) {
-	    if (*pathptr != '/')
-		return ("/");
-	    (void) strcpy(pathname, pathptr);
+	    (void) strcpy(pathname, *pathptr != '/' ? "/" : pathptr);
 	    return (pathname);
 	}
 
