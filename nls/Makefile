@@ -1,3 +1,4 @@
+# $Id$
 
 SUBDIRS=	C et finnish french german greek italian ja pl russian \
 		spanish ukrainian
