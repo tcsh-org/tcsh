@@ -1,3 +1,4 @@
+ 37. Fix rmstar not to corrupt memory when we say no. (Mark Peek)
  36. V6.10.02 - 20010806
  35. polish nls locale (Pawe³ New)
  34. Fix a tcsetattr race running background jobs as the last line on an xterm
