@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.102 2002/05/16 14:03:33 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.103 2002/06/25 19:02:11 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.102 2002/05/16 14:03:33 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.103 2002/06/25 19:02:11 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -2131,7 +2131,7 @@ getremotehost()
 	host = hbuf;
 #else
     if (getpeername(SHIN, (struct sockaddr *) &saddr, &len) != -1 &&
-	saddr.ss_family == AF_INET) {
+	saddr.sin_family == AF_INET) {
 #if 0
 	if ((hp = gethostbyaddr((char *)&saddr.sin_addr, sizeof(struct in_addr),
 				AF_INET)) != NULL)
