@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.3 1991/07/18 15:23:16 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.4 1991/07/24 21:46:36 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.init.c,v 3.3 1991/07/18 15:23:16 christos Exp christos $")
+RCSID("$Id: ed.init.c,v 3.4 1991/07/24 21:46:36 christos Exp $")
 
 #include "sh.h"
 #define EXTERN			/* intern */
@@ -49,63 +49,67 @@ RCSID("$Id: ed.init.c,v 3.3 1991/07/18 15:23:16 christos Exp christos $")
  */
 # if defined(VWERSE) && !defined(VWERASE)
 #  define VWERASE VWERSE
-# endif				/* VWERSE && !VWERASE */
+# endif /* VWERSE && !VWERASE */
 
 # if defined(VDISCRD) && !defined(VDISCARD)
 #  define VDISCARD VDISCRD
-# endif				/* VDISCRD && !VDISCARD */
+# endif /* VDISCRD && !VDISCARD */
 
 # if defined(VSTRT) && !defined(VSTART)
 #  define VSTART VSTRT
-# endif				/* VSTRT && ! VSTART */
+# endif /* VSTRT && ! VSTART */
 
 # if defined(VSTAT) && !defined(VSTATUS)
 #  define VSTATUS VSTAT
-# endif				/* VSTAT && ! VSTATUS */
+# endif /* VSTAT && ! VSTATUS */
 
 # ifndef ONLRET
 #  define ONLRET 0
-# endif				/* ONLRET */
+# endif /* ONLRET */
 
 # ifndef TAB3
 #  ifdef OXTABS
 #   define TAB3 OXTABS
 #  else
 #   define TAB3 0
-#  endif				/* OXTABS */
-# endif				/* !TAB3 */
+#  endif /* OXTABS */
+# endif /* !TAB3 */
+
+# if defined(OXTABS) && !defined(XTABS)
+#  define XTABS OXTABS
+# endif /* OXTABS && !XTABS */
 
 # ifndef ONLCR
 #  define ONLCR 0
-# endif				/* ONLCR */
+# endif /* ONLCR */
 
 # ifndef IEXTEN
 #  define IEXTEN 0
-# endif				/* IEXTEN */
+# endif /* IEXTEN */
 
 # ifndef ECHOCTL
 #  define ECHOCTL 0
-# endif				/* ECHOCTL */
+# endif /* ECHOCTL */
 
 # ifndef PARENB
 #  define PARENB 0
-# endif				/* PARENB */
+# endif /* PARENB */
 
 # ifndef EXTPROC
 #  define EXTPROC 0
-# endif				/* EXTPROC */
+# endif /* EXTPROC */
 
 # ifndef FLUSHO
 #  define FLUSHO  0
-# endif				/* FLUSHO */
+# endif /* FLUSHO */
 
 # if defined(VDISABLE) && !defined(_POSIX_VDISABLE)
 #  define _POSIX_VDISABLE VDISABLE
-# endif				/* VDISABLE && ! _POSIX_VDISABLE */
+# endif /* VDISABLE && ! _POSIX_VDISABLE */
 
 # ifndef _POSIX_VDISABLE
 #  define _POSIX_VDISABLE -1
-# endif				/* _POSIX_VDISABLE */
+# endif /* _POSIX_VDISABLE */
 
 /*
  * Work around ISC's definition of IEXTEN which is
@@ -114,10 +118,10 @@ RCSID("$Id: ed.init.c,v 3.3 1991/07/18 15:23:16 christos Exp christos $")
 # ifdef ISC
 #  ifdef IEXTEN
 #   undef IEXTEN
-#  endif				/* IEXTEN */
+#  endif /* IEXTEN */
 #  define IEXTEN 0
-# endif				/* ISC */
-#endif				/* TERMIO || POSIX */
+# endif /* ISC */
+#endif /* TERMIO || POSIX */
 
 
 /* ed.init.c -- init routines for the line editor */
@@ -135,7 +139,7 @@ extern bool GotTermCaps;
 static bool edit_discipline = 0;
 union txname tx_disc;
 extern char strPOSIX[];
-#endif				/* _IBMR2 */
+#endif /* _IBMR2 */
 
 static	int	dosetkey __P((char *, char *));
 
@@ -147,13 +151,13 @@ static struct tcshtty {
 
 #ifdef TERMIO
 # define M_INPUT	0
-    { "iflag", ICRNL, (INLCR|IGNCR) },
+    { "iflag:", ICRNL, (INLCR|IGNCR) },
 # define M_OUTPUT	1
-    { "oflag", (OPOST|ONLCR), ONLRET },
+    { "oflag:", (OPOST|ONLCR), ONLRET },
 # define M_CONTROL	2
-    { "cflag", 0, 0 },
+    { "cflag:", 0, 0 },
 # define M_LINED	3
-    { "lflag", (ISIG|ICANON|ECHO|ECHOE|ECHOCTL|IEXTEN),
+    { "lflag:", (ISIG|ICANON|ECHO|ECHOE|ECHOCTL|IEXTEN),
 	       (NOFLSH|ECHOK|ECHONL|EXTPROC|FLUSHO) },
 
 #else /* GSTTY */
@@ -231,6 +235,9 @@ static struct tcshmodes {
 # ifdef	ONOCR
     { "onocr",	ONOCR,	M_OUTPUT },
 # endif /* ONOCR */
+# ifdef ONOEOT
+    { "onoeot",	ONOEOT,	M_OUTPUT },
+# endif /* ONOEOT */
 # ifdef	ONLRET
     { "onlret",	ONLRET,	M_OUTPUT },
 # endif /* ONLRET */
@@ -268,6 +275,9 @@ static struct tcshmodes {
     { "wrap",	WRAP,	M_OUTPUT },
 # endif /* WRAP */
 
+# ifdef	CIGNORE
+    { "cignore",CIGNORE,M_CONTROL },
+# endif /* CBAUD */
 # ifdef	CBAUD
     { "cbaud",	CBAUD,	M_CONTROL },
 # endif /* CBAUD */
@@ -295,9 +305,19 @@ static struct tcshmodes {
 # ifdef	CIBAUD
     { "cibaud",	CIBAUD,	M_CONTROL },
 # endif /* CIBAUD */
-# ifdef	CRTSCTS
+# ifdef CRTSCTS
+#  ifdef CCTS_OFLOW
+    { "ccts_oflow",CCTS_OFLOW,M_CONTROL },
+#  else
     { "crtscts",CRTSCTS,M_CONTROL },
+#  endif /* CCTS_OFLOW */
 # endif /* CRTSCTS */
+# ifdef CRTS_IFLOW
+    { "crts_iflow",CRTS_IFLOW,M_CONTROL },
+# endif /* CRTS_IFLOW */
+# ifdef MDMBUF
+    { "mdmbuf",	MDMBUF,	M_CONTROL },
+# endif /* MDMBUF */
 
 # ifdef	ISIG
     { "isig",	ISIG,	M_LINED },
@@ -347,10 +367,14 @@ static struct tcshmodes {
 # ifdef	IEXTEN
     { "iexten",	IEXTEN,	M_LINED },
 # endif /* IEXTEN */
-
+# ifdef	NOKERNINFO
+    { "nokerninfo",NOKERNINFO,M_LINED },
+# endif /* NOKERNINFO */
+# ifdef	ALTWERASE
+    { "altwerase",ALTWERASE,M_LINED },
+# endif /* ALTWERASE */
 
 #else /* GSTTY */
-
 
 # ifdef	TANDEM
     { "tandem",	TANDEM,	M_CONTROL },
@@ -425,7 +449,7 @@ static struct tcshmodes {
     { "nohang",	NOHANG,	M_CONTROL },
 # endif /* NOHANG */
 # ifdef	L001000
-    { "l001000",	L001000,	M_CONTROL },
+    { "l001000",L001000,M_CONTROL },
 # endif /* L001000 */
 # ifdef	CRTKIL
     { "crtkil",	CRTKIL,	M_CONTROL },
@@ -450,46 +474,46 @@ static struct tcshmodes {
     { "lcrtbs",	LCRTBS,	M_LOCAL },
 # endif /* LCRTBS */
 # ifdef	LPRTERA
-    { "lprtera",	LPRTERA,	M_LOCAL },
+    { "lprtera",LPRTERA,M_LOCAL },
 # endif /* LPRTERA */
 # ifdef	LCRTERA
-    { "lcrtera",	LCRTERA,	M_LOCAL },
+    { "lcrtera",LCRTERA,M_LOCAL },
 # endif /* LCRTERA */
 # ifdef	LTILDE
     { "ltilde",	LTILDE,	M_LOCAL },
 # endif /* LTILDE */
 # ifdef	LMDMBUF
-    { "lmdmbuf",	LMDMBUF,	M_LOCAL },
+    { "lmdmbuf",LMDMBUF,M_LOCAL },
 # endif /* LMDMBUF */
 # ifdef	LLITOUT
-    { "llitout",	LLITOUT,	M_LOCAL },
+    { "llitout",LLITOUT,M_LOCAL },
 # endif /* LLITOUT */
 # ifdef	LTOSTOP
-    { "ltostop",	LTOSTOP,	M_LOCAL },
+    { "ltostop",LTOSTOP,M_LOCAL },
 # endif /* LTOSTOP */
 # ifdef	LFLUSHO
-    { "lflusho",	LFLUSHO,	M_LOCAL },
+    { "lflusho",LFLUSHO,M_LOCAL },
 # endif /* LFLUSHO */
 # ifdef	LNOHANG
-    { "lnohang",	LNOHANG,	M_LOCAL },
+    { "lnohang",LNOHANG,M_LOCAL },
 # endif /* LNOHANG */
 # ifdef	LCRTKIL
-    { "lcrtkil",	LCRTKIL,	M_LOCAL },
+    { "lcrtkil",LCRTKIL,M_LOCAL },
 # endif /* LCRTKIL */
 # ifdef	LPASS8
     { "lpass8",	LPASS8,	M_LOCAL },
 # endif /* LPASS8 */	
 # ifdef	LCTLECH
-    { "lctlech",	LCTLECH,	M_LOCAL },
+    { "lctlech",LCTLECH,M_LOCAL },
 # endif /* LCTLECH */
 # ifdef	LPENDIN
-    { "lpendin",	LPENDIN,	M_LOCAL },
+    { "lpendin",LPENDIN,M_LOCAL },
 # endif /* LPENDIN */
 # ifdef	LDECCTQ
-    { "ldecctq",	LDECCTQ,	M_LOCAL },
+    { "ldecctq",LDECCTQ,M_LOCAL },
 # endif /* LDECCTQ */
 # ifdef	LNOFLSH
-    { "lnoflsh",	LNOFLSH,	M_LOCAL },
+    { "lnoflsh",LNOFLSH,M_LOCAL },
 # endif /* LNOFLSH */
 
 #endif /* TERMIO */
@@ -518,10 +542,10 @@ dosetty(v, t)
 	int len = 0, st = 0, cu;
 	for (m = modelist; m->m_name; m++) {
 	    if (m->m_type != i) {
-		xprintf("%s%s:", i != -1 ? "\n" : "", 
+		xprintf("%s%s", i != -1 ? "\n" : "", 
 			ttylist[m->m_type].t_name);
 		i = m->m_type;
-		st = len = strlen(ttylist[m->m_type].t_name) + 1;
+		st = len = strlen(ttylist[m->m_type].t_name);
 	    }
 
 	    x = (ttylist[i].t_setmask & m->m_value) ? '+' : '\0';
@@ -586,7 +610,7 @@ check_window_size(force)
 {
 #ifdef BSDSIGS
     sigmask_t omask;
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
     int     lins, cols;
 
     /* don't want to confuse things here */
@@ -594,7 +618,7 @@ check_window_size(force)
     omask = sigblock(sigmask(SIG_WINDOW)) & ~sigmask(SIG_WINDOW);
 #else				/* BSDSIGS */
     (void) sighold(SIG_WINDOW);
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
 
     /*
      * From: bret@shark.agps.lanl.gov (Bret Thaeler) Avoid sunview bug, where a
@@ -618,7 +642,7 @@ check_window_size(force)
     (void) sigsetmask(omask);	/* can change it again */
 #else				/* BSDSIGS */
     (void) sigrelse(SIG_WINDOW);
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
 }
 
 sigret_t
@@ -634,19 +658,19 @@ int snum;
     check_window_size(0);
 #ifndef SIGVOID
     return (snum);
-#endif
+#endif 
 }
 
-#endif				/* SIG_WINDOW */
+#endif /* SIG_WINDOW */
 
 /* LPASS8 is new in 4.3, and makes cbreak mode provide all 8 bits.  */
 #ifndef LPASS8
 # define LPASS8 0		/* we don't have it.  Too bad!! */
-#endif
+#endif 
 
 #ifndef CTRL
 # define	CTRL(c)	('c'&037)
-#endif
+#endif 
 
 void
 ed_set_tty_eight_bit()
@@ -656,26 +680,26 @@ ed_set_tty_eight_bit()
     struct termio ttynio;
 # else				/* GSTTY */
     int     ttynlb;
-# endif				/* TERMIO */
+# endif /* TERMIO */
 #else				/* POSIX */
     struct termios ttynio;
-#endif				/* POSIX */
+#endif /* POSIX */
 
 #ifndef POSIX
 # ifdef TERMIO
     (void) ioctl(SHIN, TCGETA, (ioctl_t) & ttynio);
 # else				/* GSTTY */
     (void) ioctl(SHIN, TIOCLGET, (ioctl_t) & ttynlb);
-# endif				/* TERMIO */
+# endif /* TERMIO */
 #else				/* POSIX */
     (void) tcgetattr(SHIN, &ttynio);
-#endif				/* POSIX */
+#endif /* POSIX */
 
 #if defined(TERMIO) || defined(POSIX)
     Tty_eight_bit = (ttynio.c_cflag & CSIZE) == CS8;
 #else				/* GSTTY */
     Tty_eight_bit = ttynlb & (LPASS8 | LLITOUT);
-#endif
+#endif 
 }
 
 void
@@ -689,7 +713,7 @@ ed_Init()
 
 #ifdef DEBUG_EDIT
     CheckMaps();		/* do a little error checking on key maps */
-#endif
+#endif 
 
     if (!havesetup) {		/* if we have never been called */
 	replacemode = 0;	/* start out in insert mode */
@@ -704,7 +728,7 @@ ed_Init()
 	T_Speed = nio.c_cflag & CBAUD;
 #  else
 	T_Speed = 0;
-#  endif
+#  endif 
 # else				/* GSTTY */
 	(void) ioctl(SHIN, TIOCGETP, (ioctl_t) & nb);	/* normal setup */
 	xb = nb;		/* new setup */
@@ -715,15 +739,15 @@ ed_Init()
 #  ifdef TIOCGPAGE
 	(void) ioctl(SHIN, TIOCGPAGE, (ioctl_t) & npc);
 	xpc = npc;
-#  endif				/* TIOCGPAGE */
+#  endif /* TIOCGPAGE */
 	(void) ioctl(SHIN, TIOCLGET, (ioctl_t) & nlb);
 	xlb = nlb;
 	T_Speed = nb.sg_ispeed;
-# endif				/* TERMIO */
+# endif /* TERMIO */
 #else				/* POSIX */
 	(void) tcgetattr(SHIN, &nio);
 	T_Speed = cfgetispeed(&nio);
-#endif				/* POSIX */
+#endif /* POSIX */
 
 #if defined(TERMIO) || defined(POSIX)
 	xio = nio;
@@ -744,7 +768,7 @@ ed_Init()
 	/* don't muck with c_cflag */
 	nio.c_lflag &= ~(NOFLSH | ECHOK | ECHONL | EXTPROC | FLUSHO);
 	nio.c_lflag |= (ISIG | ICANON | ECHO | ECHOE | ECHOCTL | IEXTEN);
-#endif
+#endif 
 	nio.c_iflag &= ~ttylist[M_INPUT].t_clrmask;
 	nio.c_iflag |=  ttylist[M_INPUT].t_setmask;
 
@@ -759,7 +783,7 @@ ed_Init()
 
 # ifdef IRIX3_3
 	nio.c_line = NTTYDISC;
-# endif				/* IRIX3_3 */
+# endif /* IRIX3_3 */
 	nio.c_cc[VINTR] = '\003';	/* ^C */
 	nio.c_cc[VQUIT] = '\034';	/* ^\ */
 	nio.c_cc[VERASE] = '\177';	/* ^? */
@@ -768,43 +792,43 @@ ed_Init()
 	nio.c_cc[VEOL] = _POSIX_VDISABLE;
 # ifdef VEOL2
 	nio.c_cc[VEOL2] = _POSIX_VDISABLE;
-# endif
+# endif 
 # ifdef VSWTCH
 	nio.c_cc[VSWTCH] = _POSIX_VDISABLE;
-# endif				/* VSWTCH */
+# endif /* VSWTCH */
 # ifdef VSTART
 	nio.c_cc[VSTART] = '\021';	/* ^Q */
-# endif				/* VSTART */
+# endif /* VSTART */
 # ifdef VSTOP
 	nio.c_cc[VSTOP] = '\023';	/* ^S */
-# endif				/* VSTOP */
+# endif /* VSTOP */
 # ifdef VWERASE
 	nio.c_cc[VWERASE] = '\027';	/* ^W */
-# endif				/* VWERASE */
+# endif /* VWERASE */
 # ifdef VSUSP
 	nio.c_cc[VSUSP] = CSUSP;
-# endif
+# endif 
 # ifdef VDSUSP
 	nio.c_cc[VDSUSP] = '\031';	/* ^Y */
-# endif				/* VDSUSP */
+# endif /* VDSUSP */
 # ifdef VREPRINT
 	nio.c_cc[VREPRINT] = '\022';	/* ^R */
-# endif				/* WREPRINT */
+# endif /* WREPRINT */
 # ifdef VDISCARD
 	nio.c_cc[VDISCARD] = '\017';	/* ^O */
-# endif				/* VDISCARD */
+# endif /* VDISCARD */
 # ifdef VLNEXT
 	nio.c_cc[VLNEXT] = '\026';	/* ^V */
-# endif				/* VLNEXT */
+# endif /* VLNEXT */
 # ifdef VSTATUS
 	nio.c_cc[VSTATUS] = '\024';	/* ^T */
-# endif				/* VSTATUS */
+# endif /* VSTATUS */
 # ifdef VPGOFF
 	nio.c_cc[VPGOFF] = ' ';	/* " " */
-# endif				/* VPGOFF */
+# endif /* VPGOFF */
 # ifdef VPAGE
 	nio.c_cc[VPAGE] = '\015';	/* ^M */
-# endif				/* VPAGE */
+# endif /* VPAGE */
 
 # if (defined(OREO) || defined(hpux) || defined(_IBMR2)) && !defined(hp9000s500)
 
@@ -814,7 +838,7 @@ ed_Init()
 	nlc.t_suspc = nio.c_cc[VSUSP];	/* stop process signal	 */
 #  else
 	nlc.t_suspc = '\032';	/* stop process signal	 */
-#  endif
+#  endif 
 	nlc.t_dsuspc = '\031';	/* delayed stop process signal */
 #  ifdef hpux
 	/*
@@ -829,11 +853,11 @@ ed_Init()
 	nlc.t_flushc = '\017';	/* flush output (toggles) */
 	nlc.t_werasc = '\027';	/* word erase */
 	nlc.t_lnextc = '\026';	/* literal next character */
-#  endif				/* hpux */
-# endif				/* OREO || hpux || _IBMR2 */
+#  endif /* hpux */
+# endif /* OREO || hpux || _IBMR2 */
 # ifdef SIG_WINDOW
 	(void) sigset(SIG_WINDOW, window_change);	/* for window systems */
-# endif
+# endif 
 #else	/* GSTTY */		/* V7, Berkeley style tty */
 
 
@@ -848,7 +872,7 @@ ed_Init()
 #ifdef notdef
 	    nb.sg_flags &= ~(CBREAK | RAW | LCASE | XTABS | VTDELAY | ALLDELAY);
 	    nb.sg_flags |= (ECHO | CRMOD | ANYP);
-#endif
+#endif 
 	    nb.sg_flags &= ~(ttylist[M_CONTROL].t_clrmask | XTABS);
 	    nb.sg_flags |=  ttylist[M_CONTROL].t_setmask;
 	}
@@ -856,14 +880,14 @@ ed_Init()
 #ifdef notdef
 	    nb.sg_flags &= ~(CBREAK | RAW | LCASE | VTDELAY | ALLDELAY);
 	    nb.sg_flags |= (ECHO | CRMOD | XTABS | ANYP);
-#endif
+#endif 
 	    nb.sg_flags &= ~ttylist[M_CONTROL].t_clrmask;
 	    nb.sg_flags |=  (ttylist[M_CONTROL].t_setmask | XTABS);
 	}
 #ifdef notdef
 	nlb &= ~(LPRTERA);	/* let 8-bit mode stand as set */
 	nlb |= (LCRTBS | LCRTERA | LCRTKIL);
-#endif
+#endif 
 	nlb &= ~ttylist[M_LOCAL].t_clrmask;
 	nlb |=  ttylist[M_LOCAL].t_setmask;
 
@@ -880,7 +904,7 @@ ed_Init()
 	ntc.t_brkc = '\0';	/* input delimiter (like nl) */
 # else
 	ntc.t_brkc = -1;	/* input delimiter (like nl) */
-# endif
+# endif 
 
 	nlc.t_suspc = '\032';	/* stop process signal	 */
 	nlc.t_dsuspc = '\031';	/* delayed stop process signal	 */
@@ -896,12 +920,12 @@ ed_Init()
 	npc.tps_pagec = '\040';	/* show next page " " */
 	npc.tps_pgoffc = '\015';/* Ignore paging until input ^M */
 	npc.tps_flag = 0;
-# endif				/* TIOCGPAGE */
+# endif /* TIOCGPAGE */
 
 # ifdef SIG_WINDOW
 	(void) sigset(SIG_WINDOW, window_change);	/* for window systems */
-# endif
-#endif				/* TERMIO */
+# endif 
+#endif /* TERMIO */
     }
 
     /*
@@ -929,7 +953,7 @@ ed_Init()
 
 # ifdef IRIX3_3
     xio.c_line = NTTYDISC;
-# endif				/* IRIX3_3 */
+# endif /* IRIX3_3 */
     xio.c_cc[VINTR] = '\003';	/* ^C */
     xio.c_cc[VQUIT] = '\034';	/* ^\ */
     xio.c_cc[VERASE] = '\177';	/* ^? */
@@ -938,43 +962,43 @@ ed_Init()
     xio.c_cc[VTIME] = 0;	/* don't time out */
 # ifdef VEOL2
     xio.c_cc[VEOL2] = _POSIX_VDISABLE;
-# endif				/* VEOL2 */
+# endif /* VEOL2 */
 # ifdef VSWTCH
     xio.c_cc[VSWTCH] = _POSIX_VDISABLE;
-# endif				/* VSWTCH */
+# endif /* VSWTCH */
 # ifdef VSTART
     xio.c_cc[VSTART] = '\021';	/* ^Q */
-# endif				/* VSTART */
+# endif /* VSTART */
 # ifdef VSTOP
     xio.c_cc[VSTOP] = '\023';	/* ^S */
-# endif				/* VSTOP */
+# endif /* VSTOP */
 # ifdef VWERASE
     xio.c_cc[VWERASE] = _POSIX_VDISABLE;
-# endif				/* VWERASE */
+# endif /* VWERASE */
 # ifdef VSUSP
     xio.c_cc[VSUSP] = _POSIX_VDISABLE;
-# endif				/* VSUSP */
+# endif /* VSUSP */
 # ifdef VDSUSP
     xio.c_cc[VDSUSP] = _POSIX_VDISABLE;
-# endif				/* VDSUSP */
+# endif /* VDSUSP */
 # ifdef VREPRINT
     xio.c_cc[VREPRINT] = _POSIX_VDISABLE;
-# endif				/* VREPRINT */
+# endif /* VREPRINT */
 # ifdef VDISCARD
     xio.c_cc[VDISCARD] = '\017';/* ^O */
-# endif				/* VDISCARD */
+# endif /* VDISCARD */
 # ifdef VLNEXT
     xio.c_cc[VLNEXT] = _POSIX_VDISABLE;
-# endif				/* VLNEXT */
+# endif /* VLNEXT */
 # ifdef VSTATUS
     xio.c_cc[VSTATUS] = '\024';	/* ^T */
-# endif				/* VSTATUS */
+# endif /* VSTATUS */
 # ifdef VPGOFF
     xio.c_cc[VPGOFF] = ' ';	/* " " */
-# endif				/* VPGOFF */
+# endif /* VPGOFF */
 # ifdef VPAGE
     xio.c_cc[VPAGE] = '\015';	/* ^M */
-# endif				/* VPAGE */
+# endif /* VPAGE */
 
 # if (defined(OREO) || defined(hpux) || defined(_IBMR2)) && !defined(hp9000s500)
 #  ifdef VSUSP
@@ -997,7 +1021,7 @@ ed_Init()
     xlc.t_werasc = _POSIX_VDISABLE;	/* word erase */
     xlc.t_lnextc = _POSIX_VDISABLE;	/* literal next character */
 #  endif /* hpux */
-# endif	/* OREO || hpux || _IBMR2 */
+# endif /* OREO || hpux || _IBMR2 */
 #else /* GSTTY */
     if (T_Tabs) {		/* order of &= and |= is important to XTABS */
 	xb.sg_flags &= ~(RAW | ECHO | LCASE | XTABS | VTDELAY | ALLDELAY);
@@ -1022,7 +1046,7 @@ ed_Init()
     xtc.t_brkc = '\0';		/* input delimiter (like nl) */
 # else
     xtc.t_brkc = -1;		/* input delimiter (like nl) */
-# endif
+# endif 
 
     xlc.t_suspc = -1;		/* stop process signal (was CTRL(z)) */
     xlc.t_dsuspc = -1;		/* delayed stop process signal	 */
@@ -1038,12 +1062,12 @@ ed_Init()
     xpc.tps_pagec = -1;		/* disable show next page */
     xpc.tps_pgoffc = -1;	/* disable Ignore paging until input */
     xpc.tps_flag = 0;
-# endif				/* TIOCGPAGE */
+# endif /* TIOCGPAGE */
 
     xlb &= ~LPRTERA;
     xlb |= (LCRTBS | LCRTERA | LCRTKIL);
     Tty_eight_bit = nlb & (LPASS8 | LLITOUT);
-#endif				/* TERMIO || POSIX */
+#endif /* TERMIO || POSIX */
     havesetup = 1;
 
     /* Make sure the tty has a well-defined initial state */
@@ -1086,7 +1110,7 @@ Rawmode()
 	if (ioctl(FSHTTY, TXSETLD, (ioctl_t) strPOSIX) < 0)
 	    return (-1);
     }
-#endif				/* _IBMR2 */
+#endif /* _IBMR2 */
 
 #ifndef POSIX
 # ifdef TERMIO
@@ -1096,11 +1120,11 @@ Rawmode()
     if (ioctl(SHIN, TIOCGETP, (ioctl_t) & testsgb) < 0)
 	return (-1);		/* SHIN has been closed */
     /* test the normal flags */
-# endif				/* TERMIO */
+# endif /* TERMIO */
 #else				/* POSIX */
     if (tcgetattr(SHIN, &testio) < 0)
 	return (-1);		/* SHIN has been closed */
-#endif				/* POSIX */
+#endif /* POSIX */
 
 #if defined(POSIX) || defined(TERMIO)
     Tty_eight_bit = (testio.c_cflag & CSIZE) == CS8;
@@ -1139,7 +1163,7 @@ Rawmode()
 #ifdef notdef
 	nio.c_lflag &= ~(NOFLSH | ECHOK | ECHONL | EXTPROC | FLUSHO);
 	nio.c_lflag |= (ISIG | ICANON | IEXTEN | ECHO | ECHOE | ECHOCTL);
-#endif
+#endif 
 	nio.c_lflag &= ~ttylist[M_LINED].t_clrmask;
 	nio.c_lflag |=  ttylist[M_LINED].t_setmask;
 
@@ -1156,7 +1180,7 @@ Rawmode()
 #ifdef notdef
 	nio.c_iflag &= ~(INLCR | IGNCR);
 	nio.c_iflag |= (ICRNL);
-#endif
+#endif 
 	nio.c_iflag &= ~ttylist[M_INPUT].t_clrmask;
 	nio.c_iflag |=  ttylist[M_INPUT].t_setmask;
 
@@ -1172,7 +1196,7 @@ Rawmode()
 #ifdef notdef
 	nio.c_oflag &= ~(ONLRET);
 	nio.c_oflag |= (OPOST | ONLCR);
-#endif
+#endif 
 	nio.c_oflag &= ~ttylist[M_OUTPUT].t_clrmask;
 	nio.c_oflag |=  ttylist[M_OUTPUT].t_setmask;
 
@@ -1207,59 +1231,59 @@ Rawmode()
     if (dosetkey((char *) &testio.c_cc[VSWTCH], (char *) &nio.c_cc[VSWTCH]))
 	(void) dosetkey((char *) &testio.c_cc[VSWTCH],
 			(char *) &xio.c_cc[VSWTCH]);
-# endif				/* VSWTCH */
+# endif /* VSWTCH */
 # ifdef VEOL2
     if (dosetkey((char *) &testio.c_cc[VEOL2], (char *) &nio.c_cc[VEOL2]))
 	(void) dosetkey((char *) &testio.c_cc[VEOL2], 
 			(char *) &xio.c_cc[VEOL2]);
-# endif				/* VEOL2 */
+# endif /* VEOL2 */
 # ifdef VSTART
     if (dosetkey((char *) &testio.c_cc[VSTART], (char *) &nio.c_cc[VSTART]))
 	(void) dosetkey((char *) &testio.c_cc[VSTART],
 			(char *) &xio.c_cc[VSTART]);
-# endif				/* VSTART */
+# endif /* VSTART */
 # ifdef VSTOP
     if (dosetkey((char *) &testio.c_cc[VSTOP], (char *) &nio.c_cc[VSTOP]))
 	(void) dosetkey((char *) &testio.c_cc[VSTOP], 
 			(char *) &xio.c_cc[VSTOP]);
-# endif				/* VSTOP */
+# endif /* VSTOP */
 # ifdef VWERASE
     (void) dosetkey((char *) &testio.c_cc[VWERASE], 
 		    (char *) &nio.c_cc[VWERASE]);
-# endif				/* VWERASE */
+# endif /* VWERASE */
 # ifdef VREPRINT
     (void) dosetkey((char *) &testio.c_cc[VREPRINT],
 		    (char *) &nio.c_cc[VREPRINT]);
-# endif				/* VREPRINT */
+# endif /* VREPRINT */
 # ifdef VSUSP
     (void) dosetkey((char *) &testio.c_cc[VSUSP], (char *) &nio.c_cc[VSUSP]);
-# endif				/* VSUSP */
+# endif /* VSUSP */
 # ifdef VDSUSP
     (void) dosetkey((char *) &testio.c_cc[VDSUSP], (char *) &nio.c_cc[VDSUSP]);
-# endif				/* VDSUSP */
+# endif /* VDSUSP */
 # ifdef VLNEXT
     (void) dosetkey((char *) &testio.c_cc[VLNEXT], (char *) &nio.c_cc[VLNEXT]);
-# endif				/* VLNEXT */
+# endif /* VLNEXT */
 # ifdef VDISCARD
     if (dosetkey((char *) &testio.c_cc[VDISCARD], (char *) &nio.c_cc[VDISCARD]))
 	(void) dosetkey((char *) &testio.c_cc[VDISCARD],
 			(char *) &xio.c_cc[VDISCARD]);
-# endif				/* VDISCARD */
+# endif /* VDISCARD */
 # ifdef VSTATUS
     if (dosetkey((char *) &testio.c_cc[VSTATUS], (char *) &nio.c_cc[VSTATUS]))
 	(void) dosetkey((char *) &testio.c_cc[VSTATUS],
 			(char *) &xio.c_cc[VSTATUS]);
-# endif				/* VSTATUS */
+# endif /* VSTATUS */
 # ifdef VPGOFF
     if (dosetkey((char *) &testio.c_cc[VPGOFF], (char *) &nio.c_cc[VPGOFF]))
 	(void) dosetkey((char *) &testio.c_cc[VPGOFF],
 			(char *) &xio.c_cc[VPGOFF]);
-# endif				/* VPGOFF */
+# endif /* VPGOFF */
 # ifdef VPAGE
     if (dosetkey((char *) &testio.c_cc[VPAGE], (char *) &nio.c_cc[VPAGE]))
 	(void) dosetkey((char *) &testio.c_cc[VPAGE],
 			(char *) &xio.c_cc[VPAGE]);
-# endif				/* VPAGE */
+# endif /* VPAGE */
 
 # ifndef POSIX
     if (ioctl(SHIN, TCSETAW, (ioctl_t) & xio) < 0)
@@ -1267,7 +1291,7 @@ Rawmode()
 # else /* POSIX */
     if (tcsetattr(SHIN, TCSADRAIN, &xio) < 0)
 	return (-1);
-# endif	/* POSIX */
+# endif /* POSIX */
 
 # if (defined(OREO) || defined(hpux) || defined(_IBMR2)) && !defined(hp9000s500)
     /* get and set the new local chars */
@@ -1275,7 +1299,7 @@ Rawmode()
 	return (-1);
 #ifdef VSUSP
     testlc.t_suspc = nio.c_cc[VSUSP];	/* stop process signal	 */
-#endif
+#endif 
     (void) dosetkey((char *) &testlc.t_suspc, (char *) &nlc.t_suspc);
     (void) dosetkey((char *) &testlc.t_dsuspc, (char *) &nlc.t_dsuspc);
 # ifndef hpux
@@ -1287,7 +1311,7 @@ Rawmode()
 # endif /* hpux */
     if (ioctl(SHIN, TIOCSLTC, (ioctl_t) & xlc) < 0)
 	return (-1);
-# endif	/* OREO || hpux || _IBMR2 */
+# endif /* OREO || hpux || _IBMR2 */
 
 #else /* GSTTY */		/* for BSD... */
 
@@ -1349,7 +1373,7 @@ Rawmode()
 #ifdef notdef
 	nb.sg_flags &= ~(CBREAK | RAW | LCASE | VTDELAY | ALLDELAY);
 	nb.sg_flags |= (ECHO | CRMOD | ANYP);
-#endif
+#endif 
 	nb.sg_flags &= ~ttylist[M_CONTROL].t_clrmask;
 	nb.sg_flags |=  ttylist[M_CONTROL].t_setmask;
 
@@ -1381,7 +1405,7 @@ Rawmode()
 #ifdef notdef
 	nlb &= ~(LPRTERA | LFLUSHO);
 	nlb |= (LCRTBS | LCRTERA | LCRTKIL);
-#endif
+#endif 
 	nlb &= ~ttylist[M_LOCAL].t_clrmask;
 	nlb |=  ttylist[M_LOCAL].t_setmask;
 
@@ -1397,7 +1421,7 @@ Rawmode()
     (void) dosetkey((char *) &testpc.tps_statc, (char *) &npc.tps_statc);
     (void) dosetkey((char *) &testpc.tps_pagec, (char *) &npc.tps_pagec);
     (void) dosetkey((char *) &testpc.tps_pgoffc, (char *) &npc.tps_pgoffc);
-# endif				/* TIOCGPAGE */
+# endif /* TIOCGPAGE */
 
     (void) dosetkey((char *) &testlc.t_suspc, (char *) &nlc.t_suspc);
     (void) dosetkey((char *) &testlc.t_dsuspc, (char *) &nlc.t_dsuspc);
@@ -1416,10 +1440,10 @@ Rawmode()
 # ifdef TIOCGPAGE
     if (ioctl(SHIN, TIOCSPAGE, (ioctl_t) & xpc) < 0)
 	return (-1);
-# endif				/* TIOCGPAGE */
+# endif /* TIOCGPAGE */
     if (ioctl(SHIN, TIOCLSET, (ioctl_t) & xlb) < 0)
 	return (-1);
-# endif				/* TERMIO || POSIX */
+# endif /* TERMIO || POSIX */
     Tty_raw_mode = 1;
     flush();			/* flush any buffered output */
     return (0);
@@ -1436,7 +1460,7 @@ Cookedmode()
 	    return (-1);
 	edit_discipline = 0;
     }
-#endif				/* _IBMR2 */
+#endif /* _IBMR2 */
     if (!Tty_raw_mode)
 	return (0);
 
@@ -1444,7 +1468,7 @@ Cookedmode()
     orig_intr = signal(SIGINT, SIG_IGN);	/* hold this for reseting tty */
 #else
     orig_intr = sigset(SIGINT, SIG_IGN);	/* hold this for reseting tty */
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
 #ifndef POSIX
 # ifdef TERMIO
     if (ioctl(SHIN, TCSETAW, (ioctl_t) & nio) < 0)
@@ -1452,7 +1476,7 @@ Cookedmode()
 # if (defined(OREO) || defined(hpux) || defined(_IBMR2)) && !defined(hp9000s500)
     if (ioctl(SHIN, TIOCSLTC, (ioctl_t) & nlc) < 0)
 	return (-1);
-#  endif				/* OREO || hpux || _IBMR2 */
+#  endif /* OREO || hpux || _IBMR2 */
 # else	/* GSTTY */		/* for BSD... */
     if (ioctl(SHIN, TIOCSETN, (ioctl_t) & nb) < 0)
 	return (-1);
@@ -1463,24 +1487,24 @@ Cookedmode()
 # ifdef TIOCGPAGE
     if (ioctl(SHIN, TIOCSPAGE, (ioctl_t) & npc) < 0)
 	return (-1);
-# endif				/* TIOCGPAGE */
+# endif /* TIOCGPAGE */
     if (ioctl(SHIN, TIOCLSET, (ioctl_t) & nlb) < 0)
 	return (-1);
-# endif				/* TERMIO */
+# endif /* TERMIO */
 #else				/* POSIX */
     if (tcsetattr(SHIN, TCSADRAIN, &nio) < 0)
 	return (-1);
 # if defined(OREO) || defined(hpux) || defined(_IBMR2)
     if (ioctl(SHIN, TIOCSLTC, (ioctl_t) & nlc) < 0)
 	return (-1);
-# endif				/* OREO || hpux || _IBMR2 */
-#endif				/* POSIX */
+# endif /* OREO || hpux || _IBMR2 */
+#endif /* POSIX */
     Tty_raw_mode = 0;
 #ifdef BSDSIGS
     (void) signal(SIGINT, orig_intr);	/* take these again */
 #else
     (void) sigset(SIGINT, orig_intr);	/* take these again */
-#endif				/* BSDSIGS */
+#endif /* BSDSIGS */
     return (0);
 }
 
@@ -1499,7 +1523,7 @@ ResetInLine()
     Argument = 1;
 #ifdef notdef
     LastKill = KillBuf;		/* no kill buffer */
-#endif
+#endif 
     LastCmd = F_UNASSIGNED;	/* previous command executed */
     MacroLvl = -1;		/* no currently active macros */
 }
@@ -1529,7 +1553,7 @@ Load_input_line()
 	    PushMacro(Input_Line);
 	}
     }
-#endif
+#endif 
     return chrs > 0;
 }
 
@@ -1551,10 +1575,10 @@ QuoteModeOn()
     struct sgttyb rawb;
 # else
     struct termio rawb;
-# endif				/* TERMIO */
+# endif /* TERMIO */
 #else				/* POSIX */
     struct termios rawb;
-#endif				/* POSIX */
+#endif /* POSIX */
 
     if (MacroLvl >= 0)
 	return;
@@ -1569,7 +1593,7 @@ QuoteModeOn()
 # else				/* POSIX */
     if (tcsetattr(SHIN, TCSADRAIN, &rawb) < 0)
 	return;
-# endif				/* POSIX */
+# endif /* POSIX */
 #else				/* GSTTYB */
 
     rawb = xb;
@@ -1577,7 +1601,7 @@ QuoteModeOn()
     rawb.sg_flags |= RAW;
     if (ioctl(SHIN, TIOCSETN, (ioctl_t) & rawb) < 0)
 	return;
-#endif				/* TERMIO || POSIX */
+#endif /* TERMIO || POSIX */
     Tty_quote_mode = 1;
     return;
 }
@@ -1595,10 +1619,10 @@ QuoteModeOff()
 # else				/* POSIX */
     if (tcsetattr(SHIN, TCSADRAIN, &xio) < 0)
 	return;
-# endif				/* POSIX */
+# endif /* POSIX */
 #else				/* GSTTYB */
     if (ioctl(SHIN, TIOCSETN, (ioctl_t) & xb) < 0)
 	return;
-#endif				/* !TERMIO && !POSIX */
+#endif /* !TERMIO && !POSIX */
     return;
 }
