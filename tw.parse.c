@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -40,7 +40,7 @@
 #include "config.h"
 #ifndef lint
 static char *rcsid() 
-    { return "$Id: tw.parse.c,v 2.0 1991/03/26 02:59:29 christos Exp $"; }
+    { return "$Id: tw.parse.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
 #endif
 
 #include "sh.h"
@@ -669,7 +669,7 @@ t_search(word, wp, command, max_word_length, looking_for_command, list_max)
 	    !(nd = dnormalize(*tilded_dir ? tilded_dir : STRdot)) ||
 	    ((dir_fd = opendir(short2str(nd))) == NULL)) {
 	    xfree((ptr_t) nd);
-	    if (SearchNoDirErr)
+	    if (command == SPELL || SearchNoDirErr)
 		return (-2);
 	    xprintf("\n%s unreadable\n",
 		    *tilded_dir ? short2str(tilded_dir) :
