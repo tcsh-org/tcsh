@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.screen.c,v 3.30 1993/07/03 23:47:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.screen.c,v 3.31 1993/08/11 16:25:52 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.30 1993/07/03 23:47:53 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.31 1993/08/11 16:25:52 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -755,6 +755,16 @@ SetArrowKeys(name, fun, type)
     return -1;
 }
 
+int
+IsArrowKey(name)
+    Char *name;
+{
+    int i;
+    for (i = 0; i < 4; i++)
+	if (Strcmp(name, arrow[i].name) == 0)
+	    return 1;
+    return 0;
+}
 
 int
 ClearArrowKeys(name)

@@ -1,17 +1,14 @@
 #!/usr/local/bin/perl
-# $Id$
+# $Id: tcsh.man2html,v 1.1 1994/06/14 02:30:55 christos Exp christos $
 
 # tcsh.man2html
 # Dave Schweisguth <dcs@proton.chem.yale.edu>
 
-# Usage: tcsh.man2html [name of tcsh manpage]
+# Usage: tcsh.man2html [-s] [name of tcsh manpage]
 #
 # Reads from pipe or looks for default 'tcsh.man' if no file given
 # Creates tcsh.html; tcsh.html/top.html is the entry point
-
-# History:
-#
-# 11 Jun 94	First release
+# With -s, uses short (8 + 3) but less descriptive filenames
 
 # Notes:
 #
@@ -25,19 +22,30 @@
 # Designed with X Mosaic in mind and tested lightly with lynx. I've punted on
 # HTML's lack of a .PD equivalent and lynx's different <menu> handling.
 
+# Emulate #!/usr/local/bin/perl on systems without #!
+
+eval '(exit $?0)' && eval 'exec /usr/local/bin/perl -S $0 ${1+"$@"}'
+& eval 'exec /usr/local/bin/perl -S $0 $argv:q' if 0;
+
 ### Constants
 
 # Setup
 
-($whatami = $0)	=~ s|.*/||;		# `basename $0`
+($whatami = $0)	=~ s|.*/||;	# `basename $0`
 $isatty		= -t STDIN;
 
 # Configuration
 
-$dir		= 'tcsh.html';		# Directory in which to put the pieces
-$outfile	= 'tcsh.man';		# Default input file and copy of input file
-$script		= $whatami;		# Copy of script
-$topfile	= 'top.html';		# Top-level HTML file
+$shortfiles	= 0;		# Use long filenames
+
+$dir		= 'tcsh';	# Directory in which to put the pieces
+				#   (suffix added later)
+$header		= 'header';	# HTML file for initial comments
+				#   (suffix added later)
+$outfile	= 'tcsh.man';	# Default input file and copy of input file
+$script		= $whatami;	# Copy of script; filename length must be OK
+$topfile	= 'top';	# Top-level HTML file
+				#   (suffix added later)
 
 # Sections to inline in the top page
 
@@ -58,6 +66,16 @@ $topfile	= 'top.html';		# Top-level HTML file
 
 # Parse args
 
+while (($first, $rest) = ($ARGV[0] =~ /^-(.)(.*)/)) {
+    if ($rest eq '') {
+	shift;
+    } else {
+	$ARGV[0] = "-$rest";
+    }
+    if ($first eq 's')		{ $shortfiles = 1; }
+    else { die "$whatami: -$first is not an option.\n"; }
+}
+
 if (@ARGV == 0) {
     if ($isatty) {
         $infile = $outfile;		# Default input file if interactive
@@ -69,6 +87,13 @@ if (@ARGV == 0) {
 } else {
     die "$whatami: Please specify one and only one file.\n";
 }
+
+# Decide on HTML suffix and append it to filenames
+
+$html = $shortfiles ? 'htm' : 'html';	# Max 3-character extension
+$dir .= ".$html";			# Directory in which to put the pieces
+$header .= ".$html";			# HTML file for initial comments
+$topfile .= ".$html";			# Top-level HTML file
 
 # Check for input file
 
@@ -112,18 +137,18 @@ close MAN;
 $comment = 0;			    # 0 for text, 1 for ignored text
 @sectionlines = (0);		    # First line of section
 @sectiontypes = (0);		    # H or S
-@sectiontexts = ('header');	    # Text of section heading
-@sectionfiles = ('header.html');    # Filename in which to store section
+@sectiontexts = ('Header');	    # Text of section heading
+@sectionfiles = ($header);	    # Filename in which to store section
 %name = ();			    # Array of name anchors
 $font = '';		    	    # '' to not make names, 'B' or 'I' to do so
 
 $line = 0;
 foreach (@man) {
-    if (/^\.ig/) {			# Start ignoring
+    if (/^\.ig/) {		    # Start ignoring
 	$comment = 1;
-    } elsif (/^\.\./) {			# Stop ignoring
+    } elsif (/^\.\./) {		    # Stop ignoring
 	$comment = 0;
-    } elsif (! $comment) {		# Not in .ig'ed section; do stuff
+    } elsif (! $comment) {	    # Not in .ig'ed section; do stuff
 	
 	# Get title
 	
@@ -146,8 +171,14 @@ foreach (@man) {
 	    $text =~ s/\s*$//;		    # Remove trailing whitespace
 	    push(@sectiontexts, $text);	    # Title of section (key for href)
 	    $text =~ s/\s*\(\+\)$//;	    # Remove (+)
-	    $file = "$text.html";
-	    $file =~ s/[\s\/]+/_/g;	    # Replace whitespace and / with _
+	    if ($shortfiles) {
+		$file = $#sectionlines;	    # Short filenames; use number
+	    } else {
+		$file = $text;		    # Long filenames; use title
+		$file =~ s/[\s\/]+/_/g;	    # Replace whitespace and / with _
+		
+	    }
+	    $file .= ".$html";
 	    push(@sectionfiles, $file);	    # File in which to store section
 	    $name{"$text B"} = $file;	    # Nucleus of href anchor
 	    
@@ -207,8 +238,9 @@ foreach $section (1 .. $#sectionlines) {
 print <<EOP;
 </H2>
 <HR>
-Here are the <A HREF="$outfile">original nroff manpage</A> (175K),
-the <A HREF="$script">Perl script</A> which converted it to HTML
+Here are the <A HREF="$outfile">nroff manpage</A> (175K)
+from which this HTML version was generated,
+the <A HREF="$script">Perl script</A> which did the conversion
 and the <A HREF="file://tesla.ee.cornell.edu/pub/tcsh/">
 complete source code</A> for <I>tcsh</I>.
 <HR>
@@ -382,6 +414,7 @@ sub printsectionbody {
 		    # nroff special characters
 		    
 		    s/\\(e|\\)/\\/g;			# \e, \\
+		    s/^\\(\s)/$1/;			# leading space escape
 		    s/^\\&amp\;//;			# leading dot escape
 
 		    &make_hrefs(*name, *_);			
@@ -441,13 +474,16 @@ sub make_name {
     local($text);
 
     if (($text) = ($line =~ /^\.[BI]\s+([^\s\\]+)/)) {	# Found pattern
-	if ($text !~ /^-/		    # Avoid lists of options
-	&&  length($text) > 1		    # and history escapes
-	||  $text =~ /^[%:@]$/) {	    # Special pleading for %, :, @
-    
-	    # Record link unless there's already one with that name
+
+	if (
+	    $text !~ /^-/		    # Avoid lists of options
+	    && (length($text) > 1	    # and history escapes
+		||  $text =~ /^[%:@]$/)	    # Special pleading for %, :, @
+	    && ! $name{"$text $font"}	    # Skip if there's one already
+	) {
+	    # Record link
 	    
-	    $name{"$text $font"} = "$file#$text" unless $name{"$text $font"};
+	    $name{"$text $font"} = "$file#$text";
     
 	    # Put in the name anchor
     
@@ -498,14 +534,20 @@ sub font {
     @begin = ();
     @end = ();
     foreach (@para) {
-	push(@begin, $i + 1) if /^-->/ && $i != $#para;
-	push(@end, $i - 1) if /^<!--/ && $i != 0;
-	push(@begin, $i + 1) if /^<BR>/ && $i != $#para;
-	push(@end, $i - 1) if /^<BR>/ && $i != 0;
+	push(@begin, $i + 1) if /^-->/ || /^<BR>/;
+	push(@end, $i - 1) if /^<!--/ || /^<BR>/;
 	$i++;
     }
-    unshift(@begin, 0) if $begin[0] > $end[0] || ! @begin;
-    push(@end, $#para) if $begin[$#begin] > $end[$#end] || ! @end;
+    if ($para[0] =~ /^<!--/ || $para[0] =~ /^<BR>/) {
+	shift(@end);
+    } else {
+	unshift(@begin, 0);	# Begin at the beginning
+    }
+    if ($para[$#para] =~ /^-->/ || $para[$#para] =~ /^<BR>/) {
+	pop(@begin);
+    } else {
+	push(@end, $#para);	# End at the end
+    }
 
     # Fontify each part
 

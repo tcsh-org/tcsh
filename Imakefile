@@ -1,7 +1,7 @@
 /**/#
-/**/# $Id: Imakefile,v 1.49 1994/06/14 02:30:55 christos Exp $
+/**/# $Id: Imakefile,v 1.50 1994/06/18 21:37:29 christos Exp $
 /**/#
-/**/# Imakefile for for tcsh 6.04
+/**/# Imakefile for for tcsh 6.05
 /**/# Marc Horowitz, MIT SIPB
 /**/#
 
@@ -407,7 +407,7 @@ INCLUDES = -I. MyIncludes
 LDLIBS = MyLibs
 
 SUF = o
-VERSION = 6.04
+VERSION = 6.05
 
 SHSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.exp.c sh.file.c sh.func.c sh.glob.c sh.hist.c sh.init.c \

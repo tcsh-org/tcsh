@@ -38,6 +38,10 @@
 .\"   variables and italic for commands (externals, builtins, aliases, and
 .\"   editor commands) and arguments to commands.
 .\" 
+.\" - Be careful with the .B and .I macros: they only handle a limited number
+.\"   of words. Work around this with \fB and \fI, but only if absolutely
+.\"   necessary, since tcsh.man2html uses .B/.I to find name anchors.
+.\" 
 .\" - Indent in multiples of 4, usually 8.
 .\" 
 .\" - Use `', not '' or "", except of course in shell syntax examples.
@@ -65,12 +69,12 @@
 .\"   new features in NEW FEATURES and referenced external commands in SEE
 .\"   ALSO.
 .\" 
-.\" - The nroff-to-HTML conversion script depends heavily on the specific
-.\"   nroff commands used in the manpage when the script was written.
-.\"   Please stick closely to the style used here if you can. In particular,
-.\"   please avoid introducing nroff commands not already used herein.
+.\" - tcsh.man2html depends heavily on the specific nroff commands used in the
+.\"   manpage when the script was written. Please stick closely to the style
+.\"   used here if you can. In particular, please don't use nroff commands
+.\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "18 June 1994" "Cornell 6.04.17"
+.TH TCSH 1 "19 June 1994" "Cornell 6.05.00"
 .SH NAME
 tcsh - C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -185,9 +189,9 @@ A login shell begins by executing commands from the system files
 It then executes commands from files in the user's \fBhome\fR directory:
 first \fI~/.tcshrc\fR (+)
 or, if \fI~/.tcshrc\fR is not found, \fI~/.cshrc\fR,
-then \fI~/.history\fR (or the value of \fBhistfile\fR),
+then \fI~/.history\fR (or the value of the \fBhistfile\fR shell variable),
 then \fI~/.login\fR,
-and finally \fI~/.cshdirs\fR (or the value of \fBdirsfile\fR) (+).
+and finally \fI~/.cshdirs\fR (or the value of the \fBdirsfile\fR shell variable) (+).
 The shell may read \fI~/.login\fR before instead of after
 \fI~/.tcshrc\fR or \fI~/.cshrc\fR and \fI~/.history\fR if so compiled;
 see the \fBversion\fR shell variable. (+)
@@ -214,7 +218,7 @@ in the line.
 .PP
 One can log out by typing `^D' on an empty line, `logout' or `login' or
 via the shell's autologout mechanism (see the \fBautologout\fR shell variable).
-When a login shell terminates it sets the shell variable \fBlogout\fR to
+When a login shell terminates it sets the \fBlogout\fR shell variable to
 `normal' or `automatic' as appropriate, then
 executes commands from the files
 \fI/etc/csh.logout\fR and \fI~/.logout\fR. The shell may drop DTR on logout
@@ -1833,14 +1837,14 @@ not warn you a second time, and the suspended jobs will be terminated.
 .SS "Automatic, periodic and timed events (+)"
 There are various ways to run commands and take other actions automatically
 at various times in the "life cycle" of the shell. They are summarized here,
-and described in detail under the appropriate builtin commands, shell
-variables and special aliases.
+and described in detail under the appropriate \fBBuiltin commands\fR,
+\fBSpecial shell variables\fR and \fBSpecial aliases\fR.
 .PP
 The \fIsched\fR builtin command puts commands in a scheduled-event list,
 to be executed by the shell at a given time.
 .PP
-The \fIbeepcmd\fR, \fIcwdcmd\fR, \fIperiodic\fR and \fIprecmd\fR special
-aliases can be set, respectively, to execute commands when the shell wants
+The \fIbeepcmd\fR, \fIcwdcmd\fR, \fIperiodic\fR and \fIprecmd\fR
+\fBSpecial aliases\fR can be set, respectively, to execute commands when the shell wants
 to ring the bell, when the working directory changes, every \fBtperiod\fR
 minutes and before each prompt.
 .PP
@@ -2066,12 +2070,13 @@ For the function key form to work, the function key prefix must be
 bound to \fIsequence-lead-in\fR and \fIstring\fR must not contain that prefix.
 ..
 .PP
-.B bindkey \fR[\fB-l\fR|\fB-e\fR|\fB-v\fR] (+)
+.B bindkey \fR[\fB--\fR|\fB-l\fR|\fB-e\fR|\fB-v\fR] (+)
 .br
-.B bindkey \fR[\fB-a\fR] [\fB-b\fR\ [\fB-k\fR] [\fB-d\fR|\fB-r\fR] \fIkey \fR(+)
+.B bindkey \fR[\fB-a\fR] [\fB-b\fR] [\fB-k\fR] [\fB-d\fR|\fB-r\fR] \fIkey \fR(+)
 .PD 0
 .TP 8
-.B bindkey \fR[\fB-a\fR] [\fB-b\fR\] [\fB-k\fR] [\fB-c\fR|\fB-s\fR] \fIkey command \fR(+)
+\fBbindkey \fR[\fB-a\fR] [\fB-b\fR] [\fB-k\fR] [\fB-c\fR|\fB-s\fR] \fIkey command \fR(+)
+.\" .B macro can't take too many words, so I used \fB in the previous tag
 Without options, the first form lists all bound keys and the editor command to which each is bound,
 the second form lists the editor command to which \fIkey\fR is bound and
 the third form binds the editor command \fIcommand\fR to \fIkey\fR.
@@ -2097,10 +2102,6 @@ Binds all keys to the standard \fIvi\fR(1)-like bindings.
 Lists or changes key-bindings in the alternative key map.
 This is the key map used in \fIvi\fR command mode.
 .TP 4
-.B -k
-\fIkey\fR is interpreted as a symbolic arrow key name, which may be one of
-`down', `up', `left' or `right'.
-.TP 4
 .B -b
 \fIkey\fR is interpreted as 
 a control character written ^\fIcharacter\fR (e.g. `^A') or
@@ -2108,6 +2109,18 @@ C-\fIcharacter\fR (e.g. `C-A'),
 a meta character written M-\fIcharacter\fR (e.g. `M-A'),
 a function key written F-\fIstring\fR (e.g. `F-string'),
 or an extended prefix key written X-\fIcharacter\fR (e.g. `X-A').
+.TP 4
+.B -k
+\fIkey\fR is interpreted as a symbolic arrow key name, which may be one of
+`down', `up', `left' or `right'.
+.TP 4
+.B -d
+Restores \fIkey\fR's default binding.
+.TP 4
+.B -r
+Removes \fIkey\fR's binding.
+Be careful: `bindkey -r' does \fInot\fR bind \fIkey\fR to
+\fIself-insert-command\fR (q.v.), it unbinds \fIkey\fR completely.
 .TP 4
 .B -c
 \fIcommand\fR is interpreted as a shell or external command instead of as an
@@ -2117,14 +2130,6 @@ editor command.
 \fIcommand\fR is taken as a literal string and treated as terminal input
 when \fIkey\fR is typed. Bound keys in \fIcommand\fR are themselves
 reinterpreted, and this continues for ten levels of interpretation.
-.TP 4
-.B -d
-Restores \fIkey\fR's default binding.
-.TP 4
-.B -r
-Removes \fIkey\fR's binding.
-Be careful: `bindkey -r' does \fInot\fR bind \fIkey\fR to
-\fIself-insert-command\fR (q.v.), it unbinds \fIkey\fR completely.
 .PD
 .PP
 \fIkey\fR may be a single character or a string.
@@ -4512,7 +4517,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.04.17 (Cornell) 94/18/06.
+This manual documents tcsh 6.05.00 (Cornell) 94/19/06.
 .SH AUTHORS
 .PD 0
 .TP 2
@@ -4546,7 +4551,7 @@ Fast storage allocator routines
 Chris Grevstad, TRW, 1987
 Incorporated 4.3BSD \fIcsh\fR into \fItcsh\fR
 .TP 2
-Christos S. Zoulas, Cornell U. EE Dept., 1987-93
+Christos S. Zoulas, Cornell U. EE Dept., 1987-94
 Ports to HPUX, SVR2 and SVR3, a SysV version of getwd.c, SHORT_STRINGS support
 and a new version of sh.glob.c
 .TP 2
@@ -4657,10 +4662,10 @@ Tim P. Starrin, NASA Langley Research Center Operations, 1993
 Read-only variables
 .TP 2
 Dave Schweisguth, Yale University, 1993
-New manpage
+New manpage and tcsh.man2html
 .TP 2
 Larry Schwimmer, Stanford University, 1993
-AFS and HESIOD patches.
+AFS and HESIOD patches
 .TP 2
 Luke Mewburn, RMIT University, 1994
 Enhanced directory printing in prompt

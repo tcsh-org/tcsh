@@ -7,7 +7,13 @@ This version of tcsh has the following new things:
 * new filetest builtin
 * new hup builtin
 * =x obeys nonomatch
-XXX: add the rest
+* tcsh.man2html nroff to HTML converter for the tcsh manpage
+* prompt is now %# by default.
+* $REMHOST contains the name of the remote host (optional)
+* $HOSTTYPE is going away. New variables $OSTYPE, $MACHTYPE, $VENDOR similar
+  to the gnu ones.
+* $< can be interrupted and takes modifiers. Does not quote args by default
+  like csh.
 
 6.04
 * Variable modifiers do not stop processing after the first one fails

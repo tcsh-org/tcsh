@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.22 1994/03/31 22:36:44 christos Exp christos $
+# $Id: complete.tcsh,v 1.23 1994/05/07 18:51:25 christos Exp christos $
 # example file using the new completion code
 #
 
@@ -174,7 +174,7 @@ if ($?complete) then
 
     # More completions from waz@quahog.nl.nuwc.navy.mil (Tom Warzeka)
     # you may need to set the following variables for your host
-    set _elispdir = /usr/local/lib/emacs/19.22/lisp  # GNU Emacs lisp directory
+    set _elispdir = /usr/local/lib/emacs/19.25/lisp  # GNU Emacs lisp directory
     set _maildir = /var/spool/mail  # Post Office: /var/spool/mail or /usr/mail
     set _ypdir  = /var/yp	# directory where NIS (YP) maps are kept
     set _domain = `domainname`
@@ -272,8 +272,8 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
     complete ps	        c/-t/x:'<tty>'/ c/-/"(a c C e g k l S t u v w x)"/ \
 			n/-k/x:'<kernel>'/ N/-k/x:'<core_file>'/ n/*/x:'<PID>'/
 
-    complete chown	c/-/"(f R)"/ c/*./g/ n/-/u/. p/1/u/. n/*/f/
-    complete chgrp	c/-/"(f R)"/         n/-/g/  p/1/g/  n/*/f/
+    complete chown	c/-/"(f R)"/ C/./f/ c/*./g/ n/-/u/. p/1/u/. n/*/f/
+    complete chgrp	c/-/"(f R)"/                n/-/g/  p/1/g/  n/*/f/
 
     complete cat	c/-/"(b e n s t u v)"/ n/*/f/
     complete mv		c/-/"(f i)"/ n/-/f/ N/-/d/ p/1/f/ p/2/d/ n/*/f/

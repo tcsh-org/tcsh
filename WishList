@@ -4,11 +4,6 @@
 
 * Fix history in loops.
 
-* Fix loops so that they work inside aliases.
-
-* Fix variable substitutions so that can behave recursively; i.e. I want
-  to be able to say echo $foo:t:e
-
 * New idea.
 	Lots of people seem to like the idea to be able to do sed type
 	operations on shell variables. Maybe we can extend the syntax
@@ -36,3 +31,6 @@
   fails).
 
 * Fix the correct code... How to do that involves A.I....
+
+* Rewrite the whole thing. It has taken to much beating over the years...
+

@@ -1,17 +1,14 @@
-This is tcsh version 6.04.  Tcsh is a version of the Berkeley
+This is tcsh version 6.05.  Tcsh is a version of the Berkeley
 C-Shell, with the addition of: a command line editor, command and file
 name completion, listing, etc. and a bunch of small additions to the
 shell itself.
 
-Tcsh runs on BSD 4.2 and 4.3 Unix, Mach, Sun Unix (tested on 3.0, 3.2,
-3.4, 4.0, 4.1.x), Pyramid OS/X (in the bsd universe), Encore UMAX 4.2,
-Apple A/UX 2.0, AT&T 3b machines under SysV.2 and V.3, HP/UX 6.2 on
-series 300 and 800 machines and all HP machines under HP/UX 6.5, 7.0
-and 8.0 and will probably work with a bit of tinkering on anything else
-either BSD or SysV-ish. It also runs under VMS/POSIX and OS/2+emx.
-Note that the above list is incomplete, and the place to look is the
-config directory to find a configuration file
-appropriate for your machine.
+Tcsh has been ported to most unix variants, and can be tinkered to work
+in unix systems that it has not ported yet. See the Ported file for
+a more complete list of ported systems and in the config directory for
+a configuration file that matches your system.
+Tcsh also runs under VMS/POSIX and OS/2+emx; the OS/2 port is not
+complete yet.
 
 Feel free to use it.  These changes to csh may only be included in a
 commercial product if the inclusion or exclusion does not change the
@@ -22,8 +19,8 @@ names of the authors from the source code or documentation).
 
 To install tcsh:
 
-0)  If you are using imake, try xmkmf. Otherwise copy Makefile.std to
-    Makefile.
+0)  If you are using imake, try xmkmf and goto step 3.
+    If imake does not work, copy Makefile.std to Makefile.
 
 1)  Look at the Makefile and make sure that you are using the right
     compilation flags.
@@ -41,7 +38,6 @@ To install tcsh:
     but others may vary (such as A/UX or HPUX).  On a pyramid, compile
     in the UCB universe even if you are running under the ATT universe
     usually; it will work anyway, and you get job control for free.
-
 
 3)  Look at config_f.h, and enable or disable any features you want.
     It is configured the way I like it, but you may disagree.
@@ -63,7 +59,9 @@ To install tcsh:
 6)  make
 
 7)  Read the documentation while you are waiting.  The file tcsh.man
-    is in standard [nt]roff -man format.
+    is in standard [nt]roff -man format. If you like, you can run the
+    tcsh.man2html script (requires Perl) to generate an HTML version of
+    the manpage which you can read with Mosaic, lynx or other HTML browser.
 
 8)  Test tcsh to see that it has compiled correctly.  The history
     command should give a time stamp on every entry.  Typing normal

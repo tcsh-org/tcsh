@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.decls.h,v 3.18 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.decls.h,v 3.19 1994/05/07 18:51:25 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -92,6 +92,7 @@ extern	void	TellTC			__P((char *));
 extern	void	SetTC			__P((char *, char *));
 extern	void	EchoTC			__P((Char **));
 extern	int 	SetArrowKeys		__P((Char *, XmapVal *, int));
+extern	int 	IsArrowKey		__P((Char *));
 extern	void	ResetArrowKeys		__P((void));
 extern	void	DefaultArrowKeys	__P((void));
 extern	int 	ClearArrowKeys		__P((Char *));
