@@ -1,3 +1,5 @@
+ 64. V6.07.08 - 19980629
+ 63. add config.h.in (Kaveh)
  62. win32 updates (Amol)
  61. warning and portability cleanups on the new changes (Kaveh)
  60. V6.07.07 - 19980628
@@ -70,6 +72,7 @@
   3. HP/UX 10.0 fix for filesize resource limit; don't scale by 512 anymore.
   2. Workaround for TIOCSTAT for NetBSD from lukem@netbsd.org
   1. Return exit status from 0..255 not -128...127, as POSIX mandates.
+
 V6.07.02, 10/27/96
  58. More configure fixes from Kaveh.
  57. Fix histdup=erase again: Don't renumber events, or access uninitialized
