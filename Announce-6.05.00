@@ -1,0 +1,46 @@
+
+Hello,
+
+I am pleased to announce that tcsh-6.05 is finally available.
+
+- New manual page
+- New html manual
+- New environment variables OSTYPE VENDOR MACHTYPE REMOTEHOST
+- New pathname completions
+- New hup builtin
+- New filetest builtin and file operators
+- New $histdup variable to eliminate duplicate history entries.
+- New scheduled events formatting.
+
+- Old bind, aliases and and other obsolete builtins removed.
+
+And as always:
+
+- Many, many, many bug fixes.
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most unix machines, VMS_POSIX, and it compiles
+and is very close to working on OS/2 EMX.
+
+You can get tcsh from tesla.ee.cornell.edu:/pub/tcsh/tcsh-6.05.tar.gz
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you
+can get it from prep.ai.mit.edu or other GNU mirrors, or ask tesla to
+unpack it on the fly using 'get tcsh-6.05.tar'.
+
+For the DNS impaired: tesla.ee.cornell.edu == 128.84.253.11
+
+I would like to thank:
+
+    o the Cornell EE Department for giving tcsh a home for the past 7 years.
+    o everyone who sent bug reports
+    o the beta testers who survived all 17 beta releases
+    o and the following contributors:
+
+	Bruce Sterling 		- most code enhancements and cleanups
+	Dave Schweisguth	- new man page and html filter
+	Michael Schroeder	- rewrote the routine from hell [bgetc()]
+
+christos
