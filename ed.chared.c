@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.67 2001/05/20 20:56:22 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.68 2001/05/20 21:02:37 kim Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -76,7 +76,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.67 2001/05/20 20:56:22 kim Exp $")
+RCSID("$Id: ed.chared.c,v 3.68 2001/05/20 21:02:37 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -174,9 +174,9 @@ c_alternativ_key_map(state)
 
 static void
 c_insert(num)
-    register int num;
+    int num;
 {
-    register Char *cp;
+    Char *cp;
 
     if (LastChar + num >= InputLim)
 	return;			/* can't go past end of buffer */
@@ -190,9 +190,9 @@ c_insert(num)
 
 void
 c_delafter(num)	
-    register int num;
+    int num;
 {
-    register Char *cp, *kp = NULL;
+    Char *cp, *kp = NULL;
 
 #if defined(DSPMBYTE)
     Char *wkcp;
@@ -257,9 +257,9 @@ c_delafter(num)
 
 void
 c_delbefore(num)		/* delete before dot, with bounds checking */
-    register int num;
+    int num;
 {
-    register Char *cp, *kp = NULL;
+    Char *cp, *kp = NULL;
 
 #if defined(DSPMBYTE)
     Char *nowcur, *wkcp;
@@ -318,12 +318,12 @@ c_delbefore(num)		/* delete before dot, with bounds checking */
 
 static Char *
 c_preword(p, low, n, delim)
-    register Char *p, *low, *delim;
-    register int n;
+    Char *p, *low, *delim;
+    int n;
 {
   while (n--) {
-    register Char *prev = low;
-    register Char *new;
+    Char *prev = low;
+    Char *new;
 
     while (prev < p) {		/* Skip initial non-word chars */
       if (!Strchr(delim, *prev) || *(prev-1) == (Char)'\\')
@@ -366,7 +366,7 @@ c_preword(p, low, n, delim)
  */
 static int
 c_to_class(ch)
-register int  ch;
+int  ch;
 {
     if (Isspace(ch))
         return C_CLASS_WHITE;
@@ -379,8 +379,8 @@ register int  ch;
 
 static Char *
 c_prev_word(p, low, n)
-    register Char *p, *low;
-    register int n;
+    Char *p, *low;
+    int n;
 {
     p--;
 
@@ -401,7 +401,7 @@ c_prev_word(p, low, n)
     }
   
     while (n--) {
-        register int  c_class;
+        int  c_class;
 
         if (p < low)
             break;
@@ -428,8 +428,8 @@ c_prev_word(p, low, n)
 
 static Char *
 c_next_word(p, high, n)
-    register Char *p, *high;
-    register int n;
+    Char *p, *high;
+    int n;
 {
     if (!VImode) {
 	while (n--) {
@@ -445,7 +445,7 @@ c_next_word(p, high, n)
     }
 
     while (n--) {
-        register int  c_class;
+        int  c_class;
 
         if (p >= high)
             break;
@@ -471,8 +471,8 @@ c_next_word(p, high, n)
 
 static Char *
 c_nexword(p, high, n)
-    register Char *p, *high;
-    register int n;
+    Char *p, *high;
+    int n;
 {
     while (n--) {
 	while ((p < high) && !Isspace(*p)) 
@@ -505,12 +505,12 @@ c_nexword(p, high, n)
 
 static Char *
 c_number(p, num, dval)
-    register Char *p;
-    register int *num;
-    register int dval;
+    Char *p;
+    int *num;
+    int dval;
 {
-    register int i;
-    register int sign = 1;
+    int i;
+    int sign = 1;
 
     if (*++p == '^') {
 	*num = 1;
@@ -538,11 +538,11 @@ c_number(p, num, dval)
 
 static Char *
 c_expand(p)
-    register Char *p;
+    Char *p;
 {
-    register Char *q;
-    register struct Hist *h = Histlist.Hnext;
-    register struct wordent *l;
+    Char *q;
+    struct Hist *h = Histlist.Hnext;
+    struct wordent *l;
     int     i, from, to, dval;
     bool    all_dig;
     bool    been_once = 0;
@@ -767,10 +767,10 @@ excl_err:
 
 static void
 c_excl(p)
-    register Char *p;
+    Char *p;
 {
-    register int i;
-    register Char *q;
+    int i;
+    Char *q;
 
     /*
      * if />[SPC TAB]*![SPC TAB]/, back up p to just after the >. otherwise,
@@ -811,7 +811,7 @@ c_excl(p)
 static void
 c_substitute()
 {
-    register Char *p;
+    Char *p;
 
     /*
      * Start p out one character before the cursor.  Move it backwards looking
@@ -832,7 +832,7 @@ c_substitute()
 static void
 c_delfini()		/* Finish up delete action */
 {
-    register int Size;
+    int Size;
 
     if (ActionFlag & TCSHOP_INSERT)
 	c_alternativ_key_map(0);
@@ -870,10 +870,10 @@ c_delfini()		/* Finish up delete action */
 
 static Char *
 c_endword(p, high, n, delim)
-    register Char *p, *high, *delim;
-    register int n;
+    Char *p, *high, *delim;
+    int n;
 {
-    register int inquote = 0;
+    int inquote = 0;
     p++;
 
     while (n--) {
@@ -903,8 +903,8 @@ c_endword(p, high, n, delim)
 
 static Char *
 c_eword(p, high, n)
-    register Char *p, *high;
-    register int n;
+    Char *p, *high;
+    int n;
 {
     p++;
 
@@ -1478,9 +1478,9 @@ e_unassigned(c)
 
 CCRETVAL
 e_insert(c)
-    register int c;
+    int c;
 {
-    register int i;
+    int i;
 #if defined(DSPMBYTE)
     CCRETVAL ret;
     static Char savec;
@@ -1587,7 +1587,7 @@ int
 InsertStr(s)			/* insert ASCIZ s at cursor (for complete) */
     Char   *s;
 {
-    register int len;
+    int len;
 
     if ((len = (int) Strlen(s)) <= 0)
 	return -1;
@@ -1623,7 +1623,7 @@ DeleteBack(n)			/* delete the n characters before . */
 
 CCRETVAL
 e_digit(c)			/* gray magic here */
-    register int c;
+    int c;
 {
     if (!Isdigit(c))
 	return(CC_ERROR);	/* no NULs in the input ever!! */
@@ -1657,7 +1657,7 @@ e_digit(c)			/* gray magic here */
 
 CCRETVAL
 e_argdigit(c)			/* for ESC-n */
-    register int c;
+    int c;
 {
     c &= ASCII;
 
@@ -1678,7 +1678,7 @@ e_argdigit(c)			/* for ESC-n */
 
 CCRETVAL
 v_zero(c)			/* command mode 0 for vi */
-    register int c;
+    int c;
 {
     if (DoingArg) {		/* if doing an arg, add this in... */
 	if (Argument > 1000000)
@@ -2077,7 +2077,7 @@ CCRETVAL
 e_run_fg_editor(c)
     int c;
 {
-    register struct process *pp;
+    struct process *pp;
     extern bool tellwhat;
 
     USE(c);
@@ -2193,10 +2193,10 @@ CCRETVAL
 e_last_item(c)
     int c;
 {				/* insert the last element of the prev. cmd */
-    register Char *cp;
-    register struct Hist *hp;
-    register struct wordent *wp, *firstp;
-    register int i;
+    Char *cp;
+    struct Hist *hp;
+    struct wordent *wp, *firstp;
+    int i;
     Char buf[INBUFSIZE];
 
     USE(c);
@@ -2233,10 +2233,10 @@ CCRETVAL
 e_dabbrev_expand(c)
     int c;
 {				/* expand to preceding word matching prefix */
-    register Char *cp, *ncp, *bp;
-    register struct Hist *hp;
-    register int arg = 0, len = 0, i; /* len = 0 to shut up gcc -Wall */
-    register bool found = 0;
+    Char *cp, *ncp, *bp;
+    struct Hist *hp;
+    int arg = 0, len = 0, i; /* len = 0 to shut up gcc -Wall */
+    bool found = 0;
     Char hbuf[INBUFSIZE];
     static int oldevent, hist, word;
     static Char *start, *oldcursor;
@@ -2318,8 +2318,8 @@ CCRETVAL
 e_yank_kill(c)
     int c;
 {				/* almost like GnuEmacs */
-    register int len;
-    register Char *kp, *cp;
+    int len;
+    Char *kp, *cp;
 
     USE(c);
     if (KillRingLen == 0)	/* nothing killed */
@@ -2350,8 +2350,8 @@ CCRETVAL
 e_yank_pop(c)
     int c;
 {				/* almost like GnuEmacs */
-    register int m_bef_c, del_len, ins_len;
-    register Char *kp, *cp;
+    int m_bef_c, del_len, ins_len;
+    Char *kp, *cp;
 
     USE(c);
 
@@ -2462,7 +2462,7 @@ CCRETVAL
 e_delwordprev(c)
     int c;
 {
-    register Char *cp, *p;
+    Char *cp;
 
     USE(c);
     if (Cursor == InputBuf)
@@ -2633,7 +2633,7 @@ CCRETVAL
 e_delwordnext(c)
     int c;
 {
-    register Char *cp, *p;
+    Char *cp;
 
     USE(c);
     if (Cursor == LastChar)
@@ -2768,7 +2768,7 @@ CCRETVAL
 e_charswitch(cc)
     int cc;
 {
-    register Char c;
+    Char c;
 
     USE(cc);
 
@@ -2791,7 +2791,7 @@ CCRETVAL
 e_gcharswitch(cc)
     int cc;
 {				/* gosmacs style ^T */
-    register Char c;
+    Char c;
 
     USE(cc);
     if (Cursor > &InputBuf[1]) {/* must have at least two chars entered */
@@ -3114,7 +3114,7 @@ static CCRETVAL
 v_action(c)
     int c;
 {
-    register Char *cp, *kp;
+    Char *cp, *kp;
 
     if (ActionFlag == TCSHOP_DELETE) {
 	ActionFlag = TCSHOP_NOP;
@@ -3259,7 +3259,7 @@ CCRETVAL
 e_exchange_mark(c)
     int c;
 {
-    register Char *cp;
+    Char *cp;
 
     USE(c);
     cp = Cursor;
@@ -3486,7 +3486,7 @@ CCRETVAL
 e_expand(c)
     int c;
 {
-    register Char *p;
+    Char *p;
     extern bool justpr;
 
     USE(c);
@@ -3687,7 +3687,7 @@ CCRETVAL
 e_copyprev(c)
     int c;
 {
-    register Char *cp, *oldc, *dp;
+    Char *cp, *oldc, *dp;
 
     USE(c);
     if (Cursor == InputBuf)
@@ -3898,8 +3898,8 @@ CCRETVAL
 v_undo(c)
     int c;
 {
-    register int  loop;
-    register Char *kp, *cp;
+    int  loop;
+    Char *kp, *cp;
     Char temp;
     int	 size;
 
