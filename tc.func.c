@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.87 1999/08/14 21:24:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.88 2000/06/10 22:05:39 kim Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.87 1999/08/14 21:24:13 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.88 2000/06/10 22:05:39 kim Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -116,6 +116,14 @@ expand_lex(buf, bufsiz, sp0, from, to)
     register Char *s, *d, *e;
     register Char prev_c;
     register int i;
+
+    /*
+     * Make sure we have enough space to expand into.  E.g. we may have
+     * "a|b" turn to "a | b" (from 3 to 5 characters) which is the worst
+     * case scenario (even "a>&! b" turns into "a > & ! b", i.e. 6 to 9
+     * characters -- am I missing any other cases?).
+     */
+    bufsiz = bufsiz / 2;
 
     buf[0] = '\0';
     prev_c = '\0';
