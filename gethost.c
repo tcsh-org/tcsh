@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.38 1994/02/04 15:16:59 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/gethost.c,v 1.1 1994/02/10 12:12:23 christos Exp christos $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.38 1994/02/04 15:16:59 christos Exp $")
+RCSID("$Id: gethost.c,v 1.1 1994/02/10 12:12:23 christos Exp christos $")
 
 #include <stdio.h>
 #include <ctype.h>
@@ -138,6 +138,7 @@ main(argc, argv)
     int lineno = 0;
     int inprocess = 0;
     int token, state;
+    int errs = 0;
 
     if ((pname = strrchr(argv[0], '/')) == NULL)
 	pname = argv[0];
@@ -157,7 +158,7 @@ main(argc, argv)
 
     state = S_DISCARD;
 
-    while ((ptr = fgets(line, sizeof(line), stdin)) != NULL) {
+    while ((ptr = fgets(line, sizeof(line), fp)) != NULL) {
 	lineno++;
 	switch (token = findtoken(defs = gettoken(&ptr))) {
 	case T_NEWCODE:
@@ -200,6 +201,10 @@ main(argc, argv)
 	    if (state != S_CODE && defs && *defs != '\0') {
 		(void) fprintf(stderr, "%s: \"%s\", %d: Discarded\n",
 			       pname, fname, lineno);
+		if (++errs == 30) {
+		    (void) fprintf(stderr, "%s: Too many errors\n", pname);
+		    return 1;
+		}
 		break;
 	    }
 	    (void) fprintf(stdout, "%s", line);
@@ -232,7 +237,7 @@ main(argc, argv)
 				   pname, fname, lineno);
 		    return 1;
 		}
-		(void) fprintf(stdout, "\n\n# %d \"%s\"\n", lineno, fname);
+		(void) fprintf(stdout, "\n\n# %d \"%s\"\n", lineno + 1, fname);
 		(void) fprintf(stdout, "#if %s\n", defs);
 		inprocess = 1;
 	    }
@@ -264,7 +269,7 @@ main(argc, argv)
 
 	case S_CODE:
 	    if (token == T_NEWCODE)
-		(void) fprintf(stdout, "# %d \"%s\"\n", lineno, fname);
+		(void) fprintf(stdout, "# %d \"%s\"\n", lineno + 1, fname);
 	    break;
 
 	default:

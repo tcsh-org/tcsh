@@ -1,6 +1,14 @@
 This file contains visible (incompatible) changes to the users.
 This version of tcsh has the following new things:
 
+6.05
+* The bind, aliases, linedit builtins are not used anymore; they are
+  #ifdef'ed OBSOLETE and will be really removed in the next version
+* new filetest builtin
+* new hup builtin
+* =x obeys nonomatch
+XXX: add the rest
+
 6.04
 * Variable modifiers do not stop processing after the first one fails
      > set i=aabbcc

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.54 1994/02/03 19:32:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.55 1994/02/04 15:20:04 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -75,6 +75,10 @@
 #ifdef linux
 # undef NEEDstrerror
 #endif /* linux */
+
+#ifdef NetBSD
+# undef NEEDstrerror
+#endif
 
 #ifdef OREO
 # include <sys/time.h>

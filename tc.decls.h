@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.decls.h,v 3.25 1993/11/13 00:40:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.decls.h,v 3.26 1993/12/12 19:55:08 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -63,6 +63,11 @@ extern	unsigned char    *unparsestring	__P((Char *, unsigned char *, Char *));
 #ifdef OBSOLETE
 extern	void		  dobind	__P((Char **, struct command *));
 #endif
+
+/*
+ * tc.defs.c:
+ */
+extern	void		  getmachine	__P((void));
 
 
 /*
@@ -286,10 +291,9 @@ extern	char		 *short2qstr	__P((const Char *));
 
 
 /*
- * tc.vers.h:
+ * tc.vers.c:
  */
 extern	void		  fix_version	__P((void));
-extern	char		 *gethosttype	__P((void));
 
 /*
  * tc.who.c

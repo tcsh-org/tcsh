@@ -47,10 +47,10 @@
 .\"   reference section should be mentioned in the appropriate descriptive
 .\"   section, or at least in the reference-section description of another
 .\"   command (or whatever) which is mentioned in a description section.
-.\"   Remember to note new features in NEW FEATURES and referenced external
-.\"   commands in SEE ALSO.
+.\"   Remember to note OS-specific things in "OS variant support", new features
+.\"   in NEW FEATURES and referenced external commands in SEE ALSO.
 .\" 
-.TH TCSH 1 "4 February 1994" "Cornell 6.04.07"
+.TH TCSH 1 "10 February 1994" "Cornell 6.04.08"
 .SH NAME
 .B tcsh
 - C shell with file name completion and command line editing
@@ -107,7 +107,7 @@ yields a non-zero exit status.
 The shell ignores \fI~/.tcshrc\fR, and thus starts faster.
 .TP 4
 .B -F
-The shell uses \fIfork\fR() instead of \fIvfork\fR() to spawn processes. (Convex/OS only) (+)
+The shell uses \fIfork\fR(2) instead of \fIvfork\fR(2) to spawn processes. (Convex/OS only) (+)
 .TP 4
 .B -i
 The shell is interactive and prompts for its top-level input, even if
@@ -284,8 +284,8 @@ For example, typing `em[tab]' would complete `em' to
 `emacs' if \fIemacs\fR were the only command on your system beginning with `em'.
 Completion can find a command in any directory in \fBpath\fR or if
 given a full pathname.
-Typing `echo $HOSTT[tab]' would complete `$HOSTT' to `$HOSTTYPE'
-if no other variable began with `HOSTT'.
+Typing `echo $ar[tab]' would complete `$ar' to `$argv'
+if no other variable began with `ar'.
 .PP
 The shell parses the input buffer to determine whether the word you want to
 complete should be completed as a filename, command or variable.
@@ -1884,11 +1884,15 @@ Under Masscomp/RTU, \fIuniverse\fR sets the universe.
 .PP
 Under Convex/OS, \fIwarp\fR prints or sets the universe.
 .PP
-The \fBHOSTTYPE\fR environment variable indicates what machine and operating
-system the shell thinks it is running on, and the \fBversion\fR shell
+The \fBOSTYPE\fR environment variable indicates what operating
+system the shell thinks it is running on. The \fBMACHTYPE\fR environment
+variable indicates the hardware (microprocessor class or machine model).
+The \fBVENDOR\fB indicates the distributor of the machine.
+Finally the \fBversion\fR shell
 variable indicates what options were chosen when the shell was compiled.
-Note also the \fInewgrp\fR builtin, the \fBecho_style\fR shell variable and the system-dependent
-locations of shell input files described in the \fBFILES\fR section.
+Note also the \fInewgrp\fR builtin, the \fBafsuser\fR and
+\fBecho_style\fR shell variables and the system-dependent locations of
+shell input files described in the \fBFILES\fR section.
 .SS "Signal handling"
 Login shells ignore interrupts when reading the file \fI~/.logout\fR.
 The shell ignores quit signals unless started with \fB-q\fR.
@@ -2574,7 +2578,6 @@ internal hash table has been at locating commands (and avoiding
 \fIexec\fR's). An \fIexec\fR is attempted for each component of the
 \fBpath\fR where the hash function indicates a possible hit, and
 in each component which does not begin with a `/'.
-Available only if the shell was compiled on a system with \fIvfork\fR(2).
 .PP
 .B history \fR[\fB-hr\fR] [\fIn\fR]
 .br
@@ -3281,13 +3284,13 @@ tty, uid, user\fR and \fBversion\fR at startup; they do not change thereafter
 unless changed by the user. The shell updates \fBcwd\fR, \fBdirstack\fR,
 \fBowd\fR and \fBstatus\fR when necessary, and sets \fBlogout\fR on logout.
 .PP
-The shell synchronizes \fBhome, path, shlvl, term\fR and \fBuser\fR with the
-environment variables of the same names: whenever the environment variable
-changes the shell changes the corresponding shell variable to match (unless
-the shell variable is read-only)
-and vice versa. Note that although \fBcwd\fR and \fBPWD\fR have identical
-meanings, they are not synchronized in this manner, and that the shell
-automatically interconverts the different formats of \fBpath\fR and \fBPATH\fR.
+The shell synchronizes \fBafsuser, home, path, shlvl, term\fR and \fBuser\fR
+with the environment variables of the same names: whenever the environment
+variable changes the shell changes the corresponding shell variable to match
+(unless the shell variable is read-only) and vice versa. Note that although
+\fBcwd\fR and \fBPWD\fR have identical meanings, they are not synchronized in
+this manner, and that the shell automatically interconverts the different
+formats of \fBpath\fR and \fBPATH\fR.
 .TP 8
 .B addsuffix \fR(+)
 If set, filename completion adds `/' to the end of directories and a space
@@ -3295,8 +3298,8 @@ to the end of normal files when they are matched exactly.
 Set by default.
 .TP 8
 .B afsuser \fR(+)
-Overrides the local username for kerberos authentication for
-autologout's autolock feature.
+If set, \fBautologout\fR's autolock feature uses its value instead of
+the local username for kerberos authentication.
 .TP 8
 .B ampm \fR(+)
 If set, all times are shown in 12-hour AM/PM format.
@@ -3332,7 +3335,7 @@ in login and superuser shells, but not if the shell thinks it is running
 under a window system (i.e. the \fBDISPLAY\fR environment variable is set),
 the tty is a pseudo-tty (pty) or the shell was not so compiled (see the
 \fBversion\fR shell variable).
-See also the \fBlogout\fR shell variable.
+See also the \fBafsuser\fR and \fBlogout\fR shell variables.
 .TP 8
 .B backslash_quote \fR(+)
 If set, backslashes (`\\') always quote `\\', `'', and `"'. This may make
@@ -3494,8 +3497,8 @@ Setting or unsetting it within a shell has no effect.
 See also \fBshlvl\fR.
 .TP 8
 .B logout \fR(+)
-Set by the shell to `normal' before a normal logout or `automatic'
-before an automatic logout.
+Set by the shell to `normal' before a normal logout, `automatic'
+before an automatic logout, and `hangup' if the shell was killed by SIGHUP.
 See also the \fBautologout\fR shell variable.
 .TP 8
 .B mail
@@ -3985,7 +3988,8 @@ Set by the \fB-v\fR command line option.
 .TP 8
 .B version \fR(+)
 The version ID stamp. It contains the shell's version number (see \fBtcsh\fR),
-origin, release date, hosttype (see \fBHOSTTYPE\fR) and a comma-separated
+origin, release date, vendor, os, and machine (see \fBVENDOR\fR, 
+\fBOSTYPE\fR, \fBMACHTYPE\fB) and a comma-separated
 list of options which were set at compile time.
 Options which are set by default in the distribution are noted.
 .PP
@@ -4038,9 +4042,10 @@ rh
 The shell attempts to set the \fBREMOTEHOST\fR environment variable
 .TP 4
 afs
-The shell will verify your password with the kerberos server if local
-authentication fails. The shell variable afsuser or the environment
-variable AFSUSER will override your local username if set.
+The shell verifies your password with the kerberos server if local
+authentication fails. The \fBafsuser\fR shell variable or the
+\fBAFSUSER\fR environment variable AFSUSER override your local username
+if set.
 .PD
 .PP
 In addition to the above strings, administrators can 
@@ -4114,6 +4119,9 @@ A list of non-alphanumeric characters to be considered part of a word by the
 If unset, `*?_-.[]~=' is used.
 .SH ENVIRONMENT
 .TP 8
+.B AFSUSER \fR(+)
+Equivalent to the \fBafsuser\fR shell variable.
+.TP 8
 .B COLUMNS
 The number of columns in the terminal. See \fBTerminal management\fR.
 .TP 8
@@ -4130,281 +4138,18 @@ is running, as determined by the \fIgethostname\fR(2) system call.
 .TP 8
 .B HOSTTYPE \fR(+)
 Initialized to the type of machine on which the shell
-is running, as determined at compile time. The possible values are
+is running, as determined at compile time. This variable is obsolete and
+will be removed in future versions.
 .PP
 .RS +8
-.PD 0
-.TP 16
-386BSD
-Intel 386 running 386BSD
-.TP 16
-aix370
-IBM 370 running AIX
-.TP 16
-aixESA
-IBM ESA running AIX
-.TP 16
-alliant
-Alliant FX series
-.TP 16
-alliant-fx80
-Alliant FX80 (mc68000 based)
-.TP 16
-alliant-fx2800
-Alliant FX2800 (i860 based)
-.TP 16
-alpha
-DEC Alpha running OSF/1
-.TP 16
-amdahl
-Amdahl running uts 2.1
-.TP 16
-amiga
-amiga running AMIX 2.02
-.TP 16
-apollo
-Apollo running Domain/OS
-.TP 16
-att3b15
-AT&T 3b15
-.TP 16
-att3b2
-AT&T 3b2
-.TP 16
-att3b20
-AT&T 3b20
-.TP 16
-att3b5
-AT&T 3b5
-.TP 16
-balance
-Sequent Balance (32000 based)
-.TP 16
-bsd386
-Intel 386 running BSDI's 386BSD
-.TP 16
-butterfly
-BBN Computer Butterfly 1000
-.TP 16
-clipper
-Intergraph's clipper running CLIX
-.TP 16
-coh386
-386 running Coherent 4.0
-.TP 16
-coherent
-Unknown machine running Coherent
-.TP 16
-convex
-Convex
-.TP 16
-cray
-Cray running Unicos
-.TP 16
-decstation
-DecStation XXXX
-.TP 16
-eta10
-ETA 10 running SVR3
-.TP 16
-gould-np1
-Gould NP1
-.TP 16
-hk68
-Heurikon HK68 running Uniplus+ 5.0
-.TP 16
-hkc
-Harris Tahoe running CX/UX
-.TP 16
-hp300
-HP 9000, series 300, running mtXinu
-.TP 16
-hp800
-HP 9000, series 800, running mtXinu
-.TP 16
-hp9000s300
-HP 9000, series 300, running hpux
-.TP 16
-hp9000s500
-HP 9000, series 500, running hpux
-.TP 16
-hp9000s700
-HP 9000, series 700, running hpux
-.TP 16
-hp9000s800
-HP 9000, series 800, running hpux
-.TP 16
-hp
-HP running hpux
-.TP 16
-i386
-Intel 386 running an unknown OS
-.TP 16
-i386-mach
-Intel 386 running mach
-.TP 16
-i386-linux
-Intel 386 running Linux
-.TP 16
-i386-emx
-Intel 386 running emx [unix emulation under OS/2]
-.TP 16
-intel386
-Intel 386 running INTEL's SVR3
-.TP 16
-iris3d
-Silicon Graphics Iris 3000
-.TP 16
-iris4d
-Silicon Graphics Iris 4D
-.TP 16
-isc386
-Intel 386 running ISC
-.TP 16
-lynxos-i386
-Intel 386 running Lynx/OS-2.1
-.TP 16
-lynxos-i860
-Intel 860 running Lynx/OS-2.1
-.TP 16
-lynxos-m68k
-Motorola 68K running Lynx/OS-2.1
-.TP 16
-lynxos-m88k
-Motorola 88K running Lynx/OS-2.1
-.TP 16
-lynxos-sparc
-Sparc running Lynx/OS-2.1
-.TP 16
-lynxos-mips
-MIPS running Lynx/OS-2.1
-.TP 16
-lynxos-unknown
-An unknown machine running Lynx/OS-2.1
-.TP 16
-m88k
-MC88000 CPU machine
-.TP 16
-mac2
-Apple Computer Macintosh II running AUX
-.TP 16
-masscomp
-Concurrent (Masscomp) running RTU
-.TP 16
-minix386
-i386 running MINIX
-.TP 16
-minix
-Macintosh or Amiga running MINIX
-.TP 16
-mips
-MIPS running an unknown OS
-.TP 16
-multimax
-Encore Computer Corp. Multimax (32000 based)
-.TP 16
-news
-Sony NEWS 800 or 1700 workstation
-.TP 16
-news_mips
-MIPS running NeWS
-.TP 16
-nd500
-Norsk Data ND 500/5000 running Ndix
-.TP 16
-ns32000
-NS32000 machine
-.TP 16
-next
-NeXT
-.TP 16
-paragon
-Intel Paragon running OSF/1
-.TP 16
-pfa50
-PFU/Fujitsu A-xx computer
-.TP 16
-ps2
-IBM PS/2 running AIX
-.TP 16
-ptx
-Sequent Symmetry running DYNIX/ptx (386/486 based)
-.TP 16
-pyramid
-Pyramid Technology machine
-.TP 16
-rs6000
-IBM RS6000 running AIX 
-.TP 16
-rt
-IBM PC/RT running BSD (AOS 4.3) or Mach
-.TP 16
-rtpc
-IBM PC/RT running AIX
-.TP 16
-sco386
-Intel 386 running SCO
-.TP 16
-stellar
-Stellar running Stellix
-.TP 16
-sun
-Sun workstation of none of the above types
-.TP 16
-sun2
-Sun Microsystems series 2 workstation (68010 based)
-.TP 16
-sun3
-Sun Microsystems series 3 workstation (68020 based)
-.TP 16
-sun386i
-Sun Microsystems 386i workstation (386 based)
-.TP 16
-sun4
-Sun Microsystems series 4 workstation (SPARC based)
-.TP 16
-symmetry
-Sequent Symmetry running DYNIX 3 (386/486 based)
-.TP 16
-sysV88
-Motorola MPC running System V/88 R32V2 (SVR3/88100 based)
-.TP 16
-tahoe
-Tahoe running 4BSD
-.TP 16
-tek4300
-Tektronix 4300 running UTek (BSD 4.2 / 68020 based)
-.TP 16
-tekXD88
-Tektronix XD88/10 running UTekV 3.2e (SVR3/88100 based)
-.TP 16
-titan
-Stardent Titan
-.TP 16
-unixpc
-UNIX/PC running SVR1 att7300, AKA att3b1
-.TP 16
-vax
-Digital Equipment Corp. VAX (of any flavor)
-.TP 16
-vistra800
-Stardent Vistra 800 running SVR4
-.TP 16
-VMS-POSIX
-VAX running VMS/POSIX
-.PD
-.PP
-(The names of the machines are usually trademarks of the
-corresponding companies.)
-.PP
 This is particularly useful when sharing one's home directory between several
 types of machines; one can, for example,
 .IP "" 4
 set path = (~/bin.$HOSTTYPE /usr/ucb /bin /usr/bin .)
+.RE
 .PP
 in one's \fI~/.login\fR and put executables compiled for each machine in the
 appropriate directory.
-.RE
 .TP 8
 .B HPATH \fR(+)
 A colon-separated list of directories in which the \fIrun-help\fR editor
@@ -4421,9 +4166,15 @@ See \fBNative Language System support\fR.
 .B LINES
 The number of lines in the terminal. See \fBTerminal management\fR.
 .TP 8
+.B MACHTYPE \fR(+)
+Indicates the CPU class of the machine.
+.TP 8
 .B NOREBIND \fR(+)
 If set, printable characters are not rebound to \fIself-insert-command\fR.
 See \fBNative Language System support\fR.
+.TP 8
+.B OSTYPE \fR(+)
+Operating system name as determined at compile time.
 .TP 8
 .B PATH
 A colon-separated list of directories in which to look for executables.
@@ -4448,6 +4199,9 @@ The terminal capability string. See \fBTerminal management\fR.
 .TP 8
 .B USER
 Equivalent to the \fBuser\fR shell variable.
+.TP 8
+.B VENDOR \fR(+)
+Vendor name as determined at compile time.
 .SH FILES
 .PD 0
 .TP 16
@@ -4565,7 +4319,8 @@ printenv, which\fR and \fIwhere\fR (q.v.).
 .PP
 New variables that make useful information easily available to the shell.
 See the \fBgid, loginsh, oid, shlvl, tcsh, tty, uid\fR and \fBversion\fR
-shell variables and the \fBHOST\fR, \fBHOSTTYPE\fR and \fBREMOTEHOST\fR environment variables.
+shell variables and the \fBHOST\fR, \fBOSTYPE\fR, \fBMACHTYPE\fR, \fBVENDOR\fR,
+and \fBREMOTEHOST\fR environment variables.
 .PP
 A new syntax for including useful information in the prompt string
 (see \fBprompt\fR).
@@ -4632,10 +4387,10 @@ substitutions on a single line to 20.
 .SH "SEE ALSO"
 csh(1), emacs(1), ls(1), newgrp(1), sh(1), setpath(1), stty(1), su(1), tset(1), vi(1), x(1),
 access(2), execve(2), fork(2), killpg(2), pipe(2), setrlimit(2),
-sigvec(2), stat(2), umask(2), wait(2), malloc(3), setlocale(3), tty(4),
+sigvec(2), stat(2), umask(2), vfork(2), wait(2), malloc(3), setlocale(3), tty(4),
 a.out(5), termcap(5), environ(7), termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.07 (Cornell) 94/02/04.
+This man page documents tcsh 6.04.08 (Cornell) 94/02/10.
 .SH AUTHORS
 .PD 0
 .TP 2

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.60 1993/12/12 19:55:08 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.61 1993/12/16 16:51:24 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -67,7 +67,7 @@ typedef char Char;
 #endif 
 
 /* Elide unused argument warnings */
-#define USE(a)	((void) (a))
+#define USE(a)	(void) (a)
 /*
  * If your compiler complains, then you can either
  * throw it away and get gcc or, use the following define
@@ -960,7 +960,9 @@ EXTERN Char    HISTSUB;		/* auto-substitute character */
  * To print system call errors...
  */
 #ifndef linux
+#ifdef NEEDstrerror
 extern char *sys_errlist[];
+#endif
 extern int errno, sys_nerr;
 #endif /* !linux */
 

@@ -1,4 +1,8 @@
 V6.05.00, ... 
+ 74. 6.04.08 02/10/94
+ 73. new machtype, ostype, vendor
+ 72. execute .logout on hangup.
+ 71. more man page fixes.
  70. 6.04.07 02/04/94
  69. Dynamic hash changes, globbing for which command from Michael.
  68. INBUFSIZE fixes for history.

@@ -1,7 +1,7 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.38 1994/02/04 15:16:59 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/host.def,v 1.1 1994/02/10 12:12:20 christos Exp christos $ */
 /*
- * host.def: Hosttype/Machtype etc.
+ * host.defs: Hosttype/Machtype etc.
  */
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
@@ -37,12 +37,70 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.38 1994/02/04 15:16:59 christos Exp $")
+RCSID("$Id: host.def,v 1.1 1994/02/10 12:12:20 christos Exp christos $")
 
-void
-setmachine()
+endcode	:
+
+
+newdef	: defined(ns32000)
+newcode	:
+static char *
+isamultimax(flag)
+    int flag;
 {
-     static char unknown[] = "unknown";
+    if (access("/Umax.image", F_OK) == 0)
+	return "multimax";
+    else 
+	return flag ? "mach" : "ns32000";
+}
+endcode	:
+enddef	:
+
+
+newdef	: defined(cray)
+newcode	:
+/*  
+ * On crays, find the current machine type via the target() syscall
+ * We need ctype.h to convert the name returned to lower case
+ */
+# include <sys/target.h> 
+# include <ctype.h>
+
+/* From: hpa@hook.eecs.nwu.edu (H. Peter Anvin) */
+static char *
+getcray()
+{
+# ifdef MC_GET_SYSTEM /* If we have target() */
+    struct target data;
+
+    if (target(MC_GET_SYSTEM, &data) != -1) {
+	static char hosttype_buf[sizeof(data.mc_pmt)+1];
+	char *p = (char *) &(data.mc_pmt);
+	char *q = hosttype_buf;
+	int n;
+
+	/* 
+	 * Copy to buffer and convert to lower case 
+	 * String may not be null-terminated, so keep a counter
+	 */
+	for (n = 0; *p && n < sizeof(data.mc_pmt); n++)
+	  *q++ = tolower(p[n]);
+
+	*q = '\0';
+	return hosttype_buf; 	/* Return in static buffer */
+    }
+    else
+# endif /* MC_GET_SYSTEM */
+	return "cray";		/* target() failed */
+}
+endcode	:
+enddef	:
+
+
+newcode	:
+void
+getmachine()
+{
      char *hosttype;
      char *ostype;
      char *vendor;
@@ -51,16 +109,16 @@ setmachine()
 endcode	:
 
 newdef	: defined(__PARAGON__)
-comment	: Intel paragon
+comment	: Intel Paragon running OSF/1
 vendor	:						: "intel"
 hosttype:						: "paragon"
-ostype	:						: "paragon"
+ostype	:						: "osf1"
 machtype: defined(i386) || defined(__i386__)		: "i386"
 enddef	:
 
 
 newdef	: defined(AMIX)
-comment	: Amiga running Amix
+comment	: Amiga running Amix 2.02
 vendor	:						: "commodore"
 hosttype:						: "amiga"
 ostype	:						: "Amix"
@@ -137,16 +195,19 @@ enddef	:
 
 
 newdef	: defined(sun) || defined(__sun__)
-comment	: Sun Microsystems running Solaris
-vendor	:						: "smi"
+comment	: Sun Microsystems series 2 workstation (68010 based)
+comment	: Sun Microsystems series 3 workstation (68020 based)
+comment	: Sun Microsystems 386i workstation (386 based)
+comment	: Sun Microsystems series 4 workstation (SPARC based)
+vendor	:						: "sun"
 hosttype: defined(i386) || defined(__i386__)		: "sun386i"
 hosttype: defined(mc68010) || defined(__mc68010__)	: "sun2"
 hosttype: defined(mc68020) || defined(__mc68020__)	: "sun3"
 hosttype: defined(sparc) || defined(__sparc__)		: "sun4"
 hosttype: 						: "sun"
-ostype	: defined(SUNOS3)				: "SunOS3"
-ostype	: defined(SUNOS4)				: "SunOS4"
-ostype	: defined(SOLARIS)				: "Solaris"
+ostype	: defined(SUNOS3)				: "sunos3"
+ostype	: defined(SUNOS4)				: "sunos4"
+ostype	: defined(SOLARIS)				: "solaris"
 machtype: defined(mc68010) || defined(__mc68010__)	: "m68k"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
 machtype: defined(sparc) || defined(__sparc__)		: "sparc"
@@ -180,10 +241,11 @@ enddef	:
 
 
 newdef	: defined(ibm032)
-comment	: RT running IBM AOS4.3
+comment	: RT running IBM AOS4.3 or MACH
 vendor	:						: "ibm"
 hosttype:						: "rt"
-ostype	:						: "aos"
+ostype	: defined(MACH)					: "mach"
+ostype	: 						: "aos"
 machtype:						: "ibm032"
 enddef	:
 
@@ -303,7 +365,7 @@ enddef	:
 
 
 newdef	: defined(__EMX__)
-comment	: OS/2 EMX 
+comment	: OS/2 EMX [unix emulation under OS/2]
 vendor	: defined(i386)					: "ibm"
 hosttype: defined(i386)					: "i386-emx"
 ostype	:						: "os2"
@@ -315,7 +377,7 @@ newdef	: defined(__NetBSD__) || defined(__BSD_NET2__)
 comment	: Chris Demetriou's NetBSD
 vendor	: defined(amiga)				: "commodore"
 vendor	: defined(hp300)				: "hp"
-vendor	: defined(i386)					: "ibm"
+vendor	: defined(i386)					: "intel"
 vendor	: defined(m68k)					: "motorola"
 vendor	: defined(mac68k)				: "apple"
 vendor	: defined(pc532)				: "national-semi"
@@ -426,30 +488,22 @@ enddef	:
 
 
 newdef	: defined(sequent) || defined(_SEQUENT_)
-comment	: Sequent
+comment	: Sequent Balance (32000 based)
+comment	: Sequent Symmetry running DYNIX/ptx (386/486 based)
+comment	: Sequent Symmetry running DYNIX 3 (386/486 based)
 vendor	:						: "sequent"
 hosttype: defined(i386)	&& defined(sequent)		: "symmetry"
 hosttype: defined(i386)					: "ptx"
-hosttype: 						: "ballance"
+hosttype: 						: "balance"
 ostype	: defined(i386)	&& !defined(sequent)		: "ptx"
 ostype	: 						: "dynix3"
 machtype: defined(i386)					: "i386"
+machtype: defined(ns32000)				: "ns32000"
 enddef	:
 
 
 newdef	: defined(ns32000)
-newcode	:
-static char *
-isamultimax(flag)
-    int flag;
-{
-    if (access("/Umax.image", F_OK) == 0)
-	return "multimax";
-    else 
-	return flag ? "mach" : "ns32000";
-}
-endcode	:
-comment	: Encore
+comment	: Encore Computer Corp. Multimax (32000 based)
 vendor	:						: "encore"
 hosttype: defined(CMUCS)				: "multimax"
 hosttype: 						: isamultimax(0)
@@ -483,42 +537,6 @@ enddef	:
 
 newdef	: defined(cray)
 comment	: Cray Research Inc. running UNICOS
-newcode	:
-/*  
- * On crays, find the current machine type via the target() syscall
- * We need ctype.h to convert the name returned to lower case
- */
-# include <sys/target.h> 
-# include <ctype.h>
-
-/* From: hpa@hook.eecs.nwu.edu (H. Peter Anvin) */
-static char *
-getcray()
-{
-# ifdef MC_GET_SYSTEM /* If we have target() */
-    struct target data;
-
-    if (target(MC_GET_SYSTEM, &data) != -1) {
-	static char hosttype_buf[sizeof(data.mc_pmt)+1];
-	char *p = (char *) &(data.mc_pmt);
-	char *q = hosttype_buf;
-	int n;
-
-	/* 
-	 * Copy to buffer and convert to lower case 
-	 * String may not be null-terminated, so keep a counter
-	 */
-	for (n = 0; *p && n < sizeof(data.mc_pmt); n++)
-	  *q++ = tolower(p[n]);
-
-	*q = '\0';
-	return hosttype_buf; 	/* Return in static buffer */
-    }
-    else
-# endif /* MC_GET_SYSTEM */
-	return "cray";		/* target() failed */
-}
-endcode	:
 vendor	:						: "cri"
 hosttype:						: getcray()
 ostype	:						: "unicos"
@@ -535,7 +553,7 @@ enddef	:
 
 
 newdef	: defined(butterfly)
-comment	: BBN Butterfly
+comment	: BBN Butterfly 1000
 vendor	:						: "bbn"
 hosttype:						: "butterfly"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
@@ -550,7 +568,7 @@ machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
 enddef	:
 
 newdef	: defined(sony_news)
-comment	: Sony
+comment	: Sony NEWS 800 or 1700 workstation
 vendor	:						: "sony"
 hosttype: defined(mips)					: "news_mips"
 ostype	:						: "News"
@@ -595,7 +613,7 @@ enddef	:
 
 
 newdef	: defined(DECOSF1)
-comment	: Digital's osf1
+comment	: Digital's alpha running osf1
 vendor	:						: "dec"
 ostype	:						: "osf1"
 hosttype: defined(__alpha)				: "alpha"
@@ -604,7 +622,7 @@ enddef	:
 
 
 newdef	: defined(Lynx)
-comment	: Lynx OS
+comment	: Lynx OS 2.1
 vendor	:						: "Lynx"
 hosttype: (defined(mips) || defined(__mips)) && (defined(MIPSEL) || defined(__MIPSEL))		: "lynxos-mips"
 hosttype: (defined(mips) || defined(__mips)) && (defined(MIPSEB) || defined(__MIPSEB))		: "lynxos-mips"
@@ -642,7 +660,7 @@ enddef	:
 
 
 newdef	: defined(SXA)
-comment	: Fujitsu SX/A
+comment	: PFU/Fujitsu A-xx computer
 vendor	:						: "sxa"
 hosttype:						: "pfa50"
 ostype	: defined(_BSDX_)				: "e60-bsdx"
@@ -674,14 +692,22 @@ enddef	:
 
 
 newdef	: defined(eta10)
-comment	: ???
-vendor	:						: "eta10"
+comment	: ETA running SVR3
+vendor	:						: "eta"
 hosttype:						: "eta10"
 enddef	:
 
 
+newdef	: defined(hk68)
+comment	: Heurikon HK68 running Uniplus+ 5.0
+vendor	:						: "heurikon"
+hosttype:						: "hk68"
+ostype	:						: "uniplus"
+enddef	:
+
+
 newdef	: defined(NDIX)
-comment	: Norsk Data Systems
+comment	: Norsk Data ND 500/5000 running Ndix
 vendor	:						: "norsk"
 hosttype:						: "nd500"
 ostype	:						: "ndix"
@@ -689,7 +715,7 @@ enddef	:
 
 
 newdef	: defined(uts)
-comment	: Amdahl
+comment	: Amdahl running uts 2.1
 vendor	: 						: "amdahl"
 hosttype:						: "amdahl"
 ostype	:						: "uts"
@@ -698,28 +724,29 @@ enddef	:
 
 
 newdef	: defined(sysV68)
-comment	: ???
+comment	: Motorola MPC running System V/68 R32V2 (SVR3/68020 based)
+vendor	:						: "motorola"
 hosttype: 						: "sysV68"
 machtype:						: "m68k"
 enddef	:
 
 
 newdef	: defined(sysV88)
-comment	: ???
+comment	: Motorola MPC running System V/88 R32V2 (SVR3/88100 based)
 hosttype: 						: "sysV88"
 machtype:						: "m88k"
 enddef	:
 
 
 newdef	: defined(UTek)
-comment	: Tektronix
+comment	: Tektronix 4300 running UTek (BSD 4.2 / 68020 based)
 vendor	:						: "tek"
 hosttype: 						: "tek4300"
 enddef	:
 
 
 newdef	: defined(UTekV)
-comment	: Tektronix
+comment	: Tektronix XD88/10 running UTekV 3.2e (SVR3/88100 based)
 vendor	:						: "tek"
 hosttype: 						: "tekXD88"
 enddef	:
@@ -734,12 +761,14 @@ enddef	:
 
 newdef	: defined(mc68000) || defined(__mc68000__) || defined(mc68k32) || defined(m68k) || defined(mc68010) || defined(mc68020)
 hosttype:						: "m68k"
+vendor	: defined(m68k)					: "motorola"
 machtype:						: "m68k"
 enddef	:
 
 
 newdef	: defined(i386) || defined(__i386__)
 hosttype:						: "i386"
+vendor	: defined(i386)					: "intel"
 machtype:						: "i386"
 enddef	:
 
@@ -760,7 +789,7 @@ enddef	:
 
 newdef	: SYSVREL == 0
 ostype	: defined(BSD4_4)				: "bsd44"
-ostype	: defined(BSD)					: "bsd4"
+ostype	: defined(BSD)					: "bsd"
 ostype	: defined(POSIX)				: "posix"
 ostype	: defined(unix) || defined(__unix__)		: "unix"
 enddef	:
@@ -783,15 +812,15 @@ enddef	:
 
 newcode	:
 #ifndef _hosttype_
-    hosttype = unknown;
+    hosttype = "unknown";
 #endif
 #ifndef _ostype_
-    ostype = unknown;
+    ostype = "unknown";
 #endif
 #ifndef _vendor_
-    vendor = unknown;
+    vendor = "unknown";
 #endif
-#ifndef _vendor_
+#ifndef _machtype_
     machtype = unknown;
 #endif
     tsetenv(STRHOSTTYPE, str2short(hosttype));
