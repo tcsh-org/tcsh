@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.vers.c,v 3.14 1992/01/28 19:06:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.vers.c,v 3.15 1992/02/21 23:16:20 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.14 1992/01/28 19:06:06 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.15 1992/02/21 23:16:20 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -49,6 +49,12 @@ gethosttype()
 #ifdef HOSTTYPE	/* Override any system determined hosttypes */
     hosttype = str2short(HOSTTYPE);
 #else
+
+# ifdef AMIX /* Amiga UNIX */
+#  define _havehosttype_
+    hosttype = str2short("amiga");
+# endif /* AMIX */
+
 # if defined(vax) || defined(__vax)
 #  define _havehosttype_
     hosttype = str2short("vax");

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.proc.c,v 3.21 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.proc.c,v 3.22 1992/02/13 05:28:51 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.21 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.22 1992/02/13 05:28:51 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -999,7 +999,7 @@ pprint(pp, flag)
     char   *format;
 
 #ifdef BACKPIPE
-    struct process *pipehead, *pipetail, *pmarker;
+    struct process *pipehead = NULL, *pipetail = NULL, *pmarker = NULL;
     int inpipe = 0;
 #endif /* BACKPIPE */
 

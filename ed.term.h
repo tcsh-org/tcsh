@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.h,v 1.5 1991/12/08 17:16:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.term.h,v 1.6 1991/12/14 20:45:46 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -156,6 +156,38 @@
 #if !defined(CDISCARD) && defined(CFLUSH)
 # define CDISCARD CFLUSH
 #endif /* !CDISCARD && CFLUSH */
+
+/*
+ * IRIX4.0 control macro is broken!
+ * Ignore and undef all default tty chars defined.
+ */
+#if __STDC__ && defined(IRIS4D)
+# undef CINTR
+# undef CQUIT
+# undef CERASE
+# undef CKILL
+# undef CEOF
+# undef CEOL
+# undef CEOL2	
+# undef CSWTCH	
+# undef CDSWTCH 
+# undef CERASE2
+# undef CSTART
+# undef CSTOP
+# undef CWERASE
+# undef CSUSP
+# undef CDSUSP
+# undef CREPRINT
+# undef CDISCARD
+# undef CLNEXT
+# undef CSTATUS
+# undef CPAGE
+# undef CPGOFF
+# undef CKILL2
+# undef CBRK
+# undef CMIN
+# undef CTIME
+#endif /* __STDC__ && IRIS4D */
 
 #ifndef CINTR
 # define CINTR		CONTROL('c')

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/tcsh-6.01/RCS/tc.os.h,v 3.24 1992/01/16 13:04:21 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.os.h,v 3.25 1992/02/21 23:16:20 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -377,7 +377,9 @@ extern int atoi();
 extern char *ttyname();
 
 # ifndef hpux
+#  if __GNUC__ != 2
 extern int abort();
+#  endif /* __GNUC__ != 2 */
 # ifndef fps500
 extern int qsort();
 # endif /* fps500 */
@@ -487,6 +489,15 @@ extern char *getwd();
 extern char *ttyname();   
 # endif /* SCO */
 
+
 #endif /* POSIX */
+
+# if defined(sun) && __GNUC__ == 2
+/*
+ * Somehow these are missing
+ */
+extern int ioctl __P((int, int, ...));
+extern int readlink __P((const char *, char *, size_t));
+# endif /* sun && __GNUC__ == 2 */
 
 #endif /* _h_tc_os */

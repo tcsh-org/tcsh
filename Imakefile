@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.8 1992/02/21 23:16:20 christos Exp $
+/**/# $Id: Imakefile,v 1.9 1992/02/21 23:35:43 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -241,8 +241,12 @@ platform, unless you have a really weird architecture. */
 #ifdef MyCC
 CC = MyCC
 #else
-# ifdef HasGCC
+# if defined(HasGcc) || defined(HasGCC)
+#  ifdef HasGcc2
+CC = gcc 
+#  else
 CC = gcc -fcombine-regs -finline-functions -fstrength-reduce
+#  endif
 # else
 CC = cc
 # endif
@@ -302,7 +306,11 @@ MANDIR = $(DESTDIR)/man/man$(MANSUFFIX)
 #ifdef CDebugFlags
 CDEBUGFLAGS = CDebugFlags
 #else
+# ifdef HasGcc2
+CDEBUGFLAGS = -O2
+# else
 CDEBUGFLAGS = -O
+# endif
 #endif
 
 #ifdef AOSArchitecture
@@ -322,7 +330,7 @@ INCLUDES = -I. MyIncludes
 LDLIBS = MyLibs
 
 SUF = o
-VERSION = 6.00
+VERSION = 6.02
 
 SHSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.exp.c sh.file.c sh.func.c sh.glob.c sh.hist.c sh.init.c \

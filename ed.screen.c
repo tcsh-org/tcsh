@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.13 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.screen.c,v 3.14 1992/02/21 23:16:20 christos Exp christos $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.13 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.14 1992/02/21 23:16:20 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -226,16 +226,18 @@ static struct termcapval {
     char   *long_name;
     int     val;
 }       tval[] = {
-#define T_pt	0
-    {	"pt",	"can use physical tabs", 0 },
-#define T_li	1
-    {	"li",	"Number of lines",	 0 },
-#define T_co	2
-    {	"co",	"Number of columns",	 0 },
-#define T_km	3
-    {	"km",	"Has meta key",		 0 },
-#define T_val	4
-    {	NULL, NULL,		 0 }
+#define T_am	0
+    {	"am",	"Can use automatic margins",	0 },
+#define T_pt	1
+    {	"pt",	"Can use physical tabs", 	0 },
+#define T_li	2
+    {	"li",	"Number of lines",	 	0 },
+#define T_co	3
+    {	"co",	"Number of columns",	 	0 },
+#define T_km	4
+    {	"km",	"Has meta key",		 	0 },
+#define T_val	5
+    {	NULL, 	NULL,		 		0 }
 };
 
 static bool me_all = 0;		/* does two or more of the attributes use me */
@@ -321,6 +323,7 @@ TellTC(what)
 	    Val(T_co), Val(T_li));
     xprintf("\tIt has %s meta key\n", T_HasMeta ? "a" : "no");
     xprintf("\tIt can%suse tabs\n", T_Tabs ? " " : "not ");
+    xprintf("\tIt can%suse the rightmost column\n", T_Margin ? " " : "not ");
 
     for (t = tstr; t->name != NULL; t++)
 	xprintf("\t%25s (%s) == %s\n", t->long_name, t->name,
@@ -351,7 +354,7 @@ ReBufferDisplay()
 	xfree((ptr_t) b);
     }
     TermH = Val(T_co);
-    if (adrof(STRmargin_bug) != NULL)
+    if (adrof(STRmargin_bug) != NULL || ! T_Margin)
 	/* make this public, -1 to avoid wraps */
 	TermH--;
     TermV = (INBUFSIZE * 4) / TermH + 1;
@@ -419,6 +422,7 @@ SetTC(what, how)
 	    }
 	    T_Tabs = Val(T_pt);
 	    T_HasMeta = Val(T_km);
+	    T_Margin = !Val(T_am);
 	    return;
 	}
 	else {
@@ -490,6 +494,11 @@ EchoTC(v)
     }
     else if (strcmp(cv, "meta") == 0) {
 	xprintf(fmts, Val(T_km) ? "yes" : "no");
+	flush();
+	return;
+    }
+    else if (strcmp(cv, "margin") == 0) {
+	xprintf(fmts, T_Margin ? "yes" : "no");
 	flush();
 	return;
     }
@@ -1003,6 +1012,9 @@ ClearEOL(num)			/* clear to end of line.  There are num */
 {
     register int i;
 
+    if (num == 0 && T_Margin)
+	return;
+
     if (T_CanCEOL && GoodStr(T_ce))
 	(void) tputs(Str(T_ce), 1, putpure);
     else {
@@ -1122,6 +1134,7 @@ GetTermCaps()
 	Val(T_pt) = tgetflag("pt") && !tgetflag("xt");
 	/* do we have a meta? */
 	Val(T_km) = (tgetflag("km") || tgetflag("MT"));
+	Val(T_am) = tgetflag("am") && !tgetflag("xn");
 	Val(T_co) = tgetnum("co");
 	Val(T_li) = tgetnum("li");
 	for (t = tstr; t->name != NULL; t++)
@@ -1137,6 +1150,7 @@ GetTermCaps()
     if (T_Tabs)
 	T_Tabs = Val(T_pt);
     T_HasMeta = Val(T_km);
+    T_Margin = !Val(T_am);
     T_CanCEOL = GoodStr(T_ce);
     T_CanDel = GoodStr(T_dc) || GoodStr(T_DC);
     T_CanIns = GoodStr(T_im) || GoodStr(T_ic) || GoodStr(T_IC);

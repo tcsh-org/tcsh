@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.h,v 3.27 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.h,v 3.28 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -106,6 +106,19 @@ typedef int sigret_t;
 #ifndef INBUFSIZE
 # define INBUFSIZE	1024	/* Num input characters on the command line */
 #endif /* INBUFSIZE */
+
+
+/*
+ * What our builtin echo looks like
+ */
+#ifndef ECHO_STYLE
+# if SYSVREL > 0
+#  define ECHO_STYLE SYSV_ECHO
+# else /* SYSVREL == 0 */
+#  define ECHO_STYLE BSD_ECHO
+# endif /* SYSVREL */
+#endif /* ECHO_STYLE */
+
 /*
  * The shell moves std in/out/diag and the old std input away from units
  * 0, 1, and 2 so that it is easy to set up these standards for invoked

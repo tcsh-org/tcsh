@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.inputl.c,v 3.16 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.inputl.c,v 3.17 1992/01/28 19:06:06 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.16 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.17 1992/01/28 19:06:06 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -443,7 +443,7 @@ PushMacro(str)
 /*
  * Like eval, only using the current file descriptors
  */
-static Char **gv = NULL;
+static Char **gv = NULL, **gav = NULL;
 
 static void
 doeval1(v)
@@ -458,20 +458,21 @@ doeval1(v)
     oevalvec = evalvec;
     oevalp = evalp;
     savegv = gv;
+    gav = v;
 
 
-    gflag = 0, tglob(v);
+    gflag = 0, tglob(gav);
     if (gflag) {
-	gv = v = globall(v);
+	gv = gav = globall(gav);
 	gargv = 0;
-	if (v == 0)
+	if (gav == 0)
 	    stderror(ERR_NOMATCH);
-	v = copyblk(v);
+	gav = copyblk(gav);
     }
     else {
 	gv = NULL;
-	v = copyblk(v);
-	trim(v);
+	gav = copyblk(gav);
+	trim(gav);
     }
 
     getexit(osetexit);
@@ -484,7 +485,7 @@ doeval1(v)
 #else /* !cray */
     if ((my_reenter = setexit()) == 0) {
 #endif /* cray */
-	evalvec = v;
+	evalvec = gav;
 	evalp = 0;
 	process(0);
     }

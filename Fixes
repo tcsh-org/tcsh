@@ -1,4 +1,17 @@
 V6.02.00, ...
+46. 6.01.06 (3/7/92)
+45. complete styles are ignored after shell metachars eg.
+    > complete mail =u
+    > mail christos < [tab]
+    completes filenames.
+44. $echo_style is initialized to the default style of the machine.
+43. SGI 4.0 CTRL() macro is busted. So we ignore it.
+42. Fixed bug with the new margin code (thanks justin)
+41. Fixed mirroring of variables. Now set and setenv affect
+    HOME, TERM, PATH, SHLVL, USER and their csh counterparts. Unset affects
+    affects only the csh copies of the variables, and unsetenv only the
+    environment variables.
+40. Fixed gcc-2.0 warnings in sh.sem.c (needed for vfork() -O2 optimization)
 39. 6.01.05 (2/21/92)
 38. signal masking for BSD machines was still wrong in tw.init.c
 37. Added $margin_bug, and now the editor outputs on the rightmost 

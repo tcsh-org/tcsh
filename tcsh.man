@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.30 1992/02/13 05:28:51 christos Exp $
+.\" $Id: tcsh.man,v 3.31 1992/02/21 23:16:20 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -129,7 +129,7 @@ directory is changed.
 32) Enhanced history/variable modifier expansion
 .sp
 .ti -4
-33) Enhanced history/variable modifier expansion
+33) Programmable file/user/variable/alias completion.
 .RE
 .sp
 For a description of standard C-shell features, see the
@@ -1854,6 +1854,7 @@ The current possible values are:
 \fIaixESA\fR		an IBM ESA, running aix
 \fIalliant\fR		an Alliant FX series
 \fIamdahl\fR		an Amdahl running uts 2.1
+\fIamiga\fR		an amiga running amix 2.02
 \fIapollo\fR		an Apollo running DomainOS
 \fIatt3b15\fR		an AT&T 3b15
 \fIatt3b2\fR		an AT&T 3b2
@@ -2470,7 +2471,8 @@ and
 .I "/etc/logout.std"
 Finally on
 .I irix,
-.I A/UX
+.I A/UX,
+.I AMIX,
 and the
 .I cray
 only the file
@@ -2560,6 +2562,13 @@ re-written as:
 .RE
 .fi
 .sp
+.I Tcsh 
+can also use the
+.I l
+and 
+.I u
+modifiers to change the case of a word.
+.sp
 Also 
 .I tcsh 
 has an additional : character
@@ -2618,7 +2627,7 @@ implementation when used with the
 modifier. For example :as/f/ff/ will never terminate. This behavior
 might change in the future.
 .sp
-.SH "33. PROGRAMMABLE FILE COMPLETION"
+.SH "33. PROGRAMMABLE COMPLETION"
 The new 
 .I complete
 and 
@@ -2628,12 +2637,9 @@ in tcsh. For example some commands like
 .I cd, 
 .I pushd, 
 .I popd 
-etc, expect only directories as arguments. In addition
 .I mkdir(1)
-and 
 .I rmdir(1)
-don't accept a trailing slash in a path component. Normally
-builtin, 
+Normally
 .I tcsh 
 when asked to list or complete an argument for those commands takes
 into account all the files and not only directories. This behavior
@@ -2683,7 +2689,7 @@ For example, in the C compiler, it makes sense to complete only files
 that the compiler understands:
 .sp
 .br
-> complete cc =f:*.[cao]
+> complete cc '=f:*.[cao]'
 .br
 .PP
 It is also useful to exclude files from the completion list. Normally
@@ -2706,7 +2712,7 @@ builtin to protect precious files:
 .sp
 .nf
 > set fignore=(.o)
-> complete rm =f:^*.{c,h,cc,C,tex,1,man,l,y}
+> complete rm '=f:^*.{c,h,cc,C,tex,1,man,l,y}'
 > ls
 foo.c foo.o
 > vi f<tab>
@@ -2725,7 +2731,7 @@ can be used to change the list of items to be completed:
 > complete which =c	
 > complete dbx =c core
 > complete alias =a	# complete aliases
-> complete set =v	# complete variables
+> complete set =s	# complete variables
 > complete finger =u	# complete user-names
 .fi
 .sp

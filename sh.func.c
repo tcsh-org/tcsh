@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.25 1992/02/13 05:28:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.26 1992/02/21 23:16:20 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.25 1992/02/13 05:28:51 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.26 1992/02/21 23:16:20 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -51,6 +51,7 @@ extern char **environ;
 extern bool MapsAreInited;
 extern bool NLSMapsAreInited;
 extern bool NoNLSRebind;
+extern bool GotTermCaps;
 
 static int zlast = -1;
 
@@ -1185,6 +1186,29 @@ dosetenv(v, c)
     else if (eq(vp, STRNOREBIND)) {
 	NoNLSRebind = 1;
     }
+    else if (eq(vp, STRTERM)) {
+	set(STRterm, Strsave(lp));
+	GotTermCaps = 0;
+	ed_Init();
+    }
+    else if (eq(vp, STRHOME)) {
+	Char *cp = Strsave(value(vp));	/* get the old value back */
+
+	/*
+	 * convert to canonical pathname (possibly resolving symlinks)
+	 */
+	cp = dcanon(cp, cp);
+
+	set(STRhome, Strsave(cp));	/* have to save the new val */
+
+	/* fix directory stack for new tilde home */
+	dtilde();
+	xfree((ptr_t) cp);
+    }
+    else if (eq(vp, STRSHLVL)) 
+	set(STRshlvl, Strsave(lp));
+    else if (eq(vp, STRUSER))
+	set(STRuser, Strsave(lp));
 #ifdef SIG_WINDOW
     else if ((eq(lp, STRNULL) &&
 	      (eq(vp, STRLINES) || eq(vp, STRCOLUMNS))) ||
@@ -1808,7 +1832,7 @@ retry:
  *   pgrp, with no way for the shell to get them going again.  -IAN!
  */
 
-static Char **gv = NULL;
+static Char **gv = NULL, **gav = NULL;
 
 /*ARGSUSED*/
 void
@@ -1839,22 +1863,23 @@ doeval(v, c)
     oSHDIAG = SHDIAG;
 
     savegv = gv;
+    gav = v;
 
-    v++;
-    if (*v == 0)
+    gav++;
+    if (*gav == 0)
 	return;
-    gflag = 0, tglob(v);
+    gflag = 0, tglob(gav);
     if (gflag) {
-	gv = v = globall(v);
+	gv = gav = globall(gav);
 	gargv = 0;
-	if (v == 0)
+	if (gav == 0)
 	    stderror(ERR_NOMATCH);
-	v = copyblk(v);
+	gav = copyblk(gav);
     }
     else {
 	gv = NULL;
-	v = copyblk(v);
-	trim(v);
+	gav = copyblk(gav);
+	trim(gav);
     }
 
     saveIN = dcopy(SHIN, -1);
@@ -1871,7 +1896,7 @@ doeval(v, c)
 #else /* !cray */
     if ((my_reenter = setexit()) == 0) {
 #endif /* cray */
-	evalvec = v;
+	evalvec = gav;
 	evalp = 0;
 	SHIN = dcopy(0, -1);
 	SHOUT = dcopy(1, -1);

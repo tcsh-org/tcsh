@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.alloc.c,v 3.7 1991/10/28 06:26:50 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.alloc.c,v 3.8 1992/01/27 04:20:47 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.7 1991/10/28 06:26:50 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.8 1992/01/27 04:20:47 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -112,9 +112,8 @@ union overhead {
 #define	NBUCKETS 30
 static union overhead *nextf[NBUCKETS];
 
-#ifdef notdef
-extern char *sbrk();
-
+#ifdef sun
+extern ptr_t sbrk __P((int));
 #endif
 
 /*
