@@ -1,3 +1,6 @@
+ 53. module command completion (Dan Nicolaescu)
+ 52. Man command completion enhancement (Tom)
+ 51. Fixes for irix configuration (Kaveh)
  50. Support \a and \e in echo command. From (Keith Thompson)
  49. Alpha configure nit from Kaveh
  48. V6.08.05 - 19990511
