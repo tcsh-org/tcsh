@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.printf.c,v 3.6 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.printf.c,v 3.7 1992/06/16 20:46:26 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -38,7 +38,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.6 1992/04/03 22:15:14 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.7 1992/06/16 20:46:26 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -202,8 +202,8 @@ doprnt(addchar, sfmt, ap)
 		(*addchar) ((int) (i | attributes));
 		break;
 
-#ifdef SHORT_STRINGS
 	    case 'S':
+#ifdef SHORT_STRINGS
 		Bp = va_arg(ap, Char *);
 		if (!Bp) {
 		    bp = NULL;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.types.h,v 3.19 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.types.h,v 3.20 1992/06/16 20:46:26 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -49,7 +49,7 @@
 /***
  *** Suns running sunos4.1
  ***/
-#if defined(sun) || defined(__sun__)
+#if (defined(sun) || defined(__sun__)) && SYSVREL == 0
 /* This used to be long, but lint dissagrees... */
 # ifndef _SIGMASK_T
 #  define _SIGMASK_T
@@ -89,7 +89,7 @@
 #   endif /* _GID_T */
 #  endif /* !MACH */
 # endif /* !SUNOS4 */
-#endif /* sun || __sun__ */
+#endif /* (sun || __sun__) && SYSVREL == 0 */
 
 
 /***

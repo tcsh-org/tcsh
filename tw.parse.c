@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.33 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.34 1992/06/16 20:46:26 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.33 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.34 1992/06/16 20:46:26 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -55,13 +55,13 @@ RCSID("$Id: tw.parse.c,v 3.33 1992/05/09 04:03:53 christos Exp $")
 /*  TW_FILE,	       TW_DIRECTORY,   TW_VARLIST,     TW_USER,		*/
 /*  TW_COMPLETION,     TW_ALIAS,       TW_SHELLVAR,    TW_ENVVAR,	*/
 /*  TW_BINDING,        TW_WORDLIST,    TW_LIMIT,       TW_SIGNAL	*/
-/*  TW_JOB,	       TW_EXPLAIN					*/
+/*  TW_JOB,	       TW_EXPLAIN,     TW_PATHNAME			*/
 static void (*tw_start_entry[]) __P((DIR *, Char *)) = {
     tw_file_start,     tw_cmd_start,   tw_var_start,   tw_logname_start, 
     tw_file_start,     tw_file_start,  tw_vl_start,    tw_logname_start, 
     tw_complete_start, tw_alias_start, tw_var_start,   tw_var_start,     
     tw_bind_start,     tw_wl_start,    tw_limit_start, tw_sig_start,
-    tw_job_start,      tw_file_start
+    tw_job_start,      tw_file_start,  tw_file_start
 };
 
 static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
@@ -69,7 +69,7 @@ static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
     tw_file_next,      tw_file_next,   tw_var_next,    tw_logname_next,  
     tw_var_next,       tw_var_next,    tw_shvar_next,  tw_envvar_next,   
     tw_bind_next,      tw_wl_next,     tw_limit_next,  tw_sig_next,
-    tw_job_next,       tw_file_next
+    tw_job_next,       tw_file_next,   tw_file_next
 };
 
 static void (*tw_end_entry[]) __P((void)) = {
@@ -77,7 +77,7 @@ static void (*tw_end_entry[]) __P((void)) = {
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_logname_end, 
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
-    tw_dir_end,	       tw_dir_end
+    tw_dir_end,	       tw_dir_end,     tw_dir_end
 };
 
 /* #define TDEBUG */
@@ -324,7 +324,15 @@ tenematch(inputline, num_read, command)
 	    /* get rid of old word */
 	    DeleteBack(str_end - word_start);	
 	    /* insert newly spelled word */
+#ifdef notdef
+	    /* 
+	     * We don't want to quote spelling stuff, otherwise
+	     * $OHME -> \$HOME 
+	     */
 	    if (InsertStr(quote_meta(wordp, qu, 0)) < 0)
+		return -1;	/* error inserting */
+#endif
+	    if (InsertStr(wordp) < 0)
 		return -1;	/* error inserting */
 	}
 	return search_ret;
@@ -1124,6 +1132,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
     non_unique_match = FALSE;	/* See the recexact code below */
 
     extract_dir_and_name(word, dir, name);
+    exp_dir[0] = '\0';
 
     /*
      * Try to figure out what we should be looking for
@@ -1148,6 +1157,12 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 	if (looking == TW_COMMAND && (*word == '\0')) 
 	    return (-1);
 #endif
+	break;
+    case TW_PATHNAME:
+	gpat = 0;	/* pattern holds the pathname to be used */
+	copyn(exp_dir, pat, MAXNAMLEN);
+	catn(exp_dir, dir, MAXNAMLEN);
+	dir[0] = '\0';
 	break;
 
     case TW_VARLIST:
@@ -1188,7 +1203,6 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 #ifdef TDEBUG
     xprintf("looking = %d\n", looking);
 #endif
-    exp_dir[0] = '\0';
 
     switch (looking) {
     case TW_ALIAS:
@@ -1247,6 +1261,13 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
     case TW_FILE:
 	if ((nd = expand_dir(dir, exp_dir, &dir_fd, command)) != 0)
 	    return nd;
+	break;
+    case TW_PATHNAME:
+	if ((dir_fd = opendir(short2str(exp_dir))) == NULL) {
+	    xprintf("%S: %s\n", exp_dir, strerror(errno));
+	    return -1;
+	}
+	looking = TW_FILE;
 	break;
 
     case TW_LOGNAME:
@@ -1518,7 +1539,7 @@ nostat(dir)
     if ((vp = adrof(STRnostat)) == NULL || (cp = vp->vec) == NULL)
 	return (FALSE);
     for (; *cp != NULL; cp++)
-	if (eq(*cp, dir))
+	if (Gmatch(dir, *cp))
 	    return (TRUE);
     return (FALSE);
 } /* end nostat */
@@ -1537,7 +1558,7 @@ filetype(dir, file)
 	char   *ptr;
 	struct stat statb;
 
-	if (nostat(dir)) return('/');
+	if (nostat(dir)) return(' ');
 
 	(void) Strcpy(path, dir);
 	catn(path, file, sizeof(path) / sizeof(Char));
@@ -1603,8 +1624,6 @@ isadirectory(dir, file)		/* return 1 if dir/file is a directory */
     if (dir) {
 	Char    path[MAXPATHLEN];
 	struct stat statb;
-
-	if (nostat(dir)) return(1);
 
 	(void) Strcpy(path, dir);
 	catn(path, file, sizeof(path) / sizeof(Char));

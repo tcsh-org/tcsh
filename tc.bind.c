@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.bind.c,v 3.8 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.bind.c,v 3.9 1992/06/16 20:46:26 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.8 1992/04/10 16:38:09 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.9 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -340,7 +340,7 @@ dobindkey(v, c)
     struct command *c;
 {
     KEYCMD *map;
-    int     ntype, no, remove;
+    int     ntype, no, remove, key;
     Char   *par;
     Char    p;
     Char    inbuf[200];
@@ -354,13 +354,16 @@ dobindkey(v, c)
 
     map = CcKeyMap;
     ntype = XK_CMD;
-    remove = 0;
+    key = remove = 0;
     for (no = 1, par = v[no]; 
 	 par != NULL && (*par++ & CHAR) == '-'; no++, par = v[no]) {
 	if ((p = (*par & CHAR)) == '-')
 	    break;
 	else 
 	    switch (p) {
+	    case 'k':
+		key = 1;
+		break;
 	    case 'a':
 		map = CcAltMap;
 		break;
@@ -400,9 +403,17 @@ dobindkey(v, c)
 	return;
     }
 
-    if ((in = parsestring(v[no++], inbuf)) == NULL)
-	return;
+    if (key) 
+	in = v[no++];
+    else
+	if ((in = parsestring(v[no++], inbuf)) == NULL)
+	    return;
+
     if (remove) {
+	if (key) {
+	    (void) ClearArrowKeys(in);
+	    return;
+	}
 	if (in[1]) {
 	    (void) DeleteXkey(in);
 	}
@@ -416,7 +427,10 @@ dobindkey(v, c)
 	return;
     }
     if (!v[no]) {
-	printkey(map, in);
+	if (key)
+	    PrintArrowKeys(in);
+	else
+	    printkey(map, in);
 	return;
     }
     if (v[no + 1]) {
@@ -428,25 +442,34 @@ dobindkey(v, c)
     case XK_EXE:
 	if ((out = parsestring(v[no], outbuf)) == NULL)
 	    return;
-	AddXkey(in, XmapStr(out), ntype);
+	if (key)
+	    SetArrowKeys(in, XmapStr(out), ntype);
+	else
+	    AddXkey(in, XmapStr(out), ntype);
 	map[(unsigned char) *in] = F_XKEY;
 	break;
     case XK_CMD:
 	if ((cmd = parsecmd(v[no])) == 0)
 	    return;
-	if (in[1]) {
-	    AddXkey(in, XmapCmd((int) cmd), ntype);
-	    map[(unsigned char) *in] = F_XKEY;
-	}
+	if (key)
+	    SetArrowKeys(in, XmapCmd((int) cmd), ntype);
 	else {
-	    ClearXkey(map, in);
-	    map[(unsigned char) *in] = cmd;
+	    if (in[1]) {
+		AddXkey(in, XmapCmd((int) cmd), ntype);
+		map[(unsigned char) *in] = F_XKEY;
+	    }
+	    else {
+		ClearXkey(map, in);
+		map[(unsigned char) *in] = cmd;
+	    }
 	}
 	break;
     default:
 	abort();
 	break;
     }
+    if (key)
+	BindArrowKeys();
 }
 
 static void
@@ -555,7 +578,7 @@ parseescape(ptr)
 	    break;
 	}
     }
-    else if ((*p & CHAR) == '^' && Isalpha(p[1])) {
+    else if ((*p & CHAR) == '^' && Isalpha(p[1] & CHAR)) {
 	p++;
 	c = (*p == '?') ? '\177' : ((*p & CHAR) & 0237);
     }
@@ -664,6 +687,8 @@ print_all_keys()
     printkeys(CcAltMap, prev, i - 1);
     xprintf("Multi-character bindings\n");
     PrintXkey(STRNULL);	/* print all Xkey bindings */
+    xprintf("Arrow key bindings\n");
+    PrintArrowKeys(STRNULL);
 }
 
 static void
@@ -725,6 +750,7 @@ bindkey_usage()
     xprintf("    -d   initialized maps to default bindings\n");
     xprintf("    -l   list available functions with descriptions\n");
     xprintf("    -r   remove the binding of in-string\n");
+    xprintf("    -k   bind arrow key with name in in-string\n");
     xprintf(
        "\nIn no out-string or command is given, the binding for in-string\n");
     xprintf("is printed or all bindings if in-strings is not given.\n");

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.screen.c,v 3.22 1992/05/11 14:23:58 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.screen.c,v 3.23 1992/06/16 20:46:26 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.22 1992/05/11 14:23:58 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.23 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -315,7 +315,7 @@ TCalloc(t, cap)
 		continue;
 	    termbuf[tlen++] = '\0';
 	}
-    copy(termcap_alloc, termbuf, TC_BUFSIZE);
+    (void) memmove((ptr_t) termcap_alloc, (ptr_t) termbuf, TC_BUFSIZE);
     tloc = tlen;
     if (tloc + 3 >= TC_BUFSIZE) {
 	stderror(ERR_NAME | ERR_TCNOSTR);
@@ -671,29 +671,127 @@ EchoTC(v)
 
 bool    GotTermCaps = 0;
 
+static struct {
+    Char   *name;
+    int     key;
+    XmapVal fun;
+    int	    type;
+} arrow[4];
+
+
+void
+ResetArrowKeys()
+{
+    arrow[A_K_DN].name    = STRdown;
+    arrow[A_K_DN].fun.cmd = F_DOWN_HIST;
+    arrow[A_K_DN].type    = XK_CMD;
+
+    arrow[A_K_UP].name    = STRup;
+    arrow[A_K_UP].fun.cmd = F_UP_HIST;
+    arrow[A_K_UP].type    = XK_CMD;
+
+    arrow[A_K_LT].name    = STRleft;
+    arrow[A_K_LT].fun.cmd = F_CHARBACK;
+    arrow[A_K_LT].type    = XK_CMD;
+
+    arrow[A_K_RT].name    = STRright;
+    arrow[A_K_RT].fun.cmd = F_CHARFWD;
+    arrow[A_K_RT].type    = XK_CMD;
+
+}
+
+void
+DefaultArrowKeys() 
+{
+    static Char strA[] = {033, '[', 'A', '\0'};
+    static Char strB[] = {033, '[', 'B', '\0'};
+    static Char strC[] = {033, '[', 'C', '\0'};
+    static Char strD[] = {033, '[', 'D', '\0'};
+    static Char stOA[] = {033, 'O', 'A', '\0'};
+    static Char stOB[] = {033, 'O', 'B', '\0'};
+    static Char stOC[] = {033, 'O', 'C', '\0'};
+    static Char stOD[] = {033, 'O', 'D', '\0'};
+
+    AddXkey(strA, &arrow[A_K_UP].fun, arrow[A_K_UP].type);
+    AddXkey(strB, &arrow[A_K_DN].fun, arrow[A_K_DN].type);
+    AddXkey(strC, &arrow[A_K_RT].fun, arrow[A_K_RT].type);
+    AddXkey(strD, &arrow[A_K_LT].fun, arrow[A_K_LT].type);
+    AddXkey(stOA, &arrow[A_K_UP].fun, arrow[A_K_UP].type);
+    AddXkey(stOB, &arrow[A_K_DN].fun, arrow[A_K_DN].type);
+    AddXkey(stOC, &arrow[A_K_RT].fun, arrow[A_K_RT].type);
+    AddXkey(stOD, &arrow[A_K_LT].fun, arrow[A_K_LT].type);
+    if (VImode) {
+	AddXkey(&strA[1], &arrow[A_K_UP].fun, arrow[A_K_UP].type);
+	AddXkey(&strB[1], &arrow[A_K_DN].fun, arrow[A_K_DN].type);
+	AddXkey(&strC[1], &arrow[A_K_RT].fun, arrow[A_K_RT].type);
+	AddXkey(&strD[1], &arrow[A_K_LT].fun, arrow[A_K_LT].type);
+	AddXkey(&stOA[1], &arrow[A_K_UP].fun, arrow[A_K_UP].type);
+	AddXkey(&stOB[1], &arrow[A_K_DN].fun, arrow[A_K_DN].type);
+	AddXkey(&stOC[1], &arrow[A_K_RT].fun, arrow[A_K_RT].type);
+	AddXkey(&stOD[1], &arrow[A_K_LT].fun, arrow[A_K_LT].type);
+    }
+}
+
+
+int
+SetArrowKeys(name, fun, type)
+    Char *name;
+    XmapVal *fun;
+    int type;
+{
+    int i;
+    for (i = 0; i < 4; i++)
+	if (Strcmp(name, arrow[i].name) == 0) {
+	    arrow[i].fun  = *fun;
+	    arrow[i].type = type;
+	    return 0;
+	}
+    return -1;
+}
+
+
+int
+ClearArrowKeys(name)
+    Char *name;
+{
+    int i;
+    for (i = 0; i < 4; i++)
+	if (Strcmp(name, arrow[i].name) == 0) {
+	    arrow[i].type = XK_NOD;
+	    return 0;
+	}
+    return -1;
+}
+
+void
+PrintArrowKeys(name)
+    Char *name;
+{
+    int i;
+
+    for (i = 0; i < 4; i++)
+	if (name == STRNULL || Strcmp(name, arrow[i].name) == 0)
+	    if (arrow[i].type != XK_NOD)
+		printOne(arrow[i].name, &arrow[i].fun, arrow[i].type);
+}
+
+
 void
 BindArrowKeys()
 {
     KEYCMD *map, *dmap;
     int     i, j;
     char   *p;
-    static struct {
-	int     key, fun;
-    }       ar[] =
-    {
-	{ T_kd, F_DOWN_HIST },
-	{ T_ku, F_UP_HIST   },
-	{ T_kl, F_CHARBACK  },
-	{ T_kr, F_CHARFWD   }
-    };
 
     if (!GotTermCaps)
 	return;
     map = VImode ? CcAltMap : CcKeyMap;
     dmap = VImode ? CcViCmdMap : CcEmacsMap;
 
+    DefaultArrowKeys();
+
     for (i = 0; i < 4; i++) {
-	p = tstr[ar[i].key].str;
+	p = tstr[arrow[i].key].str;
 	if (p && *p) {
 	    j = (unsigned char) *p;
 	    /*
@@ -704,13 +802,20 @@ BindArrowKeys()
 	     *    has re-assigned the leading character to be F_XKEY
 	     * 2. They are single arrow keys pointing to an unassigned key.
 	     */
-	    if (p[1] && (dmap[j] == map[j] || map[j] == F_XKEY)) {
-		AddXkey(str2short(p), XmapCmd(ar[i].fun), XK_CMD);
-		map[j] = F_XKEY;
-	    }
-	    else if (map[j] == F_UNASSIGNED) {
+	    if (arrow[i].type == XK_NOD)
 		ClearXkey(map, str2short(p));
-		map[j] = ar[i].fun;
+	    else {
+		if (p[1] && (dmap[j] == map[j] || map[j] == F_XKEY)) {
+		    AddXkey(str2short(p), &arrow[i].fun, arrow[i].type);
+		    map[j] = F_XKEY;
+		}
+		else if (map[j] == F_UNASSIGNED) {
+		    ClearXkey(map, str2short(p));
+		    if (arrow[i].type == XK_CMD)
+			map[j] = arrow[i].fun.cmd;
+		    else
+			AddXkey(str2short(p), &arrow[i].fun, arrow[i].type);
+		}
 	    }
 	}
     }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.sem.c,v 3.18 1992/03/08 02:17:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.sem.c,v 3.19 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.18 1992/03/08 02:17:22 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.19 1992/06/16 20:46:26 christos Exp $")
 
 #include "tc.h"
 
@@ -50,9 +50,9 @@ RCSID("$Id: sh.sem.c,v 3.18 1992/03/08 02:17:22 christos Exp $")
 #endif /* FIOCLEX */
 
 #if defined(__sparc__) || defined(sparc)
-# ifndef MACH
+# if !defined(MACH) && SYSVREL == 0
 #  include <vfork.h>
-# endif /* !MACH */
+# endif /* !MACH && SYSVREL == 0 */
 #endif /* __sparc__ || sparc */
 
 #ifdef VFORK

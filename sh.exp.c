@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exp.c,v 3.8 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exp.c,v 3.9 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.8 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.9 1992/06/16 20:46:26 christos Exp $")
 
 /*
  * C shell
@@ -455,7 +455,7 @@ exp6(vp, ignore)
 	Char   *fakecom[2];
 
 	faket.t_dtyp = NODE_COMMAND;
-	faket.t_dflg = 0;
+	faket.t_dflg = F_BACKQ;
 	faket.t_dcar = faket.t_dcdr = faket.t_dspr = NULL;
 	faket.t_dcom = fakecom;
 	fakecom[0] = STRfakecom;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.decls.h,v 3.15 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.decls.h,v 3.16 1992/06/16 20:46:26 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -96,6 +96,7 @@ extern	Char		 *gettilde	__P((Char *));
 extern	Char		 *getusername	__P((Char **));
 extern	void		  doaliases	__P((Char **, struct command *));
 extern	void		  shlvl		__P((int));
+extern	int		  fixio		__P((int, int));
 
 
 /*
@@ -134,7 +135,7 @@ extern	int		  xtcsetpgrp	__P((int, int));
 # undef tcgetpgrp
 # define tcgetpgrp(a) 	  xtcgetpgrp(a)
 # undef tcsetpgrp
-# define tcsetpgrp(a, b)  xtcsetpgrp(a, b)
+# define tcsetpgrp(a, b)  xtcsetpgrp((a), (b))
 #endif /* NEEDtcgetpgrp */
 
 #ifdef YPBUGS
@@ -142,6 +143,12 @@ extern	void	 	  fix_yp_bugs	__P((void));
 #endif /* YPBUGS */
 
 extern	void	 	  osinit	__P((void));
+
+#ifdef NEEDmemmove
+extern void 		 *xmemmove	__P((ptr_t, const ptr_t, size_t));
+# define memmove(a, b, c) xmemmove((a), (b), (c))
+#endif /* NEEDmemmove */
+
 
 #ifdef NEEDgetwd
 extern	char		 *xgetwd	__P((char *));
@@ -152,7 +159,7 @@ extern	char		 *xgetwd	__P((char *));
 #ifdef NEEDgethostname
 extern	int	 	  xgethostname	__P((char *, int));
 # undef gethostname
-# define gethostname(a, b) xgethostname(a, b)
+# define gethostname(a, b) xgethostname((a), (b))
 #endif /* NEEDgethostname */
 
 #ifdef NEEDnice

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.29 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.30 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.29 1992/05/09 04:03:53 christos Exp $")
+RCSID("$Id: sh.c,v 3.30 1992/06/16 20:46:26 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -98,6 +98,7 @@ static bool    reenter = 0;
 static bool    nverbose = 0;
 static bool    nexececho = 0;
 static bool    quitit = 0;
+static bool    rdirs = 0;
 bool    fast = 0;
 static bool    batch = 0;
 static bool    mflag = 0;
@@ -247,6 +248,7 @@ main(argc, argv)
 #endif				/* NLS */
     if (MapsAreInited && !NLSMapsAreInited)
 	ed_InitNLSMaps();
+    ResetArrowKeys();
 
     /*
      * Initialize for periodic command intervals. Also, initialize the dummy
@@ -628,6 +630,9 @@ main(argc, argv)
 		}
 		prompt = 0;
 		nofile = 1;
+		break;
+	    case 'd':		/* -d	Load directory stack from file */
+		rdirs = 1;
 		break;
 
 #ifdef apollo
@@ -1018,7 +1023,7 @@ main(argc, argv)
 	if (loginsh)
 	    (void) srccat(value(STRhome), STRsldotlogin);
 #endif
-	if (!fast)
+	if (!fast && (loginsh || rdirs))
 	    loaddirs(NULL);
     }
     /* Initing AFTER .cshrc is the Right Way */
@@ -1247,7 +1252,7 @@ srcunit(unit, onlyown, hflg, av)
     /* Setup the new values of the state stuff saved above */
 
 #ifdef NO_STRUCT_ASSIGNMENT
-    copy((char *) &(saveB), (char *) &B, sizeof(B));
+    (void) memmove((ptr_t) &(saveB), (ptr_t) &B, sizeof(B));
 #else
     saveB = B;
 #endif
@@ -1316,7 +1321,7 @@ srcunit(unit, onlyown, hflg, av)
 
 	/* Reset input arena */
 #ifdef NO_STRUCT_ASSIGNMENT
-	copy((char *) &B, (char *) &(saveB), sizeof(B));
+	(void) memmove((ptr_t) &B, (ptr_t) &(saveB), sizeof(B));
 #else
 	B = saveB;
 #endif

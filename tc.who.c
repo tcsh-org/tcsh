@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.who.c,v 3.12 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.who.c,v 3.13 1992/06/16 20:46:26 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.12 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.13 1992/06/16 20:46:26 christos Exp $")
 
 #include "tc.h"
 
@@ -497,7 +497,7 @@ who_info(ptr, c, wbuf)
     case 'm':
 	if (wp->who_host[0] == '\0')
 	    return "local";
-	else
+	else {
 	    /* the ':' stuff is for <host>:<display>.<screen> */
 	    for (pb = wp->who_host, flg = Isdigit(*pb) ? '\0' : '.';
 		 *pb != '\0' &&
@@ -509,7 +509,7 @@ who_info(ptr, c, wbuf)
 	    }
 	    *wb = '\0';
 	    return wbuf;
-	break;
+	}
 
     case 'M':
 	if (wp->who_host[0] == '\0')
@@ -520,7 +520,6 @@ who_info(ptr, c, wbuf)
 	    *wb = '\0';
 	    return wbuf;
 	}
-	break;
 #endif /* UTHOST */
 
     case 'l':

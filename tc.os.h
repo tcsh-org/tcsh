@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.29 1992/05/09 04:03:53 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.30 1992/06/16 20:46:26 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -391,7 +391,9 @@ extern char *ttyname();
 extern int toupper __P((int));
 extern int tolower __P((int));
 extern caddr_t sbrk __P((int));
+# if SYSVREL == 0
 extern int qsort();
+# endif
 #else
 # ifndef hpux
 #  if __GNUC__ != 2
@@ -517,12 +519,21 @@ extern int	killpg	__P((pid_t, int));
 
 #endif /* POSIX */
 
-# if (defined(sun) || defined(__sun__)) && __GNUC__ == 2
+# if (defined(sun) || defined(__sun__)) && __GNUC__ == 2 && SYSVREL == 0
 /*
  * Somehow these are missing
  */
 extern int ioctl __P((int, int, ...));
 extern int readlink __P((const char *, char *, size_t));
-# endif /* sun && __GNUC__ == 2 */
+# endif /* sun && __GNUC__ == 2 && SYSVREL == 0 */
+
+#if defined(BSD) || (defined(sun) || defined(__sun__))
+extern void bcopy	__P((char *, char *, int));
+# define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
+#endif
+
+#if !defined(hpux) && (SYSVREL < 4) && !defined(memmove)
+# define NEEDmemmove
+#endif
 
 #endif /* _h_tc_os */

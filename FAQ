@@ -103,4 +103,18 @@ be able to get it... :-)
 
     It is a bug in the unbundled optimizer. Lower the optimization level.
 
+11. How can I use the arrow keys with hpterm?
+    Hp terminals use the arrow keys internally. You can tell hpterm not
+    to do that, by sending it the termcap sequence smkx. Since this
+    has to be done all the time, the easiest thing is to put it as an
+    alias for precmd, or inside the prompt:
+
+    if ($term == "hp") then
+	set prompt="%{`echotc smkx`%}$prompt"
+    endif
+
+    Note that by doing that you cannot use pgup and pgdn to scroll...
+
+christos
+
 Everything else is a bug :-(

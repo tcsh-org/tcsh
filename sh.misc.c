@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.misc.c,v 3.12 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.misc.c,v 3.13 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.12 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.13 1992/06/16 20:46:26 christos Exp $")
 
 static	int	renum	__P((int, int));
 static  Char  **blkend	__P((Char **));
@@ -350,18 +350,6 @@ renum(i, j)
 	return (j);
     }
     return (k);
-}
-
-void
-copy(to, from, size)
-    register char *to, *from;
-    register int size;
-{
-    if (size && from && to)
-	do
-	    /*SUPPRESS 112*/
-	    *to++ = *from++;
-	while (--size != 0);
 }
 
 /*

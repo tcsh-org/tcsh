@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.14 1992/05/15 21:54:34 christos Exp $
+/**/# $Id: Imakefile,v 1.15 1992/05/15 23:49:22 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -33,7 +33,7 @@ ones.  Please send in your fixes and additions! */
 #endif
 
 #ifdef NeXTArchitecture
-#define ConfigH next
+#define ConfigH mach
 #endif
 
 #if defined(SunArchitecture)
@@ -244,7 +244,7 @@ platform, unless you have a really weird architecture. */
 #ifdef MyCC
 CC = MyCC
 #else
-# if HasGcc || HasGCC
+# if defined(HasGcc) || defined(HasGCC)
 #  ifdef HasGcc2
 CC = gcc 
 #  else
@@ -256,11 +256,7 @@ CC = cc
 #endif
 
 #ifdef HESIOD
-# ifdef NeXTArchitecture
-HESLIB = -L/usr/athena/lib -lhesiod -lresolv
-# else
 HESLIB = -L/usr/athena/lib -lhesiod
-# endif
 /* it seems to me that the -I shouldn't be necessary, but there seems
 to be a bug in the Imake stuff, so here it is. */
 HESDEF = -DHESIOD -I/usr/athena/include

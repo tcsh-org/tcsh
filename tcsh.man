@@ -1,11 +1,11 @@
-.\" $Id: tcsh.man,v 3.43 1992/05/15 21:54:34 christos Exp $
+.\" $Id: tcsh.man,v 3.44 1992/06/16 20:46:26 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
 .B tcsh 
 [ 
-.B \-bcefimnqstvVxX 
+.B \-bcdefimnqstvVxX 
 ] 
 [ 
 .I argument .\|.\|.
@@ -178,7 +178,7 @@ is used by VI command mode. For multi-character input the basic key maps
 contains a sequence-lead-in for the first character in the input.
 .PP
 Options:
-    -a    bind in-string in alternative key map.
+    -a    bind in-string in alternative key map
 .br
     -s    bind an out-string instead of a command
 .br
@@ -187,6 +187,8 @@ Options:
     -v    bind for default VI-mode
 .br
     -e    bind for default emacs-mode
+.br
+    -k    interpret in-string as a symbolic key name
 .br
     -d    bind to compiled in default
 .br
@@ -2557,6 +2559,9 @@ or present only in
 (+)
 .sp
 .TP 4
+.I \-d
+Force load of directory stack. (+)
+.TP 4
 .I \-Dname[=value]
 Set environment variable name to value. (Domain/OS only) (+)
 .TP 4
@@ -2824,6 +2829,7 @@ f	Complete file or path component
 j	Complete jobs
 l	Complete limits
 n	Complete nothing
+p	Complete files using the supplied pathname prefix
 s	Complete shell variable
 v	Complete any variable
 u	Complete username

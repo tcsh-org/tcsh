@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.23 1992/04/10 16:38:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.chared.c,v 3.24 1992/06/16 20:46:26 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.23 1992/04/10 16:38:09 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.24 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -74,7 +74,6 @@ static	void	 c_delafter		__P((int));
 static	void	 c_delbefore		__P((int));
 static	Char	*c_prev_word		__P((Char *, Char *, int));
 static	Char	*c_next_word		__P((Char *, Char *, int));
-static	void	 c_copy			__P((Char *, Char *, int));
 static	Char	*c_number		__P((Char *, int *, int));
 static	Char	*c_expand		__P((Char *));
 static	void	 c_excl			__P((Char *));
@@ -276,30 +275,6 @@ c_nexword(p, high, n)
  * Ray Moody <ray@gibbs.physics.purdue.edu>
  * this is a neat, but odd, addition.
  */
-
-/*
- * c_copy is sorta like bcopy() except that we handle overlap between
- * source and destination memory
- */
-
-static void
-c_copy(src, dst, length)
-    register Char *src, *dst;
-    register int length;
-{
-    if (src > dst) {
-	while (length--) {
-	    *dst++ = *src++;
-	}
-    }
-    else {
-	src += length;
-	dst += length;
-	while (length--) {
-	    *--dst = *--src;
-	}
-    }
-}
 
 /*
  * c_number: Ignore character p points to, return number appearing after that.
@@ -518,10 +493,12 @@ excl_sw:
      */
     if (LastChar + (bend - buf) - (q - op) >= InputLim)
 	goto excl_err;
-    c_copy(q, q + (bend - buf) - (q - op), LastChar - q);
+    (void) memmove((ptr_t) (q + (bend - buf) - (q - op)), (ptr_t) q, 
+		   (size_t) ((LastChar - q) * sizeof(Char)));
     LastChar += (bend - buf) - (q - op);
     Cursor += (bend - buf) - (q - op);
-    c_copy(buf, op, (bend - buf));
+    (void) memmove((ptr_t) op, (ptr_t) buf, 
+		   (size_t) ((bend - buf) * sizeof(Char)));
     *LastChar = '\0';
     return(op + (bend - buf));
 excl_err:

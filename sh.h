@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.35 1992/05/15 23:49:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.36 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -518,20 +518,19 @@ EXTERN int   OLDSTD;		/* Old standard input (def for cmds) */
 typedef jmp_buf jmp_buf_t;
 
 /* bugfix by Jak Kirman @ Brown U.: remove the (void) cast here, see sh.c */
-#define	setexit()	setjmp(reslab)
-#define	reset()		longjmp(reslab, 1)
- /* Should use structure assignment here */
-#define	getexit(a)	copy((char *)(a), (char *)reslab, sizeof reslab)
-#define	resexit(a)	copy((char *)reslab, ((char *)(a)), sizeof reslab)
+# define setexit()  setjmp(reslab)
+# define reset()    longjmp(reslab, 1)
+# define getexit(a) (void) memmove((ptr_t)(a), (ptr_t)reslab, sizeof(reslab))
+# define resexit(a) (void) memmove((ptr_t)reslab, ((ptr_t)(a)), sizeof(reslab))
 
 #else
 
 typedef struct { jmp_buf j; } jmp_buf_t;
 
-#define	setexit()	setjmp(reslab.j)
-#define	reset()		longjmp(reslab.j, 1)
-#define	getexit(a)	((a) = reslab)
-#define	resexit(a)	(reslab = (a))
+# define setexit()  setjmp(reslab.j)
+# define reset()    longjmp(reslab.j, 1)
+# define getexit(a) ((a) = reslab)
+# define resexit(a) (reslab = (a))
 
 #endif	/* NO_STRUCT_ASSIGNMENT */
 
@@ -689,7 +688,7 @@ struct command {
 #define	F_NICE		(1<<11)	/* t_nice is meaningful 	 */
 #define	F_NOHUP		(1<<12)	/* nohup this command 		 */
 #define	F_TIME		(1<<13)	/* time this command 		 */
-#define F_BACKQ		(1<<14)	/* execute command under SYSTYPE */
+#define F_BACKQ		(1<<14)	/* command is in ``		 */
 #ifdef apollo
 #define F_VER		(1<<15)	/* execute command under SYSTYPE */
 #endif 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.defns.c,v 3.11 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.defns.c,v 3.12 1992/03/21 02:46:07 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.11 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.12 1992/03/21 02:46:07 christos Exp $")
 
 #include "ed.h"
 
@@ -1386,13 +1386,14 @@ ed_InitVIMaps()
     register int i;
 
     VImode = 1;
-    ResetXmap(VImode);
+    ResetXmap();
     for (i = 0; i < 256; i++) {
 	CcKeyMap[i] = CcViMap[i];
 	CcAltMap[i] = CcViCmdMap[i];
     }
     ed_InitMetaBindings();
     ed_InitNLSMaps();
+    ResetArrowKeys();
     BindArrowKeys();
 }
 
@@ -1403,7 +1404,7 @@ ed_InitEmacsMaps()
     Char    buf[3];
 
     VImode = 0;
-    ResetXmap(VImode);
+    ResetXmap();
     for (i = 0; i < 256; i++) {
 	CcKeyMap[i] = CcEmacsMap[i];
 	CcAltMap[i] = F_UNASSIGNED;
@@ -1426,6 +1427,7 @@ ed_InitEmacsMaps()
     AddXkey(buf, XmapCmd(F_PATH_NORM),     XK_CMD);
     buf[1] = 'N';
     AddXkey(buf, XmapCmd(F_PATH_NORM),     XK_CMD);
+    ResetArrowKeys();
     BindArrowKeys();
 }
 

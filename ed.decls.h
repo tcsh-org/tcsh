@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.decls.h,v 3.10 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.decls.h,v 3.11 1991/11/26 04:28:26 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -91,6 +91,11 @@ extern	void	DeleteChars		__P((int));
 extern	void	TellTC			__P((char *));
 extern	void	SetTC			__P((char *, char *));
 extern	void	EchoTC			__P((Char **));
+extern	int 	SetArrowKeys		__P((Char *, XmapVal *, int));
+extern	void	ResetArrowKeys		__P((void));
+extern	void	DefaultArrowKeys	__P((void));
+extern	int 	ClearArrowKeys		__P((Char *));
+extern	void 	PrintArrowKeys		__P((Char *));
 extern	void	BindArrowKeys		__P((void));
 extern	void	Beep			__P((void));
 extern	int	CanWeTab		__P((void));
@@ -240,8 +245,9 @@ extern  XmapVal *XmapCmd		__P((int));
 extern	void	 AddXkey		__P((Char *, XmapVal *, int));
 extern	void	 ClearXkey		__P((KEYCMD *, Char *));
 extern	int	 GetXkey		__P((Char *, XmapVal *));
-extern	void	 ResetXmap		__P((int));
+extern	void	 ResetXmap		__P((void));
 extern	int	 DeleteXkey		__P((Char *));
 extern	void	 PrintXkey		__P((Char *));
+extern	int	 printOne		__P((Char *, XmapVal *, int));
 
 #endif /* _h_ed_decls */

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.32 1992/05/15 23:49:22 christos Exp $
+# $Id: Makefile,v 1.33 1992/06/16 20:46:26 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -48,7 +48,7 @@ LFLAGS=$(INCLUDES)
 #CFLAGS=-O $(INCLUDES)
 
 # gcc-2.1
-CFLAGS=-O2 $(INCLUDES)
+CFLAGS=-O2 $(INCLUDES) -B/bin/
 
 # gcc 2.1 on linux
 #CFLAGS=-O6 $(INCLUDES)
@@ -151,7 +151,7 @@ LIBES= -ltermcap		## BSD style things, hpux
 # If you want to take out -traditional, make sure that your sys/ioctl.h
 # is fixed correctly, otherwise you'll be stopped for tty input, or you
 # will lose the editor and job control.
-CC=	gcc -Wall -ansi -pedantic 
+CC=	gcc -Wall
 #CC=	cc
 #CC=	occ
 #CC=	acc

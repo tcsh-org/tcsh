@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.20 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.21 1992/06/20 22:25:15 christos Exp christos $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.20 1992/06/16 20:46:26 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.21 1992/06/20 22:25:15 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -652,23 +652,24 @@ pr_stat_sub(p2, p1, pr)
 
 #endif /* _SEQUENT_ */
 
-#ifdef memmove
+
+#ifdef NEEDmemmove
 /* memmove():
  * 	This is the ANSI form of bcopy() with the arguments backwards...
  *	Unlike memcpy(), it handles overlaps between source and 
  *	destination memory
  */
-static void*
-xmemmove(vsrc, vdst, len)
-    ptr_t vsrc;
-    const ptr_t vdst;
+void*
+xmemmove(vdst, vsrc, len)
+    ptr_t vdst;
+    const ptr_t vsrc;
     size_t len;
 {
-    char *src = (char *) vsrc;
-    const char *dst = (char *) vdst;
+    const char *src = (char *) vsrc;
+    char *dst = (char *) vdst;
 
     if (src == dst)
-	return;
+	return vdst;
 
     if (src > dst) {
 	while (len--) 
@@ -680,8 +681,10 @@ xmemmove(vsrc, vdst, len)
 	while (len--) 
 	    *--dst = *--src;
     }
+    return vdst;
 }
-#endif
+#endif /* NEEDmemmove */
+
 
 #ifdef tcgetpgrp
 int
@@ -943,9 +946,8 @@ xgetwd(pathname)
     DIR    *dp;
     struct dirent *d;
 
-    struct stat st_root, st_cur, st_next, st_dot;
+    struct stat st_root, st_cur, st_next, st_dotdot;
     char    pathbuf[MAXPATHLEN], nextpathbuf[MAXPATHLEN * 2];
-    char   *cur_name_add;
     char   *pathptr, *nextpathptr;
 
     /* find the inode of root */
@@ -957,10 +959,10 @@ xgetwd(pathname)
     pathbuf[MAXPATHLEN - 1] = '\0';
     pathptr = &pathbuf[MAXPATHLEN - 1];
     nextpathbuf[MAXPATHLEN - 1] = '\0';
-    cur_name_add = nextpathptr = &nextpathbuf[MAXPATHLEN - 1];
+    nextpathptr = &nextpathbuf[MAXPATHLEN - 1];
 
     /* find the inode of the current directory */
-    if (lstat("./", &st_cur) == -1) {
+    if (lstat(".", &st_cur) == -1) {
 	(void) xsprintf(pathname,
 			"getwd: Cannot stat \".\" (%s)", strerror(errno));
 	return (NULL);
@@ -978,6 +980,12 @@ xgetwd(pathname)
 	}
 
 	/* open the parent directory */
+	if (stat(nextpathptr, &st_dotdot) == -1) {
+	    (void) xsprintf(pathname,
+			    "getwd: Cannot stat directory \"%s\" (%s)",
+			    nextpathptr, strerror(errno));
+	    return (NULL);
+	}
 	if ((dp = opendir(nextpathptr)) == NULL) {
 	    (void) xsprintf(pathname,
 			    "getwd: Cannot open directory \"%s\" (%s)",
@@ -986,32 +994,42 @@ xgetwd(pathname)
 	}
 
 	/* look in the parent for the entry with the same inode */
-	for (d = readdir(dp); d != NULL; d = readdir(dp)) {
-	    (void) strcpy(cur_name_add, d->d_name);
-	    if (lstat(nextpathptr, &st_next) == -1) {
-		(void) xsprintf(pathname, "getwd: Cannot stat \"%s\" (%s)",
-				d->d_name, strerror(errno));
-		return (NULL);
-	    }
-	    if (d->d_name[0] == '.' && d->d_name[1] == '\0')
-		st_dot = st_next;
-
-	    /* check if we found it yet */
-	    if (st_next.st_ino == st_cur.st_ino &&
-	    DEV_DEV_COMPARE(st_next.st_dev, st_cur.st_dev)) {
-		st_cur = st_dot;
-		pathptr = strrcpy(pathptr, d->d_name);
-		pathptr = strrcpy(pathptr, "/");
-		nextpathptr = strrcpy(nextpathptr, "../");
-		*cur_name_add = '\0';
-		(void) closedir(dp);
-		break;
+	if (DEV_DEV_COMPARE(st_dotdot.st_dev, st_cur.st_dev)) {
+	    /* Parent has same device. No need to stat every member */
+	    for (d = readdir(dp); d != NULL; d = readdir(dp)) 
+		if (d->d_fileno == st_cur.st_ino)
+		    break;
+	}
+	else {
+	    /* 
+	     * Parent has a different device. This is a mount point so we 
+	     * need to stat every member 
+	     */
+	    for (d = readdir(dp); d != NULL; d = readdir(dp)) {
+		if (ISDOT(d->d_name) || ISDOTDOT(d->d_name))
+		    continue;
+		if (lstat(nextpathptr, &st_next) == -1) {
+		    (void) xsprintf(pathname, "getwd: Cannot stat \"%s\" (%s)",
+				    d->d_name, strerror(errno));
+		    (void) closedir(dp);
+		    return (NULL);
+		}
+		/* check if we found it yet */
+		if (st_next.st_ino == st_cur.st_ino &&
+		    DEV_DEV_COMPARE(st_next.st_dev, st_cur.st_dev)) 
+		    break;
 	    }
 	}
 	if (d == NULL) {
 	    (void) xsprintf(pathname, "getwd: Cannot find \".\" in \"..\"");
+	    (void) closedir(dp);
 	    return (NULL);
 	}
+	st_cur = st_dotdot;
+	pathptr = strrcpy(pathptr, d->d_name);
+	pathptr = strrcpy(pathptr, "/");
+	nextpathptr = strrcpy(nextpathptr, "../");
+	(void) closedir(dp);
     }
 } /* end getwd */
 

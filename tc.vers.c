@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.18 1992/05/15 21:54:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.vers.c,v 3.19 1992/06/16 20:46:26 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.18 1992/05/15 21:54:34 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.19 1992/06/16 20:46:26 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -323,7 +323,7 @@ gethosttype()
 #  endif /* MIPSEB || __MIPSEB */
 # endif /* mips || __mips */
 
-#if defined(__alpha__)
+#if defined(__alpha)
 #  define _havehosttype_
     hosttype = "alpha";
 #endif

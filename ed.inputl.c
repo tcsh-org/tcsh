@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.21 1992/04/10 16:45:27 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.22 1992/06/16 20:46:26 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.21 1992/04/10 16:45:27 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.22 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -570,12 +570,7 @@ GetNextChar(cp)
     register Char *cp;
 {
     register int num_read;
-#if defined(EWOULDBLOCK) || (defined(POSIX) && defined(EAGAIN))
-# if defined(FIONBIO) || (defined(F_SETFL) && defined(O_NDELAY))
-#  define TRY_AGAIN
     int     tried = 0;
-# endif /* FIONBIO || (F_SETFL && O_NDELAY) */
-#endif /* EWOULDBLOCK || (POSIX && EAGAIN) */
     unsigned char tcp;
 
     for (;;) {
@@ -597,43 +592,12 @@ GetNextChar(cp)
     if (Rawmode() < 0)		/* make sure the tty is set up correctly */
 	return 0;		/* oops: SHIN was closed */
 
-    while ((num_read = read(SHIN, (char *) &tcp, 1)) == -1)
-	switch (errno) {
-	    /*
-	     * Someone might have set our file descriptor to non blocking From
-	     * Gray Watson (gray%antr.uucp@med.pitt.edu), Thanks!!!
-	     */
-#ifdef EWOULDBLOCK
-	case EWOULDBLOCK:
-#endif /* EWOULDBLOCK */
-#if defined(POSIX) && defined(EAGAIN)
-# if !defined(EWOULDBLOCK) || EAGAIN != EWOULDBLOCK
-	case EAGAIN:
-# endif /* !EWOULDBLOCK || EAGAIN != EWOULDBLOCK */
-#endif /* POSIX && EAGAIN */
-#ifdef TRY_AGAIN
-	    if (!tried) {
-# if defined(F_SETFL) && defined(O_NDELAY)
-		(void) fcntl(SHIN, F_SETFL,
-			     fcntl(SHIN, F_GETFL, 0) & ~O_NDELAY);
-# endif /* F_SETFL && O_NDELAY */
-# ifdef FIONBIO
-		(void) ioctl(SHIN, FIONBIO, (ioctl_t) & tried);
-# endif /* FIONBIO */
-		tried = 1;
-		break;
-	    }
-	    *cp = tcp;
-	    return (num_read);
-#endif /* TRY_AGAIN */
-	case EINTR:
-	    break;
-	default:
-#ifdef DEBUG_EDIT
-	    xprintf("GetNextChar(): errno == %d\n", errno);
-#endif /* DEBUG_EDIT */
-	    *cp = tcp;
-	    return num_read;
+    while ((num_read = read(SHIN, (char *) &tcp, 1)) == -1) 
+	if (!tried && fixio(SHIN, errno) == 0)
+	    tried = 1;
+	else {
+	    *cp = '\0';
+	    return -1;
 	}
     *cp = tcp;
     return num_read;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.time.c,v 3.7 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.time.c,v 3.8 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,9 +36,9 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.7 1992/04/03 22:15:14 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.8 1992/06/16 20:46:26 christos Exp $")
 
-#if (defined(sun) || defined(__sun__)) && ! defined(MACH)
+#if (defined(sun) || defined(__sun__)) && ! defined(MACH) && SYSVREL == 0
 # include <machine/param.h>
 #endif /* sun */
 
@@ -233,7 +233,7 @@ ruadd(ru, ru2)
 #ifndef PGSHIFT
 # define pagetok(size)   ((size) << 1)
 #else
-#ifdef __alpha__	/* PGSHIFT is a variable, so can't ifdef on it */
+#ifdef __alpha	/* PGSHIFT is a variable, so can't ifdef on it */
 #define pagetok(size)   ((size) << (PGSHIFT - LOG1024))
 #else
 #if PGSHIFT>10

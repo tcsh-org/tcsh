@@ -1,4 +1,9 @@
 V6.03.00, ...
+25. nostat accepts now a list shell patterns.
+24. Avoid print_exit_value in if ( { foo } )
+23. Symbolic key names for bindkey [arrow keys].
+22. Smarter getwd() that avoids some of the NFS hangs...
+21. Use memmove() where possible.
 20. 6.02.01 6/16/92
 19. Fix automatic correction to work with the new completion.
 18. Globbing bug with brace expansion, when arguments need to be realloced...

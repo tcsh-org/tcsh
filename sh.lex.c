@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.20 1992/05/15 23:49:22 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.lex.c,v 3.21 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.20 1992/05/15 23:49:22 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.21 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1628,9 +1628,8 @@ again:
 		    goto again;
 		}
 		if (c > 0)
-		    copy((char *) (fbuf[buf] + off),
-			 (char *) InputBuf, (int) (c * sizeof(Char)));
-		/* copy (fbuf[buf] + off, ttyline, c); */
+		    (void) memmove((ptr_t) (fbuf[buf] + off), (ptr_t) InputBuf,
+				   (size_t) (c * sizeof(Char)));
 		numleft = 0;
 	    }
 	    else {
@@ -1645,39 +1644,7 @@ again:
 	    }
 	    if (c >= 0)
 		break;
-	    switch (errno) {
-#ifdef EWOULDBLOCK
-	    case EWOULDBLOCK:
-# define TRY_AGAIN
-#endif /* EWOULDBLOCK */
-#if defined(POSIX) && defined(EAGAIN)
-# if defined(EWOULDBLOCK) && EWOULDBLOCK != EAGAIN
-	    case EAGAIN:
-#  define TRY_AGAIN
-# endif /* EWOULDBLOCK && EWOULDBLOCK != EAGAIN */
-#endif /* POSIX && EAGAIN */
-#ifdef TRY_AGAIN
-# if defined(F_SETFL) && defined(O_NDELAY)
-		(void) fcntl(SHIN, F_SETFL, fcntl(SHIN,F_GETFL,0) & ~O_NDELAY);
-# endif /* F_SETFL && O_NDELAY */
-# ifdef FIONBIO
-		c = 0;
-		(void) ioctl(SHIN, FIONBIO, (ioctl_t) &c);
-# endif	/* FIONBIO */
-# if (defined(F_SETFL) && defined(O_NDELAY)) || defined(FIONBIO)
-		c = 0;
-# endif	/* (F_SETFL && O_NDELAY) || FIONBIO */
-		break;
-#endif /* TRY_AGAIN */
-	    case EINTR:
-		c = 0;
-		break;
-	    default:
-		c = -1;
-		break;
-	    }
-	    if (c == -1)
-		break;
+	    c = fixio(SHIN, errno);
 	}
 	if (c <= 0)
 	    return (-1);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.xmap.c,v 3.6 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.xmap.c,v 3.7 1992/06/16 20:46:26 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.6 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.7 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -128,7 +128,6 @@ static	void	  PutFreeNode	__P((XmapNode *));
 static	int	  TryDeleteNode	__P((XmapNode **, Char *));
 static	int	  Lookup	__P((Char *, XmapNode *, int));
 static	int	  Enumerate	__P((XmapNode *, int));
-static	int	  printOne	__P((Char *, XmapVal *, int));
 static	int	  unparsech	__P((int, int));
 
 
@@ -155,38 +154,12 @@ XmapStr(str)
  *	initializes Xmap with arrow keys
  */
 void
-ResetXmap(vi)
-    int     vi;
+ResetXmap()
 {
-    static Char strA[] = {033, '[', 'A', '\0'};
-    static Char strB[] = {033, '[', 'B', '\0'};
-    static Char strC[] = {033, '[', 'C', '\0'};
-    static Char strD[] = {033, '[', 'D', '\0'};
-    static Char stOA[] = {033, 'O', 'A', '\0'};
-    static Char stOB[] = {033, 'O', 'B', '\0'};
-    static Char stOC[] = {033, 'O', 'C', '\0'};
-    static Char stOD[] = {033, 'O', 'D', '\0'};
-
     PutFreeNode(Xmap);
     Xmap = NULL;
-    AddXkey(strA, XmapCmd(F_UP_HIST),   XK_CMD);
-    AddXkey(strB, XmapCmd(F_DOWN_HIST), XK_CMD);
-    AddXkey(strC, XmapCmd(F_CHARFWD),   XK_CMD);
-    AddXkey(strD, XmapCmd(F_CHARBACK),  XK_CMD);
-    AddXkey(stOA, XmapCmd(F_UP_HIST),   XK_CMD);
-    AddXkey(stOB, XmapCmd(F_DOWN_HIST), XK_CMD);
-    AddXkey(stOC, XmapCmd(F_CHARFWD),   XK_CMD);
-    AddXkey(stOD, XmapCmd(F_CHARBACK),  XK_CMD);
-    if (vi) {
-	AddXkey(&strA[1], XmapCmd(F_UP_HIST),   XK_CMD);
-	AddXkey(&strB[1], XmapCmd(F_DOWN_HIST), XK_CMD);
-	AddXkey(&strC[1], XmapCmd(F_CHARFWD),   XK_CMD);
-	AddXkey(&strD[1], XmapCmd(F_CHARBACK),  XK_CMD);
-	AddXkey(&stOA[1], XmapCmd(F_UP_HIST),   XK_CMD);
-	AddXkey(&stOB[1], XmapCmd(F_DOWN_HIST), XK_CMD);
-	AddXkey(&stOC[1], XmapCmd(F_CHARFWD),   XK_CMD);
-	AddXkey(&stOD[1], XmapCmd(F_CHARBACK),  XK_CMD);
-    }
+
+    DefaultArrowKeys();
     return;
 }
 
@@ -564,7 +537,7 @@ Enumerate(ptr, cnt)
  *	Print the specified key and its associated
  *	function specified by val
  */
-static int
+int
 printOne(key, val, ntype)
     Char    *key;
     XmapVal *val;
