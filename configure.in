@@ -115,6 +115,11 @@ case "${host}" in
     tcsh_config_file=bsd4.4
   ;;
 
+  ## Mac OS X Server
+  *-*-darwin* )
+    tcsh_config_file=bsd4.4
+  ;;
+
   ## Silicon Graphics machines
   *-sgi-iri* )
     tcsh_config_file=irix
