@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.24 1998/10/25 15:09:54 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.25 1998/11/24 18:17:22 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.24 1998/10/25 15:09:54 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.25 1998/11/24 18:17:22 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -182,7 +182,11 @@ Draw(c)				/* draw c, expand tabs, ctl chars */
 	}
     }
 #ifdef KANJI
-    else if (!adrof(STRnokanji)) {
+    else if (
+#ifdef DSPMBYTE
+	     _enable_mbdisp &&
+#endif
+	     !adrof(STRnokanji)) {
 	Vdraw(c);
 	return;
     }
@@ -1264,7 +1268,11 @@ RefPlusOne()
 	PutPlusOne(c);
     }
 #ifdef KANJI
-    else if (!adrof(STRnokanji)) {
+    else if (
+#ifdef DSPMBYTE
+	     _enable_mbdisp &&
+#endif
+	     !adrof(STRnokanji)) {
 	PutPlusOne(c);
     }
 #endif
