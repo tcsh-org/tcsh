@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.h,v 3.23 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.h,v 3.24 1994/07/08 14:43:50 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -61,7 +61,7 @@ typedef CCRETVAL(*PFCmd) __P((int));	/* pointer to function returning CCRETVAL *
 struct KeyFuncs {		/* for the "bind" shell command */
     char   *name;		/* function name for bind command */
     int     func;		/* function numeric value */
-    char   *description;	/* description of function */
+    char   *desc;		/* description of function */
 };
 
 extern PFCmd CcFuncTbl[];	/* table of available commands */

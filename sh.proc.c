@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.58 1995/01/20 23:48:56 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.59 1995/03/05 03:18:09 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.58 1995/01/20 23:48:56 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.59 1995/03/05 03:18:09 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -546,8 +546,7 @@ pjwait(pp)
 
     do {
 	if ((fp->p_flags & (PFOREGND | PRUNNING)) == PRUNNING)
-	    xprintf(catgets(catd, 1, 1060,
-			    "BUG: waiting for background job!\n"));
+	    xprintf(CGETS(17, 1, "BUG: waiting for background job!\n"));
     } while ((fp = fp->p_friends) != pp);
     /*
      * Now keep pausing as long as we are not interrupted (SIGINT), and the
@@ -638,7 +637,7 @@ pjwait(pp)
      */
     if ((reason != 0) && (adrof(STRprintexitvalue)) && 
 	(pp->p_flags & PBACKQ) == 0)
-	xprintf(catgets(catd, 1, 1062, "Exit %d\n"), reason);
+	xprintf(CGETS(17, 2, "Exit %d\n"), reason);
     set(STRstatus, putn(reason), VAR_READWRITE);
     if (reason && exiterr)
 	exitstat();
@@ -716,7 +715,7 @@ pflush(pp)
     register int idx;
 
     if (pp->p_procid == 0) {
-	xprintf(catgets(catd, 1, 1063, "BUG: process flushed twice"));
+	xprintf(CGETS(17, 3, "BUG: process flushed twice"));
 	return;
     }
     while (pp->p_procid != pp->p_jobid)
@@ -1108,7 +1107,7 @@ pprint(pp, flag)
 		switch (status) {
 
 		case PRUNNING:
-		    xprintf(format, catgets(catd, 1, 1064, "Running "));
+		    xprintf(format, CGETS(17, 4, "Running "));
 		    break;
 
 		case PINTERRUPTED:
@@ -1123,8 +1122,15 @@ pprint(pp, flag)
 			|| ((flag & AREASON)
 			    && reason != SIGINT
 			    && (reason != SIGPIPE
-				|| (pp->p_flags & PPOU) == 0)))
-			xprintf(format, mesg[pp->p_reason & ASCII].pname);
+				|| (pp->p_flags & PPOU) == 0))) {
+			char *ptr;
+			char buf[1024];
+
+			if ((ptr = mesg[pp->p_reason & ASCII].pname) == NULL)
+			    xsprintf(ptr = buf, "%s %d", CGETS(17, 5, "Signal"),
+				     pp->p_reason & ASCII);
+			xprintf(format, ptr);
+		    }
 		    else
 			reason = -1;
 		    break;
@@ -1133,14 +1139,13 @@ pprint(pp, flag)
 		case PAEXITED:
 		    if (flag & REASON)
 			if (pp->p_reason)
-			    xprintf(catgets(catd, 1, 1065, "Exit %-25d"),
-				    pp->p_reason);
+			    xprintf(CGETS(17, 6, "Exit %-25d"), pp->p_reason);
 			else
-			    xprintf(format, catgets(catd, 1, 1067, "Done"));
+			    xprintf(format, CGETS(17, 7, "Done"));
 		    break;
 
 		default:
-		    xprintf(catgets(catd, 1, 1068, "BUG: status=%-9o"),
+		    xprintf(CGETS(17, 8, "BUG: status=%-9o"),
 			    status);
 		}
 	    }
@@ -1154,13 +1159,13 @@ prcomd:
 		xprintf("&");
 	}
 	if (flag & (REASON | AREASON) && pp->p_flags & PDUMPED)
-	    xprintf(catgets(catd, 1, 1069, " (core dumped)"));
+	    xprintf(CGETS(17, 9, " (core dumped)"));
 	if (tp == pp->p_friends) {
 	    if (flag & AMPERSAND)
 		xprintf(" &");
 	    if (flag & JOBDIR &&
 		!eq(tp->p_cwd->di_name, dcwd->di_name)) {
-		xprintf(catgets(catd, 1, 1070, " (wd: "));
+		xprintf(CGETS(17, 10, " (wd: "));
 		dtildepr(tp->p_cwd->di_name);
 		xprintf(")");
 	    }
@@ -1191,7 +1196,7 @@ prcomd:
 	    if (linp != linbuf)
 		xputchar('\n');
 	    if (flag & SHELLDIR && !eq(tp->p_cwd->di_name, dcwd->di_name)) {
-		xprintf(catgets(catd, 1, 1071, "(wd now: "));
+		xprintf(CGETS(17, 11, "(wd now: "));
 		dtildepr(dcwd->di_name);
 		xprintf(")\n");
 	    }
@@ -1499,7 +1504,7 @@ dokill(v, c)
 	}
 	if (Isdigit(v[0][1])) {
 	    signum = atoi(short2str(v[0] + 1));
-	    if (signum < 0 || signum > NSIG)
+	    if (signum < 0 || signum > (MAXSIG-1))
 		stderror(ERR_NAME | ERR_BADSIG);
 	}
 	else {
@@ -1529,7 +1534,7 @@ pkill(v, signum)
 #ifdef BSDSIGS
     sigmask_t omask;
 #endif /* BSDSIGS */
-    Char   *cp;
+    Char   *cp, **vp;
 
 #ifdef BSDSIGS
     omask = sigmask(SIGCHLD);
@@ -1541,6 +1546,12 @@ pkill(v, signum)
 	(void) sighold(SIGINT);
     (void) sighold(SIGCHLD);
 #endif /* !BSDSIGS */
+
+    /* Avoid globbing %?x patterns */
+    for (vp = v && vp && *vp; vp++)
+	if (**vp == '%')
+	    quote(*vp);
+
     gflag = 0, tglob(v);
     if (gflag) {
 	v = globall(v);
@@ -1551,6 +1562,7 @@ pkill(v, signum)
 	v = gargv = saveblk(v);
 	trim(v);
     }
+
 
     while (v && (cp = *v)) {
 	if (*cp == '%') {
@@ -1567,11 +1579,9 @@ pkill(v, signum)
 	    case SIGTTOU:
 		if ((jobflags & PRUNNING) == 0) {
 # ifdef SUSPENDED
-		    xprintf(catgets(catd, 1, 1072,
-				    "%S: Already suspended\n"), cp);
+		    xprintf(CGETS(17, 12, "%S: Already suspended\n"), cp);
 # else /* !SUSPENDED */
-		    xprintf(catgets(catd, 1, 1073,
-				    "%S: Already stopped\n"), cp);
+		    xprintf(CGETS(17, 13, "%S: Already stopped\n"), cp);
 # endif /* !SUSPENDED */
 		    err1++;
 		    goto cont;

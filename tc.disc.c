@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.disc.c,v 3.7 1993/10/30 19:50:16 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.disc.c,v 3.8 1995/03/05 03:18:09 christos Exp $ */
 /*
  * tc.disc.c: Functions to set/clear line disciplines
  *
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.disc.c,v 3.7 1993/10/30 19:50:16 christos Exp christos $")
+RCSID("$Id: tc.disc.c,v 3.8 1995/03/05 03:18:09 christos Exp $")
 
 #ifdef OREO
 #include <compat.h>
@@ -112,7 +112,7 @@ int     f;
 	if ((comp & COMPAT_BSDTTY) != COMPAT_BSDTTY) {
 	    (void) setcompat(comp | COMPAT_BSDTTY);
 	    if (ioctl(f, TIOCGLTC, (ioctl_t) & ltcbuf) != 0)
-		xprintf(catgets(catd, 1, 1129, "Couldn't get local chars.\n"));
+		xprintf(CGETS(21, 1, "Couldn't get local chars.\n"));
 	    else {
 		ltcbuf.t_suspc = '\032';	/* ^Z */
 		ltcbuf.t_dsuspc = '\031';	/* ^Y */
@@ -121,8 +121,7 @@ int     f;
 		ltcbuf.t_werasc = '\027';	/* ^W */
 		ltcbuf.t_lnextc = '\026';	/* ^V */
 		if (ioctl(f, TIOCSLTC, (ioctl_t) & ltcbuf) != 0)
-		    xprintf(catgets(catd, 1, 1130,
-				    "Couldn't set local chars.\n"));
+		    xprintf(CGETS(21, 2, "Couldn't set local chars.\n"));
 	    }
 	    termiob.c_cc[VSWTCH] = '\0';
 	    if (ioctl(f, TCSETAF, (ioctl_t) & termiob) != 0)

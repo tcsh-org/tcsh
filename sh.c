@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.c,v 3.65 1995/01/20 23:48:56 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.c,v 3.66 1995/03/05 03:18:09 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.65 1995/01/20 23:48:56 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.66 1995/03/05 03:18:09 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -181,7 +181,6 @@ main(argc, argv)
 
 #if defined(NLS_CATALOGS) && defined(LC_MESSAGES)
     (void) setlocale(LC_MESSAGES, "");
-    catd = catopen("tcsh", MCLoadBySet);
 # endif /* NLS_CATALOGS && LC_MESSAGES */
 
 #ifdef NLS
@@ -190,10 +189,7 @@ main(argc, argv)
 # endif /* LC_CTYPE */
 #endif /* NLS */
 
-    errinit();			/* init the errorlist in correct locale */
-    mesginit();			/* init the messages for signals */
-    dateinit();			/* init the date related messages */
-
+    nlsinit();
 
 #ifdef MALLOC_TRACE
      mal_setstatsfile(fdopen(dup2(open("/tmp/tcsh.trace", 
@@ -252,6 +248,8 @@ main(argc, argv)
 
     HIST = '!';
     HISTSUB = '^';
+    PRCH = '>';
+    PRCHROOT = '#';
     word_chars = STR_WORD_CHARS;
     bslash_quote = 0;		/* PWP: do tcsh-style backslash quoting? */
 
@@ -1076,10 +1074,9 @@ main(argc, argv)
 	    }
 	    if (tpgrp == -1) {
 	notty:
-		xprintf(catgets(catd,
-				1, 249, "Warning: no access to tty (%s).\n"),
+		xprintf(CGETS(11, 1, "Warning: no access to tty (%s).\n"),
 			strerror(errno));
-		xprintf(catgets(catd, 1, 250, "Thus no job control in this shell.\n"));
+		xprintf(CGETS(11, 2, "Thus no job control in this shell.\n"));
 		/*
 		 * Fix from:Sakari Jalovaara <sja@sirius.hut.fi> if we don't
 		 * have access to tty, disable editing too
@@ -2089,14 +2086,12 @@ mailchk()
 		continue;
 
 	    if (cnt == 1) {
-		xprintf(catgets(catd, 1, 253,
-				"You have %d mails.\n"),
+		xprintf(CGETS(11, 3, "You have %d mail messages.\n"),
 			mailcount);
 	    }
 	    else {
-		xprintf(catgets(catd, 1, 254,
-				"You have %d mails in %s.\n"),
-			  mailcount, filename);
+		xprintf(CGETS(11, 4, "You have %d mail messages in %s.\n"),
+			mailcount, filename);
 	    }
 	}
 	else {
@@ -2105,13 +2100,11 @@ mailchk()
 		(loginsh && !new))
 		continue;
 	    if (cnt == 1)
-		xprintf(catgets(catd, 1, 255,
-				"You have %smail.\n"),
-			new ? catgets(catd, 1, 1224, "new ") : "");
+		xprintf(CGETS(11, 5, "You have %smail.\n"),
+			new ? CGETS(11, 6, "new ") : "");
 	    else
-	        xprintf(catgets(catd, 1, 256,
-				"You have %smail in %s.\n"),
-			new ? catgets(catd, 1, 1224, "new ") : "");
+	        xprintf(CGETS(11, 7, "You have %smail in %s.\n"),
+			new ? CGETS(11, 6, "new ") : "");
 	}
     }
     chktim = t;

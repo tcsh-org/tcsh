@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.xmap.c,v 3.13 1994/09/04 21:54:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.xmap.c,v 3.14 1995/03/05 03:18:09 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -92,7 +92,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.13 1994/09/04 21:54:15 christos Exp christos $")
+RCSID("$Id: ed.xmap.c,v 3.14 1995/03/05 03:18:09 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -231,14 +231,12 @@ AddXkey(Xkey, val, ntype)
     cs.buf = Xkey->buf;
     cs.len = Xkey->len;
     if (Xkey->len == 0) {
-	xprintf(catgets(catd, 1, 223,
-			"AddXkey: Null extended-key not allowed.\n"));
+	xprintf(CGETS(9, 1, "AddXkey: Null extended-key not allowed.\n"));
 	return;
     }
 
     if (ntype == XK_CMD && val->cmd == F_XKEY) {
-	xprintf(catgets(catd, 1, 224,
-			"AddXkey: sequence-lead-in command not allowed\n"));
+	xprintf(CGETS(9, 2, "AddXkey: sequence-lead-in command not allowed\n"));
 	return;
     }
 
@@ -338,8 +336,7 @@ DeleteXkey(Xkey)
     CStr   *Xkey;
 {
     if (Xkey->len == 0) {
-	xprintf(catgets(catd, 1, 225,
-			"DeleteXkey: Null extended-key not allowed.\n"));
+	xprintf(CGETS(9, 3, "DeleteXkey: Null extended-key not allowed.\n"));
 	return (-1);
     }
 
@@ -482,7 +479,7 @@ PrintXkey(key)
     printbuf[0] =  '"';
     if (Lookup(&cs, Xmap, 1) <= -1)
 	/* key is not bound */
-	xprintf(catgets(catd, 1, 226, "Unbound extended key \"%S\"\n"), cs.buf);
+	xprintf(CGETS(9, 4, "Unbound extended key \"%S\"\n"), cs.buf);
     return;
 }
 
@@ -553,7 +550,7 @@ Enumerate(ptr, cnt)
     if (cnt >= MAXXKEY - 5) {	/* buffer too small */
 	printbuf[++cnt] = '"';
 	printbuf[++cnt] = '\0';
-	xprintf(catgets(catd, 1, 227,
+	xprintf(CGETS(9, 5,
 		"Some extended keys too long for internal print buffer"));
 	xprintf(" \"%S...\"\n", printbuf);
 	return (0);
@@ -561,7 +558,7 @@ Enumerate(ptr, cnt)
 
     if (ptr == NULL) {
 #ifdef DEBUG_EDIT
-	xprintf(catgets(catd, 1, 228, "Enumerate: BUG!! Null ptr passed\n!"));
+	xprintf(CGETS(9, 6, "Enumerate: BUG!! Null ptr passed\n!"));
 #endif
 	return (-1);
     }
@@ -618,7 +615,7 @@ printOne(key, val, ntype)
 	    break;
 	}
     else
-	xprintf(fmt, key, catgets(catd, 1, 229, "no input"));
+	xprintf(fmt, key, CGETS(9, 7, "no input"));
     return (0);
 }
 
@@ -669,7 +666,7 @@ parseescape(ptr)
     p = *ptr;
 
     if ((p[1] & CHAR) == 0) {
-	xprintf(catgets(catd, 1, 1095, "Something must follow: %c\n"), *p);
+	xprintf(CGETS(9, 8, "Something must follow: %c\n"), *p);
 	return -1;
     }
     if ((*p & CHAR) == '\\') {
@@ -719,7 +716,7 @@ parseescape(ptr)
 		    val = (val << 3) | (ch - '0');
 		}
 		if ((val & 0xffffff00) != 0) {
-		    xprintf(catgets(catd, 1, 1096,
+		    xprintf(CGETS(9, 9,
 			    "Octal constant does not fit in a char.\n"));
 		    return 0;
 		}

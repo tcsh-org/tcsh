@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.prompt.c,v 3.21 1994/05/26 13:11:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.prompt.c,v 3.22 1995/03/05 03:18:09 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.21 1994/05/26 13:11:20 christos Exp christos $")
+RCSID("$Id: tc.prompt.c,v 3.22 1995/03/05 03:18:09 christos Exp $")
 
 #include "ed.h"
 
@@ -55,7 +55,7 @@ static char   *day_list[7];
 void
 dateinit()
 {
-#ifdef NLS_CATALOGS
+#ifdef notyet
   int i;
 
   setlocale(LC_TIME, "");
@@ -167,13 +167,13 @@ tprintf(what, buf, fmt, siz, str, tim, info)
     Char   *z, *q;
     Char    attributes = 0;
     static int print_prompt_did_ding = 0;
-    char   *cz;
+    const char   *cz;
     Char    buff[BUFSIZE];
     char    cbuff[BUFSIZE];
 
     Char *p  = buf;
     Char *ep = &p[siz];
-    Char *cp = fmt;
+    Char *cp = fmt, Scp;
     struct tm *t = localtime(&tim);
 
 			/* prompt stuff */
@@ -181,7 +181,6 @@ tprintf(what, buf, fmt, siz, str, tim, info)
     extern int tlength;	/* cache cleared */
     register int updirs;
     int pdirs;
-    Char    Scp;
 
     for (; *cp; cp++) {
 	if (p >= ep)
@@ -197,7 +196,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 			if (p >= ep) break;
 		break;
 	    case '#':
-		*p++ = attributes | ((uid == 0) ? '#' : '>');
+		*p++ = attributes | ((uid == 0) ? PRCHROOT : PRCH);
 		break;
 	    case '!':
 	    case 'h':

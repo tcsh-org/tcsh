@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.h,v 3.65 1994/09/04 21:54:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.h,v 3.66 1995/03/05 03:18:09 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -179,16 +179,6 @@ typedef int sigret_t;
 # include <locale.h>
 #endif /* NLS */
 
-#ifdef NLS_CATALOGS
-# ifdef linux
-#  include <localeinfo.h>
-#  include <features.h>
-# endif
-# include <nl_types.h>
-EXTERN nl_catd catd;
-#else
-# define catgets(a,b,c,d) d
-#endif 
 
 #if !defined(_MINIX) && !defined(_VMS_POSIX)
 # include <sys/param.h>
@@ -972,6 +962,8 @@ EXTERN int     lastev;		/* Last event reference (default) */
 
 EXTERN Char    HIST;		/* history invocation character */
 EXTERN Char    HISTSUB;		/* auto-substitute character */
+EXTERN Char    PRCH;		/* Prompt symbol for regular users */
+EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 
 /*
  * For operating systems with single case filenames (OS/2)
@@ -1077,5 +1069,33 @@ extern char *sys_errlist[];
 #endif
 extern int errno, sys_nerr;
 #endif /* !linux */
+
+#ifdef NLS_CATALOGS
+# ifdef linux
+#  include <localeinfo.h>
+#  include <features.h>
+# endif
+# ifdef SUNOS4
+   /* Who stole my nl_types.h? :-( 
+    * All this stuff is in the man pages, but nowhere else?
+    * This does not link right now...
+    */
+   typedef void *nl_catd; 
+   extern const char * catgets __P((nl_catd, int, int, const char *));
+   nl_catd catopen __P((const char *, int));
+   int catclose __P((nl_catd));
+# else
+#  include <nl_types.h>
+# endif
+# ifndef MCLoadBySet
+#  define MCLoadBySet 0
+# endif
+EXTERN nl_catd catd;
+# define CGETS(b, c, d)	catgets(catd, b, c, d)
+# define CSAVS(b, c, d)	strsave(CGETS(b, c, d))
+#else
+# define CGETS(b, c, d)	d
+# define CSAVS(b, c, d)	d
+#endif 
 
 #endif /* _h_sh */

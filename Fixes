@@ -1,4 +1,12 @@
 V6.06.00, -
+ 55. Made %?str work again
+ 54. IRIX sigalarm problem should be fixed
+ 53. complete-word-raw and list-word-raw should work
+ 52. nls catalogs complete reworking.
+ 51. sh.init.c: Signal complete rewrite.
+ 50. Signal fixes from Bruce.
+ 49. Added promptchars, like histchars; affect %# in the prompt. The first
+     char is for the user and the second is for root.
  48. 6.05.04 - 03/03/95
  47. Add NODOT config, $command [that holds the command passed with -c]
      $GROUP and $group

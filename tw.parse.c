@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.69 1995/01/20 23:48:56 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.parse.c,v 3.70 1995/03/05 03:18:09 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.69 1995/01/20 23:48:56 christos Exp christos $")
+RCSID("$Id: tw.parse.c,v 3.70 1995/03/05 03:18:09 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -250,7 +250,7 @@ tenematch(inputline, num_read, command)
     wordp = word;
 
 #ifdef TDEBUG
-    xprintf(catgets(catd, 1, 1208, "starting_a_command %d\n"), looking);
+    xprintf(CGETS(30, 1, "starting_a_command %d\n"), looking);
     xprintf("\ncmd_start:%S:\n", cmd_start);
     xprintf("qline:%S:\n", qline);
     xprintf("qline:");
@@ -269,11 +269,11 @@ tenematch(inputline, num_read, command)
         (command == RECOGNIZE || command == LIST || command == SPELL ||
 	 command == RECOGNIZE_SCROLL || command == RECOGNIZE_ALL)) {
 #ifdef TDEBUG
-	xprintf(catgets(catd, 1, 1209, "complete %d "), looking);
+	xprintf(CGETS(30, 2, "complete %d "), looking);
 #endif
 	looking = tw_complete(cmd_start, &wordp, &pat, looking, &suf);
 #ifdef TDEBUG
-	xprintf(catgets(catd, 1, 1210, "complete %d %S\n"), looking, pat);
+	xprintf(CGETS(30, 3, "complete %d %S\n"), looking, pat);
 #endif
     }
 
@@ -283,9 +283,11 @@ tenematch(inputline, num_read, command)
 	Char   *items[2], **ptr;
 	int     i, count;
 
+    case RECOGNIZE_ALL:
+	pat = NULL;
+	/*FALLTHROUGH*/
     case RECOGNIZE:
     case RECOGNIZE_SCROLL:
-    case RECOGNIZE_ALL:
 	if (adrof(STRautocorrect)) {
 	    if ((slshp = Strrchr(wordp, '/')) != NULL && slshp[1] != '\0') {
 		SearchNoDirErr = 1;
@@ -401,14 +403,16 @@ tenematch(inputline, num_read, command)
 	    return -1;		/* error inserting */
 	return 1;
 
-    case LIST:
     case LIST_ALL:
+	pat = NULL;
+	/*FALLTHROUGH*/
+    case LIST:
 	search_ret = t_search(wordp, wp, LIST, space_left, looking, 1, 
 			      pat, suf);
 	return search_ret;
 
     default:
-	xprintf(catgets(catd, 1, 1211, "tcsh: Internal match error.\n"));
+	xprintf(CGETS(30, 4, "tcsh: Internal match error.\n"));
 	return 1;
 
     }
@@ -1303,21 +1307,20 @@ tw_list_items(looking, numitems, list_max)
 
 
     if (max_items || max_rows) {
-	char    tc;
-	char*	name;
+	char    	 tc;
+	const char	*name;
 	int maxs;
 
 	if (max_items) {
-	    name = catgets(catd, 1, 1230, "items");
+	    name = CGETS(30, 5, "items");
 	    maxs = max_items;
 	}
 	else {
-	    name = catgets(catd, 1, 1231, "rows");
+	    name = CGETS(30, 6, "rows");
 	    maxs = max_rows;
 	}
 
-	xprintf(catgets(catd, 1, 1212,
-			"There are %d %s, list them anyway? [n/y] "),
+	xprintf(CGETS(30, 7, "There are %d %s, list them anyway? [n/y] "),
 		maxs, name);
 	flush();
 	/* We should be in Rawmode here, so no \n to catch */
@@ -1469,7 +1472,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
     flags |= (gpat == 0) ? TW_IGN_OK : TW_PAT_OK;
 
 #ifdef TDEBUG
-    xprintf(catgets(catd, 1, 1215, "looking = %d\n"), looking);
+    xprintf(CGETS(30, 8, "looking = %d\n"), looking);
 #endif
 
     switch (looking) {
@@ -1596,7 +1599,8 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 	break;
 
     default:
-	xprintf(catgets(catd, 1, 1216, "\ntcsh internal error: I don't know what I'm looking for!\n"));
+	xprintf(CGETS(30, 9,
+		"\ntcsh internal error: I don't know what I'm looking for!\n"));
 	NeedsRedraw = 1;
 	return (-1);
     }
@@ -1795,9 +1799,9 @@ expand_dir(dir, edir, dfd, cmd)
 	xprintf("\n%S %s\n",
 		*edir ? edir :
 		(*tdir ? tdir : dir),
-		(errno == ENOTDIR ? catgets(catd, 1, 1217, "not a directory") :
-		(errno == ENOENT ? catgets(catd, 1, 1218, "not found") :
-		 catgets(catd, 1, 1219, "unreadable"))));
+		(errno == ENOTDIR ? CGETS(30, 10, "not a directory") :
+		(errno == ENOENT ? CGETS(30, 11, "not found") :
+		 CGETS(30, 12, "unreadable"))));
 	NeedsRedraw = 1;
 	return (-1);
     }

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.decls.h,v 3.26 1994/09/22 19:07:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.decls.h,v 3.27 1995/03/05 03:18:09 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -181,6 +181,7 @@ extern	void		  trim		__P((Char **));
 #ifdef FILEC
 extern	int		  sortscmp	__P((Char **, Char **));
 #endif
+extern	void		  nlsinit	__P((void));
 
 /*
  * sh.hist.c

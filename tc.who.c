@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.who.c,v 3.22 1995/01/20 23:48:56 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.who.c,v 3.23 1995/03/05 03:18:09 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.22 1995/01/20 23:48:56 christos Exp christos $")
+RCSID("$Id: tc.who.c,v 3.23 1995/03/05 03:18:09 christos Exp $")
 
 #include "tc.h"
 
@@ -211,8 +211,7 @@ watch_login(force)
      * Don't open utmp all the time, stat it first...
      */
     if (stat(_PATH_UTMP, &sta)) {
-	xprintf(catgets(catd, 1, 1179,
-			"cannot stat %s.  Please \"unset watch\".\n"),
+	xprintf(CGETS(26, 1, "cannot stat %s.  Please \"unset watch\".\n"),
 		_PATH_UTMP);
 #ifdef BSDSIGS
 	(void) sigsetmask(omask);
@@ -231,8 +230,7 @@ watch_login(force)
     }
     stlast = sta.st_mtime;
     if ((utmpfd = open(_PATH_UTMP, O_RDONLY)) < 0) {
-	xprintf(catgets(catd, 1, 1180,
-			"%s cannot be opened.  Please \"unset watch\".\n"),
+	xprintf(CGETS(26, 2, "%s cannot be opened.  Please \"unset watch\".\n"),
 		_PATH_UTMP);
 #ifdef BSDSIGS
 	(void) sigsetmask(omask);
@@ -429,23 +427,22 @@ debugwholist(new, wp)
     }
     xprintf("TAIL\n");
     if (a != &whotail) {
-	xprintf(catgets(catd, 1, 1182, "BUG! last element is not whotail!\n"));
+	xprintf(CGETS(26, 3, "BUG! last element is not whotail!\n"));
 	abort();
     }
     a = whotail.who_prev;
-    xprintf(catgets(catd, 1, 1183, "backward: "));
+    xprintf(CGETS(26, 4, "backward: "));
     while (a->who_prev != NULL) {
 	xprintf("%s/%s -> ", a->who_name, a->who_tty);
 	a = a->who_prev;
     }
     xprintf("HEAD\n");
     if (a != &whohead) {
-	xprintf(catgets(catd, 1, 1184, "BUG! first element is not whohead!\n"));
+	xprintf(CGETS(26, 5, "BUG! first element is not whohead!\n"));
 	abort();
     }
     if (new)
-	xprintf(catgets(catd, 1, 1185, "new: %s/%s\n"),
-		new->who_name, new->who_tty);
+	xprintf(CGETS(26, 6, "new: %s/%s\n"), new->who_name, new->who_tty);
     if (wp)
 	xprintf("wp: %s/%s\n", wp->who_name, wp->who_tty);
 }
@@ -457,9 +454,9 @@ print_who(wp)
     struct who *wp;
 {
 #ifdef UTHOST
-    Char   *cp = str2short(catgets(catd, 1, 1186, "%n has %a %l from %m."));
+    Char   *cp = str2short(CGETS(26, 7, "%n has %a %l from %m."));
 #else
-    Char   *cp = str2short(catgets(catd, 1, 1187, "%n has %a %l."));
+    Char   *cp = str2short(CGETS(26, 8, "%n has %a %l."));
 #endif /* UTHOST */
     struct varent *vp = adrof(STRwho);
     Char buf[BUFSIZE];
@@ -474,7 +471,7 @@ print_who(wp)
 } /* end print_who */
 
 
-char *
+const char *
 who_info(ptr, c, wbuf)
     ptr_t ptr;
     int c;
@@ -503,12 +500,11 @@ who_info(ptr, c, wbuf)
     case 'a':
 	switch (wp->who_status & STMASK) {
 	case ONLINE:
-	    return catgets(catd, 1, 1188, "logged on");
+	    return CGETS(26, 9, "logged on");
 	case OFFLINE:
-	    return catgets(catd, 1, 1189, "logged off");
+	    return CGETS(26, 10, "logged off");
 	case CHANGED:
-	    (void) xsprintf(wbuf, catgets(catd, 1, 1190,
-					  "replaced %s on"), wp->who_name);
+	    xsprintf(wbuf, CGETS(26, 11, "replaced %s on"), wp->who_name);
 	    return wbuf;
 	default:
 	    break;
@@ -518,7 +514,7 @@ who_info(ptr, c, wbuf)
 #ifdef UTHOST
     case 'm':
 	if (wp->who_host[0] == '\0')
-	    return catgets(catd, 1, 1191, "local");
+	    return CGETS(26, 12, "local");
 	else {
 	    /* the ':' stuff is for <host>:<display>.<screen> */
 	    for (pb = wp->who_host, flg = Isdigit(*pb) ? '\0' : '.';
@@ -535,7 +531,7 @@ who_info(ptr, c, wbuf)
 
     case 'M':
 	if (wp->who_host[0] == '\0')
-	    return catgets(catd, 1, 1191, "local");
+	    return CGETS(26, 12, "local");
 	else {
 	    for (pb = wp->who_host; *pb != '\0'; pb++)
 		*wb++ = Isupper(*pb) ? Tolower(*pb) : *pb;

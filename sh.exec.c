@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.exec.c,v 3.31 1994/05/30 15:09:14 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.exec.c,v 3.32 1995/03/05 03:18:09 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.31 1994/05/30 15:09:14 christos Exp christos $")
+RCSID("$Id: sh.exec.c,v 3.32 1995/03/05 03:18:09 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -729,7 +729,7 @@ dohash(vv, c)
 	    hashval = hashname(str2short(dp->d_name));
 	    bis(hashval, i);
 	    if (hashdebug & 1)
-	        xprintf(catgets(catd, 1, 403, "hash=%-4d dir=%-2d prog=%s\n"),
+	        xprintf(CGETS(13, 1, "hash=%-4d dir=%-2d prog=%s\n"),
 		        hashname(str2short(dp->d_name)), i, dp->d_name);
 #else /* OLD HASH */
 	    hashval = hash(hashname(str2short(dp->d_name)), i);
@@ -768,14 +768,14 @@ hashstat(v, c)
     USE(v);
 #ifdef FASTHASH 
    if (havhash && hashlength && hashwidth)
-      xprintf(catgets(catd, 1, 404, "%d hash buckets of %d bits each\n"),
+      xprintf(CGETS(13, 2, "%d hash buckets of %d bits each\n"),
 	      hashlength, hashwidth*8);
    if (hashdebug)
-      xprintf(catgets(catd, 1, 405, "debug mask = 0x%08x\n"), hashdebug);
+      xprintf(CGETS(13, 3, "debug mask = 0x%08x\n"), hashdebug);
 #endif /* FASTHASH */
 #ifdef VFORK
    if (hits + misses)
-      xprintf(catgets(catd, 1, 406, "%d hits, %d misses, %d%%\n"),
+      xprintf(CGETS(13, 4, "%d hits, %d misses, %d%%\n"),
 	      hits, misses, 100 * hits / (hits + misses));
 #endif
 }
@@ -935,8 +935,8 @@ tellmewhat(lexp, str)
 	    if (str == NULL) {
 		if (aliased)
 		    prlex(lexp);
-		xprintf(catgets(catd, 1, 407, "%S: shell built-in command.\n"),
-			sp->word);
+		xprintf(CGETS(13, 5, "%S: shell built-in command.\n"),
+			      sp->word);
 		flush();
 	    }
 	    else 
@@ -986,8 +986,7 @@ tellmewhat(lexp, str)
 	if (str == NULL) {
 	    if (aliased)
 		prlex(lexp);
-	    xprintf(catgets(catd, 1, 408, "%S: Command not found.\n"),
-		    sp->word);
+	    xprintf(CGETS(13, 6, "%S: Command not found.\n"), sp->word);
 	    flush();
 	}
 	else {
@@ -1035,7 +1034,7 @@ find_cmd(cmd, prt)
     int hashval, i, ex, rval = 0;
 
     if (prt && any(short2str(cmd), '/')) {
-	xprintf(catgets(catd, 1, 409, "where: / in command makes no sense\n"));
+	xprintf(CGETS(13, 7, "where: / in command makes no sense\n"));
 	return rval;
     }
 
@@ -1043,7 +1042,7 @@ find_cmd(cmd, prt)
 
     if (prt && adrof1(cmd, &aliases)) {
 	if ((var = adrof1(cmd, &aliases)) != NULL) {
-	    xprintf(catgets(catd, 1, 410, "%S is aliased to "), cmd);
+	    xprintf(CGETS(13, 8, "%S is aliased to "), cmd);
 	    blkpr(var->vec);
 	    xputchar('\n');
 	    rval = 1;
@@ -1056,8 +1055,7 @@ find_cmd(cmd, prt)
 	if (eq(cmd, str2short(bptr->bname))) {
 	    rval = 1;
 	    if (prt)
-		xprintf(catgets(catd, 1, 411, "%S is a shell built-in\n"),
-			cmd);
+		xprintf(CGETS(13, 9, "%S is a shell built-in\n"), cmd);
 	    else
 		return rval;
 	}
@@ -1086,7 +1084,7 @@ find_cmd(cmd, prt)
 	ex = executable(*pv, sv, 0);
 #ifdef FASTHASH
 	if (!ex && (hashdebug & 2)) {
-	    xprintf(catgets(catd, 1, 412, "hash miss: "));
+	    xprintf(CGETS(13, 10, "hash miss: "));
 	    ex = 1;	/* Force printing */
 	}
 #endif /* FASTHASH */

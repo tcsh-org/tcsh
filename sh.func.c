@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.60 1995/01/20 23:48:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.func.c,v 3.61 1995/03/05 03:18:09 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.60 1995/01/20 23:48:56 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.61 1995/03/05 03:18:09 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1315,11 +1315,8 @@ dosetenv(v, c)
 # endif
 # if defined(NLS_CATALOGS) && defined(LC_MESSAGES)
 	(void) setlocale(LC_MESSAGES, "");
-	catclose(catd);
-	catd = catopen("tcsh", MCLoadBySet);
-	errinit();		/* init the errorlist in correct locale */
-	mesginit();		/* init the messages for signals */
-	dateinit();		/* init the messages for dates */
+	(void) catclose(catd);
+	nlsinit();
 # endif /* NLS_CATALOGS && LC_MESSAGES */
 # ifdef LC_CTYPE
 	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
@@ -1473,13 +1470,8 @@ dounsetenv(v, c)
 # endif
 # if defined(NLS_CATALOGS) && defined(LC_MESSAGES)
 		    (void) setlocale(LC_MESSAGES, "");
-		    catclose(catd);
-		    catd = catopen("tcsh", MCLoadBySet);
-		    errinit(0);	/* init the errorlist in correct locale */
-		    mesginit(0); /* init the messages for signals */
-		    promptMonthDayInit(0); /* init the month and day names
-					   * depending on the locale, if any
-					   */
+		    (void) catclose(catd);
+		    nlsinit();
 # endif /* NLS_CATALOGS && LC_MESSAGES */
 # ifdef LC_CTYPE
 	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
@@ -2042,11 +2034,10 @@ setlim(lp, hard, limit)
 # endif /* aiws */
     if (ulimit(toset(lp->limconst), limit) < 0) {
 # endif /* BSDLIMIT */
-	xprintf(catgets(catd, 1, 438,
-			"%s: %s: Can't %s%s limit\n"), bname, lp->limname,
-		limit == RLIM_INFINITY ? catgets(catd, 1, 439, "remove") :
-		catgets(catd, 1, 440, "set"),
-		hard ? " hard" : "");
+	xprintf(CGETS(15, 1, "%s: %s: Can't %s%s limit\n"), bname, lp->limname,
+		limit == RLIM_INFINITY ? CGETS(15, 2, "remove") :
+		CGETS(15, 3, "set"),
+		hard ? CGETS(14, 4, " hard") : "");
 	return (-1);
     }
     return (0);
@@ -2264,4 +2255,17 @@ struct command *c;
 
     lbuffed = 1;		/* turn back on line buffering */
     flush();
+}
+
+void
+nlsinit()
+{
+#ifdef NLS_CATALOGS
+    catd = catopen("tcsh", MCLoadBySet);
+#endif
+    errinit();		/* init the errorlist in correct locale */
+    mesginit();		/* init the messages for signals */
+    dateinit();		/* init the messages for dates */
+    editinit();		/* init the editor messages */
+    terminit();		/* init the termcap messages */
 }

@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.57 1995/01/20 23:56:29 christos Exp $
+/**/# $Id: Imakefile,v 1.58 1995/03/05 03:18:09 christos Exp $
 /**/#
 /**/# Imakefile for tcsh 6.05
 /**/# Marc Horowitz, MIT SIPB
@@ -467,7 +467,7 @@ MISCF = Makefile.std Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
 	README.imake complete.tcsh vmsreadme.txt Makefile.vms termcap.vms \
-	snames.h host.defs gethost.c tcsh.man2html tcsh.m tcsh.german.m
+	snames.h host.defs gethost.c tcsh.man2html
 CONFSRCS=config/[a-z]*
 
 
@@ -516,6 +516,7 @@ tar.Z:
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
+	tar cf nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
 	tar cvf - tcsh-${VERSION} | compress > tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION}
 
@@ -525,6 +526,7 @@ tar.gz:
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
+	tar cf nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
 	tar cvf - tcsh-${VERSION} | gzip > tcsh-${VERSION}.tar.gz
 	rm -rf tcsh-${VERSION}
 
@@ -534,15 +536,28 @@ shar:
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
+	tar cf nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
 	MAKESHAR -v -n tcsh-${VERSION} tcsh-${VERSION} \
-		 tcsh-${VERSION}/?* tcsh-${VERSION}/config/?*
+		 tcsh-${VERSION}/?* tcsh-${VERSION}/config/?* \
+		 tcsh-${VERSION}/?*/set?*
 	rm -rf tcsh-${VERSION}
 
+catalogs:
+	@cd nls
+	@for i in *; \
+	do \
+	    echo "$i"; \
+	    cd $i; \
+	    cat set? set?? > ../../tcsh.$i.m \
+	    cd ..; \
+	done
+		
+	
 world:
 	$(MAKE) clean ; $(MAKE) depend ; $(MAKE) tcsh ; $(MAKE) install
 
 clean::
-	rm -f ed.defns.h sh.err.h tc.const.h config.h tc.defs.*
+	rm -f ed.defns.h sh.err.h tc.const.h config.h tc.defs.* tcsh.*.m
 
 depend:: config.h ed.defns.h sh.err.h tc.const.h $(SRCS) tc.defs.c
 

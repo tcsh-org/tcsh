@@ -82,7 +82,7 @@
  **********************************************************************
  */
 #include "sh.h"
-RCSID("$Id: ma.setp.c,v 1.8 1993/10/30 19:50:16 christos Exp christos $")
+RCSID("$Id: ma.setp.c,v 1.9 1995/03/05 03:18:09 christos Exp $")
 
 #ifdef MACH
 
@@ -119,14 +119,14 @@ static int sflag;
 static int eflag;
 
 #define INVALID { \
-	if (eflag) xprintf(catgets(catd, 1, 244,
-				   "setpath: invalid command '%s'.\n"), cmd); \
+	if (eflag) xprintf(CGETS(10, 1, \
+				 "setpath: invalid command '%s'.\n"), cmd); \
 	freepaths(); \
 	return(-1); \
 }
 
 #define TOOFEW { \
-	if (eflag) xprintf(catgets(catd, 1, 245,
+	if (eflag) xprintf(CGETS(10, 2, \
 		 "setpath: insufficient arguments to command '%s'.\n"), cmd); \
 	freepaths(); \
 	return(-1); \
@@ -242,8 +242,8 @@ register char **paths;
 	val = index(path, '=');
 	if (val == NULL) {
 	    if (eflag)
-		xprintf(catgets(catd, 1, 246,
-				"setpath: value missing in path '%s'\n"), path);
+		xprintf(CGETS(10, 3,
+			      "setpath: value missing in path '%s'\n"), path);
 	    freepaths();
 	    return(-1);
 	}
@@ -425,7 +425,7 @@ char *inpath, *path;
 	if (n >= 0)
 	    insert(pe, n + 1, path);
 	else
-	    xprintf(catgets(catd, 1, 247, "setpath: %s not found in %s\n"),
+	    xprintf(CGETS(10, 4, "setpath: %s not found in %s\n"),
 		    inpath, pe->pname);
     }
 }
@@ -442,7 +442,7 @@ char *inpath, *path;
 	if (n >= 0)
 	    insert(pe, n, path);
 	else
-	    xprintf(catgets(catd, 1, 247, "setpath: %s not found in %s\n",
+	    xprintf(CGETS(10, 4, "setpath: %s not found in %s\n",
 		    inpath, pe->pname);
 	}
 }
@@ -499,7 +499,7 @@ char *path;
 	if (n >= 0)
 	    delete(pe, n);
 	else
-	    xprintf(catgets(catd, 1, 247, "setpath: %s not found in %s\n"),
+	    xprintf(CGETS(10, 4, "setpath: %s not found in %s\n"),
 		    path, pe->pname);
     }
 }
@@ -514,7 +514,7 @@ int n;
 	if (n < pe->pdirs)
 	    delete(pe, n);
 	else
-	    xprintf(catgets(catd, 1, 248,
+	    xprintf(CGETS(10, 5,
 			    "setpath: %d not valid position in %s\n"),
 		    n, pe->pname);
     }
@@ -549,7 +549,7 @@ char *inpath, *path;
 	if (n >= 0)
 	    change(pe, n, path);
 	else
-	    xprintf(catgets(catd, 1, 247, "setpath: %s not found in %s\n"),
+	    xprintf(CGETS(10, 4, "setpath: %s not found in %s\n"),
 		    inpath, pe->pname);
     }
 }
@@ -565,7 +565,7 @@ int n;
 	if (n < pe->pdirs)
 	    change(pe, n, path);
 	else
-	    xprintf(catgets(catd, 1, 248,
+	    xprintf(CGETS(10, 5,
 			    "setpath: %d not valid position in %s\n"),
 		    n, pe->pname);
     }

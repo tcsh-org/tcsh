@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.chared.c,v 3.42 1994/05/26 13:11:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.chared.c,v 3.43 1995/03/05 03:18:09 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.42 1994/05/26 13:11:20 christos Exp christos $")
+RCSID("$Id: ed.chared.c,v 3.43 1995/03/05 03:18:09 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -3230,7 +3230,7 @@ e_load_average(c)
 #ifdef TIOCSTAT
     if (ioctl(SHIN, TIOCSTAT, 0) < 0) 
 #endif
-	xprintf(catgets(catd, 1, 5, "Load average unavailable\n"));
+	xprintf(CGETS(5, 1, "Load average unavailable\n"));
     return(CC_REFRESH);
 }
 

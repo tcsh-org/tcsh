@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.help.c,v 3.10 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tw.help.c,v 3.11 1995/03/05 03:18:09 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.help.c,v 3.10 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: tw.help.c,v 3.11 1995/03/05 03:18:09 christos Exp $")
 
 #include "tw.h"
 #include "tc.h"
@@ -106,7 +106,7 @@ do_help(command)
 
 	for (;;) {
 	    if (!*hpath) {
-		xprintf(catgets(catd, 1, 1206, "No help file for %S\n"), name);
+		xprintf(CGETS(28, 1, "No help file for %S\n"), name);
 		break;
 	    }
 	    nextslist(hpath, curdir);

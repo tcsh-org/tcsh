@@ -116,8 +116,10 @@ options to a shell script without confusion or possible subterfuge.  The shell
 will not run a set-user ID script without this option.
 .TP 4
 .B \-c
-Commands are read from the (single) following argument which must be
-present.  Any remaining arguments are placed in the \fBargv\fR shell variable.
+Commands are read from the following argument (which must be present, and
+must be a single argument),
+stored in the \fBcommand\fR shell variable for reference, and executed.
+Any remaining arguments are placed in the \fBargv\fR shell variable.
 .TP 4
 .B \-d
 The shell loads the directory stack from \fI~/.cshdirs\fR as described under
@@ -198,8 +200,9 @@ or, if \fI~/.tcshrc\fR is not found, \fI~/.cshrc\fR,
 then \fI~/.history\fR (or the value of the \fBhistfile\fR shell variable),
 then \fI~/.login\fR,
 and finally \fI~/.cshdirs\fR (or the value of the \fBdirsfile\fR shell variable) (+).
-The shell may read \fI~/.login\fR before instead of after
-\fI~/.tcshrc\fR or \fI~/.cshrc\fR and \fI~/.history\fR if so compiled;
+The shell may read \fI/etc/csh.login\fR before instead of after
+\fI/etc/csh.cshrc\fR, and \fI~/.login\fR before instead of after
+\fI~/.tcshrc\fR or \fI~/.cshrc\fR and \fI~/.history\fR, if so compiled;
 see the \fBversion\fR shell variable. (+)
 .PP
 Non-login shells read only \fI/etc/csh.cshrc\fR and \fI~/.tcshrc\fR
@@ -2274,10 +2277,12 @@ Position-dependent completion.
 variables, which must include the current word.
 .PD
 .RE
+.ig \" No longer true in 6.05.04
 .PP
 When \fIpattern\fR is a glob-pattern (for \fBc\fR, \fBC\fR, \fBn\fR and
 \fBN\fR-type completion), a \fIpattern\fR of `*' does not match an empty
 word.
+..
 .PP
 \fIlist\fR, the list of possible completions, may be one of the following:
 .PP
@@ -2420,9 +2425,13 @@ and `set' with shell variables.
 `true' doesn't have any options, so \fBx\fR does nothing when completion
 is attempted and prints `Truth has no options.' when completion choices are listed.
 .PP
+.ig \" Changed in 6.05.04
 The \fIman\fR example, and several other examples below, use
 \fBp\fR-type completion, rather than \fBC\fR- or \fBn\fR-type, so that
 `*' will match an empty word.
+..
+Note that the \fIman\fR example, and several other examples below, could
+just as well have used 'c/*' or 'n/*' as 'p/*'.
 .PP
 Words can be completed from a variable evaluated at completion time,
 .IP "" 4
@@ -2557,7 +2566,8 @@ It should come after all \fIcase\fR labels.
 .B dirs \-c \fR(+)
 The first form prints the directory stack. The top of the stack is at the
 left and the first directory in the stack is the current directory.
-With \fB\-l\fR, `~' in the output is expanded explicitly to \fBhome\fR. (+)
+With \fB\-l\fR, `~' or `~\fIname\fP' in the output is expanded explicitly
+to \fBhome\fR or the pathname of the home directory for user \fIname\fP. (+)
 With \fB\-n\fR, entries are wrapped before they reach the edge of the screen. (+)
 With \fB\-v\fR, entries are printed one per line, preceded by their stack postions. (+)
 If more than one of \fB\-n\fR or \fB\-v\fR is given, \fB\-v\fR takes precedence.
@@ -3406,15 +3416,15 @@ desired interpreter (e.g. `/bin/csh' or `/usr/local/bin/tcsh').
 .SS "Special shell variables"
 The variables described in this section have special meaning to the shell.
 .PP
-The shell sets \fBaddsuffix\fR, \fBargv\fR, \fBautologout\fR, \fBecho_style\fR,
-\fBedit\fR, \fBgid\fR, \fBhome\fR, \fBloginsh\fR, \fBoid\fR, \fBpath\fR,
+The shell sets \fBaddsuffix\fR, \fBargv\fR, \fBautologout\fR, \fBcommand\fR, \fBecho_style\fR,
+\fBedit\fR, \fBgid\fR, \fBgroup\fR, \fBhome\fR, \fBloginsh\fR, \fBoid\fR, \fBpath\fR,
 \fBprompt\fR, \fBprompt2\fR, \fBprompt3\fR, \fBshell\fR, \fBshlvl\fR,
 \fBtcsh\fR, \fBterm\fR, \fBtty\fR, \fBuid\fR, \fBuser\fR and \fBversion\fR at
 startup; they do not change thereafter unless changed by the user. The shell
 updates \fBcwd\fR, \fBdirstack\fR, \fBowd\fR and \fBstatus\fR when necessary,
 and sets \fBlogout\fR on logout.
 .PP
-The shell synchronizes \fBafsuser\fR, \fBhome\fR, \fBpath\fR, \fBshlvl\fR,
+The shell synchronizes \fBafsuser\fR, \fBgroup\fR, \fBhome\fR, \fBpath\fR, \fBshlvl\fR,
 \fBterm\fR and \fBuser\fR with the environment variables of the same names:
 whenever the environment variable changes the shell changes the corresponding
 shell variable to match (unless the shell variable is read-only) and vice
@@ -3475,6 +3485,9 @@ scripts.
 .B cdpath
 A list of directories in which \fIcd\fR should search for
 subdirectories if they aren't found in the current directory.
+.TP 8
+.B command \fR(+)
+If set, the command which was passed to the shell with the \fB-c\fR flag (q.v.).
 .TP 8
 .B complete \fR(+)
 If set to `enhance', completion 1) ignores case and 2) considers
@@ -3562,6 +3575,9 @@ If set in \fIcsh\fR, filename completion is used.
 .TP 8
 .B gid \fR(+)
 The user's real group ID.
+.TP 8
+.B group \fR(+)
+The user's group name.
 .TP 8
 .B histchars
 A string value determining the characters used in
@@ -3709,8 +3725,8 @@ If there is no \fBpath\fR variable then only full path names will execute.
 \fBpath\fR is set by the shell at startup from the \fBPATH\fR environment
 variable or, if \fBPATH\fR does not exist, to a system-dependent default
 something like `(/usr/local/bin /usr/bsd /bin /usr/bin .)'.
-The shell may put `.' first or last in \fBpath\fR depending on how it
-was compiled; see the \fBversion\fR shell variable.
+The shell may put `.' first or last in \fBpath\fR or omit it entirely
+depending on how it was compiled; see the \fBversion\fR shell variable.
 A shell which is given neither the \fB\-c\fR nor the \fB\-t\fR option
 hashes the contents of the directories in \fBpath\fR after
 reading \fI~/.tcshrc\fR and each time \fBpath\fR is reset.
@@ -4163,11 +4179,15 @@ nls
 The system's NLS is used; default for systems with NLS
 .TP 4
 lf
-Login shells execute \fI~/.login\fR before instead of after
+Login shells execute \fI/etc/csh.login\fR before instead of after
+\fI/etc/csh.cshrc\fR and \fI~/.login\fR before instead of after
 \fI~/.tcshrc\fR and \fI~/.history\fR.
 .TP 4
 dl
 `.' is put last in \fBpath\fR for security; default
+.TP 4
+nd
+`.' is omitted from \fBpath\fR for security
 .TP 4
 vi
 \fIvi\fR-style editing is the default rather than \fIemacs\fR
@@ -4202,9 +4222,6 @@ afs
 The shell verifies your password with the kerberos server if local
 authentication fails. The \fBafsuser\fR shell variable or the
 \fBAFSUSER\fR environment variable override your local username if set.
-.TP 4
-nd
-Don't put `.' in the \fBpath\fR for security
 .PD
 .PP
 An administrator may enter additional strings to indicate differences
@@ -4292,6 +4309,9 @@ If set, the shell does not set \fBautologout\fR (q.v.).
 The pathname to a default editor.
 See also the \fBVISUAL\fR environment variable
 and the \fIrun-fg-editor\fR editor command.
+.TP 8
+.B GROUP \fR(+)
+Equivalent to the \fBgroup\fR shell variable.
 .TP 8
 .B HOME
 Equivalent to the \fBhome\fR shell variable.
@@ -4424,6 +4444,9 @@ Temporary file for `<<'.
 .I /etc/passwd
 Source of home directories for `~name' substitutions.
 .PD
+.PP
+The order in which startup files are read may differ if the shell was so
+compiled; see \fBStartup and shutdown\fR and the \fBversion\fR shell variable.
 .SH "NEW FEATURES (+)"
 This manual describes \fItcsh\fR as a single entity,
 but experienced \fIcsh\fR(1) users will want to pay special attention to

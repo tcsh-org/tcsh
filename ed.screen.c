@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.screen.c,v 3.33 1994/07/08 14:43:50 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.screen.c,v 3.34 1995/03/05 03:18:09 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.33 1994/07/08 14:43:50 christos Exp christos $")
+RCSID("$Id: ed.screen.c,v 3.34 1995/03/05 03:18:09 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -139,109 +139,209 @@ static struct {
     { NULL, 0 }
 };
 
+#define T_al	0
+#define T_bl	1
+#define T_cd	2
+#define T_ce	3
+#define T_ch	4
+#define T_cl	5
+#define	T_dc	6
+#define	T_dl	7
+#define	T_dm	8
+#define	T_ed	9
+#define	T_ei	10
+#define	T_fs	11
+#define	T_ho	12
+#define	T_ic	13
+#define	T_im	14 
+#define	T_ip	15
+#define	T_kd	16
+#define	T_kl	17
+#define T_kr	18
+#define T_ku	19
+#define T_md	20
+#define T_me	21
+#define T_nd	22
+#define T_se	23
+#define T_so	24
+#define T_ts	25
+#define T_up	26
+#define T_us	27
+#define T_ue	28
+#define T_vb	29
+#define T_DC	30
+#define T_DO	31
+#define T_IC	32
+#define T_LE	33
+#define T_RI	34
+#define T_UP	35
+#define T_str	36
 static struct termcapstr {
     char   *name;
     char   *long_name;
     char   *str;
-}       tstr[] = {
+} tstr[T_str + 1];
 
-#define T_al	0
-    {	"al",	"add new blank line",		NULL },
-#define T_bl	1
-    {	"bl",	"audible bell",			NULL },
-#define T_cd	2
-    {	"cd",	"clear to bottom",		NULL },
-#define T_ce	3
-    {	"ce",	"clear to end of line",		NULL },
-#define T_ch	4
-    {	"ch",	"cursor to horiz pos",		NULL },
-#define T_cl	5
-    {	"cl",	"clear screen",			NULL },
-#define	T_dc	6
-    {	"dc",	"delete a character",		NULL },
-#define	T_dl	7
-    {	"dl",	"delete a line",		NULL },
-#define	T_dm	8
-    {	"dm",	"start delete mode",		NULL },
-#define	T_ed	9
-    {	"ed",	"end delete mode",		NULL },
-#define	T_ei	10
-    {	"ei",	"end insert mode",		NULL },
-#define	T_fs	11
-    {	"fs",	"cursor from status line",	NULL },
-#define	T_ho	12
-    {	"ho",	"home cursor",			NULL },
-#define	T_ic	13
-    {	"ic",	"insert character",		NULL },
-#define	T_im	14 
-    {	"im",	"start insert mode",		NULL },
-#define	T_ip	15
-    {	"ip",	"insert padding",		NULL },
-#define	T_kd	16
-    {	"kd",	"sends cursor down",		NULL },
-#define	T_kl	17
-    {	"kl",	"sends cursor left",		NULL },
-#define T_kr	18
-    {	"kr",	"sends cursor right",		NULL },
-#define T_ku	19
-    {	"ku",	"sends cursor up",		NULL },
-#define T_md	20
-    {	"md",	"begin bold",			NULL },
-#define T_me	21
-    {	"me",	"end attributes",		NULL },
-#define T_nd	22
-    {	"nd",	"non destructive space",	NULL },
-#define T_se	23
-    {	"se",	"end standout",			NULL },
-#define T_so	24
-    {	"so",	"begin standout",		NULL },
-#define T_ts	25
-    {	"ts",	"cursor to status line",	NULL },
-#define T_up	26
-    {	"up",	"cursor up one",		NULL },
-#define T_us	27
-    {	"us",	"begin underline",		NULL },
-#define T_ue	28
-    {	"ue",	"end underline",		NULL },
-#define T_vb	29
-    {	"vb",	"visible bell",			NULL },
-#define T_DC	30
-    {	"DC",	"delete multiple chars",	NULL },
-#define T_DO	31
-    {	"DO",	"cursor down multiple",		NULL },
-#define T_IC	32
-    {	"IC",	"insert multiple chars",	NULL },
-#define T_LE	33
-    {	"LE",	"cursor left multiple",		NULL },
-#define T_RI	34
-    {	"RI",	"cursor right multiple",	NULL },
-#define T_UP	35
-    {	"UP",	"cursor up multiple",		NULL },
-#define T_str	36
-    {	NULL,	NULL,		NULL }
-};
 
+#define T_am	0
+#define T_pt	1
+#define T_li	2
+#define T_co	3
+#define T_km	4
+#define T_xn	5
+#define T_val	6
 static struct termcapval {
     char   *name;
     char   *long_name;
     int     val;
-}       tval[] = {
-#define T_am	0
-    {	"am",	"Has automatic margins",		0 },
-#define T_pt	1
-    {	"pt",	"Can use physical tabs", 		0 },
-#define T_li	2
-    {	"li",	"Number of lines",	 		0 },
-#define T_co	3
-    {	"co",	"Number of columns",	 		0 },
-#define T_km	4
-    {	"km",	"Has meta key",		 		0 },
-#define T_xn	5
-    {	"xn",	"Newline ignored at right margin",	0 },
-#define T_val	6
-    {	NULL, 	NULL,		 			0 }
-};
+} tval[T_val + 1];
 
+void
+terminit()
+{
+#ifdef NLS_CATALOGS
+    int i;
+
+    for (i = 0; i < T_str + 1; i++)
+	xfree((ptr_t) tstr[i].long_name);
+
+    for (i = 0; i < T_val + 1; i++)
+	xfree((ptr_t) tval[i].long_name);
+#endif
+
+    tstr[T_al].name = "al";
+    tstr[T_al].long_name = CSAVS(4, 1, "add new blank line");
+
+    tstr[T_bl].name = "bl";
+    tstr[T_bl].long_name = CSAVS(4, 2, "audible bell");
+
+    tstr[T_cd].name = "cd";
+    tstr[T_cd].long_name = CSAVS(4, 3, "clear to bottom");
+
+    tstr[T_ce].name = "ce";
+    tstr[T_ce].long_name = CSAVS(4, 4, "clear to end of line");
+
+    tstr[T_ch].name = "ch";
+    tstr[T_ch].long_name = CSAVS(4, 5, "cursor to horiz pos");
+
+    tstr[T_cl].name = "cl";
+    tstr[T_cl].long_name = CSAVS(4, 6, "clear screen");
+
+    tstr[T_dc].name = "dc";
+    tstr[T_dc].long_name = CSAVS(4, 7, "delete a character");
+
+    tstr[T_dl].name = "dl";
+    tstr[T_dl].long_name = CSAVS(4, 8, "delete a line");
+
+    tstr[T_dm].name = "dm";
+    tstr[T_dm].long_name = CSAVS(4, 9, "start delete mode");
+
+    tstr[T_ed].name = "ed";
+    tstr[T_ed].long_name = CSAVS(4, 10, "end delete mode");
+
+    tstr[T_ei].name = "ei";
+    tstr[T_ei].long_name = CSAVS(4, 11, "end insert mode");
+
+    tstr[T_fs].name = "fs";
+    tstr[T_fs].long_name = CSAVS(4, 12, "cursor from status line");
+
+    tstr[T_ho].name = "ho";
+    tstr[T_ho].long_name = CSAVS(4, 13, "home cursor");
+
+    tstr[T_ic].name = "ic";
+    tstr[T_ic].long_name = CSAVS(4, 14, "insert character");
+
+    tstr[T_im].name = "im";
+    tstr[T_im].long_name = CSAVS(4, 15, "start insert mode");
+
+    tstr[T_ip].name = "ip";
+    tstr[T_ip].long_name = CSAVS(4, 16, "insert padding");
+
+    tstr[T_kd].name = "kd";
+    tstr[T_kd].long_name = CSAVS(4, 17, "sends cursor down");
+
+    tstr[T_kl].name = "kl";
+    tstr[T_kl].long_name = CSAVS(4, 18, "sends cursor left");
+
+    tstr[T_kr].name = "kr";
+    tstr[T_kr].long_name = CSAVS(4, 19, "sends cursor right");
+
+    tstr[T_ku].name = "ku";
+    tstr[T_ku].long_name = CSAVS(4, 20, "sends cursor up");
+
+    tstr[T_md].name = "md";
+    tstr[T_md].long_name = CSAVS(4, 21, "begin bold");
+
+    tstr[T_me].name = "me";
+    tstr[T_me].long_name = CSAVS(4, 22, "end attributes");
+
+    tstr[T_nd].name = "nd";
+    tstr[T_nd].long_name = CSAVS(4, 23, "non destructive space");
+
+    tstr[T_se].name = "se";
+    tstr[T_se].long_name = CSAVS(4, 24, "end standout");
+
+    tstr[T_so].name = "so";
+    tstr[T_so].long_name = CSAVS(4, 25, "begin standout");
+
+    tstr[T_ts].name = "ts";
+    tstr[T_ts].long_name = CSAVS(4, 26, "cursor to status line");
+
+    tstr[T_up].name = "up";
+    tstr[T_up].long_name = CSAVS(4, 27, "cursor up one");
+
+    tstr[T_us].name = "us";
+    tstr[T_us].long_name = CSAVS(4, 28, "begin underline");
+
+    tstr[T_ue].name = "ue";
+    tstr[T_ue].long_name = CSAVS(4, 29, "end underline");
+
+    tstr[T_vb].name = "vb";
+    tstr[T_vb].long_name = CSAVS(4, 30, "visible bell");
+
+    tstr[T_DC].name = "DC";
+    tstr[T_DC].long_name = CSAVS(4, 31, "delete multiple chars");
+
+    tstr[T_DO].name = "DO";
+    tstr[T_DO].long_name = CSAVS(4, 32, "cursor down multiple");
+
+    tstr[T_IC].name = "IC";
+    tstr[T_IC].long_name = CSAVS(4, 33, "insert multiple chars");
+
+    tstr[T_LE].name = "LE";
+    tstr[T_LE].long_name = CSAVS(4, 34, "cursor left multiple");
+
+    tstr[T_RI].name = "RI";
+    tstr[T_RI].long_name = CSAVS(4, 35, "cursor right multiple");
+
+    tstr[T_UP].name = "UP";
+    tstr[T_UP].long_name = CSAVS(4, 36, "cursor up multiple");
+
+    tstr[T_str].name = NULL;
+    tstr[T_str].long_name = NULL;
+
+
+    tval[T_am].name = "am";
+    tval[T_am].long_name = CSAVS(4, 37, "Has automatic margins");
+
+    tval[T_pt].name = "pt";
+    tval[T_pt].long_name = CSAVS(4, 38, "Can use physical tabs");
+
+    tval[T_li].name = "li";
+    tval[T_li].long_name = CSAVS(4, 39, "Number of lines");
+
+    tval[T_co].name = "co";
+    tval[T_co].long_name = CSAVS(4, 40, "Number of columns");
+
+    tval[T_km].name = "km";
+    tval[T_km].long_name = CSAVS(4, 41, "Has meta key");
+
+    tval[T_xn].name = "xn";
+    tval[T_xn].long_name = CSAVS(4, 42, "Newline ignored at right margin");
+
+    tval[T_val].name = NULL;
+    tval[T_val].long_name = NULL;
+}
 
 /*
  * A very useful table from justin@crim.ca (Justin Bur) :-)
@@ -335,27 +435,27 @@ TellTC(what)
     struct termcapstr *t;
 
     USE(what);
-    xprintf(catgets(catd, 1, 198, "\n\tTcsh thinks your terminal has the\n"));
-    xprintf(catgets(catd, 1, 199, "\tfollowing characteristics:\n\n"));
-    xprintf(catgets(catd, 1, 200, "\tIt has %d columns and %d lines\n"),
+    xprintf(CGETS(7, 1, "\n\tTcsh thinks your terminal has the\n"));
+    xprintf(CGETS(7, 2, "\tfollowing characteristics:\n\n"));
+    xprintf(CGETS(7, 3, "\tIt has %d columns and %d lines\n"),
 	    Val(T_co), Val(T_li));
-    xprintf(catgets(catd, 1, 201, "\tIt has %s meta key\n"), T_HasMeta ?
-	    catgets(catd, 1, 1225, "a") : catgets(catd, 1, 1226, "no"));
-    xprintf(catgets(catd, 1, 202, "\tIt can%s use tabs\n"), T_Tabs ?
-	    "" : catgets(catd, 1, 1227, " not"));
-    xprintf(catgets(catd, 1, 203, "\tIt %s automatic margins\n"),
+    xprintf(CGETS(7, 4, "\tIt has %s meta key\n"), T_HasMeta ?
+	    CGETS(7, 5, "a") : CGETS(7, 6, "no"));
+    xprintf(CGETS(7, 7, "\tIt can%s use tabs\n"), T_Tabs ?
+	    "" : CGETS(7, 8, " not"));
+    xprintf(CGETS(7, 9, "\tIt %s automatic margins\n"),
 		    (T_Margin&MARGIN_AUTO)?
-		    catgets(catd, 1, 1228, "has"):
-		    catgets(catd, 1, 1229, "does not have"));
-    if (T_Margin&MARGIN_AUTO)
-	xprintf(catgets(catd, 1, 204, "\tIt %s magic margins\n"),
-			(T_Margin&MARGIN_MAGIC)?
-			catgets(catd, 1, 1228, "has"):
-			catgets(catd, 1, 1229, "does not have"));
+		    CGETS(7, 10, "has"):
+		    CGETS(7, 11, "does not have"));
+    if (T_Margin & MARGIN_AUTO)
+	xprintf(CGETS(7, 12, "\tIt %s magic margins\n"),
+			(T_Margin & MARGIN_MAGIC) ?
+			CGETS(7, 10, "has"):
+			CGETS(7, 11, "does not have"));
 
     for (t = tstr; t->name != NULL; t++)
 	xprintf("\t%25s (%s) == %s\n", t->long_name, t->name,
-		t->str && *t->str ? t->str : catgets(catd, 1, 1181, "(empty)"));
+		t->str && *t->str ? t->str : CGETS(7, 13, "(empty)"));
     xputchar('\n');
 }
 
@@ -517,26 +617,26 @@ EchoTC(v)
 	return;
     (void) strcpy(cv, short2str(*v));
     if (strcmp(cv, "tabs") == 0) {
-	xprintf(fmts, T_Tabs ? catgets(catd, 1, 205, "yes") :
-		catgets(catd, 1, 206, "no"));
+	xprintf(fmts, T_Tabs ? CGETS(7, 14, "yes") :
+		CGETS(7, 15, "no"));
 	flush();
 	return;
     }
     else if (strcmp(cv, "meta") == 0) {
-	xprintf(fmts, Val(T_km) ? catgets(catd, 1, 205, "yes") :
-		catgets(catd, 1, 206, "no"));
+	xprintf(fmts, Val(T_km) ? CGETS(7, 14, "yes") :
+		CGETS(7, 15, "no"));
 	flush();
 	return;
     }
     else if (strcmp(cv, "xn") == 0) {
-	xprintf(fmts, T_Margin & MARGIN_MAGIC ? catgets(catd, 1, 205, "yes") :
-		catgets(catd, 1, 206, "no"));
+	xprintf(fmts, T_Margin & MARGIN_MAGIC ? CGETS(7, 14, "yes") :
+		CGETS(7, 15,  "no"));
 	flush();
 	return;
     }
     else if (strcmp(cv, "am") == 0) {
-	xprintf(fmts, T_Margin & MARGIN_AUTO ? catgets(catd, 1, 205, "yes") :
-		catgets(catd, 1, 206, "no"));
+	xprintf(fmts, T_Margin & MARGIN_AUTO ? CGETS(7, 14, "yes") :
+		CGETS(7, 15, "no"));
 	flush();
 	return;
     }
@@ -577,7 +677,7 @@ EchoTC(v)
 	scap = tgetstr(cv, &area);
     if (!scap || scap[0] == '\0') {
 	if (tgetflag(cv)) {
-	    xprintf(catgets(catd, 1, 125, "yes\n"));
+	    xprintf(CGETS(7, 14, "yes\n"));
 	    return;
 	}
 	if (silent)
@@ -1124,7 +1224,7 @@ DeleteChars(num)		/* deletes <num> characters */
 
     if (!T_CanDel) {
 #ifdef DEBUG_EDIT
-	xprintf(catgets(catd, 1, 209, "   ERROR: cannot delete   \n"));
+	xprintf(CGETS(7, 16, "ERROR: cannot delete\r\n"));
 #endif /* DEBUG_EDIT */
 	flush();
 	return;
@@ -1132,7 +1232,7 @@ DeleteChars(num)		/* deletes <num> characters */
 
     if (num > TermH) {
 #ifdef DEBUG_SCREEN
-	xprintf(catgets(catd, 1, 210, "DeleteChars: num is riduculous: %d\r\n"), num);
+	xprintf(CGETS(7, 17, "DeleteChars: num is riduculous: %d\r\n"), num);
 	flush();
 #endif /* DEBUG_SCREEN */
 	return;
@@ -1164,7 +1264,7 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 	return;
     if (!T_CanIns) {
 #ifdef DEBUG_EDIT
-	xprintf(catgets(catd, 1, 211, "   ERROR: cannot insert   \n"));
+	xprintf(CGETS(7, 18, "ERROR: cannot insert\r\n"));
 #endif /* DEBUG_EDIT */
 	flush();
 	return;
@@ -1172,8 +1272,7 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 
     if (num > TermH) {
 #ifdef DEBUG_SCREEN
-	xprintf(catgets(catd, 1, 212,
-			"StartInsert: num is riduculous: %d\r\n"), num);
+	xprintf(CGETS(7, 19, "StartInsert: num is riduculous: %d\r\n"), num);
 	flush();
 #endif /* DEBUG_SCREEN */
 	return;
@@ -1326,15 +1425,15 @@ GetTermCaps()
     if (i <= 0) {
 	if (i == -1) {
 #if (SYSVREL == 0) || defined(IRIS3D)
-	    xprintf(catgets(catd, 1, 213, "tcsh: Cannot open /etc/termcap.\n"));
+	    xprintf(CGETS(7, 20, "tcsh: Cannot open /etc/termcap.\n"));
 	}
 	else if (i == 0) {
 #endif /* SYSVREL */
-	    xprintf(catgets(catd, 1, 214,
+	    xprintf(CGETS(7, 21,
 			    "tcsh: No entry for terminal type \"%s\"\n"),
 		    getenv("TERM"));
 	}
-	xprintf(catgets(catd, 1, 215, "tcsh: using dumb terminal settings.\n"));
+	xprintf(CGETS(7, 22, "tcsh: using dumb terminal settings.\n"));
 	Val(T_co) = 80;		/* do a dumb terminal */
 	Val(T_pt) = Val(T_km) = Val(T_li) = 0;
 	for (t = tstr; t->name != NULL; t++)
@@ -1378,17 +1477,15 @@ GetTermCaps()
 
 #ifdef DEBUG_SCREEN
     if (!T_CanUP) {
-	xprintf(catgets(catd, 1, 216,
-			"tcsh: WARNING: Your terminal cannot move up.\n"));
-	xprintf(catgets(catd, 1, 217,
-			"Editing may be odd for long lines.\n"));
+	xprintf(CGETS(7, 23, "tcsh: WARNING: Your terminal cannot move up.\n"));
+	xprintf(CGETS(7, 24, "Editing may be odd for long lines.\n"));
     }
     if (!T_CanCEOL)
-	xprintf(catgets(catd, 1, 218, "no clear EOL capability.\n"));
+	xprintf(CGETS(7, 25, "no clear EOL capability.\n"));
     if (!T_CanDel)
-	xprintf(catgets(catd, 1, 219, "no delete char capability.\n"));
+	xprintf(CGETS(7, 26, "no delete char capability.\n"));
     if (!T_CanIns)
-	xprintf(catgets(catd, 1, 220, "no insert char capability.\n"));
+	xprintf(CGETS(7, 27, "no insert char capability.\n"));
 #endif /* DEBUG_SCREEN */
 
 

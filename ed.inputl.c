@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.inputl.c,v 3.40 1994/07/08 14:43:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/ed.inputl.c,v 3.41 1995/03/05 03:18:09 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.40 1994/07/08 14:43:50 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.41 1995/03/05 03:18:09 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -178,8 +178,7 @@ Inputl()
 
 	if (cmdnum >= NumFuns) {/* BUG CHECK command */
 #ifdef DEBUG_EDIT
-	    xprintf(catgets(catd, 1, 124,
-			    "ERROR: illegal command from key 0%o\r\n"), ch);
+	    xprintf(CGETS(6, 1, "ERROR: illegal command from key 0%o\r\n"), ch);
 #endif
 	    continue;		/* try again */
 	}
@@ -245,13 +244,13 @@ Inputl()
 		    ch = tch;
 		    if (ch == 'y' || ch == ' ') {
 			LastChar = CorrChar;	/* Restore the corrected end */
-			xprintf(catgets(catd, 1, 125, "yes\n"));
+			xprintf(CGETS(6, 2, "yes\n"));
 		    }
 		    else {
 			copyn(InputBuf, Origin, INBUFSIZE);
 			LastChar = SaveChar;
 			if (ch == 'e') {
-			    xprintf(catgets(catd, 1, 126, "edit\n"));
+			    xprintf(CGETS(6, 3, "edit\n"));
 			    *LastChar-- = '\0';
 			    Cursor = LastChar;
 			    printprompt(3, NULL);
@@ -261,14 +260,14 @@ Inputl()
 			    break;
 			}
 			else if (ch == 'a') {
-			    xprintf(catgets(catd, 1, 127, "abort\n"));
+			    xprintf(CGETS(6, 4, "abort\n"));
 		            LastChar = InputBuf;   /* Null the current line */
 			    Cursor = LastChar;
 			    printprompt(0, NULL);
 			    Refresh();
 			    break;
 			}
-			xprintf(catgets(catd, 1, 128, "no\n"));
+			xprintf(CGETS(6, 5, "no\n"));
 		    }
 		    flush();
 		}
@@ -286,9 +285,9 @@ Inputl()
                     PastBottom();
 		}
 		if (matchval == 0) {
-		    xprintf(catgets(catd, 1, 129, "No matching command\n"));
+		    xprintf(CGETS(6, 6, "No matching command\n"));
 		} else if (matchval == 2) {
-		    xprintf(catgets(catd, 1, 130, "Ambiguous command\n"));
+		    xprintf(CGETS(6, 7, "Ambiguous command\n"));
 		}
 	        if (NeedsRedraw) {
 		    ClearLines();
@@ -505,7 +504,7 @@ Inputl()
 
 	case CC_FATAL:		/* fatal error, reset to known state */
 #ifdef DEBUG_EDIT
-	    xprintf(catgets(catd, 1, 131, "*** editor fatal ERROR ***\r\n\n"));
+	    xprintf(CGETS(7, 8, "*** editor fatal ERROR ***\r\n\n"));
 #endif				/* DEBUG_EDIT */
 	    /* put (real) cursor in a known place */
 	    ClearDisp();	/* reset the display stuff */
