@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.alloc.c,v 3.24 1994/06/18 19:48:50 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/tc.alloc.c,v 3.25 1994/07/08 14:43:50 christos Exp christos $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -44,7 +44,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.24 1994/06/18 19:48:50 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.25 1994/07/08 14:43:50 christos Exp christos $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -54,7 +54,7 @@ int dont_free = 0;
 #ifndef SYSMALLOC
 
 #undef RCHECK
-#define DEBUG
+#undef DEBUG
 
 #ifdef SX
 extern void* sbrk();

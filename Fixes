@@ -1,6 +1,6 @@
 
 V6.07.00, -
- 14. 6.06.01 - 07/07/94
+ 14. 6.06.01 - 07/08/94
  13. Changed key bindings to use counted strings instead of Null terminated
      strings, so that binding ^@ works.
  12. Fix parsing bug, where words that contained keywords caused incorrect

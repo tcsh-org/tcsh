@@ -74,7 +74,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "19 June 1994" "Cornell 6.05.00"
+.TH TCSH 1 "8 July 1994" "Cornell 6.05.01"
 .SH NAME
 tcsh - C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -3542,6 +3542,8 @@ Controls handling of duplicate entries in the history list.
 If set to "all" only unique history events are entered in the history
 list. If set to "prev" and the last history event is the same as the
 current command, then the current command is not entered in the history.
+If set to "erase" and the same event is found in the history list,
+that old event gets erased and the current one gets inserted.
 .TP 8
 .B histfile \fR(+)
 The default location in which `history -S' and `history -L' look for
@@ -4517,7 +4519,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.05.00 (Cornell) 94/19/06.
+This manual documents tcsh 6.05.01 (Cornell) 94/07/08.
 .SH AUTHORS
 .PD 0
 .TP 2
