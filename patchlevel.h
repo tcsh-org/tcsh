@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/patchlevel.h,v 3.13 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/patchlevel.h,v 3.14 1991/10/28 06:26:50 christos Exp $ */
 /*
  * patchlevel.h: Our life story.
  */
@@ -9,7 +9,7 @@
 #define REV 6
 #define VERS 00
 #define PATCHLEVEL 04
-#define DATE "10/28/91"
-#define LOCALSTR " (beta 1)"
+#define DATE "11/03/91"
+#define LOCALSTR " (beta 2)"
 
 #endif /* _h_patchlevel */

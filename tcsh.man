@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.18 1991/10/18 16:27:13 christos Exp $
+.\" $Id: tcsh.man,v 3.19 1991/10/21 17:24:49 christos Exp $
 .TH TCSH 1 "20 October 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -807,7 +807,14 @@ If the
 .I autolist
 variable is set, invoking completion when several choices are possible
 will automatically list the choices, effectively merging the functionality
-described in the next section into the completion mechanism.
+described in the next section into the completion mechanism. If 
+.I autolist
+is set to "ambiguous", then 
+.I tcsh 
+will only list the choices if there were no new characters added in the
+completion operation.
+
+.PP
 The "noise level" can be controlled by the value that
 .I matchbeep
 is set to: With matchbeep=nomatch, completion will only beep if there are
@@ -1274,7 +1281,7 @@ The
 .I prompt3
 variable is used when displaying the corrected command line when
 automatic spelling correction is in effect; it defaults to 
-"CORRECT>%R (y|n)? ".
+"CORRECT>%R (y|n|e)? ".
 
 .PP
 .SH "13. TIME-STAMPED HISTORY LIST"
@@ -1937,7 +1944,7 @@ Delete	(or any character bound to \fIbackward-delete-char\fR)
 	deleting a character from the pattern if appropriate.
 ^G	Abort the search, back to the last successful one
 	if previous search failed, otherwise entire search.
-^Y	Append the rest of the current word to the pattern.
+^W	Append the rest of the current word to the pattern.
 ESC	Terminate the search, leaving current line in buffer.
 .RE
 .DT

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.18 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.19 1991/10/22 06:52:57 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -167,6 +167,12 @@ typedef int sigret_t;
 # endif /* TERMIO */
 #else /* POSIX */
 # include <termios.h>
+# if SVID > 3
+#  undef TIOCGLTC	/* we don't need those, since POSIX has them */
+#  undef TIOCSLTC
+#  undef CSWTCH
+#  define CSWTCH _POSIX_VDISABLE	/* So job control works */
+# endif /* SVID > 3 */
 #endif /* POSIX */
 
 #ifdef POSIX
@@ -726,7 +732,7 @@ extern struct varent *adrof1();
  */
 EXTERN struct wordent *alhistp;	/* Argument list (first) */
 EXTERN struct wordent *alhistt;	/* Node after last in arg list */
-EXTERN Char  **alvec;		/* The (remnants of) alias vector */
+EXTERN Char  **alvec, *alvecp;	/* The (remnants of) alias vector */
 
 /*
  * Filename/command name expansion variables

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.h,v 3.1 1991/07/18 16:20:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.h,v 3.2 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -38,7 +38,7 @@
 #ifndef _h_tc_sig
 #define _h_tc_sig
 
-#if SVID > 0
+#if (SVID > 0) || defined(BSD4_4)
 # include <signal.h>
 # ifndef SIGCHLD
 #  define SIGCHLD SIGCLD

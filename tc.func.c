@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.10 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.11 1991/10/20 01:38:14 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.10 1991/10/18 16:27:13 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.11 1991/10/20 01:38:14 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -434,7 +434,7 @@ find_stop_ed()
 	return PNULL;		/* nope */
 
     for (pp = proclist.p_next; pp; pp = pp->p_next)
-	if (pp->p_pid == pp->p_jobid) {
+	if (pp->p_procid == pp->p_jobid) {
 	    p = short2str(pp->p_command);
 	    if ((cp = strrchr(p, '/')) != NULL)	/* and it has a path */
 		cp = cp + 1;		/* then we want only the last part */

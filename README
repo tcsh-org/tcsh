@@ -101,3 +101,26 @@ On sysv versions < 3.0 (not hpux) the public domain directory
 manipulation library has to be installed.
 If the network is not installed, then there is a gethostname()
 routine is tc.os.c.
+
+
+On BSDreno, in ttyname() closedir() is called twice and so the same
+pointer gets free'd twice. tcsh's malloc is picky and it prints an
+error message to that effect. If you don't like the message:
+
+1. Apply the following patch:
+
+*** /usr/src/lib/libc/gen/ttyname.c.orig	Fri Jun  1 17:17:15 1990
+--- /usr/src/lib/libc/gen/ttyname.c	Tue Oct 29 16:33:12 1991
+***************
+*** 51,57 ****
+  		if (stat(buf, &sb2) < 0 || sb1.st_dev != sb2.st_dev ||
+  		    sb1.st_ino != sb2.st_ino)
+  			continue;
+- 		closedir(dp);
+  		rval = buf;
+  		break;
+  	}
+--- 51,56 ----
+
+Or: Comment the error printing out in tc.alloc.c
+Or: Compile -DSYSMALLOC

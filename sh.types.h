@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.11 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.12 1991/10/18 16:27:13 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -218,12 +218,12 @@ extern char *sbrk();
 #endif /* BSD */
 /***
  *** BSD RENO advertises itself as POSIX, but
- *** it is missing speed_t (newer versions of RENO have it)
+ *** it is missing speed_t 
  ***/
 #ifdef RENO
 # ifndef _SPEED_T
 #  define _SPEED_T
-/*   typedef unsigned int speed_t; */
+   typedef unsigned int speed_t; 
 # endif /* _SPEED_T */
 #endif /* RENO */
 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.11 1991/10/18 16:27:13 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.12 1991/10/21 17:24:49 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.11 1991/10/18 16:27:13 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.12 1991/10/21 17:24:49 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -155,8 +155,15 @@ c_delafter(num)
 		*cp = cp[num];
 	LastChar -= num;
     }
-    else
+#ifdef notdef
+    else {
+	/* 
+	 * XXX: We don't want to do that. In emacs mode overwrite should be
+	 * sticky. I am not sure how that affects vi mode 
+	 */
 	replacemode = 0;
+    }
+#endif /* notdef */
 }
 
 static void
@@ -791,6 +798,7 @@ e_inc_search(dir)
 	switch (CurrentKeyMap[(unsigned char) ch]) {
 	case F_INSERT:
 	case F_DIGIT:
+	case F_MAGIC_SPACE:
 	    if (patlen > INBUFSIZ - 3)
 		Beep();
 	    else {

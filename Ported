@@ -57,11 +57,11 @@ MODELS	:	vax
 COMPILER:	cc, gcc
 CFLAGS	:	normal
 LIBES	:	-ltermcap
-OS	:	bsd4.3
+OS	:	bsd4.3, bsd4.4
 CONFIG	:	config.bsd 
 ENVIRON	:	n/a
 NOTES	:	cc broken: typedef void sigret_t;
-VERSION	:	6.00.00
+VERSION	:	6.00.03
 
 VENDOR	:	digital
 MODELS	:	vax
@@ -198,11 +198,9 @@ CFLAGS	:	normal
 LIBES	:	-ltermcap
 OS	:	bsd 4.3reno
 CONFIG	:	config.bsdreno
+NOTES	:	ttyname() is buggy. calls closedir() twice. See README
 ENVIRON	:	n/a
-NOTES	:	For early reno systems need to uncomment definition of
-NOTES	:	speed_t in sh.types.h and append "#undef NLS" and
-NOTES	:	"#define SYSMALLOC" to end of config.h
-VERSION	:	6.00.01
+VERSION	:	6.00.04
 
 VENDOR	:	Cray Research
 MODELS	:	Y-MP

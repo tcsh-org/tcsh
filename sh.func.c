@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.12 1991/10/20 01:38:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.13 1991/10/28 06:26:50 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.12 1991/10/20 01:38:14 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.13 1991/10/28 06:26:50 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -45,7 +45,6 @@ RCSID("$Id: sh.func.c,v 3.12 1991/10/20 01:38:14 christos Exp $")
 /*
  * C shell
  */
-
 extern int just_signaled;
 extern char **environ;
 
@@ -935,22 +934,47 @@ wfree()
 {
     struct Ain    o;
     struct whyle *nwp;
+
+#ifdef FDEBUG
+    static char foo[] = "IAFE";
+#endif /* FDEBUG */
+
     btell(&o);
-    if (o.type != F_SEEK)
-	return;
+
+#ifdef FDEBUG
+    xprintf("o->type %c o->a_seek %d o->f_seek %d\n", 
+	    foo[o.type + 1], o.a_seek, o.f_seek);
+#endif /* FDEBUG */
 
     for (; whyles; whyles = nwp) {
 	register struct whyle *wp = whyles;
 	nwp = wp->w_next;
-	if (wp->w_start.type != F_SEEK)
-	    break;
-	if (wp->w_end.type != I_SEEK) {
-	    if (wp->w_end.type != F_SEEK)
-		break;
-	    if (o.f_seek >= wp->w_start.f_seek && 
-		(wp->w_end.f_seek == 0 || o.f_seek < wp->w_end.f_seek))
-		break;
+
+#ifdef FDEBUG
+	xprintf("start->type %c start->a_seek %d start->f_seek %d\n", 
+		foo[wp->w_start.type+1], 
+		wp->w_start.a_seek, wp->w_start.f_seek);
+	xprintf("end->type %c end->a_seek %d end->f_seek %d\n", 
+		foo[wp->w_end.type + 1], wp->w_end.a_seek, wp->w_end.f_seek);
+#endif /* FDEBUG */
+
+	/*
+	 * XXX: We free loops that have different seek types.
+	 */
+	if (wp->w_end.type != I_SEEK && wp->w_start.type == wp->w_end.type &&
+	    wp->w_start.type == o.type) {
+	    if (wp->w_end.type == F_SEEK) {
+		if (o.f_seek >= wp->w_start.f_seek && 
+		    (wp->w_end.f_seek == 0 || o.f_seek < wp->w_end.f_seek))
+		    break;
+	    }
+	    else {
+		if (o.a_seek >= wp->w_start.a_seek && 
+		    (wp->w_end.a_seek == 0 || o.a_seek < wp->w_end.a_seek))
+		    break;
+	    }
 	}
+
 	if (wp->w_fe0)
 	    blkfree(wp->w_fe0);
 	if (wp->w_fename)

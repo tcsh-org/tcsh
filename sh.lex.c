@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.8 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.9 1991/10/28 06:26:50 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.8 1991/10/21 17:24:49 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.9 1991/10/28 06:26:50 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -96,7 +96,7 @@ static struct wordent *exclnxt = NULL;
 static int exclc = 0;
 
 /* "Globp" for alias resubstitution */
-static Char *alvecp = NULL;
+Char *alvecp = NULL;
 int aret = F_SEEK;
 
 /*
@@ -183,6 +183,7 @@ lex(hp)
     else {
 	histline[BUFSIZ - 1] = '\0';
     }
+
     return (hadhist);
 }
 

@@ -1,4 +1,11 @@
 V6.00.04, ....
+18. (beta-2 11/03/91)
+17. Multi-line aliases with `` bug fix.
+16. Sticky emacs overwrite mode.
+15. Autolist option.
+14. Fix for redirection with wildcard filanames.
+13. No error correction for multi-line commands.
+12. Esix-4 re-defines p_pid. Argh...
 11. (beta-1 10/28/91)
 10. Foreach loops were broken again.
 9.  SUNOS localtime() bug does not only happen on the 8th byte. [Michael]

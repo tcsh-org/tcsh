@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tc.bind.c,v 1.3 91/09/24 17:10:49 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.bind.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.2 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -492,7 +492,7 @@ parseescape(ptr)
     p = *ptr;
 
     if ((p[1] & CHAR) == 0) {
-	xprintf("Something must follow: %c\\n", *p);
+	xprintf("Something must follow: %c\n", *p);
 	return 0;
     }
     if ((*p & CHAR) == '\\') {
