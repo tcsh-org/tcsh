@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.44 2004/11/23 02:10:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.45 2005/01/18 20:24:50 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -274,7 +274,7 @@ extern struct command 	 *syntax	__P((struct wordent *,
 extern	void		  drainoline	__P((void));
 extern	void		  flush		__P((void));
 #ifdef BSDTIMES
-extern	void		  pcsecs	__P((long));
+extern	void		  pcsecs	__P((unsigned long));
 #else /* !BSDTIMES */
 # ifdef POSIX
 extern	void		  pcsecs	__P((clock_t));
@@ -283,7 +283,7 @@ extern	void		  pcsecs	__P((time_t));
 # endif /* !POSIX */
 #endif /* BSDTIMES */
 #ifdef BSDLIMIT
-extern	void		  psecs		__P((long));
+extern	void		  psecs		__P((unsigned long));
 #endif /* BSDLIMIT */
 extern	int		  putpure	__P((int));
 extern	int		  putraw	__P((int));

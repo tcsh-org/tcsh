@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.25 2005/01/06 02:31:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.print.c,v 3.26 2005/03/03 17:01:24 kim Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.25 2005/01/06 02:31:01 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.26 2005/03/03 17:01:24 kim Exp $")
 
 #include "ed.h"
 
@@ -40,7 +40,7 @@ extern int Tty_eight_bit;
 
 int     lbuffed = 1;		/* true if line buffered */
 
-static	void	p2dig	__P((int));
+static	void	p2dig	__P((unsigned int));
 
 /*
  * C Shell
