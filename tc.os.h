@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.9 1991/07/23 23:20:08 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.10 1991/07/23 23:30:02 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -412,6 +412,10 @@ extern char *getwd();
 # if defined(sun) && !defined(__GNUC__)
 extern char *getwd();
 # endif	/* sun && ! __GNUC__ */
+
+# ifdef SCO
+extern char *ttyname();   
+# endif /* SCO */
 
 # ifdef RENO
 extern void perror();		/* Reno declares that in stdio.h :-( */
