@@ -1,6 +1,6 @@
 
 Last Updated: 
-Thu Oct 26 19:40:18 EDT 1995
+Thu Apr  9 10:22:24 EDT 1998
 
 This is for people who do not read the manual!
 
@@ -184,6 +184,17 @@ be able to get ftp it... :-)
 
 19. If you need help generating your .cshrc file, check out:
 	http://www.imada.ou.dk/~blackie/dotfile/
+
+20. On POSIX systems the kernel will send hup signals to all the processes
+    in the foreground process group if 'stty hupcl' is set. For example
+    ./tcsh
+    echo $$
+    591
+    ./tcsh
+    kill -6 591
+
+    Will kill everything, since hup will be sent to all tcsh processes.
+    To avoid that you can set stty -hupcl, but it is not recommended.
 
 christos
 
