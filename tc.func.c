@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.17 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.18 1991/11/26 04:28:26 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.17 1991/11/22 02:28:12 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.18 1991/11/26 04:28:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -438,10 +438,16 @@ find_stop_ed()
     for (pp = proclist.p_next; pp; pp = pp->p_next)
 	if (pp->p_procid == pp->p_jobid) {
 	    p = short2str(pp->p_command);
+	    /* get the first word */
+	    for (cp = p; *cp && !isspace(*cp); cp++)
+		continue;
+	    *cp = '\0';
+		
 	    if ((cp = strrchr(p, '/')) != NULL)	/* and it has a path */
 		cp = cp + 1;		/* then we want only the last part */
 	    else
 		cp = p;			/* else we get all of it */
+
 	    /* if we find either in the current name, fg it */
 	    if (strncmp(ep, cp, (size_t) epl) == 0 ||
 		strncmp(vp, cp, (size_t) vpl) == 0)
@@ -1444,4 +1450,36 @@ eof:
     if (gargv)
 	blkfree(gargv), gargv = 0;
     resexit(oldexit);
+}
+
+
+/*
+ * set the shell-level var to 1 or apply change to it.
+ */
+void
+shlvl(val)
+    int val;
+{
+    char *cp;
+
+    if ((cp = getenv("SHLVL")) != NULL) {
+
+	val += atoi(cp);
+
+	if (val <= 0) {
+	    unsetv(STRshlvl);
+	    Unsetenv(STRSHLVL);
+	}
+	else {
+	    Char    buff[BUFSIZ];
+
+	    Itoa(val, buff);
+	    set(STRshlvl, Strsave(buff));
+	    Setenv(STRSHLVL, buff);
+	}
+    }
+    else {
+	set(STRshlvl, SAVE("1"));
+	Setenv(STRSHLVL, str2short("1"));
+    }
 }

@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.23 1991/11/22 02:28:12 christos Exp $
+.\" $Id: tcsh.man,v 3.24 1991/11/26 04:28:26 christos Exp $
 .TH TCSH 1 "20 October 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1878,6 +1878,7 @@ The current possible values are:
 \fIrt\fR			an IBM PC/RT, running BSD (AOS 4.3) or mach
 \fIrtpc\fR			an IBM PC/RT, running aix
 \fIsco386\fR		an Intel 386, running SCO
+\fIstellar\fR		a stellar running stellix
 \fIsun\fR			a Sun workstation of none of the above types
 \fIsun2\fR			a Sun Microsystems series 2 workstation (68010 based)
 \fIsun3\fR			a Sun Microsystems series 3 workstation (68020 based)
@@ -2430,6 +2431,8 @@ if the shell was a login shell.
 .sp
 Note: On 
 .I convexos
+and
+.I stellix
 the names of the system default files are
 .I "/etc/cshrc",
 .I "/etc/login"

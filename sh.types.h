@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.14 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.types.h,v 3.15 1991/12/05 18:26:54 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -206,6 +206,14 @@ typedef char * caddr_t;
 # endif /* _SIZE_T */
 #endif /* SXA */
 
+/***
+ *** a stellar 2600, running stellix 2.3
+ ***/
+#ifdef stellar
+# ifndef _SIZE_T
+#  define _SIZE_T
+# endif /* _SIZE_T */
+#endif /* stellar */
 
 /***
  *** BSD systems, pre and post 4.3

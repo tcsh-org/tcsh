@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.15 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.16 1991/12/05 18:26:54 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.15 1991/11/26 04:28:26 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.16 1991/12/05 18:26:54 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -155,15 +155,15 @@ tenematch(inputline, inputline_size, num_read, command)
 	}
 	if (skp)
 	    continue;
-	if ((ismeta(word_start[-1]) || isaset(cmd_st, word_start)) &&
-	    /* (word_start[-1] != '#') && */ (word_start[-1] != '$') &&
+	if ((ismetahash(word_start[-1]) || isaset(cmd_st, word_start)) &&
+	    (word_start[-1] != '$') &&
 	    ((word_start - 1 == inputline) || (word_start[-2] != '\\')))
 	    break;
     }
 
 
 
-#ifdef	masscomp
+#ifdef masscomp
     /*
      * Avoid a nasty message from the RTU 4.1A & RTU 5.0 compiler concerning
      * the "overuse of registers". According to the compiler release notes,

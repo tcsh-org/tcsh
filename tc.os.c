@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.10 1991/10/21 17:24:49 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.11 1991/11/11 01:56:34 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.10 1991/10/21 17:24:49 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.11 1991/11/11 01:56:34 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -79,13 +79,25 @@ dosetpath(arglist, c)
     struct command *c;
 {
     extern char *getenv();
-
+    sigmask_t omask;
     Char  **pathvars, **cmdargs;
     Char  **paths;
     char  **spaths, **cpaths, **cmds;
     char   *tcp;
     unsigned int npaths, ncmds;
     int     i, sysflag;
+
+    omask = sigsetmask(sigmask(SIGINT));
+
+    /*
+     * setpath(3) uses stdio and we want 0, 1, 2 to work...
+     */
+    if (!didfds) {
+	(void) dcopy(SHIN, 0);
+	(void) dcopy(SHOUT, 1);
+	(void) dcopy(SHDIAG, 2);
+	didfds = 1;
+    }
 
     for (i = 1; arglist[i] && (arglist[i][0] != '-'); i++);
     npaths = i - 1;
@@ -137,6 +149,7 @@ dosetpath(arglist, c)
 	(void) strcpy(cmds[i], short2str(val));
     }
 
+
     if (setpath(cpaths, cmds, LOCALSYSPATH, sysflag, 1) < 0) {
 abortpath:
 	if (spaths) {
@@ -164,6 +177,8 @@ abortpath:
 	    paths[i] = SAVE(cpaths[i]);
 	    xfree((ptr_t) cpaths[i]);
 	}
+	(void) sigsetmask(omask);
+	donefds();
 	return;
     }
 
@@ -182,6 +197,8 @@ abortpath:
 	    *--val = '=';
 	}
     }
+    (void) sigsetmask(omask);
+    donefds();
 }
 #endif /* MACH */
 

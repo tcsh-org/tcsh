@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.11 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.12 1991/11/26 04:28:26 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.11 1991/11/22 02:28:12 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.12 1991/11/26 04:28:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -529,7 +529,7 @@ GetNextCommand(cmdnum, ch)
     KEYCMD  cmd = 0;
     int     num;
 
-    for (; cmd == 0 || cmd == F_XKEY;) {
+    while (cmd == 0 || cmd == F_XKEY) {
 	if ((num = GetNextChar(ch)) != 1) {	/* if EOF or error */
 	    return num;
 	}
@@ -669,10 +669,10 @@ SpellLine(cmdonly)
     endflag = 1;
     matchval = 0;
     do {
-	while (ismeta(*argptr) || iscmdmeta(*argptr))
+	while (ismetahash(*argptr) || iscmdmeta(*argptr))
 	    argptr++;
 	for (Cursor = argptr;
-	     *Cursor != '\0' && !ismeta(*Cursor) && !iscmdmeta(*Cursor);
+	     *Cursor != '\0' && !ismetahash(*Cursor) && !iscmdmeta(*Cursor);
 	     Cursor++);
 	if (*Cursor == '\0') {
 	    Cursor = LastChar;

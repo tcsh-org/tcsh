@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.23 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.24 1991/11/26 04:28:26 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -211,9 +211,9 @@ extern int setpgrp();
 #endif /* POSIX */
 
 #if SVID > 0 || defined(_IBMR2) || defined(_MINIX)
-# if !defined(pyr) || !defined(aiws)
+# if !defined(pyr) && !defined(aiws) && !defined(stellar)
 #  include <time.h>
-# endif /* !aiws || !pyr */
+# endif /* !aiws && !pyr && !stellar */
 #endif /* SVID > 0 ||  _IBMR2 */
 
 #if !((defined(sun) || defined(_MINIX)) && defined(TERMIO))

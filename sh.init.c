@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.8 1991/10/12 04:23:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.9 1991/10/18 16:27:13 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.8 1991/10/12 04:23:51 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.9 1991/10/18 16:27:13 christos Exp $")
 
 #include "ed.h"
 
@@ -366,6 +366,33 @@ struct	mesg mesg[] = {
 /* 31 */	0, 		"Reserved", /* Reserved */
 /* 32 */	"DIL",		"DIL signal",
 # endif /* hpux */
+
+# ifdef stellar
+#  define _sigextra_
+/* 20 */	"WINDOW", 	"Window changed",
+/* 21 */	"URG",		"Urgent condition on IO channel",
+/* 22 */	"POLL", 	"Pollable event occured",
+#  ifdef SUSPENDED
+/* 23 */	"STOP",		"Suspended (signal)",
+/* 24 */	"TSTP",		"Suspended",
+#  else /* SUSPENDED */
+/* 23 */	"STOP",		"Stopped (signal)",
+/* 24 */	"TSTP",		"Stopped",
+#  endif /* SUSPENDED */
+/* 25 */	"CONT",		"Continued",
+#  ifdef SUSPENDED
+/* 26 */	"TTIN", 	"Suspended (tty input)",
+/* 27 */	"TTOU", 	"Suspended (tty output)",
+#  else /* SUSPENDED */
+/* 26 */	"TTIN", 	"Stopped (tty input)",
+/* 27 */	"TTOU", 	"Stopped (tty output)",
+#  endif /* SUSPENDED */
+/* 28 */	"IO", 		"Asynchronous I/O (select)",
+/* 29 */	"XCPU",		"Cputime limit exceeded",
+/* 30 */	"XFSZ", 	"Filesize limit exceeded",
+/* 31 */	"VTALRM", 	"Virtual time alarm",
+/* 32 */	"PROF", 	"Profiling time alarm",
+# endif /* stellar */
 
 # if SVID > 3
 #  define _sigextra_

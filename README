@@ -24,11 +24,6 @@ To install tcsh:
 1)  Look at the Makefile and make sure that you are using the right
     compilation flags.
 
-    NOTES:
-	On a vax using the good ol' BSD compiler 'typedef void sigret_t;' 
-	fails in sh.os.h replace with '#define sigret_t void'. No I will not 
-	change sh.sig.h. (Both ultrix and 4.3BSD)
- 
 2)  Copy the appropriate for your machine and OS config file from the
     config subdirectory into config.h. If you are trying to compile
     tcsh on a machine for which there is no config file yet, you will
@@ -73,7 +68,9 @@ To install tcsh:
     jobs works. Make sure you can ^C in the middle of the input line.
     Also make sure that pipelines work correctly and there
     are no races. Try 'echo | cat | cat | cat | cat | more' a couple
-    of times. Also make sure that the ioctl() modes are preserved.
+    of times. If you have job control, try this command in the background
+    and bring it in the foreground when it stops for tty output. 
+    Also make sure that the ioctl() modes are preserved.
     Get into vi, enter and exit input mode and suspend it, background
     it and foreground it again. After all that, lastly make sure that
     the tty process group manipulation is happening correctly. Try
@@ -99,10 +96,11 @@ Various:
 
 ***************************************************************************
 
-On sysv versions < 3.0 (not hpux) the public domain directory 
-manipulation library has to be installed.
+On sysv versions < 3.0 (not hpux) Doug Gwyn's public domain directory 
+manipulation library has to be installed. This library is available
+for anonymous ftp from prep.ai.mit.edu:/pub/gnu/libdirent.tar.Z
 If the network is not installed, then there is a gethostname()
-routine is tc.os.c.
+routine is tc.os.c, enabled by defining NEEDgethostname
 
 ***************************************************************************
 

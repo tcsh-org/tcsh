@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.9 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.10 1991/12/05 18:26:54 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.9 1991/11/22 02:28:12 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.10 1991/12/05 18:26:54 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -347,6 +347,11 @@ gethosttype()
     /* Ken Laprade <laprade@trantor.harris-atd.com> */
     hosttype = str2short("titan");
 # endif /* titan */
+
+# ifdef stellar
+#  define _havehosttype_
+    hosttype = str2short("stellar");
+# endif /* stellar */
 
 # ifdef sgi
 /* Iris 4D is in the mips section; these are the 68k machines. */

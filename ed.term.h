@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.h,v 1.4 1991/12/05 18:33:51 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.term.h,v 1.5 1991/12/08 17:16:33 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -181,6 +181,9 @@
 #ifndef CSWTCH
 # define CSWTCH		_POSIX_VDISABLE
 #endif /* CSWTCH */
+#ifndef CDSWTCH
+# define CDSWTCH	_POSIX_VDISABLE
+#endif /* CDSWTCH */
 #ifndef CERASE2
 # define CERASE2	_POSIX_VDISABLE
 #endif /* CERASE2 */
@@ -238,6 +241,9 @@
 #ifndef CPGOFF
 # define CPGOFF		CONTROL('m')
 #endif /* CPGOFF */
+#ifndef CKILL2
+# define CKILL2		_POSIX_VDISABLE
+#endif /* CKILL2 */
 #ifndef CBRK
 # ifndef masscomp
 #  define CBRK		0377
@@ -305,6 +311,11 @@
 #    undef VSWTCH
 #   endif /* NUMCC <= VSWTCH */
 #  endif /* VSWTCH */
+#  ifdef VDSWTCH
+#   if NUMCC <= VDSWTCH
+#    undef VDSWTCH
+#   endif /* NUMCC <= VDSWTCH */
+#  endif /* VDSWTCH */
 #  ifdef VERASE2
 #   if NUMCC <= VERASE2
 #    undef VERASE2
@@ -365,6 +376,11 @@
 #    undef VPGOFF
 #   endif /* NUMCC <= VPGOFF */
 #  endif /* VPGOFF */
+#  ifdef VKILL2
+#   if NUMCC <= VKILL2
+#    undef VKILL2
+#   endif /* NUMCC <= VKILL2 */
+#  endif /* VKILL2 */
 #  ifdef VBRK
 #   if NUMCC <= VBRK
 #    undef VBRK
@@ -391,22 +407,24 @@
 #define C_EOL		 5
 #define C_EOL2		 6
 #define C_SWTCH		 7
-#define C_ERASE2	 8
-#define C_START		 9
-#define C_STOP		10
-#define C_WERASE	11
-#define C_SUSP		12
-#define C_DSUSP		13
-#define C_REPRINT	14
-#define C_DISCARD	15
-#define C_LNEXT		16
-#define C_STATUS	17
-#define C_PAGE		18
-#define C_PGOFF		19
-#define C_BRK		20
-#define C_MIN		21
-#define C_TIME		22
-#define C_NCC		23
+#define C_DSWTCH	 8
+#define C_ERASE2	 9
+#define C_START		10
+#define C_STOP		11
+#define C_WERASE	12
+#define C_SUSP		13
+#define C_DSUSP		14
+#define C_REPRINT	15
+#define C_DISCARD	16
+#define C_LNEXT		17
+#define C_STATUS	18
+#define C_PAGE		19
+#define C_PGOFF		20
+#define C_KILL2		21
+#define C_BRK		22
+#define C_MIN		23
+#define C_TIME		24
+#define C_NCC		25
 #define C_SH(A)		(1 << (A))
 
 #endif /* _h_ed_term */

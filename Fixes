@@ -1,4 +1,14 @@
 V6.01.00, ...
+19. (V6.00.08 beta 12/14/91)
+18. Filenames containing # were spelled/expanded incorrectly.
+17. Stellar/stellix port.
+16. Hpux 8.0 has SIGWINDOW but we cannot get the window size. Protect
+    against window changes updating $LINES and $COLUMNS.
+15. Mach setpath did not work right.
+14. Mach does not need setenv in lib; in fact that does not work right.
+13. shell level gets decremented when we exec.
+12. restart_fg_editor picked the wrong editor if arg contained a slash.
+    e.g vi ~/.cshrc
 11. (V6.00.07 beta 12/08/91)
 10. Allow use of vfork() on systems that do not have job control.
 9.  Avoid NUMCC from being defined twice.

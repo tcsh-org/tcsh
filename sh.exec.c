@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.7 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.8 1991/12/05 18:26:54 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.7 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.8 1991/12/05 18:26:54 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -498,7 +498,7 @@ execash(t, kp)
     saveOUT = dcopy(SHOUT, -1);
     saveDIAG = dcopy(SHDIAG, -1);
     saveSTD = dcopy(OLDSTD, -1);
-
+	
     lshift(kp->t_dcom, 1);
 
     getexit(osetexit);
@@ -518,6 +518,10 @@ execash(t, kp)
 	didcch = 0;
 #endif /* FIOCLEX */
 	didfds = 0;
+	/*
+	 * Decrement the shell level
+	 */
+	shlvl(-1);
 	doexec(kp);
     }
 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.8 1991/11/22 02:28:12 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.screen.c,v 3.9 1991/11/26 04:28:26 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.8 1991/11/22 02:28:12 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.9 1991/11/26 04:28:26 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1181,6 +1181,7 @@ GetSize(lins, cols)
     *lins = Val(T_li);
 
 #ifdef TIOCGWINSZ
+# define KNOWsize
 # ifndef lint
     {
 	struct winsize ws;	/* from 4.3 */
@@ -1195,6 +1196,7 @@ GetSize(lins, cols)
 # endif /* !lint */
 #else /* TIOCGWINSZ */
 # ifdef TIOCGSIZE
+#  define KNOWsize
     {
 	struct ttysize ts;	/* from Sun */
 
@@ -1223,7 +1225,7 @@ ChangeSize(lins, cols)
     Val(T_co) = (cols < 2) ? 80 : cols;
     Val(T_li) = (lins < 1) ? 24 : lins;
 
-#ifdef SIG_WINDOW
+#ifdef KNOWsize
     /*
      * We want to affect the environment only when we have a valid
      * setup, not when we get bad settings. Consider the following scenario:
@@ -1294,7 +1296,7 @@ ChangeSize(lins, cols)
 	    Setenv(STRTERMCAP, termcap);
 	}
     }
-#endif /* SIG_WINDOW */
+#endif /* KNOWsize */
 
     ReBufferDisplay();		/* re-make display buffers */
     ClearDisp();

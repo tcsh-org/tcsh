@@ -32,14 +32,13 @@ VERSION	:	6.00.01
 VENDOR	:	hp
 MODELS	:	hp9000s300, hp9000s700, hp9000s800
 COMPILER:	cc, gcc
-CFLAGS	:	normal
+CFLAGS	:	normal (-Aa -O3 hpux 8.0)
 LIBES	:	-ltermcap
 OS	:	hpux 6.5, 7.0.x, 8.0
 CONFIG	:	config.hpux
 ENVIRON	:	n/a
 NOTES	:	Don't use -lBSD; breaks getpgrp(). Config.hp-3.2 obsolete?
-NOTES	:	Gcc is not available on the 700's
-VERSION	:	6.00.03
+VERSION	:	6.00.04
 
 VENDOR	:	hp
 MODELS	:	hp9000s500
@@ -59,7 +58,7 @@ COMPILER:	cc, gcc
 CFLAGS	:	normal
 LIBES	:	-ltermcap
 OS	:	bsd4.3, bsd4.4
-CONFIG	:	config.bsd 
+CONFIG	:	config.bsd*
 ENVIRON	:	n/a
 NOTES	:	cc broken: typedef void sigret_t;
 VERSION	:	6.00.03
@@ -323,4 +322,17 @@ OS	:	SVR4 (DELL, ESIX, ISC, UHC)
 CONFIG	:	config.sysv4
 ENVIRON	:	n/a
 NOTES	:	none
+VERSION	:	6.00.04
+
+VENDOR	:	stardent
+MODELS	:	gs2600
+COMPILER:	/bin/cc
+CFLAGS	:	-O
+LIBES	:	-lcurses
+OS	:	stellix
+CONFIG	:	config.stellar
+ENVIRON	:	n/a
+NOTES	:	works but not worth compiling with -O4...
+NOTES	:	setpgrp() and SIGCHLD work the BSD way, not the way documented.
+NOTES	:	we need to define BACKPIPE		
 VERSION	:	6.00.04

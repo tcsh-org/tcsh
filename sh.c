@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.17 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.18 1991/11/17 05:39:06 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.17 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: sh.c,v 3.18 1991/11/17 05:39:06 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -296,19 +296,9 @@ main(argc, argv)
     fix_version();		/* publish the shell version */
 
     /*
-     * set the shell-level var to 1 or increment it.
+     * increment the shell level.
      */
-    if ((tcp = getenv("SHLVL")) != NULL) {
-	Char    buff[BUFSIZ];
-
-	Itoa(1 + atoi(tcp), buff);
-	set(STRshlvl, Strsave(buff));
-	Setenv(STRSHLVL, buff);
-    }
-    else {
-	set(STRshlvl, SAVE("1"));
-	Setenv(STRSHLVL, str2short("1"));
-    }
+    shlvl(1);
 
     if ((tcp = getenv("HOME")) != NULL)
 	cp = SAVE(tcp);
@@ -742,8 +732,8 @@ main(argc, argv)
 	        (void) tcsetpgrp(f, shpgrp);
 	    }
 #endif /* NeXT */
-    retry:
 #ifdef BSDJOBS			/* if we have tty job control */
+    retry:
 	    if ((tpgrp = tcgetpgrp(f)) != -1) {
 		if (tpgrp != shpgrp) {
 		    sigret_t(*old) () = signal(SIGTTIN, SIG_DFL);
@@ -1648,7 +1638,7 @@ dosource(t, c)
 {
     register Char *f;
     bool    hflg = 0;
-    Char    buf[BUFSIZ];
+    char    buf[BUFSIZ];
 
     t++;
     if (*t && eq(*t, STRmh)) {
@@ -1656,12 +1646,11 @@ dosource(t, c)
 	    stderror(ERR_NAME | ERR_HFLAG);
 	hflg++;
     }
-    (void) Strcpy(buf, *t);
-    f = globone(buf, G_ERROR);
-    (void) strcpy((char *) buf, short2str(f));
+    f = globone(*t, G_ERROR);
+    (void) strcpy(buf, short2str(f));
     xfree((ptr_t) f);
-    if (!srcfile((char *) buf, 0, hflg) && !hflg)
-	stderror(ERR_SYSTEM, (char *) buf, strerror(errno));
+    if ((!srcfile(buf, 0, hflg)) && (!hflg))
+	stderror(ERR_SYSTEM, buf, strerror(errno));
 }
 
 /*
