@@ -1,3 +1,6 @@
+ 40. V6.11.00 - 20010902
+ 39. Completion fixes (Tom Warzeka)
+ 38. make c_insert not static so that it can be used from win32 (amol)
  37. Fix rmstar not to corrupt memory when we say no. (Mark Peek)
  36. V6.10.02 - 20010806
  35. polish nls locale (Pawe³ New)

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.68 2001/05/20 21:02:37 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.69 2001/08/06 23:59:35 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -76,7 +76,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.68 2001/05/20 21:02:37 kim Exp $")
+RCSID("$Id: ed.chared.c,v 3.69 2001/08/06 23:59:35 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -117,7 +117,7 @@ static Char srch_char = 0;			/* Search target */
 
 /* all routines that start with c_ are private to this set of routines */
 static	void	 c_alternativ_key_map	__P((int));
-static	void	 c_insert		__P((int));
+void	 c_insert		__P((int));
 void	 c_delafter		__P((int));
 void	 c_delbefore		__P((int));
 static 	int	 c_to_class		__P((int));
@@ -172,7 +172,7 @@ c_alternativ_key_map(state)
     AltKeyMap = (Char) state;
 }
 
-static void
+void
 c_insert(num)
     int num;
 {
