@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.h,v 3.25 2002/07/02 18:51:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.h,v 3.26 2002/07/12 13:16:19 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -133,6 +133,9 @@ typedef struct sigvec sigvec_t;
 #if !defined(NSIG) && defined(_NSIG)
 # define NSIG _NSIG
 #endif /* !NSIG && _NSIG */
+#if !defined(NSIG)
+#define NSIG (sizeof(sigset_t) * 8)
+#endif /* !NSIG */
 #if !defined(MAXSIG) && defined(NSIG)
 # define MAXSIG NSIG
 #endif /* !MAXSIG && NSIG */

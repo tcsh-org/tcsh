@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.init.c,v 3.30 2004/08/04 17:12:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.init.c,v 3.31 2004/08/08 06:42:29 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -32,19 +32,12 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.30 2004/08/04 17:12:32 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.31 2004/08/08 06:42:29 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
 #include "sh.proc.h"
-
-#if !defined(NSIG) && defined(SIGMAX)
-# define NSIG (SIGMAX+1)
-#endif /* !NSIG && SIGMAX */
-#if !defined(NSIG) && defined(_NSIG)
-# define NSIG _NSIG
-#endif /* !NSIG && _NSIG */
 
 #define TW_INCR	128
 
