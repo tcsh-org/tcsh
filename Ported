@@ -26,7 +26,12 @@ LIBES	:	-lcurses -lsocket -lnsl
 OS	:	solaris 2.x, 2.3
 CONFIG	:	sol2, sol23
 ENVIRON	:	n/a
-NOTES	:	n/a
+NOTES	:	The sunpro compiler cannot compile tcsh with -O, it crashes
+	:	on some files. In any case do not use -O with any of the
+	:	tcsh files, because the optimized code assumes that the
+	:	floating point is already initialized and does not do the
+	:	necessary initializations. This results in weird floating
+	:	point failures of programs exec'ed from tcsh.
 VERSION	:	6.04.13
 
 VENDOR	:	sun
