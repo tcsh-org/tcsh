@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.40 1994/02/04 15:16:59 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.41 1994/05/07 18:51:25 christos Exp christos $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.40 1994/02/04 15:16:59 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.41 1994/05/07 18:51:25 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1924,7 +1924,7 @@ e_yank_kill(c)
     Mark = Cursor;		/* set the mark */
     cp = Cursor;		/* for speed */
 
-    c_insert(LastKill - KillBuf);	/* open the space, */
+    c_insert((int)(LastKill - KillBuf));	/* open the space, */
     for (kp = KillBuf; kp < LastKill; kp++)	/* copy the chars */
 	*cp++ = *kp;
 
@@ -1990,7 +1990,7 @@ e_delwordprev(c)
 	*kp++ = *p;
     LastKill = kp;
 
-    c_delbefore(Cursor - cp);	/* delete before dot */
+    c_delbefore((int)(Cursor - cp));	/* delete before dot */
     Cursor = cp;
     if (Cursor < InputBuf)
 	Cursor = InputBuf;	/* bounds check */
@@ -2163,7 +2163,7 @@ e_delwordnext(c)
 	*kp++ = *p;
     LastKill = kp;
 
-    c_delafter(cp - Cursor);	/* delete after dot */
+    c_delafter((int)(cp - Cursor));	/* delete after dot */
     if (Cursor > LastChar)
 	Cursor = LastChar;	/* bounds check */
     return(CC_REFRESH);
@@ -2237,7 +2237,7 @@ e_killbeg(c)
     while (cp < Cursor)
 	*kp++ = *cp++;		/* copy it */
     LastKill = kp;
-    c_delbefore(Cursor - InputBuf);
+    c_delbefore((int)(Cursor - InputBuf));
     Cursor = InputBuf;		/* zap! */
     return(CC_REFRESH);
 }
@@ -2277,7 +2277,7 @@ e_killregion(c)
 	while (cp < Mark)
 	    *kp++ = *cp++;	/* copy it */
 	LastKill = kp;
-	c_delafter(cp - Cursor);/* delete it - UNUSED BY VI mode */
+	c_delafter((int)(cp - Cursor));	/* delete it - UNUSED BY VI mode */
     }
     else {			/* mark is before cursor */
 	cp = Mark;
@@ -2285,7 +2285,7 @@ e_killregion(c)
 	while (cp < Cursor)
 	    *kp++ = *cp++;	/* copy it */
 	LastKill = kp;
-	c_delbefore(cp - Mark);
+	c_delbefore((int)(cp - Mark));
 	Cursor = Mark;
     }
     return(CC_REFRESH);
@@ -3201,7 +3201,7 @@ e_copyprev(c)
     /* does a bounds check */
     cp = c_prev_word(Cursor, InputBuf, Argument);	
 
-    c_insert(oldc - cp);
+    c_insert((int)(oldc - cp));
     for (dp = oldc; cp < oldc && dp < LastChar; cp++)
 	*dp++ = *cp;
 

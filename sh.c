@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.61 1994/04/12 15:46:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.62 1994/05/07 18:51:25 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.61 1994/04/12 15:46:46 christos Exp $")
+RCSID("$Id: sh.c,v 3.62 1994/05/07 18:51:25 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -799,6 +799,14 @@ main(argc, argv)
 		use_fork = 1;
 		break;
 
+	    case ' ':
+	    case '\t':
+		/* 
+		 * for O/S's that don't do the argument parsing right in 
+		 * "#!/foo -f " scripts
+		 */
+		break;
+
 	    default:		/* Unknown command option */
 		exiterr = 1;
 		stderror(ERR_TCSHUSAGE, tcp-1);
@@ -1307,7 +1315,7 @@ st_save(st, unit, hflg, al, av)
      * For compatibility we do that only if arguments were really
      * passed, otherwise we keep the old, global $argv like before.
      */
-    if (av != NULL) {
+    if (av != NULL && *av != NULL) {
 	struct varent *vp;
 	if ((vp = adrof(STRargv)) != NULL)
 	    st->argv = saveblk(vp->vec);
@@ -1386,7 +1394,7 @@ st_restore(st, av)
 
     if (st->argv != NULL)
 	setq(STRargv, st->argv, &shvhed, VAR_READWRITE);
-    else if (av != NULL && adrof(STRargv) != NULL)
+    else if (av != NULL  && *av != NULL && adrof(STRargv) != NULL)
 	unsetv(STRargv);
 }
 

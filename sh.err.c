@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.err.c,v 3.21 1993/10/30 19:50:16 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.err.c,v 3.22 1994/04/28 13:28:46 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.21 1993/10/30 19:50:16 christos Exp christos $")
+RCSID("$Id: sh.err.c,v 3.22 1994/04/28 13:28:46 christos Exp $")
 
 /*
  * C Shell
@@ -311,12 +311,12 @@ static char *errorlist[] =
     "Selector overflow",
 #define ERR_TCSHUSAGE   124
 #ifdef apollo
-    "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX -Dname[=value] ] [ argument ... ]",
+    "Unknown option: `-%s'\nUsage: tcsh [ -bcdefilmnqstvVxX -Dname[=value] ] [ argument ... ]",
 #else /* !apollo */
 # ifdef convex
-    "Unknown option: -%s\nUsage: tcsh [ -bcdefFilmnqstvVxX ] [ argument ... ]",
+    "Unknown option: `-%s'\nUsage: tcsh [ -bcdefFilmnqstvVxX ] [ argument ... ]",
 # else /* rest */
-    "Unknown option: -%s\nUsage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]",
+    "Unknown option: `-%s'\nUsage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ]",
 # endif /* convex */
 #endif /* apollo */
 #define ERR_COMPCOM	125

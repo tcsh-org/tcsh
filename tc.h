@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.h,v 3.1 1992/06/16 20:46:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.h,v 3.2 1993/02/12 17:22:20 christos Exp $ */
 /*
  * tc.h: Tcsh includes
  */
@@ -48,5 +48,6 @@
 #define FMT_PROMPT	0
 #define FMT_WHO		1
 #define FMT_HISTORY	2
+#define FMT_SCHED	3
 
 #endif /* _h_tc */

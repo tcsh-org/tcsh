@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.prompt.c,v 3.19 1993/10/30 19:50:16 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.prompt.c,v 3.20 1994/03/13 00:46:35 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.19 1993/10/30 19:50:16 christos Exp christos $")
+RCSID("$Id: tc.prompt.c,v 3.20 1994/03/13 00:46:35 christos Exp $")
 
 #include "ed.h"
 
@@ -145,10 +145,17 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		break;
 	    case '!':
 	    case 'h':
-		if (what == FMT_HISTORY)  
+		switch (what) {
+		case FMT_HISTORY:
 		    fmthist('h', info, cbuff);
-		else 
+		    break;
+		case FMT_SCHED:
+		    (void) xsprintf(cbuff, "%d", *(int *)info);
+		    break;
+		default:
 		    (void) xsprintf(cbuff, "%d", eventno + 1);
+		    break;
+		}
 		for (cz = cbuff; *cz; *p++ = attributes | *cz++)
 		    if (p >= ep) break;
 		break;

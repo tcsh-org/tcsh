@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.59 1994/04/28 13:28:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.60 1994/05/07 18:51:25 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -687,7 +687,7 @@ extern int wait3();	/* I think some bizarre systems still need this */
 #if defined(__alpha) && defined(__osf__) && DECOSF1 < 200
 /* These are ok for 1.3, but conflict with the header files for 2.0 */
 extern int gethostname __P((char *, int));
-extern void *sbrk __P((ssize_t));
+extern char *sbrk __P((ssize_t));
 extern int ioctl __P((int, unsigned long, char *));
 extern pid_t vfork __P((void));
 extern int killpg __P((pid_t, int));

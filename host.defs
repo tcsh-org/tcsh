@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/src/tcsh-6.04/RCS/host.defs,v 1.4 1994/04/12 15:46:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/host.defs,v 1.5 1994/05/07 18:51:25 christos Exp christos $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.4 1994/04/12 15:46:46 christos Exp $")
+RCSID("$Id: host.defs,v 1.5 1994/05/07 18:51:25 christos Exp christos $")
 
 endcode	:
 
@@ -469,7 +469,7 @@ machtype: defined(i386)					: "i386"
 enddef	:
 
 
-newdef  : !defined(SOLARIS) && (defined(__svr4__) || defined(SVR4))
+newdef  : !defined(SOLARIS2) && (defined(__svr4__) || defined(SVR4))
 comment : Unix System V Release 4.0
 vendor  : defined(DELL)                                 : "dell"
 hosttype: defined(i386)                                 : "i386"
@@ -574,6 +574,7 @@ newdef	: defined(sony_news)
 comment	: Sony NEWS 800 or 1700 workstation
 vendor	:						: "sony"
 hosttype: defined(mips)					: "news_mips"
+hosttype: defined(mc68020) || defined(__mc68020__)	: "news_m68k"
 ostype	:						: "News"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
 machtype: defined(M_mipsel)				: "mipsel"

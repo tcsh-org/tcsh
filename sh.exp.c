@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.25 1994/04/19 13:43:08 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.26 1994/04/19 14:26:49 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.25 1994/04/19 13:43:08 christos Exp christos $")
+RCSID("$Id: sh.exp.c,v 3.26 1994/04/19 14:26:49 christos Exp $")
 
 /*
  * C shell
@@ -495,6 +495,13 @@ exp5(vp, ignore)
 #ifdef EDEBUG
     etracc("exp5 p1", p1, vp);
 #endif /* EDEBUG */
+    if ((ignore & NOGLOB) != 0) 
+	/* 
+	 * We are just trying to get the right side of
+	 * a =~ or !~ operator 
+	 */
+	return Strsave(*(*vp)++);
+
     if (isa(**vp, MULOP)) {
 	register Char *op = *(*vp)++;
 
@@ -631,13 +638,14 @@ filetest(cp, vp, ignore)
     struct stat stb, *st = NULL;
 #ifdef S_IFLNK
     struct stat lstb, *lst = NULL;
+    char *filnam;
 #endif /* S_IFLNK */
     int i = 0;
     unsigned pmask = 0xffff;
     bool altout = 0;
     Char *ft = cp, *dp, *ep, *strdev, *strino, *strF, *str, valtest = '\0',
     *errval = STR0;
-    char *string, string0[8], *filnam;
+    char *string, string0[8];
     time_t footime;
     struct passwd *pw;
     struct group *gr;

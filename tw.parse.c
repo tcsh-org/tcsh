@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.65 1994/04/28 13:28:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.66 1994/05/07 18:51:25 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.65 1994/04/28 13:28:46 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.66 1994/05/07 18:51:25 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1160,15 +1160,18 @@ tw_collect(command, looking, exp_dir, exp_name, target, pat, flags, dir_fd)
 	    InsideCompletion = 0;
 	    haderr = 0;
 
-#if defined(SOLARIS2) && defined(i386)
+#if defined(SOLARIS2) && defined(i386) && !defined(__GNUC__)
 	    /* Compiler bug? (from PWP) */
-	    if ((looking == 3) || (looking == 7))
+	    if ((looking == TW_LOGNAME) || (looking == TW_USER))
 		tw_logname_end();
 	    else
-		tw_dir_end();
-#else /* !(SOLARIS2 && i386) */
+		if (looking == TW_GRPNAME)
+		   tw_grpname_end();
+		else
+		    tw_dir_end();
+#else /* !(SOLARIS2 && i386 && !__GNUC__) */
 	    (*tw_end_entry[looking])();
-#endif /* !(SOLARIS2 && i386) */
+#endif /* !(SOLARIS2 && i386 && !__GNUC__) */
 
 	    /* flag error */
 	    return(-1);
@@ -1180,15 +1183,18 @@ tw_collect(command, looking, exp_dir, exp_name, target, pat, flags, dir_fd)
 	    resexit(osetexit);
 	    InsideCompletion = 0;
 
-#if defined(SOLARIS2) && defined(i386)
+#if defined(SOLARIS2) && defined(i386) && !defined(__GNUC__)
 	    /* Compiler bug? (from PWP) */
-	    if ((looking == 3) || (looking == 7))
+	    if ((looking == TW_LOGNAME) || (looking == TW_USER))
 		tw_logname_end();
 	    else
-		tw_dir_end();
-#else /* !(SOLARIS2 && i386) */
+		if (looking == TW_GRPNAME)
+		   tw_grpname_end();
+		else
+		    tw_dir_end();
+#else /* !(SOLARIS2 && i386 && !__GNUC__) */
 	    (*tw_end_entry[looking])();
-#endif /* !(SOLARIS2 && i386) */
+#endif /* !(SOLARIS2 && i386 && !__GNUC__) */
 
 	    return(ni);
 	}

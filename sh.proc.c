@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.53 1993/10/30 19:50:16 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.54 1994/03/13 00:46:35 christos Exp christos $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.53 1993/10/30 19:50:16 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.54 1994/03/13 00:46:35 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1465,7 +1465,7 @@ dokill(v, c)
     v++;
     if (v[0] && v[0][0] == '-') {
 	if (v[0][1] == 'l') {
-	    for (signum = 1; signum <= nsig; signum++) {
+	    for (signum = 0; signum <= nsig; signum++) {
 		if ((name = mesg[signum].iname) != NULL) {
 		    len += strlen(name) + 1;
 		    if (len >= T_Cols - 1) {
@@ -1484,7 +1484,7 @@ dokill(v, c)
 		stderror(ERR_NAME | ERR_BADSIG);
 	}
 	else {
-	    for (signum = 1; signum <= nsig; signum++)
+	    for (signum = 0; signum <= nsig; signum++)
 		if (mesg[signum].iname &&
 		    eq(&v[0][1], str2short(mesg[signum].iname)))
 		    goto gotsig;

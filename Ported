@@ -13,21 +13,33 @@ COMPILER:	cc, gcc
 CFLAGS	:	normal
 LIBES	:	-ltermcap
 OS	:	sunos 3.5, 4.0, 4.1, 4.1.1, 4.1.2, 4.1.3
-CONFIG	:	sos*
+CONFIG	:	sunos*
 ENVIRON	:	n/a
 NOTES	:	Don't compile with /usr/5bin/cc
-VERSION	:	6.03.09
+VERSION	:	6.04.13
 
 VENDOR	:	sun
 MODELS	:	sun4
 COMPILER:	cc, gcc
 CFLAGS	:	normal
-LIBES	:	-lcurses
-OS	:	solaris 2.x
+LIBES	:	-lcurses -lsocket -lnsl
+OS	:	solaris 2.x, 2.3
+CONFIG	:	sol2, sol23
+ENVIRON	:	n/a
+NOTES	:	n/a
+VERSION	:	6.04.13
+
+VENDOR	:	sun
+MODELS	:	i386
+COMPILER:	cc, gcc
+CFLAGS	:	-D__STDC__=0
+LIBES	:	-lcurses -lsocket -lnsl
+OS	:	solaris 2.1
 CONFIG	:	sol2
 ENVIRON	:	n/a
 NOTES	:	n/a
-VERSION	:	6.03.00
+VERSION	:	6.04.13
+
 
 VENDOR	:	hp
 MODELS	:	apollo
@@ -51,7 +63,7 @@ ENVIRON	:	n/a
 NOTES	:	Don't use -lBSD; breaks getpgrp(). Config.hp-3.2 obsolete?
 	:	Some versions of the compiler are broken with -O3. Try 'ls *'
 	:	If it does not work, lower the optimization level...
-VERSION	:	6.04.00
+VERSION	:	6.04.13
 
 VENDOR	:	hp
 MODELS	:	hp9000s500
@@ -183,7 +195,7 @@ OS	:	bsd 4.3, news-os 3.3,4.1C
 CONFIG	:	bsd
 ENVIRON	:	n/a
 NOTES	:	none
-VERSION	:	6.03.09
+VERSION	:	6.04.13
 
 VENDOR	:	ibm + compatibles
 MODELS	:	i386,i286
@@ -205,7 +217,7 @@ OS	:	MORE/bsd 4.3+
 CONFIG	:	mtxinu
 ENVIRON	:	n/a
 NOTES	:	none
-VERSION	:	6.00.02
+VERSION	:	6.04.13
 
 VENDOR	:	digital
 MODELS	:	vax
@@ -323,12 +335,13 @@ VENDOR	:	ibm + compatibles
 MODELS	:	i386,i486
 COMPILER:	/bin/cc
 CFLAGS	:	normal
-LIBES	:	-lcurses -lc /usr/ucblib/libucb.a
+LIBES	:	-ltermlib -lsocket -lnsl (without BSDTIMES)
+LIBES	:	-ltermlib -lsocket -lnsl -lc /usr/ucblib/libucb.a (BSDTIMES)
 OS	:	SVR4 (DELL, ESIX, ISC, UHC)
 CONFIG	:	sysv4
 ENVIRON	:	n/a
 NOTES	:	none
-VERSION	:	6.03.09
+VERSION	:	6.04.13
 
 VENDOR	:	ibm + compatibles
 MODELS	:	i386,i486
@@ -684,6 +697,15 @@ LIBES   :	-lcurses
 OS      :	OSF1 1.2
 CONFIG  :	decosf1
 VERSION :	6.03
+
+VENDOR  :	digital
+MODELS  :	DECstation 3000/400 (alpha)
+COMPILER:	cc
+CFLAGS  :	-O2 -I. -I.. -Olimit 2000
+LIBES   :	-lcurses
+OS      :	OSF1 1.3, 2.0
+CONFIG  :	decosf1
+VERSION :	6.04.13
 
 VENDOR  :	Intel
 MODELS  :	Paragon

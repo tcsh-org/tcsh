@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.decls.h,v 3.28 1994/04/12 15:46:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.decls.h,v 3.29 1994/05/07 18:51:25 christos Exp christos $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -62,7 +62,7 @@ extern	int		  parseescape	__P((Char **));
 extern	unsigned char    *unparsestring	__P((Char *, unsigned char *, Char *));
 #ifdef OBSOLETE
 extern	void		  dobind	__P((Char **, struct command *));
-#endif
+#endif /* OBSOLETE */
 
 /*
  * tc.defs.c:
@@ -102,7 +102,9 @@ extern	void		  rmstar	__P((struct wordent *));
 extern	void		  continue_jobs	__P((struct wordent *));
 extern	Char		 *gettilde	__P((Char *));
 extern	Char		 *getusername	__P((Char **));
+#ifdef OBSOLETE
 extern	void		  doaliases	__P((Char **, struct command *));
+#endif /* OBSOLETE */
 extern	void		  shlvl		__P((int));
 extern	int		  fixio		__P((int, int));
 extern	int		  collate	__P((const Char *, const Char *));

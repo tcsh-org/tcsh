@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.bind.c,v 3.16 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.bind.c,v 3.17 1993/11/13 00:40:56 christos Exp christos $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.16 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.17 1993/11/13 00:40:56 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -47,7 +47,7 @@ static	char  *unparsekey	__P((int));
 static	KEYCMD getkeycmd	__P((Char **));
 static	int    parsekey		__P((Char **));
 static	void   pkeys		__P((int, int));
-#endif
+#endif /* OBSOLETE */
 
 static	void   printkey		__P((KEYCMD *, Char *));
 static	KEYCMD parsecmd		__P((Char *));

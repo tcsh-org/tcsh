@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.init.c,v 3.33 1994/01/31 16:04:49 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.init.c,v 3.34 1994/02/04 15:12:06 christos Exp christos $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.33 1994/01/31 16:04:49 christos Exp christos $")
+RCSID("$Id: sh.init.c,v 3.34 1994/02/04 15:12:06 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -53,19 +53,19 @@ struct	biltins bfunc[] = {
     { "alias",		doalias,	0,	INF	},
 #ifdef OBSOLETE
     { "aliases",	doaliases,	0,	1,	},
-#endif
+#endif /* OBSOLETE */
     { "alloc",		showall,	0,	1	},
     { "bg",		dobg,		0,	INF	},
 #ifdef OBSOLETE
     { "bind",		dobind,		0,	2	},
-#endif
+#endif /* OBSOLETE */
     { "bindkey",	dobindkey,	0,	8	},
     { "break",		dobreak,	0,	0	},
     { "breaksw",	doswbrk,	0,	0	},
     { "builtins",	dobuiltins,	0,	0	},
-#if defined(KAI)
+#ifdef KAI
     { "bye",		goodbye,	0,	0	},
-#endif
+#endif /* KAI */
     { "case",		dozip,		0,	1	},
     { "cd",		dochngd,	0,	INF	},
     { "chdir",		dochngd,	0,	INF	},
@@ -97,15 +97,15 @@ struct	biltins bfunc[] = {
     { "if",		doif,		1,	INF	},
 #ifdef apollo
     { "inlib", 		doinlib,	1,	INF	},
-#endif
+#endif /* apollo */
     { "jobs",		dojobs,		0,	1	},
     { "kill",		dokill,		1,	INF	},
 #ifndef HAVENOLIMIT
     { "limit",		dolimit,	0,	3	},
-#endif /* ! HAVENOLIMIT */
+#endif /* !HAVENOLIMIT */
 #ifdef OBSOLETE
     { "linedit",	doecho,		0,	INF	},
-#endif
+#endif /* OBSOLETE */
 #if !defined(HAVENOUTMP) && !defined(KAI)
     { "log",		dolog,		0,	0	},
 #endif /* !HAVENOUTMP && !KAI */
@@ -117,7 +117,7 @@ struct	biltins bfunc[] = {
 #endif /* TCF */
 #ifdef NEWGRP
     { "newgrp",		donewgrp,	1,	2	},
-#endif
+#endif /* NEWGRP */
     { "nice",		donice,		0,	INF	},
     { "nohup",		donohup,	0,	INF	},
     { "notify",		donotify,	0,	INF	},
@@ -129,7 +129,7 @@ struct	biltins bfunc[] = {
     { "repeat",		dorepeat,	2,	INF	},
 #ifdef apollo
     { "rootnode",	dorootnode,	1,	1	},
-#endif
+#endif /* apollo */
     { "sched",		dosched,	0,	INF	},
     { "set",		doset,		0,	INF	},
     { "setenv",		dosetenv,	0,	2	},
@@ -157,7 +157,7 @@ struct	biltins bfunc[] = {
     { "unhash",		dounhash,	0,	0	},
 #if defined(masscomp) || defined(hcx)
     { "universe",	douniverse,	0,	1	},
-#endif
+#endif /* masscomp || hcx */
 #ifndef HAVENOLIMIT
     { "unlimit",	dounlimit,	0,	INF	},
 #endif /* !HAVENOLIMIT */
@@ -165,11 +165,11 @@ struct	biltins bfunc[] = {
     { "unsetenv",	dounsetenv,	1,	INF	},
 #ifdef apollo
     { "ver",		dover,		0,	INF	},
-#endif
+#endif /* apollo */
     { "wait",		dowait,		0,	0	},
 #ifdef WARP
     { "warp",		dowarp,		0,	2	},
-#endif
+#endif /* WARP */
 #if !defined(HAVENOUTMP) && defined(KAI)
     { "watchlog",	dolog,		0,	0	},
 #endif /* !HAVENOUTMP && KAI */
@@ -218,7 +218,11 @@ int nsrchn = sizeof srchn / sizeof *srchn;
  * everybody
  */
 struct	mesg mesg[] = {
+#ifdef DECOSF1
+/*  0 */	{ "NULL"	""			},
+#else /* !DECOSF1 */
 /*  0 */	{ 0,		""			},
+#endif /* DECOSF1 */
 /*  1 */	{ "HUP",	"Hangup"		},
 /*  2 */	{ "INT",	"Interrupt"		},
 /*  3 */	{ "QUIT",	"Quit"			},
@@ -268,22 +272,29 @@ struct	mesg mesg[] = {
 #  undef  _sigextra_
 # endif /* _sigextra_ */
 
-# if !defined(IBMAIX) && !defined(cray) && !defined(__EMX__) && !defined(linux)
+# if !defined(IBMAIX) && !defined(cray) && !defined(__EMX__) && !defined(linux) && !defined(SOLARIS2)
 /* these are the real svid signals */
 /* 16 */	{ "USR1",	"User signal 1"		},
 /* 17 */	{ "USR2", 	"User signal 2"		},
 #  ifdef apollo
 /* 18 */	{ "CLD",	"Death of child"	},
 /* 19 */	{ "APOLLO",  	"Apollo-specific fault"	},
-#  else
+#  else /* !apollo */
 /* 18 */	{ "CHLD",	"Child exited"		},
-#  ifdef SOLARIS2
-/* 19 */	{ "LOST",  	"Resource Lost"		},
-#  else /* !SOLARIS2 */
 /* 19 */	{ "PWR",  	"Power failure"		},
-#  endif /* SOLARIS2 */
 #  endif /* apollo */
 # endif /* !IBMAIX && !cray && !__EMX__ && !linux */
+
+# ifdef SOLARIS2
+/* 16 */	{ "USR1",	"User signal 1"		},
+/* 17 */	{ "USR2", 	"User signal 2"		},
+/* 18 */	{ "CLD",	"Child status change"	},
+#  if SOLARIS2 >= 23
+/* 19 */	{ "PWR",  	"Power failure"		},
+#  else /* SOLARIS2 < 23 */
+/* 19 */	{ "LOST",  	"Resource Lost"		},
+#  endif /* SOLARIS2 >= 23 */
+# endif /* SOLARIS2 */
 
 # ifdef __EMX__
 #  define _sigextra_
@@ -460,13 +471,78 @@ struct	mesg mesg[] = {
 /* 29 */	{ "PROF",	"Profiling timer expired"},
 /* 30 */	{ "XCPU",	"CPU time limit exceeded"},
 /* 31 */	{ "XFSZ", 	"File size limit exceeded"},
-#ifdef SOLARIS2
+#  ifdef SOLARIS2
+#   define _64sig_
 /* 32 */	{ "WAITING",	"Process's lwps are blocked"},
 /* 33 */	{ "LWP",	"Special LWP signal"	},
-/* 34 */	{ 0,		"Maximum number of signals"},
-#else /* !SOLARIS2 */
+#   if SOLARIS2 >= 23
+/* 34 */	{ "FREEZE",	"Special CPR Signal"	},
+/* 35 */	{ "THAW",	"Special CPR Signal"	},
+/* 36 */	{ "RTMIN",	"First Realtime Signal"},
+/* 37 */	{ "RTMIN+1",	"Second Realtime Signal"},
+/* 38 */	{ "RTMIN+2",	"Third Realtime Signal"},
+/* 39 */	{ "RTMIN+3",	"Fourth Realtime Signal"},
+/* 40 */	{ "RTMAX-3",	"Fourth Last Realtime Signal"},
+/* 41 */	{ "RTMAX-2",	"Third Last Realtime Signal"},
+/* 42 */	{ "RTMAX-1",	"Second Last Realtime Signal"},
+/* 43 */	{ "RTMAX",	"Last Realtime Signal"},
+/* 44 */	{ 0,   		"Signal 44"		},
+/* 45 */	{ 0,   		"Signal 45"		},
+/* 46 */	{ 0,   		"Signal 46"		},
+/* 47 */	{ 0,   		"Signal 47"		},
+/* 48 */	{ 0,   		"Signal 48"		},
+/* 49 */	{ 0,   		"Signal 49"		},
+/* 50 */	{ 0,   		"Signal 50"		},
+/* 51 */	{ 0,   		"Signal 51"		},
+/* 52 */	{ 0,   		"Signal 52"		},
+/* 53 */	{ 0,   		"Signal 53"		},
+/* 54 */	{ 0,   		"Signal 54"		},
+/* 55 */	{ 0,   		"Signal 55"		},
+/* 56 */	{ 0,   		"Signal 56"		},
+/* 57 */	{ 0,   		"Signal 57"		},
+/* 58 */	{ 0,   		"Signal 58"		},
+/* 59 */	{ 0,   		"Signal 59"		},
+/* 60 */	{ 0,   		"Signal 60"		},
+/* 61 */	{ 0,   		"Signal 61"		},
+/* 62 */	{ 0,   		"Signal 62"		},
+/* 63 */	{ 0,   		"Signal 63"		},
+/* 64 */	{ 0,		"Signal 64"		},
+#   else /* SOLARIS2 < 23 */
+/* 34 */	{ 0,   		"Signal 34"		},
+/* 35 */	{ 0,   		"Signal 35"		},
+/* 36 */	{ 0,   		"Signal 36"		},
+/* 37 */	{ 0,   		"Signal 37"		},
+/* 38 */	{ 0,   		"Signal 38"		},
+/* 39 */	{ 0,   		"Signal 39"		},
+/* 40 */	{ 0,   		"Signal 40"		},
+/* 41 */	{ 0,   		"Signal 41"		},
+/* 42 */	{ 0,   		"Signal 42"		},
+/* 43 */	{ 0,   		"Signal 43"		},
+/* 44 */	{ 0,   		"Signal 44"		},
+/* 45 */	{ 0,   		"Signal 45"		},
+/* 46 */	{ 0,   		"Signal 46"		},
+/* 47 */	{ 0,   		"Signal 47"		},
+/* 48 */	{ 0,   		"Signal 48"		},
+/* 49 */	{ 0,   		"Signal 49"		},
+/* 50 */	{ 0,   		"Signal 50"		},
+/* 51 */	{ 0,   		"Signal 51"		},
+/* 52 */	{ 0,   		"Signal 52"		},
+/* 53 */	{ 0,   		"Signal 53"		},
+/* 54 */	{ 0,   		"Signal 54"		},
+/* 55 */	{ 0,   		"Signal 55"		},
+/* 56 */	{ 0,   		"Signal 56"		},
+/* 57 */	{ 0,   		"Signal 57"		},
+/* 58 */	{ 0,   		"Signal 58"		},
+/* 59 */	{ 0,   		"Signal 59"		},
+/* 60 */	{ 0,   		"Signal 60"		},
+/* 61 */	{ 0,   		"Signal 61"		},
+/* 62 */	{ 0,   		"Signal 62"		},
+/* 63 */	{ 0,   		"Signal 63"		},
+/* 64 */	{ 0,		"Signal 64"		},
+#   endif /* SOLARIS2 >= 23 */
+#  else /* !SOLARIS2 */
 /* 32 */	{ 0,		"Maximum number of signals"},
-#endif /* SOLARIS2 */
+#  endif /* SOLARIS2 */
 # endif /* SYSVREL > 3 */
 
 # if defined(ISC) && defined(POSIX) 
@@ -838,14 +914,14 @@ struct	mesg mesg[] = {
 # endif /* _VMS_POSIX */
 
 # ifndef _sigextra_
-#  if defined(RENO) || defined(BSD4_4) || defined(__hp_osf)
+#  if defined(RENO) || defined(BSD4_4) || defined(__hp_osf) || defined(DECOSF1)
 #   define _sigextra_
 /* 28 */	{ "WINCH",	"Window size changed"	},
 /* 29 */	{ "INFO",	"Information request"	},
 /* 30 */	{ "USR1",	"User defined signal 1"	},
 /* 31 */	{ "USR2",	"User defined signal 2"	},
 /* 32 */	{ 0,		"Signal 32"		},
-#  endif /* RENO || BSD4_4 || HPOSF1 */
+#  endif /* RENO || BSD4_4 || __hp_osf || DECOSF1 */
 # endif /* !_sigextra_ */
 
 # ifndef _sigextra_

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.refresh.c,v 3.14 1993/06/25 21:17:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.refresh.c,v 3.15 1993/10/30 19:50:16 christos Exp christos $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.14 1993/06/25 21:17:12 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.15 1993/10/30 19:50:16 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -739,20 +739,20 @@ update_line(old, new, cur_line)
 		    dprintf("   ERROR: cannot insert in early first diff\n");
 #endif  /* DEBUG_UPDATE */
 		Insert_write(nfd, fx);
-		str_insert(old, ofd - old, TermH, nfd, fx);
+		str_insert(old, (int) (ofd - old), TermH, nfd, fx);
 	    }
 	    /*
 	     * write (nsb-nfd) - fx chars of new starting at (nfd + fx)
 	     */
 	    so_write(nfd + fx, (nsb - nfd) - fx);
-	    str_cp(ofd + fx, nfd + fx, (nsb - nfd) - fx);
+	    str_cp(ofd + fx, nfd + fx, (int) ((nsb - nfd) - fx));
 	}
 	else {
 #ifdef DEBUG_UPDATE
 	    dprintf("without anything to save\r\n");
 #endif  /* DEBUG_UPDATE */
 	    so_write(nfd, (nsb - nfd));
-	    str_cp(ofd, nfd, (nsb - nfd));
+	    str_cp(ofd, nfd, (int) (nsb - nfd));
 	    /*
 	     * Done
 	     */
@@ -784,13 +784,13 @@ update_line(old, new, cur_line)
 		    dprintf("   ERROR: cannot delete in first diff\n");
 #endif /* DEBUG_UPDATE */
 		DeleteChars(-fx);
-		str_delete(old, ofd - old, TermH, -fx);
+		str_delete(old, (int) (ofd - old), TermH, -fx);
 	    }
 	    /*
 	     * write (nsb-nfd) chars of new starting at nfd
 	     */
 	    so_write(nfd, (nsb - nfd));
-	    str_cp(ofd, nfd, (nsb - nfd));
+	    str_cp(ofd, nfd, (int) (nsb - nfd));
 
 	}
 	else {
@@ -895,21 +895,21 @@ update_line(old, new, cur_line)
 		    dprintf("   ERROR: cannot insert in late first diff\n");
 #endif /* DEBUG_UPDATE */
 		Insert_write(nfd, fx);
-		str_insert(old, ofd - old, TermH, nfd, fx);
+		str_insert(old, (int) (ofd - old), TermH, nfd, fx);
 	    }
 
 	    /*
 	     * write (nsb-nfd) - fx chars of new starting at (nfd + fx)
 	     */
 	    so_write(nfd + fx, (nsb - nfd) - fx);
-	    str_cp(ofd + fx, nfd + fx, (nsb - nfd) - fx);
+	    str_cp(ofd + fx, nfd + fx, (int) ((nsb - nfd) - fx));
 	}
 	else {
 #ifdef DEBUG_UPDATE
 	    dprintf("without anything to save\r\n");
 #endif /* DEBUG_UPDATE */
 	    so_write(nfd, (nsb - nfd));
-	    str_cp(ofd, nfd, (nsb - nfd));
+	    str_cp(ofd, nfd, (int) (nsb - nfd));
 	}
     }
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.h,v 3.21 1993/04/26 21:13:10 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.h,v 3.22 1994/05/07 18:51:25 christos Exp christos $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -147,7 +147,6 @@ EXTERN Char CurrentHistLit;	/* Literal status of current show history line */
 /*
  * These are truly extern
  */
-extern Char PromptBuf[];
 extern int MacroLvl;
 
 EXTERN Char *KeyMacro[MAXMACROLEVELS];

@@ -50,7 +50,7 @@
 .\"   Remember to note OS-specific things in "OS variant support", new features
 .\"   in NEW FEATURES and referenced external commands in SEE ALSO.
 .\" 
-.TH TCSH 1 "7 May 1994" "Cornell 6.04.13"
+.TH TCSH 1 "25 May 1994" "Cornell 6.04.14"
 .SH NAME
 tcsh - C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -648,6 +648,12 @@ Expands history substitutions in the current line,
 like \fIexpand-history\fR, and appends a space.
 \fImagic-space\fR is designed to be bound to the spacebar,
 but is not bound by default.
+.TP 8
+.B normalize-command \fR(^X-?)
+Searches for the current word in PATH and, if it is found, replaces it with
+the full path to the executable. Special characters are quoted. Aliases are
+expanded and quoted but commands within aliases are not. This command is
+useful with commands which take commands as arguments, e.g. `dbx' and `sh -x'.
 .TP 8
 .B normalize-path \fR(^X-n, ^X-N)
 Expands the current word as described under the `expand' setting
@@ -1348,12 +1354,14 @@ the stack. For example,
 The \fBnoglob\fR and \fBnonomatch\fR shell variables and the \fIexpand-glob\fR
 editor command apply to directory stack as well as filename substitutions.
 .SS "Other substitutions (+)"
-There are two more transformations involving filenames, not strictly
+There are several more transformations involving filenames, not strictly
 related to the above but mentioned here for completeness.
 \fIAny\fR filename may be expanded to a full path when the
 \fBsymlinks\fR variable (q.v.) is set to `expand'.
 Quoting prevents this expansion, and
 the \fInormalize-path\fR editor command does it on demand.
+The \fInormalize-command\fR editor command expands commands in PATH into
+full paths on demand.
 Finally, \fIcd\fR and \fIpushd\fR interpret `-' as the old working directory
 (equivalent to the shell variable \fBowd\fR).
 This is not a substitution at all, but an abbreviation recognized only by
@@ -2585,6 +2593,11 @@ into the foreground, continuing each if it is stopped.
 \fIjob\fR may be a number, a string, `', `%', `+' or `-' as described
 under \fBJobs\fR.
 See also the \fIrun-fg-editor\fR editor command.
+.TP 8
+.B filetest -\fIop file\fR ... (+)
+Applies \fIop\fR (which is a file inquiry operator as described under
+\fBFile inquiry operators\fR) to each \fIfile\fR and returns the results as a
+space-separated list.
 .PP
 .B foreach \fIname \fB(\fIwordlist\fB)
 .br
@@ -3122,11 +3135,6 @@ An error in a \fIsource\fR at any level terminates all nested
 \fIsource\fR commands.
 With \fB-h\fR, commands are placed on the history list instead of being
 executed, much like `history -L'.
-.TP 8
-.B filetest -\fIop file\fR ... (+)
-Applies \fIop\fR (which is a file inquiry operator as described under
-\fBFile inquiry operators\fR) to each \fIfile\fR and returns the results as a
-space-separated list.
 .TP 8
 .B stop \fB%\fIjob\fR ...
 Stops the specified jobs which are executing in the background.
@@ -3813,6 +3821,12 @@ If the second word is set to `merge', the history list is merged with
 the existing history file instead of replacing it (if there is one) and
 sorted by time stamp and the most recent events are retained. (+)
 .TP 8
+.B sched \fR(+)
+Controls the format in which scheduled events are printed;
+if not given, `%h\\t%T\\t%R\\n' is used.
+The format sequences are described above under \fBprompt\fR;
+note the variable meaning of `%R'.
+.TP 8
 .B shell
 The file in which the shell resides.  This is used in forking
 shells to interpret files which have execute bits set, but
@@ -3851,7 +3865,7 @@ This means that \fIcd\fRing through a symbolic link and then `cd ..'ing
 returns one to the original directory. This only affects builtin commands
 and filename completion.
 .PP
-If set to `expand', the shell tries fix symbolic links by actually expanding
+If set to `expand', the shell tries to fix symbolic links by actually expanding
 arguments which look like path names. This affects any command, not just
 builtins. Unfortunately, this does not work for hard-to-recognize filenames,
 such as those embedded in command options. Expansion may be prevented by
@@ -4357,8 +4371,9 @@ and the \fBhistlit\fR shell variable.
 .PP
 Enhanced directory parsing and directory stack handling.
 See the \fIcd, pushd, popd\fR and \fIdirs\fR commands and their associated
-shell variables, the description of \fBDirectory stack substitution\fR
-and the \fBdirstack\fR, \fBowd\fR and \fBsymlinks\fR shell variables.
+shell variables, the description of \fBDirectory stack substitution\fR,
+the \fBdirstack\fR, \fBowd\fR and \fBsymlinks\fR shell variables and
+the \fInormalize-command\fR and \fInormalize-path\fR editor commands.
 .PP
 Negation in glob-patterns. See \fBFilename substitution\fR.
 .PP
@@ -4453,7 +4468,7 @@ access(2), execve(2), fork(2), killpg(2), pipe(2), setrlimit(2),
 sigvec(2), stat(2), umask(2), vfork(2), wait(2), malloc(3), setlocale(3), tty(4),
 a.out(5), termcap(5), environ(7), termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.13 (Cornell) 94/05/07.
+This man page documents tcsh 6.04.14 (Cornell) 94/05/25.
 .SH AUTHORS
 .PD 0
 .TP 2

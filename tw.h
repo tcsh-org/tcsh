@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.h,v 3.16 1994/03/31 22:36:44 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.h,v 3.17 1994/05/07 18:51:25 christos Exp christos $ */
 /*
  * tw.h: TwENEX functions headers
  */
@@ -86,8 +86,6 @@
 
 #define SEARCHLIST "HPATH"	/* Env. param for helpfile searchlist */
 #define DEFAULTLIST ":/usr/man/cat1:/usr/man/cat8:/usr/man/cat6:/usr/local/man/cat1:/usr/local/man/cat8:/usr/local/man/cat6"	/* if no HPATH */
-
-extern Char PromptBuf[];
 
 typedef enum {
     LIST, LIST_ALL, RECOGNIZE, RECOGNIZE_ALL, RECOGNIZE_SCROLL, 

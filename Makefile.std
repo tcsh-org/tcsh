@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.66 1994/04/12 15:46:46 christos Exp $
+# $Id: Makefile.std,v 1.67 1994/05/07 18:51:25 christos Exp christos $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -46,7 +46,7 @@ LFLAGS=$(INCLUDES)
 #CFLAGS=-O $(INCLUDES)
 
 # gcc-2.1+
-CFLAGS=-O2 $(INCLUDES) -g
+CFLAGS=-O2 $(INCLUDES)
 
 # lucid c on suns
 #CFLAGS=-O5 $(INCLUDES)
@@ -62,6 +62,13 @@ CFLAGS=-O2 $(INCLUDES) -g
 
 # Intel Paragon OSF/1 with PGI compilers
 #CFLAGS=-O -Mnodebug -Mnoperfmon $(INCLUDES)
+
+# DEC Alpha OSF/1
+#CFLAGS= -O2 $(INCLUDES) -Olimit 2000	## Normal Optimization
+#CFLAGS= -O3 $(INCLUDES) -Olimit 2000	## Full Optimization - may not work
+#CF=-j
+#SUF=u
+#.SUFFIXES: .u
 
 # for silicon graphics (and other mips compilers) -- use the
 # global optimizer! (-O3).
@@ -111,8 +118,6 @@ CFLAGS=-O2 $(INCLUDES) -g
 #DFLAGS = -DUTek -DBSD
 # VMS_POSIX needs:
 #DFLAGS=-D_VMS_POSIX
-# DEC/osf-1 on the alpha
-#DFLAGS=-D_BSD
 # Multiflow
 #DFLAGS=-DMULTIFLOW
 DFLAGS=
@@ -137,10 +142,11 @@ LDFLAGS= 			## The simplest, suitable for all.
 ################################################################
 LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -ltermcap			 ## SunOS, HP-UX, pyramid
-#LIBES= -ltermcap -lcs			 ## Mach
+#LIBES= -ltermcap			 ## Linux
+#LIBES= -ltermcap -lshadow		 ## Linux with PW_SHADOW
 #LIBES= -ltermcap -lsec			 ## Tek XD88/10 (UTekV) with PW_SHADOW
 #LIBES= -ltermcap -lsec			 ## Motorola MPC (sysV88) with PW_SHADOW
-#LIBES= -ltermcap -lshadow		 ## Linux
+#LIBES= -ltermcap -lcs			 ## Mach
 #LIBES= -ltermcap -lbsd			 ## DEC osf1 on the alpha
 #LIBES= -ltermcap -lbsd			 ## Intel paragon
 #LIBES= -ltermcap -lseq			 ## Sequent's Dynix
@@ -397,10 +403,10 @@ sh.prof.${SUF}:
 	${CC} ${CF} ${CFLAGS} -DPROF sh.prof.c
 
 lint: tc.const.h ed.defns.h
-	lint ${LFLAGS} sh*.c tw*.c ed*.c tc.*.c ${LIBES}
+	lint ${DFLAGS} ${LFLAGS} sh*.c tw*.c ed*.c tc.*.c ${LIBES}
 
 alint: tc.const.h ed.defns.h
-	alint ${LFLAGS} sh*.c tw*.c ed*.c tc.*.c ${LIBES}
+	alint ${DFLAGS} ${LFLAGS} sh*.c tw*.c ed*.c tc.*.c ${LIBES}
 
 print:
 	@pr READ_ME

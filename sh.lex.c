@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.lex.c,v 3.37 1994/03/13 00:46:35 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.lex.c,v 3.38 1994/04/28 13:28:46 christos Exp christos $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.37 1994/03/13 00:46:35 christos Exp christos $")
+RCSID("$Id: sh.lex.c,v 3.38 1994/04/28 13:28:46 christos Exp christos $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1649,8 +1649,8 @@ bgetc()
     int buf;
     int c;
     int numleft = 0, roomleft;
-    extern Char InputBuf[];
     char    tbuf[BUFSIZE + 1];
+    off_t   ofseekp;
 
     if (cantell) {
 	if (fseekp < fbobp || fseekp > feobp) {
@@ -1674,6 +1674,7 @@ bgetc()
 	fseekp++;
 	return (c);
     }
+    ofseekp = fseekp;
 again:
     buf = (int) fseekp / BUFSIZE;
     if (buf >= fblocks) {
@@ -1698,14 +1699,10 @@ again:
 	roomleft = BUFSIZE - off;
 	for (;;) {
 	    if (editing && intty) {	/* then use twenex routine */
-		c = numleft ? numleft : Inputl();	/* PWP: get a line */
-		if (c > roomleft) {	/* No room in this buffer? */
-		    /* start with fresh buffer */
-		    feobp = fseekp = fblocks * BUFSIZE;
-		    numleft = c;
-		    goto again;
-		}
-		if (c > 0) {
+		if (numleft == 0)
+		    numleft = Inputl();	/* PWP: get a line */
+		c = numleft > roomleft ? roomleft : numleft;
+		if (c) {
 		    /* 
 		     * Cannot really happen, but it does! 
 		     * I really cannot explain why the following if 
@@ -1728,13 +1725,23 @@ again:
 #endif
 			/* start with fresh buffer */
 			feobp = fseekp = fblocks * BUFSIZE;
-			numleft = c;
 			goto again;
 		    }
 		    (void) memmove((ptr_t) (fbuf[buf] + off), (ptr_t) InputBuf,
 				   (size_t) (c * sizeof(Char)));
+		    if (c < numleft)
+			(void) memmove((ptr_t) InputBuf, (ptr_t) (InputBuf + c),
+			               (size_t) ((numleft - c) * sizeof(Char)));
+		    numleft -= c;
 		}
-		numleft = 0;
+		feobp += c;
+	        if (numleft) {
+		    fseekp = feobp;
+		    goto again;
+		}
+		c = feobp - ofseekp;
+		fseekp = feobp = ofseekp;
+		buf = (int) fseekp / BUFSIZE;
 	    }
 	    else {
 		c = read(SHIN, tbuf, (size_t) roomleft);
