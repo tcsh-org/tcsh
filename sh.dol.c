@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.38 1998/10/25 15:10:05 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.39 2000/01/14 22:57:27 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.38 1998/10/25 15:10:05 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.39 2000/01/14 22:57:27 christos Exp $")
 
 /*
  * C shell
@@ -225,7 +225,9 @@ Dpack(wbuf, wp)
 	    Gcat(STRNULL, wbuf);
 	    return (NULL);
 	}
+#if defined(DSPMBYTE)
 mbyteskip:
+#endif /* DSPMBYTE */
 	if (--i <= 0)
 	    stderror(ERR_WTOOLONG);
 	*wp++ = (Char) c;
