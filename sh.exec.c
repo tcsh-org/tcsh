@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.29 1994/04/12 15:46:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exec.c,v 3.30 1994/05/07 18:51:25 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.29 1994/04/12 15:46:46 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.30 1994/05/07 18:51:25 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -1030,7 +1030,7 @@ find_cmd(cmd, prt)
 
     if (prt && any(short2str(cmd), '/')) {
 	xprintf("where: / in command makes no sense\n");
-	return 0;
+	return rval;
     }
 
     /* first, look for an alias */
@@ -1052,13 +1052,14 @@ find_cmd(cmd, prt)
 	    if (prt)
 		xprintf("%S is a shell built-in\n", cmd);
 	    else
-		return 1;
+		return rval;
 	}
     }
 
     /* last, look through the path for the command */
 
-    var = adrof(STRpath);
+    if ((var = adrof(STRpath)) == NULL)
+	return rval;
 
     hashval = havhash ? hashname(cmd) : 0;
 
@@ -1089,7 +1090,7 @@ find_cmd(cmd, prt)
 		xprintf("%S\n", cmd);
 	    }
 	    else
-		return 1;
+		return rval;
 	}
     }
     xfree((ptr_t) sv);
