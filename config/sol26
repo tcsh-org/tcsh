@@ -156,6 +156,7 @@
  * file offsets (e.g. Irix 6.2)
  */
 #define _FILE_OFFSET_BITS 64
+#define	_LARGE_FILE64_SOURCE 
 
 /*
  * lookupname/namei ignores tailing '/' on files
