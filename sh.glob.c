@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 3.6 1991/07/28 18:16:09 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 3.7 1991/08/01 16:36:23 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.glob.c,v 3.6 1991/07/28 18:16:09 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.7 1991/08/01 16:36:23 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -473,7 +473,7 @@ globone(str, action)
 	vo = v;
 
     vl = libglob(vo);
-    if (gflg & G_CSH)
+    if ((gflg & G_CSH) && vl != vo)
 	blkfree(vo);
     if (vl == NULL) {
 	setname(short2str(str));
@@ -517,7 +517,7 @@ globall(v)
 
     if (!noglob && (gflg & G_GLOB)) {
 	vl = libglob(vo);
-	if (gflg & G_CSH)
+	if ((gflg & G_CSH) && vl != vo)
 	    blkfree(vo);
     }
 
