@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.84 1998/10/25 15:10:00 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.85 1998/11/24 18:17:27 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.84 1998/10/25 15:10:00 christos Exp $")
+RCSID("$Id: sh.c,v 3.85 1998/11/24 18:17:27 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2086,6 +2086,7 @@ process(catch)
 	if (seterr)
 	    stderror(ERR_OLD);
 
+	postcmd();
 	/*
 	 * Execute the parse tree From: Michael Schroeder
 	 * <mlschroe@immd4.informatik.uni-erlangen.de> was execute(t, tpgrp);
@@ -2101,6 +2102,7 @@ process(catch)
 	if (catch && intty && !whyles && !tellwhat)
 	    (void) window_change(0);	/* for window systems */
 #endif /* SIG_WINDOW */
+	set(STR_, Strsave(InputBuf), VAR_READWRITE | VAR_NOGLOB);
     }
     savet = t;
     resexit(osetexit);

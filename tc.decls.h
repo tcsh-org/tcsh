@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.41 1998/06/27 12:27:32 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.42 1998/09/18 16:09:17 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -92,6 +92,7 @@ extern	struct process	 *find_stop_ed	__P((void));
 extern	void		  fg_proc_entry	__P((struct process *));
 extern	sigret_t	  alrmcatch	__P((int));
 extern	void		  precmd	__P((void));
+extern	void		  postcmd	__P((void));
 extern	void		  cwd_cmd	__P((void));
 extern	void		  beep_cmd	__P((void));
 extern	void		  period_cmd	__P((void));

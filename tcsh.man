@@ -1271,7 +1271,10 @@ Substitutes the (decimal) process number of the (parent) shell.
 .TP 8
 $!
 Substitutes the (decimal) process number of the last
-background process started by this shell.
+background process started by this shell. (+)
+.TP 8
+$_
+Substitures the command line of the last command executed. (+)
 .TP 8
 $<
 Substitutes a line from the standard input, with no further interpretation
@@ -1877,10 +1880,10 @@ and described in detail under the appropriate \fBBuiltin commands\fR,
 The \fIsched\fR builtin command puts commands in a scheduled-event list,
 to be executed by the shell at a given time.
 .PP
-The \fIbeepcmd\fR, \fIcwdcmd\fR, \fIperiodic\fR and \fIprecmd\fR
+The \fIbeepcmd\fR, \fIcwdcmd\fR, \fIperiodic\fR, \fIprecmd\fR, and \fIpostcmd\fR
 \fBSpecial aliases\fR can be set, respectively, to execute commands when the shell wants
 to ring the bell, when the working directory changes, every \fBtperiod\fR
-minutes and before each prompt.
+minutes, before each prompt, and before each command gets executed.
 .PP
 The \fBautologout\fR shell variable can be set to log out or lock the shell
 after a given number of minutes of inactivity.
@@ -3442,6 +3445,15 @@ Runs just before each prompt is printed. For example, if one does
 then \fIdate\fR(1) runs just before the shell prompts for each command.
 There are no limits on what \fIprecmd\fR can be set to do, but discretion
 should be used.
+.RE
+.TP 8
+.B postcmd
+Runs before each command gets executed.
+.RS +8
+.IP "" 4
+> alias postcmd  'echo \-n "^[]2\e;\e!#^G"'
+.PP
+then executing \fIvi foo.c\fR will put the command string in the xterm title bar.
 .RE
 .TP 8
 .B shell

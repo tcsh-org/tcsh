@@ -1,3 +1,5 @@
+ 26. added $_
+ 25. added postcmd
  24. V6.08.02 - 19981124
  23. document continue and continue_args
  22. wrong test in slowexec made NT optimization a noop (Amol)
