@@ -113,12 +113,7 @@
  * Work around OS deficiency which cannot start #!/bin/sh scripts
  */
 #define HASHBANG
-#define HAVEUTMPX
 
-/*#undef KANJI*/
-
-#undef DSPMBYTE
-#undef WIDE_STRINGS
 #define setmode(fd,mode) /*nothing*/
 
 #endif /* _h_config */
