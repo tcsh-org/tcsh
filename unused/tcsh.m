@@ -756,11 +756,11 @@ $ #251 Original Message:(error unwinds)
 $ #252 Original Message:(You have mail.)
 # You have mail.
 
-$ #253 Original Message:(You have %d piece%s of mail.\n)
-# You have %d piece%s of mail.\n
+$ #253 Original Message:(You have %d mail messages.\n)
+# You have %d mail messages.\n
 
-$ #254 Original Message:(You have %d piece%s of mail in %s.\n)
-# You have %d piece%s of mail in %s.\n
+$ #254 Original Message:(You have %d mail messages in %s.\n)
+# You have %d mail messages in %s.\n
 
 $ #255 Original Message:(You have %smail.\n", new ? "new " : ")
 # You have %smail.\n", new ? "new " : "
@@ -3704,3 +3704,343 @@ $ #1234 Original Message:(range)
 
 $ #1235 Original Message:(No such job)
 # No such job
+
+$ #1236 Original Message:(Move back a character)
+# Move back a character
+
+$ #1237 Original Message:(Delete the character behind cursor)
+# Delete the character behind cursor
+
+$ #1238 Original Message:(Cut from beginning of current word to cursor - saved in cut buffer)
+# Cut from beginning of current word to cursor - saved in cut buffer
+
+$ #1239 Original Message:(Cut from beginning of line to cursor - save in cut buffer)
+# Cut from beginning of line to cursor - save in cut buffer
+
+$ #1240 Original Message:(Move to beginning of current word)
+# Move to beginning of current word
+
+$ #1241 Original Message:(Move to beginning of line)
+# Move to beginning of line
+
+$ #1242 Original Message:(Capitalize the characters from cursor to end of current word)
+# Capitalize the characters from cursor to end of current word
+
+$ #1243 Original Message:(Vi change case of character under cursor and advance one character)
+# Vi change case of character under cursor and advance one character
+
+$ #1244 Original Message:(Vi change to end of line)
+# Vi change to end of line
+
+$ #1245 Original Message:(Clear screen leaving current line on top)
+# Clear screen leaving current line on top
+
+$ #1246 Original Message:(Complete current word)
+# Complete current word
+
+$ #1247 Original Message:(Tab forward through files)
+# Tab forward through files
+
+$ #1248 Original Message:(Tab backwards through files)
+# Tab backwards through files
+
+$ #1249 Original Message:(Complete current word ignoring programmable completions)
+# Complete current word ignoring programmable completions
+
+$ #1250 Original Message:(Copy current word to cursor)
+# Copy current word to cursor
+
+$ #1251 Original Message:(Copy area between mark and cursor to cut buffer)
+# Copy area between mark and cursor to cut buffer
+
+$ #1252 Original Message:(Delete character under cursor)
+# Delete character under cursor
+
+$ #1253 Original Message:(Delete character under cursor or signal end of file on an empty line)
+# Delete character under cursor or signal end of file on an empty line
+
+$ #1254 Original Message:(Delete character under cursor or list completions if at end of line)
+# Delete character under cursor or list completions if at end of line
+
+$ #1255 Original Message:(Delete character under cursor, list completions or signal end of file)
+# Delete character under cursor, list completions or signal end of file
+
+$ #1256 Original Message:(Cut from cursor to end of current word - save in cut buffer)
+# Cut from cursor to end of current word - save in cut buffer
+
+$ #1257 Original Message:(Adds to argument if started or enters digit)
+# Adds to argument if started or enters digit
+
+$ #1258 Original Message:(Digit that starts argument)
+# Digit that starts argument
+
+$ #1259 Original Message:(Move to next history line)
+# Move to next history line
+
+$ #1260 Original Message:(Lowercase the characters from cursor to end of current word)
+# Lowercase the characters from cursor to end of current word
+
+$ #1261 Original Message:(Indicate end of file)
+# Indicate end of file
+
+$ #1262 Original Message:(Move cursor to end of line)
+# Move cursor to end of line
+
+$ #1263 Original Message:(Exchange the cursor and mark)
+# Exchange the cursor and mark
+
+$ #1264 Original Message:(Expand file name wildcards)
+# Expand file name wildcards
+
+$ #1265 Original Message:(Expand history escapes)
+# Expand history escapes
+
+$ #1266 Original Message:(Expand the history escapes in a line)
+# Expand the history escapes in a line
+
+$ #1267 Original Message:(Expand variables)
+# Expand variables
+
+$ #1268 Original Message:(Move forward one character)
+# Move forward one character
+
+$ #1269 Original Message:(Move forward to end of current word)
+# Move forward to end of current word
+
+$ #1270 Original Message:(Exchange the two characters before the cursor)
+# Exchange the two characters before the cursor
+
+$ #1271 Original Message:(Search in history backwards for line beginning as current)
+# Search in history backwards for line beginning as current
+
+$ #1272 Original Message:(Search in history forward for line beginning as current)
+# Search in history forward for line beginning as current
+
+$ #1273 Original Message:(Insert last item of previous command)
+# Insert last item of previous command
+
+$ #1274 Original Message:(Incremental search forward)
+# Incremental search forward
+
+$ #1275 Original Message:(Incremental search backwards)
+# Incremental search backwards
+
+$ #1276 Original Message:(Clear line)
+# Clear line
+
+$ #1277 Original Message:(Cut to end of line and save in cut buffer)
+# Cut to end of line and save in cut buffer
+
+$ #1278 Original Message:(Cut area between mark and cursor and save in cut buffer)
+# Cut area between mark and cursor and save in cut buffer
+
+$ #1279 Original Message:(Cut the entire line and save in cut buffer)
+# Cut the entire line and save in cut buffer
+
+$ #1280 Original Message:(List choices for completion)
+# List choices for completion
+
+$ #1281 Original Message:(List choices for completion overriding programmable completion)
+# List choices for completion overriding programmable completion
+
+$ #1282 Original Message:(List file name wildcard matches)
+# List file name wildcard matches
+
+$ #1283 Original Message:(List choices for completion or indicate end of file if empty line)
+# List choices for completion or indicate end of file if empty line
+
+$ #1284 Original Message:(Display load average and current process status)
+# Display load average and current process status
+
+$ #1285 Original Message:(Expand history escapes and insert a space)
+# Expand history escapes and insert a space
+
+$ #1286 Original Message:(Execute command)
+# Execute command
+
+$ #1287 Original Message:(Expand pathnames, eliminating leading .'s and ..'s)
+# Expand pathnames, eliminating leading .'s and ..'s
+
+$ #1288 Original Message:(Expand commands to the resulting pathname or alias)
+# Expand commands to the resulting pathname or alias
+
+$ #1289 Original Message:(Switch from insert to overwrite mode or vice versa)
+# Switch from insert to overwrite mode or vice versa
+
+$ #1290 Original Message:(Add 8th bit to next character typed)
+# Add 8th bit to next character typed
+
+$ #1291 Original Message:(Add the next character typed to the line verbatim)
+# Add the next character typed to the line verbatim
+
+$ #1292 Original Message:(Redisplay everything)
+# Redisplay everything
+
+$ #1293 Original Message:(Restart stopped editor)
+# Restart stopped editor
+
+$ #1294 Original Message:(Look for help on current command)
+# Look for help on current command
+
+$ #1295 Original Message:(This character is added to the line)
+# This character is added to the line
+
+$ #1296 Original Message:(This character is the first in a character sequence)
+# This character is the first in a character sequence
+
+$ #1297 Original Message:(Set the mark at cursor)
+# Set the mark at cursor
+
+$ #1298 Original Message:(Correct the spelling of current word)
+# Correct the spelling of current word
+
+$ #1299 Original Message:(Correct the spelling of entire line)
+# Correct the spelling of entire line
+
+$ #1300 Original Message:(Send character to tty in cooked mode)
+# Send character to tty in cooked mode
+
+$ #1301 Original Message:(Toggle between literal and lexical current history line)
+# Toggle between literal and lexical current history line
+
+$ #1302 Original Message:(Exchange the character to the left of the cursor with the one under)
+# Exchange the character to the left of the cursor with the one under
+
+$ #1303 Original Message:(Exchange the two characters before the cursor)
+# Exchange the two characters before the cursor
+
+$ #1304 Original Message:(Tty delayed suspend character)
+# Tty delayed suspend character
+
+$ #1305 Original Message:(Tty flush output character)
+# Tty flush output character
+
+$ #1306 Original Message:(Tty interrupt character)
+# Tty interrupt character
+
+$ #1307 Original Message:(Tty quit character)
+# Tty quit character
+
+$ #1308 Original Message:(Tty suspend character)
+# Tty suspend character
+
+$ #1309 Original Message:(Tty allow output character)
+# Tty allow output character
+
+$ #1310 Original Message:(Tty disallow output character)
+# Tty disallow output character
+
+$ #1311 Original Message:(Indicates unbound character)
+# Indicates unbound character
+
+$ #1312 Original Message:(Emacs universal argument (argument times 4))
+# Emacs universal argument (argument times 4)
+
+$ #1313 Original Message:(Move to previous history line)
+# Move to previous history line
+
+$ #1314 Original Message:(Uppercase the characters from cursor to end of current word)
+# Uppercase the characters from cursor to end of current word
+
+$ #1315 Original Message:(Vi goto the beginning of next word)
+# Vi goto the beginning of next word
+
+$ #1316 Original Message:(Vi enter insert mode after the cursor)
+# Vi enter insert mode after the cursor
+
+$ #1317 Original Message:(Vi enter insert mode at end of line)
+# Vi enter insert mode at end of line
+
+$ #1318 Original Message:(Vi change case of character under cursor and advance one character)
+# Vi change case of character under cursor and advance one character
+
+$ #1319 Original Message:(Vi change prefix command)
+# Vi change prefix command
+
+$ #1320 Original Message:(Vi change to end of line)
+# Vi change to end of line
+
+$ #1321 Original Message:(Enter vi command mode (use alternative key bindings))
+# Enter vi command mode (use alternative key bindings)
+
+$ #1322 Original Message:(Vi command mode complete current word)
+# Vi command mode complete current word
+
+$ #1323 Original Message:(Vi move to previous character (backspace))
+# Vi move to previous character (backspace)
+
+$ #1324 Original Message:(Vi delete prefix command)
+# Vi delete prefix command
+
+$ #1325 Original Message:(Vi move to the end of the current space delimited word)
+# Vi move to the end of the current space delimited word
+
+$ #1326 Original Message:(Vi move to the end of the current word)
+# Vi move to the end of the current word
+
+$ #1327 Original Message:(Vi move to the character specified backwards)
+# Vi move to the character specified backwards
+
+$ #1328 Original Message:(Vi move to the character specified forward)
+# Vi move to the character specified forward
+
+$ #1329 Original Message:(Vi move up to the character specified backwards)
+# Vi move up to the character specified backwards
+
+$ #1330 Original Message:(Vi move up to the character specified forward)
+# Vi move up to the character specified forward
+
+$ #1331 Original Message:(Enter vi insert mode)
+# Enter vi insert mode
+
+$ #1332 Original Message:(Enter vi insert mode at beginning of line)
+# Enter vi insert mode at beginning of line
+
+$ #1333 Original Message:(Vi repeat current character search in the same search direction)
+# Vi repeat current character search in the same search direction
+
+$ #1334 Original Message:(Vi repeat current character search in the opposite search direction)
+# Vi repeat current character search in the opposite search direction
+
+$ #1335 Original Message:(Vi repeat current search in the same search direction)
+# Vi repeat current search in the same search direction
+
+$ #1336 Original Message:(Vi repeat current search in the opposite search direction)
+# Vi repeat current search in the opposite search direction
+
+$ #1337 Original Message:(Vi replace character under the cursor with the next character typed)
+# Vi replace character under the cursor with the next character typed
+
+$ #1338 Original Message:(Vi replace mode)
+# Vi replace mode
+
+$ #1339 Original Message:(Vi search history backwards)
+# Vi search history backwards
+
+$ #1340 Original Message:(Vi search history forward)
+# Vi search history forward
+
+$ #1341 Original Message:(Vi replace character under the cursor and enter insert mode)
+# Vi replace character under the cursor and enter insert mode
+
+$ #1342 Original Message:(Vi replace entire line)
+# Vi replace entire line
+
+$ #1343 Original Message:(Vi move to the previous word)
+# Vi move to the previous word
+
+$ #1344 Original Message:(Vi move to the next word)
+# Vi move to the next word
+
+$ #1345 Original Message:(Vi undo last change)
+# Vi undo last change
+
+$ #1346 Original Message:(Vi goto the beginning of line)
+# Vi goto the beginning of line
+
+$ #1347 Original Message:(Perform which of current command)
+# Perform which of current command
+
+$ #1348 Original Message:(Paste cut buffer at cursor position)
+# Paste cut buffer at cursor position
+
