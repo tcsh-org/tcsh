@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.78 2003/03/12 19:14:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.79 2003/05/26 07:11:07 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.78 2003/03/12 19:14:51 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.79 2003/05/26 07:11:07 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -602,8 +602,15 @@ pjwait(pp)
 	while ((fp = (fp->p_friends)) != pp);
 	if ((jobflags & PRUNNING) == 0)
 	    break;
+	if (kill(-fp->p_procid, 0) == -1 && errno == ESRCH) {
 #ifdef JOBDEBUG
-	xprintf("%d starting to sigpause for  SIGCHLD on %d\n",
+	    xprintf("%d child %d already exited\n",
+		    getpid(), fp->p_procid);
+#endif /* JOBDEBUG */
+	    break;
+	}
+#ifdef JOBDEBUG
+	xprintf("%d starting to sigpause for SIGCHLD on %d\n",
 		getpid(), fp->p_procid);
 #endif /* JOBDEBUG */
 #ifdef BSDSIGS
