@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.h,v 1.2 91/07/14 22:23:11 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.4 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -222,7 +222,11 @@ extern int setpgrp();
 #ifdef DIRENT
 # include <dirent.h>
 #else
-# include <sys/dir.h>
+# ifdef hp9000s500
+#  include <ndir.h>
+# else
+#  include <sys/dir.h>
+# endif
 # define dirent direct
 #endif /* DIRENT */
 #ifdef hpux
@@ -746,7 +750,7 @@ extern int errno, sys_nerr;
 #define str2short(a) 		(a)
 #define blk2short(a) 		saveblk(a)
 #define short2blk(a) 		saveblk(a)
-#define short2str(a) 		(a)
+#define short2str(a) 		strip(a)
 #else
 #define Strchr(a, b)   	s_strchr(a, b)
 #define Strrchr(a, b) 		s_strrchr(a, b)
