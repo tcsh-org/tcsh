@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.23 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.24 1992/01/28 19:06:06 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.23 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.24 1992/01/28 19:06:06 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1012,7 +1012,7 @@ xecho(sep, v)
 {
     register Char *cp;
     int     nonl = 0;
-    static int     sysv_echo;
+    int     sysv_echo = adrof(STRsysv_echo) != NULL;
 
     if (setintr)
 #ifdef BSDSIGS
@@ -1033,20 +1033,14 @@ xecho(sep, v)
 	v = gargv = saveblk(v);
 	trim(v);
     }
-#if !defined(OREO) && SYSVREL > 0
-    if (adrof(STRbsd_echo))
-	sysv_echo = 0;
-    else
-	sysv_echo = 1;
-#else
-    if (adrof(STRsysv_echo))
-	sysv_echo = 1;
-    else
-	sysv_echo = 0;
-#endif /* !defined(OREO) && SYSVREL > 0 */
+    /* 
+     * XXX: This is not really sysv echo, but too many things assume
+     *      csh accepts echo -n
+     */
 
     if (!sysv_echo && sep == ' ' && *v && eq(*v, STRmn))
 	nonl++, v++;
+
     while ((cp = *v++) != 0) {
 	register int c;
 

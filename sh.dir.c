@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.c,v 3.9 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.dir.c,v 3.10 1992/01/28 19:06:06 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.9 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.10 1992/01/28 19:06:06 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -225,9 +225,11 @@ printdirs()
 	    xprintf("%d\t", idx++);
 	    cur = 0;
 	}
+	len = Strlen(hp);
 	if (!(dirflag & DIR_LONG) && hp != NULL && !eq(hp, STRslash) &&
-	    prefix(hp, dp->di_name))
-	    len = Strlen(s = (dp->di_name + Strlen(hp))) + 2;
+	    Strncmp(hp, dp->di_name, len) == 0 &&
+	    (dp->di_name[len] == '\0' || dp->di_name[len] == '/')) 
+	    len = Strlen(s = (dp->di_name + len)) + 2;
 	else
 	    len = Strlen(s = dp->di_name) + 1;
 
@@ -1030,6 +1032,7 @@ dnewcwd(dp)
 		dn->di_next->di_prev = dn->di_prev;
 		dn->di_prev->di_next = dn->di_next;
 		dfree(dn);
+		break;
 	    }
     }
     dcwd = dp;

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.proc.c,v 3.20 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.proc.c,v 3.21 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.20 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.21 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -426,7 +426,14 @@ found:
 		    if (GettingInput) {
 			errno = 0;
 			(void) Rawmode();
+#ifdef notdef
+			/*
+			 * don't really want to do that, because it
+			 * will erase our message in case of multi-line
+			 * input
+			 */
 			ClearLines();
+#endif
 			ClearDisp();
 			Refresh();
 		    }

@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.28 1992/01/27 04:20:47 christos Exp $
+.\" $Id: tcsh.man,v 3.29 1992/01/28 19:06:06 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -1706,12 +1706,17 @@ based on the time of day.
 .SH "17. BUILTIN FOR ls -F"
 There is a new builtin command called
 .I ls-F
-which does the same thing as the command "ls -aF" if the shell
-variable
+which does the same thing as the command "ls -F".
+If the shell variable
 .I showdots
-has been set, and acts like "ls -F" otherwise. Ls-F works like
-ls, only it is generally faster. If other switches are passed
-to 
+has been set, it acts like "ls -aF". If 
+.I showdots 
+is equal to "-A", then 
+.I ls-F
+acts like "ls -AF". Ls-F works like
+ls, only it is generally faster, since it does not need to fork and exec,
+and safer against trojan horses if the user has `.' in the execution path. 
+If other switches are passed to 
 .I ls-F, 
 then the normal ls is executed. Aliasing ls to ls-F provides
 a fast alternative way of listing files.
@@ -2655,12 +2660,15 @@ Recognized escapes are:
 .RS +.6i
 .ta 1.2i 1.7i
 .nf
-=f	Complete file or path component
-=v	Complete variable
-=d	Complete directory
-=u	Complete username
-=c	Complete command
 =a	Complete aliases
+=b	Complete binding
+=c	Complete command
+=d	Complete directory
+=e	Complete environment variable
+=f	Complete file or path component
+=s	Complete shell variable
+=v	Complete any variable
+=u	Complete username
 =$var	Complete using words from variable
 .fi
 .RE
@@ -2668,7 +2676,7 @@ Recognized escapes are:
 .sp
 All the above escapes, except 
 .I $var
-can have an additional shell pattent which must match the files to be
+can have an additional shell pattern which must match the files to be
 completed.
 For example, in the C compiler, it makes sense to complete only files
 that the compiler understands:
@@ -2800,9 +2808,6 @@ parsing mechanism for tcsh, and it can cause syntax errors in
 .I csh
 scripts.
 .TP 10
-.B bsd_echo
-On system V based machines makes the builtin echo behave like the BSD one.
-.TP 10
 .B chase_symlinks 
 always resolve symbolic links to real names on cd, etc.
 .TP 10
@@ -2911,10 +2916,11 @@ Integer value indicating the number
 of nested shells. 
 .TP 10
 .B showdots 
-show hidden files in list and complete operations.
+show hidden files in list and complete operations. If it is set to -A,
+then "." and ".." are not displayed, similarly to the BSD ls -A.
 .TP 10
 .B sysv_echo
-On BSD based machines makes the builtin echo behave like the System V one.
+Makes the builtin echo behave like the System V /bin/echo.
 .TP 10
 .B tcsh
 Contains the current version of the shell as R.VV.PP. The 

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.init.c,v 3.3 1992/01/16 13:04:21 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.init.c,v 3.4 1992/01/27 04:20:47 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.3 1992/01/16 13:04:21 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.4 1992/01/27 04:20:47 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -56,6 +56,7 @@ typedef struct {
 
 static struct varent *tw_vptr = NULL;	/* Current shell variable 	*/
 static Char **tw_env = NULL;		/* Current environment variable */
+static struct KeyFuncs *tw_bind = NULL;	/* List of the bindings		*/
 static DIR   *tw_dir_fd = NULL;		/* Current directory descriptor	*/
 static Char   tw_retname[MAXPATHLEN+1];	/* Return buffer		*/
 static int    tw_cmd_got = 0;		/* What we need to do		*/
@@ -516,16 +517,15 @@ tw_envvar_next(dir, flags)
     Char *dir;
     int *flags;
 {
-    static Char buffer[MAXVARLEN + 1];
     Char   *ps, *pd;
 
     if (tw_env == NULL || *tw_env == NULL)
 	return (NULL);
-    for (ps = *tw_env, pd = buffer;
-	 *ps && *ps != '=' && pd <= &buffer[MAXVARLEN]; *pd++ = *ps++);
+    for (ps = *tw_env, pd = tw_retname;
+	 *ps && *ps != '=' && pd <= &tw_retname[MAXPATHLEN]; *pd++ = *ps++);
     *pd = '\0';
     tw_env++;
-    return (buffer);
+    return (tw_retname);
 } /* end tw_envvar_next */
 
 
@@ -738,3 +738,36 @@ tw_vl_start(dfd, pat)
     else
 	tw_env = NULL;
 } /* end tw_vl_start */
+
+
+/* tw_bind_start():
+ *	Begin the list of the shell bindings
+ */
+/*ARGSUSED*/
+void
+tw_bind_start(dfd, pat)
+    DIR *dfd;
+    Char *pat;
+{
+    SETDIR(dfd)
+    tw_bind = FuncNames;
+} /* end tw_bind_start */
+
+/* tw_bind_next():
+ *	Begin the list of the shell bindings
+ */
+/*ARGSUSED*/
+Char *
+tw_bind_next(dir, flags)
+    Char *dir;
+    int *flags;
+{
+    char *ptr;
+    if (tw_bind && tw_bind->name) {
+	for (ptr = tw_bind->name, dir = tw_retname; *dir++ = *ptr++;)
+	    continue;
+	tw_bind++;
+	return(tw_retname);
+    }
+    return NULL;
+} /* end tw_var_next */

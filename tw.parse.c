@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.parse.c,v 3.20 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.parse.c,v 3.21 1992/01/28 19:06:06 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.20 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.21 1992/01/28 19:06:06 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -47,25 +47,29 @@ RCSID("$Id: tw.parse.c,v 3.20 1992/01/27 04:20:47 christos Exp $")
 
 #define EVEN(x) (((x) & 1) != 1)
 
+#define DOT_NONE	0	/* Don't display dot files	*/
+#define DOT_NOT		1	/* Don't display dot or dot-dot	*/
+#define DOT_ALL		2	/* Display all dot files	*/
+
 /*  TW_COMMAND,	    TW_VARIABLE,   TW_LOGNAME,	     TW_FILE	*/
 /*  TW_DIRECTORY,   TW_VARLIST,	   TW_USER,	     TW_LITERAL	*/
-/*  TW_ALIAS,	    TW_SHELLVAR,   TW_ENVVAR			*/
+/*  TW_ALIAS,	    TW_SHELLVAR,   TW_ENVVAR, 	     TW_BINDING	*/
 static void (*tw_start_entry[]) __P((DIR *, Char *)) = {
     tw_cmd_start,   tw_var_start,  tw_logname_start, tw_file_start,
     tw_file_start,  tw_vl_start,   tw_logname_start, tw_file_start,
-    tw_alias_start, tw_var_start,  tw_var_start
+    tw_alias_start, tw_var_start,  tw_var_start,     tw_bind_start
 };
 
 static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
     tw_cmd_next,   tw_var_next,   tw_logname_next,  tw_file_next,
     tw_file_next,  tw_var_next,   tw_logname_next,  tw_file_next,
-    tw_var_next,   tw_shvar_next, tw_envvar_next
+    tw_var_next,   tw_shvar_next, tw_envvar_next,   tw_bind_next
 };
 
 static void (*tw_end_entry[]) __P((void)) = {
     tw_dir_end,    tw_dir_end,    tw_logname_end,   tw_dir_end,
     tw_dir_end,    tw_dir_end,    tw_logname_end,   tw_dir_end,
-    tw_dir_end,	   tw_dir_end,	  tw_dir_end
+    tw_dir_end,	   tw_dir_end,	  tw_dir_end,	    tw_dir_end
 };
 
 /* #define TDEBUG */
@@ -704,6 +708,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
 	    max_items = 0,		/* Maximum displayed items */
 	    flags = 0,			/* search flags */
 	    gpat = pat[0] != '\0',	/* Glob pattern search */
+	    showdots, 			/* Style to show dot files */
 	    len;
     Char    exp_dir[FILSIZ + 1],	/* dir after ~ expansion */
             dir[FILSIZ + 1],		/* /x/y/z/ part in /x/y/z/f */
@@ -715,6 +720,15 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
     DIR    *dir_fd = NULL;	
     struct varent *vp;
 
+    if ((vp = adrof(STRshowdots)) != NULL) {
+	if (vp->vec[0][0] == '-' && vp->vec[0][1] == 'A' &&
+	    vp->vec[0][2] == '\0')
+	    showdots = DOT_NOT;
+	else
+	    showdots = DOT_ALL;
+    }
+    else
+	showdots = DOT_NONE;
     /*
      * bugfix by Marty Grossman (grossman@CC5.BBN.COM): directory listing can
      * dump core when interrupted
@@ -730,10 +744,6 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
      */
 
     switch (looking) {
-    case TW_DIRECTORY:
-	dir_check = 1;
-	break;
-
     case TW_ZERO:
 	looking = TW_FILE;
 	break;
@@ -787,6 +797,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
     case TW_ALIAS:
     case TW_SHELLVAR:
     case TW_ENVVAR:
+    case TW_BINDING:
 	break;
 
 
@@ -796,9 +807,23 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
 	break;
 
     case TW_DIRECTORY:
+	dir_check = 1;
+
 #ifdef notyet
+	/*
+	 * This is supposed to expand the directory stack.
+	 * Problems:
+	 * 1. Slow
+	 * 2. directories with the same name
+	 */
 	flags |= TW_DIR_OK;
 #endif
+#ifdef notyet
+	/*
+	 * Supposed to do delayed expansion, but it is inconsistent
+	 * from a user-interface point of view, since it does not
+	 * immediately obey addsuffix
+	 */
 	if ((nd = expand_dir(dir, exp_dir, &dir_fd, command)) != 0)
 	    return nd;
 	if (isadirectory(exp_dir, name)) {
@@ -813,6 +838,9 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat)
 		name[0] = '\0';
 	    }
 	}
+#endif
+	if ((nd = expand_dir(dir, exp_dir, &dir_fd, command)) != 0)
+	    return nd;
 	break;
 
     case TW_FILE:
@@ -873,7 +901,9 @@ again:
 	    /*
 	     * Don't match . files on null prefix match
 	     */
-	    if (name_length == 0 && entry[0] == '.' && !is_set(STRshowdots))
+	    if (showdots == DOT_NOT && (ISDOT(entry) || ISDOTDOT(entry)))
+		done = TRUE;
+	    if (name_length == 0 && entry[0] == '.' && showdots == DOT_NONE)
 		done = TRUE;
 	    break;
 
@@ -915,8 +945,15 @@ again:
 		if (spdir(exp_name, exp_dir, entry, target)) {
 		    if (exec_check && !executable(exp_dir, exp_name, dir_ok)) 
 			break;
+#ifdef notdef
+		    /*
+		     * We don't want to stop immediately, because
+		     * we might find an exact/better match later.
+		     */
 		    d = 0;
 		    done = 1;
+#endif
+		    d = 3;
 		}
 	    }
 	    break;
@@ -942,7 +979,7 @@ again:
 		ptr = tw_item_add(len + 3);
 
 		copyn(ptr, entry, MAXNAMLEN - 2);
-		if (looking == TW_FILE) {
+		if (looking == TW_FILE || looking == TW_DIRECTORY) {
 		    ptr[len++] = filetype(exp_dir, entry);
 		    ptr[len] = '\0';
 		}
@@ -1014,7 +1051,7 @@ again:
 
 	catn(word, exp_name, max_word_length);	/* add extended name */
 
-	if (is_set(STRaddsuffix) && numitems == 1 && !dir_check) 
+	if (is_set(STRaddsuffix) && numitems == 1) 
 	    switch (looking) {
 
 	    case TW_LOGNAME:
@@ -1046,6 +1083,10 @@ again:
 		}
 		break;
 
+	    case TW_DIRECTORY:
+		catn(word, STRslash, max_word_length);
+		break;
+
 	    case TW_COMMAND:
 	    case TW_FILE:
 		if (isadirectory(exp_dir, exp_name))
@@ -1059,6 +1100,7 @@ again:
 	    case TW_SHELLVAR:
 	    case TW_ENVVAR:
 	    case TW_USER:
+	    case TW_BINDING:
 		catn(word, STRspace, max_word_length);
 		break;
 

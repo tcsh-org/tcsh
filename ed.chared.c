@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.chared.c,v 3.18 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/ed.chared.c,v 3.19 1992/01/27 04:20:47 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.18 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.19 1992/01/27 04:20:47 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2595,7 +2595,7 @@ v_substline(c)
 {				/* vi mode replace whole line */
     (void) e_killall(0);
     c_alternativ_key_map(0);
-    return(CC_NORM);
+    return(CC_REFRESH);
 }
 
 /*ARGSUSED*/

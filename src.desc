@@ -62,3 +62,8 @@ tw.parse.c:	All the listing and completion. Tries to tokenize the line
 		commands or not. Then it applies the requested function to
 		the word fragment.
 tw.spell.c:	String spelling correction.
+tw.comp.c:	File completion builtin
+
+OS/Dependent files
+mi.termios.c:	Minix termios emulation
+ma.setp.c:	MACH's setpath() library function

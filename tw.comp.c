@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.comp.c,v 1.1 1992/01/16 13:07:59 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.comp.c,v 1.2 1992/01/27 04:20:47 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.1 1992/01/16 13:07:59 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.2 1992/01/27 04:20:47 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -141,6 +141,9 @@ tw_result(act, pat)
 	    break;
 	case 'c':
 	    looking = TW_COMMAND;
+	    break;
+	case 'b':
+	    looking = TW_BINDING;
 	    break;
 	case '$':
 	    copyn(pat, &act[2], MAXPATHLEN);

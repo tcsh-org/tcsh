@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.22 1992/01/27 04:20:47 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.23 1992/01/28 19:06:06 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.22 1992/01/27 04:20:47 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.23 1992/01/28 19:06:06 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -537,7 +537,7 @@ xgetpass(prm)
 static void
 auto_lock()
 {
-#ifdef NO_CRYPT
+#ifndef NO_CRYPT
 
     int i;
     struct passwd *pw;
