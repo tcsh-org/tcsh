@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.26 2005/03/03 17:01:24 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.print.c,v 3.27 2005/03/03 17:04:02 kim Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.26 2005/03/03 17:01:24 kim Exp $")
+RCSID("$Id: sh.print.c,v 3.27 2005/03/03 17:04:02 kim Exp $")
 
 #include "ed.h"
 
@@ -106,7 +106,7 @@ p2dig(i)
     unsigned int i;
 {
 
-    xprintf("%d%d", i / 10, i % 10);
+    xprintf("%u%u", i / 10, i % 10);
 }
 
 char    linbuf[2048];		/* was 128 */
