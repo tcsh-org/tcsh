@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.bind.c,v 3.11 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.bind.c,v 3.12 1993/01/08 22:23:12 christos Exp christos $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.11 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.12 1993/01/08 22:23:12 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -315,7 +315,7 @@ parsekey(sp)
 	    else if (!strcmp(ts, "delete"))
 		c = '\177';
 	    else {
-		xprintf("bad key specification -- unknown name \"%s\"\n", s);
+		xprintf("bad key specification -- unknown name \"%S\"\n", s);
 		return -1;	/* error */
 	    }
 	}

@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.15 1992/10/10 18:17:34 christos Exp $
+# $Id: complete.tcsh,v 1.16 1993/01/08 22:23:12 christos Exp $
 # example file using the new completion code
 #
 
@@ -151,8 +151,9 @@ if ($?complete) then
 
     # this one is simple...
     #complete rcp c/*:/f/ C@[./]*@f@ n/*/\$hosts/:
-    # From harald: This one will rsh to the file to fetch the list of files!
-    complete rcp 'c%*:%`set q=$:-1;set q="$q:s/:/ /";set q=($q " ");rsh $q[1] ls -dp $q[2]\*`%%' 'C@[./]*@f@' 'n/*/$hosts/:'
+    # From Michael Schroeder: 
+    # This one will rsh to the file to fetch the list of files!
+    complete rcp 'c%*:%`set q=$:-0;set q="$q:s/:/ /";set q=($q " ");rsh $q[1] ls -dp $q[2]\*`%%' 'C@[./]*@f@' 'n/*/$hosts/:'
 
 
     complete dd c/if=/f/ c/of=/f/ \

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.dir.c,v 3.19 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.20 1992/10/10 18:17:34 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.19 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.20 1992/10/10 18:17:34 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -868,7 +868,7 @@ dcanon(cp, p)
 	     */
 	    *--sp = 0;		/* form the pathname for readlink */
 #ifdef S_IFLNK			/* if we have symlinks */
-	    if (sp != cp && symlinks != SYM_IGNORE &&
+	    if (sp != cp && /* symlinks != SYM_IGNORE && */
 		(cc = readlink(short2str(cp), tlink,
 			       sizeof tlink)) >= 0) {
 		(void) Strcpy(link, str2short(tlink));

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.39 1992/11/13 04:19:10 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.40 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.39 1992/11/13 04:19:10 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.40 1993/01/08 22:23:12 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1912,14 +1912,12 @@ pfork(t, wanttty)
 	     */
 	    pgrp = pcurrjob ? pcurrjob->p_jobid : pid;
 	    if (setpgid(pid, pgrp) == -1 && errno == EPERM) {
-		if (pcurrjob) {
-		    pflush(pcurrjob);
-		    pcurrjob = NULL;
-		}
-		if (mygetpgrp() != pid && setpgid(pid, pgrp = pid) == -1) {
-		    stderror(ERR_SYSTEM, "setpgid parent:", strerror(errno));
-		    xexit(0);
-		}
+		pcurrjob = NULL;
+		/* 
+		 * We don't care if this causes an error here;
+		 * then we are already in the right process group
+		 */
+		(void) setpgid(pid, pgrp = pid);
 	    }
 	}
 #endif /* POSIXJOBS */

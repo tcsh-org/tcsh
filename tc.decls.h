@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.decls.h,v 3.20 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.decls.h,v 3.21 1992/10/14 20:19:19 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -192,10 +192,10 @@ extern	int		  getv		__P((Char *));
 /*
  * tc.printf.h
  */
-extern	void		  xprintf	__P((char *, ...));
-extern	void		  xsprintf	__P((char *, char *, ...));
-extern	void		  xvprintf	__P((char *, va_list));
-extern	void		  xvsprintf	__P((char *, char *, va_list));
+extern	pret_t		  xprintf	__P((const char *, ...));
+extern	pret_t		  xsprintf	__P((char *, const char *, ...));
+extern	pret_t		  xvprintf	__P((const char *, va_list));
+extern	pret_t		  xvsprintf	__P((char *, const char *, va_list));
 
 /*
  * tc.prompt.c

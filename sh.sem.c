@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.24 1992/10/14 20:19:19 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.sem.c,v 3.25 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.24 1992/10/14 20:19:19 christos Exp christos $")
+RCSID("$Id: sh.sem.c,v 3.25 1993/01/08 22:23:12 christos Exp $")
 
 #include "tc.h"
 
@@ -229,7 +229,7 @@ execute(t, wanttty, pipein, pipeout)
 	     * Check if we have a builtin function and remember which one.
 	     */
 	    _gv.bifunc = isbfunc(t);
- 	    if (noexec) {
+ 	    if (noexec && _gv.bifunc) {
 		/*
 		 * Continue for builtins that are part of the scripting language
 		 */

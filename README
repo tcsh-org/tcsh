@@ -123,6 +123,8 @@ Or: Compile -DSYSMALLOC
 
 ***************************************************************************
 
+From: Scott Krotz <krotz@honey.rtsg.mot.com>
+
 Tcsh has been ported to minix by  Scott Krotz (krotz@honey.rtsg.mot.com).
 Unfortunately the minix sed is broken, so you'll have to find a way to
 make tc.const.h, sh.err.h, ed.defns.h which are automatically generated.
@@ -152,11 +154,11 @@ my attention also.
 
 Have fun!
 
-Scott Krotz
-
 ps.  The termios functions are provided by Magnus Doell and Bruce Evans.
      Thanks, guys!
 
+
+From: Bob Byrnes <byrnes@ee.cornell.edu>
 
 This is for minix 1.5 (straight out of the box from P-H) plus the i386
 patches from Bruce Evans.
@@ -181,4 +183,3 @@ I can make the binary available to anyone who wants it (for example people
 who can't get access to a cross-compiling environment, and who don't yet
 have gcc running under minix).
 
-Bob Byrnes (byrnes@ee.cornell.edu)

@@ -1,4 +1,22 @@
 V6.04.00, ...
+ 23. 6.03.02 12/02/93
+ 22. Protected all include files to avoid warnings from lcc.
+ 21. Finally resolved the job control problems with linux and ISC (from Beto)
+ 20. More HUP,XFSZ,XCPU fixes. (with Beto)
+ 19. Dcanon would not canonicalize correctly in case where dnormalize()
+     failed to find a directory, but the directory existed when not 
+     crossing the symbolic link.
+ 18. sh.init.c fixes; give 65 signals for all POSIX machines.
+ 17. AMS mail fixes and cmu wm handling.
+ 16. Setenv would not ignore trim quoted names...
+     > alias foo 'setenv "\!:1" bar'
+     > setenv FOO 123
+     > foo FOO
+     > printenv
+     ...
+     FOO=123
+     FOO=bar
+     ...
  15. 6.03.01 08/01/93
  14. #undef SHORT_STRINGS gcc warning fixes...
  13. csh bug fix in foreach [quoteing problem]

@@ -49,6 +49,8 @@ OS	:	hpux 6.5, 7.0.x, 8.0
 CONFIG	:	config.hpux
 ENVIRON	:	n/a
 NOTES	:	Don't use -lBSD; breaks getpgrp(). Config.hp-3.2 obsolete?
+	:	Some versions of the compiler are broken with -O3. Try 'ls *'
+	:	If it does not work, lower the optimization level...
 VERSION	:	6.00.04
 
 VENDOR	:	hp

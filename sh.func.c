@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.42 1992/11/13 04:19:10 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.43 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.42 1992/11/13 04:19:10 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.43 1993/01/08 22:23:12 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1413,9 +1413,8 @@ tsetenv(name, val)
     Char   *blk[2];
     Char  **oep = ep;
 
-
     for (; *ep; ep++) {
-	for (cp = name, dp = *ep; *cp && *cp == *dp; cp++, dp++)
+	for (cp = name, dp = *ep; *cp && (*cp & TRIM) == *dp; cp++, dp++)
 	    continue;
 	if (*cp != 0 || *dp != '=')
 	    continue;
@@ -1503,11 +1502,11 @@ doumask(v, c)
 #   define toset(a) ((a) + 1)
 #  endif /* aiws */
 # else /* BSDLIMIT */
-#  if defined(BSD4_4) && !defined(__386BSD__)
+#  if defined(BSD4_4) && !defined(__386BSD__) && !defined(bsdi)
     typedef quad_t RLIM_TYPE;
 #  else
     typedef int RLIM_TYPE;
-#  endif /* BSD4_4 && !__386BSD__ */
+#  endif /* BSD4_4 && !__386BSD__ && !defined(bsdi) */
 # endif /* BSDLIMIT */
 
 # if defined(hpux) && defined(BSDLIMIT)

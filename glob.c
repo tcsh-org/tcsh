@@ -144,15 +144,6 @@ static	void	 qprintf	__P((Char *));
  *            POSIX specifies that they should be ignored in directories.
  */
 
-/*
- * For operating systems with single case filenames (OS/2)
- */
-#ifdef CASE_INSENSITIVE
-# define samecase(x) (isupper(x) ? tolower(x) : (x))
-#else
-# define samecase(x) (x)
-#endif /* CASE_INSENSITIVE */
-
 static DIR *
 Opendir(str)
     register Char *str;

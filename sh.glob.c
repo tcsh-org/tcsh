@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.glob.c,v 3.28 1992/10/27 16:18:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.glob.c,v 3.29 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.28 1992/10/27 16:18:15 christos Exp christos $")
+RCSID("$Id: sh.glob.c,v 3.29 1993/01/08 22:23:12 christos Exp $")
 
 #include "tc.h"
 
@@ -1083,7 +1083,7 @@ sortscmp(a, b)
     if (!*b)
 	return (-1);
 
-    return (int) collate(a, b);
+    return (int) collate(*a, *b);
 }
 
 #endif

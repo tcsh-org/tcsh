@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.init.c,v 3.24 1992/11/20 08:56:38 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.init.c,v 3.25 1993/01/08 22:23:12 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.24 1992/11/20 08:56:38 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.25 1993/01/08 22:23:12 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -48,155 +48,155 @@ RCSID("$Id: sh.init.c,v 3.24 1992/11/20 08:56:38 christos Exp $")
 #define	INF	0x7fffffff
 
 struct	biltins bfunc[] = {
-    { ":",		dozip,		0,	INF, },
-    { "@",		dolet,		0,	INF, },
-    { "alias",		doalias,	0,	INF, },
-    { "aliases",	doaliases,	0,	1, /* PWP */ },
-    { "alloc",		showall,	0,	1, },
-    { "bg",		dobg,		0,	INF, },
-    { "bind",		dobind,		0,	2, },
-    { "bindkey",	dobindkey,	0,	8, },
-    { "break",		dobreak,	0,	0, },
-    { "breaksw",	doswbrk,	0,	0, },
-    { "builtins", dobuiltins,	0,	0, },
+    { ":",		dozip,		0,	INF	},
+    { "@",		dolet,		0,	INF	},
+    { "alias",		doalias,	0,	INF	},
+    { "aliases",	doaliases,	0,	1,	},
+    { "alloc",		showall,	0,	1	},
+    { "bg",		dobg,		0,	INF	},
+    { "bind",		dobind,		0,	2	},
+    { "bindkey",	dobindkey,	0,	8	},
+    { "break",		dobreak,	0,	0	},
+    { "breaksw",	doswbrk,	0,	0	},
+    { "builtins",	dobuiltins,	0,	0	},
 #if defined(IIASA) || defined(KAI)
-    { "bye",		goodbye,	0,	0, },
+    { "bye",		goodbye,	0,	0	},
 #endif
-    { "case",		dozip,		0,	1, },
-    { "cd",		dochngd,	0,	INF, },
-    { "chdir",		dochngd,	0,	INF, },
-    { "complete",	docomplete,	0,	INF, },
-    { "continue",	docontin,	0,	0, },
-    { "default",	dozip,		0,	0, },
-    { "dirs",		dodirs,		0,	INF, },
-    { "echo",		doecho,		0,	INF, },
-    { "echotc",		doechotc,	0,	INF, },
-    { "else",		doelse,		0,	INF, },
-    { "end",		doend,		0,	0, },
-    { "endif",		dozip,		0,	0, },
-    { "endsw",		dozip,		0,	0, },
-    { "eval",		doeval,		0,	INF, },
-    { "exec",		execash,	1,	INF, },
-    { "exit",		doexit,		0,	INF, },
-    { "fg",		dofg,		0,	INF, },
-    { "foreach",	doforeach,	3,	INF, },
+    { "case",		dozip,		0,	1	},
+    { "cd",		dochngd,	0,	INF	},
+    { "chdir",		dochngd,	0,	INF	},
+    { "complete",	docomplete,	0,	INF	},
+    { "continue",	docontin,	0,	0	},
+    { "default",	dozip,		0,	0	},
+    { "dirs",		dodirs,		0,	INF	},
+    { "echo",		doecho,		0,	INF	},
+    { "echotc",		doechotc,	0,	INF	},
+    { "else",		doelse,		0,	INF	},
+    { "end",		doend,		0,	0	},
+    { "endif",		dozip,		0,	0	},
+    { "endsw",		dozip,		0,	0	},
+    { "eval",		doeval,		0,	INF	},
+    { "exec",		execash,	1,	INF	},
+    { "exit",		doexit,		0,	INF	},
+    { "fg",		dofg,		0,	INF	},
+    { "foreach",	doforeach,	3,	INF	},
 #ifdef TCF
-    { "getspath",	dogetspath,	0,	0, },
-    { "getxvers",	 dogetxvers,	0,	0, },
+    { "getspath",	dogetspath,	0,	0	},
+    { "getxvers",	dogetxvers,	0,	0	},
 #endif /* TCF */
 #ifdef IIASA
-    { "gd",		dopushd,	0,	INF, },
+    { "gd",		dopushd,	0,	INF	},
 #endif
-    { "glob",		doglob,		0,	INF, },
-    { "goto",		dogoto,		1,	1, },
+    { "glob",		doglob,		0,	INF	},
+    { "goto",		dogoto,		1,	1	},
 #ifdef VFORK
-    { "hashstat",	hashstat,	0,	0, },
+    { "hashstat",	hashstat,	0,	0	},
 #endif
-    { "history",	dohist,		0,	2, },
-    { "if",		doif,		1,	INF, },
+    { "history",	dohist,		0,	2	},
+    { "if",		doif,		1,	INF	},
 #ifdef apollo
-    { "inlib", 		doinlib,	1,	INF, },
+    { "inlib", 		doinlib,	1,	INF	},
 #endif
-    { "jobs",		dojobs,		0,	1, },
-    { "kill",		dokill,		1,	INF, },
+    { "jobs",		dojobs,		0,	1	},
+    { "kill",		dokill,		1,	INF	},
 #ifndef HAVENOLIMIT
-    { "limit",		dolimit,	0,	3, },
+    { "limit",		dolimit,	0,	3	},
 #endif /* ! HAVENOLIMIT */
-    { "linedit",	doecho,		0,	INF, },
+    { "linedit",	doecho,		0,	INF	},
 #if !defined(HAVENOUTMP) && !defined(KAI)
-    { "log",		dolog,		0,	0, },
+    { "log",		dolog,		0,	0	},
 #endif /* !HAVENOUTMP && !KAI */
-    { "login",		dologin,	0,	1, },
-    { "logout",		dologout,	0,	0, },
-    { "ls-F",		dolist,		0,	INF, },
+    { "login",		dologin,	0,	1	},
+    { "logout",		dologout,	0,	0	},
+    { "ls-F",		dolist,		0,	INF	},
 #ifdef TCF
-    { "migrate",	domigrate,	1,	INF, },
+    { "migrate",	domigrate,	1,	INF	},
 #endif /* TCF */
 #ifdef NEWGRP
-    { "newgrp",		donewgrp,	1,	2, },
+    { "newgrp",		donewgrp,	1,	2	},
 #endif
-    { "nice",		donice,		0,	INF, },
-    { "nohup",		donohup,	0,	INF, },
-    { "notify",		donotify,	0,	INF, },
-    { "onintr",		doonintr,	0,	2, },
-    { "popd",		dopopd,		0,	INF, },
-    { "printenv",	doprintenv,	0,	1, },
-    { "pushd",		dopushd,	0,	INF, },
+    { "nice",		donice,		0,	INF	},
+    { "nohup",		donohup,	0,	INF	},
+    { "notify",		donotify,	0,	INF	},
+    { "onintr",		doonintr,	0,	2	},
+    { "popd",		dopopd,		0,	INF	},
+    { "printenv",	doprintenv,	0,	1	},
+    { "pushd",		dopushd,	0,	INF	},
 #ifdef IIASA
-    { "rd",		dopopd,		0,	INF, },
+    { "rd",		dopopd,		0,	INF	},
 #endif
-    { "rehash",		dohash,		0,	3, },
-    { "repeat",		dorepeat,	2,	INF, },
+    { "rehash",		dohash,		0,	3	},
+    { "repeat",		dorepeat,	2,	INF	},
 #ifdef apollo
-    { "rootnode",	dorootnode,	1,	1, },
+    { "rootnode",	dorootnode,	1,	1	},
 #endif
-    { "sched",		dosched,	0,	INF, },
-    { "set",		doset,		0,	INF, },
-    { "setenv",		dosetenv,	0,	2, },
+    { "sched",		dosched,	0,	INF	},
+    { "set",		doset,		0,	INF	},
+    { "setenv",		dosetenv,	0,	2	},
 #ifdef MACH
-    { "setpath",	dosetpath,	0,	INF, },
+    { "setpath",	dosetpath,	0,	INF	},
 #endif	/* MACH */
 #ifdef TCF
-    { "setspath",	dosetspath,	1,	INF, },
+    { "setspath",	dosetspath,	1,	INF	},
 #endif /* TCF */
-    { "settc",		dosettc,	2,	2, },
-    { "setty", 		dosetty,	0,      INF },
+    { "settc",		dosettc,	2,	2	},
+    { "setty", 		dosetty,	0,      INF	},
 #ifdef TCF
-    { "setxvers",	dosetxvers,	0,	1, },
+    { "setxvers",	dosetxvers,	0,	1	},
 #endif /* TCF */
-    { "shift",		shift,		0,	1, },
-    { "source",		dosource,	1,	INF, },
-    { "stop",		dostop,		1,	INF, },
-    { "suspend",	dosuspend,	0,	0, },
-    { "switch",		doswitch,	1,	INF, },
-    { "telltc",		dotelltc,	0,	INF, },
-    { "time",		dotime,		0,	INF, },
-    { "umask",		doumask,	0,	1, },
-    { "unalias",	unalias,	1,	INF, },
-    { "uncomplete",	douncomplete,	1,	INF, },
-    { "unhash",		dounhash,	0,	0, },
+    { "shift",		shift,		0,	1	},
+    { "source",		dosource,	1,	INF	},
+    { "stop",		dostop,		1,	INF	},
+    { "suspend",	dosuspend,	0,	0	},
+    { "switch",		doswitch,	1,	INF	},
+    { "telltc",		dotelltc,	0,	INF	},
+    { "time",		dotime,		0,	INF	},
+    { "umask",		doumask,	0,	1	},
+    { "unalias",	unalias,	1,	INF	},
+    { "uncomplete",	douncomplete,	1,	INF	},
+    { "unhash",		dounhash,	0,	0	},
 #ifdef masscomp
-    { "universe",	douniverse,	0,	1, },
+    { "universe",	douniverse,	0,	1	},
 #endif
 #ifndef HAVENOLIMIT
-    { "unlimit",	dounlimit,	0,	INF, },
+    { "unlimit",	dounlimit,	0,	INF	},
 #endif /* !HAVENOLIMIT */
-    { "unset",		unset,		1,	INF, },
-    { "unsetenv",	dounsetenv,	1,	INF, },
+    { "unset",		unset,		1,	INF	},
+    { "unsetenv",	dounsetenv,	1,	INF	},
 #ifdef apollo
-    { "ver",		dover,		0,	INF, },
+    { "ver",		dover,		0,	INF	},
 #endif
-    { "wait",		dowait,		0,	0, },
+    { "wait",		dowait,		0,	0	},
 #ifdef WARP
-    { "warp",		dowarp,		0,	2, },
+    { "warp",		dowarp,		0,	2	},
 #endif
 #if !defined(HAVENOUTMP) && defined(KAI)
-    { "watchlog",	dolog,		0,	0, },
+    { "watchlog",	dolog,		0,	0	},
 #endif /* !HAVENOUTMP && KAI */
-    { "where",		dowhere,	1,	INF, },
-    { "which",		dowhich,	1,	INF, },
-    { "while",		dowhile,	1,	INF, },
+    { "where",		dowhere,	1,	INF	},
+    { "which",		dowhich,	1,	INF	},
+    { "while",		dowhile,	1,	INF	}
 };
 int nbfunc = sizeof bfunc / sizeof *bfunc;
 
 struct srch srchn[] = {
-    { "@",		TC_LET, },
-    { "break",		TC_BREAK, },
-    { "breaksw",	TC_BRKSW, },
-    { "case",		TC_CASE, },
-    { "default", 	TC_DEFAULT, },
-    { "else",		TC_ELSE, },
-    { "end",		TC_END, },
-    { "endif",		TC_ENDIF, },
-    { "endsw",		TC_ENDSW, },
-    { "exit",		TC_EXIT, },
-    { "foreach", 	TC_FOREACH, },
-    { "goto",		TC_GOTO, },
-    { "if",		TC_IF, },
-    { "label",		TC_LABEL, },
-    { "set",		TC_SET, },
-    { "switch",		TC_SWITCH, },
-    { "while",		TC_WHILE, },
+    { "@",		TC_LET		},
+    { "break",		TC_BREAK	},
+    { "breaksw",	TC_BRKSW	},
+    { "case",		TC_CASE		},
+    { "default", 	TC_DEFAULT	},
+    { "else",		TC_ELSE		},
+    { "end",		TC_END		},
+    { "endif",		TC_ENDIF	},
+    { "endsw",		TC_ENDSW	},
+    { "exit",		TC_EXIT		},
+    { "foreach", 	TC_FOREACH	},
+    { "goto",		TC_GOTO		},
+    { "if",		TC_IF		},
+    { "label",		TC_LABEL	},
+    { "set",		TC_SET		},
+    { "switch",		TC_SWITCH	},
+    { "while",		TC_WHILE	}
 };
 int nsrchn = sizeof srchn / sizeof *srchn;
 
@@ -214,13 +214,13 @@ int nsrchn = sizeof srchn / sizeof *srchn;
 /*
  * Note: For some machines, (hpux eg.)
  * NSIG = number of signals + 1...
- * so we define 33 signals for 
+ * so we define 33 or 65 (POSIX) signals for 
  * everybody
  */
 struct	mesg mesg[] = {
 /*  0 */	{ 0,		""			},
 /*  1 */	{ "HUP",	"Hangup"		},
-/*  2 */	{ "INT",	"Interrupt",		},
+/*  2 */	{ "INT",	"Interrupt"		},
 /*  3 */	{ "QUIT",	"Quit"			},
 /*  4 */	{ "ILL",	"Illegal instruction"	},
 /*  5 */	{ "TRAP",	"Trace/BPT trap"	},
@@ -315,42 +315,11 @@ struct	mesg mesg[] = {
 /* 30 */	{ 0, 		"Signal 30"		},
 /* 31 */	{ 0, 		"Signal 31"		},
 /* 32 */	{ 0, 		"Signal 32"		},
-/* 33 */	{ 0,		"Signal 33"		},
-/* 34 */	{ 0,		"Signal 34"		},
-/* 35 */	{ 0,		"Signal 35"		},
-/* 36 */	{ 0,		"Signal 36"		},
-/* 37 */	{ 0,		"Signal 37"		},
-/* 38 */	{ 0,		"Signal 38"		},
-/* 39 */	{ 0,		"Signal 39"		},
-/* 40 */	{ 0,		"Signal 40"		},
-/* 41 */	{ 0,		"Signal 41"		},
-/* 42 */	{ 0,		"Signal 42"		},
-/* 43 */	{ 0,		"Signal 43"		},
-/* 44 */	{ 0,		"Signal 44"		},
-/* 45 */	{ 0,		"Signal 45"		},
-/* 46 */	{ 0,		"Signal 46"		},
-/* 47 */	{ 0,		"Signal 47"		},
-/* 48 */	{ 0,		"Signal 48"		},
-/* 49 */	{ 0,		"Signal 49"		},
-/* 50 */	{ 0,		"Signal 50"		},
-/* 51 */	{ 0,		"Signal 51"		},
-/* 52 */	{ 0,		"Signal 52"		},
-/* 53 */	{ 0,		"Signal 53"		},
-/* 54 */	{ 0,		"Signal 54"		},
-/* 55 */	{ 0,		"Signal 55"		},
-/* 56 */	{ 0,		"Signal 56"		},
-/* 57 */	{ 0,		"Signal 57"		},
-/* 58 */	{ 0,		"Signal 58"		},
-/* 59 */	{ 0,		"Signal 59"		},
-/* 60 */	{ 0,		"Signal 60"		},
-/* 61 */	{ 0,		"Signal 61"		},
-/* 62 */	{ 0,		"Signal 62"		},
-/* 63 */	{ 0,	    	"Signal 63"		},
-/* 64 */	{ 0,		"Signal 64"		},
 # endif /* _CRAYCOM */
 
 # if defined(cray) && !defined(_CRAYCOM)
 # define _sigextra_
+# define _64sig_
 /* 16 */	{ "IO",		"Input/output possible signal"},
 /* 17 */	{ "URG",	"Urgent condition on I/O channel"},
 /* 18 */	{ "CHLD",	"Child exited"		},
@@ -623,6 +592,7 @@ struct	mesg mesg[] = {
 
 # if defined(m88k) || defined(__m88k__)	/* Motorola 88100: POSIX/BCS signals */
 #  define _sigextra_
+#  define _64sig_
 /* 20 */	{ "WINCH", 	"Window changed"	},
 /* 21 */	{ 0,		"Signal 21"		},
 /* 22 */	{ "POLL", 	"Stream I/O pending"	},
@@ -672,6 +642,7 @@ struct	mesg mesg[] = {
 
 # ifdef IBMAIX
 #  define _sigextra_
+#  define _64sig_
 /* 16 */	{ "URG",	"Urgent condition on IO channel"},
 /* 17 */	{ "STOP",	MSG_STOP		},
 /* 18 */	{ "TSTP",	MSG_TSTP		},
@@ -777,10 +748,10 @@ struct	mesg mesg[] = {
 /* 26 */	{ 0,		"Signal 26"		},
 /* 27 */	{ 0,		"Signal 27"		},
 /* 28 */	{ 0,		"Signal 28"		},
-/* 29 */	{ 0,		"Signal 29"	},
-/* 30 */	{ 0,		"Signal 30"	},
-/* 31 */	{ 0,		"Signal 31"	},
-/* 32 */	{ 0,		"Signal 32"	},
+/* 29 */	{ 0,		"Signal 29"		},
+/* 30 */	{ 0,		"Signal 30"		},
+/* 31 */	{ 0,		"Signal 31"		},
+/* 32 */	{ 0,		"Signal 32"		},
 # endif /* _sigextra_ */
 
 #else /* bsd */
@@ -801,7 +772,7 @@ struct	mesg mesg[] = {
 /* 23 */	{ "TSTP",	MSG_TSTP		},
 /* 24 */	{ "TTIN", 	MSG_TTIN		},
 /* 25 */	{ "TTOU", 	MSG_TTOU		},
-/* 26 */        "DEBUG",        "Signaling SS$_DEBUG"	},
+/* 26 */        { "DEBUG",	"Signaling SS$_DEBUG"	},
 # else /* BSD */
 /* 16 */	{ "URG",	"Urgent condition on IO channel"},
 /* 17 */	{ "STOP",	MSG_STOP		},
@@ -853,43 +824,11 @@ struct	mesg mesg[] = {
 # ifndef _sigextra_
 #  ifdef Lynx
 #   define _sigextra_
-/* 28 */	"WINCH", 	"Window changed",
-/* 29 */	0,		"Signal 29",	
-/* 30 */	0,		"Signal 30",	
-/* 31 */	"USR1",		"User signal 1",	
-/* 32 */	"PRIO",		"Priority changed",
-/* 33 */	0,		"Signal 33",
-/* 34 */	0,		"Signal 34",
-/* 35 */	0,		"Signal 35",
-/* 36 */	0,		"Signal 36",
-/* 37 */	0,		"Signal 37",
-/* 38 */	0,		"Signal 38",
-/* 39 */	0,		"Signal 39",
-/* 40 */	0,		"Signal 40",
-/* 41 */	0,		"Signal 41",
-/* 42 */	0,		"Signal 42",
-/* 43 */	0,		"Signal 43",
-/* 44 */	0,		"Signal 44",
-/* 45 */	0,		"Signal 45",
-/* 46 */	0,		"Signal 46",
-/* 47 */	0,		"Signal 47",
-/* 48 */	0,		"Signal 48",
-/* 49 */	0,		"Signal 49",
-/* 50 */	0,		"Signal 50",
-/* 51 */	0,		"Signal 51",
-/* 52 */	0,		"Signal 52",
-/* 53 */	0,		"Signal 53",
-/* 54 */	0,		"Signal 54",
-/* 55 */	0,		"Signal 55",
-/* 56 */	0,		"Signal 56",
-/* 57 */	0,		"Signal 57",
-/* 58 */	0,		"Signal 58",
-/* 59 */	0,		"Signal 59",
-/* 60 */	0,		"Signal 60",
-/* 61 */	0,		"Signal 61",
-/* 62 */	0,		"Signal 62",
-/* 63 */	0,		"Signal 63",
-/* 64 */	0,		"Signal 64",
+/* 28 */	{ "WINCH", 	"Window changed"	},
+/* 29 */	{ 0,		"Signal 29"		},
+/* 30 */	{ 0,		"Signal 30"		},
+/* 31 */	{ "USR1",	"User signal 1"		},
+/* 32 */	{ "PRIO",	"Priority changed"	},
 #  endif /* Lynx */
 # endif /* _sigextra_ */
 
@@ -903,10 +842,45 @@ struct	mesg mesg[] = {
 
 #endif /* (SYSVREL > 0) || DGUX || IBMAIX */
 
+#if defined(POSIX) && !defined(_64sig_)
+/* 33 */	{ 0,		"Signal 33"		},
+/* 34 */	{ 0,		"Signal 34"		},
+/* 35 */	{ 0,		"Signal 35"		},
+/* 36 */	{ 0,		"Signal 36"		},
+/* 37 */	{ 0,		"Signal 37"		},
+/* 38 */	{ 0,		"Signal 38"		},
+/* 39 */	{ 0,		"Signal 39"		},
+/* 40 */	{ 0,		"Signal 40"		},
+/* 41 */	{ 0,		"Signal 41"		},
+/* 42 */	{ 0,		"Signal 42"		},
+/* 43 */	{ 0,		"Signal 43"		},
+/* 44 */	{ 0,		"Signal 44"		},
+/* 45 */	{ 0,		"Signal 45"		},
+/* 46 */	{ 0,		"Signal 46"		},
+/* 47 */	{ 0,		"Signal 47"		},
+/* 48 */	{ 0,		"Signal 48"		},
+/* 49 */	{ 0,		"Signal 49"		},
+/* 50 */	{ 0,		"Signal 50"		},
+/* 51 */	{ 0,		"Signal 51"		},
+/* 52 */	{ 0,		"Signal 52"		},
+/* 53 */	{ 0,		"Signal 53"		},
+/* 54 */	{ 0,		"Signal 54"		},
+/* 55 */	{ 0,		"Signal 55"		},
+/* 56 */	{ 0,		"Signal 56"		},
+/* 57 */	{ 0,		"Signal 57"		},
+/* 58 */	{ 0,		"Signal 58"		},
+/* 59 */	{ 0,		"Signal 59"		},
+/* 60 */	{ 0,		"Signal 60"		},
+/* 61 */	{ 0,		"Signal 61"		},
+/* 62 */	{ 0,		"Signal 62"		},
+/* 63 */	{ 0,	    	"Signal 63"		},
+/* 64 */	{ 0,		"Signal 64"		},
+#endif /* POSIX && ! _64sig_ */
+
+#ifdef POSIX
 /* These are here for systems with bad NSIG */
-#ifndef POSIX
-/* 33 */	{ 0,		"Signal 33"		}
-#else /* POSIX */
 /* 65 */	{ 0,		"Signal 65"		}
+#else /* !POSIX */
+/* 33 */	{ 0,		"Signal 33"		}
 #endif /* POSIX */
 };

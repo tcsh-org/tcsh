@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.41 1992/11/13 04:19:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.c,v 3.42 1993/01/08 22:23:12 christos Exp christos $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,9 +41,9 @@
 char    copyright[] =
 "@(#) Copyright (c) 1991 The Regents of the University of California.\n\
  All rights reserved.\n";
-#endif				/* not lint */
+#endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.41 1992/11/13 04:19:10 christos Exp christos $")
+RCSID("$Id: sh.c,v 3.42 1993/01/08 22:23:12 christos Exp christos $")
 
 #include "tc.h"
 #include "ed.h"
@@ -84,9 +84,12 @@ extern bool NoNLSRebind;
 
 jmp_buf_t reslab;
 
+sigret_t (*parintr) () = 0;	/* Parents interrupt catch */
+sigret_t (*parterm) () = 0;	/* Parents terminate catch */
+
 #ifdef TESLA
 int do_logout;
-#endif				/* TESLA */
+#endif /* TESLA */
 
 
 #ifdef convex
@@ -108,6 +111,7 @@ bool    tellwhat = 0;
 time_t  t_period;
 Char  *ffile = NULL;
 static time_t  chktim;		/* Time mail last checked */
+
 
 extern char **environ;
 
@@ -225,8 +229,10 @@ main(argc, argv)
 
 #ifdef _VMS_POSIX
     /* No better way to find if we are a login shell */
-    if (!loginsh) 
+    if (!loginsh) {
 	loginsh = (argc == 1 && getppid() == 1);
+	**tempv = '-';	/* Avoid giving VMS an acidic stomach */
+    }
 #endif /* _VMS_POSIX */
 
     if (loginsh && **tempv != '-') {
@@ -499,10 +505,11 @@ main(argc, argv)
      * xterm, so we are going to want to edit. Unfortunately emacs
      * does not restore all the tty modes, so xterm is not very well
      * set up. But this is not the shell's fault.
+     * Also don't edit if $TERM == wm, for when we're running under an ATK app.
      */
     if ((tcp = getenv("TERM")) != NULL) {
 	set(STRterm, quote(SAVE(tcp)));
-	editing = (strcmp(tcp, "emacs") != 0);
+	editing = (strcmp(tcp, "emacs") != 0 && strcmp(tcp, "wm") != 0);
     }
     else 
 	editing = ((tcp = getenv("EMACS")) == NULL || strcmp(tcp, "t") != 0);
@@ -565,6 +572,11 @@ main(argc, argv)
      * only if we are the login shell.
      */
 #ifdef BSDSIGS
+    /* 
+     * PURIFY-2 claims that osv does not get 
+     * initialized after the sigvec call
+     */
+    setzero((char*) &osv, sizeof(osv));
     /* parents interruptibility */
     (void) mysigvec(SIGINT, NULL, &osv);
     parintr = (sigret_t(*) ()) osv.sv_handler;
@@ -587,19 +599,6 @@ main(argc, argv)
 
 #endif /* BSDSIGS */
 
-    /* No reason I can see not to save history on all these events..
-     * Most usual occurrence is in a window system, where we're not a login
-     * shell, but might as well be... (sg)
-     * But there might be races when lots of shells exit together...
-     * [this is also incompatible].
-     */
-    (void) signal(SIGHUP, phup);	/* exit processing on HUP */
-#ifdef SIGXCPU
-    (void) signal(SIGXCPU, phup);	/* ...and on XCPU */
-#endif
-#ifdef SIGXFSZ
-    (void) signal(SIGXFSZ, phup);	/* ...and on XFSZ */
-#endif
 
 #ifdef TCF
     /* Enable process migration on ourselves and our progeny */
@@ -855,12 +854,39 @@ main(argc, argv)
     shpgrp = mygetpgrp();
     opgrp = tpgrp = -1;
     if (setintr) {
+	sigret_t (*osig)();
 	**argv = '-';
 	if (!quitit)		/* Wary! */
 	    (void) signal(SIGQUIT, SIG_IGN);
 	(void) sigset(SIGINT, pintr);
 	(void) sighold(SIGINT);
 	(void) signal(SIGTERM, SIG_IGN);
+
+	/* 
+	 * No reason I can see not to save history on all these events..
+	 * Most usual occurrence is in a window system, where we're not a login
+	 * shell, but might as well be... (sg)
+	 * But there might be races when lots of shells exit together...
+	 * [this is also incompatible].
+	 * We have to be mre careful here. If the parent wants to 
+	 * ignore the signals then we leave them untouched...
+	 * We also only setup the handlers for shells that are trully
+	 * interactive.
+	 */
+	osig = signal(SIGHUP, phup);	/* exit processing on HUP */
+	if (osig == SIG_IGN)
+	    (void) signal(SIGHUP, osig);
+#ifdef SIGXCPU
+	osig = signal(SIGXCPU, phup);	/* exit processing on XCPU */
+	if (osig == SIG_IGN)
+	    (void) signal(SIGXCPU, osig);
+#endif
+#ifdef SIGXFSZ
+	osig = signal(SIGXFSZ, phup);	/* exit processing on XFSZ */
+	if (osig == SIG_IGN)
+	    (void) signal(SIGXFSZ, osig);
+#endif
+
 	if (quitit == 0 && arginp == 0) {
 #ifdef SIGTSTP
 	    (void) signal(SIGTSTP, SIG_IGN);
@@ -1466,10 +1492,8 @@ int snum;
      */
     {
 	struct process *pp, *np;
-	int foregnd;
 
 	for (pp = proclist.p_next; pp; pp = pp->p_next) {
-	    foregnd = 0;
 	    np = pp;
 	    /* 
 	     * Find if this job is in the foreground. It could be that
@@ -1477,15 +1501,19 @@ int snum;
 	     * is cleared for it.
 	     */
 	    do
-		if ((np->p_flags & PFOREGND) != 0) {
-		    foregnd = 1;
+		/*
+		 * If a process is in the foreground; we try to kill
+		 * it's process group. If we succeed, then the 
+		 * whole job is gone. Otherwise we keep going...
+		 * But avoid sending HUP to the shell again.
+		 */
+		if ((np->p_flags & PFOREGND) != 0 && np->p_jobid == shpgrp &&
+		    killpg(np->p_jobid, SIGHUP) != -1) {
+		    /* In case the job was suspended... */
+		    (void) killpg(np->p_jobid, SIGCONT);
 		    break;
 		}
 	    while ((np = np->p_friends) != pp);
-
-	    /* Kill the leader of the foreground job */
-	    if (foregnd && pp->p_procid == pp->p_jobid)
-		(void) killpg (pp->p_jobid, SIGHUP);
 	}
     }
 #endif /* POSIXJOBS */
@@ -1855,6 +1883,16 @@ dosource(t, c)
  * knows, since the login program insists on saying
  * "You have mail."
  */
+
+/*
+ * The AMS version.
+ * This version checks if the file is a directory, and if so,
+ * tells you the number of files in it, otherwise do the old thang.
+ * The magic "+1" in the time calculation is to compensate for
+ * an AFS bug where directory mtimes are set to 1 second in
+ * the future.
+ */
+
 static void
 mailchk()
 {
@@ -1877,21 +1915,54 @@ mailchk()
     if (chktim + intvl > t)
 	return;
     for (; *vp; vp++) {
-	if (stat(short2str(*vp), &stb) < 0)
+	char *filename = short2str(*vp);
+
+	if (stat(filename, &stb) < 0)
 	    continue;
 #if defined(BSDTIMES) || defined(_SEQUENT_)
 	new = stb.st_mtime > time0.tv_sec;
 #else
 	new = stb.st_mtime > time0;
 #endif
-	if (stb.st_size == 0 || stb.st_atime > stb.st_mtime ||
-	    (stb.st_atime <= chktim && stb.st_mtime <= chktim) ||
-	    (loginsh && !new))
-	    continue;
-	if (cnt == 1)
-	    xprintf("You have %smail.\n", new ? "new " : "");
-	else
-	    xprintf("%s in %S.\n", new ? "New mail" : "Mail", *vp);
+	if ((stb.st_mode & S_IFMT) == S_IFDIR) {
+	    DIR *mailbox;
+	    int mailcount = 0;
+
+	    if (stb.st_mtime <= chktim + 1 || (loginsh && !new))
+		continue;
+
+	    if (!(mailbox = opendir(filename)))
+		continue;
+
+	    if (!readdir(mailbox) || !readdir(mailbox))
+		continue;
+
+	    while (readdir(mailbox))
+		mailcount++;
+
+	    if (mailcount == 0)
+		continue;
+
+	    if (cnt == 1) {
+		xprintf("You have %d piece%s of mail.\n", mailcount,
+			  mailcount == 1 ? "" : "s");
+	    }
+	    else {
+		xprintf("You have %d piece%s of mail in %s.\n",
+			  mailcount, mailcount == 1 ? "" : "s", filename);
+	    }
+	}
+	else {
+	    if (stb.st_size == 0 || stb.st_atime > stb.st_mtime ||
+		(stb.st_atime <= chktim && stb.st_mtime <= chktim) ||
+		(loginsh && !new))
+		continue;
+	    if (cnt == 1)
+		xprintf("You have %smail.\n", new ? "new " : "");
+	    else
+		xprintf("You have %smail in %s.\n", new ? "new " : "",
+			filename);
+	}
     }
     chktim = t;
 }
