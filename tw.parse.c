@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.parse.c,v 3.17 1991/12/14 20:45:46 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.parse.c,v 3.18 1991/12/19 21:40:06 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,34 +39,36 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.17 1991/12/14 20:45:46 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.18 1991/12/19 21:40:06 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
 
+/*  TW_COMMAND,	   TW_SHELLVAR,	  TW_LOGNAME,	    TW_FILE	*/
+/*  TW_DIRECTORY,  TW_VARLIST,	  TW_USER,	    TW_LITERAL	*/
+static void (*tw_start_entry[]) __P((DIR *, Char *)) = {
+    tw_cmd_start,  tw_var_start,  tw_logname_start, tw_file_start,
+    tw_file_start, tw_vl_start,   tw_logname_start, tw_file_start
+};
+
+static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
+    tw_cmd_next,   tw_var_next,   tw_logname_next,  tw_file_next,
+    tw_file_next,  tw_var_next,   tw_logname_next,  tw_file_next
+};
+
+static void (*tw_end_entry[]) __P((void)) = {
+    tw_dir_end,    tw_dir_end,    tw_logname_end,   tw_dir_end,
+    tw_dir_end,    tw_dir_end,    tw_logname_end,   tw_dir_end
+};
+
 /* #define TENEDEBUG */
-
-/* true if the path has relative elements */
-static bool relatives_in_path;
-
-static int maxitems = 0;
-Char  **command_list = (Char **) NULL;	/* the pre-digested list of commands
-					 * for speed and general usefullness */
-int     numcommands = 0;
-int     have_sorted = 0;
+/* #define TDEBUG */
 
 /* Set to TRUE if recexact is set and an exact match is found
  * along with other, longer, matches.
  */
 int non_unique_match = FALSE;
-
-#ifdef notdef
-int     dirctr = 0;		/* -1 0 1 2 ... */
-
-#endif
-Char    dirflag[5];		/* ' nn\0' - dir #s -  . 1 2 ... */
-
 static bool SearchNoDirErr = 0;	/* t_search returns -2 if dir is unreadable */
 
 /* do the expand or list on the command line -- SHOULD BE REPLACED */
@@ -75,19 +77,18 @@ extern Char NeedsRedraw;	/* from ed.h */
 extern int TermH;		/* from the editor routines */
 extern int lbuffed;		/* from sh.print.c */
 
-static	void	 free_items		__P((Char **, int));
 static	void	 extract_dir_and_name	__P((Char *, Char *, Char *));
 static	Char	*quote_meta		__P((Char *, bool));
-static	Char	*getentry		__P((DIR *, int));
 static	Char	*dollar			__P((Char *, Char *));
 static	Char	*tilde			__P((Char *, Char *));
+static  int      expand_dir		__P((Char *, Char *, DIR  **, int));
 static	Char	 filetype		__P((Char *, Char *));
 static	int	 t_glob			__P((Char ***));
+static	int	 c_glob			__P((Char ***));
 static	int	 is_prefix		__P((Char *, Char *));
 static	int	 is_suffix		__P((Char *, Char *));
 static	int	 recognize		__P((Char *, Char *, int, int));
 static	int	 ignored		__P((Char *));
-static	void	 tw_get_comm_list	__P((void));
 static	int	 isadirectory		__P((Char *, Char *));
 
 /*
@@ -112,12 +113,12 @@ tenematch(inputline, inputline_size, num_read, command)
     COMMAND command;		/* LIST or RECOGNIZE or PRINT_HELP */
 
 {
-    Char    word[FILSIZ + 1];
-    register Char *str_end, *word_start, *cmd_start, *wp;
-    Char   *cmd_st;
+    Char    word[FILSIZ + 1], pat[MAXPATHLEN + 1];
+    register Char *str_end, *word_start, *cmd_startart, *wp;
+    Char   *cmd_start;
     int     space_left;
-    int     is_a_cmd;		/* UNIX command rather than filename */
-    int     search_ret;		/* what search returned for debugging */
+    int     looking;		/* what we are looking for		*/
+    int     search_ret;		/* what search returned for debugging 	*/
     /* 
      * XXX: Avoid gcc bug. If in_single and in_double are ints 
      * then they always stay 0.
@@ -125,24 +126,25 @@ tenematch(inputline, inputline_size, num_read, command)
     Char    in_single, in_double;	/* In single or in_double quotes */
     int     backq, skp;
 
+    pat[0] = '\0';
     str_end = &inputline[num_read];
 
     /*
      * Check if in backquotes
      */
-    for (cmd_st = str_end, backq = 0;
-	 cmd_st >= inputline;
-	 backq ^= (*cmd_st-- == '`'));
+    for (cmd_start = str_end, backq = 0;
+	 cmd_start >= inputline;
+	 backq ^= (*cmd_start-- == '`'));
     /*
      * space backward looking for the beginning of this command
      */
-    for (cmd_st = str_end; cmd_st > inputline; --cmd_st)
-	if ((iscmdmeta(cmd_st[-1]) || (cmd_st[-1] == '`' && backq))
-	    && ((cmd_st - 1 == inputline) || (cmd_st[-2] != '\\')))
+    for (cmd_start = str_end; cmd_start > inputline; --cmd_start)
+	if ((iscmdmeta(cmd_start[-1]) || (cmd_start[-1] == '`' && backq))
+	    && ((cmd_start - 1 == inputline) || (cmd_start[-2] != '\\')))
 	    break;
     /* step forward over leading spaces */
-    while (*cmd_st != '\0' && (*cmd_st == ' ' || *cmd_st == '\t'))
-	cmd_st++;
+    while (*cmd_start != '\0' && (*cmd_start == ' ' || *cmd_start == '\t'))
+	cmd_start++;
 
     /*
      * Find LAST occurence of a delimiter in the inputline. The word start is
@@ -155,7 +157,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	}
 	if (skp)
 	    continue;
-	if ((ismetahash(word_start[-1]) || isaset(cmd_st, word_start)) &&
+	if ((ismetahash(word_start[-1]) || isaset(cmd_start, word_start)) &&
 	    (word_start[-1] != '$') &&
 	    ((word_start - 1 == inputline) || (word_start[-2] != '\\')))
 	    break;
@@ -181,9 +183,9 @@ tenematch(inputline, inputline_size, num_read, command)
      */
     in_double = 0;
     in_single = 0;
-    for (cmd_start = word_start, wp = word; 
-	 cmd_start < str_end && wp <= word + FILSIZ; cmd_start++) 
-	switch (*cmd_start) {
+    for (cmd_startart = word_start, wp = word; 
+	 cmd_startart < str_end && wp <= word + FILSIZ; cmd_startart++) 
+	switch (*cmd_startart) {
 	case '\'':
 	    if (!in_double) {
 		if (in_single)
@@ -192,7 +194,7 @@ tenematch(inputline, inputline_size, num_read, command)
 		    in_single = QUOTE;
 	    }
 	    else
-		*wp++ = *cmd_start | QUOTE;
+		*wp++ = *cmd_startart | QUOTE;
 	    break;
 	case '"':
 	    if (!in_single) {
@@ -202,22 +204,22 @@ tenematch(inputline, inputline_size, num_read, command)
 		    in_double = QUOTE;
 	    }
 	    else
-		*wp++ = *cmd_start | QUOTE;
+		*wp++ = *cmd_startart | QUOTE;
 	    break;
 	case '/':
 	    /*
 	     * This is so that the recognize stuff works easily
 	     */
-	    *wp++ = *cmd_start;
+	    *wp++ = *cmd_startart;
 	    break;
 	case '\\':
 	    if (in_single || in_double)
-		*wp++ = *cmd_start | QUOTE;
+		*wp++ = *cmd_startart | QUOTE;
 	    else
-		*wp++ = *++cmd_start | QUOTE;
+		*wp++ = *++cmd_startart | QUOTE;
 	    break;
 	default:
-	    *wp++ = *cmd_start | in_single;
+	    *wp++ = *cmd_startart | in_single;
 	    break;
 	}
     if (wp > word + FILSIZ)
@@ -230,16 +232,23 @@ tenematch(inputline, inputline_size, num_read, command)
     if ((in_single || in_double) && (*word_start == '\'' || *word_start == '"'))
 	word_start++;
 
-    is_a_cmd = starting_a_command(word_start - 1, inputline);
+    looking = starting_a_command(word_start - 1, inputline) ? 
+	TW_COMMAND : TW_ZERO;
 #ifdef TENEDEBUG
-    xprintf("starting_a_command %d\n", is_a_cmd);
-    xprintf("\ncmd_st:%s:\n", short2str(cmd_st));
+    xprintf("starting_a_command %d\n", looking);
+    xprintf("\ncmd_start:%s:\n", short2str(cmd_start));
     xprintf("word:%s:\n", short2str(word));
     xprintf("word:");
     for (wp = word; *wp; wp++)
 	xprintf("%c", *wp & QUOTE ? '-' : ' ');
     xprintf(":\n");
 #endif
+    if (looking == TW_ZERO) {
+	looking = tw_complete(cmd_start, word_start, pat);
+#ifdef TDEBUG
+	xprintf("complete %d %s\n", looking, short2str(pat));
+#endif
+    }
     switch ((int) command) {
 	Char    buffer[FILSIZ + 1], *bptr;
 	Char   *slshp;
@@ -264,7 +273,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	}
 	else
 	    slshp = STRNULL;
-	search_ret = t_search(word, wp, command, space_left, is_a_cmd, 1);
+	search_ret = t_search(word, wp, command, space_left, looking, 1, pat);
 	SearchNoDirErr = 0;
 
 	if (search_ret == -2) {
@@ -273,14 +282,15 @@ tenematch(inputline, inputline_size, num_read, command)
 	    (void) Strcpy(rword, slshp);
 	    if (slshp != STRNULL)
 		*slshp = '\0';
-	    if ((search_ret = spell_me(word, sizeof(word), is_a_cmd)) == 1) {
+	    search_ret = spell_me(word, sizeof(word), looking == TW_COMMAND);
+	    if (search_ret == 1) {
 		DeleteBack(str_end - word_start);/* get rid of old word */
 		(void) Strcat(word, rword);
 		if (InsertStr(word) < 0)	/* insert newly spelled word */
 		    return -1;	/* error inserting */
 		wp = word + Strlen(word);
 		search_ret = t_search(word, wp, command, space_left,
-				      is_a_cmd, 1);
+				      looking, 1, pat);
 	    }
 	}
 
@@ -306,7 +316,8 @@ tenematch(inputline, inputline_size, num_read, command)
 	    if (isglob(*bptr))
 		return 0;
 	}
-	if ((search_ret = spell_me(word, sizeof(word), is_a_cmd)) == 1) {
+	search_ret = spell_me(word, sizeof(word), looking == TW_COMMAND);
+	if (search_ret == 1) {
 	    DeleteBack(str_end - word_start);	/* get rid of old word */
 	    if (InsertStr(word) < 0)	/* insert newly spelled word */
 		return -1;	/* error inserting */
@@ -314,7 +325,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	return search_ret;
 
     case PRINT_HELP:
-	do_help(cmd_st);
+	do_help(cmd_start);
 	return 1;
 
     case GLOB:
@@ -323,13 +334,10 @@ tenematch(inputline, inputline_size, num_read, command)
 	items[0] = buffer;
 	items[1] = NULL;
 	ptr = items;
-	if (is_a_cmd) {
-	    xprintf("\nSorry no globbing for commands yet..\n");
-	    return -1;
-	}
-	if ((count = t_glob(&ptr)) > 0) {
+	count = (looking == TW_COMMAND) ? c_glob(&ptr) : t_glob(&ptr);
+	if (count > 0) {
 	    if (command == GLOB)
-		print_by_column(STRNULL, ptr, count, is_a_cmd);
+		print_by_column(STRNULL, ptr, count, looking == TW_COMMAND);
 	    else {
 		DeleteBack(str_end - word_start);/* get rid of old word */
 		for (i = 0; i < count; i++)
@@ -369,7 +377,7 @@ tenematch(inputline, inputline_size, num_read, command)
 	return (0);
 
     case LIST:
-	search_ret = t_search(word, wp, command, space_left, is_a_cmd, 1);
+	search_ret = t_search(word, wp, command, space_left, looking, 1, pat);
 	return search_ret;
 
     default:
@@ -411,6 +419,40 @@ t_glob(v)
     return (gargc);
 }
 
+/* c_glob():
+ * 	Command matching
+ */
+static int
+c_glob(v)
+    register Char ***v;
+{
+    Char *pat = **v, *cmd, **av;
+    Char dir[MAXPATHLEN+1];
+    int flag, at, ac;
+
+    if (pat == NULL)
+	return (0);
+
+    ac = 0;
+    at = 10;
+    av = (Char **) xmalloc(at * sizeof(Char *));
+    av[ac] = NULL;
+
+    tw_cmd_start(NULL, NULL);
+    while ((cmd = tw_cmd_next(dir, &flag)) != NULL) 
+	if (Gmatch(cmd, pat)) {
+	    if (ac + 1 >= at) {
+		at += 10;
+		av = (Char **) xrealloc(av, at * sizeof(Char *));
+	    }
+	    av[ac++] = Strsave(cmd);
+	    av[ac] = NULL;
+	}
+    tw_dir_end();
+    *v = av;
+
+    return (ac);
+} /* end c_glob */
 
 /*
  * quote (\) the meta-characters in a word
@@ -566,22 +608,22 @@ starting_a_command(wordstart, inputline)
  * Object: extend what user typed up to an ambiguity.
  * Algorithm:
  * On first match, copy full entry (assume it'll be the only match)
- * On subsequent matches, shorten extended_name to the first
- * character mismatch between extended_name and entry.
+ * On subsequent matches, shorten exp_name to the first
+ * character mismatch between exp_name and entry.
  * If we shorten it back to the prefix length, stop searching.
  */
 static int
-recognize(extended_name, entry, name_length, numitems)
-    Char   *extended_name, *entry;
+recognize(exp_name, entry, name_length, numitems)
+    Char   *exp_name, *entry;
     int     name_length, numitems;
 {
     if (numitems == 1)		/* 1st match */
-	copyn(extended_name, entry, MAXNAMLEN);
+	copyn(exp_name, entry, MAXNAMLEN);
     else {			/* 2nd and subsequent matches */
 	register Char *x, *ent;
 	register int len = 0;
 
-	for (x = extended_name, ent = entry;
+	for (x = exp_name, ent = entry;
 	     *x && (*x & TRIM) == (*ent & TRIM); x++, len++, ent++);
 	*x = '\0';		/* Shorten at 1st char diff */
 	if (len == name_length)	/* Ambiguous to prefix? */
@@ -593,7 +635,7 @@ recognize(extended_name, entry, name_length, numitems)
 
 
 /*
- * Perform a RECOGNIZE or LIST command on string "word".
+ * Perform a RECOGNIZE, LIST or SPELL command on string "word".
  *
  * Return value:
  *  >= 0:   SPELL command: "distance" (see spdist())
@@ -603,425 +645,389 @@ recognize(extended_name, entry, name_length, numitems)
 
 /*ARGSUSED*/
 int
-t_search(word, wp, command, max_word_length, looking_for_command, list_max)
+t_search(word, wp, command, max_word_length, looking, list_max, pat)
     Char   *word, *wp;		/* original end-of-word */
     COMMAND command;
-    int     max_word_length, looking_for_command, list_max;
+    int     max_word_length, looking, list_max;
+    Char   *pat;
 {
-    register ignoring = 1, nignored = 0;
-    register name_length,	/* Length of prefix (file name) */
-            looking_for_lognames;	/* True if looking for login names */
-    int     showpathn;		/* True if we want path number */
-    Char    tilded_dir[FILSIZ + 1],	/* dir after ~ expansion */
-            dollar_dir[FILSIZ + 1],	/* dir after $ expansion */
-            dir[FILSIZ + 1],	/* /x/y/z/ part in /x/y/z/f */
-            name[MAXNAMLEN + 1],/* f part in /d/d/d/f */
-            extended_name[MAXNAMLEN + 1],	/* the recognized (extended)
-						 * name */
-           *entry = NULL,	/* single directory entry or logname */
-           *target;		/* Target to expand/correct/list */
-    int     next_command = 0;	/* the next command to take out of */
-
-    /* the list of commands */
-    int     looking_for_shellvar,	/* true if looking for $foo */
-            looking_for_file;	/* true if looking for a file name */
-    Char  **pathv;		/* pointer to PATH elements */
-    struct varent *vptr = NULL;/* current shell variable position */
-    Char  **envptr = NULL;	/* current env. variable position */
-
-    int     d = 4, nd;		/* distance and new distance to command for
-				 * SPELL */
-    int     exec_check = 0, dir_ok = 0;	/* need to check
-					 * executability/directory */
-
-    static  Char		/* For unset path		 */
-    *       pv[2] = {STRNULL, NULL};
-    static  DIR
-    *       dir_fd = NULL;
-    static  Char
-    **      items = NULL;	/* file names when doing a LIST */
+    int     ignoring = 1, nignored = 0,
+    	    d = 4, nd = 0,		/* distance to command for SPELL */
+    	    name_length,		/* Length of prefix (file name) */
+            exec_check = 0, 		/* need to check executability	*/
+	    dir_ok = 0,			/* Ignore directories? */
+	    done, 			/* Search is done */
+    	    numitems = 0,		/* Number of items matched */
+	    max_items = 0,		/* Maximum displayed items */
+	    flags = 0,			/* search flags */
+	    gpat = pat[0] != '\0',	/* Glob pattern search */
+	    gres = 1,			/* Globbing result we want */
+	    len;
+    Char    exp_dir[FILSIZ + 1],	/* dir after ~ expansion */
+            dir[FILSIZ + 1],		/* /x/y/z/ part in /x/y/z/f */
+            exp_name[MAXNAMLEN + 1],	/* the recognized (extended) */
+            name[MAXNAMLEN + 1],	/* f part in /d/d/d/f name */
+           *entry = NULL,		/* single directory entry or logname */
+           *target = NULL,		/* Target to expand/correct/list */
+	   *ptr;
+    DIR    *dir_fd = NULL;	
+    struct varent *vp;
 
     /*
      * bugfix by Marty Grossman (grossman@CC5.BBN.COM): directory listing can
      * dump core when interrupted
      */
-    static int numitems;
-
-    pathv = (vptr = adrof(STRPATH)) == NULL ? pv : vptr->vec;
-
-    if (items != NULL)
-	FREE_ITEMS(items, numitems);
-    numitems = 0;
-    if (dir_fd != NULL)
-	FREE_DIR(dir_fd);
+    tw_item_free();
 
     non_unique_match = FALSE;	/* See the recexact code below */
 
     extract_dir_and_name(word, dir, name);
-    looking_for_lognames = (*word == '~') && (Strchr(word, '/') == NULL);
-    looking_for_shellvar = (target = Strrchr(name, '$')) &&
-	(Strchr(name, '/') == NULL);
-    looking_for_file = (!looking_for_command && !looking_for_lognames &&
-			!looking_for_shellvar) || Strchr(word, '/');
+    switch (looking) {
+    case TW_ZERO:
+	/*
+	 * Try to figure out what we should be looking for
+	 */
+	if ((*word == '~') && (Strchr(word, '/') == NULL))
+	    looking = TW_LOGNAME;
+	else if ((target = Strrchr(name, '$')) && (Strchr(name, '/') == NULL))
+	    looking = TW_SHELLVAR;
+	else if (looking == TW_ZERO)
+	    looking = TW_FILE;
+	break;
 
-    /* PWP: don't even bother when doing ALL of the commands */
-    if (looking_for_command && (*word == '\0')) 
-	return (-1);
-    tilded_dir[0] = '\0';
-    dollar_dir[0] = '\0';
-
-    if (looking_for_shellvar) {	/* Looking for a shell var? */
-	vptr = tw_start_shell_list();
-	envptr = tw_start_env_list();
-	target++;
-    }
-    else
-	target = name;
-    if (looking_for_shellvar || looking_for_file) {
-	Char   *nd = NULL;
-
-	/* Open the directory */
-	/* expand ~user/... and variables stuff */
-	if ((dollar(dollar_dir, dir) == 0) ||
-	    (tilde(tilded_dir, dollar_dir) == 0) ||
-	    !(nd = dnormalize(*tilded_dir ? tilded_dir : STRdot)) ||
-	    ((dir_fd = opendir(short2str(nd))) == NULL)) {
-	    xfree((ptr_t) nd);
-	    if (command == SPELL || SearchNoDirErr)
-		return (-2);
-	    /*
-	     * From: Amos Shapira <amoss@cs.huji.ac.il>
-	     * Print a better message when completion fails
-	     */
-	    xprintf("\n%s %s\n",
-		    *tilded_dir ? short2str(tilded_dir) :
-		    (*dollar_dir ? short2str(dollar_dir) : short2str(dir)),
-		    (errno == ENOTDIR ? "not a directory" :
-		    (errno == ENOENT ? "not found" : "unreadable")));
-	    NeedsRedraw = 1;
+    case TW_COMMAND:
+	if (Strchr(word, '/')) {
+	    looking = TW_FILE;
+	    exec_check = 1;
+	    dir_ok = 1;
+	}
+	/* PWP: don't even bother when doing ALL of the commands */
+	if (looking == TW_COMMAND && (*word == '\0')) 
 	    return (-1);
-	}
-	if (nd) {
-	    if (*tilded_dir != '\0') {
-		Char   *s, *d, *p;
+	break;
+    case TW_SHELLVAR:
+	target = name - 1;
+	break;
 
-		/*
-		 * Copy and append a / if there was one
-		 */
-		for (p = tilded_dir; *p; p++);
-		if (*--p == '/') {
-		    for (p = nd; *p; p++);
-		    if (*--p != '/')
-			p = NULL;
-		}
-		for (d = tilded_dir, s = nd; *d++ = *s++;);
-		if (!p) {
-		    *d-- = '\0';
-		    *d = '/';
-		}
-	    }
-	    xfree((ptr_t) nd);
-	}
+    case TW_LITERAL:
+	/*
+	 * Just paste in the pattern.
+	 */
+	copyn(word, pat, max_word_length);
+	if (adrof(STRaddsuffix))
+	    catn(word, STRspace, max_word_length);
+	return 1;
+
+    case TW_VARLIST:
+	gpat = 0;	/* pattern holds the name of the variable */
+	break;
+
+    default:
+	break;
     }
-    else if (looking_for_lognames) {	/* Looking for login names? */
+
+    if (pat[0] == '^') {
+	gres = 0;
+	pat++;
+    }
+	
+
+
+#ifdef TDEBUG
+    xprintf("looking = %d\n", looking);
+#endif
+    exp_dir[0] = '\0';
+
+    switch (looking) {
+    case TW_SHELLVAR:
+	target++;
+	if ((nd = expand_dir(dir, exp_dir, &dir_fd, command)) != 0)
+	    return nd;
+	break;
+
+    case TW_DIRECTORY:
+    case TW_FILE:
+	target = name;
+	if ((nd = expand_dir(dir, exp_dir, &dir_fd, command)) != 0)
+	    return nd;
+	break;
+
+    case TW_LOGNAME:
+	word++;
+	/*FALLTHROUGH*/
+    case TW_USER:
+	target = name;
 	/*
 	 * Check if the spelling was already correct
 	 * From: Rob McMahon <cudcv@cu.warwick.ac.uk>
 	 */
-	if (command == SPELL && getpwnam(short2str(&word[1])) != NULL) {
+	if (command == SPELL && getpwnam(short2str(word)) != NULL) {
 #ifdef YPBUGS
 	    fix_yp_bugs();
 #endif /* YPBUGS */
+	    if (looking == TW_LOGNAME)
+		word--;
 	    return (0);
 	}
-	copyn(name, &word[1], MAXNAMLEN);	/* name sans ~ */
-	(void) setpwent();	/* Open passwd file */
-    }
-    else if (looking_for_command) {
-	if (!numcommands)	/* if we have no list of commands */
-	    tw_get_comm_list();
-	if (!have_sorted) {	/* if we haven't sorted them yet */
-	    tw_add_builtins();
-	    tw_add_aliases();
-	    tw_sort_comms();	/* re-build the command path for twenex.c */
-	}
+	copyn(name, word, MAXNAMLEN);	/* name sans ~ */
+	if (looking == TW_LOGNAME)
+	    word--;
+	break;
+
+    case TW_COMMAND:
+	target = name;
 	copyn(target, word, MAXNAMLEN);	/* so it can match things */
-    }
-    else {
+	break;
+
+    case TW_VARLIST:
+	target = name;
+	copyn(target, word, MAXNAMLEN);	/* so it can match things */
+	break;
+
+    default:
 	xprintf("\ntcsh internal error: I don't know what I'm looking for!\n");
 	NeedsRedraw = 1;
 	return (-1);
     }
 
+    (*tw_start_entry[looking])(dir_fd, pat);
+#ifdef TDEBUG
+    xprintf("target = %s\n", short2str(target));
+#endif
+
 
 again:
     name_length = Strlen(target);
-    showpathn = looking_for_command && is_set(STRlistpathnum);
 
-    while (1) {
-	if (looking_for_shellvar) {
-	    if ((entry = tw_next_shell_var(&vptr)) == NULL)
-		if ((entry = tw_next_env_var(&envptr)) == NULL)
-		    break;
-	}
-	else if (looking_for_file || looking_for_lognames) {
-	    if ((entry = getentry(dir_fd, looking_for_lognames)) == NULL) {
-		break;
-	    }
-
+    done = FALSE;
+    while (!done && (entry = (*tw_next_entry[looking])(exp_dir, &flags))) {
+#ifdef TDEBUG
+	xprintf("entry = %s\n", short2str(entry));
+#endif
+	switch (looking) {
+	case TW_FILE:
+	case TW_DIRECTORY:
 	    /*
 	     * Don't match . files on null prefix match
 	     */
-	    if (name_length == 0 && entry[0] == '.' &&
-		!looking_for_lognames && !is_set(STRshowdots))
-		continue;
-	    if (looking_for_command && !looking_for_lognames) {
-		exec_check = 1;
-		dir_ok = 1;
-	    }
-	}
-	else if (looking_for_command) {
-#ifdef  NOTDEF			/* Not possible */
-	    if (numcommands == 0) {
-		dohash(NULL, NULL);
-	    }
-#endif
-	    /* searching . added by Andreas Luik <luik@isaak.isa.de> */
+	    if (name_length == 0 && entry[0] == '.' && 
+		(command != SPELL || !is_set(STRshowdots)))
+		done = TRUE;
+	    break;
 
-	    if ((next_command < numcommands) &&
-		(entry = command_list[next_command]) == NULL)
-		next_command = numcommands;
-	    if (next_command >= numcommands) {	/* search relative elems */
-		if (!relatives_in_path)
-		    break;	/* we don't need to do it */
-		while ((dir_fd == NULL ||
-			(entry = getentry(dir_fd, FALSE)) == NULL) &&
-		       *pathv) {
-		    if (dir_fd != NULL)
-			FREE_DIR(dir_fd);
-		    entry = NULL;
-		    while (*pathv && pathv[0][0] == '/')
-			pathv++;
-		    if (*pathv) {
-			/*
-			 * We complete directories only on '.' should that
-			 * be changed?
-			 */
-			if (pathv[0][0] == '\0' ||
-			    (pathv[0][0] == '.' && pathv[0][1] == '\0')) {
-			    *tilded_dir = '\0';
-			    dir_fd = opendir(".");
-			    dir_ok = 1;	
-			}
-			else {
-			    copyn(tilded_dir, *pathv, FILSIZ);
-			    catn(tilded_dir, STRslash, FILSIZ);
-			    dir_fd = opendir(short2str(*pathv));
-			    dir_ok = 0;
-			}
-			pathv++;
-		    }
-		}
-		if (entry == NULL)
-		    break;	/* end of PATH */
-		/*
-		 * executability check for other than "." should perhaps be
-		 * conditional on recognize_only_executables?
-		 */
-		exec_check = 1;
-	    }
-	    else
-		next_command++;
+	case TW_COMMAND:
+	    exec_check = flags & TW_EXEC_OK;
+	    dir_ok = flags & TW_DIR_OK;
+	    break;
+
+	default:
+	    break;
+	}
+	if (done) {
+	    done = FALSE;
+	    continue;
 	}
 
-	if (command == SPELL) {	/* correct the spelling of the last bit */
+	switch (command) {
+
+	case SPELL:		/* correct the spelling of the last bit */
 	    if (name_length == 0) {/* zero-length word can't be misspelled */
-		extended_name[0] = '\0';/* (not trying is important for ~) */
+		exp_name[0] = '\0';/* (not trying is important for ~) */
 		d = 0;
+		done = 1;
 		break;
 	    }
+	    if (gpat && Gmatch(entry, pat) != gres)
+		break;
 	    nd = spdist(entry, target);	/* test the entry against original */
 	    if (nd <= d && nd != 4) {
-		if (exec_check && !executable(tilded_dir, entry, dir_ok))
-		    continue;
-		(void) Strcpy(extended_name, entry);
-		d = nd;
-		if (d == 0)	/* if found it exactly */
-		    break;
-	    }
-	    else if (nd == 4) {
-		if (spdir(extended_name, tilded_dir, entry, target)) {
-		    if (exec_check &&
-			!executable(tilded_dir, extended_name, dir_ok))
-			continue;
-		    d = 0;
-		    break;
+		if (!(exec_check && !executable(exp_dir, entry, dir_ok))) {
+		    (void) Strcpy(exp_name, entry);
+		    d = nd;
+		    if (d == 0)	/* if found it exactly */
+			done = 1;
 		}
 	    }
-	}
-	else if (command == LIST) {	/* LIST command */
-	    register int length;
-	    register long i;
-	    register Char **ni, **p2;
-
-	    if (!is_prefix(target, entry))
-		continue;
-	    if (exec_check && !executable(tilded_dir, entry, dir_ok))
-		continue;
-
-	    if (items == NULL || maxitems == 0) {
-		items = (Char **) xmalloc((size_t) (sizeof(items[0]) *
-						    (ITEMS_START + 1)));
-		maxitems = ITEMS_START;
-		for (i = 0, p2 = items; i < maxitems; i++)
-		    *p2++ = NULL;
+	    else if (nd == 4) {
+		if (spdir(exp_name, exp_dir, entry, target)) {
+		    if (exec_check && !executable(exp_dir, exp_name, dir_ok)) 
+			break;
+		    d = 0;
+		    done = 1;
+		}
 	    }
-	    else if (numitems >= maxitems) {
-		ni = (Char **) xrealloc((ptr_t) items, (size_t)
-				(sizeof(items[0])) * (maxitems + ITEMS_INCR));
-		items = ni;
-		maxitems += ITEMS_INCR;
+	    break;
+
+	case LIST:
+
+	    if (!is_prefix(target, entry)) 
+		break;
+
+	    if (exec_check && !executable(exp_dir, entry, dir_ok))
+		break;
+
+	    if (looking == TW_DIRECTORY && !isadirectory(exp_dir, entry))
+		break;
+
+	    if (gpat && Gmatch(entry, pat) != gres)
+		break;
+
+	    len = Strlen(entry);
+	    /* maximum length 1 (NULL) + 1 (~ or $) + 1 (filetype) */
+	    ptr = tw_item_add(len + 3);
+
+	    copyn(ptr, entry, MAXNAMLEN - 2);
+	    if (looking == TW_FILE) {
+		ptr[len++] = filetype(exp_dir, entry);
+		ptr[len] = '\0';
 	    }
-
-
-	    length = Strlen(entry) + 1;
-	    if (showpathn)
-		length += Strlen(dirflag);
-	    if (!looking_for_lognames && !looking_for_shellvar)
-		length++;
-
-	    /* safety check */
-	    items[numitems] = (Char *) xmalloc((size_t)(length * sizeof(Char)));
-
-	    copyn(items[numitems], entry, MAXNAMLEN);
-
-	    if (!looking_for_lognames && !looking_for_shellvar
-		&& !(looking_for_command && !looking_for_file)) {
-		Char    typestr[2];
-
-		typestr[0] = filetype(tilded_dir, entry);
-		typestr[1] = '\0';
-		catn(items[numitems], typestr, MAXNAMLEN);
-	    }
-
-	    if (showpathn)
-		catn(items[numitems], dirflag, MAXNAMLEN);
 	    numitems++;
-	}
-	else {			/* RECOGNIZE command */
-	    if (!is_prefix(target, entry))
-		continue;
-	    if (exec_check && !executable(tilded_dir, entry, dir_ok))
-		continue;
+	    break;
+
+	case RECOGNIZE:
+	    if (!is_prefix(target, entry)) 
+		break;
+
+	    if (exec_check && !executable(exp_dir, entry, dir_ok))
+		break;
+
+	    if (looking == TW_DIRECTORY && !isadirectory(exp_dir, entry))
+		break;
+
+	    if (gpat && Gmatch(entry, pat) != gres)
+		break;
 
 	    if (ignoring && ignored(entry)) {
 		nignored++;
-		continue;
+		break;
 	    }
 	    if (is_set(STRrecexact)) {
 		if (StrQcmp(target, entry) == 0) {	/* EXACT match */
-		    copyn(extended_name, entry, MAXNAMLEN);
+		    copyn(exp_name, entry, MAXNAMLEN);
 		    numitems = 1;	/* fake into expanding */
 		    non_unique_match = TRUE;
+		    done = TRUE;
 		    break;
 		}
 	    }
-	    if (recognize(extended_name, entry, name_length, ++numitems))
-		break;
+	    if (recognize(exp_name, entry, name_length, ++numitems)) 
+		done = TRUE;
+	    break;
+
+	default:
+	    break;
 	}
     }
+#ifdef TDEBUG
+    xprintf("done entry = %s\n", short2str(entry));
+#endif
 
     if (ignoring && numitems == 0 && nignored > 0) {
 	ignoring = 0;
 	nignored = 0;
-	if (looking_for_lognames)
-	    (void) setpwent();
-	else
-	    rewinddir(dir_fd);
+	(*tw_start_entry[looking])(dir_fd, NULL);
 	goto again;
     }
-    if (looking_for_lognames) {
-#ifdef YPBUGS
-	fix_yp_bugs();
-#endif				/* YPBUGS */
-	(void) endpwent();
-    }
-    else if (looking_for_file || looking_for_shellvar ||
-	     (looking_for_command && relatives_in_path)) {
-	if (dir_fd != NULL)
-	    FREE_DIR(dir_fd);
-    }
 
-    if (command == RECOGNIZE) {
-	if (numitems > 0) {
-	    if (looking_for_lognames)
-		copyn(word, STRtilde, 1);
-	    else if (looking_for_shellvar) {
-		Char   *ptr = Strrchr(word, '$');
+    (*tw_end_entry[looking])();
 
+    switch (command) {
+
+    case RECOGNIZE:
+	if (numitems <= 0) 
+	    return (numitems);
+
+	switch (looking) {
+	case TW_LOGNAME:
+	    copyn(word, STRtilde, 1);
+	    break;
+	
+	case TW_SHELLVAR:
+	    if (ptr = Strrchr(word, '$'))
 		*++ptr = '\0';	/* Delete after the dollar */
-	    }
-	    else if (looking_for_file)
-		copyn(word, dir, max_word_length);	/* put back dir part */
-	    else
+	    else {
+		ptr = word;
 		word[0] = '\0';
-	    catn(word, extended_name, max_word_length);	/* add extended name */
-	    if (is_set(STRaddsuffix)) {
-		if (numitems == 1) {
-		    if (looking_for_lognames) {	/* add / */
-			catn(word, STRslash, max_word_length);
-		    }
-		    else if (looking_for_shellvar) {
-			struct varent *vp = adrof(extended_name);
-			Char   *stp;
+	    }
+	    break;
 
-			/*
-			 * Don't consider array variables or empty variables
-			 */
-			if (vp) {
-			    if (!(stp = vp->vec[0]) || vp->vec[0][0] == '\0' ||
-				vp->vec[1]) {
-				catn(word, STRspace, max_word_length);
-				stp = NULL;
-			    }
-			    else
-				stp = vp->vec[0];
-			}
-			else if ((stp = Getenv(extended_name)) == NULL)
-			    catn(word, STRspace, max_word_length);
-			if (stp != NULL) {
-			    *--target = '\0';
-			    (void) Strcat(tilded_dir, name);
-			    if (isadirectory(tilded_dir, stp))
-				catn(word, STRslash, max_word_length);
-			    else
-				catn(word, STRspace, max_word_length);
-			}
+	case TW_DIRECTORY:
+	case TW_FILE:
+	    copyn(word, dir, max_word_length);	/* put back dir part */
+	    break;
+
+	default:
+	    word[0] = '\0';
+	    break;
+	}
+
+	catn(word, exp_name, max_word_length);	/* add extended name */
+
+	if (is_set(STRaddsuffix) && numitems == 1) {
+	    switch (looking) {
+
+	    case TW_LOGNAME:
+		catn(word, STRslash, max_word_length);
+		break;
+
+	    case TW_SHELLVAR:
+		/*
+		 * Don't consider array variables or empty variables
+		 */
+		if (vp = adrof(exp_name)) {
+		    if (!(ptr = vp->vec[0]) || vp->vec[0][0] == '\0' ||
+			vp->vec[1]) {
+			catn(word, STRspace, max_word_length);
+			ptr = NULL;
 		    }
-		    else if (looking_for_file || looking_for_command) {
-			if (isadirectory(tilded_dir, extended_name)) {
-			    catn(word, STRslash, max_word_length);
-			}
-			else {
-			    catn(word, STRspace, max_word_length);
-			}
-		    }
+		    else
+			ptr = vp->vec[0];
 		}
+		else if ((ptr = Getenv(exp_name)) == NULL)
+		    catn(word, STRspace, max_word_length);
+		if (ptr != NULL) {
+		    *--target = '\0';
+		    (void) Strcat(exp_dir, name);
+		    if (isadirectory(exp_dir, ptr))
+			catn(word, STRslash, max_word_length);
+		    else
+			catn(word, STRspace, max_word_length);
+		}
+		break;
+
+	    case TW_COMMAND:
+	    case TW_FILE:
+		if (isadirectory(exp_dir, exp_name))
+		    catn(word, STRslash, max_word_length);
+		else
+		    catn(word, STRspace, max_word_length);
+		break;
+
+	    case TW_VARLIST:
+	    case TW_USER:
+		catn(word, STRspace, max_word_length);
+		break;
+
+	    case TW_DIRECTORY:
+		/* Don't add anything here */
+		break;
+
+	    default:
+		break;
 	    }
 	}
 	return (numitems);	/* at the end */
-    }
-    else if (command == LIST) {
-	register int max_items = 0;
-	register Char *cp;
 
-	if (cp = value(STRlistmax)) {
-	    while (*cp) {
-		if (!Isdigit(*cp)) {
+    case LIST:
+
+        max_items = 0;
+	if (ptr = value(STRlistmax)) {
+	    while (*ptr) {
+		if (!Isdigit(*ptr)) {
 		    max_items = 0;
 		    break;
 		}
-		max_items = max_items * 10 + *cp++ - '0';
+		max_items = max_items * 10 + *ptr++ - '0';
 	    }
 	}
 
@@ -1033,99 +1039,50 @@ again:
 	    /* We should be in Rawmode here, so no \n to catch */
 	    (void) read(SHIN, &tc, 1);
 	    xprintf("%c\r\n", tc);	/* echo the char, do a newline */
-	    if ((tc != 'y') && (tc != 'Y'))
-		goto done_list;
+	    if ((tc != 'y') && (tc != 'Y')) {
+		tw_item_free();
+		return numitems;
+	    }
 	}
-	qsort((ptr_t) items, (size_t) numitems, sizeof(items[1]), 
+	qsort((ptr_t) tw_item_get(), (size_t) numitems, sizeof(Char *), 
 	      (int (*) __P((const void *, const void *))) fcompare);
 
-	print_by_column(STRNULL, items, numitems, TRUE);
+	print_by_column(STRNULL, tw_item_get(), numitems, TRUE);
 
-done_list:
-	if (items != NULL)
-	    FREE_ITEMS(items, numitems);
+	tw_item_free();
 	return (numitems);
-    }
-    else if (command == SPELL) {
-	if (looking_for_lognames)
-	    copyn(word, STRtilde, 1);
-	else if (looking_for_shellvar) {
-	    Char   *ptr = Strrchr(word, '$');
 
-	    *++ptr = '\0';	/* Delete after the dollar */
-	}
-	else if (looking_for_file)
+    case SPELL:
+	switch (looking) {
+	case TW_LOGNAME:
+	    copyn(word, STRtilde, 1);
+	    break;
+
+	case TW_SHELLVAR:
+	    if (ptr = Strrchr(word, '$'))
+		*++ptr = '\0';	/* Delete after the dollar */
+	    else {
+		ptr = word;
+		word[0] = '\0';
+	    }
+	    break;
+
+	case TW_FILE:
 	    copyn(word, dir, max_word_length);	/* put back dir part */
-	else
+	    break;
+
+	default:
 	    word[0] = '\0';
-	catn(word, extended_name, max_word_length);	/* add extended name */
+	    break;
+	}
+	catn(word, exp_name, max_word_length);	/* add extended name */
 	return (d);
-    }
-    else {
+
+    default:
 	xprintf("Bad tw_command\n");
 	return (0);
     }
 }
-
-
-
-/* stuff for general command line hacking */
-
-/*
- * Strip next directory from path; return ptr to next unstripped directory.
- */
-
-#ifdef notdef
-Char * extract_dir_from_path(path, dir)
-    Char   *path, dir[];
-{
-    register Char *d = dir;
-
-    while (*path && (*path == ' ' || *path == ':'))
-	path++;
-    while (*path && (*path != ' ' && *path != ':'))
-	*(d++) = *(path++);
-    while (*path && (*path == ' ' || *path == ':'))
-	path++;
-
-    ++dirctr;
-    if (*dir == '.')
-	(void) Strcpy(dirflag, STRdotsp);
-    else {
-	dirflag[0] = ' ';
-	if (dirctr <= 9) {
-	    dirflag[1] = '0' + dirctr;
-	    dirflag[2] = '\0';
-	}
-	else {
-	    dirflag[1] = '0' + dirctr / 10;
-	    dirflag[2] = '0' + dirctr % 10;
-	    dirflag[3] = '\0';
-	}
-    }
-    *(d++) = '/';
-    *d = 0;
-
-    return path;
-}
-
-#endif
-
-
-static void
-free_items(items, numitems)
-    register Char **items;
-    register int numitems;
-{
-    register int i;
-
-/*     for (i = 0; items[i] != (Char *)NULL; i++) */
-    for (i = 0; i < numitems; i++)
-	xfree((ptr_t) items[i]);
-    xfree((ptr_t) items);
-    maxitems = 0;
-}
-
 
 /*
  * parse full path in file into 2 parts: directory and file names
@@ -1146,54 +1103,6 @@ extract_dir_and_name(path, dir, name)
 	p++;
 	copyn(name, p, MAXNAMLEN);
 	copyn(dir, path, p - path);
-    }
-}
-
-static Char *
-getentry(dir_fd, looking_for_lognames)
-    DIR    *dir_fd;
-    int     looking_for_lognames;
-{
-    register struct passwd *pw;
-    static Char retname[MAXPATHLEN];
-
-    register struct dirent *dirp;
-
-    if (looking_for_lognames) {	/* Is it login names we want? */
-	/*
-	 * We don't want to get interrupted inside getpwent()
-	 * because the yellow pages code is not interruptible,
-	 * and if we call endpwent() immediatetely after
-	 * (in pintr()) we may be freeing an invalid pointer
-	 */
-#ifdef BSDSIGS
-	sigmask_t omask = sigblock(sigmask(SIGINT));
-#else
-	(void) sighold(SIGINT);
-#endif /* BSDSIGS */
-	/* ISC does not declare getpwent()? */
-	pw = (struct passwd *) getpwent();
-#ifdef BSDSIGS
-	(void) sigsetmask(omask);
-#else
-	(void) sigrelse(SIGINT);
-#endif /* BSDSIGS */
-
-	if (pw == NULL) {
-#ifdef YPBUGS
-	    fix_yp_bugs();
-#endif
-	    return (NULL);
-	}
-	(void) Strcpy(retname, str2short(pw->pw_name));
-	return (retname);
-    }
-    else {			/* It's a dir entry we want */
-	if (dirp = readdir(dir_fd)) {
-	    (void) Strcpy(retname, str2short(dirp->d_name));
-	    return (retname);
-	}
-	return (NULL);
     }
 }
 
@@ -1283,6 +1192,62 @@ tilde(new, old)
     (void) Strcat(new, o);
     return (new);
 }
+
+/* expand_dir():
+ *	Open the directory given, expanding ~user and $var
+ *	Optionally normalize the path given
+ */
+static int
+expand_dir(dir, edir, dfd, cmd)
+    Char  *dir, *edir;
+    DIR  **dfd;
+    int   cmd;
+{
+    Char   *nd = NULL;
+    Char    tdir[MAXPATHLEN + 1];
+
+    if ((dollar(tdir, dir) == 0) ||
+	(tilde(edir, tdir) == 0) ||
+	!(nd = dnormalize(*edir ? edir : STRdot)) ||
+	((*dfd = opendir(short2str(nd))) == NULL)) {
+	xfree((ptr_t) nd);
+	if (cmd == SPELL || SearchNoDirErr)
+	    return (-2);
+	/*
+	 * From: Amos Shapira <amoss@cs.huji.ac.il>
+	 * Print a better message when completion fails
+	 */
+	xprintf("\n%s %s\n",
+		*edir ? short2str(edir) :
+		(*tdir ? short2str(tdir) : short2str(dir)),
+		(errno == ENOTDIR ? "not a directory" :
+		(errno == ENOENT ? "not found" : "unreadable")));
+	NeedsRedraw = 1;
+	return (-1);
+    }
+    if (nd) {
+	if (*dir != '\0') {
+	    Char   *s, *d, *p;
+
+	    /*
+	     * Copy and append a / if there was one
+	     */
+	    for (p = edir; *p; p++);
+	    if (*--p == '/') {
+		for (p = nd; *p; p++);
+		if (*--p != '/')
+		    p = NULL;
+	    }
+	    for (d = edir, s = nd; *d++ = *s++;);
+	    if (!p) {
+		*d-- = '\0';
+		*d = '/';
+	    }
+	}
+	xfree((ptr_t) nd);
+    }
+    return 0;
+} /* end expand_dir */
 
 static  Char
 filetype(dir, file)		/* symbology from 4.3 ls command */
@@ -1500,56 +1465,21 @@ copyn(des, src, count)
     *des = '\0';
 }
 
-static void
-tw_get_comm_list()
-{				/* stolen from sh.exec.c dohash() */
-    register DIR *dirp;
-    register struct dirent *dp;
-    register Char *dir;
-    register Char **pv;
-    struct varent *v = adrof(STRpath);
+Char   *
+Getenv(str)
+    Char   *str;
+{
+    Char  **var;
+    int     len, res;
 
-    relatives_in_path = 0;	/* set to false until we know better */
-    tw_clear_comm_list();
-    if (v == 0)			/* if no path */
-	return;
-
-    if (adrof(STRrecognize_only_executables)) {
-	for (pv = v->vec; *pv; pv++) {
-	    if (pv[0][0] != '/') {
-		relatives_in_path = 1;
-		continue;
-	    }
-	    dirp = opendir(short2str(*pv));
-	    if (dirp == NULL)
-		continue;
-
-	    dir = Strspl(*pv, STRslash);
-	    while ((dp = readdir(dirp)) != NULL) {
-		/* the call to executable() may make this a bit slow */
-		if (dp->d_ino != 0 &&
-		    executable(dir, str2short(dp->d_name), 0))
-		    tw_add_comm_name(str2short(dp->d_name));
-	    }
-	    (void) closedir(dirp);
-	    xfree((ptr_t) dir);
+    len = Strlen(str);
+    for (var = STR_environ; var != NULL && *var != NULL; var++)
+	if ((*var)[len] == '=') {
+	    (*var)[len] = '\0';
+	    res = StrQcmp(*var, str);
+	    (*var)[len] = '=';
+	    if (res == 0)
+		return (&((*var)[len + 1]));
 	}
-    }
-    else {
-	for (pv = v->vec; *pv; pv++) {
-	    if (pv[0][0] != '/') {
-		relatives_in_path = 1;
-		continue;
-	    }
-	    dirp = opendir(short2str(*pv));
-	    if (dirp == NULL)
-		continue;
-
-	    while ((dp = readdir(dirp)) != NULL) {
-		if (dp->d_ino != 0)
-		    tw_add_comm_name(str2short(dp->d_name));
-	    }
-	    (void) closedir(dirp);
-	}
-    }
+    return (NULL);
 }

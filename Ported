@@ -337,6 +337,17 @@ NOTES	:	setpgrp() and SIGCHLD work the BSD way, not the way documented.
 NOTES	:	we need to define BACKPIPE		
 VERSION	:	6.00.04
 
+VENDOR	:	stardent
+MODELS	:	titan
+COMPILER:	/bin/cc
+CFLAGS	:	-O -43
+LIBES	:	-ltermcap
+OS	:	OS 3.0.3
+CONFIG	:	config.bsd
+ENVIRON	:	n/a
+NOTES	:	Kernel bug with SIGTTIN, Try vi, ^Z, bg, fg....
+VERSION	:	6.01.01
+
 VENDOR  :       SGI
 MODELS  :       INDIGO
 COMPILER:       cc

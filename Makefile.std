@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.16 1992/01/06 22:36:56 christos Exp $
+# $Id: Makefile,v 1.17 1992/01/06 22:39:52 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -162,8 +162,10 @@ SHOBJS=	sh.${SUF} sh.dir.${SUF} sh.dol.${SUF} sh.err.${SUF} sh.exec.${SUF} \
 	sh.parse.${SUF} sh.print.${SUF} sh.proc.${SUF} sh.sem.${SUF} \
 	sh.set.${SUF} sh.time.${SUF} glob.${SUF} mi.termios.${SUF}
 
-TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c
-TWOBJS=	tw.help.${SUF} tw.init.${SUF} tw.parse.${SUF} tw.spell.${SUF}
+TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c \
+	tw.comp.c
+TWOBJS=	tw.help.${SUF} tw.init.${SUF} tw.parse.${SUF} tw.spell.${SUF} \
+	tw.comp.${SUF}
 
 EDSRCS= ed.chared.c ed.decls.h ed.defns.c ed.h ed.init.c ed.inputl.c \
 	ed.refresh.c ed.screen.c ed.xmap.c ed.term.c ed.term.h
@@ -293,12 +295,13 @@ vgrind:
 	@vgrind -t -x -h Index index >/crp/bill/csh/index.t
 
 install: tcsh 
-	-mv  ${DESTBIN}/tcsh  ${DESTBIN}/tcsh.old
+	-mv -f ${DESTBIN}/tcsh  ${DESTBIN}/tcsh.old
 	cp tcsh ${DESTBIN}/tcsh
 	strip ${DESTBIN}/tcsh
 	chmod 555 ${DESTBIN}/tcsh
 
 manpage: tcsh.man
+	-rm -f ${DESTMAN}/tcsh.${MANSECT}
 	cp tcsh.man ${DESTMAN}/tcsh.${MANSECT}
 	chmod 444 ${DESTMAN}/tcsh.${MANSECT}
 

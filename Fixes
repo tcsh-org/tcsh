@@ -1,4 +1,7 @@
 V6.02.00, ...
+14. 6.01.02 (1/16/92)
+13. Completion builtin, new tw* files.
+12. 6.01.01 (1/6/92)
 11. Changed w_ fields in tc.who.c to who_ to avoid redefinitions in
     <sys/wait.h> in some os's.
 10. Setting savehist to an empty string makes savehist use the value

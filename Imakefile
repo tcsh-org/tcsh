@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.4 1991/11/11 01:56:34 christos Exp $
+/**/# $Id: Imakefile,v 1.5 1991/11/26 04:28:26 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -319,8 +319,10 @@ SHOBJS=	sh.${SUF} sh.dir.${SUF} sh.dol.${SUF} sh.err.${SUF} sh.exec.${SUF} \
 	sh.parse.${SUF} sh.print.${SUF} sh.proc.${SUF} sh.sem.${SUF} \
 	sh.set.${SUF} sh.time.${SUF} glob.${SUF} mi.termios.${SUF}
 
-TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c
-TWOBJS=	tw.help.${SUF} tw.init.${SUF} tw.parse.${SUF} tw.spell.${SUF}
+TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c \
+	tw.comp.c
+TWOBJS=	tw.help.${SUF} tw.init.${SUF} tw.parse.${SUF} tw.spell.${SUF} \
+	tw.comp.${SUF}
 
 EDSRCS= ed.chared.c ed.decls.h ed.defns.c ed.h ed.init.c ed.inputl.c \
 	ed.refresh.c ed.screen.c ed.xmap.c ed.term.c ed.term.h

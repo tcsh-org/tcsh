@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.os.h,v 3.22 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.os.h,v 3.23 1992/01/06 22:36:56 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -390,15 +390,15 @@ extern int gethostname();
 #endif
 
 # ifdef BSDSIGS
-#  if defined(_AIX370) || defined(MACH) || defined(NeXT) || defined(_AIXPS2)
+#  if defined(_AIX370) || defined(MACH) || defined(NeXT) || defined(_AIXPS2) || defined(ardent)
 extern int sigvec();
 extern int sigpause();
-#  else	/* _AIX370 || MACH || NeXT || _AIXPS2 */
+#  else	/* _AIX370 || MACH || NeXT || _AIXPS2 || ardent */
 #   if !defined(apollo) || !defined(__STDC__)
-# ifndef fps500
+#    ifndef fps500
 extern sigret_t sigvec();
 extern void sigpause();
-# endif /* fps500 */
+#    endif /* fps500 */
 #   endif /* !apollo || !__STDC__ */
 #  endif /* _AIX370 || MACH || NeXT || _AIXPS2 */
 extern sigmask_t sigblock();

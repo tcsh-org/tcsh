@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tw.decls.h,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.decls.h,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -48,7 +48,7 @@ extern	void		  do_help		__P((Char *));
 extern	 int		  tenematch		__P((Char *, int, int, 
 						     COMMAND));
 extern	 int		  t_search		__P((Char *, Char *, COMMAND, 
-						     int, int, int));
+						     int, int, int, Char *));
 extern	 int		  starting_a_command	__P((Char *, Char *));
 extern	 void		  copyn			__P((Char *, Char *, int));
 extern	 void		  catn			__P((Char *, Char *, int));
@@ -56,20 +56,26 @@ extern	 int		  fcompare		__P((Char **, Char **));
 extern	 void		  print_by_column	__P((Char *, Char *[], int, 
 						     int));
 extern	 int		  StrQcmp		__P((Char *, Char *));
+extern   Char		 *Getenv		__P((Char *));
 
 /*
  * tw.init.c
  */
-extern	 void	  	  tw_clear_comm_list	__P((void));
-extern	 void	  	  tw_sort_comms		__P((void));
-extern	 void	  	  tw_add_comm_name	__P((Char *));
-extern	 void	  	  tw_add_builtins	__P((void));
-extern	 void	  	  tw_add_aliases	__P((void));
-extern	 struct	varent	 *tw_start_shell_list	__P((void));
-extern	 Char	 	 *tw_next_shell_var	__P((struct varent **));
-extern	 Char		**tw_start_env_list	__P((void));
-extern	 Char	 	 *Getenv		__P((Char *));
-extern	 Char	 	 *tw_next_env_var	__P((Char ***));
+extern	 void		  tw_cmd_start		__P((DIR *, Char *));
+extern	 void		  tw_logname_start	__P((DIR *, Char *));
+extern	 void		  tw_var_start		__P((DIR *, Char *));
+extern	 void		  tw_file_start		__P((DIR *, Char *));
+extern	 void		  tw_vl_start		__P((DIR *, Char *));
+extern	 Char		 *tw_cmd_next		__P((Char *, int *));
+extern	 Char		 *tw_logname_next	__P((Char *, int *));
+extern	 Char		 *tw_var_next		__P((Char *, int *));
+extern	 Char		 *tw_file_next		__P((Char *, int *));
+extern	 void		  tw_dir_end		__P((void));
+extern	 void		  tw_cmd_free		__P((void));
+extern	 void		  tw_logname_end	__P((void));
+extern	 Char		 *tw_item_add		__P((int));
+extern	 Char	        **tw_item_get		__P((void));
+extern	 void		  tw_item_free		__P((void));
 
 /*
  * tw.spell.c
@@ -79,4 +85,12 @@ extern	 int		  spdir			__P((Char *, Char *, Char *,
 						     Char *));
 extern	 int		  spdist		__P((Char *, Char *));
 
+/*
+ * tw.comp.c
+ */
+extern	 void		  docomplete		__P((Char **, 
+						     struct command *));
+extern	 void		  douncomplete		__P((Char **, 
+						     struct command *));
+extern	 int		  tw_complete		__P((Char *, Char *, Char *));
 #endif				/* _h_tw_decls */

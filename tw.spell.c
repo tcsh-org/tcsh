@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/tw.spell.c,v 1.3 91/09/24 17:12:25 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tw.spell.c,v 3.3 1991/10/12 04:23:51 christos Exp $ */
 /*
  * tw.spell.c: Spell check words
  */
@@ -36,12 +36,9 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.spell.c,v 3.2 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: tw.spell.c,v 3.3 1991/10/12 04:23:51 christos Exp $")
 
 #include "tw.h"
-
-extern Char **command_list;
-extern int numcommands;
 
 /* spell_me : return corrrectly spelled filename.  From K&P spname */
 int
@@ -87,7 +84,8 @@ spell_me(oldname, oldsize, looking_for_cmd)
 	 */
 	/* (*should* say "looking for directory" whenever '/' is next...) */
 	retval = t_search(guess, p, SPELL, FILSIZ,
-			  looking_for_cmd && (foundslash || *old != '/'), 1);
+			  looking_for_cmd && (foundslash || *old != '/') ?
+			  TW_COMMAND : TW_ZERO, 1, STRNULL);
 	if (retval >= 4 || retval < 0)
 	    return -1;		/* hopeless */
 	for (p = ws; *new = *p++;)

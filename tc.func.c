@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.func.c,v 3.20 1991/12/19 22:34:14 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.19 1991/12/14 20:45:46 christos Exp christos $")
+RCSID("$Id: tc.func.c,v 3.20 1991/12/19 22:34:14 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -190,7 +190,7 @@ dolist(v, c)
     struct stat st;
 
     if (*++v == NULL) {
-	(void) t_search(STRNULL, NULL, LIST, 0, 0, 0);
+	(void) t_search(STRNULL, NULL, LIST, 0, TW_ZERO, 0, STRNULL);
 	return;
     }
     gflag = 0;
@@ -302,7 +302,7 @@ dolist(v, c)
 		else 
 		    dp[-1] &= TRIM;
 		*dp = '\0';
-		(void) t_search(buf, NULL, LIST, 0, 0, 0);
+		(void) t_search(buf, NULL, LIST, 0, TW_ZERO, 0, STRNULL);
 		i = k + 1;
 	    }
 	    xfree((ptr_t) tmp);
@@ -1446,7 +1446,7 @@ doaliases(v, c)
 
 eof:
     (void) close(fd);
-    tw_clear_comm_list();
+    tw_cmd_free();
     if (gargv)
 	blkfree(gargv), gargv = 0;
     resexit(oldexit);

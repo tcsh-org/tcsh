@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.exec.c,v 3.8 1991/12/05 18:26:54 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.exec.c,v 3.9 1991/12/14 20:45:46 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.8 1991/12/05 18:26:54 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.9 1991/12/14 20:45:46 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -609,7 +609,7 @@ dohash(vv, c)
 #endif /* FASTHASH */
 
     (void) getusername(NULL);	/* flush the tilde cashe */
-    tw_clear_comm_list();
+    tw_cmd_free();
     havhash = 1;
     if (v == NULL)
 	return;

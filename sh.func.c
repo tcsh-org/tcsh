@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.20 1991/12/19 22:34:14 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.func.c,v 3.21 1992/01/06 22:36:56 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.20 1991/12/19 22:34:14 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.21 1992/01/06 22:36:56 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -238,7 +238,7 @@ doalias(v, c)
 	    stderror(ERR_NAME | ERR_DANGER);
 	}
 	set1(strip(p), saveblk(v), &aliases);
-	tw_clear_comm_list();
+	tw_cmd_free();
     }
 }
 
@@ -249,7 +249,7 @@ unalias(v, c)
     struct command *c;
 {
     unset1(v, &aliases);
-    tw_clear_comm_list();
+    tw_cmd_free();
 }
 
 /*ARGSUSED*/

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.set.c,v 3.6 1991/11/11 01:56:34 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.set.c,v 3.7 1991/12/19 22:34:14 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.6 1991/11/11 01:56:34 christos Exp christos $")
+RCSID("$Id: sh.set.c,v 3.7 1991/12/19 22:34:14 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -191,7 +191,7 @@ doset(v, c)
 	    bslash_quote = 1;
 	}
 	else if (eq(vp, STRrecognize_only_executables)) {
-	    tw_clear_comm_list();
+	    tw_cmd_free();
 	}
 	else if (eq(vp, STRwatch)) {
 	    resetwatch();
@@ -577,7 +577,7 @@ unset(v, c)
     if (adrof(STRbackslash_quote) == 0)
 	bslash_quote = 0;
     if (did_only && adrof(STRrecognize_only_executables) == 0)
-	tw_clear_comm_list();
+	tw_cmd_free();
 }
 
 void

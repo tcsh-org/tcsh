@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.init.c,v 3.10 1991/12/14 20:45:46 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.init.c,v 3.11 1992/01/06 22:36:56 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,9 +36,10 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.10 1991/12/14 20:45:46 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.11 1992/01/06 22:36:56 christos Exp $")
 
 #include "ed.h"
+#include "tw.h"
 
 /*
  * C shell
@@ -62,6 +63,7 @@ struct	biltins bfunc[] = {
     { "case",		dozip,		0,	1, },
     { "cd",		dochngd,	0,	INF, },
     { "chdir",		dochngd,	0,	INF, },
+    { "complete",	docomplete,	0,	INF, },
     { "continue",	docontin,	0,	0, },
     { "default",	dozip,		0,	0, },
     { "dirs",		dodirs,		0,	INF, },
@@ -148,6 +150,7 @@ struct	biltins bfunc[] = {
     { "time",		dotime,		0,	INF, },
     { "umask",		doumask,	0,	1, },
     { "unalias",	unalias,	1,	INF, },
+    { "uncomplete",	douncomplete,	1,	INF, },
     { "unhash",		dounhash,	0,	0, },
 #ifdef masscomp
     { "universe",	douniverse,	0,	1, },
@@ -226,7 +229,7 @@ struct	mesg mesg[] = {
 /* 14 */	"ALRM",		"Alarm clock",
 /* 15 */	"TERM",		"Terminated",
 
-#if (SYSVREL > 0) || defined(DGUX) || defined(IBMAIX) || defined(apollo)
+#if (SYSVREL > 0) || defined(DGUX) || defined(IBMAIX) || defined(apollo) || defined(masscomp) || defined(ardent)
 
 # ifdef _sigextra_
 #  undef  _sigextra_
@@ -394,6 +397,29 @@ struct	mesg mesg[] = {
 /* 32 */	"PROF", 	"Profiling time alarm",
 # endif /* stellar */
 
+# ifdef ardent
+#  define _sigextra_
+/* 20 */	"WINDOW", 	"Window changed",
+/* 21 */	"URG",		"Urgent condition on IO channel",
+/* 22 */	"POLL", 	"Pollable event occured",
+#  ifdef SUSPENDED
+/* 23 */	"STOP",		"Suspended (signal)",
+/* 24 */	"TSTP",		"Suspended",
+/* 25 */	"TTIN", 	"Suspended (tty input)",
+/* 26 */	"TTOU", 	"Suspended (tty output)",
+#  else /* SUSPENDED */
+/* 23 */	"STOP",		"Stopped (signal)",
+/* 24 */	"TSTP",		"Stopped",
+/* 25 */	"TTIN", 	"Stopped (tty input)",
+/* 26 */	"TTOU", 	"Stopped (tty output)",
+#  endif /* SUSPENDED */
+/* 27 */	"CONT",		"Continued",
+/* 28 */	"XCPU",		"Cputime limit exceeded",
+/* 29 */	"XFSZ", 	"Filesize limit exceeded",
+/* 30 */	"VTALRM", 	"Virtual time alarm",
+/* 31 */	"PROF", 	"Profiling time alarm",
+# endif /* ardent */
+
 # if SYSVREL > 3
 #  define _sigextra_
 /* 20 */	"WINCH", 	"Window change",
@@ -537,6 +563,33 @@ struct	mesg mesg[] = {
 /* 31 */	"URG",		"Urgent condition on IO channel",
 /* 32 */	"WINCH", 	"Window changed",
 # endif /* apollo */
+
+# ifdef masscomp
+#  define _sigextra_
+#  ifdef SUSPENDED
+/* 20 */	"STOP",		"Suspended (signal)",
+/* 21 */	"TSTP",		"Suspended",
+#  else /* SUSPENDED */
+/* 20 */	"STOP",		"Stopped (signal)",
+/* 21 */	"TSTP",		"Stopped",
+#  endif /* SUSPENDED */
+/* 22 */	"CONT",		"Continued",
+#  ifdef SUSPENDED
+/* 23 */	"TTIN", 	"Suspended (tty input)",
+/* 24 */	"TTOU", 	"Suspended (tty output)",
+#  else /* SUSPENDED */
+/* 23 */	"TTIN", 	"Stopped (tty input)",
+/* 24 */	"TTOU", 	"Stopped (tty output)",
+#  endif /* SUSPENDED */
+/* 25 */	"TINT", 	"New input character",
+/* 26 */	"XCPU",		"Cputime limit exceeded",
+/* 27 */	"XFSZ", 	"Filesize limit exceeded",
+/* 28 */	"WINCH", 	"Window changed",
+/* 29 */	"URG",		"Urgent condition on IO channel",
+/* 30 */	"VTALRM", 	"Virtual time alarm",
+/* 31 */	"PROF", 	"Profiling time alarm",
+/* 32 */	"IO", 		"Asynchronous I/O (select)",
+# endif /* masscomp */
 
 # ifdef aiws
 #  define _sigextra_

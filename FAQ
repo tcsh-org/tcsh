@@ -87,7 +87,7 @@ be able to get it... :-)
 
 8.  Where do I get the public domain directory library?
   
-    Anonymous ftp to prep.ai.mit.edu:/pub/gnu/libdirent.tar.Z
+    Anonymous ftp to prep.ai.mit.edu:/pub/gnu/dirent.tar.Z
 
 9.  I compiled tcsh using gcc, and when I start up it says:
     tcsh: Warning no access to tty (Invalid Argument).

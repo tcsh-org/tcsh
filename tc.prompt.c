@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.prompt.c,v 3.8 1991/12/19 21:40:06 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/tc.prompt.c,v 3.9 1991/12/19 22:34:14 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.8 1991/12/19 21:40:06 christos Exp christos $")
+RCSID("$Id: tc.prompt.c,v 3.9 1991/12/19 22:34:14 christos Exp $")
 
 #include "ed.h"
 
@@ -398,7 +398,7 @@ printprompt(promptno, str)
 		break;
 	    }
 	}
-	else if (*cp == '\\' | *cp == '^') {
+	else if (*cp == '\\' || *cp == '^') {
 	    *p++ = attributes | parseescape(&cp);
 	}
 	else if (*cp == '!') {	/* EGS: handle '!'s in prompts */
