@@ -1,3 +1,6 @@
+ 59. Add test for socklen_t in autoconf.
+ 58. Fix problems with NLSFrom prototype.
+ 57. Deal with AIX's utmpx lossage
  56. V6.13.07 - 20050118
  55. constifications, XXX: duplicate prototype on setpgrp().
  54. iconv fixes (Miloslav Trmac)
