@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.13 1991/11/11 01:56:34 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.func.c,v 3.14 1991/11/17 05:39:06 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.13 1991/11/11 01:56:34 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.14 1991/11/17 05:39:06 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -849,11 +849,11 @@ setalarm(lck)
 
     if (vp = adrof(STRautologout)) {
 	if (cp = vp->vec[0]) {
-	    alrm_time = (atoi(short2str(cp)) * 60);
+	    alrm_time = atoi(short2str(cp)) * 60;
 	    alm_fun = auto_logout;
 	}
 	if ((cp = vp->vec[1])) {
-	    lock_time = atoi(short2str(cp) * 60);
+	    lock_time = atoi(short2str(cp)) * 60;
 	    if (lck) {
 		if (lock_time < alrm_time) {
 		    alrm_time = lock_time;
