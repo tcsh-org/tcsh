@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.94 2001/12/17 16:13:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.95 2002/01/26 23:23:03 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.94 2001/12/17 16:13:00 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.95 2002/01/26 23:23:03 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1825,9 +1825,9 @@ struct limits limits[] =
     { RLIMIT_NPROC,	"maxproc",	1,	""		},
 # endif /* RLIMIT_NPROC */
 
-# ifdef RLIMIT_OFILE
+# if defined(RLIMIT_OFILE) && !defined(RLIMIT_NOFILE)
     { RLIMIT_OFILE,	"openfiles",	1,	""		},
-# endif /* RLIMIT_OFILE */
+# endif /* RLIMIT_OFILE && !defined(RLIMIT_NOFILE) */
 
     { -1, 		NULL, 		0, 	NULL		}
 };
