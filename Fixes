@@ -1,3 +1,4 @@
+ 23. V6.10.01 - 20010426
  22. LARGEFILE support on Linux.
  21. Add big5 multibyte support (Yen-Ming Lee)
  20. Check the return value of setpriority (Dima Dorfman)
