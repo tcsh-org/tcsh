@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.4 1991/07/18 00:23:46 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.5 1991/07/18 13:17:30 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.os.c,v 3.4 1991/07/18 00:23:46 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.5 1991/07/18 13:17:30 christos Exp $")
 
 #include "sh.h"
 #include "tw.h"
@@ -751,6 +751,108 @@ static char *strrcpy __P((char *, char *));
  *	Return the pathname of the current directory, or return
  *	an error message in pathname.
  */
+
+# ifdef hp9000s500
+/*
+ *  From: Bernd Mohr <mohr@faui77.informatik.uni-erlangen.de>
+ *  I also ported the tcsh to the HP9000 Series 500. This computer
+ *  is a little bit different than the other HP 9000 computer. It has
+ *  a HP Chip instead of a Motorola CPU and it is no "real" UNIX. It runs
+ *  HP-UX which is emulated in top of a HP operating system. So, the last
+ *  supported version of HP-UX is 5.2 on the HP9000s500. This has two
+ *  consequences: it supports no job control and it has a filesystem
+ *  without "." and ".." !!!
+ */
+static int pathsize;			/* pathname length */
+
+char *
+xgetwd(pathname)
+	char *pathname;
+{
+	char pathbuf[MAXNAMLEN];	/* temporary pathname buffer */
+	char *pnptr = &pathbuf[(sizeof pathbuf)-1]; /* pathname pointer */
+	char *prepend();		/* prepend dirname to pathname */
+	dev_t rdev;			/* root device number */
+	DIR *dirp;			/* directory stream */
+	ino_t rino;			/* root inode number */
+	off_t rsize;			/* root size */
+	struct direct *dir;		/* directory entry struct */
+	struct stat d ,dd;		/* file status struct */
+
+	pathsize = 0;
+	*pnptr = '\0';
+	stat("/.", &d);
+	rdev = d.st_dev;
+	rino = d.st_ino;
+	rsize = d.st_size;
+	for (;;) {
+		stat(".", &d);
+		if (d.st_ino == rino && d.st_dev == rdev && d.st_size == rsize)
+			break;		/* reached root directory */
+		if ((dirp = opendir("..")) == NULL) {
+        		(void) xsprintf(pathname,
+                        "getwd: Cannot open \"..\" (%s)", strerror(errno));
+			goto fail;
+		}
+		if (chdir("..") < 0) {
+        		(void) xsprintf(pathname,
+                        "getwd: Cannot chdir to \"..\" (%s)", strerror(errno));
+			goto fail;
+		}
+		do {
+			if((dir = readdir(dirp)) == NULL) {
+				closedir(dirp);
+        			(void) xsprintf(pathname,
+                        	"getwd: Read error in \"..\" (%s)",
+				strerror(errno));
+				goto fail;
+			}
+			stat(dir->d_name, &dd);
+		} while (dd.st_ino  != d.st_ino  ||
+			 dd.st_dev  != d.st_dev  ||
+			 dd.st_size != d.st_size
+			);
+		closedir(dirp);
+		pnptr = prepend("/", prepend(dir->d_name, pnptr));
+	}
+
+	if (*pnptr == '\0')		/* current dir == root dir */
+		strcpy(pathname, "/");
+	else {
+		strcpy(pathname, pnptr);
+		if (chdir(pnptr) < 0) {
+        		(void) xsprintf(pathname,
+                        "getwd: Cannot change back to \".\" (%s)",
+			strerror(errno));
+			return (NULL);
+		}
+	}
+	return (pathname);
+
+fail:
+	chdir(prepend(".", pnptr));
+	return (NULL);
+}
+
+/* prepend():
+ *	 tacks a directory name onto the front of a pathname.
+ */
+static char *
+prepend(dirname, pathname)
+	register char *dirname;
+	register char *pathname;
+{
+	register int i;			/* directory name size counter */
+
+	for (i = 0; *dirname != '\0'; i++, dirname++)
+		continue;
+	if ((pathsize += i) < MAXNAMLEN)
+		while (i-- > 0)
+			*--pathname = *--dirname;
+	return (pathname);
+}
+
+# else /* ! hp9000s500 */
 char   *
 xgetwd(pathname)
     char   *pathname;
@@ -828,7 +930,7 @@ xgetwd(pathname)
 	    return (NULL);
 	}
     }
-}				/* end getwd */
+} /* end getwd */
 
 /* strrcpy():
  *	Like strcpy, going backwards and returning the new pointer
@@ -843,9 +945,10 @@ strrcpy(ptr, str)
 	*--ptr = str[--len];
 
     return (ptr);
-}				/* end strrcpy */
+} /* end strrcpy */
+# endif /* hp9000s500 */
+#endif /* getwd */
 
-#endif				/* getwd */
 #ifdef iconuxv
 #include <sys/vendor.h>
 #include <sys/bsd_syscall.h>

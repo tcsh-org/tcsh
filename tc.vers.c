@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.1 1991/07/15 19:37:24 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.2 1991/07/17 13:23:10 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.vers.c,v 3.1 1991/07/15 19:37:24 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.2 1991/07/17 13:23:10 christos Exp $")
 
 #include "sh.h"
 #include "patchlevel.h"
@@ -141,6 +141,10 @@ gethosttype()
    hosttype = str2short("hp9000s300");
 #  endif /* hp9000s300 */
 #  ifndef _havehosttype_
+# if defined(hp9000s500) && !defined(_havehosttype_)
+#  define _havehosttype_
+   hosttype = str2short("hp9000s500");
+# endif /* hp9000s500 */
 #   define _havehosttype_
    hosttype = str2short("hp");
 #  endif /* _havehosttype_ */

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.2 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.3 1991/07/16 11:39:38 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -73,7 +73,9 @@ struct ucred {
 #  define CSUSP 032
 # endif	/* CSUSP */
 
-# include <sys/bsdtty.h>
+# ifndef hp9000s500
+#  include <sys/bsdtty.h>
+# endif
 
 # ifndef POSIX
 #  ifdef BSDJOBS

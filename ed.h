@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.1 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.h,v 3.2 1991/07/16 11:36:42 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -104,7 +104,7 @@ EXTERN struct termio nio;
 EXTERN struct termio xio;
 EXTERN struct termio testio;
 
-#  if defined(OREO) || defined(hpux) || defined(_IBMR2)
+#  if (defined(OREO) || defined(hpux) || defined(_IBMR2)) && !defined(hp9000s500)
 EXTERN struct ltchars nlc;
 EXTERN struct ltchars xlc;
 EXTERN struct ltchars testlc;
