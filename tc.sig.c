@@ -1,24 +1,80 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/tc.sig.c,v 2.0 1991/03/26 02:59:29 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.sig.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
 /*
  * sh.sig.c: Signal routine emulations
  */
+/*-
+ * Copyright (c) 1980, 1991 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include "config.h"
 #ifndef lint
-static char *rcsid = "$Id: tc.sig.c,v 2.0 1991/03/26 02:59:29 christos Exp christos $";
-
+static char *rcsid() 
+    { return "$Id: tc.sig.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
 #endif
 
 #include "sh.h"
-#include "sh.local.h"
-
+/*
+ * a little complicated #include <sys/wait.h>! :-(
+ */
+#if SVID > 0
+# ifdef hpux
+#  ifndef __hpux
+#   include "tc.wait.h"	/* 6.5 broke <sys/wait.h> */
+#  else
+#   ifndef POSIX
+#    define _BSD
+#   endif
+#   ifndef _CLASSIC_POSIX_TYPES
+#    define _CLASSIC_POSIX_TYPES
+#   endif
+#   include <sys/wait.h> /* 7.0 fixed it again */
+#  endif /* __hpux */
+# else /* hpux */
+#  if defined(OREO) || defined(IRIS4D) || defined(POSIX)
+#   include <sys/wait.h>
+#  else	/* OREO || IRIS4D || POSIX */
+#   include "tc.wait.h"
+#  endif /* OREO || IRIS4D || POSIX */
+# endif	/* hpux */
+#else /* SVID == 0 */
+# include <sys/wait.h>
+#endif /* SVID == 0 */
 
 #ifndef BSDSIGS
 /* libc.a contains these functions in SVID >= 3. */
 #if SVID < 3 || defined(UNIXPC)
 sigret_t
 (*sigset(a, b)) ()
-int     a;
-int     (*b) ();
+    int     a;
+    int     (*b) ();
 {
     return (signal(a, b));
 }
@@ -29,7 +85,7 @@ int     (*b) ();
  */
 void
 sigrelse(what)
-int     what;
+    int     what;
 {
     if (what == SIGCHLD)
 	sig_ch_rel();
@@ -40,7 +96,7 @@ int     what;
  */
 void
 sighold(what)
-int     what;
+    int     what;
 {
     int     sig_ch_queue();
 
@@ -52,7 +108,7 @@ int     what;
  */
 void
 sigignore(a)
-int     a;
+    int     a;
 {
     (void) signal(a, SIG_IGN);
 }
@@ -75,12 +131,12 @@ static int stk_ptr = -1;
  */
 int
 ourwait(w)
-int    *w;
+    int    *w;
 {
     int     pid;
 
 #ifdef JOBDEBUG
-    CSHprintf("our wait %d\n", stk_ptr);
+    xprintf("our wait %d\n", stk_ptr);
     flush();
 #endif				/* JOBDEBUG */
 
@@ -88,7 +144,7 @@ int    *w;
 	/* stack empty return signal from stack */
 	pid = wait(w);
 #ifdef JOBDEBUG
-	CSHprintf("signal(SIGCHLD, pchild);\n");
+	xprintf("signal(SIGCHLD, pchild);\n");
 #endif				/* JOBDEBUG */
 	(void) signal(SIGCHLD, pchild);
 	return (pid);
@@ -109,7 +165,7 @@ static void
 sig_ch_queue()
 {
 #ifdef JOBDEBUG
-    CSHprintf("queue SIGCHLD\n");
+    xprintf("queue SIGCHLD\n");
     flush();
 #endif				/* JOBDEBUG */
     stk_ptr++;
@@ -127,9 +183,9 @@ static void
 sig_ch_rel()
 {
     while (stk_ptr > -1)
-	pchild();
+	pchild(SIGCHLD);
 #ifdef JOBDEBUG
-    CSHprintf("signal(SIGCHLD, pchild);\n");
+    xprintf("signal(SIGCHLD, pchild);\n");
 #endif				/* JOBDEBUG */
     (void) signal(SIGCHLD, pchild);
 }
@@ -141,12 +197,12 @@ sig_ch_rel()
  */
 void
 sigpause(what)
-int     what;
+    int     what;
 {
 #ifdef notdef
     if (what == SIGCHLD) {
 	if (stk_ptr > -1) {
-	    pchild();
+	    pchild(SIGCHLD);
 	}
 	else {
 	    (void) sleep(1);
@@ -155,13 +211,13 @@ int     what;
 #endif
     /* From: Jim Mattson <mattson%cs@ucsd.edu> */
     if (what == SIGCHLD)
-	pchild();
+	pchild(SIGCHLD);
 
 }
 
 #endif				/* SVID < 3 || (UNIXPC) */
 
-# ifdef SXA
+#ifdef SXA
 /*
  * SX/A is SVID3 but does not have sys5-sigpause().
  * I've heard that sigpause() is not defined in SVID3.
@@ -171,32 +227,31 @@ void
 sigpause(what)
 {
     if (what == SIGCHLD) {
-	bsd_sigpause(bsd_sigblock(0) & ~sigmask(SIGBSDCHLD));
+	bsd_sigpause(bsd_sigblock((sigmask_t) 0) & ~sigmask(SIGBSDCHLD));
     }
     else if (what == 0) {
 	pause();
     }
     else {
-	CSHprintf("sigpause(%d)\n", what);
+	xprintf("sigpause(%d)\n", what);
 	pause();
     }
 }
 
-# endif	/* SXA */
-#endif	/* BSDSIGS */
+#endif				/* SXA */
+#endif				/* BSDSIGS */
 
-#if defined(hpux) || defined(aiws)
+#ifdef NEEDsignal
 /* turn into bsd signals */
 sigret_t(*
-	 signal(s, a)) ()
-int     s;
+	 xsignal(s, a)) ()
+    int     s;
 
 sigret_t(*a) ();
 {
-    sigvec_t osv,
-            sv;
+    sigvec_t osv, sv;
 
-    (void) mysigvec(s, (struct sigvec *) 0, &osv);
+    (void) mysigvec(s, NULL, &osv);
     sv = osv;
     sv.sv_handler = a;
 #ifdef SIG_STK
@@ -206,11 +261,12 @@ sigret_t(*a) ();
     sv.sv_flags = SV_BSDSIG | SV_ONSTACK;
 #endif
 
-    if (mysigvec(s, &sv, (sigvec_t *) 0) < 0)
+    if (mysigvec(s, &sv, NULL) < 0)
 	return (BADSIG);
     return (osv.sv_handler);
 }
-#endif /* hpux || aiws */
+
+#endif /* NEEDsignal */
 
 #ifdef _SEQUENT_
 /*
@@ -221,14 +277,15 @@ extern int errno;
 
 /* Set and test a bit.  Bits numbered 1 to 32 */
 
-#define SETBIT(x, y)	x |= (1 << ((y) -1) )
-#define ISSET(x, y)	((x & (1 << ((y) - 1))) != 0)
+#define SETBIT(x, y)	x |= sigmask(y)
+#define ISSET(x, y)	((x & sigmask(y)) != 0)
 
-/* #define SHOW_SIGNALS	1	/* to assist in debugging signals */
+#ifdef DEBUG
+# define SHOW_SIGNALS	1	/* to assist in debugging signals */
+#endif
 
 #ifdef SHOW_SIGNALS
 char   *show_sig_mask();
-
 #endif
 
 int     debug_signals = 0;
@@ -240,10 +297,9 @@ int     debug_signals = 0;
  */
 sigmask_t
 sigsetmask(mask)
-int     mask;
+    sigmask_t     mask;
 {
-    sigset_t set,
-            oset;
+    sigset_t set, oset;
     int     m;
     register int i;
 
@@ -255,8 +311,8 @@ int     mask;
 	    sigaddset(&set, i);
 
     if (sigprocmask(SIG_SETMASK, &set, &oset))
-	CSHprintf("sigsetmask(0x%x) - sigprocmask failed, errno %d",
-		  mask, errno);
+	xprintf("sigsetmask(0x%x) - sigprocmask failed, errno %d",
+		mask, errno);
 
     m = 0;
     for (i = 1; i < MAXSIG; i++)
@@ -274,10 +330,9 @@ int     mask;
  */
 sigmask_t
 sigblock(mask)
-int     mask;
+    sigmask_t     mask;
 {
-    sigset_t set,
-            oset;
+    sigset_t set, oset;
     int     m;
     register int i;
 
@@ -286,8 +341,8 @@ int     mask;
 
     /* Get present set of signals. */
     if (sigprocmask(SIG_SETMASK, NULL, &set))
-	CSHprintf("sigblock(0x%x) - sigprocmask failed, errno %d",
-		  mask, errno);
+	xprintf("sigblock(0x%x) - sigprocmask failed, errno %d",
+		mask, errno);
 
     /* Add in signals from mask. */
     for (i = 1; i <= MAXSIG; i++)
@@ -314,7 +369,7 @@ int     mask;
  */
 void
 bsd_sigpause(mask)
-int     mask;
+    sigmask_t     mask;
 {
     sigset_t set;
     register int i;
@@ -326,16 +381,20 @@ int     mask;
 	    sigaddset(&set, i);
     sigsuspend(&set);
 }
-#endif /* _SEQUENT_ */
+
+#endif				/* _SEQUENT_ */
 
 
 #ifdef SIGSYNCH
 static long Synch_Cnt = 0;
-sigret_t 
+
+sigret_t
 synch_handler(sno)
+int sno;
 {
     if (sno != SIGSYNCH)
 	abort();
     Synch_Cnt++;
 }
-#endif /* SIGSYNCH */
+
+#endif				/* SIGSYNCH */
