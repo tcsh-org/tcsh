@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.sem.c,v 3.15 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.01/RCS/sh.sem.c,v 3.16 1992/01/27 04:20:47 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,7 +37,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.15 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.16 1992/01/27 04:20:47 christos Exp $")
 
 #include "tc.h"
 
@@ -826,7 +826,7 @@ doio(t, pipein, pipeout)
 	}
 	else
 	    fd = 0;
-	if ((flags && F_APPEND) == 0 || fd == -1) {
+	if ((flags & F_APPEND) == 0 || fd == -1) {
 	    if (!(flags & F_OVERWRITE) && adrof(STRnoclobber)) {
 		if (flags & F_APPEND)
 		    stderror(ERR_SYSTEM, tmp, strerror(errno));
