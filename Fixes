@@ -1,3 +1,4 @@
+ 38. Fix $ expansion in prompt (Takashi Sumiyoshi)
  37. V6.09.03 - 20000715
  36. cygwin port fixes (Arihiro Yoshida)
  35. Add a new "catalog" variable that specifies which NLS catalog
