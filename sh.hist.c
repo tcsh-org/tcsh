@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.hist.c,v 3.16 1993/12/16 16:53:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.hist.c,v 3.17 1993/12/16 17:14:42 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.16 1993/12/16 16:53:07 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.17 1993/12/16 17:14:42 christos Exp $")
 
 #include "tc.h"
 
@@ -312,13 +312,13 @@ phist(hp, hflg)
     }
     else {
 	Char   *cp = str2short("%h\t%T\t%R\n");
-	Char buf[BUFSIZE];
+	Char buf[INBUFSIZE];
 	struct varent *vp = adrof(STRhistory);
 
 	if (vp && vp->vec[0] && vp->vec[1])
 	    cp = vp->vec[1];
 
-	tprintf(FMT_HISTORY, buf, cp, BUFSIZE, NULL, hp->Htime, (ptr_t) hp);
+	tprintf(FMT_HISTORY, buf, cp, INBUFSIZE, NULL, hp->Htime, (ptr_t) hp);
 	for (cp = buf; *cp;)
 	    xputchar(*cp++);
     }
@@ -340,7 +340,7 @@ fmthist(fmt, ptr, buf)
 	if (HistLit && hp->histline)
 	    (void) xsprintf(buf, "%S", hp->histline);
 	else {
-	    Char ibuf[BUFSIZE], *ip;
+	    Char ibuf[INBUFSIZE], *ip;
 	    char *p;
 	    (void) sprlex(ibuf, &hp->Hlex);
 	    for (p = buf, ip = ibuf; (*p++ = *ip++) != '\0'; )

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.53 1993/11/13 01:36:09 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.54 1994/01/31 16:04:49 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.53 1993/11/13 01:36:09 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.54 1994/01/31 16:04:49 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1278,6 +1278,8 @@ doprintenv(v, c)
 	xprintf("%S\n", e);
 	output_raw = 0;
     }
+    else
+	set(STRstatus, Strsave(STR1), VAR_READWRITE);
 }
 
 /* from "Karl Berry." <karl%mote.umb.edu@relay.cs.net> -- for NeXT things

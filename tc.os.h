@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.53 1993/12/16 16:51:24 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.54 1994/02/03 19:32:50 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -602,6 +602,8 @@ extern int nice();
 # endif	/* BSDNICE */
 
 # if (!defined(fps500) && !defined(apollo) && !defined(__lucid) && !defined(HPBSD) && !defined(DECOSF1))
+extern void setpwent();
+extern void endpwent();
 # endif /* !fps500 && !apollo && !__lucid && !HPBSD && !DECOSF1 */
 
 # ifndef __STDC__

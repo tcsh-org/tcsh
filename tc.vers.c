@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.36 1993/12/12 19:55:08 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.37 1994/01/31 16:04:49 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.36 1993/12/12 19:55:08 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.37 1994/01/31 16:04:49 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -115,7 +115,7 @@ gethosttype()
 #   define _havehosttype_
     hosttype = "sun2";
 #  endif /* mc68010 */
-#  if defined(mc68020) || defined(__mc68010__)
+#  if defined(mc68020) || defined(__mc68020__)
 #   define _havehosttype_
     hosttype = "sun3";
 #  endif /* mc68020 */

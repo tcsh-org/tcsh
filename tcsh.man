@@ -50,7 +50,7 @@
 .\"   Remember to note new features in NEW FEATURES and referenced external
 .\"   commands in SEE ALSO.
 .\" 
-.TH TCSH 1 "19 December 1993" "Cornell 6.04.06"
+.TH TCSH 1 "4 February 1994" "Cornell 6.04.07"
 .SH NAME
 .B tcsh
 - C shell with file name completion and command line editing
@@ -4635,7 +4635,7 @@ access(2), execve(2), fork(2), killpg(2), pipe(2), setrlimit(2),
 sigvec(2), stat(2), umask(2), wait(2), malloc(3), setlocale(3), tty(4),
 a.out(5), termcap(5), environ(7), termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.06 (Cornell) 93/12/19.
+This man page documents tcsh 6.04.07 (Cornell) 94/02/04.
 .SH AUTHORS
 .PD 0
 .TP 2

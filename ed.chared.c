@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.38 1993/11/13 00:40:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.39 1993/12/16 16:51:24 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.38 1993/11/13 00:40:56 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.39 1993/12/16 16:51:24 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1630,7 +1630,7 @@ e_up_search_hist(c)
 	hp = hp->Hnext;
 
     while (hp != NULL) {
-	Char sbuf[BUFSIZE], *hl;
+	Char sbuf[INBUFSIZE], *hl;
 	if (hp->histline == NULL) {
 	    hp->histline = Strsave(sprlex(sbuf, &hp->Hlex));
 	}
@@ -1683,7 +1683,7 @@ e_down_search_hist(c)
     c_hsetpat();		/* Set search pattern !! */
 
     for (h = 1; h < Hist_num && hp; h++) {
-	Char sbuf[BUFSIZE], *hl;
+	Char sbuf[INBUFSIZE], *hl;
 	if (hp->histline == NULL) {
 	    hp->histline = Strsave(sprlex(sbuf, &hp->Hlex));
 	}

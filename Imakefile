@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.42 1993/12/19 21:38:00 christos Exp christos $
+/**/# $Id: Imakefile,v 1.43 1994/01/31 16:04:49 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.04
 /**/# Marc Horowitz, MIT SIPB
@@ -143,6 +143,10 @@ EXTF=mi.termios.c mi.wait.h mi.varargs.h vms.termcap.c
 # ifdef i386BsdArchitecture
 #  define ConfigH bsd4.4
 # endif /* i386BsdArchitecture */
+
+# ifdef i386SVR4Architecture
+#  define ConfigH sysv4
+# endif
 
 #endif /* !ConfigH */
 

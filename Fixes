@@ -1,5 +1,8 @@
 V6.05.00, ... 
- 67. 6.04.07 01/31/94
+ 70. 6.04.07 02/04/94
+ 69. Dynamic hash changes, globbing for which command from Michael.
+ 68. INBUFSIZE fixes for history.
+ 67. printenv returns 1 when a variable is not found, like the non builtin one
  66. Add quotes to the mismatch array so that:
      > touch foo
      > mail "oo bar"
