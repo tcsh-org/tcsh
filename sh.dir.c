@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.51 1998/09/26 12:28:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.52 1998/10/25 15:10:03 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.51 1998/09/26 12:28:29 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.52 1998/10/25 15:10:03 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -1268,7 +1268,8 @@ getstakd(s, cnt)
 		return (0);
 	}
     }
-    (void) Strcpy(s, dp->di_name);
+    (void) Strncpy(s, dp->di_name, BUFSIZE);
+    s[BUFSIZE - 1] = '\0';
     return (1);
 }
 
