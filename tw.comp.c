@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tw.comp.c,v 1.7 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.comp.c,v 1.8 1992/03/27 01:59:46 christos Exp christos $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.7 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.8 1992/03/27 01:59:46 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -50,7 +50,7 @@ static Char		**tw_find	__P((Char *, struct varent *, int));
 static Char 		 *tw_tok	__P((Char *));
 static bool	 	  tw_pos	__P((Char *, int));
 static void	  	  tw_pr		__P((Char **));
-static void	  	  tw_match	__P((Char *, Char *));
+static int	  	  tw_match	__P((Char *, Char *));
 static void	 	  tw_prlist	__P((struct varent *));
 
 /* docomplete():
@@ -167,22 +167,22 @@ tw_find(nam, vp, cmd)
     register struct varent *vp;
     int cmd;
 {
-    register struct varent *vp1;
+    register Char **rv;
 
     for (vp = vp->v_left; vp; vp = vp->v_right) {
-	if (vp->v_left && (vp1 = tw_find(nam, vp, cmd)) != NULL)
-	    return vp1;
+	if (vp->v_left && (rv = tw_find(nam, vp, cmd)) != NULL)
+	    return rv;
 	if (cmd) {
-	    if (vp->name[0] != '-')
+	    if (vp->v_name[0] != '-')
 		continue;
-	    if (Gmatch(nam, &vp->name[1]) && vp->vec != NULL)
+	    if (Gmatch(nam, &vp->v_name[1]) && vp->vec != NULL)
 		return vp->vec;
 	}
 	else
 	    if (Gmatch(nam, vp->v_name) && vp->vec != NULL)
 		return vp->vec;
     }
-    return vp;
+    return NULL;
 } /* end tw_find */
 
 
