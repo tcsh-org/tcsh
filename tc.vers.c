@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.3 1991/07/18 15:24:41 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.vers.c,v 3.4 1991/07/24 15:36:18 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.vers.c,v 3.3 1991/07/18 15:24:41 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.4 1991/07/24 15:36:18 christos Exp christos $")
 
 #include "sh.h"
 #include "patchlevel.h"
@@ -176,9 +176,33 @@ gethosttype()
 # endif /* u3b2 */
 
 # if defined(i386) && SVID > 0
-#  define _havehosttype_
-    hosttype = str2short("iAPX386");
+
+#  if !defined(_havehosttype_) && (defined(ISC) || defined(ISC202))
+#   define _havehosttype_
+    hosttype = str2short("isc386");
+#  endif /* !_havehosttype_ && (ISC || ISC202) */
+
+#  if !defined(_havehosttype_) && defined(SCO)
+#   define _havehosttype_
+    hosttype = str2short("sco386");
+#  endif /* !_havehosttype_ && SCO */
+
+#  if !defined(_havehosttype_) && defined(INTEL)
+#   define _havehosttype_
+    hosttype = str2short("intel386");
+#  endif /* !_havehosttype_ && INTEL */
+
+#  ifndef _havehosttype_
+#   define _havehosttype_
+    hosttype = str2short("i386");
+#  endif /* _havehosttype_ */
+
 # endif 
+
+#ifdef UNIXPC
+# define _havehosttype_
+    hosttype = str2short("unixpc");
+#endif /* UNIXPC/att3b1/att7300 */
 
 # ifdef alliant
 #  define _havehosttype_
@@ -323,7 +347,7 @@ gethosttype()
 # define _havehosttype_
     hosttype = str2short("amdahl");
 #endif /* uts */
-
+  
 
 # ifndef _havehosttype_
 #  define _havehosttype_
