@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.h,v 3.22 2000/11/11 23:03:39 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.h,v 3.23 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -82,6 +82,8 @@ typedef struct sigvec sigvec_t;
 #  ifdef POSIXSIGS
 #  define mysigvec(a, b, c)	sigaction(a, b, c)
 typedef struct sigaction sigvec_t;
+#   undef sv_handler
+#   undef sv_flags
 #   define sv_handler sa_handler
 #   define sv_flags sa_flags
 #  else /* BSDSIGS */
