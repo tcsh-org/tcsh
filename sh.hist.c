@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.hist.c,v 3.14 1993/12/12 19:55:08 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.hist.c,v 3.15 1993/12/16 16:51:24 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.14 1993/12/12 19:55:08 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.15 1993/12/16 16:51:24 christos Exp $")
 
 #include "tc.h"
 
@@ -122,15 +122,15 @@ enthist(event, lp, docopy, mflg)
     struct Hist *p = NULL, *pp = &Histlist;
     int n, r;
     register struct Hist *np;
-    struct varent* hist;
+    char *dp;
     
-    if ((hist = adrof(STRhistory)) != NULL && hist->vec[1] != NULL) {
-	if (eq(hist->vec[1], STRall)) {
+    if ((dp = value(STRhistdup)) != STRNULL) {
+	if (eq(dp, STRall)) {
 	    for (p = pp; (p = p->Hnext) != NULL;)
 		if (heq(lp, &(p->Hlex)))
 		    break;
 	}
-	else if (eq(hist->vec[1], STRprev)) {
+	else if (dp, STRprev)) {
 	    if (pp->Hnext && heq(lp, &(pp->Hnext->Hlex)))
 		p = pp->Hnext;
 	}
