@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.4 1991/09/10 04:51:46 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.chared.c,v 3.5 1991/09/10 21:38:09 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.chared.c,v 3.4 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.5 1991/09/10 21:38:09 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -63,7 +63,6 @@ static	void	 c_delafter		__P((int));
 static	void	 c_delbefore		__P((int));
 static	Char	*c_prev_word		__P((Char *, Char *, int));
 static	Char	*c_next_word		__P((Char *, Char *, int));
-static	Char	*c_beg_next_word	__P((Char *, Char *, int));
 static	void	 c_copy			__P((Char *, Char *, int));
 static	Char	*c_number		__P((Char *, int *, int));
 static	Char	*c_expand		__P((Char *));
@@ -75,6 +74,7 @@ static	void	 c_hsetpat		__P((void));
 static	void	 c_get_word		__P((Char **, Char **));
 #endif
 static	Char	*c_preword		__P((Char *, Char *, int));
+static	Char	*c_nexword		__P((Char *, Char *, int));
 static	Char	*c_endword		__P((Char *, Char *, int));
 static	Char	*c_eword		__P((Char *, Char *, int));
 static  CCRETVAL v_repeat_srch		__P((int));
@@ -177,17 +177,12 @@ c_preword(p, low, n)
     register int n;
 {
     p--;
+
     while (n--) {
 	while ((p >= low) && Isspace(*p)) 
 	    p--;
-
-	if (Isalnum(*p))
-	    while ((p >= low) && Isalnum(*p)) 
-		p--;
-	else
-	    while (((p >= low) && !Isspace(*p)) || Isalnum(*p)) 
-		p--;
-
+	while ((p >= low) && !Isspace(*p)) 
+	    p--;
     }
     /* cp now points to one character before the word */
     p++;
@@ -202,27 +197,6 @@ c_prev_word(p, low, n)
     register Char *p, *low;
     register int n;
 {
-#ifdef KSHVI
-    if (VImode) {
-	if (!Isspace(*p) && Isspace(p[-1])) 
-	    p--; 
-
-	while (n--) {
-	    while ((p >= low) && Isspace(*p)) 
-		p--;
-	    while ((p >= low) && !Isspace(*p)) 
-		p--;
-	}
-	/* cp now points to one character before the word */
-	p++;
-	if (p < low)
-	    p = low;
-	/* cp now points where we want it */
-	return(p);
-    }
-#endif /* KSHVI */
-
-    /* to the beginning of the PREVIOUS word, not this one */
     p--;
 
     while (n--) {
@@ -245,22 +219,12 @@ c_next_word(p, high, n)
     register Char *p, *high;
     register int n;
 {
-#ifdef KSHVI
-    if (VImode) 
-	while (n--) {
-	    while ((p < high) && !Isspace(*p)) 
-		p++;
-	    while ((p < high) && Isspace(*p)) 
-		p++;
-	}
-    else
-#endif /* KSHVI */
-	while (n--) {
-	    while ((p < high) && !isword(*p)) 
-		p++;
-	    while ((p < high) && isword(*p)) 
-		p++;
-	}
+    while (n--) {
+	while ((p < high) && !isword(*p)) 
+	    p++;
+	while ((p < high) && isword(*p)) 
+	    p++;
+    }
     if (p > high)
 	p = high;
     /* p now points where we want it */
@@ -268,31 +232,16 @@ c_next_word(p, high, n)
 }
 
 static Char *
-c_beg_next_word(p, high, n)
+c_nexword(p, high, n)
     register Char *p, *high;
     register int n;
 {
-#ifdef KSHVI
-    if (VImode)
-	while (n--) { 
-	    if (Isalnum(*p))
-		while ((p < high) && Isalnum(*p)) 
-		    p++;
-	    else
-		while (((p < high) && !Isspace(*p)) || Isalnum(*p))
-		    p++;
-
-	    while ((p < high) && (Isspace(*p)))
-		p++;
-	}
-    else
-#endif /* KSHVI */
-	while (n--) {
-	    while ((p < high) && isword(*p))
-		p++;
-	    while ((p < high) && !isword(*p))
-		p++;
-	}
+    while (n--) {
+	while ((p < high) && !Isspace(*p)) 
+	    p++;
+	while ((p < high) && Isspace(*p)) 
+	    p++;
+    }
 
     if (p > high)
 	p = high;
@@ -748,7 +697,7 @@ e_inc_search(dir)
 		if (*Cursor == '\n')
 		    break;
 	    LastChar = Cursor;
-	    if (ch != 0033) {
+	    if (ch == 0033) {
 		*LastChar++ = '\n';
 		*LastChar = '\0';
 		PastBottom();
@@ -903,7 +852,7 @@ v_search(dir)
 	return(CC_ERROR);
     }
     else {
-	if (ch != 0033) {
+	if (ch == 0033) {
 	    Refresh();
 	    *LastChar++ = '\n';
 	    *LastChar = '\0';
@@ -1447,11 +1396,6 @@ e_up_search_hist(c)
     }
 
     if (!found) {
-	if (VImode) {
-	    LastChar = InputBuf;
-	    Cursor   = InputBuf;
-	    Refresh();
-	}
 #ifdef SDEBUG
 	xprintf("not found\n"); 
 #endif
@@ -1824,23 +1768,25 @@ CCRETVAL
 e_delnext(c)
     int c;
 {
-    if (Cursor == LastChar) {	/* if I'm at the end */
-	if (Cursor == InputBuf && !VImode) {	
-	    /* if I'm also at the beginning */
-	    so_write(STReof, 4);/* then do a EOF */
-	    flush();
-	    return(CC_EOF);
+    if (Cursor == LastChar) {/* if I'm at the end */
+	if (!VImode) {
+	    if (Cursor == InputBuf) {	
+		/* if I'm also at the beginning */
+		so_write(STReof, 4);/* then do a EOF */
+		flush();
+		return(CC_EOF);
+	    }
+	    else {
+		return(CC_ERROR);
+	    }
 	}
-	else {
-	    return(CC_ERROR);
-	}
+	else 
+	    Cursor--;
     }
-    else {
-	c_delafter(Argument);	/* delete after dot */
-	if (Cursor > LastChar)
-	    Cursor = LastChar;	/* bounds check */
-	return(CC_REFRESH);
-    }
+    c_delafter(Argument);	/* delete after dot */
+    if (Cursor > LastChar)
+	Cursor = LastChar;	/* bounds check */
+    return(CC_REFRESH);
 }
 
 /*ARGSUSED*/
@@ -2206,6 +2152,27 @@ e_wordfwd(c)
 
 /*ARGSUSED*/
 CCRETVAL
+v_wordfwd(c)
+    int c;
+{
+    if (Cursor == LastChar)
+	return(CC_ERROR);
+    /* else */
+
+    Cursor = c_nexword(Cursor, LastChar, Argument);
+
+    if (VImode)
+	if (ActionFlag & DELETE) {
+	    c_delfini();
+	    return(CC_REFRESH);
+	}
+
+    RefCursor();
+    return(CC_NORM);
+}
+
+/*ARGSUSED*/
+CCRETVAL
 v_wordbegnext(c)
     int c;
 {
@@ -2213,7 +2180,9 @@ v_wordbegnext(c)
 	return(CC_ERROR);
     /* else */
 
-    Cursor = c_beg_next_word(Cursor, LastChar, Argument);
+    Cursor = c_next_word(Cursor, LastChar, Argument);
+    if (Cursor < LastChar)
+	Cursor++;
 
     if (VImode)
 	if (ActionFlag & DELETE) {

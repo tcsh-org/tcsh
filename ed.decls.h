@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.decls.h,v 3.3 1991/09/08 00:45:32 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.decls.h,v 3.5 1991/09/10 04:51:46 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -179,6 +179,7 @@ extern	CCRETVAL	e_toggle_hist		__P((int));
 extern  CCRETVAL        e_load_average		__P((int));
 extern  CCRETVAL        v_delprev		__P((int));
 extern  CCRETVAL        v_delmeta		__P((int));
+extern  CCRETVAL        v_wordfwd		__P((int));
 extern  CCRETVAL        v_wordback		__P((int));
 extern  CCRETVAL        v_endword		__P((int));
 extern  CCRETVAL        v_eword			__P((int));

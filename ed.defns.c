@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 3.4 1991/09/10 04:51:46 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.defns.c,v 3.5 1991/09/10 21:38:09 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: ed.defns.c,v 3.4 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.5 1991/09/10 21:38:09 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -213,34 +213,36 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		V_DELPREV	83
     v_delmeta,
 #define		V_DELMETA	84
+    v_wordfwd,
+#define		V_WORDFWD	85
     v_wordback,
-#define		V_WORDBACK	85
+#define		V_WORDBACK	86
     v_endword,
-#define		V_ENDWORD	86
+#define		V_ENDWORD	87
     v_eword,
-#define		V_EWORD		87
+#define		V_EWORD		88
     v_undo,
-#define		V_UNDO		88
+#define		V_UNDO		89
     v_ush_meta,
-#define		V_USH_META	89
+#define		V_USH_META	90
     v_dsh_meta,
-#define		V_DSH_META	90
+#define		V_DSH_META	91
     v_rsrch_fwd,
-#define		V_RSRCH_FWD	91
+#define		V_RSRCH_FWD	92
     v_rsrch_rev,
-#define		V_RSRCH_REV	92
+#define		V_RSRCH_REV	93
     v_char_fwd,
-#define		V_CHAR_FWD	93
+#define		V_CHAR_FWD	94
     v_char_back,
-#define		V_CHAR_BACK	94
+#define		V_CHAR_BACK	95
     v_chgmeta,
-#define		V_CHGMETA	95
+#define		V_CHGMETA	96
     e_inc_fwd,
-#define		F_INC_FWD	96
+#define		F_INC_FWD	97
     e_inc_rev,
-#define		F_INC_REV	97
+#define		F_INC_REV	98
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	98
+#define		F_NUM_FNS	99
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -877,7 +879,7 @@ KEYCMD  CcViCmdMap[] = {
     V_USH_META,			/* ? */
     F_UNASSIGNED,		/* @ */
     V_ADDEND,			/* A */
-    F_WORDBACK,			/* B */
+    V_WORDBACK,			/* B */
     V_CHGTOEND,			/* C */
     F_KILLEND,			/* D */
     V_ENDWORD,			/* E */
@@ -898,7 +900,7 @@ KEYCMD  CcViCmdMap[] = {
     F_TOGGLE_HIST,		/* T */
     F_UNASSIGNED,		/* U */
     F_EXPAND_VARS,		/* V */
-    F_WORDFWD,			/* W */
+    V_WORDFWD,			/* W */
     F_DELPREV,			/* X */
     F_UNASSIGNED,		/* Y */
     F_UNASSIGNED,		/* Z */
@@ -909,7 +911,7 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* _ */
     F_UNASSIGNED,		/* ` */
     V_ADD,			/* a */
-    V_WORDBACK,			/* b */
+    F_WORDBACK,			/* b */
     V_CHGMETA,			/* c */
     V_DELMETA,			/* d */
     V_EWORD,			/* e */
@@ -1260,8 +1262,10 @@ struct KeyFuncs FuncNames[] = {
     "Vi replace character under the cursor and enter insert mode",
     "vi-substitute-line", V_SUBSTLINE,
     "Vi replace entire line",
-    "vi-wordback", V_WORDBACK,
+    "vi-word-back", V_WORDBACK,
     "Vi move to the previous word",
+    "vi-word-fwd", V_WORDBACK,
+    "Vi move to the next word",
     "vi-undo", V_UNDO,
     "Vi undo last change",
     "vi-zero", V_ZERO,
