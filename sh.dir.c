@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.21 1993/02/12 17:22:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.dir.c,v 3.22 1993/03/05 20:14:33 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.21 1993/02/12 17:22:20 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.22 1993/03/05 20:14:33 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -1074,7 +1074,7 @@ dcanon(cp, p)
 	for (sp = NULL; *p2 && stat(short2str(p2), &statbuf) != -1;) {
 	    if (DEV_DEV_COMPARE(statbuf.st_dev, home_dev) &&
 			statbuf.st_ino == home_ino) {
-			found = 0;
+			found = 1;
 			break;
 	    }
 	    if ((sp = Strrchr(p2, '/')) != NULL)
