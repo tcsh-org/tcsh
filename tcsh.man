@@ -50,7 +50,7 @@
 .\"   Remember to note OS-specific things in "OS variant support", new features
 .\"   in NEW FEATURES and referenced external commands in SEE ALSO.
 .\" 
-.TH TCSH 1 "25 May 1994" "Cornell 6.04.14"
+.TH TCSH 1 "28 May 1994" "Cornell 6.04.15"
 .SH NAME
 tcsh - C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -2989,6 +2989,8 @@ as `//\fInodename\fR'. (Domain/OS only)
 .TP 8
 .B sched -\fIn\fR (+)
 The first form prints the scheduled-event list.
+The \fBsched\fR shell variable may be set to define the format in which
+the scheduled-event list is printed.
 The second form adds \fIcommand\fR to the scheduled-event list.
 For example,
 .PD
@@ -3128,7 +3130,7 @@ same function on \fIvariable\fR.
 .B source \fR[\fB-h\fR] \fIname\fR [\fIargs\fR ...]
 The shell reads and executes commands from \fBname\fR.
 The commands are not placed on the history list.
-If any \fIargs\fR are given, they are placed in \fBargv\fR.
+If any \fIargs\fR are given, they are placed in \fBargv\fR. (+)
 \fIsource\fR commands may be nested;
 if they are nested too deeply the shell may run out of file descriptors.
 An error in a \fIsource\fR at any level terminates all nested
@@ -3822,7 +3824,7 @@ the existing history file instead of replacing it (if there is one) and
 sorted by time stamp and the most recent events are retained. (+)
 .TP 8
 .B sched \fR(+)
-Controls the format in which scheduled events are printed;
+The format in which the \fIsched\fR builtin command prints scheduled events;
 if not given, `%h\\t%T\\t%R\\n' is used.
 The format sequences are described above under \fBprompt\fR;
 note the variable meaning of `%R'.
@@ -4468,7 +4470,7 @@ access(2), execve(2), fork(2), killpg(2), pipe(2), setrlimit(2),
 sigvec(2), stat(2), umask(2), vfork(2), wait(2), malloc(3), setlocale(3), tty(4),
 a.out(5), termcap(5), environ(7), termio(7), Introduction to the C Shell
 .SH VERSION
-This man page documents tcsh 6.04.14 (Cornell) 94/05/25.
+This man page documents tcsh 6.04.15 (Cornell) 94/05/28.
 .SH AUTHORS
 .PD 0
 .TP 2

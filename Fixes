@@ -1,4 +1,6 @@
 V6.05.00, ... 
+104. 6.04.15 05/28/94
+103. the previous =~ fix, was a bit broken.
 102. 6.04.14 05/25/94
 101. expression parser fix for !~ and =~.
      if (foo =~ *) echo ok

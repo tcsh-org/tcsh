@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.26 1994/04/19 14:26:49 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.27 1994/05/26 13:11:20 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.26 1994/04/19 14:26:49 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.27 1994/05/26 13:11:20 christos Exp $")
 
 /*
  * C shell
@@ -495,15 +495,15 @@ exp5(vp, ignore)
 #ifdef EDEBUG
     etracc("exp5 p1", p1, vp);
 #endif /* EDEBUG */
-    if ((ignore & NOGLOB) != 0) 
-	/* 
-	 * We are just trying to get the right side of
-	 * a =~ or !~ operator 
-	 */
-	return Strsave(*(*vp)++);
 
     if (isa(**vp, MULOP)) {
 	register Char *op = *(*vp)++;
+	if ((ignore & NOGLOB) != 0) 
+	    /* 
+	     * We are just trying to get the right side of
+	     * a =~ or !~ operator 
+	     */
+	    return Strsave(op);
 
 	p2 = exp5(vp, ignore);
 #ifdef EDEBUG
