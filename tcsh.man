@@ -175,6 +175,13 @@ Sets the \fBverbose\fR shell variable even before executing \fI~/.tcshrc\fR.
 .TP 4
 .B \-X
 Is to \fB\-x\fR as \fB\-V\fR is to \fB\-v\fR.
+.TP 4
+.B \-\-help
+Print a help message on the standard output and exit. (+)
+.TP 4
+.B \-\-version
+Print the version/platform/compilation options on the standard output and exit.
+This information is also contained in the \fBversion\fR shell variable. (+)
 .PP
 After processing of flag arguments, if arguments remain but none of the
 \fB\-c\fR, \fB\-i\fR, \fB\-s\fR, or \fB\-t\fR options were given, the first
