@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.func.c,v 1.2 91/07/14 22:23:04 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.func.c,v 3.2 1991/07/15 19:37:24 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "config.h"
 
-RCSID("$Id$")
+RCSID("$Id: sh.func.c,v 3.2 1991/07/15 19:37:24 christos Exp christos $")
 
 #include "sh.h"
 #include "ed.h"
@@ -1081,7 +1081,7 @@ dosetenv(v, c)
     }
     if ((lp = *v++) == 0)
 	lp = STRNULL;
-    Setenv(vp, lp = globone(lp, G_ERROR));
+    Setenv(vp, lp = globone(lp, G_APPEND));
     if (eq(vp, STRPATH)) {
 	importpath(lp);
 	dohash(NULL, NULL);
