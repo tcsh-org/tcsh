@@ -1,0 +1,312 @@
+# $Id: Makefile.win32,v 3.5 1998/07/07 12:06:09 christos Exp $
+#	Makefile.std	4.3	6/11/83
+#
+# C Shell with process control; VM/UNIX VAX Makefile
+# Bill Joy UC Berkeley; Jim Kulp IIASA, Austria
+#
+# With an input editor, command completion, etc. and ported to all sorts of
+# things; Paul Placeway, CIS Dept., Ohio State University
+#
+#
+# Windows NT version: Amol Deshpande, Microsoft Corp.
+#
+BUILD=tcsh.exe
+
+################################################################
+## CFLAGS.  For various -D things, see config.h
+################################################################
+#
+# These are the default suffixes from .c to .o and -c to get there
+# but to use the global optimizer on the mips boxes, see below
+#
+SUF=o
+CF=-c -nologo
+
+INCLUDES=-I. -I.. -Iwin32 
+
+
+RCFLAGS = -D LOADABLE_RC
+EXTRAFLAGS = -DWINNT_NATIVE -DNO_CRYPT -DHASH_SPELL_CHECK 
+
+!if "$(PROCESSOR_ARCHITECTURE)" == "x86"
+ARCH = i386
+!else if "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
+ARCH = alpha
+!else  #Assume win9x
+ARCH = i386
+!endif
+
+
+!if "$(WIN64)" == ""
+WIN64=0
+!else
+WIN64=1
+!endif
+
+!if "$(BLDTYPE)" == ""
+BLDTYPE=retail
+!endif
+
+!if "$(BLDTYPE)" == "debug"
+
+
+NTLDFLAGS=  -debug:full -debugtype:both -pdb:none -entry:silly_entry #-profile
+NTCFLAGS = -YX -Zi -DNTDBG   -Od
+LIBES= user32.lib advapi32.lib kernel32.lib libcmtd.lib oldnames.lib  
+
+!else if "$(BLDTYPE)" == "retail"
+
+NTLDFLAGS=  -debug:full -entry:silly_entry -pdb:none
+NTCFLAGS = -Zi -O2 
+LIBES= user32.lib advapi32.lib kernel32.lib libcmt.lib oldnames.lib  
+
+!else
+
+!ERROR Unknown compilation mode $(BLDTYPE). Set DEBUG or RETAIL
+!endif
+
+!if "$(WIN64)" == "1"
+NTCFLAGS = $(NTCFLAGS) -Zp8
+!endif
+
+CFLAGS= -MT -W3 -WX -Fo$*.$(SUF) $(NTCFLAGS) $(INCLUDES) 
+LDFLAGS= -nodefaultlib $(NTLDFLAGS) -stack:1048576,524288
+
+
+CC=	cl 	
+
+ED=	ed
+RM=	-del
+#
+# Resources. which icon you want to use.
+#NTRES = BSDLOGO
+# Go Ky !
+
+NTRES = WILDCAT
+
+ASSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
+	sh.exp.c sh.file.c sh.func.c sh.glob.c sh.hist.c sh.init.c \
+	sh.lex.c sh.misc.c sh.parse.c sh.print.c sh.proc.c sh.sem.c \
+	sh.set.c sh.time.c sh.char.h sh.dir.h sh.proc.h sh.h 
+PSSRCS= sh.decls.h glob.c glob.h mi.termios.c mi.wait.h mi.varargs.h ma.setp.c \
+	vms.termcap.c
+SHSRCS= $(ASSRCS) $(PSSRCS)
+SHOBJS=	sh.$(SUF) sh.dir.$(SUF) sh.dol.$(SUF) sh.err.$(SUF) sh.exec.$(SUF) \
+	sh.char.$(SUF) sh.exp.$(SUF) sh.func.$(SUF) sh.glob.$(SUF) \
+	sh.hist.$(SUF) sh.init.$(SUF) sh.lex.$(SUF) sh.misc.$(SUF) \
+	sh.parse.$(SUF) sh.print.$(SUF) sh.proc.$(SUF) sh.sem.$(SUF) \
+	sh.set.$(SUF) sh.time.$(SUF) glob.$(SUF) mi.termios.$(SUF) \
+	ma.setp.$(SUF)  
+
+TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c \
+	tw.comp.c tw.color.c
+TWOBJS=	tw.help.$(SUF) tw.init.$(SUF) tw.parse.$(SUF) tw.spell.$(SUF) \
+	tw.comp.$(SUF) tw.color.$(SUF)
+
+EDSRCS= ed.chared.c ed.decls.h ed.defns.c ed.h ed.init.c ed.inputl.c \
+	ed.refresh.c ed.screen.c ed.xmap.c ed.term.c ed.term.h
+EDOBJS=	ed.chared.$(SUF) ed.refresh.$(SUF) ed.screen.$(SUF) ed.init.$(SUF) \
+	ed.inputl.$(SUF) ed.defns.$(SUF) ed.xmap.$(SUF) ed.term.$(SUF)
+
+TCSRCS= tc.alloc.c tc.bind.c tc.const.c tc.decls.h tc.disc.c \
+	tc.func.c tc.os.c tc.os.h tc.printf.c tc.prompt.c \
+	tc.sched.c tc.sig.c tc.sig.h tc.str.c sh.types.h tc.vers.c tc.wait.h \
+	tc.who.c tc.h
+TCOBJS=	tc.alloc.$(SUF) tc.bind.$(SUF) tc.const.$(SUF)  \
+	tc.disc.$(SUF) tc.func.$(SUF) tc.os.$(SUF) tc.printf.$(SUF) \
+	tc.prompt.$(SUF) tc.sched.$(SUF) tc.sig.$(SUF) tc.str.$(SUF) \
+	tc.vers.$(SUF) tc.who.$(SUF) 
+
+NTSRCS = win32\io.c win32\stdio.c win32\dirent.c win32\signal.c\
+		win32\support.c win32\termcap.c win32\tparam.c win32\tparse.c\
+		win32\nt.char.c win32\bogus.c win32\console.c win32\fork.c \
+		win32\ntfunc.c win32\ntb1.c win32\ntb2.c win32\globals.c \
+		win32\nt.who.c win32\ps.c win32\clip.c win32\nt.const.c \
+		win32\nt.bind.c 
+NTOBJS = io.o stdio.o dirent.o signal.o support.o termcap.o tparam.o tparse.o\
+		nt.char.o bogus.o console.o fork.o ntfunc.o globals.o nt.who.o ps.o \
+		clip.o nt.const.o nt.bind.o
+
+VHSRCS=$(PVSRCS) $(AVSRCS)
+
+
+ALLSRCS=  $(SHSRCS) $(TWSRCS) $(EDSRCS) $(TCSRCS) $(VHSRCS) $(NTSRCS)
+DISTSRCS= $(PSSRCS) $(TWSRCS) $(EDSRCS) $(TCSRCS) $(AVSRCS) 
+
+
+OBJS= $(SHOBJS) $(TWOBJS) $(EDOBJS) $(TCOBJS) $(NTOBJS)
+
+
+all: $(BUILD)
+
+$(BUILD): $(OBJS)  ntb1.o ntb2.o win32/$(NTRES).res 
+	link $(LDFLAGS) ntb1.o $(OBJS) ntb2.o $(LIBES) $(EXTRALIBS) \
+	win32/$(NTRES).res $(LOADABLE_RES) -map:tcsh.map -out:$(BUILD) 
+
+gcompress:$(BUILD)
+	gzip -v9 $(BUILD)
+
+bintar:  gcompress
+	tar -cvf tcsh-$(ARCH)-bin.tar $(BUILD) win32/README.NT \
+	win32/example.tcshrc  win32/tcsh-html.tgz win32/bin
+	gzip -v9 tcsh-$(ARCH)-bin.tar
+	move tcsh-$(ARCH)-bin.tar.gz ..
+
+win32srctar: $(NTSRCS)
+	tar -cvf tcshwin32src.tar win32 --exclude win32/bin
+	gzip -v9 tcshwin32src.tar
+	move tcshwin32src.tar.gz ..
+
+symbols:$(BUILD)
+	@echo finding image base
+	@echo rebase may crash if msdev is holding the symbol file
+	@dumpbin /headers $(BUILD) | findstr /c:"image base"
+	@echo The address given to rebase should match the image base
+	rebase -b 400000 -xa . -a $(BUILD)
+copysym: symbols
+	copy tcsh.dbg %SystemRoot%\symbols\exe
+
+chlog:
+	tcsh -fc "echo \<XMP\> > win32\\Changelog.html"
+	type win32\Changelog >> win32\ChangeLog.html
+	tcsh -fc "echo \</XMP\> >> win32\\ChangeLog.html"
+
+
+
+.c.$(SUF):
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) $<
+
+
+ed.defns.h: ed.defns.c
+	-@del  $@
+	@echo /* Do not edit this file, make creates it. */ > $@
+	@echo #ifndef _h_ed_defns >> $@
+	@echo #define _h_ed_defns >> $@
+	grep [FV]_ ed.defns.c | grep ^#define >> $@
+	@echo #endif /* _h_ed_defns */ >> $@
+
+sh.err.h: sh.err.c
+	-@del  $@
+	@echo /* Do not edit this file, make creates it. */ > $@
+	@echo #ifndef _h_sh_err >> $@
+	@echo #define _h_sh_err >> $@
+	grep ERR_ sh.err.c | grep ^#define >> $@
+	@echo #endif /* _h_sh_err */ >> $@
+
+tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
+	-@del  $@
+	@echo /* Do not edit this file, make creates it. */ > $@
+	@echo #ifndef _h_tc_const >> $@
+	@echo #define _h_tc_const >> $@
+	$(CC) -E $(INCLUDES) $(DFLAGS) $(EXTRAFLAGS) -D_h_tc_const\
+	    tc.const.c | grep "Char STR" | \
+	    sed -e "s/Char \([a-zA-Z0-9_]*\)\[\].*/extern Char \1[];/" | \
+	    sort >> $@
+	@echo #endif /* _h_tc_const */ >> $@
+
+win32\nt.const.h: win32\nt.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h tc.const.h
+	-@del  $@
+	@echo /* Do not edit this file, make creates it. */ > $@
+	@echo #ifndef _h_nt_const >> $@
+	@echo #define _h_nt_const >> $@
+	$(CC) -E $(INCLUDES) $(DFLAGS) $(EXTRAFLAGS) -D_h_nt_const\
+	    win32\nt.const.c | grep "Char STR" | \
+	    sed -e "s/Char \([a-zA-Z0-9_]*\)\[\].*/extern Char \1[];/" | \
+	    sort >> $@
+	@echo #endif /* _h_nt_const */ >> $@
+
+clean:
+	$(RM)  *.$(SUF) sh.prof.c ed.defns.h tc.const.h sh.err.h tc.defs.c
+	$(RM)  *.pdb *.pch *.ilk *.map *.dbg *.res
+	cd win32
+	$(RM) *.res nt.const.h
+	cd ..
+
+cleanall: clean
+	-del $(BUILD)
+
+
+config.h: config_f.h
+
+TCH=tc.h tc.const.h tc.decls.h tc.os.h tc.sig.h
+SHH=sh.h sh.types.h sh.char.h sh.err.h sh.dir.h sh.proc.h pathnames.h \
+    sh.decls.h $(TCH)
+TWH=tw.h tw.decls.h
+EDH=ed.h ed.decls.h
+
+# EDH
+EDINC=sh.$(SUF) sh.func.$(SUF) sh.lex.$(SUF) sh.print.$(SUF) sh.proc.$(SUF) \
+      sh.set.$(SUF) tc.bind.$(SUF) tc.os.$(SUF) tc.prompt.$(SUF) \
+      tc.sched.$(SUF) tw.parse.$(SUF)
+$(EDOBJS) $(EDINC) : $(EDH)
+
+# SHH
+$(OBJS): win32\nt.const.h win32\ntport.h win32\version.h config.h $(SHH)
+
+# TWH
+TWINC=ed.chared.$(SUF) ed.inputl.$(SUF) sh.exec.$(SUF) sh.func.$(SUF) \
+      sh.set.$(SUF) tc.func.$(SUF)
+$(TWOBJS) $(TWINC): $(TWH)
+
+# glob.h
+glob.$(SUF) sh.glob.$(SUF): glob.h
+
+# ed.defns.h
+EDDINC=tc.bind.$(SUF) tc.func.$(SUF) tc.os.$(SUF)
+$(EDOBJS) $(EDDINC): ed.defns.h
+
+# tc.defs.o
+tc.defs.$(SUF):	tc.defs.c sh.h
+#
+# NT dependencies and rules
+#
+dirent.$(SUF):win32\dirent.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\dirent.c
+win32.$(SUF):win32\win32.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\win32.c
+support.$(SUF):win32\support.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\support.c
+io.$(SUF):win32\io.c $(NTH) $(NTH2) 
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\io.c
+stdio.$(SUF):win32\stdio.c $(NTH) $(NTH2) 
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\stdio.c
+signal.$(SUF):win32\signal.c $(NTH) $(NTH2) 
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\signal.c
+access.$(SUF):win32\access.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\access.c
+nt.char.$(SUF):win32\nt.char.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.char.c
+
+termcap.$(SUF):win32\termcap.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\termcap.c
+tparam.$(SUF):win32\tparam.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\tparam.c
+tparse.$(SUF):win32\tparse.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\tparse.c
+bogus.$(SUF):win32\bogus.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\bogus.c
+console.$(SUF):win32\console.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\console.c
+fork.$(SUF):win32\fork.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\fork.c
+ntfunc.$(SUF):win32\ntfunc.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\ntfunc.c
+ntb1.$(SUF):win32\ntb1.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\ntb1.c
+ntb2.$(SUF):win32\ntb2.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\ntb2.c
+globals.$(SUF):win32\globals.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\globals.c
+nt.who.$(SUF):win32\nt.who.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.who.c
+ps.$(SUF):win32\ps.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\ps.c
+clip.$(SUF):win32\clip.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\clip.c
+nt.const.$(SUF):win32\nt.const.c $(NTH) $(NTH2)
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.const.c
+nt.bind.$(SUF):win32\nt.bind.c $(NTH) $(NTH2) ed.defns.h
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.bind.c
+
+win32/$(NTRES).res: win32/$(NTRES).rc win32/tcshrc.rc
+	rc -v $(RCFLAGS) -r win32/$(NTRES).rc

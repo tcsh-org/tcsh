@@ -1,0 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+IDI_ICON1               ICON    DISCARDABLE     "win32/WILDCAT.ICO"
+
+#ifdef LOADABLE_RC
+#include "tcshrc.rc"
+#endif 
