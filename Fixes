@@ -1,3 +1,5 @@
+ 33. Fix compilation issue under Windows/NT and charset incorrect patch
+     (Yoshiyuki Sakakibara)
  32. completion additions (Tom Warzeka)
  31. compilation fix (Martin Kraemer)
  30. V6.12.02 - 20040221
