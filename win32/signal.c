@@ -568,56 +568,72 @@ void start_sigchild_thread(HANDLE hproc, DWORD pid) {
 	CloseHandle(hthr);
 
 }
-int kill (int pid, int sig) {
+int kill(int pid, int sig) {
 
-	HANDLE hproc;
-	int ret =0;
+    HANDLE hproc;
+    int ret =0;
+    extern DWORD gdwPlatform;
+    BOOL is_winnt = TRUE;
 
-	errno = EPERM;
-    if(pid < 0)
-    {
-        if (pid == -1)
-            return -1;
-        pid = -pid; //no groups that we can actually do anything with.
-          
+    errno = EPERM;
+    is_winnt = (gdwPlatform != VER_PLATFORM_WIN32_WINDOWS);
+
+    if(is_winnt) {
+        if(pid < 0)
+        {
+            if (pid == -1)
+                return -1;
+            pid = -pid; //no groups that we can actually do anything with.
+
+        }
+    }
+    else { //win9x has -ve pids
+        if(pid > 0)
+        {
+            if (pid == 1)
+                return -1;
+            pid = -pid; //no groups that we can actually do anything with.
+
+        }
     }
 
-	switch(sig) {
-		case 0:
-		case 7:
-			hproc = OpenProcess(PROCESS_ALL_ACCESS,FALSE,pid);
-			if (hproc  == NULL) {
-				errno = ESRCH;
-				ret = -1;
-            dprintf("proc %d not found\n",pid);
-			}
-            else{
-            dprintf("proc %d found\n",pid);
+
+    switch(sig) {
+        case 0:
+        case 7:
+            hproc = OpenProcess(PROCESS_ALL_ACCESS,FALSE,pid);
+            if (hproc  == NULL) {
+                errno = ESRCH;
+                ret = -1;
+                dprintf("proc %d not found\n",pid);
             }
-			if (sig == 7) {
-				if (!TerminateProcess(hproc,0xC000013AL) ) {
-					ret = -1;
-				}
-			}
-			CloseHandle(hproc);
-			break;
-		case 1:
-			if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT,pid)) 
-				ret = -1;
-			break;
-		case 2:
-			if (!GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT,pid)) 
-				ret = -1;
-			break;
-		case 3:
-			if (kill_by_wm_close(pid) <0 ) {
-				errno = ESRCH;
-				ret = -1;
-			}
-		default:
-			break;
-	}
-	return ret;
+            else{
+                dprintf("proc %d found\n",pid);
+            }
+            if (sig == 7) {
+                if (!TerminateProcess(hproc,0xC000013AL) ) {
+                    ret = -1;
+                }
+            }
+            CloseHandle(hproc);
+            break;
+        case 1:
+            if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT,pid)) 
+                ret = -1;
+            break;
+        case 2:
+            if (!GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT,pid)) 
+                ret = -1;
+            break;
+        case 3:
+            if (kill_by_wm_close(pid) <0 ) {
+                errno = ESRCH;
+                ret = -1;
+            }
+        default:
+            break;
+    }
+    return ret;
 }
 //
 // nice(niceness)
