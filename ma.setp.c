@@ -82,7 +82,7 @@
  **********************************************************************
  */
 #include "sh.h"
-RCSID("$Id: ma.setp.c,v 1.6 1992/10/27 16:18:15 christos Exp christos $")
+RCSID("$Id: ma.setp.c,v 1.7 1992/11/20 08:56:38 christos Exp christos $")
 
 #ifdef MACH
 
@@ -324,15 +324,15 @@ freepaths()
 		    continue;
 		p = pe->pdir[i];
 		pe->pdir[i] = NULL;
-		xfree(p);
+		xfree((ptr_t) p);
 	    }
 	    pe->pdirs = 0;
 	    p = pe->pname;
 	    pe->pname = NULL;
-	    xfree(p);
+	    xfree((ptr_t) p);
 	}
 	pathhead = pe->pnext;
-	xfree((char *)pe);
+	xfree((ptr_t) pe);
     }
     npaths = 0;
 }
@@ -364,7 +364,7 @@ char *localsyspath;
 		continue;
 	    p = pe->pdir[n];
 	    pe->pdir[n] = NULL;
-	    xfree(p);
+	    xfree((ptr_t) p);
 	}
 	pe->pdirs = 0;
 	for (;;) {
@@ -523,7 +523,7 @@ int n;
 {
     register int d;
 
-    xfree(pe->pdir[n]);
+    xfree((ptr_t) (pe->pdir[n]));
     for (d = n; d < pe->pdirs - 1; d++)
 	pe->pdir[d] = pe->pdir[d+1];
     --pe->pdirs;
@@ -582,7 +582,7 @@ register char *key;
     } else
 	new = key;
     new = strsave(new);
-    xfree(pe->pdir[loc]);
+    xfree((ptr_t) (pe->pdir[loc]));
     pe->pdir[loc] = new;
 }
 

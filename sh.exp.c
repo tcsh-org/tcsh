@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.19 1993/05/17 00:11:09 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.20 1993/08/11 16:25:52 christos Exp christos $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.19 1993/05/17 00:11:09 christos Exp christos $")
+RCSID("$Id: sh.exp.c,v 3.20 1993/08/11 16:25:52 christos Exp christos $")
 
 /*
  * C shell
@@ -78,7 +78,7 @@ static	int	 egetn		__P((Char *));
 #ifdef EDEBUG
 static	void	 etracc		__P((char *, Char *, Char ***));
 static	void	 etraci		__P((char *, int, Char ***));
-#endif
+#endif /* EDEBUG */
 
 
 /*
@@ -212,7 +212,7 @@ exp0(vp, ignore)
 
 #ifdef EDEBUG
     etraci("exp0 p1", p1, vp);
-#endif
+#endif /* EDEBUG */
     if (**vp && eq(**vp, STRor2)) {
 	register int p2;
 
@@ -220,7 +220,7 @@ exp0(vp, ignore)
 	p2 = exp0(vp, (ignore & IGNORE) || p1);
 #ifdef EDEBUG
 	etraci("exp0 p2", p2, vp);
-#endif
+#endif /* EDEBUG */
 	return (p1 || p2);
     }
     return (p1);
@@ -235,7 +235,7 @@ exp1(vp, ignore)
 
 #ifdef EDEBUG
     etraci("exp1 p1", p1, vp);
-#endif
+#endif /* EDEBUG */
     if (**vp && eq(**vp, STRand2)) {
 	register int p2;
 
@@ -243,7 +243,7 @@ exp1(vp, ignore)
 	p2 = exp1(vp, (ignore & IGNORE) || !p1);
 #ifdef EDEBUG
 	etraci("exp1 p2", p2, vp);
-#endif
+#endif /* EDEBUG */
 	return (p1 && p2);
     }
     return (p1);
@@ -258,7 +258,7 @@ exp2(vp, ignore)
 
 #ifdef EDEBUG
     etraci("exp3 p1", p1, vp);
-#endif
+#endif /* EDEBUG */
     if (**vp && eq(**vp, STRor)) {
 	register int p2;
 
@@ -266,7 +266,7 @@ exp2(vp, ignore)
 	p2 = exp2(vp, ignore);
 #ifdef EDEBUG
 	etraci("exp3 p2", p2, vp);
-#endif
+#endif /* EDEBUG */
 	return (p1 | p2);
     }
     return (p1);
@@ -281,7 +281,7 @@ exp2a(vp, ignore)
 
 #ifdef EDEBUG
     etraci("exp2a p1", p1, vp);
-#endif
+#endif /* EDEBUG */
     if (**vp && eq(**vp, STRcaret)) {
 	register int p2;
 
@@ -289,7 +289,7 @@ exp2a(vp, ignore)
 	p2 = exp2a(vp, ignore);
 #ifdef EDEBUG
 	etraci("exp2a p2", p2, vp);
-#endif
+#endif /* EDEBUG */
 	return (p1 ^ p2);
     }
     return (p1);
@@ -304,7 +304,7 @@ exp2b(vp, ignore)
 
 #ifdef EDEBUG
     etraci("exp2b p1", p1, vp);
-#endif
+#endif /* EDEBUG */
     if (**vp && eq(**vp, STRand)) {
 	register int p2;
 
@@ -312,7 +312,7 @@ exp2b(vp, ignore)
 	p2 = exp2b(vp, ignore);
 #ifdef EDEBUG
 	etraci("exp2b p2", p2, vp);
-#endif
+#endif /* EDEBUG */
 	return (p1 & p2);
     }
     return (p1);
@@ -329,7 +329,7 @@ exp2c(vp, ignore)
 
 #ifdef EDEBUG
     etracc("exp2c p1", p1, vp);
-#endif
+#endif /* EDEBUG */
     if ((i = isa(**vp, EQOP)) != 0) {
 	(*vp)++;
 	if (i == EQMATCH || i == NOTEQMATCH)
@@ -337,7 +337,7 @@ exp2c(vp, ignore)
 	p2 = exp3(vp, ignore);
 #ifdef EDEBUG
 	etracc("exp2c p2", p2, vp);
-#endif
+#endif /* EDEBUG */
 	if (!(ignore & IGNORE))
 	    switch (i) {
 
@@ -377,7 +377,7 @@ exp3(vp, ignore)
     p1 = exp3a(vp, ignore);
 #ifdef EDEBUG
     etracc("exp3 p1", p1, vp);
-#endif
+#endif /* EDEBUG */
     if ((i = isa(**vp, RELOP)) != 0) {
 	(*vp)++;
 	if (**vp && eq(**vp, STRequal))
@@ -385,7 +385,7 @@ exp3(vp, ignore)
 	p2 = exp3(vp, ignore);
 #ifdef EDEBUG
 	etracc("exp3 p2", p2, vp);
-#endif
+#endif /* EDEBUG */
 	if (!(ignore & IGNORE))
 	    switch (i) {
 
@@ -423,14 +423,14 @@ exp3a(vp, ignore)
     p1 = exp4(vp, ignore);
 #ifdef EDEBUG
     etracc("exp3a p1", p1, vp);
-#endif
+#endif /* EDEBUG */
     op = **vp;
     if (op && any("<>", op[0]) && op[0] == op[1]) {
 	(*vp)++;
 	p2 = exp3a(vp, ignore);
 #ifdef EDEBUG
 	etracc("exp3a p2", p2, vp);
-#endif
+#endif /* EDEBUG */
 	if (op[0] == '<')
 	    i = egetn(p1) << egetn(p2);
 	else
@@ -453,14 +453,14 @@ exp4(vp, ignore)
     p1 = exp5(vp, ignore);
 #ifdef EDEBUG
     etracc("exp4 p1", p1, vp);
-#endif
+#endif /* EDEBUG */
     if (isa(**vp, ADDOP)) {
 	register Char *op = *(*vp)++;
 
 	p2 = exp4(vp, ignore);
 #ifdef EDEBUG
 	etracc("exp4 p2", p2, vp);
-#endif
+#endif /* EDEBUG */
 	if (!(ignore & IGNORE))
 	    switch (op[0]) {
 
@@ -490,14 +490,14 @@ exp5(vp, ignore)
     p1 = exp6(vp, ignore);
 #ifdef EDEBUG
     etracc("exp5 p1", p1, vp);
-#endif
+#endif /* EDEBUG */
     if (isa(**vp, MULOP)) {
 	register Char *op = *(*vp)++;
 
 	p2 = exp5(vp, ignore);
 #ifdef EDEBUG
 	etracc("exp5 p2", p2, vp);
-#endif
+#endif /* EDEBUG */
 	if (!(ignore & IGNORE))
 	    switch (op[0]) {
 
@@ -541,7 +541,7 @@ exp6(vp, ignore)
 	cp = exp6(vp, ignore);
 #ifdef EDEBUG
 	etracc("exp6 ! cp", cp, vp);
-#endif
+#endif /* EDEBUG */
 	i = egetn(cp);
 	xfree((ptr_t) cp);
 	return (putn(!i));
@@ -551,7 +551,7 @@ exp6(vp, ignore)
 	cp = exp6(vp, ignore);
 #ifdef EDEBUG
 	etracc("exp6 ~ cp", cp, vp);
-#endif
+#endif /* EDEBUG */
 	i = egetn(cp);
 	xfree((ptr_t) cp);
 	return (putn(~i));
@@ -561,7 +561,7 @@ exp6(vp, ignore)
 	ccode = exp0(vp, ignore);
 #ifdef EDEBUG
 	etraci("exp6 () ccode", ccode, vp);
-#endif
+#endif /* EDEBUG */
 	if (*vp == 0 || **vp == 0 || ***vp != ')')
 	    stderror(ERR_NAME | ERR_EXPRESSION);
 	(*vp)++;
@@ -598,19 +598,19 @@ exp6(vp, ignore)
 	prestjob();
 #ifdef EDEBUG
 	etraci("exp6 {} status", egetn(value(STRstatus)), vp);
-#endif
+#endif /* EDEBUG */
 	return (putn(egetn(value(STRstatus)) == 0));
     }
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));
     cp = *(*vp)++;
-#define FILETESTS "erwxfdzoplstSXL"
+#define FILETESTS "erwxfdzoplstSXLbcugk"
 #define FILEVALS  "ZAMCDIUGNFPL"
     if (*cp == '-' && (any(FILETESTS, cp[1]) || any(FILEVALS, cp[1])))
         return(filetest(cp, vp, ignore));
 #ifdef EDEBUG
     etracc("exp6 default", cp, vp);
-#endif
+#endif /* EDEBUG */
     return (ignore & NOGLOB ? Strsave(cp) : globone(cp, G_ERROR));
 }
 
@@ -627,7 +627,7 @@ filetest(cp, vp, ignore)
     struct stat stb, *st = NULL;
 #ifdef S_IFLNK
     struct stat lstb, *lst = NULL;
-#endif
+#endif /* S_IFLNK */
     int i = 0;
     unsigned pmask = 0xffff;
     bool altout = 0;
@@ -719,7 +719,7 @@ filetest(cp, vp, ignore)
 		    st = lst;
 	    }
 	    else 
-#endif
+#endif /* S_IFLNK */
 		if (!st && stat(short2str(ep), st = &stb) == -1) {
 		    xfree((ptr_t) ep);
 		    return (Strsave(errval));
@@ -730,81 +730,69 @@ filetest(cp, vp, ignore)
 	    case 'f':
 #ifdef S_ISREG
 		i = S_ISREG(st->st_mode);
-#else
+#else /* !S_ISREG */
 		i = 0;
-#endif
+#endif /* S_ISREG */
 		break;
 
 	    case 'd':
 #ifdef S_ISDIR
 		i = S_ISDIR(st->st_mode);
-#else
+#else /* !S_ISDIR */
 		i = 0;
-#endif
+#endif /* S_ISDIR */
 		break;
 
 	    case 'p':
 #ifdef S_ISFIFO
 		i = S_ISFIFO(st->st_mode);
-#else
+#else /* !S_ISFIFO */
 		i = 0;
-#endif
+#endif /* S_ISFIFO */
 		break;
 
 	    case 'l':
 #ifdef S_ISLNK
 		i = S_ISLNK(lst->st_mode);
-#else
+#else /* !S_ISLNK */
 		i = 0;
-#endif
+#endif /* S_ISLNK */
 		break;
 
 	    case 'S':
 # ifdef S_ISSOCK
 		i = S_ISSOCK(st->st_mode);
-# else
+# else /* !S_ISSOCK */
 		i = 0;
-# endif
+# endif /* S_ISSOCK */
 		break;
 
 	    case 'b':
 #ifdef S_ISBLK
 		i = S_ISBLK(st->st_mode);
-#else
+#else /* !S_ISBLK */
 		i = 0;
-#endif
+#endif /* S_ISBLK */
 		break;
 
 	    case 'c':
 #ifdef S_ISCHR
 		i = S_ISCHR(st->st_mode);
-#else
+#else /* !S_ISCHR */
 		i = 0;
-#endif
+#endif /* S_ISCHR */
 		break;
 
 	    case 'u':
-#ifdef S_ISUID
 		i = (S_ISUID & st->st_mode) != 0;
-#else
-		i = 0;
-#endif
 		break;
 
 	    case 'g':
-#ifdef S_ISGID
 		i = (S_ISGID & st->st_mode) != 0;
-#else
-		i = 0;
-#endif
 		break;
 
 	    case 'k':
-#ifdef S_ISVTX
 		i = (S_ISVTX & st->st_mode) != 0;
-#else
-		i = 0;
-#endif
 		break;
 
 	    case 'z':
@@ -856,25 +844,27 @@ filetest(cp, vp, ignore)
 		filnam = short2str(ep);
 #ifdef PATH_MAX
 # define MY_PATH_MAX PATH_MAX
-#else   
+#else /* !PATH_MAX */
 /* 
  * I can't think of any more sensible alterative; readlink doesn't give 
  * us an errno if the buffer isn't large enough :-(
  */
 # define MY_PATH_MAX  2048
-#endif
+#endif /* PATH_MAX */
 		i = readlink(filnam, string = (char *) 
 		      xmalloc((1 + MY_PATH_MAX) * sizeof(char)), MY_PATH_MAX);
+		if (i >= 0 && i <= MY_PATH_MAX)
+		    string[i] = '\0'; /* readlink does not null terminate */
 		strF = (i < 0) ? errval : str2short(string);
 		xfree((ptr_t) string);
 		xfree((ptr_t) ep);
 		return(Strsave(strF));
 		break;
 
-#else
+#else /* !S_ISLNK */
 		i = 0;
 		break
-#endif
+#endif /* S_ISLNK */
 		
 
 	    case 'N':
@@ -884,7 +874,7 @@ filetest(cp, vp, ignore)
 	    case 'P':
 		string = string0 + 1;
 		xsprintf(string, "%o", pmask & (unsigned int) 
-		     ((S_IRWXU|S_IRWXG|S_IRWXG|S_ISUID|S_ISGID) & st->st_mode));
+		     ((S_IRWXU|S_IRWXG|S_IRWXO|S_ISUID|S_ISGID) & st->st_mode));
 		if (altout && *string != '0')
 		    *--string = '0';
 		xfree((ptr_t) ep);
@@ -929,7 +919,7 @@ filetest(cp, vp, ignore)
     while (*++ft && i);
 #ifdef EDEBUG
     etraci("exp6 -? i", i, vp);
-#endif
+#endif /* EDEBUG */
     xfree((ptr_t) ep);
     return (putn(i));
 }
@@ -973,6 +963,8 @@ isa(cp, what)
 {
     if (cp == 0)
 	return ((what & RESTOP) != 0);
+    if (*cp == '\0')
+    	return 0;
     if (cp[1] == 0) {
 	if (what & ADDOP && (*cp == '+' || *cp == '-'))
 	    return (1);
@@ -1047,4 +1039,4 @@ etracc(str, cp, vp)
     blkpr(*vp);
     xputchar('\n');
 }
-#endif
+#endif /* EDEBUG */

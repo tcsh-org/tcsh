@@ -682,4 +682,16 @@ CONFIG  :	config.parosf1
 ENVIRON :	n/a
 NOTES   :	I have gotten two different config files that both seem to
 	:	work!
-VERSION : 6.03.00
+VERSION :	6.03.00
+
+VENDOR  :	Data General
+MODELS  :	AViiON mc88000
+COMPILER:	cc
+CFLAGS  :	-O2
+LIBES   :	-lcurses
+OS      :	DGUX 5.4R2.01
+CONFIG  :	config.dgux5.4
+ENVIRON :	n/a
+NOTES   :	n/a
+VERSION :	6.04.00
+

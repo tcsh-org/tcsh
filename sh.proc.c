@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.51 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.c,v 3.52 1993/10/08 19:14:01 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.51 1993/08/11 16:25:52 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.52 1993/10/08 19:14:01 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -772,6 +772,8 @@ palloc(pid, t)
 	pp->p_flags |= PPTIME;
     if (t->t_dflg & F_BACKQ)
 	pp->p_flags |= PBACKQ;
+    if (t->t_dflg & F_HUP)
+	pp->p_flags |= PHUP;
     cmdp = command;
     cmdlen = 0;
     padd(t);

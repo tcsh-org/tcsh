@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.54 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.c,v 3.55 1993/10/08 19:14:01 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.54 1993/08/11 16:25:52 christos Exp $")
+RCSID("$Id: sh.c,v 3.55 1993/10/08 19:14:01 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -496,6 +496,13 @@ main(argc, argv)
      * HOSTTYPE, too. Just set it again.
      */
     tsetenv(STRHOSTTYPE, str2short(gethosttype()));
+
+#ifdef REMHOST
+    /*
+     * Try to determine the remote host we were logged in from.
+     */
+    remhost();
+#endif /* REMHOST */
  
 #ifdef apollo
     if ((tcp = getenv("SYSTYPE")) == NULL)
@@ -1151,7 +1158,7 @@ void
 untty()
 {
 #ifdef BSDJOBS
-    if (tpgrp > 0) {
+    if (tpgrp > 0 && opgrp != shpgrp) {
 	(void) setpgid(0, opgrp);
 	(void) tcsetpgrp(FSHTTY, opgrp);
 	(void) resetdisc(FSHTTY);
@@ -1504,18 +1511,20 @@ int snum;
 	     * the process leader has exited and the foreground flag
 	     * is cleared for it.
 	     */
-	    do
+	    do 
 		/*
-		 * If a process is in the foreground; we try to kill
+		 * If a process is in the foreground we try to kill
 		 * it's process group. If we succeed, then the 
 		 * whole job is gone. Otherwise we keep going...
 		 * But avoid sending HUP to the shell again.
 		 */
-		if ((np->p_flags & PFOREGND) != 0 && np->p_jobid != shpgrp &&
-		    killpg(np->p_jobid, SIGHUP) != -1) {
-		    /* In case the job was suspended... */
-		    (void) killpg(np->p_jobid, SIGCONT);
-		    break;
+		if (((np->p_flags & PFOREGND) != 0) && np->p_jobid != shpgrp) {
+		    np->p_flags &= ~PHUP;
+		    if (killpg(np->p_jobid, SIGHUP) != -1) {
+			/* In case the job was suspended... */
+			(void) killpg(np->p_jobid, SIGCONT);
+			break;
+		    }
 		}
 	    while ((np = np->p_friends) != pp);
 	}
@@ -1742,7 +1751,7 @@ process(catch)
 	     * Following that, the prompt precmd is run.
 	     */
 #ifndef HAVENOUTMP
-	    watch_login();
+	    watch_login(0);
 #endif /* !HAVENOUTMP */
 	    sched_run();
 	    period_cmd();
@@ -2066,6 +2075,22 @@ xexit(i)
     }
 #endif /* TESLA */
 
+    {
+	struct process *pp, *np;
+
+	/* Kill all processes market for hup'ing */
+	for (pp = proclist.p_next; pp; pp = pp->p_next) {
+	    np = pp;
+	    do 
+		if ((np->p_flags & PHUP) || np->p_jobid != shpgrp)
+		    if (killpg(np->p_jobid, SIGHUP) != -1) {
+			/* In case the job was suspended... */
+			(void) killpg(np->p_jobid, SIGCONT);
+			break;
+		    }
+	    while ((np = np->p_friends) != pp);
+	}
+    }
     untty();
     _exit(i);
 }

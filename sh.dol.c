@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dol.c,v 3.24 1993/06/25 21:17:12 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.dol.c,v 3.25 1993/10/08 19:14:01 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.24 1993/06/25 21:17:12 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.25 1993/10/08 19:14:01 christos Exp $")
 
 /*
  * C shell
@@ -695,7 +695,10 @@ Dgetdol()
 	Char   *cp;
 	for (i = lwb - 1, length = 0; i < upb; i++)
 	    length += Strlen(vp->vec[i]);
+#ifdef notdef
+	/* We don't want that, since we can always compute it by adding $#xxx */
 	length += i - 1;	/* Add the number of spaces in */
+#endif
 	cp = putn(length);
 	addla(cp);
 	xfree((ptr_t) cp);

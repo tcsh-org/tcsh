@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.43 1993/09/24 16:48:57 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.44 1993/10/08 19:14:01 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.43 1993/09/24 16:48:57 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.44 1993/10/08 19:14:01 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1592,18 +1592,18 @@ fixio(fd, e)
 
 #ifdef EWOULDBLOCK
     case EWOULDBLOCK:
-# define TRY_AGAIN
+# define FDRETRY
 #endif /* EWOULDBLOCK */
 
 #if defined(POSIX) && defined(EAGAIN)
 # if !defined(EWOULDBLOCK) || EWOULDBLOCK != EAGAIN
     case EAGAIN:
-#  define TRY_AGAIN
+#  define FDRETRY
 # endif /* !EWOULDBLOCK || EWOULDBLOCK != EAGAIN */
 #endif /* POSIX && EAGAIN */
 
 	e = 0;
-#ifdef TRY_AGAIN
+#ifdef FDRETRY
 # ifdef F_SETFL
 /*
  * Great! we have on suns 3 flavors and 5 names...
@@ -1618,8 +1618,11 @@ fixio(fd, e)
 #  ifndef FNBIO
 #   define FNBIO 0
 #  endif
-#  ifndef FNNONBIO
-#   define FNNONBIO 0
+#  ifndef FNONBIO
+#   define FNONBIO 0
+#  endif
+#  ifndef FNONBLOCK
+#   define FNONBLOCK 0
 #  endif
 #  ifndef FNDELAY
 #   define FNDELAY 0
@@ -1627,7 +1630,7 @@ fixio(fd, e)
 	if ((e = fcntl(fd, F_GETFL, 0)) == -1)
 	    return -1;
 
-	e &= ~(O_NDELAY|O_NONBLOCK|FNBIO|FNONBIO|FNDELAY);
+	e &= ~(O_NDELAY|O_NONBLOCK|FNONBLOCK|FNBIO|FNONBIO|FNDELAY);
 
 	if (fcntl(fd, F_SETFL, e) == -1)
 	    return -1;
@@ -1643,7 +1646,7 @@ fixio(fd, e)
 	    e = 1;
 # endif	/* FIONBIO */
 
-#endif /* TRY_AGAIN */
+#endif /* FDRETRY */
 	return e ? 0 : -1;
 
     case EINTR:
@@ -1753,3 +1756,52 @@ hashbang(fd, vp)
     return -1;
 }
 #endif /* HASHBANG */
+
+#ifdef REMHOST
+
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+/*
+ * From: <lesv@ppvku.ericsson.se> (Lennart Svensson)
+ */
+void 
+remhost()
+{
+    struct sockaddr_in saddr;
+    struct hostent* hp;
+    char *host = NULL;
+    int len = sizeof(struct sockaddr_in);
+
+    if (getpeername(SHIN, (struct sockaddr *) &saddr, &len) == -1) {
+#ifdef UTHOST
+	char *name = utmphost();
+	xprintf("utmphost %s\n", name);
+	if (name != NULL) {
+	    if ((hp = gethostbyname(name)) == NULL) {
+		char *ptr = strchr(name, '.');
+		if (ptr) {
+		    *ptr = '\0';
+		    if ((hp = gethostbyname(name)) != NULL)
+			host = hp->h_name;
+		    *ptr = '.';
+		}
+	    }
+	    else
+		host = hp->h_name;
+	}
+#endif
+    }
+    else {
+	if ((hp = gethostbyaddr((char *)&saddr.sin_addr, len, AF_INET)) != NULL)
+	    host = hp->h_name;
+	else
+	    host = inet_ntoa(saddr.sin_addr);
+    }
+
+    if (host)
+	tsetenv(STRREMHOST, str2short(host));
+}
+#endif /* REMHOST */

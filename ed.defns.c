@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.defns.c,v 3.16 1993/01/08 22:23:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.defns.c,v 3.17 1993/04/26 21:13:10 christos Exp christos $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.16 1993/01/08 22:23:12 christos Exp christos $")
+RCSID("$Id: ed.defns.c,v 3.17 1993/04/26 21:13:10 christos Exp christos $")
 
 #include "ed.h"
 
@@ -133,8 +133,8 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		F_EXCHANGE_MARK	43
     e_last_item,
 #define		F_LAST_ITEM	44
-    e_list_delnext,
-#define		F_LIST_DELNEXT	45
+    e_delnext_list_eof,
+#define		F_DELNEXT_LIST_EOF	45
     v_cmd_mode,
 #define		V_CMD_MODE	46
     v_insert,
@@ -263,8 +263,10 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		F_COMPLETE_FWD	108
     e_complete_back,
 #define		F_COMPLETE_BACK	109
+    e_delnext_list,
+#define		F_DELNEXT_LIST	110
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	110
+#define		F_NUM_FNS	111
 };
 
 KEYCMD  NumFuns = F_NUM_FNS;
@@ -280,7 +282,7 @@ KEYCMD  CcEmacsMap[] = {
     F_TOBEG,			/* ^A */
     F_CHARBACK,			/* ^B */
     F_TTY_INT,			/* ^C */
-    F_LIST_DELNEXT,		/* ^D */
+    F_DELNEXT_LIST_EOF,		/* ^D */
     F_TOEND,			/* ^E */
     F_CHARFWD,			/* ^F */
     F_UNASSIGNED,		/* ^G */
@@ -955,7 +957,7 @@ KEYCMD  CcViCmdMap[] = {
     V_UNDO,			/* u */
     F_EXPAND_VARS,		/* v */
     V_WORDBEGNEXT,		/* w */
-    F_DELNEXT,			/* x */
+    F_DELNEXT_EOF,		/* x */
     F_UNASSIGNED,		/* y */
     F_UNASSIGNED,		/* z */
     F_UNASSIGNED,		/* { */
@@ -1130,9 +1132,11 @@ struct KeyFuncs FuncNames[] = {
     { "delete-char", F_DELNEXT,
       "Delete character under cursor" },
     { "delete-char-or-eof", F_DELNEXT_EOF,
-      "Delete character under cursor or end of file if there is no character" },
-    { "delete-char-or-list", F_LIST_DELNEXT,
+      "Delete character under cursor or signal end of file on an empty line" },
+    { "delete-char-or-list", F_DELNEXT_LIST,
       "Delete character under cursor or list completions if at end of line" },
+    { "delete-char-or-list-or-eof", F_DELNEXT_LIST_EOF,
+      "Delete character under cursor, list completions or signal end of file" },
     { "delete-word", F_DELWORDNEXT,
       "Cut from cursor to end of current word - save in cut buffer" },
     { "digit", F_DIGIT,

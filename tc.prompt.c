@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.prompt.c,v 3.17 1993/03/05 20:14:33 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.prompt.c,v 3.18 1993/06/25 21:17:12 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.17 1993/03/05 20:14:33 christos Exp christos $")
+RCSID("$Id: tc.prompt.c,v 3.18 1993/06/25 21:17:12 christos Exp $")
 
 #include "ed.h"
 
@@ -530,7 +530,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	}
 	else if (*cp == '\\' || *cp == '^') 
 	    *p++ = attributes | parseescape(&cp);
-	else if (*cp == '!') {	/* EGS: handle '!'s in prompts */
+	else if (*cp == HIST) {	/* EGS: handle '!'s in prompts */
 	    if (what == FMT_HISTORY) 
 		fmthist('h', info, cbuff);
 	    else

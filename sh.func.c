@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.49 1993/07/03 23:47:53 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.50 1993/08/11 16:25:52 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.49 1993/07/03 23:47:53 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.50 1993/08/11 16:25:52 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -209,6 +209,21 @@ donohup(v, c)
 
 /*ARGSUSED*/
 void
+dohup(v, c)
+    Char **v;
+    struct command *c;
+{
+    USE(c);
+    USE(v);
+    if (intty)
+	stderror(ERR_NAME | ERR_TERMINAL);
+    if (setintr == 0)
+	(void) signal(SIGHUP, SIG_DFL);
+}
+
+
+/*ARGSUSED*/
+void
 dozip(v, c)
     Char **v;
     struct command *c;
@@ -223,37 +238,35 @@ dostat(v, c)
     Char **v;
     struct command *c;
 {
-  Char **fileptr, *ftest, *res;
+    Char **fileptr, *ftest, *res;
 
-  if ( *(ftest = *++v) != '-' ) stderror(ERR_NAME | ERR_FILEINQ);
-  ++v;
-  /*
-   * OK, I just copied the globbing from everywhere else.
-   */
-  gflag = 0;
-  tglob(v);
-  if (gflag) {
-    v = globall(v);
-    if (v == 0)
-      stderror(ERR_NAME | ERR_NOMATCH);
-  }
-  else
-    v = gargv = saveblk(v);
-  trim(v);
+    if (*(ftest = *++v) != '-')
+	stderror(ERR_NAME | ERR_FILEINQ);
+    ++v;
 
-  while (*(fileptr = v++)) {
-    xprintf("%S", res = filetest(ftest, &fileptr, 0));
-    xfree(res);
-    if ( *v ) xprintf(" ");
-  }
-  xprintf("\n");
+    gflag = 0;
+    tglob(v);
+    if (gflag) {
+	v = globall(v);
+	if (v == 0)
+	    stderror(ERR_NAME | ERR_NOMATCH);
+    }
+    else
+	v = gargv = saveblk(v);
+    trim(v);
 
-/* Likewise, copied. I hope it's right.. */
-  if (gargv) {
-    blkfree(gargv);
-    gargv = 0;
-  }
+    while (*(fileptr = v++) != '\0') {
+	xprintf("%S", res = filetest(ftest, &fileptr, 0));
+	xfree((ptr_t) res);
+	if (*v)
+	    xprintf(" ");
+    }
+    xprintf("\n");
 
+    if (gargv) {
+	blkfree(gargv);
+	gargv = 0;
+    }
 }
 
 void
@@ -509,6 +522,7 @@ doexit(v, c)
     struct command *c;
 {
     USE(c);
+
     if (chkstop == 0 && (intty || intact) && evalvec == 0)
 	panystop(0);
     /*
@@ -521,7 +535,10 @@ doexit(v, c)
 	    stderror(ERR_NAME | ERR_EXPRESSION);
     }
     btoeof();
+#if 0
     if (intty)
+#endif
+    /* Always close, why only on ttys? */
 	(void) close(SHIN);
 }
 

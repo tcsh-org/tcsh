@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.init.c,v 3.28 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.init.c,v 3.29 1993/10/08 19:14:01 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.28 1993/08/11 16:25:52 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.29 1993/10/08 19:14:01 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -90,6 +90,7 @@ struct	biltins bfunc[] = {
     { "hashstat",	hashstat,	0,	0	},
 #endif
     { "history",	dohist,		0,	2	},
+    { "hup",		dohup,		0,	INF	},
     { "if",		doif,		1,	INF	},
 #ifdef apollo
     { "inlib", 		doinlib,	1,	INF	},

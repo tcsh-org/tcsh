@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.proc.h,v 3.4 1991/11/26 04:28:26 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.proc.h,v 3.5 1992/04/03 22:15:14 christos Exp $ */
 /*
  * sh.proc.h: Process data structures and variables
  */
@@ -105,6 +105,7 @@ struct process {
 #define	PPTIME		(1<<14)	/* time individual process */
 #define	PNEEDNOTE	(1<<15)	/* notify as soon as practical */
 #define PBACKQ		(1<<16)	/* Process is `` evaluation */
+#define PHUP		(1<<17)	/* Process is marked for SIGHUP on exit */
 
 #define	PMAXLEN		80
 

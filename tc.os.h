@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.48 1993/07/07 19:16:17 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.os.h,v 3.49 1993/08/11 16:25:52 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -334,6 +334,20 @@ struct ucred {
 #ifndef S_ISVTX
 # define S_ISVTX 0001000	/* sticky */
 #endif /* S_ISVTX */
+#ifndef S_ENFMT
+# define S_ENFMT S_ISGID	/* record locking enforcement flag */
+#endif /* S_ENFMT */
+
+/* the following macros are for POSIX conformance */
+#ifndef S_IRWXU
+# define S_IRWXU (S_IRUSR | S_IWUSR | S_IXUSR)
+#endif /* S_IRWXU */
+#ifndef S_IRWXG
+# define S_IRWXG (S_IRGRP | S_IWGRP | S_IXGRP)
+#endif /* S_IRWXG */
+#ifndef S_IRWXO
+# define S_IRWXO (S_IROTH | S_IWOTH | S_IXOTH)
+#endif /* S_IRWXO */
 
 /*
  * Access()
@@ -589,7 +603,7 @@ extern void endpwent();
 
 # ifndef __STDC__
 extern struct passwd *getpwuid(), *getpwnam(), *getpwent();
-#  ifdef PW_SHADOW
+#  ifdef PW_etgHADOW
 extern struct spwd *getspnam(), *getspent();
 #  endif /* PW_SHADOW */
 #  ifdef PW_AUTH
@@ -619,6 +633,12 @@ extern char *ttyname();
  */
 extern int ioctl __P((int, int, ...));
 extern int readlink __P((const char *, char *, size_t));
+extern void setgrent __P((void));
+extern void endgrent __P((void));
+# ifdef REMHOST
+struct sockaddr;
+extern int getpeername __P((int, struct sockaddr *, int *));
+# endif /* REMHOST */
 #endif /* SUNOS4 && __GNUC__ == 2 */
 
 #if (defined(BSD) && !defined(__386BSD__)) || defined(SUNOS4) 

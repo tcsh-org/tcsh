@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.err.c,v 3.19 1993/06/05 21:09:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.err.c,v 3.20 1993/06/25 21:17:12 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.19 1993/06/05 21:09:15 christos Exp christos $")
+RCSID("$Id: sh.err.c,v 3.20 1993/06/25 21:17:12 christos Exp $")
 
 /*
  * C Shell
@@ -344,7 +344,7 @@ static char *errorlist[] =
  */
 void
 /*VARARGS1*/
-#if __STDC__
+#ifdef FUNCPROTO
 seterror(unsigned int id, ...)
 #else
 seterror(va_alist)
@@ -355,7 +355,7 @@ seterror(va_alist)
     if (seterr == 0) {
 	va_list va;
 	char    berr[BUFSIZE];
-#if __STDC__
+#ifdef FUNCPROTO
 	va_start(va, id);
 #else
 	unsigned int id;
@@ -392,7 +392,7 @@ seterror(va_alist)
  */
 void
 /*VARARGS*/
-#if __STDC__
+#ifdef FUNCPROTO
 stderror(unsigned int id, ...)
 #else
 stderror(va_alist)
@@ -404,7 +404,7 @@ stderror(va_alist)
     int flags;
     int vareturn;
 
-#if __STDC__
+#ifdef FUNCPROTO
     va_start(va, id);
 #else
     unsigned int id;

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.56 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.57 1993/10/08 19:14:01 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -286,7 +286,7 @@ extern int setpgrp();
 
 #include <setjmp.h>
 
-#if __STDC__
+#if __STDC__ || defined(FUNCPROTO)
 # include <stdarg.h>
 #else
 #ifdef	_MINIX
@@ -340,6 +340,9 @@ extern int setpgrp();
 #undef __P
 #ifndef __P
 # if __STDC__ || defined(FUNCPROTO)
+#  ifndef FUNCPROTO
+#   define FUNCPROTO
+#  endif
 #  define __P(a) a
 # else
 #  define __P(a) ()
@@ -733,19 +736,23 @@ EXTERN Char   *lap;
  * as needed during the semantics/exeuction pass (sh.sem.c).
  */
 struct command {
-    short   t_dtyp;		/* Type of node 		 */
+    unsigned char   t_dtyp;	/* Type of node 		 */
 #define	NODE_COMMAND	1	/* t_dcom <t_dlef >t_drit	 */
 #define	NODE_PAREN	2	/* ( t_dspr ) <t_dlef >t_drit	 */
 #define	NODE_PIPE	3	/* t_dlef | t_drit		 */
 #define	NODE_LIST	4	/* t_dlef ; t_drit		 */
 #define	NODE_OR		5	/* t_dlef || t_drit		 */
 #define	NODE_AND	6	/* t_dlef && t_drit		 */
-    short   t_dflg;		/* Flags, e.g. F_AMPERSAND|... 	 */
+    unsigned char   t_nice;	/* Nice value			 */
+#ifdef apollo
+    unsigned char   t_systype;	/* System environment		 */
+#endif 
+    unsigned long   t_dflg;	/* Flags, e.g. F_AMPERSAND|... 	 */
 /* save these when re-doing 	 */
 #ifndef apollo
-#define	F_SAVE	(F_NICE|F_TIME|F_NOHUP)	
+#define	F_SAVE	(F_NICE|F_TIME|F_NOHUP|F_HUP)	
 #else
-#define	F_SAVE	(F_NICE|F_TIME|F_NOHUP|F_VER)
+#define	F_SAVE	(F_NICE|F_TIME|F_NOHUP||F_HUP|F_VER)
 #endif 
 #define	F_AMPERSAND	(1<<0)	/* executes in background	 */
 #define	F_APPEND	(1<<1)	/* output is redirected >>	 */
@@ -762,8 +769,9 @@ struct command {
 #define	F_NOHUP		(1<<12)	/* nohup this command 		 */
 #define	F_TIME		(1<<13)	/* time this command 		 */
 #define F_BACKQ		(1<<14)	/* command is in ``		 */
+#define F_HUP		(1<<15)	/* hup this command		 */
 #ifdef apollo
-#define F_VER		(1<<15)	/* execute command under SYSTYPE */
+#define F_VER		(1<<16)	/* execute command under SYSTYPE */
 #endif 
     union {
 	Char   *T_dlef;		/* Input redirect word 		 */
@@ -779,10 +787,6 @@ struct command {
 #define	t_dcdr	R.T_dcdr
     Char  **t_dcom;		/* Command/argument vector 	 */
     struct command *t_dspr;	/* Pointer to ()'d subtree 	 */
-    short   t_nice;
-#ifdef F_VER
-    short   t_systype;
-#endif 
 };
 
 

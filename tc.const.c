@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.const.c,v 3.22 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.const.c,v 3.23 1993/10/10 01:35:53 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.22 1993/10/08 19:14:01 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.23 1993/10/10 01:35:53 christos Exp $")
 
 Char STRlogout[]        = { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]    = { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -61,6 +61,9 @@ Char STRversion[]       = { 'v', 'e', 'r', 's', 'i', 'o', 'n', '\0' };
 Char STRuid[]           = { 'u', 'i', 'd', '\0' };
 Char STRgid[]           = { 'g', 'i', 'd', '\0' };
 Char STRHOST[]          = { 'H', 'O', 'S', 'T', '\0' };
+#ifdef REMHOST
+Char STRREMHOST[]       = { 'R', 'E', 'M', 'H', 'O', 'S', 'T', '\0' };
+#endif /* REMHOST */
 Char STRHOSTTYPE[]      = { 'H', 'O', 'S', 'T', 'T', 'Y', 'P', 'E', '\0' };
 Char STRedit[]          = { 'e', 'd', 'i', 't', '\0' };
 Char STRaddsuffix[]     = { 'a', 'd', 'd', 's', 'u', 'f', 'f', 'i', 'x', '\0' };
@@ -245,6 +248,7 @@ Char STRinputmode[]	= { 'i', 'n', 'p', 'u', 't', 'm', 'o', 'd', 'e', '\0' };
 Char STRoverwrite[]	= { 'o', 'v', 'e', 'r', 'w', 'r', 'i', 't', 'e', '\0' };
 Char STRinsert[]	= { 'i', 'n', 's', 'e', 'r', 't', '\0' };
 Char STRnohup[]		= { 'n', 'o', 'h', 'u', 'p', '\0' };
+Char STRhup[]		= { 'h', 'u', 'p', '\0' };
 Char STRnice[]		= { 'n', 'i', 'c', 'e', '\0' };
 Char STRshowdots[]	= { 's', 'h', 'o', 'w', 'd', 'o', 't', 's', '\0' };
 Char STRthen[]		= { 't', 'h', 'e', 'n', '\0' };

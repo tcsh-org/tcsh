@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.decls.h,v 3.22 1993/02/12 17:22:20 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.decls.h,v 3.23 1993/06/24 15:29:37 christos Exp christos $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -101,6 +101,9 @@ extern	int		  collate	__P((const Char *, const Char *));
 #ifdef HASHBANG
 extern	int		  hashbang	__P((int, Char ***));
 #endif /* HASHBANG */
+#ifdef REMHOST
+extern	void		  remhost	__P((void));
+#endif /* REMHOST */
 
 
 /*
@@ -241,7 +244,7 @@ extern	void 		  sigpause	__P((int));
 extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
 # define signal(a, b)	  xsignal(a, b)
 #endif /* NEEDsignal */
-#if defined(_SEQUENT_) || (SYSVREL > 3 && defined(POSIXSIGS))
+#if defined(_SEQUENT_) || ((SYSVREL > 3 || defined(_DGUX_SOURCE)) && defined(POSIXSIGS))
 extern	sigmask_t	  sigsetmask	__P((sigmask_t));
 extern	sigmask_t	  sigblock	__P((sigmask_t));
 extern	void		  bsd_sigpause	__P((sigmask_t));
@@ -292,9 +295,12 @@ extern	char		 *gethosttype	__P((void));
 #ifndef HAVENOUTMP
 extern	void		  initwatch	__P((void));
 extern	void		  resetwatch	__P((void));
-extern	void		  watch_login	__P((void));
+extern	void		  watch_login	__P((int));
 extern	char 		 *who_info	__P((ptr_t, int, char *));
 extern	void		  dolog		__P((Char **, struct command *));
+# ifdef UTHOST
+extern	char		 *utmphost	__P((void));
+# endif /* UTHOST */
 #endif /* HAVENOUTMP */
 
 #endif /* _h_tc_decls */

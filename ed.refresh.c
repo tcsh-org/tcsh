@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.refresh.c,v 3.13 1993/04/26 21:13:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.refresh.c,v 3.14 1993/06/25 21:17:12 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.13 1993/04/26 21:13:10 christos Exp christos $")
+RCSID("$Id: ed.refresh.c,v 3.14 1993/06/25 21:17:12 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -79,7 +79,7 @@ Char *f, *t;
  *	debugging cause you'll mangle up the file descriptors!
  */
 static void
-#if __STDC__
+#ifdef FUNCPROTO
 dprintf(char *fmt, ...)
 #else
 dprintf(va_list)
@@ -92,7 +92,7 @@ dprintf(va_list)
     if ((dtty = getenv("DEBUGTTY"))) {
 	int o;
 	va_list va;
-#if __STDC__
+#ifdef FUNCPROTO
 	va_start(va, fmt);
 #else
 	char *fmt;

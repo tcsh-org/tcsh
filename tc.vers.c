@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.32 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.33 1993/10/08 19:14:01 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.32 1993/08/11 16:25:52 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.33 1993/10/08 19:14:01 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -654,16 +654,21 @@ fix_version()
 #else
 # define NGSTR	""
 #endif
+#ifdef REMHOST
+# define RHSTR	",rh"
+#else
+# define RHSTR	""
+#endif
 /* if you want your local version to say something */
 #ifndef LOCALSTR
 # define LOCALSTR ""
 #endif /* LOCALSTR */
 
     (void) xsprintf(version,
-	     "tcsh %d.%.2d.%.2d (%s) %s (%s) options %s%s%s%s%s%s%s%s%s%s%s%s%s",
+	 "tcsh %d.%.2d.%.2d (%s) %s (%s) options %s%s%s%s%s%s%s%s%s%s%s%s%s%s",
 	     REV, VERS, PATCHLEVEL, ORIGIN, DATE, gethosttype(),
 	     SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR,
-	     BYESTR, ALSTR, KANSTR, SMSTR, HBSTR, NGSTR, LOCALSTR);
+	     BYESTR, ALSTR, KANSTR, SMSTR, HBSTR, NGSTR, RHSTR, LOCALSTR);
     set(STRversion, SAVE(version), VAR_READWRITE);
     (void) xsprintf(version, "%d.%.2d.%.2d", REV, VERS, PATCHLEVEL);
     set(STRtcsh, SAVE(version), VAR_READWRITE);

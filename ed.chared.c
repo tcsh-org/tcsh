@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.35 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.chared.c,v 3.36 1993/10/08 19:14:01 christos Exp christos $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.35 1993/08/11 16:25:52 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.36 1993/10/08 19:14:01 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1984,11 +1984,37 @@ e_delwordprev(c)
     return(CC_REFRESH);
 }
 
+/* DCS <dcs@neutron.chem.yale.edu>, 9 Oct 93
+ *
+ * Changed the names of some of the ^D family of editor functions to
+ * correspond to what they actually do and created new e_delnext_list
+ * for completeness.
+ *   
+ *   Old names:			New names:
+ *   
+ *   delete-char		delete-char-or-eof
+ *     F_DELNEXT		  F_DELNEXT_EOF
+ *     e_delnext		  e_delnext_eof
+ *     edelnxt			  edelnxteof
+ *   delete-char-or-eof		delete-char			
+ *     F_DELNEXT_EOF		  F_DELNEXT
+ *     e_delnext_eof		  e_delnext
+ *     edelnxteof		  edelnxt
+ *   delete-char-or-list	delete-char-or-list-or-eof
+ *     F_LIST_DELNEXT		  F_DELNEXT_LIST_EOF
+ *     e_list_delnext		  e_delnext_list_eof
+ *   				  edellsteof
+ *   (no old equivalent)	delete-char-or-list
+ *   				  F_DELNEXT_LIST
+ *   				  e_delnext_list
+ *   				  e_delnxtlst
+ */
+
 /* added by mtk@ari.ncl.omron.co.jp (920818) */
 /* rename e_delnext() -> e_delnext_eof() */
 /*ARGSUSED*/
 CCRETVAL
-e_delnext_eof(c)
+e_delnext(c)
     int c;
 {
     USE(c);
@@ -2012,7 +2038,7 @@ e_delnext_eof(c)
 
 /*ARGSUSED*/
 CCRETVAL
-e_delnext(c)
+e_delnext_eof(c)
     int c;
 {
     USE(c);
@@ -2042,7 +2068,26 @@ e_delnext(c)
 
 /*ARGSUSED*/
 CCRETVAL
-e_list_delnext(c)
+e_delnext_list(c)
+    int c;
+{
+    USE(c);
+    if (Cursor == LastChar) {	/* if I'm at the end */
+	PastBottom();
+	*LastChar = '\0';	/* just in case */
+	return(CC_LIST_CHOICES);
+    }
+    else {
+	c_delafter(Argument);	/* delete after dot */
+	if (Cursor > LastChar)
+	    Cursor = LastChar;	/* bounds check */
+	return(CC_REFRESH);
+    }
+}
+
+/*ARGSUSED*/
+CCRETVAL
+e_delnext_list_eof(c)
     int c;
 {
     USE(c);

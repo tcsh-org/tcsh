@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.19 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.20 1993/08/11 16:25:52 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -141,6 +141,7 @@ extern	void		  dologout	__P((Char **, struct command *));
 extern	void		  donewgrp	__P((Char **, struct command *));
 #endif
 extern	void		  donohup	__P((Char **, struct command *));
+extern	void		  dohup		__P((Char **, struct command *));
 extern	void		  doonintr	__P((Char **, struct command *));
 extern	void		  doprintenv	__P((Char **, struct command *));
 extern	void		  dorepeat	__P((Char **, struct command *));

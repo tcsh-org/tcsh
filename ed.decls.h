@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.decls.h,v 3.16 1993/04/26 21:13:10 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.decls.h,v 3.17 1993/06/25 21:17:12 christos Exp christos $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -124,7 +124,8 @@ extern	CCRETVAL	e_delprev		__P((int));
 extern	CCRETVAL	e_delnext		__P((int));
 /* added by mtk@ari.ncl.omron.co.jp (920818) */
 extern	CCRETVAL	e_delnext_eof		__P((int));	
-extern	CCRETVAL	e_list_delnext		__P((int));	/* for ^D */
+extern	CCRETVAL	e_delnext_list		__P((int));
+extern	CCRETVAL	e_delnext_list_eof	__P((int));	/* for ^D */
 extern	CCRETVAL	e_toend			__P((int));
 extern	CCRETVAL	e_tobeg			__P((int));
 extern	CCRETVAL	e_charback		__P((int));
