@@ -1,4 +1,7 @@
 V6.00.03, ....
+13. -Dvar=name command line option for the apollos.
+12. Prompt format changes for date/directory.
+11. Vi searches.
 10. Emacs i-search. [currently not bound]
 9.  Vi additions ([dc]-{w,$,f<c>},Undo)
 8.  tcsh -n parses now builtin structures.
@@ -207,10 +210,7 @@ V5.20.02, 12/15/90.
 16. Bind [A - [D and OA to OD in vi mode to the arrow key functions
     so that they work from insert mode.
 15. %~ was not working correctly for /home/news and /home/newsbin...
-14. Removed $Log: Fixes,v $
-# Revision 1.1  1991/09/08  00:45:32  christos
-# Initial revision
-# from sources; it was getting too large...
+14. Removed Rcs Log
 13. ISC unix fixes.
 12. sunos3.x wants <sys/dir.h> not <dirent.h>
 11. Remove precmd's, cwdcmd's and periodic cmds that had errors.

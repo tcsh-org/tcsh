@@ -1,11 +1,12 @@
-.\" $Id: tcsh.man,v 3.11 1991/09/08 00:45:32 christos Exp $
+.\" $Id: tcsh.man,v 3.13 1991/09/10 04:51:46 christos Exp $
 .TH TCSH 1 "5 August 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
 .B tcsh 
 [ 
-.B \-bcdefilmnqstvVxX 
+.B \-bcdefFilmnqstvVxX 
+.B \-Dname[=value]
 ] 
 [ 
 .I argument .\|.\|.  
@@ -421,7 +422,7 @@ VI Command Mode functions
 "?"	->  vi-search-fwd
 "@"	->  is undefined
 "A"	->  vi-add-at-eol
-"B"	->  backward-word
+"B"	->  vi-word-back
 "C"	->  change-till-end-of-line
 "D"	->  kill-line
 "E"	->  vi-endword
@@ -436,12 +437,12 @@ VI Command Mode functions
 "T"	->  toggle-literal-history
 "U"	->  is undefined
 "V"	->  expand-variables
-"W"	->  forward-word
+"W"	->  vi-word-fwd
 "X"	->  backward-delete-char
 "["	->  sequence-lead-in
 "\e^"	->  beginning-of-line
 "a"	->  vi-add
-"b"	->  vi-wordback
+"b"	->  backward-word
 "c"	->  is undefined
 "d"	->  vi-delmeta
 "e"	->  vi-eword
@@ -1165,7 +1166,7 @@ The available sequences are:
 .RS +.6i
 .ta 1.2i 1.7i
 .nf
-%d or %/	Current working directory.
+%/	Current working directory.
 %~	cwd.  If it starts with $HOME, that part is 
 	replaced by a ~. In addition if a directory
 	name prefix matches a user's home directory,
@@ -1195,9 +1196,12 @@ The available sequences are:
 ^c	`c' is parsed the same way as in bindkey.
 %%	A single %.
 %n	The user name, contents of $user.
-%w	The date in <Mon> dd format.
-%W	The date in mm/dd/yy format.
-%D	The date in yy-mm-dd format.
+%d	The weekday in <Day> format.
+%D	The day in dd format.
+%w	The month in <Mon> format.
+%W	The month in mm format.
+%y	The year in yy format.
+%Y	The year in yyyy format.
 %l	The line (tty) the user is logged on.
 %L	clear from prompt to end of display or end of line.
 %#	A `#' if tcsh is run as a root shell, 
@@ -1504,9 +1508,10 @@ The following sequences are available for the format specification:
 	time is approximated if unavailable).
 %T	The time, in 24-hour format. (but see 
 	the "ampm" shell variable below).
-%w	The date in <Mon> dd format.
-%W	The date in mm/dd/yy format.
-%D	The date in yy-mm-dd format.
+%D	The day in dd format.
+%w	The month in <Mon> format.
+%W	The month in mm format.
+%Y	The year in yy format.
 .RE
 .DT
 .fi
@@ -1751,7 +1756,7 @@ set path = (~/bin.$HOSTTYPE /usr/ucb /bin /usr/bin /usr/games .)
 .sp
 and the user has directories named "bin.\fImachine\fR" (where
 .I machine
-is a name from the above list), then the user can have the same
+is a name from the list below), then the user can have the same
 programs compiled for different machines in the appropriate
 "bin.\fImachine\fR" directories and
 .I tcsh
@@ -2324,6 +2329,12 @@ or present only in
 Load ~/.cshdirs (If 
 .I tcsh 
 was compiled with CSHDIRS enabled)(+)
+.TP 4
+.I \-Dname[=value]
+Set environment variable name to value. (Domain/OS only) (+)
+.TP 4
+.I \-F
+Use fork() instead of vfork() to spawn processes. (Convex/OS only) (+)
 .TP 4
 .I \-l
 Make 

@@ -2,6 +2,9 @@ This file contains visible (incompatible) changes to the users.
 This version of tcsh has the following new things:
 
 6.00 PL3
+* %d in the prompt is the week-day and no longer $cwd; use %/ instead.
+* changes in the prompt format. Date changes to accomodate people from
+  down under. 
 * vi insert mode to command mode transition does not move the cursor.
 
 6.00 PL2

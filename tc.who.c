@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.2 1991/07/17 13:25:11 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.who.c,v 3.3 1991/09/10 04:51:46 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.who.c,v 3.2 1991/07/17 13:25:11 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.3 1991/09/10 04:51:46 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -97,6 +97,7 @@ static struct who *wholist = NULL;
 static int watch_period = 0;
 static time_t stlast = 0;
 extern char *month_list[];
+extern char *day_list[];
 #ifdef WHODEBUG
 static	void	debugwholist	__P((struct who *, struct who *));
 #endif
@@ -506,17 +507,23 @@ print_who(wp)
 		else
 		    xprintf("%a%d:%02d", attributes, t->tm_hour, t->tm_min);
 		break;
-	    case 'w':
-		xprintf("%a%s %d", attributes, month_list[t->tm_mon],
-			t->tm_mday);
-		break;
-	    case 'W':
-		xprintf("%a%02d/%02d/%02d", attributes,
-			t->tm_mon + 1, t->tm_mday, t->tm_year);
+	    case 'd':
+		xprintf("%a%02d", attributes, day_list[t->tm_wday]);
 		break;
 	    case 'D':
-		xprintf("%a%02d-%02d-%02d", attributes,
-			t->tm_year, t->tm_mon + 1, t->tm_mday);
+		xprintf("%a%02d", attributes, t->tm_mday);
+		break;
+	    case 'w':
+		xprintf("%a%s", attributes, month_list[t->tm_mon]);
+		break;
+	    case 'W':
+		xprintf("%a%02d", attributes, t->tm_mon + 1);
+		break;
+	    case 'y':
+		xprintf("%a%02d", attributes, t->tm_year);
+		break;
+	    case 'Y':
+		xprintf("%a%04d", attributes, t->tm_year + 1900);
 		break;
 	    case 'l':
 		xprintf("%a%s", attributes, wp->w_tty);

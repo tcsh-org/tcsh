@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.prompt.c,v 3.2 1991/07/15 19:37:24 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.prompt.c,v 3.3 1991/09/08 00:45:32 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.prompt.c,v 3.2 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.3 1991/09/08 00:45:32 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -45,10 +45,12 @@ RCSID("$Id: tc.prompt.c,v 3.2 1991/07/15 19:37:24 christos Exp $")
  * PWP 4/27/87 -- rearange for tcsh.
  * mrdch@com.tau.edu.il 6/26/89 - added ~, T and .# - rearanged to switch()
  *                 instead of if/elseif
+ * Luke Mewburn, s902113@minyos.xx.rmit.OZ.AU 6-Sep-91 - changed date format
  */
 
 char   *month_list[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 			"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+char   *day_list[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 void
 printprompt(promptno, str)
     int     promptno;
@@ -193,7 +195,6 @@ printprompt(promptno, str)
 		}
 		/* fall through if ~ not matched */
 	    case '/':
-	    case 'd':
 		if (z = value(STRcwd)) {
 		    while (*z)
 			*p++ = attributes | *z++;
@@ -254,14 +255,24 @@ printprompt(promptno, str)
 		    while (*z)
 			*p++ = attributes | *z++;
 		break;
+	    case 'd':
+		for (cz = day_list[t->tm_wday]; *cz;)
+		    *p++ = attributes | *cz++;
+		break;
+	    case 'D':
+		Itoa(t->tm_mday, buff);
+		if (buff[1]) {
+		    *p++ = attributes | buff[0];
+		    *p++ = attributes | buff[1];
+		}
+		else {
+		    *p++ = attributes | '0';
+		    *p++ = attributes | buff[0];
+		}
+		break;
 	    case 'w':
 		for (cz = month_list[t->tm_mon]; *cz;)
 		    *p++ = attributes | *cz++;
-		*p++ = attributes | ' ';
-		Itoa(t->tm_mday, buff);
-		*p++ = attributes | buff[0];
-		if (buff[1])
-		    *p++ = attributes | buff[1];
 		break;
 	    case 'W':
 		Itoa(t->tm_mon + 1, buff);
@@ -273,30 +284,8 @@ printprompt(promptno, str)
 		    *p++ = attributes | '0';
 		    *p++ = attributes | buff[0];
 		}
-		*p++ = attributes | '/';
-
-		Itoa(t->tm_mday, buff);
-		if (buff[1]) {
-		    *p++ = attributes | buff[0];
-		    *p++ = attributes | buff[1];
-		}
-		else {
-		    *p++ = attributes | '0';
-		    *p++ = attributes | buff[0];
-		}
-		*p++ = attributes | '/';
-
-		Itoa(t->tm_year, buff);
-		if (buff[1]) {
-		    *p++ = attributes | buff[0];
-		    *p++ = attributes | buff[1];
-		}
-		else {
-		    *p++ = attributes | '0';
-		    *p++ = attributes | buff[0];
-		}
 		break;
-	    case 'D':
+	    case 'y':
 		Itoa(t->tm_year, buff);
 		if (buff[1]) {
 		    *p++ = attributes | buff[0];
@@ -306,28 +295,12 @@ printprompt(promptno, str)
 		    *p++ = attributes | '0';
 		    *p++ = attributes | buff[0];
 		}
-		*p++ = attributes | '-';
-
-		Itoa(t->tm_mon + 1, buff);
-		if (buff[1]) {
-		    *p++ = attributes | buff[0];
-		    *p++ = attributes | buff[1];
-		}
-		else {
-		    *p++ = attributes | '0';
-		    *p++ = attributes | buff[0];
-		}
-		*p++ = attributes | '-';
-
-		Itoa(t->tm_mday, buff);
-		if (buff[1]) {
-		    *p++ = attributes | buff[0];
-		    *p++ = attributes | buff[1];
-		}
-		else {
-		    *p++ = attributes | '0';
-		    *p++ = attributes | buff[0];
-		}
+	    case 'Y':
+		Itoa(t->tm_year + 1900, buff);
+		*p++ = attributes | buff[0];
+		*p++ = attributes | buff[1];
+		*p++ = attributes | buff[2];
+		*p++ = attributes | buff[3];
 		break;
 	    case 'S':		/* start standout */
 		attributes |= STANDOUT;
