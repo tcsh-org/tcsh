@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.1 1991/07/05 19:07:33 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 3.2 1991/07/15 19:37:24 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -38,8 +38,15 @@
 #define _h_tc_os
 
 #ifdef OREO
-#include <sys/time.h>
-#include <sys/resource.h>
+# include <sys/time.h>
+# include <sys/resource.h>
+# ifdef POSIX
+#  ifdef T_BREAK
+#   undef T_BREAK
+#  endif /* T_BREAK */
+#  include <sys/tty.h>
+#  include <termios.h>
+# endif /* POSIX */
 #endif /* OREO */
 
 #ifdef titan
