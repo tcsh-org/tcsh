@@ -1,0 +1,24 @@
+$Id$
+
+I think this is a good workflow:
+
+- new bug reported
+- before working on it, please assign it to yourself:
+  a) view the issue and click Assign To: while the dropdown shows [Myself]
+     or your username
+  b) use the checkboxes on the View Issues page and select the Assign
+     action and click OK (haven't gone this route myself yet)
+- work on the code, commit to CVS, use the magic words "issue #NNNN" in
+  the commit message; the commit message will get the status changed to
+  resolved; if you didn't remember to use the magic words, don't worry,
+  just continue with the next step
+- go to the View Issues page, use the checkbox(es) to select the issue(s)
+  you have resolved, select the Resolve action and click OK
+- set the Resolution field accordingly (usually "fixed", if you committed
+  code for the issue) and select the Fixed in Version (IMPORTANT)
+
+Of course, only the "fixed" resolution warrants selecting a version.
+
+Before resolving to anything but "fixed", you should probably attach a new
+note explaining why you are setting a specific resolution.
+

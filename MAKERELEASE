@@ -1,5 +1,5 @@
 #!/bin/sh
-# @(#)$Id$
+# @(#)$Id: MAKERELEASE,v 1.1 2005/03/03 20:58:10 kim Exp $
 #
 # Copyright (c) 2005 Kimmo Suominen
 # All rights reserved.
@@ -58,6 +58,7 @@ cleanit()
 {
     (cd tcsh && rm -f \
 	Announce* \
+	BUG-TRACKING \
 	Copyright \
 	MAKERELEASE \
 	Makefile.ADMIN \
