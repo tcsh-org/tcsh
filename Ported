@@ -664,8 +664,8 @@ VERSION	:	6.03.00
 VENDOR  :	digital
 MODELS  :	DECstation 3000/400 (alpha)
 COMPILER:	cc
-CFLAGS  :	-call_shared -I. -I.. -O -Olimit 2000
+CFLAGS  :	-call_shared -I. -I.. -O -Olimit 2000 -std1
 LIBES   :	-lcurses
 OS      :	OSF1 1.2
 CONFIG  :	config.decosf1
-VERSION :	6.02
+VERSION :	6.03
