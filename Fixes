@@ -1,3 +1,5 @@
+ 56. V6.13.07 - 20050118
+ 55. constifications, XXX: duplicate prototype on setpgrp().
  54. iconv fixes (Miloslav Trmac)
  53. literal code cleanups (Miloslav Trmac)
  52. move intptr_t definition to sh.h and include both stdint.h and inttypes.h
