@@ -1,5 +1,16 @@
 V6.04.00, ...
- 54. 6.03.05 04/26/93
+ 55. 6.03.05 04/26/93
+ 54. Don't echo history expansion in loops:
+     > alias junk 'foreach i (\!:2*) \
+     foreach? echo \!:1 $i; \
+     foreach? end'
+     > junk a b c d
+     echo a $i ;
+     a b
+     echo a $i ;
+     a c
+     echo a $i ;
+     a d
  53. Added complete-word-fwd and complete-word-back that scroll through
      the list of possible completions... Neat addition from 
      jfink@csugrad.cs.vt.edu (Jeff "$DOTDIR" Fink)
