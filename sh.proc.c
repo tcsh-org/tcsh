@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.30 1992/07/18 01:34:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.31 1992/07/23 14:42:29 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.30 1992/07/18 01:34:46 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.31 1992/07/23 14:42:29 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1973,18 +1973,22 @@ pgetty(wanttty, pgrp)
      */
     if (wanttty >= 0)
 	if (setpgid(0, pgrp) == -1) {
+# ifdef POSIXJOBS
 	    /* Walking process group fix; see above */
 	    if (setpgid(0, pgrp = getpid()) == -1) {
+# endif /* POSIXJOBS */
 		stderror(ERR_SYSTEM, "setpgid child:\n", strerror(errno));
 		xexit(0);
+# ifdef POSIXJOBS
 	    }
 	    wanttty = 1;  /* Now we really want the tty, since we became the
 			   * the process group leader
 			   */
+# endif /* POSIXJOBS */
 	}
 
-    if (wanttty > 0) {
 # ifdef POSIXJOBS
+    if (wanttty > 0) {
         /*
 	 * tcsetpgrp will set SIGTTOU to all the the processes in 
 	 * the background according to POSIX... We ignore this here.
@@ -1992,7 +1996,6 @@ pgetty(wanttty, pgrp)
 	sigret_t (*old)() = sigset(SIGTTOU, SIG_IGN);
 	(void) tcsetpgrp(FSHTTY, pgrp);
 	(void) sigset(SIGTTOU, old);
-# endif /* POSIXJOBS */
 
 #  ifdef BSDSIGS
 	(void) sigsetmask(omask);
@@ -2001,6 +2004,7 @@ pgetty(wanttty, pgrp)
 	(void) sigrelse(SIGTTIN);
 #  endif /* !BSDSIGS */
     }
+# endif /* POSIXJOBS */
 
     if (tpgrp > 0)
 	tpgrp = 0;		/* gave tty away */
