@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.107 2003/12/02 18:00:08 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.108 2004/02/21 20:34:24 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.107 2003/12/02 18:00:08 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.108 2004/02/21 20:34:24 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -343,11 +343,12 @@ dologin(v, c)
     Char  **v;
     struct command *c;
 {
-    USE(c);
 #ifdef WINNT_NATIVE
+    USE(c);
     USE(v);
 #else /* !WINNT_NATIVE */
     char **p = short2blk(v);
+    USE(c);
     islogin();
     rechist(NULL, adrof(STRsavehist) != NULL);
     (void) signal(SIGTERM, parterm);
