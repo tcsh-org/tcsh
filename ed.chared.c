@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/ed.chared.c,v 3.46 1995/04/16 19:15:53 christos Exp christos $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.47 1996/04/26 19:17:34 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.46 1995/04/16 19:15:53 christos Exp christos $")
+RCSID("$Id: ed.chared.c,v 3.47 1996/04/26 19:17:34 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -571,6 +571,7 @@ excl_sw:
 			xfree((ptr_t) omodbuf);
 		    omodbuf = modbuf;
 		}
+		++q;
 		break;
 
 	    case 'a':
@@ -578,16 +579,21 @@ excl_sw:
 		/* Not implemented; this needs to be done before expanding
 		 * lex. We don't have the words available to us anymore.
 		 */
+		++q;
 		break;
 
 	    case 'p':
 		/* Ok */
+		++q;
+		break;
+
+	    case '\0':
 		break;
 
 	    default:
+		++q;
 		break;
 	    }
-	    ++q;
 	    if (q[1])
 		++q;
 	}
