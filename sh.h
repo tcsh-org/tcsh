@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.111 2003/05/26 07:11:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.112 2003/07/29 21:19:44 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -427,7 +427,7 @@ typedef int sigret_t;
 #  define __P(a) a
 # else
 #  define __P(a) ()
-#  if !__STDC__
+#  if !defined(__STDC__)
 #   define const
 #   ifndef apollo
 #    define volatile	/* Apollo 'c' extensions need this */
