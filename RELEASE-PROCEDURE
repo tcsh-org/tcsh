@@ -24,4 +24,3 @@ HOW TO RELEASE TCSH
     have exported, save it in patchz.gz (z is PATCHLEVEL)
 10) Make the patch and the source tarball available on ftp
 11) Mail an announcement to tcsh@mx.gw.com
-12) Mail the patch to tcsh-diffs@mx.gw.com

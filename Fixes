@@ -1,4 +1,5 @@
- 30. V6.12.03 - 20040322
+ 36. V6.13.00 - 20040519
+ 35. V6.12.03 - 20040322
  34. turn on kanji and dspmbyte by default; add check for utf8 locales,
      and turn parsing of that automatically based on $LANG.
  33. Fix compilation issue under Windows/NT and charset incorrect patch
