@@ -1,4 +1,5 @@
 V6.05.00, ... 
+ 36. 6.04.03, 09/30/93
  35. New manual page in place.
  34. Fixed Makefile sed RE to work with gnu sed.
  33. Added hup builtin.

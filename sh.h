@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.57 1993/10/08 19:14:01 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.h,v 3.58 1993/10/30 19:50:16 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -270,9 +270,9 @@ extern int setpgrp();
 #define CSWTCH _POSIX_VDISABLE
 #endif
 
-#if (!defined(FIOCLEX) && defined(SUNOS4)) || SYSVREL == 4
+#if (!defined(FIOCLEX) && defined(SUNOS4)) || ((SYSVREL == 4) && !defined(_SEQUENT_))
 # include <sys/filio.h>
-#endif /* (!FIOCLEX && SUNOS4) || SYSVREL == 4 */
+#endif /* (!FIOCLEX && SUNOS4) || (SYSVREL == 4 && !_SEQUENT_) */
 
 #if !defined(_MINIX) && !defined(COHERENT)
 # include <sys/file.h>

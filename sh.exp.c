@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.20 1993/08/11 16:25:52 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.exp.c,v 3.21 1993/10/30 19:50:16 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.20 1993/08/11 16:25:52 christos Exp christos $")
+RCSID("$Id: sh.exp.c,v 3.21 1993/10/30 19:50:16 christos Exp $")
 
 /*
  * C shell
@@ -833,7 +833,6 @@ filetest(cp, vp, ignore)
 		xfree((ptr_t) strino);
 		xfree((ptr_t) ep);
 		return(strF);
-		break;
 		
 	    case 'L':
 		if ( *(ft + 1) ) {
@@ -859,11 +858,10 @@ filetest(cp, vp, ignore)
 		xfree((ptr_t) string);
 		xfree((ptr_t) ep);
 		return(Strsave(strF));
-		break;
 
 #else /* !S_ISLNK */
 		i = 0;
-		break
+		break;
 #endif /* S_ISLNK */
 		
 
@@ -879,7 +877,6 @@ filetest(cp, vp, ignore)
 		    *--string = '0';
 		xfree((ptr_t) ep);
 		return(Strsave(str2short(string)));
-		break;
 
 	    case 'U':
 		if (altout && (pw = getpwuid(st->st_uid))) {
