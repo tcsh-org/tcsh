@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.41 1993/12/16 16:55:13 christos Exp $
+/**/# $Id: Imakefile,v 1.42 1993/12/19 21:38:00 christos Exp christos $
 /**/#
 /**/# Imakefile for for tcsh 6.04
 /**/# Marc Horowitz, MIT SIPB
@@ -321,6 +321,17 @@ HESLIB =
 HESDEF =
 #endif
 
+#ifdef AFS
+AFSLIBDIR = /usr/afsws/lib
+AFSLIB = -L$(AFSLIBDIR) -L$(AFSLIBDIR)/afs -lkauth -lprot -lubik\
+	 -lauth -lrxkad -lsys -ldes -lrx -llwp -lcom_err\
+	 $(AFSLIBDIR)/afs/util.a
+AFSDEF = -DAFS -I/usr/afsws/include
+#else
+AFSLIB =
+AFSDEF =
+#endif
+
 /* This is encore specific, but I don't know what encore's #define is,
 and it shouldn't hurt to have it here, so here it is */
 PARALLEL=12				# Make the multi-max run fast.
@@ -383,7 +394,7 @@ HTDEF = Concat3(-DHOSTTYPE=\",HostType,\")
 HTDEF =
 #endif
 
-DEFINES = $(TCSHPATH) $(HESDEF) $(HTDEF) MyDefines MyCflags MyStdc
+DEFINES = $(TCSHPATH) $(HESDEF) $(AFSDEF) $(HTDEF) MyDefines MyCflags MyStdc
 INCLUDES = -I. MyIncludes
 LDLIBS = MyLibs
 
@@ -504,7 +515,7 @@ clean::
 depend:: config.h ed.defns.h sh.err.h tc.const.h $(SRCS)
 
 NormalProgramTarget(tcsh, $(OBJS), ed.defns.h sh.err.h tc.const.h, \
-			/*LOCALLIBS*/, $(HESLIB) $(SYSLIBS))
+			/*LOCALLIBS*/, $(HESLIB) $(AFSLIB) $(SYSLIBS))
 
 InstallProgram(tcsh, $(TCSH_BINDIR));
 InstallManPage(tcsh, $(TCSH_MANDIR));

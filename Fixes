@@ -1,5 +1,16 @@
 V6.05.00, ... 
- 51. 6.04.06 12/19/93
+ 67. 6.04.07 01/31/94
+ 66. Add quotes to the mismatch array so that:
+     > touch foo
+     > mail "oo bar"
+     does not get corrected. The right fix would be to do correct parsing
+     and quote the space...
+ 65. NULL terminate mismatch[] array in ed.inputl.c, since it is used in
+     Strchr().
+ 64. renamed stat to filetest
+ 63. Afs and Hesiod patches.
+ 62. More manual page patches.
+ 61. 6.04.06 12/19/93
  60. Alarm for resolver timeouts (untested)
  59. Fixes for Henry Spenser's regex in the Makefiles
  58. Modifiers now work with $< and $< does not do :q by default.

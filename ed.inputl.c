@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.inputl.c,v 3.35 1993/06/25 21:17:12 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.inputl.c,v 3.36 1993/08/11 16:25:52 christos Exp christos $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.35 1993/06/25 21:17:12 christos Exp christos $")
+RCSID("$Id: ed.inputl.c,v 3.36 1993/08/11 16:25:52 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -51,7 +51,8 @@ extern bool MapsAreInited;
 extern bool Tty_raw_mode;
 
 /* mismatched first character */
-static Char mismatch[] = {'!', '\\', '^', '-', '%', '\0'};
+static Char mismatch[] = 
+    {'!', '\\', '^', '-', '%', '\0', '"', '\'', '`', '\0' };
 
 static	int	GetNextCommand	__P((KEYCMD *, Char *));
 static	int	SpellLine	__P((int));
@@ -214,6 +215,7 @@ Inputl()
 		copyn(Origin, InputBuf, INBUFSIZE);
 		SaveChar = LastChar;
 		if (SpellLine(!Strcmp(*(crct->vec), STRcmd)) == 1) {
+                    PastBottom();
 		    copyn(Change, InputBuf, INBUFSIZE);
 		    *Strchr(Change, '\n') = '\0';
 		    CorrChar = LastChar;	/* Save the corrected end */

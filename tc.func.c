@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.50 1993/12/16 16:51:24 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.func.c,v 3.51 1993/12/19 21:38:00 christos Exp christos $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.50 1993/12/16 16:51:24 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.51 1993/12/19 21:38:00 christos Exp christos $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -46,6 +46,14 @@ RCSID("$Id: tc.func.c,v 3.50 1993/12/16 16:51:24 christos Exp $")
 #ifdef HESIOD
 # include <hesiod.h>
 #endif /* HESIOD */
+
+#ifdef AFS
+#define PASSMAX 16
+#include <afs/kautils.h>
+long ka_UserAuthenticateGeneral();
+#else
+#define PASSMAX 8
+#endif /* AFS */
 
 #ifdef TESLA
 extern int do_logout;
@@ -552,7 +560,7 @@ static char *
 xgetpass(prm)
     char *prm;
 {
-    static char pass[9];
+    static char pass[PASSMAX + 1];
     int fd, i;
     sigret_t (*sigint)();
 
@@ -565,7 +573,7 @@ xgetpass(prm)
     for (i = 0;;)  {
 	if (read(fd, &pass[i], 1) < 1 || pass[i] == '\n') 
 	    break;
-	if (i < 8)
+	if (i < PASSMAX)
 	    i++;
     }
 	
@@ -648,10 +656,33 @@ auto_lock()
     xputchar('\n'); 
     for (i = 0; i < 5; i++) {
 	char *crpp, *pp;
+#ifdef AFS
+	char *afsname;
+	Char *safs;
+
+	if ((safs = value(STRafsuser)) != STRNULL)
+	    afsname = short2str(safs);
+	else
+	    if ((afsname = getenv("AFSUSER")) == NULL)
+	        afsname = pw->pw_name;
+#endif
 	pp = xgetpass("Password:"); 
 
 	crpp = XCRYPT(pp, srpp);
-	if (strcmp(crpp, srpp) == 0) {
+	if ((strcmp(crpp, srpp) == 0)
+#ifdef AFS
+	    || (ka_UserAuthenticateGeneral(KA_USERAUTH_VERSION,
+					   afsname,     /* name */
+					   NULL,        /* instance */
+					   NULL,        /* realm */
+					   pp,          /* password */
+					   0,           /* lifetime */
+					   0, 0,         /* spare */
+					   NULL)        /* reason */
+	    == 0)
+#endif /* AFS */
+	    ) {
+	    memset(pp, 0, PASSMAX);
 	    if (GettingInput && !just_signaled) {
 		(void) Rawmode();
 		ClearLines();	
@@ -1811,15 +1842,15 @@ remotehost()
     struct sockaddr_in saddr;
     int len = sizeof(struct sockaddr_in);
 
+    /* Don't get stuck if the resolver does not work! */
+    sigret_t (*osig)() = signal(SIGALRM, palarm);
+    alarm(2);
+
     if (getpeername(SHIN, (struct sockaddr *) &saddr, &len) != -1) {
-	/* Don't get stuck if the resolver does not work! */
-	sigret_t (*osig)() = signal(SIGALRM, palarm);
-	alarm(2);
 	if ((hp = gethostbyaddr((char *)&saddr.sin_addr, len, AF_INET)) != NULL)
 	    host = hp->h_name;
 	else
 	    host = inet_ntoa(saddr.sin_addr);
-	(void) signal(SIGALRM, osig);
     }
 #ifdef UTHOST
     else {
@@ -1830,7 +1861,7 @@ remotehost()
 	    if ((sptr = strchr(name, ':')) != NULL)
 		*sptr = '\0';
 	    if ((hp = gethostbyname(name)) == NULL) {
-		/* Try again elinating the trailing domain */
+		/* Try again eliminating the trailing domain */
 		if ((ptr = strchr(name, '.')) != NULL) {
 		    *ptr = '\0';
 		    if ((hp = gethostbyname(name)) != NULL)
@@ -1845,6 +1876,7 @@ remotehost()
 	}
     }
 #endif
+    (void) signal(SIGALRM, osig);
 
     if (host)
 	tsetenv(STRREMOTEHOST, str2short(host));

@@ -1,4 +1,4 @@
-# $Id: Makefile.std,v 1.61 1993/12/16 16:51:24 christos Exp $
+# $Id: Makefile.std,v 1.62 1993/12/19 21:38:00 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -172,6 +172,28 @@ LIBES= -ltermcap 			 ## BSD style things
 #LIBES= -ltermc				 ## emx under OS/2
 #LIBES=					 ## Minix, VMS_POSIX
 
+################################################################
+## EXTRAFLAGS and EXTRALIBS
+################################################################
+# Compiling for HESIOD
+#HESDEF = -DHESIOD -I/usr/athena/include
+#HESLIB = -L/usr/athena/lib -lhesiod
+HESDEF=
+HESLIB=
+#
+# Compiling for AFS with kerberos authentication
+#AFSLIBDIR = /usr/afsws/lib
+#AFSDEF = -DAFS -I/usr/afsws/include
+#AFSLIB = -L$(AFSLIBDIR) -L$(AFSLIBDIR)/afs -lkauth -lprot -lubik\
+#         -lauth -lrxkad -lsys -ldes -lrx -llwp -lcom_err\
+#         $(AFSLIBDIR)/afs/util.a
+#
+AFSDEF=
+AFSLIB=
+
+EXTRAFLAGS = $(HESDEF) $(AFSDEF)
+EXTRALIBS = $(HESLIB) $(AFSLIB)
+
 
 # The difficult choice of a c-compiler...
 # First, you should try your own c-compiler. 
@@ -269,12 +291,12 @@ all: ${BUILD}
 
 tcsh:$(P) ${OBJS} 
 	rm -f tcsh core
-	${CC} -o tcsh ${LDFLAGS} ${CFLAGS} ${OBJS} ${LIBES}
+	${CC} -o tcsh ${LDFLAGS} ${CFLAGS} ${OBJS} ${LIBES} ${EXTRALIBS}
 
 # Purify
 pure:$(P) ${OBJS} 
 	rm -f tcsh core
-	purify `echo ${CC} | sed -e s,-B/bin/,,` -o tcsh ${LDFLAGS} ${CFLAGS} ${OBJS} ${LIBES}
+	purify `echo ${CC} | sed -e s,-B/bin/,,` -o tcsh ${LDFLAGS} ${CFLAGS} ${OBJS} ${LIBES} ${EXTRALIBS}
 # OS/2
 tcsh.exe: tcsh
 	emxbind tcsh
@@ -285,13 +307,13 @@ tcsh.ps: tcsh.man
 
 
 .c.${SUF}:
-	${CC} ${CF} ${CFLAGS} ${DFLAGS} $<
+	${CC} ${CF} ${CFLAGS} ${DFLAGS} ${EXTRAFLAGS} $<
 
 # _VMS_POSIX #module addition
 #.c.${SUF}:
 #	@(echo '#module '`echo $< | sed -e 's/\./_/g'`; cat $<) > $*..c
-#	@echo ${CC} ${CF} ${CFLAGS} ${DFLAGS} $*.c
-#	@${CC} ${CF} ${CFLAGS} ${DFLAGS} $*..c
+#	@echo ${CC} ${CF} ${CFLAGS} ${DFLAGS} ${EXTRAFLAGS} $*.c
+#	@${CC} ${CF} ${CFLAGS} ${DFLAGS} ${EXTRAFLAGS} $*..c
 #	@mv $*..o $*.o
 #	@rm -f $*..c
 

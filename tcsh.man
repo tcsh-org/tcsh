@@ -43,8 +43,12 @@
 .\" - Say `shell variable'/`environment variable' instead of `variable'
 .\"   and `builtin command'/`editor command' instead of `builtin' or `command'
 .\"   unless meaning is absolutely clear from context.
-.\" - Cross-reference as much as possible. Remember to note new features in
-.\"   NEW FEATURES and referenced commands in SEE ALSO.
+.\" - Cross-reference as much as possible. Commands, variables, etc. in the
+.\"   reference section should be mentioned in the appropriate descriptive
+.\"   section, or at least in the reference-section description of another
+.\"   command (or whatever) which is mentioned in a description section.
+.\"   Remember to note new features in NEW FEATURES and referenced external
+.\"   commands in SEE ALSO.
 .\" 
 .TH TCSH 1 "19 December 1993" "Cornell 6.04.06"
 .SH NAME
@@ -164,10 +168,10 @@ first \fI~/.tcshrc\fR (+)
 or, if \fI~/.tcshrc\fR is not found, \fI~/.cshrc\fR,
 then \fI~/.history\fR (or the value of \fBhistfile\fR),
 then \fI~/.login\fR,
-and finally \fI~/.cshdirs\fR (or the value of \fBdirsfile\fR).
+and finally \fI~/.cshdirs\fR (or the value of \fBdirsfile\fR) (+).
 The shell may read \fI~/.login\fR before instead of after
 \fI~/.tcshrc\fR or \fI~/.cshrc\fR and \fI~/.history\fR if so compiled;
-see the \fBversion\fR shell variable.
+see the \fBversion\fR shell variable. (+)
 .PP
 Non-login shells read only \fI/etc/csh.cshrc\fR and \fI~/.tcshrc\fR
 or \fI~/.cshrc\fR on startup.
@@ -200,7 +204,7 @@ if so compiled; see the \fBversion\fR shell variable.
 The names of the system login and logout files vary from system to system for
 compatibility with different \fIcsh\fR(1) variants; see \fBFILES\fR.
 .SS Editing
-We first describe the command-line editor.
+We first describe \fBThe command-line editor\fR.
 The \fBCompletion and listing\fR and \fBSpelling correction\fR sections
 describe two sets of functionality which are implemented as editor commands
 but which deserve their own treatment.
@@ -244,8 +248,16 @@ The ANSI/VT100 sequences for arrow keys are always bound.
 Other key bindings are, for the most part, what Emacs and \fIvi\fR(1)
 users would expect and can easily be displayed by \fIbindkey\fR, so there
 is no need to list them here. Likewise, \fIbindkey\fR can list the editor
-commands with a short description of each. Other shell variables which affect
-the editor include \fBinputmode\fR and \fBwordchars\fR.
+commands with a short description of each.
+.PP
+Note that editor commands do not have the same notion of a "word" as does the
+shell. The editor delimits words with any non-alphanumeric characters not in
+the shell variable \fBwordchars\fR, while the shell recognizes only whitespace
+and some of the characters with special meanings to it, listed under \fBLexical
+structure\fR.
+.PP
+\fBinputmode\fR is another shell variable, not yet mentioned, that affects
+the editor.
 .SS "Completion and listing (+)"
 The shell is often able to complete words when given a unique abbreviation.
 Type part of a word (for example `ls /usr/lost') and hit the tab key to
@@ -700,34 +712,63 @@ Like \fIvi-search-back\fR, but searches forward.
 Does a \fIwhich\fR (see the description of the builtin command) on the
 first word of the input buffer.
 .SS "Lexical structure"
-The shell splits input lines into words at blanks and tabs with the following
-exceptions.  The characters `&' `|' `;' `<' `>' `(' `)' form separate words.
-If doubled in `&&', `||', `<<' or `>>' these pairs form single words.  These
-parser metacharacters may be made part of other words, or prevented their
-special meaning, by preceding them with `\e'.  A newline preceded by a `\\' is
-equivalent to a blank.
+The shell splits input lines into words at blanks and tabs.  The special
+characters `&', `|', `;', `<', `>', `(', and `)' and the doubled characters
+`&&', `||', `<<' and `>>' are always separate words, whether or not they are
+surrounded by whitespace.
 .PP
-Strings enclosed in matched pairs of quotations, `', ``' or `"', form parts of
-a word; metacharacters in these strings, including blanks and tabs, do not form
-separate words.  These quotations have semantics to be described subsequently.
-Within pairs of `'' or `"' characters a newline preceded by a `\\' gives a true
-newline character.
+When the shell's input is not a terminal, the character `#' is taken to begin a
+comment. Each `#' and the rest of the input line on which it appears is
+discarded before further parsing.
 .PP
-When the shell's input is not a terminal, the character `#' introduces a
-comment which continues to the end of the input line.  It does not this
-special meaning when preceded by `\e' and in quotations using ``', `'', and
-`"'.
+A special character (including a blank or tab) may be prevented from having
+its special meaning, and possibly made part of another word, by preceding it
+with a backslash (`\\') or enclosing it in single (`''), double (`"') or
+backward (``') quotes. When not otherwise quoted a newline preceded by a `\\'
+is equivalent to a blank, but inside quotes this sequence results in a
+newline.
+.PP
+Furthermore, all \fBSubstitutions\fR (see below) except \fBHistory
+substitution\fR can be prevented by enclosing the strings (or parts of strings)
+in which they appear with single quotes or by quoting the crucial character(s)
+(e.g. `$' or ``' for \fBVariable\fR or \fBCommand substitution\fR respectively)
+with `\\'. \fBHistory substitution\fRs are quoted in the same way by
+backslashes but not by single quotes.  Strings quoted with double or backward
+quotes undergo \fBVariable\fR and \fBCommand substitution\fR, but other
+substitutions are prevented.
+.PP
+Text inside single or double quotes becomes a single word (or part of one).
+Metacharacters in these strings, including blanks and tabs, do not form
+separate words.  Only in one special case (see \fBCommand substitition\fR
+below) can a double-quoted string yield parts of more than one word;
+single-quoted strings never do. Backward quotes are special: they signal
+\fBCommand substitution\fR (q.v.), which may result in more than one word.
+.PP
+Quoting complex strings, particularly strings which themselves contain quoting
+characters, can be confusing. Remember that quotes need not be used as they are
+in human writing! It may be easier to quote not an entire string, but only
+those parts of the string which need quoting, using different types of quoting
+to do so if appropriate.
+.PP
+The \fBbackslash_quote\fR shell variable (q.v.) can be set to make backslashes
+always quote `\\', `'', and `"'. (+) This may make complex quoting tasks
+easier, but it can cause syntax errors in \fIcsh\fR(1) scripts.
 .SS Substitutions
 We now describe the various transformations the shell performs on the input in
 the order in which they occur. We note in passing the data structures involved
-and the commands and variables which affect them.
+and the commands and variables which affect them. Remember that substitutions
+can be prevented by quoting as described under \fBLexical structure\fR.
 .SS "History substitution"
-Each command, or ``event'', input from the terminal is saved in the history list.
-The previous command is always saved, and the \fBhistory\fR shell variable can be
-set to a number to save that many commands.
+Each command, or ``event'', input from the terminal is saved in the history
+list.  The previous command is always saved, and the \fBhistory\fR shell
+variable can be set to a number to save that many commands. The \fBhistdup\fR
+shell variable can be set to not save duplicate events or consecutive duplicate
+events.
+.PP
 Saved commands are numbered sequentially from 1 and stamped with the time.
 It is not usually necessary to use event numbers, but the current event number
 can be made part of the prompt by placing an `!' in the \fBprompt\fR shell variable.
+.PP
 The shell actually saves history in expanded and literal (unexpanded) forms.
 If the \fBhistlit\fR shell variable is set, commands that display and store
 history use the literal form.
@@ -770,7 +811,7 @@ An offset, referring to the event \fIn\fR before the current event
 #
 The current event.
 This should be used carefully in \fIcsh\fR(1), where there is no check for
-recursion. \fItcsh\fR allows 10 levels of recursion.
+recursion. \fItcsh\fR allows 10 levels of recursion. (+)
 .TP 8
 !
 The previous event (equivalent to `-1')
@@ -993,19 +1034,6 @@ The \fItoggle-literal-history\fR editor command switches between the
 expanded and literal forms of history lines in the input buffer.
 \fIexpand-history\fR and \fIexpand-line\fR expand history substitutions
 in the current word and in the entire input buffer respectively.
-.SS "Quotations with ' and \&""
-The quotation of strings by `'' and `"' can be used to prevent all or some of
-the remaining substitutions.  Strings enclosed in `'' are prevented from any
-further interpretation.  Strings enclosed in `"' may be expanded as described
-below.
-.PP
-In both cases the resulting text becomes (all or part of) a single word; only
-in one special case (see \fBCommand Substitition\fR below) does a `"'
-quoted string yield parts of more than one word; `'' quoted strings never do.
-.PP
-The \fBbackslash_quote\fR shell variable (q.v.) can be set to make
-backslashes (`\\') quote `\\', `'', and `"'. This changes the shell's
-parsing mechanism and can cause syntax errors in \fIcsh\fR(1) scripts.
 .SS "Alias substitution"
 The shell maintains a list of aliases which can be set, unset and printed
 by the \fIalias\fR and \fIunalias\fR commands.  After a command line
@@ -1176,6 +1204,10 @@ background process started by this shell.
 $<
 Substitutes a line from the standard input, with no further interpretation
 thereafter.  It can be used to read from the keyboard in a shell script.
+(+) While \fIcsh\fR always quotes $<, as if it were equivalent to `$<:q',
+\fItcsh\fR does not. Furthermore, when \fItcsh\fR is waiting for a line to be
+typed the user may type an interrupt to interrupt the sequence into
+which the line is to be substituted, but \fIcsh\fR does not allow this.
 .PD
 .PP
 The editor command \fIexpand-variables\fR, normally bound to `^X-$',
@@ -1189,14 +1221,15 @@ occurs very late, after input-output redirection is performed, and in a child
 of the main shell.
 .SS "Command substitution"
 Command substitution is indicated by a command enclosed in ``'.  The output
-from such a command is normally broken into separate words at blanks, tabs and
-newlines, with null words being discarded, this text then replacing the
-original string.  Within `"'s, only newlines force new words; blanks and tabs
-are preserved.
+from such a command is broken into separate words at blanks, tabs and newlines,
+and null words are discarded. The output is variable and command substituted
+and put in place of the original string.
 .PP
-In any case, the single final newline does not force a new word.  Note that it
-is thus possible for a command substitution to yield only part of a word, even
-if the command outputs a complete line.
+Command substitutions inside double
+quotes (`"') retain blanks and tabs; only newlines force new words.  The single
+final newline does not force a new word in any case.  It is thus possible for a
+command substitution to yield only part of a word, even if the command outputs
+a complete line.
 .SS "Filename substitution"
 If a word contains any of the characters `*', `?', `[' or `{' or begins with
 the character `~' it is a candidate for filename substitution, also known as
@@ -1240,14 +1273,16 @@ is passed.
 This construct may be nested.
 As a special case the words `{', `}' and `{}' are passed undisturbed.
 .PP
-The character `~' at the beginning of a filename refers to home
-directories.  Standing alone, i.e. `~', it expands to the invoker's home
-directory as reflected in the value of the variable \fBhome\fR. When followed
-by a name consisting of letters, digits and `-' characters the shell searches
-for a user with that name and substitutes their home directory; thus `~ken'
-might expand to `/usr/ken' and `~ken/chmach' to `/usr/ken/chmach'.  If the
-character `~' is followed by a character other than a letter or `/' or appears
-not at the beginning of a word, it is left undisturbed.
+The character `~' at the beginning of a filename refers to home directories.
+Standing alone, i.e. `~', it expands to the invoker's home directory as
+reflected in the value of the \fBhome\fR shell variable. When followed by a
+name consisting of letters, digits and `-' characters the shell searches for a
+user with that name and substitutes their home directory; thus `~ken' might
+expand to `/usr/ken' and `~ken/chmach' to `/usr/ken/chmach'.  If the character
+`~' is followed by a character other than a letter or `/' or appears elsewhere
+than at the beginning of a word, it is left undisturbed.
+A command like `setenv MANPATH /usr/man:/usr/local/man:~/lib/man' does not,
+therefore, do home directory substitution as one might hope.
 .PP
 It is an error for a glob-pattern containing `*', `?', `[' or `~', with or
 without `^', not to match any files. However, only one pattern in a list of
@@ -1676,7 +1711,7 @@ For example, if one tests a file with \fB-w\fR whose permissions would
 ordinarily allow writing but which is on a file system mounted read-only,
 the test will succeed in a POSIX shell but fail in a non-POSIX shell.
 .PP
-File inquiry operators can also be evaluated with the \fIstat\fR builtin
+File inquiry operators can also be evaluated with the \fIfiletest\fR builtin
 command (q.v.) (+).
 .SS Jobs
 The shell associates a \fIjob\fR with each pipeline.  It keeps a table of
@@ -1711,7 +1746,7 @@ signal until a program attempts to \fIread\fR(2) it, to the current job.
 This can usefully be typed ahead when you have prepared some commands for a
 job which you wish to stop after it has read them.
 The `^Y' key performs this function in \fIcsh\fR(1); in \fItcsh\fR,
-`^Y' is an editing command.
+`^Y' is an editing command. (+)
 .PP
 A job being run in the background stops if it tries to read from the
 terminal.  Background jobs are normally allowed to produce output, but this can
@@ -1727,7 +1762,7 @@ resumes job 1 in the background, just like `bg %1'. A job can also be named
 by an unambigous prefix of the string typed in to start it: `%ex' would
 normally restart a suspended \fIex\fR(1) job, if there were only one suspended
 job whose name began with the string `ex'.  It is also possible to say
-`%?\fIstring\fR' to specifiy a job whose text contains \fIstring\fR, if there
+`%?\fIstring\fR' to specify a job whose text contains \fIstring\fR, if there
 is only one such job.
 .PP
 The shell maintains a notion of the current and previous jobs.  In output
@@ -3030,7 +3065,7 @@ An error in a \fIsource\fR at any level terminates all nested
 With \fB-h\fR, commands are placed on the history list instead of being
 executed, much like `history -L'.
 .TP 8
-.B stat -\fIop file\fR ... (+)
+.B filetest -\fIop file\fR ... (+)
 Applies \fIop\fR (which is a file inquiry operator as described under
 \fBFile inquiry operators\fR) to each \fIfile\fR and returns the results as a
 space-separated list.
@@ -3259,6 +3294,10 @@ If set, filename completion adds `/' to the end of directories and a space
 to the end of normal files when they are matched exactly.
 Set by default.
 .TP 8
+.B afsuser \fR(+)
+Overrides the local username for kerberos authentication for
+autologout's autolock feature.
+.TP 8
 .B ampm \fR(+)
 If set, all times are shown in 12-hour AM/PM format.
 .TP 8
@@ -3296,8 +3335,9 @@ the tty is a pseudo-tty (pty) or the shell was not so compiled (see the
 See also the \fBlogout\fR shell variable.
 .TP 8
 .B backslash_quote \fR(+)
-If set, backslashes (`\\') quote `\\', `'', and `"'. This changes the shell's
-parsing mechanism and can cause syntax errors in  \fIcsh\fR(1) scripts.
+If set, backslashes (`\\') always quote `\\', `'', and `"'. This may make
+complex quoting tasks easier, but it can cause syntax errors in \fIcsh\fR(1)
+scripts.
 .TP 8
 .B cdpath
 A list of directories in which \fIcd\fR should search for
@@ -3996,6 +4036,11 @@ The \fInewgrp\fR builtin is available
 .TP 4
 rh
 The shell attempts to set the \fBREMOTEHOST\fR environment variable
+.TP 4
+afs
+The shell will verify your password with the kerberos server if local
+authentication fails. The shell variable afsuser or the environment
+variable AFSUSER will override your local username if set.
 .PD
 .PP
 In addition to the above strings, administrators can 
@@ -4411,16 +4456,16 @@ Read first by every shell.
 ConvexOS, Stellix and Intel use \fI/etc/cshrc\fR and
 NeXTs use \fI/etc/cshrc.std\fR.
 A/UX, AMIX, Cray and IRIX have no equivalent in \fIcsh\fR(1),
-but read this file in \fItcsh\fR anyway. Solaris 2.x does not have
-it either, but \fItcsh\fR reads \fI/etc/.cshrc\fR.
+but read this file in \fItcsh\fR anyway.
+Solaris 2.x does not have it either, but \fItcsh\fR reads \fI/etc/.cshrc\fR. (+)
 .TP 16
 .I /etc/csh.login
-Read by login shells after \fI/etc/csh.login\fR.
+Read by login shells after \fI/etc/csh.cshrc\fR.
 ConvexOS, Stellix and Intel use \fI/etc/login\fR,
 NeXTs use \fI/etc/login.std\fR, Solaris 2.x uses \fI/etc/.login\fR and
 A/UX, AMIX, Cray and IRIX use \fI/etc/cshrc\fR.
 .TP 16
-.I ~/.tcshrc
+.I ~/.tcshrc \fR(+)
 Read by every shell after \fI/etc/csh.cshrc\fR or its equivalent.
 .TP 16
 .I ~/.cshrc
@@ -4438,15 +4483,17 @@ Read by login shells after \fI~/.tcshrc\fR or \fI~/.history\fR.
 The shell may be compiled to read \fI~/.login\fR before instead of after
 \fI~/.tcshrc\fR and \fI~/.history\fR; see the \fBversion\fR shell variable.
 .TP 16
-.I ~/.cshdirs
+.I ~/.cshdirs \fR(+)
 Read by login shells after \fI~/.login\fR
 if \fBsavedirs\fR is set, but see also \fBdirsfile\fR.
 .TP 16
 .I /etc/csh.logout
-Read first by login shells at logout.
-ConvexOS, Stellix and Intel use \fI/etc/logout\fR,
-NeXTs use \fI/etc/logout.std\fR, and
-A/UX, AMIX, Cray and IRIX have no equivalent.
+Read by login shells at logout.
+ConvexOS, Stellix and Intel use \fI/etc/logout\fR and
+NeXTs use \fI/etc/logout.std\fR.
+A/UX, AMIX, Cray and IRIX have no equivalent in \fIcsh\fR(1),
+but read this file in \fItcsh\fR anyway.
+Solaris 2.x does not have it either, but \fItcsh\fR reads \fI/etc/.cshrc\fR. (+)
 .TP 16
 .I ~/.logout
 Read by login shells at logout after \fI/etc/csh.logout\fR or its equivalent.
@@ -4498,7 +4545,7 @@ and the \fBdirstack\fR, \fBowd\fR and \fBsymlinks\fR shell variables.
 .PP
 Negation in glob-patterns. See \fBFilename substitution\fR.
 .PP
-New \fBFile inquiry operators\fR (q.v.) and a \fIstat\fR
+New \fBFile inquiry operators\fR (q.v.) and a \fIfiletest\fR
 builtin which uses them.
 .PP
 A variety of \fBAutomatic, periodic and timed events\fR (q.v.) including
@@ -4734,6 +4781,9 @@ Read-only variables
 .TP 2
 Dave Schweisguth, Yale University, 1993
 New manpage
+.TP 2
+Larry Schwimmer, Stanford University, 1993
+AFS and HESIOD patches.
 .PD
 .PP
 .SH "THANKS TO"

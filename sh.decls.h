@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.21 1993/10/30 19:50:16 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.22 1993/11/13 00:40:56 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -145,7 +145,7 @@ extern	void		  dohup		__P((Char **, struct command *));
 extern	void		  doonintr	__P((Char **, struct command *));
 extern	void		  doprintenv	__P((Char **, struct command *));
 extern	void		  dorepeat	__P((Char **, struct command *));
-extern	void		  dostat	__P((Char **, struct command *));
+extern	void		  dofiletest	__P((Char **, struct command *));
 extern	void		  dosetenv	__P((Char **, struct command *));
 extern	void		  dosuspend	__P((Char **, struct command *));
 extern	void		  doswbrk	__P((Char **, struct command *));

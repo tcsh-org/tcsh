@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.35 1993/11/13 00:40:56 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tc.vers.c,v 3.36 1993/12/12 19:55:08 christos Exp christos $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.vers.c,v 3.35 1993/11/13 00:40:56 christos Exp christos $")
+RCSID("$Id: tc.vers.c,v 3.36 1993/12/12 19:55:08 christos Exp christos $")
 
 #include "patchlevel.h"
 
@@ -245,7 +245,12 @@ gethosttype()
     hosttype = "i386-emx";
 #endif /* i386 && __EMX__ */
 
-# ifdef __386BSD__
+#if defined(__NetBSD__) && !defined(_havehosttype_)
+# define _havehosttype_
+   hosttype = "NetBSD";
+#endif /* __NetBSD__ */
+
+# if defined(__386BSD__) && !defined(_havehosttype_)
 # define _havehosttype_
 #  ifdef __BSD_NET2__
     hosttype = "NetBSD";
@@ -253,6 +258,7 @@ gethosttype()
     hosttype = "386BSD";
 #  endif /* __BSD_NET2__ */
 # endif /* __386BSD__ */
+
 
 # if defined(i386) && defined(bsdi)
 #  define _havehosttype_
@@ -671,16 +677,21 @@ fix_version()
 #else
 # define RHSTR	""
 #endif
+#ifdef AFS
+# define AFSSTR	",afs"
+#else
+# define AFSSTR	""
+#endif
 /* if you want your local version to say something */
 #ifndef LOCALSTR
 # define LOCALSTR ""
 #endif /* LOCALSTR */
 
     (void) xsprintf(version,
-	 "tcsh %d.%.2d.%.2d (%s) %s (%s) options %s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+ "tcsh %d.%.2d.%.2d (%s) %s (%s) options %s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
 	     REV, VERS, PATCHLEVEL, ORIGIN, DATE, gethosttype(),
-	     SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR,
-	     BYESTR, ALSTR, KANSTR, SMSTR, HBSTR, NGSTR, RHSTR, LOCALSTR);
+	     SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR, BYESTR,
+	     ALSTR, KANSTR, SMSTR, HBSTR, NGSTR, RHSTR, AFSSTR, LOCALSTR);
     set(STRversion, SAVE(version), VAR_READWRITE);
     (void) xsprintf(version, "%d.%.2d.%.2d", REV, VERS, PATCHLEVEL);
     set(STRtcsh, SAVE(version), VAR_READWRITE);

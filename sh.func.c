@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.52 1993/11/13 00:40:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.53 1993/11/13 01:36:09 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.52 1993/11/13 00:40:56 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.53 1993/11/13 01:36:09 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -234,7 +234,7 @@ dozip(v, c)
 
 /*ARGSUSED*/
 void
-dostat(v, c)
+dofiletest(v, c)
     Char **v;
     struct command *c;
 {

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.59 1993/12/12 19:55:08 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.60 1993/12/16 16:51:24 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.59 1993/12/12 19:55:08 christos Exp christos $")
+RCSID("$Id: tw.parse.c,v 3.60 1993/12/16 16:51:24 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -119,7 +119,7 @@ static	int	 c_glob			__P((Char ***));
 static	int	 is_prefix		__P((Char *, Char *));
 static	int	 is_prefixmatch		__P((Char *, Char *));
 static	int	 is_suffix		__P((Char *, Char *));
-static	int	 recognize		__P((Char *, Char *, int, int));
+static	int	 recognize		__P((Char *, Char *, int, int, int));
 static	int	 ignored		__P((Char *));
 static	int	 isadirectory		__P((Char *, Char *));
 static  int      tw_collect_items	__P((COMMAND, int, Char *, Char *, 
@@ -600,19 +600,25 @@ is_prefixmatch(check, template)
 
     for (; *check; check++, template++) {
 	if ((*check & TRIM) != (*template & TRIM)) {
-            if ((*check & TRIM) == '-' || (*check & TRIM) == '.' || (*check & TRIM) == '_') {
-                MCH1 = MCH2 = (*check & TRIM);
-                if (MCH1 == '_') {
-                    MCH2 = '-';
-                } else if (MCH1 == '-') {
-                    MCH2 = '_';
-                }
-                for (;*template && (*template & TRIM) != MCH1 && (*template & TRIM) != MCH2; template++);
-                if (!*template) {
+            MCH1 = (*check & TRIM);
+            MCH2 = (*template & TRIM);
+            MCH1 = Isupper(MCH1) ? Tolower(MCH1) : MCH1;
+            MCH2 = Isupper(MCH2) ? Tolower(MCH2) : MCH2;
+            if (MCH1 != MCH2) {
+                if ((*check & TRIM) == '-' || (*check & TRIM) == '.' || (*check & TRIM) == '_') {
+                    MCH1 = MCH2 = (*check & TRIM);
+                    if (MCH1 == '_') {
+                        MCH2 = '-';
+                    } else if (MCH1 == '-') {
+                        MCH2 = '_';
+                    }
+                    for (;*template && (*template & TRIM) != MCH1 && (*template & TRIM) != MCH2; template++);
+                    if (!*template) {
+	                return (FALSE);
+                    }
+                } else {
 	            return (FALSE);
                 }
-            } else {
-	        return (FALSE);
             }
         }
     }
@@ -747,10 +753,12 @@ starting_a_command(wordstart, inputline)
  *	If we shorten it back to the prefix length, stop searching.
  */
 static int
-recognize(exp_name, item, name_length, numitems)
+recognize(exp_name, item, name_length, numitems, enhanced)
     Char   *exp_name, *item;
-    int     name_length, numitems;
+    int     name_length, numitems, enhanced;
 {
+    Char MCH1,MCH2;
+
     if (numitems == 1)		/* 1st match */
 	copyn(exp_name, item, MAXNAMLEN);
     else {			/* 2nd and subsequent matches */
@@ -758,7 +766,10 @@ recognize(exp_name, item, name_length, numitems)
 	register int len = 0;
 
 	for (x = exp_name, ent = item;
-	     *x && (*x & TRIM) == (*ent & TRIM); x++, len++, ent++)
+	     *x && enhanced ? (MCH1 = (*x & TRIM),Isupper(MCH1) ? Tolower(MCH1) : MCH1) == 
+                              (MCH2 = (*ent & TRIM),Isupper(MCH2) ? Tolower(MCH2) : MCH2)
+                            : (*x & TRIM) == (*ent & TRIM);
+             x++, len++, ent++)
 	    continue;
 	*x = '\0';		/* Shorten at 1st char diff */
 	if (!(match_unique_match || is_set(STRrecexact)) && len == name_length)	/* Ambiguous to prefix? */
@@ -968,7 +979,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 			break;
 		    }
 		}
-		if (recognize(exp_name, item, name_length, ++numitems)) 
+		if (recognize(exp_name, item, name_length, ++numitems, vp != NULL && !Strcmp(*(vp->vec),STRenhance))) 
 		    if (command != RECOGNIZE_SCROLL)
 			done = TRUE;
 	    }
