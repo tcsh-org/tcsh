@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.19 1992/10/10 18:17:34 christos Exp $
+/**/# $Id: Imakefile,v 1.20 1992/10/14 20:19:19 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.03
 /**/# Marc Horowitz, MIT SIPB
@@ -24,89 +24,91 @@ ones.  Please send in your fixes and additions! */
 
 /* specific platforms */
 
-#ifdef UltrixArchitecture
-#define ConfigH ultrix
-#endif
+#ifndef ConfigH
+# ifdef UltrixArchitecture
+#  define ConfigH ultrix
+# endif
 
-#if defined(VaxArchitecture) && !defined(UltrixArchitecture)
-#define ConfigH bsd
-#endif
+# if defined(VaxArchitecture) && !defined(UltrixArchitecture)
+#  define ConfigH bsd
+# endif
 
-#ifdef NeXTArchitecture
-#define ConfigH mach
-#endif
+# ifdef NeXTArchitecture
+#  define ConfigH mach
+# endif
 
-#if defined(SunArchitecture)
-# if (OSMajorVersion == 3)
-#  define ConfigH sunos3
-# else /* OSMajorVersion == 4 */
-#  if (OSMinorVersion == 0)
-#   define ConfigH sunos40
-#  else /* OSMinorVersion == 1 */
-#   define ConfigH sunos41
+# if defined(SunArchitecture)
+#  if (OSMajorVersion == 3)
+#   define ConfigH sunos3
+#  else /* OSMajorVersion == 4 */
+#   if (OSMinorVersion == 0)
+#    define ConfigH sunos40
+#   else /* OSMinorVersion == 1 */
+#    define ConfigH sunos41
+#   endif
 #  endif
 # endif
-#endif
 
-#ifdef HPArchitecture
-# if (OSMajorVersion == 8)
-#  define ConfigH hpux8
-# else
-#  define ConfigH hpux7
+# ifdef HPArchitecture
+#  if (OSMajorVersion == 8)
+#   define ConfigH hpux8
+#  else
+#   define ConfigH hpux7
+#  endif
 # endif
-#endif
 
-#ifdef CrayArchitecture
-#define ConfigH cray
-#endif
-
-#ifdef SGIArchitecture
-#define ConfigH sgi
-#ifdef you_are_using_yp
-# define UseSunLib 
-#endif
-#endif
-
-#ifdef IBMArchitecture
-# if (SystemV == YES)
-#  define ConfigH aix
-# else
-#  define ConfigH bsd
-#  define AOSArchitecture
+# ifdef CrayArchitecture
+#  define ConfigH cray
 # endif
-#endif
 
-#if defined(MipsBsdArchitecture) || defined(MipsSysvArchitecture)
-#define ConfigH mips
-#endif
+# ifdef SGIArchitecture
+#  define ConfigH sgi
+#  ifdef you_are_using_yp
+#   define UseSunLib 
+#  endif
+# endif
 
-#ifdef DguxArchitecture
-#define ConfigH dgux
-#endif
+# ifdef IBMArchitecture
+#  if (SystemV == YES)
+#   define ConfigH aix
+#  else
+#   define ConfigH bsd
+#   define AOSArchitecture
+#  endif
+# endif
 
-#ifdef ConvexArchitecture
-#define ConfigH convex
-#endif
+# if defined(MipsBsdArchitecture) || defined(MipsSysvArchitecture)
+#  define ConfigH mips
+# endif
 
-#ifdef SQNTArchitecture
-#define ConfigH sequent
-#endif
+# ifdef DguxArchitecture
+#  define ConfigH dgux
+# endif
 
-#ifdef MacIIArchitecture
-#define ConfigH mac2
-#endif
+# ifdef ConvexArchitecture
+#  define ConfigH convex
+# endif
 
-#ifdef MinixArchitecture
+# ifdef SQNTArchitecture
+#  define ConfigH sequent
+# endif
+
+# ifdef MacIIArchitecture
+#  define ConfigH mac2
+# endif
+
+# ifdef MinixArchitecture
 /* Maybe conditional on MACH? */
 SYSSRCS=mi.termios.c mi.wait.h mi.varargs.h
 SYSOBJS=mi.termios.${SUF}
 EXTF=ma.setp.c vms.termcap.c
-#else
+# else
 /* Maybe conditional on MACH? */
 SYSSRCS=ma.setp.c
 SYSOBJS=ma.setp.${SUF}
 EXTF=mi.termios.c mi.wait.h vms.termcap.c
-#endif
+# endif
+#endif /* !ConfigH */
 
 /* generic os's */
 
@@ -209,9 +211,9 @@ LIBINET =
 #endif
 
 #if defined(UseLibDir)
-LIBDIR = -ldir
+LIBDIRECT = -ldir
 #else
-LIBDIR = 
+LIBDIRECT = 
 #endif
 
 #if defined(UseLibX)
@@ -233,17 +235,17 @@ LIBPOSIX =
 #endif
 
 #if defined(ATTArchitecture) || defined(UseLibDirent)
-LIBDIRENT = -ldirent
+LIBDIRECTENT = -ldirent
 #else
-LIBDIRENT =
+LIBDIRECTENT =
 #endif
 
 # The order here is significant.  Although nothing uses all of these, 
 # some platforms which use more than one do care about the order.
 
-SYSLIBS = $(LIBPOSIX) $(LIBDIRENT) $(LIBTERMCAP) $(LIBCURSES) \
+SYSLIBS = $(LIBPOSIX) $(LIBDIRECTENT) $(LIBTERMCAP) $(LIBCURSES) \
 	$(LIBNET) $(LIBINTL) $(LIBSOCKET) $(LIBSUN) $(LIBBSD) $(LIBCPOSIX) \
-	$(LIBINET) $(LIBDIR) $(LIBX) $(LIBC_S) $(LIBSQNT)
+	$(LIBINET) $(LIBDIRECT) $(LIBX) $(LIBC_S) $(LIBSQNT)
 
 /* Past here, nothing should need to be changed to compile on a different
 platform, unless you have a really weird architecture. */

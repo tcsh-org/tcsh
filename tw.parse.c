@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.40 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.41 1992/10/10 18:17:34 christos Exp christos $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.40 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.41 1992/10/10 18:17:34 christos Exp christos $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1549,11 +1549,14 @@ nostat(dir)
     register Char **cp;
 
     if ((vp = adrof(STRnostat)) == NULL || (cp = vp->vec) == NULL)
-	return (FALSE);
-    for (; *cp != NULL; cp++)
+	return FALSE;
+    for (; *cp != NULL; cp++) {
+	if (Strcmp(*cp, STRstar) == 0)
+	    return TRUE;
 	if (Gmatch(dir, *cp))
-	    return (TRUE);
-    return (FALSE);
+	    return TRUE;
+    }
+    return FALSE;
 } /* end nostat */
 
 
