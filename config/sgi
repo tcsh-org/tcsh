@@ -127,7 +127,7 @@
  * YPBUGS	Work around Sun YP bugs that cause expansion of ~username
  *		to send command output to /dev/null
  */
-#undef YPBUGS
+#define YPBUGS
 
 /*
  * SIGVOID	Define this if your signal handlers return void.  On older

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.44 1998/06/27 12:27:25 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.sem.c,v 3.45 1998/06/28 15:07:22 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -37,10 +37,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.44 1998/06/27 12:27:25 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.45 1998/06/28 15:07:22 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
+#ifdef WINNT
+#include "nt.const.h"
+#endif /*WINNT*/
 
 #ifdef CLOSE_ON_EXEC
 # ifndef SUNOS4
@@ -115,11 +118,13 @@ execute(t, wanttty, pipein, pipeout)
 
 #ifdef WINNT
     {
-        if (!t->t_dcdr && !t->t_dcar && !t->t_dflg && !didfds &&
-            (intty || intact) && (t->t_dtyp == NODE_COMMAND)
-	 		&& (!((t->t_dcom[0][0] & (QUOTE | TRIM)) == QUOTE))
-                && !isbfunc(t)) {
-			Dfix(t);
+        if ((varval(STRNTslowexec) != STRNULL) &&
+            !t->t_dcdr && !t->t_dcar && !t->t_dflg && !didfds &&
+            (intty || intact) && (t->t_dtyp == NODE_COMMAND) &&
+	    !isbfunc(t)) {
+	    if ((t->t_dcom[0][0] & (QUOTE | TRIM)) == QUOTE)
+		(void) Strcpy(t->t_dcom[0], t->t_dcom[0] + 1);
+	    Dfix(t);
             if (nt_try_fast_exec(t) == 0)
                 return;
         }

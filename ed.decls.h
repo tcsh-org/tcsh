@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.decls.h,v 3.26 1998/04/21 16:08:36 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.decls.h,v 3.27 1998/06/27 12:27:06 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -237,6 +237,7 @@ extern  CCRETVAL        e_dabbrev_expand	__P((int));
 extern  CCRETVAL	e_copy_to_clipboard	__P((int));
 extern  CCRETVAL	e_paste_from_clipboard	__P((int));
 extern  CCRETVAL	e_dosify_next		__P((int));
+extern  CCRETVAL	e_dosify_prev		__P((int));
 
 /*
  * ed.inputl.c

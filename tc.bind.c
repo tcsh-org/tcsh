@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.28 1998/04/08 13:59:02 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.29 1998/06/27 12:27:30 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.28 1998/04/08 13:59:02 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.29 1998/06/27 12:27:30 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -79,7 +79,7 @@ dobindkey(v, c)
     CStr    out;
     Char    inbuf[200];
     Char    outbuf[200];
-    unsigned short ch;
+    uChar   ch;
     in.buf = inbuf;
     out.buf = outbuf;
     in.len = 0;
@@ -162,12 +162,7 @@ dobindkey(v, c)
 	}
     }
 
-#ifndef WINNT
-    /* XXX: Fixme to work with more than 1 byte chars */
-    ch = (unsigned char) in.buf[0];
-#else /* WINNT */
-    ch = in.buf[0];
-#endif /* !WINNT */
+    ch = (uChar) in.buf[0];
 
     if (remove) {
 	if (key) {
@@ -245,7 +240,7 @@ printkey(map, in)
     if (in->len < 2) {
 	(void) unparsestring(in, outbuf, STRQQ);
 	for (fp = FuncNames; fp->name; fp++) {
-	    if (fp->func == map[(unsigned char) *(in->buf)]) {
+	    if (fp->func == map[(uChar) *(in->buf)]) {
 		xprintf("%s\t->\t%s\n", outbuf, fp->name);
 	    }
 	}

@@ -34,3 +34,5 @@
 
 * Rewrite the whole thing. It has taken to much beating over the years...
 
+* Add another hook like precmd to be executed after the prompt but before the
+  command.

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.12 1998/06/05 16:20:33 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.13 1998/06/27 12:27:22 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.12 1998/06/05 16:20:33 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.13 1998/06/27 12:27:22 christos Exp $")
 
 #include "ed.h"
 
@@ -237,6 +237,15 @@ flush()
 	 * we lose our tty.
 	 */
 	case ENXIO:
+#endif
+	/*
+	 * IRIX 6.4 bogocity?
+	 */
+#ifdef ENOTTY
+	case ENOTTY:
+#endif
+#ifdef EBADF:
+	case EBADF::
 #endif
 	/* Nothing to do, but die */
 	    xexit(1);

@@ -1,5 +1,15 @@
+ 77. V6.07.09 - 19980904
+ 76. Japanese NLS messages (Yoshiyuki Sakakibara)
+ 75. Add ENXIO and EBADF in the test for write failures for Irix Zombies
+     (Ralf W. Grosse-Kunstleve)
+ 74. Missed a test for NOSTRCOLL in glob.c (Michael Liepelt)
+ 73. Another ABSOLUTEP change (Amol)
+ 72. Italian NLS messages (Massimo Bertozzi)
+ 71. WIN32 fixes for ntslowexec and color_ls literal printing in prompt (Amol)
+ 70. a few missed WIN32 merges (Amol)
+ 69. defined YPBUGS for sgi (Kaveh)
  68. V6.07.09 - 19980707
- 67. Separate the nt builtins (Amold)
+ 67. Separate the nt builtins (Amol)
  66. completion fixes (Tom)
  65. color ls fixes (Taga Nayuta)
  64. V6.07.08 - 19980629

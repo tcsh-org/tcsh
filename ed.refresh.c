@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.20 1997/10/27 22:44:22 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.refresh.c,v 3.21 1997/10/28 22:34:17 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.20 1997/10/27 22:44:22 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.21 1997/10/28 22:34:17 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -874,7 +874,14 @@ update_line(old, new, cur_line)
 #ifdef DEBUG_REFRESH
 	    dprintf("cleareol %d\n", (oe - old) - (ne - new));
 #endif  /* DEBUG_UPDATE */
+#ifndef WINNT
 	    ClearEOL((oe - old) - (ne - new));
+#else
+	    /*
+	     * The calculation above does not work too well on NT
+	     */
+	    ClearEOL(TermH - CursorH);
+#endif /*WINNT*/
 	    /*
 	     * Done
 	     */
@@ -930,7 +937,14 @@ update_line(old, new, cur_line)
 #ifdef DEBUG_REFRESH
 	    dprintf("cleareol %d\n", olen - (ne - new));
 #endif /* DEBUG_UPDATE */
+#ifndef WINNT
 	    ClearEOL(olen - (ne - new));
+#else
+	    /*
+	     * The calculation above does not work too well on NT
+	     */
+	    ClearEOL(TermH - CursorH);
+#endif /*WINNT*/
 	}
     }
 

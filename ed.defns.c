@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.defns.c,v 3.28 1997/10/27 22:44:20 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.defns.c,v 3.30 1998/04/21 16:08:37 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.28 1997/10/27 22:44:20 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.30 1998/04/21 16:08:37 christos Exp $")
 
 #include "ed.h"
 
@@ -1849,6 +1849,10 @@ editinit()
     f->name = "e_dosify_next";
     f->func = F_DOSIFY_NEXT;
     f->desc = CSAVS(3, 117, "(win32 only)Convert each '/' in next word to '\\\\'");
+    f++;
+    f->name = "e_dosify_prev";
+    f->func = F_DOSIFY_PREV;
+    f->desc = CSAVS(3, 118, "(win32 only)Convert each '/' in previous word to '\\\\'");
 
     f++;
     f->name = NULL;

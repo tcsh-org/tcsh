@@ -1,5 +1,5 @@
 XCOMM
-XCOMM $Id: Imakefile,v 1.70 1997/10/27 22:44:17 christos Exp $
+XCOMM $Id: Imakefile,v 1.71 1998/06/27 12:26:57 christos Exp $
 XCOMM
 XCOMM Imakefile for tcsh 6.07
 XCOMM Marc Horowitz, MIT SIPB
@@ -126,7 +126,9 @@ DEPENDFLAGS = -o.o
 #  endif
 #  if !HasGCC
 #   define MyStdc -D__STDC__
+#   if SGICompilerMajorVersion < 4
 CCOPTIONS=-float	# We don't want -cckr and -prototypes
+#   endif
 #  endif
 # endif
 

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.45 1998/04/21 16:08:42 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dir.c,v 3.46 1998/06/27 12:27:14 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.45 1998/04/21 16:08:42 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.46 1998/06/27 12:27:14 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -829,7 +829,7 @@ dcanon(cp, p)
 	Char    tmpdir[MAXPATHLEN];
 
 	p1 = varval(STRcwd);
-	if (p1 == STRNULL || *p1 != '/')
+	if (p1 == STRNULL || ABSOLUTEP(p1))
 	    abort();
 	if (Strlen(p1) + Strlen(cp) + 1 >= MAXPATHLEN)
 	    abort();

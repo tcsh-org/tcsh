@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.err.c,v 3.30 1998/04/08 13:58:41 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.err.c,v 3.31 1998/06/27 12:27:17 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.30 1998/04/08 13:58:41 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.31 1998/06/27 12:27:17 christos Exp $")
 
 /*
  * C Shell
@@ -190,7 +190,7 @@ char   *seterr = NULL;	/* Holds last error if there was one */
 #define ERR_BADJOB	132
 #define ERR_INVALID	133
 #define ERR_BADCOLORVAR	134
-#define NO_ERRORS	134
+#define NO_ERRORS	135
 
 static char *elst[NO_ERRORS] INIT_ZERO_STRUCT;
 

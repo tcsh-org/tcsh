@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.42 1998/04/08 13:58:33 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.screen.c,v 3.43 1998/07/07 12:06:12 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.42 1998/04/08 13:58:33 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.43 1998/07/07 12:06:12 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1225,7 +1225,7 @@ so_write(cp, n)
 	    xprintf("so: litnum %d, litptr %x\r\n",
 		    *cp & CHAR, litptr[*cp & CHAR]);
 #endif /* DEBUG_LITERAL */
-#ifdef WINNT
+#if defined(WINNT) && !defined(COLOR_LS_F)
 	    {
 		char buf[256], *ptr = &buf[0];
 		for (d = litptr[*cp++ & CHAR]; *d & LITERAL; d++)
@@ -1233,10 +1233,10 @@ so_write(cp, n)
 		flush();
 		set_cons_attr(buf);
 	    }
-#else /* !WINNT */
+#else /* !WINNT || COLOR_LS_F */
 	    for (d = litptr[*cp++ & CHAR]; *d & LITERAL; d++)
 		(void) putraw(*d & CHAR);
-#endif /* WINNT */
+#endif /* WINNT && !COLOR_LS_F */
 	    (void) putraw(*d);
 
 	}

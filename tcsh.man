@@ -76,7 +76,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "7 July 1998" "Astron 6.07.09"
+.TH TCSH 1 "9 September 1998" "Astron 6.07.10"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -4832,7 +4832,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.07.09 (Astron) 1998-07-07.
+This manual documents tcsh 6.07.10 (Astron) 1998-09-04.
 .SH AUTHORS
 .PD 0
 .TP 2
@@ -4982,7 +4982,7 @@ New manpage and tcsh.man2html
 Larry Schwimmer, Stanford University, 1993
 AFS and HESIOD patches
 .TP 2
-Luke Mewburn, Connect.com.au, 1994-6
+Luke Mewburn, RMIT University, 1994-6
 Enhanced directory printing in prompt,
 added \fBellipsis\fR and \fBrprompt\fR.
 .TP 2

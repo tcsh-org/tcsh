@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.32 1998/06/27 12:27:37 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.33 1998/06/28 15:07:28 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.32 1998/06/27 12:27:37 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.33 1998/06/28 15:07:28 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -46,7 +46,7 @@ RCSID("$Id: tc.prompt.c,v 3.32 1998/06/27 12:27:37 christos Exp $")
  * PWP 4/27/87 -- rearange for tcsh.
  * mrdch@com.tau.edu.il 6/26/89 - added ~, T and .# - rearanged to switch()
  *                 instead of if/elseif
- * Luke Mewburn, <lukem@connect.com.au>:
+ * Luke Mewburn, <lukem@cs.rmit.edu.au>
  *	6-Sep-91	changed date format
  *	16-Feb-94	rewrote directory prompt code, added $ellipsis
  *	29-Dec-96	added rprompt support

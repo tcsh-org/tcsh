@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.83 1998/04/21 16:08:57 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.84 1998/06/27 12:27:45 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,12 +39,15 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.83 1998/04/21 16:08:57 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.84 1998/06/27 12:27:45 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
 
+#ifdef WINNT
+#include "nt.const.h"
+#endif /* WINNT */
 #define EVEN(x) (((x) & 1) != 1)
 
 #define DOT_NONE	0	/* Don't display dot files		*/

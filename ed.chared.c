@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.52 1997/10/28 22:34:15 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/ed.chared.c,v 3.53 1998/04/21 16:08:34 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.52 1997/10/28 22:34:15 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.53 1998/04/21 16:08:34 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -3624,6 +3624,13 @@ e_dosify_next(c)
     USE(c);
     return (CC_ERROR);
 }
+CCRETVAL
+e_dosify_prev(c)
+    int c;
+{
+    USE(c);
+    return (CC_ERROR);
+}
 #else /* WINNT */
 /*ARGSUSED*/
 CCRETVAL
@@ -3658,6 +3665,45 @@ e_dosify_next(c)
     if (Cursor > LastChar)
 	Cursor = LastChar;	/* bounds check */
     return (e_yank_kill(c));
+}
+/*ARGSUSED*/
+CCRETVAL
+e_dosify_prev(c)
+    int c;
+{
+    register Char *cp, *p, *kp;
+
+    USE(c);
+    if (Cursor == InputBuf)
+	return(CC_ERROR);
+    /* else */
+
+    cp = Cursor-1;
+    /* Skip trailing spaces */
+    while ((cp > InputBuf) && ( (*cp & CHAR) == ' '))
+    	cp--;
+
+    while (cp > InputBuf) {
+	if ( ((*cp & CHAR) == ' ') && ((cp[-1] & CHAR) != '\\') )
+	    break;
+	cp--;
+    }
+
+    for (p = cp, kp = KillBuf; p < Cursor; p++)	{/* save the text */
+	if ( ( *p & CHAR ) == '/') {
+	    *kp++ = '\\';
+	    *kp++ = '\\';
+	}
+	else
+	    *kp++ = *p;
+    }
+    LastKill = kp;
+
+    c_delbefore((int)(Cursor - cp));	/* delete before dot */
+    Cursor = cp;
+    if (Cursor < InputBuf)
+	Cursor = InputBuf;	/* bounds check */
+    return(e_yank_kill(c));
 }
 #endif /* !WINNT */
 

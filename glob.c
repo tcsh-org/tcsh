@@ -147,7 +147,7 @@ int
 globcharcoll(c1, c2)
     int c1, c2;
 {
-#if defined(NLS) && defined(LC_COLLATE)
+#if defined(NLS) && defined(LC_COLLATE) && !defined(NOSTRCOLL)
     char s1[2], s2[2];
 
     if (c1 == c2)
