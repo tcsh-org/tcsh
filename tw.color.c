@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.8 2001/03/18 19:06:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.9 2002/03/08 17:36:47 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.8 2001/03/18 19:06:32 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.9 2002/03/08 17:36:47 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -179,6 +179,8 @@ parseLS_COLORS(value)
     char   *c;			/* pointer in colors */
     Extension *e;		/* pointer in extensions */
     jmp_buf_t osetexit;
+
+    (void) &e;
 
     /* init */
     if (extensions)
