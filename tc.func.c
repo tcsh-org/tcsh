@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.82 1998/12/15 13:07:28 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.83 1999/02/06 15:19:01 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.82 1998/12/15 13:07:28 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.83 1999/02/06 15:19:01 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -199,7 +199,7 @@ Itoa(n, s, min_digits, attributes)
 
     un = n;
     if (n < 0) {
-	un = -un;
+	un = -n;
 	*s++ = '-';
     }
 
