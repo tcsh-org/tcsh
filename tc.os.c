@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.c,v 3.27 1992/10/10 18:17:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.os.c,v 3.28 1993/04/07 21:39:23 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.27 1992/10/10 18:17:34 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.28 1993/04/07 21:39:23 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1010,6 +1010,7 @@ xgetwd(pathname)
     struct stat st_root, st_cur, st_next, st_dotdot;
     char    pathbuf[MAXPATHLEN], nextpathbuf[MAXPATHLEN * 2];
     char   *pathptr, *nextpathptr, *cur_name_add;
+    int	   save_errno = 0;
 
     /* find the inode of root */
     if (stat("/", &st_root) == -1) {
@@ -1074,15 +1075,12 @@ xgetwd(pathname)
 		    /*
 		     * We might not be able to stat() some path components
 		     * if we are using afs, but this is not an error as
-		     * long as we find the one we need
+		     * long as we find the one we need; we also save the
+		     * first error to report it if we don't finally succeed.
 		     */
+		    if (save_errno == 0)
+			save_errno = errno;
 		    continue;
-#ifdef notdef
-		    (void) xsprintf(pathname, "getwd: Cannot stat \"%s\" (%s)",
-				    d->d_name, strerror(errno));
-		    (void) closedir(dp);
-		    return (NULL);
-#endif
 		}
 		/* check if we found it yet */
 		if (st_next.st_ino == st_cur.st_ino &&
@@ -1091,10 +1089,13 @@ xgetwd(pathname)
 	    }
 	}
 	if (d == NULL) {
-	    (void) xsprintf(pathname, "getwd: Cannot find \".\" in \"..\"");
+	    (void) xsprintf(pathname, "getwd: Cannot find \".\" in \"..\" (%s)",
+			    strerror(save_errno ? save_errno : ENOENT));
 	    (void) closedir(dp);
 	    return (NULL);
 	}
+	else
+	    save_errno = 0;
 	st_cur = st_dotdot;
 	pathptr = strrcpy(pathptr, d->d_name);
 	pathptr = strrcpy(pathptr, "/");
