@@ -1,3 +1,9 @@
+ 57. V6.10.00 - 20001119
+ 56. Completion fixes (Tom Warzeka)
+ 55. add missing linux kanji define (Tsuyoshi Kawabe)
+ 54. More WINNT_NATIVE fixes (amol)
+ 53. Fix compile error on winnt (Yoshiyuki Sakakibara)
+ 52. nonstopux configure and makefile fixes (Tom Bates)
  51. V6.09.04 - 20001111
  50. Order of initialization for multibyte display was wrong 
      (HyunChul Kim)

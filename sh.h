@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.91 2000/11/11 23:03:37 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.92 2000/11/12 01:36:16 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -207,7 +207,7 @@ typedef int sigret_t;
 #ifdef _SEQUENT_
 # include <sys/procstats.h>
 #endif /* _SEQUENT_ */
-#if (defined(POSIX) || SYSVREL > 0) && !WINNT_NATIVE
+#if (defined(POSIX) || SYSVREL > 0) && !defined(WINNT_NATIVE)
 # include <sys/times.h>
 #endif /* (POSIX || SYSVREL > 0) && !WINNT_NATIVE */
 

@@ -14,7 +14,6 @@
  */
 #define POSIX
 
-#define WINNT_NATIVE
 
 /*
  * POSIXJOBS	This system supports the optional IEEE Std 1003.1-1988 (POSIX)

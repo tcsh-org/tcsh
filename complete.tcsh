@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.34 2000/07/04 19:37:11 christos Exp $
+# $Id: complete.tcsh,v 1.35 2000/07/04 19:51:14 christos Exp $
 # example file using the new completion code
 #
 
@@ -415,198 +415,6 @@ if ($?complete) then
 	'C%[^-]*%`eval Compl_module`%'
     endif
 
-    # these from Tom Warzeka <waz@quahog.npt.nuwc.navy.mil>
-    # you may need to set the following variables for your host
-    set _elispdir = /usr/local/share/emacs/20.2/lisp # GNU Emacs lisp directory
-    set _maildir = /var/spool/mail  # Post Office: /var/spool/mail or /usr/mail
-    set _ypdir  = /var/yp	# directory where NIS (YP) maps are kept
-    set _domain = "`domainname`"
-
-    # this one works but is slow and doesn't descend into subdirectories
-    # complete	cd	C@[./\$~]*@d@ \
-    #			p@1@'`\ls -1F . $cdpath | grep /\$ | sort -u`'@ n@*@n@
-
-    if ( -r /etc/shells ) then
-        complete setenv	p@1@e@ n@DISPLAY@\$hosts@: n@SHELL@'`cat /etc/shells`'@
-    else
-	complete setenv	p@1@e@ n@DISPLAY@\$hosts@:
-    endif
-    complete unsetenv	n/*/e/
-
-    if (-r $HOME/.mailrc) then
-        complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
-			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \
-			n@-u@T:$_maildir@ n/-f/f/ \
-			n@*@'`sed -n s/alias//p $HOME/.mailrc | tr -s " " "	" | cut -f 2`'@
-    else
-        complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
-			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \
-			n@-u@T:$_maildir@ n/-f/f/ n/*/u/
-    endif
-
-    complete man	    n@1@'`\ls -1 /usr/man/man1 | sed s%\\.1.\*\$%%`'@ \
-			    n@2@'`\ls -1 /usr/man/man2 | sed s%\\.2.\*\$%%`'@ \
-			    n@3@'`\ls -1 /usr/man/man3 | sed s%\\.3.\*\$%%`'@ \
-			    n@4@'`\ls -1 /usr/man/man4 | sed s%\\.4.\*\$%%`'@ \
-			    n@5@'`\ls -1 /usr/man/man5 | sed s%\\.5.\*\$%%`'@ \
-			    n@6@'`\ls -1 /usr/man/man6 | sed s%\\.6.\*\$%%`'@ \
-			    n@7@'`\ls -1 /usr/man/man7 | sed s%\\.7.\*\$%%`'@ \
-			    n@8@'`\ls -1 /usr/man/man8 | sed s%\\.8.\*\$%%`'@ \
-    n@9@'`[ -r /usr/man/man9 ] && \ls -1 /usr/man/man9 | sed s%\\.9.\*\$%%`'@ \
-    n@0@'`[ -r /usr/man/man0 ] && \ls -1 /usr/man/man0 | sed s%\\.0.\*\$%%`'@ \
-  n@new@'`[ -r /usr/man/mann ] && \ls -1 /usr/man/mann | sed s%\\.n.\*\$%%`'@ \
-  n@old@'`[ -r /usr/man/mano ] && \ls -1 /usr/man/mano | sed s%\\.o.\*\$%%`'@ \
-n@local@'`[ -r /usr/man/manl ] && \ls -1 /usr/man/manl | sed s%\\.l.\*\$%%`'@ \
-n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
-		c/-/"(- f k M P s t)"/ n/-f/c/ n/-k/x:'<keyword>'/ n/-[MP]/d/ \
-		N@-[MP]@'`\ls -1 $:-1/man? | sed s%\\..\*\$%%`'@ n/*/c/
-
-    complete ps	        c/-t/x:'<tty>'/ c/-/"(a c C e g k l S t u v w x)"/ \
-			n/-k/x:'<kernel>'/ N/-k/x:'<core_file>'/ n/*/x:'<PID>'/
-    complete compress	c/-/"(c f v b)"/ n/-b/x:'<max_bits>'/ n/*/f:^*.Z/
-    complete uncompress	c/-/"(c f v)"/                        n/*/f:*.Z/
-
-    complete xhost	c/[+-]/\$hosts/ n/*/\$hosts/
-
-    # these conform to the latest GNU versions available at press time ...
-    # updates by John Gotts <jgotts@engin.umich.edu>
-
-    complete emacs	c/-/"(batch d f funcall i insert kill l load \
-			no-init-file nw q t u user)"/ c/+/x:'<line_number>'/ \
-			n/-d/x:'<display>'/ n/-f/x:'<lisp_function>'/ n/-i/f/ \
-			n@-l@F:$_elispdir@ n/-t/x:'<terminal>'/ \
-			n/-u/u/ n/*/f:^*[\#~]/
-
-    complete gzcat	c/--/"(force help license quiet version)"/ \
-			c/-/"(f h L q V -)"/ n/*/f:*.{gz,Z,z,zip}/
-    complete gzip	c/--/"(stdout to-stdout decompress uncompress \
-			force help list license no-name quiet recurse \
-			suffix test verbose version fast best)"/ \
-			c/-/"(c d f h l L n q r S t v V 1 2 3 4 5 6 7 8 9 -)"/\
-			n/{-S,--suffix}/x:'<file_name_suffix>'/ \
-			n/{-d,--{de,un}compress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
-			N/{-d,--{de,un}compress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
-			n/*/f:^*.{gz,Z,z,zip,taz,tgz}/
-    complete {gunzip,ungzip} c/--/"(stdout to-stdout force help list license \
-			no-name quiet recurse suffix test verbose version)"/ \
-			c/-/"(c f h l L n q r S t v V -)"/ \
-			n/{-S,--suffix}/x:'<file_name_suffix>'/ \
-			n/*/f:*.{gz,Z,z,zip,taz,tgz}/
-    complete zgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
-			c/-/"(A b B c C e f h i l n s v V w x)"/ \
-			p/1/x:'<limited_regular_expression>'/ N/-*e/f/ \
-			n/-*e/x:'<limited_regular_expression>'/ n/-*f/f/ n/*/f/
-    complete zegrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
-			c/-/"(A b B c C e f h i l n s v V w x)"/ \
-			p/1/x:'<full_regular_expression>'/ N/-*e/f/ \
-			n/-*e/x:'<full_regular_expression>'/ n/-*f/f/ n/*/f/
-    complete zfgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
-			c/-/"(A b B c C e f h i l n s v V w x)"/ \
-			p/1/x:'<fixed_string>'/ N/-*e/f/ \
-			n/-*e/x:'<fixed_string>'/ n/-*f/f/ n/*/f/
-    complete znew	c/-/"(f t v 9 P K)"/ n/*/f:*.Z/
-    complete zmore	n/*/f:*.{gz,Z,z,zip}/
-    complete zfile	n/*/f:*.{gz,Z,z,zip,taz,tgz}/
-    complete ztouch	n/*/f:*.{gz,Z,z,zip,taz,tgz}/
-    complete zforce	n/*/f:^*.{gz,tgz}/
-
-    complete grep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
-			c/--/"(extended-regexp fixed-regexp basic-regexp \
-			regexp file ignore-case word-regexp line-regexp \
-			no-messages revert-match version help byte-offset \
-			line-number with-filename no-filename quiet silent \
-			text directories recursive files-without-match \
-			files-with-matches count before-context after-context \
-			context binary unix-byte-offsets)"/ \
-			c/-/"(A a B b C c d E e F f G H h i L l n q r s U u V \
-				v w x)"/ \
-			p/1/x:'<limited_regular_expression>'/ N/-*e/f/ \
-			n/-*e/x:'<limited_regular_expression>'/ n/-*f/f/ n/*/f/
-    complete egrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
-			c/--/"(extended-regexp fixed-regexp basic-regexp \
-			regexp file ignore-case word-regexp line-regexp \
-			no-messages revert-match version help byte-offset \
-			line-number with-filename no-filename quiet silent \
-			text directories recursive files-without-match \
-			files-with-matches count before-context after-context \
-			context binary unix-byte-offsets)"/ \
-			c/-/"(A a B b C c d E e F f G H h i L l n q r s U u V \
-				v w x)"/ \
-			p/1/x:'<full_regular_expression>'/ N/-*e/f/ \
-			n/-*e/x:'<full_regular_expression>'/ n/-*f/f/ n/*/f/
-    complete fgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
-			c/--/"(extended-regexp fixed-regexp basic-regexp \
-			regexp file ignore-case word-regexp line-regexp \
-			no-messages revert-match version help byte-offset \
-			line-number with-filename no-filename quiet silent \
-			text directories recursive files-without-match \
-			files-with-matches count before-context after-context \
-			context binary unix-byte-offsets)"/ \
-			c/-/"(A a B b C c d E e F f G H h i L l n q r s U u V \
-				v w x)"/ \
-			p/1/x:'<fixed_string>'/ N/-*e/f/ \
-			n/-*e/x:'<fixed_string>'/ n/-*f/f/ n/*/f/
-
-    complete users	c/--/"(help version)"/ p/1/x:'<accounting_file>'/
-    complete who	c/--/"(heading idle count mesg message writable help \
-    			version)"/ c/-/"(H i m q s T w u -)"/ \
-			p/1/x:'<accounting_file>'/ n/am/"(i)"/ n/are/"(you)"/
-
-    complete chown	c/--/"(changes dereference no-dereference silent \
-    			quiet reference recursive verbose help version)"/ \
-			c/-/"(c f h R v -)"/ C@[./\$~]@f@ c/*[.:]/g/ \
-			n/-/u/. p/1/u/. n/*/f/
-    complete chgrp	c/--/"(changes no-dereference silent quiet reference \
-    			recursive verbose help version)"/ \
-			c/-/"(c f h R v -)"/ n/-/g/ p/1/g/ n/*/f/
-    complete chmod	c/--/"(changes silent quiet verbose reference \
-    			recursive help version)"/ c/-/"(c f R v)"/
-    complete df		c/--/"(all block-size human-readable si inodes \
-			kilobytes local megabytes no-sync portability sync \
-			type print-type exclude-type help version)"/ \
-			c/-/"(a H h i k l m P T t v x)"/
-    complete du		c/--/"(all block-size bytes total dereference-args \
-    			human-readable si kilobytes count-links dereference \
-			megabytes separate-dirs summarize one-file-system \
-			exclude-from exclude max-depth help version"/ \
-			c/-/"(a b c D H h k L l m S s X x)"/
-
-    complete cat	c/--/"(number-nonblank number squeeze-blank show-all \
-			show-nonprinting show-ends show-tabs help version)"/ \
-			c/-/"(A b E e n s T t u v -)"/ n/*/f/
-    complete mv		c/--/"(backup force interactive update verbose suffix \
-			version-control help version)"/ \
-			c/-/"(b f i S u V v -)"/ \
-			n/{-S,--suffix}/x:'<suffix>'/ \
-			n/{-V,--version-control}/"(t numbered nil existing \
-			never simple)"/ n/-/f/ N/-/d/ p/1/f/ p/2/d/ n/*/f/
-    complete cp		c/--/"(archive backup no-dereference force \
-    			interactive link preserve parents sparse recursive \
-			symbolic-link suffix update verbose version-control \
-			one-file-system help version)"/ \
-			c/-/"(a b d f i l P p R r S s u V v x -)"/ \
-			n/-*r/d/ n/{-S,--suffix}/x:'<suffix>'/ \
-			n/{-V,--version-control}/"(t numbered nil existing \
-			never simple)"/ n/-/f/ N/-/d/ p/1/f/ p/2/d/ n/*/f/
-    complete ln		c/--/"(backup directory force no-dereference \
-    			interactive symbolic suffix verbose version-control \
-			help version)"/ \
-			c/-/"(b d F f i n S s V v -)"/ \
-			n/{-S,--suffix}/x:'<suffix>'/ \
-			n/{-V,--version-control}/"(t numbered nil existing \
-			never simple)"/ n/-/f/ N/-/x:'<link_name>'/ \
-			p/1/f/ p/2/x:'<link_name>'/
-    complete touch	c/--/"(date reference time help version)"/ \
-			c/-/"(a c d f m r t -)"/ \
-			n/{-d,--date}/x:'<date_string>'/ \
-			c/--time/"(access atime mtime modify use)"/ \
-			n/{-r,--file}/f/ n/-t/x:'<time_stamp>'/ n/*/f/
-    complete mkdir	c/--/"(mode parents verbose help version)"/ \
-    			c/-/"(p m -)"/ \
-			n/{-m,--mode}/x:'<mode>'/ n/*/d/
-    complete rmdir	c/--/"(ignore-fail-on-non-empty parents verbose help \
-    			version)"/ c/-/"(p -)"/ n/*/d/
-
     # from George Cox
     complete acroread	'p/*/f:*.pdf/'
     complete apachectl  'c/*/(start stop restart fullstatus status graceful \
@@ -814,6 +622,201 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			server-response span-hosts spider timeout= \
 			timestamping tries= user-agent= verbose version wait=)"/
 
+    # these from Tom Warzeka <tom@waz.cc>
+    # you may need to set the following variables for your host
+    set _elispdir = /usr/local/share/emacs/20.7/lisp # GNU Emacs lisp directory
+    set _maildir = /var/spool/mail  # Post Office: /var/spool/mail or /usr/mail
+    set _ypdir  = /var/yp	# directory where NIS (YP) maps are kept
+    set _domain = "`domainname`"
+
+    # this one works but is slow and doesn't descend into subdirectories
+    # complete	cd	C@[./\$~]*@d@ \
+    #			p@1@'`\ls -1F . $cdpath | grep /\$ | sort -u`'@ n@*@n@
+
+    if ( -r /etc/shells ) then
+        complete setenv	p@1@e@ n@DISPLAY@\$hosts@: n@SHELL@'`cat /etc/shells`'@
+    else
+	complete setenv	p@1@e@ n@DISPLAY@\$hosts@:
+    endif
+    complete unsetenv	n/*/e/
+
+    if (-r $HOME/.mailrc) then
+        complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
+			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \
+			n@-u@T:$_maildir@ n/-f/f/ \
+			n@*@'`sed -n s/alias//p $HOME/.mailrc | tr -s " " "	" | cut -f 2`'@
+    else
+        complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
+			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \
+			n@-u@T:$_maildir@ n/-f/f/ n/*/u/
+    endif
+
+    complete man	    n@1@'`\ls -1 /usr/man/man1 | sed s%\\.1.\*\$%%`'@ \
+			    n@2@'`\ls -1 /usr/man/man2 | sed s%\\.2.\*\$%%`'@ \
+			    n@3@'`\ls -1 /usr/man/man3 | sed s%\\.3.\*\$%%`'@ \
+			    n@4@'`\ls -1 /usr/man/man4 | sed s%\\.4.\*\$%%`'@ \
+			    n@5@'`\ls -1 /usr/man/man5 | sed s%\\.5.\*\$%%`'@ \
+			    n@6@'`\ls -1 /usr/man/man6 | sed s%\\.6.\*\$%%`'@ \
+			    n@7@'`\ls -1 /usr/man/man7 | sed s%\\.7.\*\$%%`'@ \
+			    n@8@'`\ls -1 /usr/man/man8 | sed s%\\.8.\*\$%%`'@ \
+    n@9@'`[ -r /usr/man/man9 ] && \ls -1 /usr/man/man9 | sed s%\\.9.\*\$%%`'@ \
+    n@0@'`[ -r /usr/man/man0 ] && \ls -1 /usr/man/man0 | sed s%\\.0.\*\$%%`'@ \
+  n@new@'`[ -r /usr/man/mann ] && \ls -1 /usr/man/mann | sed s%\\.n.\*\$%%`'@ \
+  n@old@'`[ -r /usr/man/mano ] && \ls -1 /usr/man/mano | sed s%\\.o.\*\$%%`'@ \
+n@local@'`[ -r /usr/man/manl ] && \ls -1 /usr/man/manl | sed s%\\.l.\*\$%%`'@ \
+n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
+		c/-/"(- f k M P s t)"/ n/-f/c/ n/-k/x:'<keyword>'/ n/-[MP]/d/ \
+		N@-[MP]@'`\ls -1 $:-1/man? | sed s%\\..\*\$%%`'@ n/*/c/
+
+    complete ps	        c/-t/x:'<tty>'/ c/-/"(a c C e g k l S t u v w x)"/ \
+			n/-k/x:'<kernel>'/ N/-k/x:'<core_file>'/ n/*/x:'<PID>'/
+    complete compress	c/-/"(c f v b)"/ n/-b/x:'<max_bits>'/ n/*/f:^*.Z/
+    complete uncompress	c/-/"(c f v)"/                        n/*/f:*.Z/
+
+    complete uuencode	p/1/f/ p/2/x:'<decode_pathname>'/ n/*/n/
+    complete uudecode	c/-/"(f)"/ n/-f/f:*.{uu,UU}/ p/1/f:*.{uu,UU}/ n/*/n/
+
+    complete xhost	c/[+-]/\$hosts/ n/*/\$hosts/
+
+    # these conform to the latest GNU versions available at press time ...
+    # updates by John Gotts <jgotts@engin.umich.edu>
+
+    complete emacs	c/-/"(batch d f funcall i insert kill l load \
+			no-init-file nw q t u user)"/ c/+/x:'<line_number>'/ \
+			n/-d/x:'<display>'/ n/-f/x:'<lisp_function>'/ n/-i/f/ \
+			n@-l@F:$_elispdir@ n/-t/x:'<terminal>'/ \
+			n/-u/u/ n/*/f:^*[\#~]/
+
+    complete gzcat	c/--/"(force help license quiet version)"/ \
+			c/-/"(f h L q V -)"/ n/*/f:*.{gz,Z,z,zip}/
+    complete gzip	c/--/"(stdout to-stdout decompress uncompress \
+			force help list license no-name quiet recurse \
+			suffix test verbose version fast best)"/ \
+			c/-/"(c d f h l L n q r S t v V 1 2 3 4 5 6 7 8 9 -)"/\
+			n/{-S,--suffix}/x:'<file_name_suffix>'/ \
+			n/{-d,--{de,un}compress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
+			N/{-d,--{de,un}compress}/f:*.{gz,Z,z,zip,taz,tgz}/ \
+			n/*/f:^*.{gz,Z,z,zip,taz,tgz}/
+    complete {gunzip,ungzip} c/--/"(stdout to-stdout force help list license \
+			no-name quiet recurse suffix test verbose version)"/ \
+			c/-/"(c f h l L n q r S t v V -)"/ \
+			n/{-S,--suffix}/x:'<file_name_suffix>'/ \
+			n/*/f:*.{gz,Z,z,zip,taz,tgz}/
+    complete zgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			p/1/x:'<limited_regular_expression>'/ N/-*e/f/ \
+			n/-*e/x:'<limited_regular_expression>'/ n/-*f/f/ n/*/f/
+    complete zegrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			p/1/x:'<full_regular_expression>'/ N/-*e/f/ \
+			n/-*e/x:'<full_regular_expression>'/ n/-*f/f/ n/*/f/
+    complete zfgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/-/"(A b B c C e f h i l n s v V w x)"/ \
+			p/1/x:'<fixed_string>'/ N/-*e/f/ \
+			n/-*e/x:'<fixed_string>'/ n/-*f/f/ n/*/f/
+    complete znew	c/-/"(f t v 9 P K)"/ n/*/f:*.Z/
+    complete zmore	n/*/f:*.{gz,Z,z,zip}/
+    complete zfile	n/*/f:*.{gz,Z,z,zip,taz,tgz}/
+    complete ztouch	n/*/f:*.{gz,Z,z,zip,taz,tgz}/
+    complete zforce	n/*/f:^*.{gz,tgz}/
+
+    complete grep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/--/"(extended-regexp fixed-regexp basic-regexp \
+			regexp file ignore-case word-regexp line-regexp \
+			no-messages revert-match version help byte-offset \
+			line-number with-filename no-filename quiet silent \
+			text directories recursive files-without-match \
+			files-with-matches count before-context after-context \
+			context binary unix-byte-offsets)"/ \
+			c/-/"(A a B b C c d E e F f G H h i L l n q r s U u V \
+				v w x)"/ \
+			p/1/x:'<limited_regular_expression>'/ N/-*e/f/ \
+			n/-*e/x:'<limited_regular_expression>'/ n/-*f/f/ n/*/f/
+    complete egrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/--/"(extended-regexp fixed-regexp basic-regexp \
+			regexp file ignore-case word-regexp line-regexp \
+			no-messages revert-match version help byte-offset \
+			line-number with-filename no-filename quiet silent \
+			text directories recursive files-without-match \
+			files-with-matches count before-context after-context \
+			context binary unix-byte-offsets)"/ \
+			c/-/"(A a B b C c d E e F f G H h i L l n q r s U u V \
+				v w x)"/ \
+			p/1/x:'<full_regular_expression>'/ N/-*e/f/ \
+			n/-*e/x:'<full_regular_expression>'/ n/-*f/f/ n/*/f/
+    complete fgrep	c/-*A/x:'<#_lines_after>'/ c/-*B/x:'<#_lines_before>'/\
+			c/--/"(extended-regexp fixed-regexp basic-regexp \
+			regexp file ignore-case word-regexp line-regexp \
+			no-messages revert-match version help byte-offset \
+			line-number with-filename no-filename quiet silent \
+			text directories recursive files-without-match \
+			files-with-matches count before-context after-context \
+			context binary unix-byte-offsets)"/ \
+			c/-/"(A a B b C c d E e F f G H h i L l n q r s U u V \
+				v w x)"/ \
+			p/1/x:'<fixed_string>'/ N/-*e/f/ \
+			n/-*e/x:'<fixed_string>'/ n/-*f/f/ n/*/f/
+
+    complete users	c/--/"(help version)"/ p/1/x:'<accounting_file>'/
+    complete who	c/--/"(heading idle count mesg message writable help \
+    			version)"/ c/-/"(H i m q s T w u -)"/ \
+			p/1/x:'<accounting_file>'/ n/am/"(i)"/ n/are/"(you)"/
+
+    complete chown	c/--/"(changes dereference no-dereference silent \
+    			quiet reference recursive verbose help version)"/ \
+			c/-/"(c f h R v -)"/ C@[./\$~]@f@ c/*[.:]/g/ \
+			n/-/u/: p/1/u/: n/*/f/
+    complete chgrp	c/--/"(changes no-dereference silent quiet reference \
+    			recursive verbose help version)"/ \
+			c/-/"(c f h R v -)"/ n/-/g/ p/1/g/ n/*/f/
+    complete chmod	c/--/"(changes silent quiet verbose reference \
+    			recursive help version)"/ c/-/"(c f R v)"/
+    complete df		c/--/"(all block-size human-readable si inodes \
+			kilobytes local megabytes no-sync portability sync \
+			type print-type exclude-type help version)"/ \
+			c/-/"(a H h i k l m P T t v x)"/
+    complete du		c/--/"(all block-size bytes total dereference-args \
+    			human-readable si kilobytes count-links dereference \
+			megabytes separate-dirs summarize one-file-system \
+			exclude-from exclude max-depth help version"/ \
+			c/-/"(a b c D H h k L l m S s X x)"/
+
+    complete cat	c/--/"(number-nonblank number squeeze-blank show-all \
+			show-nonprinting show-ends show-tabs help version)"/ \
+			c/-/"(A b E e n s T t u v -)"/ n/*/f/
+    complete mv		c/--/"(backup force interactive update verbose suffix \
+			version-control help version)"/ \
+			c/-/"(b f i S u V v -)"/ \
+			n/{-S,--suffix}/x:'<suffix>'/ \
+			n/{-V,--version-control}/"(t numbered nil existing \
+			never simple)"/ n/-/f/ N/-/d/ p/1/f/ p/2/d/ n/*/f/
+    complete cp		c/--/"(archive backup no-dereference force \
+    			interactive link preserve parents sparse recursive \
+			symbolic-link suffix update verbose version-control \
+			one-file-system help version)"/ \
+			c/-/"(a b d f i l P p R r S s u V v x -)"/ \
+			n/-*r/d/ n/{-S,--suffix}/x:'<suffix>'/ \
+			n/{-V,--version-control}/"(t numbered nil existing \
+			never simple)"/ n/-/f/ N/-/d/ p/1/f/ p/2/d/ n/*/f/
+    complete ln		c/--/"(backup directory force no-dereference \
+    			interactive symbolic suffix verbose version-control \
+			help version)"/ \
+			c/-/"(b d F f i n S s V v -)"/ \
+			n/{-S,--suffix}/x:'<suffix>'/ \
+			n/{-V,--version-control}/"(t numbered nil existing \
+			never simple)"/ n/-/f/ N/-/x:'<link_name>'/ \
+			p/1/f/ p/2/x:'<link_name>'/
+    complete touch	c/--/"(date reference time help version)"/ \
+			c/-/"(a c d f m r t -)"/ \
+			n/{-d,--date}/x:'<date_string>'/ \
+			c/--time/"(access atime mtime modify use)"/ \
+			n/{-r,--file}/f/ n/-t/x:'<time_stamp>'/ n/*/f/
+    complete mkdir	c/--/"(mode parents verbose help version)"/ \
+    			c/-/"(p m -)"/ \
+			n/{-m,--mode}/x:'<mode>'/ n/*/d/
+    complete rmdir	c/--/"(ignore-fail-on-non-empty parents verbose help \
+    			version)"/ c/-/"(p -)"/ n/*/d/
+
     complete tar	c/-[Acru]*/"(b B C f F g G h i l L M N o P \
 			R S T v V w W X z Z)"/ \
 			c/-[dtx]*/"( B C f F g G i k K m M O p P \
@@ -839,8 +842,9 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			block-compress help version)"/ \
 			c/-/"(b B C f F g G h i k K l L m M N o O p P R s S \
 			T v V w W X z Z 0 1 2 3 4 5 6 7 -)"/ \
+			C@[/dev]@f@ \
 			n/-c*f/x:'<new_tar_file, device_file, or "-">'/ \
-			n/{-[Adrtux]*f,--file}/f:*.tar/ \
+			n/{-[Adrtux]*f,--file}/f:*.{tar,taz,tgz}/ \
 			N/{-x*f,--file}/'`tar -tf $:-1`'/ \
 			n/--use-compress-program/c/ \
 			n/{-b,--block-size}/x:'<block_size>'/ \
@@ -852,21 +856,21 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			n/-[0-7]/"(l m h)"/
 
     # SVR4 filesystems
-    #complete  mount	c/-/"(a F m o O p r v V)"/ n/-p/n/ n/-v/n/ \
-    #			n/-o/x:'<FSType_options>'/ \
-    #			n@-F@'`\ls -1 /usr/lib/fs`'@ \
-    #			n@*@'`grep -v "^#" /etc/vfstab | tr -s " " "	 " | cut -f 3`'@
-    #complete umount	c/-/"(a o V)"/ n/-o/x:'<FSType_options>'/ \
-    #			n/*/'`mount | cut -d " " -f 1`'/
-    #complete  mountall	c/-/"(F l r)"/ n@-F@'`\ls -1 /usr/lib/fs`'@
-    #complete umountall	c/-/"(F h k l r s)"/ n@-F@'`\ls -1 /usr/lib/fs`'@ \
-    #			n/-h/'`df -k | cut -s -d ":" -f 1 | sort -u`'/
+    complete  mount	c/-/"(a F m o O p r v V)"/ n/-p/n/ n/-v/n/ \
+    			n/-o/x:'<FSType_options>'/ \
+    			n@-F@'`\ls -1 /usr/lib/fs`'@ \
+    			n@*@'`grep -v "^#" /etc/vfstab | tr -s " " "	 " | cut -f 3`'@
+    complete umount	c/-/"(a o V)"/ n/-o/x:'<FSType_options>'/ \
+    			n/*/'`mount | cut -d " " -f 1`'/
+    complete  mountall	c/-/"(F l r)"/ n@-F@'`\ls -1 /usr/lib/fs`'@
+    complete umountall	c/-/"(F h k l r s)"/ n@-F@'`\ls -1 /usr/lib/fs`'@ \
+    			n/-h/'`df -k | cut -s -d ":" -f 1 | sort -u`'/
     # BSD 4.3 filesystems
-    complete  mount	c/-/"(a r t v)"/ n/-t/"(4.2 nfs)"/ \
-			n@*@'`grep -v "^#" /etc/fstab | tr -s " " "	" | cut -f 2`'@
-    complete umount	c/-/"(a h t v)"/ n/-t/"(4.2 nfs)"/ \
-			n/-h/'`df | cut -s -d ":" -f 1 | sort -u`'/ \
-			n/*/'`mount | cut -d " " -f 3`'/
+    #complete  mount	c/-/"(a r t v)"/ n/-t/"(4.2 nfs)"/ \
+    #			n@*@'`grep -v "^#" /etc/fstab | tr -s " " "	" | cut -f 2`'@
+    #complete umount	c/-/"(a h t v)"/ n/-t/"(4.2 nfs)"/ \
+    #			n/-h/'`df | cut -s -d ":" -f 1 | sort -u`'/ \
+    #			n/*/'`mount | cut -d " " -f 3`'/
     # BSD 4.2 filesystems
     #complete  mount	c/-/"(a r t v)"/ n/-t/"(ufs nfs)"/ \
     #			n@*@'`cut -d ":" -f 2 /etc/fstab`'@

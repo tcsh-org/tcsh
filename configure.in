@@ -212,6 +212,11 @@ case "${host}" in
     tcsh_config_file=cygwin32
   ;;
 
+  ## mips-compaq-nonstopux
+  *-*-nonstopux)
+    tcsh_config_file=sysv4
+  ;;
+
   * )
   changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name
