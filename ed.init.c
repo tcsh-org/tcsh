@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.19 1991/11/17 05:39:06 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.init.c,v 3.20 1991/11/22 02:28:12 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.19 1991/11/17 05:39:06 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.20 1991/11/22 02:28:12 christos Exp $")
 
 #include "ed.h"
 #include "ed.term.h"
@@ -170,7 +170,7 @@ ed_Setup(rst)
     if (havesetup) 	/* if we have never been called */
 	return(0);
 
-#if defined(POSIX) && defined(_PC_VDISABLE)
+#if defined(POSIX) && defined(_PC_VDISABLE) && !defined(BSD4_4)
     { 
 	long pcret;
 
@@ -186,7 +186,7 @@ ed_Setup(rst)
 		    ttychars[EX_IO][rst] = vdisable;
 	    }
     }
-#else /* ! POSIX || !_PC_VDISABLE */
+#else /* ! POSIX || !_PC_VDISABLE && !defined(BSD4_4) */
     vdisable = _POSIX_VDISABLE;
 #endif /* POSIX && _PC_VDISABLE */
 	
