@@ -1,4 +1,4 @@
- 41. V6.13.05 - 20041121
+ 43. V6.13.05 - 20041121
  42. deal with not having intptr_t
  41. get rid of bool.
  40. Protect HAVE_ICONV with NLS_CATALOGS
