@@ -1,12 +1,12 @@
-$ $Id: set3,v 1.4 2001/04/26 19:07:48 kim Exp $
+$ $Id: set3,v 1.3 1995/04/24 14:12:51 christos Exp $
 $ Editor function descriptions
 $set 3 
-1 Move back a character
-2 Delete the character behind cursor
-3 Cut from beginning of current word to cursor - saved in cut buffer
-4 Cut from beginning of line to cursor - save in cut buffer
-5 Move to beginning of current word
-6 Move to beginning of line
+1 Przejd¼ znak wstecz
+2 Usuñ znak za kursorem
+3 Obetnij od pocz±tku s³owa do kursora, zachowaj w buforze wyciêæ
+4 Obetnij od pocz±tku linii do kursora, zachowaj w buforze wyciêæ
+5 Przejd¼ do pocz±tku aktualnego s³owa
+6 Przejd¼ do pocz±tku linii
 7 Capitalize the characters from cursor to end of current word
 8 Vi change case of character under cursor and advance one character
 9 Vi change to end of line
@@ -115,10 +115,3 @@ $set 3
 112 Vi goto the beginning of line
 113 Perform which of current command
 114 Paste cut buffer at cursor position
-115 Replace just-yanked text with yank from earlier kill
-116 (WIN32 only) Copy cut buffer to system clipboard
-117 (WIN32 only) Paste clipboard buffer at cursor position
-118 (WIN32 only) Convert each '/' in next word to '\\\\'
-119 (WIN32 only) Convert each '/' in previous word to '\\\\'
-120 (WIN32 only) Page visible console window up
-121 (WIN32 only) Page visible console window down
