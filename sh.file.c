@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.19 2002/03/08 18:55:17 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.20 2002/05/16 13:51:25 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.file.c,v 3.19 2002/03/08 18:55:17 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.20 2002/05/16 13:51:25 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -263,7 +263,6 @@ pushback(string)
 # else
     (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty_normal);
 # endif /* POSIX */
-    (void) sigsetmask(omask);
 #else
     (void) ioctl(SHOUT, TIOCGETP, (ioctl_t) & tty);
     tty_normal = tty;
