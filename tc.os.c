@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.0 1991/07/05 00:05:11 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -37,10 +37,11 @@
 #include "config.h"
 #ifndef lint
 static char *rcsid() 
-    { return "$Id: tc.os.c,v 3.0 1991/07/04 21:49:28 christos Exp $"; }
+    { return "$Id: tc.os.c,v 3.0 1991/07/05 00:05:11 christos Exp $"; }
 #endif
 
 #include "sh.h"
+#include "tw.h"
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 
