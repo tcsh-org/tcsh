@@ -10,7 +10,7 @@ if ($?tcsh) then
 	set pat=$tcsh:e
 	set rev=$rev:r
     endif
-    if ($rev > 5 && $rel > 0 && $pat > 1) then
+    if ($rev > 5 && $rel > 1) then
 	set complete=1
     endif
     unset rev rel pat
