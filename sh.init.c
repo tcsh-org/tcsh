@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.4 1991/07/29 22:27:35 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.init.c,v 3.5 1991/08/05 23:02:13 christos Exp christos $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: sh.init.c,v 3.4 1991/07/29 22:27:35 christos Exp christos $")
+RCSID("$Id: sh.init.c,v 3.5 1991/08/05 23:02:13 christos Exp christos $")
 
 #include "sh.h"
 #include "ed.h"
@@ -239,6 +239,16 @@ struct	mesg mesg[] = {
 /* 19 */	"PWR",  	"Power failure",
 # endif /* apollo */
 #endif /* IBMAIX */
+
+
+/*
+**  In the UNIXpc these signal *ARE* used!!
+*/
+#ifdef UNIXPC
+/* 20 */	"WIND",		"Window status changed",
+/* 21 */	"PHONE", 	"Phone status changed",
+#endif
+
 
 # ifdef OREO
 #  define _sigextra_
