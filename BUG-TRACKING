@@ -1,16 +1,17 @@
-$Id$
+$Id: BUG-TRACKING,v 1.1 2005/03/26 02:52:23 kim Exp $
 
 I think this is a good workflow:
 
 - new bug reported
-- before working on it, please assign it to yourself:
+- before working on it, please assign it to yourself (to avoid more than
+  one person working on it):
   a) view the issue and click Assign To: while the dropdown shows [Myself]
      or your username
   b) use the checkboxes on the View Issues page and select the Assign
      action and click OK (haven't gone this route myself yet)
 - work on the code, commit to CVS, use the magic words "issue #NNNN" in
   the commit message; the commit message will get the status changed to
-  resolved; if you didn't remember to use the magic words, don't worry,
+  confirmed; if you didn't remember to use the magic words, don't worry,
   just continue with the next step
 - go to the View Issues page, use the checkbox(es) to select the issue(s)
   you have resolved, select the Resolve action and click OK
