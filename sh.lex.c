@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.50 2000/01/14 22:57:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.51 2000/07/04 19:42:47 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.50 2000/01/14 22:57:28 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.51 2000/07/04 19:42:47 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_INP */
@@ -1574,7 +1574,7 @@ reread:
 #endif /* BSDJOBS */
 	c = bgetc();
 	if (c < 0) {
-#ifndef WINNT
+#ifndef WINNT_NATIVE
 # ifndef POSIX
 #  ifdef TERMIO
 	    struct termio tty;
@@ -1584,11 +1584,11 @@ reread:
 # else /* POSIX */
 	    struct termios tty;
 # endif /* POSIX */
-#endif /* !WINNT */
+#endif /* !WINNT_NATIVE */
 	    if (wanteof)
 		return (-1);
 	    /* was isatty but raw with ignoreeof yields problems */
-#ifndef WINNT
+#ifndef WINNT_NATIVE
 # ifndef POSIX
 #  ifdef TERMIO
 	    if (ioctl(SHIN, TCGETA, (ioctl_t) & tty) == 0 &&
@@ -1601,9 +1601,9 @@ reread:
 	    if (tcgetattr(SHIN, &tty) == 0 &&
 		(tty.c_lflag & ICANON))
 # endif /* POSIX */
-#else /* WINNT */
+#else /* WINNT_NATIVE */
 	    if (isatty(SHIN))
-#endif /* !WINNT */
+#endif /* !WINNT_NATIVE */
 	    {
 		/* was 'short' for FILEC */
 #ifdef BSDJOBS
@@ -1727,7 +1727,7 @@ bgetc()
 		fbuf[0][i] = (unsigned char) tbuf[i];
 	    feobp += c;
 	}
-#ifndef WINNT
+#ifndef WINNT_NATIVE
 	c = fbuf[0][fseekp - fbobp];
 	fseekp++;
 #else
@@ -1735,7 +1735,7 @@ bgetc()
 	    c = fbuf[0][fseekp - fbobp];
 	    fseekp++;
 	} while(c == '\r');
-#endif /* !WINNT */
+#endif /* !WINNT_NATIVE */
 	return (c);
     }
 
@@ -1773,7 +1773,7 @@ bgetc()
 	if (c == 0 || (c < 0 && fixio(SHIN, errno) == -1))
 	    return (-1);
     }
-#ifndef WINNT
+#ifndef WINNT_NATIVE
     c = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
     fseekp++;
 #else
@@ -1781,7 +1781,7 @@ bgetc()
 	c = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
 	fseekp++;
     } while(c == '\r');
-#endif /* !WINNT */
+#endif /* !WINNT_NATIVE */
     return (c);
 }
 

@@ -1,4 +1,19 @@
- 40. Security fix for here-doc tmp files (proton@ENERGYMECH.NET>)
+ 51. V6.09.04 - 20001111
+ 50. Order of initialization for multibyte display was wrong 
+     (HyunChul Kim)
+ 49. Follow the guideline for linux for japanese locale:
+     http://www.linux.or.jp/JF/JFdocs/Japanese-Locale-Policy.txt
+     (Tomohiro KUBOTA)
+ 48. Ukrainian nls map (Olexander Kunytsa)
+ 47. exit immeditiately if we get an error while we are setting up
+     (Michael Shalayeff)
+ 46. (unset path; unsetenv PATH; rehash) -> crash (Kent Vander Velden)
+ 45. change winnt to winnt_native (Randolph Fritz)
+ 44. Support home/end in the editor (Andrey A. Chernov)
+ 43. Typo s/gycwin/cygwin/ in tc.os.h (Andreas Schott)
+ 42. Alpha ev6 addition (Karen R. McArthur)
+ 41. DSPMBYTE patch from (Issei Suzuki)
+ 40. Security fix for here-doc tmp files (proton@ENERGYMECH.NET)
  39. Fix resource limit rounding *again* (Johannes Gross)
  38. Fix $ expansion in prompt (Takashi Sumiyoshi)
  37. V6.09.03 - 20000715

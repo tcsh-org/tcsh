@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.52 1998/10/25 15:10:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.53 2000/07/04 19:39:22 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.52 1998/10/25 15:10:03 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.53 2000/07/04 19:39:22 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -513,11 +513,11 @@ dgoto(cp)
     else
 	dp = cp;
 
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     cp = SAVE(getcwd(NULL, 0));
-#else /* !WINNT */
+#else /* !WINNT_NATIVE */
     cp = dcanon(cp, dp);
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
     return cp;
 }
 

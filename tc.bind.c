@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.bind.c,v 3.33 1998/11/24 18:17:40 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.bind.c,v 3.34 2000/06/11 02:14:15 kim Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.33 1998/11/24 18:17:40 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.34 2000/06/11 02:14:15 kim Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -304,9 +304,9 @@ parsebind(s, str)
     case 'M':
     case 'X':
     case 'C':
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     case 'N':
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 	if (s[1] != '-' || s[2] == '\0') {
 	    bad_spec(s);
 	    return NULL;
@@ -356,7 +356,7 @@ parsebind(s, str)
 #endif /* DSPMBYTE */
 	    *b = '\0';
 	    break;
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 	case 'N' : case 'n':	/* NT */
 		{
 			Char bnt;
@@ -368,7 +368,7 @@ parsebind(s, str)
 				bad_spec(s);
 		}
 	    break;
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 
 	default:
 	    abort();

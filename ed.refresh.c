@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.26 2000/06/10 20:14:57 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.27 2000/06/11 02:14:12 kim Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.26 2000/06/10 20:14:57 kim Exp $")
+RCSID("$Id: ed.refresh.c,v 3.27 2000/06/11 02:14:12 kim Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -352,9 +352,9 @@ Refresh()
     for (cur_line = 0; cur_line <= new_vcv; cur_line++) {
 	/* NOTE THAT update_line MAY CHANGE Display[cur_line] */
 	update_line(Display[cur_line], Vdisplay[cur_line], cur_line);
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 	flush();
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 
 	/*
 	 * Copy the new line to be the current one, and pad out with spaces
@@ -383,9 +383,9 @@ Refresh()
     dprintf("\r\nCursorH = %d, CursorV = %d, cur_h = %d, cur_v = %d\r\n",
 	    CursorH, CursorV, cur_h, cur_v);
 #endif /* DEBUG_REFRESH */
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     flush();
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
     MoveToLine(cur_v);		/* go to where the cursor is */
     MoveToChar(cur_h);
     SetAttributes(0);		/* Clear all attributes */
@@ -919,14 +919,14 @@ update_line(old, new, cur_line)
 #ifdef DEBUG_REFRESH
 	    dprintf("cleareol %d\n", (oe - old) - (ne - new));
 #endif  /* DEBUG_UPDATE */
-#ifndef WINNT
+#ifndef WINNT_NATIVE
 	    ClearEOL((oe - old) - (ne - new));
 #else
 	    /*
 	     * The calculation above does not work too well on NT
 	     */
 	    ClearEOL(TermH - CursorH);
-#endif /*WINNT*/
+#endif /*WINNT_NATIVE*/
 	    /*
 	     * Done
 	     */
@@ -982,14 +982,14 @@ update_line(old, new, cur_line)
 #ifdef DEBUG_REFRESH
 	    dprintf("cleareol %d\n", olen - (ne - new));
 #endif /* DEBUG_UPDATE */
-#ifndef WINNT
+#ifndef WINNT_NATIVE
 	    ClearEOL(olen - (ne - new));
 #else
 	    /*
 	     * The calculation above does not work too well on NT
 	     */
 	    ClearEOL(TermH - CursorH);
-#endif /*WINNT*/
+#endif /*WINNT_NATIVE*/
 	}
     }
 

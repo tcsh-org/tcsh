@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.49 2000/06/10 20:08:44 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.50 2000/07/15 19:58:50 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,13 +36,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.49 2000/06/10 20:08:44 kim Exp $")
+RCSID("$Id: sh.exec.c,v 3.50 2000/07/15 19:58:50 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 #include <nt.const.h>
-#endif /*WINNT*/
+#endif /*WINNT_NATIVE*/
 
 /*
  * C shell
@@ -431,9 +431,9 @@ texec(sf, st)
     switch (errno) {
 
     case ENOEXEC:
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 		nt_feed_to_cmd(f,t);
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 	/*
 	 * From: casper@fwi.uva.nl (Casper H.S. Dik) If we could not execute
 	 * it, don't feed it to the shell if it looks like a binary!
@@ -617,9 +617,9 @@ execash(t, kp)
 	 * Decrement the shell level
 	 */
 	shlvl(-1);
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 	__nt_really_exec=1;
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 	doexec(kp);
     }
 
@@ -673,10 +673,10 @@ dohash(vv, c)
     struct varent *v = adrof(STRpath);
     Char  **pv;
     int hashval;
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     int is_windir; /* check if it is the windows directory */
     USE(hashval);
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 
     USE(c);
 #ifdef FASTHASH
@@ -697,6 +697,8 @@ dohash(vv, c)
 	hashwidth = uhashwidth;
     else {
 	hashwidth = 0;
+	if (v == NULL)
+	    return;
 	for (pv = v->vec; *pv; pv++, hashwidth++)
 	    continue;
 	if (hashwidth <= widthof(unsigned char))
@@ -738,9 +740,9 @@ dohash(vv, c)
 	    continue;
 	}
 #endif
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 	is_windir = nt_check_if_windir(short2str(*pv));
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 	while ((dp = readdir(dirp)) != NULL) {
 	    if (dp->d_ino == 0)
 		continue;
@@ -748,9 +750,9 @@ dohash(vv, c)
 		(dp->d_name[1] == '\0' ||
 		 (dp->d_name[1] == '.' && dp->d_name[2] == '\0')))
 		continue;
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 	    nt_check_name_and_hash(is_windir, dp->d_name, i);
-#else /* !WINNT */
+#else /* !WINNT_NATIVE*/
 #if defined(_UWIN) || defined(__CYGWIN__)
 	    /* Turn foo.{exe,com,bat} into foo since UWIN's readdir returns
 	     * the file with the .exe, .com, .bat extension
@@ -774,7 +776,7 @@ dohash(vv, c)
 	    bis(xhash, hashval);
 # endif /* FASTHASH */
 	    /* tw_add_comm_name (dp->d_name); */
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 	}
 	(void) closedir(dirp);
     }
@@ -893,7 +895,7 @@ cont:
  * Thanks again!!
  */
 
-#ifndef WINNT
+#ifndef WINNT_NATIVE
 /*
  * executable() examines the pathname obtained by concatenating dir and name
  * (dir may be NULL), and returns 1 either if it is executable by us, or
@@ -926,7 +928,7 @@ executable(dir, name, dir_ok)
 	      access(strname, X_OK) == 0
 	)));
 }
-#endif /*!WINNT*/
+#endif /*!WINNT_NATIVE*/
 
 int
 tellmewhat(lexp, str)
@@ -988,7 +990,7 @@ tellmewhat(lexp, str)
 	    return TRUE;
 	}
     }
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     for (bptr = nt_bfunc; bptr < &nt_bfunc[nt_nbfunc]; bptr++) {
 	if (eq(sp->word, str2short(bptr->bname))) {
 	    if (str == NULL) {
@@ -1004,7 +1006,7 @@ tellmewhat(lexp, str)
 	    return TRUE;
 	}
     }
-#endif /* WINNT*/
+#endif /* WINNT_NATIVE*/
 
     sp->word = cmd = globone(sp->word, G_IGNORE);
 
@@ -1119,7 +1121,7 @@ find_cmd(cmd, prt)
 		return rval;
 	}
     }
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     for (bptr = nt_bfunc; bptr < &nt_bfunc[nt_nbfunc]; bptr++) {
 	if (eq(cmd, str2short(bptr->bname))) {
 	    rval = 1;
@@ -1129,7 +1131,7 @@ find_cmd(cmd, prt)
 		return rval;
 	}
     }
-#endif /* WINNT*/
+#endif /* WINNT_NATIVE*/
 
     /* last, look through the path for the command */
 
@@ -1171,7 +1173,7 @@ find_cmd(cmd, prt)
     xfree((ptr_t) sv);
     return rval;
 }
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 int hashval_extern(cp)
 	Char *cp;
 {
@@ -1189,5 +1191,5 @@ void bis_extern(val,i)
 {
 	bis(val,i);
 }
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 

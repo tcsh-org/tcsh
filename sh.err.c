@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.err.c,v 3.33 1998/10/25 15:10:06 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.err.c,v 3.34 1999/05/11 13:07:45 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.33 1998/10/25 15:10:06 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.34 1999/05/11 13:07:45 christos Exp $")
 
 /*
  * C Shell
@@ -504,7 +504,7 @@ stderror(va_alist)
     /*
      * Go away if -e or we are a child shell
      */
-    if (exiterr || child)
+    if (!exitset || exiterr || child)
 	xexit(1);
 
     /*

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.89 2000/07/15 19:58:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.90 2000/09/07 15:33:59 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,14 +36,14 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.89 2000/07/15 19:58:50 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.90 2000/09/07 15:33:59 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
 #include "tc.h"
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 #include "nt.const.h"
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 
 /*
  * C shell
@@ -126,9 +126,9 @@ isbfunc(t)
 	else
 	    bp1 = bp + 1;
     }
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     return nt_check_additional_builtins(cp);
-#endif /*WINNT*/
+#endif /*WINNT_NATIVE*/
     return (0);
 }
 
@@ -347,9 +347,9 @@ dologin(v, c)
     struct command *c;
 {
     USE(c);
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     USE(v);
-#else /* !WINNT */
+#else /* !WINNT_NATIVE */
     islogin();
     rechist(NULL, adrof(STRsavehist) != NULL);
     (void) signal(SIGTERM, parterm);
@@ -357,7 +357,7 @@ dologin(v, c)
     (void) execl(_PATH_USRBIN_LOGIN, "login", short2str(v[1]), NULL);
     untty();
     xexit(1);
-#endif /* !WINNT */
+#endif /* !WINNT_NATIVE */
 }
 
 
@@ -1390,13 +1390,13 @@ dosetenv(v, c)
 	xfree((ptr_t) lp);
 	return;
     }
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     if (eq(vp, STRtcshlang)) {
 	nlsinit();
 	xfree((ptr_t) lp);
 	return;
     }
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
     if (eq(vp, STRKTERM)) {
 	char *t;
 	set(STRterm, quote(lp), VAR_READWRITE);	/* lp memory used here */
@@ -1566,12 +1566,12 @@ dounsetenv(v, c)
 			ed_InitNLSMaps();
 
 		}
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 		else if (eq(name,(STRtcshlang))) {
 		    nls_dll_unload();
 		    nlsinit();
 		}
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 #ifdef COLOR_LS_F
 		else if (eq(name, STRLS_COLORS))
 		    parseLS_COLORS(n);
@@ -1609,16 +1609,16 @@ tsetenv(name, val)
     Char   *blk[2];
     Char  **oep = ep;
 
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 	nt_set_env(name,val);
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
     for (; *ep; ep++) {
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 	for (cp = name, dp = *ep; *cp && Tolower(*cp & TRIM) == Tolower(*dp);
 				cp++, dp++)
 #else
 	for (cp = name, dp = *ep; *cp && (*cp & TRIM) == *dp; cp++, dp++)
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 	    continue;
 	if (*cp != 0 || *dp != '=')
 	    continue;
@@ -1649,9 +1649,9 @@ Unsetenv(name)
     register Char *cp, *dp;
     Char **oep = ep;
 
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 	nt_set_env(name,NULL);
-#endif /*WINNT */
+#endif /*WINNT_NATIVE */
     for (; *ep; ep++) {
 	for (cp = name, dp = *ep; *cp && *cp == *dp; cp++, dp++)
 	    continue;
@@ -2367,13 +2367,13 @@ struct command *c;
 	    xputchar('\n');
 	}
     }
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     nt_print_builtins(maxwidth);
 #else
     if (Tty_raw_mode)
 	xputchar('\r');
     xputchar('\n');
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 
     lbuffed = 1;		/* turn back on line buffering */
     flush();
@@ -2390,9 +2390,9 @@ nlsinit()
 		  short2str(varval(STRcatalog)));
     catd = catopen(catalog, MCLoadBySet);
 #endif /* NLS_CATALOGS */
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     nls_dll_init();
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
     errinit();		/* init the errorlist in correct locale */
     mesginit();		/* init the messages for signals */
     dateinit();		/* init the messages for dates */

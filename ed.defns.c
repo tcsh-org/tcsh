@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.defns.c,v 3.34 2000/06/11 02:14:11 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.defns.c,v 3.35 2000/07/15 19:58:50 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.34 2000/06/11 02:14:11 kim Exp $")
+RCSID("$Id: ed.defns.c,v 3.35 2000/07/15 19:58:50 christos Exp $")
 
 #include "ed.h"
 
@@ -293,11 +293,11 @@ KEYCMD  CcAltMap[NT_NUM_KEYS];		/* the alternative key map */
 #define	F_NUM_FUNCNAMES	(F_NUM_FNS + 2)
 struct KeyFuncs FuncNames[F_NUM_FUNCNAMES];
 
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 extern KEYCMD CcEmacsMap[];
 extern KEYCMD CcViMap[];
 extern KEYCMD  CcViCmdMap[];
-#else /* !WINNT*/
+#else /* !WINNT_NATIVE*/
 KEYCMD  CcEmacsMap[] = {
 /* keymap table, each index into above tbl; should be 256*sizeof(KEYCMD)
    bytes long */
@@ -1118,7 +1118,7 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED,		/* M-~ */
     F_UNASSIGNED		/* M-^? */
 };
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 
 
 void
@@ -1126,7 +1126,7 @@ editinit()
 {
     struct KeyFuncs *f;
 
-#if defined(NLS_CATALOGS) || defined(WINNT)
+#if defined(NLS_CATALOGS) || defined(WINNT_NATIVE)
     int i;
 
     for (i = 0; i < F_NUM_FUNCNAMES; i++)

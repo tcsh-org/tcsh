@@ -63,9 +63,9 @@ static char sccsid[] = "@(#)glob.c	5.12 (Berkeley) 6/24/91";
 #include <ctype.h>
 typedef void * ptr_t;
 #endif
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 	#pragma warning(disable:4244)
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 
 #define Char __Char
 #include "sh.h"

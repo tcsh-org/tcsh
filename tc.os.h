@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.84 2000/07/04 19:46:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.85 2000/07/15 19:58:51 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -37,9 +37,9 @@
 #ifndef _h_tc_os
 #define _h_tc_os
 
-#ifndef WINNT
+#ifndef WINNT_NATIVE
 #define NEEDstrerror		/* Too hard to find which systems have it */
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 
 
 #ifdef notdef 
@@ -237,7 +237,7 @@ struct ucred {
  *
  * From: scott@craycos.com (Scott Bolte)
  */
-#ifndef WINNT
+#ifndef WINNT_NATIVE
 # ifdef F_SETFD
 #  define close_on_exec(fd, v) fcntl((fd), F_SETFD, v)
 # else /* !F_SETFD */
@@ -247,9 +247,9 @@ struct ucred {
 #   define close_on_exec(fd, v)	/* Nothing */
 #  endif /* FIOCLEX */
 # endif /* F_SETFD */
-#else /* WINNT */
+#else /* WINNT_NATIVE */
 # define close_on_exec(fd, v) nt_close_on_exec((fd),(v))
-#endif /* !WINNT */
+#endif /* !WINNT_NATIVE */
 
 /*
  * Stat
@@ -506,7 +506,7 @@ struct ucred {
 #endif /* POSIX */
 
 
-#if !defined(SOLARIS2) && !defined(sinix) && !defined(BSD4_4) && !defined(WINNT)
+#if !defined(SOLARIS2) && !defined(sinix) && !defined(BSD4_4) && !defined(WINNT_NATIVE)
 # if (SYSVREL > 0 && !defined(OREO) && !defined(sgi) && !defined(linux) && !defined(sinix) && !defined(_AIX) &&!defined(_UWIN)) || defined(NeXT)
 #  define NEEDgetcwd
 # endif /* (SYSVREL > 0 && !OREO && !sgi && !linux && !sinix && !_AIX && !_UWIN) || NeXT */
@@ -532,7 +532,7 @@ typedef struct timeval timeval_t;
 #endif /* NeXT */
 
 #if !defined(BSD4_4) && !defined(__linux__) && !defined(__hpux) && \
-    !defined(sgi) && !defined(_AIX) && !defined(__GYGWIN__)
+    !defined(sgi) && !defined(_AIX) && !defined(__CYGWIN__)
 #ifndef NEEDgethostname
 extern int gethostname __P((char *, int));
 #endif /* NEEDgethostname */
@@ -558,7 +558,7 @@ extern caddr_t sbrk __P((int));
 extern int qsort();
 #  endif /* SYSVREL == 0 && !__lucid */
 # else /* !SUNOS4 */
-#  ifndef WINNT
+#  ifndef WINNT_NATIVE
 #   ifndef hpux
 #    if __GNUC__ != 2
 extern int abort();
@@ -570,7 +570,7 @@ extern int qsort();
 extern void abort();
 extern void qsort();
 #   endif /* hpux */
-#  endif /* !WINNT */
+#  endif /* !WINNT_NATIVE */
 # endif	/* SUNOS4 */
 #ifndef _CX_UX
 extern void perror();

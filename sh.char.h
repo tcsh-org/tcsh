@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.char.h,v 3.15 1998/09/18 16:09:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.char.h,v 3.16 2000/06/11 02:14:14 kim Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -151,7 +151,7 @@ extern unsigned short _toebcdic[256];
 #endif /* !defined(DSPMBYTE) */
 #  define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsPunct((unsigned) (c)))
 # else /* !NeXT */
-#  ifndef WINNT
+#  ifndef WINNT_NATIVE
 #   define Isspace(c)	(((Char)(c) & QUOTE) ? 0 : isspace((tcshuc) (c)))
 #   define Isdigit(c)	(((Char)(c) & QUOTE) ? 0 : isdigit((tcshuc) (c)))
 #   define Isalpha(c)	(((Char)(c) & QUOTE) ? 0 : isalpha((tcshuc) (c)))
@@ -192,7 +192,7 @@ extern unsigned short _toebcdic[256];
 #   define Isprint(c)	( (IsprintM(c)) || (_enable_mbdisp&&(IsmbyteU((c)))) )
 #endif /* !defined(DSPMBYTE) */
 #    define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : ispunct((tcshuc) (c)))
-#  else /* WINNT */
+#  else /* WINNT_NATIVE */
 #   define Isspace(c) (((Char)(c) & QUOTE) ? 0 : isspace( oem_it((tcshuc)(c))))
 #   define Isdigit(c) (((Char)(c) & QUOTE) ? 0 : isdigit( oem_it((tcshuc)(c))))
 #   define Isalpha(c) (((Char)(c) & QUOTE) ? 0 : isalpha( oem_it((tcshuc)(c))))
@@ -212,7 +212,7 @@ extern unsigned short _toebcdic[256];
 #   define Iscntrl(c) (((Char)(c) & QUOTE) ? 0 : iscntrl( oem_it((tcshuc)(c))))
 #   define Isprint(c) (((Char)(c) & QUOTE) ? 0 : isprint( oem_it((tcshuc)(c))))
 #endif /* !defined(DSPMBYTE) */
-#  endif /* WINNT */
+#  endif /* WINNT_NATIVE */
 # endif /* !NeXT */
 #else /* !NLS */
 # define Isspace(c)	cmap(c, _SP|_NL)

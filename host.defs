@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /src/pub/tcsh/host.defs,v 1.26 2000/06/10 18:48:09 kim Exp $ */
+/* $Header: /src/pub/tcsh/host.defs,v 1.27 2000/06/11 02:14:13 kim Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.26 2000/06/10 18:48:09 kim Exp $")
+RCSID("$Id: host.defs,v 1.27 2000/06/11 02:14:13 kim Exp $")
 
 endcode	:
 
@@ -1089,7 +1089,6 @@ newdef	: SYSVREL == 0
 ostype	: defined(BSD4_4)				: "bsd44"
 ostype	: defined(BSD)					: "bsd"
 ostype	: defined(POSIX)				: "posix"
-ostype	: defined(unix) || defined(__unix__)		: "unix"
 enddef	:
 
 

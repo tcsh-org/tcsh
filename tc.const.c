@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.const.c,v 3.54 2000/06/11 02:14:15 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.const.c,v 3.55 2000/07/15 19:58:51 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.54 2000/06/11 02:14:15 kim Exp $")
+RCSID("$Id: tc.const.c,v 3.55 2000/07/15 19:58:51 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -133,7 +133,7 @@ Char STRmbytemap[]	= { 'm', 'b', 'y', 't', 'e', 'm', 'a', 'p', '\0' };
 /* STRLANGEUCJP,STRLANGEUCJPB = EUCJP Trap */
 /* STRLANGEUCKR,STRLANGEUCKRB = EUCKR Trap */
 /* STRLANGSJIS,STRLANGSJISB = SJIS Trap */
-#  if defined(__FreeBSD__) || defined(__uxps__) || defined(linux) || defined(sgi)  || defined(aix) || defined(__CYGWIN__) /* linux? */
+#  if defined(__FreeBSD__) || defined(__uxps__) || defined(sgi)  || defined(aix) || defined(__CYGWIN__)
 Char STRLANGEUCJP[]	= { 'j', 'a', '_', 'J', 'P', '.', 'E', 'U', 'C', '\0' };
 Char STRLANGEUCKR[]	= { 'k', 'o', '_', 'K', 'R', '.', 'E', 'U', 'C', '\0' };
 #   if defined(__uxps__)
@@ -150,6 +150,14 @@ Char STRLANGEUCKRB[]	= { 'k', 'o', '_', 'K', 'R', '\0' };
 Char STRLANGEUCJPB[]	= { '\0' };
 Char STRLANGEUCKRB[]	= { '\0' };
 #   endif
+Char STRLANGSJIS[]	= { 'j', 'a', '_', 'J', 'P', '.', 'S', 'J', 'I', 'S',
+			    '\0' };
+Char STRLANGSJISB[]	= { '\0' };
+#  elif defined(linux)
+Char STRLANGEUC[]	= { 'j', 'a', '_', 'J', 'P', '.', 'e', 'u', 'c', 'J',
+			    'P', '\0' };
+Char STRLANGEUCB[]	= { 'j', 'a', '_', 'J', 'P', '.', 'u', 'j', 'i', 's',
+			    '\0' };
 Char STRLANGSJIS[]	= { 'j', 'a', '_', 'J', 'P', '.', 'S', 'J', 'I', 'S',
 			    '\0' };
 Char STRLANGSJISB[]	= { '\0' };
@@ -417,6 +425,7 @@ Char STRup[]		= { 'u', 'p', '\0' };
 Char STRdown[]		= { 'd', 'o', 'w', 'n', '\0' };
 Char STRleft[]		= { 'l', 'e', 'f', 't', '\0' };
 Char STRright[]		= { 'r', 'i', 'g', 'h', 't', '\0' };
+Char STRend[]           = { 'e', 'n', 'd', '\0' };
 
 #ifdef COLORCAT
 Char STRcolorcat[]	= { 'c', 'o', 'l', 'o', 'r', 'c', 'a', 't', '\0' };

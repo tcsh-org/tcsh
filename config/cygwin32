@@ -1,3 +1,4 @@
+/* config.h.  Generated automatically by configure.  */
 /*
  * config.h -- configure various defines for tcsh
  *
@@ -38,38 +39,38 @@
  *		Note that some machines eg. rs6000 have a vfork, but not
  *		with the berkeley semantics, so we cannot use it there either.
  */
-#undef VFORK
+/* #undef VFORK */
 
 /*
  * BSDJOBS	You have BSD-style job control (both process groups and
  *		a tty that deals correctly
  */
-#define BSDJOBS
+/* #undef BSDJOBS */
 
 /*
  * BSDSIGS	You have 4.2-style signals, rather than USG style.
  *		Note: POSIX systems should not define this unless they
  *		have sigvec() and friends (ie: 4.3BSD-RENO, HP-UX).
  */
-#undef BSDSIGS
+/* #undef BSDSIGS */
 
 /*
  * BSDTIMES	You have BSD-style process time stuff (like rusage)
  *		This may or may not be true.  For example, Apple Unix
  *		(OREO) has BSDJOBS and BSDSIGS but not BSDTIMES.
  */
-#define BSDTIMES
+/* #undef BSDTIMES */
 
 /*
  * BSDLIMIT	You have BSD-style resource limit stuff (getrlimit/setrlimit)
  */
-#undef BSDLIMIT
+/* #undef BSDLIMIT */
 
 /*
  * BSDNICE	Your system uses setpriority() instead of nice, to
  *		change a processes scheduling priority
  */
-#undef BSDNICE
+/* #undef BSDNICE */
 
 /*
  * TERMIO	You have struct termio instead of struct sgttyb.
@@ -94,7 +95,7 @@
  * YPBUGS	Work around Sun YP bugs that cause expansion of ~username
  *		to send command output to /dev/null
  */
-#undef YPBUGS
+/* #undef YPBUGS */
 
 /*
  * SIGVOID	Define this if your signal handlers return void.  On older
@@ -135,10 +136,11 @@
 
 /* that gives too long startup delays for me */
 
-#undef REMOTEHOST
+/* #undef REMOTEHOST */
 
-#undef NLS_CATALOGS
+/* #undef NLS_CATALOGS */
 
 #define NO_CRYPT
 
 #endif /* _h_config */
+/* config.h.in.  Generated automatically from configure.in by autoheader.  */

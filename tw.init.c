@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.init.c,v 3.25 1998/10/25 15:10:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.init.c,v 3.26 2000/07/15 19:58:53 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.25 1998/10/25 15:10:50 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.26 2000/07/15 19:58:53 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -300,11 +300,11 @@ tw_cmd_builtin()
     for (bptr = bfunc; bptr < &bfunc[nbfunc]; bptr++)
 	if (bptr->bname)
 	    tw_cmd_add(str2short(bptr->bname));
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     for (bptr = nt_bfunc; bptr < &nt_bfunc[nt_nbfunc]; bptr++)
 	if (bptr->bname)
 	    tw_cmd_add(str2short(bptr->bname));
-#endif /* WINNT*/
+#endif /* WINNT_NATIVE*/
 } /* end tw_cmd_builtin */
 
 
@@ -644,9 +644,9 @@ tw_logname_start(dfd, pat)
 {
     USE(pat);
     SETDIR(dfd)
-#if !defined(_VMS_POSIX) && !defined(WINNT)
+#if !defined(_VMS_POSIX) && !defined(WINNT_NATIVE)
     (void) setpwent();	/* Open passwd file */
-#endif /* !_VMS_POSIX && !WINNT */
+#endif /* !_VMS_POSIX && !WINNT_NATIVE */
 } /* end tw_logname_start */
 
 
@@ -670,12 +670,12 @@ tw_logname_next(dir, flags)
     USE(flags);
     USE(dir);
     TW_HOLD();
-#if !defined(_VMS_POSIX) && !defined(WINNT)
+#if !defined(_VMS_POSIX) && !defined(WINNT_NATIVE)
     /* ISC does not declare getpwent()? */
     pw = (struct passwd *) getpwent();
-#else /* _VMS_POSIX || WINNT */
+#else /* _VMS_POSIX || WINNT_NATIVE */
     pw = NULL;
-#endif /* !_VMS_POSIX && !WINNT */
+#endif /* !_VMS_POSIX && !WINNT_NATIVE */
     TW_RELS();
 
     if (pw == NULL) {
@@ -698,9 +698,9 @@ tw_logname_end()
 #ifdef YPBUGS
     fix_yp_bugs();
 #endif
-#if !defined(_VMS_POSIX) && !defined(WINNT)
+#if !defined(_VMS_POSIX) && !defined(WINNT_NATIVE)
    (void) endpwent();
-#endif /* !_VMS_POSIX && !WINNT */
+#endif /* !_VMS_POSIX && !WINNT_NATIVE */
 } /* end tw_logname_end */
 
 
@@ -715,9 +715,9 @@ tw_grpname_start(dfd, pat)
 {
     USE(pat);
     SETDIR(dfd)
-#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX) && !defined(WINNT)
+#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX) && !defined(WINNT_NATIVE)
     (void) setgrent();	/* Open group file */
-#endif /* !_VMS_POSIX && !_OSD_POSIX && !WINNT */
+#endif /* !_VMS_POSIX && !_OSD_POSIX && !WINNT_NATIVE */
 } /* end tw_grpname_start */
 
 
@@ -741,11 +741,11 @@ tw_grpname_next(dir, flags)
     USE(flags);
     USE(dir);
     TW_HOLD();
-#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX) && !defined(WINNT)
+#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX) && !defined(WINNT_NATIVE)
     gr = (struct group *) getgrent();
-#else /* _VMS_POSIX || _OSD_POSIX || WINNT */
+#else /* _VMS_POSIX || _OSD_POSIX || WINNT_NATIVE */
     gr = NULL;
-#endif /* !_VMS_POSIX && !_OSD_POSIX && !WINNT */
+#endif /* !_VMS_POSIX && !_OSD_POSIX && !WINNT_NATIVE */
     TW_RELS();
 
     if (gr == NULL) {
@@ -768,9 +768,9 @@ tw_grpname_end()
 #ifdef YPBUGS
     fix_yp_bugs();
 #endif
-#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX) && !defined(WINNT)
+#if !defined(_VMS_POSIX) && !defined(_OSD_POSIX) && !defined(WINNT_NATIVE)
    (void) endgrent();
-#endif /* !_VMS_POSIX && !_OSD_POSIX && !WINNT */
+#endif /* !_VMS_POSIX && !_OSD_POSIX && !WINNT_NATIVE */
 } /* end tw_grpname_end */
 
 /* tw_file_start():

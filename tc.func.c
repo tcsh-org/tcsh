@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.91 2000/07/04 19:44:11 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.92 2000/07/15 17:13:01 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,15 +36,15 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.91 2000/07/04 19:44:11 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.92 2000/07/15 17:13:01 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 #include "tw.h"
 #include "tc.h"
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 #include "nt.const.h"
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 
 #ifdef AFS
 #define PASSMAX 16
@@ -402,9 +402,9 @@ dolist(v, c)
 		for (cp = tmp, dp = buf; *cp; *dp++ = (*cp++ | QUOTE))
 		    continue;
 		if (
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 		    (dp[-1] != (Char) (':' | QUOTE)) &&
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 		    (dp[-1] != (Char) ('/' | QUOTE)))
 		    *dp++ = '/';
 		else 
@@ -1950,10 +1950,10 @@ hashbang(fd, vp)
     char *sargv[HACKVECSZ];
     unsigned char *p, *ws;
     int sargc = 0;
-#ifdef WINNT
+#ifdef WINNT_NATIVE
     int fw = 0; 	/* found at least one word */
     int first_word = 0;
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 
     if (read(fd, (char *) lbuf, HACKBUFSZ) <= 0)
 	return -1;
@@ -1964,16 +1964,16 @@ hashbang(fd, vp)
 	switch (*p) {
 	case ' ':
 	case '\t':
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 	case '\r':
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 	    if (ws) {	/* a blank after a word.. save it */
 		*p = '\0';
-#ifndef WINNT
+#ifndef WINNT_NATIVE
 		if (sargc < HACKVECSZ - 1)
 		    sargv[sargc++] = ws;
 		ws = NULL;
-#else /* WINNT */
+#else /* WINNT_NATIVE */
 		if (sargc < HACKVECSZ - 1) {
 		    sargv[sargc] = first_word ? NULL: hb_subst(ws);
 		    if (sargv[sargc] == NULL)
@@ -1983,7 +1983,7 @@ hashbang(fd, vp)
 		ws = NULL;
 	    	fw = 1;
 		first_word = 1;
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 	    }
 	    p++;
 	    continue;
@@ -1993,22 +1993,22 @@ hashbang(fd, vp)
 
 	case '\n':	/* The end of the line. */
 	    if (
-#ifdef WINNT
+#ifdef WINNT_NATIVE
 		fw ||
-#endif /* WINNT */
+#endif /* WINNT_NATIVE */
 		ws) {	/* terminate the last word */
 		*p = '\0';
-#ifndef WINNT
+#ifndef WINNT_NATIVE
 		if (sargc < HACKVECSZ - 1)
 		    sargv[sargc++] = ws;
-#else /* WINNT */
+#else /* WINNT_NATIVE */
 		if (sargc < HACKVECSZ - 1) { /* deal with the 1-word case */
 		    sargv[sargc] = first_word? NULL : hb_subst(ws);
 		    if (sargv[sargc] == NULL)
 			sargv[sargc] = ws;
 		    sargc++;
 		}
-#endif /* !WINNT */
+#endif /* !WINNT_NATIVE */
 	    }
 	    sargv[sargc] = NULL;
 	    ws = NULL;
