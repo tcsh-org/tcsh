@@ -1,4 +1,5 @@
 V6.02.00, ...
+47. New completion style. [[<pattern>[ ]],=<completion action>]
 46. 6.01.06 (3/7/92)
 45. complete styles are ignored after shell metachars eg.
     > complete mail =u
