@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.109 2004/02/21 22:02:37 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.110 2004/04/19 11:59:42 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.109 2004/02/21 22:02:37 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.110 2004/04/19 11:59:42 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -834,6 +834,7 @@ search(type, level, goal)
     register Char *aword = wordbuf;
     register Char *cp;
     struct whyle *wp;
+    int wlevel = 0;
 
     Stype = (Char) type;
     Sgoal = goal;
@@ -871,20 +872,24 @@ search(type, level, goal)
 
 	case TC_FOREACH:
 	case TC_WHILE:
+	    wlevel++;
 	    if (type == TC_BREAK)
 		level++;
 	    break;
 
 	case TC_END:
 	    if (type == TC_BRKSW) {
-		wp = whyles;
-		if (wp) {
-			whyles = wp->w_next;
-			wpfree(wp);
+		if (wlevel == 0) {
+		    wp = whyles;
+		    if (wp) {
+			    whyles = wp->w_next;
+			    wpfree(wp);
+		    }
 		}
 	    }
 	    if (type == TC_BREAK)
 		level--;
+	    wlevel--;
 	    break;
 
 	case TC_SWITCH:
