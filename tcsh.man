@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.3 1991/07/17 22:19:09 christos Exp $
+.\" $Id: tcsh.man,v 3.4 1991/07/18 15:24:56 christos Exp $
 .TH TCSH 1 "17 July 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -77,7 +77,7 @@ executed at given times.
 .sp
 .ti -4
 18) An addition to the file expression syntax for a character not
-in a set of characters and the ability to negate a regular expression.
+in a set of characters and the ability to negate a globbing pattern.
 .sp
 .ti -4
 19) New automatically initialized environment variables \fIHOST\fR and
@@ -1635,7 +1635,7 @@ specified.  For example:
 Note that the second form includes .Xdefaults and .Xinit because 'X'
 (and all the lower case letters) are outside of the range of a single '.'.
 .PP
-Also the ability to negate a regular expression has been added:
+Also the ability to negate a globbing pattern has been added:
 .sp
 .nf
 .RS +.6i
