@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.h,v 3.3 2005/01/05 17:53:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.h,v 3.4 2005/01/06 02:29:33 christos Exp $ */
 /*
  * tc.nls.h: NLS support
  *
@@ -84,7 +84,7 @@ extern void NLSQuote __P((Char *));
 
 extern int NLSExtend __P((Char *, int, int));
 extern Char *NLSChangeCase __P((Char *, int));
-/* $Header: /src/pub/tcsh/tc.nls.h,v 3.3 2005/01/05 17:53:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.h,v 3.4 2005/01/06 02:29:33 christos Exp $ */
 /*
  * tc.nls.h: NLS support
  *
@@ -125,7 +125,7 @@ extern Char *NLSChangeCase __P((Char *, int));
 #ifdef WIDE_STRINGS
 
 # define NLSSize(s, l) 1
-# define NLSFrom(s, l, cp) (USE (l), (*cp = *s), 1)
+# define NLSFrom(s, l, cp) (USE (l), (*(cp) = *(s) & CHAR), 1)
 # define NLSFinished(s, l, c) (l != 0 && c != CHAR_ERR ? 2 : 1)
 # define NLSChars(s) Strlen(s)
 # define NLSQuote(s)
@@ -154,7 +154,7 @@ extern void NLSQuote __P((Char *));
 
 # else
 #  define NLSSize(s, l) 1
-#  define NLSFrom(s, l, cp) (USE (l), (*cp = *s), 1)
+#  define NLSFrom(s, l, cp) (USE (l), (*(cp) = *(s) & CHAR), 1)
 #  define NLSFinished(s, l, c) (l != 0 && c != CHAR_ERR ? 2 : 1)
 #  define NLSChars(s) Strlen(s)
 #  define NLSStringWidth(s) Strlen(s)
