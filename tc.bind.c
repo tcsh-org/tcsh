@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.29 1998/06/27 12:27:30 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.bind.c,v 3.30 1998/09/04 21:16:58 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.29 1998/06/27 12:27:30 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.30 1998/09/04 21:16:58 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -277,6 +277,9 @@ parsebind(s, str)
     Char *s;
     CStr *str;
 {
+#ifdef DSPMBYTE
+    extern bool NoNLSRebind;
+#endif /* DSPMBYTE */
     Char *b = str->buf;
 
     if (Iscntrl(*s)) {
@@ -337,11 +340,20 @@ parsebind(s, str)
 	    break;
 
 	case 'M' : case 'm':	/* Turn into 0x80|c */
+#ifdef DSPMBYTE
+	    if (!NoNLSRebind) {
+	    	*b++ = CTL_ESC('\033');
+	    	*b++ = *s;
+	    } else {
+#endif /* DSPMBYTE */
 #ifndef _OSD_POSIX
 	    *b++ = *s | 0x80;
 #else /*_OSD_POSIX*/
 	    *b++ = _toebcdic[_toascii[*s] | 0x80];
 #endif /*_OSD_POSIX*/
+#ifdef DSPMBYTE
+	    }
+#endif /* DSPMBYTE */
 	    *b = '\0';
 	    break;
 #ifdef WINNT

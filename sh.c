@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.81 1998/09/13 13:51:05 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.82 1998/09/18 16:09:04 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.81 1998/09/13 13:51:05 christos Exp $")
+RCSID("$Id: sh.c,v 3.82 1998/09/18 16:09:04 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1289,6 +1289,10 @@ main(argc, argv)
     if ((tcp = getenv("LANG")) != NULL && !adrof(CHECK_MBYTEVAR)) {
 	autoset_dspmbyte(str2short(tcp));
     }
+#if defined(WINNT)
+    else if (!adrof(CHECK_MBYTEVAR))
+      nt_autoset_dspmbyte();
+#endif /* WINNT */
 #endif
 
     /*

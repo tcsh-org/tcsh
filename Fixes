@@ -1,3 +1,7 @@
+ 93. V6.07.13 - 19980926
+ 96. NT multibyte fixes (Amol)
+ 95. NeXT needs getcwd.
+ 94. fix new bug introduced by strncpy'fication in sh.dir.c (Taga Nayuta)
  93. V6.07.12 - 19980918
  92. add cray in configure script (Tom)
  91. nls fixes
