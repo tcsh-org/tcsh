@@ -200,7 +200,7 @@ Stat(fn, sb)
     {
 	int     st;
 
-	st = lstat(buf, sb);
+	st = stat(buf, sb);
 	if (*buf)
 	    dc--;
 	return (*--dc == '/' && !S_ISDIR(sb->st_mode) ? -1 : st);

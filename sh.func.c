@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.35 1992/07/18 01:34:46 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.36 1992/08/09 00:13:36 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.35 1992/07/18 01:34:46 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.36 1992/08/09 00:13:36 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1446,7 +1446,7 @@ doumask(v, c)
 }
 
 #ifndef HAVENOLIMIT
-# ifndef BSDTIMES
+# ifndef BSDLIMIT
    typedef long RLIM_TYPE;
 #  ifndef RLIM_INFINITY
 #   ifndef _MINIX
@@ -1462,13 +1462,13 @@ doumask(v, c)
 #  else /* aiws */
 #   define toset(a) ((a) + 1)
 #  endif /* aiws */
-# else /* BSDTIMES */
+# else /* BSDLIMIT */
 #  if defined(BSD4_4) && !defined(__386BSD__)
     typedef quad_t RLIM_TYPE;
 #  else
     typedef int RLIM_TYPE;
 #  endif /* BSD4_4 && !__386BSD__ */
-# endif /* BSDTIMES */
+# endif /* BSDLIMIT */
 
 struct limits limits[] = 
 {
@@ -1735,23 +1735,23 @@ plim(lp, hard)
     register struct limits *lp;
     Char    hard;
 {
-# ifdef BSDTIMES
+# ifdef BSDLIMIT
     struct rlimit rlim;
-# endif /* BSDTIMES */
+# endif /* BSDLIMIT */
     RLIM_TYPE limit;
 
     xprintf("%s \t", lp->limname);
 
-# ifndef BSDTIMES
+# ifndef BSDLIMIT
     limit = ulimit(lp->limconst, 0);
 #  ifdef aiws
     if (lp->limconst == RLIMIT_DATA)
 	limit -= 0x20000000;
 #  endif /* aiws */
-# else /* BSDTIMES */
+# else /* BSDLIMIT */
     (void) getrlimit(lp->limconst, &rlim);
     limit = hard ? rlim.rlim_max : rlim.rlim_cur;
-# endif /* BSDTIMES */
+# endif /* BSDLIMIT */
 
     if (limit == RLIM_INFINITY)
 	xprintf("unlimited");
@@ -1760,7 +1760,7 @@ plim(lp, hard)
 	psecs((long) limit);
 # endif /* RLIMIT_CPU */
     else
-# ifndef BSDTIMES
+# ifndef BSDLIMIT
     if (lp->limconst == RLIMIT_FSIZE)
 	/*
 	 * Christos: filesize comes in 512 blocks. we divide by 2 to get 1024
@@ -1769,7 +1769,7 @@ plim(lp, hard)
 	xprintf("%ld %s", (long) (limit / (lp->limdiv == 1024 ? 2 : 1)), 
 	        lp->limscale);
     else
-# endif /* BSDTIMES */
+# endif /* BSDLIMIT */
 	xprintf("%ld %s", (long) (limit / lp->limdiv), lp->limscale);
     xputchar('\n');
 }
@@ -1810,7 +1810,7 @@ setlim(lp, hard, limit)
     Char    hard;
     RLIM_TYPE limit;
 {
-# ifdef BSDTIMES
+# ifdef BSDLIMIT
     struct rlimit rlim;
 
     (void) getrlimit(lp->limconst, &rlim);
@@ -1823,7 +1823,7 @@ setlim(lp, hard, limit)
 	rlim.rlim_cur = limit;
 
     if (setrlimit(lp->limconst, &rlim) < 0) {
-# else /* BSDTIMES */
+# else /* BSDLIMIT */
     if (limit != RLIM_INFINITY && lp->limconst == RLIMIT_FSIZE)
 	limit /= 512;
 # ifdef aiws
@@ -1831,7 +1831,7 @@ setlim(lp, hard, limit)
 	limit += 0x20000000;
 # endif /* aiws */
     if (ulimit(toset(lp->limconst), limit) < 0) {
-# endif /* BSDTIMES */
+# endif /* BSDLIMIT */
 	xprintf("%s: %s: Can't %s%s limit\n", bname, lp->limname,
 		limit == RLIM_INFINITY ? "remove" : "set",
 		hard ? " hard" : "");

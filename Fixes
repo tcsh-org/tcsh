@@ -1,5 +1,14 @@
 V6.03.00, ...
-35. 6.02.05 8/8/92 
+45. 6.02.06 8/14/92 
+44. Separated limit stuff from BSDTIMES and added BSDLIMIT
+43. History searching inconsistent with HistLit:
+    > echo foo
+    foo
+    > ^foo^bar
+    bar
+    > ec[M-p]
+    echo foo
+42. 6.02.05 8/8/92 
 41. sourcing a script that contains 'onintr -; onintr' would disable 
     interrupts on the command line
 40. cd ../... with symlinks=ignore would work !@#!@

@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.print.c,v 1.3 91/09/24 17:10:10 marc Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.print.c,v 3.2 1991/10/12 04:23:51 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.2 1991/10/12 04:23:51 christos Exp $")
 
 #include "ed.h"
 
@@ -80,16 +80,13 @@ void
 pcsecs(l)			/* PWP: print mm:ss.dd, l is in sec*100 */
 #ifdef BSDTIMES
     long    l;
-
-#else				/* BSDTIMES */
-#ifndef POSIX
+#else /* BSDTIMES */
+# ifndef POSIX
     time_t  l;
-
-#else				/* POSIX */
+# else /* POSIX */
     clock_t l;
-
-#endif				/* POSIX */
-#endif				/* BSDTIMES */
+# endif /* POSIX */
+#endif /* BSDTIMES */
 {
     register int i;
 

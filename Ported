@@ -429,3 +429,58 @@ CONFIG	:	config.bsd
 ENVIRON	:	n/a
 NOTES	:	n/a
 VERSION	:	6.00.01
+
+VENDOR	:	gould (encore)
+MODELS	:	NP1
+COMPILER:	cc
+CFLAGS	:	production
+LIBES	:	-ltermcap
+OS	:	UTX/32 3.1A
+CONFIG	:	config.bsd
+ENVIRON	:	n/a
+NOTES	:	n/a
+VERSION	:	6.02.00
+
+VENDOR	:	gould (encore)
+MODELS	:	9050
+COMPILER:	cc
+CFLAGS	:	production
+LIBES	:	-ltermcap
+OS	:	UTX/32 2.1A
+CONFIG	:	config.bsd
+ENVIRON	:	n/a
+NOTES	:	n/a
+VERSION	:	6.02.00
+
+VENDOR	:	ibm & compatible
+MODELS	:	i386
+COMPILER:	cc
+CFLAGS	:	production
+LIBES	:	-lcurses -lcposix
+OS	:	3.2
+CONFIG	:	config.isc
+ENVIRON :	ISC386
+NOTES	:	n/a
+VERSION	:	6.02.00
+
+VENDOR	:	att
+MODELS	:	3b2-600GR (RISC)
+COMPILER:	cc
+CFLAGS	:	production
+LIBES	:	-lcurses
+OS	:	SystemV R4.0
+CONFIG	:	config.sysv4
+ENVIRON	:	n/a
+NOTES	:	n/a
+VERSION	:	6.02.00
+
+VENDOR	:	att
+MODELS	:	3b2-600G
+COMPILER:	cc
+CFLAGS	:	production
+LIBES	:	-lcurses
+OS	:	SystemV R3.2.3
+CONFIG	:	config.sysv3
+ENVIRON	:	n/a
+NOTES	:	n/a
+VERSION	:	6.02.00
