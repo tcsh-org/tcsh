@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/ed.inputl.c,v 1.2 91/07/14 22:22:30 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/ed.inputl.c,v 3.3 1991/07/16 18:13:06 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: ed.inputl.c,v 3.3 1991/07/16 18:13:06 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -275,9 +275,11 @@ Inputl()
 		    Beep();
 		break;
 	    default:
-		if (matchval < 0)	/* Error from tenematch */
+		if (matchval < 0) {	/* Error from tenematch */
 		    Beep();
-		else if (matchbeep) {
+		    break;
+		}
+		if (matchbeep) {
 		    if ((Strcmp(*(matchbeep->vec), STRambiguous) == 0 ||
 			 Strcmp(*(matchbeep->vec), STRnotunique) == 0))
 			Beep();
@@ -309,14 +311,16 @@ Inputl()
 
 	case CC_LIST_CHOICES:
 	    /* should catch ^C here... */
-	    (void) tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf, LIST);
+	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf, LIST) < 0)
+		Beep();
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
 	    break;
 
 	case CC_LIST_GLOB:
-	    (void) tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf, GLOB);
+	    if (tenematch(InputBuf, INBUFSIZ, Cursor - InputBuf, LIST) < 0)
+		Beep();
 	    Refresh();
 	    Argument = 1;
 	    DoingArg = 0;
