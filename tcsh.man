@@ -29,8 +29,8 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\" $Id: tcsh.man,v 3.58 1993/06/05 21:09:15 christos Exp $
-.TH TCSH 1 "16 May 1993" "Cornell 6.03.06"
+.\" $Id: tcsh.man,v 3.59 1993/06/25 21:17:12 christos Exp $
+.TH TCSH 1 "25 June 1993" "Cornell 6.04.00"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -3511,7 +3511,7 @@ I am certain that there are bugs.  Bugs (preferably with fixes)
 should be sent to Christos Zoulas (christos@ee.cornell.edu).
 .PP
 .SH VERSION
-This man page documents tcsh 6.03.06 (Cornell) 93/05/16.
+This man page documents tcsh 6.04.00 (Cornell) 93/06/25.
 .PP
 .SH AUTHORS
 Ken Greer, HP Labs, 1981
