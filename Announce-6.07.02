@@ -1,0 +1,27 @@
+Hello,
+
+I am pleased to announce that tcsh-6.07 is finally available; this is
+a bug fix maintainance release with only two new features:
+
+	- GNU style configure script (ghazi@caip.rutgers.edu)
+	- implicit chdir (hutchins@sgi.com & dbg@sgi.com)
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most unix machines, VMS_POSIX, and it compiles
+and is very close to working on OS/2 EMX.
+
+You can get tcsh from ftp.deshaw.edu:/pub/tcsh/tcsh-6.07.tar.gz
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you
+can get it from prep.ai.mit.edu or other GNU mirrors, or ask ftp to
+unpack it on the fly using 'get tcsh-6.07.tar'.
+
+I would like to thank:
+
+    o D. E. Shaw & Co. for providing a home for tcsh
+    o everyone who sent bug reports
+    o the beta team for all their help, bug fixes, and suggestions
+
+christos
