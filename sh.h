@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.7 1991/07/20 01:44:54 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.h,v 3.8 1991/07/24 15:36:18 christos Exp christos $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -432,7 +432,7 @@ sigret_t (*parterm) ();		/* Parents terminate catch */
  * Lexical definitions.
  *
  * All lexical space is allocated dynamically.
- * The eighth/sizteenth bit of characters is used to prevent recognition,
+ * The eighth/sixteenth bit of characters is used to prevent recognition,
  * and eventually stripped.
  */
 #define		META		0200

@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.0 1991/07/04 21:49:28 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.dol.c,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.dol.c,v 3.1 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 
@@ -67,10 +67,19 @@ static Char *Dcp, **Dvp;	/* Input vector for Dreadc */
  * words within this expansion, the count of remaining words, and the
  * information about any : modifier which is being applied.
  */
+#define MAXWLEN (BUFSIZ - 4)
+#ifndef COMPAT
+#define MAXMOD MAXWLEN		/* This cannot overflow	*/
+#endif /* COMPAT */
 static Char *dolp;		/* Remaining chars from this word */
 static Char **dolnxt;		/* Further words */
 static int dolcnt;		/* Count of further words */
+#ifdef COMPAT
 static Char dolmod;		/* : modifier character */
+#else
+static Char dolmod[MAXMOD];	/* : modifier character */
+static int dolnmod;		/* Number of modifiers */
+#endif /* COMPAT */
 static int dolmcnt;		/* :gx -> 10000, else 1 */
 
 static	void	 Dfix2		__P((Char **));
@@ -152,7 +161,6 @@ Dfix2(v)
 	continue;
 }
 
-#define MAXWLEN (BUFSIZ - 4)
 /*
  * Pack up more characters in this word
  */
@@ -391,7 +399,11 @@ Dgetdol()
     char    tnp;
     Char    wbuf[BUFSIZ];
 
+#ifdef COMPAT
     dolmod = dolmcnt = 0;
+#else
+    dolnmod = dolmcnt = 0;
+#endif /* COMPAT */
     c = sc = DgetC(0);
     if (c == '{')
 	c = DgetC(0);		/* sc is { to take } later */
@@ -427,7 +439,11 @@ Dgetdol()
 	 * it. The actual function of the 'q' causes filename expansion not to
 	 * be done on the interpolated value.
 	 */
+#ifdef COMPAT
 	dolmod = 'q';
+#else
+	dolmod[dolnmod++] = 'q';
+#endif /* COMPAT */
 	dolmcnt = 10000;
 	setDolp(wbuf);
 	goto eatbrac;
@@ -605,14 +621,26 @@ fixDolMod()
 
     c = DgetC(0);
     if (c == ':') {
-	c = DgetC(0), dolmcnt = 1;
-	if (c == 'g')
-	    c = DgetC(0), dolmcnt = 10000;
-	if (!any("htrqxe", c))
-	    stderror(ERR_BADMOD, c);
-	dolmod = c;
-	if (c == 'q')
-	    dolmcnt = 10000;
+#ifndef COMPAT
+	do {
+#endif /* COMPAT */
+	    c = DgetC(0), dolmcnt = 1;
+	    if (c == 'g')
+		c = DgetC(0), dolmcnt = 10000;
+	    if (!any("htrqxe", c))
+		stderror(ERR_BADMOD, c);
+#ifndef COMPAT
+	    dolmod[dolnmod++] = c;
+#else
+	    dolmod = c;
+#endif /* COMPAT */
+	    if (c == 'q')
+		dolmcnt = 10000;
+#ifndef COMPAT
+	}
+	while ((c = DgetC(0)) == ':');
+	unDredc(c);
+#endif /* COMPAT */
     }
     else
 	unDredc(c);
@@ -623,19 +651,46 @@ setDolp(cp)
     register Char *cp;
 {
     register Char *dp;
+#ifndef COMPAT
+    int i;
+#endif /* COMPAT */
 
+#ifdef COMPAT
     if (dolmod == 0 || dolmcnt == 0) {
+#else
+    if (dolnmod == 0 || dolmcnt == 0) {
+#endif /* COMPAT */
 	dolp = cp;
 	return;
     }
+#ifdef COMPAT
     dp = domod(cp, dolmod);
+#else
+    dp = cp = Strsave(cp);
+    for (i = 0; i < dolnmod; i++)
+	if ((dp = domod(cp, dolmod[i]))) {
+	    xfree((ptr_t) cp);
+	    cp = dp;
+	    dolmcnt--;
+	}
+	else {
+	    dp = cp;
+	    break;
+	}
+#endif /* COMPAT */
+
     if (dp) {
+#ifdef COMPAT
 	dolmcnt--;
+#endif /* COMPAT */
 	addla(dp);
 	xfree((ptr_t) dp);
     }
+#ifndef COMPAT
     else
 	addla(cp);
+#endif /* COMPAT */
+
     dolp = STRNULL;
     if (seterr)
 	stderror(ERR_OLD);

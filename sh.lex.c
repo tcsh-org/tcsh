@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/sh.lex.c,v 1.2 91/07/14 22:23:21 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.lex.c,v 3.2 1991/07/15 19:37:24 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id$")
+RCSID("$Id: sh.lex.c,v 3.2 1991/07/15 19:37:24 christos Exp $")
 
 #include "sh.h"
 #include "ed.h"
@@ -568,18 +568,26 @@ getdol()
 
 	int     gmodflag = 0;
 
-	*np++ = c, c = getC(DOEXCL);
-	if (c == 'g')
-	    gmodflag++, *np++ = c, c = getC(DOEXCL);
-	*np++ = c;
-	if (!any("htrqxe", c)) {
-	    if (gmodflag && c == '\n')
-		stderror(ERR_VARSYN);	/* strike */
-	    seterror(ERR_VARMOD, c);
-	    *np = 0;
-	    addla(name);
-	    return;
+#ifndef COMPAT
+	do {
+#endif /* COMPAT */
+	    *np++ = c, c = getC(DOEXCL);
+	    if (c == 'g')
+		gmodflag++, *np++ = c, c = getC(DOEXCL);
+	    *np++ = c;
+	    if (!any("htrqxe", c)) {
+		if (gmodflag && c == '\n')
+		    stderror(ERR_VARSYN);	/* strike */
+		seterror(ERR_VARMOD, c);
+		*np = 0;
+		addla(name);
+		return;
+	    }
+#ifndef COMPAT
 	}
+	while ((c = getC(DOEXCL)) == ':');
+	ungetD(c);
+#endif /* COMPAT */
     }
     else
 	ungetD(c);
@@ -708,124 +716,133 @@ getsub(en)
     int     delim;
     register int c;
     int     sc;
-    bool global = 0;
+    bool global;
     Char    orhsb[sizeof(rhsb) / sizeof(Char)];
 
-    exclnxt = 0;
-    sc = c = getC(0);
-    if (c == 'g')
-	global++, sc = c = getC(0);
+#ifndef COMPAT
+    do {
+#endif /* COMPAT */
+	exclnxt = 0;
+	global = 0;
+	sc = c = getC(0);
+	if (c == 'g')
+	    global++, sc = c = getC(0);
 
-    switch (c) {
-    case 'p':
-	justpr++;
-	return (en);
-
-    case 'x':
-    case 'q':
-	global++;
-
-	/* fall into ... */
-
-    case 'h':
-    case 'r':
-    case 't':
-    case 'e':
-	break;
-
-    case '&':
-	if (slhs[0] == 0) {
-	    seterror(ERR_NOSUBST);
+	switch (c) {
+	case 'p':
+	    justpr++;
 	    return (en);
-	}
-	(void) Strcpy(lhsb, slhs);
-	break;
+
+	case 'x':
+	case 'q':
+	    global++;
+
+	    /* fall into ... */
+
+	case 'h':
+	case 'r':
+	case 't':
+	case 'e':
+	    break;
+
+	case '&':
+	    if (slhs[0] == 0) {
+		seterror(ERR_NOSUBST);
+		return (en);
+	    }
+	    (void) Strcpy(lhsb, slhs);
+	    break;
 
 #ifdef notdef
-    case '~':
-	if (lhsb[0] == 0)
-	    goto badlhs;
-	break;
+	case '~':
+	    if (lhsb[0] == 0)
+		goto badlhs;
+	    break;
 #endif
 
-    case 's':
-	delim = getC(0);
-	if (letter(delim) || Isdigit(delim) || any(" \t\n", delim)) {
-	    unreadc(delim);
-	    lhsb[0] = 0;
-	    seterror(ERR_BADSUBST);
-	    return (en);
-	}
-	cp = lhsb;
-	for (;;) {
-	    c = getC(0);
-	    if (c == '\n') {
-		unreadc(c);
-		break;
-	    }
-	    if (c == delim)
-		break;
-	    if (cp > &lhsb[sizeof(lhsb) / sizeof(Char) - 2]) {
+	case 's':
+	    delim = getC(0);
+	    if (letter(delim) || Isdigit(delim) || any(" \t\n", delim)) {
+		unreadc(delim);
 		lhsb[0] = 0;
 		seterror(ERR_BADSUBST);
 		return (en);
 	    }
-	    if (c == '\\') {
+	    cp = lhsb;
+	    for (;;) {
 		c = getC(0);
-		if (c != delim && c != '\\')
-		    *cp++ = '\\';
+		if (c == '\n') {
+		    unreadc(c);
+		    break;
+		}
+		if (c == delim)
+		    break;
+		if (cp > &lhsb[sizeof(lhsb) / sizeof(Char) - 2]) {
+		    lhsb[0] = 0;
+		    seterror(ERR_BADSUBST);
+		    return (en);
+		}
+		if (c == '\\') {
+		    c = getC(0);
+		    if (c != delim && c != '\\')
+			*cp++ = '\\';
+		}
+		*cp++ = c;
 	    }
-	    *cp++ = c;
-	}
-	if (cp != lhsb)
-	    *cp++ = 0;
-	else if (lhsb[0] == 0) {
-	    seterror(ERR_LHS);
-	    return (en);
-	}
-	cp = rhsb;
-	(void) Strcpy(orhsb, cp);
-	for (;;) {
-	    c = getC(0);
-	    if (c == '\n') {
-		unreadc(c);
-		break;
-	    }
-	    if (c == delim)
-		break;
-#ifdef notdef
-	    if (c == '~') {
-		if (&cp[Strlen(orhsb)] > &rhsb[sizeof(rhsb) /
-					       sizeof(Char) - 2])
-		    goto toorhs;
-		(void) Strcpy(cp, orhsb);
-		cp = Strend(cp);
-		continue;
-	    }
-#endif
-	    if (cp > &rhsb[sizeof(rhsb) / sizeof(Char) - 2]) {
-		seterror(ERR_RHSLONG);
+	    if (cp != lhsb)
+		*cp++ = 0;
+	    else if (lhsb[0] == 0) {
+		seterror(ERR_LHS);
 		return (en);
 	    }
-	    if (c == '\\') {
+	    cp = rhsb;
+	    (void) Strcpy(orhsb, cp);
+	    for (;;) {
 		c = getC(0);
-		if (c != delim /* && c != '~' */ )
-		    *cp++ = '\\';
+		if (c == '\n') {
+		    unreadc(c);
+		    break;
+		}
+		if (c == delim)
+		    break;
+#ifdef notdef
+		if (c == '~') {
+		    if (&cp[Strlen(orhsb)] > &rhsb[sizeof(rhsb) /
+						   sizeof(Char) - 2])
+			goto toorhs;
+		    (void) Strcpy(cp, orhsb);
+		    cp = Strend(cp);
+		    continue;
+		}
+#endif
+		if (cp > &rhsb[sizeof(rhsb) / sizeof(Char) - 2]) {
+		    seterror(ERR_RHSLONG);
+		    return (en);
+		}
+		if (c == '\\') {
+		    c = getC(0);
+		    if (c != delim /* && c != '~' */ )
+			*cp++ = '\\';
+		}
+		*cp++ = c;
 	    }
-	    *cp++ = c;
-	}
-	*cp++ = 0;
-	break;
+	    *cp++ = 0;
+	    break;
 
-    default:
-	if (c == '\n')
-	    unreadc(c);
-	seterror(ERR_BADBANGMOD, c);
-	return (en);
+	default:
+	    if (c == '\n')
+		unreadc(c);
+	    seterror(ERR_BADBANGMOD, c);
+	    return (en);
+	}
+	(void) Strcpy(slhs, lhsb);
+	if (exclc)
+	    en = dosub(sc, en, global);
+#ifndef COMPAT
     }
-    (void) Strcpy(slhs, lhsb);
-    if (exclc)
-	en = dosub(sc, en, global);
+    while ((c = getC(0)) == ':');
+    unreadc(c);
+#endif /* COMPAT */
     return (en);
 }
 
