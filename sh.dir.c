@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.60 2002/07/08 21:03:04 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.61 2003/03/12 19:14:50 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dir.c,v 3.60 2002/07/08 21:03:04 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.61 2003/03/12 19:14:50 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -264,7 +264,7 @@ printdirs(dflag)
 	}
 	if (user) 
 	    xprintf("~%S", user);
-	xprintf("%S%c", s, (dflag & DIR_VERT) ? '\n' : ' ');
+	xprintf("\045S%c", s, (dflag & DIR_VERT) ? '\n' : ' ');
     } while ((dp = dp->di_prev) != dcwd);
     if (!(dflag & DIR_VERT))
 	xputchar('\n');
@@ -276,7 +276,7 @@ dtildepr(dir)
 {
     Char* user;
     if ((user = getusername(&dir)) != NULL)
-	xprintf("~%S%S", user, dir);
+	xprintf("~\045S%S", user, dir);
     else
 	xprintf("%S", dir);
 }
