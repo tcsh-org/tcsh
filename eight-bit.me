@@ -1,4 +1,4 @@
-.\" $Id$
+.\" $Id: eight-bit.me,v 3.0 1991/07/04 21:56:26 christos Exp $
 How to use 8 bit characters
 by 
 Johan Widen 
@@ -53,7 +53,9 @@ I give xmodmap an input something like the following:
 .nf
 keycode 26 = Mode_switch
 add mod2 = Mode_switch
-! if you want Mode_switch to toggle, add the line below
+! if you want Mode_switch to toggle, at the expense of losing
+! Caps- or whatever Lock you currently have, add the two lines below
+! clear Lock
 ! add Lock = Mode_switch
 ! 	Binds swedish characters on ][\\
 !
