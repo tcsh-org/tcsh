@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.26 1992/03/21 22:34:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.27 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.26 1992/03/21 22:34:18 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.27 1992/03/27 01:59:46 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1154,9 +1154,11 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 	    flags |= TW_EXEC_CHK;
 	    flags |= TW_DIR_OK;
 	}
+#ifdef notdef
 	/* PWP: don't even bother when doing ALL of the commands */
 	if (looking == TW_COMMAND && (*word == '\0')) 
 	    return (-1);
+#endif
 	break;
 
     case TW_VARLIST:
