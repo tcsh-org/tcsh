@@ -1,3 +1,4 @@
+ 69. V6.13.09 - 20050303
  68. Autoconf additions (Miloslav Trmac and Jean-Luc Leger)
  67. Fix erroneous sign extension when printing huge numbers (Martin Kraemer)
  66. Handle delay in termcap entries (Martin Kraemer)
