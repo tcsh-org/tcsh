@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.h,v 2.0 1991/03/26 02:59:29 christos Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-5.99/RCS/tc.os.h,v 2.1 1991/03/31 13:06:41 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -8,7 +8,7 @@
 #ifdef OREO
 # include <sys/time.h>
 # include <sys/resource.h>
-#endif				/* OREO */
+#endif /* OREO */
 
 #ifdef hpux
 # ifdef lint
@@ -28,18 +28,18 @@ struct ucred {
  */
 # ifndef CSUSP
 #  define CSUSP 032
-# endif				/* CSUSP */
+# endif	/* CSUSP */
 
 # ifndef POSIX
 #  include <sys/bsdtty.h>
-# endif				/* POSIX */
+# endif	/* POSIX */
 
 # ifdef BSDJOBS
 #  define getpgrp(a) getpgrp2(a)
 #  define setpgrp(a, b) setpgrp2(a, b)
-# endif
+# endif /* BSDJOBS */
 
-#endif				/* hpux */
+#endif /* hpux */
 
 #ifdef HYPERCUBE
 /*
@@ -48,7 +48,7 @@ struct ucred {
 # include <sys/stream.h>
 # include <sys/ptem.h>
 # define gethostname(a, b) xgethostname(a, b)
-#endif				/* HYPERCUBE */
+#endif /* HYPERCUBE */
 
 #ifdef IRIS4D
 # include <sys/time.h>
@@ -62,7 +62,7 @@ struct ucred {
  */
 # define setpgrp BSDsetpgrp
 # define getpgrp BSDgetpgrp
-#endif				/* IRIS4D */
+#endif /* IRIS4D */
 
 #ifdef ISC
 /* these are not defined for _POSIX_SOURCE under ISC 2.2 */
@@ -74,40 +74,38 @@ struct ucred {
 #  define S_IFREG 0100000		/* regular */
 #  define S_IFIFO 0010000		/* fifo */
 #  define S_IFNAM 0050000		/* special named file */
-# endif				/* S_IFMT */
-#endif				/* ISC */
+# endif /* S_IFMT */
+#endif /* ISC */
 
 
 #ifdef _SEQUENT_
 # include <sys/procstats.h>
 # define gethostname(a, b) xgethostname(a, b)
-#endif				/* _SEQUENT_ */
+#endif /* _SEQUENT_ */
 
 #if defined(BSD) && defined(POSIXJOBS)
 # define setpgid(pid, pgrp)	setpgrp(pid, pgrp)
-#endif				/* BSD && POSIXJOBS */
+#endif /* BSD && POSIXJOBS */
 
 #if defined(BSDJOBS) && !(defined(POSIX) && defined(POSIXJOBS))
 # if !defined(_AIX370) && !defined(_AIXPS2)
 #  define setpgid(pid, pgrp)	setpgrp(pid, pgrp)
-# endif				/* !_AIX370 && !_AIXPS2 */
+# endif /* !_AIX370 && !_AIXPS2 */
 # define tcsetpgrp(fd, pgrp)	ioctl((fd), TIOCSPGRP, (ioctl_t) &(pgrp))
 # define tcgetpgrp(fd)		xtcgetpgrp(fd)
 extern int xtcgetpgrp();
-# define NEED_XTCGETPGRP
-#endif				/* BSDJOBS && !(POSIX && POSIXJOBS) */
+#endif /* BSDJOBS && !(POSIX && POSIXJOBS) */
 
 #ifdef RENO
 /* tcgetpgrp() core dumps */
-# define NEED_XTCGETPGRP
 # define tcsetpgrp(fd, pgrp)	ioctl((fd), TIOCSPGRP, (ioctl_t) &(pgrp))
 # define tcgetpgrp(fd) xtcgetpgrp(fd)
-#endif				/* RENO */
+#endif /* RENO */
 
 #ifdef DGUX
 # define setpgrp(a, b) setpgrp2(a, b)
 # define getpgrp(a) getpgrp2(a)
-#endif				/* DGUX */
+#endif /* DGUX */
 
 #ifdef SXA
 # ifndef BSDNICE
@@ -117,42 +115,42 @@ extern int xtcgetpgrp();
  */
 #  define setrlimit(a, b) 	bsd_setrlimit(a, b)
 #  define getrlimit(a, b)	bsd_getrlimit(a, b)
-# endif				/* BSDNICE */
+# endif /* BSDNICE */
 # ifndef NOFILE
 #  define	NOFILE	64
-# endif				/* NOFILE */
-#endif				/* SXA */
+# endif	/* NOFILE */
+#endif /* SXA */
 
 #ifndef POSIX
 # define mygetpgrp()    getpgrp(0)
-#else				/* POSIX */
+#else /* POSIX */
 # if defined(BSD) || defined(sun)
 #  define mygetpgrp()    getpgrp(0)
-# else				/* BSD || sun */
+# else /* BSD || sun */
 #  define mygetpgrp()    getpgrp()
-# endif				/* BSD || sun */
-#endif				/* POSIX */
+# endif /* BSD || sun */
+#endif /* POSIX */
 
 #ifndef R_OK
 # define R_OK 4
-#endif
+#endif /* R_OK */
 #ifndef F_OK
 # define F_OK 0
-#endif
+#endif /* F_OK */
 
 #if SVID > 0 && !defined(OREO) && !defined(IRIS4D)
 # define getwd(a) xgetwd(a)
 extern char *xgetwd();
-#endif				/* SVID > 0 && !OREO && !IRIS4D */
+#endif /* SVID > 0 && !OREO && !IRIS4D */
 
 #ifndef S_IFLNK
 # define lstat stat
-#endif				/* S_IFLNK */
+#endif /* S_IFLNK */
 
 
 #if defined(BSDTIMES) && !defined(_SEQUENT_)
 typedef struct timeval timeval_t;
-#endif
+#endif /* BSDTIMES && ! _SEQUENT_ */
 
 #ifdef NeXT
 /*
@@ -162,42 +160,56 @@ typedef struct timeval timeval_t;
 # define calloc tcsh_calloc
 # define realloc tcsh_realloc
 # define free tcsh_free
-#endif
+#endif /* NeXT */
 
 
-#ifndef POSIX
+#if !defined(POSIX) || defined(sun)
 extern time_t time();
 extern char *getenv();
 extern int atoi();
+extern char *ttyname();
+extern void abort();
+extern void perror();
+extern void qsort();
+
 # ifndef gethostname
-extern int gethostname();
-# else
-extern int xgethostname();
-# endif
+    extern int gethostname();
+# else /* gethostname */
+    extern int xgethostname();
+# endif /* gethostname */
+
 # ifdef BSDSIGS
 #  ifndef _AIX370
 extern sigret_t sigvec();
 extern void sigpause();
-#  else
+#  else /* !_AIX370 */
 extern int sigvec();
 extern int sigpause();
-#  endif
+#  endif /* !_AIX370 */
 extern sigmask_t sigblock();
 extern sigmask_t sigsetmask();
-# endif
+# endif /* BSDSIGS */
+
 # ifndef killpg
 extern int killpg();
-# endif
-extern char *ttyname();
-extern void abort();
-extern void perror();
+# endif /* killpg */
+
+# ifndef lstat
 extern int lstat();
+# endif /* lstat */
+
+
+#ifdef BSDTIMES
 extern int getrlimit();
 extern int setrlimit();
+extern int getrusage();
+extern int gettimeofday();
+#endif /* BSDTIMES */
+
 # if defined(NLS) && !defined(NOSTRCOLL)
 extern int strcoll();
 # endif
-extern void qsort();
+
 # ifdef BSDJOBS
 #  ifdef BSDTIMES
 extern int wait3();
@@ -215,29 +227,30 @@ extern int ourwait();
 extern int wait();
 #  endif /* SVID >= 3 */
 # endif /* ! BSDJOBS */
-extern int gettimeofday();
+
 # ifdef BSDNICE
 extern int setpriority();
-# else
+# else /* !BSDNICE */
 extern int nice();
-# endif
-# ifdef BSDTIMES
-extern int getrusage();
-# endif
+# endif /* !BSDNICE */
+
 extern void setpwent();
 extern void endpwent();
 extern struct passwd *getpwuid (), *getpwnam (), *getpwent();
+
 # ifndef getwd
 extern char *getwd();
-# endif
-#else
+# endif /* getwd */
+#else /* POSIX */
+
 # if defined(sun) && !defined(__GNUC__)
 extern char *getwd();
-# endif
-# if defined(RENO)
+# endif /* sun && ! __GNUC__ */
+
+# ifdef RENO
 extern void perror();	/* Reno declares that in stdio.h :-( */
 # endif /* RENO */
-#endif
+#endif /* POSIX */
 
 
-#endif				/* _h_tc_os */
+#endif /* _h_tc_os */
