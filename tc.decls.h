@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/sipbsrc/src/tcsh-6.00/RCS/tc.decls.h,v 1.2 91/07/14 22:23:59 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.decls.h,v 3.1 1991/07/15 19:37:24 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -86,6 +86,7 @@ extern	void		  fg_proc_entry	__P((struct process *));
 extern	sigret_t	  alrmcatch	__P((int));
 extern	void		  precmd	__P((void));
 extern	void		  cwd_cmd	__P((void));
+extern	void		  beep_cmd	__P((void));
 extern	void		  period_cmd	__P((void));
 extern	void		  aliasrun	__P((int, Char *, Char *));
 extern	void		  setalarm	__P((void));
