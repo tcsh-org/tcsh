@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.111 2004/05/13 15:23:39 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.112 2004/07/24 21:52:48 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.111 2004/05/13 15:23:39 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.112 2004/07/24 21:52:48 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2514,11 +2514,13 @@ nlsinit()
 void
 nlsclose()
 {
+#ifdef NLS_CATALOGS
 #ifdef HAVE_ICONV
     if (catgets_iconv != (iconv_t)-1) {
 	iconv_close(catgets_iconv);
 	catgets_iconv = (iconv_t)-1;
     }
-#endif
+#endif /* HAVE_ICONV */
     catclose(catd);
+#endif /* NLS_CATALOGS */
 }
