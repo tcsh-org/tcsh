@@ -22,7 +22,7 @@
  * POSIXJOBS	This system supports the optional IEEE Std 1003.1-1988 (POSIX)
  *		job control facilities.
  */
-#define POSIXJOBS
+#undef POSIXJOBS
 
 /*
  * POSIXSIGS	Use the POSIX signal facilities to emulate BSD signals.
@@ -48,7 +48,11 @@
  * BSDJOBS	You have BSD-style job control (both process groups and
  *		a tty that deals correctly
  */
-#undef BSDJOBS
+#ifdef mips
+# define BSDJOBS
+#else
+# undef BSDJOBS
+#endif
 
 /*
  * BSDSIGS	You have 4.2-style signals, rather than USG style.
