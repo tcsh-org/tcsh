@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.41 2005/01/18 20:12:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.42 2005/01/18 20:43:30 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -149,7 +149,7 @@ EXTERN int HistWhich;		/* Hist_num is saved in this */
 EXTERN char Expand;		/* true if we are expanding a line */
 extern Char HistLit;		/* true if history lines are shown literal */
 EXTERN Char CurrentHistLit;	/* Literal status of current show history line */
-EXTERN int Tty_raw_mode;
+extern int Tty_raw_mode;
 
 /*
  * These are truly extern
