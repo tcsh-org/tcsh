@@ -1,4 +1,4 @@
-$ $Id: set3,v 1.2 1995/03/19 18:09:24 christos Exp $
+$ $Id: set3,v 1.3 1995/04/08 21:28:07 christos Exp christos $
 $ Editor function descriptions
 $set 3
 1 Ein Zeichen zurück
@@ -114,4 +114,4 @@ $set 3
 111 Vi mache letzte Änderung rückgängig
 112 Vi gehe zum Anfang der Zeile
 113 Mache ein 'which' von dem aktuellen Befehl
-114 Füge den Cut-Puffer an der Cursor-Positioh14 Fü
+114 Füge den Cut-Puffer an der Cursor-Position ein

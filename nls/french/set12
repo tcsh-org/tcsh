@@ -1,0 +1,4 @@
+$ $Id: set12,v 1.2 1995/03/19 18:07:15 vansteen Exp $
+$ sh.dir.c
+$set 12 
+1 tcsh: Essaie de démarrer à partir de "%s"\n

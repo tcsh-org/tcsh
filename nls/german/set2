@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set2,v 1.2 1995/03/19 18:09:24 christos Exp christos $
 $ Signal names
 $set 2
 1 Null signal
@@ -30,10 +30,10 @@ $set 2
 27 Kindprozeß angehalten oder beendet
 28 Kindprozeß beendet
 29 Stromunterbrechung
-30 Stromunterbrechung
-31 Ressource verloren
-32 Unterbrechung (Ctrl-Break)
-33 Mögliches Ein-/Ausgabesignal
+30 Ressource verloren
+31 Unterbrechung (Ctrl-Break)
+32 Mögliches Ein-/Ausgabesignal
+33 Asynchrone I/O (select)
 34 Dringende Anfrage von Ein-/Ausgabekanal
 35 Multitasking wake-up
 36 Multitasking kill
