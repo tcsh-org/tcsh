@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.screen.c,v 3.25 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.screen.c,v 3.26 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.25 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.26 1992/10/05 02:41:30 christos Exp christos $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1185,7 +1185,7 @@ ClearEOL(num)			/* clear to end of line.  There are num */
 {
     register int i;
 
-    if (num == 0)
+    if (num <= 0)
 	return;
 
     if (T_CanCEOL && GoodStr(T_ce))

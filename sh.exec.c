@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.exec.c,v 3.19 1992/10/05 02:41:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.exec.c,v 3.20 1992/10/14 20:19:19 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.19 1992/10/05 02:41:30 christos Exp christos $")
+RCSID("$Id: sh.exec.c,v 3.20 1992/10/14 20:19:19 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -289,7 +289,7 @@ doexec(t)
 	        (void) signal(SIGQUIT,SIG_DFL);
 	    }
 
-	    if (gointr && eq(gointr, STRminus) {
+	    if (gointr && eq(gointr, STRminus)) {
 # ifdef JOBDEBUG
     	        xprintf("set SIGINT to SIG_IGN\n");
     	        xprintf("set SIGQUIT to SIG_IGN\n");

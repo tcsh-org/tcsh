@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.proc.c,v 3.36 1992/10/10 18:17:34 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.proc.c,v 3.37 1992/10/14 20:19:19 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.36 1992/10/10 18:17:34 christos Exp christos $")
+RCSID("$Id: sh.proc.c,v 3.37 1992/10/14 20:19:19 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -337,8 +337,6 @@ found:
 	    else
 		pp->p_flags |= PNEXITED;
 	}
-	if (forepid == pp->p_jobid)
-	    forepid = 0;
     }
     jobflags = 0;
     fp = pp;
@@ -1628,7 +1626,6 @@ pstart(pp, foregnd)
 #ifdef BSDJOBS
     if (foregnd) {
 	(void) tcsetpgrp(FSHTTY, pp->p_jobid);
-	forepid = pp->p_jobid;
     }
     /*
      * 1. child process of csh (shell script) receives SIGTTIN/SIGTTOU
@@ -2042,7 +2039,5 @@ pgetty(wanttty, pgrp)
 
     if (tpgrp > 0)
 	tpgrp = 0;		/* gave tty away */
-    if (wanttty > 0)
-	forepid = pgrp;
 #endif /* BSDJOBS */
 }

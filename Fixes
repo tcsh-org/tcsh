@@ -1,4 +1,14 @@
 V6.03.00, ...
+91. 6.02.11 10/27/92
+90. Again POSIX SIGHUP fixes... Maybe we got it right this time...
+89. Increased BUFSIZE to 4K. Smaller machines may want to decrease this.
+    [ Now one can edit up to 4K of buffer! ]. From Harald.
+88. : is now a true builtin that does nothing, instead of being treated like
+    the last character of a label. This is so it can take args. From Harald.
+87. More fixes for hpux limits from Harald.
+86. Login shell if ppid == 1 and argc == 1 for VMS.
+85. Typo in sh.exec.c from Harry.
+84. Per's editor fixes.
 83. 6.02.10 10/17/92
 82. Don't free STRNULL in freelex(). Update linked list in copylex() to
     do the same insert as in lex().

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/ed.inputl.c,v 3.28 1992/10/05 02:41:30 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/ed.inputl.c,v 3.29 1992/10/14 20:19:19 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.28 1992/10/05 02:41:30 christos Exp christos $")
+RCSID("$Id: ed.inputl.c,v 3.29 1992/10/14 20:19:19 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -523,7 +523,7 @@ RunCommand(str)
 
     ClearLines();
     ClearDisp();
-    NeedsRedraw = 1;
+    NeedsRedraw = 0;
     Refresh();
 }
 

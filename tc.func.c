@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.func.c,v 3.35 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/tc.func.c,v 3.36 1992/10/05 02:41:30 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.35 1992/09/18 20:56:35 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.36 1992/10/05 02:41:30 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -398,6 +398,17 @@ dowhich(v, c)
     lex[0].word = STRNULL;
     lex[2].word = STRret;
 
+    gflag = 0, tglob(v);
+    if (gflag) {
+	v = globall(v);
+	if (v == 0)
+	    stderror(ERR_NAME | ERR_NOMATCH);
+    }
+    else {
+	v = gargv = saveblk(v);
+	trim(v);
+    }
+
     while (*++v) {
 	if ((vp = adrof1(*v, &aliases)) != NULL) {
 	    xprintf("%S: \t aliased to ", *v);
@@ -409,6 +420,8 @@ dowhich(v, c)
 	    tellmewhat(lex);
 	}
     }
+    if (gargv)
+	blkfree(gargv), gargv = 0;
 }
 
 /* PWP: a hack to start up your stopped editor on a single keystroke */

@@ -82,7 +82,7 @@
  **********************************************************************
  */
 #include "sh.h"
-RCSID("$Id: ma.setp.c,v 1.4 1992/03/28 00:32:37 christos Exp $")
+RCSID("$Id: ma.setp.c,v 1.5 1992/09/18 20:56:35 christos Exp $")
 
 #ifdef MACH
 
@@ -264,7 +264,7 @@ register char **paths;
 	q = val;
 	for (;;) {
 	    q = index(p = q, ':');
-	    done = (*q == '\0');
+	    done = (q == NULL);
 	    if (!done)
 		*q++ = '\0';
 	    p = strsave(p);
@@ -367,7 +367,7 @@ char *localsyspath;
 	pe->pdirs = 0;
 	for (;;) {
 	    new = index(p = new, ':');
-	    done = (*new == '\0');
+	    done = (new == NULL);
 	    if (!done)
 		*new++ = '\0';
 	    p = strsave(p);

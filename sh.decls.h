@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.decls.h,v 3.13 1992/09/18 20:56:35 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.decls.h,v 3.14 1992/10/05 02:41:30 christos Exp christos $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -268,9 +268,9 @@ extern	void		  pcsecs	__P((clock_t));
 extern	void		  pcsecs	__P((time_t));
 # endif /* !POSIX */
 #endif /* BSDTIMES */
-#ifdef RLIMIT_CPU
+#ifdef BSDLIMIT
 extern	void		  psecs		__P((long));
-#endif /* RLIMIT_CPU */
+#endif /* BSDLIMIT */
 extern	int		  putpure	__P((int));
 extern	int		  putraw	__P((int));
 extern	void		  xputchar	__P((int));

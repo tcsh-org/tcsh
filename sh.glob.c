@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.glob.c,v 3.26 1992/10/05 02:41:30 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.glob.c,v 3.27 1992/10/10 18:17:34 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.26 1992/10/05 02:41:30 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.27 1992/10/10 18:17:34 christos Exp $")
 
 #include "tc.h"
 
@@ -88,7 +88,7 @@ static Char *
 globtilde(nv, s)
     Char  **nv, *s;
 {
-    Char    gbuf[MAXPATHLEN], *gstart, *b, *u, *e;
+    Char    gbuf[BUFSIZE], *gstart, *b, *u, *e;
 #ifdef apollo
     int slash;
 #endif
@@ -96,7 +96,7 @@ globtilde(nv, s)
     gstart = gbuf;
     *gstart++ = *s++;
     u = s;
-    for (b = gstart, e = &gbuf[MAXPATHLEN - 1]; 
+    for (b = gstart, e = &gbuf[BUFSIZE - 1]; 
 	 *s && *s != '/' && *s != ':' && b < e;
 	 *b++ = *s++)
 	continue;
@@ -158,7 +158,7 @@ globequal(new, old)
 
     /* Copy the rest of the string */
     for (d = &new[Strlen(new)]; 
-	 d < &new[MAXPATHLEN - 1] && (*d++ = *b++) != '\0';)
+	 d < &new[BUFSIZE - 1] && (*d++ = *b++) != '\0';)
 	continue;
     *d = '\0';
 
@@ -172,7 +172,7 @@ globbrace(s, p, bl)
     int     i, len;
     Char   *pm, *pe, *lm, *pl;
     Char  **nv, **vl;
-    Char    gbuf[MAXPATHLEN];
+    Char    gbuf[BUFSIZE];
     int     size = GLOBSPACE;
 
     nv = vl = (Char **) xmalloc((size_t) (sizeof(Char *) * size));
@@ -393,7 +393,7 @@ globexpand(v)
     vl = nv;
     for (s = *vl; s; s = *++vl)
 	switch (*s) {
-	    Char gp[MAXPATHLEN], *ns;
+	    Char gp[BUFSIZE], *ns;
 	case '~':
 	    *vl = globtilde(nv, s);
 	    break;
@@ -691,7 +691,7 @@ dobackp(cp, literal)
     bool    literal;
 {
     register Char *lp, *rp;
-    Char   *ep, word[MAXPATHLEN];
+    Char   *ep, word[BUFSIZE];
 
     if (pargv) {
 #ifdef notdef
@@ -704,7 +704,7 @@ dobackp(cp, literal)
     pargv[0] = NULL;
     pargcp = pargs = word;
     pargc = 0;
-    pnleft = MAXPATHLEN - 4;
+    pnleft = BUFSIZE - 4;
     for (;;) {
 	for (lp = cp; *lp != '`'; lp++) {
 	    if (*lp == 0) {
@@ -896,7 +896,7 @@ pword()
     pargv[pargc++] = Strsave(pargs);
     pargv[pargc] = NULL;
     pargcp = pargs;
-    pnleft = MAXPATHLEN - 4;
+    pnleft = BUFSIZE - 4;
 }
 
 int

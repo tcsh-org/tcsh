@@ -1,4 +1,8 @@
-#posix /etc/termcap 1992
+# $Id$
+# posix /etc/termcap 1992 
+#
+# Minimal termcap for VMS/POSIX
+#
 # 7bit vt300 series
 p3|vt300_series|vt300_series|dec vt320:\
 	:hs:\

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.init.c,v 3.20 1992/10/10 18:17:34 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.init.c,v 3.21 1992/10/14 20:19:19 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.20 1992/10/10 18:17:34 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.21 1992/10/14 20:19:19 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -48,6 +48,7 @@ RCSID("$Id: sh.init.c,v 3.20 1992/10/10 18:17:34 christos Exp $")
 #define	INF	0x7fffffff
 
 struct	biltins bfunc[] = {
+    { ":",		dozip,		0,	INF, },
     { "@",		dolet,		0,	INF, },
     { "alias",		doalias,	0,	INF, },
     { "aliases",	doaliases,	0,	1, /* PWP */ },

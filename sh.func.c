@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.func.c,v 3.39 1992/10/10 18:17:34 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.03/RCS/sh.func.c,v 3.40 1992/10/14 20:19:19 christos Exp christos $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.39 1992/10/10 18:17:34 christos Exp christos $")
+RCSID("$Id: sh.func.c,v 3.40 1992/10/14 20:19:19 christos Exp christos $")
 
 #include "ed.h"
 #include "tw.h"
@@ -76,7 +76,7 @@ isbfunc(t)
     static struct biltins foregnd = {"%job", dofg1, 0, 0};
     static struct biltins backgnd = {"%job &", dobg1, 0, 0};
 
-    if (lastchr(cp) == ':') {
+    if (*cp != ':' && lastchr(cp) == ':') {
 	label.bname = short2str(cp);
 	return (&label);
     }
@@ -1483,25 +1483,16 @@ doumask(v, c)
 /* Yes, we could have defined _KERNEL, and -I/etc/conf/h, but is that better? */
 #  ifndef RLIMIT_CPU
 #   define RLIMIT_CPU		0
-#  endif /* RLIMIT_CPU */
-#  ifndef RLIMIT_FSIZE
 #   define RLIMIT_FSIZE		1
-#  endif /* RLIMIT_FSIZE */
-#  ifndef RLIMIT_DATA
 #   define RLIMIT_DATA		2
-#  endif /* RLIMIT_DATA */
-#  ifndef RLIMIT_STACK
 #   define RLIMIT_STACK		3
-#  endif /* RLIMIT_STACK */
-#  ifndef RLIMIT_CORE
 #   define RLIMIT_CORE		4
-#  endif /* RLIMIT_CORE */
-#  ifndef RLIMIT_RSS
 #   define RLIMIT_RSS		5
-#  endif /* RLIMIT_RSS */
-#  ifndef RLIMIT_NOFILE
 #   define RLIMIT_NOFILE	6
-#  endif /* RLIMIT_NOFILE */
+#  endif /* RLIMIT_CPU */
+#  ifndef RLIM_INFINITY
+#   define RLIM_INFINITY	0x7fffffff
+#  endif RLIM_INFINITY
 # endif /* hpux && BSDLIMIT */
 
 struct limits limits[] = 
