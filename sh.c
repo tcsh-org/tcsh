@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.31 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.c,v 3.32 1992/07/18 01:34:46 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.31 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: sh.c,v 3.32 1992/07/18 01:34:46 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -106,6 +106,7 @@ static bool    prompt = 1;
 static bool    enterhist = 0;
 bool    tellwhat = 0;
 time_t  t_period;
+Char  *ffile = NULL;
 static time_t  chktim;		/* Time mail last checked */
 static int     gid;		/* Invokers gid */
 
@@ -189,7 +190,8 @@ main(argc, argv)
     bslash_quote = 0;		/* PWP: do tcsh-style backslash quoting? */
 
     tempv = argv;
-    if (eq(str2short(tempv[0]), STRaout))	/* A.out's are quittable */
+    ffile = SAVE(tempv[0]);
+    if (eq(ffile, STRaout))	/* A.out's are quittable */
 	quitit = 1;
     uid = getuid();
     gid = getgid();
@@ -734,6 +736,9 @@ main(argc, argv)
 	    /* ... doesn't return */
 	    stderror(ERR_SYSTEM, tempv[0], strerror(errno));
 	}
+	if (ffile != NULL)
+	    xfree((ptr_t) ffile);
+	ffile = SAVE(tempv[0]);
 	/* 
 	 * Replace FSHIN. Handle /dev/std{in,out,err} specially
 	 * since once they are closed we cannot open them again.
@@ -761,10 +766,6 @@ main(argc, argv)
 	 /* argc not used any more */ tempv++;
     }
 
-    /*
-     * Allways set ffile, why not?
-     */
-    ffile = SAVE(tempv[0]);
 
     /*
      * Consider input a tty if it really is or we are interactive. but not for

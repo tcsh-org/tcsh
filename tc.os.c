@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.21 1992/06/20 22:25:15 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.c,v 3.22 1992/07/06 15:26:18 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.21 1992/06/20 22:25:15 christos Exp christos $")
+RCSID("$Id: tc.os.c,v 3.22 1992/07/06 15:26:18 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -939,6 +939,11 @@ prepend(dirname, pathname)
 }
 
 # else /* ! hp9000s500 */
+
+#if SYSVREL != 0 && !defined(d_fileno)
+# define d_fileno d_ino
+#endif
+
 char   *
 xgetwd(pathname)
     char   *pathname;
@@ -948,7 +953,7 @@ xgetwd(pathname)
 
     struct stat st_root, st_cur, st_next, st_dotdot;
     char    pathbuf[MAXPATHLEN], nextpathbuf[MAXPATHLEN * 2];
-    char   *pathptr, *nextpathptr;
+    char   *pathptr, *nextpathptr, cur_name_add;
 
     /* find the inode of root */
     if (stat("/", &st_root) == -1) {
@@ -959,7 +964,7 @@ xgetwd(pathname)
     pathbuf[MAXPATHLEN - 1] = '\0';
     pathptr = &pathbuf[MAXPATHLEN - 1];
     nextpathbuf[MAXPATHLEN - 1] = '\0';
-    nextpathptr = &nextpathbuf[MAXPATHLEN - 1];
+    cur_name_add = nextpathptr = &nextpathbuf[MAXPATHLEN - 1];
 
     /* find the inode of the current directory */
     if (lstat(".", &st_cur) == -1) {
@@ -1008,6 +1013,7 @@ xgetwd(pathname)
 	    for (d = readdir(dp); d != NULL; d = readdir(dp)) {
 		if (ISDOT(d->d_name) || ISDOTDOT(d->d_name))
 		    continue;
+		(void) strcpy(cur_name_add, d->d_name);
 		if (lstat(nextpathptr, &st_next) == -1) {
 		    (void) xsprintf(pathname, "getwd: Cannot stat \"%s\" (%s)",
 				    d->d_name, strerror(errno));
@@ -1030,6 +1036,7 @@ xgetwd(pathname)
 	pathptr = strrcpy(pathptr, "/");
 	nextpathptr = strrcpy(nextpathptr, "../");
 	(void) closedir(dp);
+	*cur_name_add = '\0';
     }
 } /* end getwd */
 

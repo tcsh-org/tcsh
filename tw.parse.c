@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.35 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tw.parse.c,v 3.36 1992/07/18 01:34:46 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.35 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.36 1992/07/18 01:34:46 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -722,7 +722,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
     int dir_ok     = flags & TW_DIR_OK;  /* Ignore directories? */
     int gpat       = flags & TW_PAT_OK;	 /* Match against a pattern */
     int ignoring   = flags & TW_IGN_OK;	 /* Use fignore? */
-    int d = 4, nd = 0;			 /* Spelling distance */
+    int d = 4, nd;			 /* Spelling distance */
     Char *entry, *ptr;
     Char buf[MAXPATHLEN+1];
     struct varent *vp;
@@ -1110,7 +1110,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
     Char   *pat;
     int     suf;
 {
-    int     numitems = 0,		/* Number of items matched */
+    int     numitems,			/* Number of items matched */
 	    flags = 0,			/* search flags */
 	    gpat = pat[0] != '\0',	/* Glob pattern search */
 	    nd;				/* Normalized directory return */
@@ -1118,7 +1118,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
             dir[FILSIZ + 1],		/* /x/y/z/ part in /x/y/z/f */
             exp_name[MAXNAMLEN + 1],	/* the recognized (extended) */
             name[MAXNAMLEN + 1],	/* f part in /d/d/d/f name */
-           *target = NULL;		/* Target to expand/correct/list */
+           *target;			/* Target to expand/correct/list */
     DIR    *dir_fd = NULL;	
 
     /*
@@ -1280,8 +1280,6 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 #ifdef YPBUGS
 	    fix_yp_bugs();
 #endif /* YPBUGS */
-	    if (looking == TW_LOGNAME)
-		word--;
 	    return (0);
 	}
 	copyn(name, word, MAXNAMLEN);	/* name sans ~ */

@@ -1,6 +1,9 @@
 V6.03.00, ...
+34. Walking process group fixes.
+33. $0 contains now argv[0] when we are not executing a shell script.
+32. New Getwd() was broken.
 31. 6.02.03 7/17/92
-30. We kill our last foreground process group leader on HUP, for POSIX systems.
+30. We kill our last foreground process group on HUP, for POSIX systems.
 29. Walking process group fix.
 28. $shlvl gets reset to 1 for login shells.
 27. Macros can now involve multiple commands, i.e.

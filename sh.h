@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.37 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.h,v 3.38 1992/07/18 01:34:46 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -440,7 +440,7 @@ EXTERN bool    is2atty;		/* is file descriptor 2 a tty (didfds mode) */
  */
 EXTERN Char   *arginp;		/* Argument input for sh -c and internal `xx` */
 EXTERN int     onelflg;		/* 2 -> need line for -t, 1 -> exit on read */
-EXTERN Char   *ffile;		/* Name of shell file for $0 */
+extern Char   *ffile;		/* Name of shell file for $0 */
 
 extern char *seterr;		/* Error message from scanner/parser */
 extern int errno;		/* Error from C library routines */

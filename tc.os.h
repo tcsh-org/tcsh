@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.31 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.os.h,v 3.32 1992/07/18 01:34:46 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -388,8 +388,12 @@ extern int atoi();
 extern char *ttyname();
 
 #if defined(SUNOS4)
+# ifndef toupper
 extern int toupper __P((int));
+# endif
+# ifndef tolower
 extern int tolower __P((int));
+# endif
 extern caddr_t sbrk __P((int));
 # if SYSVREL == 0
 extern int qsort();

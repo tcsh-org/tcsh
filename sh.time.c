@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.time.c,v 3.9 1992/07/06 15:26:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.time.c,v 3.10 1992/07/18 01:34:46 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.9 1992/07/06 15:26:18 christos Exp $")
+RCSID("$Id: sh.time.c,v 3.10 1992/07/18 01:34:46 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -230,18 +230,16 @@ ruadd(ru, ru2)
 /* Convert clicks (kernel pages) to kbytes ... */
 /* If there is no PGSHIFT defined, assume it is 11 */
 /* Is this needed for compatability with some old flavor of 4.2 or 4.1? */
-#ifndef PGSHIFT
-# define pagetok(size)   ((size) << 1)
-#else
-#ifdef __alpha	/* PGSHIFT is a variable, so can't ifdef on it */
-#define pagetok(size)   ((size) << (PGSHIFT - LOG1024))
-#else
-#if PGSHIFT>10
-#  define pagetok(size)   ((size) << (PGSHIFT - LOG1024))
+#ifdef SUNOS4
+# ifndef PGSHIFT
+#  define pagetok(size)   ((size) << 1)
 # else
-#  define pagetok(size)   ((size) >> (LOG1024 - PGSHIFT))
+#  if PGSHIFT>10
+#   define pagetok(size)   ((size) << (PGSHIFT - LOG1024))
+#  else
+#   define pagetok(size)   ((size) >> (LOG1024 - PGSHIFT))
+#  endif
 # endif
-#endif
 #endif
 
 /*
@@ -432,10 +430,7 @@ prusage(bs, es, e, b)
 		break;
 
 	    case 'M':		/* max. Resident Set Size */
-#if defined(sun) || defined(__sun__)
-# ifdef notdef
-		xprintf("%ld", r1->ru_maxrss * 1024L/(long) getpagesize());
-# endif
+#ifdef SUNOS4
 		xprintf("%ld", pagetok(r1->ru_maxrss));
 #else
 		xprintf("%ld", r1->ru_maxrss / 2L);

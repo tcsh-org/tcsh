@@ -115,6 +115,14 @@ be able to get it... :-)
 
     Note that by doing that you cannot use pgup and pgdn to scroll...
 
+12. On POSIX machines ^C and ^Z will do not work when tcsh is a login
+    shell?
+    Make sure that the interrupt character is set to ^C and suspend
+    is set to ^Z; 'stty -a' will show you the current stty settings;
+    'stty intr ^C susp ^Z' will set them to ^C and ^Z respectively.
+
+
+
 christos
 
 Everything else is a bug :-(

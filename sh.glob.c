@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.glob.c,v 3.22 1992/05/02 23:39:58 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/sh.glob.c,v 3.23 1992/06/16 20:46:26 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.22 1992/05/02 23:39:58 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.23 1992/06/16 20:46:26 christos Exp $")
 
 #include "tc.h"
 
@@ -129,7 +129,7 @@ globequal(new, old)
     Char *new, *old;
 {
     int     dig;
-    Char    *b = NULL, *d;
+    Char    *b, *d;
 
     /*
      * kfk - 17 Jan 1984 - stack hack allows user to get at arbitrary dir names

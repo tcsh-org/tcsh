@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.prompt.c,v 3.12 1992/03/21 02:46:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.02/RCS/tc.prompt.c,v 3.13 1992/06/16 20:46:26 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.12 1992/03/21 02:46:07 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.13 1992/06/16 20:46:26 christos Exp $")
 
 #include "ed.h"
 
@@ -283,7 +283,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 		    else {
 			j = 1;
 		    }
-		    if ((z = value(STRcwd)) != STRNULL)
+		    if ((z = value(STRcwd)) == STRNULL)
 			break;
 		    (void) Strcpy(buff, z);
 		    if (!buff[1]) /* if CWD == / */
