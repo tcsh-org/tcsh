@@ -1,4 +1,4 @@
-\" $Id: tcsh.man,v 3.7 1991/07/24 15:36:18 christos Exp christos $
+\" $Id: tcsh.man,v 3.8 1991/07/25 04:50:55 christos Exp $
 .TH TCSH 1 "24 July 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -2418,6 +2418,12 @@ list possibilities on an ambiguous completion.
 .TP 10
 .B autologout 
 number of minutes of inactivity before automatic logout.
+.TP 10
+.B backslash_quote
+makes the backslash quote \\, \', and ". This option changes the
+parsing mechanism for tcsh, and it can cause syntax errors in 
+.I csh
+scripts.
 .TP 10
 .B chase_symlinks 
 always resolve symbolic links to real names on cd, etc.
