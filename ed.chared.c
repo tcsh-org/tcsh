@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.64 2001/02/19 23:30:43 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.65 2001/02/21 02:34:14 kim Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -76,7 +76,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.64 2001/02/19 23:30:43 kim Exp $")
+RCSID("$Id: ed.chared.c,v 3.65 2001/02/21 02:34:14 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -133,9 +133,9 @@ static	void	 c_hsetpat		__P((void));
 #ifdef COMMENT
 static	void	 c_get_word		__P((Char **, Char **));
 #endif
-static	Char	*c_preword		__P((Char *, Char *, int));
+static	Char	*c_preword		__P((Char *, Char *, int, Char *));
 static	Char	*c_nexword		__P((Char *, Char *, int));
-static	Char	*c_endword		__P((Char *, Char *, int));
+static	Char	*c_endword		__P((Char *, Char *, int, Char *));
 static	Char	*c_eword		__P((Char *, Char *, int));
 static	void	 c_push_kill		__P((Char *, Char *));
 static  CCRETVAL c_get_histline		__P((void));
@@ -317,16 +317,16 @@ c_delbefore(num)		/* delete before dot, with bounds checking */
 }
 
 static Char *
-c_preword(p, low, n)
-    register Char *p, *low;
+c_preword(p, low, n, delim)
+    register Char *p, *low, *delim;
     register int n;
 {
   while (n--) {
     register Char *prev = low;
     register Char *new;
 
-    while (prev < p) {		/* Skip initial spaces */
-      if (!Isspace(*prev) || (Isspace(*prev) && *(prev-1) == (Char)'\\'))
+    while (prev < p) {		/* Skip initial non-word chars */
+      if (!Strchr(delim, *prev) || *(prev-1) == (Char)'\\')
 	break;
       prev++;
     }
@@ -335,10 +335,10 @@ c_preword(p, low, n)
 
     while (new < p) {
       prev = new;
-      new = c_endword(prev-1, p, 1);	/* Skip to next space */
+      new = c_endword(prev-1, p, 1, delim); /* Skip to next non-word char */
       new++;			/* Step away from end of word */
-      while (new <= p) {	/* Skip trailing spaces */
-	if (!Isspace(*new) || (Isspace(*new) && *(new-1) == (Char)'\\'))
+      while (new <= p) {	/* Skip trailing non-word chars */
+	if (!Strchr(delim, *new) || *(new-1) == (Char)'\\')
 	  break;
 	new++;
       }
@@ -869,27 +869,28 @@ c_delfini()		/* Finish up delete action */
 }
 
 static Char *
-c_endword(p, high, n)
-    register Char *p, *high;
+c_endword(p, high, n, delim)
+    register Char *p, *high, *delim;
     register int n;
 {
     register int inquote = 0;
     p++;
 
     while (n--) {
-        while (p < high) {	/* Skip spaces */
-	  if (!Isspace(*p) || (Isspace(*p) && *(p-1) == (Char)'\\'))
+        while (p < high) {	/* Skip non-word chars */
+	  if (!Strchr(delim, *p) || *(p-1) == (Char)'\\')
 	    break;
 	  p++;
         }
 	while (p < high) {	/* Skip string */
 	  if ((*p == (Char)'\'' || *p == (Char)'"')) { /* Quotation marks? */
-	    if ((!inquote && *(p-1) != (Char)'\\') || inquote) { /* Should it be honored? */
+	    if (inquote || *(p-1) != (Char)'\\') { /* Should it be honored? */
 	      if (inquote == 0) inquote = *p;
 	      else if (inquote == *p) inquote = 0;
 	    }
 	  }
-	  if (!inquote && (Isspace(*p) && *(p-1) != (Char)'\\')) /* Break if unquoted space */
+	  /* Break if unquoted non-word char */
+	  if (!inquote && Strchr(delim, *p) && *(p-1) != (Char)'\\')
 	    break;
 	  p++;
 	}
@@ -2244,7 +2245,7 @@ e_dabbrev_expand(c)
     if (Argument <= 0)
 	return(CC_ERROR);
 
-    cp = c_preword(Cursor, InputBuf, 1);
+    cp = c_preword(Cursor, InputBuf, 1, STRshwordsep);
     if (cp == Cursor || Isspace(*cp))
 	return(CC_ERROR);
 
@@ -2263,7 +2264,7 @@ e_dabbrev_expand(c)
 	    bp = hbuf;
 	    hp = hp->Hnext;
 	}
-	cp = c_preword(cp, bp, word);
+	cp = c_preword(cp, bp, word, STRshwordsep);
     } else {			/* starting new search */
 	oldevent = eventno;
 	start = cp;
@@ -2274,7 +2275,7 @@ e_dabbrev_expand(c)
     }
 
     while (!found) {
-	ncp = c_preword(cp, bp, 1);
+	ncp = c_preword(cp, bp, 1, STRshwordsep);
 	if (ncp == cp || Isspace(*ncp)) { /* beginning of line */
 	    hist++;
 	    word = 0;
@@ -2287,7 +2288,7 @@ e_dabbrev_expand(c)
 	    continue;
 	} else {
 	    word++;
-	    len = (int) (c_endword(ncp-1, cp, 1) - ncp + 1);
+	    len = (int) (c_endword(ncp-1, cp, 1, STRshwordsep) - ncp + 1);
 	    cp = ncp;
 	}
 	if (len > patlen && Strncmp(cp, patbuf, patlen) == 0) {
@@ -2870,7 +2871,7 @@ v_wordback(c)
 	return(CC_ERROR);
     /* else */
 
-    Cursor = c_preword(Cursor, InputBuf, Argument); /* bounds check */
+    Cursor = c_preword(Cursor, InputBuf, Argument, STRshwspace); /* bounds check */
 
     if (ActionFlag & TCSHOP_DELETE) {
 	c_delfini();
@@ -3768,7 +3769,7 @@ v_endword(c)
 	return(CC_ERROR);
     /* else */
 
-    Cursor = c_endword(Cursor, LastChar, Argument);
+    Cursor = c_endword(Cursor, LastChar, Argument, STRshwspace);
 
     if (ActionFlag & TCSHOP_DELETE)
     {
