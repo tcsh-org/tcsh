@@ -4987,11 +4987,10 @@ Command substitution supports multiple commands and conditions, but not
 cycles or backward \fIgoto\fRs.
 .PP
 Report bugs to tcsh-bugs@mx.gw.com, preferably with fixes.  If you want to
-help maintain and test tcsh, send mail to listserv@mx.gw.com with the text
-`subscribe tcsh <your name>' on a line by itself in the body.  You can
-also `subscribe tcsh-bugs <your name>' to get all bug reports, or
-`subscribe tcsh-diffs <your name>' to get the development list plus
-diffs for each patchlevel.
+help maintain and test tcsh, send mail to tcsh-request@mx.gw.com with the
+text `subscribe tcsh' on a line by itself in the body.  You can also send
+mail to tcsh-bugs-request@mx.gw.com with the text `subscribe tcsh-bugs' to
+receive all bug reports.
 .SH THE T IN TCSH
 In 1964, DEC produced the PDP-6.  The PDP-10 was a later re-implementation.  It
 was re-christened the DECsystem-10 in 1970 or so when DEC brought out the
