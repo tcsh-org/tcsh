@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.89 2003/03/12 19:14:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.90 2004/01/23 16:21:10 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -242,7 +242,10 @@ struct ucred {
  */
 #ifndef WINNT_NATIVE
 # ifdef F_SETFD
-#  define close_on_exec(fd, v) fcntl((fd), F_SETFD, v)
+#  ifndef FD_CLOEXEC
+#   define FD_CLOEXEC 1
+#  endif
+#  define close_on_exec(fd, v) fcntl((fd), F_SETFD, ((v) ? FD_CLOEXEC : 0))
 # else /* !F_SETFD */
 #  ifdef FIOCLEX
 #   define close_on_exec(fd, v) ioctl((fd), ((v) ? FIOCLEX : FIONCLEX), NULL)
