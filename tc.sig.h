@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.h,v 3.23 2002/03/08 17:36:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.h,v 3.24 2002/07/02 16:14:00 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -62,11 +62,9 @@
 #  define HAVE_SIGVEC
 #  define mysigvec(a, b, c)	sigaction(a, b, c)
 typedef struct sigaction sigvec_t;
-#  if defined(convex) || defined(__convex__)
-     /* eliminate compiler warnings since these are defined in signal.h  */
-#    undef sv_handler
-#    undef sv_flags
-#  endif
+/* eliminate compiler warnings since these are defined in signal.h  */
+#  undef sv_handler
+#  undef sv_flags
 #  define sv_handler sa_handler
 #  define sv_flags sa_flags
 # endif /* _SEQUENT || (_POSIX_SOURCE && !hpux) */
