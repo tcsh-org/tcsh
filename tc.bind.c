@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.bind.c,v 3.37 2004/08/04 17:12:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.bind.c,v 3.38 2004/11/20 17:33:39 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.37 2004/08/04 17:12:30 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.38 2004/11/20 17:33:39 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -158,10 +158,12 @@ dobindkey(v, c)
 	}
     }
 
+#ifndef WINNT_NATIVE
     if (in.buf[0] > 0xFF) {
 	bad_spec(in.buf);
 	return;
     }
+#endif
     ch = (uChar) in.buf[0];
 
     if (removeb) {

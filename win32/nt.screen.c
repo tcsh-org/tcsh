@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.4 2005/01/05 16:06:19 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.5 2005/01/18 20:12:14 christos Exp $*/
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -88,8 +88,8 @@ TellTC(what)
 ReBufferDisplay()
 {
 	register int i;
-	eChar **b;
-	eChar **bufp;
+	Char **b;
+	Char **bufp;
 	int lins,cols;
 
 	nt_getsize(&lins,&cols,&DisplayWindowHSize);
@@ -111,14 +111,14 @@ ReBufferDisplay()
 	TermH = cols;
 
 	TermV = (INBUFSIZE * 4) / TermH + 1;
-	b = (eChar **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
+	b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
 	for (i = 0; i < TermV; i++)
-		b[i] = (eChar *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
+		b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
 	b[TermV] = NULL;
 	Display = b;
-	b = (eChar **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
+	b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
 	for (i = 0; i < TermV; i++)
-		b[i] = (eChar *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
+		b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
 	b[TermV] = NULL;
 	Vdisplay = b;
 }
@@ -326,7 +326,7 @@ MoveToChar(where)		/* move to character position (where) */
 
 	void
 so_write(cp, n)
-	register eChar *cp;
+	register Char *cp;
 	register int n;
 {
 	if (n <= 0)
@@ -379,7 +379,7 @@ DeleteChars(num)		/* deletes <num> characters */
 
 	if (num > TermH) {
 #ifdef DEBUG_SCREEN
-		xprintf(CGETS(7, 17, "DeleteChars: num is riduculous: %d\r\n"), num);
+		xprintf(CGETS(7, 17, "DeletChars: num is riduculous: %d\r\n"), num);
 		flush();
 #endif /* DEBUG_SCREEN */
 		return;
@@ -389,7 +389,7 @@ DeleteChars(num)		/* deletes <num> characters */
 
 	void
 Insert_write(cp, num)		/* Puts terminal in insert character mode, */
-	register eChar *cp;
+	register Char *cp;
 	register int num;		/* or inserts num characters in the line */
 {
 	if (num <= 0)

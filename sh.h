@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.131 2005/03/03 17:13:06 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.132 2005/03/21 21:26:36 kim Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -49,7 +49,7 @@
 # include <inttypes.h>
 #endif
 
-#if !defined(HAVE_STDINT_H) && !defined(HAVE_INTTYPES_H)
+#if !defined(HAVE_STDINT_H) && !defined(HAVE_INTTYPES_H) && !defined(WINNT_NATIVE)
 typedef unsigned long intptr_t;
 #endif
 

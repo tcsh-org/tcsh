@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/ntport.h,v 1.5 2004/05/19 18:22:28 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/ntport.h,v 1.6 2005/01/18 20:24:55 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -242,6 +242,10 @@ struct rusage {
 	 long ru_nvcsw;      /* voluntary context switches */
 	 long ru_nivcsw;          /* involuntary context switches */
 };
+typedef int uid_t;
+typedef int gid_t;
+typedef long ssize_t;
+
 struct passwd {
 	  char    *pw_name;       /* user name */
 	  char    *pw_passwd;     /* user password */
@@ -318,7 +322,7 @@ void nt_cleanup(void);
 /* stdio.c */
 extern int  nt_creat(char*,int);
 extern int  nt_close(int);
-extern int  nt_open(char*,int ,...);
+extern int  nt_open(const char*,int ,...);
 extern int  nt_pipe(int*);
 extern void restore_fds(void ) ;
 extern void copy_fds(void);
@@ -424,7 +428,7 @@ extern void doprintresource(short **, struct command * ) ;
 #ifdef NTDBG
 extern void dodebugbreak(short **, struct command * ) ;
 #endif NTDBG
-extern void nt_set_env(short *, short*);
+extern void nt_set_env(const short *, const short*);
 extern char *hb_subst(char *) ;
 extern void init_hb_subst() ;
 extern void init_shell_dll(void) ;

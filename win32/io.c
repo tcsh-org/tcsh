@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/io.c,v 1.3 2002/08/11 07:58:12 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/io.c,v 1.4 2004/05/19 18:22:28 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -43,7 +43,7 @@
 #include "sh.h"
 #include "ntport.h"
 #include "signal.h"
-#include "config_f.h"
+//#include "config_f.h"
 
 #define CR 0x0d
 
@@ -60,7 +60,7 @@ unsigned short __nt_want_vcode=0,__nt_vcode=0;
 HANDLE __h_con_alarm=0;
 HANDLE __h_con_int=0;
 
-extern unsigned int NoNLSRebind;
+extern int NoNLSRebind;
 
 extern int OLDSTD, SHIN;
 /* 
