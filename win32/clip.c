@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/clip.c,v 1.4 2004/05/19 18:22:27 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/clip.c,v 1.5 2004/05/19 18:23:08 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -508,7 +508,7 @@ e_dosify_next(c)
 
 	heap_free(buf);
 
-	Cursor = LastChar = cp;
+	Cursor =  cp;
 
 	return (CC_REFRESH);
 }
@@ -534,7 +534,11 @@ e_dosify_prev(c)
 			break;
 		cp--;
 	}
-	Cursor = cp;
+	if(cp != InputBuf)
+	  Cursor = cp + 1;
+	else
+	  Cursor = cp;
+	
 	return e_dosify_next(0);
 }
 extern BOOL ConsolePageUpOrDown(BOOL);
