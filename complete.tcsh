@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.41 2003/01/31 17:19:31 christos Exp $
+# $Id: complete.tcsh,v 1.42 2004/02/21 20:34:24 christos Exp $
 # example file using the new completion code
 #
 # Debian GNU/Linux
@@ -181,8 +181,16 @@ endif
 if ($?traditional_complete) then
     complete zcat	n/*/f:*.Z/
 else
-    complete zcat	c/--/"(force help license quiet version)"/ \
-			c/-/"(f h L q V -)"/ n/*/f:*.{gz,Z,z,zip}/
+    # "zcat" may be linked to "compress" or "gzip"
+    if (-X zcat) then
+        zcat --version >& /dev/null
+        if ($status != 0) then
+            complete zcat	n/*/f:*.Z/
+        else
+            complete zcat	c/--/"(force help license quiet version)"/ \
+				c/-/"(f h L q V -)"/ n/*/f:*.{gz,Z,z,zip}/
+	endif
+    endif
 endif
 
     complete finger	c/*@/\$hosts/ n/*/u/@ 
@@ -775,14 +783,43 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			N/-{z,g,remote,rgb,papercolor,t1lib,freetype,ps,paperw,paperh,upw}/f:*.{pdf,PDF}/ \
 			N/-/x:'<page>'/ p/1/f:*.{pdf,PDF}/ p/2/x:'<page>'/
 
+    complete tcsh	c/-D*=/'x:<value>'/ c/-D/'x:<name>'/ \
+			c/-/"(b c d D e f F i l m n q s t v V x X -version)"/ \
+			n/-c/c/ n/{-l,--version}/n/ n/*/'f:*.{,t}csh'/
+
+    complete rpm	c/--/"(query verify nodeps nofiles nomd5 noscripts    \
+	                nogpg nopgp install upgrade freshen erase allmatches  \
+		        notriggers repackage test rebuild recompile initdb    \
+		        rebuilddb addsign resign querytags showrc setperms    \
+		        setugids all file group package querybynumber qf      \
+		        triggeredby whatprovides whatrequires changelog       \
+		        configfiles docfiles dump filesbypkg info last list   \
+		        provides queryformat requires scripts state triggers  \
+		        triggerscripts allfiles badreloc excludepath checksig \
+	                excludedocs force hash ignoresize ignorearch ignoreos \
+		        includedocs justdb noorder oldpackage percent prefix  \
+		        relocate replace-files replacepkgs buildroot clean    \
+		        nobuild rmsource rmspec short-circuit sign target     \
+		        help version quiet rcfile pipe dbpath root specfile)"/\
+		        c/-/"(q V K i U F e ba bb bp bc bi bl bs ta tb tp tc  \
+			ti tl ts a f g p c d l R s h ? v vv -)"/              \
+		n/{-f,--file}/f/ n/{-g,--group}/g/ n/--pipe/c/ n/--dbpath/d/  \
+		n/--querybynumber/x:'<number>'/ n/--triggeredby/x:'<package>'/\
+		n/--what{provides,requires}/x:'<capability>'/ n/--root/d/     \
+		n/--{qf,queryformat}/x:'<format>'/ n/--buildroot/d/           \
+		n/--excludepath/x:'<oldpath>'/  n/--prefix/x:'<newpath>'/     \
+		n/--relocate/x:'<oldpath=newpath>'/ n/--target/x:'<platform>'/\
+		n/--rcfile/x:'<filelist>'/ n/--specfile/x:'<specfile>'/       \
+	        n/{-[iUFep],--{install,upgrade,freshen,erase,package}}/f:*.rpm/
+
     # these conform to the latest GNU versions available at press time ...
     # updates by John Gotts <jgotts@engin.umich.edu>
     if (-X emacs) then
       # TW note:  if your version of GNU Emacs supports the "--version" option,
       #           uncomment this line and comment the next to automatically
-      #           detect the version, else replace "21.2" with your version.
+      #           detect the version, else set "_emacs_ver" to your version.
       #set _emacs_ver=`emacs --version | sed -e 's%GNU Emacs %%' -e q | cut -d . -f1-2`
-      set _emacs_ver=21.2
+      set _emacs_ver=21.3
       set _emacs_dir=`which emacs | sed s%/bin/emacs%%` 
       complete emacs	c/--/"(batch terminal display no-windows no-init-file \
                                user debug-init unibyte multibyte version help \
@@ -795,7 +832,6 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
       unset _emacs_ver _emacs_dir
     endif
 
-    # if your "zcat" is the GNU version, change "gzcat" below to just "zcat"
     complete gzcat	c/--/"(force help license quiet version)"/ \
 			c/-/"(f h L q V -)"/ n/*/f:*.{gz,Z,z,zip}/
     complete gzip	c/--/"(stdout to-stdout decompress uncompress \
@@ -962,9 +998,13 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			block-compress help version)"/ \
 			c/-/"(b B C f F g G h i k K l L m M N o O p P R s S \
 			T v V w W X z Z 0 1 2 3 4 5 6 7 -)"/ \
-			C@[/dev]@f@ \
+			C@/dev@f@ \
 			n/-c*f/x:'<new_tar_file, device_file, or "-">'/ \
-			n/{-[Adrtux]*f,--file}/f:*.{tar,taz,tgz}/ \
+			n/{-[Adrtux]z*f,--file}/f:*.{tar.gz,tgz}/ \
+			n/{-[Adrtux]Z*f,--file}/f:*.{tar.Z,taz}/ \
+			n/{-[Adrtux]*f,--file}/f:*.tar/ \
+			N/{-xz*f,--file}/'`tar -tzf $:-1`'/ \
+			N/{-xZ*f,--file}/'`tar -tZf $:-1`'/ \
 			N/{-x*f,--file}/'`tar -tf $:-1`'/ \
 			n/--use-compress-program/c/ \
 			n/{-b,--block-size}/x:'<block_size>'/ \
@@ -1036,8 +1076,7 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
     # From Alphonse Bendt
     complete ant \
 	 'n/-f/f:*.xml/' \
-	      'n@*@`cat build.xml | sed -n -e "s/[ \t]*<target[
-	      \t\n]*name=.\([a-zA-Z0-9_:]*\).*/\1/p"`@'
+	      'n@*@`cat build.xml | sed -n -e "s/[ \t]*<target[\t\n]*name=.\([a-zA-Z0-9_:]*\).*/\1/p"`@'
 
     if ($?P4CLIENT && -X perl) then
 	# This is from Greg Allen.
