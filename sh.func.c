@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.func.c,v 3.29 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.func.c,v 3.30 1992/04/10 16:38:09 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.29 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.30 1992/04/10 16:38:09 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -938,6 +938,9 @@ wfree()
 {
     struct Ain    o;
     struct whyle *nwp;
+#ifdef lint
+    nwp = NULL;	/* sun lint is dumb! */
+#endif
 
 #ifdef FDEBUG
     static char foo[] = "IAFE";
@@ -1552,7 +1555,9 @@ getval(lp, v)
 # endif /* convex */
 
     register float f;
+#ifndef atof	/* This can be a macro on linux */
     extern double  atof __P((const char *));
+#endif /* atof */
     static int lmin = 0x80000000, lmax = 0x7fffffff;
     Char   *cp = *v++;
 

@@ -1,5 +1,5 @@
 /**/#
-/**/# $Id: Imakefile,v 1.10 1992/03/08 02:17:22 christos Exp $
+/**/# $Id: Imakefile,v 1.11 1992/03/27 01:59:46 christos Exp $
 /**/#
 /**/# Imakefile for for tcsh 6.00
 /**/# Marc Horowitz, MIT SIPB
@@ -416,8 +416,8 @@ shar:
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
-	MAKESHAR ${VERSION} tcsh-${VERSION}/[a-zA-Z]* \
-			    tcsh-${VERSION}/config/config.*
+	MAKESHAR -v -n tcsh-${VERSION} tcsh-${VERSION} \
+		 tcsh-${VERSION}/* tcsh-${VERSION}/config/*
 	rm -rf tcsh-${VERSION}
 
 world:

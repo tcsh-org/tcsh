@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tc.sig.c,v 3.7 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.sig.c,v 3.8 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.7 1992/01/06 22:36:56 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.8 1992/03/27 01:59:46 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -250,7 +250,7 @@ sigret_t(*
 
 #endif /* NEEDsignal */
 
-#ifdef _SEQUENT_
+#if defined(_SEQUENT_) || defined(linux)
 /*
  * Support for signals.
  */
@@ -292,12 +292,16 @@ sigsetmask(mask)
 	if (ISSET(mask, i))
 	    sigaddset(&set, i);
 
+#ifdef linux	/* sigprocmask returns old mask! */
+    (void) sigprocmask(SIG_SETMASK, &set, &oset);
+#else /* !linux */
     if (sigprocmask(SIG_SETMASK, &set, &oset))
 	xprintf("sigsetmask(0x%x) - sigprocmask failed, errno %d",
 		mask, errno);
 
+#endif /* linux */
     m = 0;
-    for (i = 1; i < MAXSIG; i++)
+    for (i = 1; i <= MAXSIG; i++)
 	if (sigismember(&oset, i))
 	    SETBIT(m, i);
 
@@ -335,7 +339,7 @@ sigblock(mask)
 
     /* Return old mask to user. */
     m = 0;
-    for (i = 1; i < MAXSIG; i++)
+    for (i = 1; i <= MAXSIG; i++)
 	if (sigismember(&oset, i))
 	    SETBIT(m, i);
 

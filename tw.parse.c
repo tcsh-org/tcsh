@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.31 1992/04/24 21:50:07 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tw.parse.c,v 3.32 1992/05/02 23:39:58 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.31 1992/04/24 21:50:07 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.32 1992/05/02 23:39:58 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -840,7 +840,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		default:
 		    break;
 		}
-		if (tw_item_find(buf))
+		if (looking == TW_COMMAND && tw_item_find(buf))
 		    break;
 		else {
 		    /* maximum length 1 (NULL) + 1 (~ or $) + 1 (filetype) */

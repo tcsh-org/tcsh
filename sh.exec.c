@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.exec.c,v 3.14 1992/03/21 22:34:18 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.exec.c,v 3.15 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.14 1992/03/21 22:34:18 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.15 1992/03/27 01:59:46 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -918,14 +918,14 @@ find_cmd(cmd, prt)
     Char *sv;
     int hashval, i, ex, rval = 0;
 
-    if (any(short2str(cmd), '/') && !prt) {
+    if (prt && any(short2str(cmd), '/')) {
 	xprintf("where: / in command makes no sense\n");
 	return 0;
     }
 
     /* first, look for an alias */
 
-    if (adrof1(cmd, &aliases) && !prt) {
+    if (prt && adrof1(cmd, &aliases)) {
 	if ((var = adrof1(cmd, &aliases)) != NULL) {
 	    xprintf("%s is aliased to ", short2str(cmd));
 	    blkpr(var->vec);

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.os.h,v 3.27 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.os.h,v 3.28 1992/04/10 16:38:09 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -501,5 +501,12 @@ extern char *ttyname();
 extern int ioctl __P((int, int, ...));
 extern int readlink __P((const char *, char *, size_t));
 # endif /* sun && __GNUC__ == 2 */
+
+#ifdef linux
+extern int		tcgetpgrp	__P((int));
+extern int		tcsetpgrp	__P((int, int));
+extern int		gethostname	__P((char *, int));
+extern int		readlink	__P(());
+#endif /* linux */
 
 #endif /* _h_tc_os */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.proc.c,v 3.25 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.proc.c,v 3.26 1992/04/03 22:15:14 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.25 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.26 1992/04/03 22:15:14 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -282,6 +282,11 @@ loop:
 	    goto loop;
 	}
 	pnoprocesses = pid == -1;
+#ifdef linux
+# ifdef UNRELSIGS
+	(void) sigset(SIGCHLD, pchild);
+# endif /* UNRELSIGS */
+#endif /* linux */
 #ifndef SIGVOID
 	return (0);
 #else /* !SIGVOID */
@@ -535,7 +540,6 @@ pjwait(pp)
 #ifdef UNRELSIGS
     sigret_t (*inthandler)();
 #endif /* UNRELSIGS */
-
     while (pp->p_procid != pp->p_jobid)
 	pp = pp->p_friends;
     fp = pp;

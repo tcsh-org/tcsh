@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.28 1992/04/10 16:52:32 christos Exp $
+# $Id: Makefile,v 1.29 1992/04/24 21:50:07 christos Exp $
 #	Makefile	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -48,6 +48,9 @@ CFLAGS=-O $(INCLUDES)
 # gcc-2.1
 CFLAGS=-O2 $(INCLUDES)
 
+# gcc 2.0+ on linux
+#CFLAGS=-O6 $(INCLUDES) -finline-functions -fstrength-reduce
+
 #hpux 8.0
 #CFLAGS=  $(INCLUDES) +O3 -Aa
 
@@ -89,6 +92,7 @@ DFLAGS=
 ## LDLAGS.  Define something here if you need to
 ################################################################
 LDFLAGS= 			## The simplest, suitable for all.
+#LDFLAGS= -static -s		## Stripped. No shared libs. (linux)
 #LDFLAGS= -s			## Stripped. Takes less space on disk.
 #LDFLAGS= -s -n			## Pure executable. Spares paging over
 # 				## the network for machines with local
@@ -286,6 +290,9 @@ sh.prof.${SUF}:
 lint: tc.const.h ed.defns.h
 	lint ${LFLAGS} sh*.c tw*.c ed*.c tc.*.c ${LIBES}
 
+alint: tc.const.h ed.defns.h
+	alint ${LFLAGS} sh*.c tw*.c ed*.c tc.*.c ${LIBES}
+
 print:
 	@pr READ_ME
 	@pr makefile makefile.*
@@ -351,7 +358,8 @@ shar:
 	mkdir tcsh-${VERSION} tcsh-${VERSION}/config 
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
-	MAKESHAR ${VERSION} tcsh-${VERSION}/* tcsh-${VERSION}/config/*
+	MAKESHAR -v -n tcsh-${VERSION} tcsh-${VERSION} \
+		 tcsh-${VERSION}/* tcsh-${VERSION}/config/*
 	rm -rf tcsh-${VERSION}
 
 tcsh-${VERSION}.tar.Z:

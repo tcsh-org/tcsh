@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tc.sig.h,v 3.6 1992/01/06 22:36:56 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.sig.h,v 3.7 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -131,6 +131,9 @@ typedef struct sigvec sigvec_t;
 #  define 	killpg(a, b)	kill(-getpgrp(a), b)
 #  define	NEEDsignal
 # endif	/* aiws */
+# ifdef linux
+#  define	sigpause(a)	bsd_sigpause(a)
+# endif /* linux */
 #endif /* BSDSIGS */
 
 

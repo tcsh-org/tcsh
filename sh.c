@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.c,v 3.27 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.c,v 3.28 1992/04/10 16:38:09 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.27 1992/04/03 22:15:14 christos Exp $")
+RCSID("$Id: sh.c,v 3.28 1992/04/10 16:38:09 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -141,7 +141,7 @@ main(argc, argv)
     sigvec_t osv;
 #endif /* BSDSIGS */
 
-#if !defined(BSDTIMES) && defined(POSIX)
+#if !(defined(BSDTIMES) || defined(_SEQUENT_)) && defined(POSIX)
 # ifdef _SC_CLK_TCK
     clk_tck = (clock_t) sysconf(_SC_CLK_TCK);
 # else /* ! _SC_CLK_TCK */

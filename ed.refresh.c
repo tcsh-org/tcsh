@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.refresh.c,v 3.7 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.refresh.c,v 3.8 1992/05/02 23:39:58 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.7 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.8 1992/05/02 23:39:58 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -57,12 +57,11 @@ static	void	str_delete		__P((Char *, int, int, int));
 static	void	str_cp			__P((Char *, Char *, int));
 static	void	PutPlusOne		__P((int));
 static	void	cpy_pad_spaces		__P((Char *, Char *, int));
+#if defined(DEBUG_UPDATE) || defined(DEBUG_REFRESH) || defined(DEBUG_LITERAL)
+static	void	dprintf			__P((char *, ...));
 #ifdef DEBUG_UPDATE
 static	void	dprintstr		__P((char *, Char *, Char *));
-static	void	dprintf			__P((char *, ...));
-#endif  /* DEBUG_UPDATE */
 
-#ifdef DEBUG_UPDATE
 static void
 dprintstr(str, f, t)
 char *str;
@@ -73,6 +72,7 @@ Char *f, *t;
 	dprintf("%c", *f++ & ASCII);
     dprintf("\"\r\n");
 } 
+#endif /* DEBUG_UPDATE */
 
 /* dprintf():
  *	Print to $DEBUGTTY, so that we can test editing on one pty, and 
@@ -106,13 +106,13 @@ dprintf(va_list)
 	o = SHOUT;
 	flush();
 	SHOUT = fd;
-	vprintf(fmt, va);
+	xvprintf(fmt, va);
 	va_end(va);
 	flush();
 	SHOUT = o;
     }
 }
-#endif  /* DEBUG_UPDATE */
+#endif  /* DEBUG_UPDATE || DEBUG_REFRESH || DEBUG_LITERAL */
 
 static void
 Draw(c)				/* draw c, expand tabs, ctl chars */
@@ -715,8 +715,8 @@ update_line(old, new, cur_line)
      * if we have a net insert on the first difference, AND inserting the net
      * amount ((nsb-nfd) - (osb-ofd)) won't push the last useful character
      * (which is ne if nls != ne, otherwise is nse) off the edge of the screen
-     * (TermH) else we do the deletes first so that we keep everything we need
-     * to.
+     * (TermH - 1) else we do the deletes first so that we keep everything we
+     * need to.
      */
 
     /*
@@ -732,7 +732,7 @@ update_line(old, new, cur_line)
      * width) We need to do an insert! else if (we need to delete characters)
      * We need to delete characters! else No insert or delete
      */
-    if ((nsb != nfd) && fx > 0 && ((p - old) + fx <= TermH)) {
+    if ((nsb != nfd) && fx > 0 && ((p - old) + fx < TermH)) {
 #ifdef DEBUG_UPDATE
 	dprintf("first diff insert at %d...\r\n", nfd - new);
 #endif  /* DEBUG_UPDATE */
@@ -1101,15 +1101,16 @@ PutPlusOne(c)
 	CursorH = 0;
 	CursorV++;
 	OldvcV++;
-	(void) putraw('\r');
-	(void) putraw('\n');
-#ifdef notdef
-	if (T_Margin != (MARGIN_AUTO|MARGIN_MAGIC)) {
-	    /* Cannot do that yet */
+	if (T_Margin & MARGIN_AUTO) {
+	    if (T_Margin & MARGIN_MAGIC) {
+		(void) putraw(' ');
+		(void) putraw('\b');
+	    }
+	}
+	else {
 	    (void) putraw('\r');
 	    (void) putraw('\n');
 	}
-#endif
     }
 }
 
@@ -1168,9 +1169,9 @@ ClearLines()
     register int i;
 
     if (T_CanCEOL) {
-	MoveToChar(0);
 	for (i = 0; i <= OldvcV; i++) {	/* for each line on the screen */
 	    MoveToLine(i);
+	    MoveToChar(0);
 	    ClearEOL(TermH);
 	}
 	MoveToLine(0);

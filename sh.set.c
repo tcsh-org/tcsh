@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.set.c,v 3.13 1992/04/03 22:15:14 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.set.c,v 3.14 1992/04/10 16:38:09 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.13 1992/04/03 22:15:14 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.14 1992/04/10 16:38:09 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -769,6 +769,9 @@ balance(p, f, d)
     register struct varent *t;	/* used by the rotate macros */
 #endif /* !lint */
     register int ff;
+#ifdef lint
+    ff = 0;	/* Sun's lint is dumb! */
+#endif
 
     /*
      * Ok, from here on, p is the node we're operating on; pp is it's parent; f

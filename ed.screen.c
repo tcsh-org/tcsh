@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.screen.c,v 3.19 1992/03/27 01:59:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/ed.screen.c,v 3.20 1992/04/24 21:50:47 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.19 1992/03/27 01:59:46 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.20 1992/04/24 21:50:47 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -375,13 +375,6 @@ ReBufferDisplay()
 	xfree((ptr_t) b);
     }
     TermH = Val(T_co);
-    /*
-     * XXX: we cannot use the rightmost column with only
-     * automatic margins
-     */
-    if (T_Margin == MARGIN_AUTO)
-	/* make this public, -1 to avoid wraps */
-	TermH--;
     TermV = (INBUFSIZE * 4) / TermH + 1;
     b = (Char **) xmalloc((size_t) (sizeof(Char *) * (TermV + 1)));
     for (i = 0; i < TermV; i++)
@@ -815,12 +808,24 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
     }
 
     if ((del = where - CursorV) > 0) {
-	if ((del > 1) && GoodStr(T_DO))
-	    (void) tputs(tgoto(Str(T_DO), del, del), del, putpure);
-	else {
-	    for (i = 0; i < del; i++)
-		(void) putraw('\n');
-	    CursorH = 0;	/* because the \n will become \r\n */
+	while (del > 0) {
+	    if ((T_Margin & MARGIN_AUTO) && Display[CursorV][0] != '\0') {
+		/* move without newline */
+		MoveToChar(TermH - 1);
+		so_write(&Display[CursorV][CursorH], 1); /* updates CursorH/V*/
+		del--;
+	    }
+	    else {
+		if ((del > 1) && GoodStr(T_DO)) {
+		    (void) tputs(tgoto(Str(T_DO), del, del), del, putpure);
+		    del = 0;
+		}
+		else {
+		    for ( ; del > 0; del--) 
+			(void) putraw('\n');
+		    CursorH = 0;	/* because the \n will become \r\n */
+		}
+	    }
 	}
     }
     else {			/* del < 0 */
@@ -845,7 +850,7 @@ mc_again:
     if (where == CursorH)
 	return;
 
-    if (where > (TermH + 1)) {
+    if (where >= TermH) {
 #ifdef DEBUG_SCREEN
 	xprintf("MoveToChar: where is riduculous: %d\r\n", where);
 	flush();
@@ -875,6 +880,11 @@ mc_again:
 			for (i = (CursorH & 0370); i < (where & 0370); i += 8)
 			    (void) putraw('\t');	/* then tab over */
 			CursorH = where & 0370;
+			if (CursorH < where && where == (TermH - 1)) {
+			    /* optimize: we can tab to the last column */
+			    (void) putraw('\t');
+			    CursorH = where;
+			}
 		    }
 		}
 		/* it's usually cheaper to just write the chars, so we do. */
@@ -911,7 +921,7 @@ so_write(cp, n)
     if (n <= 0)
 	return;			/* catch bugs */
 
-    if (n > (TermH + 1)) {
+    if (n > TermH) {
 #ifdef DEBUG_SCREEN
 	xprintf("so_write: n is riduculous: %d\r\n", n);
 	flush();
@@ -937,6 +947,24 @@ so_write(cp, n)
 	    (void) putraw(*cp++);
 	CursorH++;
     } while (--n);
+
+    if (CursorH >= TermH) { /* wrap? */
+	if (T_Margin & MARGIN_AUTO) { /* yes */
+	    CursorH = 0;
+	    CursorV++;
+	    if (T_Margin & MARGIN_MAGIC) {
+		/* force the wrap to avoid the "magic" situation */
+		Char c;
+		if ((c = Display[CursorV][CursorH]) != '\0')
+		    so_write(&c, 1);
+		else
+		    putraw(' ');
+		CursorH = 1;
+	    }
+	}
+	else			/* no wrap, but cursor stays on screen */
+	    CursorH = TermH - 1;
+    }
 }
 
 
@@ -1006,7 +1034,7 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
     if (GoodStr(T_IC))		/* if I have multiple insert */
 	if ((num > 1) || !GoodStr(T_ic)) {	/* if ic would be more expen. */
 	    (void) tputs(tgoto(Str(T_IC), num, num), num, putpure);
-	    so_write(cp, num);	/* this updates CursorH */
+	    so_write(cp, num);	/* this updates CursorH/V */
 	    return;
 	}
 
@@ -1046,7 +1074,7 @@ ClearEOL(num)			/* clear to end of line.  There are num */
 {
     register int i;
 
-    if (num == 0 && T_Margin == (MARGIN_AUTO|MARGIN_MAGIC))
+    if (num == 0)
 	return;
 
     if (T_CanCEOL && GoodStr(T_ce))

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/tc.decls.h,v 3.13 1992/02/21 23:16:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/tc.decls.h,v 3.14 1992/03/27 01:59:46 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -215,17 +215,15 @@ extern	pid_t 		  ourwait	__P((int *));
 extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
 #define signal(a, b)	  xsignal(a, b)
 #endif
-#ifdef _SEQUENT_
+#if defined(_SEQUENT_) || defined(linux)
 extern	sigmask_t	  sigsetmask	__P((sigmask_t));
 extern	sigmask_t	  sigblock	__P((sigmask_t));
 extern	void		  bsd_sigpause	__P((sigmask_t));
 extern  sigret_t        (*bsd_signal    __P((int, sigret_t (*)(int)))) ();
-#endif
+#endif /* _SEQUENT_ || linux */
 #ifdef SIGSYNCH
 extern	sigret_t	  synch_handler	__P((int));
 #endif
-
-
 
 
 /*

@@ -1,4 +1,4 @@
-.\" $Id: tcsh.man,v 3.40 1992/04/24 21:50:47 christos Exp $
+.\" $Id: tcsh.man,v 3.41 1992/05/02 23:39:58 christos Exp $
 .TH TCSH 1 "19 December 1991" "Cornell"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
@@ -826,7 +826,7 @@ several shell variables:
 Setting the
 .I recexact
 variable makes an exact command be expanded rather than just ringing the bell.
-For example, assume the current directory has two subdirectories
+For example, assume the current directory has two sub-directories
 called foo and food, then with
 .I recexact
 set the following could be done:
@@ -899,7 +899,7 @@ available".  Thus, when you have typed, perhaps:
 > cd ~speech/data/fritz/
 .RE
 .sp
-you may wish to know what files or subdirectories exist (in
+you may wish to know what files or sub-directories exist (in
 ~speech/data/fritz), without, of course, aborting the command you are
 typing.  Typing the character Control-D (^D), will list the names
 (files, in this case) available.  The files are listed in multicolumn
@@ -916,7 +916,7 @@ If the user had typed:
 > cd ~speech/data/fr[^D]
 .RE
 .sp
-all files and subdirectories whose prefix was
+all files and sub-directories whose prefix was
 ``fr'' would be printed.  Notice that the example before was simply
 a degenerate case of this with a null trailing file name. 
 (The null string is a prefix of all strings.)
@@ -1465,7 +1465,7 @@ is set to either
 or
 .I expand,
 then tcsh
-tries to determing the current directory name relative to the name of the
+tries to determine the current directory name relative to the name of the
 current directory before the link was crossed. In simple terms, if you chdir
 through a symbolic link and then cd .., 
 you will end .. relatively to where you were before
@@ -1475,8 +1475,8 @@ where the symbolic link points. While
 affects only builtin commands and completion, 
 .I expand 
 affects command execution too, by `fixing' arguments that it considers
-to be path names. Unforunately this does not work in every case, specially
-when file arguments are imbedded in command line options. 
+to be path names. Unfortunately this does not work in every case, specially
+when file arguments are embedded in command line options. 
 .I Expand
 also allows to specify the `real' 
 (as opposed to the one determined relatively to 
@@ -1766,7 +1766,7 @@ is equal to "-A", then
 .I ls-F
 acts like "ls -AF". Ls-F works like
 ls, only it is generally faster, since it does not need to fork and exec,
-and safer against trojan horses if the user has `.' in the execution path. 
+and safer against Trojan horses if the user has `.' in the execution path. 
 If other switches are passed to 
 .I ls-F, 
 then the normal ls is executed. Aliasing ls to ls-F provides
@@ -2686,7 +2686,7 @@ The new
 .I complete
 and 
 .I uncomplete 
-builtins can change the behaviour of the listing and file-completion 
+builtins can change the behavior of the listing and file-completion 
 in tcsh. For example some commands like 
 .I cd,
 .I pushd,
@@ -2721,8 +2721,8 @@ builtins is:
 .I uncomplete <command-pattern>
 .PP
 Completion arguments are matched in turn from left to right and
-the first sucessful match is returned.
-There are three different completion arguments, modelled after the
+the first successful match is returned.
+There are three different completion arguments, modeled after the
 .I sed(1) 
 substitute command and they are of the form:
 .sp
@@ -2997,7 +2997,7 @@ which is substituted by the n'th word of the current line.
 Notes:
 .TP 
 1. 
-The completion command-patterns are overriden when the internal
+The completion command-patterns are overridden when the internal
 parsing mechanism determines that the completion is a login name,
 or a variable.
 .TP
@@ -3006,13 +3006,13 @@ This is an experimental feature and the syntax/behavior may change in
 future versions.
 .sp
 .SH FYI
-This shell uses cbreak mode but takes typed-ahead characters anyway.
+This shell uses CBREAK mode but takes typed-ahead characters anyway.
 You can still use
 .IR stty (1)
 to set some of the modes of your terminal (but not bindings).
 .PP
 This shell will restore your tty to a sane mode if it appears to
-return from some command in raw, cbreak, or noecho mode. This behavior
+return from some command in raw, CBREAK, or noecho mode. This behavior
 can be changed using 
 .I setty.
 .PP
@@ -3220,7 +3220,7 @@ can be set to:
 .I "chase",
 in order to resolve the full path names,
 .I "ignore",
-in order to use $cwd to resolve relative directory references for builting.
+in order to use $cwd to resolve relative directory references for builtins.
 .I "expand",
 in order to use $cwd and rewrite the arguments for commands.
 .TP 10
@@ -3378,6 +3378,11 @@ James J Dempsey, BBN, 1988, and Paul Placeway, OSU, 1988
 Re-ported tcsh to A/UX.
 .sp
 .SH "BUGFIXES AND ENHANCEMENTS"
+.sp
+Mika Liljeberg, liljeber@kruuna.Helsinki.FI
+.br
+Linux port.
+.sp
 Scott Krotz, Motorola, 1991
 .br
 Minix port.

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/beta-6.01/RCS/sh.init.c,v 3.13 1992/02/21 23:16:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.01/RCS/sh.init.c,v 3.14 1992/03/27 01:59:46 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.13 1992/02/21 23:16:20 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.14 1992/03/27 01:59:46 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -229,16 +229,27 @@ struct	mesg mesg[] = {
 #ifdef aiws
 /*  7 */	"DANGER", 	"System Crash Imminent",
 #else /* aiws */
+# ifdef linux
+/*  7 */	0,		"Signal 7",
+# else /* linux */
 /*  7 */	"EMT",		"EMT trap",
+# endif /* linux */
 #endif /* aiws */
 /*  8 */	"FPE",		"Floating exception",
 /*  9 */	"KILL",		"Killed",
+#ifdef linux
+/* 10 */	"USR1",		"User signal 1",
+/* 11 */	"SEGV",		"Segmentation fault",
+/* 12 */	"USR2",		"User signal 2",
+#else /* linux */
 /* 10 */	"BUS",		"Bus error",
 /* 11 */	"SEGV",		"Segmentation fault",
 /* 12 */	"SYS",		"Bad system call",
+#endif /* linux */
 /* 13 */	"PIPE",		"Broken pipe",
 /* 14 */	"ALRM",		"Alarm clock",
 /* 15 */	"TERM",		"Terminated",
+
 
 #if (SYSVREL > 0) || defined(DGUX) || defined(IBMAIX) || defined(apollo) || defined(masscomp) || defined(ardent)
 
@@ -246,7 +257,7 @@ struct	mesg mesg[] = {
 #  undef  _sigextra_
 # endif /* _sigextra_ */
 
-#if !defined(IBMAIX) && !defined(cray)
+#if !defined(IBMAIX) && !defined(cray) && !defined(linux)
 /* these are the real svid signals */
 /* 16 */	"USR1",		"User signal 1",
 /* 17 */	"USR2", 	"User signal 2",
@@ -257,7 +268,28 @@ struct	mesg mesg[] = {
 /* 18 */	"CHLD",		"Child exited",
 /* 19 */	"PWR",  	"Power failure",
 # endif /* apollo */
-#endif /* IBMAIX */
+#endif /* IBMAIX && cray && linux */
+
+#ifdef linux
+# define _sigextra_
+/* 16 */	0,		"Signal 16",
+/* 17 */	"CHLD",		"Child exited",
+/* 18 */	"CONT",		"Continued",
+/* 19 */	"STOP",		MSG_STOP,
+/* 20 */	"TSTP",		MSG_TSTP,
+/* 21 */	"TTIN", 	MSG_TTIN,
+/* 22 */	"TTOU", 	MSG_TTOU,
+/* 23 */	0,   		"Signal 23",
+/* 24 */	0,		"Signal 24",
+/* 25 */	0, 		"Signal 25",
+/* 26 */	0,	 	"Signal 26",
+/* 27 */	0,		"Signal 27",
+/* 28 */	"WINCH", 	"Window changed",
+/* 29 */	0,		"Signal 29",
+/* 30 */	0,		"Signal 30",
+/* 31 */	0,		"Signal 31",
+/* 32 */	0,		"Signal 32",
+#endif /* linux */
 
 # ifdef cray
 # define _sigextra_

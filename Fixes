@@ -1,4 +1,6 @@
 V6.02.00, ...
+89. Print \n in the right margin always to be consistent.
+88. Linux patches.
 87. 6.01.13 (5/02/92) 
 86. Fixes in listing and completion of non-unique commands.
 85. Fix =stack entries > 9... from Bill Petro
