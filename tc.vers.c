@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.vers.c,v 3.44 1998/06/27 12:27:38 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.vers.c,v 3.45 1998/09/18 16:09:20 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -37,7 +37,7 @@
 #include "sh.h"
 #include "tw.h"
 
-RCSID("$Id: tc.vers.c,v 3.44 1998/06/27 12:27:38 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.45 1998/09/18 16:09:20 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -134,6 +134,11 @@ fix_version()
 #else
 # define DSPMSTR ""
 #endif
+#ifdef COLORCAT
+# define CCATSTR ",ccat"
+#else
+# define CCATSTR ""
+#endif
 /* if you want your local version to say something */
 #ifndef LOCALSTR
 # define LOCALSTR ""
@@ -152,11 +157,11 @@ fix_version()
 
 
     (void) xsnprintf(version, sizeof(version),
-"tcsh %d.%.2d.%.2d (%s) %s (%S-%S-%S) options %s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+"tcsh %d.%.2d.%.2d (%s) %s (%S-%S-%S) options %s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
 	     REV, VERS, PATCHLEVEL, ORIGIN, DATE, machtype, vendor, ostype,
 	     SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR, BYESTR,
 	     ALSTR, KANSTR, SMSTR, HBSTR, NGSTR, RHSTR, AFSSTR, NDSTR,
-	     COLORSTR, DSPMSTR, LOCALSTR);
+	     COLORSTR, DSPMSTR, CCATSTR, LOCALSTR);
     set(STRversion, SAVE(version), VAR_READWRITE);
     (void) xsnprintf(version, sizeof(version), "%d.%.2d.%.2d",
 		     REV, VERS, PATCHLEVEL);

@@ -1,3 +1,14 @@
+ 47. In some system, when a builtin fails immediately after we start
+     tcsh and before we print any messages, NLS messages fail (some
+     descriptor might be closed) [FreeBSD, HP/UX?]. So we force reading
+     the NLS catalogs in errinit() (Yoshiyuki Sakakibara)
+ 46. typos in ja/set1 and ja/set29 (Yoshiyuki Sakakibara)
+ 45. "dspmbyte autoset trap" support to HP-UX 10.20. (Yoshiyuki Sakakibara)
+ 44. misnumbered NLS message in tw.help.c (Yoshiyuki Sakakibara)
+ 43. colorcat variable for NLS color messages (Yoshiyuki Sakakibara)
+ 42. autoconf fixes from Kaveh (and if it broke, me)
+ 41. SGI irix fixes from Glenn Coombs.
+ 40. Don't spin writing the history file when quota is exceeded (Rob McMahon)
  39. V6.08.04 - 19990419
  38. complete additions (John Gotts)
  37. Port to amiga with geek gadgets (Arto Huusko)

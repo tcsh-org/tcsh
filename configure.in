@@ -8,42 +8,27 @@ dnl
 dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 dnl
 
-AC_PREREQ(2.12)dnl Minimum Autoconf version required.
+AC_PREREQ(2.13)dnl Minimum Autoconf version required.
 AC_INIT(tc.vers.c)
 
-tcsh_configure_args="$@"
-# Shift out arguments leaving the optional platform name.
-while test -n "$1" ; do
- case "$1" in
-  -*) shift ;;
-  *) break ;;
- esac
-done
+AC_CANONICAL_HOST
 
-AC_MSG_CHECKING(for the canonical name of this system)
-if test "$1" = '' ; then
-  PATH=$srcdir:$PATH # Prefer the tcsh source directory, it might be there.
-  export PATH
-  new_canonical=`(config.guess) 2>/dev/null` || new_canonical=unknown
+dnl We don't use AC_VALIDATE_CACHED_SYSTEM_TUPLE here because we only
+dnl care about the HOST value, not the HOST/BUILD/TARGET triplet.
+AC_MSG_CHECKING([cached host tuple])
+if { test x"${ac_cv_host_system_type+set}" = x"set" &&
+     test x"$ac_cv_host_system_type" != x"$host"; }; then
+  AC_MSG_RESULT([different])
+  AC_MSG_ERROR([remove config.cache and re-run configure])
 else
-  new_canonical="$1"
+  AC_MSG_RESULT(ok)
 fi
-AC_CACHE_VAL(tcsh_cv_canonical, tcsh_cv_canonical=${new_canonical})
-AC_MSG_RESULT($tcsh_cv_canonical)
+ac_cv_host_system_type="$host"
 
-if test  "$tcsh_cv_canonical" != "$new_canonical"
-then
-  AC_MSG_WARN([Cache configured for \`${tcsh_cv_canonical}'.])
-  AC_MSG_WARN([This system is \`${new_canonical}'.])
-  AC_MSG_WARN([Assuming invalid cache - removing \`${cache_file}'.])
-  AC_MSG_WARN([Restarting...])
-  rm -f "$cache_file"
-  exec ${CONFIG_SHELL-/bin/sh} $0 "$tcsh_configure_args"
-fi
 
 changequote(, )dnl
 
-case "${tcsh_cv_canonical}" in
+case "${host}" in
 
   ## Alpha (DEC) machines.
   alpha-dec-osf* )
@@ -128,12 +113,22 @@ case "${tcsh_cv_canonical}" in
   *-sgi-iri* )
     tcsh_config_file=sgi
     NON_GNU_DFLAGS='-D__STDC__'
-    case "${tcsh_cv_canonical}" in
-      *-irix[34]*)
+    case "${host-os}" in
+      *irix[34]*)
         LIBS='-lsun -lbsd -lc_s'
+	tcsh_config_file=irix5
       ;;
-      *-irix[56]*)
+      *irix5*)
         LIBS='-lsun -lbsd'
+	tcsh_config_file=irix5
+      ;;
+      *irix62*)
+        LIBS='-lsun -lbsd'
+	tcsh_config_file=irix62
+      ;;
+      *irix6*)
+        LIBS='-lsun -lbsd'
+	tcsh_config_file=irix65
       ;;
     esac
   ;;
@@ -214,14 +209,14 @@ case "${tcsh_cv_canonical}" in
   ;;
 
   ## Cygnus GNU Win32
-  *-cygwin32-* )
-    tcsh_config_file=3Dcygwin32
+  *-cygwin)
+    tcsh_config_file=cygwin32
   ;;
 
   * )
   changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name
-for \`${tcsh_cv_canonical}' systems.
+for \`${host}' systems.
 Check tcsh's \`Ported' file for manual configuration instructions.])
   changequote(, )dnl
   ;;
@@ -241,25 +236,11 @@ if test $ac_cv_prog_gcc = no ; then
   CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
 fi
 
-AC_CHECK_FUNC(crypt)
-if test $ac_cv_func_crypt = no; then
-  AC_CHECK_LIB(crypt, crypt)
-fi
-AC_CHECK_LIB(termlib, tgetent)
-if test $ac_cv_lib_termlib_tgetent = no ; then
-  AC_CHECK_LIB(curses, tgetent)
-  if test $ac_cv_lib_curses_tgetent = no ; then
-    AC_CHECK_LIB(termcap, tgetent)
-  fi
-fi
-AC_CHECK_FUNC(gethostbyname)
-if test $ac_cv_func_gethostbyname = no; then
-      AC_CHECK_LIB(nsl, gethostbyname)
-fi
-AC_CHECK_FUNC(connect)
-if test $ac_cv_func_connect = no; then
-  AC_CHECK_LIB(socket, connect)
-fi
+AC_SEARCH_LIBS(crypt, crypt)
+AC_SEARCH_LIBS(tgetent, termlib curses termcap)
+AC_SEARCH_LIBS(gethostbyname, nsl)
+AC_SEARCH_LIBS(connect, socket)
+
 AC_SUBST(DFLAGS)
 
 AC_ARG_WITH(hesiod,

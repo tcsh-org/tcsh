@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.err.c,v 3.32 1998/09/04 21:16:51 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.err.c,v 3.33 1998/10/25 15:10:06 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.32 1998/09/04 21:16:51 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.33 1998/10/25 15:10:06 christos Exp $")
 
 /*
  * C Shell
@@ -205,6 +205,11 @@ errinit()
 
     for (i = 0; i < NO_ERRORS; i++)
 	xfree((ptr_t) elst[i]);
+#  if defined(__FreeBSD__) || defined(hpux)
+#  define NLS_MAXSET 30
+    for (i = 1; i <= NLS_MAXSET; i++)
+	CGETS(i, 1, "" );
+#  endif
 #endif
 
     elst[ERR_SYNTAX] = CSAVS(1, 1, "Syntax Error");

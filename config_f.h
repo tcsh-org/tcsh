@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.20 1998/09/19 14:48:08 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/config_f.h,v 3.21 1998/10/25 15:09:45 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -169,6 +169,12 @@
  *
  */
 #define COLOR_LS_F
+
+/*
+ * COLORCAT Do you want to colorful message ?
+ *
+ */
+#undef COLORCAT
 
 /*
  * RCSID	This defines if we want rcs strings in the binary or not

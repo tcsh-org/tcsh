@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.50 1998/11/24 18:17:41 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.const.c,v 3.51 1998/12/15 13:07:25 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.const.c,v 3.50 1998/11/24 18:17:41 christos Exp $")
+RCSID("$Id: tc.const.c,v 3.51 1998/12/15 13:07:25 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -152,6 +152,11 @@ Char STRLANGSJISB[]	= { '\0' };
 #  elif defined(SOLARIS2)
 Char STRLANGEUC[]	= { 'j', 'a', '\0' };
 Char STRLANGEUCB[]	= { 'j', 'a', 'p', 'a', 'n', 'e', 's', 'e', '\0' };
+Char STRLANGSJIS[]	= { '\0' };
+Char STRLANGSJISB[]	= { '\0' };
+#  elif defined(hpux)
+Char STRLANGEUC[]	= { 'j', 'a', '_', 'J', 'P', '.', 'e', 'u', 'c', 'J', 'P' };
+Char STRLANGEUCB[]	= { '\0' };
 Char STRLANGSJIS[]	= { '\0' };
 Char STRLANGSJISB[]	= { '\0' };
 #  else
@@ -395,3 +400,7 @@ Char STRup[]		= { 'u', 'p', '\0' };
 Char STRdown[]		= { 'd', 'o', 'w', 'n', '\0' };
 Char STRleft[]		= { 'l', 'e', 'f', 't', '\0' };
 Char STRright[]		= { 'r', 'i', 'g', 'h', 't', '\0' };
+
+#ifdef COLORCAT
+Char STRcolorcat[]	= { 'c', 'o', 'l', 'o', 'r', 'c', 'a', 't', '\0' };
+#endif

@@ -3555,6 +3555,10 @@ If set, it enables color display for the builtin \fBls\-F\fR and it passes
 \fBls\-F\fR or only \fBls\fR to enable color only to one command. Setting
 it to nothing is equivalent to setting it to \fB(ls\-F ls)\fR.
 .TP 8
+.B colorcat
+If set, it enables color escape sequence for NLS message files.
+And display colorful NLS messages.
+.TP 8
 .B command \fR(+)
 If set, the command which was passed to the shell with the \fB-c\fR flag (q.v.).
 .TP 8

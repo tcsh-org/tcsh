@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.16 1998/10/25 15:10:21 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.print.c,v 3.17 1999/02/06 15:01:24 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.16 1998/10/25 15:10:21 christos Exp $")
+RCSID("$Id: sh.print.c,v 3.17 1999/02/06 15:01:24 christos Exp $")
 
 #include "ed.h"
 
@@ -130,7 +130,11 @@ xputchar(c)
     c &= CHAR | QUOTE;
     if (!output_raw && (c & QUOTE) == 0) {
 	if (Iscntrl(c)) {
+#ifdef COLORCAT
+	    if (c != '\t' && c != '\n' && !(adrof(STRcolorcat) && c=='\033') && (xlate_cr || c != '\r')) {
+#else
 	    if (c != '\t' && c != '\n' && (xlate_cr || c != '\r')) {
+#endif
 		xputchar('^' | atr);
 #ifndef _OSD_POSIX
 		if (c == ASCII)
@@ -254,6 +258,12 @@ flush()
 #endif
 #ifdef EBADF
 	case EBADF:
+#endif
+	/*
+	 * Over our quota, writing the history file
+	 */
+#ifdef EDQUOT
+	case EDQUOT:
 #endif
 	/* Nothing to do, but die */
 	    xexit(1);
