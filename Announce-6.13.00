@@ -15,11 +15,13 @@ the length of your fingers.
 
 Tcsh runs on most unix machines, VMS_POSIX, OS/2 EMX, WIN32, Amiga...
 
-You can get tcsh from ftp://ftp.astron.com/pub/tcsh/tcsh-6.13.tar.gz or
-from the mirrors:
+You can get tcsh from ftp://ftp.astron.com/pub/tcsh/tcsh-6.13.00.tar.gz
+or from the mirrors:
 
-    ftp://ftp.gw.com/pub/unix/tcsh/tcsh-6.13.tar.gz [US]
-    ftp://ftp.funet.fi/pub/unix/shells/tcsh/tcsh-6.13.tar.gz [Finland]
+    ftp://ftp.gw.com/pub/unix/tcsh/tcsh-6.13.00.tar.gz [US]
+    ftp://ftp.funet.fi/pub/unix/shells/tcsh/tcsh-6.13.00.tar.gz [Finland]
+
+    MD5 (tcsh-6.13.00.tar.gz) = 11c0c9c9148652dc01270c4880d1cc6e
 
 This is a gzip (GNU zip) tar archive. If you don't have GNU zip you can
 get it from ftp.gnu.org or other GNU mirrors.
