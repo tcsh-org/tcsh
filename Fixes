@@ -1,4 +1,5 @@
-  5. V6.12.01 - 20030208
+  6. V6.12.01 - 20030208
+  5. Misc NT cleanup. No more GPL code (amol)
   4. use strtol() to detect errors in builtin kill (Peter Jeremy)
   3. Recognize linux systems on mips* (Maciej W. Rozycki)
   2. Enable complete=igncase on unix (Stephen Krauth)
