@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.26 2005/03/03 20:16:31 kim Exp $
+# $Id: Makefile.in,v 3.27 2005/03/23 13:20:30 kim Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -526,6 +526,8 @@ veryclean: clean
 	${RM} -f *~ #*
 
 distclean: veryclean
+
+cleandir: veryclean
 
 tags:	/tmp
 	${CTAGS} sh*.c
