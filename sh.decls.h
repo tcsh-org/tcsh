@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.decls.h,v 3.24 1994/02/04 15:12:06 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.decls.h,v 3.25 1994/05/07 18:51:25 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -298,7 +298,7 @@ extern	void		  pjwait	__P((struct process *));
 extern	void		  pnote		__P((void));
 extern	void		  prestjob	__P((void));
 extern	void		  psavejob	__P((void));
-extern	void		  pstart	__P((struct process *, int));
+extern	int		  pstart	__P((struct process *, int));
 extern	void		  pwait		__P((void));
 extern  struct process   *pfind		__P((Char *));
 

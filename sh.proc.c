@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.55 1994/05/26 13:11:20 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.proc.c,v 3.56 1994/09/22 19:07:11 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.55 1994/05/26 13:11:20 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.56 1994/09/22 19:07:11 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -475,7 +475,7 @@ pnote()
 
 static void
 pfree(pp)
-    struct proc *pp;
+    struct process *pp;
 {	
     xfree((ptr_t) pp->p_command);
     if (pp->p_cwd && --pp->p_cwd->di_count == 0)

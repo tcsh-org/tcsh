@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.err.c,v 3.22 1994/04/28 13:28:46 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.05/RCS/sh.err.c,v 3.23 1994/05/26 13:11:20 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -37,7 +37,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.22 1994/04/28 13:28:46 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.23 1994/05/26 13:11:20 christos Exp $")
 
 /*
  * C Shell
@@ -333,7 +333,9 @@ static char *errorlist[] =
     "Usage: unlimit [-fh] [limits]",
 #define ERR_READONLY	131
     "$%S is read-only",
-#define ERR_INVALID	132
+#define ERR_BADJOB	132
+    "Cannot restart %S (%s)",
+#define ERR_INVALID	133
     "Invalid Error"
 };
 
