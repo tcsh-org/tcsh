@@ -1,7 +1,14 @@
- 80. Cursor bounds checks (Michael Schroeder)
- 79. Syntax error nits (Michael Schroeder)
- 78. configure fixes (Michael Schroeder)
- 77. V6.07.09 - 19980904
+ 86. V6.07.11 - 19980913
+ 85. Leave remotehost ip addresses alone (don't try to resolve them) (Kim)
+ 84. Read vs. force_read fixes (Amol)
+ 83. Make colorls if color is set before the first LS_COLORS setenv
+     (Taga Nayuta)
+ 82. Use _PATH_DEFPATH on BSD4_4 systems. (Jim Bernard)
+ 81. Cursor bounds checks (Michael Schroeder)
+ 80. Syntax error nits (Michael Schroeder)
+ 79. configure fixes (Michael Schroeder)
+ 78. V6.07.10 - 19980904
+ 77. Off by one error in NO_ERRORS...
  76. Japanese NLS messages (Yoshiyuki Sakakibara)
  75. Add ENXIO and EBADF in the test for write failures for Irix Zombies
      (Ralf W. Grosse-Kunstleve)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/pathnames.h,v 3.15 1995/01/20 23:48:56 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/pathnames.h,v 3.16 1996/04/26 19:18:42 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -36,6 +36,10 @@
  */
 #ifndef _h_pathnames
 #define _h_pathnames
+
+#ifdef BSD4_4
+# include <paths.h>
+#endif
 
 #if defined(CMUCS) && !defined(_PATH_LOCAL)
 # define _PATH_LOCAL		"/usr/cs/bin"

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.82 1998/07/07 12:06:20 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.h,v 3.83 1998/09/04 21:16:53 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -58,6 +58,7 @@
 #ifndef WINNT
 # define INIT_ZERO
 # define INIT_ZERO_STRUCT
+# define force_read read
 #endif /*!WINNT */
 /*
  * Sanity

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.35 1998/04/08 13:58:40 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.dol.c,v 3.36 1998/06/27 12:27:15 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.35 1998/04/08 13:58:40 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.36 1998/06/27 12:27:15 christos Exp $")
 
 /*
  * C shell
@@ -489,11 +489,7 @@ Dgetdol()
 #else /* !BSDSIGS */
 	    (void) sigrelse(SIGINT);
 #endif /* BSDSIGS */
-#ifdef WINNT
-# undef read
-# define read force_read
-#endif /* WINNT */
-	    for (np = wbuf; read(OLDSTD, &tnp, 1) == 1; np++) {
+	    for (np = wbuf; force_read(OLDSTD, &tnp, 1) == 1; np++) {
 		*np = (unsigned char) tnp;
 		if (np >= &wbuf[BUFSIZE - 1])
 		    stderror(ERR_LTOOLONG);

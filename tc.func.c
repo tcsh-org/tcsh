@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.77 1998/06/28 15:07:26 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.func.c,v 3.78 1998/07/07 12:06:25 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.77 1998/06/28 15:07:26 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.78 1998/07/07 12:06:25 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1178,13 +1178,13 @@ rmstar(cp)
 		    xprintf(CGETS(22, 8,
 			    "Do you really want to delete all files? [n/y] "));
 		    flush();
-		    (void) read(SHIN, &c, 1);
+		    (void) force_read(SHIN, &c, 1);
 		    /* 
 		     * Perhaps we should use the yesexpr from the
 		     * actual locale
 		     */
 		    doit = (strchr(CGETS(22, 14, "Yy"), c) != NULL);
-		    while (c != '\n' && read(SHIN, &c, 1) == 1)
+		    while (c != '\n' && force_read(SHIN, &c, 1) == 1)
 			continue;
 		    if (!doit) {
 			/* remove the command instead */
@@ -2006,10 +2006,12 @@ getremotehost()
     int len = sizeof(struct sockaddr_in);
 
     if (getpeername(SHIN, (struct sockaddr *) &saddr, &len) != -1) {
+#if 0
 	if ((hp = gethostbyaddr((char *)&saddr.sin_addr, sizeof(struct in_addr),
 				AF_INET)) != NULL)
 	    host = hp->h_name;
 	else
+#endif
 	    host = inet_ntoa(saddr.sin_addr);
     }
 #if defined(UTHOST) && !defined(HAVENOUTMP)
@@ -2018,6 +2020,10 @@ getremotehost()
 	char *name = utmphost();
 	/* Avoid empty names and local X displays */
 	if (name != NULL && *name != '\0' && *name != ':') {
+	    /* Leave IP address as is */
+	    if (isdigit(*name))
+		host = name;
+	    else {
 	    /* Look for host:display.screen */
 	    if ((sptr = strchr(name, ':')) != NULL)
 		*sptr = '\0';
@@ -2036,6 +2042,7 @@ getremotehost()
 	    }
 	    if (sptr)
 		*sptr = ':';
+	    }
 	}
     }
 #endif

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.79 1998/04/21 11:41:08 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.80 1998/06/27 12:27:12 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.79 1998/04/21 11:41:08 christos Exp $")
+RCSID("$Id: sh.c,v 3.80 1998/06/27 12:27:12 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -664,7 +664,11 @@ main(argc, argv)
      * Re-initialize path if set in environment
      */
     if ((tcp = getenv("PATH")) == NULL)
+#ifdef _PATH_DEFPATH
+	importpath(str2short(_PATH_DEFPATH));
+#else /* !_PATH_DEFPATH */
 	setq(STRpath, defaultpath(), &shvhed, VAR_READWRITE);
+#endif /* _PATH_DEFPATH */
     else
 	/* Importpath() allocates memory for the path, and the
 	 * returned pointer from SAVE() was discarded, so

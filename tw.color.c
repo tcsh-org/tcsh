@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.color.c,v 1.2 1998/06/28 15:07:35 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.color.c,v 1.3 1998/07/07 12:06:35 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.2 1998/06/28 15:07:35 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.3 1998/07/07 12:06:35 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -52,7 +52,8 @@ typedef struct {
 
 #define VAR(suffix,variable,defaultcolor) \
 { \
-    suffix, variable, { NULL, 0 }, { defaultcolor, sizeof(defaultcolor) - 1 } \
+    suffix, variable, { defaultcolor, sizeof(defaultcolor) - 1 }, \
+      { defaultcolor, sizeof(defaultcolor) - 1 } \
 }
 #define NOS '\0' /* no suffix */
 

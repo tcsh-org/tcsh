@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.75 1998/07/07 12:06:28 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.76 1998/09/04 21:16:59 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -506,7 +506,7 @@ struct ucred {
 # define NEEDgetwd
 #endif /* SYSVREL > 0 && !OREO && !sgi && !linux && !sinix */
 
-#if defined(SOLARIS2) || defined(sinix)
+#if defined(SOLARIS2) || defined(sinix) || defined(BSD4_4)
 # undef NEEDgetwd
 # define getwd(a)	getcwd(a, MAXPATHLEN)
 #endif

@@ -36,3 +36,5 @@
 
 * Add another hook like precmd to be executed after the prompt but before the
   command.
+
+* Change getwd -> getcwd
