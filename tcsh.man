@@ -3794,7 +3794,8 @@ string is erased and the current one is inserted.
 .TP 8
 .B killring \fR(+)
 Indicates the number of killed strings to keep in memory.  Set to `30'
-by default.
+by default.  If unset or set to less than `2', the shell will only
+keep the most recently killed string.
 .TP 8
 .B listflags \fR(+)
 If set to `x', `a' or `A', or any combination thereof (e.g., `xA'), they
