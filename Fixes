@@ -1,4 +1,6 @@
 V6.03.00, ...
+69. 6.02.08 9/18/92
+68. VMS port additions.
 67. Added $%var, which == strlen(var)
 66. Added ^X^I and ^X^D to override programmable listing+completion
 65. Added case insensitive globbing for OS/2
