@@ -7,3 +7,5 @@ Check arguments for limits limit file 6000M
 
 Glob bindkey's args... Are other builtins for which args are not globbed
 and should be?
+
+fix keymaps so they handle ^@ [NULL's] in key strings
