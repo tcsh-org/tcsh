@@ -1,4 +1,4 @@
-/* $Header: /afs/sipb.mit.edu/project/tcsh/beta/tcsh-6.00-b3/RCS/sh.glob.c,v 1.3 91/09/24 17:09:29 marc Exp $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.glob.c,v 3.12 1991/11/04 04:16:33 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.10 1991/09/10 04:51:46 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.12 1991/11/04 04:16:33 christos Exp $")
 
 #include "tc.h"
 
@@ -230,6 +230,8 @@ globbrace(s, p, bl)
 		}
 	    }
 	    break;
+	default:
+	    break;
 	}
     *vl = NULL;
     *bl = nv;
@@ -381,6 +383,8 @@ handleone(str, vl, action)
     case G_IGNORE:
 	str = Strsave(strip(*vlp));
 	blkfree(vl);
+	break;
+    default:
 	break;
     }
     return (str);
@@ -686,6 +690,15 @@ backeval(cp, literal)
 	arginp = cp;
 	while (*cp)
 	    *cp++ &= TRIM;
+
+        /*
+	 * In the child ``forget'' everything about current aliases or
+	 * eval vectors.
+	 */
+	alvec = NULL;
+	evalvec = NULL;
+	alvecp = NULL;
+	evalp = NULL;
 	(void) lex(&paraml);
 	if (seterr)
 	    stderror(ERR_OLD);
