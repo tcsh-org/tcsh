@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.95 2002/01/26 23:23:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.96 2002/03/05 21:41:14 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.95 2002/01/26 23:23:03 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.96 2002/03/05 21:41:14 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1711,15 +1711,15 @@ doumask(v, c)
 #   define toset(a) ((a) + 1)
 #  endif /* aiws */
 # else /* BSDLIMIT */
-#  if defined(BSD4_4) && !defined(__386BSD__)
-    typedef quad_t RLIM_TYPE;
+#  if (defined(BSD4_4) || defined(__linux__)) && !defined(__386BSD__)
+    typedef rlim_t RLIM_TYPE;
 #  else
 #   if defined(SOLARIS2) || (defined(sgi) && SYSVREL > 3)
      typedef rlim_t RLIM_TYPE;
 #   else
 #    if defined(_SX)
       typedef long long RLIM_TYPE;
-#    else /* _SX */
+#    else /* !_SX */
       typedef unsigned long RLIM_TYPE;
 #    endif /* _SX */
 #   endif /* SOLARIS2 || (sgi && SYSVREL > 3) */

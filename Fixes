@@ -1,3 +1,4 @@
+  6. Fix 64 bit compilation with linux and resource limits.
   5. Avoid double globbing when ls-F needs to fork (Joe Townsend)
   4. put back csh filec compatible support.
   3. add support for quads in xprintf in the presence of gcc.
