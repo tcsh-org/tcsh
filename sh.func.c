@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.70 1997/10/28 22:34:24 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.func.c,v 3.71 1998/04/08 13:58:45 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.70 1997/10/28 22:34:24 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.71 1998/04/08 13:58:45 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1318,11 +1318,13 @@ dosetenv(v, c)
 # ifdef LC_COLLATE
 	(void) setlocale(LC_COLLATE, "");
 # endif
-# if defined(NLS_CATALOGS) && defined(LC_MESSAGES)
+# ifdef NLS_CATALOGS
+#  ifdef LC_MESSAGES
 	(void) setlocale(LC_MESSAGES, "");
+#  endif /* LC_MESSAGES */
 	(void) catclose(catd);
 	nlsinit();
-# endif /* NLS_CATALOGS && LC_MESSAGES */
+# endif /* NLS_CATALOGS */
 # ifdef LC_CTYPE
 	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
 # endif /* LC_CTYPE */
@@ -1492,11 +1494,13 @@ dounsetenv(v, c)
 # ifdef LC_COLLATE
 		    (void) setlocale(LC_COLLATE, "");
 # endif
-# if defined(NLS_CATALOGS) && defined(LC_MESSAGES)
+# ifdef NLS_CATALOGS
+#  ifdef LC_MESSAGES
 		    (void) setlocale(LC_MESSAGES, "");
+#  endif /* LC_MESSAGES */
 		    (void) catclose(catd);
 		    nlsinit();
-# endif /* NLS_CATALOGS && LC_MESSAGES */
+# endif /* NLS_CATALOGS */
 # ifdef LC_CTYPE
 	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
 # endif /* LC_CTYPE */

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.glob.c,v 3.40 1997/10/28 22:34:25 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.glob.c,v 3.41 1998/04/08 13:58:47 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.40 1997/10/28 22:34:25 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.41 1998/04/08 13:58:47 christos Exp $")
 
 #include "tc.h"
 
@@ -1043,8 +1043,8 @@ pmatch(string, pattern, estr)
 		if (match)
 		    continue;
 		if (rangec == '-' && *(pattern-2) != '[' && *pattern  != ']') {
-		    match = (stringc <= (*pattern & TRIM) &&
-			      (*(pattern-2) & TRIM) <= stringc);
+		    match = (globcharcoll(stringc, *pattern & TRIM) <= 0 &&
+		    globcharcoll(*(pattern-2) & TRIM, stringc) <= 0);
 		    pattern++;
 		}
 		else 

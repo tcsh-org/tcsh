@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.18 1997/05/04 17:52:14 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/host.defs,v 1.19 1997/10/02 16:36:27 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -37,7 +37,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.18 1997/05/04 17:52:14 christos Exp $")
+RCSID("$Id: host.defs,v 1.19 1997/10/02 16:36:27 christos Exp $")
 
 endcode	:
 
@@ -898,6 +898,16 @@ newdef	: defined(UTekV)
 comment	: Tektronix XD88/10 running UTekV 3.2e (SVR3/88100 based)
 vendor	:						: "tektronix"
 hosttype: 						: "tekXD88"
+enddef	:
+
+
+newdef	: defined(__DGUX__)
+comment	: Data-General AViiON running DGUX
+hosttype:						: "aviion"
+ostype	:						: "dgux"
+vendor	:						: "dg"
+machtype: defined(__m88k__)				: "m88k"
+machtype: defined(__i386__)				: "pentium"
 enddef	:
 
 

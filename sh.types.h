@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.06/RCS/sh.types.h,v 3.33 1995/04/29 22:28:24 christos Exp christos $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.types.h,v 3.34 1996/04/26 19:20:28 christos Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h
@@ -178,30 +178,17 @@ typedef char * caddr_t;
 #endif /* hp9000s500 */
 
 /***
- *** Data General 88000, running dgux ???
- *** ISN'T_THIS_REALLY_UGLY_OR_IS_IT_JUST_ME?
+ *** Data General AViiON 88000 or Pentium, running dgux 5.4R3 or R4.11
  ***/
 #ifdef DGUX
-/*
- * DGUX types
- */
-# ifdef ___int_size_t_h
-#  if defined(_TARGETTING_M88KBCS_OR_DGUX) || defined(_TARGETTING_M88KBCS_OR_M88KOCS_OR_DGUX)
-#   if defined(_USING_ANSI_C_OR_POSIX_OR_SYSV3_OR_BSD_OR_DGUX) || defined(_USING_ANSI_C_OR_POSIX_OR_XPG3_OR_SYSV3_OR_BSD_OR_DGUX)
-#    ifndef _SIZE_T
-#     define _SIZE_T
-#    endif /* _SIZE_T */
-#   endif  /* _USING_ANSI_C_OR_POSIX_OR_SYSV3_OR_BSD_OR_DGUX || _USING_ANSI_C_OR_POSIX_OR_XPG3_OR_SYSV3_OR_BSD_OR_DGUX */
-#  endif  /* _TARGETTING_M88KBCS_OR_DGUX || _TARGETTING_M88KBCS_OR_M88KOCS_OR_DGUX */
-# endif  /* ___int_size_t_h */
-
-# ifdef _USING_POSIX_OR_SYSV3_OR_BSD_OR_DGUX
-#  ifndef _PID_T
-#   define _PID_T
-#  endif /* _PID_T */
-# endif  /* _USING_POSIX_OR_SYSV3_OR_BSD_OR_DGUX */
-
-#endif
+# ifndef _SIZE_T
+#  define _SIZE_T size_t
+    typedef unsigned int size_t;
+# endif /* _SIZE_T */
+# ifndef _PID_T
+#  define _PID_T
+# endif /* _PID_T */
+#endif /* DGUX */
 
 
 /***

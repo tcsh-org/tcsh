@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.80 1997/10/27 22:44:41 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tw.parse.c,v 3.81 1998/04/08 13:59:15 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.80 1997/10/27 22:44:41 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.81 1998/04/08 13:59:15 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -112,10 +112,7 @@ static	Char	 filetype		__P((Char *, Char *));
 static	int	 t_glob			__P((Char ***, int));
 static	int	 c_glob			__P((Char ***));
 static	int	 is_prefix		__P((Char *, Char *));
-#ifdef WINNT
-static	int	 is_igncase_prefixmatch	__P((Char *, Char *, int));
-#endif /* WINNT */
-static	int	 is_prefixmatch		__P((Char *, Char *));
+static	int	 is_prefixmatch		__P((Char *, Char *, int));
 static	int	 is_suffix		__P((Char *, Char *));
 static	int	 recognize		__P((Char *, Char *, int, int, int));
 static	int	 ignored		__P((Char *));
@@ -623,45 +620,6 @@ is_prefix(check, template)
     return (TRUE);
 } /* end is_prefix */
 
-#ifdef WINNT
-/* is_igncase_prefixmatch():
- *	return true if check matches initial chars in template
- */
-static int
-is_igncase_prefixmatch(check, template, igncase)
-    register Char *check, *template;
-    int igncase;
-{
-    Char MCH1, MCH2;
-
-    for (; *check; check++, template++) {
-	if ((*check & TRIM) != (*template & TRIM)) {
-	    MCH1 = (*check & TRIM);
-	    MCH2 = (*template & TRIM);
-	    MCH1 = Isupper(MCH1) ? Tolower(MCH1) : MCH1;
-	    MCH2 = Isupper(MCH2) ? Tolower(MCH2) : MCH2;
-	    if ( MCH1 != MCH2) {
-		if ((!igncase) && ((*check & TRIM) == '-' || 
-				   (*check & TRIM) == '.' || 
-				   (*check & TRIM) == '_')) {
-		    MCH1 = MCH2 = (*check & TRIM);
-		    if (MCH1 == '_')
-			MCH2 = '-';
-		    else if (MCH1 == '-')
-			MCH2 = '_';
-		    for (; *template && (*template & TRIM) != MCH1 &&
-				        (*template & TRIM) != MCH2; template++)
-			continue;
-		    if (!*template)
-			return FALSE;
-		} else
-		    return FALSE;
-	    }
-	}
-    }
-    return TRUE;
-}
-#endif /* WINNT */
 
 /* is_prefixmatch():
  *	return true if check matches initial chars in template
@@ -670,10 +628,11 @@ is_igncase_prefixmatch(check, template, igncase)
  * and matches on shortening of commands
  */
 static int
-is_prefixmatch(check, template)
-    register Char *check, *template;
+is_prefixmatch(check, template, igncase)
+    Char *check, *template;
+    int igncase;
 {
-    Char MCH1,MCH2;
+    Char MCH1, MCH2;
 
     for (; *check; check++, template++) {
 	if ((*check & TRIM) != (*template & TRIM)) {
@@ -682,7 +641,9 @@ is_prefixmatch(check, template)
             MCH1 = Isupper(MCH1) ? Tolower(MCH1) : MCH1;
             MCH2 = Isupper(MCH2) ? Tolower(MCH2) : MCH2;
             if (MCH1 != MCH2) {
-                if ((*check & TRIM) == '-' || (*check & TRIM) == '.' || (*check & TRIM) == '_') {
+                if (!igncase && ((*check & TRIM) == '-' || 
+				 (*check & TRIM) == '.' ||
+				 (*check & TRIM) == '_')) {
                     MCH1 = MCH2 = (*check & TRIM);
                     if (MCH1 == '_') {
                         MCH2 = '-';
@@ -1017,7 +978,7 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 		|| igncase
 #endif /* WINNT */
 	    ) {
-	        if (!is_prefixmatch(target, item)) 
+	        if (!is_prefixmatch(target, item, 0)) 
 		    break;
      	    } else {
 	        if (!is_prefix(target, item)) 
@@ -1033,8 +994,12 @@ tw_collect_items(command, looking, exp_dir, exp_name, target, pat, flags)
 	    if (text_check && isadirectory(exp_dir, item))
 		break;
 
-	    if (gpat && !Gmatch(item, pat))
-		if (!dir_check && !isadirectory(exp_dir, item))
+	    /*
+	     * Only pattern match directories if we're checking
+	     * for directories.
+	     */
+	    if (gpat && !Gmatch(item, pat) &&
+		(dir_check || !isadirectory(exp_dir, item)))
 		    break;
 
 	    /*

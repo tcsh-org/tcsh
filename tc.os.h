@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.70 1997/10/28 22:34:33 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.os.h,v 3.71 1998/04/08 13:59:10 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -443,9 +443,9 @@ struct ucred {
 # define NEEDgethostname
 #endif /* _SEQUENT_ */
 
-#if defined(BSD) && defined(POSIXJOBS) && !defined(__hp_osf)
+#if defined(BSD) && defined(POSIXJOBS) && !defined(BSD4_4) && !defined(__hp_osf)
 # define setpgid(pid, pgrp)	setpgrp(pid, pgrp)
-#endif /* BSD && POSIXJOBS && !__hp_osf */
+#endif /* BSD && POSIXJOBS && && !BSD4_4 && !__hp_osf */
 
 #if defined(BSDJOBS) && !(defined(POSIX) && defined(POSIXJOBS))
 # if !defined(_AIX370) && !defined(_AIXPS2)
@@ -494,11 +494,11 @@ struct ucred {
 #ifndef POSIX
 # define mygetpgrp()    getpgrp(0)
 #else /* POSIX */
-# if defined(BSD) || defined(SUNOS4) || defined(IRIS4D) || defined(DGUX) || defined(HPRT)
+# if (defined(BSD) && !defined(BSD4_4)) || defined(SUNOS4) || defined(IRIS4D) || defined(DGUX) || defined(HPRT)
 #  define mygetpgrp()    getpgrp(0)
-# else /* !(BSD || SUNOS4 || IRIS4D || DGUX || HPRT) */
+# else /* !((BSD && !BSD4_4) || SUNOS4 || IRIS4D || DGUX || HPRT) */
 #  define mygetpgrp()    getpgrp()
-# endif	/* BSD || SUNOS4 || IRISD || DGUX  || HPRT */
+# endif	/* (BSD && BSD4_4) || SUNOS4 || IRISD || DGUX  || HPRT */
 #endif /* POSIX */
 
 
@@ -694,16 +694,16 @@ extern int getpeername __P((int, struct sockaddr *, int *));
 # endif /* REMOTEHOST */
 #endif /* SUNOS4 && __GNUC__ == 2 */
 
-#if (defined(BSD) && !defined(__386BSD__)) || defined(SUNOS4) 
+#if (defined(BSD) && !defined(BSD4_4)) || defined(SUNOS4) 
 # if defined(__alpha) && defined(__osf__) && DECOSF1 < 200
 extern void bcopy	__P((const void *, void *, size_t));
 #  define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
 # endif /* __alpha && __osf__ && DECOSF1 < 200 */
-#endif /* (BSD && !__386BSD__) || SUNOS4 */
+#endif /* (BSD && !BSD4_4) || SUNOS4 */
 
-#if !defined(hpux) && !defined(COHERENT) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(__386BSD__) && !defined(memmove)
+#if !defined(hpux) && !defined(COHERENT) && ((SYSVREL < 4) || defined(_SEQUENT_)) && !defined(BSD4_4) && !defined(memmove)
 # define NEEDmemmove
-#endif /* !hpux && !COHERENT && (SYSVREL < 4 || _SEQUENT_) && !__386BSD__ && !memmove */
+#endif /* !hpux && !COHERENT && (SYSVREL < 4 || _SEQUENT_) && !BSD4_4 && !memmove */
 
 #if defined(UTek) || defined(pyr)
 # define NEEDmemset

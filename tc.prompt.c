@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.28 1997/10/27 22:44:37 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.prompt.c,v 3.29 1998/04/08 13:59:11 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.28 1997/10/27 22:44:37 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.29 1998/04/08 13:59:11 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -185,9 +185,9 @@ tprintf(what, buf, fmt, siz, str, tim, info)
     Char   *z, *q;
     Char    attributes = 0;
     static int print_prompt_did_ding = 0;
-    const char   *cz;
+    const unsigned char   *cz;
     Char    buff[BUFSIZE];
-    char    cbuff[BUFSIZE];
+    unsigned char    cbuff[BUFSIZE];
 
     Char *p  = buf;
     Char *ep = &p[siz];
@@ -208,9 +208,9 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 	    switch (*cp) {
 	    case 'R':
 		if (what == FMT_HISTORY)
-		    fmthist('R', info, str = cbuff, sizeof(cbuff));
+		    fmthist('R', info, str = (char *) cbuff, sizeof(cbuff));
 		if (str != NULL)
-		    for (; *str; *p++ = attributes | *str++)
+		    for (; *str; *p++ = attributes | (unsigned char) *str++)
 			if (p >= ep) break;
 		break;
 	    case '#':

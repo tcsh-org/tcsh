@@ -143,6 +143,23 @@ static	void	 qprintf	__P((Char *));
 #define	M_SET		META('[')
 #define	ismeta(c)	(((c)&M_META) != 0)
 
+int
+globcharcoll(c1, c2)
+    int c1, c2;
+{
+#if defined(NLS) && defined(LC_COLLATE)
+    char s1[2], s2[2];
+
+    if (c1 == c2)
+	return (0);
+    s1[0] = c1;
+    s2[0] = c2;
+    s1[1] = s2[1] = '\0';
+    return strcoll(s1, s2);
+#endif
+    return (c1 - c2);
+}
+
 /*
  * Need to dodge two kernel bugs:
  * opendir("") != opendir(".")
@@ -650,7 +667,8 @@ match(name, pat, patend, m_not)
 		++pat;
 	    while (((c = *pat++) & M_MASK) != M_END) {
 		if ((*pat & M_MASK) == M_RNG) {
-		    if (c <= k && k <= pat[1])
+		    if (globcharcoll(CHAR(c), CHAR(k)) <= 0 &&
+			globcharcoll(CHAR(k), CHAR(pat[1])) <= 0)
 			ok = 1;
 		    pat += 2;
 		}

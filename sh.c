@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.76 1997/10/28 22:34:21 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/sh.c,v 3.77 1998/04/08 13:58:37 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -43,7 +43,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.76 1997/10/28 22:34:21 christos Exp $")
+RCSID("$Id: sh.c,v 3.77 1998/04/08 13:58:37 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2312,7 +2312,7 @@ xexit(i)
 	for (pp = proclist.p_next; pp; pp = pp->p_next) {
 	    np = pp;
 	    do 
-		if ((np->p_flags & PHUP) && np->p_jobid != shpgrp)
+		if ((np->p_flags & PHUP) && np->p_jobid != shpgrp) {
 		    if (killpg(np->p_jobid, SIGHUP) != -1) {
 			/* In case the job was suspended... */
 #ifdef SIGCONT
@@ -2320,6 +2320,7 @@ xexit(i)
 #endif
 			break;
 		    }
+		}
 	    while ((np = np->p_friends) != pp);
 	}
     }

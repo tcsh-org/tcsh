@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.sig.c,v 3.22 1997/10/27 22:44:38 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.sig.c,v 3.23 1997/10/28 22:34:35 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.22 1997/10/27 22:44:38 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.23 1997/10/28 22:34:35 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -304,6 +304,7 @@ sigsetmask(mask)
 }
 #endif /* __PARAGON__ */
 
+#ifndef __DGUX__
 /*
  * sigblock(mask)
  *
@@ -341,6 +342,7 @@ sigblock(mask)
 
     return (m);
 }
+#endif /* __DGUX__ */
 
 
 /*

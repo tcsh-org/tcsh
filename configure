@@ -568,6 +568,14 @@ case "${tcsh_cv_canonical}" in
     tcsh_config_file=ultrix
   ;;
 
+  ## DGUX
+  *-dg-dguxR4* )
+    tcsh_config_file=dgux5.4
+  ;;
+  m88k-dg-dgux5.4R* )
+    tcsh_config_file=dgux5.4
+  ;;
+
   ## HP/UX
   *-hp-hpux7* )
     tcsh_config_file=hpux7

@@ -1,4 +1,12 @@
- 41. Fix trailing whitespace parsing in HASHBANG code (Martin Kraemer)
+ 50. V6.07.06 - 04/08/98
+ 49. Collation fix for globbing (Andrey A. Chernov)
+ 48. We might have NLS_CATALOGS and not LC_MESSAGES (Andrey A. Chernov)
+ 47. 4.4BSD header fixes (Andrey A. Chernov)
+ 46. Signed char prompt fixes (Andrey A. Chernov)
+ 45. Pattern match fix for directory searches (Mike Patnode)
+ 44. Pentium DGUX fixes (Miko Nahum)
+ 43. Spanish nls message catalogs (Luis Francisco Gonzalez)
+ 42. Fix trailing whitespace parsing in HASHBANG code (Martin Kraemer)
  41. Remove stray debuggin message from unmatched substitutions.
      (from Amol Deshpande)
  40. Fix reversed arguments in Usagae message. (from Amol Deshpande)

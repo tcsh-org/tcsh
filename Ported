@@ -921,6 +921,20 @@ NOTES   :       In config.h, set HAVEUTMPX und unset BSDSIGS and BSDTIMES
 NOTES   :
 VERSION :       6.06.03
 
+VENDOR  :       SNI (Siemens Nixdorf Information Systems)
+MODELS  :       rm600  (R4000 mips)
+COMPILER:       /usr/bin/cc
+CFLAGS  :       -kansi -DSVR4 -DSNI -DSMSINFO -DR3000
+LIBES   :       -ltermcap -lsocket -lxnet -lc -L/usr/ucblib -lucb
+OS      :       SINIX 5.43
+CONFIG  :       sysv4
+ENVIRON :
+NOTES   :       In config.h, set HAVEUTMPX und unset BSDSIGS,
+NOTES   :       BSDTIMES, and BSDLIMIT, since otherwise resource.h
+NOTES   :       is falsely searched in /usr/ucbinclude/sys/
+NOTES   :
+VERSION :       6.07.02
+
 VENDOR	:	FUJITSU
 MODELS	:	ds90
 COMPILER:	cc

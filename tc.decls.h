@@ -1,4 +1,4 @@
-/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.38 1997/10/27 22:44:35 christos Exp $ */
+/* $Header: /u/christos/cvsroot/tcsh/tc.decls.h,v 3.39 1997/10/28 22:34:31 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -272,7 +272,9 @@ extern	sigret_t	(*xsignal	__P((int, sigret_t (*)(int)))) ();
 #endif /* NEEDsignal */
 #if defined(_SEQUENT_) || ((SYSVREL > 3 || defined(_DGUX_SOURCE)) && defined(POSIXSIGS)) || (defined(_AIX) && defined(POSIXSIGS)) || defined(WINNT)
 extern	sigmask_t	  sigsetmask	__P((sigmask_t));
+# if !defined(DGUX) || (defined(DGUX) && defined(__ix86))
 extern	sigmask_t	  sigblock	__P((sigmask_t));
+# endif /* !DGUX */
 extern	void		  bsd_sigpause	__P((sigmask_t));
 extern  sigret_t        (*bsd_signal    __P((int, sigret_t (*)(int)))) __P((int));
 #endif /* _SEQUENT_ */
