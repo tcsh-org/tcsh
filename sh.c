@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.6 1991/07/30 20:51:12 jwo Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/sh.c,v 3.7 1991/08/01 16:36:23 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -41,7 +41,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif				/* not lint */
 
-RCSID("$Id: sh.c,v 3.6 1991/07/30 20:51:12 jwo Exp christos $")
+RCSID("$Id: sh.c,v 3.7 1991/08/01 16:36:23 christos Exp $")
 
 #include "sh.h"
 #include "tc.h"
@@ -88,7 +88,7 @@ int do_logout;
 #endif				/* TESLA */
 
 Char   *dumphist[] = {STRhistory, STRmh, 0, 0};
-Char   *loadhist[] = {STRsource, STRmh, STRhistfile, 0};
+Char   *loadhist[] = {STRsource, STRmh, STRtildothist, 0};
 
 #ifdef CSHDIRS
 Char   *loaddirs[] = {STRsource, STRdirfile, 0};
@@ -252,24 +252,24 @@ main(argc, argv)
      * for any psudo-terminals (this catches most window systems) and not for
      * any terminal running X windows.
      * 
-     * At Ohio State, we have had problems with a user having his X session drop
-     * out from under him (on a Sun) because the shell in his master xterm
-     * timed out and exited.
+     * At Ohio State, we have had problems with a user having his X session 
+     * drop out from under him (on a Sun) because the shell in his master 
+     * xterm timed out and exited.
      * 
      * Really, this should be done with a program external to the shell, that
      * watches for no activity (and NO running programs, such as dump) on a
      * terminal for a long peroid of time, and then SIGHUPS the shell on that
      * terminal.
      * 
-     * bugfix by Rich Salz <rsalz@PINEAPPLE.BBN.COM>: For root rsh things allways
-     * first check to see if loginsh or really root, then do things with
-     * ttyname()
+     * bugfix by Rich Salz <rsalz@PINEAPPLE.BBN.COM>: For root rsh things 
+     * allways first check to see if loginsh or really root, then do things 
+     * with ttyname()
      * 
      * Also by Jean-Francois Lamy <lamy%ai.toronto.edu@RELAY.CS.NET>: check the
      * value of cp before using it! ("root can rsh too")
      * 
-     * PWP: keep the nested ifs; the order of the tests matters and a good (smart)
-     * C compiler might re-arange things wrong.
+     * PWP: keep the nested ifs; the order of the tests matters and a good 
+     * (smart) C compiler might re-arange things wrong.
      */
 #ifdef AUTOLOGOUT
     if (loginsh || (uid == 0)) {
@@ -323,27 +323,40 @@ main(argc, argv)
      * Grab other useful things from the environment. Should we grab
      * everything??
      */
-    if ((tcp = getenv("LOGNAME")) != NULL || (tcp = getenv("USER")) != NULL)
-	set(STRuser, SAVE(tcp));
-
-    /*
-     * set usefull environment things for the user
-     */
     {
-
+	char *cln, *cus;
 	Char    buff[BUFSIZ];
+	struct passwd *pw;
+
 
 #ifdef apollo
 	int     oid = getoid();
 
 	Itoa(oid, buff);
 	set(STRoid, Strsave(buff));
-#endif				/* apollo */
+#endif /* apollo */
+
 	Itoa(uid, buff);
 	set(STRuid, Strsave(buff));
 
 	Itoa(gid, buff);
 	set(STRgid, Strsave(buff));
+
+	cln = getenv("LOGNAME");
+	cus = getenv("USER");
+	if (cus != NULL)
+	    set(STRuser, SAVE(cus));
+	else if (cln != NULL)
+	    set(STRuser, SAVE(cln));
+	else if ((pw = getpwuid(uid)) == NULL)
+	    set(STRuser, SAVE("unknown"));
+	else
+	    set(STRuser, SAVE(pw->pw_name));
+	if (cln == NULL)
+	    Setenv(STRLOGNAME, value(STRuser));
+	if (cus == NULL)
+	    Setenv(STRUSER, value(STRuser));
+	    
     }
 
     /*
@@ -841,6 +854,8 @@ main(argc, argv)
 	/*
 	 * Source history before .login so that it is available in .login
 	 */
+	if ((cp = value(STRhistfile)) != NULL)
+	    loadhist[2] = cp;
 	dosource(loadhist, NULL);
 #ifndef LOGINFIRST
 	if (loginsh)
@@ -1160,15 +1175,17 @@ srcunit(unit, onlyown, hflg)
 void
 rechist()
 {
-    Char    buf[BUFSIZ];
+    Char    buf[BUFSIZ], *hfile;
     int     fp, ftmp, oldidfds;
 
     if (!fast) {
 	if (value(STRsavehist)[0] == '\0')
 	    return;
-	(void) Strcpy(buf, value(STRhome));
-	(void) Strcat(buf, STRsldthist);
-	fp = creat(short2str(buf), 0600);
+	if ((hfile = value(STRhistfile)) == NULL) {
+	    hfile = Strcpy(buf, value(STRhome));
+	    (void) Strcat(buf, STRsldthist);
+	}
+	fp = creat(short2str(hfile), 0600);
 	if (fp == -1) 
 	    return;
 	oldidfds = didfds;
