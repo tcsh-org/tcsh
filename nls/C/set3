@@ -1,4 +1,4 @@
-$ $Id$
+$ $Id: set3,v 1.2 1995/03/19 18:07:15 christos Exp $
 $ Editor function descriptions
 $set 3 
 1 Move back a character
@@ -13,7 +13,7 @@ $set 3
 10 Clear screen leaving current line on top
 11 Complete current word
 12 Tab forward through files
-13 Tab backwards through files
+13 Tab backward through files
 14 Complete current word ignoring programmable completions
 15 Copy current word to cursor
 16 Copy area between mark and cursor to cut buffer
@@ -37,11 +37,11 @@ $set 3
 34 Move forward one character
 35 Move forward to end of current word
 36 Exchange the two characters before the cursor
-37 Search in history backwards for line beginning as current
+37 Search in history backward for line beginning as current
 38 Search in history forward for line beginning as current
 39 Insert last item of previous command
 40 Incremental search forward
-41 Incremental search backwards
+41 Incremental search backward
 42 Clear line
 43 Cut to end of line and save in cut buffer
 44 Cut area between mark and cursor and save in cut buffer
@@ -93,9 +93,9 @@ $set 3
 90 Vi delete prefix command
 91 Vi move to the end of the current space delimited word
 92 Vi move to the end of the current word
-93 Vi move to the character specified backwards
+93 Vi move to the character specified backward
 94 Vi move to the character specified forward
-95 Vi move up to the character specified backwards
+95 Vi move up to the character specified backward
 96 Vi move up to the character specified forward
 97 Enter vi insert mode
 98 Enter vi insert mode at beginning of line
@@ -105,7 +105,7 @@ $set 3
 102 Vi repeat current search in the opposite search direction
 103 Vi replace character under the cursor with the next character typed
 104 Vi replace mode
-105 Vi search history backwards
+105 Vi search history backward
 106 Vi search history forward
 107 Vi replace character under the cursor and enter insert mode
 108 Vi replace entire line
