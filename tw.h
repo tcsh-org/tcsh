@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.h,v 3.14 1993/08/11 16:25:52 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.h,v 3.15 1993/10/08 19:14:01 christos Exp $ */
 /*
  * tw.h: TwENEX functions headers
  */
@@ -37,28 +37,29 @@
 #ifndef _h_tw
 #define _h_tw
 
-#define TW_ZERO		-1
-#define TW_NONE		0
-#define TW_COMMAND	1
-#define TW_VARIABLE	2
-#define TW_LOGNAME	3
-#define TW_FILE		4
-#define TW_DIRECTORY	5
-#define TW_VARLIST	6
-#define TW_USER		7
-#define TW_COMPLETION	8
-#define TW_ALIAS	9
-#define TW_SHELLVAR	10
-#define TW_ENVVAR	11
-#define TW_BINDING	12
-#define TW_WORDLIST	13
-#define TW_LIMIT	14
-#define TW_SIGNAL	15
-#define TW_JOB		16
-#define TW_EXPLAIN	17
-#define TW_PATHNAME	18
-#define TW_TEXT		19
-#define TW_GRPNAME	20
+#define TW_PATH		0x1000
+#define TW_ZERO		0x0fff
+
+#define TW_NONE		0x0000
+#define TW_COMMAND	0x0001
+#define TW_VARIABLE	0x0002
+#define TW_LOGNAME	0x0003
+#define TW_FILE		0x0004
+#define TW_DIRECTORY	0x0005
+#define TW_VARLIST	0x0006
+#define TW_USER		0x0007
+#define TW_COMPLETION	0x0008
+#define TW_ALIAS	0x0009
+#define TW_SHELLVAR	0x000a
+#define TW_ENVVAR	0x000b
+#define TW_BINDING	0x000c
+#define TW_WORDLIST	0x000d
+#define TW_LIMIT	0x000e
+#define TW_SIGNAL	0x000f
+#define TW_JOB		0x0010
+#define TW_EXPLAIN	0x0011
+#define TW_TEXT		0x0012
+#define TW_GRPNAME	0x0013
 
 #define TW_EXEC_CHK	0x01
 #define TW_DIR_CHK	0x02

@@ -1,5 +1,10 @@
 V6.05.00, ... 
- 78. 6.04.10 03/29/94
+ 84. 6.04.10 03/29/94
+ 83. Pathname completion bug fixes...
+ 82. Completion pathname(p) changes: Completion 'C' -> 'X'.
+     Replaced 'p' with 'F' and added D,T,C.
+ 81. Next NLS fixes
+     (From Paul Nevai <nevai@ops.mps.ohio-state.edu>)
  80. make spelling correction obey the current histchars setting.
  79. Fix rounding in limits so that 0 is a true 0. 
      (From Ken Lalonde <ken@cs.berkeley.edu>)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.char.h,v 3.6 1993/06/05 21:09:15 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.char.h,v 3.7 1993/07/03 23:47:53 christos Exp christos $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -37,7 +37,11 @@
  */
 #ifndef _h_sh_char
 #define _h_sh_char
-#include <ctype.h>
+#if defined(NeXT) && defined(NLS)
+# include <appkit/NXCType.h>
+#else
+# include <ctype.h>
+#endif
 
 #ifdef _MINIX
 # undef _SP
@@ -84,19 +88,34 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 #define alnum(c)	(((Char)(c) & QUOTE) ? 0 : \
 		         (isalnum((unsigned char) (c)) || (c) == '_'))
 #ifdef NLS
-# define Isspace(c)	(((Char)(c) & QUOTE) ? 0 : isspace((unsigned char) (c)))
-# define Isdigit(c)	(((Char)(c) & QUOTE) ? 0 : isdigit((unsigned char) (c)))
-# define Isalpha(c)	(((Char)(c) & QUOTE) ? 0 : isalpha((unsigned char) (c)))
-# define Islower(c)	(((Char)(c) & QUOTE) ? 0 : islower((unsigned char) (c)))
-# define Isupper(c)	(((Char)(c) & QUOTE) ? 0 : isupper((unsigned char) (c)))
-# define Tolower(c) 	(((Char)(c) & QUOTE) ? 0 : tolower((unsigned char) (c)))
-# define Toupper(c) 	(((Char)(c) & QUOTE) ? 0 : toupper((unsigned char) (c)))
-# define Isxdigit(c)	(((Char)(c) & QUOTE) ? 0 : isxdigit((unsigned char) (c)))
-# define Isalnum(c)	(((Char)(c) & QUOTE) ? 0 : isalnum((unsigned char) (c)))
-# define Iscntrl(c) 	(((Char)(c) & QUOTE) ? 0 : iscntrl((unsigned char) (c)))
-# define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : isprint((unsigned char) (c)))
-# define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : ispunct((unsigned char) (c)))
-#else
+# ifdef NeXT
+#  define Isspace(c)	(((Char)(c) & QUOTE) ? 0 : NXIsSpace((unsigned) (c)))
+#  define Isdigit(c)	(((Char)(c) & QUOTE) ? 0 : NXIsDigit((unsigned) (c)))
+#  define Isalpha(c)	(((Char)(c) & QUOTE) ? 0 : NXIsAlpha((unsigned) (c)))
+#  define Islower(c)	(((Char)(c) & QUOTE) ? 0 : NXIsLower((unsigned) (c)))
+#  define Isupper(c)	(((Char)(c) & QUOTE) ? 0 : NXIsUpper((unsigned) (c)))
+#  define Tolower(c) 	(((Char)(c) & QUOTE) ? 0 : NXToLower((unsigned) (c)))
+#  define Toupper(c) 	(((Char)(c) & QUOTE) ? 0 : NXToUpper((unsigned) (c)))
+#  define Isxdigit(c)	(((Char)(c) & QUOTE) ? 0 : NXIsXDigit((unsigned) (c)))
+#  define Isalnum(c)	(((Char)(c) & QUOTE) ? 0 : NXIsAlNum((unsigned) (c)))
+#  define Iscntrl(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsCntrl((unsigned) (c)))
+#  define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsPrint((unsigned) (c)))
+#  define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : NXIsPunct((unsigned) (c)))
+# else /* !NeXT */
+#  define Isspace(c)	(((Char)(c) & QUOTE) ? 0 : isspace((unsigned char) (c)))
+#  define Isdigit(c)	(((Char)(c) & QUOTE) ? 0 : isdigit((unsigned char) (c)))
+#  define Isalpha(c)	(((Char)(c) & QUOTE) ? 0 : isalpha((unsigned char) (c)))
+#  define Islower(c)	(((Char)(c) & QUOTE) ? 0 : islower((unsigned char) (c)))
+#  define Isupper(c)	(((Char)(c) & QUOTE) ? 0 : isupper((unsigned char) (c)))
+#  define Tolower(c) 	(((Char)(c) & QUOTE) ? 0 : tolower((unsigned char) (c)))
+#  define Toupper(c) 	(((Char)(c) & QUOTE) ? 0 : toupper((unsigned char) (c)))
+#  define Isxdigit(c)	(((Char)(c) & QUOTE) ? 0 : isxdigit((unsigned char) (c)))
+#  define Isalnum(c)	(((Char)(c) & QUOTE) ? 0 : isalnum((unsigned char) (c)))
+#  define Iscntrl(c) 	(((Char)(c) & QUOTE) ? 0 : iscntrl((unsigned char) (c)))
+#  define Isprint(c) 	(((Char)(c) & QUOTE) ? 0 : isprint((unsigned char) (c)))
+#  define Ispunct(c) 	(((Char)(c) & QUOTE) ? 0 : ispunct((unsigned char) (c)))
+# endif /* !NeXT */
+#else /* !NLS */
 # define Isspace(c)	cmap(c, _SP|_NL)
 # define Isdigit(c)	cmap(c, _DIG)
 # define Isalpha(c)	(cmap(c,_LET) && !(((c) & META) && AsciiOnly))
@@ -109,6 +128,6 @@ extern unsigned char _cmap_lower[], _cmap_upper[];
 # define Iscntrl(c)	(cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
 # define Isprint(c)	(!cmap(c,_CTR) && !(((c) & META) && AsciiOnly))
 # define Ispunct(c)	(cmap(c,_PUN) && !(((c) & META) && AsciiOnly))
-#endif
+#endif /* !NLS */
 
 #endif /* _h_sh_char */

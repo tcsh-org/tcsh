@@ -2211,18 +2211,23 @@ Bindings (editor commands)
 .TP 8
 .B c
 Commands (builtin or external commands)
-.TP 8
 .B C
-Completions
+Commands (builtin or external commands) with supplied pathname prefix
 .TP 8
 .B d
 Directories
+.TP 8
+.B D
+Directories with supplied pathname prefix
 .TP 8
 .B e
 Environment variables
 .TP 8
 .B f
 Filenames
+.TP 8
+.B F
+Filenames with supplied pathname prefix
 .TP 8
 .B g
 Groupnames
@@ -2236,9 +2241,6 @@ Limits
 .B n
 Nothing
 .TP 8
-.B p
-Filenames, using the supplied pathname prefix
-.TP 8
 .B s
 Shell variables
 .TP 8
@@ -2248,6 +2250,9 @@ Signals
 .B t
 Plain (`text') files
 .TP 8
+.B T
+Plain (`text') files with supplied pathname prefix
+.TP 8
 .B v
 Any variables
 .TP 8
@@ -2256,6 +2261,9 @@ Usernames
 .TP 8
 .B x
 Like \fBn\fR, but prints \fIselect\fR when \fIlist-choices\fR is used.
+.TP 8
+.B X
+Completions
 .TP 8
 $\fIvar\fR
 Words from the variable \fIvar\fR
@@ -2604,25 +2612,19 @@ first rather than oldest first.
 .RS +8
 .PP
 With \fB-S\fR, the second form saves the history list to \fIfilename\fR.
-If the first word \fBsavehist\fR shell variable contains a number,
-only that many lines of the history list are saved.
-(\fBsavehist\fR must be less than or equal to \fBhistory\fR.)
-.PP
-When the second word of the 
-\fBsavehist\fR
-shell variable is set to 
-\fBmerge\fR
-the current history will be merged with the history file on save 
-(according to time stamps). This feature is intended for an 
-environment with numerous shells being in simultaneous use (like 
-X-windows). Currently the automatic merge can
-only succeed when the shells nicely quit one after another.
+If the first word of the \fBsavehist\fR shell variable is set to a
+number, at most that many lines are saved.  If the second word of
+\fBsavehist\fR is set to `merge', the history list is merged with the
+existing history file instead of replacing it (if there is one) and
+sorted by time stamp. (+) Merging is intended for an environment like
+X-windows with several shells in simultaneous use.  Currently it only
+succeeds when the shells quit nicely one after another.
 .PP
 With \fB-L\fR, the shell appends \fIfilename\fR, which is presumably a
 history list saved by the \fB-S\fR option or the \fBsavehist\fR mechanism,
 to the history list.
-\fB-M\fR is like \fB-L\fR, but the contents of \fIfilename\fR are sorted
-into the history list by timestamp.
+\fB-M\fR is like \fB-L\fR, but the contents of \fIfilename\fR are merged
+into the history list and sorted by timestamp.
 In either case, \fBhistfile\fR is used if \fIfilename\fR is not given and
 \fI~/.history\fR is used if \fBhistfile\fR is unset.
 `history -L' is exactly like 'source -h' except that it does not require a
@@ -3433,8 +3435,9 @@ If set, the command-line editor is used.
 Set by default in interactive shells.
 .TP 8
 .B ellipsis \fR(+)
-Causes ellipsis (`\&.\&.\&.') to be displayed in the \fBprompt\fR instead
-of the number of skipped components if the `%[.cC]0n' syntax is used.
+If set, the `%c'/`%.' and `%C' prompt sequences (see the \fBprompt\fR
+shell variable) indicate skipped directories with an ellipsis (`...')
+instead of `/<skipped>'.
 .TP 8
 .B fignore \fR(+)
 Lists file name suffixes to be ignored by completion.
@@ -3614,22 +3617,21 @@ are replaced by the given information:
 The current working directory.
 .TP 4
 %~
-The current working directory. If it starts with \fBhome\fR, that part is 
-replaced by `~'. If it starts with some other \fIuser\fR's home directory,
-that part of the directory is replaced by with `~\fIuser\fR'. The latter
-substitution happens only if the shell has already used `~\fIuser\fR' in a
-pathname in the current session.
+The current working directory, but with one's home directory
+represented by `~' and other users' home directories represented by
+`~user' as per \fBFilename Substitution\fR. `~user' substitution
+happens only if the shell has already used `~\fIuser\fR' in a pathname
+in the current session.
 .TP 4
-%c[0][\fIn\fR], %.[0][\fIn\fR]
-The trailing component of the current working directory, \fIn\fR
+%c[[0]\fIn\fR], %.[[0]\fIn\fR]
+The trailing component of the current working directory, or \fIn\fR
 trailing components if a digit \fIn\fR is given.
-If \fIn\fR is prefixed with a 0, the number of skipped components and the
-trailing component is reported as `/<\fIskipped\fR>path', unless the shell
-variable \fBellipsis\fR is set - in which case it is reported as
-`\&.\&.\&.path'.
-`~' substitution is performed in a similar way to `%~' above, except that
-the `~[user]/' component is not counted when the trailing component
-calculation is made.
+If \fIn\fR begins aith `0', the number of skipped components precede
+the trailing component(s) in the format `/<\fIskipped\fR>trailing'.
+If the \fBellipsis\fR shell variable is set, skipped components
+are represented by an ellipsis so the whole becomes `...trailing'.
+`~' substitution is done as in `%~' above, but the `~' component
+is ignored when counting trailing components.
 .TP 4
 %C
 Like %c, but without `~' substitution.
@@ -3767,9 +3769,10 @@ If set, the shell does `dirs -S' before exiting.
 .B savehist
 If set, the shell does `history -S' before exiting.
 If the first word is set to a number, at most that many lines are saved.
-If the second word is set to \fBmerge\fR, then the contents of the history
-file are merged with the current history, and the most recent events are
-retained.
+(The number must be less than or equal to \fBhistory\fR.)
+If the second word is set to `merge', the history list is merged with
+the existing history file instead of replacing it (if there is one) and
+sorted by time stamp and the most recent events are retained. (+)
 .TP 8
 .B shell
 The file in which the shell resides.  This is used in forking

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.54 1994/01/31 16:04:49 christos Exp $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/sh.func.c,v 3.55 1994/02/04 15:16:59 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.54 1994/01/31 16:04:49 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.55 1994/02/04 15:16:59 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1815,7 +1815,7 @@ getval(lp, v)
 	cp++;
     if (*cp == 0) {
 	if (*v == 0)
-	    return restrict_limit((f + 0.5) * lp->limdiv);
+	    return f == 0.0 ? 0 : restrict_limit((f + 0.5) * lp->limdiv);
 	cp = *v;
     }
     switch (*cp) {
@@ -1823,7 +1823,7 @@ getval(lp, v)
     case ':':
 	if (lp->limconst != RLIMIT_CPU)
 	    goto badscal;
-	return restrict_limit((f * 60.0 + atof(short2str(cp + 1))));
+	return f == 0.0 ? 0 : restrict_limit((f * 60.0 + atof(short2str(cp + 1))));
     case 'h':
 	if (lp->limconst != RLIMIT_CPU)
 	    goto badscal;
@@ -1881,7 +1881,7 @@ badscal:
 	stderror(ERR_NAME | ERR_SCALEF);
     }
 # ifdef convex
-    return restrict_limit((f + 0.5));
+    return f == 0.0 ? 0 : restrict_limit((f + 0.5));
 # else
     f += 0.5;
     if (f > (float) RLIM_INFINITY)

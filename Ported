@@ -242,15 +242,15 @@ VERSION	:	6.03.09
 
 VENDOR	:	next
 MODELS	:	any
-COMPILER:	cc
-CFLAGS	:	normal
-LIBES	:	-ltermcap -lcs
-OS	:	next os 2.x
+COMPILER:	gcc or cc -arch m68k -arch i386
+CFLAGS	:	-O2 -g
+LIBES	:	-ltermcap # [-lcs 2.0]
+OS	:	next os 2.x, 3.x
 CONFIG	:	mach
 ENVIRON	:	n/a
 NOTES	:	n/a
-VERSION	:	6.01.00
-
+VERSION	:	6.04.00
+  
 VENDOR	:	Heurikon
 MODELS	:	HK68
 COMPILER:	gcc (Green Hills C-68000)

@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.61 1994/01/31 16:04:49 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/tw.parse.c,v 3.62 1994/03/13 00:46:35 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -39,7 +39,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.61 1994/01/31 16:04:49 christos Exp christos $")
+RCSID("$Id: tw.parse.c,v 3.62 1994/03/13 00:46:35 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -55,15 +55,13 @@ RCSID("$Id: tw.parse.c,v 3.61 1994/01/31 16:04:49 christos Exp christos $")
 /*  TW_FILE,	       TW_DIRECTORY,   TW_VARLIST,     TW_USER,		*/
 /*  TW_COMPLETION,     TW_ALIAS,       TW_SHELLVAR,    TW_ENVVAR,	*/
 /*  TW_BINDING,        TW_WORDLIST,    TW_LIMIT,       TW_SIGNAL	*/
-/*  TW_JOB,	       TW_EXPLAIN,     TW_PATHNAME,    TW_TEXT		*/
-/*  TW_GRPNAME								*/
+/*  TW_JOB,	       TW_EXPLAIN,     TW_TEXT,	       TW_GRPNAME	*/
 static void (*tw_start_entry[]) __P((DIR *, Char *)) = {
     tw_file_start,     tw_cmd_start,   tw_var_start,   tw_logname_start, 
     tw_file_start,     tw_file_start,  tw_vl_start,    tw_logname_start, 
     tw_complete_start, tw_alias_start, tw_var_start,   tw_var_start,     
     tw_bind_start,     tw_wl_start,    tw_limit_start, tw_sig_start,
-    tw_job_start,      tw_file_start,  tw_file_start,  tw_file_start,
-    tw_grpname_start
+    tw_job_start,      tw_file_start,  tw_file_start,  tw_grpname_start
 };
 
 static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
@@ -71,8 +69,7 @@ static Char * (*tw_next_entry[]) __P((Char *, int *)) = {
     tw_file_next,      tw_file_next,   tw_var_next,    tw_logname_next,  
     tw_var_next,       tw_var_next,    tw_shvar_next,  tw_envvar_next,   
     tw_bind_next,      tw_wl_next,     tw_limit_next,  tw_sig_next,
-    tw_job_next,       tw_file_next,   tw_file_next,   tw_file_next,
-    tw_grpname_next
+    tw_job_next,       tw_file_next,   tw_file_next,   tw_grpname_next
 };
 
 static void (*tw_end_entry[]) __P((void)) = {
@@ -80,8 +77,7 @@ static void (*tw_end_entry[]) __P((void)) = {
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_logname_end, 
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
     tw_dir_end,        tw_dir_end,     tw_dir_end,    tw_dir_end,
-    tw_dir_end,	       tw_dir_end,     tw_dir_end,    tw_dir_end,
-    tw_grpname_end
+    tw_dir_end,	       tw_dir_end,     tw_dir_end,    tw_grpname_end
 };
 
 /* #define TDEBUG */
@@ -1322,13 +1318,21 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
     non_unique_match = FALSE;	/* See the recexact code below */
 
     extract_dir_and_name(word, dir, name);
-    exp_dir[0] = '\0';
 
     /*
      * Try to figure out what we should be looking for
      */
+    if (looking & TW_PATH) {
+	gpat = 0;	/* pattern holds the pathname to be used */
+	copyn(exp_dir, pat, MAXNAMLEN);
+	if (exp_dir[Strlen(exp_dir) - 1] != '/')
+	    catn(exp_dir, STRslash, MAXNAMLEN);
+	catn(exp_dir, dir, MAXNAMLEN);
+    }
+    else
+	exp_dir[0] = '\0';
 
-    switch (looking) {
+    switch (looking & ~TW_PATH) {
     case TW_NONE:
 	return -1;
 
@@ -1337,7 +1341,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 	break;
 
     case TW_COMMAND:
-	if (Strchr(word, '/')) {
+	if (Strchr(word, '/') || (looking & TW_PATH)) {
 	    looking = TW_FILE;
 	    flags |= TW_EXEC_CHK;
 	    flags |= TW_DIR_OK;
@@ -1348,12 +1352,7 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 	    return (-1);
 #endif
 	break;
-    case TW_PATHNAME:
-	gpat = 0;	/* pattern holds the pathname to be used */
-	copyn(exp_dir, pat, MAXNAMLEN);
-	catn(exp_dir, dir, MAXNAMLEN);
-	/* dir[0] = '\0'; */
-	break;
+
 
     case TW_VARLIST:
     case TW_WORDLIST:
@@ -1458,12 +1457,40 @@ t_search(word, wp, command, max_word_length, looking, list_max, pat, suf)
 	if ((nd = expand_dir(dir, exp_dir, &dir_fd, command)) != 0)
 	    return nd;
 	break;
-    case TW_PATHNAME:
+
+    case TW_PATH | TW_TEXT:
+    case TW_PATH | TW_FILE:
+    case TW_PATH | TW_DIRECTORY:
+    case TW_PATH | TW_COMMAND:
 	if ((dir_fd = opendir(short2str(exp_dir))) == NULL) {
 	    xprintf("%S: %s\n", exp_dir, strerror(errno));
 	    return -1;
 	}
-	looking = TW_FILE;
+	if (exp_dir[Strlen(exp_dir) - 1] != '/')
+	    catn(exp_dir, STRslash, MAXNAMLEN);
+
+	looking &= ~TW_PATH;
+
+	switch (looking) {
+	case TW_TEXT:
+	    flags |= TW_TEXT_CHK;
+	    break;
+
+	case TW_FILE:
+	    break;
+
+	case TW_DIRECTORY:
+	    flags |= TW_DIR_CHK;
+	    break;
+
+	case TW_COMMAND:
+	    copyn(target, word, MAXNAMLEN);	/* so it can match things */
+	    break;
+
+	default:
+	    abort();	/* Cannot happen */
+	    break;
+	}
 	break;
 
     case TW_LOGNAME:

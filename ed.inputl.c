@@ -1,4 +1,4 @@
-/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.inputl.c,v 3.36 1993/08/11 16:25:52 christos Exp christos $ */
+/* $Header: /u/christos/src/tcsh-6.04/RCS/ed.inputl.c,v 3.37 1994/01/31 16:04:49 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -36,7 +36,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.36 1993/08/11 16:25:52 christos Exp christos $")
+RCSID("$Id: ed.inputl.c,v 3.37 1994/01/31 16:04:49 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -52,7 +52,7 @@ extern bool Tty_raw_mode;
 
 /* mismatched first character */
 static Char mismatch[] = 
-    {'!', '\\', '^', '-', '%', '\0', '"', '\'', '`', '\0' };
+    {'!', '^' , '\\', '-', '%', '\0', '"', '\'', '`', '\0' };
 
 static	int	GetNextCommand	__P((KEYCMD *, Char *));
 static	int	SpellLine	__P((int));
@@ -786,6 +786,9 @@ SpellLine(cmdonly)
 		Cursor--;
 	    endflag = 0;
 	}
+	/* Obey current history character settings */
+	mismatch[0] = HIST;
+	mismatch[1] = HISTSUB;
 	if (!Strchr(mismatch, *argptr) &&
 	    (!cmdonly || starting_a_command(argptr, InputBuf))) {
 	    switch (tenematch(InputBuf, Cursor - InputBuf, SPELL)) {

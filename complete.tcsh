@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.20 1993/06/07 22:21:41 christos Exp $
+# $Id: complete.tcsh,v 1.21 1993/07/03 23:47:53 christos Exp $
 # example file using the new completion code
 #
 
@@ -170,7 +170,7 @@ if ($?complete) then
 		p/2/f:*.a/ p/*/f:*.o/
 
     complete {refile,sprev,snext,scan,pick,rmm,inc,folder,show} \
-		c@+@p:$HOME/Mail/@
+		c@+@F:$HOME/Mail/@
 
     # More completions from waz@quahog.nl.nuwc.navy.mil (Tom Warzeka)
     # this one works but is slow and doesn't descend into subdirectories
@@ -189,13 +189,13 @@ if ($?complete) then
     complete emacs	c/-/"(batch d f funcall i insert kill l load \
 			no-init-file q t u user)"/ c/+/x:'<line_number>'/ \
 			n/-d/x:'<display>'/ n/-f/x:'<lisp_function>'/ n/-i/f/ \
-			n@-l@p:/usr/local/emacs/lisp@ n/-t/x:'<terminal>'/ \
+			n@-l@F:/usr/local/emacs/lisp@ n/-t/x:'<terminal>'/ \
 			n/-u/u/ n/*/f:^*[\#~]/
 
     # if you're running SysV, change "/var/spool" to "/usr"
     complete mail       c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
-			c@+@p:$HOME/Mail@ C@[./]@f@ n/-s/x:'<subject>'/ \
-			n@-u@p:/var/spool/mail@ n/-f/f/ n/*/u/
+			c@+@F:$HOME/Mail@ C@[./]@f@ n/-s/x:'<subject>'/ \
+			n@-u@F:/var/spool/mail@ n/-f/f/ n/*/u/
 
     complete man	    n@1@'`\ls -1 /usr/man/man1 | sed s%\\.1.\*\$%%`'@ \
 			    n@2@'`\ls -1 /usr/man/man2 | sed s%\\.2.\*\$%%`'@ \
