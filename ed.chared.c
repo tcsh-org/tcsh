@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.66 2001/03/05 02:09:44 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.67 2001/05/20 20:56:22 kim Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -76,7 +76,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.66 2001/03/05 02:09:44 kim Exp $")
+RCSID("$Id: ed.chared.c,v 3.67 2001/05/20 20:56:22 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2728,20 +2728,18 @@ CCRETVAL
 e_killregion(c)
     int c;
 {
-    register Char *cp;
-
     USE(c);
     if (!Mark)
 	return(CC_ERROR);
 
     if (Mark > Cursor) {
 	c_push_kill(Cursor, Mark); /* copy it */
-	c_delafter((int)(cp - Cursor));	/* delete it - UNUSED BY VI mode */
+	c_delafter((int)(Mark - Cursor)); /* delete it - UNUSED BY VI mode */
 	Mark = Cursor;
     }
     else {			/* mark is before cursor */
 	c_push_kill(Mark, Cursor); /* copy it */
-	c_delbefore((int)(cp - Mark));
+	c_delbefore((int)(Cursor - Mark));
 	Cursor = Mark;
     }
     return(CC_REFRESH);
