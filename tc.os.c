@@ -1,4 +1,4 @@
-/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.3 1991/07/17 13:17:16 christos Exp christos $ */
+/* $Header: /home/hyperion/mu/christos/src/sys/tcsh-6.00/RCS/tc.os.c,v 3.4 1991/07/18 00:23:46 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -35,7 +35,7 @@
  * SUCH DAMAGE.
  */
 #include "config.h"
-RCSID("$Id: tc.os.c,v 3.3 1991/07/17 13:17:16 christos Exp christos $")
+RCSID("$Id: tc.os.c,v 3.4 1991/07/18 00:23:46 christos Exp $")
 
 #include "sh.h"
 #include "tw.h"
@@ -695,11 +695,12 @@ osinit()
 #endif /* OREO */
 
 #ifdef aiws
-    struct sigstack inst;
-
-    inst.ss_sp = xmalloc(4192) + 4192;
-    inst.ss_onstack = 0;
-    sigstack(&inst, NULL);
+    {
+	struct sigstack inst;
+	inst.ss_sp = xmalloc(4192) + 4192;
+	inst.ss_onstack = 0;
+	sigstack(&inst, NULL);
+    }
 #endif /* aiws */
 
 #ifdef hpux
