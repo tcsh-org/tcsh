@@ -120,6 +120,10 @@
 /* have been moved to config_f.h */
 #include "config_f.h"
 
+#if defined(__FreeBSD__)
+#define NLS_BUGS
+#endif
+
 #if defined(__bsdi__)
 /*
  * _PATH_TCSHELL      if you've change the installation location (vix)
