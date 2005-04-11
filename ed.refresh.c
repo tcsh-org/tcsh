@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.38 2005/01/18 20:43:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.39 2005/02/15 21:09:02 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.38 2005/01/18 20:43:30 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.39 2005/02/15 21:09:02 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -45,30 +45,28 @@ Char   *litptr;
 static int vcursor_h, vcursor_v;
 static int rprompt_h, rprompt_v;
 
-static	int	MakeLiteral		__P((Char *, int, Char));
-static	int	Draw 			__P((Char *, int));
-static	void	Vdraw 			__P((Char, int));
-static	void	RefreshPromptpart	__P((Char *));
-static	void	update_line 		__P((Char *, Char *, int));
-static	void	str_insert		__P((Char *, int, int, Char *, int));
-static	void	str_delete		__P((Char *, int, int, int));
-static	void	str_cp			__P((Char *, Char *, int));
+static	int	MakeLiteral		(Char *, int, Char);
+static	int	Draw 			(Char *, int);
+static	void	Vdraw 			(Char, int);
+static	void	RefreshPromptpart	(Char *);
+static	void	update_line 		(Char *, Char *, int);
+static	void	str_insert		(Char *, int, int, Char *, int);
+static	void	str_delete		(Char *, int, int, int);
+static	void	str_cp			(Char *, Char *, int);
 #ifndef WINNT_NATIVE
 static
 #else
 extern
 #endif
-	void    PutPlusOne      __P((Char, int));
-static	void	cpy_pad_spaces		__P((Char *, Char *, int));
+	void    PutPlusOne      (Char, int);
+static	void	cpy_pad_spaces		(Char *, Char *, int);
 #if defined(DEBUG_UPDATE) || defined(DEBUG_REFRESH) || defined(DEBUG_LITERAL)
-static	void	dprintf			__P((char *, ...));
+static	void	dprintf			(char *, ...);
 #ifdef DEBUG_UPDATE
-static	void	dprintstr		__P((char *, const Char *, const Char *));
+static	void	dprintstr		(char *, const Char *, const Char *);
 
 static void
-dprintstr(str, f, t)
-char *str;
-const Char *f, *t;
+dprintstr(char *str, const Char *f, const Char *t)
 {
     dprintf("%s:\"", str);
     while (f < t) {
@@ -87,12 +85,7 @@ const Char *f, *t;
  *	debugging cause you'll mangle up the file descriptors!
  */
 static void
-#ifdef PROTOTYPES
 dprintf(char *fmt, ...)
-#else
-dprintf(va_list)
-    va_dcl
-#endif /* __STDC__ */
 {
     static int fd = -1;
     char *dtty;
@@ -100,13 +93,7 @@ dprintf(va_list)
     if ((dtty = getenv("DEBUGTTY"))) {
 	int o;
 	va_list va;
-#ifdef PROTOTYPES
 	va_start(va, fmt);
-#else
-	char *fmt;
-	va_start(va);
-	fmt = va_arg(va, char *);
-#endif /* __STDC__ */
 
 	if (fd == -1)
 	    fd = open(dtty, O_RDWR);
@@ -123,10 +110,7 @@ dprintf(va_list)
 
 static int litlen = 0, litalloc = 0;
 
-static int MakeLiteral(str, len, addlit)
-    Char *str;
-    int len;
-    Char addlit;
+static int MakeLiteral(Char *str, int len, Char addlit)
 {
     int i, addlitlen = 0;
     Char *addlitptr = 0;
@@ -179,9 +163,7 @@ static int MakeLiteral(str, len, addlit)
 }
 
 static int
-Draw(cp, nocomb)	/* draw char at cp, expand tabs, ctl chars */
-    Char *cp;
-    int nocomb;
+Draw(Char *cp, int nocomb)	/* draw char at cp, expand tabs, ctl chars */
 {
     int l, w, i, lv, lh;
     Char ch, attr;
@@ -268,9 +250,7 @@ Draw(cp, nocomb)	/* draw char at cp, expand tabs, ctl chars */
 }
 
 static void
-Vdraw(c, width)			/* draw char c onto V lines */
-    Char c;
-    int width;
+Vdraw(Char c, int width)	/* draw char c onto V lines */
 {
 #ifdef DEBUG_REFRESH
 # ifdef SHORT_STRINGS
@@ -308,8 +288,7 @@ Vdraw(c, width)			/* draw char c onto V lines */
  *	draws a prompt element, expanding literals (we know it's ASCIZ)
  */
 static void
-RefreshPromptpart(buf)
-    Char *buf;
+RefreshPromptpart(Char *buf)
 {
     Char *cp;
     NLSChar c;
@@ -352,7 +331,7 @@ static
 int OldvcV = 0;
 
 void
-Refresh()
+Refresh(void)
 {
     int cur_line;
     Char *cp;
@@ -463,7 +442,7 @@ Refresh()
 }
 
 #ifdef notdef
-GotoBottom()
+GotoBottom(void)
 {				/* used to go to last used screen line */
     MoveToLine(OldvcV);
 }
@@ -471,7 +450,7 @@ GotoBottom()
 #endif 
 
 void
-PastBottom()
+PastBottom(void)
 {				/* used to go to last used screen line */
     MoveToLine(OldvcV);
     (void) putraw('\r');
@@ -484,11 +463,7 @@ PastBottom()
 /* insert num characters of s into d (in front of the character) at dat,
    maximum length of d is dlen */
 static void
-str_insert(d, dat, dlen, s, num)
-    Char *d;
-    int dat, dlen;
-    Char *s;
-    int num;
+str_insert(Char *d, int dat, int dlen, Char *s, int num)
 {
     Char *a, *b;
 
@@ -530,9 +505,7 @@ str_insert(d, dat, dlen, s, num)
 
 /* delete num characters d at dat, maximum length of d is dlen */
 static void
-str_delete(d, dat, dlen, num)
-    Char *d;
-    int dat, dlen, num;
+str_delete(Char *d, int dat, int dlen, int num)
 {
     Char *a, *b;
 
@@ -563,9 +536,7 @@ str_delete(d, dat, dlen, num)
 }
 
 static void
-str_cp(a, b, n)
-    Char *a, *b;
-    int n;
+str_cp(Char *a, Char *b, int n)
 {
     while (n-- && *b)
 	*a++ = *b++;
@@ -597,9 +568,7 @@ new:	eddie> Oh, my little buggy says to me, as lurgid as
 #define MIN_END_KEEP	4
 
 static void			/* could be changed to make it smarter */
-update_line(old, new, cur_line)
-    Char *old, *new;
-    int     cur_line;
+update_line(Char *old, Char *new, int cur_line)
 {
     Char *o, *n, *p, c;
     Char  *ofd, *ols, *oe, *nfd, *nls, *ne;
@@ -1133,9 +1102,7 @@ update_line(old, new, cur_line)
 
 
 static void
-cpy_pad_spaces(dst, src, width)
-    Char *dst, *src;
-    int width;
+cpy_pad_spaces(Char *dst, Char *src, int width)
 {
     int i;
 
@@ -1153,7 +1120,7 @@ cpy_pad_spaces(dst, src, width)
 }
 
 void
-RefCursor()
+RefCursor(void)
 {				/* only move to new cursor pos */
     Char *cp;
     NLSChar c;
@@ -1242,9 +1209,7 @@ RefCursor()
 
 #ifndef WINTT_NATIVE
 static void
-PutPlusOne(c, width)
-    Char   c;
-    int    width;
+PutPlusOne(Char c, int width)
 {
     while (width > 1 && CursorH + width > TermH)
 	PutPlusOne(' ', 1);
@@ -1331,7 +1296,7 @@ RefPlusOne(int l)
 /* clear the screen buffers so that new new prompt starts fresh. */
 
 void
-ClearDisp()
+ClearDisp(void)
 {
     int i;
 
@@ -1344,7 +1309,7 @@ ClearDisp()
 }
 
 void
-ClearLines()
+ClearLines(void)
 {				/* Make sure all lines are *really* blank */
     int i;
 

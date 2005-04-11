@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.comp.c,v 1.36 2004/11/20 17:25:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.comp.c,v 1.37 2004/11/23 02:10:50 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.36 2004/11/20 17:25:07 christos Exp $")
+RCSID("$Id: tw.comp.c,v 1.37 2004/11/23 02:10:50 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -41,24 +41,22 @@ RCSID("$Id: tw.comp.c,v 1.36 2004/11/20 17:25:07 christos Exp $")
 /* #define TDEBUG */
 struct varent completions;
 
-static int 	 	  tw_result	__P((Char *, Char **));
-static Char		**tw_find	__P((Char *, struct varent *, int));
-static Char 		 *tw_tok	__P((Char *));
-static int	 	  tw_pos	__P((Char *, int));
-static void	  	  tw_pr		__P((Char **));
-static int	  	  tw_match	__P((Char *, Char *));
-static void	 	  tw_prlist	__P((struct varent *));
-static Char  		 *tw_dollar	__P((Char *,Char **, int, Char *, 
-					     Char, const char *));
+static int 	 	  tw_result	(Char *, Char **);
+static Char		**tw_find	(Char *, struct varent *, int);
+static Char 		 *tw_tok	(Char *);
+static int	 	  tw_pos	(Char *, int);
+static void	  	  tw_pr		(Char **);
+static int	  	  tw_match	(Char *, Char *);
+static void	 	  tw_prlist	(struct varent *);
+static Char  		 *tw_dollar	(Char *,Char **, int, Char *,
+					 Char, const char *);
 
 /* docomplete():
  *	Add or list completions in the completion list
  */
 /*ARGSUSED*/
 void
-docomplete(v, t)
-    Char **v;
-    struct command *t;
+docomplete(Char **v, struct command *t)
 {
     struct varent *vp;
     Char *p;
@@ -93,9 +91,7 @@ docomplete(v, t)
  */
 /*ARGSUSED*/
 void
-douncomplete(v, t)
-    Char **v;
-    struct command *t;
+douncomplete(Char **v, struct command *t)
 {
     USE(t);
     unset1(v, &completions);
@@ -106,8 +102,7 @@ douncomplete(v, t)
  *	Pretty print a list of variables
  */
 static void
-tw_prlist(p)
-    struct varent *p;
+tw_prlist(struct varent *p)
 {
     struct varent *c;
 
@@ -146,8 +141,7 @@ x:
  *	a completion argument and collapsing multiple spaces to one.
  */
 static void
-tw_pr(cmp)
-    Char **cmp;
+tw_pr(Char **cmp)
 {
     int sp, osp;
     Char *ptr;
@@ -173,10 +167,7 @@ tw_pr(cmp)
  *	For commands we only look at names that start with -
  */
 static Char **
-tw_find(nam, vp, cmd)
-    Char   *nam;
-    struct varent *vp;
-    int cmd;
+tw_find(Char *nam, struct varent *vp, int cmd)
 {
     Char **rv;
 
@@ -201,9 +192,7 @@ tw_find(nam, vp, cmd)
  *	Return true if the position is within the specified range
  */
 static int
-tw_pos(ran, wno)
-    Char *ran;
-    int	  wno;
+tw_pos(Char *ran, int wno)
 {
     Char *p;
 
@@ -232,8 +221,7 @@ tw_pos(ran, wno)
  *	Return the next word from string, unquoteing it.
  */
 static Char *
-tw_tok(str)
-    Char *str;
+tw_tok(Char *str)
 {
     static Char *bf = NULL;
 
@@ -262,8 +250,7 @@ tw_tok(str)
  *	in a prefix of the string.
  */
 static int
-tw_match(str, pat)
-    Char *str, *pat;
+tw_match(Char *str, Char *pat)
 {
     Char *estr;
     int rv = Gnmatch(str, pat, &estr);
@@ -281,8 +268,7 @@ tw_match(str, pat)
  *	string
  */
 static int
-tw_result(act, pat)
-    Char *act, **pat;
+tw_result(Char *act, Char **pat)
 {
     int looking;
     static Char* res = NULL;
@@ -418,12 +404,8 @@ tw_result(act, pat)
  *	Expand $<n> args in buffer
  */
 static Char *
-tw_dollar(str, wl, nwl, buffer, sep, msg)
-    Char *str, **wl;
-    int nwl;
-    Char *buffer;
-    Char sep;
-    const char *msg;
+tw_dollar(Char *str, Char **wl, int nwl, Char *buffer, Char sep,
+	  const char *msg)
 {
     Char *sp, *bp = buffer, *ebp = &buffer[MAXPATHLEN];
 
@@ -471,9 +453,7 @@ tw_dollar(str, wl, nwl, buffer, sep, msg)
  *	N/<pattern>/<completion>/[<suffix>/]	next-next word
  */
 int
-tw_complete(line, word, pat, looking, suf)
-    Char *line, **word, **pat;
-    int looking, *suf;
+tw_complete(Char *line, Char **word, Char **pat, int looking, int *suf)
 {
     Char buf[MAXPATHLEN + 1], **vec, *ptr; 
     Char *wl[MAXPATHLEN/6];

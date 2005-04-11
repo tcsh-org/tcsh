@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.c,v 3.28 2004/08/04 17:12:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.c,v 3.29 2005/01/18 20:24:51 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.28 2004/08/04 17:12:31 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.29 2005/01/18 20:24:51 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -55,7 +55,7 @@ static int stk_ptr = -1;
 /* queue child signals
  */
 static RETSIGTYPE
-sig_ch_queue()
+sig_ch_queue(void)
 {
 #  ifdef JOBDEBUG
     xprintf("queue SIGCHLD\n");
@@ -70,7 +70,7 @@ sig_ch_queue()
 /* process all awaiting child signals
  */
 static RETSIGTYPE
-sig_ch_rel()
+sig_ch_rel(void)
 {
     while (stk_ptr > -1)
 	pchild(SIGCHLD);
@@ -83,9 +83,7 @@ sig_ch_rel()
 
 /* libc.a contains these functions in SYSVREL >= 3. */
 RETSIGTYPE
-(*xsigset(a, b)) ()
-    int     a;
-    signalfun_t  b;
+(*xsigset(int a, signalfun_t b)) ()
 {
     return (signal(a, b));
 }
@@ -95,8 +93,7 @@ RETSIGTYPE
  *	set the default signal handler
  */
 void
-sigrelse(what)
-    int     what;
+sigrelse(int what)
 {
     if (what == SIGCHLD)
 	sig_ch_rel();
@@ -110,8 +107,7 @@ sigrelse(what)
  * only works with child and interrupt
  */
 void
-xsighold(what)
-    int     what;
+xsighold(int what)
 {
     if (what == SIGCHLD)
 	(void) signal(SIGCHLD, sig_ch_queue);
@@ -124,8 +120,7 @@ xsighold(what)
 /* ignore signal
  */
 void
-xsigignore(a)
-    int     a;
+xsigignore(int a)
 {
     (void) signal(a, SIG_IGN);
 }
@@ -133,8 +128,7 @@ xsigignore(a)
 /* atomically release one signal
  */
 void
-xsigpause(what)
-    int     what;
+xsigpause(int what)
 {
     /* From: Jim Mattson <mattson%cs@ucsd.edu> */
     if (what == SIGCHLD)
@@ -145,8 +139,7 @@ xsigpause(what)
 /* return either awaiting processes or do a wait now
  */
 pid_t
-ourwait(w)
-    int    *w;
+ourwait(int *w)
 {
     pid_t pid;
 
@@ -176,9 +169,7 @@ ourwait(w)
 #  ifdef COHERENT
 #   undef signal
 RETSIGTYPE
-(*xsignal(a, b)) ()
-    int     a;
-    signalfun_t  b;
+(*xsignal(int a, signalfun_t b)) ()
 {
     if (a == SIGCHLD)
 	return SIG_DFL;
@@ -196,7 +187,7 @@ RETSIGTYPE
  */
 /* This is not need if you make tcsh by BSD option's cc. */
 void
-sigpause(what)
+sigpause(int what)
 {
     if (what == SIGCHLD) {
 	(void) bsd_sigpause(bsd_sigblock((sigmask_t) 0) & ~sigmask(SIGBSDCHLD));
@@ -216,9 +207,7 @@ sigpause(what)
 #ifdef NEEDsignal
 /* turn into bsd signals */
 RETSIGTYPE
-(*xsignal(s, a)) ()
-    int     s;
-    signalfun_t a;
+(*xsignal(int s, singalfun_t a)) ()
 {
     sigvec_t osv, sv;
 
@@ -266,8 +255,7 @@ char   *show_sig_mask();
  * Set a new signal mask.  Return old mask.
  */
 sigmask_t
-sigsetmask(mask)
-    sigmask_t     mask;
+sigsetmask(sigmask_t mask)
 {
     sigset_t set, oset;
     int     m;
@@ -302,8 +290,7 @@ sigsetmask(mask)
  * Return old mask.
  */
 sigmask_t
-sigblock(mask)
-    sigmask_t     mask;
+sigblock(sigmask_t mask)
 {
     sigset_t set, oset;
     int     m;
@@ -342,8 +329,7 @@ sigblock(mask)
  * Old mask is restored on signal.
  */
 void
-bsd_sigpause(mask)
-    sigmask_t     mask;
+bsd_sigpause(sigmask_t mask)
 {
     sigset_t set;
     int i;
@@ -361,9 +347,7 @@ bsd_sigpause(mask)
  *
  * Emulate bsd style signal()
  */
-RETSIGTYPE (*bsd_signal(sig, func)) ()
-        int sig;
-        signalfun_t func;
+RETSIGTYPE (*bsd_signal(int sig, signalfun_t func)) ()
 {
         struct sigaction act, oact;
         sigset_t set;
@@ -398,8 +382,7 @@ RETSIGTYPE (*bsd_signal(sig, func)) ()
 static long Synch_Cnt = 0;
 
 RETSIGTYPE
-synch_handler(sno)
-int sno;
+synch_handler(int sno)
 {
     if (sno != SIGSYNCH)
 	abort();

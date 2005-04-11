@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.125 2005/03/04 15:42:17 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.126 2005/03/20 06:35:48 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.125 2005/03/04 15:42:17 kim Exp $")
+RCSID("$Id: sh.func.c,v 3.126 2005/03/20 06:35:48 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -60,20 +60,19 @@ extern int GotTermCaps;
 
 static int zlast = -1;
 
-static	void	islogin		__P((void));
-static	void	preread		__P((void));
-static	void	doagain		__P((void));
-static  const char *isrchx	__P((int));
-static	void	search		__P((int, int, Char *));
-static	int	getword		__P((Char *));
-static	void	toend		__P((void));
-static	void	xecho		__P((int, Char **));
-static	int	islocale_var	__P((Char *));
-static	void	wpfree		__P((struct whyle *));
+static	void	islogin		(void);
+static	void	preread		(void);
+static	void	doagain		(void);
+static  const char *isrchx	(int);
+static	void	search		(int, int, Char *);
+static	int	getword		(Char *);
+static	void	toend		(void);
+static	void	xecho		(int, Char **);
+static	int	islocale_var	(Char *);
+static	void	wpfree		(struct whyle *);
 
 struct biltins *
-isbfunc(t)
-    struct command *t;
+isbfunc(struct command *t)
 {
     Char *cp = t->t_dcom[0];
     struct biltins *bp, *bp1, *bp2;
@@ -136,9 +135,7 @@ isbfunc(t)
 }
 
 void
-func(t, bp)
-    struct command *t;
-    struct biltins *bp;
+func(struct command *t, struct biltins *bp)
 {
     int     i;
 
@@ -154,9 +151,7 @@ func(t, bp)
 
 /*ARGSUSED*/
 void
-doonintr(v, c)
-    Char  **v;
-    struct command *c;
+doonintr(Char **v, struct command *c)
 {
     Char *cp;
     Char *vv = v[1];
@@ -207,9 +202,7 @@ doonintr(v, c)
 
 /*ARGSUSED*/
 void
-donohup(v, c)
-    Char **v;
-    struct command *c;
+donohup(Char **v, struct command *c)
 {
     USE(c);
     USE(v);
@@ -225,9 +218,7 @@ donohup(v, c)
 
 /*ARGSUSED*/
 void
-dohup(v, c)
-    Char **v;
-    struct command *c;
+dohup(Char **v, struct command *c)
 {
     USE(c);
     USE(v);
@@ -240,9 +231,7 @@ dohup(v, c)
 
 /*ARGSUSED*/
 void
-dozip(v, c)
-    Char **v;
-    struct command *c;
+dozip(Char **v, struct command *c)
 {
     USE(c);
     USE(v);
@@ -250,9 +239,7 @@ dozip(v, c)
 
 /*ARGSUSED*/
 void
-dofiletest(v, c)
-    Char **v;
-    struct command *c;
+dofiletest(Char **v, struct command *c)
 {
     Char **fileptr, *ftest, *res;
 
@@ -287,16 +274,14 @@ dofiletest(v, c)
 }
 
 void
-prvars()
+prvars(void)
 {
     plist(&shvhed, VAR_ALL);
 }
 
 /*ARGSUSED*/
 void
-doalias(v, c)
-    Char **v;
-    struct command *c;
+doalias(Char **v, struct command *c)
 {
     struct varent *vp;
     Char *p;
@@ -323,9 +308,7 @@ doalias(v, c)
 
 /*ARGSUSED*/
 void
-unalias(v, c)
-    Char  **v;
-    struct command *c;
+unalias(Char **v, struct command *c)
 {
     USE(c);
     unset1(v, &aliases);
@@ -334,9 +317,7 @@ unalias(v, c)
 
 /*ARGSUSED*/
 void
-dologout(v, c)
-    Char **v;
-    struct command *c;
+dologout(Char **v, struct command *c)
 {
     USE(c);
     USE(v);
@@ -346,9 +327,7 @@ dologout(v, c)
 
 /*ARGSUSED*/
 void
-dologin(v, c)
-    Char  **v;
-    struct command *c;
+dologin(Char **v, struct command *c)
 {
 #ifdef WINNT_NATIVE
     USE(c);
@@ -371,7 +350,7 @@ dologin(v, c)
 #ifdef NEWGRP
 /*ARGSUSED*/
 void
-donewgrp(v, c)
+donewgrp(Char **v, struct command *c)
     Char  **v;
     struct command *c;
 {
@@ -393,7 +372,7 @@ donewgrp(v, c)
 #endif /* NEWGRP */
 
 static void
-islogin()
+islogin(void)
 {
     if (chkstop == 0 && setintr)
 	panystop(0);
@@ -403,9 +382,7 @@ islogin()
 }
 
 void
-doif(v, kp)
-    Char  **v;
-    struct command *kp;
+doif(Char **v, struct command *kp)
 {
     int i;
     Char **vv;
@@ -443,8 +420,7 @@ doif(v, kp)
  * to redo i/o redirection, which is already set up.
  */
 void
-reexecute(kp)
-    struct command *kp;
+reexecute(struct command *kp)
 {
     kp->t_dflg &= F_SAVE;
     kp->t_dflg |= F_REPEAT;
@@ -458,9 +434,7 @@ reexecute(kp)
 
 /*ARGSUSED*/
 void
-doelse (v, c)
-    Char **v;
-    struct command *c;
+doelse (Char **v, struct command *c)
 {
     USE(c);
     USE(v);
@@ -469,9 +443,7 @@ doelse (v, c)
 
 /*ARGSUSED*/
 void
-dogoto(v, c)
-    Char  **v;
-    struct command *c;
+dogoto(Char **v, struct command *c)
 {
     Char   *lp;
 
@@ -481,8 +453,7 @@ dogoto(v, c)
 }
 
 void
-gotolab(lab)
-    Char *lab;
+gotolab(Char *lab)
 {
     struct whyle *wp;
     /*
@@ -507,9 +478,7 @@ gotolab(lab)
 
 /*ARGSUSED*/
 void
-doswitch(v, c)
-    Char **v;
-    struct command *c;
+doswitch(Char **v, struct command *c)
 {
     Char *cp, *lp;
 
@@ -528,9 +497,7 @@ doswitch(v, c)
 
 /*ARGSUSED*/
 void
-dobreak(v, c)
-    Char **v;
-    struct command *c;
+dobreak(Char **v, struct command *c)
 {
     USE(v);
     USE(c);
@@ -542,9 +509,7 @@ dobreak(v, c)
 
 /*ARGSUSED*/
 void
-doexit(v, c)
-    Char  **v;
-    struct command *c;
+doexit(Char **v, struct command *c)
 {
     USE(c);
 
@@ -569,9 +534,7 @@ doexit(v, c)
 
 /*ARGSUSED*/
 void
-doforeach(v, c)
-    Char **v;
-    struct command *c;
+doforeach(Char **v, struct command *c)
 {
     Char *cp, *sp;
     struct whyle *nwp;
@@ -620,9 +583,7 @@ doforeach(v, c)
 
 /*ARGSUSED*/
 void
-dowhile(v, c)
-    Char  **v;
-    struct command *c;
+dowhile(Char **v, struct command *c)
 {
     int status;
     int again = whyles != 0 && 
@@ -666,7 +627,7 @@ dowhile(v, c)
 }
 
 static void
-preread()
+preread(void)
 {
     whyles->w_end.type = TCSH_I_SEEK;
     if (setintr)
@@ -687,9 +648,7 @@ preread()
 
 /*ARGSUSED*/
 void
-doend(v, c)
-    Char **v;
-    struct command *c;
+doend(Char **v, struct command *c)
 {
     USE(v);
     USE(c);
@@ -701,9 +660,7 @@ doend(v, c)
 
 /*ARGSUSED*/
 void
-docontin(v, c)
-    Char **v;
-    struct command *c;
+docontin(Char **v, struct command *c)
 {
     USE(v);
     USE(c);
@@ -713,7 +670,7 @@ docontin(v, c)
 }
 
 static void
-doagain()
+doagain(void)
 {
     /* Repeating a while is simple */
     if (whyles->w_fename == 0) {
@@ -734,9 +691,7 @@ doagain()
 }
 
 void
-dorepeat(v, kp)
-    Char  **v;
-    struct command *kp;
+dorepeat(Char **v, struct command *kp)
 {
     int i = 1;
 
@@ -776,9 +731,7 @@ dorepeat(v, kp)
 
 /*ARGSUSED*/
 void
-doswbrk(v, c)
-    Char **v;
-    struct command *c;
+doswbrk(Char **v, struct command *c)
 {
     USE(v);
     USE(c);
@@ -786,8 +739,7 @@ doswbrk(v, c)
 }
 
 int
-srchx(cp)
-    Char *cp;
+srchx(Char *cp)
 {
     struct srch *sp, *sp1, *sp2;
     int i;
@@ -816,8 +768,7 @@ srchx(cp)
 }
 
 static const char *
-isrchx(n)
-    int n;
+isrchx(int n)
 {
     struct srch *sp, *sp2;
 
@@ -832,10 +783,7 @@ static Char Stype;
 static Char *Sgoal;
 
 static void
-search(type, level, goal)
-    int     type;
-    int level;
-    Char   *goal;
+search(int type, int level, Char *goal)
 {
     Char    wordbuf[BUFSIZE];
     Char *aword = wordbuf;
@@ -947,8 +895,7 @@ search(type, level, goal)
 }
 
 static int
-getword(wp)
-    Char *wp;
+getword(Char *wp)
 {
     int found = 0, first;
     eChar c, d;
@@ -1040,7 +987,7 @@ past:
 }
 
 static void
-toend()
+toend(void)
 {
     if (whyles->w_end.type == TCSH_F_SEEK && whyles->w_end.f_seek == 0) {
 	search(TC_BREAK, 0, NULL);
@@ -1054,8 +1001,7 @@ toend()
 }
 
 static void
-wpfree(wp)
-    struct whyle *wp;
+wpfree(struct whyle *wp)
 {
 	if (wp->w_fe0)
 	    blkfree(wp->w_fe0);
@@ -1065,7 +1011,7 @@ wpfree(wp)
 }
 
 void
-wfree()
+wfree(void)
 {
     struct Ain    o;
     struct whyle *nwp;
@@ -1119,9 +1065,7 @@ wfree()
 
 /*ARGSUSED*/
 void
-doecho(v, c)
-    Char  **v;
-    struct command *c;
+doecho(Char **v, struct command *c)
 {
     USE(c);
     xecho(' ', v);
@@ -1129,9 +1073,7 @@ doecho(v, c)
 
 /*ARGSUSED*/
 void
-doglob(v, c)
-    Char  **v;
-    struct command *c;
+doglob(Char **v, struct command *c)
 {
     USE(c);
     xecho(0, v);
@@ -1139,9 +1081,7 @@ doglob(v, c)
 }
 
 static void
-xecho(sep, v)
-    int    sep;
-    Char **v;
+xecho(int sep, Char **v)
 {
     Char *cp;
     int     nonl = 0;
@@ -1272,8 +1212,7 @@ done:
 
 /* check whether an environment variable should invoke 'set_locale()' */
 static int
-islocale_var(var)
-    Char *var;
+islocale_var(Char *var)
 {
     static Char *locale_vars[] = {
 	STRLANG,	STRLC_ALL, 	STRLC_CTYPE,	STRLC_NUMERIC,
@@ -1289,9 +1228,7 @@ islocale_var(var)
 
 /*ARGSUSED*/
 void
-doprintenv(v, c)
-    Char **v;
-    struct command *c;
+doprintenv(Char **v, struct command *c)
 {
     Char   *e;
 
@@ -1326,9 +1263,7 @@ doprintenv(v, c)
 
 /*ARGSUSED*/
 void
-dosetenv(v, c)
-    Char **v;
-    struct command *c;
+dosetenv(Char **v, struct command *c)
 {
     Char   *vp, *lp;
 
@@ -1514,9 +1449,7 @@ dosetenv(v, c)
 
 /*ARGSUSED*/
 void
-dounsetenv(v, c)
-    Char **v;
-    struct command *c;
+dounsetenv(Char **v, struct command *c)
 {
     Char  **ep, *p, *n;
     int     i, maxi;
@@ -1631,8 +1564,7 @@ dounsetenv(v, c)
 }
 
 void
-tsetenv(name, val)
-    const Char *name, *val;
+tsetenv(const Char *name, const Char *val)
 {
 #ifdef SETENV_IN_LIB
 /*
@@ -1689,8 +1621,7 @@ tsetenv(name, val)
 }
 
 void
-Unsetenv(name)
-    Char   *name;
+Unsetenv(Char *name)
 {
     Char **ep = STR_environ;
     Char *cp, *dp;
@@ -1718,9 +1649,7 @@ Unsetenv(name)
 
 /*ARGSUSED*/
 void
-doumask(v, c)
-    Char **v;
-    struct command *c;
+doumask(Char **v, struct command *c)
 {
     Char *cp = v[1];
     int i;
@@ -1890,16 +1819,15 @@ struct limits limits[] =
     { -1, 		NULL, 		0, 	NULL		}
 };
 
-static struct limits *findlim	__P((Char *));
-static RLIM_TYPE getval		__P((struct limits *, Char **));
-static void limtail		__P((Char *, const char *));
-static void plim		__P((struct limits *, int));
-static int setlim		__P((struct limits *, int, RLIM_TYPE));
+static struct limits *findlim	(Char *);
+static RLIM_TYPE getval		(struct limits *, Char **);
+static void limtail		(Char *, const char *);
+static void plim		(struct limits *, int);
+static int setlim		(struct limits *, int, RLIM_TYPE);
 
 #ifdef convex
 static  RLIM_TYPE
-restrict_limit(value)
-    double  value;
+restrict_limit(double value)
 {
     /*
      * is f too large to cope with? return the maximum or minimum int
@@ -1917,8 +1845,7 @@ restrict_limit(value)
 
 
 static struct limits *
-findlim(cp)
-    Char   *cp;
+findlim(Char *cp)
 {
     struct limits *lp, *res;
 
@@ -1938,9 +1865,7 @@ findlim(cp)
 
 /*ARGSUSED*/
 void
-dolimit(v, c)
-    Char **v;
-    struct command *c;
+dolimit(Char **v, struct command *c)
 {
     struct limits *lp;
     RLIM_TYPE limit;
@@ -1968,9 +1893,7 @@ dolimit(v, c)
 }
 
 static  RLIM_TYPE
-getval(lp, v)
-    struct limits *lp;
-    Char  **v;
+getval(struct limits *lp, Char **v)
 {
     float f;
     Char   *cp = *v++;
@@ -2068,9 +1991,7 @@ badscal:
 }
 
 static void
-limtail(cp, str)
-    Char   *cp;
-    const char   *str;
+limtail(Char *cp, const char *str)
 {
     const char *sp;
 
@@ -2084,9 +2005,7 @@ limtail(cp, str)
 
 /*ARGSUSED*/
 static void
-plim(lp, hard)
-    struct limits *lp;
-    int hard;
+plim(struct limits *lp, int hard)
 {
 # ifdef BSDLIMIT
     struct rlimit rlim;
@@ -2140,9 +2059,7 @@ plim(lp, hard)
 
 /*ARGSUSED*/
 void
-dounlimit(v, c)
-    Char **v;
-    struct command *c;
+dounlimit(Char **v, struct command *c)
 {
     struct limits *lp;
     int    lerr = 0;
@@ -2182,10 +2099,7 @@ dounlimit(v, c)
 }
 
 static int
-setlim(lp, hard, limit)
-    struct limits *lp;
-    int    hard;
-    RLIM_TYPE limit;
+setlim(struct limits *lp, int hard, RLIM_TYPE limit)
 {
 # ifdef BSDLIMIT
     struct rlimit rlim;
@@ -2237,9 +2151,7 @@ setlim(lp, hard, limit)
 
 /*ARGSUSED*/
 void
-dosuspend(v, c)
-    Char **v;
-    struct command *c;
+dosuspend(Char **v, struct command *c)
 {
 #ifdef BSDJOBS
     int     ctpgrp;
@@ -2299,9 +2211,7 @@ static Char **gv = NULL, **gav = NULL;
 
 /*ARGSUSED*/
 void
-doeval(v, c)
-    Char  **v;
-    struct command *c;
+doeval(Char **v, struct command *c)
 {
     Char  **oevalvec;
     Char   *oevalp;
@@ -2400,9 +2310,7 @@ doeval(v, c)
 
 /*ARGSUSED*/
 void
-dobuiltins(v, c)
-Char **v;
-struct command *c;
+dobuiltins(Char **v, struct command *c)
 {
     /* would use print_by_column() in tw.parse.c but that assumes
      * we have an array of Char * to pass.. (sg)
@@ -2457,10 +2365,7 @@ struct command *c;
 #ifdef NLS_CATALOGS
 #ifdef HAVE_ICONV
 char *
-iconv_catgets(ctd, set_id, msg_id, s)
-nl_catd ctd;
-int set_id, msg_id;
-const char *s;
+iconv_catgets(nl_catd ctd, int set_id, int msg_id, const char *s)
 {
     static char *buf = NULL;
     static size_t buf_size = 0;
@@ -2505,7 +2410,7 @@ const char *s;
 #endif
 
 void
-nlsinit()
+nlsinit(void)
 {
 #ifdef NLS_CATALOGS
     char catalog[ 256 ] = { 't', 'c', 's', 'h', '\0' };
@@ -2531,7 +2436,7 @@ nlsinit()
 }
 
 void
-nlsclose()
+nlsclose(void)
 {
 #ifdef NLS_CATALOGS
 #ifdef HAVE_ICONV

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.c,v 3.57 2005/01/05 16:06:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.c,v 3.58 2005/01/18 20:24:51 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.57 2005/01/05 16:06:14 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.58 2005/01/18 20:24:51 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -78,9 +78,7 @@ static Char *syspaths[] = {STRKPATH, STRCPATH, STRLPATH, STRMPATH,
 
 /*ARGSUSED*/
 void
-dosetpath(arglist, c)
-    Char  **arglist;
-    struct command *c;
+dosetpath(Char **arglist, struct command *c)
 {
     extern char *getenv();
     sigmask_t omask;
@@ -201,9 +199,7 @@ abortpath:
 #ifdef TCF
 /* ARGSUSED */
 void
-dogetxvers(v, c)
-    Char  **v;
-    struct command *c;
+dogetxvers(Char **v, struct command *c)
 {
     char    xvers[MAXPATHLEN];
 
@@ -215,9 +211,7 @@ dogetxvers(v, c)
 
 /*ARGSUSED*/
 void
-dosetxvers(v, c)
-    Char  **v;
-    struct command *c;
+dosetxvers(Char **v, struct command *c)
 {
     char   *xvers;
 
@@ -270,8 +264,7 @@ static struct xc_cpu_t {
  * our local hack table, stolen from x.out.h
  */
 static char *
-getxcode(xcid)
-    short   xcid;
+getxcode(short xcid)
 {
     int     i;
 
@@ -282,8 +275,7 @@ getxcode(xcid)
 }
 
 static short
-getxid(xcname)
-    char   *xcname;
+getxid(char *xcname)
 {
     int     i;
 
@@ -296,9 +288,7 @@ getxid(xcname)
 
 /*ARGSUSED*/
 void
-dogetspath(v, c)
-    Char  **v;
-    struct command *c;
+dogetspath(Char **v, struct command *c)
 {
     int     i, j;
     sitepath_t p[MAXSITE];
@@ -342,9 +332,7 @@ dogetspath(v, c)
 
 /*ARGSUSED*/
 void
-dosetspath(v, c)
-    Char  **v;
-    struct command *c;
+dosetspath(Char **v, struct command *c)
 {
     int     i;
     short   j;
@@ -388,8 +376,7 @@ dosetspath(v, c)
  *	Return the site name where the process is running
  */
 char   *
-sitename(pid)
-    pid_t   pid;
+sitename(pid_t pid)
 {
     siteno_t ss;
     struct sf *st;
@@ -401,9 +388,7 @@ sitename(pid)
 }
 
 static int
-migratepid(pid, new_site)
-    pid_t   pid;
-    siteno_t new_site;
+migratepid(pit_t pid, siteno_t new_site)
 {
     struct sf *st;
     int     need_local;
@@ -435,9 +420,7 @@ migratepid(pid, new_site)
 
 /*ARGSUSED*/
 void
-domigrate(v, c)
-    Char  **v;
-    struct command *c;
+domigrate(Char **v, struct command *c)
 {
     struct sf *st;
     char   *s;
@@ -534,9 +517,7 @@ done:
  ***/
 #if defined(_CRAY) && !defined(_CRAYMPP)
 void
-dodmmode(v, c)
-    Char  **v;
-    struct command *c;
+dodmmode(Char **v, struct command *c)
 {
     Char *cp = v[1];
 
@@ -584,7 +565,7 @@ dodmmode(v, c)
 static jmp_buf sigsys_buf;
 
 static RETSIGTYPE
-catch_sigsys()
+catch_sigsys(void)
 {
     longjmp(sigsys_buf, 1);
 }
@@ -592,9 +573,7 @@ catch_sigsys()
 
 /*ARGSUSED*/
 void
-dowarp(v, c)
-    Char  **v;
-    struct command *c;
+dowarp(Char **v, struct command *c)
 {
     int     warp, oldwarp;
     struct warpent *we;
@@ -652,9 +631,7 @@ dowarp(v, c)
 #if defined(masscomp) || defined(_CX_UX)
 /*ARGSUSED*/
 void
-douniverse(v, c)
-    Char **v;
-    struct command *c;
+douniverse(Char **v, struct command *c)
 {
     Char *cp = v[1];
     Char *cp2;		/* dunno how many elements v comes in with */
@@ -798,9 +775,7 @@ bs2cmdlist(char *str)
 }
 /*ARGSUSED*/
 void
-dobs2cmd(v, c)
-    Char **v;
-    struct command *c;
+dobs2cmd(Char **v, struct command *c)
 {
     Char *cp;
     int  i = 0, len = 0;
@@ -908,9 +883,7 @@ dobs2cmd(v, c)
 #if defined(_CX_UX)
 /*ARGSUSED*/
 void
-doatt(v, c)
-    Char **v;
-    struct command *c;
+doatt(Char **v, struct command *c)
 {
     Char *cp = v[1];
     char    ubuf[100];
@@ -943,9 +916,7 @@ doatt(v, c)
 
 /*ARGSUSED*/
 void
-doucb(v, c)
-    Char **v;
-    struct command *c;
+doucb(Char **v, struct command *c)
 {
     Char *cp = v[1];
     char    ubuf[100];
@@ -982,8 +953,8 @@ doucb(v, c)
  * Compute the difference in process stats.
  */
 void
-pr_stat_sub(p2, p1, pr)
-    struct process_stats *p2, *p1, *pr;
+pr_stat_sub(struct process_stats *p2, struct process_stats *p1,
+	    struct process_stats *pr)
 {
     pr->ps_utime.tv_sec = p2->ps_utime.tv_sec - p1->ps_utime.tv_sec;
     pr->ps_utime.tv_usec = p2->ps_utime.tv_usec - p1->ps_utime.tv_usec;
@@ -1022,10 +993,7 @@ pr_stat_sub(p2, p1, pr)
 
 #ifndef HAVE_MEMSET
 /* This is a replacement for a missing memset function */
-ptr_t xmemset(loc, value, len)
-    ptr_t loc;
-    int len;
-    size_t value;
+ptr_t xmemset(ptr_t loc, int value, size_t len)
 {
     char *ptr = (char *) loc;
   
@@ -1043,10 +1011,7 @@ ptr_t xmemset(loc, value, len)
  *	destination memory
  */
 ptr_t
-xmemmove(vdst, vsrc, len)
-    ptr_t vdst;
-    const ptr_t vsrc;
-    size_t len;
+xmemmove(ptr_t vdst, const ptr_t vsrc, size_t len)
 {
     const char *src = (const char *) vsrc;
     char *dst = (char *) vdst;
@@ -1072,8 +1037,7 @@ xmemmove(vdst, vsrc, len)
 #ifndef WINNT_NATIVE
 #ifdef NEEDtcgetpgrp
 int
-xtcgetpgrp(fd)
-    int     fd;
+xtcgetpgrp(int fd)
 {
     int     pgrp;
 
@@ -1090,8 +1054,7 @@ xtcgetpgrp(fd)
  * this out.
  */
 int
-xtcsetpgrp(fd, pgrp)
-    int fd, pgrp;
+xtcsetpgrp(int fd, int pgrp)
 {
     return ioctl(fd, TIOCSPGRP, (ioctl_t) &pgrp);
 }
@@ -1102,18 +1065,18 @@ xtcsetpgrp(fd, pgrp)
 
 #ifdef YPBUGS
 void
-fix_yp_bugs()
+fix_yp_bugs(void)
 {
     char   *mydomain;
 
-    extern int yp_get_default_domain __P((char **));
+    extern int yp_get_default_domain (char **);
     /*
      * PWP: The previous version assumed that yp domain was the same as the
      * internet name domain.  This isn't allways true. (Thanks to Mat Landau
      * <mlandau@bbn.com> for the original version of this.)
      */
     if (yp_get_default_domain(&mydomain) == 0) {	/* if we got a name */
-	extern void yp_unbind __P((const char *));
+	extern void yp_unbind (const char *);
 
 	yp_unbind(mydomain);
     }
@@ -1123,7 +1086,7 @@ fix_yp_bugs()
 
 #ifdef STRCOLLBUG
 void
-fix_strcoll_bug()
+fix_strcoll_bug(void)
 {
 #if defined(NLS) && !defined(NOSTRCOLL)
     /*
@@ -1159,7 +1122,7 @@ fix_strcoll_bug()
 #endif /* OREO */
 
 void
-osinit()
+osinit(void)
 {
 #ifdef OREO
     set42sig();
@@ -1191,8 +1154,7 @@ osinit()
 
 #ifndef HAVE_STRERROR
 char *
-xstrerror(i)
-    int i;
+xstrerror(int i)
 {
     static char errbuf[128];
 
@@ -1212,9 +1174,7 @@ xstrerror(i)
 # endif /* !_MINIX && !__EMX__ && !WINNT_NATIVE */
 
 int
-xgethostname(name, namlen)
-    char   *name;
-    int     namlen;
+xgethostname(char *name, int namlen)
 {
 # if !defined(_MINIX) && !defined(__EMX__) && !defined(WINNT_NATIVE)
     int     i, retval;
@@ -1255,8 +1215,7 @@ xgethostname(name, namlen)
 #  include <lib.h>
 # endif /* _MINIX && NICE */
 int 
-xnice(incr)
-    int incr;
+xnice(int incr)
 {
 #if defined(_MINIX) && defined(NICE)
     return callm1(MM, NICE, incr, 0, 0, NIL_PTR, NIL_PTR, NIL_PTR);
@@ -1267,7 +1226,7 @@ xnice(incr)
 #endif /* !HAVE_NICE */
 
 #ifndef HAVE_GETCWD
-static char *strnrcpy __P((char *, char *, size_t));
+static char *strnrcpy (char *, char *, size_t);
 
 /* xgetcwd():
  *	Return the pathname of the current directory, or return
@@ -1286,9 +1245,7 @@ static char *strnrcpy __P((char *, char *, size_t));
  *  without "." and ".." !!!
  */
 char *
-xgetcwd(pathname, pathlen)
-    char *pathname;
-    size_t pathlen;
+xgetcwd(char *pathname, size_t pathlen)
 {
     char pathbuf[MAXNAMLEN];	/* temporary pathname buffer */
     char *pnptr = &pathbuf[(sizeof pathbuf)-1]; /* pathname pointer */
@@ -1370,9 +1327,7 @@ fail:
 
 
 char *
-xgetcwd(pathname, pathlen)
-    char   *pathname;
-    size_t pathlen;
+xgetcwd(char *pathname, size_t pathlen)
 {
     DIR    *dp;
     struct dirent *d;
@@ -1491,9 +1446,7 @@ xgetcwd(pathname, pathlen)
  *	Like strncpy, going backwards and returning the new pointer
  */
 static char *
-strnrcpy(ptr, str, siz)
-    char *ptr, *str;
-    size_t siz;
+strnrcpy(char *ptr, char *str, size_t siz)
 {
     int len = strlen(str);
     if (siz == 0)
@@ -1516,8 +1469,7 @@ strnrcpy(ptr, str, siz)
 
 
 static char *
-apperr(st)
-    status_$t *st;
+apperr(status_$t *st)
 {
     static char buf[BUFSIZE];
     short e_subl, e_modl, e_codel;
@@ -1533,8 +1485,7 @@ apperr(st)
 }
 
 static int
-llib(s)
-    Char *s;
+llib(Char *s)
 {
     short len = Strlen(s);
     status_$t st;
@@ -1547,9 +1498,7 @@ llib(s)
 
 /*ARGSUSED*/
 void
-doinlib(v, c)
-    Char **v;
-    struct command *c;
+doinlib(Char **v, struct command *c)
 {
     setname(short2str(*v++));
     gflag = 0, tglob(v);
@@ -1570,8 +1519,7 @@ doinlib(v, c)
 }
 
 int
-getv(v)
-    Char *v;
+getv(Char *v)
 {
     if (eq(v, STRbsd43))
 	return(1);
@@ -1586,9 +1534,7 @@ getv(v)
 
 /*ARGSUSED*/
 void
-dover(v, c)
-    Char **v;
-    struct command *c;
+dover(Char **v, struct command *c)
 {
     Char *p;
 
@@ -1619,9 +1565,7 @@ typedef short enum {
 
 /*ARGSUSED*/
 void
-dorootnode(v, c)
-    Char **v;
-    struct command *c;
+dorootnode(Char **v, struct command *c)
 {
     name_$dir_type_t dirtype = name_$node_dir_type;
     uid_$t uid;
@@ -1645,7 +1589,7 @@ dorootnode(v, c)
 }
 
 int
-isapad()
+isapad(void)
 {
     static int res = -1;
     static status_$t st;

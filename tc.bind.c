@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.bind.c,v 3.38 2004/11/20 17:33:39 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.bind.c,v 3.39 2005/03/25 18:46:41 kim Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -32,28 +32,28 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.38 2004/11/20 17:33:39 christos Exp $")
+RCSID("$Id: tc.bind.c,v 3.39 2005/03/25 18:46:41 kim Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
 
 #ifdef OBSOLETE
-static	int    tocontrol	__P((int));
-static	char  *unparsekey	__P((int));
-static	KEYCMD getkeycmd	__P((Char **));
-static	int    parsekey		__P((Char **));
-static	void   pkeys		__P((int, int));
+static	int    tocontrol	(int);
+static	char  *unparsekey	(int);
+static	KEYCMD getkeycmd	(Char **);
+static	int    parsekey		(Char **);
+static	void   pkeys		(int, int);
 #endif /* OBSOLETE */
 
-static	void   printkey		__P((KEYCMD *, CStr *));
-static	KEYCMD parsecmd		__P((Char *));
-static  void   bad_spec		__P((Char *));
-static	CStr  *parsestring	__P((Char *, CStr *));
-static	CStr  *parsebind	__P((Char *, CStr *));
-static	void   print_all_keys	__P((void));
-static	void   printkeys	__P((KEYCMD *, int, int));
-static	void   bindkey_usage	__P((void));
-static	void   list_functions	__P((void));
+static	void   printkey		(KEYCMD *, CStr *);
+static	KEYCMD parsecmd		(Char *);
+static  void   bad_spec		(Char *);
+static	CStr  *parsestring	(Char *, CStr *);
+static	CStr  *parsebind	(Char *, CStr *);
+static	void   print_all_keys	(void);
+static	void   printkeys	(KEYCMD *, int, int);
+static	void   bindkey_usage	(void);
+static	void   list_functions	(void);
 
 extern int MapsAreInited;
 
@@ -62,9 +62,7 @@ extern int MapsAreInited;
 
 /*ARGSUSED*/
 void
-dobindkey(v, c)
-    Char  **v;
-    struct command *c;
+dobindkey(Char **v, struct command *c)
 {
     KEYCMD *map;
     int     ntype, no, removeb, key, bindk;
@@ -232,9 +230,7 @@ dobindkey(v, c)
 }
 
 static void
-printkey(map, in)
-    KEYCMD *map;
-    CStr   *in;
+printkey(KEYCMD *map, CStr *in)
 {
     unsigned char outbuf[100];
     struct KeyFuncs *fp;
@@ -252,8 +248,7 @@ printkey(map, in)
 }
 
 static  KEYCMD
-parsecmd(str)
-    Char   *str;
+parsecmd(Char *str)
 {
     struct KeyFuncs *fp;
 
@@ -268,16 +263,13 @@ parsecmd(str)
 
 
 static void
-bad_spec(str)
-    Char *str;
+bad_spec(Char *str)
 {
     xprintf(CGETS(20, 4, "Bad key spec %S\n"), str);
 }
 
 static CStr *
-parsebind(s, str)
-    Char *s;
-    CStr *str;
+parsebind(Char *s, CStr *str)
 {
     Char *b = str->buf;
 
@@ -383,9 +375,7 @@ parsebind(s, str)
 
 
 static CStr *
-parsestring(str, buf)
-    Char   *str;
-    CStr   *buf;
+parsestring(Char *str, CStr *buf)
 {
     Char   *b;
     const Char   *p;
@@ -413,7 +403,7 @@ parsestring(str, buf)
 }
 
 static void
-print_all_keys()
+print_all_keys(void)
 {
     int     prev, i;
     CStr nilstr;
@@ -447,9 +437,7 @@ print_all_keys()
 }
 
 static void
-printkeys(map, first, last)
-    KEYCMD *map;
-    int     first, last;
+printkeys(KEYCMD *map, int first, int last)
 {
     struct KeyFuncs *fp;
     Char    firstbuf[2], lastbuf[2];
@@ -499,7 +487,7 @@ printkeys(map, first, last)
 }
 
 static void
-bindkey_usage()
+bindkey_usage(void)
 {
     xprintf(CGETS(20, 12,
 	    "Usage: bindkey [options] [--] [KEY [COMMAND]]\n"));
@@ -535,7 +523,7 @@ bindkey_usage()
 }
 
 static void
-list_functions()
+list_functions(void)
 {
     struct KeyFuncs *fp;
 
@@ -560,8 +548,7 @@ static unsigned char APOLLO_0377 = 0377;
 #endif /* apollo */
 
 static int
-tocontrol(c)
-    int    c;
+tocontrol(int c)
 {
     c &= CHAR;
     if (Islower(c))
@@ -581,8 +568,7 @@ tocontrol(c)
 }
 
 static char *
-unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
-    int c;
+unparsekey(int c)		/* 'c' -> "c", '^C' -> "^" + "C" */
 {
     char *cp;
     static char tmp[10];
@@ -658,8 +644,7 @@ unparsekey(c)			/* 'c' -> "c", '^C' -> "^" + "C" */
 }
 
 static  KEYCMD
-getkeycmd(sp)
-    Char  **sp;
+getkeycmd(Char **sp)
 {
     Char *s = *sp;
     char c;
@@ -704,9 +689,7 @@ getkeycmd(sp)
 }
 
 static int
-parsekey(sp)
-    Char  **sp;			/* Return position of first unparsed character
-				 * for return value -2 (xkeynext) */
+parsekey(Char **sp)
 {
     int c, meta = 0, control = 0, ctrlx = 0;
     Char   *s = *sp;
@@ -856,9 +839,7 @@ parsekey(sp)
 
 /*ARGSUSED*/
 void
-dobind(v, dummy)
-    Char **v;
-    struct command *dummy;
+dobind(Char **v, struct command *dummy)
 {
     int c;
     struct KeyFuncs *fp;
@@ -1023,8 +1004,7 @@ dobind(v, dummy)
 }
 
 static void
-pkeys(first, last)
-    int first, last;
+pkeys(int first, int last)
 {
     struct KeyFuncs *fp;
     KEYCMD *map;

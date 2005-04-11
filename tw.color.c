@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.17 2004/12/25 21:15:09 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.18 2005/03/03 16:40:53 kim Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.17 2004/12/25 21:15:09 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.18 2005/03/03 16:40:53 kim Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -101,14 +101,14 @@ static char *colors = NULL;
 int	     color_context_ls = FALSE;	/* do colored ls */
 static int  color_context_lsmF = FALSE;	/* do colored ls-F */
 
-static int getstring __P((char **, const Char **, Str *, int));
-static void put_color __P((Str *));
-static void print_color __P((Char *, size_t, Char));
+static int getstring (char **, const Char **, Str *, int);
+static void put_color (Str *);
+static void print_color (Char *, size_t, Char);
 
 /* set_color_context():
  */
 void
-set_color_context()
+set_color_context(void)
 {
     struct varent *vp = adrof(STRcolor);
 
@@ -135,11 +135,7 @@ set_color_context()
 /* getstring():
  */
 static  int
-getstring(dp, sp, pd, f)
-    char        **dp;		/* dest buffer */
-    const Char  **sp;		/* source buffer */
-    Str          *pd;		/* pointer to dest buffer */
-    int           f;		/* final character */
+getstring(char **dp, const Char **sp, Str *pd, int f)
 {
     const Char *s = *sp;
     char *d = *dp;
@@ -167,8 +163,7 @@ getstring(dp, sp, pd, f)
  *	Parse the LS_COLORS environment variable
  */
 void
-parseLS_COLORS(value)
-    Char   *value;		/* LS_COLOR variable's value */
+parseLS_COLORS(Char *value)
 {
     size_t  i, len;
     const Char   *v;		/* pointer in value */
@@ -259,8 +254,7 @@ parseLS_COLORS(value)
 /* put_color():
  */
 static void
-put_color(color)
-    Str    *color;
+put_color(Str *color)
 {
     size_t  i;
     const char   *c = color->s;
@@ -276,10 +270,7 @@ put_color(color)
 /* print_color():
  */
 static void
-print_color(fname, len, suffix)
-    Char   *fname;
-    size_t  len;
-    Char    suffix;
+print_color(Char *fname, size_t len, Char suffix)
 {
     size_t  i;
     char   *filename = short2str(fname);
@@ -323,10 +314,7 @@ print_color(fname, len, suffix)
 /* print_with_color():
  */
 void
-print_with_color(filename, len, suffix)
-    Char   *filename;
-    size_t  len;
-    Char    suffix;
+print_with_color(Char *filename, size_t len, Char suffix)
 {
     if (color_context_lsmF &&
 	(haderr ? (didfds ? is2atty : isdiagatty) :

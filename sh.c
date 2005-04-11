@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.122 2005/01/18 20:24:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.123 2005/03/21 21:26:36 kim Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.122 2005/01/18 20:24:50 christos Exp $")
+RCSID("$Id: sh.c,v 3.123 2005/03/21 21:26:36 kim Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -157,29 +157,27 @@ struct saved_state {
     int		  reenter;
 };
 
-static	int		  srccat	__P((Char *, Char *));
+static	int		  srccat	(Char *, Char *);
 #ifndef WINNT_NATIVE
-static	int		  srcfile	__P((const char *, int, int, Char **));
+static	int		  srcfile	(const char *, int, int, Char **);
 #else
-int		  srcfile	__P((const char *, int, int, Char **));
+int		  srcfile	(const char *, int, int, Char **);
 #endif /*WINNT_NATIVE*/
-static	RETSIGTYPE	  phup		__P((int));
-static	void		  srcunit	__P((int, int, int, Char **));
-static	void		  mailchk	__P((void));
+static	RETSIGTYPE	  phup		(int);
+static	void		  srcunit	(int, int, int, Char **);
+static	void		  mailchk	(void);
 #ifndef _PATH_DEFPATH
-static	Char	 	**defaultpath	__P((void));
+static	Char	 	**defaultpath	(void);
 #endif
-static	void		  record	__P((void));
-static	void		  st_save	__P((struct saved_state *, int, int,
-					     Char **, Char **));
-static	void		  st_restore	__P((struct saved_state *, Char **));
+static	void		  record	(void);
+static	void		  st_save	(struct saved_state *, int, int,
+					 Char **, Char **);
+static	void		  st_restore	(struct saved_state *, Char **);
 
-	int		  main		__P((int, char **));
+	int		  main		(int, char **);
 
 int
-main(argc, argv)
-    int     argc;
-    char  **argv;
+main(int argc, char **argv)
 {
     Char *cp;
 #ifdef AUTOLOGOUT
@@ -1384,7 +1382,7 @@ main(argc, argv)
 }
 
 void
-untty()
+untty(void)
 {
 #ifdef BSDJOBS
     if (tpgrp > 0 && opgrp != shpgrp) {
@@ -1396,8 +1394,7 @@ untty()
 }
 
 void
-importpath(cp)
-    Char   *cp;
+importpath(Char *cp)
 {
     int i = 0;
     Char *dp;
@@ -1440,8 +1437,7 @@ importpath(cp)
  * Source to the file which is the catenation of the argument names.
  */
 static int
-srccat(cp, dp)
-    Char   *cp, *dp;
+srccat(Char *cp, Char *dp)
 {
     if (cp[0] == '/' && cp[1] == '\0') 
 	return srcfile(short2str(dp), (mflag ? 0 : 1), 0, NULL);
@@ -1475,11 +1471,7 @@ static int
 #else
 int
 #endif /*WINNT_NATIVE*/
-srcfile(f, onlyown, flag, av)
-    const char   *f;
-    int    onlyown;
-    int flag;
-    Char **av;
+srcfile(const char *f, int onlyown, int flag, Char **av)
 {
     int unit;
 
@@ -1501,10 +1493,7 @@ srcfile(f, onlyown, flag, av)
  * fd.
  */
 static void
-st_save(st, unit, hflg, al, av)
-    struct saved_state *st;
-    int unit, hflg;
-    Char **al, **av;
+st_save(struct saved_state *st, int unit, int hflg, Char **al, Char **av)
 {
     st->insource	= insource;
     st->SHIN		= SHIN;
@@ -1604,9 +1593,7 @@ st_save(st, unit, hflg, al, av)
  * Restore the shell to a saved state
  */
 static void
-st_restore(st, av)
-    struct saved_state *st;
-    Char **av;
+st_restore(struct saved_state *st, Char **av)
 {
     if (st->SHIN == -1)
 	return;
@@ -1660,11 +1647,7 @@ st_restore(st, av)
  * we don't chance it.	This occurs on ".cshrc"s and the like.
  */
 static void
-srcunit(unit, onlyown, hflg, av)
-    int unit;
-    int    onlyown;
-    int hflg;
-    Char **av;
+srcunit(int unit, int onlyown, int hflg, Char **av)
 {
     struct saved_state st;
     st.SHIN = -1;	/* st_restore checks this */
@@ -1744,9 +1727,7 @@ srcunit(unit, onlyown, hflg, av)
 
 /*ARGSUSED*/
 void
-goodbye(v, c)
-    Char **v;
-    struct command *c;
+goodbye(Char **v, struct command *c)
 {
     USE(v);
     USE(c);
@@ -1777,7 +1758,7 @@ goodbye(v, c)
 }
 
 void
-exitstat()
+exitstat(void)
 {
 #ifdef PROF
     monitor(0);
@@ -1796,8 +1777,7 @@ exitstat()
  * in the event of a HUP we want to save the history
  */
 static RETSIGTYPE
-phup(snum)
-int snum;
+phup(int snum)
 {
     /*
      * There is no return from here,
@@ -1878,8 +1858,7 @@ static Char   *jobargv[2] = {STRjobs, 0};
 int     just_signaled;		/* bugfix by Michael Bloom (mg@ttidca.TTI.COM) */
 
 RETSIGTYPE
-pintr(snum)
-int snum;
+pintr(int snum)
 {
     USE(snum);
 #ifdef UNRELSIGS
@@ -1891,8 +1870,7 @@ int snum;
 }
 
 void
-pintr1(wantnl)
-    int    wantnl;
+pintr1(int wantnl)
 {
     Char **v;
 #ifdef BSDSIGS
@@ -1987,8 +1965,7 @@ pintr1(wantnl)
  */
 static struct command *savet = NULL;
 void
-process(catch)
-    int    catch;
+process(int catch)
 {
     jmp_buf_t osetexit;
     /* PWP: This might get nuked my longjmp so don't make it a register var */
@@ -2197,9 +2174,7 @@ process(catch)
 
 /*ARGSUSED*/
 void
-dosource(t, c)
-    Char **t;
-    struct command *c;
+dosource(Char **t, struct command *c)
 {
     Char *f;
     int    hflg = 0;
@@ -2254,7 +2229,7 @@ dosource(t, c)
  */
 
 static void
-mailchk()
+mailchk(void)
 {
     struct varent *v;
     Char **vp;
@@ -2355,8 +2330,7 @@ mailchk()
  * We write the home directory of the user back there.
  */
 int
-gethdir(home)
-    Char   *home;
+gethdir(Char *home)
 {
     Char   *h;
 
@@ -2388,7 +2362,7 @@ gethdir(home)
  * resting places, closing all other units.
  */
 void
-initdesc()
+initdesc(void)
 {
 #ifdef NLS_BUGS
 #ifdef NLS_CATALOGS
@@ -2417,11 +2391,10 @@ initdesc()
 
 void
 #ifdef PROF
-done(i)
+done(int i)
 #else
-xexit(i)
+xexit(int i)
 #endif
-    int     i;
 {
 #ifdef TESLA
     if (loginsh && do_logout) {
@@ -2477,7 +2450,7 @@ xexit(i)
 
 #ifndef _PATH_DEFPATH
 static Char **
-defaultpath()
+defaultpath(void)
 {
     char   *ptr;
     Char  **blk, **blkp;
@@ -2528,7 +2501,7 @@ defaultpath()
 #endif
 
 static void
-record()
+record(void)
 {
     if (!fast) {
 	recdirs(NULL, adrof(STRsavedirs) != NULL);

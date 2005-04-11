@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.defns.c,v 3.42 2005/03/03 16:49:15 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.defns.c,v 3.43 2005/04/11 21:09:33 kim Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -32,11 +32,11 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.42 2005/03/03 16:49:15 kim Exp $")
+RCSID("$Id: ed.defns.c,v 3.43 2005/04/11 21:09:33 kim Exp $")
 
 #include "ed.h"
 
-static	void		ed_InitMetaBindings 	__P((void));
+static	void		ed_InitMetaBindings 	(void);
 
 PFCmd   CcFuncTbl[] = {		/* table of available commands */
     e_unassigned,
@@ -1124,7 +1124,7 @@ KEYCMD  CcViCmdMap[] = {
 
 
 void
-editinit()
+editinit(void)
 {
     struct KeyFuncs *f;
 
@@ -1799,7 +1799,7 @@ editinit()
 
 #ifdef DEBUG_EDIT
 void
-CheckMaps()
+CheckMaps(void)
 {		/* check the size of the key maps */
     int     c1 = (NT_NUM_KEYS * sizeof(KEYCMD));
 
@@ -1831,7 +1831,7 @@ int    NLSMapsAreInited = 0;
 int    NoNLSRebind;
 
 void
-ed_InitNLSMaps()
+ed_InitNLSMaps(void)
 {
     int i;
 
@@ -1848,7 +1848,7 @@ ed_InitNLSMaps()
 }
 
 static void
-ed_InitMetaBindings()
+ed_InitMetaBindings(void)
 {
     Char    buf[3];
     int     i;
@@ -1884,7 +1884,7 @@ ed_InitMetaBindings()
 }
 
 void
-ed_InitVIMaps()
+ed_InitVIMaps(void)
 {
     int i;
 
@@ -1901,7 +1901,7 @@ ed_InitVIMaps()
 }
 
 void
-ed_InitEmacsMaps()
+ed_InitEmacsMaps(void)
 {
     int     i;
     Char    buf[3];
@@ -1944,7 +1944,7 @@ ed_InitEmacsMaps()
 }
 
 void
-ed_InitMaps()
+ed_InitMaps(void)
 {
     if (MapsAreInited)
 	return;

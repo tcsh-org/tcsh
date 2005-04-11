@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.96 2005/03/03 19:57:07 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.97 2005/03/03 22:32:01 kim Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -454,7 +454,7 @@ typedef struct timeval timeval_t;
 #endif /* NeXT */
 
 #if defined(HAVE_GETHOSTNAME) && !HAVE_DECL_GETHOSTNAME
-extern int gethostname __P((char *, int));
+extern int gethostname (char *, int);
 #endif
 
 #ifndef GETPGRP_VOID
@@ -474,12 +474,12 @@ extern char *ttyname();
 
 # if defined(SUNOS4)
 #  ifndef toupper
-extern int toupper __P((int));
+extern int toupper (int);
 #  endif /* toupper */
 #  ifndef tolower
-extern int tolower __P((int));
+extern int tolower (int);
 #  endif /* tolower */
-extern caddr_t sbrk __P((int));
+extern caddr_t sbrk (int);
 # else /* !SUNOS4 */
 #  ifndef WINNT_NATIVE
 #   ifdef hpux
@@ -564,21 +564,21 @@ extern char *ttyname();
 /*
  * Somehow these are missing
  */
-extern int ioctl __P((int, int, ...));
-extern int readlink __P((const char *, char *, size_t));
-extern void setgrent __P((void));
-extern void endgrent __P((void));
+extern int ioctl (int, int, ...);
+extern int readlink (const char *, char *, size_t);
+extern void setgrent (void);
+extern void endgrent (void);
 # ifdef REMOTEHOST
 #  ifndef _SOCKLEN_T	/* Avoid Solaris 2.7 bogosity. */
 struct sockaddr;
-extern int getpeername __P((int, struct sockaddr *, int *));
+extern int getpeername (int, struct sockaddr *, int *);
 #  endif /* _SOCKLEN_T */
 # endif /* REMOTEHOST */
 #endif /* SUNOS4 && __GNUC__ == 2 */
 
 #if (defined(BSD) && !defined(BSD4_4)) || defined(SUNOS4) 
 # if defined(__alpha) && defined(__osf__) && DECOSF1 < 200
-extern void bcopy	__P((const void *, void *, size_t));
+extern void bcopy	(const void *, void *, size_t);
 #  define memmove(a, b, c) (bcopy((char *) (b), (char *) (a), (int) (c)), a)
 # endif /* __alpha && __osf__ && DECOSF1 < 200 */
 #endif /* (BSD && !BSD4_4) || SUNOS4 */
@@ -594,25 +594,25 @@ extern void bcopy	__P((const void *, void *, size_t));
 #  if !defined(__sgi) && !defined(_OSD_POSIX) && !defined(__MVS__)
 #   ifndef _SOCKLEN_T	/* Avoid Solaris 2.7 bogosity. */
 struct sockaddr;
-extern int getpeername __P((int, struct sockaddr *, int *));
+extern int getpeername (int, struct sockaddr *, int *);
 #   endif /* _SOCKLEN_T */
 #  endif /* !__sgi && !_OSD_POSIX && !__MVS__ */
 # endif /* REMOTEHOST */
 # ifndef BSDTIMES
-extern int getrlimit __P((int, struct rlimit *));
-extern int setrlimit __P((int, const struct rlimit *));
+extern int getrlimit (int, struct rlimit *);
+extern int setrlimit (int, const struct rlimit *);
 # endif /* !BSDTIMES */
 # if defined(SOLARIS2)
-extern char *strerror __P((int));
+extern char *strerror (int);
 # endif /* SOLARIS2 */
 #endif /* SYSVREL == 4 */
 
 #if defined(__alpha) && defined(__osf__) && DECOSF1 < 200
 /* These are ok for 1.3, but conflict with the header files for 2.0 */
-extern char *sbrk __P((ssize_t));
-extern int ioctl __P((int, unsigned long, char *));
-extern pid_t vfork __P((void));
-extern int killpg __P((pid_t, int));
+extern char *sbrk (ssize_t);
+extern int ioctl (int, unsigned long, char *);
+extern pid_t vfork (void);
+extern int killpg (pid_t, int);
 #endif /* __osf__ && __alpha && DECOSF1 < 200 */
 
 #endif /* _h_tc_os */

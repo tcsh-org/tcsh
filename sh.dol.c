@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.54 2004/11/23 02:10:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.55 2004/12/25 21:15:06 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.54 2004/11/23 02:10:48 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.55 2004/12/25 21:15:06 christos Exp $")
 
 /*
  * C shell
@@ -79,25 +79,24 @@ static int dolnmod;		/* Number of modifiers */
 static int dolmcnt;		/* :gx -> 10000, else 1 */
 static int dolwcnt;		/* :ax -> 10000, else 1 */
 
-static	void	 Dfix2		__P((Char **));
-static	Char 	*Dpack		__P((Char *, Char *));
-static	int	 Dword		__P((void));
-static	void	 dolerror	__P((Char *));
-static	eChar	 DgetC		__P((int));
-static	void	 Dgetdol	__P((void));
-static	void	 fixDolMod	__P((void));
-static	void	 setDolp	__P((Char *));
-static	void	 unDredc	__P((eChar));
-static	eChar	 Dredc		__P((void));
-static	void	 Dtestq		__P((Char));
+static	void	 Dfix2		(Char **);
+static	Char 	*Dpack		(Char *, Char *);
+static	int	 Dword		(void);
+static	void	 dolerror	(Char *);
+static	eChar	 DgetC		(int);
+static	void	 Dgetdol	(void);
+static	void	 fixDolMod	(void);
+static	void	 setDolp	(Char *);
+static	void	 unDredc	(eChar);
+static	eChar	 Dredc		(void);
+static	void	 Dtestq		(Char);
 
 /*
  * Fix up the $ expansions and quotations in the
  * argument list to command t.
  */
 void
-Dfix(t)
-    struct command *t;
+Dfix(struct command *t)
 {
     Char **pp;
     Char *p;
@@ -122,8 +121,7 @@ Dfix(t)
  * $ substitute one word, for i/o redirection
  */
 Char   *
-Dfix1(cp)
-    Char *cp;
+Dfix1(Char *cp)
 {
     Char   *Dv[2];
 
@@ -145,8 +143,7 @@ Dfix1(cp)
  * Subroutine to do actual fixing after state initialization.
  */
 static void
-Dfix2(v)
-    Char  **v;
+Dfix2(Char **v)
 {
     ginit();			/* Initialize glob's area pointers */
     Dvp = v;
@@ -163,8 +160,7 @@ Dfix2(v)
  * Pack up more characters in this word
  */
 static Char *
-Dpack(wbuf, wp)
-    Char   *wbuf, *wp;
+Dpack(Char *wbuf, Char *wp)
 {
     eChar c;
     int i = MAXWLEN - (int) (wp - wbuf);
@@ -211,7 +207,7 @@ Dpack(wbuf, wp)
  * Rather, DgetC will return a DEOF when we hit the end-of-input.
  */
 static int
-Dword()
+Dword(void)
 {
     eChar c, c1;
     Char    wbuf[BUFSIZE];
@@ -358,8 +354,7 @@ Dword()
  * QUOTEd so that it will not be recognized above.
  */
 static eChar
-DgetC(flag)
-    int flag;
+DgetC(int flag)
 {
     Char c;
 
@@ -407,8 +402,7 @@ static struct varent nulargv = {nulvec, STRargv, VAR_READWRITE,
 				{ NULL, NULL, NULL }, 0 };
 
 static void
-dolerror(s)
-    Char   *s;
+dolerror(Char *s)
 {
     setname(short2str(s));
     stderror(ERR_NAME | ERR_RANGE);
@@ -419,7 +413,7 @@ dolerror(s)
  * Ugh.
  */
 static void
-Dgetdol()
+Dgetdol(void)
 {
     Char *np;
     struct varent *vp = NULL;
@@ -777,7 +771,7 @@ eatbrac:
 }
 
 static void
-fixDolMod()
+fixDolMod(void)
 {
     eChar c;
 
@@ -845,8 +839,7 @@ fixDolMod()
 }
 
 static void
-setDolp(cp)
-    Char *cp;
+setDolp(Char *cp)
 {
     Char *dp;
 #ifndef COMPAT
@@ -976,15 +969,14 @@ setDolp(cp)
 }
 
 static void
-unDredc(c)
-    eChar   c;
+unDredc(eChar c)
 {
 
     Dpeekrd = c;
 }
 
 static eChar
-Dredc()
+Dredc(void)
 {
     Char c;
 
@@ -1003,8 +995,7 @@ Dredc()
 }
 
 static void
-Dtestq(c)
-    Char c;
+Dtestq(Char c)
 {
 
     if (cmap(c, QUOTES))
@@ -1017,8 +1008,7 @@ Dtestq(c)
  * Unit 0 should have been closed before this call.
  */
 void
-heredoc(term)
-    Char   *term;
+heredoc(Char *term)
 {
     eChar  c;
     Char   *Dv[2];

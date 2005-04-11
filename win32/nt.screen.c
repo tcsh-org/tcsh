@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.5 2005/01/18 20:12:14 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.6 2005/03/25 18:46:42 kim Exp $*/
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -61,7 +61,7 @@ extern void NT_WrapHorizontal(void);
 
 int DisplayWindowHSize;
 	void
-terminit()
+terminit(void)
 {
 	return;
 }
@@ -70,13 +70,12 @@ terminit()
 
 int T_ActualWindowSize;
 
-static	void	ReBufferDisplay	__P((void));
+static	void	ReBufferDisplay	(void);
 
 
 /*ARGSUSED*/
 	void
-TellTC(what)
-	char   *what;
+TellTC(char *what)
 {
 
 	USE(what);
@@ -85,7 +84,7 @@ TellTC(what)
 
 
 	static void
-ReBufferDisplay()
+ReBufferDisplay(void)
 {
 	register int i;
 	Char **b;
@@ -124,8 +123,7 @@ ReBufferDisplay()
 }
 
 	void
-SetTC(what, how)
-	char   *what, *how;
+SetTC(char *what, char *how)
 {
 	int li,win,co;
 
@@ -148,8 +146,7 @@ SetTC(what, how)
  * Print the termcap string out with variable substitution
  */
 	void
-EchoTC(v)
-	Char  **v;
+EchoTC(Char **v)
 {
 
 	char    cv[BUFSIZE];
@@ -210,49 +207,43 @@ int    GotTermCaps = 0;
 
 
 	void
-ResetArrowKeys()
+ResetArrowKeys(void)
 {
 }
 
 	void
-DefaultArrowKeys() 
+DefaultArrowKeys(void)
 {
 }
 
 
 	int
-SetArrowKeys(name, fun, type)
-	CStr *name;
-	XmapVal *fun;
-	int type;
+SetArrowKeys(CStr *name, XmapVal *fun, int type)
 {
 	return -1;
 }
 
 	int
-IsArrowKey(name)
-	Char *name;
+IsArrowKey(Char *name)
 {
 	return 0;
 }
 
 	int
-ClearArrowKeys(name)
-	CStr *name;
+ClearArrowKeys(CStr *name)
 {
 	return -1;
 }
 
 	void
-PrintArrowKeys(name)
-	CStr *name;
+PrintArrowKeys(CStr *name)
 {
 	return;
 }
 
 
 	void
-BindArrowKeys()
+BindArrowKeys(void)
 {
 	return;
 }
@@ -260,22 +251,21 @@ static Char cur_atr = 0;	/* current attributes */
 
 #define GoodStr(ignore)  1
 	void
-SetAttributes(atr)
-	int     atr;
+SetAttributes(int atr)
 {
 	atr &= ATTRIBUTES;
 }
 
 /* PWP 6-27-88 -- if the tty driver thinks that we can tab, we ask termcap */
 	int
-CanWeTab()
+CanWeTab(void)
 {
 	return 1;
 }
 
+/* move to line <where> (first line == 0) as efficiently as possible; */
 	void
-MoveToLine(where)		/* move to line <where> (first line == 0) */
-	int     where;		/* as efficiently as possible; */
+MoveToLine(int where)
 {
 	int     del;
 
@@ -297,10 +287,10 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
 	CursorV = where;		/* now where is here */
 }
 
+/* move to character position (where) as efficiently as possible */
 	void
-MoveToChar(where)		/* move to character position (where) */
-	int     where;
-{				/* as efficiently as possible */
+MoveToChar(int where)		
+{
 	if (where == CursorH)
 		return;
 
@@ -325,9 +315,7 @@ MoveToChar(where)		/* move to character position (where) */
 }
 
 	void
-so_write(cp, n)
-	register Char *cp;
-	register int n;
+so_write(register Char *cp, register int n)
 {
 	if (n <= 0)
 		return;			/* catch bugs */
@@ -363,8 +351,7 @@ so_write(cp, n)
 
 
 	void
-DeleteChars(num)		/* deletes <num> characters */
-	int     num;
+DeleteChars(int num)		/* deletes <num> characters */
 {
 	if (num <= 0)
 		return;
@@ -387,10 +374,10 @@ DeleteChars(num)		/* deletes <num> characters */
 
 }
 
+/* Puts terminal in insert character mode, or inserts num characters in the
+   line */
 	void
-Insert_write(cp, num)		/* Puts terminal in insert character mode, */
-	register Char *cp;
-	register int num;		/* or inserts num characters in the line */
+Insert_write(register Char *cp, register int num)
 {
 	if (num <= 0)
 		return;
@@ -413,9 +400,9 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 
 }
 
+/* clear to end of line.  There are num characters to clear */
 	void
-ClearEOL(num)			/* clear to end of line.  There are num */
-	int     num;		/* characters to clear */
+ClearEOL(int num)
 {
 
 	if (num <= 0)
@@ -426,7 +413,7 @@ ClearEOL(num)			/* clear to end of line.  There are num */
 }
 
 	void
-ClearScreen()
+ClearScreen(void)
 {				/* clear the whole screen and home */
 
 	NT_ClearScreen();
@@ -434,7 +421,7 @@ ClearScreen()
 }
 
 	void
-SoundBeep()
+SoundBeep(void)
 {				/* produce a sound */
 	beep_cmd ();
 	if (adrof(STRnobeep))
@@ -447,14 +434,14 @@ SoundBeep()
 }
 
 	void
-ClearToBottom()
+ClearToBottom(void)
 {				/* clear to the bottom of the screen */
 	NT_ClearEOD();
 
 }
 
 	void
-GetTermCaps()
+GetTermCaps(void)
 {
 	int lins,cols;
 
@@ -482,8 +469,7 @@ GetTermCaps()
  *	true if the size was changed.
  */
 	int
-GetSize(lins, cols)
-	int    *lins, *cols;
+GetSize(int *lins, int *cols)
 {
 
 	*lins = T_Lines;
@@ -502,8 +488,7 @@ GetSize(lins, cols)
 #endif /* SIGWINDOW */
 
 	void
-ChangeSize(lins, cols)
-	int     lins, cols;
+ChangeSize(int lins, int cols)
 {
 
 	// here we're setting the window size, not the buffer size.
@@ -517,9 +502,7 @@ ChangeSize(lins, cols)
 	ClearDisp();
 }
 	void
-PutPlusOne(c, width)
-	Char  c;
-	int   width;
+PutPlusOne(Char c, int width)
 {
 	extern int OldvcV;
 

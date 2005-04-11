@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.term.c,v 1.30 2004/08/04 17:12:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.term.c,v 1.31 2004/11/23 02:10:48 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #ifndef WINNT_NATIVE
 
-RCSID("$Id: ed.term.c,v 1.30 2004/08/04 17:12:28 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.31 2004/11/23 02:10:48 christos Exp $")
 
 #include "ed.h"
 
@@ -582,9 +582,7 @@ static int count;
 
 /*ARGSUSED*/
 void
-dosetty(v, t)
-    Char **v;
-    struct command *t;
+dosetty(Char **v, struct command *t)
 {
     struct tcshmodes *m;
     char x, *d;
@@ -687,9 +685,7 @@ dosetty(v, t)
 } /* end dosetty */
 
 int
-tty_getty(fd, td)
-   int fd;
-   ttydata_t *td;
+tty_getty(int fd, ttydata_t *td)
 {
 #ifdef POSIX
     RETRY(tcgetattr(fd, &td->d_t));
@@ -720,9 +716,7 @@ tty_getty(fd, td)
 }
 
 int
-tty_setty(fd, td)
-   int fd;
-   ttydata_t *td;
+tty_setty(int fd, ttydata_t *td)
 {
 #ifdef POSIX
     RETRY(tcsetattr(fd, TCSADRAIN, &td->d_t)); 
@@ -753,9 +747,7 @@ tty_setty(fd, td)
 }
 
 void
-tty_getchar(td, s)
-    ttydata_t *td;
-    unsigned char *s;
+tty_getchar(ttydata_t *td, unsigned char *s)
 {   
 #ifdef TIOCGLTC
     {
@@ -891,9 +883,7 @@ tty_getchar(td, s)
 
 
 void
-tty_setchar(td, s)
-    ttydata_t *td;
-    unsigned char *s;
+tty_setchar(ttydata_t *td, unsigned char *s)
 {   
 #ifdef TIOCGLTC
     {
@@ -1030,8 +1020,7 @@ tty_setchar(td, s)
 } /* tty_setchar */
 
 speed_t
-tty_getspeed(td)
-    ttydata_t *td;
+tty_getspeed(ttydata_t *td)
 {
     speed_t spd;
 
@@ -1054,8 +1043,7 @@ tty_getspeed(td)
 } /* end tty_getspeed */
 
 int
-tty_gettabs(td)
-    ttydata_t *td;
+tty_gettabs(ttydata_t *td)
 {
 #if defined(POSIX) || defined(TERMIO)
     return ((td->d_t.c_oflag & TAB3) == TAB3) ? 0 : 1;
@@ -1065,8 +1053,7 @@ tty_gettabs(td)
 } /* end tty_gettabs */
 
 int
-tty_geteightbit(td)
-    ttydata_t *td;
+tty_geteightbit(ttydata_t *td)
 {
 #if defined(POSIX) || defined(TERMIO)
     return (td->d_t.c_cflag & CSIZE) == CS8;
@@ -1076,8 +1063,7 @@ tty_geteightbit(td)
 } /* end tty_geteightbit */
 
 int
-tty_cooked_mode(td)
-    ttydata_t *td;
+tty_cooked_mode(ttydata_t *td)
 {
 #if defined(POSIX) || defined(TERMIO)
     return (td->d_t.c_lflag & ICANON);
@@ -1088,9 +1074,7 @@ tty_cooked_mode(td)
 
 #ifdef _IBMR2
 void
-tty_setdisc(fd, dis)
-    int fd;
-    int dis;
+tty_setdisc(int fd, int dis)
 {
     static int edit_discipline = 0;
     static union txname tx_disc;
@@ -1124,8 +1108,7 @@ tty_setdisc(fd, dis)
 
 #ifdef DEBUG_TTY
 static void
-tty_printchar(s)
-    unsigned char *s;
+tty_printchar(unsigned char *s)
 {
     struct tcshmodes *m;
     int i;
@@ -1144,8 +1127,7 @@ tty_printchar(s)
 #endif /* DEBUG_TTY */
 #else /* WINNT_NATIVE */
 int
-tty_cooked_mode(td)
-    void *td;
+tty_cooked_mode(void *td)
 {
     return do_nt_check_cooked_mode();
 }

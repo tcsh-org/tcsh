@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.61 2004/11/23 02:10:49 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.62 2004/12/25 21:15:07 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.61 2004/11/23 02:10:49 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.62 2004/12/25 21:15:07 christos Exp $")
 
 #include "ed.h"
 
@@ -49,22 +49,22 @@ RCSID("$Id: sh.lex.c,v 3.61 2004/11/23 02:10:49 christos Exp $")
  * There is some involved processing here, because of the complications
  * of input buffering, and especially because of history substitution.
  */
-static	Char		*word		__P((int));
-static	eChar	 	 getC1		__P((int));
-static	void	 	 getdol		__P((void));
-static	void	 	 getexcl	__P((Char));
-static	struct Hist 	*findev		__P((Char *, int));
-static	void	 	 setexclp	__P((Char *));
-static	eChar	 	 bgetc		__P((void));
-static	void		 balloc		__P((int));
-static	void	 	 bfree		__P((void));
-static	struct wordent	*gethent	__P((Char));
-static	int	 	 matchs		__P((Char *, Char *));
-static	int	 	 getsel		__P((int *, int *, int));
-static	struct wordent	*getsub		__P((struct wordent *));
-static	Char 		*subword	__P((Char *, Char, int *));
-static	struct wordent	*dosub		__P((Char, struct wordent *, int));
-static	ssize_t		 wide_read	__P((int, Char *, size_t, int));
+static	Char		*word		(int);
+static	eChar	 	 getC1		(int);
+static	void	 	 getdol		(void);
+static	void	 	 getexcl	(Char);
+static	struct Hist 	*findev		(Char *, int);
+static	void	 	 setexclp	(Char *);
+static	eChar	 	 bgetc		(void);
+static	void		 balloc		(int);
+static	void	 	 bfree		(void);
+static	struct wordent	*gethent	(Char);
+static	int	 	 matchs		(Char *, Char *);
+static	int	 	 getsel		(int *, int *, int);
+static	struct wordent	*getsub		(struct wordent *);
+static	Char 		*subword	(Char *, Char, int *);
+static	struct wordent	*dosub		(Char, struct wordent *, int);
+static	ssize_t		 wide_read	(int, Char *, size_t, int);
 
 /*
  * Peekc is a peek character for getC, peekread for readc.
@@ -137,7 +137,7 @@ static Char getCtmp;
  * if reading saved history (sg)
  */
 time_t Htime = (time_t)0;
-static time_t a2time_t __P((Char *));
+static time_t a2time_t (Char *);
 
 /*
  * special parsing rules apply for source -h
@@ -152,8 +152,7 @@ extern int enterhist;
 static int uselastevent = 1;
 
 int
-lex(hp)
-    struct wordent *hp;
+lex(struct wordent *hp)
 {
     struct wordent *wdp;
     eChar    c;
@@ -209,8 +208,7 @@ lex(hp)
 }
 
 static time_t
-a2time_t(wordx)
-    Char *wordx;
+a2time_t(Char *wordx)
 {
     /* Attempt to distinguish timestamps from other possible entries.
      * Format: "+NNNNNNNNNN" (10 digits, left padded with ascii '0') */
@@ -236,8 +234,7 @@ a2time_t(wordx)
 }
 
 void
-prlex(sp0)
-    struct wordent *sp0;
+prlex(struct wordent *sp0)
 {
     struct wordent *sp = sp0->next;
 
@@ -252,9 +249,7 @@ prlex(sp0)
 }
 
 void
-copylex(hp, fp)
-    struct wordent *hp;
-    struct wordent *fp;
+copylex(struct wordent *hp, struct wordent *fp)
 {
     struct wordent *wdp;
 
@@ -276,8 +271,7 @@ copylex(hp, fp)
 }
 
 void
-freelex(vp)
-    struct wordent *vp;
+freelex(struct wordent *vp)
 {
     struct wordent *fp;
 
@@ -292,8 +286,7 @@ freelex(vp)
 }
 
 static Char *
-word(parsehtime)
-    int parsehtime;
+word(int parsehtime)
 {
     eChar c, c1;
     Char *wp, *unfinished = 0;
@@ -451,8 +444,7 @@ ret:
 }
 
 static eChar
-getC1(flag)
-    int flag;
+getC1(int flag)
 {
     eChar c;
 
@@ -511,7 +503,7 @@ getC1(flag)
 }
 
 static void
-getdol()
+getdol(void)
 {
     Char *np, *ep;
     Char    name[4 * MAXVARLEN + 1];
@@ -730,8 +722,7 @@ getdol()
 }
 
 void
-addla(cp)
-    Char   *cp;
+addla(Char *cp)
 {
     Char    buf[BUFSIZE];
 
@@ -755,8 +746,7 @@ static Char rhsb[64];
 static int quesarg;
 
 static void
-getexcl(sc)
-    Char    sc;
+getexcl(Char sc)
 {
     struct wordent *hp, *ip;
     int     left, right, dol;
@@ -838,8 +828,7 @@ subst:
 }
 
 static struct wordent *
-getsub(en)
-    struct wordent *en;
+getsub(struct wordent *en)
 {
     Char *cp;
     eChar   delim;
@@ -994,10 +983,7 @@ getsub(en)
 
 #define HIST_PURGE -50000000
 static struct wordent *
-dosub(sc, en, global)
-    Char   sc;
-    struct wordent *en;
-    int global;
+dosub(Char sc, struct wordent *en, int global)
 {
     struct wordent lexi;
     int    didsub = 0, didone = 0;
@@ -1054,10 +1040,7 @@ dosub(sc, en, global)
 }
 
 static Char *
-subword(cp, type, adid)
-    Char   *cp;
-    Char    type;
-    int   *adid;
+subword(Char *cp, Char type, int *adid)
 {
     Char    wbuf[BUFSIZE];
     Char *wp, *mp, *np;
@@ -1130,9 +1113,7 @@ subword(cp, type, adid)
 }
 
 Char   *
-domod(cp, type)
-    Char   *cp;
-    Char    type;
+domod(Char *cp, Char type)
 {
     Char *wp, *xp;
     int c;
@@ -1187,8 +1168,7 @@ domod(cp, type)
 }
 
 static int
-matchs(str, pat)
-    Char *str, *pat;
+matchs(Char *str, Char *pat)
 {
     while (*str && *pat && *str == *pat)
 	str++, pat++;
@@ -1196,9 +1176,7 @@ matchs(str, pat)
 }
 
 static int
-getsel(al, ar, dol)
-    int *al, *ar;
-    int     dol;
+getsel(int *al, int *ar, int dol)
 {
     eChar c = getC(0);
     int i;
@@ -1282,8 +1260,7 @@ getsel(al, ar, dol)
 }
 
 static struct wordent *
-gethent(sc)
-    Char   sc;
+gethent(Char sc)
 {
     struct Hist *hp;
     Char *np;
@@ -1408,9 +1385,7 @@ gethent(sc)
 }
 
 static struct Hist *
-findev(cp, anyarg)
-    Char   *cp;
-    int    anyarg;
+findev(Char *cp, int anyarg)
 {
     struct Hist *hp;
 
@@ -1460,8 +1435,7 @@ findev(cp, anyarg)
 
 
 static void
-setexclp(cp)
-    Char *cp;
+setexclp(Char *cp)
 {
     if (cp && cp[0] == '\n')
 	return;
@@ -1469,15 +1443,13 @@ setexclp(cp)
 }
 
 void
-unreadc(c)
-    Char    c;
+unreadc(Char c)
 {
     peekread = (Char) c;
 }
 
 eChar
-readc(wanteof)
-    int    wanteof;
+readc(int wanteof)
 {
     eChar c;
     static  int sincereal;	/* Number of real EOFs we've seen */
@@ -1666,8 +1638,7 @@ reread:
 }
 
 static void
-balloc(buf)
-    int buf;
+balloc(int buf)
 {
     Char **nfbuf;
 
@@ -1685,11 +1656,7 @@ balloc(buf)
 }
 
 static ssize_t
-wide_read(fildes, buf, nchars, use_fclens)
-    int fildes;
-    Char *buf;
-    size_t nchars;
-    int use_fclens;
+wide_read(int fildes, Char *buf, size_t nchars, int use_fclens)
 {
     char cbuf[BUFSIZE + 1];
     ssize_t res, r;
@@ -1741,7 +1708,7 @@ wide_read(fildes, buf, nchars, use_fclens)
 }
 
 static eChar
-bgetc()
+bgetc(void)
 {
     Char ch;
     int c, off, buf;
@@ -1832,7 +1799,7 @@ bgetc()
 }
 
 static void
-bfree()
+bfree(void)
 {
     int sb, i;
 
@@ -1852,8 +1819,7 @@ bfree()
 }
 
 void
-bseek(l)
-    struct Ain   *l;
+bseek(struct Ain *l)
 {
     switch (aret = l->type) {
     case TCSH_E_SEEK:
@@ -1906,8 +1872,7 @@ bseek(l)
 
 /* any similarity to bell telephone is purely accidental */
 void
-btell(l)
-struct Ain *l;
+btell(struct Ain *l)
 {
     switch (l->type = aret) {
     case TCSH_E_SEEK:
@@ -1948,7 +1913,7 @@ struct Ain *l;
 }
 
 void
-btoeof()
+btoeof(void)
 {
     (void) lseek(SHIN, (off_t) 0, L_XTND);
     aret = TCSH_F_SEEK;
@@ -1962,7 +1927,7 @@ btoeof()
 }
 
 void
-settell()
+settell(void)
 {
     off_t x;
     cantell = 0;

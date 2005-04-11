@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.help.c,v 3.20 2004/08/04 17:12:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.help.c,v 3.21 2005/01/18 20:24:51 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -35,24 +35,23 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.help.c,v 3.20 2004/08/04 17:12:32 christos Exp $")
+RCSID("$Id: tw.help.c,v 3.21 2005/01/18 20:24:51 christos Exp $")
 
 #include "tw.h"
 #include "tc.h"
 
 
 static int f = -1;
-static	RETSIGTYPE	 cleanf		__P((int));
-static	Char    	*skipslist	__P((Char *));
-static	void		 nextslist 	__P((Char *, Char *));
+static	RETSIGTYPE	 cleanf		(int);
+static	Char    	*skipslist	(Char *);
+static	void		 nextslist 	(Char *, Char *);
 
 static const char *h_ext[] = {
     ".help", ".1", ".8", ".6", "", NULL
 };
 
 void
-do_help(command)
-    Char   *command;
+do_help(Char *command)
 {
     Char    name[FILSIZ + 1];
     Char   *cmd_p, *ep;
@@ -145,8 +144,7 @@ do_help(command)
 
 static RETSIGTYPE
 /*ARGSUSED*/
-cleanf(snum)
-int snum;
+cleanf(int snum)
 {
     USE(snum);
 #ifdef UNRELSIGS
@@ -169,9 +167,7 @@ int snum;
  */
 
 static void
-nextslist(sl, np)
-    Char *sl;
-    Char *np;
+nextslist(Char *sl, Char *np)
 {
     if (!*sl)
 	*np = '\000';
@@ -191,8 +187,7 @@ nextslist(sl, np)
  */
 
 static Char *
-skipslist(sl)
-    Char *sl;
+skipslist(Char *sl)
 {
     while (*sl && *sl++ != ':')
 	continue;

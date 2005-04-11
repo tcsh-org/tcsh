@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.89 2005/03/03 16:49:16 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.90 2005/03/03 19:57:07 kim Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.89 2005/03/03 16:49:16 kim Exp $")
+RCSID("$Id: sh.proc.c,v 3.90 2005/03/03 19:57:07 kim Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -110,18 +110,18 @@ static struct tms zru = {0L, 0L, 0L, 0L}, lru = {0L, 0L, 0L, 0L};
 # define	RUSAGE_CHILDREN	-1
 #endif /* RUSAGE_CHILDREN */
 
-static	void		 pflushall	__P((void));
-static	void		 pflush		__P((struct process *));
-static	void		 pfree		__P((struct process *));
-static	void		 pclrcurr	__P((struct process *));
-static	void		 padd		__P((struct command *));
-static	int		 pprint		__P((struct process *, int));
-static	void		 ptprint	__P((struct process *));
-static	void		 pads		__P((Char *));
-static	void		 pkill		__P((Char **, int));
-static	struct process	*pgetcurr	__P((struct process *));
-static	void		 okpcntl	__P((void));
-static	void		 setttypgrp	__P((int));
+static	void		 pflushall	(void);
+static	void		 pflush		(struct process *);
+static	void		 pfree		(struct process *);
+static	void		 pclrcurr	(struct process *);
+static	void		 padd		(struct command *);
+static	int		 pprint		(struct process *, int);
+static	void		 ptprint	(struct process *);
+static	void		 pads		(Char *);
+static	void		 pkill		(Char **, int);
+static	struct process	*pgetcurr	(struct process *);
+static	void		 okpcntl	(void);
+static	void		 setttypgrp	(int);
 
 /*
  * pchild - called at interrupt level by the SIGCHLD signal
@@ -132,8 +132,7 @@ static	void		 setttypgrp	__P((int));
  */
 RETSIGTYPE
 /*ARGSUSED*/
-pchild(snum)
-int snum;
+pchild(int snum)
 {
     struct process *pp;
     struct process *fp;
@@ -197,7 +196,7 @@ loop:
         (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
 #   else
     /* both a wait3 and rusage */
-#    if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || defined(linux) || defined(__GNU__) || defined(__GLIBC__) || (defined(IRIS4D) && (__STDC__ || defined(PROTOTYPES)) && SYSVREL <= 3) || defined(__lucid) || defined(__osf__)
+#    if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || defined(linux) || defined(__GNU__) || defined(__GLIBC__) || (defined(IRIS4D) && SYSVREL <= 3) || defined(__lucid) || defined(__osf__)
     pid = wait3(&w,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
 #    else /* BSDWAIT */
@@ -452,7 +451,7 @@ found:
 }
 
 void
-pnote()
+pnote(void)
 {
     struct process *pp;
     int     flags;
@@ -483,8 +482,7 @@ pnote()
 
 
 static void
-pfree(pp)
-    struct process *pp;
+pfree(struct process *pp)
 {	
     xfree((ptr_t) pp->p_command);
     if (pp->p_cwd && --pp->p_cwd->di_count == 0)
@@ -499,7 +497,7 @@ pfree(pp)
  *	of current and previous job indicators.
  */
 void
-pwait()
+pwait(void)
 {
     struct process *fp, *pp;
 #ifdef BSDSIGS
@@ -538,8 +536,7 @@ pwait()
  *	It is assumed to be in the foreground state (PFOREGND)
  */
 void
-pjwait(pp)
-    struct process *pp;
+pjwait(struct process *pp)
 {
     struct process *fp;
     int     jobflags, reason;
@@ -662,9 +659,7 @@ pjwait(pp)
 
 /*ARGSUSED*/
 void
-dowait(v, c)
-    Char **v;
-    struct command *c;
+dowait(Char **v, struct command *c)
 {
     struct process *pp;
 #ifdef BSDSIGS
@@ -705,7 +700,7 @@ loop:
  * pflushall - flush all jobs from list (e.g. at fork())
  */
 static void
-pflushall()
+pflushall(void)
 {
     struct process *pp;
 
@@ -720,8 +715,7 @@ pflushall()
  *	space is not done here since pflush is called at interrupt level.
  */
 static void
-pflush(pp)
-    struct process *pp;
+pflush(struct process *pp)
 {
     struct process *np;
     int idx;
@@ -754,8 +748,7 @@ pflush(pp)
  *	pp MUST be the job leader
  */
 static void
-pclrcurr(pp)
-    struct process *pp;
+pclrcurr(struct process *pp)
 {
     if (pp == pcurrent) {
 	if (pprevious != NULL) {
@@ -780,8 +773,7 @@ static Char *cmdp;
  * unparse - Export padd() functionality 
  */
 Char *
-unparse(t)
-    struct command *t;
+unparse(struct command *t)
 {
     cmdp = command;
     cmdlen = 0;
@@ -796,9 +788,7 @@ unparse(t)
  *	an important assumption is made that the process is running.
  */
 void
-palloc(pid, t)
-    int     pid;
-    struct command *t;
+palloc(int pid, struct command *t)
 {
     struct process *pp;
     int     i;
@@ -884,8 +874,7 @@ palloc(pid, t)
 }
 
 static void
-padd(t)
-    struct command *t;
+padd(struct command *t)
 {
     Char  **argp;
 
@@ -948,8 +937,7 @@ padd(t)
 }
 
 static void
-pads(cp)
-    Char   *cp;
+pads(Char *cp)
 {
     int i;
 
@@ -981,7 +969,7 @@ pads(cp)
  *	and `` in globbing.
  */
 void
-psavejob()
+psavejob(void)
 {
     pholdjob = pcurrjob;
     pcurrjob = NULL;
@@ -992,7 +980,7 @@ psavejob()
  *	somewhere, but pendjob cleans up anyway.
  */
 void
-prestjob()
+prestjob(void)
 {
     pcurrjob = pholdjob;
     pholdjob = NULL;
@@ -1003,7 +991,7 @@ prestjob()
  *	or is about to begin.
  */
 void
-pendjob()
+pendjob(void)
 {
     struct process *pp, *tp;
 
@@ -1034,9 +1022,7 @@ pendjob()
  */
 
 static int
-pprint(pp, flag)
-    struct process *pp;
-    int    flag;
+pprint(struct process *pp, int flag)
 {
     int status, reason;
     struct process *tp;
@@ -1279,8 +1265,7 @@ prcomd:
 	   ((tvp)->tv_sec  cmp (uvp)->tv_sec))
 
 static void
-ptprint(tp)
-    struct process *tp;
+ptprint(struct process *tp)
 {
 #ifdef BSDTIMES
     struct timeval tetime, diff;
@@ -1360,9 +1345,7 @@ ptprint(tp)
  */
 /*ARGSUSED*/
 void
-dojobs(v, c)
-    Char  **v;
-    struct command *c;
+dojobs(Char **v, struct command *c)
 {
     struct process *pp;
     int flag = NUMBER | NAME | REASON;
@@ -1391,9 +1374,7 @@ dojobs(v, c)
  */
 /*ARGSUSED*/
 void
-dofg(v, c)
-    Char  **v;
-    struct command *c;
+dofg(Char **v, struct command *c)
 {
     struct process *pp;
 
@@ -1422,9 +1403,7 @@ dofg(v, c)
  */
 /*ARGSUSED*/
 void
-dofg1(v, c)
-    Char  **v;
-    struct command *c;
+dofg1(Char **v, struct command *c)
 {
     struct process *pp;
 
@@ -1450,9 +1429,7 @@ dofg1(v, c)
  */
 /*ARGSUSED*/
 void
-dobg(v, c)
-    Char  **v;
-    struct command *c;
+dobg(Char **v, struct command *c)
 {
     struct process *pp;
 
@@ -1473,9 +1450,7 @@ dobg(v, c)
  */
 /*ARGSUSED*/
 void
-dobg1(v, c)
-    Char  **v;
-    struct command *c;
+dobg1(Char **v, struct command *c)
 {
     struct process *pp;
 
@@ -1492,9 +1467,7 @@ dobg1(v, c)
  */
 /*ARGSUSED*/
 void
-dostop(v, c)
-    Char  **v;
-    struct command *c;
+dostop(Char **v, struct command *c)
 {
     USE(c);
 #ifdef BSDJOBS
@@ -1507,9 +1480,7 @@ dostop(v, c)
  */
 /*ARGSUSED*/
 void
-dokill(v, c)
-    Char  **v;
-    struct command *c;
+dokill(Char **v, struct command *c)
 {
     int signum, len = 0;
     const char *name;
@@ -1564,9 +1535,7 @@ gotsig:
 }
 
 static void
-pkill(v, signum)
-    Char  **v;
-    int     signum;
+pkill(Char **v, int signum)
 {
     struct process *pp, *np;
     int jobflags = 0, err1 = 0;
@@ -1692,9 +1661,7 @@ cont:
  * pstart - start the job in foreground/background
  */
 int
-pstart(pp, foregnd)
-    struct process *pp;
-    int     foregnd;
+pstart(struct process *pp, int foregnd)
 {
     int rv = 0;
     struct process *np;
@@ -1767,8 +1734,7 @@ pstart(pp, foregnd)
 }
 
 void
-panystop(neednl)
-    int    neednl;
+panystop(int neednl)
 {
     struct process *pp;
 
@@ -1779,8 +1745,7 @@ panystop(neednl)
 }
 
 struct process *
-pfind(cp)
-    Char   *cp;
+pfind(Char *cp)
 {
     struct process *pp, *np;
 
@@ -1834,8 +1799,7 @@ pfind(cp)
  * pgetcurr - find most recent job that is not pp, preferably stopped
  */
 static struct process *
-pgetcurr(pp)
-    struct process *pp;
+pgetcurr(struct process *pp)
 {
     struct process *np;
     struct process *xp = NULL;
@@ -1856,9 +1820,7 @@ pgetcurr(pp)
  */
 /*ARGSUSED*/
 void
-donotify(v, c)
-    Char  **v;
-    struct command *c;
+donotify(Char **v, struct command *c)
 {
     struct process *pp;
 
@@ -1880,9 +1842,7 @@ donotify(v, c)
  */
 
 int
-pfork(t, wanttty)
-    struct command *t;		/* command we are forking for */
-    int     wanttty;
+pfork(struct command *t, int wanttty)
 {
     int pid;
     int    ignint = 0;
@@ -2062,7 +2022,7 @@ pfork(t, wanttty)
 }
 
 static void
-okpcntl()
+okpcntl(void)
 {
     if (tpgrp == -1)
 	stderror(ERR_JOBCONTROL);
@@ -2072,8 +2032,7 @@ okpcntl()
 
 
 static void
-setttypgrp(pgrp)
-    int pgrp;
+setttypgrp(int pgrp)
 {
     /*
      * If we are piping out a builtin, eg. 'echo | more' things can go
@@ -2114,8 +2073,7 @@ setttypgrp(pgrp)
  * I am open to suggestions how to fix that.
  */
 void
-pgetty(wanttty, pgrp)
-    int     wanttty, pgrp;
+pgetty(int wanttty, int pgrp)
 {
 #ifdef BSDJOBS
 # if defined(BSDSIGS) && defined(POSIXJOBS)

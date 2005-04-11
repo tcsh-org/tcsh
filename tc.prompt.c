@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.52 2004/12/25 21:15:08 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.53 2005/01/05 18:06:43 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.52 2004/12/25 21:15:08 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.53 2005/01/05 18:06:43 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -52,7 +52,7 @@ static const char   *month_list[12];
 static const char   *day_list[7];
 
 void
-dateinit()
+dateinit(void)
 {
 #ifdef notyet
   int i;
@@ -108,9 +108,7 @@ dateinit()
 }
 
 void
-printprompt(promptno, str)
-    int     promptno;
-    const char   *str;
+printprompt(int promptno, const char *str)
 {
     static  Char *ocp = NULL;
     static  const char *ostr = NULL;
@@ -168,14 +166,8 @@ printprompt(promptno, str)
 }
 
 void
-tprintf(what, buf, fmt, siz, str, tim, info)
-    int what;
-    Char *buf;
-    const Char *fmt;
-    size_t siz;
-    const char *str;
-    time_t tim;
-    ptr_t info;
+tprintf(int what, Char *buf, const Char *fmt, size_t siz, const char *str,
+	time_t tim, ptr_t info)
 {
     Char   *z, *q;
     Char    attributes = 0;
@@ -617,11 +609,7 @@ tprintf(what, buf, fmt, siz, str, tim, info)
 }
 
 Char *
-expdollar(dstp, srcp, spp, attr)
-    Char **dstp;
-    const Char **srcp;
-    size_t *spp;
-    int	    attr;
+expdollar(Char **dstp, const Char **srcp, size_t *spp, int attr)
 {
     struct varent *vp;
     Char var[MAXVARLEN];

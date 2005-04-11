@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.27 2004/12/25 21:15:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.28 2005/01/05 16:06:13 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.file.c,v 3.27 2004/12/25 21:15:07 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.28 2005/01/05 16:06:13 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -59,26 +59,26 @@ typedef enum {
     LIST, RECOGNIZE
 }       COMMAND;
 
-static	void	 setup_tty		__P((int));
-static	void	 back_to_col_1		__P((void));
-static	void	 pushback		__P((Char *));
-static	void	 catn			__P((Char *, Char *, int));
-static	void	 copyn			__P((Char *, Char *, int));
-static	int	 filetype		__P((Char *, Char *));
-static	void	 print_by_column	__P((Char *, Char *[], size_t));
-static	Char 	*tilde			__P((Char *, Char *));
-static	void	 retype			__P((void));
-static	void	 beep			__P((void));
-static	void 	 print_recognized_stuff	__P((Char *));
-static	void	 extract_dir_and_name	__P((Char *, Char *, Char *));
-static	Char	*getitem		__P((DIR *, int));
-static	void	 free_items		__P((Char **, size_t));
-static	int	 tsearch		__P((Char *, COMMAND, int));
-static	int	 compare		__P((const ptr_t, const ptr_t));
-static	int	 recognize		__P((Char *, Char *, int, size_t));
-static	int	 is_prefix		__P((Char *, Char *));
-static	int	 is_suffix		__P((Char *, Char *));
-static	int	 ignored		__P((Char *));
+static	void	 setup_tty		(int);
+static	void	 back_to_col_1		(void);
+static	void	 pushback		(Char *);
+static	void	 catn			(Char *, Char *, int);
+static	void	 copyn			(Char *, Char *, int);
+static	int	 filetype		(Char *, Char *);
+static	void	 print_by_column	(Char *, Char *[], size_t);
+static	Char 	*tilde			(Char *, Char *);
+static	void	 retype			(void);
+static	void	 beep			(void);
+static	void 	 print_recognized_stuff	(Char *);
+static	void	 extract_dir_and_name	(Char *, Char *, Char *);
+static	Char	*getitem		(DIR *, int);
+static	void	 free_items		(Char **, size_t);
+static	int	 tsearch		(Char *, COMMAND, int);
+static	int	 compare		(const ptr_t, const ptr_t);
+static	int	 recognize		(Char *, Char *, int, size_t);
+static	int	 is_prefix		(Char *, Char *);
+static	int	 is_suffix		(Char *, Char *);
+static	int	 ignored		(Char *);
 
 
 /*
@@ -89,8 +89,7 @@ static	int	 ignored		__P((Char *));
 int    filec = 0;
 
 static void
-setup_tty(on)
-    int     on;
+setup_tty(int on)
 {
 #ifdef TERMIO
 # ifdef POSIX
@@ -164,7 +163,7 @@ setup_tty(on)
  * Move back to beginning of current line
  */
 static void
-back_to_col_1()
+back_to_col_1(void)
 {
 #ifdef TERMIO
 # ifdef POSIX
@@ -222,8 +221,7 @@ back_to_col_1()
  * Push string contents back into tty queue
  */
 static void
-pushback(string)
-    Char   *string;
+pushback(Char *string)
 {
     Char *p;
 #ifdef TERMIO
@@ -293,9 +291,7 @@ pushback(string)
  * Always null terminate.
  */
 static void
-catn(des, src, count)
-    Char *des, *src;
-    int count;
+catn(Char *des, Char *src, int count)
 {
     while (--count >= 0 && *des)
 	des++;
@@ -310,9 +306,7 @@ catn(des, src, count)
  * and always null terminate.
  */
 static void
-copyn(des, src, count)
-    Char *des, *src;
-    int count;
+copyn(Char *des, Char *src, int count)
 {
     while (--count >= 0)
 	if ((*des++ = *src++) == 0)
@@ -321,8 +315,7 @@ copyn(des, src, count)
 }
 
 static int
-filetype(dir, file)
-    Char   *dir, *file;
+filetype(Char *dir, Char *file)
 {
     Char    path[MAXPATHLEN];
     struct stat statb;
@@ -357,9 +350,7 @@ static struct winsize win;
  * Print sorted down columns
  */
 static void
-print_by_column(dir, items, count)
-    Char   *dir, *items[];
-    size_t  count;
+print_by_column(Char *dir, Char *items[], size_t count)
 {
     size_t i;
     int rows, r, c, maxwidth = 0, columns;
@@ -400,8 +391,7 @@ print_by_column(dir, items, count)
  *	home_directory_of_person/mumble
  */
 static Char *
-tilde(new, old)
-    Char   *new, *old;
+tilde(Char *new, Char *old)
 {
     Char *o, *p;
     struct passwd *pw;
@@ -428,7 +418,7 @@ tilde(new, old)
  * Cause pending line to be printed
  */
 static void
-retype()
+retype(void)
 {
 #ifdef TERMIO
 # ifdef POSIX
@@ -456,7 +446,7 @@ retype()
 }
 
 static void
-beep()
+beep(void)
 {
     if (adrof(STRnobeep) == 0)
 #ifdef IS_ASCII
@@ -474,8 +464,7 @@ beep()
  * print the recognized part of the string
  */
 static void
-print_recognized_stuff(recognized_part)
-    Char   *recognized_part;
+print_recognized_stuff(Char *recognized_part)
 {
     /* An optimized erasing of that silly ^[ */
     (void) putraw('\b');
@@ -507,8 +496,7 @@ print_recognized_stuff(recognized_part)
  * Should leave final slash (/) at end of dir.
  */
 static void
-extract_dir_and_name(path, dir, name)
-    Char   *path, *dir, *name;
+extract_dir_and_name(Char *path, Char *dir, Char *name)
 {
     Char *p;
 
@@ -524,9 +512,7 @@ extract_dir_and_name(path, dir, name)
 }
 
 static Char *
-getitem(dir_fd, looking_for_lognames)
-    DIR    *dir_fd;
-    int     looking_for_lognames;
+getitem(DIR *dir_fd, int looking_for_lognames)
 {
     struct passwd *pw;
     struct dirent *dirp;
@@ -546,9 +532,7 @@ getitem(dir_fd, looking_for_lognames)
 }
 
 static void
-free_items(items, numitems)
-    Char **items;
-    size_t numitems;
+free_items(Char **items, size_t numitems)
 {
     size_t i;
 
@@ -577,10 +561,7 @@ free_items(items, numitems)
  * Perform a RECOGNIZE or LIST command on string "word".
  */
 static int
-tsearch(word, command, max_word_length)
-    Char   *word;
-    int     max_word_length;
-    COMMAND command;
+tsearch(Char *word, COMMAND command, int max_word_length)
 {
     DIR *dir_fd;
     int ignoring = TRUE, nignored = 0;
@@ -672,7 +653,7 @@ again:				/* search for matches */
     }
     else {			/* LIST */
 	qsort((ptr_t) items, numitems, sizeof(items[0]), 
-	    (int (*) __P((const void *, const void *))) compare);
+	    (int (*) (const void *, const void *)) compare);
 	print_by_column(looking_for_lognames ? NULL : tilded_dir,
 			items, numitems);
 	if (items != NULL)
@@ -683,8 +664,7 @@ again:				/* search for matches */
 
 
 static int
-compare(p, q)
-    const ptr_t  p, q;
+compare(const ptr_t p, const ptr_t q)
 {
 #ifdef WIDE_STRINGS
     errno = 0;
@@ -717,10 +697,7 @@ compare(p, q)
  * If we shorten it back to the prefix length, stop searching.
  */
 static int
-recognize(extended_name, item, name_length, numitems)
-    Char   *extended_name, *item;
-    int     name_length;
-    size_t  numitems;
+recognize(Char *extended_name, Char *item, int name_length, size_t numitems)
 {
     if (numitems == 1)		/* 1st match */
 	copyn(extended_name, item, MAXNAMLEN);
@@ -743,8 +720,7 @@ recognize(extended_name, item, name_length, numitems)
  * it matches anything.
  */
 static int
-is_prefix(check, template)
-    Char *check, *template;
+is_prefix(Char *check, Char *template)
 {
     do
 	if (*check == 0)
@@ -758,8 +734,7 @@ is_prefix(check, template)
  *  end of check, I.e., are it's suffix.
  */
 static int
-is_suffix(check, template)
-    Char   *check, *template;
+is_suffix(Char *check, Char *template)
 {
     Char *c, *t;
 
@@ -774,9 +749,7 @@ is_suffix(check, template)
 }
 
 int
-tenex(inputline, inputline_size)
-    Char   *inputline;
-    int     inputline_size;
+tenex(Char *inputline, int inputline_size)
 {
     int numitems, num_read;
     char    tinputline[BUFSIZE + 1];
@@ -845,8 +818,7 @@ tenex(inputline, inputline_size)
 }
 
 static int
-ignored(item)
-    Char *item;
+ignored(Char *item)
 {
     struct varent *vp;
     Char **cp;

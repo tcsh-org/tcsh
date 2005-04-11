@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.61 2004/11/23 02:10:49 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.62 2004/12/25 21:15:07 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.61 2004/11/23 02:10:49 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.62 2004/12/25 21:15:07 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -73,19 +73,18 @@ static int pargc = 0;
  * handled in glob() which is part of the 4.4BSD libc.
  *
  */
-static	Char	 *globtilde	__P((Char **, Char *));
-static	Char     *handleone	__P((Char *, Char **, int));
-static	Char	**libglob	__P((Char **));
-static	Char	**globexpand	__P((Char **));
-static	int	  globbrace	__P((Char *, Char *, Char ***));
-static  void	  expbrace	__P((Char ***, Char ***, int));
-static	void	  pword		__P((int));
-static	void	  psave		__P((Char));
-static	void	  backeval	__P((Char *, int));
+static	Char	 *globtilde	(Char **, Char *);
+static	Char     *handleone	(Char *, Char **, int);
+static	Char	**libglob	(Char **);
+static	Char	**globexpand	(Char **);
+static	int	  globbrace	(Char *, Char *, Char ***);
+static  void	  expbrace	(Char ***, Char ***, int);
+static	void	  pword		(int);
+static	void	  psave		(Char);
+static	void	  backeval	(Char *, int);
 
 static Char *
-globtilde(nv, s)
-    Char  **nv, *s;
+globtilde(Char **nv, Char *s)
 {
     Char    gbuf[BUFSIZE], *gstart, *b, *u, *e;
 #ifdef apollo
@@ -126,8 +125,7 @@ globtilde(nv, s)
 }
 
 Char *
-globequal(new, old)
-    Char *new, *old;
+globequal(Char *new, Char *old)
 {
     int     dig;
     Char    *b, *d;
@@ -167,8 +165,7 @@ globequal(new, old)
 }
 
 static int
-globbrace(s, p, bl)
-    Char   *s, *p, ***bl;
+globbrace(Char *s, Char *p, Char ***bl)
 {
     int     i, len;
     Char   *pm, *pe, *lm, *pl;
@@ -259,9 +256,7 @@ globbrace(s, p, bl)
 
 
 static void
-expbrace(nvp, elp, size)
-    Char ***nvp, ***elp;
-    int size;
+expbrace(Char ***nvp, Char ***elp, int size)
 {
     Char **vl, **el, **nv, *s;
 
@@ -335,8 +330,7 @@ expbrace(nvp, elp, size)
 }
 
 static Char **
-globexpand(v)
-    Char  **v;
+globexpand(Char **v)
 {
     Char   *s;
     Char  **nv, **vl, **el;
@@ -432,9 +426,7 @@ globexpand(v)
 }
 
 static Char *
-handleone(str, vl, action)
-    Char   *str, **vl;
-    int     action;
+handleone(Char *str, Char **vl, int action)
 {
 
     Char   **vlp = vl;
@@ -472,8 +464,7 @@ handleone(str, vl, action)
 }
 
 static Char **
-libglob(vl)
-    Char  **vl;
+libglob(Char **vl)
 {
     int     gflgs = GLOB_QUOTE | GLOB_NOMAGIC | GLOB_ALTNOT;
     glob_t  globv;
@@ -519,9 +510,7 @@ libglob(vl)
 }
 
 Char   *
-globone(str, action)
-    Char   *str;
-    int     action;
+globone(Char *str, int action)
 {
 
     Char   *v[2], **vl, **vo;
@@ -581,8 +570,7 @@ globone(str, action)
 }
 
 Char  **
-globall(v)
-    Char  **v;
+globall(Char **v)
 {
     Char  **vl, **vo;
     int gflg = gflag;
@@ -616,7 +604,7 @@ globall(v)
 }
 
 void
-ginit()
+ginit(void)
 {
     gargsiz = GLOBSPACE;
     gargv = (Char **) xmalloc((size_t) (sizeof(Char *) * gargsiz));
@@ -625,9 +613,7 @@ ginit()
 }
 
 void
-rscan(t, f)
-    Char **t;
-    void    (*f) __P((Char));
+rscan(Char **t, void (*f) (Char))
 {
     Char *p;
 
@@ -637,8 +623,7 @@ rscan(t, f)
 }
 
 void
-trim(t)
-    Char **t;
+trim(Char **t)
 {
     Char *p;
 
@@ -648,8 +633,7 @@ trim(t)
 }
 
 void
-tglob(t)
-    Char **t;
+tglob(Char **t)
 {
     Char *p, *c;
 
@@ -704,9 +688,7 @@ tglob(t)
  * words only at newlines.
  */
 Char  **
-dobackp(cp, literal)
-    Char   *cp;
-    int    literal;
+dobackp(Char *cp, int literal)
 {
     Char *lp, *rp;
     Char   *ep, word[LONGBSIZE];
@@ -750,9 +732,7 @@ dobackp(cp, literal)
 
 
 static void
-backeval(cp, literal)
-    Char   *cp;
-    int    literal;
+backeval(Char *cp, int literal)
 {
     int icnt;
     Char c, *ip;
@@ -961,8 +941,7 @@ backeval(cp, literal)
 }
 
 static void
-psave(c)
-    Char   c;
+psave(Char c)
 {
     if (--pnleft <= 0)
 	stderror(ERR_WTOOLONG);
@@ -970,8 +949,7 @@ psave(c)
 }
 
 static void
-pword(bufsiz)
-    int    bufsiz;
+pword(int bufsiz)
 {
     psave(0);
     if (pargc == pargsiz - 1) {
@@ -987,15 +965,13 @@ pword(bufsiz)
 }
 
 int
-Gmatch(string, pattern)
-    Char *string, *pattern;
+Gmatch(Char *string, Char *pattern)
 {
     return Gnmatch(string, pattern, NULL);
 }
 
 int 
-Gnmatch(string, pattern, endstr)
-    Char *string, *pattern, **endstr;
+Gnmatch(Char *string, Char *pattern, Char **endstr)
 {
     Char **blk, **p, *tstring = string;
     int	   gpol = 1, gres = 0;
@@ -1039,9 +1015,7 @@ Gnmatch(string, pattern, endstr)
  *	*estr will point to the end of the longest exact or substring match.
  */
 int
-t_pmatch(string, pattern, estr, cs)
-    Char *string, *pattern, **estr;
-    int cs;
+t_pmatch(Char *string, Char *pattern, Char **estr, int cs)
 {
     NLSChar stringc, patternc, rangec;
     int     match, negate_range;
@@ -1146,8 +1120,7 @@ t_pmatch(string, pattern, estr, cs)
 }
 
 void
-Gcat(s1, s2)
-    Char   *s1, *s2;
+Gcat(Char *s1, Char *s2)
 {
     Char *p, *q;
     int     n;
@@ -1172,8 +1145,7 @@ Gcat(s1, s2)
 
 #if defined(FILEC) && defined(TIOCSTI)
 int
-sortscmp(a, b)
-    Char **a, **b;
+sortscmp(Char **a, Char **b)
 {
     if (!a)			/* check for NULL */
 	return (b ? 1 : 0);

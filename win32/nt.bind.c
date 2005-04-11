@@ -1,4 +1,4 @@
-/*$Header$*/
+/*$Header: /src/pub/tcsh/win32/nt.bind.c,v 1.3 2002/08/11 07:58:12 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -1277,8 +1277,7 @@ KEYCMD  CcViCmdMap[] = {
     F_UNASSIGNED		/* DEL */
 };
 static void
-nt_bad_spec(str)
-    Char *str;
+nt_bad_spec(Char *str)
 {
     xprintf(CGETS(20, 4, "Bad key spec %S\n"), str);
 }

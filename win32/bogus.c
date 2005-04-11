@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/bogus.c,v 1.3 2002/08/11 07:58:12 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/bogus.c,v 1.4 2004/05/19 18:22:27 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -150,9 +150,7 @@ int tty_geteightbit(void *ignore) {
 	return 1;
 }
 void
-dosetty(v, t)
-    Char **v;
-    struct command *t;
+dosetty(Char **v, struct command *t)
 {
 	xprintf("setty not supported in NT\n");
 }

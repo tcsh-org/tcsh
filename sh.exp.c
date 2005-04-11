@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exp.c,v 3.44 2005/01/05 16:06:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exp.c,v 3.45 2005/01/18 20:24:50 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.44 2005/01/05 16:06:13 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.45 2005/01/18 20:24:50 christos Exp $")
 
 #include "tw.h"
 
@@ -57,25 +57,25 @@ RCSID("$Id: sh.exp.c,v 3.44 2005/01/05 16:06:13 christos Exp $")
 #define EQMATCH 7
 #define NOTEQMATCH 8
 
-static	int	 sh_access	__P((Char *, int));
-static	int	 exp1		__P((Char ***, int));
-static	int	 exp2x		__P((Char ***, int));
-static	int	 exp2a		__P((Char ***, int));
-static	int	 exp2b		__P((Char ***, int));
-static	int	 exp2c		__P((Char ***, int));
-static	Char 	*exp3		__P((Char ***, int));
-static	Char 	*exp3a		__P((Char ***, int));
-static	Char 	*exp4		__P((Char ***, int));
-static	Char 	*exp5		__P((Char ***, int));
-static	Char 	*exp6		__P((Char ***, int));
-static	void	 evalav		__P((Char **));
-static	int	 isa		__P((Char *, int));
-static	int	 egetn		__P((Char *));
+static	int	 sh_access	(Char *, int);
+static	int	 exp1		(Char ***, int);
+static	int	 exp2x		(Char ***, int);
+static	int	 exp2a		(Char ***, int);
+static	int	 exp2b		(Char ***, int);
+static	int	 exp2c		(Char ***, int);
+static	Char 	*exp3		(Char ***, int);
+static	Char 	*exp3a		(Char ***, int);
+static	Char 	*exp4		(Char ***, int);
+static	Char 	*exp5		(Char ***, int);
+static	Char 	*exp6		(Char ***, int);
+static	void	 evalav		(Char **);
+static	int	 isa		(Char *, int);
+static	int	 egetn		(Char *);
 
 
 #ifdef EDEBUG
-static	void	 etracc		__P((char *, Char *, Char ***));
-static	void	 etraci		__P((char *, int, Char ***));
+static	void	 etracc		(char *, Char *, Char ***);
+static	void	 etraci		(char *, int, Char ***);
 #endif /* EDEBUG */
 
 
@@ -84,9 +84,7 @@ static	void	 etraci		__P((char *, int, Char ***));
  * From Beto Appleton (beto@aixwiz.aix.ibm.com)
  */
 static int
-sh_access(fname, mode)
-    Char *fname;
-    int mode;
+sh_access(Char *fname, int mode)
 {
 #if defined(POSIX) && !defined(USE_ACCESS)
     struct stat     statb;
@@ -185,16 +183,13 @@ sh_access(fname, mode)
 }
 
 int
-expr(vp)
-    Char ***vp;
+expr(Char ***vp)
 {
     return (exp0(vp, 0));
 }
 
 int
-exp0(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp0(Char ***vp, int ignore)
 {
     int p1 = exp1(vp, ignore);
 
@@ -215,9 +210,7 @@ exp0(vp, ignore)
 }
 
 static int
-exp1(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp1(Char ***vp, int ignore)
 {
     int p1 = exp2x(vp, ignore);
 
@@ -238,9 +231,7 @@ exp1(vp, ignore)
 }
 
 static int
-exp2x(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp2x(Char ***vp, int ignore)
 {
     int p1 = exp2a(vp, ignore);
 
@@ -261,9 +252,7 @@ exp2x(vp, ignore)
 }
 
 static int
-exp2a(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp2a(Char ***vp, int ignore)
 {
     int p1 = exp2b(vp, ignore);
 
@@ -284,9 +273,7 @@ exp2a(vp, ignore)
 }
 
 static int
-exp2b(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp2b(Char ***vp, int ignore)
 {
     int p1 = exp2c(vp, ignore);
 
@@ -307,9 +294,7 @@ exp2b(vp, ignore)
 }
 
 static int
-exp2c(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp2c(Char ***vp, int ignore)
 {
     Char *p1 = exp3(vp, ignore);
     Char *p2;
@@ -355,9 +340,7 @@ exp2c(vp, ignore)
 }
 
 static Char *
-exp3(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp3(Char ***vp, int ignore)
 {
     Char *p1, *p2;
     int i;
@@ -401,9 +384,7 @@ exp3(vp, ignore)
 }
 
 static Char *
-exp3a(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp3a(Char ***vp, int ignore)
 {
     Char *p1, *p2, *op;
     int i;
@@ -431,9 +412,7 @@ exp3a(vp, ignore)
 }
 
 static Char *
-exp4(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp4(Char ***vp, int ignore)
 {
     Char *p1, *p2;
     int i = 0;
@@ -468,9 +447,7 @@ exp4(vp, ignore)
 }
 
 static Char *
-exp5(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp5(Char ***vp, int ignore)
 {
     Char *p1, *p2;
     int i = 0;
@@ -522,9 +499,7 @@ exp5(vp, ignore)
 }
 
 static Char *
-exp6(vp, ignore)
-    Char ***vp;
-    int    ignore;
+exp6(Char ***vp, int ignore)
 {
     int     ccode, i = 0;
     Char *cp;
@@ -619,9 +594,7 @@ exp6(vp, ignore)
  * From: John Rowe <rowe@excc.exeter.ac.uk>
  */
 Char *
-filetest(cp, vp, ignore)
-    Char *cp, ***vp;
-    int ignore;
+filetest(Char *cp, Char ***vp, int ignore)
 {
 #ifdef convex
     struct cvxstat stb, *st = NULL;
@@ -975,8 +948,7 @@ filetest(cp, vp, ignore)
 
 
 static void
-evalav(v)
-    Char **v;
+evalav(Char **v)
 {
     struct wordent paraml1;
     struct wordent *hp = &paraml1;
@@ -1006,9 +978,7 @@ evalav(v)
 }
 
 static int
-isa(cp, what)
-    Char *cp;
-    int what;
+isa(Char *cp, int what)
 {
     if (cp == 0)
 	return ((what & RESTOP) != 0);
@@ -1057,8 +1027,7 @@ isa(cp, what)
 }
 
 static int
-egetn(cp)
-    Char *cp;
+egetn(Char *cp)
 {
     if (*cp && *cp != '-' && !Isdigit(*cp))
 	stderror(ERR_NAME | ERR_EXPRESSION);
@@ -1069,20 +1038,14 @@ egetn(cp)
 
 #ifdef EDEBUG
 static void
-etraci(str, i, vp)
-    char   *str;
-    int     i;
-    Char ***vp;
+etraci(char *str, int i, Char ***vp)
 {
     xprintf("%s=%d\t", str, i);
     blkpr(*vp);
     xputchar('\n');
 }
 static void
-etracc(str, cp, vp)
-    char   *str;
-    Char   *cp;
-    Char ***vp;
+etracc(char *str, Char *cp, Char ***vp)
 {
     xprintf("%s=%s\t", str, cp);
     blkpr(*vp);

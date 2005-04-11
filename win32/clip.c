@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/clip.c,v 1.6 2005/02/11 05:31:27 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/clip.c,v 1.7 2005/03/25 18:46:42 kim Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -461,8 +461,7 @@ HANDLE create_clip_reader_thread(void) {
 }
 
 CCRETVAL
-e_dosify_next(c)
-    Char c;
+e_dosify_next(Char c)
 {
 	register Char *cp, *buf, *bp;
 	int len;
@@ -518,8 +517,7 @@ e_dosify_next(c)
 }
 /*ARGSUSED*/
 CCRETVAL
-e_dosify_prev(c)
-    Char c;
+e_dosify_prev(Char c)
 {
 	register Char *cp;
 
@@ -547,16 +545,14 @@ e_dosify_prev(c)
 }
 extern BOOL ConsolePageUpOrDown(BOOL);
 CCRETVAL
-e_page_up(c) //blukas@broadcom.com
-    Char c;
+e_page_up(Char c) //blukas@broadcom.com
 {
     USE(c);
 	ConsolePageUpOrDown(TRUE);
 	return (CC_REFRESH);
 }
 CCRETVAL
-e_page_down(c)
-    Char c;
+e_page_down(Char c)
 {
     USE(c);
 	ConsolePageUpOrDown(FALSE);

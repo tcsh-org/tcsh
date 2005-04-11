@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/ntfunc.c,v 1.9 2004/07/25 14:36:27 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/ntfunc.c,v 1.10 2004/11/23 02:10:50 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -1149,9 +1149,7 @@ BOOL is_nt_executable(char *path,char *extension) {
 	return FALSE;
 }
 int
-executable(dir, name, dir_ok)
-    Char   *dir, *name;
-    int    dir_ok;
+executable(Char *dir, Char *name, int dir_ok)
 {
 	struct stat stbuf;
 	Char    path[MAXPATHLEN + 1];
@@ -1199,8 +1197,7 @@ executable(dir, name, dir_ok)
 			 )));
 }
 int
-nt_check_if_windir(path)
-    char *path;
+nt_check_if_windir(char *path)
 {
     char windir[MAX_PATH];
 
@@ -1211,10 +1208,7 @@ nt_check_if_windir(path)
 }
 
 void
-nt_check_name_and_hash(is_windir, file, i)
-    int is_windir;
-    char *file;
-    int i;
+nt_check_name_and_hash(int is_windir, char *file, int i)
 {
 	char name_only[MAX_PATH];
 	char *tmp = (char *)strrchr(file, '.');

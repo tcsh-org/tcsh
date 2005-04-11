@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.63 2005/01/18 20:43:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.64 2005/04/11 21:16:37 kim Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.63 2005/01/18 20:43:30 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.64 2005/04/11 21:16:37 kim Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -184,7 +184,7 @@ static struct termcapval {
 } tval[T_val + 1];
 
 void
-terminit()
+terminit(void)
 {
 #ifdef NLS_CATALOGS
     int i;
@@ -351,14 +351,12 @@ terminit()
 
 static int me_all = 0;		/* does two or more of the attributes use me */
 
-static	void	ReBufferDisplay	__P((void));
-static	void	TCalloc		__P((struct termcapstr *, char *)); 
+static	void	ReBufferDisplay	(void);
+static	void	TCalloc		(struct termcapstr *, char *);
 
 
 static void
-TCalloc(t, cap)
-    struct termcapstr *t;
-    char   *cap;
+TCalloc(struct termcapstr *t, char *cap)
 {
     static char termcap_alloc[TC_BUFSIZE];
     char    termbuf[TC_BUFSIZE];
@@ -422,7 +420,7 @@ TCalloc(t, cap)
 
 /*ARGSUSED*/
 void
-TellTC()
+TellTC(void)
 {
     struct termcapstr *t;
     char *s;
@@ -457,7 +455,7 @@ TellTC()
 
 
 static void
-ReBufferDisplay()
+ReBufferDisplay(void)
 {
     int i;
     Char **b;
@@ -492,8 +490,7 @@ ReBufferDisplay()
 }
 
 void
-SetTC(what, how)
-    char   *what, *how;
+SetTC(char *what, char *how)
 {
     struct termcapstr *ts;
     struct termcapval *tv;
@@ -568,8 +565,7 @@ SetTC(what, how)
  * Print the termcap string out with variable substitution
  */
 void
-EchoTC(v)
-    Char  **v;
+EchoTC(Char **v)
 {
     char   *cap, *scap, cv[BUFSIZE];
     int     arg_need, arg_cols, arg_rows;
@@ -802,7 +798,7 @@ static struct {
 #define A_K_NKEYS 6
 
 void
-ResetArrowKeys()
+ResetArrowKeys(void)
 {
     arrow[A_K_DN].fun.cmd = F_DOWN_HIST;
     arrow[A_K_DN].type    = XK_CMD;
@@ -824,7 +820,7 @@ ResetArrowKeys()
 }
 
 void
-DefaultArrowKeys() 
+DefaultArrowKeys(void)
 {
     static Char strA[] = {033, '[', 'A', '\0'};
     static Char strB[] = {033, '[', 'B', '\0'};
@@ -892,10 +888,7 @@ DefaultArrowKeys()
 
 
 int
-SetArrowKeys(name, fun, type)
-    CStr *name;
-    XmapVal *fun;
-    int type;
+SetArrowKeys(CStr *name, XmapVal *fun, int type)
 {
     int i;
     for (i = 0; i < A_K_NKEYS; i++)
@@ -908,8 +901,7 @@ SetArrowKeys(name, fun, type)
 }
 
 int
-IsArrowKey(name)
-    Char *name;
+IsArrowKey(Char *name)
 {
     int i;
     for (i = 0; i < A_K_NKEYS; i++)
@@ -919,8 +911,7 @@ IsArrowKey(name)
 }
 
 int
-ClearArrowKeys(name)
-    CStr *name;
+ClearArrowKeys(CStr *name)
 {
     int i;
     for (i = 0; i < A_K_NKEYS; i++)
@@ -932,8 +923,7 @@ ClearArrowKeys(name)
 }
 
 void
-PrintArrowKeys(name)
-    CStr *name;
+PrintArrowKeys(CStr *name)
 {
     int i;
 
@@ -949,7 +939,7 @@ PrintArrowKeys(name)
 
 
 void
-BindArrowKeys()
+BindArrowKeys(void)
 {
     KEYCMD *map, *dmap;
     int     i, j;
@@ -1000,8 +990,7 @@ BindArrowKeys()
 static Char cur_atr = 0;	/* current attributes */
 
 void
-SetAttributes(atr)
-    Char     atr;
+SetAttributes(Char atr)
 {
     atr &= ATTRIBUTES;
     if (atr != cur_atr) {
@@ -1068,14 +1057,14 @@ SetAttributes(atr)
 
 /* PWP 6-27-88 -- if the tty driver thinks that we can tab, we ask termcap */
 int
-CanWeTab()
+CanWeTab(void)
 {
     return (Val(T_pt));
 }
 
+/* move to line <where> (first line == 0) as efficiently as possible; */
 void
-MoveToLine(where)		/* move to line <where> (first line == 0) */
-    int     where;		/* as efficiently as possible; */
+MoveToLine(int where)		
 {
     int     del;
 
@@ -1132,8 +1121,7 @@ MoveToLine(where)		/* move to line <where> (first line == 0) */
 }
 
 void
-MoveToChar(where)		/* move to character position (where) */
-    int     where;
+MoveToChar(int where)		/* move to character position (where) */
 {				/* as efficiently as possible */
     int     del;
 
@@ -1207,9 +1195,7 @@ mc_again:
 }
 
 void
-so_write(cp, n)
-    Char *cp;
-    int n;
+so_write(Char *cp, int n)
 {
     if (n <= 0)
 	return;			/* catch bugs */
@@ -1264,8 +1250,7 @@ so_write(cp, n)
 
 
 void
-DeleteChars(num)		/* deletes <num> characters */
-    int     num;
+DeleteChars(int num)		/* deletes <num> characters */
 {
     if (num <= 0)
 	return;
@@ -1303,10 +1288,10 @@ DeleteChars(num)		/* deletes <num> characters */
 	(void) tputs(Str(T_ed), 1, PUTPURE);
 }
 
+/* Puts terminal in insert character mode, or inserts num characters in the
+   line */
 void
-Insert_write(cp, num)		/* Puts terminal in insert character mode, */
-    Char *cp;
-    int num;		/* or inserts num characters in the line */
+Insert_write(Char *cp, int num)		
 {
     if (num <= 0)
 	return;
@@ -1358,9 +1343,9 @@ Insert_write(cp, num)		/* Puts terminal in insert character mode, */
 
 }
 
+/* clear to end of line.  There are num characters to clear */
 void
-ClearEOL(num)			/* clear to end of line.  There are num */
-    int     num;		/* characters to clear */
+ClearEOL(int num)
 {
     int i;
 
@@ -1377,7 +1362,7 @@ ClearEOL(num)			/* clear to end of line.  There are num */
 }
 
 void
-ClearScreen()
+ClearScreen(void)
 {				/* clear the whole screen and home */
     if (GoodStr(T_cl))
 	/* send the clear screen code */
@@ -1394,7 +1379,7 @@ ClearScreen()
 }
 
 void
-SoundBeep()
+SoundBeep(void)
 {				/* produce a sound */
     beep_cmd ();
     if (adrof(STRnobeep))
@@ -1410,7 +1395,7 @@ SoundBeep()
 }
 
 void
-ClearToBottom()
+ClearToBottom(void)
 {				/* clear to the bottom of the screen */
     if (GoodStr(T_cd))
 	(void) tputs(Str(T_cd), Val(T_li), PUTPURE);
@@ -1419,7 +1404,7 @@ ClearToBottom()
 }
 
 void
-GetTermCaps()
+GetTermCaps(void)
 {				/* read in the needed terminal capabilites */
     int i;
     const char   *ptr;
@@ -1557,8 +1542,7 @@ GetTermCaps()
  *	is not a tty, but it will work in most cases.
  */
 int
-GetSize(lins, cols)
-    int    *lins, *cols;
+GetSize(int *lins, int *cols)
 {
     *cols = Val(T_co);
     *lins = Val(T_li);
@@ -1599,8 +1583,7 @@ GetSize(lins, cols)
 #endif /* SIG_WINDOW */
 
 void
-ChangeSize(lins, cols)
-    int     lins, cols;
+ChangeSize(int lins, int cols)
 {
     /*
      * Just in case

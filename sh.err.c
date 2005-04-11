@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.err.c,v 3.38 2005/01/05 16:06:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.err.c,v 3.39 2005/01/18 20:43:30 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -33,7 +33,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.38 2005/01/05 16:06:13 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.39 2005/01/18 20:43:30 christos Exp $")
 
 /*
  * C Shell
@@ -194,7 +194,7 @@ static const char *elst[NO_ERRORS] INIT_ZERO_STRUCT;
  * Init the elst depending on the locale
  */
 void
-errinit()
+errinit(void)
 {
 #ifdef NLS_CATALOGS
     int i;
@@ -371,24 +371,13 @@ errinit()
  */
 void
 /*VARARGS1*/
-#ifdef PROTOTYPES
 seterror(unsigned int id, ...)
-#else
-seterror(va_alist)
-    va_dcl
-#endif
 {
 
     if (seterr == 0) {
 	va_list va;
 	char    berr[BUFSIZE];
-#ifdef PROTOTYPES
 	va_start(va, id);
-#else
-	unsigned int id;
-	va_start(va);
-	id = va_arg(va, unsigned int);
-#endif
 
 	if (id >= sizeof(elst) / sizeof(elst[0]))
 	    id = ERR_INVALID;
@@ -419,26 +408,14 @@ seterror(va_alist)
  */
 void
 /*VARARGS*/
-#ifdef PROTOTYPES
 stderror(unsigned int id, ...)
-#else
-stderror(va_alist)
-    va_dcl
-#endif
 {
     va_list va;
     Char **v;
     int flags;
     int vareturn;
 
-#ifdef PROTOTYPES
     va_start(va, id);
-#else
-    unsigned int id;
-
-    va_start(va);
-    id = va_arg(va, unsigned int);
-#endif
 
     /*
      * Reset don't free flag for buggy os's

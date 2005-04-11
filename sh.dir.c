@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.65 2004/11/23 02:10:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.66 2005/03/03 16:40:53 kim Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,23 +33,23 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.dir.c,v 3.65 2004/11/23 02:10:48 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.66 2005/03/03 16:40:53 kim Exp $")
 
 /*
  * C Shell - directory management
  */
 
-static	void			 dstart		__P((const char *));
-static	struct directory	*dfind		__P((Char *));
-static	Char 			*dfollow	__P((Char *));
-static	void 	 	 	 printdirs	__P((int));
-static	Char 			*dgoto		__P((Char *));
-static	void 	 	 	 dnewcwd	__P((struct directory *, int));
-static	void 	 	 	 dset		__P((Char *));
-static  void 			 dextract	__P((struct directory *));
-static  int 			 skipargs	__P((Char ***, const char *,
-						     const char *));
-static	void			 dgetstack	__P((void));
+static	void			 dstart		(const char *);
+static	struct directory	*dfind		(Char *);
+static	Char 			*dfollow	(Char *);
+static	void 	 	 	 printdirs	(int);
+static	Char 			*dgoto		(Char *);
+static	void 	 	 	 dnewcwd	(struct directory *, int);
+static	void 	 	 	 dset		(Char *);
+static  void 			 dextract	(struct directory *);
+static  int 			 skipargs	(Char ***, const char *,
+						 const char *);
+static	void			 dgetstack	(void);
 
 static struct directory dhead INIT_ZERO_STRUCT;		/* "head" of loop */
 static int    printd;			/* force name to be printed */
@@ -57,8 +57,7 @@ static int    printd;			/* force name to be printed */
 int     bequiet = 0;		/* do not print dir stack -strike */
 
 static void
-dstart(from)
-    const char *from;
+dstart(const char *from)
 {
     xprintf(CGETS(12, 1, "%s: Trying to start from \"%s\"\n"), progname, from);
 }
@@ -67,8 +66,7 @@ dstart(from)
  * dinit - initialize current working directory
  */
 void
-dinit(hp)
-    Char   *hp;
+dinit(Char *hp)
 {
     char *tcp;
     Char *cp;
@@ -139,8 +137,7 @@ dinit(hp)
 }
 
 static void
-dset(dp)
-Char *dp;
+dset(Char *dp)
 {
     /*
      * Don't call set() directly cause if the directory contains ` or
@@ -162,10 +159,7 @@ Char *dp;
 #define DIR_OLD	  	0x80	/* - */
 
 static int
-skipargs(v, dstr, str)
-    Char ***v;
-    const char   *dstr;
-    const char   *str;
+skipargs(Char ***v, const char *dstr, const char *str)
 {
     Char  **n = *v, *s;
 
@@ -200,9 +194,7 @@ skipargs(v, dstr, str)
  */
 /*ARGSUSED*/
 void
-dodirs(v, c)
-    Char  **v;
-    struct command *c;
+dodirs(Char **v, struct command *c)
 {
     static char flags[] = "plvnSLc";
     int dflag = skipargs(&v, flags, "");
@@ -234,8 +226,7 @@ dodirs(v, c)
 }
 
 static void
-printdirs(dflag)
-    int dflag;
+printdirs(int dflag)
 {
     struct directory *dp;
     Char   *s, *user;
@@ -272,8 +263,7 @@ printdirs(dflag)
 }
 
 void
-dtildepr(dir)
-    Char *dir;
+dtildepr(Char *dir)
 {
     Char* user;
     if ((user = getusername(&dir)) != NULL)
@@ -283,7 +273,7 @@ dtildepr(dir)
 }
 
 void
-dtilde()
+dtilde(void)
 {
     struct directory *d = dcwd;
 
@@ -307,9 +297,7 @@ dtilde()
  *	Otherwise, a copy is made and sent back.
  */
 Char   *
-dnormalize(cp, expnd)
-    Char   *cp;
-    int expnd;
+dnormalize(Char *cp, int expnd)
 {
 
 /* return true if dp is of the form "../xxx" or "/../xxx" */
@@ -447,9 +435,7 @@ dnormalize(cp, expnd)
  */
 /*ARGSUSED*/
 void
-dochngd(v, c)
-    Char  **v;
-    struct command *c;
+dochngd(Char **v, struct command *c)
 {
     Char *cp;
     struct directory *dp;
@@ -498,8 +484,7 @@ dochngd(v, c)
 }
 
 static Char *
-dgoto(cp)
-    Char   *cp;
+dgoto(Char *cp)
 {
     Char   *dp;
 
@@ -547,8 +532,7 @@ dgoto(cp)
  * dfollow - change to arg directory; fall back on cdpath if not valid
  */
 static Char *
-dfollow(cp)
-    Char *cp;
+dfollow(Char *cp)
 {
     Char *dp;
     struct varent *c;
@@ -649,9 +633,7 @@ dfollow(cp)
  */
 /*ARGSUSED*/
 void
-dopushd(v, c)
-    Char  **v;
-    struct command *c;
+dopushd(Char **v, struct command *c)
 {
     struct directory *dp;
     Char *cp;
@@ -731,8 +713,7 @@ dopushd(v, c)
  * dfind - find a directory if specified by numeric (+n) argument
  */
 static struct directory *
-dfind(cp)
-    Char *cp;
+dfind(Char *cp)
 {
     struct directory *dp;
     int i;
@@ -762,9 +743,7 @@ dfind(cp)
  */
 /*ARGSUSED*/
 void
-dopopd(v, c)
-    Char  **v;
-    struct command *c;
+dopopd(Char **v, struct command *c)
 {
     Char *cp;
     struct directory *dp, *p = NULL;
@@ -808,8 +787,7 @@ dopopd(v, c)
  * dfree - free the directory (or keep it if it still has ref count)
  */
 void
-dfree(dp)
-    struct directory *dp;
+dfree(struct directory *dp)
 {
 
     if (dp->di_count != 0) {
@@ -827,8 +805,7 @@ dfree(dp)
  *	constructed (always have ..'s, directories have links)
  */
 Char   *
-dcanon(cp, p)
-    Char *cp, *p;
+dcanon(Char *cp, Char *p)
 {
     Char *sp;
     Char *p1, *p2;	/* general purpose */
@@ -1184,9 +1161,7 @@ dcanon(cp, p)
  * dnewcwd - make a new directory in the loop the current one
  */
 static void
-dnewcwd(dp, dflag)
-    struct directory *dp;
-    int dflag;
+dnewcwd(struct directory *dp, int dflag)
 {
     int print;
 
@@ -1217,7 +1192,7 @@ dnewcwd(dp, dflag)
 }
 
 void
-dsetstack()
+dsetstack(void)
 {
     Char **cp;
     struct varent *vp;
@@ -1252,7 +1227,7 @@ dsetstack()
 }
 
 static void
-dgetstack()
+dgetstack(void)
 {
     int i = 0;
     Char **dblk, **dbp;
@@ -1276,9 +1251,7 @@ dgetstack()
  * the directory stack, or finds last directory in stack.
  */
 int
-getstakd(s, cnt)
-    Char   *s;
-    int     cnt;
+getstakd(Char *s, int cnt)
 {
     struct directory *dp;
 
@@ -1310,8 +1283,7 @@ getstakd(s, cnt)
  * position, and pushes it onto the top.
  */
 static void
-dextract(dp)
-    struct directory *dp;
+dextract(struct directory *dp)
 {
     if (dp == dcwd)
 	return;
@@ -1324,8 +1296,7 @@ dextract(dp)
 }
 
 void
-loaddirs(fname)
-    Char *fname;
+loaddirs(Char *fname)
 {
     static Char *loaddirs_cmd[] = { STRsource, NULL, NULL };
 
@@ -1348,9 +1319,7 @@ loaddirs(fname)
  * -strike
  */
 void
-recdirs(fname, def)
-    Char *fname;
-    int def;
+recdirs(Char *fname, int def)
 {
     int     fp, ftmp, oldidfds;
     int     cdflag = 0;

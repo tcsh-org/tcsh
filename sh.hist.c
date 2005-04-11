@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.hist.c,v 3.32 2004/11/23 18:12:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.hist.c,v 3.33 2004/12/25 21:15:07 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.32 2004/11/23 18:12:43 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.33 2004/12/25 21:15:07 christos Exp $")
 
 #include "tc.h"
 
@@ -40,10 +40,10 @@ extern int histvalid;
 extern Char histline[];
 Char HistLit = 0;
 
-static	int	heq	__P((struct wordent *, struct wordent *));
-static	void	hfree	__P((struct Hist *));
-static	void	dohist1	__P((struct Hist *, int *, int));
-static	void	phist	__P((struct Hist *, int));
+static	int	heq	(struct wordent *, struct wordent *);
+static	void	hfree	(struct Hist *);
+static	void	dohist1	(struct Hist *, int *, int);
+static	void	phist	(struct Hist *, int);
 
 #define HIST_ONLY	0x01
 #define HIST_SAVE	0x02
@@ -58,9 +58,7 @@ static	void	phist	__P((struct Hist *, int));
  */
 
 void
-savehist(sp, mflg)
-    struct wordent *sp;
-    int mflg;
+savehist(struct wordent *sp, int mflg)
 {
     struct Hist *hp, *np;
     int histlen = 0;
@@ -91,8 +89,7 @@ savehist(sp, mflg)
 }
 
 static int
-heq(a0, b0)
-    struct wordent *a0, *b0;
+heq(struct wordent *a0, struct wordent *b0)
 {
     struct wordent *a = a0->next, *b = b0->next;
 
@@ -110,11 +107,7 @@ heq(a0, b0)
 
 
 struct Hist *
-enthist(event, lp, docopy, mflg)
-    int     event;
-    struct wordent *lp;
-    int    docopy;
-    int    mflg;
+enthist(int event, struct wordent *lp, int docopy, int mflg)
 {
     struct Hist *p = NULL, *pp = &Histlist;
     int n, r;
@@ -208,8 +201,7 @@ enthist(event, lp, docopy, mflg)
 }
 
 static void
-hfree(hp)
-    struct Hist *hp;
+hfree(struct Hist *hp)
 {
 
     freelex(&hp->Hlex);
@@ -221,9 +213,7 @@ hfree(hp)
 
 /*ARGSUSED*/
 void
-dohist(vp, c)
-    Char  **vp;
-    struct command *c;
+dohist(Char **vp, struct command *c)
 {
     int     n, hflg = 0;
 
@@ -291,9 +281,7 @@ dohist(vp, c)
 }
 
 static void
-dohist1(hp, np, hflg)
-    struct Hist *hp;
-    int    *np, hflg;
+dohist1(struct Hist *hp, int *np, int hflg)
 {
     int    print = (*np) > 0;
 
@@ -311,9 +299,7 @@ dohist1(hp, np, hflg)
 }
 
 static void
-phist(hp, hflg)
-    struct Hist *hp;
-    int     hflg;
+phist(struct Hist *hp, int hflg)
 {
     if (hflg & HIST_ONLY) {
        /*
@@ -353,11 +339,7 @@ phist(hp, hflg)
 
 
 void
-fmthist(fmt, ptr, buf, bufsiz)
-    int fmt;
-    ptr_t ptr;
-    char *buf;
-    size_t bufsiz;
+fmthist(int fmt, ptr_t ptr, char *buf, size_t bufsiz)
 {
     struct Hist *hp = (struct Hist *) ptr;
     switch (fmt) {
@@ -395,9 +377,7 @@ fmthist(fmt, ptr, buf, bufsiz)
 }
 
 void
-rechist(fname, ref)
-    Char *fname;
-    int ref;
+rechist(Char *fname, int ref)
 {
     Char    *snum;
     int     fp, ftmp, oldidfds;
@@ -465,9 +445,7 @@ rechist(fname, ref)
 
 
 void
-loadhist(fname, mflg)
-    Char *fname;
-    int mflg;
+loadhist(Char *fname, int mflg)
 {
     static Char   *loadhist_cmd[] = {STRsource, NULL, NULL, NULL};
     loadhist_cmd[1] = mflg ? STRmm : STRmh;

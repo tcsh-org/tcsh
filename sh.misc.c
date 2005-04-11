@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.33 2005/01/06 16:52:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.34 2005/01/18 20:24:50 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,20 +32,18 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.33 2005/01/06 16:52:32 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.34 2005/01/18 20:24:50 christos Exp $")
 
-static	int	renum	__P((int, int));
-static  Char  **blkend	__P((Char **));
-static  Char  **blkcat	__P((Char **, Char **));
+static	int	renum	(int, int);
+static  Char  **blkend	(Char **);
+static  Char  **blkcat	(Char **, Char **);
 
 /*
  * C Shell
  */
 
 int
-any(s, c)
-    const char *s;
-    Char c;
+any(const char *s, Char c)
 {
     if (!s)
 	return (0);		/* Check for nil pointer */
@@ -56,9 +54,7 @@ any(s, c)
 }
 
 void
-setzero(cp, i)
-    char   *cp;
-    int     i;
+setzero(char *cp, int i)
 {
     if (i != 0)
 	do
@@ -67,8 +63,7 @@ setzero(cp, i)
 }
 
 char   *
-strsave(s)
-    const char *s;
+strsave(const char *s)
 {
     char   *n, *r;
     const char *p;
@@ -84,8 +79,7 @@ strsave(s)
 }
 
 static Char  **
-blkend(up)
-    Char **up;
+blkend(Char **up)
 {
 
     while (*up)
@@ -95,8 +89,7 @@ blkend(up)
 
 
 void
-blkpr(av)
-    Char **av;
+blkpr(Char **av)
 {
 
     for (; *av; av++) {
@@ -107,9 +100,7 @@ blkpr(av)
 }
 
 void
-blkexpand(av, str)
-    Char **av;
-    Char *str;
+blkexpand(Char **av, Char *str)
 {
     *str = '\0';
     for (; *av; av++) {
@@ -120,8 +111,7 @@ blkexpand(av, str)
 }
 
 int
-blklen(av)
-    Char **av;
+blklen(Char **av)
 {
     int i = 0;
 
@@ -131,9 +121,7 @@ blklen(av)
 }
 
 Char  **
-blkcpy(oav, bv)
-    Char  **oav;
-    Char **bv;
+blkcpy(Char **oav, Char **bv)
 {
     Char **av = oav;
 
@@ -143,8 +131,7 @@ blkcpy(oav, bv)
 }
 
 static Char  **
-blkcat(up, vp)
-    Char  **up, **vp;
+blkcat(Char **up, Char **vp)
 {
 
     (void) blkcpy(blkend(up), vp);
@@ -152,8 +139,7 @@ blkcat(up, vp)
 }
 
 void
-blkfree(av0)
-    Char  **av0;
+blkfree(Char **av0)
 {
     Char **av = av0;
 
@@ -165,8 +151,7 @@ blkfree(av0)
 }
 
 Char  **
-saveblk(v)
-    Char **v;
+saveblk(Char **v)
 {
     Char **newv =
     (Char **) xcalloc((size_t) (blklen(v) + 1), sizeof(Char **));
@@ -179,8 +164,7 @@ saveblk(v)
 
 #ifndef HAVE_STRSTR
 char   *
-strstr(s, t)
-    const char *s, *t;
+strstr(const char *s, const char *t)
 {
     do {
 	const char *ss = s;
@@ -197,8 +181,7 @@ strstr(s, t)
 
 #ifndef SHORT_STRINGS
 char   *
-strspl(cp, dp)
-    const char *cp, *dp;
+strspl(const char *cp, const char *dp)
 {
     char   *ep;
     size_t cl, dl;
@@ -218,8 +201,7 @@ strspl(cp, dp)
 #endif /* !SHORT_STRINGS */
 
 Char  **
-blkspl(up, vp)
-    Char **up, **vp;
+blkspl(Char **up, Char **vp)
 {
     Char **wp =
     (Char **) xcalloc((size_t) (blklen(up) + blklen(vp) + 1),
@@ -230,8 +212,7 @@ blkspl(up, vp)
 }
 
 Char
-lastchr(cp)
-    Char *cp;
+lastchr(Char *cp)
 {
 
     if (!cp)
@@ -248,7 +229,7 @@ lastchr(cp)
  * any units which may have been left open accidentally.
  */
 void
-closem()
+closem(void)
 {
     int f;
 
@@ -290,7 +271,7 @@ closem()
  * shell fd's being in units 16-19 which are closed automatically!
  */
 void
-closech()
+closech(void)
 {
     int f;
 
@@ -310,7 +291,7 @@ closech()
 #endif /* CLOSE_ON_EXEC */
 
 void
-donefds()
+donefds(void)
 {
 
     (void) close(0);
@@ -333,8 +314,7 @@ donefds()
  * i.e. to a unit > FSAFE.  This also happens in dcopy.
  */
 int
-dmove(i, j)
-    int i, j;
+dmove(int i, int j)
 {
 
     if (i == j || i < 0)
@@ -354,8 +334,7 @@ dmove(i, j)
 }
 
 int
-dcopy(i, j)
-    int i, j;
+dcopy(int i, int j)
 {
 
     if (i == j || i < 0 || (j < 0 && i > FSAFE))
@@ -372,8 +351,7 @@ dcopy(i, j)
 }
 
 static int
-renum(i, j)
-    int i, j;
+renum(int i, int j)
 {
     int k = dup(i);
 
@@ -395,9 +373,7 @@ renum(i, j)
  * as well as by commands like "repeat".
  */
 void
-lshift(v, c)
-    Char **v;
-    int c;
+lshift(Char **v, int c)
 {
     Char **u;
 
@@ -407,8 +383,7 @@ lshift(v, c)
 }
 
 int
-number(cp)
-    Char   *cp;
+number(Char *cp)
 {
     if (!cp)
 	return (0);
@@ -424,8 +399,7 @@ number(cp)
 }
 
 Char  **
-copyblk(v)
-    Char **v;
+copyblk(Char **v)
 {
     Char **nv =
     (Char **) xcalloc((size_t) (blklen(v) + 1), sizeof(Char **));
@@ -435,8 +409,7 @@ copyblk(v)
 
 #ifndef SHORT_STRINGS
 char   *
-strend(cp)
-    char *cp;
+strend(char *cp)
 {
     if (!cp)
 	return (cp);
@@ -448,8 +421,7 @@ strend(cp)
 #endif /* SHORT_STRINGS */
 
 Char   *
-strip(cp)
-    Char   *cp;
+strip(Char *cp)
 {
     Char *dp = cp;
 
@@ -461,8 +433,7 @@ strip(cp)
 }
 
 Char   *
-quote(cp)
-    Char   *cp;
+quote(Char *cp)
 {
     Char *dp = cp;
 
@@ -474,9 +445,7 @@ quote(cp)
 }
 
 Char   *
-quote_meta(d, s)
-    Char   *d;
-    const Char   *s;
+quote_meta(Char *d, const Char *s)
 {
     Char *r = d;
     while (*s != '\0') {
@@ -489,8 +458,7 @@ quote_meta(d, s)
 }
 
 void
-udvar(name)
-    Char   *name;
+udvar(Char *name)
 {
 
     setname(short2str(name));
@@ -498,8 +466,7 @@ udvar(name)
 }
 
 int
-prefix(sub, str)
-    const Char *sub, *str;
+prefix(const Char *sub, const Char *str)
 {
 
     for (;;) {

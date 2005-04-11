@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.init.c,v 3.51 2004/11/23 02:10:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.init.c,v 3.52 2005/01/18 20:24:50 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.51 2004/11/23 02:10:47 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.52 2005/01/18 20:24:50 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -90,8 +90,7 @@ static unsigned char ttychars[NN_IO][C_NCC] = {
 
 #ifdef SIG_WINDOW
 void
-check_window_size(force)
-    int     force;
+check_window_size(int force)
 {
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -131,8 +130,7 @@ check_window_size(force)
 
 RETSIGTYPE
 /*ARGSUSED*/
-window_change(snum)
-int snum;
+window_change(int snum)
 {
     USE(snum);
 #ifdef UNRELSIGS 
@@ -146,7 +144,7 @@ int snum;
 #endif /* SIG_WINDOW */
 
 void
-ed_set_tty_eight_bit()
+ed_set_tty_eight_bit(void)
 {
     if (tty_getty(SHTTY, &extty) == -1) {
 #ifdef DEBUG_TTY
@@ -159,8 +157,7 @@ ed_set_tty_eight_bit()
 
 			
 int
-ed_Setup(rst)
-    int rst;
+ed_Setup(int rst)
 {
     static int havesetup = 0;
     struct varent *imode;
@@ -292,7 +289,7 @@ ed_Setup(rst)
 }
 
 void
-ed_Init()
+ed_Init(void)
 {
     ResetInLine(1);		/* reset the input pointers */
     GettingInput = 0;		/* just in case */
@@ -376,7 +373,7 @@ ed_Init()
  * Check and re-init the line. set the terminal into 1 char at a time mode.
  */
 int
-Rawmode()
+Rawmode(void)
 {
     if (Tty_raw_mode)
 	return (0);
@@ -561,7 +558,7 @@ Rawmode()
 }
 
 int
-Cookedmode()
+Cookedmode(void)
 {				/* set tty in normal setup */
 #ifdef WINNT_NATIVE
     do_nt_cooked_mode();
@@ -622,8 +619,7 @@ Cookedmode()
 }
 
 void
-ResetInLine(macro)
-    int macro;
+ResetInLine(int macro)
 {
     Cursor = InputBuf;		/* reset cursor */
     LastChar = InputBuf;
@@ -642,7 +638,7 @@ ResetInLine(macro)
 
 static Char *Input_Line = NULL;
 int
-Load_input_line()
+Load_input_line(void)
 {
 #ifdef SUNOS4
     long chrs = 0;
@@ -692,7 +688,7 @@ Load_input_line()
  * (via Hans J Albertsson (thanks))
  */
 void
-QuoteModeOn()
+QuoteModeOn(void)
 {
     if (MacroLvl >= 0)
 	return;
@@ -731,7 +727,7 @@ QuoteModeOn()
 }
 
 void
-QuoteModeOff()
+QuoteModeOff(void)
 {
     if (!Tty_quote_mode)
 	return;

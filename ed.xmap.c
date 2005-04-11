@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.27 2004/12/25 21:15:06 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.28 2005/01/05 18:06:43 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -88,7 +88,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.27 2004/12/25 21:15:06 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.28 2005/01/05 18:06:43 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -117,19 +117,18 @@ static Char printbuf[MAXXKEY];	/* buffer for printing */
 
 
 /* Some declarations of procedures */
-static	int       TraverseMap	__P((XmapNode *, CStr *, XmapVal *));
-static	int       TryNode	__P((XmapNode *, CStr *, XmapVal *, int));
-static	XmapNode *GetFreeNode	__P((CStr *));
-static	void	  PutFreeNode	__P((XmapNode *));
-static	int	  TryDeleteNode	__P((XmapNode **, CStr *));
-static	int	  Lookup	__P((CStr *, XmapNode *, int));
-static	int	  Enumerate	__P((XmapNode *, int));
-static	int	  unparsech	__P((int, Char *));
+static	int       TraverseMap	(XmapNode *, CStr *, XmapVal *);
+static	int       TryNode	(XmapNode *, CStr *, XmapVal *, int);
+static	XmapNode *GetFreeNode	(CStr *);
+static	void	  PutFreeNode	(XmapNode *);
+static	int	  TryDeleteNode	(XmapNode **, CStr *);
+static	int	  Lookup	(CStr *, XmapNode *, int);
+static	int	  Enumerate	(XmapNode *, int);
+static	int	  unparsech	(int, Char *);
 
 
 XmapVal *
-XmapCmd(cmd)
-    int cmd;
+XmapCmd(int cmd)
 {
     static XmapVal xm;
     xm.cmd = (KEYCMD) cmd;
@@ -137,8 +136,7 @@ XmapCmd(cmd)
 }
 
 XmapVal *
-XmapStr(str)
-    CStr  *str;
+XmapStr(CStr *str)
 {
     static XmapVal xm;
     xm.str.len = str->len;
@@ -151,7 +149,7 @@ XmapStr(str)
  *	initializes Xmap with arrow keys
  */
 void
-ResetXmap()
+ResetXmap(void)
 {
     PutFreeNode(Xmap);
     Xmap = NULL;
@@ -165,9 +163,7 @@ ResetXmap()
  *	Calls the recursive function with entry point Xmap
  */
 int
-GetXkey(ch, val)
-    CStr     *ch;
-    XmapVal  *val;
+GetXkey(CStr *ch, XmapVal *val)
 {
     return (TraverseMap(Xmap, ch, val));
 }
@@ -177,10 +173,7 @@ GetXkey(ch, val)
  * 	found.  May read in more characters.
  */
 static int
-TraverseMap(ptr, ch, val)
-    XmapNode *ptr;
-    CStr     *ch;
-    XmapVal  *val;
+TraverseMap(XmapNode *ptr, CStr *ch, XmapVal *val)
 {
     Char    tch;
 
@@ -218,10 +211,7 @@ TraverseMap(ptr, ch, val)
 }
 
 void
-AddXkey(Xkey, val, ntype)
-    CStr    *Xkey;
-    XmapVal *val;
-    int      ntype;
+AddXkey(CStr *Xkey, XmapVal *val, int ntype)
 {
     CStr cs;
     cs.buf = Xkey->buf;
@@ -246,11 +236,7 @@ AddXkey(Xkey, val, ntype)
 }
 
 static int
-TryNode(ptr, str, val, ntype)
-    XmapNode *ptr;
-    CStr     *str;
-    XmapVal  *val;
-    int       ntype;
+TryNode(XmapNode *ptr, CStr *str, XmapVal *val, int ntype)
 {
     /*
      * Find a node that matches *string or allocate a new one
@@ -317,9 +303,7 @@ TryNode(ptr, str, val, ntype)
 }
 
 void
-ClearXkey(map, in)
-    KEYCMD *map;
-    CStr   *in;
+ClearXkey(KEYCMD *map, CStr *in)
 {
     unsigned char c = (unsigned char) *(in->buf);
     if ((map[c] == F_XKEY) &&
@@ -329,8 +313,7 @@ ClearXkey(map, in)
 }
 
 int
-DeleteXkey(Xkey)
-    CStr   *Xkey;
+DeleteXkey(CStr *Xkey)
 {
     if (Xkey->len == 0) {
 	xprintf(CGETS(9, 3, "DeleteXkey: Null extended-key not allowed.\n"));
@@ -345,9 +328,7 @@ DeleteXkey(Xkey)
 }
 
 static int
-TryDeleteNode(inptr, str)
-    XmapNode **inptr;
-    CStr   *str;
+TryDeleteNode(XmapNode **inptr, CStr *str)
 {
     XmapNode *ptr;
     XmapNode *prev_ptr = NULL;
@@ -401,8 +382,7 @@ TryDeleteNode(inptr, str)
  *	Puts a tree of nodes onto free list using free(3).
  */
 static void
-PutFreeNode(ptr)
-    XmapNode *ptr;
+PutFreeNode(XmapNode *ptr)
 {
     if (ptr == NULL)
 	return;
@@ -435,8 +415,7 @@ PutFreeNode(ptr)
  *	Returns pointer to an XmapNode for ch.
  */
 static XmapNode *
-GetFreeNode(ch)
-    CStr *ch;
+GetFreeNode(CStr *ch)
 {
     XmapNode *ptr;
 
@@ -456,8 +435,7 @@ GetFreeNode(ch)
  *	Print entire Xmap if null
  */
 void
-PrintXkey(key)
-    CStr   *key;
+PrintXkey(CStr *key)
 {
     CStr cs;
 
@@ -485,10 +463,7 @@ PrintXkey(key)
  *	Print if last node
  */
 static int
-Lookup(str, ptr, cnt)
-    CStr   *str;
-    XmapNode *ptr;
-    int     cnt;
+Lookup(CStr *str, XmapNode *ptr, int cnt)
 {
     int     ncnt;
 
@@ -538,9 +513,7 @@ Lookup(str, ptr, cnt)
 }
 
 static int
-Enumerate(ptr, cnt)
-    XmapNode *ptr;
-    int     cnt;
+Enumerate(XmapNode *ptr, int cnt)
 {
     int     ncnt;
 
@@ -585,10 +558,7 @@ Enumerate(ptr, cnt)
  *	function specified by val
  */
 int
-printOne(key, val, ntype)
-    CStr    *key;
-    XmapVal *val;
-    int      ntype;
+printOne(CStr *key, XmapVal *val, int ntype)
 {
     struct KeyFuncs *fp;
     unsigned char unparsbuf[200];
@@ -617,9 +587,7 @@ printOne(key, val, ntype)
 }
 
 static int
-unparsech(cnt, ch)
-    int   cnt;
-    Char  *ch;
+unparsech(int cnt, Char *ch)
 {
     if (ch == 0) {
 	printbuf[cnt++] = '^';
@@ -676,8 +644,7 @@ unparsech(cnt, ch)
 }
 
 eChar
-parseescape(ptr)
-    const Char  **ptr;
+parseescape(const Char **ptr)
 {
     const Char *p;
     Char c;
@@ -777,10 +744,7 @@ parseescape(ptr)
 
 
 unsigned char *
-unparsestring(str, buf, sep)
-    CStr   *str;
-    unsigned char *buf;
-    Char   *sep;
+unparsestring(CStr *str, unsigned char *buf, Char *sep)
 {
     unsigned char *b;
     Char   p;

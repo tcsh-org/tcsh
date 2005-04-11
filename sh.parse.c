@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.parse.c,v 3.12 2004/08/04 17:12:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.parse.c,v 3.13 2004/11/23 02:10:49 christos Exp $ */
 /*
  * sh.parse.c: Interpret a list of tokens
  */
@@ -32,21 +32,21 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.parse.c,v 3.12 2004/08/04 17:12:30 christos Exp $")
+RCSID("$Id: sh.parse.c,v 3.13 2004/11/23 02:10:49 christos Exp $")
 
 /*
  * C shell
  */
-static	void		 asyntax __P((struct wordent *, struct wordent *));
-static	void		 asyn0 	 __P((struct wordent *, struct wordent *));
-static	void		 asyn3	 __P((struct wordent *, struct wordent *));
-static	struct wordent	*freenod __P((struct wordent *, struct wordent *));
-static	struct command	*syn0	 __P((struct wordent *, struct wordent *, int));
-static	struct command	*syn1	 __P((struct wordent *, struct wordent *, int));
-static	struct command	*syn1a	 __P((struct wordent *, struct wordent *, int));
-static	struct command	*syn1b	 __P((struct wordent *, struct wordent *, int));
-static	struct command	*syn2	 __P((struct wordent *, struct wordent *, int));
-static	struct command	*syn3	 __P((struct wordent *, struct wordent *, int));
+static	void		 asyntax (struct wordent *, struct wordent *);
+static	void		 asyn0 	 (struct wordent *, struct wordent *);
+static	void		 asyn3	 (struct wordent *, struct wordent *);
+static	struct wordent	*freenod (struct wordent *, struct wordent *);
+static	struct command	*syn0	 (struct wordent *, struct wordent *, int);
+static	struct command	*syn1	 (struct wordent *, struct wordent *, int);
+static	struct command	*syn1a	 (struct wordent *, struct wordent *, int);
+static	struct command	*syn1b	 (struct wordent *, struct wordent *, int);
+static	struct command	*syn2	 (struct wordent *, struct wordent *, int);
+static	struct command	*syn3	 (struct wordent *, struct wordent *, int);
 
 #define ALEFT	51		/* max of 50 alias expansions	 */
 #define HLEFT	11		/* max of 10 history expansions */
@@ -59,8 +59,7 @@ static	struct command	*syn3	 __P((struct wordent *, struct wordent *, int));
 static int aleft;
 extern int hleft;
 void
-alias(lexp)
-    struct wordent *lexp;
+alias(struct wordent *lexp)
 {
     jmp_buf_t osetexit;
 
@@ -79,8 +78,7 @@ alias(lexp)
 }
 
 static void
-asyntax(p1, p2)
-    struct wordent *p1, *p2;
+asyntax(struct wordent *p1, struct wordent *p2)
 {
     while (p1 != p2)
 	if (any(";&\n", p1->word[0]))
@@ -92,9 +90,7 @@ asyntax(p1, p2)
 }
 
 static void
-asyn0(p1, p2)
-    struct wordent *p1;
-    struct wordent *p2;
+asyn0(struct wordent *p1, struct wordent *p2)
 {
     struct wordent *p;
     int l = 0;
@@ -135,9 +131,7 @@ asyn0(p1, p2)
 }
 
 static void
-asyn3(p1, p2)
-    struct wordent *p1;
-    struct wordent *p2;
+asyn3(struct wordent *p1, struct wordent *p2)
 {
     struct varent *ap;
     struct wordent alout;
@@ -186,8 +180,7 @@ asyn3(p1, p2)
 }
 
 static struct wordent *
-freenod(p1, p2)
-    struct wordent *p1, *p2;
+freenod(struct wordent *p1, struct wordent *p2)
 {
     struct wordent *retp = p1->prev;
 
@@ -212,9 +205,7 @@ freenod(p1, p2)
  *	syn0
  */
 struct command *
-syntax(p1, p2, flags)
-    struct wordent *p1, *p2;
-    int     flags;
+syntax(struct wordent *p1, struct wordent *p2, int flags)
 {
 
     while (p1 != p2)
@@ -231,9 +222,7 @@ syntax(p1, p2, flags)
  *	syn1 & syntax
  */
 static struct command *
-syn0(p1, p2, flags)
-    struct wordent *p1, *p2;
-    int     flags;
+syn0(struct wordent *p1, struct wordent *p2, int flags)
 {
     struct wordent *p;
     struct command *t, *t1;
@@ -301,9 +290,7 @@ syn0(p1, p2, flags)
  *	syn1a ; syntax
  */
 static struct command *
-syn1(p1, p2, flags)
-    struct wordent *p1, *p2;
-    int     flags;
+syn1(struct wordent *p1, struct wordent *p2, int flags)
 {
     struct wordent *p;
     struct command *t;
@@ -345,9 +332,7 @@ syn1(p1, p2, flags)
  *	syn1b || syn1a
  */
 static struct command *
-syn1a(p1, p2, flags)
-    struct wordent *p1, *p2;
-    int     flags;
+syn1a(struct wordent *p1, struct wordent *p2, int flags)
 {
     struct wordent *p;
     struct command *t;
@@ -389,9 +374,7 @@ syn1a(p1, p2, flags)
  *	syn2 && syn1b
  */
 static struct command *
-syn1b(p1, p2, flags)
-    struct wordent *p1, *p2;
-    int     flags;
+syn1b(struct wordent *p1, struct wordent *p2, int flags)
 {
     struct wordent *p;
     struct command *t;
@@ -432,9 +415,7 @@ syn1b(p1, p2, flags)
  *	syn3 |& syn2
  */
 static struct command *
-syn2(p1, p2, flags)
-    struct wordent *p1, *p2;
-    int     flags;
+syn2(struct wordent *p1, struct wordent *p2, int flags)
 {
     struct wordent *p, *pn;
     struct command *t;
@@ -486,9 +467,7 @@ static char RELPAR[] = {'<', '>', '(', ')', '\0'};
  *	KEYWORD = (@ exit foreach if set switch test while)
  */
 static struct command *
-syn3(p1, p2, flags)
-    struct wordent *p1, *p2;
-    int     flags;
+syn3(struct wordent *p1, struct wordent *p2, int flags)
 {
     struct wordent *p;
     struct wordent *lp, *rp;
@@ -667,8 +646,7 @@ again:
 }
 
 void
-freesyn(t)
-    struct command *t;
+freesyn(struct command *t)
 {
     Char **v;
 

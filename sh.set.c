@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.60 2004/12/25 21:15:08 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.61 2005/03/03 16:57:02 kim Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.60 2004/12/25 21:15:08 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.61 2005/03/03 16:57:02 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -44,25 +44,24 @@ RCSID("$Id: sh.set.c,v 3.60 2004/12/25 21:15:08 christos Exp $")
 extern int GotTermCaps;
 int numeof = 0;
 
-static	void		 update_vars	__P((Char *));
-static	Char		*getinx		__P((Char *, int *));
-static	void		 asx		__P((Char *, int, Char *));
-static	struct varent 	*getvx		__P((Char *, int));
-static	Char		*xset		__P((Char *, Char ***));
-static	Char		*operate	__P((int, Char *, Char *));
-static	void	 	 putn1		__P((int));
-static	struct varent	*madrof		__P((Char *, struct varent *));
-static	void		 unsetv1	__P((struct varent *));
-static	void		 exportpath	__P((Char **));
-static	void		 balance	__P((struct varent *, int, int));
+static	void		 update_vars	(Char *);
+static	Char		*getinx		(Char *, int *);
+static	void		 asx		(Char *, int, Char *);
+static	struct varent 	*getvx		(Char *, int);
+static	Char		*xset		(Char *, Char ***);
+static	Char		*operate	(int, Char *, Char *);
+static	void	 	 putn1		(int);
+static	struct varent	*madrof		(Char *, struct varent *);
+static	void		 unsetv1	(struct varent *);
+static	void		 exportpath	(Char **);
+static	void		 balance	(struct varent *, int, int);
 
 /*
  * C Shell
  */
 
 static void
-update_vars(vp)
-    Char *vp;
+update_vars(Char *vp)
 {
     if (eq(vp, STRpath)) {
 	exportpath(adrof(STRpath)->vec);
@@ -208,9 +207,7 @@ update_vars(vp)
 
 /*ARGSUSED*/
 void
-doset(v, c)
-    Char **v;
-    struct command *c;
+doset(Char **v, struct command *c)
 {
     Char *p;
     Char   *vp, op;
@@ -311,9 +308,7 @@ doset(v, c)
 }
 
 static Char *
-getinx(cp, ip)
-    Char *cp;
-    int *ip;
+getinx(Char *cp, int *ip)
 {
     *ip = 0;
     *cp++ = 0;
@@ -325,10 +320,7 @@ getinx(cp, ip)
 }
 
 static void
-asx(vp, subscr, p)
-    Char   *vp;
-    int     subscr;
-    Char   *p;
+asx(Char *vp, int subscr, Char *p)
 {
     struct varent *v = getvx(vp, subscr);
 
@@ -339,9 +331,7 @@ asx(vp, subscr, p)
 }
 
 static struct varent *
-getvx(vp, subscr)
-    Char   *vp;
-    int     subscr;
+getvx(Char *vp, int subscr)
 {
     struct varent *v = adrof(vp);
 
@@ -354,9 +344,7 @@ getvx(vp, subscr)
 
 /*ARGSUSED*/
 void
-dolet(v, dummy)
-    Char  **v;
-    struct command *dummy;
+dolet(Char **v, struct command *dummy)
 {
     Char *p;
     Char   *vp, c, op;
@@ -443,8 +431,7 @@ dolet(v, dummy)
 }
 
 static Char *
-xset(cp, vp)
-    Char   *cp, ***vp;
+xset(Char *cp, Char ***vp)
 {
     Char *dp;
 
@@ -458,9 +445,7 @@ xset(cp, vp)
 }
 
 static Char *
-operate(op, vp, p)
-    int     op;
-    Char    *vp, *p;
+operate(int op, Char *vp, Char *p)
 {
     Char    opr[2];
     Char   *vec[5];
@@ -488,8 +473,7 @@ operate(op, vp, p)
 static Char *putp, nbuf[50];
 
 Char   *
-putn(n)
-    int n;
+putn(int n)
 {
     int     num;
 
@@ -520,8 +504,7 @@ putn(n)
 }
 
 static void
-putn1(n)
-    int n;
+putn1(int n)
 {
     if (n > 9)
 	putn1(n / 10);
@@ -529,8 +512,7 @@ putn1(n)
 }
 
 int
-getn(cp)
-    Char *cp;
+getn(Char *cp)
 {
     int n;
     int     sign;
@@ -556,9 +538,7 @@ getn(cp)
 }
 
 Char   *
-value1(var, head)
-    Char   *var;
-    struct varent *head;
+value1(Char *var, struct varent *head)
 {
     struct varent *vp;
 
@@ -571,9 +551,7 @@ value1(var, head)
 }
 
 static struct varent *
-madrof(pat, vp)
-    Char   *pat;
-    struct varent *vp;
+madrof(Char *pat, struct varent *vp)
 {
     struct varent *vp1;
 
@@ -587,9 +565,7 @@ madrof(pat, vp)
 }
 
 struct varent *
-adrof1(name, v)
-    Char *name;
-    struct varent *v;
+adrof1(Char *name, struct varent *v)
 {
     int cmp;
 
@@ -607,9 +583,7 @@ adrof1(name, v)
  * The caller is responsible for putting value in a safe place
  */
 void
-set(var, val, flags)
-    Char   *var, *val;
-    int	   flags;
+set(Char *var, Char *val, int flags)
 {
     Char **vec = (Char **) xmalloc((size_t) (2 * sizeof(Char **)));
 
@@ -619,10 +593,7 @@ set(var, val, flags)
 }
 
 void
-set1(var, vec, head, flags)
-    Char   *var, **vec;
-    struct varent *head;
-    int flags;
+set1(Char *var, Char **vec, struct varent *head, int flags)
 {
     Char **oldv = vec;
 
@@ -694,10 +665,7 @@ set1(var, vec, head, flags)
 
 
 void
-setq(name, vec, p, flags)
-    Char   *name, **vec;
-    struct varent *p;
-    int flags;
+setq(Char *name, Char **vec, struct varent *p, int flags)
 {
     struct varent *c;
     int f;
@@ -728,9 +696,7 @@ setq(name, vec, p, flags)
 
 /*ARGSUSED*/
 void
-unset(v, c)
-    Char   **v;
-    struct command *c;
+unset(Char **v, struct command *c)
 {
     int did_roe, did_edit;
 
@@ -788,9 +754,7 @@ unset(v, c)
 }
 
 void
-unset1(v, head)
-    Char *v[];
-    struct varent *head;
+unset1(Char *v[], struct varent *head)
 {
     struct varent *vp;
     int cnt;
@@ -808,8 +772,7 @@ unset1(v, head)
 }
 
 void
-unsetv(var)
-    Char   *var;
+unsetv(Char *var)
 {
     struct varent *vp;
 
@@ -819,8 +782,7 @@ unsetv(var)
 }
 
 static void
-unsetv1(p)
-    struct varent *p;
+unsetv1(struct varent *p)
 {
     struct varent *c, *pp;
     int f;
@@ -864,17 +826,14 @@ unsetv1(p)
 }
 
 void
-setNS(cp)
-    Char   *cp;
+setNS(Char *cp)
 {
     set(cp, Strsave(STRNULL), VAR_READWRITE);
 }
 
 /*ARGSUSED*/
 void
-shift(v, c)
-    Char **v;
-    struct command *c;
+shift(Char **v, struct command *c)
 {
     struct varent *argv;
     Char *name;
@@ -898,8 +857,7 @@ shift(v, c)
 static Char STRsep[2] = { PATHSEP, '\0' };
 
 static void
-exportpath(val)
-    Char  **val;
+exportpath(Char **val)
 {
   Char    	*exppath;
   size_t	exppath_size = BUFSIZE;
@@ -947,14 +905,12 @@ exportpath(val)
 	(p) = t)
 #else
 static struct varent *
-rleft(p)
-    struct varent *p;
+rleft(struct varent *p)
 {
     return (p);
 }
 static struct varent *
-rright(p)
-    struct varent *p;
+rright(struct varent *p)
 {
     return (p);
 }
@@ -968,9 +924,7 @@ rright(p)
  * D == 1 means we've just done a delete, otherwise an insert.
  */
 static void
-balance(p, f, d)
-    struct varent *p;
-    int f, d;
+balance(struct varent *p, int f, int d)
 {
     struct varent *pp;
 
@@ -1073,9 +1027,7 @@ balance(p, f, d)
 }
 
 void
-plist(p, what)
-    struct varent *p;
-    int what;
+plist(struct varent *p, int what)
 {
     struct varent *c;
     int len;
@@ -1119,7 +1071,7 @@ x:
 extern int dspmbyte_ls;
 
 void
-update_dspmbyte_vars()
+update_dspmbyte_vars(void)
 {
     int lp, iskcode;
     Char *dstr1;
@@ -1234,8 +1186,7 @@ update_dspmbyte_vars()
 /* dspkanji/dspmbyte autosetting */
 /* PATCH IDEA FROM Issei.Suzuki VERY THANKS */
 void
-autoset_dspmbyte(pcp)
-    Char *pcp;
+autoset_dspmbyte(Char *pcp)
 {
     int i;
     struct dspm_autoset_Table {

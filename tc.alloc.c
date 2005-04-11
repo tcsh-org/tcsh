@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.38 2004/08/04 17:12:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.39 2005/01/05 16:06:14 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -40,7 +40,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.38 2004/08/04 17:12:30 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.39 2005/01/05 16:06:14 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -134,8 +134,8 @@ static union overhead *nextf[NBUCKETS] IZERO_STRUCT;
 static U_int nmalloc[NBUCKETS] IZERO_STRUCT;
 
 #ifndef lint
-static	int	findbucket	__P((union overhead *, int));
-static	void	morecore	__P((int));
+static	int	findbucket	(union overhead *, int);
+static	void	morecore	(int);
 #endif
 
 
@@ -156,8 +156,7 @@ static	void	morecore	__P((int));
 #endif
 
 memalign_t
-malloc(nbytes)
-    size_t nbytes;
+malloc(size_t nbytes)
 {
 #ifndef lint
     union overhead *p;
@@ -232,8 +231,7 @@ malloc(nbytes)
  * Allocate more memory to the indicated bucket.
  */
 static void
-morecore(bucket)
-    int bucket;
+morecore(int bucket)
 {
     union overhead *op;
     int rnu;		/* 2^rnu bytes will be requested */
@@ -287,8 +285,7 @@ morecore(bucket)
 #endif
 
 void
-free(cp)
-    ptr_t   cp;
+free(ptr_t cp)
 {
 #ifndef lint
     int size;
@@ -330,8 +327,7 @@ free(cp)
 }
 
 memalign_t
-calloc(i, j)
-    size_t  i, j;
+calloc(size_t i, size_t j)
 {
 #ifndef lint
     char *cp, *scp;
@@ -369,9 +365,7 @@ static int     realloc_srchlen = 4;
 #endif /* lint */
 
 memalign_t
-realloc(cp, nbytes)
-    ptr_t   cp;
-    size_t  nbytes;
+realloc(ptr_t cp, size_t nbytes)
 {
 #ifndef lint
     U_int onb;
@@ -446,9 +440,7 @@ realloc(cp, nbytes)
  * Return bucket number, or -1 if not found.
  */
 static int
-findbucket(freep, srchlen)
-    union overhead *freep;
-    int     srchlen;
+findbucket(union overhead *freep, int srchlen)
 {
     union overhead *p;
     size_t i;
@@ -483,8 +475,7 @@ findbucket(freep, srchlen)
  ** Also we call our error routine if we run out of memory.
  **/
 memalign_t
-smalloc(n)
-    size_t  n;
+smalloc(size_t n)
 {
     ptr_t   ptr;
 
@@ -509,9 +500,7 @@ smalloc(n)
 }
 
 memalign_t
-srealloc(p, n)
-    ptr_t   p;
-    size_t  n;
+srealloc(ptr_t p, size_t n)
 {
     ptr_t   ptr;
 
@@ -536,8 +525,7 @@ srealloc(p, n)
 }
 
 memalign_t
-scalloc(s, n)
-    size_t  s, n;
+scalloc(size_t s, size_t n)
 {
     char   *sptr;
     ptr_t   ptr;
@@ -572,8 +560,7 @@ scalloc(s, n)
 }
 
 void
-sfree(p)
-    ptr_t   p;
+sfree(ptr_t p)
 {
     if (p && !dont_free)
 	free(p);
@@ -590,9 +577,7 @@ sfree(p)
  */
 /*ARGSUSED*/
 void
-showall(v, c)
-    Char **v;
-    struct command *c;
+showall(Char **v, struct command *c)
 {
 #ifndef SYSMALLOC
     size_t i, j;

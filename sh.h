@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.132 2005/03/21 21:26:36 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.133 2005/03/25 18:46:41 kim Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -357,15 +357,7 @@ typedef int NLSChar;
 
 #include <setjmp.h>
 
-#if defined(PROTOTYPES)
-# include <stdarg.h>
-#else
-#ifdef	_MINIX
-# include "mi.varargs.h"
-#else
-# include <varargs.h>
-#endif	/* _MINIX */
-#endif 
+#include <stdarg.h>
 
 #ifdef HAVE_DIRENT_H
 # include <dirent.h>
@@ -427,20 +419,6 @@ typedef int NLSChar;
 # include <sys/uio.h>	/* For struct iovec */
 #endif /* REMOTEHOST */
 
-/*
- * ANSIisms... These must be *after* the system include and 
- * *before* our includes, so that BSDreno has time to define __P
- */
-#undef __P
-#ifndef __P
-# if defined(PROTOTYPES)
-#  define __P(a) a
-# else
-#  define __P(a) ()
-# endif
-#endif 
-
-
 #ifdef PURIFY
 /* exit normally, allowing purify to trace leaks */
 # define _exit		exit
@@ -474,14 +452,14 @@ typedef void pret_t;
 #ifndef __NetBSD__ /* XXX */
 #ifndef WINNT_NATIVE
 # ifndef GETPGRP_VOID
-extern pid_t getpgrp __P((int));
+extern pid_t getpgrp (int);
 # else
-extern pid_t getpgrp __P((void));
+extern pid_t getpgrp (void);
 # endif
 #endif /* !WINNT_NATIVE */
 #endif
 
-typedef RETSIGTYPE (*signalfun_t) __P((int));
+typedef RETSIGTYPE (*signalfun_t) (int);
 
 #ifndef lint
 typedef ptr_t memalign_t;
@@ -502,10 +480,10 @@ typedef union {
 #endif 
 
 #ifdef MDEBUG
-extern memalign_t	DebugMalloc	__P((unsigned, char *, int));
-extern memalign_t	DebugRealloc	__P((ptr_t, unsigned, char *, int));
-extern memalign_t	DebugCalloc	__P((unsigned, unsigned, char *, int));
-extern void		DebugFree	__P((ptr_t, char *, int));
+extern memalign_t	DebugMalloc	(unsigned, char *, int);
+extern memalign_t	DebugRealloc	(ptr_t, unsigned, char *, int);
+extern memalign_t	DebugCalloc	(unsigned, unsigned, char *, int);
+extern void		DebugFree	(ptr_t, char *, int);
 # define xmalloc(i)  	DebugMalloc(i, __FILE__, __LINE__)
 # define xrealloc(p, i)((p) ? DebugRealloc(p, i, __FILE__, __LINE__) : \
 			      DebugMalloc(i, __FILE__, __LINE__))
@@ -979,7 +957,7 @@ struct command {
     /* Avoid hpux ansi mode spurious warnings */
 typedef void (*bfunc_t) ();
 #else
-typedef void (*bfunc_t) __P((Char **, struct command *));
+typedef void (*bfunc_t) (Char **, struct command *);
 #endif /* hpux && __STDC__ && !__GNUC__ */
 
 extern struct biltins {
@@ -1266,9 +1244,9 @@ extern int	NoNLSRebind;
     * This does not link right now...
     */
    typedef void *nl_catd; 
-   extern const char * catgets __P((nl_catd, int, int, const char *));
-   nl_catd catopen __P((const char *, int));
-   int catclose __P((nl_catd));
+   extern const char * catgets (nl_catd, int, int, const char *);
+   nl_catd catopen (const char *, int);
+   int catclose (nl_catd);
 #  else
 #   ifdef __uxps__
 #    define gettxt gettxt_ds

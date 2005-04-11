@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.5 2005/01/20 05:16:10 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.6 2005/02/15 21:09:02 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,12 +32,11 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.nls.c,v 3.5 2005/01/20 05:16:10 christos Exp $")
+RCSID("$Id: tc.nls.c,v 3.6 2005/02/15 21:09:02 christos Exp $")
 
 #ifdef SHORT_STRINGS
 int
-NLSWidth(c)
-    NLSChar c;
+NLSWidth(NLSChar c)
 {
 # ifdef HAVE_WCWIDTH
     int l; 
@@ -273,9 +272,7 @@ NLSChangeCase(Char *p, int mode)
 #endif
 
 int
-NLSClassify(c, nocomb)
-    NLSChar c;
-    int nocomb;
+NLSClassify(NLSChar c, int nocomb)
 {
     int w;
     if (c & NLS_ILLEGAL)

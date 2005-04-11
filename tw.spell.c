@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.spell.c,v 3.16 2004/08/04 17:12:32 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.spell.c,v 3.17 2004/11/23 02:10:50 christos Exp $ */
 /*
  * tw.spell.c: Spell check words
  */
@@ -32,17 +32,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.spell.c,v 3.16 2004/08/04 17:12:32 christos Exp $")
+RCSID("$Id: tw.spell.c,v 3.17 2004/11/23 02:10:50 christos Exp $")
 
 #include "tw.h"
 
 /* spell_me : return corrrectly spelled filename.  From K&P spname */
 int
-spell_me(oldname, oldsize, looking, pat, suf)
-    Char   *oldname;
-    int     oldsize, looking;
-    Char   *pat;
-    int     suf;
+spell_me(Char *oldname, int oldsize, int looking, Char *pat, int suf)
 {
     /* The +1 is to fool hp's optimizer */
     Char    guess[FILSIZ + 1], newname[FILSIZ + 1];
@@ -110,8 +106,7 @@ spell_me(oldname, oldsize, looking, pat, suf)
  */
 
 int
-spdist(s, t)
-    Char *s, *t;
+spdist(Char *s, Char *t)
 {
     for (; (*s & TRIM) == (*t & TRIM); t++, s++)
 	if (*t == '\0')
@@ -133,11 +128,7 @@ spdist(s, t)
 }
 
 int
-spdir(extended_name, tilded_dir, item, name)
-    Char   *extended_name;
-    Char   *tilded_dir;
-    Char   *item;
-    Char   *name;
+spdir(Char *extended_name, Char *tilded_dir, Char *item, Char *name)
 {
     Char    path[MAXPATHLEN + 1];
     Char   *s;

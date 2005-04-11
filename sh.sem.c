@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.68 2005/01/05 16:06:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.69 2005/01/18 20:24:51 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.68 2005/01/05 16:06:14 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.69 2005/01/18 20:24:51 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -56,11 +56,11 @@ RCSID("$Id: sh.sem.c,v 3.68 2005/01/05 16:06:14 christos Exp $")
 #endif /* __sparc__ || sparc */
 
 #ifdef VFORK
-static	RETSIGTYPE	vffree	__P((int));
+static	RETSIGTYPE	vffree	(int);
 #endif 
-static	Char		*splicepipe	__P((struct command *, Char *));
-static	void		 doio		__P((struct command *, int *, int *));
-static	void		 chkclob	__P((char *));
+static	Char		*splicepipe	(struct command *, Char *);
+static	void		 doio		(struct command *, int *, int *);
+static	void		 chkclob	(char *);
 
 /*
  * C shell
@@ -84,11 +84,7 @@ static	void		 chkclob	__P((char *));
 
 /*VARARGS 1*/
 void
-execute(t, wanttty, pipein, pipeout, do_glob)
-    struct command *t;
-    int     wanttty;
-    int *pipein, *pipeout;
-    int do_glob;
+execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 {
     int    forked = 0;
     struct biltins *bifunc;
@@ -756,8 +752,7 @@ execute(t, wanttty, pipein, pipeout, do_glob)
 #ifdef VFORK
 static RETSIGTYPE
 /*ARGSUSED*/
-vffree(snum)
-int snum;
+vffree(int snum)
 {
     Char **v;
 
@@ -792,9 +787,7 @@ int snum;
  * code is present and the user can choose it by setting noambiguous
  */
 static Char *
-splicepipe(t, cp)
-    struct command *t;
-    Char *cp;	/* word after < or > */
+splicepipe(struct command *t, Char *cp)
 {
     Char *blk[2];
 
@@ -838,9 +831,7 @@ splicepipe(t, cp)
  * We may or maynot be forked here.
  */
 static void
-doio(t, pipein, pipeout)
-    struct command *t;
-    int    *pipein, *pipeout;
+doio(struct command *t, int *pipein, int *pipeout)
 {
     int fd;
     Char *cp;
@@ -962,8 +953,7 @@ doio(t, pipein, pipeout)
 }
 
 void
-mypipe(pv)
-    int *pv;
+mypipe(int *pv)
 {
 
     if (pipe(pv) < 0)
@@ -977,8 +967,7 @@ oops:
 }
 
 static void
-chkclob(cp)
-    char *cp;
+chkclob(char *cp)
 {
     struct stat stb;
 

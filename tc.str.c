@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.str.c,v 3.18 2005/01/05 16:06:15 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.str.c,v 3.19 2005/01/06 16:56:26 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$Id: tc.str.c,v 3.18 2005/01/05 16:06:15 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.19 2005/01/06 16:56:26 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -93,8 +93,7 @@ rt_mbtowc(wchar_t *pwc, const char *s, size_t n)
 }
 
 Char  **
-blk2short(src)
-    char **src;
+blk2short(char **src)
 {
     size_t     n;
     Char **sdst, **dst;
@@ -113,8 +112,7 @@ blk2short(src)
 }
 
 char  **
-short2blk(src)
-    Char **src;
+short2blk(Char **src)
 {
     size_t     n;
     char **sdst, **dst;
@@ -133,8 +131,7 @@ short2blk(src)
 }
 
 Char   *
-str2short(src)
-    const char *src;
+str2short(const char *src)
 {
     static Char *sdst;
     static size_t dstsize = 0;
@@ -166,8 +163,7 @@ str2short(src)
 }
 
 char   *
-short2str(src)
-    const Char *src;
+short2str(const Char *src)
 {
     static char *sdst = NULL;
     static size_t dstsize = 0;
@@ -201,9 +197,7 @@ short2str(src)
 
 #ifndef WIDE_STRINGS
 Char   *
-s_strcpy(dst, src)
-    Char *dst;
-    const Char *src;
+s_strcpy(Char *dst, const Char *src)
 {
     Char *sdst;
 
@@ -214,10 +208,7 @@ s_strcpy(dst, src)
 }
 
 Char   *
-s_strncpy(dst, src, n)
-    Char *dst;
-    const Char *src;
-    size_t n;
+s_strncpy(Char *dst, const Char *src, size_t n)
 {
     Char *sdst;
 
@@ -236,9 +227,7 @@ s_strncpy(dst, src, n)
 }
 
 Char   *
-s_strcat(dst, src)
-    Char *dst;
-    const Char *src;
+s_strcat(Char *dst, const Char *src)
 {
     Char *sdst;
 
@@ -253,10 +242,7 @@ s_strcat(dst, src)
 
 #ifdef NOTUSED
 Char   *
-s_strncat(dst, src, n)
-    Char *dst;
-    const Char *src;
-    size_t n;
+s_strncat(Char *dst, const Char *src, size_t n)
 {
     Char *sdst;
 
@@ -282,9 +268,7 @@ s_strncat(dst, src, n)
 #endif
 
 Char   *
-s_strchr(str, ch)
-    const Char *str;
-    int ch;
+s_strchr(const Char *str, int ch)
 {
     do
 	if (*str == ch)
@@ -294,9 +278,7 @@ s_strchr(str, ch)
 }
 
 Char   *
-s_strrchr(str, ch)
-    const Char *str;
-    int ch;
+s_strrchr(const Char *str, int ch)
 {
     const Char *rstr;
 
@@ -309,8 +291,7 @@ s_strrchr(str, ch)
 }
 
 size_t
-s_strlen(str)
-    const Char *str;
+s_strlen(const Char *str)
 {
     size_t n;
 
@@ -320,8 +301,7 @@ s_strlen(str)
 }
 
 int
-s_strcmp(str1, str2)
-    const Char *str1, *str2;
+s_strcmp(const Char *str1, const Char *str2)
 {
     for (; *str1 && *str1 == *str2; str1++, str2++)
 	continue;
@@ -341,9 +321,7 @@ s_strcmp(str1, str2)
 }
 
 int
-s_strncmp(str1, str2, n)
-    const Char *str1, *str2;
-    size_t n;
+s_strncmp(const Char *str1, const Char *str2, size_t n)
 {
     if (n == 0)
 	return (0);
@@ -370,8 +348,7 @@ s_strncmp(str1, str2, n)
 #endif /* not WIDE_STRINGS */
 
 int
-s_strcasecmp(str1, str2)
-    const Char *str1, *str2;
+s_strcasecmp(const Char *str1, const Char *str2)
 {
 #ifdef WIDE_STRINGS
     wchar_t l1 = 0, l2 = 0;
@@ -405,8 +382,7 @@ s_strcasecmp(str1, str2)
 }
 
 Char   *
-s_strsave(s)
-    const Char *s;
+s_strsave(const Char *s)
 {
     Char   *n;
     Char *p;
@@ -423,8 +399,7 @@ s_strsave(s)
 }
 
 Char   *
-s_strspl(cp, dp)
-    const Char   *cp, *dp;
+s_strspl(const Char *cp, const Char *dp)
 {
     Char   *ep;
     Char *p, *q;
@@ -448,8 +423,7 @@ s_strspl(cp, dp)
 }
 
 Char   *
-s_strend(cp)
-    const Char *cp;
+s_strend(const Char *cp)
 {
     if (!cp)
 	return ((Char *)(intptr_t) cp);
@@ -459,8 +433,7 @@ s_strend(cp)
 }
 
 Char   *
-s_strstr(s, t)
-    const Char *s, *t;
+s_strstr(const Char *s, const Char *t)
 {
     do {
 	const Char *ss = s;
@@ -477,8 +450,7 @@ s_strstr(s, t)
 #endif				/* SHORT_STRINGS */
 
 char   *
-short2qstr(src)
-    const Char *src;
+short2qstr(const Char *src)
 {
     static char *sdst = NULL;
     static size_t dstsize = 0;

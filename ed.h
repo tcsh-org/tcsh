@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.44 2005/03/05 03:20:15 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.45 2005/04/11 21:09:34 kim Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -54,7 +54,7 @@
 #define KEYCMD   unsigned char	/* size needed to index into CcFuncTbl */
  /* Must be unsigned 		       */
 
-typedef CCRETVAL(*PFCmd) __P((Char));	/* pointer to function returning CCRETVAL */
+typedef CCRETVAL(*PFCmd) (Char); /* pointer to function returning CCRETVAL */
 
 struct KeyFuncs {		/* for the "bind" shell command */
     const char *name;		/* function name for bind command */
@@ -228,22 +228,22 @@ extern ttyperm_t ttylist;
 /*
  * We don't prototype these, cause some systems have them wrong!
  */
-extern int   tgetent	__P(());
-extern char *tgetstr	__P(());
-extern int   tgetflag	__P(());
-extern int   tgetnum	__P(());
-extern char *tgoto	__P(());
+extern int   tgetent	();
+extern char *tgetstr	();
+extern int   tgetflag	();
+extern int   tgetnum	();
+extern char *tgoto	();
 # define PUTPURE putpure
 # define PUTRAW putraw
 #else
-extern int   tgetent	__P((char *, const char *));
-extern char *tgetstr	__P((const char *, char **));
-extern int   tgetflag	__P((const char *));
-extern int   tgetnum	__P((const char *));
-extern char *tgoto	__P((const char *, int, int));
-extern void  tputs	__P((const char *, int, void (*)(int)));
-# define PUTPURE ((void (*)__P((int))) putpure)
-# define PUTRAW ((void (*)__P((int))) putraw)
+extern int   tgetent	(char *, const char *);
+extern char *tgetstr	(const char *, char **);
+extern int   tgetflag	(const char *);
+extern int   tgetnum	(const char *);
+extern char *tgoto	(const char *, int, int);
+extern void  tputs	(const char *, int, void (*)(int));
+# define PUTPURE ((void (*)(int)) putpure)
+# define PUTRAW ((void (*)(int)) putraw)
 #endif
 
 #endif /* _h_ed */

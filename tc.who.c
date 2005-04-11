@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.43 2005/03/03 22:58:39 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.44 2005/03/03 23:44:45 kim Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.43 2005/03/03 22:58:39 kim Exp $")
+RCSID("$Id: tc.who.c,v 3.44 2005/03/03 23:44:45 kim Exp $")
 
 #include "tc.h"
 
@@ -135,9 +135,9 @@ static struct who whohead, whotail;
 static time_t watch_period = 0;
 static time_t stlast = 0;
 #ifdef WHODEBUG
-static	void	debugwholist	__P((struct who *, struct who *));
+static	void	debugwholist	(struct who *, struct who *);
 #endif
-static	void	print_who	__P((struct who *));
+static	void	print_who	(struct who *);
 
 
 #define ONLINE		01
@@ -153,7 +153,7 @@ static	void	print_who	__P((struct who *));
  * when doing pointer-chase searches.
  */
 void
-initwatch()
+initwatch(void)
 {
     whohead.who_next = &whotail;
     whotail.who_prev = &whohead;
@@ -164,7 +164,7 @@ initwatch()
 }
 
 void
-resetwatch()
+resetwatch(void)
 {
     watch_period = 0;
     stlast = 0;
@@ -175,8 +175,7 @@ resetwatch()
  * Watch /etc/utmp for login/logout changes.
  */
 void
-watch_login(force)
-    int force;
+watch_login(int force)
 {
     int     comp = -1, alldone;
     int	    firsttime = stlast == 1;
@@ -483,8 +482,7 @@ watch_login(force)
 
 #ifdef WHODEBUG
 static void
-debugwholist(new, wp)
-    struct who *new, *wp;
+debugwholist(struct who *new, struct who *wp)
 {
     struct who *a;
 
@@ -518,8 +516,7 @@ debugwholist(new, wp)
 
 
 static void
-print_who(wp)
-    struct who *wp;
+print_who(struct who *wp)
 {
 #ifdef HAVE_STRUCT_UTMP_UT_HOST
     Char   *cp = str2short(CGETS(26, 7, "%n has %a %l from %m."));
@@ -540,11 +537,7 @@ print_who(wp)
 
 
 const char *
-who_info(ptr, c, wbuf, wbufsiz)
-    ptr_t ptr;
-    int c;
-    char *wbuf;
-    size_t wbufsiz;
+who_info(ptr_t ptr, int c, char *wbuf, size_t wbufsiz)
 {
     struct who *wp = (struct who *) ptr;
 #ifdef HAVE_STRUCT_UTMP_UT_HOST
@@ -626,9 +619,7 @@ who_info(ptr, c, wbuf, wbufsiz)
 
 void
 /*ARGSUSED*/
-dolog(v, c)
-Char **v;
-struct command *c;
+dolog(Char **v, struct command *c)
 {
     struct who *wp;
     struct varent *vp;
@@ -648,13 +639,13 @@ struct command *c;
 
 # ifdef HAVE_STRUCT_UTMP_UT_HOST
 size_t
-utmphostsize()
+utmphostsize(void)
 {
     return UTHOSTLEN;
 }
 
 char *
-utmphost()
+utmphost(void)
 {
     char *tty = short2str(varval(STRtty));
     struct who *wp;

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sched.c,v 3.20 2004/08/04 17:12:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sched.c,v 3.21 2004/11/23 02:10:50 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -34,7 +34,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.20 2004/08/04 17:12:31 christos Exp $")
+RCSID("$Id: tc.sched.c,v 3.21 2004/11/23 02:10:50 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -51,7 +51,7 @@ static struct sched_event *sched_ptr = NULL;
 
 
 time_t
-sched_next()
+sched_next(void)
 {
     if (sched_ptr)
 	return (sched_ptr->t_when);
@@ -60,9 +60,7 @@ sched_next()
 
 /*ARGSUSED*/
 void
-dosched(v, c)
-    Char **v;
-    struct command *c;
+dosched(Char **v, struct command *c)
 {
     struct sched_event *tp, *tp1, *tp2;
     time_t  cur_time;
@@ -196,8 +194,7 @@ dosched(v, c)
  */
 /*ARGSUSED*/
 void
-sched_run(n)
-    int n;
+sched_run(int n)
 {
     time_t   cur_time;
     struct sched_event *tp, *tp1;

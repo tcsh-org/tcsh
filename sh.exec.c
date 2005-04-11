@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.62 2004/11/21 04:38:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.63 2004/11/23 02:10:48 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.62 2004/11/21 04:38:03 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.63 2004/11/23 02:10:48 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -141,15 +141,13 @@ static int hits, misses;
 /* Dummy search path for just absolute search when no path */
 static Char *justabs[] = {STRNULL, 0};
 
-static	void	pexerr		__P((void));
-static	void	texec		__P((Char *, Char **));
-int	hashname	__P((Char *));
-static	int 	iscommand	__P((Char *));
+static	void	pexerr		(void);
+static	void	texec		(Char *, Char **);
+int	hashname	(Char *);
+static	int 	iscommand	(Char *);
 
 void
-doexec(t, do_glob)
-    struct command *t;
-    int do_glob;
+doexec(struct command *t, int do_glob)
 {
     Char *dp, **pv, **av, *sav;
     struct varent *v;
@@ -359,7 +357,7 @@ cont:
 }
 
 static void
-pexerr()
+pexerr(void)
 {
     /* Couldn't find the damn thing */
     if (expath) {
@@ -383,9 +381,7 @@ pexerr()
  * Also do shell scripts here.
  */
 static void
-texec(sf, st)
-    Char   *sf;
-    Char **st;
+texec(Char *sf, Char **st)
 {
     char **t;
     char *f;
@@ -553,9 +549,7 @@ texec(sf, st)
 
 /*ARGSUSED*/
 void
-execash(t, kp)
-    Char  **t;
-    struct command *kp;
+execash(Char **t, struct command *kp)
 {
     int     saveIN, saveOUT, saveDIAG, saveSTD;
     int     oSHIN;
@@ -651,8 +645,7 @@ execash(t, kp)
 }
 
 void
-xechoit(t)
-    Char  **t;
+xechoit(Char **t)
 {
     if (adrof(STRecho)) {
 	int odidfds = didfds;
@@ -668,9 +661,7 @@ xechoit(t)
 
 /*ARGSUSED*/
 void
-dohash(vv, c)
-    Char **vv;
-    struct command *c;
+dohash(Char **vv, struct command *c)
 {
 #ifdef COMMENT
     struct stat stb;
@@ -797,9 +788,7 @@ dohash(vv, c)
 
 /*ARGSUSED*/
 void
-dounhash(v, c)
-    Char **v;
-    struct command *c;
+dounhash(Char **v, struct command *c)
 {
     USE(c);
     USE(v);
@@ -814,9 +803,7 @@ dounhash(v, c)
 
 /*ARGSUSED*/
 void
-hashstat(v, c)
-    Char **v;
-    struct command *c;
+hashstat(Char **v, struct command *c)
 {
     USE(c);
     USE(v);
@@ -839,8 +826,7 @@ hashstat(v, c)
  * Hash a command name.
  */
 int
-hashname(cp)
-    Char *cp;
+hashname(Char *cp)
 {
     unsigned long h;
 
@@ -850,8 +836,7 @@ hashname(cp)
 }
 
 static int
-iscommand(name)
-    Char   *name;
+iscommand(Char *name)
 {
     Char **pv;
     Char *sav;
@@ -916,9 +901,7 @@ cont:
  * This is a bit kludgy, but in the name of optimization...
  */
 int
-executable(dir, name, dir_ok)
-    Char   *dir, *name;
-    int    dir_ok;
+executable(Char *dir, Char *name, int dir_ok)
 {
     struct stat stbuf;
     Char    path[MAXPATHLEN + 1];
@@ -944,9 +927,7 @@ executable(dir, name, dir_ok)
 #endif /*!WINNT_NATIVE*/
 
 int
-tellmewhat(lexp, str)
-    struct wordent *lexp;
-    Char *str;
+tellmewhat(struct wordent *lexp, Char *str)
 {
     int i;
     struct biltins *bptr;
@@ -1083,9 +1064,7 @@ tellmewhat(lexp, str)
 
 /*ARGSUSED*/
 void
-dowhere(v, c)
-    Char **v;
-    struct command *c;
+dowhere(Char **v, struct command *c)
 {
     int found = 1;
     USE(c);
@@ -1097,9 +1076,7 @@ dowhere(v, c)
 }
 
 int
-find_cmd(cmd, prt)
-    Char *cmd;
-    int prt;
+find_cmd(Char *cmd, int prt)
 {
     struct varent *var;
     struct biltins *bptr;

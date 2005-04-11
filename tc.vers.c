@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.vers.c,v 3.49 2002/05/16 13:51:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.vers.c,v 3.50 2004/08/04 17:12:31 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "tw.h"
 
-RCSID("$Id: tc.vers.c,v 3.49 2002/05/16 13:51:26 christos Exp $")
+RCSID("$Id: tc.vers.c,v 3.50 2004/08/04 17:12:31 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -43,7 +43,7 @@ RCSID("$Id: tc.vers.c,v 3.49 2002/05/16 13:51:26 christos Exp $")
  *	options that might affect the user.
  */
 void
-fix_version()
+fix_version(void)
 {
 #ifdef WIDE_STRINGS
 # define SSSTR "wide"

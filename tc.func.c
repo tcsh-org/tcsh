@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.118 2005/02/15 21:07:35 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.119 2005/03/06 03:57:10 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.118 2005/02/15 21:07:35 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.119 2005/03/06 03:57:10 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -66,20 +66,20 @@ static int cwdcmd_active = 0;	/* PWP: for cwd_cmd */
 static int beepcmd_active = 0;
 static signalfun_t alm_fun = NULL;
 
-static	void	 auto_logout	__P((int));
-static	char	*xgetpass	__P((const char *));
-static	void	 auto_lock	__P((int));
+static	void	 auto_logout	(int);
+static	char	*xgetpass	(const char *);
+static	void	 auto_lock	(int);
 #ifdef BSDJOBS
-static	void	 insert		__P((struct wordent *, int));
-static	void	 insert_we	__P((struct wordent *, struct wordent *));
-static	int	 inlist		__P((Char *, Char *));
+static	void	 insert		(struct wordent *, int);
+static	void	 insert_we	(struct wordent *, struct wordent *);
+static	int	 inlist		(Char *, Char *);
 #endif /* BSDJOBS */
 struct tildecache;
-static	int	 tildecompare	__P((struct tildecache *, struct tildecache *));
-static  Char    *gethomedir	__P((Char *));
+static	int	 tildecompare	(struct tildecache *, struct tildecache *);
+static  Char    *gethomedir	(Char *);
 #ifdef REMOTEHOST
-static	RETSIGTYPE palarm		__P((int));
-static	void	 getremotehost	__P((void));
+static	RETSIGTYPE palarm		(int);
+static	void	 getremotehost	(void);
 #endif /* REMOTEHOST */
 
 /*
@@ -103,11 +103,7 @@ static	void	 getremotehost	__P((void));
    the magic-space stuff */
 
 Char   *
-expand_lex(buf, bufsiz, sp0, from, to)
-    Char   *buf;
-    size_t  bufsiz;
-    struct  wordent *sp0;
-    int     from, to;
+expand_lex(Char *buf, size_t bufsiz, struct wordent *sp0, int from, int to)
 {
     struct wordent *sp;
     Char *s, *d, *e;
@@ -180,10 +176,7 @@ expand_lex(buf, bufsiz, sp0, from, to)
 }
 
 Char   *
-sprlex(buf, bufsiz, sp0)
-    Char   *buf;
-    size_t  bufsiz;
-    struct wordent *sp0;
+sprlex(Char *buf, size_t bufsiz, struct wordent *sp0)
 {
     Char   *cp;
 
@@ -194,10 +187,7 @@ sprlex(buf, bufsiz, sp0)
 
 
 Char *
-Itoa(n, s, min_digits, attributes)
-    int n;
-    Char *s;
-    int min_digits, attributes;
+Itoa(int n, Char *s, int min_digits, int attributes)
 {
     /*
      * The array size here is derived from
@@ -239,9 +229,7 @@ Itoa(n, s, min_digits, attributes)
 
 /*ARGSUSED*/
 void
-dolist(v, c)
-    Char **v;
-    struct command *c;
+dolist(Char **v, struct command *c)
 {
     int     i, k;
     struct stat st;
@@ -432,9 +420,7 @@ extern int GotTermCaps;
 
 /*ARGSUSED*/
 void
-dotelltc(v, c)
-    Char **v;
-    struct command *c;
+dotelltc(Char **v, struct command *c)
 {
     USE(v);
     USE(c);
@@ -445,9 +431,7 @@ dotelltc(v, c)
 
 /*ARGSUSED*/
 void
-doechotc(v, c)
-    Char **v;
-    struct command *c;
+doechotc(Char **v, struct command *c)
 {
     USE(c);
     if (!GotTermCaps)
@@ -457,9 +441,7 @@ doechotc(v, c)
 
 /*ARGSUSED*/
 void
-dosettc(v, c)
-    Char  **v;
-    struct command *c;
+dosettc(Char **v, struct command *c)
 {
     char    tv[2][BUFSIZE];
 
@@ -481,9 +463,7 @@ dosettc(v, c)
  * Thanks!!
  */
 int
-cmd_expand(cmd, str)
-    Char *cmd;
-    Char *str;
+cmd_expand(Char *cmd, Char *str)
 {
     struct wordent lexp[3];
     struct varent *vp;
@@ -519,9 +499,7 @@ cmd_expand(cmd, str)
 
 /*ARGSUSED*/
 void
-dowhich(v, c)
-    Char **v;
-    struct command *c;
+dowhich(Char **v, struct command *c)
 {
     int rv = TRUE;
     USE(c);
@@ -561,7 +539,7 @@ dowhich(v, c)
 /* jbs - fixed hack so it worked :-) 3/28/89 */
 
 struct process *
-find_stop_ed()
+find_stop_ed(void)
 {
     struct process *pp, *retp;
     const char *ep, *vp;
@@ -635,8 +613,7 @@ find_stop_ed()
 }
 
 void
-fg_proc_entry(pp)
-    struct process *pp;
+fg_proc_entry(struct process *pp)
 {
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -680,8 +657,7 @@ fg_proc_entry(pp)
 }
 
 static char *
-xgetpass(prm)
-    const char *prm;
+xgetpass(const char *prm)
 {
     static char pass[PASSMAX + 1];
     int fd, i;
@@ -711,7 +687,7 @@ xgetpass(prm)
 	
 #ifndef NO_CRYPT
 #ifndef __STDC__
-    extern char *crypt __P(());
+    extern char *crypt ();
 #endif
 #ifdef __linux__
 #include <crypt.h>
@@ -728,8 +704,7 @@ xgetpass(prm)
  */
 /*ARGSUSED*/
 static void
-auto_lock(n)
-	int n;
+auto_lock(int n)
 {
 #ifndef NO_CRYPT
 
@@ -742,7 +717,7 @@ auto_lock(n)
 #if defined(HAVE_AUTH_H)
 
     struct authorization *apw;
-    extern char *crypt16 __P((const char *, const char *));
+    extern char *crypt16 (const char *, const char *);
 
 # define XCRYPT(a, b) crypt16(a, b)
 
@@ -832,8 +807,7 @@ auto_lock(n)
 
 
 static void
-auto_logout(n)
-    int n;
+auto_logout(int n)
 {
     USE(n);
     xprintf("auto-logout\n");
@@ -852,8 +826,7 @@ auto_logout(n)
 
 RETSIGTYPE
 /*ARGSUSED*/
-alrmcatch(snum)
-int snum;
+alrmcatch(int snum)
 {
     USE(snum);
 #ifdef UNRELSIGS
@@ -876,7 +849,7 @@ int snum;
  * one's current directory just before each command.
  */
 void
-precmd()
+precmd(void)
 {
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -903,7 +876,7 @@ leave:
 }
 
 void
-postcmd()
+postcmd(void)
 {
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -936,7 +909,7 @@ leave:
  * space.
  */
 void
-cwd_cmd()
+cwd_cmd(void)
 {
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -967,7 +940,7 @@ leave:
  * to beep the terminal bell. Useful for playing nice sounds instead.
  */
 void
-beep_cmd()
+beep_cmd(void)
 {
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -1000,7 +973,7 @@ beep_cmd()
  * $tperiod minutes.  Useful for occasional checking of msgs and such.
  */
 void
-period_cmd()
+period_cmd(void)
 {
     Char *vp;
     time_t  t, interval;
@@ -1049,8 +1022,7 @@ leave:
  * Cloned from cwd_cmd().
  */
 void
-job_cmd(args)
-    Char *args;
+job_cmd(Char *args)
 {
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -1086,9 +1058,7 @@ leave:
  * This code is based on the mainline of process().
  */
 void
-aliasrun(cnt, s1, s2)
-    int     cnt;
-    Char   *s1, *s2;
+aliasrun(int cnt, Char *s1, Char *s2)
 {
     struct wordent w, *new1, *new2;	/* for holding alias name */
     struct command *t = NULL;
@@ -1176,8 +1146,7 @@ aliasrun(cnt, s1, s2)
 }
 
 void
-setalarm(lck)
-    int lck;
+setalarm(int lck)
 {
     struct varent *vp;
     Char   *cp;
@@ -1230,8 +1199,7 @@ setalarm(lck)
 #undef RMDEBUG			/* For now... */
 
 void
-rmstar(cp)
-    struct wordent *cp;
+rmstar(struct wordent *cp)
 {
     struct wordent *we, *args;
     struct wordent *tmp, *del;
@@ -1337,8 +1305,7 @@ rmstar(cp)
 
 #undef CNDEBUG			/* For now */
 void
-continue_jobs(cp)
-    struct wordent *cp;
+continue_jobs(struct wordent *cp)
 {
     struct wordent *we;
     struct process *pp, *np;
@@ -1409,9 +1376,7 @@ continue_jobs(cp)
 /* The actual "aliasing" of for backgrounds() is done here
    with the aid of insert_we().   */
 static void
-insert(pl, file_args)
-    struct wordent *pl;
-    int    file_args;
+insert(struct wordent *pl, int file_args)
 {
     struct wordent *now, *last;
     Char   *cmd, *bcmd, *cp1, *cp2;
@@ -1503,8 +1468,7 @@ insert(pl, file_args)
 }
 
 static void
-insert_we(new, where)
-    struct wordent *new, *where;
+insert_we(struct wordent *new, struct wordent *where)
 {
 
     new->prev = where;
@@ -1514,8 +1478,7 @@ insert_we(new, where)
 }
 
 static int
-inlist(list, name)
-    Char   *list, *name;
+inlist(Char *list, Char *name)
 {
     Char *l, *n;
 
@@ -1563,15 +1526,13 @@ int tlength = 0;
 static int tsize = TILINCR;
 
 static int
-tildecompare(p1, p2)
-    struct tildecache *p1, *p2;
+tildecompare(struct tildecache *p1, struct tildecache *p2)
 {
     return Strcmp(p1->user, p2->user);
 }
 
 static Char *
-gethomedir(us)
-    Char   *us;
+gethomedir(Char *us)
 {
     struct passwd *pp;
 #ifdef HESIOD
@@ -1635,8 +1596,7 @@ gethomedir(us)
 }
 
 Char   *
-gettilde(us)
-    Char   *us;
+gettilde(Char *us)
 {
     struct tildecache *bp1, *bp2, *bp;
     Char *hd;
@@ -1677,7 +1637,7 @@ gettilde(us)
     tcache[tlength++].hlen = (int) Strlen(hd);
 
     qsort((ptr_t) tcache, (size_t) tlength, sizeof(struct tildecache),
-	  (int (*) __P((const void *, const void *))) tildecompare);
+	  (int (*) (const void *, const void *)) tildecompare);
 
     if (tlength == tsize) {
 	tsize += TILINCR;
@@ -1696,8 +1656,7 @@ gettilde(us)
  * If we are passed a null pointer, then we flush the cache.
  */
 Char   *
-getusername(hm)
-    Char  **hm;
+getusername(Char **hm)
 {
     Char   *h, *p;
     int     i, j;
@@ -1737,9 +1696,7 @@ getusername(hm)
  */
 /*ARGSUSED*/
 void
-doaliases(v, c)
-    Char  **v;
-    struct command *c;
+doaliases(Char **v, struct command *c)
 {
     jmp_buf_t oldexit;
     Char  **vec, *lp;
@@ -1827,8 +1784,7 @@ eof:
  * set the shell-level var to 1 or apply change to it.
  */
 void
-shlvl(val)
-    int val;
+shlvl(int val)
 {
     char *cp;
 
@@ -1863,8 +1819,7 @@ shlvl(val)
  *	Try to recover from a read error
  */
 int
-fixio(fd, e)
-    int fd, e;
+fixio(int fd, int e)
 {
     switch (e) {
     case -1:	/* Make sure that the code is reachable */
@@ -1955,9 +1910,7 @@ fixio(fd, e)
  *	String collation
  */
 int
-collate(a, b)
-    const Char *a;
-    const Char *b;
+collate(const Char *a, const Char *b)
 {
     int rv;
 #ifdef SHORT_STRINGS
@@ -2003,9 +1956,7 @@ collate(a, b)
 #define HACKBUFSZ 1024		/* Max chars in #! vector */
 #define HACKVECSZ 128		/* Max words in #! vector */
 int
-hashbang(fd, vp)
-    int fd;
-    Char ***vp;
+hashbang(int fd, Char ***vp)
 {
     unsigned char lbuf[HACKBUFSZ];
     char *sargv[HACKVECSZ];
@@ -2093,8 +2044,7 @@ hashbang(fd, vp)
 #ifdef REMOTEHOST
 
 static RETSIGTYPE
-palarm(snum)
-    int snum;
+palarm(int snum)
 {
     USE(snum);
 #ifdef UNRELSIGS
@@ -2107,7 +2057,7 @@ palarm(snum)
 
 
 static void
-getremotehost()
+getremotehost(void)
 {
     const char *host = NULL;
 #ifdef INET6
@@ -2242,7 +2192,7 @@ getremotehost()
  * From: <lesv@ppvku.ericsson.se> (Lennart Svensson)
  */
 void 
-remotehost()
+remotehost(void)
 {
     /* Don't get stuck if the resolver does not work! */
     signalfun_t osig = sigset(SIGALRM, palarm);
@@ -2277,9 +2227,7 @@ remotehost()
  * platforms
  */
 void
-dotermname(v, c)
-    Char **v;
-    struct command *c;
+dotermname(Char **v, struct command *c)
 {
     char *termtype;
     /*

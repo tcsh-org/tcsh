@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.printf.c,v 3.26 2004/12/25 21:15:08 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.printf.c,v 3.27 2005/01/05 16:06:15 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -34,7 +34,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.26 2004/12/25 21:15:08 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.27 2005/01/05 16:06:15 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -46,14 +46,11 @@ RCSID("$Id: tc.printf.c,v 3.26 2004/12/25 21:15:08 christos Exp $")
 static char buf[128];
 static char snil[] = "(nil)";
 
-static	void	xaddchar	__P((int));
-static	void	doprnt		__P((void (*) __P((int)), const char *, va_list));
+static	void	xaddchar	(int);
+static	void	doprnt		(void (*) (int), const char *, va_list);
 
 static void
-doprnt(addchar, sfmt, ap)
-    void    (*addchar) __P((int));
-    const char   *sfmt;
-    va_list ap;
+doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
 {
     char *bp;
     const char *f;
@@ -314,8 +311,7 @@ lcase_s:
 
 static char *xstring, *xestring;
 static void
-xaddchar(c)
-    int     c;
+xaddchar(int c)
 {
     if (xestring == xstring)
 	*xstring = '\0';
@@ -326,25 +322,10 @@ xaddchar(c)
 
 pret_t
 /*VARARGS*/
-#ifdef PROTOTYPES
 xsnprintf(char *str, size_t size, const char *fmt, ...)
-#else
-xsnprintf(va_alist)
-    va_dcl
-#endif
 {
     va_list va;
-#ifdef PROTOTYPES
     va_start(va, fmt);
-#else
-    char *str, *fmt;
-    size_t size;
-
-    va_start(va);
-    str = va_arg(va, char *);
-    size = va_arg(va, size_t);
-    fmt = va_arg(va, char *);
-#endif
 
     xstring = str;
     xestring = str + size - 1;
@@ -358,22 +339,10 @@ xsnprintf(va_alist)
 
 pret_t
 /*VARARGS*/
-#ifdef PROTOTYPES
 xprintf(const char *fmt, ...)
-#else
-xprintf(va_alist)
-    va_dcl
-#endif
 {
     va_list va;
-#ifdef PROTOTYPES
     va_start(va, fmt);
-#else
-    char   *fmt;
-
-    va_start(va);
-    fmt = va_arg(va, char *);
-#endif
     doprnt(xputchar, fmt, va);
     va_end(va);
 #ifdef PURIFY
@@ -383,9 +352,7 @@ xprintf(va_alist)
 
 
 pret_t
-xvprintf(fmt, va)
-    const char   *fmt;
-    va_list va;
+xvprintf(const char *fmt, va_list va)
 {
     doprnt(xputchar, fmt, va);
 #ifdef PURIFY
@@ -394,11 +361,7 @@ xvprintf(fmt, va)
 }
 
 pret_t
-xvsnprintf(str, size, fmt, va)
-    char   *str;
-    size_t size;
-    const char   *fmt;
-    va_list va;
+xvsnprintf(char *str, size_t size, const char *fmt, va_list va)
 {
     xstring = str;
     xestring = str + size - 1;
@@ -423,34 +386,17 @@ xvsnprintf(str, size, fmt, va)
 #define FILE int
 #endif
 int 
-#ifdef PROTOTYPES
 fprintf(FILE *fp, const char* fmt, ...)
-#else
-fprintf(va_alist)
-    va_dcl
-#endif
 {
     va_list va;
-#ifdef PROTOTYPES
     va_start(va, fmt);
-#else
-    FILE *fp;
-    const char   *fmt;
-
-    va_start(va);
-    fp = va_arg(va, FILE *);
-    fmt = va_arg(va, const char *);
-#endif
     doprnt(xputchar, fmt, va);
     va_end(va);
     return 1;
 }
 
 int 
-vfprintf(fp, fmt, va)
-    FILE *fp;
-    const char   *fmt;
-    va_list va;
+vfprintf(FILE *fp, const char *fmt, va_list va)
 {
     doprnt(xputchar, fmt, va);
     return 1;

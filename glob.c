@@ -80,23 +80,23 @@ static char sccsid[] = "@(#)glob.c	5.12 (Berkeley) 6/24/91";
 
 typedef unsigned short Char;
 
-static	int	 glob1 		__P((Char *, glob_t *, int));
-static	int	 glob2		__P((Char *, Char *, Char *, glob_t *, int));
-static	int	 glob3		__P((Char *, Char *, Char *, Char *,
-				     glob_t *, int));
-static	int	 globextend	__P((Char *, glob_t *));
-static	int	 match		__P((Char *, Char *, Char *, int));
+static	int	 glob1 		(Char *, glob_t *, int);
+static	int	 glob2		(Char *, Char *, Char *, glob_t *, int);
+static	int	 glob3		(Char *, Char *, Char *, Char *,
+				 glob_t *, int);
+static	int	 globextend	(Char *, glob_t *);
+static	int	 match		(Char *, Char *, Char *, int);
 #ifndef __clipper__
-static	int	 compare	__P((const ptr_t, const ptr_t));
+static	int	 compare	(const ptr_t, const ptr_t);
 #endif
-static 	DIR	*Opendir	__P((Char *));
+static 	DIR	*Opendir	(Char *);
 #ifdef S_IFLNK
-static	int	 Lstat		__P((Char *, struct stat *));
+static	int	 Lstat		(Char *, struct stat *);
 #endif
-static	int	 Stat		__P((Char *, struct stat *sb));
-static 	Char 	*Strchr		__P((Char *, int));
+static	int	 Stat		(Char *, struct stat *sb);
+static 	Char 	*Strchr		(Char *, int);
 #ifdef DEBUG
-static	void	 qprintf	__P((Char *));
+static	void	 qprintf	(Char *);
 #endif
 
 #define	DOLLAR		'$'
@@ -137,9 +137,7 @@ static	void	 qprintf	__P((Char *));
 #endif
 
 int
-globcharcoll(c1, c2, cs)
-    NLSChar c1, c2;
-    int cs;
+globcharcoll(NLSChar c1, NLSChar c2, int cs)
 {
 #if defined(NLS) && defined(LC_COLLATE) && !defined(NOSTRCOLL)
 # if defined(SHORT_STRINGS)
@@ -198,8 +196,7 @@ globcharcoll(c1, c2, cs)
  */
 
 static DIR *
-Opendir(str)
-    Char *str;
+Opendir(Char *str)
 {
     char    buf[GLOBBUFLEN];
     char *dc = buf;
@@ -223,9 +220,7 @@ Opendir(str)
 
 #ifdef S_IFLNK
 static int
-Lstat(fn, sb)
-    Char *fn;
-    struct stat *sb;
+Lstat(Char *fn, struct stat *sb)
 {
     char    buf[GLOBBUFLEN];
     char *dc = buf;
@@ -250,9 +245,7 @@ Lstat(fn, sb)
 #endif /* S_IFLNK */
 
 static int
-Stat(fn, sb)
-    Char *fn;
-    struct stat *sb;
+Stat(Char *fn, struct stat *sb)
 {
     char    buf[GLOBBUFLEN];
     char *dc = buf;
@@ -274,9 +267,7 @@ Stat(fn, sb)
 }
 
 static Char *
-Strchr(str, ch)
-    Char *str;
-    int ch;
+Strchr(Char *str, int ch)
 {
     do
 	if (*str == ch)
@@ -287,8 +278,7 @@ Strchr(str, ch)
 
 #ifdef DEBUG
 static void
-qprintf(s)
-Char *s;
+qprintf(Char *s)
 {
     Char *p;
 
@@ -305,8 +295,7 @@ Char *s;
 #endif /* DEBUG */
 
 static int
-compare(p, q)
-    const ptr_t  p, q;
+compare(const ptr_t p, const ptr_t q)
 {
 #if defined(NLS) && !defined(NOSTRCOLL)
     errno = 0;  /* strcoll sets errno, another brain-damage */
@@ -325,11 +314,8 @@ compare(p, q)
  * to find no matches.
  */
 int
-glob(pattern, flags, errfunc, pglob)
-    const char *pattern;
-    int     flags;
-    int     (*errfunc) __P((const char *, int));
-    glob_t *pglob;
+glob(const char *pattern, int flags, int (*errfunc) (const char *, int),
+     glob_t *pglob)
 {
     int     err, oldpathc;
     Char *bufnext, *bufend, *compilebuf, m_not;
@@ -496,15 +482,12 @@ glob(pattern, flags, errfunc, pglob)
     else if (!(flags & GLOB_NOSORT) && (pglob->gl_pathc != oldpathc))
 	qsort((char *) (pglob->gl_pathv + pglob->gl_offs + oldpathc),
 	      pglob->gl_pathc - oldpathc, sizeof(char *),
-	      (int (*) __P((const void *, const void *))) compare);
+	      (int (*) (const void *, const void *)) compare);
     return (0);
 }
 
 static int
-glob1(pattern, pglob, no_match)
-    Char *pattern;
-    glob_t *pglob;
-    int     no_match;
+glob1(Char *pattern, glob_t *pglob, int no_match)
 {
     Char pathbuf[GLOBBUFLEN + 1];
 
@@ -522,10 +505,7 @@ glob1(pattern, pglob, no_match)
  * more meta characters.
  */
 static int
-glob2(pathbuf, pathend, pattern, pglob, no_match)
-    Char *pathbuf, *pathend, *pattern;
-    glob_t *pglob;
-    int     no_match;
+glob2(Char *pathbuf, Char *pathend, Char *pattern, glob_t *pglob, int no_match)
 {
     struct stat sbuf;
     int anymeta;
@@ -582,10 +562,8 @@ glob2(pathbuf, pathend, pattern, pglob, no_match)
 
 
 static int
-glob3(pathbuf, pathend, pattern, restpattern, pglob, no_match)
-    Char *pathbuf, *pathend, *pattern, *restpattern;
-    glob_t *pglob;
-    int     no_match;
+glob3(Char *pathbuf, Char *pathend, Char *pattern, Char *restpattern,
+      glob_t *pglob, int no_match)
 {
     DIR    *dirp;
     struct dirent *dp;
@@ -649,9 +627,7 @@ glob3(pathbuf, pathend, pattern, restpattern, pglob, no_match)
  *	 gl_pathv points to (gl_offs + gl_pathc + 1) items.
  */
 static int
-globextend(path, pglob)
-    Char *path;
-    glob_t *pglob;
+globextend(Char *path, glob_t *pglob)
 {
     char **pathv;
     int i;
@@ -711,9 +687,7 @@ One_mbtowc(NLSChar *pwc, const Char *s, size_t n)
  * pattern causes a recursion level.
  */
 static  int
-match(name, pat, patend, m_not)
-    Char *name, *pat, *patend;
-    int m_not;
+match(Char *name, Char *pat, Char *patend, int m_not)
 {
     int ok, negate_range;
     Char c, k;
@@ -780,8 +754,7 @@ match(name, pat, patend, m_not)
 
 /* free allocated data belonging to a glob_t structure */
 void
-globfree(pglob)
-    glob_t *pglob;
+globfree(glob_t *pglob)
 {
     int i;
     char **pp;
