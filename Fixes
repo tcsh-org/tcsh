@@ -1,3 +1,4 @@
+  5. Fix doc path in Cygwin installation (Corinna Vinschen)
   4. Fix column size calculation (Martin Kraemer)
   3. Implement newline-and-hold and newline-and-down-history (Per Hedeland)
   2. Messages fixes for the ja (Japanese) locale (NAKAMURA Takeshi)

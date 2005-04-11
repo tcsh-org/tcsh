@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.27 2005/03/23 13:20:30 kim Exp $
+# $Id: Makefile.in,v 3.28 2005/03/27 03:06:16 kim Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -489,12 +489,12 @@ install.man: tcsh.man
 	chmod 444 ${DESTMAN}/tcsh.${MANSECT}
 
 install.cygwin: install install.man
-	-mkdir -p ${DESTDIR}${prefix}/doc/tcsh
-	cp ${srcdir}/FAQ ${srcdir}/Fixes ${DESTDIR}${prefix}/doc/tcsh
-	cp ${srcdir}/NewThings ${srcdir}/README ${DESTDIR}${prefix}/doc/tcsh
-	cp ${srcdir}/WishList ${srcdir}/Y2K ${DESTDIR}${prefix}/doc/tcsh
+	-mkdir -p ${DESTDIR}${prefix}/share/doc/tcsh
+	cp ${srcdir}/FAQ ${srcdir}/Fixes ${DESTDIR}${prefix}/share/doc/tcsh
+	cp ${srcdir}/NewThings ${srcdir}/README ${DESTDIR}${prefix}/share/doc/tcsh
+	cp ${srcdir}/WishList ${srcdir}/Y2K ${DESTDIR}${prefix}/share/doc/tcsh
 	perl ${srcdir}/tcsh.man2html ${srcdir}/tcsh.man
-	cp -rp tcsh.html ${DESTDIR}${prefix}/doc/tcsh
+	cp -rp tcsh.html ${DESTDIR}${prefix}/share/doc/tcsh
 	-mkdir -p ${DESTDIR}/etc/profile.d
 	-mkdir -p ${DESTDIR}/etc/postinstall
 	cp -p ${srcdir}/cygwin/etc/csh.* ${DESTDIR}/etc
