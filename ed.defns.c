@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.defns.c,v 3.41 2004/11/23 02:10:47 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.defns.c,v 3.42 2005/03/03 16:49:15 kim Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.41 2004/11/23 02:10:47 christos Exp $")
+RCSID("$Id: ed.defns.c,v 3.42 2005/03/03 16:49:15 kim Exp $")
 
 #include "ed.h"
 
@@ -279,8 +279,12 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define		F_PAGE_DOWN	118
     e_yank_pop,
 #define		F_YANK_POP	119
+    e_newline_hold,
+#define		F_NEWLINE_HOLD	120
+    e_newline_down_hist,
+#define		F_NEWLINE_DOWN_HIST	121
     0				/* DUMMY VALUE */
-#define		F_NUM_FNS	120
+#define		F_NUM_FNS	122
 
 };
 
@@ -493,7 +497,7 @@ KEYCMD  CcEmacsMap[] = {
     F_UNASSIGNED,		/* M-> */
     F_WHICH,			/* M-? */
     F_UNASSIGNED,		/* M-@ */
-    F_UNASSIGNED,		/* M-A */
+    F_NEWLINE_HOLD,		/* M-A */
     F_WORDBACK,			/* M-B */
     F_CASECAPITAL,		/* M-C */
     F_DELWORDNEXT,		/* M-D */
@@ -525,7 +529,7 @@ KEYCMD  CcEmacsMap[] = {
     F_UNASSIGNED,		/* M-^ */
     F_LAST_ITEM,		/* M-_ */
     F_UNASSIGNED,		/* M-` */
-    F_UNASSIGNED,		/* M-a */
+    F_NEWLINE_HOLD,		/* M-a */
     F_WORDBACK,			/* M-b */
     F_CASECAPITAL,		/* M-c */
     F_DELWORDNEXT,		/* M-d */
@@ -1406,6 +1410,16 @@ editinit()
     f->name = "newline";
     f->func = F_NEWLINE;
     f->desc = CSAVS(3, 52, "Execute command");
+
+    f++;
+    f->name = "newline-and-hold";
+    f->func = F_NEWLINE_HOLD;
+    f->desc = CSAVS(3, 122, "Execute command and keep current line");
+
+    f++;
+    f->name = "newline-and-down-history";
+    f->func = F_NEWLINE_DOWN_HIST;
+    f->desc = CSAVS(3, 123, "Execute command and move to next history line");
 
     f++;
     f->name = "normalize-path";

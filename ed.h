@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.43 2005/03/03 16:57:01 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.44 2005/03/05 03:20:15 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -142,10 +142,11 @@ EXTERN int  UndoAction;
 EXTERN Char HistBuf[INBUFSIZE];	/* history buffer */
 EXTERN Char *LastHist;		/* points to end of history buffer */
 EXTERN int Hist_num;		/* what point up the history we are at now. */
-EXTERN Char WhichBuf[INBUFSIZE];	/* buffer for which command */
-EXTERN Char *LastWhich;		/* points to end of which buffer */
-EXTERN Char *CursWhich;		/* points to the cursor point in which buf */
-EXTERN int HistWhich;		/* Hist_num is saved in this */
+EXTERN Char SavedBuf[INBUFSIZE]; /* buffer for which command and others */
+EXTERN Char *LastSaved;		/* points to end of saved buffer */
+EXTERN Char *CursSaved;		/* points to the cursor point in saved buf */
+EXTERN int HistSaved;		/* Hist_num is saved in this */
+EXTERN char RestoreSaved;	/* true if SavedBuf should be restored */
 EXTERN char Expand;		/* true if we are expanding a line */
 extern Char HistLit;		/* true if history lines are shown literal */
 EXTERN Char CurrentHistLit;	/* Literal status of current show history line */

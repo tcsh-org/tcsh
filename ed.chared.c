@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.82 2005/01/18 20:43:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.83 2005/03/03 16:21:08 kim Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.82 2005/01/18 20:43:30 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.83 2005/03/03 16:21:08 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -134,7 +134,7 @@ static	Char	*c_nexword		__P((Char *, Char *, int));
 static	Char	*c_endword		__P((Char *, Char *, int, Char *));
 static	Char	*c_eword		__P((Char *, Char *, int));
 static	void	 c_push_kill		__P((Char *, Char *));
-static  CCRETVAL c_get_histline		__P((void));
+static	void	 c_save_inputbuf	__P((void));
 static  CCRETVAL c_search_line		__P((Char *, int));
 static  CCRETVAL v_repeat_srch		__P((int));
 static	CCRETVAL e_inc_search		__P((int));
@@ -952,8 +952,19 @@ c_push_kill(start, end)
     *kp = '\0';
 }
 
-static CCRETVAL
-c_get_histline()
+/* Save InputBuf etc in SavedBuf etc for restore after cmd exec */
+static void
+c_save_inputbuf()
+{
+    copyn(SavedBuf, InputBuf, INBUFSIZE);
+    LastSaved = SavedBuf + (LastChar - InputBuf);
+    CursSaved = SavedBuf + (Cursor - InputBuf);
+    HistSaved = Hist_num;
+    RestoreSaved = 1;
+}
+
+CCRETVAL
+GetHistLine()
 {
     struct Hist *hp;
     int     h;
@@ -1177,9 +1188,9 @@ e_inc_search(dir)
 		if (redo && newdir == dir) {
 		    if (pchar == '?') {	/* wrap around */
 			Hist_num = newdir == F_UP_SEARCH_HIST ? 0 : 0x7fffffff;
-			if (c_get_histline() == CC_ERROR)
+			if (GetHistLine() == CC_ERROR)
 			    /* Hist_num was fixed by first call */
-			    (void) c_get_histline();
+			    (void) GetHistLine();
 			Cursor = newdir == F_UP_SEARCH_HIST ?
 			    LastChar : InputBuf;
 		    } else
@@ -1203,7 +1214,7 @@ e_inc_search(dir)
 		    SoundBeep();
 		    if (Hist_num != oldHist_num) {
 			Hist_num = oldHist_num;
-			if (c_get_histline() == CC_ERROR)
+			if (GetHistLine() == CC_ERROR)
 			    return(CC_ERROR);
 		    }
 		    Cursor = oldCursor;
@@ -1228,7 +1239,7 @@ e_inc_search(dir)
 	    patlen = oldpatlen;
 	    if (Hist_num != oldHist_num) {
 		Hist_num = oldHist_num;
-		if (c_get_histline() == CC_ERROR)
+		if (GetHistLine() == CC_ERROR)
 		    return(CC_ERROR);
 	    }
 	    Cursor = oldCursor;
@@ -1617,6 +1628,33 @@ e_newline(c)
 
 /*ARGSUSED*/
 CCRETVAL
+e_newline_hold(c)
+    Char c;
+{
+    USE(c);
+    c_save_inputbuf();
+    HistSaved = 0;
+    *LastChar++ = '\n';		/* for the benefit of CSH */
+    *LastChar = '\0';		/* just in case */
+    return(CC_NEWLINE);
+}
+
+/*ARGSUSED*/
+CCRETVAL
+e_newline_down_hist(c)
+    Char c;
+{
+    USE(c);
+    if (Hist_num > 1) {
+	HistSaved = Hist_num;
+    }
+    *LastChar++ = '\n';		/* for the benefit of CSH */
+    *LastChar = '\0';		/* just in case */
+    return(CC_NEWLINE);
+}
+
+/*ARGSUSED*/
+CCRETVAL
 e_send_eof(c)
     Char c;
 {				/* for when ^D is ONLY send-eof */
@@ -1753,9 +1791,9 @@ e_up_hist(c)
 
     Hist_num += Argument;
 
-    if (c_get_histline() == CC_ERROR) {
+    if (GetHistLine() == CC_ERROR) {
 	beep = 1;
-	(void) c_get_histline(); /* Hist_num was fixed by first call */
+	(void) GetHistLine(); /* Hist_num was fixed by first call */
     }
 
     Refresh();
@@ -1781,7 +1819,7 @@ e_down_hist(c)
 	return(CC_ERROR);	/* make it beep */
     }
 
-    return(c_get_histline());
+    return(GetHistLine());
 }
 
 
@@ -1888,7 +1926,7 @@ e_up_search_hist(c)
 
     Hist_num = h;
 
-    return(c_get_histline());
+    return(GetHistLine());
 }
 
 /*ARGSUSED*/
@@ -1942,7 +1980,7 @@ e_down_search_hist(c)
 
     Hist_num = found;
 
-    return(c_get_histline());
+    return(GetHistLine());
 }
 
 /*ARGSUSED*/
@@ -1986,11 +2024,7 @@ e_run_fg_editor(c)
     USE(c);
     if ((pp = find_stop_ed()) != NULL) {
 	/* save our editor state so we can restore it */
-	tellwhat = 1;
-	copyn(WhichBuf, InputBuf, INBUFSIZE);
-	LastWhich = WhichBuf + (LastChar - InputBuf);
-	CursWhich = WhichBuf + (Cursor - InputBuf);
-	HistWhich = Hist_num;
+	c_save_inputbuf();
 	Hist_num = 0;		/* for the history commands */
 
 	/* put the tty in a sane mode */
@@ -2002,7 +2036,8 @@ e_run_fg_editor(c)
 
 	(void) Rawmode();	/* go on */
 	Refresh();
-	tellwhat = 0;
+	RestoreSaved = 0;
+	HistSaved = 0;
     }
     return(CC_NORM);
 }
@@ -2086,6 +2121,8 @@ e_which(c)
     Char c;
 {				/* do a fast command line which(1) */
     USE(c);
+    c_save_inputbuf();
+    Hist_num = 0;		/* for the history commands */
     PastBottom();
     *LastChar = '\0';		/* just in case */
     return(CC_WHICH);
