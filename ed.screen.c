@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.62 2005/01/18 20:14:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.63 2005/01/18 20:43:30 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.62 2005/01/18 20:14:03 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.63 2005/01/18 20:43:30 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1596,7 +1596,7 @@ GetSize(lins, cols)
     return (Val(T_co) != *cols || Val(T_li) != *lins);
 }
 
-#endif /* SIGWINDOW */
+#endif /* SIG_WINDOW */
 
 void
 ChangeSize(lins, cols)
