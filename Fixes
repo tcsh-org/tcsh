@@ -1,5 +1,5 @@
   8. V6.14.01 - 20050411
-  7. Implement =- (H.Merijn Brand)
+  7. Make =- refer to $owd (H.Merijn Brand)
   6. Use prototypes (almost) everywhere (Miloslav Trmac) (issue #5)
   5. Fix doc path in Cygwin installation (Corinna Vinschen)
   4. Fix column size calculation (Martin Kraemer)
