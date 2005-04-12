@@ -1,3 +1,5 @@
+ 10. V6.14.02 - 20050412
+  9. Prototype fixes (Miloslav Trmac and Jean-Luc Leger)
   8. V6.14.01 - 20050411
   7. Make =- refer to $owd (H.Merijn Brand)
   6. Use prototypes (almost) everywhere (Miloslav Trmac) (issue #5)
