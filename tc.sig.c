@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.c,v 3.29 2005/01/18 20:24:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.c,v 3.30 2005/04/11 22:11:00 kim Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.29 2005/01/18 20:24:51 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.30 2005/04/11 22:11:00 kim Exp $")
 
 #include "tc.wait.h"
 
@@ -207,7 +207,7 @@ sigpause(int what)
 #ifdef NEEDsignal
 /* turn into bsd signals */
 RETSIGTYPE
-(*xsignal(int s, singalfun_t a)) ()
+(*xsignal(int s, signalfun_t a)) ()
 {
     sigvec_t osv, sv;
 

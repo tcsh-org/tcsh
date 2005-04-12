@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.time.c,v 3.29 2005/04/11 22:10:58 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.time.c,v 3.30 2005/04/12 23:41:52 kim Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.29 2005/04/11 22:10:58 kim Exp $")
+RCSID("$Id: sh.time.c,v 3.30 2005/04/12 23:41:52 kim Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -295,10 +295,10 @@ prusage(struct process_stats *r0, struct process_stats *r1, timeval_t e,
 # else /* _SEQUENT_ */
 #  ifndef POSIX
 void
-prusage(structx tms *bs, struct tms *es, time_t e, time_t b)
+prusage(struct tms *bs, struct tms *es, time_t e, time_t b)
 #  else	/* POSIX */
 void
-prusage(structx tms *bs, struct tms *es, clock_t e, clock_t b)
+prusage(struct tms *bs, struct tms *es, clock_t e, clock_t b)
 #  endif /* POSIX */
 # endif	/* _SEQUENT_ */
 #endif /* BSDTIMES */
