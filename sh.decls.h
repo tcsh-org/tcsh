@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.46 2005/03/03 17:04:01 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.47 2005/04/11 22:10:56 kim Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -179,10 +179,8 @@ extern	int		  sortscmp	(Char **, Char **);
 #endif
 
 #ifndef WINNT_NATIVE
-#ifdef NLS_CATALOGS
-#ifdef HAVE_ICONV
+#if defined(NLS_CATALOGS) && defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
 extern	char		 *iconv_catgets	(nl_catd, int, int, const char *);
-#endif
 #endif
 #endif
 extern	void		  nlsinit	(void);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.126 2005/03/20 06:35:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.127 2005/04/11 22:10:57 kim Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.126 2005/03/20 06:35:48 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.127 2005/04/11 22:10:57 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -41,11 +41,9 @@ RCSID("$Id: sh.func.c,v 3.126 2005/03/20 06:35:48 christos Exp $")
 #include "nt.const.h"
 #endif /* WINNT_NATIVE */
 
-#ifdef NLS_CATALOGS
-#ifdef HAVE_ICONV
+#if defined (NLS_CATALOGS) && defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
 #include <langinfo.h>
 static iconv_t catgets_iconv; /* Or (iconv_t)-1 */
-#endif
 #endif
 
 /*
@@ -2362,8 +2360,7 @@ dobuiltins(Char **v, struct command *c)
     flush();
 }
 
-#ifdef NLS_CATALOGS
-#ifdef HAVE_ICONV
+#if defined (NLS_CATALOGS) && defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
 char *
 iconv_catgets(nl_catd ctd, int set_id, int msg_id, const char *s)
 {
@@ -2407,7 +2404,6 @@ iconv_catgets(nl_catd ctd, int set_id, int msg_id, const char *s)
     return buf;
 }
 #endif
-#endif
 
 void
 nlsinit(void)
@@ -2419,11 +2415,11 @@ nlsinit(void)
         xsnprintf((char *)catalog, sizeof(catalog), "tcsh.%s",
 		  short2str(varval(STRcatalog)));
     catd = catopen(catalog, MCLoadBySet);
-#ifdef HAVE_ICONV
+#if defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
     /* catgets (), not CGETS, the charset name should be in ASCII anyway. */
     catgets_iconv = iconv_open (nl_langinfo (CODESET),
 				catgets(catd, 255, 1, "ASCII"));
-#endif /* HAVE_ICONV */
+#endif /* HAVE_ICONV && HAVE_NL_LANGINFO */
 #endif /* NLS_CATALOGS */
 #ifdef WINNT_NATIVE
     nls_dll_init();
@@ -2439,12 +2435,12 @@ void
 nlsclose(void)
 {
 #ifdef NLS_CATALOGS
-#ifdef HAVE_ICONV
+#if defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
     if (catgets_iconv != (iconv_t)-1) {
 	iconv_close(catgets_iconv);
 	catgets_iconv = (iconv_t)-1;
     }
-#endif /* HAVE_ICONV */
+#endif /* HAVE_ICONV && HAVE_NL_LANGINFO */
     catclose(catd);
 #endif /* NLS_CATALOGS */
 }

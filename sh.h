@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.133 2005/03/25 18:46:41 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.134 2005/04/11 22:10:57 kim Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -1260,7 +1260,7 @@ extern int	NoNLSRebind;
 #   define MCLoadBySet 0
 #  endif
 EXTERN nl_catd catd;
-#  ifdef HAVE_ICONV
+#  if defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
 #   define CGETS(b, c, d)	iconv_catgets(catd, b, c, d)
 #  else
 #   define CGETS(b, c, d)	catgets(catd, b, c, d)

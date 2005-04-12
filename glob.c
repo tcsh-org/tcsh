@@ -678,7 +678,7 @@ One_mbtowc(NLSChar *pwc, const Char *s, size_t n)
 	;
     return one_mbtowc(pwc, buf, n);
 #else
-    return NLSFrom(s, n, pwc);
+    return NLSFrom((const __Char *)s, n, pwc);
 #endif
 }
 
