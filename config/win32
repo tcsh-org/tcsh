@@ -91,6 +91,33 @@
  */
 #undef YPBUGS
 
+
+#define HAVE_DUP2                1
+#define RETSIGTYPE               void
+#define HAVE_DUP2                1
+#define HAVE_STRUCT_UTMP_UT_HOST 1
+#define HAVE_DIRENT_H            1
+#define PROTOTYPES               1
+#define HAVE_GETCWD              1
+#define HAVE_GETHOSTNAME         1
+#define HAVE_MEMMOVE             1
+#define HAVE_MEMSET              1
+#define HAVE_NICE                1
+#define HAVE_SBRK                1
+#define HAVE_STDLIB_H            1
+#define HAVE_STRSTR              1
+#define HAVE_WCHAR_H             1
+#define GETPGRP_VOID             1
+#define HAVE_STRUCT_DIRENT_D_INO 1
+
+#define SHORT_STRINGS    
+
+#define SIZEOF_WCHAR_T           2
+
+#define RCSID(id) static char *rcsid = (id);
+
+// fake defines
+#define HAVE_SETPGID             1
 /****************** local defines *********************/
 
 #define _PATH_TCSHELL "/bin/tcsh"
@@ -99,7 +126,6 @@
 # define __USE_BSD_SIGNAL
 #endif
 
-/* that gives too long startup delays for me */
 
 #undef REMOTEHOST
 
@@ -108,6 +134,9 @@
 #undef AUTOLOGOUT
 #undef NLS_CATALOGS
 
+#include <limits.h>
 #include <ntport.h>
 
+#include "config_f.h"
+#undef REMOTEHOST
 #endif /* _h_config */
