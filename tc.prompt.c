@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.53 2005/01/05 18:06:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.54 2005/04/11 22:11:00 kim Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.53 2005/01/05 18:06:43 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.54 2005/04/11 22:11:00 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -562,7 +562,7 @@ tprintf(int what, Char *buf, const Char *fmt, size_t siz, const char *str,
 		 * No literal capability, so skip all chars in the literal
 		 * string
 		 */
-		while (*cp != '\0' && (*cp != '%' || cp[1] != '}'))
+		while (*cp != '\0' && (cp[-1] != '%' || *cp != '}'))
 		    cp++;
 #endif				/* LITERAL == 0 */
 		attributes |= LITERAL;
