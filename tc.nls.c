@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.6 2005/02/15 21:09:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.7 2005/04/11 22:10:59 kim Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.nls.c,v 3.6 2005/02/15 21:09:02 christos Exp $")
+RCSID("$Id: tc.nls.c,v 3.7 2005/04/11 22:10:59 kim Exp $")
 
 #ifdef SHORT_STRINGS
 int
@@ -262,7 +262,7 @@ NLSChangeCase(Char *p, int mode)
     if (!*p)
 	return 0;
     l2 = NLSTo((Char *)0, c2);
-    n = (Char *)xmalloc((size_t)((op - p + l2 + Strlen(p + l) + 1) * sizeof(Char)));
+    n = (Char *)xmalloc((size_t)((p - op + l2 + Strlen(p + l) + 1) * sizeof(Char)));
     if (p != op)
 	memcpy(n, op, (p - op) * sizeof(Char));
     NLSTo(n + (p - op), c2);

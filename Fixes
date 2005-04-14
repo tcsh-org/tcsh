@@ -1,3 +1,5 @@
+ 13. Fix uppercase/lowercase transformations (Jean-Luc Leger)
+ 12. Fix symlink expansion (revert from 6.10.00) (Jean-Luc Leger and Christos)
  11. Fix literal sequence in prompt (Miloslav Trmac)
  10. V6.14.02 - 20050412
   9. Prototype fixes (Miloslav Trmac and Jean-Luc Leger)
