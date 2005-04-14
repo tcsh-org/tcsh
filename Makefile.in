@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.28 2005/03/27 03:06:16 kim Exp $
+# $Id: Makefile.in,v 3.29 2005/04/11 21:26:32 kim Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -370,9 +370,16 @@ tcsh.ps: tcsh.man
 	rm -f tcsh.ps
 	-ptroff -t -man $(srcdir)/tcsh.man > tcsh.ps
 
-
 .c.${SUF}:
 	${CC} ${CF} ${CFLAGS} ${CPPFLAGS} ${DFLAGS} ${EXTRAFLAGS} $<
+
+.SUFFIXES: .s .i
+
+.c.i:
+	${CC} -E ${CFLAGS} ${CPPFLAGS} ${DFLAGS} ${EXTRAFLAGS} $< | cat -s > $@
+
+.c.s:
+	${CC} -S ${CFLAGS} ${CPPFLAGS} ${DFLAGS} ${EXTRAFLAGS} $<
 
 # _VMS_POSIX #module addition
 #.c.${SUF}:
@@ -515,7 +522,8 @@ install.cygwin: install install.man
 
 clean:
 	${RM} -f a.out strings x.c xs.c tcsh$(EXEEXT) tcsh.a _MAKE_LOG gethost
-	${RM} -f *.${SUF} sh.prof.c ed.defns.h tc.const.h sh.err.h tc.defs.c
+	${RM} -f *.${SUF} *.i *.s
+	${RM} -f sh.prof.c ed.defns.h tc.const.h sh.err.h tc.defs.c
 	${RM} -f tcsh.*.m tcsh.*.cat
 
 veryclean: clean
