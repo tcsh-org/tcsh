@@ -131,7 +131,6 @@
 
 #define CASE_INSENSITIVE
 #define HASHBANG
-#undef AUTOLOGOUT
 #undef NLS_CATALOGS
 
 #include <limits.h>
@@ -139,4 +138,5 @@
 
 #include "config_f.h"
 #undef REMOTEHOST
+#undef AUTOLOGOUT
 #endif /* _h_config */
