@@ -308,7 +308,8 @@ AC_CHECK_MEMBERS([struct dirent.d_ino], , ,
 #endif])
 AC_CHECK_MEMBERS([struct utmp.ut_host, struct utmp.ut_user, struct utmp.ut_tv,
 		  struct utmp.ut_xtime], , ,
-[#ifdef HAVE_UTMPX_H
+[#include <sys/types.h>
+#ifdef HAVE_UTMPX_H
 #include <utmpx.h>
 #define utmp utmpx
 #elif defined HAVE_UTMP_H
