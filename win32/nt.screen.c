@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.7 2005/04/11 22:11:02 kim Exp $*/
+/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.8 2005/05/25 02:47:32 amold Exp $*/
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -55,6 +55,8 @@ extern void NT_ClearEOD( void) ;
 extern void NT_ClearScreen(void) ;
 extern void NT_VisibleBell(void);
 extern void NT_WrapHorizontal(void);
+
+static int GetSize(int *lins, int *cols);
 
 int DisplayWindowHSize;
 	void

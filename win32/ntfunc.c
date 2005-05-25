@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/ntfunc.c,v 1.10 2004/11/23 02:10:50 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/ntfunc.c,v 1.11 2005/04/11 22:11:02 kim Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -348,7 +348,7 @@ void make_err_str(unsigned int error,char *buf,int size) {
 char dummy;
 char *nameBuf=&dummy, *valBuf=&dummy;
 
-void nt_set_env(Char *name, Char *val) {
+void nt_set_env(const Char *name, const Char *val) {
 	char *cname, *cval;
 	int len;
 

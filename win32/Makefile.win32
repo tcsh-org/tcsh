@@ -1,4 +1,4 @@
-# $Id: Makefile.win32,v 1.4 2005/01/18 20:24:55 christos Exp $
+# $Id: Makefile.win32,v 1.5 2005/04/12 04:17:17 amold Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -263,55 +263,49 @@ tc.defs.$(SUF):	tc.defs.c sh.h
 #
 # NT dependencies and rules
 #
+CFLAGS_WX = $(CFLAGS) -WX
 dirent.$(SUF):win32\dirent.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\dirent.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\dirent.c
 win32.$(SUF):win32\win32.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\win32.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\win32.c
 support.$(SUF):win32\support.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\support.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\support.c
 io.$(SUF):win32\io.c $(NTH) $(NTH2) 
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\io.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\io.c
 stdio.$(SUF):win32\stdio.c $(NTH) $(NTH2) 
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\stdio.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\stdio.c
 signal.$(SUF):win32\signal.c $(NTH) $(NTH2) 
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\signal.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\signal.c
 access.$(SUF):win32\access.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\access.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\access.c
 nt.char.$(SUF):win32\nt.char.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.char.c
-
-termcap.$(SUF):win32\termcap.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\termcap.c
-tparam.$(SUF):win32\tparam.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\tparam.c
-tparse.$(SUF):win32\tparse.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\tparse.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\nt.char.c
 bogus.$(SUF):win32\bogus.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\bogus.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\bogus.c
 console.$(SUF):win32\console.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\console.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\console.c
 fork.$(SUF):win32\fork.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\fork.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\fork.c
 ntfunc.$(SUF):win32\ntfunc.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\ntfunc.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\ntfunc.c
 ntb1.$(SUF):win32\ntb1.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\ntb1.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\ntb1.c
 ntb2.$(SUF):win32\ntb2.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\ntb2.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\ntb2.c
 globals.$(SUF):win32\globals.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\globals.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\globals.c
 nt.who.$(SUF):win32\nt.who.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.who.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\nt.who.c
 ps.$(SUF):win32\ps.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\ps.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\ps.c
 clip.$(SUF):win32\clip.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\clip.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\clip.c
 nt.const.$(SUF):win32\nt.const.c $(NTH) $(NTH2)
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.const.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\nt.const.c
 nt.bind.$(SUF):win32\nt.bind.c $(NTH) $(NTH2) ed.defns.h
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.bind.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\nt.bind.c
 nt.screen.$(SUF):win32\nt.screen.c $(NTH) $(NTH2) ed.defns.h
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) win32\nt.screen.c
+	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\nt.screen.c
 
 win32/$(NTRES).res: win32/$(NTRES).rc win32/tcshrc.rc
-	rc -v $(RCFLAGS) -r win32/$(NTRES).rc
+	rc -v $(RCFLAGS_WX) -r win32/$(NTRES).rc

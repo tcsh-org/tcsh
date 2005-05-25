@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/stdio.c,v 1.3 2002/08/11 07:58:13 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/stdio.c,v 1.4 2004/05/19 18:22:28 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -529,7 +529,7 @@ get_fd:
 	return fd;
 	
 }
-int nt_open(char *filename, int perms,...) { 
+int nt_open(const char *filename, int perms,...) { 
 
 	// ignore the bloody mode
 
