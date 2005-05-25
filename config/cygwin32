@@ -111,5 +111,8 @@
 
 #define NO_CRYPT
 
+/* Cygwin allows paths prepended with double slashes (network paths). */
+#define HAVE_SLASHSLASH 1
+
 #endif /* _h_config */
 /* config.h.in.  Generated automatically from configure.in by autoheader.  */

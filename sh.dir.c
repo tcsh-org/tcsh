@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.67 2005/04/11 22:10:56 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.68 2005/04/14 14:01:23 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.dir.c,v 3.67 2005/04/11 22:10:56 kim Exp $")
+RCSID("$Id: sh.dir.c,v 3.68 2005/04/14 14:01:23 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -309,9 +309,9 @@ dnormalize(Char *cp, int expnd)
  	int     dotdot = 0;
 	Char   *dp, *cwd, *start = cp, buf[MAXPATHLEN];
 	struct stat sb;
-# ifdef apollo
+# ifdef HAVE_SLASHSLASH
 	int slashslash;
-# endif /* apollo */
+# endif /* HAVE_SLASHSLASH */
 
 	/*
 	 * count the number of "../xxx" or "xxx/../xxx" in the path
@@ -351,9 +351,9 @@ dnormalize(Char *cp, int expnd)
 	 */
 	if (ABSOLUTEP(start))
 	    *cwd = '\0';
-# ifdef apollo
+# ifdef HAVE_SLASHSLASH
 	slashslash = cwd[0] == '/' && cwd[1] == '/';
-# endif /* apollo */
+# endif /* HAVE_SLASHSLASH */
 
 	/*
 	 * Ignore . and count ..'s
@@ -381,10 +381,10 @@ dnormalize(Char *cp, int expnd)
 	    *dp = '\0';
 	    while (dotdot > 0) 
 	        if ((dp = Strrchr(cwd, '/')) != NULL) {
-# ifdef apollo
+# ifdef HAVE_SLASHSLASH
 		    if (dp == &cwd[1]) 
 		        slashslash = 1;
-# endif /* apollo */
+# endif /* HAVE_SLASHSLASH */
 		        *dp = '\0';
 		        dotdot--;
 	        }
@@ -393,19 +393,19 @@ dnormalize(Char *cp, int expnd)
 
 	    if (!*cwd) {	/* too many ..'s, starts with "/" */
 	        cwd[0] = '/';
-# ifdef apollo
+# ifdef HAVE_SLASHSLASH
 		cwd[1] = '/';
 		cwd[2] = '\0';
-# else /* !apollo */
+# else /* !HAVE_SLASHSLASH */
 		cwd[1] = '\0';
-# endif /* apollo */
+# endif /* HAVE_SLASHSLASH */
 	    }
-# ifdef apollo
+# ifdef HAVE_SLASHSLASH
 	    else if (slashslash && cwd[1] == '\0') {
 		cwd[1] = '/';
 		cwd[2] = '\0';
 	    }
-# endif /* apollo */
+# endif /* HAVE_SLASHSLASH */
 
 	    if (buf[0]) {
 	        if ((TRM(cwd[(dotdot = (int) Strlen(cwd)) - 1])) != '/')
@@ -819,9 +819,9 @@ dcanon(Char *cp, Char *p)
     Char *sp;
     Char *p1, *p2;	/* general purpose */
     int    slash;
-#ifdef apollo
+#ifdef HAVE_SLASHSLASH
     int    slashslash;
-#endif /* apollo */
+#endif /* HAVE_SLASHSLASH */
     size_t  clen;
 
 #ifdef S_IFLNK			/* if we have symlinks */
@@ -867,9 +867,9 @@ dcanon(Char *cp, Char *p)
 	cp = p = Strsave(tmpdir);
     }
 
-#ifdef apollo
+#ifdef HAVE_SLASHSLASH
     slashslash = (cp[0] == '/' && cp[1] == '/');
-#endif /* apollo */
+#endif /* HAVE_SLASHSLASH */
 
     while (*p) {		/* for each component */
 	sp = p;			/* save slash address */
@@ -888,10 +888,10 @@ dcanon(Char *cp, Char *p)
 		    break;
 		}
 
-#ifdef apollo
+#ifdef HAVE_SLASHSLASH
 	if (&cp[1] == sp && sp[0] == '.' && sp[1] == '.' && sp[2] == '\0')
 	    slashslash = 1;
-#endif /* apollo */
+#endif /* HAVE_SLASHSLASH */
 	if (*sp == '\0') {	/* if component is null */
 	    if (--sp == cp)	/* if path is one char (i.e. /) */ 
 		break;
@@ -986,9 +986,9 @@ dcanon(Char *cp, Char *p)
 		}
 		xfree((ptr_t) cp);
 		cp = newcp;
-#ifdef apollo
+#ifdef HAVE_SLASHSLASH
                 slashslash = (cp[0] == '/' && cp[1] == '/');
-#endif /* apollo */
+#endif /* HAVE_SLASHSLASH */
 		continue;	/* canonicalize the link */
 	    }
 #endif /* S_IFLNK */
@@ -1083,9 +1083,9 @@ dcanon(Char *cp, Char *p)
 		}
 		xfree((ptr_t) cp);
 		cp = newcp;
-#ifdef apollo
+#ifdef HAVE_SLASHSLASH
                 slashslash = (cp[0] == '/' && cp[1] == '/');
-#endif /* apollo */
+#endif /* HAVE_SLASHSLASH */
 		continue;	/* canonicalize the mlink */
 	    }
 #endif /* S_IFLNK */
@@ -1149,7 +1149,7 @@ dcanon(Char *cp, Char *p)
     }
 #endif /* S_IFLNK */
 
-#ifdef apollo
+#ifdef HAVE_SLASHSLASH
     if (slashslash) {
 	if (cp[1] != '/') {
 	    p = (Char *) xmalloc((size_t) (Strlen(cp) + 2) * sizeof(Char));
@@ -1161,7 +1161,7 @@ dcanon(Char *cp, Char *p)
     }
     if (cp[1] == '/' && cp[2] == '/') 
 	(void) Strcpy(&cp[1], &cp[2]);
-#endif /* apollo */
+#endif /* HAVE_SLASHSLASH */
     return cp;
 }
 
