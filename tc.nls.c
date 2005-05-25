@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.7 2005/04/11 22:10:59 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.8 2005/04/14 17:39:06 kim Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.nls.c,v 3.7 2005/04/11 22:10:59 kim Exp $")
+RCSID("$Id: tc.nls.c,v 3.8 2005/04/14 17:39:06 kim Exp $")
 
 #ifdef SHORT_STRINGS
 int
@@ -45,7 +45,7 @@ NLSWidth(NLSChar c)
     l = wcwidth(c);
     return l >= 0 ? l : 0;
 # else
-    return c != 0;
+    return Iswprint(c) != 0;
 # endif
 }
 #endif
