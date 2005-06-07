@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.33 2005/03/29 04:41:11 kim Exp $ */
+/* $Header: /src/pub/tcsh/config_f.h,v 3.34 2005/04/12 23:33:59 kim Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -50,7 +50,7 @@
  * WIDE_STRINGS	Represent strings using wide characters
  *		Allows proper function in multibyte encodings like UTF-8
  */
-#if defined (SHORT_STRINGS) && SIZEOF_WCHAR_T >= 4 && !defined (WINNT_NATIVE) && !defined(_OSD_POSIX)
+#if defined (SHORT_STRINGS) && SIZEOF_WCHAR_T >= 4 && !defined (WINNT_NATIVE) && !defined(_OSD_POSIX) && !defined(SUNOS4)
 # define WIDE_STRINGS
 #endif
 
