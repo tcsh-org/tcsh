@@ -194,6 +194,9 @@
 /* Define to `int' if neither <sys/types.h> nor <sys/socket.h> define. */
 #undef socklen_t
 
+/* Define to `int' not defined in <sys/types.h>. */
+#undef ssize_t
+
 /* Define to `int' if <sys/types.h> doesn't define. */
 #undef uid_t
 
