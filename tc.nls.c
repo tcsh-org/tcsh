@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.7 2005/04/11 22:10:59 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.10 2005/06/08 00:33:17 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.nls.c,v 3.7 2005/04/11 22:10:59 kim Exp $")
+RCSID("$Id: tc.nls.c,v 3.10 2005/06/08 00:33:17 christos Exp $")
 
 #ifdef SHORT_STRINGS
 int
@@ -87,13 +87,15 @@ NLSExtend(Char *from, int max, int num)
 int
 NLSStringWidth(Char *s)
 {
-    int w = 0;
-    while (*s)
+    int w = 0, c;
+    while (*s) {
+	c = *s++;
 #ifdef HAVE_WCWIDTH
-	w += wcwidth(*s++);
+	w += wcwidth(c);
 #else
-	w += Iswprint(*s++) != 0;
+	w += Iswprint(c) != 0;
 #endif
+    }
     return w;
 }
 
@@ -129,7 +131,7 @@ NLSFrom(const Char *p, size_t l, NLSChar *cp)
 int
 NLSFinished(Char *p, size_t l, eChar extra)
 {
-#ifdef HAVE_MBSTATE_T
+#ifdef HAVE_MBRTOWC
     size_t i, r; 
     wchar_t c;
     char b[MB_LEN_MAX + 1], back[MB_LEN_MAX];

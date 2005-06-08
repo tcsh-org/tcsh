@@ -277,6 +277,10 @@ AC_HEADER_STDC
 
 dnl Checks for types
 AC_CHECK_TYPES([long long])
+AC_CHECK_TYPES([wint_t], , ,
+[AC_INCLUDES_DEFAULT
+#include <wchar.h>
+])
 AC_TYPE_GETGROUPS
 AC_TYPE_MODE_T
 AC_TYPE_SIGNAL
@@ -337,7 +341,7 @@ dnl checks for library functions
 AC_CHECK_DECLS([gethostname])
 AC_CHECK_FUNCS([dup2 getcwd gethostname getpwent getutent memmove memset] dnl
 	[nice nl_langinfo sbrk setpgid setpriority strerror strstr sysconf] dnl
-	[wcwidth])
+	[wcwidth mbrtowc])
 AC_FUNC_GETPGRP
 AC_FUNC_SETPGRP
 
