@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.8 2005/04/14 17:39:06 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.7 2005/04/11 22:10:59 kim Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.nls.c,v 3.8 2005/04/14 17:39:06 kim Exp $")
+RCSID("$Id: tc.nls.c,v 3.7 2005/04/11 22:10:59 kim Exp $")
 
 #ifdef SHORT_STRINGS
 int
@@ -89,7 +89,11 @@ NLSStringWidth(Char *s)
 {
     int w = 0;
     while (*s)
+#ifdef HAVE_WCWIDTH
 	w += wcwidth(*s++);
+#else
+	w += Iswprint(*s++) != 0;
+#endif
     return w;
 }
 
@@ -125,6 +129,7 @@ NLSFrom(const Char *p, size_t l, NLSChar *cp)
 int
 NLSFinished(Char *p, size_t l, eChar extra)
 {
+#ifdef HAVE_MBSTATE_T
     size_t i, r; 
     wchar_t c;
     char b[MB_LEN_MAX + 1], back[MB_LEN_MAX];
@@ -141,6 +146,9 @@ NLSFinished(Char *p, size_t l, eChar extra)
 	memcmp(b, back, r) != 0)
 	return -1;
     return r == i ? 1 : 2;
+#else
+    return 1;
+#endif
 }
 
 int
@@ -244,19 +252,20 @@ NLSQuote(Char *cp)
 Char *
 NLSChangeCase(Char *p, int mode)
 {
+#ifdef HAVE_WINT_T
     Char *n, *op = p;
     NLSChar c, c2 = 0;
     int l, l2;
 
     while (*p) {
-       l = NLSFrom(p, NLSZEROT, &c);
-       if (mode == 0 && iswlower((wint_t)c)) {
-	   c2 = (int)towupper((wint_t)c);
-	   break;
-       } else if (mode && iswupper((wint_t)c)) {
-	   c2 = (int)towlower((wint_t)c);
-	   break;
-       }
+	l = NLSFrom(p, NLSZEROT, &c);
+	if (mode == 0 && iswlower((wint_t)c)) {
+	    c2 = (int)towupper((wint_t)c);
+	    break;
+	} else if (mode && iswupper((wint_t)c)) {
+	    c2 = (int)towlower((wint_t)c);
+	    break;
+	}
 	p += l;
     }
     if (!*p)
@@ -268,6 +277,24 @@ NLSChangeCase(Char *p, int mode)
     NLSTo(n + (p - op), c2);
     memcpy(n + (p - op + l2), p + l, (Strlen(p + l) + 1) * sizeof(Char));
     return n;
+#else
+    Char *n = Strsave(p);
+
+    if (mode == 0) {
+	for (p = n; *p; p++) 
+	    if (Islower(*p)) {
+		*p = Toupper(*p);
+		return n;
+	    }
+    } else {
+	for (p = n; *p; p++) 
+	    if (Isupper(*p)) {
+		*p = Tolower(*p);
+		return n;
+	    }
+    }
+    return n;
+#endif
 }
 #endif
 

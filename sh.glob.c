@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.63 2005/04/11 22:10:57 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.64 2005/04/11 22:33:03 kim Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.63 2005/04/11 22:10:57 kim Exp $")
+RCSID("$Id: sh.glob.c,v 3.64 2005/04/11 22:33:03 kim Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -1118,7 +1118,7 @@ t_pmatch(Char *string, Char *pattern, Char **estr, int cs)
 	default:
 	    TRIM_AND_EXTEND(pattern, patternc);
 	    if (cs ? patternc  != stringc
-#if defined (NLS) && defined (SHORT_STRINGS)
+#if defined (NLS) && defined (WIDE_STRINGS)
 		: towlower(patternc) != towlower(stringc))
 #else
 		: Tolower(patternc) != Tolower(stringc))

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.char.h,v 3.25 2005/01/05 17:54:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.char.h,v 3.26 2005/03/03 16:49:15 kim Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -264,7 +264,7 @@ extern tcshuc _cmap_lower[], _cmap_upper[];
 
 #endif /* !NLS */
 
-#if defined (SHORT_STRINGS) && defined (NLS)
+#if defined (WIDE_STRINGS) && defined (NLS)
 # define Iswcntrl(c) 	(((c) & QUOTE) ? 0 : iswcntrl(c))
 # define Iswprint(c) 	(((c) & QUOTE) ? 0 : iswprint(c))
 #else

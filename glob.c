@@ -140,7 +140,7 @@ int
 globcharcoll(NLSChar c1, NLSChar c2, int cs)
 {
 #if defined(NLS) && defined(LC_COLLATE) && !defined(NOSTRCOLL)
-# if defined(SHORT_STRINGS)
+# if defined(WIDE_STRINGS)
     wchar_t s1[2], s2[2];
 
     if (c1 == c2)
@@ -160,7 +160,7 @@ globcharcoll(NLSChar c1, NLSChar c2, int cs)
     s2[0] = c2;
     s1[1] = s2[1] = '\0';
     return wcscoll(s1, s2);
-# else /* not SHORT_STRINGS */
+# else /* not WIDE_STRINGS */
     char s1[2], s2[2];
 
     if (c1 == c2)
