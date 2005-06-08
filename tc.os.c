@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.c,v 3.58 2005/01/18 20:24:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.c,v 3.59 2005/04/11 22:10:59 kim Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.58 2005/01/18 20:24:51 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.59 2005/04/11 22:10:59 kim Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1153,6 +1153,8 @@ osinit(void)
 }
 
 #ifndef HAVE_STRERROR
+extern int sys_nerr;
+extern char *sys_errlist[];
 char *
 xstrerror(int i)
 {
