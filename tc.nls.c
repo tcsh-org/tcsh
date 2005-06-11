@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.10 2005/06/08 00:33:17 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.11 2005/06/08 00:48:02 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.nls.c,v 3.10 2005/06/08 00:33:17 christos Exp $")
+RCSID("$Id: tc.nls.c,v 3.11 2005/06/08 00:48:02 christos Exp $")
 
 #ifdef SHORT_STRINGS
 int
@@ -149,7 +149,7 @@ NLSFinished(Char *p, size_t l, eChar extra)
 	return -1;
     return r == i ? 1 : 2;
 #else
-    return 1;
+    return *p ? 2 : 1;
 #endif
 }
 
