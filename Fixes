@@ -1,3 +1,4 @@
+ 15. %j was broken (Peter Kruse)
  14. Extend // handling in pathnames from being apollo specific to also
      cygwin (Corinna Vinschen)
  13. Fix uppercase/lowercase transformations (Jean-Luc Leger)
