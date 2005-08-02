@@ -1,7 +1,8 @@
+ 18. Dave Yearke: configure did not recognize solaris 10 [PR/18]
  17. CYGWIN: Don't lowercase commands and allow foo.exe on command line.
-     (Corinna Vinschen)
+     (Corinna Vinschen) [PR/19]
  16. CYGWIN: cd /foo && cd .. ends up erroneously in // for systems that
-     HAVE_SLASHSLASH
+     HAVE_SLASHSLASH [PR/21]
  15. %j was broken (Peter Kruse)
  14. Extend // handling in pathnames from being apollo specific to also
      cygwin (Corinna Vinschen)

@@ -150,16 +150,16 @@ case "${host}" in
   *-sun-sunos4.1.[3456]* )
     tcsh_config_file=sunos413
   ;;
-  *-*-solaris2.[01]* ) # Should handle sparc or x86
+  *-*-solaris2.[01] ) # Should handle sparc or x86
     tcsh_config_file=sol2
   ;;
-  *-sun-solaris2.2* ) # Sparc only release
+  *-sun-solaris2.2 ) # Sparc only release
     tcsh_config_file=sol22
   ;;
-  *-sun-solaris2.3* ) # Sparc only release
+  *-sun-solaris2.3 ) # Sparc only release
     tcsh_config_file=sol23
   ;;
-  *-*-solaris2.[45]* ) # Should handle sparc, x86 and powerpc
+  *-*-solaris2.[45] ) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol24
   ;;
   *-*-solaris2.* ) # Should handle sparc, x86 and powerpc
