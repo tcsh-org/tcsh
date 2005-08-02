@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.44 2005/03/03 23:44:45 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.45 2005/04/11 22:11:00 kim Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.44 2005/03/03 23:44:45 kim Exp $")
+RCSID("$Id: tc.who.c,v 3.45 2005/04/11 22:11:00 kim Exp $")
 
 #include "tc.h"
 
@@ -145,6 +145,7 @@ static	void	print_who	(struct who *);
 #define CHANGED		04
 #define STMASK		07
 #define ANNOUNCE	010
+#define CLEARED		020
 
 /*
  * Karl Kleinpaste, 26 Jan 1984.
@@ -301,10 +302,8 @@ watch_login(int force)
      * xterm clears the entire utmp entry - mark everyone on the status list
      * OFFLINE or we won't notice X "logouts"
      */
-    for (wp = whohead.who_next; wp->who_next != NULL; wp = wp->who_next) {
-	wp->who_status = OFFLINE;
-	wp->who_time = 0;
-    }
+    for (wp = whohead.who_next; wp->who_next != NULL; wp = wp->who_next)
+	wp->who_status = OFFLINE | CLEARED;
 
     /*
      * Read in the utmp file, sort the entries, and update existing entries or
@@ -339,6 +338,8 @@ watch_login(int force)
 	    wp = wp->who_next;/* find that tty! */
 
 	if (wp->who_next && comp == 0) {	/* found the tty... */
+	    if (utmp.ut_time < wp->who_time)
+	        continue;
 # ifdef DEAD_PROCESS
 	    if (utmp.ut_type == DEAD_PROCESS) {
 		wp->who_time = utmp.ut_time;
@@ -353,7 +354,7 @@ watch_login(int force)
 	    else if (strncmp(utmp.ut_name, wp->who_name, UTNAMLEN) == 0) {
 		/* someone is logged in */ 
 		wp->who_time = utmp.ut_time;
-		wp->who_status = 0;	/* same guy */
+		wp->who_status = ONLINE | ANNOUNCE;	/* same guy */
 	    }
 	    else {
 		(void) strncpy(wp->who_new, utmp.ut_name, UTNAMLEN);
@@ -446,8 +447,10 @@ watch_login(int force)
 	    /* already printed or not right one to print */
 
 
-	    if (wp->who_time == 0)/* utmp entry was cleared */
+	    if (wp->who_status & CLEARED) {/* utmp entry was cleared */
 		wp->who_time = watch_period;
+		wp->who_status &= ~CLEARED;
+	    }
 
 	    if ((wp->who_status & OFFLINE) &&
 		(wp->who_name[0] != '\0')) {
