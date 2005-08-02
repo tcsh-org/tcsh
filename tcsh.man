@@ -129,7 +129,8 @@ The shell exits if any invoked command terminates abnormally or
 yields a non-zero exit status.
 .TP 4
 .B \-f
-The shell ignores \fI~/.tcshrc\fR, and thus starts faster.
+The shell does not load any resource or startup files, or perform any 
+command hashing, and thus starts faster.
 .TP 4
 .B \-F
 The shell uses \fIfork\fR(2) instead of \fIvfork\fR(2) to spawn processes. (Convex/OS only) (+)
@@ -1470,16 +1471,28 @@ used to prevent \fIcd\fR from affecting the current shell.
 When a command to be executed is found not to be a builtin command the shell
 attempts to execute the command via \fIexecve\fR(2).  Each word in the variable
 \fBpath\fR names a directory in which the shell will look for the
-command.  If it is given neither a \fB\-c\fR nor a \fB\-t\fR option, the shell
+command.  If the shell is not given a \fB\-f\fR option, the shell
 hashes the names in these directories into an internal table so that it will
 try an \fIexecve\fR(2) in only a directory where there is a possibility that the
 command resides there.  This greatly speeds command location when a large
-number of directories are present in the search path.  If this mechanism has
-been turned off (via \fIunhash\fR), if the shell was given a \fB\-c\fR or
-\fB\-t\fR argument or in any case for each directory component of \fBpath\fR
-which does not begin with a `/', the shell concatenates the current working
-directory with the given command name to form a path name of a file which it
-then attempts to execute.
+number of directories are present in the search path. This hashing mechanism is
+not used:
+.TP 4
+.B 1.
+If hashing is turned explicitly off via \fIunhash\fR.
+.TP 4
+.B 2.
+If the shell was given a \fB\-f\fR argument.
+.TP 4
+.B 3.
+For each directory component of \fBpath\fR which does not begin with a `/'.
+.TP 4
+.B 4.
+If the command contains a `/'.
+.PP
+In the above four cases the shell concatenates each component of the path
+vector with the given command name to form a path name of a file which it
+then attempts to execute it. If execution is successful, the search stops.
 .PP
 If the file has execute permissions but is not an executable to the system
 (i.e., it is neither an executable binary nor a script that specifies its
