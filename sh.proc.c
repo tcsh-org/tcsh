@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.90 2005/03/03 19:57:07 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.91 2005/04/11 22:10:58 kim Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.90 2005/03/03 19:57:07 kim Exp $")
+RCSID("$Id: sh.proc.c,v 3.91 2005/04/11 22:10:58 kim Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1493,7 +1493,7 @@ dokill(Char **v, struct command *c)
 	    for (signum = 0; signum <= nsig; signum++) {
 		if ((name = mesg[signum].iname) != NULL) {
 		    len += strlen(name) + 1;
-		    if (len >= T_Cols - 1) {
+		    if (len >= TermH - 1) {
 			xputchar('\n');
 			len = strlen(name) + 1;
 		    }

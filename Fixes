@@ -1,3 +1,5 @@
+ 21. Don't use T_Cols for wrapping purposes; use TermH consistently
+     (Martin Kraemer) [PR/8]
  20. Don't display duplicate utmp records (Miloslav Trmac) [PR/17]
  19. Clarify hashing and -f sections of man page (Volker Quetschke) [PR/20]
  18. Dave Yearke: configure did not recognize solaris 10 [PR/18]

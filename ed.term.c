@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.term.c,v 1.31 2004/11/23 02:10:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.term.c,v 1.32 2005/04/11 22:10:55 kim Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #ifndef WINNT_NATIVE
 
-RCSID("$Id: ed.term.c,v 1.31 2004/11/23 02:10:48 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.32 2005/04/11 22:10:55 kim Exp $")
 
 #include "ed.h"
 
@@ -635,7 +635,7 @@ dosetty(Char **v, struct command *t)
 
 	    if (x != '\0' || aflag) {
 		cu = strlen(m->m_name) + (x != '\0') + 1;
-		if (len + cu >= T_Cols) {
+		if (len + cu >= TermH) {
 		    xprintf("\n%*s", st, "");
 		    len = st + cu;
 		}

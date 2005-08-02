@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.69 2005/05/25 13:07:06 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.70 2005/08/02 16:18:55 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.dir.c,v 3.69 2005/05/25 13:07:06 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.70 2005/08/02 16:18:55 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -250,7 +250,7 @@ printdirs(int dflag)
 	    len = (int) (Strlen(s) + 1);
 
 	cur += len;
-	if ((dflag & DIR_LINE) && cur >= T_Cols - 1 && len < T_Cols) {
+	if ((dflag & DIR_LINE) && cur >= TermH - 1 && len < TermH) {
 	    xputchar('\n');
 	    cur = len;
 	}
