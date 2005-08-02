@@ -1,3 +1,4 @@
+ 22. recognize "li" and "co" in echotc (Martin Kraemer) [PR/7]
  21. Don't use T_Cols for wrapping purposes; use TermH consistently
      (Martin Kraemer) [PR/8]
  20. Don't display duplicate utmp records (Miloslav Trmac) [PR/17]

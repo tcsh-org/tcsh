@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.64 2005/04/11 21:16:37 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.65 2005/04/11 22:10:55 kim Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.64 2005/04/11 21:16:37 kim Exp $")
+RCSID("$Id: ed.screen.c,v 3.65 2005/04/11 22:10:55 kim Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -645,12 +645,13 @@ EchoTC(Char **v)
 	flush();
 	return;
     }
-    else if (strcmp(cv, "rows") == 0 || strcmp(cv, "lines") == 0) {
+    else if (strcmp(cv, "rows") == 0 || strcmp(cv, "lines") == 0 ||
+	strcmp(cv, "li") == 0) {
 	xprintf(fmtd, Val(T_li));
 	flush();
 	return;
     }
-    else if (strcmp(cv, "cols") == 0) {
+    else if (strcmp(cv, "cols") == 0 || strcmp(cv, "co") == 0) {
 	xprintf(fmtd, Val(T_co));
 	flush();
 	return;
