@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.68 2005/04/14 14:01:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.69 2005/05/25 13:07:06 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.dir.c,v 3.68 2005/04/14 14:01:23 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.69 2005/05/25 13:07:06 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -394,7 +394,11 @@ dnormalize(Char *cp, int expnd)
 	    if (!*cwd) {	/* too many ..'s, starts with "/" */
 	        cwd[0] = '/';
 # ifdef HAVE_SLASHSLASH
-		cwd[1] = '/';
+		/*
+		 * Only append another slash, if already the former cwd
+		 * was in a double-slash path.
+		 */
+		cwd[1] = slashslash ? '/' : '\0';
 		cwd[2] = '\0';
 # else /* !HAVE_SLASHSLASH */
 		cwd[1] = '\0';

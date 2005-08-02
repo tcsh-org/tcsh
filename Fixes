@@ -1,3 +1,5 @@
+ 16. cd /foo && cd .. ends up erroneously in // for systems that
+     HAVE_SLASHSLASH (Corinna Vinschen)
  15. %j was broken (Peter Kruse)
  14. Extend // handling in pathnames from being apollo specific to also
      cygwin (Corinna Vinschen)
