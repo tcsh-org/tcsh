@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.63 2004/11/23 02:10:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.64 2005/04/11 22:10:56 kim Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.63 2004/11/23 02:10:48 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.64 2005/04/11 22:10:56 kim Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -760,13 +760,11 @@ dohash(Char **vv, struct command *c)
 		size_t	ext = strlen(dp->d_name) - 4;
 		if ((ext > 0) && (strcasecmp(&dp->d_name[ext], ".exe") == 0 ||
 				  strcasecmp(&dp->d_name[ext], ".bat") == 0 ||
-				  strcasecmp(&dp->d_name[ext], ".com") == 0))
-		    {
-			dp->d_name[ext] = '\0';
-#if defined(__CYGWIN__)
-			strlwr(dp->d_name);
+				  strcasecmp(&dp->d_name[ext], ".com") == 0)) {
+#ifdef __CYGWIN__
+		    strlwr((char *)item);
 #endif /* __CYGWIN__ */
-		    }
+		    dp->d_name[ext] = '\0';
 	    }
 #endif /* _UWIN || __CYGWIN__ */
 # ifdef FASTHASH
