@@ -1,5 +1,7 @@
- 16. cd /foo && cd .. ends up erroneously in // for systems that
-     HAVE_SLASHSLASH (Corinna Vinschen)
+ 17. CYGWIN: Don't lowercase commands and allow foo.exe on command line.
+     (Corinna Vinschen)
+ 16. CYGWIN: cd /foo && cd .. ends up erroneously in // for systems that
+     HAVE_SLASHSLASH
  15. %j was broken (Peter Kruse)
  14. Extend // handling in pathnames from being apollo specific to also
      cygwin (Corinna Vinschen)
