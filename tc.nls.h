@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.h,v 3.9 2005/03/03 15:52:20 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.h,v 3.10 2005/04/11 22:10:59 kim Exp $ */
 /*
  * tc.nls.h: NLS support
  *
@@ -53,7 +53,7 @@ extern int NLSStringWidth (Char *);
 #define NLS_ILLEGAL INVALID_BYTE
 
 #else
-# ifdef SHORT_STRINGS
+# if defined(SHORT_STRINGS) && defined(NLS)
 
 extern int NLSFrom (const Char *, size_t, NLSChar *);
 extern int NLSFinished (Char *, size_t, eChar);

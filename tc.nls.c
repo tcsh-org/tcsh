@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.11 2005/06/08 00:48:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.12 2005/06/11 22:50:33 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,9 +32,9 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.nls.c,v 3.11 2005/06/08 00:48:02 christos Exp $")
+RCSID("$Id: tc.nls.c,v 3.12 2005/06/11 22:50:33 christos Exp $")
 
-#ifdef SHORT_STRINGS
+#if defined(SHORT_STRINGS) && defined(NLS)
 int
 NLSWidth(NLSChar c)
 {
@@ -50,7 +50,7 @@ NLSWidth(NLSChar c)
 }
 #endif
 
-#if defined (WIDE_STRINGS) || !defined (SHORT_STRINGS)
+#if defined(WIDE_STRINGS) || (defined(SHORT_STRINGS) && !defined(NLS))
 Char *
 NLSChangeCase(Char *p, int mode)
 {
@@ -99,7 +99,7 @@ NLSStringWidth(Char *s)
     return w;
 }
 
-#elif defined (SHORT_STRINGS)
+#elif defined (SHORT_STRINGS) && defined(NLS)
 
 int
 NLSFrom(const Char *p, size_t l, NLSChar *cp)

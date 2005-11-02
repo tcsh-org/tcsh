@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.134 2005/04/11 22:10:57 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.135 2005/04/12 23:41:52 kim Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -90,8 +90,8 @@ typedef unsigned long intptr_t;
 #endif
 
 #ifdef SHORT_STRINGS
-#include <wchar.h>
 # ifdef WIDE_STRINGS
+#include <wchar.h>
 typedef wchar_t Char;
 typedef unsigned long uChar;
 typedef wint_t eChar; /* Can contain any Char value or CHAR_ERR */

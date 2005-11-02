@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.char.h,v 3.26 2005/03/03 16:49:15 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.char.h,v 3.27 2005/06/08 00:33:17 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -38,10 +38,12 @@
 #else
 # include <ctype.h>
 # ifdef SHORT_STRINGS
-#  ifdef HAVE_WCTYPE_H
-#   include <wctype.h>
-#  else
-#   include <wchar.h>
+#  ifdef WIDE_STRINGS
+#   ifdef HAVE_WCTYPE_H
+#    include <wctype.h>
+#   else
+#    include <wchar.h>
+#   endif
 #  endif
 # endif
 #endif
