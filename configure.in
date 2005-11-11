@@ -120,6 +120,11 @@ case "${host}" in
     tcsh_config_file=bsd4.4
   ;;
 
+  ## DragonFly systems
+  *-*-dragonfly*)
+    tcsh_config_file=bsd4.4
+  ;;
+
   ## Silicon Graphics machines
   *-sgi-iri* )
     tcsh_config_file=irix
