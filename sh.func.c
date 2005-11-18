@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.127 2005/04/11 22:10:57 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.128 2005/04/12 23:41:52 kim Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.127 2005/04/11 22:10:57 kim Exp $")
+RCSID("$Id: sh.func.c,v 3.128 2005/04/12 23:41:52 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2441,6 +2441,16 @@ nlsclose(void)
 	catgets_iconv = (iconv_t)-1;
     }
 #endif /* HAVE_ICONV && HAVE_NL_LANGINFO */
-    catclose(catd);
+    if (catd != (nl_catd)-1) {
+	/*
+	 * catclose can call other functions which can call longjmp
+	 * making us re-enter this code. Prevent infinite recursion
+	 * by resetting catd. Problem reported and solved by:
+	 * Gerhard Niklasch
+	 */
+	nl_catd oldcatd = catd;
+	catd = (nl_catd)-1;
+	catclose(oldcatd);
+    }
 #endif /* NLS_CATALOGS */
 }
