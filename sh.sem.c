@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.69 2005/01/18 20:24:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.70 2005/04/11 22:10:58 kim Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.69 2005/01/18 20:24:51 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.70 2005/04/11 22:10:58 kim Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -283,10 +283,12 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 	     * Check if we have a builtin function and remember which one.
 	     */
 	    bifunc = isbfunc(t);
- 	    if (noexec && bifunc) {
+ 	    if (noexec) {
 		/*
 		 * Continue for builtins that are part of the scripting language
 		 */
+		if (bifunc == NULL)
+		    break;
 		if (bifunc->bfunct != (bfunc_t)dobreak	&&
 		    bifunc->bfunct != (bfunc_t)docontin	&&
 		    bifunc->bfunct != (bfunc_t)doelse	&&

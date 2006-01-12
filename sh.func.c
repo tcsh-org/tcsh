@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.128 2005/04/12 23:41:52 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.129 2005/11/18 15:35:10 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.128 2005/04/12 23:41:52 kim Exp $")
+RCSID("$Id: sh.func.c,v 3.129 2005/11/18 15:35:10 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -386,7 +386,7 @@ doif(Char **v, struct command *kp)
     Char **vv;
 
     v++;
-    i = expr(&v);
+    i = noexec ? 1 : expr(&v);
     vv = v;
     if (*vv == NULL)
 	stderror(ERR_NAME | ERR_EMPTYIF);
@@ -436,7 +436,8 @@ doelse (Char **v, struct command *c)
 {
     USE(c);
     USE(v);
-    search(TC_ELSE, 0, NULL);
+    if (!noexec)
+	search(TC_ELSE, 0, NULL);
 }
 
 /*ARGSUSED*/
@@ -446,7 +447,9 @@ dogoto(Char **v, struct command *c)
     Char   *lp;
 
     USE(c);
-    gotolab(lp = globone(v[1], G_ERROR));
+    lp = globone(v[1], G_ERROR);
+    if (!noexec)
+	gotolab(lp);
     xfree((ptr_t) lp);
 }
 
@@ -489,7 +492,9 @@ doswitch(Char **v, struct command *c)
 	v--;
     if (*v)
 	stderror(ERR_SYNTAX);
-    search(TC_SWITCH, 0, lp = globone(cp, G_ERROR));
+    lp = globone(cp, G_ERROR);
+    if (!noexec)
+	search(TC_SWITCH, 0, lp);
     xfree((ptr_t) lp);
 }
 
@@ -499,10 +504,10 @@ dobreak(Char **v, struct command *c)
 {
     USE(v);
     USE(c);
-    if (whyles)
-	toend();
-    else
+    if (whyles == NULL)
 	stderror(ERR_NAME | ERR_NOTWHILE);
+    if (!noexec)
+	toend();
 }
 
 /*ARGSUSED*/
@@ -555,7 +560,7 @@ doforeach(Char **v, struct command *c)
     gflag = 0, tglob(v);
     if (gflag) {
 	v = globall(v);
-	if (v == 0)
+	if (v == 0 && !noexec)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
     else {
@@ -576,7 +581,8 @@ doforeach(Char **v, struct command *c)
     zlast = TC_FOREACH;
     if (intty)
 	preread();
-    doagain();
+    if (!noexec)
+	doagain();
 }
 
 /*ARGSUSED*/
@@ -594,11 +600,13 @@ dowhile(Char **v, struct command *c)
      * Implement prereading here also, taking care not to evaluate the
      * expression before the loop has been read up from a terminal.
      */
-    if (intty && !again)
+    if (noexec)
+	status = 0;
+    else if (intty && !again)
 	status = !exp0(&v, 1);
     else
 	status = !expr(&v);
-    if (*v)
+    if (*v && !noexec)
 	stderror(ERR_NAME | ERR_EXPRESSION);
     if (!again) {
 	struct whyle *nwp =
@@ -653,7 +661,8 @@ doend(Char **v, struct command *c)
     if (!whyles)
 	stderror(ERR_NAME | ERR_NOTWHILE);
     btell(&whyles->w_end);
-    doagain();
+    if (!noexec)
+	doagain();
 }
 
 /*ARGSUSED*/
@@ -664,7 +673,8 @@ docontin(Char **v, struct command *c)
     USE(c);
     if (!whyles)
 	stderror(ERR_NAME | ERR_NOTWHILE);
-    doagain();
+    if (!noexec)
+	doagain();
 }
 
 static void
@@ -701,6 +711,8 @@ dorepeat(Char **v, struct command *kp)
 	i *= getn(v[1]);
 	lshift(v, 2);
     } while (v[0] != NULL && Strcmp(v[0], STRrepeat) == 0);
+    if (noexec)
+	i = 1;
 
     if (setintr)
 #ifdef BSDSIGS
@@ -733,7 +745,8 @@ doswbrk(Char **v, struct command *c)
 {
     USE(v);
     USE(c);
-    search(TC_BRKSW, 0, NULL);
+    if (!noexec)
+	search(TC_BRKSW, 0, NULL);
 }
 
 int
