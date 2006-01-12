@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.55 2005/04/13 00:08:28 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.56 2005/06/28 13:01:24 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.55 2005/04/13 00:08:28 kim Exp $")
+RCSID("$Id: tc.prompt.c,v 3.56 2005/06/28 13:01:24 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -192,7 +192,7 @@ tprintf(int what, Char *buf, const Char *fmt, size_t siz, const char *str,
     for (; *cp; cp++) {
 	if (p >= ep)
 	    break;
-	l = NLSSize(cp, -1);
+	l = NLSSize(cp, NLSZEROT);
 	if (l > 1) {
 	    while (l--)
 		*p++ = attributes | *cp++;

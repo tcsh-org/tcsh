@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.c,v 3.59 2005/04/11 22:10:59 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.c,v 3.60 2005/06/08 00:25:05 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.59 2005/04/11 22:10:59 kim Exp $")
+RCSID("$Id: tc.os.c,v 3.60 2005/06/08 00:25:05 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -832,7 +832,7 @@ dobs2cmd(Char **v, struct command *c)
     faket.t_drit = 0;
     faket.t_dspr = 0;
     faket.t_dcom = fakecom;
-    fakecom[0] = STRbs2cmd;
+    fakecom[0] = (Char *)STRbs2cmd;
     fakecom[1] = 0;
 
     mypipe(pvec);

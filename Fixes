@@ -1,3 +1,4 @@
+ 26. signness warnings (Miloslav Trmac)
  25. Prevent infinite recursion in catclose (Gerhard Niklasch)
  24. Add Dragonfly (Joerg Sonnenberger)
  23. Check for wcwidth returning a negative number (TOMITA Yoshinori)

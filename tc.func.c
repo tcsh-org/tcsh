@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.120 2005/04/11 22:10:59 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.121 2005/06/07 23:49:38 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.120 2005/04/11 22:10:59 kim Exp $")
+RCSID("$Id: tc.func.c,v 3.121 2005/06/07 23:49:38 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1958,16 +1958,14 @@ collate(const Char *a, const Char *b)
 int
 hashbang(int fd, Char ***vp)
 {
-    unsigned char lbuf[HACKBUFSZ];
-    char *sargv[HACKVECSZ];
-    unsigned char *p, *ws;
+    char *sargv[HACKVECSZ], lbuf[HACKBUFSZ], *p, *ws;
     int sargc = 0;
 #ifdef WINNT_NATIVE
     int fw = 0; 	/* found at least one word */
     int first_word = 0;
 #endif /* WINNT_NATIVE */
 
-    if (read(fd, (char *) lbuf, HACKBUFSZ) <= 0)
+    if (read(fd, lbuf, HACKBUFSZ) <= 0)
 	return -1;
 
     ws = 0;	/* word started = 0 */

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.13 2005/11/02 17:27:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.14 2005/11/11 18:26:48 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.nls.c,v 3.13 2005/11/02 17:27:26 christos Exp $")
+RCSID("$Id: tc.nls.c,v 3.14 2005/11/11 18:26:48 christos Exp $")
 
 #if defined(SHORT_STRINGS) && defined(NLS)
 int
@@ -160,7 +160,7 @@ NLSChars(Char *s)
 {
     int l;
     for (l = 0; *s; l++)
-        s += NLSSize(s, -1);
+        s += NLSSize(s, NLSZEROT);
     return l;
 }
 
@@ -246,7 +246,7 @@ NLSQuote(Char *cp)
 {
     int l;
     while (*cp) {
-	l = NLSSize(cp, -1);
+	l = NLSSize(cp, NLSZEROT);
 	cp++;
 	while (l-- > 1)
 	    *cp++ |= QUOTE;

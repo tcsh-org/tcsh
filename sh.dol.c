@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.55 2004/12/25 21:15:06 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.56 2005/04/11 22:10:56 kim Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.55 2004/12/25 21:15:06 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.56 2005/04/11 22:10:56 kim Exp $")
 
 /*
  * C shell
@@ -852,7 +852,7 @@ setDolp(Char *cp)
     if (dolnmod == 0 || dolmcnt == 0) {
 #endif /* COMPAT */
 	for (dp = cp; *dp; dp++) {
-	    if (NLSSize(dp, -1) != 1) {
+	    if (NLSSize(dp, NLSZEROT) != 1) {
 		addla(cp);
 		return;
 	    }
