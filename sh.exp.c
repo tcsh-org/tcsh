@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exp.c,v 3.45 2005/01/18 20:24:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exp.c,v 3.46 2005/04/11 22:10:57 kim Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.45 2005/01/18 20:24:50 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.46 2005/04/11 22:10:57 kim Exp $")
 
 #include "tw.h"
 
@@ -57,7 +57,7 @@ RCSID("$Id: sh.exp.c,v 3.45 2005/01/18 20:24:50 christos Exp $")
 #define EQMATCH 7
 #define NOTEQMATCH 8
 
-static	int	 sh_access	(Char *, int);
+static	int	 sh_access	(const Char *, int);
 static	int	 exp1		(Char ***, int);
 static	int	 exp2x		(Char ***, int);
 static	int	 exp2a		(Char ***, int);
@@ -76,7 +76,10 @@ static	int	 egetn		(Char *);
 #ifdef EDEBUG
 static	void	 etracc		(char *, Char *, Char ***);
 static	void	 etraci		(char *, int, Char ***);
-#endif /* EDEBUG */
+#else /* !EDEBUG */
+#define etracc(A, B, C) ((void)0)
+#define etraci(A, B, C) ((void)0)
+#endif /* !EDEBUG */
 
 
 /*
@@ -84,7 +87,7 @@ static	void	 etraci		(char *, int, Char ***);
  * From Beto Appleton (beto@aixwiz.aix.ibm.com)
  */
 static int
-sh_access(Char *fname, int mode)
+sh_access(const Char *fname, int mode)
 {
 #if defined(POSIX) && !defined(USE_ACCESS)
     struct stat     statb;
@@ -193,17 +196,13 @@ exp0(Char ***vp, int ignore)
 {
     int p1 = exp1(vp, ignore);
 
-#ifdef EDEBUG
     etraci("exp0 p1", p1, vp);
-#endif /* EDEBUG */
     if (**vp && eq(**vp, STRor2)) {
 	int p2;
 
 	(*vp)++;
 	p2 = exp0(vp, (ignore & TEXP_IGNORE) || p1);
-#ifdef EDEBUG
 	etraci("exp0 p2", p2, vp);
-#endif /* EDEBUG */
 	return (p1 || p2);
     }
     return (p1);
@@ -214,17 +213,13 @@ exp1(Char ***vp, int ignore)
 {
     int p1 = exp2x(vp, ignore);
 
-#ifdef EDEBUG
     etraci("exp1 p1", p1, vp);
-#endif /* EDEBUG */
     if (**vp && eq(**vp, STRand2)) {
 	int p2;
 
 	(*vp)++;
 	p2 = exp1(vp, (ignore & TEXP_IGNORE) || !p1);
-#ifdef EDEBUG
 	etraci("exp1 p2", p2, vp);
-#endif /* EDEBUG */
 	return (p1 && p2);
     }
     return (p1);
@@ -235,17 +230,13 @@ exp2x(Char ***vp, int ignore)
 {
     int p1 = exp2a(vp, ignore);
 
-#ifdef EDEBUG
     etraci("exp3 p1", p1, vp);
-#endif /* EDEBUG */
     if (**vp && eq(**vp, STRor)) {
 	int p2;
 
 	(*vp)++;
 	p2 = exp2x(vp, ignore);
-#ifdef EDEBUG
 	etraci("exp3 p2", p2, vp);
-#endif /* EDEBUG */
 	return (p1 | p2);
     }
     return (p1);
@@ -256,17 +247,13 @@ exp2a(Char ***vp, int ignore)
 {
     int p1 = exp2b(vp, ignore);
 
-#ifdef EDEBUG
     etraci("exp2a p1", p1, vp);
-#endif /* EDEBUG */
     if (**vp && eq(**vp, STRcaret)) {
 	int p2;
 
 	(*vp)++;
 	p2 = exp2a(vp, ignore);
-#ifdef EDEBUG
 	etraci("exp2a p2", p2, vp);
-#endif /* EDEBUG */
 	return (p1 ^ p2);
     }
     return (p1);
@@ -277,17 +264,13 @@ exp2b(Char ***vp, int ignore)
 {
     int p1 = exp2c(vp, ignore);
 
-#ifdef EDEBUG
     etraci("exp2b p1", p1, vp);
-#endif /* EDEBUG */
     if (**vp && eq(**vp, STRand)) {
 	int p2;
 
 	(*vp)++;
 	p2 = exp2b(vp, ignore);
-#ifdef EDEBUG
 	etraci("exp2b p2", p2, vp);
-#endif /* EDEBUG */
 	return (p1 & p2);
     }
     return (p1);
@@ -300,17 +283,13 @@ exp2c(Char ***vp, int ignore)
     Char *p2;
     int i;
 
-#ifdef EDEBUG
     etracc("exp2c p1", p1, vp);
-#endif /* EDEBUG */
     if ((i = isa(**vp, EQOP)) != 0) {
 	(*vp)++;
 	if (i == EQMATCH || i == NOTEQMATCH)
 	    ignore |= TEXP_NOGLOB;
 	p2 = exp3(vp, ignore);
-#ifdef EDEBUG
 	etracc("exp2c p2", p2, vp);
-#endif /* EDEBUG */
 	if (!(ignore & TEXP_IGNORE))
 	    switch (i) {
 
@@ -346,17 +325,13 @@ exp3(Char ***vp, int ignore)
     int i;
 
     p1 = exp3a(vp, ignore);
-#ifdef EDEBUG
     etracc("exp3 p1", p1, vp);
-#endif /* EDEBUG */
     if ((i = isa(**vp, RELOP)) != 0) {
 	(*vp)++;
 	if (**vp && eq(**vp, STRequal))
 	    i |= 1, (*vp)++;
 	p2 = exp3(vp, ignore);
-#ifdef EDEBUG
 	etracc("exp3 p2", p2, vp);
-#endif /* EDEBUG */
 	if (!(ignore & TEXP_IGNORE))
 	    switch (i) {
 
@@ -386,26 +361,23 @@ exp3(Char ***vp, int ignore)
 static Char *
 exp3a(Char ***vp, int ignore)
 {
-    Char *p1, *p2, *op;
+    Char *p1, *p2;
+    const Char *op;
     int i;
 
     p1 = exp4(vp, ignore);
-#ifdef EDEBUG
     etracc("exp3a p1", p1, vp);
-#endif /* EDEBUG */
     op = **vp;
     if (op && any("<>", op[0]) && op[0] == op[1]) {
 	(*vp)++;
 	p2 = exp3a(vp, ignore);
-#ifdef EDEBUG
 	etracc("exp3a p2", p2, vp);
-#endif /* EDEBUG */
 	if (op[0] == '<')
 	    i = egetn(p1) << egetn(p2);
 	else
 	    i = egetn(p1) >> egetn(p2);
-	xfree((ptr_t) p1);
-	xfree((ptr_t) p2);
+	xfree(p1);
+	xfree(p2);
 	return (putn(i));
     }
     return (p1);
@@ -418,16 +390,12 @@ exp4(Char ***vp, int ignore)
     int i = 0;
 
     p1 = exp5(vp, ignore);
-#ifdef EDEBUG
     etracc("exp4 p1", p1, vp);
-#endif /* EDEBUG */
     if (isa(**vp, ADDOP)) {
-	Char *op = *(*vp)++;
+	const Char *op = *(*vp)++;
 
 	p2 = exp4(vp, ignore);
-#ifdef EDEBUG
 	etracc("exp4 p2", p2, vp);
-#endif /* EDEBUG */
 	if (!(ignore & TEXP_IGNORE))
 	    switch (op[0]) {
 
@@ -453,23 +421,19 @@ exp5(Char ***vp, int ignore)
     int i = 0;
 
     p1 = exp6(vp, ignore);
-#ifdef EDEBUG
     etracc("exp5 p1", p1, vp);
-#endif /* EDEBUG */
 
     if (isa(**vp, MULOP)) {
-	Char *op = *(*vp)++;
-	if ((ignore & TEXP_NOGLOB) != 0) 
-	    /* 
+	const Char *op = *(*vp)++;
+	if ((ignore & TEXP_NOGLOB) != 0)
+	    /*
 	     * We are just trying to get the right side of
-	     * a =~ or !~ operator 
+	     * a =~ or !~ operator
 	     */
 	    return Strsave(op);
 
 	p2 = exp5(vp, ignore);
-#ifdef EDEBUG
 	etracc("exp5 p2", p2, vp);
-#endif /* EDEBUG */
 	if (!(ignore & TEXP_IGNORE))
 	    switch (op[0]) {
 
@@ -509,29 +473,23 @@ exp6(Char ***vp, int ignore)
     if (eq(**vp, STRbang)) {
 	(*vp)++;
 	cp = exp6(vp, ignore);
-#ifdef EDEBUG
 	etracc("exp6 ! cp", cp, vp);
-#endif /* EDEBUG */
 	i = egetn(cp);
-	xfree((ptr_t) cp);
+	xfree(cp);
 	return (putn(!i));
     }
     if (eq(**vp, STRtilde)) {
 	(*vp)++;
 	cp = exp6(vp, ignore);
-#ifdef EDEBUG
 	etracc("exp6 ~ cp", cp, vp);
-#endif /* EDEBUG */
 	i = egetn(cp);
-	xfree((ptr_t) cp);
+	xfree(cp);
 	return (putn(~i));
     }
     if (eq(**vp, STRLparen)) {
 	(*vp)++;
 	ccode = exp0(vp, ignore);
-#ifdef EDEBUG
 	etraci("exp6 () ccode", ccode, vp);
-#endif /* EDEBUG */
 	if (*vp == 0 || **vp == 0 || ***vp != ')')
 	    stderror(ERR_NAME | ERR_EXPRESSION);
 	(*vp)++;
@@ -566,9 +524,7 @@ exp6(Char ***vp, int ignore)
 	}
 	pwait();
 	prestjob();
-#ifdef EDEBUG
 	etraci("exp6 {} status", egetn(varval(STRstatus)), vp);
-#endif /* EDEBUG */
 	return (putn(egetn(varval(STRstatus)) == 0));
     }
     if (isa(**vp, ANYOP))
@@ -582,9 +538,7 @@ exp6(Char ***vp, int ignore)
 #define FILEVALS  "ZAMCDIUGNFPL"
     if (*cp == '-' && (any(FILETESTS, cp[1]) || any(FILEVALS, cp[1])))
         return(filetest(cp, vp, ignore));
-#ifdef EDEBUG
     etracc("exp6 default", cp, vp);
-#endif /* EDEBUG */
     return (ignore & TEXP_NOGLOB ? Strsave(cp) : globone(cp, G_APPEND));
 }
 
@@ -864,23 +818,10 @@ filetest(Char *cp, Char ***vp, int ignore)
 		}
 #ifdef S_ISLNK
 		filnam = short2str(ep);
-#ifdef PATH_MAX
-# define MY_PATH_MAX PATH_MAX
-#else /* !PATH_MAX */
-/* 
- * I can't think of any more sensible alterative; readlink doesn't give 
- * us an errno if the buffer isn't large enough :-(
- */
-# define MY_PATH_MAX  2048
-#endif /* PATH_MAX */
-		i = readlink(filnam, string = (char *) 
-		      xmalloc((size_t) (1 + MY_PATH_MAX) * sizeof(char)),
-			MY_PATH_MAX);
-		if (i >= 0 && i <= MY_PATH_MAX)
-		    string[i] = '\0'; /* readlink does not null terminate */
-		strF = (i < 0) ? errval : str2short(string);
-		xfree((ptr_t) string);
-		xfree((ptr_t) ep);
+		string = areadlink(filnam);
+		strF = string == NULL ? errval : str2short(string);
+		xfree(string);
+		xfree(ep);
 		return(Strsave(strF));
 
 #else /* !S_ISLNK */
@@ -939,10 +880,8 @@ filetest(Char *cp, Char ***vp, int ignore)
 	    }
 	}
     while (*++ft && i);
-#ifdef EDEBUG
     etraci("exp6 -? i", i, vp);
-#endif /* EDEBUG */
-    xfree((ptr_t) ep);
+    xfree(ep);
     return (putn(i));
 }
 

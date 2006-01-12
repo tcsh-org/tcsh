@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/ps.c,v 1.3 2002/08/11 07:58:13 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/ps.c,v 1.4 2004/05/19 18:22:28 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -164,7 +164,7 @@ done:
 
 DWORD NTLister(void) {
 	
-	DWORD procs[200],dummy,ignore;
+	DWORD procs[200]/*FIXBUF*/,dummy,ignore;
 	HANDLE hproc;
 	HMODULE hmod;
 	unsigned int i;
@@ -442,14 +442,14 @@ void dops(Char ** vc, struct command *c) {
 	
 	DWORD nump;
 	unsigned int i,k;
+	int gflag;
 	char **v;
 
 	if (!ProcessListFunc)
 		return;
-	gflag = 0;
-	tglob(vc);
+	gflag = tglob(vc);
 	if (gflag) {
-		vc = globall(vc);
+		vc = globall(vc, gflag);
 		if (vc == 0)
 			stderror(ERR_NAME | ERR_NOMATCH);
 	}
@@ -492,8 +492,8 @@ void doshutdown(Char **vc, struct command *c) {
 	unsigned char reboot,shutdown,logoff,shutdown_ok;
 	char **v;
 	char *ptr;
-	char errbuf[128];
-	int k;
+	char errbuf[128];/*FIXBUF*/
+	int k, gflag;
 	HANDLE hToken;
 	TOKEN_PRIVILEGES tp,tpPrevious;
 	LUID luid;
@@ -504,10 +504,9 @@ void doshutdown(Char **vc, struct command *c) {
 	}
 
 	shutdown_ok = reboot = shutdown = logoff = 0;
-	gflag = 0;
-	tglob(vc);
+	gflag = tglob(vc);
 	if (gflag) {
-		vc = globall(vc);
+		vc = globall(vc, gflag);
 		if (vc == 0)
 			stderror(ERR_NAME | ERR_NOMATCH);
 	}

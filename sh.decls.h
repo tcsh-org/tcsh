@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.47 2005/04/11 22:10:56 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.48 2005/04/12 23:41:52 kim Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -36,7 +36,7 @@
 /*
  * sh.c
  */
-extern	int	 	  gethdir	(Char *);
+extern	Char	 	 *gethdir	(const Char *);
 extern	void		  dosource	(Char **, struct command *);
 extern	void		  exitstat	(void);
 extern	void		  goodbye	(Char **, struct command *);
@@ -61,12 +61,12 @@ extern	Char		 *dcanon	(Char *, Char *);
 extern	void		  dtildepr	(Char *);
 extern	void		  dtilde	(void);
 extern	void		  dochngd	(Char **, struct command *);
-extern	Char		 *dnormalize	(Char *, int);
+extern	Char		 *dnormalize	(const Char *, int);
 extern	void		  dopushd	(Char **, struct command *);
 extern	void		  dopopd	(Char **, struct command *);
 extern	void		  dfree		(struct directory *);
 extern	void		  dsetstack	(void);
-extern	int		  getstakd	(Char *, int);
+extern	const Char	 *getstakd	(int);
 extern	void		  recdirs	(Char *, int);
 extern	void		  loaddirs	(Char *);
 
@@ -93,8 +93,8 @@ extern	void		  dounhash	(Char **, struct command *);
 extern	void		  execash	(Char **, struct command *);
 extern	void		  hashstat	(Char **, struct command *);
 extern	void		  xechoit	(Char **);
-extern	int		  executable	(Char *, Char *, int);
-extern	int		  tellmewhat	(struct wordent *, Char *);
+extern	int		  executable	(const Char *, const Char *, int);
+extern	int		  tellmewhat	(struct wordent *, Char **);
 extern	void		  dowhere	(Char **, struct command *);
 extern	int		  find_cmd	(Char *, int);
 
@@ -109,7 +109,7 @@ extern	int		  exp0		(Char ***, int);
  * sh.file.c
  */
 #if defined(FILEC) && defined(TIOCSTI)
-extern	int		  tenex		(Char *, int);
+extern	size_t		  tenex		(Char *, size_t);
 #endif
 
 /*
@@ -150,9 +150,10 @@ extern	void		  dounlimit	(Char **, struct command *);
 extern	void		  dounsetenv	(Char **, struct command *);
 extern	void		  dowhile	(Char **, struct command *);
 extern	void		  dozip		(Char **, struct command *);
-extern	void		  func		(struct command *, struct biltins *);
+extern	void		  func		(struct command *,
+					 const struct biltins *);
 extern	void		  gotolab	(Char *);
-extern struct biltins 	 *isbfunc	(struct command *);
+extern const struct biltins *isbfunc	(struct command *);
 extern	void		  prvars	(void);
 extern	int		  srchx		(Char *);
 extern	void		  unalias	(Char **, struct command *);
@@ -163,20 +164,18 @@ extern	void		  reexecute	(struct command *);
 /*
  * sh.glob.c
  */
-extern	Char	 	 *globequal	(Char *, Char *);
+extern	Char	 	 *globequal	(Char *);
 extern	Char		**dobackp	(Char *, int);
-extern	void		  Gcat		(Char *, Char *);
+extern	void		  Gcat		(Char *);
 extern	Char		 *globone	(Char *, int);
-extern	int		  Gmatch	(Char *, Char *);
-extern	int		  Gnmatch	(Char *, Char *, Char **);
+extern	int		  Gmatch	(const Char *, const Char *);
+extern	int		  Gnmatch	(const Char *, const Char *,
+					 const Char **);
 extern	void		  ginit		(void);
-extern	Char		**globall	(Char **);
+extern	Char		**globall	(Char **, int);
 extern	void		  rscan		(Char **, void (*)(Char));
-extern	void		  tglob		(Char **);
+extern	int		  tglob		(Char **);
 extern	void		  trim		(Char **);
-#if defined(FILEC) && defined(TIOCSTI)
-extern	int		  sortscmp	(Char **, Char **);
-#endif
 
 #ifndef WINNT_NATIVE
 #if defined(NLS_CATALOGS) && defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
@@ -185,7 +184,8 @@ extern	char		 *iconv_catgets	(nl_catd, int, int, const char *);
 #endif
 extern	void		  nlsinit	(void);
 extern	void	          nlsclose	(void);
-extern  int	  	  t_pmatch	(Char *, Char *, Char **, int);
+extern  int	  	  t_pmatch	(const Char *, const Char *,
+					 const Char **, int);
 
 /*
  * sh.hist.c
@@ -193,7 +193,7 @@ extern  int	  	  t_pmatch	(Char *, Char *, Char **, int);
 extern	void	 	  dohist	(Char **, struct command *);
 extern  struct Hist 	 *enthist	(int, struct wordent *, int, int);
 extern	void	 	  savehist	(struct wordent *, int);
-extern	void		  fmthist	(int, ptr_t, char *, size_t);
+extern	char		 *fmthist	(int, ptr_t);
 extern	void		  rechist	(Char *, int);
 extern	void		  loadhist	(Char *, int);
 
@@ -226,8 +226,8 @@ extern	int		  any		(const char *, Char);
 extern	Char		**blkcpy	(Char **, Char **);
 extern	void		  blkfree	(Char **);
 extern	int		  blklen	(Char **);
-extern	void		  blkpr		(Char **);
-extern	void		  blkexpand	(Char **, Char *);
+extern	void		  blkpr		(Char *const *);
+extern	Char		 *blkexpand	(Char *const *);
 extern	Char		**blkspl	(Char **, Char **);
 extern	void		  closem	(void);
 #ifndef CLOSE_ON_EXEC
@@ -242,27 +242,27 @@ extern	void		  lshift	(Char **, int);
 extern	int		  number	(Char *);
 extern	int		  prefix	(const Char *, const Char *);
 extern	Char		**saveblk	(Char **);
-extern	void		  setzero	(char *, int);
+extern	void		  setzero	(void *, size_t);
 extern	Char		 *strip		(Char *);
 extern	Char		 *quote		(Char *);
-extern	Char		 *quote_meta	(Char *, const Char *);
+extern	const Char	 *quote_meta	(struct Strbuf *, const Char *);
+extern	char		 *strnsave	(const char *, size_t);
 extern	char		 *strsave	(const char *);
 extern	void		  udvar		(Char *);
 #ifndef POSIX
 extern  char   	  	 *strstr	(const char *, const char *);
 #endif /* !POSIX */
-#ifndef SHORT_STRINGS
 extern	char		 *strspl	(const char *, const char *);
-extern	char		 *strend	(char *);
-#endif /* SHORT_STRINGS */
+extern	char		 *strend	(const char *);
+extern	char		 *areadlink	(const char *);
 
 /*
  * sh.parse.c
  */
 extern	void		  alias		(struct wordent *);
 extern	void		  freesyn	(struct command *);
-extern struct command 	 *syntax	(struct wordent *, 
-					 struct wordent *, int);
+extern struct command 	 *syntax	(const struct wordent *,
+					 const struct wordent *, int);
 
 /*
  * sh.print.c
@@ -305,12 +305,12 @@ extern	void		  dokill	(Char **, struct command *);
 extern	void		  donotify	(Char **, struct command *);
 extern	void		  dostop	(Char **, struct command *);
 extern	void		  dowait	(Char **, struct command *);
-extern	void		  palloc	(int, struct command *);
+extern	void		  palloc	(pid_t, struct command *);
 extern	void		  panystop	(int);
 extern	RETSIGTYPE	  pchild	(int);
 extern	void		  pendjob	(void);
-extern	int		  pfork		(struct command *, int);
-extern	void		  pgetty	(int, int);
+extern	pid_t		  pfork		(struct command *, int);
+extern	void		  pgetty	(int, pid_t);
 extern	void		  pjwait	(struct process *);
 extern	void		  pnote		(void);
 extern	void		  prestjob	(void);
@@ -329,7 +329,7 @@ extern	void		  mypipe	(int *);
 /*
  * sh.set.c
  */
-extern	struct varent 	 *adrof1	(Char *, struct varent *);
+extern	struct varent 	 *adrof1	(const Char *, struct varent *);
 extern	void		  doset		(Char **, struct command *);
 extern	void		  dolet		(Char **, struct command *);
 extern	Char		 *putn		(int);
@@ -386,5 +386,11 @@ extern	void		  tvsub		(struct timeval *,
 					 struct timeval *, 
 					 struct timeval *);
 #endif /* BSDTIMES || _SEQUENT_ */
+
+/*
+ * tw.parse.c
+ */
+extern	 void		  copyn			(Char *, const Char *, size_t);
+extern	 void		  catn			(Char *, const Char *, int);
 
 #endif /* _h_sh_decls */

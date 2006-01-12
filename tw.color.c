@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.18 2005/03/03 16:40:53 kim Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.19 2005/04/11 22:11:00 kim Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.18 2005/03/03 16:40:53 kim Exp $")
+RCSID("$Id: tw.color.c,v 1.19 2005/04/11 22:11:00 kim Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -42,7 +42,7 @@ RCSID("$Id: tw.color.c,v 1.18 2005/03/03 16:40:53 kim Exp $")
 
 typedef struct {
     const char   *s;
-    int     len;
+    size_t len;
 } Str;
 
 
@@ -102,8 +102,8 @@ int	     color_context_ls = FALSE;	/* do colored ls */
 static int  color_context_lsmF = FALSE;	/* do colored ls-F */
 
 static int getstring (char **, const Char **, Str *, int);
-static void put_color (Str *);
-static void print_color (Char *, size_t, Char);
+static void put_color (const Str *);
+static void print_color (const Char *, size_t, Char);
 
 /* set_color_context():
  */
@@ -152,7 +152,7 @@ getstring(char **dp, const Char **sp, Str *pd, int f)
     }
 
     pd->s = *dp;
-    pd->len = (int) (d - *dp);
+    pd->len = d - *dp;
     *sp = s;
     *dp = d;
     return *s == (Char)f;
@@ -163,7 +163,7 @@ getstring(char **dp, const Char **sp, Str *pd, int f)
  *	Parse the LS_COLORS environment variable
  */
 void
-parseLS_COLORS(Char *value)
+parseLS_COLORS(const Char *value)
 {
     size_t  i, len;
     const Char   *v;		/* pointer in value */
@@ -247,14 +247,14 @@ parseLS_COLORS(Char *value)
 
     resexit(osetexit);
 
-    nextensions = (int) (e - extensions);
+    nextensions = e - extensions;
 }
 
 
 /* put_color():
  */
 static void
-put_color(Str *color)
+put_color(const Str *color)
 {
     size_t  i;
     const char   *c = color->s;
@@ -270,7 +270,7 @@ put_color(Str *color)
 /* print_color():
  */
 static void
-print_color(Char *fname, size_t len, Char suffix)
+print_color(const Char *fname, size_t len, Char suffix)
 {
     size_t  i;
     char   *filename = short2str(fname);
@@ -314,7 +314,7 @@ print_color(Char *fname, size_t len, Char suffix)
 /* print_with_color():
  */
 void
-print_with_color(Char *filename, size_t len, Char suffix)
+print_with_color(const Char *filename, size_t len, Char suffix)
 {
     if (color_context_lsmF &&
 	(haderr ? (didfds ? is2atty : isdiagatty) :

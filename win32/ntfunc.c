@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/ntfunc.c,v 1.11 2005/04/11 22:11:02 kim Exp $*/
+/*$Header: /src/pub/tcsh/win32/ntfunc.c,v 1.12 2005/05/25 03:01:20 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -56,7 +56,7 @@ BOOL is_url(const char *cmd);
 void error(char * ) ;
 void make_err_str(unsigned int ,char *,int) ;
 
-#define	INF	0x7fffffff
+#define	INF INT_MAX
 struct	biltins nt_bfunc[] = {
     { "cls",		docls,		0,	0	},
 #ifdef NTDBG
@@ -151,7 +151,7 @@ BOOL is_directory(const char *cmd) {
 void dostart(Char ** vc, struct command *c) {
 
 	char *cmdstr,*cmdend,*ptr;
-	char argv0[256];
+	char argv0[256];/*FIXBUF*/
 	DWORD cmdsize;
 	char *currdir=NULL;
 	char *savepath;
@@ -159,7 +159,7 @@ void dostart(Char ** vc, struct command *c) {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	DWORD dwCreationFlags=CREATE_NEW_CONSOLE;
-	int k,cmdlen,j,jj,ret;
+	int k,cmdlen,j,jj,ret,gflag;
 
 
 	USE(c);*vc++;
@@ -172,10 +172,9 @@ void dostart(Char ** vc, struct command *c) {
 	memset(&si,0,sizeof(si));
 	si.cb = sizeof(si);
 
-	gflag = 0;
-	tglob(vc);
+	gflag = tglob(vc);
 	if (gflag) {
-		vc = globall(vc);
+		vc = globall(vc, gflag);
 		if (vc == 0)
 			stderror(ERR_NAME | ERR_NOMATCH);
 	}
@@ -225,6 +224,7 @@ void dostart(Char ** vc, struct command *c) {
 			j=(lstrlen(v[jj]) + 2);
 			if (j + cmdlen > cmdsize) {
 				ptr = cmdstr;
+				/* FIXME: buffer overflow */
 				cmdstr = heap_realloc(cmdstr, cmdsize << 1);
 				if(!cmdstr)
 				{
@@ -381,16 +381,15 @@ void nt_set_env(const Char *name, const Char *val) {
 }
 void dotitle(Char **vc, struct command * c) {
 
-	int k;
-	char titlebuf[512];
-	char errbuf[128],err2[128];
+	int k, gflag;
+	char titlebuf[512];/*FIXBUF*/
+	char errbuf[128],err2[128];/*FIXBUF*/
 	char **v;
 
 	USE(c);*vc++;
-	gflag = 0;
-	tglob(vc);
+	gflag = tglob(vc);
 	if (gflag) {
-		vc = globall(vc);
+		vc = globall(vc, gflag);
 		if (vc == 0)
 			stderror(ERR_NAME | ERR_NOMATCH);
 	}
@@ -432,7 +431,7 @@ void docls(Char **vc, struct command *c) {
 int nt_feed_to_cmd(char *file,char **argv) {
 
 	char *ptr;
-	char cmdbuf[128];
+	char cmdbuf[128];/*FIXBUF*/
 	HANDLE htemp;
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -474,7 +473,7 @@ int nt_feed_to_cmd(char *file,char **argv) {
 			*ptr = '\\';
 		ptr++;
 	}
-	if (gdwPlatform == VER_PLATFORM_WIN32_WINDOWS){
+	if (gdwPlatform == VER_PLATFORM_WIN32_WINDOWS){/*FIXME:bufer overflows*/
 		wsprintf(cmdbuf,"command.com /c %s",file);
 	}
 	else
@@ -516,7 +515,7 @@ static char *hb_subst_array[20] ;
 void init_hb_subst(void) {
 	int i= 0;
 	size_t len;
-	char envbuf[1024];
+	char envbuf[1024];/*FIXBUF*/
 	char *ptr;
 	char *p2;
 
@@ -575,8 +574,8 @@ static HMODULE hShellDll;
 static shell_ex_func pShellExecuteEx;
 int __nt_only_start_exes;
 
-static char no_assoc[256]; //the environment string
-static char *no_assoc_array[20]; // the list of extensions to NOT try 
+static char no_assoc[256]; //the environment string/*FIXBUF*/
+static char *no_assoc_array[20]; // the list of extensions to NOT try /*FIXBUF*/
 								 // explorer associations for
 
 void init_shell_dll(void) {
@@ -657,7 +656,7 @@ void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {
 	char *originalPtr = NULL;
 	unsigned int cmdsize,cmdlen;
 	int hasdot = 0;
-	char err2[256];
+	char err2[256];/*FIXBUF*/
 	char *ptr;
 	short quotespace=0;
 	SHELLEXECUTEINFO shinfo;
@@ -776,7 +775,7 @@ int nt_try_fast_exec(struct command *t) {
 	register struct varent *v;
 	register int hashval,i;
 	register int slash;
-	int rc;
+	int rc, gflag;
 	Char *vp;
 	Char   *blk[2];
 
@@ -792,9 +791,9 @@ int nt_try_fast_exec(struct command *t) {
         return 1;
 
 
-	gflag = 0, tglob(blk);
+	gflag = tglob(blk);
 	if (gflag) {
-		pv = globall(blk);
+		pv = globall(blk, gflag);
 		if (pv == 0) {
 			return 1;
 		}
@@ -815,11 +814,10 @@ int nt_try_fast_exec(struct command *t) {
 	/*
 	 * Glob the argument list, if necessary. Otherwise trim off the quote bits.
 	 */
-	gflag = 0;
 	av = &t->t_dcom[1];
-	tglob(av);
+	gflag = tglob(av);
 	if (gflag) {
-		av = globall(av);
+		av = globall(av, gflag);
 		if (av == 0) {
 			blkfree(pv);
 			return 1;
@@ -1109,14 +1107,13 @@ BOOL is_url(const char *cmd) {
   return TRUE;
 }
 void dostacksize(Char ** vc, struct command *c) {
-	int k;
+	int k, gflag;
 	char **v;
 	USE(c);
 	*vc++;
-	gflag = 0;
-	tglob(vc);
+	gflag = tglob(vc);
 	if (gflag) {
-		vc = globall(vc);
+		vc = globall(vc, gflag);
 		if (vc == 0)
 			stderror(ERR_NAME | ERR_NOMATCH);
 	}
@@ -1149,12 +1146,12 @@ BOOL is_nt_executable(char *path,char *extension) {
 	return FALSE;
 }
 int
-executable(Char *dir, Char *name, int dir_ok)
+executable(const Char *dir, const Char *name, int dir_ok)
 {
 	struct stat stbuf;
-	Char    path[MAXPATHLEN + 1];
+	Char    path[MAXPATHLEN + 1];/*FIXBUF*/
 	char   *strname;
-	char extension[MAXPATHLEN]; //bugfix by Avner Lottem.avner.lottem@intel.com
+	char extension[MAXPATHLEN]; //bugfix by Avner Lottem.avner.lottem@intel.com/*FIXBUF*/
 	char *ptr, *p2 ;
 	int has_ext = 0;
 	extern void copyn(Char *, Char *, int);
@@ -1163,8 +1160,8 @@ executable(Char *dir, Char *name, int dir_ok)
 	(void) memset(path, 0, sizeof(path));
 
 	if (dir && *dir) {
-		copyn(path, dir, MAXPATHLEN);
-		catn(path, name, MAXPATHLEN);
+		copyn(path, dir, MAXPATHLEN);/*FIXBUF*/
+		catn(path, name, MAXPATHLEN);/*FIXBUF*/
 
 		p2 = ptr = short2str(path);
 
@@ -1177,13 +1174,13 @@ executable(Char *dir, Char *name, int dir_ok)
 				break;
 			if (*ptr == '.') {
 				has_ext = 1;
-				lstrcpyn(extension,ptr+1,MAXPATHLEN);
+				lstrcpyn(extension,ptr+1,MAXPATHLEN);/*FIXBUF*/
 				break;
 			}
 			ptr--;
 		}
 		if (!has_ext && (nt_stat(p2, &stbuf) == -1))
-			catn(path, STRdotEXE, MAXPATHLEN);
+			catn(path, STRdotEXE, MAXPATHLEN);/*FIXBUF*/
 		strname = short2str(path);
 	}
 	else
@@ -1248,8 +1245,8 @@ void dosourceresource(Char ** vc, struct command *c) {
 }
 void doprintresource(Char ** vc, struct command *c) {
 
-	static char oembuf[256];
-	WCHAR buffer[256];
+	static char oembuf[256];/*FIXBUF*/
+	WCHAR buffer[256];/*FIXBUF*/
 	int rc;
 	HANDLE hMod = GetModuleHandle(NULL);
 	int i = 666;

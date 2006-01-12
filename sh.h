@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.135 2005/04/12 23:41:52 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.136 2005/11/02 17:27:26 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -312,8 +312,8 @@ typedef int NLSChar;
 #  undef calloc
 #  undef realloc
 # endif /* glibc || sgi */
-# include <limits.h>
 #endif /* POSIX && !WINNT_NATIVE */
+#include <limits.h>
 
 #if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX) || defined(linux) || defined(__GNU__) || defined(__GLIBC__)
 # if !defined(pyr) && !defined(stellar)
@@ -520,10 +520,6 @@ extern void		DebugFree	(ptr_t, char *, int);
  * April, 1980
  */
 
-#if !defined(MAXNAMLEN) && defined(_D_NAME_MAX)
-# define MAXNAMLEN _D_NAME_MAX
-#endif /* MAXNAMLEN */
-
 #ifdef HESIOD
 # include <hesiod.h>
 #endif /* HESIOD */
@@ -533,7 +529,9 @@ extern void		DebugFree	(ptr_t, char *, int);
 #endif /* REMOTEHOST */
 
 #ifndef MAXHOSTNAMELEN
-# if defined(SCO) && (SYSVREL > 3)
+# ifdef HOST_NAME_MAX
+#  define MAXHOSTNAMELEN (HOST_NAME_MAX + 1)
+# elif defined(SCO) && (SYSVREL > 3)
 #  include <sys/socket.h>
 # else
 #  define MAXHOSTNAMELEN 256
@@ -585,7 +583,7 @@ EXTERN int    is2atty IZERO;	/* is file descriptor 2 a tty (didfds mode) */
 EXTERN int    arun IZERO;	/* Currently running multi-line-aliases */
 EXTERN int     implicit_cd IZERO;/* implicit cd enabled?(1=enabled,2=verbose) */
 EXTERN int    inheredoc IZERO;	/* Currently parsing a heredoc */
-EXTERN int    windowchg IZERO;	/* We received a window change event */
+EXTERN int    windowchg IZERO;	/* We received a window change event *//*FIXME: volatile sig_atomic_t */
 #if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
 EXTERN int    dspmbyte_ls;
 #endif
@@ -632,7 +630,7 @@ EXTERN long seconds0;
  * Miscellany
  */
 EXTERN Char   *doldol;		/* Character pid for $$ */
-EXTERN int     backpid;		/* pid of the last background job */
+EXTERN pid_t   backpid;		/* pid of the last background job */
 
 /*
  * Ideally these should be uid_t, gid_t, pid_t. I cannot do that right now
@@ -647,12 +645,8 @@ EXTERN pid_t   opgrp,		/* Initial pgrp and tty pgrp */
                tpgrp;		/* Terminal process group */
 				/* If tpgrp is -1, leave tty alone! */
 
-EXTERN Char    PromptBuf[INBUFSIZE*2];	/* buffer for the actual printed prompt.
-					 * this must be large enough to contain
-					 * the input line and the prompt, in
-					 * case a correction occurred...
-					 */
-EXTERN Char    RPromptBuf[INBUFSIZE];	/* buffer for right-hand side prompt */
+EXTERN Char   *Prompt;		/* The actual printed prompt.*/
+EXTERN Char   *RPrompt;		/* Right-hand side prompt */
 
 /*
  * To be able to redirect i/o for builtins easily, the shell moves the i/o
@@ -861,7 +855,8 @@ struct wordent {
  * process id's from `$$', and modified variable values (from qualifiers
  * during expansion in sh.dol.c) here.
  */
-EXTERN Char   *lap;
+extern struct Strbuf labuf;
+EXTERN size_t lap; /* N/A if == labuf.len, index into labuf.s otherwise */
 
 /*
  * Parser structure
@@ -960,7 +955,7 @@ typedef void (*bfunc_t) ();
 typedef void (*bfunc_t) (Char **, struct command *);
 #endif /* hpux && __STDC__ && !__GNUC__ */
 
-extern struct biltins {
+extern const struct biltins {
     const char   *bname;
     bfunc_t bfunct;
     int     minargs, maxargs;
@@ -1029,21 +1024,18 @@ EXTERN Char  **alvec IZERO_STRUCT,
 /*
  * Filename/command name expansion variables
  */
-EXTERN int   gflag;		/* After tglob -> is globbing needed? */
-
-#define MAXVARLEN 256		/* Maximum number of char in a variable name */
 
 #ifdef __CYGWIN__
 # undef MAXPATHLEN
 #endif /* __CYGWIN__ */
 
 #ifndef MAXPATHLEN
-# define MAXPATHLEN 2048
+# ifdef PATH_MAX
+#  define MAXPATHLEN PATH_MAX
+# else
+#  define MAXPATHLEN 2048/*FIXBUF?*/
+# endif
 #endif /* MAXPATHLEN */
-
-#ifndef MAXNAMLEN
-# define MAXNAMLEN 512
-#endif /* MAXNAMLEN */
 
 #ifndef HAVENOLIMIT
 /*
@@ -1067,9 +1059,6 @@ extern int    gargc;		/* Number args in gargv */
  * Variables for command expansion.
  */
 extern Char **pargv;		/* Pointer to the argv list space */
-EXTERN Char  *pargs;		/* Pointer to start current word */
-EXTERN long   pnleft;		/* Number of chars left in pargs */
-EXTERN Char  *pargcp;		/* Current index into pargs */
 
 /*
  * History list
@@ -1130,6 +1119,7 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 #define Strcasecmp(a, b)	strcasecmp(a, b)
 
 #define Strspl(a, b)		strspl(a, b)
+#define Strnsave(a, b)		strnsave(a, b)
 #define Strsave(a)		strsave(a)
 #define Strend(a)		strend(a)
 #define Strstr(a, b)		strstr(a, b)
@@ -1163,6 +1153,7 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 #define Strcasecmp(a, b)	s_strcasecmp(a, b)
 
 #define Strspl(a, b)		s_strspl(a, b)
+#define Strnsave(a, b)		s_strnsave(a, b)
 #define Strsave(a)		s_strsave(a)
 #define Strend(a)		s_strend(a)
 #define Strstr(a, b)		s_strstr(a, b)

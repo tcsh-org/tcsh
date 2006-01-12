@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.term.c,v 1.32 2005/04/11 22:10:55 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.term.c,v 1.33 2005/08/02 21:04:50 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #ifndef WINNT_NATIVE
 
-RCSID("$Id: ed.term.c,v 1.32 2005/04/11 22:10:55 kim Exp $")
+RCSID("$Id: ed.term.c,v 1.33 2005/08/02 21:04:50 christos Exp $")
 
 #include "ed.h"
 
@@ -84,7 +84,7 @@ ttyperm_t ttylist = {
     }
 };
 
-static struct tcshmodes {
+static const struct tcshmodes {
     const char *m_name;
 #ifdef SOLARIS2
     unsigned long m_value;
@@ -568,31 +568,34 @@ static struct tcshmodes {
 #endif
 
 /* Retry a system call */
-static int count;
-#define RETRY(x) \
-   for (count = 0;; count++) \
-	if ((x) == -1) { \
-	    if (OKERROR(errno) || KLUDGE) \
-		continue; \
-	    else \
-		return -1; \
-	} \
-	else \
-	   break \
+#define RETRY(x)				\
+do {						\
+    int count;					\
+						\
+    for (count = 0;; count++)			\
+	if ((x) == -1) {			\
+	    if (OKERROR(errno) || KLUDGE)	\
+		continue;			\
+	    else				\
+		return -1;			\
+	}					\
+	else					\
+	    break;				\
+} while (0)
 
 /*ARGSUSED*/
 void
 dosetty(Char **v, struct command *t)
 {
-    struct tcshmodes *m;
-    char x, *d;
+    const struct tcshmodes *m;
+    char x, *d, *cmdname;
     int aflag = 0;
     Char *s;
     int z = EX_IO;
-    char cmdname[BUFSIZE];
 
     USE(t);
-    setname(strcpy(cmdname, short2str(*v++)));
+    cmdname = strsave(short2str(*v++));
+    setname(cmdname);
 
     while (v && *v && v[0][0] == '-' && v[0][2] == '\0') 
 	switch (v[0][1]) {
@@ -613,6 +616,7 @@ dosetty(Char **v, struct command *t)
 	    z = QU_IO;
 	    break;
 	default:
+	    xfree(cmdname);
 	    stderror(ERR_NAME | ERR_SYSTEM, short2str(v[0]), 
 		     CGETS(8, 1, "Unknown switch"));
 	    break;
@@ -648,6 +652,7 @@ dosetty(Char **v, struct command *t)
 	    }
 	}
 	xputchar('\n');
+	xfree(cmdname);
 	return;
     }
     while (v && (s = *v++)) {
@@ -682,6 +687,7 @@ dosetty(Char **v, struct command *t)
 	    break;
 	}
     }
+    xfree(cmdname);
 } /* end dosetty */
 
 int

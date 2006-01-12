@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.62 2005/04/11 22:10:58 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.63 2005/11/02 17:27:26 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.62 2005/04/11 22:10:58 kim Exp $")
+RCSID("$Id: sh.set.c,v 3.63 2005/11/02 17:27:26 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -50,7 +50,7 @@ static	void		 asx		(Char *, int, Char *);
 static	struct varent 	*getvx		(Char *, int);
 static	Char		*xset		(Char *, Char ***);
 static	Char		*operate	(int, Char *, Char *);
-static	void	 	 putn1		(int);
+static	void	 	 putn1		(unsigned);
 static	struct varent	*madrof		(Char *, struct varent *);
 static	void		 unsetv1	(struct varent *);
 static	void		 exportpath	(Char **);
@@ -255,10 +255,6 @@ doset(Char **v, struct command *c)
 		continue;
 	if (vp == p || !letter(*vp))
 	    stderror(ERR_NAME | ERR_VARBEGIN);
-	if ((p - vp) > MAXVARLEN) {
-	    stderror(ERR_NAME | ERR_VARTOOLONG);
-	    return;
-	}
 	if (*p == '[') {
 	    hadsub++;
 	    p = getinx(p, &subscr);
@@ -366,8 +362,6 @@ dolet(Char **v, struct command *dummy)
 		continue;
 	if (vp == p || !letter(*vp))
 	    stderror(ERR_NAME | ERR_VARBEGIN);
-	if ((p - vp) > MAXVARLEN)
-	    stderror(ERR_NAME | ERR_VARTOOLONG);
 	if (*p == '[') {
 	    hadsub++;
 	    p = getinx(p, &subscr);
@@ -394,19 +388,25 @@ dolet(Char **v, struct command *dummy)
 	else {
 	    c = *p++;
 	    if (any("+-", c)) {
-		if (c != op || *p)
+		if (c != op || *p) {
+		    xfree(vp);
 		    stderror(ERR_NAME | ERR_UNKNOWNOP);
+		}
 		p = Strsave(STR1);
 	    }
 	    else {
 		if (any("<>", op)) {
-		    if (c != op)
+		    if (c != op) {
+			xfree(vp);
 			stderror(ERR_NAME | ERR_UNKNOWNOP);
-		    c = *p++;
+		    }
+		    xfree(vp);
 		    stderror(ERR_NAME | ERR_SYNTAX);
 		}
-		if (c != '=')
+		if (c != '=') {
+		    xfree(vp);
 		    stderror(ERR_NAME | ERR_UNKNOWNOP);
+		}
 		p = xset(p, &v);
 	    }
 	}
@@ -470,41 +470,25 @@ operate(int op, Char *vp, Char *p)
     return (putn(i));
 }
 
-static Char *putp, nbuf[50];
+static Char *putp;
 
 Char   *
 putn(int n)
 {
-    int     num;
+    Char nbuf[(CHAR_BIT * sizeof (n) + 2) / 3 + 2]; /* Enough even for octal */
 
     putp = nbuf;
     if (n < 0) {
 	n = -n;
 	*putp++ = '-';
     }
-    num = 2;			/* confuse lint */
-    if (sizeof(int) == num && ((unsigned int) n) == 0x8000) {
-	*putp++ = '3';
-	n = 2768;
-#ifdef pdp11
-    }
-#else /* !pdp11 */
-    }
-    else {
-	num = 4;		/* confuse lint */
-	if (sizeof(int) == num && ((unsigned int) n) == 0x80000000) {
-	    *putp++ = '2';
-	    n = 147483648;
-	}
-    }
-#endif /* pdp11 */
     putn1(n);
     *putp = 0;
     return (Strsave(nbuf));
 }
 
 static void
-putn1(int n)
+putn1(unsigned n)
 {
     if (n > 9)
 	putn1(n / 10);
@@ -565,7 +549,7 @@ madrof(Char *pat, struct varent *vp)
 }
 
 struct varent *
-adrof1(Char *name, struct varent *v)
+adrof1(const Char *name, struct varent *v)
 {
     int cmp;
 
@@ -598,10 +582,11 @@ set1(Char *var, Char **vec, struct varent *head, int flags)
     Char **oldv = vec;
 
     if ((flags & VAR_NOGLOB) == 0) {
-	gflag = 0;
-	tglob(oldv);
+	int gflag;
+
+	gflag = tglob(oldv);
 	if (gflag) {
-	    vec = globall(oldv);
+	    vec = globall(oldv, gflag);
 	    if (vec == 0) {
 		blkfree(oldv);
 		stderror(ERR_NAME | ERR_NOMATCH);
@@ -854,34 +839,22 @@ shift(Char **v, struct command *c)
     update_vars(name);
 }
 
-static Char STRsep[2] = { PATHSEP, '\0' };
-
 static void
 exportpath(Char **val)
 {
-  Char    	*exppath;
-  size_t	exppath_size = BUFSIZE;
-  exppath = (Char *)xmalloc(sizeof(Char)*exppath_size);
+    struct Strbuf buf = Strbuf_INIT;
+    Char    	*exppath;
 
-    exppath[0] = 0;
     if (val)
 	while (*val) {
-	  while (Strlen(*val) + Strlen(exppath) + 2 > exppath_size) {
-	    if ((exppath
-		 = (Char *)xrealloc(exppath, sizeof(Char)*(exppath_size *= 2)))
-		 == NULL) {
-		xprintf(CGETS(18, 1,
-			      "Warning: ridiculously long PATH truncated\n"));
-		break;
-	      }
-	    }
-	    (void) Strcat(exppath, *val++);
+	    Strbuf_append(&buf, *val++);
 	    if (*val == 0 || eq(*val, STRRparen))
-	      break;
-	    (void) Strcat(exppath, STRsep);
-	  }
-  tsetenv(STRKPATH, exppath);
-  free(exppath);
+		break;
+	    Strbuf_append1(&buf, PATHSEP);
+	}
+    exppath = Strbuf_finish(&buf);
+    tsetenv(STRKPATH, exppath);
+    xfree(exppath);
 }
 
 #ifndef lint

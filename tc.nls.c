@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.14 2005/11/11 18:26:48 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.15 2006/01/12 18:06:34 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.nls.c,v 3.14 2005/11/11 18:26:48 christos Exp $")
+RCSID("$Id: tc.nls.c,v 3.15 2006/01/12 18:06:34 christos Exp $")
 
 #if defined(SHORT_STRINGS) && defined(NLS)
 int
@@ -52,9 +52,11 @@ NLSWidth(NLSChar c)
 
 #if defined(WIDE_STRINGS) || (defined(SHORT_STRINGS) && !defined(NLS))
 Char *
-NLSChangeCase(Char *p, int mode)
+NLSChangeCase(const Char *p, int mode)
 {
-    Char c, *op = p, *n, c2 = 0;
+    Char c, *n, c2 = 0;
+    const Char *op = p;
+
     for (; (c = *p) != 0; p++) {
         if (mode == 0 && Islower(c)) {
 	    c2 = Toupper(c);
@@ -72,7 +74,7 @@ NLSChangeCase(Char *p, int mode)
 }
 
 int
-NLSExtend(Char *from, int max, int num)
+NLSExtend(const Char *from, int max, int num)
 {
     (void)from;
     num = abs (num);
@@ -85,7 +87,7 @@ NLSExtend(Char *from, int max, int num)
 #ifdef WIDE_STRINGS
 
 int
-NLSStringWidth(Char *s)
+NLSStringWidth(const Char *s)
 {
     int w = 0, c, l;
     while (*s) {
@@ -131,7 +133,7 @@ NLSFrom(const Char *p, size_t l, NLSChar *cp)
 }
 
 int
-NLSFinished(Char *p, size_t l, eChar extra)
+NLSFinished(const Char *p, size_t l, eChar extra)
 {
 #ifdef HAVE_MBRTOWC
     size_t i, r; 
@@ -156,7 +158,7 @@ NLSFinished(Char *p, size_t l, eChar extra)
 }
 
 int
-NLSChars(Char *s)
+NLSChars(const Char *s)
 {
     int l;
     for (l = 0; *s; l++)
@@ -165,7 +167,7 @@ NLSChars(Char *s)
 }
 
 int
-NLSStringWidth(Char *s)
+NLSStringWidth(const Char *s)
 {
     int w = 0;
     NLSChar c;
@@ -198,7 +200,7 @@ NLSTo(Char *p, NLSChar c)
 
 
 int
-NLSExtend(Char *from, int max, int num)
+NLSExtend(const Char *from, int max, int num)
 {
     int l, n, i;
     Char *p;
@@ -254,12 +256,14 @@ NLSQuote(Char *cp)
 }
 
 Char *
-NLSChangeCase(Char *p, int mode)
+NLSChangeCase(const Char *p, int mode)
 {
 #ifdef HAVE_WINT_T
-    Char *n, *op = p;
+    Char *n;
+    const Char *op = p;
     NLSChar c, c2 = 0;
-    int l, l2;
+    size_t l;
+    int l2;
 
     while (*p) {
 	l = NLSFrom(p, NLSZEROT, &c);

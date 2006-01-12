@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.64 2005/04/11 22:10:56 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.65 2005/08/02 18:16:44 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.64 2005/04/11 22:10:56 kim Exp $")
+RCSID("$Id: sh.exec.c,v 3.65 2005/08/02 18:16:44 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -151,7 +151,7 @@ doexec(struct command *t, int do_glob)
 {
     Char *dp, **pv, **av, *sav;
     struct varent *v;
-    int slash;
+    int slash, gflag;
     int hashval, i;
     Char   *blk[2];
 
@@ -164,9 +164,9 @@ doexec(struct command *t, int do_glob)
     blk[1] = 0;
     gflag = 0;
     if (do_glob)
-	tglob(blk);
+	gflag = tglob(blk);
     if (gflag) {
-	pv = globall(blk);
+	pv = globall(blk, gflag);
 	if (pv == 0) {
 	    setname(short2str(blk[0]));
 	    stderror(ERR_NAME | ERR_NOMATCH);
@@ -197,9 +197,9 @@ doexec(struct command *t, int do_glob)
     gflag = 0;
     av = &t->t_dcom[1];
     if (do_glob)
-	tglob(av);
+	gflag = tglob(av);
     if (gflag) {
-	av = globall(av);
+	av = globall(av, gflag);
 	if (av == 0) {
 	    blkfree(pv);
 	    setname(short2str(expath));
@@ -899,21 +899,21 @@ cont:
  * This is a bit kludgy, but in the name of optimization...
  */
 int
-executable(Char *dir, Char *name, int dir_ok)
+executable(const Char *dir, const Char *name, int dir_ok)
 {
     struct stat stbuf;
-    Char    path[MAXPATHLEN + 1];
     char   *strname;
-    (void) memset(path, 0, sizeof(path));
 
     if (dir && *dir) {
-	copyn(path, dir, MAXPATHLEN);
-	catn(path, name, MAXPATHLEN);
+	Char *path;
+
+	path = Strspl(dir, name);
 	strname = short2str(path);
+	xfree(path);
     }
     else
 	strname = short2str(name);
-    
+
     return (stat(strname, &stbuf) != -1 &&
 	    ((dir_ok && S_ISDIR(stbuf.st_mode)) ||
 	     (S_ISREG(stbuf.st_mode) &&
@@ -925,10 +925,10 @@ executable(Char *dir, Char *name, int dir_ok)
 #endif /*!WINNT_NATIVE*/
 
 int
-tellmewhat(struct wordent *lexp, Char *str)
+tellmewhat(struct wordent *lexp, Char **str)
 {
     int i;
-    struct biltins *bptr;
+    const struct biltins *bptr;
     struct wordent *sp = lexp->next;
     int    aliased = 0, found;
     Char   *s0, *s1, *s2, *cmd;
@@ -976,8 +976,8 @@ tellmewhat(struct wordent *lexp, Char *str)
 			      sp->word);
 		flush();
 	    }
-	    else 
-		(void) Strcpy(str, sp->word);
+	    else
+		*str = Strsave(sp->word);
 	    sp->word = s0;	/* we save and then restore this */
 	    return TRUE;
 	}
@@ -992,8 +992,8 @@ tellmewhat(struct wordent *lexp, Char *str)
 			      sp->word);
 		flush();
 	    }
-	    else 
-		(void) Strcpy(str, sp->word);
+	    else
+		*str = Strsave(sp->word);
 	    sp->word = s0;	/* we save and then restore this */
 	    return TRUE;
 	}
@@ -1027,12 +1027,12 @@ tellmewhat(struct wordent *lexp, Char *str)
 	else {
 	    s1 = Strspl(*pv, STRslash);
 	    sp->word = Strspl(s1, sp->word);
-	    xfree((ptr_t) s1);
+	    xfree(s1);
 	    if (str == NULL)
 		prlex(lexp);
 	    else
-		(void) Strcpy(str, sp->word);
-	    xfree((ptr_t) sp->word);
+		*str = Strsave(sp->word);
+	    xfree(sp->word);
 	}
 	found = 1;
     }
@@ -1044,11 +1044,11 @@ tellmewhat(struct wordent *lexp, Char *str)
 	    flush();
 	}
 	else
-	    (void) Strcpy(str, sp->word);
+	    *str = Strsave(sp->word);
 	found = 0;
     }
     sp->word = s0;		/* we save and then restore this */
-    xfree((ptr_t) cmd);
+    xfree(cmd);
     return found;
 }
 
@@ -1077,7 +1077,7 @@ int
 find_cmd(Char *cmd, int prt)
 {
     struct varent *var;
-    struct biltins *bptr;
+    const struct biltins *bptr;
     Char **pv;
     Char *sv;
     int hashval, i, ex, rval = 0;

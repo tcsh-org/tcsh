@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.39 2005/02/15 21:09:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.40 2005/04/11 22:10:55 kim Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.39 2005/02/15 21:09:02 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.40 2005/04/11 22:10:55 kim Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -340,7 +340,7 @@ Refresh(void)
     Char    oldgetting;
 
 #ifdef DEBUG_REFRESH
-    dprintf("PromptBuf = :%s:\r\n", short2str(PromptBuf));
+    dprintf("Prompt = :%s:\r\n", short2str(Prompt));
     dprintf("InputBuf = :%s:\r\n", short2str(InputBuf));
 #endif /* DEBUG_REFRESH */
     oldgetting = GettingInput;
@@ -349,14 +349,14 @@ Refresh(void)
     /* reset the Vdraw cursor, temporarily draw rprompt to calculate its size */
     vcursor_h = 0;
     vcursor_v = 0;
-    RefreshPromptpart(RPromptBuf);
+    RefreshPromptpart(RPrompt);
     rprompt_h = vcursor_h;
     rprompt_v = vcursor_v;
 
     /* reset the Vdraw cursor, draw prompt */
     vcursor_h = 0;
     vcursor_v = 0;
-    RefreshPromptpart(PromptBuf);
+    RefreshPromptpart(Prompt);
     cur_h = -1;			/* set flag in case I'm not set */
 
     /* draw the current input buffer */
@@ -383,7 +383,7 @@ Refresh(void)
 			 */
 	while (--rhdiff > 0)		/* pad out with spaces */
 	    Vdraw(' ', 1);
-	RefreshPromptpart(RPromptBuf);
+	RefreshPromptpart(RPrompt);
     }
     else {
 	rprompt_h = 0;			/* flag "not using rprompt" */
@@ -1131,13 +1131,13 @@ RefCursor(void)
     v = 0;
     th = TermH;			/* optimize for speed */
 
-    for (cp = PromptBuf; *cp; ) {	/* do prompt */
+    for (cp = Prompt; *cp; ) {	/* do prompt */
 	if (*cp & LITERAL) {
 	    cp++;
 	    continue;
 	}
 	l = NLSFrom(cp, NLSZEROT, &c);
-	w = NLSClassify(c, cp == PromptBuf);
+	w = NLSClassify(c, cp == Prompt);
 	cp += l;
 	switch(w) {
 	    case NLSCLASS_NL:

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.45 2005/04/11 22:11:00 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.46 2005/08/02 19:59:27 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.45 2005/04/11 22:11:00 kim Exp $")
+RCSID("$Id: tc.who.c,v 3.46 2005/08/02 19:59:27 christos Exp $")
 
 #include "tc.h"
 
@@ -527,24 +527,26 @@ print_who(struct who *wp)
     Char   *cp = str2short(CGETS(26, 8, "%n has %a %l."));
 #endif /* HAVE_STRUCT_UTMP_UT_HOST */
     struct varent *vp = adrof(STRwho);
-    Char buf[BUFSIZE];
+    Char *str;
 
     if (vp && vp->vec && vp->vec[0])
 	cp = vp->vec[0];
 
-    tprintf(FMT_WHO, buf, cp, BUFSIZE, NULL, wp->who_time, (ptr_t) wp);
-    for (cp = buf; *cp;)
+    str = tprintf(FMT_WHO, cp, NULL, wp->who_time, wp);
+    for (cp = str; *cp;)
 	xputwchar(*cp++);
+    xfree(str);
     xputchar('\n');
 } /* end print_who */
 
 
-const char *
-who_info(ptr_t ptr, int c, char *wbuf, size_t wbufsiz)
+char *
+who_info(ptr_t ptr, int c)
 {
-    struct who *wp = (struct who *) ptr;
+    struct who *wp = ptr;
+    char *wbuf;
 #ifdef HAVE_STRUCT_UTMP_UT_HOST
-    char *wb = wbuf;
+    char *wb;
     int flg;
     char *pb;
 #endif /* HAVE_STRUCT_UTMP_UT_HOST */
@@ -554,9 +556,9 @@ who_info(ptr_t ptr, int c, char *wbuf, size_t wbufsiz)
 	switch (wp->who_status & STMASK) {
 	case ONLINE:
 	case CHANGED:
-	    return wp->who_new;
+	    return strsave(wp->who_new);
 	case OFFLINE:
-	    return wp->who_name;
+	    return strsave(wp->who_name);
 	default:
 	    break;
 	}
@@ -565,13 +567,11 @@ who_info(ptr_t ptr, int c, char *wbuf, size_t wbufsiz)
     case 'a':
 	switch (wp->who_status & STMASK) {
 	case ONLINE:
-	    return CGETS(26, 9, "logged on");
+	    return strsave(CGETS(26, 9, "logged on"));
 	case OFFLINE:
-	    return CGETS(26, 10, "logged off");
+	    return strsave(CGETS(26, 10, "logged off"));
 	case CHANGED:
-	    xsnprintf(wbuf, wbufsiz, CGETS(26, 11, "replaced %s on"),
-		      wp->who_name);
-	    return wbuf;
+	    return xasprintf(CGETS(26, 11, "replaced %s on"), wp->who_name);
 	default:
 	    break;
 	}
@@ -580,12 +580,14 @@ who_info(ptr_t ptr, int c, char *wbuf, size_t wbufsiz)
 #ifdef HAVE_STRUCT_UTMP_UT_HOST
     case 'm':
 	if (wp->who_host[0] == '\0')
-	    return CGETS(26, 12, "local");
+	    return strsave(CGETS(26, 12, "local"));
 	else {
+	    pb = wp->who_host;
+	    wbuf = xmalloc(strlen(pb) + 1);
+	    wb = wbuf;
 	    /* the ':' stuff is for <host>:<display>.<screen> */
-	    for (pb = wp->who_host,
-		flg = isdigit((unsigned char)*pb) ? '\0' : '.';
-		*pb != '\0' && (*pb != flg || ((pb = strchr(pb, ':')) != 0));
+	    for (flg = isdigit((unsigned char)*pb) ? '\0' : '.';
+		 *pb != '\0' && (*pb != flg || ((pb = strchr(pb, ':')) != 0));
 		 pb++) {
 		if (*pb == ':')
 		    flg = '\0';
@@ -598,9 +600,12 @@ who_info(ptr_t ptr, int c, char *wbuf, size_t wbufsiz)
 
     case 'M':
 	if (wp->who_host[0] == '\0')
-	    return CGETS(26, 12, "local");
+	    return strsave(CGETS(26, 12, "local"));
 	else {
-	    for (pb = wp->who_host; *pb != '\0'; pb++)
+	    pb = wp->who_host;
+	    wbuf = xmalloc(strlen(pb) + 1);
+	    wb = wbuf;
+	    for (; *pb != '\0'; pb++)
 		*wb++ = isupper((unsigned char)*pb) ?
 		    tolower((unsigned char)*pb) : *pb;
 	    *wb = '\0';
@@ -609,9 +614,10 @@ who_info(ptr_t ptr, int c, char *wbuf, size_t wbufsiz)
 #endif /* HAVE_STRUCT_UTMP_UT_HOST */
 
     case 'l':
-	return wp->who_tty;
+	return strsave(wp->who_tty);
 
     default:
+	wbuf = xmalloc(3);
 	wbuf[0] = '%';
 	wbuf[1] = (char) c;
 	wbuf[2] = '\0';

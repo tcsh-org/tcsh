@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/vms.termcap.c,v 1.8 2005/03/03 16:49:16 kim Exp $ */
+/* $Header: /src/pub/tcsh/vms.termcap.c,v 1.9 2005/04/11 22:11:01 kim Exp $ */
 /*
  *	termcap.c	1.1	20/7/87		agc	Joypace Ltd
  *
@@ -9,7 +9,7 @@
  *	A public domain implementation of the termcap(3) routines.
  */
 #include "sh.h"
-RCSID("$Id: vms.termcap.c,v 1.8 2005/03/03 16:49:16 kim Exp $")
+RCSID("$Id: vms.termcap.c,v 1.9 2005/04/11 22:11:01 kim Exp $")
 #if defined(_VMS_POSIX) || defined(_OSD_POSIX)
 /*    efth      1988-Apr-29
 
@@ -51,8 +51,8 @@ tgetent(char *bp, char *name)
 	char	*termfile;
 	char	*cp,
 		*ptr,		/* temporary pointer */
-		tmp[1024];	/* buffer for terminal name */
-	short	len = strlen(name);
+		tmp[1024];	/* buffer for terminal name *//*FIXBUF*/
+	size_t	len = strlen(name);
 
 	capab = bp;
 
@@ -77,7 +77,7 @@ tgetent(char *bp, char *name)
 		and then append the next line. */
 		while (*(cp = &bp[strlen(bp) - 2]) == '\\')
 			fgets(cp, 1024, fp);
-		
+
 		/* Skip over any spaces or tabs */
 		for (++cp ; ISSPACE(*cp) ; cp++);
 
@@ -118,7 +118,6 @@ sscanf to look at aliases.  These are delimited by '|'. */
 	sleep(1);
 #endif /* DEBUG */
 	return(0);
-	
 }
 
 /*

@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/console.c,v 1.5 2002/09/13 05:27:10 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/console.c,v 1.6 2004/05/19 18:22:27 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -168,7 +168,7 @@ int nt_ClearEOL( void) {
 	CONSOLE_SCREEN_BUFFER_INFO scrbuf;
 	HANDLE hStdout =ghstdout ;
 	DWORD numwrote;
-	char errbuf[128];
+	char errbuf[128];/*FIXME: uninitialized*/
 	int num=0;
 	COORD savepos;
 

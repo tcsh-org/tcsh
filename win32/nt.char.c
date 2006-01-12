@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.char.c,v 1.4 2004/05/19 18:22:28 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/nt.char.c,v 1.5 2005/03/25 18:46:42 kim Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -76,8 +76,8 @@ char * nt_cgets(int set, int msgnum, char *def) {
 
 	int rc;
 	int mesg;
-	static char oembuf[256];
-	WCHAR buffer[256];
+	static char oembuf[256];/*FIXBUF*/
+	WCHAR buffer[256];/*FIXBUF*/
 
 
 

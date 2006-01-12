@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.34 2005/01/18 20:24:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.35 2005/04/11 22:10:58 kim Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.34 2005/01/18 20:24:50 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.35 2005/04/11 22:10:58 kim Exp $")
 
 static	int	renum	(int, int);
 static  Char  **blkend	(Char **);
@@ -54,27 +54,33 @@ any(const char *s, Char c)
 }
 
 void
-setzero(char *cp, int i)
+setzero(void *p, size_t size)
 {
-    if (i != 0)
-	do
-	    *cp++ = 0;
-	while (--i);
+    memset(p, 0, size);
+}
+
+char *
+strnsave(const char *s, size_t len)
+{
+    char *r;
+
+    r = xmalloc(len + 1);
+    memcpy(r, s, len);
+    r[len] = '\0';
+    return r;
 }
 
 char   *
 strsave(const char *s)
 {
-    char   *n, *r;
-    const char *p;
+    char   *r;
+    size_t size;
 
     if (s == NULL)
 	s = "";
-    for (p = s; *p++ != '\0';)
-	continue;
-    r = n = (char *) xmalloc((size_t)((((const char *) p) - s) * sizeof(char)));
-    while ((*n++ = *s++) != '\0')
-	continue;
+    size = strlen(s) + 1;
+    r = xmalloc(size);
+    memcpy(r, s, size);
     return (r);
 }
 
@@ -89,7 +95,7 @@ blkend(Char **up)
 
 
 void
-blkpr(Char **av)
+blkpr(Char *const *av)
 {
 
     for (; *av; av++) {
@@ -99,15 +105,17 @@ blkpr(Char **av)
     }
 }
 
-void
-blkexpand(Char **av, Char *str)
+Char *
+blkexpand(Char *const *av)
 {
-    *str = '\0';
+    struct Strbuf buf = Strbuf_INIT;
+
     for (; *av; av++) {
-	(void) Strcat(str, *av);
+	Strbuf_append(&buf, *av);
 	if (av[1])
-	    (void) Strcat(str, STRspace);
+	    Strbuf_append1(&buf, ' ');
     }
+    return Strbuf_finish(&buf);
 }
 
 int
@@ -172,14 +180,13 @@ strstr(const char *s, const char *t)
 
 	do
 	    if (*tt == '\0')
-		return ((char *) s);
+		return (s);
 	while (*ss++ == *tt++);
     } while (*s++ != '\0');
     return (NULL);
 }
 #endif /* !HAVE_STRSTR */
 
-#ifndef SHORT_STRINGS
 char   *
 strspl(const char *cp, const char *dp)
 {
@@ -192,20 +199,16 @@ strspl(const char *cp, const char *dp)
 	dp = "";
     cl = strlen(cp);
     dl = strlen(dp);
-    ep = (char *) xmalloc((cl + dl + 1) * sizeof(char));
+    ep = xmalloc((cl + dl + 1) * sizeof(char));
     memcpy(ep, cp, cl);
     memcpy(ep + cl, dp, dl + 1);
     return (ep);
 }
 
-#endif /* !SHORT_STRINGS */
-
 Char  **
 blkspl(Char **up, Char **vp)
 {
-    Char **wp =
-    (Char **) xcalloc((size_t) (blklen(up) + blklen(vp) + 1),
-		      sizeof(Char **));
+    Char **wp = xcalloc(blklen(up) + blklen(vp) + 1, sizeof(Char **));
 
     (void) blkcpy(wp, up);
     return (blkcat(wp, vp));
@@ -401,24 +404,20 @@ number(Char *cp)
 Char  **
 copyblk(Char **v)
 {
-    Char **nv =
-    (Char **) xcalloc((size_t) (blklen(v) + 1), sizeof(Char **));
+    Char **nv = xcalloc(blklen(v) + 1, sizeof(Char **));
 
     return (blkcpy(nv, v));
 }
 
-#ifndef SHORT_STRINGS
 char   *
-strend(char *cp)
+strend(const char *cp)
 {
     if (!cp)
-	return (cp);
+	return ((char *)cp);
     while (*cp)
 	cp++;
-    return (cp);
+    return ((char *)cp);
 }
-
-#endif /* SHORT_STRINGS */
 
 Char   *
 strip(Char *cp)
@@ -444,17 +443,17 @@ quote(Char *cp)
     return (cp);
 }
 
-Char   *
-quote_meta(Char *d, const Char *s)
+const Char *
+quote_meta(struct Strbuf *buf, const Char *s)
 {
-    Char *r = d;
+    buf->len = 0;
     while (*s != '\0') {
 	if (cmap(*s, _META | _DOL | _QF | _QB | _ESC | _GLOB))
-		*d++ = '\\';
-	*d++ = *s++;
+	    Strbuf_append1(buf, '\\');
+	Strbuf_append1(buf, *s++);
     }
-    *d = '\0';
-    return r;
+    Strbuf_terminate(buf);
+    return buf->s;
 }
 
 void
@@ -477,4 +476,29 @@ prefix(const Char *sub, const Char *str)
 	if ((*sub++ & TRIM) != (*str++ & TRIM))
 	    return (0);
     }
+}
+
+char *
+areadlink(const char *path)
+{
+    char *buf;
+    size_t size;
+    ssize_t res;
+
+    size = MAXPATHLEN + 1;
+    buf = xmalloc(size);
+    while ((size_t)(res = readlink(path, buf, size)) == size) {
+	size *= 2;
+	buf = xrealloc(buf, size);
+    }
+    if (res == -1) {
+	int err;
+
+	err = errno;
+	xfree(buf);
+	errno = err;
+	return NULL;
+    }
+    buf[res] = '\0';
+    return xrealloc(buf, res + 1);
 }

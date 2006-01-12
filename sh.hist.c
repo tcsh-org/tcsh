@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.hist.c,v 3.33 2004/12/25 21:15:07 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.hist.c,v 3.34 2005/04/11 22:10:57 kim Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,15 +32,15 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.33 2004/12/25 21:15:07 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.34 2005/04/11 22:10:57 kim Exp $")
 
 #include "tc.h"
 
 extern int histvalid;
-extern Char histline[];
+extern struct Strbuf histline;
 Char HistLit = 0;
 
-static	int	heq	(struct wordent *, struct wordent *);
+static	int	heq	(const struct wordent *, const struct wordent *);
 static	void	hfree	(struct Hist *);
 static	void	dohist1	(struct Hist *, int *, int);
 static	void	phist	(struct Hist *, int);
@@ -68,16 +68,12 @@ savehist(struct wordent *sp, int mflg)
     if (sp && sp->next->word[0] == '\n')
 	return;
     cp = varval(STRhistory);
-    if (*cp) {
-	Char *p = cp;
-
-	while (*p) {
-	    if (!Isdigit(*p)) {
-		histlen = 0;
-		break;
-	    }
-	    histlen = histlen * 10 + *p++ - '0';
+    while (*cp) {
+	if (!Isdigit(*cp)) {
+	    histlen = 0;
+	    break;
 	}
+	histlen = histlen * 10 + *cp++ - '0';
     }
     if (sp)
 	(void) enthist(++eventno, sp, 1, mflg);
@@ -89,9 +85,9 @@ savehist(struct wordent *sp, int mflg)
 }
 
 static int
-heq(struct wordent *a0, struct wordent *b0)
+heq(const struct wordent *a0, const struct wordent *b0)
 {
-    struct wordent *a = a0->next, *b = b0->next;
+    const struct wordent *a = a0->next, *b = b0->next;
 
     for (;;) {
 	if (Strcmp(a->word, b->word) != 0)
@@ -112,7 +108,7 @@ enthist(int event, struct wordent *lp, int docopy, int mflg)
     struct Hist *p = NULL, *pp = &Histlist;
     int n, r;
     struct Hist *np;
-    Char *dp;
+    const Char *dp;
     
     if ((dp = varval(STRhistdup)) != STRNULL) {
 	if (eq(dp, STRerase)) {
@@ -162,7 +158,7 @@ enthist(int event, struct wordent *lp, int docopy, int mflg)
     if (docopy) {
 	copylex(&np->Hlex, lp);
 	if (histvalid)
-	    np->histline = Strsave(histline);
+	    np->histline = Strsave(histline.s);
 	else
 	    np->histline = NULL;
     }
@@ -325,55 +321,52 @@ phist(struct Hist *hp, int hflg)
     }
     else {
 	Char   *cp = str2short("%h\t%T\t%R\n");
-	Char buf[INBUFSIZE];
+	Char *p;
 	struct varent *vp = adrof(STRhistory);
 
 	if (vp && vp->vec != NULL && vp->vec[0] && vp->vec[1])
 	    cp = vp->vec[1];
 
-	tprintf(FMT_HISTORY, buf, cp, INBUFSIZE, NULL, hp->Htime, (ptr_t) hp);
-	for (cp = buf; *cp;)
+	p = tprintf(FMT_HISTORY, cp, NULL, hp->Htime, hp);
+	for (cp = p; *cp;)
 	    xputwchar(*cp++);
+	xfree(p);
     }
 }
 
 
-void
-fmthist(int fmt, ptr_t ptr, char *buf, size_t bufsiz)
+char *
+fmthist(int fmt, ptr_t ptr)
 {
-    struct Hist *hp = (struct Hist *) ptr;
+    struct Hist *hp = ptr;
+    char *buf;
+
     switch (fmt) {
     case 'h':
-	(void) xsnprintf(buf, bufsiz, "%6d", hp->Hnum);
-	break;
+	return xasprintf("%6d", hp->Hnum);
     case 'R':
 	if (HistLit && hp->histline)
-	    (void) xsnprintf(buf, bufsiz, "%S", hp->histline);
+	    return xasprintf("%S", hp->histline);
 	else {
-	    Char ibuf[INBUFSIZE], *ip;
+	    Char *istr, *ip;
 	    char *p;
-	    (void) sprlex(ibuf, sizeof(ibuf) / sizeof(Char), &hp->Hlex);
+	    istr = sprlex(&hp->Hlex);
+	    buf = xmalloc(Strlen(istr) * MB_LEN_MAX + 1);
 	    p = buf;
-	    ip = ibuf;
-	    do {
-	        char xbuf[MB_LEN_MAX];
-		size_t len;
-
-		len = one_wctomb(xbuf, CHAR & *ip);
-		if ((size_t)((p - buf) + len) >= bufsiz)
-		    break;
-		memcpy(p, xbuf, len);
-		p += len;
-	    } while ((CHAR & *ip++) != 0);
-	    if (p <= buf + bufsiz - 1)
-	        *p = '\0';
+	    ip = istr;
+	    do
+		p += one_wctomb(p, CHAR & *ip);
+	    while ((CHAR & *ip++) != 0);
+	    *p = '\0';
+	    xfree(istr);
+	    return buf;
 	}
-	break;
     default:
+	buf = xmalloc(1);
 	buf[0] = '\0';
+	return buf;
 	break;
     }
-	
 }
 
 void

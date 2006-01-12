@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.c,v 3.60 2005/06/08 00:25:05 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.c,v 3.61 2006/01/12 18:06:34 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.60 2005/06/08 00:25:05 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.61 2006/01/12 18:06:34 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -466,9 +466,11 @@ domigrate(Char **v, struct command *c)
 	    err1++;
     }
     else {
-	gflag = 0, tglob(v);
+        int gflag;
+
+	gflag = tglob(v);
 	if (gflag) {
-	    v = globall(v);
+	    v = globall(v, gflag);
 	    if (v == 0)
 		stderror(ERR_NAME | ERR_NOMATCH);
 	}
@@ -784,7 +786,7 @@ dobs2cmd(Char **v, struct command *c)
     struct command faket;
     Char   *fakecom[2];
     char    tibuf[BUFSIZE];
-    int     icnt;
+    int     icnt, gflag;
     static const Char STRbs2cmd[] = { 'b','s','2','c','m','d','\0' };
 
     if (setintr)
@@ -794,9 +796,9 @@ dobs2cmd(Char **v, struct command *c)
 	(void) sigrelse (SIGINT);
 #endif /* BSDSIGS */
     v++;
-    gflag = 0, tglob(v);
+    gflag = tglob(v);
     if (gflag) {
-	v = globall(v);
+	v = globall(v, gflag);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
@@ -857,7 +859,7 @@ dobs2cmd(Char **v, struct command *c)
     (void) close(pvec[1]);
     for(;;) {
         do
-            icnt = read(pvec[0], tibuf, BUFSIZE);
+	    icnt = read(pvec[0], tibuf, sizeof(tibuf));
         while (icnt == -1 && errno == EINTR);
         if (icnt <= 0)
             break;
@@ -993,10 +995,10 @@ pr_stat_sub(struct process_stats *p2, struct process_stats *p1,
 
 #ifndef HAVE_MEMSET
 /* This is a replacement for a missing memset function */
-ptr_t xmemset(ptr_t loc, int value, size_t len)
+void *xmemset(void *loc, int value, size_t len)
 {
-    char *ptr = (char *) loc;
-  
+    char *ptr = loc;
+
     while (len--)
 	*ptr++ = value;
     return loc;
@@ -1010,11 +1012,11 @@ ptr_t xmemset(ptr_t loc, int value, size_t len)
  *	Unlike memcpy(), it handles overlaps between source and 
  *	destination memory
  */
-ptr_t
-xmemmove(ptr_t vdst, const ptr_t vsrc, size_t len)
+void *
+xmemmove(void *vdst, const void *vsrc, size_t len)
 {
-    const char *src = (const char *) vsrc;
-    char *dst = (char *) vdst;
+    const char *src = vsrc;
+    char *dst = vdst;
 
     if (src == dst)
 	return vdst;
@@ -1036,7 +1038,7 @@ xmemmove(ptr_t vdst, const ptr_t vsrc, size_t len)
 
 #ifndef WINNT_NATIVE
 #ifdef NEEDtcgetpgrp
-int
+pid_t
 xtcgetpgrp(int fd)
 {
     int     pgrp;
@@ -1158,13 +1160,13 @@ extern char *sys_errlist[];
 char *
 xstrerror(int i)
 {
-    static char errbuf[128];
-
     if (i >= 0 && i < sys_nerr) {
 	return sys_errlist[i];
     } else {
-	(void) xsnprintf(errbuf, sizeof(errbuf),
-	    CGETS(23, 13, "Unknown Error: %d"), i);
+	static char *errbuf; /* = NULL; */
+
+	xfree(errbuf);
+	errbuf = xasprintf(CGETS(23, 13, "Unknown Error: %d"), i);
 	return errbuf;
     }
 }
@@ -1473,7 +1475,7 @@ strnrcpy(char *ptr, char *str, size_t siz)
 static char *
 apperr(status_$t *st)
 {
-    static char buf[BUFSIZE];
+    static char *buf; /* = NULL */
     short e_subl, e_modl, e_codel;
     error_$string_t e_sub, e_mod, e_code;
 
@@ -1481,7 +1483,8 @@ apperr(status_$t *st)
     e_sub[e_subl] = '\0';
     e_code[e_codel] = '\0';
     e_mod[e_modl] = '\0';
-    (void) xsnprintf(buf, sizeof(buf), "%s (%s/%s)", e_code, e_sub, e_mod);
+    xfree(buf);
+    buf = xasprintf("%s (%s/%s)", e_code, e_sub, e_mod);
 
     return(buf);
 }
@@ -1502,10 +1505,12 @@ llib(Char *s)
 void
 doinlib(Char **v, struct command *c)
 {
+    int gflag;
+
     setname(short2str(*v++));
-    gflag = 0, tglob(v);
+    gflag = tglob(v);
     if (gflag) {
-	v = globall(v);
+	v = globall(v, gflag);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }

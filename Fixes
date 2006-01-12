@@ -1,3 +1,4 @@
+ 31. Use dynamically allocated buffers everywhere (Miloslav Trmac)
  30. Fix reading of invalid byte sequences (Miloslav Trmac)
  29. read should only increment count when it succeeds (Miloslav Trmac)
  28. testsuiteadditions (Miloslav Trmac)

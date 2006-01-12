@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.init.c,v 3.55 2005/01/18 20:43:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.init.c,v 3.56 2005/04/11 22:10:57 kim Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.55 2005/01/18 20:43:31 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.56 2005/04/11 22:10:57 kim Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -41,15 +41,12 @@ RCSID("$Id: sh.init.c,v 3.55 2005/01/18 20:43:31 christos Exp $")
  * C shell
  */
 
-#define	INF	0x7fffffff
+#define	INF INT_MAX
 
-struct	biltins bfunc[] = {
+const struct biltins bfunc[] = {
     { ":",		dozip,		0,	INF	},
     { "@",		dolet,		0,	INF	},
     { "alias",		doalias,	0,	INF	},
-#ifdef OBSOLETE
-    { "aliases",	doaliases,	0,	1,	},
-#endif /* OBSOLETE */
     { "alloc",		showall,	0,	1	},
 #if defined(_CX_UX)
     { "att",		doatt,		0,	INF	},

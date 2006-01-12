@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.init.c,v 3.52 2005/01/18 20:24:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.init.c,v 3.53 2005/04/11 22:10:55 kim Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.52 2005/01/18 20:24:50 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.53 2005/04/11 22:10:55 kim Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -623,7 +623,7 @@ ResetInLine(int macro)
 {
     Cursor = InputBuf;		/* reset cursor */
     LastChar = InputBuf;
-    InputLim = &InputBuf[INBUFSIZE - 2];
+    InputLim = &InputBuf[INBUFSIZE - 2];/*FIXBUF*/
     Mark = InputBuf;
     MetaNext = 0;
     CurrentKeyMap = CcKeyMap;

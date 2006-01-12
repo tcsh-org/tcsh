@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.97 2005/03/03 22:32:01 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.98 2005/04/11 22:10:59 kim Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -87,22 +87,6 @@
 #  include <termios.h>
 # endif /* POSIX */
 #endif /* OREO */
-
-#ifndef NCARGS
-# ifdef _SC_ARG_MAX
-#  define NCARGS sysconf(_SC_ARG_MAX)
-# else /* !_SC_ARG_MAX */
-#  ifdef ARG_MAX
-#   define NCARGS ARG_MAX
-#  else /* !ARG_MAX */
-#   ifdef _MINIX
-#    define NCARGS 80
-#   else /* !_MINIX */
-#    define NCARGS 1024
-#   endif /* _MINIX */
-#  endif /* ARG_MAX */
-# endif /* _SC_ARG_MAX */
-#endif /* NCARGS */
 
 #ifdef convex
 # include <sys/dmon.h>

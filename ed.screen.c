@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.65 2005/04/11 22:10:55 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.66 2005/08/02 21:08:29 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.65 2005/04/11 22:10:55 kim Exp $")
+RCSID("$Id: ed.screen.c,v 3.66 2005/08/02 21:08:29 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -352,69 +352,22 @@ terminit(void)
 static int me_all = 0;		/* does two or more of the attributes use me */
 
 static	void	ReBufferDisplay	(void);
-static	void	TCalloc		(struct termcapstr *, char *);
+static	void	TCset		(struct termcapstr *, const char *);
 
 
 static void
-TCalloc(struct termcapstr *t, char *cap)
+TCset(struct termcapstr *t, const char *cap)
 {
-    static char termcap_alloc[TC_BUFSIZE];
-    char    termbuf[TC_BUFSIZE];
-    struct termcapstr *ts;
-    static int tloc = 0;
-    int     tlen, clen;
-
     if (cap == NULL || *cap == '\0') {
+	xfree(t->str);
 	t->str = NULL;
-	return;
+    } else {
+	size_t size;
+
+	size = strlen(cap) + 1;
+	t->str = xrealloc(t->str, size);
+	memcpy(t->str, cap, size);
     }
-    else
-	clen = strlen(cap);
-
-    if (t->str == NULL)
-	tlen = 0;
-    else
-	tlen = strlen(t->str);
-
-    /*
-     * New string is shorter; no need to allocate space
-     */
-    if (clen <= tlen) {
-	(void) strcpy(t->str, cap);
-	return;
-    }
-
-    /*
-     * New string is longer; see if we have enough space to append
-     */
-    if (tloc + 3 < TC_BUFSIZE) {
-	(void) strcpy(t->str = &termcap_alloc[tloc], cap);
-	tloc += clen + 1;	/* one for \0 */
-	return;
-    }
-
-    /*
-     * Compact our buffer; no need to check compaction, cause we know it
-     * fits...
-     */
-    tlen = 0;
-    for (ts = tstr; ts->name != NULL; ts++)
-	if (t != ts && ts->str != NULL && ts->str[0] != '\0') {
-	    char   *ptr;
-
-	    for (ptr = ts->str; *ptr != '\0'; termbuf[tlen++] = *ptr++)
-		continue;
-	    termbuf[tlen++] = '\0';
-	}
-    (void) memmove((ptr_t) termcap_alloc, (ptr_t) termbuf, (size_t) TC_BUFSIZE);
-    tloc = tlen;
-    if (tloc + 3 >= TC_BUFSIZE) {
-	stderror(ERR_NAME | ERR_TCNOSTR);
-	return;
-    }
-    (void) strcpy(t->str = &termcap_alloc[tloc], cap);
-    tloc += clen + 1;		/* one for \0 */
-    return;
 }
 
 
@@ -459,32 +412,23 @@ ReBufferDisplay(void)
 {
     int i;
     Char **b;
-    Char **bufp;
 
     b = Display;
     Display = NULL;
-    if (b != NULL) {
-	for (bufp = b; *bufp != NULL; bufp++)
-	    xfree((ptr_t) * bufp);
-	xfree((ptr_t) b);
-    }
+    blkfree(b);
     b = Vdisplay;
     Vdisplay = NULL;
-    if (b != NULL) {
-	for (bufp = b; *bufp != NULL; bufp++)
-	    xfree((ptr_t) * bufp);
-	xfree((ptr_t) b);
-    }
+    blkfree(b);
     TermH = Val(T_co);
-    TermV = (INBUFSIZE * 4) / TermH + 1;
-    b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
+    TermV = (INBUFSIZE * 4) / TermH + 1;/*FIXBUF*/
+    b = xmalloc(sizeof(*b) * (TermV + 1));
     for (i = 0; i < TermV; i++)
-	b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
+	b[i] = xmalloc(sizeof(*b[i]) * (TermH + 1));
     b[TermV] = NULL;
     Display = b;
-    b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
+    b = xmalloc(sizeof(*b) * (TermV + 1));
     for (i = 0; i < TermV; i++)
-	b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
+	b[i] = xmalloc(sizeof(*b[i]) * (TermH + 1));
     b[TermV] = NULL;
     Vdisplay = b;
 }
@@ -503,7 +447,7 @@ SetTC(char *what, char *how)
 	if (strcmp(ts->name, what) == 0)
 	    break;
     if (ts->name != NULL) {
-	TCalloc(ts, how);
+	TCset(ts, how);
 	/*
 	 * Reset variables
 	 */
@@ -567,11 +511,11 @@ SetTC(char *what, char *how)
 void
 EchoTC(Char **v)
 {
-    char   *cap, *scap, cv[BUFSIZE];
+    char   *cap, *scap, *cv;
     int     arg_need, arg_cols, arg_rows;
-    int     verbose = 0, silent = 0;
+    int     verbose = 0, silent = 0, gflag;
     char   *area;
-    static const char *fmts = "%s\n", *fmtd = "%d\n";
+    static const char fmts[] = "%s\n", fmtd[] = "%d\n";
     struct termcapstr *t;
     char    buf[TC_BUFSIZE];
 
@@ -579,9 +523,9 @@ EchoTC(Char **v)
 
     setname("echotc");
 
-    tglob(v);
+    gflag = tglob(v);
     if (gflag) {
-	v = globall(v);
+        v = globall(v, gflag);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
@@ -590,7 +534,7 @@ EchoTC(Char **v)
     trim(v);
 
     if (!*v || *v[0] == '\0')
-	return;
+	goto end;
     if (v[0][0] == '-') {
 	switch (v[0][1]) {
 	case 'v':
@@ -606,31 +550,27 @@ EchoTC(Char **v)
 	v++;
     }
     if (!*v || *v[0] == '\0')
-	return;
-    (void) strcpy(cv, short2str(*v));
+	goto end;
+    cv = strsave(short2str(*v));
     if (strcmp(cv, "tabs") == 0) {
 	xprintf(fmts, T_Tabs ? CGETS(7, 14, "yes") :
 		CGETS(7, 15, "no"));
-	flush();
-	return;
+	goto end_flush;
     }
     else if (strcmp(cv, "meta") == 0) {
 	xprintf(fmts, Val(T_km) ? CGETS(7, 14, "yes") :
 		CGETS(7, 15, "no"));
-	flush();
-	return;
+	goto end_flush;
     }
     else if (strcmp(cv, "xn") == 0) {
 	xprintf(fmts, T_Margin & MARGIN_MAGIC ? CGETS(7, 14, "yes") :
 		CGETS(7, 15,  "no"));
-	flush();
-	return;
+	goto end_flush;
     }
     else if (strcmp(cv, "am") == 0) {
 	xprintf(fmts, T_Margin & MARGIN_AUTO ? CGETS(7, 14, "yes") :
 		CGETS(7, 15, "no"));
-	flush();
-	return;
+	goto end_flush;
     }
     else if (strcmp(cv, "baud") == 0) {
 	int     i;
@@ -638,23 +578,19 @@ EchoTC(Char **v)
 	for (i = 0; baud_rate[i].b_name != NULL; i++)
 	    if (T_Speed == baud_rate[i].b_rate) {
 		xprintf(fmts, baud_rate[i].b_name);
-		flush();
-		return;
+		goto end_flush;
 	    }
 	xprintf(fmtd, 0);
-	flush();
-	return;
+	goto end_flush;
     }
     else if (strcmp(cv, "rows") == 0 || strcmp(cv, "lines") == 0 ||
 	strcmp(cv, "li") == 0) {
 	xprintf(fmtd, Val(T_li));
-	flush();
-	return;
+	goto end_flush;
     }
     else if (strcmp(cv, "cols") == 0 || strcmp(cv, "co") == 0) {
 	xprintf(fmtd, Val(T_co));
-	flush();
-	return;
+	goto end_flush;
     }
 
     /* 
@@ -671,10 +607,10 @@ EchoTC(Char **v)
     if (!scap || scap[0] == '\0') {
 	if (tgetflag(cv)) {
 	    xprintf(CGETS(7, 14, "yes\n"));
-	    return;
+	    goto end_cv;
 	}
 	if (silent)
-	    return;
+	    goto end_cv;
 	else
 	    stderror(ERR_NAME | ERR_TCCAP, cv);
     }
@@ -715,7 +651,7 @@ EchoTC(Char **v)
 	v++;
 	if (*v && *v[0]) {
 	    if (silent)
-		return;
+		goto end_cv;
 	    else
 		stderror(ERR_NAME | ERR_TCARGS, cv, arg_need);
 	}
@@ -730,7 +666,7 @@ EchoTC(Char **v)
 	v++;
 	if (*v && *v[0]) {
 	    if (silent)
-		return;
+		goto end_cv;
 	    else
 		stderror(ERR_NAME | ERR_TCARGS, cv, arg_need);
 	}
@@ -745,7 +681,7 @@ EchoTC(Char **v)
 	v++;
 	if (!*v || *v[0] == '\0') {
 	    if (silent)
-		return;
+		goto end_cv;
 	    else
 		stderror(ERR_NAME | ERR_TCNARGS, cv, 2);
 	}
@@ -753,7 +689,7 @@ EchoTC(Char **v)
 	v++;
 	if (!*v || *v[0] == '\0') {
 	    if (silent)
-		return;
+		goto end_cv;
 	    else
 		stderror(ERR_NAME | ERR_TCNARGS, cv, 2);
 	}
@@ -761,14 +697,18 @@ EchoTC(Char **v)
 	v++;
 	if (*v && *v[0]) {
 	    if (silent)
-		return;
+		goto end_cv;
 	    else
 		stderror(ERR_NAME | ERR_TCARGS, cv, arg_need);
 	}
 	(void) tputs(tgoto(scap, arg_cols, arg_rows), arg_rows, PUTRAW);
 	break;
     }
+ end_flush:
     flush();
+ end_cv:
+    xfree(cv);
+ end:
     if (gargv) {
 	blkfree(gargv);
 	gargv = 0;
@@ -930,12 +870,8 @@ PrintArrowKeys(CStr *name)
 
     for (i = 0; i < A_K_NKEYS; i++)
 	if (name->len == 0 || Strcmp(name->buf, arrow[i].name) == 0)
-	    if (arrow[i].type != XK_NOD) {
-		CStr cs;
-		cs.buf = arrow[i].name;
-		cs.len = Strlen(cs.buf);
-		(void) printOne(&cs, &arrow[i].fun, arrow[i].type);
-	    }
+	    if (arrow[i].type != XK_NOD)
+		printOne(arrow[i].name, &arrow[i].fun, arrow[i].type);
 }
 
 
@@ -1466,7 +1402,7 @@ GetTermCaps(void)
 	Val(T_co) = 80;		/* do a dumb terminal */
 	Val(T_pt) = Val(T_km) = Val(T_li) = 0;
 	for (t = tstr; t->name != NULL; t++)
-	    TCalloc(t, NULL);
+	    TCset(t, NULL);
     }
     else {
 	/* Can we tab */
@@ -1478,7 +1414,7 @@ GetTermCaps(void)
 	Val(T_co) = tgetnum("co");
 	Val(T_li) = tgetnum("li");
 	for (t = tstr; t->name != NULL; t++)
-	    TCalloc(t, tgetstr(t->name, &area));
+	    TCset(t, tgetstr(t->name, &area));
     }
     if (Val(T_co) < 2)
 	Val(T_co) = 80;		/* just in case */
@@ -1604,22 +1540,25 @@ ChangeSize(int lins, int cols)
      * our only chance to get the window size right.
      */
     if (Val(T_co) == cols && Val(T_li) == lins) {
-	Char    buf[10];
+	Char   *p;
 	char   *tptr;
 
 	if (getenv("COLUMNS")) {
-	    (void) Itoa(Val(T_co), buf, 0, 0);
-	    tsetenv(STRCOLUMNS, buf);
+	    p = Itoa(Val(T_co), 0, 0);
+	    tsetenv(STRCOLUMNS, p);
+	    xfree(p);
 	}
 
 	if (getenv("LINES")) {
-	    (void) Itoa(Val(T_li), buf, 0, 0);
-	    tsetenv(STRLINES, buf);
+	    p = Itoa(Val(T_li), 0, 0);
+	    tsetenv(STRLINES, p);
+	    xfree(p);
 	}
 
 	if ((tptr = getenv("TERMCAP")) != NULL) {
 	    /* Leave 64 characters slop in case we enlarge the termcap string */
 	    Char    termcap[1024+64], backup[1024+64], *ptr;
+	    Char buf[4];
 
 	    ptr = str2short(tptr);
 	    (void) Strncpy(termcap, ptr, 1024);
@@ -1637,8 +1576,9 @@ ChangeSize(int lins, int cols)
 		size_t len = (ptr - termcap) + Strlen(buf);
 		(void) Strncpy(backup, termcap, len);
 		backup[len] = '\0';
-		(void) Itoa(Val(T_co), buf, 0, 0);
-		(void) Strcat(backup + len, buf);
+		p = Itoa(Val(T_co), 0, 0);
+		(void) Strcat(backup + len, p);
+		xfree(p);
 		ptr = Strchr(ptr, ':');
 		(void) Strcat(backup, ptr);
 	    }
@@ -1655,8 +1595,9 @@ ChangeSize(int lins, int cols)
 		size_t len = (ptr - backup) + Strlen(buf);
 		(void) Strncpy(termcap, backup, len);
 		termcap[len] = '\0';
-		(void) Itoa(Val(T_li), buf, 0, 0);
-		(void) Strcat(termcap, buf);
+		p = Itoa(Val(T_li), 0, 0);
+		(void) Strcat(termcap, p);
+		xfree(p);
 		ptr = Strchr(ptr, ':');
 		(void) Strcat(termcap, ptr);
 	    }

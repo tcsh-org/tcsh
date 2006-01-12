@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.bind.c,v 3.39 2005/03/25 18:46:41 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.bind.c,v 3.40 2005/04/11 22:10:59 kim Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.39 2005/03/25 18:46:41 kim Exp $")
+RCSID("$Id: tc.bind.c,v 3.40 2005/04/11 22:10:59 kim Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -45,11 +45,11 @@ static	int    parsekey		(Char **);
 static	void   pkeys		(int, int);
 #endif /* OBSOLETE */
 
-static	void   printkey		(KEYCMD *, CStr *);
+static	void   printkey		(const KEYCMD *, CStr *);
 static	KEYCMD parsecmd		(Char *);
-static  void   bad_spec		(Char *);
-static	CStr  *parsestring	(Char *, CStr *);
-static	CStr  *parsebind	(Char *, CStr *);
+static  void   bad_spec		(const Char *);
+static	CStr  *parsestring	(const Char *, CStr *);
+static	CStr  *parsebind	(const Char *, CStr *);
 static	void   print_all_keys	(void);
 static	void   printkeys	(KEYCMD *, int, int);
 static	void   bindkey_usage	(void);
@@ -71,13 +71,7 @@ dobindkey(Char **v, struct command *c)
     KEYCMD  cmd;
     CStr    in;
     CStr    out;
-    Char    inbuf[200];
-    Char    outbuf[200];
     uChar   ch;
-    in.buf = inbuf;
-    out.buf = outbuf;
-    in.len = 0;
-    out.len = 0;
 
     USE(c);
     if (!MapsAreInited)
@@ -142,7 +136,7 @@ dobindkey(Char **v, struct command *c)
     if (key) {
 	if (!IsArrowKey(v[no]))
 	    xprintf(CGETS(20, 1, "Invalid key name `%S'\n"), v[no]);
-	in.buf = v[no++];
+	in.buf = Strsave(v[no++]);
 	in.len = Strlen(in.buf);
     }
     else {
@@ -159,17 +153,16 @@ dobindkey(Char **v, struct command *c)
 #ifndef WINNT_NATIVE
     if (in.buf[0] > 0xFF) {
 	bad_spec(in.buf);
+	xfree(in.buf);
 	return;
     }
 #endif
     ch = (uChar) in.buf[0];
 
     if (removeb) {
-	if (key) {
+	if (key)
 	    (void) ClearArrowKeys(&in);
-	    return;
-	}
-	if (in.len > 1) {
+	else if (in.len > 1) {
 	    (void) DeleteXkey(&in);
 	}
 	else if (map[ch] == F_XKEY) {
@@ -179,6 +172,7 @@ dobindkey(Char **v, struct command *c)
 	else {
 	    map[ch] = F_UNASSIGNED;
 	}
+	xfree(in.buf);
 	return;
     }
     if (!v[no]) {
@@ -186,28 +180,35 @@ dobindkey(Char **v, struct command *c)
 	    PrintArrowKeys(&in);
 	else
 	    printkey(map, &in);
+	xfree(in.buf);
 	return;
     }
     if (v[no + 1]) {
 	bindkey_usage();
+	xfree(in.buf);
 	return;
     }
     switch (ntype) {
     case XK_STR:
     case XK_EXE:
-	if (parsestring(v[no], &out) == NULL)
+	if (parsestring(v[no], &out) == NULL) {
+	    xfree(in.buf);
 	    return;
+	}
 	if (key) {
 	    if (SetArrowKeys(&in, XmapStr(&out), ntype) == -1)
 		xprintf(CGETS(20, 2, "Bad key name: %S\n"), in.buf);
 	}
 	else
 	    AddXkey(&in, XmapStr(&out), ntype);
+	xfree(out.buf);
 	map[ch] = F_XKEY;
 	break;
     case XK_CMD:
-	if ((cmd = parsecmd(v[no])) == 0)
+	if ((cmd = parsecmd(v[no])) == 0) {
+	    xfree(in.buf);
 	    return;
+	}
 	if (key)
 	    (void) SetArrowKeys(&in, XmapCmd((int) cmd), ntype);
 	else {
@@ -225,25 +226,28 @@ dobindkey(Char **v, struct command *c)
 	abort();
 	break;
     }
+    xfree(in.buf);
     if (key)
 	BindArrowKeys();
 }
 
 static void
-printkey(KEYCMD *map, CStr *in)
+printkey(const KEYCMD *map, CStr *in)
 {
-    unsigned char outbuf[100];
     struct KeyFuncs *fp;
 
     if (in->len < 2) {
-	(void) unparsestring(in, outbuf, STRQQ);
+	unsigned char *unparsed;
+
+	unparsed = unparsestring(in, STRQQ);
 	for (fp = FuncNames; fp->name; fp++) {
 	    if (fp->func == map[(uChar) *(in->buf)]) {
-		xprintf("%s\t->\t%s\n", outbuf, fp->name);
+		xprintf("%s\t->\t%s\n", unparsed, fp->name);
 	    }
 	}
+	xfree(unparsed);
     }
-    else 
+    else
 	PrintXkey(in);
 }
 
@@ -263,32 +267,30 @@ parsecmd(Char *str)
 
 
 static void
-bad_spec(Char *str)
+bad_spec(const Char *str)
 {
     xprintf(CGETS(20, 4, "Bad key spec %S\n"), str);
 }
 
 static CStr *
-parsebind(Char *s, CStr *str)
+parsebind(const Char *s, CStr *str)
 {
-    Char *b = str->buf;
+    struct Strbuf b = Strbuf_INIT;
 
     if (Iscntrl(*s)) {
-	*b++ = *s;
-	*b = '\0';
-	str->len = (int) (b - str->buf);
-	return str;
+	Strbuf_append1(&b, *s);
+	goto end;
     }
 
     switch (*s) {
     case '^':
 	s++;
 #ifdef IS_ASCII
-	*b++ = (*s == '?') ? '\177' : ((*s & CHAR) & 0237);
+	Strbuf_append1(&b, (*s == '?') ? '\177' : ((*s & CHAR) & 0237));
 #else
-	*b++ = (*s == '?') ? CTL_ESC('\177') : _toebcdic[_toascii[*s & CHAR] & 0237];
+	Strbuf_append1(&b, (*s == '?') ? CTL_ESC('\177')
+		       : _toebcdic[_toascii[*s & CHAR] & 0237]);
 #endif
-	*b = '\0';
 	break;
 
     case 'F':
@@ -298,50 +300,44 @@ parsebind(Char *s, CStr *str)
 #ifdef WINNT_NATIVE
     case 'N':
 #endif /* WINNT_NATIVE */
-	if (s[1] != '-' || s[2] == '\0') {
-	    bad_spec(s);
-	    return NULL;
-	}
+	if (s[1] != '-' || s[2] == '\0')
+	    goto bad_spec;
 	s += 2;
 	switch (s[-2]) {
 	case 'F': case 'f':	/* Turn into ^[str */
-	    *b++ = CTL_ESC('\033');
-	    while ((*b++ = *s++) != '\0')
-		continue;
-	    b--;
+	    Strbuf_append1(&b, CTL_ESC('\033'));
+	    Strbuf_append(&b, s);
 	    break;
 
 	case 'C': case 'c':	/* Turn into ^c */
 #ifdef IS_ASCII
-	    *b++ = (*s == '?') ? '\177' : ((*s & CHAR) & 0237);
+	    Strbuf_append1(&b, (*s == '?') ? '\177' : ((*s & CHAR) & 0237));
 #else
-	    *b++ = (*s == '?') ? CTL_ESC('\177') : _toebcdic[_toascii[*s & CHAR] & 0237];
+	    Strbuf_append1(&b, (*s == '?') ? CTL_ESC('\177')
+			   : _toebcdic[_toascii[*s & CHAR] & 0237]);
 #endif
-	    *b = '\0';
 	    break;
 
 	case 'X' : case 'x':	/* Turn into ^Xc */
 #ifdef IS_ASCII
-	    *b++ = 'X' & 0237;
+	    Strbuf_append1(&b, 'X' & 0237);
 #else
-	    *b++ = _toebcdic[_toascii['X'] & 0237];
+	    Strbuf_append1(&b, _toebcdic[_toascii['X'] & 0237]);
 #endif
-	    *b++ = *s;
-	    *b = '\0';
+	    Strbuf_append1(&b, *s);
 	    break;
 
 	case 'M' : case 'm':	/* Turn into 0x80|c */
 	    if (!NoNLSRebind) {
-	    	*b++ = CTL_ESC('\033');
-	    	*b++ = *s;
+		Strbuf_append1(&b, CTL_ESC('\033'));
+	    	Strbuf_append1(&b, *s);
 	    } else {
 #ifdef IS_ASCII
-	    *b++ = *s | 0x80;
+		Strbuf_append1(&b, *s | 0x80);
 #else
-	    *b++ = _toebcdic[_toascii[*s] | 0x80];
+		Strbuf_append1(&b, _toebcdic[_toascii[*s] | 0x80]);
 #endif
 	    }
-	    *b = '\0';
 	    break;
 #ifdef WINNT_NATIVE
 	case 'N' : case 'n':	/* NT */
@@ -350,7 +346,7 @@ parsebind(Char *s, CStr *str)
 
 			bnt = nt_translate_bindkey(s);
 			if (bnt != 0)
-				*b++ = bnt;
+			        Strbuf_append1(&b, bnt);
 			else
 				bad_spec(s);
 		}
@@ -365,23 +361,29 @@ parsebind(Char *s, CStr *str)
 	break;
 
     default:
-	bad_spec(s);
-	return NULL;
+	goto bad_spec;
     }
 
-    str->len = (int) (b - str->buf);
+ end:
+    Strbuf_terminate(&b);
+    str->buf = xrealloc(b.s, (b.len + 1) * sizeof (*str->buf));
+    str->len = b.len;
     return str;
+
+ bad_spec:
+    bad_spec(s);
+    xfree(b.s);
+    return NULL;
 }
 
 
 static CStr *
-parsestring(Char *str, CStr *buf)
+parsestring(const Char *str, CStr *buf)
 {
-    Char   *b;
+    struct Strbuf b = Strbuf_INIT;
     const Char   *p;
     eChar  es;
 
-    b = buf->buf;
     if (*str == 0) {
 	xprintf(CGETS(20, 5, "Null string specification\n"));
 	return NULL;
@@ -389,16 +391,18 @@ parsestring(Char *str, CStr *buf)
 
     for (p = str; *p != 0; p++) {
 	if ((*p & CHAR) == '\\' || (*p & CHAR) == '^') {
-	    if ((es = parseescape(&p)) == CHAR_ERR)
+	    if ((es = parseescape(&p)) == CHAR_ERR) {
+		xfree(b.s);
 		return 0;
-	    else
-		*b++ = (Char) es;
+	    } else
+		Strbuf_append1(&b, es);
 	}
 	else
-	    *b++ = *p & CHAR;
+	    Strbuf_append1(&b, *p & CHAR);
     }
-    *b = 0;
-    buf->len = (int) (b - buf->buf);
+    Strbuf_terminate(&b);
+    buf->buf = xrealloc(b.s, (b.len + 1) * sizeof (*buf->buf));
+    buf->len = b.len;
     return buf;
 }
 
@@ -442,7 +446,7 @@ printkeys(KEYCMD *map, int first, int last)
     struct KeyFuncs *fp;
     Char    firstbuf[2], lastbuf[2];
     CStr fb, lb;
-    unsigned char unparsbuf[10], extrabuf[10];
+    unsigned char *unparsed;
     fb.buf = firstbuf;
     lb.buf = lastbuf;
 
@@ -453,37 +457,35 @@ printkeys(KEYCMD *map, int first, int last)
     fb.len = 1;
     lb.len = 1;
 
+    unparsed = unparsestring(&fb, STRQQ);
     if (map[first] == F_UNASSIGNED) {
 	if (first == last)
-	    xprintf(CGETS(20, 10, "%-15s->  is undefined\n"),
-		    unparsestring(&fb, unparsbuf, STRQQ));
+	    xprintf(CGETS(20, 10, "%-15s->  is undefined\n"), unparsed);
+	xfree(unparsed);
 	return;
     }
 
     for (fp = FuncNames; fp->name; fp++) {
 	if (fp->func == map[first]) {
-	    if (first == last) {
-		xprintf("%-15s->  %s\n",
-			unparsestring(&fb, unparsbuf, STRQQ), fp->name);
-	    }
+	    if (first == last)
+		xprintf("%-15s->  %s\n", unparsed, fp->name);
 	    else {
-		xprintf("%-4s to %-7s->  %s\n",
-			unparsestring(&fb, unparsbuf, STRQQ),
-			unparsestring(&lb, extrabuf, STRQQ), fp->name);
+		unsigned char *p;
+
+		p = unparsestring(&lb, STRQQ);
+		xprintf("%-4s to %-7s->  %s\n", unparsed, p, fp->name);
+		xfree (p);
 	    }
+	    xfree(unparsed);
 	    return;
 	}
     }
-    if (map == CcKeyMap) {
-	xprintf(CGETS(20, 11, "BUG!!! %s isn't bound to anything.\n"),
-		unparsestring(&fb, unparsbuf, STRQQ));
+    xprintf(CGETS(20, 11, "BUG!!! %s isn't bound to anything.\n"), unparsed);
+    if (map == CcKeyMap)
 	xprintf("CcKeyMap[%d] == %d\n", first, CcKeyMap[first]);
-    }
-    else {
-	xprintf(CGETS(20, 11, "BUG!!! %s isn't bound to anything.\n"),
-		unparsestring(&fb, unparsbuf, STRQQ));
+    else
 	xprintf("CcAltMap[%d] == %d\n", first, CcAltMap[first]);
-    }
+    xfree(unparsed);
 }
 
 static void
@@ -846,7 +848,7 @@ dobind(Char **v, struct command *dummy)
     int i, prev;
     Char   *p, *l;
     CStr    cstr;
-    Char    buf[1000];
+    Char    buf[3];
 
     USE(dummy);
     /*
@@ -874,25 +876,25 @@ dobind(Char **v, struct command *dummy)
 		    for (i = 0; i < 256; i++) {
 			if (i != CTL_ESC('\033') && (CcKeyMap[i] == F_XKEY ||
 					 CcAltMap[i] == F_XKEY)) {
-			    p = buf;
+			    struct Strbuf sb = Strbuf_INIT;
+
 #ifdef IS_ASCII
 			    if (i > 0177) {
-				*p++ = 033;
-				*p++ = i & ASCII;
+				Strbuf_append1(&sb, 033);
+				Strbuf_append1(&sb, i & ASCII);
 			    }
-			    else {
-				*p++ = (Char) i;
-			    }
+			    else
+				Strbuf_append1(&sb, (Char) i);
 #else
-			    *p++ = (Char) i;
+			    Strbuf_append1(&sb, (Char) i);
 #endif
-			    for (l = s; *l != 0; l++) {
-				*p++ = *l;
-			    }
-			    *p = 0;
-			    cstr.buf = buf;
-			    cstr.len = Strlen(buf);
+			    for (l = s; *l != 0; l++)
+				Strbuf_append1(&sb, *l);
+			    Strbuf_terminate(&sb);
+			    cstr.buf = sb.s;
+			    cstr.len = Strlen(sb.s);
 			    AddXkey(&cstr, XmapCmd(fp->func), XK_CMD);
+			    xfree(sb.s);
 			}
 		    }
 		    return;

@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/dirent.c,v 1.3 2002/08/11 07:58:12 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/dirent.c,v 1.4 2004/05/19 18:22:27 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -294,7 +294,7 @@ HANDLE open_enum(char *server, WIN32_FIND_DATA *fdata) {
 		return INVALID_HANDLE_VALUE;
 	
 	hnet = heap_alloc(sizeof(nethandle_t));
-	hnet->netres = heap_alloc(1024);
+	hnet->netres = heap_alloc(1024);/*FIXBUF*/
 	hnet->henum = henum;
 
 

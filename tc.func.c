@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.121 2005/06/07 23:49:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.122 2006/01/12 18:06:34 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.121 2005/06/07 23:49:38 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.122 2006/01/12 18:06:34 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -43,14 +43,9 @@ RCSID("$Id: tc.func.c,v 3.121 2005/06/07 23:49:38 christos Exp $")
 #endif /* WINNT_NATIVE */
 
 #ifdef AFS
-#define PASSMAX 16
 #include <afs/stds.h>
 #include <afs/kautils.h>
 long ka_UserAuthenticateGeneral();
-#else
-#ifndef PASSMAX
-#define PASSMAX 8
-#endif
 #endif /* AFS */
 
 #ifdef TESLA
@@ -64,19 +59,18 @@ static int postcmd_active = 0;
 static int periodic_active = 0;
 static int cwdcmd_active = 0;	/* PWP: for cwd_cmd */
 static int beepcmd_active = 0;
-static signalfun_t alm_fun = NULL;
+static void (*alm_fun)(void) = NULL;
 
-static	void	 auto_logout	(int);
+static	void	 auto_logout	(void);
 static	char	*xgetpass	(const char *);
-static	void	 auto_lock	(int);
+static	void	 auto_lock	(void);
 #ifdef BSDJOBS
 static	void	 insert		(struct wordent *, int);
 static	void	 insert_we	(struct wordent *, struct wordent *);
 static	int	 inlist		(Char *, Char *);
 #endif /* BSDJOBS */
-struct tildecache;
-static	int	 tildecompare	(struct tildecache *, struct tildecache *);
-static  Char    *gethomedir	(Char *);
+static	int	 tildecompare	(const void *, const void *);
+static  Char    *gethomedir	(const Char *);
 #ifdef REMOTEHOST
 static	RETSIGTYPE palarm		(int);
 static	void	 getremotehost	(void);
@@ -87,59 +81,41 @@ static	void	 getremotehost	(void);
  */
 
 /*
- * expand_lex: Take the given lex and put an expanded version of it in
- * the string buf. First guy in lex list is ignored; last guy is ^J
- * which we ignore. Only take lex'es from position 'from' to position
- * 'to' inclusive
+ * expand_lex: Take the given lex and return an expanded version of it.
+ * First guy in lex list is ignored; last guy is ^J which we ignore.
+ * Only take lex'es from position 'from' to position 'to' inclusive
  *
  * Note: csh sometimes sets bit 8 in characters which causes all kinds
  * of problems if we don't mask it here. Note: excl's in lexes have been
  * un-back-slashed and must be re-back-slashed
  *
- * (PWP: NOTE: this returns a pointer to the END of the string expanded
- *             (in other words, where the NUL is).)
  */
 /* PWP: this is a combination of the old sprlex() and the expand_lex from
    the magic-space stuff */
 
 Char   *
-expand_lex(Char *buf, size_t bufsiz, struct wordent *sp0, int from, int to)
+expand_lex(const struct wordent *sp0, int from, int to)
 {
-    struct wordent *sp;
-    Char *s, *d, *e;
+    struct Strbuf buf = Strbuf_INIT;
+    const struct wordent *sp;
+    Char *s;
     Char prev_c;
     int i;
 
-    /*
-     * Make sure we have enough space to expand into.  E.g. we may have
-     * "a|b" turn to "a | b" (from 3 to 5 characters) which is the worst
-     * case scenario (even "a>&! b" turns into "a > & ! b", i.e. 6 to 9
-     * characters -- am I missing any other cases?).
-     */
-    bufsiz = bufsiz / 2;
-
-    buf[0] = '\0';
     prev_c = '\0';
-    d = buf;
-    e = &buf[bufsiz];		/* for bounds checking */
 
-    if (!sp0)
-	return (buf);		/* null lex */
-    if ((sp = sp0->next) == sp0)
-	return (buf);		/* nada */
-    if (sp == (sp0 = sp0->prev))
-	return (buf);		/* nada */
+    if (!sp0 || (sp = sp0->next) == sp0 || sp == (sp0 = sp0->prev))
+	return Strbuf_finish(&buf); /* null lex */
 
-    for (i = 0; i < NCARGS; i++) {
+    for (i = 0; ; i++) {
 	if ((i >= from) && (i <= to)) {	/* if in range */
-	    for (s = sp->word; *s && d < e; s++) {
+	    for (s = sp->word; *s; s++) {
 
 		if (s[1] & QUOTE) {
 		    int l = NLSSize(s, -1);
 		    if (l > 1) {
 			while (l-- > 0) {
-			    if (d < e)
-				*d++ = (*s & TRIM);
+			    Strbuf_append1(&buf, *s & TRIM);
 			    prev_c = *s++;
 			}
 			s--;
@@ -156,38 +132,32 @@ expand_lex(Char *buf, size_t bufsiz, struct wordent *sp0, int from, int to)
 			(((*s & TRIM) == '\'') && (prev_c != '\\')) ||
 			(((*s & TRIM) == '\"') && (prev_c != '\\')) ||
 			(((*s & TRIM) == '\\') && (prev_c != '\\')))) {
-		    *d++ = '\\';
+		    Strbuf_append1(&buf, '\\');
 		}
-		if (d < e)
-		    *d++ = (*s & TRIM);
+		Strbuf_append1(&buf, *s & TRIM);
 		prev_c = *s;
 	    }
-	    if (d < e)
-		*d++ = ' ';
+	    Strbuf_append1(&buf, ' ');
 	}
 	sp = sp->next;
 	if (sp == sp0)
 	    break;
     }
-    if (d > buf)
-	d--;			/* get rid of trailing space */
+    if (buf.len != 0)
+	buf.len--;		/* get rid of trailing space */
 
-    return (d);
+    return Strbuf_finish(&buf);
 }
 
 Char   *
-sprlex(Char *buf, size_t bufsiz, struct wordent *sp0)
+sprlex(const struct wordent *sp0)
 {
-    Char   *cp;
-
-    cp = expand_lex(buf, bufsiz, sp0, 0, NCARGS);
-    *cp = '\0';
-    return (buf);
+    return expand_lex(sp0, 0, INT_MAX);
 }
 
 
 Char *
-Itoa(int n, Char *s, int min_digits, int attributes)
+Itoa(int n, size_t min_digits, Char attributes)
 {
     /*
      * The array size here is derived from
@@ -199,19 +169,16 @@ Itoa(int n, Char *s, int min_digits, int attributes)
 #ifndef CHAR_BIT
 # define CHAR_BIT 8
 #endif
-    Char buf[CHAR_BIT * sizeof(int) / 3 + 1];
-    Char *p;
+    Char buf[CHAR_BIT * sizeof(int) / 3 + 1], *res, *p, *s;
     unsigned int un;	/* handle most negative # too */
     int pad = (min_digits != 0);
 
-    if ((int)(sizeof(buf) - 1) < min_digits)
+    if (sizeof(buf) - 1 < min_digits)
 	min_digits = sizeof(buf) - 1;
 
     un = n;
-    if (n < 0) {
+    if (n < 0)
 	un = -n;
-	*s++ = '-';
-    }
 
     p = buf;
     do {
@@ -219,11 +186,15 @@ Itoa(int n, Char *s, int min_digits, int attributes)
 	un /= 10;
     } while ((pad && --min_digits > 0) || un != 0);
 
+    res = xmalloc((p - buf + 2) * sizeof(*res));
+    s = res;
+    if (n < 0)
+	*s++ = '-';
     while (p > buf)
 	*s++ = *--p | attributes;
 
     *s = '\0';
-    return s;
+    return res;
 }
 
 
@@ -231,18 +202,21 @@ Itoa(int n, Char *s, int min_digits, int attributes)
 void
 dolist(Char **v, struct command *c)
 {
-    int     i, k;
+    int     i, k, gflag;
     struct stat st;
 
     USE(c);
     if (*++v == NULL) {
-	(void) t_search(STRNULL, NULL, LIST, 0, TW_ZERO, 0, STRNULL, 0);
+	struct Strbuf word = Strbuf_INIT;
+
+	Strbuf_terminate(&word);
+	(void) t_search(&word, LIST, TW_ZERO, 0, STRNULL, 0);
+	xfree(word.s);
 	return;
     }
-    gflag = 0;
-    tglob(v);
+    gflag = tglob(v);
     if (gflag) {
-	v = globall(v);
+	v = globall(v, gflag);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
@@ -357,17 +331,18 @@ dolist(Char **v, struct command *c)
 #endif /* BSDSIGS */
     }
     else {
-	Char   *dp, *tmp, buf[MAXPATHLEN];
+	Char   *dp, *tmp;
+	struct Strbuf buf = Strbuf_INIT;
 
 	for (k = 0, i = 0; v[k] != NULL; k++) {
 	    tmp = dnormalize(v[k], symlinks == SYM_IGNORE);
-	    dp = &tmp[Strlen(tmp) - 1];
+	    dp = Strend(tmp) - 1;
 	    if (*dp == '/' && dp != tmp)
 #ifdef apollo
 		if (dp != &tmp[1])
 #endif /* apollo */
 		*dp = '\0';
-		if (stat(short2str(tmp), &st) == -1) {
+	    if (stat(short2str(tmp), &st) == -1) {
 		if (k != i) {
 		    if (i != 0)
 			xputchar('\n');
@@ -387,8 +362,10 @@ dolist(Char **v, struct command *c)
 		if (k != 0 && v[1] != NULL)
 		    xputchar('\n');
 		xprintf("%S:\n", tmp);
-		for (cp = tmp, dp = buf; *cp; *dp++ = (*cp++ | QUOTE))
-		    continue;
+		buf.len = 0;
+		for (cp = tmp; *cp; cp++)
+		    Strbuf_append1(&buf, (*cp | QUOTE));
+		Strbuf_terminate(&buf);
 		if (
 #ifdef WINNT_NATIVE
 		    (dp[-1] != (Char) (':' | QUOTE)) &&
@@ -398,11 +375,12 @@ dolist(Char **v, struct command *c)
 		else 
 		    dp[-1] &= TRIM;
 		*dp = '\0';
-		(void) t_search(buf, NULL, LIST, 0, TW_ZERO, 0, STRNULL, 0);
+		(void) t_search(&buf, LIST, TW_ZERO, 0, STRNULL, 0);
 		i = k + 1;
 	    }
-	    xfree((ptr_t) tmp);
+	    xfree(tmp);
 	}
+	xfree(buf.s);
 	if (k != i) {
 	    if (i != 0)
 		xputchar('\n');
@@ -443,15 +421,17 @@ doechotc(Char **v, struct command *c)
 void
 dosettc(Char **v, struct command *c)
 {
-    char    tv[2][BUFSIZE];
+    char    *tv[2];
 
     USE(c);
     if (!GotTermCaps)
 	GetTermCaps();
 
-    (void) strcpy(tv[0], short2str(v[1]));
-    (void) strcpy(tv[1], short2str(v[2]));
+    tv[0] = strsave(short2str(v[1]));
+    tv[1] = strsave(short2str(v[2]));
     SetTC(tv[0], tv[1]);
+    xfree(tv[0]);
+    xfree(tv[1]);
 }
 
 /* The dowhich() is by:
@@ -463,7 +443,7 @@ dosettc(Char **v, struct command *c)
  * Thanks!!
  */
 int
-cmd_expand(Char *cmd, Char *str)
+cmd_expand(Char *cmd, Char **str)
 {
     struct wordent lexp[3];
     struct varent *vp;
@@ -486,8 +466,8 @@ cmd_expand(Char *cmd, Char *str)
 	    blkpr(vp->vec);
 	    xputchar('\n');
 	}
-	else 
-	    blkexpand(vp->vec, str);
+	else
+	    *str = blkexpand(vp->vec);
     }
     else {
 	lexp[1].word = cmd;
@@ -510,9 +490,9 @@ dowhich(Char **v, struct command *c)
      * E.g. which \ls if ls is aliased will not work correctly if
      * we glob here.
      */
-    gflag = 0, tglob(v);
+    int gflag = tglob(v);
     if (gflag) {
-	v = globall(v);
+	v = globall(v, gflag);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
@@ -659,8 +639,8 @@ fg_proc_entry(struct process *pp)
 static char *
 xgetpass(const char *prm)
 {
-    static char pass[PASSMAX + 1];
-    int fd, i;
+    static struct strbuf pass; /* = strbuf_INIT; */
+    int fd;
     signalfun_t sigint;
 
     sigint = (signalfun_t) sigset(SIGINT, SIG_IGN);
@@ -669,22 +649,23 @@ xgetpass(const char *prm)
 	fd = SHIN;
 
     xprintf("%s", prm); flush();
-    for (i = 0;;)  {
-	if (read(fd, &pass[i], 1) < 1 || pass[i] == '\n') 
+    pass.len = 0;
+    for (;;)  {
+	char c;
+
+	if (read(fd, &c, 1) < 1 || c == '\n') 
 	    break;
-	if (i < PASSMAX)
-	    i++;
+	strbuf_append1(&pass, c);
     }
-	
-    pass[i] = '\0';
+    strbuf_terminate(&pass);
 
     if (fd != SHIN)
 	(void) close(fd);
     (void) sigset(SIGINT, sigint);
 
-    return(pass);
+    return pass.s;
 }
-	
+
 #ifndef NO_CRYPT
 #if !defined(__STDC__) || defined(SUNOS4)
     extern char *crypt ();
@@ -704,7 +685,7 @@ xgetpass(const char *prm)
  */
 /*ARGSUSED*/
 static void
-auto_lock(int n)
+auto_lock(void)
 {
 #ifndef NO_CRYPT
 
@@ -747,7 +728,7 @@ auto_lock(int n)
 #endif
 
     if (srpp == NULL) {
-	auto_logout(0);
+	auto_logout();
 	/*NOTREACHED*/
 	return;
     }
@@ -788,7 +769,7 @@ auto_lock(int n)
 	    == 0)
 #endif /* AFS */
 	    ) {
-	    (void) memset(pp, 0, PASSMAX);
+	    (void) memset(pp, 0, strlen(pp));
 	    if (GettingInput && !just_signaled) {
 		(void) Rawmode();
 		ClearLines();	
@@ -801,15 +782,13 @@ auto_lock(int n)
 	xprintf(CGETS(22, 2, "\nIncorrect passwd for %s\n"), pw->pw_name);
     }
 #endif /* NO_CRYPT */
-    auto_logout(0);
-    USE(n);
+    auto_logout();
 }
 
 
 static void
-auto_logout(int n)
+auto_logout()
 {
-    USE(n);
     xprintf("auto-logout\n");
     /* Don't leave the tty in raw mode */
     if (editing)
@@ -834,7 +813,7 @@ alrmcatch(int snum)
 	(void) sigset(SIGALRM, alrmcatch);
 #endif /* UNRELSIGS */
 
-    (*alm_fun)(0);
+    (*alm_fun)();
 
     setalarm(1);
 }
@@ -1518,21 +1497,25 @@ inlist(Char *list, Char *name)
 static struct tildecache {
     Char   *user;
     Char   *home;
-    int     hlen;
+    size_t  hlen;
 }      *tcache = NULL;
 
 #define TILINCR 10
-int tlength = 0;
-static int tsize = TILINCR;
+size_t tlength = 0;
+static size_t tsize = TILINCR;
 
 static int
-tildecompare(struct tildecache *p1, struct tildecache *p2)
+tildecompare(const void *xp1, const void *xp2)
 {
+    const struct tildecache *p1, *p2;
+
+    p1 = xp1;
+    p2 = xp2;
     return Strcmp(p1->user, p2->user);
 }
 
 static Char *
-gethomedir(Char *us)
+gethomedir(const Char *us)
 {
     struct passwd *pp;
 #ifdef HESIOD
@@ -1596,7 +1579,7 @@ gethomedir(Char *us)
 }
 
 Char   *
-gettilde(Char *us)
+gettilde(const Char *us)
 {
     struct tildecache *bp1, *bp2, *bp;
     Char *hd;
@@ -1634,16 +1617,13 @@ gettilde(Char *us)
      */
     tcache[tlength].user = Strsave(us);
     tcache[tlength].home = hd;
-    tcache[tlength++].hlen = (int) Strlen(hd);
+    tcache[tlength++].hlen = Strlen(hd);
 
-    qsort((ptr_t) tcache, (size_t) tlength, sizeof(struct tildecache),
-	  (int (*) (const void *, const void *)) tildecompare);
+    qsort(tcache, tlength, sizeof(struct tildecache), tildecompare);
 
     if (tlength == tsize) {
 	tsize += TILINCR;
-	tcache = (struct tildecache *) xrealloc((ptr_t) tcache,
-						(size_t) (tsize *
-						  sizeof(struct tildecache)));
+	tcache = xrealloc(tcache, tsize * sizeof(struct tildecache));
     }
     return (hd);
 }
@@ -1659,125 +1639,34 @@ Char   *
 getusername(Char **hm)
 {
     Char   *h, *p;
-    int     i, j;
+    size_t i, j;
 
     if (hm == NULL) {
 	for (i = 0; i < tlength; i++) {
-	    xfree((ptr_t) tcache[i].home);
-	    xfree((ptr_t) tcache[i].user);
+	    xfree(tcache[i].home);
+	    xfree(tcache[i].user);
 	}
-	xfree((ptr_t) tcache);
+	xfree(tcache);
 	tlength = 0;
 	tsize = TILINCR;
 	tcache = NULL;
 	return NULL;
     }
+    p = *hm;
     if (((h = varval(STRhome)) != STRNULL) &&
-	(Strncmp(p = *hm, h, (size_t) (j = (int) Strlen(h))) == 0) &&
+	(Strncmp(p, h, j = Strlen(h)) == 0) &&
 	(p[j] == '/' || p[j] == '\0')) {
 	*hm = &p[j];
 	return STRNULL;
     }
     for (i = 0; i < tlength; i++)
-	if ((Strncmp(p = *hm, tcache[i].home, (size_t)
-	    (j = tcache[i].hlen)) == 0) && (p[j] == '/' || p[j] == '\0')) {
+	if ((Strncmp(p, tcache[i].home, (j = tcache[i].hlen)) == 0) &&
+	    (p[j] == '/' || p[j] == '\0')) {
 	    *hm = &p[j];
 	    return tcache[i].user;
 	}
     return NULL;
 }
-
-#ifdef OBSOLETE
-/*
- * PWP: read a bunch of aliases out of a file QUICKLY.  The format
- *  is almost the same as the result of saying "alias > FILE", except
- *  that saying "aliases > FILE" does not expand non-letters to printable
- *  sequences.
- */
-/*ARGSUSED*/
-void
-doaliases(Char **v, struct command *c)
-{
-    jmp_buf_t oldexit;
-    Char  **vec, *lp;
-    int     fd;
-    Char    buf[BUFSIZE], line[BUFSIZE];
-    char    tbuf[BUFSIZE + 1], *tmp;
-    extern int output_raw;	/* PWP: in sh.print.c */
-
-    USE(c);
-    v++;
-    if (*v == 0) {
-	output_raw = 1;
-	plist(&aliases, VAR_ALL);
-	output_raw = 0;
-	return;
-    }
-
-    gflag = 0, tglob(v);
-    if (gflag) {
-	v = globall(v);
-	if (v == 0)
-	    stderror(ERR_NAME | ERR_NOMATCH);
-    }
-    else {
-	v = gargv = saveblk(v);
-	trim(v);
-    }
-
-    if ((fd = open(tmp = short2str(*v), O_RDONLY|O_LARGEFILE)) < 0)
-	stderror(ERR_NAME | ERR_SYSTEM, tmp, strerror(errno));
-
-    getexit(oldexit);
-    if (setexit() == 0) {
-	for (;;) {
-	    Char   *p = NULL;
-	    int     n = 0;
-	    lp = line;
-	    for (;;) {
-		if (n <= 0) {
-		    int     i;
-
-		    if ((n = read(fd, tbuf, BUFSIZE)) <= 0) {
-#ifdef convex
-			stderror(ERR_SYSTEM, progname, strerror(errno));
-#endif /* convex */
-			goto eof;
-		    }
-		    for (i = 0; i < n; i++)
-  			buf[i] = (Char) tbuf[i];
-		    p = buf;
-		}
-		n--;
-		if ((*lp++ = *p++) == '\n') {
-		    lp[-1] = '\0';
-		    break;
-		}
-	    }
-	    for (lp = line; *lp; lp++) {
-		if (isspc(*lp)) {
-		    *lp++ = '\0';
-		    while (isspc(*lp))
-			lp++;
-		    vec = (Char **) xmalloc((size_t)
-					    (2 * sizeof(Char **)));
-		    vec[0] = Strsave(lp);
-		    vec[1] = NULL;
-		    setq(strip(line), vec, &aliases, VAR_READWRITE);
-		    break;
-		}
-	    }
-	}
-    }
-
-eof:
-    (void) close(fd);
-    tw_cmd_free();
-    if (gargv)
-	blkfree(gargv), gargv = 0;
-    resexit(oldexit);
-}
-#endif /* OBSOLETE */
 
 
 /*
@@ -1801,11 +1690,11 @@ shlvl(int val)
 	    Unsetenv(STRKSHLVL);
 	}
 	else {
-	    Char    buff[BUFSIZE];
+	    Char *p;
 
-	    (void) Itoa(val, buff, 0, 0);
-	    set(STRshlvl, Strsave(buff), VAR_READWRITE);
-	    tsetenv(STRKSHLVL, buff);
+	    p = Itoa(val, 0, 0);
+	    set(STRshlvl, p, VAR_READWRITE);
+	    tsetenv(STRKSHLVL, p);
 	}
     }
     else {
@@ -1954,12 +1843,11 @@ collate(const Char *a, const Char *b)
  * If it is, splice the header into the argument list and retry.
  */
 #define HACKBUFSZ 1024		/* Max chars in #! vector */
-#define HACKVECSZ 128		/* Max words in #! vector */
 int
 hashbang(int fd, Char ***vp)
 {
-    char *sargv[HACKVECSZ], lbuf[HACKBUFSZ], *p, *ws;
-    int sargc = 0;
+    char **sargv = NULL, lbuf[HACKBUFSZ], *p, *ws;
+    size_t sargc = 0, sarg_size = 0;
 #ifdef WINNT_NATIVE
     int fw = 0; 	/* found at least one word */
     int first_word = 0;
@@ -1970,7 +1858,14 @@ hashbang(int fd, Char ***vp)
 
     ws = 0;	/* word started = 0 */
 
-    for (p = lbuf; p < &lbuf[HACKBUFSZ]; )
+    for (p = lbuf; p < &lbuf[HACKBUFSZ]; ) {
+	if (sargc + 1 >= sarg_size) {
+	    if (sarg_size == 0)
+		sarg_size = 16; /* Arbitrary */
+	    else
+		sarg_size *= 2;
+	    sargv = xrealloc(sargv, sarg_size * sizeof (*sargv));
+	}
 	switch (*p) {
 	case ' ':
 	case '\t':
@@ -1980,16 +1875,13 @@ hashbang(int fd, Char ***vp)
 	    if (ws) {	/* a blank after a word.. save it */
 		*p = '\0';
 #ifndef WINNT_NATIVE
-		if (sargc < HACKVECSZ - 1)
-		    sargv[sargc++] = ws;
+		sargv[sargc++] = ws;
 		ws = NULL;
 #else /* WINNT_NATIVE */
-		if (sargc < HACKVECSZ - 1) {
-		    sargv[sargc] = first_word ? NULL: hb_subst(ws);
-		    if (sargv[sargc] == NULL)
-			sargv[sargc] = ws;
-		    sargc++;
-		}
+		sargv[sargc] = first_word ? NULL: hb_subst(ws);
+		if (sargv[sargc] == NULL)
+		    sargv[sargc] = ws;
+		sargc++;
 		ws = NULL;
 	    	fw = 1;
 		first_word = 1;
@@ -1999,7 +1891,7 @@ hashbang(int fd, Char ***vp)
 	    continue;
 
 	case '\0':	/* Whoa!! what the hell happened */
-	    return -1;
+	    goto err;
 
 	case '\n':	/* The end of the line. */
 	    if (
@@ -2009,25 +1901,24 @@ hashbang(int fd, Char ***vp)
 		ws) {	/* terminate the last word */
 		*p = '\0';
 #ifndef WINNT_NATIVE
-		if (sargc < HACKVECSZ - 1)
-		    sargv[sargc++] = ws;
+		sargv[sargc++] = ws;
 #else /* WINNT_NATIVE */
-		if (sargc < HACKVECSZ - 1) { /* deal with the 1-word case */
-		    sargv[sargc] = first_word? NULL : hb_subst(ws);
-		    if (sargv[sargc] == NULL)
-			sargv[sargc] = ws;
-		    sargc++;
-		}
+		/* deal with the 1-word case */
+		sargv[sargc] = first_word? NULL : hb_subst(ws);
+		if (sargv[sargc] == NULL)
+		    sargv[sargc] = ws;
+		sargc++;
 #endif /* !WINNT_NATIVE */
 	    }
 	    sargv[sargc] = NULL;
 	    ws = NULL;
 	    if (sargc > 0) {
 		*vp = blk2short(sargv);
+		xfree(sargv);
 		return 0;
 	    }
 	    else
-		return -1;
+		goto err;
 
 	default:
 	    if (!ws)	/* Start a new word? */
@@ -2035,6 +1926,9 @@ hashbang(int fd, Char ***vp)
 	    p++;
 	    break;
 	}
+    }
+ err:
+    xfree(sargv);
     return -1;
 }
 #endif /* HASHBANG */
@@ -2122,7 +2016,7 @@ getremotehost(void)
 		if (sptr != name) {
 #ifdef INET6
 		    char *s, *domain;
-		    char dbuf[MAXHOSTNAMELEN], cbuf[MAXHOSTNAMELEN];
+		    char dbuf[MAXHOSTNAMELEN];
 		    struct addrinfo hints, *res = NULL;
 
 		    memset(&hints, 0, sizeof(hints));
@@ -2133,19 +2027,19 @@ getremotehost(void)
 		    {
 			if (getaddrinfo(name, NULL, &hints, &res) != 0)
 			    res = NULL;
-		    } else if (gethostname(dbuf, sizeof(dbuf) - 1) == 0 &&
-			       (domain = strchr(dbuf, '.')) != NULL) {
+		    } else if (gethostname(dbuf, sizeof(dbuf)) == 0 &&
+			       (dbuf[sizeof(dbuf)-1] = '\0', /*FIXME: ugly*/
+				(domain = strchr(dbuf, '.')) != NULL)) {
 			for (s = strchr(name, '.');
 			     s != NULL; s = strchr(s + 1, '.')) {
 			    if (*(s + 1) != '\0' &&
 				(ptr = strstr(domain, s)) != NULL) {
-				len = s - name;
-				if (len + strlen(ptr) >= sizeof(cbuf))
-				    break;
-				strncpy(cbuf, name, len);
-				strcpy(cbuf + len, ptr);
+			        char *cbuf;
+
+				cbuf = strspl(name, ptr);
 				if (getaddrinfo(cbuf, NULL, &hints, &res) != 0)
 				    res = NULL;
+				xfree(cbuf);
 				break;
 			    }
 			}

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.err.c,v 3.39 2005/01/18 20:43:30 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.err.c,v 3.40 2005/04/11 22:10:56 kim Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -33,7 +33,7 @@
 #define _h_sh_err		/* Don't redefine the errors	 */
 #include "sh.h"
 
-RCSID("$Id: sh.err.c,v 3.39 2005/01/18 20:43:30 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.40 2005/04/11 22:10:56 kim Exp $")
 
 /*
  * C Shell
@@ -373,18 +373,14 @@ void
 /*VARARGS1*/
 seterror(unsigned int id, ...)
 {
-
     if (seterr == 0) {
 	va_list va;
-	char    berr[BUFSIZE];
-	va_start(va, id);
 
+	va_start(va, id);
 	if (id >= sizeof(elst) / sizeof(elst[0]))
 	    id = ERR_INVALID;
-	xvsnprintf(berr, sizeof(berr), elst[id], va);
+	seterr = xvasprintf(elst[id], va);
 	va_end(va);
-
-	seterr = strsave(berr);
     }
 }
 

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.decls.h,v 3.39 2005/01/18 20:24:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.decls.h,v 3.41 2005/04/11 22:10:54 kim Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -271,8 +271,8 @@ extern	int	 GetXkey		(CStr *, XmapVal *);
 extern	void	 ResetXmap		(void);
 extern	int	 DeleteXkey		(CStr *);
 extern	void	 PrintXkey		(CStr *);
-extern	int	 printOne		(CStr *, XmapVal *, int);
+extern	void	 printOne		(const Char *, const XmapVal *, int);
 extern	eChar		  parseescape	(const Char **);
-extern	unsigned char    *unparsestring	(CStr *, unsigned char *, Char *);
+extern	unsigned char    *unparsestring	(const CStr *, const Char *);
 
 #endif /* _h_ed_decls */

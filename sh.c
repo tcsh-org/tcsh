@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.123 2005/03/21 21:26:36 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.124 2005/04/11 22:10:56 kim Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.123 2005/03/21 21:26:36 kim Exp $")
+RCSID("$Id: sh.c,v 3.124 2005/04/11 22:10:56 kim Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -524,19 +524,9 @@ main(int argc, char **argv)
      */
     shlvl(1);
 
-    if ((tcp = getenv("HOME")) != NULL) {
-	if (strlen(tcp) >= MAXPATHLEN) {
-	    struct passwd *pw;
-	    if ((pw = getpwuid(getuid())) != NULL)
-		cp = quote(SAVE(pw->pw_dir));
-	    else {
-		tcp[MAXPATHLEN-1] = '\0';
-		cp = quote(SAVE(tcp));
-	    }
-	} else {
-	    cp = quote(SAVE(tcp));
-	}
-    } else
+    if ((tcp = getenv("HOME")) != NULL)
+	cp = quote(SAVE(tcp));
+    else
 	cp = NULL;
 
     if (cp == NULL)
@@ -552,7 +542,6 @@ main(int argc, char **argv)
      */
     {
 	char *cln, *cus, *cgr;
-	Char    buff[BUFSIZE];
 	struct passwd *pw;
 	struct group *gr;
 
@@ -560,15 +549,12 @@ main(int argc, char **argv)
 #ifdef apollo
 	int     oid = getoid();
 
-	(void) Itoa(oid, buff, 0, 0);
-	set(STRoid, Strsave(buff), VAR_READWRITE);
+	set(STRoid, Itoa(oid, 0, 0), VAR_READWRITE);
 #endif /* apollo */
 
-	(void) Itoa(uid, buff, 0, 0);
-	set(STRuid, Strsave(buff), VAR_READWRITE);
+	set(STRuid, Itoa(uid, 0, 0), VAR_READWRITE);
 
-	(void) Itoa(gid, buff, 0, 0);
-	set(STRgid, Strsave(buff), VAR_READWRITE);
+	set(STRgid, Itoa(gid, 0, 0), VAR_READWRITE);
 
 	cln = getenv("LOGNAME");
 	cus = getenv("USER");
@@ -729,10 +715,13 @@ main(int argc, char **argv)
     doldol = putn((int) getpid());	/* For $$ */
 #ifdef WINNT_NATIVE
     {
-	char *strtmp1, strtmp2[MAXPATHLEN];
-	if ((strtmp1 = getenv("TMP")) != NULL)
-	    wsprintf(strtmp2, "%s/%s", strtmp1, "sh");
-	shtemp = Strspl(SAVE(strtmp2), doldol);	/* For << */
+	char *tmp;
+	if ((tmp = getenv("TMP")) != NULL)
+	    tmp = xasprintf("%s/%s", tmp, "sh");
+	else
+	    tmp = SAVE(""); /* FIXME: something different? */
+	shtemp = Strspl(tmp, doldol);	/* For << */
+	xfree(tmp);
     }
 #else /* !WINNT_NATIVE */
     shtemp = Strspl(STRtmpsh, doldol);	/* For << */
@@ -1855,8 +1844,9 @@ static Char   *jobargv[2] = {STRjobs, 0};
  * and finally go through the normal error mechanism, which
  * gets a chance to make the shell go away.
  */
-int     just_signaled;		/* bugfix by Michael Bloom (mg@ttidca.TTI.COM) */
+int just_signaled;		/* bugfix by Michael Bloom (mg@ttidca.TTI.COM) */
 
+/* FIXME: how asynchronous can this be? nothing uses volatile sig_atomic_t */
 RETSIGTYPE
 pintr(int snum)
 {
@@ -2049,7 +2039,7 @@ process(int catch)
 #ifndef HAVENOUTMP
 	    watch_login(0);
 #endif /* !HAVENOUTMP */
-	    sched_run(0);
+	    sched_run();
 	    period_cmd();
 	    precmd();
 	    /*
@@ -2177,8 +2167,8 @@ void
 dosource(Char **t, struct command *c)
 {
     Char *f;
-    int    hflg = 0;
-    char    buf[BUFSIZE];
+    int    hflg = 0, gflag;
+    char *file;
 
     USE(c);
     t++;
@@ -2194,19 +2184,22 @@ dosource(Char **t, struct command *c)
     }
 
     f = globone(*t++, G_ERROR);
-    (void) strcpy(buf, short2str(f));
-    xfree((ptr_t) f);
-    gflag = 0, tglob(t);
+    file = strsave(short2str(f));
+    xfree(f);
+    gflag = tglob(t);
     if (gflag) {
-	t = globall(t);
-	if (t == 0)
+        t = globall(t, gflag);
+	if (t == 0) {
+	    xfree(file);
 	    stderror(ERR_NAME | ERR_NOMATCH);
+	}
     } else {
 	t = saveblk(t);
 	trim(t);
     }
-    if ((!srcfile(buf, 0, hflg, t)) && (!hflg) && (!bequiet))
-	stderror(ERR_SYSTEM, buf, strerror(errno));
+    if ((!srcfile(file, 0, hflg, t)) && (!hflg) && (!bequiet))
+	stderror(ERR_SYSTEM, file, strerror(errno)); /* FIXME: leaks file */
+    xfree(file);
 }
 
 /*
@@ -2263,10 +2256,10 @@ mailchk(void)
 	if (S_ISDIR(stb.st_mode)) {
 	    DIR *mailbox;
 	    int mailcount = 0;
-	    char tempfilename[MAXPATHLEN];
+	    char *tempfilename;
 	    struct stat stc;
 
-	    xsnprintf(tempfilename, MAXPATHLEN, "%s/new", filename);
+	    tempfilename = xasprintf("%s/new", filename);
 
 	    if (stat(tempfilename, &stc) != -1 && S_ISDIR(stc.st_mode)) {
 		/*
@@ -2282,10 +2275,14 @@ mailchk(void)
 		mboxdir = tempfilename;
 	    }
 
-	    if (stb.st_mtime <= chktim + 1 || (loginsh && !new))
+	    if (stb.st_mtime <= chktim + 1 || (loginsh && !new)) {
+		xfree(tempfilename);
 		continue;
+	    }
 
-	    if ((mailbox = opendir(mboxdir)) == NULL)
+	    mailbox = opendir(mboxdir);
+	    xfree(tempfilename);
+	    if (mailbox == NULL)
 		continue;
 
 	    /* skip . and .. */
@@ -2327,10 +2324,10 @@ mailchk(void)
  * Extract a home directory from the password file
  * The argument points to a buffer where the name of the
  * user whose home directory is sought is currently.
- * We write the home directory of the user back there.
+ * We return home directory of the user, or NULL.
  */
-int
-gethdir(Char *home)
+Char *
+gethdir(const Char *home)
 {
     Char   *h;
 
@@ -2338,23 +2335,19 @@ gethdir(Char *home)
      * Is it us?
      */
     if (*home == '\0') {
-	if ((h = varval(STRhome)) != STRNULL) {
-	    (void) Strcpy(home, h);
-	    return 0;
-	}
+	if ((h = varval(STRhome)) != STRNULL)
+	    return Strsave(h);
 	else
-	    return 1;
+	    return NULL;
     }
 
     /*
      * Look in the cache
      */
     if ((h = gettilde(home)) == NULL)
-	return 1;
-    else {
-	(void) Strcpy(home, h);
-	return 0;
-    }
+	return NULL;
+    else
+	return Strsave(h);
 }
 
 /*

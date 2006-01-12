@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.91 2005/04/11 22:10:58 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.92 2005/08/02 21:04:50 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.91 2005/04/11 22:10:58 kim Exp $")
+RCSID("$Id: sh.proc.c,v 3.92 2005/08/02 21:04:50 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -766,7 +766,7 @@ pclrcurr(struct process *pp)
 
 /* +4 here is 1 for '\0', 1 ea for << >& >> */
 static Char command[PMAXLEN + 4];
-static int cmdlen;
+static size_t cmdlen;
 static Char *cmdp;
 
 /* GrP
@@ -788,12 +788,12 @@ unparse(struct command *t)
  *	an important assumption is made that the process is running.
  */
 void
-palloc(int pid, struct command *t)
+palloc(pid_t pid, struct command *t)
 {
     struct process *pp;
     int     i;
 
-    pp = (struct process *) xcalloc(1, (size_t) sizeof(struct process));
+    pp = xcalloc(1, sizeof(struct process));
     pp->p_procid = pid;
     pp->p_flags = ((t->t_dflg & F_AMPERSAND) ? 0 : PFOREGND) | PRUNNING;
     if (t->t_dflg & F_TIME)
@@ -939,7 +939,7 @@ padd(struct command *t)
 static void
 pads(Char *cp)
 {
-    int i;
+    size_t i;
 
     /*
      * Avoid the Quoted Space alias hack! Reported by:
@@ -948,7 +948,7 @@ pads(Char *cp)
     if (cp[0] == STRQNULL[0])
 	cp++;
 
-    i = (int) Strlen(cp);
+    i = Strlen(cp);
 
     if (cmdlen >= PMAXLEN)
 	return;
@@ -1137,15 +1137,19 @@ pprint(struct process *pp, int flag)
 			    && reason != SIGINT
 			    && (reason != SIGPIPE
 				|| (pp->p_flags & PPOU) == 0))) {
-			const char *ptr;
-			char buf[1024];
+			char *ptr;
+			int free_ptr;
 
-			if ((ptr = mesg[pp->p_reason & ASCII].pname) == NULL) {
-			    xsnprintf(buf, sizeof(buf), "%s %d",
-				CGETS(17, 5, "Signal"), pp->p_reason & ASCII);
-			    ptr = buf;
+			free_ptr = 0;
+			ptr = (char *)mesg[pp->p_reason & ASCII].pname;
+			if (ptr == NULL) {
+			    ptr = xasprintf("%s %d", CGETS(17, 5, "Signal"),
+					    pp->p_reason & ASCII);
+			    free_ptr = 1;
 			}
 			xprintf(format, ptr);
+			if (free_ptr != 0)
+			    xfree(ptr);
 		    }
 		    else
 			reason = -1;
@@ -1538,7 +1542,7 @@ static void
 pkill(Char **v, int signum)
 {
     struct process *pp, *np;
-    int jobflags = 0, err1 = 0;
+    int jobflags = 0, err1 = 0, gflag;
     pid_t     pid;
 #ifdef BSDSIGS
     sigmask_t omask;
@@ -1561,9 +1565,9 @@ pkill(Char **v, int signum)
 	if (**vp == '%')
 	    (void) quote(*vp);
 
-    gflag = 0, tglob(v);
+    gflag = tglob(v);
     if (gflag) {
-	v = globall(v);
+      v = globall(v, gflag);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
@@ -1841,12 +1845,12 @@ donotify(Char **v, struct command *c)
  * It is usually just the value of tpgrp.
  */
 
-int
+pid_t
 pfork(struct command *t, int wanttty)
 {
-    int pid;
+    pid_t pid;
     int    ignint = 0;
-    int     pgrp;
+    pid_t pgrp;
 #ifdef BSDSIGS
     sigmask_t omask = 0;
 #endif /* BSDSIGS */
@@ -2073,7 +2077,7 @@ setttypgrp(int pgrp)
  * I am open to suggestions how to fix that.
  */
 void
-pgetty(int wanttty, int pgrp)
+pgetty(int wanttty, pid_t pgrp)
 {
 #ifdef BSDJOBS
 # if defined(BSDSIGS) && defined(POSIXJOBS)

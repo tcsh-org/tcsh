@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/fork.c,v 1.5 2003/11/04 01:37:44 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/fork.c,v 1.6 2004/05/19 18:22:27 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -177,7 +177,7 @@ int fork(void) {
 
 	int rc;
 	size_t stacksize;
-	char modname[512];
+	char modname[512];/*FIXBUF*/
 	HANDLE  hProc,hThread, hArray[2];
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;

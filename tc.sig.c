@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.c,v 3.30 2005/04/11 22:11:00 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.c,v 3.31 2005/04/12 23:45:10 kim Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.30 2005/04/11 22:11:00 kim Exp $")
+RCSID("$Id: tc.sig.c,v 3.31 2005/04/12 23:45:10 kim Exp $")
 
 #include "tc.wait.h"
 
@@ -240,14 +240,6 @@ extern int errno;
 #define SETBIT(x, y)	x |= sigmask(y)
 #define ISSET(x, y)	((x & sigmask(y)) != 0)
 
-#ifdef DEBUG
-# define SHOW_SIGNALS	1	/* to assist in debugging signals */
-#endif /* DEBUG */
-
-#ifdef SHOW_SIGNALS
-char   *show_sig_mask();
-#endif /* SHOW_SIGNALS */
-
 #ifndef __PARAGON__
 /*
  * sigsetmask(mask)
@@ -350,8 +342,6 @@ bsd_sigpause(sigmask_t mask)
 RETSIGTYPE (*bsd_signal(int sig, signalfun_t func)) ()
 {
         struct sigaction act, oact;
-        sigset_t set;
-        signalfun_t r_func;
 
         if (sig < 0 || sig > MAXSIG) {
                 xprintf(CGETS(25, 2,
@@ -359,10 +349,8 @@ RETSIGTYPE (*bsd_signal(int sig, signalfun_t func)) ()
                 return((signalfun_t) SIG_IGN);
         }
 
-        (void) sigemptyset(&set);
-
-        act.sa_handler = (signalfun_t) func; /* user function */
-        act.sa_mask = set;                      /* signal mask */
+        act.sa_handler = func;                  /* user function */
+        sigemptyset(&act.sa_mask);              /* signal mask */
         act.sa_flags = 0;                       /* no special actions */
 
         if (sigaction(sig, &act, &oact)) {
@@ -372,14 +360,13 @@ RETSIGTYPE (*bsd_signal(int sig, signalfun_t func)) ()
                 return((signalfun_t) SIG_IGN);
         }
 
-        r_func = (signalfun_t) oact.sa_handler;
-        return(r_func);
+        return oact.sa_handler;
 }
 #endif /* POSIXSIG */
 
 
 #ifdef SIGSYNCH
-static long Synch_Cnt = 0;
+static long Synch_Cnt = 0; /* FIXME: not used */
 
 RETSIGTYPE
 synch_handler(int sno)

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.h,v 3.10 2005/04/11 22:10:59 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.h,v 3.11 2005/11/02 17:27:26 christos Exp $ */
 /*
  * tc.nls.h: NLS support
  *
@@ -48,7 +48,7 @@
 # define TRIM_AND_EXTEND(s, c) (c &= TRIM)
 
 extern int NLSWidth (NLSChar);
-extern int NLSStringWidth (Char *);
+extern int NLSStringWidth (const Char *);
 
 #define NLS_ILLEGAL INVALID_BYTE
 
@@ -56,9 +56,9 @@ extern int NLSStringWidth (Char *);
 # if defined(SHORT_STRINGS) && defined(NLS)
 
 extern int NLSFrom (const Char *, size_t, NLSChar *);
-extern int NLSFinished (Char *, size_t, eChar);
-extern int NLSChars (Char *);
-extern int NLSStringWidth (Char *);
+extern int NLSFinished (const Char *, size_t, eChar);
+extern int NLSChars (const Char *);
+extern int NLSStringWidth (const Char *);
 extern int NLSWidth (NLSChar);
 extern int NLSTo (Char *, NLSChar);
 extern void NLSQuote (Char *);
@@ -82,8 +82,8 @@ extern void NLSQuote (Char *);
 # endif
 #endif
 
-extern int NLSExtend (Char *, int, int);
-extern Char *NLSChangeCase (Char *, int);
+extern int NLSExtend (const Char *, int, int);
+extern Char *NLSChangeCase (const Char *, int);
 extern int NLSClassify (NLSChar, int);
 
 #define NLSCLASS_CTRL		(-1)

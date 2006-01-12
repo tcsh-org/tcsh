@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/globals.c,v 1.4 2004/05/19 18:22:28 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/globals.c,v 1.5 2004/07/02 01:26:15 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -89,7 +89,7 @@ int fork_copy_user_mem(HANDLE hproc) {
 #include <winnt.h>
 #include <ntport.h>
 
-#define XFER_BUFFER_SIZE 2048
+#define XFER_BUFFER_SIZE 2048/*FIXME: not used AFAICS*/
 
 int is_gui(char *exename) {
 

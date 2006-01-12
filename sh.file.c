@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.28 2005/01/05 16:06:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.29 2005/04/11 22:10:57 kim Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.file.c,v 3.28 2005/01/05 16:06:13 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.29 2005/04/11 22:10:57 kim Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -61,24 +61,22 @@ typedef enum {
 
 static	void	 setup_tty		(int);
 static	void	 back_to_col_1		(void);
-static	void	 pushback		(Char *);
-static	void	 catn			(Char *, Char *, int);
-static	void	 copyn			(Char *, Char *, int);
-static	int	 filetype		(Char *, Char *);
-static	void	 print_by_column	(Char *, Char *[], size_t);
-static	Char 	*tilde			(Char *, Char *);
+static	void	 pushback		(const Char *);
+static	int	 filetype		(const Char *, const Char *);
+static	void	 print_by_column	(const Char *, Char *[], size_t);
+static	Char 	*tilde			(const Char *);
 static	void	 retype			(void);
 static	void	 beep			(void);
-static	void 	 print_recognized_stuff	(Char *);
-static	void	 extract_dir_and_name	(Char *, Char *, Char *);
+static	void 	 print_recognized_stuff	(const Char *);
+static	void	 extract_dir_and_name	(const Char *, Char **, const Char **);
 static	Char	*getitem		(DIR *, int);
 static	void	 free_items		(Char **, size_t);
-static	int	 tsearch		(Char *, COMMAND, int);
-static	int	 compare		(const ptr_t, const ptr_t);
-static	int	 recognize		(Char *, Char *, int, size_t);
-static	int	 is_prefix		(Char *, Char *);
-static	int	 is_suffix		(Char *, Char *);
-static	int	 ignored		(Char *);
+static	size_t	 tsearch		(Char *, COMMAND, size_t);
+static	int	 compare		(const void *, const void *);
+static	int	 recognize		(Char **, Char *, size_t, size_t);
+static	int	 is_prefix		(const Char *, const Char *);
+static	int	 is_suffix		(const Char *, const Char *);
+static	int	 ignored		(const Char *);
 
 
 /*
@@ -221,9 +219,9 @@ back_to_col_1(void)
  * Push string contents back into tty queue
  */
 static void
-pushback(Char *string)
+pushback(const Char *string)
 {
-    Char *p;
+    const Char *p;
 #ifdef TERMIO
 # ifdef POSIX
     struct termios tty, tty_normal;
@@ -285,49 +283,23 @@ pushback(Char *string)
 # endif /* BSDISGS */
 }
 
-/*
- * Concatenate src onto tail of des.
- * Des is a string whose maximum length is count.
- * Always null terminate.
- */
-static void
-catn(Char *des, Char *src, int count)
-{
-    while (--count >= 0 && *des)
-	des++;
-    while (--count >= 0)
-	if ((*des++ = *src++) == 0)
-	    return;
-    *des = '\0';
-}
-
-/*
- * Like strncpy but always leave room for trailing \0
- * and always null terminate.
- */
-static void
-copyn(Char *des, Char *src, int count)
-{
-    while (--count >= 0)
-	if ((*des++ = *src++) == 0)
-	    return;
-    *des = '\0';
-}
-
 static int
-filetype(Char *dir, Char *file)
+filetype(const Char *dir, const Char *file)
 {
-    Char    path[MAXPATHLEN];
+    Char    *path;
+    char *spath;
     struct stat statb;
 
-    catn(Strcpy(path, dir), file, sizeof(path) / sizeof(Char));
-    if (lstat(short2str(path), &statb) == 0) {
+    path = Strspl(dir, file);
+    spath = short2str(path);
+    xfree(path);
+    if (lstat(spath, &statb) == 0) {
 	switch (statb.st_mode & S_IFMT) {
 	case S_IFDIR:
 	    return ('/');
 
 	case S_IFLNK:
-	    if (stat(short2str(path), &statb) == 0 &&	/* follow it out */
+	    if (stat(spath, &statb) == 0 &&	/* follow it out */
 		S_ISDIR(statb.st_mode))
 		return ('>');
 	    else
@@ -344,14 +316,13 @@ filetype(Char *dir, Char *file)
     return (' ');
 }
 
-static struct winsize win;
-
 /*
  * Print sorted down columns
  */
 static void
-print_by_column(Char *dir, Char *items[], size_t count)
+print_by_column(const Char *dir, Char *items[], size_t count)
 {
+    struct winsize win;
     size_t i;
     int rows, r, c, maxwidth = 0, columns;
 
@@ -391,27 +362,30 @@ print_by_column(Char *dir, Char *items[], size_t count)
  *	home_directory_of_person/mumble
  */
 static Char *
-tilde(Char *new, Char *old)
+tilde(const Char *old)
 {
-    Char *o, *p;
+    const Char *o, *home;
     struct passwd *pw;
-    static Char person[40];
 
     if (old[0] != '~')
-	return (Strcpy(new, old));
+	return (Strsave(old));
+    old++;
 
-    for (p = person, o = &old[1]; *o && *o != '/'; *p++ = *o++);
-    *p = '\0';
-    if (person[0] == '\0')
-	(void) Strcpy(new, varval(STRhome));
+    for (o = old; *o != '\0' && *o != '/'; o++)
+	;
+    if (o == old)
+	home = varval(STRhome);
     else {
+	Char *person;
+
+	person = Strnsave(old, o - old);
 	pw = getpwnam(short2str(person));
+	xfree(person);
 	if (pw == NULL)
 	    return (NULL);
-	(void) Strcpy(new, str2short(pw->pw_dir));
+	home = str2short(pw->pw_dir);
     }
-    (void) Strcat(new, o);
-    return (new);
+    return Strspl(home, o);
 }
 
 /*
@@ -464,7 +438,7 @@ beep(void)
  * print the recognized part of the string
  */
 static void
-print_recognized_stuff(Char *recognized_part)
+print_recognized_stuff(const Char *recognized_part)
 {
     /* An optimized erasing of that silly ^[ */
     (void) putraw('\b');
@@ -496,19 +470,17 @@ print_recognized_stuff(Char *recognized_part)
  * Should leave final slash (/) at end of dir.
  */
 static void
-extract_dir_and_name(Char *path, Char *dir, Char *name)
+extract_dir_and_name(const Char *path, Char **dir, const Char **name)
 {
-    Char *p;
+    const Char *p;
 
     p = Strrchr(path, '/');
-    if (p == NULL) {
-	copyn(name, path, MAXNAMLEN);
-	dir[0] = '\0';
-    }
-    else {
-	copyn(name, ++p, MAXNAMLEN);
-	copyn(dir, path, p - path);
-    }
+    if (p == NULL)
+	p = path;
+    else
+	p++;
+    *name = p;
+    *dir = Strnsave(path, p - path);
 }
 
 static Char *
@@ -560,37 +532,39 @@ free_items(Char **items, size_t numitems)
 /*
  * Perform a RECOGNIZE or LIST command on string "word".
  */
-static int
-tsearch(Char *word, COMMAND command, int max_word_length)
+static size_t
+tsearch(Char *word, COMMAND command, size_t max_word_length)
 {
     DIR *dir_fd;
     int ignoring = TRUE, nignored = 0;
-    int name_length, looking_for_lognames;
-    Char    tilded_dir[MAXPATHLEN + 1], dir[MAXPATHLEN + 1];
-    Char    name[MAXNAMLEN + 1], extended_name[MAXNAMLEN + 1];
-    Char   *item;
+    int looking_for_lognames;
+    Char *tilded_dir = NULL, *dir = NULL;
+    Char *extended_name = NULL;
+    const Char *name;
+    Char *item;
     Char **items = NULL;
-    size_t numitems = 0, maxitems = 0;
+    size_t name_length, numitems = 0, maxitems = 0;
 
     looking_for_lognames = (*word == '~') && (Strchr(word, '/') == NULL);
     if (looking_for_lognames) {
 #ifdef HAVE_GETPWENT
 	(void) setpwent();
 #endif
-	copyn(name, &word[1], MAXNAMLEN);	/* name sans ~ */
+	name = word + 1;	/* name sans ~ */
 	dir_fd = NULL;
     }
     else {
-	extract_dir_and_name(word, dir, name);
-	if (tilde(tilded_dir, dir) == 0)
-	    return (0);
+	extract_dir_and_name(word, &dir, &name);
+	tilded_dir = tilde(dir);
+	if (tilded_dir == NULL)
+	    goto end;
 	dir_fd = opendir(*tilded_dir ? short2str(tilded_dir) : ".");
 	if (dir_fd == NULL)
-	    return (0);
+	    goto end;
     }
 
-again:				/* search for matches */
     name_length = Strlen(name);
+again:				/* search for matches */
     for (numitems = 0;
 	(item = getitem(dir_fd, looking_for_lognames)) != NULL;) {
 	if (!is_prefix(name, item))
@@ -602,22 +576,15 @@ again:				/* search for matches */
 	if (command == LIST) {
 	    if (numitems >= maxitems) {
 		maxitems += 1024;
-		if (items == NULL)
-			items = (Char **) xmalloc(sizeof(*items) * maxitems);
-		else
-			items = (Char **) xrealloc((ptr_t) items,
-			    sizeof(*items) * maxitems);
+		items = xrealloc(items, sizeof(*items) * maxitems);
 	    }
-	    items[numitems] = (Char *) xmalloc((size_t) (Strlen(item) + 1) *
-					       sizeof(Char));
-	    copyn(items[numitems], item, MAXNAMLEN);
+	    items[numitems] = Strsave(item);
 	    numitems++;
 	}
 	else {			/* RECOGNIZE command */
 	    if (ignoring && ignored(item))
 		nignored++;
-	    else if (recognize(extended_name,
-			       item, name_length, ++numitems))
+	    else if (recognize(&extended_name, item, name_length, ++numitems))
 		break;
 	}
     }
@@ -639,45 +606,45 @@ again:				/* search for matches */
 #endif
     } else
 	(void) closedir(dir_fd);
-    if (numitems == 0)
-	return (0);
-    if (command == RECOGNIZE) {
-	if (looking_for_lognames)
-	    copyn(word, STRtilde, 1);
-	else
-	    /* put back dir part */
-	    copyn(word, dir, max_word_length);
-	/* add extended name */
-	catn(word, extended_name, max_word_length);
-	return (numitems);
+    if (numitems != 0) {
+	if (command == RECOGNIZE) {
+	    if (looking_for_lognames)
+		copyn(word, STRtilde, 2);/*FIXBUF, sort of */
+	    else
+		/* put back dir part */
+		copyn(word, dir, max_word_length);/*FIXBUF*/
+	    /* add extended name */
+	    catn(word, extended_name, max_word_length);/*FIXBUF*/
+	}
+	else {			/* LIST */
+	    qsort(items, numitems, sizeof(items[0]), compare);
+	    print_by_column(looking_for_lognames ? NULL : tilded_dir,
+			    items, numitems);
+	    if (items != NULL)
+		FREE_ITEMS(items, numitems);
+	}
     }
-    else {			/* LIST */
-	qsort((ptr_t) items, numitems, sizeof(items[0]), 
-	    (int (*) (const void *, const void *)) compare);
-	print_by_column(looking_for_lognames ? NULL : tilded_dir,
-			items, numitems);
-	if (items != NULL)
-	    FREE_ITEMS(items, numitems);
-    }
-    return (0);
+ end:
+    xfree(extended_name);
+    xfree(tilded_dir);
+    return (numitems);
 }
 
 
 static int
-compare(const ptr_t p, const ptr_t q)
+compare(const void *p, const void *q)
 {
 #ifdef WIDE_STRINGS
     errno = 0;
 
-    return (wcscoll(*(Char **) p, *(Char **) q));
+    return (wcscoll(*(Char *const *) p, *(Char *const *) q));
 #else
     char *p1, *q1;
     int res;
 
-    p1 = strsave(short2str(*(Char **) p));
-    q1 = strsave(short2str(*(Char **) q));
+    p1 = strsave(short2str(*(Char *const *) p));
+    q1 = strsave(short2str(*(Char *const *) q));
 # if defined(NLS) && !defined(NOSTRCOLL)
-    errno = 0;  /* strcoll sets errno, another brain-damage */
     res = strcoll(p1, q1);
 # else
     res = strcmp(p1, q1);
@@ -697,15 +664,16 @@ compare(const ptr_t p, const ptr_t q)
  * If we shorten it back to the prefix length, stop searching.
  */
 static int
-recognize(Char *extended_name, Char *item, int name_length, size_t numitems)
+recognize(Char **extended_name, Char *item, size_t name_length,
+	  size_t numitems)
 {
     if (numitems == 1)		/* 1st match */
-	copyn(extended_name, item, MAXNAMLEN);
+	*extended_name = Strsave(item);
     else {			/* 2nd & subsequent matches */
 	Char *x, *ent;
-	int len = 0;
+	size_t len = 0;
 
-	x = extended_name;
+	x = *extended_name;
 	for (ent = item; *x && *x == *ent++; x++, len++);
 	*x = '\0';		/* Shorten at 1st Char diff */
 	if (len == name_length)	/* Ambiguous to prefix? */
@@ -720,7 +688,7 @@ recognize(Char *extended_name, Char *item, int name_length, size_t numitems)
  * it matches anything.
  */
 static int
-is_prefix(Char *check, Char *template)
+is_prefix(const Char *check, const Char *template)
 {
     do
 	if (*check == 0)
@@ -734,9 +702,9 @@ is_prefix(Char *check, Char *template)
  *  end of check, I.e., are it's suffix.
  */
 static int
-is_suffix(Char *check, Char *template)
+is_suffix(const Char *check, const Char *template)
 {
-    Char *c, *t;
+    const Char *c, *t;
 
     for (c = check; *c++;);
     for (t = template; *t++;);
@@ -748,28 +716,29 @@ is_suffix(Char *check, Char *template)
     }
 }
 
-int
-tenex(Char *inputline, int inputline_size)
+size_t
+tenex(Char *inputline, size_t inputline_size)
 {
-    int numitems, num_read;
-    char    tinputline[BUFSIZE + 1];
+    size_t numitems;
+    ssize_t num_read;
+    char    tinputline[BUFSIZE + 1];/*FIXBUF*/
 
 
     setup_tty(ON);
 
-    while ((num_read = read(SHIN, tinputline, BUFSIZE)) > 0) {
-	static Char delims[] = {' ', '\'', '"', '\t', ';', '&', '<',
+    while ((num_read = read(SHIN, tinputline, BUFSIZE)) > 0) {/*FIXBUF*/
+	static const Char delims[] = {' ', '\'', '"', '\t', ';', '&', '<',
 	'>', '(', ')', '|', '^', '%', '\0'};
 	Char *str_end, *word_start, last_Char, should_retype;
-	int space_left;
+	size_t space_left;
 	COMMAND command;
 
 	tinputline[num_read] = 0;
-	Strcpy(inputline, str2short(tinputline));
+	Strcpy(inputline, str2short(tinputline));/*FIXBUF*/
 	num_read = Strlen(inputline);
 	last_Char = inputline[num_read - 1] & ASCII;
 
-	if (last_Char == '\n' || num_read == inputline_size)
+	if (last_Char == '\n' || (size_t)num_read == inputline_size)
 	    break;
 	command = (last_Char == ESC) ? RECOGNIZE : LIST;
 	if (command == LIST)
@@ -786,7 +755,7 @@ tenex(Char *inputline, int inputline_size)
 	    if (Strchr(delims, word_start[-1]))
 		break;
 	space_left = inputline_size - (word_start - inputline) - 1;
-	numitems = tsearch(word_start, command, space_left);
+	numitems = tsearch(word_start, command, space_left);/*FIXBUF*/
 
 	if (command == RECOGNIZE) {
 	    /* print from str_end on */
@@ -818,7 +787,7 @@ tenex(Char *inputline, int inputline_size)
 }
 
 static int
-ignored(Char *item)
+ignored(const Char *item)
 {
     struct varent *vp;
     Char **cp;

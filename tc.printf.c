@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.printf.c,v 3.27 2005/01/05 16:06:15 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.printf.c,v 3.28 2005/04/11 22:10:59 kim Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -34,16 +34,15 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.27 2005/01/05 16:06:15 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.28 2005/04/11 22:10:59 kim Exp $")
 
 #ifdef lint
 #undef va_arg
 #define va_arg(a, b) (a ? (b) 0 : (b) 0)
 #endif
 
-#define INF	32766		/* should be bigger than any field to print */
+#define INF	INT_MAX		/* should be bigger than any field to print */
 
-static char buf[128];
 static char snil[] = "(nil)";
 
 static	void	xaddchar	(int);
@@ -55,7 +54,7 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
     char *bp;
     const char *f;
 #ifdef SHORT_STRINGS
-    Char *Bp;
+    const Char *Bp;
 #endif /* SHORT_STRINGS */
 #ifdef HAVE_LONG_LONG
     long long l;
@@ -64,6 +63,7 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
     long l;
     unsigned long u;
 #endif
+    char buf[(CHAR_BIT * sizeof (l) + 2) / 3 + 1]; /* Octal: 3 bits per char */
     int i;
     int fmt;
     unsigned char pad = ' ';
@@ -372,6 +372,38 @@ xvsnprintf(char *str, size_t size, const char *fmt, va_list va)
 #endif
 }
 
+char *
+xvasprintf(const char *fmt, va_list va)
+{
+    size_t size;
+    char *buf;
+
+    buf = NULL;
+    size = 64; /* Arbitrary */
+    for (;;) {
+	buf = xrealloc(buf, size);
+	xstring = buf;
+	xestring = buf + size - 1;
+	doprnt(xaddchar, fmt, va);
+	if (xstring < xestring)
+	    break;
+	size *= 2;
+    }
+    *xstring++ = '\0';
+    return xrealloc(buf, xstring - buf);
+}
+
+char *
+xasprintf(const char *fmt, ...)
+{
+    va_list va;
+    char *ret;
+
+    va_start (va, fmt);
+    ret = xvasprintf(fmt, va);
+    va_end(va);
+    return ret;
+}
 
 
 #ifdef PURIFY

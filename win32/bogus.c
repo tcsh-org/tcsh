@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/bogus.c,v 1.4 2004/05/19 18:22:27 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/bogus.c,v 1.5 2005/04/11 22:11:01 kim Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -38,7 +38,7 @@
 
 static struct passwd pass_bogus;
 static char username[20];
-static char homedir[256];
+static char homedir[256];/*FIXBUF*/
 static char *this_shell="tcsh";
 
 static char dummy[2]={0,0};
@@ -64,7 +64,7 @@ struct passwd * getpwnam(char *name) {
 		GetUserName(username,&size);
 		ptr = getenv("HOME");
 		if (ptr){
-			strcpy(homedir,ptr);
+			strcpy(homedir,ptr);/*FIXME: buffer overflow?*/
 			pass_bogus.pw_dir = &homedir[0];
 		}
 		pass_bogus.pw_name = &username[0];
@@ -89,7 +89,7 @@ struct passwd * getpwuid(uid_t uid) {
 		GetUserName(username,&size);
 		ptr = getenv("HOME");
 		if (ptr){
-			strcpy(homedir,ptr);
+			strcpy(homedir,ptr);/*FIXME: buffer overflow?*/
 			pass_bogus.pw_dir = &homedir[0];
 		}
 		pass_bogus.pw_name = &username[0];

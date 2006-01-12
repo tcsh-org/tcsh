@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.57 2005/01/18 20:24:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.58 2005/04/11 22:10:59 kim Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -32,6 +32,9 @@
  */
 #ifndef _h_tc_decls
 #define _h_tc_decls
+
+struct strbuf;
+struct Strbuf;
 
 /*
  * tc.alloc.c
@@ -74,16 +77,15 @@ extern	int		  resetdisc	(int);
 /*
  * tc.func.c
  */
-extern	Char		 *expand_lex    (Char *, size_t, struct wordent *, 
-					 int, int);
-extern	Char		 *sprlex	(Char *, size_t, struct wordent *);
-extern	Char		 *Itoa		(int, Char *, int, int);
+extern	Char		 *expand_lex    (const struct wordent *, int, int);
+extern	Char		 *sprlex	(const struct wordent *);
+extern	Char		 *Itoa		(int, size_t, Char);
 extern	void		  dolist	(Char **, struct command *);
 extern	void		  dotermname	(Char **, struct command *);
 extern	void		  dotelltc	(Char **, struct command *);
 extern	void		  doechotc	(Char **, struct command *);
 extern	void		  dosettc	(Char **, struct command *);
-extern	int		  cmd_expand	(Char *, Char *);
+extern	int		  cmd_expand	(Char *, Char **);
 extern	void		  dowhich	(Char **, struct command *);
 extern	struct process	 *find_stop_ed	(void);
 extern	void		  fg_proc_entry	(struct process *);
@@ -98,7 +100,7 @@ extern	void		  aliasrun	(int, Char *, Char *);
 extern	void		  setalarm	(int);
 extern	void		  rmstar	(struct wordent *);
 extern	void		  continue_jobs	(struct wordent *);
-extern	Char		 *gettilde	(Char *);
+extern	Char		 *gettilde	(const Char *);
 extern	Char		 *getusername	(Char **);
 #ifdef OBSOLETE
 extern	void		  doaliases	(Char **, struct command *);
@@ -158,7 +160,7 @@ extern	void	 	  pr_stat_sub	(struct process_stats *,
 #endif /* _SEQUENT_ */
 
 #ifdef NEEDtcgetpgrp
-extern	int	 	  xtcgetpgrp	(int);
+extern	pid_t	 	  xtcgetpgrp	(int);
 extern	int		  xtcsetpgrp	(int, int);
 # undef tcgetpgrp
 # define tcgetpgrp(a) 	  xtcgetpgrp(a)
@@ -176,12 +178,12 @@ extern	void	 	  fix_strcoll_bug	(void);
 extern	void	 	  osinit	(void);
 
 #ifndef HAVE_MEMMOVE
-extern ptr_t 		 xmemmove	(ptr_t, const ptr_t, size_t);
+extern void 		*xmemmove	(void *, const void *, size_t);
 # define memmove(a, b, c) xmemmove(a, b, c)
 #endif /* !HAVE_MEMMOVE */
 
 #ifndef HAVE_MEMSET
-extern ptr_t 		 xmemset	(ptr_t, int, size_t);
+extern void 		*xmemset	(void *, int, size_t);
 # define memset(a, b, c) xmemset(a, b, c)
 #endif /* !HAVE_MEMSET */
 
@@ -223,26 +225,27 @@ extern	int		  getv		(Char *);
  */
 extern	pret_t		  xprintf	(const char *, ...);
 extern	pret_t		  xsnprintf	(char *, size_t, const char *, ...);
+extern	char		 *xasprintf	(const char *, ...);
 extern	pret_t		  xvprintf	(const char *, va_list);
 extern	pret_t		  xvsnprintf	(char *, size_t, const char *,
 					 va_list);
+extern	char		 *xvasprintf	(const char *, va_list);
 
 /*
  * tc.prompt.c
  */
 extern	void		  dateinit	(void);
 extern	void		  printprompt	(int, const char *);
-extern  Char 		 *expdollar	(Char **, const Char **, size_t *,
-					 int);
-extern	void		  tprintf	(int, Char *, const Char *, size_t, 
-					 const char *, time_t, ptr_t);
+extern  int 		  expdollar	(struct Strbuf *, const Char **, Char);
+extern	Char		 *tprintf	(int, const Char *, const char *,
+					 time_t, ptr_t);
 
 /*
  * tc.sched.c
  */
 extern	time_t		  sched_next	(void);
 extern	void		  dosched	(Char **, struct command *);
-extern	void		  sched_run	(int);
+extern	void		  sched_run	(void);
 
 /*
  * tc.sig.c
@@ -313,6 +316,7 @@ extern	size_t		  s_strlen	(const Char *);
 extern	int		  s_strcmp	(const Char *, const Char *);
 extern	int		  s_strncmp	(const Char *, const Char *, size_t);
 extern	int		  s_strcasecmp	(const Char *, const Char *);
+extern	Char		 *s_strnsave	(const Char *, size_t);
 extern	Char		 *s_strsave	(const Char *);
 extern	Char		 *s_strend	(const Char *);
 extern	Char		 *s_strstr	(const Char *, const Char *);
@@ -322,6 +326,19 @@ extern	char		 *short2str	(const Char *);
 extern	char		**short2blk	(Char **);
 #endif /* SHORT_STRINGS */
 extern	char		 *short2qstr	(const Char *);
+
+extern	void		  strbuf_terminate(struct strbuf *);
+extern  void		  strbuf_append1(struct strbuf *, char);
+extern  void		  strbuf_appendn(struct strbuf *, const char *,
+					 size_t);
+extern  void		  strbuf_append (struct strbuf *, const char *);
+extern  char		 *strbuf_finish (struct strbuf *);
+extern	void		  Strbuf_terminate(struct Strbuf *);
+extern  void		  Strbuf_append1(struct Strbuf *, Char);
+extern  void		  Strbuf_appendn(struct Strbuf *, const Char *,
+					 size_t);
+extern  void		  Strbuf_append (struct Strbuf *, const Char *);
+extern  Char		 *Strbuf_finish (struct Strbuf *);
 
 
 /*
@@ -336,7 +353,7 @@ extern	void		  fix_version	(void);
 extern	void		  initwatch	(void);
 extern	void		  resetwatch	(void);
 extern	void		  watch_login	(int);
-extern	const char 	 *who_info	(ptr_t, int, char *, size_t);
+extern	char	 	 *who_info	(ptr_t, int);
 extern	void		  dolog		(Char **, struct command *);
 # ifdef HAVE_STRUCT_UTMP_UT_HOST
 extern	char		 *utmphost	(void);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.str.c,v 3.19 2005/01/06 16:56:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.str.c,v 3.20 2005/04/11 22:11:00 kim Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$Id: tc.str.c,v 3.19 2005/01/06 16:56:26 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.20 2005/04/11 22:11:00 kim Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -133,33 +133,20 @@ short2blk(Char **src)
 Char   *
 str2short(const char *src)
 {
-    static Char *sdst;
-    static size_t dstsize = 0;
-    Char *dst, *edst;
+    static struct Strbuf buf; /* = Strbuf_INIT; */
 
     if (src == NULL)
 	return (NULL);
 
-    if (sdst == (NULL)) {
-	dstsize = MALLOC_INCR;
-	sdst = (Char *) xmalloc((size_t) (dstsize * sizeof(Char)));
-    }
+    buf.len = 0;
+    while (*src) {
+	Char wc;
 
-    dst = sdst;
-    edst = &dst[dstsize];
-    while ((unsigned char) *src) {
-	src += one_mbtowc(dst, src, MB_LEN_MAX);
-	dst++;
-	if (dst == edst) {
-	    dstsize += MALLOC_INCR;
-	    sdst = (Char *) xrealloc((ptr_t) sdst,
-				     (size_t) (dstsize * sizeof(Char)));
-	    edst = &sdst[dstsize];
-	    dst = &edst[-MALLOC_INCR];
-	}
+	src += one_mbtowc(&wc, src, MB_LEN_MAX);
+	Strbuf_append1(&buf, wc);
     }
-    *dst = 0;
-    return (sdst);
+    Strbuf_terminate(&buf);
+    return buf.s;
 }
 
 char   *
@@ -382,44 +369,50 @@ s_strcasecmp(const Char *str1, const Char *str2)
 }
 
 Char   *
+s_strnsave(const Char *s, size_t len)
+{
+    Char *n;
+
+    n = xmalloc((len + 1) * sizeof (*n));
+    memcpy(n, s, len * sizeof (*n));
+    n[len] = '\0';
+    return n;
+}
+
+Char   *
 s_strsave(const Char *s)
 {
     Char   *n;
-    Char *p;
+    size_t size;
 
-    if (s == 0)
+    if (s == NULL)
 	s = STRNULL;
-    for (p = (Char *)(intptr_t)s; *p++;)
-	continue;
-    n = p = (Char *) xmalloc((size_t) 
-			     ((((const Char *) p) - s) * sizeof(Char)));
-    while ((*p++ = *s++) != '\0')
-	continue;
+    size = (Strlen(s) + 1) * sizeof(*n);
+    n = xmalloc(size);
+    memcpy(n, s, size);
     return (n);
 }
 
 Char   *
 s_strspl(const Char *cp, const Char *dp)
 {
-    Char   *ep;
-    Char *p, *q;
+    Char *res, *ep;
+    const Char *p, *q;
 
     if (!cp)
 	cp = STRNULL;
     if (!dp)
 	dp = STRNULL;
-    for (p = (Char *)(intptr_t) cp; *p++;)
+    for (p = cp; *p++;)
 	continue;
-    for (q = (Char *)(intptr_t) dp; *q++;)
+    for (q = dp; *q++;)
 	continue;
-    ep = (Char *) xmalloc((size_t)
-			  (((((const Char *) p) - cp) + 
-			    (((const Char *) q) - dp) - 1) * sizeof(Char)));
-    for (p = ep, q = (Char*)(intptr_t) cp; (*p++ = *q++) != '\0';)
+    res = xmalloc(((p - cp) + (q - dp) - 1) * sizeof(Char));
+    for (ep = res, q = cp; (*ep++ = *q++) != '\0';)
 	continue;
-    for (p--, q = (Char *)(intptr_t) dp; (*p++ = *q++) != '\0';)
+    for (ep--, q = dp; (*ep++ = *q++) != '\0';)
 	continue;
-    return (ep);
+    return (res);
 }
 
 Char   *
@@ -492,3 +485,63 @@ short2qstr(const Char *src)
     *dst = 0;
     return (sdst);
 }
+
+#define DO_STRBUF(STRBUF, CHAR, STRLEN)				\
+static void							\
+STRBUF##_store1(struct STRBUF *buf, CHAR c)			\
+{								\
+    if (buf->size == buf->len) {				\
+	if (buf->size == 0)					\
+	    buf->size = 64; /* Arbitrary */			\
+	else							\
+	    buf->size *= 2;					\
+	buf->s = xrealloc(buf->s, buf->size * sizeof(*buf->s));	\
+    }								\
+    buf->s[buf->len] = c;					\
+}								\
+								\
+/* Like strbuf_append1(buf, '\0'), but don't advance len */	\
+void								\
+STRBUF##_terminate(struct STRBUF *buf)				\
+{								\
+    STRBUF##_store1(buf, '\0');					\
+}								\
+								\
+void								\
+STRBUF##_append1(struct STRBUF *buf, CHAR c)			\
+{								\
+    STRBUF##_store1(buf, c);					\
+    buf->len++;							\
+}								\
+								\
+void								\
+STRBUF##_appendn(struct STRBUF *buf, const CHAR *s, size_t len)	\
+{								\
+    if (buf->size < buf->len + len) {				\
+	if (buf->size == 0)					\
+	    buf->size = 64; /* Arbitrary */			\
+	while (buf->size < buf->len + len)			\
+	    buf->size *= 2;					\
+	buf->s = xrealloc(buf->s, buf->size * sizeof(*buf->s));	\
+    }								\
+    memcpy(buf->s + buf->len, s, len * sizeof(*buf->s));	\
+    buf->len += len;						\
+}								\
+								\
+void								\
+STRBUF##_append(struct STRBUF *buf, const CHAR *s)		\
+{								\
+    STRBUF##_appendn(buf, s, STRLEN(s));			\
+}								\
+								\
+CHAR *								\
+STRBUF##_finish(struct STRBUF *buf)				\
+{								\
+    STRBUF##_append1(buf, 0);					\
+    return xrealloc(buf->s, buf->len * sizeof(*buf->s));	\
+}								\
+								\
+const struct STRBUF STRBUF##_init; /* = STRBUF##_INIT; */
+
+DO_STRBUF(strbuf, char, strlen);
+DO_STRBUF(Strbuf, Char, Strlen);

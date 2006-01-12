@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.70 2005/04/11 22:10:58 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.71 2006/01/12 18:07:43 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.70 2005/04/11 22:10:58 kim Exp $")
+RCSID("$Id: sh.sem.c,v 3.71 2006/01/12 18:07:43 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -60,7 +60,7 @@ static	RETSIGTYPE	vffree	(int);
 #endif 
 static	Char		*splicepipe	(struct command *, Char *);
 static	void		 doio		(struct command *, int *, int *);
-static	void		 chkclob	(char *);
+static	void		 chkclob	(const char *);
 
 /*
  * C shell
@@ -87,8 +87,8 @@ void
 execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 {
     int    forked = 0;
-    struct biltins *bifunc;
-    int     pid = 0;
+    const struct biltins *bifunc;
+    pid_t pid = 0;
     int     pv[2];
 #ifdef BSDSIGS
     static sigmask_t csigmask;
@@ -127,36 +127,45 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
      */
     if (implicit_cd && (intty || intact) && t->t_dcom && t->t_dcom[0] &&
 	 t->t_dcom[0][0] && (blklen(t->t_dcom) == 1) && !noexec) {
-	Char sCName[MAXPATHLEN];
-	Char *pCN;
+	Char *sCName;
 	struct stat stbuf;
 	char *pathname;
 
-	dollar(sCName, t->t_dcom[0]);
-	pCN = sCName;
-	if (pCN[0] == '~') {
-	    Char sCPath[MAXPATHLEN];
-	    Char *pCP = sCPath;
+	sCName = dollar(t->t_dcom[0]);
+	if (sCName != NULL && sCName[0] == '~') {
+	    struct Strbuf buf = Strbuf_INIT;
+	    const Char *name_end;
 
-	    ++pCN;
-	    while (*pCN && *pCN != '/')
-		*pCP++ = *pCN++;
-	    *pCP = 0;
-	    if (sCPath[0])
-		gethdir(sCPath);
-	    else
-		(void) Strcpy(sCPath, varval(STRhome));
-	    catn(sCPath, pCN, MAXPATHLEN);
-	    (void) Strcpy(sCName, sCPath);
+	    for (name_end = sCName + 1; *name_end != '\0' && *name_end != '/';
+		 name_end++)
+		continue;
+	    if (name_end != sCName + 1) {
+		Char *name, *home;
+
+		name = Strnsave(sCName + 1, name_end - (sCName + 1));
+		home = gethdir(name);
+		if (home != NULL) {
+		    Strbuf_append(&buf, home);
+		    xfree(home);
+		} else
+		    Strbuf_append(&buf, name);
+		xfree(name);
+	    } else
+		Strbuf_append(&buf, varval(STRhome));
+	    Strbuf_append(&buf, name_end);
+	    xfree(sCName);
+	    sCName = Strbuf_finish(&buf);
 	}
-    
+
 	pathname = short2str(sCName);
+	xfree(sCName);
 	/* if this is a dir, tack a "cd" on as the first arg */
-	if ((stat(pathname, &stbuf) != -1 && S_ISDIR(stbuf.st_mode))
+	if (pathname != NULL &&
+	    ((stat(pathname, &stbuf) != -1 && S_ISDIR(stbuf.st_mode))
 #ifdef WINNT_NATIVE
-	    || (pathname[0] && pathname[1] == ':' && pathname[2] == '\0')
+	     || (pathname[0] && pathname[1] == ':' && pathname[2] == '\0')
 #endif /* WINNT_NATIVE */
-	) {
+	     )) {
 	    Char *vCD[2];
 	    Char **ot_dcom = t->t_dcom;
 	
@@ -795,35 +804,36 @@ splicepipe(struct command *t, Char *cp)
 
     if (adrof(STRnoambiguous)) {
 	Char **pv;
+	int gflag;
 
 	blk[0] = Dfix1(cp); /* expand $ */
 	blk[1] = NULL;
 
-	gflag = 0, tglob(blk);
+	gflag = tglob(blk);
 	if (gflag) {
-	    pv = globall(blk);
+	    pv = globall(blk, gflag);
 	    if (pv == NULL) {
 		setname(short2str(blk[0]));
-		xfree((ptr_t) blk[0]);
+		xfree(blk[0]);
 		stderror(ERR_NAME | ERR_NOMATCH);
 	    }
 	    gargv = NULL;
 	    if (pv[1] != NULL) { /* we need to fix the command vector */
 		Char **av = blkspl(t->t_dcom, &pv[1]);
-		xfree((ptr_t) t->t_dcom);
+		xfree(t->t_dcom);
 		t->t_dcom = av;
 	    }
-	    xfree((ptr_t) blk[0]);
+	    xfree(blk[0]);
 	    blk[0] = pv[0];
-	    xfree((ptr_t) pv);
+	    xfree(pv);
 	}
     }
     else {
-	Char buf[BUFSIZE];
+	Char *buf;
 
-	(void) Strcpy(buf, blk[1] = Dfix1(cp));
-	xfree((ptr_t) blk[1]);
+	buf = Dfix1(cp);
 	blk[0] = globone(buf, G_ERROR);
+	xfree(buf);
     }
     return(blk[0]);
 }
@@ -843,7 +853,7 @@ doio(struct command *t, int *pipein, int *pipeout)
 	return;
     if ((flags & F_READ) == 0) {/* F_READ already done */
 	if (t->t_dlef) {
-	    char    tmp[MAXPATHLEN+1];
+	    char *tmp;
 
 	    /*
 	     * so < /dev/std{in,out,err} work
@@ -852,11 +862,11 @@ doio(struct command *t, int *pipein, int *pipeout)
 	    (void) dcopy(SHOUT, 1);
 	    (void) dcopy(SHDIAG, 2);
 	    cp = splicepipe(t, t->t_dlef);
-	    (void) strncpy(tmp, short2str(cp), MAXPATHLEN);
-	    tmp[MAXPATHLEN] = '\0';
-	    xfree((ptr_t) cp);
+	    tmp = strsave(short2str(cp));
+	    xfree(cp);
 	    if ((fd = open(tmp, O_RDONLY|O_LARGEFILE)) < 0)
-		stderror(ERR_SYSTEM, tmp, strerror(errno));
+		stderror(ERR_SYSTEM, tmp, strerror(errno));/* FIXME: memory leak */
+	    xfree(tmp);
 	    /* allow input files larger than 2Gb  */
 #ifndef WINNT_NATIVE
 	    (void) fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_LARGEFILE);
@@ -888,12 +898,11 @@ doio(struct command *t, int *pipein, int *pipeout)
 	}
     }
     if (t->t_drit) {
-	char    tmp[MAXPATHLEN+1];
+	char *tmp;
 
 	cp = splicepipe(t, t->t_drit);
-	(void) strncpy(tmp, short2str(cp), MAXPATHLEN);
-	tmp[MAXPATHLEN] = '\0';
-	xfree((ptr_t) cp);
+	tmp = strsave(short2str(cp));
+	xfree(cp);
 	/*
 	 * so > /dev/std{out,err} work
 	 */
@@ -912,16 +921,17 @@ doio(struct command *t, int *pipein, int *pipeout)
 	if ((flags & F_APPEND) == 0 || fd == -1) {
 	    if (!(flags & F_OVERWRITE) && adrof(STRnoclobber)) {
 		if (flags & F_APPEND)
-		    stderror(ERR_SYSTEM, tmp, strerror(errno));
-		chkclob(tmp);
+		    stderror(ERR_SYSTEM, tmp, strerror(errno));/*FIXME: memory leak */
+		chkclob(tmp);/*FIXME: memory leak of tmp */
 	    }
 	    if ((fd = creat(tmp, 0666)) < 0)
-		stderror(ERR_SYSTEM, tmp, strerror(errno));
+		stderror(ERR_SYSTEM, tmp, strerror(errno));/*FIXME: memory leak */
 	    /* allow input files larger than 2Gb  */
 #ifndef WINNT_NATIVE
 	    (void) fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_LARGEFILE);
 #endif /*!WINNT_NATIVE*/
 	}
+	xfree(tmp);
 	(void) dmove(fd, 1);
 	is1atty = isatty(1);
     }
@@ -969,7 +979,7 @@ oops:
 }
 
 static void
-chkclob(char *cp)
+chkclob(const char *cp)
 {
     struct stat stb;
 

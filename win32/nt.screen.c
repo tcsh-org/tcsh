@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.8 2005/05/25 02:47:32 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.9 2005/05/25 03:01:19 amold Exp $*/
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -107,7 +107,7 @@ ReBufferDisplay(void)
 	}
 	TermH = cols;
 
-	TermV = (INBUFSIZE * 4) / TermH + 1;
+	TermV = (INBUFSIZE * 4) / TermH + 1;/*FIXBUF*/
 	b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
 	for (i = 0; i < TermV; i++)
 		b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
@@ -147,17 +147,17 @@ SetTC(char *what, char *how)
 EchoTC(Char **v)
 {
 
-    char    cv[BUFSIZE];
-    int     verbose = 0, silent = 0;
+    char    cv[BUFSIZE];/*FIXBUF*/
+    int     verbose = 0, silent = 0, gflag;
     static char *fmts = "%s\n", *fmtd = "%d\n";
     int li,co;
 
 
     setname("echotc");
 
-    tglob(v);
+    gflag = tglob(v);
     if (gflag) {
-        v = globall(v);
+        v = globall(v, gflag);
         if (v == 0)
             stderror(ERR_NAME | ERR_NOMATCH);
     }
@@ -248,7 +248,6 @@ BindArrowKeys(void)
 {
 	return;
 }
-static Char cur_atr = 0;	/* current attributes */
 
 #define GoodStr(ignore)  1
 	void

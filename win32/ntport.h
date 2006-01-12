@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/ntport.h,v 1.6 2005/01/18 20:24:55 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/ntport.h,v 1.7 2005/03/25 18:46:42 kim Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -172,7 +172,6 @@ pretty */
 #define NOFILE                64
 #define ARG_MAX               1024
 #define MAXSIG                NSIG
-#define NCARGS                ARG_MAX
 
 /*
 mode Value	Checks File For

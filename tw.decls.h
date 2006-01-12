@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.decls.h,v 3.20 2004/08/08 06:42:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.decls.h,v 3.21 2005/04/11 22:11:00 kim Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */
@@ -36,21 +36,19 @@
 /*
  * tw.help.c
  */
-extern	void		  do_help		(Char *);
+extern	void		  do_help		(const Char *);
 
 /*
  * tw.parse.c
  */
-extern	 Char		 *dollar		(Char *, const Char *);
+extern	 Char		 *dollar		(const Char *);
 #ifndef __MVS__
 extern	 int		  tenematch		(Char *, int, COMMAND);
-extern	 int		  t_search		(Char *, Char *, COMMAND, 
-						 int, int, int, Char *, int);
+extern	 int		  t_search		(struct Strbuf *, COMMAND, int,
+						 int, Char *, eChar);
 #endif
 extern	 int		  starting_a_command	(Char *, Char *);
-extern	 void		  copyn			(Char *, Char *, int);
-extern	 void		  catn			(Char *, const Char *, int);
-extern	 int		  fcompare		(Char **, Char **);
+extern	 int		  fcompare		(const void *, const void *);
 extern	 void		  print_by_column	(Char *, Char *[], int, int);
 extern	 int		  StrQcmp		(const Char *, const Char *);
 extern	 Char		 *tgetenv		(Char *);
@@ -58,36 +56,48 @@ extern	 Char		 *tgetenv		(Char *);
 /*
  * tw.init.c
  */
-extern	 void		  tw_alias_start	(DIR *, Char *);
-extern	 void		  tw_cmd_start		(DIR *, Char *);
-extern	 void		  tw_logname_start	(DIR *, Char *);
-extern	 void		  tw_var_start		(DIR *, Char *);
-extern	 void		  tw_complete_start	(DIR *, Char *);
-extern	 void		  tw_file_start		(DIR *, Char *);
-extern	 void		  tw_vl_start		(DIR *, Char *);
-extern	 void		  tw_wl_start		(DIR *, Char *);
-extern	 void		  tw_bind_start		(DIR *, Char *);
-extern	 void		  tw_limit_start	(DIR *, Char *);
-extern	 void		  tw_sig_start		(DIR *, Char *);
-extern	 void		  tw_job_start		(DIR *, Char *);
-extern	 void		  tw_grpname_start	(DIR *, Char *);
-extern	 Char		 *tw_cmd_next		(Char *, int *);
-extern	 Char		 *tw_logname_next	(Char *, int *);
-extern	 Char		 *tw_shvar_next		(Char *, int *);
-extern	 Char		 *tw_envvar_next	(Char *, int *);
-extern	 Char		 *tw_var_next		(Char *, int *);
-extern	 Char		 *tw_file_next		(Char *, int *);
-extern	 Char		 *tw_wl_next		(Char *, int *);
-extern	 Char		 *tw_bind_next		(Char *, int *);
-extern	 Char		 *tw_limit_next		(Char *, int *);
-extern	 Char		 *tw_sig_next		(Char *, int *);
-extern	 Char		 *tw_job_next		(Char *, int *);
-extern	 Char		 *tw_grpname_next	(Char *, int *);
+extern	 void		  tw_alias_start	(DIR *, const Char *);
+extern	 void		  tw_cmd_start		(DIR *, const Char *);
+extern	 void		  tw_logname_start	(DIR *, const Char *);
+extern	 void		  tw_var_start		(DIR *, const Char *);
+extern	 void		  tw_complete_start	(DIR *, const Char *);
+extern	 void		  tw_file_start		(DIR *, const Char *);
+extern	 void		  tw_vl_start		(DIR *, const Char *);
+extern	 void		  tw_wl_start		(DIR *, const Char *);
+extern	 void		  tw_bind_start		(DIR *, const Char *);
+extern	 void		  tw_limit_start	(DIR *, const Char *);
+extern	 void		  tw_sig_start		(DIR *, const Char *);
+extern	 void		  tw_job_start		(DIR *, const Char *);
+extern	 void		  tw_grpname_start	(DIR *, const Char *);
+extern	 int		  tw_cmd_next		(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_logname_next	(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_shvar_next		(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_envvar_next	(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_var_next		(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_file_next		(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_wl_next		(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_bind_next		(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_limit_next		(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_sig_next		(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_job_next		(struct Strbuf *,
+						 struct Strbuf *, int *);
+extern	 int		  tw_grpname_next	(struct Strbuf *,
+						 struct Strbuf *, int *);
 extern	 void		  tw_dir_end		(void);
 extern	 void		  tw_cmd_free		(void);
 extern	 void		  tw_logname_end	(void);
 extern	 void		  tw_grpname_end	(void);
-extern	 Char		 *tw_item_add		(int);
+extern	 void		  tw_item_add		(const struct Strbuf *);
 extern	 Char	        **tw_item_get		(void);
 extern	 void		  tw_item_free		(void);
 extern	 Char		 *tw_item_find		(Char *);
@@ -95,26 +105,26 @@ extern	 Char		 *tw_item_find		(Char *);
 /*
  * tw.spell.c
  */
-extern	 int		  spell_me		(Char *, int, int,
-						 Char *, int);
-extern	 int		  spdir			(Char *, Char *, Char *,
-						 Char *);
-extern	 int		  spdist		(Char *, Char *);
+extern	 int		  spell_me		(struct Strbuf *, int, Char *,
+						 eChar);
+extern	 int		  spdir			(struct Strbuf *, const Char *,
+						 const Char *, Char *);
+extern	 int		  spdist		(const Char *, const Char *);
 
 /*
  * tw.comp.c
  */
 extern	 void		  docomplete		(Char **, struct command *);
 extern	 void		  douncomplete		(Char **, struct command *);
-extern	 int		  tw_complete		(Char *, Char **, 
-						 Char **, int, int *);
+extern	 int		  tw_complete		(const Char *, Char **,
+						 Char **, int, eChar *);
 #ifdef COLOR_LS_F
 /*
  * tw.color.c
  */
 extern	 void		  set_color_context	(void);
-extern	 void		  print_with_color	(Char *, size_t, Char);
-extern	 void		  parseLS_COLORS	(Char *);
+extern	 void		  print_with_color	(const Char *, size_t, Char);
+extern	 void		  parseLS_COLORS	(const Char *);
 #endif /* COLOR_LS_F */
 
 #endif /* _h_tw_decls */

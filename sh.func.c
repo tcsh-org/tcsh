@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.129 2005/11/18 15:35:10 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.130 2006/01/12 18:07:43 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.129 2005/11/18 15:35:10 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.130 2006/01/12 18:07:43 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -49,7 +49,6 @@ static iconv_t catgets_iconv; /* Or (iconv_t)-1 */
 /*
  * C shell
  */
-extern int just_signaled;
 extern char **environ;
 
 extern int MapsAreInited;
@@ -63,17 +62,17 @@ static	void	preread		(void);
 static	void	doagain		(void);
 static  const char *isrchx	(int);
 static	void	search		(int, int, Char *);
-static	int	getword		(Char *);
+static	int	getword		(struct Strbuf *);
 static	void	toend		(void);
 static	void	xecho		(int, Char **);
 static	int	islocale_var	(Char *);
 static	void	wpfree		(struct whyle *);
 
-struct biltins *
+const struct biltins *
 isbfunc(struct command *t)
 {
     Char *cp = t->t_dcom[0];
-    struct biltins *bp, *bp1, *bp2;
+    const struct biltins *bp, *bp1, *bp2;
     static struct biltins label = {"", dozip, 0, 0};
     static struct biltins foregnd = {"%job", dofg1, 0, 0};
     static struct biltins backgnd = {"%job &", dobg1, 0, 0};
@@ -133,7 +132,7 @@ isbfunc(struct command *t)
 }
 
 void
-func(struct command *t, struct biltins *bp)
+func(struct command *t, const struct biltins *bp)
 {
     int     i;
 
@@ -240,16 +239,16 @@ void
 dofiletest(Char **v, struct command *c)
 {
     Char **fileptr, *ftest, *res;
+    int gflag;
 
     USE(c);
     if (*(ftest = *++v) != '-')
 	stderror(ERR_NAME | ERR_FILEINQ);
     ++v;
 
-    gflag = 0;
-    tglob(v);
+    gflag = tglob(v);
     if (gflag) {
-	v = globall(v);
+	v = globall(v, gflag);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
@@ -541,6 +540,7 @@ doforeach(Char **v, struct command *c)
 {
     Char *cp, *sp;
     struct whyle *nwp;
+    int gflag;
 
     USE(c);
     v++;
@@ -551,15 +551,13 @@ doforeach(Char **v, struct command *c)
 	cp++;
     if (*cp)
 	stderror(ERR_NAME | ERR_VARALNUM);
-    if ((cp - sp) > MAXVARLEN)
-	stderror(ERR_NAME | ERR_VARTOOLONG);
     cp = *v++;
     if (v[0][0] != '(' || v[blklen(v) - 1][0] != ')')
 	stderror(ERR_NAME | ERR_NOPAREN);
     v++;
-    gflag = 0, tglob(v);
+    gflag = tglob(v);
     if (gflag) {
-	v = globall(v);
+	v = globall(v, gflag);
 	if (v == 0 && !noexec)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
@@ -790,19 +788,18 @@ isrchx(int n)
 }
 
 
-static Char Stype;
+static int Stype;
 static Char *Sgoal;
 
 static void
 search(int type, int level, Char *goal)
 {
-    Char    wordbuf[BUFSIZE];
-    Char *aword = wordbuf;
+    struct Strbuf word = Strbuf_INIT;
     Char *cp;
     struct whyle *wp;
     int wlevel = 0;
 
-    Stype = (Char) type;
+    Stype = type;
     Sgoal = goal;
     if (type == TC_GOTO) {
 	struct Ain a;
@@ -814,20 +811,19 @@ search(int type, int level, Char *goal)
 	if (intty && fseekp == feobp && aret == TCSH_F_SEEK)
 	    printprompt(1, isrchx(type == TC_BREAK ? zlast : type));
 	/* xprintf("? "), flush(); */
-	aword[0] = 0;
-	(void) getword(aword);
-	switch (srchx(aword)) {
+	(void) getword(&word);
+	switch (srchx(word.s)) {
 
 	case TC_ELSE:
 	    if (level == 0 && type == TC_IF)
-		return;
+		goto end;
 	    break;
 
 	case TC_IF:
-	    while (getword(aword))
+	    while (getword(&word))
 		continue;
 	    if ((type == TC_IF || type == TC_ELSE) &&
-		eq(aword, STRthen))
+		eq(word.s, STRthen))
 		level++;
 	    break;
 
@@ -869,31 +865,31 @@ search(int type, int level, Char *goal)
 	    break;
 
 	case TC_LABEL:
-	    if (type == TC_GOTO && getword(aword) && eq(aword, goal))
+	    if (type == TC_GOTO && getword(&word) && eq(word.s, goal))
 		level = -1;
 	    break;
 
 	default:
 	    if (type != TC_GOTO && (type != TC_SWITCH || level != 0))
 		break;
-	    if (lastchr(aword) != ':')
+	    if (word.len == 0 || word.s[word.len - 1] != ':')
 		break;
-	    aword[Strlen(aword) - 1] = 0;
-	    if ((type == TC_GOTO && eq(aword, goal)) ||
-		(type == TC_SWITCH && eq(aword, STRdefault)))
+	    word.s[--word.len] = 0;
+	    if ((type == TC_GOTO && eq(word.s, goal)) ||
+		(type == TC_SWITCH && eq(word.s, STRdefault)))
 		level = -1;
 	    break;
 
 	case TC_CASE:
 	    if (type != TC_SWITCH || level != 0)
 		break;
-	    (void) getword(aword);
-	    if (lastchr(aword) == ':')
-		aword[Strlen(aword) - 1] = 0;
-	    cp = strip(Dfix1(aword));
+	    (void) getword(&word);
+	    if (word.len != 0 && word.s[word.len - 1] == ':')
+		word.s[--word.len] = 0;
+	    cp = strip(Dfix1(word.s));
 	    if (Gmatch(goal, cp))
 		level = -1;
-	    xfree((ptr_t) cp);
+	    xfree(cp);
 	    break;
 
 	case TC_DEFAULT:
@@ -903,14 +899,18 @@ search(int type, int level, Char *goal)
 	}
 	(void) getword(NULL);
     } while (level >= 0);
+ end:
+    xfree(word.s);
 }
 
 static int
-getword(Char *wp)
+getword(struct Strbuf *wp)
 {
     int found = 0, first;
     eChar c, d;
 
+    if (wp)
+	wp->len = 0;
     c = readc(1);
     d = 0;
     do {
@@ -942,16 +942,11 @@ getword(Char *wp)
 	    }
 	    if (c == CHAR_ERR)
 		goto past;
-	    if (wp) {
-		*wp++ = (Char) c;
-		*wp = '\0';
-	    }
+	    if (wp)
+		Strbuf_append1(wp, (Char) c);
 	    if (!first && !d && c == '(') {
-		if (wp) {
-		    unreadc(c);
-		    *--wp = '\0';
-		    return found;
-		}
+		if (wp)
+		    goto past_word_end;
 		else 
 		    break;
 	    }
@@ -959,9 +954,12 @@ getword(Char *wp)
 	} while ((d || (c != ' ' && c != '\t')) && c != '\n');
     } while (wp == 0);
 
+ past_word_end:
     unreadc(c);
-    if (found)
-	*--wp = '\0';
+    if (found) {
+	wp->len--;
+	Strbuf_terminate(wp);
+    }
 
     return (found);
 
@@ -1095,7 +1093,7 @@ static void
 xecho(int sep, Char **v)
 {
     Char *cp;
-    int     nonl = 0;
+    int     nonl = 0, gflag;
 #ifdef ECHO_STYLE
     int	    echo_style = ECHO_STYLE;
 #else /* !ECHO_STYLE */
@@ -1128,9 +1126,9 @@ xecho(int sep, Char **v)
     v++;
     if (*v == 0)
 	goto done;
-    gflag = 0, tglob(v);
+    gflag = tglob(v);
     if (gflag) {
-	v = globall(v);
+	v = globall(v, gflag);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
@@ -1585,13 +1583,13 @@ tsetenv(const Char *name, const Char *val)
  * it is not needed anymore.
  */
 #undef setenv
-    char    nameBuf[BUFSIZE];
-    char   *cname = short2str(name);
+    char   *cname;
 
-    if (cname == NULL)
+    if (name == NULL)
 	return;
-    (void) strcpy(nameBuf, cname);
-    setenv(nameBuf, short2str(val), 1);
+    cname = strsave(short2str(name));
+    setenv(cname, short2str(val), 1);
+    xfree(cname);
 #else /* !SETENV_IN_LIB */
     Char **ep = STR_environ;
     const Char *ccp;
@@ -2226,7 +2224,7 @@ doeval(Char **v, struct command *c)
 {
     Char  **oevalvec;
     Char   *oevalp;
-    int     odidfds;
+    int     odidfds, gflag;
 #ifndef CLOSE_ON_EXEC
     int     odidcch;
 #endif /* CLOSE_ON_EXEC */
@@ -2253,9 +2251,9 @@ doeval(Char **v, struct command *c)
     gav++;
     if (*gav == 0)
 	return;
-    gflag = 0, tglob(gav);
+    gflag = tglob(gav);
     if (gflag) {
-	gv = gav = globall(gav);
+	gv = gav = globall(gav, gflag);
 	gargv = 0;
 	if (gav == 0)
 	    stderror(ERR_NOMATCH);
@@ -2326,7 +2324,7 @@ dobuiltins(Char **v, struct command *c)
     /* would use print_by_column() in tw.parse.c but that assumes
      * we have an array of Char * to pass.. (sg)
      */
-    struct biltins *b;
+  const struct biltins *b;
     int row, col, columns, rows;
     unsigned int w, maxwidth;
 
@@ -2422,12 +2420,15 @@ void
 nlsinit(void)
 {
 #ifdef NLS_CATALOGS
-    char catalog[ 256 ] = { 't', 'c', 's', 'h', '\0' };
+    static const char default_catalog[] = "tcsh";
+
+    char *catalog = (char *)default_catalog;
 
     if (adrof(STRcatalog) != NULL)
-        xsnprintf((char *)catalog, sizeof(catalog), "tcsh.%s",
-		  short2str(varval(STRcatalog)));
+	catalog = xasprintf("tcsh.%s", short2str(varval(STRcatalog)));
     catd = catopen(catalog, MCLoadBySet);
+    if (catalog != default_catalog)
+	xfree(catalog);
 #if defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
     /* catgets (), not CGETS, the charset name should be in ASCII anyway. */
     catgets_iconv = iconv_open (nl_langinfo (CODESET),

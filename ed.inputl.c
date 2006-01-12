@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.58 2005/04/11 21:09:34 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.59 2005/04/11 22:10:55 kim Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,13 +32,13 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.58 2005/04/11 21:09:34 kim Exp $")
+RCSID("$Id: ed.inputl.c,v 3.59 2005/04/11 22:10:55 kim Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 #include "tw.h"			/* for twenex stuff */
 
-#define OKCMD (INBUFSIZE+INBUFSIZE)
+#define OKCMD INT_MAX
 
 /* ed.inputl -- routines to get a single line from the input. */
 
@@ -88,7 +88,6 @@ Inputl(void)
     struct varent *matchbeep = adrof(STRmatchbeep);
     struct varent *imode = adrof(STRinputmode);
     Char   *SaveChar, *CorrChar;
-    Char    Origin[INBUFSIZE], Change[INBUFSIZE];
     int     matchval;		/* from tenematch() */
     COMMAND fn;
     int curlen = 0;
@@ -135,9 +134,9 @@ Inputl(void)
     tellwhat = 0;
 
     if (RestoreSaved) {
-	copyn(InputBuf, SavedBuf, INBUFSIZE);
-	LastChar = InputBuf + (LastSaved - SavedBuf);
-	Cursor = InputBuf + (CursSaved - SavedBuf);
+	copyn(InputBuf, SavedBuf.s, INBUFSIZE);/*FIXBUF*/
+	LastChar = InputBuf + LastSaved;
+	Cursor = InputBuf + CursSaved;
 	Hist_num = HistSaved;
 	HistSaved = 0;
 	RestoreSaved = 0;
@@ -163,7 +162,7 @@ Inputl(void)
 	    xprintf("Cursor > InputLim\r\n");
 	if (LastChar > InputLim)
 	    xprintf("LastChar > InputLim\r\n");
-	if (InputLim != &InputBuf[INBUFSIZE - 2])
+	if (InputLim != &InputBuf[INBUFSIZE - 2])/*FIXBUF*/
 	    xprintf("InputLim != &InputBuf[INBUFSIZE-2]\r\n");
 	if ((!DoingArg) && (Argument != 1))
 	    xprintf("(!DoingArg) && (Argument != 1)\r\n");
@@ -226,19 +225,24 @@ Inputl(void)
 	    matchval = 1;
 	    if (crct && crct->vec != NULL && (!Strcmp(*(crct->vec), STRcmd) ||
 			 !Strcmp(*(crct->vec), STRall))) {
+		Char *Origin;
+
                 PastBottom();
-		copyn(Origin, InputBuf, INBUFSIZE);
+		Origin = Strsave(InputBuf);
 		SaveChar = LastChar;
 		if (SpellLine(!Strcmp(*(crct->vec), STRcmd)) == 1) {
+		    Char *Change;
+
                     PastBottom();
-		    copyn(Change, InputBuf, INBUFSIZE);
+		    Change = Strsave(InputBuf);
 		    *Strchr(Change, '\n') = '\0';
 		    CorrChar = LastChar;	/* Save the corrected end */
 		    LastChar = InputBuf;	/* Null the current line */
 		    SoundBeep();
 		    printprompt(2, short2str(Change));
+		    xfree(Change);
 		    Refresh();
-		    if (read(SHIN, (char *) &tch, 1) < 0)
+		    if (read(SHIN, &tch, 1) < 0) {
 #ifdef convex
 		        /*
 			 * need to print error message in case file
@@ -247,15 +251,17 @@ Inputl(void)
                         if (errno && errno != EINTR)
                             stderror(ERR_SYSTEM, progname, strerror(errno));
 #else
+			xfree(Origin);
 			break;
 #endif
+		    }
 		    ch = tch;
 		    if (ch == 'y' || ch == ' ') {
 			LastChar = CorrChar;	/* Restore the corrected end */
 			xprintf(CGETS(6, 2, "yes\n"));
 		    }
 		    else {
-			copyn(InputBuf, Origin, INBUFSIZE);
+			Strcpy(InputBuf, Origin);
 			LastChar = SaveChar;
 			if (ch == 'e') {
 			    xprintf(CGETS(6, 3, "edit\n"));
@@ -265,6 +271,7 @@ Inputl(void)
 			    ClearLines();
 			    ClearDisp();
 			    Refresh();
+			    xfree(Origin);
 			    break;
 			}
 			else if (ch == 'a') {
@@ -273,12 +280,14 @@ Inputl(void)
 			    Cursor = LastChar;
 			    printprompt(0, NULL);
 			    Refresh();
+			    xfree(Origin);
 			    break;
 			}
 			xprintf(CGETS(6, 5, "no\n"));
 		    }
 		    flush();
 		}
+		xfree(Origin);
 	    } else if (crct && crct->vec != NULL &&
 		!Strcmp(*(crct->vec), STRcomplete)) {
                 if (LastChar > InputBuf && LastChar[-1] == '\n') {
@@ -569,6 +578,7 @@ doeval1(Char **v)
     int     my_reenter;
     Char  **savegv;
     jmp_buf_t osetexit;
+    int gflag;
 
     oevalvec = evalvec;
     oevalp = evalp;
@@ -576,9 +586,9 @@ doeval1(Char **v)
     gav = v;
 
 
-    gflag = 0, tglob(gav);
+    gflag = tglob(gav);
     if (gflag) {
-	gv = gav = globall(gav);
+	gv = gav = globall(gav, gflag);
 	gargv = 0;
 	if (gav == 0)
 	    stderror(ERR_NOMATCH);

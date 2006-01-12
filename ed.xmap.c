@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.28 2005/01/05 18:06:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.29 2005/04/11 22:10:55 kim Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -88,7 +88,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.28 2005/01/05 18:06:43 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.29 2005/04/11 22:10:55 kim Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -112,8 +112,6 @@ typedef struct Xmapnode {
 } XmapNode;
 
 static XmapNode *Xmap = NULL;	/* the current Xmap */
-#define MAXXKEY 100		/* max length of a Xkey for print putposes */
-static Char printbuf[MAXXKEY];	/* buffer for printing */
 
 
 /* Some declarations of procedures */
@@ -122,9 +120,10 @@ static	int       TryNode	(XmapNode *, CStr *, XmapVal *, int);
 static	XmapNode *GetFreeNode	(CStr *);
 static	void	  PutFreeNode	(XmapNode *);
 static	int	  TryDeleteNode	(XmapNode **, CStr *);
-static	int	  Lookup	(CStr *, XmapNode *, int);
-static	int	  Enumerate	(XmapNode *, int);
-static	int	  unparsech	(int, Char *);
+static	int	  Lookup	(struct Strbuf *, const CStr *,
+				 const XmapNode *);
+static	void	  Enumerate	(struct Strbuf *, const XmapNode *);
+static	void	  unparsech	(struct Strbuf *, Char);
 
 
 XmapVal *
@@ -437,6 +436,7 @@ GetFreeNode(CStr *ch)
 void
 PrintXkey(CStr *key)
 {
+    struct Strbuf buf = Strbuf_INIT;
     CStr cs;
 
     if (key) {
@@ -451,11 +451,10 @@ PrintXkey(CStr *key)
     if (Xmap == NULL && cs.len == 0)
 	return;
 
-    printbuf[0] =  '"';
-    if (Lookup(&cs, Xmap, 1) <= -1)
+    Strbuf_append1(&buf, '"');
+    if (Lookup(&buf, &cs, Xmap) <= -1)
 	/* key is not bound */
 	xprintf(CGETS(9, 4, "Unbound extended key \"%S\"\n"), cs.buf);
-    return;
 }
 
 /* Lookup():
@@ -463,39 +462,34 @@ PrintXkey(CStr *key)
  *	Print if last node
  */
 static int
-Lookup(CStr *str, XmapNode *ptr, int cnt)
+Lookup(struct Strbuf *buf, const CStr *str, const XmapNode *ptr)
 {
-    int     ncnt;
-
     if (ptr == NULL)
 	return (-1);		/* cannot have null ptr */
 
     if (str->len == 0) {
 	/* no more chars in string.  Enumerate from here. */
-	(void) Enumerate(ptr, cnt);
+	Enumerate(buf, ptr);
 	return (0);
     }
     else {
-	/* If match put this char into printbuf.  Recurse */
+	/* If match put this char into buf.  Recurse */
 	if (ptr->ch == *(str->buf)) {
 	    /* match found */
-	    ncnt = unparsech(cnt, &ptr->ch);
+	    unparsech(buf, ptr->ch);
 	    if (ptr->next != NULL) {
 		/* not yet at leaf */
 		CStr tstr;
 		tstr.buf = str->buf + 1;
 		tstr.len = str->len - 1;
-		return (Lookup(&tstr, ptr->next, ncnt + 1));
+		return (Lookup(buf, &tstr, ptr->next));
 	    }
 	    else {
 		/* next node is null so key should be complete */
 		if (str->len == 1) {
-		    CStr pb;
-		    printbuf[ncnt + 1] = '"';
-		    printbuf[ncnt + 2] = '\0';
-		    pb.buf = printbuf;
-		    pb.len = ncnt + 2;
-		    (void) printOne(&pb, &ptr->val, ptr->type);
+		    Strbuf_append1(buf, '"');
+		    Strbuf_terminate(buf);
+		    printOne(buf->s, &ptr->val, ptr->type);
 		    return (0);
 		}
 		else
@@ -505,51 +499,41 @@ Lookup(CStr *str, XmapNode *ptr, int cnt)
 	else {
 	    /* no match found try sibling */
 	    if (ptr->sibling)
-		return (Lookup(str, ptr->sibling, cnt));
+		return (Lookup(buf, str, ptr->sibling));
 	    else
 		return (-1);
 	}
     }
 }
 
-static int
-Enumerate(XmapNode *ptr, int cnt)
+static void
+Enumerate(struct Strbuf *buf, const XmapNode *ptr)
 {
-    int     ncnt;
-
-    if (cnt >= MAXXKEY - 5) {	/* buffer too small */
-	printbuf[++cnt] = '"';
-	printbuf[++cnt] = '\0';
-	xprintf(CGETS(9, 5,
-		"Some extended keys too long for internal print buffer"));
-	xprintf(" \"%S...\"\n", printbuf);
-	return (0);
-    }
+    size_t old_len;
 
     if (ptr == NULL) {
 #ifdef DEBUG_EDIT
 	xprintf(CGETS(9, 6, "Enumerate: BUG!! Null ptr passed\n!"));
 #endif
-	return (-1);
+	return;
     }
 
-    ncnt = unparsech(cnt, &ptr->ch); /* put this char at end of string */
+    old_len = buf->len;
+    unparsech(buf, ptr->ch); /* put this char at end of string */
     if (ptr->next == NULL) {
-	CStr pb;
 	/* print this Xkey and function */
-	printbuf[++ncnt] = '"';
-	printbuf[++ncnt] = '\0';
-	pb.buf = printbuf;
-	pb.len = ncnt;
-	(void) printOne(&pb, &ptr->val, ptr->type);
+	Strbuf_append1(buf, '"');
+	Strbuf_terminate(buf);
+	printOne(buf->s, &ptr->val, ptr->type);
     }
     else
-	(void) Enumerate(ptr->next, ncnt + 1);
+	Enumerate(buf, ptr->next);
 
     /* go to sibling if there is one */
-    if (ptr->sibling)
-	(void) Enumerate(ptr->sibling, cnt);
-    return (0);
+    if (ptr->sibling) {
+	buf->len = old_len;
+	Enumerate(buf, ptr->sibling);
+    }
 }
 
 
@@ -557,21 +541,24 @@ Enumerate(XmapNode *ptr, int cnt)
  *	Print the specified key and its associated
  *	function specified by val
  */
-int
-printOne(CStr *key, XmapVal *val, int ntype)
+void
+printOne(const Char *key, const XmapVal *val, int ntype)
 {
     struct KeyFuncs *fp;
-    unsigned char unparsbuf[200];
     static const char *fmt = "%s\n";
 
-    xprintf("%-15S-> ", key->buf);
+    xprintf("%-15S-> ", key);
     if (val != NULL)
 	switch (ntype) {
 	case XK_STR:
-	case XK_EXE:
-	    xprintf(fmt, unparsestring(&val->str, unparsbuf, 
-				       ntype == XK_STR ? STRQQ : STRBB));
+	case XK_EXE: {
+	    unsigned char *p;
+
+	    p = unparsestring(&val->str, ntype == XK_STR ? STRQQ : STRBB);
+	    xprintf(fmt, p);
+	    xfree(p);
 	    break;
+	}
 	case XK_CMD:
 	    for (fp = FuncNames; fp->name; fp++)
 		if (val->cmd == fp->func)
@@ -582,65 +569,56 @@ printOne(CStr *key, XmapVal *val, int ntype)
 	    break;
 	}
     else
-	xprintf(fmt, key, CGETS(9, 7, "no input"));
-    return (0);
+	xprintf(fmt, CGETS(9, 7, "no input"));
 }
 
-static int
-unparsech(int cnt, Char *ch)
+static void
+unparsech(struct Strbuf *buf, Char ch)
 {
     if (ch == 0) {
-	printbuf[cnt++] = '^';
-	printbuf[cnt] = '@';
-	return cnt;
+	Strbuf_append1(buf, '^');
+	Strbuf_append1(buf, '@');
     }
-
-    if (Iscntrl(*ch)) {
+    else if (Iscntrl(ch)) {
 #ifdef IS_ASCII
-	printbuf[cnt++] = '^';
-	if (*ch == CTL_ESC('\177'))
-	    printbuf[cnt] = '?';
+	Strbuf_append1(buf, '^');
+	if (ch == CTL_ESC('\177'))
+	    Strbuf_append1(buf, '?');
 	else
-	    printbuf[cnt] = *ch | 0100;
+	    Strbuf_append1(buf, ch | 0100);
 #else
-	if (*ch == CTL_ESC('\177'))
-	{
-		printbuf[cnt++] = '^';
-		printbuf[cnt] = '?';
+	if (ch == CTL_ESC('\177')) {
+	    Strbuf_append1(buf, '^');
+	    Strbuf_append1(buf, '?');
 	}
-	else if (Isupper(_toebcdic[_toascii[*ch]|0100])
-		|| strchr("@[\\]^_", _toebcdic[_toascii[*ch]|0100]) != NULL)
-	{
-		printbuf[cnt++] = '^';
-		printbuf[cnt] = _toebcdic[_toascii[*ch]|0100];
+	else if (Isupper(_toebcdic[_toascii[ch]|0100])
+		 || strchr("@[\\]^_", _toebcdic[_toascii[ch]|0100]) != NULL) {
+	    Strbuf_append1(buf, '^');
+	    Strbuf_append1(buf, _toebcdic[_toascii[ch]|0100]);
 	}
-	else
-	{
-		printbuf[cnt++] = '\\';
-		printbuf[cnt++] = ((*ch >> 6) & 7) + '0';
-		printbuf[cnt++] = ((*ch >> 3) & 7) + '0';
-		printbuf[cnt] = (*ch & 7) + '0';
+	else {
+	    Strbuf_append1(buf, '\\');
+	    Strbuf_append1(buf, ((ch >> 6) & 7) + '0');
+	    Strbuf_append1(buf, ((ch >> 3) & 7) + '0');
+	    Strbuf_append1(buf, (ch & 7) + '0');
 	}
 #endif
     }
-    else if (*ch == '^') {
-	printbuf[cnt++] = '\\';
-	printbuf[cnt] = '^';
-    }
-    else if (*ch == '\\') {
-	printbuf[cnt++] = '\\';
-	printbuf[cnt] = '\\';
-    }
-    else if (*ch == ' ' || (Isprint(*ch) && !Isspace(*ch))) {
-	printbuf[cnt] = *ch;
+    else if (ch == '^') {
+	Strbuf_append1(buf, '\\');
+	Strbuf_append1(buf, '^');
+    } else if (ch == '\\') {
+	Strbuf_append1(buf, '\\');
+	Strbuf_append1(buf, '\\');
+    } else if (ch == ' ' || (Isprint(ch) && !Isspace(ch))) {
+	Strbuf_append1(buf, ch);
     }
     else {
-	printbuf[cnt++] = '\\';
-	printbuf[cnt++] = ((*ch >> 6) & 7) + '0';
-	printbuf[cnt++] = ((*ch >> 3) & 7) + '0';
-	printbuf[cnt] = (*ch & 7) + '0';
+	Strbuf_append1(buf, '\\');
+	Strbuf_append1(buf, ((ch >> 6) & 7) + '0');
+	Strbuf_append1(buf, ((ch >> 3) & 7) + '0');
+	Strbuf_append1(buf, (ch & 7) + '0');
     }
-    return cnt;
 }
 
 eChar
@@ -744,12 +722,14 @@ parseescape(const Char **ptr)
 
 
 unsigned char *
-unparsestring(CStr *str, unsigned char *buf, Char *sep)
+unparsestring(const CStr *str, const Char *sep)
 {
-    unsigned char *b;
+    unsigned char *buf, *b;
     Char   p;
     int l;
 
+    /* Worst-case is "\uuu" or result of wctomb() for each char from str */
+    buf = xmalloc((str->len + 1) * max(4, MB_LEN_MAX));
     b = buf;
     if (sep[0])
 #ifndef WINNT_NATIVE

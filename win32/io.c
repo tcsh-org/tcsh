@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/io.c,v 1.4 2004/05/19 18:22:28 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/io.c,v 1.5 2005/03/25 18:46:42 kim Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -479,8 +479,8 @@ int stringtable_read(int fd, char * buf, int howmany) {
 	static int read_once = 0;
 	static long resline;
 	static long strpos;
-	static char oembuf[256];
-	WCHAR buffer[256];
+	static char oembuf[256];/*FIXBUF*/
+	WCHAR buffer[256];/*FIXBUF*/
 
 
 	if (read_once) {

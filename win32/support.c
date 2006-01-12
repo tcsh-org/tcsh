@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/support.c,v 1.5 2003/11/04 01:37:44 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/support.c,v 1.6 2004/02/13 13:40:50 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -68,7 +68,7 @@ void nt_init(void) {
 
 #ifdef SECURE_CD
 	{
-		char temp[512];
+		char temp[512];/*FIXBUF*/
 		extern char gcurr_drive;
 		if(!GetCurrentDirectory(512,temp))
 			ExitProcess((DWORD)-1);
@@ -161,7 +161,7 @@ char * forward_slash_get_cwd(char * path, int maxlen) {
 }
 void getmachine (void) {
 
-	char temp[256];
+	char temp[256];/*FIXBUF*/
 	char *vendor, *ostype;
 	OSVERSIONINFO osver;
 	SYSTEM_INFO sysinfo;
