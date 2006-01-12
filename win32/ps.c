@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/ps.c,v 1.4 2004/05/19 18:22:28 christos Exp $*/
+/*$Header: /src/pub/tcsh/win32/ps.c,v 1.5 2006/01/12 18:15:25 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -454,15 +454,17 @@ void dops(Char ** vc, struct command *c) {
 			stderror(ERR_NAME | ERR_NOMATCH);
 	}
 	else
-		vc = gargv = saveblk(vc);
+		vc = saveblk(vc);
 	trim(vc);
 	v = short2blk(vc);
+	blkfree(vc);
 	for (k = 0; v[k] != NULL ; k++){
 		if ( v[k][0] == '-' ) {
 			if( (v[k][1] == 'W') || (v[k][1] == 'w'))
 				g_dowindows = 1;
 		}
 	}
+	blkfree(v);
 	nump = ProcessListFunc();
 
 	for(i=0; i< nump; i++) {
@@ -511,9 +513,11 @@ void doshutdown(Char **vc, struct command *c) {
 			stderror(ERR_NAME | ERR_NOMATCH);
 	}
 	else
-		vc = gargv = saveblk(vc);
+		vc = saveblk(vc);
 	trim(vc);
 	v = short2blk(vc);
+	blkfree(vc);
+	cleanup_push((Char **)v, blk_cleanup);
 	for (k = 0; v[k] != NULL ; k++){
 		if ( v[k][0] == '-' ) {
 			ptr = v[k];
@@ -525,10 +529,8 @@ void doshutdown(Char **vc, struct command *c) {
 					reboot =1;
 				else if (*ptr == 'l')
 					logoff =1;
-				else {
-					blkfree((Char **)v);
+				else
 					stderror(ERR_SYSTEM,"Usage",shutdown_usage);
-				}
 				ptr++;
 			}
 		}
@@ -536,41 +538,33 @@ void doshutdown(Char **vc, struct command *c) {
 			shutdown_ok = 1;
 		}
 	}
-	if (k == 0) {
-		blkfree((Char**)v);
+	if (k == 0)
 		stderror(ERR_SYSTEM,"Usage",shutdown_usage);
-	}
 	if (!reboot && !logoff){
 		flags |= EWX_SHUTDOWN;
 		shutdown = 1;
 	}
-	if (reboot && logoff ) {
-		blkfree((Char **)v);
+	if (reboot && logoff )
 		stderror(ERR_SYSTEM,"Usage",shutdown_usage);
-	}
 	if (reboot)
 		flags |= EWX_REBOOT;
 	if (logoff)
 		flags |= EWX_LOGOFF;
 
-	if ((reboot || shutdown) && (!shutdown_ok) ) {
-		blkfree((Char **)v);
+	if ((reboot || shutdown) && (!shutdown_ok) )
 		stderror(ERR_SYSTEM,"shutdown","Specify \"now\" to really shutdown");
-	}
 
 
 	if (!OpenProcessToken(GetCurrentProcess(),
 							TOKEN_ADJUST_PRIVILEGES| TOKEN_QUERY,
 							&hToken) ){
 		make_err_str(GetLastError(),errbuf,128);
-		blkfree((Char **)v);
 		stderror(ERR_SYSTEM,"shutdown failed",errbuf);
 	}
 							
 
 	if (!LookupPrivilegeValue(NULL,SE_SHUTDOWN_NAME,&luid)) {
 		make_err_str(GetLastError(),errbuf,128);
-		blkfree((Char **)v);
 		stderror(ERR_SYSTEM,"shutdown failed",errbuf);
 	}
 	tp.PrivilegeCount = 1;
@@ -580,7 +574,6 @@ void doshutdown(Char **vc, struct command *c) {
 	if (!AdjustTokenPrivileges(hToken,FALSE,&tp,sizeof(tp),&tpPrevious,
 				&cbPrevious)){
 		make_err_str(GetLastError(),errbuf,128);
-		blkfree((Char **)v);
 		stderror(ERR_SYSTEM,"shutdown failed",errbuf);
 	}
 	tpPrevious.PrivilegeCount = 1;
@@ -590,12 +583,11 @@ void doshutdown(Char **vc, struct command *c) {
 	if (!AdjustTokenPrivileges(hToken,FALSE,&tpPrevious,cbPrevious,NULL,
 				NULL)){
 		make_err_str(GetLastError(),errbuf,128);
-		blkfree((Char **)v);
 		stderror(ERR_SYSTEM,"shutdown failed",errbuf);
 	}
 	if  (  !ExitWindowsEx(flags,0) ) {
 		make_err_str(GetLastError(),errbuf,128);
-		blkfree((Char **)v);
 		stderror(ERR_SYSTEM,"shutdown failed",errbuf);
 	}
+	cleanup_until((Char **)v);
 }

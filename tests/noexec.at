@@ -38,14 +38,14 @@ endsw
 
 repeat 1000000 sleep 1
 ]])
-AT_CHECK([tcsh -n correct.csh])
+AT_CHECK([tcsh -f -n correct.csh])
 
 AT_DATA([ifnoskip.csh],
 [[if ( 0 ) then
   <
 endif
 ]])
-AT_CHECK([tcsh -n ifnoskip.csh], 1, [], [Missing name for redirect.
+AT_CHECK([tcsh -f -n ifnoskip.csh], 1, [], [Missing name for redirect.
 ])
 
 AT_DATA([elsenoskip.csh],
@@ -55,7 +55,7 @@ else
   <
 endif
 ]])
-AT_CHECK([tcsh -n elsenoskip.csh], 1, [], [Missing name for redirect.
+AT_CHECK([tcsh -f -n elsenoskip.csh], 1, [], [Missing name for redirect.
 ])
 
 AT_DATA([gotonoskip.csh],
@@ -63,7 +63,7 @@ AT_DATA([gotonoskip.csh],
   <
 label:
 ]])
-AT_CHECK([tcsh -n gotonoskip.csh], 1, [], [Missing name for redirect.
+AT_CHECK([tcsh -f -n gotonoskip.csh], 1, [], [Missing name for redirect.
 ])
 
 AT_DATA([switchnoskip.csh],
@@ -74,20 +74,20 @@ case value:
   breaksw
 endsw
 ]])
-AT_CHECK([tcsh -n switchnoskip.csh], 1, [], [Missing name for redirect.
+AT_CHECK([tcsh -f -n switchnoskip.csh], 1, [], [Missing name for redirect.
 ])
 
 AT_DATA([switchsyntax.csh],
 [[switch value
 endsw
 ]])
-AT_CHECK([tcsh -n switchsyntax.csh], 1, [], [Syntax Error.
+AT_CHECK([tcsh -f -n switchsyntax.csh], 1, [], [Syntax Error.
 ])
 
 AT_DATA([breaknowhile.csh],
 [[break
 ]])
-AT_CHECK([tcsh -n breaknowhile.csh], 1, [], [break: Not in while/foreach.
+AT_CHECK([tcsh -f -n breaknowhile.csh], 1, [], [break: Not in while/foreach.
 ])
 
 AT_DATA([breaknoskip.csh],
@@ -96,7 +96,7 @@ AT_DATA([breaknoskip.csh],
   <
 end
 ]])
-AT_CHECK([tcsh -n breaknoskip.csh], 1, [], [Missing name for redirect.
+AT_CHECK([tcsh -f -n breaknoskip.csh], 1, [], [Missing name for redirect.
 ])
 
 AT_DATA([foreachsyntax.csh],
@@ -104,7 +104,8 @@ AT_DATA([foreachsyntax.csh],
   echo $name
 end
 ]])
-AT_CHECK([tcsh -n foreachsyntax.csh], 1, [], [foreach: Words not parenthesized.
+AT_CHECK([tcsh -f -n foreachsyntax.csh], 1, [],
+[foreach: Words not parenthesized.
 ])
 
 AT_DATA([whilenoskip.csh],
@@ -112,19 +113,20 @@ AT_DATA([whilenoskip.csh],
   <
 end
 ]])
-AT_CHECK([tcsh -n whilenoskip.csh], 1, [], [Missing name for redirect.
+AT_CHECK([tcsh -f -n whilenoskip.csh], 1, [], [Missing name for redirect.
 ])
 
 AT_DATA([endnowhile.csh],
 [[end
 ]])
-AT_CHECK([tcsh -n endnowhile.csh], 1, [], [end: Not in while/foreach.
+AT_CHECK([tcsh -f -n endnowhile.csh], 1, [], [end: Not in while/foreach.
 ])
 
 AT_DATA([continuenowhile.csh],
 [[continue
 ]])
-AT_CHECK([tcsh -n continuenowhile.csh], 1, [], [continue: Not in while/foreach.
+AT_CHECK([tcsh -f -n continuenowhile.csh], 1, [],
+[continue: Not in while/foreach.
 ])
 
 AT_DATA([continuenoskip.csh],
@@ -133,7 +135,7 @@ AT_DATA([continuenoskip.csh],
   <
 end
 ]])
-AT_CHECK([tcsh -n continuenoskip.csh], 1, [], [Missing name for redirect.
+AT_CHECK([tcsh -f -n continuenoskip.csh], 1, [], [Missing name for redirect.
 ])
 
 AT_CLEANUP

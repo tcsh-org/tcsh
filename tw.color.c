@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.20 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.21 2006/01/12 19:43:01 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.20 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.21 2006/01/12 19:43:01 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -170,12 +170,12 @@ parseLS_COLORS(const Char *value)
     char   *c;			/* pointer in colors */
     Extension *volatile e;	/* pointer in extensions */
     jmp_buf_t osetexit;
+    size_t omark;
 
     (void) &e;
 
     /* init */
-    if (extensions)
-        xfree(extensions);
+    xfree(extensions);
     for (i = 0; i < nvariables; i++)
 	variables[i].color = variables[i].defaultcolor;
     colors = NULL;
@@ -202,6 +202,7 @@ parseLS_COLORS(const Char *value)
 
     /* Prevent from crashing if unknown parameters are given. */
 
+    omark = cleanup_push_mark();
     getexit(osetexit);
 
     if (setexit() == 0) {
@@ -245,11 +246,11 @@ parseLS_COLORS(const Char *value)
     }
     }
 
+    cleanup_pop_mark(omark);
     resexit(osetexit);
 
     nextensions = e - extensions;
 }
-
 
 /* put_color():
  */
@@ -261,9 +262,10 @@ put_color(const Str *color)
     int    original_output_raw = output_raw;
 
     output_raw = TRUE;
+    cleanup_push(&original_output_raw, output_raw_restore);
     for (i = color->len; 0 < i; i--)
 	xputchar(*c++);
-    output_raw = original_output_raw;
+    cleanup_until(&original_output_raw);
 }
 
 
@@ -281,7 +283,7 @@ print_color(const Char *fname, size_t len, Char suffix)
     case '>':			/* File is a symbolic link pointing to
 				 * a directory */
         color = &variables[VDir].color;
-	    break;
+	break;
     case '+':			/* File is a hidden directory [aix] or
 				 * context dependent [hpux] */
     case ':':			/* File is network special [hpux] */

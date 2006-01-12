@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.h,v 3.6 2004/08/04 17:12:31 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.h,v 3.7 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.h: Tcsh includes
  */
@@ -66,5 +66,15 @@ struct Strbuf {
 #define Strbuf_INIT { NULL, 0, 0 }
 extern const struct strbuf strbuf_init;
 extern const struct Strbuf Strbuf_init;
+
+/* A string vector in progress */
+struct blk_buf
+{
+    Char **vec;
+    size_t len;			/* Valid strings */
+    size_t size;		/* Allocated space for string pointers */
+};
+
+#define BLK_BUF_INIT { NULL, 0, 0 }
 
 #endif /* _h_tc */

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.36 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.37 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,11 +32,12 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.36 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.37 2006/01/12 19:43:00 christos Exp $")
 
 static	int	renum	(int, int);
 static  Char  **blkend	(Char **);
 static  Char  **blkcat	(Char **, Char **);
+static	int	xdup2	(int, int);
 
 /*
  * C Shell
@@ -158,6 +159,21 @@ blkfree(Char **av0)
     xfree(av0);
 }
 
+void
+blk_cleanup(void *ptr)
+{
+    blkfree(ptr);
+}
+
+void
+blk_indirect_cleanup(void *xptr)
+{
+    Char ***ptr;
+
+    ptr = xptr;
+    blkfree(*ptr);
+}
+
 Char  **
 saveblk(Char **v)
 {
@@ -253,10 +269,10 @@ closem(void)
 #endif /* MALLOC_TRACE */
 	    )
 	  {
-	    (void) close(f);
+	    xclose(f);
 #ifdef NISPLUS
 	    if(f < 3)
-		(void) open(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE);
+		(void) xopen(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE);
 #endif /* NISPLUS */
 	  }
 #ifdef NLS_BUGS
@@ -289,7 +305,7 @@ closech(void)
     isdiagatty = isatty(SHDIAG);
     num_files = NOFILE;
     for (f = 3; f < num_files; f++)
-	(void) close(f);
+	xclose(f);
 }
 
 #endif /* CLOSE_ON_EXEC */
@@ -298,13 +314,13 @@ void
 donefds(void)
 {
 
-    (void) close(0);
-    (void) close(1);
-    (void) close(2);
+    xclose(0);
+    xclose(1);
+    xclose(2);
     didfds = 0;
 #ifdef NISPLUS
     {
-	int fd = open(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE);
+	int fd = xopen(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE);
 	(void)dcopy(fd, 1);
 	(void)dcopy(fd, 2);
 	(void)dmove(fd, 0);
@@ -325,15 +341,15 @@ dmove(int i, int j)
 	return (i);
 #ifdef HAVE_DUP2
     if (j >= 0) {
-	(void) dup2(i, j);
+	(void) xdup2(i, j);
 	if (j != i)
-	    (void) close(i);
+	    xclose(i);
 	return (j);
     }
 #endif
     j = dcopy(i, j);
     if (j != i)
-	(void) close(i);
+	xclose(i);
     return (j);
 }
 
@@ -345,10 +361,10 @@ dcopy(int i, int j)
 	return (i);
     if (j >= 0) {
 #ifdef HAVE_DUP2
-	(void) dup2(i, j);
+	(void) xdup2(i, j);
 	return (j);
 #else
-	(void) close(j);
+	xclose(j);
 #endif
     }
     return (renum(i, j));
@@ -365,7 +381,7 @@ renum(int i, int j)
 	return (k);
     if (k != j) {
 	j = renum(k, j);
-	(void) close(k);
+	xclose(k);
 	return (j);
     }
     return (k);
@@ -460,7 +476,6 @@ quote_meta(struct Strbuf *buf, const Char *s)
 void
 udvar(Char *name)
 {
-
     setname(short2str(name));
     stderror(ERR_NAME | ERR_UNDVAR);
 }
@@ -502,4 +517,141 @@ areadlink(const char *path)
     }
     buf[res] = '\0';
     return xrealloc(buf, res + 1);
+}
+
+void
+xclose(int fildes)
+{
+    while (close(fildes) == -1 && errno == EINTR)
+	handle_pending_signals();
+}
+
+void
+xclosedir(DIR *dirp)
+{
+    while (closedir(dirp) == -1 && errno == EINTR)
+	handle_pending_signals();
+}
+
+int
+xcreat(const char *path, mode_t mode)
+{
+    int res;
+
+    while ((res = creat(path, mode)) == -1 && errno == EINTR)
+	handle_pending_signals();
+    return res;
+}
+
+#ifdef HAVE_DUP2
+static int
+xdup2(int fildes, int fildes2)
+{
+    int res;
+
+    while ((res = dup2(fildes, fildes2)) == -1 && errno == EINTR)
+	handle_pending_signals();
+    return res;
+}
+#endif
+
+struct group *
+xgetgrgid(gid_t gid)
+{
+    struct group *res;
+
+    errno = 0;
+    while ((res = getgrgid(gid)) == NULL && errno == EINTR) {
+	handle_pending_signals();
+	errno = 0;
+    }
+    return res;
+}
+
+struct passwd *
+xgetpwnam(const char *name)
+{
+    struct passwd *res;
+
+    errno = 0;
+    while ((res = getpwnam(name)) == NULL && errno == EINTR) {
+	handle_pending_signals();
+	errno = 0;
+    }
+    return res;
+}
+
+struct passwd *
+xgetpwuid(uid_t uid)
+{
+    struct passwd *res;
+
+    errno = 0;
+    while ((res = getpwuid(uid)) == NULL && errno == EINTR) {
+	handle_pending_signals();
+	errno = 0;
+    }
+    return res;
+}
+
+int
+xopen(const char *path, int oflag, ...)
+{
+    int res;
+
+    if ((oflag & O_CREAT) == 0) {
+	while ((res = open(path, oflag)) == -1 && errno == EINTR)
+	    handle_pending_signals();
+    } else {
+	va_list ap;
+	mode_t mode;
+
+	va_start(ap, oflag);
+	/* "int" should actually be "mode_t after default argument
+	   promotions". "int" is the best guess we have, "mode_t" used to be
+	   "unsigned short", which we obviously can't use. */
+	mode = va_arg(ap, int);
+	while ((res = open(path, oflag, mode)) == -1 && errno == EINTR)
+	    handle_pending_signals();
+    }
+    return res;
+}
+
+ssize_t
+xread(int fildes, void *buf, size_t nbyte)
+{
+    ssize_t res;
+
+    /* This is where we will be blocked most of the time, so handle signals
+       that didn't interrupt any system call. */
+    do
+      handle_pending_signals();
+    while ((res = read(fildes, buf, nbyte)) == -1 && errno == EINTR);
+    return res;
+}
+
+#ifdef POSIX
+int
+xtcsetattr(int fildes, int optional_actions, const struct termios *termios_p)
+{
+    int res;
+
+    while ((res = tcsetattr(fildes, optional_actions, termios_p)) == -1 &&
+	   errno == EINTR)
+	handle_pending_signals();
+    return res;
+}
+#endif
+
+ssize_t
+xwrite(int fildes, const void *buf, size_t nbyte)
+{
+    ssize_t res;
+
+    /* This is where we will be blocked most of the time, so handle signals
+       that didn't interrupt any system call. */
+    do
+      handle_pending_signals();
+    while ((res = write(fildes, buf, nbyte)) == -1 && errno == EINTR);
+    return res;
 }

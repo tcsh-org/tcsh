@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.125 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.126 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.125 2006/01/12 18:15:24 christos Exp $")
+RCSID("$Id: sh.c,v 3.126 2006/01/12 19:43:00 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -82,8 +82,8 @@ jmp_buf_t reslab INIT_ZERO_STRUCT;
 
 static const char tcshstr[] = "tcsh";
 
-signalfun_t parintr = 0;	/* Parents interrupt catch */
-signalfun_t parterm = 0;	/* Parents terminate catch */
+struct sigaction parintr;	/* Parents interrupt catch */
+struct sigaction parterm;	/* Parents terminate catch */
 
 #ifdef TESLA
 int do_logout = 0;
@@ -100,14 +100,7 @@ static Char	INVCHAR;
 Char    *INVPTR = &INVCHAR;
 Char    **INVPPTR = &INVPTR;
 
-static int     nofile = 0;
-static int    reenter = 0;
-static int    nverbose = 0;
-static int    nexececho = 0;
-static int    quitit = 0;
-static int    rdirs = 0;
-int    fast = 0;
-static int    batch = 0;
+static int    fast = 0;
 static int    mflag = 0;
 static int    prompt = 1;
 int     enterhist = 0;
@@ -143,15 +136,10 @@ struct saved_state {
     int		  onelflg;
     int	  enterhist;
     Char	**argv;
+    Char	**av;
     Char	  HIST;
     int	  cantell;
     struct Bin	  B;
-    /* These keep signal state and setjump state */
-#ifdef BSDSIGS
-    sigmask_t	  mask;
-#endif
-    jmp_buf_t	  oldexit;
-    int		  reenter;
 };
 
 static	int		  srccat	(Char *, Char *);
@@ -160,7 +148,6 @@ static	int		  srcfile	(const char *, int, int, Char **);
 #else
 int		  srcfile	(const char *, int, int, Char **);
 #endif /*WINNT_NATIVE*/
-static	RETSIGTYPE	  phup		(int);
 static	void		  srcunit	(int, int, int, Char **);
 static	void		  mailchk	(void);
 #ifndef _PATH_DEFPATH
@@ -169,26 +156,28 @@ static	Char	 	**defaultpath	(void);
 static	void		  record	(void);
 static	void		  st_save	(struct saved_state *, int, int,
 					 Char **, Char **);
-static	void		  st_restore	(struct saved_state *, Char **);
+static	void		  st_restore	(void *);
 
 	int		  main		(int, char **);
 
 int
 main(int argc, char **argv)
 {
+    int batch = 0;
+    int nexececho = 0;
+    int nofile = 0;
+    int nverbose = 0;
+    int rdirs = 0;
+    int quitit = 0;
     Char *cp;
 #ifdef AUTOLOGOUT
     Char *cp2;
 #endif
     char *tcp, *ttyn;
-    int f;
+    int f, reenter;
     char **tempv;
     int osetintr;
-    signalfun_t oparintr;
-
-#ifdef BSDSIGS
-    sigvec_t osv;
-#endif /* BSDSIGS */
+    struct sigaction oparintr;
 
 #ifdef WINNT_NATIVE
     nt_init();
@@ -206,7 +195,7 @@ main(int argc, char **argv)
     nlsinit();
 
 #ifdef MALLOC_TRACE
-    mal_setstatsfile(fdopen(dmove(open("/tmp/tcsh.trace", 
+    mal_setstatsfile(fdopen(dmove(xopen("/tmp/tcsh.trace", 
 	O_WRONLY|O_CREAT|O_LARGEFILE, 0666), 25), "w"));
     mal_trace(1);
 #endif /* MALLOC_TRACE */
@@ -234,11 +223,11 @@ main(int argc, char **argv)
      */
     {
 	do 
-	    if ((f = open(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE)) == -1 &&
-		(f = open("/", O_RDONLY|O_LARGEFILE)) == -1) 
+	    if ((f = xopen(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE)) == -1 &&
+		(f = xopen("/", O_RDONLY|O_LARGEFILE)) == -1) 
 		exit(1);
 	while (f < 3);
-	(void) close(f);
+	xclose(f);
     }
 
 #ifdef O_TEXT
@@ -290,7 +279,7 @@ main(int argc, char **argv)
     bslash_quote = 0;		/* PWP: do tcsh-style backslash quoting? */
 
     /* Default history size to 100 */
-    set(STRhistory, SAVE("100"), VAR_READWRITE);
+    setcopy(STRhistory, str2short("100"), VAR_READWRITE);
 
     tempv = argv;
     ffile = SAVE(tempv[0]);
@@ -331,7 +320,7 @@ main(int argc, char **argv)
     }
     if (loginsh) {
 	(void) time(&chktim);
-	set(STRloginsh, Strsave(STRNULL), VAR_READWRITE);
+	setNS(STRloginsh);
     }
 
     AsciiOnly = 1;
@@ -393,8 +382,8 @@ main(int argc, char **argv)
      */
      if (loginsh && isatty(SHIN)) {
 	 ttyn = ttyname(SHIN);
-	 (void) close(SHIN);
-	 SHIN = open(ttyn, O_RDWR|O_LARGEFILE);
+	 xclose(SHIN);
+	 SHIN = xopen(ttyn, O_RDWR|O_LARGEFILE);
 	 shpgrp = getpid();
 	 (void) ioctl (SHIN, TIOCSPGRP, (ioctl_t) &shpgrp);
 	 (void) setpgid(0, shpgrp);
@@ -457,14 +446,13 @@ main(int argc, char **argv)
      */
 #ifdef AUTOLOGOUT
 # ifdef convex
-    if (uid == 0) {
+    if (uid == 0)
 	/*  root always has a 15 minute autologout  */
-	set(STRautologout, Strsave(STRrootdefautologout), VAR_READWRITE);
-    }
+	setcopy(STRautologout, STRrootdefautologout, VAR_READWRITE);
     else
 	if (loginsh)
 	    /*  users get autologout set to 0  */
-	    set(STRautologout, Strsave(STR0), VAR_READWRITE);
+	    setcopy(STRautologout, STR0, VAR_READWRITE);
 # else /* convex */
     if (loginsh || (uid == 0)) {
 	if (*cp) {
@@ -478,8 +466,7 @@ main(int argc, char **argv)
 		  ((Strncmp(cp, STRpts, 3) == 0) && cp[3] == '/'))) {
 		if (getenv("DISPLAY") == NULL) {
 		    /* NOT on X window shells */
-		    set(STRautologout, Strsave(STRdefautologout), 
-			VAR_READWRITE);
+		    setcopy(STRautologout, STRdefautologout, VAR_READWRITE);
 		}
 	    }
 	}
@@ -487,9 +474,9 @@ main(int argc, char **argv)
 # endif /* convex */
 #endif /* AUTOLOGOUT */
 
-    (void) sigset(SIGALRM, alrmcatch);
+    sigset_interrupting(SIGALRM, queue_alrmcatch);
 
-    set(STRstatus, Strsave(STR0), VAR_READWRITE);
+    setcopy(STRstatus, STR0, VAR_READWRITE);
 
     /*
      * get and set machine specific environment variables
@@ -503,17 +490,17 @@ main(int argc, char **argv)
 #if ECHO_STYLE != BSD_ECHO
     if (tcsh) {
 # if ECHO_STYLE == NONE_ECHO
-	set(STRecho_style, Strsave(STRnone), VAR_READWRITE);
+	setcopy(STRecho_style, STRnone, VAR_READWRITE);
 # endif /* ECHO_STYLE == NONE_ECHO */
 # if ECHO_STYLE == SYSV_ECHO
-	set(STRecho_style, Strsave(STRsysv), VAR_READWRITE);
+	setcopy(STRecho_style, STRsysv, VAR_READWRITE);
 # endif /* ECHO_STYLE == SYSV_ECHO */
 # if ECHO_STYLE == BOTH_ECHO
-	set(STRecho_style, Strsave(STRboth), VAR_READWRITE);
+	setcopy(STRecho_style, STRboth, VAR_READWRITE);
 # endif /* ECHO_STYLE == BOTH_ECHO */
     } else
 #endif /* ECHO_STYLE != BSD_ECHO */
-	set(STRecho_style, Strsave(STRbsd), VAR_READWRITE);
+	setcopy(STRecho_style, STRbsd, VAR_READWRITE);
 
     /*
      * increment the shell level.
@@ -558,10 +545,10 @@ main(int argc, char **argv)
 	    set(STRuser, quote(SAVE(cus)), VAR_READWRITE);
 	else if (cln != NULL)
 	    set(STRuser, quote(SAVE(cln)), VAR_READWRITE);
-	else if ((pw = getpwuid(uid)) == NULL)
-	    set(STRuser, SAVE("unknown"), VAR_READWRITE);
+	else if ((pw = xgetpwuid(uid)) == NULL)
+	    setcopy(STRuser, str2short("unknown"), VAR_READWRITE);
 	else
-	    set(STRuser, SAVE(pw->pw_name), VAR_READWRITE);
+	    setcopy(STRuser, str2short(pw->pw_name), VAR_READWRITE);
 	if (cln == NULL)
 	    tsetenv(STRLOGNAME, varval(STRuser));
 	if (cus == NULL)
@@ -570,10 +557,10 @@ main(int argc, char **argv)
 	cgr = getenv("GROUP");
 	if (cgr != NULL)
 	    set(STRgroup, quote(SAVE(cgr)), VAR_READWRITE);
-	else if ((gr = getgrgid(gid)) == NULL)
-	    set(STRgroup, SAVE("unknown"), VAR_READWRITE);
+	else if ((gr = xgetgrgid(gid)) == NULL)
+	    setcopy(STRgroup, str2short("unknown"), VAR_READWRITE);
 	else
-	    set(STRgroup, SAVE(gr->gr_name), VAR_READWRITE);
+	    setcopy(STRgroup, str2short(gr->gr_name), VAR_READWRITE);
 	if (cgr == NULL)
 	    tsetenv(STRKGROUP, varval(STRgroup));
     }
@@ -644,24 +631,24 @@ main(int argc, char **argv)
      * need a value.  Making it 'emacs' might be confusing. 
      */
     if (editing)
-	set(STRedit, Strsave(STRNULL), VAR_READWRITE);
+	setNS(STRedit);
 
 
     /*
      * still more mutability: make the complete routine automatically add the
      * suffix of file names...
      */
-    set(STRaddsuffix, Strsave(STRNULL), VAR_READWRITE);
+    setNS(STRaddsuffix);
 
     /*
      * Compatibility with tcsh >= 6.12 by default
      */
-    set(STRcsubstnonl, Strsave(STRNULL), VAR_READWRITE);
+    setNS(STRcsubstnonl);
     
     /*
      * Random default kill ring size
      */
-    set(STRkillring, SAVE("30"), VAR_READWRITE);
+    setcopy(STRkillring, str2short("30"), VAR_READWRITE);
 
     /*
      * Re-initialize path if set in environment
@@ -700,7 +687,7 @@ main(int argc, char **argv)
 		sh_len = 0;
 	}
 	if (sh_len == 0)
-	    set(STRshell, Strsave(STR_SHELLPATH), VAR_READWRITE);
+	    setcopy(STRshell, STR_SHELLPATH, VAR_READWRITE);
     }
 
 #ifdef COLOR_LS_F
@@ -729,33 +716,8 @@ main(int argc, char **argv)
      * be either. Our children inherit termination from our parent. We catch it
      * only if we are the login shell.
      */
-#ifdef BSDSIGS
-    /*
-     * PURIFY-2 claims that osv does not get
-     * initialized after the sigvec call
-     */
-    setzero(&osv, sizeof(osv));
-    /* parents interruptibility */
-    (void) mysigvec(SIGINT, NULL, &osv);
-    parintr = (signalfun_t) osv.sv_handler;
-    (void) mysigvec(SIGTERM, NULL, &osv);
-    parterm = (signalfun_t) osv.sv_handler;
-#else				/* BSDSIGS */
-    parintr = signal(SIGINT, SIG_IGN);	/* parents interruptibility */
-    (void) sigset(SIGINT, parintr);	/* ... restore */
-
-# ifdef COHERENT
-    if (loginsh) /* it seems that SIGTERM is always set to SIG_IGN by */
-                 /* init/getty so it should be set to SIG_DFL - there may be */
-                 /* a better fix for this. */
-         parterm = SIG_DFL;
-    else
-# else /* !COHERENT */
-    parterm = signal(SIGTERM, SIG_IGN);	/* parents terminability */
-# endif /* COHERENT */
-    (void) sigset(SIGTERM, parterm);	/* ... restore */
-
-#endif /* BSDSIGS */
+    sigaction(SIGINT, NULL, &parintr);
+    sigaction(SIGTERM, NULL, &parterm);
 
 
 #ifdef TCF
@@ -840,7 +802,7 @@ main(int argc, char **argv)
 		 * we put the command into a variable
 		 */
 		if (arginp != NULL)
-		  set(STRcommand, quote(Strsave(arginp)), VAR_READWRITE);
+		    set(STRcommand, quote(Strsave(arginp)), VAR_READWRITE);
 
 		/*
 		 * * Give an error on -c arguments that end in * backslash to
@@ -933,7 +895,7 @@ main(int argc, char **argv)
 		setNS(STRecho);	/* NOW! */
 		break;
 
-	    case 'F':		/* Undocumented flag */
+	    case 'F':
 		/*
 		 * This will cause children to be created using fork instead of
 		 * vfork.
@@ -967,7 +929,7 @@ main(int argc, char **argv)
      * read commands.
      */
     if (nofile == 0 && argc > 0) {
-	nofile = open(tempv[0], O_RDONLY|O_LARGEFILE);
+	nofile = xopen(tempv[0], O_RDONLY|O_LARGEFILE);
 	if (nofile < 0) {
 	    child = 1;		/* So this ... */
 	    /* ... doesn't return */
@@ -1054,12 +1016,12 @@ main(int argc, char **argv)
      */
     if (prompt) {
 	if (tcsh)
-	    set(STRprompt, Strsave(STRdeftcshprompt), VAR_READWRITE);
+	    setcopy(STRprompt, STRdeftcshprompt, VAR_READWRITE);
 	else
-	    set(STRprompt, Strsave(STRdefcshprompt), VAR_READWRITE);
+	    setcopy(STRprompt, STRdefcshprompt, VAR_READWRITE);
 	/* that's a meta-questionmark */
-	set(STRprompt2, Strsave(STRmquestion), VAR_READWRITE);
-	set(STRprompt3, Strsave(STRKCORRECT), VAR_READWRITE);
+	setcopy(STRprompt2, STRmquestion, VAR_READWRITE);
+	setcopy(STRprompt3, STRKCORRECT, VAR_READWRITE);
     }
 
     /*
@@ -1069,12 +1031,13 @@ main(int argc, char **argv)
     shpgrp = mygetpgrp();
     opgrp = tpgrp = -1;
     if (setintr) {
-	signalfun_t osig;
+	struct sigaction osig;
+
 	**argv = '-';
 	if (!quitit)		/* Wary! */
 	    (void) signal(SIGQUIT, SIG_IGN);
-	(void) sigset(SIGINT, pintr);
-	(void) sighold(SIGINT);
+	pintr_disabled = 1;
+	sigset_interrupting(SIGINT, queue_pintr);
 	(void) signal(SIGTERM, SIG_IGN);
 
 	/* 
@@ -1088,18 +1051,21 @@ main(int argc, char **argv)
 	 * We also only setup the handlers for shells that are trully
 	 * interactive.
 	 */
-	osig = signal(SIGHUP, phup);	/* exit processing on HUP */
-	if (!loginsh && osig == SIG_IGN)
-	    (void) signal(SIGHUP, osig);
+	sigaction(SIGHUP, NULL, &osig);
+	if (loginsh || osig.sa_handler != SIG_IGN)
+	    /* exit processing on HUP */
+	    sigset_interrupting(SIGHUP, queue_phup);
 #ifdef SIGXCPU
-	osig = signal(SIGXCPU, phup);	/* exit processing on XCPU */
-	if (!loginsh && osig == SIG_IGN)
-	    (void) signal(SIGXCPU, osig);
+	sigaction(SIGXCPU, NULL, &osig);
+	if (loginsh || osig.sa_handler != SIG_IGN)
+	    /* exit processing on XCPU */
+	    sigset_interrupting(SIGXCPU, queue_phup);
 #endif
 #ifdef SIGXFSZ
-	osig = signal(SIGXFSZ, phup);	/* exit processing on XFSZ */
-	if (!loginsh && osig == SIG_IGN)
-	    (void) signal(SIGXFSZ, osig);
+	sigaction(SIGXFSZ, NULL, &osig);
+	if (loginsh || osig.sa_handler != SIG_IGN)
+	    /* exit processing on XFSZ */
+	    sigset_interrupting(SIGXFSZ, queue_phup);
 #endif
 
 	if (quitit == 0 && arginp == 0) {
@@ -1137,9 +1103,12 @@ main(int argc, char **argv)
     retry:
 	    if ((tpgrp = tcgetpgrp(f)) != -1) {
 		if (tpgrp != shpgrp) {
-		    signalfun_t old = signal(SIGTTIN, SIG_DFL);
+		    struct sigaction old;
+
+		    sigaction(SIGTTIN, NULL, &old);
+		    signal(SIGTTIN, SIG_DFL);
 		    (void) kill(0, SIGTTIN);
-		    (void) signal(SIGTTIN, old);
+		    sigaction(SIGTTIN, &old, NULL);
 		    goto retry;
 		}
 		/*
@@ -1198,7 +1167,7 @@ main(int argc, char **argv)
 	    }
 	    if (tpgrp == -1) {
 	notty:
-		xprintf(CGETS(11, 1, "Warning: no access to tty (%s).\n"),
+	        xprintf(CGETS(11, 1, "Warning: no access to tty (%s).\n"),
 			strerror(errno));
 		xprintf(CGETS(11, 2, "Thus no job control in this shell.\n"));
 		/*
@@ -1214,7 +1183,7 @@ main(int argc, char **argv)
 #endif				/* BSDJOBS */
 	}
     }
-    if ((setintr == 0) && (parintr == SIG_DFL))
+    if (setintr == 0 && parintr.sa_handler == SIG_DFL)
 	setintr = 1;
 
 /*
@@ -1224,25 +1193,7 @@ main(int argc, char **argv)
  *
  * David Dawes (dawes@physics.su.oz.au) Sept 1991
  */
-
-#if SYSVREL > 3
-    {
-	struct sigaction act;
-        act.sa_handler=pchild;
-	(void) sigemptyset(&(act.sa_mask));	/* Don't block any extra sigs
-						 * when the handler is called
-						 */
-        act.sa_flags=0;	           /* want behaviour of sigset() without
-                                    * SA_NOCLDSTOP
-				    */
-
-        if ((sigaction(SIGCHLD,&act,(struct sigaction *)NULL)) == -1)
-	    stderror(ERR_SYSTEM, "sigaction", strerror(errno));
-    }
-#else /* SYSVREL <= 3 */
-    (void) sigset(SIGCHLD, pchild);	/* while signals not ready */
-#endif /* SYSVREL <= 3 */
-
+    sigset_interrupting(SIGCHLD, queue_pchild);
 
     if (intty && !arginp) 	
 	(void) ed_Setup(editing);/* Get the tty state, and set defaults */
@@ -1254,23 +1205,25 @@ main(int argc, char **argv)
      */
     osetintr = setintr;
     oparintr = parintr;
-    reenter = setexit();	/* PWP */
+    (void)cleanup_push_mark(); /* There is no outer handler */
+    if (setexit() != 0) /* PWP */
+	reenter = 1;
+    else
+	reenter = 0;
     exitset++;
     haderr = 0;			/* In case second time through */
     if (!fast && reenter == 0) {
 	/* Will have varval(STRhome) here because set fast if don't */
 	{
-#ifdef BSDSIGS
-	    sigmask_t omask = sigblock(sigmask(SIGINT));
-#else
-	    (void) sighold(SIGINT);
-#endif
-	    setintr = 0;
-	    parintr = SIG_IGN;	/* onintr in /etc/ files has no effect */
+	    pintr_disabled++;
+	    cleanup_push(&pintr_disabled, disabled_cleanup);
+	    setintr = 0;/*FIXRESET:cleanup*/
+	    /* onintr in /etc/ files has no effect */
+	    parintr.sa_handler = SIG_IGN;/*FIXRESET: cleanup*/
 #ifdef LOGINFIRST
 #ifdef _PATH_DOTLOGIN
 	    if (loginsh)
-	      (void) srcfile(_PATH_DOTLOGIN, 0, 0, NULL);
+		(void) srcfile(_PATH_DOTLOGIN, 0, 0, NULL);
 #endif
 #endif
 
@@ -1285,11 +1238,7 @@ main(int argc, char **argv)
 		(void) srcfile(_PATH_DOTLOGIN, 0, 0, NULL);
 #endif
 #endif
-#ifdef BSDSIGS
-	    (void) sigsetmask(omask);
-#else
-	    (void) sigrelse(SIGINT);
-#endif
+	    cleanup_until(&pintr_disabled);
 	    setintr = osetintr;
 	    parintr = oparintr;
 	}
@@ -1301,7 +1250,7 @@ main(int argc, char **argv)
 	if (!srccat(varval(STRhome), STRsldottcshrc))
 	    (void) srccat(varval(STRhome), STRsldotcshrc);
 
-	if (!fast && !arginp && !onelflg && !havhash)
+	if (!arginp && !onelflg && !havhash)
 	    dohash(NULL,NULL);
 
 	/*
@@ -1312,12 +1261,13 @@ main(int argc, char **argv)
 	if (loginsh)
 	    (void) srccat(varval(STRhome), STRsldotlogin);
 #endif
-	if (!fast && (loginsh || rdirs))
+	if (loginsh || rdirs)
 	    loaddirs(NULL);
     }
     /* Reset interrupt flag */
     setintr = osetintr;
     parintr = oparintr;
+    exitset--;
 
     /* Initing AFTER .cshrc is the Right Way */
     if (intty && !arginp) {	/* PWP setup stuff */
@@ -1349,7 +1299,7 @@ main(int argc, char **argv)
     if (intty) {
 	if (loginsh) {
 	    xprintf("logout\n");
-	    (void) close(SHIN);
+	    xclose(SHIN);
 	    child = 1;
 #ifdef TESLA
 	    do_logout = 1;
@@ -1414,7 +1364,10 @@ importpath(Char *cp)
 	    dp++;
 	}
     pv[i] = 0;
+    cleanup_push(pv, blk_cleanup);
     setq(STRpath, pv, &shvhed, VAR_READWRITE);
+    cleanup_ignore(pv);
+    cleanup_until(pv);
 }
 
 /*
@@ -1437,10 +1390,11 @@ srccat(Char *cp, Char *dp)
 #endif /* WINNT_NATIVE */
 
 	ep = Strspl(cp, dp);
+	cleanup_push(ep, xfree);
 	ptr = short2str(ep);
 
 	rv = srcfile(ptr, (mflag ? 0 : 1), 0, NULL);
-	xfree(ep);
+	cleanup_until(ep);
 	return rv;
     }
 }
@@ -1457,12 +1411,15 @@ srcfile(const char *f, int onlyown, int flag, Char **av)
 {
     int unit;
 
-    if ((unit = open(f, O_RDONLY|O_LARGEFILE)) == -1) 
+    if ((unit = xopen(f, O_RDONLY|O_LARGEFILE)) == -1) 
 	return 0;
 #ifdef O_TEXT
     setmode(unit, O_TEXT);
 #endif
+    cleanup_push(&unit, open_cleanup);
     unit = dmove(unit, -1);
+    cleanup_ignore(&unit);
+    cleanup_until(&unit);
 
     (void) close_on_exec(unit, 1);
     srcunit(unit, onlyown, flag, av);
@@ -1545,6 +1502,7 @@ st_save(struct saved_state *st, int unit, int hflg, Char **al, Char **av)
     }
     else
 	st->argv = NULL;
+    st->av = av;
 
     SHIN	= unit;	/* Do this first */
 
@@ -1575,8 +1533,11 @@ st_save(struct saved_state *st, int unit, int hflg, Char **al, Char **av)
  * Restore the shell to a saved state
  */
 static void
-st_restore(struct saved_state *st, Char **av)
+st_restore(void *xst)
 {
+    struct saved_state *st;
+
+    st = xst;
     if (st->SHIN == -1)
 	return;
 
@@ -1594,16 +1555,16 @@ st_restore(struct saved_state *st, Char **av)
     }
     cpybin(B, st->B);
 
-    (void) close(SHIN);
+    xclose(SHIN);
 
     insource	= st->insource;
     SHIN	= st->SHIN;
     if (st->OLDSTD != -1)
-	    (void)close(OLDSTD), OLDSTD = st->OLDSTD;
+	xclose(OLDSTD), OLDSTD = st->OLDSTD;
     if (st->SHOUT != -1)
-	    (void)close(SHOUT),  SHOUT = st->SHOUT;
+	xclose(SHOUT),  SHOUT = st->SHOUT;
     if (st->SHDIAG != -1)
-	    (void)close(SHDIAG), SHDIAG = st->SHDIAG;
+	xclose(SHDIAG), SHDIAG = st->SHDIAG;
     arginp	= st->arginp;
     onelflg	= st->onelflg;
     evalp	= st->evalp;
@@ -1620,7 +1581,7 @@ st_restore(struct saved_state *st, Char **av)
 
     if (st->argv != NULL)
 	setq(STRargv, st->argv, &shvhed, VAR_READWRITE);
-    else if (av != NULL  && *av != NULL && adrof(STRargv) != NULL)
+    else if (st->av != NULL  && *st->av != NULL && adrof(STRargv) != NULL)
 	unsetv(STRargv);
 }
 
@@ -1632,6 +1593,8 @@ static void
 srcunit(int unit, int onlyown, int hflg, Char **av)
 {
     struct saved_state st;
+    int old_pintr_disabled = 0;
+
     st.SHIN = -1;	/* st_restore checks this */
 
     if (unit < 0)
@@ -1641,19 +1604,18 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 	struct stat stb;
 
 	if (fstat(unit, &stb) < 0) {
-	    (void) close(unit);
+	    xclose(unit);
 	    return;
 	}
     }
 
-    getexit(st.oldexit);
-
-    if (setintr)
-#ifdef BSDSIGS
-	st.mask = sigblock(sigmask(SIGINT));
-#else
-	(void) sighold(SIGINT);
-#endif
+    /* Does nothing before st_save() because st.SHIN == -1 */
+    cleanup_push(&st, st_restore);
+    if (setintr) {
+	old_pintr_disabled = pintr_disabled;
+	pintr_disabled++;
+	cleanup_push(&pintr_disabled, disabled_cleanup);
+    }
 
     /* Save the current state and move us to a new state */
     st_save(&st, unit, hflg, NULL, av);
@@ -1662,48 +1624,15 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
      * Now if we are allowing commands to be interrupted, we let ourselves be
      * interrupted.
      */
-    if (setintr)
-#ifdef BSDSIGS
-	(void) sigsetmask(st.mask);
-#else
-	(void) sigrelse(SIGINT);
-#endif
-
-    /*
-     * Bugfix for running out of memory by: Jak Kirman
-     * <jak%cs.brown.edu@RELAY.CS.NET>.  Solution: pay attention to what
-     * setexit() is returning because reenter _may_ be in a register, and
-     * thus restored to 0 on a longjump(). (PWP: insert flames about
-     * compiler-dependant code here) PWP: THANKS LOTS !!!
-     *
-     * PWP: think of this as like a LISP (unwind-protect ...)
-     * thanks to Diana Smetters for pointing out how this _should_ be written
-     */
-#ifdef cray
-    st.reenter = 1;		/* assume non-zero return val */
-    if (setexit() == 0) {
-	st.reenter = 0;		/* Oh well, we were wrong */
-#else
-    if ((st.reenter = setexit()) == 0) {
-#endif
-	process(0);		/* 0 -> blow away on errors */
+    if (setintr) {
+	cleanup_until(&pintr_disabled);
+	cleanup_push(&pintr_disabled, disabled_cleanup);
     }
 
-    if (setintr)
-#ifdef BSDSIGS
-	(void) sigsetmask(st.mask);
-#else
-	(void) sigrelse(SIGINT);
-#endif
+    process(0);		/* 0 -> blow away on errors */
 
     /* Restore the old state */
-    st_restore(&st, av);
-    resexit(st.oldexit);
-    /*
-     * If process reset() (effectively an unwind) then we must also unwind.
-     */
-    if (st.reenter)
-	stderror(ERR_SILENT);
+    cleanup_until(&st);
 }
 
 
@@ -1716,25 +1645,29 @@ goodbye(Char **v, struct command *c)
     record();
 
     if (loginsh) {
+	size_t omark;
+
 	(void) sigset(SIGQUIT, SIG_IGN);
 	(void) sigset(SIGINT, SIG_IGN);
 	(void) sigset(SIGTERM, SIG_IGN);
 	(void) sigset(SIGHUP, SIG_IGN);
+	phup_disabled = 1;
 	setintr = 0;		/* No interrupts after "logout" */
 	/* Trap errors inside .logout */
-	reenter = setexit();
-	if (reenter != 0)
-	    exitstat();
-	if (!(adrof(STRlogout)))
-	    set(STRlogout, Strsave(STRnormal), VAR_READWRITE);
+	omark = cleanup_push_mark();
+	if (setexit() == 0) {
+	    if (!(adrof(STRlogout)))
+		setcopy(STRlogout, STRnormal, VAR_READWRITE);
 #ifdef _PATH_DOTLOGOUT
-	(void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
+	    (void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
 #endif
-	if (adrof(STRhome))
-	    (void) srccat(varval(STRhome), STRsldtlogout);
+	    if (adrof(STRhome))
+		(void) srccat(varval(STRhome), STRsldtlogout);
 #ifdef TESLA
-	do_logout = 1;
+	    do_logout = 1;
 #endif /* TESLA */
+	}
+	cleanup_pop_mark(omark);
     }
     exitstat();
 }
@@ -1758,27 +1691,11 @@ exitstat(void)
 /*
  * in the event of a HUP we want to save the history
  */
-static RETSIGTYPE
-phup(int snum)
+void
+phup(void)
 {
-    /*
-     * There is no return from here,
-     * so we are not going to release SIGHUP
-     * anymore
-     */
-#ifdef UNRELSIGS
-    if (snum)
-	(void) sigset(snum, SIG_IGN);
-#else
-# ifdef BSDSIGS
-    (void) sigblock(sigmask(SIGHUP));
-# else
-    (void) sighold(SIGHUP);
-# endif /* BSDSIGS */
-#endif /* UNRELSIGS */
-
     if (loginsh) {
-	set(STRlogout, Strsave(STRhangup), VAR_READWRITE);
+	setcopy(STRlogout, STRhangup, VAR_READWRITE);
 #ifdef _PATH_DOTLOGOUT
 	(void) srcfile(_PATH_DOTLOGOUT, 0, 0, NULL);
 #endif
@@ -1825,7 +1742,7 @@ phup(int snum)
     }
 #endif /* POSIXJOBS */
 
-    xexit(snum);
+    xexit(SIGHUP);
 }
 
 static Char   *jobargv[2] = {STRjobs, 0};
@@ -1839,15 +1756,9 @@ static Char   *jobargv[2] = {STRjobs, 0};
  */
 int just_signaled;		/* bugfix by Michael Bloom (mg@ttidca.TTI.COM) */
 
-/* FIXME: how asynchronous can this be? nothing uses volatile sig_atomic_t */
-RETSIGTYPE
-pintr(int snum)
+void
+pintr(void)
 {
-    USE(snum);
-#ifdef UNRELSIGS
-    if (snum)
-	(void) sigset(snum, pintr);
-#endif /* UNRELSIGS */
     just_signaled = 1;
     pintr1(1);
 }
@@ -1855,20 +1766,7 @@ pintr(int snum)
 void
 pintr1(int wantnl)
 {
-    Char **v;
-#ifdef BSDSIGS
-    sigmask_t omask;
-#endif
-
-#ifdef BSDSIGS
-    omask = sigblock((sigmask_t) 0);
-#endif
     if (setintr) {
-#ifdef BSDSIGS
-	(void) sigsetmask(omask & ~sigmask(SIGINT));
-#else
-	(void) sigrelse(SIGINT);
-#endif
 	if (pjobs) {
 	    pjobs = 0;
 	    xputchar('\n');
@@ -1886,13 +1784,6 @@ pintr1(int wantnl)
 	(void) Cookedmode();
 	GettingInput = 0;
     }
-#ifdef BSDSIGS
-    (void) sigsetmask(omask & ~sigmask(SIGCHLD));
-#else
-    if (setintr)
-	(void) sighold(SIGINT);
-    (void) sigrelse(SIGCHLD);
-#endif
     drainoline();
 #ifdef HAVE_GETPWENT
     (void) endpwent();
@@ -1905,11 +1796,6 @@ pintr1(int wantnl)
      */
     if (gointr) {
 	gotolab(gointr);
-	timflg = 0;
-	if ((v = pargv) != 0)
-	    pargv = 0, blkfree(v);
-	if ((v = gargv) != 0)
-	    gargv = 0, blkfree(v);
 	reset();
     }
     else if (intty && wantnl) {
@@ -1946,59 +1832,30 @@ pintr1(int wantnl)
  * Note that if catch is not set then we will unwind on any error.
  * If an end-of-file occurs, we return.
  */
-static struct command *savet = NULL;
 void
 process(int catch)
 {
     jmp_buf_t osetexit;
     /* PWP: This might get nuked my longjmp so don't make it a register var */
-    struct command *t = savet;
+    size_t omark;
 
-    savet = NULL;
     getexit(osetexit);
+    omark = cleanup_push_mark();
+    exitset++;
     for (;;) {
+	struct command *t;
+	int hadhist, old_pintr_disabled;
 
+	(void) setexit();
 	pendjob();
 
-	/* This was leaking memory badly, particularly when sourcing
-	 * files, etc.. For whatever reason we were arriving here with
-	 * allocated pointers still active, and the code was simply
-	 * overwriting them.  I can't say I fully understand the
-	 * control flow here, but according to Purify this particular
-	 * leak has been plugged, and I haven't noticed any ill
-	 * effects.. (sg)
-	 */
-	if (paraml.next && paraml.next != &paraml)
-	    freelex(&paraml);
-
-	paraml.next = paraml.prev = &paraml;
-	paraml.word = STRNULL;
-	(void) setexit();
 	justpr = enterhist;	/* execute if not entering history */
-
-	/*
-	 * Interruptible during interactive reads
-	 */
-	if (setintr)
-#ifdef BSDSIGS
-	    (void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else
-	    (void) sigrelse(SIGINT);
-#endif
-
-
-	/*
-	 * For the sake of reset()
-	 */
-	freelex(&paraml);
-	if (savet)
-	    freesyn(savet), savet = NULL;
 
 	if (haderr) {
 	    if (!catch) {
 		/* unwind */
 		doneinp = 0;
-		savet = t;
+		cleanup_pop_mark(omark);
 		resexit(osetexit);
 		reset();
 	    }
@@ -2046,16 +1903,26 @@ process(int catch)
 	    setalarm(1);
 	}
 	if (seterr) {
-	    xfree((ptr_t) seterr);
+	    xfree(seterr);
 	    seterr = NULL;
 	}
+
+	/*
+	 * Interruptible during interactive reads
+	 */
+	if (setintr)
+	    pintr_push_enable(&old_pintr_disabled);
+	hadhist = lex(&paraml);
+	if (setintr)
+	    cleanup_until(&old_pintr_disabled);
+	cleanup_push(&paraml, lex_cleanup);
 
 	/*
 	 * Echo not only on VERBOSE, but also with history expansion. If there
 	 * is a lexical error then we forego history echo.
 	 */
-	if ((lex(&paraml) && !seterr && intty && !tellwhat && !Expand && 
-	     !whyles) || adrof(STRverbose)) {
+	if ((hadhist && !seterr && intty && !tellwhat && !Expand && !whyles) ||
+	    adrof(STRverbose)) {
 	    int odidfds = didfds;
 	    haderr = 1;
 	    didfds = 0;
@@ -2065,16 +1932,7 @@ process(int catch)
 	    didfds = odidfds;
 	}
 	(void) alarm(0);	/* Autologout OFF */
-
-	/*
-	 * The parser may lose space if interrupted.
-	 */
-	if (setintr)
-#ifdef BSDSIGS
-	    (void) sigblock(sigmask(SIGINT));
-#else
-	    (void) sighold(SIGINT);
-#endif
+	alrmcatch_disabled = 1;
 
 	/*
 	 * Save input text on the history list if reading in old history, or it
@@ -2100,14 +1958,14 @@ process(int catch)
 	 * should go
 	 */
 	if (justpr)
-	    reset();
+	    goto cmd_done;
 
 	/*
 	 * If had a tellwhat from twenex() then do
 	 */
 	if (tellwhat) {
 	    (void) tellmewhat(&paraml, NULL);
-	    reset();
+	    goto cmd_done;
 	}
 
 	alias(&paraml);
@@ -2128,7 +1986,8 @@ process(int catch)
 	/*
 	 * Parse the words of the input into a parse tree.
 	 */
-	savet = syntax(paraml.next, &paraml, 0);
+	t = syntax(paraml.next, &paraml, 0);
+	cleanup_push(t, syntax_cleanup);
 	if (seterr)
 	    stderror(ERR_OLD);
 
@@ -2137,21 +1996,22 @@ process(int catch)
 	 * Execute the parse tree From: Michael Schroeder
 	 * <mlschroe@immd4.informatik.uni-erlangen.de> was execute(t, tpgrp);
 	 */
-	execute(savet, (tpgrp > 0 ? tpgrp : -1), NULL, NULL, TRUE);
+	execute(t, (tpgrp > 0 ? tpgrp : -1), NULL, NULL, TRUE);
 
 	/*
 	 * Made it!
 	 */
-	freelex(&paraml);
-	freesyn(savet), savet = NULL;
 #ifdef SIG_WINDOW
 	if (windowchg || (catch && intty && !whyles && !tellwhat)) {
 	    (void) check_window_size(0);	/* for window systems */
 	}
 #endif /* SIG_WINDOW */
-	set(STR_, Strsave(InputBuf), VAR_READWRITE | VAR_NOGLOB);
+	setcopy(STR_, InputBuf, VAR_READWRITE | VAR_NOGLOB);
+    cmd_done:
+	cleanup_until(&paraml);
     }
-    savet = t;
+    exitset--;
+    cleanup_pop_mark(omark);
     resexit(osetexit);
 }
 
@@ -2178,21 +2038,20 @@ dosource(Char **t, struct command *c)
 
     f = globone(*t++, G_ERROR);
     file = strsave(short2str(f));
+    cleanup_push(file, xfree);
     xfree(f);
     gflag = tglob(t);
     if (gflag) {
-        t = globall(t, gflag);
-	if (t == 0) {
-	    xfree(file);
+	t = globall(t, gflag);
+	if (t == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
-	}
     } else {
 	t = saveblk(t);
 	trim(t);
     }
     if ((!srcfile(file, 0, hflg, t)) && (!hflg) && (!bequiet))
-	stderror(ERR_SYSTEM, file, strerror(errno)); /* FIXME: leaks file */
-    xfree(file);
+	stderror(ERR_SYSTEM, file, strerror(errno));
+    cleanup_until(file);
 }
 
 /*
@@ -2303,11 +2162,12 @@ mailchk(void)
 		(loginsh && !new))
 		continue;
 	    type = strsave(new ? CGETS(11, 6, "new ") : "");
+	    cleanup_push(type, xfree);
 	    if (cnt == 1)
 		xprintf(CGETS(11, 5, "You have %smail.\n"), type);
 	    else
 	        xprintf(CGETS(11, 7, "You have %smail in %s.\n"), type, filename);
-	    xfree(type);
+	    cleanup_until(type);
 	}
     }
     chktim = t;

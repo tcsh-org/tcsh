@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.86 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.87 2006/01/12 19:43:00 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.86 2006/01/12 18:15:24 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.87 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1236,7 +1236,9 @@ v_search(int dir)
     Char *oldbuf;
     Char *oldlc, *oldc;
 
+    cleanup_push(&tmpbuf, Strbuf_cleanup);
     oldbuf = Strsave(InputBuf);
+    cleanup_push(oldbuf, xfree);
     oldlc = LastChar;
     oldc = Cursor;
     Strbuf_append1(&tmpbuf, '*');
@@ -1252,8 +1254,7 @@ v_search(int dir)
     Refresh();
     for (ch = 0;ch == 0;) {
 	if (GetNextChar(&ch) != 1) {
-	    xfree(tmpbuf.s);
-	    xfree(oldbuf);
+	    cleanup_until(&tmpbuf);
 	    return(e_send_eof(0));
 	}
 	switch (ASC(ch)) {
@@ -1268,8 +1269,7 @@ v_search(int dir)
 		copyn(InputBuf, oldbuf, INBUFSIZE);/*FIXBUF*/
 		LastChar = oldlc;
 		Cursor = oldc;
-		xfree(tmpbuf.s);
-		xfree(oldbuf);
+		cleanup_until(&tmpbuf);
 		return(CC_REFRESH);
 	    }
 	    Refresh();
@@ -1295,7 +1295,7 @@ v_search(int dir)
 	    break;
 	}
     }
-    xfree(oldbuf);
+    cleanup_until(oldbuf);
 
     if (tmpbuf.len == 1) {
 	/*
@@ -1306,7 +1306,7 @@ v_search(int dir)
 	    LastChar = InputBuf;
 	    Cursor = InputBuf;
 	    Refresh();
-	    xfree(tmpbuf.s);
+	    cleanup_until(&tmpbuf);
 	    return(CC_ERROR);
 	}
 	if (patbuf.s[0] != '*') {
@@ -1326,7 +1326,7 @@ v_search(int dir)
 	Strbuf_append(&patbuf, tmpbuf.s);
 	Strbuf_terminate(&patbuf);
     }
-    xfree(tmpbuf.s);
+    cleanup_until(&tmpbuf);
     LastCmd = (KEYCMD) dir; /* avoid c_hsetpat */
     Cursor = LastChar = InputBuf;
     if ((dir == F_UP_SEARCH_HIST ? e_up_search_hist(0) : 
@@ -1858,14 +1858,19 @@ e_up_search_hist(Char c)
 
 	if (hp->histline == NULL)
 	    hp->histline = sprlex(&hp->Hlex);
-	hl = HistLit ? hp->histline : sprlex(&hp->Hlex);
+	if (HistLit)
+	    hl = hp->histline;
+	else {
+	    hl = sprlex(&hp->Hlex);
+	    cleanup_push(hl, xfree);
+	}
 #ifdef SDEBUG
 	xprintf("Comparing with \"%S\"\n", hl);
 #endif
 	matched = (Strncmp(hl, InputBuf, (size_t) (LastChar - InputBuf)) ||
 		   hl[LastChar-InputBuf]) && c_hmatch(hl);
 	if (!HistLit)
-	    xfree(hl);
+	    cleanup_until(hl);
 	if (matched) {
 	    found++;
 	    break;
@@ -1876,7 +1881,7 @@ e_up_search_hist(Char c)
 
     if (!found) {
 #ifdef SDEBUG
-	xprintf("not found\n"); 
+	xprintf("not found\n");
 #endif
 	return(CC_ERROR);
     }
@@ -1912,7 +1917,12 @@ e_down_search_hist(Char c)
 	Char *hl;
 	if (hp->histline == NULL)
 	    hp->histline = sprlex(&hp->Hlex);
-	hl = HistLit ? hp->histline : sprlex(&hp->Hlex);
+	if (HistLit)
+	    hl = hp->histline;
+	else {
+	    hl = sprlex(&hp->Hlex);
+	    cleanup_push(hl, xfree);
+	}
 #ifdef SDEBUG
 	xprintf("Comparing with \"%S\"\n", hl);
 #endif
@@ -1920,14 +1930,14 @@ e_down_search_hist(Char c)
 	     hl[LastChar-InputBuf]) && c_hmatch(hl))
 	    found = h;
 	if (!HistLit)
-	    xfree(hl);
+	    cleanup_until(hl);
 	hp = hp->Hnext;
     }
 
     if (!found) {		/* is it the current history number? */
 	if (!c_hmatch(HistBuf.s)) {
 #ifdef SDEBUG
-	    xprintf("not found\n"); 
+	    xprintf("not found\n");
 #endif
 	    return(CC_ERROR);
 	}
@@ -2819,7 +2829,7 @@ v_repeat_srch(int c)
 {
     CCRETVAL rv = CC_ERROR;
 #ifdef SDEBUG
-    xprintf("dir %d patlen %d patbuf %S\n", 
+    xprintf("dir %d patlen %d patbuf %S\n",
 	    c, (int)patbuf.len, patbuf.s);
 #endif
 
@@ -3063,6 +3073,13 @@ e_argfour(Char c)
     return(CC_ARGHACK);
 }
 
+static void
+quote_mode_cleanup(void *unused)
+{
+    USE(unused);
+    QuoteModeOff();
+}
+
 /*ARGSUSED*/
 CCRETVAL
 e_quote(Char c)
@@ -3072,8 +3089,9 @@ e_quote(Char c)
 
     USE(c);
     QuoteModeOn();
+    cleanup_push(&c, quote_mode_cleanup); /* Using &c just as a mark */
     num = GetNextChar(&ch);
-    QuoteModeOff();
+    cleanup_until(&c);
     if (num == 1)
 	return e_insert(ch);
     else
@@ -3329,13 +3347,13 @@ e_stuff_char(Char c)
      if (was_raw)
          (void) Cookedmode();
 
-     (void) write(SHIN, "\n", 1);
+     (void) xwrite(SHIN, "\n", 1);
      len = one_wctomb(buf, c & CHAR);
      for (i = 0; i < len; i++)
 	 (void) ioctl(SHIN, TIOCSTI, (ioctl_t) &buf[i]);
 
      if (was_raw)
-         (void) Rawmode();
+	 (void) Rawmode();
      return(e_redisp(c));
 #else /* !TIOCSTI */  
      return(CC_ERROR);

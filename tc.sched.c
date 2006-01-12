@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sched.c,v 3.22 2005/04/11 22:11:00 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.sched.c,v 3.23 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -34,7 +34,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sched.c,v 3.22 2005/04/11 22:11:00 kim Exp $")
+RCSID("$Id: tc.sched.c,v 3.23 2006/01/12 18:15:25 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -89,11 +89,13 @@ dosched(Char **v, struct command *c)
 	    Char *buf, *str;
 
 	    buf = blkexpand(tp->t_lex);
+	    cleanup_push(buf, xfree);
 	    str = tprintf(FMT_SCHED, fmt, short2str(buf), tp->t_when, &count);
-	    xfree(buf);
+	    cleanup_until(buf);
+	    cleanup_push(str, xfree);
 	    for (cp = str; *cp;)
 		xputwchar(*cp++);
-	    xfree(str);
+	    cleanup_until(str);
 	}
 	return;
     }
@@ -190,13 +192,9 @@ sched_run(void)
     struct wordent cmd, *nextword, *lastword;
     struct command *t;
     Char  **v, *cp;
-#ifdef BSDSIGS
-    sigmask_t omask;
 
-    omask = sigblock(sigmask(SIGINT)) & ~sigmask(SIGINT);
-#else
-    (void) sighold(SIGINT);
-#endif
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
 
     (void) time(&cur_time);
 
@@ -207,11 +205,7 @@ sched_run(void)
      * ought to fix it all up.  -jbb
      */
     if (!(sched_ptr && sched_ptr->t_when < cur_time)) {
-#ifdef BSDSIGS
-	(void) sigsetmask(omask);
-#else
-	(void) sigrelse(SIGINT);
-#endif
+	cleanup_until(&pintr_disabled);
 	return;
     }
 
@@ -239,16 +233,18 @@ sched_run(void)
 	blkfree(tp->t_lex);	/* straighten out in case of */
 	xfree(tp);		/* command blow-up. */
 
+	cleanup_push(&cmd, lex_cleanup);
 	/* expand aliases like process() does. */
 	alias(&cmd);
 	/* build a syntax tree for the command. */
 	t = syntax(cmd.next, &cmd, 0);
+	cleanup_push(t, syntax_cleanup);
 	if (seterr)
 	    stderror(ERR_OLD);
 	/* execute the parse tree. */
 	execute(t, -1, NULL, NULL, TRUE);
 	/* done. free the lex list and parse tree. */
-	freelex(&cmd), freesyn(t);
+	cleanup_until(&cmd);
     }
     if (GettingInput && !just_signaled) {	/* PWP */
 	(void) Rawmode();
@@ -258,9 +254,5 @@ sched_run(void)
     }
     just_signaled = 0;
 
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else
-    (void) sigrelse(SIGINT);
-#endif
+    cleanup_until(&pintr_disabled);
 }

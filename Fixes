@@ -1,3 +1,4 @@
+ 33. Signal related changes (Miloslav Trmac)
  32. Misc cast cleanups and code clarification (Miloslav Trmac)
  31. Use dynamically allocated buffers everywhere (Miloslav Trmac)
  30. Fix reading of invalid byte sequences (Miloslav Trmac)

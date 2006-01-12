@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/ntfunc.c,v 1.12 2005/05/25 03:01:20 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/ntfunc.c,v 1.13 2006/01/12 18:15:25 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -179,9 +179,10 @@ void dostart(Char ** vc, struct command *c) {
 			stderror(ERR_NAME | ERR_NOMATCH);
 	}
 	else
-		vc = gargv = saveblk(vc);
+		vc = saveblk(vc);
 	trim(vc);
 	v = short2blk(vc);
+	blkfree(vc);
 	for (k = 0; v[k] != NULL ; k++){
 
 		if ( v[k][0] == '-' ) {
@@ -208,7 +209,7 @@ void dostart(Char ** vc, struct command *c) {
 				dwCreationFlags |= REALTIME_PRIORITY_CLASS;
 			else{
 				blkfree((Char **)v);
-				stderror(ERR_SYSTEM,start_usage,"See CMD.EXE for more info");
+				stderror(ERR_SYSTEM,start_usage,"See CMD.EXE for more info");/*FIXRESET*/
 			}
 		}
 		else{ // non-option arg
@@ -229,7 +230,7 @@ void dostart(Char ** vc, struct command *c) {
 				if(!cmdstr)
 				{
 					heap_free(ptr);
-					stderror(ERR_NOMEM,"start");
+					stderror(ERR_NOMEM,"start");/*FIXRESET*/
 				}
 				cmdend =  cmdstr + (cmdend - ptr);
 				cmdsize <<= 1;
@@ -244,7 +245,7 @@ void dostart(Char ** vc, struct command *c) {
 	}
 	if (jj == k) {
 		blkfree((Char **)v);
-		stderror(ERR_SYSTEM,start_usage,"See CMD.EXE for more info");
+		stderror(ERR_SYSTEM,start_usage,"See CMD.EXE for more info");/*FIXRESET*/
 	}
 	*cmdend = 0;
 	lstrcpyn(argv0,v[k],255);
@@ -286,7 +287,7 @@ void dostart(Char ** vc, struct command *c) {
 			heap_free(cmdstr); /* free !! */
 
 			if (errno) {
-				stderror(ERR_ARCH,argv0,strerror(errno));
+				stderror(ERR_ARCH,argv0,strerror(errno));/*FIXRESET*/
 			}
 		}
 		else if (ret == ERROR_INVALID_PARAMETER) {
@@ -295,7 +296,7 @@ void dostart(Char ** vc, struct command *c) {
 
 			heap_free(cmdstr); /* free !! */
 
-			stderror(ERR_TOOLARGE,argv0);
+			stderror(ERR_TOOLARGE,argv0);/*FIXRESET*/
 
 		}
 		else {
@@ -309,7 +310,7 @@ void dostart(Char ** vc, struct command *c) {
 
 			heap_free(cmdstr); /* free !! */
 			if (errno) {
-				stderror(ERR_NOTFOUND,argv0);
+				stderror(ERR_NOTFOUND,argv0);/*FIXRESET*/
 			}
 		}
 	}
@@ -394,34 +395,35 @@ void dotitle(Char **vc, struct command * c) {
 			stderror(ERR_NAME | ERR_NOMATCH);
 	}
 	else
-		vc = gargv = saveblk(vc);
+		vc = saveblk(vc);
 	trim(vc);
+	cleanup_push(vc, blk_cleanup);
 
 	if (k=GetConsoleTitle(titlebuf,512) ) {
 		titlebuf[k]=0;
-		set(STRoldtitle,SAVE(titlebuf),VAR_READWRITE);
+		setcopy(STRoldtitle,str2short(titlebuf),VAR_READWRITE);
 	}
 
 	memset(titlebuf,0,512);
 	v = short2blk(vc);
+	cleanup_until(vc);
+	cleanup_push((Char **)v, blk_cleanup);
 	for (k = 0; v[k] != NULL ; k++){
 		__try {
 			 lstrcat(titlebuf,v[k]);
 			 lstrcat(titlebuf," ");
 		}
 		__except(1) {
-			blkfree((Char **)v);
 			stderror(ERR_TOOMANY);
 		}
 	}
-	blkfree((Char **)v);
 
 	if (!SetConsoleTitle(titlebuf) ) {
 			make_err_str(GetLastError(),errbuf,128);
 			wsprintf(err2,"%s",v[k]);
-			blkfree((Char **)v);
 			stderror(ERR_SYSTEM,err2,errbuf);
 	}
+	cleanup_until((Char **)v);
 	return;
 }
 void docls(Char **vc, struct command *c) {
@@ -649,7 +651,7 @@ int find_no_assoc(char *str) {
 	}
 	return 0;
 }
-void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {
+void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {/*FIXRESET*/
 
 	char *prog;
 	char *cmdstr, *p2, *cmdend;
@@ -750,7 +752,7 @@ void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {
 
 		make_err_str(GetLastError(),cmdstr,512);//don't need the full size
 		wsprintf(err2,"%s",prog);
-		stderror(ERR_SYSTEM,err2,cmdstr);
+		stderror(ERR_SYSTEM,err2,cmdstr);/*FIXRESET*/
 	}
 
 	heap_free(originalPtr);
@@ -797,7 +799,6 @@ int nt_try_fast_exec(struct command *t) {
 		if (pv == 0) {
 			return 1;
 		}
-		gargv = 0;
 	}
 	else
 		pv = saveblk(blk);
@@ -817,12 +818,11 @@ int nt_try_fast_exec(struct command *t) {
 	av = &t->t_dcom[1];
 	gflag = tglob(av);
 	if (gflag) {
-		av = globall(av, gflag);
+		av = globall(av, gflag);/*FIXRESET*/
 		if (av == 0) {
 			blkfree(pv);
 			return 1;
 		}
-		gargv = 0;
 	}
 	else
 		av = saveblk(av);
@@ -837,7 +837,7 @@ int nt_try_fast_exec(struct command *t) {
 	if (*av == NULL || **av == '\0')
 		return 1;
 
-	xechoit(av);		/* Echo command if -x */
+	xechoit(av);/*FIXRESET*/		/* Echo command if -x */
 	if (v == 0 || v->vec[0] == 0 || slash)
 		pv = abspath;
 	else
@@ -1052,7 +1052,7 @@ re_cp:
 		if(!gui_app) {
 			WaitForSingleObject(pi.hProcess,INFINITE);
 			(void)GetExitCodeProcess(pi.hProcess,&exitcode);
-			set(STRstatus, putn(exitcode), VAR_READWRITE);
+			set(STRstatus, putn(exitcode), VAR_READWRITE);/*FIXRESET*/
 		}
 		retval = 0;
 		CloseHandle(pi.hProcess);
@@ -1118,10 +1118,12 @@ void dostacksize(Char ** vc, struct command *c) {
 			stderror(ERR_NAME | ERR_NOMATCH);
 	}
 	else
-		vc = gargv = saveblk(vc);
+		vc = saveblk(vc);
 	trim(vc);
 
 	v = short2blk(vc);
+	blkfree(vc);
+	cleanup_push((Char **)v, blk_cleanup);
 	if (v[0] == NULL) {
 		xprintf("Stack limit for shell threads is %d bytes\n",gdwStackSize);
 	}
@@ -1130,7 +1132,7 @@ void dostacksize(Char ** vc, struct command *c) {
 			gdwStackSize = (unsigned)atol(v[k]);
 		}
 	}
-	blkfree((Char **)v);
+	cleanup_until((Char **)v);
 }
 /*
  * patch based on work by Chun-Pong Yu (bol.pacific.net.sg)

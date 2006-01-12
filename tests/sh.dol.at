@@ -15,6 +15,6 @@ AT_DATA([input],
 [[foo
 !@#$%^&*()_+-=[]{};':"\|,./<>?`~
 ]])
-AT_CHECK([tcsh cat.csh < input | cmp -s input -])
+AT_CHECK([tcsh -f cat.csh < input | cmp -s input -])
 
 AT_CLEANUP

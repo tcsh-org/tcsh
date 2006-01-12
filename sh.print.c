@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.29 2005/04/11 22:10:58 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.print.c,v 3.30 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.29 2005/04/11 22:10:58 kim Exp $")
+RCSID("$Id: sh.print.c,v 3.30 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 
@@ -110,6 +110,16 @@ char    linbuf[2048];		/* was 128 */
 char   *linp = linbuf;
 int    output_raw = 0;		/* PWP */
 int    xlate_cr   = 0;		/* HE */
+
+/* For cleanup_push() */
+void
+output_raw_restore(void *xorig)
+{
+    int *orig;
+
+    orig = xorig;
+    output_raw = *orig;
+}
 
 #ifdef WIDE_STRINGS
 void
@@ -230,7 +240,7 @@ flush(void)
 	return;
     if (interrupted) {
 	interrupted = 0;
-	linp = linbuf;		/* avoid resursion as stderror calls flush */
+	linp = linbuf;		/* avoid recursion as stderror calls flush */
 	stderror(ERR_SILENT);
     }
     interrupted = 1;
@@ -244,11 +254,11 @@ flush(void)
 	lmode & LFLUSHO) {
 	lmode = LFLUSHO;
 	(void) ioctl(unit, TIOCLBIC, (ioclt_t) & lmode);
-	(void) write(unit, "\n", 1);
+	(void) xwrite(unit, "\n", 1);
     }
 #endif
 #endif
-    if (write(unit, linbuf, linp - linbuf) == -1)
+    if (xwrite(unit, linbuf, linp - linbuf) == -1)
 	switch (errno) {
 #ifdef EIO
 	/* We lost our tty */

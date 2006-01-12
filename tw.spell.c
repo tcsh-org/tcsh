@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.spell.c,v 3.18 2005/04/11 22:11:01 kim Exp $ */
+/* $Header: /src/pub/tcsh/tw.spell.c,v 3.19 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tw.spell.c: Spell check words
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.spell.c,v 3.18 2005/04/11 22:11:01 kim Exp $")
+RCSID("$Id: tw.spell.c,v 3.19 2006/01/12 18:15:25 christos Exp $")
 
 #include "tw.h"
 
@@ -46,6 +46,8 @@ spell_me(struct Strbuf *oldname, int looking, Char *pat, eChar suf)
     int    foundslash = 0;
     int     retval;
 
+    cleanup_push(&guess, Strbuf_cleanup);
+    cleanup_push(&newname, Strbuf_cleanup);
     for (;;) {
 	while (*old == '/') {	/* skip '/' */
 	    Strbuf_append1(&newname, *old++);
@@ -57,9 +59,10 @@ spell_me(struct Strbuf *oldname, int looking, Char *pat, eChar suf)
 	Strbuf_terminate(&newname);
 	if (*old == '\0') {
 	    retval = (StrQcmp(oldname->s, newname.s) != 0);
+	    cleanup_ignore(&newname);
 	    xfree(oldname->s);
 	    *oldname = newname; /* shove it back. */
-	    xfree(guess.s);
+	    cleanup_until(&guess);
 	    return retval;
 	}
 	guess.len = 0;		/* start at beginning of buf */
@@ -78,7 +81,7 @@ spell_me(struct Strbuf *oldname, int looking, Char *pat, eChar suf)
 			  looking == TW_COMMAND && (foundslash || *old != '/') ?
 			  TW_COMMAND : looking, 1, pat, suf);
 	if (retval >= 4 || retval < 0) {
-	    xfree(guess.s);
+	    cleanup_until(&guess);
 	    return -1;		/* hopeless */
 	}
 	Strbuf_append(&newname, guess.s + ws);

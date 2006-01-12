@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.30 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.31 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.file.c,v 3.30 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.31 2006/01/12 19:43:00 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -70,7 +70,6 @@ static	void	 beep			(void);
 static	void 	 print_recognized_stuff	(const Char *);
 static	void	 extract_dir_and_name	(const Char *, Char **, const Char **);
 static	Char	*getitem		(DIR *, int);
-static	void	 free_items		(Char **, size_t);
 static	size_t	 tsearch		(Char *, COMMAND, size_t);
 static	int	 compare		(const void *, const void *);
 static	int	 recognize		(Char **, Char *, size_t, size_t);
@@ -128,7 +127,7 @@ setup_tty(int on)
 # endif /* POSIX */
     }
 # ifdef POSIX
-    (void) tcsetattr(SHIN, on, &tchars);
+    (void) xtcsetattr(SHIN, on, &tchars);
 # else
     (void) ioctl(SHIN, on, (ioctl_t) &tchars);
 # endif /* POSIX */
@@ -173,11 +172,8 @@ back_to_col_1(void)
     struct sgttyb tty, tty_normal;
 #endif /* TERMIO */
 
-# ifdef BSDSIGS
-    sigmask_t omask = sigblock(sigmask(SIGINT));
-# else
-    (void) sighold(SIGINT);
-# endif /* BSDSIGS */
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
 
 #ifdef TERMIO
 # ifdef POSIX
@@ -189,13 +185,13 @@ back_to_col_1(void)
     tty.c_iflag &= ~INLCR;
     tty.c_oflag &= ~ONLCR;
 # ifdef POSIX
-    (void) tcsetattr(SHOUT, TCSANOW, &tty);
+    (void) xtcsetattr(SHOUT, TCSANOW, &tty);
 # else
     (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty);
 # endif /* POSIX */
-    (void) write(SHOUT, "\r", 1);
+    (void) xwrite(SHOUT, "\r", 1);
 # ifdef POSIX
-    (void) tcsetattr(SHOUT, TCSANOW, &tty_normal);
+    (void) xtcsetattr(SHOUT, TCSANOW, &tty_normal);
 # else
     (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty_normal);
 # endif /* POSIX */
@@ -204,15 +200,11 @@ back_to_col_1(void)
     tty_normal = tty;
     tty.sg_flags &= ~CRMOD;
     (void) ioctl(SHIN, TIOCSETN, (ioctl_t) & tty);
-    (void) write(SHOUT, "\r", 1);
+    (void) xwrite(SHOUT, "\r", 1);
     (void) ioctl(SHIN, TIOCSETN, (ioctl_t) & tty_normal);
 #endif /* TERMIO */
 
-# ifdef BSDSIGS
-    (void) sigsetmask(omask);
-# else
-    (void) sigrelse(SIGINT);
-# endif /* BSDISGS */
+    cleanup_until(&pintr_disabled);
 }
 
 /*
@@ -232,11 +224,8 @@ pushback(const Char *string)
     struct sgttyb tty, tty_normal;
 #endif /* TERMIO */
 
-#ifdef BSDSIGS
-    sigmask_t omask = sigblock(sigmask(SIGINT));
-#else
-    (void) sighold(SIGINT);
-#endif /* BSDSIGS */
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
 
 #ifdef TERMIO
 # ifdef POSIX
@@ -247,7 +236,7 @@ pushback(const Char *string)
     tty_normal = tty;
     tty.c_lflag &= ~(ECHOKE | ECHO | ECHOE | ECHOK | ECHONL | ECHOPRT | ECHOCTL);
 # ifdef POSIX
-    (void) tcsetattr(SHOUT, TCSANOW, &tty);
+    (void) xtcsetattr(SHOUT, TCSANOW, &tty);
 # else
     (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty);
 # endif /* POSIX */
@@ -261,7 +250,7 @@ pushback(const Char *string)
 	    (void) ioctl(SHOUT, TIOCSTI, (ioctl_t) &buf[i]);
     }
 # ifdef POSIX
-    (void) tcsetattr(SHOUT, TCSANOW, &tty_normal);
+    (void) xtcsetattr(SHOUT, TCSANOW, &tty_normal);
 # else
     (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty_normal);
 # endif /* POSIX */
@@ -276,11 +265,7 @@ pushback(const Char *string)
     (void) ioctl(SHOUT, TIOCSETN, (ioctl_t) & tty_normal);
 #endif /* TERMIO */
 
-# ifdef BSDSIGS
-    (void) sigsetmask(omask);
-# else
-    (void) sigrelse(SIGINT);
-# endif /* BSDISGS */
+    cleanup_until(&pintr_disabled);
 }
 
 static int
@@ -379,7 +364,7 @@ tilde(const Char *old)
 	Char *person;
 
 	person = Strnsave(old, o - old);
-	pw = getpwnam(short2str(person));
+	pw = xgetpwnam(short2str(person));
 	xfree(person);
 	if (pw == NULL)
 	    return (NULL);
@@ -408,7 +393,7 @@ retype(void)
     tty.c_lflag |= PENDIN;
 
 # ifdef POSIX
-    (void) tcsetattr(SHOUT, TCSANOW, &tty);
+    (void) xtcsetattr(SHOUT, TCSANOW, &tty);
 # else
     (void) ioctl(SHOUT, TCSETAW, (ioctl_t) &tty);
 # endif /* POSIX */
@@ -424,11 +409,11 @@ beep(void)
 {
     if (adrof(STRnobeep) == 0)
 #ifdef IS_ASCII
-	(void) write(SHOUT, "\007", 1);
+	(void) xwrite(SHOUT, "\007", 1);
 #else
     {
 	unsigned char beep_ch = CTL_ESC('\007');
-	(void) write(SHOUT, &beep_ch, 1);
+	(void) xwrite(SHOUT, &beep_ch, 1);
     }
 #endif
 }
@@ -503,32 +488,6 @@ getitem(DIR *dir_fd, int looking_for_lognames)
     return (NULL);
 }
 
-static void
-free_items(Char **items, size_t numitems)
-{
-    size_t i;
-
-    for (i = 0; i < numitems; i++)
-	xfree(items[i]);
-    xfree(items);
-}
-
-#ifdef BSDSIGS
-# define FREE_ITEMS(items, numitems) { \
-	sigmask_t omask;\
-\
-	omask = sigblock(sigmask(SIGINT));\
-	free_items(items, numitems);\
-	(void) sigsetmask(omask);\
-}
-#else
-# define FREE_ITEMS(items, numitems) { \
-	(void) sighold(SIGINT);\
-	free_items(items, numitems);\
-	(void) sigrelse(SIGINT);\
-}
-#endif /* BSDSIGS */
-
 /*
  * Perform a RECOGNIZE or LIST command on string "word".
  */
@@ -542,8 +501,8 @@ tsearch(Char *word, COMMAND command, size_t max_word_length)
     Char *extended_name = NULL;
     const Char *name;
     Char *item;
-    Char **items = NULL;
-    size_t name_length, numitems = 0, maxitems = 0;
+    struct blk_buf items = BLK_BUF_INIT;
+    size_t name_length;
 
     looking_for_lognames = (*word == '~') && (Strchr(word, '/') == NULL);
     if (looking_for_lognames) {
@@ -552,43 +511,41 @@ tsearch(Char *word, COMMAND command, size_t max_word_length)
 #endif
 	name = word + 1;	/* name sans ~ */
 	dir_fd = NULL;
+	cleanup_push(dir, xfree);
     }
     else {
 	extract_dir_and_name(word, &dir, &name);
+	cleanup_push(dir, xfree);
 	tilded_dir = tilde(dir);
 	if (tilded_dir == NULL)
 	    goto end;
+	cleanup_push(tilded_dir, xfree);
 	dir_fd = opendir(*tilded_dir ? short2str(tilded_dir) : ".");
 	if (dir_fd == NULL)
 	    goto end;
     }
 
     name_length = Strlen(name);
+    cleanup_push(&extended_name, xfree_indirect);
+    cleanup_push(&items, bb_cleanup);
 again:				/* search for matches */
-    for (numitems = 0;
-	(item = getitem(dir_fd, looking_for_lognames)) != NULL;) {
+    while ((item = getitem(dir_fd, looking_for_lognames)) != NULL) {
 	if (!is_prefix(name, item))
 	    continue;
 	/* Don't match . files on null prefix match */
 	if (name_length == 0 && item[0] == '.' &&
 	    !looking_for_lognames)
 	    continue;
-	if (command == LIST) {
-	    if (numitems >= maxitems) {
-		maxitems += 1024;
-		items = xrealloc(items, sizeof(*items) * maxitems);
-	    }
-	    items[numitems] = Strsave(item);
-	    numitems++;
-	}
+	if (command == LIST)
+	    bb_append(&items, Strsave(item));
 	else {			/* RECOGNIZE command */
 	    if (ignoring && ignored(item))
 		nignored++;
-	    else if (recognize(&extended_name, item, name_length, ++numitems))
+	    else if (recognize(&extended_name, item, name_length, ++items.len))
 		break;
 	}
     }
-    if (ignoring && numitems == 0 && nignored > 0) {
+    if (ignoring && items.len == 0 && nignored > 0) {
 	ignoring = FALSE;
 	nignored = 0;
 	if (looking_for_lognames) {
@@ -605,8 +562,8 @@ again:				/* search for matches */
 	(void) endpwent();
 #endif
     } else
-	(void) closedir(dir_fd);
-    if (numitems != 0) {
+	xclosedir(dir_fd);
+    if (items.len != 0) {
 	if (command == RECOGNIZE) {
 	    if (looking_for_lognames)
 		copyn(word, STRtilde, 2);/*FIXBUF, sort of */
@@ -617,17 +574,14 @@ again:				/* search for matches */
 	    catn(word, extended_name, max_word_length);/*FIXBUF*/
 	}
 	else {			/* LIST */
-	    qsort(items, numitems, sizeof(items[0]), compare);
+	    qsort(items.vec, items.len, sizeof(items.vec[0]), compare);
 	    print_by_column(looking_for_lognames ? NULL : tilded_dir,
-			    items, numitems);
-	    if (items != NULL)
-		FREE_ITEMS(items, numitems);
+			    items.vec, items.len);
 	}
     }
  end:
-    xfree(extended_name);
-    xfree(tilded_dir);
-    return (numitems);
+    cleanup_until(dir);
+    return items.len;
 }
 
 
@@ -716,6 +670,13 @@ is_suffix(const Char *check, const Char *template)
     }
 }
 
+static void
+setup_tty_cleanup(void *dummy)
+{
+    USE(dummy);
+    setup_tty(OFF);
+}
+
 size_t
 tenex(Char *inputline, size_t inputline_size)
 {
@@ -723,10 +684,10 @@ tenex(Char *inputline, size_t inputline_size)
     ssize_t num_read;
     char    tinputline[BUFSIZE + 1];/*FIXBUF*/
 
-
     setup_tty(ON);
+    cleanup_push(&num_read, setup_tty_cleanup); /* num_read is only a marker */
 
-    while ((num_read = read(SHIN, tinputline, BUFSIZE)) > 0) {/*FIXBUF*/
+    while ((num_read = xread(SHIN, tinputline, BUFSIZE)) > 0) {/*FIXBUF*/
 	static const Char delims[] = {' ', '\'', '"', '\t', ';', '&', '<',
 	'>', '(', ')', '|', '^', '%', '\0'};
 	Char *str_end, *word_start, last_Char, should_retype;
@@ -755,7 +716,7 @@ tenex(Char *inputline, size_t inputline_size)
 	    if (Strchr(delims, word_start[-1]))
 		break;
 	space_left = inputline_size - (word_start - inputline) - 1;
-	numitems = tsearch(word_start, command, space_left);/*FIXBUF*/
+	numitems = tsearch(word_start, command, space_left);
 
 	if (command == RECOGNIZE) {
 	    /* print from str_end on */
@@ -782,7 +743,7 @@ tenex(Char *inputline, size_t inputline_size)
 	if (should_retype)
 	    retype();
     }
-    setup_tty(OFF);
+    cleanup_until(&num_read);
     return (num_read);
 }
 

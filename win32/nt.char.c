@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.char.c,v 1.5 2005/03/25 18:46:42 kim Exp $*/
+/*$Header: /src/pub/tcsh/win32/nt.char.c,v 1.6 2006/01/12 18:15:25 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -112,7 +112,7 @@ char * nt_cgets(int set, int msgnum, char *def) {
 void nt_autoset_dspmbyte(void) {
 	switch (GetConsoleCP()) {
 	case 932: /* Japan */
-		set(CHECK_MBYTEVAR, Strsave(STRsjis), VAR_READWRITE);
+		setcopy(CHECK_MBYTEVAR, STRsjis, VAR_READWRITE);
 		update_dspmbyte_vars();
 		break;
 	}

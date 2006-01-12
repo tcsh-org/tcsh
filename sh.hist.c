@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.hist.c,v 3.35 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.hist.c,v 3.36 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.hist.c,v 3.35 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: sh.hist.c,v 3.36 2006/01/12 19:43:00 christos Exp $")
 
 #include "tc.h"
 
@@ -216,12 +216,6 @@ dohist(Char **vp, struct command *c)
     USE(c);
     if (getn(varval(STRhistory)) == 0)
 	return;
-    if (setintr)
-#ifdef BSDSIGS
-	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else
-	(void) sigrelse(SIGINT);
-#endif
     while (*++vp && **vp == '-') {
 	Char   *vp2 = *vp;
 
@@ -260,20 +254,18 @@ dohist(Char **vp, struct command *c)
 	    hp->Hnext = np->Hnext, hfree(np);
     }
 
-    if (hflg & (HIST_LOAD | HIST_MERGE)) {
+    if (hflg & (HIST_LOAD | HIST_MERGE))
 	loadhist(*vp, (hflg & HIST_MERGE) ? 1 : 0);
-	return;
-    }
-    else if (hflg & HIST_SAVE) {
+    else if (hflg & HIST_SAVE)
 	rechist(*vp, 1);
-	return;
-    }
-    if (*vp)
-	n = getn(*vp);
     else {
-	n = getn(varval(STRhistory));
+	if (*vp)
+	    n = getn(*vp);
+	else {
+	    n = getn(varval(STRhistory));
+	}
+	dohist1(Histlist.Hnext, &n, hflg);
     }
-    dohist1(Histlist.Hnext, &n, hflg);
 }
 
 static void
@@ -282,6 +274,12 @@ dohist1(struct Hist *hp, int *np, int hflg)
     int    print = (*np) > 0;
 
     for (; hp != 0; hp = hp->Hnext) {
+	if (setintr) {
+	    int old_pintr_disabled;
+
+	    pintr_push_enable(&old_pintr_disabled);
+	    cleanup_until(&old_pintr_disabled);
+	}
 	(*np)--;
 	if ((hflg & HIST_REV) == 0) {
 	    dohist1(hp->Hnext, np, hflg);
@@ -298,13 +296,17 @@ static void
 phist(struct Hist *hp, int hflg)
 {
     if (hflg & HIST_ONLY) {
+	int old_output_raw;
+
        /*
         * Control characters have to be written as is (output_raw).
         * This way one can preserve special characters (like tab) in
         * the history file.
         * From: mveksler@vnet.ibm.com (Veksler Michael)
         */
-        output_raw= 1;
+	old_output_raw = output_raw;
+        output_raw = 1;
+	cleanup_push(&old_output_raw, output_raw_restore);
 	if (hflg & HIST_TIME)
 	    /* 
 	     * Make file entry with history time in format:
@@ -317,7 +319,7 @@ phist(struct Hist *hp, int hflg)
 	    xprintf("%S\n", hp->histline);
 	else
 	    prlex(&hp->Hlex);
-        output_raw= 0;
+        cleanup_until(&old_output_raw);
     }
     else {
 	Char   *cp = str2short("%h\t%T\t%R\n");
@@ -328,9 +330,10 @@ phist(struct Hist *hp, int hflg)
 	    cp = vp->vec[1];
 
 	p = tprintf(FMT_HISTORY, cp, NULL, hp->Htime, hp);
+	cleanup_push(p, xfree);
 	for (cp = p; *cp;)
 	    xputwchar(*cp++);
-	xfree(p);
+	cleanup_until(p);
     }
 }
 
@@ -396,10 +399,11 @@ rechist(Char *fname, int ref)
     }
     else
 	fname = globone(fname, G_ERROR);
+    cleanup_push(fname, xfree);
 
     /*
      * The 'savehist merge' feature is intended for an environment
-     * with numerous shells beeing in simultaneous use. Imagine
+     * with numerous shells being in simultaneous use. Imagine
      * any kind of window system. All these shells 'share' the same 
      * ~/.history file for recording their command line history. 
      * Currently the automatic merge can only succeed when the shells
@@ -421,19 +425,20 @@ rechist(Char *fname, int ref)
     if ((shist = adrof(STRsavehist)) != NULL && shist->vec != NULL)
 	if (shist->vec[1] && eq(shist->vec[1], STRmerge))
 	    loadhist(fname, 1);
-    fp = creat(short2str(fname), 0600);
+    fp = xcreat(short2str(fname), 0600);
     if (fp == -1) {
 	didfds = oldidfds;
+	cleanup_until(fname);
 	return;
     }
     ftmp = SHOUT;
     SHOUT = fp;
     dumphist[2] = snum;
     dohist(dumphist, NULL);
-    (void) close(fp);
+    xclose(fp);
     SHOUT = ftmp;
     didfds = oldidfds;
-    xfree(fname);
+    cleanup_until(fname);
 }
 
 

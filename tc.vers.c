@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.vers.c,v 3.51 2005/04/11 22:11:00 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.vers.c,v 3.52 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "tw.h"
 
-RCSID("$Id: tc.vers.c,v 3.51 2005/04/11 22:11:00 kim Exp $")
+RCSID("$Id: tc.vers.c,v 3.52 2006/01/12 18:15:25 christos Exp $")
 
 #include "patchlevel.h"
 
@@ -165,9 +165,11 @@ fix_version(void)
 	     SSSTR, NLSSTR, LFSTR, DLSTR, VISTR, DTRSTR, BYESTR,
 	     ALSTR, KANSTR, SMSTR, HBSTR, NGSTR, RHSTR, AFSSTR, NDSTR,
 	     COLORSTR, DSPMSTR, CCATSTR, FILECSTR, LOCALSTR);
-    set(STRversion, SAVE(version), VAR_READWRITE);
-    xfree(version);
+    cleanup_push(version, xfree);
+    setcopy(STRversion, str2short(version), VAR_READWRITE);
+    cleanup_until(version);
     version = xasprintf("%d.%.2d.%.2d", REV, VERS, PATCHLEVEL);
-    set(STRtcsh, SAVE(version), VAR_READWRITE);
-    xfree(version);
+    cleanup_push(version, xfree);
+    setcopy(STRtcsh, str2short(version), VAR_READWRITE);
+    cleanup_until(version);
 }

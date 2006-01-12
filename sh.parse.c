@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.parse.c,v 3.15 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.parse.c,v 3.16 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.parse.c: Interpret a list of tokens
  */
@@ -32,14 +32,14 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.parse.c,v 3.15 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: sh.parse.c,v 3.16 2006/01/12 19:43:00 christos Exp $")
 
 /*
  * C shell
  */
-static	void		 asyntax (struct wordent *, struct wordent *);
-static	void		 asyn0 	 (struct wordent *, struct wordent *);
-static	void		 asyn3	 (struct wordent *, struct wordent *);
+static	int		 asyntax (struct wordent *, struct wordent *);
+static	int		 asyn0 	 (struct wordent *, struct wordent *);
+static	int		 asyn3	 (struct wordent *, struct wordent *);
 static	struct wordent	*freenod (struct wordent *, struct wordent *);
 static	struct command	*syn0	 (const struct wordent *, const struct wordent *, int);
 static	struct command	*syn1	 (const struct wordent *, const struct wordent *, int);
@@ -56,40 +56,32 @@ static	struct command	*syn3	 (const struct wordent *, const struct wordent *, in
  * If word 0 of a command has an alias, do it.
  * Repeat a maximum of 50 times.
  */
-static int aleft;
 extern int hleft;
 void
 alias(struct wordent *lexp)
 {
-    jmp_buf_t osetexit;
+    int aleft;
 
     aleft = ALEFT;
     hleft = HLEFT;
-    getexit(osetexit);
-    (void) setexit();
-    if (haderr) {
-	resexit(osetexit);
-	reset();
-    }
-    if (--aleft == 0)
-	stderror(ERR_ALIASLOOP);
-    asyntax(lexp->next, lexp);
-    resexit(osetexit);
+    do {
+	if (--aleft == 0)
+	    stderror(ERR_ALIASLOOP);
+    } while (asyntax(lexp->next, lexp) != 0);
 }
 
-static void
+static int
 asyntax(struct wordent *p1, struct wordent *p2)
 {
-    while (p1 != p2)
-	if (any(";&\n", p1->word[0]))
-	    p1 = p1->next;
-	else {
-	    asyn0(p1, p2);
-	    return;
-	}
+    while (p1 != p2) {
+	if (!any(";&\n", p1->word[0]))
+	    return asyn0(p1, p2);
+	p1 = p1->next;
+    }
+    return 0;
 }
 
-static void
+static int
 asyn0(struct wordent *p1, struct wordent *p2)
 {
     struct wordent *p;
@@ -119,18 +111,28 @@ asyn0(struct wordent *p1, struct wordent *p2)
 	case '\n':
 	    if (l != 0)
 		continue;
-	    asyn3(p1, p);
-	    asyntax(p->next, p2);
-	    return;
+	    if (asyn3(p1, p) != 0)
+		return 1;
+	    return asyntax(p->next, p2);
 
 	default:
 	    break;
 	}
     if (l == 0)
-	asyn3(p1, p2);
+	return asyn3(p1, p2);
+    return 0;
 }
 
 static void
+alvec_cleanup(void *dummy)
+{
+    USE(dummy);
+    alhistp = NULL;
+    alhistt = NULL;
+    alvec = NULL;
+}
+
+static int
 asyn3(struct wordent *p1, struct wordent *p2)
 {
     struct varent *ap;
@@ -138,25 +140,24 @@ asyn3(struct wordent *p1, struct wordent *p2)
     int redid;
 
     if (p1 == p2)
-	return;
+	return 0;
     if (p1->word[0] == '(') {
 	for (p2 = p2->prev; p2->word[0] != ')'; p2 = p2->prev)
 	    if (p2 == p1)
-		return;
+		return 0;
 	if (p2 == p1->next)
-	    return;
-	asyn0(p1->next, p2);
-	return;
+	    return 0;
+	return asyn0(p1->next, p2);
     }
     ap = adrof1(p1->word, &aliases);
     if (ap == 0)
-	return;
+	return 0;
     alhistp = p1->prev;
     alhistt = p2;
     alvec = ap->vec;
+    cleanup_push(&alvec, alvec_cleanup);
     redid = lex(&alout);
-    alhistp = alhistt = 0;
-    alvec = 0;
+    cleanup_until(&alvec);
     if (seterr) {
 	freelex(&alout);
 	stderror(ERR_OLD);
@@ -176,7 +177,7 @@ asyn3(struct wordent *p1, struct wordent *p2)
 	xfree(alout.prev->word);
 	xfree(alout.prev);
     }
-    reset();			/* throw! */
+    return 1;
 }
 
 static struct wordent *
@@ -677,4 +678,13 @@ freesyn(struct command *t)
 	break;
     }
     xfree(t);
+}
+
+void
+syntax_cleanup(void *xt)
+{
+    struct command *t;
+
+    t = xt;
+    freesyn(t);
 }

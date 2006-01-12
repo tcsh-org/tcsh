@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.decls.h,v 3.41 2005/04/11 22:10:54 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.decls.h,v 3.42 2006/01/12 18:15:24 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -46,7 +46,7 @@ extern	CCRETVAL GetHistLine		(void);
  */
 #ifdef SIG_WINDOW
 extern	void	check_window_size	(int);
-extern	RETSIGTYPE window_change	(int);
+extern	void	window_change		(int);
 #endif /* SIG_WINDOW */
 extern	int	ed_Setup		(int);
 extern	void	ed_Init			(void);
@@ -90,12 +90,12 @@ extern	void	DeleteChars		(int);
 extern	void	TellTC			(void);
 extern	void	SetTC			(char *, char *);
 extern	void	EchoTC			(Char **);
-extern	int 	SetArrowKeys		(CStr *, XmapVal *, int);
+extern	int 	SetArrowKeys		(const CStr *, XmapVal *, int);
 extern	int 	IsArrowKey		(Char *);
 extern	void	ResetArrowKeys		(void);
 extern	void	DefaultArrowKeys	(void);
-extern	int 	ClearArrowKeys		(CStr *);
-extern	void 	PrintArrowKeys		(CStr *);
+extern	int 	ClearArrowKeys		(const CStr *);
+extern	void 	PrintArrowKeys		(const CStr *);
 extern	void	BindArrowKeys		(void);
 extern	void	SoundBeep		(void);
 extern	int	CanWeTab		(void);
@@ -265,12 +265,12 @@ extern	void	PastBottom		(void);
  */
 extern  XmapVal *XmapStr		(CStr *);
 extern  XmapVal *XmapCmd		(int);
-extern	void	 AddXkey		(CStr *, XmapVal *, int);
-extern	void	 ClearXkey		(KEYCMD *, CStr *);
+extern	void	 AddXkey		(const CStr *, XmapVal *, int);
+extern	void	 ClearXkey		(KEYCMD *, const CStr *);
 extern	int	 GetXkey		(CStr *, XmapVal *);
 extern	void	 ResetXmap		(void);
-extern	int	 DeleteXkey		(CStr *);
-extern	void	 PrintXkey		(CStr *);
+extern	int	 DeleteXkey		(const CStr *);
+extern	void	 PrintXkey		(const CStr *);
 extern	void	 printOne		(const Char *, const XmapVal *, int);
 extern	eChar		  parseescape	(const Char **);
 extern	unsigned char    *unparsestring	(const CStr *, const Char *);

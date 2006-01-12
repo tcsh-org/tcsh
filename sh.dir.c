@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.72 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.73 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.dir.c,v 3.72 2006/01/12 18:15:24 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.73 2006/01/12 19:43:00 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -98,9 +98,10 @@ dinit(Char *hp)
 
     /* Don't believe the login shell home, because it may be a symlink */
     tcp = agetcwd();
+    cleanup_push(tcp, xfree);
     if (tcp == NULL || *tcp == '\0') {
 	xprintf("%s: %s\n", progname, strerror(errno));
-	xfree(tcp);
+	cleanup_until(tcp);
 	if (hp && *hp) {
 	    tcp = short2str(hp);
 	    dstart(tcp);
@@ -122,12 +123,14 @@ dinit(Char *hp)
     else {
 #ifdef S_IFLNK
 	struct stat swd, shp;
+	int swd_ok;
+	Char *copy;
 
+	swd_ok = stat(tcp, &swd) == 0;
 	/*
 	 * See if $HOME is the working directory we got and use that
 	 */
-	if (hp && *hp &&
-	    stat(tcp, &swd) != -1 && stat(short2str(hp), &shp) != -1 &&
+	if (swd_ok && hp && *hp && stat(short2str(hp), &shp) != -1 &&
 	    DEV_DEV_COMPARE(swd.st_dev, shp.st_dev)  &&
 		swd.st_ino == shp.st_ino)
 	    cp = Strsave(hp);
@@ -137,20 +140,29 @@ dinit(Char *hp)
 	    /*
 	     * use PWD if we have it (for subshells)
 	     */
-	    if ((cwd = getenv("PWD")) != NULL) {
+	    if (swd_ok && (cwd = getenv("PWD")) != NULL) {
 		if (stat(cwd, &shp) != -1 &&
 			DEV_DEV_COMPARE(swd.st_dev, shp.st_dev) &&
 		        swd.st_ino == shp.st_ino) {
-		    xfree(tcp);
+		    cleanup_until(tcp);
 		    tcp = strsave(cwd);
+		    cleanup_push(tcp, xfree);
 		}
 	    }
-	    cp = dcanon(SAVE(tcp), STRNULL);
+	    copy = SAVE(tcp);
+	    cleanup_push(copy, xfree);
+	    cp = dcanon(copy, STRNULL);
+	    cleanup_ignore(copy);
+	    cleanup_until(copy);
 	}
 #else /* S_IFLNK */
-	cp = dcanon(SAVE(tcp), STRNULL);
+        copy = SAVE(tcp);
+	cleanup_push(copy, xfree);
+	cp = dcanon(copy, STRNULL);
+	cleanup_ignore(copy);
+	cleanup_until(copy);
 #endif /* S_IFLNK */
-	xfree(tcp);
+	cleanup_until(tcp);
     }
 
     dp = xcalloc(sizeof(struct directory), 1);
@@ -160,7 +172,7 @@ dinit(Char *hp)
     dp->di_next = dp->di_prev = &dhead;
     printd = 0;
     dnewcwd(dp, 0);
-    set(STRdirstack, Strsave(dp->di_name), VAR_READWRITE|VAR_NOGLOB);
+    setcopy(STRdirstack, dp->di_name, VAR_READWRITE|VAR_NOGLOB);
 }
 
 static void
@@ -170,9 +182,8 @@ dset(Char *dp)
      * Don't call set() directly cause if the directory contains ` or
      * other junk characters glob will fail. 
      */
-    set(STRowd, Strsave(varval(STRcwd)), VAR_READWRITE|VAR_NOGLOB);
-    set(STRcwd, Strsave(dp), VAR_READWRITE|VAR_NOGLOB);
-
+    setcopy(STRowd, varval(STRcwd), VAR_READWRITE|VAR_NOGLOB);
+    setcopy(STRcwd, dp, VAR_READWRITE|VAR_NOGLOB);
     tsetenv(STRPWD, dp);
 }
 
@@ -200,11 +211,8 @@ skipargs(Char ***v, const char *dstr, const char *str)
 	    {
 		if ((p = strchr(dstr, *s++)) != NULL)
 		    dflag |= (1 << (p - dstr));
-	        else {
+	        else
 		    stderror(ERR_DIRUS, short2str(**v), dstr, str);
-		    loop = 0;	/* break from both loops */
-		    break;
-	        }
 	    }
 	}
     if (*n && (dflag & DIR_OLD))
@@ -532,7 +540,7 @@ dochngd(Char **v, struct command *c)
 static Char *
 dgoto(Char *cp)
 {
-    Char   *dp;
+    Char *dp, *ret;
     char *cwd;
 
     if (!ABSOLUTEP(cp))
@@ -560,20 +568,27 @@ dgoto(Char *cp)
 
 #if defined(WINNT_NATIVE)
     cwd = agetcwd();
-    cp = SAVE(cwd);
+    ret = SAVE(cwd);
     xfree(cwd);
 #elif defined(__CYGWIN__)
     if (ABSOLUTEP(cp) && cp[1] == ':') { /* Only DOS paths are treated that way */
 	cwd = agetcwd();
-    	cp = SAVE(cwd);
+    	ret = SAVE(cwd);
 	xfree(cwd);
-    } else
-    	cp = dcanon(cp, dp);
+    } else {
+	cleanup_push(cp, xfree);
+    	ret = dcanon(cp, dp);
+	cleanup_ignore(cp);
+	cleanup_until(cp);
+    }
 #else /* !WINNT_NATIVE */
     USE(cwd);
-    cp = dcanon(cp, dp);
+    cleanup_push(cp, xfree);
+    ret = dcanon(cp, dp);
+    cleanup_ignore(cp);
+    cleanup_until(cp);
 #endif /* WINNT_NATIVE */
-    return cp;
+    return ret;
 }
 
 /*
@@ -587,21 +602,21 @@ dfollow(Char *cp)
     int serrno;
 
     cp = globone(cp, G_ERROR);
+    cleanup_push(cp, xfree);
 #ifdef apollo
     if (Strchr(cp, '`')) {
 	char *dptr, *ptr;
 	if (chdir(dptr = short2str(cp)) < 0) 
 	    stderror(ERR_SYSTEM, dptr, strerror(errno));
-	else if ((ptr = agetcwd()) && *ptr != '\0') {
-		xfree(cp);
-		cp = Strsave(str2short(ptr));
-		xfree(ptr);
-		return dgoto(cp);
+	ptr = agetcwd();
+	cleanup_push(ptr, xfree);
+	if (ptr != NULL && *ptr != '\0') {
+	    dp = Strsave(str2short(ptr));
+	    cleanup_until(cp);
+	    return dgoto(dp);
 	}
-	else {
-	    xfree(ptr);
+	else
 	    stderror(ERR_SYSTEM, dptr, strerror(errno));
-	}
     }
 #endif /* apollo */
 
@@ -611,19 +626,21 @@ dfollow(Char *cp)
      */ 
     dp = dnormalize(cp, symlinks == SYM_IGNORE);
     if (chdir(short2str(dp)) >= 0) {
-        xfree(cp);
+        cleanup_until(cp);
         return dgoto(dp);
     }
     else {
         xfree(dp);
-        if (chdir(short2str(cp)) >= 0)
+        if (chdir(short2str(cp)) >= 0) {
+	    cleanup_ignore(cp);
+	    cleanup_until(cp);
 	    return dgoto(cp);
+	}
 	else if (errno != ENOENT && errno != ENOTDIR) {
-	    char *p;
+	    int err;
 
-	    p = short2str(cp);
-	    xfree(cp);
-	    stderror(ERR_SYSTEM, p, strerror(errno));
+	    err = errno;
+	    stderror(ERR_SYSTEM, short2str(cp), strerror(err));
 	}
 	serrno = errno;
     }
@@ -647,14 +664,16 @@ dfollow(Char *cp)
 				   symlinks == SYM_EXPAND);
 	    if (chdir(short2str(dp)) >= 0) {
 		printd = 1;
-		xfree(cp);
 		xfree(buf.s);
+		cleanup_until(cp);
 		return dgoto(dp);
 	    }
 	    else if (chdir(short2str(cp)) >= 0) {
 		printd = 1;
 		xfree(dp);
 		xfree(buf.s);
+		cleanup_ignore(cp);
+		cleanup_until(cp);
 		return dgoto(cp);
 	    }
 	}
@@ -662,7 +681,7 @@ dfollow(Char *cp)
     }
     dp = varval(cp);
     if ((dp[0] == '/' || dp[0] == '.') && chdir(short2str(dp)) >= 0) {
-	xfree(cp);
+	cleanup_until(cp);
 	cp = Strsave(dp);
 	printd = 1;
 	return dgoto(cp);
@@ -671,14 +690,9 @@ dfollow(Char *cp)
      * on login source of ~/.cshdirs, errors are eaten. the dir stack is all
      * directories we could get to.
      */
-    if (!bequiet) {
-	char *p;
-
-	p = short2str(cp);
-	xfree(cp);
-	stderror(ERR_SYSTEM, p, strerror(serrno));
-    }
-    xfree(cp);
+    if (!bequiet)
+	stderror(ERR_SYSTEM, short2str(cp), strerror(serrno));
+    cleanup_until(cp);
     return (NULL);
 }
 
@@ -706,7 +720,6 @@ dopushd(Char **v, struct command *c)
 		stderror(ERR_NAME | ERR_NOHOMEDIR);
 	    if (chdir(short2str(cp)) < 0)
 		stderror(ERR_NAME | ERR_CANTCHANGE);
-	    cp = Strsave(cp);	/* hmmm... PWP */
 	    if ((cp = dfollow(cp)) == NULL)
 		return;
 	    dp = xcalloc(sizeof(struct directory), 1);
@@ -831,13 +844,13 @@ dopopd(Char **v, struct command *c)
     }
     dp->di_prev->di_next = dp->di_next;
     dp->di_next->di_prev = dp->di_prev;
+    dfree(dp);
     if (dp == dcwd) {
-	dnewcwd(p, dflag);
+        dnewcwd(p, dflag);
     }
     else {
 	printdirs(dflag);
     }
-    dfree(dp);
 }
 
 /*
@@ -892,13 +905,16 @@ dcanon(Char *cp, Char *p)
 	p1 = varval(STRcwd);
 	if (p1 == STRNULL || !ABSOLUTEP(p1)) {
 	    char *tmp = agetcwd();
+	    Char *new_cwd;
+
+	    cleanup_push(tmp, xfree);
 	    if (tmp == NULL || *tmp == '\0') {
 		xprintf("%s: %s\n", progname, strerror(errno));
-		set(STRcwd, SAVE("/"), VAR_READWRITE|VAR_NOGLOB);
-	    } else {
-		set(STRcwd, SAVE(tmp), VAR_READWRITE|VAR_NOGLOB);
-	    }
-	    xfree(tmp);
+		new_cwd = str2short("/");
+	    } else
+		new_cwd = str2short(tmp);
+	    cleanup_until(tmp);
+	    setcopy(STRcwd, new_cwd, VAR_READWRITE|VAR_NOGLOB);
 	    p1 = varval(STRcwd);
 	}
 	len = Strlen(p1);
@@ -1257,7 +1273,10 @@ dgetstack(void)
     for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev, dbp++)
 	 *dbp = Strsave(dn->di_name);
     *dbp = NULL;
+    cleanup_push(dblk, blk_cleanup);
     setq(STRdirstack, dblk, &shvhed, VAR_READWRITE);
+    cleanup_ignore(dblk);
+    cleanup_until(dblk);
 }
 
 /*
@@ -1308,20 +1327,28 @@ dextract(struct directory *dp)
     dcwd->di_next = dp;
 }
 
+static void
+bequiet_cleanup(void *dummy)
+{
+    USE(dummy);
+    bequiet = 0;
+}
+
 void
 loaddirs(Char *fname)
 {
     static Char *loaddirs_cmd[] = { STRsource, NULL, NULL };
 
     bequiet = 1;
-    if (fname) 
+    cleanup_push(&bequiet, bequiet_cleanup);
+    if (fname)
 	loaddirs_cmd[1] = fname;
     else if ((fname = varval(STRdirsfile)) != STRNULL)
 	loaddirs_cmd[1] = fname;
     else
 	loaddirs_cmd[1] = STRtildotdirs;
     dosource(loaddirs_cmd, NULL);
-    bequiet = 0;
+    cleanup_until(&bequiet);
 }
 
 /*
@@ -1352,9 +1379,10 @@ recdirs(Char *fname, int def)
     }
     else 
 	fname = globone(fname, G_ERROR);
+    cleanup_push(fname, xfree);
 
-    if ((fp = creat(short2str(fname), 0600)) == -1) {
-	xfree(fname);
+    if ((fp = xcreat(short2str(fname), 0600)) == -1) {
+	cleanup_until(fname);
 	return;
     }
 
@@ -1368,6 +1396,7 @@ recdirs(Char *fname, int def)
     ftmp = SHOUT;
     SHOUT = fp;
 
+    cleanup_push(&qname, Strbuf_cleanup);
     dp = dcwd->di_next;
     do {
 	if (dp == &dhead)
@@ -1384,10 +1413,9 @@ recdirs(Char *fname, int def)
 	    break;
 
     } while ((dp = dp->di_next) != dcwd->di_next);
-    xfree(qname.s);
 
-    (void) close(fp);
+    xclose(fp);
     SHOUT = ftmp;
     didfds = oldidfds;
-    xfree(fname);
+    cleanup_until(fname);
 }

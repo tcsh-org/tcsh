@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.30 2005/04/14 17:24:30 kim Exp $
+# $Id: Makefile.in,v 3.31 2006/01/12 18:12:43 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -328,7 +328,9 @@ AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	README.imake complete.tcsh vmsreadme.txt termcap.vms snames.h \
 	host.defs gethost.c tcsh.man2html configure.in configure config.h.in \
 	tests/testsuite.at
-TESTFILES= tests/noexec.at tests/sh.dol.at
+TESTFILES= tests/aliases.at tests/arguments.at tests/commands.at \
+	tests/expr.at tests/lexical.at tests/noexec.at tests/syntax.at \
+	tests/subst.at tests/variables.at tests/sh.dol.at
 
 VHSRCS=${PVSRCS} ${AVSRCS}
 

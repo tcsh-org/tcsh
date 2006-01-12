@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.57 2006/01/12 18:06:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.58 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.57 2006/01/12 18:06:34 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.58 2006/01/12 18:15:25 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -142,6 +142,7 @@ printprompt(int promptno, const char *str)
     }
 
     xfree(Prompt);
+    Prompt = NULL;
     Prompt = tprintf(FMT_PROMPT, cp, str, lclock, NULL);
     if (!editing) {
 	for (cp = Prompt; *cp ; )
@@ -151,6 +152,7 @@ printprompt(int promptno, const char *str)
     }
 
     xfree(RPrompt);
+    RPrompt = NULL;
     if (promptno == 0) {	/* determine rprompt if using main prompt */
 	cp = varval(STRrprompt);
 	RPrompt = tprintf(FMT_PROMPT, cp, NULL, lclock, NULL);
@@ -162,9 +164,6 @@ printprompt(int promptno, const char *str)
 	    putraw(' ');
 	    flush();
 	}
-    } else {
-      RPrompt = xmalloc(sizeof(*RPrompt));
-      RPrompt[0] = '\0';
     }
 }
 
@@ -199,6 +198,7 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
     size_t pdirs;
     int l;
 
+    cleanup_push(&buf, Strbuf_cleanup);
     for (; *cp; cp++) {
 	l = NLSSize(cp, NLSZEROT);
 	if (l > 1) {
@@ -591,6 +591,8 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 	else
 	    Strbuf_append1(&buf, attributes | *cp); /* normal character */
     }
+    cleanup_ignore(&buf);
+    cleanup_until(&buf);
     return Strbuf_finish(&buf);
 }
 

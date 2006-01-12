@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.init.c,v 3.54 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.init.c,v 3.55 2006/01/12 19:43:00 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.54 2006/01/12 18:15:24 christos Exp $")
+RCSID("$Id: ed.init.c,v 3.55 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -92,17 +92,11 @@ static unsigned char ttychars[NN_IO][C_NCC] = {
 void
 check_window_size(int force)
 {
-#ifdef BSDSIGS
-    sigmask_t omask;
-#endif /* BSDSIGS */
     int     lins, cols;
 
     /* don't want to confuse things here */
-#ifdef BSDSIGS
-    omask = sigblock(sigmask(SIG_WINDOW)) & ~sigmask(SIG_WINDOW);
-#else /* BSDSIGS */
-    (void) sighold(SIG_WINDOW);
-#endif /* BSDSIGS */
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
     /*
      * From: bret@shark.agps.lanl.gov (Bret Thaeler) Avoid sunview bug, where a
      * partially hidden window gets a SIG_WINDOW every time the text is
@@ -120,24 +114,15 @@ check_window_size(int force)
 	else
 	    ChangeSize(lins, cols);
     }
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);	/* can change it again */
-#else				/* BSDSIGS */
-    (void) sigrelse(SIG_WINDOW);
-#endif /* BSDSIGS */
     windowchg = 0;
+    cleanup_until(&pintr_disabled);	/* can change it again */
 }
 
-RETSIGTYPE
+void
 /*ARGSUSED*/
 window_change(int snum)
 {
     USE(snum);
-#ifdef UNRELSIGS 
-    /* If we were called as a signal handler, restore it. */
-    if (snum > 0)
-      sigset(snum, window_change);
-#endif /* UNRELSIGS */
     windowchg = 1;
 }
 
@@ -562,7 +547,8 @@ Cookedmode(void)
 #ifdef WINNT_NATIVE
     do_nt_cooked_mode();
 #else
-    signalfun_t orig_intr;
+    sigset_t omask;
+    int res;
 
 # ifdef _IBMR2
     tty_setdisc(SHTTY, EX_IO);
@@ -572,45 +558,17 @@ Cookedmode(void)
 	return (0);
 
     /* hold this for reseting tty */
-# ifdef BSDSIGS
-    orig_intr = (signalfun_t) signal(SIGINT, SIG_IGN);
-# else
-#  ifdef SIG_HOLD
-    /*
-     * sigset doesn't return the previous handler if the signal is held,
-     * it will return SIG_HOLD instead. So instead of restoring the
-     * the signal we would end up installing a blocked SIGINT with a
-     * SIG_IGN signal handler. This is what happened when Cookedmode
-     * was called from sched_run, disabling interrupt for the rest
-     * of your session.
-     *
-     * This is what we do:
-     * - if the signal is blocked, keep it that way
-     * - else set it to SIG_IGN
-     *
-     * Casper Dik (casper@fwi.uva.nl)
-     */
-    orig_intr = (signalfun_t) sigset(SIGINT, SIG_HOLD);
-    if (orig_intr != SIG_HOLD)
-	(void) sigset(SIGINT, SIG_IGN); /* returns SIG_HOLD */
-#  else /* !SIG_HOLD */
-    /*
-     * No SIG_HOLD; probably no reliable signals as well.
-     */
-    orig_intr = (signalfun_t) sigset(SIGINT, SIG_IGN);
-#  endif /* SIG_HOLD */
-# endif /* BSDSIGS */
-    if (tty_setty(SHTTY, &extty) == -1) {
+    sigprocmask(SIG_BLOCK, NULL, &omask);
+    sighold(SIGINT);
+    cleanup_push(&omask, sigprocmask_cleanup);
+    res = tty_setty(SHTTY, &extty);
+    cleanup_until(&omask);
+    if (res == -1) {
 # ifdef DEBUG_TTY
 	xprintf("Cookedmode: tty_setty: %s\n", strerror(errno));
 # endif /* DEBUG_TTY */
 	return -1;
     }
-# ifdef BSDSIGS
-    (void) signal(SIGINT, orig_intr);	/* take these again */
-# else
-    (void) sigset(SIGINT, orig_intr);	/* take these again */
-# endif /* BSDSIGS */
 #endif /* WINNT_NATIVE */
 
     Tty_raw_mode = 0;
@@ -661,7 +619,7 @@ Load_input_line(void)
     if (chrs > 0) {
         char    buf[BUFSIZE];
 
-	chrs = read(SHIN, buf, (size_t) min(chrs, BUFSIZE - 1));
+	chrs = xread(SHIN, buf, min(chrs, BUFSIZE - 1));
 	if (chrs > 0) {
 	    buf[chrs] = '\0';
 	    Input_Line = Strsave(str2short(buf));

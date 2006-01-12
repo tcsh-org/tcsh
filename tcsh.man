@@ -133,7 +133,7 @@ The shell does not load any resource or startup files, or perform any
 command hashing, and thus starts faster.
 .TP 4
 .B \-F
-The shell uses \fIfork\fR(2) instead of \fIvfork\fR(2) to spawn processes. (Convex/OS only) (+)
+The shell uses \fIfork\fR(2) instead of \fIvfork\fR(2) to spawn processes. (+)
 .TP 4
 .B \-i
 The shell is interactive and prompts for its top-level input, even if
@@ -941,7 +941,7 @@ Even in braces, history substitutions do not nest.
 letter `d' appended to it, \fItcsh\fR expands it to the last event beginning
 with `3d'; only completely numeric arguments are treated as event numbers.
 This makes it possible to recall events beginning with numbers.
-To expand `!3d' as in \fIcsh\fR(1) say `!\\3d'.
+To expand `!3d' as in \fIcsh\fR(1) say `!{3}d'.
 .PP
 To select words from an event we can follow the event specification by a `:'
 and a designator for the desired words.  The words of an input line are
@@ -1038,7 +1038,7 @@ Any character may be used as the delimiter in place of `/';
 a `\\' can be used to quote the delimiter inside \fIl\fR and \fIr\fR.
 The character `&' in the \fIr\fR is replaced by \fIl\fR; `\\' also quotes `&'.
 If \fIl\fR is empty (``''), the \fIl\fR from a previous substitution or the
-\fIs\fR from a previous `?\fIs\fR?' event specification is used.
+\fIs\fR from a previous search or event number in event specification is used.
 The trailing delimiter may be omitted if it is immediately followed by a newline.
 .TP 8
 &
@@ -1206,10 +1206,10 @@ $\fIname\fR
 ${\fIname\fR}
 Substitutes the words of the value of variable \fIname\fR, each separated
 by a blank.  Braces insulate \fIname\fR from following characters which would
-otherwise be part of it.  Shell variables have names consisting of up to 20
+otherwise be part of it.  Shell variables have names consisting of
 letters and digits starting with a letter.  The underscore character is
 considered a letter.  If \fIname\fR is not a shell variable, but is set in the
-environment, then that value is returned (but `:' modifiers and the other forms
+environment, then that value is returned (but some of the other forms
 given below are not available in this case).
 .PP
 $\fIname\fR[\fIselector\fR]
@@ -1623,7 +1623,7 @@ operand is matched.  This reduces the need for use of the \fIswitch\fR
 builtin command in shell scripts when all that is really needed is
 pattern matching.
 .PP
-Strings which begin with `0' are considered octal numbers.  Null or
+Null or
 missing arguments are considered `0'.  The results of all expressions are
 strings, which represent decimal numbers.  It is important to note that
 no two components of an expression can appear in the same word; except
@@ -2691,7 +2691,7 @@ Executes the specified command in place of the current shell.
 .B exit \fR[\fIexpr\fR]
 The shell exits either with the value of the specified \fIexpr\fR
 (an expression, as described under \fBExpressions\fR)
-or, without \fIexpr\fR, with the value of the \fBstatus\fR variable.
+or, without \fIexpr\fR, with the value 0.
 .TP 8
 .B fg \fR[\fB%\fIjob\fR ...]
 Brings the specified jobs (or, without arguments, the current job)
@@ -2730,7 +2730,7 @@ Prints the system execution path.  (TCF only)
 Prints the experimental version prefix.  (TCF only)
 .TP 8
 .B glob \fIwordlist
-Like \fIecho\fR, but no `\\' escapes are recognized and words are
+Like \fIecho\fR, but the `-n' parameter is not recognized and words are
 delimited by null characters in the output.  Useful for
 programs which wish to use the shell to filename expand a list of words.
 .TP 8
@@ -3536,7 +3536,7 @@ startup; they do not change thereafter unless changed by the user.  The shell
 updates \fBcwd\fR, \fBdirstack\fR, \fBowd\fR and \fBstatus\fR when necessary,
 and sets \fBlogout\fR on logout.
 .PP
-The shell synchronizes \fBafsuser\fR, \fBgroup\fR, \fBhome\fR, \fBpath\fR, \fBshlvl\fR,
+The shell synchronizes \fBgroup\fR, \fBhome\fR, \fBpath\fR, \fBshlvl\fR,
 \fBterm\fR and \fBuser\fR with the environment variables of the same names:
 whenever the environment variable changes the shell changes the corresponding
 shell variable to match (unless the shell variable is read-only) and vice

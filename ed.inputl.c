@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.60 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.61 2006/01/12 19:43:00 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.60 2006/01/12 18:15:24 christos Exp $")
+RCSID("$Id: ed.inputl.c,v 3.61 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -229,29 +229,31 @@ Inputl(void)
 
                 PastBottom();
 		Origin = Strsave(InputBuf);
+		cleanup_push(Origin, xfree);
 		SaveChar = LastChar;
 		if (SpellLine(!Strcmp(*(crct->vec), STRcmd)) == 1) {
 		    Char *Change;
 
                     PastBottom();
 		    Change = Strsave(InputBuf);
+		    cleanup_push(Change, xfree);
 		    *Strchr(Change, '\n') = '\0';
 		    CorrChar = LastChar;	/* Save the corrected end */
 		    LastChar = InputBuf;	/* Null the current line */
 		    SoundBeep();
 		    printprompt(2, short2str(Change));
-		    xfree(Change);
+		    cleanup_until(Change);
 		    Refresh();
-		    if (read(SHIN, &tch, 1) < 0) {
+		    if (xread(SHIN, &tch, 1) < 0) {
 #ifdef convex
 		        /*
 			 * need to print error message in case file
 			 * is migrated
 			 */
-                        if (errno && errno != EINTR)
+                        if (errno)
                             stderror(ERR_SYSTEM, progname, strerror(errno));
 #else
-			xfree(Origin);
+			cleanup_until(Origin);
 			break;
 #endif
 		    }
@@ -271,7 +273,7 @@ Inputl(void)
 			    ClearLines();
 			    ClearDisp();
 			    Refresh();
-			    xfree(Origin);
+			    cleanup_until(Origin);
 			    break;
 			}
 			else if (ch == 'a') {
@@ -280,14 +282,14 @@ Inputl(void)
 			    Cursor = LastChar;
 			    printprompt(0, NULL);
 			    Refresh();
-			    xfree(Origin);
+			    cleanup_until(Origin);
 			    break;
 			}
 			xprintf(CGETS(6, 5, "no\n"));
 		    }
 		    flush();
 		}
-		xfree(Origin);
+		cleanup_until(Origin);
 	    } else if (crct && crct->vec != NULL &&
 		!Strcmp(*(crct->vec), STRcomplete)) {
                 if (LastChar > InputBuf && LastChar[-1] == '\n') {
@@ -565,67 +567,56 @@ PushMacro(Char *str)
     }
 }
 
+struct eval1_state
+{
+    Char **evalvec, *evalp;
+};
+
+static void
+eval1_cleanup(void *xstate)
+{
+    struct eval1_state *state;
+
+    state = xstate;
+    evalvec = state->evalvec;
+    evalp = state->evalp;
+    doneinp = 0;
+}
+
 /*
  * Like eval, only using the current file descriptors
  */
-static Char **gv = NULL, **gav = NULL;
-
 static void
 doeval1(Char **v)
 {
-    Char  **oevalvec;
-    Char   *oevalp;
-    int     my_reenter;
-    Char  **savegv;
-    jmp_buf_t osetexit;
+    struct eval1_state state;
+    Char  **gv;
     int gflag;
 
-    oevalvec = evalvec;
-    oevalp = evalp;
-    savegv = gv;
-    gav = v;
-
-
-    gflag = tglob(gav);
+    gflag = tglob(v);
     if (gflag) {
-	gv = gav = globall(gav, gflag);
-	gargv = 0;
-	if (gav == 0)
+	gv = v = globall(v, gflag);
+	if (v == 0)
 	    stderror(ERR_NOMATCH);
-	gav = copyblk(gav);
+	v = copyblk(v);
     }
     else {
 	gv = NULL;
-	gav = copyblk(gav);
-	trim(gav);
+	v = copyblk(v);
+	trim(v);
     }
-
-    getexit(osetexit);
-
-    /* PWP: setjmp/longjmp bugfix for optimizing compilers */
-#ifdef cray
-    my_reenter = 1;             /* assume non-zero return val */
-    if (setexit() == 0) {
-        my_reenter = 0;         /* Oh well, we were wrong */
-#else /* !cray */
-    if ((my_reenter = setexit()) == 0) {
-#endif /* cray */
-	evalvec = gav;
-	evalp = 0;
-	process(0);
-    }
-
-    evalvec = oevalvec;
-    evalp = oevalp;
-    doneinp = 0;
-
     if (gv)
-	blkfree(gv);
+	cleanup_push(gv, blk_cleanup);
 
-    gv = savegv;
-    resexit(osetexit);
-    if (my_reenter)
-	stderror(ERR_SILENT);
+    state.evalvec = evalvec;
+    state.evalp = evalp;
+    evalvec = v;
+    evalp = 0;
+    cleanup_push(&state, eval1_cleanup);
+    process(0);
+    cleanup_until(&state);
+    if (gv)
+	cleanup_until(gv);
 }
 
 static void
@@ -642,7 +633,7 @@ RunCommand(Char *str)
     GettingInput = 0;
 
     doeval1(cmd);
-    
+
     (void) Rawmode();
     GettingInput = 1;
 
@@ -769,16 +760,13 @@ GetNextChar(Char *cp)
 #endif /* SIG_WINDOW */
     cbp = 0;
     for (;;) {
-	while ((num_read = read(SHIN, cbuf + cbp, 1)) == -1) {
-	    if (errno == EINTR)
-		continue;
+	while ((num_read = xread(SHIN, cbuf + cbp, 1)) == -1) {
 	    if (!tried && fixio(SHIN, errno) != -1)
 		tried = 1;
 	    else {
 # ifdef convex
 		/* need to print error message in case the file is migrated */
-		if (errno != EINTR)
-		    stderror(ERR_SYSTEM, progname, strerror(errno));
+		stderror(ERR_SYSTEM, progname, strerror(errno));
 # endif  /* convex */
 # ifdef WINNT_NATIVE
 		__nt_want_vcode = 0;

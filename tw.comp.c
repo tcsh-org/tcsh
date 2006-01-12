@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.comp.c,v 1.38 2005/04/11 22:11:00 kim Exp $ */
+/* $Header: /src/pub/tcsh/tw.comp.c,v 1.39 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.comp.c,v 1.38 2005/04/11 22:11:00 kim Exp $")
+RCSID("$Id: tw.comp.c,v 1.39 2006/01/12 18:15:25 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -106,19 +106,18 @@ tw_prlist(struct varent *p)
 {
     struct varent *c;
 
-    if (setintr)
-#ifdef BSDSIGS
-	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else				/* BSDSIGS */
-	(void) sigrelse(SIGINT);
-#endif				/* BSDSIGS */
-
     for (;;) {
 	while (p->v_left)
 	    p = p->v_left;
 x:
 	if (p->v_parent == 0)	/* is it the header? */
-	    return;
+	    break;
+	if (setintr) {
+	    int old_pintr_disabled;
+
+	    pintr_push_enable(&old_pintr_disabled);
+	    cleanup_until(&old_pintr_disabled);
+	}
 	xprintf("%s\t", short2str(p->v_name));
 	if (p->vec)
 	    tw_pr(p->vec);
@@ -213,7 +212,6 @@ tw_pos(Char *ran, int wno)
 	return getn(ran) <= wno;
     else				/* range = <number> - <number> */
 	return (getn(ran) <= wno) && (wno <= getn(p));
-	   
 } /* end tw_pos */
 
 
@@ -464,13 +462,14 @@ tw_complete(const Char *line, Char **word, Char **pat, int looking, eChar *suf)
     int n;
 
     buf = Strsave(line);
+    cleanup_push(buf, xfree);
     /* Single-character words, empty current word, terminating NULL */
     wl = xmalloc(((Strlen(line) + 1) / 2 + 2) * sizeof (*wl));
+    cleanup_push(wl, xfree);
 
     /* find the command */
     if ((wl[0] = tw_tok(buf)) == NULL || wl[0] == INVPTR) {
-	xfree(wl);
-	xfree(buf);
+	cleanup_until(buf);
 	return TW_ZERO;
     }
 
@@ -480,8 +479,7 @@ tw_complete(const Char *line, Char **word, Char **pat, int looking, eChar *suf)
      */
     if ((vec = tw_find(wl[0], &completions, (looking == TW_COMMAND)))
 	== NULL) {
-	xfree(wl);
-	xfree(buf);
+	cleanup_until(buf);
 	return looking;
     }
 
@@ -491,8 +489,7 @@ tw_complete(const Char *line, Char **word, Char **pat, int looking, eChar *suf)
 	continue;
 
     if (wl[wordno] == INVPTR) {		/* Found a meta character */
-	xfree(wl);
-	xfree(buf);
+	cleanup_until(buf);
 	return TW_ZERO;			/* de-activate completions */
     }
 #ifdef TDEBUG
@@ -550,16 +547,12 @@ tw_complete(const Char *line, Char **word, Char **pat, int looking, eChar *suf)
 	case 'p':
 	    break;
 	default:
-	    xfree(wl);
-	    xfree(buf);
 	    stderror(ERR_COMPINV, CGETS(27, 1, "command"), cmd);
 	    return TW_ZERO;
 	}
 
 	sep = ptr[1];
 	if (!Ispunct(sep)) {
-	    xfree(wl);
-	    xfree(buf);
 	    /* Truncates data if WIDE_STRINGS */
 	    stderror(ERR_COMPINV, CGETS(27, 2, "separator"), (int)sep);
 	    return TW_ZERO;
@@ -567,11 +560,9 @@ tw_complete(const Char *line, Char **word, Char **pat, int looking, eChar *suf)
 
 	ptr = tw_dollar(&ptr[2], wl, wordno, &ran, sep,
 			CGETS(27, 3, "pattern"));
+	cleanup_push(ran, xfree);
 	if (ran[0] == '\0')	/* check for empty pattern (disallowed) */
 	{
-	    xfree(ran);
-	    xfree(wl);
-	    xfree(buf);
 	    stderror(ERR_COMPINC, cmd == 'p' ?  CGETS(27, 4, "range") :
 		     CGETS(27, 3, "pattern"), "");
 	    return TW_ZERO;
@@ -579,6 +570,7 @@ tw_complete(const Char *line, Char **word, Char **pat, int looking, eChar *suf)
 
 	ptr = tw_dollar(ptr, wl, wordno, &com, sep,
 			CGETS(27, 5, "completion"));
+	cleanup_push(com, xfree);
 
 	if (*ptr != '\0') {
 	    if (*ptr == sep)
@@ -615,8 +607,7 @@ tw_complete(const Char *line, Char **word, Char **pat, int looking, eChar *suf)
 	    xprintf("%d\n", tw_pos(ran, wordno - 1));
 #endif /* TDEBUG */
 	    if (!tw_pos(ran, wordno - 1)) {
-		xfree(com);
-		xfree(ran);
+		cleanup_until(ran);
 		continue;
 	    }
 	    break;
@@ -629,8 +620,7 @@ tw_complete(const Char *line, Char **word, Char **pat, int looking, eChar *suf)
 	    xprintf("%c: ", cmd);
 #endif /* TDEBUG */
 	    if ((n = tw_match(pos, ran)) < 0) {
-		xfree(com);
-		xfree(ran);
+		cleanup_until(ran);
 		continue;
 	    }
 	    if (cmd == 'c')
@@ -641,14 +631,10 @@ tw_complete(const Char *line, Char **word, Char **pat, int looking, eChar *suf)
 	    abort();		       /* Cannot happen */
 	}
 	res = tw_result(com, pat);
-	xfree(com);
-	xfree(ran);
-	xfree(wl);
-	xfree(buf);
+	cleanup_until(buf);
 	return res;
     }
-    xfree(wl);
-    xfree(buf);
+    cleanup_until(buf);
     *suf = '\0';
     return TW_ZERO;
 } /* end tw_complete */

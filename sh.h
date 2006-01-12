@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.137 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.138 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -36,6 +36,7 @@
 #include "config.h"
 
 #include <stddef.h>
+#include <signal.h>
 
 #ifdef HAVE_ICONV
 # include <iconv.h>
@@ -72,7 +73,7 @@ typedef unsigned long intptr_t;
 #ifndef WINNT_NATIVE
 # define INIT_ZERO
 # define INIT_ZERO_STRUCT
-# define force_read read
+# define force_read xread
 #endif /*!WINNT_NATIVE */
 /*
  * Sanity
@@ -84,10 +85,6 @@ typedef unsigned long intptr_t;
 #if defined(POSIXJOBS) && !defined(BSDJOBS)
 # define BSDJOBS
 #endif 
-
-#if defined(POSIXSIGS) && !defined(BSDSIGS)
-# define BSDSIGS
-#endif
 
 #ifdef SHORT_STRINGS
 # ifdef WIDE_STRINGS
@@ -328,7 +325,7 @@ typedef int NLSChar;
  * versions of DECOSF1 will get TIOCGWINSZ. This might break older versions...
  */
 #if !((defined(SUNOS4) || defined(_MINIX) /* || defined(DECOSF1) */) && defined(TERMIO))
-# if !defined(COHERENT) && !defined(_VMS_POSIX) && !defined(WINNT_NATIVE)
+# if !defined(_VMS_POSIX) && !defined(WINNT_NATIVE)
 #  include <sys/ioctl.h>
 # endif
 #endif 
@@ -342,9 +339,9 @@ typedef int NLSChar;
 # include <sys/filio.h>
 #endif /* (!FIOCLEX && SUNOS4) || (SYSVREL == 4 && !_SEQUENT_ && !SCO && !_SX ) */
 
-#if !defined(_MINIX) && !defined(COHERENT) && !defined(supermax) && !defined(WINNT_NATIVE) && !defined(IRIS4D)
+#if !defined(_MINIX) && !defined(supermax) && !defined(WINNT_NATIVE) && !defined(IRIS4D)
 # include <sys/file.h>
-#endif	/* !_MINIX && !COHERENT && !supermax && !WINNT_NATIVE && !defined(IRIS4D) */
+#endif	/* !_MINIX && !supermax && !WINNT_NATIVE && !defined(IRIS4D) */
 
 #if !defined(O_RDONLY) || !defined(O_NDELAY)
 # include <fcntl.h>
@@ -372,9 +369,9 @@ typedef int NLSChar;
 #ifndef HAVE_STRUCT_DIRENT_D_INO
 # define d_ino d_fileno
 #endif
-#if defined(hpux) || defined(sgi) || defined(OREO) || defined(COHERENT)
+#if defined(hpux) || defined(sgi) || defined(OREO)
 # include <stdio.h>	/* So the fgetpwent() prototypes work */
-#endif /* hpux || sgi || OREO || COHERENT */
+#endif /* hpux || sgi || OREO */
 #ifndef WINNT_NATIVE
 #include <pwd.h>
 #include <grp.h>
@@ -459,8 +456,6 @@ extern pid_t getpgrp (void);
 #endif /* !WINNT_NATIVE */
 #endif
 
-typedef RETSIGTYPE (*signalfun_t) (int);
-
 #ifndef lint
 typedef ptr_t memalign_t;
 #else
@@ -479,29 +474,17 @@ typedef union {
 # define calloc		lint_calloc
 #endif 
 
-#ifdef MDEBUG
-extern memalign_t	DebugMalloc	(unsigned, char *, int);
-extern memalign_t	DebugRealloc	(ptr_t, unsigned, char *, int);
-extern memalign_t	DebugCalloc	(unsigned, unsigned, char *, int);
-extern void		DebugFree	(ptr_t, char *, int);
-# define xmalloc(i)  	DebugMalloc(i, __FILE__, __LINE__)
-# define xrealloc(p, i)((p) ? DebugRealloc(p, i, __FILE__, __LINE__) : \
-			      DebugMalloc(i, __FILE__, __LINE__))
-# define xcalloc(n, s)	DebugCalloc(n, s, __FILE__, __LINE__)
-# define xfree(p)    	if (p) DebugFree(p, __FILE__, __LINE__)
+#ifdef SYSMALLOC
+# define xmalloc(i)	smalloc(i)
+# define xrealloc(p, i)	srealloc(p, i)
+# define xcalloc(n, s)	scalloc(n, s)
+# define xfree		sfree
 #else
-# ifdef SYSMALLOC
-#  define xmalloc(i)		smalloc(i)
-#  define xrealloc(p, i)	srealloc(p, i)
-#  define xcalloc(n, s)		scalloc(n, s)
-#  define xfree(p)		sfree(p)
-# else
-#  define xmalloc(i)  		malloc(i)
-#  define xrealloc(p, i)	realloc(p, i)
-#  define xcalloc(n, s)		calloc(n, s)
-#  define xfree(p)    		free(p)
-# endif /* SYSMALLOC */
-#endif /* MDEBUG */
+# define xmalloc(i)  	malloc(i)
+# define xrealloc(p, i)	realloc(p, i)
+# define xcalloc(n, s)	calloc(n, s)
+# define xfree	 	free
+#endif /* SYSMALLOC */
 #include "sh.char.h"
 #include "sh.err.h"
 #include "sh.dir.h"
@@ -571,7 +554,6 @@ EXTERN int    neednote IZERO;	/* Need to pnotify() */
 EXTERN int    noexec IZERO;	/* Don't execute, just syntax check */
 EXTERN int    pjobs IZERO;	/* want to print jobs if interrupted */
 EXTERN int    setintr IZERO;	/* Set interrupts on/off -> Wait intr... */
-EXTERN int    timflg IZERO;	/* Time the next waited for command */
 EXTERN int    havhash IZERO;	/* path hashing is available */
 EXTERN int    editing IZERO;	/* doing filename expansion and line editing */
 EXTERN int    noediting IZERO;	/* initial $term defaulted to noedit */
@@ -583,7 +565,8 @@ EXTERN int    is2atty IZERO;	/* is file descriptor 2 a tty (didfds mode) */
 EXTERN int    arun IZERO;	/* Currently running multi-line-aliases */
 EXTERN int     implicit_cd IZERO;/* implicit cd enabled?(1=enabled,2=verbose) */
 EXTERN int    inheredoc IZERO;	/* Currently parsing a heredoc */
-EXTERN int    windowchg IZERO;	/* We received a window change event *//*FIXME: volatile sig_atomic_t */
+/* We received a window change event */
+EXTERN volatile sig_atomic_t windowchg IZERO;
 #if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
 EXTERN int    dspmbyte_ls;
 #endif
@@ -601,7 +584,8 @@ extern char *seterr;		/* Error message from scanner/parser */
 extern int errno;		/* Error from C library routines */
 #endif
 extern int exitset;
-EXTERN Char   *shtemp IZERO;	/* Temp name for << shell files in /tmp */
+/* Temp name for << shell files in /tmp, for xfree() */
+EXTERN Char   *shtemp IZERO;
 
 #ifdef BSDTIMES
 EXTERN struct timeval time0;	/* Time at which the shell started */
@@ -645,8 +629,8 @@ EXTERN pid_t   opgrp,		/* Initial pgrp and tty pgrp */
                tpgrp;		/* Terminal process group */
 				/* If tpgrp is -1, leave tty alone! */
 
-EXTERN Char   *Prompt;		/* The actual printed prompt.*/
-EXTERN Char   *RPrompt;		/* Right-hand side prompt */
+EXTERN Char   *Prompt;		/* The actual printed prompt or NULL */
+EXTERN Char   *RPrompt;		/* Right-hand side prompt or NULL */
 
 /*
  * To be able to redirect i/o for builtins easily, the shell moves the i/o
@@ -678,49 +662,27 @@ EXTERN int   OLDSTD IZERO;	/* Old standard input (def for cmds) */
  * Because of source commands and .cshrc we need nested error catches.
  */
 
-#ifdef NO_STRUCT_ASSIGNMENT
-
-# ifdef SIGSETJMP
-   typedef sigjmp_buf jmp_buf_t;
-   /* bugfix by Jak Kirman @ Brown U.: remove the (void) cast here, see sh.c */
-#  define setexit()  sigsetjmp(reslab)
-#  define reset()    siglongjmp(reslab, 1)
-# else
-   typedef jmp_buf jmp_buf_t;
-   /* bugfix by Jak Kirman @ Brown U.: remove the (void) cast here, see sh.c */
-#  define setexit()  setjmp(reslab)
-#  define reset()    longjmp(reslab, 1)
-# endif
-# define getexit(a) (void) memmove(&(a), &reslab, sizeof(reslab))
-# define resexit(a) (void) memmove(&reslab, &(a), sizeof(reslab))
-
-# define cpybin(a, b) (void) memmove(&(a), &(b), sizeof(Bin))
-
-#else
-
-# ifdef SIGSETJMP
+#ifdef SIGSETJMP
    typedef struct { sigjmp_buf j; } jmp_buf_t;
-#  define setexit()  sigsetjmp(reslab.j)
-#  define reset()    siglongjmp(reslab.j, 1)
-# else
+# define setexit()  sigsetjmp(reslab.j)
+# define _reset()    siglongjmp(reslab.j, 1)
+#else
    typedef struct { jmp_buf j; } jmp_buf_t;
-#  define setexit()  setjmp(reslab.j)
-#  define reset()    longjmp(reslab.j, 1)
-# endif
+# define setexit()  setjmp(reslab.j)
+# define _reset()    longjmp(reslab.j, 1)
+#endif
 
-# define getexit(a) (void) ((a) = reslab)
-# define resexit(a) (void) (reslab = (a))
+#define getexit(a) (void) ((a) = reslab)
+#define resexit(a) (void) (reslab = (a))
 
-# define cpybin(a, b) (void) ((a) = (b))
-
-#endif	/* NO_STRUCT_ASSIGNMENT */
+#define cpybin(a, b) (void) ((a) = (b))
 
 extern jmp_buf_t reslab;
 
 EXTERN Char   *gointr;		/* Label for an onintr transfer */
 
-extern signalfun_t parintr;	/* Parents interrupt catch */
-extern signalfun_t parterm;	/* Parents terminate catch */
+extern struct sigaction parintr;	/* Parents interrupt catch */
+extern struct sigaction parterm;	/* Parents terminate catch */
 
 /*
  * Lexical definitions.
@@ -1033,7 +995,7 @@ EXTERN Char  **alvec IZERO_STRUCT,
 # ifdef PATH_MAX
 #  define MAXPATHLEN PATH_MAX
 # else
-#  define MAXPATHLEN 2048/*FIXBUF?*/
+#  define MAXPATHLEN 2048
 # endif
 #endif /* MAXPATHLEN */
 
@@ -1048,17 +1010,6 @@ extern struct limits {
     const char *limscale;
 } limits[];
 #endif /* !HAVENOLIMIT */
-
-/*
- * Variables for filename expansion
- */
-extern Char **gargv;		/* Pointer to the (stack) arglist */
-extern int    gargc;		/* Number args in gargv */
-
-/*
- * Variables for command expansion.
- */
-extern Char **pargv;		/* Pointer to the argv list space */
 
 /*
  * History list
@@ -1254,7 +1205,7 @@ EXTERN nl_catd catd;
 #  if defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
 #   define CGETS(b, c, d)	iconv_catgets(catd, b, c, d)
 #  else
-#   define CGETS(b, c, d)	catgets(catd, b, c, d)
+#   define CGETS(b, c, d)	xcatgets(catd, b, c, d)
 #  endif
 #  define CSAVS(b, c, d)	strsave(CGETS(b, c, d))
 # else

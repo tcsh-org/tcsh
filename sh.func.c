@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.131 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.132 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.131 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.132 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -154,7 +154,7 @@ doonintr(Char **v, struct command *c)
     Char *vv = v[1];
 
     USE(c);
-    if (parintr == SIG_IGN)
+    if (parintr.sa_handler == SIG_IGN)
 	return;
     if (setintr && intty)
 	stderror(ERR_NAME | ERR_TERMINAL);
@@ -162,38 +162,19 @@ doonintr(Char **v, struct command *c)
     gointr = 0;
     xfree(cp);
     if (vv == 0) {
-#ifdef BSDSIGS
-	if (setintr) {
-	    (void) sigblock(sigmask(SIGINT));
-	    (void) signal(SIGINT, pintr);
-	}
-	else 
-	    (void) signal(SIGINT, SIG_DFL);
-#else /* !BSDSIGS */
-	if (setintr) {
-	    (void) sighold(SIGINT);
-	    (void) sigset(SIGINT, pintr);
-	}
+	if (setintr)
+	    sigset_interrupting(SIGINT, queue_pintr);
 	else
-	    (void) sigset(SIGINT, SIG_DFL);
-#endif /* BSDSIGS */
+	    (void) signal(SIGINT, SIG_DFL);
 	gointr = 0;
     }
     else if (eq((vv = strip(vv)), STRminus)) {
-#ifdef BSDSIGS
 	(void) signal(SIGINT, SIG_IGN);
-#else /* !BSDSIGS */
-	(void) sigset(SIGINT, SIG_IGN);
-#endif /* BSDSIGS */
 	gointr = Strsave(STRminus);
     }
     else {
 	gointr = Strsave(vv);
-#ifdef BSDSIGS
-	(void) signal(SIGINT, pintr);
-#else /* !BSDSIGS */
-	(void) sigset(SIGINT, pintr);
-#endif /* BSDSIGS */
+	sigset_interrupting(SIGINT, queue_pintr);
     }
 }
 
@@ -207,6 +188,7 @@ donohup(Char **v, struct command *c)
 	stderror(ERR_NAME | ERR_TERMINAL);
     if (setintr == 0) {
 	(void) signal(SIGHUP, SIG_IGN);
+	phup_disabled = 1;
 #ifdef CC
 	submit(getpid());
 #endif /* CC */
@@ -238,7 +220,7 @@ dozip(Char **v, struct command *c)
 void
 dofiletest(Char **v, struct command *c)
 {
-    Char **fileptr, *ftest, *res;
+    Char **globbed, **fileptr, *ftest, *res;
     int gflag;
 
     USE(c);
@@ -253,21 +235,22 @@ dofiletest(Char **v, struct command *c)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
     else
-	v = gargv = saveblk(v);
+	v = saveblk(v);
+    globbed = v;
+    cleanup_push(globbed, blk_cleanup);
     trim(v);
 
     while (*(fileptr = v++) != '\0') {
-	xprintf("%S", res = filetest(ftest, &fileptr, 0));
-	xfree(res);
+	res = filetest(ftest, &fileptr, 0);
+	cleanup_push(res, xfree);
+	xprintf("%S", res);
+	cleanup_until(res);
 	if (*v)
 	    xprintf(" ");
     }
     xprintf("\n");
 
-    if (gargv) {
-	blkfree(gargv);
-	gargv = 0;
-    }
+    cleanup_until(globbed);
 }
 
 void
@@ -331,13 +314,15 @@ dologin(Char **v, struct command *c)
     USE(v);
 #else /* !WINNT_NATIVE */
     char **p = short2blk(v);
+
     USE(c);
+    cleanup_push((Char **)p, blk_cleanup);
     islogin();
     rechist(NULL, adrof(STRsavehist) != NULL);
-    (void) signal(SIGTERM, parterm);
+    sigaction(SIGTERM, &parterm, NULL);
     (void) execv(_PATH_BIN_LOGIN, p);
     (void) execv(_PATH_USRBIN_LOGIN, p);
-    blkfree((Char **) p);
+    cleanup_until((Char **)p);
     untty();
     xexit(1);
 #endif /* !WINNT_NATIVE */
@@ -352,7 +337,7 @@ donewgrp(Char **v, struct command *c)
     char **p;
     if (chkstop == 0 && setintr)
 	panystop(0);
-    (void) signal(SIGTERM, parterm);
+    sigaction(SIGTERM, &parterm, NULL);
     p = short2blk(v);
     /*
      * From Beto Appleton (beto@aixwiz.austin.ibm.com)
@@ -445,9 +430,10 @@ dogoto(Char **v, struct command *c)
 
     USE(c);
     lp = globone(v[1], G_ERROR);
+    cleanup_push(lp, xfree);
     if (!noexec)
 	gotolab(lp);
-    xfree(lp);
+    cleanup_until(lp);
 }
 
 void
@@ -490,9 +476,10 @@ doswitch(Char **v, struct command *c)
     if (*v)
 	stderror(ERR_SYNTAX);
     lp = globone(cp, G_ERROR);
+    cleanup_push(lp, xfree);
     if (!noexec)
 	search(TC_SWITCH, 0, lp);
-    xfree(lp);
+    cleanup_until(lp);
 }
 
 /*ARGSUSED*/
@@ -529,7 +516,7 @@ doexit(Char **v, struct command *c)
     if (intty)
 #endif
     /* Always close, why only on ttys? */
-	(void) close(SHIN);
+	xclose(SHIN);
 }
 
 /*ARGSUSED*/
@@ -560,12 +547,11 @@ doforeach(Char **v, struct command *c)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
     else {
-	v = gargv = saveblk(v);
+	v = saveblk(v);
 	trim(v);
     }
     nwp = xcalloc(1, sizeof *nwp);
     nwp->w_fe = nwp->w_fe0 = v;
-    gargv = 0;
     btell(&nwp->w_start);
     nwp->w_fename = Strsave(cp);
     nwp->w_next = whyles;
@@ -630,20 +616,14 @@ dowhile(Char **v, struct command *c)
 static void
 preread(void)
 {
+    int old_pintr_disabled;
+
     whyles->w_end.type = TCSH_I_SEEK;
     if (setintr)
-#ifdef BSDSIGS
-	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else /* !BSDSIGS */
-	(void) sigrelse (SIGINT);
-#endif /* BSDSIGS */
+	pintr_push_enable(&old_pintr_disabled);
     search(TC_BREAK, 0, NULL);		/* read the expression in */
     if (setintr)
-#ifdef BSDSIGS
-	(void) sigblock(sigmask(SIGINT));
-#else /* !BSDSIGS */
-	(void) sighold(SIGINT);
-#endif /* BSDSIGS */
+	cleanup_until(&old_pintr_disabled);
     btell(&whyles->w_end);
 }
 
@@ -698,10 +678,6 @@ dorepeat(Char **v, struct command *kp)
 {
     int i = 1;
 
-#ifdef BSDSIGS
-    sigmask_t omask = 0;
-#endif /* BSDSIGS */
-
     do {
 	i *= getn(v[1]);
 	lshift(v, 2);
@@ -709,29 +685,21 @@ dorepeat(Char **v, struct command *kp)
     if (noexec)
 	i = 1;
 
-    if (setintr)
-#ifdef BSDSIGS
-	omask = sigblock(sigmask(SIGINT)) & ~sigmask(SIGINT);
-#else /* !BSDSIGS */
-	(void) sighold(SIGINT);
-#endif /* BSDSIGS */
+    if (setintr) {
+	pintr_disabled++;
+	cleanup_push(&pintr_disabled, disabled_cleanup);
+    }
     while (i > 0) {
-	if (setintr)
-#ifdef BSDSIGS
-	    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-	    (void) sigrelse (SIGINT);
-#endif /* BSDSIGS */
+	if (setintr && pintr_disabled == 1) {
+	    cleanup_until(&pintr_disabled);
+	    pintr_disabled++;
+	    cleanup_push(&pintr_disabled, disabled_cleanup);
+	}
 	reexecute(kp);
 	--i;
     }
+    cleanup_until(&pintr_disabled);
     donefds();
-    if (setintr)
-#ifdef BSDSIGS
-	(void) sigsetmask(omask);
-#else /* !BSDSIGS */
-	(void) sigrelse (SIGINT);
-#endif /* BSDSIGS */
 }
 
 /*ARGSUSED*/
@@ -804,6 +772,7 @@ search(int type, int level, Char *goal)
 	a.f_seek = 0;
 	bseek(&a);
     }
+    cleanup_push(&word, Strbuf_cleanup);
     do {
 	if (intty && fseekp == feobp && aret == TCSH_F_SEEK)
 	    printprompt(1, isrchx(type == TC_BREAK ? zlast : type));
@@ -884,9 +853,10 @@ search(int type, int level, Char *goal)
 	    if (word.len != 0 && word.s[word.len - 1] == ':')
 		word.s[--word.len] = 0;
 	    cp = strip(Dfix1(word.s));
+	    cleanup_push(cp, xfree);
 	    if (Gmatch(goal, cp))
 		level = -1;
-	    xfree(cp);
+	    cleanup_until(cp);
 	    break;
 
 	case TC_DEFAULT:
@@ -897,7 +867,7 @@ search(int type, int level, Char *goal)
 	(void) getword(NULL);
     } while (level >= 0);
  end:
-    xfree(word.s);
+    cleanup_until(&word);
 }
 
 static int
@@ -1031,7 +1001,7 @@ wfree(void)
     btell(&o);
 
 #ifdef FDEBUG
-    xprintf("o->type %c o->a_seek %d o->f_seek %d\n", 
+    xprintf("o->type %c o->a_seek %d o->f_seek %d\n",
 	    foo[o.type + 1], o.a_seek, o.f_seek);
 #endif /* FDEBUG */
 
@@ -1040,10 +1010,10 @@ wfree(void)
 	nwp = wp->w_next;
 
 #ifdef FDEBUG
-	xprintf("start->type %c start->a_seek %d start->f_seek %d\n", 
+	xprintf("start->type %c start->a_seek %d start->f_seek %d\n",
 		foo[wp->w_start.type+1], 
 		wp->w_start.a_seek, wp->w_start.f_seek);
-	xprintf("end->type %c end->a_seek %d end->f_seek %d\n", 
+	xprintf("end->type %c end->a_seek %d end->f_seek %d\n",
 		foo[wp->w_end.type + 1], wp->w_end.a_seek, wp->w_end.f_seek);
 #endif /* FDEBUG */
 
@@ -1088,17 +1058,9 @@ doglob(Char **v, struct command *c)
 static void
 xecho(int sep, Char **v)
 {
-    Char *cp;
+    Char *cp, **globbed = NULL;
     int     nonl = 0, gflag;
-#ifdef ECHO_STYLE
     int	    echo_style = ECHO_STYLE;
-#else /* !ECHO_STYLE */
-# if SYSVREL > 0
-    int	    echo_style = SYSV_ECHO;
-# else /* SYSVREL == 0 */
-    int	    echo_style = BSD_ECHO;
-# endif /* SYSVREL */
-#endif /* ECHO_STYLE */
     struct varent *vp;
 
     if ((vp = adrof(STRecho_style)) != NULL && vp->vec != NULL &&
@@ -1113,25 +1075,28 @@ xecho(int sep, Char **v)
 	    echo_style = NONE_ECHO;
     }
 
-    if (setintr)
-#ifdef BSDSIGS
-	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else /* !BSDSIGS */
-	(void) sigrelse (SIGINT);
-#endif /* BSDSIGS */
     v++;
     if (*v == 0)
 	goto done;
     gflag = tglob(v);
     if (gflag) {
+	int old_pintr_disabled;
+
+	if (setintr)
+	    pintr_push_enable(&old_pintr_disabled);
 	v = globall(v, gflag);
+	if (setintr)
+	    cleanup_until(&old_pintr_disabled);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
     else {
-	v = gargv = saveblk(v);
+	v = saveblk(v);
 	trim(v);
     }
+    globbed = v;
+    if (globbed != NULL)
+	cleanup_push(globbed, blk_cleanup);
 
     if ((echo_style & BSD_ECHO) != 0 && sep == ' ' && *v && eq(*v, STRmn))
 	nonl++, v++;
@@ -1139,6 +1104,12 @@ xecho(int sep, Char **v)
     while ((cp = *v++) != 0) {
 	Char c;
 
+	if (setintr) {
+	    int old_pintr_disabled;
+
+	    pintr_push_enable(&old_pintr_disabled);
+	    cleanup_until(&old_pintr_disabled);
+	}
 	while ((c = *cp++) != 0) {
 	    if ((echo_style & SYSV_ECHO) != 0 && c == '\\') {
 		switch (c = *cp++) {
@@ -1205,14 +1176,8 @@ done:
 	xputchar('\n');
     else
 	flush();
-    if (setintr)
-#ifdef BSDSIGS
-	(void) sigblock(sigmask(SIGINT));
-#else /* !BSDSIGS */
-	(void) sighold(SIGINT);
-#endif /* BSDSIGS */
-    if (gargv)
-	blkfree(gargv), gargv = 0;
+    if (globbed != NULL)
+	cleanup_until(globbed);
 }
 
 /* check whether an environment variable should invoke 'set_locale()' */
@@ -1231,36 +1196,48 @@ islocale_var(Char *var)
     return 0;
 }
 
+static void
+xlate_cr_cleanup(void *dummy)
+{
+    USE(dummy);
+    xlate_cr = 0;
+}
+
 /*ARGSUSED*/
 void
-doprintenv(Char **v, struct command *c)
+doprintenv(Char **v, struct command *c) 
 {
     Char   *e;
 
     USE(c);
-    if (setintr)
-#ifdef BSDSIGS
-	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else /* !BSDSIGS */
-	(void) sigrelse (SIGINT);
-#endif /* BSDSIGS */
-
     v++;
     if (*v == 0) {
 	Char **ep;
 
 	xlate_cr = 1;
-	for (ep = STR_environ; *ep; ep++)
+	cleanup_push(&xlate_cr, xlate_cr_cleanup);
+	for (ep = STR_environ; *ep; ep++) {
+	    if (setintr) {
+		int old_pintr_disabled;
+
+		pintr_push_enable(&old_pintr_disabled);
+		cleanup_until(&old_pintr_disabled);
+	    }
 	    xprintf("%S\n", *ep);
-	xlate_cr = 0;
+	}
+	cleanup_until(&xlate_cr);
     }
     else if ((e = tgetenv(*v)) != NULL) {
+	int old_output_raw;
+
+	old_output_raw = output_raw;
 	output_raw = 1;
+	cleanup_push(&old_output_raw, output_raw_restore);
 	xprintf("%S\n", e);
-	output_raw = 0;
+	cleanup_until(&old_output_raw);
     }
     else
-	set(STRstatus, Strsave(STR1), VAR_READWRITE);
+	setcopy(STRstatus, STR1, VAR_READWRITE);
 }
 
 /* from "Karl Berry." <karl%mote.umb.edu@relay.cs.net> -- for NeXT things
@@ -1289,18 +1266,20 @@ dosetenv(Char **v, struct command *c)
     if ((lp = *v++) == 0)
 	lp = STRNULL;
 
-    tsetenv(vp, lp = globone(lp, G_APPEND));
+    lp = globone(lp, G_APPEND);
+    cleanup_push(lp, xfree);
+    tsetenv(vp, lp);
     if (eq(vp, STRKPATH)) {
-	importpath(lp);
+        importpath(lp);
 	dohash(NULL, NULL);
-	xfree(lp);
+	cleanup_until(lp);
 	return;
     }
 
 #ifdef apollo
     if (eq(vp, STRSYSTYPE)) {
 	dohash(NULL, NULL);
-	xfree(lp);
+	cleanup_until(lp);
 	return;
     }
 #endif /* apollo */
@@ -1351,7 +1330,7 @@ dosetenv(Char **v, struct command *c)
 	ed_Init();
 	if (MapsAreInited && !NLSMapsAreInited)
 	    ed_InitNLSMaps();
-	xfree(lp);
+	cleanup_until(lp);
 	return;
     }
 
@@ -1367,24 +1346,27 @@ dosetenv(Char **v, struct command *c)
 	MapsAreInited = 0;
 	NLSMapsAreInited = 0;
 	ed_InitMaps();
-	xfree(lp);
+	cleanup_until(lp);
 	return;
     }
 #ifdef WINNT_NATIVE
     if (eq(vp, STRtcshlang)) {
 	nlsinit();
-	xfree(lp);
+	cleanup_until(lp);
 	return;
     }
 #endif /* WINNT_NATIVE */
     if (eq(vp, STRKTERM)) {
 	char *t;
+
 	set(STRterm, quote(lp), VAR_READWRITE);	/* lp memory used here */
+	cleanup_ignore(lp);
+	cleanup_until(lp);
 	t = short2str(lp);
 	if (noediting && strcmp(t, "unknown") != 0 && strcmp(t,"dumb") != 0) {
 	    editing = 1;
 	    noediting = 0;
-	    set(STRedit, Strsave(STRNULL), VAR_READWRITE);
+	    setNS(STRedit);
 	}
 	GotTermCaps = 0;
 	ed_Init();
@@ -1392,11 +1374,17 @@ dosetenv(Char **v, struct command *c)
     }
 
     if (eq(vp, STRKHOME)) {
+	Char *canon;
 	/*
 	 * convert to canonical pathname (possibly resolving symlinks)
 	 */
-	lp = dcanon(lp, lp);
-	set(STRhome, quote(lp), VAR_READWRITE);	/* cp memory used here */
+	canon = dcanon(lp, lp);
+	cleanup_ignore(lp);
+	cleanup_until(lp);
+	cleanup_push(canon, xfree);
+	set(STRhome, quote(canon), VAR_READWRITE); /* lp memory used here */
+	cleanup_ignore(canon);
+	cleanup_until(canon);
 
 	/* fix directory stack for new tilde home */
 	dtilde();
@@ -1404,24 +1392,30 @@ dosetenv(Char **v, struct command *c)
     }
 
     if (eq(vp, STRKSHLVL)) {
-	/* lp memory used here */
-	set(STRshlvl, quote(lp), VAR_READWRITE);
+	set(STRshlvl, quote(lp), VAR_READWRITE); /* lp memory used here */
+	cleanup_ignore(lp);
+	cleanup_until(lp);
 	return;
     }
 
     if (eq(vp, STRKUSER)) {
 	set(STRuser, quote(lp), VAR_READWRITE);	/* lp memory used here */
+	cleanup_ignore(lp);
+	cleanup_until(lp);
 	return;
     }
 
     if (eq(vp, STRKGROUP)) {
-	set(STRgroup, quote(lp), VAR_READWRITE);	/* lp memory used here */
+	set(STRgroup, quote(lp), VAR_READWRITE); /* lp memory used here */
+	cleanup_ignore(lp);
+	cleanup_until(lp);
 	return;
     }
 
 #ifdef COLOR_LS_F
     if (eq(vp, STRLS_COLORS)) {
         parseLS_COLORS(lp);
+	cleanup_until(lp);
 	return;
     }
 #endif /* COLOR_LS_F */
@@ -1432,7 +1426,7 @@ dosetenv(Char **v, struct command *c)
      */
     if ((eq(lp, STRNULL) && (eq(vp, STRLINES) || eq(vp, STRCOLUMNS))) ||
 	eq(vp, STRTERMCAP)) {
-	xfree(lp);
+	cleanup_until(lp);
 	check_window_size(1);
 	return;
     }
@@ -1444,24 +1438,22 @@ dosetenv(Char **v, struct command *c)
 #if 0
 	GotTermCaps = 0;
 #endif
-	xfree(lp);
+	cleanup_until(lp);
 	ed_Init();
 	return;
     }
 #endif /* SIG_WINDOW */
-    xfree(lp);
+    cleanup_until(lp);
 }
 
 /*ARGSUSED*/
 void
 dounsetenv(Char **v, struct command *c)
 {
-    Char  **ep, *p, *n;
+    Char  **ep, *p, *n, *name;
     int     i, maxi;
-    static Char *name = NULL;
 
     USE(c);
-    xfree(name);
     /*
      * Find the longest environment variable
      */
@@ -1473,6 +1465,7 @@ dounsetenv(Char **v, struct command *c)
     }
 
     name = xmalloc((maxi + 1) * sizeof(Char));
+    cleanup_push(name, xfree);
 
     while (++v && *v) 
 	for (maxi = 1; maxi;)
@@ -1564,7 +1557,7 @@ dounsetenv(Char **v, struct command *c)
 		 */
 		break;
 	    }
-    xfree(name); name = NULL;
+    cleanup_until(name);
 }
 
 void
@@ -2141,11 +2134,12 @@ setlim(struct limits *lp, int hard, RLIM_TYPE limit)
 	err = errno;
 	op = strsave(limit == RLIM_INFINITY ? CGETS(15, 2, "remove") :
 		     	CGETS(15, 3, "set"));
+	cleanup_push(op, xfree);
 	type = strsave(hard ? CGETS(15, 4, " hard") : "");
+	cleanup_push(type, xfree);
 	xprintf(CGETS(15, 1, "%s: %s: Can't %s%s limit (%s)\n"), bname,
 	    lp->limname, op, type, strerror(err));
-	xfree(type);
-	xfree(op);
+	cleanup_until(op);
 	return (-1);
     }
     return (0);
@@ -2159,8 +2153,7 @@ dosuspend(Char **v, struct command *c)
 {
 #ifdef BSDJOBS
     int     ctpgrp;
-
-    signalfun_t old;
+    struct sigaction old;
 #endif /* BSDJOBS */
     
     USE(c);
@@ -2171,10 +2164,11 @@ dosuspend(Char **v, struct command *c)
     untty();
 
 #ifdef BSDJOBS
-    old = signal(SIGTSTP, SIG_DFL);
+    sigaction(SIGTSTP, NULL, &old);
+    signal(SIGTSTP, SIG_DFL);
     (void) kill(0, SIGTSTP);
     /* the shell stops here */
-    (void) signal(SIGTSTP, old);
+    sigaction(SIGTSTP, &old, NULL);
 #else /* !BSDJOBS */
     stderror(ERR_JOBCONTROL);
 #endif /* BSDJOBS */
@@ -2186,9 +2180,10 @@ retry:
 	if (ctpgrp == -1)
 	    stderror(ERR_SYSTEM, "tcgetpgrp", strerror(errno));
 	if (ctpgrp != opgrp) {
-	    old = signal(SIGTTIN, SIG_DFL);
+	    sigaction(SIGTTIN, NULL, &old);
+	    signal(SIGTTIN, SIG_DFL);
 	    (void) kill(0, SIGTTIN);
-	    (void) signal(SIGTTIN, old);
+	    sigaction(SIGTTIN, &old, NULL);
 	    goto retry;
 	}
 	(void) setpgid(0, shpgrp);
@@ -2211,106 +2206,106 @@ retry:
  *   pgrp, with no way for the shell to get them going again.  -IAN!
  */
 
-static Char **gv = NULL, **gav = NULL;
+struct doeval_state
+{
+    Char **evalvec, *evalp;
+    int didfds;
+#ifndef CLOSE_ON_EXEC
+    int didcch;
+#endif
+    int saveIN, saveOUT, saveDIAG;
+    int SHIN, SHOUT, SHDIAG;
+};
+
+static void
+doeval_cleanup(void *xstate)
+{
+    struct doeval_state *state;
+
+    state = xstate;
+    evalvec = state->evalvec;
+    evalp = state->evalp;
+    doneinp = 0;
+#ifndef CLOSE_ON_EXEC
+    didcch = state->didcch;
+#endif /* CLOSE_ON_EXEC */
+    didfds = state->didfds;
+    xclose(SHIN);
+    xclose(SHOUT);
+    xclose(SHDIAG);
+    close_on_exec(SHIN = dmove(state->saveIN, state->SHIN), 1);
+    close_on_exec(SHOUT = dmove(state->saveOUT, state->SHOUT), 1);
+    close_on_exec(SHDIAG = dmove(state->saveDIAG, state->SHDIAG), 1);
+}
 
 /*ARGSUSED*/
 void
 doeval(Char **v, struct command *c)
 {
-    Char  **oevalvec;
-    Char   *oevalp;
-    int     odidfds, gflag;
-#ifndef CLOSE_ON_EXEC
-    int     odidcch;
-#endif /* CLOSE_ON_EXEC */
-    jmp_buf_t osetexit;
-    int     my_reenter;
-    Char  **savegv;
-    int     saveIN, saveOUT, saveDIAG;
-    int     oSHIN, oSHOUT, oSHDIAG;
+    struct doeval_state state;
+    int gflag;
+    Char **gv;
 
     USE(c);
-    oevalvec = evalvec;
-    oevalp = evalp;
-    odidfds = didfds;
-#ifndef CLOSE_ON_EXEC
-    odidcch = didcch;
-#endif /* CLOSE_ON_EXEC */
-    oSHIN = SHIN;
-    oSHOUT = SHOUT;
-    oSHDIAG = SHDIAG;
-
-    savegv = gv;
-    gav = v;
-
-    gav++;
-    if (*gav == 0)
+    v++;
+    if (*v == 0)
 	return;
-    gflag = tglob(gav);
+    gflag = tglob(v);
     if (gflag) {
-	gv = gav = globall(gav, gflag);
-	gargv = 0;
-	if (gav == 0)
+	gv = v = globall(v, gflag);
+	if (v == 0)
 	    stderror(ERR_NOMATCH);
-	gav = copyblk(gav);
+	cleanup_push(gv, blk_cleanup);
+	v = copyblk(v);
     }
     else {
 	gv = NULL;
-	gav = copyblk(gav);
-	trim(gav);
+	v = copyblk(v);
+	trim(v);
     }
 
-    (void)close_on_exec(saveIN = dcopy(SHIN, -1), 1);
-    (void)close_on_exec(saveOUT = dcopy(SHOUT, -1), 1);
-    (void)close_on_exec(saveDIAG = dcopy(SHDIAG, -1), 1);
-
-    getexit(osetexit);
-
-    /* PWP: setjmp/longjmp bugfix for optimizing compilers */
-#ifdef cray
-    my_reenter = 1;             /* assume non-zero return val */
-    if (setexit() == 0) {
-	my_reenter = 0;         /* Oh well, we were wrong */
-#else /* !cray */
-    if ((my_reenter = setexit()) == 0) {
-#endif /* cray */
-	evalvec = gav;
-	evalp = 0;
-	(void)close_on_exec(SHIN = dcopy(0, -1), 1);
-	(void)close_on_exec(SHOUT = dcopy(1, -1), 1);
-	(void)close_on_exec(SHDIAG = dcopy(2, -1), 1);
+    state.evalvec = evalvec;
+    state.evalp = evalp;
+    state.didfds = didfds;
 #ifndef CLOSE_ON_EXEC
-	didcch = 0;
+    state.didcch = didcch;
 #endif /* CLOSE_ON_EXEC */
-	didfds = 0;
-	process(0);
-    }
+    state.SHIN = SHIN;
+    state.SHOUT = SHOUT;
+    state.SHDIAG = SHDIAG;
 
-    evalvec = oevalvec;
-    evalp = oevalp;
-    doneinp = 0;
+    (void)close_on_exec(state.saveIN = dcopy(SHIN, -1), 1);
+    (void)close_on_exec(state.saveOUT = dcopy(SHOUT, -1), 1);
+    (void)close_on_exec(state.saveDIAG = dcopy(SHDIAG, -1), 1);
+
+    cleanup_push(&state, doeval_cleanup);
+
+    evalvec = v;
+    evalp = 0;
+    (void)close_on_exec(SHIN = dcopy(0, -1), 1);
+    (void)close_on_exec(SHOUT = dcopy(1, -1), 1);
+    (void)close_on_exec(SHDIAG = dcopy(2, -1), 1);
 #ifndef CLOSE_ON_EXEC
-    didcch = odidcch;
+    didcch = 0;
 #endif /* CLOSE_ON_EXEC */
-    didfds = odidfds;
-    (void) close(SHIN);
-    (void) close(SHOUT);
-    (void) close(SHDIAG);
-    (void)close_on_exec (SHIN = dmove(saveIN, oSHIN), 1);
-    (void)close_on_exec (SHOUT = dmove(saveOUT, oSHOUT), 1);
-    (void)close_on_exec (SHDIAG = dmove(saveDIAG, oSHDIAG), 1);
+    didfds = 0;
+    process(0);
+
+    cleanup_until(&state);
 
     if (gv)
-	blkfree(gv);
-
-    gv = savegv;
-    resexit(osetexit);
-    if (my_reenter)
-	stderror(ERR_SILENT);
+	cleanup_until(gv);
 }
 
 /*************************************************************************/
 /* print list of builtin commands */
+
+static void
+lbuffed_cleanup (void *dummy)
+{
+    USE(dummy);
+    lbuffed = 1;
+}
 
 /*ARGSUSED*/
 void
@@ -2319,13 +2314,14 @@ dobuiltins(Char **v, struct command *c)
     /* would use print_by_column() in tw.parse.c but that assumes
      * we have an array of Char * to pass.. (sg)
      */
-  const struct biltins *b;
+    const struct biltins *b;
     int row, col, columns, rows;
     unsigned int w, maxwidth;
 
     USE(c);
     USE(v);
     lbuffed = 0;		/* turn off line buffering */
+    cleanup_push(&lbuffed, lbuffed_cleanup);
 
     /* find widest string */
     for (maxwidth = 0, b = bfunc; b < &bfunc[nbfunc]; ++b)
@@ -2362,11 +2358,26 @@ dobuiltins(Char **v, struct command *c)
     xputchar('\n');
 #endif /* WINNT_NATIVE */
 
-    lbuffed = 1;		/* turn back on line buffering */
+    cleanup_until(&lbuffed);		/* turn back on line buffering */
     flush();
 }
 
-#if defined (NLS_CATALOGS) && defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
+#ifdef NLS_CATALOGS
+char *
+xcatgets(nl_catd ctd, int set_id, int msg_id, const char *s)
+{
+    char *res;
+
+    errno = 0;
+    while ((res = catgets(ctd, set_id, msg_id, s)) == s && errno == EINTR) {
+	handle_pending_signals();
+	errno = 0;
+    }
+    return res;
+}
+
+
+# if defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
 char *
 iconv_catgets(nl_catd ctd, int set_id, int msg_id, const char *s)
 {
@@ -2381,7 +2392,7 @@ iconv_catgets(nl_catd ctd, int set_id, int msg_id, const char *s)
 #endif
     size_t src_size, dest_size;
   
-    orig = catgets(ctd, set_id, msg_id, s);
+    orig = xcatgets(ctd, set_id, msg_id, s);
     if (catgets_iconv == (iconv_t)-1 || orig == s)
         return orig;
     src = orig;
@@ -2409,7 +2420,8 @@ iconv_catgets(nl_catd ctd, int set_id, int msg_id, const char *s)
     }
     return buf;
 }
-#endif
+# endif /* HAVE_ICONV && HAVE_NL_LANGINFO */
+#endif /* NLS_CATALOGS */
 
 void
 nlsinit(void)
@@ -2425,9 +2437,9 @@ nlsinit(void)
     if (catalog != default_catalog)
 	xfree(catalog);
 #if defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
-    /* catgets (), not CGETS, the charset name should be in ASCII anyway. */
+    /* xcatgets (), not CGETS, the charset name should be in ASCII anyway. */
     catgets_iconv = iconv_open (nl_langinfo (CODESET),
-				catgets(catd, 255, 1, "ASCII"));
+				xcatgets(catd, 255, 1, "ASCII"));
 #endif /* HAVE_ICONV && HAVE_NL_LANGINFO */
 #endif /* NLS_CATALOGS */
 #ifdef WINNT_NATIVE
@@ -2459,7 +2471,8 @@ nlsclose(void)
 	 */
 	nl_catd oldcatd = catd;
 	catd = (nl_catd)-1;
-	catclose(oldcatd);
+	while (catclose(oldcatd) == -1 && errno == EINTR)
+	    handle_pending_signals();
     }
 #endif /* NLS_CATALOGS */
 }

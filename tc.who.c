@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.47 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.48 2006/01/12 19:43:01 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.47 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.48 2006/01/12 19:43:01 christos Exp $")
 
 #include "tc.h"
 
@@ -185,9 +185,6 @@ watch_login(int force)
 #else
     int utmpfd;
 #endif
-#ifdef BSDSIGS
-    sigmask_t omask;
-#endif				/* BSDSIGS */
     struct utmp utmp;
     struct who *wp, *wpnew;
     struct varent *v;
@@ -206,19 +203,12 @@ watch_login(int force)
 #endif /* WINNT_NATIVE */
 
     /* stop SIGINT, lest our login list get trashed. */
-#ifdef BSDSIGS
-    omask = sigblock(sigmask(SIGINT));
-#else
-    (void) sighold(SIGINT);
-#endif
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
 
     v = adrof(STRwatch);
     if ((v == NULL || v->vec == NULL) && !force) {
-#ifdef BSDSIGS
-	(void) sigsetmask(omask);
-#else
-	(void) sigrelse(SIGINT);
-#endif
+	cleanup_until(&pintr_disabled);
 	return;			/* no names to watch */
     }
     if (!force) {
@@ -244,11 +234,7 @@ watch_login(int force)
 	}
 #endif /* WINNT_NATIVE */
     if (t - watch_period < interval) {
-#ifdef BSDSIGS
-	(void) sigsetmask(omask);
-#else
-	(void) sigrelse(SIGINT);
-#endif
+	cleanup_until(&pintr_disabled);
 	return;			/* not long enough yet... */
     }
     watch_period = t;
@@ -265,37 +251,26 @@ watch_login(int force)
 	    xprintf(CGETS(26, 1,
 			  "cannot stat %s.  Please \"unset watch\".\n"),
 		    TCSH_PATH_UTMP);
-# ifdef BSDSIGS
-	(void) sigsetmask(omask);
-# else
-	(void) sigrelse(SIGINT);
-# endif
+	cleanup_until(&pintr_disabled);
 	return;
     }
     if (stlast == sta.st_mtime) {
-# ifdef BSDSIGS
-	(void) sigsetmask(omask);
-# else
-	(void) sigrelse(SIGINT);
-# endif
+	cleanup_until(&pintr_disabled);
 	return;
     }
     stlast = sta.st_mtime;
 #ifdef HAVE_GETUTENT
     setutent();
 #else
-    if ((utmpfd = open(TCSH_PATH_UTMP, O_RDONLY|O_LARGEFILE)) < 0) {
+    if ((utmpfd = xopen(TCSH_PATH_UTMP, O_RDONLY|O_LARGEFILE)) < 0) {
 	if (!force)
 	    xprintf(CGETS(26, 2,
 			  "%s cannot be opened.  Please \"unset watch\".\n"),
 		    TCSH_PATH_UTMP);
-# ifdef BSDSIGS
-	(void) sigsetmask(omask);
-# else
-	(void) sigrelse(SIGINT);
-# endif
+	cleanup_until(&pintr_disabled);
 	return;
     }
+    cleanup_push(&utmpfd, open_cleanup);
 #endif
 
     /*
@@ -313,7 +288,7 @@ watch_login(int force)
     while ((uptr = getutent()) != NULL) {
         memcpy(&utmp, uptr, sizeof (utmp));
 #else
-    while (read(utmpfd, &utmp, sizeof utmp) == sizeof utmp) {
+    while (xread(utmpfd, &utmp, sizeof utmp) == sizeof utmp) {
 #endif
 
 # ifdef DEAD_PROCESS
@@ -415,15 +390,17 @@ watch_login(int force)
 #ifdef HAVE_GETUTENT
     endutent();
 #else
-    (void) close(utmpfd);
+    cleanup_until(&utmpfd);
 #endif
 # if defined(HAVE_STRUCT_UTMP_UT_HOST) && defined(_SEQUENT_)
     endutent();
 # endif
 #endif /* !WINNT_NATIVE */
 
-    if (force || vp == NULL)
+    if (force || vp == NULL) {
+	cleanup_until(&pintr_disabled);
 	return;
+    }
 
     /*
      * The state of all logins is now known, so we can search the user's list
@@ -476,11 +453,7 @@ watch_login(int force)
 	    }
 	}
     }
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else
-    (void) sigrelse(SIGINT);
-#endif
+    cleanup_until(&pintr_disabled);
 }
 
 #ifdef WHODEBUG
@@ -533,9 +506,10 @@ print_who(struct who *wp)
 	cp = vp->vec[0];
 
     str = tprintf(FMT_WHO, cp, NULL, wp->who_time, wp);
+    cleanup_push(str, xfree);
     for (cp = str; *cp;)
 	xputwchar(*cp++);
-    xfree(str);
+    cleanup_until(str);
     xputchar('\n');
 } /* end print_who */
 

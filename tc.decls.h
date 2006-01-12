@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.58 2005/04/11 22:10:59 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.59 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -33,6 +33,7 @@
 #ifndef _h_tc_decls
 #define _h_tc_decls
 
+struct blk_buf;
 struct strbuf;
 struct Strbuf;
 
@@ -58,9 +59,6 @@ extern	void		  showall	(Char **, struct command *);
  * tc.bind.c
  */
 extern	void		  dobindkey	(Char **, struct command *);
-#ifdef OBSOLETE
-extern	void		  dobind	(Char **, struct command *);
-#endif /* OBSOLETE */
 
 /*
  * tc.defs.c:
@@ -89,7 +87,7 @@ extern	int		  cmd_expand	(Char *, Char **);
 extern	void		  dowhich	(Char **, struct command *);
 extern	struct process	 *find_stop_ed	(void);
 extern	void		  fg_proc_entry	(struct process *);
-extern	RETSIGTYPE	  alrmcatch	(int);
+extern	void		  alrmcatch	(void);
 extern	void		  precmd	(void);
 extern	void		  postcmd	(void);
 extern	void		  cwd_cmd	(void);
@@ -248,49 +246,6 @@ extern	void		  dosched	(Char **, struct command *);
 extern	void		  sched_run	(void);
 
 /*
- * tc.sig.c
- */
-#ifndef BSDSIGS
-# ifdef UNRELSIGS
-#  ifdef COHERENT
-extern	RETSIGTYPE	(*xsignal	(int, RETSIGTYPE (*)(int))) ();
-#   define signal(x,y)	  xsignal(x,y)
-#  endif /* COHERENT */
-extern	RETSIGTYPE	(*xsigset	(int, RETSIGTYPE (*)(int))) ();
-#  define sigset(x,y)	  xsigset(x,y)
-extern	void		  xsigrelse	(int);
-#  define sigrelse(x)	  xsigrelse(x)
-extern	void		  xsighold	(int);
-#  define sighold(x)	  xsighold(x)
-extern	void		  xsigignore	(int);
-#  define sigignore(x)	  xsigignore(x)
-extern	void 		  xsigpause	(int);
-#  define sigpause(x)	  xsigpause(x)
-extern	pid_t 		  ourwait	(int *);
-# endif /* UNRELSIGS */
-# ifdef SXA
-extern	void 		  sigpause	(int);
-# endif /* SXA */
-#endif /* !BSDSIGS */
-
-#ifdef NEEDsignal
-extern	RETSIGTYPE	(*xsignal	(int, RETSIGTYPE (*)(int))) ();
-# define signal(a, b)	  xsignal(a, b)
-#endif /* NEEDsignal */
-#if defined(_SEQUENT_) || ((SYSVREL > 3 || defined(_DGUX_SOURCE)) && defined(POSIXSIGS)) || ((defined(_AIX) || defined(__CYGWIN__)) && defined(POSIXSIGS)) || defined(WINNT_NATIVE)
-extern	sigmask_t	  sigsetmask	(sigmask_t);
-# if !defined(DGUX) || (defined(DGUX) && defined(__ix86))
-extern	sigmask_t	  sigblock	(sigmask_t);
-# endif /* !DGUX */
-extern	void		  bsd_sigpause	(sigmask_t);
-extern  RETSIGTYPE        (*bsd_signal    (int, RETSIGTYPE (*)(int))) (int);
-#endif /* _SEQUENT_ */
-#ifdef SIGSYNCH
-extern	RETSIGTYPE	  synch_handler	(int);
-#endif /* SIGSYNCH */
-
-
-/*
  * tc.str.c:
  */
 #ifdef WIDE_STRINGS
@@ -327,18 +282,24 @@ extern	char		**short2blk	(Char **);
 #endif /* SHORT_STRINGS */
 extern	char		 *short2qstr	(const Char *);
 
+extern	void		  bb_append	(struct blk_buf *, Char *);
+extern	void		  bb_cleanup	(void *);
+extern	Char		**bb_finish	(struct blk_buf *);
+
 extern	void		  strbuf_terminate(struct strbuf *);
 extern  void		  strbuf_append1(struct strbuf *, char);
 extern  void		  strbuf_appendn(struct strbuf *, const char *,
 					 size_t);
 extern  void		  strbuf_append (struct strbuf *, const char *);
 extern  char		 *strbuf_finish (struct strbuf *);
+extern	void		  strbuf_cleanup(void *);
 extern	void		  Strbuf_terminate(struct Strbuf *);
 extern  void		  Strbuf_append1(struct Strbuf *, Char);
 extern  void		  Strbuf_appendn(struct Strbuf *, const Char *,
 					 size_t);
 extern  void		  Strbuf_append (struct Strbuf *, const Char *);
 extern  Char		 *Strbuf_finish (struct Strbuf *);
+extern	void		  Strbuf_cleanup(void *);
 
 
 /*

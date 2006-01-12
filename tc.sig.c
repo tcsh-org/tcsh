@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.c,v 3.32 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.c,v 3.33 2006/01/12 19:43:01 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,347 +32,104 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.32 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: tc.sig.c,v 3.33 2006/01/12 19:43:01 christos Exp $")
 
 #include "tc.wait.h"
 
-#ifndef BSDSIGS
-
-/* this stack is used to queue signals
- * we can handle up to MAX_CHLD outstanding children now;
- */
-#define MAX_CHLD 50
-
-# ifdef UNRELSIGS
-static struct mysigstack {
-    int     s_w;		/* wait report			 */
-    int     s_errno;		/* errno returned;		 */
-    pid_t   s_pid;		/* pid returned			 */
-}       stk[MAX_CHLD];
-static int stk_ptr = -1;
-
-
-/* queue child signals
- */
-static RETSIGTYPE
-sig_ch_queue(void)
-{
-#  ifdef JOBDEBUG
-    xprintf("queue SIGCHLD\n");
-    flush();
-#  endif /* JOBDEBUG */
-    stk_ptr++;
-    stk[stk_ptr].s_pid = wait(&stk[stk_ptr].s_w);
-    stk[stk_ptr].s_errno = errno;
-    (void) signal(SIGCHLD, sig_ch_queue);
-}
-
-/* process all awaiting child signals
- */
-static RETSIGTYPE
-sig_ch_rel(void)
-{
-    while (stk_ptr > -1)
-	pchild(SIGCHLD);
-#  ifdef JOBDEBUG
-    xprintf("signal(SIGCHLD, pchild);\n");
-#  endif /* JOBDEBUG */
-    (void) signal(SIGCHLD, pchild);
-}
-
-
-/* libc.a contains these functions in SYSVREL >= 3. */
-RETSIGTYPE
-(*xsigset(int a, signalfun_t b)) ()
-{
-    return (signal(a, b));
-}
-
-/* release signal
- *	release all queued signals and
- *	set the default signal handler
- */
 void
-sigrelse(int what)
+sigset_interrupting(int sig, void (*fn) (int))
 {
-    if (what == SIGCHLD)
-	sig_ch_rel();
+    struct sigaction act;
 
-#  ifdef COHERENT
-    (void) signal(what, what == SIGINT ? pintr : SIG_DFL);
-#  endif /* COHERENT */
+    act.sa_handler = fn;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = 0;
+    if (sigaction(sig, &act, NULL) == 0)
+	sigrelse(sig);
 }
 
-/* hold signal
- * only works with child and interrupt
- */
+static volatile sig_atomic_t alrmcatch_pending; /* = 0; */
+static volatile sig_atomic_t pchild_pending; /* = 0; */
+static volatile sig_atomic_t phup_pending; /* = 0; */
+static volatile sig_atomic_t pintr_pending; /* = 0; */
+int alrmcatch_disabled; /* = 0; */
+int phup_disabled; /* = 0; */
+int pchild_disabled; /* = 0; */
+int pintr_disabled; /* = 0; */
+
 void
-xsighold(int what)
+handle_pending_signals(void)
 {
-    if (what == SIGCHLD)
-	(void) signal(SIGCHLD, sig_ch_queue);
-
-#  ifdef COHERENT
-    (void) signal(what, SIG_IGN);
-#  endif /* COHERENT */
-}
-
-/* ignore signal
- */
-void
-xsigignore(int a)
-{
-    (void) signal(a, SIG_IGN);
-}
-
-/* atomically release one signal
- */
-void
-xsigpause(int what)
-{
-    /* From: Jim Mattson <mattson%cs@ucsd.edu> */
-    if (what == SIGCHLD)
-	pchild(SIGCHLD);
-}
-
-
-/* return either awaiting processes or do a wait now
- */
-pid_t
-ourwait(int *w)
-{
-    pid_t pid;
-
-#  ifdef JOBDEBUG
-    xprintf(CGETS(25, 1, "our wait %d\n"), stk_ptr);
-    flush();
-#  endif /* JOBDEBUG */
-
-    if (stk_ptr == -1) {
-	/* stack empty return signal from stack */
-	pid = (pid_t) wait(w);
-#  ifdef JOBDEBUG
-	xprintf("signal(SIGCHLD, pchild);\n");
-#  endif /* JOBDEBUG */
-	(void) signal(SIGCHLD, pchild);
-	return (pid);
+    if (!phup_disabled && phup_pending) {
+	phup_pending = 0;
+	phup();
     }
-    else {
-	/* return signal from stack */
-	errno = stk[stk_ptr].s_errno;
-	*w = stk[stk_ptr].s_w;
-	stk_ptr--;
-	return (stk[stk_ptr + 1].s_pid);
+    if (!pintr_disabled && pintr_pending) {
+	pintr_pending = 0;
+	pintr();
     }
-} /* end ourwait */
-
-#  ifdef COHERENT
-#   undef signal
-RETSIGTYPE
-(*xsignal(int a, signalfun_t b)) ()
-{
-    if (a == SIGCHLD)
-	return SIG_DFL;
-    else
-	return (signal(a, b));
-}
-#  endif /* COHERENT */
-
-# endif /* UNRELSIGS */
-
-# ifdef SXA
-/*
- * SX/A is SYSVREL3 but does not have sys5-sigpause().
- * I've heard that sigpause() is not defined in SYSVREL3.
- */
-/* This is not need if you make tcsh by BSD option's cc. */
-void
-sigpause(int what)
-{
-    if (what == SIGCHLD) {
-	(void) bsd_sigpause(bsd_sigblock((sigmask_t) 0) & ~sigmask(SIGBSDCHLD));
+    if (!pchild_disabled && pchild_pending) {
+	pchild_pending = 0;
+	pchild();
     }
-    else if (what == 0) {
-	pause();
-    }
-    else {
-	xprintf("sigpause(%d)\n", what);
-	pause();
+    if (!alrmcatch_disabled && alrmcatch_pending) {
+	alrmcatch_pending = 0;
+	alrmcatch();
     }
 }
-# endif /* SXA */
 
-#endif /* !BSDSIGS */
-
-#ifdef NEEDsignal
-/* turn into bsd signals */
-RETSIGTYPE
-(*xsignal(int s, signalfun_t a)) ()
-{
-    sigvec_t osv, sv;
-
-    (void) mysigvec(s, NULL, &osv);
-    sv = osv;
-    sv.sv_handler = a;
-#ifdef SIG_STK
-    sv.sv_onstack = SIG_STK;
-#endif /* SIG_STK */
-#ifdef SV_BSDSIG
-    sv.sv_flags = SV_BSDSIG;
-#endif /* SV_BSDSIG */
-
-    if (mysigvec(s, &sv, NULL) < 0)
-	return (BADSIG);
-    return (osv.sv_handler);
-}
-
-#endif /* NEEDsignal */
-
-#ifdef POSIXSIGS
-/*
- * Support for signals.
- */
-
-extern int errno;
-
-/* Set and test a bit.  Bits numbered 1 to 32 */
-
-#define SETBIT(x, y)	x |= sigmask(y)
-#define ISSET(x, y)	((x & sigmask(y)) != 0)
-
-#ifndef __PARAGON__
-/*
- * sigsetmask(mask)
- *
- * Set a new signal mask.  Return old mask.
- */
-sigmask_t
-sigsetmask(sigmask_t mask)
-{
-    sigset_t set, oset;
-    int     m;
-    int i;
-
-    (void) sigemptyset(&set);
-    (void) sigemptyset(&oset);
-
-    for (i = 1; i <= MAXSIG; i++)
-	if (ISSET(mask, i))
-	    (void) sigaddset(&set, i);
-
-    if ((sigprocmask(SIG_SETMASK, &set, &oset)) == -1) {
-	xprintf("sigsetmask(0x%x) - sigprocmask failed, errno %d",
-		mask, errno);
-    }
-
-    m = 0;
-    for (i = 1; i <= MAXSIG; i++)
-	if (sigismember(&oset, i) == 1)
-	    SETBIT(m, i);
-
-    return (m);
-}
-#endif /* __PARAGON__ */
-
-#ifndef __DGUX__
-/*
- * sigblock(mask)
- *
- * Add "mask" set of signals to the present signal mask.
- * Return old mask.
- */
-sigmask_t
-sigblock(sigmask_t mask)
-{
-    sigset_t set, oset;
-    int     m;
-    int i;
-
-    (void) sigemptyset(&set);
-    (void) sigemptyset(&oset);
-
-    /* Get present set of signals. */
-    if ((sigprocmask(SIG_SETMASK, NULL, &set)) == -1)
-	stderror(ERR_SYSTEM, "sigprocmask", strerror(errno));
-
-    /* Add in signals from mask. */
-    for (i = 1; i <= MAXSIG; i++)
-	if (ISSET(mask, i))
-	    (void) sigaddset(&set, i);
-
-    if ((sigprocmask(SIG_SETMASK, &set, &oset)) == -1)
-	stderror(ERR_SYSTEM, "sigprocmask", strerror(errno));
-
-    /* Return old mask to user. */
-    m = 0;
-    for (i = 1; i <= MAXSIG; i++)
-	if (sigismember(&oset, i) == 1)
-	    SETBIT(m, i);
-
-    return (m);
-}
-#endif /* __DGUX__ */
-
-
-/*
- * bsd_sigpause(mask)
- *
- * Set new signal mask and wait for signal;
- * Old mask is restored on signal.
- */
 void
-bsd_sigpause(sigmask_t mask)
+queue_alrmcatch(int sig)
 {
-    sigset_t set;
-    int i;
-
-    (void) sigemptyset(&set);
-
-    for (i = 1; i <= MAXSIG; i++)
-	if (ISSET(mask, i))
-	    (void) sigaddset(&set, i);
-    (void) sigsuspend(&set);
+    USE(sig);
+    alrmcatch_pending = 1;
 }
 
-/*
- * bsd_signal(sig, func)
- *
- * Emulate bsd style signal()
- */
-RETSIGTYPE (*bsd_signal(int sig, signalfun_t func)) ()
+void
+queue_pchild(int sig)
 {
-        struct sigaction act, oact;
-
-        if (sig < 0 || sig > MAXSIG) {
-                xprintf(CGETS(25, 2,
-			"error: bsd_signal(%d) signal out of range\n"), sig);
-                return((signalfun_t) SIG_IGN);
-        }
-
-        act.sa_handler = func;                  /* user function */
-        sigemptyset(&act.sa_mask);              /* signal mask */
-        act.sa_flags = 0;                       /* no special actions */
-
-        if (sigaction(sig, &act, &oact)) {
-                xprintf(CGETS(25, 3,
-			"error: bsd_signal(%d) - sigaction failed, errno %d\n"),
-			sig, errno);
-                return((signalfun_t) SIG_IGN);
-        }
-
-        return oact.sa_handler;
+    USE(sig);
+    pchild_pending = 1;
 }
-#endif /* POSIXSIG */
 
-
-#ifdef SIGSYNCH
-static long Synch_Cnt = 0; /* FIXME: not used */
-
-RETSIGTYPE
-synch_handler(int sno)
+void
+queue_phup(int sig)
 {
-    if (sno != SIGSYNCH)
-	abort();
-    Synch_Cnt++;
+    USE(sig);
+    phup_pending = 1;
 }
-#endif /* SIGSYNCH */
+
+void
+queue_pintr(int sig)
+{
+    USE(sig);
+    pintr_pending = 1;
+}
+
+void
+disabled_cleanup(void *xdisabled)
+{
+    int *disabled;
+
+    disabled = xdisabled;
+    if (--*disabled == 0)
+	handle_pending_signals();
+}
+
+void
+pintr_disabled_restore(void *xold)
+{
+    int *old;
+
+    old = xold;
+    pintr_disabled = *old;
+}
+
+void
+pintr_push_enable(int *saved)
+{
+    *saved = pintr_disabled;
+    pintr_disabled = 0;
+    cleanup_push(saved, pintr_disabled_restore);
+    handle_pending_signals();
+}

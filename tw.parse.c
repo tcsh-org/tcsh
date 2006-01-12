@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.110 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.111 2006/01/12 19:43:01 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.110 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.111 2006/01/12 19:43:01 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -170,6 +170,7 @@ tenematch(Char *inputline, int num_read, COMMAND command)
     int     backq = 0;
 
     str_end = &inputline[num_read];
+    cleanup_push(&qline, Strbuf_cleanup);
 
     word_start = inputline;
     word = cmd_start = 0;
@@ -296,22 +297,25 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	    slshp = STRNULL;
 	Strbuf_append(&wordbuf, qline.s + wordp);
 	Strbuf_terminate(&wordbuf);
+	cleanup_push(&wordbuf, Strbuf_cleanup);
 	search_ret = t_search(&wordbuf, command, looking, 1, pat, suf);
 	qline.len = wordp;
 	Strbuf_append(&qline, wordbuf.s);
 	Strbuf_terminate(&qline);
-	xfree(wordbuf.s);
+	cleanup_until(&wordbuf);
 	SearchNoDirErr = 0;
 
 	if (search_ret == -2) {
 	    Char *rword;
 
 	    rword = Strsave(slshp);
+	    cleanup_push(rword, xfree);
 	    if (slshp != STRNULL)
 		*slshp = '\0';
 	    wordbuf.len = 0;
 	    Strbuf_append(&wordbuf, qline.s + wordp);
 	    Strbuf_terminate(&wordbuf);
+	    cleanup_push(&wordbuf, Strbuf_cleanup);
 	    search_ret = spell_me(&wordbuf, looking, pat, suf);
 	    if (search_ret == 1) {
 		Strbuf_append(&wordbuf, rword);
@@ -322,8 +326,7 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	    qline.len = wordp;
 	    Strbuf_append(&qline, wordbuf.s);
 	    Strbuf_terminate(&qline);
-	    xfree(wordbuf.s);
-	    xfree(rword);
+	    cleanup_until(rword);
 	}
 	if (qline.s[wp] != '\0' &&
 	    insert_meta(word_start, str_end, qline.s + word, !qu) < 0)
@@ -346,11 +349,12 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	}
 	Strbuf_append(&wordbuf, qline.s + wordp);
 	Strbuf_terminate(&wordbuf);
+	cleanup_push(&wordbuf, Strbuf_cleanup);
 	search_ret = spell_me(&wordbuf, looking, pat, suf);
 	qline.len = wordp;
 	Strbuf_append(&qline, wordbuf.s);
 	Strbuf_terminate(&qline);
-	xfree(wordbuf.s);
+	cleanup_until(&wordbuf);
 	if (search_ret == 1) {
 	    if (insert_meta(word_start, str_end, qline.s + word, !qu) < 0)
 		goto err;		/* error inserting */
@@ -367,11 +371,14 @@ tenematch(Char *inputline, int num_read, COMMAND command)
     case GLOB_EXPAND:
 	items[0] = Strsave(qline.s + wordp);
 	items[1] = NULL;
+	cleanup_push(items[0], xfree);
 	ptr = items;
 	count = (looking == TW_COMMAND && Strchr(qline.s + wordp, '/') == 0) ?
 		c_glob(&ptr) :
 		t_glob(&ptr, looking == TW_COMMAND);
-	xfree(items[0]);
+	cleanup_until(items[0]);
+	if (ptr != items)
+	    cleanup_push(ptr, blk_cleanup);
 	if (count > 0) {
 	    if (command == GLOB)
 		print_by_column(STRNULL, ptr, count, 0);
@@ -382,13 +389,15 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 			(void) quote(ptr[i]);
 			if (insert_meta(0, 0, ptr[i], 0) < 0 ||
 			    InsertStr(STRspace) < 0) {
-			    blkfree(ptr);
+			    if (ptr != items)
+				cleanup_until(ptr);
 			    goto err;		/* error inserting */
 			}
 		    }
 	    }
-	    blkfree(ptr);
 	}
+	if (ptr != items)
+	    cleanup_until(ptr);
 	search_ret = count;
 	break;
 
@@ -425,6 +434,7 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	int found;
 
 	found = !cmd_expand(qline.s + wordp, &p);
+	cleanup_push(p, xfree);
 	if (!found) {
 	    xfree(p);
 	    search_ret = 0;
@@ -445,11 +455,12 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 
 	Strbuf_append(&wordbuf, qline.s + wordp);
 	Strbuf_terminate(&wordbuf);
+	cleanup_push(&wordbuf, Strbuf_cleanup);
 	search_ret = t_search(&wordbuf, LIST, looking, 1, pat, suf);
 	qline.len = wordp;
 	Strbuf_append(&qline, wordbuf.s);
 	Strbuf_terminate(&qline);
-	xfree(wordbuf.s);
+	cleanup_until(&wordbuf);
 	break;
     }
 
@@ -458,11 +469,11 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	search_ret = 1;
     }
  end:
-    xfree(qline.s);
+    cleanup_until(&qline);
     return search_ret;
 
  err:
-    xfree(qline.s);
+    cleanup_until(&qline);
     return -1;
 } /* end tenematch */
 
@@ -480,11 +491,14 @@ t_glob(Char ***v, int cmd)
 	return (0);
     gflag = tglob(*v);
     if (gflag) {
+	size_t omark;
+
 	getexit(osetexit);	/* make sure to come back here */
+	omark = cleanup_push_mark();
 	if (setexit() == 0)
 	    *v = globall(*v, gflag);
+	cleanup_pop_mark(omark);
 	resexit(osetexit);
-	gargv = 0;
 	if (haderr) {
 	    haderr = 0;
 	    NeedsRedraw = 1;
@@ -498,9 +512,9 @@ t_glob(Char ***v, int cmd)
 
     if (cmd) {
 	Char **av = *v, *p;
-	int fwd, i, ac = gargc;
+	int fwd, i;
 
-	for (i = 0, fwd = 0; i < ac; i++) 
+	for (i = 0, fwd = 0; av[i] != NULL; i++) 
 	    if (!executable(NULL, av[i], 0)) {
 		fwd++;		
 		p = av[i];
@@ -512,11 +526,9 @@ t_glob(Char ***v, int cmd)
 
 	if (fwd)
 	    av[i - fwd] = av[i];
-	gargc -= fwd;
-	av[gargc] = NULL;
     }
 
-    return (gargc);
+    return blklen(*v);
 } /* end t_glob */
 
 
@@ -526,35 +538,30 @@ t_glob(Char ***v, int cmd)
 static int
 c_glob(Char ***v)
 {
-    Char *pat = **v, **av;
+    struct blk_buf av = BLK_BUF_INIT;
     struct Strbuf cmd = Strbuf_INIT, dir = Strbuf_INIT;
-    int flag, at, ac;
+    Char *pat = **v;
+    int flag;
 
     if (pat == NULL)
 	return (0);
 
-    ac = 0;
-    at = 10;
-    av = xmalloc(at * sizeof(Char *));
-    av[ac] = NULL;
+    cleanup_push(&av, bb_cleanup);
+    cleanup_push(&cmd, Strbuf_cleanup);
+    cleanup_push(&dir, Strbuf_cleanup);
 
     tw_cmd_start(NULL, NULL);
-    while (cmd.len = 0, tw_cmd_next(&cmd, &dir, &flag) != 0)
+    while (cmd.len = 0, tw_cmd_next(&cmd, &dir, &flag) != 0) {
 	Strbuf_terminate(&cmd);
-	if (Gmatch(cmd.s, pat)) {
-	    if (ac + 1 >= at) {
-		at += 10;
-		av = xrealloc(av, at * sizeof(Char *));
-	    }
-	    av[ac++] = Strsave(cmd.s);
-	    av[ac] = NULL;
-	}
+	if (Gmatch(cmd.s, pat))
+	    bb_append(&av, Strsave(cmd.s));
+    }
     tw_dir_end();
-    *v = av;
-    xfree(dir.s);
-    xfree(cmd.s);
+    *v = bb_finish(&av);
+    cleanup_ignore(&av);
+    cleanup_until(&av);
 
-    return (ac);
+    return av.len;
 } /* end c_glob */
 
 
@@ -940,6 +947,8 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 		break;
 	    }
 
+    cleanup_push(&item, Strbuf_cleanup);
+    cleanup_push(&buf, Strbuf_cleanup);
     while (!done &&
 	   (item.len = 0,
 	    tw_next_entry[looking](&item, exp_dir, &flags) != 0)) {
@@ -1150,8 +1159,7 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 	xprintf("done item = %S\n", item.s);
 #endif
     }
-    xfree(buf.s);
-    xfree(item.s);
+    cleanup_until(&item);
 
     if (command == RECOGNIZE_SCROLL) {
 	if ((cnt <= curchoice) || (curchoice == -1)) {
@@ -1290,7 +1298,7 @@ tw_collect(COMMAND command, int looking, struct Strbuf *exp_dir,
 	   struct Strbuf *exp_name, Char *target, Char *pat, int flags,
 	   DIR *dir_fd)
 {
-    volatile int ni;
+    int ni;
     jmp_buf_t osetexit;
 
 #ifdef TDEBUG
@@ -1299,20 +1307,26 @@ tw_collect(COMMAND command, int looking, struct Strbuf *exp_dir,
     ni = 0;
     getexit(osetexit);
     for (;;) {
+	volatile size_t omark;
+
 	(*tw_start_entry[looking])(dir_fd, pat);
 	InsideCompletion = 1;
 	if (setexit()) {
+	    cleanup_pop_mark(omark);
+	    resexit(osetexit);
 	    /* interrupted, clean up */
 	    haderr = 0;
 	    ni = -1; /* flag error */
 	    break;
 	}
-        if ((ni = tw_collect_items(command, looking, exp_dir, exp_name,
-			           target, pat,
-				   ni >= 0 ? flags : flags & ~TW_IGN_OK)) >= 0)
+	omark = cleanup_push_mark();
+	ni = tw_collect_items(command, looking, exp_dir, exp_name, target, pat,
+			      ni >= 0 ? flags : flags & ~TW_IGN_OK);
+	cleanup_pop_mark(omark);
+	resexit(osetexit);
+        if (ni >= 0)
 	    break;
     }
-    resexit(osetexit);
     InsideCompletion = 0;
 #if defined(SOLARIS2) && defined(i386) && !defined(__GNUC__)
     /* Compiler bug? (from PWP) */
@@ -1397,14 +1411,15 @@ tw_list_items(int looking, int numitems, int list_max)
 	}
 
 	sname = strsave(name);
+	cleanup_push(sname, xfree);
 	xprintf(CGETS(30, 7, "There are %d %s, list them anyway? [n/y] "),
 		maxs, sname);
-	xfree(sname);
+	cleanup_until(sname);
 	flush();
 	/* We should be in Rawmode here, so no \n to catch */
-	(void) read(SHIN, &tc, 1);
+	(void) xread(SHIN, &tc, 1);
 	xprintf("%c\r\n", tc);	/* echo the char, do a newline */
-	/* 
+	/*
 	 * Perhaps we should use the yesexpr from the
 	 * actual locale
 	 */
@@ -1467,6 +1482,8 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
     non_unique_match = FALSE;	/* See the recexact code below */
 
     extract_dir_and_name(word->s, &dir, &name);
+    cleanup_push(&dir, Strbuf_cleanup);
+    cleanup_push(&name, xfree_indirect);
 
     /*
      *  SPECIAL HARDCODED COMPLETIONS:
@@ -1499,6 +1516,7 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 	Strbuf_append(&exp_dir, dir.s);
     }
     Strbuf_terminate(&exp_dir);
+    cleanup_push(&exp_dir, Strbuf_cleanup);
 
     switch (looking & ~TW_PATH) {
     case TW_NONE:
@@ -1517,7 +1535,7 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 	}
 #ifdef notdef
 	/* PWP: don't even bother when doing ALL of the commands */
-	if (looking == TW_COMMAND && word->len == 0)) {
+	if (looking == TW_COMMAND && word->len == 0) {
 	    res = -1;
 	    goto err_dir;
 	}
@@ -1554,6 +1572,8 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 #endif
 
     switch (looking) {
+	Char *user_name;
+
     case TW_ALIAS:
     case TW_SHELLVAR:
     case TW_ENVVAR:
@@ -1664,26 +1684,26 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 	break;
 
     case TW_LOGNAME:
-	word->s++;
+	user_name = word->s + 1;
+	goto do_user;
+
 	/*FALLTHROUGH*/
     case TW_USER:
+	user_name = word->s;
+    do_user:
 	/*
 	 * Check if the spelling was already correct
 	 * From: Rob McMahon <cudcv@cu.warwick.ac.uk>
 	 */
-	if (command == SPELL && getpwnam(short2str(word->s)) != NULL) {
+	if (command == SPELL && xgetpwnam(short2str(user_name)) != NULL) {
 #ifdef YPBUGS
 	    fix_yp_bugs();
 #endif /* YPBUGS */
 	    res = 0;
-	    if (looking == TW_LOGNAME)
-		word->s--;
 	    goto err_dir;
 	}
 	xfree(name);
-	target = name = Strsave(word->s);	/* name sans ~ */
-	if (looking == TW_LOGNAME)
-	    word->s--;
+	target = name = Strsave(user_name);
 	break;
 
     case TW_COMMAND:
@@ -1701,6 +1721,7 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 	goto err_dir;
     }
 
+    cleanup_push(&exp_name, Strbuf_cleanup);
     numitems = tw_collect(command, looking, &exp_dir, &exp_name, target, pat,
 			  flags, dir_fd);
     if (numitems == -1)
@@ -1748,10 +1769,8 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
     }
  end:
     res = numitems;
-    xfree(exp_name.s);
  err_dir:
-    xfree(exp_dir.s);
-    xfree(dir.s);
+    cleanup_until(&dir);
     return res;
 } /* end t_search */
 
@@ -1775,7 +1794,7 @@ extract_dir_and_name(const Char *path, struct Strbuf *dir, Char **name)
     else {
 	p++;
 	*name = Strsave(p);
-	Strbuf_appendn(dir, path, p - path + 1);
+	Strbuf_appendn(dir, path, p - path);
     }
     Strbuf_terminate(dir);
 } /* end extract_dir_and_name */
@@ -1871,6 +1890,7 @@ expand_dir(const Char *dir, struct Strbuf *edir, DIR **dfd, COMMAND cmd)
     Char *tdir;
 
     tdir = dollar(dir);
+    cleanup_push(tdir, xfree);
     if (tdir == NULL ||
 	(tilde(edir, tdir) != 0) ||
 	!(nd = dnormalize(edir->len ? edir->s : STRdot,
@@ -1878,7 +1898,7 @@ expand_dir(const Char *dir, struct Strbuf *edir, DIR **dfd, COMMAND cmd)
 	((*dfd = opendir(short2str(nd))) == NULL)) {
 	xfree(nd);
 	if (cmd == SPELL || SearchNoDirErr) {
-	    xfree(tdir);
+	    cleanup_until(tdir);
 	    return (-2);
 	}
 	/*
@@ -1890,10 +1910,10 @@ expand_dir(const Char *dir, struct Strbuf *edir, DIR **dfd, COMMAND cmd)
 		(errno == ENOENT ? CGETS(30, 11, "not found") :
 		 CGETS(30, 12, "unreadable"))));
 	NeedsRedraw = 1;
-	xfree(tdir);
+	cleanup_until(tdir);
 	return (-1);
     }
-    xfree(tdir);
+    cleanup_until(tdir);
     if (nd) {
 	if (*dir != '\0') {
 	    int slash;
@@ -2135,8 +2155,7 @@ print_by_column(Char *dir, Char *items[], int count, int no_file_suffix)
 		}
 		else {
 		    /* Print filename followed by '/' or '*' or ' ' */
-		    xprintf("%-S%c", items[i],
-			    filetype(dir, items[i]));
+		    xprintf("%-S%c", items[i], filetype(dir, items[i]));
 		    wx++;
 		}
 #endif /* COLOR_LS_F */
@@ -2277,6 +2296,7 @@ choose_scroll_tab(struct Strbuf *exp_name, int cnt)
     Char **ptr;
 
     ptr = xmalloc(sizeof(Char *) * cnt);
+    cleanup_push(ptr, xfree);
 
     for(loop = scroll_tab; loop && (tmp >= 0); loop = loop->next)
 	ptr[--tmp] = loop->element;
@@ -2286,7 +2306,7 @@ choose_scroll_tab(struct Strbuf *exp_name, int cnt)
     exp_name->len = 0;
     Strbuf_append(exp_name, ptr[curchoice]);
     Strbuf_terminate(exp_name);
-    xfree(ptr);
+    cleanup_until(ptr);
 }
 
 static void

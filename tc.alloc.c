@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.40 2005/04/11 22:10:58 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.41 2006/01/12 19:43:01 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -40,7 +40,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.40 2005/04/11 22:10:58 kim Exp $")
+RCSID("$Id: tc.alloc.c,v 3.41 2006/01/12 19:43:01 christos Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -53,6 +53,15 @@ int dont_free = 0;
 # define calloc		fcalloc
 # define realloc	frealloc
 #endif /* WINNT_NATIVE */
+
+static void
+out_of_memory (void)
+{
+    static const char msg[] = "Out of memory\n";
+
+    write(didfds ? 2 : SHDIAG, msg, strlen(msg));
+    _exit(1);
+}
 
 #ifndef SYSMALLOC
 
@@ -195,7 +204,7 @@ malloc(size_t nbytes)
     if ((p = nextf[bucket]) == NULL) {
 	child++;
 #ifndef DEBUG
-	stderror(ERR_NOMEM);
+	out_of_memory();
 #else
 	showall(NULL, NULL);
 	xprintf(CGETS(19, 1, "nbytes=%d: Out of memory\n"), nbytes);
@@ -482,10 +491,8 @@ smalloc(size_t n)
 	membot = sbrk(0);
 #endif /* HAVE_SBRK */
 
-    if ((ptr = malloc(n)) == NULL) {
-	child++;
-	stderror(ERR_NOMEM);
-    }
+    if ((ptr = malloc(n)) == NULL)
+	out_of_memory();
 #ifndef HAVE_SBRK
     if (memtop < ((char *) ptr) + n)
 	memtop = ((char *) ptr) + n;
@@ -507,10 +514,8 @@ srealloc(ptr_t p, size_t n)
 	membot = sbrk(0);
 #endif /* HAVE_SBRK */
 
-    if ((ptr = (p ? realloc(p, n) : malloc(n))) == NULL) {
-	child++;
-	stderror(ERR_NOMEM);
-    }
+    if ((ptr = (p ? realloc(p, n) : malloc(n))) == NULL)
+	out_of_memory();
 #ifndef HAVE_SBRK
     if (memtop < ((char *) ptr) + n)
 	memtop = ((char *) ptr) + n;
@@ -533,10 +538,8 @@ scalloc(size_t s, size_t n)
 	membot = sbrk(0);
 #endif /* HAVE_SBRK */
 
-    if ((ptr = malloc(n)) == NULL) {
-	child++;
-	stderror(ERR_NOMEM);
-    }
+    if ((ptr = malloc(n)) == NULL)
+	out_of_memory();
 
     memset (ptr, 0, n);
 

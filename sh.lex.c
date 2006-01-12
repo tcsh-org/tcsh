@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.64 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.65 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.64 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.65 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 
@@ -164,6 +164,7 @@ lex(struct wordent *hp)
 	getexcl(c);
     else
 	unreadc(c);
+    cleanup_push(hp, lex_cleanup);
     wdp = hp;
     /*
      * The following loop is written so that the links needed by freelex will
@@ -173,7 +174,7 @@ lex(struct wordent *hp)
 	struct wordent *new;
 
 	new = xmalloc(sizeof(*new));
-	new->word = STRNULL;
+	new->word = NULL;
 	new->prev = wdp;
 	new->next = hp;
 	wdp->next = new;
@@ -182,6 +183,8 @@ lex(struct wordent *hp)
 	wdp->word = word(parsehtime);
 	parsehtime = 0;
     } while (wdp->word[0] != '\n');
+    cleanup_ignore(hp);
+    cleanup_until(hp);
     Strbuf_terminate(&histline);
     if (histline.len != 0 && histline.s[histline.len - 1] == '\n')
 	histline.s[histline.len - 1] = '\0';
@@ -241,7 +244,7 @@ copylex(struct wordent *hp, struct wordent *fp)
 	struct wordent *new;
 
 	new = xmalloc(sizeof(*new));
-	new->word = STRNULL;
+	new->word = NULL;
 	new->prev = wdp;
 	new->next = hp;
 	wdp->next = new;
@@ -266,6 +269,15 @@ freelex(struct wordent *vp)
     vp->prev = vp;
 }
 
+void
+lex_cleanup(void *xvp)
+{
+    struct wordent *vp;
+
+    vp = xvp;
+    freelex(vp);
+}
+
 static Char *
 word(int parsehtime)
 {
@@ -276,6 +288,7 @@ word(int parsehtime)
     int	    h;
     int dolflg;
 
+    cleanup_push(&wbuf, Strbuf_cleanup);
 loop:
     while ((c = getC(DOALL)) == ' ' || c == '\t')
 	continue;
@@ -410,6 +423,8 @@ loop:
 	}
     }
 ret:
+    cleanup_ignore(&wbuf);
+    cleanup_until(&wbuf);
     return Strbuf_finish(&wbuf);
 }
 
@@ -483,6 +498,7 @@ getdol(void)
 	ungetC('$' | QUOTE);
 	return;
     }
+    cleanup_push(&name, Strbuf_cleanup);
     Strbuf_append1(&name, '$');
     if (c == '{')
 	Strbuf_append1(&name, c), c = getC(DOEXCL);
@@ -631,6 +647,8 @@ getdol(void)
 	Strbuf_append1(&name, c);
     }
  end:
+    cleanup_ignore(&name);
+    cleanup_until(&name);
     addla(Strbuf_finish(&name));
 }
 
@@ -1223,7 +1241,7 @@ gethent(Char sc)
 		Strbuf_append1(&lhsb, c);
 	    }
 	    if (lhsb.len == 0) {
-		lhsb.len = Strlen(lhsb.s); /* lhsb.s wasn't chagned */
+		lhsb.len = Strlen(lhsb.s); /* lhsb.s wasn't changed */
 		if (lhsb.len == 0) {
 		    seterror(ERR_NOSEARCH);
 		    return (0);
@@ -1483,7 +1501,7 @@ reread:
 					"\nUse \"exit\" to leave %s.\n"),
 					progname);
 			}
-			reset();
+		    reset();
 		} else {
 			/* If we don't have ignoreeof set, just fall through */
 			;	/* EMPTY */
@@ -1532,10 +1550,8 @@ wide_read(int fildes, Char *buf, size_t nchars, int use_fclens)
     do {
 	size_t i;
 	
-	do
-	    r = read(fildes, cbuf + partial,
-		     nchars > partial ? nchars - partial : 1);
-	while (partial != 0 && r < 0 && errno == EINTR);
+	r = xread(fildes, cbuf + partial,
+		  nchars > partial ? nchars - partial : 1);
 	if (partial == 0 && r <= 0)
 	    break;
 	partial += r;
@@ -1584,9 +1600,7 @@ bgetc(void)
 	}
 	if (fseekp == feobp) {
 	    fbobp = feobp;
-	    do
-		c = wide_read(SHIN, fbuf[0], BUFSIZE, 1);
-	    while (c < 0 && errno == EINTR);
+	    c = wide_read(SHIN, fbuf[0], BUFSIZE, 1);
 #ifdef convex
 	    if (c < 0)
 		stderror(ERR_SYSTEM, progname, strerror(errno));
@@ -1616,7 +1630,7 @@ bgetc(void)
 	    fseekp = feobp;		/* where else? */
 #if defined(FILEC) && defined(TIOCSTI)
 	    if (!editing)
-		c = numleft = tenex(InputBuf, BUFSIZE);/*FIXBUF*/
+		c = numleft = tenex(InputBuf, BUFSIZE);
 	    else
 #endif /* FILEC && TIOCSTI */
 	    c = numleft = Inputl();	/* PWP: get a line */

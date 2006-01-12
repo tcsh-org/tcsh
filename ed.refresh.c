@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.41 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.42 2006/01/12 19:43:00 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.41 2006/01/12 18:15:24 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.42 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -96,7 +96,7 @@ dprintf(char *fmt, ...)
 	va_start(va, fmt);
 
 	if (fd == -1)
-	    fd = open(dtty, O_RDWR);
+	    fd = xopen(dtty, O_RDWR);
 	o = SHOUT;
 	flush();
 	SHOUT = fd;
@@ -291,6 +291,8 @@ RefreshPromptpart(Char *buf)
     NLSChar c;
     int l, w;
 
+    if (buf == NULL)
+	return;
     for (cp = buf; *cp; ) {
 	if (*cp & LITERAL) {
 	    Char *litstart = cp;
@@ -1127,7 +1129,7 @@ RefCursor(void)
     v = 0;
     th = TermH;			/* optimize for speed */
 
-    for (cp = Prompt; *cp; ) {	/* do prompt */
+    for (cp = Prompt; cp != NULL && *cp; ) {	/* do prompt */
 	if (*cp & LITERAL) {
 	    cp++;
 	    continue;

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.term.c,v 1.33 2005/08/02 21:04:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.term.c,v 1.34 2006/01/12 18:15:24 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #ifndef WINNT_NATIVE
 
-RCSID("$Id: ed.term.c,v 1.33 2005/08/02 21:04:50 christos Exp $")
+RCSID("$Id: ed.term.c,v 1.34 2006/01/12 18:15:24 christos Exp $")
 
 #include "ed.h"
 
@@ -595,6 +595,7 @@ dosetty(Char **v, struct command *t)
 
     USE(t);
     cmdname = strsave(short2str(*v++));
+    cleanup_push(cmdname, xfree);
     setname(cmdname);
 
     while (v && *v && v[0][0] == '-' && v[0][2] == '\0') 
@@ -616,8 +617,7 @@ dosetty(Char **v, struct command *t)
 	    z = QU_IO;
 	    break;
 	default:
-	    xfree(cmdname);
-	    stderror(ERR_NAME | ERR_SYSTEM, short2str(v[0]), 
+	    stderror(ERR_NAME | ERR_SYSTEM, short2str(v[0]),
 		     CGETS(8, 1, "Unknown switch"));
 	    break;
 	}
@@ -628,7 +628,7 @@ dosetty(Char **v, struct command *t)
 	int len = 0, st = 0, cu;
 	for (m = modelist; m->m_name; m++) {
 	    if (m->m_type != i) {
-		xprintf("%s%s", i != -1 ? "\n" : "", 
+		xprintf("%s%s", i != -1 ? "\n" : "",
 			ttylist[z][m->m_type].t_name);
 		i = m->m_type;
 		st = len = strlen(ttylist[z][m->m_type].t_name);
@@ -652,7 +652,7 @@ dosetty(Char **v, struct command *t)
 	    }
 	}
 	xputchar('\n');
-	xfree(cmdname);
+	cleanup_until(cmdname);
 	return;
     }
     while (v && (s = *v++)) {
@@ -687,7 +687,7 @@ dosetty(Char **v, struct command *t)
 	    break;
 	}
     }
-    xfree(cmdname);
+    cleanup_until(cmdname);
 } /* end dosetty */
 
 int
@@ -725,7 +725,7 @@ int
 tty_setty(int fd, ttydata_t *td)
 {
 #ifdef POSIX
-    RETRY(tcsetattr(fd, TCSADRAIN, &td->d_t)); 
+    RETRY(xtcsetattr(fd, TCSADRAIN, &td->d_t)); 
 #else
 # ifdef TERMIO
     RETRY(ioctl(fd, TCSETAW,    (ioctl_t) &td->d_t));

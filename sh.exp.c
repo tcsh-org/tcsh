@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exp.c,v 3.47 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exp.c,v 3.48 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.47 2006/01/12 18:15:24 christos Exp $")
+RCSID("$Id: sh.exp.c,v 3.48 2006/01/12 19:43:00 christos Exp $")
 
 #include "tw.h"
 
@@ -283,12 +283,14 @@ exp2c(Char ***vp, int ignore)
     Char *p2;
     int i;
 
+    cleanup_push(p1, xfree);
     etracc("exp2c p1", p1, vp);
     if ((i = isa(**vp, EQOP)) != 0) {
 	(*vp)++;
 	if (i == EQMATCH || i == NOTEQMATCH)
 	    ignore |= TEXP_NOGLOB;
 	p2 = exp3(vp, ignore);
+	cleanup_push(p2, xfree);
 	etracc("exp2c p2", p2, vp);
 	if (!(ignore & TEXP_IGNORE))
 	    switch (i) {
@@ -309,12 +311,11 @@ exp2c(Char ***vp, int ignore)
 		i = !Gmatch(p1, p2);
 		break;
 	    }
-	xfree(p1);
-	xfree(p2);
+	cleanup_until(p1);
 	return (i);
     }
     i = egetn(p1);
-    xfree(p1);
+    cleanup_until(p1);
     return (i);
 }
 
@@ -330,7 +331,9 @@ exp3(Char ***vp, int ignore)
 	(*vp)++;
 	if (**vp && eq(**vp, STRequal))
 	    i |= 1, (*vp)++;
+	cleanup_push(p1, xfree);
 	p2 = exp3(vp, ignore);
+	cleanup_push(p2, xfree);
 	etracc("exp3 p2", p2, vp);
 	if (!(ignore & TEXP_IGNORE))
 	    switch (i) {
@@ -351,8 +354,7 @@ exp3(Char ***vp, int ignore)
 		i = egetn(p1) <= egetn(p2);
 		break;
 	    }
-	xfree(p1);
-	xfree(p2);
+	cleanup_until(p1);
 	return (putn(i));
     }
     return (p1);
@@ -370,14 +372,15 @@ exp3a(Char ***vp, int ignore)
     op = **vp;
     if (op && any("<>", op[0]) && op[0] == op[1]) {
 	(*vp)++;
+	cleanup_push(p1, xfree);
 	p2 = exp3a(vp, ignore);
+	cleanup_push(p2, xfree);
 	etracc("exp3a p2", p2, vp);
 	if (op[0] == '<')
 	    i = egetn(p1) << egetn(p2);
 	else
 	    i = egetn(p1) >> egetn(p2);
-	xfree(p1);
-	xfree(p2);
+	cleanup_until(p1);
 	return (putn(i));
     }
     return (p1);
@@ -394,7 +397,9 @@ exp4(Char ***vp, int ignore)
     if (isa(**vp, ADDOP)) {
 	const Char *op = *(*vp)++;
 
+	cleanup_push(p1, xfree);
 	p2 = exp4(vp, ignore);
+	cleanup_push(p2, xfree);
 	etracc("exp4 p2", p2, vp);
 	if (!(ignore & TEXP_IGNORE))
 	    switch (op[0]) {
@@ -407,8 +412,7 @@ exp4(Char ***vp, int ignore)
 		i = egetn(p1) - egetn(p2);
 		break;
 	    }
-	xfree(p1);
-	xfree(p2);
+	cleanup_until(p1);
 	return (putn(i));
     }
     return (p1);
@@ -425,14 +429,18 @@ exp5(Char ***vp, int ignore)
 
     if (isa(**vp, MULOP)) {
 	const Char *op = *(*vp)++;
-	if ((ignore & TEXP_NOGLOB) != 0)
+	if ((ignore & TEXP_NOGLOB) != 0) {
 	    /*
 	     * We are just trying to get the right side of
 	     * a =~ or !~ operator
 	     */
+	    xfree(p1);
 	    return Strsave(op);
+	}
 
+	cleanup_push(p1, xfree);
 	p2 = exp5(vp, ignore);
+	cleanup_push(p2, xfree);
 	etracc("exp5 p2", p2, vp);
 	if (!(ignore & TEXP_IGNORE))
 	    switch (op[0]) {
@@ -455,8 +463,7 @@ exp5(Char ***vp, int ignore)
 		i = egetn(p1) % i;
 		break;
 	    }
-	xfree(p1);
-	xfree(p2);
+	cleanup_until(p1);
 	return (putn(i));
     }
     return (p1);
@@ -473,17 +480,19 @@ exp6(Char ***vp, int ignore)
     if (eq(**vp, STRbang)) {
 	(*vp)++;
 	cp = exp6(vp, ignore);
+	cleanup_push(cp, xfree);
 	etracc("exp6 ! cp", cp, vp);
 	i = egetn(cp);
-	xfree(cp);
+	cleanup_until(cp);
 	return (putn(!i));
     }
     if (eq(**vp, STRtilde)) {
 	(*vp)++;
 	cp = exp6(vp, ignore);
+	cleanup_push(cp, xfree);
 	etracc("exp6 ~ cp", cp, vp);
 	i = egetn(cp);
-	xfree(cp);
+	cleanup_until(cp);
 	return (putn(~i));
     }
     if (eq(**vp, STRLparen)) {
@@ -517,13 +526,14 @@ exp6(Char ***vp, int ignore)
 	if (ignore & TEXP_IGNORE)
 	    return (Strsave(STRNULL));
 	psavejob();
+	cleanup_push(&faket, psavejob_cleanup); /* faket is only a marker */
 	if (pfork(&faket, -1) == 0) {
 	    *--(*vp) = 0;
 	    evalav(v);
 	    exitstat();
 	}
 	pwait();
-	prestjob();
+	cleanup_until(&faket);
 	etraci("exp6 {} status", egetn(varval(STRstatus)), vp);
 	return (putn(egetn(varval(STRstatus)) == 0));
     }
@@ -623,6 +633,7 @@ filetest(Char *cp, Char ***vp, int ignore)
     if (ignore & TEXP_IGNORE)
 	return (Strsave(STRNULL));
     ep = globone(dp, G_APPEND);
+    cleanup_push(ep, xfree);
     ft = &cp[1];
     do 
 	switch (*ft) {
@@ -659,7 +670,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 		if (!lst) {
 		    lst = &lstb;
 		    if (TCSH_LSTAT(short2str(ep), lst) == -1) {
-			xfree(ep);
+			cleanup_until(ep);
 			return (Strsave(errval));
 		    }
 		}
@@ -674,7 +685,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 		if (!st) {
 		    st = &stb;
 		    if (TCSH_STAT(short2str(ep), st) == -1) {
-			xfree(ep);
+			cleanup_until(ep);
 			return (Strsave(errval));
 		    }
 		}
@@ -808,7 +819,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 		(void) Strcat(Strcat(Strcpy(strF, strdev), STRcolon), strino);
 		xfree(strdev);
 		xfree(strino);
-		xfree(ep);
+		cleanup_until(ep);
 		return(strF);
 		
 	    case 'L':
@@ -821,7 +832,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 		string = areadlink(filnam);
 		strF = string == NULL ? errval : str2short(string);
 		xfree(string);
-		xfree(ep);
+		cleanup_until(ep);
 		return(Strsave(strF));
 
 #else /* !S_ISLNK */
@@ -841,20 +852,20 @@ filetest(Char *cp, Char ***vp, int ignore)
 		    ((S_IRWXU|S_IRWXG|S_IRWXO|S_ISUID|S_ISGID) & st->st_mode));
 		if (altout && *string != '0')
 		    *--string = '0';
-		xfree(ep);
+		cleanup_until(ep);
 		return(Strsave(str2short(string)));
 
 	    case 'U':
-		if (altout && (pw = getpwuid(st->st_uid))) {
-		    xfree(ep);
+		if (altout && (pw = xgetpwuid(st->st_uid))) {
+		    cleanup_until(ep);
 		    return(Strsave(str2short(pw->pw_name)));
 		}
 		i = (int) st->st_uid;
 		break;
 
 	    case 'G':
-		if ( altout && (gr = getgrgid(st->st_gid))) {
-		    xfree(ep);
+		if (altout && (gr = xgetgrgid(st->st_gid))) {
+		    cleanup_until(ep);
 		    return(Strsave(str2short(gr->gr_name)));
 		}
 		i = (int) st->st_gid;
@@ -871,7 +882,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 		    strF = str2short(ctime(&footime));
 		    if ((str = Strchr(strF, '\n')) != NULL)
 			*str = (Char) '\0';
-		    xfree(ep);
+		    cleanup_until(ep);
 		    return(Strsave(strF));
 		}
 		i = (int) footime;
@@ -881,7 +892,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 	}
     while (*++ft && i);
     etraci("exp6 -? i", i, vp);
-    xfree(ep);
+    cleanup_until(ep);
     return (putn(i));
 }
 
@@ -894,7 +905,7 @@ evalav(Char **v)
     struct command *t;
     struct wordent *wdp = hp;
 
-    set(STRstatus, Strsave(STR0), VAR_READWRITE);
+    setcopy(STRstatus, STR0, VAR_READWRITE);
     hp->prev = hp->next = hp;
     hp->word = STRNULL;
     while (*v) {
@@ -907,12 +918,14 @@ evalav(Char **v)
 	wdp->word = Strsave(*v++);
     }
     hp->prev = wdp;
+    cleanup_push(&paraml1, lex_cleanup);
     alias(&paraml1);
     t = syntax(paraml1.next, &paraml1, 0);
+    cleanup_push(t, syntax_cleanup);
     if (seterr)
 	stderror(ERR_OLD);
     execute(t, -1, NULL, NULL, TRUE);
-    freelex(&paraml1), freesyn(t);
+    cleanup_until(&paraml1);
 }
 
 static int

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.64 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.65 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.64 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.65 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -120,27 +120,31 @@ update_vars(Char *vp)
 	    Strcmp(cp, STRunknown) != 0 && Strcmp(cp, STRdumb) != 0) {
 	    editing = 1;
 	    noediting = 0;
-	    set(STRedit, Strsave(STRNULL), VAR_READWRITE);
+	    setNS(STRedit);
 	}
 	ed_Init();		/* reset the editor */
     }
     else if (eq(vp, STRhome)) {
-	Char *cp;
+	Char *cp, *canon;
 
 	cp = Strsave(varval(vp));	/* get the old value back */
+	cleanup_push(cp, xfree);
 
 	/*
 	 * convert to cononical pathname (possibly resolving symlinks)
 	 */
-	cp = dcanon(cp, cp);
+	canon = dcanon(cp, cp);
+	cleanup_ignore(cp);
+	cleanup_until(cp);
+	cleanup_push(canon, xfree);
 
-	set(vp, Strsave(cp), VAR_READWRITE);	/* have to save the new val */
+	setcopy(vp, canon, VAR_READWRITE);	/* have to save the new val */
 
 	/* and now mirror home with HOME */
-	tsetenv(STRKHOME, cp);
+	tsetenv(STRKHOME, canon);
 	/* fix directory stack for new tilde home */
 	dtilde();
-	xfree(cp);
+	cleanup_until(canon);
     }
     else if (eq(vp, STRedit)) {
 	editing = 1;
@@ -295,8 +299,15 @@ doset(Char **v, struct command *c)
 	    *e = p;
 	    v = e + 1;
 	}
-	else if (hadsub)
-	    asx(vp, subscr, Strsave(p));
+	else if (hadsub) {
+	    Char *copy;
+
+	    copy = Strsave(p);
+	    cleanup_push(copy, xfree);
+	    asx(vp, subscr, copy);
+	    cleanup_ignore(copy);
+	    cleanup_until(copy);
+	}
 	else
 	    set(vp, Strsave(p), flags);
 	update_vars(vp);
@@ -319,11 +330,14 @@ static void
 asx(Char *vp, int subscr, Char *p)
 {
     struct varent *v = getvx(vp, subscr);
+    Char *prev;
 
     if (v->v_flags & VAR_READONLY)
 	stderror(ERR_READONLY|ERR_NAME, v->v_name);
-    xfree(v->vec[subscr - 1]);
+    prev = v->vec[subscr - 1];
+    cleanup_push(prev, xfree);
     v->vec[subscr - 1] = globone(p, G_APPEND);
+    cleanup_until(prev);
 }
 
 static struct varent *
@@ -381,6 +395,7 @@ dolet(Char **v, struct command *dummy)
 	    stderror(ERR_NAME | ERR_ASSIGN);
 
 	vp = Strsave(vp);
+	cleanup_push(vp, xfree);
 	if (op == '=') {
 	    c = '=';
 	    p = xset(p, &v);
@@ -388,45 +403,50 @@ dolet(Char **v, struct command *dummy)
 	else {
 	    c = *p++;
 	    if (any("+-", c)) {
-		if (c != op || *p) {
-		    xfree(vp);
+		if (c != op || *p)
 		    stderror(ERR_NAME | ERR_UNKNOWNOP);
-		}
 		p = Strsave(STR1);
 	    }
 	    else {
 		if (any("<>", op)) {
-		    if (c != op) {
-			xfree(vp);
+		    if (c != op)
 			stderror(ERR_NAME | ERR_UNKNOWNOP);
-		    }
-		    xfree(vp);
 		    stderror(ERR_NAME | ERR_SYNTAX);
 		}
-		if (c != '=') {
-		    xfree(vp);
+		if (c != '=')
 		    stderror(ERR_NAME | ERR_UNKNOWNOP);
-		}
 		p = xset(p, &v);
 	    }
 	}
+	cleanup_push(p, xfree);
 	if (op == '=') {
 	    if (hadsub)
 		asx(vp, subscr, p);
 	    else
 		set(vp, p, VAR_READWRITE);
+	    cleanup_ignore(p);
 	}
 	else if (hadsub) {
 	    struct varent *gv = getvx(vp, subscr);
+	    Char *val;
 
-	    asx(vp, subscr, operate(op, gv->vec[subscr - 1], p));
+	    val = operate(op, gv->vec[subscr - 1], p);
+	    cleanup_push(val, xfree);
+	    asx(vp, subscr, val);
+	    cleanup_ignore(val);
+	    cleanup_until(val);
 	}
-	else
-	    set(vp, operate(op, varval(vp), p), VAR_READWRITE);
+	else {
+	    Char *val;
+
+	    val = operate(op, varval(vp), p);
+	    cleanup_push(val, xfree);
+	    set(vp, val, VAR_READWRITE);
+	    cleanup_ignore(val);
+	    cleanup_until(val);
+	}
 	update_vars(vp);
-	xfree(vp);
-	if (c != '=')
-	    xfree(p);
+	cleanup_until(vp);
     } while ((p = *v++) != NULL);
 }
 
@@ -563,11 +583,23 @@ adrof1(const Char *name, struct varent *v)
     return v;
 }
 
+void
+setcopy(const Char *var, const Char *val, int flags)
+{
+    Char *copy;
+
+    copy = Strsave(val);
+    cleanup_push(copy, xfree);
+    set(var, copy, flags);
+    cleanup_ignore(copy);
+    cleanup_until(copy);
+}
+
 /*
  * The caller is responsible for putting value in a safe place
  */
 void
-set(Char *var, Char *val, int flags)
+set(const Char *var, Char *val, int flags)
 {
     Char **vec = xmalloc(2 * sizeof(Char **));
 
@@ -577,7 +609,7 @@ set(Char *var, Char *val, int flags)
 }
 
 void
-set1(Char *var, Char **vec, struct varent *head, int flags)
+set1(const Char *var, Char **vec, struct varent *head, int flags)
 {
     Char **oldv = vec;
 
@@ -590,10 +622,8 @@ set1(Char *var, Char **vec, struct varent *head, int flags)
 	    if (vec == 0) {
 		blkfree(oldv);
 		stderror(ERR_NAME | ERR_NOMATCH);
-		return;
 	    }
 	    blkfree(oldv);
-	    gargv = 0;
 	}
     }
     /*
@@ -618,7 +648,7 @@ set1(Char *var, Char **vec, struct varent *head, int flags)
 		    for (j = 0; j < i; j++)
 			/* If have earlier identical item, remove i'th item */
 			if (vec[i] && vec[j] && Strcmp(vec[j], vec[i]) == 0) {
-			    free(vec[i]);
+			    xfree(vec[i]);
 			    vec[i] = NULL;
 			    break;
 			}
@@ -629,7 +659,7 @@ set1(Char *var, Char **vec, struct varent *head, int flags)
 			/* If have later identical item, remove i'th item */
 			if (vec[i] && vec[j] && Strcmp(vec[j], vec[i]) == 0) {
 			    /* remove identical item (the first) */
-			    free(vec[i]);
+			    xfree(vec[i]);
 			    vec[i] = NULL;
 			}
 	    }
@@ -650,7 +680,7 @@ set1(Char *var, Char **vec, struct varent *head, int flags)
 
 
 void
-setq(Char *name, Char **vec, struct varent *p, int flags)
+setq(const Char *name, Char **vec, struct varent *p, int flags)
 {
     struct varent *c;
     int f;
@@ -813,7 +843,7 @@ unsetv1(struct varent *p)
 void
 setNS(Char *cp)
 {
-    set(cp, Strsave(STRNULL), VAR_READWRITE);
+    setcopy(cp, STRNULL, VAR_READWRITE);
 }
 
 /*ARGSUSED*/
@@ -853,8 +883,9 @@ exportpath(Char **val)
 	    Strbuf_append1(&buf, PATHSEP);
 	}
     exppath = Strbuf_finish(&buf);
+    cleanup_push(exppath, xfree);
     tsetenv(STRKPATH, exppath);
-    xfree(exppath);
+    cleanup_until(exppath);
 }
 
 #ifndef lint
@@ -926,7 +957,7 @@ balance(struct varent *p, int f, int d)
 		break;
 	    case 1:		/* was already right heavy */
 		switch (p->v_right->v_bal) {
-		case 1:	/* sigle rotate */
+		case 1:	/* single rotate */
 		    pp->v_link[ff] = rleft(p);
 		    p->v_left->v_bal = 0;
 		    p->v_bal = 0;
@@ -968,7 +999,7 @@ balance(struct varent *p, int f, int d)
 		    p->v_right->v_bal = 0;
 		    p->v_bal = 0;
 		    break;
-		case 0:	/* signle rotate */
+		case 0:	/* single rotate */
 		    pp->v_link[ff] = rright(p);
 		    p->v_right->v_bal = -1;
 		    p->v_bal = 1;
@@ -1005,20 +1036,19 @@ plist(struct varent *p, int what)
     struct varent *c;
     int len;
 
-    if (setintr)
-#ifdef BSDSIGS
-	(void) sigsetmask(sigblock((sigmask_t) 0) & ~sigmask(SIGINT));
-#else /* !BSDSIGS */
-	(void) sigrelse(SIGINT);
-#endif /* BSDSIGS */
-
     for (;;) {
 	while (p->v_left)
 	    p = p->v_left;
 x:
 	if (p->v_parent == 0)	/* is it the header? */
-	    return;
+	    break;
 	if ((p->v_flags & what) != 0) {
+	    if (setintr) {
+		int old_pintr_disabled;
+
+		pintr_push_enable(&old_pintr_disabled);
+		cleanup_until(&old_pintr_disabled);
+	    }
 	    len = blklen(p->vec);
 	    xprintf("%S\t", p->v_name);
 	    if (len != 1)
@@ -1150,7 +1180,7 @@ update_dspmbyte_vars(void)
 	for (lp = 0; lp < 256; lp++)
 	    mbmapstr[lp] = _mbmap[lp] + '0';
 	mbmapstr[lp] = 0;
-	set(STRmbytemap, Strsave(mbmapstr), VAR_READWRITE);
+	setcopy(STRmbytemap, mbmapstr, VAR_READWRITE);
     }
 #endif /* MBYTEMAP */
 }
@@ -1158,7 +1188,7 @@ update_dspmbyte_vars(void)
 /* dspkanji/dspmbyte autosetting */
 /* PATCH IDEA FROM Issei.Suzuki VERY THANKS */
 void
-autoset_dspmbyte(Char *pcp)
+autoset_dspmbyte(const Char *pcp)
 {
     int i;
     static const struct dspm_autoset_Table {
@@ -1195,7 +1225,7 @@ autoset_dspmbyte(Char *pcp)
 	for (i = 0; dspmc[i].n; i++) {
 	    Char *estr;
 	    if (dspmc[i].n[0] && t_pmatch(pcp, dspmc[i].n, &estr, 0) > 0) {
-		set(CHECK_MBYTEVAR, Strsave(dspmc[i].v), VAR_READWRITE);
+		setcopy(CHECK_MBYTEVAR, dspmc[i].v, VAR_READWRITE);
 		update_dspmbyte_vars();
 		return;
 	    }
@@ -1209,7 +1239,7 @@ autoset_dspmbyte(Char *pcp)
     for (i = 0; dspmt[i].n; i++) {
 	Char *estr;
 	if (dspmt[i].n[0] && t_pmatch(pcp, dspmt[i].n, &estr, 0) > 0) {
-	    set(CHECK_MBYTEVAR, Strsave(dspmt[i].v), VAR_READWRITE);
+	    setcopy(CHECK_MBYTEVAR, dspmt[i].v, VAR_READWRITE);
 	    update_dspmbyte_vars();
 	    break;
 	}

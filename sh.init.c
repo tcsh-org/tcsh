@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.init.c,v 3.57 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.init.c,v 3.58 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.57 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: sh.init.c,v 3.58 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -52,9 +52,6 @@ const struct biltins bfunc[] = {
     { "att",		doatt,		0,	INF	},
 #endif /* _CX_UX */
     { "bg",		dobg,		0,	INF	},
-#ifdef OBSOLETE
-    { "bind",		dobind,		0,	2	},
-#endif /* OBSOLETE */
     { "bindkey",	dobindkey,	0,	8	},
     { "break",		dobreak,	0,	0	},
     { "breaksw",	doswbrk,	0,	0	},

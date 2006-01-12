@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.93 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.94 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.93 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.94 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -77,6 +77,14 @@ RCSID("$Id: sh.proc.c,v 3.93 2006/01/12 18:15:25 christos Exp $")
 # endif /* !BSDWAIT */
 #endif /* !WCOREDUMP */
 
+#ifndef JOBDEBUG
+# define jobdebug_xprintf(x)	(void)0
+# define jobdebug_flush()	(void)0
+#else
+# define jobdebug_xprintf(s)	xprintf s
+# define jobdebug_flush()	flush()
+#endif
+
 /*
  * C Shell - functions that manage processes, handling hanging, termination
  */
@@ -106,6 +114,10 @@ static struct tms zru = {0L, 0L, 0L, 0L}, lru = {0L, 0L, 0L, 0L};
 # endif	/* !_SEQUENT_ */
 #endif /* !BSDTIMES */
 
+#ifndef BSDTIMES
+static int timesdone;	/* shtimes buffer full ? */
+#endif /* BSDTIMES */
+
 #ifndef RUSAGE_CHILDREN
 # define	RUSAGE_CHILDREN	-1
 #endif /* RUSAGE_CHILDREN */
@@ -124,15 +136,14 @@ static	void		 okpcntl	(void);
 static	void		 setttypgrp	(int);
 
 /*
- * pchild - called at interrupt level by the SIGCHLD signal
+ * pchild - call queued by the SIGCHLD signal
  *	indicating that at least one child has terminated or stopped
  *	thus at least one wait system call will definitely return a
  *	childs status.  Top level routines (like pwait) must be sure
  *	to mask interrupts when playing with the proclist data structures!
  */
-RETSIGTYPE
-/*ARGSUSED*/
-pchild(int snum)
+void
+pchild(void)
 {
     struct process *pp;
     struct process *fp;
@@ -160,33 +171,13 @@ pchild(int snum)
 # endif	/* !_SEQUENT_ */
 #endif /* !BSDTIMES */
 
-    USE(snum);
-#ifdef JOBDEBUG
-    xprintf("pchild()\n");
-#endif	/* JOBDEBUG */
-
-/* Christos on where the signal(SIGCHLD, pchild) shoud be:
- *
- * I think that it should go *after* the wait, unlike most signal handlers.
- *
- * In release two (for which I have manuals), it says that wait will remove
- * the first child from the queue of dead children.
- * All the rest of the children that die while in the signal handler of the
- * SIGC(H)LD, will be placed in the queue. If signal is called to re-establish
- * the signal handler, and there are items in the queue, the process will
- * receive another SIGC(H)LD before signal returns. BTW this is from the
- * manual page on comp-sim... Maybe it is not applicable to the hp's, but
- * I read on the news in comp.unix.wizards or comp.unix.questions yesterday
- * that another person was claiming the the signal() call should be after
- * the wait().
- */
+    jobdebug_xprintf(("pchild()\n"));
 
 loop:
+    jobdebug_xprintf(("Waiting...\n"));
+    jobdebug_flush();
     errno = 0;			/* reset, just in case */
-#ifdef JOBDEBUG
-    xprintf("Waiting...\n");
-    flush();
-#endif /* JOBDEBUG */
+
 #ifndef WINNT_NATIVE
 # ifdef BSDJOBS
 #  ifdef BSDTIMES
@@ -234,7 +225,7 @@ loop:
 #  else /* !BSDTIMES */
 #   ifdef ODT  /* For Sco Unix 3.2.0 or ODT 1.0 */
 #    define HAVEwait3
-     pid = waitpid(-1, &w,
+    pid = waitpid(-1, &w,
  	    (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG));
 #   endif /* ODT */	    
 #   if defined(aiws) || defined(uts)
@@ -243,50 +234,35 @@ loop:
 	(setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), 0);
 #   endif /* aiws || uts */
 #   ifndef HAVEwait3
-#    ifdef UNRELSIGS
+#    ifndef BSDWAIT
      /* no wait3, therefore no rusage */
      /* on Sys V, this may hang.  I hope it's not going to be a problem */
-#     ifdef _MINIX
-      pid = wait(&w);
-#     else /* !_MINIX */
-      pid = ourwait(&w.w_status);
-#     endif /* _MINIX */
-#    else /* !UNRELSIGS */
+    pid = wait(&w);
+#    else /* BSDWAIT */
      /* 
       * XXX: for greater than 3 we should use waitpid(). 
       * but then again, SVR4 falls into the POSIX/BSDJOBS category.
       */
-     pid = wait(&w.w_status);
-#    endif /* !UNRELSIGS */
+    pid = wait(&w.w_status);
+#    endif /* BSDWAIT */
 #   endif /* !HAVEwait3 */
 #  endif	/* !BSDTIMES */
-#  ifndef BSDSIGS
-    (void) sigset(SIGCHLD, pchild);
-#  endif /* !BSDSIGS */
 # endif /* !BSDJOBS */
 #else /* WINNT_NATIVE */
-    {
-	extern int insource;
-	pid = waitpid(-1, &w,
+    pid = waitpid(-1, &w,
 	    (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG));
-    }
 #endif /* WINNT_NATIVE */
 
-#ifdef JOBDEBUG
-    xprintf("parent %d pid %d, retval %x termsig %x retcode %x\n",
-	    (int)getpid(), (int)pid, w, WTERMSIG(w), WEXITSTATUS(w));
-    flush();
-#endif /* JOBDEBUG */
+    jobdebug_xprintf(("parent %d pid %d, retval %x termsig %x retcode %x\n",
+		      (int)getpid(), (int)pid, w, WTERMSIG(w),
+		      WEXITSTATUS(w)));
+    jobdebug_flush();
 
     if ((pid == 0) || (pid == -1)) {
-#ifdef JOBDEBUG
-	xprintf("errno == %d\n", errno);
-#endif /* JOBDEBUG */
-	if (errno == EINTR) {
-	    errno = 0;
+	handle_pending_signals();
+	jobdebug_xprintf(("errno == %d\n", errno));
+	if (errno == EINTR)
 	    goto loop;
-	}
-	pnoprocesses = pid == -1;
 	goto end;
     }
     for (pp = proclist.p_next; pp != NULL; pp = pp->p_next)
@@ -311,12 +287,7 @@ found:
 # ifdef _SEQUENT_
 	    (void) get_process_stats(&pp->p_etime, PS_SELF, NULL, NULL);
 # else	/* !_SEQUENT_ */
-#  ifndef COHERENT
 	    pp->p_etime = times(&proctimes);
-#  else /* COHERENT */
-	    pp->p_etime = HZ * time(NULL);
-	    times(&proctimes);
-#  endif /* COHERENT */
 # endif	/* !_SEQUENT_ */
 #else /* BSDTIMES */
 	    (void) gettimeofday(&pp->p_etime, NULL);
@@ -398,11 +369,8 @@ found:
 		!eq(dcwd->di_name, fp->p_cwd->di_name))) {
 	    /* PWP: print a newline after ^C */
 		if (jobflags & PINTERRUPTED) {
-#ifdef SHORT_STRINGS
-		    xputchar('\r' | QUOTE), xputchar('\n');
-#else /* !SHORT_STRINGS */
-		    xprintf("\215\n");	/* \215 is a quoted ^M */
-#endif /* !SHORT_STRINGS */
+		    xputchar('\r' | QUOTE);
+		    xputchar('\n');
 		}
 #ifdef notdef
 		else if ((jobflags & (PTIME|PSTOPPED)) == PTIME)
@@ -412,34 +380,29 @@ found:
 	}
 	else {
 	    if (jobflags & PNOTIFY || adrof(STRnotify)) {
-#ifdef SHORT_STRINGS
-		xputchar('\r' | QUOTE), xputchar('\n');
-#else /* !SHORT_STRINGS */
-		xprintf("\215\n");	/* \215 is a quoted ^M */
-#endif /* !SHORT_STRINGS */
+	        xputchar('\r' | QUOTE);
+		xputchar('\n');
 		(void) pprint(pp, NUMBER | NAME | REASON);
 		if ((jobflags & PSTOPPED) == 0)
 		    pflush(pp);
-		{
-		    if (GettingInput) {
-			errno = 0;
-			(void) Rawmode();
+		if (GettingInput) {
+		    errno = 0;
+		    (void) Rawmode();
 #ifdef notdef
-			/*
-			 * don't really want to do that, because it
-			 * will erase our message in case of multi-line
-			 * input
-			 */
-			ClearLines();
+		    /*
+		     * don't really want to do that, because it
+		     * will erase our message in case of multi-line
+		     * input
+		     */
+		    ClearLines();
 #endif /* notdef */
-			ClearDisp();
-			Refresh();
-		    }
+		    ClearDisp();
+		    Refresh();
 		}
 	    }
 	    else {
 		fp->p_flags |= PNEEDNOTE;
-		neednote++;
+		neednote = 1;
 	    }
 	}
     }
@@ -455,27 +418,17 @@ pnote(void)
 {
     struct process *pp;
     int     flags;
-#ifdef BSDSIGS
-    sigmask_t omask;
-#endif /* BSDSIGS */
 
     neednote = 0;
     for (pp = proclist.p_next; pp != NULL; pp = pp->p_next) {
 	if (pp->p_flags & PNEEDNOTE) {
-#ifdef BSDSIGS
-	    omask = sigblock(sigmask(SIGCHLD));
-#else /* !BSDSIGS */
-	    (void) sighold(SIGCHLD);
-#endif /* !BSDSIGS */
+	    pchild_disabled++;
+	    cleanup_push(&pchild_disabled, disabled_cleanup);
 	    pp->p_flags &= ~PNEEDNOTE;
 	    flags = pprint(pp, NUMBER | NAME | REASON);
 	    if ((flags & (PRUNNING | PSTOPPED)) == 0)
 		pflush(pp);
-#ifdef BSDSIGS
-	    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-	    (void) sigrelse(SIGCHLD);
-#endif /* !BSDSIGS */
+	    cleanup_until(&pchild_disabled);
 	}
     }
 }
@@ -500,33 +453,16 @@ void
 pwait(void)
 {
     struct process *fp, *pp;
-#ifdef BSDSIGS
-    sigmask_t omask;
-#endif /* BSDSIGS */
 
     /*
      * Here's where dead procs get flushed.
      */
-#ifdef BSDSIGS
-    omask = sigblock(sigmask(SIGCHLD));
-#else /* !BSDSIGS */
-    (void) sighold(SIGCHLD);
-#endif /* !BSDSIGS */
     for (pp = (fp = &proclist)->p_next; pp != NULL; pp = (fp = pp)->p_next)
 	if (pp->p_procid == 0) {
 	    fp->p_next = pp->p_next;
 	    pfree(pp);
 	    pp = fp;
 	}
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGCHLD);
-# ifdef notdef
-    if (setintr)
-	sigignore(SIGINT);
-# endif /* notdef */
-#endif /* !BSDSIGS */
     pjwait(pcurrjob);
 }
 
@@ -540,65 +476,37 @@ pjwait(struct process *pp)
 {
     struct process *fp;
     int     jobflags, reason;
-#ifdef BSDSIGS
-    sigmask_t omask;
-#endif /* BSDSIGS */
-#ifdef UNRELSIGS
-    signalfun_t inthandler;
-#endif /* UNRELSIGS */
+    sigset_t pause_mask;
+    Char *reason_str;
+
     while (pp->p_procid != pp->p_jobid)
 	pp = pp->p_friends;
     fp = pp;
 
     do {
 	if ((fp->p_flags & (PFOREGND | PRUNNING)) == PRUNNING)
-	    xprintf(CGETS(17, 1, "BUG: waiting for background job!\n"));
+	  xprintf(CGETS(17, 1, "BUG: waiting for background job!\n"));
     } while ((fp = fp->p_friends) != pp);
     /*
      * Now keep pausing as long as we are not interrupted (SIGINT), and the
      * target process, or any of its friends, are running
      */
     fp = pp;
-#ifdef BSDSIGS
-    omask = sigblock(sigmask(SIGCHLD));
-#endif /* BSDSIGS */
-#ifdef UNRELSIGS
-    if (setintr)
-        inthandler = signal(SIGINT, SIG_IGN);
-#endif /* UNRELSIGS */
+    sigprocmask(SIG_BLOCK, NULL, &pause_mask);
+    sigdelset(&pause_mask, SIGCHLD);
     for (;;) {
-#ifndef BSDSIGS
-	(void) sighold(SIGCHLD);
-#endif /* !BSDSIGS */
+	handle_pending_signals();
 	jobflags = 0;
 	do
 	    jobflags |= fp->p_flags;
 	while ((fp = (fp->p_friends)) != pp);
 	if ((jobflags & PRUNNING) == 0)
 	    break;
-#ifdef JOBDEBUG
-	xprintf("%d starting to sigpause for SIGCHLD on %d\n",
-		getpid(), fp->p_procid);
-#endif /* JOBDEBUG */
-#ifdef BSDSIGS
-	/* (void) sigpause(sigblock((sigmask_t) 0) &~ sigmask(SIGCHLD)); */
-	(void) sigpause(omask & ~sigmask(SIGCHLD));
-#else /* !BSDSIGS */
-	(void) sigpause(SIGCHLD);
-#endif /* !BSDSIGS */
+	jobdebug_xprintf(("%d starting to isgsuspend for SIGCHLD on %d\n",
+			  getpid(), fp->p_procid));
+	sigsuspend(&pause_mask);
     }
-#ifdef JOBDEBUG
-	xprintf("%d returned from sigpause loop\n", getpid());
-#endif /* JOBDEBUG */
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGCHLD);
-#endif /* !BSDSIGS */
-#ifdef UNRELSIGS
-    if (setintr)
-        (void) signal(SIGINT, inthandler);
-#endif /* UNRELSIGS */
+    jobdebug_xprintf(("%d returned from sigsuspend loop\n", getpid()));
 #ifdef BSDJOBS
     if (tpgrp > 0)		/* get tty back */
 	(void) tcsetpgrp(FSHTTY, tpgrp);
@@ -647,7 +555,11 @@ pjwait(struct process *pp)
     if ((reason != 0) && (adrof(STRprintexitvalue)) && 
 	(pp->p_flags & PBACKQ) == 0)
 	xprintf(CGETS(17, 2, "Exit %d\n"), reason);
-    set(STRstatus, putn(reason), VAR_READWRITE);
+    reason_str = putn(reason);
+    cleanup_push(reason_str, xfree);
+    set(STRstatus, reason_str, VAR_READWRITE);
+    cleanup_ignore(reason_str);
+    cleanup_until(reason_str);
     if (reason && exiterr)
 	exitstat();
     pflush(pp);
@@ -662,37 +574,24 @@ void
 dowait(Char **v, struct command *c)
 {
     struct process *pp;
-#ifdef BSDSIGS
-    sigmask_t omask;
-#endif /* BSDSIGS */
+    sigset_t pause_mask;
 
     USE(c);
     USE(v);
     pjobs++;
-#ifdef BSDSIGS
-    omask = sigblock(sigmask(SIGCHLD));
-loop:
-#else /* !BSDSIGS */
+    sigprocmask(SIG_BLOCK, NULL, &pause_mask);
+    sigdelset(&pause_mask, SIGCHLD);
     if (setintr)
-	(void) sigrelse(SIGINT);
+	sigdelset(&pause_mask, SIGINT);
 loop:
-    (void) sighold(SIGCHLD);
-#endif /* !BSDSIGS */
     for (pp = proclist.p_next; pp; pp = pp->p_next)
 	if (pp->p_procid &&	/* pp->p_procid == pp->p_jobid && */
 	    pp->p_flags & PRUNNING) {
-#ifdef BSDSIGS
-	    (void) sigpause((sigmask_t) 0);
-#else /* !BSDSIGS */
-	    (void) sigpause(SIGCHLD);
-#endif /* !BSDSIGS */
+	    handle_pending_signals();
+	    sigsuspend(&pause_mask);
+	    handle_pending_signals();
 	    goto loop;
 	}
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGCHLD);
-#endif /* !BSDSIGS */
     pjobs = 0;
 }
 
@@ -862,12 +761,7 @@ palloc(pid_t pid, struct command *t)
     {
 	struct tms tmptimes;
 
-#  ifndef COHERENT
 	pp->p_btime = times(&tmptimes);
-#  else /* !COHERENT */
-	pp->p_btime = HZ * time(NULL);
-	times(&tmptimes);
-#  endif /* !COHERENT */
     }
 # endif /* !_SEQUENT_ */
 #endif /* !BSDTIMES */
@@ -975,13 +869,10 @@ psavejob(void)
     pcurrjob = NULL;
 }
 
-/*
- * prestjob - opposite of psavejob.  This may be missed if we are interrupted
- *	somewhere, but pendjob cleans up anyway.
- */
 void
-prestjob(void)
+psavejob_cleanup(void *dummy)
 {
+    USE(dummy);
     pcurrjob = pholdjob;
     pholdjob = NULL;
 }
@@ -1092,10 +983,6 @@ pprint(struct process *pp, int flag)
 		    xprintf("       ");
 	    }
 	    if (flag & FANCY) {
-#ifdef TCF
-		extern char *sitename();
-
-#endif /* TCF */
 		xprintf("%5d ", pp->p_procid);
 #ifdef TCF
 		xprintf("%11s ", sitename(pp->p_procid));
@@ -1145,11 +1032,12 @@ pprint(struct process *pp, int flag)
 			if (ptr == NULL) {
 			    ptr = xasprintf("%s %d", CGETS(17, 5, "Signal"),
 					    pp->p_reason & ASCII);
+			    cleanup_push(ptr, xfree);
 			    free_ptr = 1;
 			}
 			xprintf(format, ptr);
 			if (free_ptr != 0)
-			    xfree(ptr);
+			    cleanup_until(ptr);
 		    }
 		    else
 			reason = -1;
@@ -1392,12 +1280,6 @@ dofg(Char **v, struct command *c)
 	    stderror(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
 	    continue;
 	}
-#ifndef BSDSIGS
-# ifdef notdef
-	if (setintr)
-	    sigignore(SIGINT);
-# endif
-#endif /* !BSDSIGS */
 	pjwait(pp);
     } while (*v && *++v);
 }
@@ -1419,12 +1301,6 @@ dofg1(Char **v, struct command *c)
 	stderror(ERR_NAME|ERR_BADJOB, pp->p_command, strerror(errno));
 	return;
     }
-#ifndef BSDSIGS
-# ifdef notdef
-    if (setintr)
-	sigignore(SIGINT);
-# endif
-#endif /* !BSDSIGS */
     pjwait(pp);
 }
 
@@ -1544,21 +1420,14 @@ pkill(Char **v, int signum)
     struct process *pp, *np;
     int jobflags = 0, err1 = 0, gflag;
     pid_t     pid;
-#ifdef BSDSIGS
-    sigmask_t omask;
-#endif /* BSDSIGS */
-    Char   *cp, **vp;
+    Char *cp, **vp, **globbed;
 
-#ifdef BSDSIGS
-    omask = sigmask(SIGCHLD);
-    if (setintr)
-	omask |= sigmask(SIGINT);
-    omask = sigblock(omask) & ~omask;
-#else /* !BSDSIGS */
-    if (setintr)
-	(void) sighold(SIGINT);
-    (void) sighold(SIGCHLD);
-#endif /* !BSDSIGS */
+    pchild_disabled++;
+    cleanup_push(&pchild_disabled, disabled_cleanup);
+    if (setintr) {
+	pintr_disabled++;
+	cleanup_push(&pintr_disabled, disabled_cleanup);
+    }
 
     /* Avoid globbing %?x patterns */
     for (vp = v; vp && *vp; vp++)
@@ -1567,14 +1436,16 @@ pkill(Char **v, int signum)
 
     gflag = tglob(v);
     if (gflag) {
-      v = globall(v, gflag);
+	v = globall(v, gflag);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
     else {
-	v = gargv = saveblk(v);
+	v = saveblk(v);
 	trim(v);
     }
+    globbed = v;
+    cleanup_push(globbed, blk_cleanup);
 
 
     while (v && (cp = *v)) {
@@ -1648,15 +1519,7 @@ pkill(Char **v, int signum)
 cont:
 	v++;
     }
-    if (gargv)
-	blkfree(gargv), gargv = 0;
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGCHLD);
-    if (setintr)
-	(void) sigrelse(SIGINT);
-#endif /* !BSDSIGS */
+    cleanup_until(&pchild_disabled);
     if (err1)
 	stderror(ERR_SILENT);
 }
@@ -1669,17 +1532,11 @@ pstart(struct process *pp, int foregnd)
 {
     int rv = 0;
     struct process *np;
-#ifdef BSDSIGS
-    sigmask_t omask;
-#endif /* BSDSIGS */
     /* We don't use jobflags in this function right now (see below) */
     /* long    jobflags = 0; */
 
-#ifdef BSDSIGS
-    omask = sigblock(sigmask(SIGCHLD));
-#else /* !BSDSIGS */
-    (void) sighold(SIGCHLD);
-#endif
+    pchild_disabled++;
+    cleanup_push(&pchild_disabled, disabled_cleanup);
     np = pp;
     do {
 	/* We don't use jobflags in this function right now (see below) */
@@ -1714,7 +1571,7 @@ pstart(struct process *pp, int foregnd)
      * 4. pchild() calls wait3(WNOHANG) which returns 0.
      *    The child process is NOT ready to be waited for at this time.
      *    pchild() returns without picking-up the correct status
-     *    for the child process which generated the SIGCHILD.
+     *    for the child process which generated the SIGCHLD.
      * 5. CONSEQUENCE : csh is UNaware that the process is stopped
      * 6. THIS LINE HAS BEEN COMMENTED OUT : if (jobflags&PSTOPPED)
      * 	  (beto@aixwiz.austin.ibm.com - aug/03/91)
@@ -1729,11 +1586,7 @@ pstart(struct process *pp, int foregnd)
     if (rv != -1)
 	rv = killpg(pp->p_jobid, SIGCONT);
 #endif /* BSDJOBS */
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGCHLD);
-#endif /* !BSDSIGS */
+    cleanup_until(&pchild_disabled);
     return rv != -1;
 }
 
@@ -1833,6 +1686,14 @@ donotify(Char **v, struct command *c)
     pp->p_flags |= PNOTIFY;
 }
 
+#ifdef SIGSYNCH
+static void
+synch_handler(int sno)
+{
+    USE(sno);
+}
+#endif /* SIGSYNCH */
+
 /*
  * Do the fork and whatever should be done in the child side that
  * should not be done if we are not forking at all (like for simple builtin's)
@@ -1851,12 +1712,8 @@ pfork(struct command *t, int wanttty)
     pid_t pid;
     int    ignint = 0;
     pid_t pgrp;
-#ifdef BSDSIGS
-    sigmask_t omask = 0;
-#endif /* BSDSIGS */
 #ifdef SIGSYNCH
-    sigvec_t osv;
-    static sigvec_t nsv = {synch_handler, (sigset_t) ~0, 0};
+    struct sigaction osa, nsa;
 #endif /* SIGSYNCH */
 
     /*
@@ -1871,43 +1728,33 @@ pfork(struct command *t, int wanttty)
 	ignint = (tpgrp == -1 && (t->t_dflg & F_NOINTERRUPT))
 	    || (gointr && eq(gointr, STRminus));
 
-#ifdef COHERENT
-    ignint |= gointr && eq(gointr, STRminus);
-#endif /* COHERENT */
-
     /*
      * Check for maximum nesting of 16 processes to avoid Forking loops
      */
     if (child == 16)
 	stderror(ERR_NESTING, 16);
 #ifdef SIGSYNCH
-    if (mysigvec(SIGSYNCH, &nsv, &osv))
-	stderror(ERR_SYSTEM, "pfork: sigvec set", strerror(errno));
+    nsa.sa_handler = synch_handler;
+    sigfillset(&nsa.sa_mask);
+    nsa.sa_flags = SA_RESTART;
+    if (sigaction(SIGSYNCH, &nsa, &osa))
+	stderror(ERR_SYSTEM, "pfork: sigaction set", strerror(errno));
 #endif /* SIGSYNCH */
     /*
-     * Hold SIGCHLD until we have the process installed in our table.
+     * Hold pchild() until we have the process installed in our table.
      */
     if (wanttty < 0) {
-#ifdef BSDSIGS
-	omask = sigblock(sigmask(SIGCHLD));
-#else /* !BSDSIGS */
-	(void) sighold(SIGCHLD);
-#endif /* !BSDSIGS */
+	pchild_disabled++;
+	cleanup_push(&pchild_disabled, disabled_cleanup);
     }
     while ((pid = fork()) == -1)
 	if (setintr == 0)
 	    (void) sleep(FORKSLEEP);
-	else {
-	    if (wanttty < 0)
-#ifdef BSDSIGS
-		(void) sigsetmask(omask);
-#else /* !BSDSIGS */
-		(void) sigrelse(SIGCHLD);
-	    (void) sigrelse(SIGINT);
-#endif /* !BSDSIGS */
+	else
 	    stderror(ERR_NOPROC);
-	}
     if (pid == 0) {
+	(void)cleanup_push_mark(); /* Never to be popped */
+	pchild_disabled = 0;
 	settimes();
 	pgrp = pcurrjob ? pcurrjob->p_jobid : getpid();
 	pflushall();
@@ -1918,10 +1765,6 @@ pfork(struct command *t, int wanttty)
 	child++;
 	if (setintr) {
 	    setintr = 0;	/* until I think otherwise */
-#ifndef BSDSIGS
-	    if (wanttty < 0)
-		(void) sigrelse(SIGCHLD);
-#endif /* !BSDSIGS */
 	    /*
 	     * Children just get blown away on SIGINT, SIGQUIT unless "onintr
 	     * -" seen.
@@ -1936,7 +1779,7 @@ pfork(struct command *t, int wanttty)
 		(void) signal(SIGTTOU, SIG_DFL);
 	    }
 #endif /* BSDJOBS */
-	    (void) signal(SIGTERM, parterm);
+	    sigaction(SIGTERM, &parterm, NULL);
 	}
 	else if (tpgrp == -1 && (t->t_dflg & F_NOINTERRUPT)) {
 	    (void) signal(SIGINT, SIG_IGN);
@@ -1958,7 +1801,7 @@ pfork(struct command *t, int wanttty)
 	    int nval = SIGN_EXTEND_CHAR(t->t_nice);
 #ifdef HAVE_SETPRIORITY
 	    if (setpriority(PRIO_PROCESS, 0, nval) == -1 && errno)
-		    stderror(ERR_SYSTEM, "setpriority", strerror(errno));
+		stderror(ERR_SYSTEM, "setpriority", strerror(errno));
 #else /* !HAVE_SETPRIORITY */
 	    (void) nice(nval);
 #endif /* !HAVE_SETPRIORITY */
@@ -2000,6 +1843,9 @@ pfork(struct command *t, int wanttty)
 #endif /* POSIXJOBS */
 	palloc(pid, t);
 #ifdef SIGSYNCH
+	{
+	    sigset_t pause_mask;
+
 	/*
 	 * rfw 8/89 Wait for child to own terminal.  Solves half of ugly
 	 * synchronization problem.  With this change, we know that the only
@@ -2008,19 +1854,19 @@ pfork(struct command *t, int wanttty)
 	 * either have exited or not yet started to run.  Two uglies become
 	 * one.
 	 */
-	(void) sigpause(omask & ~SYNCHMASK);
-	if (mysigvec(SIGSYNCH, &osv, NULL))
-	    stderror(ERR_SYSTEM, "pfork parent: sigvec restore",
-		     strerror(errno));
+	    sigprocmask(SIG_BLOCK, NULL, &pause);
+	    sigdelset(&pause_mask, SIGCHLD);
+	    sigdelset(&pause_mask, SIGSYNCH);
+	    sigsuspend(&pause_mask);
+	    handle_pending_signals();
+	    if (sigaction(SIGSYNCH, &osa, NULL))
+		stderror(ERR_SYSTEM, "pfork parent: sigaction restore",
+			 strerror(errno));
+	}
 #endif /* SIGSYNCH */
 
-	if (wanttty < 0) {
-#ifdef BSDSIGS
-	    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-	    (void) sigrelse(SIGCHLD);
-#endif /* !BSDSIGS */
-	}
+	if (wanttty < 0)
+	    cleanup_until(&pchild_disabled);
     }
     return (pid);
 }
@@ -2053,15 +1899,18 @@ setttypgrp(int pgrp)
      */
     if (tcgetpgrp(FSHTTY) != pgrp) {
 #ifdef POSIXJOBS
+	struct sigaction old;
+
         /*
 	 * tcsetpgrp will set SIGTTOU to all the the processes in 
 	 * the background according to POSIX... We ignore this here.
 	 */
-	signalfun_t old = sigset(SIGTTOU, SIG_IGN);
+	sigaction(SIGTTOU, NULL, &old);
+	sigset(SIGTTOU, SIG_IGN);
 #endif
 	(void) tcsetpgrp(FSHTTY, pgrp);
 # ifdef POSIXJOBS
-	(void) sigset(SIGTTOU, old);
+	sigaction(SIGTTOU, &old, NULL);
 # endif
 
     }
@@ -2080,29 +1929,24 @@ void
 pgetty(int wanttty, pid_t pgrp)
 {
 #ifdef BSDJOBS
-# if defined(BSDSIGS) && defined(POSIXJOBS)
-    sigmask_t omask = 0;
-# endif /* BSDSIGS && POSIXJOBS */
+# ifdef POSIXJOBS
+    sigset_t omask;
+# endif /* POSIXJOBS */
 
-# ifdef JOBDEBUG
-    xprintf("wanttty %d pid %d opgrp%d pgrp %d tpgrp %d\n",
-	    wanttty, (int)getpid(), (int)pgrp, (int)mygetpgrp(),
-	    (int)tcgetpgrp(FSHTTY));
-# endif /* JOBDEBUG */
+    jobdebug_xprintf(("wanttty %d pid %d opgrp%d pgrp %d tpgrp %d\n",
+		      wanttty, (int)getpid(), (int)pgrp, (int)mygetpgrp(),
+		      (int)tcgetpgrp(FSHTTY)));
 # ifdef POSIXJOBS
     /*
      * christos: I am blocking the tty signals till I've set things
      * correctly....
      */
-    if (wanttty > 0)
-#  ifdef BSDSIGS
-	omask = sigblock(sigmask(SIGTSTP)|sigmask(SIGTTIN));
-#  else /* !BSDSIGS */
-    {
+    if (wanttty > 0) {
+	sigprocmask(SIG_BLOCK, NULL, &omask);
 	(void) sighold(SIGTSTP);
 	(void) sighold(SIGTTIN);
+	cleanup_push(&omask, sigprocmask_cleanup);
     }
-#  endif /* !BSDSIGS */
 # endif /* POSIXJOBS */
 
 # ifndef POSIXJOBS
@@ -2134,20 +1978,14 @@ pgetty(int wanttty, pid_t pgrp)
     }
 
 # ifdef POSIXJOBS
-    if (wanttty > 0)
+    if (wanttty > 0) {
 	setttypgrp(pgrp);
-#  ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#  else /* BSDSIGS */
-    (void) sigrelse(SIGTSTP);
-    (void) sigrelse(SIGTTIN);
-#  endif /* !BSDSIGS */
+	cleanup_until(&omask);
+    }
 # endif /* POSIXJOBS */
 
-# ifdef JOBDEBUG
-    xprintf("wanttty %d pid %d pgrp %d tpgrp %d\n", 
-	    wanttty, getpid(), mygetpgrp(), tcgetpgrp(FSHTTY));
-# endif /* JOBDEBUG */
+    jobdebug_xprintf(("wanttty %d pid %d pgrp %d tpgrp %d\n",
+		      wanttty, getpid(), mygetpgrp(), tcgetpgrp(FSHTTY)));
 
     if (tpgrp > 0)
 	tpgrp = 0;		/* gave tty away */

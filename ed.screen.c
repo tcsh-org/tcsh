@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.67 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.68 2006/01/12 19:43:00 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.67 2006/01/12 18:15:24 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.68 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -376,34 +376,37 @@ void
 TellTC(void)
 {
     struct termcapstr *t;
-    char *s;
+    char *first, *s;
 
     xprintf(CGETS(7, 1, "\n\tTcsh thinks your terminal has the\n"));
     xprintf(CGETS(7, 2, "\tfollowing characteristics:\n\n"));
     xprintf(CGETS(7, 3, "\tIt has %d columns and %d lines\n"),
 	    Val(T_co), Val(T_li));
     s = strsave(T_HasMeta ? CGETS(7, 5, "a") : CGETS(7, 6, "no"));
+    cleanup_push(s, xfree);
+    first = s;
     xprintf(CGETS(7, 4, "\tIt has %s meta key\n"), s);
-    xfree(s);
     s = strsave(T_Tabs ? "" : CGETS(7, 8, " not"));
+    cleanup_push(s, xfree);
     xprintf(CGETS(7, 7, "\tIt can%s use tabs\n"), s);
-    xfree(s);
     s = strsave((T_Margin&MARGIN_AUTO) ?
 		CGETS(7, 10, "has") : CGETS(7, 11, "does not have"));
+    cleanup_push(s, xfree);
     xprintf(CGETS(7, 9, "\tIt %s automatic margins\n"), s);
-    xfree(s);
     if (T_Margin & MARGIN_AUTO) {
         s = strsave((T_Margin & MARGIN_MAGIC) ?
 			CGETS(7, 10, "has") : CGETS(7, 11, "does not have"));
+	cleanup_push(s, xfree);
 	xprintf(CGETS(7, 12, "\tIt %s magic margins\n"), s);
-	xfree(s);
     }
     for (t = tstr; t->name != NULL; t++) {
         s = strsave(t->str && *t->str ? t->str : CGETS(7, 13, "(empty)"));
+	cleanup_push(s, xfree);
 	xprintf("\t%36s (%s) == %s\n", t->long_name, t->name, s);
-	xfree(s);
+	cleanup_until(s);
     }
     xputchar('\n');
+    cleanup_until(first);
 }
 
 
@@ -518,6 +521,7 @@ EchoTC(Char **v)
     static const char fmts[] = "%s\n", fmtd[] = "%d\n";
     struct termcapstr *t;
     char    buf[TC_BUFSIZE];
+    Char **globbed;
 
     area = buf;
 
@@ -525,12 +529,14 @@ EchoTC(Char **v)
 
     gflag = tglob(v);
     if (gflag) {
-        v = globall(v, gflag);
+	v = globall(v, gflag);
 	if (v == 0)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
     else
-	v = gargv = saveblk(v);
+	v = saveblk(v);
+    globbed = v;
+    cleanup_push(globbed, blk_cleanup);
     trim(v);
 
     if (!*v || *v[0] == '\0')
@@ -552,6 +558,7 @@ EchoTC(Char **v)
     if (!*v || *v[0] == '\0')
 	goto end;
     cv = strsave(short2str(*v));
+    cleanup_push(cv, xfree);
     if (strcmp(cv, "tabs") == 0) {
 	xprintf(fmts, T_Tabs ? CGETS(7, 14, "yes") :
 		CGETS(7, 15, "no"));
@@ -607,10 +614,10 @@ EchoTC(Char **v)
     if (!scap || scap[0] == '\0') {
 	if (tgetflag(cv)) {
 	    xprintf(CGETS(7, 14, "yes\n"));
-	    goto end_cv;
+	    goto end;
 	}
 	if (silent)
-	    goto end_cv;
+	    goto end;
 	else
 	    stderror(ERR_NAME | ERR_TCCAP, cv);
     }
@@ -651,7 +658,7 @@ EchoTC(Char **v)
 	v++;
 	if (*v && *v[0]) {
 	    if (silent)
-		goto end_cv;
+		goto end;
 	    else
 		stderror(ERR_NAME | ERR_TCARGS, cv, arg_need);
 	}
@@ -666,7 +673,7 @@ EchoTC(Char **v)
 	v++;
 	if (*v && *v[0]) {
 	    if (silent)
-		goto end_cv;
+		goto end;
 	    else
 		stderror(ERR_NAME | ERR_TCARGS, cv, arg_need);
 	}
@@ -681,7 +688,7 @@ EchoTC(Char **v)
 	v++;
 	if (!*v || *v[0] == '\0') {
 	    if (silent)
-		goto end_cv;
+		goto end;
 	    else
 		stderror(ERR_NAME | ERR_TCNARGS, cv, 2);
 	}
@@ -689,7 +696,7 @@ EchoTC(Char **v)
 	v++;
 	if (!*v || *v[0] == '\0') {
 	    if (silent)
-		goto end_cv;
+		goto end;
 	    else
 		stderror(ERR_NAME | ERR_TCNARGS, cv, 2);
 	}
@@ -697,7 +704,7 @@ EchoTC(Char **v)
 	v++;
 	if (*v && *v[0]) {
 	    if (silent)
-		goto end_cv;
+		goto end;
 	    else
 		stderror(ERR_NAME | ERR_TCARGS, cv, arg_need);
 	}
@@ -706,13 +713,8 @@ EchoTC(Char **v)
     }
  end_flush:
     flush();
- end_cv:
-    xfree(cv);
  end:
-    if (gargv) {
-	blkfree(gargv);
-	gargv = 0;
-    }
+    cleanup_until(globbed);
 }
 
 int    GotTermCaps = 0;
@@ -829,7 +831,7 @@ DefaultArrowKeys(void)
 
 
 int
-SetArrowKeys(CStr *name, XmapVal *fun, int type)
+SetArrowKeys(const CStr *name, XmapVal *fun, int type)
 {
     int i;
     for (i = 0; i < A_K_NKEYS; i++)
@@ -852,7 +854,7 @@ IsArrowKey(Char *name)
 }
 
 int
-ClearArrowKeys(CStr *name)
+ClearArrowKeys(const CStr *name)
 {
     int i;
     for (i = 0; i < A_K_NKEYS; i++)
@@ -864,7 +866,7 @@ ClearArrowKeys(CStr *name)
 }
 
 void
-PrintArrowKeys(CStr *name)
+PrintArrowKeys(const CStr *name)
 {
     int i;
 
@@ -1228,7 +1230,7 @@ DeleteChars(int num)		/* deletes <num> characters */
 /* Puts terminal in insert character mode, or inserts num characters in the
    line */
 void
-Insert_write(Char *cp, int num)		
+Insert_write(Char *cp, int num)
 {
     if (num <= 0)
 	return;
@@ -1352,17 +1354,13 @@ GetTermCaps(void)
 
 
 #ifdef SIG_WINDOW
-# ifdef BSDSIGS
-    sigmask_t omask;
-# endif /* BSDSIGS */
+    sigset_t omask;
     int     lins, cols;
 
     /* don't want to confuse things here */
-# ifdef BSDSIGS
-    omask = sigblock(sigmask(SIG_WINDOW)) & ~sigmask(SIG_WINDOW);
-# else /* BSDSIGS */
+    sigprocmask(SIG_BLOCK, NULL, &omask);
     (void) sighold(SIG_WINDOW);
-# endif /* BSDSIGS */
+    cleanup_push(&omask, sigprocmask_cleanup);
 #endif /* SIG_WINDOW */
     area = buf;
 
@@ -1460,11 +1458,7 @@ GetTermCaps(void)
     (void) GetSize(&lins, &cols);	/* get the correct window size */
     ChangeSize(lins, cols);
 
-# ifdef BSDSIGS
-    (void) sigsetmask(omask);	/* can change it again */
-# else /* BSDSIGS */
-    (void) sigrelse(SIG_WINDOW);
-# endif /* BSDSIGS */
+    cleanup_until(&omask);		/* can change it again */
 #else /* SIG_WINDOW */
     ChangeSize(Val(T_li), Val(T_co));
 #endif /* SIG_WINDOW */
@@ -1545,14 +1539,16 @@ ChangeSize(int lins, int cols)
 
 	if (getenv("COLUMNS")) {
 	    p = Itoa(Val(T_co), 0, 0);
+	    cleanup_push(p, xfree);
 	    tsetenv(STRCOLUMNS, p);
-	    xfree(p);
+	    cleanup_until(p);
 	}
 
 	if (getenv("LINES")) {
 	    p = Itoa(Val(T_li), 0, 0);
+	    cleanup_push(p, xfree);
 	    tsetenv(STRLINES, p);
-	    xfree(p);
+	    cleanup_until(p);
 	}
 
 	if ((tptr = getenv("TERMCAP")) != NULL) {

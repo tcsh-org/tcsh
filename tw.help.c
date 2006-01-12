@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.help.c,v 3.22 2005/04/11 22:11:00 kim Exp $ */
+/* $Header: /src/pub/tcsh/tw.help.c,v 3.23 2006/01/12 18:15:25 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -35,14 +35,14 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.help.c,v 3.22 2005/04/11 22:11:00 kim Exp $")
+RCSID("$Id: tw.help.c,v 3.23 2006/01/12 18:15:25 christos Exp $")
 
 #include "tw.h"
 #include "tc.h"
 
 
 static int f = -1;
-static	RETSIGTYPE	 cleanf		(int);
+static	void		 cleanf		(int);
 static	Char    	*skipslist	(Char *);
 static	void		 nextslist 	(const Char *, Char *);
 
@@ -61,6 +61,7 @@ do_help(const Char *command)
 
     /* copy the string to a safe place */
     name = Strsave(command);
+    cleanup_push(name, xfree);
 
     /* trim off the whitespace that may be at the end */
     for (cmd_p = name;
@@ -70,16 +71,19 @@ do_help(const Char *command)
 
     /* if nothing left, return */
     if (*name == '\0') {
-	xfree(name);
+	cleanup_until(name);
 	return;
     }
 
     if (adrof1(STRhelpcommand, &aliases)) {	/* if we have an alias */
 	jmp_buf_t osetexit;
+	size_t omark;
 
 	getexit(osetexit);	/* make sure to come back here */
+	omark = cleanup_push_mark();
 	if (setexit() == 0)
 	    aliasrun(2, STRhelpcommand, name);	/* then use it. */
+	cleanup_pop_mark(omark);
 	resexit(osetexit);	/* and finish up */
     }
     else {			/* else cat something to them */
@@ -93,7 +97,10 @@ do_help(const Char *command)
 	if (hpath == NULL)
 	    hpath = str2short(DEFAULTLIST);
 	thpath = hpath = Strsave(hpath);
+	cleanup_push(thpath, xfree);
 	curdir = xmalloc((Strlen(thpath) + 1) * sizeof (*curdir));
+	cleanup_push(curdir, xfree);
+	cleanup_push(&full, Strbuf_cleanup);
 
 	for (;;) {
 	    const char *const *sp;
@@ -120,55 +127,44 @@ do_help(const Char *command)
 		full.len = ep;
 		Strbuf_append(&full, str2short(*sp));
 		Strbuf_terminate(&full);
-		if ((f = open(short2str(full.s), O_RDONLY|O_LARGEFILE)) != -1)
+		if ((f = xopen(short2str(full.s), O_RDONLY|O_LARGEFILE)) != -1)
 		    break;
 	    }
 	    if (f != -1) {
 	        unsigned char buf[512];
-		signalfun_t orig_intr;
+		sigset_t orig_mask;
+		struct sigaction orig_intr;
 		ssize_t len;
 
 		/* so cat it to the terminal */
-		orig_intr = (signalfun_t) sigset(SIGINT, cleanf);
-		while ((len = read(f, buf, sizeof(buf))) > 0)
-		    (void) write(SHOUT, buf, len);
-		(void) sigset(SIGINT, orig_intr);
-		if (f != -1)
-		    (void) close(f);
+		cleanup_push(&f, open_cleanup);
+		sigaction(SIGINT, NULL, &orig_intr);
+		cleanup_push(&orig_intr, sigint_cleanup);
+		sigprocmask(SIG_UNBLOCK, NULL, &orig_mask);
+		sigset(SIGINT, cleanf);
+		cleanup_push(&orig_mask, sigprocmask_cleanup);
+		while ((len = xread(f, buf, sizeof(buf))) > 0)
+		    (void) xwrite(SHOUT, buf, len);
+		cleanup_until(&f);
 #ifdef convex
 		/* print error in case file is migrated */
-		if (len == -1) {
-		    int err;
-
-		    err = errno;
-		    xfree(full.s);
-		    xfree(curdir);
-		    xfree(thpath);
-		    xfree(name);
-		    stderror(ERR_SYSTEM, progname, strerror(err));
-		}
+		if (len == -1)
+		    stderror(ERR_SYSTEM, progname, strerror(errno));
 #endif /* convex */
 		break;
 	    }
 	}
-	xfree(full.s);
-	xfree(curdir);
-	xfree(thpath);
     }
-    xfree(name);
+    cleanup_until(name);
 }
 
-static RETSIGTYPE
+static void
 /*ARGSUSED*/
 cleanf(int snum)
 {
     USE(snum);
-#ifdef UNRELSIGS
-    if (snum)
-	(void) sigset(SIGINT, cleanf);
-#endif /* UNRELSIGS */
     if (f != -1)
-	(void) close(f);
+	xclose(f);
     f = -1;
 }
 

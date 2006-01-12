@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.123 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.124 2006/01/12 19:43:01 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.123 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.124 2006/01/12 19:43:01 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -41,6 +41,7 @@ RCSID("$Id: tc.func.c,v 3.123 2006/01/12 18:15:25 christos Exp $")
 #ifdef WINNT_NATIVE
 #include "nt.const.h"
 #endif /* WINNT_NATIVE */
+#include <sys/wait.h>
 
 #ifdef AFS
 #include <afs/stds.h>
@@ -72,8 +73,8 @@ static	int	 inlist		(Char *, Char *);
 static	int	 tildecompare	(const void *, const void *);
 static  Char    *gethomedir	(const Char *);
 #ifdef REMOTEHOST
-static	RETSIGTYPE palarm		(int);
-static	void	 getremotehost	(void);
+static	void	 palarm		(int);
+static	void	 getremotehost	(int);
 #endif /* REMOTEHOST */
 
 /*
@@ -202,6 +203,7 @@ Itoa(int n, size_t min_digits, Char attributes)
 void
 dolist(Char **v, struct command *c)
 {
+    Char **globbed;
     int     i, k, gflag;
     struct stat st;
 
@@ -210,8 +212,9 @@ dolist(Char **v, struct command *c)
 	struct Strbuf word = Strbuf_INIT;
 
 	Strbuf_terminate(&word);
+	cleanup_push(&word, Strbuf_cleanup);
 	(void) t_search(&word, LIST, TW_ZERO, 0, STRNULL, 0);
-	xfree(word.s);
+	cleanup_until(&word);
 	return;
     }
     gflag = tglob(v);
@@ -221,7 +224,9 @@ dolist(Char **v, struct command *c)
 	    stderror(ERR_NAME | ERR_NOMATCH);
     }
     else
-	v = gargv = saveblk(v);
+	v = saveblk(v);
+    globbed = v;
+    cleanup_push(globbed, blk_cleanup);
     trim(v);
     for (k = 0; v[k] != NULL && v[k][0] != '-'; k++)
 	continue;
@@ -235,14 +240,10 @@ dolist(Char **v, struct command *c)
 	Char   *cp;
 	struct varent *vp;
 
-#ifdef BSDSIGS
-	sigmask_t omask = 0;
-
-	if (setintr)
-	    omask = sigblock(sigmask(SIGINT)) & ~sigmask(SIGINT);
-#else /* !BSDSIGS */
-	(void) sighold(SIGINT);
-#endif /* BSDSIGS */
+	if (setintr) {
+	    pintr_disabled++;
+	    cleanup_push(&pintr_disabled, disabled_cleanup);
+	}
 	if (seterr) {
 	    xfree(seterr);
 	    seterr = NULL;
@@ -312,9 +313,11 @@ dolist(Char **v, struct command *c)
 	}
 	lastword->next = &cmd;
 	cmd.prev = lastword;
+	cleanup_push(&cmd, lex_cleanup);
 
 	/* build a syntax tree for the command. */
 	t = syntax(cmd.next, &cmd, 0);
+	cleanup_push(t, syntax_cleanup);
 	if (seterr)
 	    stderror(ERR_OLD);
 	/* expand aliases like process() does */
@@ -322,20 +325,18 @@ dolist(Char **v, struct command *c)
 	/* execute the parse tree. */
 	execute(t, tpgrp > 0 ? tpgrp : -1, NULL, NULL, FALSE);
 	/* done. free the lex list and parse tree. */
-	freelex(&cmd), freesyn(t);
+	cleanup_until(&cmd);
 	if (setintr)
-#ifdef BSDSIGS
-	    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-	    (void) sigrelse(SIGINT);
-#endif /* BSDSIGS */
+	    cleanup_until(&pintr_disabled);
     }
     else {
 	Char   *dp, *tmp;
 	struct Strbuf buf = Strbuf_INIT;
 
+	cleanup_push(&buf, Strbuf_cleanup);
 	for (k = 0, i = 0; v[k] != NULL; k++) {
 	    tmp = dnormalize(v[k], symlinks == SYM_IGNORE);
+	    cleanup_push(tmp, xfree);
 	    dp = Strend(tmp) - 1;
 	    if (*dp == '/' && dp != tmp)
 #ifdef apollo
@@ -343,12 +344,15 @@ dolist(Char **v, struct command *c)
 #endif /* apollo */
 		*dp = '\0';
 	    if (stat(short2str(tmp), &st) == -1) {
+		int err;
+
+		err = errno;
 		if (k != i) {
 		    if (i != 0)
 			xputchar('\n');
 		    print_by_column(STRNULL, &v[i], k - i, FALSE);
 		}
-		xprintf("%S: %s.\n", tmp, strerror(errno));
+		xprintf("%S: %s.\n", tmp, strerror(err));
 		i = k + 1;
 	    }
 	    else if (S_ISDIR(st.st_mode)) {
@@ -378,9 +382,9 @@ dolist(Char **v, struct command *c)
 		(void) t_search(&buf, LIST, TW_ZERO, 0, STRNULL, 0);
 		i = k + 1;
 	    }
-	    xfree(tmp);
+	    cleanup_until(tmp);
 	}
-	xfree(buf.s);
+	cleanup_until(&buf);
 	if (k != i) {
 	    if (i != 0)
 		xputchar('\n');
@@ -388,10 +392,7 @@ dolist(Char **v, struct command *c)
 	}
     }
 
-    if (gargv) {
-	blkfree(gargv);
-	gargv = 0;
-    }
+    cleanup_until(globbed);
 }
 
 extern int GotTermCaps;
@@ -428,10 +429,11 @@ dosettc(Char **v, struct command *c)
 	GetTermCaps();
 
     tv[0] = strsave(short2str(v[1]));
+    cleanup_push(tv[0], xfree);
     tv[1] = strsave(short2str(v[2]));
+    cleanup_push(tv[1], xfree);
     SetTC(tv[0], tv[1]);
-    xfree(tv[0]);
-    xfree(tv[1]);
+    cleanup_until(tv[0]);
 }
 
 /* The dowhich() is by:
@@ -484,35 +486,17 @@ dowhich(Char **v, struct command *c)
     int rv = TRUE;
     USE(c);
 
-#ifdef notdef
-    /* 
+    /*
      * We don't want to glob dowhich args because we lose quoteing
      * E.g. which \ls if ls is aliased will not work correctly if
      * we glob here.
      */
-    int gflag = tglob(v);
-    if (gflag) {
-	v = globall(v, gflag);
-	if (v == 0)
-	    stderror(ERR_NAME | ERR_NOMATCH);
-    }
-    else {
-	v = gargv = saveblk(v);
-	trim(v);
-    }
-#endif
 
     while (*++v) 
 	rv &= cmd_expand(*v, NULL);
 
     if (!rv)
-	set(STRstatus, Strsave(STR1), VAR_READWRITE);
-
-#ifdef notdef
-    /* Again look at the comment above; since we don't glob, we don't free */
-    if (gargv)
-	blkfree(gargv), gargv = 0;
-#endif
+	setcopy(STRstatus, STR1, VAR_READWRITE);
 }
 
 /* PWP: a hack to start up your stopped editor on a single keystroke */
@@ -596,28 +580,24 @@ find_stop_ed(void)
 void
 fg_proc_entry(struct process *pp)
 {
-#ifdef BSDSIGS
-    sigmask_t omask;
-#endif
     jmp_buf_t osetexit;
     int    ohaderr;
     Char    oGettingInput;
+    size_t omark;
 
     getexit(osetexit);
 
-#ifdef BSDSIGS
-    omask = sigblock(sigmask(SIGINT));
-#else
-    (void) sighold(SIGINT);
-#endif
+    pintr_disabled++;
     oGettingInput = GettingInput;
     GettingInput = 0;
 
     ohaderr = haderr;		/* we need to ignore setting of haderr due to
 				 * process getting stopped by a signal */
+    omark = cleanup_push_mark();
     if (setexit() == 0) {	/* come back here after pjwait */
 	pendjob();
 	(void) alarm(0);	/* No autologout */
+	alrmcatch_disabled = 1;
 	if (!pstart(pp, 1)) {
 	    pp->p_procid = 0;
 	    stderror(ERR_BADJOB, pp->p_command, strerror(errno));
@@ -625,16 +605,12 @@ fg_proc_entry(struct process *pp)
 	pjwait(pp);
     }
     setalarm(1);		/* Autologout back on */
+    cleanup_pop_mark(omark);
     resexit(osetexit);
     haderr = ohaderr;
     GettingInput = oGettingInput;
 
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGINT);
-#endif /* BSDSIGS */
-
+    disabled_cleanup(&pintr_disabled);
 }
 
 static char *
@@ -642,27 +618,33 @@ xgetpass(const char *prm)
 {
     static struct strbuf pass; /* = strbuf_INIT; */
     int fd;
-    signalfun_t sigint;
+    sigset_t omask;
+    struct sigaction sigint;
 
-    sigint = (signalfun_t) sigset(SIGINT, SIG_IGN);
+    sigprocmask(SIG_UNBLOCK, NULL, &omask);
+    sigaction(SIGINT, NULL, &sigint);
+    sigset(SIGINT, SIG_IGN);
+    cleanup_push(&sigint, sigint_cleanup);
+    cleanup_push(&omask, sigprocmask_cleanup);
     (void) Rawmode();	/* Make sure, cause we want echo off */
-    if ((fd = open("/dev/tty", O_RDWR|O_LARGEFILE)) == -1)
+    fd = xopen("/dev/tty", O_RDWR|O_LARGEFILE);
+    if (fd == -1)
 	fd = SHIN;
+    else
+	cleanup_push(&fd, open_cleanup);
 
     xprintf("%s", prm); flush();
     pass.len = 0;
     for (;;)  {
 	char c;
 
-	if (read(fd, &c, 1) < 1 || c == '\n') 
+	if (xread(fd, &c, 1) < 1 || c == '\n') 
 	    break;
 	strbuf_append1(&pass, c);
     }
     strbuf_terminate(&pass);
 
-    if (fd != SHIN)
-	(void) close(fd);
-    (void) sigset(SIGINT, sigint);
+    cleanup_until(&sigint);
 
     return pass.s;
 }
@@ -703,7 +685,7 @@ auto_lock(void)
 
 # define XCRYPT(a, b) crypt16(a, b)
 
-    if ((pw = getpwuid(euid)) != NULL &&	/* effective user passwd  */
+    if ((pw = xgetpwuid(euid)) != NULL &&	/* effective user passwd  */
         (apw = getauthuid(euid)) != NULL) 	/* enhanced ultrix passwd */
 	srpp = apw->a_password;
 
@@ -713,16 +695,22 @@ auto_lock(void)
 
 # define XCRYPT(a, b) crypt(a, b)
 
-    if ((pw = getpwuid(euid)) != NULL &&	/* effective user passwd  */
-	(spw = getspnam(pw->pw_name)) != NULL)	/* shadowed passwd	  */
-	srpp = spw->sp_pwdp;
+    if ((pw = xgetpwuid(euid)) != NULL)	{	/* effective user passwd  */
+	errno = 0;
+	while ((spw = getspnam(pw->pw_name)) == NULL && errno == EINTR) {
+	    handle_pending_signals();
+	    errno = 0;
+	}
+	if (spw != NULL)			 /* shadowed passwd	  */
+	    srpp = spw->sp_pwdp;
+    }
 
 #else
 
 #define XCRYPT(a, b) crypt(a, b)
 
 #if !defined(__MVS__)
-    if ((pw = getpwuid(euid)) != NULL)	/* effective user passwd  */
+    if ((pw = xgetpwuid(euid)) != NULL)	/* effective user passwd  */
 	srpp = pw->pw_passwd;
 #endif /* !MVS */
 
@@ -735,12 +723,7 @@ auto_lock(void)
     }
 
     setalarm(0);		/* Not for locking any more */
-#ifdef BSDSIGS
-    (void) sigsetmask(sigblock(0) & ~(sigmask(SIGALRM)));
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGALRM);
-#endif /* BSDSIGS */
-    xputchar('\n'); 
+    xputchar('\n');
     for (i = 0; i < 5; i++) {
 	const char *crpp;
 	char *pp;
@@ -754,7 +737,7 @@ auto_lock(void)
 	    if ((afsname = getenv("AFSUSER")) == NULL)
 	        afsname = pw->pw_name;
 #endif
-	pp = xgetpass("Password:"); 
+	pp = xgetpass("Password:");
 
 	crpp = XCRYPT(pp, srpp);
 	if ((strcmp(crpp, srpp) == 0)
@@ -773,8 +756,8 @@ auto_lock(void)
 	    (void) memset(pp, 0, strlen(pp));
 	    if (GettingInput && !just_signaled) {
 		(void) Rawmode();
-		ClearLines();	
-		ClearDisp();	
+		ClearLines();
+		ClearDisp();
 		Refresh();
 	    }
 	    just_signaled = 0;
@@ -788,14 +771,14 @@ auto_lock(void)
 
 
 static void
-auto_logout()
+auto_logout(void)
 {
     xprintf("auto-logout\n");
     /* Don't leave the tty in raw mode */
     if (editing)
 	(void) Cookedmode();
-    (void) close(SHIN);
-    set(STRlogout, Strsave(STRautomatic), VAR_READWRITE);
+    xclose(SHIN);
+    setcopy(STRlogout, STRautomatic, VAR_READWRITE);
     child = 1;
 #ifdef TESLA
     do_logout = 1;
@@ -804,18 +787,10 @@ auto_logout()
     goodbye(NULL, NULL);
 }
 
-RETSIGTYPE
-/*ARGSUSED*/
-alrmcatch(int snum)
+void
+alrmcatch(void)
 {
-    USE(snum);
-#ifdef UNRELSIGS
-    if (snum)
-	(void) sigset(SIGALRM, alrmcatch);
-#endif /* UNRELSIGS */
-
     (*alm_fun)();
-
     setalarm(1);
 }
 
@@ -831,13 +806,8 @@ alrmcatch(int snum)
 void
 precmd(void)
 {
-#ifdef BSDSIGS
-    sigmask_t omask;
-
-    omask = sigblock(sigmask(SIGINT));
-#else /* !BSDSIGS */
-    (void) sighold(SIGINT);
-#endif /* BSDSIGS */
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
     if (precmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRprecmd);
 	xprintf(CGETS(22, 3, "Faulty alias 'precmd' removed.\n"));
@@ -848,23 +818,14 @@ precmd(void)
 	aliasrun(1, STRprecmd, NULL);
 leave:
     precmd_active = 0;
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGINT);
-#endif /* BSDSIGS */
+    cleanup_until(&pintr_disabled);
 }
 
 void
 postcmd(void)
 {
-#ifdef BSDSIGS
-    sigmask_t omask;
-
-    omask = sigblock(sigmask(SIGINT));
-#else /* !BSDSIGS */
-    (void) sighold(SIGINT);
-#endif /* BSDSIGS */
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
     if (postcmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRpostcmd);
 	xprintf(CGETS(22, 3, "Faulty alias 'postcmd' removed.\n"));
@@ -875,11 +836,7 @@ postcmd(void)
 	aliasrun(1, STRpostcmd, NULL);
 leave:
     postcmd_active = 0;
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGINT);
-#endif /* BSDSIGS */
+    cleanup_until(&pintr_disabled);
 }
 
 /*
@@ -891,13 +848,8 @@ leave:
 void
 cwd_cmd(void)
 {
-#ifdef BSDSIGS
-    sigmask_t omask;
-
-    omask = sigblock(sigmask(SIGINT));
-#else /* !BSDSIGS */
-    (void) sighold(SIGINT);
-#endif /* BSDSIGS */
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
     if (cwdcmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRcwdcmd);
 	xprintf(CGETS(22, 4, "Faulty alias 'cwdcmd' removed.\n"));
@@ -908,11 +860,7 @@ cwd_cmd(void)
 	aliasrun(1, STRcwdcmd, NULL);
 leave:
     cwdcmd_active = 0;
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGINT);
-#endif /* BSDSIGS */
+    cleanup_until(&pintr_disabled);
 }
 
 /*
@@ -922,13 +870,8 @@ leave:
 void
 beep_cmd(void)
 {
-#ifdef BSDSIGS
-    sigmask_t omask;
-
-    omask = sigblock(sigmask(SIGINT));
-#else /* !BSDSIGS */
-    (void) sighold(SIGINT);
-#endif /* BSDSIGS */
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
     if (beepcmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRbeepcmd);
 	xprintf(CGETS(22, 5, "Faulty alias 'beepcmd' removed.\n"));
@@ -939,11 +882,7 @@ beep_cmd(void)
 	    aliasrun(1, STRbeepcmd, NULL);
     }
     beepcmd_active = 0;
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGINT);
-#endif /* BSDSIGS */
+    cleanup_until(&pintr_disabled);
 }
 
 
@@ -957,13 +896,9 @@ period_cmd(void)
 {
     Char *vp;
     time_t  t, interval;
-#ifdef BSDSIGS
-    sigmask_t omask;
 
-    omask = sigblock(sigmask(SIGINT));
-#else /* !BSDSIGS */
-    (void) sighold(SIGINT);
-#endif /* BSDSIGS */
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
     if (periodic_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRperiodic);
 	xprintf(CGETS(22, 6, "Faulty alias 'periodic' removed.\n"));
@@ -985,11 +920,7 @@ period_cmd(void)
     }
 leave:
     periodic_active = 0;
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGINT);
-#endif /* BSDSIGS */
+    cleanup_until(&pintr_disabled);
 }
 
 
@@ -1004,13 +935,8 @@ leave:
 void
 job_cmd(Char *args)
 {
-#ifdef BSDSIGS
-    sigmask_t omask;
-
-    omask = sigblock(sigmask(SIGINT));
-#else /* !BSDSIGS */
-    (void) sighold(SIGINT);
-#endif /* BSDSIGS */
+    pintr_disabled++;
+    cleanup_push(&pintr_disabled, disabled_cleanup);
     if (jobcmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRjobcmd);
 	xprintf(CGETS(22, 14, "Faulty alias 'jobcmd' removed.\n"));
@@ -1024,11 +950,7 @@ job_cmd(Char *args)
     }
 leave:
     jobcmd_active = 0;
-#ifdef BSDSIGS
-    (void) sigsetmask(omask);
-#else /* !BSDSIGS */
-    (void) sigrelse(SIGINT);
-#endif /* BSDSIGS */
+    cleanup_until(&pintr_disabled);
 }
 
 
@@ -1044,6 +966,7 @@ aliasrun(int cnt, Char *s1, Char *s2)
     struct command *t = NULL;
     jmp_buf_t osetexit;
     int status;
+    size_t omark;
 
     getexit(osetexit);
     if (seterr) {
@@ -1066,6 +989,7 @@ aliasrun(int cnt, Char *s1, Char *s2)
 	new1->next = w.prev = new2;
 	new1->prev = new2->next = &w;
     }
+    cleanup_push(&w, lex_cleanup);
 
     /* Save the old status */
     status = getn(varval(STRstatus));
@@ -1074,13 +998,15 @@ aliasrun(int cnt, Char *s1, Char *s2)
     alias(&w);
     /* build a syntax tree for the command. */
     t = syntax(w.next, &w, 0);
+    cleanup_push(t, syntax_cleanup);
     if (seterr)
 	stderror(ERR_OLD);
 
     psavejob();
-
+    cleanup_push(&cnt, psavejob_cleanup); /* cnt is used only as a marker */
 
     /* catch any errors here */
+    omark = cleanup_push_mark();
     if (setexit() == 0)
 	/* execute the parse tree. */
 	/*
@@ -1088,8 +1014,9 @@ aliasrun(int cnt, Char *s1, Char *s2)
 	 * was execute(t, tpgrp);
 	 */
 	execute(t, tpgrp > 0 ? tpgrp : -1, NULL, NULL, TRUE);
-    /* done. free the lex list and parse tree. */
-    freelex(&w), freesyn(t);
+    /* reset the error catcher to the old place */
+    cleanup_pop_mark(omark);
+    resexit(osetexit);
     if (haderr) {
 	haderr = 0;
 	/*
@@ -1117,9 +1044,7 @@ aliasrun(int cnt, Char *s1, Char *s2)
 	    period_cmd();
 #endif /* notdef */
     }
-    /* reset the error catcher to the old place */
-    resexit(osetexit);
-    prestjob();
+    cleanup_until(&w);
     pendjob();
     /* Restore status */
     set(STRstatus, putn(status), VAR_READWRITE);
@@ -1173,6 +1098,7 @@ setalarm(int lck)
 	    alm_fun = sched_run;
 	}
     }
+    alrmcatch_disabled = 0;
     (void) alarm(alrm_time);	/* Autologout ON */
 }
 
@@ -1517,7 +1443,7 @@ gethomedir(const Char *us)
     Char *rp;
 #endif /* HESIOD */
     
-    pp = getpwnam(short2str(us));
+    pp = xgetpwnam(short2str(us));
 #ifdef YPBUGS
     fix_yp_bugs();
 #endif /* YPBUGS */
@@ -1686,13 +1612,16 @@ shlvl(int val)
 	    Char *p;
 
 	    p = Itoa(val, 0, 0);
+	    cleanup_push(p, xfree);
 	    set(STRshlvl, p, VAR_READWRITE);
+	    cleanup_ignore(p);
+	    cleanup_until(p);
 	    tsetenv(STRKSHLVL, p);
 	}
     }
     else {
-	set(STRshlvl, SAVE("1"), VAR_READWRITE);
-	tsetenv(STRKSHLVL, str2short("1"));
+	setcopy(STRshlvl, STR1, VAR_READWRITE);
+	tsetenv(STRKSHLVL, STR1);
     }
 }
 
@@ -1839,26 +1768,20 @@ collate(const Char *a, const Char *b)
 int
 hashbang(int fd, Char ***vp)
 {
-    char **sargv = NULL, lbuf[HACKBUFSZ], *p, *ws;
-    size_t sargc = 0, sarg_size = 0;
+    struct blk_buf sarg = BLK_BUF_INIT;
+    char lbuf[HACKBUFSZ], *p, *ws;
 #ifdef WINNT_NATIVE
     int fw = 0; 	/* found at least one word */
-    int first_word = 0;
+    int first_word = 1;
+    char *real;
 #endif /* WINNT_NATIVE */
 
-    if (read(fd, lbuf, HACKBUFSZ) <= 0)
+    if (xread(fd, lbuf, HACKBUFSZ) <= 0)
 	return -1;
 
     ws = 0;	/* word started = 0 */
 
     for (p = lbuf; p < &lbuf[HACKBUFSZ]; ) {
-	if (sargc + 1 >= sarg_size) {
-	    if (sarg_size == 0)
-		sarg_size = 16; /* Arbitrary */
-	    else
-		sarg_size *= 2;
-	    sargv = xrealloc(sargv, sarg_size * sizeof (*sargv));
-	}
 	switch (*p) {
 	case ' ':
 	case '\t':
@@ -1867,18 +1790,17 @@ hashbang(int fd, Char ***vp)
 #endif /* WINNT_NATIVE */
 	    if (ws) {	/* a blank after a word.. save it */
 		*p = '\0';
-#ifndef WINNT_NATIVE
-		sargv[sargc++] = ws;
-		ws = NULL;
-#else /* WINNT_NATIVE */
-		sargv[sargc] = first_word ? NULL: hb_subst(ws);
-		if (sargv[sargc] == NULL)
-		    sargv[sargc] = ws;
-		sargc++;
-		ws = NULL;
+#ifdef WINNT_NATIVE
+		if (first_word) {
+		    real = hb_subst(ws);
+		    if (real != NULL)
+			ws = real;
+		}
 	    	fw = 1;
-		first_word = 1;
+		first_word = 0;
 #endif /* WINNT_NATIVE */
+		bb_append(&sarg, SAVE(ws));
+		ws = NULL;
 	    }
 	    p++;
 	    continue;
@@ -1893,21 +1815,18 @@ hashbang(int fd, Char ***vp)
 #endif /* WINNT_NATIVE */
 		ws) {	/* terminate the last word */
 		*p = '\0';
-#ifndef WINNT_NATIVE
-		sargv[sargc++] = ws;
-#else /* WINNT_NATIVE */
+#ifdef WINNT_NATIVE
 		/* deal with the 1-word case */
-		sargv[sargc] = first_word? NULL : hb_subst(ws);
-		if (sargv[sargc] == NULL)
-		    sargv[sargc] = ws;
-		sargc++;
+		if (first_word) {
+		    real = hb_subst(ws);
+		    if (real != NULL)
+			ws = real;
+		}
 #endif /* !WINNT_NATIVE */
+		bb_append(&sarg, SAVE(ws));
 	    }
-	    sargv[sargc] = NULL;
-	    ws = NULL;
-	    if (sargc > 0) {
-		*vp = blk2short(sargv);
-		xfree(sargv);
+	    if (sarg.len > 0) {
+		*vp = bb_finish(&sarg);
 		return 0;
 	    }
 	    else
@@ -1921,28 +1840,22 @@ hashbang(int fd, Char ***vp)
 	}
     }
  err:
-    xfree(sargv);
+    bb_cleanup(&sarg);
     return -1;
 }
 #endif /* HASHBANG */
 
 #ifdef REMOTEHOST
 
-static RETSIGTYPE
+static void
 palarm(int snum)
 {
     USE(snum);
-#ifdef UNRELSIGS
-    if (snum)
-	(void) sigset(snum, SIG_IGN);
-#endif /* UNRELSIGS */
-    (void) alarm(0);
-    reset();
+    _exit(1);
 }
 
-
 static void
-getremotehost(void)
+getremotehost(int dest_fd)
 {
     const char *host = NULL;
 #ifdef INET6
@@ -1953,9 +1866,6 @@ getremotehost(void)
     struct sockaddr_in saddr;
 #endif
     socklen_t len = sizeof(saddr);
-#ifdef HAVE_STRUCT_UTMP_UT_HOST
-    char *sptr = NULL;
-#endif
 
 #ifdef INET6
     if (getpeername(SHIN, (struct sockaddr *) &saddr, &len) != -1 &&
@@ -1987,6 +1897,7 @@ getremotehost(void)
 	/* Avoid empty names and local X displays */
 	if (name != NULL && *name != '\0' && *name != ':') {
 	    struct in_addr addr;
+	    char *sptr;
 
 	    /* Look for host:display.screen */
 	    /*
@@ -2062,37 +1973,75 @@ getremotehost(void)
     }
 #endif
 
-    if (host)
-	tsetenv(STRREMOTEHOST, str2short(host));
+    if (host) {
+	size_t left;
 
-#ifdef HAVE_STRUCT_UTMP_UT_HOST
-    if (sptr)
-	*sptr = ':';
-#endif
+	left = strlen(host);
+	while (left != 0) {
+	    ssize_t res;
+
+	    res = xwrite(dest_fd, host, left);
+	    if (res < 0)
+		_exit(1);
+	    host += res;
+	    left -= res;
+	}
+    }
+    _exit(0);
 }
-
 
 /*
  * From: <lesv@ppvku.ericsson.se> (Lennart Svensson)
  */
-void 
+void
 remotehost(void)
 {
-    /* Don't get stuck if the resolver does not work! */
-    signalfun_t osig = sigset(SIGALRM, palarm);
+    struct sigaction sa;
+    struct strbuf hostname = strbuf_INIT;
+    int fds[2], wait_options, status;
+    pid_t pid, wait_res;
 
-    jmp_buf_t osetexit;
-    getexit(osetexit);
+    sa.sa_handler = SIG_DFL; /* Make sure a zombie is created */
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGCHLD, &sa, NULL);
+    mypipe(fds);
+    pid = fork();
+    if (pid == 0) {
+	xclose(fds[0]);
+	/* Don't get stuck if the resolver does not work! */
+	sigset(SIGALRM, palarm);
+	(void) alarm(2);
+	getremotehost(fds[1]);
+	/*NOTREACHED*/
+    }
+    xclose(fds[1]);
+    for (;;) {
+	char buf[BUFSIZE];
+	ssize_t res;
 
-    (void) alarm(2);
-
-    if (setexit() == 0)
-	getremotehost();
-
-    resexit(osetexit);
-
-    (void) alarm(0);
-    (void) sigset(SIGALRM, osig);
+	res = xread(fds[0], buf, sizeof(buf));
+	if (res == -1) {
+	    hostname.len = 0;
+	    wait_options = WNOHANG;
+	    goto done;
+	}
+	if (res == 0)
+	    break;
+	strbuf_appendn(&hostname, buf, res);
+    }
+    wait_options = 0;
+ done:
+    xclose(fds[0]);
+    while ((wait_res = waitpid(pid, &status, wait_options)) == -1
+	   && errno == EINTR)
+	handle_pending_signals();
+    cleanup_push(&hostname, strbuf_cleanup);
+    if (wait_res == pid && WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+	strbuf_terminate(&hostname);
+	tsetenv(STRREMOTEHOST, str2short(hostname.s));
+    }
+    cleanup_until(&hostname);
 
 #ifdef YPBUGS
     /* From: casper@fwi.uva.nl (Casper H.S. Dik), for Solaris 2.3 */
@@ -2126,7 +2075,7 @@ dotermname(Char **v, struct command *c)
 	/* no luck - the user didn't provide one and none is 
 	 * specified in the environment
 	 */
-	set(STRstatus, Strsave(STR1), VAR_READWRITE);
+	setcopy(STRstatus, STR1, VAR_READWRITE);
 	return;
     }
 
@@ -2139,9 +2088,8 @@ dotermname(Char **v, struct command *c)
      */
     if (tgetent(termcap_buffer, termtype) == 1) {
 	xprintf("%s\n", termtype);
-	set(STRstatus, Strsave(STR0), VAR_READWRITE);
-    } else {
-	set(STRstatus, Strsave(STR1), VAR_READWRITE);
-    }
+	setcopy(STRstatus, STR0, VAR_READWRITE);
+    } else
+	setcopy(STRstatus, STR1, VAR_READWRITE);
 }
 #endif /* WINNT_NATIVE */

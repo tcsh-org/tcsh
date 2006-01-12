@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.30 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.31 2006/01/12 19:43:00 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -88,7 +88,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.30 2006/01/12 18:15:24 christos Exp $")
+RCSID("$Id: ed.xmap.c,v 3.31 2006/01/12 19:43:00 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -210,7 +210,7 @@ TraverseMap(XmapNode *ptr, CStr *ch, XmapVal *val)
 }
 
 void
-AddXkey(CStr *Xkey, XmapVal *val, int ntype)
+AddXkey(const CStr *Xkey, XmapVal *val, int ntype)
 {
     CStr cs;
     cs.buf = Xkey->buf;
@@ -301,7 +301,7 @@ TryNode(XmapNode *ptr, CStr *str, XmapVal *val, int ntype)
 }
 
 void
-ClearXkey(KEYCMD *map, CStr *in)
+ClearXkey(KEYCMD *map, const CStr *in)
 {
     unsigned char c = (unsigned char) *(in->buf);
     if ((map[c] == F_XKEY) &&
@@ -311,9 +311,12 @@ ClearXkey(KEYCMD *map, CStr *in)
 }
 
 int
-DeleteXkey(CStr *Xkey)
+DeleteXkey(const CStr *Xkey)
 {
-    if (Xkey->len == 0) {
+    CStr s;
+
+    s = *Xkey;
+    if (s.len == 0) {
 	xprintf(CGETS(9, 3, "DeleteXkey: Null extended-key not allowed.\n"));
 	return (-1);
     }
@@ -321,10 +324,11 @@ DeleteXkey(CStr *Xkey)
     if (Xmap == NULL)
 	return (0);
 
-    (void) TryDeleteNode(&Xmap, Xkey);
+    (void) TryDeleteNode(&Xmap, &s);
     return (0);
 }
 
+/* Destroys str */
 static int
 TryDeleteNode(XmapNode **inptr, CStr *str)
 {
@@ -425,7 +429,7 @@ GetFreeNode(CStr *ch)
  *	Print entire Xmap if null
  */
 void
-PrintXkey(CStr *key)
+PrintXkey(const CStr *key)
 {
     struct Strbuf buf = Strbuf_INIT;
     CStr cs;
@@ -443,9 +447,11 @@ PrintXkey(CStr *key)
 	return;
 
     Strbuf_append1(&buf, '"');
+    cleanup_push(&buf, Strbuf_cleanup);
     if (Lookup(&buf, &cs, Xmap) <= -1)
 	/* key is not bound */
 	xprintf(CGETS(9, 4, "Unbound extended key \"%S\"\n"), cs.buf);
+    cleanup_until(&buf);
 }
 
 /* Lookup():
@@ -546,8 +552,9 @@ printOne(const Char *key, const XmapVal *val, int ntype)
 	    unsigned char *p;
 
 	    p = unparsestring(&val->str, ntype == XK_STR ? STRQQ : STRBB);
+	    cleanup_push(p, xfree);
 	    xprintf(fmt, p);
-	    xfree(p);
+	    cleanup_until(p);
 	    break;
 	}
 	case XK_CMD:

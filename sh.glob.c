@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.66 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.67 2006/01/12 19:43:00 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,14 +32,12 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.66 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.67 2006/01/12 19:43:00 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
 
 #include "glob.h"
-
-static int pargsiz, gargsiz;
 
 /*
  * Values for gflag
@@ -57,11 +55,6 @@ static int pargsiz, gargsiz;
 #define RBRK ']'
 #define EOS '\0'
 
-Char  **gargv = NULL;
-int     gargc = 0;
-Char  **pargv = NULL;
-static int pargc = 0;
-
 /*
  * globbing is now done in two stages. In the first pass we expand
  * csh globbing idioms ~`{ and then we proceed doing the normal
@@ -71,17 +64,17 @@ static int pargc = 0;
  * handled in glob() which is part of the 4.4BSD libc.
  *
  */
-static	Char	 *globtilde	(Char **, Char *);
+static	Char	 *globtilde	(Char *);
 static	Char     *handleone	(Char *, Char **, int);
 static	Char	**libglob	(Char **);
 static	Char	**globexpand	(Char **, int);
 static	int	  globbrace	(const Char *, Char ***);
 static  void	  expbrace	(Char ***, Char ***, int);
-static	void	  pword		(struct Strbuf *);
-static	void	  backeval	(struct Strbuf *, Char *, int);
-
+static	void	  pword		(struct blk_buf *, struct Strbuf *);
+static	void	  backeval	(struct blk_buf *, struct Strbuf *, Char *,
+				 int);
 static Char *
-globtilde(Char **nv, Char *s)
+globtilde(Char *s)
 {
     Char *name, *u, *home, *res;
 
@@ -89,25 +82,19 @@ globtilde(Char **nv, Char *s)
     for (s++; *s && *s != '/' && *s != ':'; s++)
 	continue;
     name = Strnsave(u + 1, s - (u + 1));
+    cleanup_push(name, xfree);
     home = gethdir(name);
     if (home == NULL) {
 	if (adrof(STRnonomatch)) {
-	    xfree(name);
+	    cleanup_until(name);
 	    return u;
 	}
-	blkfree(nv);
-	if (*name) {
-	    char *cname;
-
-	    cname = short2str(name);
-	    xfree(name);
-	    stderror(ERR_UNKUSER, cname);
-	} else {
-	    xfree(name);
+	if (*name)
+	    stderror(ERR_UNKUSER, short2str(name));
+	else
 	    stderror(ERR_NOHOME);
-	}
     }
-    xfree(name);
+    cleanup_until(name);
     if (home[0] == '/' && home[1] == '\0' && s[0] == '/')
 	res = Strsave(s);
     else
@@ -162,12 +149,11 @@ static int
 globbrace(const Char *s, Char ***bl)
 {
     struct Strbuf gbuf = Strbuf_INIT;
-    int     i, len;
+    struct blk_buf bb = BLK_BUF_INIT;
+    int     i;
     const Char *p, *pm, *pe, *pl;
-    Char  **nv, **vl;
-    size_t prefix_len, size = GLOBSPACE;
+    size_t prefix_len;
 
-    len = 0;
     /* copy part up to the brace */
     for (p = s; *p != LBRC; p++)
 	;
@@ -193,8 +179,6 @@ globbrace(const Char *s, Char ***bl)
     if (i != 0 || *pe == '\0')
 	return (-RBRC);
 
-    nv = vl = xmalloc(sizeof(Char *) * size);
-    *vl = NULL;
     Strbuf_appendn(&gbuf, s, prefix_len);
 
     for (i = 0, pl = pm = p; pm <= pe; pm++)
@@ -203,8 +187,7 @@ globbrace(const Char *s, Char ***bl)
 	    for (++pm; *pm != RBRK && *pm != EOS; pm++)
 		continue;
 	    if (*pm == EOS) {
-		*vl = NULL;
-		blkfree(nv);
+		bb_cleanup(&bb);
 		xfree(gbuf.s);
 		return (-RBRK);
 	    }
@@ -226,23 +209,16 @@ globbrace(const Char *s, Char ***bl)
 		Strbuf_appendn(&gbuf, pl, pm - pl);
 		Strbuf_append(&gbuf, pe + 1);
 		Strbuf_terminate(&gbuf);
-		*vl++ = Strsave(gbuf.s);
-		len++;
+		bb_append(&bb, Strsave(gbuf.s));
 		pl = pm + 1;
-		if (vl == &nv[size]) {
-		    size += GLOBSPACE;
-		    nv = xrealloc(nv, size * sizeof(Char *));
-		    vl = &nv[size - GLOBSPACE];
-		}
 	    }
 	    break;
 	default:
 	    break;
 	}
-    *vl = NULL;
-    *bl = nv;
+    *bl = bb_finish(&bb);
     xfree(gbuf.s);
-    return (len);
+    return bb.len;
 }
 
 
@@ -264,13 +240,11 @@ expbrace(Char ***nvp, Char ***elp, int size)
 	if (s[0] == '{' && (s[1] == '\0' || (s[1] == '}' && s[2] == '\0')))
 	    continue;
 	if (Strchr(s, '{') != NULL) {
-	    Char  **bl;
+	    Char  **bl = NULL;
 	    int     len;
 
-	    if ((len = globbrace(s, &bl)) < 0) {
-		xfree(nv);
+	    if ((len = globbrace(s, &bl)) < 0)
 		stderror(ERR_MISSING, -len);
-	    }
 	    xfree(s);
 	    if (len == 1) {
 		*vl-- = *bl;
@@ -284,6 +258,7 @@ expbrace(Char ***nvp, Char ***elp, int size)
 		l = vl - nv;
 		e = el - nv;
 		nv = xrealloc(nv, size * sizeof(Char *));
+		*nvp = nv; /* To keep cleanups working */
 		vl = nv + l;
 		el = nv + e;
 	    }
@@ -314,7 +289,6 @@ expbrace(Char ***nvp, Char ***elp, int size)
     }
     if (elp != NULL)
 	*elp = el;
-    *nvp = nv;
 }
 
 static Char **
@@ -327,6 +301,7 @@ globexpand(Char **v, int noglob)
 
     nv = vl = xmalloc(sizeof(Char *) * size);
     *vl = NULL;
+    cleanup_push(&nv, blk_indirect_cleanup);
 
     /*
      * Step 1: expand backquotes.
@@ -334,18 +309,18 @@ globexpand(Char **v, int noglob)
     while ((s = *v++) != '\0') {
 	if (Strchr(s, '`')) {
 	    int     i;
+	    Char **expanded;
 
-	    (void) dobackp(s, 0);
-	    for (i = 0; i < pargc; i++) {
-		*vl++ = pargv[i];
+	    expanded = dobackp(s, 0);
+	    for (i = 0; expanded[i] != NULL; i++) {
+		*vl++ = expanded[i];
 		if (vl == &nv[size]) {
 		    size += GLOBSPACE;
 		    nv = xrealloc(nv, size * sizeof(Char *));
 		    vl = &nv[size - GLOBSPACE];
 		}
 	    }
-	    xfree(pargv);
-	    pargv = NULL;
+	    xfree(expanded);
 	}
 	else {
 	    *vl++ = Strsave(s);
@@ -355,11 +330,11 @@ globexpand(Char **v, int noglob)
 		vl = &nv[size - GLOBSPACE];
 	    }
 	}
+	*vl = NULL;
     }
-    *vl = NULL;
 
     if (noglob)
-	return (nv);
+	goto done;
 
     /*
      * Step 2: expand braces
@@ -376,15 +351,12 @@ globexpand(Char **v, int noglob)
 	switch (*s) {
 	    Char *ns;
 	case '~':
-	    *vl = globtilde(nv, s);
+	    *vl = globtilde(s);
 	    break;
 	case '=':
 	    if ((ns = globequal(s)) == NULL) {
-		if (!adrof(STRnonomatch)) {
-		    /* Error */
-		    blkfree(nv);
-		    stderror(ERR_DEEP);
-		}
+		if (!adrof(STRnonomatch))
+		    stderror(ERR_DEEP); /* Error */
 	    }
 	    if (ns && ns != s) {
 		/* Expansion succeeded */
@@ -407,6 +379,9 @@ globexpand(Char **v, int noglob)
 	}
     }
 
+ done:
+    cleanup_ignore(&nv);
+    cleanup_until(&nv);
     return nv;
 }
 
@@ -513,6 +488,7 @@ globone(Char *str, int action)
 	    vl = vo;
 	    goto result;
 	}
+	cleanup_push(vo, blk_cleanup);
     }
     else if (noglob || (gflg & G_GLOB) == 0)
 	return (strip(Strsave(str)));
@@ -521,7 +497,7 @@ globone(Char *str, int action)
 
     vl = libglob(vo);
     if ((gflg & G_CSH) && vl != vo)
-	blkfree(vo);
+	cleanup_until(vo);
     if (vl == NULL) {
 	setname(short2str(str));
 	stderror(ERR_NAME | ERR_NOMATCH);
@@ -546,11 +522,8 @@ globall(Char **v, int gflg)
     Char  **vl, **vo;
     int noglob;
 
-    if (!v || !v[0]) {
-	gargv = saveblk(v);
-	gargc = blklen(gargv);
-	return (gargv);
-    }
+    if (!v || !v[0])
+	return saveblk(v);
 
     noglob = adrof(STRnoglob) != 0;
 
@@ -563,24 +536,16 @@ globall(Char **v, int gflg)
 	vl = vo = saveblk(v);
 
     if (!noglob && (gflg & G_GLOB)) {
+	cleanup_push(vo, blk_cleanup);
 	vl = libglob(vo);
-	if (vl != vo)
-	    blkfree(vo);
+	if (vl == vo)
+	    cleanup_ignore(vo);
+	cleanup_until(vo);
     }
     else
 	trim(vl);
 
-    gargc = vl ? blklen(vl) : 0;
-    return (gargv = vl);
-}
-
-void
-ginit(void)
-{
-    gargsiz = GLOBSPACE;
-    gargv = xmalloc(sizeof(Char *) * gargsiz);
-    gargv[0] = 0;
-    gargc = 0;
+    return vl;
 }
 
 void
@@ -658,27 +623,17 @@ Char  **
 dobackp(Char *cp, int literal)
 {
     struct Strbuf word = Strbuf_INIT;
+    struct blk_buf bb = BLK_BUF_INIT;
     Char *lp, *rp, *ep;
 
-    if (pargv) {
-#ifdef notdef
-	abort();
-#endif
-	blkfree(pargv);
-    }
-    pargsiz = GLOBSPACE;
-    pargv = xmalloc(sizeof(Char *) * pargsiz);
-    pargv[0] = NULL;
-    pargc = 0;
+    cleanup_push(&bb, bb_cleanup);
+    cleanup_push(&word, Strbuf_cleanup);
     for (;;) {
 	for (lp = cp; *lp != '\0' && *lp != '`'; lp++)
 	    ;
 	Strbuf_appendn(&word, cp, lp - cp);
-	if (*lp == 0) {
-	    if (word.len != 0)
-		pword(&word);
-	    return pargv;
-	}
+	if (*lp == 0)
+	    break;
 	lp++;
 	for (rp = lp; *rp && *rp != '`'; rp++)
 	    if (*rp == '\\') {
@@ -687,19 +642,25 @@ dobackp(Char *cp, int literal)
 		    goto oops;
 	    }
 	if (!*rp) {
-	oops: xfree(word.s);
+	oops:
 	    stderror(ERR_UNMATCHED, '`');
 	}
-	ep = Strsave(lp);
-	ep[rp - lp] = 0;
-	backeval(&word, ep, literal);
+	ep = Strnsave(lp, rp - lp);
+	cleanup_push(ep, xfree);
+	backeval(&bb, &word, ep, literal);
+	cleanup_until(ep);
 	cp = rp + 1;
     }
+    if (word.len != 0)
+	pword(&bb, &word);
+    cleanup_ignore(&bb);
+    cleanup_until(&bb);
+    return bb_finish(&bb);
 }
 
 
 static void
-backeval(struct Strbuf *word, Char *cp, int literal)
+backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 {
     int icnt;
     Char c, *ip;
@@ -729,6 +690,7 @@ backeval(struct Strbuf *word, Char *cp, int literal)
      * we are sure to fork here.
      */
     psavejob();
+    cleanup_push(&faket, psavejob_cleanup); /* faket is only a marker */
 
     /*
      * It would be nicer if we could integrate this redirection more with the
@@ -736,22 +698,18 @@ backeval(struct Strbuf *word, Char *cp, int literal)
      * was piped out.
      */
     mypipe(pvec);
+    cleanup_push(&pvec[0], open_cleanup);
+    cleanup_push(&pvec[1], open_cleanup);
     if (pfork(&faket, -1) == 0) {
 	jmp_buf_t osetexit;
-	struct command *volatile t;
+	struct command *t;
+	size_t omark;
 
-	(void) close(pvec[0]);
+	xclose(pvec[0]);
 	(void) dmove(pvec[1], 1);
 	(void) dmove(SHDIAG,  2);
 	initdesc();
 	closem();
-	/*
-	 * Bugfix for nested backquotes by Michael Greim <greim@sbsvax.UUCP>,
-	 * posted to comp.bugs.4bsd 12 Sep. 1989.
-	 */
-	if (pargv)		/* mg, 21.dec.88 */
-	    blkfree(pargv), pargv = 0, pargsiz = 0;
-	/* mg, 21.dec.88 */
 	arginp = cp;
 	for (arginp = cp; *cp; cp++) {
 	    *cp &= TRIM;
@@ -768,28 +726,16 @@ backeval(struct Strbuf *word, Char *cp, int literal)
 	alvecp = NULL;
 	evalp = NULL;
 
-	t = NULL;
+	omark = cleanup_push_mark();
 	getexit(osetexit);
 	for (;;) {
-
-	    if (paraml.next && paraml.next != &paraml)
-		freelex(&paraml);
-	    
-	    paraml.next = paraml.prev = &paraml;
-	    paraml.word = STRNULL;
 	    (void) setexit();
 	    justpr = 0;
 	    
-	    /*
-	     * For the sake of reset()
-	     */
-	    freelex(&paraml);
-	    if (t)
-		freesyn(t), t = NULL;
-
 	    if (haderr) {
 		/* unwind */
 		doneinp = 0;
+		cleanup_pop_mark(omark);
 		resexit(osetexit);
 		reset();
 	    }
@@ -799,10 +745,12 @@ backeval(struct Strbuf *word, Char *cp, int literal)
 	    }
 
 	    (void) lex(&paraml);
+	    cleanup_push(&paraml, lex_cleanup);
 	    if (seterr)
 		stderror(ERR_OLD);
 	    alias(&paraml);
 	    t = syntax(paraml.next, &paraml, 0);
+	    cleanup_push(t, syntax_cleanup);
 	    if (seterr)
 		stderror(ERR_OLD);
 #ifdef SIGTSTP
@@ -816,12 +764,10 @@ backeval(struct Strbuf *word, Char *cp, int literal)
 #endif
 	    execute(t, -1, NULL, NULL, TRUE);
 
-	    freelex(&paraml);
-	    freesyn(t), t = NULL;
+	    cleanup_until(&paraml);
 	}
     }
-    xfree(cp);
-    (void) close(pvec[1]);
+    cleanup_until(&pvec[1]);
     c = 0;
     ip = NULL;
     do {
@@ -834,9 +780,7 @@ backeval(struct Strbuf *word, Char *cp, int literal)
 		int     i, eof;
 
 		ip = ibuf;
-		do
-		    icnt = read(pvec[0], tmp, tibuf + BUFSIZE - tmp);
-		while (icnt == -1 && errno == EINTR);
+		icnt = xread(pvec[0], tmp, tibuf + BUFSIZE - tmp);
 		eof = 0;
 		if (icnt <= 0) {
 		    if (tmp == tibuf)
@@ -898,28 +842,23 @@ backeval(struct Strbuf *word, Char *cp, int literal)
 	 * would lose blank lines.
 	 */
 	if (c != 0 && (cnt || literal))
-	    pword(word);
+	    pword(bb, word);
 	hadnl = 0;
     } while (c > 0);
  eof:
-    (void) close(pvec[0]);
+    cleanup_until(&pvec[0]);
     pwait();
-    prestjob();
+    cleanup_until(&faket); /* psavejob_cleanup(); */
 }
 
 static void
-pword(struct Strbuf *word)
+pword(struct blk_buf *bb, struct Strbuf *word)
 {
     Char *s;
 
-    if (pargc == pargsiz - 1) {
-	pargsiz += GLOBSPACE;
-	pargv = xrealloc(pargv, pargsiz * sizeof(Char *));
-    }
     s = Strbuf_finish(word);
     NLSQuote(s);
-    pargv[pargc++] = s;
-    pargv[pargc] = NULL;
+    bb_append(bb, s);
     *word = Strbuf_init;
 }
 
@@ -945,6 +884,7 @@ Gnmatch(const Char *string, const Char *pattern, const Char **endstr)
     blk[0] = Strsave(pattern);
     blk[1] = NULL;
 
+    cleanup_push(&blk, blk_indirect_cleanup);
     expbrace(&blk, NULL, GLOBSPACE);
 
     if (endstr == NULL)
@@ -965,7 +905,7 @@ Gnmatch(const Char *string, const Char *pattern, const Char **endstr)
 	*endstr = end;
     }
 
-    blkfree(blk);
+    cleanup_until(&blk);
     return(gres == gpol);
 } 
 
@@ -1067,15 +1007,4 @@ t_pmatch(const Char *string, const Char *pattern, const Char **estr, int cs)
 	    break;
 	}
     }
-}
-
-void
-Gcat(Char *s)
-{
-    gargv[gargc] = s;
-    if (++gargc >= gargsiz) {
-	gargsiz += GLOBSPACE;
-	gargv = xrealloc(gargv, gargsiz * sizeof(Char *));
-    }
-    gargv[gargc] = 0;
 }

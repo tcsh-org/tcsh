@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.time.c,v 3.30 2005/04/12 23:41:52 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.time.c,v 3.31 2005/04/12 23:45:10 kim Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.time.c,v 3.30 2005/04/12 23:41:52 kim Exp $")
+RCSID("$Id: sh.time.c,v 3.31 2005/04/12 23:45:10 kim Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -83,12 +83,7 @@ settimes(void)
     ruadd(&ru0,	&ruch);
 # else	/* _SEQUENT_ */
     seconds0 = time(NULL);
-#  ifndef COHERENT
     time0 = times(&times0);
-#  else	/* !COHERENT */
-    time0 = HZ * seconds0;
-    times(&times0);
-#  endif /* !COHERENT */
     times0.tms_stime +=	times0.tms_cstime;
     times0.tms_utime +=	times0.tms_cutime;
     times0.tms_cstime =	0;
@@ -135,12 +130,7 @@ dotime(Char **v, struct command *c)
 
     struct tms times_dol;
 
-#ifndef	COHERENT
     timedol = times(&times_dol);
-#else
-    timedol = HZ * time(NULL);
-    times(&times_dol);
-#endif
     times_dol.tms_stime	+= times_dol.tms_cstime;
     times_dol.tms_utime	+= times_dol.tms_cutime;
     times_dol.tms_cstime = 0;
@@ -464,7 +454,6 @@ prusage(struct tms *bs, struct tms *es, clock_t e, clock_t b)
 				 (long long)r0->ru_ixrss) /
 			 (long long)t);
 		xprintf("%lu", (unsigned long)memtmp);
-			
 		break;
 
 	    case 'D':		/* (average) unshared data size	*/

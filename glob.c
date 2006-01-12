@@ -572,7 +572,7 @@ glob3(struct strbuf *pathbuf, const Char *pattern, const Char *restpattern,
 	    break;
     }
     /* todo: check error from readdir? */
-    (void) closedir(dirp);
+    closedir(dirp);
     return (err);
 }
 

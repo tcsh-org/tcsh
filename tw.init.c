@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.init.c,v 3.36 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.init.c,v 3.37 2006/01/12 19:43:01 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.36 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: tw.init.c,v 3.37 2006/01/12 19:43:01 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -76,15 +76,6 @@ static struct {				/* Current element pointer	*/
 } tw_cmd_state;
 
 
-#ifdef BSDSIGS
-static sigmask_t tw_omask;
-# define TW_HOLD()	tw_omask = sigblock(sigmask(SIGINT))
-# define TW_RELS()	(void) sigsetmask(tw_omask)
-#else /* !BSDSIGS */
-# define TW_HOLD()	(void) sighold(SIGINT)
-# define TW_RELS()	(void) sigrelse(SIGINT)
-#endif /* BSDSIGS */
-
 #define SETDIR(dfd) \
     { \
 	tw_dir_fd = dfd; \
@@ -94,10 +85,10 @@ static sigmask_t tw_omask;
 
 #define CLRDIR(dfd) \
     if (dfd != NULL) { \
-	TW_HOLD(); \
-	(void) closedir(dfd); \
+	pintr_disabled++; \
+	xclosedir(dfd); \
 	dfd = NULL; \
-	TW_RELS(); \
+	disabled_cleanup(&pintr_disabled); \
     }
 
 static Char	*tw_str_add		(stringlist_t *, size_t);
@@ -120,16 +111,16 @@ tw_str_add(stringlist_t *sl, size_t len)
     Char *ptr;
 
     if (sl->tlist <= sl->nlist) {
-	TW_HOLD();
+	pintr_disabled++;
 	sl->tlist += TW_INCR;
 	sl->list = xrealloc(sl->list, sl->tlist * sizeof(Char *));
-	TW_RELS();
+	disabled_cleanup(&pintr_disabled);
     }
     if (sl->tbuff <= sl->nbuff + len) {
 	size_t i;
-	ptr = sl->buff;
 
-	TW_HOLD();
+	ptr = sl->buff;
+	pintr_disabled++;
 	sl->tbuff += TW_INCR + len;
 	sl->buff = xrealloc(sl->buff, sl->tbuff * sizeof(Char));
 	/* Re-thread the new pointer list, if changed */
@@ -138,7 +129,7 @@ tw_str_add(stringlist_t *sl, size_t len)
 	    for (i = 0; i < sl->nlist; i++)
 		sl->list[i] += offs;
 	}
-	TW_RELS();
+	disabled_cleanup(&pintr_disabled);
     }
     ptr = sl->list[sl->nlist++] = &sl->buff[sl->nbuff];
     sl->nbuff += len;
@@ -152,7 +143,7 @@ tw_str_add(stringlist_t *sl, size_t len)
 static void
 tw_str_free(stringlist_t *sl)
 {
-    TW_HOLD();
+    pintr_disabled++;
     if (sl->list) {
 	xfree(sl->list);
 	sl->list = NULL;
@@ -163,7 +154,7 @@ tw_str_free(stringlist_t *sl)
 	sl->buff = NULL;
 	sl->tbuff = sl->nbuff = 0;
     }
-    TW_RELS();
+    disabled_cleanup(&pintr_disabled);
 } /* end tw_str_free */
 
 
@@ -234,8 +225,11 @@ tw_cmd_cmd(void)
 	if ((dirp = opendir(short2str(*pv))) == NULL)
 	    continue;
 
-	if (recexec)
+	cleanup_push(dirp, opendir_cleanup);
+	if (recexec) {
 	    dir = Strspl(*pv, STRslash);
+	    cleanup_push(dir, xfree);
+	}
 	while ((dp = readdir(dirp)) != NULL) {
 #if defined(_UWIN) || defined(__CYGWIN__)
 	    /* Turn foo.{exe,com,bat} into foo since UWIN's readdir returns
@@ -259,9 +253,7 @@ tw_cmd_cmd(void)
                 continue;		/* Ignore!		*/
             tw_cmd_add(name);
 	}
-	(void) closedir(dirp);
-	if (recexec)
-	    xfree(dir);
+	cleanup_until(dirp);
     }
 } /* end tw_cmd_cmd */
 
@@ -324,7 +316,7 @@ tw_cmd_sort(void)
 {
     size_t fwd, i;
 
-    TW_HOLD();
+    pintr_disabled++;
     /* sort the list. */
     qsort(tw_cmd.list, tw_cmd.nlist, sizeof(Char *), fcompare);
 
@@ -339,7 +331,7 @@ tw_cmd_sort(void)
     if (fwd)
 	tw_cmd.list[i - fwd] = tw_cmd.list[i];
     tw_cmd.nlist -= fwd;
-    TW_RELS();
+    disabled_cleanup(&pintr_disabled);
 } /* end tw_cmd_sort */
 
 
@@ -616,6 +608,7 @@ int
 tw_logname_next(struct Strbuf *res, struct Strbuf *dir, int *flags)
 {
     struct passwd *pw;
+
     /*
      * We don't want to get interrupted inside getpwent()
      * because the yellow pages code is not interruptible,
@@ -624,13 +617,13 @@ tw_logname_next(struct Strbuf *res, struct Strbuf *dir, int *flags)
      */
     USE(flags);
     USE(dir);
-    TW_HOLD();
+    pintr_disabled++;
 #ifdef HAVE_GETPWENT
     pw = getpwent();
 #else
     pw = NULL;
 #endif
-    TW_RELS();
+    disabled_cleanup(&pintr_disabled);
 
     if (pw == NULL) {
 #ifdef YPBUGS
@@ -681,6 +674,7 @@ int
 tw_grpname_next(struct Strbuf *res, struct Strbuf *dir, int *flags)
 {
     struct group *gr;
+
     /*
      * We don't want to get interrupted inside getgrent()
      * because the yellow pages code is not interruptible,
@@ -689,13 +683,17 @@ tw_grpname_next(struct Strbuf *res, struct Strbuf *dir, int *flags)
      */
     USE(flags);
     USE(dir);
-    TW_HOLD();
+    pintr_disabled++;
 #if !defined(_VMS_POSIX) && !defined(_OSD_POSIX) && !defined(WINNT_NATIVE)
-    gr = (struct group *) getgrent();
+    errno = 0;
+    while ((gr = getgrent()) == NULL && errno == EINTR) {
+	handle_pending_signals();
+	errno = 0;
+    }
 #else /* _VMS_POSIX || _OSD_POSIX || WINNT_NATIVE */
     gr = NULL;
 #endif /* !_VMS_POSIX && !_OSD_POSIX && !WINNT_NATIVE */
-    TW_RELS();
+    disabled_cleanup(&pintr_disabled);
 
     if (gr == NULL) {
 #ifdef YPBUGS
