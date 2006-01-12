@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.57 2006/01/12 18:06:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.58 2006/01/12 18:12:43 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.57 2006/01/12 18:06:34 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.58 2006/01/12 18:12:43 christos Exp $")
 
 /*
  * C shell
@@ -508,14 +508,23 @@ Dgetdol(void)
 		np++;
 	    }
 	    while (cbp != 0) {
-	        *np = (unsigned char)*cbuf;
+		int len;
+
+		len = normal_mbtowc(np, cbuf, cbp);
+		if (len == -1) {
+		    reset_mbtowc();
+		    *np = (unsigned char)*cbuf | INVALID_BYTE;
+		}
+		if (len <= 0)
+		    len = 1;
+		if (cbp != (size_t)len)
+		    memmove(cbuf, cbuf + len, cbp - len);
+		cbp -= len;
 		if (np >= &wbuf[BUFSIZE - 1])
 		    stderror(ERR_LTOOLONG);
 		if (*np == '\n')
 		    break;
 		np++;
-		cbp--;
-		memmove(cbuf, cbuf + 1, cbp);
 	    }
 	    *np = 0;
 #ifdef BSDSIGS
