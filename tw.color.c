@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.19 2005/04/11 22:11:00 kim Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.20 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.19 2005/04/11 22:11:00 kim Exp $")
+RCSID("$Id: tw.color.c,v 1.20 2006/01/12 18:15:25 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -175,7 +175,7 @@ parseLS_COLORS(const Char *value)
 
     /* init */
     if (extensions)
-        xfree((ptr_t) extensions);
+        xfree(extensions);
     for (i = 0; i < nvariables; i++)
 	variables[i].color = variables[i].defaultcolor;
     colors = NULL;
@@ -191,7 +191,7 @@ parseLS_COLORS(const Char *value)
     for (v = value; *v; v++)
 	if ((*v & CHAR) == ':')
 	    i++;
-    extensions = (Extension *) xmalloc((size_t) (len + i * sizeof(Extension)));
+    extensions = xmalloc(len + i * sizeof(Extension));
     colors = i * sizeof(Extension) + (char *)extensions;
     nextensions = 0;
 
@@ -205,7 +205,7 @@ parseLS_COLORS(const Char *value)
     getexit(osetexit);
 
     if (setexit() == 0) {
-	    
+
     /* parse */
     while (*v) {
 	switch (*v & CHAR) {
@@ -295,9 +295,10 @@ print_color(const Char *fname, size_t len, Char suffix)
 	    }
 	if (i == nvariables) {
 	    for (i = 0; i < nextensions; i++)
-	        if (strncmp(last - extensions[i].extension.len,
-			    extensions[i].extension.s,
-			    extensions[i].extension.len) == 0) {
+	        if (len >= extensions[i].extension.len
+		    && strncmp(last - extensions[i].extension.len,
+			       extensions[i].extension.s,
+			       extensions[i].extension.len) == 0) {
 		  color = &extensions[i].color;
 		break;
 	    }

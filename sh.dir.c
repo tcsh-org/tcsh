@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.71 2005/08/02 21:04:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.72 2006/01/12 18:15:24 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.dir.c,v 3.71 2005/08/02 21:04:50 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.72 2006/01/12 18:15:24 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -196,7 +196,7 @@ skipargs(Char ***v, const char *dstr, const char *str)
 	    dflag |= DIR_OLD;
 	else {
 	    char *p;
-	    while (loop && *s != '\0')	/* examine flags */
+	    while (*s != '\0')	/* examine flags */
 	    {
 		if ((p = strchr(dstr, *s++)) != NULL)
 		    dflag |= (1 << (p - dstr));
@@ -223,7 +223,7 @@ skipargs(Char ***v, const char *dstr, const char *str)
 void
 dodirs(Char **v, struct command *c)
 {
-    static char flags[] = "plvnSLc";
+    static const char flags[] = "plvnSLc";
     int dflag = skipargs(&v, flags, "");
 
     USE(c);
@@ -370,8 +370,7 @@ dnormalize(const Char *cp, int expnd)
 	    return (Strsave(start));
 # endif
 
-	cwd = (Char *) xmalloc((size_t) (((int) Strlen(dcwd->di_name) + 3) *
-					   sizeof(Char)));
+	cwd = xmalloc((Strlen(dcwd->di_name) + 3) * sizeof(Char));
 	(void) Strcpy(cwd, dcwd->di_name);
 
 	/*
@@ -519,7 +518,7 @@ dochngd(Char **v, struct command *c)
     else
 	if ((cp = dfollow(cp)) == NULL)
 	    return;
-    dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
+    dp = xcalloc(sizeof(struct directory), 1);
     dp->di_name = cp;
     dp->di_count = 0;
     dp->di_next = dcwd->di_next;
@@ -710,7 +709,7 @@ dopushd(Char **v, struct command *c)
 	    cp = Strsave(cp);	/* hmmm... PWP */
 	    if ((cp = dfollow(cp)) == NULL)
 		return;
-	    dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
+	    dp = xcalloc(sizeof(struct directory), 1);
 	    dp->di_name = cp;
 	    dp->di_count = 0;
 	    dp->di_prev = dcwd;
@@ -756,7 +755,7 @@ dopushd(Char **v, struct command *c)
 
 	if ((ccp = dfollow(cp)) == NULL)
 	    return;
-	dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
+	dp = xcalloc(sizeof(struct directory), 1);
 	dp->di_name = ccp;
 	dp->di_count = 0;
 	dp->di_prev = dcwd;
@@ -852,8 +851,8 @@ dfree(struct directory *dp)
 	dp->di_next = dp->di_prev = 0;
     }
     else {
-	xfree((ptr_t) dp->di_name);
-	xfree((ptr_t) dp);
+	xfree(dp->di_name);
+	xfree(dp);
     }
 }
 
@@ -1231,7 +1230,7 @@ dsetstack(void)
 
     /* put back the stack */
     for (cp = vp->vec; cp && *cp && **cp; cp++) {
-	dp = (struct directory *) xcalloc(sizeof(struct directory), 1);
+	dp = xcalloc(sizeof(struct directory), 1);
 	dp->di_name = Strsave(*cp);
 	dp->di_count = 0;
 	dp->di_prev = dcwd;
@@ -1252,10 +1251,10 @@ dgetstack(void)
     if (adrof(STRdirstack) == NULL) 
     	return;
 
-    for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev, i++) 
+    for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev, i++)
 	continue;
-    dbp = dblk = (Char**) xmalloc((size_t) (i + 1) * sizeof(Char *));
-    for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev, dbp++) 
+    dbp = dblk = xmalloc((i + 1) * sizeof(Char *));
+    for (dn = dhead.di_prev; dn != &dhead; dn = dn->di_prev, dbp++)
 	 *dbp = Strsave(dn->di_name);
     *dbp = NULL;
     setq(STRdirstack, dblk, &shvhed, VAR_READWRITE);
@@ -1321,7 +1320,7 @@ loaddirs(Char *fname)
 	loaddirs_cmd[1] = fname;
     else
 	loaddirs_cmd[1] = STRtildotdirs;
-    dosource(loaddirs_cmd, (struct command *)0);
+    dosource(loaddirs_cmd, NULL);
     bequiet = 0;
 }
 
@@ -1353,9 +1352,9 @@ recdirs(Char *fname, int def)
     }
     else 
 	fname = globone(fname, G_ERROR);
-		
+
     if ((fp = creat(short2str(fname), 0600)) == -1) {
-	xfree((ptr_t) fname);
+	xfree(fname);
 	return;
     }
 

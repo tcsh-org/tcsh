@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.c,v 3.61 2006/01/12 18:06:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.c,v 3.62 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.61 2006/01/12 18:06:34 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.62 2006/01/12 18:15:25 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -119,20 +119,20 @@ dosetpath(Char **arglist, struct command *c)
 
     /* note that npaths != 0 */
 
-    spaths = (char **) xmalloc((size_t) npaths * sizeof *spaths);
-    setzero((char *) spaths, npaths * sizeof *spaths);
-    cpaths = (char **) xmalloc((size_t) (npaths + 1) * sizeof *cpaths);
-    setzero((char *) cpaths, (npaths + 1) * sizeof *cpaths);
-    cmds = (char **) xmalloc((size_t) (ncmds + 1) * sizeof *cmds);
-    setzero((char *) cmds, (ncmds + 1) * sizeof *cmds);
+    spaths = xmalloc(npaths * sizeof *spaths);
+    setzero(spaths, npaths * sizeof *spaths);
+    cpaths = xmalloc((npaths + 1) * sizeof *cpaths);
+    setzero(cpaths, (npaths + 1) * sizeof *cpaths);
+    cmds = xmalloc((ncmds + 1) * sizeof *cmds);
+    setzero(cmds, (ncmds + 1) * sizeof *cmds);
     for (i = 0; i < npaths; i++) {
 	char   *val = getenv(short2str(pathvars[i]));
 
 	if (val == NULL)
 	    val = "";
 
-	spaths[i] = (char *) xmalloc((size_t) (Strlen(pathvars[i]) +
-				      strlen(val) + 2) * sizeof **spaths);
+	spaths[i] = xmalloc((Strlen(pathvars[i]) + strlen(val) + 2) *
+			    sizeof **spaths);
 	(void) strcpy(spaths[i], short2str(pathvars[i]));
 	(void) strcat(spaths[i], "=");
 	(void) strcat(spaths[i], val);
@@ -144,8 +144,7 @@ dosetpath(Char **arglist, struct command *c)
 
 	if (val == NULL)
 	    goto abortpath;
-	cmds[i] = (char *) xmalloc((size_t) Strlen(val) + 1);
-	(void) strcpy(cmds[i], short2str(val));
+	cmds[i] = strsave(short2str(val));
     }
 
 
@@ -153,17 +152,14 @@ dosetpath(Char **arglist, struct command *c)
 abortpath:
 	if (spaths) {
 	    for (i = 0; i < npaths; i++)
-		if (spaths[i])
-		    xfree((ptr_t) spaths[i]);
-	    xfree((ptr_t) spaths);
+		xfree(spaths[i]);
+	    xfree(spaths);
 	}
-	if (cpaths)
-	    xfree((ptr_t) cpaths);
+	xfree(cpaths);
 	if (cmds) {
 	    for (i = 0; i < ncmds; i++)
-		if (cmds[i])
-		    xfree((ptr_t) cmds[i]);
-	    xfree((ptr_t) cmds);
+		xfree(cmds[i]);
+	    xfree(cmds);
 	}
 
 	(void) sigsetmask(omask);
@@ -395,7 +391,7 @@ migratepid(pit_t pid, siteno_t new_site)
 
     need_local = (pid == 0) || (pid == getpid());
 
-    if (kill3((pid_t) pid, SIGMIGRATE, new_site) < 0) {
+    if (kill3(pid, SIGMIGRATE, new_site) < 0) {
 	xprintf("%d: %s\n", pid, strerror(errno));
 	return (-1);
     }
@@ -482,7 +478,7 @@ domigrate(Char **v, struct command *c)
 	while (v && (cp = *v)) {
 	    if (*cp == '%') {
 		pp = pfind(cp);
-		if (kill3((pid_t) - pp->p_jobid, SIGMIGRATE, new_site) < 0) {
+		if (kill3(- pp->p_jobid, SIGMIGRATE, new_site) < 0) {
 		    xprintf("%S: %s\n", cp, strerror(errno));
 		    err1++;
 		}
@@ -1135,7 +1131,7 @@ osinit(void)
 #ifdef aiws
     {
 	struct sigstack inst;
-	inst.ss_sp = (char *) xmalloc((size_t) 4192) + 4192;
+	inst.ss_sp = xmalloc(4192) + 4192;
 	inst.ss_onstack = 0;
 	sigstack(&inst, NULL);
     }
@@ -1251,7 +1247,7 @@ static char *strnrcpy (char *, char *, size_t);
 char *
 xgetcwd(char *pathname, size_t pathlen)
 {
-    char pathbuf[MAXNAMLEN];	/* temporary pathname buffer */
+    char pathbuf[MAXPATHLEN];	/* temporary pathname buffer */
     char *pnptr = &pathbuf[(sizeof pathbuf)-1]; /* pathname pointer */
     dev_t rdev;			/* root device number */
     DIR *dirp = NULL;		/* directory stream */

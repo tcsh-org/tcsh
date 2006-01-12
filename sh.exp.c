@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exp.c,v 3.46 2005/04/11 22:10:57 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.exp.c,v 3.47 2006/01/12 18:15:24 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exp.c,v 3.46 2005/04/11 22:10:57 kim Exp $")
+RCSID("$Id: sh.exp.c,v 3.47 2006/01/12 18:15:24 christos Exp $")
 
 #include "tw.h"
 
@@ -167,7 +167,7 @@ sh_access(const Char *fname, int mode)
 	    n = getgroups(0, (GETGROUPS_T *) NULL);
 
 	if (n > 0) {
-	    groups = xmalloc((size_t) (n * sizeof(*groups)));
+	    groups = xmalloc(n * sizeof(*groups));
 	    n = getgroups((int) n, groups);
 	    while (--n >= 0)
 		if (groups[n] == statb.st_gid) {
@@ -309,12 +309,12 @@ exp2c(Char ***vp, int ignore)
 		i = !Gmatch(p1, p2);
 		break;
 	    }
-	xfree((ptr_t) p1);
-	xfree((ptr_t) p2);
+	xfree(p1);
+	xfree(p2);
 	return (i);
     }
     i = egetn(p1);
-    xfree((ptr_t) p1);
+    xfree(p1);
     return (i);
 }
 
@@ -351,8 +351,8 @@ exp3(Char ***vp, int ignore)
 		i = egetn(p1) <= egetn(p2);
 		break;
 	    }
-	xfree((ptr_t) p1);
-	xfree((ptr_t) p2);
+	xfree(p1);
+	xfree(p2);
 	return (putn(i));
     }
     return (p1);
@@ -407,8 +407,8 @@ exp4(Char ***vp, int ignore)
 		i = egetn(p1) - egetn(p2);
 		break;
 	    }
-	xfree((ptr_t) p1);
-	xfree((ptr_t) p2);
+	xfree(p1);
+	xfree(p2);
 	return (putn(i));
     }
     return (p1);
@@ -455,8 +455,8 @@ exp5(Char ***vp, int ignore)
 		i = egetn(p1) % i;
 		break;
 	    }
-	xfree((ptr_t) p1);
-	xfree((ptr_t) p2);
+	xfree(p1);
+	xfree(p2);
 	return (putn(i));
     }
     return (p1);
@@ -659,7 +659,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 		if (!lst) {
 		    lst = &lstb;
 		    if (TCSH_LSTAT(short2str(ep), lst) == -1) {
-			xfree((ptr_t) ep);
+			xfree(ep);
 			return (Strsave(errval));
 		    }
 		}
@@ -674,7 +674,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 		if (!st) {
 		    st = &stb;
 		    if (TCSH_STAT(short2str(ep), st) == -1) {
-			xfree((ptr_t) ep);
+			xfree(ep);
 			return (Strsave(errval));
 		    }
 		}
@@ -803,12 +803,12 @@ filetest(Char *cp, Char ***vp, int ignore)
 	    case 'F':
 		strdev = putn( (int) st->st_dev);
 		strino = putn( (int) st->st_ino);
-		strF = (Char *) xmalloc((size_t) (2 + Strlen(strdev) + 
-					 Strlen(strino)) * sizeof(Char));
+		strF = xmalloc((2 + Strlen(strdev) + Strlen(strino))
+			       * sizeof(Char));
 		(void) Strcat(Strcat(Strcpy(strF, strdev), STRcolon), strino);
-		xfree((ptr_t) strdev);
-		xfree((ptr_t) strino);
-		xfree((ptr_t) ep);
+		xfree(strdev);
+		xfree(strino);
+		xfree(ep);
 		return(strF);
 		
 	    case 'L':
@@ -841,12 +841,12 @@ filetest(Char *cp, Char ***vp, int ignore)
 		    ((S_IRWXU|S_IRWXG|S_IRWXO|S_ISUID|S_ISGID) & st->st_mode));
 		if (altout && *string != '0')
 		    *--string = '0';
-		xfree((ptr_t) ep);
+		xfree(ep);
 		return(Strsave(str2short(string)));
 
 	    case 'U':
 		if (altout && (pw = getpwuid(st->st_uid))) {
-		    xfree((ptr_t) ep);
+		    xfree(ep);
 		    return(Strsave(str2short(pw->pw_name)));
 		}
 		i = (int) st->st_uid;
@@ -854,7 +854,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 
 	    case 'G':
 		if ( altout && (gr = getgrgid(st->st_gid))) {
-		    xfree((ptr_t) ep);
+		    xfree(ep);
 		    return(Strsave(str2short(gr->gr_name)));
 		}
 		i = (int) st->st_gid;
@@ -871,7 +871,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 		    strF = str2short(ctime(&footime));
 		    if ((str = Strchr(strF, '\n')) != NULL)
 			*str = (Char) '\0';
-		    xfree((ptr_t) ep);
+		    xfree(ep);
 		    return(Strsave(strF));
 		}
 		i = (int) footime;
@@ -898,8 +898,7 @@ evalav(Char **v)
     hp->prev = hp->next = hp;
     hp->word = STRNULL;
     while (*v) {
-	struct wordent *new =
-	(struct wordent *) xcalloc(1, sizeof *wdp);
+	struct wordent *new = xcalloc(1, sizeof *wdp);
 
 	new->prev = wdp;
 	new->next = hp;

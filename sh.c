@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.124 2005/04/11 22:10:56 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.125 2006/01/12 18:15:24 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.124 2005/04/11 22:10:56 kim Exp $")
+RCSID("$Id: sh.c,v 3.125 2006/01/12 18:15:24 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -81,9 +81,6 @@ extern int NLSMapsAreInited;
 jmp_buf_t reslab INIT_ZERO_STRUCT;
 
 static const char tcshstr[] = "tcsh";
-#ifdef WINNT_NATIVE
-static const char tcshstr_nt[] = "tcsh.exe";
-#endif /* WINNT_NATIVE */
 
 signalfun_t parintr = 0;	/* Parents interrupt catch */
 signalfun_t parterm = 0;	/* Parents terminate catch */
@@ -320,17 +317,16 @@ main(int argc, char **argv)
 #endif /* _VMS_POSIX */
 
     if (loginsh && **tempv != '-') {
+	char *argv0;
+
 	/*
 	 * Mangle the argv space
 	 */
 	tempv[1][0] = '\0';
 	tempv[1][1] = '\0';
 	tempv[1] = NULL;
-	for (tcp = *tempv; *tcp++;)
-	     continue;
-	for (tcp--; tcp >= *tempv; tcp--)
-	    tcp[1] = tcp[0];
-	*++tcp = '-';
+	argv0 = strspl("-", *tempv);
+	*tempv = argv0;
 	argc--;
     }
     if (loginsh) {
@@ -396,7 +392,7 @@ main(int argc, char **argv)
      * 2. reenable the control terminal
      */
      if (loginsh && isatty(SHIN)) {
-	 ttyn = (char *) ttyname(SHIN);
+	 ttyn = ttyname(SHIN);
 	 (void) close(SHIN);
 	 SHIN = open(ttyn, O_RDWR|O_LARGEFILE);
 	 shpgrp = getpid();
@@ -734,11 +730,11 @@ main(int argc, char **argv)
      * only if we are the login shell.
      */
 #ifdef BSDSIGS
-    /* 
-     * PURIFY-2 claims that osv does not get 
+    /*
+     * PURIFY-2 claims that osv does not get
      * initialized after the sigvec call
      */
-    setzero((char*) &osv, sizeof(osv));
+    setzero(&osv, sizeof(osv));
     /* parents interruptibility */
     (void) mysigvec(SIGINT, NULL, &osv);
     parintr = (signalfun_t) osv.sv_handler;
@@ -853,7 +849,7 @@ main(int argc, char **argv)
 		{
 		    int count;
 
-		    cp = arginp + Strlen(arginp);
+		    cp = Strend(arginp);
 		    count = 0;
 		    while (cp > arginp && *--cp == '\\')
 			++count;
@@ -980,8 +976,7 @@ main(int argc, char **argv)
 #ifdef O_TEXT
 	setmode(nofile, O_TEXT);
 #endif
-	if (ffile != NULL)
-	    xfree((ptr_t) ffile);
+	xfree(ffile);
 	dolzero = 1;
 	ffile = SAVE(tempv[0]);
 	/* 
@@ -1385,7 +1380,7 @@ untty(void)
 void
 importpath(Char *cp)
 {
-    int i = 0;
+    size_t i = 0;
     Char *dp;
     Char **pv;
     int     c;
@@ -1397,7 +1392,7 @@ importpath(Char *cp)
      * i+2 where i is the number of colons in the path. There are i+1
      * directories in the path plus we need room for a zero terminator.
      */
-    pv = (Char **) xcalloc((size_t) (i + 2), sizeof(Char *));
+    pv = xcalloc(i + 2, sizeof(Char *));
     dp = cp;
     i = 0;
     if (*dp)
@@ -1436,10 +1431,8 @@ srccat(Char *cp, Char *dp)
 	int rv;
 
 #ifdef WINNT_NATIVE
-	ep = cp;
-	while(*ep)
-	    ep++;
-	if (ep[-1] == '/' && dp[0] == '/') /* silly win95 */
+	ep = Strend(cp);
+	if (ep != cp && ep[-1] == '/' && dp[0] == '/') /* silly win95 */
 	    dp++;
 #endif /* WINNT_NATIVE */
 
@@ -1447,7 +1440,7 @@ srccat(Char *cp, Char *dp)
 	ptr = short2str(ep);
 
 	rv = srcfile(ptr, (mflag ? 0 : 1), 0, NULL);
-	xfree((ptr_t) ep);
+	xfree(ep);
 	return rv;
     }
 }
@@ -1596,8 +1589,8 @@ st_restore(struct saved_state *st, Char **av)
 	fblocks = 0;
 	fbuf = NULL;
 	for (i = 0; i < nfblocks; i++)
-	    xfree((ptr_t) nfbuf[i]);
-	xfree((ptr_t) nfbuf);
+	    xfree(nfbuf[i]);
+	xfree(nfbuf);
     }
     cpybin(B, st->B);
 
@@ -2449,7 +2442,7 @@ defaultpath(void)
     Char  **blk, **blkp;
     struct stat stb;
 
-    blkp = blk = (Char **) xmalloc((size_t) sizeof(Char *) * 10);
+    blkp = blk = xmalloc(sizeof(Char *) * 10);
 
 #ifndef NODOT
 # ifndef DOTLAST

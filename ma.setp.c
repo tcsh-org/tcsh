@@ -82,7 +82,7 @@
  **********************************************************************
  */
 #include "sh.h"
-RCSID("$Id: ma.setp.c,v 1.15 2005/04/11 22:10:56 kim Exp $")
+RCSID("$Id: ma.setp.c,v 1.16 2006/01/12 18:15:24 christos Exp $")
 
 #ifdef MACH
 
@@ -246,8 +246,8 @@ initpaths(char **paths)
 	    return(-1);
 	}
 	*val++ = '\0';
-	pe = (struct pelem *)xmalloc((unsigned)(sizeof(struct pelem)));
-	setzero((char *) pe, sizeof(struct pelem));
+	pe = xmalloc(sizeof(struct pelem));
+	setzero(pe, sizeof(struct pelem));
 	if (pathhead == NULL)
 	    pathhead = pathend = pe;
 	else {

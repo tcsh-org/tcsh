@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.46 2005/08/02 19:59:27 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.who.c,v 3.47 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.who.c,v 3.46 2005/08/02 19:59:27 christos Exp $")
+RCSID("$Id: tc.who.c,v 3.47 2006/01/12 18:15:25 christos Exp $")
 
 #include "tc.h"
 
@@ -313,7 +313,7 @@ watch_login(int force)
     while ((uptr = getutent()) != NULL) {
         memcpy(&utmp, uptr, sizeof (utmp));
 #else
-    while (read(utmpfd, (char *) &utmp, sizeof utmp) == sizeof utmp) {
+    while (read(utmpfd, &utmp, sizeof utmp) == sizeof utmp) {
 #endif
 
 # ifdef DEAD_PROCESS
@@ -377,7 +377,7 @@ watch_login(int force)
 	    }
 	}
 	else {		/* new tty in utmp */
-	    wpnew = (struct who *) xcalloc(1, sizeof *wpnew);
+	    wpnew = xcalloc(1, sizeof *wpnew);
 	    (void) strncpy(wpnew->who_tty, utmp.ut_line, UTLINLEN);
 # ifdef HAVE_STRUCT_UTMP_UT_HOST
 #  ifdef _SEQUENT_
@@ -706,7 +706,7 @@ void add_to_who_list(name, mach_nm)
 	}
     }
     else {
-	wpnew = (struct who *) xcalloc(1, sizeof *wpnew);
+	wpnew = xcalloc(1, sizeof *wpnew);
 	(void) strncpy(wpnew->who_tty, mach_nm, UTLINLEN);
 	wpnew->who_time = 0;
 	if (*name == '\0')

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.printf.c,v 3.28 2005/04/11 22:10:59 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.printf.c,v 3.29 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -34,7 +34,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.28 2005/04/11 22:10:59 kim Exp $")
+RCSID("$Id: tc.printf.c,v 3.29 2006/01/12 18:15:25 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -75,7 +75,7 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
     f = sfmt;
     for (; *f; f++) {
 	if (*f != '%') {	/* then just out the char */
-	    (*addchar) ((int) (((unsigned char)*f) | attributes));
+	    (*addchar) (((unsigned char)*f) | attributes);
 	}
 	else {
 	    f++;		/* skip the % */
@@ -164,12 +164,12 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
 		f_width = f_width - (int) (bp - buf);
 		if (!flush_left)
 		    while (f_width-- > 0) 
-			(*addchar) ((int) (pad | attributes));
+			(*addchar) (pad | attributes);
 		for (bp--; bp >= buf; bp--) 
-		    (*addchar) ((int) (((unsigned char) *bp) | attributes));
+		    (*addchar) (((unsigned char) *bp) | attributes);
 		if (flush_left)
 		    while (f_width-- > 0)
-			(*addchar) ((int) (' ' | attributes));
+			(*addchar) (' ' | attributes);
 		break;
 
 	    case 'p':
@@ -182,7 +182,7 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
 	    case 'u':
 		switch (do_long) {
 		case 0:
-		    u = (unsigned long) (va_arg(ap, unsigned int));
+		    u = va_arg(ap, unsigned int);
 		    break;
 		case 1:
 #ifndef HAVE_LONG_LONG
@@ -224,18 +224,18 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
 		i = f_width - (int) (bp - buf);
 		if (!flush_left)
 		    while (i-- > 0)
-			(*addchar) ((int) (pad | attributes));
+			(*addchar) (pad | attributes);
 		for (bp--; bp >= buf; bp--)
-		    (*addchar) ((int) (((unsigned char) *bp) | attributes));
+		    (*addchar) (((unsigned char) *bp) | attributes);
 		if (flush_left)
 		    while (i-- > 0)
-			(*addchar) ((int) (' ' | attributes));
+			(*addchar) (' ' | attributes);
 		break;
 
 
 	    case 'c':
 		i = va_arg(ap, int);
-		(*addchar) ((int) (i | attributes));
+		(*addchar) (i | attributes);
 		break;
 
 	    case 'S':
@@ -255,16 +255,16 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
 		    size_t pos, len;
 
 		    if (fmt == 'Q' && *Bp & QUOTE)
-			(*addchar) ((int) ('\\' | attributes));
+			(*addchar) ('\\' | attributes);
 		    len = one_wctomb(cbuf, *Bp & CHAR);
 		    for (pos = 0; pos < len; pos++)
-			(*addchar) ((int) ((unsigned char)cbuf[pos]
-					   | attributes | (*Bp & ATTRIBUTES)));
+			(*addchar) ((unsigned char)cbuf[pos] | attributes
+				    | (*Bp & ATTRIBUTES));
 		    Bp++;
 		}
 		if (flush_left)
 		    while (f_width-- > 0)
-			(*addchar) ((int) (' ' | attributes));
+			(*addchar) (' ' | attributes);
 		break;
 #endif /* SHORT_STRINGS */
 
@@ -274,20 +274,19 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
 lcase_s:
 		if (!bp)
 		    bp = snil;
-		f_width = f_width - strlen((char *) bp);
+		f_width = f_width - strlen(bp);
 		if (!flush_left)
 		    while (f_width-- > 0)
-			(*addchar) ((int) (pad | attributes));
+			(*addchar) (pad | attributes);
 		for (i = 0; *bp && i < prec; i++) {
 		    if (fmt == 'q' && *bp & QUOTE)
-			(*addchar) ((int) ('\\' | attributes));
-		    (*addchar) ((int) (((unsigned char) *bp & TRIM) |
-				   	attributes));
+			(*addchar) ('\\' | attributes);
+		    (*addchar) (((unsigned char) *bp & TRIM) | attributes);
 		    bp++;
 		}
 		if (flush_left)
 		    while (f_width-- > 0)
-			(*addchar) ((int) (' ' | attributes));
+			(*addchar) (' ' | attributes);
 		break;
 
 	    case 'a':
@@ -295,7 +294,7 @@ lcase_s:
 		break;
 
 	    case '%':
-		(*addchar) ((int) ('%' | attributes));
+		(*addchar) ('%' | attributes);
 		break;
 
 	    default:

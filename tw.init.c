@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.init.c,v 3.35 2005/04/11 22:11:00 kim Exp $ */
+/* $Header: /src/pub/tcsh/tw.init.c,v 3.36 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.init.c,v 3.35 2005/04/11 22:11:00 kim Exp $")
+RCSID("$Id: tw.init.c,v 3.36 2006/01/12 18:15:25 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -154,12 +154,12 @@ tw_str_free(stringlist_t *sl)
 {
     TW_HOLD();
     if (sl->list) {
-	xfree((ptr_t) sl->list);
+	xfree(sl->list);
 	sl->list = NULL;
 	sl->tlist = sl->nlist = 0;
     }
     if (sl->buff) {
-	xfree((ptr_t) sl->buff);
+	xfree(sl->buff);
 	sl->buff = NULL;
 	sl->tbuff = sl->nbuff = 0;
     }
@@ -189,9 +189,9 @@ tw_dir_next(struct Strbuf *res, DIR *dfd)
 static void
 tw_cmd_add(const Char *name)
 {
-    int len;
+    size_t len;
 
-    len = (int) Strlen(name) + 2;
+    len = Strlen(name) + 2;
     (void) Strcpy(tw_str_add(&tw_cmd, len), name);
 } /* end tw_cmd_add */
 
@@ -219,7 +219,7 @@ tw_cmd_cmd(void)
     Char **pv;
     struct varent *v = adrof(STRpath);
     struct varent *recexec = adrof(STRrecognize_only_executables);
-    int len;
+    size_t len;
 
 
     if (v == NULL || v->vec == NULL) /* if no path */
@@ -241,27 +241,27 @@ tw_cmd_cmd(void)
 	    /* Turn foo.{exe,com,bat} into foo since UWIN's readdir returns
 	     * the file with the .exe, .com, .bat extension
 	     */
-	    size_t ext = strlen(dp->d_name) - 4;
-	    if ((ext > 0) && (strcmp(&dp->d_name[ext], ".exe") == 0 ||
-		strcmp(&dp->d_name[ext], ".bat") == 0 ||
-		strcmp(&dp->d_name[ext], ".com") == 0))
-		dp->d_name[ext] = '\0';
+	    len = strlen(dp->d_name);
+	    if (len > 4 && (strcmp(&dp->d_name[len - 4], ".exe") == 0 ||
+		strcmp(&dp->d_name[len - 4], ".bat") == 0 ||
+		strcmp(&dp->d_name[len - 4], ".com") == 0))
+		dp->d_name[len - 4] = '\0';
 #endif /* _UWIN || __CYGWIN__ */
 	    /* the call to executable() may make this a bit slow */
 	    name = str2short(dp->d_name);
 	    if (dp->d_ino == 0 || (recexec && !executable(dir, name, 0)))
 		continue;
-            len = (int) Strlen(name) + 2;
+            len = Strlen(name);
             if (name[0] == '#' ||	/* emacs temp files	*/
 		name[0] == '.' ||	/* .files		*/
-		name[len - 3] == '~' ||	/* emacs backups	*/
-		name[len - 3] == '%')	/* textedit backups	*/
+		name[len - 1] == '~' ||	/* emacs backups	*/
+		name[len - 1] == '%')	/* textedit backups	*/
                 continue;		/* Ignore!		*/
             tw_cmd_add(name);
 	}
 	(void) closedir(dirp);
 	if (recexec)
-	    xfree((ptr_t) dir);
+	    xfree(dir);
     }
 } /* end tw_cmd_cmd */
 

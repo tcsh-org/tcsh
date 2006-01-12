@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.init.c,v 3.53 2005/04/11 22:10:55 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.init.c,v 3.54 2006/01/12 18:15:24 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.53 2005/04/11 22:10:55 kim Exp $")
+RCSID("$Id: ed.init.c,v 3.54 2006/01/12 18:15:24 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -305,8 +305,7 @@ ed_Init(void)
     {				/* no kill ring - why? */
 	int i;
 	for (i = 0; i < KillRingMax; i++) {
-	    if (KillRing[i].buf != NULL)
-		xfree((ptr_t) KillRing[i].buf);
+	    xfree(KillRing[i].buf);
 	    KillRing[i].buf = NULL;
 	    KillRing[i].len = 0;
 	}
@@ -636,10 +635,10 @@ ResetInLine(int macro)
 	MacroLvl = -1;		/* no currently active macros */
 }
 
-static Char *Input_Line = NULL;
 int
 Load_input_line(void)
 {
+    static Char *Input_Line = NULL;
 #ifdef SUNOS4
     long chrs = 0;
 #else /* !SUNOS4 */
@@ -651,7 +650,7 @@ Load_input_line(void)
 #endif /* SUNOS4 */
 
     if (Input_Line)
-	xfree((ptr_t) Input_Line);
+	xfree(Input_Line);
     Input_Line = NULL;
 
     if (Tty_raw_mode)
@@ -660,7 +659,7 @@ Load_input_line(void)
 #if defined(FIONREAD) && !defined(OREO)
     (void) ioctl(SHIN, FIONREAD, (ioctl_t) &chrs);
     if (chrs > 0) {
-	char    buf[BUFSIZE];
+        char    buf[BUFSIZE];
 
 	chrs = read(SHIN, buf, (size_t) min(chrs, BUFSIZE - 1));
 	if (chrs > 0) {

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.init.c,v 3.56 2005/04/11 22:10:57 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.init.c,v 3.57 2006/01/12 18:15:25 christos Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.init.c,v 3.56 2005/04/11 22:10:57 kim Exp $")
+RCSID("$Id: sh.init.c,v 3.57 2006/01/12 18:15:25 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -236,7 +236,7 @@ mesginit(void)
     int i;
 
     for (i = 0; i < NUMSIG; i++) {
-	xfree((ptr_t) mesg[i].pname);
+        xfree((char *)mesg[i].pname);
 	mesg[i].pname = NULL;
     }
 #endif /* NLS_CATALOGS */

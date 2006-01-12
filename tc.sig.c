@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.c,v 3.31 2005/04/12 23:45:10 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.c,v 3.32 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.sig.c,v 3.31 2005/04/12 23:45:10 kim Exp $")
+RCSID("$Id: tc.sig.c,v 3.32 2006/01/12 18:15:25 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -62,7 +62,7 @@ sig_ch_queue(void)
     flush();
 #  endif /* JOBDEBUG */
     stk_ptr++;
-    stk[stk_ptr].s_pid = (pid_t) wait(&stk[stk_ptr].s_w);
+    stk[stk_ptr].s_pid = wait(&stk[stk_ptr].s_w);
     stk[stk_ptr].s_errno = errno;
     (void) signal(SIGCHLD, sig_ch_queue);
 }

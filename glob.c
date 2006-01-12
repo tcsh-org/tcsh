@@ -727,7 +727,7 @@ globfree(glob_t *pglob)
 	pp = pglob->gl_pathv + pglob->gl_offs;
 	for (i = pglob->gl_pathc; i--; ++pp)
 	    if (*pp)
-		xfree((ptr_t) *pp), *pp = NULL;
-	xfree((ptr_t) pglob->gl_pathv), pglob->gl_pathv = NULL;
+		xfree(*pp), *pp = NULL;
+	xfree(pglob->gl_pathv), pglob->gl_pathv = NULL;
     }
 }

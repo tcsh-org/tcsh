@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.65 2005/06/08 00:33:17 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.66 2006/01/12 18:15:25 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.65 2005/06/08 00:33:17 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.66 2006/01/12 18:15:25 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -308,7 +308,7 @@ expbrace(Char ***nvp, Char ***elp, int size)
 	    vp++;
 	    for (bp = bl + 1; *bp; *vp++ = *bp++)
 		continue;
-	    xfree((ptr_t) bl);
+	    xfree(bl);
 	}
 
     }
@@ -340,20 +340,18 @@ globexpand(Char **v, int noglob)
 		*vl++ = pargv[i];
 		if (vl == &nv[size]) {
 		    size += GLOBSPACE;
-		    nv = (Char **) xrealloc((ptr_t) nv,
-					    (size_t) (size * sizeof(Char *)));
+		    nv = xrealloc(nv, size * sizeof(Char *));
 		    vl = &nv[size - GLOBSPACE];
 		}
 	    }
-	    xfree((ptr_t) pargv);
+	    xfree(pargv);
 	    pargv = NULL;
 	}
 	else {
 	    *vl++ = Strsave(s);
 	    if (vl == &nv[size]) {
 		size += GLOBSPACE;
-		nv = (Char **) xrealloc((ptr_t) nv, 
-					(size_t) (size * sizeof(Char *)));
+		nv = xrealloc(nv, size * sizeof(Char *));
 		vl = &nv[size - GLOBSPACE];
 	    }
 	}
@@ -580,7 +578,7 @@ void
 ginit(void)
 {
     gargsiz = GLOBSPACE;
-    gargv = (Char **) xmalloc((size_t) (sizeof(Char *) * gargsiz));
+    gargv = xmalloc(sizeof(Char *) * gargsiz);
     gargv[0] = 0;
     gargc = 0;
 }
@@ -796,7 +794,7 @@ backeval(struct Strbuf *word, Char *cp, int literal)
 		reset();
 	    }
 	    if (seterr) {
-		xfree((ptr_t) seterr);
+		xfree(seterr);
 		seterr = NULL;
 	    }
 
@@ -822,7 +820,7 @@ backeval(struct Strbuf *word, Char *cp, int literal)
 	    freesyn(t), t = NULL;
 	}
     }
-    xfree((ptr_t) cp);
+    xfree(cp);
     (void) close(pvec[1]);
     c = 0;
     ip = NULL;
@@ -943,7 +941,7 @@ Gnmatch(const Char *string, const Char *pattern, const Char **endstr)
 	pattern++;
     }
 
-    blk = (Char **) xmalloc((size_t) (GLOBSPACE * sizeof(Char *)));
+    blk = xmalloc(GLOBSPACE * sizeof(Char *));
     blk[0] = Strsave(pattern);
     blk[1] = NULL;
 

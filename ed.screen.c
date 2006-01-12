@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.66 2005/08/02 21:08:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.67 2006/01/12 18:15:24 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.66 2005/08/02 21:08:29 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.67 2006/01/12 18:15:24 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -53,7 +53,7 @@ RCSID("$Id: ed.screen.c,v 3.66 2005/08/02 21:08:29 christos Exp $")
 #define Str(a) tstr[a].str
 #define Val(a) tval[a].val
 
-static struct {
+static const struct {
     const char   *b_name;
     speed_t b_rate;
 }       baud_rate[] = {
@@ -483,10 +483,10 @@ SetTC(char *what, char *how)
 		stderror(ERR_SETTCUS, tv->name);
 		return;
 	    }
-	    T_Tabs = (Char) Val(T_pt);
-	    T_HasMeta = (Char) Val(T_km);
-	    T_Margin = (Char) Val(T_am) ? MARGIN_AUTO : 0;
-	    T_Margin |= (Char) Val(T_xn) ? MARGIN_MAGIC : 0;
+	    T_Tabs = Val(T_pt);
+	    T_HasMeta = Val(T_km);
+	    T_Margin = Val(T_am) ? MARGIN_AUTO : 0;
+	    T_Margin |= Val(T_xn) ? MARGIN_MAGIC : 0;
 	    if (tv == &tval[T_am] || tv == &tval[T_xn]) 
 		ChangeSize(Val(T_li), Val(T_co));
 	    return;
@@ -1424,10 +1424,10 @@ GetTermCaps(void)
     T_Cols = (Char) Val(T_co);
     T_Lines = (Char) Val(T_li);
     if (T_Tabs)
-	T_Tabs = (Char) Val(T_pt);
-    T_HasMeta = (Char) Val(T_km);
-    T_Margin = (Char) Val(T_am) ? MARGIN_AUTO : 0;
-    T_Margin |= (Char) Val(T_xn) ? MARGIN_MAGIC : 0;
+	T_Tabs = Val(T_pt);
+    T_HasMeta = Val(T_km);
+    T_Margin = Val(T_am) ? MARGIN_AUTO : 0;
+    T_Margin |= Val(T_xn) ? MARGIN_MAGIC : 0;
     T_CanCEOL = GoodStr(T_ce);
     T_CanDel = GoodStr(T_dc) || GoodStr(T_DC);
     T_CanIns = GoodStr(T_im) || GoodStr(T_ic) || GoodStr(T_IC);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.65 2005/08/02 18:16:44 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.66 2006/01/12 18:15:24 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.65 2005/08/02 18:16:44 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.66 2006/01/12 18:15:24 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -212,8 +212,8 @@ doexec(struct command *t, int do_glob)
 
     blkfree(t->t_dcom);
     t->t_dcom = blkspl(pv, av);
-    xfree((ptr_t) pv);
-    xfree((ptr_t) av);
+    xfree(pv);
+    xfree(av);
     av = t->t_dcom;
     trim(av);
 
@@ -339,7 +339,7 @@ doexec(struct command *t, int do_glob)
 #ifdef VFORK
 	    Vdp = 0;
 #endif /* VFORK */
-	    xfree((ptr_t) dp);
+	    xfree(dp);
 	}
 #ifdef VFORK
 	misses++;
@@ -352,7 +352,7 @@ cont:
     hits--;
     Vsav = 0;
 #endif /* VFORK */
-    xfree((ptr_t) sav);
+    xfree(sav);
     pexerr();
 }
 
@@ -365,7 +365,7 @@ pexerr(void)
 #ifdef VFORK
 	Vexpath = 0;
 #endif /* VFORK */
-	xfree((ptr_t) expath);
+	xfree(expath);
 	expath = 0;
     }
     else
@@ -439,20 +439,27 @@ texec(Char *sf, Char **st)
 #ifdef O_TEXT
 	    setmode(fd, O_TEXT);
 #endif
-	    if ((nread = read(fd, (char *) pref, 2)) == 2) {
+	    if ((nread = read(fd, pref, 2)) == 2) {
 		if (!isprint((unsigned char)pref[0]) &&
 		    (pref[0] != '\n' && pref[0] != '\t')) {
+		    int err;
+
+		    err = errno;
 		    (void) close(fd);
 		    /*
 		     * We *know* what ENOEXEC means.
 		     */
-		    stderror(ERR_ARCH, f, strerror(errno));
+		    stderror(ERR_ARCH, f, strerror(err));
 		}
 	    }
 	    else if (nread < 0 && errno != EINTR) {
 #ifdef convex
+		int err;
+
+		err = errno;
+		close(fd);
 		/* need to print error incase the file is migrated */
-		stderror(ERR_SYSTEM, f, strerror(errno));
+		stderror(ERR_SYSTEM, f, strerror(err));
 #endif
 	    }
 #ifdef _PATH_BSHELL
@@ -503,7 +510,7 @@ texec(Char *sf, Char **st)
 	/* The order for the conversions is significant */
 	t = short2blk(st);
 	f = short2str(sf);
-	xfree((ptr_t) st);
+	xfree(st);
 	blkfree((Char **) vp);
 #ifdef VFORK
 	Vt = t;
@@ -536,8 +543,7 @@ texec(Char *sf, Char **st)
     default:
 	if (exerr == 0) {
 	    exerr = strerror(errno);
-	    if (expath)
-		xfree((ptr_t) expath);
+	    xfree(expath);
 	    expath = Strsave(sf);
 #ifdef VFORK
 	    Vexpath = expath;
@@ -716,9 +722,8 @@ dohash(Char **vv, struct command *c)
         hashlength = hashwidth * (8*64);/* "average" files per dir in path */
     
     if (xhash)
-        xfree((ptr_t) xhash);
-    xhash = (unsigned long *) xcalloc((size_t) (hashlength * hashwidth), 
-				      (size_t) 1);
+        xfree(xhash);
+    xhash = xcalloc(hashlength * hashwidth, 1);
 #endif /* FASTHASH */
 
     (void) getusername(NULL);	/* flush the tilde cashe */
@@ -757,7 +762,7 @@ dohash(Char **vv, struct command *c)
 	     * the file with the .exe, .com, .bat extension
 	     */
 	    {
-		size_t	ext = strlen(dp->d_name) - 4;
+		ssize_t	ext = strlen(dp->d_name) - 4;
 		if ((ext > 0) && (strcasecmp(&dp->d_name[ext], ".exe") == 0 ||
 				  strcasecmp(&dp->d_name[ext], ".bat") == 0 ||
 				  strcasecmp(&dp->d_name[ext], ".com") == 0)) {
@@ -792,10 +797,8 @@ dounhash(Char **v, struct command *c)
     USE(v);
     havhash = 0;
 #ifdef FASTHASH
-    if (xhash) {
-       xfree((ptr_t) xhash);
-       xhash = NULL;
-    }
+    xfree(xhash);
+    xhash = NULL;
 #endif /* FASTHASH */
 }
 
@@ -863,13 +866,13 @@ iscommand(Char *name)
 	}
 	if (pv[0][0] == 0 || eq(pv[0], STRdot)) {	/* don't make ./xxx */
 	    if (executable(NULL, name, 0)) {
-		xfree((ptr_t) sav);
+		xfree(sav);
 		return i + 1;
 	    }
 	}
 	else {
 	    if (executable(*pv, sav, 0)) {
-		xfree((ptr_t) sav);
+		xfree(sav);
 		return i + 1;
 	    }
 	}
@@ -877,7 +880,7 @@ cont:
 	pv++;
 	i++;
     } while (*pv);
-    xfree((ptr_t) sav);
+    xfree(sav);
     return 0;
 }
 
@@ -1013,13 +1016,12 @@ tellmewhat(struct wordent *lexp, Char **str)
 	else
 	    pv = v->vec;
 
-	while (--i)
-	    pv++;
+	pv += i - 1;
 	if (pv[0][0] == 0 || eq(pv[0], STRdot)) {
 	    if (!slash) {
 		sp->word = Strspl(STRdotsl, sp->word);
 		prlex(lexp);
-		xfree((ptr_t) sp->word);
+		xfree(sp->word);
 	    }
 	    else
 		prlex(lexp);
@@ -1159,7 +1161,7 @@ find_cmd(Char *cmd, int prt)
 		return rval;
 	}
     }
-    xfree((ptr_t) sv);
+    xfree(sv);
     return rval;
 }
 #ifdef WINNT_NATIVE

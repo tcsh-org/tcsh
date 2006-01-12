@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.71 2006/01/12 18:07:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.72 2006/01/12 18:15:25 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.71 2006/01/12 18:07:43 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.72 2006/01/12 18:15:25 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -176,7 +176,7 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 		blkpr(t->t_dcom);
 		xputchar( '\n' );
 	    }
-	    xfree((ptr_t) ot_dcom);
+	    xfree(ot_dcom);
 	}
     }
 
@@ -505,13 +505,13 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 # endif /* BSDSIGS */
 		    nosigchld = onosigchld;
 
-		    xfree((ptr_t) Vsav);
+		    xfree(Vsav);
 		    Vsav = 0;
-		    xfree((ptr_t) Vdp);
+		    xfree(Vdp);
 		    Vdp = 0;
-		    xfree((ptr_t) Vexpath);
+		    xfree(Vexpath);
 		    Vexpath = 0;
-		    blkfree((Char **) Vt);
+		    blkfree(Vt);
 		    Vt = 0;
 		    /* this is from pfork() */
 		    palloc(pid, t);
@@ -524,7 +524,7 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 		}
 		else {		/* child */
 		    /* this is from pfork() */
-		    int     pgrp;
+		    pid_t pgrp;
 		    int    ignint = 0;
 		    if (nosigchld) {
 # ifdef BSDSIGS
@@ -770,12 +770,12 @@ vffree(int snum)
     USE(snum);
     if ((v = gargv) != 0) {
 	gargv = 0;
-	xfree((ptr_t) v);
+	xfree(v);
     }
 
     if ((v = pargv) != 0) {
 	pargv = 0;
-	xfree((ptr_t) v);
+	xfree(v);
     }
 
     _exit(1);

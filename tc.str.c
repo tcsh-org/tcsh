@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.str.c,v 3.20 2005/04/11 22:11:00 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.str.c,v 3.21 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$Id: tc.str.c,v 3.20 2005/04/11 22:11:00 kim Exp $")
+RCSID("$Id: tc.str.c,v 3.21 2006/01/12 18:15:25 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -103,7 +103,7 @@ blk2short(char **src)
      */
     for (n = 0; src[n] != NULL; n++)
 	continue;
-    sdst = dst = (Char **) xmalloc((size_t) ((n + 1) * sizeof(Char *)));
+    sdst = dst = xmalloc((n + 1) * sizeof(Char *));
 
     for (; *src != NULL; src++)
 	*dst++ = SAVE(*src);
@@ -122,7 +122,7 @@ short2blk(Char **src)
      */
     for (n = 0; src[n] != NULL; n++)
 	continue;
-    sdst = dst = (char **) xmalloc((size_t) ((n + 1) * sizeof(char *)));
+    sdst = dst = xmalloc((n + 1) * sizeof(char *));
 
     for (; *src != NULL; src++)
 	*dst++ = strsave(short2str(*src));
@@ -161,8 +161,7 @@ short2str(const Char *src)
 
     if (sdst == NULL) {
 	dstsize = MALLOC_INCR;
-	sdst = (char *) xmalloc((size_t) ((dstsize + MALLOC_SURPLUS)
-					  * sizeof(char)));
+	sdst = xmalloc((dstsize + MALLOC_SURPLUS) * sizeof(char));
     }
     dst = sdst;
     edst = &dst[dstsize];
@@ -171,9 +170,7 @@ short2str(const Char *src)
 	src++;
 	if (dst >= edst) {
 	    dstsize += MALLOC_INCR;
-	    sdst = (char *) xrealloc((ptr_t) sdst,
-				     (size_t) ((dstsize + MALLOC_SURPLUS)
-					       * sizeof(char)));
+	    sdst = xrealloc(sdst, (dstsize + MALLOC_SURPLUS) * sizeof(char));
 	    edst = &sdst[dstsize];
 	    dst = &edst[-MALLOC_INCR];
 	}
@@ -216,15 +213,8 @@ s_strncpy(Char *dst, const Char *src, size_t n)
 Char   *
 s_strcat(Char *dst, const Char *src)
 {
-    Char *sdst;
-
-    sdst = dst;
-    while (*dst++)
-	continue;
-    --dst;
-    while ((*dst++ = *src++) != '\0')
-	continue;
-    return (sdst);
+    Strcpy(Strend(dst), src);
+    return dst;
 }
 
 #ifdef NOTUSED
@@ -238,9 +228,8 @@ s_strncat(Char *dst, const Char *src, size_t n)
 
     sdst = dst;
 
-    while (*dst++)
-	continue;
-    --dst;
+    while (*dst)
+	dst++;
 
     do 
 	if ((*dst++ = *src++) == '\0')
@@ -454,8 +443,7 @@ short2qstr(const Char *src)
 
     if (sdst == NULL) {
 	dstsize = MALLOC_INCR;
-	sdst = (char *) xmalloc((size_t) ((dstsize + MALLOC_SURPLUS)
-					  * sizeof(char)));
+	sdst = xmalloc((dstsize + MALLOC_SURPLUS) * sizeof(char));
     }
     dst = sdst;
     edst = &dst[dstsize];
@@ -464,9 +452,8 @@ short2qstr(const Char *src)
 	    *dst++ = '\\';
 	    if (dst == edst) {
 		dstsize += MALLOC_INCR;
-		sdst = (char *) xrealloc((ptr_t) sdst,
-					 (size_t) ((dstsize + MALLOC_SURPLUS)
-						   * sizeof(char)));
+		sdst = xrealloc(sdst,
+				(dstsize + MALLOC_SURPLUS) * sizeof(char));
 		edst = &sdst[dstsize];
 		dst = &edst[-MALLOC_INCR];
 	    }
@@ -475,9 +462,7 @@ short2qstr(const Char *src)
 	src++;
 	if (dst >= edst) {
 	    dstsize += MALLOC_INCR;
-	    sdst = (char *) xrealloc((ptr_t) sdst,
-				     (size_t) ((dstsize + MALLOC_SURPLUS)
-					       * sizeof(char)));
+	    sdst = xrealloc(sdst, (dstsize + MALLOC_SURPLUS) * sizeof(char));
 	    edst = &sdst[dstsize];
 	    dst = &edst[-MALLOC_INCR];
 	}

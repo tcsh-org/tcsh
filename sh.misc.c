@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.35 2005/04/11 22:10:58 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.36 2006/01/12 18:15:25 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.35 2005/04/11 22:10:58 kim Exp $")
+RCSID("$Id: sh.misc.c,v 3.36 2006/01/12 18:15:25 christos Exp $")
 
 static	int	renum	(int, int);
 static  Char  **blkend	(Char **);
@@ -154,15 +154,14 @@ blkfree(Char **av0)
     if (!av0)
 	return;
     for (; *av; av++)
-	xfree((ptr_t) * av);
-    xfree((ptr_t) av0);
+	xfree(*av);
+    xfree(av0);
 }
 
 Char  **
 saveblk(Char **v)
 {
-    Char **newv =
-    (Char **) xcalloc((size_t) (blklen(v) + 1), sizeof(Char **));
+    Char **newv = xcalloc(blklen(v) + 1, sizeof(Char **));
     Char  **onewv = newv;
 
     while (*v)
@@ -234,7 +233,7 @@ lastchr(Char *cp)
 void
 closem(void)
 {
-    int f;
+    int f, num_files;
 
 #ifdef NLS_BUGS
 #ifdef NLS_CATALOGS
@@ -245,7 +244,8 @@ closem(void)
     /* suggested by Justin Bur; thanks to Karl Kleinpaste */
     fix_yp_bugs();
 #endif /* YPBUGS */
-    for (f = 0; f < NOFILE; f++)
+    num_files = NOFILE;
+    for (f = 0; f < num_files; f++)
 	if (f != SHIN && f != SHOUT && f != SHDIAG && f != OLDSTD &&
 	    f != FSHTTY 
 #ifdef MALLOC_TRACE
@@ -276,7 +276,7 @@ closem(void)
 void
 closech(void)
 {
-    int f;
+    int f, num_files;
 
     if (didcch)
 	return;
@@ -287,7 +287,8 @@ closech(void)
     OLDSTD = 0;
     isoutatty = isatty(SHOUT);
     isdiagatty = isatty(SHDIAG);
-    for (f = 3; f < NOFILE; f++)
+    num_files = NOFILE;
+    for (f = 3; f < num_files; f++)
 	(void) close(f);
 }
 
@@ -381,7 +382,7 @@ lshift(Char **v, int c)
     Char **u;
 
     for (u = v; *u && --c >= 0; u++)
-	xfree((ptr_t) *u);
+	xfree(*u);
     (void) blkcpy(v, u);
 }
 

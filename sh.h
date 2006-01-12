@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.136 2005/11/02 17:27:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.137 2006/01/12 18:15:25 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -691,10 +691,10 @@ EXTERN int   OLDSTD IZERO;	/* Old standard input (def for cmds) */
 #  define setexit()  setjmp(reslab)
 #  define reset()    longjmp(reslab, 1)
 # endif
-# define getexit(a) (void) memmove((ptr_t)&(a), (ptr_t)&reslab, sizeof(reslab))
-# define resexit(a) (void) memmove((ptr_t)&reslab, (ptr_t)&(a), sizeof(reslab))
+# define getexit(a) (void) memmove(&(a), &reslab, sizeof(reslab))
+# define resexit(a) (void) memmove(&reslab, &(a), sizeof(reslab))
 
-# define cpybin(a, b) (void) memmove((ptr_t)&(a), (ptr_t)&(b), sizeof(Bin))
+# define cpybin(a, b) (void) memmove(&(a), &(b), sizeof(Bin))
 
 #else
 
@@ -762,7 +762,7 @@ extern signalfun_t parterm;	/* Parents terminate catch */
 # define	ATTRIBUTES	0200	/* The bits used for attributes */
 # define	INVALID_BYTE	0
 # define	CHAR		0000177	/* Mask to mask out the character */
-#endif 
+#endif
 #define		CHAR_DBWIDTH	(LITERAL|(LITERAL-1))
 
 EXTERN int     AsciiOnly;	/* If set only 7 bits expected in characters */

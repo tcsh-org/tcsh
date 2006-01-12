@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.28 2005/03/03 17:19:35 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.print.c,v 3.29 2005/04/11 22:10:58 kim Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.28 2005/03/03 17:19:35 kim Exp $")
+RCSID("$Id: sh.print.c,v 3.29 2005/04/11 22:10:58 kim Exp $")
 
 #include "ed.h"
 
@@ -138,9 +138,9 @@ xputwchar(Char c)
 void
 xputchar(int c)
 {
-    int     atr = 0;
+    int     atr;
 
-    atr |= c & ATTRIBUTES & TRIM;
+    atr = c & ATTRIBUTES & TRIM;
     c &= CHAR | QUOTE;
     if (!output_raw && (c & QUOTE) == 0) {
 	if (iscntrl(c) && (c < 0x80 || MB_CUR_MAX == 1)) {
@@ -221,7 +221,6 @@ flush(void)
 {
     int unit;
     static int interrupted = 0;
-    size_t sz;
 
     /* int lmode; */
 
@@ -249,8 +248,7 @@ flush(void)
     }
 #endif
 #endif
-    sz = (size_t) (linp - linbuf);
-    if (write(unit, linbuf, sz) == -1)
+    if (write(unit, linbuf, linp - linbuf) == -1)
 	switch (errno) {
 #ifdef EIO
 	/* We lost our tty */

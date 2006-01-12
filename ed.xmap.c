@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.29 2005/04/11 22:10:55 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.30 2006/01/12 18:15:24 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -88,7 +88,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.29 2005/04/11 22:10:55 kim Exp $")
+RCSID("$Id: ed.xmap.c,v 3.30 2006/01/12 18:15:24 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -263,8 +263,7 @@ TryNode(XmapNode *ptr, CStr *str, XmapVal *val, int ntype)
 	switch (ptr->type) {
 	case XK_STR:
 	case XK_EXE:
-	    if (ptr->val.str.buf != NULL)
-		xfree((ptr_t) ptr->val.str.buf);
+	    xfree(ptr->val.str.buf);
 	    ptr->val.str.len = 0;
 	    break;
 	case XK_NOD:
@@ -281,11 +280,11 @@ TryNode(XmapNode *ptr, CStr *str, XmapVal *val, int ntype)
 	    break;
 	case XK_STR:
 	case XK_EXE:
-	    ptr->val.str.len = (val->str.len + 1) * sizeof(Char);
-	    ptr->val.str.buf = (Char *) xmalloc((size_t) ptr->val.str.len);
-	    (void) memmove((ptr_t) ptr->val.str.buf, (ptr_t) val->str.buf,
-			   (size_t) ptr->val.str.len);
 	    ptr->val.str.len = val->str.len;
+	    ptr->val.str.buf = xmalloc(ptr->val.str.len
+				       * sizeof(*ptr->val.str.buf));
+	    (void) memcpy(ptr->val.str.buf, val->str.buf,
+			  ptr->val.str.len * sizeof(*ptr->val.str.buf));
 	    break;
 	default:
 	    abort();
@@ -330,7 +329,6 @@ static int
 TryDeleteNode(XmapNode **inptr, CStr *str)
 {
     XmapNode *ptr;
-    XmapNode *prev_ptr = NULL;
 
     ptr = *inptr;
     /*
@@ -344,7 +342,7 @@ TryDeleteNode(XmapNode **inptr, CStr *str)
 		break;
 	if (xm->sibling == NULL)
 	    return (0);
-	prev_ptr = xm;
+	inptr = &xm->sibling;
 	ptr = xm->sibling;
     }
 
@@ -353,10 +351,7 @@ TryDeleteNode(XmapNode **inptr, CStr *str)
 
     if (str->len == 0) {
 	/* we're there */
-	if (prev_ptr == NULL)
-	    *inptr = ptr->sibling;
-	else
-	    prev_ptr->sibling = ptr->sibling;
+	*inptr = ptr->sibling;
 	ptr->sibling = NULL;
 	PutFreeNode(ptr);
 	return (1);
@@ -364,10 +359,7 @@ TryDeleteNode(XmapNode **inptr, CStr *str)
     else if (ptr->next != NULL && TryDeleteNode(&ptr->next, str) == 1) {
 	if (ptr->next != NULL)
 	    return (0);
-	if (prev_ptr == NULL)
-	    *inptr = ptr->sibling;
-	else
-	    prev_ptr->sibling = ptr->sibling;
+	*inptr = ptr->sibling;
 	ptr->sibling = NULL;
 	PutFreeNode(ptr);
 	return (1);
@@ -399,14 +391,13 @@ PutFreeNode(XmapNode *ptr)
 	break;
     case XK_EXE:
     case XK_STR:
-	if (ptr->val.str.buf != NULL)
-	    xfree((ptr_t) ptr->val.str.buf);
+	xfree(ptr->val.str.buf);
 	break;
     default:
 	abort();
 	break;
     }
-    xfree((ptr_t) ptr);
+    xfree(ptr);
 }
 
 
@@ -418,7 +409,7 @@ GetFreeNode(CStr *ch)
 {
     XmapNode *ptr;
 
-    ptr = (XmapNode *) xmalloc((size_t) sizeof(XmapNode));
+    ptr = xmalloc(sizeof(XmapNode));
     ptr->ch = ch->buf[0];
     ptr->type = XK_NOD;
     ptr->val.str.buf = NULL;
@@ -683,7 +674,7 @@ parseescape(const Char **ptr)
 		    }
 		    val = (val << 3) | (ch - '0');
 		}
-		if ((val & 0xffffff00) != 0) {
+		if ((val & ~0xff) != 0) {
 		    xprintf(CGETS(9, 9,
 			    "Octal constant does not fit in a char.\n"));
 		    return 0;

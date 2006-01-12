@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.46 2005/04/11 22:10:55 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.47 2006/01/12 18:15:24 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -37,7 +37,6 @@
 # define EXTERN extern
 #endif
 
-#define TABSIZE		8	/* usually 8 spaces/tab */
 #define MAXMACROLEVELS	10	/* max number of nested kbd macros */
 
 #ifndef WINNT_NATIVE
@@ -100,7 +99,7 @@ typedef struct {
     int   len;
 } CStr;
 
-typedef union Xmapval {		/* value passed to the Xkey routines */
+typedef union {		/* value passed to the Xkey routines */
     KEYCMD cmd;
     CStr str;
 } XmapVal;
@@ -177,14 +176,14 @@ EXTERN Char **Vdisplay;	/* new buffer */
 EXTERN int T_Lines, T_Cols;	/* Rows and Cols of the terminal */
 EXTERN Char T_CanIns;		/* true if I can insert characters */
 EXTERN Char T_CanDel;		/* dito for delete characters */
-EXTERN Char T_Tabs;		/* true if tty interface is passing tabs */
-EXTERN Char T_Margin;		
+EXTERN char T_Tabs;		/* true if tty interface is passing tabs */
+EXTERN char T_Margin;
 #define MARGIN_AUTO  1		/* term has auto margins */
 #define MARGIN_MAGIC 2		/* concept glitch */
 EXTERN speed_t T_Speed;		/* Tty input Baud rate */
 EXTERN Char T_CanCEOL;		/* true if we can clear to end of line */
 EXTERN Char T_CanUP;		/* true if this term can do reverse linefeen */
-EXTERN Char T_HasMeta;		/* true if we have a meta key */
+EXTERN char T_HasMeta;		/* true if we have a meta key */
 
 /* note the extra characters in the Strchr() call in this macro */
 #define isword(c)	(Isalpha(c)||Isdigit(c)||Strchr(word_chars,c))

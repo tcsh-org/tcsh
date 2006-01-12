@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.122 2006/01/12 18:06:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.123 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.122 2006/01/12 18:06:34 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.123 2006/01/12 18:15:25 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -244,7 +244,7 @@ dolist(Char **v, struct command *c)
 	(void) sighold(SIGINT);
 #endif /* BSDSIGS */
 	if (seterr) {
-	    xfree((ptr_t) seterr);
+	    xfree(seterr);
 	    seterr = NULL;
 	}
 
@@ -275,19 +275,19 @@ dolist(Char **v, struct command *c)
 
 	cmd.word = STRNULL;
 	lastword = &cmd;
-	nextword = (struct wordent *) xcalloc(1, sizeof cmd);
+	nextword = xcalloc(1, sizeof cmd);
 	nextword->word = Strsave(lspath);
 	lastword->next = nextword;
 	nextword->prev = lastword;
 	lastword = nextword;
-	nextword = (struct wordent *) xcalloc(1, sizeof cmd);
+	nextword = xcalloc(1, sizeof cmd);
 	nextword->word = Strsave(STRmCF);
 	lastword->next = nextword;
 	nextword->prev = lastword;
 #if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
 	if (dspmbyte_ls) {
 	    lastword = nextword;
-	    nextword = (struct wordent *) xcalloc(1, sizeof cmd);
+	    nextword = xcalloc(1, sizeof cmd);
 	    nextword->word = Strsave(STRmmliteral);
 	    lastword->next = nextword;
 	    nextword->prev = lastword;
@@ -296,7 +296,7 @@ dolist(Char **v, struct command *c)
 #ifdef COLOR_LS_F
 	if (color_context_ls) {
 	    lastword = nextword;
-	    nextword = (struct wordent *) xcalloc(1, sizeof cmd);
+	    nextword = xcalloc(1, sizeof cmd);
 	    nextword->word = Strsave(STRmmcolormauto);
 	    lastword->next = nextword;
 	    nextword->prev = lastword;
@@ -304,7 +304,7 @@ dolist(Char **v, struct command *c)
 #endif /* COLOR_LS_F */
 	lastword = nextword;
 	for (cp = *v; cp; cp = *++v) {
-	    nextword = (struct wordent *) xcalloc(1, sizeof cmd);
+	    nextword = xcalloc(1, sizeof cmd);
 	    nextword->word = quote(Strsave(cp));
 	    lastword->next = nextword;
 	    nextword->prev = lastword;
@@ -524,7 +524,8 @@ find_stop_ed(void)
     struct process *pp, *retp;
     const char *ep, *vp;
     char *cp, *p;
-    int     epl, vpl, pstatus;
+    size_t epl, vpl;
+    int pstatus;
 
     if ((ep = getenv("EDITOR")) != NULL) {	/* if we have a value */
 	if ((p = strrchr(ep, '/')) != NULL) 	/* if it has a path */
@@ -574,8 +575,8 @@ find_stop_ed(void)
 		cp = p;			/* else we get all of it */
 
 	    /* if we find either in the current name, fg it */
-	    if (strncmp(ep, cp, (size_t) epl) == 0 ||
-		strncmp(vp, cp, (size_t) vpl) == 0) {
+	    if (strncmp(ep, cp, epl) == 0 ||
+		strncmp(vp, cp, vpl) == 0) {
 
 		/*
 		 * If there is a choice, then choose the current process if
@@ -1046,11 +1047,11 @@ aliasrun(int cnt, Char *s1, Char *s2)
 
     getexit(osetexit);
     if (seterr) {
-	xfree((ptr_t) seterr);
+	xfree(seterr);
 	seterr = NULL;	/* don't repeatedly print err msg. */
     }
     w.word = STRNULL;
-    new1 = (struct wordent *) xcalloc(1, sizeof w);
+    new1 = xcalloc(1, sizeof w);
     new1->word = Strsave(s1);
     if (cnt == 1) {
 	/* build a lex list with one word. */
@@ -1059,7 +1060,7 @@ aliasrun(int cnt, Char *s1, Char *s2)
     }
     else {
 	/* build a lex list with two words. */
-	new2 = (struct wordent *) xcalloc(1, sizeof w);
+	new2 = xcalloc(1, sizeof w);
 	new2->word = Strsave(s2);
 	w.next = new2->prev = new1;
 	new1->next = w.prev = new2;
@@ -1242,18 +1243,18 @@ rmstar(struct wordent *cp)
 			     *tmp->word != ';' && tmp != cp;) {
 			    tmp->prev->next = tmp->next;
 			    tmp->next->prev = tmp->prev;
-			    xfree((ptr_t) tmp->word);
+			    xfree(tmp->word);
 			    del = tmp;
 			    tmp = tmp->next;
-			    xfree((ptr_t) del);
+			    xfree(del);
 			}
 			if (*tmp->word == ';') {
 			    tmp->prev->next = tmp->next;
 			    tmp->next->prev = tmp->prev;
-			    xfree((ptr_t) tmp->word);
+			    xfree(tmp->word);
 			    del = tmp;
 			    tmp = tmp->next;
-			    xfree((ptr_t) del);
+			    xfree(del);
 			}
 			we = tmp;
 			continue;
@@ -1359,23 +1360,23 @@ insert(struct wordent *pl, int file_args)
 {
     struct wordent *now, *last;
     Char   *cmd, *bcmd, *cp1, *cp2;
-    int     cmd_len;
+    size_t cmd_len;
     Char   *upause = STRunderpause;
-    int     p_len = (int) Strlen(upause);
+    size_t p_len = Strlen(upause);
 
-    cmd_len = (int) Strlen(pl->word);
-    cmd = (Char *) xcalloc(1, (size_t) ((cmd_len + 1) * sizeof(Char)));
+    cmd_len = Strlen(pl->word);
+    cmd = xcalloc(1, (cmd_len + 1) * sizeof(Char));
     (void) Strcpy(cmd, pl->word);
 /* Do insertions at beginning, first replace command word */
 
     if (file_args) {
 	now = pl;
-	xfree((ptr_t) now->word);
-	now->word = (Char *) xcalloc(1, (size_t) (5 * sizeof(Char)));
+	xfree(now->word);
+	now->word = xcalloc(1, 5 * sizeof(Char));
 	(void) Strcpy(now->word, STRecho);
 
-	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
-	now->word = (Char *) xcalloc(1, (size_t) (6 * sizeof(Char)));
+	now = xcalloc(1, sizeof(struct wordent));
+	now->word = xcalloc(1, 6 * sizeof(Char));
 	(void) Strcpy(now->word, STRbackqpwd);
 	insert_we(now, pl);
 
@@ -1383,18 +1384,18 @@ insert(struct wordent *pl, int file_args)
 	     last = last->next)
 	    continue;
 
-	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
-	now->word = (Char *) xcalloc(1, (size_t) (2 * sizeof(Char)));
+	now = xcalloc(1, sizeof(struct wordent));
+	now->word = xcalloc(1, 2 * sizeof(Char));
 	(void) Strcpy(now->word, STRgt);
 	insert_we(now, last->prev);
 
-	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
-	now->word = (Char *) xcalloc(1, (size_t) (2 * sizeof(Char)));
+	now = xcalloc(1, sizeof(struct wordent));
+	now->word = xcalloc(1, 2 * sizeof(Char));
 	(void) Strcpy(now->word, STRbang);
 	insert_we(now, last->prev);
 
-	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
-	now->word = (Char *) xcalloc(1, (size_t) cmd_len + p_len + 4);
+	now = xcalloc(1, sizeof(struct wordent));
+	now->word = xcalloc(1, (cmd_len + p_len + 4) * sizeof(Char));
 	cp1 = now->word;
 	cp2 = cmd;
 	*cp1++ = '~';
@@ -1408,17 +1409,14 @@ insert(struct wordent *pl, int file_args)
 	    continue;
 	insert_we(now, last->prev);
 
-	now = (struct wordent *) xcalloc(1, (size_t) sizeof(struct wordent));
-	now->word = (Char *) xcalloc(1, (size_t) (2 * sizeof(Char)));
+	now = xcalloc(1, sizeof(struct wordent));
+	now->word = xcalloc(1, 2 * sizeof(Char));
 	(void) Strcpy(now->word, STRsemi);
 	insert_we(now, last->prev);
-	bcmd = (Char *) xcalloc(1, (size_t) ((cmd_len + 2) * sizeof(Char)));
-	cp1 = bcmd;
-	cp2 = cmd;
-	*cp1++ = '%';
-	while ((*cp1++ = *cp2++) != '\0')
-	    continue;
-	now = (struct wordent *) xcalloc(1, (size_t) (sizeof(struct wordent)));
+	bcmd = xcalloc(1, (cmd_len + 2) * sizeof(Char));
+	*bcmd = '%';
+	Strcpy(bcmd + 1, cmd);
+	now = xcalloc(1, sizeof(struct wordent));
 	now->word = bcmd;
 	insert_we(now, last->prev);
     }
@@ -1426,22 +1424,18 @@ insert(struct wordent *pl, int file_args)
 	struct wordent *del;
 
 	now = pl;
-	xfree((ptr_t) now->word);
-	now->word = (Char *) xcalloc(1, 
-				     (size_t) ((cmd_len + 2) * sizeof(Char)));
-	cp1 = now->word;
-	cp2 = cmd;
-	*cp1++ = '%';
-	while ((*cp1++ = *cp2++) != '\0')
-	    continue;
+	xfree(now->word);
+	now->word = xcalloc(1, (cmd_len + 2) * sizeof(Char));
+	*now->word = '%';
+	Strcpy(now->word + 1, cmd);
 	for (now = now->next;
 	     *now->word != '\n' && *now->word != ';' && now != pl;) {
 	    now->prev->next = now->next;
 	    now->next->prev = now->prev;
-	    xfree((ptr_t) now->word);
+	    xfree(now->word);
 	    del = now;
 	    now = now->next;
-	    xfree((ptr_t) del);
+	    xfree(del);
 	}
     }
 }
@@ -1568,7 +1562,7 @@ gethomedir(const Char *us)
 #if 0
 	/* Don't return if root */
 	if (rp != NULL && rp[0] == '/' && rp[1] == '\0') {
-	    xfree((ptr_t)rp);
+	    xfree(rp);
 	    rp = NULL;
 	}
 #endif
@@ -1589,8 +1583,7 @@ gettilde(const Char *us)
 	return NULL;
 
     if (tcache == NULL)
-	tcache = (struct tildecache *) xmalloc((size_t) (TILINCR *
-						  sizeof(struct tildecache)));
+	tcache = xmalloc(TILINCR * sizeof(struct tildecache));
     /*
      * Binary search
      */
@@ -1822,16 +1815,16 @@ collate(const Char *a, const Char *b)
      * only documented valid errno value for strcoll [EINVAL]
      */
     if (errno == EINVAL) {
-	xfree((ptr_t) sa);
-	xfree((ptr_t) sb);
+	xfree(sa);
+	xfree(sb);
 	stderror(ERR_SYSTEM, "strcoll", strerror(errno));
     }
 #else
     rv = strcmp(sa, sb);
 #endif /* NLS && !NOSTRCOLL */
 
-    xfree((ptr_t) sa);
-    xfree((ptr_t) sb);
+    xfree(sa);
+    xfree(sb);
 
     return rv;
 }
@@ -1954,13 +1947,12 @@ getremotehost(void)
     const char *host = NULL;
 #ifdef INET6
     struct sockaddr_storage saddr;
-    socklen_t len = sizeof(struct sockaddr_storage);
     static char hbuf[NI_MAXHOST];
 #else
     struct hostent* hp;
     struct sockaddr_in saddr;
-    socklen_t len = sizeof(struct sockaddr_in);
 #endif
+    socklen_t len = sizeof(saddr);
 #ifdef HAVE_STRUCT_UTMP_UT_HOST
     char *sptr = NULL;
 #endif

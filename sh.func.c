@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.130 2006/01/12 18:07:43 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.131 2006/01/12 18:15:25 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.130 2006/01/12 18:07:43 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.131 2006/01/12 18:15:25 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -160,7 +160,7 @@ doonintr(Char **v, struct command *c)
 	stderror(ERR_NAME | ERR_TERMINAL);
     cp = gointr;
     gointr = 0;
-    xfree((ptr_t) cp);
+    xfree(cp);
     if (vv == 0) {
 #ifdef BSDSIGS
 	if (setintr) {
@@ -258,7 +258,7 @@ dofiletest(Char **v, struct command *c)
 
     while (*(fileptr = v++) != '\0') {
 	xprintf("%S", res = filetest(ftest, &fileptr, 0));
-	xfree((ptr_t) res);
+	xfree(res);
 	if (*v)
 	    xprintf(" ");
     }
@@ -348,8 +348,6 @@ dologin(Char **v, struct command *c)
 /*ARGSUSED*/
 void
 donewgrp(Char **v, struct command *c)
-    Char  **v;
-    struct command *c;
 {
     char **p;
     if (chkstop == 0 && setintr)
@@ -449,7 +447,7 @@ dogoto(Char **v, struct command *c)
     lp = globone(v[1], G_ERROR);
     if (!noexec)
 	gotolab(lp);
-    xfree((ptr_t) lp);
+    xfree(lp);
 }
 
 void
@@ -494,7 +492,7 @@ doswitch(Char **v, struct command *c)
     lp = globone(cp, G_ERROR);
     if (!noexec)
 	search(TC_SWITCH, 0, lp);
-    xfree((ptr_t) lp);
+    xfree(lp);
 }
 
 /*ARGSUSED*/
@@ -565,7 +563,7 @@ doforeach(Char **v, struct command *c)
 	v = gargv = saveblk(v);
 	trim(v);
     }
-    nwp = (struct whyle *) xcalloc(1, sizeof *nwp);
+    nwp = xcalloc(1, sizeof *nwp);
     nwp->w_fe = nwp->w_fe0 = v;
     gargv = 0;
     btell(&nwp->w_start);
@@ -607,8 +605,7 @@ dowhile(Char **v, struct command *c)
     if (*v && !noexec)
 	stderror(ERR_NAME | ERR_EXPRESSION);
     if (!again) {
-	struct whyle *nwp =
-	(struct whyle *) xcalloc(1, sizeof(*nwp));
+	struct whyle *nwp = xcalloc(1, sizeof(*nwp));
 
 	nwp->w_start = lineloc;
 	nwp->w_end.type = TCSH_F_SEEK;
@@ -1014,9 +1011,8 @@ wpfree(struct whyle *wp)
 {
 	if (wp->w_fe0)
 	    blkfree(wp->w_fe0);
-	if (wp->w_fename)
-	    xfree((ptr_t) wp->w_fename);
-	xfree((ptr_t) wp);
+	xfree(wp->w_fename);
+	xfree(wp);
 }
 
 void
@@ -1029,7 +1025,7 @@ wfree(void)
 #endif
 
 #ifdef FDEBUG
-    static char foo[] = "IAFE";
+    static const char foo[] = "IAFE";
 #endif /* FDEBUG */
 
     btell(&o);
@@ -1297,14 +1293,14 @@ dosetenv(Char **v, struct command *c)
     if (eq(vp, STRKPATH)) {
 	importpath(lp);
 	dohash(NULL, NULL);
-	xfree((ptr_t) lp);
+	xfree(lp);
 	return;
     }
 
 #ifdef apollo
     if (eq(vp, STRSYSTYPE)) {
 	dohash(NULL, NULL);
-	xfree((ptr_t) lp);
+	xfree(lp);
 	return;
     }
 #endif /* apollo */
@@ -1355,7 +1351,7 @@ dosetenv(Char **v, struct command *c)
 	ed_Init();
 	if (MapsAreInited && !NLSMapsAreInited)
 	    ed_InitNLSMaps();
-	xfree((ptr_t) lp);
+	xfree(lp);
 	return;
     }
 
@@ -1371,13 +1367,13 @@ dosetenv(Char **v, struct command *c)
 	MapsAreInited = 0;
 	NLSMapsAreInited = 0;
 	ed_InitMaps();
-	xfree((ptr_t) lp);
+	xfree(lp);
 	return;
     }
 #ifdef WINNT_NATIVE
     if (eq(vp, STRtcshlang)) {
 	nlsinit();
-	xfree((ptr_t) lp);
+	xfree(lp);
 	return;
     }
 #endif /* WINNT_NATIVE */
@@ -1436,7 +1432,7 @@ dosetenv(Char **v, struct command *c)
      */
     if ((eq(lp, STRNULL) && (eq(vp, STRLINES) || eq(vp, STRCOLUMNS))) ||
 	eq(vp, STRTERMCAP)) {
-	xfree((ptr_t) lp);
+	xfree(lp);
 	check_window_size(1);
 	return;
     }
@@ -1448,12 +1444,12 @@ dosetenv(Char **v, struct command *c)
 #if 0
 	GotTermCaps = 0;
 #endif
-	xfree((ptr_t) lp);
+	xfree(lp);
 	ed_Init();
 	return;
     }
 #endif /* SIG_WINDOW */
-    xfree((ptr_t) lp);
+    xfree(lp);
 }
 
 /*ARGSUSED*/
@@ -1465,8 +1461,7 @@ dounsetenv(Char **v, struct command *c)
     static Char *name = NULL;
 
     USE(c);
-    if (name)
-	xfree((ptr_t) name);
+    xfree(name);
     /*
      * Find the longest environment variable
      */
@@ -1477,7 +1472,7 @@ dounsetenv(Char **v, struct command *c)
 	    maxi = i;
     }
 
-    name = (Char *) xmalloc((size_t) ((maxi + 1) * sizeof(Char)));
+    name = xmalloc((maxi + 1) * sizeof(Char));
 
     while (++v && *v) 
 	for (maxi = 1; maxi;)
@@ -1519,7 +1514,7 @@ dounsetenv(Char **v, struct command *c)
 		    (void) setlocale(LC_COLLATE, "");
 # endif
 # ifdef LC_CTYPE
-	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
+		    (void) setlocale(LC_CTYPE, ""); /* for iscntrl */
 # endif /* LC_CTYPE */
 # ifdef NLS_CATALOGS
 #  ifdef LC_MESSAGES
@@ -1569,7 +1564,7 @@ dounsetenv(Char **v, struct command *c)
 		 */
 		break;
 	    }
-    xfree((ptr_t) name); name = NULL;
+    xfree(name); name = NULL;
 }
 
 void
@@ -1598,7 +1593,7 @@ tsetenv(const Char *name, const Char *val)
     Char  **oep = ep;
 
 #ifdef WINNT_NATIVE
-	nt_set_env(name,val);
+    nt_set_env(name,val);
 #endif /* WINNT_NATIVE */
     for (; *ep; ep++) {
 #ifdef WINNT_NATIVE
@@ -1611,21 +1606,21 @@ tsetenv(const Char *name, const Char *val)
 	if (*ccp != 0 || *dp != '=')
 	    continue;
 	cp = Strspl(STRequal, val);
-	xfree((ptr_t) * ep);
+	xfree(*ep);
 	*ep = strip(Strspl(name, cp));
-	xfree((ptr_t) cp);
+	xfree(cp);
 	blkfree((Char **) environ);
 	environ = short2blk(STR_environ);
 	return;
     }
     cp = Strspl(name, STRequal);
     blk[0] = strip(Strspl(cp, val));
-    xfree((ptr_t) cp);
+    xfree(cp);
     blk[1] = 0;
     STR_environ = blkspl(STR_environ, blk);
     blkfree((Char **) environ);
     environ = short2blk(STR_environ);
-    xfree((ptr_t) oep);
+    xfree(oep);
 #endif /* SETENV_IN_LIB */
 }
 
@@ -1650,8 +1645,8 @@ Unsetenv(Char *name)
 	blkfree((Char **) environ);
 	environ = short2blk(STR_environ);
 	*ep = cp;
-	xfree((ptr_t) cp);
-	xfree((ptr_t) oep);
+	xfree(cp);
+	xfree(oep);
 	return;
     }
 }
@@ -1858,7 +1853,7 @@ findlim(Char *cp)
 {
     struct limits *lp, *res;
 
-    res = (struct limits *) NULL;
+    res = NULL;
     for (lp = limits; lp->limconst >= 0; lp++)
 	if (prefix(cp, str2short(lp->limname))) {
 	    if (res)
@@ -2059,7 +2054,7 @@ plim(struct limits *lp, int hard)
 # endif
 # ifdef RLIMIT_CPU
     if (lp->limconst == RLIMIT_CPU)
-	psecs((long) limit);
+	psecs(limit);
     else
 # endif /* RLIMIT_CPU */
 	xprintf("%ld %s", (long) (limit / xdiv), lp->limscale);

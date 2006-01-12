@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.63 2005/04/11 22:10:58 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.64 2006/01/12 18:15:25 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.63 2005/04/11 22:10:58 kim Exp $")
+RCSID("$Id: sh.lex.c,v 3.64 2006/01/12 18:15:25 christos Exp $")
 
 #include "ed.h"
 
@@ -172,7 +172,7 @@ lex(struct wordent *hp)
     do {
 	struct wordent *new;
 
-	new = (struct wordent *) xmalloc((size_t) sizeof(*wdp));
+	new = xmalloc(sizeof(*new));
 	new->word = STRNULL;
 	new->prev = wdp;
 	new->next = hp;
@@ -203,8 +203,7 @@ a2time_t(Char *wordx)
     if (!wordx || *(s = wordx) != '+')
 	return (time_t)0;
 
-    for (++s, ret = 0, ct = 0; *s; ++s, ++ct)
-    {
+    for (++s, ret = 0, ct = 0; *s; ++s, ++ct) {
 	if (!isdigit((unsigned char)*s))
 	    return (time_t)0;
 	ret = ret * 10 + (time_t)((unsigned char)*s - '0');
@@ -240,8 +239,8 @@ copylex(struct wordent *hp, struct wordent *fp)
     fp = fp->next;
     do {
 	struct wordent *new;
-	
-	new = (struct wordent *) xmalloc((size_t) sizeof(*wdp));
+
+	new = xmalloc(sizeof(*new));
 	new->word = STRNULL;
 	new->prev = wdp;
 	new->next = hp;
@@ -261,9 +260,8 @@ freelex(struct wordent *vp)
     while (vp->next != vp) {
 	fp = vp->next;
 	vp->next = fp->next;
-	if (fp->word != STRNULL)
-	    xfree((ptr_t) fp->word);
-	xfree((ptr_t) fp);
+	xfree(fp->word);
+	xfree(fp);
     }
     vp->prev = vp;
 }
@@ -883,8 +881,7 @@ dosub(Char sc, struct wordent *en, int global)
 
     wdp = hp;
     while (--i >= 0) {
-	struct wordent *new = 
-		(struct wordent *) xcalloc(1, sizeof *wdp);
+	struct wordent *new = xcalloc(1, sizeof *wdp);
 
 	new->word = 0;
 	new->prev = wdp;
@@ -904,11 +901,11 @@ dosub(Char sc, struct wordent *en, int global)
 			otword = tword;
 			tword = subword(otword, sc, &didone);
 			if (Strcmp(tword, otword) == 0) {
-			    xfree((ptr_t) otword);
+			    xfree(otword);
 			    break;
 			}
 			else
-			    xfree((ptr_t) otword);
+			    xfree(otword);
 		    }
 		}
 	    }
@@ -1433,7 +1430,7 @@ reread:
 #endif /* !WINNT_NATIVE */
 	    {
 #ifdef BSDJOBS
-		int     ctpgrp;
+		pid_t ctpgrp;
 #endif /* BSDJOBS */
 
 		if (numeof != 0 && ++sincereal >= numeof)	/* Too many EOFs?  Bye! */
@@ -1446,7 +1443,7 @@ reread:
 # ifdef _SEQUENT_
 		    if (ctpgrp)
 # endif /* _SEQUENT */
-		    (void) killpg((pid_t) ctpgrp, SIGHUP);
+		    (void) killpg(ctpgrp, SIGHUP);
 # ifdef notdef
 		    /*
 		     * With the walking process group fix, this message
@@ -1454,7 +1451,7 @@ reread:
 		     * changes, the shell needs to adjust. Well too bad.
 		     */
 		    xprintf(CGETS(16, 1, "Reset tty pgrp from %d to %d\n"),
-			    ctpgrp, tpgrp);
+			    (int)ctpgrp, (int)tpgrp);
 # endif /* notdef */
 		    goto reread;
 		}
@@ -1510,14 +1507,13 @@ balloc(int buf)
     Char **nfbuf;
 
     while (buf >= fblocks) {
-	nfbuf = (Char **) xcalloc((size_t) (fblocks + 2),
-			  sizeof(Char **));
+	nfbuf = xcalloc(fblocks + 2, sizeof(Char **));
 	if (fbuf) {
 	    (void) blkcpy(nfbuf, fbuf);
-	    xfree((ptr_t) fbuf);
+	    xfree(fbuf);
 	}
 	fbuf = nfbuf;
-	fbuf[fblocks] = (Char *) xcalloc(BUFSIZE, sizeof(Char));
+	fbuf[fblocks] = xcalloc(BUFSIZE, sizeof(Char));
 	fblocks++;
     }
 }
@@ -1631,9 +1627,8 @@ bgetc(void)
 		roomleft = BUFSIZE - off;
 		if (roomleft > numleft)
 		    roomleft = numleft;
-		(void) memmove((ptr_t) (fbuf[buf] + off),
-		    (ptr_t) (InputBuf + c - numleft),
-		    (size_t) (roomleft * sizeof(Char)));
+		(void) memcpy(fbuf[buf] + off, InputBuf + c - numleft,
+			      roomleft * sizeof(Char));
 		numleft -= roomleft;
 		feobp += roomleft;
 	    }
@@ -1642,7 +1637,7 @@ bgetc(void)
 	    buf = (int) feobp / BUFSIZE;
 	    balloc(buf);
 	    roomleft = BUFSIZE - off;
-	    c = wide_read(SHIN, fbuf[buf] + off, (size_t) roomleft, 0);
+	    c = wide_read(SHIN, fbuf[buf] + off, roomleft, 0);
 	    if (c > 0)
 		feobp += c;
 	}
@@ -1677,7 +1672,7 @@ bfree(void)
     sb = (int) (fseekp - 1) / BUFSIZE;
     if (sb > 0) {
 	for (i = 0; i < sb; i++)
-	    xfree((ptr_t) fbuf[i]);
+	    xfree(fbuf[i]);
 	(void) blkcpy(fbuf, &fbuf[sb]);
 	fseekp -= BUFSIZE * sb;
 	feobp -= BUFSIZE * sb;
@@ -1802,9 +1797,9 @@ settell(void)
 	return;
     if ((x = lseek(SHIN, (off_t) 0, L_INCR)) == -1)
 	return;
-    fbuf = (Char **) xcalloc(2, sizeof(Char **));
+    fbuf = xcalloc(2, sizeof(Char **));
     fblocks = 1;
-    fbuf[0] = (Char *) xcalloc(BUFSIZE, sizeof(Char));
+    fbuf[0] = xcalloc(BUFSIZE, sizeof(Char));
     fseekp = fbobp = feobp = x;
     cantell = 1;
 }

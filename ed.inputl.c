@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.59 2005/04/11 22:10:55 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.60 2006/01/12 18:15:24 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.59 2005/04/11 22:10:55 kim Exp $")
+RCSID("$Id: ed.inputl.c,v 3.60 2006/01/12 18:15:24 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -695,7 +695,7 @@ GetNextCommand(KEYCMD *cmdnum, Char *ch)
 	    XmapVal val;
 	    CStr cstr;
 	    cstr.buf = ch;
-	    cstr.len = Strlen(ch);
+	    cstr.len = 1;
 	    switch (GetXkey(&cstr, &val)) {
 	    case XK_CMD:
 		cmd = val.cmd;

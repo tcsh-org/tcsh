@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.63 2005/11/02 17:27:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.64 2006/01/12 18:15:25 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.63 2005/11/02 17:27:26 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.64 2006/01/12 18:15:25 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -140,7 +140,7 @@ update_vars(Char *vp)
 	tsetenv(STRKHOME, cp);
 	/* fix directory stack for new tilde home */
 	dtilde();
-	xfree((ptr_t) cp);
+	xfree(cp);
     }
     else if (eq(vp, STRedit)) {
 	editing = 1;
@@ -322,7 +322,7 @@ asx(Char *vp, int subscr, Char *p)
 
     if (v->v_flags & VAR_READONLY)
 	stderror(ERR_READONLY|ERR_NAME, v->v_name);
-    xfree((ptr_t) v->vec[subscr - 1]);
+    xfree(v->vec[subscr - 1]);
     v->vec[subscr - 1] = globone(p, G_APPEND);
 }
 
@@ -424,9 +424,9 @@ dolet(Char **v, struct command *dummy)
 	else
 	    set(vp, operate(op, varval(vp), p), VAR_READWRITE);
 	update_vars(vp);
-	xfree((ptr_t) vp);
+	xfree(vp);
 	if (c != '=')
-	    xfree((ptr_t) p);
+	    xfree(p);
     } while ((p = *v++) != NULL);
 }
 
@@ -438,7 +438,7 @@ xset(Char *cp, Char ***vp)
     if (*cp) {
 	dp = Strsave(cp);
 	--(*vp);
-	xfree((ptr_t) ** vp);
+	xfree(** vp);
 	**vp = dp;
     }
     return (putn(expr(vp)));
@@ -456,7 +456,7 @@ operate(int op, Char *vp, Char *p)
     if (op != '=') {
 	if (*vp)
 	    *v++ = vp;
-	opr[0] = (Char) op;
+	opr[0] = op;
 	opr[1] = 0;
 	*v++ = opr;
 	if (op == '<' || op == '>')
@@ -569,7 +569,7 @@ adrof1(const Char *name, struct varent *v)
 void
 set(Char *var, Char *val, int flags)
 {
-    Char **vec = (Char **) xmalloc((size_t) (2 * sizeof(Char **)));
+    Char **vec = xmalloc(2 * sizeof(Char **));
 
     vec[0] = val;
     vec[1] = 0;
@@ -669,7 +669,7 @@ setq(Char *name, Char **vec, struct varent *p, int flags)
 	p = c;
 	f = f > 0;
     }
-    p->v_link[f] = c = (struct varent *) xmalloc((size_t)sizeof(struct varent));
+    p->v_link[f] = c = xmalloc(sizeof(struct varent));
     c->v_name = Strsave(name);
     c->v_flags = flags;
     c->v_bal = 0;
@@ -776,7 +776,7 @@ unsetv1(struct varent *p)
      * Free associated memory first to avoid complications.
      */
     blkfree(p->vec);
-    xfree((ptr_t) p->v_name);
+    xfree(p->v_name);
     /*
      * If p is missing one child, then we can move the other into where p is.
      * Otherwise, we find the predecessor of p, which is guaranteed to have no
@@ -806,7 +806,7 @@ unsetv1(struct varent *p)
     /*
      * Free the deleted node, and rebalance.
      */
-    xfree((ptr_t) p);
+    xfree(p);
     balance(pp, f, 1);
 }
 
@@ -1147,10 +1147,9 @@ update_dspmbyte_vars(void)
 #ifdef MBYTEDEBUG	/* Sorry, use for beta testing */
     {
 	Char mbmapstr[300];
-	for (lp = 0; lp < 256; lp++) {
+	for (lp = 0; lp < 256; lp++)
 	    mbmapstr[lp] = _mbmap[lp] + '0';
-	    mbmapstr[lp+1] = 0;
-	}
+	mbmapstr[lp] = 0;
 	set(STRmbytemap, Strsave(mbmapstr), VAR_READWRITE);
     }
 #endif /* MBYTEMAP */
@@ -1162,7 +1161,7 @@ void
 autoset_dspmbyte(Char *pcp)
 {
     int i;
-    struct dspm_autoset_Table {
+    static const struct dspm_autoset_Table {
 	Char *n;
 	Char *v;
     } dspmt[] = {
@@ -1182,7 +1181,7 @@ autoset_dspmbyte(Char *pcp)
 	{ NULL, NULL }
     };
 #if defined(HAVE_NL_LANGINFO) && defined(CODESET)
-    struct dspm_autoset_Table dspmc[] = {
+    static const struct dspm_autoset_Table dspmc[] = {
 	{ STRstarutfstar8, STRutf8 },
 	{ STReuc, STReuc },
 	{ STRGB2312, STReuc },

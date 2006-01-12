@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.92 2005/08/02 21:04:50 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.93 2006/01/12 18:15:25 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.92 2005/08/02 21:04:50 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.93 2006/01/12 18:15:25 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -136,7 +136,7 @@ pchild(int snum)
 {
     struct process *pp;
     struct process *fp;
-    int pid;
+    pid_t pid;
 #ifdef BSDWAIT
     union wait w;
 #else /* !BSDWAIT */
@@ -274,7 +274,7 @@ loop:
 
 #ifdef JOBDEBUG
     xprintf("parent %d pid %d, retval %x termsig %x retcode %x\n",
-	    getpid(), pid, w, WTERMSIG(w), WEXITSTATUS(w));
+	    (int)getpid(), (int)pid, w, WTERMSIG(w), WEXITSTATUS(w));
     flush();
 #endif /* JOBDEBUG */
 
@@ -484,11 +484,11 @@ pnote(void)
 static void
 pfree(struct process *pp)
 {	
-    xfree((ptr_t) pp->p_command);
+    xfree(pp->p_command);
     if (pp->p_cwd && --pp->p_cwd->di_count == 0)
 	if (pp->p_cwd->di_next == 0)
 	    dfree(pp->p_cwd);
-    xfree((ptr_t) pp);
+    xfree(pp);
 }
 
 
@@ -1062,9 +1062,9 @@ pprint(struct process *pp, int flag)
 	 * we can search for the next one downstream later.
 	 */
 	}
-	pcond = (int) (tp != pp || (inpipe && tp == pp));
+	pcond = (tp != pp || (inpipe && tp == pp));
 #else /* !BACKPIPE */
-	pcond = (int) (tp != pp);
+	pcond = (tp != pp);
 #endif /* BACKPIPE */	    
 
 	jobflags |= pp->p_flags;
@@ -1129,7 +1129,7 @@ pprint(struct process *pp, int flag)
 		case PSIGNALED:
 		    /*
 		     * tell what happened to the background job
-		     * From: Michael Schroeder 
+		     * From: Michael Schroeder
 		     * <mlschroe@immd4.informatik.uni-erlangen.de>
 		     */
 		    if ((flag & REASON)
@@ -2085,8 +2085,9 @@ pgetty(int wanttty, pid_t pgrp)
 # endif /* BSDSIGS && POSIXJOBS */
 
 # ifdef JOBDEBUG
-    xprintf("wanttty %d pid %d opgrp%d pgrp %d tpgrp %d\n", 
-	    wanttty, getpid(), pgrp, mygetpgrp(), tcgetpgrp(FSHTTY));
+    xprintf("wanttty %d pid %d opgrp%d pgrp %d tpgrp %d\n",
+	    wanttty, (int)getpid(), (int)pgrp, (int)mygetpgrp(),
+	    (int)tcgetpgrp(FSHTTY));
 # endif /* JOBDEBUG */
 # ifdef POSIXJOBS
     /*

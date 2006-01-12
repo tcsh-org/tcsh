@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.39 2005/01/05 16:06:14 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.40 2005/04/11 22:10:58 kim Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -40,7 +40,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.39 2005/01/05 16:06:14 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.40 2005/04/11 22:10:58 kim Exp $")
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -192,7 +192,7 @@ malloc(size_t nbytes)
      */
     if (nextf[bucket] == NULL)
 	morecore(bucket);
-    if ((p = (union overhead *) nextf[bucket]) == NULL) {
+    if ((p = nextf[bucket]) == NULL) {
 	child++;
 #ifndef DEBUG
 	stderror(ERR_NOMEM);
@@ -249,14 +249,14 @@ morecore(int bucket)
     if (membot == NULL)
 	membot = memtop;
     if ((long) op & 0x3ff) {
-	memtop = (char *) sbrk((int) (1024 - ((long) op & 0x3ff)));
+	memtop = sbrk((int) (1024 - ((long) op & 0x3ff)));
 	memtop += (long) (1024 - ((long) op & 0x3ff));
     }
 
     /* take 2k unless the block is bigger than that */
     rnu = (bucket <= 8) ? 11 : bucket + 3;
     nblks = 1 << (rnu - (bucket + 3));	/* how many blocks to get */
-    memtop = (char *) sbrk(1 << rnu);	/* PWP */
+    memtop = sbrk(1 << rnu);	/* PWP */
     op = (union overhead *) memtop;
     /* no more room! */
     if ((long) op == -1)
@@ -330,16 +330,13 @@ memalign_t
 calloc(size_t i, size_t j)
 {
 #ifndef lint
-    char *cp, *scp;
+    char *cp;
 
     i *= j;
-    scp = cp = (char *) xmalloc((size_t) i);
-    if (i != 0)
-	do
-	    *cp++ = 0;
-	while (--i);
+    cp = xmalloc(i);
+    memset(cp, 0, i);
 
-    return ((memalign_t) scp);
+    return ((memalign_t) cp);
 #else
     if (i && j)
 	return ((memalign_t) 0);
@@ -417,8 +414,7 @@ realloc(ptr_t cp, size_t nbytes)
 	 * smaller of the old and new size
 	 */
 	onb = (1 << (i + 3)) - MEMALIGN(sizeof(union overhead)) - RSLOP;
-	(void) memmove((ptr_t) res, (ptr_t) cp, 
-		       (size_t) (onb < nbytes ? onb : nbytes));
+	(void) memmove(res, cp, onb < nbytes ? onb : nbytes);
     }
     if (was_alloced)
 	free(cp);
@@ -483,10 +479,10 @@ smalloc(size_t n)
 
 #ifdef HAVE_SBRK
     if (membot == NULL)
-	membot = (char*) sbrk(0);
+	membot = sbrk(0);
 #endif /* HAVE_SBRK */
 
-    if ((ptr = malloc(n)) == (ptr_t) 0) {
+    if ((ptr = malloc(n)) == NULL) {
 	child++;
 	stderror(ERR_NOMEM);
     }
@@ -494,7 +490,7 @@ smalloc(size_t n)
     if (memtop < ((char *) ptr) + n)
 	memtop = ((char *) ptr) + n;
     if (membot == NULL)
-	membot = (char*) ptr;
+	membot = ptr;
 #endif /* !HAVE_SBRK */
     return ((memalign_t) ptr);
 }
@@ -508,10 +504,10 @@ srealloc(ptr_t p, size_t n)
 
 #ifdef HAVE_SBRK
     if (membot == NULL)
-	membot = (char*) sbrk(0);
+	membot = sbrk(0);
 #endif /* HAVE_SBRK */
 
-    if ((ptr = (p ? realloc(p, n) : malloc(n))) == (ptr_t) 0) {
+    if ((ptr = (p ? realloc(p, n) : malloc(n))) == NULL) {
 	child++;
 	stderror(ERR_NOMEM);
     }
@@ -519,7 +515,7 @@ srealloc(ptr_t p, size_t n)
     if (memtop < ((char *) ptr) + n)
 	memtop = ((char *) ptr) + n;
     if (membot == NULL)
-	membot = (char*) ptr;
+	membot = ptr;
 #endif /* !HAVE_SBRK */
     return ((memalign_t) ptr);
 }
@@ -527,7 +523,6 @@ srealloc(ptr_t p, size_t n)
 memalign_t
 scalloc(size_t s, size_t n)
 {
-    char   *sptr;
     ptr_t   ptr;
 
     n *= s;
@@ -535,25 +530,21 @@ scalloc(size_t s, size_t n)
 
 #ifdef HAVE_SBRK
     if (membot == NULL)
-	membot = (char*) sbrk(0);
+	membot = sbrk(0);
 #endif /* HAVE_SBRK */
 
-    if ((ptr = malloc(n)) == (ptr_t) 0) {
+    if ((ptr = malloc(n)) == NULL) {
 	child++;
 	stderror(ERR_NOMEM);
     }
 
-    sptr = (char *) ptr;
-    if (n != 0)
-	do
-	    *sptr++ = 0;
-	while (--n);
+    memset (ptr, 0, n);
 
 #ifndef HAVE_SBRK
     if (memtop < ((char *) ptr) + n)
 	memtop = ((char *) ptr) + n;
     if (membot == NULL)
-	membot = (char*) ptr;
+	membot = ptr;
 #endif /* !HAVE_SBRK */
 
     return ((memalign_t) ptr);
@@ -604,7 +595,7 @@ showall(Char **v, struct command *c)
 	    (unsigned long) sbrk(0));
 #else
 #ifdef HAVE_SBRK
-    memtop = (char *) sbrk(0);
+    memtop = sbrk(0);
 #endif /* HAVE_SBRK */
     xprintf(CGETS(19, 12, "Allocated memory from 0x%lx to 0x%lx (%ld).\n"),
 	    (unsigned long) membot, (unsigned long) memtop, 

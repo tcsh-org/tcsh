@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.85 2005/04/11 22:10:54 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.86 2006/01/12 18:15:24 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.85 2005/04/11 22:10:54 kim Exp $")
+RCSID("$Id: ed.chared.c,v 3.86 2006/01/12 18:15:24 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -834,7 +834,7 @@ SetKillRing(int max)
 	max = 1;		/* no ring, but always one buffer */
     if (max == KillRingMax)
 	return;
-    new = (CStr *)xcalloc((size_t) max, sizeof(CStr));
+    new = xcalloc(max, sizeof(CStr));
     if (KillRing != NULL) {
 	if (KillRingLen != 0) {
 	    if (max >= KillRingLen) {
@@ -909,10 +909,7 @@ c_push_kill(Char *start, Char *end)
     pos = &KillRing[KillPos];
     KillPos = (KillPos + 1) % KillRingMax;
     if (pos->len < len) {
-	if (pos->buf == NULL)
-	    pos->buf = (Char *) xmalloc(len * sizeof(Char));
-	else
-	    pos->buf = (Char *) xrealloc((ptr_t) pos->buf, len * sizeof(Char));
+	pos->buf = xrealloc(pos->buf, len * sizeof(Char));
 	pos->len = len;
     }
     cp = start;
@@ -1009,13 +1006,13 @@ static CCRETVAL
 c_search_line(Char *pattern, int dir)
 {
     Char *cp;
-    int len;
+    size_t len;
 
-    len = (int) Strlen(pattern);
+    len = Strlen(pattern);
 
     if (dir == F_UP_SEARCH_HIST) {
 	for (cp = Cursor; cp >= InputBuf; cp--)
-	    if (Strncmp(cp, pattern, (size_t) len) == 0 ||
+	    if (Strncmp(cp, pattern, len) == 0 ||
 		Gmatch(cp, pattern)) {
 		Cursor = cp;
 		return(CC_NORM);
@@ -1023,7 +1020,7 @@ c_search_line(Char *pattern, int dir)
 	return(CC_ERROR);
     } else {
 	for (cp = Cursor; *cp != '\0' && cp < InputLim; cp++)
-	    if (Strncmp(cp, pattern, (size_t) len) == 0 ||
+	    if (Strncmp(cp, pattern, len) == 0 ||
 		Gmatch(cp, pattern)) {
 		Cursor = cp;
 		return(CC_NORM);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.29 2005/04/11 22:10:57 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.30 2006/01/12 18:15:25 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.file.c,v 3.29 2005/04/11 22:10:57 kim Exp $")
+RCSID("$Id: sh.file.c,v 3.30 2006/01/12 18:15:25 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -509,8 +509,8 @@ free_items(Char **items, size_t numitems)
     size_t i;
 
     for (i = 0; i < numitems; i++)
-	xfree((ptr_t) items[i]);
-    xfree((ptr_t) items);
+	xfree(items[i]);
+    xfree(items);
 }
 
 #ifdef BSDSIGS

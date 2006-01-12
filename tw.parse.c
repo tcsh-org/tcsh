@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.109 2006/01/12 18:06:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.110 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.109 2006/01/12 18:06:34 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.110 2006/01/12 18:15:25 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -505,7 +505,7 @@ t_glob(Char ***v, int cmd)
 		fwd++;		
 		p = av[i];
 		av[i] = NULL;
-		xfree((ptr_t) p);
+		xfree(p);
 	    }
 	    else if (fwd) 
 		av[i - fwd] = av[i];
@@ -734,10 +734,8 @@ is_suffix(Char *check, Char *template)
 {
     Char *t, *c;
 
-    for (t = template; *t++;)
-	continue;
-    for (c = check; *c++;)
-	continue;
+    t = Strend(template);
+    c = Strend(check);
     for (;;) {
 	if (t == template)
 	    return 1;
@@ -2087,7 +2085,8 @@ void
 print_by_column(Char *dir, Char *items[], int count, int no_file_suffix)
 {
     int i, r, c, columns, rows;
-    unsigned int w, wx, maxwidth = 0;
+    size_t w;
+    unsigned int wx, maxwidth = 0;
     Char *val;
     int across;
 
@@ -2114,7 +2113,7 @@ print_by_column(Char *dir, Char *items[], int count, int no_file_suffix)
 
 	    if (i < count) {
 		wx = 0;
-		w = (unsigned int) Strlen(items[i]);
+		w = Strlen(items[i]);
 
 #ifdef COLOR_LS_F
 		if (no_file_suffix) {
@@ -2143,7 +2142,7 @@ print_by_column(Char *dir, Char *items[], int count, int no_file_suffix)
 #endif /* COLOR_LS_F */
 
 		if (c < (columns - 1)) {	/* Not last column? */
-		    w = (unsigned int) NLSStringWidth(items[i]) + wx;
+		    w = NLSStringWidth(items[i]) + wx;
 		    for (; w < maxwidth; w++)
 			xputchar(' ');
 		}
@@ -2298,7 +2297,7 @@ free_scroll_tab(void)
     while(scroll_tab) {
 	loop = scroll_tab;
 	scroll_tab = scroll_tab->next;
-	xfree((ptr_t) loop->element);
-	xfree((ptr_t) loop);
+	xfree(loop->element);
+	xfree(loop);
     }
 }

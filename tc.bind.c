@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.bind.c,v 3.40 2005/04/11 22:10:59 kim Exp $ */
+/* $Header: /src/pub/tcsh/tc.bind.c,v 3.41 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.40 2005/04/11 22:10:59 kim Exp $")
+RCSID("$Id: tc.bind.c,v 3.41 2006/01/12 18:15:25 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"
@@ -638,7 +638,7 @@ unparsekey(int c)		/* 'c' -> "c", '^C' -> "^" + "C" */
 	    *cp++ = _toebcdic[_toascii[c]|0100]
 	}
 	else {
-	    xsnprintf(cp, 3, "\\%3.3o", c);
+	    xsnprintf(cp, 4, "\\%03.3o", c);
 	    cp += 4;
 	}
 #endif /* IS_ASCII */

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.59 2006/01/12 18:14:05 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.60 2006/01/12 18:15:24 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.59 2006/01/12 18:14:05 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.60 2006/01/12 18:15:24 christos Exp $")
 
 /*
  * C shell
@@ -381,8 +381,7 @@ Dgetdol(void)
 	if (dimen || bitset || length)
 	    stderror(ERR_SYNTAX);
 	if (backpid != 0) {
-	    if (dolbang) 
-		xfree((ptr_t) dolbang);
+	    xfree(dolbang);
 	    setDolp(dolbang = putn(backpid));
 	}
 	goto eatbrac;
