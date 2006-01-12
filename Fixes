@@ -1,3 +1,5 @@
+ 29. read should only increment count when it succeeds (Miloslav Trmac)
+ 28. testsuiteadditions (Miloslav Trmac)
  27. -n fixes (Miloslav Trmac)
  26. signness warnings (Miloslav Trmac)
  25. Prevent infinite recursion in catclose (Gerhard Niklasch)

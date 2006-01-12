@@ -1,0 +1,7 @@
+# Process this file with autom4te to create testsuite. -*- Autotest -*-
+
+AT_INIT
+AT_TESTED([tcsh])
+
+m4_include([noexec.at])
+m4_include([sh.dol.at])

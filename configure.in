@@ -12,6 +12,7 @@ AC_PREREQ([2.59])dnl Minimum Autoconf version required.
 AC_INIT
 AC_CONFIG_SRCDIR([tc.vers.c])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_TESTDIR([.], [.])
 
 AC_CANONICAL_HOST
 

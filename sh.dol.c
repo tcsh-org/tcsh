@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.56 2005/04/11 22:10:56 kim Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.57 2006/01/12 18:06:34 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.56 2005/04/11 22:10:56 kim Exp $")
+RCSID("$Id: sh.dol.c,v 3.57 2006/01/12 18:06:34 christos Exp $")
 
 /*
  * C shell
@@ -485,9 +485,10 @@ Dgetdol(void)
 	    (void) sigrelse(SIGINT);
 #endif /* BSDSIGS */
 	    np = wbuf;
-	    while (force_read(OLDSTD, cbuf + cbp++, 1) == 1) {
+	    while (force_read(OLDSTD, cbuf + cbp, 1) == 1) {
 	        int len;
 
+		cbp++;
 		len = normal_mbtowc(np, cbuf, cbp);
 		if (len == -1) {
 		    reset_mbtowc();

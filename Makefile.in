@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 3.29 2005/04/11 21:26:32 kim Exp $
+# $Id: Makefile.in,v 3.30 2005/04/14 17:24:30 kim Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -8,7 +8,7 @@
 # things; Paul Placeway, CIS Dept., Ohio State University
 #
 SHELL=/bin/sh
-VERSION=6.12
+VERSION=@PACKAGE_VERSION@
 BUILD=tcsh$(EXEEXT)
 VPATH=@srcdir@
 srcdir=@srcdir@
@@ -326,14 +326,16 @@ AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
 	README.imake complete.tcsh vmsreadme.txt termcap.vms snames.h \
-	host.defs gethost.c tcsh.man2html configure.in configure config.h.in
+	host.defs gethost.c tcsh.man2html configure.in configure config.h.in \
+	tests/testsuite.at
+TESTFILES= tests/noexec.at tests/sh.dol.at
 
 VHSRCS=${PVSRCS} ${AVSRCS}
 
 CONFSRCS=config/* 
 
 ALLSRCS=  ${SHSRCS} ${TWSRCS} ${EDSRCS} ${TCSRCS} ${VHSRCS}
-DISTSRCS= ${PSSRCS} ${TWSRCS} ${EDSRCS} ${TCSRCS} ${AVSRCS}
+DISTSRCS= ${PSSRCS} ${TWSRCS} ${EDSRCS} ${TCSRCS} ${AVSRCS} $(TESTFILES)
 
 
 OBJS= ${SHOBJS} ${TWOBJS} ${EDOBJS} ${TCOBJS}
@@ -443,6 +445,25 @@ tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
 	    sort >> $@
 	@echo '#endif /* _h_tc_const */' >> $@
 
+$(srcdir)/tests/package.m4: $(srcdir)/configure.in
+	{								   \
+	  echo '# Signature of the current package.';			   \
+	  echo 'm4_define([AT_PACKAGE_NAME],      [@PACKAGE_NAME@])';	   \
+	  echo 'm4_define([AT_PACKAGE_TARNAME],   [@PACKAGE_TARNAME@])';   \
+	  echo 'm4_define([AT_PACKAGE_VERSION],   [@PACKAGE_VERSION@])';   \
+	  echo 'm4_define([AT_PACKAGE_STRING],    [@PACKAGE_STRING@])';	   \
+	  echo 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
+	} >$(srcdir)/tests/package.m4
+
+$(srcdir)/tests/testsuite: tests/package.m4 tests/testsuite.at $(TESTFILES)
+	autom4te --language=autotest -I $(srcdir)/tests \
+		$(srcdir)/tests/testsuite.at -o $@.tmp
+	mv $@.tmp $@
+
+atconfig: config.status
+	$(SHELL) ./config.status ./atconfig
+
+
 csh.prof: ${OBJS} sh.prof.${SUF} mcrt0.${SUF}
 	rm -f csh.prof
 	ld -X mcrt0.${SUF} ${OBJS} -o csh.prof ${LIBES} -lc
@@ -543,7 +564,7 @@ tags:	/tmp
 tar.Z:
 	rm -f tcsh-${VERSION}.tar.Z
 	rm -rf tcsh-${VERSION} 
-	-mkdir tcsh-${VERSION} tcsh-${VERSION}/config
+	-mkdir tcsh-${VERSION} tcsh-${VERSION}/config tcsh-${VERSION}/tests
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
 	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
@@ -553,7 +574,7 @@ tar.Z:
 tar.gz:
 	rm -f tcsh-${VERSION}.tar.gz
 	rm -rf tcsh-${VERSION} 
-	-mkdir tcsh-${VERSION} tcsh-${VERSION}/config
+	-mkdir tcsh-${VERSION} tcsh-${VERSION}/config tcsh-${VERSION}/tests
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
 	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
@@ -563,7 +584,7 @@ tar.gz:
 shar:
 	rm -f tcsh-*.shar
 	rm -rf tcsh-${VERSION} 
-	-mkdir tcsh-${VERSION} tcsh-${VERSION}/config
+	-mkdir tcsh-${VERSION} tcsh-${VERSION}/config tcsh-${VERSION}/tests
 	cp ${ALLSRCS} tcsh-${VERSION}
 	cp ${CONFSRCS} tcsh-${VERSION}/config
 	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
@@ -578,7 +599,7 @@ catalogs:
 tcsh-${VERSION}.tar.Z:
 	rm -rf tcsh-${VERSION} 
 	rm -f tcsh-${VERSION}.tar tcsh-${VERSION}.tar.Z DIFFS.[123]
-	-mkdir tcsh-${VERSION}
+	-mkdir tcsh-${VERSION} tcsh-${VERSION}/tests
 	./MAKEDIFFS bsd
 	mv DIFFS.1 DIFFS.2 DIFFS.3 tcsh-${VERSION}
 	cp ${DISTSRCS} tcsh-${VERSION}
@@ -630,6 +651,9 @@ $(srcdir)/config.h.in: $(srcdir)/stamp-h.in
 $(srcdir)/stamp-h.in: $(srcdir)/configure.in
 	cd $(srcdir) && autoheader
 	@echo timestamp > $(srcdir)/stamp-h.in
+
+check: atconfig $(srcdir)/tests/testsuite
+	$(SHELL) $(srcdir)/tests/testsuite
 
 #
 # Dependencies
