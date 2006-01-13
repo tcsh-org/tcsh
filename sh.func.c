@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.133 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.134 2006/01/13 00:27:51 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.133 2006/01/12 19:55:38 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.134 2006/01/13 00:27:51 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -778,7 +778,8 @@ search(int type, int level, Char *goal)
 	    printprompt(1, isrchx(type == TC_BREAK ? zlast : type));
 	/* xprintf("? "), flush(); */
 	(void) getword(&word);
-	switch (word.s ? srchx(word.s) : -1) {
+	Strbuf_terminate(&word);
+	switch (srchx(word.s)) {
 
 	case TC_ELSE:
 	    if (level == 0 && type == TC_IF)
