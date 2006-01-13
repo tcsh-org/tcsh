@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.49 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.decls.h,v 3.50 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -82,7 +82,14 @@ extern	void		  heredoc	(Char *);
  * sh.err.c
  */
 extern	void		  reset		(void);
-extern	void		  cleanup_push	(void *, void (*fn) (void *));
+extern	void		  cleanup_push_internal(void *, void (*fn) (void *)
+#ifdef CLEANUP_DEBUG
+						, const char *, size_t
+#define cleanup_push(v, f) cleanup_push_internal(v, f, __FILE__, __LINE__)
+#else
+#define cleanup_push(v, f) cleanup_push_internal(v, f)
+#endif
+);
 extern	void		  cleanup_ignore(void *);
 extern	void		  cleanup_until	(void *);
 extern	void		  cleanup_until_mark(void);
