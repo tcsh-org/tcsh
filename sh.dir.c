@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.73 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.74 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.dir.c,v 3.73 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: sh.dir.c,v 3.74 2006/01/12 19:55:38 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -345,7 +345,6 @@ dnormalize(const Char *cp, int expnd)
  	int     dotdot = 0;
 	Char   *dp, *cwd;
 	const Char *start = cp;
-	struct stat sb;
 # ifdef HAVE_SLASHSLASH
 	int slashslash;
 # endif /* HAVE_SLASHSLASH */
@@ -364,6 +363,7 @@ dnormalize(const Char *cp, int expnd)
 	    return (Strsave(start));
 	
 # ifdef notdef
+	struct stat sb;
 	/*
 	 * We disable this test because:
 	 * cd /tmp; mkdir dir1 dir2; cd dir2; ln -s /tmp/dir1; cd dir1;
