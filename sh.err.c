@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.err.c,v 3.44 2006/01/13 00:27:02 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.err.c,v 3.45 2006/01/13 00:29:53 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -34,7 +34,7 @@
 #include "sh.h"
 #include <assert.h>
 
-RCSID("$Id: sh.err.c,v 3.44 2006/01/13 00:27:02 christos Exp $")
+RCSID("$Id: sh.err.c,v 3.45 2006/01/13 00:29:53 christos Exp $")
 
 /*
  * C Shell
@@ -385,9 +385,9 @@ static size_t cleanup_stack_size; /* = 0 */
 /* fn() will be run with all signals blocked, so it should not do anything
    risky. */
 void
-cleanup_push_internal(void *var, void (*fn) (void *),
+cleanup_push_internal(void *var, void (*fn) (void *)
 #ifdef CLEANUP_DEBUG
-    const char *file, size_t line
+    , const char *file, size_t line
 #endif
 )
 {
