@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.printf.c,v 3.30 2006/01/12 19:43:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.printf.c,v 3.31 2006/01/13 17:14:28 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -34,7 +34,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.30 2006/01/12 19:43:01 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.31 2006/01/13 17:14:28 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -390,7 +390,7 @@ xvasprintf(const char *fmt, va_list va)
     char *buf;
 
     buf = NULL;
-    size = 64; /* Arbitrary */
+    size = 2048; /* Arbitrary */
     for (;;) {
 	buf = xrealloc(buf, size);
 	xstring = buf;
