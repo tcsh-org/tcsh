@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.59 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.60 2006/01/13 00:30:56 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.59 2006/01/12 19:55:38 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.60 2006/01/13 00:30:56 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -185,7 +185,7 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
     Char   *z, *q;
     Char    attributes = 0;
     static int print_prompt_did_ding = 0;
-    char *cz, *scz = NULL;
+    char *cz;
 
     Char *p;
     const Char *cp = fmt;
@@ -311,11 +311,12 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 		    xfree(cz);
 		break;
 
-	    case 'm':
+	    case 'm': {
+		char *scz = NULL;
 #ifndef HAVENOUTMP
 		if (what == FMT_WHO)
 		    scz = cz = who_info(info, 'm');
-		else 
+		else
 #endif /* HAVENOUTMP */
 		    cz = getenv("HOST");
 
@@ -329,6 +330,7 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 		if (scz)
 		    xfree(scz);
 		break;
+	    }
 
 			/* lukem: new directory prompt code */
 	    case '~':
