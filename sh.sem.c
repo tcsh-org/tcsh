@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.73 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.sem.c,v 3.74 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.sem.c,v 3.73 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: sh.sem.c,v 3.74 2006/01/12 19:55:38 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -487,7 +487,7 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 		    Vdp = 0;
 		    xfree(Vexpath);
 		    Vexpath = 0;
-		    blkfree(Vt);
+		    blk_cleanup(Vt);
 		    Vt = 0;
 		    /* this is from pfork() */
 		    palloc(pid, t);
