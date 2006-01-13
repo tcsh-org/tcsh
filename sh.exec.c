@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.67 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.68 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.67 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: sh.exec.c,v 3.68 2006/01/12 19:55:38 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -252,7 +252,9 @@ doexec(struct command *t, int do_glob)
     else
 	pv = v->vec;
     sav = Strspl(STRslash, *av);/* / command name for postpending */
+#ifdef notdef
     cleanup_push(sav, xfree);
+#endif
 #ifdef VFORK
     Vsav = sav;
 #endif /* VFORK */
@@ -283,7 +285,9 @@ doexec(struct command *t, int do_glob)
 	    texec(*av, av);
 	else {
 	    dp = Strspl(*pv, sav);
+#ifdef notdef
 	    cleanup_push(dp, xfree);
+#endif
 #ifdef VFORK
 	    Vdp = dp;
 #endif /* VFORK */
@@ -292,7 +296,10 @@ doexec(struct command *t, int do_glob)
 #ifdef VFORK
 	    Vdp = 0;
 #endif /* VFORK */
+#ifdef notdef
 	    cleanup_until(dp);
+#endif
+	    xfree(dp);
 	}
 #ifdef VFORK
 	misses++;
@@ -305,7 +312,10 @@ cont:
     hits--;
     Vsav = 0;
 #endif /* VFORK */
+#ifdef notdef
     cleanup_until(sav);
+#endif
+    xfree(sav);
     pexerr();
 }
 
