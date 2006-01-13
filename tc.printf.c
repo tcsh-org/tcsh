@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.printf.c,v 3.29 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.printf.c,v 3.30 2006/01/12 19:43:01 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -34,7 +34,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.29 2006/01/12 18:15:25 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.30 2006/01/12 19:43:01 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -67,7 +67,8 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
     int i;
     int fmt;
     unsigned char pad = ' ';
-    int     flush_left = 0, f_width = 0, prec = INF, hash = 0, do_long = 0;
+    int     flush_left = 0, f_width = 0, prec = INF, hash = 0;
+    int	    do_long = 0, do_size_t = 0;
     int     sign = 0;
     int     attributes = 0;
 
@@ -126,6 +127,10 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
 		    f++;
 		}
 	    }
+	    if (*f == 'z') {	/* size_t format */
+		do_size_t++;
+		f++;
+	    }
 
 	    fmt = (unsigned char) *f;
 	    if (fmt != 'S' && fmt != 'Q' && isupper(fmt)) {
@@ -137,7 +142,10 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
 	    case 'd':
 		switch (do_long) {
 		case 0:
-		    l = (long) (va_arg(ap, int));
+		    if (do_size_t)
+			l = (long) (va_arg(ap, size_t));
+		    else
+			l = (long) (va_arg(ap, int));
 		    break;
 		case 1:
 #ifndef HAVE_LONG_LONG
@@ -182,7 +190,10 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
 	    case 'u':
 		switch (do_long) {
 		case 0:
-		    u = va_arg(ap, unsigned int);
+		    if (do_size_t)
+			u = va_arg(ap, size_t);
+		    else
+			u = va_arg(ap, unsigned int);
 		    break;
 		case 1:
 #ifndef HAVE_LONG_LONG
@@ -300,7 +311,8 @@ lcase_s:
 	    default:
 		break;
 	    }
-	    flush_left = 0, f_width = 0, prec = INF, hash = 0, do_long = 0;
+	    flush_left = 0, f_width = 0, prec = INF, hash = 0;
+	    do_size_t = 0, do_long = 0;
 	    sign = 0;
 	    pad = ' ';
 	}

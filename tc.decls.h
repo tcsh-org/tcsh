@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.60 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.61 2006/01/13 16:29:20 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -223,13 +223,21 @@ extern	int		  getv		(Char *);
 /*
  * tc.printf.h
  */
-extern	pret_t		  xprintf	(const char *, ...);
-extern	pret_t		  xsnprintf	(char *, size_t, const char *, ...);
-extern	char		 *xasprintf	(const char *, ...);
-extern	pret_t		  xvprintf	(const char *, va_list);
-extern	pret_t		  xvsnprintf	(char *, size_t, const char *,
-					 va_list);
-extern	char		 *xvasprintf	(const char *, va_list);
+#ifndef __GNUC__
+#define __attribute__(a)
+#endif
+extern	pret_t		  xprintf	(const char *, ...)
+    __attribute__((__format__(__printf__, 1, 2)));
+extern	pret_t		  xsnprintf	(char *, size_t, const char *, ...)
+    __attribute__((__format__(__printf__, 3, 4)));
+extern	char		 *xasprintf	(const char *, ...)
+    __attribute__((__format__(__printf__, 1, 2)));
+extern	pret_t		  xvprintf	(const char *, va_list)
+    __attribute__((__format__(__printf__, 1, 0)));
+extern	pret_t		  xvsnprintf	(char *, size_t, const char *, va_list)
+    __attribute__((__format__(__printf__, 3, 0)));
+extern	char		 *xvasprintf	(const char *, va_list)
+    __attribute__((__format__(__printf__, 1, 0)));
 
 /*
  * tc.prompt.c
