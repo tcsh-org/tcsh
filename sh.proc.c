@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.94 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.95 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.94 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.95 2006/01/12 19:55:38 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1028,7 +1028,7 @@ pprint(struct process *pp, int flag)
 			int free_ptr;
 
 			free_ptr = 0;
-			ptr = (char *)mesg[pp->p_reason & ASCII].pname;
+			ptr = (char *)(intptr_t)mesg[pp->p_reason & ASCII].pname;
 			if (ptr == NULL) {
 			    ptr = xasprintf("%s %d", CGETS(17, 5, "Signal"),
 					    pp->p_reason & ASCII);
