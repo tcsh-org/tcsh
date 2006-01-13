@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.87 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.88 2006/01/12 19:55:37 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.87 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.88 2006/01/12 19:55:37 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2128,7 +2128,7 @@ e_dabbrev_expand(Char c)
     Char *cp, *ncp, *bp;
     struct Hist *hp;
     int arg = 0, i;
-    size_t len;
+    size_t len = 0;
     int found = 0;
     Char *hbuf;
     static int oldevent, hist, word;
