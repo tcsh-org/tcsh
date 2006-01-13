@@ -749,6 +749,10 @@ else if (0) then
 else
   echo fail
 endif
+# skipping over an empty line
+if (0) then
+
+endif
 ]])
 AT_CHECK([tcsh -f if.csh], ,
 [OK
