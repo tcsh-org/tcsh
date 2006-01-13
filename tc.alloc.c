@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.41 2006/01/12 19:43:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.42 2006/01/12 19:55:38 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -40,7 +40,10 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.41 2006/01/12 19:43:01 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.42 2006/01/12 19:55:38 christos Exp $")
+
+#undef RCHECK
+#undef DEBUG
 
 static char   *memtop = NULL;		/* PWP: top of current memory */
 static char   *membot = NULL;		/* PWP: bottom of allocatable memory */
@@ -54,6 +57,7 @@ int dont_free = 0;
 # define realloc	frealloc
 #endif /* WINNT_NATIVE */
 
+#ifndef DEBUG
 static void
 out_of_memory (void)
 {
@@ -62,11 +66,9 @@ out_of_memory (void)
     write(didfds ? 2 : SHDIAG, msg, strlen(msg));
     _exit(1);
 }
+#endif
 
 #ifndef SYSMALLOC
-
-#undef RCHECK
-#undef DEBUG
 
 #ifdef SX
 extern void* sbrk();
