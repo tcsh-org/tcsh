@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.134 2006/01/13 00:27:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.135 2006/01/13 16:18:13 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.134 2006/01/13 00:27:51 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.135 2006/01/13 16:18:13 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -49,7 +49,6 @@ static iconv_t catgets_iconv; /* Or (iconv_t)-1 */
 /*
  * C shell
  */
-extern char **environ;
 
 extern int MapsAreInited;
 extern int NLSMapsAreInited;

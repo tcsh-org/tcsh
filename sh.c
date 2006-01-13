@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.126 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.127 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.126 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: sh.c,v 3.127 2006/01/12 19:55:38 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -113,7 +113,6 @@ int	exitset = 0;
 static time_t  chktim;		/* Time mail last checked */
 char *progname;
 int tcsh;
-extern char **environ;
 
 /*
  * This preserves the input state of the shell. It is used by

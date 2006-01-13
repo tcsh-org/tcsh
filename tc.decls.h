@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.decls.h,v 3.59 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.decls.h,v 3.60 2006/01/12 19:55:38 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */
@@ -42,10 +42,12 @@ struct Strbuf;
  */
 #ifndef SYSMALLOC
 #ifndef WINNT_NATIVE
+#ifndef __linux__
 extern	void		  free		(ptr_t);
 extern	memalign_t	  malloc	(size_t);
 extern	memalign_t	  realloc	(ptr_t, size_t);
 extern	memalign_t	  calloc	(size_t, size_t);
+#endif
 #endif /* !WINNT_NATIVE */
 #else /* SYSMALLOC */
 extern	void		  sfree		(ptr_t);
