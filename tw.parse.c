@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.113 2006/01/23 22:38:39 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.114 2006/02/01 15:24:34 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.113 2006/01/23 22:38:39 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.114 2006/02/01 15:24:34 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -312,7 +312,7 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	    cleanup_push(rword, xfree);
 	    if (slshp != STRNULL)
 		*slshp = '\0';
-	    wordbuf.len = 0;
+	    wordbuf = Strbuf_init;
 	    Strbuf_append(&wordbuf, qline.s + wordp);
 	    Strbuf_terminate(&wordbuf);
 	    cleanup_push(&wordbuf, Strbuf_cleanup);
