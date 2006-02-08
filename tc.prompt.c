@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.60 2006/01/13 00:30:56 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.61 2006/01/13 16:19:29 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.60 2006/01/13 00:30:56 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.61 2006/01/13 16:19:29 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -288,7 +288,7 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 			size_t i;
 
 			for (i = 0; STRDING[i] != 0; i++)
-			    Strbuf_append1(&buf, attributes | STRDING[i++]);
+			    Strbuf_append1(&buf, attributes | STRDING[i]);
 			print_prompt_did_ding = 1;
 		    }
 		}
