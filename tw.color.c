@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.color.c,v 1.21 2006/01/12 19:43:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.color.c,v 1.22 2006/01/12 19:55:39 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.color.c,v 1.21 2006/01/12 19:43:01 christos Exp $")
+RCSID("$Id: tw.color.c,v 1.22 2006/01/12 19:55:39 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -41,7 +41,7 @@ RCSID("$Id: tw.color.c,v 1.21 2006/01/12 19:43:01 christos Exp $")
 #ifdef COLOR_LS_F
 
 typedef struct {
-    const char   *s;
+    const char	 *s;
     size_t len;
 } Str;
 
@@ -56,8 +56,8 @@ typedef struct {
 typedef struct {
     const char suffix;
     const char *variable;
-    Str     color;
-    Str     defaultcolor;
+    Str	    color;
+    Str	    defaultcolor;
 } Variable;
 
 static Variable variables[] = {
@@ -80,6 +80,11 @@ static Variable variables[] = {
 #endif
     VAR(NOS, "rc", "m"),	/* Right code */
     VAR(NOS, "ec", ""),		/* End code (replaces lc+no+rc) */
+    VAR(NOS, "su", ""),		/* Setuid file (u+s) */
+    VAR(NOS, "sg", ""),		/* Setgid file (g+s) */
+    VAR(NOS, "tw", ""),		/* Sticky and other writable dir (+t,o+w) */
+    VAR(NOS, "ow", ""),		/* Other writable dir (o+w) but not sticky */
+    VAR(NOS, "st", ""),		/* Sticky dir (+t) but not other writable */
 };
 
 enum FileType {
@@ -90,8 +95,8 @@ enum FileType {
 #define nvariables (sizeof(variables)/sizeof(variables[0]))
 
 typedef struct {
-    Str     extension;	/* file extension */
-    Str     color;	/* color string */
+    Str	    extension;	/* file extension */
+    Str	    color;	/* color string */
 } Extension;
 
 static Extension *extensions = NULL;
@@ -99,7 +104,7 @@ static size_t nextensions = 0;
 
 static char *colors = NULL;
 int	     color_context_ls = FALSE;	/* do colored ls */
-static int  color_context_lsmF = FALSE;	/* do colored ls-F */
+static int  color_context_lsmF = FALSE; /* do colored ls-F */
 
 static int getstring (char **, const Char **, Str *, int);
 static void put_color (const Str *);
@@ -134,7 +139,7 @@ set_color_context(void)
 
 /* getstring():
  */
-static  int
+static	int
 getstring(char **dp, const Char **sp, Str *pd, int f)
 {
     const Char *s = *sp;
@@ -166,7 +171,7 @@ void
 parseLS_COLORS(const Char *value)
 {
     size_t  i, len;
-    const Char   *v;		/* pointer in value */
+    const Char	 *v;		/* pointer in value */
     char   *c;			/* pointer in colors */
     Extension *volatile e;	/* pointer in extensions */
     jmp_buf_t osetexit;
@@ -258,8 +263,8 @@ static void
 put_color(const Str *color)
 {
     size_t  i;
-    const char   *c = color->s;
-    int    original_output_raw = output_raw;
+    const char	 *c = color->s;
+    int	   original_output_raw = output_raw;
 
     output_raw = TRUE;
     cleanup_push(&original_output_raw, output_raw_restore);
@@ -277,17 +282,17 @@ print_color(const Char *fname, size_t len, Char suffix)
     size_t  i;
     char   *filename = short2str(fname);
     char   *last = filename + len;
-    Str    *color = &variables[VFile].color;
+    Str	   *color = &variables[VFile].color;
 
     switch (suffix) {
     case '>':			/* File is a symbolic link pointing to
 				 * a directory */
-        color = &variables[VDir].color;
+	color = &variables[VDir].color;
 	break;
     case '+':			/* File is a hidden directory [aix] or
 				 * context dependent [hpux] */
     case ':':			/* File is network special [hpux] */
-        break;
+	break;
     default:
 	for (i = 0; i < nvariables; i++)
 	    if (variables[i].suffix != NOS &&
@@ -297,7 +302,7 @@ print_color(const Char *fname, size_t len, Char suffix)
 	    }
 	if (i == nvariables) {
 	    for (i = 0; i < nextensions; i++)
-	        if (len >= extensions[i].extension.len
+		if (len >= extensions[i].extension.len
 		    && strncmp(last - extensions[i].extension.len,
 			       extensions[i].extension.s,
 			       extensions[i].extension.len) == 0) {
