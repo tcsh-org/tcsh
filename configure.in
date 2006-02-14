@@ -282,10 +282,6 @@ AC_HEADER_STDC
 
 dnl Checks for types
 AC_CHECK_TYPES([long long])
-AC_CHECK_TYPES([wint_t], , ,
-[AC_INCLUDES_DEFAULT
-#include <wchar.h>
-])
 AC_TYPE_GETGROUPS
 AC_TYPE_MODE_T
 AC_TYPE_SIZE_T
@@ -350,8 +346,9 @@ AC_CHECK_DECLS([gethostname, getpgrp], , ,
 ])
 AC_CHECK_FUNCS([catgets dup2 getauthid getcwd gethostname getpwent] dnl
 	[getutent memmove memset nice nl_langinfo sbrk setpgid setpriority] dnl
-	[strerror strstr sysconf wcwidth mbrtowc])
+	[strerror strstr sysconf wcwidth])
 AC_FUNC_GETPGRP
+AC_FUNC_MBRTOWC
 AC_FUNC_SETPGRP
 
 dnl This is not good enough; we need sockaddr_storage too.

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.66 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.67 2006/01/13 16:28:23 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.66 2006/01/12 19:55:38 christos Exp $")
+RCSID("$Id: sh.lex.c,v 3.67 2006/01/13 16:28:23 christos Exp $")
 
 #include "ed.h"
 
@@ -282,7 +282,6 @@ static Char *
 word(int parsehtime)
 {
     eChar c, c1;
-    size_t unfinished = (size_t)-1;
     struct Strbuf wbuf = Strbuf_INIT;
     Char    hbuf[12];
     int	    h;
@@ -410,17 +409,6 @@ loop:
 	}
 	Strbuf_append1(&wbuf, c);
 	c = getC(dolflg);
-	if (unfinished == (size_t)-1)
-	    unfinished = wbuf.len - 1;
-	switch (NLSFinished(wbuf.s + unfinished, wbuf.len - unfinished, c)) {
-	case 1:
-	case 0:
-	    c |= QUOTE;
-	    break;
-	default:
-	    unfinished = (size_t)-1;
-	    break;
-	}
     }
 ret:
     cleanup_ignore(&wbuf);
@@ -663,7 +651,6 @@ addla(Char *cp)
     labuf.len = 0;
     Strbuf_append(&labuf, cp);
     Strbuf_terminate(&labuf);
-    NLSQuote(labuf.s);
     Strbuf_appendn(&labuf, buf.s, buf.len);
     xfree(cp);
     lap = 0;

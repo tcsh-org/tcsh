@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.140 2006/01/13 16:29:20 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.141 2006/02/14 00:52:52 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -112,12 +112,6 @@ typedef int eChar;
 #define normal_mbtowc(PWC, S, N) ((void)(N), *(PWC) = (unsigned char)*(S), 1)
 #define reset_mbtowc() ((void)0)
 # define SAVE(a) (strsave(a))
-#endif 
-#if SIZEOF_WCHAR_T >= 4
-typedef wchar_t NLSChar;
-#else
-/* Assumes sizeof (int) >= 4, unlike some parts of tcsh */
-typedef int NLSChar;
 #endif
 
 /* Elide unused argument warnings */
@@ -1078,7 +1072,7 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 #define str2short(a) 		(a)
 #define blk2short(a) 		saveblk(a)
 #define short2blk(a) 		saveblk(a)
-#define short2str(a) 		strip(a)
+#define short2str(a) 		caching_strip(a)
 #else
 #ifdef WIDE_STRINGS
 #define Strchr(a, b)		wcschr(a, b)

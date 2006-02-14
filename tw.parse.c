@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.115 2006/02/01 23:31:33 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.116 2006/02/14 00:52:52 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.115 2006/02/01 23:31:33 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.116 2006/02/14 00:52:52 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -585,7 +585,7 @@ insert_meta(const Char *cp, const Char *cpend, const Char *word,
     Char qu = 0;
     int ndel = (int) (cp ? cpend - cp : 0);
     Char w, wq;
-    int l, res;
+    int res;
 
     for (wptr = word;;) {
 	if (cp >= cpend)
@@ -649,14 +649,6 @@ insert_meta(const Char *cp, const Char *cpend, const Char *word,
 	    if (in_sync && *cp++ != w)
 		in_sync = 0;
 	    Strbuf_append1(&buffer, w);
-	    l = NLSSize(wptr, NLSZEROT);
-	    while (--l > 0) {
-		wptr++;
-		w = *wptr & ~QUOTE;
-		if (in_sync && *cp++ != w)
-		    in_sync = 0;
-		Strbuf_append1(&buffer, w);
-	    }
 	}
 	wptr++;
 	if (cmap(qu, _ESC))

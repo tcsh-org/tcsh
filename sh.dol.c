@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.62 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.63 2006/01/13 00:26:12 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.62 2006/01/12 19:55:38 christos Exp $")
+RCSID("$Id: sh.dol.c,v 3.63 2006/01/13 00:26:12 christos Exp $")
 
 /*
  * C shell
@@ -516,7 +516,7 @@ Dgetdol(void)
 		if (ffile == 0)
 		    stderror(ERR_DOLZERO);
 		if (length) {
-		    length = NLSChars(ffile);
+		    length = Strlen(ffile);
 		    addla(putn(length));
 		}
 		else {
@@ -678,7 +678,7 @@ Dgetdol(void)
 	int i;
 
 	for (i = lwb - 1, length = 0; i < upb; i++)
-	    length += NLSChars(vp->vec[i]);
+	    length += Strlen(vp->vec[i]);
 #ifdef notdef
 	/* We don't want that, since we can always compute it by adding $#xxx */
 	length += i - 1;	/* Add the number of spaces in */
@@ -766,12 +766,6 @@ setDolp(Char *cp)
     size_t i;
 
     if (dolmod.len == 0 || dolmcnt == 0) {
-	for (dp = cp; *dp; dp++) {
-	    if (NLSSize(dp, NLSZEROT) != 1) {
-		addla(Strsave(cp));
-		return;
-	    }
-	}
 	dolp = cp;
 	return;
     }

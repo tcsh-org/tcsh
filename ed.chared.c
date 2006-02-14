@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.88 2006/01/12 19:55:37 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.chared.c,v 3.89 2006/01/13 00:33:35 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$Id: ed.chared.c,v 3.88 2006/01/12 19:55:37 christos Exp $")
+RCSID("$Id: ed.chared.c,v 3.89 2006/01/13 00:33:35 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -137,7 +137,9 @@ static	void	 c_save_inputbuf	(void);
 static  CCRETVAL c_search_line		(Char *, int);
 static  CCRETVAL v_repeat_srch		(int);
 static	CCRETVAL e_inc_search		(int);
+#ifdef notyet
 static  CCRETVAL e_insert_str		(Char *);
+#endif
 static	CCRETVAL v_search		(int);
 static	CCRETVAL v_csearch_fwd		(Char, int, int);
 static	CCRETVAL v_action		(int);
@@ -186,7 +188,6 @@ c_delafter(int num)
 	num = (int) (LastChar - Cursor);	/* bounds check */
 
     if (num > 0) {			/* if I can delete anything */
-	num = NLSExtend(Cursor, LastChar - Cursor, num);
 	if (VImode) {
 	    kp = UndoBuf;		/* Set Up for VI undo command */
 	    UndoAction = TCSHOP_INSERT;
@@ -224,7 +225,6 @@ c_delbefore(int num)		/* delete before dot, with bounds checking */
 	num = (int) (Cursor - InputBuf);	/* bounds check */
 
     if (num > 0) {			/* if I can delete anything */
-	num = NLSExtend(Cursor, Cursor - InputBuf, -num);
 	if (VImode) {
 	    kp = UndoBuf;		/* Set Up for VI undo command */
 	    UndoAction = TCSHOP_INSERT;
@@ -1391,6 +1391,7 @@ e_unassigned(Char c)
     return(CC_NORM);
 }
 
+#ifdef notyet
 static CCRETVAL
 e_insert_str(Char *c)
 {
@@ -1400,7 +1401,7 @@ e_insert_str(Char *c)
     if (LastChar + Argument * n >= InputLim)
 	return(CC_ERROR);	/* end of buffer space */
     if (inputmode != MODE_INSERT) {
-	c_delafter(Argument * NLSChars(c));
+	c_delafter(Argument * Strlen(c));
     }
     c_insert(Argument * n);
     while (Argument--) {
@@ -1410,6 +1411,7 @@ e_insert_str(Char *c)
     Refresh();
     return(CC_NORM);
 }
+#endif
 
 CCRETVAL
 e_insert(Char c)
@@ -1423,28 +1425,6 @@ e_insert(Char c)
 
     if (LastChar + Argument >= InputLim)
 	return(CC_ERROR);	/* end of buffer space */
-
-    if (!NLSFinished(Cursor, 0, c)) {
-	Char buf[MB_LEN_MAX + 1];
-	int f;
-	size_t i = 1;
-	buf[0] = c;
-	do {
-	    if (GetNextChar(&c) != 1)
-		break;
-	    f = NLSFinished(buf, i, (eChar)c);
-	    if (f == -1) {
-		UngetNextChar(c);
-		break;
-	    }
-	    buf[i++] = c;
-	} while (!f && i < MB_CUR_MAX);
-	if (i > 1) {
-	    buf[i] = 0;
-	    return e_insert_str(buf);
-	}
-	c = buf[0];
-    }
 
     if (Argument == 1) {  	/* How was this optimized ???? */
 
@@ -2668,14 +2648,12 @@ e_gcharswitch(Char cc)
 CCRETVAL
 e_charback(Char c)
 {
-    int     num;
     USE(c);
     if (Cursor > InputBuf) {
-	num = NLSExtend(Cursor, Cursor - InputBuf, -Argument);
-	if (num > Cursor - InputBuf)
+	if (Argument > Cursor - InputBuf)
 	    Cursor = InputBuf;
 	else
-	    Cursor -= num;
+	    Cursor -= Argument;
 
 	if (VImode)
 	    if (ActionFlag & TCSHOP_DELETE) {
@@ -2736,11 +2714,9 @@ e_wordback(Char c)
 CCRETVAL
 e_charfwd(Char c)
 {
-    int     num;
     USE(c);
     if (Cursor < LastChar) {
-	num = NLSExtend(Cursor, LastChar - Cursor, Argument);
-	Cursor += num;
+	Cursor += Argument;
 	if (Cursor > LastChar)
 	    Cursor = LastChar;
 

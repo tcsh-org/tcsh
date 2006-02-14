@@ -130,7 +130,7 @@ static	void	 qprintf	(const Char *);
 #define	ismeta(c)	(((c)&M_META) != 0)
 
 int
-globcharcoll(NLSChar c1, NLSChar c2, int cs)
+globcharcoll(__Char c1, __Char c2, int cs)
 {
 #if defined(NLS) && defined(LC_COLLATE) && !defined(NOSTRCOLL)
 # if defined(WIDE_STRINGS)
@@ -614,24 +614,7 @@ globextend(const char *path, glob_t *pglob)
 }
 
 static size_t
-One_char_mbtowc(NLSChar *pwc, const char *s, size_t n)
-{
-#ifdef WIDE_STRINGS
-    return one_mbtowc(pwc, s, n);
-#else
-    __Char buf[MB_LEN_MAX], *p;
-
-    if (n > MB_LEN_MAX)
-      n = MB_LEN_MAX;
-    p = buf;
-    while (p < buf + n && (*p++ = *s++) != 0)
-	;
-    return NLSFrom(buf, n, pwc);
-#endif
-}
-
-static size_t
-One_Char_mbtowc(NLSChar *pwc, const Char *s, size_t n)
+One_Char_mbtowc(__Char *pwc, const Char *s, size_t n)
 {
 #ifdef WIDE_STRINGS
     char buf[MB_LEN_MAX], *p;
@@ -643,7 +626,8 @@ One_Char_mbtowc(NLSChar *pwc, const Char *s, size_t n)
 	;
     return one_mbtowc(pwc, buf, n);
 #else
-    return NLSFrom((const __Char *)s, n, pwc);
+    *pwc = *s & CHAR;
+    return 1;
 #endif
 }
 
@@ -659,11 +643,11 @@ match(const char *name, const Char *pat, const Char *patend, int m_not)
 
     while (pat < patend) {
 	size_t lwk;
-	NLSChar wc, wk;
+	__Char wc, wk;
 
 	c = *pat; /* Only for M_MASK bits */
 	pat += One_Char_mbtowc(&wc, pat, MB_LEN_MAX);
-	lwk = One_char_mbtowc(&wk, name, MB_LEN_MAX);
+	lwk = one_mbtowc(&wk, name, MB_LEN_MAX);
 	switch (c & M_MASK) {
 	case M_ALL:
 	    if (pat == patend)
@@ -674,7 +658,7 @@ match(const char *name, const Char *pat, const Char *patend, int m_not)
 		if (*name == EOS)
 		    break;
 		name += lwk;
-		lwk = One_char_mbtowc(&wk, name, MB_LEN_MAX);
+		lwk = one_mbtowc(&wk, name, MB_LEN_MAX);
 	    }
 	    return (0);
 	case M_ONE:
@@ -692,7 +676,7 @@ match(const char *name, const Char *pat, const Char *patend, int m_not)
 	    while ((*pat & M_MASK) != M_END) {
 		pat += One_Char_mbtowc(&wc, pat, MB_LEN_MAX);
 		if ((*pat & M_MASK) == M_RNG) {
-		    NLSChar wc2;
+		    __Char wc2;
 
 		    pat++;
 		    pat += One_Char_mbtowc(&wc2, pat, MB_LEN_MAX);

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.42 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.43 2006/01/12 19:55:38 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.42 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: ed.refresh.c,v 3.43 2006/01/12 19:55:38 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -162,12 +162,11 @@ static int MakeLiteral(Char *str, int len, Char addlit)
 static int
 Draw(Char *cp, int nocomb)	/* draw char at cp, expand tabs, ctl chars */
 {
-    int l, w, i, lv, lh;
-    Char ch, attr;
-    NLSChar c;
+    int w, i, lv, lh;
+    Char c, attr;
 
     attr = *cp & ~CHAR;
-    l = NLSFrom(cp, NLSZEROT, &c);
+    c = *cp & CHAR;
     w = NLSClassify(c, nocomb);
     switch (w) {
 	case NLSCLASS_NL:
@@ -194,11 +193,10 @@ Draw(Char *cp, int nocomb)	/* draw char at cp, expand tabs, ctl chars */
 	    }
 	    break;
 	case NLSCLASS_ILLEGAL:
-	    ch = *cp & CHAR;
 	    Vdraw('\\' | attr, 1);
-	    Vdraw((((ch >> 6) & 7) + '0') | attr, 1);
-	    Vdraw((((ch >> 3) & 7) + '0') | attr, 1);
-	    Vdraw(((ch & 7) + '0') | attr, 1);
+	    Vdraw((((c >> 6) & 7) + '0') | attr, 1);
+	    Vdraw((((c >> 3) & 7) + '0') | attr, 1);
+	    Vdraw(((c & 7) + '0') | attr, 1);
 	    break;
 	case NLSCLASS_ILLEGAL2:
 	case NLSCLASS_ILLEGAL3:
@@ -224,26 +222,19 @@ Draw(Char *cp, int nocomb)	/* draw char at cp, expand tabs, ctl chars */
 		    break;
 	    }
 	    if (lv < 0) {
-		int l2 = l;
-		for (; l2-- > 0; cp++) {
-		    ch = *cp & CHAR;
-		    Vdraw('\\' | attr, 1);
-		    Vdraw((((ch >> 6) & 7) + '0') | attr, 1);
-		    Vdraw((((ch >> 3) & 7) + '0') | attr, 1);
-		    Vdraw(((ch & 7) + '0') | attr, 1);
-		}
-		return l;
+		Vdraw('\\' | attr, 1);
+		Vdraw((((c >> 6) & 7) + '0') | attr, 1);
+		Vdraw((((c >> 3) & 7) + '0') | attr, 1);
+		Vdraw(((c & 7) + '0') | attr, 1);
+		break;
 	    }
-	    Vdisplay[lv][lh] = MakeLiteral(cp, l, Vdisplay[lv][lh]);
+	    Vdisplay[lv][lh] = MakeLiteral(cp, 1, Vdisplay[lv][lh]);
 	    break;
 	default:
-	    if (l > 1)
-		Vdraw(MakeLiteral(cp, l, 0), w);
-	    else
-		Vdraw(*cp, w);
+	    Vdraw(*cp, w);
 	    break;
     }
-    return l;
+    return 1;
 }
 
 static void
@@ -288,8 +279,7 @@ static void
 RefreshPromptpart(Char *buf)
 {
     Char *cp;
-    NLSChar c;
-    int l, w;
+    int w;
 
     if (buf == NULL)
 	return;
@@ -299,10 +289,9 @@ RefreshPromptpart(Char *buf)
 	    while (*cp & LITERAL)
 		cp++;
 	    if (*cp) {
-		l = NLSFrom(cp, NLSZEROT, &c);
-		w = NLSWidth(c);
-		Vdraw(MakeLiteral(litstart, cp + l - litstart, 0), w);
-		cp += l;
+		w = NLSWidth(*cp & CHAR);
+		Vdraw(MakeLiteral(litstart, cp + 1 - litstart, 0), w);
+		cp++;
 	    }
 	    else {
 		/*
@@ -1121,8 +1110,7 @@ void
 RefCursor(void)
 {				/* only move to new cursor pos */
     Char *cp;
-    NLSChar c;
-    int l, w, h, th, v;
+    int w, h, th, v;
 
     /* first we must find where the cursor is... */
     h = 0;
@@ -1134,9 +1122,8 @@ RefCursor(void)
 	    cp++;
 	    continue;
 	}
-	l = NLSFrom(cp, NLSZEROT, &c);
-	w = NLSClassify(c, cp == Prompt);
-	cp += l;
+	w = NLSClassify(*cp & CHAR, cp == Prompt);
+	cp++;
 	switch(w) {
 	    case NLSCLASS_NL:
 		h = 0;
@@ -1167,9 +1154,8 @@ RefCursor(void)
     }
 
     for (cp = InputBuf; cp < Cursor;) {	/* do input buffer to Cursor */
-	l = NLSFrom(cp, Cursor - cp, &c);
-	w = NLSClassify(c, cp == InputBuf);
-	cp += l;
+	w = NLSClassify(*cp & CHAR, cp == InputBuf);
+	cp++;
 	switch(w) {
 	    case NLSCLASS_NL:
 		h = 0;
@@ -1243,9 +1229,8 @@ void
 RefPlusOne(int l)
 {				/* we added just one char, handle it fast.
 				 * assumes that screen cursor == real cursor */
-    Char *cp;
+    Char *cp, c;
     int w;
-    NLSChar c;
 
     if (Cursor != LastChar) {
 	Refresh();		/* too hard to handle */
@@ -1256,7 +1241,7 @@ RefPlusOne(int l)
 	return;
     }
     cp = Cursor - l;
-    NLSFrom(cp, (size_t)l, &c);
+    c = *cp & CHAR;
     w = NLSClassify(c, cp == InputBuf);
     switch(w) {
 	case NLSCLASS_CTRL:

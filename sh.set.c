@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.65 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.set.c,v 3.66 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.set.c,v 3.65 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: sh.set.c,v 3.66 2006/01/12 19:55:38 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1223,7 +1223,7 @@ autoset_dspmbyte(const Char *pcp)
     codeset = str2short(nl_langinfo(CODESET));
     if (*codeset != '\0') {
 	for (i = 0; dspmc[i].n; i++) {
-	    Char *estr;
+	    const Char *estr;
 	    if (dspmc[i].n[0] && t_pmatch(pcp, dspmc[i].n, &estr, 0) > 0) {
 		setcopy(CHECK_MBYTEVAR, dspmc[i].v, VAR_READWRITE);
 		update_dspmbyte_vars();
@@ -1237,7 +1237,7 @@ autoset_dspmbyte(const Char *pcp)
 	return;
 
     for (i = 0; dspmt[i].n; i++) {
-	Char *estr;
+	const Char *estr;
 	if (dspmt[i].n[0] && t_pmatch(pcp, dspmt[i].n, &estr, 0) > 0) {
 	    setcopy(CHECK_MBYTEVAR, dspmt[i].v, VAR_READWRITE);
 	    update_dspmbyte_vars();

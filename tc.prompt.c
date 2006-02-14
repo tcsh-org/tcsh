@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.61 2006/01/13 16:19:29 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.62 2006/02/08 01:55:54 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.prompt.c,v 3.61 2006/01/13 16:19:29 christos Exp $")
+RCSID("$Id: tc.prompt.c,v 3.62 2006/02/08 01:55:54 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -196,17 +196,9 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
     static Char *olduser = NULL;
     int updirs;
     size_t pdirs;
-    int l;
 
     cleanup_push(&buf, Strbuf_cleanup);
     for (; *cp; cp++) {
-	l = NLSSize(cp, NLSZEROT);
-	if (l > 1) {
-	    while (l--)
-		Strbuf_append1(&buf, attributes | *cp++);
-	    cp--;
-	    continue;
-	}
 	if ((*cp == '%') && ! (cp[1] == '\0')) {
 	    cp++;
 	    switch (*cp) {

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.67 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.68 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.67 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: sh.glob.c,v 3.68 2006/01/12 19:55:38 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -857,7 +857,6 @@ pword(struct blk_buf *bb, struct Strbuf *word)
     Char *s;
 
     s = Strbuf_finish(word);
-    NLSQuote(s);
     bb_append(bb, s);
     *word = Strbuf_init;
 }
@@ -918,15 +917,13 @@ Gnmatch(const Char *string, const Char *pattern, const Char **endstr)
 int
 t_pmatch(const Char *string, const Char *pattern, const Char **estr, int cs)
 {
-    NLSChar stringc, patternc, rangec;
+    Char stringc, patternc, rangec;
     int     match, negate_range;
     const Char *pestr, *nstring;
 
     for (nstring = string;; string = nstring) {
-	stringc = *nstring++;
-	TRIM_AND_EXTEND(nstring, stringc);
-	patternc = *pattern++;
-	TRIM_AND_EXTEND(pattern, patternc);
+	stringc = *nstring++ & TRIM;
+	patternc = *pattern++ & TRIM;
 	switch (patternc) {
 	case '\0':
 	    *estr = string;
@@ -954,10 +951,9 @@ t_pmatch(const Char *string, const Char *pattern, const Char **estr, int cs)
 		default:
 		    abort();	/* Cannot happen */
 		}
-		stringc = *string++;
+		stringc = *string++ & TRIM;
 		if (!stringc)
 		    break;
-		TRIM_AND_EXTEND(string, stringc);
 	    }
 
 	    if (pestr) {
@@ -971,17 +967,15 @@ t_pmatch(const Char *string, const Char *pattern, const Char **estr, int cs)
 	    match = 0;
 	    if ((negate_range = (*pattern == '^')) != 0)
 		pattern++;
-	    while ((rangec = *pattern++) != '\0') {
+	    while ((rangec = *pattern++ & TRIM) != '\0') {
 		if (rangec == ']')
 		    break;
-		TRIM_AND_EXTEND(pattern, rangec);
 		if (match)
 		    continue;
 		if (*pattern == '-' && pattern[1] != ']') {
-		    NLSChar rangec2;
+		    Char rangec2;
 		    pattern++;
-		    rangec2 = *pattern++;
-		    TRIM_AND_EXTEND(pattern, rangec2);
+		    rangec2 = *pattern++ & TRIM;
 		    match = (globcharcoll(stringc, rangec2, 0) <= 0 &&
 			globcharcoll(rangec, stringc, 0) <= 0);
 		}
@@ -996,13 +990,8 @@ t_pmatch(const Char *string, const Char *pattern, const Char **estr, int cs)
 		return (0);
 	    break;
 	default:
-	    TRIM_AND_EXTEND(pattern, patternc);
 	    if (cs ? patternc  != stringc
-#if defined (NLS) && defined (WIDE_STRINGS)
-		: towlower(patternc) != towlower(stringc))
-#else
 		: Tolower(patternc) != Tolower(stringc))
-#endif
 		return (0);
 	    break;
 	}

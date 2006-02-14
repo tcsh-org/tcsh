@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.h,v 3.11 2005/11/02 17:27:26 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.h,v 3.12 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tc.nls.h: NLS support
  *
@@ -36,55 +36,16 @@
 
 #include "sh.h"
 
-#define NLSZEROT	((size_t)-1)
-
 #ifdef WIDE_STRINGS
-
-# define NLSSize(s, l) 1
-# define NLSFrom(s, l, cp) (USE (l), (*(cp) = *(s) & CHAR), 1)
-# define NLSFinished(s, l, c) (l != 0 && c != CHAR_ERR ? 2 : 1)
-# define NLSChars(s) Strlen(s)
-# define NLSQuote(s)
-# define TRIM_AND_EXTEND(s, c) (c &= TRIM)
-
-extern int NLSWidth (NLSChar);
+extern int NLSWidth(Char);
 extern int NLSStringWidth (const Char *);
-
-#define NLS_ILLEGAL INVALID_BYTE
-
 #else
-# if defined(SHORT_STRINGS) && defined(NLS)
-
-extern int NLSFrom (const Char *, size_t, NLSChar *);
-extern int NLSFinished (const Char *, size_t, eChar);
-extern int NLSChars (const Char *);
-extern int NLSStringWidth (const Char *);
-extern int NLSWidth (NLSChar);
-extern int NLSTo (Char *, NLSChar);
-extern void NLSQuote (Char *);
-
-#define NLSSize(s, l) NLSFrom(s, l, (NLSChar *)0)
-#define TRIM_AND_EXTEND(s, c) (s += NLSFrom(s - 1, NLSZEROT, &c) - 1)
-#define NLS_ILLEGAL 0x40000000
-
-
-# else
-#  define NLSSize(s, l) 1
-#  define NLSFrom(s, l, cp) (USE (l), (*(cp) = *(s) & CHAR), 1)
-#  define NLSFinished(s, l, c) (l != 0 && c != CHAR_ERR ? 2 : 1)
-#  define NLSChars(s) Strlen(s)
-#  define NLSStringWidth(s) Strlen(s)
-#  define NLSWidth(c) 1
-#  define NLSQuote(s)
-
-#  define TRIM_AND_EXTEND(s, c) (c &= TRIM)
-#  define NLS_ILLEGAL 0x40000000
-# endif
+# define NLSStringWidth(s) Strlen(s)
+# define NLSWidth(c) 1
 #endif
 
-extern int NLSExtend (const Char *, int, int);
 extern Char *NLSChangeCase (const Char *, int);
-extern int NLSClassify (NLSChar, int);
+extern int NLSClassify (Char, int);
 
 #define NLSCLASS_CTRL		(-1)
 #define NLSCLASS_TAB		(-2)

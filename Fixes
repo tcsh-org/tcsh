@@ -1,3 +1,12 @@
+ 49. V6.14.04 - 20060214
+ 48. Fixes build failure with !SHORT_STRINGS (Miloslav Trmac)
+ 47. Fixes constness warnings with !SHORT_STRINGS: short2str is "strip()",
+     which modifies its argument.  Rather than verify this is safe in all
+     callers, I have added caching_strip() to mirror the behavior of other
+     modes. (Miloslav Trmac)
+ 46. Fixes some constness warnings with SHORT_STRINGS;  this is orthogonal
+     to both build errors with SHORT_STRINGS in 6.14.03, and
+     short_strings.patch. (Miloslav Trmac)
  45. config-catalogs.patch: Autodetect catalog support (#14). (Miloslav Trmac)
  44. auth.patch: Handle false positives in getauthid() detection,
      IIRC on FreeBSD. (Miloslav Trmac)

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.str.c,v 3.22 2006/01/12 19:43:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.str.c,v 3.23 2006/01/12 19:55:38 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$Id: tc.str.c,v 3.22 2006/01/12 19:43:01 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.23 2006/01/12 19:55:38 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -77,9 +77,7 @@ one_wctomb(char *s, wchar_t wchar)
     }
     return len;
 }
-#endif
-     
-#ifdef SHORT_STRINGS
+
 int
 rt_mbtowc(wchar_t *pwc, const char *s, size_t n)
 {
@@ -91,7 +89,9 @@ rt_mbtowc(wchar_t *pwc, const char *s, size_t n)
 	ret = -1;
     return ret;
 }
+#endif
 
+#ifdef SHORT_STRINGS
 Char  **
 blk2short(char **src)
 {
@@ -429,7 +429,26 @@ s_strstr(const Char *s, const Char *t)
     return (NULL);
 }
 
-#endif				/* SHORT_STRINGS */
+#else /* !SHORT_STRINGS */
+char *
+caching_strip(const char *s)
+{
+    static char *buf = NULL;
+    static size_t buf_size = 0;
+    size_t size;
+
+    if (s == NULL)
+      return NULL;
+    size = strlen(s) + 1;
+    if (buf_size < size) {
+	buf = xrealloc(buf, size);
+	buf_size = size;
+    }
+    memcpy(buf, s, size);
+    strip(buf);
+    return buf;
+}
+#endif
 
 char   *
 short2qstr(const Char *src)
