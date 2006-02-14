@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.139 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.h,v 3.140 2006/01/13 16:29:20 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -446,14 +446,14 @@ typedef void pret_t;
 
 #include "sh.types.h"
 
-#if !defined(__NetBSD__) && !defined(__linux__) /* XXX */
-#ifndef WINNT_NATIVE
+#ifndef __NetBSD__
+#if !HAVE_DECL_GETPGRP
 # ifndef GETPGRP_VOID
 extern pid_t getpgrp (int);
 # else
 extern pid_t getpgrp (void);
 # endif
-#endif /* !WINNT_NATIVE */
+#endif
 #endif
 
 #ifndef lint
@@ -1168,9 +1168,7 @@ extern int	use_fork;
 #endif
 extern int	tellwhat;
 extern int	NoNLSRebind;
-#ifndef __linux__
 extern char   **environ;
-#endif
 
 #include "tc.h"
 

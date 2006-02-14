@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.135 2006/01/13 16:18:13 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.136 2006/01/13 16:29:20 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.135 2006/01/13 16:18:13 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.136 2006/01/13 16:29:20 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2429,7 +2429,7 @@ nlsinit(void)
 #ifdef NLS_CATALOGS
     static const char default_catalog[] = "tcsh";
 
-    char *catalog = (char *)default_catalog;
+    char *catalog = (char *)(intptr_t)default_catalog;
 
     if (adrof(STRcatalog) != NULL)
 	catalog = xasprintf("tcsh.%s", short2str(varval(STRcatalog)));

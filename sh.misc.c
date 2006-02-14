@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.38 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.misc.c,v 3.39 2006/01/13 00:28:22 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.misc.c,v 3.38 2006/01/12 19:55:38 christos Exp $")
+RCSID("$Id: sh.misc.c,v 3.39 2006/01/13 00:28:22 christos Exp $")
 
 static	int	renum	(int, int);
 static  Char  **blkend	(Char **);
@@ -611,6 +611,7 @@ xopen(const char *path, int oflag, ...)
 	   promotions". "int" is the best guess we have, "mode_t" used to be
 	   "unsigned short", which we obviously can't use. */
 	mode = va_arg(ap, int);
+	va_end(ap);
 	while ((res = open(path, oflag, mode)) == -1 && errno == EINTR)
 	    handle_pending_signals();
     }

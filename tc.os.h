@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.99 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.h,v 3.100 2006/01/12 19:55:38 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -506,9 +506,9 @@ extern struct passwd *getpwuid(), *getpwnam(), *getpwent();
 #  ifdef HAVE_SHADOW_H
 extern struct spwd *getspnam(), *getspent();
 #  endif /* HAVE_SHADOW_H */
-#  ifdef HAVE_AUTH_H
+#  if defined(HAVE_AUTH_H) && defined(HAVE_GETAUTHUID)
 extern struct authorization *getauthuid();
-#  endif /* HAVE_AUTH_H */
+#  endif /* HAVE_AUTH_H && HAVE_GETAUTHUID */
 # endif /* __STDC__ */
 
 # ifndef getcwd
@@ -585,5 +585,13 @@ extern int ioctl (int, unsigned long, char *);
 extern pid_t vfork (void);
 extern int killpg (pid_t, int);
 #endif /* __osf__ && __alpha && DECOSF1 < 200 */
+
+#ifndef va_copy
+# ifdef __va_copy
+#  define va_copy(DEST, SRC) __va_copy(DEST, SRC)
+# else
+#  define va_copy(DEST, SRC) memcpy(&(DEST), &(SRC), sizeof(va_list))
+# endif
+#endif
 
 #endif /* _h_tc_os */

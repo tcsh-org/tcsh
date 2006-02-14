@@ -9,7 +9,7 @@ dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 dnl
 
 AC_PREREQ([2.59])dnl Minimum Autoconf version required.
-AC_INIT
+AC_INIT([tcsh], [6.14.03], [http://bugs.gw.com/])
 AC_CONFIG_SRCDIR([tc.vers.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_TESTDIR([.], [.])
@@ -270,8 +270,7 @@ AC_SEARCH_LIBS([iconv], [iconv], [AC_DEFINE([HAVE_ICONV], [1],
 	[Define to 1 if you have the iconv () interface])])
 
 dnl Checks for header files
-AC_CHECK_HEADERS([auth.h inttypes.h shadow.h stdint.h])
-AC_CHECK_HEADERS([utmpx.h utmp.h])
+AC_CHECK_HEADERS([auth.h crypt.h inttypes.h shadow.h stdint.h utmp.h utmpx.h])
 AC_CHECK_HEADERS([wchar.h],
 	[AC_CHECK_SIZEOF([wchar_t], [], [dnl
 #include <stdio.h>
@@ -344,9 +343,9 @@ AC_C_VOLATILE
 
 dnl checks for library functions
 AC_CHECK_DECLS([gethostname])
-AC_CHECK_FUNCS([dup2 getcwd gethostname getpwent getutent memmove memset] dnl
-	[nice nl_langinfo sbrk setpgid setpriority strerror strstr sysconf] dnl
-	[wcwidth mbrtowc])
+AC_CHECK_FUNCS([catgets dup2 getcwd gethostname getpwent getutent memmove] dnl
+	[memset nice nl_langinfo sbrk setpgid setpriority strerror strstr] dnl
+	[sysconf wcwidth mbrtowc])
 AC_FUNC_GETPGRP
 AC_FUNC_SETPGRP
 

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.defns.c,v 3.43 2005/04/11 21:09:33 kim Exp $ */
+/* $Header: /src/pub/tcsh/ed.defns.c,v 3.44 2005/04/11 22:10:54 kim Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.defns.c,v 3.43 2005/04/11 21:09:33 kim Exp $")
+RCSID("$Id: ed.defns.c,v 3.44 2005/04/11 22:10:54 kim Exp $")
 
 #include "ed.h"
 
@@ -1132,7 +1132,7 @@ editinit(void)
     int i;
 
     for (i = 0; i < F_NUM_FUNCNAMES; i++)
-	xfree((ptr_t) FuncNames[i].desc);
+	xfree((ptr_t)(intptr_t)FuncNames[i].desc);
 #endif
 
     f = FuncNames;

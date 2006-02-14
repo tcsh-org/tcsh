@@ -10,6 +10,12 @@
 /* Define to 1 if you have the <auth.h> header file. */
 #undef HAVE_AUTH_H
 
+/* Define to 1 if you have the `catgets' function. */
+#undef HAVE_CATGETS
+
+/* Define to 1 if you have the <crypt.h> header file. */
+#undef HAVE_CRYPT_H
+
 /* Define to 1 if you have the declaration of `gethostname', and to 0 if you
    don't. */
 #undef HAVE_DECL_GETHOSTNAME
@@ -166,9 +172,6 @@
 
 /* Define to 1 if the C compiler supports function prototypes. */
 #undef PROTOTYPES
-
-/* Define as the return type of signal handlers (`int' or `void'). */
-#undef RETSIGTYPE
 
 /* Define to 1 if the `setpgrp' function takes no argument. */
 #undef SETPGRP_VOID

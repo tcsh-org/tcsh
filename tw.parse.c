@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.114 2006/02/01 15:24:34 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.115 2006/02/01 23:31:33 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.114 2006/02/01 15:24:34 christos Exp $")
+RCSID("$Id: tw.parse.c,v 3.115 2006/02/01 23:31:33 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -980,8 +980,10 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 		assert(sizeof(char) == sizeof (Char)); 
 		if ((ext > 0) && (strcasecmp((char *)&item.s[ext], ".exe") == 0 ||
 				  strcasecmp((char *)&item.s[ext], ".bat") == 0 ||
-				  strcasecmp((char *)&item.s[ext], ".com") == 0))
-		    item.s[ext] = '\0';
+				  strcasecmp((char *)&item.s[ext], ".com") == 0)) {
+		    item.len = ext;
+		    Strbuf_terminate(&item);
+		}
 	    }
 #endif /* _UWIN || __CYGWIN__ */
 	    exec_check = flags & TW_EXEC_CHK;

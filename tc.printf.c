@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.printf.c,v 3.32 2006/01/13 19:28:44 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.printf.c,v 3.33 2006/01/14 02:23:48 christos Exp $ */
 /*
  * tc.printf.c: A public-domain, minimal printf/sprintf routine that prints
  *	       through the putchar() routine.  Feel free to use for
@@ -34,7 +34,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.printf.c,v 3.32 2006/01/13 19:28:44 christos Exp $")
+RCSID("$Id: tc.printf.c,v 3.33 2006/01/14 02:23:48 christos Exp $")
 
 #ifdef lint
 #undef va_arg
@@ -392,14 +392,14 @@ xvasprintf(const char *fmt, va_list va)
     buf = NULL;
     size = 2048; /* Arbitrary */
     for (;;) {
+	va_list copy;
+
 	buf = xrealloc(buf, size);
 	xstring = buf;
 	xestring = buf + size - 1;
-	/*
-	 * XXX: this breaks on some platforms where va_list gets modified.
-	 * is the solution va_copy? At least x86_64 seems to suffer from it.
-	 */
-	doprnt(xaddchar, fmt, va);
+	va_copy(copy, va);
+	doprnt(xaddchar, fmt, copy);
+	va_end(copy);
 	if (xstring < xestring)
 	    break;
 	size *= 2;

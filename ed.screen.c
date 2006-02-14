@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.68 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.screen.c,v 3.69 2006/01/12 19:55:38 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.screen.c,v 3.68 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: ed.screen.c,v 3.69 2006/01/12 19:55:38 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -190,10 +190,10 @@ terminit(void)
     int i;
 
     for (i = 0; i < T_str + 1; i++)
-	xfree((ptr_t) tstr[i].long_name);
+	xfree((ptr_t)(intptr_t)tstr[i].long_name);
 
     for (i = 0; i < T_val + 1; i++)
-	xfree((ptr_t) tval[i].long_name);
+	xfree((ptr_t)(intptr_t)tval[i].long_name);
 #endif
 
     tstr[T_al].name = "al";

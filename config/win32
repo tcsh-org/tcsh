@@ -81,8 +81,6 @@
 
 
 #define HAVE_DUP2                1
-#define RETSIGTYPE               void
-#define HAVE_DUP2                1
 #define HAVE_STRUCT_UTMP_UT_HOST 1
 #define HAVE_DIRENT_H            1
 #define PROTOTYPES               1
@@ -96,6 +94,7 @@
 #define HAVE_STRSTR              1
 #define HAVE_WCHAR_H             1
 #define GETPGRP_VOID             1
+#define HAVE_DECL_GETPGRP	 1
 #define HAVE_STRUCT_DIRENT_D_INO 1
 
 #define SHORT_STRINGS    

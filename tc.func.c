@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.124 2006/01/12 19:43:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.125 2006/01/12 19:55:38 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.124 2006/01/12 19:43:01 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.125 2006/01/12 19:55:38 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -650,10 +650,12 @@ xgetpass(const char *prm)
 }
 
 #ifndef NO_CRYPT
-#if !defined(__STDC__) || defined(SUNOS4)
+#ifndef __NetBSD__
+#if !HAVE_DECL_CRYPT
     extern char *crypt ();
 #endif
-#ifdef __linux__
+#endif
+#ifdef HAVE_CRYPT_H
 #include <crypt.h>
 #endif
 #endif
@@ -678,7 +680,7 @@ auto_lock(void)
 
 #undef XCRYPT
 
-#if defined(HAVE_AUTH_H)
+#if defined(HAVE_AUTH_H) && defined(HAVE_GETAUTHUID)
 
     struct authorization *apw;
     extern char *crypt16 (const char *, const char *);

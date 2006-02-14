@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.95 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.proc.c,v 3.96 2006/01/13 00:29:14 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.proc.c,v 3.95 2006/01/12 19:55:38 christos Exp $")
+RCSID("$Id: sh.proc.c,v 3.96 2006/01/13 00:29:14 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -476,7 +476,7 @@ pjwait(struct process *pp)
 {
     struct process *fp;
     int     jobflags, reason;
-    sigset_t pause_mask;
+    sigset_t omask, pause_mask;
     Char *reason_str;
 
     while (pp->p_procid != pp->p_jobid)
@@ -492,6 +492,9 @@ pjwait(struct process *pp)
      * target process, or any of its friends, are running
      */
     fp = pp;
+    sigprocmask(SIG_BLOCK, NULL, &omask);
+    sighold(SIGINT);
+    cleanup_push(&omask, sigprocmask_cleanup);
     sigprocmask(SIG_BLOCK, NULL, &pause_mask);
     sigdelset(&pause_mask, SIGCHLD);
     for (;;) {
@@ -506,6 +509,7 @@ pjwait(struct process *pp)
 			  getpid(), fp->p_procid));
 	sigsuspend(&pause_mask);
     }
+    cleanup_until(&omask);
     jobdebug_xprintf(("%d returned from sigsuspend loop\n", getpid()));
 #ifdef BSDJOBS
     if (tpgrp > 0)		/* get tty back */

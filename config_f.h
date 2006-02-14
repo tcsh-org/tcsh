@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.34 2005/04/12 23:33:59 kim Exp $ */
+/* $Header: /src/pub/tcsh/config_f.h,v 3.35 2005/06/07 23:53:36 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -69,7 +69,9 @@
  *		if you don't have <nl_types.h>, you don't want
  *		to define this.
  */
-#undef NLS_CATALOGS
+#ifdef HAVE_CATGETS
+# define NLS_CATALOGS
+#endif
 
 /*
  * LOGINFIRST   Source ~/.login before ~/.cshrc

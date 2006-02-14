@@ -1,3 +1,25 @@
+ 45. config-catalogs.patch: Autodetect catalog support (#14). (Miloslav Trmac)
+ 44. auth.patch: Handle false positives in getauthid() detection,
+     IIRC on FreeBSD. (Miloslav Trmac)
+ 43. crypt.patch: Autodetect whether <crypt.h> is available. (Miloslav Trmac)
+ 42. sigint.patch: Block SIGINT while waiting on children.
+     This is necessary, but I'll still have to look on the older
+     releases to find out why it was not necessary before
+     ("before" = 6.13 on Linux). (Miloslav Trmac)
+ 41. config-package.patch: Readd package version to configure.in,
+     the testsuite uses it.
+     (TODO: a better integration with package.h) (Miloslav Trmac)
+ 40. item_len.patch: Truncate item.len when truncating the string,
+     just to be sure. (Miloslav Trmac)
+ 39. va_list.patch: Add missing va_end(). (Miloslav Trmac)
+ 38. Use va_copy in xvasprintf(); emulate va_copy as suggested in
+     Autoconf manual if it is not available. (Miloslav Trmac)
+ 37. declarations.patch: Replace some #ifdef nests by autodetecting
+     whether the guarded declaration is necessary.
+     I'm only guessing this is the intent of the #ifdefs, though.
+     Declare environ unconditionally, it is a bit hard to detect
+     and the declaration is correct for Linux, anyway. (Miloslav Trmac)
+ 36. warning.patch: Fix a const warning.
  35. More color-ls variables (Jean-Luc Leger)
  34. V6.14.03 - 20060212
  33. Signal related changes (Miloslav Trmac)
