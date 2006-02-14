@@ -6825,6 +6825,11 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 $ac_includes_default
+#ifdef HAVE_CRYPT_H
+#include <crypt.h>
+#endif
+
+
 int
 main ()
 {
@@ -6883,6 +6888,81 @@ _ACEOF
 
 
 fi
+echo "$as_me:$LINENO: checking whether getpgrp is declared" >&5
+echo $ECHO_N "checking whether getpgrp is declared... $ECHO_C" >&6
+if test "${ac_cv_have_decl_getpgrp+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#ifdef HAVE_CRYPT_H
+#include <crypt.h>
+#endif
+
+
+int
+main ()
+{
+#ifndef getpgrp
+  char *p = (char *) getpgrp;
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_have_decl_getpgrp=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_have_decl_getpgrp=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_have_decl_getpgrp" >&5
+echo "${ECHO_T}$ac_cv_have_decl_getpgrp" >&6
+if test $ac_cv_have_decl_getpgrp = yes; then
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_DECL_GETPGRP 1
+_ACEOF
+
+
+else
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_DECL_GETPGRP 0
+_ACEOF
+
+
+fi
 
 
 
@@ -6903,7 +6983,8 @@ fi
 
 
 
-for ac_func in catgets dup2 getcwd gethostname getpwent getutent memmove 	memset nice nl_langinfo sbrk setpgid setpriority strerror strstr 	sysconf wcwidth mbrtowc
+
+for ac_func in catgets dup2 getauthid getcwd gethostname getpwent 	getutent memmove memset nice nl_langinfo sbrk setpgid setpriority 	strerror strstr sysconf wcwidth mbrtowc
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ac_func" >&5

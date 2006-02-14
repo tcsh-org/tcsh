@@ -342,10 +342,15 @@ AC_C_PROTOTYPES
 AC_C_VOLATILE
 
 dnl checks for library functions
-AC_CHECK_DECLS([gethostname])
-AC_CHECK_FUNCS([catgets dup2 getcwd gethostname getpwent getutent memmove] dnl
-	[memset nice nl_langinfo sbrk setpgid setpriority strerror strstr] dnl
-	[sysconf wcwidth mbrtowc])
+AC_CHECK_DECLS([gethostname, getpgrp], , ,
+[AC_INCLUDES_DEFAULT([])
+#ifdef HAVE_CRYPT_H
+#include <crypt.h>
+#endif
+])
+AC_CHECK_FUNCS([catgets dup2 getauthid getcwd gethostname getpwent] dnl
+	[getutent memmove memset nice nl_langinfo sbrk setpgid setpriority] dnl
+	[strerror strstr sysconf wcwidth mbrtowc])
 AC_FUNC_GETPGRP
 AC_FUNC_SETPGRP
 
