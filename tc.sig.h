@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.h,v 3.28 2005/01/18 20:24:51 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.sig.h,v 3.29 2006/01/12 19:55:38 christos Exp $ */
 /*
  * tc.sig.h: Signal handling
  *
@@ -98,6 +98,11 @@
 #if !defined(MAXSIG) && defined(NSIG)
 # define MAXSIG NSIG
 #endif /* !MAXSIG && NSIG */
+
+#ifdef __CYGWIN__
+# define	sigignore(s)	signal(s, SIG_IGN)
+# define	sigset(s, a)	signal(s, a)
+#endif /* __CYGWIN__ */
 
 /*
  * We choose a define for the window signal if it exists..

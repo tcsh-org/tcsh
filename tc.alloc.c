@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.43 2006/01/13 00:30:27 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.44 2006/01/13 17:14:28 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -40,7 +40,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.43 2006/01/13 00:30:27 christos Exp $")
+RCSID("$Id: tc.alloc.c,v 3.44 2006/01/13 17:14:28 christos Exp $")
 
 #define RCHECK
 #define DEBUG
@@ -57,7 +57,7 @@ int dont_free = 0;
 # define realloc	frealloc
 #endif /* WINNT_NATIVE */
 
-#ifndef DEBUG
+#if !defined(DEBUG) || defined(SYSMALLOC)
 static void
 out_of_memory (void)
 {
