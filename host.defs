@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /src/pub/tcsh/host.defs,v 1.40 2005/03/03 16:49:15 kim Exp $ */
+/* $Header: /src/pub/tcsh/host.defs,v 1.41 2005/04/11 22:10:56 kim Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.40 2005/03/03 16:49:15 kim Exp $")
+RCSID("$Id: host.defs,v 1.41 2005/04/11 22:10:56 kim Exp $")
 
 endcode	:
 
@@ -445,8 +445,7 @@ hosttype: defined(__x86_64__)				: "x86_64-linux"
 hosttype: defined(M_i586) 				: "i586-linux"
 hosttype: defined(M_i486) 				: "i486-linux"
 hosttype: defined(M_i386)				: "i386-linux"
-ostype	: !defined(PPC) 				: "linux"
-ostype	: defined(PPC)					: "mklinux"
+ostype	: 						: "linux"
 machtype: defined(__ia64__)				: "ia64"
 machtype: defined(__powerpc64__)			: "powerpc64"
 machtype: defined(__s390x__)				: "s390x"
