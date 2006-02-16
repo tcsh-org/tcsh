@@ -50,11 +50,12 @@ nothing*
 foo* ab{c,d} ^fo*
 ])
 
-AT_CHECK([echo '(echo ~; echo "$HOME") | uniq | wc -l' | tcsh -f], , [1
+AT_CHECK([echo 'echo ~; echo "$HOME"' | tcsh -f | uniq | wc -l | tr -d ' \t'],
+, [1
 ])
 
-AT_CHECK([echo "(echo ~$(id -un)/foo; echo \"$HOME/foo\") | uniq | wc -l" dnl
-| tcsh -f], , [1
+AT_CHECK([echo "echo ~$(id -un)/foo; echo \"$HOME/foo\"" | tcsh -f | uniq dnl
+	  | wc -l | tr -d ' \t'], , [1
 ])
 
 AT_CLEANUP

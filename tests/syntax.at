@@ -36,7 +36,8 @@ AT_CLEANUP
 
 AT_SETUP([Command execution])
 
-AT_CHECK([tcsh -f -c '((true | cd ..; pwd); cd ..; pwd)' | uniq | wc -l], ,
+AT_CHECK([tcsh -f -c '((true | cd ..; pwd); cd ..; pwd)' | uniq | wc -l dnl
+	  | tr -d ' \t'], ,
 [1
 ])
 

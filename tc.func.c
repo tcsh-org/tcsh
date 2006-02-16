@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.127 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.128 2006/02/15 16:15:55 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.127 2006/02/14 14:07:36 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.128 2006/02/15 16:15:55 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -639,10 +639,8 @@ xgetpass(const char *prm)
 }
 
 #ifndef NO_CRYPT
-#ifndef __NetBSD__
 #if !HAVE_DECL_CRYPT
     extern char *crypt ();
-#endif
 #endif
 #ifdef HAVE_CRYPT_H
 #include <crypt.h>

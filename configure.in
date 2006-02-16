@@ -337,8 +337,9 @@ AC_C_PROTOTYPES
 AC_C_VOLATILE
 
 dnl checks for library functions
-AC_CHECK_DECLS([gethostname, getpgrp], , ,
-[AC_INCLUDES_DEFAULT([])
+AC_CHECK_DECLS([crypt, environ, gethostname, getpgrp], , ,
+[#include "config_p.h"
+AC_INCLUDES_DEFAULT([])
 #ifdef HAVE_CRYPT_H
 #include <crypt.h>
 #endif
