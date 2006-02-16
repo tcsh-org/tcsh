@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.136 2006/01/13 16:29:20 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.func.c,v 3.137 2006/02/14 00:52:52 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.func.c,v 3.136 2006/01/13 16:29:20 christos Exp $")
+RCSID("$Id: sh.func.c,v 3.137 2006/02/14 00:52:52 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2385,11 +2385,7 @@ iconv_catgets(nl_catd ctd, int set_id, int msg_id, const char *s)
     static size_t buf_size = 0;
   
     char *orig, *dest, *p;
-#ifdef __NetBSD__
-    const char *src;
-#else
-    char *src;
-#endif
+    ICONV_CONST char *src;
     size_t src_size, dest_size;
   
     orig = xcatgets(ctd, set_id, msg_id, s);
