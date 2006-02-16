@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.str.c,v 3.23 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.str.c,v 3.24 2006/02/14 14:07:36 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$Id: tc.str.c,v 3.23 2006/01/12 19:55:38 christos Exp $")
+RCSID("$Id: tc.str.c,v 3.24 2006/02/14 14:07:36 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -593,7 +593,7 @@ STRBUF##_cleanup(void *xbuf)					\
     xfree(buf->s);						\
 }								\
 								\
-const struct STRBUF STRBUF##_init; /* = STRBUF##_INIT; */
+const struct STRBUF STRBUF##_init /* = STRBUF##_INIT; */
 
 DO_STRBUF(strbuf, char, strlen);
 DO_STRBUF(Strbuf, Char, Strlen);
