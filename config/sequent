@@ -119,7 +119,6 @@
 #ifdef _SEQUENT_
 #define NAMEI_BUG
 #else /* _SEQUENT_ */
-#undef NLS
 #undef NLS_CATALOGS
 #endif /* _SEQUENT_ */
 #endif /* _h_config */

@@ -344,6 +344,7 @@ AC_INCLUDES_DEFAULT([])
 #include <crypt.h>
 #endif
 ])
+AC_CHECK_FUNC([setlocale], [have_setlocale=yes], [have_setlocale=no])
 AC_CHECK_FUNCS([catgets dup2 getauthid getcwd gethostname getpwent] dnl
 	[getutent memmove memset nice nl_langinfo sbrk setpgid setpriority] dnl
 	[strerror strstr sysconf wcwidth])
@@ -398,6 +399,15 @@ dnl fi])
 dnl IPv6_CHECK_FUNC(getnameinfo, DFLAGS="$DFLAGS -DINET6")
 
 AC_SUBST(DFLAGS)
+
+dnl Checks for system services
+if test "$have_setlocale" != no; then
+  AC_ARG_ENABLE([nls], AS_HELP_STRING([--disable-nls], [Disable NLS support]),
+	        [], [enable_nls=yes])
+  if test "x$enable_nls" != xno; then
+    AC_DEFINE([NLS], [1], [Support NLS.])
+  fi
+fi
 
 AC_ARG_WITH(hesiod,
   [  --with-hesiod=PREFIX    Use Hesiod lookup for ~ expansion],

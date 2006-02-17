@@ -82,6 +82,5 @@
 /* The Apollo system allows paths prepended with double slashes. */
 #define HAVE_SLASHSLASH 1
 
-#undef NLS
 #undef NLS_CATALOGS
 #endif /* _h_config */

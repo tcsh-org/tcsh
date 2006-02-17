@@ -143,7 +143,6 @@
 
 #ifdef notdef
 /* You can put these back if your os does not really support nls */
-#undef NLS
 #undef NLS_CATALOGS
 #endif
 #endif /* _h_config */

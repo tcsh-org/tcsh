@@ -80,7 +80,6 @@
 
 /****************** local defines *********************/
 
-#undef NLS
 #undef NLS_CATALOGS
 #undef REMOTEHOST
 

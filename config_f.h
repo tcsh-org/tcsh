@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.36 2006/02/14 00:52:52 christos Exp $ */
+/* $Header: /src/pub/tcsh/config_f.h,v 3.37 2006/02/14 14:07:36 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -55,21 +55,13 @@
 #endif
 
 /*
- * NLS:		Use Native Language System
- *		Routines like setlocale() are needed
- *		if you don't have <locale.h>, you don't want
- *		to define this.
- */
-#define NLS
-
-/*
  * NLS_CATALOGS:Use Native Language System catalogs for
  *		international messages.
  *		Routines like catopen() are needed
  *		if you don't have <nl_types.h>, you don't want
  *		to define this.
  */
-#ifdef HAVE_CATGETS
+#if defined (NLS) && defined (HAVE_CATGETS)
 # define NLS_CATALOGS
 #endif
 

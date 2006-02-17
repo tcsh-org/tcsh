@@ -93,7 +93,6 @@
  */
 #define SETLOCALEBUG
 
-#define NEEDstrerror
 #define strtoul(a, b, c) ((unsigned long)strtol((a), (b), (c)))
 
 #endif /* _h_config */

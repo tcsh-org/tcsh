@@ -93,6 +93,5 @@
 /*
  * SX/A does not have NLS
  */
-#undef NLS
 #undef NLS_CATALOGS
 #endif /* _h_config */

@@ -1,3 +1,5 @@
+ 50. remove imake support and make nls configurable by configure
+     (Miloslav Trmac)
  49. V6.14.04 - 20060214
  48. Fixes build failure with !SHORT_STRINGS (Miloslav Trmac)
  47. Fixes constness warnings with !SHORT_STRINGS: short2str is "strip()",

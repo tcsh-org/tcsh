@@ -146,10 +146,6 @@
 # define _ALL_SOURCE	/* for window size etc, extra tty chars etc. */
 #endif
 
-#ifdef NLS
-# undef NLS	/* Let us decide in config_f.h... */
-#endif /* NLS */
-
 /*
  * NOSTRCOLL	We don't have strcoll()
  */
@@ -168,7 +164,6 @@
 #define _LARGE_FILES
 
 #if defined(_AIXPS2) || defined(aiws)
-# undef NLS
 # undef NLS_CATALOGS
 #endif
 

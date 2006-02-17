@@ -78,7 +78,6 @@
 #define YPBUGS
 
 /****************** local defines *********************/
-#define NEEDstrerror
 #define strtoul(a, b, c) ((unsigned long)strtol((a), (b), (c)))
 #define BSD	/* We really look like BSD 4.2 */
 
