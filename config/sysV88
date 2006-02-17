@@ -81,5 +81,4 @@
 #define sysV88  /* Motorola MPC */
 #endif /* !sysV88 */
 
-#define NOSTRCOLL
 #endif /* _h_config */

@@ -81,8 +81,6 @@
 /****************** local defines *********************/
 #ifdef NeXT
 # define environ _environ
-/* strcoll() on the NeXT appears to have 3 args, but only 2 args in tcsh src */
-#define NOSTRCOLL
 #else
 # ifdef notdef
 #  define SETENV_IN_LIB		/* read comment in sh.func.c */

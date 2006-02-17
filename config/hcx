@@ -95,8 +95,6 @@
 
 
 /****************** local defines *********************/
-#define NOSTRCOLL
-
 /*
  * It appears like 5.x defines hcx and does not define _CX_UX and
  * 7.x defines _CX_UX and does not define hcx. In tcsh we currently

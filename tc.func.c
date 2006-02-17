@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.128 2006/02/15 16:15:55 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.func.c,v 3.129 2006/02/16 03:11:59 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.func.c,v 3.128 2006/02/15 16:15:55 christos Exp $")
+RCSID("$Id: tc.func.c,v 3.129 2006/02/16 03:11:59 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1722,7 +1722,7 @@ collate(const Char *a, const Char *b)
     char *sb = strip(strsave(b));
 #endif /* SHORT_STRINGS */
 
-#if defined(NLS) && !defined(NOSTRCOLL)
+#if defined(NLS) && defined(HAVE_STRCOLL)
     errno = 0;	/* strcoll sets errno, another brain-damage */
 
     rv = strcoll(sa, sb);
@@ -1739,7 +1739,7 @@ collate(const Char *a, const Char *b)
     }
 #else
     rv = strcmp(sa, sb);
-#endif /* NLS && !NOSTRCOLL */
+#endif /* NLS && HAVE_STRCOLL */
 
     xfree(sa);
     xfree(sb);

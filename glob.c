@@ -132,7 +132,7 @@ static	void	 qprintf	(const Char *);
 int
 globcharcoll(__Char c1, __Char c2, int cs)
 {
-#if defined(NLS) && defined(LC_COLLATE) && !defined(NOSTRCOLL)
+#if defined(NLS) && defined(LC_COLLATE) && defined(HAVE_STRCOLL)
 # if defined(WIDE_STRINGS)
     wchar_t s1[2], s2[2];
 
@@ -268,11 +268,11 @@ qprintf(const Char *s)
 static int
 compare(const void *p, const void *q)
 {
-#if defined(NLS) && !defined(NOSTRCOLL)
+#if defined(NLS) && defined(HAVE_STRCOLL)
     return (strcoll(*(char *const *) p, *(char *const *) q));
 #else
     return (strcmp(*(char *const *) p, *(char *const *) q));
-#endif /* NLS && !NOSTRCOLL */
+#endif /* NLS && HAVE_STRCOLL */
 }
 
 /*

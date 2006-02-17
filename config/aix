@@ -147,13 +147,6 @@
 #endif
 
 /*
- * NOSTRCOLL	We don't have strcoll()
- */
-#ifndef _IBMR2
-# define NOSTRCOLL	/* only the rs6000 has strcoll() */
-#endif
-
-/*
  * Function pointer comparisons are broken
  */
 #ifdef aiws

@@ -89,9 +89,4 @@
 # endif /* _POSIX_SOURCE */
 #endif /* POSIX */
 
-/*
- * NOSTRCOLL	We don't have strcoll()
- */
-#define NOSTRCOLL
-
 #endif /* _h_config */

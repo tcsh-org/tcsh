@@ -351,6 +351,7 @@ AC_CHECK_FUNCS([catgets dup2 getauthid getcwd gethostname getpwent] dnl
 AC_FUNC_GETPGRP
 AC_FUNC_MBRTOWC
 AC_FUNC_SETPGRP
+AC_FUNC_STRCOLL
 
 dnl This is not good enough; we need sockaddr_storage too.
 dnl See whether we can use IPv6 related functions

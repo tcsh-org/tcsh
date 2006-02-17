@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.c,v 3.63 2006/01/12 19:43:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.os.c,v 3.64 2006/01/12 19:55:38 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.os.c,v 3.63 2006/01/12 19:43:01 christos Exp $")
+RCSID("$Id: tc.os.c,v 3.64 2006/01/12 19:55:38 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1075,7 +1075,7 @@ fix_yp_bugs(void)
 void
 fix_strcoll_bug(void)
 {
-#if defined(NLS) && !defined(NOSTRCOLL)
+#if defined(NLS) && defined(HAVE_STRCOLL)
     /*
      * SunOS4 checks the file descriptor from openlocale() for <= 0
      * instead of == -1. Someone should tell sun that file descriptor 0

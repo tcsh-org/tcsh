@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.31 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.32 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.file.c,v 3.31 2006/01/12 19:43:00 christos Exp $")
+RCSID("$Id: sh.file.c,v 3.32 2006/01/12 19:55:38 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -598,11 +598,11 @@ compare(const void *p, const void *q)
 
     p1 = strsave(short2str(*(Char *const *) p));
     q1 = strsave(short2str(*(Char *const *) q));
-# if defined(NLS) && !defined(NOSTRCOLL)
+# if defined(NLS) && defined(HAVE_STRCOLL)
     res = strcoll(p1, q1);
 # else
     res = strcmp(p1, q1);
-# endif /* NLS && !NOSTRCOLL */
+# endif /* NLS && HAVE_STRCOLL */
     xfree (p1);
     xfree (q1);
     return res;
