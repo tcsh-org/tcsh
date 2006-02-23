@@ -1,3 +1,4 @@
+ 52. Be more conservative in wide_read PR#29
  51. remove HAVE_STRCOLL; not needed anymore (Miloslav Trmac)
  50. remove imake support and make nls configurable by configure
      (Miloslav Trmac)
