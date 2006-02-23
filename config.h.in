@@ -16,6 +16,14 @@
 /* Define to 1 if you have the <crypt.h> header file. */
 #undef HAVE_CRYPT_H
 
+/* Define to 1 if you have the declaration of `crypt', and to 0 if you don't.
+   */
+#undef HAVE_DECL_CRYPT
+
+/* Define to 1 if you have the declaration of `environ', and to 0 if you
+   don't. */
+#undef HAVE_DECL_ENVIRON
+
 /* Define to 1 if you have the declaration of `gethostname', and to 0 if you
    don't. */
 #undef HAVE_DECL_GETHOSTNAME
@@ -46,7 +54,7 @@
 /* Define to 1 if you have the `getutent' function. */
 #undef HAVE_GETUTENT
 
-/* Define to 1 if you have the iconv () interface */
+/* Define if you have the iconv() function. */
 #undef HAVE_ICONV
 
 /* Define to 1 if you have the <inttypes.h> header file. */
@@ -55,7 +63,7 @@
 /* Define to 1 if the system has the type `long long'. */
 #undef HAVE_LONG_LONG
 
-/* Define to 1 if you have the `mbrtowc' function. */
+/* Define to 1 if mbrtowc and mbstate_t are properly declared. */
 #undef HAVE_MBRTOWC
 
 /* Define to 1 if you have the `memmove' function. */
@@ -93,6 +101,10 @@
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strcoll' function and it is properly defined.
+   */
+#undef HAVE_STRCOLL
 
 /* Define to 1 if you have the `strerror' function. */
 #undef HAVE_STRERROR
@@ -159,8 +171,11 @@
 /* Define to 1 if you have the `wcwidth' function. */
 #undef HAVE_WCWIDTH
 
-/* Define to 1 if the system has the type `wint_t'. */
-#undef HAVE_WINT_T
+/* Define as const if the declaration of iconv() needs const. */
+#undef ICONV_CONST
+
+/* Support NLS. */
+#undef NLS
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
