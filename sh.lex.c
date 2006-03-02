@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.lex.c,v 3.68 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.lex.c,v 3.69 2006/02/23 18:19:37 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.lex.c,v 3.68 2006/02/14 14:07:36 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.69 2006/02/23 18:19:37 christos Exp $")
 
 #include "ed.h"
 

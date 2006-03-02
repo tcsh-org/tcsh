@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.str.c,v 3.24 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.str.c,v 3.25 2006/02/16 01:36:25 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$Id: tc.str.c,v 3.24 2006/02/14 14:07:36 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.25 2006/02/16 01:36:25 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS

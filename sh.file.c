@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.32 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.file.c,v 3.33 2006/02/17 02:27:55 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.file.c,v 3.32 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: sh.file.c,v 3.33 2006/02/17 02:27:55 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.parse.c,v 3.116 2006/02/14 00:52:52 christos Exp $ */
+/* $Header: /src/pub/tcsh/tw.parse.c,v 3.117 2006/02/14 14:07:37 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tw.parse.c,v 3.116 2006/02/14 00:52:52 christos Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.117 2006/02/14 14:07:37 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.init.c,v 3.55 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.init.c,v 3.56 2006/01/12 19:55:37 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.init.c,v 3.55 2006/01/12 19:43:00 christos Exp $")
+RCSID("$tcsh: ed.init.c,v 3.56 2006/01/12 19:55:37 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"

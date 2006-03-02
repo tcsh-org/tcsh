@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.parse.c,v 3.16 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.parse.c,v 3.17 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.parse.c: Interpret a list of tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.parse.c,v 3.16 2006/01/12 19:43:00 christos Exp $")
+RCSID("$tcsh: sh.parse.c,v 3.17 2006/01/12 19:55:38 christos Exp $")
 
 /*
  * C shell

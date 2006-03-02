@@ -1,4 +1,4 @@
-$ $Id: set3,v 1.1 1995/04/25 14:04:35 christos Exp $
+$ $tcsh: set3,v 1.2 2001/04/26 19:07:49 kim Exp $
 $ Description des fonctions éditeur
 $set 3 
 1 Recule d'un caractère

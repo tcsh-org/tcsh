@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.70 2006/01/13 16:12:23 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.exec.c,v 3.71 2006/02/15 23:35:36 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.exec.c,v 3.70 2006/01/13 16:12:23 christos Exp $")
+RCSID("$tcsh: sh.exec.c,v 3.71 2006/02/15 23:35:36 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"

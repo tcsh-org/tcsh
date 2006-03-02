@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.bind.c,v 3.42 2006/01/12 19:43:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.bind.c,v 3.43 2006/01/12 19:55:38 christos Exp $ */
 /*
  * tc.bind.c: Key binding functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.bind.c,v 3.42 2006/01/12 19:43:01 christos Exp $")
+RCSID("$tcsh: tc.bind.c,v 3.43 2006/01/12 19:55:38 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"

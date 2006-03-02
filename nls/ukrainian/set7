@@ -1,4 +1,4 @@
-$ $Id: set7,v 1.2 2002/05/20 19:24:22 kunia Exp $
+$ $tcsh: set7,v 1.2 2002/07/01 20:50:22 christos Exp $
 $ ed.screen.c
 $set 7
 1 \n\tTcsh thinks your terminal has the\n

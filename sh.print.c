@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.30 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.print.c,v 3.31 2006/01/12 19:55:38 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.print.c,v 3.30 2006/01/12 19:43:00 christos Exp $")
+RCSID("$tcsh: sh.print.c,v 3.31 2006/01/12 19:55:38 christos Exp $")
 
 #include "ed.h"
 

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.61 2006/01/12 19:43:00 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.62 2006/01/12 19:55:37 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.inputl.c,v 3.61 2006/01/12 19:43:00 christos Exp $")
+RCSID("$tcsh: ed.inputl.c,v 3.62 2006/01/12 19:55:37 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */

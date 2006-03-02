@@ -1,4 +1,4 @@
-$ $Id$
+$ $tcsh: set19,v 1.2 1995/03/19 18:09:24 christos Exp $
 $ tc.alloc.c
 $set 19
 1 nbytes=%d: Out of memory\n

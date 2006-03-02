@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.17 2006/01/12 19:43:01 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.nls.c,v 3.18 2006/02/14 14:07:36 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.nls.c,v 3.17 2006/01/12 19:43:01 christos Exp $")
+RCSID("$tcsh: tc.nls.c,v 3.18 2006/02/14 14:07:36 christos Exp $")
 
 #ifdef WIDE_STRINGS
 int

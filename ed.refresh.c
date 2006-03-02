@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.43 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.44 2006/02/14 14:07:36 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.refresh.c,v 3.43 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: ed.refresh.c,v 3.44 2006/02/14 14:07:36 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */

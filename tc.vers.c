@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.vers.c,v 3.52 2006/01/12 18:15:25 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.vers.c,v 3.53 2006/01/12 19:55:38 christos Exp $ */
 /*
  * tc.vers.c: Version dependent stuff
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "tw.h"
 
-RCSID("$Id: tc.vers.c,v 3.52 2006/01/12 18:15:25 christos Exp $")
+RCSID("$tcsh: tc.vers.c,v 3.53 2006/01/12 19:55:38 christos Exp $")
 
 #include "patchlevel.h"
 

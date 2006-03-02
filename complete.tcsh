@@ -1,5 +1,5 @@
 #
-# $Id: complete.tcsh,v 1.45 2004/12/25 21:15:05 christos Exp $
+# $tcsh: complete.tcsh,v 1.46 2005/03/21 21:26:08 kim Exp $
 # example file using the new completion code
 #
 # Debian GNU/Linux

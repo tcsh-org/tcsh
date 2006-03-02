@@ -1,4 +1,4 @@
-# $Id$
+# $tcsh: Makefile,v 1.13 2005/03/26 01:59:45 kim Exp $
 
 SUBDIRS=	C et finnish french german greek italian ja pl russian \
 		spanish ukrainian

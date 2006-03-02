@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.32 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.xmap.c,v 3.33 2006/01/13 17:17:13 christos Exp $ */
 /*
  * ed.xmap.c: This module contains the procedures for maintaining
  *	      the extended-key map.
@@ -88,7 +88,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: ed.xmap.c,v 3.32 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: ed.xmap.c,v 3.33 2006/01/13 17:17:13 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"

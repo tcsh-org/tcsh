@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.127 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.c,v 3.128 2006/01/13 16:29:20 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$Id: sh.c,v 3.127 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.128 2006/01/13 16:29:20 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"

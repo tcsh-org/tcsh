@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dir.c,v 3.74 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dir.c,v 3.75 2006/01/13 00:26:35 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$Id: sh.dir.c,v 3.74 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: sh.dir.c,v 3.75 2006/01/13 00:26:35 christos Exp $")
 
 /*
  * C Shell - directory management

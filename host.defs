@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /src/pub/tcsh/host.defs,v 1.41 2005/04/11 22:10:56 kim Exp $ */
+/* $Header: /src/pub/tcsh/host.defs,v 1.42 2006/02/15 23:30:33 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$Id: host.defs,v 1.41 2005/04/11 22:10:56 kim Exp $")
+RCSID("$tcsh: host.defs,v 1.42 2006/02/15 23:30:33 christos Exp $")
 
 endcode	:
 

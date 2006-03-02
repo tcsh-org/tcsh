@@ -1,4 +1,4 @@
-# $Id: Makefile.win32,v 1.5 2005/04/12 04:17:17 amold Exp $
+# $tcsh: Makefile.win32,v 1.6 2005/05/25 03:01:19 amold Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile

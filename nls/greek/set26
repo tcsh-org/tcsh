@@ -1,4 +1,4 @@
-$ $Id: set26,v 1.1 1996/04/26 19:24:49 christos Exp $
+$ $tcsh: set26,v 1.2 1998/09/18 15:32:02 christos Exp $
 $ tc.who.c
 $set 26 
 1 δε μπορώ να κάνω stat το %s. Παρακαλώ δώστε "unset watch".\n

@@ -1,5 +1,5 @@
 #!/bin/sh
-# @(#)$Id: MAKERELEASE,v 1.1 2005/03/03 20:58:10 kim Exp $
+# @(#)$tcsh: MAKERELEASE,v 1.2 2005/03/26 02:52:23 kim Exp $
 #
 # Copyright (c) 2005 Kimmo Suominen
 # All rights reserved.

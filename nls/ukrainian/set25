@@ -1,4 +1,4 @@
-$ $Id: set25,v 1.1 2002/05/16 19:25:11 kunia Exp $
+$ $tcsh: set25,v 1.2 2002/07/01 20:50:22 christos Exp $
 $ tc.sig.c
 $set 25 
 1 our wait %d\n

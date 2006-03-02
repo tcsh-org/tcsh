@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.err.c,v 3.46 2006/01/13 16:10:59 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.err.c,v 3.47 2006/02/14 00:52:52 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -34,7 +34,7 @@
 #include "sh.h"
 #include <assert.h>
 
-RCSID("$Id: sh.err.c,v 3.46 2006/01/13 16:10:59 christos Exp $")
+RCSID("$tcsh: sh.err.c,v 3.47 2006/02/14 00:52:52 christos Exp $")
 
 /*
  * C Shell

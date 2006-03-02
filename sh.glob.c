@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.68 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.glob.c,v 3.69 2006/02/14 14:07:36 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.glob.c,v 3.68 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.69 2006/02/14 14:07:36 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"

@@ -1,4 +1,4 @@
-# $Id$
+# $tcsh: termcap.vms,v 1.2 1992/10/27 16:18:15 christos Exp $
 # posix /etc/termcap 1992 
 #
 # Minimal termcap for VMS/POSIX

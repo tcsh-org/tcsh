@@ -82,7 +82,7 @@
  **********************************************************************
  */
 #include "sh.h"
-RCSID("$Id: ma.setp.c,v 1.16 2006/01/12 18:15:24 christos Exp $")
+RCSID("$tcsh: ma.setp.c,v 1.17 2006/01/12 19:43:00 christos Exp $")
 
 #ifdef MACH
 

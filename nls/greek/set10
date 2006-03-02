@@ -1,4 +1,4 @@
-$ $Id: set10,v 1.1 1996/04/26 19:24:10 christos Exp $
+$ $tcsh: set10,v 1.2 1998/09/18 15:31:58 christos Exp $
 $ ma.setp.c
 $set 10 
 1 setpath: άκυρη εντολή '%s'.\n

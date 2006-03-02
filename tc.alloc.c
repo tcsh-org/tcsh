@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.44 2006/01/13 17:14:28 christos Exp $ */
+/* $Header: /src/pub/tcsh/tc.alloc.c,v 3.45 2006/02/15 23:35:36 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -40,7 +40,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: tc.alloc.c,v 3.44 2006/01/13 17:14:28 christos Exp $")
+RCSID("$tcsh: tc.alloc.c,v 3.45 2006/02/15 23:35:36 christos Exp $")
 
 #define RCHECK
 #define DEBUG

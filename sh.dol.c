@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.63 2006/01/13 00:26:12 christos Exp $ */
+/* $Header: /src/pub/tcsh/sh.dol.c,v 3.64 2006/02/14 14:07:36 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$Id: sh.dol.c,v 3.63 2006/01/13 00:26:12 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.64 2006/02/14 14:07:36 christos Exp $")
 
 /*
  * C shell
