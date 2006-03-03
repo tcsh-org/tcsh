@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/signal.c,v 1.5 2003/11/04 02:02:59 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/signal.c,v 1.6 2004/10/18 02:32:17 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -203,6 +203,20 @@ int sigsuspend(const sigset_t *mask) {
 	errno = EINTR;
 	return -1;
 
+}
+int sigrelse(int signal) {
+	sigset_t omask = {0};
+
+	sigaddset(&omask,signal);
+
+	return sigprocmask(SIG_UNBLOCK,&omask,NULL);
+}
+int sighold(int signal) {
+	sigset_t omask = {0};
+
+	sigaddset(&omask,signal);
+
+	return sigprocmask(SIG_BLOCK,&omask,NULL);
 }
 int sigaction(int signo, const struct sigaction *act, struct sigaction *oact) {
 

@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.who.c,v 1.3 2002/09/13 05:27:10 amold Exp $*/
+/*$Header: /src/pub/tcsh/win32/nt.who.c,v 1.4 2004/05/19 18:22:28 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -41,14 +41,14 @@
 
 
 typedef struct _ASTAT_ {
-	ADAPTER_STATUS adapt;
-	NAME_BUFFER    NameBuff [10];
+    ADAPTER_STATUS adapt;
+    NAME_BUFFER    NameBuff [10];
 } ASTAT;
 
 typedef struct _n_ctx {
-	NCB ncb;
-	u_char usr_name[NCBNAMSZ];
-	u_char mach_name[NCBNAMSZ];
+    NCB ncb;
+    u_char usr_name[NCBNAMSZ];
+    u_char mach_name[NCBNAMSZ];
 } ncb_ctx;
 
 typedef UCHAR (APIENTRY *netbios_func)(NCB *);
@@ -64,207 +64,207 @@ static HMODULE hnetapi;
 extern add_to_who_list(char *,char*);
 
 void init_netbios(void ) {
-	
 
-	if (!ginited) {
-		hnetapi = LoadLibrary("NETAPI32.DLL");
-		if (!hnetapi)
-			return ;
 
-		p_Netbios = (netbios_func)GetProcAddress(hnetapi,"Netbios");
+    if (!ginited) {
+	hnetapi = LoadLibrary("NETAPI32.DLL");
+	if (!hnetapi)
+	    return ;
 
-		if (!p_Netbios )
-			return ;
-		ginited = 1;
-	}
-	InitializeCriticalSection(&nb_critter);
+	p_Netbios = (netbios_func)GetProcAddress(hnetapi,"Netbios");
+
+	if (!p_Netbios )
+	    return ;
+	ginited = 1;
+    }
+    InitializeCriticalSection(&nb_critter);
 }
 void cleanup_netbios(void) {
-	if (hnetapi){
-		DeleteCriticalSection(&nb_critter);
-		FreeLibrary(hnetapi);
-	}
+    if (hnetapi){
+	DeleteCriticalSection(&nb_critter);
+	FreeLibrary(hnetapi);
+    }
 }
 void CALLBACK complete_ncb( NCB * p_ncb) {
 
-	int count,i;
-	ADAPTER_STATUS *p_ad;
-	ASTAT *pas;
-	char *p1;
-	ncb_ctx *ctx = (ncb_ctx *)p_ncb;
+    int count,i;
+    ADAPTER_STATUS *p_ad;
+    ASTAT *pas;
+    char *p1;
+    ncb_ctx *ctx = (ncb_ctx *)p_ncb;
 
-	if (p_ncb->ncb_retcode)
-		goto end;
+    if (p_ncb->ncb_retcode)
+	goto end;
 
-	__try {
+    __try {
 
-		EnterCriticalSection(&nb_critter);
-		pas = ((ASTAT*) p_ncb->ncb_buffer);
-		p_ad = &pas->adapt;
+	EnterCriticalSection(&nb_critter);
+	pas = ((ASTAT*) p_ncb->ncb_buffer);
+	p_ad = &pas->adapt;
 
-		count = p_ad->name_count;
+	count = p_ad->name_count;
 
-		if (count <=0 )
-			__leave;
+	if (count <=0 )
+	    __leave;
 
-		if (ctx->usr_name[0] == 0) { //any user on given machine
-			for(i=0; i<count;i++) {
-				if (pas->NameBuff[i].name[15] == 03) { // unique name
-					if (!strncmp(pas->NameBuff[i].name,
-								p_ncb->ncb_callname,NCBNAMSZ))
-								continue;
-					else {
-						p1 = strchr(pas->NameBuff[i].name,' ');
-						if (p1)
-							*p1 = 0;
-						else
-							pas->NameBuff[i].name[15]= 0;
-						add_to_who_list(pas->NameBuff[i].name,
-								ctx->mach_name);
-						break;
-					}
-				}
-			}
+	if (ctx->usr_name[0] == 0) { //any user on given machine
+	    for(i=0; i<count;i++) {
+		if (pas->NameBuff[i].name[15] == 03) { // unique name
+		    if (!strncmp(pas->NameBuff[i].name,
+				p_ncb->ncb_callname,NCBNAMSZ))
+			continue;
+		    else {
+			p1 = strchr(pas->NameBuff[i].name,' ');
+			if (p1)
+			    *p1 = 0;
+			else
+			    pas->NameBuff[i].name[15]= 0;
+			add_to_who_list(pas->NameBuff[i].name,
+				ctx->mach_name);
+			break;
+		    }
 		}
-		else if (ctx->mach_name[0] == 0)  { // given user on any machine
-			for(i=0; i<count;i++) {
-				if (pas->NameBuff[i].name[15] == 03) { // unique name
-					if (!strncmp(pas->NameBuff[i].name,
-								p_ncb->ncb_callname,NCBNAMSZ))
-								continue;
-					else {
-						p1 = strchr(pas->NameBuff[i].name,' ');
-						if (p1)
-							*p1 = 0;
-						else
-							pas->NameBuff[i].name[15]= 0;
-						add_to_who_list(ctx->usr_name,
-								pas->NameBuff[i].name);
-						break;
-					}
-				}
-			}
-		}
-		else { // specific user on specific machine
-			for(i=0; i<count;i++) {
-				if (pas->NameBuff[i].name[15] == 03) { // unique name
-					// skip computer name
-					if (!strncmp(pas->NameBuff[i].name,
-								p_ncb->ncb_callname,NCBNAMSZ)) {
-								continue;
-					}
-					else if (!strncmp(pas->NameBuff[i].name,
-								ctx->usr_name,lstrlen(ctx->usr_name))) {
-						p1 = strchr(pas->NameBuff[i].name,' ');
-						if (p1)
-							*p1 = 0;
-						else
-							pas->NameBuff[i].name[15]= 0;
-						add_to_who_list(pas->NameBuff[i].name,
-								ctx->mach_name);
-						break;
-					}
-				}
-			}
-		}
+	    }
 	}
-	__except(1) {
-		;
+	else if (ctx->mach_name[0] == 0)  { // given user on any machine
+	    for(i=0; i<count;i++) {
+		if (pas->NameBuff[i].name[15] == 03) { // unique name
+		    if (!strncmp(pas->NameBuff[i].name,
+				p_ncb->ncb_callname,NCBNAMSZ))
+			continue;
+		    else {
+			p1 = strchr(pas->NameBuff[i].name,' ');
+			if (p1)
+			    *p1 = 0;
+			else
+			    pas->NameBuff[i].name[15]= 0;
+			add_to_who_list(ctx->usr_name,
+				pas->NameBuff[i].name);
+			break;
+		    }
+		}
+	    }
 	}
-	LeaveCriticalSection(&nb_critter);
+	else { // specific user on specific machine
+	    for(i=0; i<count;i++) {
+		if (pas->NameBuff[i].name[15] == 03) { // unique name
+		    // skip computer name
+		    if (!strncmp(pas->NameBuff[i].name,
+				p_ncb->ncb_callname,NCBNAMSZ)) {
+			continue;
+		    }
+		    else if (!strncmp(pas->NameBuff[i].name,
+				ctx->usr_name,lstrlen(ctx->usr_name))) {
+			p1 = strchr(pas->NameBuff[i].name,' ');
+			if (p1)
+			    *p1 = 0;
+			else
+			    pas->NameBuff[i].name[15]= 0;
+			add_to_who_list(pas->NameBuff[i].name,
+				ctx->mach_name);
+			break;
+		    }
+		}
+	    }
+	}
+    }
+    __except(1) {
+	;
+    }
+    LeaveCriticalSection(&nb_critter);
 end:
-	heap_free(p_ncb->ncb_buffer);
-	heap_free(p_ncb);
-	return;
+    heap_free(p_ncb->ncb_buffer);
+    heap_free(p_ncb);
+    return;
 }
 void start_ncbs (Char **vp) {
 
-	ncb_ctx * p_ctx;
-	NCB *Ncb;
-	Char **namevec = vp;
-	char *p1,*p2,*nb_name;
-	UCHAR uRetCode;
-	ASTAT *Adapter;
+    ncb_ctx * p_ctx;
+    NCB *Ncb;
+    Char **namevec = vp;
+    char *p1,*p2,*nb_name;
+    UCHAR uRetCode;
+    ASTAT *Adapter;
 
-	if (!ginited) {
-		init_netbios();
-	}
-	if (!ginited)
-		return;
-
-	for (namevec = vp;*namevec != NULL;namevec +=2) {
-
-		p_ctx = heap_alloc(sizeof(ncb_ctx));
-		Adapter = heap_alloc(sizeof(ASTAT));
-
-		Ncb = (NCB*)p_ctx;
-
-		memset( Ncb, 0, sizeof(NCB) );
-
-		Ncb->ncb_command = NCBRESET;
-		Ncb->ncb_lana_num = 0;
-
-		uRetCode = p_Netbios( Ncb );
-
-		if(uRetCode)
-			goto cleanup;
-		
-		if  ((**namevec == '\0' ) || ( *(namevec +1) ==  NULL) ||
-			 (**(namevec +1) == '\0') )
-			 	break;
-		
-
-		p1 = short2str(*namevec);
-		if (!lstrcmpi(p1,"any") ) {
-			p_ctx->usr_name[0] = 0;
-		}
-		else {
-			strcpy(p_ctx->usr_name,p1);
-		}
-		p1 = &(p_ctx->usr_name[0]);
-
-		p2 = short2str(*(namevec+1));
-		//
-		// If machine is not "any", make it the callname
-		//
-		if (!lstrcmpi(p2,"any") ) {
-			p_ctx->mach_name[0] = 0;
-			nb_name = p1;
-		}
-		else {
-			strcpy(p_ctx->mach_name,p2);
-			nb_name = p2;
-		}
-		
-		// do not permit any any
-		//
-		if( (p_ctx->mach_name[0] == 0) && (p_ctx->usr_name[0] == 0) )
-			goto cleanup;
-
-
-
-		memset( Ncb, 0, sizeof (NCB) );
-
-		Ncb->ncb_command = NCBASTAT | ASYNCH;
-		Ncb->ncb_lana_num = 0;
-
-		memset(Ncb->ncb_callname,' ',sizeof(Ncb->ncb_callname));
-
-		Ncb->ncb_callname[15]=03;
-
-		memcpy(Ncb->ncb_callname,nb_name,lstrlen(nb_name));
-		
-		Ncb->ncb_buffer = (char *) Adapter;
-		Ncb->ncb_length = sizeof(*Adapter);
-
-		Ncb->ncb_post = complete_ncb;
-
-		uRetCode = p_Netbios( Ncb );
-	}
+    if (!ginited) {
+	init_netbios();
+    }
+    if (!ginited)
 	return;
+
+    for (namevec = vp;*namevec != NULL;namevec +=2) {
+
+	p_ctx = heap_alloc(sizeof(ncb_ctx));
+	Adapter = heap_alloc(sizeof(ASTAT));
+
+	Ncb = (NCB*)p_ctx;
+
+	memset( Ncb, 0, sizeof(NCB) );
+
+	Ncb->ncb_command = NCBRESET;
+	Ncb->ncb_lana_num = 0;
+
+	uRetCode = p_Netbios( Ncb );
+
+	if(uRetCode)
+	    goto cleanup;
+
+	if  ((**namevec == '\0' ) || ( *(namevec +1) ==  NULL) ||
+		(**(namevec +1) == '\0') )
+	    break;
+
+
+	p1 = short2str(*namevec);
+	if (!lstrcmpi(p1,"any") ) {
+	    p_ctx->usr_name[0] = 0;
+	}
+	else {
+	    StringCbCopy(p_ctx->usr_name,sizeof(p_ctx->usr_name),p1);
+	}
+	p1 = &(p_ctx->usr_name[0]);
+
+	p2 = short2str(*(namevec+1));
+	//
+	// If machine is not "any", make it the callname
+	//
+	if (!lstrcmpi(p2,"any") ) {
+	    p_ctx->mach_name[0] = 0;
+	    nb_name = p1;
+	}
+	else {
+	    StringCbCopy(p_ctx->mach_name,sizeof(p_ctx->mach_name),p2);
+	    nb_name = p2;
+	}
+
+	// do not permit any any
+	//
+	if( (p_ctx->mach_name[0] == 0) && (p_ctx->usr_name[0] == 0) )
+	    goto cleanup;
+
+
+
+	memset( Ncb, 0, sizeof (NCB) );
+
+	Ncb->ncb_command = NCBASTAT | ASYNCH;
+	Ncb->ncb_lana_num = 0;
+
+	memset(Ncb->ncb_callname,' ',sizeof(Ncb->ncb_callname));
+
+	Ncb->ncb_callname[15]=03;
+
+	memcpy(Ncb->ncb_callname,nb_name,lstrlen(nb_name));
+
+	Ncb->ncb_buffer = (char *) Adapter;
+	Ncb->ncb_length = sizeof(*Adapter);
+
+	Ncb->ncb_post = complete_ncb;
+
+	uRetCode = p_Netbios( Ncb );
+    }
+    return;
 
 cleanup:
-	heap_free(Adapter);
-	heap_free(p_ctx);
-	return;
+    heap_free(Adapter);
+    heap_free(p_ctx);
+    return;
 }

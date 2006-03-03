@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/globals.c,v 1.5 2004/07/02 01:26:15 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/globals.c,v 1.6 2006/01/12 18:15:25 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -35,6 +35,9 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
+#define STRSAFE_LIB
+#define STRSAFE_NO_CCH_FUNCTIONS
+#include <strsafe.h>
 
 extern unsigned long bookend1,bookend2;
 extern char **environ;
@@ -50,7 +53,9 @@ dprintf(char *format, ...)
 	err = GetLastError();
 	{
 		va_start(vl, format);
-		_vsnprintf(putbuf, sizeof(putbuf),format, vl);
+#pragma warning(disable:4995)
+		wvsprintf(putbuf,format, vl);
+#pragma warning(default:4995)
 		va_end(vl);
 		OutputDebugString(putbuf);
 	}

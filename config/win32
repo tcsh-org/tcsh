@@ -96,6 +96,7 @@
 #define GETPGRP_VOID             1
 #define HAVE_DECL_GETPGRP	 1
 #define HAVE_STRUCT_DIRENT_D_INO 1
+#define HAVE_STRERROR            1
 
 #define SHORT_STRINGS    
 
@@ -117,6 +118,8 @@
 #define HASHBANG
 #undef NLS_CATALOGS
 
+#define _CRT_SECURE_NO_DEPRECATE 1
+#define _CRT_NONSTDC_NO_DEPRECATE 1
 #include <limits.h>
 #include <ntport.h>
 

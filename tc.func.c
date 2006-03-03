@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.func.c,v 3.130 2006/02/17 02:27:55 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.131 2006/03/02 18:46:45 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.130 2006/02/17 02:27:55 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.131 2006/03/02 18:46:45 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -40,8 +40,9 @@ RCSID("$tcsh: tc.func.c,v 3.130 2006/02/17 02:27:55 christos Exp $")
 #include "tc.h"
 #ifdef WINNT_NATIVE
 #include "nt.const.h"
-#endif /* WINNT_NATIVE */
+#else /* WINNT_NATIVE */
 #include <sys/wait.h>
+#endif /* WINNT_NATIVE */
 
 #ifdef AFS
 #include <afs/stds.h>

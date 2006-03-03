@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.misc.c,v 3.40 2006/02/14 00:52:52 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.misc.c,v 3.41 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.misc.c,v 3.40 2006/02/14 00:52:52 christos Exp $")
+RCSID("$tcsh: sh.misc.c,v 3.41 2006/03/02 18:46:44 christos Exp $")
 
 static	int	renum	(int, int);
 static  Char  **blkend	(Char **);
@@ -493,7 +493,7 @@ prefix(const Char *sub, const Char *str)
 	    return (0);
     }
 }
-
+#ifndef WINNT_NATIVE
 char *
 areadlink(const char *path)
 {
@@ -518,6 +518,7 @@ areadlink(const char *path)
     buf[res] = '\0';
     return xrealloc(buf, res + 1);
 }
+#endif /*!WINNT_NATIVE*/
 
 void
 xclose(int fildes)

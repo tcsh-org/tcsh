@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.h,v 3.143 2006/02/15 23:35:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.144 2006/02/16 03:11:59 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -597,7 +597,7 @@ EXTERN clock_t clk_tck;
 #  endif /* POSIX */
 EXTERN struct tms shtimes;	/* shell and child times for process timing */
 # endif /* _SEQUENT_ */
-EXTERN long seconds0;
+EXTERN time_t seconds0;
 #endif /* BSDTIMES */
 
 #ifndef HZ

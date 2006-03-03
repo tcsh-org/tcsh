@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.char.c,v 1.6 2006/01/12 18:15:25 christos Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/nt.char.c,v 1.7 2006/01/12 19:55:58 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -46,78 +46,82 @@ extern DWORD gdwPlatform;
 
 
 unsigned char oem_it(unsigned char ch) {
-	unsigned char ch1[2],ch2[2];
+    unsigned char ch1[2],ch2[2];
 
-	ch1[0] = ch;
-	ch1[1] = 0;
+    ch1[0] = ch;
+    ch1[1] = 0;
 
-	OemToChar(ch1,ch2);
+    OemToChar(ch1,ch2);
 
-	return ch2[0];
+    return ch2[0];
 }
 void nls_dll_unload(void) {
-	FreeLibrary(hlangdll);
-	hlangdll=NULL;
-}
-void nls_dll_init(void) {
-
-	char *ptr;
-	
-	ptr = getenv("TCSHLANG");
-
-	if (!ptr)
-		ptr = "TCSHC.DLL";
-
-	if (hlangdll)
-		FreeLibrary(hlangdll);
-	hlangdll = LoadLibrary(ptr);
+    FreeLibrary(hlangdll);
+    hlangdll=NULL;
 }
 char * nt_cgets(int set, int msgnum, char *def) {
 
-	int rc;
-	int mesg;
-	static char oembuf[256];/*FIXBUF*/
-	WCHAR buffer[256];/*FIXBUF*/
+    int rc;
+    int mesg;
+    static char oembuf[256];/*FIXBUF*/
+    WCHAR buffer[256];/*FIXBUF*/
 
 
 
-	if (!hlangdll)
-		return def;
-	
-	mesg = set * 10000 + msgnum;
+    if (!hlangdll)
+	return def;
 
-	if (gdwPlatform == VER_PLATFORM_WIN32_WINDOWS) {
-		rc = LoadString(hlangdll,mesg,oembuf,sizeof(oembuf));
+    mesg = set * 10000 + msgnum;
 
-		if(!rc)
-			return def;
-		return oembuf;
-	}
-	rc = LoadStringW(hlangdll,mesg,buffer,sizeof(buffer));
+    if (gdwPlatform == VER_PLATFORM_WIN32_WINDOWS) {
+	rc = LoadString(hlangdll,mesg,oembuf,sizeof(oembuf));
 
 	if(!rc)
-		return def;
-
-	WideCharToMultiByte(CP_OEMCP,
-						0,
-						buffer,
-						-1,
-						oembuf,//winbuf,
-						256,
-						NULL,NULL);
-	
+	    return def;
 	return oembuf;
+    }
+    rc = LoadStringW(hlangdll,mesg,buffer,sizeof(buffer));
+
+    if(!rc)
+	return def;
+
+    WideCharToMultiByte(CP_OEMCP,
+	    0,
+	    buffer,
+	    -1,
+	    oembuf,//winbuf,
+	    256,
+	    NULL,NULL);
+
+    return oembuf;
 }
 #if defined(DSPMBYTE)
 void nt_autoset_dspmbyte(void) {
-	switch (GetConsoleCP()) {
+    switch (GetConsoleCP()) {
 	case 932: /* Japan */
-		setcopy(CHECK_MBYTEVAR, STRsjis, VAR_READWRITE);
-		update_dspmbyte_vars();
-		break;
-	}
+	    setcopy(CHECK_MBYTEVAR, STRsjis, VAR_READWRITE);
+	    update_dspmbyte_vars();
+	    break;
+    }
 }
 
 // _mbmap must be copied to the child during fork()
 unsigned short _mbmap[256] = { 0 };
 #endif
+
+#undef free
+void nls_dll_init(void) {
+
+    char *ptr;
+    size_t size = 0;
+
+
+    if (_dupenv_s(&ptr,&size,"TCSHLANG") ){
+
+	if (hlangdll)
+	    FreeLibrary(hlangdll);
+	hlangdll = LoadLibrary(ptr);
+
+	free(ptr);
+    }
+}

@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/nt.screen.c,v 1.10 2006/01/12 18:15:25 christos Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/nt.screen.c,v 1.11 2006/01/12 19:55:58 christos Exp $*/
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -59,10 +59,10 @@ extern void NT_WrapHorizontal(void);
 static int GetSize(int *lins, int *cols);
 
 int DisplayWindowHSize;
-	void
+    void
 terminit(void)
 {
-	return;
+    return;
 }
 
 
@@ -73,77 +73,77 @@ static	void	ReBufferDisplay	(void);
 
 
 /*ARGSUSED*/
-	void
+    void
 TellTC(void)
 {
 
-	xprintf(CGETS(7, 1, "\n\tYou're using a Windows console.\n"));
+    xprintf(CGETS(7, 1, "\n\tYou're using a Windows console.\n"));
 }
 
 
-	static void
+    static void
 ReBufferDisplay(void)
 {
-	register int i;
-	Char **b;
-	Char **bufp;
-	int lins,cols;
+    register int i;
+    Char **b;
+    Char **bufp;
+    int lins,cols;
 
-	nt_getsize(&lins,&cols,&DisplayWindowHSize);
+    nt_getsize(&lins,&cols,&DisplayWindowHSize);
 
-	b = Display;
-	Display = NULL;
-	if (b != NULL) {
-		for (bufp = b; *bufp != NULL; bufp++)
-			xfree((ptr_t) * bufp);
-		xfree((ptr_t) b);
-	}
-	b = Vdisplay;
-	Vdisplay = NULL;
-	if (b != NULL) {
-		for (bufp = b; *bufp != NULL; bufp++)
-			xfree((ptr_t) * bufp);
-		xfree((ptr_t) b);
-	}
-	TermH = cols;
+    b = Display;
+    Display = NULL;
+    if (b != NULL) {
+	for (bufp = b; *bufp != NULL; bufp++)
+	    xfree((ptr_t) * bufp);
+	xfree((ptr_t) b);
+    }
+    b = Vdisplay;
+    Vdisplay = NULL;
+    if (b != NULL) {
+	for (bufp = b; *bufp != NULL; bufp++)
+	    xfree((ptr_t) * bufp);
+	xfree((ptr_t) b);
+    }
+    TermH = cols;
 
-	TermV = (INBUFSIZE * 4) / TermH + 1;/*FIXBUF*/
-	b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
-	for (i = 0; i < TermV; i++)
-		b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
-	b[TermV] = NULL;
-	Display = b;
-	b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
-	for (i = 0; i < TermV; i++)
-		b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
-	b[TermV] = NULL;
-	Vdisplay = b;
+    TermV = (INBUFSIZE * 4) / TermH + 1;/*FIXBUF*/
+    b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
+    for (i = 0; i < TermV; i++)
+	b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
+    b[TermV] = NULL;
+    Display = b;
+    b = (Char **) xmalloc((size_t) (sizeof(*b) * (TermV + 1)));
+    for (i = 0; i < TermV; i++)
+	b[i] = (Char *) xmalloc((size_t) (sizeof(*b[i]) * (TermH + 1)));
+    b[TermV] = NULL;
+    Vdisplay = b;
 }
 
-	void
+    void
 SetTC(char *what, char *how)
 {
-	int li,win,co;
+    int li,win,co;
 
-	nt_getsize(&li,&co,&win);
-	if (!lstrcmp(what,"li")) {
-		li = atoi(how);
-		
-	}else if(!lstrcmp(what,"co")) { //set window, not buffer size
-		win = atoi(how);
-	}
-	else
-		stderror(ERR_SYSTEM, "SetTC","Sorry, this function is not supported");
+    nt_getsize(&li,&co,&win);
+    if (!lstrcmp(what,"li")) {
+	li = atoi(how);
 
-	ChangeSize(li,win);
-	return;
+    }else if(!lstrcmp(what,"co")) { //set window, not buffer size
+	win = atoi(how);
+    }
+    else
+	stderror(ERR_SYSTEM, "SetTC","Sorry, this function is not supported");
+
+    ChangeSize(li,win);
+    return;
 }
 
 
 /*
  * Print the termcap string out with variable substitution
  */
-	void
+    void
 EchoTC(Char **v)
 {
     Char **globbed;
@@ -157,321 +157,321 @@ EchoTC(Char **v)
 
     gflag = tglob(v);
     if (gflag) {
-        v = globall(v, gflag);
-        if (v == 0)
-            stderror(ERR_NAME | ERR_NOMATCH);
+	v = globall(v, gflag);
+	if (v == 0)
+	    stderror(ERR_NAME | ERR_NOMATCH);
     }
     else
-        v = saveblk(v);
+	v = saveblk(v);
     globbed = v;
     cleanup_push(globbed, blk_cleanup);
     trim(v);
 
     if (!*v || *v[0] == '\0')
-        goto end;
+	goto end;
     if (v[0][0] == '-') {
-        switch (v[0][1]) {
-            case 'v':
-                verbose = 1;
-                break;
-            case 's':
-                silent = 1;
-                break;
-            default:
-                stderror(ERR_NAME | ERR_TCUSAGE);
-                break;
-        }
-        v++;
+	switch (v[0][1]) {
+	    case 'v':
+		verbose = 1;
+		break;
+	    case 's':
+		silent = 1;
+		break;
+	    default:
+		stderror(ERR_NAME | ERR_TCUSAGE);
+		break;
+	}
+	v++;
     }
     if (!*v || *v[0] == '\0')
-        goto end;
-    (void) strcpy(cv, short2str(*v));
+	goto end;
+    (void) StringCbCopy(cv,sizeof(cv), short2str(*v));
 
     GetSize(&li,&co);
 
     if(!lstrcmp(cv,"rows") || !lstrcmp(cv,"lines") ) {
-        xprintf(fmtd,T_Lines);
-        goto end;
+	xprintf(fmtd,T_Lines);
+	goto end;
     }
     else if(!lstrcmp(cv,"cols") ) {
-        xprintf(fmtd,T_ActualWindowSize);
-        goto end;
+	xprintf(fmtd,T_ActualWindowSize);
+	goto end;
     }
     else if(!lstrcmp(cv,"buffer") ) {
-        xprintf(fmtd,T_Cols);
-        goto end;
+	xprintf(fmtd,T_Cols);
+	goto end;
     }
     else
-        stderror(ERR_SYSTEM, "EchoTC","Sorry, this function is not supported");
+	stderror(ERR_SYSTEM, "EchoTC","Sorry, this function is not supported");
 
- end:
+end:
     cleanup_until(globbed);
 }
 
 int    GotTermCaps = 0;
 
 
-	void
+    void
 ResetArrowKeys(void)
 {
 }
 
-	void
+    void
 DefaultArrowKeys(void)
 {
 }
 
 
-	int
-SetArrowKeys(CStr *name, XmapVal *fun, int type)
+    int
+SetArrowKeys(const CStr *name, XmapVal *fun, int type)
 {
-	return -1;
+    return -1;
 }
 
-	int
+    int
 IsArrowKey(Char *name)
 {
-	return 0;
+    return 0;
 }
 
-	int
-ClearArrowKeys(CStr *name)
+    int
+ClearArrowKeys(const CStr *name)
 {
-	return -1;
+    return -1;
 }
 
-	void
-PrintArrowKeys(CStr *name)
+    void
+PrintArrowKeys(const CStr *name)
 {
-	return;
+    return;
 }
 
 
-	void
+    void
 BindArrowKeys(void)
 {
-	return;
+    return;
 }
 
 #define GoodStr(ignore)  1
-	void
+    void
 SetAttributes(Char atr)
 {
-	atr &= ATTRIBUTES;
+    atr &= ATTRIBUTES;
 }
 
 /* PWP 6-27-88 -- if the tty driver thinks that we can tab, we ask termcap */
-	int
+    int
 CanWeTab(void)
 {
-	return 1;
+    return 1;
 }
 
 /* move to line <where> (first line == 0) as efficiently as possible; */
-	void
+    void
 MoveToLine(int where)
 {
-	int     del;
+    int     del;
 
-	if (where == CursorV)
-		return;
+    if (where == CursorV)
+	return;
 
-	if (where > TermV) {
+    if (where > TermV) {
 #ifdef DEBUG_SCREEN
-		xprintf("MoveToLine: where is ridiculous: %d\r\n", where);
-		flush();
+	xprintf("MoveToLine: where is ridiculous: %d\r\n", where);
+	flush();
 #endif /* DEBUG_SCREEN */
-		return;
-	}
+	return;
+    }
 
-	del = where - CursorV;
+    del = where - CursorV;
 
-	NT_MoveToLineOrChar(del, 1);
+    NT_MoveToLineOrChar(del, 1);
 
-	CursorV = where;		/* now where is here */
+    CursorV = where;		/* now where is here */
 }
 
 /* move to character position (where) as efficiently as possible */
-	void
+    void
 MoveToChar(int where)		
 {
-	if (where == CursorH)
-		return;
+    if (where == CursorH)
+	return;
 
-	if (where >= TermH) {
+    if (where >= TermH) {
 #ifdef DEBUG_SCREEN
-		xprintf("MoveToChar: where is riduculous: %d\r\n", where);
-		flush();
+	xprintf("MoveToChar: where is riduculous: %d\r\n", where);
+	flush();
 #endif /* DEBUG_SCREEN */
-		return;
-	}
+	return;
+    }
 
-	if (!where) {		/* if where is first column */
-		//(void) putraw('\r');	/* do a CR */
-		NT_MoveToLineOrChar(where, 0);
-		flush();
-		CursorH = 0;
-		return;
-	}
-
+    if (!where) {		/* if where is first column */
+	//(void) putraw('\r');	/* do a CR */
 	NT_MoveToLineOrChar(where, 0);
-	CursorH = where;		/* now where is here */
+	flush();
+	CursorH = 0;
+	return;
+    }
+
+    NT_MoveToLineOrChar(where, 0);
+    CursorH = where;		/* now where is here */
 }
 
-	void
+    void
 so_write(register Char *cp, register int n)
 {
-	if (n <= 0)
-		return;			/* catch bugs */
+    if (n <= 0)
+	return;			/* catch bugs */
 
-	if (n > TermH) {
-		return;
+    if (n > TermH) {
+	return;
+    }
+
+    do {
+	if (*cp & LITERAL) {
+	    Char   *d;
+
+	    for (d = litptr + (*cp++ & ~LITERAL) * LIT_FACTOR; *d;
+		    d++)
+		(void) putraw(*d);
 	}
+	else
+	    (void) putraw(*cp++);
+	CursorH++;
+    } while (--n);
 
-	do {
-		if (*cp & LITERAL) {
-			Char   *d;
+    if (CursorH >= TermH) { /* wrap? */
+	CursorH = 0;
+	CursorV++;
+	NT_WrapHorizontal();
 
-			for (d = litptr + (*cp++ & ~LITERAL) * LIT_FACTOR; *d;
-			     d++)
-				(void) putraw(*d);
-		}
-		else
-			(void) putraw(*cp++);
-		CursorH++;
-	} while (--n);
-
-	if (CursorH >= TermH) { /* wrap? */
-		CursorH = 0;
-		CursorV++;
-		NT_WrapHorizontal();
-
-	}
-	else if(CursorH >= DisplayWindowHSize) {
-		flush();
-		NT_MoveToLineOrChar(CursorH,0);
-	}
+    }
+    else if(CursorH >= DisplayWindowHSize) {
+	flush();
+	NT_MoveToLineOrChar(CursorH,0);
+    }
 }
 
 
-	void
+    void
 DeleteChars(int num)		/* deletes <num> characters */
 {
-	if (num <= 0)
-		return;
+    if (num <= 0)
+	return;
 
-	if (!T_CanDel) {
+    if (!T_CanDel) {
 #ifdef DEBUG_EDIT
-		xprintf(CGETS(7, 16, "ERROR: cannot delete\r\n"));
+	xprintf(CGETS(7, 16, "ERROR: cannot delete\r\n"));
 #endif /* DEBUG_EDIT */
-		flush();
-		return;
-	}
+	flush();
+	return;
+    }
 
-	if (num > TermH) {
+    if (num > TermH) {
 #ifdef DEBUG_SCREEN
-		xprintf(CGETS(7, 17, "DeletChars: num is riduculous: %d\r\n"), num);
-		flush();
+	xprintf(CGETS(7, 17, "DeletChars: num is riduculous: %d\r\n"), num);
+	flush();
 #endif /* DEBUG_SCREEN */
-		return;
-	}
+	return;
+    }
 
 }
 
 /* Puts terminal in insert character mode, or inserts num characters in the
    line */
-	void
+    void
 Insert_write(register Char *cp, register int num)
 {
-	if (num <= 0)
-		return;
-	if (!T_CanIns) {
+    if (num <= 0)
+	return;
+    if (!T_CanIns) {
 #ifdef DEBUG_EDIT
-		xprintf(CGETS(7, 18, "ERROR: cannot insert\r\n"));
+	xprintf(CGETS(7, 18, "ERROR: cannot insert\r\n"));
 #endif /* DEBUG_EDIT */
-		flush();
-		return;
-	}
+	flush();
+	return;
+    }
 
-	if (num > TermH) {
+    if (num > TermH) {
 #ifdef DEBUG_SCREEN
-		xprintf(CGETS(7, 19, "StartInsert: num is riduculous: %d\r\n"), num);
-		flush();
+	xprintf(CGETS(7, 19, "StartInsert: num is riduculous: %d\r\n"), num);
+	flush();
 #endif /* DEBUG_SCREEN */
-		return;
-	}
+	return;
+    }
 
 
 }
 
 /* clear to end of line.  There are num characters to clear */
-	void
+    void
 ClearEOL(int num)
 {
 
-	if (num <= 0)
-		return;
+    if (num <= 0)
+	return;
 
-	nt_ClearEOL();
+    nt_ClearEOL();
 
 }
 
-	void
+    void
 ClearScreen(void)
 {				/* clear the whole screen and home */
 
-	NT_ClearScreen();
+    NT_ClearScreen();
 
 }
 
-	void
+    void
 SoundBeep(void)
 {				/* produce a sound */
-	beep_cmd ();
-	if (adrof(STRnobeep))
-		return;
+    beep_cmd ();
+    if (adrof(STRnobeep))
+	return;
 
-	if (adrof(STRvisiblebell))
-		NT_VisibleBell();	/* visible bell */
-	else
-		MessageBeep(MB_ICONQUESTION);
+    if (adrof(STRvisiblebell))
+	NT_VisibleBell();	/* visible bell */
+    else
+	MessageBeep(MB_ICONQUESTION);
 }
 
-	void
+    void
 ClearToBottom(void)
 {				/* clear to the bottom of the screen */
-	NT_ClearEOD();
+    NT_ClearEOD();
 
 }
 
-	void
+    void
 GetTermCaps(void)
 {
-	int lins,cols;
+    int lins,cols;
 
-	nt_getsize(&lins,&cols,&DisplayWindowHSize);
+    nt_getsize(&lins,&cols,&DisplayWindowHSize);
 
-	GotTermCaps = 1;
+    GotTermCaps = 1;
 
-	T_Cols = cols;
-	T_Lines = lins;
-	T_ActualWindowSize = DisplayWindowHSize;
-	T_Margin = MARGIN_AUTO;
-	T_CanCEOL  = 1;
-	T_CanDel = 0;
-	T_CanIns = 0;
-	T_CanUP = 1;
+    T_Cols = cols;
+    T_Lines = lins;
+    T_ActualWindowSize = DisplayWindowHSize;
+    T_Margin = MARGIN_AUTO;
+    T_CanCEOL  = 1;
+    T_CanDel = 0;
+    T_CanIns = 0;
+    T_CanUP = 1;
 
-	ReBufferDisplay();
-	ClearDisp();
+    ReBufferDisplay();
+    ClearDisp();
 
-	return;
+    return;
 }
 /* GetSize():
  *	Return the new window size in lines and cols, and
  *	true if the size was changed.
  */
-	int
+    int
 GetSize(int *lins, int *cols)
 {
 
@@ -493,47 +493,47 @@ GetSize(int *lins, int *cols)
 
     return ret;
 }
-void
+    void
 ChangeSize(int lins, int cols)
 {
 
     int rc = 0;
-	// here we're setting the window size, not the buffer size.
-	// 
-	nt_set_size(lins,cols);
+    // here we're setting the window size, not the buffer size.
+    // 
+    nt_set_size(lins,cols);
 
-	rc = GetSize(&lins,&cols);
+    rc = GetSize(&lins,&cols);
 
 
-	ReBufferDisplay();		/* re-make display buffers */
-	ClearDisp();
+    ReBufferDisplay();		/* re-make display buffers */
+    ClearDisp();
 }
-	void
+    void
 PutPlusOne(Char c, int width)
 {
-	extern int OldvcV;
+    extern int OldvcV;
 
-	while (width > 1 && CursorH + width > DisplayWindowHSize)
-		PutPlusOne(' ', 1);
-	if ((c & LITERAL) != 0) { 
-		Char *d;
-		for (d = litptr + (c & ~LITERAL) * LIT_FACTOR; *d; d++)
-			(void) putwraw(*d);
-	} else {
-		(void) putwraw(c);
-	}
+    while (width > 1 && CursorH + width > DisplayWindowHSize)
+	PutPlusOne(' ', 1);
+    if ((c & LITERAL) != 0) { 
+	Char *d;
+	for (d = litptr + (c & ~LITERAL) * LIT_FACTOR; *d; d++)
+	    (void) putwraw(*d);
+    } else {
+	(void) putwraw(c);
+    }
 
-	Display[CursorV][CursorH++] = (Char) c;
-	while (--width > 0)
-		Display[CursorV][CursorH++] = CHAR_DBWIDTH;
+    Display[CursorV][CursorH++] = (Char) c;
+    while (--width > 0)
+	Display[CursorV][CursorH++] = CHAR_DBWIDTH;
 
-	if (CursorH >= TermH) {	/* if we must overflow */
-		CursorH = 0;
-		CursorV++;
-		OldvcV++;
-		NT_WrapHorizontal();
-	}
-	else if(CursorH >= DisplayWindowHSize) {
-		NT_MoveToLineOrChar(CursorH,0);
-	}
+    if (CursorH >= TermH) {	/* if we must overflow */
+	CursorH = 0;
+	CursorV++;
+	OldvcV++;
+	NT_WrapHorizontal();
+    }
+    else if(CursorH >= DisplayWindowHSize) {
+	NT_MoveToLineOrChar(CursorH,0);
+    }
 }

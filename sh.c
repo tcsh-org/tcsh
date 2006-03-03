@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.c,v 3.128 2006/01/13 16:29:20 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.129 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.128 2006/01/13 16:29:20 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.129 2006/03/02 18:46:44 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -675,7 +675,7 @@ main(int argc, char **argv)
 	 * default isn't appropriate (sg).
 	 */
 
-	int sh_len = 0;
+	size_t sh_len = 0;
 
 	if ((tcp = getenv("SHELL")) != NULL) {
 	    sh_len = strlen(tcp);
@@ -698,12 +698,17 @@ main(int argc, char **argv)
 #ifdef WINNT_NATIVE
     {
 	char *tmp;
-	if ((tmp = getenv("TMP")) != NULL)
+	Char *tmp2;
+	if ((tmp = getenv("TMP")) != NULL) {
 	    tmp = xasprintf("%s/%s", tmp, "sh");
-	else
-	    tmp = SAVE(""); /* FIXME: something different? */
-	shtemp = Strspl(tmp, doldol);	/* For << */
+	    tmp2 = SAVE(tmp);
 	xfree(tmp);
+    }
+	else {
+	    tmp2 = SAVE(""); 
+	}
+	shtemp = Strspl(tmp2, doldol);	/* For << */
+	xfree(tmp2);
     }
 #else /* !WINNT_NATIVE */
     shtemp = Strspl(STRtmpsh, doldol);	/* For << */

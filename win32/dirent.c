@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/dirent.c,v 1.4 2004/05/19 18:22:27 christos Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/dirent.c,v 1.5 2006/01/12 18:15:25 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -43,6 +43,13 @@
 #include "dirent.h"
 #include <winnetwk.h>
 
+#ifndef WINDOWS_ONLY
+#define STRSAFE_NO_DEPRECATE
+#endif /* WINDOWS_ONLY*/
+#define STRSAFE_LIB
+#define STRSAFE_NO_CCH_FUNCTIONS
+#include <strsafe.h>
+
 #pragma intrinsic("memset")
 
 static HANDLE open_enum(char *,WIN32_FIND_DATA*);
@@ -55,98 +62,110 @@ typedef struct _enum_h {
 } nethandle_t;
 
 static int inode= 1; // useless piece that some unix programs need
-DIR * opendir(char *buf) {
+DIR * opendir(const char *inbuf) {
 
-	DIR *dptr;
-	WIN32_FIND_DATA fdata;
-	char *tmp ;
-	int is_net=0;
-	
+    DIR *dptr;
+    WIN32_FIND_DATA fdata;
+    char *tmp  = NULL;
+    char *buf = NULL;
+    int is_net=0;
+    size_t buflen;
 
-	if (!buf)
-		buf = "." ;
-	tmp = buf;
-	while(*tmp) {
+    errno = 0;
+
+    buflen = lstrlen(inbuf) + 1;
+    buf= (char *)heap_alloc(buflen); 
+    (void)StringCbCopy(buf,buflen,inbuf);
+
+    if (!buf)
+	buf = "." ;
+    tmp = buf;
+    while(*tmp) {
 #ifdef DSPMBYTE
-       if (Ismbyte1(*tmp) && *(tmp + 1))
-           tmp ++;
-       else
-#endif DSPMBYTE
-		if (*tmp == '\\')
-			*tmp = '/';
-		tmp++;
-	}
-	/*
-	 * paths like / confuse NT because it looks like a UNC name
-	 * when we append "\*" -amol
-	 */
-	if (*(tmp -1) == '/')
-		*(tmp -1) = 0;
-	tmp= (char *)heap_alloc(lstrlen(buf) + 4); 
-
-	memset(tmp,0,lstrlen(buf) +4);
-
-
-	if ( (buf[0] == '/') && (buf[1] != '/') ) {
-		wsprintf(tmp,"%c:%s*",'A' + (_getdrive()-1),buf);
-	}
-	else if ( (buf[0] == '/')  &&  (buf[1] == '/')  ){
-		is_net = 1;
-		wsprintf(tmp,"%s",buf);
-	}
-	else { 
-		wsprintf(tmp,"%s/*",buf);
-	}
-	
-	dptr = (DIR *)heap_alloc(sizeof(DIR));
-	dptr->dd_fd = INVALID_HANDLE_VALUE;
-	if (!dptr){
-		errno = ENOMEM;
-		heap_free(tmp);
-		return NULL;
-	}
-	
-	if (is_net){
-		dptr->dd_fd = open_enum(tmp,&fdata);
-		dptr->flags = IS_NET;
-	}
-	if (dptr->dd_fd == INVALID_HANDLE_VALUE){
-		wsprintf(tmp,"%s/*",buf);
-		dptr->flags = 0;
-		dptr->dd_fd = FindFirstFile(tmp,&fdata);
-	}
-	if (dptr->dd_fd == INVALID_HANDLE_VALUE){
-		if (GetLastError() == ERROR_DIRECTORY)
-			errno = ENOTDIR;
-		else
-			errno = ENOENT;	
-		heap_free(tmp);
-		heap_free(dptr);
-		return NULL;
-	}
-	memset(dptr->orig_dir_name,0,sizeof(dptr->orig_dir_name));
-	memcpy(dptr->orig_dir_name,tmp,lstrlen(tmp));
-	heap_free(tmp);
-
-	dptr->dd_loc = 0;
-	dptr->dd_size = fdata.nFileSizeLow;
-	dptr->dd_buf = (struct dirent *)heap_alloc(sizeof(struct dirent));
-	if (!dptr->dd_buf){
-		heap_free(dptr);
-		errno = ENOMEM;
-		return NULL;
-	}
-	(dptr->dd_buf)->d_ino = inode++;
-	(dptr->dd_buf)->d_off = 0;
-	(dptr->dd_buf)->d_reclen = 0;
-	if (lstrcmpi(fdata.cFileName,".") ){
-		//dptr->dd_buf->d_name[0] = '.';
-		memcpy((dptr->dd_buf)->d_name,".",2);
-		dptr->flags |= IS_ROOT;
-	}
+	if (Ismbyte1(*tmp) && *(tmp + 1))
+	    tmp ++;
 	else
-		memcpy((dptr->dd_buf)->d_name,fdata.cFileName,MAX_PATH);
-	return dptr;
+#endif DSPMBYTE
+	    if (*tmp == '\\')
+		*tmp = '/';
+	tmp++;
+    }
+    /*
+     * paths like / confuse NT because it looks like a UNC name
+     * when we append "\*" -amol
+     */
+    if (*(tmp -1) == '/')
+	*(tmp -1) = 0;
+
+    buflen = lstrlen(buf) + 4;
+    tmp= (char *)heap_alloc(buflen); 
+
+    if ( (buf[0] == '/') && (buf[1] != '/') ) {
+	(void)StringCbPrintf(tmp,buflen, "%c:%s*",
+			     'A' + (_getdrive()-1),buf);
+    }
+    else if ( (buf[0] == '/')  &&  (buf[1] == '/')  ){
+	is_net = 1;
+	(void)StringCbPrintf(tmp,buflen,"%s",buf);
+    }
+    else { 
+	(void)StringCbPrintf(tmp,buflen,"%s/*",buf);
+    }
+
+    dptr = (DIR *)heap_alloc(sizeof(DIR));
+    dptr->dd_fd = INVALID_HANDLE_VALUE;
+    if (!dptr){
+	errno = ENOMEM;
+	goto done;
+    }
+
+    if (is_net){
+	dptr->dd_fd = open_enum(tmp,&fdata);
+	dptr->flags = IS_NET;
+    }
+    if (dptr->dd_fd == INVALID_HANDLE_VALUE){
+	(void)StringCbPrintf(tmp,buflen,"%s/*",buf);
+	dptr->flags = 0;
+	dptr->dd_fd = FindFirstFile(tmp,&fdata);
+    }
+    if (dptr->dd_fd == INVALID_HANDLE_VALUE){
+	if (GetLastError() == ERROR_DIRECTORY)
+	    errno = ENOTDIR;
+	else
+	    errno = ENOENT;	
+
+	goto done;
+    }
+    memset(dptr->orig_dir_name,0,sizeof(dptr->orig_dir_name));
+    memcpy(dptr->orig_dir_name,tmp,lstrlen(tmp));
+
+    dptr->dd_loc = 0;
+    dptr->dd_size = fdata.nFileSizeLow;
+    dptr->dd_buf = (struct dirent *)heap_alloc(sizeof(struct dirent));
+    if (!dptr->dd_buf){
+	errno = ENOMEM;
+	goto done;
+    }
+    (dptr->dd_buf)->d_ino = inode++;
+    (dptr->dd_buf)->d_off = 0;
+    (dptr->dd_buf)->d_reclen = 0;
+    if (lstrcmpi(fdata.cFileName,".") ){
+	//dptr->dd_buf->d_name[0] = '.';
+	memcpy((dptr->dd_buf)->d_name,".",2);
+	dptr->flags |= IS_ROOT;
+    }
+    else
+	memcpy((dptr->dd_buf)->d_name,fdata.cFileName,MAX_PATH);
+
+done:
+    if(tmp)
+	heap_free(tmp);
+    if(errno) {
+	heap_free(dptr);
+	dptr = NULL;
+    }
+
+    return dptr;
 }
 int closedir(DIR *dptr){
 

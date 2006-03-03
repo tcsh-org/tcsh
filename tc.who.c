@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.who.c,v 3.49 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.50 2006/03/02 18:46:45 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.who.c,v 3.49 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: tc.who.c,v 3.50 2006/03/02 18:46:45 christos Exp $")
 
 #include "tc.h"
 
@@ -226,7 +226,7 @@ watch_login(int force)
 	 * before we are due -amol 6/5/97
 	 */
 	if (!ncbs_posted) {
-	    unsigned long tdiff = t - watch_period;
+	    time_t tdiff = t - watch_period;
 	    if (!watch_period || ((tdiff  > 0) && (tdiff > (interval - 90)))) {
 		start_ncbs(vp);
  		ncbs_posted = 1;
