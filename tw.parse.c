@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.118 2006/03/02 18:46:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.119 2006/03/03 22:08:45 amold Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.118 2006/03/02 18:46:45 christos Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.119 2006/03/03 22:08:45 amold Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -2206,7 +2206,7 @@ StrQcmp(const Char *str1, const Char *str2)
 int
 fcompare(const void *xfile1, const void *xfile2)
 {
-    const Char **file1 = xfile1, **file2 = xfile2;
+    const Char *const *file1 = xfile1, *const *file2 = xfile2;
 
     return collate(*file1, *file2);
 } /* end fcompare */
