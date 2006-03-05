@@ -1,4 +1,4 @@
-# $Id: Makefile.win32,v 1.8 2006/03/03 22:08:45 amold Exp $
+# $Id: Makefile.win32,v 1.9 2006/03/05 08:59:36 amold Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -69,13 +69,13 @@ BLDTYPE=retail
 !if "$(BLDTYPE)" == "debug"
 
 
-NTLDFLAGS=  -entry:silly_entry 
+NTLDFLAGS=  -entry:silly_entry  -debug
 NTCFLAGS = -Zi -DNTDBG   -Od
 LIBES= user32.lib advapi32.lib kernel32.lib $(DEBUG_CRTLIBS) strsafe.lib
 
 !else if "$(BLDTYPE)" == "retail"
 
-NTLDFLAGS=  -entry:silly_entry 
+NTLDFLAGS=  -entry:silly_entry  -debug
 NTCFLAGS = -Zi -O2 
 LIBES= user32.lib advapi32.lib kernel32.lib  $(CRTLIBS) strsafe.lib
 

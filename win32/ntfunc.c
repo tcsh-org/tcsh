@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.15 2006/03/03 22:08:45 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.16 2006/03/05 08:59:36 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -772,6 +772,8 @@ void try_shell_ex(char **argv,int exitsuccess, BOOL throw_ok) {/*FIXRESET*/
 }
 #ifdef NTDBG
 void dodebugbreak(Char **vc, struct command *c) {
+	UNREFERENCED_PARAMETER(vc);
+	UNREFERENCED_PARAMETER(c);
 	DebugBreak();
 }
 #endif NTDBG

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dir.c,v 3.76 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dir.c,v 3.77 2006/03/03 22:08:45 amold Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$tcsh: sh.dir.c,v 3.76 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: sh.dir.c,v 3.77 2006/03/03 22:08:45 amold Exp $")
 
 /*
  * C Shell - directory management
@@ -65,7 +65,7 @@ agetcwd(void)
 
     len = MAXPATHLEN;
     buf = xmalloc(len);
-    while (getcwd(buf, (int)len) == NULL) {
+    while (getcwd(buf, len) == NULL) {
 	int err;
 
 	err = errno;

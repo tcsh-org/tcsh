@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/dirent.c,v 1.6 2006/03/03 22:08:45 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/dirent.c,v 1.7 2006/03/05 08:59:36 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -69,9 +69,8 @@ DIR * opendir(const char *inbuf) {
     char *tmp  = NULL;
     char *buf = NULL;
     int is_net=0;
+	int had_error = 1;
     size_t buflen;
-
-    errno = 0;
 
     buflen = lstrlen(inbuf) + 1;
     buf= (char *)heap_alloc(buflen); 
@@ -116,6 +115,7 @@ DIR * opendir(const char *inbuf) {
     dptr->dd_fd = INVALID_HANDLE_VALUE;
     if (!dptr){
 	errno = ENOMEM;
+	had_error =1
 	goto done;
     }
 
@@ -134,6 +134,7 @@ DIR * opendir(const char *inbuf) {
 	else
 	    errno = ENOENT;	
 
+	had_error =1
 	goto done;
     }
     memset(dptr->orig_dir_name,0,sizeof(dptr->orig_dir_name));
@@ -144,6 +145,7 @@ DIR * opendir(const char *inbuf) {
     dptr->dd_buf = (struct dirent *)heap_alloc(sizeof(struct dirent));
     if (!dptr->dd_buf){
 	errno = ENOMEM;
+	had_error=1;
 	goto done;
     }
     (dptr->dd_buf)->d_ino = inode++;
@@ -160,7 +162,7 @@ DIR * opendir(const char *inbuf) {
 done:
     if(tmp)
 	heap_free(tmp);
-    if(errno) {
+    if(had_error) {
 	heap_free(dptr);
 	dptr = NULL;
     }

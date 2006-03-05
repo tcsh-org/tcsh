@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/support.c,v 1.8 2006/03/03 22:08:45 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/support.c,v 1.9 2006/03/05 08:59:36 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -133,7 +133,7 @@ void caseify_pwd(char *curwd) {
 
 }
 static char defcwd[MAX_PATH];
-char * forward_slash_get_cwd(char * path, int maxlen) {
+char * forward_slash_get_cwd(char * path, size_t maxlen) {
 
 	char *ptemp;
 	Char *vp;
@@ -144,7 +144,7 @@ char * forward_slash_get_cwd(char * path, int maxlen) {
 		maxlen = MAX_PATH;
 	}
 
-	rc = GetCurrentDirectory(maxlen,path);
+	rc = GetCurrentDirectory((DWORD)maxlen,path);
 	if (rc > maxlen) {
 		errno = ERANGE;
 		return NULL;
