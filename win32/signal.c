@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/signal.c,v 1.6 2004/10/18 02:32:17 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/signal.c,v 1.7 2006/03/03 22:08:45 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -41,6 +41,7 @@
 #include "forkdata.h"
 #include "signal.h"
 
+#pragma warning(disable:4055)
 
 #define SIGBAD(signo)        ( (signo) <=0 || (signo) >=NSIG) 
 #define fast_sigmember(a,b)  ( (*(a) & (1 << (b-1)) ) )
@@ -89,8 +90,7 @@ void nt_init_signals(void) {
 					0,
 					FALSE,
 					DUPLICATE_SAME_ACCESS)){
-		int err = GetLastError();
-		ExitProcess(0);
+		ExitProcess(GetLastError());
 	}
 	hsigsusp = CreateEvent(NULL,FALSE,FALSE,NULL);
 	__h_con_alarm=CreateEvent(NULL,FALSE,FALSE,NULL);
@@ -230,7 +230,8 @@ int sigaction(int signo, const struct sigaction *act, struct sigaction *oact) {
 			oact->sa_mask = 0;
 			oact->sa_flags =0;
 	}
-	if (signo == SIGHUP &&  (act && act->sa_handler == SIG_IGN) && __forked)
+	if ((signo == SIGHUP) && (act && (act->sa_handler == SIG_IGN)) 
+						&& __forked)
 		__nt_child_nohupped = 1;
 	if (act)
 		handlers[signo]=act->sa_handler;
@@ -379,6 +380,7 @@ int waitpid(pid_t pid, int *statloc, int options) {
 	ChildListNode *temp;
 	int retcode;
 
+	UNREFERENCED_PARAMETER(options);
 	errno = EINVAL;
 	if (pid != -1)
 		return -1;
@@ -443,7 +445,9 @@ unsigned int alarm(unsigned int seconds) {
 	__alarm_set = 1;
 
 	ht = CreateThread(NULL,gdwStackSize,
-				(LPTHREAD_START_ROUTINE)alarm_callback, (void*)seconds,0,&tid);
+				(LPTHREAD_START_ROUTINE)alarm_callback, 
+				(void*)UIntToPtr(seconds),
+				0,&tid);
 	if (ht)
 		CloseHandle(ht);
 	
@@ -476,6 +480,8 @@ end:
 }
 void sig_child_callback(DWORD pid,DWORD exitcode) {
 	
+	DWORD ecode = 0;
+
 	EnterCriticalSection(&sigcritter);
 	add_to_child_list(pid,exitcode);
 	suspend_main_thread();
@@ -485,7 +491,7 @@ void sig_child_callback(DWORD pid,DWORD exitcode) {
 	__try {
 		generic_handler(SIGCHLD);
 	}
-	__except(1) {
+	__except(ecode = GetExceptionCode()) {
 		;
 	}
 	resume_main_thread();
@@ -648,8 +654,8 @@ Niceness    Base    Priority class/thread priority
 ****************************************************************************/
 int nice(int niceness) {
 
-    DWORD pclass;
-    int priority;
+    DWORD pclass = IDLE_PRIORITY_CLASS;
+    int priority = THREAD_PRIORITY_NORMAL;
 
     if (niceness < -6 || niceness > 7) {
         errno = EPERM;
@@ -713,12 +719,10 @@ int nice(int niceness) {
     }
 
     if (!SetPriorityClass(GetCurrentProcess(),pclass)){
-        int err = GetLastError() ;
         errno = EPERM;
         return -1;
     }
     if (!SetThreadPriority(GetCurrentThread(),priority)){
-        int err = GetLastError() ;
         errno = EPERM;
         return -1;
     }

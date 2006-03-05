@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/clip.c,v 1.7 2005/03/25 18:46:42 kim Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/clip.c,v 1.8 2005/04/11 22:11:02 kim Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -103,7 +103,7 @@ BOOL InitApplication(HINSTANCE hInstance)
 	wc.hInstance     = hInstance;
 	wc.hIcon         = NULL;//LoadIcon (hInstance, szAppName);
 	wc.hCursor       = NULL;//LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wc.hbrBackground = (HBRUSH)IntToPtr(COLOR_WINDOW+1);
 
 	wc.lpszMenuName  = NULL;
 	wc.lpszClassName = "tcshclipboard";
@@ -124,6 +124,8 @@ BOOL InitApplication(HINSTANCE hInstance)
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
    HWND hWnd;
 
+
+   UNREFERENCED_PARAMETER(nCmdShow);
 
    hWnd = CreateWindow("tcshclipboard", "tcshclipboard", 
    			WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0,
@@ -159,11 +161,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 CCRETVAL e_copy_to_clipboard(Char c) {
 	unsigned char *cbp;
 	Char *kp;
-	int err,len;
+	int err;
+	size_t len;
 	unsigned char *clipbuf;
 	HANDLE hclipbuf;
 
-	USE(c);
+	UNREFERENCED_PARAMETER(c);
 
 	if (!ghwndmain)	
 		return (CC_ERROR);
@@ -188,7 +191,7 @@ CCRETVAL e_copy_to_clipboard(Char c) {
 	cbp = clipbuf;
 		
 	while(*kp != '\0') {
-		*cbp = *kp & CHAR;
+		*cbp = (u_char)(*kp & CHAR);
 		cbp++;kp++;
 	}
 	*cbp = 0;
@@ -222,6 +225,8 @@ CCRETVAL e_paste_from_clipboard(Char c) {
 	unsigned char *clipbuf;
 
 
+
+	UNREFERENCED_PARAMETER(c);
 
 	if (!ghwndmain)	
 		return (CC_ERROR);
@@ -285,7 +290,7 @@ void clip_writer_proc(HANDLE hinpipe) {
 	ptrloc = 0;
 	spleft = rbsize;
 
-	while(1) {
+	while(spleft) {
 		if (!ReadFile(hinpipe,ptr,spleft,&bread,NULL)) {
 			spleft = GetLastError();
 			dprintf("hinpipe returend %d\n",spleft);
@@ -299,16 +304,21 @@ void clip_writer_proc(HANDLE hinpipe) {
 		spleft -=bread;
 
 		if (spleft <=0){
+			u_char *tmp;
+
 			rbsize <<=1;
+
+			tmp = realbuf;
 			realbuf = heap_realloc(realbuf,rbsize);
-			if (!realbuf)
+			if (!realbuf) {
+				realbuf = tmp;
 				break;
+			}
 			spleft += rbsize >> 1;
 
 			ptr = realbuf+ptrloc;
 
 			dprintf("updated size now %d, splef %d, ptrloc %d, ptr 0x%08x, realbuf 0x%08x\n",rbsize,spleft,ptrloc,ptr,realbuf);
-			//break;
 		}
 	}
 	CloseHandle(hinpipe);
@@ -320,7 +330,7 @@ void clip_writer_proc(HANDLE hinpipe) {
 		is_dev_clipboard_active=0;
 		return;
 	}
-	clipbuf = (char*)GlobalLock(hclipbuf);
+	clipbuf = (u_char*)GlobalLock(hclipbuf);
 
 	if (!clipbuf){
 		err = GetLastError();
@@ -483,8 +493,8 @@ e_dosify_next(Char c)
 		if ( ((*cp & CHAR) == ' ') && ((cp[-1] & CHAR) != '\\') )
 			bDone = TRUE;
 		if (!bDone &&  (*cp & CHAR) == '/')  {
-			*bp++ = '\\'  | (*cp & ~(*cp & CHAR) );
-			*bp++ = '\\'  | (*cp & ~(*cp & CHAR) );
+			*bp++ = '\\'  | (Char)(*cp & ~(*cp & CHAR) );
+			*bp++ = '\\'  | (Char)(*cp & ~(*cp & CHAR) );
 
 			len++;
 

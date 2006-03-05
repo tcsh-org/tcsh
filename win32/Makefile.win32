@@ -1,4 +1,4 @@
-# $Id: Makefile.win32,v 1.6 2005/05/25 03:01:19 amold Exp $
+# $Id: Makefile.win32,v 1.8 2006/03/03 22:08:45 amold Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -20,7 +20,7 @@ BUILD=tcsh.exe
 # but to use the global optimizer on the mips boxes, see below
 #
 SUF=obj
-CF=-c -nologo
+CF=-c -nologo 
 
 INCLUDES=-I. -I.. -Iwin32 
 
@@ -28,13 +28,31 @@ DEBUG_CRTLIBS= libcmtd.lib oldnames.lib  libcpmtd.lib
 CRTLIBS= libcmt.lib oldnames.lib libcpmt.lib
 
 EXTRAFLAGS = -DWINNT_NATIVE -DNO_CRYPT -DHAVE_DIRENT_H
+WINDOWS_WARNING_LEVEL=-W4 -WX
+REST_WARNING_LEVEL=-WX -W3
+ANALYZE_FLAGS = -analyze
 
 !if "$(PROCESSOR_ARCHITECTURE)" == "x86"
+
 ARCH = i386
+
 !else if "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
+
 ARCH = alpha
+
+!else if "$(PROCESSOR_ARCHITECTURE)" == "AMD64"
+
+ARCH = amd64 
+#main code is broken for 64-bit. ignore warnings and pray it works
+ 
+REST_WARNING_LEVEL= -W3
+ANALYZE_FLAGS= 
+IGNORE_64= -wd4244 -wd4267 
+
 !else  #Assume win9x
+
 ARCH = i386
+
 !endif
 
 
@@ -51,13 +69,13 @@ BLDTYPE=retail
 !if "$(BLDTYPE)" == "debug"
 
 
-NTLDFLAGS=  -debug:full -pdb:none -entry:silly_entry #-profile
+NTLDFLAGS=  -entry:silly_entry 
 NTCFLAGS = -Zi -DNTDBG   -Od
 LIBES= user32.lib advapi32.lib kernel32.lib $(DEBUG_CRTLIBS) strsafe.lib
 
 !else if "$(BLDTYPE)" == "retail"
 
-NTLDFLAGS=  -debug:full -entry:silly_entry -pdb:none
+NTLDFLAGS=  -entry:silly_entry 
 NTCFLAGS = -Zi -O2 
 LIBES= user32.lib advapi32.lib kernel32.lib  $(CRTLIBS) strsafe.lib
 
@@ -70,7 +88,7 @@ LIBES= user32.lib advapi32.lib kernel32.lib  $(CRTLIBS) strsafe.lib
 NTCFLAGS = $(NTCFLAGS) -Zp8
 !endif
 
-CFLAGS= -MT -W3 -WX $(NTCFLAGS) $(INCLUDES) 
+CFLAGS= -MT $(NTCFLAGS) $(INCLUDES) 
 LDFLAGS= -nodefaultlib $(NTLDFLAGS) -stack:1048576,524288
 
 
@@ -177,7 +195,7 @@ chlog:
 
 
 .c.$(SUF):
-	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS) $<
+	$(CC) $(CF) $(CFLAGS) $(REST_WARNING_LEVEL) $(DFLAGS) $(EXTRAFLAGS) $<
 
 
 ed.defns.h: ed.defns.c
@@ -260,10 +278,17 @@ $(EDOBJS) $(EDDINC): ed.defns.h
 
 # tc.defs.o
 tc.defs.$(SUF):	tc.defs.c sh.h
+
+# too many 64-bit warnings in these files. for now, turn the warning off.
+ed.chared.$(SUF): ed.chared.c
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS)  $(IGNORE_64) ed.chared.c
+ed.inputl.$(SUF): ed.inputl.c
+	$(CC) $(CF) $(CFLAGS) $(DFLAGS) $(EXTRAFLAGS)  $(IGNORE_64) ed.inputl.c
+	
 #
 # NT dependencies and rules
 #
-CFLAGS_WX = $(CFLAGS) -WX -DWINDOWS_ONLY
+CFLAGS_WX = $(CFLAGS) $(WINDOWS_WARNING_LEVEL) -DWINDOWS_ONLY $(ANALYZE_FLAGS)
 
 dirent.$(SUF):win32\dirent.c $(NTH) $(NTH2)
 	$(CC) $(CF) $(CFLAGS_WX) $(DFLAGS) $(EXTRAFLAGS) win32\dirent.c

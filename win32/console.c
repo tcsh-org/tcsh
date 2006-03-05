@@ -1,4 +1,4 @@
-/*$Header: /src/pub/tcsh/win32/console.c,v 1.6 2004/05/19 18:22:27 christos Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/console.c,v 1.7 2006/01/12 18:15:25 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -38,6 +38,10 @@
 #include <stdio.h>
 #include "ntport.h"
 
+
+// int to SHORT. caused by all the stupid functions that take WORDs
+#pragma warning(disable:4244)
+
 void ScrollBuf(HANDLE,CONSOLE_SCREEN_BUFFER_INFO*,int);
 void NT_MoveToLineOrChar(int ,int ) ;
 WORD get_attributes();
@@ -61,7 +65,6 @@ static int nt_is_raw;
 // Seems to have helped the speed a bit. -amol
 //
 HANDLE ghstdout;
-CONSOLE_SCREEN_BUFFER_INFO gscrbuf;
 HANDLE ghReverse;
 
 //
@@ -69,21 +72,22 @@ HANDLE ghReverse;
 //
 void redo_console(void) {
 
+	CONSOLE_SCREEN_BUFFER_INFO scrbuf;
 	HANDLE hTemp= GetStdHandle(STD_OUTPUT_HANDLE);
 	WORD dbga;
 	DWORD wrote;
 	COORD origin = {0,0};
 
 	if (!DuplicateHandle(GetCurrentProcess(),hTemp,GetCurrentProcess(),
-						&ghstdout,0,TRUE,DUPLICATE_SAME_ACCESS) ) {
-						;
+				&ghstdout,0,TRUE,DUPLICATE_SAME_ACCESS) ) {
+		;
 	}
 
-	if(!GetConsoleScreenBufferInfo(ghstdout, &gscrbuf) ) {
+	if(!GetConsoleScreenBufferInfo(ghstdout, &scrbuf) ) {
 		wNormalAttributes = FOREGROUND_BLACK | BACKGROUND_WHITE;
 	}
 	else
-		wNormalAttributes = gscrbuf.wAttributes;
+		wNormalAttributes = scrbuf.wAttributes;
 
 	ghReverse = CreateConsoleScreenBuffer(GENERIC_READ|GENERIC_WRITE,
 			FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -92,12 +96,12 @@ void redo_console(void) {
 			NULL);
 
 	dbga = ((wNormalAttributes & 0x00f0) >> 4) |
-						((wNormalAttributes & 0x000f) << 4) ;
+		((wNormalAttributes & 0x000f) << 4) ;
 
 	FillConsoleOutputAttribute(ghReverse,dbga,
-				gscrbuf.dwSize.X*gscrbuf.dwSize.Y,
-				origin,
-				&wrote);
+			scrbuf.dwSize.X*scrbuf.dwSize.Y,
+			origin,
+			&wrote);
 }
 void nt_term_cleanup(void) {
 	CloseHandle(ghstdout);
@@ -133,8 +137,8 @@ void do_nt_raw_mode() {
 		;
 	}
 	if(!SetConsoleMode(hinput,dwmode & (~(
-				ENABLE_LINE_INPUT |ENABLE_ECHO_INPUT 
-				| ENABLE_PROCESSED_INPUT)| ENABLE_WINDOW_INPUT )
+						ENABLE_LINE_INPUT |ENABLE_ECHO_INPUT 
+						| ENABLE_PROCESSED_INPUT)| ENABLE_WINDOW_INPUT )
 				) ){
 		return;
 	}
@@ -152,8 +156,8 @@ void do_nt_cooked_mode() {
 		;
 	}
 	if(!SetConsoleMode(hinput,dwmode | ( (
-				ENABLE_LINE_INPUT|ENABLE_ECHO_INPUT |
-				ENABLE_PROCESSED_INPUT) )
+						ENABLE_LINE_INPUT|ENABLE_ECHO_INPUT |
+						ENABLE_PROCESSED_INPUT) )
 				) ){
 	}
 	nt_is_raw = 0;
@@ -183,27 +187,27 @@ int nt_ClearEOL( void) {
 
 	savepos = scrbuf.dwCursorPosition;
 	if (!FillConsoleOutputCharacter(hStdout,' ',num,scrbuf.dwCursorPosition,
-		&numwrote) ){
+				&numwrote) ){
 		dprintf("error from FillCons %s",errbuf);
 	}
 	else if (!FillConsoleOutputAttribute(hStdout,scrbuf.wAttributes, num,
-		scrbuf.dwCursorPosition,&numwrote)) {
+				scrbuf.dwCursorPosition,&numwrote)) {
 		dprintf("error from FillConsAttr %s",errbuf);
 	}
 	return 0;
 }
 void nt_move_next_tab(void) {
 
-	CONSOLE_SCREEN_BUFFER_INFO gscrbuf;
+	CONSOLE_SCREEN_BUFFER_INFO scrbuf;
 	HANDLE hStdout = ghstdout;
 	int where;
 
-	if(!GetConsoleScreenBufferInfo(hStdout, &gscrbuf) ) {
+	if(!GetConsoleScreenBufferInfo(hStdout, &scrbuf) ) {
 		;
 	}
-	where = 8 - (gscrbuf.dwCursorPosition.X+1)%8;
-	gscrbuf.dwCursorPosition.X += where;
-	if (!SetConsoleCursorPosition(hStdout, gscrbuf.dwCursorPosition) ) {
+	where = 8 - (scrbuf.dwCursorPosition.X+1)%8;
+	scrbuf.dwCursorPosition.X += where;
+	if (!SetConsoleCursorPosition(hStdout, scrbuf.dwCursorPosition) ) {
 		;
 	}
 
@@ -219,8 +223,8 @@ void NT_VisibleBell(void) {
 
 }
 void NT_WrapHorizontal(void) {
-    SMALL_RECT wnd;
-    CONSOLE_SCREEN_BUFFER_INFO scrbuf;
+	SMALL_RECT wnd;
+	CONSOLE_SCREEN_BUFFER_INFO scrbuf;
 
 
 	if (ghstdout == INVALID_HANDLE_VALUE){
@@ -229,13 +233,13 @@ void NT_WrapHorizontal(void) {
 	if(!GetConsoleScreenBufferInfo(ghstdout, &scrbuf) ) {
 		return;
 	}
-    //absolute movement
-    wnd.Left =  0;//scrbuf.srWindow.Left ;
-    wnd.Right = scrbuf.srWindow.Right- scrbuf.srWindow.Left + 1;
-    wnd.Top =  scrbuf.srWindow.Top;
-    wnd.Bottom = scrbuf.srWindow.Bottom;
+	//absolute movement
+	wnd.Left =  0;//scrbuf.srWindow.Left ;
+	wnd.Right = scrbuf.srWindow.Right- scrbuf.srWindow.Left + 1;
+	wnd.Top =  scrbuf.srWindow.Top;
+	wnd.Bottom = scrbuf.srWindow.Bottom;
 
-    SetConsoleWindowInfo(ghstdout,TRUE,&wnd);
+	SetConsoleWindowInfo(ghstdout,TRUE,&wnd);
 }
 void ScrollBufHorizontal(HANDLE hOut, CONSOLE_SCREEN_BUFFER_INFO *scrbuf,
 		int where) {
@@ -288,10 +292,10 @@ void NT_MoveToLineOrChar(int where,int line) {
 	if(!GetConsoleScreenBufferInfo(hStdout, &scrbuf) ) {
 		return;
 	}
-		
+
 	if (line){
 		if ( ((scrbuf.dwCursorPosition.Y+where)> (scrbuf.srWindow.Bottom-1))
-			&&( where >0)){
+				&&( where >0)){
 			ScrollBuf(hStdout,&scrbuf,where);
 			scrbuf.dwCursorPosition.Y += where;
 		}
@@ -365,17 +369,17 @@ BOOL ConsolePageUpOrDown(BOOL Up) {
 	if (Up)
 		diff = -diff;
 
-    if ((scrbuf.srWindow.Top + diff > 0) &&
-          (scrbuf.srWindow.Bottom + diff < scrbuf.dwSize.Y)) { 
-        srect.Top = diff;  
-        srect.Bottom = diff;
-        srect.Left = 0;    
-        srect.Right = 0;  
- 
-        if (! SetConsoleWindowInfo( hStdout, FALSE, &srect)) {
+	if ((scrbuf.srWindow.Top + diff > 0) &&
+			(scrbuf.srWindow.Bottom + diff < scrbuf.dwSize.Y)) { 
+		srect.Top = diff;  
+		srect.Bottom = diff;
+		srect.Left = 0;    
+		srect.Right = 0;  
+
+		if (! SetConsoleWindowInfo( hStdout, FALSE, &srect)) {
 			return FALSE;
-        }
-    } 
+		}
+	} 
 
 	return TRUE;
 }
@@ -421,7 +425,7 @@ void nt_set_size(int lins, int cols) {
 		expand = 1;
 		scrbuf.dwSize.Y = lins+1;
 	}
-	
+
 	if (expand && !SetConsoleScreenBufferSize(ghstdout,scrbuf.dwSize))
 		return;
 
@@ -451,7 +455,7 @@ void NT_ClearEOD(void) {
 		return ;
 	}
 	if (!FillConsoleOutputAttribute(hStdout,scrbuf.wAttributes, ht*wt,
-		scrbuf.dwCursorPosition,&numwrote)) {
+				scrbuf.dwCursorPosition,&numwrote)) {
 		return;
 	}
 	return;
@@ -471,11 +475,11 @@ void NT_ClearScreen(void) {
 	origin.X = scrbuf.srWindow.Left;
 	origin.Y = scrbuf.srWindow.Top;
 	if(!FillConsoleOutputCharacter(hStdout,' ',scrbuf.dwSize.X*scrbuf.dwSize.Y,
-		origin,&numwrote) ) {
+				origin,&numwrote) ) {
 		;
 	}
 	if (!FillConsoleOutputAttribute(hStdout,scrbuf.wAttributes,
-		scrbuf.dwSize.X*scrbuf.dwSize.Y,origin,&numwrote)) {
+				scrbuf.dwSize.X*scrbuf.dwSize.Y,origin,&numwrote)) {
 		;
 	}
 	if (!SetConsoleCursorPosition(hStdout, origin) ) { // home cursor
@@ -496,11 +500,11 @@ void NT_ClearScreen_WholeBuffer(void) {
 		;
 	}
 	if(!FillConsoleOutputCharacter(hStdout,' ',scrbuf.dwSize.X*scrbuf.dwSize.Y,
-		origin,&numwrote) ) {
+				origin,&numwrote) ) {
 		;
 	}
 	if (!FillConsoleOutputAttribute(hStdout,scrbuf.wAttributes,
-		scrbuf.dwSize.X*scrbuf.dwSize.Y,origin,&numwrote)) {
+				scrbuf.dwSize.X*scrbuf.dwSize.Y,origin,&numwrote)) {
 		;
 	}
 	if (!SetConsoleCursorPosition(hStdout, origin) ) { // home cursor
@@ -539,9 +543,9 @@ void set_cons_attr(char *attr2) {
 
 
 /*
-  color escape sequences (ISO 6429, aixterm)
-  - nayuta
-*/
+   color escape sequences (ISO 6429, aixterm)
+   - nayuta
+ */
 
 
 WORD get_attributes() {
@@ -560,7 +564,7 @@ WORD get_attributes() {
 
 void set_attributes(const unsigned char *color) {
 
-	static const colors[8] = { 0, 4, 2, 6, 1, 5, 3, 7 };
+	static const int colors[8] = { 0, 4, 2, 6, 1, 5, 3, 7 };
 	WORD wAttributes;
 	const char *t;
 
@@ -573,12 +577,12 @@ void set_attributes(const unsigned char *color) {
 	}
 
 	wAttributes = get_attributes();
-	t = color;
+	t = (char*)color;
 
 	while (t) {
 		int n = atoi(t);
 
-		if ((t = strchr(t, ';')))
+		if ((t = strchr(t, ';')) != NULL)
 			t++;
 
 		if      (n == 0)				// Normal (default)

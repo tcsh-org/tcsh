@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/dirent.c,v 1.5 2006/01/12 18:15:25 christos Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/dirent.c,v 1.6 2006/03/03 22:08:45 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -65,7 +65,7 @@ static int inode= 1; // useless piece that some unix programs need
 DIR * opendir(const char *inbuf) {
 
     DIR *dptr;
-    WIN32_FIND_DATA fdata;
+    WIN32_FIND_DATA fdata = {0};
     char *tmp  = NULL;
     char *buf = NULL;
     int is_net=0;
@@ -208,7 +208,7 @@ void rewinddir(DIR *dptr) {
 }
 struct dirent *readdir(DIR *dir) {
 
-	WIN32_FIND_DATA fdata;
+	WIN32_FIND_DATA fdata = {0};
 	HANDLE hfind;
 	char *tmp ;
 
@@ -333,7 +333,7 @@ int enum_next_share(DIR *dir) {
 	nethandle_t *hnet;
 	char *tmp,*p1;
 	HANDLE henum;
-	int count, breq,ret;
+	DWORD count, breq,ret;
 
 	hnet = (nethandle_t*)(dir->dd_fd);
 	henum = hnet->henum;
