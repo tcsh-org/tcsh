@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.glob.c,v 3.69 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.70 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.69 2006/02/14 14:07:36 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.70 2006/03/02 18:46:44 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -754,13 +754,13 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 	    if (seterr)
 		stderror(ERR_OLD);
 #ifdef SIGTSTP
-	    (void) sigignore(SIGTSTP);
+	    signal(SIGTSTP, SIG_IGN);
 #endif
 #ifdef SIGTTIN
-	    (void) sigignore(SIGTTIN);
+	    signal(SIGTTIN, SIG_IGN);
 #endif
 #ifdef SIGTTOU
-	    (void) sigignore(SIGTTOU);
+	    signal(SIGTTOU, SIG_IGN);
 #endif
 	    execute(t, -1, NULL, NULL, TRUE);
 

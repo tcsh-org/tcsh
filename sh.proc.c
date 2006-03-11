@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.c,v 3.97 2006/02/14 00:52:52 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.98 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.97 2006/02/14 00:52:52 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.98 2006/03/02 18:46:44 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1790,7 +1790,7 @@ pfork(struct command *t, int wanttty)
 	    (void) signal(SIGQUIT, SIG_IGN);
 	}
 #ifdef OREO
-	sigignore(SIGIO);	/* ignore SIGIO in child too */
+	signal(SIGIO, SIG_IGN);	/* ignore SIGIO in child too */
 #endif /* OREO */
 
 	pgetty(wanttty, pgrp);
@@ -1910,7 +1910,7 @@ setttypgrp(int pgrp)
 	 * the background according to POSIX... We ignore this here.
 	 */
 	sigaction(SIGTTOU, NULL, &old);
-	sigset(SIGTTOU, SIG_IGN);
+	signal(SIGTTOU, SIG_IGN);
 #endif
 	(void) tcsetpgrp(FSHTTY, pgrp);
 # ifdef POSIXJOBS

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.c,v 3.65 2006/02/17 02:27:55 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.c,v 3.66 2006/03/02 18:46:45 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.os.c,v 3.65 2006/02/17 02:27:55 christos Exp $")
+RCSID("$tcsh: tc.os.c,v 3.66 2006/03/02 18:46:45 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -841,13 +841,13 @@ dobs2cmd(Char **v, struct command *c)
 /*        closem();*/
 	sigrelse(SIGINT);
 #ifdef SIGTSTP
-        (void) sigignore(SIGTSTP);
+        signal(SIGTSTP, SIG_IGN);
 #endif
 #ifdef SIGTTIN
-        (void) sigignore(SIGTTIN);
+        signal(SIGTTIN, SIG_IGN);
 #endif
 #ifdef SIGTTOU
-        (void) sigignore(SIGTTOU);
+        signal(SIGTTOU, SIG_IGN);
 #endif
         xexit(bs2cmdlist(cmd));
     }
@@ -1114,7 +1114,7 @@ osinit(void)
 #ifdef OREO
     set42sig();
     setcompat(getcompat() & ~COMPAT_EXEC);
-    sigignore(SIGIO);		/* ignore SIGIO */
+    signal(SIGIO, SIG_IGN);		/* ignore SIGIO */
 #endif /* OREO */
 
 #ifdef aiws

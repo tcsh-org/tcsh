@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tw.help.c,v 3.24 2006/01/12 19:55:39 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.help.c,v 3.25 2006/03/02 18:46:45 christos Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.help.c,v 3.24 2006/01/12 19:55:39 christos Exp $")
+RCSID("$tcsh: tw.help.c,v 3.25 2006/03/02 18:46:45 christos Exp $")
 
 #include "tw.h"
 #include "tc.h"
@@ -141,8 +141,9 @@ do_help(const Char *command)
 		sigaction(SIGINT, NULL, &orig_intr);
 		cleanup_push(&orig_intr, sigint_cleanup);
 		sigprocmask(SIG_UNBLOCK, NULL, &orig_mask);
-		sigset(SIGINT, cleanf);
 		cleanup_push(&orig_mask, sigprocmask_cleanup);
+		signal(SIGINT, cleanf);
+		sigrelse(SIGINT);
 		while ((len = xread(f, buf, sizeof(buf))) > 0)
 		    (void) xwrite(SHOUT, buf, len);
 		cleanup_until(&f);

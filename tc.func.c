@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.131 2006/03/02 18:46:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.132 2006/03/03 22:08:45 amold Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.131 2006/03/02 18:46:45 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.132 2006/03/03 22:08:45 amold Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -613,7 +613,8 @@ xgetpass(const char *prm)
 
     sigprocmask(SIG_UNBLOCK, NULL, &omask);
     sigaction(SIGINT, NULL, &sigint);
-    sigset(SIGINT, SIG_IGN);
+    signal(SIGINT, SIG_IGN);
+    sigrelse(SIGINT);
     cleanup_push(&sigint, sigint_cleanup);
     cleanup_push(&omask, sigprocmask_cleanup);
     (void) Rawmode();	/* Make sure, cause we want echo off */
@@ -2000,7 +2001,8 @@ remotehost(void)
     if (pid == 0) {
 	xclose(fds[0]);
 	/* Don't get stuck if the resolver does not work! */
-	sigset(SIGALRM, palarm);
+	signal(SIGALRM, palarm);
+	sigrelse(SIGALRM);
 	(void) alarm(2);
 	getremotehost(fds[1]);
 	/*NOTREACHED*/

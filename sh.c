@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.129 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.130 2006/03/03 22:08:45 amold Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.129 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.130 2006/03/03 22:08:45 amold Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1651,10 +1651,14 @@ goodbye(Char **v, struct command *c)
     if (loginsh) {
 	size_t omark;
 
-	(void) sigset(SIGQUIT, SIG_IGN);
-	(void) sigset(SIGINT, SIG_IGN);
-	(void) sigset(SIGTERM, SIG_IGN);
-	(void) sigset(SIGHUP, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+	sigrelse(SIGQUIT);
+	signal(SIGINT, SIG_IGN);
+	sigrelse(SIGINT);
+	signal(SIGTERM, SIG_IGN);
+	sigrelse(SIGTERM);
+	signal(SIGHUP, SIG_IGN);
+	sigrelse(SIGHUP);
 	phup_disabled = 1;
 	setintr = 0;		/* No interrupts after "logout" */
 	/* Trap errors inside .logout */
