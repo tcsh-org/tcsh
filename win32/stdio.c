@@ -51,7 +51,6 @@
 
 #define FIOCLEX 1
 #define FCONSOLE 2
-#define FRESOURCE 4 //stringtable resource
 
 typedef struct _myfile {
 	HANDLE  handle;
@@ -157,9 +156,6 @@ void copy_fds(void ) {
 		__gOpenFilesCopy[i].flags = __gOpenFiles[i].flags;
 	}
 }
-int is_resource_file(int fd) {
-	return (__gOpenFiles[fd].flags & FRESOURCE);
-}
 intptr_t __nt_get_osfhandle(int fd) {
 	return (intptr_t)(__gOpenFiles[fd].handle);
 }
@@ -180,11 +176,6 @@ int __nt_open_osfhandle(intptr_t h1, int mode) {
 }
 int nt_close(int fd) {
 
-	if (__gOpenFiles[fd].flags & FRESOURCE) {
-		__gOpenFiles[fd].handle = INVHL;
-		__gOpenFiles[fd].flags = 0;
-		return 0;
-	}
 	if( (fd == -1) ||(__gOpenFiles[fd].handle == INVHL))
 		return 0;
 	CloseHandle((HANDLE)(__gOpenFiles[fd].handle));
@@ -291,22 +282,17 @@ int nt_dup(int fdin) {
 	HANDLE horig =  __gOpenFiles[fdin].handle;
 	int ret;
 
-	if (__gOpenFiles[fdin].flags & FRESOURCE) {
-		hdup = __gOpenFiles[fdin].handle;
-	}
-	else {
 
-		if (!DuplicateHandle(GetCurrentProcess(),
-					horig,
-					GetCurrentProcess(),
-					&hdup,
-					0,
-					FALSE,
-					DUPLICATE_SAME_ACCESS)) {
-			errno = GetLastError();
-			errno = EBADF;
-			return -1;
-		}
+	if (!DuplicateHandle(GetCurrentProcess(),
+				horig,
+				GetCurrentProcess(),
+				&hdup,
+				0,
+				FALSE,
+				DUPLICATE_SAME_ACCESS)) {
+		errno = GetLastError();
+		errno = EBADF;
+		return -1;
 	}
 	ret = __nt_open_osfhandle((intptr_t)hdup,_O_BINARY | _O_NOINHERIT);
 
@@ -319,11 +305,6 @@ int nt_dup2(int fdorig,int fdcopy) {
 	HANDLE hdup;
 	HANDLE horig =  __gOpenFiles[fdorig].handle;
 
-	if (__gOpenFiles[fdorig].flags & FRESOURCE) {
-		__gOpenFiles[fdcopy].handle = __gOpenFiles[fdorig].handle;
-		__gOpenFiles[fdcopy].flags = __gOpenFiles[fdorig].flags;
-		return 0;
-	}
 
 	if (__gOpenFiles[fdcopy].handle != INVHL) {
 		CloseHandle((HANDLE)__gOpenFiles[fdcopy].handle );
@@ -448,7 +429,7 @@ int nt_stat(const char *filename, struct stat *stbuf) {
 int nt_creat(const char *filename, int mode) {
 	// ignore the bloody mode
 
-	int fd = 0,is_cons =0, is_resource = 0;
+	int fd = 0,is_cons =0;
 	HANDLE retval;
 	SECURITY_ATTRIBUTES security;
 
@@ -470,11 +451,6 @@ int nt_creat(const char *filename, int mode) {
 		retval = create_clip_writer_thread();
 		if (retval == INVHL)
 			return -1;
-		goto get_fd;
-	}
-	else if (_stricmp(filename,"/dev/builtinresource")) {
-		retval = GetModuleHandle(NULL);
-		is_resource = 1;
 		goto get_fd;
 	}
 	retval = CreateFile(filename,
@@ -499,9 +475,6 @@ get_fd:
 		if (is_cons) {
 			__gOpenFiles[fd].flags = FCONSOLE;
 		}
-		if (is_resource) {
-			__gOpenFiles[fd].flags = FRESOURCE;
-		}
 	}
 	return fd;
 
@@ -511,7 +484,6 @@ int nt_open(const char *filename, int perms,...) {
 	// ignore the bloody mode
 
 	int fd,mode, is_cons=0;
-	int is_resource = 0;
 	HANDLE retval;
 	SECURITY_ATTRIBUTES security;
 	DWORD dwAccess, dwFlags, dwCreateDist;
@@ -533,11 +505,6 @@ int nt_open(const char *filename, int perms,...) {
 	}
 	else if (!_stricmp(filename,"/dev/clipboard")) {
 		retval = create_clip_reader_thread();
-		goto get_fd;
-	}
-	else if (!lstrcmp(filename,"/dev/builtinresource")) {
-		retval = GetModuleHandle(NULL);
-		is_resource = 1;
 		goto get_fd;
 	}
 	security.nLength = sizeof(security);
@@ -606,9 +573,6 @@ get_fd:
 	else {
 		if (is_cons) {
 			__gOpenFiles[fd].flags = FCONSOLE;
-		}
-		if (is_resource) {
-			__gOpenFiles[fd].flags = FRESOURCE;
 		}
 	}
 	return fd;
