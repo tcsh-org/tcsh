@@ -333,7 +333,6 @@ AC_CHECK_MEMBERS([struct sockaddr_storage.ss_family], , ,
 
 dnl Checks for compiler characteristics
 AC_C_CONST
-AC_C_PROTOTYPES
 AC_C_VOLATILE
 
 dnl checks for library functions

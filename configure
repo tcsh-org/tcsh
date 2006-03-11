@@ -7329,26 +7329,6 @@ _ACEOF
 
 fi
 
-echo "$as_me:$LINENO: checking for function prototypes" >&5
-echo $ECHO_N "checking for function prototypes... $ECHO_C" >&6
-if test "$ac_cv_prog_cc_stdc" != no; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-
-cat >>confdefs.h <<\_ACEOF
-#define PROTOTYPES 1
-_ACEOF
-
-
-cat >>confdefs.h <<\_ACEOF
-#define __PROTOTYPES 1
-_ACEOF
-
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
 echo "$as_me:$LINENO: checking for working volatile" >&5
 echo $ECHO_N "checking for working volatile... $ECHO_C" >&6
 if test "${ac_cv_c_volatile+set}" = set; then
