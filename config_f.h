@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/config_f.h,v 3.37 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/config_f.h,v 3.38 2006/02/17 02:25:59 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -143,7 +143,7 @@
  *		This can be much slower and no memory statistics will be
  *		provided.
  */
-#if defined(__MACHTEN__) || defined(PURIFY) || defined(MALLOC_TRACE) || defined(_OSD_POSIX) || defined(__MVS__)
+#if defined(__MACHTEN__) || defined(PURIFY) || defined(MALLOC_TRACE) || defined(_OSD_POSIX) || defined(__MVS__) || defined (__linux__)
 # define SYSMALLOC
 #else
 # undef SYSMALLOC
