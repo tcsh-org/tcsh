@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.70 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.71 2006/03/11 15:32:00 mitr Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.70 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.71 2006/03/11 15:32:00 mitr Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -546,6 +546,23 @@ globall(Char **v, int gflg)
 	trim(vl);
 
     return vl;
+}
+
+Char **
+glob_all_or_error(Char **v)
+{
+    int gflag;
+
+    gflag = tglob(v);
+    if (gflag) {
+	v = globall(v, gflag);
+	if (v == NULL)
+	    stderror(ERR_NAME | ERR_NOMATCH);
+    } else {
+	v = saveblk(v);
+	trim(v);
+    }
+    return v;
 }
 
 void

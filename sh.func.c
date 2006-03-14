@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.func.c,v 3.138 2006/02/16 01:26:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.139 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.138 2006/02/16 01:26:09 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.139 2006/03/02 18:46:44 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -220,24 +220,15 @@ void
 dofiletest(Char **v, struct command *c)
 {
     Char **globbed, **fileptr, *ftest, *res;
-    int gflag;
 
     USE(c);
     if (*(ftest = *++v) != '-')
 	stderror(ERR_NAME | ERR_FILEINQ);
     ++v;
 
-    gflag = tglob(v);
-    if (gflag) {
-	v = globall(v, gflag);
-	if (v == 0)
-	    stderror(ERR_NAME | ERR_NOMATCH);
-    }
-    else
-	v = saveblk(v);
+    v = glob_all_or_error(v);
     globbed = v;
     cleanup_push(globbed, blk_cleanup);
-    trim(v);
 
     while (*(fileptr = v++) != '\0') {
 	res = filetest(ftest, &fileptr, 0);
@@ -1059,7 +1050,7 @@ static void
 xecho(int sep, Char **v)
 {
     Char *cp, **globbed = NULL;
-    int     nonl = 0, gflag;
+    int     nonl = 0, old_pintr_disabled;
     int	    echo_style = ECHO_STYLE;
     struct varent *vp;
 
@@ -1078,22 +1069,11 @@ xecho(int sep, Char **v)
     v++;
     if (*v == 0)
 	goto done;
-    gflag = tglob(v);
-    if (gflag) {
-	int old_pintr_disabled;
-
-	if (setintr)
-	    pintr_push_enable(&old_pintr_disabled);
-	v = globall(v, gflag);
-	if (setintr)
-	    cleanup_until(&old_pintr_disabled);
-	if (v == 0)
-	    stderror(ERR_NAME | ERR_NOMATCH);
-    }
-    else {
-	v = saveblk(v);
-	trim(v);
-    }
+    if (setintr)
+	pintr_push_enable(&old_pintr_disabled);
+    v = glob_all_or_error(v);
+    if (setintr)
+	cleanup_until(&old_pintr_disabled);
     globbed = v;
     if (globbed != NULL)
 	cleanup_push(globbed, blk_cleanup);

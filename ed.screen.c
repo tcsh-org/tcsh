@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.screen.c,v 3.70 2006/02/14 00:52:52 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.71 2006/03/02 18:46:44 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.screen.c,v 3.70 2006/02/14 00:52:52 christos Exp $")
+RCSID("$tcsh: ed.screen.c,v 3.71 2006/03/02 18:46:44 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -516,7 +516,7 @@ EchoTC(Char **v)
 {
     char   *cap, *scap, *cv;
     int     arg_need, arg_cols, arg_rows;
-    int     verbose = 0, silent = 0, gflag;
+    int     verbose = 0, silent = 0;
     char   *area;
     static const char fmts[] = "%s\n", fmtd[] = "%d\n";
     struct termcapstr *t;
@@ -527,17 +527,9 @@ EchoTC(Char **v)
 
     setname("echotc");
 
-    gflag = tglob(v);
-    if (gflag) {
-	v = globall(v, gflag);
-	if (v == 0)
-	    stderror(ERR_NAME | ERR_NOMATCH);
-    }
-    else
-	v = saveblk(v);
+    v = glob_all_or_error(v);
     globbed = v;
     cleanup_push(globbed, blk_cleanup);
-    trim(v);
 
     if (!*v || *v[0] == '\0')
 	goto end;

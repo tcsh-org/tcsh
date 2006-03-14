@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.130 2006/03/03 22:08:45 amold Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.131 2006/03/11 15:32:00 mitr Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.130 2006/03/03 22:08:45 amold Exp $")
+RCSID("$tcsh: sh.c,v 3.131 2006/03/11 15:32:00 mitr Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2028,7 +2028,7 @@ void
 dosource(Char **t, struct command *c)
 {
     Char *f;
-    int    hflg = 0, gflag;
+    int    hflg = 0;
     char *file;
 
     USE(c);
@@ -2048,15 +2048,7 @@ dosource(Char **t, struct command *c)
     file = strsave(short2str(f));
     cleanup_push(file, xfree);
     xfree(f);
-    gflag = tglob(t);
-    if (gflag) {
-	t = globall(t, gflag);
-	if (t == 0)
-	    stderror(ERR_NAME | ERR_NOMATCH);
-    } else {
-	t = saveblk(t);
-	trim(t);
-    }
+    t = glob_all_or_error(t);
     if ((!srcfile(file, 0, hflg, t)) && (!hflg) && (!bequiet))
 	stderror(ERR_SYSTEM, file, strerror(errno));
     cleanup_until(file);

@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/ps.c,v 1.7 2006/03/03 22:08:45 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/ps.c,v 1.8 2006/03/05 08:59:36 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -233,22 +233,13 @@ void dops(Char ** vc, struct command *c) {
 
 	DWORD nump;
 	unsigned int i,k;
-	int gflag;
 	char **v;
 
 	UNREFERENCED_PARAMETER(c);
 
 	if (!ProcessListFunc)
 		return;
-	gflag = tglob(vc);
-	if (gflag) {
-		vc = globall(vc, gflag);
-		if (vc == 0)
-			stderror(ERR_NAME | ERR_NOMATCH);
-	}
-	else
-		vc = saveblk(vc);
-	trim(vc);
+	vc = glob_all_or_error(vc);
 	v = short2blk(vc);
 	blkfree(vc);
 	for (k = 0; v[k] != NULL ; k++){
@@ -288,7 +279,7 @@ void doshutdown(Char **vc, struct command *c) {
 	char **v;
 	char *ptr;
 	char errbuf[128];
-	int k, gflag;
+	int k;
 	HANDLE hToken;
 	TOKEN_PRIVILEGES tp,tpPrevious;
 	LUID luid;
@@ -301,15 +292,7 @@ void doshutdown(Char **vc, struct command *c) {
 	}
 
 	shutdown_ok = reboot = shutdown = logoff = 0;
-	gflag = tglob(vc);
-	if (gflag) {
-		vc = globall(vc, gflag);
-		if (vc == 0)
-			stderror(ERR_NAME | ERR_NOMATCH);
-	}
-	else
-		vc = saveblk(vc);
-	trim(vc);
+	vc = glob_all_or_error(vc);
 	v = short2blk(vc);
 	blkfree(vc);
 	cleanup_push((Char **)v, blk_cleanup);

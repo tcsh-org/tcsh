@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.16 2006/03/05 08:59:36 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.17 2006/03/05 18:35:53 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -156,7 +156,7 @@ void dostart(Char ** vc, struct command *c) {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	DWORD dwCreationFlags=CREATE_NEW_CONSOLE;
-	DWORD k,cmdlen,j,jj,ret,gflag;
+	DWORD k,cmdlen,j,jj,ret;
 
 
 	UNREFERENCED_PARAMETER(c);
@@ -170,15 +170,7 @@ void dostart(Char ** vc, struct command *c) {
 	memset(&si,0,sizeof(si));
 	si.cb = sizeof(si);
 
-	gflag = tglob(vc);
-	if (gflag) {
-		vc = globall(vc, gflag);
-		if (vc == 0)
-			stderror(ERR_NAME | ERR_NOMATCH);
-	}
-	else
-		vc = saveblk(vc);
-	trim(vc);
+	vc = glob_all_or_error(vc);
 	v = short2blk(vc);
 	if(v == NULL) {
 		stderror(ERR_NOMEM);
@@ -387,22 +379,14 @@ void nt_set_env(const Char *name, const Char *val) {
 }
 void dotitle(Char **vc, struct command * c) {
 
-	int k, gflag;
+	int k;
 	char titlebuf[512];
 	char errbuf[128],err2[128];
 	char **v;
 
 	UNREFERENCED_PARAMETER(c);
 	vc++;
-	gflag = tglob(vc);
-	if (gflag) {
-		vc = globall(vc, gflag);
-		if (vc == 0)
-			stderror(ERR_NAME | ERR_NOMATCH);
-	}
-	else
-		vc = saveblk(vc);
-	trim(vc);
+	vc = glob_all_or_error(vc);
 	cleanup_push(vc, blk_cleanup);
 
 	if ((k=GetConsoleTitle(titlebuf,512) ) != 0) {

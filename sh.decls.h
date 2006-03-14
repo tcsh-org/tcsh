@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.decls.h,v 3.50 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.51 2006/01/13 00:27:02 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -191,6 +191,7 @@ extern	int		  Gmatch	(const Char *, const Char *);
 extern	int		  Gnmatch	(const Char *, const Char *,
 					 const Char **);
 extern	Char		**globall	(Char **, int);
+extern	Char		**glob_all_or_error(Char **);
 extern	void		  rscan		(Char **, void (*)(Char));
 extern	int		  tglob		(Char **);
 extern	void		  trim		(Char **);

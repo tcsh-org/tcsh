@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.c,v 3.66 2006/03/02 18:46:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.c,v 3.67 2006/03/11 15:32:00 mitr Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.os.c,v 3.66 2006/03/02 18:46:45 christos Exp $")
+RCSID("$tcsh: tc.os.c,v 3.67 2006/03/11 15:32:00 mitr Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -459,18 +459,8 @@ domigrate(Char **v, struct command *c)
     }
     else {
 	Char **globbed;
-        int gflag;
 
-	gflag = tglob(v);
-	if (gflag) {
-	    v = globall(v, gflag);
-	    if (v == 0)
-		stderror(ERR_NAME | ERR_NOMATCH);
-	}
-	else {
-	    v = saveblk(v);
-	    trim(v);
-	}
+	v = glob_all_or_error(v);
 	globbed = v;
 	cleanup_push(globbed, blk_cleanup);
 
@@ -776,26 +766,15 @@ dobs2cmd(Char **v, struct command *c)
     struct command faket;
     Char   *fakecom[2];
     char    tibuf[BUFSIZE];
-    int     icnt, gflag;
+    int     icnt, old_pintr_disabled;
     static const Char STRbs2cmd[] = { 'b','s','2','c','m','d','\0' };
 
     v++;
-    gflag = tglob(v);
-    if (gflag) {
-	int old_pintr_disabled;
-
-	if (setintr)
-	    pintr_push_enable(&old_pintr_disabled);
-	v = globall(v, gflag);
-	if (setintr)
-	    cleanup_until(&old_pintr_disabled);
-	if (v == 0)
-	    stderror(ERR_NAME | ERR_NOMATCH);
-    }
-    else {
-	v = saveblk(v);
-	trim(v);
-    }
+    if (setintr)
+	pintr_push_enable(&old_pintr_disabled);
+    v = glob_all_or_error(v);
+    if (setintr)
+	cleanup_until(&old_pintr_disabled);
     globbed = v;
     cleanup_push(globbed, blk_cleanup);
 
@@ -1491,19 +1470,9 @@ void
 doinlib(Char **v, struct command *c)
 {
     Char **globbed;
-    int gflag;
 
     setname(short2str(*v++));
-    gflag = tglob(v);
-    if (gflag) {
-	v = globall(v, gflag);
-	if (v == 0)
-	    stderror(ERR_NAME | ERR_NOMATCH);
-    }
-    else {
-	v = saveblk(v);
-	trim(v);
-    }
+    v = glob_all_or_error(v);
     globbed = v;
     cleanup_push(globbed, blk_cleanup);
 
