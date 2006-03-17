@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.71 2006/03/11 15:32:00 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.72 2006/03/14 01:22:57 mitr Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.71 2006/03/11 15:32:00 mitr Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.72 2006/03/14 01:22:57 mitr Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -496,8 +496,12 @@ globone(Char *str, int action)
 	vo = v;
 
     vl = libglob(vo);
-    if ((gflg & G_CSH) && vl != vo)
-	cleanup_until(vo);
+    if (gflg & G_CSH) {
+    	if (vl != vo)
+	    cleanup_until(vo);
+	else
+	    cleanup_ignore(vo);
+    }
     if (vl == NULL) {
 	setname(short2str(str));
 	stderror(ERR_NAME | ERR_NOMATCH);
