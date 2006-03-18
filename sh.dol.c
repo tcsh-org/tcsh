@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.66 2006/03/18 07:03:27 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.67 2006/03/18 07:10:14 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.66 2006/03/18 07:03:27 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.67 2006/03/18 07:10:14 christos Exp $")
 
 /*
  * C shell
@@ -849,7 +849,6 @@ setDolp(Char *cp)
     }
 
     addla(cp);
-    xfree(cp);
 
     dolp = STRNULL;
     if (seterr)
