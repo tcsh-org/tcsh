@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.dol.c,v 3.64 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.65 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.64 2006/02/14 14:07:36 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.65 2006/03/02 18:46:44 christos Exp $")
 
 /*
  * C shell
@@ -941,8 +941,10 @@ again:
 	    if (unlink(tmp) == -1) {
 		(void) gettimeofday(&tv, NULL);
 		xfree(shtemp);
-		shtemp = Strspl(STRtmpsh, putn((((int)tv.tv_sec) ^ 
-		    ((int)tv.tv_usec) ^ ((int)getpid())) & 0x00ffffff));
+		mbp = putn((((int)tv.tv_sec) ^ 
+		    ((int)tv.tv_usec) ^ ((int)getpid())) & 0x00ffffff);
+		shtemp = Strspl(STRtmpsh, mbp);
+		xfree(mbp);
 	    }
 	    goto again;
 	}
