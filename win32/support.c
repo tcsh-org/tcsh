@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/support.c,v 1.9 2006/03/05 08:59:36 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/support.c,v 1.10 2006/03/05 18:35:53 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -63,6 +63,10 @@ void path_slashify(char *pstr) {
 		pstr++;
 	}
 }
+
+void do_nothing(const wchar_t *p1, const wchar_t *p2, const wchar_t*p3,
+		unsigned int p4, uintptr_t p5) {
+}
 void nt_init(void) {
 
 
@@ -76,6 +80,7 @@ void nt_init(void) {
 	}
 #endif SECURE_CD
 
+	_set_invalid_parameter_handler(do_nothing);
 	init_stdio();
 	nt_init_signals();
 	nt_term_init();
