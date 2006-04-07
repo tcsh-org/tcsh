@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/support.c,v 1.10 2006/03/05 18:35:53 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/support.c,v 1.11 2006/04/05 15:32:37 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -66,6 +66,11 @@ void path_slashify(char *pstr) {
 
 void do_nothing(const wchar_t *p1, const wchar_t *p2, const wchar_t*p3,
 		unsigned int p4, uintptr_t p5) {
+        UNREFERENCED_PARAMETER(p1);
+        UNREFERENCED_PARAMETER(p2);
+        UNREFERENCED_PARAMETER(p3);
+        UNREFERENCED_PARAMETER(p4);
+        UNREFERENCED_PARAMETER(p5);
 }
 void nt_init(void) {
 

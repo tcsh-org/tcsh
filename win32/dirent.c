@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/dirent.c,v 1.7 2006/03/05 08:59:36 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/dirent.c,v 1.8 2006/03/05 18:35:53 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -69,7 +69,7 @@ DIR * opendir(const char *inbuf) {
     char *tmp  = NULL;
     char *buf = NULL;
     int is_net=0;
-	int had_error = 1;
+    int had_error = 0;
     size_t buflen;
 
     buflen = lstrlen(inbuf) + 1;
@@ -115,7 +115,7 @@ DIR * opendir(const char *inbuf) {
     dptr->dd_fd = INVALID_HANDLE_VALUE;
     if (!dptr){
 	errno = ENOMEM;
-	had_error =1
+	had_error =1;
 	goto done;
     }
 
@@ -134,7 +134,7 @@ DIR * opendir(const char *inbuf) {
 	else
 	    errno = ENOENT;	
 
-	had_error =1
+	had_error =1;
 	goto done;
     }
     memset(dptr->orig_dir_name,0,sizeof(dptr->orig_dir_name));

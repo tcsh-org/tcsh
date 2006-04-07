@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntport.h,v 1.10 2006/03/05 08:59:36 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntport.h,v 1.11 2006/03/05 18:35:53 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -307,7 +307,7 @@ extern void dprintf(char *,...);
 /* support.c */
 extern void nt_init(void);
 extern int gethostname(char*,int);
-extern char* forward_slash_get_cwd(char *,int len );
+extern char* forward_slash_get_cwd(char *,size_t len );
 extern int  nt_chdir(char*);
 extern void  nt_execve(char *,char**,char**);
 extern void  nt_exec(char *,char**);
