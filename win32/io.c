@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/io.c,v 1.7 2006/03/03 22:08:45 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/io.c,v 1.8 2006/03/05 08:59:36 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -61,6 +61,7 @@ INPUT_RECORD girec[2048];
 unsigned short __nt_want_vcode=0,__nt_vcode=0;
 HANDLE __h_con_alarm=0;
 HANDLE __h_con_int=0;
+HANDLE __h_con_hup=0;
 
 extern int NoNLSRebind;
 
@@ -258,7 +259,7 @@ int consoleread(HANDLE hInput, unsigned char * buf,size_t howmany) {
 	int rc;
 	size_t where=0;
 	int alt_pressed = 0,memfree=0;
-	HANDLE hevents[3];
+	HANDLE hevents[4];
 	static int pre_ch = -1;
 
 	if (0 <= pre_ch) {
@@ -284,14 +285,22 @@ int consoleread(HANDLE hInput, unsigned char * buf,size_t howmany) {
 	while(1) {
 		hevents[0] = __h_con_alarm;
 		hevents[1] = __h_con_int;
-		hevents[2] = hInput;
-		rc = WaitForMultipleObjects(3,hevents,FALSE,INFINITE);
+		hevents[2] = __h_con_hup;
+		hevents[3] = hInput;
+		rc = WaitForMultipleObjects(sizeof(hevents)/sizeof(hevents[0]),
+					    hevents,FALSE,INFINITE);
 		if (rc == WAIT_OBJECT_0) {
 			generic_handler(SIGALRM);
 		}
 		if (rc == (WAIT_OBJECT_0 +1) ) {
 			errno = EINTR;
 			generic_handler(SIGINT);
+			break;
+		}
+		if (rc == (WAIT_OBJECT_0 +2) ) {
+			errno = EINTR;
+			generic_handler(SIGHUP);
+			break;
 		}
 		rc = ReadConsoleInput(hInput,irec,(DWORD)howmany,&numread);
 		if (!rc) {
