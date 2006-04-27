@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.99 2006/03/11 15:32:00 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.100 2006/03/14 01:22:57 mitr Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.99 2006/03/11 15:32:00 mitr Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.100 2006/03/14 01:22:57 mitr Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -406,7 +406,7 @@ found:
 	    }
 	}
     }
-#if defined(BSDJOBS) || defined(HAVEwait3)
+#if defined(BSDJOBS) || defined(HAVEwait3) ||defined(WINNT_NATIVE)
     goto loop;
 #endif /* BSDJOBS || HAVEwait3 */
  end:
