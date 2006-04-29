@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/signal.c,v 1.8 2006/03/05 08:59:36 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/signal.c,v 1.9 2006/04/13 00:59:03 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -436,10 +436,15 @@ unsigned int alarm(unsigned int seconds) {
 	static unsigned int prev_val=0;
 	HANDLE ht;
 	DWORD tid;
+	SECURITY_ATTRIBUTES secd;
+
+	secd.nLength=sizeof(secd);
+	secd.lpSecurityDescriptor=NULL;
+	secd.bInheritHandle=TRUE;
 
 
 	if (!__halarm) {
-		__halarm=CreateEvent(NULL,FALSE,FALSE,NULL);
+		__halarm=CreateEvent(&secd,FALSE,FALSE,NULL);
 	}
 	if(__alarm_set )
 		SetEvent(__halarm);
