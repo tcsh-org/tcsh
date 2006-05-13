@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exp.c,v 3.49 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.50 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exp.c,v 3.49 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: sh.exp.c,v 3.50 2006/03/02 18:46:44 christos Exp $")
 
 #include "tw.h"
 
@@ -499,7 +499,7 @@ exp6(Char ***vp, int ignore)
 	(*vp)++;
 	ccode = exp0(vp, ignore);
 	etraci("exp6 () ccode", ccode, vp);
-	if (*vp == 0 || **vp == 0 || ***vp != ')')
+	if (**vp == 0 || ***vp != ')')
 	    stderror(ERR_NAME | ERR_EXPRESSION);
 	(*vp)++;
 	return (putn(ccode));
