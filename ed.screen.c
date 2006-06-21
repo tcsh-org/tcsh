@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.71 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.72 2006/03/14 01:22:57 mitr Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.screen.c,v 3.71 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: ed.screen.c,v 3.72 2006/03/14 01:22:57 mitr Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1545,12 +1545,12 @@ ChangeSize(int lins, int cols)
 
 	if ((tptr = getenv("TERMCAP")) != NULL) {
 	    /* Leave 64 characters slop in case we enlarge the termcap string */
-	    Char    termcap[1024+64], backup[1024+64], *ptr;
+	    Char    termcap[TC_BUFSIZE+64], backup[TC_BUFSIZE+64], *ptr;
 	    Char buf[4];
 
 	    ptr = str2short(tptr);
-	    (void) Strncpy(termcap, ptr, 1024);
-	    termcap[1023] = '\0';
+	    (void) Strncpy(termcap, ptr, TC_BUFSIZE);
+	    termcap[TC_BUFSIZE-1] = '\0';
 
 	    /* update termcap string; first do columns */
 	    buf[0] = 'c';
@@ -1590,10 +1590,10 @@ ChangeSize(int lins, int cols)
 		(void) Strcat(termcap, ptr);
 	    }
 	    /*
-	     * Chop the termcap string at 1024 characters to avoid core-dumps
-	     * in the termcap routines
+	     * Chop the termcap string at TC_BUFSIZE-1 characters to avoid
+	     * core-dumps in the termcap routines
 	     */
-	    termcap[1023] = '\0';
+	    termcap[TC_BUFSIZE - 1] = '\0';
 	    tsetenv(STRTERMCAP, termcap);
 	}
     }
