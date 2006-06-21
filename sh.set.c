@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.set.c,v 3.67 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.68 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.67 2006/02/14 14:07:36 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.68 2006/03/02 18:46:44 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -64,8 +64,13 @@ static void
 update_vars(Char *vp)
 {
     if (eq(vp, STRpath)) {
-	exportpath(adrof(STRpath)->vec);
-	dohash(NULL, NULL);
+	struct varent *p = adrof(STRpath); 
+	if (p == NULL)
+	    stderror(ERR_NAME | ERR_UNDVAR);
+	else {
+	    exportpath(p->vec);
+	    dohash(NULL, NULL);
+	}
     }
     else if (eq(vp, STRhistchars)) {
 	Char *pn = varval(vp);
