@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.139 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.140 2006/03/14 01:22:57 mitr Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.139 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.140 2006/03/14 01:22:57 mitr Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1050,7 +1050,7 @@ static void
 xecho(int sep, Char **v)
 {
     Char *cp, **globbed = NULL;
-    int     nonl = 0, old_pintr_disabled;
+    int     nonl = 0;
     int	    echo_style = ECHO_STYLE;
     struct varent *vp;
 
@@ -1069,11 +1069,14 @@ xecho(int sep, Char **v)
     v++;
     if (*v == 0)
 	goto done;
-    if (setintr)
+    if (setintr) {
+	int old_pintr_disabled;
 	pintr_push_enable(&old_pintr_disabled);
-    v = glob_all_or_error(v);
-    if (setintr)
+	v = glob_all_or_error(v);
 	cleanup_until(&old_pintr_disabled);
+    } else {
+	v = glob_all_or_error(v);
+    }
     globbed = v;
     if (globbed != NULL)
 	cleanup_push(globbed, blk_cleanup);
