@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.prompt.c,v 3.63 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.prompt.c,v 3.64 2006/03/02 18:46:45 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.prompt.c,v 3.63 2006/02/14 14:07:36 christos Exp $")
+RCSID("$tcsh: tc.prompt.c,v 3.64 2006/03/02 18:46:45 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -607,7 +607,7 @@ expdollar(struct Strbuf *buf, const Char **srcp, Char attr)
 	    curly = 1;
 	    var[i] = *++src & TRIM;
 	}
-	if (!alnum(var[i])) {
+	if (!alnum(var[i]) && var[i] != '_') {
 
 	    var[i] = '\0';
 	    break;
@@ -620,7 +620,8 @@ expdollar(struct Strbuf *buf, const Char **srcp, Char attr)
     if (vp && vp->vec) {
 	for (i = 0; vp->vec[i] != NULL; i++) {
 	    for (val = vp->vec[i]; *val; val++)
-		Strbuf_append1(buf, *val | attr);
+		if (*val != '\n' && *val != '\r')
+		    Strbuf_append1(buf, *val | attr);
 	    if (vp->vec[i+1])
 		Strbuf_append1(buf, ' ' | attr);
 	}
@@ -628,8 +629,9 @@ expdollar(struct Strbuf *buf, const Char **srcp, Char attr)
     else {
 	val = (!vp) ? tgetenv(var) : NULL;
 	if (val) {
-	    while (*val)
-		Strbuf_append1(buf, *val++ | attr);
+	    for (; *val; val++)
+		if (*val != '\n' && *val != '\r')
+		    Strbuf_append1(buf, *val | attr);
 	} else {
 	    *srcp = src;
 	    xfree(var);
