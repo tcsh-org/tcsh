@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.144 2006/02/16 03:11:59 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.145 2006/03/03 22:08:45 amold Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -729,6 +729,13 @@ EXTERN int     AsciiOnly;	/* If set only 7 bits expected in characters */
  * exactly one if the input is seekable and tell is available.
  * In other cases, the shell buffers enough blocks to keep all loops
  * in the buffer.
+ *
+ * If (WIDE_STRINGS && cantell), fbobp is always a byte offset, but
+ * (fseekp - fbobp) and (feobp - fbobp) are character offsets (usable for
+ * fbuf indexing).
+ *
+ * If (!cantell), all offsets are character offsets; if (!WIDE_STRINGS), there
+ * is no difference between byte and character offsets.
  */
 EXTERN struct Bin {
     off_t   Bfseekp;		/* Seek pointer, generally != lseek() value */
@@ -752,7 +759,7 @@ struct Ain {
 #define TCSH_F_SEEK	 2		/* File seek */
 #define TCSH_E_SEEK	 3		/* Eval seek */
     union {
-	off_t _f_seek;
+	off_t _f_seek;		/* A byte offset if (cantell) */
 	Char* _c_seek;
     } fc;
 #define f_seek fc._f_seek

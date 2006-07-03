@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.70 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.71 2006/03/04 18:20:43 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.70 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.71 2006/03/04 18:20:43 christos Exp $")
 
 #include "ed.h"
 
@@ -1592,7 +1592,13 @@ bgetc(void)
 	    (void) lseek(SHIN, fseekp, L_SET);
 	}
 	if (fseekp == feobp) {
-	    fbobp = feobp;
+	    off_t bytes;
+	    size_t i;
+
+	    bytes = fbobp;
+	    for (i = 0; i < (size_t)(feobp - fbobp); i++)
+		bytes += fclens[i];
+	    fbobp = fseekp = feobp = bytes;
 	    c = wide_read(SHIN, fbuf[0], BUFSIZE, 1);
 #ifdef convex
 	    if (c < 0)
@@ -1760,9 +1766,9 @@ btell(struct Ain *l)
 	return;
     case TCSH_F_SEEK:
 #ifdef WIDE_STRINGS
-	if (cantell && fseekp >= fbobp && fseekp < feobp) {
+	if (cantell && fseekp >= fbobp && fseekp <= feobp) {
 	    size_t i;
-	    
+
 	    l->f_seek = fbobp;
 	    for (i = 0; i < (size_t)(fseekp - fbobp); i++)
 		l->f_seek += fclens[i];
