@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.33 2006/03/02 18:46:44 christos Exp $
+# $tcsh: Makefile.in,v 3.34 2006/03/05 17:45:36 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -330,8 +330,9 @@ AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	host.defs gethost.c tcsh.man2html configure.in configure config.h.in \
 	tests/testsuite.at
 TESTFILES= tests/aliases.at tests/arguments.at tests/commands.at \
-	tests/expr.at tests/lexical.at tests/noexec.at tests/syntax.at \
-	tests/subst.at tests/variables.at tests/sh.dol.at
+	tests/expr.at tests/lexical.at tests/mb-eucjp.at tests/mb-utf8.at \
+	tests/noexec.at tests/syntax.at tests/subst.at tests/variables.at \
+	tests/sh.dol.at
 
 VHSRCS=${PVSRCS} ${AVSRCS}
 
