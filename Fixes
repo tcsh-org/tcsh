@@ -1,3 +1,5 @@
+ 56. Mark-Cursor exchange emacs editing fix (Martin Kraemer)
+ 55. V6.14.05 - 20060304
  54. don't limit termcap strings to 1K (Alan Ferrency)
  53. protect against null path.
  52. Be more conservative in wide_read PR#29
