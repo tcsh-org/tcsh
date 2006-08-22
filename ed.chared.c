@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.chared.c,v 3.90 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.91 2006/03/02 18:46:44 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$tcsh: ed.chared.c,v 3.90 2006/02/14 14:07:36 christos Exp $")
+RCSID("$tcsh: ed.chared.c,v 3.91 2006/03/02 18:46:44 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -202,7 +202,11 @@ c_delafter(int num)
 	    for (cp = Cursor; cp + num <= LastChar; cp++)
 		*cp = cp[num];
 	LastChar -= num;
-	if (Mark && Mark > Cursor)
+	/* Mark was within the range of the deleted word? */
+	if (Mark && Mark > Cursor && Mark <= Cursor+num)
+		Mark = Cursor;
+	/* Mark after the deleted word? */
+	else if (Mark && Mark > Cursor)
 		Mark -= num;
     }
 #ifdef notdef
@@ -240,7 +244,11 @@ c_delbefore(int num)		/* delete before dot, with bounds checking */
 		*cp = cp[num];
 	LastChar -= num;
 	Cursor -= num;
-	if (Mark && Mark > Cursor)
+	/* Mark was within the range of the deleted word? */
+	if (Mark && Mark > Cursor && Mark <= Cursor+num)
+		Mark = Cursor;
+	/* Mark after the deleted word? */
+	else if (Mark && Mark > Cursor)
 		Mark -= num;
     }
 }
@@ -2540,7 +2548,9 @@ e_killend(Char c)
 {
     USE(c);
     c_push_kill(Cursor, LastChar); /* copy it */
-    Mark = LastChar = Cursor;		/* zap! -- delete to end */
+    LastChar = Cursor;		/* zap! -- delete to end */
+    if (Mark > Cursor)
+        Mark = Cursor;
     return(CC_REFRESH);
 }
 
