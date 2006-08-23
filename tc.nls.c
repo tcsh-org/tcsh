@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.c,v 3.18 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.nls.c,v 3.19 2006/03/02 18:46:45 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.nls.c,v 3.18 2006/02/14 14:07:36 christos Exp $")
+RCSID("$tcsh: tc.nls.c,v 3.19 2006/03/02 18:46:45 christos Exp $")
 
 #ifdef WIDE_STRINGS
 int
@@ -98,17 +98,13 @@ NLSClassify(Char c, int nocomb)
     if (c & INVALID_BYTE)
 	return NLSCLASS_ILLEGAL;
     w = NLSWidth(c);
-    if (w > 0 || (Isprint(c) && !nocomb))
+    if ((w > 0 && !(Iscntrl(c) && (c & CHAR) < 0x100)) || (Isprint(c) && !nocomb))
 	return w;
-    if (Iscntrl(c) && c < 0x100) {
+    if (Iscntrl(c) && (c & CHAR) < 0x100) {
 	if (c == '\n')
 	    return NLSCLASS_NL;
 	if (c == '\t')
 	    return NLSCLASS_TAB;
-#ifndef ASCII
-	if (!Isupper(_toebcdic[_toascii[c]|0100]) && !strchr("@[\\]^_", _toebcdic[_toascii[c]|0100]))
-	    return NLSCLASS_ILLEGAL;
-#endif
 	return NLSCLASS_CTRL;
     }
     if (c >= 0x1000000)

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.131 2006/03/11 15:32:00 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.132 2006/03/14 01:22:57 mitr Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.131 2006/03/11 15:32:00 mitr Exp $")
+RCSID("$tcsh: sh.c,v 3.132 2006/03/14 01:22:57 mitr Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -342,7 +342,7 @@ main(int argc, char **argv)
     {
 	int     k;
 
-	for (k = 0200; k <= 0377 && !Isprint(k); k++)
+	for (k = 0200; k <= 0377 && !Isprint(CTL_ESC(k)); k++)
 	    continue;
 	AsciiOnly = MB_CUR_MAX == 1 && k > 0377;
     }
@@ -688,6 +688,12 @@ main(int argc, char **argv)
 	if (sh_len == 0)
 	    setcopy(STRshell, STR_SHELLPATH, VAR_READWRITE);
     }
+
+#ifdef _OSD_POSIX  /* BS2000 needs this variable set to "SHELL" */
+    if ((tcp = getenv("PROGRAM_ENVIRONMENT")) == NULL)
+	tcp = "SHELL";
+    tsetenv(STRPROGRAM_ENVIRONMENT, quote(str2short(tcp)));
+#endif /* _OSD_POSIX */
 
 #ifdef COLOR_LS_F
     if ((tcp = getenv("LS_COLORS")) != NULL)

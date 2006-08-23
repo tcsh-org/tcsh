@@ -72,7 +72,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "4 March 2006" "Astron 6.14.05"
+.TH TCSH 1 "24 August 2006" "Astron 6.14.06"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -3782,6 +3782,15 @@ The user's real group ID.
 .B group \fR(+)
 The user's group name.
 .TP 8
+.B highlight
+If set, the incremental search match (in \fIi-search-back\fR and
+\fIi-search-fwd\fR) and the region between the mark and the cursor are
+highlighted in reverse video.
+
+Highlighting requires more frequent terminal writes, which introduces extra
+overhead. If you care about terminal performance, you may want to leave this
+unset.
+.TP 8
 .B histchars
 A string value determining the characters used in \fBHistory
 substitution\fR (q.v.).  The first character of its value is used as
@@ -5064,7 +5073,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.14.05 (Astron) 2006-03-04.
+This manual documents tcsh 6.14.06 (Astron) 2006-08-24.
 .SH AUTHORS
 .PD 0
 .TP 2

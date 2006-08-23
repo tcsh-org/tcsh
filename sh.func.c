@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.140 2006/03/14 01:22:57 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.141 2006/06/30 16:45:37 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.140 2006/03/14 01:22:57 mitr Exp $")
+RCSID("$tcsh: sh.func.c,v 3.141 2006/06/30 16:45:37 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1109,7 +1109,7 @@ xecho(int sep, Char **v)
 #if 0			/* Windows does not understand \e */
 		    c = '\e';
 #else
-		    c = '\033';
+		    c = CTL_ESC('\033');
 #endif
 		    break;
 		case 'f':
@@ -1303,7 +1303,7 @@ dosetenv(Char **v, struct command *c)
 	fix_strcoll_bug();
 # endif /* STRCOLLBUG */
 	tw_cmd_free();	/* since the collation sequence has changed */
-	for (k = 0200; k <= 0377 && !Isprint(k); k++)
+	for (k = 0200; k <= 0377 && !Isprint(CTL_ESC(k)); k++)
 	    continue;
 	AsciiOnly = MB_CUR_MAX == 1 && k > 0377;
 #else /* !NLS */
@@ -1506,7 +1506,7 @@ dounsetenv(Char **v, struct command *c)
 		    fix_strcoll_bug();
 # endif /* STRCOLLBUG */
 		    tw_cmd_free();/* since the collation sequence has changed */
-		    for (k = 0200; k <= 0377 && !Isprint(k); k++)
+		    for (k = 0200; k <= 0377 && !Isprint(CTL_ESC(k)); k++)
 			continue;
 		    AsciiOnly = MB_CUR_MAX == 1 && k > 0377;
 #else /* !NLS */

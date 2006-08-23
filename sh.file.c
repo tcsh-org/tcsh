@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.file.c,v 3.33 2006/02/17 02:27:55 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.file.c,v 3.34 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$tcsh: sh.file.c,v 3.33 2006/02/17 02:27:55 christos Exp $")
+RCSID("$tcsh: sh.file.c,v 3.34 2006/03/02 18:46:44 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -697,7 +697,7 @@ tenex(Char *inputline, size_t inputline_size)
 	tinputline[num_read] = 0;
 	Strcpy(inputline, str2short(tinputline));/*FIXBUF*/
 	num_read = Strlen(inputline);
-	last_Char = inputline[num_read - 1] & ASCII;
+	last_Char = CTL_ESC(ASC(inputline[num_read - 1]) & ASCII);
 
 	if (last_Char == '\n' || (size_t)num_read == inputline_size)
 	    break;

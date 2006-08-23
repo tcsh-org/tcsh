@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.refresh.c,v 3.44 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.refresh.c,v 3.45 2006/03/02 18:46:44 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.refresh.c,v 3.44 2006/02/14 14:07:36 christos Exp $")
+RCSID("$tcsh: ed.refresh.c,v 3.45 2006/03/02 18:46:44 christos Exp $")
 
 #include "ed.h"
 /* #define DEBUG_UPDATE */
@@ -70,10 +70,10 @@ dprintstr(char *str, const Char *f, const Char *t)
 {
     dprintf("%s:\"", str);
     while (f < t) {
-	if (*f & ~ASCII)
+	if (ASC(*f) & ~ASCII)
 	  dprintf("[%x]", *f++);
 	else
-	  dprintf("%c", *f++ & ASCII);
+	  dprintf("%c", CTL_ESC(ASCII & ASC(*f++)));
     }
     dprintf("\"\r\n");
 }
@@ -580,10 +580,12 @@ update_line(Char *old, Char *new, int cur_line)
      * Remove any trailing blanks off of the end, being careful not to
      * back up past the beginning.
      */
+    if (!(adrof(STRhighlight) && MarkIsSet)) {
     while (ofd < o) {
 	if (o[-1] != ' ')
 	    break;
 	o--;
+    }
     }
     oe = o;
     *oe = (Char) 0;
@@ -591,10 +593,12 @@ update_line(Char *old, Char *new, int cur_line)
     n = Strend(n);
 
     /* remove blanks from end of new */
+    if (!(adrof(STRhighlight) && MarkIsSet)) {
     while (nfd < n) {
 	if (n[-1] != ' ')
 	    break;
 	n--;
+    }
     }
     ne = n;
     *ne = (Char) 0;
@@ -1188,6 +1192,11 @@ RefCursor(void)
     /* now go there */
     MoveToLine(v);
     MoveToChar(h);
+    if (adrof(STRhighlight) && MarkIsSet) {
+	ClearLines();
+	ClearDisp();
+	Refresh();
+    }
     flush();
 }
 
@@ -1264,10 +1273,14 @@ RefPlusOne(int l)
 	    PutPlusOne((c & 7) + '0', 1);
 	    break;
 	case 1:
+	    if (adrof(STRhighlight) && MarkIsSet)
+		StartHighlight();
 	    if (l > 1)
 		PutPlusOne(MakeLiteral(cp, l, 0), 1);
 	    else
 		PutPlusOne(*cp, 1);
+	    if (adrof(STRhighlight) && MarkIsSet)
+		StopHighlight();
 	    break;
 	default:
 	    Refresh();		/* too hard to handle */

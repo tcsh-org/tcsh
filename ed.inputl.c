@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.inputl.c,v 3.62 2006/01/12 19:55:37 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.inputl.c,v 3.63 2006/03/02 18:46:44 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.inputl.c,v 3.62 2006/01/12 19:55:37 christos Exp $")
+RCSID("$tcsh: ed.inputl.c,v 3.63 2006/03/02 18:46:44 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -440,6 +440,14 @@ Inputl(void)
 		if (autol && autol->vec != NULL && 
 		    (Strcmp(*(autol->vec), STRambiguous) != 0 || 
 				     expnum == Cursor - InputBuf)) {
+		    if (adrof(STRhighlight) && MarkIsSet) {
+			/* clear highlighting before showing completions */
+			MarkIsSet = 0;
+			ClearLines();
+			ClearDisp();
+			Refresh();
+			MarkIsSet = 1;
+		    }
 		    PastBottom();
 		    fn = (retval == CC_COMPLETE_ALL) ? LIST_ALL : LIST;
 		    (void) tenematch(InputBuf, Cursor-InputBuf, fn);
@@ -539,6 +547,11 @@ Inputl(void)
 
 	case CC_ERROR:
 	default:		/* functions we don't know about */
+	    if (adrof(STRhighlight)) {
+		ClearLines();
+		ClearDisp();
+		Refresh();
+	    }
 	    DoingArg = 0;
 	    Argument = 1;
 	    SoundBeep();

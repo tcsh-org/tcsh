@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.decls.h,v 3.42 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.decls.h,v 3.43 2006/01/12 19:55:37 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */
@@ -105,6 +105,8 @@ extern	int	GetSize			(int *, int *);
 #endif /* SIG_WINDOW */
 extern	void	ClearToBottom		(void);
 extern	void	GetTermCaps		(void);
+extern	void	StartHighlight		(void);
+extern	void	StopHighlight		(void);
 
 /*
  * ed.defns.c

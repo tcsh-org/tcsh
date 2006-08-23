@@ -1,3 +1,7 @@
+ 59. V6.14.06 - 20060824
+ 59. set PROGRAM_ENVIRONMENT for OSD_POSIX (Martin Kraemer)
+ 58. EBCDIC patch (Martin Kraemer)
+ 57. Highlighting patch (Martin Kraemer)
  56. Mark-Cursor exchange emacs editing fix (Martin Kraemer)
  55. V6.14.05 - 20060304
  54. don't limit termcap strings to 1K (Alan Ferrency)

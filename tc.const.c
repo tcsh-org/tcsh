@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.const.c,v 3.81 2004/12/25 21:15:08 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.82 2006/03/02 18:46:45 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.const.c,v 3.81 2004/12/25 21:15:08 christos Exp $")
+RCSID("$tcsh: tc.const.c,v 3.82 2006/03/02 18:46:45 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -419,6 +419,7 @@ Char STRwho[]		= { 'w', 'h', 'o', '\0' };
 Char STRsched[]		= { 's', 'c', 'h', 'e', 'd', '\0' };
 Char STRrmstar[]	= { 'r', 'm', 's', 't', 'a', 'r', '\0' };
 Char STRrm[]		= { 'r', 'm', '\0' };
+Char STRhighlight[]	= { 'h', 'i', 'g', 'h', 'l', 'i', 'g', 'h', 't', '\0' };
 
 Char STRimplicitcd[] = { 'i', 'm', 'p', 'l', 'i', 'c', 'i', 't',
                          'c', 'd', '\0' };
@@ -446,6 +447,10 @@ Char STRLINES[]		= { 'L', 'I', 'N', 'E', 'S', '\0'};
 Char STRCOLUMNS[]	= { 'C', 'O', 'L', 'U', 'M', 'N', 'S', '\0'};
 Char STRTERMCAP[]	= { 'T', 'E', 'R', 'M', 'C', 'A', 'P', '\0'};
 #endif /* SIG_WINDOW  || _VMS_POSIX */
+
+#if defined (_OSD_POSIX)  /* BS2000 needs this variable set to "SHELL" */
+Char STRPROGRAM_ENVIRONMENT[]		= { 'P', 'R', 'O', 'G', 'R', 'A', 'M', '_', 'E', 'N', 'V', 'I', 'R', 'O', 'N', 'M', 'E', 'N', 'T', '\0'};
+#endif /* _OSD_POSIX */
 
 #ifdef WARP
 Char STRwarp[]		= { 'w', 'a', 'r', 'p', '\0' };

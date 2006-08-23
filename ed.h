@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.h,v 3.47 2006/01/12 18:15:24 christos Exp $ */
+/* $Header: /src/pub/tcsh/ed.h,v 3.48 2006/01/12 19:43:00 christos Exp $ */
 /*
  * ed.h: Editor declarations and globals
  */
@@ -124,6 +124,7 @@ EXTERN Char MetaNext;		/* flags for ^V and ^[ functions */
 EXTERN Char AltKeyMap;		/* Using alternative command map (for vi mode) */
 EXTERN Char VImode;		/* true if running in vi mode (PWP 6-27-88) */
 EXTERN Char *Mark;		/* the emacs "mark" (dot is Cursor) */
+EXTERN char MarkIsSet;		/* true if the mark has been set explicitly */
 EXTERN Char DoingArg;		/* true if we have an argument */
 EXTERN int Argument;		/* "universal" argument value */
 EXTERN KEYCMD LastCmd;		/* previous command executed */
@@ -146,6 +147,7 @@ EXTERN size_t LastSaved;	/* points to end of saved buffer */
 EXTERN size_t CursSaved;	/* points to the cursor point in saved buf */
 EXTERN int HistSaved;		/* Hist_num is saved in this */
 EXTERN char RestoreSaved;	/* true if SavedBuf should be restored */
+EXTERN int IncMatchLen;		/* current match length during incremental search */
 EXTERN char Expand;		/* true if we are expanding a line */
 extern Char HistLit;		/* true if history lines are shown literal */
 EXTERN Char CurrentHistLit;	/* Literal status of current show history line */

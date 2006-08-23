@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.print.c,v 3.31 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.print.c,v 3.32 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.print.c,v 3.31 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: sh.print.c,v 3.32 2006/03/02 18:46:44 christos Exp $")
 
 #include "ed.h"
 
@@ -153,29 +153,22 @@ xputchar(int c)
     atr = c & ATTRIBUTES & TRIM;
     c &= CHAR | QUOTE;
     if (!output_raw && (c & QUOTE) == 0) {
-	if (iscntrl(c) && (c < 0x80 || MB_CUR_MAX == 1)) {
+	if (iscntrl(c) && (ASC(c) < 0x80 || MB_CUR_MAX == 1)) {
+	    if (c != '\t' && c != '\n'
 #ifdef COLORCAT
-	    if (c != '\t' && c != '\n' && !(adrof(STRcolorcat) && c=='\033') && (xlate_cr || c != '\r'))
-#else
-	    if (c != '\t' && c != '\n' && (xlate_cr || c != '\r'))
+	        && !(adrof(STRcolorcat) && c == CTL_ESC('\033'))
 #endif
+		&& (xlate_cr || c != '\r'))
 	    {
 		xputchar('^' | atr);
-#ifdef IS_ASCII
-		if (c == 0177)
-		    c = '?';
-		else
-		    c |= 0100;
-#else
 		if (c == CTL_ESC('\177'))
 		    c = '?';
 		else
-		    c =_toebcdic[_toascii[c]|0100];
-#endif
-
+		    /* Note: for IS_ASCII, this compiles to: c = c | 0100 */
+		    c = CTL_ESC(ASC(c)|0100);
 	    }
 	}
-	else if (!isprint(c) && (c < 0x80 || MB_CUR_MAX == 1)) {
+	else if (!isprint(c) && (ASC(c) < 0x80 || MB_CUR_MAX == 1)) {
 	    xputchar('\\' | atr);
 	    xputchar((((c >> 6) & 7) + '0') | atr);
 	    xputchar((((c >> 3) & 7) + '0') | atr);

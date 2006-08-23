@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.72 2006/03/14 01:22:57 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.73 2006/06/21 18:13:47 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.screen.c,v 3.72 2006/03/14 01:22:57 mitr Exp $")
+RCSID("$tcsh: ed.screen.c,v 3.73 2006/06/21 18:13:47 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -124,45 +124,47 @@ static const struct {
     { NULL, 0 }
 };
 
-#define T_al	0
-#define T_bl	1
-#define T_cd	2
-#define T_ce	3
-#define T_ch	4
-#define T_cl	5
-#define	T_dc	6
-#define	T_dl	7
-#define	T_dm	8
-#define	T_ed	9
-#define	T_ei	10
-#define	T_fs	11
-#define	T_ho	12
-#define	T_ic	13
-#define	T_im	14 
-#define	T_ip	15
-#define	T_kd	16
-#define	T_kl	17
-#define T_kr	18
-#define T_ku	19
-#define T_md	20
-#define T_me	21
-#define T_nd	22
-#define T_se	23
-#define T_so	24
-#define T_ts	25
-#define T_up	26
-#define T_us	27
-#define T_ue	28
-#define T_vb	29
-#define T_DC	30
-#define T_DO	31
-#define T_IC	32
-#define T_LE	33
-#define T_RI	34
-#define T_UP	35
-#define T_kh    36
-#define T_at7   37
-#define T_str   38
+#define T_at7   0
+#define T_al	1
+#define T_bl	2
+#define T_cd	3
+#define T_ce	4
+#define T_ch	5
+#define T_cl	6
+#define	T_dc	7
+#define	T_dl	8
+#define	T_dm	9
+#define	T_ed	10
+#define	T_ei	11
+#define	T_fs	12
+#define	T_ho	13
+#define	T_ic	14
+#define	T_im	15 
+#define	T_ip	16
+#define	T_kd	17
+#define T_kh    18
+#define	T_kl	19
+#define T_kr	20
+#define T_ku	21
+#define T_md	22
+#define T_me	23
+#define T_mr    24
+#define T_nd	25
+#define T_se	26
+#define T_so	27
+#define T_ts	28
+#define T_up	29
+#define T_us	30
+#define T_ue	31
+#define T_vb	32
+#define T_DC	33
+#define T_DO	34
+#define T_IC	35
+#define T_LE	36
+#define T_RI	37
+#define T_UP	38
+#define T_str   39
+
 static struct termcapstr {
     const char   *name;
     const char   *long_name;
@@ -305,10 +307,13 @@ terminit(void)
     tstr[T_UP].long_name = CSAVS(4, 36, "cursor up multiple");
 
     tstr[T_kh].name = "kh";
-    tstr[T_kh].long_name = CSAVS(4, 37, "send cursor home");
+    tstr[T_kh].long_name = CSAVS(4, 43, "send cursor home");
 
     tstr[T_at7].name = "@7";
-    tstr[T_at7].long_name = CSAVS(4, 38, "send cursor end");
+    tstr[T_at7].long_name = CSAVS(4, 44, "send cursor end");
+
+    tstr[T_mr].name = "mr";
+    tstr[T_mr].long_name = CSAVS(4, 45, "begin reverse video");
 
     tstr[T_str].name = NULL;
     tstr[T_str].long_name = NULL;
@@ -986,6 +991,22 @@ SetAttributes(Char atr)
     }
 }
 
+int highlighting = 0;
+
+void
+StartHighlight()
+{
+    (void) tputs(Str(T_mr), 1, PUTPURE);
+    highlighting = 1;
+}
+
+void
+StopHighlight()
+{
+    (void) tputs(Str(T_me), 1, PUTPURE);
+    highlighting = 0;
+}
+
 /* PWP 6-27-88 -- if the tty driver thinks that we can tab, we ask termcap */
 int
 CanWeTab(void)
@@ -1128,6 +1149,8 @@ mc_again:
 void
 so_write(Char *cp, int n)
 {
+    int cur_pos, prompt_len = 0, region_start = 0, region_end = 0;
+
     if (n <= 0)
 	return;			/* catch bugs */
 
@@ -1139,7 +1162,37 @@ so_write(Char *cp, int n)
 	return;
     }
 
+    if (adrof(STRhighlight)) {
+	/* find length of prompt */
+	Char *promptc;
+	for (promptc = Prompt; *promptc; promptc++);
+	prompt_len = promptc - Prompt;
+
+	/* find region start and end points */
+	if (IncMatchLen) {
+	    region_start = (Cursor - InputBuf) + prompt_len;
+	    region_end = region_start + IncMatchLen;
+	} else if (MarkIsSet) {
+	    region_start = (min(Cursor, Mark) - InputBuf) + prompt_len;
+	    region_end   = (max(Cursor, Mark) - InputBuf) + prompt_len;
+	}
+    }
+
     do {
+	if (adrof(STRhighlight)) {
+	    cur_pos = CursorV * TermH + CursorH;
+	    if (!highlighting &&
+		cur_pos >= region_start && cur_pos < region_end)
+		StartHighlight();
+	    else if (highlighting && cur_pos >= region_end)
+		StopHighlight();
+
+	    /* don't highlight over the cursor. the highlighting's reverse
+	     * video would cancel it out. :P */
+	    if (highlighting && cur_pos == (Cursor - InputBuf) + prompt_len)
+		StopHighlight();
+	}
+
 	if (*cp != CHAR_DBWIDTH) {
 	    if (*cp & LITERAL) {
 		Char   *d;
@@ -1156,15 +1209,18 @@ so_write(Char *cp, int n)
 	CursorH++;
     } while (--n);
 
+    if (adrof(STRhighlight) && highlighting)
+	StopHighlight();
+
     if (CursorH >= TermH) { /* wrap? */
 	if (T_Margin & MARGIN_AUTO) { /* yes */
 	    CursorH = 0;
 	    CursorV++;
 	    if (T_Margin & MARGIN_MAGIC) {
 		/* force the wrap to avoid the "magic" situation */
-		Char c;
-		if ((c = Display[CursorV][CursorH]) != '\0') {
-		    so_write(&c, 1);
+		Char xc;
+		if ((xc = Display[CursorV][CursorH]) != '\0') {
+		    so_write(&xc, 1);
 		    while(Display[CursorV][CursorH] == CHAR_DBWIDTH)
 			CursorH++;
 		}

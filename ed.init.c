@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.init.c,v 3.57 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.init.c,v 3.58 2006/03/11 15:32:00 mitr Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.init.c,v 3.57 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: ed.init.c,v 3.58 2006/03/11 15:32:00 mitr Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -583,6 +583,7 @@ ResetInLine(int macro)
     LastChar = InputBuf;
     InputLim = &InputBuf[INBUFSIZE - 2];/*FIXBUF*/
     Mark = InputBuf;
+    MarkIsSet = 0;
     MetaNext = 0;
     CurrentKeyMap = CcKeyMap;
     AltKeyMap = 0;
@@ -590,6 +591,7 @@ ResetInLine(int macro)
     DoingArg = 0;
     Argument = 1;
     LastCmd = F_UNASSIGNED;	/* previous command executed */
+    IncMatchLen = 0;
     if (macro)
 	MacroLvl = -1;		/* no currently active macros */
 }
