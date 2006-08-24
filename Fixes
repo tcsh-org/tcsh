@@ -1,3 +1,9 @@
+ 66. rename set to setv to avoid clashes (christos)
+ 65. Eliminate sighold/sigrelse (christos)
+ 64. Compilation cleanups. (Martin Kraemer)
+ 63. Don't rebuild needlessly when generated files are unchanged
+     (Martin Kraemer)
+ 62. Fix confusion between Char and eChar (Martin Kraemer)
  61. V6.14.06 - 20060824
  60. set PROGRAM_ENVIRONMENT for OSD_POSIX (Martin Kraemer)
  59. EBCDIC patch (Martin Kraemer)

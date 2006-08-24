@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.132 2006/03/14 01:22:57 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.133 2006/08/23 15:03:14 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.132 2006/03/14 01:22:57 mitr Exp $")
+RCSID("$tcsh: sh.c,v 3.133 2006/08/23 15:03:14 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -406,12 +406,12 @@ main(int argc, char **argv)
 	 * utmp, so we keep it too.
 	 */
 	if (strncmp(ttyn, "/dev/", 5) == 0)
-	    set(STRtty, cp = SAVE(ttyn + 5), VAR_READWRITE);
+	    setv(STRtty, cp = SAVE(ttyn + 5), VAR_READWRITE);
 	else
-	    set(STRtty, cp = SAVE(ttyn), VAR_READWRITE);
+	    setv(STRtty, cp = SAVE(ttyn), VAR_READWRITE);
     }
     else
-	set(STRtty, cp = SAVE(""), VAR_READWRITE);
+	setv(STRtty, cp = SAVE(""), VAR_READWRITE);
     /*
      * Initialize the shell variables. ARGV and PROMPT are initialized later.
      * STATUS is also munged in several places. CHILD is munged when
@@ -514,7 +514,7 @@ main(int argc, char **argv)
     if (cp == NULL)
 	fast = 1;		/* No home -> can't read scripts */
     else
-	set(STRhome, cp, VAR_READWRITE);
+	setv(STRhome, cp, VAR_READWRITE);
 
     dinit(cp);			/* dinit thinks that HOME == cwd in a login
 				 * shell */
@@ -531,19 +531,19 @@ main(int argc, char **argv)
 #ifdef apollo
 	int     oid = getoid();
 
-	set(STRoid, Itoa(oid, 0, 0), VAR_READWRITE);
+	setv(STRoid, Itoa(oid, 0, 0), VAR_READWRITE);
 #endif /* apollo */
 
-	set(STRuid, Itoa(uid, 0, 0), VAR_READWRITE);
+	setv(STRuid, Itoa(uid, 0, 0), VAR_READWRITE);
 
-	set(STRgid, Itoa(gid, 0, 0), VAR_READWRITE);
+	setv(STRgid, Itoa(gid, 0, 0), VAR_READWRITE);
 
 	cln = getenv("LOGNAME");
 	cus = getenv("USER");
 	if (cus != NULL)
-	    set(STRuser, quote(SAVE(cus)), VAR_READWRITE);
+	    setv(STRuser, quote(SAVE(cus)), VAR_READWRITE);
 	else if (cln != NULL)
-	    set(STRuser, quote(SAVE(cln)), VAR_READWRITE);
+	    setv(STRuser, quote(SAVE(cln)), VAR_READWRITE);
 	else if ((pw = xgetpwuid(uid)) == NULL)
 	    setcopy(STRuser, str2short("unknown"), VAR_READWRITE);
 	else
@@ -555,7 +555,7 @@ main(int argc, char **argv)
 	
 	cgr = getenv("GROUP");
 	if (cgr != NULL)
-	    set(STRgroup, quote(SAVE(cgr)), VAR_READWRITE);
+	    setv(STRgroup, quote(SAVE(cgr)), VAR_READWRITE);
 	else if ((gr = xgetgrgid(gid)) == NULL)
 	    setcopy(STRgroup, str2short("unknown"), VAR_READWRITE);
 	else
@@ -614,7 +614,7 @@ main(int argc, char **argv)
      * if noediting is set, we switch on editing if $TERM is changed.
      */
     if ((tcp = getenv("TERM")) != NULL) {
-	set(STRterm, quote(SAVE(tcp)), VAR_READWRITE);
+	setv(STRterm, quote(SAVE(tcp)), VAR_READWRITE);
 	noediting = strcmp(tcp, "unknown") == 0 || strcmp(tcp, "dumb") == 0 ||
 		    strcmp(tcp, "network") == 0;
 	editing = strcmp(tcp, "emacs") != 0 && strcmp(tcp, "wm") != 0 &&
@@ -681,7 +681,7 @@ main(int argc, char **argv)
 	    sh_len = strlen(tcp);
 	    if ((sh_len >= 5 && strcmp(tcp + (sh_len - 5), "/tcsh") == 0) || 
 	        (!tcsh && sh_len >= 4 && strcmp(tcp + (sh_len - 4), "/csh") == 0))
-		set(STRshell, quote(SAVE(tcp)), VAR_READWRITE);
+		setv(STRshell, quote(SAVE(tcp)), VAR_READWRITE);
 	    else
 		sh_len = 0;
 	}
@@ -812,7 +812,7 @@ main(int argc, char **argv)
 		 * we put the command into a variable
 		 */
 		if (arginp != NULL)
-		    set(STRcommand, quote(Strsave(arginp)), VAR_READWRITE);
+		    setv(STRcommand, quote(Strsave(arginp)), VAR_READWRITE);
 
 		/*
 		 * * Give an error on -c arguments that end in * backslash to
@@ -1603,7 +1603,6 @@ static void
 srcunit(int unit, int onlyown, int hflg, Char **av)
 {
     struct saved_state st;
-    int old_pintr_disabled = 0;
 
     st.SHIN = -1;	/* st_restore checks this */
 
@@ -1622,7 +1621,6 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
     /* Does nothing before st_save() because st.SHIN == -1 */
     cleanup_push(&st, st_restore);
     if (setintr) {
-	old_pintr_disabled = pintr_disabled;
 	pintr_disabled++;
 	cleanup_push(&pintr_disabled, disabled_cleanup);
     }
@@ -1656,15 +1654,18 @@ goodbye(Char **v, struct command *c)
 
     if (loginsh) {
 	size_t omark;
+	sigset_t set;
 
 	signal(SIGQUIT, SIG_IGN);
-	sigrelse(SIGQUIT);
+	sigaddset(&set, SIGQUIT);
+	sigprocmask(SIG_UNBLOCK, &set, NULL);
 	signal(SIGINT, SIG_IGN);
-	sigrelse(SIGINT);
+	sigaddset(&set, SIGINT);
 	signal(SIGTERM, SIG_IGN);
-	sigrelse(SIGTERM);
+	sigaddset(&set, SIGTERM);
 	signal(SIGHUP, SIG_IGN);
-	sigrelse(SIGHUP);
+	sigaddset(&set, SIGHUP);
+	sigprocmask(SIG_UNBLOCK, &set, NULL);
 	phup_disabled = 1;
 	setintr = 0;		/* No interrupts after "logout" */
 	/* Trap errors inside .logout */

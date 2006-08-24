@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.68 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.69 2006/06/21 18:12:23 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.68 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.69 2006/06/21 18:12:23 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -314,7 +314,7 @@ doset(Char **v, struct command *c)
 	    cleanup_until(copy);
 	}
 	else
-	    set(vp, Strsave(p), flags);
+	    setv(vp, Strsave(p), flags);
 	update_vars(vp);
     } while ((p = *v++) != NULL);
 }
@@ -428,7 +428,7 @@ dolet(Char **v, struct command *dummy)
 	    if (hadsub)
 		asx(vp, subscr, p);
 	    else
-		set(vp, p, VAR_READWRITE);
+		setv(vp, p, VAR_READWRITE);
 	    cleanup_ignore(p);
 	}
 	else if (hadsub) {
@@ -446,7 +446,7 @@ dolet(Char **v, struct command *dummy)
 
 	    val = operate(op, varval(vp), p);
 	    cleanup_push(val, xfree);
-	    set(vp, val, VAR_READWRITE);
+	    setv(vp, val, VAR_READWRITE);
 	    cleanup_ignore(val);
 	    cleanup_until(val);
 	}
@@ -595,7 +595,7 @@ setcopy(const Char *var, const Char *val, int flags)
 
     copy = Strsave(val);
     cleanup_push(copy, xfree);
-    set(var, copy, flags);
+    setv(var, copy, flags);
     cleanup_ignore(copy);
     cleanup_until(copy);
 }
@@ -604,7 +604,7 @@ setcopy(const Char *var, const Char *val, int flags)
  * The caller is responsible for putting value in a safe place
  */
 void
-set(const Char *var, Char *val, int flags)
+setv(const Char *var, Char *val, int flags)
 {
     Char **vec = xmalloc(2 * sizeof(Char **));
 

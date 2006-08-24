@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.hist.c,v 3.37 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.38 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.37 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.38 2006/03/02 18:46:44 christos Exp $")
 
 #include "tc.h"
 
@@ -368,7 +368,6 @@ fmthist(int fmt, ptr_t ptr)
 	buf = xmalloc(1);
 	buf[0] = '\0';
 	return buf;
-	break;
     }
 }
 

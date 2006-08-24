@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.101 2006/04/27 07:43:46 amold Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.102 2006/08/23 15:03:14 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.101 2006/04/27 07:43:46 amold Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.102 2006/08/23 15:03:14 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -476,7 +476,7 @@ pjwait(struct process *pp)
 {
     struct process *fp;
     int     jobflags, reason;
-    sigset_t omask, pause_mask;
+    sigset_t oset, set, pause_mask;
     Char *reason_str;
 
     while (pp->p_procid != pp->p_jobid)
@@ -492,10 +492,11 @@ pjwait(struct process *pp)
      * target process, or any of its friends, are running
      */
     fp = pp;
-    sigprocmask(SIG_BLOCK, NULL, &omask);
-    sighold(SIGINT);
-    cleanup_push(&omask, sigprocmask_cleanup);
-    sigprocmask(SIG_BLOCK, NULL, &pause_mask);
+    sigemptyset(&set);
+    sigaddset(&set, SIGINT);
+    (void)sigprocmask(SIG_BLOCK, &set, &oset);
+    cleanup_push(&oset, sigprocmask_cleanup);
+    pause_mask = oset;
     sigdelset(&pause_mask, SIGCHLD);
     for (;;) {
 	handle_pending_signals();
@@ -509,7 +510,7 @@ pjwait(struct process *pp)
 			  getpid(), fp->p_procid));
 	sigsuspend(&pause_mask);
     }
-    cleanup_until(&omask);
+    cleanup_until(&oset);
     jobdebug_xprintf(("%d returned from sigsuspend loop\n", getpid()));
 #ifdef BSDJOBS
     if (tpgrp > 0)		/* get tty back */
@@ -561,7 +562,7 @@ pjwait(struct process *pp)
 	xprintf(CGETS(17, 2, "Exit %d\n"), reason);
     reason_str = putn(reason);
     cleanup_push(reason_str, xfree);
-    set(STRstatus, reason_str, VAR_READWRITE);
+    setv(STRstatus, reason_str, VAR_READWRITE);
     cleanup_ignore(reason_str);
     cleanup_until(reason_str);
     if (reason && exiterr)
@@ -1925,7 +1926,7 @@ pgetty(int wanttty, pid_t pgrp)
 {
 #ifdef BSDJOBS
 # ifdef POSIXJOBS
-    sigset_t omask;
+    sigset_t oset, set;
 # endif /* POSIXJOBS */
 
     jobdebug_xprintf(("wanttty %d pid %d opgrp%d pgrp %d tpgrp %d\n",
@@ -1937,10 +1938,11 @@ pgetty(int wanttty, pid_t pgrp)
      * correctly....
      */
     if (wanttty > 0) {
-	sigprocmask(SIG_BLOCK, NULL, &omask);
-	(void) sighold(SIGTSTP);
-	(void) sighold(SIGTTIN);
-	cleanup_push(&omask, sigprocmask_cleanup);
+	sigemptyset(&set);
+	sigaddset(&set, SIGTSTP);
+	sigaddset(&set, SIGTTIN);
+	(void)sigprocmask(SIG_BLOCK, &set, &oset);
+	cleanup_push(&oset, sigprocmask_cleanup);
     }
 # endif /* POSIXJOBS */
 
@@ -1975,7 +1977,7 @@ pgetty(int wanttty, pid_t pgrp)
 # ifdef POSIXJOBS
     if (wanttty > 0) {
 	setttypgrp(pgrp);
-	cleanup_until(&omask);
+	cleanup_until(&oset);
     }
 # endif /* POSIXJOBS */
 

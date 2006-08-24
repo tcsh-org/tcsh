@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.c,v 3.67 2006/03/11 15:32:00 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.c,v 3.68 2006/03/14 01:22:57 mitr Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.os.c,v 3.67 2006/03/11 15:32:00 mitr Exp $")
+RCSID("$tcsh: tc.os.c,v 3.68 2006/03/14 01:22:57 mitr Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -547,7 +547,9 @@ static jmp_buf sigsys_buf;
 static void
 catch_sigsys(void)
 {
-    sigrelse(SIGSYS);
+    sigset_t set;
+    sigemptyset(&set, SIGSYS);
+    (void)sigprocmask(SIG_UNBLOCK, &set, NULL);
     longjmp(sigsys_buf, 1);
 }
 
@@ -812,13 +814,15 @@ dobs2cmd(Char **v, struct command *c)
     cleanup_push(&pvec[0], open_cleanup);
     cleanup_push(&pvec[1], open_cleanup);
     if (pfork(&faket, -1) == 0) {
+	sigset_t set;
         /* child */
         xclose(pvec[0]);
         (void) dmove(pvec[1], 1);
         (void) dmove(SHDIAG,  2);
         initdesc();
-/*        closem();*/
-	sigrelse(SIGINT);
+	sigemptyset(&set);
+	sigaddset(&set, SIGINT);
+	(void)sigprocmask(SIG_UNBLOCK, &set, NULL);
 #ifdef SIGTSTP
         signal(SIGTSTP, SIG_IGN);
 #endif

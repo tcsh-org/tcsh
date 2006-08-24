@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.exec.c,v 3.71 2006/02/15 23:35:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exec.c,v 3.72 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exec.c,v 3.71 2006/02/15 23:35:36 christos Exp $")
+RCSID("$tcsh: sh.exec.c,v 3.72 2006/03/02 18:46:44 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -238,9 +238,14 @@ doexec(struct command *t, int do_glob)
      * We must do this AFTER any possible forking (like `foo` in glob) so that
      * this shell can still do subprocesses.
      */
-    (void) sigrelse(SIGINT);
+    {
+	sigset_t set;
+	sigemptyset(&set);
+	sigaddset(&set, SIGINT);
+	sigaddset(&set, SIGCHLD);
+	sigprocmask(SIG_UNBLOCK, &set, NULL);
+    }
     pintr_disabled = 0;
-    (void) sigrelse(SIGCHLD);
     pchild_disabled = 0;
 
     /*

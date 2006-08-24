@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.sig.c,v 3.34 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.sig.c,v 3.35 2006/03/02 18:46:45 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.sig.c,v 3.34 2006/01/12 19:55:38 christos Exp $")
+RCSID("$tcsh: tc.sig.c,v 3.35 2006/03/02 18:46:45 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -44,8 +44,12 @@ sigset_interrupting(int sig, void (*fn) (int))
     act.sa_handler = fn;
     sigemptyset(&act.sa_mask);
     act.sa_flags = 0;
-    if (sigaction(sig, &act, NULL) == 0)
-	sigrelse(sig);
+    if (sigaction(sig, &act, NULL) == 0) {
+	sigset_t set;
+	sigemptyset(&set);
+	sigaddset(&set, sig);
+	sigprocmask(SIG_UNBLOCK, &set, NULL);
+    }
 }
 
 static volatile sig_atomic_t alrmcatch_pending; /* = 0; */

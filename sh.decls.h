@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.51 2006/01/13 00:27:02 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.52 2006/03/14 01:22:57 mitr Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -371,7 +371,7 @@ extern	Char		 *putn		(int);
 extern	int		  getn		(Char *);
 extern	Char		 *value1	(Char *, struct varent *);
 extern	void		  setcopy	(const Char *, const Char *, int);
-extern	void		  set		(const Char *, Char *, int);
+extern	void		  setv		(const Char *, Char *, int);
 extern	void		  set1		(const Char *, Char **,
 					 struct varent *, int);
 extern	void		  setq		(const Char *, Char **,

@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.sem.c,v 3.75 2006/01/13 00:28:50 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.76 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.sem.c,v 3.75 2006/01/13 00:28:50 christos Exp $")
+RCSID("$tcsh: sh.sem.c,v 3.76 2006/03/02 18:46:44 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -90,7 +90,8 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
     const struct biltins *bifunc;
     pid_t pid = 0;
     int     pv[2];
-    static sigset_t csigmask;
+    sigset_t set;
+    static sigset_t csigset;
 #ifdef VFORK
     static int onosigchld = 0;
 #endif /* VFORK */
@@ -374,15 +375,16 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 		 * not die before we can set the process group
 		 */
 		if (wanttty >= 0 && !nosigchld) {
-		    sigprocmask(SIG_BLOCK, NULL, &csigmask);
-		    (void) sighold(SIGCHLD);
+		    sigemptyset(&set);
+		    sigaddset(&set, SIGCHLD);
+		    (void)sigprocmask(SIG_BLOCK, &set, &csigset);
 
 		    nosigchld = 1;
 		}
 
 		pid = pfork(t, wanttty);
 		if (pid == 0 && nosigchld) {
-		    sigprocmask(SIG_SETMASK, &csigmask, NULL);
+		    sigprocmask(SIG_SETMASK, &csigset, NULL);
 		    nosigchld = 0;
 		}
 		else if (pid != 0 && (t->t_dflg & F_AMPERSAND))
@@ -394,7 +396,7 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 		int     ochild, osetintr, ohaderr, odidfds;
 		int     oSHIN, oSHOUT, oSHDIAG, oOLDSTD, otpgrp;
 		int     oisoutatty, oisdiagatty;
-		sigset_t omask, ocsigmask;
+		sigset_t oset, ocsigset;
 # ifndef CLOSE_ON_EXEC
 		int     odidcch;
 # endif  /* !CLOSE_ON_EXEC */
@@ -418,13 +420,15 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 
 # endif /* SAVESIGVEC */
 		if (wanttty >= 0 && !nosigchld && !noexec) {
-		    sigprocmask(SIG_BLOCK, NULL, &csigmask);
-		    (void) sighold(SIGCHLD);
+		    sigemptyset(&set);
+		    sigaddset(&set, SIGCHLD);
+		    (void)sigprocmask(SIG_BLOCK, &set, &csigset);
 		    nosigchld = 1;
 		}
-		sigprocmask(SIG_BLOCK, NULL, &omask);
-		(void) sighold(SIGCHLD);
-		(void) sighold(SIGINT);
+		sigemptyset(&set);
+		sigaddset(&set, SIGCHLD);
+		sigaddset(&set, SIGINT);
+		(void)sigprocmask(SIG_BLOCK, &set, &oset);
 		ochild = child;
 		osetintr = setintr;
 		ohaderr = haderr;
@@ -439,7 +443,7 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 		otpgrp = tpgrp;
 		oisoutatty = isoutatty;
 		oisdiagatty = isdiagatty;
-		ocsigmask = csigmask;
+		ocsigset = csigset;
 		onosigchld = nosigchld;
 		Vsav = Vdp = 0;
 		Vexpath = 0;
@@ -456,7 +460,7 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 # ifdef SAVESIGVEC
 		    restoresigvec(savesv, savesm);
 # endif /* SAVESIGVEC */
-		    sigprocmask(SIG_SETMASK, &omask, NULL);
+		    sigprocmask(SIG_SETMASK, &oset, NULL);
 		    stderror(ERR_NOPROC);
 		}
 		forked++;
@@ -478,7 +482,7 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 		    tpgrp = otpgrp;
 		    isoutatty = oisoutatty;
 		    isdiagatty = oisdiagatty;
-		    csigmask = ocsigmask;
+		    csigset = ocsigset;
 		    nosigchld = onosigchld;
 
 		    xfree(Vsav);
@@ -491,14 +495,14 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 		    Vt = 0;
 		    /* this is from pfork() */
 		    palloc(pid, t);
-		    sigprocmask(SIG_SETMASK, &omask, NULL);
+		    sigprocmask(SIG_SETMASK, &oset, NULL);
 		}
 		else {		/* child */
 		    /* this is from pfork() */
 		    pid_t pgrp;
 		    int    ignint = 0;
 		    if (nosigchld) {
-			sigprocmask(SIG_SETMASK, &csigmask, NULL);
+			sigprocmask(SIG_SETMASK, &csigset, NULL);
 			nosigchld = 0;
 		    }
 
@@ -592,7 +596,7 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
 #endif /* BACKPIPE */
 
 	    if (nosigchld) {
-		sigprocmask(SIG_SETMASK, &csigmask, NULL);
+		sigprocmask(SIG_SETMASK, &csigset, NULL);
 		nosigchld = 0;
 	    }
 	    if ((t->t_dflg & F_AMPERSAND) == 0)

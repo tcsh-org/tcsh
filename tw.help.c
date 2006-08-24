@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.help.c,v 3.25 2006/03/02 18:46:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.help.c,v 3.26 2006/03/11 15:32:00 mitr Exp $ */
 /* tw.help.c: actually look up and print documentation on a file.
  *	      Look down the path for an appropriate file, then print it.
  *	      Note that the printing is NOT PAGED.  This is because the
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.help.c,v 3.25 2006/03/02 18:46:45 christos Exp $")
+RCSID("$tcsh: tw.help.c,v 3.26 2006/03/11 15:32:00 mitr Exp $")
 
 #include "tw.h"
 #include "tc.h"
@@ -132,18 +132,19 @@ do_help(const Char *command)
 	    }
 	    if (f != -1) {
 	        unsigned char buf[512];
-		sigset_t orig_mask;
-		struct sigaction orig_intr;
+		sigset_t oset, set;
+		struct sigaction osa, sa;
 		ssize_t len;
 
 		/* so cat it to the terminal */
 		cleanup_push(&f, open_cleanup);
-		sigaction(SIGINT, NULL, &orig_intr);
-		cleanup_push(&orig_intr, sigint_cleanup);
-		sigprocmask(SIG_UNBLOCK, NULL, &orig_mask);
-		cleanup_push(&orig_mask, sigprocmask_cleanup);
-		signal(SIGINT, cleanf);
-		sigrelse(SIGINT);
+		sa.sa_handler = cleanf;
+		sigemptyset(&sa.sa_mask);
+		sa.sa_flags = 0;
+		(void)sigaction(SIGINT, &sa, &osa);
+		cleanup_push(&osa, sigint_cleanup);
+		(void)sigprocmask(SIG_UNBLOCK, &set, &oset);
+		cleanup_push(&oset, sigprocmask_cleanup);
 		while ((len = xread(f, buf, sizeof(buf))) > 0)
 		    (void) xwrite(SHOUT, buf, len);
 		cleanup_until(&f);

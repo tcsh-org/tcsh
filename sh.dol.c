@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.67 2006/03/18 07:10:14 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.68 2006/03/18 07:11:07 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.67 2006/03/18 07:10:14 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.68 2006/03/18 07:11:07 christos Exp $")
 
 /*
  * C shell
@@ -201,11 +201,10 @@ Dword(struct blk_buf *bb)
     eChar c, c1;
     struct Strbuf wbuf = Strbuf_INIT;
     int dolflg;
-    int    sofar = 0, done = 0;
+    int    sofar = 0;
 
     cleanup_push(&wbuf, Strbuf_cleanup);
     for (;;) {
-	done = 1;
 	c = DgetC(DODOL);
 	switch (c) {
 
@@ -376,6 +375,10 @@ Dgetdol(void)
     cleanup_push(&name, Strbuf_cleanup);
     dolmod.len = dolmcnt = dol_flag_a = 0;
     c = sc = DgetC(0);
+    if (c == DEOF) {
+      stderror(ERR_SYNTAX);
+      return;
+    }
     if (c == '{')
 	c = DgetC(0);		/* sc is { to take } later */
     if ((c & TRIM) == '#')
@@ -503,7 +506,7 @@ Dgetdol(void)
 	    do {
 		subscr = subscr * 10 + c - '0';
 		c = DgetC(0);
-	    } while (Isdigit(c));
+	    } while (c != DEOF && Isdigit(c));
 	    unDredc(c);
 	    if (subscr < 0)
 		stderror(ERR_RANGE);
@@ -540,7 +543,7 @@ Dgetdol(void)
 	    }
 	    break;
 	}
-	if (!alnum(c)) {
+	if (c == DEOF || !alnum(c)) {
 	    np = dimen ? STRargv : (bitset ? STRstatus : NULL);
 	    if (np) {
 		bitset = 0;
@@ -557,7 +560,7 @@ Dgetdol(void)
 	for (;;) {
 	    Strbuf_append1(&name, (Char) c);
 	    c = DgetC(0);
-	    if (!alnum(c))
+	    if (c == DEOF || !alnum(c))
 		break;
 	}
 	Strbuf_terminate(&name);
@@ -730,7 +733,7 @@ fixDolMod(void)
 		Strbuf_append1(&dolmod, (Char) c);
 		Strbuf_append1(&dolmod, (Char) delim);
 
-		if (!delim || letter(delim)
+		if (delim == DEOF || !delim || letter(delim)
 		    || Isdigit(delim) || any(" \t\n", delim)) {
 		    seterror(ERR_BADSUBST);
 		    break;

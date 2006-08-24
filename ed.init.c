@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.init.c,v 3.58 2006/03/11 15:32:00 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.init.c,v 3.59 2006/08/23 15:03:13 christos Exp $ */
 /*
  * ed.init.c: Editor initializations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.init.c,v 3.58 2006/03/11 15:32:00 mitr Exp $")
+RCSID("$tcsh: ed.init.c,v 3.59 2006/08/23 15:03:13 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -261,8 +261,13 @@ ed_Setup(int rst)
 	tty_setchar(&extty, ttychars[EX_IO]);
 
 # ifdef SIG_WINDOW
-    signal(SIG_WINDOW, window_change);	/* for window systems */
-    sigrelse(SIG_WINDOW);
+    {
+	sigset_t set;
+	(void)signal(SIG_WINDOW, window_change);	/* for window systems */
+	sigemptyset(&set);
+	sigaddset(&set, SIG_WINDOW);
+	(void)sigprocmask(SIG_UNBLOCK, &set, NULL);
+    }
 # endif
 #else /* WINNT_NATIVE */
 # ifdef DEBUG
@@ -548,7 +553,7 @@ Cookedmode(void)
 #ifdef WINNT_NATIVE
     do_nt_cooked_mode();
 #else
-    sigset_t omask;
+    sigset_t set, oset;
     int res;
 
 # ifdef _IBMR2
@@ -559,11 +564,12 @@ Cookedmode(void)
 	return (0);
 
     /* hold this for reseting tty */
-    sigprocmask(SIG_BLOCK, NULL, &omask);
-    sighold(SIGINT);
-    cleanup_push(&omask, sigprocmask_cleanup);
+    sigemptyset(&set);
+    sigaddset(&set, SIGINT);
+    (void)sigprocmask(SIG_BLOCK, &set, &oset);
+    cleanup_push(&oset, sigprocmask_cleanup);
     res = tty_setty(SHTTY, &extty);
-    cleanup_until(&omask);
+    cleanup_until(&oset);
     if (res == -1) {
 # ifdef DEBUG_TTY
 	xprintf("Cookedmode: tty_setty: %s\n", strerror(errno));

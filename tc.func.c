@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.133 2006/03/11 15:32:00 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.134 2006/03/14 01:22:57 mitr Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.133 2006/03/11 15:32:00 mitr Exp $")
+RCSID("$tcsh: tc.func.c,v 3.134 2006/03/14 01:22:57 mitr Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -600,15 +600,20 @@ xgetpass(const char *prm)
 {
     static struct strbuf pass; /* = strbuf_INIT; */
     int fd;
-    sigset_t omask;
-    struct sigaction sigint;
+    sigset_t oset, set;
+    struct sigaction sa, osa;
 
-    sigprocmask(SIG_UNBLOCK, NULL, &omask);
-    sigaction(SIGINT, NULL, &sigint);
-    signal(SIGINT, SIG_IGN);
-    sigrelse(SIGINT);
-    cleanup_push(&sigint, sigint_cleanup);
-    cleanup_push(&omask, sigprocmask_cleanup);
+    sa.sa_handler = SIG_IGN;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    (void)sigaction(SIGINT, &sa, &osa);
+
+    sigemptyset(&set);
+    sigaddset(&set, SIGINT);
+    (void)sigprocmask(SIG_UNBLOCK, &set, &oset);
+
+    cleanup_push(&osa, sigint_cleanup);
+    cleanup_push(&oset, sigprocmask_cleanup);
     (void) Rawmode();	/* Make sure, cause we want echo off */
     fd = xopen("/dev/tty", O_RDWR|O_LARGEFILE);
     if (fd == -1)
@@ -627,7 +632,7 @@ xgetpass(const char *prm)
     }
     strbuf_terminate(&pass);
 
-    cleanup_until(&sigint);
+    cleanup_until(&sa);
 
     return pass.s;
 }
@@ -1030,7 +1035,7 @@ aliasrun(int cnt, Char *s1, Char *s2)
     cleanup_until(&w);
     pendjob();
     /* Restore status */
-    set(STRstatus, putn(status), VAR_READWRITE);
+    setv(STRstatus, putn(status), VAR_READWRITE);
 }
 
 void
@@ -1596,7 +1601,7 @@ shlvl(int val)
 
 	    p = Itoa(val, 0, 0);
 	    cleanup_push(p, xfree);
-	    set(STRshlvl, p, VAR_READWRITE);
+	    setv(STRshlvl, p, VAR_READWRITE);
 	    cleanup_ignore(p);
 	    cleanup_until(p);
 	    tsetenv(STRKSHLVL, p);
@@ -1991,11 +1996,14 @@ remotehost(void)
     mypipe(fds);
     pid = fork();
     if (pid == 0) {
+	sigset_t set;
 	xclose(fds[0]);
 	/* Don't get stuck if the resolver does not work! */
 	signal(SIGALRM, palarm);
-	sigrelse(SIGALRM);
-	(void) alarm(2);
+	sigemptyset(&set);
+	sigaddset(&set, SIGALRM);
+	(void)sigprocmask(SIG_UNBLOCK, &set, NULL);
+	(void)alarm(2);
 	getremotehost(fds[1]);
 	/*NOTREACHED*/
     }
