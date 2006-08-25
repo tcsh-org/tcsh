@@ -107,9 +107,6 @@ int sigprocmask(int ,const sigset_t*,sigset_t*);
 int sigaction(int, const struct sigaction *, struct sigaction*);
 int sigsuspend(const sigset_t *sigmask);
 
-int sigrelse(int signal);
-int sighold(int signal);
-
 #define WNOHANG 0
 #define WUNTRACED 1
 
