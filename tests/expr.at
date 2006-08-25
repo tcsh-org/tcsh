@@ -83,7 +83,7 @@ AT_CHECK([tcsh -f -c 'exit { true }'], 1)
 AT_CHECK([tcsh -f -c 'exit { false }'], 0)
 
 touch file1 file2
-chmod 7777 file1
+chmod 6777 file1
 chmod 000 file2
 
 AT_CHECK([tcsh -f -c 'exit ( -r file1 )'], 1)
@@ -111,6 +111,7 @@ AT_CHECK([tcsh -f -c 'exit ( -s file1 )'], 0)
 AT_CHECK([tcsh -f -c 'exit ( -r nonempty )'], 1)
 
 mkdir dir
+chmod +t dir
 ln -s file2 link
 mkfifo pipe
 
@@ -132,7 +133,7 @@ AT_CHECK([tcsh -f -c 'exit ( -u file2 )'], 0)
 AT_CHECK([tcsh -f -c 'exit ( -g file1 )'], 1)
 AT_CHECK([tcsh -f -c 'exit ( -g file2 )'], 0)
 
-AT_CHECK([tcsh -f -c 'exit ( -k file1 )'], 1)
+AT_CHECK([tcsh -f -c 'exit ( -k dir )'], 1)
 AT_CHECK([tcsh -f -c 'exit ( -k file2 )'], 0)
 
 AT_CHECK([tcsh -f -c 'exit ( -t 0 )' < /dev/null], 0)

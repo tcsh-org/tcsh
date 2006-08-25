@@ -381,7 +381,7 @@ TCSH_UNTESTED([fg])
 AT_SETUP([filetest])
 
 touch file1 file2
-chmod 7777 file1
+chmod 6777 file1
 chmod 000 file2
 
 AT_CHECK([tcsh -f -c 'filetest -r file1 file2'], ,
@@ -418,6 +418,7 @@ AT_CHECK([tcsh -f -c 'filetest -s file1 nonempty'], ,
 ])
 
 mkdir dir
+chmod +t dir
 ln -s file2 link
 mkfifo pipe
 
@@ -445,7 +446,7 @@ AT_CHECK([tcsh -f -c 'filetest -g file1 file2'], ,
 [1 0
 ])
 
-AT_CHECK([tcsh -f -c 'filetest -k file1 file2'], ,
+AT_CHECK([tcsh -f -c 'filetest -k dir file2'], ,
 [1 0
 ])
 
