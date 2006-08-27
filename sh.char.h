@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.char.h,v 3.29 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.char.h,v 3.30 2006/08/24 20:56:31 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -113,16 +113,16 @@ extern tcshuc _cmap_lower[], _cmap_upper[];
 
 #ifdef WIDE_STRINGS
 # define cmap(c, bits)	\
-	((c < 0) ? 0 : \
+	(((c) < 0) ? 0 : \
 	((c) & QUOTE) || (c) >= 0x0080 ? 0 : (_cmap[(tcshuc)ASC(c)] & (bits)))
 #elif defined(SHORT_STRINGS) && defined(KANJI)
 #  define cmap(c, bits)	\
-	((c < 0) ? 0 : \
+	(((c) < 0) ? 0 : \
 	(((c) & QUOTE) || ((ASC(c) & 0x80) && adrof(STRnokanji))) ? \
 	0 : (_cmap[(tcshuc)ASC(c)] & (bits)))
 #else /* SHORT_STRINGS && KANJI */
 # define cmap(c, bits)	\
-	((c < 0) ? 0 : \
+	(((c) < 0) ? 0 : \
 	((c) & QUOTE) ? 0 : (_cmap[(tcshuc)ASC(c)] & (bits)))
 #endif /* SHORT_STRINGS && KANJI */
 
