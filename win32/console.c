@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/console.c,v 1.7 2006/01/12 18:15:25 christos Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/console.c,v 1.8 2006/03/05 08:59:36 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -627,4 +627,10 @@ void set_attributes(const unsigned char *color) {
 		wAttributes = (wAttributes & COMMON_LVB_UNDERSCORE)
 			| ((wAttributes & 0x00f0) >> 4) | ((wAttributes & 0x000f) << 4);
 	SetConsoleTextAttribute(ghstdout, wAttributes);
+}
+void StartHighlight(void)
+{
+}
+void StopHighlight(void)
+{
 }

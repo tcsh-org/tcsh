@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.17 2006/03/05 18:35:53 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.18 2006/03/14 01:22:57 mitr Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -1049,7 +1049,7 @@ re_cp:
 		if(!gui_app) {
 			WaitForSingleObject(pi.hProcess,INFINITE);
 			(void)GetExitCodeProcess(pi.hProcess,&exitcode);
-			set(STRstatus, putn(exitcode), VAR_READWRITE);/*FIXRESET*/
+			setv(STRstatus, putn(exitcode), VAR_READWRITE);/*FIXRESET*/
 		}
 		retval = 0;
 		CloseHandle(pi.hProcess);
