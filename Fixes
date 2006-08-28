@@ -1,4 +1,5 @@
- 61. V6.14.07 - 20060825
+ 68. Automatically disable WIDE_STRINGS with --disable-nls (Miloslav Trmac)
+ 67. V6.14.07 - 20060825
  66. rename set to setv to avoid clashes (christos)
  65. Eliminate sighold/sigrelse (christos)
  64. Compilation cleanups. (Martin Kraemer)
