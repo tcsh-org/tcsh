@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.134 2006/03/14 01:22:57 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.135 2006/08/24 20:56:31 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.134 2006/03/14 01:22:57 mitr Exp $")
+RCSID("$tcsh: tc.func.c,v 3.135 2006/08/24 20:56:31 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1811,7 +1811,8 @@ hashbang(int fd, Char ***vp)
 			ws = real;
 		}
 #endif /* !WINNT_NATIVE */
-		bb_append(&sarg, SAVE(ws));
+		if (ws)
+		    bb_append(&sarg, SAVE(ws));
 	    }
 	    if (sarg.len > 0) {
 		*vp = bb_finish(&sarg);
