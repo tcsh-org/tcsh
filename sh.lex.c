@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.73 2006/07/05 15:07:03 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.74 2006/08/23 01:25:45 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.73 2006/07/05 15:07:03 mitr Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.74 2006/08/23 01:25:45 christos Exp $")
 
 #include "ed.h"
 
@@ -44,6 +44,8 @@ RCSID("$tcsh: sh.lex.c,v 3.73 2006/07/05 15:07:03 mitr Exp $")
  * C shell
  */
 
+#define FLAG_G	1
+#define FLAG_A	2
 /*
  * These lexical routines read input and form lists of words.
  * There is some involved processing here, because of the complications
@@ -751,12 +753,8 @@ getsub(struct wordent *en)
 	exclnxt = 0;
 	global = 0;
 	sc = c = getC(0);
-	if (c == 'g' || c == 'a') {
-	    global |= (c == 'g') ? 1 : 2;
-	    sc = c = getC(0);
-	}
-	if (((c =='g') && !(global & 1)) || ((c == 'a') && !(global & 2))) {
-	    global |= (c == 'g') ? 1 : 2;
+	while (c == 'g' || c == 'a') {
+	    global |= (c == 'g') ? FLAG_G : FLAG_A;
 	    sc = c = getC(0);
 	}
 
@@ -767,7 +765,7 @@ getsub(struct wordent *en)
 
 	case 'x':
 	case 'q':
-	    global |= 1;
+	    global |= FLAG_G;
 	    /*FALLTHROUGH*/
 
 	case 'h':
@@ -897,11 +895,11 @@ dosub(Char sc, struct wordent *en, int global)
 	if (en->word) {
 	    Char *tword, *otword;
 
-	    if ((global & 1) || didsub == 0) {
+	    if ((global & FLAG_G) || didsub == 0) {
 		tword = subword(en->word, sc, &didone);
 		if (didone)
 		    didsub = 1;
-		if (global & 2) {
+		if (global & FLAG_A) {
 		    while (didone && tword != STRNULL) {
 			otword = tword;
 			tword = subword(otword, sc, &didone);
@@ -935,8 +933,8 @@ subword(Char *cp, Char type, int *adid)
 {
     Char *wp;
     const Char *mp, *np;
+    int rec;
 
-    *adid = 0;
     switch (type) {
 
     case 'r':
@@ -948,12 +946,16 @@ subword(Char *cp, Char type, int *adid)
     case 'u':
     case 'l':
 	wp = domod(cp, type);
-	if (wp == 0)
+	if (wp == 0) {
+	    *adid = 0;
 	    return (Strsave(cp));
+	}
 	*adid = 1;
 	return (wp);
 
     default:
+	rec = Strstr(rhsb.s, lhsb.s) == NULL || *adid == 0;
+	*adid = 0;
 	for (mp = cp; *mp; mp++)
 	    if (matchs(mp, lhsb.s)) {
 		struct Strbuf wbuf = Strbuf_INIT;
@@ -976,7 +978,7 @@ subword(Char *cp, Char type, int *adid)
 			continue;
 		    }
 		Strbuf_append(&wbuf, mp + lhsb.len);
-		*adid = 1;
+		*adid = rec;
 		return Strbuf_finish(&wbuf);
 	    }
 	return (Strsave(cp));

@@ -1,3 +1,5 @@
+ 69. Avoid infinite loops in :ga modifiers when the LHS is a substring of the
+     RHS.
  68. Automatically disable WIDE_STRINGS with --disable-nls (Miloslav Trmac)
  67. V6.14.07 - 20060825
  66. rename set to setv to avoid clashes (christos)
