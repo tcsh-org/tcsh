@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dir.c,v 3.77 2006/03/03 22:08:45 amold Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dir.c,v 3.78 2006/03/05 18:35:53 amold Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,13 +33,13 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$tcsh: sh.dir.c,v 3.77 2006/03/03 22:08:45 amold Exp $")
+RCSID("$tcsh: sh.dir.c,v 3.78 2006/03/05 18:35:53 amold Exp $")
 
 /*
  * C Shell - directory management
  */
 
-static	char			*agetcwd	(void);
+static	Char			*agetcwd	(void);
 static	void			 dstart		(const char *);
 static	struct directory	*dfind		(Char *);
 static	Char 			*dfollow	(Char *);
@@ -57,10 +57,11 @@ static int    printd;			/* force name to be printed */
 
 int     bequiet = 0;		/* do not print dir stack -strike */
 
-static char *
+static Char *
 agetcwd(void)
 {
     char *buf;
+    Char *cwd;
     size_t len;
 
     len = MAXPATHLEN;
@@ -77,7 +78,13 @@ agetcwd(void)
 	len *= 2;
 	buf = xrealloc(buf, len);
     }
-    return xrealloc(buf, strlen(buf) + 1);
+    if (*buf == '\0') {
+	xfree(buf);
+	return NULL;
+    }
+    cwd = SAVE(buf);
+    xfree(buf);
+    return cwd;
 }
 
 static void
@@ -92,20 +99,17 @@ dstart(const char *from)
 void
 dinit(Char *hp)
 {
-    char *tcp;
-    Char *cp;
+    Char *cp, *tcp;
     struct directory *dp;
 
     /* Don't believe the login shell home, because it may be a symlink */
     tcp = agetcwd();
-    cleanup_push(tcp, xfree);
-    if (tcp == NULL || *tcp == '\0') {
+    if (tcp == NULL) {
 	xprintf("%s: %s\n", progname, strerror(errno));
-	cleanup_until(tcp);
 	if (hp && *hp) {
-	    tcp = short2str(hp);
-	    dstart(tcp);
-	    if (chdir(tcp) == -1)
+	    char *xcp = short2str(hp);
+	    dstart(xcp);
+	    if (chdir(xcp) == -1)
 		cp = NULL;
 	    else
 		cp = Strsave(hp);
@@ -121,12 +125,11 @@ dinit(Char *hp)
 	}
     }
     else {
-	Char *copy;
 #ifdef S_IFLNK
 	struct stat swd, shp;
 	int swd_ok;
 
-	swd_ok = stat(tcp, &swd) == 0;
+	swd_ok = stat(short2str(tcp), &swd) == 0;
 	/*
 	 * See if $HOME is the working directory we got and use that
 	 */
@@ -144,25 +147,21 @@ dinit(Char *hp)
 		if (stat(cwd, &shp) != -1 &&
 			DEV_DEV_COMPARE(swd.st_dev, shp.st_dev) &&
 		        swd.st_ino == shp.st_ino) {
-		    cleanup_until(tcp);
-		    tcp = strsave(cwd);
+		    tcp = SAVE(cwd);
 		    cleanup_push(tcp, xfree);
 		}
 	    }
-	    copy = SAVE(tcp);
-	    cleanup_push(copy, xfree);
-	    cp = dcanon(copy, STRNULL);
-	    cleanup_ignore(copy);
-	    cleanup_until(copy);
+	    cleanup_push(tcp, xfree);
+	    cp = dcanon(tcp, STRNULL);
+	    cleanup_ignore(tcp);
+	    cleanup_until(tcp);
 	}
 #else /* S_IFLNK */
-        copy = SAVE(tcp);
-	cleanup_push(copy, xfree);
-	cp = dcanon(copy, STRNULL);
-	cleanup_ignore(copy);
-	cleanup_until(copy);
-#endif /* S_IFLNK */
+	cleanup_push(tcp, xfree);
+	cp = dcanon(tcp, STRNULL);
+	cleanup_ignore(tcp);
 	cleanup_until(tcp);
+#endif /* S_IFLNK */
     }
 
     dp = xcalloc(sizeof(struct directory), 1);
@@ -541,7 +540,6 @@ static Char *
 dgoto(Char *cp)
 {
     Char *dp, *ret;
-    char *cwd;
 
     if (!ABSOLUTEP(cp))
     {
@@ -567,14 +565,10 @@ dgoto(Char *cp)
 	dp = cp;
 
 #if defined(WINNT_NATIVE)
-    cwd = agetcwd();
-    ret = SAVE(cwd);
-    xfree(cwd);
+    return agetcwd();
 #elif defined(__CYGWIN__)
     if (ABSOLUTEP(cp) && cp[1] == ':') { /* Only DOS paths are treated that way */
-	cwd = agetcwd();
-    	ret = SAVE(cwd);
-	xfree(cwd);
+	return agetcwd();
     } else {
 	cleanup_push(cp, xfree);
     	ret = dcanon(cp, dp);
@@ -582,7 +576,6 @@ dgoto(Char *cp)
 	cleanup_until(cp);
     }
 #else /* !WINNT_NATIVE */
-    USE(cwd);
     cleanup_push(cp, xfree);
     ret = dcanon(cp, dp);
     cleanup_ignore(cp);
@@ -605,13 +598,12 @@ dfollow(Char *cp)
     cleanup_push(cp, xfree);
 #ifdef apollo
     if (Strchr(cp, '`')) {
-	char *dptr, *ptr;
+	char *dptr;
 	if (chdir(dptr = short2str(cp)) < 0) 
 	    stderror(ERR_SYSTEM, dptr, strerror(errno));
-	ptr = agetcwd();
-	cleanup_push(ptr, xfree);
-	if (ptr != NULL && *ptr != '\0') {
-	    dp = Strsave(str2short(ptr));
+	dp = agetcwd();
+	cleanup_push(dp, xfree);
+	if (dp != NULL) {
 	    cleanup_until(cp);
 	    return dgoto(dp);
 	}
@@ -904,17 +896,14 @@ dcanon(Char *cp, Char *p)
 
 	p1 = varval(STRcwd);
 	if (p1 == STRNULL || !ABSOLUTEP(p1)) {
-	    char *tmp = agetcwd();
-	    Char *new_cwd;
+	    Char *new_cwd = agetcwd();
 
-	    cleanup_push(tmp, xfree);
-	    if (tmp == NULL || *tmp == '\0') {
+	    if (new_cwd == NULL) {
 		xprintf("%s: %s\n", progname, strerror(errno));
-		new_cwd = str2short("/");
-	    } else
-		new_cwd = str2short(tmp);
-	    cleanup_until(tmp);
-	    setcopy(STRcwd, new_cwd, VAR_READWRITE|VAR_NOGLOB);
+		setcopy(STRcwd, str2short("/"), VAR_READWRITE|VAR_NOGLOB);
+	    }
+	    else
+		setv(STRcwd, new_cwd, VAR_READWRITE|VAR_NOGLOB);
 	    p1 = varval(STRcwd);
 	}
 	len = Strlen(p1);
