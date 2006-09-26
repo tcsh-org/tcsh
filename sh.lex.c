@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.74 2006/08/23 01:25:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.75 2006/09/14 18:30:16 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.74 2006/08/23 01:25:45 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.75 2006/09/14 18:30:16 christos Exp $")
 
 #include "ed.h"
 
@@ -1531,7 +1531,8 @@ wide_read(int fildes, Char *buf, size_t nchars, int use_fclens)
     char cbuf[BUFSIZE + 1];
     ssize_t res, r = 0;
     size_t partial;
-    
+    int err;
+
     if (nchars == 0)
 	return 0;
     assert (nchars <= sizeof(cbuf) / sizeof(*cbuf));
@@ -1579,7 +1580,9 @@ wide_read(int fildes, Char *buf, size_t nchars, int use_fclens)
     } while (partial != 0 && nchars > 0);
     /* Throwing away possible partial multibyte characters on error if the
        stream is not seekable */
+    err = errno;
     lseek(fildes, -(off_t)partial, L_INCR);
+    errno = err;
     return res != 0 ? res : r;
 }
 
