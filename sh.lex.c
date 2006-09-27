@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.75 2006/09/14 18:30:16 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.76 2006/09/26 16:25:02 mitr Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.75 2006/09/14 18:30:16 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.76 2006/09/26 16:25:02 mitr Exp $")
 
 #include "ed.h"
 
@@ -64,7 +64,7 @@ static	struct wordent	*gethent	(Char);
 static	int	 	 matchs		(const Char *, const Char *);
 static	int	 	 getsel		(int *, int *, int);
 static	struct wordent	*getsub		(struct wordent *);
-static	Char 		*subword	(Char *, Char, int *);
+static	Char 		*subword	(Char *, Char, int *, size_t *);
 static	struct wordent	*dosub		(Char, struct wordent *, int);
 static	ssize_t		 wide_read	(int, Char *, size_t, int);
 
@@ -896,13 +896,16 @@ dosub(Char sc, struct wordent *en, int global)
 	    Char *tword, *otword;
 
 	    if ((global & FLAG_G) || didsub == 0) {
-		tword = subword(en->word, sc, &didone);
+		size_t pos;
+
+		pos = 0;
+		tword = subword(en->word, sc, &didone, &pos);
 		if (didone)
 		    didsub = 1;
 		if (global & FLAG_A) {
 		    while (didone && tword != STRNULL) {
 			otword = tword;
-			tword = subword(otword, sc, &didone);
+			tword = subword(otword, sc, &didone, &pos);
 			if (Strcmp(tword, otword) == 0) {
 			    xfree(otword);
 			    break;
@@ -928,12 +931,15 @@ dosub(Char sc, struct wordent *en, int global)
     return &(hst->Hlex);
 }
 
+/* Return a newly allocated result of one modification of CP using the
+   operation TYPE.  Set ADID to 1 if a modification was performed.
+   If TYPE == 's', perform substitutions only from *START_POS on and set
+   *START_POS to the position of next substitution attempt. */
 static Char *
-subword(Char *cp, Char type, int *adid)
+subword(Char *cp, Char type, int *adid, size_t *start_pos)
 {
     Char *wp;
     const Char *mp, *np;
-    int rec;
 
     switch (type) {
 
@@ -954,9 +960,7 @@ subword(Char *cp, Char type, int *adid)
 	return (wp);
 
     default:
-	rec = Strstr(rhsb.s, lhsb.s) == NULL || *adid == 0;
-	*adid = 0;
-	for (mp = cp; *mp; mp++)
+	for (mp = cp + *start_pos; *mp; mp++) {
 	    if (matchs(mp, lhsb.s)) {
 		struct Strbuf wbuf = Strbuf_INIT;
 
@@ -977,10 +981,13 @@ subword(Char *cp, Char type, int *adid)
 			Strbuf_append(&wbuf, lhsb.s);
 			continue;
 		    }
+		*start_pos = wbuf.len;
 		Strbuf_append(&wbuf, mp + lhsb.len);
-		*adid = rec;
+		*adid = 1;
 		return Strbuf_finish(&wbuf);
 	    }
+	}
+	*adid = 0;
 	return (Strsave(cp));
     }
 }

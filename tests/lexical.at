@@ -409,6 +409,8 @@ echo !echo:0:s//OK/
 echo !?ux?:*:s//uux/
 echo !!:*:&
 echo !1:*:gu:gr
+echo !1:*:gas/o/O/
+echo !1:*:gas/o/\[oo\]/
 echo !1:1-:p:au
 set var=(!1:1-:gs/a/ /)
 echo ${#var}
@@ -418,7 +420,7 @@ set var=(!1:1-:gs/a/ /:x)
 echo ${#var}
 ]])
 AT_CHECK([tcsh -f -q -i < modifiers.csh], ,
-[> foo bar baz quux /usr/src/sys/sys/malloc.c
+[[> foo bar baz quux /usr/src/sys/sys/malloc.c
 foo bar bash quux /usr/src/sys/sys/malloc.c
 /usr/src/sys/sys
 malloc.c
@@ -432,12 +434,14 @@ OK
 foo abr baz quuux
 foo abr baz quuuux
 Foo Bar Baz Quux /Usr/src/sys/sys/malloc
+fOO bar baz quux /usr/src/sys/sys/mallOc.c
+f[oo][oo] bar baz quux /usr/src/sys/sys/mall[oo]c.c
 6
 4
 6
 > exit
-],
-[echo foo bar bash quux /usr/src/sys/sys/malloc.c
+]],
+[[echo foo bar bash quux /usr/src/sys/sys/malloc.c
 echo foo kPa bash quux /usr/src/sys/sys/malloc.c
 echo /usr/src/sys/sys
 echo malloc.c
@@ -451,11 +455,13 @@ echo OK
 echo foo abr baz quuux
 echo foo abr baz quuuux
 echo Foo Bar Baz Quux /Usr/src/sys/sys/malloc
+echo fOO bar baz quux /usr/src/sys/sys/mallOc.c
+echo f\[oo\]\[oo\] bar baz quux /usr/src/sys/sys/mall\[oo\]c.c
 echo FOO bar baz quux
 set var= ( foo b r b z quux )
 set var= ( foo b r b z quux )
 set var= ( foo b r b z quux )
-])
+]])
 
 AT_CLEANUP
 

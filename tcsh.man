@@ -1050,9 +1050,8 @@ Apply the following modifier once to each word.
 a (+)
 Apply the following modifier as many times as possible to a single word.
 `a' and `g' can be used together to apply a modifier globally.
-In the current implementation, using the `a' and `s' modifiers together can
-lead to an infinite loop.  For example, `:as/f/ff/' will never terminate.
-This behavior might change in the future.
+With the `s' modifier, only the patterns contained in the original word are
+substituted, not patterns that contain any substitution result.
 .TP 8
 p
 Print the new command line but do not execute it.
