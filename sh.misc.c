@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.misc.c,v 3.43 2006/03/18 06:23:16 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.misc.c,v 3.44 2006/03/18 06:30:49 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.misc.c,v 3.43 2006/03/18 06:23:16 christos Exp $")
+RCSID("$tcsh: sh.misc.c,v 3.44 2006/03/18 06:30:49 christos Exp $")
 
 static	int	renum	(int, int);
 static  Char  **blkend	(Char **);
@@ -172,6 +172,7 @@ blk_indirect_cleanup(void *xptr)
 
     ptr = xptr;
     blkfree(*ptr);
+    xfree(ptr);
 }
 
 Char  **

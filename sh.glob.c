@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.72 2006/03/14 01:22:57 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.73 2006/03/17 19:58:01 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.72 2006/03/14 01:22:57 mitr Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.73 2006/03/17 19:58:01 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -295,13 +295,14 @@ static Char **
 globexpand(Char **v, int noglob)
 {
     Char   *s;
-    Char  **nv, **vl, **el;
+    Char  ***fnv, **vl, **el;
     int     size = GLOBSPACE;
 
 
-    nv = vl = xmalloc(sizeof(Char *) * size);
+    fnv = xmalloc(sizeof(Char ***));
+    *fnv = vl = xmalloc(sizeof(Char *) * size);
     *vl = NULL;
-    cleanup_push(&nv, blk_indirect_cleanup);
+    cleanup_push(fnv, blk_indirect_cleanup);
 
     /*
      * Step 1: expand backquotes.
@@ -314,20 +315,20 @@ globexpand(Char **v, int noglob)
 	    expanded = dobackp(s, 0);
 	    for (i = 0; expanded[i] != NULL; i++) {
 		*vl++ = expanded[i];
-		if (vl == &nv[size]) {
+		if (vl == &(*fnv)[size]) {
 		    size += GLOBSPACE;
-		    nv = xrealloc(nv, size * sizeof(Char *));
-		    vl = &nv[size - GLOBSPACE];
+		    *fnv = xrealloc(*fnv, size * sizeof(Char *));
+		    vl = &(*fnv)[size - GLOBSPACE];
 		}
 	    }
 	    xfree(expanded);
 	}
 	else {
 	    *vl++ = Strsave(s);
-	    if (vl == &nv[size]) {
+	    if (vl == &(*fnv)[size]) {
 		size += GLOBSPACE;
-		nv = xrealloc(nv, size * sizeof(Char *));
-		vl = &nv[size - GLOBSPACE];
+		*fnv = xrealloc(*fnv, size * sizeof(Char *));
+		vl = &(*fnv)[size - GLOBSPACE];
 	    }
 	}
 	*vl = NULL;
@@ -340,13 +341,13 @@ globexpand(Char **v, int noglob)
      * Step 2: expand braces
      */
     el = vl;
-    expbrace(&nv, &el, size);
+    expbrace(fnv, &el, size);
 
 
     /*
      * Step 3: expand ~ =
      */
-    vl = nv;
+    vl = *fnv;
     for (s = *vl; s; s = *++vl)
 	switch (*s) {
 	    Char *ns;
@@ -367,7 +368,7 @@ globexpand(Char **v, int noglob)
 	default:
 	    break;
 	}
-    vl = nv;
+    vl = *fnv;
 
     /*
      * Step 4: expand .. if the variable symlinks==expand is set
@@ -380,9 +381,11 @@ globexpand(Char **v, int noglob)
     }
 
  done:
-    cleanup_ignore(&nv);
-    cleanup_until(&nv);
-    return nv;
+    cleanup_ignore(fnv);
+    cleanup_until(fnv);
+    vl = *fnv;
+    xfree(fnv);
+    return vl;
 }
 
 static Char *
@@ -891,7 +894,7 @@ Gmatch(const Char *string, const Char *pattern)
 int
 Gnmatch(const Char *string, const Char *pattern, const Char **endstr)
 {
-    Char **blk, **p;
+    Char ***fblk, **p;
     const Char *tstring = string;
     int	   gpol = 1, gres = 0;
 
@@ -900,23 +903,24 @@ Gnmatch(const Char *string, const Char *pattern, const Char **endstr)
 	pattern++;
     }
 
-    blk = xmalloc(GLOBSPACE * sizeof(Char *));
-    blk[0] = Strsave(pattern);
-    blk[1] = NULL;
+    fblk = xmalloc(sizeof(Char ***));
+    *fblk = xmalloc(GLOBSPACE * sizeof(Char *));
+    (*fblk)[0] = Strsave(pattern);
+    (*fblk)[1] = NULL;
 
-    cleanup_push(&blk, blk_indirect_cleanup);
-    expbrace(&blk, NULL, GLOBSPACE);
+    cleanup_push(fblk, blk_indirect_cleanup);
+    expbrace(fblk, NULL, GLOBSPACE);
 
     if (endstr == NULL)
 	/* Exact matches only */
-	for (p = blk; *p; p++) 
+	for (p = *fblk; *p; p++) 
 	    gres |= t_pmatch(string, *p, &tstring, 1) == 2 ? 1 : 0;
     else {
 	const Char *end;
 
 	/* partial matches */
         end = Strend(string);
-	for (p = blk; *p; p++)
+	for (p = *fblk; *p; p++)
 	    if (t_pmatch(string, *p, &tstring, 1) != 0) {
 		gres |= 1;
 		if (end > tstring)
@@ -925,7 +929,7 @@ Gnmatch(const Char *string, const Char *pattern, const Char **endstr)
 	*endstr = end;
     }
 
-    cleanup_until(&blk);
+    cleanup_until(fblk);
     return(gres == gpol);
 } 
 
