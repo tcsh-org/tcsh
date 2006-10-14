@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.76 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.77 2006/08/24 20:56:31 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.sem.c,v 3.76 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: sh.sem.c,v 3.77 2006/08/24 20:56:31 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -84,10 +84,11 @@ static	void		 chkclob	(const char *);
 
 /*VARARGS 1*/
 void
-execute(struct command *t, int wanttty, int *pipein, int *pipeout, int do_glob)
+execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
+    int do_glob)
 {
     int    forked = 0;
-    const struct biltins *bifunc;
+    const struct biltins * volatile bifunc;
     pid_t pid = 0;
     int     pv[2];
     sigset_t set;

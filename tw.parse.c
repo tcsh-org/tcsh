@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.120 2006/03/04 18:20:43 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.121 2006/06/24 05:39:14 amold Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.120 2006/03/04 18:20:43 christos Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.121 2006/06/24 05:39:14 amold Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1292,7 +1292,7 @@ tw_collect(COMMAND command, int looking, struct Strbuf *exp_dir,
 	   struct Strbuf *exp_name, Char *target, Char *pat, int flags,
 	   DIR *dir_fd)
 {
-    int ni;
+    volatile int ni;
     jmp_buf_t osetexit;
 
 #ifdef TDEBUG
