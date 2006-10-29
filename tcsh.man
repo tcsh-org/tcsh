@@ -3992,6 +3992,10 @@ The user's real organization ID.  (Domain/OS only)
 The old working directory, equivalent to the `\-' used by \fIcd\fR and \fIpushd\fR.
 See also the \fBcwd\fR and \fBdirstack\fR shell variables.
 .TP 8
+.B padhour
+If set, enable the printing of padding '0' for hours, in 24 and 12 hour
+formats.  E.G.: 07:45:42 vs. 7:45:42
+.TP 8
 .B path
 A list of directories in which to look for executable commands.
 A null word specifies the current directory.

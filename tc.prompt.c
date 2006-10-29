@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.prompt.c,v 3.64 2006/03/02 18:46:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.prompt.c,v 3.65 2006/06/30 16:43:20 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.prompt.c,v 3.64 2006/03/02 18:46:45 christos Exp $")
+RCSID("$tcsh: tc.prompt.c,v 3.65 2006/06/30 16:43:20 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -258,7 +258,11 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 			what != FMT_PROMPT || adrof(STRnoding)) {
 			if (t->tm_min)
 			    print_prompt_did_ding = 0;
-			p = Itoa(hr, 0, attributes);
+			/*
+			 * Pad hour to 2 characters if padhour is set,
+			 * by ADAM David Alan Martin
+			 */
+			Itoa(hr, p, adrof(STRpadhour) ? 2 : 0, attributes);
 			Strbuf_append(&buf, p);
 			xfree(p);
 			Strbuf_append1(&buf, attributes | ':');
