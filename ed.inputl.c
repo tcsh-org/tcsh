@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.inputl.c,v 3.63 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.inputl.c,v 3.64 2006/08/23 15:03:14 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.inputl.c,v 3.63 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: ed.inputl.c,v 3.64 2006/08/23 15:03:14 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -791,7 +791,7 @@ GetNextChar(Char *cp)
 	cbp++;
 	if (normal_mbtowc(cp, cbuf, cbp) == -1) {
 	    reset_mbtowc();
-	    if (cbp < MB_LEN_MAX)
+	    if (cbp < MB_CUR_MAX)
 		continue; /* Maybe a partial character */
 	    /* And drop the following bytes, if any */
 	    *cp = (unsigned char)*cbuf | INVALID_BYTE;
