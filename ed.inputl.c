@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.inputl.c,v 3.64 2006/08/23 15:03:14 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.inputl.c,v 3.65 2006/11/23 23:29:42 mitr Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.inputl.c,v 3.64 2006/08/23 15:03:14 christos Exp $")
+RCSID("$tcsh: ed.inputl.c,v 3.65 2006/11/23 23:29:42 mitr Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -788,13 +788,17 @@ GetNextChar(Char *cp)
 		return -1;
 	    }
 	}
-	cbp++;
-	if (normal_mbtowc(cp, cbuf, cbp) == -1) {
-	    reset_mbtowc();
-	    if (cbp < MB_CUR_MAX)
-		continue; /* Maybe a partial character */
-	    /* And drop the following bytes, if any */
-	    *cp = (unsigned char)*cbuf | INVALID_BYTE;
+	if (AsciiOnly) {
+	    *cp = (unsigned char)*cbuf;
+	} else {
+	    cbp++;
+	    if (normal_mbtowc(cp, cbuf, cbp) == -1) {
+		reset_mbtowc();
+		if (cbp < MB_CUR_MAX)
+		    continue; /* Maybe a partial character */
+		/* And drop the following bytes, if any */
+		*cp = (unsigned char)*cbuf | INVALID_BYTE;
+	    }
 	}
 	break;
     }
