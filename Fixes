@@ -1,3 +1,4 @@
+ 70. One off copying macro buffers (Jean-Luc Leger)
  69. Avoid infinite loops in :ga modifiers when the LHS is a substring of the
      RHS.
  68. Automatically disable WIDE_STRINGS with --disable-nls (Miloslav Trmac)
