@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.134 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.135 2006/10/14 17:23:39 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.134 2006/08/24 20:56:31 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.135 2006/10/14 17:23:39 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1634,6 +1634,7 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
      */
     if (setintr) {
 	cleanup_until(&pintr_disabled);
+	pintr_disabled++;
 	cleanup_push(&pintr_disabled, disabled_cleanup);
     }
 
