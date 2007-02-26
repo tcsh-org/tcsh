@@ -25,7 +25,6 @@ The following steps are now automated by running
 11) Export the previous release as well
 12) Remove files that should not be in a release:
     - Announce*
-    - Copyright
     - MAKERELEASE
     - Makefile.ADMIN
     - RELEASE-PROCEDURE (this file)

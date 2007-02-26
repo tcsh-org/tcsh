@@ -1,5 +1,5 @@
 #!/bin/sh
-# @(#)$tcsh: MAKERELEASE,v 1.3 2006/03/02 18:46:44 christos Exp $
+# @(#)$tcsh: MAKERELEASE,v 1.4 2006/03/04 17:19:25 christos Exp $
 #
 # Copyright (c) 2005 Kimmo Suominen
 # All rights reserved.
@@ -57,24 +57,22 @@ cd ${WRKDIR} || exit 1
 #
 cleanit()
 {
-    (cd tcsh-${VerB} && rm -f \
+    (cd "$1" && rm -f \
 	Announce* \
 	BUG-TRACKING \
-	Copyright \
 	MAKERELEASE \
 	Makefile.ADMIN \
 	RELEASE-PROCEDURE \
     )
-    chmod -R u=rwX,go=rX tcsh-${VerB}
+    chmod -R u=rwX,go=rX "$1"
 }
 #
 TagA=$(printf "TCSH%d_%02d_%02d" "${1}" "${2}" "${3}")
 VerA=$(printf "%d.%02d.%02d" "${1}" "${2}" "${3}")
 #
 echo "Checking out ${TagA}"
-cvs -d ${REPOSITORY} -q export -r "${TagA}" tcsh > /dev/null
-cleanit
-mv tcsh "tcsh-${VerA}"
+cvs -d ${REPOSITORY} -q export -r "${TagA}" -d "tcsh-${VerA}" tcsh > /dev/null
+cleanit "tcsh-${VerA}"
 echo "Creating tarball"
 tar -cf "tcsh-${VerA}.tar" "tcsh-${VerA}"
 gzip -9 "tcsh-${VerA}.tar"
@@ -87,7 +85,7 @@ then
     pfile=$(printf "patch%d" "${3}")
     echo "Checking out ${TagB}"
     cvs -d ${REPOSITORY} -q export -r "${TagB}" -d "tcsh-${VerB}" tcsh > /dev/null
-    cleanit
+    cleanit "tcsh-${VerB}"
     echo "Creating patch"
     diff -urN "tcsh-${VerB}" "tcsh-${VerA}" > "${pfile}"
     gzip -9 "${pfile}"
