@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.121 2006/06/24 05:39:14 amold Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.122 2006/10/14 17:23:39 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.121 2006/06/24 05:39:14 amold Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.122 2006/10/14 17:23:39 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -963,18 +963,24 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 
 	case TW_COMMAND:
 #if defined(_UWIN) || defined(__CYGWIN__)
-	    /* Turn foo.{exe,com,bat} into foo since UWIN's readdir returns
-	     * the file with the .exe, .com, .bat extension
+	    /*
+	     * Turn foo.{exe,com,bat,cmd} into foo since UWIN's readdir returns
+	     * the file with the .exe, .com, .bat, .cmd extension
 	     */
 	    {
-		size_t ext = strlen((char *)item.s) - 4;
-		/* The casts won't work with SHORT_STRINGS */
-		assert(sizeof(char) == sizeof (Char)); 
-		if ((ext > 0) && (strcasecmp((char *)&item.s[ext], ".exe") == 0 ||
-				  strcasecmp((char *)&item.s[ext], ".bat") == 0 ||
-				  strcasecmp((char *)&item.s[ext], ".com") == 0)) {
-		    item.len = ext;
-		    Strbuf_terminate(&item);
+		static const char *rext[] = { ".exe", ".bat", ".com", ".cmd" };
+		size_t exti = Strlen(item.s);
+
+		if (exti > 4) {
+		    char *ext = short2str(&item.s[exti -= 4]);
+		    size_t i;
+
+		    for (i = 0; i < sizeof(rext) / sizeof(rext[0]); i++)
+			if (strcasecmp(ext, rext[i]) == 0) {
+			    item.len = exti;
+			    Strbuf_terminate(&item);
+			    break;
+			}
 		}
 	    }
 #endif /* _UWIN || __CYGWIN__ */
