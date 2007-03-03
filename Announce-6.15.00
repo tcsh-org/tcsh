@@ -1,0 +1,44 @@
+Hello,
+
+I am pleased to announce that tcsh-6.15 is now available; this version
+fixes a number of bugs and adds the following enhancements:
+
+Changes:
+    * Addition of a test suite
+    * More configuration moved to autoconf from static constants
+    * Fixed buffer sizes removed, memory allocation redone, with unwind code
+    * Use only posix signal code.
+    * Implement newline-and-hold and newline-and-down-history
+
+Bug Fixes:
+    * too many to enumerate here, consult the Fixes file
+
+Some of the changes may have broken support for older operating systems.
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most UNIX machines, VMS_POSIX, OS/2 EMX, WIN32, Amiga...
+
+You can get tcsh from ftp://ftp.astron.com/pub/tcsh/tcsh-6.15.00.tar.gz
+or from the mirrors:
+
+    ftp://ftp.gw.com/pub/unix/tcsh/tcsh-6.15.00.tar.gz [US]
+    ftp://ftp.funet.fi/pub/unix/shells/tcsh/tcsh-6.15.00.tar.gz [Finland]
+
+    MD5 (tcsh-6.14.00.tar.gz) = 353d1bb7d2741bf8de602c7b6f0efd79
+    RMD160 (tcsh-6.14.00.tar.gz) = fa7635225ceb0225aedcfad5dd9d8e17d8d70849
+    SHA1 (tcsh-6.14.00.tar.gz) = 55a08b31a57cfd8631edd1fb7e42f18578d8198a
+
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you can
+get it from ftp.gnu.org or other GNU mirrors.
+
+I would like to thank:
+
+    * Miloslav Trmac (test suite, posix signal code, memory allocation,
+      autoconf changes)
+    * everyone who sent bug reports
+    * the beta team for all their help, bug fixes, and suggestions
+
++ christos

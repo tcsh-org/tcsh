@@ -1,3 +1,6 @@
+ 74. V6.15.00 - 20070303
+ 73. fix extension eating windows code (christos)
+ 72. fix loop in %R history expansion (christos)
  71. sched +X source file disables interrupts (Mike Sullivan)
  70. One off copying macro buffers (Jean-Luc Leger)
  69. Avoid infinite loops in :ga modifiers when the LHS is a substring of the
