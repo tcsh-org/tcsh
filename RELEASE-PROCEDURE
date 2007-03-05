@@ -5,7 +5,7 @@ HOW TO RELEASE TCSH
 3)  Update tcsh.man to have the new version and date also
     (two separate lines, with the date in different formats)
 4)  Update the version in configure.in
-5)  Update README to have the new version.
+5)  Update README to have the new version
 6)  Commit changes into CVS
 7)  run autoreconf
 8)  Commit changes into CVS
@@ -34,4 +34,9 @@ The following steps are now automated by running
 The rest are still manual:
 
 14) Make the patch and the source tarball available on ftp
-15) Mail an announcement to tcsh@mx.gw.com
+15) Add the new version to bugs.gw.com:
+    - Click: Manage > Manage Projects > tcsh
+    - Scroll down to "Versions"
+    - Type the new version into the box at the bottom of the
+      version list and click on "Add Version"
+16) Mail an announcement to tcsh@mx.gw.com
