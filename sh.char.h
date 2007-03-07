@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.char.h,v 3.31 2006/08/27 02:01:23 amold Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.char.h,v 3.32 2006/09/26 16:44:37 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -137,9 +137,12 @@ extern tcshuc _cmap_lower[], _cmap_upper[];
 		         (iswalnum((tcshuc) (c)) || (c) == '_'))
 #else
 #define letter(c)	(((Char)(c) & QUOTE) ? 0 :  \
-			 (isalpha((tcshuc) (c)) || (c) == '_'))
+			 ((isalpha((tcshuc) (c)) && !(cmap((c), _PUN))) \
+			  || (c) == '_'))
 #define alnum(c)	(((Char)(c) & QUOTE) ? 0 :  \
-		         (isalnum((tcshuc) (c)) || (c) == '_'))
+		         ((isalnum((tcshuc) (c)) && !(cmap((c), _PUN))) \
+			  || (c) == '_'))
+
 #endif
 
 #if defined(DSPMBYTE)
