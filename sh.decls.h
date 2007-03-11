@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.52 2006/03/14 01:22:57 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.53 2006/08/24 20:56:31 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -357,7 +357,7 @@ extern  struct process   *pfind		(Char *);
 /*
  * sh.sem.c
  */
-extern	void		  execute	(struct command *, int, int *,
+extern	void		  execute	(struct command *, volatile int, int *,
 					 int *, int);
 extern	void		  mypipe	(int *);
 
