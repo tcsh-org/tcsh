@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.76 2006/09/26 16:25:02 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.77 2006/09/27 17:01:06 mitr Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.76 2006/09/26 16:25:02 mitr Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.77 2006/09/27 17:01:06 mitr Exp $")
 
 #include "ed.h"
 
@@ -851,7 +851,8 @@ getsub(struct wordent *en)
 	    return (en);
 	}
 	slhs.len = 0;
-	Strbuf_append(&slhs, lhsb.s);
+	if (lhsb.s != NULL && lhsb.len != 0)
+	    Strbuf_append(&slhs, lhsb.s);
 	Strbuf_terminate(&slhs);
 	if (exclc)
 	    en = dosub(sc, en, global);
