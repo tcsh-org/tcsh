@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.135 2006/10/14 17:23:39 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.136 2007/02/22 21:57:37 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.135 2006/10/14 17:23:39 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.136 2007/02/22 21:57:37 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1854,15 +1854,19 @@ process(int catch)
     jmp_buf_t osetexit;
     /* PWP: This might get nuked my longjmp so don't make it a register var */
     size_t omark;
+    int didexitset = 0;
 
     getexit(osetexit);
     omark = cleanup_push_mark();
-    exitset++;
     for (;;) {
 	struct command *t;
 	int hadhist, old_pintr_disabled;
 
-	(void) setexit();
+	(void)setexit();
+	if (didexitset == 0) {
+	    exitset++;
+	    didexitset++;
+	}
 	pendjob();
 
 	justpr = enterhist;	/* execute if not entering history */
@@ -2026,9 +2030,9 @@ process(int catch)
     cmd_done:
 	cleanup_until(&paraml);
     }
-    exitset--;
     cleanup_pop_mark(omark);
     resexit(osetexit);
+    exitset--;
 }
 
 /*ARGSUSED*/

@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /src/pub/tcsh/host.defs,v 1.42 2006/02/15 23:30:33 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.43 2006/03/02 18:46:44 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.42 2006/02/15 23:30:33 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.43 2006/03/02 18:46:44 christos Exp $")
 
 endcode	:
 
@@ -518,6 +518,15 @@ ostype	:						: "FreeBSD"
 machtype: defined(__alpha)				: "alpha"
 machtype: defined(M_i386)				: "i386"
 enddef	:
+
+
+newdef  : defined(__MidnightBSD__)
+comment : MidnightBSD
+vendor  : defined(M_intel)                              : "intel"
+hosttype:                                               : "MidnightBSD"
+ostype  :                                               : "MidnightBSD"
+machtype: defined(M_i386)                               : "i386"
+enddef  :
 
 
 newdef	: defined(__386BSD__)

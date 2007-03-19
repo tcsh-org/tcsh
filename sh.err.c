@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.err.c,v 3.47 2006/02/14 00:52:52 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.err.c,v 3.48 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -34,7 +34,7 @@
 #include "sh.h"
 #include <assert.h>
 
-RCSID("$tcsh: sh.err.c,v 3.47 2006/02/14 00:52:52 christos Exp $")
+RCSID("$tcsh: sh.err.c,v 3.48 2006/03/02 18:46:44 christos Exp $")
 
 /*
  * C Shell
@@ -202,7 +202,7 @@ errinit(void)
 
     for (i = 0; i < NO_ERRORS; i++)
 	xfree((char *)(intptr_t)elst[i]);
-#  if defined(__FreeBSD__) || defined(hpux)
+#  if defined(__FreeBSD__) || defined(hpux) || defined(__MidnightBSD__)
 #  define NLS_MAXSET 30
     for (i = 1; i <= NLS_MAXSET; i++)
 	CGETS(i, 1, "" );
