@@ -1,3 +1,4 @@
+  4. MidnightBsd support (Lucas Holt)
   3. Fix history substitution core-dump with no history entries
   2. Merge two character tables that are the same (Martin Kraemer)
   1. On ancient 7 bit locales, punctuation characters are used to
