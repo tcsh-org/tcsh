@@ -1,3 +1,4 @@
+  3. Fix history substitution core-dump with no history entries
   2. Merge two character tables that are the same (Martin Kraemer)
   1. On ancient 7 bit locales, punctuation characters are used to
      denote special characters such as umlaut, adiaresis, etc.
