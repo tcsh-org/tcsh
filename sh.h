@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.145 2006/03/03 22:08:45 amold Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.146 2006/07/03 22:59:01 mitr Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -691,13 +691,17 @@ extern struct sigaction parterm;	/* Parents terminate catch */
 /* 31st char bit used for 'ing (not 32nd, we want all values nonnegative) */
 # define	QUOTE		0x40000000
 # define	TRIM		0x3FFFFFFF /* Mask to strip quote bit */
-# define	UNDER		0x20000000 /* Underline flag */
-# define	BOLD		0x10000000 /* Bold flag */
-# define	STANDOUT	0x08000000 /* Standout flag */
-# define	LITERAL		0x04000000 /* Literal character flag */
-# define	ATTRIBUTES	0x3C000000 /* The bits used for attributes */
-# define	INVALID_BYTE	0x00200000 /* Invalid character on input */
-# define	CHAR		0x003FFFFF /* Mask to mask out the character */
+# define	UNDER		0x08000000 /* Underline flag */
+# define	BOLD		0x04000000 /* Bold flag */
+# define	STANDOUT	0x02000000 /* Standout flag */
+# define	LITERAL		0x01000000 /* Literal character flag */
+# define	ATTRIBUTES	0x0F000000 /* The bits used for attributes */
+# define	INVALID_BYTE	0x00800000 /* Invalid character on input */
+# ifdef SOLARIS2
+#  define	CHAR		0x30FFFFFF /* Mask to mask out the character */
+# else
+#  define	CHAR		0x00FFFFFF /* Mask to mask out the character */
+# endif
 #elif defined (SHORT_STRINGS)
 # define	QUOTE 	((Char)	0100000)/* 16nth char bit used for 'ing */
 # define	TRIM		0073777	/* Mask to strip quote/lit bit */
