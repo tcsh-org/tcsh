@@ -1,3 +1,5 @@
+  5. cd - twice from a directory that contained a glob pattern,
+     expands the glob twice (Mark Santcroos)
   4. MidnightBsd support (Lucas Holt)
   3. Fix history substitution core-dump with no history entries
   2. Merge two character tables that are the same (Martin Kraemer)
