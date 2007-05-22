@@ -1,5 +1,5 @@
 #
-# $tcsh: complete.tcsh,v 1.46 2005/03/21 21:26:08 kim Exp $
+# $tcsh: complete.tcsh,v 1.47 2006/03/02 18:46:44 christos Exp $
 # example file using the new completion code
 #
 # Debian GNU/Linux
@@ -38,18 +38,18 @@ endif
 if ($?_complete) then
     set noglob
     if ( ! $?hosts ) set hosts
-    foreach f ($HOME/.hosts /usr/local/etc/csh.hosts $HOME/.rhosts /etc/hosts.equiv)
+    foreach f ("$HOME/.hosts" /usr/local/etc/csh.hosts "$HOME/.rhosts" /etc/hosts.equiv)
         if ( -r $f ) then
 	    set hosts = ($hosts `grep -v "+" $f | grep -E -v "^#" | tr -s " " "	" | cut -f 1`)
 	endif
     end
-    if ( -r $HOME/.netrc ) then
-	set f=`awk '/machine/ { print $2 }' < $HOME/.netrc` >& /dev/null
+    if ( -r "$HOME/.netrc" ) then
+	set f=`awk '/machine/ { print $2 }' < "$HOME/.netrc"` >& /dev/null
 	set hosts=($hosts $f)
     endif
-    if ( -r $HOME/.ssh/known_hosts ) then
-	set f=`cat $HOME/.ssh/known_hosts | cut -f 1 -d \ ` >& /dev/null
-	set f=`cat $HOME/.ssh/known_hosts | cut -f 1 -d \ | sed -e 's/,/ /g'` >& /dev/null
+    if ( -r "$HOME/.ssh/known_hosts" ) then
+	set f=`cat "$HOME/.ssh/known_hosts" | cut -f 1 -d \ ` >& /dev/null
+	set f=`cat "$HOME/.ssh/known_hosts" | cut -f 1 -d \ | sed -e 's/,/ /g'` >& /dev/null
 	set hosts=($hosts $f)
     endif
     unset f
@@ -224,7 +224,7 @@ if ($?_complete) then
 
     # these should be merged with the MH completion hacks below - jgotts
     complete {refile,sprev,snext,scan,pick,rmm,inc,folder,show} \
-		c@+@F:$HOME/Mail/@
+		"c@+@F:$HOME/Mail/@"
 
     # these and interrupt handling from Jaap Vermeulen <jaap@sequent.com>
     complete {rexec,rxexec,rxterm,rmterm} \
@@ -286,7 +286,7 @@ if ($?_complete) then
     complete setenv	'p/1/e/' 'c/*:/f/'
 
     # these and method of setting hosts from Kimmo Suominen <kim@tac.nyc.ny.us>
-    if ( -f $HOME/.mh_profile && -x "`which folders`" ) then 
+    if ( -f "$HOME/.mh_profile" && -x "`which folders`" ) then 
 
     if ( ! $?FOLDERS ) setenv FOLDERS "`folders -fast -recurse`"
     if ( ! $?MHA )     setenv MHA     "`ali | sed -e '/^ /d' -e 's/:.*//'`"
@@ -591,14 +591,14 @@ if ($?_complete) then
 			flush-logs flush-status flush-tables flush-privileges \
 			kill password ping processlist reload refresh \
 			shutdown status variables version)/'
-    complete mutt	c@-f=@F:${HOME}/Mail/@ \
+    complete mutt	"c@-f=@F:${HOME}/Mail/@" \
 			n/-a/f/ \
 			n/-F/f/ n/-H/f/ \
 			n/-s/x:'<subject line>'/ \
 			n/-e/x:'<command>'/ \
-			n@-b@'`cat ${HOME}/.muttrc-alias | awk '"'"'{print $2 }'"'"\`@ \
-			n@-c@'`cat ${HOME}/.muttrc-alias | awk '"'"'{print $2 }'"'"\`@ \
-			n@*@'`cat ${HOME}/.muttrc-alias | awk '"'"'{print $2 }'"'"\`@
+			n@-b@'`cat "${HOME}/.muttrc-alias" | awk '"'"'{print $2 }'"'"\`@ \
+			n@-c@'`cat "${HOME}/.muttrc-alias" | awk '"'"'{print $2 }'"'"\`@ \
+			n@*@'`cat "${HOME}/.muttrc-alias" | awk '"'"'{print $2 }'"'"\`@
     complete ndc	'n/*/(status dumpdb reload stats trace notrace \
 			querylog start stop restart )/'
     if ($?traditional_complete) then
@@ -711,14 +711,15 @@ if ($?_complete) then
     complete unsetenv	n/*/e/
 
     set _maildir = /var/mail
-    if (-r $HOME/.mailrc) then
+    if (-r "$HOME/.mailrc") then
         complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
-			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \
+			"c@+@F:$HOME/Mail@" C@[./\$~]@f@ n/-s/x:'<subject>'/ \
 			n@-u@T:$_maildir@ n/-f/f/ \
-			n@*@'`sed -n s/alias//p $HOME/.mailrc | tr -s " " "	" | cut -f 2`'@
+			n@*@'`sed -n s/alias//p "$HOME/.mailrc" | \
+			tr -s " " "	" | cut -f 2`'@
     else
         complete mail	c/-/"(e i f n s u v)"/ c/*@/\$hosts/ \
-			c@+@F:$HOME/Mail@ C@[./\$~]@f@ n/-s/x:'<subject>'/ \
+			"c@+@F:$HOME/Mail@" C@[./\$~]@f@ n/-s/x:'<subject>'/ \
 			n@-u@T:$_maildir@ n/-f/f/ n/*/u/
     endif
     unset _maildir
