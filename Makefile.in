@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.35 2006/07/05 15:07:03 mitr Exp $
+# $tcsh: Makefile.in,v 3.36 2006/08/24 20:56:31 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -531,11 +531,16 @@ install.cygwin: install install.man
 	cp ${srcdir}/WishList ${srcdir}/Y2K ${DESTDIR}${prefix}/share/doc/tcsh
 	perl ${srcdir}/tcsh.man2html ${srcdir}/tcsh.man
 	cp -rp tcsh.html ${DESTDIR}${prefix}/share/doc/tcsh
+	-mkdir -p ${DESTDIR}/etc/defaults/etc/profile.d
 	-mkdir -p ${DESTDIR}/etc/profile.d
 	-mkdir -p ${DESTDIR}/etc/postinstall
-	cp -p ${srcdir}/cygwin/etc/csh.* ${DESTDIR}/etc
-	cp -p ${srcdir}/cygwin/etc/profile.d/*.tcsh ${DESTDIR}/etc/profile.d
-	cp -p ${srcdir}/cygwin/etc/postinstall/tcsh.sh ${DESTDIR}/etc/postinstall
+	-mkdir -p ${DESTDIR}/etc/preremove
+	cp -p ${srcdir}/cygwin/csh.cshrc ${DESTDIR}/etc/defaults/etc
+	cp -p ${srcdir}/cygwin/csh.login ${DESTDIR}/etc/defaults/etc
+	cp -p ${srcdir}/cygwin/bindkey.tcsh ${DESTDIR}/etc/defaults/etc/profile.d
+	cp -p ${srcdir}/complete.tcsh ${DESTDIR}/etc/defaults/etc/profile.d
+	cp -p ${srcdir}/cygwin/postinstall.sh ${DESTDIR}/etc/postinstall/tcsh.sh
+	cp -p ${srcdir}/cygwin/preremove.sh ${DESTDIR}/etc/preremove/tcsh.sh
 
 # Amiga Unix
 #install.man: tcsh.man
