@@ -1,5 +1,5 @@
 #
-# $tcsh: complete.tcsh,v 1.47 2006/03/02 18:46:44 christos Exp $
+# $tcsh: complete.tcsh,v 1.48 2007/05/22 14:06:11 christos Exp $
 # example file using the new completion code
 #
 # Debian GNU/Linux
@@ -1030,23 +1030,41 @@ n@public@'`[ -r /usr/man/manp ]&& \ls -1 /usr/man/manp | sed s%\\.p.\*\$%%`'@ \
 			N/{-C,--directory}/'`\ls $:-1`'/ \
 			n/-[0-7]/"(l m h)"/
 
-    # Linux filesystems
-    complete  mount	c/-/"(a f F h l n o r s t U v V w)"/ n/-[hV]/n/ \
-    			n/-o/x:'<options>'/ n/-t/x:'<vfstype>'/ \
-    			n/-L/x:'<label>'/ n/-U/x:'<uuid>'/ \
-    			n@*@'`grep -v "^#" /etc/fstab | tr -s " " "	 " | cut -f 2`'@
-    complete umount	c/-/"(a h n r t v V)"/ n/-t/x:'<vfstype>'/ \
-    			n/*/'`mount | cut -d " " -f 3`'/
-    # Solaris filesystems
-    #complete  mount	c/-/"(a F m o O p r v V)"/ n/-p/n/ n/-v/n/ \
-    #			n/-o/x:'<FSType_options>'/ \
-    #			n@-F@'`\ls -1 /usr/lib/fs`'@ \
-    #			n@*@'`grep -v "^#" /etc/vfstab | tr -s " " "	 " | cut -f 3`'@
-    #complete umount	c/-/"(a o V)"/ n/-o/x:'<FSType_options>'/ \
-    #			n/*/'`mount | cut -d " " -f 1`'/
-    #complete  mountall	c/-/"(F l r)"/ n@-F@'`\ls -1 /usr/lib/fs`'@
-    #complete umountall	c/-/"(F h k l r s)"/ n@-F@'`\ls -1 /usr/lib/fs`'@ \
-    #			n/-h/'`df -k | cut -s -d ":" -f 1 | sort -u`'/
+    switch ( "$OSTYPE" )
+    case "linux":
+      # Linux filesystems
+      complete  mount	c/-/"(a f F h l n o r s t U v V w)"/ n/-[hV]/n/ \
+			n/-o/x:'<options>'/ n/-t/x:'<vfstype>'/ \
+			n/-L/x:'<label>'/ n/-U/x:'<uuid>'/ \
+			n@*@'`grep -v "^#" /etc/fstab | tr -s " " "	 " | cut -f 2`'@
+      complete umount	c/-/"(a h n r t v V)"/ n/-t/x:'<vfstype>'/ \
+			  n/*/'`mount | cut -d " " -f 3`'/
+      breaksw
+    case "sunos*":
+    case "solaris":
+      # Solaris filesystems
+      complete  mount	c/-/"(a F m o O p r v V)"/ n/-p/n/ n/-v/n/ \
+      			n/-o/x:'<FSType_options>'/ \
+      			n@-F@'`\ls -1 /usr/lib/fs`'@ \
+      			n@*@'`grep -v "^#" /etc/vfstab | tr -s " " "	 " | cut -f 3`'@
+      complete umount	c/-/"(a o V)"/ n/-o/x:'<FSType_options>'/ \
+      			n/*/'`mount | cut -d " " -f 1`'/
+      complete  mountall	c/-/"(F l r)"/ n@-F@'`\ls -1 /usr/lib/fs`'@
+      complete umountall	c/-/"(F h k l r s)"/ n@-F@'`\ls -1 /usr/lib/fs`'@ \
+      			n/-h/'`df -k | cut -s -d ":" -f 1 | sort -u`'/
+      breaksw
+    case "cygwin":
+      # Cygwin mounts
+      complete  mount	c/-/"(b c f h m o p s t u v x E X)"/ n/-[hmpv]/n/ \
+      			n/-c/x:'/'/ \
+			n/-o/"(user system binary text exec notexec cygexec nosuid managed)"/ \
+      			n@*@'`mount -p | tail -1 | cut -d " " -f 1 | xargs ls -1 | awk '"'"'{print $1":/"; } END{print "//";}'"'"'`'@
+      complete umount	c/-/"(A c h s S u U v)"/ n/-[AhSUv]/n/ \
+      			n@*@'`mount | grep -v noumount | cut -d " " -f 3`'@
+      breaksw
+    default:
+      breaksw
+    endsw
 
     # these deal with NIS (formerly YP); if it's not running you don't need 'em
     if (-X domainname) then
