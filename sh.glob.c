@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.73 2006/03/17 19:58:01 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.74 2006/10/14 17:57:21 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.73 2006/03/17 19:58:01 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.74 2006/10/14 17:57:21 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -842,10 +842,10 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 	    c = (*ip++ & TRIM);
 	    if (c == 0)
 		break;
-#ifdef WINNT_NATIVE
+#if defined(WINNT_NATIVE) || defined(__CYGWIN__)
 	    if (c == '\r')
 	    	c = ' ';
-#endif /* WINNT_NATIVE */
+#endif /* WINNT_NATIVE || __CYGWIN__ */
 	    if (c == '\n') {
 		/*
 		 * Continue around the loop one more time, so that we can eat

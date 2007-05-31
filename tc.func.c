@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.135 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.136 2006/09/01 12:51:35 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.135 2006/08/24 20:56:31 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.136 2006/09/01 12:51:35 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1773,9 +1773,9 @@ hashbang(int fd, Char ***vp)
 	switch (*p) {
 	case ' ':
 	case '\t':
-#ifdef WINNT_NATIVE
+#if defined(WINNT_NATIVE) || defined (__CYGWIN__)
 	case '\r':
-#endif /* WINNT_NATIVE */
+#endif /* WINNT_NATIVE || __CYGWIN__ */
 	    if (ws) {	/* a blank after a word.. save it */
 		*p = '\0';
 #ifdef WINNT_NATIVE

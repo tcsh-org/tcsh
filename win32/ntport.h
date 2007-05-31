@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntport.h,v 1.11 2006/03/05 18:35:53 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntport.h,v 1.12 2006/04/07 00:57:59 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -120,7 +120,6 @@ pretty */
 #define write(f,b,n)          nt_write((f),(b),(n))
 #define creat(f,m)            nt_creat((f),(m))
 #define _exit(a)              ExitProcess((a))
-#define setmode(a,b)          /* ignore*/
 
 #define chdir(a)              nt_chdir(a)
 

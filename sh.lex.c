@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.77 2006/09/27 17:01:06 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.78 2007/03/19 20:52:08 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.77 2006/09/27 17:01:06 mitr Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.78 2007/03/19 20:52:08 christos Exp $")
 
 #include "ed.h"
 
@@ -1626,7 +1626,7 @@ bgetc(void)
 		return CHAR_ERR;
 	    feobp += c;
 	}
-#ifndef WINNT_NATIVE
+#if !defined(WINNT_NATIVE) && !defined(__CYGWIN__)
 	ch = fbuf[0][fseekp - fbobp];
 	fseekp++;
 #else
@@ -1634,7 +1634,7 @@ bgetc(void)
 	    ch = fbuf[0][fseekp - fbobp];
 	    fseekp++;
 	} while(ch == '\r');
-#endif /* !WINNT_NATIVE */
+#endif /* !WINNT_NATIVE && !__CYGWIN__ */
 	return (ch);
     }
 
@@ -1679,7 +1679,7 @@ bgetc(void)
     if (windowchg)
 	(void) check_window_size(0);	/* for window systems */
 #endif /* SIG_WINDOW */
-#ifndef WINNT_NATIVE
+#if !defined(WINNT_NATIVE) && !defined(__CYGWIN__)
     ch = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
     fseekp++;
 #else
@@ -1687,7 +1687,7 @@ bgetc(void)
 	ch = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
 	fseekp++;
     } while(ch == '\r');
-#endif /* !WINNT_NATIVE */
+#endif /* !WINNT_NATIVE && !__CYGWIN__ */
     return (ch);
 }
 

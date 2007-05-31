@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.136 2007/02/22 21:57:37 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.137 2007/03/19 23:25:02 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.136 2007/02/22 21:57:37 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.137 2007/03/19 23:25:02 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -228,10 +228,6 @@ main(int argc, char **argv)
 	while (f < 3);
 	xclose(f);
     }
-
-#ifdef O_TEXT
-    setmode(0, O_TEXT);
-#endif
 
     osinit();			/* Os dependent initialization */
 
@@ -945,9 +941,6 @@ main(int argc, char **argv)
 	    /* ... doesn't return */
 	    stderror(ERR_SYSTEM, tempv[0], strerror(errno));
 	}
-#ifdef O_TEXT
-	setmode(nofile, O_TEXT);
-#endif
 	xfree(ffile);
 	dolzero = 1;
 	ffile = SAVE(tempv[0]);
@@ -1423,9 +1416,6 @@ srcfile(const char *f, int onlyown, int flag, Char **av)
 
     if ((unit = xopen(f, O_RDONLY|O_LARGEFILE)) == -1) 
 	return 0;
-#ifdef O_TEXT
-    setmode(unit, O_TEXT);
-#endif
     cleanup_push(&unit, open_cleanup);
     unit = dmove(unit, -1);
     cleanup_ignore(&unit);

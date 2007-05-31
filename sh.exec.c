@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.exec.c,v 3.72 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exec.c,v 3.73 2006/08/24 20:56:31 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exec.c,v 3.72 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: sh.exec.c,v 3.73 2006/08/24 20:56:31 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -402,9 +402,6 @@ texec(Char *sf, Char **st)
 	 */
 	if ((fd = xopen(f, O_RDONLY|O_LARGEFILE)) != -1) {
 	    int nread;
-#ifdef O_TEXT
-	    setmode(fd, O_TEXT);
-#endif
 	    if ((nread = xread(fd, pref, 2)) == 2) {
 		if (!isprint((unsigned char)pref[0]) &&
 		    (pref[0] != '\n' && pref[0] != '\t')) {
