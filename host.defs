@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.43 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.44 2007/03/19 23:25:02 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.43 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.44 2007/03/19 23:25:02 christos Exp $")
 
 endcode	:
 
@@ -1068,6 +1068,12 @@ vendor	:						: "fujitsu"
 hosttype:						: "ds90"
 ostype	:						: "sysv4"
 machtype:						: "sparc"
+enddef	:
+
+newdef	: defined(__CYGWIN__)
+comment	: Cygwin
+hosttype:						: "i386-cygwin"
+ostype	:						: "cygwin"
 enddef	:
 
 newdef  : defined(_UWIN)
