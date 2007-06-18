@@ -1,5 +1,5 @@
 #
-# $tcsh: complete.tcsh,v 1.48 2007/05/22 14:06:11 christos Exp $
+# $tcsh: complete.tcsh,v 1.49 2007/05/31 19:28:13 corinna Exp $
 # example file using the new completion code
 #
 # Debian GNU/Linux
@@ -39,8 +39,8 @@ if ($?_complete) then
     set noglob
     if ( ! $?hosts ) set hosts
     foreach f ("$HOME/.hosts" /usr/local/etc/csh.hosts "$HOME/.rhosts" /etc/hosts.equiv)
-        if ( -r $f ) then
-	    set hosts = ($hosts `grep -v "+" $f | grep -E -v "^#" | tr -s " " "	" | cut -f 1`)
+        if ( -r "$f" ) then
+	    set hosts = ($hosts `grep -v "+" "$f" | grep -E -v "^#" | tr -s " " "	" | cut -f 1`)
 	endif
     end
     if ( -r "$HOME/.netrc" ) then
