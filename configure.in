@@ -238,6 +238,11 @@ case "${host}" in
     tcsh_config_file=apollo
   ;;
 
+  ## QNX6
+  *-qnx6*)
+    tcsh_config_file=qnx6
+  ;;
+
   * )
   changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.char.h,v 3.32 2006/09/26 16:44:37 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.char.h,v 3.33 2007/03/07 16:27:16 christos Exp $ */
 /*
  * sh.char.h: Table for spotting special characters quickly
  * 	      Makes for very obscure but efficient coding.
@@ -72,9 +72,15 @@ extern tcshuc _cmap_lower[], _cmap_upper[];
 
 #endif
 
+#ifndef __QNXNTO__
 #define	_QF	0x0001		/* '" (Forward quotes) */
 #define	_QB	0x0002		/* ` (Backquote) */
 #define	_SP	0x0004		/* space and tab */
+#else
+#define	_XD	0x0001		/* As in <ctype.h> */
+#define	_UP	0x0002		/* As in <ctype.h> */
+#define	_SP	0x0004		/* As in <ctype.h> */
+#endif
 #define	_NL	0x0008		/* \n */
 #define	_META	0x0010		/* lex meta characters, sp #'`";&<>()|\t\n */
 #define	_GLOB	0x0020		/* glob characters, *?{[` */
@@ -82,9 +88,17 @@ extern tcshuc _cmap_lower[], _cmap_upper[];
 #define	_DOL	0x0080		/* $ */
 #define	_DIG  	0x0100		/* 0-9 */
 #define	_LET  	0x0200		/* a-z, A-Z, _, or locale-specific */
+#ifndef __QNXNTO__
 #define	_UP   	0x0400		/* A-Z, or locale-specific */
+#else
+#define	_QF	0x0400		/* '" (Forward quotes) */
+#endif
 #define	_DOW  	0x0800		/* a-z, or locale-specific */
+#ifndef __QNXNTO__
 #define	_XD 	0x1000		/* 0-9, a-f, A-F */
+#else
+#define	_QB	0x1000		/* 0-9, a-f, A-F */
+#endif
 #define	_CMD	0x2000		/* lex end of command chars, ;&(|` */
 #define _CTR	0x4000		/* control */
 #define _PUN	0x8000		/* punctuation */

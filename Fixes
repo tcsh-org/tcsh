@@ -1,3 +1,4 @@
+  6. QNX patches via pkgsrc
   5. cd - twice from a directory that contained a glob pattern,
      expands the glob twice (Mark Santcroos)
   4. MidnightBsd support (Lucas Holt)
