@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.142 2006/08/23 15:03:14 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.143 2006/08/24 20:56:31 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.142 2006/08/23 15:03:14 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.143 2006/08/24 20:56:31 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2226,8 +2226,9 @@ void
 doeval(Char **v, struct command *c)
 {
     struct doeval_state state;
-    int gflag;
+    int gflag, my_reenter;
     Char **gv;
+    jmp_buf_t osetexit;
 
     USE(c);
     v++;
@@ -2263,21 +2264,37 @@ doeval(Char **v, struct command *c)
 
     cleanup_push(&state, doeval_cleanup);
 
-    evalvec = v;
-    evalp = 0;
-    (void)close_on_exec(SHIN = dcopy(0, -1), 1);
-    (void)close_on_exec(SHOUT = dcopy(1, -1), 1);
-    (void)close_on_exec(SHDIAG = dcopy(2, -1), 1);
-#ifndef CLOSE_ON_EXEC
-    didcch = 0;
-#endif /* CLOSE_ON_EXEC */
-    didfds = 0;
-    process(0);
+    getexit(osetexit);
 
-    cleanup_until(&state);
+    /* PWP: setjmp/longjmp bugfix for optimizing compilers */
+#ifdef cray
+    my_reenter = 1;             /* assume non-zero return val */
+    if (setexit() == 0) {
+	my_reenter = 0;         /* Oh well, we were wrong */
+#else /* !cray */
+    if ((my_reenter = setexit()) == 0) {
+#endif /* cray */
+	evalvec = v;
+	evalp = 0;
+	(void)close_on_exec(SHIN = dcopy(0, -1), 1);
+	(void)close_on_exec(SHOUT = dcopy(1, -1), 1);
+	(void)close_on_exec(SHDIAG = dcopy(2, -1), 1);
+#ifndef CLOSE_ON_EXEC
+	didcch = 0;
+#endif /* CLOSE_ON_EXEC */
+	didfds = 0;
+	process(0);
+    }
+
+    if (my_reenter == 0)
+	cleanup_until(&state);
 
     if (gv)
 	cleanup_until(gv);
+
+    resexit(osetexit);
+    if (my_reenter)
+	stderror(ERR_SILENT);
 }
 
 /*************************************************************************/
