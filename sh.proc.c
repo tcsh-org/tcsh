@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.103 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.104 2006/09/27 16:59:04 mitr Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.103 2006/08/24 20:56:31 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.104 2006/09/27 16:59:04 mitr Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -518,7 +518,7 @@ pjwait(struct process *pp)
 	(void) tcsetpgrp(FSHTTY, tpgrp);
 #endif /* BSDJOBS */
     if ((jobflags & (PSIGNALED | PSTOPPED | PTIME)) ||
-	!eq(dcwd->di_name, fp->p_cwd->di_name)) {
+	fp->p_cwd == NULL || !eq(dcwd->di_name, fp->p_cwd->di_name)) {
 	if (jobflags & PSTOPPED) {
 	    xputchar('\n');
 	    if (adrof(STRlistjobs)) {
