@@ -1,3 +1,7 @@
+ 10. kill `foo` got stuck because sigchld was disabled too soon (Mark Peek)
+  9. Avoid null pointer dereference in proc cwd (Kurt Miller)
+  8. eval "foreach a b c" exits (Anthony Menasse)
+  7. Quoting was broken in substitutions (Joe Wells)
   6. QNX patches via pkgsrc
   5. cd - twice from a directory that contained a glob pattern,
      expands the glob twice (Mark Santcroos)
