@@ -1,4 +1,4 @@
- 11. Fix pty detection for autologout setting (Giorgos Keramidas)
+ 11. Fix pty detection for autologout setting (Kris Kennaway, Giorgos Keramidas)
  10. kill `foo` got stuck because sigchld was disabled too soon (Mark Peek)
   9. Avoid null pointer dereference in proc cwd (Kurt Miller)
   8. eval "foreach a b c" exits (Anthony Menasse)
