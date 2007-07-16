@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.137 2007/03/19 23:25:02 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.138 2007/05/31 08:26:12 corinna Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.137 2007/03/19 23:25:02 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.138 2007/05/31 08:26:12 corinna Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -453,12 +453,12 @@ main(int argc, char **argv)
 	if (*cp) {
 	    /* only for login shells or root and we must have a tty */
 	    if ((cp2 = Strrchr(cp, (Char) '/')) != NULL) {
-		cp = cp2 + 1;
+		cp2 = cp2 + 1;
 	    }
 	    else
 		cp2 = cp;
 	    if (!(((Strncmp(cp2, STRtty, 3) == 0) && Isalpha(cp2[3])) ||
-		  ((Strncmp(cp, STRpts, 3) == 0) && cp[3] == '/'))) {
+	          Strstr(cp, STRslptssl) != NULL)) {
 		if (getenv("DISPLAY") == NULL) {
 		    /* NOT on X window shells */
 		    setcopy(STRautologout, STRdefautologout, VAR_READWRITE);

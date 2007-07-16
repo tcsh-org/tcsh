@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.84 2006/10/29 19:02:17 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.85 2007/03/19 23:25:02 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.const.c,v 3.84 2006/10/29 19:02:17 christos Exp $")
+RCSID("$tcsh: tc.const.c,v 3.85 2007/03/19 23:25:02 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -46,7 +46,7 @@ Char STRautomatic[]	= { 'a', 'u', 't', 'o', 'm', 'a', 't', 'i', 'c',
 Char STRhangup[]	= { 'h', 'a', 'n', 'g', 'u', 'p', '\0' };
 Char STRaout[]		= { 'a', '.', 'o', 'u', 't', '\0' };
 Char STRtty[]		= { 't', 't', 'y', '\0' };
-Char STRpts[]		= { 'p', 't', 's', '\0' };
+Char STRslptssl[]	= { '/', 'p', 't', 's', '/', '\0' };
 Char STRany[]		= { 'a', 'n', 'y', '\0' };
 Char STRstatus[]	= { 's', 't', 'a', 't', 'u', 's', '\0' };
 Char STR0[]		= { '0', '\0' };
