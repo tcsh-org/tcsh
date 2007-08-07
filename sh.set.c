@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.69 2006/06/21 18:12:23 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.70 2006/08/24 20:56:31 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.69 2006/06/21 18:12:23 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.70 2006/08/24 20:56:31 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -525,6 +525,7 @@ getn(Char *cp)
 {
     int n;
     int     sign;
+    int base;
 
     if (!cp)			/* PWP: extra error checking */
 	stderror(ERR_NAME | ERR_BADNUM);
@@ -538,9 +539,19 @@ getn(Char *cp)
 	if (!Isdigit(*cp))
 	    stderror(ERR_NAME | ERR_BADNUM);
     }
+
+    if (cp[0] == '0' && cp[1])
+	base = 8;
+    else
+	base = 10;
+
     n = 0;
     while (Isdigit(*cp))
-	n = n * 10 + *cp++ - '0';
+    {
+	if (base == 8 && *cp >= '8')
+	    stderror(ERR_NAME | ERR_BADNUM);
+	n = n * base + *cp++ - '0';
+    }
     if (*cp)
 	stderror(ERR_NAME | ERR_BADNUM);
     return (sign ? -n : n);

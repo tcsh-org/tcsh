@@ -1,3 +1,4 @@
+ 12. Fix octal parsing (Li Zefan)
  11. Fix pty detection for autologout setting (Kris Kennaway, Giorgos Keramidas)
  10. kill `foo` got stuck because sigchld was disabled too soon (Mark Peek)
   9. Avoid null pointer dereference in proc cwd (Kurt Miller)

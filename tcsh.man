@@ -1785,7 +1785,7 @@ Equivalent to `\-P \fIfile\fR & \fImode\fR', e.g., `\-P22 \fIfile\fR' returns
 and `0' if by neither
 .TP 8
 .B P\fImode\fB:
-Like \fBP\fImode\fB:\fR, with leading zero
+Like \fBP\fImode\fR, with leading zero
 .TP 8
 .B U
 Numeric userid
@@ -1894,9 +1894,9 @@ default \fInotify\fR marks the current process; simply say `notify' after
 starting a background job to mark it.
 .PP
 When you try to leave the shell while jobs are stopped, you will be
-warned that `You have stopped jobs.' You may use the \fIjobs\fR command to see
-what they are.  If you do this or immediately try to exit again, the shell will
-not warn you a second time, and the suspended jobs will be terminated.
+warned that `There are suspended jobs.' You may use the \fIjobs\fR command to
+see what they are.  If you do this or immediately try to exit again, the shell
+will not warn you a second time, and the suspended jobs will be terminated.
 .SS "Automatic, periodic and timed events (+)"
 There are various ways to run commands and take other actions automatically
 at various times in the ``life cycle'' of the shell.  They are summarized here,
