@@ -1,4 +1,4 @@
-# $Id: Makefile.win32,v 1.10 2006/03/05 18:35:53 amold Exp $
+# $Id: Makefile.win32,v 1.11 2006/06/26 04:41:48 amold Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -20,7 +20,7 @@ BUILD=tcsh.exe
 # but to use the global optimizer on the mips boxes, see below
 #
 SUF=obj
-CF=-c -nologo 
+CF=-c -nologo  -GL
 
 INCLUDES=-I. -I.. -Iwin32 
 
@@ -89,7 +89,7 @@ NTCFLAGS = $(NTCFLAGS) -Zp8
 !endif
 
 CFLAGS= -MT $(NTCFLAGS) $(INCLUDES) 
-LDFLAGS= -nodefaultlib $(NTLDFLAGS) -stack:1048576,524288
+LDFLAGS= -nodefaultlib $(NTLDFLAGS) -stack:1048576,524288 -ltcg
 
 
 CC=	cl 	
@@ -177,14 +177,6 @@ win32srctar: $(NTSRCS)
 	gzip -v9 tcshwin32src.tar
 	move tcshwin32src.tar.gz ..
 
-symbols:$(BUILD)
-	@echo finding image base
-	@echo rebase may crash if msdev is holding the symbol file
-	@dumpbin /headers $(BUILD) | findstr /c:"image base"
-	@echo The address given to rebase should match the image base
-	rebase -b 400000 -xa . -a $(BUILD)
-copysym: symbols
-	copy tcsh.dbg %SystemRoot%\symbols\exe
 
 chlog:
 	tcsh -fc "echo \<XMP\> > win32\\Changelog.html"

@@ -71,11 +71,17 @@ int fork_copy_user_mem(HANDLE hproc) {
 	
 	SIZE_T bytes,rc;
 	SIZE_T size;
+	void *low = &bookend1, *high= &bookend2;
 
-	size =(char*)&bookend2 - (char*)&bookend1;
-	rc =WriteProcessMemory(hproc,&bookend1,&bookend1,
-					(DWORD)size,
-					&bytes);
+	if(&bookend1 > &bookend2) {
+		low = &bookend2;
+		high = &bookend1;
+	}
+
+	size =(char*)high - (char*)low;
+
+
+	rc =WriteProcessMemory(hproc,low,low, (DWORD)size, &bytes);
 
 	if (!rc) {
 		rc = GetLastError();
