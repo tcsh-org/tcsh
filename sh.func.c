@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.143 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.144 2007/07/06 20:32:10 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.143 2006/08/24 20:56:31 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.144 2007/07/06 20:32:10 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -688,7 +688,8 @@ dorepeat(Char **v, struct command *kp)
 	reexecute(kp);
 	--i;
     }
-    cleanup_until(&pintr_disabled);
+    if (setintr && pintr_disabled == 1)
+        cleanup_until(&pintr_disabled);
     donefds();
 }
 
