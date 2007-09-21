@@ -5057,9 +5057,7 @@ supervisor call mechanism [are my IBM roots also showing?]).
 The creator of tcsh was impressed by this feature and several others of TENEX
 and TOPS-20, and created a version of csh which mimicked them.
 .SH LIMITATIONS
-Words can be no longer than 1024 characters.
-.PP
-The system limits argument lists to 10240 characters.
+The system limits argument lists to ARG_MAX characters.
 .PP
 The number of arguments to a command which involves filename expansion is
 limited to 1/6th the number of characters allowed in an argument list.
