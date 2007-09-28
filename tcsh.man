@@ -72,7 +72,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "3 March 2007" "Astron 6.15.00"
+.TH TCSH 1 "28 September 2007" "Astron 6.15.01"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -3615,6 +3615,10 @@ And display colorful NLS messages.
 .B command \fR(+)
 If set, the command which was passed to the shell with the \fB-c\fR flag (q.v.).
 .TP 8
+.B compat_expr \fR(+)
+If set, the shell will evaluate expressions right to left, like the original
+\fIcsh\fR.
+.TP 8
 .B complete \fR(+)
 If set to `enhance', completion 1) ignores case and 2) considers
 periods, hyphens and underscores (`.', `\-' and `_') to be word
@@ -5074,7 +5078,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.15.00 (Astron) 2007-03-03.
+This manual documents tcsh 6.15.01 (Astron) 2007-09-28.
 .SH AUTHORS
 .PD 0
 .TP 2

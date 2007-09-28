@@ -1,3 +1,11 @@
+ 19. V6.15.01 - 20070928
+ 18. Evaluate expressions in the proper order (Li Zefan), controlled by
+     compat_expr.
+ 17. Don't need to flush() if we are silent. Prevents recursive error issue.
+     (joshua stein)
+ 16. Don't execute the jobcmd if the output is not a tty (Charles Ross)
+ 15. Quote the history in the examples (Johann 'Myrkraverk' Oskarsson)
+ 14. Mismatch clarification patch (Per Hedeland)
  13. Fix 'repeat n cmd &' abort() (Mike Sullivan)
  12. Fix octal parsing (Li Zefan)
  11. Fix pty detection for autologout setting (Kris Kennaway, Giorgos Keramidas)

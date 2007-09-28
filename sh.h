@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.146 2006/07/03 22:59:01 mitr Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.147 2007/04/26 14:04:24 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -552,6 +552,7 @@ EXTERN int    havhash IZERO;	/* path hashing is available */
 EXTERN int    editing IZERO;	/* doing filename expansion and line editing */
 EXTERN int    noediting IZERO;	/* initial $term defaulted to noedit */
 EXTERN int    bslash_quote IZERO;/* PWP: tcsh-style quoting?  (in sh.c) */
+EXTERN int    compat_expr IZERO;/* csh-style expressions? */
 EXTERN int    isoutatty IZERO;	/* is SHOUT a tty */
 EXTERN int    isdiagatty IZERO;/* is SHDIAG a tty */
 EXTERN int    is1atty IZERO;	/* is file descriptor 1 a tty (didfds mode) */

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.70 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.71 2007/08/07 10:18:52 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.70 2006/08/24 20:56:31 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.71 2007/08/07 10:18:52 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -173,6 +173,9 @@ update_vars(Char *vp)
     } 
     else if (eq(vp, STRbackslash_quote)) {
 	bslash_quote = 1;
+    }
+    else if (eq(vp, STRcompat_expr)) {
+	compat_expr = 1;
     }
     else if (eq(vp, STRdirstack)) {
 	dsetstack();
@@ -761,6 +764,8 @@ unset(Char **v, struct command *c)
 	editing = 0;
     if (adrof(STRbackslash_quote) == 0)
 	bslash_quote = 0;
+    if (adrof(STRcompat_expr) == 0)
+	compat_expr = 0;
     if (adrof(STRsymlinks) == 0)
 	symlinks = 0;
     if (adrof(STRimplicitcd) == 0)

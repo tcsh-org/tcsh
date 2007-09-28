@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.77 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.78 2006/10/14 17:23:39 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.sem.c,v 3.77 2006/08/24 20:56:31 christos Exp $")
+RCSID("$tcsh: sh.sem.c,v 3.78 2006/10/14 17:23:39 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -326,7 +326,14 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 	 * Don't run if we're not in a tty
 	 * Don't run if we're not really executing 
 	 */
-	if (t->t_dtyp == NODE_COMMAND && !bifunc && !noexec && intty) {
+	/*
+	 * CR  -  Charles Ross Aug 2005
+	 * added "isoutatty".
+	 * The new behavior is that the jobcmd won't be executed
+	 * if stdout (SHOUT) isnt attached to a tty.. IE when
+	 * redirecting, or using backquotes etc..
+	 */
+	if (t->t_dtyp == NODE_COMMAND && !bifunc && !noexec && intty && isoutatty) {
 	    Char *cmd = unparse(t);
 
 	    cleanup_push(cmd, xfree);
