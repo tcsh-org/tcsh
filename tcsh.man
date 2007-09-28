@@ -3466,7 +3466,7 @@ Runs before each command gets executed, or when the command changes state.
 This is similar to \fIpostcmd\fR, but it does not print builtins.
 .RS +8
 .IP "" 4
-> alias jobcmd  'echo \-n "^[]2\e;\e!#^G"'
+> alias jobcmd  'echo \-n "^[]2\e;\e!#:q^G"'
 .PP
 then executing \fIvi foo.c\fR will put the command string in the xterm title bar.
 .RE
@@ -3515,7 +3515,7 @@ should be used.
 Runs before each command gets executed.
 .RS +8
 .IP "" 4
-> alias postcmd  'echo \-n "^[]2\e;\e!#^G"'
+> alias postcmd  'echo \-n "^[]2\e;\e!#:q^G"'
 .PP
 then executing \fIvi foo.c\fR will put the command string in the xterm title bar.
 .RE
