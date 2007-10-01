@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.86 2007/07/16 03:03:20 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.87 2007/09/28 21:02:03 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.const.c,v 3.86 2007/07/16 03:03:20 christos Exp $")
+RCSID("$tcsh: tc.const.c,v 3.87 2007/09/28 21:02:03 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -452,8 +452,12 @@ Char STRTERMCAP[]	= { 'T', 'E', 'R', 'M', 'C', 'A', 'P', '\0'};
 #endif /* SIG_WINDOW  || _VMS_POSIX */
 
 #if defined (_OSD_POSIX)  /* BS2000 needs this variable set to "SHELL" */
-Char STRPROGRAM_ENVIRONMENT[]		= { 'P', 'R', 'O', 'G', 'R', 'A', 'M', '_', 'E', 'N', 'V', 'I', 'R', 'O', 'N', 'M', 'E', 'N', 'T', '\0'};
+Char STRPROGRAM_ENVIRONMENT[] = { 'P', 'R', 'O', 'G', 'R', 'A', 'M',
+			    '_', 'E', 'N', 'V', 'I', 'R', 'O', 'N', 'M',
+			    'E', 'N', 'T', '\0'};
 #endif /* _OSD_POSIX */
+Char STRCOMMAND_LINE[]	= { 'C', 'O', 'M', 'M', 'A', 'N', 'D', '_', 'L', 'I',
+			    'N', 'E', '\0' };
 
 #ifdef WARP
 Char STRwarp[]		= { 'w', 'a', 'r', 'p', '\0' };

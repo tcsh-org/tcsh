@@ -1,5 +1,5 @@
 #
-# $tcsh: complete.tcsh,v 1.49 2007/05/31 19:28:13 corinna Exp $
+# $tcsh: complete.tcsh,v 1.50 2007/06/18 08:10:13 corinna Exp $
 # example file using the new completion code
 #
 # Debian GNU/Linux
@@ -505,6 +505,19 @@ if ($?_complete) then
 			logout rdiff release remove rtag status tag unedit \
 			update watch watchers)/' 'n/-a/(edit unedit commit \
 			all none)/' 'n/watch/(on off add remove)/'
+    complete svn 	'C@file:///@`'"${HOME}/etc/tcsh/complete.d/svn"'`@@' \
+			'n@ls@(file:/// svn+ssh:// svn://)@@' \
+			'n@help@(add blame cat checkout \
+			cleanup commit copy delete export help \
+			import info list ls lock log merge mkdir \
+			move propdel propedit propget proplist \
+			propset resolved revert status switch unlock \
+			update)@' 'p@1@(add blame cat checkout \
+			cleanup commit copy delete export help \
+			import info list ls lock log merge mkdir \
+			move propdel propedit propget proplist \
+			propset resolved revert status switch unlock \
+			update)@'
     complete cxx	'p/*/f:*.{c++,cxx,c,cc,C,cpp}/'
     complete detex	'p/*/f:*.tex/'
     complete edquota    'n/*/u/'

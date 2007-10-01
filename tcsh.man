@@ -2413,6 +2413,14 @@ completion.  If null, no character is appended.  If omitted (in which
 case the fourth delimiter can also be omitted), a slash is appended to
 directories and a space to other words.
 .PP
+\fIcommand\fR invoked from `...` version has additional environment
+variable set, the variable name is \%\fBCOMMAND_LINE\fR\% and
+contains (as its name indicates) contents of the current (already
+typed in) command line. One can examine and use contents of the
+\%\fBCOMMAND_LINE\fR\% variable in her custom script to build more
+sophisticated completions (see completion for svn(1) included in
+this package).
+.PP
 Now for some examples.  Some commands take only directories as arguments,
 so there's no point completing plain files.
 .IP "" 4
