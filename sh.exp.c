@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.51 2006/05/13 21:25:20 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.52 2007/09/28 21:02:02 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exp.c,v 3.51 2006/05/13 21:25:20 christos Exp $")
+RCSID("$tcsh: sh.exp.c,v 3.52 2007/09/28 21:02:02 christos Exp $")
 
 #include "tw.h"
 
@@ -72,10 +72,9 @@ static	void	 evalav		(Char **);
 static	int	 isa		(Char *, int);
 static	int	 egetn		(Char *);
 
-
 #ifdef EDEBUG
-static	void	 etracc		(char *, Char *, Char ***);
-static	void	 etraci		(char *, int, Char ***);
+static	void	 etracc		(const char *, const Char *, Char ***);
+static	void	 etraci		(const char *, int, Char ***);
 #else /* !EDEBUG */
 #define etracc(A, B, C) ((void)0)
 #define etraci(A, B, C) ((void)0)
@@ -405,7 +404,7 @@ exp3a(Char ***vp, int ignore)
     p1 = exp4(vp, ignore);
     etracc("exp3a p1", p1, vp);
     op = **vp;
-    while (op && any("<>", op[0]) && op[0] == op[1]) {
+    if (op && any("<>", op[0]) && op[0] == op[1]) {
 	(*vp)++;
 	cleanup_push(p1, xfree);
 	p2 = compat_expr ?
@@ -420,8 +419,6 @@ exp3a(Char ***vp, int ignore)
 	cleanup_until(p1);
 	p1 = putn(i);
 	etracc("exp3a p1", p1, vp);
-	if (compat_expr)
-	    break;
     }
     return (p1);
 }
@@ -1039,16 +1036,16 @@ egetn(Char *cp)
 
 #ifdef EDEBUG
 static void
-etraci(char *str, int i, Char ***vp)
+etraci(const char *str, int i, Char ***vp)
 {
     xprintf("%s=%d\t", str, i);
     blkpr(*vp);
     xputchar('\n');
 }
 static void
-etracc(char *str, Char *cp, Char ***vp)
+etracc(const char *str, const Char *cp, Char ***vp)
 {
-    xprintf("%s=%s\t", str, cp);
+    xprintf("%s=%S\t", str, cp);
     blkpr(*vp);
     xputchar('\n');
 }
