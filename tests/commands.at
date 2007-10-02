@@ -523,9 +523,9 @@ TCSH_UNTESTED([getxvers])
 
 AT_SETUP([glob])
 
-AT_CHECK([[tcsh -c 'glob a b c' | od] dnl
+AT_CHECK([[tcsh -c 'glob a b c' | od -c] dnl
 	  [| sed 's/[ 	][ 	]*/ /g; s/ $//']], ,
-[[0000000 000141 000142 000143
+[[0000000 a \0 b \0 c
 0000005
 ]])
 
