@@ -95,6 +95,16 @@
 #define SOLARIS2 23
 
 /*
+ * Fix http://bugs.opensolaris.org/view_bug.do?bug_id=6593766
+ * All XPG4 and XPG4.2 applications should use __XPG4_CHAR_CLASS__
+ * The degree character(?) is not part of ASCII. It is part of extended-ASCII
+ * and needs wide char to get this to working. Hence we need to enable the
+ * macro __XPG4_CHAR_CLASS__ in config_f.h header file under tcsh to get
+ * this to working.
+ */
+#define __XPG4_CHAR_CLASS__
+
+/*
  * lookupname/namei ignores tailing '/' on files
  */
 #define NAMEI_BUG

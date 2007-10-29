@@ -94,12 +94,15 @@
 /****************** local defines *********************/
 #define SOLARIS2 26
 
-/* 
- * LARGE_OFFSETS (Solaris 2.6 in conjunction with NFSv3 to servers with >31 bit 
- * file offsets (e.g. Irix 6.2)
+/*
+ * Fix http://bugs.opensolaris.org/view_bug.do?bug_id=6593766
+ * All XPG4 and XPG4.2 applications should use __XPG4_CHAR_CLASS__
+ * The degree character(?) is not part of ASCII. It is part of extended-ASCII
+ * and needs wide char to get this to working. Hence we need to enable the
+ * macro __XPG4_CHAR_CLASS__ in config_f.h header file under tcsh to get
+ * this to working.
  */
-#define _FILE_OFFSET_BITS 64
-#define	_LARGE_FILE64_SOURCE 
+#define __XPG4_CHAR_CLASS__
 
 /*
  * lookupname/namei ignores tailing '/' on files
