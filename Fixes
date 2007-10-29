@@ -1,3 +1,7 @@
+ 22. Fix degree handling by defining __XPG4_CHAR_CLASS__ for solaris
+     (Mike Sullivan)
+ 21. Change 'od' to 'od -c' in tests so that they work on big endian machines.
+     (Martin Kraemer)
  20. Add environment variable COMMAND_LINE to be available in completions
      (Marcin Konarski)
  19. V6.15.01 - 20070928
