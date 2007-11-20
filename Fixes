@@ -1,3 +1,4 @@
+ 23. rename setp -> tcsh_setp to avoid conflict with mach (Javier Vasquez)
  22. Fix degree handling by defining __XPG4_CHAR_CLASS__ for solaris
      (Mike Sullivan)
  21. Change 'od' to 'od -c' in tests so that they work on big endian machines.
