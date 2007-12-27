@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.78 2007/03/19 20:52:08 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.79 2007/05/31 08:26:12 corinna Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.78 2007/03/19 20:52:08 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.79 2007/05/31 08:26:12 corinna Exp $")
 
 #include "ed.h"
 
@@ -368,7 +368,7 @@ loop:
 		else {
 		    if (bslash_quote &&
 			((c == '\'') || (c == '"') ||
-			 (c == '\\'))) {
+			 (c == '\\') || (c == '$'))) {
 			c |= QUOTE;
 		    }
 		    else {
