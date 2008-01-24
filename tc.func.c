@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.136 2006/09/01 12:51:35 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.137 2007/05/31 08:26:12 corinna Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.136 2006/09/01 12:51:35 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.137 2007/05/31 08:26:12 corinna Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -632,7 +632,7 @@ xgetpass(const char *prm)
     }
     strbuf_terminate(&pass);
 
-    cleanup_until(&sa);
+    cleanup_until(&osa);
 
     return pass.s;
 }
