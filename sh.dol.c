@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.71 2007/05/31 08:26:12 corinna Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.72 2007/07/06 20:10:24 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.71 2007/05/31 08:26:12 corinna Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.72 2007/07/06 20:10:24 christos Exp $")
 
 /*
  * C shell
@@ -613,7 +613,7 @@ Dgetdol(void)
 
 	    for (i = 0; Isdigit(*np); i = i * 10 + *np++ - '0')
 		continue;
-	    if ((i < 0 || i > upb) && !any("-*", *np)) {
+	    if (i < 0 || i > upb) {
 		cleanup_until(&name);
 		dolerror(vp->v_name);
 		return;
