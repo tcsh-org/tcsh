@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.str.c,v 3.25 2006/02/16 01:36:25 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.26 2006/03/02 18:46:45 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.25 2006/02/16 01:36:25 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.26 2006/03/02 18:46:45 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -490,6 +490,12 @@ short2qstr(const Char *src)
     return (sdst);
 }
 
+struct blk_buf *
+bb_alloc()
+{
+    return xcalloc(1, sizeof(struct blk_buf));
+}
+
 static void
 bb_store(struct blk_buf *bb, Char *str)
 {
@@ -522,6 +528,13 @@ bb_cleanup(void *xbb)
     xfree(bb->vec);
 }
 
+void
+bb_free(void *bb)
+{
+    bb_cleanup(bb);
+    xfree(bb);
+}
+
 Char **
 bb_finish(struct blk_buf *bb)
 {
@@ -530,6 +543,13 @@ bb_finish(struct blk_buf *bb)
 }
 
 #define DO_STRBUF(STRBUF, CHAR, STRLEN)				\
+								\
+struct STRBUF *							\
+STRBUF##_alloc(void)						\
+{								\
+    return xcalloc(1, sizeof(struct STRBUF));			\
+}								\
+								\
 static void							\
 STRBUF##_store1(struct STRBUF *buf, CHAR c)			\
 {								\
@@ -591,6 +611,13 @@ STRBUF##_cleanup(void *xbuf)					\
 								\
     buf = xbuf;							\
     xfree(buf->s);						\
+}								\
+								\
+void								\
+STRBUF##_free(void *xbuf)					\
+{								\
+    STRBUF##_cleanup(xbuf);					\
+    xfree(xbuf);						\
 }								\
 								\
 const struct STRBUF STRBUF##_init /* = STRBUF##_INIT; */
