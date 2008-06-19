@@ -1,3 +1,6 @@
+ 26. /bin/echo "`" coredumped because stderror() calls longjmp corrupting
+     the stack (Mark Davies). We should vet the code for all stderror()
+     calls that cleanup local stack variables.
  25. foo > ${undef} caused coredumps because of vfork() child corrupting
      the state of the parent stack. 
  24. $x[A-B] did not complain for A out of range. (Cai Xianchao)
