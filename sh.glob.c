@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.74 2006/10/14 17:57:21 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.75 2007/05/31 08:26:12 corinna Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.74 2006/10/14 17:57:21 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.75 2007/05/31 08:26:12 corinna Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -667,6 +667,7 @@ dobackp(Char *cp, int literal)
 	    }
 	if (!*rp) {
 	oops:
+	    cleanup_until(&bb);
 	    stderror(ERR_UNMATCHED, '`');
 	}
 	ep = Strnsave(lp, rp - lp);
