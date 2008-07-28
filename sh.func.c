@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.144 2007/07/06 20:32:10 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.145 2007/09/19 20:28:07 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.144 2007/07/06 20:32:10 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.145 2007/09/19 20:28:07 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2287,11 +2287,11 @@ doeval(Char **v, struct command *c)
 	process(0);
     }
 
-    if (my_reenter == 0)
+    if (my_reenter == 0) {
 	cleanup_until(&state);
-
-    if (gv)
-	cleanup_until(gv);
+	if (gv)
+	    cleanup_until(gv);
+    }
 
     resexit(osetexit);
     if (my_reenter)
