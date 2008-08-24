@@ -1,4 +1,4 @@
-# $Id: Makefile.win32,v 1.11 2006/06/26 04:41:48 amold Exp $
+# $Id: Makefile.win32,v 1.12 2007/08/13 06:41:47 amold Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -20,7 +20,7 @@ BUILD=tcsh.exe
 # but to use the global optimizer on the mips boxes, see below
 #
 SUF=obj
-CF=-c -nologo  -GL
+CF=-c -nologo 
 
 INCLUDES=-I. -I.. -Iwin32 
 
@@ -89,7 +89,7 @@ NTCFLAGS = $(NTCFLAGS) -Zp8
 !endif
 
 CFLAGS= -MT $(NTCFLAGS) $(INCLUDES) 
-LDFLAGS= -nodefaultlib $(NTLDFLAGS) -stack:1048576,524288 -ltcg
+LDFLAGS= -nodefaultlib $(NTLDFLAGS) -stack:1048576,524288
 
 
 CC=	cl 	
@@ -160,7 +160,7 @@ OBJS= $(SHOBJS) $(TWOBJS) $(EDOBJS) $(TCOBJS) $(NTOBJS)
 all: $(BUILD)
 
 $(BUILD): $(OBJS)  ntb1.$(SUF) ntb2.$(SUF) win32/$(NTRES).res 
-	link $(LDFLAGS) ntb1.$(SUF) $(OBJS) ntb2.$(SUF) $(LIBES) $(EXTRALIBS) \
+	link $(LDFLAGS) ntb1.$(SUF) $(OBJS)  $(LIBES) ntb2.$(SUF) $(EXTRALIBS) \
 	win32/$(NTRES).res $(LOADABLE_RES) -map:tcsh.map -out:$(BUILD) 
 
 gcompress:$(BUILD)

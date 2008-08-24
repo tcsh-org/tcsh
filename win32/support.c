@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/support.c,v 1.11 2006/04/05 15:32:37 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/support.c,v 1.12 2006/04/07 00:57:59 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -523,32 +523,6 @@ int nt_chdir (char *path) {
 void WINAPI uhef( EXCEPTION_POINTERS *lpep) {
 	ExitProcess(lpep->ExceptionRecord->ExceptionCode);
 }
-extern BOOL CreateWow64Events(DWORD,HANDLE*,HANDLE*,BOOL);
-// load kernel32 and look for iswow64. if not found, assume FALSE
-BOOL bIsWow64Process = FALSE;
-void init_wow64(void) {
-	HMODULE hlib;
-	//BOOL (WINAPI *pfnIsWow64)(HANDLE,BOOL*);
-	FARPROC pfnIsWow64;
-
-	bIsWow64Process = FALSE;
-
-	hlib = LoadLibrary("kernel32.dll");
-	if (!hlib) {
-		return;
-	}
-	pfnIsWow64 = GetProcAddress(hlib,"IsWow64Process");
-	if (!pfnIsWow64) {
-		FreeLibrary(hlib);
-		return;
-	}
-	if (!pfnIsWow64(GetCurrentProcess(),&bIsWow64Process) )
-		bIsWow64Process = FALSE;
-
-	FreeLibrary(hlib);
-	return;
-
-}
 
 extern void mainCRTStartup(void *);
 
@@ -573,85 +547,10 @@ void silly_entry(void *peb) {
 	OSVERSIONINFO osver;
 
 
-	init_wow64();
-
-#ifdef _M_IX86
-	// look at the explanation in fork.c for why we do these steps.
-	if (bIsWow64Process) {
-		HANDLE h64Parent,h64Child;
-		char *stk, *end;
-		DWORD mb = (1<<20);
-
-		// if we found the events, then we're the product of a fork()
-		if (CreateWow64Events(GetCurrentProcessId(),
-					&h64Parent,&h64Child,TRUE)) {
-
-			if (!h64Parent || !h64Child)
-				return;
-
-			// tell parent we're rolling
-			SetEvent(h64Child);
-
-			if(WaitForSingleObject(h64Parent,FORK_TIMEOUT) != WAIT_OBJECT_0) {
-				return;
-			}
-
-			// if __forked is 0, we shouldn't have found the events
-			if (!__forked) 
-				return;
-		}
-
-		// now create the stack 
-
-		if (!__forked) {
-			stk = VirtualAlloc(NULL,mb+65536,MEM_COMMIT,PAGE_READWRITE);
-			if (!stk) {
-				dprintf("virtual alloc in parent failed %d\n",GetLastError());
-				return;
-			}
-			end = stk + mb + 65536;
-			end -= sizeof(char*);
-
-			__fork_stack_begin = end;
-
-			__asm {mov esp,end };
-
-			set_stackbase(end);
-			heap_init();
-		}
-		else { // child process
-			stk = (char*)__fork_stack_begin + sizeof(char*)- mb - 65536;
-
-			dprintf("begin is 0x%08x\n",stk);
-			end = VirtualAlloc(stk, mb+65536 , MEM_RESERVE , PAGE_READWRITE);
-			if (!end) {
-				rc = GetLastError();
-				dprintf("virtual alloc 1 in child failed %d\n",rc);
-				return;
-			}
-			stk = VirtualAlloc(end, mb+65536 , MEM_COMMIT , PAGE_READWRITE);
-			if (!stk) {
-				rc = GetLastError();
-				dprintf("virtual alloc 2 in child failed %d\n",rc);
-				return;
-			}
-			end = stk + mb + 65536;
-			__asm {mov esp, end};
-			set_stackbase(end);
-
-			SetEvent(h64Child);
-
-			CloseHandle(h64Parent);
-			CloseHandle(h64Child);
-		}
-	}
-#endif _M_IX86
-
 
 	SetFileApisToOEM();
 
-	if (!bIsWow64Process)
-		heap_init();
+	heap_init();
 
 
 	osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
