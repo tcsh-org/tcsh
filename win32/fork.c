@@ -61,6 +61,7 @@ typedef unsigned long U_long;
 
 static void stack_probe(void *ptr) ;
 /*static void heap_init(void);*/
+BOOL CreateWow64Events(DWORD , HANDLE *, HANDLE *, BOOL);
 
 //
 // This is exported from the user program.
@@ -138,6 +139,7 @@ void set_stackbase(void*ptr){
  * -amol 11/10/97
  */
 
+extern BOOL bIsWow64Process;
 
 int fork_init(void) {
 
@@ -279,6 +281,69 @@ int fork(void) {
 
 
 	__forked=1;
+	/*
+	 * Usage of events in the wow64 case:
+	 *
+	 * h64Parent : initially non-signalled
+	 * h64Child  : initially non-signalled
+	 *
+	 *    1. Create the events, resume the child thread.
+	 *    2. Child opens h64Parent to see if it is a child process in wow64
+	 *    3. Child opens and sets h64Child to tell parent it's running. (This
+	 *       step is needed because we can't copy to a process created in the
+	 *       suspended state on wow64.)
+	 *    4. Copy gForkData and then set h64Parent. This tells the child
+	 *       that the parameters in the structure are trustworthy.
+	 *    5. Wait for h64Child so that we know the child has created the stack
+	 *       in dynamic memory.
+	 *
+	 *   The rest of the fork hack should now proceed as in x86
+	 *
+	 */
+	if (bIsWow64Process) {
+
+		// allocate the heap for the child. this can be done even when
+		// the child is suspended. 
+		// avoids inexplicable allocation failures in the child.
+		if (VirtualAllocEx(hProc,
+					__heap_base,
+					__heap_size,
+					MEM_RESERVE,
+					PAGE_READWRITE) == NULL) {
+			dprintf("virtual allocex failed %d\n",GetLastError());
+			goto error;
+		}
+		if (VirtualAllocEx(hProc,
+					__heap_base,
+					__heap_size,
+					MEM_COMMIT,
+					PAGE_READWRITE) == NULL) {
+			dprintf("virtual allocex2 failed %d\n",GetLastError());
+			goto error;
+		}
+
+		// Do NOT expect existing events
+		if (!CreateWow64Events(pi.dwProcessId,&h64Parent,&h64Child,FALSE)) {
+			goto error;
+		}
+		ResumeThread(hThread);
+
+		// wait for the child to tell us it is running
+		//if (WaitForSingleObject(h64Child,FORK_TIMEOUT) != WAIT_OBJECT_0) {
+		//	rc = GetLastError();
+		//	goto error;
+		//}
+		hArray[0] = h64Child;
+		hArray[1] = hProc;
+
+		if (WaitForMultipleObjects(2,hArray,FALSE,FORK_TIMEOUT) != 
+				WAIT_OBJECT_0){
+
+			rc = GetLastError();
+			goto error;
+		}
+
+	}
 	//
 	// Copy all the shared data
 	//
@@ -289,7 +354,27 @@ int fork(void) {
 	if (rc != sizeof(ForkData)) 
 		goto error;
 
-	rc = ResumeThread(hThread);
+	if (!bIsWow64Process) {
+		rc = ResumeThread(hThread);
+	}
+	// in the wow64 case, the child will be waiting  on h64parent again.
+	// set it, and then wait for h64child. This will mean the child has
+	// a stack set up at the right location.
+	else {
+		SetEvent(h64Parent);
+		hArray[0] = h64Child;
+		hArray[1] = hProc;
+
+		if (WaitForMultipleObjects(2,hArray,FALSE,FORK_TIMEOUT) != 
+				WAIT_OBJECT_0){
+
+			rc = GetLastError();
+			goto error;
+		}
+		CloseHandle(h64Parent);
+		CloseHandle(h64Child);
+		h64Parent = h64Child = NULL;
+	}
 
 	//
 	// Wait for the child to start and init itself.
@@ -388,6 +473,8 @@ void heap_init(void) {
 		if (temp != (char*)__heap_base) {
 			if (!temp){
 				err = GetLastError();
+				if (bIsWow64Process)
+					ExitProcess(0);
 				abort();
 			}
 			else 
@@ -396,6 +483,8 @@ void heap_init(void) {
 		if (!VirtualAlloc(__heap_base,(char*)__heap_top -(char*)__heap_base, 
 					MEM_COMMIT,PAGE_READWRITE)){
 			err = GetLastError();
+			if (bIsWow64Process)
+				ExitProcess(0);
 			abort();
 		}
 		temp = (char*)__heap_base;
@@ -448,4 +537,78 @@ void * sbrk(int delta) {
 	}
 
 	return (void*) old_top;
+}
+/*
+ * Semantics of CreateWow64Events
+ *
+ * Try to open the events even if bOpenExisting is FALSE. This will help
+ * us detect name duplication.
+ *
+ *       1. If OpenEvent succeeds,and bOpenExisting is FALSE,  fail.
+ *
+ *       2. If OpenEvent failed,and bOpenExisting is TRUE fail
+ *
+ *       3. else create the events anew
+ *
+ */
+#define TCSH_WOW64_PARENT_EVENT_NAME "tcsh-wow64-parent-event"
+#define TCSH_WOW64_CHILD_EVENT_NAME  "tcsh-wow64-child-event"
+BOOL CreateWow64Events(DWORD pid, HANDLE *hParent, HANDLE *hChild, 
+		BOOL bOpenExisting) {
+
+	SECURITY_ATTRIBUTES sa;
+	char parentname[256],childname[256];
+
+	*hParent = *hChild = NULL;
+
+	// make darn sure they're not inherited
+	sa.nLength = sizeof(sa);
+	sa.lpSecurityDescriptor =0;
+	sa.bInheritHandle = FALSE;
+	//
+
+#pragma warning(disable:4995)
+
+	// This event tells the child to hold for gForkData to be copied
+	wsprintfA(parentname, "Local\\%d-%s",pid, TCSH_WOW64_PARENT_EVENT_NAME);
+
+	wsprintfA(childname, "Local\\%d-%s",pid, TCSH_WOW64_CHILD_EVENT_NAME );
+
+#pragma warning(default:4995)
+
+	*hParent = OpenEvent(EVENT_ALL_ACCESS,FALSE, parentname);
+
+	if(*hParent) {
+		if (bOpenExisting == FALSE) { // didn't expect to be a child process
+			CloseHandle(*hParent);
+			*hParent = NULL;
+			return FALSE;
+		}
+
+		*hChild = OpenEvent(EVENT_ALL_ACCESS,FALSE, childname);
+		if (!*hChild) {
+			CloseHandle(*hParent);
+			*hParent = NULL;
+			return FALSE;
+		}
+
+		return TRUE;
+	}
+	else { //event does not exist
+		if (bOpenExisting == TRUE)
+			return FALSE;
+	}
+
+	*hParent = CreateEvent(&sa,FALSE,FALSE,parentname);	
+	if (!*hParent)
+		return FALSE;
+
+
+	*hChild = CreateEvent(&sa,FALSE,FALSE,childname);	
+	if (!*hChild){
+		CloseHandle(*hParent);
+		*hParent = NULL;
+		return FALSE;
+	}
+	return TRUE;
 }
