@@ -1,5 +1,5 @@
  28. V6.15.02 - 20080830
- 27. Fix an eval free'ing botch (Per Hederland)
+ 27. Fix an eval free'ing botch (Per Hedeland)
  26. /bin/echo "`" coredumped because stderror() calls longjmp corrupting
      the stack (Mark Davies). We should vet the code for all stderror()
      calls that cleanup local stack variables.
