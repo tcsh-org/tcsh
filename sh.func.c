@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.145 2007/09/19 20:28:07 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.146 2008/07/28 15:20:14 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.145 2007/09/19 20:28:07 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.146 2008/07/28 15:20:14 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2222,6 +2222,7 @@ doeval_cleanup(void *xstate)
     close_on_exec(SHDIAG = dmove(state->saveDIAG, state->SHDIAG), 1);
 }
 
+static Char **Ggv;
 /*ARGSUSED*/
 void
 doeval(Char **v, struct command *c)
@@ -2249,6 +2250,7 @@ doeval(Char **v, struct command *c)
 	trim(v);
     }
 
+    Ggv = gv;
     state.evalvec = evalvec;
     state.evalp = evalp;
     state.didfds = didfds;
@@ -2284,13 +2286,15 @@ doeval(Char **v, struct command *c)
 	didcch = 0;
 #endif /* CLOSE_ON_EXEC */
 	didfds = 0;
+	gv = Ggv;
 	process(0);
+	Ggv = gv;
     }
 
     if (my_reenter == 0) {
 	cleanup_until(&state);
-	if (gv)
-	    cleanup_until(gv);
+	if (Ggv)
+	    cleanup_until(Ggv);
     }
 
     resexit(osetexit);

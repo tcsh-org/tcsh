@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.138 2007/05/31 08:26:12 corinna Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.139 2007/07/16 03:03:19 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.138 2007/05/31 08:26:12 corinna Exp $")
+RCSID("$tcsh: sh.c,v 3.139 2007/07/16 03:03:19 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1844,7 +1844,7 @@ process(int catch)
     jmp_buf_t osetexit;
     /* PWP: This might get nuked my longjmp so don't make it a register var */
     size_t omark;
-    int didexitset = 0;
+    volatile int didexitset = 0;
 
     getexit(osetexit);
     omark = cleanup_push_mark();
