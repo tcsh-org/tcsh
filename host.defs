@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.44 2007/03/19 23:25:02 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.45 2007/05/31 09:03:10 corinna Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.44 2007/03/19 23:25:02 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.45 2007/05/31 09:03:10 corinna Exp $")
 
 endcode	:
 
@@ -1012,6 +1012,9 @@ hosttype:						: "clipper"
 machtype:						: "clipper"
 enddef	:
 
+newdef : defined(__QNX__)
+ostype :						: "qnx"
+enddef :
 
 newdef	: (defined(SNI) || defined(sinix)) && !defined(_OSD_POSIX)
 comment	: Fujitsu Siemens Computers (former "Siemens Nixdorf Informationssysteme"): SINIX aka. ReliantUNIX, a SVR4 derivative
