@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.36 2006/08/24 20:56:31 christos Exp $
+# $tcsh: Makefile.in,v 3.37 2007/05/31 21:00:16 corinna Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -248,7 +248,7 @@ CPP = @CPP@ # This is set by autoconf.
 # The -B tells gcc to use /bin/ld. This is to avoid using the gnu ld, which
 # on the suns does not know how to make dynamically linked binaries.
 CC = @CC@ # This is set by autoconf.
-#CC= gcc -Wall -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Werror -Wmissing-declarations -Wredundant-decls -Wnested-externs -Wsign-compare -Wcast-qual -Wreturn-type -Wswitch -Wshadow -Wwrite-strings
+#CC= gcc -Wall -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Werror -Wmissing-declarations -Wredundant-decls -Wnested-externs -Wsign-compare -Wcast-qual -Wreturn-type -Wswitch -Wshadow -Wwrite-strings -Wextra
 #CC=	gcc -Wall -pipe -B/bin/	# -ansi -pedantic
 #CC=	gcc -m486 -pipe -Wall # Generate code for Intel 486 (linux)
 #CC=	shlicc 	# BSDI2.1 w/ shared libraries
