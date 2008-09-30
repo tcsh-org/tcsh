@@ -1,3 +1,7 @@
+ 33. V6.16.00 - 20080930
+ 32. longjmp clobbered variable fixes.
+ 31. __GNX__ addition
+ 30. Windows fork fixes
  28. V6.15.02 - 20080830
  27. Fix an eval free'ing botch (Per Hedeland)
  26. /bin/echo "`" coredumped because stderror() calls longjmp corrupting
