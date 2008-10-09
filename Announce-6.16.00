@@ -1,0 +1,29 @@
+Hello,
+
+I am pleased to announce that tcsh-6.16 is now available; this is a bug
+fix release. Please consult the Fixes files for a complete list of changes.
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most UNIX machines, VMS_POSIX, OS/2 EMX, WIN32, Amiga...
+
+You can get tcsh from ftp://ftp.astron.com/pub/tcsh/tcsh-6.16.00.tar.gz
+or from the mirrors:
+
+    ftp://ftp.gw.com/pub/unix/tcsh/tcsh-6.16.00.tar.gz [US]
+    ftp://ftp.funet.fi/pub/unix/shells/tcsh/tcsh-6.16.00.tar.gz [Finland]
+
+    SHA1 (tcsh-6.16.00.tar.gz) = 3d3536bbb9201abdf39b8b364b95e0a218970a5c
+    RMD160 (tcsh-6.16.00.tar.gz) = ed23351273bb737c184658235f33869488e64696
+
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you can
+get it from ftp.gnu.org or other GNU mirrors.
+
+I would like to thank:
+
+    * everyone who sent bug reports
+    * the beta team for all their help, bug fixes, and suggestions
+
++ christos
