@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/nt.char.c,v 1.8 2006/03/03 22:08:45 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/nt.char.c,v 1.9 2006/03/05 08:59:36 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -116,7 +116,7 @@ void nls_dll_init(void) {
 	size_t size = 0;
 
 
-	if (_dupenv_s(&ptr,&size,"TCSHLANG") ){
+	if (_dupenv_s(&ptr,&size,"TCSHLANG") == 0){
 
 		if (hlangdll)
 			FreeLibrary(hlangdll);

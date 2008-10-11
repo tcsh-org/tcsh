@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/bogus.c,v 1.7 2006/03/03 22:08:45 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/bogus.c,v 1.8 2006/03/05 08:59:36 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -64,7 +64,7 @@ struct passwd * getpwnam(const char *name) {
 
 	if (pass_bogus.pw_name == NULL) {
 		GetUserName(username,&size);
-		if (_dupenv_s(&ptr,&esize,"HOME") ){
+		if (_dupenv_s(&ptr,&esize,"HOME") == 0){
 			StringCbCopy(homedir,sizeof(homedir),ptr);
 			pass_bogus.pw_dir = &homedir[0];
 			free(ptr);
@@ -91,7 +91,7 @@ struct passwd * getpwuid(uid_t myuid) {
 	UNREFERENCED_PARAMETER(myuid);
 	if (pass_bogus.pw_name == NULL) {
 		GetUserName(username,&size);
-		if (_dupenv_s(&ptr,&esize,"HOME") ){
+		if (_dupenv_s(&ptr,&esize,"HOME") == 0){
 			StringCbCopy(homedir,sizeof(homedir),ptr);
 			pass_bogus.pw_dir = &homedir[0];
 			free(ptr);
