@@ -1,3 +1,5 @@
+  1. Fix pts detection issue (Ruslan Ermilov)
+
  33. V6.16.00 - 20080930
  32. longjmp clobbered variable fixes.
  31. __GNX__ addition

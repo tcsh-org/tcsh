@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.139 2007/07/16 03:03:19 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.140 2008/09/25 14:41:48 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.139 2007/07/16 03:03:19 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.140 2008/09/25 14:41:48 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -458,7 +458,7 @@ main(int argc, char **argv)
 	    else
 		cp2 = cp;
 	    if (!(((Strncmp(cp2, STRtty, 3) == 0) && Isalpha(cp2[3])) ||
-	          Strstr(cp, STRslptssl) != NULL)) {
+	          Strstr(cp, STRptssl) != NULL)) {
 		if (getenv("DISPLAY") == NULL) {
 		    /* NOT on X window shells */
 		    setcopy(STRautologout, STRdefautologout, VAR_READWRITE);
