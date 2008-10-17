@@ -3574,7 +3574,8 @@ each completion attempt.
 .TP 8
 .B autoexpand \fR(+)
 If set, the \fIexpand-history\fR editor command is invoked automatically
-before each completion attempt.
+before each completion attempt. If this is set to \fIonlyhistory\fR, then
+only history will be expanded and a second completion will expand filenames.
 .TP 8
 .B autolist \fR(+)
 If set, possibilities are listed after an ambiguous completion.
