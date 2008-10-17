@@ -781,6 +781,21 @@ EOF
 EOF
 	echo ${UNAME_MACHINE}-unknown-midnightbsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'`${LIBC:+-$LIBC}
 	exit 0 ;;
+    *:DragonFly:*:*)
+	# Determine whether the default compiler uses glibc.
+	eval $set_cc_for_build
+	sed 's/^	//' << EOF >$dummy.c
+	#include <features.h>
+	#if __GLIBC__ >= 2
+	LIBC=gnu
+	#else
+	LIBC=
+	#endif
+EOF
+	eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep ^LIBC=`
+	rm -f $dummy.c && rmdir $tmpdir
+	echo ${UNAME_MACHINE}-unknown-dragonfly`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'`${LIBC:+-$LIBC}
+	exit 0 ;;
     i*:CYGWIN*:*)
 	echo ${UNAME_MACHINE}-pc-cygwin
 	exit 0 ;;
