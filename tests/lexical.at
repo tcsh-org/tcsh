@@ -510,7 +510,9 @@ set a2=("$a")
 echo ${#a2}
 echo ${v}tail
 echo $env_var:l
-echo $a[2] ${a[-2]} $a[5-] $a[*] ${a[7-]} ${a[-0]}
+echo $a[2] ${a[-2]} $a[5-] $a[*] ${a[-0]}
+#echo ${a[7-]}
+#a: Subscript out of range.
 echo $a[$a[5]]
 echo $0 $1 $2
 echo $*
