@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.inputl.c,v 3.67 2007/09/28 21:02:02 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.inputl.c,v 3.68 2008/10/17 20:25:00 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.inputl.c,v 3.67 2007/09/28 21:02:02 christos Exp $")
+RCSID("$tcsh: ed.inputl.c,v 3.68 2008/10/17 20:25:00 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -404,8 +404,8 @@ Inputl(void)
 		nr_history_exp += ExpandHistory();
 
 	    /* try normal expansion only if no history references were found */
-	    if (Strcmp(autoexpand, STRonlyhistory) == 0 &&
-		nr_history_exp == 0) {
+	    if (nr_history_exp == 0 ||
+		Strcmp(autoexpand, STRonlyhistory) != 0) {
 		/*
 		 * Modified by Martin Boyer (gamin@ireq-robot.hydro.qc.ca):
 		 * A separate variable now controls beeping after
