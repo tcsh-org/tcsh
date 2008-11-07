@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.73 2008/02/28 22:13:20 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.74 2008/05/14 20:10:30 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.73 2008/02/28 22:13:20 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.74 2008/05/14 20:10:30 christos Exp $")
 
 /*
  * C shell
@@ -587,9 +587,13 @@ Dgetdol(void)
 
 	    cleanup_until(name);
 	    fixDolMod();
-	    xfree(env_val);
-	    env_val = Strsave(np);
-	    setDolp(env_val);
+	    if (length) {
+		    addla(putn(Strlen(np)));
+	    } else {
+		    xfree(env_val);
+		    env_val = Strsave(np);
+		    setDolp(env_val);
+	    }
 	    goto eatbrac;
 	}
 	udvar(name->s);
