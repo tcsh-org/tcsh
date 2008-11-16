@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.147 2008/09/25 14:41:48 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.148 2008/10/17 19:58:22 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.147 2008/09/25 14:41:48 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.148 2008/10/17 19:58:22 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -956,8 +956,8 @@ static struct wordent
 	if (c == '\n') {
 	nl:
 	    tmp->len = 0;
-	    Strbuf_terminate(tmp);
 	    Strbuf_append1(tmp, (Char) c);
+	    Strbuf_terminate(tmp);
 	    histent->word = Strsave(tmp->s);
 	    return histent;
 	}
