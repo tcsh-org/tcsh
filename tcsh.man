@@ -3375,13 +3375,14 @@ executed programs.
 .B universe \fIuniverse\fR (+)
 Sets the universe to \fIuniverse\fR.  (Masscomp/RTU only)
 .TP 8
-.B unlimit \fR[\fB\-h\fR] [\fIresource\fR]
+.B unlimit \fR[\fB\-hf\fR] [\fIresource\fR]
 Removes the limitation on \fIresource\fR or, if no \fIresource\fR is
 specified, all \fIresource\fR limitations.
 With \fB\-h\fR, the corresponding hard limits are removed.
 Only the super-user may do this.
 Note that \fBunlimit\fR may not exit successful, since most systems
 do not allow \fIdescriptors\fR to be unlimited.
+With \fB\-f\fR errors are ignored.
 .TP 8
 .B unset \fIpattern
 Removes all variables whose names match \fIpattern\fR, unless they are read-only.
