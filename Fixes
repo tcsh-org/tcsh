@@ -1,3 +1,5 @@
+  7. Fix "as" $ modifier from corrupting memory.
+     set t=demfonsftraftionf; echo $t:as/f//
   6. Make $% work with environment variable (Ron Johnston)
   5. Dragonfly script support (Matthias Schmidt, m65)
   4. Add autoexpand=onlyhistory (Don Estabrook, m66)
