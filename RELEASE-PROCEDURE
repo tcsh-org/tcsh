@@ -39,4 +39,5 @@ The rest are still manual:
     - Scroll down to "Versions"
     - Type the new version into the box at the bottom of the
       version list and click on "Add Version"
-16) Mail an announcement to tcsh@mx.gw.com
+16) Update the version on http://www.tcsh.org/MostRecentRelease
+17) Mail an announcement to tcsh@mx.gw.com
