@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.148 2008/10/17 19:58:22 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.149 2008/11/16 15:44:24 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.148 2008/10/17 19:58:22 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.149 2008/11/16 15:44:24 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2272,10 +2272,9 @@ void
 dosuspend(Char **v, struct command *c)
 {
 #ifdef BSDJOBS
-    int     ctpgrp;
     struct sigaction old;
 #endif /* BSDJOBS */
-    
+
     USE(c);
     USE(v);
 
@@ -2295,17 +2294,8 @@ dosuspend(Char **v, struct command *c)
 
 #ifdef BSDJOBS
     if (tpgrp != -1) {
-retry:
-	ctpgrp = tcgetpgrp(FSHTTY);
-	if (ctpgrp == -1)
+	if (grabpgrp(FSHTTY, opgrp) == -1)
 	    stderror(ERR_SYSTEM, "tcgetpgrp", strerror(errno));
-	if (ctpgrp != opgrp) {
-	    sigaction(SIGTTIN, NULL, &old);
-	    signal(SIGTTIN, SIG_DFL);
-	    (void) kill(0, SIGTTIN);
-	    sigaction(SIGTTIN, &old, NULL);
-	    goto retry;
-	}
 	(void) setpgid(0, shpgrp);
 	(void) tcsetpgrp(FSHTTY, shpgrp);
     }

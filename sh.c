@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.140 2008/09/25 14:41:48 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.141 2008/10/15 16:42:00 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.140 2008/09/25 14:41:48 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.141 2008/10/15 16:42:00 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1103,17 +1103,7 @@ main(int argc, char **argv)
 	    }
 #endif /* NeXT */
 #ifdef BSDJOBS			/* if we have tty job control */
-    retry:
-	    if ((tpgrp = tcgetpgrp(f)) != -1) {
-		if (tpgrp != shpgrp) {
-		    struct sigaction old;
-
-		    sigaction(SIGTTIN, NULL, &old);
-		    signal(SIGTTIN, SIG_DFL);
-		    (void) kill(0, SIGTTIN);
-		    sigaction(SIGTTIN, &old, NULL);
-		    goto retry;
-		}
+	    if (grabpgrp(f, shpgrp) != -1) {
 		/*
 		 * Thanks to Matt Day for the POSIX references, and to
 		 * Paul Close for the SGI clarification.
@@ -2355,4 +2345,29 @@ record(void)
 	recdirs(NULL, adrof(STRsavedirs) != NULL);
 	rechist(NULL, adrof(STRsavehist) != NULL);
     }
+}
+
+/*
+ * Grab the tty repeatedly, and give up if we are not in the correct
+ * tty process group.
+ */
+int
+grabpgrp(int fd, pid_t desired)
+{
+    struct sigaction old;
+    pid_t pgrp;
+    size_t i;
+
+    for (i = 0; i < 100; i++) {
+	if ((pgrp = tcgetpgrp(fd)) == -1)
+	    return -1;
+	if (pgrp == desired)
+	    return 0;
+	(void)sigaction(SIGTTIN, NULL, &old);
+	(void)signal(SIGTTIN, SIG_DFL);
+	(void)kill(0, SIGTTIN);
+	(void)sigaction(SIGTTIN, &old, NULL);
+    }
+    errno = EPERM;
+    return -1;
 }

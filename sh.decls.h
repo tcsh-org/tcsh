@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.53 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.54 2007/03/11 06:21:05 amold Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -52,6 +52,7 @@ extern	void		  done		(int);
 #else
 extern	void		  xexit		(int);
 #endif
+extern	int		  grabpgrp	(int, pid_t);
 
 /*
  * sh.dir.c
