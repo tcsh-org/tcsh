@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.26 2006/03/02 18:46:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.27 2008/05/14 20:10:30 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.26 2006/03/02 18:46:45 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.27 2008/05/14 20:10:30 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -169,10 +169,17 @@ short2str(const Char *src)
 	dst += one_wctomb(dst, *src & CHAR);
 	src++;
 	if (dst >= edst) {
+	    char *wdst = dst;
+	    char *wedst = edst;
+
 	    dstsize += MALLOC_INCR;
 	    sdst = xrealloc(sdst, (dstsize + MALLOC_SURPLUS) * sizeof(char));
 	    edst = &sdst[dstsize];
 	    dst = &edst[-MALLOC_INCR];
+	    while (wdst > wedst) {
+		dst++;
+		wdst--;
+	    }
 	}
     }
     *dst = 0;
@@ -480,10 +487,11 @@ short2qstr(const Char *src)
 	dst += one_wctomb(dst, *src & CHAR);
 	src++;
 	if (dst >= edst) {
+	    ptrdiff_t i = dst - edst;
 	    dstsize += MALLOC_INCR;
 	    sdst = xrealloc(sdst, (dstsize + MALLOC_SURPLUS) * sizeof(char));
 	    edst = &sdst[dstsize];
-	    dst = &edst[-MALLOC_INCR];
+	    dst = &edst[-MALLOC_INCR + i];
 	}
     }
     *dst = 0;

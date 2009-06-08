@@ -1,3 +1,5 @@
+  9. fix short2str/short2qstr length adjustment in wide chars
+     (Vitezslav Crhonek)
   8. set histfile=/tmp/history.temp; set savehist=(100 merge);
      alias precmd history -S. After that justpr is not restored and commands
      don't execute. (Andriy Gapon)
