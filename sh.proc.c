@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.105 2007/07/06 20:37:37 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.106 2007/07/12 14:12:46 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.105 2007/07/06 20:37:37 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.106 2007/07/12 14:12:46 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -126,6 +126,7 @@ static	void		 pflushall	(void);
 static	void		 pflush		(struct process *);
 static	void		 pfree		(struct process *);
 static	void		 pclrcurr	(struct process *);
+static	void		 morecommand	(size_t);
 static	void		 padd		(struct command *);
 static	int		 pprint		(struct process *, int);
 static	void		 ptprint	(struct process *);
@@ -670,9 +671,23 @@ pclrcurr(struct process *pp)
 }
 
 /* +4 here is 1 for '\0', 1 ea for << >& >> */
-static Char command[PMAXLEN + 4];
+static Char *cmdstr;
+static size_t cmdmax;
 static size_t cmdlen;
 static Char *cmdp;
+
+static void
+morecommand(size_t s)
+{
+    Char *ncmdstr;
+    ptrdiff_t d;
+
+    cmdmax += s;
+    ncmdstr = xrealloc(cmdstr, cmdmax);
+    d = ncmdstr - cmdstr;
+    cmdstr = ncmdstr;
+    cmdp += d;
+}
 
 /* GrP
  * unparse - Export padd() functionality 
@@ -680,11 +695,13 @@ static Char *cmdp;
 Char *
 unparse(struct command *t)
 {
-    cmdp = command;
+    if (cmdmax == 0)
+	morecommand(1024);
+    cmdp = cmdstr;
     cmdlen = 0;
     padd(t);
     *cmdp++ = '\0';
-    return Strsave(command);
+    return Strsave(cmdstr);
 }
 
 
@@ -707,7 +724,9 @@ palloc(pid_t pid, struct command *t)
 	pp->p_flags |= PBACKQ;
     if (t->t_dflg & F_HUP)
 	pp->p_flags |= PHUP;
-    cmdp = command;
+    if (cmdmax == 0)
+	morecommand(1024);
+    cmdp = cmdstr;
     cmdlen = 0;
     padd(t);
     *cmdp++ = 0;
@@ -716,7 +735,7 @@ palloc(pid_t pid, struct command *t)
 	if (t->t_dflg & F_STDERR)
 	    pp->p_flags |= PDIAG;
     }
-    pp->p_command = Strsave(command);
+    pp->p_command = Strsave(cmdstr);
     if (pcurrjob) {
 	struct process *fp;
 
@@ -839,7 +858,7 @@ padd(struct command *t)
 static void
 pads(Char *cp)
 {
-    size_t i;
+    size_t i, len;
 
     /*
      * Avoid the Quoted Space alias hack! Reported by:
@@ -850,14 +869,9 @@ pads(Char *cp)
 
     i = Strlen(cp);
 
-    if (cmdlen >= PMAXLEN)
-	return;
-    if (cmdlen + i >= PMAXLEN) {
-	(void) Strcpy(cmdp, STRsp3dots);
-	cmdlen = PMAXLEN;
-	cmdp += 4;
-	return;
-    }
+    len = cmdlen + i + 100;
+    if (len >= cmdmax)
+	morecommand(len);
     (void) Strcpy(cmdp, cp);
     cmdp += i;
     cmdlen += i;
