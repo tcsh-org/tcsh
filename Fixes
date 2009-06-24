@@ -1,3 +1,4 @@
+ 12. add rlimit swapsize from FreeBSD.
  11. restore behavior where a[n-] never prints an error.
  10. always save the whole command, not just the first 80 chars of it.
   9. fix short2str/short2qstr length adjustment in wide chars

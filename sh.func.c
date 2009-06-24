@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.149 2008/11/16 15:44:24 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.150 2009/02/25 22:54:54 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.149 2008/11/16 15:44:24 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.150 2009/02/25 22:54:54 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1932,6 +1932,10 @@ struct limits limits[] =
 # ifdef RLIMIT_SBSIZE
     { RLIMIT_SBSIZE,	"sbsize",	1,	""		},
 # endif /* RLIMIT_SBSIZE */
+
+# ifdef RLIMIT_SWAP 
+    { RLIMIT_SWAP,	"swapsize",	1024,	"kbytes"	}, 
+# endif /* RLIMIT_SWAP */ 
 
     { -1, 		NULL, 		0, 	NULL		}
 };

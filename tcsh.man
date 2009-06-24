@@ -72,7 +72,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "30 September 2008" "Astron 6.16.00"
+.TH TCSH 1 "24 September 2009" "Astron 6.16.01"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -2929,6 +2929,9 @@ the maximum number of simultaneous processes for this user id
 .TP
 \fIsbsize\fR
 the maximum size of socket buffer usage for this user
+.TP 
+\fIswapsize\fR 
+the maximum amount of swap space reserved or used for this user 
 .PP
 \fImaximum-use\fR may be given as a (floating point or
 integer) number followed by a scale factor.  For all limits
@@ -5088,7 +5091,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.16.00 (Astron) 2008-09-30.
+This manual documents tcsh 6.16.01 (Astron) 2009-06-24.
 .SH AUTHORS
 .PD 0
 .TP 2
