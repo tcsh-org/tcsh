@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.150 2009/02/25 22:54:54 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.151 2009/06/24 15:21:14 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.150 2009/02/25 22:54:54 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.151 2009/06/24 15:21:14 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -888,8 +888,8 @@ search(int type, int level, Char *goal)
     cleanup_until(&word);
 }
 
-static struct wordent 
-*histgetword(struct wordent *histent) 
+static struct wordent *
+histgetword(struct wordent *histent) 
 {
     int found = 0, first;
     eChar c, d;
