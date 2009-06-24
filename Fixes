@@ -1,3 +1,5 @@
+ 14. V6.16.01 - 20090624
+ 13. add missing sigemptyset in goodbye()
  12. add rlimit swapsize from FreeBSD.
  11. restore behavior where a[n-] never prints an error.
  10. always save the whole command, not just the first 80 chars of it.
