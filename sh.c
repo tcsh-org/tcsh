@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.142 2009/02/25 22:54:53 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.143 2009/04/24 14:38:23 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.142 2009/02/25 22:54:53 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.143 2009/04/24 14:38:23 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1640,6 +1640,7 @@ goodbye(Char **v, struct command *c)
 	size_t omark;
 	sigset_t set;
 
+	sigemptyset(&set);
 	signal(SIGQUIT, SIG_IGN);
 	sigaddset(&set, SIGQUIT);
 	sigprocmask(SIG_UNBLOCK, &set, NULL);
