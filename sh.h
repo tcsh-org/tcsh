@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.148 2007/09/28 21:02:02 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.149 2009/06/25 21:15:37 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -94,7 +94,7 @@ typedef unsigned long uChar;
 typedef wint_t eChar; /* Can contain any Char value or CHAR_ERR */
 #define CHAR_ERR WEOF /* Pretty please, use bit 31... */
 #define normal_mbtowc(PWC, S, N) rt_mbtowc(PWC, S, N)
-#define reset_mbtowc() (void)mbtowc(NULL, NULL, 0)
+#define reset_mbtowc() IGNORE(mbtowc(NULL, NULL, 0))
 # else
 typedef short Char;
 typedef unsigned short uChar;
@@ -117,6 +117,10 @@ typedef int eChar;
 /* Elide unused argument warnings */
 #define USE(a)	(void) (a)
 #define IGNORE(a)	ignore((intptr_t)a)
+static inline void ignore(intptr_t a)
+{
+    USE(a);
+}
 
 /*
  * Return true if the path is absolute
