@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.151 2009/06/24 15:21:14 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.152 2009/06/24 20:16:42 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.151 2009/06/24 15:21:14 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.152 2009/06/24 20:16:42 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -940,7 +940,7 @@ histgetword(struct wordent *histent)
 	    
 	    Strbuf_append1(tmp, (Char) c);
 	    
-	    if (!first && !d && c == '(') {
+	    if (!first && !d && c == '(' && !e) {
 		break;
 	    }
 	    first = 0;

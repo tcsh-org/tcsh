@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.exec.c,v 3.73 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exec.c,v 3.74 2007/05/31 08:26:12 corinna Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exec.c,v 3.73 2006/08/24 20:56:31 christos Exp $")
+RCSID("$tcsh: sh.exec.c,v 3.74 2007/05/31 08:26:12 corinna Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -1066,7 +1066,7 @@ find_cmd(Char *cmd, int prt)
     int hashval, i, ex, rval = 0;
 
     if (prt && any(short2str(cmd), '/')) {
-	xprintf(CGETS(13, 7, "where: / in command makes no sense\n"));
+	xprintf("%s", CGETS(13, 7, "where: / in command makes no sense\n"));
 	return rval;
     }
 
@@ -1129,7 +1129,7 @@ find_cmd(Char *cmd, int prt)
 	ex = executable(*pv, sv, 0);
 #ifdef FASTHASH
 	if (!ex && (hashdebug & 2)) {
-	    xprintf(CGETS(13, 10, "hash miss: "));
+	    xprintf("%s", CGETS(13, 10, "hash miss: "));
 	    ex = 1;	/* Force printing */
 	}
 #endif /* FASTHASH */

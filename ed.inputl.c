@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.inputl.c,v 3.68 2008/10/17 20:25:00 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.inputl.c,v 3.69 2008/11/04 13:33:23 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.inputl.c,v 3.68 2008/10/17 20:25:00 christos Exp $")
+RCSID("$tcsh: ed.inputl.c,v 3.69 2008/11/04 13:33:23 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -264,13 +264,13 @@ Inputl(void)
 		    ch = tch;
 		    if (ch == 'y' || ch == ' ') {
 			LastChar = CorrChar;	/* Restore the corrected end */
-			xprintf(CGETS(6, 2, "yes\n"));
+			xprintf("%s", CGETS(6, 2, "yes\n"));
 		    }
 		    else {
 			Strcpy(InputBuf, Origin);
 			LastChar = SaveChar;
 			if (ch == 'e') {
-			    xprintf(CGETS(6, 3, "edit\n"));
+			    xprintf("%s", CGETS(6, 3, "edit\n"));
 			    *LastChar-- = '\0';
 			    Cursor = LastChar;
 			    printprompt(3, NULL);
@@ -281,7 +281,7 @@ Inputl(void)
 			    break;
 			}
 			else if (ch == 'a') {
-			    xprintf(CGETS(6, 4, "abort\n"));
+			    xprintf("%s", CGETS(6, 4, "abort\n"));
 		            LastChar = InputBuf;   /* Null the current line */
 			    Cursor = LastChar;
 			    printprompt(0, NULL);
@@ -289,7 +289,7 @@ Inputl(void)
 			    cleanup_until(Origin);
 			    break;
 			}
-			xprintf(CGETS(6, 5, "no\n"));
+			xprintf("%s", CGETS(6, 5, "no\n"));
 		    }
 		    flush();
 		}
@@ -309,9 +309,9 @@ Inputl(void)
                     PastBottom();
 		}
 		if (matchval == 0) {
-		    xprintf(CGETS(6, 6, "No matching command\n"));
+		    xprintf("%s", CGETS(6, 6, "No matching command\n"));
 		} else if (matchval == 2) {
-		    xprintf(CGETS(6, 7, "Ambiguous command\n"));
+		    xprintf("%s", CGETS(6, 7, "Ambiguous command\n"));
 		}
 	        if (NeedsRedraw) {
 		    ClearLines();

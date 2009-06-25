@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.79 2007/05/31 08:26:12 corinna Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.80 2007/12/27 17:33:27 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.79 2007/05/31 08:26:12 corinna Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.80 2007/12/27 17:33:27 christos Exp $")
 
 #include "ed.h"
 
@@ -1491,7 +1491,7 @@ reread:
 		if (adrof(STRignoreeof)) {
 			/* If so, tell the user to use exit or logout */
 		    if (loginsh) {
-				xprintf(CGETS(16, 2,
+				xprintf("%s", CGETS(16, 2,
 					"\nUse \"logout\" to logout.\n"));
 		   	} else {
 				xprintf(CGETS(16, 3,

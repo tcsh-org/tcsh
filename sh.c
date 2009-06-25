@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.143 2009/04/24 14:38:23 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.144 2009/06/24 15:32:25 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.143 2009/04/24 14:38:23 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.144 2009/06/24 15:32:25 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -758,7 +758,7 @@ main(int argc, char **argv)
     }
     if (argc > 1 && strcmp(argv[1], "--help") == 0) {
 	xprintf("%S\n\n", varval(STRversion));
-	xprintf(CGETS(11, 8, HELP_STRING));
+	xprintf("%s", CGETS(11, 8, HELP_STRING));
 	xexit(0);
     }
     /*
@@ -1162,8 +1162,9 @@ main(int argc, char **argv)
 	    if (tpgrp == -1) {
 	notty:
 	        xprintf(CGETS(11, 1, "Warning: no access to tty (%s).\n"),
-			strerror(errno));
-		xprintf(CGETS(11, 2, "Thus no job control in this shell.\n"));
+		    strerror(errno));
+		xprintf("%s",
+		    CGETS(11, 2, "Thus no job control in this shell.\n"));
 		/*
 		 * Fix from:Sakari Jalovaara <sja@sirius.hut.fi> if we don't
 		 * have access to tty, disable editing too

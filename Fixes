@@ -13,7 +13,7 @@
   6. Make $% work with environment variable (Ron Johnston)
   5. Dragonfly script support (Matthias Schmidt, m65)
   4. Add autoexpand=onlyhistory (Don Estabrook, m66)
-  3. Add history in loops (Lawrence Darby, m48)
+  3. Add history in loops (Laurence Darby, m48)
   2. Add missing colorls "rs" variable (Shlomi Fish, m70)
   1. Fix pts detection issue (Ruslan Ermilov)
 

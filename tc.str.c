@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.27 2008/05/14 20:10:30 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.28 2009/06/08 18:05:57 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.27 2008/05/14 20:10:30 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.28 2009/06/08 18:05:57 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -52,7 +52,7 @@ one_mbtowc(wchar_t *pwc, const char *s, size_t n)
 
     len = rt_mbtowc(pwc, s, n);
     if (len == -1) {
-        mbtowc(NULL, NULL, 0);
+        reset_mbtowc(NULL, NULL, 0);
 	*pwc = (unsigned char)*s | INVALID_BYTE;
     }
     if (len <= 0)
