@@ -9,35 +9,37 @@ HOW TO RELEASE TCSH
 6)  Commit changes into CVS
 7)  run autoreconf
 8)  Commit changes into CVS
-9)  Tag the release with TCSHx_yy_zz where
+9)  run make check
+10)  Tag the release with TCSHx_yy_zz where
 	x  == REV
 	yy == VERS
 	zz == PATCHLEVEL
     from patchlevel.h (the new values you picked)
+	
 
 The following steps are now automated by running
 
     ./MAKERELEASE x yy zz
 
-10) Export the code using the new tag you created.  Rename
+11) Export the code using the new tag you created.  Rename
     the directory from "tcsh" to "tcsh-x.yy.zz" and create
     tcsh-x.yy.zz.tar.gz
-11) Export the previous release as well
-12) Remove files that should not be in a release:
+12) Export the previous release as well
+13) Remove files that should not be in a release:
     - Announce*
     - MAKERELEASE
     - Makefile.ADMIN
     - RELEASE-PROCEDURE (this file)
-13) Generate a "diff -urN" between the two directories you
+14) Generate a "diff -urN" between the two directories you
     have exported, save it in patchz.gz (z is PATCHLEVEL)
 
 The rest are still manual:
 
-14) Make the patch and the source tarball available on ftp
-15) Add the new version to bugs.gw.com:
+15) Make the patch and the source tarball available on ftp
+16) Add the new version to bugs.gw.com:
     - Click: Manage > Manage Projects > tcsh
     - Scroll down to "Versions"
     - Type the new version into the box at the bottom of the
       version list and click on "Add Version"
-16) Update the version on http://www.tcsh.org/MostRecentRelease
-17) Mail an announcement to tcsh@mx.gw.com
+17) Update the version on http://www.tcsh.org/MostRecentRelease
+18) Mail an announcement to tcsh@mx.gw.com
