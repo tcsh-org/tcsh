@@ -1,3 +1,8 @@
+ 19. V6.17.00 - 20090710
+ 18. Fix small bug in history in loops.
+ 17. Provide newer config.{guess,sub}
+ 16. Fix gcc 4 warnings.
+ 15. Fix memory trashing bug introduced in 10.
  14. V6.16.01 - 20090624
  13. add missing sigemptyset in goodbye()
  12. add rlimit swapsize from FreeBSD.
