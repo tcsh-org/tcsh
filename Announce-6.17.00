@@ -22,8 +22,7 @@ or from the mirrors:
     ftp://ftp.gw.com/pub/unix/tcsh/tcsh-6.17.00.tar.gz [US]
     ftp://ftp.funet.fi/pub/unix/shells/tcsh/tcsh-6.17.00.tar.gz [Finland]
 
-    SHA1 (tcsh-6.16.00.tar.gz) = 3d3536bbb9201abdf39b8b364b95e0a218970a5c
-    RMD160 (tcsh-6.16.00.tar.gz) = ed23351273bb737c184658235f33869488e64696
+    RMD160 (tcsh-6.17.00.tar.gz) = 2cc41a895799ade6d62640f877bb626f136dac35
 
 This is a gzip (GNU zip) tar archive. If you don't have GNU zip you can
 get it from ftp.gnu.org or other GNU mirrors.
