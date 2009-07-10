@@ -1,4 +1,6 @@
- 19. V6.17.00 - 20090710
+ 21. V6.17.00 - 20090710
+ 20. Fix dataroot autoconf issue.
+ 19. Fix directory stuff for unit tests.
  18. Fix small bug in history in loops.
  17. Provide newer config.{guess,sub}
  16. Fix gcc 4 warnings.
