@@ -1,3 +1,5 @@
+ 22. remember to closedir in mailchk (from Werner Fink, reported by
+     David Binderman)
  21. V6.17.00 - 20090710
  20. Fix dataroot autoconf issue.
  19. Fix directory stuff for unit tests.
