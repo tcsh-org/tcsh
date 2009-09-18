@@ -1,3 +1,4 @@
+ 23. Fix AsciiOnly setting that broke 8 bit input. (Juergen Keil)
  22. remember to closedir in mailchk (from Werner Fink, reported by
      David Binderman)
  21. V6.17.00 - 20090710
