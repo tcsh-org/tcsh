@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.146 2009/08/14 12:34:34 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.147 2009/09/18 18:10:29 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.146 2009/08/14 12:34:34 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.147 2009/09/18 18:10:29 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1293,6 +1293,8 @@ main(int argc, char **argv)
      */
     process(setintr);
 
+    /* Take care of these (especially HUP) here instead of inside flush. */
+    handle_pending_signals();
     /*
      * Mop-up.
      */
@@ -2023,6 +2025,7 @@ process(int catch)
     cleanup_pop_mark(omark);
     resexit(osetexit);
     exitset--;
+    handle_pending_signals();
 }
 
 /*ARGSUSED*/
