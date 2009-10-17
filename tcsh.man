@@ -609,7 +609,7 @@ See \fBFilename substitution\fR.
 .TP 8
 .B expand-line \fR(not bound)
 Like \fIexpand-history\fR, but
-expands history substitutions in each word in the input buffer,
+expands history substitutions in each word in the input buffer.
 .TP 8
 .B expand-variables \fR(^X-$)
 Expands the variable to the left of the cursor.
@@ -860,7 +860,7 @@ history use the literal form.
 .PP
 The \fIhistory\fR builtin command can print, store in a file, restore
 and clear the history list at any time,
-and the \fBsavehist\fR and \fBhistfile\fR shell variables can be can be set to
+and the \fBsavehist\fR and \fBhistfile\fR shell variables can be set to
 store the history list automatically on logout and restore it on login.
 .PP
 History substitutions introduce words from the history list into the input
@@ -1150,7 +1150,7 @@ The system maintains its own list of ``environment'' variables.
 These can be displayed and changed with \fIprintenv\fR, \fIsetenv\fR and
 \fIunsetenv\fR.
 .PP
-(+) Variables may be made read-only with `set \-r' (q.v.)
+(+) Variables may be made read-only with `set \-r' (q.v.).
 Read-only variables may not be modified or unset;
 attempting to do so will cause an error.
 Once made read-only, a variable cannot be made writable,
@@ -1501,7 +1501,7 @@ to specify an interpreter other than the shell itself.
 .PP
 On systems which do not understand the `#!' script interpreter convention
 the shell may be compiled to emulate it; see the \fBversion\fR shell
-variable\fR.  If so, the shell checks the first line of the file to
+variable.  If so, the shell checks the first line of the file to
 see if it is of the form `#!\fIinterpreter\fR \fIarg\fR ...'.  If it is,
 the shell starts \fIinterpreter\fR with the given \fIarg\fRs and feeds the
 file to it on standard input.
@@ -1704,7 +1704,7 @@ Sticky bit is set (+)
 for a terminal device (+)
 .TP 4
 .B R
-Has been migrated (convex only) (+)
+Has been migrated (Convex only) (+)
 .TP 4
 .B L
 Applies subsequent operators in a multiple-operator test to a symbolic link
@@ -1730,7 +1730,7 @@ non-links.  \fBL\fR has a different meaning when it is the last operator
 in a multiple-operator test; see below.
 .PP
 It is possible but not useful, and sometimes misleading, to combine operators
-which expect \fIfile\fR to be a file with operators which do not,
+which expect \fIfile\fR to be a file with operators which do not
 (e.g., \fBX\fR and \fBt\fR).  Following \fBL\fR with a non-file operator
 can lead to particularly strange results.
 .PP
@@ -2929,9 +2929,9 @@ the maximum number of simultaneous processes for this user id
 .TP
 \fIsbsize\fR
 the maximum size of socket buffer usage for this user
-.TP 
-\fIswapsize\fR 
-the maximum amount of swap space reserved or used for this user 
+.TP
+\fIswapsize\fR
+the maximum amount of swap space reserved or used for this user
 .PP
 \fImaximum-use\fR may be given as a (floating point or
 integer) number followed by a scale factor.  For all limits
@@ -2952,7 +2952,7 @@ See also \fIwatchlog\fR.
 .TP 8
 .B login
 Terminates a login shell, replacing it with an instance of
-\fI/bin/login.\fR This is one way to log off, included for
+\fI/bin/login\fR. This is one way to log off, included for
 compatibility with \fIsh\fR(1).
 .TP 8
 .B logout
@@ -3021,7 +3021,7 @@ unless \fBlistflags\fR contains an `x', in which case it acts like `ls \-xF'.
 so `alias ls ls\-F' generally does the right thing.
 .PP
 The \fBls\-F\fR builtin can list files using different colors depending on the
-filetype or extension.  See the \fBcolor\fR \fItcsh\fR variable and the
+filetype or extension.  See the \fBcolor\fR shell variable and the
 \fBLS_COLORS\fR environment variable.
 .RE
 .PP
@@ -3218,14 +3218,13 @@ The second form sets \fIname\fR to the null string.
 The third form sets \fIname\fR to the single \fIword\fR.
 The fourth form sets \fIname\fR to the list of words in
 \fIwordlist\fR.  In all cases the value is command and filename expanded.
-If \-r is specified, the value is set read-only.  If \-f or \-l are
-specified, set only unique words keeping their order.
-\-f prefers the first occurrence of a word, and \-l the last.
-The fifth form sets the \fIindex\fR'th component of name to \fIword\fR;
+If \fB\-r\fR is specified, the value is set read-only.  If \fB\-f\fR or
+\fB\-l\fR are specified, set only unique words keeping their order.
+\fB\-f\fR prefers the first occurrence of a word, and \fB\-l\fR the last.
+The fifth form sets the \fIindex\fR'th component of \fIname\fR to \fIword\fR;
 this component must already exist.
 The sixth form lists only the names of all shell variables that are read-only.
 The seventh form makes \fIname\fR read-only, whether or not it has a value.
-The second form sets \fIname\fR to the null string.
 The eighth form is the same as the third form, but
 make \fIname\fR read-only at the same time.
 .PD
@@ -3361,7 +3360,7 @@ Common values for the mask are
 022, giving read and execute access to the group and others.
 Without \fIvalue\fR, prints the current file creation mask.
 .TP 8
-.B unalias \fIpattern
+.B unalias \fIpattern\fR
 .br
 Removes all aliases whose names match \fIpattern\fR.
 `unalias *' thus removes all aliases.
@@ -3591,8 +3590,8 @@ characters are added by completion.
 The first word is the number of minutes of inactivity before automatic
 logout.  The optional second word is the number of minutes of inactivity
 before automatic locking.
-When the shell automatically logs out,
-it prints `auto-logout', sets the variable logout to `automatic' and exits.
+When the shell automatically logs out, it prints `auto-logout', sets the
+variable \fBlogout\fR to `automatic' and exits.
 When the shell automatically locks, the user is required to enter his password
 to continue working.  Five incorrect attempts result in automatic logout.
 Set to `60' (automatic logout after 60 minutes, and no locking) by default
@@ -3692,7 +3691,7 @@ but the first element (the current working directory) is always correct.
 See also the \fBcwd\fR and \fBowd\fR shell variables.
 .TP 8
 .B dspmbyte \fR(+)
-Has an affect iff 'dspm' is listed as part of the \fBversion\fR shell variable.
+Has an effect iff 'dspm' is listed as part of the \fBversion\fR shell variable.
 If set to `euc', it enables display and editing EUC-kanji(Japanese) code.
 If set to `sjis', it enables display and editing Shift-JIS(Japanese) code.
 If set to `big5', it enables display and editing Big5(Chinese) code.
@@ -3718,12 +3717,12 @@ is set to number 0,1,2 and 3.  Each number has the following meaning:
   3 ... used for both the first byte and second byte of a multi-byte character.
 .\" SHK: I tried my best to get the following to be grammatically correct.
 .\" However, I still don't understand what's going on here.  In the
- \" following example, there are three bytes, but the text seems to refer to
- \" each nybble as a character.  What's going on here?  It this 3-byte code
- \" in the table?  The text above seems to imply that there are 256
- \" characters/bytes in the table.  If I get some more info on this (perhaps
- \" a complete example), I could fix the text to be grammatically correct.
- \" (steve.kelem@xilinx.com 1999/09/13)
+.\" following example, there are three bytes, but the text seems to refer to
+.\" each nybble as a character.  What's going on here?  It this 3-byte code
+.\" in the table?  The text above seems to imply that there are 256
+.\" characters/bytes in the table.  If I get some more info on this (perhaps
+.\" a complete example), I could fix the text to be grammatically correct.
+.\" (steve.kelem@xilinx.com 1999/09/13)
 .PP
   Example:
 .br
@@ -3811,7 +3810,7 @@ The user's group name.
 If set, the incremental search match (in \fIi-search-back\fR and
 \fIi-search-fwd\fR) and the region between the mark and the cursor are
 highlighted in reverse video.
-
+.IP "" 8
 Highlighting requires more frequent terminal writes, which introduces extra
 overhead. If you care about terminal performance, you may want to leave this
 unset.
@@ -4020,7 +4019,7 @@ See also the \fBcwd\fR and \fBdirstack\fR shell variables.
 .TP 8
 .B padhour
 If set, enable the printing of padding '0' for hours, in 24 and 12 hour
-formats.  E.G.: 07:45:42 vs. 7:45:42
+formats.  E.G.: 07:45:42 vs. 7:45:42.
 .TP 8
 .B path
 A list of directories in which to look for executable commands.
@@ -5000,7 +4999,7 @@ See the \fBgid\fR, \fBloginsh\fR, \fBoid\fR, \fBshlvl\fR, \fBtcsh\fR,
 variables.
 .PP
 A new syntax for including useful information in the prompt string
-(see \fBprompt\fR).
+(see \fBprompt\fR),
 and special prompts for loops and spelling correction
 (see \fBprompt2\fR and \fBprompt3\fR).
 .PP
