@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.123 2007/03/01 21:21:42 corinna Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.124 2007/07/02 15:48:48 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.123 2007/03/01 21:21:42 corinna Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.124 2007/07/02 15:48:48 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -915,6 +915,7 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
     int gpat       = flags & TW_PAT_OK;	 /* Match against a pattern */
     int ignoring   = flags & TW_IGN_OK;	 /* Use fignore? */
     int d = 4, nd;			 /* Spelling distance */
+    Char **cp;
     Char *ptr;
     struct varent *vp;
     struct Strbuf buf = Strbuf_INIT, item = Strbuf_INIT;
@@ -936,6 +937,17 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 		showdots = DOT_NOT;
 		break;
 	    default:
+		break;
+	    }
+
+    if (looking == TW_COMMAND
+	&& (vp = adrof(STRautorehash)) != NULL && vp->vec != NULL)
+	for (cp = vp->vec; *cp; cp++)
+	    if (Strcmp(*cp, STRalways) == 0
+		|| (Strcmp(*cp, STRcorrect) == 0 && command == SPELL)
+		|| (Strcmp(*cp, STRcomplete) == 0 && command != SPELL)) {
+		tw_cmd_free();
+		tw_cmd_start(NULL, NULL);
 		break;
 	    }
 
@@ -1047,15 +1059,13 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 	case RECOGNIZE_ALL:
 	case RECOGNIZE_SCROLL:
 
-	    if ((vp = adrof(STRcomplete)) != NULL && vp->vec != NULL) {
-		Char **cp;
+	    if ((vp = adrof(STRcomplete)) != NULL && vp->vec != NULL)
 		for (cp = vp->vec; *cp; cp++) {
 		    if (Strcmp(*cp, STRigncase) == 0)
 			igncase = 1;
 		    if (Strcmp(*cp, STRenhance) == 0)
 			enhanced = 1;
 		}
-	    }
 
 	    if (enhanced || igncase) {
 	        if (!is_prefixmatch(target, item.s, igncase))

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.exec.c,v 3.74 2007/05/31 08:26:12 corinna Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exec.c,v 3.75 2009/06/25 21:15:37 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exec.c,v 3.74 2007/05/31 08:26:12 corinna Exp $")
+RCSID("$tcsh: sh.exec.c,v 3.75 2009/06/25 21:15:37 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -149,9 +149,9 @@ static	int 	iscommand	(Char *);
 void
 doexec(struct command *t, int do_glob)
 {
-    Char *dp, **pv, **av, *sav;
+    Char *dp, **pv, **opv, **av, *sav;
     struct varent *v;
-    int slash, gflag;
+    int slash, gflag, rehashed;
     int hashval, i;
     Char   *blk[2];
 
@@ -253,9 +253,9 @@ doexec(struct command *t, int do_glob)
      * command search.
      */
     if (v == NULL || v->vec == NULL || v->vec[0] == NULL || slash)
-	pv = justabs;
+	opv = justabs;
     else
-	pv = v->vec;
+	opv = v->vec;
     sav = Strspl(STRslash, *av);/* / command name for postpending */
 #ifndef VFORK
     cleanup_push(sav, xfree);
@@ -264,6 +264,9 @@ doexec(struct command *t, int do_glob)
 #endif /* VFORK */
     hashval = havhash ? hashname(*av) : 0;
 
+    rehashed = 0;
+retry:
+    pv = opv;
     i = 0;
 #ifdef VFORK
     hits++;
@@ -313,6 +316,11 @@ cont:
 #ifdef VFORK
     hits--;
 #endif /* VFORK */
+    if (adrof(STRautorehash) && !rehashed && havhash && opv != justabs) {
+	dohash(NULL, NULL);
+	rehashed = 1;
+	goto retry;
+    }
 #ifndef VFORK
     cleanup_until(sav);
 #else /* VFORK */
@@ -801,19 +809,23 @@ hashname(Char *cp)
 static int
 iscommand(Char *name)
 {
-    Char **pv;
+    Char **opv, **pv;
     Char *sav;
     struct varent *v;
     int slash = any(short2str(name), '/');
-    int hashval, i;
+    int hashval, rehashed, i;
 
     v = adrof(STRpath);
     if (v == NULL || v->vec == NULL || v->vec[0] == NULL || slash)
-	pv = justabs;
+	opv = justabs;
     else
-	pv = v->vec;
+	opv = v->vec;
     sav = Strspl(STRslash, name);	/* / command name for postpending */
     hashval = havhash ? hashname(name) : 0;
+
+    rehashed = 0;
+retry:
+    pv = opv;
     i = 0;
     do {
 	if (!slash && ABSOLUTEP(pv[0]) && havhash) {
@@ -842,6 +854,11 @@ cont:
 	pv++;
 	i++;
     } while (*pv);
+    if (adrof(STRautorehash) && !rehashed && havhash && opv != justabs) {
+	dohash(NULL, NULL);
+	rehashed = 1;
+	goto retry;
+    }
     xfree(sav);
     return 0;
 }
@@ -1063,7 +1080,7 @@ find_cmd(Char *cmd, int prt)
     const struct biltins *bptr;
     Char **pv;
     Char *sv;
-    int hashval, i, ex, rval = 0;
+    int hashval, rehashed, i, ex, rval = 0;
 
     if (prt && any(short2str(cmd), '/')) {
 	xprintf("%s", CGETS(13, 7, "where: / in command makes no sense\n"));
@@ -1115,6 +1132,8 @@ find_cmd(Char *cmd, int prt)
     sv = Strspl(STRslash, cmd);
     cleanup_push(sv, xfree);
 
+    rehashed = 0;
+retry:
     for (pv = var->vec, i = 0; pv && *pv; pv++, i++) {
 	if (havhash && !eq(*pv, STRdot)) {
 #ifdef FASTHASH
@@ -1142,6 +1161,11 @@ find_cmd(Char *cmd, int prt)
 	    else
 		return rval;
 	}
+    }
+    if (adrof(STRautorehash) && !rehashed && havhash) {
+	dohash(NULL, NULL);
+	rehashed = 1;
+	goto retry;
     }
     cleanup_until(sv);
     return rval;

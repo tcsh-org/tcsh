@@ -3118,11 +3118,12 @@ as on \fIdirs\fR.  (+)
 .B rehash
 Causes the internal hash table of the contents of the
 directories in the \fBpath\fR variable to be recomputed.  This is
-needed if new commands are added to directories in \fBpath\fR
-while you are logged in.  This should be necessary only if
-you add commands to one of your own directories, or if a
-systems programmer changes the contents of one of the
-system directories.  Also flushes the cache of home directories
+needed if the \fBautorehash\fR shell variable is not set and new
+commands are added to directories in \fBpath\fR while you are logged
+in.  With \fBautorehash\fR, a new command will be found
+automatically, except in the special case where another command of
+the same name which is located in a different directory already
+exists in the hash table.  Also flushes the cache of home directories
 built by tilde expansion.
 .TP 8
 .B repeat \fIcount command
@@ -3600,6 +3601,14 @@ under a window system (i.e., the \fBDISPLAY\fR environment variable is set),
 the tty is a pseudo-tty (pty) or the shell was not so compiled (see the
 \fBversion\fR shell variable).
 See also the \fBafsuser\fR and \fBlogout\fR shell variables.
+.TP 8
+.B autorehash \fR(+)
+If set, the internal hash table of the contents of the directories in the
+\fBpath\fR variable will be recomputed if a command is not found in the hash
+table.  In addition, the list of available commands will be rebuilt for each
+command completion or spelling correction attempt if set to `complete' or
+`correct' respectively; if set to `always', this will be done for both
+cases.
 .TP 8
 .B backslash_quote \fR(+)
 If set, backslashes (`\\') always quote `\\', `'', and `"'.  This may make
