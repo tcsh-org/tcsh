@@ -5025,8 +5025,7 @@ done with output control.
 Alias substitution is most often used to clumsily simulate shell procedures;
 shell procedures should be provided rather than aliases.
 .PP
-Commands within loops are not placed in the history
-list.  Control structures should be parsed rather than being recognized as
+Control structures should be parsed rather than being recognized as
 built-in commands.  This would allow control commands to be placed anywhere,
 to be combined with `|', and to be used with `&' and `;' metasyntax.
 .PP
