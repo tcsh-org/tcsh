@@ -1,3 +1,4 @@
+ 25. Fix hostname building from utmp (Cyrus Rahman)
  24. Handle pending signals before flush so that the the history file does
      not get truncated.  (Ted Anderson)
  23. Fix AsciiOnly setting that broke 8 bit input. (Juergen Keil)
