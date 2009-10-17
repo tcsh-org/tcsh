@@ -1,6 +1,7 @@
 # Test of the history functions.  Some of these are already tested in
 # variables and commands.
 
+
 #AT_SETUP([history])
 #...
 
@@ -19,7 +20,7 @@ AT_DATA([hist-kill.sh],
 
 program=script
 [ $# -eq 0 ] || program=$1
-progpath=`which $program`
+progpath=$(which $program)
 [ -n "$progpath" -a -x "$progpath" ] || {
     echo $program was not found; exit 0
 }
@@ -33,20 +34,20 @@ histfile=$PWD/test.history
 { echo "#+1234567890"; echo echo dummy history; } > $histfile
 
 setHistSize() {
-    histsize=`stat -c %s $histfile`
+    histsize=$(ls -l $histfile | cut -f 5)
     [ $histsize -gt 0 ] || exit 3       # should never happen
-    histdate=`stat -c %Y $histfile`
+    histdate=$(ls -l $histfile | cut -f 6,7,8)
     ls -l --full-time $histfile
-    echo size is $histsize date is $histdate at `date`
+    echo size is $histsize date is $histdate at $(date)
 }
 
 checkHistSize () {
     local oldS=$1
     local oldD=$2
-    local newHistsize=`stat -c %s $histfile`
-    local newHistdate=`stat -c %Y $histfile`
+    local newHistsize=$(ls -l $histfile | cut -f 5)
+    local newHistdate=$(ls -l $histfile | cut -f 6,7,8)
     ls -l --full-time $histfile
-    echo size is now $newHistsize date is now $newHistdate at `date`
+    echo size is now $newHistsize date is now $newHistdate at $(date)
     # if the size not zero while the date and size are not both unchanged then
     # the test is successful
     [ $newHistsize -gt 0 -a \
@@ -54,7 +55,7 @@ checkHistSize () {
         { echo check hist size/date failed; return 66; }
 }
 
-tcshPath=`which tcsh`
+tcshPath=$(which tcsh)
 [ -x $tcshPath ] || exit 1
 tcshInput=hist-kill.csh
 [ -e $tcshInput ] || exit 2
@@ -66,7 +67,7 @@ if [ $program = script ]; then
     sleep 1
     setHistSize
     # Not sure if there is a more standard way to do this.
-    childScript=`ps --ppid $scriptPid --no-headers --format pid`
+    childScript=$(ps --pppid $scriptPid --no-headers --format pid)
     [ -n $childScript -a $childScript -gt 1 ] && kill $childScript
 elif [ $program = xterm ]; then
     # use xterm to create the pty

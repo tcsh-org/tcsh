@@ -191,11 +191,11 @@ foo
 ])
 
 AT_DATA([nohist.csh],
-[[echo ! space !	tab != "!(" newline !
-]])
-AT_CHECK([tcsh -f nohist.csh], ,
-[! space ! tab != !( newline !
+[echo ! space !	tab != "!(" newline !
 ])
+AT_CHECK([tcsh -f nohist.csh], ,
+[[! space ! tab != !( newline !
+]])
 
 AT_CLEANUP
 

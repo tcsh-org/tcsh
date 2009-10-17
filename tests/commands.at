@@ -137,7 +137,7 @@ TCSH_UNTESTED([bye])
 AT_SETUP([cd])
 
 AT_DATA([cd.csh],
-[[set current=$cwd
+[[set current=`pwd`
 set home=$current
 mkdir -p a
 echo ---
