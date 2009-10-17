@@ -440,5 +440,5 @@ fi
 AC_SUBST(HESDEF)
 AC_SUBST(HESLIB)
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile nls/Makefile])
 AC_OUTPUT

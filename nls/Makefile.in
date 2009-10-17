@@ -1,0 +1,24 @@
+# $tcsh: Makefile,v 1.14 2006/03/02 18:46:45 christos Exp $
+
+LOCALES=	C et finnish french german greek italian ja pl russian \
+		spanish ukrainian
+GENCAT=		gencat
+INSTALL=	ginstall
+
+datarootdir=@datarootdir@
+CATALOGS=$(LOCALES:%=%.cat)
+INSTALLED=$(LOCALES:%=@localedir@/%/LC_MESSAGES/tcsh.cat)
+
+all:	$(CATALOGS)
+
+install:	$(INSTALLED)
+
+@localedir@/%/LC_MESSAGES/tcsh.cat:	%.cat
+	mkdir -p $(@D)
+	$(INSTALL) $< $@
+
+%.cat:
+	$(GENCAT) $@ $(@:%.cat=%)/*set*
+
+clean:
+	$(RM) $(CATALOGS)

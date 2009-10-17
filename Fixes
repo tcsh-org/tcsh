@@ -1,3 +1,4 @@
+ 26. Better NLSPATH handling (Norm Jacobs)
  25. Fix hostname building from utmp (Cyrus Rahman)
  24. Handle pending signals before flush so that the the history file does
      not get truncated.  (Ted Anderson)

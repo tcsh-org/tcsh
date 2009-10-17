@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.147 2009/09/18 18:10:29 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.148 2009/10/03 02:44:23 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.147 2009/09/18 18:10:29 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.148 2009/10/03 02:44:23 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -160,6 +160,40 @@ static	void		  st_restore	(void *);
 
 	int		  main		(int, char **);
 
+#ifndef LOCALEDIR
+#define LOCALEDIR "/usr/share/locale"
+#endif
+
+static void
+add_localedir_to_nslpath(const char *path)
+{
+    static const char msgs[] = "/%L/LC_MESSAGES/%N.cat";
+    char *old = getenv("NLSPATH");
+    char *new;
+    size_t len = 0;
+
+    if (path == NULL)
+        return;
+
+    if (old != NULL)
+        len += strlen(old);
+
+    len += strlen(path) + sizeof(msgs);
+
+    new = xcalloc(len, 1);
+
+    if (old != NULL) {
+        (void)strncat(new, old, len);
+        (void)strncat(new, ":", len);
+    }
+
+    (void)strncat(new, path, len);
+    (void)strncat(new, msgs, len);
+
+    tsetenv(STRNLSPATH, str2short(new));
+    free(new);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -191,6 +225,8 @@ main(int argc, char **argv)
     (void) setlocale(LC_CTYPE, ""); /* for iscntrl */
 # endif /* LC_CTYPE */
 #endif /* NLS */
+
+    add_localedir_to_nslpath(LOCALEDIR);
 
     nlsinit();
 
