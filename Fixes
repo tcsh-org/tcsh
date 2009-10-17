@@ -1,3 +1,4 @@
+ 31. Reduce whitespace in Makefile (Don Estabrook)
  30. Manual page fixes (Alan R. S. Bueno)
  29. Remove history in loops bug from the documentation (Holger Weiss)
  28. Add autorehash (Holger Weiss)
