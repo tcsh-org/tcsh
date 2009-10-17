@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.148 2009/10/03 02:44:23 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.149 2009/10/17 17:08:40 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.148 2009/10/03 02:44:23 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.149 2009/10/17 17:08:40 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -226,6 +226,9 @@ main(int argc, char **argv)
 # endif /* LC_CTYPE */
 #endif /* NLS */
 
+    STR_environ = blk2short(environ);
+    environ = short2blk(STR_environ);	/* So that we can free it */
+
     add_localedir_to_nslpath(LOCALEDIR);
 
     nlsinit();
@@ -299,8 +302,6 @@ main(int argc, char **argv)
     STR_SHELLPATH = SAVE(_PATH_CSHELL);
 # endif
 #endif
-    STR_environ = blk2short(environ);
-    environ = short2blk(STR_environ);	/* So that we can free it */
     STR_WORD_CHARS = SAVE(WORD_CHARS);
 
     HIST = '!';
