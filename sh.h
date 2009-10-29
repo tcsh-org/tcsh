@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.151 2009/10/29 14:55:13 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.152 2009/10/29 15:16:39 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -114,7 +114,7 @@ typedef int eChar;
 # define SAVE(a) (strsave(a))
 #endif
 
-#if !defined(__inline) && !defined(__GNUC__)
+#if !defined(__inline) && !defined(__GNUC__) && !defined(_MSC_VER)
 #define __inline
 #endif
 /* Elide unused argument warnings */
