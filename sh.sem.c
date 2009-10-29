@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.79 2007/09/28 21:02:02 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.80 2009/06/25 21:27:38 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.sem.c,v 3.79 2007/09/28 21:02:02 christos Exp $")
+RCSID("$tcsh: sh.sem.c,v 3.80 2009/06/25 21:27:38 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -840,7 +840,7 @@ doio(struct command *t, int *pipein, int *pipeout)
 	}
 	else if (flags & F_PIPEIN) {
 	    xclose(0);
-	    IGNORE(dup(pipein[0]));
+	    TCSH_IGNORE(dup(pipein[0]));
 	    xclose(pipein[0]);
 	    xclose(pipein[1]);
 	}
@@ -850,7 +850,7 @@ doio(struct command *t, int *pipein, int *pipeout)
 	}
 	else {
 	    xclose(0);
-	    IGNORE(dup(OLDSTD));
+	    TCSH_IGNORE(dup(OLDSTD));
 #if defined(CLOSE_ON_EXEC) && defined(CLEX_DUPS)
 	    /*
 	     * PWP: Unlike Bezerkeley 4.3, FIONCLEX for Pyramid is preserved
@@ -903,12 +903,12 @@ doio(struct command *t, int *pipein, int *pipeout)
     }
     else if (flags & F_PIPEOUT) {
 	xclose(1);
-	IGNORE(dup(pipeout[1]));
+	TCSH_IGNORE(dup(pipeout[1]));
 	is1atty = 0;
     }
     else {
 	xclose(1);
-	IGNORE(dup(SHOUT));
+	TCSH_IGNORE(dup(SHOUT));
 	is1atty = isoutatty;
 # if defined(CLOSE_ON_EXEC) && defined(CLEX_DUPS)
 	(void) close_on_exec(1, 0);
@@ -917,11 +917,11 @@ doio(struct command *t, int *pipein, int *pipeout)
 
     xclose(2);
     if (flags & F_STDERR) {
-	IGNORE(dup(1));
+	TCSH_IGNORE(dup(1));
 	is2atty = is1atty;
     }
     else {
-	IGNORE(dup(SHDIAG));
+	TCSH_IGNORE(dup(SHDIAG));
 	is2atty = isdiagatty;
 # if defined(CLOSE_ON_EXEC) && defined(CLEX_DUPS)
 	(void) close_on_exec(2, 0);

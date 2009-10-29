@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.149 2009/06/25 21:15:37 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.150 2009/06/25 21:27:37 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -94,7 +94,7 @@ typedef unsigned long uChar;
 typedef wint_t eChar; /* Can contain any Char value or CHAR_ERR */
 #define CHAR_ERR WEOF /* Pretty please, use bit 31... */
 #define normal_mbtowc(PWC, S, N) rt_mbtowc(PWC, S, N)
-#define reset_mbtowc() IGNORE(mbtowc(NULL, NULL, 0))
+#define reset_mbtowc() TCSH_IGNORE(mbtowc(NULL, NULL, 0))
 # else
 typedef short Char;
 typedef unsigned short uChar;
@@ -116,7 +116,7 @@ typedef int eChar;
 
 /* Elide unused argument warnings */
 #define USE(a)	(void) (a)
-#define IGNORE(a)	ignore((intptr_t)a)
+#define TCSH_IGNORE(a)	ignore((intptr_t)a)
 static inline void ignore(intptr_t a)
 {
     USE(a);
