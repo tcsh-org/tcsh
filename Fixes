@@ -1,3 +1,5 @@
+ 33. Don't print 'Exit X' when printexitvalue is set in `` expressions
+     (Jeff Bastian)
  32. Add more LS_COLORS vars (M.H. Anderson)
  31. Reduce whitespace in Makefile (Don Estabrook)
  30. Manual page fixes (Alan R. S. Bueno)
