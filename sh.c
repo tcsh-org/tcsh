@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.149 2009/10/17 17:08:40 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.150 2009/10/17 17:45:47 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.149 2009/10/17 17:08:40 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.150 2009/10/17 17:45:47 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -164,8 +164,9 @@ static	void		  st_restore	(void *);
 #define LOCALEDIR "/usr/share/locale"
 #endif
 
+#ifdef NLS_CATALOGS
 static void
-add_localedir_to_nslpath(const char *path)
+add_localedir_to_nlspath(const char *path)
 {
     static const char msgs[] = "/%L/LC_MESSAGES/%N.cat";
     char *old = getenv("NLSPATH");
@@ -193,6 +194,7 @@ add_localedir_to_nslpath(const char *path)
     tsetenv(STRNLSPATH, str2short(new));
     free(new);
 }
+#endif
 
 int
 main(int argc, char **argv)
@@ -229,7 +231,9 @@ main(int argc, char **argv)
     STR_environ = blk2short(environ);
     environ = short2blk(STR_environ);	/* So that we can free it */
 
-    add_localedir_to_nslpath(LOCALEDIR);
+#ifdef NLS_CATALOGS
+    add_localedir_to_nlspath(LOCALEDIR);
+#endif
 
     nlsinit();
 
