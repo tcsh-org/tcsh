@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.152 2009/06/24 20:16:42 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.153 2009/06/25 21:15:37 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.152 2009/06/24 20:16:42 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.153 2009/06/25 21:15:37 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1859,8 +1859,17 @@ doumask(Char **v, struct command *c)
 #  endif
 # endif /* SYSVREL > 3 && BSDLIMIT */
 
-# if (defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && defined(RLIMIT_AS) && !defined(RLIMIT_VMEM)
-#  define RLIMIT_VMEM	RLIMIT_AS
+# if (defined(__linux__) || defined(__GNU__) || defined(__GLIBC__))
+#  if defined(RLIMIT_AS) && !defined(RLIMIT_VMEM)
+#   define RLIMIT_VMEM	RLIMIT_AS
+#  endif
+/*
+ * Oh well, <asm-generic/resource.h> has it, but <bits/resource.h> does not
+ * Linux headers: When the left hand does not know what the right hand does.
+ */
+#  if defined(RLIMIT_RTPRIO) && !defined(RLIMIT_RTTIME)
+#   define RLIMIT_RTTIME (RLIMIT_RTPRIO + 1)
+#  endif
 # endif
 
 struct limits limits[] = 
@@ -1936,6 +1945,30 @@ struct limits limits[] =
 # ifdef RLIMIT_SWAP 
     { RLIMIT_SWAP,	"swapsize",	1024,	"kbytes"	}, 
 # endif /* RLIMIT_SWAP */ 
+
+# ifdef RLIMIT_LOCKS 
+    { RLIMIT_LOCKS,	"maxlocks",	1,	""		}, 
+# endif /* RLIMIT_LOCKS */ 
+
+# ifdef RLIMIT_SIGPENDING 
+    { RLIMIT_SIGPENDING,"maxsignal",	1,	""		}, 
+# endif /* RLIMIT_SIGPENDING */ 
+
+# ifdef RLIMIT_MSGQUEUE 
+    { RLIMIT_MSGQUEUE,	"maxmessage",	1,	""		}, 
+# endif /* RLIMIT_MSGQUEUE */ 
+
+# ifdef RLIMIT_NICE 
+    { RLIMIT_NICE,	"maxnice",	1,	""		}, 
+# endif /* RLIMIT_NICE */ 
+
+# ifdef RLIMIT_RTPRIO 
+    { RLIMIT_RTPRIO,	"maxrtprio",	1,	""		}, 
+# endif /* RLIMIT_RTPRIO */ 
+
+# ifdef RLIMIT_RTTIME 
+    { RLIMIT_RTTIME,	"maxrttime",	1,	""		}, 
+# endif /* RLIMIT_RTTIME */ 
 
     { -1, 		NULL, 		0, 	NULL		}
 };
