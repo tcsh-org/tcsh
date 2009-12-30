@@ -269,8 +269,8 @@ AT_CLEANUP
 AT_SETUP([dirs])
 
 AT_DATA([dirs.csh],
-[[set current=$cwd
-set home=$cwd
+[[set current=`pwd`
+set home=$current
 mkdir a
 echo ---
 dirs
@@ -944,8 +944,8 @@ AT_CLEANUP
 AT_SETUP([popd])
 
 AT_DATA([popd.csh],
-[[set current=$cwd
-set home=$cwd
+[[set current=`pwd`
+set home=$current
 pushd /
 popd
 pushd /
@@ -1002,7 +1002,7 @@ AT_CLEANUP
 AT_SETUP([pushd])
 
 AT_DATA([pushd.csh],
-[[set home=$cwd
+[[set home=`pwd`
 mkdir a
 pushd /
 pushd /dev
@@ -1411,7 +1411,7 @@ touch ls-F
 chmod a+x ls-F
 AT_DATA([where.csh],
 [[alias ls-F foo bar
-set path=($cwd)
+set path=(`pwd`)
 where ls-F
 where this_does_not_exist
 ]])
@@ -1430,7 +1430,7 @@ touch my_command
 chmod a+x my_command
 AT_DATA([which.csh],
 [[alias my_alias my alias
-set path=($cwd)
+set path=(`pwd`)
 which my_command
 which my_alias
 which echo

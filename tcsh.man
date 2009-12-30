@@ -2911,6 +2911,10 @@ the size of the largest core dump that will be created
 the maximum amount of physical memory a process
 may have allocated to it at a given time
 .TP
+\fIvmemoryuse\fR
+the maximum amount of virtual memory a process
+may have allocated to it at a given time (address space)
+.TP
 \fIheapsize\fR
 the maximum amount of memory a process
 may allocate per \fIbrk()\fR system call
@@ -2932,6 +2936,24 @@ the maximum size of socket buffer usage for this user
 .TP
 \fIswapsize\fR
 the maximum amount of swap space reserved or used for this user
+.TP
+\fImaxlocks\fR
+the maximum number of locks for this user
+.TP
+\fImaxsignal\fR
+the maximum number of pending signals for this user
+.TP
+\fImaxmessage\fR
+the maximum number of bytes in POSIX mqueues for this user
+.TP
+\fImaxnice\fR
+the maximum nice priority the user is allowed to raise mapped from [19...-20]
+to [0...39] for this user
+.TP
+\fImaxrtprio\fR
+the maximum realtime priority for this user
+\fImaxrttime\fR
+the timeout for RT tasks in microseconds for this user.
 .PP
 \fImaximum-use\fR may be given as a (floating point or
 integer) number followed by a scale factor.  For all limits
