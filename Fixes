@@ -1,18 +1,20 @@
- 33. Don't print 'Exit X' when printexitvalue is set in `` expressions
+ 13. Add new linux resource limits.
+ 12. Don't print 'Exit X' when printexitvalue is set in `` expressions
      (Jeff Bastian)
- 32. Add more LS_COLORS vars (M.H. Anderson)
- 31. Reduce whitespace in Makefile (Don Estabrook)
- 30. Manual page fixes (Alan R. S. Bueno)
- 29. Remove history in loops bug from the documentation (Holger Weiss)
- 28. Add autorehash (Holger Weiss)
- 27. Add history.at (Ted Anderson)
- 26. Better NLSPATH handling (Norm Jacobs)
- 25. Fix hostname building from utmp (Cyrus Rahman)
- 24. Handle pending signals before flush so that the the history file does
+ 11. Add more LS_COLORS vars (M.H. Anderson)
+ 10. Reduce whitespace in Makefile (Don Estabrook)
+  9. Manual page fixes (Alan R. S. Bueno)
+  8. Remove history in loops bug from the documentation (Holger Weiss)
+  7. Add autorehash (Holger Weiss)
+  6. Add history.at (Ted Anderson)
+  5. Better NLSPATH handling (Norm Jacobs)
+  4. Fix hostname building from utmp (Cyrus Rahman)
+  3. Handle pending signals before flush so that the the history file does
      not get truncated.  (Ted Anderson)
- 23. Fix AsciiOnly setting that broke 8 bit input. (Juergen Keil)
- 22. remember to closedir in mailchk (from Werner Fink, reported by
+  2. Fix AsciiOnly setting that broke 8 bit input. (Juergen Keil)
+  1. remember to closedir in mailchk (from Werner Fink, reported by
      David Binderman)
+
  21. V6.17.00 - 20090710
  20. Fix dataroot autoconf issue.
  19. Fix directory stuff for unit tests.
