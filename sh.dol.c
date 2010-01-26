@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.77 2009/06/19 16:25:00 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.78 2010/01/26 16:10:08 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.77 2009/06/19 16:25:00 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.78 2010/01/26 16:10:08 christos Exp $")
 
 /*
  * C shell
@@ -402,7 +402,7 @@ Dgetdol(void)
 	    stderror(ERR_SYNTAX);
 	if (backpid != 0) {
 	    xfree(dolbang);
-	    setDolp(dolbang = putn((long long)backpid));
+	    setDolp(dolbang = putn((tcsh_number_t)backpid));
 	}
 	cleanup_until(name);
 	goto eatbrac;
@@ -528,7 +528,7 @@ Dgetdol(void)
 		    stderror(ERR_DOLZERO);
 		if (length) {
 		    length = Strlen(ffile);
-		    addla(putn((long long)length));
+		    addla(putn((tcsh_number_t)length));
 		}
 		else {
 		    fixDolMod();
@@ -588,7 +588,7 @@ Dgetdol(void)
 	    cleanup_until(name);
 	    fixDolMod();
 	    if (length) {
-		    addla(putn((long long)Strlen(np)));
+		    addla(putn((tcsh_number_t)Strlen(np)));
 	    } else {
 		    xfree(env_val);
 		    env_val = Strsave(np);
@@ -687,7 +687,7 @@ Dgetdol(void)
 		stderror(ERR_MISSING, '}');
 	    unDredc(c);
 	}
-	addla(putn((long long)(upb - lwb + 1)));
+	addla(putn((tcsh_number_t)(upb - lwb + 1)));
     }
     else if (length) {
 	int i;
@@ -698,7 +698,7 @@ Dgetdol(void)
 	/* We don't want that, since we can always compute it by adding $#xxx */
 	length += i - 1;	/* Add the number of spaces in */
 #endif
-	addla(putn((long long)length));
+	addla(putn((tcsh_number_t)length));
     }
     else {
 eatmod:
@@ -963,9 +963,9 @@ again:
 	    if (unlink(tmp) == -1) {
 		(void) gettimeofday(&tv, NULL);
 		xfree(shtemp);
-		mbp = putn((((long long)tv.tv_sec) ^ 
-		    ((long long)tv.tv_usec) ^
-		    ((long long)getpid())) & 0x00ffffff);
+		mbp = putn((((tcsh_number_t)tv.tv_sec) ^ 
+		    ((tcsh_number_t)tv.tv_usec) ^
+		    ((tcsh_number_t)getpid())) & 0x00ffffff);
 		shtemp = Strspl(STRtmpsh, mbp);
 		xfree(mbp);
 	    }

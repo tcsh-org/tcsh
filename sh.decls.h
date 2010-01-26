@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.55 2009/02/25 22:54:54 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.56 2010/01/26 16:10:08 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -123,8 +123,8 @@ extern	int		  find_cmd	(Char *, int);
  * sh.exp.c
  */
 extern  Char		 *filetest      (Char *, Char ***, int);
-extern	long long 	  expr		(Char ***);
-extern	long long	  exp0		(Char ***, int);
+extern	tcsh_number_t 	  expr		(Char ***);
+extern	tcsh_number_t	  exp0		(Char ***, int);
 
 /*
  * sh.file.c
@@ -368,8 +368,8 @@ extern	void		  mypipe	(int *);
 extern	struct varent 	 *adrof1	(const Char *, struct varent *);
 extern	void		  doset		(Char **, struct command *);
 extern	void		  dolet		(Char **, struct command *);
-extern	Char		 *putn		(long long);
-extern	long long	  getn		(const Char *);
+extern	Char		 *putn		(tcsh_number_t);
+extern	tcsh_number_t	  getn		(const Char *);
 extern	Char		 *value1	(Char *, struct varent *);
 extern	void		  setcopy	(const Char *, const Char *, int);
 extern	void		  setv		(const Char *, Char *, int);

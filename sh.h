@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.153 2009/10/29 17:06:20 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.154 2010/01/26 16:10:09 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -222,6 +222,11 @@ static __inline void tcsh_ignore(intptr_t a)
 # define lstat lstat64
 #endif /* __HP_CXD_SPP && !__hpux */
 
+#ifdef HAVE_LONG_LONG
+typedef long long tcsh_number_t;
+#else
+typedef long tcsh_number_t;
+#endif
 /*
  * This macro compares the st_dev field of struct stat. On aix on ibmESA
  * st_dev is a structure, so comparison does not work. 

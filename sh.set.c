@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.72 2007/09/28 21:02:03 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.73 2010/01/26 16:10:09 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.72 2007/09/28 21:02:03 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.73 2010/01/26 16:10:09 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -50,7 +50,7 @@ static	void		 asx		(Char *, int, Char *);
 static	struct varent 	*getvx		(Char *, int);
 static	Char		*xset		(Char *, Char ***);
 static	Char		*operate	(int, Char *, Char *);
-static	void	 	 putn1		(unsigned long long);
+static	void	 	 putn1		(tcsh_number_t);
 static	struct varent	*madrof		(Char *, struct varent *);
 static	void		 unsetv1	(struct varent *);
 static	void		 exportpath	(Char **);
@@ -479,7 +479,7 @@ operate(int op, Char *vp, Char *p)
     Char   *vec[5];
     Char **v = vec;
     Char  **vecp = v;
-    long long i;
+    tcsh_number_t i;
 
     if (op != '=') {
 	if (*vp)
@@ -501,7 +501,7 @@ operate(int op, Char *vp, Char *p)
 static Char *putp;
 
 Char *
-putn(long long n)
+putn(tcsh_number_t n)
 {
     Char nbuf[1024]; /* Enough even for octal */
 
@@ -516,17 +516,17 @@ putn(long long n)
 }
 
 static void
-putn1(unsigned long long n)
+putn1(tcsh_number_t n)
 {
     if (n > 9)
 	putn1(n / 10);
     *putp++ = n % 10 + '0';
 }
 
-long long
+tcsh_number_t
 getn(const Char *cp)
 {
-    long long n;
+    tcsh_number_t n;
     int     sign;
     int base;
 

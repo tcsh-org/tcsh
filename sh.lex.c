@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.81 2009/06/25 21:15:37 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.82 2010/01/26 16:10:09 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.81 2009/06/25 21:15:37 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.82 2010/01/26 16:10:09 christos Exp $")
 
 #include "ed.h"
 
@@ -1258,7 +1258,7 @@ gethent(Char sc)
 	    lastev = hp->Hnum;
 	    return (&hp->Hlex);
 	}
-    np = putn((long long)event);
+    np = putn((tcsh_number_t)event);
     seterror(ERR_NOEVENT, short2str(np));
     xfree(np);
     return (0);
