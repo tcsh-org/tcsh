@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.139 2009/06/25 21:15:38 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.140 2009/10/17 15:25:19 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.139 2009/06/25 21:15:38 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.140 2009/10/17 15:25:19 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1035,7 +1035,7 @@ aliasrun(int cnt, Char *s1, Char *s2)
     cleanup_until(&w);
     pendjob();
     /* Restore status */
-    setv(STRstatus, putn(status), VAR_READWRITE);
+    setv(STRstatus, putn((long long)status), VAR_READWRITE);
 }
 
 void

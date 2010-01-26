@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.150 2009/10/17 17:45:47 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.151 2009/12/26 21:33:25 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.150 2009/10/17 17:45:47 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.151 2009/12/26 21:33:25 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -743,7 +743,7 @@ main(int argc, char **argv)
 	parseLS_COLORS(str2short(tcp));
 #endif /* COLOR_LS_F */
 
-    doldol = putn((int) getpid());	/* For $$ */
+    doldol = putn((long long)getpid());	/* For $$ */
 #ifdef WINNT_NATIVE
     {
 	char *tmp;

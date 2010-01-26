@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.76 2009/02/03 16:26:56 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.77 2009/06/19 16:25:00 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.76 2009/02/03 16:26:56 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.77 2009/06/19 16:25:00 christos Exp $")
 
 /*
  * C shell
@@ -402,7 +402,7 @@ Dgetdol(void)
 	    stderror(ERR_SYNTAX);
 	if (backpid != 0) {
 	    xfree(dolbang);
-	    setDolp(dolbang = putn(backpid));
+	    setDolp(dolbang = putn((long long)backpid));
 	}
 	cleanup_until(name);
 	goto eatbrac;
@@ -528,7 +528,7 @@ Dgetdol(void)
 		    stderror(ERR_DOLZERO);
 		if (length) {
 		    length = Strlen(ffile);
-		    addla(putn(length));
+		    addla(putn((long long)length));
 		}
 		else {
 		    fixDolMod();
@@ -588,7 +588,7 @@ Dgetdol(void)
 	    cleanup_until(name);
 	    fixDolMod();
 	    if (length) {
-		    addla(putn(Strlen(np)));
+		    addla(putn((long long)Strlen(np)));
 	    } else {
 		    xfree(env_val);
 		    env_val = Strsave(np);
@@ -625,7 +625,7 @@ Dgetdol(void)
 
 	    for (i = 0; Isdigit(*np); i = i * 10 + *np++ - '0')
 		continue;
-	    if (i < 0 || i > upb && !any("-*", *np)) {
+	    if (i < 0 || (i > upb && !any("-*", *np))) {
 		cleanup_until(name);
 		dolerror(vp->v_name);
 		return;
@@ -687,7 +687,7 @@ Dgetdol(void)
 		stderror(ERR_MISSING, '}');
 	    unDredc(c);
 	}
-	addla(putn(upb - lwb + 1));
+	addla(putn((long long)(upb - lwb + 1)));
     }
     else if (length) {
 	int i;
@@ -698,7 +698,7 @@ Dgetdol(void)
 	/* We don't want that, since we can always compute it by adding $#xxx */
 	length += i - 1;	/* Add the number of spaces in */
 #endif
-	addla(putn(length));
+	addla(putn((long long)length));
     }
     else {
 eatmod:
@@ -830,7 +830,7 @@ setDolp(Char *cp)
 		    cp = np;
 		    cp[--len] = '\0';
 		    didmod = 1;
-		    if (diff >= len)
+		    if (diff >= (ssize_t)len)
 			break;
 		} else {
 		    /* should this do a seterror? */
@@ -963,8 +963,9 @@ again:
 	    if (unlink(tmp) == -1) {
 		(void) gettimeofday(&tv, NULL);
 		xfree(shtemp);
-		mbp = putn((((int)tv.tv_sec) ^ 
-		    ((int)tv.tv_usec) ^ ((int)getpid())) & 0x00ffffff);
+		mbp = putn((((long long)tv.tv_sec) ^ 
+		    ((long long)tv.tv_usec) ^
+		    ((long long)getpid())) & 0x00ffffff);
 		shtemp = Strspl(STRtmpsh, mbp);
 		xfree(mbp);
 	    }

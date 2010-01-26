@@ -1,3 +1,5 @@
+ 14. Change internal expression calculations to long long so that we can
+     deal with > 32 bit time, inodes, uids, file sizes etc.
  13. Add new linux resource limits.
  12. Don't print 'Exit X' when printexitvalue is set in `` expressions
      (Jeff Bastian)

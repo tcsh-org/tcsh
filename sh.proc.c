@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.108 2009/06/25 14:20:35 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.109 2009/06/25 21:15:37 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.108 2009/06/25 14:20:35 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.109 2009/06/25 21:15:37 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -562,7 +562,7 @@ pjwait(struct process *pp)
     if ((reason != 0) && (adrof(STRprintexitvalue)) && 
 	(pp->p_flags & PBACKQ) == 0)
 	xprintf(CGETS(17, 2, "Exit %d\n"), reason);
-    reason_str = putn(reason);
+    reason_str = putn((long long)reason);
     cleanup_push(reason_str, xfree);
     setv(STRstatus, reason_str, VAR_READWRITE);
     cleanup_ignore(reason_str);
