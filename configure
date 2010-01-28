@@ -2685,8 +2685,11 @@ case "${host}" in
   *-*-solaris2.[45] ) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol24
   ;;
-  *-*-solaris2.* ) # Should handle sparc, x86 and powerpc
+  *-*-solaris2.[678] ) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol26
+  ;;
+  *-*-solaris2.* ) # Should handle sparc, x86 and powerpc
+    tcsh_config_file=sol29
   ;;
 
   ## Dell SVR4
