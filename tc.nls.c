@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.nls.c,v 3.20 2006/08/23 15:03:14 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.nls.c,v 3.21 2006/09/26 16:45:30 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.nls.c,v 3.20 2006/08/23 15:03:14 christos Exp $")
+RCSID("$tcsh: tc.nls.c,v 3.21 2006/09/26 16:45:30 christos Exp $")
 
 #ifdef WIDE_STRINGS
 int
@@ -42,7 +42,7 @@ NLSWidth(Char c)
     int l;
     if (c & INVALID_BYTE)
 	return 1;
-    l = wcwidth(c);
+    l = wcwidth((wchar_t) c);
     return l >= 0 ? l : 0;
 # else
     return iswprint(c) != 0;
@@ -58,7 +58,7 @@ NLSStringWidth(const Char *s)
     while (*s) {
 	c = *s++;
 #ifdef HAVE_WCWIDTH
-	if ((l = wcwidth(c)) < 0)
+	if ((l = wcwidth((wchar_t) c)) < 0)
 		l = 2;
 #else
 	l = iswprint(c) != 0;
