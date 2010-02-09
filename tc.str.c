@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.29 2009/06/25 21:15:38 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.30 2009/06/25 21:27:38 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.29 2009/06/25 21:15:38 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.30 2009/06/25 21:27:38 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -46,7 +46,7 @@ RCSID("$tcsh: tc.str.c,v 3.29 2009/06/25 21:15:38 christos Exp $")
 
 #ifdef WIDE_STRINGS
 size_t
-one_mbtowc(wchar_t *pwc, const char *s, size_t n)
+one_mbtowc(Char *pwc, const char *s, size_t n)
 {
     int len;
 
@@ -61,7 +61,7 @@ one_mbtowc(wchar_t *pwc, const char *s, size_t n)
 }
 
 size_t
-one_wctomb(char *s, wchar_t wchar)
+one_wctomb(char *s, Char wchar)
 {
     int len;
 
@@ -69,7 +69,7 @@ one_wctomb(char *s, wchar_t wchar)
 	s[0] = wchar & 0xFF;
 	len = 1;
     } else {
-	len = wctomb(s, wchar);
+	len = wctomb(s, (wchar_t) wchar);
 	if (len == -1)
 	    s[0] = wchar;
 	if (len <= 0)
@@ -79,14 +79,24 @@ one_wctomb(char *s, wchar_t wchar)
 }
 
 int
-rt_mbtowc(wchar_t *pwc, const char *s, size_t n)
+rt_mbtowc(Char *pwc, const char *s, size_t n)
 {
     int ret;
     char back[MB_LEN_MAX];
+#ifdef UTF16_STRINGS
+    wchar_t tmp;
 
+    ret = mbtowc(&tmp, s, n);
+#else
     ret = mbtowc(pwc, s, n);
-    if (ret > 0 && (wctomb(back, *pwc) != ret || memcmp(s, back, ret) != 0))
-	ret = -1;
+#endif
+    if (ret > 0) {
+#ifdef UTF16_STRINGS
+	*pwc = tmp;
+#endif
+      	if (wctomb(back, *pwc) != ret || memcmp(s, back, ret) != 0)
+	    ret = -1;
+    }
     return ret;
 }
 #endif
@@ -186,7 +196,7 @@ short2str(const Char *src)
     return (sdst);
 }
 
-#ifndef WIDE_STRINGS
+#if !defined (WIDE_STRINGS) || defined (UTF16_STRINGS)
 Char   *
 s_strcpy(Char *dst, const Char *src)
 {
@@ -334,7 +344,7 @@ int
 s_strcasecmp(const Char *str1, const Char *str2)
 {
 #ifdef WIDE_STRINGS
-    wchar_t l1 = 0, l2 = 0;
+    wint_t l1 = 0, l2 = 0;
     for (; *str1 && ((*str1 == *str2 && (l1 = l2 = 0) == 0) || 
 	(l1 = towlower(*str1)) == (l2 = towlower(*str2))); str1++, str2++)
 	continue;
