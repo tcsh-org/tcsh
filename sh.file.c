@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.file.c,v 3.35 2006/08/23 15:03:14 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.file.c,v 3.36 2007/07/05 14:13:06 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$tcsh: sh.file.c,v 3.35 2006/08/23 15:03:14 christos Exp $")
+RCSID("$tcsh: sh.file.c,v 3.36 2007/07/05 14:13:06 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -594,7 +594,7 @@ again:				/* search for matches */
 static int
 compare(const void *p, const void *q)
 {
-#ifdef WIDE_STRINGS
+#if defined (WIDE_STRINGS) && !defined (UTF16_STRING)
     errno = 0;
 
     return (wcscoll(*(Char *const *) p, *(Char *const *) q));
