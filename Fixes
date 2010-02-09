@@ -1,3 +1,4 @@
+ 16. Make tcsh work on systems where sizeof(wchar_t) == 2 (Corinna Vinschen)
  15. Better support for Solaris >= 2.9 (Thomas Uhle)
  14. Change internal expression calculations to long long so that we can
      deal with > 32 bit time, inodes, uids, file sizes etc.
