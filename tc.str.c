@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.31 2010/02/09 20:20:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.32 2010/02/10 13:29:57 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.31 2010/02/09 20:20:09 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.32 2010/02/10 13:29:57 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -69,6 +69,19 @@ one_wctomb(char *s, Char wchar)
 	s[0] = wchar & 0xFF;
 	len = 1;
     } else {
+#ifdef UTF16_STRINGS
+	if (wchar >= 0x10000) {
+	    /* UTF-16 systems can't handle these values directly.  Since the
+	       rest of the code assumes UTF-32, we handle this here,
+	       encapsulated in one_wctomb and rt_mbtowc.  See there for
+	       the inverse operation. */
+	    *s++ = 0xf0 | ((wchar & 0x1c0000) >> 18);
+	    *s++ = 0x80 | ((wchar &  0x3f000) >> 12);
+	    *s++ = 0x80 | ((wchar &    0xfc0) >> 6);
+	    *s   = 0x80 |  (wchar &     0x3f);
+	    return 4;
+	}
+#endif
 	len = wctomb(s, (wchar_t) wchar);
 	if (len == -1)
 	    s[0] = wchar;
@@ -84,10 +97,25 @@ rt_mbtowc(Char *pwc, const char *s, size_t n)
     int ret;
     char back[MB_LEN_MAX];
     wchar_t tmp;
+    mbstate_t mb;
 
-    ret = mbtowc(&tmp, s, n);
+    memset (&mb, 0, sizeof mb);
+    ret = mbrtowc(&tmp, s, n, &mb);
     if (ret > 0) {
 	*pwc = tmp;
+#ifdef UTF16_STRINGS
+	if (tmp >= 0xd800 && tmp <= 0xdbff) {
+	    /* UTF-16 surrogate pair.  Fetch second half and compute
+	       UTF-32 value.  Dispense with the inverse test in this case. */
+	    size_t n2 = mbrtowc(&tmp, s + ret, n - ret, &mb);
+	    if (n2 == 0 || n2 == (size_t)-1 || n2 == (size_t)-2)
+		ret = -1;
+	    else {
+		*pwc = (((*pwc & 0x3ff) << 10) | (tmp & 0x3ff)) + 0x10000;
+		ret += n2;
+	    }
+	} else
+#endif
       	if (wctomb(back, *pwc) != ret || memcmp(s, back, ret) != 0)
 	    ret = -1;
     }
