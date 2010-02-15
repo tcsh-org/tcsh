@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.32 2010/02/10 13:29:57 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.33 2010/02/12 22:18:20 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.32 2010/02/10 13:29:57 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.33 2010/02/12 22:18:20 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -71,16 +71,19 @@ one_wctomb(char *s, Char wchar)
     } else {
 #ifdef UTF16_STRINGS
 	if (wchar >= 0x10000) {
-	    /* UTF-16 systems can't handle these values directly.  Since the
-	       rest of the code assumes UTF-32, we handle this here,
-	       encapsulated in one_wctomb and rt_mbtowc.  See there for
-	       the inverse operation. */
-	    *s++ = 0xf0 | ((wchar & 0x1c0000) >> 18);
-	    *s++ = 0x80 | ((wchar &  0x3f000) >> 12);
-	    *s++ = 0x80 | ((wchar &    0xfc0) >> 6);
-	    *s   = 0x80 |  (wchar &     0x3f);
-	    return 4;
-	}
+	    /* UTF-16 systems can't handle these values directly in calls to
+	       wctomb.  Convert value to UTF-16 surrogate and call wcstombs to
+	       convert the "string" to the correct multibyte representation,
+	       if any. */
+	    wchar_t ws[3];
+	    wchar -= 0x10000;
+	    ws[0] = 0xd800 | (wchar >> 10);
+	    ws[1] = 0xdc00 | (wchar & 0x3ff);
+	    ws[2] = 0;
+	    /* The return value of wcstombs excludes the trailing 0, so len is
+	       the correct number of multibytes for the Unicode char. */
+	    len = wcstombs (s, ws, MB_CUR_MAX + 1);
+	} else
 #endif
 	len = wctomb(s, (wchar_t) wchar);
 	if (len == -1)
