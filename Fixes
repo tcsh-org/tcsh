@@ -1,3 +1,4 @@
+ 18. Make 'e' in vi mode work like 'b' - use wordchars (Alistair Crooks)
  17. Handle UTF-16 surrogates (Corinna Vinschen)
  16. Make tcsh work on systems where sizeof(wchar_t) == 2 (Corinna Vinschen)
  15. Better support for Solaris >= 2.9 (Thomas Uhle)

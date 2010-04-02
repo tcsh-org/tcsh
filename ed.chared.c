@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.94 2008/10/17 20:24:59 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.95 2009/06/25 21:15:37 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$tcsh: ed.chared.c,v 3.94 2008/10/17 20:24:59 christos Exp $")
+RCSID("$tcsh: ed.chared.c,v 3.95 2009/06/25 21:15:37 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -832,11 +832,11 @@ c_eword(Char *p, Char *high, int n)
 	while ((p < high) && Isspace(*p)) 
 	    p++;
 
-	if (Isalnum(*p))
-	    while ((p < high) && Isalnum(*p)) 
+	if (isword(*p))
+	    while ((p < high) && isword(*p)) 
 		p++;
 	else
-	    while ((p < high) && !(Isspace(*p) || Isalnum(*p)))
+	    while ((p < high) && !(Isspace(*p) || isword(*p)))
 		p++;
     }
 
