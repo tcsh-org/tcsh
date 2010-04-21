@@ -81,8 +81,6 @@
 
 /****************** local defines *********************/
 
-#define HAVENOLIMIT
-
 #ifndef _PATH_TCSHELL
 #define _PATH_TCSHELL "/bin/tcsh"
 #endif
