@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.91 2009/06/19 16:35:33 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.92 2009/10/17 17:22:32 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.const.c,v 3.91 2009/06/19 16:35:33 christos Exp $")
+RCSID("$tcsh: tc.const.c,v 3.92 2009/10/17 17:22:32 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -60,6 +60,7 @@ Char STR_[]		= { '_', '\0' };
 Char STRNULL[]		= { '\0' };
 Char STRtcsh[]		= { 't', 'c', 's', 'h', '\0' };
 Char STRhome[]		= { 'h', 'o', 'm', 'e', '\0' };
+Char STReuser[]         = { 'e', 'u', 's', 'e', 'r', '\0'};
 Char STRuser[]		= { 'u', 's', 'e', 'r', '\0' };
 Char STRgroup[]		= { 'g', 'r', 'o', 'u', 'p', '\0' };
 #ifdef AFS
@@ -67,6 +68,7 @@ Char STRafsuser[]	   = { 'a', 'f', 's', 'u', 's', 'e', 'r', '\0' };
 #endif /* AFS */
 Char STRterm[]		= { 't', 'e', 'r', 'm', '\0' };
 Char STRversion[]	= { 'v', 'e', 'r', 's', 'i', 'o', 'n', '\0' };
+Char STReuid[]		= { 'e', 'u', 'i', 'd', '\0' };
 Char STRuid[]		= { 'u', 'i', 'd', '\0' };
 Char STRgid[]		= { 'g', 'i', 'd', '\0' };
 Char STRunknown[]	= { 'u', 'n', 'k', 'n', 'o', 'w', 'n', '\0' };
@@ -305,6 +307,8 @@ Char STRmn[]		= { '-', 'n', '\0' };
 Char STRminus[]		= { '-', '\0' };
 Char STRnoglob[]	= { 'n', 'o', 'g', 'l', 'o', 'b', '\0' };
 Char STRnonomatch[]	= { 'n', 'o', 'n', 'o', 'm', 'a', 't', 'c', 'h', '\0' };
+Char STRglobstar[]	= { 'g', 'l', 'o', 'b', 's', 't', 'a', 'r', '\0' };
+Char STRglobdot[]	= { 'g', 'l', 'o', 'b', 'd', 'o', 't', '\0' };
 Char STRfakecom1[]	= { '`', ' ', '.', '.', '.', ' ', '`', '\0' };
 Char STRampm[]		= { 'a', 'm', 'p', 'm', '\0' };
 Char STRtime[]		= { 't', 'i', 'm', 'e', '\0' };
@@ -382,6 +386,7 @@ Char STRalways[]	= { 'a', 'l', 'w', 'a', 'y', 's', '\0' };
 Char STRerase[]		= { 'e', 'r', 'a', 's', 'e', '\0' };
 Char STRprev[]		= { 'p', 'r', 'e', 'v', '\0' };
 Char STRcomplete[]	= { 'c', 'o', 'm', 'p', 'l', 'e', 't', 'e', '\0' };
+Char STREnhance[]	= { 'E', 'n', 'h', 'a', 'n', 'c', 'e', '\0' };
 Char STRenhance[]	= { 'e', 'n', 'h', 'a', 'n', 'c', 'e', '\0' };
 Char STRigncase[]	= { 'i', 'g', 'n', 'c', 'a', 's', 'e', '\0' };
 Char STRautoexpand[]	= { 'a', 'u', 't', 'o', 'e', 'x', 'p', 'a', 'n', 'd',

@@ -389,10 +389,13 @@ glob(const char *pattern, int flags, int (*errfunc) (const char *, int),
 	    break;
 	case STAR:
 	    pglob->gl_flags |= GLOB_MAGCHAR;
-	    /* collapse adjacent stars to one, to avoid
-	     * exponential behavior
+	    /* collapse adjacent stars to one [or three if globstar],
+	     * to avoid exponential behavior
 	     */
-	    if (bufnext == patbuf || bufnext[-1] != M_ALL)
+	    if (bufnext == patbuf || bufnext[-1] != M_ALL ||
+	       ((flags & GLOB_STAR) != 0 && 
+		 (bufnext - 1 == patbuf || bufnext[-2] != M_ALL ||
+		 bufnext - 2 == patbuf || bufnext[-3] != M_ALL)))
 		*bufnext++ = M_ALL;
 	    break;
 	default:
@@ -530,7 +533,24 @@ glob2(struct strbuf *pathbuf, const Char *pattern, glob_t *pglob, int no_match)
     /* NOTREACHED */
 }
 
+static size_t
+One_Char_mbtowc(__Char *pwc, const Char *s, size_t n)
+{
+#ifdef WIDE_STRINGS
+    char buf[MB_LEN_MAX], *p;
 
+    if (n > MB_LEN_MAX)
+	n = MB_LEN_MAX;
+    p = buf;
+    while (p < buf + n && (*p++ = LCHAR(*s++)) != 0)
+	;
+    return one_mbtowc(pwc, buf, n);
+#else
+    *pwc = *s & CHAR;
+    return 1;
+#endif
+}
+ 
 static int
 glob3(struct strbuf *pathbuf, const Char *pattern, const Char *restpattern,
       glob_t *pglob, int no_match)
@@ -540,9 +560,25 @@ glob3(struct strbuf *pathbuf, const Char *pattern, const Char *restpattern,
     int     err;
     Char m_not = (pglob->gl_flags & GLOB_ALTNOT) ? M_ALTNOT : M_NOT;
     size_t orig_len;
+    const Char *p = pattern;
+    int globstar = 0;
+    int chase_symlinks = 0;
 
     strbuf_terminate(pathbuf);
     errno = 0;
+
+    while (p < restpattern) {
+	__Char wc;
+	size_t width = One_Char_mbtowc(&wc, p, MB_LEN_MAX);
+	if ((p[0] & M_MASK) == M_ALL && (p[width] & M_MASK) == M_ALL 
+	    && p + width < restpattern) {
+	    globstar = 1;
+	    if (p[width + width] == M_ALL)
+		chase_symlinks = 1;
+	    break;
+	}
+        p += width;
+    } 
 
     if (!(dirp = Opendir(pathbuf->s))) {
 	/* todo: don't call for ENOENT or ENOTDIR? */
@@ -560,16 +596,42 @@ glob3(struct strbuf *pathbuf, const Char *pattern, const Char *restpattern,
     while ((dp = readdir(dirp)) != NULL) {
 	/* initial DOT must be matched literally */
 	if (dp->d_name[0] == DOT && *pattern != DOT)
-	    continue;
+	    if (!(pglob->gl_flags & GLOB_DOT) || !dp->d_name[1] ||
+		(dp->d_name[1] == DOT && !dp->d_name[2]))
+		continue; /*unless globdot and not . or .. */
 	pathbuf->len = orig_len;
 	strbuf_append(pathbuf, dp->d_name);
 	strbuf_terminate(pathbuf);
-	if (match(pathbuf->s + orig_len, pattern, restpattern, (int) m_not)
-	    == no_match)
-	    continue;
-	err = glob2(pathbuf, restpattern, pglob, no_match);
-	if (err)
-	    break;
+
+	if (p != restpattern) {
+	    size_t save_len = pathbuf->len;
+#ifdef S_IFLNK
+	    if (!chase_symlinks) {
+		struct stat sbuf;
+		if (Lstat(pathbuf->s, &sbuf) || S_ISLNK(sbuf.st_mode))
+		    continue;
+	    }
+#endif
+	    if (match(pathbuf->s + orig_len, pattern, restpattern,
+		(int)m_not) == no_match) {
+		if (match(pathbuf->s + orig_len, pattern, p + 1, (int)m_not)
+		    == no_match)
+		    continue;
+	    } else 
+		if ((err = glob2(pathbuf, restpattern, pglob, no_match)) != 0)
+		    break;
+	    pathbuf->len = save_len;
+	    strbuf_append1(pathbuf, SEP);
+	    strbuf_terminate(pathbuf);
+	    if ((err = glob2(pathbuf, p, pglob, no_match)) != 0)
+		break;
+	} else {
+	    if (match(pathbuf->s + orig_len, pattern, restpattern,
+		(int) m_not) == no_match)
+		continue;
+	    if ((err = glob2(pathbuf, restpattern, pglob, no_match)) != 0)
+		break;
+	}
     }
     /* todo: check error from readdir? */
     closedir(dirp);
@@ -613,24 +675,6 @@ globextend(const char *path, glob_t *pglob)
     pathv[pglob->gl_offs + pglob->gl_pathc] = NULL;
 }
 
-static size_t
-One_Char_mbtowc(__Char *pwc, const Char *s, size_t n)
-{
-#ifdef WIDE_STRINGS
-    char buf[MB_LEN_MAX], *p;
-
-    if (n > MB_LEN_MAX)
-	n = MB_LEN_MAX;
-    p = buf;
-    while (p < buf + n && (*p++ = LCHAR(*s++)) != 0)
-	;
-    return one_mbtowc(pwc, buf, n);
-#else
-    *pwc = *s & CHAR;
-    return 1;
-#endif
-}
-
 /*
  * pattern matching function for filenames.  Each occurrence of the *
  * pattern causes a recursion level.
@@ -652,6 +696,8 @@ match(const char *name, const Char *pat, const Char *patend, int m_not)
 	case M_ALL:
 	    if (pat == patend)
 		return (1);
+	    while ((*pat & M_MASK) == M_ALL) /* eat consecutive '*' */
+		pat += One_Char_mbtowc(&wc, pat, MB_LEN_MAX);
 	    for (;;) {
 		if (match(name, pat, patend, m_not))
 		    return (1);

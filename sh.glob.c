@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.76 2008/06/19 15:20:56 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.77 2009/10/30 14:27:13 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.76 2008/06/19 15:20:56 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.77 2009/10/30 14:27:13 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -430,6 +430,12 @@ libglob(Char **vl)
     glob_t  globv;
     char   *ptr;
     int     nonomatch = adrof(STRnonomatch) != 0, magic = 0, match = 0;
+
+    if (adrof(STRglobdot))
+       gflgs |= GLOB_DOT;
+
+    if (adrof(STRglobstar))
+       gflgs |= GLOB_STAR;
 
     if (!vl || !vl[0])
 	return(vl);

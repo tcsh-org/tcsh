@@ -444,6 +444,17 @@ would list all three files, because case is ignored and hyphens and
 underscores are equivalent.  Periods, however, are not equivalent to
 hyphens or underscores.
 .PP
+If the \fBcomplete\fR shell variable is set to `Enhance', completion
+ignores case and differences between a hyphen and an underscore word
+separator only when the user types a lowercase character or a hyphen.
+Entering an uppercase character or an underscore will not match the 
+corresponding lowercase character or hyphen word separator.  
+Typing `rm a\-\-file[^D]' in the directory of the previous example would 
+still list all three files, but typing `rm A\-\-file' would match only 
+`A_silly_file' and typing `rm a__file[^D]' would match just `A_silly_file' 
+and `another_silly_file' because the user explicitly used an uppercase 
+or an underscore character.  
+.PP
 Completion and listing are affected by several other shell variables:
 \fBrecexact\fR can be set to complete on the shortest possible unique
 match, even if more typing might result in a longer match:
@@ -1328,7 +1339,9 @@ pattern.
 .PP
 In matching filenames, the character `.' at the beginning of a filename or
 immediately following a `/', as well as the character `/' must be matched
-explicitly.  The character `*' matches any string of characters, including the
+explicitly unless 
+.B globdot
+is set.  The character `*' matches any string of characters, including the
 null string.  The character `?' matches any single character.  The sequence
 `[...]' matches any one of the characters enclosed.  Within `[...]', a pair of
 characters separated by `\-' matches any character lexically between the two.
@@ -1380,6 +1393,15 @@ only if there were no files in the current directory ending in `.a', `.c', or
 `.o'), and if the \fBnonomatch\fR shell variable is set a pattern (or list
 of patterns) which matches nothing is left unchanged rather than causing
 an error.
+.PP
+The \fBglobstar\fR shell variable can be set to allow `**' and `***' as 
+additional glob-pattern that matches filenames and directories recursively.  
+For example, `grep /usr/include/**.h' would search for all .h files in the
+directory `/usr/include' and any directory contained in `/usr/include', and 
+`touch **' would touch all the files in the current directory and each 
+subdirectory.  To prevent problems with recursion, the `**' glob-pattern will
+not descend into a symbolic link containing a directory.  To follow symlinks,
+use `***' (+)
 .PP
 The \fBnoglob\fR shell variable can be set to prevent filename substitution,
 and the \fIexpand-glob\fR editor command, normally bound to `^X-*', can be
@@ -3663,10 +3685,15 @@ If set, the shell will evaluate expressions right to left, like the original
 \fIcsh\fR.
 .TP 8
 .B complete \fR(+)
-If set to `enhance', completion 1) ignores case and 2) considers
-periods, hyphens and underscores (`.', `\-' and `_') to be word
-separators and hyphens and underscores to be equivalent. If set to
-`igncase', the completion becomes case insensitive.
+If set to `igncase', the completion becomes case insensitive.
+If set to `enhance', completion ignores case and considers
+hyphens and underscores to be equivalent; it will also treat
+periods, hyphens and underscores (`.', `\-' and `_') as word
+separators.
+If set to `Enhance', completion matches uppercase and underscore
+characters explicitly and matches lowercase and hyphens in a
+case-insensivite manner; it will treat periods, hypens and underscores
+as word separators.
 .TP 8
 .B continue \fR(+)
 If set to a list of commands, the shell will continue the listed
@@ -3812,6 +3839,12 @@ If set, the `%c'/`%.' and `%C' prompt sequences (see the \fBprompt\fR
 shell variable) indicate skipped directories with an ellipsis (`...')
 instead of `/<skipped>'.
 .TP 8
+.B euid \fR(+)
+The user's effective user ID.
+.TP 8
+.B euser \fR(+)
+The first matching passwd entry name corresponding to the effective user ID.
+.TP 8
 .B fignore \fR(+)
 Lists file name suffixes to be ignored by completion.
 .TP 8
@@ -3824,6 +3857,18 @@ If set in \fIcsh\fR, filename completion is used.
 .TP 8
 .B gid \fR(+)
 The user's real group ID.
+.TP 8
+.B globdot \fR(+)
+If set, wild-card glob patterns will match files and directories beginning
+with `.' except for `.' and `..'
+.TP 8
+.B globstar \fR(+)
+If set, the `**' and `***' file glob patterns will match any string of 
+characters and traverse any sub-directories recursively.  (e.g. `ls **.c'
+will list all the .c files in the current directory and subdirectories).
+To prevent problems with recursion, the `**' glob-pattern will not 
+descend into a symbolic link containing a directory.  To override this,
+use `***'
 .TP 8
 .B group \fR(+)
 The user's group name.
@@ -4134,6 +4179,9 @@ A single `%'.
 .TP 4
 %n
 The user name.
+.TP 4
+%N
+The effective user name.
 .TP 4
 %j
 The number of jobs.

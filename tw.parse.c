@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.124 2007/07/02 15:48:48 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.125 2009/10/17 17:22:33 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.124 2007/07/02 15:48:48 christos Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.125 2009/10/17 17:22:33 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -688,37 +688,40 @@ is_prefix(Char *check, Char *template)
  * and matches on shortening of commands
  */
 static int
-is_prefixmatch(Char *check, Char *template, int igncase)
+is_prefixmatch(Char *check, Char *template, int enhanced)
 {
-    Char MCH1, MCH2;
+    Char MCH1, MCH2, LCH1, LCH2;
 
     for (; *check; check++, template++) {
 	if ((*check & TRIM) != (*template & TRIM)) {
-            MCH1 = (*check & TRIM);
-            MCH2 = (*template & TRIM);
-            MCH1 = Isupper(MCH1) ? Tolower(MCH1) : MCH1;
-            MCH2 = Isupper(MCH2) ? Tolower(MCH2) : MCH2;
-            if (MCH1 != MCH2) {
-                if (!igncase && ((*check & TRIM) == '-' || 
+	    MCH1 = (*check & TRIM);
+	    MCH2 = (*template & TRIM);
+            LCH1 = Isupper(MCH1) ? Tolower(MCH1) : 
+		enhanced == 2 && MCH1 == '_' ? '-' : MCH1;
+            LCH2 = Isupper(MCH2) ? Tolower(MCH2) :
+		enhanced == 2 && MCH2 == '_' ? '-' : MCH2;
+	    if (MCH1 != MCH2 && MCH1 != LCH2 &&
+		(LCH1 != MCH2 || enhanced == 2)) {
+		if (enhanced && ((*check & TRIM) == '-' || 
 				 (*check & TRIM) == '.' ||
 				 (*check & TRIM) == '_')) {
-                    MCH1 = MCH2 = (*check & TRIM);
-                    if (MCH1 == '_') {
-                        MCH2 = '-';
-                    } else if (MCH1 == '-') {
-                        MCH2 = '_';
-                    }
-                    for (;*template && (*template & TRIM) != MCH1 &&
-				       (*template & TRIM) != MCH2; template++)
+		    MCH1 = MCH2 = (*check & TRIM);
+		    if (MCH1 == '_' && enhanced != 2) {
+			MCH2 = '-';
+		    } else if (MCH1 == '-') {
+			MCH2 = '_';
+		    }
+		    for (; *template && (*template & TRIM) != MCH1 &&
+					(*template & TRIM) != MCH2; template++)
 			continue;
-                    if (!*template) {
+		    if (!*template) {
 	                return (FALSE);
-                    }
-                } else {
-	            return (FALSE);
-                }
-            }
-        }
+		    }
+		} else {
+		    return (FALSE);
+		}
+	    }
+	}
     }
     return (TRUE);
 } /* end is_prefixmatch */
@@ -853,7 +856,7 @@ static int
 recognize(struct Strbuf *exp_name, const Char *item, size_t name_length,
 	  int numitems, int enhanced, int igncase)
 {
-    Char MCH1, MCH2;
+    Char MCH1, MCH2, LCH1, LCH2;
     Char *x;
     const Char *ent;
     size_t len = 0;
@@ -872,18 +875,21 @@ recognize(struct Strbuf *exp_name, const Char *item, size_t name_length,
 	for (x = exp_name->s, ent = item; *x; x++, ent++) {
 	    MCH1 = *x & TRIM;
 	    MCH2 = *ent & TRIM;
-            MCH1 = Isupper(MCH1) ? Tolower(MCH1) : MCH1;
-            MCH2 = Isupper(MCH2) ? Tolower(MCH2) : MCH2;
-	    if (MCH1 != MCH2)
-		break;
+	    LCH1 = Isupper(MCH1) ? Tolower(MCH1) : MCH1;
+	    LCH2 = Isupper(MCH2) ? Tolower(MCH2) : MCH2;
+	    if (MCH1 != MCH2) {
+		if (LCH1 == MCH2 || (MCH1 == '_' && MCH2 == '-'))
+		    *x = *ent;
+		else if (LCH1 != LCH2)
+		    break;
+	    }
 	    len++;
 	}
-	if (*x || !*ent)	/* Shorter or exact match */
-	    memcpy(exp_name->s, item, len * sizeof(*exp_name->s));
     }
     *x = '\0';		/* Shorten at 1st char diff */
     exp_name->len = x - exp_name->s;
-    if (!(match_unique_match || is_set(STRrecexact) || (enhanced && *ent)) && len == name_length)	/* Ambiguous to prefix? */
+    if (!(match_unique_match || is_set(STRrecexact) || (enhanced && *ent)) &&
+	len == name_length)	/* Ambiguous to prefix? */
 	return (-1);	/* So stop now and save time */
     return (0);
 } /* end recognize */

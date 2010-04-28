@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.152 2010/01/26 16:10:08 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.153 2010/01/26 20:03:17 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.152 2010/01/26 16:10:08 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.153 2010/01/26 20:03:17 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -577,6 +577,12 @@ main(int argc, char **argv)
 	setv(STRoid, Itoa(oid, 0, 0), VAR_READWRITE);
 #endif /* apollo */
 
+	setv(STReuid, Itoa(euid, 0, 0), VAR_READWRITE);
+	if ((pw = xgetpwuid(euid)) == NULL)
+	    setcopy(STReuser, STRunknown, VAR_READWRITE);
+	else
+	    setcopy(STReuser, str2short(pw->pw_name), VAR_READWRITE);
+
 	setv(STRuid, Itoa(uid, 0, 0), VAR_READWRITE);
 
 	setv(STRgid, Itoa(gid, 0, 0), VAR_READWRITE);
@@ -588,7 +594,7 @@ main(int argc, char **argv)
 	else if (cln != NULL)
 	    setv(STRuser, quote(SAVE(cln)), VAR_READWRITE);
 	else if ((pw = xgetpwuid(uid)) == NULL)
-	    setcopy(STRuser, str2short("unknown"), VAR_READWRITE);
+	    setcopy(STRuser, STRunknown, VAR_READWRITE);
 	else
 	    setcopy(STRuser, str2short(pw->pw_name), VAR_READWRITE);
 	if (cln == NULL)
@@ -600,7 +606,7 @@ main(int argc, char **argv)
 	if (cgr != NULL)
 	    setv(STRgroup, quote(SAVE(cgr)), VAR_READWRITE);
 	else if ((gr = xgetgrgid(gid)) == NULL)
-	    setcopy(STRgroup, str2short("unknown"), VAR_READWRITE);
+	    setcopy(STRgroup, STRunknown, VAR_READWRITE);
 	else
 	    setcopy(STRgroup, str2short(gr->gr_name), VAR_READWRITE);
 	if (cgr == NULL)
@@ -619,7 +625,7 @@ main(int argc, char **argv)
 	    tsetenv(STRHOST, str2short(cbuff));
 	}
 	else
-	    tsetenv(STRHOST, str2short("unknown"));
+	    tsetenv(STRHOST, STRunknown);
     }
 
 
