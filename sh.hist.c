@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.39 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.40 2007/03/01 17:14:51 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.39 2006/08/24 20:56:31 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.40 2007/03/01 17:14:51 christos Exp $")
 
 #include "tc.h"
 
@@ -422,8 +422,18 @@ rechist(Char *fname, int ref)
     oldidfds = didfds;
     didfds = 0;
     if ((shist = adrof(STRsavehist)) != NULL && shist->vec != NULL)
-	if (shist->vec[1] && eq(shist->vec[1], STRmerge))
+	if (shist->vec[1] && eq(shist->vec[1], STRmerge)) {
+	    /*
+	     * Unset verbose while we read the history file. From:
+	     * jbastian@redhat.com (Jeffrey Bastian)
+	     */
+	    Char *verb = varval(STRverbose);
+	    if (verb != STRNULL)
+		unsetv(STRverbose);
 	    loadhist(fname, 1);
+	    if (verb != STRNULL)
+		setv(STRverbose, verb, VAR_READWRITE);
+	}
     fp = xcreat(short2str(fname), 0600);
     if (fp == -1) {
 	didfds = oldidfds;

@@ -1,4 +1,6 @@
- 20. V6.17.01 - 20100428
+ 21. V6.17.01 - 20100506
+ 20. unset verbose while we are reading the history file to avoid echoing
+     to the terminal. (Jeffrey Bastian)
  19. globstar addition, Enhance addition, euid, euser, gid variables
      (Greg Dionne)
  18. Make 'e' in vi mode work like 'b' - use wordchars (Alistair Crooks)
