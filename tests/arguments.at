@@ -74,7 +74,7 @@ TCSH_UNTESTED([-q])
 # Nested to make the SIGQUIT reporting predictable
 #AT_CHECK([tcsh -f -q -c 'kill -QUIT $$'], 131, ,)
 
-AT_CLEANUP
+#AT_CLEANUP
 
 
 AT_SETUP([-s])
