@@ -68,12 +68,11 @@ TCSH_UNTESTED([-m])
 # -n tested in noexec.at
 
 
-AT_SETUP([-q])
+TCSH_UNTESTED([-q])
+#AT_SETUP([-q])
 
 # Nested to make the SIGQUIT reporting predictable
-AT_CHECK([tcsh -f -q -c 'kill -QUIT $$'], 131, ,
-[Quit 
-])
+#AT_CHECK([tcsh -f -q -c 'kill -QUIT $$'], 131, ,)
 
 AT_CLEANUP
 
