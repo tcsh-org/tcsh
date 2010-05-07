@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.153 2010/01/26 20:03:17 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.154 2010/04/28 17:33:19 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.153 2010/01/26 20:03:17 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.154 2010/04/28 17:33:19 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -964,6 +964,8 @@ main(int argc, char **argv)
 
 	    case ' ':
 	    case '\t':
+	    case '\r':
+	    case '\n':
 		/* 
 		 * for O/S's that don't do the argument parsing right in 
 		 * "#!/foo -f " scripts
