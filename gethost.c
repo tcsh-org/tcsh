@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/gethost.c,v 1.11 2005/04/11 22:10:55 kim Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.12 2006/03/02 18:46:44 christos Exp $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: gethost.c,v 1.11 2005/04/11 22:10:55 kim Exp $")
+RCSID("$tcsh: gethost.c,v 1.12 2006/03/02 18:46:44 christos Exp $")
 
 #ifdef SCO
 # define perror __perror
@@ -231,7 +231,7 @@ main(int argc, char *argv[])
 	    break;
 
 	case T_NONE:
-	    if (state != S_CODE && defs && *defs != '\0') {
+	    if (state != S_CODE && *defs != '\0') {
 		(void) fprintf(stderr, "%s: \"%s\", %d: Discarded\n",
 			       pname, fname, lineno);
 		if (++errs == 30) {
