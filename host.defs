@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.45 2007/05/31 09:03:10 corinna Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.46 2008/09/25 14:41:05 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.45 2007/05/31 09:03:10 corinna Exp $")
+RCSID("$tcsh: host.defs,v 1.46 2008/09/25 14:41:05 christos Exp $")
 
 endcode	:
 
@@ -431,6 +431,21 @@ hosttype: defined(M_i386)				: "minix386"
 hosttype:						: "minix"
 ostype	:						: "minix"
 machtype: defined(M_i386)				: "i386"
+enddef	:
+
+
+newdef	: defined(__gnu_hurd__)
+comment : GNU/HURD
+vendor	: defined(M_intel)				: "intel"
+hosttype: defined(M_i686)				: "i686"
+hosttype: defined(M_i586)				: "i586"
+hosttype: defined(M_i486)				: "i486"
+hosttype: defined(M_i386)				: "i386"
+ostype	:						: "gnu"
+machtype: defined(M_i686)				: "i686-pc-gnu"
+machtype: defined(M_i586)				: "i586-pc-gnu"
+machtype: defined(M_i486)				: "i486-pc-gnu"
+machtype: defined(M_i386)				: "i386-pc-gnu"
 enddef	:
 
 
