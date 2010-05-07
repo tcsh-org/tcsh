@@ -1,3 +1,5 @@
+ 23. Turn HistLit on while recording history to avoid \!\! losing its \.
+     From Debian
  22. set autoexpand; set histchars="";\n<tab> crash. From Debian
  21. V6.17.01 - 20100506
  20. unset verbose while we are reading the history file to avoid echoing
