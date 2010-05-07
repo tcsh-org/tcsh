@@ -1,3 +1,5 @@
+ 24. Callers of rt_mbtowc don't grok -2 as a return. Return -1 for now.
+     (Corinna Vinschen)
  23. Turn HistLit on while recording history to avoid \!\! losing its \.
      From Debian
  22. set autoexpand; set histchars="";\n<tab> crash. From Debian
