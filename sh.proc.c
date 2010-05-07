@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.110 2010/01/26 16:10:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.111 2010/01/26 20:03:18 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.110 2010/01/26 16:10:09 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.111 2010/01/26 20:03:18 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -719,6 +719,7 @@ palloc(pid_t pid, struct command *t)
 
     pp = xcalloc(1, sizeof(struct process));
     pp->p_procid = pid;
+    pp->p_parentid = shpgrp;
     pp->p_flags = ((t->t_dflg & F_AMPERSAND) ? 0 : PFOREGND) | PRUNNING;
     if (t->t_dflg & F_TIME)
 	pp->p_flags |= PPTIME;

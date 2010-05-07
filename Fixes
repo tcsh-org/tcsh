@@ -1,3 +1,5 @@
+ 27. Don't kill "hup" background jobs when a child of the shell exits.
+     From Debian.
  26. Ignore \r\n in the command line options for OS's that don't strip
      these from #!; from Debian
  25. Fix enhanced missing patch (Greg Dionne)

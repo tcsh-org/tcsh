@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/sh.proc.h,v 3.12 2006/01/12 19:55:38 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.h,v 3.13 2009/06/19 16:35:33 christos Exp $ */
 /*
  * sh.proc.h: Process data structures and variables
  */
@@ -51,6 +51,7 @@ struct process {
     unsigned long p_flags;	/* various job status flags */
     unsigned char p_reason;	/* reason for entering this state */
     int     p_index;		/* shorthand job index */
+    pid_t   p_parentid;		/* parent pid */
     pid_t   p_procid;
     pid_t   p_jobid;		/* pid of job leader */
     /* if a job is stopped/background p_jobid gives its pgrp */

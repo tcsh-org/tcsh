@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.154 2010/04/28 17:33:19 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.155 2010/05/07 17:59:15 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.154 2010/04/28 17:33:19 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.155 2010/05/07 17:59:15 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2316,12 +2316,13 @@ xexit(int i)
 
     {
 	struct process *pp, *np;
-
+	pid_t mypid = getpid();
 	/* Kill all processes marked for hup'ing */
 	for (pp = proclist.p_next; pp; pp = pp->p_next) {
 	    np = pp;
-	    do 
-		if ((np->p_flags & PHUP) && np->p_jobid != shpgrp) {
+	    do
+		if ((np->p_flags & PHUP) && np->p_jobid != shpgrp &&
+		    np->p_parentid == mypid) {
 		    if (killpg(np->p_jobid, SIGHUP) != -1) {
 			/* In case the job was suspended... */
 #ifdef SIGCONT
