@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.73 2010/01/26 16:10:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.74 2010/01/26 20:03:18 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.73 2010/01/26 16:10:09 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.74 2010/01/26 20:03:18 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -76,13 +76,19 @@ update_vars(Char *vp)
 	Char *pn = varval(vp);
 
 	HIST = *pn++;
-	HISTSUB = *pn;
+	if (HIST)
+	    HISTSUB = *pn;
+	else
+	    HISTSUB = HIST;
     }
     else if (eq(vp, STRpromptchars)) {
 	Char *pn = varval(vp);
 
 	PRCH = *pn++;
-	PRCHROOT = *pn;
+	if (PRCH)
+	    PRCHROOT = *pn;
+	else
+	    PRCHROOT = PRCH;
     }
     else if (eq(vp, STRhistlit)) {
 	HistLit = 1;

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.95 2009/06/25 21:15:37 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.96 2010/04/02 12:50:57 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$tcsh: ed.chared.c,v 3.95 2009/06/25 21:15:37 christos Exp $")
+RCSID("$tcsh: ed.chared.c,v 3.96 2010/04/02 12:50:57 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -506,7 +506,7 @@ excl_sw:
 	if (*q == ':')		/* short form: !:arg */
 	    --q;
 
-	if (*q != HIST) {
+	if (HIST != '\0' && *q != HIST) {
 	    /*
 	     * Search for a space, tab, or colon.  See if we have a number (as
 	     * in !1234:xyz).  Remember the number.
@@ -716,8 +716,9 @@ c_excl(Char *p)
      */
     nr_exp = 0;
     for (;;) {
-	while (*p != HIST && p < Cursor)
-	    ++p;
+	if (HIST != '\0')
+	    while (*p != HIST && p < Cursor)
+		++p;
 	for (i = 1; (p - i) >= InputBuf && p[-i] == '\\'; i++)
 	    continue;
 	if (i % 2 == 0)
@@ -745,13 +746,13 @@ c_substitute(void)
      * for white space, the beginning of the line, or a history character.
      */
     for (p = Cursor - 1; 
-	 p > InputBuf && *p != ' ' && *p != '\t' && *p != HIST; --p)
+	 p > InputBuf && *p != ' ' && *p != '\t' && *p && *p != HIST; --p)
 	continue;
 
     /*
      * If we found a history character, go expand it.
      */
-    if (*p == HIST)
+    if (HIST != '\0' && *p == HIST)
 	nr_exp = c_excl(p);
     else
         nr_exp = 0;

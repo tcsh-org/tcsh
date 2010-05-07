@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/pathnames.h,v 3.17 1998/09/13 13:51:03 christos Exp $ */
+/* $Header: /src/pub/tcsh/pathnames.h,v 3.18 2002/03/08 17:36:46 christos Exp $ */
 /*
  * pathnames.h: Location of things to find
  */
@@ -92,6 +92,10 @@
 # define _PATH_TCSHELL		"/local/bin/tcsh"	/* use ram disk */
 #endif /* _MINIX && !_PATH_TCSHELL */
 
+#if defined(__linux__) && !defined(_PATH_TCSHELL)
+# define _PATH_TCSHELL		"/bin/tcsh"
+#endif /* __linux__ && !_PATH_TCSHELL */
+
 #if defined(__EMX__) && !defined(_PATH_DEVNULL)
 # define _PATH_DEVNULL		"nul"
 #endif /* __EMX__ && !_PATH_DEVNULL */
@@ -141,7 +145,7 @@
 #endif /* !_PATH_CSHELL */
 
 #ifndef _PATH_TCSHELL
-#  define _PATH_TCSHELL		"/usr/local/bin/tcsh"
+# define _PATH_TCSHELL		"/usr/local/bin/tcsh"
 #endif /* !_PATH_TCSHELL */
 
 #ifndef _PATH_BIN_LOGIN

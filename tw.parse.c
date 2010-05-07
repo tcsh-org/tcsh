@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.125 2009/10/17 17:22:33 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.126 2010/04/28 17:33:19 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.125 2009/10/17 17:22:33 christos Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.126 2010/04/28 17:33:19 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -205,9 +205,11 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	/* Don't quote '/' to make the recognize stuff work easily */
 	/* Don't quote '$' in double quotes */
 
-	if (cmap(*cp, _ESC) && cp < str_end - 1 && cp[1] == HIST)
+	if (cmap(*cp, _ESC) && cp < str_end - 1 && cp[1] == HIST &&
+	    HIST != '\0')
 	    Strbuf_append1(&qline, *++cp | QUOTE);
-	else if (qu && (tricky(*cp) || *cp == '~') && !(qu == '\"' && tricky_dq(*cp)))
+	else if (qu && (tricky(*cp) || *cp == '~') &&
+	    !(qu == '\"' && tricky_dq(*cp)))
 	    Strbuf_append1(&qline, *cp | QUOTE);
 	else
 	    Strbuf_append1(&qline, *cp);
@@ -640,8 +642,9 @@ insert_meta(const Char *cp, const Char *cpend, const Char *word,
 	    Strbuf_append1(&buffer, w);
 	    Strbuf_append1(&buffer, qu);
 	} else if (wq &&
-		   ((!qu && (tricky(w) || (w == HISTSUB && buffer.len == 0))) ||
-		    (!cmap(qu, _ESC) && w == HIST))) {
+		   ((!qu && (tricky(w) || (w == HISTSUB && HISTSUB != '\0'
+		       && buffer.len == 0))) ||
+		    (!cmap(qu, _ESC) && w == HIST && HIST != '\0'))) {
 	    in_sync = 0;
 	    Strbuf_append1(&buffer, '\\');
 	    Strbuf_append1(&buffer, w);
