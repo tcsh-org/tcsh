@@ -2581,7 +2581,7 @@ Finally, here's a complex example for inspiration:
 .br
 \&'n/\-name/f/' 'n/\-newer/f/' 'n/\-{,n}cpio/f/' \e
 .br
-\'n/\-exec/c/' 'n/\-ok/c/' 'n/\-user/u/' \e
+\&\'n/\-exec/c/' 'n/\-ok/c/' 'n/\-user/u/' \e
 .br
 \&'n/\-group/g/' 'n/\-fstype/(nfs 4.2)/' \e
 .br
