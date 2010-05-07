@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.126 2010/04/28 17:33:19 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.127 2010/05/07 16:19:04 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.126 2010/04/28 17:33:19 christos Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.127 2010/05/07 16:19:04 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1070,14 +1070,16 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 
 	    if ((vp = adrof(STRcomplete)) != NULL && vp->vec != NULL)
 		for (cp = vp->vec; *cp; cp++) {
-		    if (Strcmp(*cp, STRigncase) == 0)
+		    if (Strcmp(*cp, STREnhance) == 0)
+			enhanced = 2;
+		    else if (Strcmp(*cp, STRigncase) == 0)
 			igncase = 1;
-		    if (Strcmp(*cp, STRenhance) == 0)
+		    else if (Strcmp(*cp, STRenhance) == 0)
 			enhanced = 1;
 		}
 
 	    if (enhanced || igncase) {
-	        if (!is_prefixmatch(target, item.s, igncase))
+	        if (!is_prefixmatch(target, item.s, enhanced))
 		    break;
      	    } else {
 	        if (!is_prefix(target, item.s))
