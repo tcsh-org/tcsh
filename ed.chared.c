@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.96 2010/04/02 12:50:57 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.97 2010/05/07 16:19:04 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$tcsh: ed.chared.c,v 3.96 2010/04/02 12:50:57 christos Exp $")
+RCSID("$tcsh: ed.chared.c,v 3.97 2010/05/07 16:19:04 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -730,8 +730,6 @@ c_excl(Char *p)
 	    ++nr_exp;
 	}
     }
-
-    return nr_exp;
 }
 
 

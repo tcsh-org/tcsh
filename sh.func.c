@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.154 2009/12/30 19:03:33 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.155 2009/12/30 19:15:08 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.154 2009/12/30 19:03:33 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.155 2009/12/30 19:15:08 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -963,9 +963,6 @@ histgetword(struct wordent *histent)
 	}
     }
     
-    unreadc(c);
-    return histent;
-
 past:
     switch (Stype) {
 
