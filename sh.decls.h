@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.56 2010/01/26 16:10:08 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.57 2010/01/26 20:03:17 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -270,7 +270,9 @@ extern	void		  setzero	(void *, size_t);
 extern	Char		 *strip		(Char *);
 extern	Char		 *quote		(Char *);
 extern	const Char	 *quote_meta	(struct Strbuf *, const Char *);
+#ifndef SHORT_STRINGS
 extern	char		 *strnsave	(const char *, size_t);
+#endif
 extern	char		 *strsave	(const char *);
 extern	void		  udvar		(Char *);
 #ifndef POSIX
