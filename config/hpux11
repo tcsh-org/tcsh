@@ -107,6 +107,7 @@
 /****************** local defines *********************/
 #define NAMEI_BUG	/* Great! you broke that one too */
 
-#define HPUXVERSION  1100 /* For HP-UX version 8.00 */
+#define HPUXVERSION  1100 /* For HP-UX version 11.00 */
+#define _XOPEN_SOURCE_EXTENDED	/* for socklen_t */
 
 #endif /* _h_config */
