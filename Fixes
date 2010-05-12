@@ -1,3 +1,4 @@
+ 32. V6.17.02 - 20100512
  31. PR/79: nargs: Better handling for promptchars.
  30. PR/97: Add parseoctal to retain compatibility with previous versions (Jim
      Zajkowski)
