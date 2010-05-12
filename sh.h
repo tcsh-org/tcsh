@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.155 2010/01/26 20:03:17 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.156 2010/02/09 20:22:22 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -1047,11 +1047,12 @@ extern struct limits {
  */
 EXTERN struct Hist {
     struct wordent Hlex;
-    int     Hnum;
+    int     Hnum;		 /* eventno when inserted into history list  */
     int     Href;
     time_t  Htime;
     Char   *histline;
-    struct Hist *Hnext;
+    struct Hist *Hnext, *Hprev;         /* doubly linked list */
+    unsigned Hhash;                     /* hash value of command line */
 }       Histlist IZERO_STRUCT;
 
 EXTERN struct wordent paraml;	/* Current lexical word list */
