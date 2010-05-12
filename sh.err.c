@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.err.c,v 3.49 2007/03/19 23:25:02 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.err.c,v 3.50 2007/09/28 20:25:15 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -34,7 +34,7 @@
 #include "sh.h"
 #include <assert.h>
 
-RCSID("$tcsh: sh.err.c,v 3.49 2007/03/19 23:25:02 christos Exp $")
+RCSID("$tcsh: sh.err.c,v 3.50 2007/09/28 20:25:15 christos Exp $")
 
 /*
  * C Shell
@@ -597,10 +597,9 @@ stderror(unsigned int id, ...)
 	if (!(flags & ERR_SILENT)) {
 	    /*
 	     * Must flush before we print as we wish output before the error
-	     * to go * on (some form of) standard output, while output after
-	     * goes on (some * form of) diagnostic output. If didfds then
-	     * output will go to 1/2 * else to FSHOUT/FSHDIAG. See flush in
-	     * sh.print.c.
+	     * to go on (some form of) standard output, while output after
+	     * goes on (some form of) diagnostic output. If didfds then output
+	     * will go to 1/2 else to FSHOUT/FSHDIAG. See flush in sh.print.c.
 	     */
 	    flush();/*FIXRESET*/
 	    haderr = 1;			/* Now to diagnostic output */
