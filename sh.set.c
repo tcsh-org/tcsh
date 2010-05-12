@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.74 2010/01/26 20:03:18 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.75 2010/05/07 16:19:04 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.74 2010/01/26 20:03:18 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.75 2010/05/07 16:19:04 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -867,10 +867,11 @@ unsetv1(struct varent *p)
     balance(pp, f, 1);
 }
 
+/* Set variable name to NULL. */
 void
-setNS(Char *cp)
+setNS(const Char *varName)
 {
-    setcopy(cp, STRNULL, VAR_READWRITE);
+    setcopy(varName, STRNULL, VAR_READWRITE);
 }
 
 /*ARGSUSED*/
