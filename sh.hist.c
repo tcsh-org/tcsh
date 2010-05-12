@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.45 2010/05/12 16:00:00 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.46 2010/05/12 16:20:16 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.45 2010/05/12 16:00:00 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.46 2010/05/12 16:20:16 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
@@ -107,7 +107,7 @@ hremove(struct Hist *hp)
 
 /* Prune length of history list to specified size by history variable. */
 PG_STATIC void
-discardExcess(unsigned histlen)
+discardExcess(int histlen)
 {
     struct Hist *hp, *np;
     if (histTail == NULL) {
@@ -117,22 +117,23 @@ discardExcess(unsigned histlen)
     /* Prune dummy entries from the front, then old entries from the back. If
      * the list is still too long scan the whole list as before.  But only do a
      * full scan if the list is more than 6% (1/16th) too long. */
-    while (histCount > histlen && (np = Histlist.Hnext)) {
-        if ((unsigned)(eventno - np->Href) >= histlen || histlen == 0)
+    while (histCount > (unsigned)histlen && (np = Histlist.Hnext)) {
+        if (eventno - np->Href >= histlen || histlen == 0)
             hremove(np), hfree(np);
         else
             break;
     }
-    while (histCount > histlen && (np = histTail) != &Histlist) {
-        if ((unsigned)(eventno - np->Href) >= histlen || histlen == 0)
+    while (histCount > (unsigned)histlen && (np = histTail) != &Histlist) {
+        if (eventno - np->Href >= histlen || histlen == 0)
             hremove(np), hfree(np);
         else
             break;
     }
-    if (histCount - (histlen >> 4) <= histlen)
+    if (histCount - (histlen >> 4) <= (unsigned)histlen)
 	return;				/* don't bother doing the full scan */
-    for (hp = &Histlist; histCount > histlen && (np = hp->Hnext) != NULL;)
-        if ((unsigned)(eventno - np->Href) >= histlen || histlen == 0)
+    for (hp = &Histlist; histCount > (unsigned)histlen &&
+	(np = hp->Hnext) != NULL;)
+        if (eventno - np->Href >= histlen || histlen == 0)
             hremove(np), hfree(np);
         else
             hp = np;
@@ -708,7 +709,7 @@ discardHistHashTable(void)
 
 /* Computes a new hash table size, when the current one is too small. */
 static inline
-unsigned getHashTableSize(unsigned histlen)
+unsigned getHashTableSize(int histlen)
 {
     unsigned target = histlen * 2;
     unsigned e = 5;
@@ -726,11 +727,17 @@ unsigned getHashTableSize(unsigned histlen)
 
 /* Create the hash table or resize, if necessary. */
 static void
-createHistHashTable(unsigned histlen)
+createHistHashTable(int histlen)
 {
     if (histlen == 0) {
 	discardHistHashTable();
         return;
+    }
+    if (histlen < 0) {
+        histlen = getn(varval(STRhistory));
+	if (histlen == 0)
+	    return;			/* no need for hash table */
+	assert(histlen > 0);
     }
     if (histHashTable != NULL) {
 	if (histCount < histHashTableLength * 3 / 4)
@@ -738,7 +745,7 @@ createHistHashTable(unsigned histlen)
 	discardHistHashTable();		/* too small */
     }
     histHashTableLength = getHashTableSize(
-	histlen > histCount ? histlen : histCount);
+	histlen > (int)histCount ? histlen : (int)histCount);
     histHashTable = xmalloc(histHashTableLength * sizeof(struct Hist *));
     memset(histHashTable, 0, histHashTableLength * sizeof(struct Hist *));
     assert(histHashTable[0] == emptyHTE);
@@ -778,7 +785,7 @@ insertHistHashTable(struct Hist *np, unsigned hashval)
           histHashTable[hi] != emptyHTE && histHashTable[hi] != deletedHTE);
          rehashes++) {
         assert(np != histHashTable[hi]);
-        if (rehashes >= histHashTableLength/10) {
+        if (rehashes >= histHashTableLength / 10) {
             /* Hash table is full, so grow it.  We assume the create function
              * will roughly double the size we give it.  Create initializes the
              * new table with everything on the Histlist, so we are done when

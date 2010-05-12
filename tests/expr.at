@@ -75,7 +75,8 @@ AT_CLEANUP
 
 AT_SETUP([Primary expressions])
 
-AT_CHECK([tcsh -f -c 'exit (010)'], 8)
+AT_CHECK([tcsh -f -c 'set parseoctal; exit (010)'], 8)
+AT_CHECK([tcsh -f -c 'exit (010)'], 10)
 
 AT_CHECK([tcsh -f -c 'exit ( "" )'], 0)
 
