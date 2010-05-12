@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.44 2010/05/12 15:07:02 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.45 2010/05/12 16:00:00 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.44 2010/05/12 15:07:02 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.45 2010/05/12 16:00:00 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
@@ -846,6 +846,8 @@ findHistHashTable(struct wordent *lp, unsigned hashval)
     unsigned deleted = 0;		/* number of deleted entries skipped */
     unsigned hi = hashval;
     struct Hist *hp;
+    if (!histHashTable)
+	return NULL;
     while ((hi = hash2tableIndex(hi, histHashTableLength)),
            (hp = histHashTable[hi]) != emptyHTE) {
         if (hp == deletedHTE)
