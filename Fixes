@@ -1,3 +1,7 @@
+ 30. PR/97: Add parseoctal to retain compatibility with previous versions (Jim
+     Zajkowski)
+ 29. PR/84: Performance fixes for large history merges (add
+     hashtable (Ted Anderson)
  28. Revert previous #23; people should use $histlit if they want this
      feature.
  27. Don't kill "hup" background jobs when a child of the shell exits.

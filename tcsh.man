@@ -4088,6 +4088,11 @@ See also the \fBcwd\fR and \fBdirstack\fR shell variables.
 If set, enable the printing of padding '0' for hours, in 24 and 12 hour
 formats.  E.G.: 07:45:42 vs. 7:45:42.
 .TP 8
+.B parseoctal
+To retain compatibily with older versions numeric variables starting with
+0 are not interpreted as octal. Setting this variable enables proper octal
+parsing.
+.TP 8
 .B path
 A list of directories in which to look for executable commands.
 A null word specifies the current directory.
