@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.41 2010/05/06 14:16:24 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.42 2010/05/07 16:28:40 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.41 2010/05/06 14:16:24 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.42 2010/05/07 16:28:40 christos Exp $")
 
 #include "tc.h"
 
@@ -375,7 +375,7 @@ void
 rechist(Char *fname, int ref)
 {
     Char    *snum;
-    int     fp, ftmp, oldidfds, oHistLit;
+    int     fp, ftmp, oldidfds;
     struct varent *shist;
     static Char   *dumphist[] = {STRhistory, STRmhT, 0, 0};
 
@@ -443,10 +443,7 @@ rechist(Char *fname, int ref)
     ftmp = SHOUT;
     SHOUT = fp;
     dumphist[2] = snum;
-    oHistLit = HistLit;
-    HistLit = 1;
     dohist(dumphist, NULL);
-    HistLit = oHistLit;
     xclose(fp);
     SHOUT = ftmp;
     didfds = oldidfds;
