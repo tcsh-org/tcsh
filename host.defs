@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.46 2008/09/25 14:41:05 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.47 2010/05/07 15:41:58 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.46 2008/09/25 14:41:05 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.47 2010/05/07 15:41:58 christos Exp $")
 
 endcode	:
 
@@ -289,6 +289,7 @@ ostype	: defined(SUNOS4)				: "sunos4"
 ostype	: defined(SOLARIS2)				: "solaris"
 machtype: defined(mc68010) || defined(__mc68010__)	: "m68k"
 machtype: defined(mc68020) || defined(__mc68020__)	: "m68k"
+machtype: defined(__sparcv9)				: "sparcv9"
 machtype: defined(sparc) || defined(__sparc__)		: "sparc"
 machtype: defined(M_i386)				: "i386"
 enddef	:
