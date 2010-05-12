@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.76 2010/05/12 15:11:50 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.77 2010/05/12 15:19:45 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.76 2010/05/12 15:11:50 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.77 2010/05/12 15:19:45 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -757,7 +757,7 @@ unset(Char **v, struct command *c)
     if (adrof(STRignoreeof) == 0)
 	numeof = 0;
     if (adrof(STRpromptchars) == 0) {
-	PRCH = '>';
+	PRCH = tcsh ? '>' : '%';
 	PRCHROOT = '#';
     }
     if (adrof(STRhistlit) == 0)

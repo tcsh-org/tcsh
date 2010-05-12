@@ -1,3 +1,4 @@
+ 31. PR/79: nargs: Better handling for promptchars.
  30. PR/97: Add parseoctal to retain compatibility with previous versions (Jim
      Zajkowski)
  29. PR/84: Performance fixes for large history merges (add
