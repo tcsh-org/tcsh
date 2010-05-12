@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.43 2010/05/12 14:38:29 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.44 2010/05/12 15:07:02 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.43 2010/05/12 14:38:29 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.44 2010/05/12 15:07:02 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
@@ -67,12 +67,16 @@ static	void	hfree	(struct Hist *);
 //#define DEBUG_HIST 1
 
 static const int fastMergeErase = 1;
-static unsigned histCount = 0;           /* number elements on history list */
+static unsigned histCount = 0;		/* number elements on history list */
 static struct Hist *histTail = NULL;     /* last element on history list */
 static struct Hist *histMerg = NULL;	 /* last element merged by Htime */
 
+static void insertHistHashTable(struct Hist *, unsigned);
+
+
 /* Insert new element (hp) in history list after specified predecessor (pp). */
-static void hinsert(struct Hist *hp, struct Hist *pp)
+static void
+hinsert(struct Hist *hp, struct Hist *pp)
 {
     struct Hist *fp = pp->Hnext;        /* following element, if any */
     hp->Hnext = fp, hp->Hprev = pp;
@@ -85,7 +89,8 @@ static void hinsert(struct Hist *hp, struct Hist *pp)
 }
 
 /* Remove the entry from the history list. */
-static void hremove(struct Hist *hp)
+static void
+hremove(struct Hist *hp)
 {
     struct Hist *pp = hp->Hprev;
     assert(pp);                         /* elements always have a previous */
@@ -101,7 +106,8 @@ static void hremove(struct Hist *hp)
 }
 
 /* Prune length of history list to specified size by history variable. */
-PG_STATIC void discardExcess(int histlen)
+PG_STATIC void
+discardExcess(unsigned histlen)
 {
     struct Hist *hp, *np;
     if (histTail == NULL) {
@@ -112,21 +118,21 @@ PG_STATIC void discardExcess(int histlen)
      * the list is still too long scan the whole list as before.  But only do a
      * full scan if the list is more than 6% (1/16th) too long. */
     while (histCount > histlen && (np = Histlist.Hnext)) {
-        if (eventno - np->Href >= histlen || histlen == 0)
+        if ((unsigned)(eventno - np->Href) >= histlen || histlen == 0)
             hremove(np), hfree(np);
         else
             break;
     }
     while (histCount > histlen && (np = histTail) != &Histlist) {
-        if (eventno - np->Href >= histlen || histlen == 0)
+        if ((unsigned)(eventno - np->Href) >= histlen || histlen == 0)
             hremove(np), hfree(np);
         else
             break;
     }
-    if (histCount - (histlen>>4) <= histlen)
+    if (histCount - (histlen >> 4) <= histlen)
 	return;				/* don't bother doing the full scan */
     for (hp = &Histlist; histCount > histlen && (np = hp->Hnext) != NULL;)
-        if (eventno - np->Href >= histlen || histlen == 0)
+        if ((unsigned)(eventno - np->Href) >= histlen || histlen == 0)
             hremove(np), hfree(np);
         else
             hp = np;
@@ -197,7 +203,8 @@ struct hashValue		  /* State used to hash a wordend word list. */
 };
 
 /* Set up the internal state */
-static inline void initializeHash(struct hashValue *h)
+static inline
+void initializeHash(struct hashValue *h)
 {
     h->a = h->b = h->c = 0xdeadbeef;
 }
@@ -205,7 +212,8 @@ static inline void initializeHash(struct hashValue *h)
 /* This does a partial hash of the Chars in a single word.  For efficiency we
  * include 3 versions of the code to pack Chars into 32-bit words for the
  * mixing function. */
- void addWordToHash(struct hashValue *h, const Char *word)
+static void
+addWordToHash(struct hashValue *h, const Char *word)
 {
     uint32_t a = h->a, b = h->b, c = h->c;
 #ifdef SHORT_STRINGS
@@ -253,7 +261,8 @@ static inline void initializeHash(struct hashValue *h)
     h->a = a, h->b = b, h->c = c;
 }
 
-void addCharToHash(struct hashValue *h, Char ch)
+static void
+addCharToHash(struct hashValue *h, Char ch)
 {
     /* The compiler (gcc -O2) seems to do a good job optimizing this without
      * explicitly extracting into local variables. */
@@ -261,7 +270,8 @@ void addCharToHash(struct hashValue *h, Char ch)
     mix(h->a, h->b, h->c);
 }
 
-static inline uint32_t finalizeHash(struct hashValue *h)
+static inline
+uint32_t finalizeHash(struct hashValue *h)
 {
     uint32_t a = h->a, b = h->b, c = h->c;
     final(a, b, c);
@@ -275,7 +285,8 @@ static inline uint32_t finalizeHash(struct hashValue *h)
    http://burtleburtle.net/bob/hash/doobs.html */
 
 #if 0
-ub4 one_at_a_time(char *key, ub4 len)
+ub4
+one_at_a_time(char *key, ub4 len)
 {
   ub4   hash, i;
   for (hash=0, i=0; i<len; ++i)
@@ -292,11 +303,14 @@ ub4 one_at_a_time(char *key, ub4 len)
 #endif
 
 struct hashValue { uint32_t h; };
-static inline void initializeHash(struct hashValue *h)
+static inline
+void initializeHash(struct hashValue *h)
 {
     h->h = 0;
 }
-static inline void addWordToHash(struct hashValue *h, const Char *word)
+
+static inline
+void addWordToHash(struct hashValue *h, const Char *word)
 {
     unsigned k;
     uint32_t hash = h->h;
@@ -304,12 +318,16 @@ static inline void addWordToHash(struct hashValue *h, const Char *word)
 	hash += k, hash += hash << 10, hash ^= hash >> 6;
     h->h = hash;
 }
-static inline void addCharToHash(struct hashValue *h, Char c)
+
+static inline void
+addCharToHash(struct hashValue *h, Char c)
 {
     Char b[2] = { c, 0 };
     addWordToHash(h, b);
 }
-static inline uint32_t finalizeHash(struct hashValue *h)
+
+static inline uint32_t
+finalizeHash(struct hashValue *h)
 {
     unsigned hash = h->h;
     hash += (hash << 3);
@@ -323,11 +341,14 @@ static inline uint32_t finalizeHash(struct hashValue *h)
 /* Simple multipy and add hash. */
 #define PRIME_LENGTH 1			/* need "good" HTL */
 struct hashValue { uint32_t h; };
-static inline void initializeHash(struct hashValue *h)
+static inline void
+initializeHash(struct hashValue *h)
 {
     h->h = 0xe13e2345;
 }
-static inline void addWordToHash(struct hashValue *h, const Char *word)
+
+static inline void
+addWordToHash(struct hashValue *h, const Char *word)
 {
     unsigned k;
     uint32_t hash = h->h;
@@ -335,17 +356,22 @@ static inline void addWordToHash(struct hashValue *h, const Char *word)
 	hash = hash * 0x9e4167b9 + k;
     h->h = hash;
 }
-static inline void addCharToHash(struct hashValue *h, Char c)
+
+static inline void
+addCharToHash(struct hashValue *h, Char c)
 {
     h->h = h->h * 0x9e4167b9 + (uChar)c;
 }
-static inline uint32_t finalizeHash(struct hashValue *h)
+
+static inline uint32_t
+finalizeHash(struct hashValue *h)
 {
     return h->h;
 }
 #endif
 
-static unsigned hashhist(struct wordent *h0)
+static unsigned
+hashhist(struct wordent *h0)
 {
     struct hashValue s;
     initializeHash(&s);
@@ -364,7 +390,8 @@ static unsigned hashhist(struct wordent *h0)
 }
 
 #if 0
-unsigned hashStr(Char *str)
+unsigned
+hashStr(Char *str)
 {
     struct hashValue s;
     initializeHash(&s);
@@ -385,7 +412,8 @@ unsigned hashStr(Char *str)
 #ifdef DEBUG_HIST
 
 #ifdef BSDTIMES
-static double doTiming(int start) {
+static double
+doTiming(int start) {
     static struct timeval beginTime;
     if (start) {
 	gettimeofday(&beginTime, NULL);
@@ -398,11 +426,16 @@ static double doTiming(int start) {
     }
 }
 #else
-static double doTiming(int start) { return 0.0; }
+static double
+doTiming(int start) {
+    USE(start);
+    return 0.0;
+}
 #endif
 
-static void generateHashes(int nChars, unsigned nWords, unsigned samples,
-			   unsigned *hashes, unsigned length)
+static void
+generateHashes(int nChars, unsigned nWords, unsigned samples, unsigned *hashes,
+    unsigned length)
 {
     if (nChars < 1)
 	return;
@@ -474,9 +507,10 @@ static void generateHashes(int nChars, unsigned nWords, unsigned samples,
 }
 #endif /* DEBUG_HIST */
 
-static void testHash()
-{
 #ifdef DEBUG_HIST
+static void
+testHash(void)
+{
     static const Char STRtestHashTimings[] =
 	{ 't','e','s','t','H','a','s','h','T','i','m','i','n','g','s', 0 };
     struct varent *vp = adrof(STRtestHashTimings);
@@ -558,8 +592,8 @@ static void testHash()
 	    xprintf(" %d runs of length %d buckets\n", bins[i], i);
     }
     xfree(hashes);
-#endif /* DEBUG_HIST */
 }
+#endif /* DEBUG_HIST */
 
 /* Compares two word lists for equality. */
 static int
@@ -580,7 +614,8 @@ heq(const struct wordent *a0, const struct wordent *b0)
 }
 
 /* Renumber entries following p, which we will be deleting. */
-PG_STATIC void renumberHist(struct Hist *p)
+PG_STATIC void
+renumberHist(struct Hist *p)
 {
     int n = p->Href;
     while ((p = p->Hnext))
@@ -609,7 +644,8 @@ static struct {
 } hashStats;
 
 #ifdef DEBUG_HIST
-void checkHistHashTable(int print)
+void
+checkHistHashTable(int print)
 {
     unsigned occupied = 0;
     unsigned deleted = 0;
@@ -631,7 +667,8 @@ static int doneTest = 0;
 
 /* Main entry point for displaying history statistics and hash function
  * behavior. */
-void displayHistStats(const char *reason)
+void
+displayHistStats(const char *reason)
 {
     /* Just hash statistics for now. */
     xprintf("%s history hash table len %u count %u (deleted %d)\n", reason,
@@ -652,12 +689,15 @@ void displayHistStats(const char *reason)
     }
 }
 #else
-void displayHistStats(const char *reason) {}
+void
+displayHistStats(const char *reason)
+{
+    USE(reason);
+}
 #endif
 
-static void insertHistHashTable(struct Hist *np, unsigned hashval);
-
-static void discardHistHashTable( void )
+static void
+discardHistHashTable(void)
 {
     if (histHashTable == NULL)
         return;
@@ -667,7 +707,8 @@ static void discardHistHashTable( void )
 }
 
 /* Computes a new hash table size, when the current one is too small. */
-static inline unsigned getHashTableSize(unsigned histlen)
+static inline
+unsigned getHashTableSize(unsigned histlen)
 {
     unsigned target = histlen * 2;
     unsigned e = 5;
@@ -684,7 +725,8 @@ static inline unsigned getHashTableSize(unsigned histlen)
 }
 
 /* Create the hash table or resize, if necessary. */
-static void createHistHashTable(unsigned histlen)
+static void
+createHistHashTable(unsigned histlen)
 {
     if (histlen == 0) {
 	discardHistHashTable();
@@ -694,12 +736,6 @@ static void createHistHashTable(unsigned histlen)
 	if (histCount < histHashTableLength * 3 / 4)
 	    return;			/* good enough for now */
 	discardHistHashTable();		/* too small */
-    }
-    if (histlen < 0) {
-        histlen = getn(varval(STRhistory));
-	if (histlen == 0)
-	    return;			/* no need for hash table */
-	assert(histlen > 0);
     }
     histHashTableLength = getHashTableSize(
 	histlen > histCount ? histlen : histCount);
@@ -722,7 +758,8 @@ static void createHistHashTable(unsigned histlen)
 /* Insert np into the hash table.  We assume that np is already on the
  * Histlist.  The specified hashval matches the new Hist entry but has not yet
  * been assigned to Hhash (or the element is already on the hash table). */
-static void insertHistHashTable(struct Hist *np, unsigned hashval)
+static void
+insertHistHashTable(struct Hist *np, unsigned hashval)
 {
     unsigned rehashes = 0;
     unsigned hi = 0;
@@ -765,7 +802,8 @@ static void insertHistHashTable(struct Hist *np, unsigned hashval)
 }
 
 /* Remove the 'np' entry from the hash table. */
-static void removeHistHashTable(struct Hist *np)
+static void
+removeHistHashTable(struct Hist *np)
 {
     unsigned hi = np->Hhash;
     if (!histHashTable || !hi)
@@ -802,7 +840,8 @@ static void removeHistHashTable(struct Hist *np)
 
 /* Search the history hash table for a command matching lp, using hashval as
  * its hash value. */
-static struct Hist *findHistHashTable(struct wordent *lp, unsigned hashval)
+static struct Hist *
+findHistHashTable(struct wordent *lp, unsigned hashval)
 {
     unsigned deleted = 0;		/* number of deleted entries skipped */
     unsigned hi = hashval;
@@ -829,9 +868,10 @@ static struct Hist *findHistHashTable(struct wordent *lp, unsigned hashval)
  * before the first entry with equal times, so the caller can check for
  * duplicates.  When pTime is not NULL, use it as a starting point for search,
  * otherwise search from beginning (largest time value) of history list. */
-PG_STATIC struct Hist *mergeInsertionPoint(
-  struct Hist *np,                      /* new entry to be inserted */
-  struct Hist *pTime)                   /* hint about where to insert */
+PG_STATIC struct Hist *
+mergeInsertionPoint(
+    struct Hist *np,                      /* new entry to be inserted */
+    struct Hist *pTime)                   /* hint about where to insert */
 {
     struct Hist *pp, *p;
     if (histTail && histTail->Htime >= np->Htime)
@@ -1053,7 +1093,7 @@ dophist(int n, int hflg)
     if ((hflg & HIST_REV) == 0) {
 	/* Since the history list is stored most recent first, non-reversing
 	 * print needs to print (backwards) up the list. */
-	if (n >= histCount)
+	if ((unsigned)n >= histCount)
 	    hp = histTail;
 	else {
 	    for (hp = Histlist.Hnext;
