@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.82 2010/01/26 16:10:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.83 2010/01/26 20:03:17 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.82 2010/01/26 16:10:09 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.83 2010/01/26 20:03:17 christos Exp $")
 
 #include "ed.h"
 
@@ -928,7 +928,7 @@ dosub(Char sc, struct wordent *en, int global)
      * ANSI mode HP/UX compiler chokes on
      * return &enthist(HIST_PURGE, &lexi, 0)->Hlex;
      */
-    hst = enthist(HIST_PURGE, &lexi, 0, 0);
+    hst = enthist(HIST_PURGE, &lexi, 0, 0, -1);
     return &(hst->Hlex);
 }
 
