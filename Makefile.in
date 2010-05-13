@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.43 2009/10/17 21:46:17 christos Exp $
+# $tcsh: Makefile.in,v 3.44 2009/10/17 21:49:36 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -688,7 +688,7 @@ shar:
 	rm -rf tcsh-${VERSION}
 
 catalogs:
-	@(cd nls; make catalogs)
+	@(cd nls; ${MAKE} catalogs)
 
 tcsh-${VERSION}.tar.Z:
 	rm -rf tcsh-${VERSION} 

@@ -1,4 +1,4 @@
-# $tcsh: Makefile,v 1.14 2006/03/02 18:46:45 christos Exp $
+# $tcsh: Makefile.in,v 1.1 2009/10/17 17:08:40 christos Exp $
 
 LOCALES=	C et finnish french german greek italian ja pl russian \
 		spanish ukrainian
@@ -12,6 +12,8 @@ INSTALLED=$(LOCALES:%=@localedir@/%/LC_MESSAGES/tcsh.cat)
 all:	$(CATALOGS)
 
 install:	$(INSTALLED)
+
+catalogs: all
 
 @localedir@/%/LC_MESSAGES/tcsh.cat:	%.cat
 	mkdir -p $(@D)
