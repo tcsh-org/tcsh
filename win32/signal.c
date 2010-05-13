@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/signal.c,v 1.10 2006/04/29 07:19:09 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/signal.c,v 1.11 2006/08/25 17:49:57 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -507,12 +507,12 @@ void sigchild_thread(struct thread_args *args) {
 	GetExitCodeProcess(args->hproc,&exitcode);
 	CloseHandle(args->hproc);
 	sig_child_callback(args->pid,exitcode);
-	ffree(args);
     dprintf("exiting sigchild thread for pid %d\n",args->pid);
+	heap_free(args);
 }
 void start_sigchild_thread(HANDLE hproc, DWORD pid) {
 
-	struct thread_args *args=fmalloc(sizeof(struct thread_args));
+	struct thread_args *args=heap_alloc(sizeof(struct thread_args));
 	DWORD tid;
 	HANDLE hthr;
 	args->hproc = hproc;
