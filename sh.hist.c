@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.46 2010/05/12 16:20:16 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.47 2010/05/12 16:26:26 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.46 2010/05/12 16:20:16 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.47 2010/05/12 16:26:26 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
@@ -375,9 +375,10 @@ static unsigned
 hashhist(struct wordent *h0)
 {
     struct hashValue s;
-    initializeHash(&s);
     struct wordent *firstWord = h0->next;
     struct wordent *h = firstWord;
+
+    initializeHash(&s);
     for (; h != h0; h = h->next) {
         if (h->word[0] == '\n')
             break;                      /* don't hash newline */
