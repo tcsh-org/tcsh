@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.156 2010/02/09 20:22:22 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.157 2010/05/12 15:04:58 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -1104,7 +1104,7 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 #define short2blk(a) 		saveblk(a)
 #define short2str(a) 		caching_strip(a)
 #else
-#ifndef UTF16_STRINGS
+#if defined(WIDE_STRINGS) && !defined(UTF16_STRINGS)
 #define Strchr(a, b)		wcschr(a, b)
 #define Strrchr(a, b)		wcsrchr(a, b)
 #define Strcat(a, b)  		wcscat(a, b)

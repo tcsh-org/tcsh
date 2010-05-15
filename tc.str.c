@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.34 2010/02/15 00:46:22 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.35 2010/05/07 16:39:44 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.34 2010/02/15 00:46:22 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.35 2010/05/07 16:39:44 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -100,13 +100,17 @@ rt_mbtowc(Char *pwc, const char *s, size_t n)
     int ret;
     char back[MB_LEN_MAX];
     wchar_t tmp;
+#if defined(UTF16_STRINGS) && defined(HAVE_MBRTOWC)
     mbstate_t mb;
 
     memset (&mb, 0, sizeof mb);
     ret = mbrtowc(&tmp, s, n, &mb);
+#else
+    ret = mbtowc(&tmp, s, n);
+#endif
     if (ret > 0) {
 	*pwc = tmp;
-#ifdef UTF16_STRINGS
+#if defined(UTF16_STRINGS) && defined(HAVE_MBRTOWC)
 	if (tmp >= 0xd800 && tmp <= 0xdbff) {
 	    /* UTF-16 surrogate pair.  Fetch second half and compute
 	       UTF-32 value.  Dispense with the inverse test in this case. */
