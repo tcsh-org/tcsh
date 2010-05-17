@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.83 2010/01/26 20:03:17 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.84 2010/05/12 15:10:48 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.83 2010/01/26 20:03:17 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.84 2010/05/12 15:10:48 christos Exp $")
 
 #include "ed.h"
 
@@ -672,11 +672,11 @@ getexcl(Char sc)
     eChar c;
 
     if (sc == 0) {
-	sc = getC(0);
-	if (sc != '{') {
-	    ungetC(sc);
-	    sc = 0;
-	}
+	c = getC(0);
+	if (c == '{')
+	    sc = (Char) c;
+	else
+	    ungetC(c);
     }
     quesarg = -1;
 
@@ -693,7 +693,7 @@ getexcl(Char sc)
 	for (ip = hp->next->next; ip != hp->prev; ip = ip->next)
 	    dol++;
     left = 0, right = dol;
-    if (sc == HISTSUB) {
+    if (sc == HISTSUB && HISTSUB != '\0') {
 	ungetC('s'), unreadc(HISTSUB), c = ':';
 	goto subst;
     }
@@ -726,7 +726,7 @@ subst:
     exclc = right - left + 1;
     while (--left >= 0)
 	hp = hp->next;
-    if (sc == HISTSUB || c == ':') {
+    if ((sc == HISTSUB && HISTSUB != '\0') || c == ':') {
 	do {
 	    hp = getsub(hp);
 	    c = getC(0);
@@ -1147,7 +1147,7 @@ gethent(Char sc)
     int     event;
     int    back = 0;
 
-    c = sc == HISTSUB ? (eChar)HIST : getC(0);
+    c = (sc == HISTSUB && HISTSUB != '\0') ? (eChar)HIST : getC(0);
     if (c == (eChar)HIST) {
 	if (alhistp)
 	    return (alhistp);
