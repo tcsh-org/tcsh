@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.47 2010/05/07 15:41:58 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.48 2010/05/12 15:23:08 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.47 2010/05/07 15:41:58 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.48 2010/05/12 15:23:08 christos Exp $")
 
 endcode	:
 
@@ -79,7 +79,7 @@ getcray(void)
 
     if (target(MC_GET_SYSTEM, &data) != -1) {
 	static char hosttype_buf[sizeof(data.mc_pmt)+1];
-	char *p = (char *) &(data.mc_pmt);
+	unsigned char *p = (unsigned char *) &(data.mc_pmt);
 	char *q = hosttype_buf;
 	int n;
 
@@ -472,6 +472,7 @@ machtype: defined(M_i486) 				: "i486"
 machtype: defined(M_i386)				: "i386"
 vendor	: defined(__alpha)				: "dec"
 vendor	: defined(PPC)					: "apple"
+hosttype: defined(__arm__)				: "arm"
 hosttype: defined(__alpha)				: "alpha"
 hosttype: defined(PPC)					: "powerpc"
 machtype: defined(__alpha)				: "alpha"
