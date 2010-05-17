@@ -83,7 +83,7 @@ typedef unsigned short Char;
 static	int	 glob1 		(Char *, glob_t *, int);
 static	int	 glob2		(struct strbuf *, const Char *, glob_t *, int);
 static	int	 glob3		(struct strbuf *, const Char *, const Char *,
-				 glob_t *, int);
+				 const Char *, glob_t *, int);
 static	void	 globextend	(const char *, glob_t *);
 static	int	 match		(const char *, const Char *, const Char *,
 				 int);
@@ -527,7 +527,7 @@ glob2(struct strbuf *pathbuf, const Char *pattern, glob_t *pglob, int no_match)
 	}
 	else {			/* need expansion, recurse */
 	    pathbuf->len = orig_len;
-	    return (glob3(pathbuf, pattern, p, pglob, no_match));
+	    return (glob3(pathbuf, pattern, p, pattern, pglob, no_match));
 	}
     }
     /* NOTREACHED */
@@ -553,32 +553,45 @@ One_Char_mbtowc(__Char *pwc, const Char *s, size_t n)
  
 static int
 glob3(struct strbuf *pathbuf, const Char *pattern, const Char *restpattern,
-      glob_t *pglob, int no_match)
+      const Char *pglobstar, glob_t *pglob, int no_match)
 {
     DIR    *dirp;
     struct dirent *dp;
     int     err;
     Char m_not = (pglob->gl_flags & GLOB_ALTNOT) ? M_ALTNOT : M_NOT;
     size_t orig_len;
-    const Char *p = pattern;
     int globstar = 0;
     int chase_symlinks = 0;
+    const Char *termstar = NULL;
 
     strbuf_terminate(pathbuf);
-    errno = 0;
+    orig_len = pathbuf->len;
+    errno = err = 0;
 
-    while (p < restpattern) {
+    while (pglobstar < restpattern) {
 	__Char wc;
-	size_t width = One_Char_mbtowc(&wc, p, MB_LEN_MAX);
-	if ((p[0] & M_MASK) == M_ALL && (p[width] & M_MASK) == M_ALL 
-	    && p + width < restpattern) {
+	size_t width = One_Char_mbtowc(&wc, pglobstar, MB_LEN_MAX);
+	if ((pglobstar[0] & M_MASK) == M_ALL &&
+	    (pglobstar[width] & M_MASK) == M_ALL) {
 	    globstar = 1;
-	    if (p[width + width] == M_ALL)
-		chase_symlinks = 1;
+	    chase_symlinks = (pglobstar[2 * width] & M_MASK) == M_ALL;
+	    termstar = pglobstar + (2 + chase_symlinks) * width;
 	    break;
 	}
-        p += width;
+        pglobstar += width;
     } 
+
+    if (globstar) {
+	err = pglobstar==pattern && termstar==restpattern ?
+		LCHAR(*restpattern) == SEP ?
+		glob2(pathbuf, restpattern + 1, pglob, no_match) :
+		glob2(pathbuf, restpattern - 1, pglob, no_match) :
+		glob3(pathbuf, pattern, restpattern, termstar, pglob, no_match);
+	if (err)
+	    return err;
+	pathbuf->len = orig_len;
+	strbuf_terminate(pathbuf);
+    }
 
     if (!(dirp = Opendir(pathbuf->s))) {
 	/* todo: don't call for ENOENT or ENOTDIR? */
@@ -589,9 +602,6 @@ glob3(struct strbuf *pathbuf, const Char *pattern, const Char *restpattern,
 	    return (0);
     }
 
-    err = 0;
-
-    orig_len = pathbuf->len;
     /* search directory for matching names */
     while ((dp = readdir(dirp)) != NULL) {
 	/* initial DOT must be matched literally */
@@ -603,8 +613,7 @@ glob3(struct strbuf *pathbuf, const Char *pattern, const Char *restpattern,
 	strbuf_append(pathbuf, dp->d_name);
 	strbuf_terminate(pathbuf);
 
-	if (p != restpattern) {
-	    size_t save_len = pathbuf->len;
+	if (globstar) {
 #ifdef S_IFLNK
 	    if (!chase_symlinks) {
 		struct stat sbuf;
@@ -612,18 +621,12 @@ glob3(struct strbuf *pathbuf, const Char *pattern, const Char *restpattern,
 		    continue;
 	    }
 #endif
-	    if (match(pathbuf->s + orig_len, pattern, restpattern,
-		(int)m_not) == no_match) {
-		if (match(pathbuf->s + orig_len, pattern, p + 1, (int)m_not)
-		    == no_match)
+	    if (match(pathbuf->s + orig_len, pattern, termstar-1,
+		(int)m_not) == no_match) 
 		    continue;
-	    } else 
-		if ((err = glob2(pathbuf, restpattern, pglob, no_match)) != 0)
-		    break;
-	    pathbuf->len = save_len;
 	    strbuf_append1(pathbuf, SEP);
 	    strbuf_terminate(pathbuf);
-	    if ((err = glob2(pathbuf, p, pglob, no_match)) != 0)
+	    if ((err = glob2(pathbuf, pglobstar, pglob, no_match)) != 0)
 		break;
 	} else {
 	    if (match(pathbuf->s + orig_len, pattern, restpattern,

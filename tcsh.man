@@ -1339,11 +1339,14 @@ pattern.
 .PP
 In matching filenames, the character `.' at the beginning of a filename or
 immediately following a `/', as well as the character `/' must be matched
-explicitly unless 
+explicitly (unless either
 .B globdot
-is set.  The character `*' matches any string of characters, including the
-null string.  The character `?' matches any single character.  The sequence
-`[...]' matches any one of the characters enclosed.  Within `[...]', a pair of
+or
+.B globstar
+or both are set(+)).  The character `*' matches any string of characters, 
+including the null string.  The character `?' matches any single character.  
+The sequence `[...]' matches any one of the characters enclosed.  
+Within `[...]', a pair of
 characters separated by `\-' matches any character lexically between the two.
 .PP
 (+) Some glob-patterns can be negated:
@@ -1394,13 +1397,18 @@ only if there were no files in the current directory ending in `.a', `.c', or
 of patterns) which matches nothing is left unchanged rather than causing
 an error.
 .PP
-The \fBglobstar\fR shell variable can be set to allow `**' and `***' as 
-additional glob-pattern that matches filenames and directories recursively.  
-For example, `grep /usr/include/**.h' would search for all .h files in the
-directory `/usr/include' and any directory contained in `/usr/include', and 
-`touch **' would touch all the files in the current directory and each 
-subdirectory.  To prevent problems with recursion, the `**' glob-pattern will
-not descend into a symbolic link containing a directory.  To follow symlinks,
+The \fBglobstar\fR shell variable can be set to allow `**' or `***' as 
+a file glob pattern that matches any string of characters including `/',
+recursively traversing any existing sub-directories.  For example, 
+`ls **.c' will list all the .c files in the current directory tree.
+If used by itself, it will match match zero or more sub-directories
+(e.g. `ls /usr/include/**/time.h' will list any file named `time.h'
+in the /usr/include directory tree; `ls /usr/include/**time.h' will match 
+any file in the /usr/include directory tree ending in `time.h'; and
+`ls /usr/include/**time**.h' will match any .h file with `time' either
+in a subdirectory name or in the filename itself).
+To prevent problems with recursion, the `**' glob-pattern will not 
+descend into a symbolic link containing a directory.  To override this,
 use `***' (+)
 .PP
 The \fBnoglob\fR shell variable can be set to prevent filename substitution,
@@ -3864,8 +3872,12 @@ with `.' except for `.' and `..'
 .TP 8
 .B globstar \fR(+)
 If set, the `**' and `***' file glob patterns will match any string of 
-characters and traverse any sub-directories recursively.  (e.g. `ls **.c'
-will list all the .c files in the current directory and subdirectories).
+characters including `/' traversing any existing sub-directories.  (e.g. 
+`ls **.c' will list all the .c files in the current directory tree).
+If used by itself, it will match match zero or more sub-directories
+(e.g. `ls /usr/include/**/time.h' will list any file named `time.h'
+in the /usr/include directory tree; whereas `ls /usr/include/**time.h'
+will match any file in the /usr/include directory tree ending in `time.h').
 To prevent problems with recursion, the `**' glob-pattern will not 
 descend into a symbolic link containing a directory.  To override this,
 use `***'
