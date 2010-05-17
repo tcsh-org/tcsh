@@ -1,3 +1,7 @@
+ 36. Error out when processing the last incomplete line instead of silently
+     ignoring it (Anders Kaseorg)
+ 35. Fix SEGV from echo ``
+ 34. Better fixes for histchars and promptchars (nargs)
  33. Fix win32 issue calling fmalloc/ffree from non-thread-safe context.
      (Fabio Fabbri)
  32. V6.17.02 - 20100512

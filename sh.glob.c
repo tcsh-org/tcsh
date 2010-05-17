@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.77 2009/10/30 14:27:13 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.78 2010/04/28 17:33:19 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.77 2009/10/30 14:27:13 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.78 2010/04/28 17:33:19 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -781,6 +781,8 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 		stderror(ERR_OLD);
 	    alias(&paraml);
 	    t = syntax(paraml.next, &paraml, 0);
+	    if (t == NULL)
+		return;
 	    cleanup_push(t, syntax_cleanup);
 	    /* The F_BACKQ flag must set so the job output is correct if
 	     * printexitvalue is set.  If it's not set, the job output

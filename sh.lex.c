@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.84 2010/05/12 15:10:48 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.85 2010/05/17 19:24:32 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.84 2010/05/12 15:10:48 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.85 2010/05/17 19:24:32 christos Exp $")
 
 #include "ed.h"
 
@@ -460,7 +460,13 @@ getC1(int flag)
 		setexclp(exclnxt->word);
 	    continue;
 	}
-	c = readc(0);
+	c = readc(1);
+
+	/* Catch EOF in the middle of a line.  (An EOF at the beginning of
+	 * a line would have been processed by the readc(0) in lex().) */
+	if (c == CHAR_ERR)
+	    stderror(ERR_EOF);
+
 	if (c == '$' && (flag & DODOL)) {
 	    getdol();
 	    continue;

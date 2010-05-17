@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.79 2010/01/26 20:03:17 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.80 2010/05/12 15:02:47 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.79 2010/01/26 20:03:17 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.80 2010/05/12 15:02:47 christos Exp $")
 
 /*
  * C shell
@@ -1007,6 +1007,10 @@ again:
 		Strbuf_append1(&lbuf, (Char) c);
 	}
 	Strbuf_terminate(&lbuf);
+
+	/* Catch EOF in the middle of a line. */
+	if (c == CHAR_ERR && lbuf.len != 0)
+	    stderror(ERR_EOF);
 
 	/*
 	 * Check for EOF or compare to terminator -- before expansion
