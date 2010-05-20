@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.78 2010/04/28 17:33:19 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.79 2010/05/17 19:36:45 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.78 2010/04/28 17:33:19 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.79 2010/05/17 19:36:45 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -787,7 +787,7 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 	    /* The F_BACKQ flag must set so the job output is correct if
 	     * printexitvalue is set.  If it's not set, the job output
 	     * will have "Exit N" appended where N is the exit status. */
-	    t->t_dflg = F_BACKQ;
+	    t->t_dflg = F_BACKQ|F_NOFORK;
 	    if (seterr)
 		stderror(ERR_OLD);
 #ifdef SIGTSTP
