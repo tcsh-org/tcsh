@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.81 2009/10/29 14:55:13 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.82 2009/10/30 14:27:13 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.sem.c,v 3.81 2009/10/29 14:55:13 christos Exp $")
+RCSID("$tcsh: sh.sem.c,v 3.82 2009/10/30 14:27:13 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -232,8 +232,7 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 		    if (strchr("+-", t->t_dcom[1][0])) {
 			if (t->t_dcom[2]) {
 			    setname("nice");
-			    t->t_nice =
-				getn(t->t_dcom[1]);
+			    t->t_nice = (unsigned char)getn(t->t_dcom[1]);
 			    lshift(t->t_dcom, 2);
 			    t->t_dflg |= F_NICE;
 			}

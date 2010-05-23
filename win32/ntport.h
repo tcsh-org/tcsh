@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntport.h,v 1.12 2006/04/07 00:57:59 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntport.h,v 1.13 2007/05/31 08:26:12 corinna Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -157,6 +157,8 @@ pretty */
 #define setpgrp(a,b) (-1)
 #define tcsetattr(a,b,c) 0
 
+#define inline __inline
+
 #undef stdin
 #undef stdout
 #undef stderr
@@ -223,6 +225,7 @@ typedef unsigned char u_char;
 typedef size_t caddr_t;
 typedef int sig_atomic_t;
 typedef int mode_t;
+typedef UINT32 uint32_t;
 
 struct timeval{
 	long tv_sec;
