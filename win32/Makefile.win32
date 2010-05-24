@@ -1,4 +1,4 @@
-# $Id: Makefile.win32,v 1.13 2008/08/24 23:29:32 amold Exp $
+# $Id: Makefile.win32,v 1.14 2010/05/23 17:20:32 amold Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -95,10 +95,7 @@ ED=	ed
 RM=	-del
 #
 # Resources. which icon you want to use.
-#NTRES = BSDLOGO
-# Go Ky !
-
-NTRES = WILDCAT
+NTRES = BSDLOGO
 
 ASSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.exp.c sh.file.c sh.func.c sh.glob.c sh.hist.c sh.init.c \
