@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.47 2010/05/12 16:26:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.48 2010/05/13 17:56:29 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.47 2010/05/12 16:26:26 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.48 2010/05/13 17:56:29 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
@@ -377,6 +377,7 @@ hashhist(struct wordent *h0)
     struct hashValue s;
     struct wordent *firstWord = h0->next;
     struct wordent *h = firstWord;
+    unsigned hash = 0;
 
     initializeHash(&s);
     for (; h != h0; h = h->next) {
@@ -386,7 +387,7 @@ hashhist(struct wordent *h0)
             addCharToHash(&s, ' ');	/* space between words */
 	addWordToHash(&s, h->word);
     }
-    unsigned hash = finalizeHash(&s);
+    hash = finalizeHash(&s);
     /* Zero means no hash value, so never return zero as a hash value. */
     return hash ? hash : 0x7fffffff;	/* prime! */
 }

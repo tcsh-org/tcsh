@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/stdio.c,v 1.7 2006/03/03 22:08:45 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/stdio.c,v 1.9 2006/03/11 01:47:40 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -419,8 +419,21 @@ int nt_stat(const char *filename, struct stat *stbuf) {
 			(*(filename+1) && *(filename+1) == ':' && !*(filename+2)) ) {
 		return _stat("C:/",(struct _stat *)stbuf);
 	}
-	else 
-		return _stat(filename,(struct _stat *)stbuf);
+        else  {
+            char *last = (char*)filename + strlen(filename) -1;
+            int rc = 0;
+            BOOL lastslash = (*last == '/');
+            if(lastslash)
+            {
+                *last = 0;
+            }
+            rc =  _stat(filename,(struct _stat *)stbuf);
+            if(lastslash)
+            {
+                *last = '/';
+            }
+            return rc;
+        }
 }
 //
 // replacement for creat that makes handle non-inheritable. 
