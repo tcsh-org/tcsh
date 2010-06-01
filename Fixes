@@ -1,3 +1,4 @@
+ 39. Check for EOS before ** from Greg Dionne
  38. Don't fork in backeval from Bryan Mason
  37. Better globstar support from Greg Dionne
  36. Error out when processing the last incomplete line instead of silently

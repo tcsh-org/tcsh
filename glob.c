@@ -744,9 +744,9 @@ match(const char *name, const Char *pat, const Char *patend, int m_not)
 		return (0);
 	    break;
 	default:
-	    name += lwk;
-	    if (samecase(wk) != samecase(wc))
+	    if (*name == EOS || samecase(wk) != samecase(wc))
 		return (0);
+	    name += lwk;
 	    break;
 	}
     }
