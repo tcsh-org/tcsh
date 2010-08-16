@@ -1,3 +1,4 @@
+ 41. remove .bat and .cmd handling for executables on cygwin (Corinna Vinschen)
  40. Don't echo history while history -L or history -M
  39. Check for EOS before ** from Greg Dionne
  38. Don't fork in backeval from Bryan Mason

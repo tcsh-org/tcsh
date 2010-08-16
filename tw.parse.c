@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.127 2010/05/07 16:19:04 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.128 2010/05/07 16:42:45 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.127 2010/05/07 16:19:04 christos Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.128 2010/05/07 16:42:45 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -987,9 +987,15 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 	    /*
 	     * Turn foo.{exe,com,bat,cmd} into foo since UWIN's readdir returns
 	     * the file with the .exe, .com, .bat, .cmd extension
+	     *
+	     * Same for Cygwin, but only for .exe and .com extension.
 	     */
 	    {
+#ifdef __CYGWIN__
+		static const char *rext[] = { ".exe", ".com" };
+#else
 		static const char *rext[] = { ".exe", ".bat", ".com", ".cmd" };
+#endif
 		size_t exti = Strlen(item.s);
 
 		if (exti > 4) {
