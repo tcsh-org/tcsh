@@ -2945,6 +2945,10 @@ may have allocated to it at a given time
 the maximum amount of virtual memory a process
 may have allocated to it at a given time (address space)
 .TP
+\fIvmemoryuse\fR
+the maximum amount of virtual memory a process
+may have allocated to it at a given time
+.TP
 \fIheapsize\fR
 the maximum amount of memory a process
 may allocate per \fIbrk()\fR system call
@@ -2988,10 +2992,14 @@ the timeout for RT tasks in microseconds for this user.
 \fImaximum-use\fR may be given as a (floating point or
 integer) number followed by a scale factor.  For all limits
 other than \fIcputime\fR the default scale is `k' or `kilobytes'
-(1024 bytes); a scale factor of `m' or `megabytes' may also
-be used.  For \fIcputime\fR the default scaling is `seconds',
+(1024 bytes); a scale factor of `m' or `megabytes' or `g' or `gigabytes'
+may also be used.  For \fIcputime\fR the default scaling is `seconds',
 while `m' for minutes or `h' for hours, or a time of the
 form `mm:ss' giving minutes and seconds may be used.
+.PP
+If \fImaximum-use\fR  is `unlimited',
+then the limitation on the specified \fIresource\fR
+is removed (this is equivalent to the \fIunlimit\fR builtin command).
 .PP
 For both \fIresource\fR names and scale factors, unambiguous
 prefixes of the names suffice.
