@@ -1,3 +1,4 @@
+ 43. PR/109: make wait interruptible (Vojtech Vitek)
  42. resource limit fixes: signed vs. unsigned, megabyte issue, doc issues
      (Robert Byrnes)
  41. remove .bat and .cmd handling for executables on cygwin (Corinna Vinschen)

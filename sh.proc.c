@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.111 2010/01/26 20:03:18 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.112 2010/05/07 18:16:07 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.111 2010/01/26 20:03:18 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.112 2010/05/07 18:16:07 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -260,7 +260,7 @@ loop:
     jobdebug_flush();
 
     if ((pid == 0) || (pid == -1)) {
-	handle_pending_signals();
+	(void)handle_pending_signals();
 	jobdebug_xprintf(("errno == %d\n", errno));
 	if (errno == EINTR)
 	    goto loop;
@@ -501,7 +501,7 @@ pjwait(struct process *pp)
     pause_mask = oset;
     sigdelset(&pause_mask, SIGCHLD);
     for (;;) {
-	handle_pending_signals();
+	(void)handle_pending_signals();
 	jobflags = 0;
 	do
 	    jobflags |= fp->p_flags;
@@ -594,9 +594,10 @@ loop:
     for (pp = proclist.p_next; pp; pp = pp->p_next)
 	if (pp->p_procid &&	/* pp->p_procid == pp->p_jobid && */
 	    pp->p_flags & PRUNNING) {
-	    handle_pending_signals();
+	    (void)handle_pending_signals();
 	    sigsuspend(&pause_mask);
-	    handle_pending_signals();
+	    if (handle_pending_signals())
+		break;
 	    goto loop;
 	}
     pjobs = 0;
@@ -1871,7 +1872,7 @@ pfork(struct command *t, int wanttty)
 	    sigdelset(&pause_mask, SIGCHLD);
 	    sigdelset(&pause_mask, SIGSYNCH);
 	    sigsuspend(&pause_mask);
-	    handle_pending_signals();
+	    (void)handle_pending_signals();
 	    if (sigaction(SIGSYNCH, &osa, NULL))
 		stderror(ERR_SYSTEM, "pfork parent: sigaction restore",
 			 strerror(errno));
