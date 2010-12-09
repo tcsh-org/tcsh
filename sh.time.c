@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.time.c,v 3.33 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.time.c,v 3.34 2010/10/09 15:32:04 christos Exp $ */
 /*
  * sh.time.c: Shell time keeping and printing.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.time.c,v 3.33 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: sh.time.c,v 3.34 2010/10/09 15:32:04 christos Exp $")
 
 #ifdef SUNOS4
 # include <machine/param.h>
@@ -515,7 +515,7 @@ prusage(struct tms *bs, struct tms *es, clock_t e, clock_t b)
 #  ifdef _OSD_POSIX
 		xprintf("0",0);
 #  else
-		xprintf("%ld", (long)(r1->ru_maxrss / 2L));
+		xprintf("%ld", (long)r1->ru_maxrss);
 #  endif
 # endif	/* convex */
 #endif /* SUNOS4 */
@@ -610,7 +610,7 @@ prusage(struct tms *bs, struct tms *es, clock_t e, clock_t b)
 		break;
 
 	    case 'M':
-		xprintf("%ld", (long)(r1->ps_maxrss / 2));
+		xprintf("%ld", (long)r1->ps_maxrss);
 		break;
 
 	    case 'F':
