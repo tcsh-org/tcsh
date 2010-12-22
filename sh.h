@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.157 2010/05/12 15:04:58 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.158 2010/05/15 13:32:09 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -75,6 +75,10 @@ typedef unsigned long intptr_t;
 # define INIT_ZERO_STRUCT
 # define force_read xread
 #endif /*!WINNT_NATIVE */
+
+#if defined(KANJI) && defined(WIDE_STRINGS) && defined(HAVE_NL_LANGINFO) && defined(CODESET)
+#define AUTOSET_KANJI
+#endif
 /*
  * Sanity
  */

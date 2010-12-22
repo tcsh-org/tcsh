@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.36 2010/05/15 13:32:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.37 2010/12/22 17:25:05 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.36 2010/05/15 13:32:09 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.37 2010/12/22 17:25:05 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -101,7 +101,20 @@ rt_mbtowc(Char *pwc, const char *s, size_t n)
     char back[MB_LEN_MAX];
     wchar_t tmp;
 #if defined(UTF16_STRINGS) && defined(HAVE_MBRTOWC)
+# if defined(AUTOSET_KANJI)
+    static mbstate_t mb_zero, mb;
+    /*
+     * Workaround the Shift-JIS endcoding that translates unshifted 7 bit ASCII!
+     */
+    if (!adrof(STRnokanji) && n && pwc && s && (*s == '\\' || *s == '~') &&
+	!memcmp(&mb, &mb_zero, sizeof(mb)))
+    {
+	*pwc = *s;
+	return 1;
+    }
+# else
     mbstate_t mb;
+# endif
 
     memset (&mb, 0, sizeof mb);
     ret = mbrtowc(&tmp, s, n, &mb);

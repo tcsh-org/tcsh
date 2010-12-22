@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.58 2010/05/08 00:41:58 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.59 2010/05/12 15:01:52 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -390,6 +390,9 @@ extern	Char		 *unparse	(struct command *);
 #if defined(DSPMBYTE)
 extern	void 		  update_dspmbyte_vars	(void);
 extern	void		  autoset_dspmbyte	(const Char *);
+#endif
+#if defined(AUTOSET_KANJI)
+extern	void		  autoset_kanji	(void);
 #endif
 
 /*

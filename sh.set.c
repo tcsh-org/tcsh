@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.77 2010/05/12 15:19:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.78 2010/05/12 15:35:37 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.77 2010/05/12 15:19:45 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.78 2010/05/12 15:35:37 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1098,7 +1098,8 @@ x:
     }
 }
 
-#if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
+#if defined(KANJI)
+# if defined(SHORT_STRINGS) && defined(DSPMBYTE)
 extern int dspmbyte_ls;
 
 void
@@ -1273,4 +1274,26 @@ autoset_dspmbyte(const Char *pcp)
 	}
     }
 }
+# elif defined(AUTOSET_KANJI)
+void
+autoset_kanji(void)
+{
+    char *codeset = nl_langinfo(CODESET);
+    
+    if (*codeset == '\0') {
+	if (adrof(STRnokanji) == NULL)
+	    setNS(STRnokanji);
+	return;
+    }
+
+    if (strcasestr(codeset, "SHIFT_JIS") == (char*)0) {
+	if (adrof(STRnokanji) == NULL)
+	    setNS(STRnokanji);
+	return;
+    }
+
+    if (adrof(STRnokanji) != NULL)
+	unsetv(STRnokanji);
+}
+#endif
 #endif

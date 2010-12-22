@@ -1,3 +1,7 @@
+ 45. Add AUTOSET_KANJI which works around the Shift-JIS encoding that
+     translates unshifted 7 bit ASCII (Werner Fink)
+ 44. Handle mb{r,}towc() returning 0 by setting the return value to NUL
+     (Jean-Luc Leger)
  43. PR/109: make wait interruptible (Vojtech Vitek)
  42. resource limit fixes: signed vs. unsigned, megabyte issue, doc issues
      (Robert Byrnes)

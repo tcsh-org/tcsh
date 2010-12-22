@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.158 2010/05/12 15:35:37 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.159 2010/07/09 15:24:56 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.158 2010/05/12 15:35:37 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.159 2010/07/09 15:24:56 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -802,7 +802,14 @@ main(int argc, char **argv)
       nt_autoset_dspmbyte();
 #endif /* WINNT_NATIVE */
 #endif
-
+#if defined(AUTOSET_KANJI) 
+# if defined(NLS) && defined(LC_CTYPE)
+    if (setlocale(LC_CTYPE, NULL) != NULL || getenv("LANG") != NULL)
+# else
+    if (getenv("LANG") != NULL)
+# endif
+	autoset_kanji();
+#endif /* AUTOSET_KANJI */
     fix_version();		/* publish the shell version */
 
     if (argc > 1 && strcmp(argv[1], "--version") == 0) {

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.156 2010/05/08 00:34:41 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.157 2010/10/15 17:14:20 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.156 2010/05/08 00:34:41 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.157 2010/10/15 17:14:20 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1423,6 +1423,9 @@ dosetenv(Char **v, struct command *c)
 # ifdef LC_CTYPE
 	(void) setlocale(LC_CTYPE, ""); /* for iscntrl */
 # endif /* LC_CTYPE */
+# if defined(AUTOSET_KANJI)
+        autoset_kanji();
+# endif /* AUTOSET_KANJI */
 # ifdef NLS_CATALOGS
 #  ifdef LC_MESSAGES
 	(void) setlocale(LC_MESSAGES, "");
