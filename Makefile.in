@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.44 2009/10/17 21:49:36 christos Exp $
+# $tcsh: Makefile.in,v 3.45 2010/05/13 18:39:02 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -340,6 +340,7 @@ CC = @CC@
 # for NEC SX-4
 #CC=	cc	-h0,ansi,novector,float0
 #CC=	lcc	-wa 
+CC_FOR_GETHOST = @CC_FOR_GETHOST@
 ED=	ed
 AS=	as
 RM=	rm
@@ -446,7 +447,7 @@ pure:$(P) ${OBJS}
 
 gethost:  gethost.c sh.err.h tc.const.h sh.h
 	rm -f gethost
-	${CC} -o gethost ${LDFLAGS} ${CFLAGS} ${CPPFLAGS} ${DFLAGS} $(srcdir)/gethost.c ${LIBES} ${EXTRALIBS}
+	${CC_FOR_GETHOST} -o gethost ${CPPFLAGS} $(srcdir)/gethost.c
 
 tc.defs.c:	gethost host.defs
 	@rm -f $@.tmp

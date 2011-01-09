@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.112 2010/05/07 18:16:07 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.113 2010/11/29 15:28:58 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.112 2010/05/07 18:16:07 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.113 2010/11/29 15:28:58 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -48,7 +48,9 @@ RCSID("$tcsh: sh.proc.c,v 3.112 2010/05/07 18:16:07 christos Exp $")
 #endif /* aiws */
 
 #if defined(_BSD) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(linux) || defined(__GNU__) || defined(__GLIBC__)
-# define BSDWAIT
+# if !defined(__ANDROID__)
+#  define BSDWAIT
+# endif
 #endif /* _BSD || (IRIS4D && __STDC__) || __lucid || glibc */
 #ifndef WTERMSIG
 # define WTERMSIG(w)	(((union wait *) &(w))->w_termsig)
@@ -221,7 +223,11 @@ loop:
 #   ifdef hpux
     pid = wait3(&w.w_status, WNOHANG, 0);
 #   else	/* !hpux */
+#     ifndef BSDWAIT
+    pid = wait3(&w, WNOHANG, &ru);
+#     else
     pid = wait3(&w.w_status, WNOHANG, &ru);
+#     endif /* BSDWAIT */
 #   endif /* !hpux */
 #  else /* !BSDTIMES */
 #   ifdef ODT  /* For Sco Unix 3.2.0 or ODT 1.0 */

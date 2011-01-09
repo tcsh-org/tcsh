@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.48 2010/05/12 15:23:08 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.49 2010/05/17 19:23:06 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.48 2010/05/12 15:23:08 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.49 2010/05/17 19:23:06 christos Exp $")
 
 endcode	:
 
@@ -461,6 +461,7 @@ hosttype: defined(__x86_64__)				: "x86_64-linux"
 hosttype: defined(M_i586) 				: "i586-linux"
 hosttype: defined(M_i486) 				: "i486-linux"
 hosttype: defined(M_i386)				: "i386-linux"
+ostype	: defined(__ANDROID__)				: "android"
 ostype	: 						: "linux"
 machtype: defined(__ia64__)				: "ia64"
 machtype: defined(__powerpc64__)			: "powerpc64"
@@ -470,6 +471,8 @@ machtype: defined(__x86_64__)				: "x86_64"
 machtype: defined(M_i586) 				: "i586"
 machtype: defined(M_i486) 				: "i486"
 machtype: defined(M_i386)				: "i386"
+machtype: defined(__arm__)				: "arm"
+vendor	: defined(__ANDROID__)				: "linux"
 vendor	: defined(__alpha)				: "dec"
 vendor	: defined(PPC)					: "apple"
 hosttype: defined(__arm__)				: "arm"
