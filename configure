@@ -670,6 +670,7 @@ OBJEXT
 CPP
 GREP
 EGREP
+CC_FOR_GETHOST
 LIBICONV
 LTLIBICONV
 DFLAGS
@@ -1899,6 +1900,11 @@ case "${host}" in
   *-ibm-os390*)
     CC='c89'
     tcsh_config_file=os390
+  ;;
+
+  ## Android
+  *-*-android*)
+    tcsh_config_file=android
   ;;
 
   ## Linux
@@ -3452,6 +3458,13 @@ echo "${ECHO_T}$ac_cv_prog_gcc_traditional" >&6; }
   if test $ac_cv_prog_gcc_traditional = yes; then
     CC="$CC -traditional"
   fi
+fi
+
+
+if test "x${cross_compiling}" = xyes ; then
+  CC_FOR_GETHOST="cc"
+else
+  CC_FOR_GETHOST="\$(CC)"
 fi
 
 
@@ -8293,7 +8306,8 @@ _ACEOF
 
   fi
 
-{ echo "$as_me:$LINENO: checking whether setpgrp takes no argument" >&5
+if test "x${cross_compiling}" != xyes ; then
+  { echo "$as_me:$LINENO: checking whether setpgrp takes no argument" >&5
 echo $ECHO_N "checking whether setpgrp takes no argument... $ECHO_C" >&6; }
 if test "${ac_cv_func_setpgrp_void+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -8365,6 +8379,9 @@ _ACEOF
 
 fi
 
+else
+  ac_cv_func_setpgrp_void=yes
+fi
 { echo "$as_me:$LINENO: checking for working strcoll" >&5
 echo $ECHO_N "checking for working strcoll... $ECHO_C" >&6; }
 if test "${ac_cv_func_strcoll_works+set}" = set; then
@@ -9304,6 +9321,7 @@ OBJEXT!$OBJEXT$ac_delim
 CPP!$CPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
+CC_FOR_GETHOST!$CC_FOR_GETHOST$ac_delim
 LIBICONV!$LIBICONV$ac_delim
 LTLIBICONV!$LTLIBICONV$ac_delim
 DFLAGS!$DFLAGS$ac_delim
@@ -9313,7 +9331,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 62; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 63; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
