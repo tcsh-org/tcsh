@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.160 2010/12/22 17:26:04 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.161 2011/01/09 16:25:29 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.160 2010/12/22 17:26:04 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.161 2011/01/09 16:25:29 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -553,8 +553,13 @@ main(int argc, char **argv)
 	cp = quote(SAVE(tcp));
     else
 #ifdef __ANDROID__
-	/* On Android, $HOME usually isn't set.  Default to the sdcard root
-	   dir as home to enable loading user RC files. */
+	/* On Android, $HOME usually isn't set, so we can't load user RC files.
+	   Check for the environment variable EXTERNAL_STORAGE, which contains
+	   the mount point of the external storage (SD card, mostly).  If
+	   EXTERNAL_STORAGE isn't set fall back to "/sdcard". */
+    if ((tcp = getenv("EXTERNAL_STORAGE")) != NULL)
+	cp = quote(SAVE(tcp));
+    else
 	cp = quote(SAVE("/sdcard"));
 #else
 	cp = NULL;
