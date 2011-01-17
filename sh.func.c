@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.157 2010/10/15 17:14:20 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.158 2010/12/22 17:26:04 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.157 2010/10/15 17:14:20 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.158 2010/12/22 17:26:04 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -520,12 +520,13 @@ doforeach(Char **v, struct command *c)
 
     USE(c);
     v++;
-    sp = cp = strip(*v);
-    if (!letter(*sp))
+    cp = sp = strip(*v);
+    if (!letter(*cp))
 	stderror(ERR_NAME | ERR_VARBEGIN);
-    while (*cp && alnum(*cp))
+    do {
 	cp++;
-    if (*cp)
+    } while (alnum(*cp));
+    if (*cp != '\0')
 	stderror(ERR_NAME | ERR_VARALNUM);
     cp = *v++;
     if (v[0][0] != '(' || v[blklen(v) - 1][0] != ')')
@@ -1373,13 +1374,16 @@ dosetenv(Char **v, struct command *c)
     }
 
     vp = *v++;
-
     lp = vp;
- 
-    for (; *lp != '\0' ; lp++) {
-	if (*lp == '=')
-	    stderror(ERR_NAME | ERR_SYNTAX);
-    }
+
+    if (!letter(*lp))
+	stderror(ERR_NAME | ERR_VARBEGIN);
+    do {
+	lp++;
+    } while (alnum(*lp));
+    if (*lp != '\0')
+	stderror(ERR_NAME | ERR_VARALNUM);
+
     if ((lp = *v++) == 0)
 	lp = STRNULL;
 
