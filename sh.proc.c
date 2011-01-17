@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.113 2010/11/29 15:28:58 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.114 2011/01/09 16:25:29 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.113 2010/11/29 15:28:58 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.114 2011/01/09 16:25:29 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -557,6 +557,10 @@ pjwait(struct process *pp)
     reason = 0;
     fp = pp;
     do {
+	/* In case of pipelines only the result of the last
+	 * command should be taken in account */
+	if ((fp->p_flags & PPOU) || (fp->p_flags & PBACKQ))
+	    continue;
 	if (fp->p_reason)
 	    reason = fp->p_flags & (PSIGNALED | PINTERRUPTED) ?
 		fp->p_reason | META : fp->p_reason;
