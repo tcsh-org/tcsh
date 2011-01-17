@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.142 2010/01/26 20:03:18 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.143 2010/05/07 16:19:04 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.142 2010/01/26 20:03:18 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.143 2010/05/07 16:19:04 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -2025,12 +2025,13 @@ remotehost(void)
     }
     wait_options = 0;
  done:
+    cleanup_push(&hostname, strbuf_cleanup);
     xclose(fds[0]);
     while ((wait_res = waitpid(pid, &status, wait_options)) == -1
 	   && errno == EINTR)
 	handle_pending_signals();
-    cleanup_push(&hostname, strbuf_cleanup);
-    if (wait_res == pid && WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+    if (hostname.len > 0 && wait_res == pid && WIFEXITED(status)
+	   && WEXITSTATUS(status) == 0) {
 	strbuf_terminate(&hostname);
 	tsetenv(STRREMOTEHOST, str2short(hostname.s));
     }
