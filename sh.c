@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.161 2011/01/09 16:25:29 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.162 2011/01/10 14:08:14 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.161 2011/01/09 16:25:29 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.162 2011/01/10 14:08:14 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2230,7 +2230,7 @@ mailchk(void)
 	else {
 	    char *type;
 	    
-	    if (stb.st_size == 0 || stb.st_atime > stb.st_mtime ||
+	    if (stb.st_size == 0 || stb.st_atime >= stb.st_mtime ||
 		(stb.st_atime <= chktim && stb.st_mtime <= chktim) ||
 		(loginsh && !new))
 		continue;
