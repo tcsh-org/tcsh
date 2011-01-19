@@ -238,7 +238,7 @@ case "${host}" in
 
   ## Red Hat Cygwin
   *-cygwin)
-    tcsh_config_file=cygwin32
+    tcsh_config_file=cygwin
   ;;
 
   ## mips-compaq-nonstopux

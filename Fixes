@@ -1,3 +1,5 @@
+ 56. Rename cygwin32 to cygwin and bring it up-to-date with modern cygwin
+     settings (Corinna Vinschen)
  55. Avoid double slashes in cdpath (Corinna Vinschen)
  54. V6.17.04 - 20110118
  53. Revert PR/110, breaks the test suite.
