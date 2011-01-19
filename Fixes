@@ -1,9 +1,10 @@
+ 53. Revert PR/110, breaks the test suite.
  52. V6.17.03 - 20110117
  51. PR/102: Complain on input files with missing trailing \n
  50. PR/104: If atime == mtime we don't have new mail.
  49. PR/113: Don't allow illegal variable names to be set.
  48. PR/112: don't set $REMOTEHOST on the local machine.
- 47. PR/110: exist status of the pipeline should be the status of the last
+ 47. PR/110: exit status of the pipeline should be the status of the last
      command.
  46. Android support (Corinna Vinschen)
  45. Add AUTOSET_KANJI which works around the Shift-JIS encoding that

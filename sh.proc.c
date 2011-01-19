@@ -557,10 +557,6 @@ pjwait(struct process *pp)
     reason = 0;
     fp = pp;
     do {
-	/* In case of pipelines only the result of the last
-	 * command should be taken in account */
-	if ((fp->p_flags & PPOU) || (fp->p_flags & PBACKQ))
-	    continue;
 	if (fp->p_reason)
 	    reason = fp->p_flags & (PSIGNALED | PINTERRUPTED) ?
 		fp->p_reason | META : fp->p_reason;
