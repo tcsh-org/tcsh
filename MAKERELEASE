@@ -1,5 +1,5 @@
 #!/bin/sh
-# @(#)$tcsh: MAKERELEASE,v 1.5 2007/02/26 16:55:12 mitr Exp $
+# @(#)$tcsh: MAKERELEASE,v 1.6 2011/01/19 02:45:43 christos Exp $
 #
 # Copyright (c) 2005 Kimmo Suominen
 # All rights reserved.
@@ -36,8 +36,9 @@
 # 2. edit patchlevel.h and fix the version.
 # 3. edit tcsh.man and fix the version [2 places]
 # 4. run autoreconf -f -i
-# 5. cvs commit
-# 6. cvs tag TCSHX_YY_ZZ
+# 5. mention the release in Fixes
+# 6. cvs commit
+# 7. cvs tag TCSHX_YY_ZZ
 #
 # 20050303  Kimmo Suominen
 #
