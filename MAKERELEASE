@@ -1,5 +1,5 @@
 #!/bin/sh
-# @(#)$tcsh: MAKERELEASE,v 1.4 2006/03/04 17:19:25 christos Exp $
+# @(#)$tcsh: MAKERELEASE,v 1.5 2007/02/26 16:55:12 mitr Exp $
 #
 # Copyright (c) 2005 Kimmo Suominen
 # All rights reserved.
@@ -31,11 +31,19 @@
 #
 #
 # Create tcsh release tar.gz and patch files.
+# Before you run this:
+# 1. edit configure.in and fix the version
+# 2. edit patchlevel.h and fix the version.
+# 3. edit tcsh.man and fix the version [2 places]
+# 4. run autoreconf -f -i
+# 5. cvs commit
+# 6. cvs tag TCSHX_YY_ZZ
 #
 # 20050303  Kimmo Suominen
 #
 REPOSITORY=rebar.astron.com:/p/tcsh/cvsroot
 PROG="$(basename "$0")"
+set -e
 #
 if [ $# -ne 3 ]
 then
