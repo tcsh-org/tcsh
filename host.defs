@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.49 2010/05/17 19:23:06 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.50 2011/01/09 16:25:29 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.49 2010/05/17 19:23:06 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.50 2011/01/09 16:25:29 christos Exp $")
 
 endcode	:
 
@@ -44,6 +44,7 @@ macro	: M_mipseb : (!defined(M_mips64eb)) && (defined(mips) || defined(__mips)) 
 macro	: M_i386 : (defined(i386) || defined(__i386__))
 macro	: M_i486 : (defined(i486) || defined(__i486__))
 macro	: M_i586 : (defined(i586) || defined(__i586__))
+macro	: M_i686 : (defined(i686) || defined(__i686__))
 macro	: M_intel : (defined(M_i386) || defined(M_i486) || defined(M_i586))
 
 newdef	: defined(ns32000)
@@ -458,6 +459,7 @@ hosttype: defined(__powerpc64__)			: "powerpc64-linux"
 hosttype: defined(__s390x__)				: "s390x-linux"
 hosttype: defined(__s390__)				: "s390-linux"
 hosttype: defined(__x86_64__)				: "x86_64-linux"
+hosttype: defined(M_i686) 				: "i686-linux"
 hosttype: defined(M_i586) 				: "i586-linux"
 hosttype: defined(M_i486) 				: "i486-linux"
 hosttype: defined(M_i386)				: "i386-linux"
@@ -468,6 +470,7 @@ machtype: defined(__powerpc64__)			: "powerpc64"
 machtype: defined(__s390x__)				: "s390x"
 machtype: defined(__s390__)				: "s390"
 machtype: defined(__x86_64__)				: "x86_64"
+machtype: defined(M_i686) 				: "i686"
 machtype: defined(M_i586) 				: "i586"
 machtype: defined(M_i486) 				: "i486"
 machtype: defined(M_i386)				: "i386"
@@ -1095,8 +1098,16 @@ enddef	:
 
 newdef	: defined(__CYGWIN__)
 comment	: Cygwin
-hosttype:						: "i386-cygwin"
+vendor	:						: "intel"
+hosttype: defined(M_i686) 				: "i686-cygwin"
+hosttype: defined(M_i586) 				: "i586-cygwin"
+hosttype: defined(M_i486) 				: "i486-cygwin"
+hosttype: defined(M_i386) 				: "i386-cygwin"
 ostype	:						: "cygwin"
+machtype: defined(M_i686) 				: "i686"
+machtype: defined(M_i586) 				: "i586"
+machtype: defined(M_i486) 				: "i486"
+machtype: defined(M_i386) 				: "i386"
 enddef	:
 
 newdef  : defined(_UWIN)

@@ -1,3 +1,4 @@
+ 57. Recognize i686 (Corinna Vinschen)
  56. Rename cygwin32 to cygwin and bring it up-to-date with modern cygwin
      settings (Corinna Vinschen)
  55. Avoid double slashes in cdpath (Corinna Vinschen)
