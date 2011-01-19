@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.49 2010/05/27 04:00:23 amold Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.50 2010/07/09 15:24:56 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.49 2010/05/27 04:00:23 amold Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.50 2010/07/09 15:24:56 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
@@ -64,7 +64,7 @@ static	void	hfree	(struct Hist *);
 #define PG_STATIC static
 #endif
 
-//#define DEBUG_HIST 1
+/* #define DEBUG_HIST 1 */
 
 static const int fastMergeErase = 1;
 static unsigned histCount = 0;		/* number elements on history list */
@@ -165,7 +165,7 @@ savehist(
 }
 
 #define USE_JENKINS_HASH 1
-//#define USE_ONE_AT_A_TIME 1
+/* #define USE_ONE_AT_A_TIME 1 */
 #undef PRIME_LENGTH			/* no need for good HTL */
 
 #ifdef USE_JENKINS_HASH
@@ -792,12 +792,16 @@ insertHistHashTable(struct Hist *np, unsigned hashval)
              * will roughly double the size we give it.  Create initializes the
              * new table with everything on the Histlist, so we are done when
              * it returns.  */
-	    //	    xprintf("Growing history hash table from %d ...",
-	    //		    histHashTableLength); flush();
+#ifdef DEBUG_HIST
+	    xprintf("Growing history hash table from %d ...",
+		histHashTableLength);
+	    flush();
+#endif
             discardHistHashTable();
             createHistHashTable(histHashTableLength);
-	    //	    xprintf("to %d.\n",
-	    //		    histHashTableLength);
+#ifdef DEBUG_HIST
+	    xprintf("to %d.\n", histHashTableLength);
+#endif
             return;
         }
     }
