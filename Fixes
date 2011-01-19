@@ -1,3 +1,4 @@
+ 55. Avoid double slashes in cdpath (Corinna Vinschen)
  54. V6.17.04 - 20110118
  53. Revert PR/110, breaks the test suite.
  52. V6.17.03 - 20110117

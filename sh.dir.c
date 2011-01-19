@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dir.c,v 3.79 2006/09/25 18:17:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dir.c,v 3.80 2007/05/08 21:05:34 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$tcsh: sh.dir.c,v 3.79 2006/09/25 18:17:26 christos Exp $")
+RCSID("$tcsh: sh.dir.c,v 3.80 2007/05/08 21:05:34 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -643,9 +643,13 @@ dfollow(Char *cp, int old)
 	Char  **cdp;
 
 	for (cdp = c->vec; *cdp; cdp++) {
+	    size_t len = Strlen(*cdp);
 	    buf.len = 0;
-	    Strbuf_append(&buf, *cdp);
-	    Strbuf_append1(&buf, '/');
+	    if (len > 0) {
+		Strbuf_append(&buf, *cdp);
+		if ((*cdp)[len - 1] != '/')
+		    Strbuf_append1(&buf, '/');
+	    }
 	    Strbuf_append(&buf, cp);
 	    Strbuf_terminate(&buf);
 	    /*
