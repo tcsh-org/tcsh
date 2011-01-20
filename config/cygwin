@@ -86,12 +86,6 @@
 
 #undef NLS_CATALOGS
 
-/* Actually there is a crypt function but it doesn't do us any good.
-   It's used to compare the value of the pw_passwd field with user input,
-   but the pw_passwd field in Cygwin is unused in Cygwin since Windows
-   doesn't allow to fetch the password hash value. */
-#define NO_CRYPT
-
 /* Cygwin allows paths prepended with double slashes (network paths). */
 #define HAVE_SLASHSLASH 1
 

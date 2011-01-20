@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.os.h,v 3.101 2006/02/14 00:52:52 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.h,v 3.102 2007/07/05 14:13:06 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -600,5 +600,9 @@ extern int killpg (pid_t, int);
 #  define va_copy(DEST, SRC) memcpy(&(DEST), &(SRC), sizeof(va_list))
 # endif
 #endif
+
+#if defined(__CYGWIN__) && !defined(NO_CRYPT)
+extern char *cygwin_xcrypt(struct passwd *, const char *, const char *);
+#endif /* __CYGWIN__ && !NO_CRYPT */
 
 #endif /* _h_tc_os */
