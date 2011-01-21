@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.50 2011/01/09 16:25:29 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.51 2011/01/19 23:22:54 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.50 2011/01/09 16:25:29 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.51 2011/01/19 23:22:54 christos Exp $")
 
 endcode	:
 
@@ -169,6 +169,59 @@ getconvex(void)
 endcode	:
 enddef	:
 
+newdef : defined(__linux__) || defined(__CYGWIN__) || defined(__GNU__) || defined(__GLIBC__)
+newcode :
+# include "tw.h"
+#include <sys/utsname.h>
+static char mach[256];
+static char host[256];
+static char ostype[32];
+static void populate(void)
+{
+	struct utsname uts;
+	int e = uname(&uts);
+	const char *p = short2str(tgetenv(STROSTYPE));
+	if (p == NULL) {
+#if defined(__ANDROID__)
+		p = "android";
+#elif defined(__CYGWIN__)
+		p = "cygwin";
+#else
+		p = "linux";
+#endif
+	}
+	xsnprintf(ostype, sizeof(ostype), "%s", p);
+	xsnprintf(mach, sizeof(mach), "%s", e != -1 ? uts.machine : "unknown");
+	xsnprintf(host, sizeof(host), "%s-%s",
+	    e != -1 ? uts.machine : "unknown", ostype);
+}
+
+static char *
+getmach(void)
+{
+    if (!mach[0])
+	populate();
+    return mach;
+}
+
+static char *
+gethost(void)
+{
+    if (!host[0])
+	populate();
+    return host;
+}
+
+static char *
+getostype(void)
+{
+    if (!ostype[0])
+	populate();
+    return ostype;
+}
+
+endcode :
+enddef :
 
 newcode	:
 void
@@ -454,39 +507,12 @@ enddef	:
 newdef	: defined(linux) || defined(__GNU__) || defined(__GLIBC__)
 comment	: Linus Torvalds's linux
 vendor	: defined(M_intel)				: "intel"
-hosttype: defined(__ia64__)				: "ia64-linux"
-hosttype: defined(__powerpc64__)			: "powerpc64-linux"
-hosttype: defined(__s390x__)				: "s390x-linux"
-hosttype: defined(__s390__)				: "s390-linux"
-hosttype: defined(__x86_64__)				: "x86_64-linux"
-hosttype: defined(M_i686) 				: "i686-linux"
-hosttype: defined(M_i586) 				: "i586-linux"
-hosttype: defined(M_i486) 				: "i486-linux"
-hosttype: defined(M_i386)				: "i386-linux"
-ostype	: defined(__ANDROID__)				: "android"
-ostype	: 						: "linux"
-machtype: defined(__ia64__)				: "ia64"
-machtype: defined(__powerpc64__)			: "powerpc64"
-machtype: defined(__s390x__)				: "s390x"
-machtype: defined(__s390__)				: "s390"
-machtype: defined(__x86_64__)				: "x86_64"
-machtype: defined(M_i686) 				: "i686"
-machtype: defined(M_i586) 				: "i586"
-machtype: defined(M_i486) 				: "i486"
-machtype: defined(M_i386)				: "i386"
-machtype: defined(__arm__)				: "arm"
+hosttype:						: gethost()
+ostype	: 						: getostype()
+machtype:						: getmach()
 vendor	: defined(__ANDROID__)				: "linux"
 vendor	: defined(__alpha)				: "dec"
 vendor	: defined(PPC)					: "apple"
-hosttype: defined(__arm__)				: "arm"
-hosttype: defined(__alpha)				: "alpha"
-hosttype: defined(PPC)					: "powerpc"
-machtype: defined(__alpha)				: "alpha"
-machtype: defined(PPC)					: "powerpc"
-machtype: defined(M_mipsel)				: "mipsel"
-machtype: defined(M_mipseb)				: "mipseb"
-machtype: defined(M_mips64el)				: "mips64el"
-machtype: defined(M_mips64eb)				: "mips64eb"
 enddef	:
 
 
@@ -501,6 +527,7 @@ enddef	:
 
 newdef	: defined(__NetBSD__) 
 comment	: NetBSD
+vendor	: defined(algor)				: "algoritmics"
 vendor	: defined(arm32) || defined(__arm__)		: "acorn"
 vendor	: defined(alpha)				: "digital"
 vendor	: defined(amiga)				: "commodore"
@@ -515,8 +542,11 @@ vendor	: defined(mips)					: "mips"
 vendor	: defined(sparc)				: "sun"
 vendor	: defined(sun3)					: "sun"
 vendor	: defined(vax)					: "digital"
+vendor	: defined(x86_64)				: "amd"
 hosttype: 						: "NetBSD"
 ostype	: 						: "NetBSD"
+machtype: defined(alpha)				: "alpha"
+machtype: defined(algor)				: "algor"
 machtype: defined(arm32) || defined(__APCS_32__)	: "arm32"
 machtype: defined(arm26) || defined(__APCS_26__)	: "arm26"
 machtype: defined(arm) || defined(__arm__)		: "arm"
@@ -528,7 +558,7 @@ machtype: defined(M_mipseb)				: "mipseb"
 machtype: defined(mips)					: "mips"
 machtype: defined(pc532)				: "pc532"
 machtype: defined(vax)					: "vax"
-machtype: defined(alpha)				: "alpha"
+machtype: defined(x86_64)				: "x86_64"
 enddef	:
 
 
@@ -1099,15 +1129,9 @@ enddef	:
 newdef	: defined(__CYGWIN__)
 comment	: Cygwin
 vendor	:						: "intel"
-hosttype: defined(M_i686) 				: "i686-cygwin"
-hosttype: defined(M_i586) 				: "i586-cygwin"
-hosttype: defined(M_i486) 				: "i486-cygwin"
-hosttype: defined(M_i386) 				: "i386-cygwin"
-ostype	:						: "cygwin"
-machtype: defined(M_i686) 				: "i686"
-machtype: defined(M_i586) 				: "i586"
-machtype: defined(M_i486) 				: "i486"
-machtype: defined(M_i386) 				: "i386"
+hosttype: 		 				: gethost()
+ostype	:						: getostype()
+machtype: 		 				: getmach()
 enddef	:
 
 newdef  : defined(_UWIN)
