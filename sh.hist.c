@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.50 2010/07/09 15:24:56 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.51 2011/01/19 17:34:08 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.50 2010/07/09 15:24:56 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.51 2011/01/19 17:34:08 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
@@ -204,8 +204,8 @@ struct hashValue		  /* State used to hash a wordend word list. */
 };
 
 /* Set up the internal state */
-static inline
-void initializeHash(struct hashValue *h)
+static void
+initializeHash(struct hashValue *h)
 {
     h->a = h->b = h->c = 0xdeadbeef;
 }
@@ -271,8 +271,8 @@ addCharToHash(struct hashValue *h, Char ch)
     mix(h->a, h->b, h->c);
 }
 
-static inline
-uint32_t finalizeHash(struct hashValue *h)
+static uint32_t
+finalizeHash(struct hashValue *h)
 {
     uint32_t a = h->a, b = h->b, c = h->c;
     final(a, b, c);
@@ -304,14 +304,14 @@ one_at_a_time(char *key, ub4 len)
 #endif
 
 struct hashValue { uint32_t h; };
-static inline
-void initializeHash(struct hashValue *h)
+static void
+initializeHash(struct hashValue *h)
 {
     h->h = 0;
 }
 
-static inline
-void addWordToHash(struct hashValue *h, const Char *word)
+static void
+addWordToHash(struct hashValue *h, const Char *word)
 {
     unsigned k;
     uint32_t hash = h->h;
@@ -320,14 +320,14 @@ void addWordToHash(struct hashValue *h, const Char *word)
     h->h = hash;
 }
 
-static inline void
+static void
 addCharToHash(struct hashValue *h, Char c)
 {
     Char b[2] = { c, 0 };
     addWordToHash(h, b);
 }
 
-static inline uint32_t
+static uint32_t
 finalizeHash(struct hashValue *h)
 {
     unsigned hash = h->h;
@@ -342,13 +342,13 @@ finalizeHash(struct hashValue *h)
 /* Simple multipy and add hash. */
 #define PRIME_LENGTH 1			/* need "good" HTL */
 struct hashValue { uint32_t h; };
-static inline void
+static void
 initializeHash(struct hashValue *h)
 {
     h->h = 0xe13e2345;
 }
 
-static inline void
+static void
 addWordToHash(struct hashValue *h, const Char *word)
 {
     unsigned k;
@@ -358,13 +358,13 @@ addWordToHash(struct hashValue *h, const Char *word)
     h->h = hash;
 }
 
-static inline void
+static void
 addCharToHash(struct hashValue *h, Char c)
 {
     h->h = h->h * 0x9e4167b9 + (uChar)c;
 }
 
-static inline uint32_t
+static uint32_t
 finalizeHash(struct hashValue *h)
 {
     return h->h;
@@ -710,8 +710,8 @@ discardHistHashTable(void)
 }
 
 /* Computes a new hash table size, when the current one is too small. */
-static inline
-unsigned getHashTableSize(int histlen)
+static unsigned
+getHashTableSize(int histlen)
 {
     unsigned target = histlen * 2;
     unsigned e = 5;
