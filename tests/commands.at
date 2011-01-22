@@ -137,30 +137,30 @@ TCSH_UNTESTED([bye])
 AT_SETUP([cd])
 
 AT_DATA([cd.csh],
-[[set current=`pwd`
+[[set current=`/bin/pwd`
 set home=$current
 mkdir -p a
 echo ---
 cd a
-pwd | sed "s,$current,,"
+/bin/pwd | sed "s,$current,,"
 echo ---
 cd
-pwd | sed "s,$current,,"
+/bin/pwd | sed "s,$current,,"
 echo ---
 cd "$current/a"
-pwd | sed "s,$current,,"
+/bin/pwd | sed "s,$current,,"
 echo ---
 cd -
-pwd | sed "s,$current,,"
+/bin/pwd | sed "s,$current,,"
 echo ---
 cd a
 set cdpath=($current)
 echo ---
 cd a
-pwd | sed "s,$current,,"
+/bin/pwd | sed "s,$current,,"
 echo ---
 cd current
-pwd | sed "s,$current,,"
+/bin/pwd | sed "s,$current,,"
 echo ---
 cd -p | sed "s,$current,,"
 echo ---
@@ -269,7 +269,7 @@ AT_CLEANUP
 AT_SETUP([dirs])
 
 AT_DATA([dirs.csh],
-[[set current=`pwd`
+[[set current=`/bin/pwd`
 set home=$current
 mkdir a
 echo ---
@@ -326,7 +326,7 @@ CWD/a CWD @&t@
 [[Usage: dirs [-plvnSLc].
 Usage: dirs [-plvnSLc].
 ]])
-AT_CHECK([sed "s,$PWD,CWD,g" < saved], ,
+AT_CHECK([echo x"`/bin/pwd`"x > /tmp/x && sed "s,`/bin/pwd`,CWD,g" < saved], ,
 [cd CWD
 pushd CWD/a
 ])
@@ -523,7 +523,7 @@ TCSH_UNTESTED([getxvers])
 
 AT_SETUP([glob])
 
-AT_CHECK([[tcsh -c 'glob a b c' | od -c] dnl
+AT_CHECK([[tcsh -f -c 'glob a b c' | od -c] dnl
 	  [| sed 's/[ 	][ 	]*/ /g; s/ $//']], ,
 [[0000000 a \0 b \0 c
 0000005
@@ -944,7 +944,7 @@ AT_CLEANUP
 AT_SETUP([popd])
 
 AT_DATA([popd.csh],
-[[set current=`pwd`
+[[set current=`/bin/pwd`
 set home=$current
 pushd /
 popd
@@ -963,7 +963,7 @@ pushd /; echo ---; popd -p
 (popd - foo)
 :
 ]])
-AT_CHECK([tcsh -f popd.csh | sed "s,$PWD,CWD,"], ,
+AT_CHECK([tcsh -f popd.csh | sed "s,`/bin/pwd`,CWD,"], ,
 [/ ~ @&t@
 ~ @&t@
 / ~ @&t@
@@ -1002,7 +1002,7 @@ AT_CLEANUP
 AT_SETUP([pushd])
 
 AT_DATA([pushd.csh],
-[[set home=`pwd`
+[[set home=`/bin/pwd`
 mkdir a
 pushd /
 pushd /dev
@@ -1034,7 +1034,7 @@ pushd -p
 (pushd - foo)
 :
 ]])
-AT_CHECK([tcsh -f pushd.csh | sed "s,$PWD,CWD,g"], ,
+AT_CHECK([tcsh -f pushd.csh | sed "s,`/bin/pwd`,CWD,g"], ,
 [/ ~ @&t@
 /dev / ~ @&t@
 / /dev ~ @&t@
@@ -1411,11 +1411,11 @@ touch ls-F
 chmod a+x ls-F
 AT_DATA([where.csh],
 [[alias ls-F foo bar
-set path=(`pwd`)
+set path=(`/bin/pwd`)
 where ls-F
 where this_does_not_exist
 ]])
-AT_CHECK([tcsh -f where.csh | sed "s,$PWD,CWD,"], ,
+AT_CHECK([tcsh -f where.csh | sed "s,`/bin/pwd`,CWD,"], ,
 [ls-F is aliased to foo bar
 ls-F is a shell built-in
 CWD/ls-F
@@ -1430,7 +1430,7 @@ touch my_command
 chmod a+x my_command
 AT_DATA([which.csh],
 [[alias my_alias my alias
-set path=(`pwd`)
+set path=(`/bin/pwd`)
 which my_command
 which my_alias
 which echo
@@ -1438,7 +1438,7 @@ which this_does_not_exist
 alias echo echo_alias
 which echo
 ]])
-AT_CHECK([tcsh -f which.csh | sed "s,$PWD,CWD,"], ,
+AT_CHECK([tcsh -f which.csh | sed "s,`/bin/pwd`,CWD,"], ,
 [CWD/my_command
 my_alias: 	 aliased to my alias
 echo: shell built-in command.

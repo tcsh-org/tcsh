@@ -866,7 +866,7 @@ set shlvl=8
 printenv SHLVL
 setenv SHLVL 2
 echo $shlvl
-tcsh -c 'echo $shlvl'
+tcsh -f -c 'echo $shlvl'
 ]])
 AT_CHECK([SHLVL=5 tcsh -f shlvl.csh], ,
 [6
