@@ -594,10 +594,10 @@ sh -c 'echo 2 >&2'
 sh -c 'echo 3 >&2'
 set implicitcd
 subdir
-pwd
+/bin/pwd
 ..
 ~/subdir
-pwd
+/bin/pwd
 cd
 set implicitcd=verbose
 subdir
@@ -606,7 +606,7 @@ subdir
 ]])
 (echo 1; echo 'subdir: Command not found.';
  echo 2; echo "$PWD/subdir: Permission denied."; echo 3) > experr
-AT_CHECK([tcsh -f -i -q < implicitcd.csh | sed "s,`pwd`,CWD,"], ,
+AT_CHECK([tcsh -f -i -q < implicitcd.csh | sed "s,`/bin/pwd`,CWD,"], ,
 [> 0
 CWD/subdir
 CWD/subdir
@@ -915,9 +915,9 @@ cd ..
 echo $cwd
 set symlinks=expand
 cd a
-(echo ../a; echo `pwd`) | uniq | wc -l | tr -d ' \t'
+(echo ../a; echo $cwd) | uniq | wc -l | tr -d ' \t'
 ]])
-AT_CHECK([tcsh -f symlinks.csh | sed "s,`pwd`,CWD,"], ,
+AT_CHECK([tcsh -f symlinks.csh | sed "s,`tcsh -f -c echo\\ \\$PWD`,CWD,"], ,
 [0
 CWD/a/b
 CWD/link
