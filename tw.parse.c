@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.129 2010/08/16 17:08:22 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.130 2011/01/24 18:10:26 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.129 2010/08/16 17:08:22 christos Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.130 2011/01/24 18:10:26 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -358,7 +358,7 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	 * Trying to spell can hang when we have NFS mounted hung
 	 * volumes.
 	 */
-	if ((looking == TW_COMMAND) && (*wordbuf.s == '/')) {
+	if ((looking == TW_COMMAND) && ABSOLUTEP(wordbuf.s)) {
 	    if (executable(NULL, wordbuf.s, 0)) {
 		cleanup_until(&wordbuf);
 		search_ret = 0;
