@@ -1,3 +1,4 @@
+ 59. Avoid leaking fd's in mail check (Werner Fink)
  58. Add cygwin_xcrypt() (Corinna Vinschen)
  57. Recognize i686 (Corinna Vinschen)
  56. Rename cygwin32 to cygwin and bring it up-to-date with modern cygwin
