@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.159 2010/12/22 17:26:05 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.160 2011/01/24 18:10:25 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -663,7 +663,7 @@ EXTERN int   SHDIAG IZERO;	/* Diagnostic output... shell errs go here */
 EXTERN int   OLDSTD IZERO;	/* Old standard input (def for cmds) */
 
 
-#if SYSVREL == 4 && defined(_UTS)
+#if (SYSVREL == 4 && defined(_UTS)) || defined(__linux__)
 /* 
  * From: fadden@uts.amdahl.com (Andy McFadden)
  * we need sigsetjmp for UTS4, but not UTS2.1
@@ -681,7 +681,7 @@ EXTERN int   OLDSTD IZERO;	/* Old standard input (def for cmds) */
 
 #ifdef SIGSETJMP
    typedef struct { sigjmp_buf j; } jmp_buf_t;
-# define setexit()  sigsetjmp(reslab.j)
+# define setexit()  sigsetjmp(reslab.j, 1)
 # define _reset()    siglongjmp(reslab.j, 1)
 #else
    typedef struct { jmp_buf j; } jmp_buf_t;

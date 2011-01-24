@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.err.c,v 3.52 2010/05/17 19:36:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.err.c,v 3.53 2011/01/24 18:10:25 christos Exp $ */
 /*
  * sh.err.c: Error printing routines. 
  */
@@ -34,7 +34,7 @@
 #include "sh.h"
 #include <assert.h>
 
-RCSID("$tcsh: sh.err.c,v 3.52 2010/05/17 19:36:45 christos Exp $")
+RCSID("$tcsh: sh.err.c,v 3.53 2011/01/24 18:10:25 christos Exp $")
 
 /*
  * C Shell
@@ -449,6 +449,12 @@ cleanup_until(void *last_var)
 	    return;
     }
     abort();
+}
+
+int
+cleanup_reset(void)
+{
+    return cleanup_sp > cleanup_mark;
 }
 
 void

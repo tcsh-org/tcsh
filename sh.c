@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.163 2011/01/17 19:35:10 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.164 2011/01/24 17:46:29 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.163 2011/01/17 19:35:10 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.164 2011/01/24 17:46:29 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -78,7 +78,7 @@ extern int NLSMapsAreInited;
  * ported to Apple Unix (TM) (OREO)  26 -- 29 Jun 1987
  */
 
-jmp_buf_t reslab INIT_ZERO_STRUCT;
+jmp_buf_t reslab;
 
 static const char tcshstr[] = "tcsh";
 
@@ -215,6 +215,7 @@ main(int argc, char **argv)
     int osetintr;
     struct sigaction oparintr;
 
+    (void)memset(&reslab, 0, sizeof(reslab));
 #ifdef WINNT_NATIVE
     nt_init();
 #endif /* WINNT_NATIVE */
@@ -2087,7 +2088,10 @@ process(int catch)
 #endif /* SIG_WINDOW */
 	setcopy(STR_, InputBuf, VAR_READWRITE | VAR_NOGLOB);
     cmd_done:
-	cleanup_until(&paraml);
+	if (cleanup_reset())
+	    cleanup_until(&paraml);
+	else
+	    haderr = 1;
     }
     cleanup_pop_mark(omark);
     resexit(osetexit);
