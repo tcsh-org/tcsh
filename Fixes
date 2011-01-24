@@ -1,3 +1,7 @@
+ 62. Don't try to spell check full path binaries that are correct because
+     they can cause hangs when other nfs partitions are hung. (Werner Fink)
+ 61. Avoid nested interrupts when exiting causing history writing to fail
+     https://bugzilla.novell.com/show_bug.cgi?id=331627 (Werner Fink)
  60. Instead of giving an error or ignoring lines with missing eol at eof,
      process them.
  59. Avoid leaking fd's in mail check (Werner Fink)

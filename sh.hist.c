@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.51 2011/01/19 17:34:08 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.52 2011/01/21 02:31:17 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.51 2011/01/19 17:34:08 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.52 2011/01/21 02:31:17 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
@@ -1276,9 +1276,9 @@ rechist(Char *fname, int ref)
 	    loadhist(fname, 1);
 
     fp = xcreat(short2str(fname), 0600);
+    cleanup_until(fname);
     if (fp == -1) {
 	didfds = oldidfds;
-	cleanup_until(fname);
 	return;
     }
     ftmp = SHOUT;
@@ -1288,7 +1288,6 @@ rechist(Char *fname, int ref)
     xclose(fp);
     SHOUT = ftmp;
     didfds = oldidfds;
-    cleanup_until(fname);
 }
 
 

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.158 2010/05/15 13:32:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.159 2010/12/22 17:26:05 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -569,6 +569,7 @@ EXTERN int    neednote IZERO;	/* Need to pnotify() */
 EXTERN int    noexec IZERO;	/* Don't execute, just syntax check */
 EXTERN int    pjobs IZERO;	/* want to print jobs if interrupted */
 EXTERN int    setintr IZERO;	/* Set interrupts on/off -> Wait intr... */
+EXTERN int    handle_intr IZERO;/* Are we currently handling an interrupt? */
 EXTERN int    havhash IZERO;	/* path hashing is available */
 EXTERN int    editing IZERO;	/* doing filename expansion and line editing */
 EXTERN int    noediting IZERO;	/* initial $term defaulted to noedit */

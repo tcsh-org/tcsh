@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.sig.c,v 3.36 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.sig.c,v 3.37 2010/11/29 15:28:58 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.sig.c,v 3.36 2006/08/24 20:56:31 christos Exp $")
+RCSID("$tcsh: tc.sig.c,v 3.37 2010/11/29 15:28:58 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -60,6 +60,7 @@ int alrmcatch_disabled; /* = 0; */
 int phup_disabled; /* = 0; */
 int pchild_disabled; /* = 0; */
 int pintr_disabled; /* = 0; */
+int handle_interrupt; /* = 0; */
 
 int
 handle_pending_signals(void)
@@ -67,20 +68,28 @@ handle_pending_signals(void)
     int rv = 0;
     if (!phup_disabled && phup_pending) {
 	phup_pending = 0;
+	handle_interrupt++;
 	phup();
+	handle_interrupt--;
     }
     if (!pintr_disabled && pintr_pending) {
 	pintr_pending = 0;
+	handle_interrupt++;
 	pintr();
+	handle_interrupt--;
 	rv = 1;
     }
     if (!pchild_disabled && pchild_pending) {
 	pchild_pending = 0;
+	handle_interrupt++;
 	pchild();
+	handle_interrupt--;
     }
     if (!alrmcatch_disabled && alrmcatch_pending) {
 	alrmcatch_pending = 0;
+	handle_interrupt++;
 	alrmcatch();
+	handle_interrupt--;
     }
     return rv;
 }
