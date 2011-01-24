@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.164 2011/01/24 17:46:29 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.165 2011/01/24 18:17:07 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.164 2011/01/24 17:46:29 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.165 2011/01/24 18:17:07 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -168,28 +168,30 @@ static	void		  st_restore	(void *);
 static void
 add_localedir_to_nlspath(const char *path)
 {
-    static const char msgs[] = "/%L/LC_MESSAGES/%N.cat";
+    static const char msgs_L[] = "/%L/LC_MESSAGES/%N.cat";
+    static const char msgs_l[] = "/%l/LC_MESSAGES/%N.cat";
     char *old = getenv("NLSPATH");
-    char *new;
+    char *new, *new_p;
     size_t len = 0;
 
     if (path == NULL)
         return;
 
     if (old != NULL)
-        len += strlen(old);
+        len += strlen(old) + 1;	/* don't forget the colon. */
 
-    len += strlen(path) + sizeof(msgs);
+    len += 2 * strlen(path)
+	   + sizeof(msgs_L) + sizeof(msgs_l); /* includes the extra colon */
 
-    new = xcalloc(len, 1);
+    new = new_p = xcalloc(len, 1);
 
     if (old != NULL) {
-        (void)strncat(new, old, len);
-        (void)strncat(new, ":", len);
+	(void) xsnprintf(new_p, len, "%s:", old);
+	new_p += strlen (new_p);
+	len -= new_p - new;
     }
 
-    (void)strncat(new, path, len);
-    (void)strncat(new, msgs, len);
+    (void) xsnprintf(new_p, len, "%s%s:%s%s", path, msgs_L, path, msgs_l);
 
     tsetenv(STRNLSPATH, str2short(new));
     free(new);
