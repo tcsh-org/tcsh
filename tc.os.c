@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.c,v 3.70 2011/01/09 16:25:29 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.c,v 3.71 2011/01/20 19:40:25 christos Exp $ */
 /*
  * tc.os.c: OS Dependent builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.os.c,v 3.70 2011/01/09 16:25:29 christos Exp $")
+RCSID("$tcsh: tc.os.c,v 3.71 2011/01/20 19:40:25 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1620,6 +1620,6 @@ cygwin_xcrypt(struct passwd *pw, const char *password, const char *expected_pwd)
     if (token == INVALID_HANDLE_VALUE)
 	return invalid_password;
     CloseHandle(token);
-    return expected_pwd;
+    return (char *) expected_pwd;
 }
 #endif /* __CYGWIN__ && !NO_CRYPT */

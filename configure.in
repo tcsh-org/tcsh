@@ -14,6 +14,7 @@ AC_CONFIG_SRCDIR([tc.vers.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_TESTDIR([.], [.])
 
+AC_PROG_INSTALL
 AC_CANONICAL_HOST
 
 AC_MSG_CHECKING([cached host tuple])
@@ -297,6 +298,7 @@ AC_SEARCH_LIBS(getspnam, sec)
 AC_SEARCH_LIBS(tgetent, termlib termcap curses ncurses)
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(connect, socket)
+AC_SEARCH_LIBS(catgets, catgets)
 AM_ICONV
 
 dnl Checks for header files
@@ -376,7 +378,7 @@ AC_INCLUDES_DEFAULT([])
 #endif
 ])
 AC_CHECK_FUNC([setlocale], [have_setlocale=yes], [have_setlocale=no])
-AC_CHECK_FUNCS([catgets dup2 getauthid getcwd gethostname getpwent] dnl
+AC_CHECK_FUNCS([dup2 getauthid getcwd gethostname getpwent] dnl
 	[getutent memmove memset nice nl_langinfo sbrk setpgid setpriority] dnl
 	[strerror strstr sysconf wcwidth])
 AC_FUNC_GETPGRP

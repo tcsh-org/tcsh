@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.45 2010/05/13 18:39:02 christos Exp $
+# $tcsh: Makefile.in,v 3.46 2011/01/09 16:25:29 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -607,6 +607,7 @@ install.man: tcsh.man
 	chmod 444 ${DESTMAN}/tcsh.${MANSECT}
 
 install.cygwin: install install.man
+	make -C nls install DESTDIR=${DESTDIR}
 	-mkdir -p ${DESTDIR}${prefix}/share/doc/tcsh
 	cp ${srcdir}/FAQ ${srcdir}/Fixes ${DESTDIR}${prefix}/share/doc/tcsh
 	cp ${srcdir}/NewThings ${srcdir}/README ${DESTDIR}${prefix}/share/doc/tcsh

@@ -1,3 +1,4 @@
+ 65. Enable NLS catalogs on Cygwin (Corinna Vinschen)
  64. NLSPATH handling fixes (Corinna Vinschen)
  63. Avoid infrequent exit when tcsh cd's into a non-existent directory
      https://bugzilla.novell.com/show_bug.cgi?id=293395 (Werner Fink)
