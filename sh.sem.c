@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.82 2009/10/30 14:27:13 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.83 2010/05/23 17:20:32 amold Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.sem.c,v 3.82 2009/10/30 14:27:13 christos Exp $")
+RCSID("$tcsh: sh.sem.c,v 3.83 2010/05/23 17:20:32 amold Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -628,10 +628,19 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 	 * possible stopping
 	 */
 	if (bifunc) {
-	    func(t, bifunc);
-	    if (forked)
+	    if (forked) {
+		func(t, bifunc);
 		exitstat();
-	    else {
+	    } else {
+		jmp_buf_t oldexit;
+		int ohaderr = haderr;
+
+		getexit(oldexit);
+		if (setexit() == 0)
+		    func(t, bifunc);
+		resexit(oldexit);
+		haderr = ohaderr;
+
 		if (adrof(STRprintexitvalue)) {
 		    int rv = getn(varval(STRstatus));
 		    if (rv != 0)
