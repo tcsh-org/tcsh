@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.166 2011/01/24 21:58:30 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.167 2011/01/25 17:30:52 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.166 2011/01/24 21:58:30 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.167 2011/01/25 17:30:52 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -168,11 +168,13 @@ static	void		  st_restore	(void *);
 static void
 add_localedir_to_nlspath(const char *path)
 {
-    static const char msgs_L[] = "/%L/LC_MESSAGES/%N.cat";
-    static const char msgs_l[] = "/%l/LC_MESSAGES/%N.cat";
+    static const char msgs_LOC[] = "/%L/LC_MESSAGES/%N.cat";
+    static const char msgs_lang[] = "/%l/LC_MESSAGES/%N.cat";
     char *old = getenv("NLSPATH");
     char *new, *new_p;
     size_t len = 0;
+    int add_LOC = 1;
+    int add_lang = 1;
 
     if (path == NULL)
         return;
@@ -180,18 +182,40 @@ add_localedir_to_nlspath(const char *path)
     if (old != NULL)
         len += strlen(old) + 1;	/* don't forget the colon. */
 
-    len += 2 * strlen(path)
-	   + sizeof(msgs_L) + sizeof(msgs_l); /* includes the extra colon */
+    len += 2 * strlen(path) +
+	   sizeof(msgs_LOC) + sizeof(msgs_lang); /* includes the extra colon */
 
     new = new_p = xcalloc(len, 1);
 
     if (old != NULL) {
-	(void) xsnprintf(new_p, len, "%s:", old);
-	new_p += strlen (new_p);
+	size_t pathlen = strlen(path);
+	char *old_p;
+
+	(void) xsnprintf(new_p, len, "%s", old);
+	new_p += strlen(new_p);
 	len -= new_p - new;
+
+	/* Check if the paths we try to add are already present in NLSPATH.
+	   If so, note it by setting the appropriate flag to 0. */
+	for (old_p = old; old_p; old_p = strchr(old_p, ':'),
+				 old_p = old_p ? old_p + 1 : NULL) {
+	    if (strncmp(old_p, path, pathlen) != 0)
+	    	continue;
+	    if (strncmp(old_p + pathlen, msgs_LOC, sizeof(msgs_LOC) - 1) == 0)
+		add_LOC = 0;
+	    else if (strncmp(old_p + pathlen, msgs_lang,
+			      sizeof(msgs_lang) - 1) == 0)
+		add_lang = 0;
+	}
     }
 
-    (void) xsnprintf(new_p, len, "%s%s:%s%s", path, msgs_L, path, msgs_l);
+    /* Add the message catalog paths not already present to NLSPATH. */
+    if (add_LOC || add_lang)
+	(void) xsnprintf(new_p, len, "%s%s%s%s%s%s",
+			 old ? ":" : "",
+			 add_LOC ? path : "", add_LOC ? msgs_LOC : "",
+			 add_LOC && add_lang ? ":" : "",
+			 add_lang ? path : "", add_lang ? msgs_lang : "");
 
     tsetenv(STRNLSPATH, str2short(new));
     free(new);
