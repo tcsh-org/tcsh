@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.165 2011/01/24 18:17:07 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.166 2011/01/24 21:58:30 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.165 2011/01/24 18:17:07 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.166 2011/01/24 21:58:30 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -502,7 +502,8 @@ main(int argc, char **argv)
     if (loginsh || (uid == 0)) {
 	if (*cp) {
 	    /* only for login shells or root and we must have a tty */
-	    if ((cp2 = Strrchr(cp, (Char) '/')) != NULL) {
+	    if (((cp2 = Strrchr(cp, (Char) '/')) != NULL) &&
+		(Strncmp(cp, STRptssl, 3) != 0)) {
 		cp2 = cp2 + 1;
 	    }
 	    else
@@ -780,7 +781,16 @@ main(int argc, char **argv)
 	xfree(tmp2);
     }
 #else /* !WINNT_NATIVE */
+#ifdef HAVE_MKSTEMP
+    {
+	char *tmpdir = getenv ("TMPDIR");
+	if (!tmpdir)
+	    tmpdir = "/tmp";
+	shtemp = Strspl(SAVE(tmpdir), SAVE("/sh.XXXXXX")); /* For << */
+    }
+#else /* !HAVE_MKSTEMP */
     shtemp = Strspl(STRtmpsh, doldol);	/* For << */
+#endif /* HAVE_MKSTEMP */
 #endif /* WINNT_NATIVE */
 
     /*
