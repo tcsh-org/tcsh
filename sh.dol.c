@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.81 2010/05/17 19:36:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.82 2011/01/24 17:48:15 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.81 2010/05/17 19:36:45 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.82 2011/01/24 17:48:15 christos Exp $")
 
 /*
  * C shell
@@ -936,29 +936,34 @@ heredoc(Char *term)
     Char *lbp, *obp, *mbp;
     Char  **vp;
     int    quoted;
+#ifdef HAVE_MKSTEMP
+    char   *tmp = short2str(shtemp);
+    char   *dot = strrchr(tmp, '.');
+
+    if (!dot)
+	stderror(ERR_NAME | ERR_NOMATCH);
+    strcpy(dot, TMP_TEMPLATE);
+
+    xclose(0);
+    if (mkstemp(tmp) == -1)
+	stderror(ERR_SYSTEM, tmp, strerror(errno));
+#else /* !HAVE_MKSTEMP */
     char   *tmp;
-#ifndef WINNT_NATIVE
+# ifndef WINNT_NATIVE
     struct timeval tv;
 
 again:
-#endif /* WINNT_NATIVE */
+# endif /* WINNT_NATIVE */
     tmp = short2str(shtemp);
-#ifndef O_CREAT
-# define O_CREAT 0
+# if O_CREAT == 0
     if (xcreat(tmp, 0600) < 0)
 	stderror(ERR_SYSTEM, tmp, strerror(errno));
-#endif
+# endif
     xclose(0);
-#ifndef O_TEMPORARY
-# define O_TEMPORARY 0
-#endif
-#ifndef O_EXCL
-# define O_EXCL 0
-#endif
     if (xopen(tmp, O_RDWR|O_CREAT|O_EXCL|O_TEMPORARY|O_LARGEFILE, 0600) ==
 	-1) {
 	int oerrno = errno;
-#ifndef WINNT_NATIVE
+# ifndef WINNT_NATIVE
 	if (errno == EEXIST) {
 	    if (unlink(tmp) == -1) {
 		(void) gettimeofday(&tv, NULL);
@@ -971,11 +976,12 @@ again:
 	    }
 	    goto again;
 	}
-#endif /* WINNT_NATIVE */
+# endif /* WINNT_NATIVE */
 	(void) unlink(tmp);
 	errno = oerrno;
  	stderror(ERR_SYSTEM, tmp, strerror(errno));
     }
+#endif /* HAVE_MKSTEMP */
     (void) unlink(tmp);		/* 0 0 inode! */
     Dv[0] = term;
     Dv[1] = NULL;

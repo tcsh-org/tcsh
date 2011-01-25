@@ -1,3 +1,6 @@
+ 68. Use mkstemp() if there for here docs (Werner Fink)
+ 67. Fix handling of errors and exit values in builtins (Werner Fink)
+ 66. Better pty name detection (Werner Fink)
  65. Enable NLS catalogs on Cygwin (Corinna Vinschen)
  64. NLSPATH handling fixes (Corinna Vinschen)
  63. Avoid infrequent exit when tcsh cd's into a non-existent directory

@@ -7,6 +7,7 @@ dnl You'll also need a version of config.guess from a gnu package
 dnl
 dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 dnl
+dnl $tcsh$
 
 AC_PREREQ([2.59])dnl Minimum Autoconf version required.
 AC_INIT([tcsh], [6.17.04], [http://bugs.gw.com/])
@@ -378,9 +379,9 @@ AC_INCLUDES_DEFAULT([])
 #endif
 ])
 AC_CHECK_FUNC([setlocale], [have_setlocale=yes], [have_setlocale=no])
-AC_CHECK_FUNCS([dup2 getauthid getcwd gethostname getpwent] dnl
-	[getutent memmove memset nice nl_langinfo sbrk setpgid setpriority] dnl
-	[strerror strstr sysconf wcwidth])
+AC_CHECK_FUNCS([catgets dup2 getauthid getcwd gethostname getpwent] dnl
+	[getutent memmove memset mkstemp nice nl_langinfo sbrk setpgid] dnl
+	[setpriority strerror strstr sysconf wcwidth])
 AC_FUNC_GETPGRP
 AC_FUNC_MBRTOWC
 if test "x${cross_compiling}" != xyes ; then

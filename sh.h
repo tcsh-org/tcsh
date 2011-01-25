@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.160 2011/01/24 18:10:25 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.161 2011/01/24 18:17:07 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -89,6 +89,8 @@ typedef unsigned long intptr_t;
 #if defined(POSIXJOBS) && !defined(BSDJOBS)
 # define BSDJOBS
 #endif 
+
+#define TMP_TEMPLATE ".XXXXXX"
 
 #ifdef SHORT_STRINGS
 # ifdef WIDE_STRINGS
@@ -361,9 +363,6 @@ typedef long tcsh_number_t;
 #if !defined(O_RDONLY) || !defined(O_NDELAY)
 # include <fcntl.h>
 #endif 
-#ifndef O_LARGEFILE
-# define O_LARGEFILE 0
-#endif
 
 #include <errno.h>
 
