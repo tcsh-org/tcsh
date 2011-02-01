@@ -1,3 +1,4 @@
+ 69. V6.17.05 - 20110201
  68. Use mkstemp() if there for here docs (Werner Fink)
  67. Fix handling of errors and exit values in builtins (Werner Fink)
  66. Better pty name detection (Werner Fink)
