@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.h,v 3.103 2011/01/20 19:40:25 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.h,v 3.104 2011/01/25 20:10:46 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */
@@ -164,7 +164,7 @@ struct ucred {
  * It would break on glibc, where all this is
  * defined in <termios.h>. Wrapper added.
  */
-#if !defined(linux) && !defined(__GNU__) && !defined(__GLIBC__) && !defined(_VMS_POSIX)
+#if !defined(__linux__) && !defined(__GNU__) && !defined(__GLIBC__) && !defined(_VMS_POSIX)
 # if defined(INTEL) || defined(u3b2) || defined (u3b5) || defined(ub15) || defined(u3b20d) || defined(ISC) || defined(SCO) || defined(tower32)
 #  ifdef TIOCGWINSZ
 /*

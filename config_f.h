@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/config_f.h,v 3.43 2010/02/09 20:28:17 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/config_f.h,v 3.44 2010/05/15 13:32:09 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -146,7 +146,7 @@
  *		This can be much slower and no memory statistics will be
  *		provided.
  */
-#if defined(__MACHTEN__) || defined(PURIFY) || defined(MALLOC_TRACE) || defined(_OSD_POSIX) || defined(__MVS__)
+#if defined(__MACHTEN__) || defined(PURIFY) || defined(MALLOC_TRACE) || defined(_OSD_POSIX) || defined(__MVS__) || defined (__CYGWIN__) || defined(__GLIBC__)
 # define SYSMALLOC
 #else
 # undef SYSMALLOC
@@ -188,7 +188,7 @@
  * RCSID	This defines if we want rcs strings in the binary or not
  *
  */
-#if !defined(lint) && !defined(SABER) && !defined(__CLCC__)
+#if !defined(lint) && !defined(SABER) && !defined(__CLCC__) && !defined(__linux__)
 # ifndef __GNUC__
 #  define RCSID(id) static char *rcsid = (id);
 # else

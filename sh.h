@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.161 2011/01/24 18:17:07 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.162 2011/01/25 20:10:46 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -290,7 +290,7 @@ typedef long tcsh_number_t;
 #  else
 #   include <termio.h>
 #  endif /* _UWIN */
-#  if SYSVREL > 3
+#  if SYSVREL > 3 || defined(__linux__)
 #   undef TIOCGLTC	/* we don't need those, since POSIX has them */
 #   undef TIOCSLTC
 #   undef CSWTCH
@@ -311,7 +311,7 @@ typedef long tcsh_number_t;
  * redefines malloc(), so we define the following
  * to avoid it.
  */
-# if defined(SYSMALLOC) || defined(linux) || defined(__GNU__) || defined(__GLIBC__) || defined(sgi) || defined(_OSD_POSIX)
+# if defined(SYSMALLOC) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__) || defined(sgi) || defined(_OSD_POSIX)
 #  define NO_FIX_MALLOC
 #  include <stdlib.h>
 # else /* glibc */
@@ -329,7 +329,7 @@ typedef long tcsh_number_t;
 #endif /* POSIX && !WINNT_NATIVE */
 #include <limits.h>
 
-#if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX) || defined(linux) || defined(__GNU__) || defined(__GLIBC__)
+#if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
 # if !defined(pyr) && !defined(stellar)
 #  include <time.h>
 #  ifdef _MINIX
@@ -344,6 +344,12 @@ typedef long tcsh_number_t;
 #if !((defined(SUNOS4) || defined(_MINIX) /* || defined(DECOSF1) */) && defined(TERMIO))
 # if !defined(_VMS_POSIX) && !defined(WINNT_NATIVE)
 #  include <sys/ioctl.h>
+#  if SYSVREL > 3 || defined(__linux__)
+#   undef TIOCGLTC	/* we don't need those, since POSIX has them */
+#   undef TIOCSLTC
+#   undef CSWTCH
+#   define CSWTCH _POSIX_VDISABLE	/* So job control works */
+#  endif /* SYSVREL > 3 */
 # endif
 #endif 
 
@@ -1204,11 +1210,9 @@ extern char   **environ;
 
 #ifndef WINNT_NATIVE
 # ifdef NLS_CATALOGS
-#  if defined(linux) || defined(__GNU__) || defined(__GLIBC__)
+#  if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
 #   include <locale.h>
-#   ifdef notdef
-#    include <localeinfo.h>	/* Has this changed ? */
-#   endif
+#   include <langinfo.h>
 #   include <features.h>
 #  endif
 #  ifdef SUNOS4

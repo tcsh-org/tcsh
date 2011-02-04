@@ -70,7 +70,7 @@
  *
  *		Note: Linux should work with any SYSVREL < 3.
  */
-#define SYSVREL	0
+#define SYSVREL	2
 
 /*
  * YPBUGS	Work around Sun YP bugs that cause expansion of ~username
@@ -86,19 +86,35 @@
  */
 
 #define __STRICT_ANSI__
-#define _BSD_SOURCE
-#define _SVID_SOURCE
-#define _POSIX_SOURCE
-#define _XOPEN_SOURCE 500
-#define _GNU_SOURCE
+#ifndef _BSD_SOURCE
+# define _BSD_SOURCE
+#endif
+#ifndef _SVID_SOURCE
+# define _SVID_SOURCE
+#endif
+#ifndef _POSIX_SOURCE
+# define _POSIX_SOURCE
+#endif
+#ifndef _XOPEN_SOURCE
+# define _XOPEN_SOURCE 500
+#endif
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
 
 /*
  * Large file support from <features.h>
  */
 
-#define _LARGEFILE_SOURCE
-#define _LARGEFILE64_SOURCE
-#define _FILE_OFFSET_BITS 64
+#ifndef _LARGEFILE_SOURCE
+# define _LARGEFILE_SOURCE
+#endif
+#ifndef _LARGEFILE64_SOURCE
+# define _LARGEFILE64_SOURCE
+#endif
+#ifndef _FILE_OFFSET_BITS
+# define _FILE_OFFSET_BITS 64
+#endif
 
 /****************** local defines *********************/
 #ifndef _PATH_TCSHELL
@@ -107,5 +123,17 @@
 #define ECHO_STYLE      BOTH_ECHO
 
 #define NLS_CATALOGS
+
+#if !defined(SYSMALLOC)
+# define SYSMALLOC
+#endif
+#if !defined(NISPLUS)
+# define NISPLUS
+#endif
+#if !defined(POSIX)
+# define POSIX
+#endif
+
+#define MCLoadBySet	NL_CAT_LOCALE
 
 #endif /* _h_config */

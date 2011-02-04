@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.79 2010/12/22 17:26:05 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.80 2011/01/17 16:28:39 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.79 2010/12/22 17:26:05 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.80 2011/01/17 16:28:39 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1229,7 +1229,7 @@ autoset_dspmbyte(const Char *pcp)
 	{ STRLANGEUCJPB, STReuc },
 	{ STRLANGEUCKRB, STReuc },
 	{ STRLANGEUCZHB, STReuc },
-#ifdef linux
+#ifdef __linux__
 	{ STRLANGEUCJPC, STReuc },
 #endif
 	{ STRLANGSJIS, STRsjis },

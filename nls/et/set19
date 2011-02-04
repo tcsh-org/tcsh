@@ -1,4 +1,4 @@
-$ $tcsh: set19,v 1.1 2001/01/04 18:46:03 christos Exp $
+$ $tcsh: set19,v 1.2 2006/03/02 18:46:45 christos Exp $
 $ tc.alloc.c
 $set 19 
 1 nbytes=%d: Mälu on otsas\n
@@ -13,3 +13,11 @@ $set 19
 10 \n\tKokku kasutusel: %d, kokku vaba: %d\n
 11 \tMälu vahemikus 0x%lx kuni 0x%lx.  Tegelik algus 0x%lx\n
 12 Mälu vahemikus 0x%lx kuni 0x%lx (%ld).\n
+13 %s current memory allocation:\n
+14 Total space allocated from system: %d\n
+15 Number of non-inuse chunks: %d\n
+16 Number of mmapped regions: %d\n
+17 Total space in mmapped regions: %d\n
+18 Total allocated space: %d\n
+19 Total non-inuse space: %d\n
+20 Top-most, releasable space: %d\n

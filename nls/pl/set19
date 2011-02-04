@@ -13,3 +13,11 @@ $set 19
 10 \n\tAktualnie w u¿yciu: %d, wolnych: %d\n
 11 \tZaallokowano pamiêæ od 0x%lx do 0x%lx.  Wierzcho³ek 0x%lx\n
 12 Zaallokowano pamiêæ od 0x%lx do 0x%lx (%ld).\n
+13 %s current memory allocation:\n
+14 Total space allocated from system: %d\n
+15 Number of non-inuse chunks: %d\n
+16 Number of mmapped regions: %d\n
+17 Total space in mmapped regions: %d\n
+18 Total allocated space: %d\n
+19 Total non-inuse space: %d\n
+20 Top-most, releasable space: %d\n

@@ -1,4 +1,4 @@
-$ $tcsh: set19,v 1.1 1998/04/08 17:59:59 christos Exp $
+$ $tcsh: set19,v 1.2 2006/03/02 18:46:48 christos Exp $
 $ tc.alloc.c
 $set 19 
 1 nbytes=%d: Se ha agotado la memoria\n
@@ -13,3 +13,11 @@ $set 19
 10 \n\tTotal en uso: %d, total libre: %d\n
 11 \tSe ha asignado memoria de  0x%lx a 0x%lx.  Límite superior real en 0x%lx\n
 12 Se ha asignado memoria de 0x%lx a 0x%lx (%ld).\n
+13 %s current memory allocation:\n
+14 Total space allocated from system: %d\n
+15 Number of non-inuse chunks: %d\n
+16 Number of mmapped regions: %d\n
+17 Total space in mmapped regions: %d\n
+18 Total allocated space: %d\n
+19 Total non-inuse space: %d\n
+20 Top-most, releasable space: %d\n
