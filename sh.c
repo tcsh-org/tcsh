@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.168 2011/01/25 19:32:02 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.169 2011/01/25 20:10:46 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.168 2011/01/25 19:32:02 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.169 2011/01/25 20:10:46 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -170,17 +170,26 @@ add_localedir_to_nlspath(const char *path)
 {
     static const char msgs_LOC[] = "/%L/LC_MESSAGES/%N.cat";
     static const char msgs_lang[] = "/%l/LC_MESSAGES/%N.cat";
-    char *old = getenv("NLSPATH");
+    char *old;
     char *new, *new_p;
-    size_t len = 0;
+    size_t len;
     int add_LOC = 1;
     int add_lang = 1;
+    char trypath[MAXPATHLEN];
+    struct stat st;
 
     if (path == NULL)
         return;
 
-    if (old != NULL)
-        len += strlen(old) + 1;	/* don't forget the colon. */
+    (void) xsnprintf(trypath, sizeof(trypath), "%s/en/LC_MESSAGES/tcsh.cat",
+	path);
+    if (stat(trypath, &st) == -1)
+	return;
+
+    if ((old = getenv("NLSPATH")) != NULL)
+        len = strlen(old) + 1;	/* don't forget the colon. */
+    else
+	len = 0;
 
     len += 2 * strlen(path) +
 	   sizeof(msgs_LOC) + sizeof(msgs_lang); /* includes the extra colon */
