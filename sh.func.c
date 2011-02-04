@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.158 2010/12/22 17:26:04 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.159 2011/01/17 16:28:39 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.158 2010/12/22 17:26:04 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.159 2011/01/17 16:28:39 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2632,7 +2632,7 @@ nlsinit(void)
 #if defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
     /* xcatgets (), not CGETS, the charset name should be in ASCII anyway. */
     catgets_iconv = iconv_open (nl_langinfo (CODESET),
-				xcatgets(catd, 255, 1, "ASCII"));
+				xcatgets(catd, 255, 1, "UTF-8"));
 #endif /* HAVE_ICONV && HAVE_NL_LANGINFO */
 #endif /* NLS_CATALOGS */
 #ifdef WINNT_NATIVE
