@@ -79,5 +79,4 @@
 /****************** local defines *********************/
 #define BACKPIPE	/* Fork pipelines backwards */
 
-#undef NLS_CATALOGS
 #endif /* _h_config */

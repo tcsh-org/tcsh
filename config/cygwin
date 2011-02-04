@@ -84,8 +84,6 @@
 #endif
 #define ECHO_STYLE      BOTH_ECHO
 
-#define NLS_CATALOGS
-
 /* Cygwin allows paths prepended with double slashes (network paths). */
 #define HAVE_SLASHSLASH 1
 

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/config_f.h,v 3.44 2010/05/15 13:32:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/config_f.h,v 3.45 2011/02/04 18:00:25 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -55,17 +55,6 @@
 # if SIZEOF_WCHAR_T < 4
 #  define UTF16_STRINGS
 # endif
-#endif
-
-/*
- * NLS_CATALOGS:Use Native Language System catalogs for
- *		international messages.
- *		Routines like catopen() are needed
- *		if you don't have <nl_types.h>, you don't want
- *		to define this.
- */
-#if defined (NLS) && defined (HAVE_CATGETS)
-# define NLS_CATALOGS
 #endif
 
 /*

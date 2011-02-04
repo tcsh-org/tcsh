@@ -96,5 +96,4 @@
 # define _SYSV_SOURCE
 #endif /* _SYSV_SOURCE */
 
-#undef NLS_CATALOGS
 #endif /* _h_config */

@@ -95,5 +95,4 @@
 
 #define strtoul(a, b, c) ((unsigned long)strtol((a), (b), (c)))
 
-#undef NLS_CATALOGS
 #endif /* _h_config */

@@ -95,7 +95,4 @@
 # define _TERMIOS_H_
 #endif /* __NeXT31__  && !POSIX */
 
-#ifndef NeXT
-#undef NLS_CATALOGS
-#endif
 #endif /* _h_config */

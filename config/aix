@@ -156,8 +156,4 @@
 /* > 2GB file support (stat64 etc.) */
 #define _LARGE_FILES
 
-#if defined(_AIXPS2) || defined(aiws)
-# undef NLS_CATALOGS
-#endif
-
 #endif /* _h_config */

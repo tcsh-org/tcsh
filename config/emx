@@ -82,5 +82,4 @@
 #define NO_CRYPT
 #define BACKPIPE
 #define CASE_INSENSITIVE
-#undef NLS_CATALOGS
 #endif /* _h_config */

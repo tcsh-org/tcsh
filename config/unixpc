@@ -79,5 +79,4 @@
 /****************** local defines *********************/
 #define UNIXPC
 
-#undef NLS_CATALOGS
 #endif /* _h_config */

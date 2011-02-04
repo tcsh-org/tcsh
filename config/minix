@@ -97,6 +97,5 @@
  */
 #undef _MINIX_VMD
 
-#undef NLS_CATALOGS
 #undef REMOTEHOST
 #endif /* _h_config */

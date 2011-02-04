@@ -78,5 +78,4 @@
 
 /****************** local defines *********************/
 #define RTU6
-#undef NLS_CATALOGS
 #endif /* _h_config */

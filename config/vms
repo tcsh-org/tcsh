@@ -96,7 +96,6 @@
 #define glob		vms_glob
 #define globfree	vms_globfree
 
-#undef NLS_CATALOGS
 #undef SYSMALLOC
 #define SYSMALLOC
 

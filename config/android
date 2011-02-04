@@ -105,7 +105,6 @@
 #endif
 #define ECHO_STYLE      BOTH_ECHO
 
-#undef NLS_CATALOGS
 #define NO_CRYPT
 
 #endif /* _h_config */

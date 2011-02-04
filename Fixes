@@ -1,3 +1,4 @@
+ 74. Add --disable-nls-catalogs (Corinna Vinschen)
  73. convert message catalogs to UTF-8 (Werner Fink)
  72. check that the NLS path works before setting $NLSPATH.
  71. use SYSMALLOC for GLIBC (Werner Fink)

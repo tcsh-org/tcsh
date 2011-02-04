@@ -77,6 +77,5 @@
 #undef YPBUGS
 
 /****************** local defines *********************/
-#undef NLS_CATALOGS
 #define SYSMALLOC
 #endif /* _h_config */

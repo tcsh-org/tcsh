@@ -122,8 +122,6 @@
 #endif
 #define ECHO_STYLE      BOTH_ECHO
 
-#define NLS_CATALOGS
-
 #if !defined(SYSMALLOC)
 # define SYSMALLOC
 #endif
