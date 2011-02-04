@@ -1,6 +1,6 @@
-$ $tcsh: set25,v 1.1 2001/01/04 18:46:04 christos Exp $
+$ $tcsh: set25,v 1.2 2006/03/02 18:46:45 christos Exp $
 $ tc.sig.c
 $set 25 
 1 our wait %d\n
 2 viga: bsd_signal(%d) pole signaal\n
-3 viga: bsd_signal(%d) - sigaction ebaınnestus, errno = %d\n
+3 viga: bsd_signal(%d) - sigaction eba√µnnestus, errno = %d\n
