@@ -10,9 +10,6 @@
 /* Define to 1 if you have the <auth.h> header file. */
 #undef HAVE_AUTH_H
 
-/* Define to 1 if you have the `catgets' function. */
-#undef HAVE_CATGETS
-
 /* Define to 1 if you have the <crypt.h> header file. */
 #undef HAVE_CRYPT_H
 
@@ -89,6 +86,9 @@
 
 /* Define to 1 if you have the `nl_langinfo' function. */
 #undef HAVE_NL_LANGINFO
+
+/* Define to 1 if you have the <paths.h> header file. */
+#undef HAVE_PATHS_H
 
 /* Define to 1 if you have the `sbrk' function. */
 #undef HAVE_SBRK
@@ -182,6 +182,9 @@
 
 /* Support NLS. */
 #undef NLS
+
+/* Support NLS catalogs. */
+#undef NLS_CATALOGS
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
