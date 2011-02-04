@@ -1,4 +1,4 @@
-$ $tcsh: set19,v 1.4 2011/02/04 18:00:27 christos Exp $
+$ $tcsh: set19,v 1.5 2011/02/04 18:19:36 christos Exp $
 $ tc.alloc.c
 $set 19
 1 nbytes=%d: Out of memory\n
@@ -16,14 +16,6 @@ $set 19
 13 Tcsh's augenblickliche Speicherbelegung:\n
 14 Gesamter vom System angeforderter Speicher: %d\n
 15 Anzahl nicht benutzter BlÃ¶cke:: %d\n
-16 Anzahl via mmap angeforderter Speicherbereiche: %d\n
-17 Via mmap angeforderter Speicher: %d\n
-18 Gesamter benutzer Speicher im Pool: %d\n
-19 Gesamter freier Speicher im Pool: %d\n
-20 Speicher der freigegeben werden kann: %d\n
-13 Tcsh's augenblickliche Speicherbelegung:\n
-14 Gesamter vom System angeforderter Speicher: %d\n
-15 Anzahl nicht benutzter BlÃÂ¶cke:: %d\n
 16 Anzahl via mmap angeforderter Speicherbereiche: %d\n
 17 Via mmap angeforderter Speicher: %d\n
 18 Gesamter benutzer Speicher im Pool: %d\n
