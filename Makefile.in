@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.47 2011/01/25 13:58:19 christos Exp $
+# $tcsh: Makefile.in,v 3.48 2011/02/05 16:14:20 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -642,11 +642,14 @@ install.cygwin: install
 	cp -p ${srcdir}/cygwin/postinstall.sh ${DESTDIR}/etc/postinstall/tcsh.sh
 	cp -p ${srcdir}/cygwin/preremove.sh ${DESTDIR}/etc/preremove/tcsh.sh
 
-clean:
+clean: clean.catalogs
 	${RM} -f a.out strings x.c xs.c tcsh$(EXEEXT) tcsh.a _MAKE_LOG gethost
 	${RM} -f *.${SUF} *.i *.s
 	${RM} -f sh.prof.c ed.defns.h tc.const.h sh.err.h tc.defs.c
 	${RM} -f tcsh.*.m tcsh.*.cat
+
+clean.catalogs:
+	@test "x${BUILD_CATALOGS}" = "xyes" && (cd nls; ${MAKE} clean) || exit 0
 
 veryclean: clean
 	${RM} -f Makefile config.h config_p.h
