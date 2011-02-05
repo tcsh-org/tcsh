@@ -72,7 +72,6 @@ typedef struct {
 #define	GLOB_NOSYS	(-4)	/* Implementation does not support function. */
 
 /* #if !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE) */
-#if (!defined _POSIX_C_SOURCE || _POSIX_C_SOURCE < 2 || defined _BSD_SOURCE || defined _GNU_SOURCE)
 #define	GLOB_ALTDIRFUNC	0x0040	/* Use alternately specified directory funcs. */
 #define	GLOB_BRACE	0x0080	/* Expand braces ala csh. */
 #define	GLOB_MAGCHAR	0x0100	/* Pattern had globbing characters. */
@@ -85,7 +84,7 @@ typedef struct {
 #define	GLOB_DOT	0x8000	/* don't skip dotfiles (except . and ..) */
 
 #define	GLOB_ABEND	GLOB_ABORTED	/* source compatibility */
-#endif
+/* #endif */
 
 int	glob (const char *, int, int (*)(const char *, int), glob_t *);
 void	globfree (glob_t *);
