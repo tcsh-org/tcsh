@@ -7,7 +7,7 @@ dnl You'll also need a version of config.guess from a gnu package
 dnl
 dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 dnl
-dnl $tcsh: configure.in,v 3.88 2011/02/04 18:00:25 christos Exp $
+dnl $tcsh: configure.in,v 3.89 2011/02/04 22:16:06 christos Exp $
 
 AC_PREREQ([2.59])dnl Minimum Autoconf version required.
 AC_INIT([tcsh], [6.17.05], [http://bugs.gw.com/])
@@ -305,7 +305,8 @@ AC_SEARCH_LIBS(catgets, catgets)
 AM_ICONV
 
 dnl Checks for header files
-AC_CHECK_HEADERS([auth.h crypt.h inttypes.h paths.h shadow.h stdint.h utmp.h utmpx.h])
+AC_CHECK_HEADERS([auth.h crypt.h features.h inttypes.h paths.h] dnl
+		 [shadow.h stdint.h utmp.h utmpx.h])
 AC_CHECK_HEADERS([wchar.h],
 	[AC_CHECK_SIZEOF([wchar_t], [], [dnl
 #include <stdio.h>
@@ -455,6 +456,7 @@ if test "x$enable_nls" != xno -a "$have_catgets" != no -a -n "$GENCAT" ; then
   AC_ARG_ENABLE([nls-catalogs], AS_HELP_STRING([--disable-nls-catalogs], [Disable NLS catalog support]),
 	        [], [enable_nls_catalogs=yes])
   if test "x$enable_nls_catalogs" != xno; then
+    BUILD_CATALOGS="yes"
     AC_DEFINE([NLS_CATALOGS], [1], [Support NLS catalogs.])
   fi
 fi
@@ -474,6 +476,7 @@ if test "$hesiod" != no; then
 fi
 AC_SUBST(HESDEF)
 AC_SUBST(HESLIB)
+AC_SUBST(BUILD_CATALOGS)
 
 AC_CONFIG_FILES([Makefile nls/Makefile])
 AC_OUTPUT

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.159 2011/01/17 16:28:39 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.160 2011/02/04 18:20:42 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.159 2011/01/17 16:28:39 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.160 2011/02/04 18:20:42 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -41,8 +41,7 @@ RCSID("$tcsh: sh.func.c,v 3.159 2011/01/17 16:28:39 christos Exp $")
 #include "nt.const.h"
 #endif /* WINNT_NATIVE */
 
-#if defined (NLS_CATALOGS) && defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)
-#include <langinfo.h>
+#if defined (NLS_CATALOGS) && defined(HAVE_ICONV)
 static iconv_t catgets_iconv; /* Or (iconv_t)-1 */
 #endif
 
@@ -2626,7 +2625,18 @@ nlsinit(void)
 
     if (adrof(STRcatalog) != NULL)
 	catalog = xasprintf("tcsh.%s", short2str(varval(STRcatalog)));
+#ifdef NL_CAT_LOCALE /* POSIX-compliant. */
+    /*
+     * Check if LC_MESSAGES is set in the environment and use it, if so.
+     * If not, fall back to the setting of LANG.
+     */
+    catd = catopen(catalog, tgetenv(STRLC_MESSAGES) ? NL_CAT_LOCALE : 0);
+#else /* pre-POSIX */
+# ifndef MCLoadBySet
+#  define MCLoadBySet 0
+#  endif
     catd = catopen(catalog, MCLoadBySet);
+#endif
     if (catalog != default_catalog)
 	xfree(catalog);
 #if defined(HAVE_ICONV) && defined(HAVE_NL_LANGINFO)

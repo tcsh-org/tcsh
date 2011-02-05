@@ -132,6 +132,4 @@
 # define POSIX
 #endif
 
-#define MCLoadBySet	NL_CAT_LOCALE
-
 #endif /* _h_config */

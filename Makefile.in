@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.46 2011/01/09 16:25:29 christos Exp $
+# $tcsh: Makefile.in,v 3.47 2011/01/25 13:58:19 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -370,6 +370,8 @@ DESTMAN=${DESTDIR}${mandir}/man${MANSECT}
 EXEEXT=@EXEEXT@
 FTPAREA=/usr/spool/ftp
 
+BUILD_CATALOGS = @BUILD_CATALOGS@
+
 ASSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.exp.c sh.file.c sh.func.c sh.glob.c sh.hist.c sh.init.c \
 	sh.lex.c sh.misc.c sh.parse.c sh.print.c sh.proc.c sh.sem.c \
@@ -427,7 +429,7 @@ DISTSRCS= ${PSSRCS} ${TWSRCS} ${EDSRCS} ${TCSRCS} ${AVSRCS} $(TESTFILES)
 OBJS= ${SHOBJS} ${TWOBJS} ${EDOBJS} ${TCOBJS}
 
 
-all: ${BUILD}
+all: ${BUILD} catalogs
 
 tcsh$(EXEEXT):$(P) ${OBJS} 
 	rm -f tcsh$(EXEEXT) core
@@ -593,12 +595,15 @@ vgrind:
 
 install-strip: install
 
-install: tcsh$(EXEEXT) 
+install: tcsh$(EXEEXT) install.catalogs install.man
 	-mkdir -p ${DESTBIN}
 	-mv -f ${DESTBIN}/tcsh$(EXEEXT)  ${DESTBIN}/tcsh.old
 	cp tcsh$(EXEEXT) ${DESTBIN}/tcsh$(EXEEXT)
 	-strip ${DESTBIN}/tcsh$(EXEEXT)
 	chmod 755 ${DESTBIN}/tcsh$(EXEEXT)
+
+install.catalogs:
+	@test "x${BUILD_CATALOGS}" = "xyes" && (cd nls; ${MAKE} install DESTDIR=${DESTDIR}) || exit 0
 
 install.man: tcsh.man
 	-mkdir -p ${DESTMAN}
@@ -606,8 +611,20 @@ install.man: tcsh.man
 	cp $(srcdir)/tcsh.man ${DESTMAN}/tcsh.${MANSECT}
 	chmod 444 ${DESTMAN}/tcsh.${MANSECT}
 
-install.cygwin: install install.man
-	make -C nls install DESTDIR=${DESTDIR}
+# Amiga Unix
+#install.man: tcsh.man
+#        compress tcsh.man
+#	cp tcsh.man.Z ${DESTMAN}/tcsh.Z
+#	chmod 444 ${DESTMAN}/tcsh.Z
+
+# Apple A/UX
+#install.man: tcsh.man
+#	-rm -f ${DESTMAN}/tcsh.${MANSECT}.Z
+#	nroff -man tcsh.man | compress > ${DESTMAN}/tcsh.${MANSECT}.Z
+#	chmod 444 ${DESTMAN}/tcsh.${MANSECT}.Z
+
+install.cygwin: install
+	-gzip ${DESTMAN}/tcsh.${MANSECT}
 	-mkdir -p ${DESTDIR}${prefix}/share/doc/tcsh
 	cp ${srcdir}/FAQ ${srcdir}/Fixes ${DESTDIR}${prefix}/share/doc/tcsh
 	cp ${srcdir}/NewThings ${srcdir}/README ${DESTDIR}${prefix}/share/doc/tcsh
@@ -624,18 +641,6 @@ install.cygwin: install install.man
 	cp -p ${srcdir}/complete.tcsh ${DESTDIR}/etc/defaults/etc/profile.d
 	cp -p ${srcdir}/cygwin/postinstall.sh ${DESTDIR}/etc/postinstall/tcsh.sh
 	cp -p ${srcdir}/cygwin/preremove.sh ${DESTDIR}/etc/preremove/tcsh.sh
-
-# Amiga Unix
-#install.man: tcsh.man
-#        compress tcsh.man
-#	cp tcsh.man.Z ${DESTMAN}/tcsh.Z
-#	chmod 444 ${DESTMAN}/tcsh.Z
-
-# Apple A/UX
-#install.man: tcsh.man
-#	-rm -f ${DESTMAN}/tcsh.${MANSECT}.Z
-#	nroff -man tcsh.man | compress > ${DESTMAN}/tcsh.${MANSECT}.Z
-#	chmod 444 ${DESTMAN}/tcsh.${MANSECT}.Z
 
 clean:
 	${RM} -f a.out strings x.c xs.c tcsh$(EXEEXT) tcsh.a _MAKE_LOG gethost
@@ -690,7 +695,7 @@ shar:
 	rm -rf tcsh-${VERSION}
 
 catalogs:
-	@(cd nls; ${MAKE} catalogs)
+	@test "x${BUILD_CATALOGS}" = "xyes" && (cd nls; ${MAKE} catalogs) || exit 0
 
 tcsh-${VERSION}.tar.Z:
 	rm -rf tcsh-${VERSION} 
