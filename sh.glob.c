@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.79 2010/05/17 19:36:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.80 2010/05/20 22:03:40 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.79 2010/05/17 19:36:45 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.80 2010/05/20 22:03:40 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -516,7 +516,7 @@ globone(Char *str, int action)
 	stderror(ERR_NAME | ERR_NOMATCH);
     }
  result:
-    if (vl[0] == NULL) {
+    if (vl && vl[0] == NULL) {
 	xfree(vl);
 	return (Strsave(STRNULL));
     }
@@ -693,7 +693,7 @@ dobackp(Char *cp, int literal)
 static void
 backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 {
-    int icnt;
+    ssize_t icnt;
     Char c, *ip;
     struct command faket;
     int    hadnl;
@@ -808,7 +808,7 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
     c = 0;
     ip = NULL;
     do {
-	int     cnt = 0;
+	ssize_t     cnt = 0;
 	char   *tmp;
 
 	tmp = tibuf;
