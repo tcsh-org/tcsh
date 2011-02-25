@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.169 2011/01/25 20:10:46 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.170 2011/02/04 18:21:29 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.169 2011/01/25 20:10:46 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.170 2011/02/04 18:21:29 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2347,8 +2347,14 @@ initdesc(void)
 #ifndef CLOSE_ON_EXEC
     didcch = 0;			/* Havent closed for child */
 #endif /* CLOSE_ON_EXEC */
-    isdiagatty = isatty(SHDIAG);
-    isoutatty = isatty(SHOUT);
+    if (SHDIAG >= 0)
+	isdiagatty = isatty(SHDIAG);
+    else
+    	isdiagatty = 0;
+    if (SHDIAG >= 0)
+	isoutatty = isatty(SHOUT);
+    else
+    	isoutatty = 0;
 #ifdef NLS_BUGS
 #ifdef NLS_CATALOGS
     nlsinit();
