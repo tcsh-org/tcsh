@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.144 2011/01/17 16:26:43 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.145 2011/01/20 19:40:25 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.144 2011/01/17 16:26:43 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.145 2011/01/20 19:40:25 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1944,6 +1944,7 @@ getremotehost(int dest_fd)
 		    if (res != NULL) {
 			if (res->ai_canonname != NULL) {
 			    strncpy(hbuf, res->ai_canonname, sizeof(hbuf));
+			    hbuf[sizeof(hbuf) - 1] = '\0';
 			    host = hbuf;
 			}
 			freeaddrinfo(res);
