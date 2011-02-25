@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.37 2010/12/22 17:25:05 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.38 2010/12/22 17:26:05 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -35,7 +35,7 @@
 
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.37 2010/12/22 17:25:05 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.38 2010/12/22 17:26:05 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -625,6 +625,7 @@ STRBUF##_store1(struct STRBUF *buf, CHAR c)			\
 	    buf->size *= 2;					\
 	buf->s = xrealloc(buf->s, buf->size * sizeof(*buf->s));	\
     }								\
+    assert(buf->s);						\
     buf->s[buf->len] = c;					\
 }								\
 								\
