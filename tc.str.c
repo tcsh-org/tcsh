@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.38 2010/12/22 17:26:05 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.39 2011/02/25 23:08:04 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -33,9 +33,10 @@
  */
 #include "sh.h"
 
+#include <assert.h>
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.38 2010/12/22 17:26:05 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.39 2011/02/25 23:08:04 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS

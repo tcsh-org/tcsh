@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.term.c,v 1.36 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.term.c,v 1.37 2011/02/25 23:20:41 christos Exp $ */
 /*
  * ed.term.c: Low level terminal interface
  */
@@ -33,8 +33,8 @@
 #include "sh.h"
 #ifndef WINNT_NATIVE
 
-RCSID("$tcsh: ed.term.c,v 1.36 2006/03/02 18:46:44 christos Exp $")
-
+RCSID("$tcsh: ed.term.c,v 1.37 2011/02/25 23:20:41 christos Exp $")
+#include <assert.h>
 #include "ed.h"
 
 int didsetty = 0;

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.exec.c,v 3.77 2010/05/12 15:04:11 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exec.c,v 3.78 2010/08/16 17:08:21 christos Exp $ */
 /*
  * sh.exec.c: Search, find, and execute a command!
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exec.c,v 3.77 2010/05/12 15:04:11 christos Exp $")
+RCSID("$tcsh: sh.exec.c,v 3.78 2010/08/16 17:08:21 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -141,7 +141,7 @@ static int hits, misses;
 /* Dummy search path for just absolute search when no path */
 static Char *justabs[] = {STRNULL, 0};
 
-static	void	pexerr		(void);
+static	void	pexerr		(void) __attribute__((__noreturn__));
 static	void	texec		(Char *, Char **);
 int	hashname	(Char *);
 static	int 	iscommand	(Char *);

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.60 2010/12/22 17:26:04 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.61 2011/01/24 18:17:07 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -48,9 +48,9 @@ extern	void		  phup		(void);
 extern	void		  process	(int);
 extern	void		  untty		(void);
 #ifdef PROF
-extern	void		  done		(int);
+extern	void		  done		(int) __attribute__((__noreturn__));
 #else
-extern	void		  xexit		(int);
+extern	void		  xexit		(int) __attribute__((__noreturn__));
 #endif
 extern	int		  grabpgrp	(int, pid_t);
 
@@ -82,7 +82,7 @@ extern	void		  heredoc	(Char *);
 /*
  * sh.err.c
  */
-extern	void		  reset		(void);
+extern	void		  reset		(void) __attribute__((__noreturn__));
 extern	void		  cleanup_push_internal(void *, void (*fn) (void *)
 #ifdef CLEANUP_DEBUG
 						, const char *, size_t
@@ -104,7 +104,9 @@ extern	void		  sigprocmask_cleanup(void *);
 extern	void		  xfree_indirect(void *);
 extern	void		  errinit	(void);
 extern	void		  seterror	(unsigned int, ...);
-extern	void		  stderror	(unsigned int, ...);
+extern	void		  fixerror	(void);
+extern	void		  stderror	(unsigned int, ...)
+    __attribute__((__noreturn__));
 
 /*
  * sh.exec.c
@@ -276,7 +278,7 @@ extern	const Char	 *quote_meta	(struct Strbuf *, const Char *);
 extern	char		 *strnsave	(const char *, size_t);
 #endif
 extern	char		 *strsave	(const char *);
-extern	void		  udvar		(Char *);
+extern	void		  udvar		(Char *) __attribute__((__noreturn__));
 #ifndef POSIX
 extern  char   	  	 *strstr	(const char *, const char *);
 #endif /* !POSIX */
