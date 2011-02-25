@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.54 2010/01/26 16:10:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.55 2010/01/26 20:03:17 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exp.c,v 3.54 2010/01/26 16:10:09 christos Exp $")
+RCSID("$tcsh: sh.exp.c,v 3.55 2010/01/26 20:03:17 christos Exp $")
 
 #include "tw.h"
 
@@ -632,7 +632,7 @@ filetest(Char *cp, Char ***vp, int ignore)
     int altout = 0;
     Char *ft = cp, *dp, *ep, *strdev, *strino, *strF, *str, valtest = '\0',
     *errval = STR0;
-    char *string, string0[8];
+    char *string, string0[MB_LEN_MAX + 1];
     time_t footime;
     struct passwd *pw;
     struct group *gr;
