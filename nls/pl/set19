@@ -9,7 +9,7 @@ $set 19
 6 free(%lx) bad range check.
 7 free(%lx) bad block index.
 8 %s aktualnie allokowana pamięć:\nwolna:\t
-9 \nużywane:\t
+9 używane
 10 \n\tAktualnie w użyciu: %d, wolnych: %d\n
 11 \tZaallokowano pamięć od 0x%lx do 0x%lx.  Wierzchołek 0x%lx\n
 12 Zaallokowano pamięć od 0x%lx do 0x%lx (%ld).\n

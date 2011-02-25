@@ -1,4 +1,4 @@
-$ $tcsh: set19,v 1.4 2011/02/04 18:00:28 christos Exp $
+$ $tcsh: set19,v 1.5 2011/02/04 18:19:44 christos Exp $
 $ tc.alloc.c
 $set 19 
 1 nbytes=%d: Мало пам'яті\n
@@ -9,7 +9,7 @@ $set 19
 6 free(%lx) bad range check.
 7 free(%lx) bad block index.
 8 Нинішнє розподілення пам'яті %s:\nвільно:\t
-9 \nзанято:\t
+9 занято
 10 \n\tВсього занято: %d, всього вільно: %d\n
 11 \tЗанято пам'ять з 0x%lx до 0x%lx.  Real top at 0x%lx\n
 12 Занято пам'ять з 0x%lx до 0x%lx (%ld).\n

@@ -1,4 +1,4 @@
-$ $tcsh: set19,v 1.4 2011/02/04 18:00:27 christos Exp $
+$ $tcsh: set19,v 1.5 2011/02/04 18:19:35 christos Exp $
 $ tc.alloc.c
 $set 19 
 1 nbytes=%d: Plus de mémoire\n
@@ -9,7 +9,7 @@ $set 19
 6 free(%lx) limites incorrectes.
 7 free(%lx) index de bloc incorrect.
 8 %s allocation mémoire actuelle:\nfree:\t
-9 \nutilisé:\t
+9 utilisé
 10 \n\tTotal utilisé: %d, total libre: %d\n
 11 \tMémoire allouée de 0x%lx à 0x%lx.  Limite réelle supérieure à 0x%lx\n
 12 Mémoire allouée de 0x%lx à 0x%lx (%ld).\n

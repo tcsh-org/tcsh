@@ -1,4 +1,4 @@
-$ $tcsh: set19,v 1.4 2011/02/04 18:00:27 christos Exp $
+$ $tcsh: set19,v 1.5 2011/02/04 18:19:41 christos Exp $
 $ tc.alloc.c
 $set 19 
 1 nbytes=%d: Нет памяти\n
@@ -9,7 +9,7 @@ $set 19
 6 free(%lx) bad range check.
 7 free(%lx) bad block index.
 8 %s current memory allocation:\nfree:\t
-9 \nused:\t
+9 used
 10 \n\tВсего используется: %d, всего свободно: %d\n
 11 \tAllocated memory from 0x%lx to 0x%lx.  Real top at 0x%lx\n
 12 Allocated memory from 0x%lx to 0x%lx (%ld).\n

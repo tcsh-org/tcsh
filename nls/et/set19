@@ -1,4 +1,4 @@
-$ $tcsh: set19,v 1.3 2011/02/04 18:00:26 christos Exp $
+$ $tcsh: set19,v 1.4 2011/02/04 18:19:33 christos Exp $
 $ tc.alloc.c
 $set 19 
 1 nbytes=%d: Mälu on otsas\n
@@ -9,7 +9,7 @@ $set 19
 6 free(%lx) vigane piirkonna kontroll.
 7 free(%lx) vigane plokkide indeks.
 8 %s mälu kasutamine hetkel:\nvaba:\t
-9 \nkasutatud:\t
+9 kasutatud
 10 \n\tKokku kasutusel: %d, kokku vaba: %d\n
 11 \tMälu vahemikus 0x%lx kuni 0x%lx.  Tegelik algus 0x%lx\n
 12 Mälu vahemikus 0x%lx kuni 0x%lx (%ld).\n

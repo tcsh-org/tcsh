@@ -1,4 +1,4 @@
-$ $tcsh: set19,v 1.2 2006/03/02 18:46:47 christos Exp $
+$ $tcsh: set19,v 1.3 2011/02/04 18:00:27 christos Exp $
 $ tc.alloc.c
 $set 19 
 1 nbytes=%d: Memoria esaurita\n
@@ -9,7 +9,7 @@ $set 19
 6 free(%lx) intervallo di controllo sbagliato.
 7 free(%lx) indice di blocco sbagliato.
 8 %s attuale allocazione di memoria:\nlibera:\t
-9 \nutilizzata:\t
+9 utilizzata
 10 \n\tTotale utilizzata: %d, totale libera: %d\n
 11 \tAllocata memoria da 0x%lx a 0x%lx.  Limite superiore effettivo a 0x%lx\n
 12 Allocata memoria da 0x%lx a 0x%lx (%ld).\n

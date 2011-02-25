@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.46 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.47 2011/02/04 18:00:26 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -43,7 +43,7 @@
 #include <malloc.h>
 #endif
 
-RCSID("$tcsh: tc.alloc.c,v 3.46 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: tc.alloc.c,v 3.47 2011/02/04 18:00:26 christos Exp $")
 
 #define RCHECK
 #define DEBUG
@@ -590,7 +590,7 @@ showall(Char **v, struct command *c)
 	xprintf(" %4zd", j);
 	totfree += j * (1 << (i + 3));
     }
-    xprintf(CGETS(19, 9, "\nused:\t"));
+    xprintf("\n%s:\t", CGETS(19, 9, "used"));
     for (i = 0; i < NBUCKETS; i++) {
 	xprintf(" %4d", nmalloc[i]);
 	totused += nmalloc[i] * (1 << (i + 3));
