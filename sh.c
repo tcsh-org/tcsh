@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.170 2011/02/04 18:21:29 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.171 2011/02/25 23:25:33 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.170 2011/02/04 18:21:29 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.171 2011/02/25 23:25:33 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -2259,8 +2259,10 @@ mailchk(void)
 		continue;
 
 	    /* skip . and .. */
-	    if (!readdir(mailbox) || !readdir(mailbox))
+	    if (!readdir(mailbox) || !readdir(mailbox)) {
+		(void)closedir(mailbox);
 		continue;
+	    }
 
 	    while (readdir(mailbox))
 		mailcount++;
