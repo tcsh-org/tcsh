@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.75 2006/08/24 20:56:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.76 2009/06/25 21:15:37 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.screen.c,v 3.75 2006/08/24 20:56:31 christos Exp $")
+RCSID("$tcsh: ed.screen.c,v 3.76 2009/06/25 21:15:37 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1625,7 +1625,8 @@ ChangeSize(int lins, int cols)
 		(void) Strcat(backup + len, p);
 		xfree(p);
 		ptr = Strchr(ptr, ':');
-		(void) Strcat(backup, ptr);
+		if (ptr)
+		    (void) Strcat(backup, ptr);
 	    }
 
 	    /* now do lines */
