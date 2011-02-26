@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.160 2011/02/04 18:20:42 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.161 2011/02/05 16:14:20 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.160 2011/02/04 18:20:42 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.161 2011/02/05 16:14:20 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -587,6 +587,7 @@ dowhile(Char **v, struct command *c)
 	nwp->w_start = lineloc;
 	nwp->w_end.type = TCSH_F_SEEK;
 	nwp->w_end.f_seek = 0;
+	nwp->w_end.a_seek = 0;
 	nwp->w_next = whyles;
 	whyles = nwp;
 	zlast = TC_WHILE;
@@ -763,6 +764,7 @@ search(int type, int level, Char *goal)
 	struct Ain a;
 	a.type = TCSH_F_SEEK;
 	a.f_seek = 0;
+	a.a_seek = 0;
 	bseek(&a);
     }
     cleanup_push(&word, Strbuf_cleanup);
