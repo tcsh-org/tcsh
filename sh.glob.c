@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.80 2010/05/20 22:03:40 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.81 2011/02/25 23:19:11 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.80 2010/05/20 22:03:40 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.81 2011/02/25 23:19:11 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -520,7 +520,7 @@ globone(Char *str, int action)
 	xfree(vl);
 	return (Strsave(STRNULL));
     }
-    if (vl[1]) 
+    if (vl && vl[1]) 
 	return (handleone(str, vl, action));
     else {
 	str = strip(*vl);

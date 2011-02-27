@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.145 2011/01/20 19:40:25 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.146 2011/02/25 22:49:54 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.145 2011/01/20 19:40:25 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.146 2011/02/25 22:49:54 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1640,7 +1640,7 @@ fixio(int fd, int e)
 # endif /* !EWOULDBLOCK || EWOULDBLOCK != EAGAIN */
 #endif /* POSIX && EAGAIN */
 
-	e = 0;
+	e = -1;
 #ifdef FDRETRY
 # ifdef F_SETFL
 /*
@@ -1688,19 +1688,17 @@ fixio(int fd, int e)
 	if (fcntl(fd, F_SETFL, e) == -1)
 	    return -1;
 	else 
-	    e = 1;
+	    e = 0;
 # endif /* F_SETFL */
 
 # ifdef FIONBIO
 	e = 0;
 	if (ioctl(fd, FIONBIO, (ioctl_t) &e) == -1)
 	    return -1;
-	else
-	    e = 1;
 # endif	/* FIONBIO */
 
 #endif /* FDRETRY */
-	return e ? 0 : -1;
+	return e;
 
     case EINTR:
 	return 0;
