@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.130 2011/01/24 18:10:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.131 2011/01/24 18:50:44 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.130 2011/01/24 18:10:26 christos Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.131 2011/01/24 18:50:44 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -124,7 +124,8 @@ static  int      tw_collect_items	(COMMAND, int, struct Strbuf *,
 static  int      tw_collect		(COMMAND, int, struct Strbuf *,
 					 struct Strbuf *, Char *, Char *, int,
 					 DIR *);
-static	Char 	 tw_suffix		(int, const Char *, Char *);
+static	Char 	 tw_suffix		(int, struct Strbuf *,const Char *,
+					 Char *);
 static	void 	 tw_fixword		(int, struct Strbuf *, Char *, Char *);
 static	void	 tw_list_items		(int, int, int);
 static 	void	 add_scroll_tab		(Char *);
@@ -1232,9 +1233,10 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
  */
 /*ARGSUSED*/
 static Char
-tw_suffix(int looking, const Char *exp_dir, Char *exp_name)
+tw_suffix(int looking, struct Strbuf *word, const Char *exp_dir, Char *exp_name)
 {
     Char *ptr;
+    Char *dollar;
     struct varent *vp;
 
     (void) strip(exp_name);
@@ -1255,6 +1257,10 @@ tw_suffix(int looking, const Char *exp_dir, Char *exp_name)
 	}
 	else if ((ptr = tgetenv(exp_name)) == NULL || *ptr == '\0')
 	    return ' ';
+
+	if ((dollar = Strrchr(word->s, '$')) != 0 && 
+	    dollar[1] == '{' && Strchr(dollar, '}') == NULL)
+	  return '}';
 
 	return isadirectory(exp_dir, ptr) ? '/' : ' ';
 
@@ -1303,6 +1309,7 @@ tw_fixword(int looking, struct Strbuf *word, Char *dir, Char *exp_name)
 
     case TW_VARIABLE:
 	if ((ptr = Strrchr(word->s, '$')) != NULL) {
+	    if (ptr[1] == '{') ptr++;
 	    word->len = ptr + 1 - word->s; /* Delete after the dollar */
 	} else
 	    word->len = 0;
@@ -1538,8 +1545,10 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 	gpat = 0;	/* Override pattern mechanism */
     }
     else if ((target = Strrchr(name, '$')) != 0 && 
+	     (target[1] != '{' || Strchr(target, '}') == NULL) &&
 	     (Strchr(name, '/') == NULL)) {
 	target++;
+	if (target[0] == '{') target++;
 	looking = TW_VARIABLE;
 	gpat = 0;	/* Override pattern mechanism */
     }
@@ -1782,7 +1791,7 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 	    switch (suf) {
 	    case 0: 	/* Automatic suffix */
 		Strbuf_append1(word,
-			       tw_suffix(looking, exp_dir.s, exp_name.s));
+			       tw_suffix(looking, word, exp_dir.s, exp_name.s));
 		break;
 
 	    case CHAR_ERR:	/* No suffix */
