@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.116 2011/01/19 02:34:53 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.117 2011/02/04 18:00:25 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.116 2011/01/19 02:34:53 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.117 2011/02/04 18:00:25 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -918,6 +918,7 @@ pendjob(void)
 
     if (pcurrjob && (pcurrjob->p_flags & (PFOREGND | PSTOPPED)) == 0) {
 	pp = pcurrjob;
+	pcurrjob = NULL;
 	while (pp->p_procid != pp->p_jobid)
 	    pp = pp->p_friends;
 	xprintf("[%d]", pp->p_index);
