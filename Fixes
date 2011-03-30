@@ -1,3 +1,5 @@
+ 77. Don't push the syntax struct on the cleanup stack, because on foo;bar
+     if foo fails, we will free bar prematurely (Ben Miller)
  76. Avoid infinite loop while trying to print the pid of a dying process
      to a closed file (Bob Arendt)
  75. Handle completion of ${ variables (Anthony Mallet)
