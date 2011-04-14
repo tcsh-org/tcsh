@@ -72,7 +72,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "1 February 2011" "Astron 6.17.05"
+.TH TCSH 1 "15 April 2011" "Astron 6.17.06"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -4352,7 +4352,12 @@ Reset to 1 in login shells.
 See also \fBloginsh\fR.
 .TP 8
 .B status
-The status returned by the last command.  If it terminated
+The status returned by the last command, unless the variable
+.B anyerror
+is set, and any error in a pipeline or a backquote expansion will be
+propagated (this was the default
+.B csh
+behavior). If it terminated
 abnormally, then 0200 is added to the status.  Builtin commands
 which fail return exit status `1', all other builtin commands
 return status `0'.
@@ -5193,7 +5198,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
-This manual documents tcsh 6.17.05 (Astron) 2011-02-01.
+This manual documents tcsh 6.17.06 (Astron) 2011-04-15.
 .SH AUTHORS
 .PD 0
 .TP 2

@@ -57,7 +57,7 @@ echo "&|;<>()&||<<>>space tab	end"
 set verbose
 echo `&|;<>()&||<<>>space tab	end`
 ]])
-AT_CHECK([tcsh -f nosplit.csh], 1,
+AT_CHECK([tcsh -f nosplit.csh], 0,
 [&|;<>()&||<<>>space tab	end
 &|;<>()&||<<>>space tab	end
 &|;<>()&||<<>>space tab	end
@@ -132,7 +132,7 @@ AT_CHECK([tcsh -f -c "echo !OK"], 1, ,
 AT_CHECK([tcsh -f -c 'echo "$OK"'], 1, , [OK: Undefined variable.
 ])
 
-AT_CHECK([tcsh -f -c 'echo "`OK`"'], 1, [
+AT_CHECK([tcsh -f -c 'echo "`OK`"'], 0, [
 ],
 [OK: Command not found.
 ])

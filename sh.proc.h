@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.h,v 3.13 2009/06/19 16:35:33 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.h,v 3.14 2010/05/07 18:16:07 christos Exp $ */
 /*
  * sh.proc.h: Process data structures and variables
  */
@@ -103,6 +103,7 @@ struct process {
 #define	PNEEDNOTE	(1<<15)	/* notify as soon as practical */
 #define PBACKQ		(1<<16)	/* Process is `` evaluation */
 #define PHUP		(1<<17)	/* Process is marked for SIGHUP on exit */
+#define PBRACE		(1<<18)	/* Process is {} evaluation */
 
 /* defines for arguments to pprint */
 #define	NUMBER		01

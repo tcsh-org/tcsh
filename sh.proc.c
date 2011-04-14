@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.117 2011/02/04 18:00:25 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.118 2011/03/24 14:06:59 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.117 2011/02/04 18:00:25 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.118 2011/03/24 14:06:59 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -557,6 +557,11 @@ pjwait(struct process *pp)
     reason = 0;
     fp = pp;
     do {
+	/* In case of pipelines only the result of the last
+	 * command should be taken in account */
+	if (!anyerror && !(fp->p_flags & PBRACE)
+		&& ((fp->p_flags & PPOU) || (fp->p_flags & PBACKQ)))
+	    continue;
 	if (fp->p_reason)
 	    reason = fp->p_flags & (PSIGNALED | PINTERRUPTED) ?
 		fp->p_reason | META : fp->p_reason;
@@ -734,6 +739,8 @@ palloc(pid_t pid, struct command *t)
 	pp->p_flags |= PBACKQ;
     if (t->t_dflg & F_HUP)
 	pp->p_flags |= PHUP;
+    if (t->t_dcom && t->t_dcom[0] && (*t->t_dcom[0] == '{'))
+	pp->p_flags |= PBRACE;
     if (cmdmax == 0)
 	morecommand(CMD_INIT);
     cmdp = cmdstr;

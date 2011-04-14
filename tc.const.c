@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.96 2011/02/04 18:00:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.97 2011/02/27 00:14:38 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.const.c,v 3.96 2011/02/04 18:00:26 christos Exp $")
+RCSID("$tcsh: tc.const.c,v 3.97 2011/02/27 00:14:38 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -43,6 +43,7 @@ Char STRrootdefautologout[] = { '1', '5', '\0' };
 #endif
 Char STRautomatic[]	= { 'a', 'u', 't', 'o', 'm', 'a', 't', 'i', 'c',
 			    '\0' };
+Char STRanyerror[]	= { 'a', 'n', 'y', 'e', 'r', 'r', 'o', 'r', '\0' };
 Char STRhangup[]	= { 'h', 'a', 'n', 'g', 'u', 'p', '\0' };
 Char STRaout[]		= { 'a', '.', 'o', 'u', 't', '\0' };
 Char STRtty[]		= { 't', 't', 'y', '\0' };

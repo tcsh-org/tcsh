@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.80 2011/01/17 16:28:39 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.81 2011/02/04 18:00:26 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.80 2011/01/17 16:28:39 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.81 2011/02/04 18:00:26 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -105,6 +105,9 @@ update_vars(Char *vp)
     }
     else if (eq(vp, STRloginsh)) {
 	loginsh = 1;
+    }
+    else if (eq(vp, STRanyerror)) {
+	anyerror = 1;
     }
     else if (eq(vp, STRsymlinks)) {
 	Char *pn = varval(vp);
@@ -763,6 +766,8 @@ unset(Char **v, struct command *c)
 	HistLit = 0;
     if (adrof(STRloginsh) == 0)
 	loginsh = 0;
+    if (adrof(STRanyerror) == 0)
+	anyerror = 0;
     if (adrof(STRwordchars) == 0)
 	word_chars = STR_WORD_CHARS;
     if (adrof(STRedit) == 0)

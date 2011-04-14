@@ -1,3 +1,5 @@
+ 80. V6.17.06 - 20110415
+ 79. PR/110: Add $anyerror to select behavior. Default to the new one.
  78. Don't try to spell commands that are correct (Rouben Rostamian)
      [./tcsh -f; set path=($path 2); mkdir foo2; cd foo2; touch foo;
       chmod +x foo; set correct=cmd; ./foo -> ../foo]
