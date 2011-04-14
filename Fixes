@@ -1,3 +1,6 @@
+ 78. Don't try to spell commands that are correct (Rouben Rostamian)
+     [./tcsh -f; set path=($path 2); mkdir foo2; cd foo2; touch foo;
+      chmod +x foo; set correct=cmd; ./foo -> ../foo]
  77. Don't push the syntax struct on the cleanup stack, because on foo;bar
      if foo fails, we will free bar prematurely (Ben Miller)
  76. Avoid infinite loop while trying to print the pid of a dying process
