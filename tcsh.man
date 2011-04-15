@@ -3115,7 +3115,7 @@ commands in simple \fIif\fR statements apply.
 .B nohup \fR[\fIcommand\fR]
 With \fIcommand\fR, runs \fIcommand\fR such that it will ignore hangup signals.
 Note that commands may set their own response to hangups, overriding \fInohup\fR.
-Without an argument (allowed in only a shell script), causes the shell to
+Without an argument, causes the non-interactive shell only to
 ignore hangups for the remainder of the script.
 See also \fBSignal handling\fR and the \fIhup\fR builtin command.
 .TP 8
