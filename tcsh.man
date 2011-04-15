@@ -3097,7 +3097,7 @@ itself can cause unexpected behavior, because the shell
 does not like to lose its tty.  (TCF only)
 .PD
 .TP 8
-.B newgrp \fR[\fB\-\fR] \fIgroup\fR (+)
+.B newgrp \fR[\fB\-\fR] \fI[group]\fR (+)
 Equivalent to `exec newgrp'; see \fInewgrp\fR(1).
 Available only if the shell was so compiled;
 see the \fBversion\fR shell variable.
