@@ -2841,7 +2841,7 @@ With \fIcommand\fR, runs \fIcommand\fR such that it will exit on a hangup
 signal and arranges for the shell to send it a hangup signal when the shell
 exits.
 Note that commands may set their own response to hangups, overriding \fIhup\fR.
-Without an argument (allowed in only a shell script), causes the shell to
+Without an argument, causes the non-interactive shell only to
 exit on a hangup for the remainder of the script.
 See also \fBSignal handling\fR and the \fInohup\fR builtin command.
 .TP 8
