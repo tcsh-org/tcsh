@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.init.c,v 3.40 2010/08/16 17:08:22 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.init.c,v 3.41 2011/01/09 16:25:29 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.init.c,v 3.40 2010/08/16 17:08:22 christos Exp $")
+RCSID("$tcsh: tw.init.c,v 3.41 2011/01/09 16:25:29 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -404,7 +404,7 @@ tw_cmd_next(struct Strbuf *res, struct Strbuf *dir, int *flags)
      * We need to process relatives in the path.
      */
     while ((tw_cmd_state.dfd == NULL ||
-	    (ret = tw_dir_next(res, tw_cmd_state.dfd)) == 0) &&
+	    (res->len = 0, ret = tw_dir_next(res, tw_cmd_state.dfd)) == 0) &&
 	   *tw_cmd_state.pathv != NULL) {
 
         CLRDIR(tw_cmd_state.dfd)
@@ -412,6 +412,7 @@ tw_cmd_next(struct Strbuf *res, struct Strbuf *dir, int *flags)
 	while (*tw_cmd_state.pathv && tw_cmd_state.pathv[0][0] == '/')
 	    tw_cmd_state.pathv++;
 	if ((ptr = *tw_cmd_state.pathv) != 0) {
+	    res->len = 0;
 	    Strbuf_append(res, ptr);
 	    ret = 1;
 	    /*

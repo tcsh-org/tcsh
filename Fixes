@@ -1,3 +1,4 @@
+ 82. Fix spelling correction correcting ./foo -> ../foo2 (jean-luc leger)
  81. PR/120: string0 in filetest does not have enough space.
  80. V6.17.06 - 20110415
  79. PR/110: Add $anyerror to select behavior. Default to the new one.
