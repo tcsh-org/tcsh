@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.118 2011/03/24 14:06:59 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.119 2011/04/14 18:25:25 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.118 2011/03/24 14:06:59 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.119 2011/04/14 18:25:25 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -373,6 +373,7 @@ found:
 #ifdef notdef
 		jobflags & PAEXITED ||
 #endif /* notdef */
+		fp->p_cwd == NULL ||
 		!eq(dcwd->di_name, fp->p_cwd->di_name))) {
 	    /* PWP: print a newline after ^C */
 		if (jobflags & PINTERRUPTED) {

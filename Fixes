@@ -1,3 +1,4 @@
+ 83. PR/38: Null check for jobs (Kurt Miller)
  82. Fix spelling correction correcting ./foo -> ../foo2 (jean-luc leger)
  81. PR/120: string0 in filetest does not have enough space.
  80. V6.17.06 - 20110415
