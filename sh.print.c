@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.print.c,v 3.34 2011/01/24 18:10:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.print.c,v 3.35 2011/02/25 23:58:34 christos Exp $ */
 /*
  * sh.print.c: Primitive Output routines.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.print.c,v 3.34 2011/01/24 18:10:26 christos Exp $")
+RCSID("$tcsh: sh.print.c,v 3.35 2011/02/25 23:58:34 christos Exp $")
 
 #include "ed.h"
 
@@ -284,6 +284,12 @@ flush(void)
 	 * Lost our file descriptor, exit (IRIS4D)
 	 */
 	case ESTALE:
+#endif
+#ifdef ENOENT
+	/*
+	 * Deal with SoFS bogocity: returns ENOENT instead of ESTALE.
+	 */
+	case ENOENT:
 #endif
 	/*
 	 * Over our quota, writing the history file
