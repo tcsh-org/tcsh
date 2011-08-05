@@ -4021,13 +4021,12 @@ signal (see \fBSignal handling\fR).  See also the \fBautologout\fR
 shell variable.
 .TP 8
 .B mail
-The names of the files or directories to check for incoming mail,
-separated by whitespace, and optionally preceded by a numeric word.
-Before each prompt, if 10 minutes have passed since the last check, the
-shell checks each file and says `You have new mail.' (or, if \fBmail\fR
-contains multiple files, `You have new mail in \fIname\fR.') if the
-filesize is greater than zero in size and has a modification time
-greater than its access time.
+A list of files and directories to check for incoming mail, optionally
+preceded by a numeric word.  Before each prompt, if 10 minutes have
+passed since the last check, the shell checks each file and says `You
+have new mail.' (or, if \fBmail\fR contains multiple files, `You have
+new mail in \fIname\fR.') if the filesize is greater than zero in size
+and has a modification time greater than its access time.
 .PP
 .RS +8
 .PD
