@@ -2291,7 +2291,7 @@ see the \fBversion\fR shell variable.
 .B case \fIlabel\fB:
 A label in a \fIswitch\fR statement as discussed below.
 .TP 8
-.B cd \fR[\fB\-p\fR] [\fB\-l\fR] [\fB\-n\fR|\fB\-v\fR] [\fIname\fR]
+.B cd \fR[\fB\-p\fR] [\fB\-l\fR] [\fB\-n\fR|\fB\-v\fR] [\I--\fR] [\fIname\fR]
 If a directory \fIname\fR is given, changes the shell's working directory
 to \fIname\fR.  If not, changes to \fBhome\fR.
 If \fIname\fR is `\-' it is interpreted as the previous working directory
@@ -2306,6 +2306,8 @@ begins with `/', then this is tried to see if it is a directory.
 With \fB\-p\fR, prints the final directory stack, just like \fIdirs\fR.
 The \fB\-l\fR, \fB\-n\fR and \fB\-v\fR flags have the same effect on \fIcd\fR
 as on \fIdirs\fR, and they imply \fB\-p\fR.  (+)
+Using \fB\-\-\fR forces a break from option processing so the next word
+is taken as the directory \fIname\fR even if it begins with '\-'. (+)
 .PP
 See also the \fBimplicitcd\fR shell variable.
 .RE

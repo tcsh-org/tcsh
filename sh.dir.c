@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dir.c,v 3.80 2007/05/08 21:05:34 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dir.c,v 3.81 2011/01/19 17:06:44 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$tcsh: sh.dir.c,v 3.80 2007/05/08 21:05:34 christos Exp $")
+RCSID("$tcsh: sh.dir.c,v 3.81 2011/01/19 17:06:44 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -204,10 +204,12 @@ skipargs(Char ***v, const char *dstr, const char *str)
     for (n++; loop && *n != NULL && (*n)[0] == '-'; n++) 
 	if (*(s = &((*n)[1])) == '\0')	/* test for bare "-" argument */
 	    dflag |= DIR_OLD;
-	else {
+	else if ((*n)[1] == '-' && (*n)[2] == '\0') {   /* test for -- */
+	    n++;
+	    break;
+	} else {
 	    char *p;
-	    while (*s != '\0')	/* examine flags */
-	    {
+	    while (*s != '\0')	/* examine flags */ {
 		if ((p = strchr(dstr, *s++)) != NULL)
 		    dflag |= (1 << (p - dstr));
 	        else
