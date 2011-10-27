@@ -1,3 +1,4 @@
+ 86. PR/149: Don't print -1 in %j (Vojtech Vitek)
  85. handle -- on chdir commands as the end of options processing so that
      they can process a directory like -x without resorting to ./-x
      (Andrew Stevenson)
