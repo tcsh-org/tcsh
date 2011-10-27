@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.prompt.c,v 3.68 2010/04/28 17:33:19 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.prompt.c,v 3.69 2010/05/17 19:26:42 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.prompt.c,v 3.68 2010/04/28 17:33:19 christos Exp $")
+RCSID("$tcsh: tc.prompt.c,v 3.69 2010/05/17 19:26:42 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -533,6 +533,8 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 		    struct process *pp;
 
 		    for (pp = proclist.p_next; pp; pp = pp->p_next)
+			njobs++;
+		    if (njobs == -1)
 			njobs++;
 		    p = Itoa(njobs, 1, attributes);
 		    Strbuf_append(&buf, p);
