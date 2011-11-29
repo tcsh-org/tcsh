@@ -4356,9 +4356,11 @@ See also \fBloginsh\fR.
 The status returned by the last command, unless the variable
 .B anyerror
 is set, and any error in a pipeline or a backquote expansion will be
-propagated (this was the default
+propagated (this is the default
 .B csh
-behavior). If it terminated
+behavior, and the current
+.B tcsh
+default). If it terminated
 abnormally, then 0200 is added to the status.  Builtin commands
 which fail return exit status `1', all other builtin commands
 return status `0'.
