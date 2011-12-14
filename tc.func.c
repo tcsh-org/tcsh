@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.146 2011/02/25 22:49:54 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.148 2011/12/14 16:33:23 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.146 2011/02/25 22:49:54 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.148 2011/12/14 16:33:23 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -174,7 +174,7 @@ Itoa(int n, size_t min_digits, Char attributes)
     do {
 	*p++ = un % 10 + '0';
 	un /= 10;
-    } while ((pad && --min_digits > 0) || un != 0);
+    } while ((pad && (ssize_t)--min_digits > 0) || un != 0);
 
     res = xmalloc((p - buf + 2) * sizeof(*res));
     s = res;
