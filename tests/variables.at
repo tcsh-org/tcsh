@@ -547,7 +547,7 @@ history
 ]])
 AT_CHECK([tcsh -f -i -q < history.csh | sed "s,$PWD,CWD,"], ,
 [> 1 100
-CWD,~,     6,     6,     6,%,-1,value,>,history
+CWD,~,     6,     6,     6,%,0,value,>,history
 > exit
 ])
 

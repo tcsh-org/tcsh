@@ -14,7 +14,7 @@ set csubstnonl
 echo `echo 1; \\
   echo 2`
 ]])
-AT_CHECK([tcsh -f backq.csh], 0,
+AT_CHECK([tcsh -f backq.csh], 1,
 [4
 2
 1 2
