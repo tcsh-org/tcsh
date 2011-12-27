@@ -54,7 +54,7 @@
 /* Define to 1 if you have the `getutent' function. */
 #undef HAVE_GETUTENT
 
-/* Define if you have the iconv() function. */
+/* Define if you have the iconv() function and it works. */
 #undef HAVE_ICONV
 
 /* Define to 1 if you have the <inttypes.h> header file. */
@@ -127,22 +127,22 @@
 /* Define to 1 if you have the `strstr' function. */
 #undef HAVE_STRSTR
 
-/* Define to 1 if `d_ino' is member of `struct dirent'. */
+/* Define to 1 if `d_ino' is a member of `struct dirent'. */
 #undef HAVE_STRUCT_DIRENT_D_INO
 
-/* Define to 1 if `ss_family' is member of `struct sockaddr_storage'. */
+/* Define to 1 if `ss_family' is a member of `struct sockaddr_storage'. */
 #undef HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY
 
-/* Define to 1 if `ut_host' is member of `struct utmp'. */
+/* Define to 1 if `ut_host' is a member of `struct utmp'. */
 #undef HAVE_STRUCT_UTMP_UT_HOST
 
-/* Define to 1 if `ut_tv' is member of `struct utmp'. */
+/* Define to 1 if `ut_tv' is a member of `struct utmp'. */
 #undef HAVE_STRUCT_UTMP_UT_TV
 
-/* Define to 1 if `ut_user' is member of `struct utmp'. */
+/* Define to 1 if `ut_user' is a member of `struct utmp'. */
 #undef HAVE_STRUCT_UTMP_UT_USER
 
-/* Define to 1 if `ut_xtime' is member of `struct utmp'. */
+/* Define to 1 if `ut_xtime' is a member of `struct utmp'. */
 #undef HAVE_STRUCT_UTMP_UT_XTIME
 
 /* Define to 1 if you have the `sysconf' function. */
@@ -201,6 +201,9 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -217,7 +220,7 @@
 #undef STDC_HEADERS
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
-   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
    #define below would cause a syntax error. */
 #undef _UINT32_T
 
