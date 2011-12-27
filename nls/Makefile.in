@@ -1,10 +1,10 @@
-# $tcsh: Makefile.in,v 1.6 2011/01/25 13:58:19 christos Exp $
+# $tcsh: Makefile.in,v 1.7 2011/02/05 16:08:26 christos Exp $
 
 LOCALES=	C et finnish french german greek italian ja pl russian \
 		spanish ukrainian
 GENCAT=		@GENCAT@
 INSTALL=	@INSTALL@
-RM?=		rm
+RM?=		rm -f
 VPATH=@srcdir@
 srcdir=@srcdir@
 
