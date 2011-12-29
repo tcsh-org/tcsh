@@ -6214,6 +6214,70 @@ _ACEOF
 
 
 fi
+ac_fn_c_check_member "$LINENO" "struct utmpx" "ut_host" "ac_cv_member_struct_utmpx_ut_host" "#include <sys/types.h>
+#ifdef HAVE_UTMPX_H
+#include <utmpx.h>
+#define utmp utmpx
+#elif defined HAVE_UTMP_H
+#include <utmp.h>
+#endif
+"
+if test "x$ac_cv_member_struct_utmpx_ut_host" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_STRUCT_UTMPX_UT_HOST 1
+_ACEOF
+
+
+fi
+ac_fn_c_check_member "$LINENO" "struct utmpx" "ut_user" "ac_cv_member_struct_utmpx_ut_user" "#include <sys/types.h>
+#ifdef HAVE_UTMPX_H
+#include <utmpx.h>
+#define utmp utmpx
+#elif defined HAVE_UTMP_H
+#include <utmp.h>
+#endif
+"
+if test "x$ac_cv_member_struct_utmpx_ut_user" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_STRUCT_UTMPX_UT_USER 1
+_ACEOF
+
+
+fi
+ac_fn_c_check_member "$LINENO" "struct utmpx" "ut_tv" "ac_cv_member_struct_utmpx_ut_tv" "#include <sys/types.h>
+#ifdef HAVE_UTMPX_H
+#include <utmpx.h>
+#define utmp utmpx
+#elif defined HAVE_UTMP_H
+#include <utmp.h>
+#endif
+"
+if test "x$ac_cv_member_struct_utmpx_ut_tv" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_STRUCT_UTMPX_UT_TV 1
+_ACEOF
+
+
+fi
+ac_fn_c_check_member "$LINENO" "struct utmpx" "ut_xtime" "ac_cv_member_struct_utmpx_ut_xtime" "#include <sys/types.h>
+#ifdef HAVE_UTMPX_H
+#include <utmpx.h>
+#define utmp utmpx
+#elif defined HAVE_UTMP_H
+#include <utmp.h>
+#endif
+"
+if test "x$ac_cv_member_struct_utmpx_ut_xtime" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_STRUCT_UTMPX_UT_XTIME 1
+_ACEOF
+
+
+fi
 
 ac_fn_c_check_member "$LINENO" "struct sockaddr_storage" "ss_family" "ac_cv_member_struct_sockaddr_storage_ss_family" "#include <sys/types.h>
 #include <sys/socket.h>
@@ -6422,7 +6486,7 @@ else
   have_catgets=no
 fi
 
-for ac_func in dup2 getauthid getcwd gethostname getpwent 	getutent mallinfo memmove memset mkstemp nice nl_langinfo sbrk 	setpgid setpriority strerror strstr sysconf wcwidth
+for ac_func in dup2 getauthid getcwd gethostname getpwent 	getutent getutxent mallinfo memmove memset mkstemp nice 	nl_langinfo sbrk setpgid setpriority strerror strstr sysconf wcwidth
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
