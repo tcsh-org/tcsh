@@ -1,3 +1,4 @@
+ 90. Add support for FreeBSD's utmpx.
  89. V6.17.07 - 20111227
  88. Fix debian bug #645238: tcsh segfaults when prompt includes %j and
      there are more than 10 jobs.

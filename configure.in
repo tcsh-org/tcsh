@@ -7,7 +7,7 @@ dnl You'll also need a version of config.guess from a gnu package
 dnl
 dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 dnl
-dnl $tcsh: configure.in,v 3.92 2011/12/27 19:58:33 christos Exp $
+dnl $tcsh: configure.in,v 3.93 2011/12/27 21:20:03 christos Exp $
 
 AC_PREREQ([2.59])dnl Minimum Autoconf version required.
 AC_INIT([tcsh], [6.17.07], [http://bugs.gw.com/])
@@ -358,7 +358,9 @@ AC_CHECK_MEMBERS([struct dirent.d_ino], , ,
 # define dirent direct
 #endif])
 AC_CHECK_MEMBERS([struct utmp.ut_host, struct utmp.ut_user, struct utmp.ut_tv,
-		  struct utmp.ut_xtime], , ,
+		  struct utmp.ut_xtime, struct utmpx.ut_host,
+		  struct utmpx.ut_user, struct utmpx.ut_tv,
+		  struct utmpx.ut_xtime], , ,
 [#include <sys/types.h>
 #ifdef HAVE_UTMPX_H
 #include <utmpx.h>
@@ -385,8 +387,8 @@ AC_INCLUDES_DEFAULT([])
 AC_CHECK_FUNC([setlocale], [have_setlocale=yes], [have_setlocale=no])
 AC_CHECK_FUNC([catgets], [have_catgets=yes], [have_catgets=no])
 AC_CHECK_FUNCS([dup2 getauthid getcwd gethostname getpwent] dnl
-	[getutent mallinfo memmove memset mkstemp nice nl_langinfo sbrk] dnl
-	[setpgid setpriority strerror strstr sysconf wcwidth])
+	[getutent getutxent mallinfo memmove memset mkstemp nice] dnl
+	[nl_langinfo sbrk setpgid setpriority strerror strstr sysconf wcwidth])
 AC_FUNC_GETPGRP
 AC_FUNC_MBRTOWC
 if test "x${cross_compiling}" != xyes ; then

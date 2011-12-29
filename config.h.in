@@ -54,6 +54,9 @@
 /* Define to 1 if you have the `getutent' function. */
 #undef HAVE_GETUTENT
 
+/* Define to 1 if you have the `getutxent' function. */
+#undef HAVE_GETUTXENT
+
 /* Define if you have the iconv() function and it works. */
 #undef HAVE_ICONV
 
@@ -132,6 +135,18 @@
 
 /* Define to 1 if `ss_family' is a member of `struct sockaddr_storage'. */
 #undef HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY
+
+/* Define to 1 if `ut_host' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_HOST
+
+/* Define to 1 if `ut_tv' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_TV
+
+/* Define to 1 if `ut_user' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_USER
+
+/* Define to 1 if `ut_xtime' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_XTIME
 
 /* Define to 1 if `ut_host' is a member of `struct utmp'. */
 #undef HAVE_STRUCT_UTMP_UT_HOST
