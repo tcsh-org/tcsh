@@ -1,3 +1,7 @@
+ 93. V6.17.08 - 20111230
+ 92. Remove - from gencat
+ 91. Provide support for malloc_usable_size() so that linux works again
+     without SYSMALLOC
  90. Add support for FreeBSD's utmpx.
  89. V6.17.07 - 20111227
  88. Fix debian bug #645238: tcsh segfaults when prompt includes %j and
