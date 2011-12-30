@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.51 2006/03/03 22:08:45 amold Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.52 2011/12/29 16:45:08 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.who.c,v 3.51 2006/03/03 22:08:45 amold Exp $")
+RCSID("$tcsh: tc.who.c,v 3.52 2011/12/29 16:45:08 christos Exp $")
 
 #include "tc.h"
 
@@ -405,9 +405,6 @@ watch_login(int force)
 #else
     cleanup_until(&utmpfd);
 #endif
-# if defined(UTHOSTLEN)
-    endutent();
-# endif
 #endif /* !WINNT_NATIVE */
 
     if (force || vp == NULL) {
