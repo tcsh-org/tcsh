@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.47 2011/02/04 18:00:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.48 2011/02/25 23:58:06 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -43,7 +43,7 @@
 #include <malloc.h>
 #endif
 
-RCSID("$tcsh: tc.alloc.c,v 3.47 2011/02/04 18:00:26 christos Exp $")
+RCSID("$tcsh: tc.alloc.c,v 3.48 2011/02/25 23:58:06 christos Exp $")
 
 #define RCHECK
 #define DEBUG
@@ -441,6 +441,23 @@ realloc(ptr_t cp, size_t nbytes)
 #endif /* !lint */
 }
 
+/*
+ * On linux, _nss_nis_setnetgrent() calls this function to determine
+ * the usable size of the pointer passed, but this is not a portable
+ * API, so we cannot use our malloc replacement without providing one.
+ * Thanks a lot glibc!
+ */
+size_t malloc_usable_size(const void *);
+size_t
+malloc_usable_size(const void *ptr)
+{
+    const union overhead *op = (const union overhead *)
+	(((const char *) ptr) - MEMALIGN(sizeof(*op)));
+    if (op->ov_magic == MAGIC)
+	    return 1 << (op->ov_index + 2);
+    else
+	    return 0;
+}
 
 
 #ifndef lint
