@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.48 2011/02/25 23:58:06 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.49 2011/12/30 17:18:24 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -43,7 +43,7 @@
 #include <malloc.h>
 #endif
 
-RCSID("$tcsh: tc.alloc.c,v 3.48 2011/02/25 23:58:06 christos Exp $")
+RCSID("$tcsh: tc.alloc.c,v 3.49 2011/12/30 17:18:24 christos Exp $")
 
 #define RCHECK
 #define DEBUG
@@ -447,9 +447,14 @@ realloc(ptr_t cp, size_t nbytes)
  * API, so we cannot use our malloc replacement without providing one.
  * Thanks a lot glibc!
  */
-size_t malloc_usable_size(const void *);
+#ifdef __linux__
+#define M_U_S_CONST
+#else
+#define M_U_S_CONST
+#endif
+size_t malloc_usable_size(M_U_S_CONST void *);
 size_t
-malloc_usable_size(const void *ptr)
+malloc_usable_size(M_U_S_CONST void *ptr)
 {
     const union overhead *op = (const union overhead *)
 	(((const char *) ptr) - MEMALIGN(sizeof(*op)));
