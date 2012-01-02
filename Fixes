@@ -1,3 +1,6 @@
+ 96. V6.17.09 - 20120102
+ 95. revert gencat handling to pre-cygwin fixes (without the env settings)
+ 94. remove stray endutent()
  93. V6.17.08 - 20111230
  92. Remove - from gencat
  91. Provide support for malloc_usable_size() so that linux works again
