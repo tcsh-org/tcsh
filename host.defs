@@ -1,5 +1,5 @@
 newcode	:
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.52 2011/01/21 23:06:14 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.53 2012/01/03 00:49:43 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode	:
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.52 2011/01/21 23:06:14 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.53 2012/01/03 00:49:43 christos Exp $")
 
 endcode	:
 
@@ -538,8 +538,10 @@ vendor	: defined(m68k)					: "motorola"
 vendor	: defined(mac68k)				: "apple"
 vendor	: defined(pc532)				: "national-semi"
 vendor	: defined(pmax)					: "dec"
+vendor	: defined(powerpc)				: "motorola"
 vendor	: defined(mips)					: "mips"
 vendor	: defined(sparc)				: "sun"
+vendor	: defined(sparc64)				: "sun"
 vendor	: defined(sun3)					: "sun"
 vendor	: defined(vax)					: "digital"
 vendor	: defined(x86_64)				: "amd"
@@ -551,12 +553,14 @@ machtype: defined(arm32) || defined(__APCS_32__)	: "arm32"
 machtype: defined(arm26) || defined(__APCS_26__)	: "arm26"
 machtype: defined(arm) || defined(__arm__)		: "arm"
 machtype: defined(sparc)				: "sparc"
+machtype: defined(sparc64)				: "sparc64"
 machtype: defined(mc68020)				: "m68k"
 machtype: defined(M_i386)				: "i386"
 machtype: defined(M_mipsel)				: "mipsel"
 machtype: defined(M_mipseb)				: "mipseb"
 machtype: defined(mips)					: "mips"
 machtype: defined(pc532)				: "pc532"
+machtype: defined(powerpc)				: "powerpc"
 machtype: defined(vax)					: "vax"
 machtype: defined(x86_64)				: "x86_64"
 enddef	:
@@ -565,14 +569,25 @@ enddef	:
 newdef	: defined(__FreeBSD__) 
 comment	: FreeBSD
 vendor	: defined(__alpha)				: "digital"
+vendor	: defined(arm32) || defined(__arm__)		: "acorn"
 vendor	: defined(M_intel)				: "intel"
+vendor	: defined(ia64)					: "intel"
+vendor	: defined(mips)					: "mips"
+vendor	: defined(powerpc)				: "motorola"
 vendor	: defined(sparc)				: "sun"
+vendor	: defined(sparc64)				: "sun"
 vendor	: defined(x86_64)				: "amd"
 hosttype:						: "FreeBSD"
 ostype	:						: "FreeBSD"
 machtype: defined(__alpha)				: "alpha"
+machtype: defined(arm32) || defined(__APCS_32__)	: "arm32"
+machtype: defined(arm) || defined(__arm__)		: "arm"
+machtype: defined(ia64)					: "ia64"
 machtype: defined(M_i386)				: "i386"
+machtype: defined(mips)					: "mips"
+machtype: defined(powerpc)				: "powerpc"
 machtype: defined(sparc)				: "sparc"
+machtype: defined(sparc64)				: "sparc64"
 machtype: defined(x86_64)				: "x86_64"
 enddef	:
 
