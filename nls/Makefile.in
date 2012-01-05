@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 1.11 2012/01/02 17:31:53 christos Exp $
+# $tcsh: Makefile.in,v 1.12 2012/01/03 00:45:28 christos Exp $
 
 CATALOGS=	C.cat et.cat finnish.cat french.cat german.cat greek.cat \
 		italian.cat ja.cat pl.cat russian.cat spanish.cat ukrainian.cat
@@ -12,6 +12,7 @@ srcdir=@srcdir@
 prefix=@prefix@
 datarootdir=@datarootdir@
 localedir=${DESTDIR}@localedir@
+CATGEN=		${srcdir}/catgen
 
 all: ${CATALOGS}
 
@@ -21,7 +22,7 @@ ${localedir}/C/LC_MESSAGES/tcsh.cat:	C.cat
 	$(INSTALL) $< $@
 
 C.cat: ${srcdir}/C/charset ${srcdir}/C/*set[0-9]*
-	LANG=C $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/et/LC_MESSAGES/tcsh.cat
 ${localedir}/et/LC_MESSAGES/tcsh.cat:	et.cat
@@ -29,7 +30,7 @@ ${localedir}/et/LC_MESSAGES/tcsh.cat:	et.cat
 	$(INSTALL) $< $@
 
 et.cat: ${srcdir}/et/charset ${srcdir}/et/*set[0-9]*
-	LANG=et_EE $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/fi/LC_MESSAGES/tcsh.cat
 ${localedir}/fi/LC_MESSAGES/tcsh.cat:	finnish.cat
@@ -37,7 +38,7 @@ ${localedir}/fi/LC_MESSAGES/tcsh.cat:	finnish.cat
 	$(INSTALL) $< $@
 
 finnish.cat: ${srcdir}/finnish/charset ${srcdir}/finnish/*set[0-9]*
-	LANG=fi_FI $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/fr/LC_MESSAGES/tcsh.cat
 ${localedir}/fr/LC_MESSAGES/tcsh.cat:	french.cat
@@ -45,7 +46,7 @@ ${localedir}/fr/LC_MESSAGES/tcsh.cat:	french.cat
 	$(INSTALL) $< $@
 
 french.cat: ${srcdir}/french/charset ${srcdir}/french/*set[0-9]*
-	LANG=fr_FR $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/de/LC_MESSAGES/tcsh.cat
 ${localedir}/de/LC_MESSAGES/tcsh.cat:	german.cat
@@ -53,7 +54,7 @@ ${localedir}/de/LC_MESSAGES/tcsh.cat:	german.cat
 	$(INSTALL) $< $@
 
 german.cat: ${srcdir}/german/charset ${srcdir}/german/*set[0-9]*
-	LANG=de_DE $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/gr/LC_MESSAGES/tcsh.cat
 ${localedir}/gr/LC_MESSAGES/tcsh.cat:	greek.cat
@@ -61,7 +62,7 @@ ${localedir}/gr/LC_MESSAGES/tcsh.cat:	greek.cat
 	$(INSTALL) $< $@
 
 greek.cat: ${srcdir}/greek/charset ${srcdir}/greek/*set[0-9]*
-	LANG=el_GR $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/it/LC_MESSAGES/tcsh.cat
 ${localedir}/it/LC_MESSAGES/tcsh.cat:	italian.cat
@@ -69,7 +70,7 @@ ${localedir}/it/LC_MESSAGES/tcsh.cat:	italian.cat
 	$(INSTALL) $< $@
 
 italian.cat: ${srcdir}/italian/charset ${srcdir}/italian/*set[0-9]*
-	LANG=it_IT $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/ja/LC_MESSAGES/tcsh.cat
 ${localedir}/ja/LC_MESSAGES/tcsh.cat:	ja.cat
@@ -77,7 +78,7 @@ ${localedir}/ja/LC_MESSAGES/tcsh.cat:	ja.cat
 	$(INSTALL) $< $@
 
 ja.cat: ${srcdir}/ja/charset ${srcdir}/ja/*set[0-9]*
-	LANG=ja_JP $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/pl/LC_MESSAGES/tcsh.cat
 ${localedir}/pl/LC_MESSAGES/tcsh.cat:	pl.cat
@@ -85,7 +86,7 @@ ${localedir}/pl/LC_MESSAGES/tcsh.cat:	pl.cat
 	$(INSTALL) $< $@
 
 pl.cat: ${srcdir}/pl/charset ${srcdir}/pl/*set[0-9]*
-	LANG=pl_PL $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/ru/LC_MESSAGES/tcsh.cat
 ${localedir}/ru/LC_MESSAGES/tcsh.cat:	russian.cat
@@ -93,7 +94,7 @@ ${localedir}/ru/LC_MESSAGES/tcsh.cat:	russian.cat
 	$(INSTALL) $< $@
 
 russian.cat: ${srcdir}/russian/charset ${srcdir}/russian/*set[0-9]*
-	LANG=ru_RU $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/es/LC_MESSAGES/tcsh.cat
 ${localedir}/es/LC_MESSAGES/tcsh.cat:	spanish.cat
@@ -101,7 +102,7 @@ ${localedir}/es/LC_MESSAGES/tcsh.cat:	spanish.cat
 	$(INSTALL) $< $@
 
 spanish.cat: ${srcdir}/spanish/charset ${srcdir}/spanish/*set[0-9]*
-	LANG=es_ES $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 INSTALLED+=${localedir}/ru_UA.koi8u/LC_MESSAGES/tcsh.cat
 ${localedir}/ru_UA.koi8u/LC_MESSAGES/tcsh.cat:	ukrainian.cat
@@ -109,7 +110,7 @@ ${localedir}/ru_UA.koi8u/LC_MESSAGES/tcsh.cat:	ukrainian.cat
 	$(INSTALL) $< $@
 
 ukrainian.cat: ${srcdir}/ukrainian/charset ${srcdir}/ukrainian/*set[0-9]*
-	LANG=ru_UA $(GENCAT) $@ $^ $>
+	@${CATGEN} $(GENCAT) $@ $^ $>
 
 install:	$(INSTALLED)
 
