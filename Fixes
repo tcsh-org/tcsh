@@ -1,3 +1,7 @@
+100. V6.17.10 - 20120105
+ 99. Add more FreeBSD/NetBSD machines
+ 98. Add portability wrapper for gencat
+ 97. Fix warning for write in SYSMALLOC systems.
  96. V6.17.09 - 20120102
  95. revert gencat handling to pre-cygwin fixes (without the env settings)
  94. remove stray endutent()
