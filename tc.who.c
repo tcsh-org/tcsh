@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.53 2011/12/30 20:35:19 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.54 2012/01/10 16:20:17 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.who.c,v 3.53 2011/12/30 20:35:19 christos Exp $")
+RCSID("$tcsh: tc.who.c,v 3.54 2012/01/10 16:20:17 christos Exp $")
 
 #include "tc.h"
 
@@ -60,12 +60,12 @@ RCSID("$tcsh: tc.who.c,v 3.53 2011/12/30 20:35:19 christos Exp $")
 #  define TCSH_PATH_UTMP _PATH_UTMPX
 # elif defined(UTMPX_FILE)
 #  define TCSH_PATH_UTMP UTMPX_FILE
-# else 
-#  if __FreeBSD_version >= 900000
-#   /* Why isn't this defined somewhere? */
-#   define TCSH_PATH_UTMP "/var/run/utx.active"
-#  endif
-# endif /* __UTMPX_FILE && !UTMPX_FILE */
+# elif __FreeBSD_version >= 900000
+#  /* Why isn't this defined somewhere? */
+#  define TCSH_PATH_UTMP "/var/run/utx.active"
+# elif defined(__hpux)
+#  define TCSH_PATH_UTMP "/etc/utmpx"
+# endif
 # if defined(TCSH_PATH_UTMP) || !defined(HAVE_UTMP_H)
 #  define utmp utmpx
 #  define TCSH_USE_UTMPX
