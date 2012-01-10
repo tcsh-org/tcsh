@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.52 2011/12/29 16:45:08 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.53 2011/12/30 20:35:19 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.who.c,v 3.52 2011/12/29 16:45:08 christos Exp $")
+RCSID("$tcsh: tc.who.c,v 3.53 2011/12/30 20:35:19 christos Exp $")
 
 #include "tc.h"
 
@@ -68,30 +68,34 @@ RCSID("$tcsh: tc.who.c,v 3.52 2011/12/29 16:45:08 christos Exp $")
 # endif /* __UTMPX_FILE && !UTMPX_FILE */
 # if defined(TCSH_PATH_UTMP) || !defined(HAVE_UTMP_H)
 #  define utmp utmpx
+#  define TCSH_USE_UTMPX
 #  if defined(HAVE_GETUTENT) || defined(HAVE_GETUTXENT)
 #   define getutent getutxent
 #   define setutent setutxent
 #   define endutent endutxent
 #  endif /* HAVE_GETUTENT || HAVE_GETUTXENT */
-# else
-#  ifdef HAVE_UTMP_H
-#   include <utmp.h>
-#  endif /* WINNT_NATIVE */
-# endif /* TCSH_PATH_UTMP */
-#else /* !HAVE_UTMPX_H */
-# ifdef HAVE_UTMP_H
-#  include <utmp.h>
-# endif /* WINNT_NATIVE */
+#  if defined(HAVE_STRUCT_UTMPX_UT_TV)
+#   define ut_time ut_tv.tv_sec
+#  elif defined(HAVE_STRUCT_UTMPX_UT_XTIME)
+#   define ut_time ut_xtime
+#  endif
+#  if defined(HAVE_STRUCT_UTMPX_UT_USER)
+#   define ut_name ut_user
+#  endif
+# endif /* TCSH_PATH_UTMP || !HAVE_UTMP_H */
 #endif /* HAVE_UTMPX_H */
 
-#if defined(HAVE_STRUCT_UTMP_UT_TV) || defined(HAVE_STRUCT_UTMPX_UT_TV)
-# define ut_time ut_tv.tv_sec
-#elif defined(HAVE_STRUCT_UTMP_UT_XTIME) || defined(HAVE_STRUCT_UTMPX_UT_XTIME)
-# define ut_time ut_xtime
-#endif
-#if defined(HAVE_STRUCT_UTMP_UT_USER) || defined(HAVE_STRUCT_UTMPX_UT_USER)
-# define ut_name ut_user
-#endif
+#if !defined(TCSH_USE_UTMPX) && defined(HAVE_UTMP_X)
+# include <utmp.h>
+# if defined(HAVE_STRUCT_UTMP_UT_TV)
+#  define ut_time ut_tv.tv_sec
+# elif defined(HAVE_STRUCT_UTMP_UT_XTIME)
+#  define ut_time ut_xtime
+# endif
+# if defined(HAVE_STRUCT_UTMP_UT_USER)
+#  define ut_name ut_user
+# endif
+#endif /* !TCSH_USE_UTMPX && HAVE_UTMP_H */
 
 #if defined(HAVE_UTMP_H) && !defined(HAVE_UTMPX_H)
 # ifndef BROKEN_CC
