@@ -1,3 +1,7 @@
+104. V6.18.00 - 20120114
+103. remove unused variables.
+102. Make gethost use definitions for x __x__ and __x automatically.
+101. More utmp fixes
 100. V6.17.10 - 20120105
  99. Add more FreeBSD/NetBSD machines
  98. Add portability wrapper for gencat
