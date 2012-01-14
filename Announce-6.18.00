@@ -1,0 +1,33 @@
+Hello,
+
+I am pleased to announce that tcsh-6.18 is now available; this is a mainly a
+bug fix release with few new features:
+
+	1. new autorehash builtin to control how the internal command hash 
+	   table is maintained.
+	2. globstar globbing to allow ** and *** expansions
+	3. euid, euser, egid variables.
+	4. wait built-in is now interruptible
+	5. new anyerror variable to control error handling in pipelines
+
+Please consult the Fixes files for a complete list of changes.
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most UNIX machines, VMS_POSIX, OS/2 EMX, WIN32, Amiga...
+
+You can get tcsh from ftp://ftp.astron.com/pub/tcsh/tcsh-6.18.00.tar.gz
+
+RMD160 (tcsh-6.18.00.tar.gz) = 67d017601e1611cffdc9fc24885d01c1af378bb2
+
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you can
+get it from ftp.gnu.org or other GNU mirrors.
+
+I would like to thank:
+
+    * everyone who sent bug reports
+    * the beta team for all their help, bug fixes, and suggestions
+
+christos
