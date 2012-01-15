@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.54 2012/01/10 16:20:17 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.55 2012/01/10 17:07:51 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.who.c,v 3.54 2012/01/10 16:20:17 christos Exp $")
+RCSID("$tcsh: tc.who.c,v 3.55 2012/01/10 17:07:51 christos Exp $")
 
 #include "tc.h"
 
@@ -95,9 +95,6 @@ RCSID("$tcsh: tc.who.c,v 3.54 2012/01/10 16:20:17 christos Exp $")
 # if defined(HAVE_STRUCT_UTMP_UT_USER)
 #  define ut_name ut_user
 # endif
-#endif /* !TCSH_USE_UTMPX && HAVE_UTMP_H */
-
-#if defined(HAVE_UTMP_H) && !defined(HAVE_UTMPX_H)
 # ifndef BROKEN_CC
 #  define UTNAMLEN	sizeof(((struct utmp *) 0)->ut_name)
 #  define UTLINLEN	sizeof(((struct utmp *) 0)->ut_line)
@@ -111,7 +108,6 @@ RCSID("$tcsh: tc.who.c,v 3.54 2012/01/10 16:20:17 christos Exp $")
 # else
 /* give poor cc a little help if it needs it */
 struct utmp __ut;
-
 #  define UTNAMLEN	sizeof(__ut.ut_name)
 #  define UTLINLEN	sizeof(__ut.ut_line)
 #  ifdef HAVE_STRUCT_UTMP_UT_HOST
@@ -121,19 +117,24 @@ struct utmp __ut;
 #    define UTHOSTLEN	sizeof(__ut.ut_host)
 #   endif
 #  endif /* HAVE_STRUCT_UTMP_UT_HOST */
-#endif /* BROKEN_CC */
-#endif /* HAVE_UTMP_H */
+# endif /* BROKEN_CC */
+# ifndef TCSH_PATH_UTMP
+#  ifdef UTMP_FILE
+#   define TCSH_PATH_UTMP UTMP_FILE
+#  elif defined(_PATH_UTMP)
+#   define TCSH_PATH_UTMP _PATH_UTMP
+#  else
+#   define TCSH_PATH_UTMP "/etc/utmp"
+#  endif /* UTMP_FILE */
+# endif /* TCSH_PATH_UTMP */
+#endif /* !TCSH_USE_UTMPX && HAVE_UTMP_H */
 
-#ifndef TCSH_PATH_UTMP
-# ifdef	UTMP_FILE
-#  define TCSH_PATH_UTMP UTMP_FILE
-# elif defined(_PATH_UTMP)
-#  define TCSH_PATH_UTMP _PATH_UTMP
-# else
-#  define TCSH_PATH_UTMP "/etc/utmp"
-# endif /* UTMP_FILE */
-#endif /* TCSH_PATH_UTMP */
-
+#ifndef UTNAMLEN
+#define UTNAMLEN 64
+#endif
+#ifndef UTLINLEN
+#define UTLINLEN 64
+#endif
 
 struct who {
     struct who *who_next;
