@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.81 2011/02/04 18:00:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.82 2011/04/14 18:25:25 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.81 2011/02/04 18:00:26 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.82 2011/04/14 18:25:25 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -528,7 +528,7 @@ putn1(tcsh_number_t n)
 {
     if (n > 9)
 	putn1(n / 10);
-    *putp++ = n % 10 + '0';
+    *putp++ = (Char)(n % 10 + '0');
 }
 
 tcsh_number_t
