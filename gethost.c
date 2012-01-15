@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.13 2010/05/07 15:13:58 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.14 2012/01/11 20:20:15 christos Exp $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: gethost.c,v 1.13 2010/05/07 15:13:58 christos Exp $")
+RCSID("$tcsh: gethost.c,v 1.14 2012/01/11 20:20:15 christos Exp $")
 
 #ifdef SCO
 # define perror __perror
@@ -161,14 +161,17 @@ cat(const char *a, const char *b, size_t len)
 static const char *
 explode(const char *defs)
 {
-	static const char def[] = "defined(";
+	static const char def[] = "defined("; /* ) */
 	static char *buf;
 	size_t len;
-	const char *ptr, *bptr, *eptr, *name;
+	const char *ptr, *bptr, *eptr = NULL, *name;
 	size_t buflen = 0;
 
+	if (strstr(defs, "#machine(" /* ) */))
+		return defs;
+
 	free(buf);
-	buf = strdup("(");
+	buf = strdup("("); /* ) */
 	for (ptr = defs; (bptr = strstr(ptr, def)) != NULL; ptr = eptr + 1) {
 		if (ptr != bptr)
 			buf = cat(buf, ptr, bptr - ptr);
@@ -197,6 +200,10 @@ explode(const char *defs)
 			buf = cat(buf, undername, len + 3);
 		}
 	}
+	if (!eptr) {
+	    (void) fprintf(stderr, "%s: invalid input `%s'\n", pname, defs);
+	    return defs;
+        }
 	buf = cat(buf, eptr + 1, 0);
 	buf = cat(buf, ")", 0);
 	return buf;
