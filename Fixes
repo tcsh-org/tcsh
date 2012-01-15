@@ -1,3 +1,8 @@
+  4. ignore bogus compiler overflow message
+  3. cleanup ifdefs in utmp code, and provide default array entries
+  2. Ignore #machine entries in host.defs
+  1. Detect missing ) in gethost.c (Corinna Vinschen)
+
 104. V6.18.00 - 20120114
 103. remove unused variables.
 102. Make gethost use definitions for x __x__ and __x automatically.
