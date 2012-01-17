@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.55 2012/01/10 17:07:51 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.56 2012/01/15 17:14:11 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.who.c,v 3.55 2012/01/10 17:07:51 christos Exp $")
+RCSID("$tcsh: tc.who.c,v 3.56 2012/01/15 17:14:11 christos Exp $")
 
 #include "tc.h"
 
@@ -85,7 +85,7 @@ RCSID("$tcsh: tc.who.c,v 3.55 2012/01/10 17:07:51 christos Exp $")
 # endif /* TCSH_PATH_UTMP || !HAVE_UTMP_H */
 #endif /* HAVE_UTMPX_H */
 
-#if !defined(TCSH_USE_UTMPX) && defined(HAVE_UTMP_X)
+#if !defined(TCSH_USE_UTMPX) && defined(HAVE_UTMP_H)
 # include <utmp.h>
 # if defined(HAVE_STRUCT_UTMP_UT_TV)
 #  define ut_time ut_tv.tv_sec
