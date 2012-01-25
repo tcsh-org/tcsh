@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.119 2011/04/14 18:25:25 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.120 2011/04/21 20:28:28 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.119 2011/04/14 18:25:25 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.120 2011/04/21 20:28:28 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -594,6 +594,7 @@ dowait(Char **v, struct command *c)
 {
     struct process *pp;
     sigset_t pause_mask;
+    int opintr_disabled, gotsig;
 
     USE(c);
     USE(v);
@@ -608,7 +609,11 @@ loop:
 	    pp->p_flags & PRUNNING) {
 	    (void)handle_pending_signals();
 	    sigsuspend(&pause_mask);
-	    if (handle_pending_signals())
+	    opintr_disabled = pintr_disabled;
+	    pintr_disabled = 0;
+	    gotsig = handle_pending_signals();
+	    pintr_disabled = opintr_disabled;
+	    if (gotsig)
 		break;
 	    goto loop;
 	}

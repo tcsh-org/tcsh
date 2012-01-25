@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.sig.c,v 3.38 2011/01/24 18:10:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.sig.c,v 3.39 2012/01/16 03:40:20 christos Exp $ */
 /*
  * tc.sig.c: Signal routine emulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.sig.c,v 3.38 2011/01/24 18:10:26 christos Exp $")
+RCSID("$tcsh: tc.sig.c,v 3.39 2012/01/16 03:40:20 christos Exp $")
 
 #include "tc.wait.h"
 
@@ -72,7 +72,7 @@ handle_pending_signals(void)
 	phup();
 	handle_interrupt--;
     }
-    if (pintr_disabled && pintr_pending) {
+    if (!pintr_disabled && pintr_pending) {
 	pintr_pending = 0;
 	handle_interrupt++;
 	pintr();
