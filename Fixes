@@ -1,3 +1,4 @@
+  6. V6.18.01 - 20120214
   5. fix interruptible wait again
   4. ignore bogus compiler overflow message
   3. cleanup ifdefs in utmp code, and provide default array entries
