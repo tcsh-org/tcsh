@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.57 2011/04/15 22:58:15 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.58 2011/12/25 15:21:50 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exp.c,v 3.57 2011/04/15 22:58:15 christos Exp $")
+RCSID("$tcsh: sh.exp.c,v 3.58 2011/12/25 15:21:50 christos Exp $")
 
 #include "tw.h"
 
@@ -322,7 +322,7 @@ exp2c(Char ***vp, int ignore)
 	cleanup_push(p2, xfree);
 	etracc("exp2c p2", p2, vp);
 	if (!(ignore & TEXP_IGNORE))
-	    switch (i) {
+	    switch ((int)i) {
 
 	    case EQEQ:
 		i = eq(p1, p2);
@@ -367,7 +367,7 @@ exp3(Char ***vp, int ignore)
 	cleanup_push(p2, xfree);
 	etracc("exp3 p2", p2, vp);
 	if (!(ignore & TEXP_IGNORE))
-	    switch (i) {
+	    switch ((int)i) {
 
 	    case GTR:
 		i = egetn(p1) > egetn(p2);
