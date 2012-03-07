@@ -1,0 +1,3 @@
+#!./tcsh
+echo $#argv
+echo "${argv[2-]}"
