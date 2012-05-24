@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.41 2011/02/27 00:15:17 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.42 2012/01/10 21:34:31 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -36,7 +36,7 @@
 #include <assert.h>
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.41 2011/02/27 00:15:17 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.42 2012/01/10 21:34:31 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -590,10 +590,14 @@ bb_cleanup(void *xbb)
     struct blk_buf *bb;
     size_t i;
 
-    bb = xbb;
-    for (i = 0; i < bb->len; i++)
-	xfree(bb->vec[i]);
-    xfree(bb->vec);
+    bb = (struct blk_buf *)xbb;
+    if (bb->vec) {
+	for (i = 0; i < bb->len; i++)
+	    xfree(bb->vec[i]);
+	xfree(bb->vec);
+    }
+    bb->vec = NULL;
+    bb->len = 0;
 }
 
 void
