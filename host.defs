@@ -1,5 +1,5 @@
 newcode :
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.55 2012/01/11 20:20:15 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.56 2012/02/14 21:26:56 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode :
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.55 2012/01/11 20:20:15 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.56 2012/02/14 21:26:56 christos Exp $")
 
 endcode :
 
@@ -563,6 +563,38 @@ machtype: defined(powerpc)				: "powerpc"
 machtype: defined(vax)					: "vax"
 machtype: defined(x86_64)				: "x86_64"
 enddef	:
+
+newdef : defined(__OpenBSD__)
+comment        : OpenBSD
+vendor : defined(__alpha__)                            : "digital"
+vendor : defined(__amd64__)                            : "amd"
+vendor : defined(__arm__)                              : "arm"
+vendor : defined(__hppa__) || defined(__hppa64__)      : "hp"
+vendor : defined(M_intel)                              : "intel"
+vendor : defined(__m68k__)                             : "motorola"
+vendor : defined(__m88k__)                             : "motorola"
+vendor : defined(__mips__) && defined(__sgi__)         : "sgi"
+vendor : defined(__powerpc__)                          : "motorola"
+vendor : defined(__sh__)                               : "io-data"
+vendor : defined(__sparc__) || defined(__sparc64__)    : "sun"
+vendor : defined(__vax__)                              : "digital"
+hosttype:                                              : "OpenBSD"
+ostype :                                               : "OpenBSD"
+machtype: defined(__alpha__)                           : "alpha"
+machtype: defined(__amd64__)                           : "amd64"
+machtype: defined(__arm__)                             : "arm"
+machtype: defined(__hppa__)                            : "hppa"
+machtype: defined(__hppa64__)                          : "hppa64"
+machtype: defined(M_i386)                              : "i386"
+machtype: defined(__m68k__)                            : "m68k"
+machtype: defined(__m88k__)                            : "m88k"
+machtype: defined(__mips__)                            : "mips"
+machtype: defined(__sh__)                              : "sh"
+machtype: defined(__sparc64__)                         : "sparc64"
+machtype: defined(__sparc__)                           : "sparc"
+machtype: defined(__powerpc__)                         : "powerpc"
+machtype: defined(__vax__)                             : "vax"
+enddef :
 
 
 newdef	: defined(__FreeBSD__) 
