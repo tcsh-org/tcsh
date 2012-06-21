@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.148 2011/12/14 16:33:23 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.148 2011/12/14 16:36:44 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.148 2011/12/14 16:33:23 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.148 2011/12/14 16:36:44 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -1109,7 +1109,7 @@ rmstar(struct wordent *cp)
 #endif /* RMDEBUG */
     Char   *charac;
     char    c;
-    int     ask, doit, star = 0, silent = 0;
+    int     ask, doit, star = 0, silent = 0, opintr_disabled;
 
     if (!adrof(STRrmstar))
 	return;
@@ -1119,6 +1119,8 @@ rmstar(struct wordent *cp)
     we = cp->next;
     while (*we->word == ';' && we != cp)
 	we = we->next;
+    opintr_disabled = pintr_disabled;
+    pintr_disabled = 0;
     while (we != cp) {
 #ifdef RMDEBUG
 	if (*tag)
@@ -1195,6 +1197,7 @@ rmstar(struct wordent *cp)
 	    xprintf("%S ", we->word);
     }
 #endif /* RMDEBUG */
+    pintr_disabled = opintr_disabled;
     return;
 }
 
