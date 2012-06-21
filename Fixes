@@ -1,3 +1,4 @@
+ 10. make ls-F print to stderr and set the exit code
   9. make rmstar interruptible on linux
   8. Get rid of pret_t and make the printf functions return the number of
      characters printed as the system ones do.

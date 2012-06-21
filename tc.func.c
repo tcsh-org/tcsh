@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.148 2011/12/14 16:36:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.149 2012/06/21 19:13:18 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.148 2011/12/14 16:36:44 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.149 2012/06/21 19:13:18 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -193,7 +193,7 @@ void
 dolist(Char **v, struct command *c)
 {
     Char **globbed;
-    int     i, k;
+    int     i, k, ret = 0;
     struct stat st;
 
     USE(c);
@@ -333,8 +333,11 @@ dolist(Char **v, struct command *c)
 			xputchar('\n');
 		    print_by_column(STRNULL, &v[i], k - i, FALSE);
 		}
+		haderr = 1;
 		xprintf("%S: %s.\n", tmp, strerror(err));
+		haderr = 0;
 		i = k + 1;
+		ret = 1;
 	    }
 	    else if (S_ISDIR(st.st_mode)) {
 		Char   *cp;
@@ -375,6 +378,8 @@ dolist(Char **v, struct command *c)
     }
 
     cleanup_until(globbed);
+    if (ret)
+	stderror(ERR_SILENT);
 }
 
 extern int GotTermCaps;
