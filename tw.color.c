@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.color.c,v 1.27 2010/08/19 05:52:19 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.color.c,v 1.28 2012/06/21 17:40:40 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.color.c,v 1.27 2010/08/19 05:52:19 christos Exp $")
+RCSID("$tcsh: tw.color.c,v 1.28 2012/06/21 17:40:40 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -260,9 +260,9 @@ makecolor(char **c, int fg, int bg, Str *v)
 {
     int l;
     if (fg & 0x80)
-	l = snprintf(*c, 12, "%.2d;%.2d;%.2d;%.2d", ANSI_BOLD_ON,
+	l = xsnprintf(*c, 12, "%.2d;%.2d;%.2d;%.2d", ANSI_BOLD_ON,
 	    fg & ~TCSH_BOLD, (10 + bg) & ~TCSH_BOLD, ANSI_BOLD_OFF);
-	l = snprintf(*c, 6, "%.2d;%.2d",
+	l = xsnprintf(*c, 6, "%.2d;%.2d",
 	    fg & ~TCSH_BOLD, (10 + bg) & ~TCSH_BOLD);
 
     v->s = *c;
