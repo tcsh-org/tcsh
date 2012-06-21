@@ -1746,7 +1746,7 @@ rather than to the file to which the link points (+) *
 see if it has the specified relationship to the real user.  If \fIfile\fR
 does not exist or is inaccessible or, for the operators indicated by `*',
 if the specified file type does not exist on the current system,
-then all enquiries return false, i.e., `0'.
+then all inquiries return false, i.e., `0'.
 .PP
 These operators may be combined for conciseness: `\-\fIxy file\fR' is
 equivalent to `\-\fIx file\fR && \-\fIy file\fR'.  (+) For example, `\-fx' is true
@@ -3615,7 +3615,7 @@ whenever the environment variable changes the shell changes the corresponding
 shell variable to match (unless the shell variable is read-only) and vice
 versa.  Note that although \fBcwd\fR and \fBPWD\fR have identical meanings, they
 are not synchronized in this manner, and that the shell automatically
-interconverts the different formats of \fBpath\fR and \fBPATH\fR.
+converts between the different formats of \fBpath\fR and \fBPATH\fR.
 .TP 8
 .B addsuffix \fR(+)
 If set, filename completion adds `/' to the end of directories and a space
