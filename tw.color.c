@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.color.c,v 1.26 2009/10/26 17:34:13 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.color.c,v 1.27 2010/08/19 05:52:19 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.color.c,v 1.26 2009/10/26 17:34:13 christos Exp $")
+RCSID("$tcsh: tw.color.c,v 1.27 2010/08/19 05:52:19 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -91,13 +91,66 @@ static Variable variables[] = {
     VAR(NOS, "ca", "30;41"),    /* File with capability */
 };
 
-enum FileType {
-    VDir, VSym, VOrph, VPipe, VSock, VDoor, VBlock, VChr, VExe,
-    VFile, VNormal, VMiss, VLeft, VRight, VEnd
-};
-
 #define nvariables (sizeof(variables)/sizeof(variables[0]))
 
+enum FileType {
+    VDir, VSym, VOrph, VPipe, VSock, VDoor, VBlock, VChr, VExe,
+    VFile, VNormal, VMiss, VLeft, VRight, VEnd, VSuid, VSgid, VSticky,
+    VOther, Vstird, VReset, Vhard, Vhard2, VCap
+};
+
+/*
+ * Map from LSCOLORS entry index to Variable array index
+ */
+static const uint8_t map[] = {
+    VDir,	/* Directory */
+    VSym,	/* Symbolic Link */
+    VSock,	/* Socket */
+    VPipe,	/* Named Pipe */
+    VExe,	/* Executable */
+    VBlock,	/* Block Special */
+    VChr,	/* Character Special */
+    VSuid,	/* Setuid Executable */
+    VSgid,	/* Setgid Executable */
+    VSticky,	/* Directory writable to others and sticky */
+    VOther,	/* Directory writable to others but not sticky */
+};
+
+
+
+enum ansi {
+    ANSI_RESET_ON = 0,		/* reset colors/styles (white on black) */
+    ANSI_BOLD_ON = 1,		/* bold on */
+    ANSI_ITALICS_ON = 3,	/* italics on */
+    ANSI_UNDERLINE_ON = 4,	/* underline on */
+    ANSI_INVERSE_ON = 7,	/* inverse on */
+    ANSI_STRIKETHROUGH_ON = 9,	/* strikethrough on */
+    ANSI_BOLD_OFF = 22,		/* bold off */
+    ANSI_ITALICS_OFF = 23,	/* italics off */
+    ANSI_UNDERLINE_OFF = 24,	/* underline off */
+    ANSI_INVERSE_OFF = 27,	/* inverse off */
+    ANSI_STRIKETHROUGH_OFF = 29,/* strikethrough off */
+    ANSI_FG_BLACK = 30,		/* fg black */
+    ANSI_FG_RED = 31,		/* fg red */
+    ANSI_FG_GREEN = 32,		/* fg green */
+    ANSI_FG_YELLOW = 33,	/* fg yellow */
+    ANSI_FG_BLUE = 34,		/* fg blue */
+    ANSI_FG_MAGENTA = 35,	/* fg magenta */
+    ANSI_FG_CYAN = 36,		/* fg cyan */
+    ANSI_FG_WHITE = 37,		/* fg white */
+    ANSI_FG_DEFAULT = 39,	/* fg default (white) */
+    ANSI_BG_BLACK = 40,		/* bg black */
+    ANSI_BG_RED = 41,		/* bg red */
+    ANSI_BG_GREEN = 42,		/* bg green */
+    ANSI_BG_YELLOW = 43,	/* bg yellow */
+    ANSI_BG_BLUE = 44,		/* bg blue */
+    ANSI_BG_MAGENTA = 45,	/* bg magenta */
+    ANSI_BG_CYAN = 46,		/* bg cyan */
+    ANSI_BG_WHITE = 47,		/* bg white */
+    ANSI_BG_DEFAULT = 49,	/* bg default (black) */
+};
+#define TCSH_BOLD	0x80
+	
 typedef struct {
     Str	    extension;	/* file extension */
     Str	    color;	/* color string */
@@ -167,6 +220,103 @@ getstring(char **dp, const Char **sp, Str *pd, int f)
     return *s == (Char)f;
 }
 
+static void
+init(size_t colorlen, size_t extnum)
+{
+    size_t i;
+
+    xfree(extensions);
+    for (i = 0; i < nvariables; i++)
+	variables[i].color = variables[i].defaultcolor;
+    if (colorlen == 0 && extnum == 0) {
+	extensions = NULL;
+	colors = NULL;
+    } else {
+	extensions = xmalloc(colorlen + extnum * sizeof(*extensions));
+	colors = extnum * sizeof(*extensions) + (char *)extensions;
+    }
+    nextensions = 0;
+}
+
+static int
+color(Char x)
+{
+    int c;
+    static const char colors[] = "abcdefghx";
+    char *p;
+    if (Isupper(x)) {
+	x = Tolower(x);
+	c |= TCSH_BOLD;
+    } else
+	c = 0;
+
+    if (x == '\0' || (p = strchr(colors, x)) == NULL)
+	return -1;
+    return 30 + (p - colors);
+}
+
+static void
+makecolor(char **c, int fg, int bg, Str *v)
+{
+    int l;
+    if (fg & 0x80)
+	l = snprintf(*c, 12, "%.2d;%.2d;%.2d;%.2d", ANSI_BOLD_ON,
+	    fg & ~TCSH_BOLD, (10 + bg) & ~TCSH_BOLD, ANSI_BOLD_OFF);
+	l = snprintf(*c, 6, "%.2d;%.2d",
+	    fg & ~TCSH_BOLD, (10 + bg) & ~TCSH_BOLD);
+
+    v->s = *c;
+    v->len = l;
+    *c += l + 1;
+}
+
+/* parseLSCOLORS():
+ * 	Parse the LSCOLORS environment variable
+ */
+void
+parseLSCOLORS(const Char *value)
+{
+    size_t i, len, clen;
+    const Char	 *v;		/* pointer in value */
+    char   *c;			/* pointer in colors */
+    jmp_buf_t osetexit;
+    size_t omark;
+
+    if (value == NULL) {
+	init(0, 0);
+	return;
+    }
+
+    len = Strlen(value);
+    len >>= 1;
+    clen = len * 12;	/* "??;??;??;??\0" */
+    init(clen, 0);
+
+    /* Prevent from crashing if unknown parameters are given. */
+    omark = cleanup_push_mark();
+    getexit(osetexit);
+
+    /* init pointers */
+    v = value;
+    c = colors;
+
+    if (setexit() == 0) {
+	int fg, bg;
+	for (i = 0; i < len; i++) {
+	    fg = color(*v++);
+	    if (fg == -1)
+		stderror(ERR_BADCOLORVAR, v[-1], '?');
+
+	    bg = color(*v++);
+	    if (bg == -1)
+		stderror(ERR_BADCOLORVAR, '?', v[-1]);
+	    makecolor(&c, fg, bg, &variables[map[i]].color);
+	}
+
+    }
+    cleanup_pop_mark(omark);
+    resexit(osetexit);
+}
 
 /* parseLS_COLORS():
  *	Parse the LS_COLORS environment variable
@@ -183,16 +333,11 @@ parseLS_COLORS(const Char *value)
 
     (void) &e;
 
-    /* init */
-    xfree(extensions);
-    for (i = 0; i < nvariables; i++)
-	variables[i].color = variables[i].defaultcolor;
-    colors = NULL;
-    extensions = NULL;
-    nextensions = 0;
 
-    if (value == NULL)
+    if (value == NULL) {
+	init(0, 0);
 	return;
+    }
 
     len = Strlen(value);
     /* allocate memory */
@@ -200,14 +345,13 @@ parseLS_COLORS(const Char *value)
     for (v = value; *v; v++)
 	if ((*v & CHAR) == ':')
 	    i++;
-    extensions = xmalloc(len + i * sizeof(Extension));
-    colors = i * sizeof(Extension) + (char *)extensions;
-    nextensions = 0;
+
+    init(len, i);
 
     /* init pointers */
     v = value;
     c = colors;
-    e = &extensions[0];
+    e = extensions;
 
     /* Prevent from crashing if unknown parameters are given. */
 
@@ -216,43 +360,43 @@ parseLS_COLORS(const Char *value)
 
     if (setexit() == 0) {
 
-    /* parse */
-    while (*v) {
-	switch (*v & CHAR) {
-	case ':':
-	    v++;
-	    continue;
-
-	case '*':		/* :*ext=color: */
-	    v++;
-	    if (getstring(&c, &v, &e->extension, '=') &&
-		0 < e->extension.len) {
+	/* parse */
+	while (*v) {
+	    switch (*v & CHAR) {
+	    case ':':
 		v++;
-		getstring(&c, &v, &e->color, ':');
-		e++;
 		continue;
-	    }
-	    break;
 
-	default:		/* :vl=color: */
-	    if (v[0] && v[1] && (v[2] & CHAR) == '=') {
-		for (i = 0; i < nvariables; i++)
-		    if ((Char)variables[i].variable[0] == (v[0] & CHAR) &&
-			(Char)variables[i].variable[1] == (v[1] & CHAR))
-			break;
-		if (i < nvariables) {
-		    v += 3;
-		    getstring(&c, &v, &variables[i].color, ':');
+	    case '*':		/* :*ext=color: */
+		v++;
+		if (getstring(&c, &v, &e->extension, '=') &&
+		    0 < e->extension.len) {
+		    v++;
+		    getstring(&c, &v, &e->color, ':');
+		    e++;
 		    continue;
 		}
-		else
-		    stderror(ERR_BADCOLORVAR, v[0], v[1]);
+		break;
+
+	    default:		/* :vl=color: */
+		if (v[0] && v[1] && (v[2] & CHAR) == '=') {
+		    for (i = 0; i < nvariables; i++)
+			if ((Char)variables[i].variable[0] == (v[0] & CHAR) &&
+			    (Char)variables[i].variable[1] == (v[1] & CHAR))
+			    break;
+		    if (i < nvariables) {
+			v += 3;
+			getstring(&c, &v, &variables[i].color, ':');
+			continue;
+		    }
+		    else
+			stderror(ERR_BADCOLORVAR, v[0], v[1]);
+		}
+		break;
 	    }
-	    break;
+	    while (*v && (*v & CHAR) != ':')
+		v++;
 	}
-	while (*v && (*v & CHAR) != ':')
-	    v++;
-    }
     }
 
     cleanup_pop_mark(omark);

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.173 2011/03/30 16:22:15 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.174 2011/11/29 18:38:54 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.173 2011/03/30 16:22:15 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.174 2011/11/29 18:38:54 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -797,6 +797,8 @@ main(int argc, char **argv)
 #ifdef COLOR_LS_F
     if ((tcp = getenv("LS_COLORS")) != NULL)
 	parseLS_COLORS(str2short(tcp));
+    if ((tcp = getenv("LSCOLORS")) != NULL)
+	parseLSCOLORS(str2short(tcp));
 #endif /* COLOR_LS_F */
 
     doldol = putn((tcsh_number_t)getpid());	/* For $$ */

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.98 2011/04/14 18:25:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.99 2012/02/14 18:26:42 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.const.c,v 3.98 2011/04/14 18:25:26 christos Exp $")
+RCSID("$tcsh: tc.const.c,v 3.99 2012/02/14 18:26:42 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -491,6 +491,7 @@ Char STRmmcolormauto[]	= { '-', 'G', '\0' };
 Char STRmmcolormauto[]	= { '-', '-', 'c', 'o', 'l', 'o', 'r', '=', 'a', 'u', 't', 'o', '\0' };
 #endif /* BSD_STYLE_COLORLS */
 Char STRLS_COLORS[]	= { 'L', 'S', '_', 'C', 'O', 'L', 'O', 'R', 'S', '\0' };
+Char STRLSCOLORS[]	= { 'L', 'S', 'C', 'O', 'L', 'O', 'R', 'S', '\0' };
 #endif /* COLOR_LS_F */
 
 Char STRls[]		= { 'l', 's', '\0' };

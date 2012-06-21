@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.161 2011/02/05 16:14:20 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.162 2011/02/26 00:07:06 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.161 2011/02/05 16:14:20 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.162 2011/02/26 00:07:06 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1543,6 +1543,11 @@ dosetenv(Char **v, struct command *c)
 	cleanup_until(lp);
 	return;
     }
+    if (eq(vp, STRLSCOLORS)) {
+        parseLSCOLORS(lp);
+	cleanup_until(lp);
+	return;
+    }
 #endif /* COLOR_LS_F */
 
 #ifdef SIG_WINDOW
@@ -1670,6 +1675,8 @@ dounsetenv(Char **v, struct command *c)
 #ifdef COLOR_LS_F
 		else if (eq(name, STRLS_COLORS))
 		    parseLS_COLORS(n);
+		else if (eq(name, STRLSCOLORS))
+		    parseLSCOLORS(n);
 #endif /* COLOR_LS_F */
 #ifdef NLS_CATALOGS
 		else if (eq(name, STRNLSPATH)) {
