@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.49 2011/12/30 17:18:24 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.50 2011/12/30 20:55:24 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -43,7 +43,7 @@
 #include <malloc.h>
 #endif
 
-RCSID("$tcsh: tc.alloc.c,v 3.49 2011/12/30 17:18:24 christos Exp $")
+RCSID("$tcsh: tc.alloc.c,v 3.50 2011/12/30 20:55:24 christos Exp $")
 
 #define RCHECK
 #define DEBUG
@@ -66,7 +66,7 @@ out_of_memory (void)
 {
     static const char msg[] = "Out of memory\n";
 
-    write(didfds ? 2 : SHDIAG, msg, strlen(msg));
+    TCSH_IGNORE(write(didfds ? 2 : SHDIAG, msg, strlen(msg)));
     _exit(1);
 }
 #endif
