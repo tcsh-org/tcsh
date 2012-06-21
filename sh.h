@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.164 2011/02/05 16:14:20 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.165 2011/04/14 18:25:25 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -440,21 +440,7 @@ typedef long tcsh_number_t;
 #ifdef PURIFY
 /* exit normally, allowing purify to trace leaks */
 # define _exit		exit
-typedef  int		pret_t;
-#else /* !PURIFY */
-/*
- * If your compiler complains, then you can either
- * throw it away and get gcc or, use the following define
- * and get rid of the typedef.
- * [The 4.2/3BSD vax compiler does not like that]
- * Both MULTIFLOW and PCC compilers exhbit this bug.  -- sterling@netcom.com
- */
-# if (defined(vax) || defined(uts) || defined(MULTIFLOW) || defined(PCC)) && !defined(__GNUC__)
-#  define pret_t void
-# else /* !((vax || uts || MULTIFLOW || PCC) && !__GNUC__) */
-typedef void pret_t;
-# endif /* (vax || uts || MULTIFLOW || PCC) && !__GNUC__ */
-#endif /* PURIFY */
+#endif /* !PURIFY */
 
 /*
  * ASCII vs. EBCDIC

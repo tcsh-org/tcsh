@@ -1,3 +1,5 @@
+  8. Get rid of pret_t and make the printf functions return the number of
+     characters printed as the system ones do.
   7. Parse a FreeBSD compat $LSCOLORS. What to do when both LSCOLORS and
      LS_COLORS are set. I am not documenting this until we decide.
   6. V6.18.01 - 20120214
