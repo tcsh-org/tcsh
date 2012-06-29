@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.color.c,v 1.28 2012/06/21 17:40:40 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.color.c,v 1.29 2012/06/21 17:46:25 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.color.c,v 1.28 2012/06/21 17:40:40 christos Exp $")
+RCSID("$tcsh: tw.color.c,v 1.29 2012/06/21 17:46:25 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -125,7 +125,7 @@ enum ansi {
     ANSI_UNDERLINE_ON = 4,	/* underline on */
     ANSI_INVERSE_ON = 7,	/* inverse on */
     ANSI_STRIKETHROUGH_ON = 9,	/* strikethrough on */
-    ANSI_BOLD_OFF = 22,		/* bold off */
+    ANSI_BOLD_OFF = 21,		/* bold off */
     ANSI_ITALICS_OFF = 23,	/* italics off */
     ANSI_UNDERLINE_OFF = 24,	/* underline off */
     ANSI_INVERSE_OFF = 27,	/* inverse off */
