@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.174 2011/11/29 18:38:54 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.175 2012/06/21 17:40:40 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.174 2011/11/29 18:38:54 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.175 2012/06/21 17:40:40 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1217,14 +1217,14 @@ main(int argc, char **argv)
 
 #ifdef NeXT
 	    /* NeXT 2.0 /usr/etc/rlogind, does not set our process group! */
-	    if (shpgrp == 0) {
+	    if (f != -1 && shpgrp == 0) {
 	        shpgrp = getpid();
 		(void) setpgid(0, shpgrp);
 	        (void) tcsetpgrp(f, shpgrp);
 	    }
 #endif /* NeXT */
 #ifdef BSDJOBS			/* if we have tty job control */
-	    if (grabpgrp(f, shpgrp) != -1) {
+	    if (f != -1 && grabpgrp(f, shpgrp) != -1) {
 		/*
 		 * Thanks to Matt Day for the POSIX references, and to
 		 * Paul Close for the SGI clarification.
