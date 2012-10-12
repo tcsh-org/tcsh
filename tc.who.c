@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.56 2012/01/15 17:14:11 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.57 2012/01/17 20:53:38 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.who.c,v 3.56 2012/01/15 17:14:11 christos Exp $")
+RCSID("$tcsh: tc.who.c,v 3.57 2012/01/17 20:53:38 christos Exp $")
 
 #include "tc.h"
 
@@ -65,6 +65,8 @@ RCSID("$tcsh: tc.who.c,v 3.56 2012/01/15 17:14:11 christos Exp $")
 #  define TCSH_PATH_UTMP "/var/run/utx.active"
 # elif defined(__hpux)
 #  define TCSH_PATH_UTMP "/etc/utmpx"
+# elif defined(IBMAIX) && define(UTMP_FILE)
+#  define TCSH_PATH_UTMP UTMP_FILE
 # endif
 # if defined(TCSH_PATH_UTMP) || !defined(HAVE_UTMP_H)
 #  define utmp utmpx
