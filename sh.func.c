@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.162 2011/02/26 00:07:06 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.163 2012/06/21 17:40:40 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.162 2011/02/26 00:07:06 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.163 2012/06/21 17:40:40 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -799,8 +799,16 @@ search(int type, int level, Char *goal)
 	    break;
 
 	case TC_IF:
-	    while (getword(&word))
+	    while (getword(&word)) {
+		if (intty) {
+		    histent->word = Strsave(word.s);
+		    histent->next = xmalloc(sizeof(*histent));
+		    histent->next->prev = histent;
+		    histent = histent->next;
+		}
 		continue;
+	    }
+	    
 	    if ((type == TC_IF || type == TC_ELSE) &&
 		eq(word.s, STRthen))
 		level++;
