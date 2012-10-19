@@ -1,3 +1,4 @@
+ 13. remove AsciiOnly fix now that the real issue has been fixed (Roman Kollar)
  12. define utmp file for aix (Laurence Darby)
  11. fix if history in loops
  10. make ls-F print to stderr and set the exit code
