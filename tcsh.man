@@ -2967,6 +2967,10 @@ the maximum size which a process may lock into memory using mlock(2)
 \fImaxproc\fR
 the maximum number of simultaneous processes for this user id
 .TP
+\fImaxthread\fR
+the maximum number of simultaneous threads (lightweight processes) for this
+user id
+.TP
 \fIsbsize\fR
 the maximum size of socket buffer usage for this user
 .TP

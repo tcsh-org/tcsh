@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.163 2012/06/21 17:40:40 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.164 2012/10/12 01:24:32 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.163 2012/06/21 17:40:40 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.164 2012/10/12 01:24:32 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1989,6 +1989,10 @@ struct limits limits[] =
 # ifdef RLIMIT_RTTIME 
     { RLIMIT_RTTIME,	"maxrttime",	1,	"usec"		}, 
 # endif /* RLIMIT_RTTIME */ 
+
+# ifdef RLIMIT_NTHR 
+    { RLIMIT_NTHR,	"maxthread",	1,	""		}, 
+# endif /* RLIMIT_NTHR */ 
 
     { -1, 		NULL, 		0, 	NULL		}
 };
