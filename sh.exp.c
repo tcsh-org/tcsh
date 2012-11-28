@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.59 2012/02/14 18:22:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.60 2012/05/11 17:16:11 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exp.c,v 3.59 2012/02/14 18:22:09 christos Exp $")
+RCSID("$tcsh: sh.exp.c,v 3.60 2012/05/11 17:16:11 christos Exp $")
 
 #include "tw.h"
 
@@ -172,6 +172,7 @@ sh_access(const Char *fname, int mode)
 		    mode <<= 3;
 		    break;
 		}
+	    xfree(groups);
 	}
     }
 # endif /* NGROUPS_MAX */
