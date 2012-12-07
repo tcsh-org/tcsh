@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.120 2011/04/21 20:28:28 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.121 2012/01/25 15:34:41 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.120 2011/04/21 20:28:28 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.121 2012/01/25 15:34:41 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -507,6 +507,7 @@ pjwait(struct process *pp)
     cleanup_push(&oset, sigprocmask_cleanup);
     pause_mask = oset;
     sigdelset(&pause_mask, SIGCHLD);
+    sigaddset(&pause_mask, SIGINT);
     for (;;) {
 	(void)handle_pending_signals();
 	jobflags = 0;
