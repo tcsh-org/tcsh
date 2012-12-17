@@ -1,3 +1,28 @@
+ 15. fix globbing for ``, stripping backslashes. Example:
+	cat << _EOF > huh
+	echo 'hello\;world'
+        _EOF
+	echo `./huh 0`
+	echo `./huh $?`
+ 14. fix for `` that causes hang. Example:
+	cat << _EOF > huh
+	#!/bin/sh
+	echo "[$@]"
+	echo "I am running"
+	echo "I am running ($$)" >> huh.out
+	_EOF
+	cat << _EOF > huh.tcsh
+	#!/bin/tcsh -f
+
+	./huh \
+	    `#comment blah blah blah` \
+	    parameter a \
+	    `#comment blah blah blah` \
+	    parameter b \
+	    `#comment blah blah blah` \
+	    parameter c
+	echo ok
+	_EOF
  13. remove AsciiOnly fix now that the real issue has been fixed (Roman Kollar)
  12. define utmp file for aix (Laurence Darby)
  11. fix if history in loops
