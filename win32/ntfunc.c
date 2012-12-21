@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.18 2006/03/14 01:22:57 mitr Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.19 2006/08/27 01:13:28 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -383,20 +383,25 @@ void dotitle(Char **vc, struct command * c) {
 	char titlebuf[512];
 	char errbuf[128],err2[128];
 	char **v;
+	Char *nvc;
 
 	UNREFERENCED_PARAMETER(c);
 	vc++;
-	vc = glob_all_or_error(vc);
-	cleanup_push(vc, blk_cleanup);
+	nvc = glob_all_or_error(vc);
+	if (nvc == NULL)
+		return;
+	if (nvc != vc)
+		cleanup_push(nvc, blk_cleanup);
 
-	if ((k=GetConsoleTitle(titlebuf,512) ) != 0) {
-		titlebuf[k]=0;
-		setcopy(STRoldtitle,str2short(titlebuf),VAR_READWRITE);
+	if ((k = GetConsoleTitle(titlebuf, sizeof(titlebuf))) != 0) {
+		setcopy(STRoldtitle,str2short(titlebuf),
+		    VAR_READWRITE|VAR_NOGLOB);
 	}
 
-	memset(titlebuf,0,512);
-	v = short2blk(vc);
-	cleanup_until(vc);
+	titlebuf[0] = '\0';
+	v = short2blk(nvc);
+	if (nvc != vc)
+		cleanup_until(nvc);
 	cleanup_push((Char **)v, blk_cleanup);
 	for (k = 0; v[k] != NULL ; k++){
 		__try {
