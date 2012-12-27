@@ -1,3 +1,7 @@
+ 16. revert fix for 15. Causes extra quoting, for example (foo is a program
+     that prints its arguments):
+	$ ./foo 'abc' *
+	'\a\b\c'
  15. fix globbing for ``, stripping backslashes. Example:
 	cat << _EOF > huh
 	echo 'hello\;world'
