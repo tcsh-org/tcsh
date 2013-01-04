@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.14 2012/01/11 20:20:15 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.15 2012/01/15 17:14:54 christos Exp $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: gethost.c,v 1.14 2012/01/11 20:20:15 christos Exp $")
+RCSID("$tcsh: gethost.c,v 1.15 2012/01/15 17:14:54 christos Exp $")
 
 #ifdef SCO
 # define perror __perror
@@ -150,11 +150,17 @@ cat(const char *a, const char *b, size_t len)
 	char *r;
 
 	if (len == 0)
-		len = strlen(b);
-	l = strlen(a) + len + 1;
+		len = strlen(b) + 1;
+	if (a)
+	    l = strlen(a) + len;
+	else
+	    l = len;
 	if ((r = malloc(l)) == NULL)
 		abort();
-	snprintf(r, l, "%s%.*s", a, (int)len, b);
+	if (a)
+	    snprintf(r, l, "%s%.*s", a, (int)len, b);
+	else
+	    snprintf(r, l, "%.*s", (int)len, b);
 	return r;
 }
 
@@ -171,13 +177,15 @@ explode(const char *defs)
 		return defs;
 
 	free(buf);
-	buf = strdup("("); /* ) */
+	buf = NULL;
 	for (ptr = defs; (bptr = strstr(ptr, def)) != NULL; ptr = eptr + 1) {
 		if (ptr != bptr)
 			buf = cat(buf, ptr, bptr - ptr);
+		buf = cat(buf, "(", 0); /* ) */
 		if ((eptr = strchr(ptr + sizeof(def) - 1, ')')) == NULL) {
 			(void) fprintf(stderr, "%s: missing close paren `%s'\n",
 			    pname, defs);
+			free(buf);
 			return defs;
 		}
 		buf = cat(buf, bptr, eptr - bptr + 1);
@@ -186,26 +194,29 @@ explode(const char *defs)
 		if (len < 1) {
 			(void) fprintf(stderr, "%s: empty define `%s'\n",
 			    pname, defs);
+			free(buf);
 			return defs;
 		}
 		if (*name != '_') {
 			char *undername = malloc(len + 10);
-			buf = cat(buf, " || defined(", 0);
+			if (undername == NULL)
+				abort();
+			buf = cat(buf, ") || defined(", 0);
 			snprintf(undername, len + 10, "__%.*s__)", (int)len,
 			    name);
 			buf = cat(buf, undername, len + 5);
-			buf = cat(buf, " || defined(", 0);
+			buf = cat(buf, ") || defined(", 0);
 			snprintf(undername, len + 10, "__%.*s)", (int)len,
 			    name);
 			buf = cat(buf, undername, len + 3);
 		}
+		buf = cat(buf, "))", 0);
 	}
 	if (!eptr) {
 	    (void) fprintf(stderr, "%s: invalid input `%s'\n", pname, defs);
 	    return defs;
         }
 	buf = cat(buf, eptr + 1, 0);
-	buf = cat(buf, ")", 0);
 	return buf;
 }
 	
