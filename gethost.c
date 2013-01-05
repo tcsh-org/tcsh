@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.15 2012/01/15 17:14:54 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.16 2013/01/04 22:20:37 christos Exp $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: gethost.c,v 1.15 2012/01/15 17:14:54 christos Exp $")
+RCSID("$tcsh: gethost.c,v 1.16 2013/01/04 22:20:37 christos Exp $")
 
 #ifdef SCO
 # define perror __perror
@@ -180,7 +180,7 @@ explode(const char *defs)
 	buf = NULL;
 	for (ptr = defs; (bptr = strstr(ptr, def)) != NULL; ptr = eptr + 1) {
 		if (ptr != bptr)
-			buf = cat(buf, ptr, bptr - ptr);
+			buf = cat(buf, ptr, bptr - ptr + 1);
 		buf = cat(buf, "(", 0); /* ) */
 		if ((eptr = strchr(ptr + sizeof(def) - 1, ')')) == NULL) {
 			(void) fprintf(stderr, "%s: missing close paren `%s'\n",
