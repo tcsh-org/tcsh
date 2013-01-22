@@ -1,3 +1,4 @@
+.\"
 .\" Copyright (c) 1980, 1990, 1993
 .\"	The Regents of the University of California.  All rights reserved.
 .\"
@@ -42,6 +43,10 @@
 .\" 
 .\" - Use `', not '' or "", except of course in shell syntax examples.
 .\"   '' at the beginning of a line will vanish!
+.\"
+.\" - Use \` for literal back-quote (`).
+.\"
+.\" - Use \e for literal backslash (\).
 .\" 
 .\" - Use \-, not -.
 .\" 
@@ -160,7 +165,7 @@ it is used under a debugger.  Job control is disabled. (u)
 Command input is taken from the standard input.
 .TP 4
 .B \-t
-The shell reads and executes a single line of input.  A `\\' may be used to
+The shell reads and executes a single line of input.  A `\e' may be used to
 escape the newline at the end of this line and continue onto another line.
 .TP 4
 .B \-v
@@ -408,7 +413,7 @@ README          main.c          meal            side.o
 .br
 condiments.h    main.c~
 .br
-> set fignore = (.o \\~)
+> set fignore = (.o \e~)
 .br
 > emacs ma[^D]
 .br
@@ -420,7 +425,7 @@ main.c   main.c~  main.o
 .PP
 `main.c~' and `main.o' are ignored by completion (but not listing),
 because they end in suffixes in \fBfignore\fR.
-Note that a `\\' was needed in front of `~' to prevent it from being
+Note that a `\e' was needed in front of `~' to prevent it from being
 expanded to \fBhome\fR as described under \fBFilename substitution\fR.
 \fBfignore\fR is ignored if only one completion is possible.
 .PP
@@ -760,7 +765,7 @@ unless bound to another command.
 .B spell-line \fR(M-$)
 Attempts to correct the spelling of each word in the input buffer, like
 \fIspell-word\fR, but ignores words whose first character is one of
-`\-', `!', `^' or `%', or which contain `\\', `*' or `?', to avoid problems
+`\-', `!', `^' or `%', or which contain `\e', `*' or `?', to avoid problems
 with switches, substitutions and the like.
 See \fBSpelling correction\fR.
 .TP 8
@@ -816,16 +821,16 @@ discarded before further parsing.
 .PP
 A special character (including a blank or tab) may be prevented from having
 its special meaning, and possibly made part of another word, by preceding it
-with a backslash (`\\') or enclosing it in single (`''), double (`"') or
-backward (``') quotes.  When not otherwise quoted a newline preceded by a `\\'
+with a backslash (`\e') or enclosing it in single (`''), double (`"') or
+backward (`\`') quotes.  When not otherwise quoted a newline preceded by a `\e'
 is equivalent to a blank, but inside quotes this sequence results in a
 newline.
 .PP
 Furthermore, all \fBSubstitutions\fR (see below) except \fBHistory substitution\fR
 can be prevented by enclosing the strings (or parts of strings)
 in which they appear with single quotes or by quoting the crucial character(s)
-(e.g., `$' or ``' for \fBVariable substitution\fR or \fBCommand substitution\fR respectively)
-with `\\'.  (\fBAlias substitution\fR is no exception: quoting in any way any
+(e.g., `$' or `\`' for \fBVariable substitution\fR or \fBCommand substitution\fR respectively)
+with `\e'.  (\fBAlias substitution\fR is no exception: quoting in any way any
 character of a word for which an \fIalias\fR has been defined prevents
 substitution of the alias.  The usual way of quoting an alias is to precede it
 with a backslash.) \fBHistory substitution\fR is prevented by
@@ -847,7 +852,7 @@ those parts of the string which need quoting, using different types of quoting
 to do so if appropriate.
 .PP
 The \fBbackslash_quote\fR shell variable (q.v.) can be set to make backslashes
-always quote `\\', `'', and `"'.  (+) This may make complex quoting tasks
+always quote `\e', `'', and `"'.  (+) This may make complex quoting tasks
 easier, but it can cause syntax errors in \fIcsh\fR(1) scripts.
 .SS Substitutions
 We now describe the various transformations the shell performs on the input in
@@ -880,7 +885,7 @@ command in the current command, or fix spelling mistakes in the previous
 command with little typing and a high degree of confidence.
 .PP
 History substitutions begin with the character `!'.  They may begin anywhere in
-the input stream, but they do not nest.  The `!' may be preceded by a `\\' to
+the input stream, but they do not nest.  The `!' may be preceded by a `\e' to
 prevent its special meaning; for convenience, a `!' is passed unchanged when it
 is followed by a blank, tab, newline, `=' or `('.  History substitutions also
 occur when an input line begins with `^'.  This special abbreviation will be
@@ -1046,8 +1051,8 @@ Substitute \fIl\fR for \fIr\fR.
 \fIl\fR is simply a string like \fIr\fR, not a regular expression as in
 the eponymous \fIed\fR(1) command.
 Any character may be used as the delimiter in place of `/';
-a `\\' can be used to quote the delimiter inside \fIl\fR and \fIr\fR.
-The character `&' in the \fIr\fR is replaced by \fIl\fR; `\\' also quotes `&'.
+a `\e' can be used to quote the delimiter inside \fIl\fR and \fIr\fR.
+The character `&' in the \fIr\fR is replaced by \fIl\fR; `\e' also quotes `&'.
 If \fIl\fR is empty (``''), the \fIl\fR from a previous substitution or the
 \fIs\fR from a previous search or event number in event specification is used.
 The trailing delimiter may be omitted if it is immediately followed by a newline.
@@ -1187,7 +1192,7 @@ After the input line is aliased and parsed, and before each command is
 executed, variable substitution is performed keyed by `$' characters.  This
 expansion can be prevented by preceding the `$' with a `\e' except within `"'s
 where it \fIalways\fR occurs, and within `''s where it \fInever\fR occurs.
-Strings quoted by ``' are interpreted later (see \fBCommand substitution\fR
+Strings quoted by `\`' are interpreted later (see \fBCommand substitution\fR
 below) so `$' substitution does not occur there until later,
 if at all.  A `$' is passed unchanged if followed by a blank, tab, or
 end-of-line.
@@ -1316,7 +1321,7 @@ shell, the command name is substituted separately from the argument list.  This
 occurs very late, after input-output redirection is performed, and in a child
 of the main shell.
 .SS "Command substitution"
-Command substitution is indicated by a command enclosed in ``'.  The output
+Command substitution is indicated by a command enclosed in `\`'.  The output
 from such a command is broken into separate words at blanks, tabs and newlines,
 and null words are discarded.  The output is variable and command substituted
 and put in place of the original string.
@@ -1549,9 +1554,9 @@ expanded) as the standard input.
 Read the shell input up to a line which is identical to \fIword\fR.  \fIword\fR
 is not subjected to variable, filename or command substitution, and each input
 line is compared to \fIword\fR before any substitutions are done on this input
-line.  Unless a quoting `\e', `"', `' or ``' appears in \fIword\fR variable and
+line.  Unless a quoting `\e', `"', `' or `\`' appears in \fIword\fR variable and
 command substitution is performed on the intervening lines, allowing `\e' to
-quote `$', `\e' and ``'.  Commands which are substituted have all blanks, tabs,
+quote `$', `\e' and `\`'.  Commands which are substituted have all blanks, tabs,
 and newlines preserved, except for the final newline which is dropped.  The
 resultant text is placed in an anonymous temporary file which is given to the
 command as standard input.
@@ -2262,7 +2267,7 @@ The ASCII character corresponding to the octal number \fInnn\fR
 .RE
 .PP
 `\e' nullifies the special meaning of the following character, if it has
-any, notably `\\' and `^'.
+any, notably `\e' and `^'.
 .RE
 .TP 8
 .B bs2cmd \fIbs2000-command\fR (+)
@@ -2428,7 +2433,7 @@ Words from the variable \fIvar\fR
 (...)
 Words from the given list
 .TP 8
-`...`
+\`...\`
 Words from the output of command
 .PD
 .RE
@@ -2445,7 +2450,7 @@ completion.  If null, no character is appended.  If omitted (in which
 case the fourth delimiter can also be omitted), a slash is appended to
 directories and a space to other words.
 .PP
-\fIcommand\fR invoked from `...` version has additional environment
+\fIcommand\fR invoked from \`...\` version has additional environment
 variable set, the variable name is \%\fBCOMMAND_LINE\fR\% and
 contains (as its name indicates) contents of the current (already
 typed in) command line. One can examine and use contents of the
@@ -2526,7 +2531,7 @@ rtfm.mit.edu tesla.ee.cornell.edu uunet.uu.net
 .PP
 or from a command run at completion time:
 .IP "" 4
-> complete kill 'p/*/`ps | awk \\{print\\ \\$1\\}`/'
+> complete kill 'p/*/\`ps | awk \e{print\e \e$1\e}\`/'
 .br
 > kill \-9 [^D]
 .br
@@ -2587,7 +2592,7 @@ again the order in which the completions are specified.
 .PP
 Finally, here's a complex example for inspiration:
 .IP "" 4
-> complete find \\
+> complete find \e
 .br
 \&'n/\-name/f/' 'n/\-newer/f/' 'n/\-{,n}cpio/f/' \e
 .br
@@ -2684,7 +2689,7 @@ or does not have that capability).  One might use this to make the output
 from a shell script less verbose on slow terminals, or limit command
 output to the number of lines on the screen:
 .IP "" 4
-> set history=`echotc lines`
+> set history=\`echotc lines\`
 .br
 > @ history\-\-
 .PP
@@ -2693,9 +2698,9 @@ One should use double quotes when setting a shell variable to a terminal
 capability string, as in the following example that places the date in
 the status line:
 .IP "" 4
-> set tosl="`echotc ts 0`"
+> set tosl="\`echotc ts 0\`"
 .br
-> set frsl="`echotc fs`"
+> set frsl="\`echotc fs\`"
 .br
 > echo \-n "$tosl";date; echo \-n "$frsl"
 .PP
@@ -3216,12 +3221,13 @@ For example,
 .PD
 .RS +8
 .IP "" 4
-> sched 11:00 echo It\\'s eleven o\\'clock.
+> sched 11:00 echo It\e's eleven o\e'clock.
 .PP
 causes the shell to echo `It's eleven o'clock.' at 11 AM.
 The time may be in 12-hour AM/PM format
 .IP "" 4
-> sched 5pm set prompt='[%h] It\\'s after 5; go home: >'
+.\" TODO
+> sched 5pm set prompt='[%h] It\e's after 5; go home: >'
 .PP
 or may be relative to the current time:
 .IP "" 4
@@ -3676,7 +3682,8 @@ command completion or spelling correction attempt if set to `complete' or
 cases.
 .TP 8
 .B backslash_quote \fR(+)
-If set, backslashes (`\\') always quote `\\', `'', and `"'.  This may make
+.\" TODO
+If set, backslashes (`\e') always quote `\e', `'', and `"'.  This may make
 complex quoting tasks easier, but it can cause syntax errors in \fIcsh\fR(1)
 scripts.
 .TP 8
@@ -3725,7 +3732,7 @@ commands, instead of starting a new one.
 Same as continue, but the shell will execute:
 .RS +8
 .IP "" 4
-echo `pwd` $argv > ~/.<cmd>_pause; %<cmd>
+echo \`pwd\` $argv > ~/.<cmd>_pause; %<cmd>
 .RE
 .TP 8
 .B correct \fR(+)
@@ -3941,7 +3948,7 @@ also the \fItoggle-literal-history\fR editor command.
 .B history
 The first word indicates the number of history events to save.  The
 optional second word (+) indicates the format in which history is
-printed; if not given, `%h\\t%T\\t%R\\n' is used.  The format sequences
+printed; if not given, `%h\et%T\et%R\en' is used.  The format sequences
 are described below under \fBprompt\fR; note the variable meaning of
 `%R'.  Set to `100' by default.
 .TP 8
@@ -4282,7 +4289,7 @@ Set by default to `%# ' in interactive shells.
 .TP 8
 .B prompt2 \fR(+)
 The string with which to prompt in \fIwhile\fR and \fIforeach\fR loops and
-after lines ending in `\\'.
+after lines ending in `\e'.
 The same format sequences may be used as in \fBprompt\fR (q.v.);
 note the variable meaning of `%R'.
 Set by default to `%R? ' in interactive shells.
@@ -4340,7 +4347,7 @@ sorted by time stamp and the most recent events are retained.  (+)
 .TP 8
 .B sched \fR(+)
 The format in which the \fIsched\fR builtin command prints scheduled events;
-if not given, `%h\\t%T\\t%R\\n' is used.
+if not given, `%h\et%T\et%R\en' is used.
 The format sequences are described above under \fBprompt\fR;
 note the variable meaning of `%R'.
 .TP 8
