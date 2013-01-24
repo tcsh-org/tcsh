@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.164 2012/10/12 01:24:32 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.165 2012/11/15 02:53:46 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.164 2012/10/12 01:24:32 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.165 2012/11/15 02:53:46 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1389,7 +1389,7 @@ dosetenv(Char **v, struct command *c)
 	stderror(ERR_NAME | ERR_VARBEGIN);
     do {
 	lp++;
-    } while (alnum(*lp));
+    } while (alnum(*lp) || *lp == '.');
     if (*lp != '\0')
 	stderror(ERR_NAME | ERR_VARALNUM);
 
