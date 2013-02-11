@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.init.c,v 3.62 2006/08/23 01:26:19 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.init.c,v 3.63 2006/08/23 01:49:32 mitr Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.init.c,v 3.62 2006/08/23 01:26:19 christos Exp $")
+RCSID("$tcsh: sh.init.c,v 3.63 2006/08/23 01:49:32 mitr Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -214,7 +214,7 @@ int nsrchn = sizeof srchn / sizeof *srchn;
  */
 
 /* We define NUMSIG to avoid changing NSIG or MAXSIG */
-#if defined(POSIX) && !defined(__CYGWIN__)
+#if defined(POSIX) && (!defined(__CYGWIN__) || defined (__x86_64__))
 # define NUMSIG 65
 #else /* !POSIX */
 # define NUMSIG 33
