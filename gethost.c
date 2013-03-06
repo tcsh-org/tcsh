@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.16 2013/01/04 22:20:37 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.17 2013/01/05 01:23:08 christos Exp $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: gethost.c,v 1.16 2013/01/04 22:20:37 christos Exp $")
+RCSID("$tcsh: gethost.c,v 1.17 2013/01/05 01:23:08 christos Exp $")
 
 #ifdef SCO
 # define perror __perror
@@ -175,6 +175,8 @@ explode(const char *defs)
 
 	if (strstr(defs, "#machine(" /* ) */))
 		return defs;
+	if (!strstr(defs, def))
+		return defs;
 
 	free(buf);
 	buf = NULL;
@@ -197,7 +199,7 @@ explode(const char *defs)
 			free(buf);
 			return defs;
 		}
-		if (*name != '_') {
+		if (*name != '_' && (*name != 'M' && name[1] != '_')) {
 			char *undername = malloc(len + 10);
 			if (undername == NULL)
 				abort();
@@ -303,8 +305,8 @@ main(int argc, char *argv[])
 			       pname, fname, lineno);
 		break;
 	    }
-	    (void) fprintf(stdout, "\n#if %s\n# define %s\n#endif\n\n", stmt,
-			   defs);
+	    (void) fprintf(stdout, "\n#if %s\n# define %s\n#endif\n\n",
+		explode(stmt), defs);
 	    break;
 
 	case T_NONE:
@@ -351,7 +353,7 @@ main(int argc, char *argv[])
 #ifdef LINEDIRECTIVE
 		(void) fprintf(stdout, "# %d \"%s\"\n", lineno + 1, fname);
 #endif /* LINEDIRECTIVE */
-		(void) fprintf(stdout, "#if %s\n", defs);
+		(void) fprintf(stdout, "#if (%s)\n", explode(defs));
 		inprocess = 1;
 	    }
 	    else {
