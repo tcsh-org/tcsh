@@ -1,5 +1,5 @@
 newcode :
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.57 2012/06/20 21:31:32 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.58 2013/03/06 22:48:45 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode :
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.57 2012/06/20 21:31:32 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.58 2013/03/06 22:48:45 christos Exp $")
 
 endcode :
 
@@ -334,7 +334,7 @@ comment : Sun Microsystems series 4 workstation (SPARC based)
 vendor	:						: "sun"
 hosttype: defined(M_i386) && !defined(SVR4)		: "sun386i"
 hosttype: defined(M_i386) && defined(SVR4)		: "i86pc"
-hosttype: defined(M_amd64)				: "amd"
+hosttype: defined(M_amd64)				: "i86pc"
 hosttype: defined(mc68010)				: "sun2"
 hosttype: defined(mc68020)				: "sun3"
 hosttype: defined(sparc)				: "sun4"
