@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.49 2011/02/05 17:35:31 christos Exp $
+# $tcsh: Makefile.in,v 3.50 2012/02/14 18:27:22 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -594,12 +594,12 @@ vgrind:
 	@vgrind -t -x -h Index index >/crp/bill/csh/index.t
 
 install-strip: install
+	-strip ${DESTBIN}/tcsh$(EXEEXT)
 
 install: tcsh$(EXEEXT) install.catalogs install.man
 	-mkdir -p ${DESTBIN}
 	-mv -f ${DESTBIN}/tcsh$(EXEEXT)  ${DESTBIN}/tcsh.old
 	cp tcsh$(EXEEXT) ${DESTBIN}/tcsh$(EXEEXT)
-	-strip ${DESTBIN}/tcsh$(EXEEXT)
 	chmod 755 ${DESTBIN}/tcsh$(EXEEXT)
 
 install.catalogs:
