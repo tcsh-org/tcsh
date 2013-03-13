@@ -1,5 +1,5 @@
 newcode :
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.58 2013/03/06 22:48:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.59 2013/03/07 00:42:22 christos Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode :
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.58 2013/03/06 22:48:45 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.59 2013/03/07 00:42:22 christos Exp $")
 
 endcode :
 
@@ -1181,7 +1181,7 @@ enddef	:
 
 newdef	: defined(CYGWIN)
 comment : Cygwin
-vendor	:						: "intel"
+vendor	: defined(M_intel)				: "intel"
 hosttype:						: gethost()
 ostype	:						: getostype()
 machtype:						: getmach()
