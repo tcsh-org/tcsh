@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.121 2012/01/25 15:34:41 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.122 2012/12/07 20:54:39 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.121 2012/01/25 15:34:41 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.122 2012/12/07 20:54:39 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1834,12 +1834,12 @@ pfork(struct command *t, int wanttty)
 	    (void) signal(SIGHUP, SIG_IGN);
 	if (t->t_dflg & F_NICE) {
 	    int nval = SIGN_EXTEND_CHAR(t->t_nice);
-#ifdef HAVE_SETPRIORITY
+#if defined(HAVE_SETPRIORITY) && defined(PRIO_PROCESS)
 	    if (setpriority(PRIO_PROCESS, 0, nval) == -1 && errno)
 		stderror(ERR_SYSTEM, "setpriority", strerror(errno));
-#else /* !HAVE_SETPRIORITY */
+#else /* !HAVE_SETPRIORITY || !PRIO_PROCESS */
 	    (void) nice(nval);
-#endif /* !HAVE_SETPRIORITY */
+#endif /* HAVE_SETPRIORITY  && PRIO_PROCESS */
 	}
 #ifdef F_VER
         if (t->t_dflg & F_VER) {

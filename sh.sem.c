@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.85 2011/02/04 18:00:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.86 2011/02/25 23:24:19 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.sem.c,v 3.85 2011/02/04 18:00:26 christos Exp $")
+RCSID("$tcsh: sh.sem.c,v 3.86 2011/02/25 23:24:19 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -560,13 +560,13 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 			(void) signal(SIGHUP, SIG_DFL);
 		    if (t->t_dflg & F_NICE) {
 			int nval = SIGN_EXTEND_CHAR(t->t_nice);
-# ifdef HAVE_SETPRIORITY
+# if defined(HAVE_SETPRIORITY) && defined(PRIO_PROCESS)
 			if (setpriority(PRIO_PROCESS, 0, nval) == -1 && errno)
 				stderror(ERR_SYSTEM, "setpriority",
 				    strerror(errno));
-# else /* !HAVE_SETPRIORITY */
+# else /* !HAVE_SETPRIORITY || !PRIO_PROCESS */
 			(void) nice(nval);
-# endif /* HAVE_SETPRIORITY */
+# endif /* HAVE_SETPRIORITY && PRIO_PROCESS */
 		    }
 # ifdef F_VER
 		    if (t->t_dflg & F_VER) {
