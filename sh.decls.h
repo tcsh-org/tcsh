@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.61 2011/01/24 18:17:07 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.62 2011/02/25 23:58:34 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -221,6 +221,7 @@ extern	char		 *fmthist	(int, ptr_t);
 extern	void		  rechist	(Char *, int);
 extern	void		  loadhist	(Char *, int);
 extern	void		  displayHistStats(const char *);
+extern	void		  sethistory	(int);
 
 /*
  * sh.init.c

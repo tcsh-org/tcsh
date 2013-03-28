@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.82 2011/04/14 18:25:25 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.83 2012/01/15 17:15:28 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.82 2011/04/14 18:25:25 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.83 2012/01/15 17:15:28 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -194,6 +194,9 @@ update_vars(Char *vp)
     }
     else if (eq(vp, STRkillring)) {
 	SetKillRing((int)getn(varval(vp)));
+    }
+    else if (eq(vp, STRhistory)) {
+	sethistory((int)getn(varval(vp)));
     }
 #ifndef HAVENOUTMP
     else if (eq(vp, STRwatch)) {
@@ -786,6 +789,8 @@ unset(Char **v, struct command *c)
 	noediting = 0;
     if (did_roe && adrof(STRrecognize_only_executables) == 0)
 	tw_cmd_free();
+    if (adrof(STRhistory) == 0)
+	sethistory(0);
 #ifdef COLOR_LS_F
     if (adrof(STRcolor) == 0)
 	set_color_context();

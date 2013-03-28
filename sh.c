@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.175 2012/06/21 17:40:40 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.176 2012/10/10 03:03:51 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.175 2012/06/21 17:40:40 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.176 2012/10/10 03:03:51 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -355,6 +355,7 @@ main(int argc, char **argv)
 
     /* Default history size to 100 */
     setcopy(STRhistory, str2short("100"), VAR_READWRITE);
+    sethistory(100);
 
     tempv = argv;
     ffile = SAVE(tempv[0]);
