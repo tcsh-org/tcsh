@@ -1,3 +1,4 @@
+ 18. Cache history count to speed up thing
  17. PR/240: minix support 
  16. revert fix for 15. Causes extra quoting, for example (foo is a program
      that prints its arguments):
