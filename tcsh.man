@@ -1406,7 +1406,7 @@ The \fBglobstar\fR shell variable can be set to allow `**' or `***' as
 a file glob pattern that matches any string of characters including `/',
 recursively traversing any existing sub-directories.  For example, 
 `ls **.c' will list all the .c files in the current directory tree.
-If used by itself, it will match match zero or more sub-directories
+If used by itself, it will match zero or more sub-directories
 (e.g. `ls /usr/include/**/time.h' will list any file named `time.h'
 in the /usr/include directory tree; `ls /usr/include/**time.h' will match 
 any file in the /usr/include directory tree ending in `time.h'; and
@@ -3895,7 +3895,7 @@ with `.' except for `.' and `..'
 If set, the `**' and `***' file glob patterns will match any string of 
 characters including `/' traversing any existing sub-directories.  (e.g. 
 `ls **.c' will list all the .c files in the current directory tree).
-If used by itself, it will match match zero or more sub-directories
+If used by itself, it will match zero or more sub-directories
 (e.g. `ls /usr/include/**/time.h' will list any file named `time.h'
 in the /usr/include directory tree; whereas `ls /usr/include/**time.h'
 will match any file in the /usr/include directory tree ending in `time.h').
