@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.149 2012/06/21 19:13:18 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.150 2012/06/21 21:47:15 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.149 2012/06/21 19:13:18 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.150 2012/06/21 21:47:15 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -738,7 +738,7 @@ auto_lock(void)
 	pp = xgetpass("Password:");
 
 	crpp = XCRYPT(pw, pp, srpp);
-	if ((strcmp(crpp, srpp) == 0)
+	if ((crpp && strcmp(crpp, srpp) == 0)
 #ifdef AFS
 	    || (ka_UserAuthenticateGeneral(KA_USERAUTH_VERSION,
 					   afsname,     /* name */
