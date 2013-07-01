@@ -539,10 +539,6 @@ not register a misspelling.
 Like completion, spelling correction works anywhere in the line,
 pushing the rest of the line to the right and possibly leaving
 extra characters to the right of the cursor.
-.PP
-Beware: spelling correction is not guaranteed to work the way one intends,
-and is provided mostly as an experimental feature.
-Suggestions and improvements are welcome.
 .SS "Editor commands (+)"
 `bindkey' lists key bindings and `bindkey \-l' lists and briefly describes
 editor commands.
