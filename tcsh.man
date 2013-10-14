@@ -4337,7 +4337,9 @@ entries are saved.
 .B savehist
 If set, the shell does `history \-S' before exiting.
 If the first word is set to a number, at most that many lines are saved.
-(The number must be less than or equal to \fBhistory\fR.)
+(The number should be less than or equal to the number \fBhistory\fR entries;
+if it is set to greater than the number of \fBhistory\fR settings, only
+\fBhistory\fR entries will be saved)
 If the second word is set to `merge', the history list is merged with
 the existing history file instead of replacing it (if there is one) and
 sorted by time stamp and the most recent events are retained.  (+)
