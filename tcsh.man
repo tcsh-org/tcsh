@@ -2959,6 +2959,12 @@ may allocate per \fIbrk()\fR system call
 \fIdescriptors\fR or \fIopenfiles\fR
 the maximum number of open files for this process
 .TP
+\fIpseudoterminals\fR
+the maximum number of pseudo-terminals for this user
+.TP
+\fIkqueues\fR
+the maximum number of kqueues allocated for this process
+.TP
 \fIconcurrency\fR
 the maximum number of threads for this process
 .TP
@@ -2972,6 +2978,9 @@ the maximum number of simultaneous processes for this user id
 the maximum number of simultaneous threads (lightweight processes) for this
 user id
 .TP
+\fIthreads\fR
+the maximum number of threads for this process
+.TP
 \fIsbsize\fR
 the maximum size of socket buffer usage for this user
 .TP
@@ -2980,6 +2989,9 @@ the maximum amount of swap space reserved or used for this user
 .TP
 \fImaxlocks\fR
 the maximum number of locks for this user
+.TP
+\fIposixlocks\fR
+the maximum number of POSIX advisory locks for this user
 .TP
 \fImaxsignal\fR
 the maximum number of pending signals for this user
