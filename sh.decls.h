@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.62 2011/02/25 23:58:34 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.63 2013/03/28 15:06:31 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -78,6 +78,7 @@ extern	void		  loaddirs	(Char *);
 extern	void		  Dfix		(struct command *);
 extern	Char		 *Dfix1		(Char *);
 extern	void		  heredoc	(Char *);
+extern  Char		 *randsuf	(void);
 
 /*
  * sh.err.c

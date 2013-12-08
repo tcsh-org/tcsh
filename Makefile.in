@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.50 2012/02/14 18:27:22 christos Exp $
+# $tcsh: Makefile.in,v 3.51 2013/03/13 15:34:45 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -377,14 +377,14 @@ ASSRCS=	sh.c sh.dir.c sh.dol.c sh.err.c sh.exec.c sh.char.c \
 	sh.lex.c sh.misc.c sh.parse.c sh.print.c sh.proc.c sh.sem.c \
 	sh.set.c sh.time.c sh.char.h sh.dir.h sh.proc.h sh.h \
 	tw.color.c
-PSSRCS= sh.decls.h glob.c glob.h mi.termios.c mi.wait.h mi.varargs.h ma.setp.c \
+PSSRCS= sh.decls.h glob.c glob.h dotlock.c dotlock.h mi.termios.c mi.wait.h mi.varargs.h ma.setp.c \
 	vms.termcap.c
 SHSRCS= ${ASSRCS} ${PSSRCS}
 SHOBJS=	sh.${SUF} sh.dir.${SUF} sh.dol.${SUF} sh.err.${SUF} sh.exec.${SUF} \
 	sh.char.${SUF} sh.exp.${SUF} sh.file.${SUF} sh.func.${SUF} \
 	sh.glob.${SUF} sh.hist.${SUF} sh.init.${SUF} sh.lex.${SUF} \
 	sh.misc.${SUF} sh.parse.${SUF} sh.print.${SUF} sh.proc.${SUF} \
-	sh.sem.${SUF} sh.set.${SUF} sh.time.${SUF} glob.${SUF} \
+	sh.sem.${SUF} sh.set.${SUF} sh.time.${SUF} glob.${SUF} dotlock.${SUF} \
 	mi.termios.${SUF} ma.setp.${SUF} vms.termcap.${SUF}
 
 TWSRCS= tw.decls.h tw.h tw.help.c tw.init.c tw.parse.c tw.spell.c \
@@ -786,6 +786,9 @@ ${TWOBJS} ${TWINC}: ${TWH}
 
 # glob.h
 glob.${SUF} sh.glob.${SUF}: glob.h
+
+# dotlock.h
+dotlock.${SUF}: dotlock.h
 
 # ed.defns.h
 EDDINC=tc.bind.${SUF} tc.func.${SUF} tc.os.${SUF}

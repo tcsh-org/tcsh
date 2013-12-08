@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.53 2011/01/24 18:10:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.54 2013/03/28 15:06:31 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,10 +32,11 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.53 2011/01/24 18:10:26 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.54 2013/03/28 15:06:31 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
+#include "dotlock.h"
 
 extern int histvalid;
 extern struct Strbuf histline;
@@ -1208,13 +1209,19 @@ fmthist(int fmt, ptr_t ptr)
     }
 }
 
+void dotlock_cleanup(void* lockpath)
+{
+	dot_unlock((char*)lockpath);
+}
+
 /* Save history before exiting the shell. */
 void
 rechist(Char *fname, int ref)
 {
-    Char    *snum;
+    Char    *snum, *rs;
     int     fp, ftmp, oldidfds;
     struct varent *shist;
+    char path[MAXPATHLEN];
     static Char   *dumphist[] = {STRhistory, STRmhT, 0, 0};
 
     if (fname == NULL && !ref) 
@@ -1243,12 +1250,14 @@ rechist(Char *fname, int ref)
      * with numerous shells being in simultaneous use. Imagine
      * any kind of window system. All these shells 'share' the same 
      * ~/.history file for recording their command line history. 
-     * Currently the automatic merge can only succeed when the shells
-     * nicely quit one after another. 
+     * We try to handle the case of multiple shells trying to merge
+     * histories at the same time, by creating semi-unique filenames
+     * and saving the history there first and then trying to rename
+     * them in the proper history file.
      *
      * Users that like to nuke their environment require here an atomic
-     * 	loadhist-creat-dohist(dumphist)-close
-     * sequence.
+     * loadhist-creat-dohist(dumphist)-close sequence which is given
+		 * by optional lock parameter to savehist.
      *
      * jw.
      */ 
@@ -1259,14 +1268,36 @@ rechist(Char *fname, int ref)
      */
     oldidfds = didfds;
     didfds = 0;
-    if ((shist = adrof(STRsavehist)) != NULL && shist->vec != NULL)
-	if (shist->vec[1] && eq(shist->vec[1], STRmerge))
-	    loadhist(fname, 1);
+    if ((shist = adrof(STRsavehist)) != NULL && shist->vec != NULL) {
+	size_t i;
+	int merge = 0, lock = 0;
 
-    fp = xcreat(short2str(fname), 0600);
-    cleanup_until(fname);
+	for (i = 1; shist->vec[i]; i++) {
+	    if (eq(shist->vec[i], STRmerge))
+		merge++;
+	    if (eq(shist->vec[i], STRlock))
+		lock++;
+	}
+
+	if (merge) {
+	    if (lock) {
+		char *lockpath = strsave(short2str(fname));
+		cleanup_push(lockpath, xfree);
+		/* Poll in 100 miliseconds interval to obtain the lock. */
+		if ((dot_lock(lockpath, 100) == 0))
+		    cleanup_push(lockpath, dotlock_cleanup);
+	    }
+	    loadhist(fname, 1);
+	}
+    }
+    rs = randsuf();
+    xsnprintf(path, sizeof(path), "%S.%S", fname, rs);
+    xfree(rs);
+
+    fp = xcreat(path, 0600);
     if (fp == -1) {
 	didfds = oldidfds;
+	cleanup_until(fname);
 	return;
     }
     ftmp = SHOUT;
@@ -1276,6 +1307,8 @@ rechist(Char *fname, int ref)
     xclose(fp);
     SHOUT = ftmp;
     didfds = oldidfds;
+    (void)rename(path, short2str(fname));
+    cleanup_until(fname);
 }
 
 

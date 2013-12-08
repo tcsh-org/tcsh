@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.99 2012/02/14 18:26:42 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.100 2012/06/21 17:40:40 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.const.c,v 3.99 2012/02/14 18:26:42 christos Exp $")
+RCSID("$tcsh: tc.const.c,v 3.100 2012/06/21 17:40:40 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -113,6 +113,7 @@ Char STRmhT[]		= { '-', 'h', 'T', '\0' };
 Char STRmm[]		= { '-', 'm', '\0' };
 Char STRmr[]		= { '-', 'r', '\0' };
 Char STRmerge[]		= { 'm', 'e', 'r', 'g', 'e', '\0' };
+Char STRlock[]		= { 'l', 'o', 'c', 'k', '\0' };
 Char STRtildothist[]	= { '~', '/', '.', 'h', 'i', 's', 't', 'o', 'r', 
 			    'y', '\0' };
 

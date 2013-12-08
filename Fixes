@@ -1,3 +1,4 @@
+ 20. Add locked merge history support (Marcin Konarski)
  19. Support more resource limits from various BSD's
  18. Cache history count to speed up thing
  17. PR/240: minix support 

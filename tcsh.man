@@ -2815,8 +2815,10 @@ number, at most that many lines are saved.  If the second word of
 existing history file instead of replacing it (if there is one) and
 sorted by time stamp.  (+) Merging is intended for an environment like
 the X Window System
-with several shells in simultaneous use.  Currently it succeeds
-only when the shells quit nicely one after another.
+with several shells in simultaneous use.  If the second word of \fBsavehist\fR
+is `merge' and the third word is set to `lock', the history file update
+will be serialized with other shell sessions that would possibly like
+to merge history at exactly the same time.
 .PP
 With \fB\-L\fR, the shell appends \fIfilename\fR, which is presumably a
 history list saved by the \fB\-S\fR option or the \fBsavehist\fR mechanism,
@@ -4354,7 +4356,10 @@ if it is set to greater than the number of \fBhistory\fR settings, only
 \fBhistory\fR entries will be saved)
 If the second word is set to `merge', the history list is merged with
 the existing history file instead of replacing it (if there is one) and
-sorted by time stamp and the most recent events are retained.  (+)
+sorted by time stamp and the most recent events are retained.
+If the second word of \fBsavehist\fR is `merge' and the third word is set to
+`lock', the history file update will be serialized with other shell sessions
+that would possibly like to merge history at exactly the same time. (+)
 .TP 8
 .B sched \fR(+)
 The format in which the \fIsched\fR builtin command prints scheduled events;
