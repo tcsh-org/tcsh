@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.54 2013/03/28 15:06:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.55 2013/12/08 22:53:09 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.54 2013/03/28 15:06:31 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.55 2013/12/08 22:53:09 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
@@ -1222,6 +1222,7 @@ rechist(Char *fname, int ref)
     int     fp, ftmp, oldidfds;
     struct varent *shist;
     char path[MAXPATHLEN];
+    struct stat st;
     static Char   *dumphist[] = {STRhistory, STRmhT, 0, 0};
 
     if (fname == NULL && !ref) 
@@ -1299,6 +1300,11 @@ rechist(Char *fname, int ref)
 	didfds = oldidfds;
 	cleanup_until(fname);
 	return;
+    }
+    /* Try to preserve ownership and permissions of the original history file */
+    if (stat(short2str(fname), &st) != -1) {
+	TCSH_IGNORE(fchown(fp, st.st_uid, st.st_gid));
+	TCSH_IGNORE(fchmod(fp, st.st_mode));
     }
     ftmp = SHOUT;
     SHOUT = fp;
