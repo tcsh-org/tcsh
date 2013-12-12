@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.50 2011/12/30 20:55:24 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.51 2012/06/21 18:45:15 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -43,7 +43,7 @@
 #include <malloc.h>
 #endif
 
-RCSID("$tcsh: tc.alloc.c,v 3.50 2011/12/30 20:55:24 christos Exp $")
+RCSID("$tcsh: tc.alloc.c,v 3.51 2012/06/21 18:45:15 christos Exp $")
 
 #define RCHECK
 #define DEBUG
@@ -459,7 +459,7 @@ malloc_usable_size(M_U_S_CONST void *ptr)
     const union overhead *op = (const union overhead *)
 	(((const char *) ptr) - MEMALIGN(sizeof(*op)));
     if (op->ov_magic == MAGIC)
-	    return 1 << (op->ov_index + 2);
+	    return 1 << (op->ov_index + 3);
     else
 	    return 0;
 }
