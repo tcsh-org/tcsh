@@ -1,3 +1,4 @@
+ 21. set foo="aabaabaa"; echo $foo:as/a// should produce bb
  20. Add locked merge history support (Marcin Konarski)
  19. Support more resource limits from various BSD's
  18. Cache history count to speed up thing
