@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.176 2012/10/10 03:03:51 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.177 2013/03/28 15:06:31 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.176 2012/10/10 03:03:51 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.177 2013/03/28 15:06:31 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -821,7 +821,7 @@ main(int argc, char **argv)
 #else /* !WINNT_NATIVE */
 #ifdef HAVE_MKSTEMP
     {
-	char *tmpdir = getenv ("TMPDIR");
+	const char *tmpdir = getenv ("TMPDIR");
 	if (!tmpdir)
 	    tmpdir = "/tmp";
 	shtemp = Strspl(SAVE(tmpdir), SAVE("/sh" TMP_TEMPLATE)); /* For << */

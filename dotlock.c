@@ -24,12 +24,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "sh.h"
-RCSID("$tcsh: dotlock.c,v 3.1 2013/12/08 22:53:09 christos Exp $");
+RCSID("$tcsh: dotlock.c,v 3.2 2013/12/11 16:03:26 christos Exp $");
 
 #include <stdio.h>
 #ifndef O_SYNC
 #define O_SYNC	0
 #endif
+
+#include "dotlock.h"
 
 static int create_exclusive(const char *);
 /*

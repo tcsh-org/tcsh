@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.color.c,v 1.29 2012/06/21 17:46:25 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.color.c,v 1.30 2012/06/29 15:19:26 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.color.c,v 1.29 2012/06/21 17:46:25 christos Exp $")
+RCSID("$tcsh: tw.color.c,v 1.30 2012/06/29 15:19:26 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -242,7 +242,7 @@ static int
 color(Char x)
 {
     int c;
-    static const char colors[] = "abcdefghx";
+    static const char ccolors[] = "abcdefghx";
     char *p;
     if (Isupper(x)) {
 	x = Tolower(x);
@@ -250,9 +250,9 @@ color(Char x)
     } else
 	c = 0;
 
-    if (x == '\0' || (p = strchr(colors, x)) == NULL)
+    if (x == '\0' || (p = strchr(ccolors, x)) == NULL)
 	return -1;
-    return 30 + (p - colors);
+    return 30 + (p - ccolors);
 }
 
 static void
@@ -277,8 +277,6 @@ void
 parseLSCOLORS(const Char *value)
 {
     size_t i, len, clen;
-    const Char	 *v;		/* pointer in value */
-    char   *c;			/* pointer in colors */
     jmp_buf_t osetexit;
     size_t omark;
 
@@ -297,10 +295,11 @@ parseLSCOLORS(const Char *value)
     getexit(osetexit);
 
     /* init pointers */
-    v = value;
-    c = colors;
 
     if (setexit() == 0) {
+	const Char *v = value;
+	char *c = colors;
+
 	int fg, bg;
 	for (i = 0; i < len; i++) {
 	    fg = color(*v++);
@@ -408,15 +407,15 @@ parseLS_COLORS(const Char *value)
 /* put_color():
  */
 static void
-put_color(const Str *color)
+put_color(const Str *colorp)
 {
     size_t  i;
-    const char	 *c = color->s;
+    const char	 *c = colorp->s;
     int	   original_output_raw = output_raw;
 
     output_raw = TRUE;
     cleanup_push(&original_output_raw, output_raw_restore);
-    for (i = color->len; 0 < i; i--)
+    for (i = colorp->len; 0 < i; i--)
 	xputchar(*c++);
     cleanup_until(&original_output_raw);
 }
@@ -430,12 +429,12 @@ print_color(const Char *fname, size_t len, Char suffix)
     size_t  i;
     char   *filename = short2str(fname);
     char   *last = filename + len;
-    Str	   *color = &variables[VFile].color;
+    Str	   *colorp = &variables[VFile].color;
 
     switch (suffix) {
     case '>':			/* File is a symbolic link pointing to
 				 * a directory */
-	color = &variables[VDir].color;
+	colorp = &variables[VDir].color;
 	break;
     case '+':			/* File is a hidden directory [aix] or
 				 * context dependent [hpux] */
@@ -445,7 +444,7 @@ print_color(const Char *fname, size_t len, Char suffix)
 	for (i = 0; i < nvariables; i++)
 	    if (variables[i].suffix != NOS &&
 		(Char)variables[i].suffix == suffix) {
-		color = &variables[i].color;
+		colorp = &variables[i].color;
 		break;
 	    }
 	if (i == nvariables) {
@@ -454,7 +453,7 @@ print_color(const Char *fname, size_t len, Char suffix)
 		    && strncmp(last - extensions[i].extension.len,
 			       extensions[i].extension.s,
 			       extensions[i].extension.len) == 0) {
-		  color = &extensions[i].color;
+		  colorp = &extensions[i].color;
 		break;
 	    }
 	}
@@ -462,7 +461,7 @@ print_color(const Char *fname, size_t len, Char suffix)
     }
 
     put_color(&variables[VLeft].color);
-    put_color(color);
+    put_color(colorp);
     put_color(&variables[VRight].color);
 }
 

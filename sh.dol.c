@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.84 2013/12/08 22:53:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.85 2014/02/28 17:10:43 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.84 2013/12/08 22:53:09 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.85 2014/02/28 17:10:43 christos Exp $")
 
 /*
  * C shell
@@ -923,7 +923,7 @@ Char *
 randsuf(void) {
 	struct timeval tv;
 	(void) gettimeofday(&tv, NULL);
-	putn((((tcsh_number_t)tv.tv_sec) ^ 
+	return putn((((tcsh_number_t)tv.tv_sec) ^ 
 	    ((tcsh_number_t)tv.tv_usec) ^
 	    ((tcsh_number_t)getpid())) & 0x00ffffff);
 }

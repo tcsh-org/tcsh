@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.55 2013/12/08 22:53:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.56 2013/12/11 16:02:54 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.55 2013/12/08 22:53:09 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.56 2013/12/11 16:02:54 christos Exp $")
 
 #include <assert.h>
 #include "tc.h"
@@ -1209,7 +1209,8 @@ fmthist(int fmt, ptr_t ptr)
     }
 }
 
-void dotlock_cleanup(void* lockpath)
+static void
+dotlock_cleanup(void* lockpath)
 {
 	dot_unlock((char*)lockpath);
 }

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.17 2013/01/05 01:23:08 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.18 2013/03/06 22:48:45 christos Exp $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: gethost.c,v 1.17 2013/01/05 01:23:08 christos Exp $")
+RCSID("$tcsh: gethost.c,v 1.18 2013/03/06 22:48:45 christos Exp $")
 
 #ifdef SCO
 # define perror __perror
@@ -171,7 +171,6 @@ explode(const char *defs)
 	static char *buf;
 	size_t len;
 	const char *ptr, *bptr, *eptr = NULL, *name;
-	size_t buflen = 0;
 
 	if (strstr(defs, "#machine(" /* ) */))
 		return defs;

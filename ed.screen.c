@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.77 2011/02/25 23:26:20 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.78 2011/02/27 00:14:38 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.screen.c,v 3.77 2011/02/25 23:26:20 christos Exp $")
+RCSID("$tcsh: ed.screen.c,v 3.78 2011/02/27 00:14:38 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1625,7 +1625,6 @@ ChangeSize(int lins, int cols)
 	if ((tptr = getenv("TERMCAP")) != NULL) {
 	    /* Leave 64 characters slop in case we enlarge the termcap string */
 	    Char    termcap[TC_BUFSIZE+64], backup[TC_BUFSIZE+64], *ptr;
-	    Char buf[4];
 
 	    ptr = str2short(tptr);
 	    (void) Strncpy(termcap, ptr, TC_BUFSIZE);
