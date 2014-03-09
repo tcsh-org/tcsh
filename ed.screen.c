@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.78 2011/02/27 00:14:38 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.79 2014/03/09 00:11:54 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.screen.c,v 3.78 2011/02/27 00:14:38 christos Exp $")
+RCSID("$tcsh: ed.screen.c,v 3.79 2014/03/09 00:11:54 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -994,14 +994,14 @@ SetAttributes(Char atr)
 int highlighting = 0;
 
 void
-StartHighlight()
+StartHighlight(void)
 {
     (void) tputs(Str(T_mr), 1, PUTPURE);
     highlighting = 1;
 }
 
 void
-StopHighlight()
+StopHighlight(void)
 {
     (void) tputs(Str(T_me), 1, PUTPURE);
     highlighting = 0;
