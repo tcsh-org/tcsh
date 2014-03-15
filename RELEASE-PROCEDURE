@@ -10,7 +10,7 @@ HOW TO RELEASE TCSH
 7)  run autoreconf
 8)  Commit changes into CVS
 9)  run make check
-10)  Tag the release with TCSHx_yy_zz where
+10) Tag the release with TCSHx_yy_zz where
 	x  == REV
 	yy == VERS
 	zz == PATCHLEVEL
@@ -39,7 +39,14 @@ The rest are still manual:
 16) Add the new version to bugs.gw.com:
     - Click: Manage > Manage Projects > tcsh
     - Scroll down to "Versions"
-    - Type the new version into the box at the bottom of the
-      version list and click on "Add Version"
+    - Click: Edit next to the HEAD version
+    - Change the Version from HEAD to the newly released version
+    - Change the "Date Order" to the current time
+    - Check the Released box
+    - Click: Update Version
+    - Type HEAD into the box at the bottom of the version list and
+      click on "Add and Edit Version"
+    - Set the "Date Order" to 2030-01-01 (i.e. far in the future)
+    - Click: Update Version
 17) Update the version on http://www.tcsh.org/MostRecentRelease
 18) Mail an announcement to tcsh@mx.gw.com
