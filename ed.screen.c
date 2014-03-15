@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.79 2014/03/09 00:11:54 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.80 2014/03/09 00:20:26 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.screen.c,v 3.79 2014/03/09 00:11:54 christos Exp $")
+RCSID("$tcsh: ed.screen.c,v 3.80 2014/03/09 00:20:26 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1437,7 +1437,8 @@ GetTermCaps(void)
     if (i <= 0) {
 	if (i == -1) {
 #if (SYSVREL == 0) || defined(IRIS3D)
-	    xprintf(CGETS(7, 20, "%s: Cannot open /etc/termcap.\n"), progname);
+	    xprintf(CGETS(7, 20,
+		"%s: The terminal database could not be opened.\n"), progname);
 	}
 	else if (i == 0) {
 #endif /* SYSVREL */
