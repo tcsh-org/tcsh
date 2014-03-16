@@ -1,5 +1,7 @@
 HOW TO RELEASE TCSH
 
+@(#) $tcsh$
+
 1)  Update version number and date in patchlevel.h
 2)  Note the new version and date in Fixes
 3)  Update tcsh.man to have the new version and date also
@@ -39,14 +41,14 @@ The rest are still manual:
 16) Add the new version to bugs.gw.com:
     - Click: Manage > Manage Projects > tcsh
     - Scroll down to "Versions"
-    - Click: Edit next to the HEAD version
-    - Change the Version from HEAD to the newly released version
+    - Click on "Edit" next to the HEAD version
+    - Change the "Version" from HEAD to the newly released version
     - Change the "Date Order" to the current time
-    - Check the Released box
-    - Click: Update Version
+    - Check the "Released" box
+    - Click on "Update Version"
     - Type HEAD into the box at the bottom of the version list and
       click on "Add and Edit Version"
     - Set the "Date Order" to 2030-01-01 (i.e. far in the future)
-    - Click: Update Version
+    - Click on "Update Version"
 17) Update the version on http://www.tcsh.org/MostRecentRelease
 18) Mail an announcement to tcsh@mx.gw.com
