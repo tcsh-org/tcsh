@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 1.13 2012/01/05 16:54:25 christos Exp $
+# $tcsh: Makefile.in,v 1.14 2014/04/04 12:05:09 kim Exp $
 
 CATALOGS=	C.cat et.cat finnish.cat french.cat german.cat greek.cat \
 		italian.cat ja.cat pl.cat russian.cat spanish.cat ukrainian.cat
@@ -104,8 +104,8 @@ ${localedir}/es/LC_MESSAGES/tcsh.cat:	spanish.cat
 spanish.cat: ${srcdir}/spanish/charset ${srcdir}/spanish/*set[0-9]*
 	@${CATGEN} $(GENCAT) $@ $^ $>
 
-INSTALLED+=${localedir}/ru_UA.koi8u/LC_MESSAGES/tcsh.cat
-${localedir}/ru_UA.koi8u/LC_MESSAGES/tcsh.cat:	ukrainian.cat
+INSTALLED+=${localedir}/ru_UA/LC_MESSAGES/tcsh.cat
+${localedir}/ru_UA/LC_MESSAGES/tcsh.cat:	ukrainian.cat
 	mkdir -p $(@D)
 	$(INSTALL) $> $@
 
