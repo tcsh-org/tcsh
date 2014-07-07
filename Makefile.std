@@ -1,4 +1,4 @@
-# $tcsh: Makefile.std,v 1.97 2006/03/02 18:46:44 christos Exp $
+# $tcsh: Makefile.std,v 1.98 2013/12/08 22:53:09 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -321,7 +321,8 @@ AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
 	README.imake complete.tcsh vmsreadme.txt termcap.vms snames.h \
-	host.defs gethost.c tcsh.man2html configure.in configure config.h.in
+	host.defs gethost.c tcsh.man2html configure.ac configure config.h.in \
+	aclocal.m4
 
 VHSRCS=${PVSRCS} ${AVSRCS}
 
@@ -584,11 +585,11 @@ ftp: tcsh-${VERSION}.tar.Z tcsh.tahoe-${VERSION}.tar.Z
 
 autoconfigure: $(srcdir)/configure $(srcdir)/config.h.in
 
-$(srcdir)/configure: $(srcdir)/configure.in
+$(srcdir)/configure: $(srcdir)/configure.ac
 	cd $(srcdir) && autoconf
 
 $(srcdir)/config.h.in: $(srcdir)/stamp-h.in
-$(srcdir)/stamp-h.in: $(srcdir)/configure.in
+$(srcdir)/stamp-h.in: $(srcdir)/configure.ac
 	cd $(srcdir) && autoheader
 	@echo timestamp > $(srcdir)/stamp-h.in
 

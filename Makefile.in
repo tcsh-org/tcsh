@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.52 2013/12/08 22:53:09 christos Exp $
+# $tcsh: Makefile.in,v 3.53 2014/03/09 00:20:12 christos Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -411,8 +411,8 @@ AVSRCS= Fixes MAKEDIFFS MAKESHAR NewThings README FAQ \
 	WishList config_f.h eight-bit.me glob.3 patchlevel.h \
 	pathnames.h tcsh.man Ported src.desc Imakefile imake.config \
 	README.imake complete.tcsh vmsreadme.txt termcap.vms snames.h \
-	host.defs gethost.c tcsh.man2html configure.in configure config.h.in \
-	tests/testsuite.at
+	host.defs gethost.c tcsh.man2html configure.ac configure config.h.in \
+	tests/testsuite.at aclocal.m4
 TESTFILES= tests/aliases.at tests/arguments.at tests/commands.at \
 	tests/expr.at tests/lexical.at tests/mb-eucjp.at \
 	tests/mb-utf8.at tests/noexec.at tests/syntax.at tests/subst.at \
@@ -537,7 +537,7 @@ tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
 	@echo '#endif /* _h_tc_const */' >> $@.tmp
 	@if [ -f $@ ] && cmp -s $@.tmp $@; then echo $@ unchanged.; rm -f $@.tmp; else mv -f $@.tmp $@; echo $@ recreated.; fi
 
-$(srcdir)/tests/package.m4: $(srcdir)/configure.in
+$(srcdir)/tests/package.m4: $(srcdir)/configure.ac
 	{								   \
 	  echo '# Signature of the current package.';			   \
 	  echo 'm4_define([AT_PACKAGE_NAME],      [@PACKAGE_NAME@])';	   \
@@ -748,11 +748,11 @@ ftp: tcsh-${VERSION}.tar.Z tcsh.tahoe-${VERSION}.tar.Z
 
 autoconfigure: $(srcdir)/configure $(srcdir)/config.h.in
 
-$(srcdir)/configure: $(srcdir)/configure.in
+$(srcdir)/configure: $(srcdir)/configure.ac
 	cd $(srcdir) && autoconf
 
 $(srcdir)/config.h.in: $(srcdir)/stamp-h.in
-$(srcdir)/stamp-h.in: $(srcdir)/configure.in
+$(srcdir)/stamp-h.in: $(srcdir)/configure.ac
 	cd $(srcdir) && autoheader
 	@echo timestamp > $(srcdir)/stamp-h.in
 

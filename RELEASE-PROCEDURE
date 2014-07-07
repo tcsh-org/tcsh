@@ -1,12 +1,12 @@
 HOW TO RELEASE TCSH
 
-@(#) $tcsh$
+@(#) $tcsh: RELEASE-PROCEDURE,v 1.14 2014/03/16 08:53:53 kim Exp $
 
 1)  Update version number and date in patchlevel.h
 2)  Note the new version and date in Fixes
 3)  Update tcsh.man to have the new version and date also
     (two separate lines, with the date in different formats)
-4)  Update the version in configure.in
+4)  Update the version in configure.ac
 5)  Update README to have the new version
 6)  Commit changes into CVS
 7)  run autoreconf
