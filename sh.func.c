@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.168 2013/10/31 12:58:35 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.169 2014/01/30 01:29:58 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.168 2013/10/31 12:58:35 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.169 2014/01/30 01:29:58 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -901,7 +901,7 @@ search(int type, int level, Char *goal)
 static struct wordent *
 histgetword(struct wordent *histent) 
 {
-    int found = 0, first;
+    int first;
     eChar c, d;
     int e;
     struct Strbuf *tmp;
@@ -925,7 +925,6 @@ histgetword(struct wordent *histent)
 	if (c == '\n') 
 	    goto nl;
 	unreadc(c);
-	found = 1;
 	first = 1;
 	do {
 	    e = (c == '\\');
