@@ -1,6 +1,6 @@
 HOW TO RELEASE TCSH
 
-@(#) $tcsh: RELEASE-PROCEDURE,v 1.15 2014/07/07 20:34:58 christos Exp $
+@(#) $tcsh: RELEASE-PROCEDURE,v 1.16 2014/07/18 19:51:56 christos Exp $
 
 1)  Update version number and date in patchlevel.h
 2)  Note the new version and date in Fixes
@@ -11,7 +11,7 @@ HOW TO RELEASE TCSH
 6)  Commit changes into CVS
 7)  run autoreconf
 8)  Commit changes into CVS
-9)  run configure && make check
+9)  run make distclean; configure && make && make check
 10) Tag the release with TCSHx_yy_zz where
 	x  == REV
 	yy == VERS
