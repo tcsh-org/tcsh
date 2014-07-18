@@ -1,5 +1,5 @@
 #!/bin/sh
-# @(#)$tcsh: MAKERELEASE,v 1.8 2011/01/19 03:01:13 christos Exp $
+# @(#)$tcsh: MAKERELEASE,v 1.9 2011/01/19 03:10:48 christos Exp $
 #
 # Copyright (c) 2005 Kimmo Suominen
 # All rights reserved.
@@ -89,7 +89,7 @@ then
     cvs -d ${REPOSITORY} -q export -r "${TagB}" -d "tcsh-${VerB}" tcsh > /dev/null
     cleanit "tcsh-${VerB}"
     echo "Creating patch"
-    diff -urN "tcsh-${VerB}" "tcsh-${VerA}" > "${pfile}"
+    diff -purN "tcsh-${VerB}" "tcsh-${VerA}" > "${pfile}" || true
     gzip -9 "${pfile}"
 fi
 #
