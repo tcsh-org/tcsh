@@ -15,3 +15,4 @@ cat $(sortit "$@") > "$TMP"
 
 echo "$(basename "$OUT" .cat)"
 "${GENCAT}" "$OUT" "$TMP"
+exit 0
