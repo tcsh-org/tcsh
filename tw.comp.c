@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.comp.c,v 1.42 2007/10/01 21:52:00 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.comp.c,v 1.43 2014/07/23 18:06:24 christos Exp $ */
 /*
  * tw.comp.c: File completion builtin
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.comp.c,v 1.42 2007/10/01 21:52:00 christos Exp $")
+RCSID("$tcsh: tw.comp.c,v 1.43 2014/07/23 18:06:24 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -255,7 +255,8 @@ tw_match(const Char *str, const Char *pat, int exact)
 #ifdef TDEBUG
     xprintf("G%smatch(%s, ", exact ? "" : "n", short2str(str));
     xprintf("%s, ", short2str(pat));
-    xprintf("%s) = %d [%td]\n", short2str(estr), rv, estr - str);
+    xprintf("%s) = %d [%" TCSH_PTRDIFF_T_FMT "d]\n", short2str(estr), rv,
+	estr - str);
 #endif /* TDEBUG */
     return (int) (rv ? estr - str : -1);
 }

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.166 2012/06/21 18:49:11 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.167 2013/02/11 13:52:08 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -126,6 +126,11 @@ typedef int eChar;
 
 #if !defined(__inline) && !defined(__GNUC__) && !defined(_MSC_VER)
 #define __inline
+#endif
+#ifdef _MSC_VER
+#define TCSH_PTRDIFF_T_FMT "I"
+#else
+#define TCSH_PTRDIFF_T_FMT "t"
 #endif
 /* Elide unused argument warnings */
 #define USE(a)	(void) (a)
