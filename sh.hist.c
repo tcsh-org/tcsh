@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.56 2013/12/11 16:02:54 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.57 2014/03/09 00:11:54 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,8 +32,9 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.56 2013/12/11 16:02:54 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.57 2014/03/09 00:11:54 christos Exp $")
 
+#include <stdio.h>	/* for rename(2), grr. */
 #include <assert.h>
 #include "tc.h"
 #include "dotlock.h"
