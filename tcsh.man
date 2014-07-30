@@ -3649,6 +3649,11 @@ the local username for kerberos authentication.
 .B ampm \fR(+)
 If set, all times are shown in 12-hour AM/PM format.
 .TP 8
+.B anyerror \fR(+)
+This variable selects what is propagated to the value of the
+\fBstatus\fR variable. For more information see the description of the
+\fBstatus\fR variable below.
+.TP 8
 .B argv
 The arguments to the shell.  Positional parameters are taken from \fBargv\fR,
 i.e., `$1' is replaced by `$argv[1]', etc.
@@ -4380,17 +4385,20 @@ Reset to 1 in login shells.
 See also \fBloginsh\fR.
 .TP 8
 .B status
-The status returned by the last command, unless the variable
-.B anyerror
-is set, and any error in a pipeline or a backquote expansion will be
-propagated (this is the default
-.B csh
-behavior, and the current
-.B tcsh
-default). If it terminated
-abnormally, then 0200 is added to the status.  Builtin commands
-which fail return exit status `1', all other builtin commands
-return status `0'.
+The exit status returned by the last command, and any error in a
+pipeline or a backquote expansion will be propagated to \fBstatus\fR
+(this is the default \fBcsh\fR behavior, and the current \fBtcsh\fR
+default).
+.RS +8
+.PP
+If the \fBanyerror\fR variable is unset, the exit status of a pipeline
+is set based on the last command in the pipeline, and the exit status of
+a backquote expansion is \fInot\fR propagated to \fBstatus\fR.
+.PP
+If a command terminated abnormally, then 0200 is added to the status.
+Builtin commands which fail return exit status `1', all other builtin
+commands return status `0'.
+.RE
 .TP 8
 .B symlinks \fR(+)
 Can be set to several different values to control symbolic link (`symlink')
