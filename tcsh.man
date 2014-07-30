@@ -4385,15 +4385,14 @@ Reset to 1 in login shells.
 See also \fBloginsh\fR.
 .TP 8
 .B status
-The exit status returned by the last command, and any error in a
-pipeline or a backquote expansion will be propagated to \fBstatus\fR
-(this is the default \fBcsh\fR behavior, and the current \fBtcsh\fR
-default).
+The exit status from the last command or backquote expansion, or any
+command in a pipeline is propagated to \fBstatus\fR.  (This is also the
+default \fBcsh\fR behavior.)
 .RS +8
 .PP
 If the \fBanyerror\fR variable is unset, the exit status of a pipeline
-is set based on the last command in the pipeline, and the exit status of
-a backquote expansion is \fInot\fR propagated to \fBstatus\fR.
+is determined only from the last command in the pipeline, and the exit
+status of a backquote expansion is \fInot\fR propagated to \fBstatus\fR.
 .PP
 If a command terminated abnormally, then 0200 is added to the status.
 Builtin commands which fail return exit status `1', all other builtin
