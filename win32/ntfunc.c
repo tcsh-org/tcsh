@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.19 2006/08/27 01:13:28 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.20 2012/12/21 20:29:00 christos Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -44,6 +44,7 @@
 
 #include "nt.const.h"
 
+#pragma warning(disable:6001 6011)
 
 extern DWORD gdwPlatform;
 
@@ -383,7 +384,7 @@ void dotitle(Char **vc, struct command * c) {
 	char titlebuf[512];
 	char errbuf[128],err2[128];
 	char **v;
-	Char *nvc;
+	Char **nvc;
 
 	UNREFERENCED_PARAMETER(c);
 	vc++;
@@ -629,7 +630,7 @@ void init_shell_dll(void) {
 			break;
 		ptr++;
 	}
-#if NTDBG
+#if NTDBG_X
 	for(i=0;i<20,no_assoc_array[i] != NULL;i++)
 		dprintf("no_assoc array %d inited remains %s\n",i,no_assoc_array[i]);
 #endif NTDBG

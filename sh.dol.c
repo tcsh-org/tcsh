@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.85 2014/02/28 17:10:43 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dol.c,v 3.86 2014/03/09 00:11:54 christos Exp $ */
 /*
  * sh.dol.c: Variable substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.dol.c,v 3.85 2014/02/28 17:10:43 christos Exp $")
+RCSID("$tcsh: sh.dol.c,v 3.86 2014/03/09 00:11:54 christos Exp $")
 
 /*
  * C shell
@@ -921,11 +921,15 @@ inheredoc_cleanup(void *dummy)
 
 Char *
 randsuf(void) {
+#ifndef WINNT_NATIVE
 	struct timeval tv;
 	(void) gettimeofday(&tv, NULL);
 	return putn((((tcsh_number_t)tv.tv_sec) ^ 
 	    ((tcsh_number_t)tv.tv_usec) ^
 	    ((tcsh_number_t)getpid())) & 0x00ffffff);
+#else
+    return putn(getpid());
+#endif
 }
 
 /*

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.57 2014/03/09 00:11:54 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.58 2014/07/24 10:48:56 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.57 2014/03/09 00:11:54 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.58 2014/07/24 10:48:56 christos Exp $")
 
 #include <stdio.h>	/* for rename(2), grr. */
 #include <assert.h>
@@ -1284,11 +1284,13 @@ rechist(Char *fname, int ref)
 
 	if (merge) {
 	    if (lock) {
+#ifndef WINNT_NATIVE
 		char *lockpath = strsave(short2str(fname));
 		cleanup_push(lockpath, xfree);
 		/* Poll in 100 miliseconds interval to obtain the lock. */
 		if ((dot_lock(lockpath, 100) == 0))
 		    cleanup_push(lockpath, dotlock_cleanup);
+#endif
 	    }
 	    loadhist(fname, 1);
 	}
@@ -1304,10 +1306,14 @@ rechist(Char *fname, int ref)
 	return;
     }
     /* Try to preserve ownership and permissions of the original history file */
+#ifndef WINNT_NATIVE
     if (stat(short2str(fname), &st) != -1) {
 	TCSH_IGNORE(fchown(fp, st.st_uid, st.st_gid));
 	TCSH_IGNORE(fchmod(fp, st.st_mode));
     }
+#else
+    UNREFERENCED_PARAMETER(st);
+#endif
     ftmp = SHOUT;
     SHOUT = fp;
     dumphist[2] = snum;
