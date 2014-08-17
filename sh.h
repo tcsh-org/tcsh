@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.167 2013/02/11 13:52:08 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.168 2014/07/24 10:50:15 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -1050,7 +1050,7 @@ EXTERN struct Hist {
     unsigned Hhash;                     /* hash value of command line */
 }       Histlist IZERO_STRUCT;
 
-EXTERN struct wordent paraml;	/* Current lexical word list */
+extern struct wordent paraml;	/* Current lexical word list */
 EXTERN int     eventno;		/* Next events number */
 EXTERN int     lastev;		/* Last event reference (default) */
 

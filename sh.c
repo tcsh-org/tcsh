@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.177 2013/03/28 15:06:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.178 2014/03/09 00:11:54 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.177 2013/03/28 15:06:31 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.178 2014/03/09 00:11:54 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -78,7 +78,8 @@ extern int NLSMapsAreInited;
  * ported to Apple Unix (TM) (OREO)  26 -- 29 Jun 1987
  */
 
-jmp_buf_t reslab;
+jmp_buf_t reslab IZERO_STRUCT;
+extern struct wordent paraml IZERO_STRUCT;
 
 static const char tcshstr[] = "tcsh";
 
@@ -250,10 +251,11 @@ main(int argc, char **argv)
     int osetintr;
     struct sigaction oparintr;
 
-    (void)memset(&reslab, 0, sizeof(reslab));
 #ifdef WINNT_NATIVE
     nt_init();
 #endif /* WINNT_NATIVE */
+
+    (void)memset(&reslab, 0, sizeof(reslab));
 #if defined(NLS_CATALOGS) && defined(LC_MESSAGES)
     (void) setlocale(LC_MESSAGES, "");
 #endif /* NLS_CATALOGS && LC_MESSAGES */

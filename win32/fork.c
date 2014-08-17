@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/fork.c,v 1.11 2008/08/31 14:09:01 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/fork.c,v 1.12 2014/08/13 23:39:34 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -237,6 +237,7 @@ int fork(void) {
 		STR_environ = blk2short(environ);
 		environ = short2blk(STR_environ);	/* So that we can free it */
 
+        dprintf("returning 0\n");
 		return 0;
 	}
 	copy_fds();

@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/support.c,v 1.14 2008/08/31 14:09:01 amold Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/support.c,v 1.15 2014/08/13 23:39:34 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -85,7 +85,6 @@ void nt_init(void) {
 		gcurr_drive=temp[0];
 	}
 #endif SECURE_CD
-
 	_set_invalid_parameter_handler(do_nothing);
 	init_stdio();
 	nt_init_signals();
@@ -584,7 +583,7 @@ void silly_entry(void *peb) {
 	}
 	gdwVersion = osver.dwMajorVersion;
 
-//	if(gdwVersion < 6) // no wow64 hackery for vista.
+	if(gdwVersion < 6) // no wow64 hackery for vista.
 	{
 		init_wow64();
 	}
