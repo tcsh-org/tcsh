@@ -1,3 +1,4 @@
+ 27. Fix root prompt char for windows (Corinna Vinschen)
  26. For "next" completion matches only consider exact matches of the previous
      word (Jamie Landeg-Jones)
  25. Fix echo "\1" for echo_style=both where the first character was
