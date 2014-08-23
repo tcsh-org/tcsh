@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.178 2014/03/09 00:11:54 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.179 2014/08/17 02:56:37 amold Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.178 2014/03/09 00:11:54 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.179 2014/08/17 02:56:37 amold Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -79,7 +79,7 @@ extern int NLSMapsAreInited;
  */
 
 jmp_buf_t reslab IZERO_STRUCT;
-extern struct wordent paraml IZERO_STRUCT;
+struct wordent paraml IZERO_STRUCT;
 
 static const char tcshstr[] = "tcsh";
 
