@@ -4388,6 +4388,9 @@ See also \fBloginsh\fR.
 The exit status from the last command or backquote expansion, or any
 command in a pipeline is propagated to \fBstatus\fR.  (This is also the
 default \fBcsh\fR behavior.)
+This default does not match what POSIX mandates (to return the
+status of the last command only). To match the POSIX behavior, you need
+to unset \fBanyerror\fR.
 .RS +8
 .PP
 If the \fBanyerror\fR variable is unset, the exit status of a pipeline
