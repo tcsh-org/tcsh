@@ -39,6 +39,28 @@ VAR_UNSET([afsuser])
 VAR_UNSET([ampm])
 
 
+AT_SETUP([$ anyerror])
+
+AT_DATA([exit_status.csh],
+[[echo $?anyerror $anyerror
+false | true ; echo $?
+unset anyerror ; echo $?anyerror
+false | true ; echo $?
+set anyerror
+false | true ; echo $?
+]])
+
+AT_CHECK([tcsh -f exit_status.csh],,
+[1
+1
+0
+0
+1
+])
+
+AT_CLEANUP
+
+
 AT_SETUP([$ argv])
 
 AT_CHECK([tcsh -f -c 'echo $argv; echo $2' foo bar baz], ,
