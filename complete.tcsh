@@ -1,5 +1,5 @@
 #
-# $tcsh: complete.tcsh,v 1.53 2014/07/05 09:44:32 kim Exp $
+# $tcsh: complete.tcsh,v 1.54 2014/07/18 21:31:24 kim Exp $
 # example file using the new completion code
 #
 # Debian GNU/Linux
@@ -46,7 +46,7 @@ endif
 
 if ( ! $?hosts ) set hosts
 
-foreach f ( "$HOME/."{,r,ssh/known_}hosts \
+foreach f ( "$HOME/."{,r,ssh/known_}hosts* \
   /usr/local/etc/csh.hosts /etc/hosts.equiv )
   if ( -r "$f" ) then
     set hosts=($hosts `sed \
@@ -55,7 +55,7 @@ foreach f ( "$HOME/."{,r,ssh/known_}hosts \
       -e 's/^[-+]//' \
       -e 's/[[:space:]].*//' \
       -e 's/,/\n/g' "$f" \
-      | sed -e '/^[.:[:xdigit:][:space:]]*$/d')
+      | sed -e '/^[.:[:xdigit:][:space:]]*$/d'`)
   endif
 end
 unset f
