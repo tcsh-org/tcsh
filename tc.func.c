@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.151 2013/05/17 15:46:47 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.152 2014/07/18 19:30:14 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.151 2013/05/17 15:46:47 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.152 2014/07/18 19:30:14 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -486,6 +486,19 @@ dowhich(Char **v, struct command *c)
 	setcopy(STRstatus, STR1, VAR_READWRITE);
 }
 
+static int
+findvv(Char **vv, const char *cp)
+{
+    for (; vv && *vv; vv++) {
+	size_t i;
+	for (i = 0; (*vv)[i] && (*vv)[i] == cp[i]; i++)
+	    continue;
+	if ((*vv)[i] == '\0' && cp[i] == '\0')
+	    return 1;
+    }
+    return 0;
+}
+
 /* PWP: a hack to start up your stopped editor on a single keystroke */
 /* jbs - fixed hack so it worked :-) 3/28/89 */
 
@@ -497,6 +510,8 @@ find_stop_ed(void)
     char *cp, *p;
     size_t epl, vpl;
     int pstatus;
+    struct varent *varp;
+    Char **vv;
 
     if ((ep = getenv("EDITOR")) != NULL) {	/* if we have a value */
 	if ((p = strrchr(ep, '/')) != NULL) 	/* if it has a path */
@@ -519,6 +534,11 @@ find_stop_ed(void)
 
     if (pcurrent == NULL)	/* see if we have any jobs */
 	return NULL;		/* nope */
+
+    if ((varp = adrof(STReditors)) != NULL)
+	vv = varp->vec;
+    else
+	vv = NULL;
 
     retp = NULL;
     for (pp = proclist.p_next; pp; pp = pp->p_next)
@@ -547,7 +567,7 @@ find_stop_ed(void)
 
 	    /* if we find either in the current name, fg it */
 	    if (strncmp(ep, cp, epl) == 0 ||
-		strncmp(vp, cp, vpl) == 0) {
+		strncmp(vp, cp, vpl) == 0 || findvv(vv, cp)) {
 
 		/*
 		 * If there is a choice, then choose the current process if
