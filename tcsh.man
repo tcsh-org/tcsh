@@ -77,7 +77,7 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\" 
-.TH TCSH 1 "18 July 2014" "Astron 6.18.02"
+.TH TCSH 1 "28 October 2014" "Astron 6.18.02"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -2294,8 +2294,8 @@ A label in a \fIswitch\fR statement as discussed below.
 .TP 8
 .B cd \fR[\fB\-p\fR] [\fB\-l\fR] [\fB\-n\fR|\fB\-v\fR] [\I--\fR] [\fIname\fR]
 If a directory \fIname\fR is given, changes the shell's working directory
-to \fIname\fR.  If not, changes to \fBhome\fR, unless the \fBnoimplicithome\fR
-variable is set, in which case a \fIname\fR is required.
+to \fIname\fR.  If not, changes to \fBhome\fR, unless the \fBcdtohome\fR
+variable is not set, in which case a \fIname\fR is required.
 If \fIname\fR is `\-' it is interpreted as the previous working directory
 (see \fBOther substitutions\fR).  (+)
 If \fIname\fR is not a subdirectory of the current directory
@@ -2311,7 +2311,7 @@ as on \fIdirs\fR, and they imply \fB\-p\fR.  (+)
 Using \fB\-\-\fR forces a break from option processing so the next word
 is taken as the directory \fIname\fR even if it begins with '\-'. (+)
 .PP
-See also the \fBimplicitcd\fR and \fBnoimplicithome\fR shell variables.
+See also the \fBimplicitcd\fR and \fBcdtohome\fR shell variables.
 .RE
 .TP 8
 .B chdir
@@ -3712,6 +3712,11 @@ default `tcsh'.
 A list of directories in which \fIcd\fR should search for
 subdirectories if they aren't found in the current directory.
 .TP 8
+.B cdtohome \fR(+)
+If not set, \fIcd\fR requires a directory \fIname\fR, and will not go to the
+\fBhome\fR directory if it's omitted.
+This is set by default.
+.TP 8
 .B color
 If set, it enables color display for the builtin \fBls\-F\fR and it passes
 \fB\-\-color=auto\fR to \fBls\fR.  Alternatively, it can be set to only
@@ -3992,10 +3997,6 @@ is inhibited in non-interactive shell scripts, or for command strings
 with more than one word.  Changing directory takes precedence over
 executing a like-named command, but it is done after alias
 substitutions.  Tilde and variable expansions work as expected.
-.TP 8
-.B noimplicithome \fR(+)
-If set, \fIcd\fR requires a directory \fIname\fR, and will not go to the
-\fBhome\fR directory if it's omitted
 .TP 8
 .B inputmode \fR(+)
 If set to `insert' or `overwrite', puts the editor into that input mode

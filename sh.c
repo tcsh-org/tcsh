@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.180 2014/08/23 09:04:15 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.181 2014/09/08 19:18:55 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.180 2014/08/23 09:04:15 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.181 2014/09/08 19:18:55 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -480,6 +480,9 @@ main(int argc, char **argv)
      */
     initdesc();
 
+    cdtohome = 1;
+    setv(STRcdtohome, SAVE(""), VAR_READWRITE);
+
     /*
      * Get and set the tty now
      */
@@ -496,6 +499,7 @@ main(int argc, char **argv)
     }
     else
 	setv(STRtty, cp = SAVE(""), VAR_READWRITE);
+
     /*
      * Initialize the shell variables. ARGV and PROMPT are initialized later.
      * STATUS is also munged in several places. CHILD is munged when

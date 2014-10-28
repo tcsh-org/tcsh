@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.169 2014/08/17 02:56:37 amold Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.170 2014/10/28 16:51:30 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -575,7 +575,7 @@ EXTERN int    is1atty IZERO;	/* is file descriptor 1 a tty (didfds mode) */
 EXTERN int    is2atty IZERO;	/* is file descriptor 2 a tty (didfds mode) */
 EXTERN int    arun IZERO;	/* Currently running multi-line-aliases */
 EXTERN int    implicit_cd IZERO;/* implicit cd enabled?(1=enabled,2=verbose) */
-EXTERN int    no_implicit_home IZERO;/* implicit home disabled? */
+EXTERN int    cdtohome IZERO;	/* cd without args goes home */
 EXTERN int    inheredoc IZERO;	/* Currently parsing a heredoc */
 /* We received a window change event */
 EXTERN volatile sig_atomic_t windowchg IZERO;

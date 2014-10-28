@@ -702,11 +702,11 @@ AT_CHECK([tcsh -f mail.csh], ,
 AT_CLEANUP
 
 
-AT_SETUP([$ noimplicithome])
+AT_SETUP([$ cdtohome])
 AT_CHECK([tcsh -f -c 'cd'], 0)
 AT_CLEANUP
 AT_SETUP([$ noimplicithome])
-AT_CHECK([tcsh -f -c 'set noimplicithome; cd'], 1, , [cd: Too few arguments.
+AT_CHECK([tcsh -f -c 'unset cdtohome; cd'], 1, , [cd: Too few arguments.
 ])
 AT_CLEANUP
 
