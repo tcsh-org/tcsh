@@ -702,6 +702,15 @@ AT_CHECK([tcsh -f mail.csh], ,
 AT_CLEANUP
 
 
+AT_SETUP([$ noimplicithome])
+AT_CHECK([tcsh -f -c 'cd'], 0)
+AT_CLEANUP
+AT_SETUP([$ noimplicithome])
+AT_CHECK([tcsh -f -c 'set noimplicithome; cd'], 1, , [cd: Too few arguments.
+])
+AT_CLEANUP
+
+
 VAR_UNSET([matchbeep])
 VAR_UNSET([nobeep])
 VAR_UNSET([noclobber]) # Functionality tested with "Command execution"

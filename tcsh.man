@@ -2294,7 +2294,8 @@ A label in a \fIswitch\fR statement as discussed below.
 .TP 8
 .B cd \fR[\fB\-p\fR] [\fB\-l\fR] [\fB\-n\fR|\fB\-v\fR] [\I--\fR] [\fIname\fR]
 If a directory \fIname\fR is given, changes the shell's working directory
-to \fIname\fR.  If not, changes to \fBhome\fR.
+to \fIname\fR.  If not, changes to \fBhome\fR, unless the \fBnoimplicithome\fR
+variable is set, in which case a \fIname\fR is required.
 If \fIname\fR is `\-' it is interpreted as the previous working directory
 (see \fBOther substitutions\fR).  (+)
 If \fIname\fR is not a subdirectory of the current directory
@@ -2310,7 +2311,7 @@ as on \fIdirs\fR, and they imply \fB\-p\fR.  (+)
 Using \fB\-\-\fR forces a break from option processing so the next word
 is taken as the directory \fIname\fR even if it begins with '\-'. (+)
 .PP
-See also the \fBimplicitcd\fR shell variable.
+See also the \fBimplicitcd\fR and \fBnoimplicithome\fR shell variables.
 .RE
 .TP 8
 .B chdir
@@ -3991,6 +3992,10 @@ is inhibited in non-interactive shell scripts, or for command strings
 with more than one word.  Changing directory takes precedence over
 executing a like-named command, but it is done after alias
 substitutions.  Tilde and variable expansions work as expected.
+.TP 8
+.B noimplicithome \fR(+)
+If set, \fIcd\fR requires a directory \fIname\fR, and will not go to the
+\fBhome\fR directory if it's omitted
 .TP 8
 .B inputmode \fR(+)
 If set to `insert' or `overwrite', puts the editor into that input mode
