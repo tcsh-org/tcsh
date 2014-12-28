@@ -2302,7 +2302,8 @@ If \fIname\fR is not a subdirectory of the current directory
 (and does not begin with `/', `./' or `../'), each component of the variable
 \fBcdpath\fR is checked to see if it has a subdirectory \fIname\fR.  Finally, if
 all else fails but \fIname\fR is a shell variable whose value
-begins with `/', then this is tried to see if it is a directory.
+begins with `/' or '.', then this is tried to see if it is a directory, and
+the \fB\-p\fR option is implied.
 .RS +8
 .PP
 With \fB\-p\fR, prints the final directory stack, just like \fIdirs\fR.
