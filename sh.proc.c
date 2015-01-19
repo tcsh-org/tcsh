@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.122 2012/12/07 20:54:39 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.123 2013/03/18 21:00:46 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.122 2012/12/07 20:54:39 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.123 2013/03/18 21:00:46 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -594,31 +594,59 @@ void
 dowait(Char **v, struct command *c)
 {
     struct process *pp;
+
+    /* the current block mask to be able to restore */
+    sigset_t old_mask;
+
+    /* block mask for critical section: OLD_MASK U {SIGCHLD} */
+    sigset_t block_mask;
+
+    /* ignore those during blocking sigsuspend:
+       OLD_MASK / {SIGCHLD, possibly(SIGINT)} */
     sigset_t pause_mask;
+
     int opintr_disabled, gotsig;
 
     USE(c);
     USE(v);
     pjobs++;
+
+    sigprocmask(SIG_BLOCK, NULL, &block_mask);
+    sigaddset(&block_mask, SIGCHLD);
+
     sigprocmask(SIG_BLOCK, NULL, &pause_mask);
+    sigdelset(&pause_mask, SIGCHLD);
+
     sigdelset(&pause_mask, SIGCHLD);
     if (setintr)
 	sigdelset(&pause_mask, SIGINT);
+
+    /* critical section, block also SIGCHLD */
+    sigprocmask(SIG_BLOCK, &block_mask, &old_mask);
+
+    /* detect older SIGCHLDs and remove PRUNNING flag from proclist */
+    (void)handle_pending_signals();
+
 loop:
     for (pp = proclist.p_next; pp; pp = pp->p_next)
 	if (pp->p_procid &&	/* pp->p_procid == pp->p_jobid && */
 	    pp->p_flags & PRUNNING) {
-	    (void)handle_pending_signals();
+	    /* wait for (or pick up alredy blocked) SIGCHLD */
 	    sigsuspend(&pause_mask);
+
+	    /* TODO: Document the circumstances we do 'pintr_disabled=0' for */
 	    opintr_disabled = pintr_disabled;
 	    pintr_disabled = 0;
 	    gotsig = handle_pending_signals();
 	    pintr_disabled = opintr_disabled;
 	    if (gotsig)
 		break;
+
 	    goto loop;
 	}
     pjobs = 0;
+
+    sigprocmask(SIG_BLOCK, &old_mask, NULL);
 }
 
 /*
