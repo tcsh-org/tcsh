@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.123 2013/03/18 21:00:46 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.124 2015/01/19 15:10:59 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.123 2013/03/18 21:00:46 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.124 2015/01/19 15:10:59 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -646,7 +646,7 @@ loop:
 	}
     pjobs = 0;
 
-    sigprocmask(SIG_BLOCK, &old_mask, NULL);
+    sigprocmask(SIG_SETMASK, &old_mask, NULL);
 }
 
 /*
