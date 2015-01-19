@@ -1,3 +1,7 @@
+ 29. Pavel Raiskup fix hang with:
+	while (1)
+	   ( date & ; wait )
+        end
  28. Add cdtohome special variable (Martin Tournoij)
  27. Fix root prompt char for windows (Corinna Vinschen)
  26. For "next" completion matches only consider exact matches of the previous
