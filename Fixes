@@ -1,3 +1,4 @@
+ 30. Fridolin Pokorny NUL in `` does not mean EOF.
  29. Pavel Raiskup fix hang with:
 	while (1)
 	   ( date & ; wait )
