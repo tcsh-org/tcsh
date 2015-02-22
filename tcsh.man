@@ -2621,8 +2621,6 @@ and completes anything not otherwise completed to a directory.  Whew.
 .PP
 Remember that programmed completions are ignored if the word being completed
 is a tilde substitution (beginning with `~') or a variable (beginning with `$').
-\fIcomplete\fR is an experimental feature, and the syntax may change
-in future versions of the shell.
 See also the \fIuncomplete\fR builtin command.
 .RE
 .TP 8
