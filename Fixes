@@ -1,3 +1,4 @@
+ 31. PR/291: Print job status messages to stderr.
  30. Fridolin Pokorny NUL in `` does not mean EOF.
  29. Pavel Raiskup fix hang with:
 	while (1)
