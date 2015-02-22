@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.58 2014/07/24 10:48:56 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.59 2014/08/13 23:39:34 amold Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.58 2014/07/24 10:48:56 christos Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.59 2014/08/13 23:39:34 amold Exp $")
 
 #include <stdio.h>	/* for rename(2), grr. */
 #include <assert.h>
@@ -1043,6 +1043,8 @@ hfree(struct Hist *hp)
 PG_STATIC void
 phist(struct Hist *hp, int hflg)
 {
+    if (hp->Href < 0)
+	return;
     if (hflg & HIST_ONLY) {
 	int old_output_raw;
 
