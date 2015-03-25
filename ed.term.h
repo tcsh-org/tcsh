@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/ed.term.h,v 1.17 2004/12/25 21:15:06 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.term.h,v 1.18 2007/07/05 14:13:06 christos Exp $ */
 /*
  * ed.term.h: Local terminal header
  */
@@ -300,10 +300,18 @@
 # endif /* masscomp */
 #endif /* CBRK */
 #ifndef CMIN
-# define CMIN		CEOF
+# if VMIN == VEOF
+#  define CMIN		CEOF
+# else
+#  define CMIN		1
+# endif
 #endif /* CMIN */
 #ifndef CTIME
-# define CTIME		CEOL
+# if VTIME == VEOL
+#  define CTIME		CEOL
+# else
+#  define CTIME		0
+# endif
 #endif /* CTIME */
 
 /*
