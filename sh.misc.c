@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.misc.c,v 3.46 2010/05/08 00:41:58 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.misc.c,v 3.47 2012/06/21 19:13:18 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.misc.c,v 3.46 2010/05/08 00:41:58 christos Exp $")
+RCSID("$tcsh: sh.misc.c,v 3.47 2012/06/21 19:13:18 christos Exp $")
 
 static	int	renum	(int, int);
 static  Char  **blkend	(Char **);
@@ -450,8 +450,11 @@ strip(Char *cp)
 
     if (!cp)
 	return (cp);
-    while ((*dp++ &= TRIM) != '\0')
-	continue;
+    while (*dp != '\0') {
+	if (*dp < INVALID_BYTE)
+		*dp &= TRIM;
+	dp++;
+    }
     return (cp);
 }
 
@@ -462,8 +465,11 @@ quote(Char *cp)
 
     if (!cp)
 	return (cp);
-    while (*dp != '\0')
-	*dp++ |= QUOTE;
+    while (*dp != '\0') {
+	if (*dp < 0x80)
+	    *dp |= QUOTE;
+	dp++;
+    }
     return (cp);
 }
 

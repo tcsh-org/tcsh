@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.43 2012/05/24 12:56:08 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.str.c,v 3.44 2014/03/09 00:20:26 christos Exp $ */
 /*
  * tc.str.c: Short string package
  * 	     This has been a lesson of how to write buggy code!
@@ -36,7 +36,7 @@
 #include <assert.h>
 #include <limits.h>
 
-RCSID("$tcsh: tc.str.c,v 3.43 2012/05/24 12:56:08 christos Exp $")
+RCSID("$tcsh: tc.str.c,v 3.44 2014/03/09 00:20:26 christos Exp $")
 
 #define MALLOC_INCR	128
 #ifdef WIDE_STRINGS
@@ -66,7 +66,7 @@ one_wctomb(char *s, Char wchar)
 {
     int len;
 
-    if (wchar & INVALID_BYTE) {
+    if (wchar >= INVALID_BYTE) {
 	s[0] = wchar & 0xFF;
 	len = 1;
     } else {
@@ -224,7 +224,13 @@ short2str(const Char *src)
     dst = sdst;
     edst = &dst[dstsize];
     while (*src) {
-	dst += one_wctomb(dst, *src & CHAR);
+	if (*src < INVALID_BYTE)
+		dst += one_wctomb(dst, *src & MAX_UTF32);
+	else {
+		/* invalid char, example) if *src = 90000090, then *dst = ffffff90 */
+		*dst = (char)*(src+0);
+		dst++;
+	}
 	src++;
 	if (dst >= edst) {
 	    char *wdst = dst;
@@ -544,7 +550,13 @@ short2qstr(const Char *src)
 		dst = &edst[-MALLOC_INCR];
 	    }
 	}
-	dst += one_wctomb(dst, *src & CHAR);
+	if (*src < INVALID_BYTE)
+		dst += one_wctomb(dst, *src & MAX_UTF32);
+	else {
+		/* invalid char, example) if *src = 90000090, then *dst = ffffff90 */
+		*dst = (char)*(src+0);
+		dst++;
+	}
 	src++;
 	if (dst >= edst) {
 	    ptrdiff_t i = dst - edst;

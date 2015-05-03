@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.85 2012/12/17 23:32:40 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.86 2015/02/03 16:02:05 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.85 2012/12/17 23:32:40 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.86 2015/02/03 16:02:05 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -595,7 +595,10 @@ trim(Char **t)
 
     while ((p = *t++) != '\0')
 	while (*p)
-	    *p++ &= TRIM;
+	    if (*p < INVALID_BYTE)
+		*p++ &= TRIM;
+	    else
+		*p++;
 }
 
 int

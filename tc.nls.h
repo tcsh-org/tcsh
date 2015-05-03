@@ -1,4 +1,4 @@
-/* $Header: /src/pub/tcsh/tc.nls.h,v 3.13 2006/02/14 14:07:36 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.nls.h,v 3.14 2011/02/25 23:57:21 christos Exp $ */
 /*
  * tc.nls.h: NLS support
  *
@@ -52,6 +52,7 @@ extern int NLSClassify (Char, int);
 #define NLSCLASS_ILLEGAL2	(-5)
 #define NLSCLASS_ILLEGAL3	(-6)
 #define NLSCLASS_ILLEGAL4	(-7)
+#define NLSCLASS_ILLEGAL5	(-8)
 
 #define NLSCLASS_ILLEGAL_SIZE(x) (-(x) - (-(NLSCLASS_ILLEGAL) - 1))
 
