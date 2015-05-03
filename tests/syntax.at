@@ -28,8 +28,9 @@ AT_CHECK([[tcsh -f -c '(sleep 1; echo async) & echo sync; wait' \
 [[[1] @&t@
 sync
 async
-[1]    Done                          ( sleep 1; echo async )
-]])
+]],
+[[[1]    Done                          ( sleep 1; echo async )]]
+)
 
 AT_CLEANUP
 

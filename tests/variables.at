@@ -918,7 +918,7 @@ if ( $status > 128 ) echo OK
 true
 echo $status
 ]])
-AT_CHECK([tcsh -f status.csh | sed 's/Abort (core dumped)/Abort/'], ,
+AT_CHECK([tcsh -f status.csh 2>&1 | sed 's/Abort (core dumped)/Abort/'], ,
 [0
 Abort
 OK

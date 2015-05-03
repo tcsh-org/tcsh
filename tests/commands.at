@@ -702,9 +702,10 @@ echo fail
 # onintr - is necessary to keep setintr == 0; should dohup () be checking
 # something else?
 AT_CHECK([tcsh -f -c 'onintr -; nohup tcsh -f hup.csh' < /dev/null], ignore,
-[OK
-Hangup
-])
+[[OK
+]],
+[[Hangup]]
+)
 
 # The prefix form requires job control and is not tested
 
@@ -782,8 +783,9 @@ AT_DATA([kill.csh],
 kill -USR1 $$
 ]])
 AT_CHECK([tcsh -f -c 'tcsh -f -i -q < kill.csh'], ignore,
-[> User signal 1
-])
+[[> ]],
+[[User signal 1]]
+)
 
 # kill %job, kill -l untested untested
 
