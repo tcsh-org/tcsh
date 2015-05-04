@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.171 2014/07/22 21:53:00 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.172 2015/05/04 15:28:12 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.171 2014/07/22 21:53:00 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.172 2015/05/04 15:28:12 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1274,9 +1274,6 @@ xecho(int sep, Char **v)
 		    c = '\\';
 		    break;
 		case '0':
-		case '1':
-		case '2':
-		case '3':
 		    c = 0;
 		    if (*cp >= '0' && *cp < '8')
 			c = c * 8 + *cp++ - '0';
