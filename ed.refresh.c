@@ -165,8 +165,8 @@ Draw(Char *cp, int nocomb)	/* draw char at cp, expand tabs, ctl chars */
     int w, i, lv, lh;
     Char c, attr;
 
-    attr = *cp & ~MAX_UTF32;
-    c = *cp;
+    attr = *cp & ~CHAR;
+    c = *cp & CHAR;
     w = NLSClassify(c, nocomb);
     switch (w) {
 	case NLSCLASS_NL:
@@ -201,11 +201,10 @@ Draw(Char *cp, int nocomb)	/* draw char at cp, expand tabs, ctl chars */
 	case NLSCLASS_ILLEGAL2:
 	case NLSCLASS_ILLEGAL3:
 	case NLSCLASS_ILLEGAL4:
-	case NLSCLASS_ILLEGAL5:
-	    Vdraw('\\', 1);
-	    Vdraw('U', 1);
-	    Vdraw('+', 1);
-	    for (i = 16 + 4 * (-w-5); i >= 0; i -= 4)
+	    Vdraw('\\' | attr, 1);
+	    Vdraw('U' | attr, 1);
+	    Vdraw('+' | attr, 1);
+	    for (i = 8 * NLSCLASS_ILLEGAL_SIZE(w) - 4; i >= 0; i -= 4)
 		Vdraw("0123456789ABCDEF"[(c >> i) & 15] | attr, 1);
 	    break;
 	case 0:

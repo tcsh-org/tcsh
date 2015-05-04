@@ -66,7 +66,7 @@ one_wctomb(char *s, Char wchar)
 {
     int len;
 
-    if (wchar >= INVALID_BYTE) {
+    if (wchar & INVALID_BYTE) {
 	s[0] = wchar & 0xFF;
 	len = 1;
     } else {
@@ -224,13 +224,7 @@ short2str(const Char *src)
     dst = sdst;
     edst = &dst[dstsize];
     while (*src) {
-	if (*src < INVALID_BYTE)
-		dst += one_wctomb(dst, *src & MAX_UTF32);
-	else {
-		/* invalid char, example) if *src = 90000090, then *dst = ffffff90 */
-		*dst = (char)*(src+0);
-		dst++;
-	}
+	dst += one_wctomb(dst, *src & CHAR);
 	src++;
 	if (dst >= edst) {
 	    char *wdst = dst;
@@ -550,13 +544,7 @@ short2qstr(const Char *src)
 		dst = &edst[-MALLOC_INCR];
 	    }
 	}
-	if (*src < INVALID_BYTE)
-		dst += one_wctomb(dst, *src & MAX_UTF32);
-	else {
-		/* invalid char, example) if *src = 90000090, then *dst = ffffff90 */
-		*dst = (char)*(src+0);
-		dst++;
-	}
+	dst += one_wctomb(dst, *src & CHAR);
 	src++;
 	if (dst >= edst) {
 	    ptrdiff_t i = dst - edst;

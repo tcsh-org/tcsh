@@ -707,14 +707,14 @@ extern struct sigaction parterm;	/* Parents terminate catch */
 #define		ASCII		0177
 #ifdef WIDE_STRINGS		/* Implies SHORT_STRINGS */
 /* 31st char bit used for 'ing (not 32nd, we want all values nonnegative) */
-# define	QUOTE		0x80000000U
-# define	TRIM		0x7FFFFFFFU /* Mask to strip quote bit */
+# define	QUOTE		0x40000000
+# define	TRIM		0x3FFFFFFF /* Mask to strip quote bit */
 # define	UNDER		0x08000000 /* Underline flag */
 # define	BOLD		0x04000000 /* Bold flag */
 # define	STANDOUT	0x02000000 /* Standout flag */
 # define	LITERAL		0x01000000 /* Literal character flag */
 # define	ATTRIBUTES	0x0F000000 /* The bits used for attributes */
-# define	INVALID_BYTE	0x90000000U /* Invalid character on input */
+# define	INVALID_BYTE	0x00800000 /* Invalid character on input */
 # ifdef SOLARIS2
 #  define	CHAR		0x30FFFFFF /* Mask to mask out the character */
 # else
@@ -742,8 +742,6 @@ extern struct sigaction parterm;	/* Parents terminate catch */
 # define	CHAR		0000177	/* Mask to mask out the character */
 #endif
 #define		CHAR_DBWIDTH	(LITERAL|(LITERAL-1))
-
-# define 	MAX_UTF32	0x7FFFFFFFU	/* max UTF32 is U+7FFFFFFF */
 
 EXTERN int     AsciiOnly;	/* If set only 7 bits expected in characters */
 

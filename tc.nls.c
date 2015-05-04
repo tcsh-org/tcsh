@@ -64,7 +64,7 @@ NLSWidth(Char c)
 {
 # ifdef HAVE_WCWIDTH
     int l;
-    if (c >= INVALID_BYTE)
+    if (c & INVALID_BYTE)
 	return 1;
     l = xwcwidth((wchar_t) c);
     return l >= 0 ? l : 0;
@@ -119,18 +119,8 @@ int
 NLSClassify(Char c, int nocomb)
 {
     int w;
-    if (c >= INVALID_BYTE)
+    if (c & INVALID_BYTE)
 	return NLSCLASS_ILLEGAL;
-#ifdef WIDE_STRINGS
-    if (c >= 0x10000000)	/* U+10000000 = FC 90 80 80 80 80 */
-	return NLSCLASS_ILLEGAL5;
-    if (c >= 0x1000000)		/*  U+1000000 = F9 80 80 80 80 */
-	return NLSCLASS_ILLEGAL4;
-    if (c >= 0x100000)		/*   U+100000 = F4 80 80 80 */
-	return NLSCLASS_ILLEGAL3;
-#endif
-    if (c >= 0x10000)		/*    U+10000 = F0 90 80 80 */
-	return NLSCLASS_ILLEGAL2;
     w = NLSWidth(c);
     if ((w > 0 && !(Iscntrl(c) && (c & CHAR) < 0x100)) || (Isprint(c) && !nocomb))
 	return w;
@@ -141,5 +131,13 @@ NLSClassify(Char c, int nocomb)
 	    return NLSCLASS_TAB;
 	return NLSCLASS_CTRL;
     }
+#ifdef WIDE_STRINGS
+    if (c >= 0x1000000)
+	return NLSCLASS_ILLEGAL4;
+    if (c >= 0x10000)
+	return NLSCLASS_ILLEGAL3;
+#endif
+    if (c >= 0x100)
+	return NLSCLASS_ILLEGAL2;
     return NLSCLASS_ILLEGAL;
 }

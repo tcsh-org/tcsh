@@ -52,7 +52,6 @@ extern int NLSClassify (Char, int);
 #define NLSCLASS_ILLEGAL2	(-5)
 #define NLSCLASS_ILLEGAL3	(-6)
 #define NLSCLASS_ILLEGAL4	(-7)
-#define NLSCLASS_ILLEGAL5	(-8)
 
 #define NLSCLASS_ILLEGAL_SIZE(x) (-(x) - (-(NLSCLASS_ILLEGAL) - 1))
 

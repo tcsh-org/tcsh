@@ -618,8 +618,7 @@ insert_meta(const Char *cp, const Char *cpend, const Char *word,
 	    break;
 
 	wq = w & QUOTE;
-	/* comment out for FIX UTF32 */
-	/* w &= ~QUOTE; */
+	w &= ~QUOTE;
 
 	if (cmap(w, _ESC | _QF))
 	    wq = QUOTE;		/* quotes are always quoted */
@@ -1328,8 +1327,7 @@ tw_fixword(int looking, struct Strbuf *word, Char *dir, Char *exp_name)
 	break;
     }
 
-    /* comment out for FIX UTF32 */
-    /* (void) quote(exp_name); */
+    (void) quote(exp_name);
     Strbuf_append(word, exp_name);		/* add extended name */
     Strbuf_terminate(word);
 } /* end tw_fixword */
