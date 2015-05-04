@@ -1,3 +1,6 @@
+ 36. V6.18.04 - 20150504
+ 35. revert fix echo "\1", it is incorrect.
+ 34. revert fix to PR/437, breaks short strings.
  33. V6.18.03 - 20150503
  32. PR/437: Nakajima Akira: Fix segmentation fault reading input files
  31. PR/291: Print job status messages to stderr.
