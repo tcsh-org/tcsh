@@ -30,6 +30,8 @@ AT_CLEANUP
 
 AT_SETUP([Comments])
 
+AT_CHECK([if [ ! -t 0 ]; then exit 77; fi],, [Skipping comment tests])
+
 AT_CHECK([echo 'echo OK@%:@comment' | tcsh -f], , [OK
 ])
 
