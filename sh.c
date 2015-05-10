@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.183 2015/05/08 22:20:20 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.184 2015/05/08 22:36:07 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.183 2015/05/08 22:20:20 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.184 2015/05/08 22:36:07 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -1913,6 +1913,8 @@ pintr1(int wantnl)
     {
 	(void) Cookedmode();
 	GettingInput = 0;
+	if (evalvec)
+	    doneinp = 1;
     }
     drainoline();
 #ifdef HAVE_GETPWENT
