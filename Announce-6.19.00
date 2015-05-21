@@ -1,0 +1,30 @@
+Hello,
+
+I am pleased to announce that tcsh-6.19 is now available; this is a mainly a
+bug fix release (after 3 years) with few new features:
+
+	1. new cdtohome variable
+	2. locking in history files
+	3. history speedups.
+
+Please consult the Fixes files for a complete list of changes.
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most UNIX machines, VMS_POSIX, OS/2 EMX, WIN32, Amiga...
+
+You can get tcsh from ftp://ftp.astron.com/pub/tcsh/tcsh-6.19.00.tar.gz
+
+RMD160 (tcsh-6.19.00.tar.gz) = 0f1e8c5fdee634baff6670290bd30074db965da3
+
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you can
+get it from ftp.gnu.org or other GNU mirrors.
+
+I would like to thank:
+
+    * everyone who sent bug reports
+    * the beta team for all their help, bug fixes, and suggestions
+
+christos
