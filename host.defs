@@ -1,5 +1,5 @@
 newcode :
-/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.59 2013/03/07 00:42:22 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/host.defs,v 1.60 2013/03/13 15:53:38 corinna Exp $ */
 /*
  * host.defs: Hosttype/Machtype etc.
  */
@@ -33,7 +33,7 @@ newcode :
  */
 #include "sh.h"
 
-RCSID("$tcsh: host.defs,v 1.59 2013/03/07 00:42:22 christos Exp $")
+RCSID("$tcsh: host.defs,v 1.60 2013/03/13 15:53:38 corinna Exp $")
 
 endcode :
 
@@ -347,7 +347,7 @@ machtype: defined(mc68020)				: "m68k"
 machtype: defined(sparcv9)				: "sparcv9"
 machtype: defined(sparc)				: "sparc"
 machtype: defined(M_i386)				: "i386"
-machtype: defined(M_amd64)				: "x86_64"
+machtype: defined(M_amd64)				: "amd64"
 enddef	:
 
 
