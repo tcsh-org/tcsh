@@ -1,4 +1,6 @@
- 41  V6.19.00 - 20150521
+  1. PR/451: Fix error messages containing %c to be always '%c'
+
+ 41. V6.19.00 - 20150521
  40. V6.18.05 - 20150510
  39. fix reseting when interrupted inside an eval "eval sleep 10^C"
      (paulo.cesar.pereira.de.andrade)
