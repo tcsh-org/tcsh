@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.103 2014/10/28 16:51:30 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.const.c,v 3.104 2014/10/28 18:40:46 christos Exp $ */
 /*
  * sh.const.c: String constants for tcsh.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.const.c,v 3.103 2014/10/28 16:51:30 christos Exp $")
+RCSID("$tcsh: tc.const.c,v 3.104 2014/10/28 18:40:46 christos Exp $")
 
 Char STRlogout[]	= { 'l', 'o', 'g', 'o', 'u', 't', '\0' };
 Char STRautologout[]	= { 'a', 'u', 't', 'o', 'l', 'o', 'g', 'o', 'u', 't', 
@@ -453,7 +453,7 @@ Char STRLC_MONETARY[]	= { 'L', 'C', '_', 'M', 'O', 'N', 'E', 'T', 'A',
 			    'R', 'Y', '\0' };
 Char STRNOREBIND[] 	= { 'N', 'O', 'R', 'E', 'B', 'I', 'N', 'D', '\0' };
 
-#if defined(SIG_WINDOW) || defined(SIGWINCH) || defined(SIGWINDOW) || defined (_VMS_POSIX)	 
+#if defined(SIG_WINDOW) || defined(SIGWINCH) || defined(SIGWINDOW) || defined (_VMS_POSIX) || defined(_SIGWINCH)
 /* atp - problem with declaration of str{lines,columns} in sh.func.c (1277) */
 Char STRLINES[]		= { 'L', 'I', 'N', 'E', 'S', '\0'};
 Char STRCOLUMNS[]	= { 'C', 'O', 'L', 'U', 'M', 'N', 'S', '\0'};
