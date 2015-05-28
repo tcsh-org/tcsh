@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.52 2013/12/12 01:20:43 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.53 2015/02/22 16:31:54 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -46,7 +46,7 @@
 #define USE_SBRK
 #endif
 
-RCSID("$tcsh: tc.alloc.c,v 3.52 2013/12/12 01:20:43 christos Exp $")
+RCSID("$tcsh: tc.alloc.c,v 3.53 2015/02/22 16:31:54 christos Exp $")
 
 #define RCHECK
 #define DEBUG
@@ -348,10 +348,13 @@ calloc(size_t i, size_t j)
 {
 #ifndef lint
     char *cp;
+    size_t k;
 
     i *= j;
     cp = xmalloc(i);
-    memset(cp, 0, i);
+    /* Stop gcc 5.x from optimizing malloc+memset = calloc */
+    k = i;
+    memset(cp, 0, k);
 
     return ((memalign_t) cp);
 #else
