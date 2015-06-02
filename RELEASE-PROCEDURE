@@ -1,6 +1,6 @@
 HOW TO RELEASE TCSH
 
-@(#) $tcsh: RELEASE-PROCEDURE,v 1.16 2014/07/18 19:51:56 christos Exp $
+@(#) $tcsh: RELEASE-PROCEDURE,v 1.17 2014/07/18 19:54:11 christos Exp $
 
 1)  Update version number and date in patchlevel.h
 2)  Note the new version and date in Fixes
@@ -51,4 +51,11 @@ The rest are still manual:
     - Set the "Date Order" to 2030-01-01 (i.e. far in the future)
     - Click on "Update Version"
 17) Update the version on http://www.tcsh.org/MostRecentRelease
-18) Mail an announcement to tcsh@mx.gw.com
+18) Update the online manual page http://www.tcsh.org/tcsh.man/top.html
+    - Login to the webhost (huru)
+    - cd ~/src/tcsh && cvs up
+    - cd ~/.www/sites/tcsh.org/man \
+	&& cp -p ~/src/tcsh/tcsh.man \
+	&& make clean \
+	&& make
+19) Mail an announcement to tcsh@mx.gw.com
