@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.98 2010/05/08 00:37:39 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.99 2014/03/09 00:20:26 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$tcsh: ed.chared.c,v 3.98 2010/05/08 00:37:39 christos Exp $")
+RCSID("$tcsh: ed.chared.c,v 3.99 2014/03/09 00:20:26 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -3387,7 +3387,7 @@ e_stuff_char(Char c)
          (void) Cookedmode();
 
      (void) xwrite(SHIN, "\n", 1);
-     len = one_wctomb(buf, c & CHAR);
+     len = one_wctomb(buf, c);
      for (i = 0; i < len; i++)
 	 (void) ioctl(SHIN, TIOCSTI, (ioctl_t) &buf[i]);
 

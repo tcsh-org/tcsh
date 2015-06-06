@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.misc.c,v 3.47 2012/06/21 19:13:18 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.misc.c,v 3.49 2015/05/04 15:31:13 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.misc.c,v 3.47 2012/06/21 19:13:18 christos Exp $")
+RCSID("$tcsh: sh.misc.c,v 3.49 2015/05/04 15:31:13 christos Exp $")
 
 static	int	renum	(int, int);
 static  Char  **blkend	(Char **);
@@ -450,8 +450,13 @@ strip(Char *cp)
 
     if (!cp)
 	return (cp);
-    while ((*dp++ &= TRIM) != '\0')
-	continue;
+    while (*dp != '\0') {
+#if INVALID_BYTE != 0
+	if ((*dp & INVALID_BYTE) != INVALID_BYTE)    /* *dp < INVALID_BYTE */
+#endif
+		*dp &= TRIM;
+	dp++;
+    }
     return (cp);
 }
 
@@ -462,8 +467,17 @@ quote(Char *cp)
 
     if (!cp)
 	return (cp);
-    while (*dp != '\0')
-	*dp++ |= QUOTE;
+    while (*dp != '\0') {
+#ifdef WIDE_STRINGS
+	if ((*dp & 0xffffff80) == 0)	/* *dp < 0x80 */
+#elif defined SHORT_STRINGS
+	if ((*dp & 0xff80) == 0)	/* *dp < 0x80 */
+#else
+	if ((*dp & 0x80) == 0)		/* *dp < 0x80 */
+#endif
+	    *dp |= QUOTE;
+	dp++;
+    }
     return (cp);
 }
 

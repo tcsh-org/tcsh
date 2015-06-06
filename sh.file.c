@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.file.c,v 3.37 2010/02/09 20:21:49 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.file.c,v 3.38 2015/03/07 18:07:46 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$tcsh: sh.file.c,v 3.37 2010/02/09 20:21:49 christos Exp $")
+RCSID("$tcsh: sh.file.c,v 3.38 2015/03/07 18:07:46 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 
@@ -249,7 +249,7 @@ pushback(const Char *string)
 	char buf[MB_LEN_MAX];
 	size_t i, len;
 
-	len = one_wctomb(buf, *p & CHAR);
+	len = one_wctomb(buf, *p);
 	for (i = 0; i < len; i++)
 	    (void) ioctl(SHOUT, TIOCSTI, (ioctl_t) &buf[i]);
     }

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.59 2014/08/13 23:39:34 amold Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.60 2015/02/22 21:59:00 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.hist.c,v 3.59 2014/08/13 23:39:34 amold Exp $")
+RCSID("$tcsh: sh.hist.c,v 3.60 2015/02/22 21:59:00 christos Exp $")
 
 #include <stdio.h>	/* for rename(2), grr. */
 #include <assert.h>
@@ -1199,7 +1199,7 @@ fmthist(int fmt, ptr_t ptr)
 	    buf = xmalloc(Strlen(istr) * MB_LEN_MAX + 1);
 
 	    for (p = buf, ip = istr; *ip != '\0'; ip++)
-		p += one_wctomb(p, CHAR & *ip);
+		p += one_wctomb(p, *ip);
 
 	    *p = '\0';
 	    xfree(istr);

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.173 2015/05/04 15:31:13 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.174 2015/05/10 13:29:28 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -707,14 +707,21 @@ extern struct sigaction parterm;	/* Parents terminate catch */
 #define		ASCII		0177
 #ifdef WIDE_STRINGS		/* Implies SHORT_STRINGS */
 /* 31st char bit used for 'ing (not 32nd, we want all values nonnegative) */
-# define	QUOTE		0x40000000
-# define	TRIM		0x3FFFFFFF /* Mask to strip quote bit */
+/*
+ * Notice
+ *
+ * By fix for handling unicode name file, 32nd bit is used.
+ * We need use '&' instead of '> or <' when comparing with INVALID_BYTE etc..
+ * Cast to uChar is not recommended,
+ *  becase Char is 4bytes but uChar is 8bytes on I32LP64. */
+# define	QUOTE		0x80000000
+# define	TRIM		0x7FFFFFFF /* Mask to strip quote bit */
 # define	UNDER		0x08000000 /* Underline flag */
 # define	BOLD		0x04000000 /* Bold flag */
 # define	STANDOUT	0x02000000 /* Standout flag */
 # define	LITERAL		0x01000000 /* Literal character flag */
 # define	ATTRIBUTES	0x0F000000 /* The bits used for attributes */
-# define	INVALID_BYTE	0x00800000 /* Invalid character on input */
+# define	INVALID_BYTE	0xF0000000 /* Invalid character on input */
 # ifdef SOLARIS2
 #  define	CHAR		0x30FFFFFF /* Mask to mask out the character */
 # else
@@ -742,6 +749,8 @@ extern struct sigaction parterm;	/* Parents terminate catch */
 # define	CHAR		0000177	/* Mask to mask out the character */
 #endif
 #define		CHAR_DBWIDTH	(LITERAL|(LITERAL-1))
+
+# define 	MAX_UTF32	0x7FFFFFFF	/* max UTF32 is U+7FFFFFFF */
 
 EXTERN int     AsciiOnly;	/* If set only 7 bits expected in characters */
 

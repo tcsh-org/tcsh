@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.152 2014/07/18 19:30:14 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.153 2014/10/11 21:52:26 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.152 2014/07/18 19:30:14 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.153 2014/10/11 21:52:26 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -124,7 +124,14 @@ expand_lex(const struct wordent *sp0, int from, int to)
 			(((*s & TRIM) == '\\') && (prev_c != '\\')))) {
 		    Strbuf_append1(&buf, '\\');
 		}
+#if INVALID_BYTE != 0
+		if ((*s & INVALID_BYTE) != INVALID_BYTE) /* *s < INVALID_BYTE */
+		    Strbuf_append1(&buf, *s & TRIM);
+		else
+		    Strbuf_append1(&buf, *s);
+#else
 		Strbuf_append1(&buf, *s & TRIM);
+#endif
 		prev_c = *s;
 	    }
 	    Strbuf_append1(&buf, ' ');
