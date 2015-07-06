@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.172 2015/05/04 15:28:12 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.173 2015/05/04 17:10:45 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.172 2015/05/04 15:28:12 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.173 2015/05/04 17:10:45 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -1045,6 +1045,17 @@ getword(struct Strbuf *wp)
 		goto past;
 	    if (wp)
 		Strbuf_append1(wp, (Char) c);
+	    if (!d && c == ')') {
+		if (!first && wp) {
+		    goto past_word_end;
+		} else {
+		    if (wp) {
+			wp->len = 1;
+			Strbuf_terminate(wp);
+		    }
+		    return found;
+		}
+	    }
 	    if (!first && !d && c == '(') {
 		if (wp)
 		    goto past_word_end;
