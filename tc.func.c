@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.153 2014/10/11 21:52:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.func.c,v 3.154 2015/06/06 21:19:08 christos Exp $ */
 /*
  * tc.func.c: New tcsh builtins.
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.func.c,v 3.153 2014/10/11 21:52:26 christos Exp $")
+RCSID("$tcsh: tc.func.c,v 3.154 2015/06/06 21:19:08 christos Exp $")
 
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
@@ -520,6 +520,9 @@ find_stop_ed(void)
     struct varent *varp;
     Char **vv;
 
+    if (pcurrent == NULL)	/* see if we have any jobs */
+	return NULL;		/* nope */
+
     if ((ep = getenv("EDITOR")) != NULL) {	/* if we have a value */
 	if ((p = strrchr(ep, '/')) != NULL) 	/* if it has a path */
 	    ep = p + 1;		/* then we want only the last part */
@@ -538,9 +541,6 @@ find_stop_ed(void)
 	continue;
     for (epl = 0; ep[epl] && !isspace((unsigned char)ep[epl]); epl++)
 	continue;
-
-    if (pcurrent == NULL)	/* see if we have any jobs */
-	return NULL;		/* nope */
 
     if ((varp = adrof(STReditors)) != NULL)
 	vv = varp->vec;
@@ -572,9 +572,13 @@ find_stop_ed(void)
 	    else
 		cp = p;			/* else we get all of it */
 
-	    /* if we find either in the current name, fg it */
-	    if (strncmp(ep, cp, epl) == 0 ||
-		strncmp(vp, cp, vpl) == 0 || findvv(vv, cp)) {
+	    /*
+	     * If we find the current name as $EDITOR or $VISUAL,
+	     * or in $editors array, fg it
+	     */
+	    if ((strncmp(ep, cp, epl) == 0 && cp[epl] == '\0') ||
+		(strncmp(vp, cp, vpl) == 0 && cp[vpl] == '\0') ||
+		findvv(vv, cp)) {
 
 		/*
 		 * If there is a choice, then choose the current process if
