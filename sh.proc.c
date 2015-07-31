@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.126 2015/01/19 15:15:59 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.127 2015/02/22 21:40:14 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.126 2015/01/19 15:15:59 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.127 2015/02/22 21:40:14 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1003,7 +1003,7 @@ pprint(struct process *pp, int flag)
     tp = pp;
     status = reason = -1;
     jobflags = 0;
-    haderr = 1;	/* Print statuc to stderr */
+    haderr = 1;	/* Print status to stderr */
     do {
 #ifdef BACKPIPE
 	/*
