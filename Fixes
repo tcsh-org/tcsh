@@ -1,3 +1,4 @@
+  4. run-fg-editor improvements and documentation (Luke Mewburn)
   3. Fix parsing of 'if (cond)then' (Fridolin Pokorny)
   2. PR/437: Fix handling of invalid unicode characters.
   1. PR/451: Fix error messages containing %c to be always '%c'
