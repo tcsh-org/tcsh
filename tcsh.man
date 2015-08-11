@@ -3745,7 +3745,7 @@ periods, hyphens and underscores (`.', `\-' and `_') as word
 separators.
 If set to `Enhance', completion matches uppercase and underscore
 characters explicitly and matches lowercase and hyphens in a
-case-insensivite manner; it will treat periods, hypens and underscores
+case-insensitive manner; it will treat periods, hyphens and underscores
 as word separators.
 .TP 8
 .B continue \fR(+)
