@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.defns.c,v 3.46 2006/03/02 18:46:44 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.defns.c,v 3.47 2015/08/13 09:04:07 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.defns.c,v 3.46 2006/03/02 18:46:44 christos Exp $")
+RCSID("$tcsh: ed.defns.c,v 3.47 2015/08/13 09:04:07 christos Exp $")
 
 #include "ed.h"
 
@@ -1890,6 +1890,8 @@ ed_InitVIMaps(void)
 
     VImode = 1;
     setNS(STRvimode);
+    update_wordchars();
+
     ResetXmap();
     for (i = 0; i < NT_NUM_KEYS; i++) {
 	CcKeyMap[i] = CcViMap[i];
@@ -1913,6 +1915,7 @@ ed_InitEmacsMaps(void)
     VImode = 0;
     if (adrof(STRvimode))
 	unsetv(STRvimode);
+    update_wordchars();
 
     ResetXmap();
     for (i = 0; i < NT_NUM_KEYS; i++) {

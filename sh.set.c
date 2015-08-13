@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.86 2014/10/28 18:40:46 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.87 2015/08/13 09:04:07 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.86 2014/10/28 18:40:46 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.87 2015/08/13 09:04:07 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -167,6 +167,7 @@ update_vars(Char *vp)
     }
     else if (eq(vp, STRvimode)) {
 	VImode = 1;
+	update_wordchars();
     }
     else if (eq(vp, STRshlvl)) {
 	tsetenv(STRKSHLVL, varval(vp));
@@ -808,6 +809,7 @@ unset(Char **v, struct command *c)
 #if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
     update_dspmbyte_vars();
 #endif
+    update_wordchars();
 #ifdef NLS_CATALOGS
     nlsclose();
     nlsinit();
@@ -1316,3 +1318,11 @@ autoset_kanji(void)
 }
 #endif
 #endif
+
+void
+update_wordchars(void)
+{
+    if ((word_chars == STR_WORD_CHARS) || (word_chars == STR_WORD_CHARS_VI)) {
+	word_chars = (VImode ? STR_WORD_CHARS_VI : STR_WORD_CHARS);
+    }
+}

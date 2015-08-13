@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.184 2015/05/08 22:36:07 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.185 2015/05/10 13:28:54 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.184 2015/05/08 22:36:07 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.185 2015/05/10 13:28:54 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -345,6 +345,7 @@ main(int argc, char **argv)
 # endif
 #endif
     STR_WORD_CHARS = SAVE(WORD_CHARS);
+    STR_WORD_CHARS_VI = SAVE(WORD_CHARS_VI);
 
     HIST = '!';
     HISTSUB = '^';

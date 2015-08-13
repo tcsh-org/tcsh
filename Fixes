@@ -1,3 +1,4 @@
+  7. more correct $wordchars for vimode (Luke Mewburn)
   6. expose VImode in $vimode (Luke Mewburn)
   5. display what the compiled in editor is in bindkey -d (Luke Mewburn)
   4. run-fg-editor improvements and documentation (Luke Mewburn)

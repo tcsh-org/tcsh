@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.174 2015/05/10 13:29:28 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.175 2015/06/06 21:19:08 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */
@@ -1161,12 +1161,14 @@ extern struct mesg {
     const char *pname;		/* print name */
 } mesg[];
 
-/* word_chars is set by default to WORD_CHARS but can be overridden by
-   the worchars variable--if unset, reverts to WORD_CHARS */
+/* word_chars is set by default to WORD_CHARS (or WORD_CHARS_VI) but can
+   be overridden by the wordchars variable--if unset, reverts to
+   WORD_CHARS (or WORD_CHARS_VI) */
 
 EXTERN Char   *word_chars;
 
 #define WORD_CHARS "*?_-.[]~="	/* default chars besides alnums in words */
+#define WORD_CHARS_VI "_"	/* default chars besides alnums in words */
 
 EXTERN Char   *STR_SHELLPATH;
 
@@ -1174,6 +1176,7 @@ EXTERN Char   *STR_SHELLPATH;
 EXTERN Char   *STR_BSHELL;
 #endif 
 EXTERN Char   *STR_WORD_CHARS;
+EXTERN Char   *STR_WORD_CHARS_VI;
 EXTERN Char  **STR_environ IZERO;
 
 extern int     dont_free;	/* Tell free that we are in danger if we free */

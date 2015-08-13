@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.63 2013/03/28 15:06:31 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.64 2013/12/08 22:53:09 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -399,6 +399,7 @@ extern	void		  autoset_dspmbyte	(const Char *);
 #if defined(AUTOSET_KANJI)
 extern	void		  autoset_kanji	(void);
 #endif
+extern	void		  update_wordchars	(void);
 
 /*
  * sh.time.c
