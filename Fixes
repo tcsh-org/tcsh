@@ -1,3 +1,4 @@
+  6. expose VImode in $vimode (Luke Mewburn)
   5. display what the compiled in editor is in bindkey -d (Luke Mewburn)
   4. run-fg-editor improvements and documentation (Luke Mewburn)
   3. Fix parsing of 'if (cond)then' (Fridolin Pokorny)
