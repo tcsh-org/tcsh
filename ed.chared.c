@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.100 2015/06/06 21:19:07 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.101 2015/08/13 08:55:30 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$tcsh: ed.chared.c,v 3.100 2015/06/06 21:19:07 christos Exp $")
+RCSID("$tcsh: ed.chared.c,v 3.101 2015/08/13 08:55:30 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -93,7 +93,7 @@ RCSID("$tcsh: ed.chared.c,v 3.100 2015/06/06 21:19:07 christos Exp $")
  * from: Gert-Jan Vons <vons@cesar.crbca1.sinet.slb.com>
  */
 #define C_CLASS_WHITE	1
-#define C_CLASS_ALNUM	2
+#define C_CLASS_WORD	2
 #define C_CLASS_OTHER	3
 
 static Char *InsertPos = InputBuf; /* Where insertion starts */
@@ -305,8 +305,8 @@ c_to_class(Char ch)
     if (Isspace(ch))
         return C_CLASS_WHITE;
 
-    if (Isdigit(ch) || Isalpha(ch) || ch == '_')
-        return C_CLASS_ALNUM;
+    if (isword(ch))
+        return C_CLASS_WORD;
 
     return C_CLASS_OTHER;
 }
