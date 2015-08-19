@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.101 2015/08/13 08:55:30 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.102 2015/08/13 09:06:33 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$tcsh: ed.chared.c,v 3.101 2015/08/13 08:55:30 christos Exp $")
+RCSID("$tcsh: ed.chared.c,v 3.102 2015/08/13 09:06:33 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -3034,7 +3034,7 @@ e_uppercase(Char c)
 
 /*ARGSUSED*/
 CCRETVAL
-e_capitolcase(Char c)
+e_capitalcase(Char c)
 {
     Char   *cp, *end;
 
