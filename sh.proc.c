@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.127 2015/02/22 21:40:14 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.128 2015/07/31 08:57:13 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.127 2015/02/22 21:40:14 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.128 2015/07/31 08:57:13 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -47,7 +47,7 @@ RCSID("$tcsh: sh.proc.c,v 3.127 2015/02/22 21:40:14 christos Exp $")
 # define HZ 16
 #endif /* aiws */
 
-#if defined(_BSD) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
+#if defined(_BSD) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(__GLIBC__)
 # if !defined(__ANDROID__)
 #  define BSDWAIT
 # endif
