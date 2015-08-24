@@ -1,4 +1,4 @@
-# $tcsh: Makefile.std,v 1.98 2013/12/08 22:53:09 christos Exp $
+# $tcsh: Makefile.std,v 1.99 2014/07/07 20:34:58 christos Exp $
 #	Makefile.std	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -425,7 +425,7 @@ tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
 	${CPP} $(INCLUDES) ${DFLAGS} ${EXTRAFLAGS} -D_h_tc_const\
 	    $(srcdir)/tc.const.c | grep 'Char STR' | \
 	    sed -e 's/Char \([a-zA-Z0-9_]*\) *\[ *\].*/extern Char \1[];/' | \
-	    sort >> $@
+	    LC_COLLATE=C sort >> $@
 	@echo '#endif /* _h_tc_const */' >> $@
 
 csh.prof: ${OBJS} sh.prof.${SUF} mcrt0.${SUF}
