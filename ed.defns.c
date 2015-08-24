@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.defns.c,v 3.47 2015/08/13 09:04:07 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.defns.c,v 3.48 2015/08/13 09:05:21 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.defns.c,v 3.47 2015/08/13 09:04:07 christos Exp $")
+RCSID("$tcsh: ed.defns.c,v 3.48 2015/08/13 09:05:21 christos Exp $")
 
 #include "ed.h"
 
@@ -151,7 +151,7 @@ PFCmd   CcFuncTbl[] = {		/* table of available commands */
 #define         F_CASEUPPER     54
     e_lowercase,
 #define         F_CASELOWER     55
-    e_capitolcase,
+    e_capitalcase,
 #define         F_CASECAPITAL   56
     v_zero,
 #define		V_ZERO		57
