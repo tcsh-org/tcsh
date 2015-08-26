@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.136 2015/05/04 15:31:13 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.137 2015/06/06 21:19:08 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -35,7 +35,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.parse.c,v 3.136 2015/05/04 15:31:13 christos Exp $")
+RCSID("$tcsh: tw.parse.c,v 3.137 2015/06/06 21:19:08 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -1332,7 +1332,6 @@ tw_fixword(int looking, struct Strbuf *word, Char *dir, Char *exp_name)
 	break;
     }
 
-    (void) quote(exp_name);
     Strbuf_append(word, exp_name);		/* add extended name */
     Strbuf_terminate(word);
 } /* end tw_fixword */
