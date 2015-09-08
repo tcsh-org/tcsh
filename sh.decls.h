@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.64 2013/12/08 22:53:09 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.65 2015/08/13 09:05:21 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -185,6 +185,7 @@ extern	void		  unalias	(Char **, struct command *);
 extern	void		  wfree		(void);
 extern	void		  dobuiltins	(Char **, struct command *);
 extern	void		  reexecute	(struct command *);
+extern  int		  getYN		(const char *);
 
 /*
  * sh.glob.c

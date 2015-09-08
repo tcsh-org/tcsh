@@ -1636,6 +1636,9 @@ If the shell variable \fBnoclobber\fR is set, then the file must not exist or be
 character special file (e.g., a terminal or `/dev/null') or an error results.
 This helps prevent accidental destruction of files.  In this case the `!' forms
 can be used to suppress this check.
+If \fBnotempty\fR is given in \fBnoclobber\fR, `>' is allowed on empty files;
+if \fBask\fR is set, an interacive confirmation is presented, rather than an
+error.
 .PP
 The forms involving `&' route the diagnostic output into the specified file as
 well as the standard output.  \fIname\fR is expanded in the same way as `<'

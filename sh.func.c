@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.173 2015/05/04 17:10:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.174 2015/07/06 21:52:45 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.func.c,v 3.173 2015/05/04 17:10:45 christos Exp $")
+RCSID("$tcsh: sh.func.c,v 3.174 2015/07/06 21:52:45 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -2721,4 +2721,21 @@ nlsclose(void)
 	    handle_pending_signals();
     }
 #endif /* NLS_CATALOGS */
+}
+
+int
+getYN(const char *prompt)
+{
+    int doit, c;
+    xprintf("%s", prompt);
+    flush();
+    (void) force_read(SHIN, &c, 1);
+    /* 
+     * Perhaps we should use the yesexpr from the
+     * actual locale
+     */
+    doit = (strchr(CGETS(22, 14, "Yy"), c) != NULL);
+    while (c != '\n' && force_read(SHIN, &c, 1) == 1)
+	continue;
+    return doit;
 }

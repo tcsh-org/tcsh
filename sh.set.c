@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.87 2015/08/13 09:04:07 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.88 2015/08/13 09:05:21 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.set.c,v 3.87 2015/08/13 09:04:07 christos Exp $")
+RCSID("$tcsh: sh.set.c,v 3.88 2015/08/13 09:05:21 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -55,6 +55,7 @@ static	struct varent	*madrof		(Char *, struct varent *);
 static	void		 unsetv1	(struct varent *);
 static	void		 exportpath	(Char **);
 static	void		 balance	(struct varent *, int, int);
+static	int		 set_noclobber  (Char **);
 
 /*
  * C Shell
@@ -71,6 +72,13 @@ update_vars(Char *vp)
 	    exportpath(p->vec);
 	    dohash(NULL, NULL);
 	}
+    }
+    else if (eq(vp, STRnoclobber)) {
+	struct varent *p = adrof(STRnoclobber);
+	if (p == NULL)
+	    stderror(ERR_NAME | ERR_UNDVAR);
+	else
+	    no_clobber = set_noclobber(p->vec);
     }
     else if (eq(vp, STRhistchars)) {
 	Char *pn = varval(vp);
@@ -772,6 +780,8 @@ unset(Char **v, struct command *c)
 	PRCH = tcsh ? '>' : '%';
 	PRCHROOT = '#';
     }
+    if (adrof(STRnoclobber) == 0)
+	no_clobber = 0;
     if (adrof(STRhistlit) == 0)
 	HistLit = 0;
     if (adrof(STRloginsh) == 0)
@@ -935,6 +945,28 @@ exportpath(Char **val)
     cleanup_push(exppath, xfree);
     tsetenv(STRKPATH, exppath);
     cleanup_until(exppath);
+}
+
+static int
+set_noclobber(Char **val)
+{
+    Char *option;
+    int nc = NOCLOBBER_DEFAULT;
+
+    if (val == NULL)
+	return nc;
+    while (*val) {
+	if (*val == 0 || eq(*val, STRRparen))
+	    return nc;
+
+	option = *val++;
+
+	if (eq(option, STRnotempty))
+	    nc |= NOCLOBBER_NOTEMPTY;
+	else if (eq(option, STRask))
+	    nc |= NOCLOBBER_ASK;
+    }
+    return nc;
 }
 
 #ifndef lint
