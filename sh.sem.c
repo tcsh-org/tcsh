@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.88 2014/09/08 18:52:15 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.89 2015/09/08 15:49:53 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -33,7 +33,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.sem.c,v 3.88 2014/09/08 18:52:15 christos Exp $")
+RCSID("$tcsh: sh.sem.c,v 3.89 2015/09/08 15:49:53 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -212,8 +212,14 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 	 * If noexec then this is all we do.
 	 */
 	if (t->t_dflg & F_READ) {
+	    int old_pintr_disabled;
+
 	    xclose(0);
+	    if (setintr)
+		pintr_push_enable(&old_pintr_disabled);
 	    heredoc(t->t_dlef);
+	    if (setintr)
+		cleanup_until(&old_pintr_disabled);
 	    if (noexec)
 		xclose(0);
 	}
