@@ -24,7 +24,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "sh.h"
-RCSID("$tcsh: dotlock.c,v 3.2 2013/12/11 16:03:26 christos Exp $");
+RCSID("$tcsh: dotlock.c,v 3.3 2014/03/09 00:11:54 christos Exp $")
 
 #include <stdio.h>
 #ifndef O_SYNC
