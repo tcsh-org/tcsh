@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.65 2015/08/13 09:05:21 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.66 2015/09/08 15:49:53 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -239,6 +239,7 @@ extern	void		  btell		(struct Ain *);
 extern	void		  btoeof	(void);
 extern	void		  copylex	(struct wordent *, struct wordent *);
 extern	Char		 *domod		(Char *, Char);
+extern	void		  initlex	(struct wordent *);
 extern	void		  freelex	(struct wordent *);
 extern	int		  lex		(struct wordent *);
 extern	void		  lex_cleanup	(void *);

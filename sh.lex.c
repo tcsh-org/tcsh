@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.86 2010/05/17 19:36:45 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.87 2011/01/24 17:48:15 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.86 2010/05/17 19:36:45 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.87 2011/01/24 17:48:15 christos Exp $")
 
 #include "ed.h"
 
@@ -255,6 +255,13 @@ copylex(struct wordent *hp, struct wordent *fp)
 	wdp->word = Strsave(fp->word);
 	fp = fp->next;
     } while (wdp->word[0] != '\n');
+}
+
+void
+initlex(struct wordent *vp)
+{
+	vp->prev = vp;
+	vp->next = vp;
 }
 
 void

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.185 2015/05/10 13:28:54 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.186 2015/08/13 09:05:21 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.185 2015/05/10 13:28:54 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.186 2015/08/13 09:05:21 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -274,6 +274,7 @@ main(int argc, char **argv)
 #endif
 
     nlsinit();
+    initlex(&paraml);
 
 #ifdef MALLOC_TRACE
     mal_setstatsfile(fdopen(dmove(xopen("/tmp/tcsh.trace", 
@@ -2049,6 +2050,7 @@ process(int catch)
 	 */
 	if (setintr)
 	    pintr_push_enable(&old_pintr_disabled);
+	freelex(&paraml);
 	hadhist = lex(&paraml);
 	if (setintr)
 	    cleanup_until(&old_pintr_disabled);

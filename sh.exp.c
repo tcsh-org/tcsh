@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.60 2012/05/11 17:16:11 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.exp.c,v 3.61 2012/11/28 13:45:11 christos Exp $ */
 /*
  * sh.exp.c: Expression evaluations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.exp.c,v 3.60 2012/05/11 17:16:11 christos Exp $")
+RCSID("$tcsh: sh.exp.c,v 3.61 2012/11/28 13:45:11 christos Exp $")
 
 #include "tw.h"
 
@@ -968,6 +968,7 @@ evalav(Char **v)
     }
     hp->prev = wdp;
     cleanup_push(&paraml1, lex_cleanup);
+    initlex(&paraml1);
     alias(&paraml1);
     t = syntax(paraml1.next, &paraml1, 0);
     cleanup_push(t, syntax_cleanup);

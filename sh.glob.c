@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.90 2015/05/28 14:03:00 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.91 2015/06/06 21:19:07 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.90 2015/05/28 14:03:00 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.91 2015/06/06 21:19:07 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -765,6 +765,9 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 	omark = cleanup_push_mark();
 	getexit(osetexit);
 	for (;;) {
+	    struct wordent paraml1;
+	    initlex(&paraml1);
+
 	    (void) setexit();
 	    justpr = 0;
 	    
@@ -780,12 +783,13 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 		seterr = NULL;
 	    }
 
-	    (void) lex(&paraml);
-	    cleanup_push(&paraml, lex_cleanup);
+	    freelex(&paraml1);
+	    (void) lex(&paraml1);
+	    cleanup_push(&paraml1, lex_cleanup);
 	    if (seterr)
 		stderror(ERR_OLD);
-	    alias(&paraml);
-	    t = syntax(paraml.next, &paraml, 0);
+	    alias(&paraml1);
+	    t = syntax(paraml1.next, &paraml1, 0);
 	    cleanup_push(t, syntax_cleanup);
 	    /* The F_BACKQ flag must set so the job output is correct if
 	     * printexitvalue is set.  If it's not set, the job output
@@ -805,7 +809,7 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 #endif
 	    execute(t, -1, NULL, NULL, TRUE);
 
-	    cleanup_until(&paraml);
+	    cleanup_until(&paraml1);
 	}
     }
     cleanup_until(&pvec[1]);
