@@ -71,11 +71,11 @@ Invalid null command.
 
 # backslash handling tested with $backslash_quote
 
-AT_CHECK([tcsh -f -c 'echo "foo\"bar"'], 1, , [Unmatched ".
+AT_CHECK([tcsh -f -c 'echo "foo\"bar"'], 1, , [Unmatched '"'.
 ])
 dnl " Pacify emacs
 
-AT_CHECK([tcsh -f -c "echo 'foo\'bar'"], 1, , [Unmatched '.
+AT_CHECK([tcsh -f -c "echo 'foo\'bar'"], 1, , [Unmatched '''.
 ])
 
 AT_CLEANUP
