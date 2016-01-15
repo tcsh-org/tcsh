@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.defns.c,v 3.48 2015/08/13 09:05:21 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.defns.c,v 3.49 2015/08/24 20:08:24 kim Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.defns.c,v 3.48 2015/08/13 09:05:21 christos Exp $")
+RCSID("$tcsh: ed.defns.c,v 3.49 2015/08/24 20:08:24 kim Exp $")
 
 #include "ed.h"
 
@@ -1805,7 +1805,7 @@ CheckMaps(void)
 
     if ((sizeof(CcKeyMap)) != c1)
 	xprintf("CcKeyMap should be %d entries, but is %d.\r\n",
-		NT_NUM_KEYS, sizeof(CcKeyMap) / sizeof(KEYCMD)));
+		NT_NUM_KEYS, (sizeof(CcKeyMap) / sizeof(KEYCMD)));
 
     if ((sizeof(CcAltMap)) != c1)
 	xprintf("CcAltMap should be %d entries, but is %d.\r\n",
