@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.defns.c,v 3.49 2015/08/24 20:08:24 kim Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.defns.c,v 3.50 2016/01/15 15:28:57 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: ed.defns.c,v 3.49 2015/08/24 20:08:24 kim Exp $")
+RCSID("$tcsh: ed.defns.c,v 3.50 2016/01/15 15:28:57 christos Exp $")
 
 #include "ed.h"
 
@@ -1801,27 +1801,27 @@ editinit(void)
 void
 CheckMaps(void)
 {		/* check the size of the key maps */
-    int     c1 = (NT_NUM_KEYS * sizeof(KEYCMD));
+    size_t     c1 = NT_NUM_KEYS * sizeof(KEYCMD);
 
-    if ((sizeof(CcKeyMap)) != c1)
-	xprintf("CcKeyMap should be %d entries, but is %d.\r\n",
-		NT_NUM_KEYS, (sizeof(CcKeyMap) / sizeof(KEYCMD)));
+    if (sizeof(CcKeyMap) != c1)
+	xprintf("CcKeyMap should be %u entries, but is %zu.\r\n",
+		NT_NUM_KEYS, sizeof(CcKeyMap) / sizeof(KEYCMD));
 
-    if ((sizeof(CcAltMap)) != c1)
-	xprintf("CcAltMap should be %d entries, but is %d.\r\n",
-		NT_NUM_KEYS, (sizeof(CcAltMap) / sizeof(KEYCMD)));
+    if (sizeof(CcAltMap) != c1)
+	xprintf("CcAltMap should be %u entries, but is %zu.\r\n",
+		NT_NUM_KEYS, sizeof(CcAltMap) / sizeof(KEYCMD));
 
-    if ((sizeof(CcEmacsMap)) != c1)
-	xprintf("CcEmacsMap should be %d entries, but is %d.\r\n",
-		NT_NUM_KEYS, (sizeof(CcEmacsMap) / sizeof(KEYCMD)));
+    if (sizeof(CcEmacsMap) != c1)
+	xprintf("CcEmacsMap should be %u entries, but is %zu.\r\n",
+		NT_NUM_KEYS, sizeof(CcEmacsMap) / sizeof(KEYCMD));
 
-    if ((sizeof(CcViMap)) != c1)
-	xprintf("CcViMap should be %d entries, but is %d.\r\n",
-		NT_NUM_KEYS, (sizeof(CcViMap) / sizeof(KEYCMD)));
+    if (sizeof(CcViMap) != c1)
+	xprintf("CcViMap should be %u entries, but is %zu.\r\n",
+		NT_NUM_KEYS, sizeof(CcViMap) / sizeof(KEYCMD));
 
-    if ((sizeof(CcViCmdMap)) != c1)
-	xprintf("CcViCmdMap should be %d entries, but is %d.\r\n",
-		NT_NUM_KEYS, (sizeof(CcViCmdMap) / sizeof(KEYCMD)));
+    if (sizeof(CcViCmdMap) != c1)
+	xprintf("CcViCmdMap should be %u entries, but is %zu.\r\n",
+		NT_NUM_KEYS, sizeof(CcViCmdMap) / sizeof(KEYCMD));
 }
 
 #endif
