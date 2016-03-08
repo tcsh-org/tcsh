@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/config_f.h,v 3.49 2014/07/20 09:14:34 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/config_f.h,v 3.50 2015/02/22 16:31:54 christos Exp $ */
 /*
  * config_f.h -- configure various defines for tcsh
  *
@@ -37,6 +37,10 @@
  */
 #ifndef _h_config_f
 #define _h_config_f
+
+#ifdef HAVE_FEATURES_H
+#include <features.h>		/* for __GLIBC__ */
+#endif
 
 /*
  * SHORT_STRINGS Use at least 16 bit characters instead of 8 bit chars
