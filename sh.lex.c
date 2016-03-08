@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.88 2015/12/09 15:06:19 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.89 2015/12/09 17:17:55 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.88 2015/12/09 15:06:19 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.89 2015/12/09 17:17:55 christos Exp $")
 
 #include "ed.h"
 
@@ -386,7 +386,7 @@ loop:
 			     */
 			    c |= QUOTE;
 			ungetC(c);
-			c = '\\';
+			c = '\\' | QUOTE;
 		    }
 		}
 	    }

@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.91 2015/06/06 21:19:07 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.92 2015/12/09 15:06:19 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.91 2015/06/06 21:19:07 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.92 2015/12/09 15:06:19 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -878,7 +878,9 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 	    if (!quoted && (c == ' ' || c == '\t'))
 		break;
 	    cnt++;
-	    Strbuf_append1(word, c | quoted);
+	    if (c == '\\' || quoted)
+		c |= QUOTE;
+	    Strbuf_append1(word, c);
 	}
 	/*
 	 * Unless at end-of-file, we will form a new word here if there were

@@ -1,3 +1,5 @@
+ 10. PR/526: Quote backslashes properly so they can be preserved in ``
+     expansions
   9. Fix memory leak for paraml
   8. Add notempty and ask values for the noclobber setting (Martin Tournoij)
   7. more correct $wordchars for vimode (Luke Mewburn)
