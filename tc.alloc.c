@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.54 2015/05/28 11:47:03 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.55 2015/07/07 12:24:54 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -46,7 +46,7 @@
 #define USE_SBRK
 #endif
 
-RCSID("$tcsh: tc.alloc.c,v 3.54 2015/05/28 11:47:03 christos Exp $")
+RCSID("$tcsh: tc.alloc.c,v 3.55 2015/07/07 12:24:54 christos Exp $")
 
 #define RCHECK
 #define DEBUG
@@ -134,7 +134,11 @@ union overhead {
 #endif
 
 
+#ifdef _LP64
+#define ROUNDUP	15
+#else
 #define ROUNDUP	7
+#endif
 
 /*
  * nextf[i] is the pointer to the next free block of size 2^(i+3).  The
