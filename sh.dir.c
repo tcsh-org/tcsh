@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.dir.c,v 3.83 2014/10/28 16:51:30 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.dir.c,v 3.84 2014/10/28 18:40:46 christos Exp $ */
 /*
  * sh.dir.c: Directory manipulation functions
  */
@@ -33,7 +33,7 @@
 #include "sh.h"
 #include "ed.h"
 
-RCSID("$tcsh: sh.dir.c,v 3.83 2014/10/28 16:51:30 christos Exp $")
+RCSID("$tcsh: sh.dir.c,v 3.84 2014/10/28 18:40:46 christos Exp $")
 
 /*
  * C Shell - directory management
@@ -676,6 +676,7 @@ dfollow(Char *cp, int old)
 		cleanup_until(cp);
 		return dgoto(cp);
 	    }
+	    xfree(dp);
 	}
 	xfree(buf.s);
     }
