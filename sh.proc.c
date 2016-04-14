@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.128 2015/07/31 08:57:13 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.129 2015/08/24 07:08:42 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.128 2015/07/31 08:57:13 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.129 2015/08/24 07:08:42 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -47,11 +47,11 @@ RCSID("$tcsh: sh.proc.c,v 3.128 2015/07/31 08:57:13 christos Exp $")
 # define HZ 16
 #endif /* aiws */
 
-#if defined(_BSD) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(__GLIBC__)
-# if !defined(__ANDROID__)
+#if defined(_BSD) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(__linux__) || defined(__GNU__)
+# if !defined(__ANDROID__) && !defined(__GLIBC__)
 #  define BSDWAIT
 # endif
-#endif /* _BSD || (IRIS4D && __STDC__) || __lucid || glibc */
+#endif /* _BSD || (IRIS4D && __STDC__) || __lucid || gnu-linux */
 #ifndef WTERMSIG
 # define WTERMSIG(w)	(((union wait *) &(w))->w_termsig)
 # ifndef BSDWAIT
