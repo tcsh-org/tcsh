@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.186 2015/08/13 09:05:21 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.c,v 3.187 2015/12/09 15:06:19 christos Exp $ */
 /*
  * sh.c: Main shell routines
  */
@@ -39,7 +39,7 @@ char    copyright[] =
  All rights reserved.\n";
 #endif /* not lint */
 
-RCSID("$tcsh: sh.c,v 3.186 2015/08/13 09:05:21 christos Exp $")
+RCSID("$tcsh: sh.c,v 3.187 2015/12/09 15:06:19 christos Exp $")
 
 #include "tc.h"
 #include "ed.h"
@@ -597,19 +597,22 @@ main(int argc, char **argv)
      */
     shlvl(1);
 
+#ifdef __ANDROID__
+    /* On Android, $HOME either isn't set or set to /data, a R/O location.
+       Check for the environment variable EXTERNAL_STORAGE, which contains
+       the mount point of the external storage (SD card, mostly).  If
+       EXTERNAL_STORAGE isn't set fall back to "/sdcard".  Eventually
+       override $HOME so the environment is on the same page. */
+    if (((tcp = getenv("HOME")) != NULL && strcmp (tcp, "/data") != 0)
+	|| (tcp = getenv("EXTERNAL_STORAGE")) != NULL) {
+	cp = quote(SAVE(tcp));
+    } else
+	cp = quote(SAVE("/sdcard"));
+    tsetenv(STRKHOME, cp);
+#else
     if ((tcp = getenv("HOME")) != NULL)
 	cp = quote(SAVE(tcp));
     else
-#ifdef __ANDROID__
-	/* On Android, $HOME usually isn't set, so we can't load user RC files.
-	   Check for the environment variable EXTERNAL_STORAGE, which contains
-	   the mount point of the external storage (SD card, mostly).  If
-	   EXTERNAL_STORAGE isn't set fall back to "/sdcard". */
-    if ((tcp = getenv("EXTERNAL_STORAGE")) != NULL)
-	cp = quote(SAVE(tcp));
-    else
-	cp = quote(SAVE("/sdcard"));
-#else
 	cp = NULL;
 #endif
 
