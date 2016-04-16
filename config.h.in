@@ -69,6 +69,9 @@
 /* Define to 1 if you have the `mallinfo' function. */
 #undef HAVE_MALLINFO
 
+/* Define to 1 if you have the `mblen' function. */
+#undef HAVE_MBLEN
+
 /* Define to 1 if mbrtowc and mbstate_t are properly declared. */
 #undef HAVE_MBRTOWC
 

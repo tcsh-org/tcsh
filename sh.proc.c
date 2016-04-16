@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.129 2015/08/24 07:08:42 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.130 2016/04/14 11:09:09 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.129 2015/08/24 07:08:42 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.130 2016/04/14 11:09:09 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -191,8 +191,13 @@ loop:
 #   else
     /* both a wait3 and rusage */
 #    if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__) || (defined(IRIS4D) && SYSVREL <= 3) || defined(__lucid) || defined(__osf__)
+#ifdef __ANDROID__ /* no wait3, only wait4 */
+    pid = wait4(-1, &w,
+       (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
+#else
     pid = wait3(&w,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
+#endif /* __ANDROID__ */
 #    else /* BSDWAIT */
     pid = wait3(&w.w_status,
        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);

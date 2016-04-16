@@ -59,6 +59,11 @@ static char sccsid[] = "@(#)glob.c	5.12 (Berkeley) 6/24/91";
 #include "sh.h"
 #include "glob.h"
 
+#ifndef HAVE_MBLEN
+#undef mblen
+#define mblen(_s,_n)	mbrlen((_s),(_n),NULL)
+#endif
+
 #undef Char
 #undef QUOTE
 #undef TILDE
