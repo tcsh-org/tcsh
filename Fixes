@@ -1,3 +1,4 @@
+ 11. Android updates from Corinna Vinschen
  10. PR/526: Quote backslashes properly so they can be preserved in ``
      expansions
   9. Fix memory leak for paraml
