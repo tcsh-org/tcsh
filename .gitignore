@@ -11,3 +11,5 @@ sh.err.h
 tc.const.h
 tc.defs.c
 tcsh
+tests/package.m4
+tests/testsuite
