@@ -1,3 +1,4 @@
+ 12. PR/526: Fix double \\ printing from previous fix in history expansion.
  11. Android updates from Corinna Vinschen
  10. PR/526: Quote backslashes properly so they can be preserved in ``
      expansions
