@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.92 2015/12/09 15:06:19 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.93 2016/03/08 15:45:26 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.92 2015/12/09 15:06:19 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.93 2016/03/08 15:45:26 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -708,7 +708,12 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 
     hadnl = 0;
     icnt = 0;
-    quoted = (literal || (cp[0] & QUOTE)) ? QUOTE : 0;
+    if (!literal) {
+	for (ip = cp; (*ip & QUOTE) != 0; ip++)
+		continue;
+	quoted = *ip == '\0';
+    } else
+	quoted = literal;
     faket.t_dtyp = NODE_COMMAND;
     faket.t_dflg = F_BACKQ;
     faket.t_dlef = 0;
