@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.131 2016/04/16 15:44:18 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.proc.c,v 3.132 2016/05/24 15:11:30 christos Exp $ */
 /*
  * sh.proc.c: Job manipulations
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.proc.c,v 3.131 2016/04/16 15:44:18 christos Exp $")
+RCSID("$tcsh: sh.proc.c,v 3.132 2016/05/24 15:11:30 christos Exp $")
 
 #include "ed.h"
 #include "tc.h"
@@ -1010,7 +1010,8 @@ pprint(struct process *pp, int flag)
     status = reason = -1;
     jobflags = 0;
     ohaderr = haderr;
-    haderr = 1;	/* Print status to stderr */
+    /* Print status to stderr, except for jobs built-in */
+    haderr = !(flag & JOBLIST);
     do {
 #ifdef BACKPIPE
 	/*
@@ -1318,7 +1319,7 @@ void
 dojobs(Char **v, struct command *c)
 {
     struct process *pp;
-    int flag = NUMBER | NAME | REASON;
+    int flag = NUMBER | NAME | REASON | JOBLIST;
     int     i;
 
     USE(c);
