@@ -605,3 +605,24 @@ AT_CHECK([tcsh -f uniformity_test.csh], 0,[OK])
 AT_CHECK([tcsh -f quoting_result_test.csh], 0, [OK])
 
 AT_CLEANUP
+
+AT_SETUP([\echo for git_tcsh_completion])
+
+AT_DATA([escape_echo.csh],
+[[
+set myvar = `\echo "1 2 3"`
+echo ${myvar}
+echo ${myvar[1]}
+echo ${myvar[2]}
+echo ${myvar[3]}
+exit 0
+]])
+
+AT_CHECK([tcsh -f escape_echo.csh], 0,
+[1 2 3
+1
+2
+3
+])
+
+AT_CLEANUP
