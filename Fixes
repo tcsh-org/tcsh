@@ -1,3 +1,4 @@
+ 14. Fix drawing issu with multi-line prompt (Kensuke Iwahashi/David Kaspar)
  13. always send prusage to stdout.
  12. PR/526: Fix double \\ printing from previous fix in history expansion.
  11. Android updates from Corinna Vinschen
