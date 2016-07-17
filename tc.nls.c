@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.nls.c,v 3.25 2015/05/04 15:31:13 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tc.nls.c,v 3.26 2015/06/06 21:19:08 christos Exp $ */
 /*
  * tc.nls.c: NLS handling
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tc.nls.c,v 3.25 2015/05/04 15:31:13 christos Exp $")
+RCSID("$tcsh: tc.nls.c,v 3.26 2015/06/06 21:19:08 christos Exp $")
 
 
 #ifdef WIDE_STRINGS
@@ -143,6 +143,13 @@ NLSClassify(Char c, int nocomb, int drawPrompt)
 	if (c >= 0x10000)		/*    U+10000 = F0 90 80 80 */
 	    return NLSCLASS_ILLEGAL2;
     }
+    if (Iscntrl(c) && (c & CHAR) < 0x100) {
+	if (c == '\n')
+	    return NLSCLASS_NL;
+	if (c == '\t')
+	    return NLSCLASS_TAB;
+	return NLSCLASS_CTRL;
+    }
     w = NLSWidth(c);
     if (drawPrompt) {			/* draw prompt */
 	if (w > 0)
@@ -152,12 +159,5 @@ NLSClassify(Char c, int nocomb, int drawPrompt)
     }
     if ((w > 0 && !(Iscntrl(c) && (c & CHAR) < 0x100)) || (Isprint(c) && !nocomb))
 	return w;
-    if (Iscntrl(c) && (c & CHAR) < 0x100) {
-	if (c == '\n')
-	    return NLSCLASS_NL;
-	if (c == '\t')
-	    return NLSCLASS_TAB;
-	return NLSCLASS_CTRL;
-    }
     return NLSCLASS_ILLEGAL;
 }
