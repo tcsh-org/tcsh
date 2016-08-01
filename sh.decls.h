@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.66 2015/09/08 15:49:53 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.decls.h,v 3.67 2015/12/09 15:06:19 christos Exp $ */
 /*
  * sh.decls.h	 External declarations from sh*.c
  */
@@ -247,6 +247,7 @@ extern	void		  prlex		(struct wordent *);
 extern	eChar		  readc		(int);
 extern	void		  settell	(void);
 extern	void		  unreadc	(Char);
+extern	ssize_t		  wide_read	(int, Char *, size_t, int);
 
 
 /*

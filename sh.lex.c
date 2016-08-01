@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.89 2015/12/09 17:17:55 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.90 2016/03/08 15:45:26 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.lex.c,v 3.89 2015/12/09 17:17:55 christos Exp $")
+RCSID("$tcsh: sh.lex.c,v 3.90 2016/03/08 15:45:26 christos Exp $")
 
 #include "ed.h"
 
@@ -66,7 +66,6 @@ static	int	 	 getsel		(int *, int *, int);
 static	struct wordent	*getsub		(struct wordent *);
 static	Char 		*subword	(Char *, Char, int *, size_t *);
 static	struct wordent	*dosub		(Char, struct wordent *, int);
-static	ssize_t		 wide_read	(int, Char *, size_t, int);
 
 /*
  * Peekc is a peek character for getC, peekread for readc.
@@ -1547,7 +1546,7 @@ balloc(int buf)
     }
 }
 
-static ssize_t
+ssize_t
 wide_read(int fildes, Char *buf, size_t nchars, int use_fclens)
 {
     char cbuf[BUFSIZE + 1];

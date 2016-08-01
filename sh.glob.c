@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.93 2016/03/08 15:45:26 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/sh.glob.c,v 3.94 2016/05/24 19:29:19 christos Exp $ */
 /*
  * sh.glob.c: Regular expression expansion
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: sh.glob.c,v 3.93 2016/03/08 15:45:26 christos Exp $")
+RCSID("$tcsh: sh.glob.c,v 3.94 2016/05/24 19:29:19 christos Exp $")
 
 #include "tc.h"
 #include "tw.h"
@@ -704,7 +704,6 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
     int    hadnl;
     int     pvec[2], quoted;
     Char   *fakecom[2], ibuf[BUFSIZE];
-    char    tibuf[BUFSIZE];
 
     hadnl = 0;
     icnt = 0;
@@ -822,45 +821,13 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
     ip = NULL;
     do {
 	ssize_t     cnt = 0;
-	char   *tmp;
 
-	tmp = tibuf;
 	for (;;) {
-	    while (icnt == 0) {
-		int     i, eof;
-
+	    if (icnt == 0) {
 		ip = ibuf;
-		icnt = xread(pvec[0], tmp, tibuf + BUFSIZE - tmp);
-		eof = 0;
-		if (icnt <= 0) {
-		    if (tmp == tibuf)
-			goto eof;
-		    icnt = 0;
-		    eof = 1;
-		}
-		icnt += tmp - tibuf;
-		i = 0;
-		tmp = tibuf;
-		while (tmp < tibuf + icnt) {
-		    int len;
-
-		    len = normal_mbtowc(&ip[i], tmp, tibuf + icnt - tmp);
-		    if (len == -1) {
-		        reset_mbtowc();
-		        if (!eof && (size_t)(tibuf + icnt - tmp) < MB_CUR_MAX) {
-			    break; /* Maybe a partial character */
-			}
-			ip[i] = (unsigned char) *tmp | INVALID_BYTE; /* Error */
-		    }
-		    if (len <= 0)
-		        len = 1;
-		    i++;
-		    tmp += len;
-		}
-		if (tmp != tibuf)
-		    memmove (tibuf, tmp, tibuf + icnt - tmp);
-		tmp = tibuf + (tibuf + icnt - tmp);
-		icnt = i;
+		icnt = wide_read(pvec[0], ibuf, BUFSIZE, 0);
+		if (icnt <= 0)
+		    goto eof;
 	    }
 	    if (hadnl)
 		break;
