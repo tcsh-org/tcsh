@@ -206,7 +206,7 @@ A login shell begins by executing commands from the system files
 It then executes commands from files in the user's \fBhome\fR directory:
 first \fI~/.tcshrc\fR (+)
 or, if \fI~/.tcshrc\fR is not found, \fI~/.cshrc\fR,
-then \fI~/.history\fR (or the value of the \fBhistfile\fR shell variable),
+then the contents of \fI~/.history\fR (or the value of the \fBhistfile\fR shell variable) are loaded into memory,
 then \fI~/.login\fR,
 and finally \fI~/.cshdirs\fR (or the value of the \fBdirsfile\fR shell variable) (+).
 The shell may read \fI/etc/csh.login\fR before instead of after
