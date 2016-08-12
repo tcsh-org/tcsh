@@ -1,4 +1,4 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.20 2012/12/21 20:29:00 christos Exp $*/
+/*$Header: /p/tcsh/cvsroot/tcsh/win32/ntfunc.c,v 1.21 2014/08/13 23:39:34 amold Exp $*/
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -778,7 +778,7 @@ int nt_try_fast_exec(struct command *t) {
 	register struct varent *v;
 	register int hashval,i;
 	register int slash;
-	int rc = 0, gflag;
+	int rc = 1, gflag;
 	Char *vp;
 	Char   *blk[2];
 
