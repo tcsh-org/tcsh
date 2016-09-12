@@ -900,12 +900,18 @@ printenv SHLVL
 setenv SHLVL 2
 echo $shlvl
 tcsh -f -c 'echo $shlvl'
+tcsh -f -c 'tcsh -f -c "printenv SHLVL"'
+tcsh -f -c 'exec tcsh -f -c "printenv SHLVL"'
+tcsh -f -c '(exec tcsh -f -c "printenv SHLVL")'
 ]])
 AT_CHECK([SHLVL=5 tcsh -f shlvl.csh], ,
 [6
 8
 2
 3
+4
+3
+4
 ])
 
 AT_CLEANUP

@@ -1,4 +1,5 @@
- 15: PR/403: Fix backquote expansion for multi-byte character sets.
+ 16. PR/572: Fix $SHLVL issue when exec'ing subshells.
+ 15. PR/403: Fix backquote expansion for multi-byte character sets.
  14. Fix drawing issu with multi-line prompt (Kensuke Iwahashi/David Kaspar)
  13. always send prusage to stdout.
  12. PR/526: Fix double \\ printing from previous fix in history expansion.
