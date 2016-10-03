@@ -2748,18 +2748,15 @@ file to it on standard input.
 The standard input and standard output of a command may be redirected with the
 following syntax:
 .Pp
-XXXXXXXXXXXXXXXXXXX
-.PD 0
-.TP 8
-< \fIname
+.Bl -tag -width XXXXXX -offset indent -compact
+.It Ar < name
 Open file
 .Va name
 (which is first variable, command and filename
 expanded) as the standard input.
-.TP 8
-<< \fIword
+.It Ar << word
 Read the shell input up to a line which is identical to
-.Va word
+.Va word .
 .Va word
 is not subjected to variable, filename or command substitution, and each input
 line is compared to
@@ -2767,13 +2764,12 @@ line is compared to
 before any substitutions are done on this input
 line.
 Unless a quoting
-.Sq \e
+.Sq \e ,
+.Sq \&"
 ,
-.Sq "
-,
-.Sq
+.Sq \&'
 or
-.Sq \`
+.Sq \&`
 appears in
 .Va word
 variable and
@@ -2781,39 +2777,33 @@ command substitution is performed on the intervening lines, allowing
 .Sq \e
 to
 quote
-.Sq $
-,
+.Sq $ ,
 .Sq \e
 and
-.Sq \`
+.Sq \&` .
 Commands which are substituted have all blanks, tabs,
 and newlines preserved, except for the final newline which is dropped.
 The
 resultant text is placed in an anonymous temporary file which is given to the
 command as standard input.
 .Pp
-> \fIname
-.br
->! \fIname
-.br
->& \fIname
-.TP 8
->&! \fIname
+.It Ar > name
+.It Ar >! name
+.It Ar >& name
+.It Ar >&! name
 The file
 .Va name
 is used as standard output.
 If the file does not exist
 then it is created; if the file exists, it is truncated, its previous contents
 being lost.
-.RS +8
-.PD
 .Pp
 If the shell variable
 .Va noclobber
 is set, then the file must not exist or be a
 character special file (e.g., a terminal or
-.Sq /dev/null
-) or an error results.
+.Sq /dev/null )
+or an error results.
 This helps prevent accidental destruction of files.
 In this case the
 .Sq \&!
@@ -2831,7 +2821,7 @@ is set, an interacive confirmation is presented, rather than an
 error.
 .Pp
 The forms involving
-.Sq &
+.Sq \&&
 route the diagnostic output into the specified file as
 well as the standard output.
 .Va name
@@ -2839,13 +2829,10 @@ is expanded in the same way as
 .Sq <
 input filenames are.
 .Pp
-.Bd -literal -offset indent
->> name
->>& name
->>! name
-.Ed
-.TP 8
->>&! \fIname
+.It Ar >> name
+.It Ar >>& name
+.It Ar >>! name
+.It Ar >>&! name
 Like
 .Sq >
 , but appends output to the end of
@@ -2858,7 +2845,7 @@ the file
 to exist, unless one of the
 .Sq \&!
 forms is given.
-.PD
+.El
 .Pp
 A command receives the environment in which the shell was invoked as modified
 by the input-output parameters and the presence of the command in a pipeline.
@@ -2875,27 +2862,21 @@ Note
 that the default standard input for a command run detached is
 .Va not
 the empty file
-.Va /dev/null
-, but the original standard input of the shell.
+.Va /dev/null ,
+but the original standard input of the shell.
 If this is a terminal and if the process attempts to read from the terminal,
 then the process will block and the user will be notified (see
-.Va Jobs
-).
+.Sx Jobs ) .
 .Pp
 Diagnostic output may be directed through a pipe with the standard output.
 Simply use the form
 .Sq |&
 rather than just
-.Sq |
+.Sq | .
 .Pp
 The shell cannot presently redirect diagnostic output without also redirecting
 standard output, but
-.Sq \&(
-.Va command
->
-.Va output-file
-) >&
-.Va error-file
+.Sq \&( command > output-file ) >&  error-file
 is often an acceptable workaround.
 Either
 .Va output-file
@@ -2916,10 +2897,9 @@ shell to reread or skip in its input and, due to the implementation,
 restrict the placement of some of the commands.
 .Pp
 The
-.Va foreach
-,
-.Va switch
-, and
+.Va foreach ,
+.Va switch ,
+and
 .Va while
 statements, as well as the
 .Va if-then-else
@@ -2931,14 +2911,12 @@ keywords appear in a single simple command on an input line as shown below.
 If the shell's input is not seekable, the shell buffers up input whenever
 a loop is being read and performs seeks in this internal buffer to
 accomplish the rereading implied by the loop.
-(To the extent that this
-allows, backward
+(To the extent that this allows, backward
 .Va goto
 s will succeed on non-seekable inputs.)
 .Ss "Expressions"
 The
-.Va if
-,
+.Va if ,
 .Va while
 and
 .Va exit
@@ -2953,31 +2931,27 @@ builtin command (q.v.) has its own separate syntax.
 These operators are similar to those of C and have the same precedence.
 They include
 .IP "" 4
-||  &&  |   &  ==  !=  =~  !~  <=  >=
-.br
-<  > <<  >>  +  \-  *  /  %  !  ~  (  )
+.Bl -width XXXXXX -offset indent -compact
+.It ||  &&  |   &  ==  !=  =~  !~  <=  >=
+.It <  > <<  >>  +  \-  *  /  %  !  ~  (  )
+.El
 .Pp
 Here the precedence increases to the right,
 .Sq ==
-.Sq !=
+.Sq \&!=
 .Sq =~
 and
-.Sq !~
-,
+.Sq \&!~ ,
 .Sq <=
-`>='
+.Sq >=
 .Sq <
 and
-.Sq >
-,
+.Sq > ,
 .Sq <<
-and
-.Sq >>
-,
+.Sq >> ,
 .Sq +
 and
-.Sq \-
-,
+.Sq \&- ,
 .Sq *
 .Sq /
 and
@@ -2986,24 +2960,24 @@ being, in
 groups, at the same level.
 The
 .Sq ==
-.Sq !=
+.Sq \&!=
 .Sq =~
 and
-.Sq !~
+.Sq \&!~
 operators compare
 their arguments as strings; all others operate on numbers.
 The operators
-`=~' and
-.Sq !~
+.Sq =~
+and
+.Sq \&!~
 are like
-.Sq !=
+.Sq \&!=
 and
 .Sq ==
 except that the right hand side is a
 glob-pattern (see
-.Va Filename substitution
-) against which the left hand
-operand is matched.
+.Sx "Filename substitution" )
+against which the left hand operand is matched.
 This reduces the need for use of the
 .Va switch
 builtin command in shell scripts when all that is really needed is
@@ -3017,25 +2991,27 @@ strings, which represent decimal numbers.
 It is important to note that
 no two components of an expression can appear in the same word; except
 when adjacent to components of expressions which are syntactically
-significant to the parser (`&'
+significant to the parser
+.Sq ( \&&
 .Sq |
 .Sq <
 .Sq >
 .Sq \&(
-.Sq \&)
-) they should be
+.Sq \&) )
+they should be
 surrounded by spaces.
 .Ss "Command exit status"
 Commands can be executed in expressions and their exit status
-returned by enclosing them in braces (`{}').
+returned by enclosing them in braces 
+.Sq ( {} ) .
 Remember that the braces should
 be separated from the words of the command by spaces.
 Command executions
 succeed, returning true, i.e.,
-.Sq 1
-, if the command exits with status 0,
+.Sq 1 ,
+if the command exits with status 0,
 otherwise they fail, returning false, i.e.,
-.Sq 0
+.Sq 0 .
 If more detailed status
 information is required then the command should be executed outside of an
 expression and the
@@ -3050,84 +3026,59 @@ They are of the form
 , where
 .Va op
 is one of
-.Pp
-.PD 0
-.RS +4
-.TP 4
-.B r
+.Bl -width XXX -offset indent -compact
+.It Ar r
 Read access
-.TP 4
-.B w
+.It Ar w
 Write access
-.TP 4
-.B x
+.It Ar x
 Execute access
-.TP 4
-.B X
+.It Ar X
 Executable in the path or shell builtin, e.g.,
-.Sq \-X ls
+.Sq \&-X ls
 and
-.Sq \-X ls\-F
+.Sq \&-X ls\&-F
 are
 generally true, but
-.Sq \-X /bin/ls
+.Sq \&-X /bin/ls
 is not (+)
-.TP 4
-.B e
+.It Ar e
 Existence
-.TP 4
-.B o
+.It Ar o
 Ownership
-.TP 4
-.B z
+.It Ar z
 Zero size
-.TP 4
-.B s
+.It Ar s
 Non-zero size (+)
-.TP 4
-.B f
+.It Ar f
 Plain file
-.TP 4
-.B d
+.It Ar d
 Directory
-.TP 4
-.B l
+.It Ar l
 Symbolic link (+) *
-.TP 4
-.B b
+.It Ar b
 Block special file (+)
-.TP 4
-.B c
+.It Ar c
 Character special file (+)
-.TP 4
-.B p
+.It Ar p
 Named pipe (fifo) (+) *
-.TP 4
-.B S
+.It Ar S
 Socket special file (+) *
-.TP 4
-.B u
+.It Ar u
 Set-user-ID bit is set (+)
-.TP 4
-.B g
+.It Ar g
 Set-group-ID bit is set (+)
-.TP 4
-.B k
+.It Ar k
 Sticky bit is set (+)
-.TP 4
-.B t
-.Va file
+.It Ar t file
 (which must be a digit) is an open file descriptor
 for a terminal device (+)
-.TP 4
-.B R
+.It Ar R
 Has been migrated (Convex only) (+)
-.TP 4
-.B L
+.It Ar L
 Applies subsequent operators in a multiple-operator test to a symbolic link
 rather than to the file to which the link points (+) *
-.RE
-.PD
+.El
 .Pp
 .Va file
 is command and filename expanded and then tested to
@@ -3135,36 +3086,31 @@ see if it has the specified relationship to the real user.
 If
 .Va file
 does not exist or is inaccessible or, for the operators indicated by
-.Sq *
-,
+.Sq * ,
 if the specified file type does not exist on the current system,
 then all inquiries return false, i.e.,
-.Sq 0
+.Sq 0 .
 .Pp
 These operators may be combined for conciseness:
-.Sq \-
+.Sq \&-
 .Va xy file
 is
 equivalent to
-.Sq \-
-.Va x file
-&& \-
-.Va y file
+.Sq \&-x file && \&-y file .
 (+) For example,
-.Sq \-fx
+.Sq \&-fx
 is true
 (returns
-.Sq 1
-) for plain executable files, but not for directories.
+.Sq 1 )
+for plain executable files, but not for directories.
 .Pp
 .Va L
 may be used in a multiple-operator test to apply subsequent operators
 to a symbolic link rather than to the file to which the link points.
 For example,
-.Sq \-lLo
+.Sq \&-lLo
 is true for links owned by the invoking user.
-.Va Lr
-,
+.Va Lr ,
 .Va Lw
 and
 .Va Lx
@@ -3181,8 +3127,7 @@ to be a file with operators which do not
 (e.g.,
 .Va X
 and
-.Va t
-).
+.Va t ) .
 Following
 .Va L
 with a non-file operator
