@@ -86,13 +86,13 @@ UNIX C shell,
 It is a command language interpreter usable both as an interactive login
 shell and a shell script command processor.
 It includes a command-line editor (see
-.Sx "The command-line editor" )
+.Sx The command-line editor )
 programmable word completion (see
-.Sx "Completion and listing" )
+.Sx Completion and listing )
 spelling correction (see
-.Sx "Spelling correction" ) ,
+.Sx Spelling correction ) ,
 a history mechanism (see
-.Sx "History substitution" ) ,
+.Sx History substitution ) ,
 job control (see
 .Sx Jobs )
 and a C-like syntax.
@@ -391,18 +391,18 @@ variants; see
 .Sx FILES .
 .Ss Editing
 We first describe
-.Sx "The command-line editor" .
+.Sx The command-line editor" 
 The
-.Sx "Completion and listing"
+.Sx Completion and listing
 and
-.Sx "Spelling correction"
+.Sx Spelling correction
 sections describe two sets of functionality that are implemented as editor
 commands but which deserve their own treatment.
 Finally,
-.Sx "Editor commands"
+.Sx Editor commands
 lists and describes
 the editor commands specific to the shell and their default bindings.
-.It Sx "The command-line editor (+)"
+.It Sx The command-line editor (+)
 Command-line input can be edited using key sequences much like those used in
 .Xr emacs 1
 or
@@ -473,7 +473,7 @@ the shell variable
 .Va wordchars ,
 while the shell recognizes only whitespace
 and some of the characters with special meanings to it, listed under
-.Sx "Lexical structure" .
+.Sx Lexical structure .
 .Ss Completion and listing (+)
 The shell is often able to complete words when given a unique abbreviation.
 Type part of a word (for example
@@ -539,7 +539,7 @@ if no other variable began with
 The shell parses the input buffer to determine whether the word you want to
 complete should be completed as a filename, command or variable.
 The first word in the buffer and the first word following
-.Sq ; ,
+.Sq \&; ,
 .Sq | ,
 .Sq |& ,
 .Sq &&
@@ -557,7 +557,8 @@ as a filename.
 You can list the possible completions of a word at any time by typing
 .Sq ^D
 to run the
-.Ic delete-char-or-list-or-eof editor command.
+.Ic delete-char-or-list-or-eof
+editor command.
 The shell lists the possible completions using the
 .Ic ls\-F
 builtin (q.v.)
@@ -582,7 +583,7 @@ libtermcap.a@ libtermlib.a@
 If
 .Va autolist
 shell variable is set to
-.Dv ambiguous ,
+.Sq ambiguous ,
 choices are listed only when
 completion fails and adds no new characters to the word being completed.
 .Pp
@@ -590,11 +591,11 @@ A filename to be completed can contain variables, your own or others' home
 directories abbreviated with
 .Sq ~
 (see
-.Sx "Filename substitution" )
+.Sx Filename substitution )
 and directory stack entries abbreviated with
 .Sq =
 (see
-.Sx 'Directory stack substitution" ).
+.Sx Directory stack substitution ) .
 For example,
 .Bd -literal -offset indent
 > ls ~k[^D]
@@ -675,7 +676,7 @@ was needed in front of
 to prevent it from being expanded to
 .Va home
 as described under
-.Sx "Filename substitution" .
+.Sx Filename substitution .
 .Va fignore
 is ignored if only one completion is possible.
 .Pp
@@ -726,7 +727,7 @@ hyphens or underscores.
 If the
 .Va complete
 shell variable is set to
-.Dv enhance ,
+.Sq enhance ,
 completion
 ignores case and differences between a hyphen and an underscore word
 separator only when the user types a lowercase character or a hyphen.
@@ -787,7 +788,7 @@ before each completion attempt,
 .Va autocorrect
 can be set to
 spelling-correct the word to be completed (see
-.Sx 'Spelling correction" )
+.Sx Spelling correction )
 before each completion attempt and
 .Va correct
 can be set to complete commands automatically after one hits
@@ -817,7 +818,7 @@ Finally, the
 builtin command can be used to tell the shell how
 to complete words other than filenames, commands and variables.
 Completion and listing do not work on glob-patterns (see
-.Sx "Filename substitution" ) ,
+.Sx Filename substitution ) ,
 but the
 .Ic list-glob
 and
@@ -925,7 +926,7 @@ Word boundary behavior modified by
 .Va vimode
 .It Ic complete-word Ar (tab)
 Completes a word as described under
-.Sx "Completion and listing"
+.Sx Completion and listing
 .It Ic complete-word-back Ar (not bound)
 Like
 .Ic complete-word-fwd ,
@@ -1020,7 +1021,7 @@ Cursor behavior modified by
 .It Ic expand-history Ar (M-space)
 Expands history substitutions in the current word.
 See
-.Sx "History substitution"
+.Sx History substitution
 See also
 .Ic magic-space ,
 .Ic toggle-literal-history
@@ -1030,7 +1031,7 @@ shell variable.
 .It Ic expand-glob Ar (^X-*)
 Expands the glob-pattern to the left of the cursor.
 See
-.Sx "Filename substitution"
+.Sx Filename substitution
 .It Ic expand-line Ar (not bound)
 Like
 .Ic expand-history ,
@@ -1038,7 +1039,7 @@ but expands history substitutions in each word in the input buffer.
 .It Ic expand-variables Ar (^X-$)
 Expands the variable to the left of the cursor.
 See
-.Sx "Variable substitution"
+.Sx Variable substitution
 .It Ic forward-char Ar (^F, right)
 Move forward one character.
 Cursor behavior modified by
@@ -1052,7 +1053,7 @@ Searches backwards through the history list for a command beginning with
 the current contents of the input buffer up to the cursor and copies it
 into the input buffer.
 The search string may be a glob-pattern (see
-.Sx "Filename substitution" )
+.Sx Filename substitution )
 containing
 .Sq * ,
 .Sq \&?  ,
@@ -1131,7 +1132,7 @@ See also
 .Ic copy-prev-word
 .It Ic list-choices Ar (M-^D)
 Lists completion possibilities as described under
-.Sx "Completion and listing"
+.Sx Completion and listing
 See also
 .Ic delete-char-or-list-or-eof
 and
@@ -1145,7 +1146,7 @@ Lists (via the
 .Ic ls\-F
 builtin) matches to the glob-pattern
 (see
-.Sx "Filename substitution" )
+.Sx Filename substitution )
 to the left of the cursor.
 .It Ic list-or-eof Ar (not bound)
 Does
@@ -1280,10 +1281,10 @@ or
 .Sq \&? ,
 to avoid problems with switches, substitutions and the like.
 See
-.Sx "Spelling correction"
+.Sx Spelling correction
 .It Ic spell-word Ar (M-s, M-S)
 Attempts to correct the spelling of the current word as described under
-.Sx "Spelling correction'
+.Sx Spelling correction
 Checks each component of a word which appears to be a pathname.
 .It Ic toggle-literal-history Ar (M-r, M-R)
 Expands or
@@ -1399,7 +1400,7 @@ newline.
 Furthermore, all
 .Sx Substitutions
 (see below) except
-.Sx "History substitution"
+.Sx History substitution
 can be prevented by enclosing the strings (or parts of strings)
 in which they appear with single quotes or by quoting the crucial character(s)
 (e.g.,
@@ -1407,13 +1408,13 @@ in which they appear with single quotes or by quoting the crucial character(s)
 or
 .Sq \&`
 for
-.Sx "Variable substitution"
+.Sx Variable substitution
 or
-.Sx "Command substitution"
+.Sx Command substitution
 respectively)
 with
 .Sq \e
-.Sx ( "Alias substitution"
+.Sx ( Alias substitution
 is no exception: quoting in any way any
 character of a word for which an
 .Va alias
@@ -1421,14 +1422,14 @@ has been defined prevents
 substitution of the alias.
 The usual way of quoting an alias is to precede it
 with a backslash.)
-.Sx "History substitution"
+.Sx History substitution
 is prevented by
 backslashes but not by single quotes.
 Strings quoted with double or backward
 quotes undergo
-.Sx "Variable substitution"
+.Sx Variable substitution
 and
-.Sx "Command substitution" ,
+.Sx Command substitution ,
 but other substitutions are prevented.
 .Pp
 Text inside single or double quotes becomes a single word (or part of one).
@@ -2020,7 +2021,7 @@ cause an error.
 .Pp
 Some aliases are referred to by the shell; see
 .Va Special aliases
-.Sx "Variable substitution"
+.Sx Variable substitution
 The shell maintains a list of variables, each of which has as value a list of
 zero or more words.
 The values of shell variables can be displayed and changed with the
@@ -2098,7 +2099,7 @@ occurs.
 Strings quoted by
 .Sq \`
 are interpreted later (see
-.Sx "Command substitution"
+.Sx Command substitution
 below) so
 .Sq $
 substitution does not occur there until later,
@@ -2202,7 +2203,7 @@ which is equivalent to
 The
 .Sq \&:
 modifiers described under
-.Sx "History substitution" ,
+.Sx History substitution ,
 except for
 .Sq \&:p ,
 can be applied to the substitutions above.
@@ -2210,7 +2211,7 @@ More than one may be used.
 (+)
 Braces may be needed to insulate a variable substitution from a literal colon
 just as with
-.Sx "History substitution"
+.Sx History substitution
 (q.v.); any modifiers must appear
 within the braces.
 .Pp
@@ -2931,7 +2932,7 @@ builtin command (q.v.) has its own separate syntax.
 These operators are similar to those of C and have the same precedence.
 They include
 .IP "" 4
-.Bl -width XXXXXX -offset indent -compact
+.Bl -tag -width XXXXXX -offset indent -compact
 .It ||  &&  |   &  ==  !=  =~  !~  <=  >=
 .It <  > <<  >>  +  \-  *  /  %  !  ~  (  )
 .El
@@ -2976,7 +2977,7 @@ and
 .Sq ==
 except that the right hand side is a
 glob-pattern (see
-.Sx "Filename substitution" )
+.Sx Filename substitution )
 against which the left hand operand is matched.
 This reduces the need for use of the
 .Va switch
@@ -3026,7 +3027,7 @@ They are of the form
 , where
 .Va op
 is one of
-.Bl -width XXX -offset indent -compact
+.Bl -tag -width XXX -offset indent -compact
 .It Ar r
 Read access
 .It Ar w
@@ -9341,7 +9342,7 @@ and
 .Pp
 Programmable, interactive word completion and listing.
 See
-.Sx "Completion and listing"
+.Sx Completion and listing
 and the
 .Va complete
 and
