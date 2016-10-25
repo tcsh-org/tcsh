@@ -64,9 +64,9 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\"
-.Dd October 16, 2015
+.Dd October 25, 2016
 .Dt TCSH 1
-.Os Astron 6.19.00
+.Os Astron 6.19.01
 .Sh NAME
 .Nm tcsh
 .Nd C shell with file name completion and command line editing
@@ -9650,7 +9650,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .Sh VERSION
-This manual documents tcsh 6.19.00 (Astron) 2015-05-21.
+This manual documents tcsh 6.19.01 (Astron) 2015-10-25.
 .Sh AUTHORS
 .PD 0
 .TP 2
