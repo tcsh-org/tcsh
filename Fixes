@@ -1,6 +1,7 @@
- 18: V6.20.00 - 20161124
- 18: V6.19.01 - 20161025
- 17: restore file description when cleaning up after eval:
+ 20. V6.20.00 - 20161124
+ 19. Don't resize the screen if it did not change size.
+ 18. V6.19.01 - 20161025
+ 17. restore file description when cleaning up after eval:
 	repeat 99 time
  16. PR/572: Fix $SHLVL issue when exec'ing subshells.
  15. PR/403: Fix backquote expansion for multi-byte character sets.
