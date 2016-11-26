@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 3.58 2015/07/06 21:52:45 christos Exp $
+# $tcsh: Makefile.in,v 3.59 2015/08/24 20:09:04 kim Exp $
 #	Makefile.in	4.3	6/11/83
 #
 # C Shell with process control; VM/UNIX VAX Makefile
@@ -449,7 +449,7 @@ pure:$(P) ${OBJS}
 
 gethost:  gethost.c sh.err.h tc.const.h sh.h
 	rm -f gethost
-	${CC_FOR_GETHOST} -o gethost ${CPPFLAGS} $(srcdir)/gethost.c
+	${CC_FOR_GETHOST} -o gethost ${CPPFLAGS} ${CFLAGS} ${LDFLAGS} $(srcdir)/gethost.c
 
 tc.defs.c:	gethost host.defs
 	@rm -f $@.tmp
