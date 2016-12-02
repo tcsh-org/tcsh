@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.102 2015/08/13 09:06:33 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.103 2015/08/19 14:29:55 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -72,7 +72,7 @@
 
 #include "sh.h"
 
-RCSID("$tcsh: ed.chared.c,v 3.102 2015/08/13 09:06:33 christos Exp $")
+RCSID("$tcsh: ed.chared.c,v 3.103 2015/08/19 14:29:55 christos Exp $")
 
 #include "ed.h"
 #include "tw.h"
@@ -750,7 +750,7 @@ c_substitute(void)
     /*
      * If we found a history character, go expand it.
      */
-    if (HIST != '\0' && *p == HIST)
+    if (p >= InputBuf && HIST != '\0' && *p == HIST)
 	nr_exp = c_excl(p);
     else
         nr_exp = 0;
