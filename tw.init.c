@@ -1,4 +1,4 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.init.c,v 3.41 2011/01/09 16:25:29 christos Exp $ */
+/* $Header: /p/tcsh/cvsroot/tcsh/tw.init.c,v 3.42 2011/04/17 14:49:30 christos Exp $ */
 /*
  * tw.init.c: Handle lists of things to complete
  */
@@ -32,7 +32,7 @@
  */
 #include "sh.h"
 
-RCSID("$tcsh: tw.init.c,v 3.41 2011/01/09 16:25:29 christos Exp $")
+RCSID("$tcsh: tw.init.c,v 3.42 2011/04/17 14:49:30 christos Exp $")
 
 #include "tw.h"
 #include "ed.h"
@@ -125,9 +125,8 @@ tw_str_add(stringlist_t *sl, size_t len)
 	sl->buff = xrealloc(sl->buff, sl->tbuff * sizeof(Char));
 	/* Re-thread the new pointer list, if changed */
 	if (ptr != NULL && ptr != sl->buff) {
-	    intptr_t offs = sl->buff - ptr;
 	    for (i = 0; i < sl->nlist; i++)
-		sl->list[i] += offs;
+		sl->list[i] = sl->buff + (sl->list[i] - ptr);
 	}
 	disabled_cleanup(&pintr_disabled);
     }
