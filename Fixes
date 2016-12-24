@@ -1,3 +1,4 @@
+  4. Don't play pointer tricks that are undefined in modern c (Brooks Davis)
   3. Fix out of bounds read (Brooks Davis)
   2. Fix type of read in prompt confirmation (eg. rmstar) (David Kaspar)
   1. PR/471: Delay arginp parsing
