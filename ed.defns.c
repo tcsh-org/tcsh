@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.defns.c,v 3.50 2016/01/15 15:28:57 christos Exp $ */
 /*
  * ed.defns.c: Editor function definitions and initialization
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: ed.defns.c,v 3.50 2016/01/15 15:28:57 christos Exp $")
-
 #include "ed.h"
 
 static	void		ed_InitMetaBindings 	(void);

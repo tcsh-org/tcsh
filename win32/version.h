@@ -1,4 +1,3 @@
-/*$Header: /p/tcsh/cvsroot/tcsh/win32/version.h,v 1.23 2008/08/24 23:29:32 amold Exp $*/
 #ifndef VERSION_H
 #define VERSION_H
 

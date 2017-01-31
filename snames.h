@@ -1,4 +1,3 @@
-/* $Header: /src/pub/tcsh/snames.h,v 1.3 1996/04/26 19:20:31 christos Exp $ */
 /*
  * snames.h: Short names for old compilers
  */

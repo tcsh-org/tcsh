@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.hist.c,v 3.60 2015/02/22 21:59:00 christos Exp $ */
 /*
  * sh.hist.c: Shell history expansions and substitutions
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: sh.hist.c,v 3.60 2015/02/22 21:59:00 christos Exp $")
-
 #include <stdio.h>	/* for rename(2), grr. */
 #include <assert.h>
 #include "tc.h"

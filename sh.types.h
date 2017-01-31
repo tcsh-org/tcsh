@@ -1,4 +1,3 @@
-/* $Header: /src/pub/tcsh/sh.types.h,v 3.42 2005/03/03 19:57:07 kim Exp $ */
 /* sh.types.h: Do the necessary typedefs for each system.
  *             Up till now I avoided making this into a separate file
  *	       But I just wanted to eliminate the whole mess from sh.h

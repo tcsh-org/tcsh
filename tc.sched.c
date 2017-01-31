@@ -1,4 +1,3 @@
-/* $Header: /src/pub/tcsh/tc.sched.c,v 3.24 2006/01/12 19:55:38 christos Exp $ */
 /*
  * tc.sched.c: Scheduled command execution
  *
@@ -33,9 +32,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: tc.sched.c,v 3.24 2006/01/12 19:55:38 christos Exp $")
-
 #include "ed.h"
 #include "tw.h"
 #include "tc.h"

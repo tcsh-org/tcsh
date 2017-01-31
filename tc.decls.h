@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.decls.h,v 3.65 2010/02/09 20:26:13 christos Exp $ */
 /*
  * tc.decls.h: Function declarations from all the tcsh modules
  */

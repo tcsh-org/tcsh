@@ -1,4 +1,3 @@
-/*$Header: /src/pub/tcsh/win32/nt.const.c,v 1.3 2002/08/11 07:58:12 amold Exp $*/
 /*
  * nt.const.c: NT-specific String constants for tcsh.
  */

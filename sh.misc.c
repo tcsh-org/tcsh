@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.misc.c,v 3.49 2015/05/04 15:31:13 christos Exp $ */
 /*
  * sh.misc.c: Miscelaneous functions
  */
@@ -31,8 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: sh.misc.c,v 3.49 2015/05/04 15:31:13 christos Exp $")
 
 static	int	renum	(int, int);
 static  Char  **blkend	(Char **);

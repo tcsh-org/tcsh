@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.sem.c,v 3.89 2015/09/08 15:49:53 christos Exp $ */
 /*
  * sh.sem.c: I/O redirections and job forking. A touchy issue!
  *	     Most stuff with builtins is incorrect
@@ -32,9 +31,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: sh.sem.c,v 3.89 2015/09/08 15:49:53 christos Exp $")
-
 #include "tc.h"
 #include "tw.h"
 #ifdef WINNT_NATIVE

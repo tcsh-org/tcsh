@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.inputl.c,v 3.72 2012/05/25 01:39:03 christos Exp $ */
 /*
  * ed.inputl.c: Input line handling.
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: ed.inputl.c,v 3.72 2012/05/25 01:39:03 christos Exp $")
-
 #include "ed.h"
 #include "ed.defns.h"		/* for the function names */
 #include "tw.h"			/* for twenex stuff */

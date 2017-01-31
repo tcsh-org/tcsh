@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.chared.c,v 3.103 2015/08/19 14:29:55 christos Exp $ */
 /*
  * ed.chared.c: Character editing functions.
  */
@@ -71,9 +70,6 @@
  */
 
 #include "sh.h"
-
-RCSID("$tcsh: ed.chared.c,v 3.103 2015/08/19 14:29:55 christos Exp $")
-
 #include "ed.h"
 #include "tw.h"
 #include "ed.defns.h"

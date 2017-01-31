@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.parse.c,v 3.18 2006/03/02 18:46:44 christos Exp $ */
 /*
  * sh.parse.c: Interpret a list of tokens
  */
@@ -31,8 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: sh.parse.c,v 3.18 2006/03/02 18:46:44 christos Exp $")
 
 /*
  * C shell

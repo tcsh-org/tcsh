@@ -1,4 +1,4 @@
-# $tcsh: Makefile.in,v 1.15 2014/06/19 18:05:10 christos Exp $
+# nls/Makefile.in
 
 CATALOGS=	C.cat et.cat finnish.cat french.cat german.cat greek.cat \
 		italian.cat ja.cat pl.cat russian.cat spanish.cat ukrainian.cat

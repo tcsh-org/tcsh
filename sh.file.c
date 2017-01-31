@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.file.c,v 3.39 2015/06/06 21:19:07 christos Exp $ */
 /*
  * sh.file.c: File completion for csh. This file is not used in tcsh.
  */
@@ -32,8 +31,6 @@
  */
 #include "sh.h"
 #include "ed.h"
-
-RCSID("$tcsh: sh.file.c,v 3.39 2015/06/06 21:19:07 christos Exp $")
 
 #if defined(FILEC) && defined(TIOCSTI)
 

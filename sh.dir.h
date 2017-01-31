@@ -1,4 +1,3 @@
-/* $Header: /src/pub/tcsh/sh.dir.h,v 3.5 1997/10/27 22:44:26 christos Exp $ */
 /*
  * sh.dir.h: Directory data structures and globals
  */

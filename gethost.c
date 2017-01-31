@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/gethost.c,v 1.18 2013/03/06 22:48:45 christos Exp $ */
 /*
  * gethost.c: Create version file from prototype
  */
@@ -31,8 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: gethost.c,v 1.18 2013/03/06 22:48:45 christos Exp $")
 
 #ifdef SCO
 # define perror __perror

@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.alloc.c,v 3.55 2015/07/07 12:24:54 christos Exp $ */
 /*
  * tc.alloc.c (Caltech) 2/21/82
  * Chris Kingsley, kingsley@cit-20.
@@ -45,8 +44,6 @@
 #if defined(HAVE_SBRK) && !defined(__APPLE__)
 #define USE_SBRK
 #endif
-
-RCSID("$tcsh: tc.alloc.c,v 3.55 2015/07/07 12:24:54 christos Exp $")
 
 #define RCHECK
 #define DEBUG

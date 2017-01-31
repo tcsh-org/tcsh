@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.color.c,v 1.32 2014/07/07 19:53:51 christos Exp $ */
 /*
  * tw.color.c: builtin color ls-F
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: tw.color.c,v 1.32 2014/07/07 19:53:51 christos Exp $")
-
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"

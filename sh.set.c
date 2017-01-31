@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.set.c,v 3.88 2015/08/13 09:05:21 christos Exp $ */
 /*
  * sh.set.c: Setting and Clearing of variables
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: sh.set.c,v 3.88 2015/08/13 09:05:21 christos Exp $")
-
 #include "ed.h"
 #include "tw.h"
 

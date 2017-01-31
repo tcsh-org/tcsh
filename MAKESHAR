@@ -2,7 +2,6 @@
 #
 # MAKESHAR.sh: Make a shar file for the sources
 #
-# $tcsh: MAKESHAR,v 3.1 1992/05/09 04:03:53 christos Exp $
 
 AWK=/usr/bin/nawk	# Must be nawk or gawk cause of 2D arrays
 WC=/usr/ucb/wc		

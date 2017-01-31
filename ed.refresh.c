@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.refresh.c,v 3.50 2015/05/04 15:31:13 christos Exp $ */
 /*
  * ed.refresh.c: Lower level screen refreshing functions
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: ed.refresh.c,v 3.50 2015/05/04 15:31:13 christos Exp $")
-
 #include "ed.h"
 /* #define DEBUG_UPDATE */
 /* #define DEBUG_REFRESH */

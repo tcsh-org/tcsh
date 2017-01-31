@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.decls.h,v 3.45 2008/10/17 20:25:00 christos Exp $ */
 /*
  * ed.decls.h: Editor external definitions
  */

@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.h,v 3.177 2015/09/08 15:49:53 christos Exp $ */
 /*
  * sh.h: Catch it all globals and includes file!
  */

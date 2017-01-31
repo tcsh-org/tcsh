@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.prompt.c,v 3.70 2011/10/27 22:41:06 christos Exp $ */
 /*
  * tc.prompt.c: Prompt printing stuff
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: tc.prompt.c,v 3.70 2011/10/27 22:41:06 christos Exp $")
-
 #include "ed.h"
 #include "tw.h"
 

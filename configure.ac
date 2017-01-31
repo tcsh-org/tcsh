@@ -6,8 +6,6 @@ dnl
 dnl You'll also need a version of config.guess from a gnu package
 dnl
 dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
-dnl
-dnl $tcsh: configure.ac,v 3.9 2016/10/25 15:13:40 christos Exp $
 
 AC_PREREQ([2.59])dnl Minimum Autoconf version required.
 AC_INIT([tcsh], [6.20.00], [http://bugs.gw.com/])

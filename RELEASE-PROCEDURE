@@ -1,7 +1,5 @@
 HOW TO RELEASE TCSH
 
-@(#) $tcsh: RELEASE-PROCEDURE,v 1.18 2015/06/02 21:15:57 kim Exp $
-
 1)  Update version number and date in patchlevel.h
 2)  Note the new version and date in Fixes
 3)  Update tcsh.man to have the new version and date also

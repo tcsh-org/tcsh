@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.func.c,v 3.176 2016/10/18 17:26:42 christos Exp $ */
 /*
  * sh.func.c: csh builtin functions
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: sh.func.c,v 3.176 2016/10/18 17:26:42 christos Exp $")
-
 #include "ed.h"
 #include "tw.h"
 #include "tc.h"

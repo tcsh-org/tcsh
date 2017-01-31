@@ -1,4 +1,3 @@
-/* $Header: /src/pub/tcsh/tw.decls.h,v 3.22 2006/01/12 18:15:25 christos Exp $ */
 /*
  * tw.decls.h: Tenex external declarations
  */

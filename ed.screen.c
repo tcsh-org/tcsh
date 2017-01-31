@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/ed.screen.c,v 3.81 2014/03/15 21:25:11 christos Exp $ */
 /*
  * ed.screen.c: Editor/termcap-curses interface
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: ed.screen.c,v 3.81 2014/03/15 21:25:11 christos Exp $")
-
 #include "ed.h"
 #include "tc.h"
 #include "ed.defns.h"

@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.os.h,v 3.104 2011/01/25 20:10:46 christos Exp $ */
 /*
  * tc.os.h: Shell os dependent defines
  */

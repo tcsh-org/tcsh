@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.init.c,v 3.63 2006/08/23 01:49:32 mitr Exp $ */
 /*
  * sh.init.c: Function and signal tables
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: sh.init.c,v 3.63 2006/08/23 01:49:32 mitr Exp $")
-
 #include "ed.h"
 #include "tw.h"
 

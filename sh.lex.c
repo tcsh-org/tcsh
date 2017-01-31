@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/sh.lex.c,v 3.90 2016/03/08 15:45:26 christos Exp $ */
 /*
  * sh.lex.c: Lexical analysis into tokens
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: sh.lex.c,v 3.90 2016/03/08 15:45:26 christos Exp $")
-
 #include "ed.h"
 
 #include <assert.h>

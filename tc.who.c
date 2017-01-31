@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tc.who.c,v 3.58 2012/10/12 01:41:32 christos Exp $ */
 /*
  * tc.who.c: Watch logins and logouts...
  */
@@ -31,9 +30,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: tc.who.c,v 3.58 2012/10/12 01:41:32 christos Exp $")
-
 #include "tc.h"
 
 #ifndef HAVENOUTMP

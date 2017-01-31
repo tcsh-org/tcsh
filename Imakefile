@@ -1,6 +1,4 @@
 XCOMM
-XCOMM $tcsh: Imakefile,v 1.87 2010/01/28 19:01:05 christos Exp $
-XCOMM
 XCOMM Imakefile for tcsh 6.12
 XCOMM Marc Horowitz, MIT SIPB
 XCOMM

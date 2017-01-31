@@ -1,4 +1,3 @@
-$ $tcsh: set11,v 1.4 1996/10/19 17:52:49 christos Exp $
 $ sh.c
 $set 11
 1 Warnung: kein Zugriff auf Tty (%s).\n

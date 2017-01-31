@@ -1,4 +1,3 @@
-/* $Header: /p/tcsh/cvsroot/tcsh/tw.parse.c,v 3.138 2015/08/26 07:57:17 christos Exp $ */
 /*
  * tw.parse.c: Everyone has taken a shot in this futile effort to
  *	       lexically analyze a csh line... Well we cannot good
@@ -34,9 +33,6 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
-
-RCSID("$tcsh: tw.parse.c,v 3.138 2015/08/26 07:57:17 christos Exp $")
-
 #include "tw.h"
 #include "ed.h"
 #include "tc.h"
