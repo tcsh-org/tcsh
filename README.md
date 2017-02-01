@@ -19,3 +19,4 @@ the Tcsh Bugs mailing list:
 
 > tcsh-bugs@mx.gw.com
 
+[![Build Status](https://travis-ci.org/tcsh-org/tcsh.svg?branch=master)](https://travis-ci.org/tcsh-org/tcsh)
