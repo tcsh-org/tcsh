@@ -7,8 +7,7 @@ mirror at:
 
 > http://github.com/tcsh-org/tcsh
 
-Instructions for compiling Tcsh can be found in
-[BUILDING](blob/master/BUILDING).
+Instructions for compiling Tcsh can be found in [BUILDING].
 
 PLEASE file any bug reports, fixes, and code for new features at:
 
