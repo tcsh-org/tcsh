@@ -1,32 +1,44 @@
-This is tcsh version 6.20.00.  Tcsh is a version of the Berkeley
-C-Shell, with the addition of: a command line editor, command and file
-name completion, listing, etc. and a bunch of small additions to the
+Tcsh is an enhanced but completely compatible version of the Berkeley
+C-Shell, with the addition of a command line editor, command and file
+name completion, listing, etc., and a bunch of small additions to the
 shell itself.
 
 Tcsh has been ported to most unix variants, and can be tinkered to work
 in unix systems that it has not ported yet. See the Ported file for
 a more complete list of ported systems and in the config directory for
 a configuration file that matches your system.
+
 Tcsh also runs under VMS/POSIX and OS/2+emx; the OS/2 port is not
 complete yet.
 
-Feel free to use it.  These changes to csh may only be included in a
-commercial product if the inclusion or exclusion does not change the
+Feel free to use it.  These changes to csh may only be included in
+a commercial product if the inclusion or exclusion does not change the
 purchase price, level of support, etc.  Please respect the individual
 authors by giving credit where credit is due (in other words, don't
 claim that you wrote portions that you haven't, and don't delete the
-names of the authors from the source code or documentation).  
+names of the authors from the source code or documentation).
 
 To install tcsh:
 
-0)  Try running "./configure".  If that doesn't work, goto step 1.
+1)  Try running "./configure".  If that doesn't work, goto step 2.
     Run "./configure --help" to see possible options.  After running
-    configure, goto step 3.
+    configure, goto step 5.
 
-1)  Otherwise copy Makefile.std to Makefile. Look at the Makefile and
+2)  If you have imake running on your machine, you may try building with
+    it.  Note that imake is not supported for all the platforms yet, so
+    this might not work on your machine.  If that is the case please let
+    us know, and goto step 3.  If you can send a patch that fixes the
+    problem we would appreciate it.
+
+    a) Modify configurable parameters in imake.config to your liking.
+    b) xmkmf; make depend
+
+    Goto step 5.
+
+3)  Otherwise copy Makefile.std to Makefile. Look at the Makefile and
     make sure that you are using the right compilation flags.
 
-2)  Copy the appropriate for your machine and OS config file from the
+4)  Copy the appropriate for your machine and OS config file from the
     config subdirectory into config.h.  Consult the file "Ported" for
     settings known to work on various machines.  If you are trying to
     compile tcsh on a machine for which there is no config file yet,
@@ -34,35 +46,36 @@ To install tcsh:
     the supplied ones.  If you get tcsh working on a new machine, I'd
     appreciate a copy of the config file plus additional information
     about the architecture/OS.  If you are creating a new config file,
-    look very hard at BSDJOBS and BSDTIMES if you are running
-    a non-BSD machine.  For vanila SysV, these would all be #undef-ed,
-    but others may vary (such as A/UX or HPUX).  On a pyramid, compile
-    in the UCB universe even if you are running under the ATT universe
-    usually; it will work anyway, and you get job control for free.
+    look very hard at BSDJOBS and BSDTIMES if you are running a non-BSD
+    machine.  For vanila SysV, these would all be #undef-ed, but others
+    may vary (such as A/UX or HPUX).  On a pyramid, compile in the UCB
+    universe even if you are running under the ATT universe usually; it
+    will work anyway, and you get job control for free.
 
-3)  Look at config_f.h, and enable or disable any features you want.
+5)  Look at config_f.h, and enable or disable any features you want.
     It is configured the way I like it, but you may disagree.
 
-4)  Look at host.defs to make sure that you have the right defines to set
-    the environment variables "HOSTTYPE", "MACHTYPE", "OSTYPE" and 
-    "VENDOR" correctly.  If you need to make changes, PLEASE SEND THEM 
+6)  Look at host.defs to make sure that you have the right defines to
+    set the environment variables "HOSTTYPE", "MACHTYPE", "OSTYPE" and
+    "VENDOR" correctly.  If you need to make changes, PLEASE SEND THEM
     BACK TO ME.
 
-5)  You may want to adjust the DESTBIN and DESTMAN entries in
-    the Makefile.  These are the directories that tcsh, and the tcsh.1
-    man entry will be placed in when you do a "make install" and "make
-    install.man" respectively.  If you decide to install tcsh somewhere
-    other than in /usr/local/bin/tcsh, you should #define _PATH_TCSHELL
+7)  You may want to adjust the DESTBIN and DESTMAN entries in Makefile.
+    These are the directories that tcsh, and the tcsh.1 man entry will
+    be placed in when you do a "make install" and "make install.man"
+    respectively.  If you decide to install tcsh somewhere other
+    than in /usr/local/bin/tcsh, you should #define _PATH_TCSHELL
     "/your/installation/directory/tcsh" in pathnames.h.
 
-6)  make
+8)  make
 
-7)  Read the documentation while you are waiting.  The file tcsh.man
+9)  Read the documentation while you are waiting.  The file tcsh.man
     is in standard [nt]roff -man format. If you like, you can run the
-    tcsh.man2html script (requires Perl) to generate an HTML version of
-    the manpage which you can read with Mosaic, lynx or other HTML browser.
+    tcsh.man2html script (requires Perl) to generate an HTML version
+    of the manpage which you can read with Mosaic, lynx or other HTML
+    browser.
 
-8)  Test tcsh by typing ./tcsh to see that it has compiled correctly.
+10) Test tcsh by typing ./tcsh to see that it has compiled correctly.
     The history command should give a time stamp on every entry.
     Typing normal characters should echo each exactly once.  Control-A
     should put the cursor at the beginning of the input line, but after
@@ -80,29 +93,19 @@ To install tcsh:
     passwd appears on the screen, you have lost /dev/tty. Otherwise
     everything is fine.
 
-9)  Once satisfied that tcsh is working correctly, complete the installation
-    by typing "make install" to install the binary, and "make install.man" to
-    install the documentation. Don't forget to look at complete.tcsh for
-    useful completions...
+11) Once satisfied that tcsh is working correctly, complete the
+    installation by typing "make install" to install the binary, and
+    "make install.man" to install the documentation. Don't forget to
+    look at complete.tcsh for useful completions...
 
-10) Enjoy.
-
-11) PLEASE file any bug reports (and fixes), code for new features at:
-
-	http://bugs.gw.com/
-
-    Comments, questions, etc. (even flames) are welcome via email to:
-
-	The tcsh bugs mailing list
-	tcsh-bugs@mx.gw.com
-
-Various:
+12) Enjoy.
 
 ***************************************************************************
 
-On sysv versions < 3.0 (not hpux) Doug Gwyn's public domain directory 
+On sysv versions < 3.0 (not hpux) Doug Gwyn's public domain directory
 manipulation library has to be installed. This library is available
 for anonymous ftp from prep.ai.mit.edu:/pub/gnu/dirent.tar.Z
+
 If the network is not installed, then there is a gethostname()
 routine is tc.os.c
 
@@ -130,24 +133,23 @@ error message to that effect. If you don't like the message:
 Or: Comment the error printing out in tc.alloc.c
 Or: Compile -DSYSMALLOC
 
-
 ***************************************************************************
 
 From: Scott Krotz <krotz@honey.rtsg.mot.com>
 
-Tcsh has been ported to minix by  Scott Krotz (krotz@honey.rtsg.mot.com).
+Tcsh has been ported to minix by Scott Krotz (krotz@honey.rtsg.mot.com).
 Unfortunately the minix sed is broken, so you'll have to find a way to
 make tc.const.h, sh.err.h, ed.defns.h which are automatically generated.
-The easiest way to create them is to make a copy from unix, copying 
+The easiest way to create them is to make a copy from unix, copying
 minix to config.h, and then 'make sh.err.h tc.const.h ed.defns.h'
 
 The OS/dependent files are in mi.termios.h, mi.wait.h, mi.varargs.h
 
-You will get some warnings, but dont worry about them, just ignore
-them.  After tcsh has compiled and the gcc binary is converted to a
-minix binary, remember to chmem it to give it more memory - it will
-need it!  How much you need depends on how many aliases you have, etc..
-Add at least 50000 to it.
+You will get some warnings, but dont worry about them, just ignore them.
+After tcsh has compiled and the gcc binary is converted to a minix
+binary, remember to chmem it to give it more memory - it will need it!
+How much you need depends on how many aliases you have, etc..  Add at
+least 50000 to it.
 
 One last thing.  You might have to make some links for include files so
 that they are in the directories that tcsh is expecting while compiling.
@@ -193,12 +195,11 @@ I can make the binary available to anyone who wants it (for example people
 who can't get access to a cross-compiling environment, and who don't yet
 have gcc running under minix).
 
-
 ***************************************************************************
 
-If your compiler cannot handle long symbol names, add 
+If your compiler cannot handle long symbol names, add
 
-#include "snames.h" 
+#include "snames.h"
 
 to your config.h file
 
