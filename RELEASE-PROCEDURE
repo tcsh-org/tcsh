@@ -1,43 +1,28 @@
 HOW TO RELEASE TCSH
 
-1)  Update version number and date in patchlevel.h
-2)  Note the new version and date in Fixes
-3)  Update tcsh.man to have the new version and date also
-    (two separate lines, with the date in different formats)
-4)  Update the version in configure.ac
-5)  Update README to have the new version
-6)  Commit changes into CVS
-7)  run autoreconf
-8)  Commit changes into CVS
-9)  run make distclean; configure && make && make check
-10) Tag the release with TCSHx_yy_zz where
+1)  Update version number and date
+    - patchlevel.h
+    - Fixes (make a new entry at the top)
+    - tcsh.man (two separate lines, with the date in different formats)
+    - configure.ac (version only)
+2)  Run autoreconf
+3)  Run make distclean; configure && make && make check
+4)  If checks succeed, commit the changed files and tag the release
+	git add patchlevel.h Fixes tcsh.man configure.ac configure
+	git commit
+	git push origin
+	git tag TCSHx_yy_zz
+	git push origin tag TCSHx_yy_zz
+    using the values
 	x  == REV
 	yy == VERS
 	zz == PATCHLEVEL
     from patchlevel.h (the new values you picked)
-	
-
-The following steps are now automated by running
-
-    ./MAKERELEASE x yy zz
-
-11) Export the code using the new tag you created.  Rename
-    the directory from "tcsh" to "tcsh-x.yy.zz" and create
-    tcsh-x.yy.zz.tar.gz
-12) Export the previous release as well
-13) Remove files that should not be in a release:
-    - Announce*
-    - MAKERELEASE
-    - Makefile.ADMIN
-    - RELEASE-PROCEDURE (this file)
-14) Generate a "diff -urN" between the two directories you
-    have exported, save it in patchz.gz (z is PATCHLEVEL)
-
-The rest are still manual:
-
-15) Make the patch and the source tarball available on ftp, and sign it
-    - gpg --armor --detach-sign tcsh-x.yy.zz.tar.gz
-16) Add the new version to bugs.gw.com:
+5)  Create the archive and sign it
+	git archive -o tcsh-x.yy.zz.tar.gz --prefix=tcsh-x.yy.zz/ TCSHx_yy_zz
+	gpg --armor --detach-sign tcsh-x.yy.zz.tar.gz
+6)  Make the archive and signature available on ftp
+7)  Add the new version to bugs.gw.com:
     - Click: Manage > Manage Projects > tcsh
     - Scroll down to "Versions"
     - Click on "Edit" next to the HEAD version
@@ -49,12 +34,12 @@ The rest are still manual:
       click on "Add and Edit Version"
     - Set the "Date Order" to 2030-01-01 (i.e. far in the future)
     - Click on "Update Version"
-17) Update the version on http://www.tcsh.org/MostRecentRelease
-18) Update the online manual page http://www.tcsh.org/tcsh.man/top.html
+8)  Update the version on http://www.tcsh.org/MostRecentRelease
+9)  Update the online manual page http://www.tcsh.org/tcsh.man/top.html
     - Login to the webhost (huru)
-    - cd ~/src/tcsh && cvs up
+    - cd ~/src/tcsh && git pull
     - cd ~/.www/sites/tcsh.org/man \
 	&& cp -p ~/src/tcsh/tcsh.man \
 	&& make clean \
 	&& make
-19) Mail an announcement to tcsh@mx.gw.com
+10) Mail an announcement to tcsh@mx.gw.com
