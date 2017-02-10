@@ -3,7 +3,7 @@
 #
 # Maintenance tasks
 #
-# You can refetch files from the website, then run "cvs diff" to
+# You can refetch files from the website, then run "git diff" to
 # sanity check any changes before committing.
 #
 
