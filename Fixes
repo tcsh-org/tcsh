@@ -1,3 +1,4 @@
+  5. Look for tgetent in libtinfo as well (Werner Fink)
   4. Don't play pointer tricks that are undefined in modern c (Brooks Davis)
   3. Fix out of bounds read (Brooks Davis)
   2. Fix type of read in prompt confirmation (eg. rmstar) (David Kaspar)
