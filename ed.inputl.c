@@ -796,13 +796,17 @@ GetNextChar(Char *cp)
 		return -1;
 	    }
 	}
-	cbp++;
-	if (normal_mbtowc(cp, cbuf, cbp) == -1) {
-	    reset_mbtowc();
-	    if (cbp < MB_CUR_MAX)
-		continue; /* Maybe a partial character */
-	    /* And drop the following bytes, if any */
-	    *cp = (unsigned char)*cbuf | INVALID_BYTE;
+	if (AsciiOnly) {
+	    *cp = (unsigned char)*cbuf;
+	} else {
+	    cbp++;
+	    if (normal_mbtowc(cp, cbuf, cbp) == -1) {
+		reset_mbtowc();
+		if (cbp < MB_CUR_MAX)
+		    continue; /* Maybe a partial character */
+		/* And drop the following bytes, if any */
+		*cp = (unsigned char)*cbuf | INVALID_BYTE;
+	    }
 	}
 	break;
     }
