@@ -1,3 +1,5 @@
+  7. convert match() from recursive to backtracking.
+  6. Handle 8 bit characters in bindkey (Werner Fink)
   5. Look for tgetent in libtinfo as well (Werner Fink)
   4. Don't play pointer tricks that are undefined in modern c (Brooks Davis)
   3. Fix out of bounds read (Brooks Davis)
