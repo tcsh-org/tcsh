@@ -796,7 +796,8 @@ GetNextChar(Char *cp)
 		return -1;
 	    }
 	}
-	if (AsciiOnly) {
+	if (cbp == 0 && *cbuf < NT_NUM_KEYS
+	    && CurrentKeyMap[(unsigned char)*cbuf] == F_XKEY) {
 	    *cp = (unsigned char)*cbuf;
 	} else {
 	    cbp++;
