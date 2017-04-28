@@ -651,7 +651,7 @@ xopen(const char *path, int oflag, ...)
 ssize_t
 xread(int fildes, void *buf, size_t nbyte)
 {
-    ssize_t res;
+    ssize_t res = -1;
 
     /* This is where we will be blocked most of the time, so handle signals
        that didn't interrupt any system call. */
@@ -679,7 +679,7 @@ xtcsetattr(int fildes, int optional_actions, const struct termios *termios_p)
 ssize_t
 xwrite(int fildes, const void *buf, size_t nbyte)
 {
-    ssize_t res;
+    ssize_t res = -1;
 
     /* This is where we will be blocked most of the time, so handle signals
        that didn't interrupt any system call. */
