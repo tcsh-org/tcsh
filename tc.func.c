@@ -1153,11 +1153,14 @@ rmstar(struct wordent *cp)
     opintr_disabled = pintr_disabled;
     pintr_disabled = 0;
     while (we != cp) {
+	Char *cmd = we->word;
+	if (cmd[0] == STRQNULL[0])
+	    cmd++;
 #ifdef RMDEBUG
 	if (*tag)
-	    xprintf(CGETS(22, 7, "parsing command line\n"));
+	    xprintf(CGETS(22, 7, "parsing command line [%S]\n"), cmd);
 #endif /* RMDEBUG */
-	if (!Strcmp(we->word, STRrm)) {
+	if (!StrQcmp(cmd, STRrm)) {
 	    args = we->next;
 	    ask = (*args->word != '-');
 	    while (*args->word == '-' && !silent) {	/* check options */
@@ -1216,7 +1219,7 @@ rmstar(struct wordent *cp)
     if (*tag) {
 	xprintf(CGETS(22, 10, "command line now is:\n"));
 	for (we = cp->next; we != cp; we = we->next)
-	    xprintf("%S ", we->word);
+	    xprintf("[%S] ", we->word);
     }
 #endif /* RMDEBUG */
     pintr_disabled = opintr_disabled;
