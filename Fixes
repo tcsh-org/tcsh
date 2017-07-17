@@ -1,3 +1,5 @@
+  9. make closem() not close sockets so as not to affect nss_ldap.
+     tcsh never creates sockets so that's ok (Miloslav Trmac)
   8. PR/597: Make rmstar work with aliased rm
   7. convert match() from recursive to backtracking.
   6. Handle 8 bit characters in bindkey (Werner Fink)

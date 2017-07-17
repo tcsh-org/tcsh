@@ -254,6 +254,7 @@ void
 closem(void)
 {
     int f, num_files;
+    struct stat st;
 
 #ifdef NLS_BUGS
 #ifdef NLS_CATALOGS
@@ -271,6 +272,16 @@ closem(void)
 #ifdef MALLOC_TRACE
 	    && f != 25
 #endif /* MALLOC_TRACE */
+#ifdef S_ISSOCK
+	    /* NSS modules (e.g. Linux nss_ldap) might keep sockets open.
+	     * If we close such a socket, both the NSS module and tcsh think
+	     * they "own" the descriptor.
+	     *
+	     * Not closing sockets does not make the cleanup use of closem()
+	     * less reliable because tcsh never creates sockets.
+	     */
+	    && fstat(f, &st) == 0 && !S_ISSOCK(st.st_mode)	
+#endif
 	    )
 	  {
 	    xclose(f);
