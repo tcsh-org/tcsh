@@ -1,0 +1,39 @@
+#!/bin/sh
+# $KimmoSuominen: .cfg/home/dot.cron/push-tcsh-git-mirror,v 1.1 2017/08/31 12:20:18 kim Exp $
+#
+# Push tcsh to GitHub.
+#
+# 20170201  Kimmo Suominen
+#
+
+IDENTITY="${HOME}/.ssh/tcsh-deploy"
+REPO=/p/tcsh/tcsh.git
+REMOTE=github
+
+PATH=/usr/local/bin:/bin:/usr/bin:/usr/pkg/bin
+export PATH
+
+PROG="${0##*/}"
+
+die()
+{
+    echo "${PROG}: ${@}" 1>&2
+    exit 1
+}
+
+case "${SSH_AUTH_SOCK}" in
+'')
+    exec ssh-agent "${0}" "${@}"
+    die 'Failed to start ssh-agent'
+    ;;
+esac
+
+ssh-add "${IDENTITY}" >/dev/null 2>&1 \
+|| die "Failed to add identity '${IDENTITY}'"
+
+cd "${REPO}" \
+|| die "Failed to change dir to '${REPO}'"
+
+# The remote is presumably setup with the --mirror option.
+# git remote add --mirror=push github git@github.com:tcsh-org/tcsh.git
+git push --quiet "${REMOTE}"
