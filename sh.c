@@ -245,7 +245,7 @@ main(int argc, char **argv)
     char *tcp, *ttyn;
     int f, reenter;
     char **tempv;
-    const char *targinp = NULL;
+    static const char *targinp = NULL;
     int osetintr;
     struct sigaction oparintr;
 
