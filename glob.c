@@ -717,7 +717,7 @@ match(const char *name, const Char *pat, const Char *patend, int m_not)
 	lwk = one_mbtowc(&wk, name, MB_LEN_MAX);
 	switch (c & M_MASK) {
 	case M_ALL:
-	    while (*(pat + pwk) & M_MASK == M_ALL) {
+	    while ((*(pat + pwk) & M_MASK) == M_ALL) {
 		pat += pwk;
 		pwk = One_Char_mbtowc(&wc, pat, MB_LEN_MAX);
 	    }
