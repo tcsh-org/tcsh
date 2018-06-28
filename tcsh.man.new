@@ -9593,10 +9593,10 @@ cycles or backward
 .Va goto
 s.
 .Pp
-Report bugs at http://bugs.gw.com/, preferably with fixes.
+Report bugs at https://bugs.astron.com/, preferably with fixes.
 If you want to
-help maintain and test tcsh, send mail to tcsh-request@mx.gw.com with the
-text
+help maintain and test tcsh, add yourself to the mailing list in
+https://mailman.astron.com/.
 .Sq subscribe tcsh
 on a line by itself in the body.
 .Sh THE T IN TCSH

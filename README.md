@@ -11,12 +11,13 @@ Instructions for compiling Tcsh can be found in [BUILDING].
 
 PLEASE file any bug reports, fixes, and code for new features at:
 
-> http://bugs.gw.com/
+> https://bugs.astron.com/
 
 Comments, questions, etc. (even flames) are welcome via email to
 the Tcsh Bugs mailing list:
 
-> tcsh-bugs@mx.gw.com
+> tcsh-bugs@astron.com
+> https://mailman.astron.com/
 
 [![Build Status][status]][travis]
 

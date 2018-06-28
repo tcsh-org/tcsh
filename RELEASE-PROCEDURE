@@ -22,7 +22,7 @@ HOW TO RELEASE TCSH
 	git archive -o tcsh-x.yy.zz.tar.gz --prefix=tcsh-x.yy.zz/ TCSHx_yy_zz
 	gpg --armor --detach-sign tcsh-x.yy.zz.tar.gz
 6)  Make the archive and signature available on ftp
-7)  Add the new version to bugs.gw.com:
+7)  Add the new version to bugs.astron.com:
     - Click: Manage > Manage Projects > tcsh
     - Scroll down to "Versions"
     - Click on "Edit" next to the HEAD version
@@ -42,4 +42,4 @@ HOW TO RELEASE TCSH
 	&& cp -p ~/src/tcsh/tcsh.man \
 	&& make clean \
 	&& make
-10) Mail an announcement to tcsh@mx.gw.com
+10) Mail an announcement to tcsh@astron.com
