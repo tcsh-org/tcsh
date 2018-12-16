@@ -1101,8 +1101,7 @@ e_inc_search(int dir)
 	if (GetNextChar(&ch) != 1)
 	    return(e_send_eof(0));
 
-	switch (ch > NT_NUM_KEYS
-		? F_INSERT : CurrentKeyMap[(unsigned char) ch]) {
+	switch (GetCmdChar(ch)) {
 	case F_INSERT:
 	case F_DIGIT:
 	case F_MAGIC_SPACE:

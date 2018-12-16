@@ -249,6 +249,7 @@ extern  CCRETVAL	e_newline_down_hist	(Char);
  * ed.inputl.c
  */
 extern	int	Inputl			(void);
+extern	int	GetCmdChar		(Char);
 extern	int	GetNextChar		(Char *);
 extern	void    UngetNextChar		(Char);
 extern	void	PushMacro		(Char *);

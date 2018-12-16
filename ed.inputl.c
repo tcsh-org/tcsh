@@ -664,6 +664,13 @@ RunCommand(Char *str)
     Refresh();
 }
 
+int
+GetCmdChar(wchar_t ch)
+{
+    wint_t c = ch & CHAR;
+    return c < NT_NUM_KEYS ? CurrentKeyMap[c] : F_INSERT;
+}
+
 static int
 GetNextCommand(KEYCMD *cmdnum, Char *ch)
 {
@@ -692,17 +699,8 @@ GetNextCommand(KEYCMD *cmdnum, Char *ch)
 	    MetaNext = 0;
 	    *ch |= META;
 	}
-	/* XXX: This needs to be fixed so that we don't just truncate
-	 * the character, we unquote it.
-	 */
-	if (*ch < NT_NUM_KEYS)
-	    cmd = CurrentKeyMap[*ch];
-	else
-#ifdef WINNT_NATIVE
-	    cmd = CurrentKeyMap[(unsigned char) *ch];
-#else
-	    cmd = F_INSERT;
-#endif
+
+	cmd = GetCmdChar(*ch);
 	if (cmd == F_XKEY) {
 	    XmapVal val;
 	    CStr cstr;
