@@ -1,3 +1,5 @@
+ 11. Abort history loading on words and lines too long
+     https://bugzilla.redhat.com/show_bug.cgi?id=1598502
  10. PR/37: Introduce GetCmdChar() to avoid open coding array access.
   9. make closem() not close sockets so as not to affect nss_ldap.
      tcsh never creates sockets so that's ok (Miloslav Trmac)
