@@ -14,5 +14,6 @@ sh.err.h
 tc.const.h
 tc.defs.c
 tcsh
+tcsh-*.tar.gz
 tests/package.m4
 tests/testsuite
