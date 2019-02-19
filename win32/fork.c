@@ -58,9 +58,6 @@ typedef unsigned short U_short;
 typedef unsigned long U_long;
 
 
-#if _M_AMD64
-#error "64-bit fork no longer works. Hence that build configuration is deprecated" 
-#endif
 static void stack_probe(void *ptr) ;
 /*static void heap_init(void);*/
 BOOL CreateWow64Events(DWORD , HANDLE *, HANDLE *, BOOL);
@@ -215,7 +212,9 @@ int fork(void) {
 		__hforkparent = CreateEvent(&sa,TRUE,FALSE,NULL);
 
 	rc = setjmp(__fork_context);
-
+ #if _M_AMD64
+    ((_JUMP_BUFFER *)&__fork_context)->Frame = 0; //https://stackoverflow.com/questions/26605063/an-invalid-or-unaligned-stack-was-encountered-during-an-unwind-operation
+#endif
 	if (rc) { // child
 #ifdef  _M_IX86
 		//

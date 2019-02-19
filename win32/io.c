@@ -58,9 +58,9 @@ int consoleread(HANDLE , unsigned char * ,size_t ) ;
 INPUT_RECORD girec[2048];
 
 unsigned short __nt_want_vcode=0,__nt_vcode=0;
-HANDLE __h_con_alarm=0;
-HANDLE __h_con_int=0;
-HANDLE __h_con_hup=0;
+HANDLE __h_con_alarm;
+HANDLE __h_con_int;
+HANDLE __h_con_hup;
 
 extern int NoNLSRebind;
 
