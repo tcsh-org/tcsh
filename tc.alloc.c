@@ -231,7 +231,7 @@ malloc(size_t nbytes)
     /*
      * Record allocated size of block and bound space with magic numbers.
      */
-    p->ov_size = (p->ov_index <= 13) ? nbytes - 1 : 0;
+    p->ov_size = (p->ov_index <= 13) ? (U_short)nbytes - 1 : 0;
     p->ov_rmagic = RMAGIC;
     *((U_int *) (((caddr_t) p) + nbytes - RSLOP)) = RMAGIC;
 #endif
@@ -423,7 +423,7 @@ realloc(ptr_t cp, size_t nbytes)
 	nbytes = MEMALIGN(MEMALIGN(sizeof(union overhead))+nbytes+RSLOP);
 	*((U_int *) (((caddr_t) op) + nbytes - RSLOP)) = RMAGIC;
 	op->ov_rmagic = RMAGIC;
-	op->ov_size = (op->ov_index <= 13) ? nbytes - 1 : 0;
+	op->ov_size = (op->ov_index <= 13) ? (U_short)nbytes - 1 : 0;
 #endif
 	return ((memalign_t) cp);
     }

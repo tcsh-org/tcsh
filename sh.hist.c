@@ -1319,7 +1319,11 @@ rechist(Char *fname, int ref)
     xclose(fp);
     SHOUT = ftmp;
     didfds = oldidfds;
+#ifndef WINNT_NATIVE
     (void)rename(path, short2str(fname));
+#else
+    (void)ReplaceFile( short2str(fname),path,NULL,0,NULL,NULL);
+#endif
     cleanup_until(fname);
 }
 

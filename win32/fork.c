@@ -58,6 +58,9 @@ typedef unsigned short U_short;
 typedef unsigned long U_long;
 
 
+#if _M_AMD64
+#error "64-bit fork no longer works. Hence that build configuration is deprecated" 
+#endif
 static void stack_probe(void *ptr) ;
 /*static void heap_init(void);*/
 BOOL CreateWow64Events(DWORD , HANDLE *, HANDLE *, BOOL);
@@ -166,7 +169,7 @@ int fork_init(void) {
 #ifdef  _M_IX86
 		_old_exr = __fork_context[6];
 		__fork_context[6] =(int)GETEXCEPTIONREGIST();//tmp;
-#endif  _M_ALPHA
+#endif  
 		//
 		// Whee !
 		longjmp(__fork_context,1);

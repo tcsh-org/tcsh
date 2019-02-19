@@ -459,12 +459,6 @@ int nt_creat(const char *filename, int mode) {
 	else if (!_stricmp(filename,"/dev/null") ){
 		filename = "NUL";
 	}
-	else if (!_stricmp(filename,"/dev/clipboard")) {
-		retval = create_clip_writer_thread();
-		if (retval == INVHL)
-			return -1;
-		goto get_fd;
-	}
 	retval = CreateFile(filename,
 			GENERIC_READ | GENERIC_WRITE,
 			FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -477,7 +471,6 @@ int nt_creat(const char *filename, int mode) {
 		errno = EACCES;
 		return -1;
 	}
-get_fd:
 	fd = __nt_open_osfhandle((intptr_t)retval,_O_BINARY);
 	if (fd <0) {
 		//should never happen
@@ -514,10 +507,6 @@ int nt_open(const char *filename, int perms,...) {
 	}
 	else if (!lstrcmp(filename,"/dev/null") ){
 		filename = "NUL";
-	}
-	else if (!_stricmp(filename,"/dev/clipboard")) {
-		retval = create_clip_reader_thread();
-		goto get_fd;
 	}
 	security.nLength = sizeof(security);
 	security.lpSecurityDescriptor = NULL;
@@ -576,7 +565,6 @@ int nt_open(const char *filename, int perms,...) {
 	if (perms & O_APPEND) {
 		SetFilePointer(retval,0,NULL,FILE_END);
 	}
-get_fd:
 	fd = __nt_open_osfhandle((intptr_t)retval,_O_BINARY);
 	if (fd <0) {
 		//should never happen

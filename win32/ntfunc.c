@@ -66,8 +66,6 @@ struct	biltins nt_bfunc[] = {
 #ifdef NTDBG
 	{ "debugbreak",	dodebugbreak,	0,	0	},
 #endif /* NTDBG */
-	{ "ps",	dops,	0,	1	},
-	{ "shutdown",	doshutdown,	0,	2	},
 	{ "start",		dostart,	1,	INF	},
 	{ "title",		dotitle,	1,	INF	},
 };
