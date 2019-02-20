@@ -17,3 +17,4 @@ tcsh
 tcsh-*.tar.gz
 tests/package.m4
 tests/testsuite
+*.suo

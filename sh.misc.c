@@ -254,7 +254,9 @@ void
 closem(void)
 {
     int f, num_files;
+#ifdef S_ISSOCK
     struct stat st;
+#endif /*S_ISSOCK*/
 
 #ifdef NLS_BUGS
 #ifdef NLS_CATALOGS
