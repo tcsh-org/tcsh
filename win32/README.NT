@@ -1,6 +1,3 @@
-*********************************************************
-64-bit builds are no longer supported
-*********************************************************
 -----------------------------------------------------------------------------
 To prevent Cygwin applications from expanding wildcards, set the environment
 variable CYGWIN to "noglob".  i.e., in your .tcshrc, put a line like this:

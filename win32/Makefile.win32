@@ -86,7 +86,7 @@ NTCFLAGS = $(NTCFLAGS) -Zp8
 !endif
 
 CFLAGS= -MT $(NTCFLAGS) $(INCLUDES) 
-LDFLAGS= -nodefaultlib $(NTLDFLAGS) -stack:1048576,524288 -dynamicbase:no
+LDFLAGS= -nodefaultlib $(NTLDFLAGS) -stack:1048576,524288 -dynamicbase:no -ignore:4099
 
 
 CC=	cl 	
@@ -226,6 +226,7 @@ clean:
 
 cleanall: clean
 	-del $(BUILD)
+	-del *nativecodeanalysi*.xml
 
 
 config.h: config_f.h
