@@ -53,7 +53,7 @@ extern time_t t_period;
 extern int just_signaled;
 static int precmd_active = 0;
 static int jobcmd_active = 0; /* GrP */
-static int postcmd_active = 0;
+int postcmd_active = 0;
 static int periodic_active = 0;
 static int cwdcmd_active = 0;	/* PWP: for cwd_cmd */
 static int beepcmd_active = 0;
@@ -900,12 +900,12 @@ beep_cmd(void)
     if (beepcmd_active) {	/* an error must have been caught */
 	aliasrun(2, STRunalias, STRbeepcmd);
 	xprintf("%s", CGETS(22, 5, "Faulty alias 'beepcmd' removed.\n"));
+	goto leave;
     }
-    else {
-	beepcmd_active = 1;
-	if (!whyles && adrof1(STRbeepcmd, &aliases))
-	    aliasrun(1, STRbeepcmd, NULL);
-    }
+    beepcmd_active = 1;
+    if (!whyles && adrof1(STRbeepcmd, &aliases))
+	aliasrun(1, STRbeepcmd, NULL);
+leave:
     beepcmd_active = 0;
     cleanup_until(&pintr_disabled);
 }
@@ -922,6 +922,8 @@ period_cmd(void)
     Char *vp;
     time_t  t, interval;
 
+    if (whyles)
+	return;
     pintr_disabled++;
     cleanup_push(&pintr_disabled, disabled_cleanup);
     if (periodic_active) {	/* an error must have been caught */
@@ -960,6 +962,8 @@ leave:
 void
 job_cmd(Char *args)
 {
+    if (whyles)
+	return;
     pintr_disabled++;
     cleanup_push(&pintr_disabled, disabled_cleanup);
     if (jobcmd_active) {	/* an error must have been caught */
