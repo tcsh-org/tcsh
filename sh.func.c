@@ -226,7 +226,7 @@ dofiletest(Char **v, struct command *c)
     globbed = v;
     cleanup_push(globbed, blk_cleanup);
 
-    while (*(fileptr = v++) != '\0') {
+    while (*(fileptr = v++) != NULL) {
 	res = filetest(ftest, &fileptr, 0);
 	cleanup_push(res, xfree);
 	xprintf("%S", res);
