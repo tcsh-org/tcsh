@@ -199,7 +199,7 @@ dohup(Char **v, struct command *c)
     if (intty)
 	stderror(ERR_NAME | ERR_TERMINAL);
     if (setintr == 0)
-	(void) signal(SIGHUP, SIG_DFL);
+    	sigset_interrupting(SIGHUP, SIG_DFL);
 }
 
 
