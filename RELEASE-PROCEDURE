@@ -4,6 +4,7 @@ HOW TO RELEASE TCSH
     - patchlevel.h
     - Fixes (make a new entry at the top)
     - tcsh.man (two separate lines, with the date in different formats)
+    - tcsh.man.new (same)
     - configure.ac (version only)
 2)  Run autoreconf
 3)  Run make distclean; configure && make && make check
