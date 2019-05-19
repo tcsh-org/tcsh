@@ -16,7 +16,7 @@ PLEASE file any bug reports, fixes, and code for new features at:
 Comments, questions, etc. (even flames) are welcome via email to
 the Tcsh Bugs mailing list:
 
-> tcsh-bugs@astron.com
+> tcsh-bugs@astron.com  
 > https://mailman.astron.com/
 
 [![Build Status][status]][travis]
