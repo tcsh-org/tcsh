@@ -1,3 +1,5 @@
+  4. Avoid infinite loops during history loads when merging, print a better
+     error for errors during history load.
   3. PR/88: Preserve empty arguments in :q
   2. PR/94: Small apple issues (SAVESIGVEC, HOSTTYPE)
   1. PR/81: Fix range matching issue where we were comparing with the
