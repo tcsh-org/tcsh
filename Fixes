@@ -1,3 +1,5 @@
+  5. PR/113: Sobomax: avoid infinite loops for -c commands when stdout is
+     not a tty.
   4. Avoid infinite loops during history loads when merging, print a better
      error for errors during history load.
   3. PR/88: Preserve empty arguments in :q
