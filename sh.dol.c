@@ -64,9 +64,10 @@ static Char *dolp;		/* Remaining chars from this word */
 static Char **dolnxt;		/* Further words */
 static int dolcnt;		/* Count of further words */
 static struct Strbuf dolmod; /* = Strbuf_INIT; : modifier characters */
-static int dolmcnt;		/* :gx -> INT_MAX, else 1 */
-static int dol_flag_a;		/* :ax -> 1, else 0 */
-static int *dolmcnts, ndolmcnts, *dolaflags;            /* keep track of mod counts for each modifier */
+
+static int ndolflags;		/* keep track of mod counts for each modifier */
+static int *dolmcnts;		/* :gx -> INT_MAX, else 1 */
+static int *dolaflags;		/* :ax -> 1, else 0 */
 
 static	Char	 **Dfix2	(Char *const *);
 static	int 	 Dpack		(struct Strbuf *);
@@ -379,8 +380,7 @@ Dgetdol(void)
     static Char *dolbang = NULL;
 
     cleanup_push(name, Strbuf_free);
-    dolmod.len = dolmcnt = dol_flag_a = 0;
-    ndolmcnts = 0;
+    dolmod.len = ndolflags = 0;
     c = sc = DgetC(0);
     if (c == DEOF) {
       stderror(ERR_SYNTAX);
@@ -720,30 +720,26 @@ fixDolMod(void)
 
     c = DgetC(0);
     if (c == ':') {
-	ndolmcnts = 0;
+	ndolflags = 0;
 	do {
-	    ++ndolmcnts;
-	    dolmcnts = xrealloc(dolmcnts, ndolmcnts);
-	    dolaflags = xrealloc(dolaflags, ndolmcnts);
-	    c = DgetC(0), dolmcnt = 1, dol_flag_a = 0, dolmcnts[ndolmcnts - 1] = 1, dolaflags[ndolmcnts - 1] = 0;
+	    ++ndolflags;
+	    dolmcnts = xrealloc(dolmcnts, ndolflags);
+	    dolaflags = xrealloc(dolaflags, ndolflags);
+	    c = DgetC(0), dolmcnts[ndolflags - 1] = 1, dolaflags[ndolflags - 1] = 0;
 	    if (c == 'g' || c == 'a') {
 		if (c == 'g') {
-		    dolmcnt = INT_MAX;
-		    dolmcnts[ndolmcnts - 1] = INT_MAX;
+		    dolmcnts[ndolflags - 1] = INT_MAX;
 		} else {
-		    dol_flag_a = 1;
-		    dolaflags[ndolmcnts - 1] = 1;
+		    dolaflags[ndolflags - 1] = 1;
 		}
 		c = DgetC(0);
 	    }
-	    if ((c == 'g' && dolmcnt != INT_MAX) || 
-		(c == 'a' && dol_flag_a == 0)) {
+	    if ((c == 'g' && dolmcnts[ndolflags - 1] != INT_MAX) || 
+		(c == 'a' && dolaflags[ndolflags - 1] == 0)) {
 		if (c == 'g') {
-		    dolmcnt = INT_MAX;
-		    dolmcnts[ndolmcnts - 1] = INT_MAX;
+		    dolmcnts[ndolflags - 1] = INT_MAX;
 		} else {
-		    dol_flag_a = 1;
-		    dolaflags[ndolmcnts - 1] = 1;
+		    dolaflags[ndolflags - 1] = 1;
 		}
 		c = DgetC(0);
 	    }
@@ -774,8 +770,7 @@ fixDolMod(void)
 		stderror(ERR_BADMOD, (int)c);
 	    Strbuf_append1(&dolmod, (Char) c);
 	    if (c == 'q') {
-		dolmcnt = INT_MAX;
-		dolmcnts[ndolmcnts - 1] = INT_MAX;
+		dolmcnts[ndolflags - 1] = INT_MAX;
 	    }
 	}
 	while ((c = DgetC(0)) == ':');
@@ -789,7 +784,7 @@ static int
 all_dolmcnts_are_0()
 {
     int i = 0;
-    for(; i < ndolmcnts; ++i) {
+    for(; i < ndolflags; ++i) {
 	if(dolmcnts[i] != 0)
 	    return 0;
     }
@@ -886,14 +881,12 @@ setDolp(Char *cp)
 	    }
 	    while (dolaflags[nthMod] != 0);
 	}
-	if (didmod && dolmcnt != INT_MAX)
-	    dolmcnt--;
+	if(didmod && dolmcnts[nthMod] != INT_MAX)
+	    dolmcnts[nthMod]--;
 #ifdef notdef
 	else
 	    break;
 #endif
-	if(didmod && dolmcnts[nthMod] != INT_MAX)
-	    dolmcnts[nthMod]--;
 
 	++nthMod;
     }
