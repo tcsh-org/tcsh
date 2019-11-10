@@ -626,3 +626,25 @@ AT_CHECK([tcsh -f escape_echo.csh], 0,
 ])
 
 AT_CLEANUP
+
+AT_SETUP([:gas work as described in the man pages])
+
+AT_DATA([gas.csh],
+[[set x=(aa bb aa bb)
+echo $x:gas/a/c/:gs/b/d/
+foreach i ( "$x:gas/a/c/:q" )
+    echo $i
+end
+echo $x:gas/a/q/:gs/b/w/:s/b/e/
+echo $x:gas/a/q/:gs/b/w/:s/b/e/:gas/q/Q/
+exit 0
+]])
+
+AT_CHECK([tcsh -f gas.csh], 0,
+[cc db cc db
+cc bb cc bb
+qq we qq wb
+QQ we QQ wb
+])
+
+AT_CLEANUP
