@@ -790,6 +790,8 @@ setDolp(Char *cp)
 	    Char delim;
 	    Char *lhsub, *rhsub, *np;
 	    size_t lhlen = 0, rhlen = 0;
+	    /* keep track of where the last :a match hit */
+	    ptrdiff_t last_match = 0;
 
 	    delim = dolmod.s[++i];
 	    if (!delim || letter(delim)
@@ -813,7 +815,7 @@ setDolp(Char *cp)
 	    strip(cp);
 	    dp = cp;
 	    do {
-		dp = Strstr(dp, lhsub);
+		dp = Strstr(dp + last_match, lhsub);
 		if (dp) {
 		    ptrdiff_t diff = dp - cp;
 		    size_t len = (Strlen(cp) + 1 - lhlen + rhlen);
@@ -821,6 +823,7 @@ setDolp(Char *cp)
 		    (void) Strncpy(np, cp, diff);
 		    (void) Strcpy(np + diff, rhsub);
 		    (void) Strcpy(np + diff + rhlen, dp + lhlen);
+		    last_match = diff + rhlen;
 
 		    xfree(cp);
 		    dp = cp = np;
