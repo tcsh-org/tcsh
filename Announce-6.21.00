@@ -1,0 +1,29 @@
+Hello,
+
+I am pleased to announce that tcsh-6.21 is now available; this is a bug
+fix release (after 2.5 years) with no new features.
+
+Please consult the Fixes files for a complete list of changes.
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most UNIX machines, as well as Windows
+
+You can get tcsh from ftp://ftp.astron.com/pub/tcsh/tcsh-6.21.00.tar.gz
+The latest source is on github: https://github.com/tcsh-org/tcsh
+
+RMD160 (tcsh-6.21.00.tar.gz) = 665d522ded31e3fa23b71a5726d2d52e1c60e085
+
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you can
+get it from ftp.gnu.org or other GNU mirrors.
+
+I would like to thank:
+
+    * everyone who sent bug reports
+    * the beta team for all their help, bug fixes, and suggestions
+
+Best,
+
+christos

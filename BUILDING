@@ -28,8 +28,7 @@ To install tcsh:
 	Try the following:
 	apt-get install \
 	build-essential \
-	libncurses5-dev \
-	libncursesw5-dev \
+	libncurses-dev \
 	;
 
 2)  If you have imake running on your machine, you may try building with

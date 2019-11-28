@@ -199,7 +199,7 @@ dohup(Char **v, struct command *c)
     if (intty)
 	stderror(ERR_NAME | ERR_TERMINAL);
     if (setintr == 0)
-	(void) signal(SIGHUP, SIG_DFL);
+    	sigset_interrupting(SIGHUP, SIG_DFL);
 }
 
 
@@ -226,7 +226,7 @@ dofiletest(Char **v, struct command *c)
     globbed = v;
     cleanup_push(globbed, blk_cleanup);
 
-    while (*(fileptr = v++) != '\0') {
+    while (*(fileptr = v++) != NULL) {
 	res = filetest(ftest, &fileptr, 0);
 	cleanup_push(res, xfree);
 	xprintf("%S", res);

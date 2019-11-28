@@ -138,6 +138,7 @@ static time_t a2time_t (Char *);
  * special parsing rules apply for source -h
  */
 extern int enterhist;
+extern int postcmd_active;
 
 int
 lex(struct wordent *hp)
@@ -150,7 +151,8 @@ lex(struct wordent *hp)
     histvalid = 0;
     histline.len = 0;
 
-    btell(&lineloc);
+    if (!postcmd_active)
+	btell(&lineloc);
     hp->next = hp->prev = hp;
     hp->word = STRNULL;
     hadhist = 0;
@@ -1018,8 +1020,10 @@ domod(Char *cp, Char type)
 
     switch (type) {
 
-    case 'x':
     case 'q':
+    case 'x':
+	if (*cp == '\0')
+	    return Strsave(STRQNULL);
 	wp = Strsave(cp);
 	for (xp = wp; (c = *xp) != 0; xp++)
 	    if ((c != ' ' && c != '\t') || type == 'q')
