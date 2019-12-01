@@ -1,3 +1,10 @@
+  2. V6.22.01 - 20191201
+  1. undo PR/88: Preserve empty arguments in :q, since it breaks
+	$ set x=""
+	$ alias test "echo "\""$x:q"\"" is working."
+	$ alias test
+	echo "
+
   6. V6.22.00 - 20191128
   5. PR/113: Sobomax: avoid infinite loops for -c commands when stdout is
      not a tty.
