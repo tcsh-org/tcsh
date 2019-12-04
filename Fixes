@@ -1,3 +1,5 @@
+  4. V6.22.02 - 20191204
+  3. Fix version in configure.ac
   2. V6.22.01 - 20191201
   1. undo PR/88: Preserve empty arguments in :q, since it breaks
 	$ set x=""
