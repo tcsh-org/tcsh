@@ -1849,6 +1849,16 @@ substituted, not patterns that contain any substitution result.
 Print the new command line but do not execute it.
 .It Ar q
 Quote the substituted words, preventing further substitutions.
+.It Ar Q
+Same as
+.Ar q
+but in addition preserve empty variables as a string containing a NUL.
+This is useful to preserve positional arguments for example:
+.Bd -literal -offset indent -compact
+> set args=('arg 1' '' 'arg 3')
+> tcsh -f -c 'echo ${#argv}' $args:gQ
+3
+.Ed
 .It Ar x
 Like 
 .Ar q ,

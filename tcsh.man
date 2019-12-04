@@ -1133,6 +1133,18 @@ Print the new command line but do not execute it.
 q
 Quote the substituted words, preventing further substitutions.
 .TP 8
+Q
+Same as q
+but in addition preserve empty variables as a string containing a NUL.
+This is useful to preserve positional arguments for example:
+.IP "" 12
+> set args=('arg 1' '' 'arg 3')
+.br
+> tcsh -f -c 'echo ${#argv}' $args:gQ
+.br
+3
+.br
+.TP 8
 x
 Like q, but break into words at blanks, tabs and newlines.
 .PD

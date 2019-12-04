@@ -1,3 +1,5 @@
+  5. PR/88: Add a Q: modifier that preserves empty arguments leaving :q
+     alone.
   4. V6.22.02 - 20191204
   3. Fix version in configure.ac
   2. V6.22.01 - 20191201
