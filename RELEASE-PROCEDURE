@@ -35,7 +35,4 @@ HOW TO RELEASE TCSH
       click on "Add and Edit Version"
     - Set the "Date Order" to 2030-01-01 (i.e. far in the future)
     - Click on "Update Version"
-8)  Update the version on http://www.tcsh.org/MostRecentRelease
-9)  Update the online manual page http://www.tcsh.org/
-    - See instructions at https://github.com/tcsh-org/www
-10) Mail an announcement to tcsh@astron.com
+9)  Mail an announcement to tcsh@astron.com
