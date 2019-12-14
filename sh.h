@@ -1156,6 +1156,8 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 #define Strstr(a, b)		s_strstr(a, b)
 #endif 
 
+#define TCSH_MODIFIERS	"ehlqrstuxQ"
+
 /*
  * setname is a macro to save space (see sh.err.c)
  */
