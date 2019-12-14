@@ -64,9 +64,9 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\"
-.Dd May 8, 2019
+.Dd Dec 4, 2019
 .Dt TCSH 1
-.Os Astron 6.21.00
+.Os Astron 6.22.02
 .Sh NAME
 .Nm tcsh
 .Nd C shell with file name completion and command line editing
@@ -1849,6 +1849,16 @@ substituted, not patterns that contain any substitution result.
 Print the new command line but do not execute it.
 .It Ar q
 Quote the substituted words, preventing further substitutions.
+.It Ar Q
+Same as
+.Ar q
+but in addition preserve empty variables as a string containing a NUL.
+This is useful to preserve positional arguments for example:
+.Bd -literal -offset indent -compact
+> set args=('arg 1' '' 'arg 3')
+> tcsh -f -c 'echo ${#argv}' $args:gQ
+3
+.Ed
 .It Ar x
 Like 
 .Ar q ,
@@ -9518,7 +9528,7 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .Sh VERSION
-This manual documents tcsh 6.21.00 (Astron) 2019-05-08.
+This manual documents tcsh 6.22.02 (Astron) 2019-12-04.
 .Sh AUTHORS
 .PD 0
 .TP 2

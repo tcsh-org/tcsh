@@ -766,7 +766,7 @@ fixDolMod(void)
 		}
 		continue;
 	    }
-	    if (!any("luhtrqxes", c))
+	    if (!any(TCSH_MODIFIERS, c))
 		stderror(ERR_BADMOD, (int)c);
 	    Strbuf_append1(&dolmod, (Char) c);
 	    if (c == 'q') {

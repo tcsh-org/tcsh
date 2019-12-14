@@ -5,7 +5,7 @@
 The Tcsh source code is available on GitHub as a read-only repo
 mirror at:
 
-> http://github.com/tcsh-org/tcsh
+> https://github.com/tcsh-org/tcsh
 
 Instructions for compiling Tcsh can be found in [BUILDING].
 
