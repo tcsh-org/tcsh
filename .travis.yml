@@ -5,9 +5,15 @@ compiler:
 addons:
   apt:
     packages:
-    - automake
-    - libtinfo-dev
+    - libncurses-dev
     - make
+jobs:
+  allow_failures:
+  - os: windows
+os:
+- linux
+- osx
+- windows
 script:
 - ./configure
 - make -j4
