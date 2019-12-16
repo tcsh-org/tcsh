@@ -1,5 +1,7 @@
 HOW TO RELEASE TCSH
 
+See TOOLS.md for pre-requisites.
+
 1)  Update version number and date
     - patchlevel.h
     - Fixes (make a new entry at the top)
