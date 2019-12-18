@@ -8,13 +8,9 @@ addons:
     - libncurses-dev
     - make
 jobs:
-  allow_failures:
-  - os: windows
+  exclude:
+  - os: osx
+    compiler: gcc
 os:
 - linux
 - osx
-- windows
-script:
-- ./configure
-- make -j4
-- make check
