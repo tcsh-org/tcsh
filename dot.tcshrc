@@ -16,7 +16,7 @@ alias	rd	rmdir
 # The following commands are only for interactive shells.
 #
 
-if ($?prompt)
+if ( $?prompt ) then
   set \
     autocorrect \
     autoexpand \
@@ -44,9 +44,13 @@ if ($?prompt)
     bindkey ^Z run-fg-editor
     bindkey ^[^W kill-region
 
+    #
+    # Setup $hosts from ~/.hosts, ~/.rhosts, ~/.ssh/known_hosts
+    #
+
     if ( ! $?hosts ) then
       set hosts=()
-      foreach f ( "$HOME/."{,r,ssh/known_}hosts )
+      foreach f ( ~/.{,r,ssh/known_}hosts )
 	if ( -r "$f" ) then
 	  set hosts=( \
 	    $hosts \
