@@ -103,7 +103,8 @@ To install tcsh:
 11) Once satisfied that tcsh is working correctly, complete the
     installation by typing "make install" to install the binary, and
     "make install.man" to install the documentation. Don't forget to
-    look at complete.tcsh for useful completions...
+    look at complete.tcsh for useful completions, dot.login for a sample
+    ~/.login file, and dot.tcshrc for a sample ~/.tcshrc file...
 
 12) Enjoy.
 
