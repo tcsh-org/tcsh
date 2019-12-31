@@ -26,24 +26,12 @@ if ($?tcsh) then
 
 	set ellipsis
 	set rmstar
-#	set prompt='%{f9%}%/%{gg%}(%{f2%}%?%{gg%})\>'
-if ($?TERM) then
-    if ($TERM == "emacs") then
-	set prompt='%/\>'
-    else
-	set prompt='%{f9%}%c03%{gg%}\>'
-	set prompt3 = '%{fc%}Correct to %R ?(y|n|e)%{gg%} '
-    endif
-else
-	set prompt='%{f9%}%c03%{gg%}\>'
-	set prompt3 = '%{fc%}Correct to %R ?(y|n|e)%{gg%} '
-endif
+	set globstar
+	set prompt='%c03\>'
 
-	if ($?loginsh) then
-		set correct=all
-		set savedirs=100
-		set autocorrect
-	endif
+	set correct=all
+	set savedirs=100
+	set autocorrect
 
 #	set printexitvalue
 	set complete=igncase
@@ -113,6 +101,29 @@ set noglob
 			c/-Z/"(i 7 d p a e g l z)"/ \
 			c/-M/"(T D L)"/ \
 			n@*@f:*.{c,C,cpp,CPP}@
+
+	complete git "p/1/(commit branch remote merge pull push amend clone grep rebase reset bisect diff clone blame log checkout fetch status wdiff symbolic-ref reflog delete-merged)/" \
+		'n/br/`git branch|cut -c 3-|xargs echo --contains`/' 'N/br/`git branch|cut -c 3-`/' \
+		'n/cb/`git branch|cut -c 3-`/' \
+		'n/branch/`git branch|cut -c 3-`/' 'N/branch/`git branch|cut -c 3-`/' \
+		'n/co/`git branch|cut -c 3-`/' \
+		'N/symbolic-ref/`git branch|cut -c 3-`/' \
+		'n/merge/`git branch|cut -c 3-|xargs echo --no-ff --ff-only --squash`/' \
+		'N/merge/`git branch|cut -c 3-`/' \
+		'n/rebase/`git branch|cut -c 3-| xargs echo --continue --abort --onto --skip --interactive`/' \
+		'N/rebase/`git branch|cut -c 3-`/' \
+		'n/log/(--stat --author)/' \
+		'n/lh/(--stat --author)/' \
+		'n/commit/(--amend)/' \
+		'n/diff/(--cached --no-prefix --color-words --name-only)/' \
+		'n/pull/(--rebase --no-ff --squash)/' \
+		'n/fetch/`git remote`/' \
+		'n/reset/(HEAD^)/' \
+		'N/reset/(HEAD^)/' \
+		'n/stash/(apply list save pop clear)/' \
+		'n/push/`git remote`/' 'N/push/`git branch|cut -c 3-`/' \
+		'n/remote/(show add rm prune update)/' 'N/remote/`git remote`/'
+
 unset noglob
 #end completions
 
@@ -156,56 +167,41 @@ endif
 
 
 if (! $?PATH_DONE) then
-set path=($path c:/gnubin .)
+set path=($path:q c:/bin c:/vim/vim80 .)
+set path= ( c:/users/amol/appdata/local/Atlassian/SourceTree/git_local/bin $path )
+
 setenv PATH_DONE  1
 endif
 
 set notify
-set cdpath=( C:/ D:/ )#E:/ H:/samples )
+set cdpath=( C:/ H:/github F:/p4root )
 set noclobber
 set filec
 set history=(1000) 
-#"%h  %T   %{a2%}%R%{gg%}\n")
-#set histdup=all
 set savehist=(200 merge)
 set ignoreeof
 set fignore =(.obj .pdb .bsc .ilk .idb  .OBJ .PDB .BSC .ILK .IDB)
 
 set NTlamepathfix
-eval `dircolors`
 unalias v d ls vdir dir
 
-alias	ls  ls-F 
-alias   lc ls $LS_OPTIONS
+alias	ls  ls-F -C --color
 alias 	h 	history
-#alias   cwdcmd 'title `echo $cwd`'
 
 #
-# use the win32gnu utils for the following. or the win32sdk ones if you prefer.
-# PLEASE don't alias them to the posix utils in the reskit..
 #
-alias 	rm 	c:/gnubin/rm.exe -i
-alias 	rd	c:/gnubin/rmdir.exe
-alias 	md	c:/gnubin/mkdir.exe
+alias 	rm 	c:/bin/rm.exe -i
+alias 	rd	c:/bin/rmdir.exe
+alias 	md	c:/bin/mkdir.exe
 alias 	mv	C:/bin/mv.exe -i
 alias   cp  C:/bin/cp.exe -i
 alias	pwd 'echo $cwd'
+alias 	vi  c:/vim/vim80/vim.exe
 #
 alias   env printenv
 alias	net NET.EXE  # avoid spelling correction to "set"
 alias	cl  CL.EXE  # avoid spelling correction to "cp"
-alias   word c:/apps/winword/winword/winword.exe
-alias   excel e:/apps/excel/Excel/Excel.exe
-#alias	telnet qvtnet32
-alias	emacs c:/bin/emacs.csh
-alias	gemacs c:/bin/gemacs.csh #gui emacs
-alias	eshell c:/bin/eshell.csh
-alias	helpcommand winhlp32
-alias	benvcmd  start cmd /k benv.cmd
-alias   benv   source c:/bin/razzle.csh
-
-alias	use c:/bin/netuse.csh
-alias	unuse c:/bin/netunuse.csh
 
 alias   unsave unset savehist savedirs
-
+alias precmd "source ~/gitprompt.csh"
+alias git git #for spellcheck to .git
