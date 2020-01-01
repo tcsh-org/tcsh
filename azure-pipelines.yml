@@ -18,8 +18,8 @@ steps:
       nmake -f win32\makefile.win32 
     displayName: Build
 
-#  - task: PublishPipelineArtifact@1
-#   inputs:
-#      targetPath: '$(System.DefaultWorkingDirectory)/tcsh-x64.exe'
-#      artifact: 'binary'
-#      publishLocation: 'pipeline'
+  - task: PublishPipelineArtifact@1
+   inputs:
+      targetPath: '$(System.DefaultWorkingDirectory)/tcsh-x64.exe'
+      artifact: 'binary'
+      publishLocation: 'pipeline'
