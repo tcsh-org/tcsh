@@ -6,8 +6,8 @@ steps:
     inputs:
       gitHubConnection: github.com_amoldeshpande
       repositoryName: $(Build.Repository.Name) 
-      action: 'create' # Options: create, edit, delete
-      target:  # Required when action == Create || Action == Edit
+      #action: 'create' # Options: create, edit, delete
+      #target:  # Required when action == Create || Action == Edit
       tagSource: 'manual' # Required when action == Create# Options: auto, manual
       #tagPattern: # Optional
       tag: $(Build.BuildNumber) # Required when action == Edit || Action == Delete || TagSource == Manual
