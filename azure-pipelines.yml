@@ -38,7 +38,7 @@ steps:
       #releaseNotes: # Optional
       assets: '$(System.DefaultWorkingDirectory)/tcsh-x64.exe' # Optional
       #assetUploadMode: 'delete' # Optional. Options: delete, replace
-      isDraft: true # Optional
+      #isDraft: true # Optional
       #isPreRelease: false # Optional
       #addChangeLog: true # Optional
       #compareWith: 'lastFullRelease' # Required when addChangeLog == True. Options: lastFullRelease, lastRelease, lastReleaseByTag
