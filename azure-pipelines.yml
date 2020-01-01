@@ -18,11 +18,11 @@ steps:
       nmake -f win32\makefile.win32 
     displayName: Build
 
-  - task: PublishPipelineArtifact@1
-    inputs:
-      targetPath: '$(System.DefaultWorkingDirectory)/tcsh-x64.exe'
-      artifact: 'binary'
-      publishLocation: 'pipeline'
+#  - task: PublishPipelineArtifact@1
+#   inputs:
+#     targetPath: '$(System.DefaultWorkingDirectory)/tcsh-x64.exe'
+#      artifact: 'binary'
+#      publishLocation: 'pipeline'
   - task: GitHubRelease@0
     inputs:
       gitHubConnection: github.com_amoldeshpande
@@ -36,7 +36,7 @@ steps:
       #releaseNotesSource: 'file' # Optional. Options: file, input
       #releaseNotesFile: # Optional
       #releaseNotes: # Optional
-      assets: '$(Build.ArtifactStagingDirectory)/tcsh-x64.exe' # Optional
+      assets: '$(System.DefaultWorkingDirectory)/tcsh-x64.exe' # Optional
       #assetUploadMode: 'delete' # Optional. Options: delete, replace
       isDraft: true # Optional
       #isPreRelease: false # Optional
