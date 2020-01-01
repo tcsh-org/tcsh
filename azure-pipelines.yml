@@ -19,7 +19,7 @@ steps:
     displayName: Build
 
   - task: PublishPipelineArtifact@1
-   inputs:
+    inputs:
       targetPath: '$(System.DefaultWorkingDirectory)/tcsh-x64.exe'
       artifact: 'binary'
       publishLocation: 'pipeline'
