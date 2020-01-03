@@ -596,7 +596,7 @@ getdol(void)
 	int     gmodflag = 0, amodflag = 0;
 
 	do {
-	    Strbuf_append1(&name, c), c = getC(DOEXCL);
+	    Strbuf_append1(&name, c), c = getC(DOEXCL), gmodflag = 0, amodflag = 0;
 	    if (c == 'g' || c == 'a') {
 		if (c == 'g')
 		    gmodflag++;

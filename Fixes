@@ -1,3 +1,5 @@
+  7. alxwded@github, keep track of the :g and :a modifiers per modifier they
+     affect.
   6. alzwded@github, fix infinite loop with :gas variable modifier
   5. PR/88: Add a Q: modifier that preserves empty arguments leaving :q
      alone.
