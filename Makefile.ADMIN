@@ -9,15 +9,15 @@
 
 LYNX=	lynx -dump -nolist
 TRIM=	expand | sed -e 's/^  *$$//' | cat -s
-WEB=	http://www.tcsh.org/page?
+WEB=	https://www.tcsh.org
 
-PAGES=	FAQ WishList
+PAGES=	FAQ
 
 all: ${PAGES}
 
-.for i in FAQ WishList
+.for i in ${PAGES}
 $i: force
-	${LYNX} ${WEB}$i | ${TRIM} > ${.TARGET}
+	${LYNX} ${WEB}/${i:tl}/ | ${TRIM} > ${.TARGET}
 .endfor
 
 .DUMMY: force
