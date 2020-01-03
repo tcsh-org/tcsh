@@ -626,3 +626,18 @@ AT_CHECK([tcsh -f escape_echo.csh], 0,
 ])
 
 AT_CLEANUP
+
+AT_SETUP([avoid infinite loop in :gas])
+
+AT_DATA([replace_all.csh],
+[[set x=aa
+echo $x:gas/a/ba/
+exit 0
+]])
+
+AT_CHECK([tcsh -f replace_all.csh], 0,
+[baba
+])
+
+AT_CLEANUP
+
