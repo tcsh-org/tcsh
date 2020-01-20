@@ -1,3 +1,4 @@
+  8. Prevent recursive entry for writing history (Brett Frankenberger)
   7. alxwded@github, keep track of the :g and :a modifiers per modifier they
      affect.
   6. alzwded@github, fix infinite loop with :gas variable modifier

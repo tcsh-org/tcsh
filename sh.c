@@ -1839,6 +1839,10 @@ exitstat(void)
 void
 phup(void)
 {
+    static int again = 0;
+    if (again++)
+	return;
+
     if (loginsh) {
 	setcopy(STRlogout, STRhangup, VAR_READWRITE);
 #ifdef _PATH_DOTLOGOUT
@@ -2516,6 +2520,10 @@ defaultpath(void)
 static void
 record(void)
 {
+    static int again = 0;
+    if (again++)
+	return;
+
     if (!fast) {
 	recdirs(NULL, adrof(STRsavedirs) != NULL);
 	rechist(NULL, adrof(STRsavehist) != NULL);
