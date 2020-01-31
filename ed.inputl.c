@@ -665,7 +665,7 @@ RunCommand(Char *str)
 }
 
 int
-GetCmdChar(wchar_t ch)
+GetCmdChar(Char ch)
 {
 #ifndef WINNT_NATIVE // We use more than 256 for various extended keys 
     wint_t c = ch & CHAR;

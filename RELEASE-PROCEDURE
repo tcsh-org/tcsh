@@ -1,9 +1,12 @@
 HOW TO RELEASE TCSH
 
+See TOOLS.md for pre-requisites.
+
 1)  Update version number and date
     - patchlevel.h
     - Fixes (make a new entry at the top)
     - tcsh.man (two separate lines, with the date in different formats)
+    - tcsh.man.new (same)
     - configure.ac (version only)
 2)  Run autoreconf
 3)  Run make distclean; configure && make && make check
@@ -34,12 +37,4 @@ HOW TO RELEASE TCSH
       click on "Add and Edit Version"
     - Set the "Date Order" to 2030-01-01 (i.e. far in the future)
     - Click on "Update Version"
-8)  Update the version on http://www.tcsh.org/MostRecentRelease
-9)  Update the online manual page http://www.tcsh.org/tcsh.man/top.html
-    - Login to the webhost (huru)
-    - cd ~/src/tcsh && git pull
-    - cd ~/.www/sites/tcsh.org/man \
-	&& cp -p ~/src/tcsh/tcsh.man \
-	&& make clean \
-	&& make
-10) Mail an announcement to tcsh@astron.com
+9)  Mail an announcement to tcsh@astron.com

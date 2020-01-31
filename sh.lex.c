@@ -596,7 +596,7 @@ getdol(void)
 	int     gmodflag = 0, amodflag = 0;
 
 	do {
-	    Strbuf_append1(&name, c), c = getC(DOEXCL);
+	    Strbuf_append1(&name, c), c = getC(DOEXCL), gmodflag = 0, amodflag = 0;
 	    if (c == 'g' || c == 'a') {
 		if (c == 'g')
 		    gmodflag++;
@@ -634,7 +634,7 @@ getdol(void)
 		}
 		c = 's';
 	    }
-	    if (!any("htrqxesul", c)) {
+	    if (!any(TCSH_MODIFIERS, c)) {
 		if ((amodflag || gmodflag) && c == '\n')
 		    stderror(ERR_VARSYN);	/* strike */
 		seterror(ERR_BADMOD, c);
@@ -1019,12 +1019,15 @@ domod(Char *cp, Char type)
     int c;
 
     switch (type) {
-
-    case 'x':
+    case 'Q':
+	if (*cp == '\0')
+		return Strsave(STRQNULL);
+	/*FALLTHROUGH*/
     case 'q':
+    case 'x':
 	wp = Strsave(cp);
 	for (xp = wp; (c = *xp) != 0; xp++)
-	    if ((c != ' ' && c != '\t') || type == 'q')
+	    if ((c != ' ' && c != '\t') || type == 'q' || type == 'Q')
 		*xp |= QUOTE;
 	return (wp);
 
