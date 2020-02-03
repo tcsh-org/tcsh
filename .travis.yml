@@ -1,3 +1,7 @@
+branches:
+  only:
+  - master
+  - coverity_scan
 language: c
 compiler:
 - gcc
@@ -7,6 +11,16 @@ addons:
     packages:
     - libncurses-dev
     - make
+  coverity_scan:
+    project:
+      name: tcsh-org/tcsh
+      version: 6.22
+      description: C shell with file name completion and command line editing
+    notification_email: tcsh-notify@tcsh.org
+    build_command_prepend: ./configure
+    build_command: make
+    # https://scan.coverity.com/faq#frequency
+    branch_pattern: coverity_scan
 jobs:
   exclude:
   - os: osx
@@ -14,3 +28,5 @@ jobs:
 os:
 - linux
 - osx
+script:
+- '[ "${COVERITY_SCAN_BRANCH}" != 1 ] && ./configure && make && make test'
