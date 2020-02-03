@@ -28,5 +28,7 @@ jobs:
 os:
 - linux
 - osx
-script:
-- '[ "${COVERITY_SCAN_BRANCH}" != 1 ] && ./configure && make && make test'
+script: >-
+  if [ "${COVERITY_SCAN_BRANCH}" != 1 ] ;
+  then ./configure && make && make test ;
+  fi
