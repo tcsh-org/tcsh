@@ -22,5 +22,5 @@ the tcsh mailing list:
 [![Build Status][status]][travis]
 
 [BUILDING]: BUILDING
-[status]: https://travis-ci.org/tcsh-org/tcsh.svg?branch=master
-[travis]: https://travis-ci.org/tcsh-org/tcsh
+[status]: https://travis-ci.com/tcsh-org/tcsh.svg?branch=master
+[travis]: https://travis-ci.com/tcsh-org/tcsh
