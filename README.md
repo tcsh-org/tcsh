@@ -20,7 +20,10 @@ the tcsh mailing list:
 > https://mailman.astron.com/mailman/listinfo/tcsh
 
 [![Build Status][status]][travis]
+[![Coverity Scan][badge]][coverity]
 
 [BUILDING]: BUILDING
+[badge]: https://scan.coverity.com/projects/20307/badge.svg
+[coverity]: https://scan.coverity.com/projects/tcsh-org-tcsh
 [status]: https://travis-ci.com/tcsh-org/tcsh.svg?branch=master
 [travis]: https://travis-ci.com/tcsh-org/tcsh
