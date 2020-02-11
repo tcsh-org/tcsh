@@ -928,6 +928,10 @@ Saved commands are numbered sequentially from 1 and stamped with the time.
 It is not usually necessary to use event numbers, but the current event number
 can be made part of the prompt by placing an `!' in the \fBprompt\fR shell variable.
 .PP
+By default history entries are displayed by printing each parsed token
+separated by space; thus the redirection operator `>&!' will be displayed as
+`> & !'.
+.PP
 The shell actually saves history in expanded and literal (unexpanded) forms.
 If the \fBhistlit\fR shell variable is set, commands that display and store
 history use the literal form.

@@ -1494,6 +1494,11 @@ in the
 .Va prompt
 shell variable.
 .Pp
+By default history entries are displayed by printing each parsed token
+separated by space; thus the redirection operator
+.Sq >\&&\&!
+will be displayed as
+.Sq >\0\&&\0\&! .
 The shell actually saves history in expanded and literal (unexpanded) forms.
 If the
 .Va histlit
