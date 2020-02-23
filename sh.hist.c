@@ -1292,7 +1292,7 @@ rechist(Char *fname, int ref)
 #endif
 	    }
 	    getexit(osetexit);
-	    if (setexit())
+	    if (setexit() == 0)
 		loadhist(fname, 1);
 	    resexit(osetexit);
 	}
