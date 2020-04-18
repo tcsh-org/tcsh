@@ -1356,7 +1356,7 @@ loaddirs(Char *fname)
 void
 recdirs(Char *fname, int def)
 {
-    int     fp, ftmp, oldidfds;
+    int     fp, ftmp, oldidfds, ophup_disabled;
     int     cdflag = 0;
     struct directory *dp;
     unsigned int    num;
@@ -1366,6 +1366,8 @@ recdirs(Char *fname, int def)
     if (fname == NULL && !def) 
 	return;
 
+    ophup_disabled = phup_disabled;
+    phup_disabled = 1;
     if (fname == NULL) {
 	if ((fname = varval(STRdirsfile)) == STRNULL)
 	    fname = Strspl(varval(STRhome), &STRtildotdirs[1]);
@@ -1378,6 +1380,7 @@ recdirs(Char *fname, int def)
 
     if ((fp = xcreat(short2str(fname), 0600)) == -1) {
 	cleanup_until(fname);
+	phup_disabled = ophup_disabled;
 	return;
     }
 
@@ -1413,4 +1416,5 @@ recdirs(Char *fname, int def)
     SHOUT = ftmp;
     didfds = oldidfds;
     cleanup_until(fname);
+    phup_disabled = ophup_disabled;
 }

@@ -1,3 +1,4 @@
+ 10. Block SIGHUP while writing history/directory stack (Brett Frankenberger)
   9. Fixed reversed test that broke history merging (Brett Frankenberger)
   8. Prevent recursive entry for writing history (Brett Frankenberger)
   7. alxwded@github, keep track of the :g and :a modifiers per modifier they
