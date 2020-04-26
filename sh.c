@@ -179,7 +179,7 @@ add_localedir_to_nlspath(const char *path)
     if (path == NULL)
         return;
 
-    (void) xsnprintf(trypath, sizeof(trypath), "%s/en/LC_MESSAGES/tcsh.cat",
+    (void) xsnprintf(trypath, sizeof(trypath), "%s/C/LC_MESSAGES/tcsh.cat",
 	path);
     if (stat(trypath, &st) == -1)
 	return;
