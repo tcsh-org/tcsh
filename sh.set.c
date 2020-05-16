@@ -146,15 +146,10 @@ update_vars(Char *vp)
 	Char *cp, *canon;
 
 	cp = Strsave(varval(vp));	/* get the old value back */
-	cleanup_push(cp, xfree);
-
 	/*
 	 * convert to cononical pathname (possibly resolving symlinks)
 	 */
 	canon = dcanon(cp, cp);
-	// coverity[use_after_free] we use the pointer as a marker
-	cleanup_ignore(cp);
-	cleanup_until(cp);
 	cleanup_push(canon, xfree);
 
 	setcopy(vp, canon, VAR_READWRITE);	/* have to save the new val */

@@ -48,6 +48,7 @@ static  void 			 dextract	(struct directory *);
 static  int 			 skipargs	(Char ***, const char *,
 						 const char *);
 static	void			 dgetstack	(void);
+static  Char			*dcanon_internal(Char *, Char *);
 
 static struct directory dhead INIT_ZERO_STRUCT;		/* "head" of loop */
 static int    printd;			/* force name to be printed */
@@ -148,16 +149,10 @@ dinit(Char *hp)
 		    cleanup_push(tcp, xfree);
 		}
 	    }
-	    cleanup_push(tcp, xfree);
 	    cp = dcanon(tcp, STRNULL);
-	    cleanup_ignore(tcp);
-	    cleanup_until(tcp);
 	}
 #else /* S_IFLNK */
-	cleanup_push(tcp, xfree);
 	cp = dcanon(tcp, STRNULL);
-	cleanup_ignore(tcp);
-	cleanup_until(tcp);
 #endif /* S_IFLNK */
     }
 
@@ -313,7 +308,7 @@ dtilde(void)
     do {
 	if (d == &dhead)
 	    continue;
-	d->di_name = dcanon(d->di_name, STRNULL);
+	d->di_name = dcanon_internal(d->di_name, STRNULL);
     } while ((d = d->di_prev) != dcwd);
 
     dset(dcwd->di_name);
@@ -571,16 +566,10 @@ dgoto(Char *cp)
     if (ABSOLUTEP(cp) && cp[1] == ':') { /* Only DOS paths are treated that way */
 	return agetcwd();
     } else {
-	cleanup_push(cp, xfree);
     	ret = dcanon(cp, dp);
-	cleanup_ignore(cp);
-	cleanup_until(cp);
     }
 #else /* !WINNT_NATIVE */
-    cleanup_push(cp, xfree);
     ret = dcanon(cp, dp);
-    cleanup_ignore(cp);
-    cleanup_until(cp);
 #endif /* WINNT_NATIVE */
     return ret;
 }
@@ -868,12 +857,26 @@ dfree(struct directory *dp)
 }
 
 /*
- * dcanon - canonicalize the pathname, removing excess ./ and ../ etc.
+ * dcanon - a safe version of dcanon_internal that arranges for cleanup
+ */
+Char *
+dcanon(Char *cp, Char *p)
+{
+    cleanup_push(cp, xfree);
+    p = dcanon_internal(cp, p);
+    // coverity[use_after_free] we use the pointer as a marker
+    cleanup_ignore(cp);
+    cleanup_until(cp);
+    return p;
+}
+
+/*
+ * dcanon_internal - canonicalize the pathname, removing excess ./ and ../ etc.
  *	we are of course assuming that the file system is standardly
  *	constructed (always have ..'s, directories have links)
  */
-Char   *
-dcanon(Char *cp, Char *p)
+static Char *
+dcanon_internal(Char *cp, Char *p)
 {
     Char *sp;
     Char *p1, *p2;	/* general purpose */
