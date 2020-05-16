@@ -152,6 +152,7 @@ update_vars(Char *vp)
 	 * convert to cononical pathname (possibly resolving symlinks)
 	 */
 	canon = dcanon(cp, cp);
+	// coverity[use_after_free] we use the pointer as a marker
 	cleanup_ignore(cp);
 	cleanup_until(cp);
 	cleanup_push(canon, xfree);
