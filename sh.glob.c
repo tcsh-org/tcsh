@@ -513,14 +513,16 @@ globone(Char *str, int action)
     }
  result:
     if (vl && vl[0] == NULL) {
-	xfree(vl);
+	if (vl != v)
+	    xfree(vl);
 	return (Strsave(STRNULL));
     }
     if (vl && vl[1]) 
 	return (handleone(str, vl, action));
     else {
 	str = strip(*vl);
-	xfree(vl);
+	if (vl != v)
+	    xfree(vl);
 	return (str);
     }
 }
