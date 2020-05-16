@@ -660,7 +660,7 @@ set1(const Char *var, Char **vec, struct varent *head, int flags)
 	gflag = tglob(oldv);
 	if (gflag) {
 	    vec = globall(oldv, gflag);
-	    if (vec == 0) {
+	    if (vec == NULL) {
 		blkfree(oldv);
 		stderror(ERR_NAME | ERR_NOMATCH);
 	    }
@@ -677,7 +677,7 @@ set1(const Char *var, Char **vec, struct varent *head, int flags)
 	 *  Delete all duplicate words leaving "holes" in the word array (vec).
 	 *  Then remove the "holes", keeping the order of the words unchanged.
 	 */
-	if (vec && vec[0] && vec[1]) { /* more than one word ? */
+	if (vec[0] && vec[1]) { /* more than one word ? */
 	    int i, j;
 	    int num_items;
 
