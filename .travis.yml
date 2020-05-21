@@ -27,6 +27,7 @@ jobs:
     compiler: gcc
 os:
 - linux
+- freebsd
 - osx
 script: >-
   if [ "${COVERITY_SCAN_BRANCH}" != 1 ] ;
