@@ -2,10 +2,50 @@ branches:
   only:
   - master
   - coverity_scan
+
 language: c
+
+arch:
+- amd64
+- arm64
+- ppc64le
+- s390x
+
 compiler:
 - gcc
 - clang
+
+os:
+- linux
+- freebsd
+- osx
+
+jobs:
+  exclude:
+  - os: osx
+    compiler: gcc
+  include:
+  - name: 'Linux 32-bit gcc'
+    arch: amd64
+    compiler: gcc
+    os: linux
+    env: CC='gcc -m32'
+  - name: 'Linux 32-bit clang'
+    arch: amd64
+    compiler: gcc
+    os: linux
+    env: CC='clang -m32'
+  - name: 'FreeBSD 32-bit gcc'
+    arch: amd64
+    compiler: gcc
+    os: freebsd
+    env: CC='gcc -m32'
+  - name: 'FreeBSD 32-bit clang'
+    arch: amd64
+    compiler: gcc
+    os: freebsd
+    env: CC='clang -m32'
+
 addons:
   apt:
     packages:
@@ -21,19 +61,7 @@ addons:
     build_command: make
     # https://scan.coverity.com/faq#frequency
     branch_pattern: coverity_scan
-jobs:
-  exclude:
-  - os: osx
-    compiler: gcc
-arch:
-- amd64
-- arm64
-- ppc64le
-- s390x
-os:
-- linux
-- freebsd
-- osx
+
 script: >-
   if [ "${COVERITY_SCAN_BRANCH}" != 1 ] ;
   then ./configure && make && make test ;
