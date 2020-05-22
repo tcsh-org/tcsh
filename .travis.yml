@@ -33,8 +33,10 @@ jobs:
     addons:
       apt:
         packages:
-        - lib32ncurses5-dev
         - gcc-multilib
+        - lib32ncurses5-dev
+        - libncurses5-dev
+        - make
   - name: 'Linux 32-bit clang'
     arch: amd64
     compiler: clang
@@ -43,8 +45,10 @@ jobs:
     addons:
       apt:
         packages:
-        - lib32ncurses5-dev
         - gcc-multilib
+        - lib32ncurses5-dev
+        - libncurses5-dev
+        - make
   - name: 'FreeBSD 32-bit gcc'
     arch: amd64
     compiler: gcc
