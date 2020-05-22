@@ -49,8 +49,10 @@ jobs:
 addons:
   apt:
     packages:
+    - lib32ncurses-dev
     - libncurses-dev
     - make
+    - multilib
   coverity_scan:
     project:
       name: tcsh-org/tcsh
