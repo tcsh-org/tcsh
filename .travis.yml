@@ -21,8 +21,6 @@ os:
 - osx
 
 jobs:
-  allow_failures:
-  - os: freebsd
   exclude:
   - os: osx
     compiler: gcc
