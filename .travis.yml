@@ -25,6 +25,11 @@ jobs:
   exclude:
   - os: osx
     compiler: gcc
+arch:
+- amd64
+- arm64
+- ppc64le
+- s390x
 os:
 - linux
 - freebsd
