@@ -32,9 +32,9 @@ jobs:
     env: CFLAGS=-m32
     addons:
       apt:
-	packages:
-	- lib32ncurses5-dev
-	- gcc-multilib
+        packages:
+        - lib32ncurses5-dev
+        - gcc-multilib
   - name: 'Linux 32-bit clang'
     arch: amd64
     compiler: clang
@@ -42,9 +42,9 @@ jobs:
     env: CFLAGS=-m32
     addons:
       apt:
-	packages:
-	- lib32ncurses5-dev
-	- gcc-multilib
+        packages:
+        - lib32ncurses5-dev
+        - gcc-multilib
   - name: 'FreeBSD 32-bit gcc'
     arch: amd64
     compiler: gcc
