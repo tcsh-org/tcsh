@@ -30,11 +30,21 @@ jobs:
     compiler: gcc
     os: linux
     env: CFLAGS=-m32
+    addons:
+      apt:
+	packages:
+	- lib32ncurses5-dev
+	- gcc-multilib
   - name: 'Linux 32-bit clang'
     arch: amd64
     compiler: clang
     os: linux
     env: CFLAGS=-m32
+    addons:
+      apt:
+	packages:
+	- lib32ncurses5-dev
+	- gcc-multilib
   - name: 'FreeBSD 32-bit gcc'
     arch: amd64
     compiler: gcc
@@ -49,10 +59,8 @@ jobs:
 addons:
   apt:
     packages:
-    - lib32ncurses5-dev
     - libncurses5-dev
     - make
-    - gcc-multilib
   coverity_scan:
     project:
       name: tcsh-org/tcsh
