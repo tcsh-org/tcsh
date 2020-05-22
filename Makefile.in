@@ -739,7 +739,9 @@ $(srcdir)/stamp-h.in: $(srcdir)/configure.ac
 	@echo timestamp > $(srcdir)/stamp-h.in
 
 check test: atconfig $(srcdir)/tests/testsuite
-	$(ENVCMD) - $(SHELL) $(srcdir)/tests/testsuite
+	$(ENVCMD) - \
+		USER="$(USER)" \
+		$(SHELL) $(srcdir)/tests/testsuite
 
 #
 # Dependencies
