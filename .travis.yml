@@ -29,30 +29,30 @@ jobs:
     arch: amd64
     compiler: gcc
     os: linux
-    env: CC='gcc -m32'
+    env: CFLAGS=-m32
   - name: 'Linux 32-bit clang'
     arch: amd64
-    compiler: gcc
+    compiler: clang
     os: linux
-    env: CC='clang -m32'
+    env: CFLAGS=-m32
   - name: 'FreeBSD 32-bit gcc'
     arch: amd64
     compiler: gcc
     os: freebsd
-    env: CC='gcc -m32'
+    env: CFLAGS=-m32
   - name: 'FreeBSD 32-bit clang'
     arch: amd64
-    compiler: gcc
+    compiler: clang
     os: freebsd
-    env: CC='clang -m32'
+    env: CFLAGS=-m32
 
 addons:
   apt:
     packages:
-    - lib32ncurses-dev
-    - libncurses-dev
+    - lib32ncurses5-dev
+    - libncurses5-dev
     - make
-    - multilib
+    - gcc-multilib
   coverity_scan:
     project:
       name: tcsh-org/tcsh
