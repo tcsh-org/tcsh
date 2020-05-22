@@ -723,8 +723,8 @@ fixDolMod(void)
 	ndolflags = 0;
 	do {
 	    ++ndolflags;
-	    dolmcnts = xrealloc(dolmcnts, ndolflags);
-	    dolaflags = xrealloc(dolaflags, ndolflags);
+	    dolmcnts = xrealloc(dolmcnts, ndolflags * sizeof(int));
+	    dolaflags = xrealloc(dolaflags, ndolflags * sizeof(int));
 	    c = DgetC(0), dolmcnts[ndolflags - 1] = 1, dolaflags[ndolflags - 1] = 0;
 	    if (c == 'g' || c == 'a') {
 		if (c == 'g') {
