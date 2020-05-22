@@ -6,6 +6,7 @@
 # things; Paul Placeway, CIS Dept., Ohio State University
 #
 SHELL=/bin/sh
+ENVCMD=/usr/bin/env
 VERSION=@PACKAGE_VERSION@
 BUILD=tcsh$(EXEEXT)
 VPATH=@srcdir@
@@ -738,7 +739,7 @@ $(srcdir)/stamp-h.in: $(srcdir)/configure.ac
 	@echo timestamp > $(srcdir)/stamp-h.in
 
 check test: atconfig $(srcdir)/tests/testsuite
-	$(SHELL) $(srcdir)/tests/testsuite
+	$(ENVCMD) - $(SHELL) $(srcdir)/tests/testsuite
 
 #
 # Dependencies
