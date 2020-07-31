@@ -3770,6 +3770,7 @@ in login and superuser shells, but not if the shell thinks it is running
 under a window system (i.e., the \fBDISPLAY\fR environment variable is set),
 the tty is a pseudo-tty (pty) or the shell was not so compiled (see the
 \fBversion\fR shell variable).
+Unset or set to `0' to disable automatic logout.
 See also the \fBafsuser\fR and \fBlogout\fR shell variables.
 .TP 8
 .B autorehash \fR(+)

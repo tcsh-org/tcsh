@@ -6818,6 +6818,10 @@ environment variable is set),
 the tty is a pseudo-tty (pty) or the shell was not so compiled (see the
 .Va version
 shell variable).
+Unset
+.Va autologout or set it to 
+.Dv 0
+to disable automatic logout.
 See also the
 .Va afsuser
 and
