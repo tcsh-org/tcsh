@@ -1047,24 +1047,22 @@ domod(Char *cp, Char type)
 	wp = Strrchr(cp, '/');
 	if (wp == NULL)
 	    return Strsave(type == 't' ? cp : STRNULL);
-	if (type == 'h')
-	    xp = Strnsave(cp, wp - cp);
-	else
+	if (type == 't')
 	    xp = Strsave(wp + 1);
+	else
+	    xp = Strnsave(cp, wp - cp);
 	return (xp);
 
     case 'e':
     case 'r':
-	wp = Strend(cp);
-	for (wp--; wp >= cp && *wp != '/'; wp--)
-	    if (*wp == '.') {
-		if (type == 'e')
-		    xp = Strsave(wp + 1);
-		else
-		    xp = Strnsave(cp, wp - cp);
-		return (xp);
-	    }
-	return (Strsave(type == 'e' ? STRNULL : cp));
+	wp = Strrchr(cp, '.');
+	if (wp == NULL)
+	    return Strsave(type == 'r' ? cp : STRNULL);
+	if (type == 'e')
+	    xp = Strsave(wp + 1);
+	else
+	    xp = Strnsave(cp, wp - cp);
+	return (xp);
     default:
 	break;
     }
