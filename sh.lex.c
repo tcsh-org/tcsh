@@ -1044,14 +1044,16 @@ domod(Char *cp, Char type)
 
     case 'h':
     case 't':
-	if (!any(short2str(cp), '/'))
-	    return (type == 't' ? Strsave(cp) : 0);
-	wp = Strrchr(cp, '/');
-	if (type == 'h')
-	    xp = Strnsave(cp, wp - cp);
-	else
-	    xp = Strsave(wp + 1);
-	return (xp);
+	wp = Strend(cp);
+	for (wp--; wp >= cp; wp--)
+	    if (*wp == '/') {
+		if (type == 'h')
+		    xp = Strnsave(cp, wp - cp);
+		else
+		    xp = Strsave(wp + 1);
+		return (xp);
+	    }
+	return (Strsave(type == 'h' ? STRNULL : cp));
 
     case 'e':
     case 'r':
