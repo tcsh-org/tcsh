@@ -1046,7 +1046,7 @@ domod(Char *cp, Char type)
     case 't':
 	wp = Strrchr(cp, '/');
 	if (wp == NULL)
-	    return (type == 't' ? Strsave(cp) : 0);
+	    return Strsave(type == 't' ? cp : STRNULL);
 	if (type == 'h')
 	    xp = Strnsave(cp, wp - cp);
 	else
