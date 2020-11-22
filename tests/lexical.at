@@ -677,7 +677,7 @@ AT_CHECK([tcsh -f colon_r_no_extension.csh], 0,
 
 AT_CLEANUP
 
-AT_SETUP([$x:q:h does not cause out of memory crash and yields nothing])
+AT_SETUP([$x:q:h does not cause out of memory crash and yields the full string])
 
 AT_DATA([x_colon_q_colon_h.csh],
 [[set x='a/b c/d.e'
@@ -686,7 +686,7 @@ exit 0
 ]])
 
 AT_CHECK([tcsh -f x_colon_q_colon_h.csh], 0,
-[
+[a/b c/d.e
 ])
 
 AT_CLEANUP
