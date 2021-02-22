@@ -1,5 +1,6 @@
-  1. Don't crash with 'bindkey "^0" clear-screen' (Karl Jeacle)
- 12. V6.22.02 - 20201118
+ 14. Don't crash with 'bindkey "^0" clear-screen' (Karl Jeacle)
+ 13. Fix $x:q:h and $x:q:t return the whole string for strings not containing /
+ 12. V6.22.03 - 20201118
  11. Fix $x:q:h and $x:q:t to not crash (alzwded) with strings containing /
  10. Block SIGHUP while writing history/directory stack (Brett Frankenberger)
   9. Fixed reversed test that broke history merging (Brett Frankenberger)
