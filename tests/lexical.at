@@ -663,3 +663,73 @@ AT_CHECK([tcsh -f replace_all.csh], 0,
 
 AT_CLEANUP
 
+AT_SETUP([/a.b/c:r doesn't remove path elements])
+
+AT_DATA([colon_r_no_extension.csh],
+[[set x='/a.b/c'
+echo $x:r
+exit 0
+]])
+
+AT_CHECK([tcsh -f colon_r_no_extension.csh], 0,
+[/a.b/c
+])
+
+AT_CLEANUP
+
+AT_SETUP([$x:q:h does not cause out of memory crash and yields the full string])
+
+AT_DATA([x_colon_q_colon_h.csh],
+[[set x='a/b c/d.e'
+echo $x:q:h
+exit 0
+]])
+
+AT_CHECK([tcsh -f x_colon_q_colon_h.csh], 0,
+[a/b c/d.e
+])
+
+AT_CLEANUP
+
+AT_SETUP([$x:q:t does not cause out of memory crash and yields the full string])
+
+AT_DATA([x_colon_q_colon_h.csh],
+[[set x='a/b c/d.e'
+echo $x:q:t
+exit 0
+]])
+
+AT_CHECK([tcsh -f x_colon_q_colon_h.csh], 0,
+[a/b c/d.e
+])
+
+AT_CLEANUP
+
+AT_SETUP([$x:q:r yields the full string])
+
+AT_DATA([x_colon_q_colon_r.csh],
+[[set x='a/b c/d.e'
+echo $x:q:r
+exit 0
+]])
+
+AT_CHECK([tcsh -f x_colon_q_colon_r.csh], 0,
+[a/b c/d.e
+])
+
+AT_CLEANUP
+
+AT_SETUP([$x:q:e yields nothing])
+
+AT_DATA([x_colon_q_colon_e.csh],
+[[set x='a/b c/d.e'
+echo $x:q:e
+exit 0
+]])
+
+AT_CHECK([tcsh -f x_colon_q_colon_e.csh], 0,
+[
+])
+
+AT_CLEANUP
+

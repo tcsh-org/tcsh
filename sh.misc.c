@@ -288,7 +288,7 @@ closem(void)
 	  {
 	    xclose(f);
 #ifdef NISPLUS
-	    if(f < 3)
+	    if (f < 3)
 		(void) xopen(_PATH_DEVNULL, O_RDONLY|O_LARGEFILE);
 #endif /* NISPLUS */
 	  }

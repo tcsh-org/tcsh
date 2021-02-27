@@ -790,7 +790,7 @@ static int
 all_dolmcnts_are_0()
 {
     int i = 0;
-    for(; i < ndolflags; ++i) {
+    for (; i < ndolflags; ++i) {
 	if (dolmcnts[i] != 0)
 	    return 0;
     }
@@ -827,12 +827,12 @@ setDolp(Char *cp)
 		break;
 	    }
 	    lhsub = &dolmod.s[++i];
-	    while(dolmod.s[i] != delim && dolmod.s[++i]) {
+	    while (dolmod.s[i] != delim && dolmod.s[++i]) {
 		lhlen++;
 	    }
 	    dolmod.s[i] = 0;
 	    rhsub = &dolmod.s[++i];
-	    while(dolmod.s[i] != delim && dolmod.s[++i]) {
+	    while (dolmod.s[i] != delim && dolmod.s[++i]) {
 		rhlen++;
 	    }
 	    dolmod.s[i] = 0;

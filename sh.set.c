@@ -219,7 +219,7 @@ update_vars(Char *vp)
     }
 #endif /* COLOR_LS_F */
 #if defined(KANJI) && defined(SHORT_STRINGS) && defined(DSPMBYTE)
-    else if(eq(vp, CHECK_MBYTEVAR) || eq(vp, STRnokanji)) {
+    else if (eq(vp, CHECK_MBYTEVAR) || eq(vp, STRnokanji)) {
 	update_dspmbyte_vars();
     }
 #endif
@@ -272,7 +272,7 @@ doset(Char **v, struct command *c)
 	    v++;
 	    changed = 1;
 	}
-    } while(changed);
+    } while (changed);
     p = *v++;
     if (p == 0) {
 	plist(&shvhed, flags);
@@ -1158,7 +1158,7 @@ update_dspmbyte_vars(void)
     if ((vp = adrof(CHECK_MBYTEVAR)) && !adrof(STRnokanji)) {
 	_enable_mbdisp = 1;
 	dstr1 = vp->vec[0];
-	if(eq (dstr1, STRsjis))
+	if (eq (dstr1, STRsjis))
 	    iskcode = 1;
 	else if (eq(dstr1, STReuc))
 	    iskcode = 2;

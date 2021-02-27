@@ -1472,7 +1472,7 @@ e_insert(Char c)
     else {
 	if (inputmode != MODE_INSERT) {
 	    int i;
-	    for(i = 0; i < Argument; i++) 
+	    for (i = 0; i < Argument; i++) 
 		UndoBuf[UndoSize++] = *(Cursor + i);
 
 	    UndoBuf[UndoSize] = '\0';
@@ -2923,7 +2923,7 @@ v_csearch_fwd(Char ch, int count, int tflag)
 
     cp = Cursor;
     while (count--) {
-	if(*cp == ch) 
+	if (*cp == ch) 
 	    cp++;
 	while (cp < LastChar && *cp != ch) 
 	    cp++;
@@ -3771,7 +3771,7 @@ v_undo(Char c)
 	size = (int)(Cursor-LastChar); /*  NOT NSL independant */
 	if (size < UndoSize)
 	    size = UndoSize;
-	for(loop = 0; loop < size; loop++) {
+	for (loop = 0; loop < size; loop++) {
 	    temp = *kp;
 	    *kp++ = *cp;
 	    *cp++ = temp;

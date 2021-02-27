@@ -1423,7 +1423,7 @@ dosetenv(Char **v, struct command *c)
     /* dspkanji/dspmbyte autosetting */
     /* PATCH IDEA FROM Issei.Suzuki VERY THANKS */
 #if defined(DSPMBYTE)
-    if(eq(vp, STRLANG) && !adrof(CHECK_MBYTEVAR)) {
+    if (eq(vp, STRLANG) && !adrof(CHECK_MBYTEVAR)) {
 	autoset_dspmbyte(lp);
     }
 #endif
