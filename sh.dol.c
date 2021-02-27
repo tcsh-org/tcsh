@@ -746,6 +746,7 @@ fixDolMod(void)
 
 	    if (c == 's') {	/* [eichin:19910926.0755EST] */
 		int delimcnt = 2;
+		int esc = 0;
 		eChar delim = DgetC(0);
 		Strbuf_append1(&dolmod, (Char) c);
 		Strbuf_append1(&dolmod, (Char) delim);
@@ -756,11 +757,16 @@ fixDolMod(void)
 		    break;
 		}	
 		while ((c = DgetC(0)) != DEOF) {
+		    if (esc == 0 && c == '\\') {
+			esc = 1;
+			continue;
+		    }
 		    Strbuf_append1(&dolmod, (Char) c);
-		    if(c == delim) delimcnt--;
-		    if(!delimcnt) break;
+		    if (!esc && c == delim) delimcnt--;
+		    if (!delimcnt) break;
+		    esc = 0;
 		}
-		if(delimcnt) {
+		if (delimcnt) {
 		    seterror(ERR_BADSUBST);
 		    break;
 		}
@@ -785,7 +791,7 @@ all_dolmcnts_are_0()
 {
     int i = 0;
     for(; i < ndolflags; ++i) {
-	if(dolmcnts[i] != 0)
+	if (dolmcnts[i] != 0)
 	    return 0;
     }
     return 1;
@@ -807,7 +813,7 @@ setDolp(Char *cp)
 	int didmod = 0;
 
 	/* handle s// [eichin:19910926.0510EST] */
-	if(dolmod.s[i] == 's') {
+	if (dolmod.s[i] == 's') {
 	    Char delim;
 	    Char *lhsub, *rhsub, *np;
 	    size_t lhlen = 0, rhlen = 0;
@@ -833,7 +839,7 @@ setDolp(Char *cp)
 
 	    strip(lhsub);
 	    strip(rhsub);
-	    if(dolmcnts[nthMod] != 0) {
+	    if (dolmcnts[nthMod] != 0) {
 	        strip(cp);
 	        dp = cp;
 	        do {
@@ -864,7 +870,7 @@ setDolp(Char *cp)
 	     * restore dolmod for additional words
 	     */
 	    dolmod.s[i] = rhsub[-1] = (Char) delim;
-	} else if(dolmcnts[nthMod] != 0) {
+	} else if (dolmcnts[nthMod] != 0) {
 
 	    do {
 		if ((dp = domod(cp, dolmod.s[i])) != NULL) {
@@ -884,7 +890,7 @@ setDolp(Char *cp)
 	    }
 	    while (dolaflags[nthMod] != 0);
 	}
-	if(didmod && dolmcnts[nthMod] != INT_MAX)
+	if (didmod && dolmcnts[nthMod] != INT_MAX)
 	    dolmcnts[nthMod]--;
 #ifdef notdef
 	else

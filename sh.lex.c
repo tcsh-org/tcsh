@@ -615,6 +615,7 @@ getdol(void)
 	    /* scan s// [eichin:19910926.0512EST] */
 	    if (c == 's') {
 		int delimcnt = 2;
+		int esc = 0;
 		eChar delim = getC(0);
 
 		Strbuf_append1(&name, delim);
@@ -624,11 +625,17 @@ getdol(void)
 		    break;
 		}
 		while ((c = getC(0)) != CHAR_ERR) {
+		    if (esc == 0 && c == '\\') {
+			esc = 1;
+			Strbuf_append1(&name, c);
+			continue;
+		    }
 		    Strbuf_append1(&name, c);
-		    if(c == delim) delimcnt--;
-		    if(!delimcnt) break;
+		    if (!esc && c == delim) delimcnt--;
+		    if (!delimcnt) break;
+		    esc = 0;
 		}
-		if(delimcnt) {
+		if (delimcnt) {
 		    seterror(ERR_BADSUBST);
 		    break;
 		}
