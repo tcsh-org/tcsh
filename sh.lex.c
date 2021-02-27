@@ -628,10 +628,10 @@ getdol(void)
 		}
 		while ((c = getC(0)) != CHAR_ERR) {
 		    Strbuf_append1(&name, c);
-		    if(c == delim) delimcnt--;
-		    if(!delimcnt) break;
+		    if (c == delim) delimcnt--;
+		    if (!delimcnt) break;
 		}
-		if(delimcnt) {
+		if (delimcnt) {
 		    seterror(ERR_BADSUBST);
 		    break;
 		}
@@ -1659,7 +1659,7 @@ bgetc(void)
 	do {
 	    ch = fbuf[0][fseekp - fbobp];
 	    fseekp++;
-	} while(ch == '\r');
+	} while (ch == '\r');
 #endif /* !WINNT_NATIVE && !__CYGWIN__ */
 	return (ch);
     }
@@ -1712,7 +1712,7 @@ bgetc(void)
     do {
 	ch = fbuf[(int) fseekp / BUFSIZE][(int) fseekp % BUFSIZE];
 	fseekp++;
-    } while(ch == '\r');
+    } while (ch == '\r');
 #endif /* !WINNT_NATIVE && !__CYGWIN__ */
     return (ch);
 }

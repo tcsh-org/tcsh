@@ -1249,7 +1249,7 @@ main(int argc, char **argv)
 		     * was a session leader .
 		     */
 		    else if (shpgrp != mygetpgrp()) {
-			if(setpgid(0, shpgrp) == -1) {
+			if (setpgid(0, shpgrp) == -1) {
 			    xprintf("setpgid:");
 			    goto notty;
 			}

@@ -757,10 +757,10 @@ fixDolMod(void)
 		}	
 		while ((c = DgetC(0)) != DEOF) {
 		    Strbuf_append1(&dolmod, (Char) c);
-		    if(c == delim) delimcnt--;
-		    if(!delimcnt) break;
+		    if (c == delim) delimcnt--;
+		    if (!delimcnt) break;
 		}
-		if(delimcnt) {
+		if (delimcnt) {
 		    seterror(ERR_BADSUBST);
 		    break;
 		}
@@ -784,8 +784,8 @@ static int
 all_dolmcnts_are_0()
 {
     int i = 0;
-    for(; i < ndolflags; ++i) {
-	if(dolmcnts[i] != 0)
+    for (; i < ndolflags; ++i) {
+	if (dolmcnts[i] != 0)
 	    return 0;
     }
     return 1;
@@ -807,7 +807,7 @@ setDolp(Char *cp)
 	int didmod = 0;
 
 	/* handle s// [eichin:19910926.0510EST] */
-	if(dolmod.s[i] == 's') {
+	if (dolmod.s[i] == 's') {
 	    Char delim;
 	    Char *lhsub, *rhsub, *np;
 	    size_t lhlen = 0, rhlen = 0;
@@ -821,19 +821,19 @@ setDolp(Char *cp)
 		break;
 	    }
 	    lhsub = &dolmod.s[++i];
-	    while(dolmod.s[i] != delim && dolmod.s[++i]) {
+	    while (dolmod.s[i] != delim && dolmod.s[++i]) {
 		lhlen++;
 	    }
 	    dolmod.s[i] = 0;
 	    rhsub = &dolmod.s[++i];
-	    while(dolmod.s[i] != delim && dolmod.s[++i]) {
+	    while (dolmod.s[i] != delim && dolmod.s[++i]) {
 		rhlen++;
 	    }
 	    dolmod.s[i] = 0;
 
 	    strip(lhsub);
 	    strip(rhsub);
-	    if(dolmcnts[nthMod] != 0) {
+	    if (dolmcnts[nthMod] != 0) {
 	        strip(cp);
 	        dp = cp;
 	        do {
@@ -864,7 +864,7 @@ setDolp(Char *cp)
 	     * restore dolmod for additional words
 	     */
 	    dolmod.s[i] = rhsub[-1] = (Char) delim;
-	} else if(dolmcnts[nthMod] != 0) {
+	} else if (dolmcnts[nthMod] != 0) {
 
 	    do {
 		if ((dp = domod(cp, dolmod.s[i])) != NULL) {
@@ -884,7 +884,7 @@ setDolp(Char *cp)
 	    }
 	    while (dolaflags[nthMod] != 0);
 	}
-	if(didmod && dolmcnts[nthMod] != INT_MAX)
+	if (didmod && dolmcnts[nthMod] != INT_MAX)
 	    dolmcnts[nthMod]--;
 #ifdef notdef
 	else
