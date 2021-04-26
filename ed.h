@@ -247,8 +247,12 @@ extern int   tgetflag	(const char *);
 extern int   tgetnum	(const char *);
 extern char *tgoto	(const char *, int, int);
 extern void  tputs	(const char *, int, void (*)(int));
-# define PUTPURE ((void (*)(int)) putpure)
-# define PUTRAW ((void (*)(int)) putraw)
+static __inline void PUTPURE(int c) {
+    (void)putpure(c);
+}
+static __inline void PUTRAW(int c) {
+    (void)putraw(c);
+}
 #endif
 
 #endif /* _h_ed */
