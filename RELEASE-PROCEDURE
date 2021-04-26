@@ -11,7 +11,7 @@ See TOOLS.md for pre-requisites.
 2)  Run autoreconf
 3)  Run make distclean; configure && make && make check
 4)  If checks succeed, commit the changed files and tag the release
-	git add patchlevel.h Fixes tcsh.man configure.ac configure
+	git add patchlevel.h Fixes tcsh.man tcsh.man.new configure.ac configure
 	git commit
 	git push origin
 	git tag TCSHx_yy_zz
