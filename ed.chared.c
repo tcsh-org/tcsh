@@ -257,7 +257,7 @@ c_preword(Char *p, Char *low, int n, Char *delim)
     Char *new;
 
     while (prev < p) {		/* Skip initial non-word chars */
-      if (!Strchr(delim, *prev) || *(prev-1) == (Char)'\\')
+      if (!Strchr(delim, *prev) || (prev > low && prev[-1] == (Char)'\\'))
 	break;
       prev++;
     }
@@ -269,7 +269,7 @@ c_preword(Char *p, Char *low, int n, Char *delim)
       new = c_endword(prev-1, p, 1, delim); /* Skip to next non-word char */
       new++;			/* Step away from end of word */
       while (new <= p) {	/* Skip trailing non-word chars */
-	if (!Strchr(delim, *new) || *(new-1) == (Char)'\\')
+	if (!Strchr(delim, *new) || new > prev && new[-1] == (Char)'\\')
 	  break;
 	new++;
       }
@@ -795,19 +795,19 @@ c_endword(Char *p, Char *high, int n, Char *delim)
 
     while (n--) {
         while (p < high) {	/* Skip non-word chars */
-	  if (!Strchr(delim, *p) || *(p-1) == (Char)'\\')
+	  if (!Strchr(delim, *p) || p[-1] == (Char)'\\')
 	    break;
 	  p++;
         }
 	while (p < high) {	/* Skip string */
 	  if ((*p == (Char)'\'' || *p == (Char)'"')) { /* Quotation marks? */
-	    if (inquote || *(p-1) != (Char)'\\') { /* Should it be honored? */
+	    if (inquote || p[-1] != (Char)'\\') { /* Should it be honored? */
 	      if (inquote == 0) inquote = *p;
 	      else if (inquote == *p) inquote = 0;
 	    }
 	  }
 	  /* Break if unquoted non-word char */
-	  if (!inquote && Strchr(delim, *p) && *(p-1) != (Char)'\\')
+	  if (!inquote && Strchr(delim, *p) && p[-1] != (Char)'\\')
 	    break;
 	  p++;
 	}
@@ -1473,7 +1473,7 @@ e_insert(Char c)
 	if (inputmode != MODE_INSERT) {
 	    int i;
 	    for (i = 0; i < Argument; i++) 
-		UndoBuf[UndoSize++] = *(Cursor + i);
+		UndoBuf[UndoSize++] = Cursor[i];
 
 	    UndoBuf[UndoSize] = '\0';
 	    c_delafter(Argument);   /* Do NOT use the saving ONE */
