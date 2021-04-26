@@ -560,7 +560,7 @@ printOne(const Char *key, const XmapVal *val, int ntype)
 	    for (fp = FuncNames; fp->name; fp++)
 		if (val->cmd == fp->func)
 		    xprintf(fmt, fp->name);
-		break;
+	    break;
 	default:
 	    abort();
 	    break;
