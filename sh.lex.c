@@ -994,7 +994,7 @@ subword(Char *cp, Char type, int *adid, size_t *start_pos)
 		    case '\\':
 			if (np[1] == '&')
 			    np++;
-			/* fall into ... */
+			/* FALLTHROUGH */
 
 		    default:
 			Strbuf_append1(&wbuf, *np);
@@ -1205,7 +1205,7 @@ gethent(Char sc)
 	case '-':
 	    back = 1;
 	    c = getC(0);
-	    /* FALLSTHROUGH */
+	    /* FALLTHROUGH */
 
 	default:
 	    if (any("(=~", c)) {
