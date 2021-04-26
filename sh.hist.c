@@ -205,25 +205,35 @@ addWordToHash(struct hashValue *h, const Char *word)
 {
     uint32_t a = h->a, b = h->b, c = h->c;
 #ifdef SHORT_STRINGS
+#define GETK    if ((k = (uChar)*word++) == 0) break
 #ifdef WIDE_STRINGS
     assert(sizeof(Char) >= 4);
     while (1) {
 	unsigned k;
-	if ((k = (uChar)*word++) == 0) break; a += k;
-	if ((k = (uChar)*word++) == 0) break; b += k;
-	if ((k = (uChar)*word++) == 0) break; c += k;
+	GETK;
+	a += k;
+	GETK;
+	b += k;
+	GETK;
+	c += k;
 	mix(a, b, c);
     }
 #else
     assert(sizeof(Char) == 2);
     while (1) {
 	unsigned k;
-	if ((k = (uChar)*word++) == 0) break; a += k;
-	if ((k = (uChar)*word++) == 0) break; a += k << 16;
-	if ((k = (uChar)*word++) == 0) break; b += k;
-	if ((k = (uChar)*word++) == 0) break; b += k << 16;
-	if ((k = (uChar)*word++) == 0) break; c += k;
-	if ((k = (uChar)*word++) == 0) break; c += k << 16;
+	GETK;
+	a += k;
+	GETK;
+	a += k << 16;
+	GETK;
+	b += k;
+	GETK;
+	b += k << 16;
+	GETK;
+	c += k;
+	GETK;
+	c += k << 16;
 	mix(a, b, c);
     }
 #endif
@@ -1216,18 +1226,20 @@ dotlock_cleanup(void* lockpath)
 
 /* Save history before exiting the shell. */
 void
-rechist(Char *fname, int ref)
+rechist(Char *xfname, int ref)
 {
     Char    *snum, *rs;
     int     fp, ftmp, oldidfds, ophup_disabled;
     struct varent *shist;
     char path[MAXPATHLEN];
     struct stat st;
+    static Char *fname;
     static Char   *dumphist[] = {STRhistory, STRmhT, 0, 0};
 
     if (fname == NULL && !ref)
 	return;
 
+    fname = xfname;
     ophup_disabled = phup_disabled;
     phup_disabled = 1;
 
@@ -1331,7 +1343,7 @@ rechist(Char *fname, int ref)
 #ifndef WINNT_NATIVE
     (void)rename(path, short2str(fname));
 #else
-    (void)ReplaceFile( short2str(fname),path,NULL,0,NULL,NULL);
+    (void)ReplaceFile(short2str(fname), path, NULL, 0, NULL, NULL);
 #endif
     cleanup_until(fname);
     phup_disabled = ophup_disabled;
