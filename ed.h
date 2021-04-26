@@ -219,7 +219,7 @@ EXTERN char T_HasMeta;		/* true if we have a meta key */
 # define M_CHAR		2
 # define M_NN		3
 #endif /* TERMIO */
-typedef struct { 
+typedef struct {
     const char *t_name;
     unsigned int  t_setmask;
     unsigned int  t_clrmask;

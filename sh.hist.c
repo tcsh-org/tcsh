@@ -1054,9 +1054,9 @@ phist(struct Hist *hp, int hflg)
         output_raw = 1;
 	cleanup_push(&old_output_raw, output_raw_restore);
 	if (hflg & HIST_TIME)
-	    /* 
+	    /*
 	     * Make file entry with history time in format:
-	     * "+NNNNNNNNNN" (10 digits, left padded with ascii '0') 
+	     * "+NNNNNNNNNN" (10 digits, left padded with ascii '0')
 	     */
 
 	    xprintf("#+%010lu\n", (unsigned long)hp->Htime);
@@ -1225,7 +1225,7 @@ rechist(Char *fname, int ref)
     struct stat st;
     static Char   *dumphist[] = {STRhistory, STRmhT, 0, 0};
 
-    if (fname == NULL && !ref) 
+    if (fname == NULL && !ref)
 	return;
 
     ophup_disabled = phup_disabled;
@@ -1253,8 +1253,8 @@ rechist(Char *fname, int ref)
     /*
      * The 'savehist merge' feature is intended for an environment
      * with numerous shells being in simultaneous use. Imagine
-     * any kind of window system. All these shells 'share' the same 
-     * ~/.history file for recording their command line history. 
+     * any kind of window system. All these shells 'share' the same
+     * ~/.history file for recording their command line history.
      * We try to handle the case of multiple shells trying to merge
      * histories at the same time, by creating semi-unique filenames
      * and saving the history there first and then trying to rename
@@ -1265,7 +1265,7 @@ rechist(Char *fname, int ref)
 		 * by optional lock parameter to savehist.
      *
      * jw.
-     */ 
+     */
     /*
      * We need the didfds stuff before loadhist otherwise
      * exec in a script will fail to print if merge is set.

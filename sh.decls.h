@@ -410,31 +410,31 @@ extern	void		  donice	(Char **, struct command *);
 extern	void		  dotime	(Char **, struct command *);
 #ifdef BSDTIMES
 extern	void		  prusage	(struct sysrusage *,
-					 struct sysrusage *, 
+					 struct sysrusage *,
 					 timeval_t *, timeval_t *);
 extern	void		  ruadd		(struct sysrusage *,
 					 struct sysrusage *);
 #else /* BSDTIMES */
 # ifdef _SEQUENT_
 extern	void		  prusage	(struct process_stats *,
-					 struct process_stats *, 
+					 struct process_stats *,
 					 timeval_t *, timeval_t *);
 extern	void		  ruadd		(struct process_stats *,
 					 struct process_stats *);
 # else /* !_SEQUENT_ */
 #  ifdef POSIX
-extern	void		  prusage	(struct tms *, struct tms *, 
+extern	void		  prusage	(struct tms *, struct tms *,
 					 clock_t, clock_t);
 #  else	/* !POSIX */
-extern	void		  prusage	(struct tms *, struct tms *, 
+extern	void		  prusage	(struct tms *, struct tms *,
 					 time_t, time_t);
 #  endif /* !POSIX */
 # endif	/* !_SEQUENT_ */
 #endif /* BSDTIMES */
 extern	void		  settimes	(void);
 #if defined(BSDTIMES) || defined(_SEQUENT_)
-extern	void		  tvsub		(struct timeval *, 
-					 struct timeval *, 
+extern	void		  tvsub		(struct timeval *,
+					 struct timeval *,
 					 struct timeval *);
 #endif /* BSDTIMES || _SEQUENT_ */
 

@@ -146,7 +146,7 @@ enum ansi {
     ANSI_BG_DEFAULT = 49,	/* bg default (black) */
 };
 #define TCSH_BOLD	0x80
-	
+
 typedef struct {
     Str	    extension;	/* file extension */
     Str	    color;	/* color string */
