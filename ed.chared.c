@@ -269,7 +269,7 @@ c_preword(Char *p, Char *low, int n, Char *delim)
       new = c_endword(prev-1, p, 1, delim); /* Skip to next non-word char */
       new++;			/* Step away from end of word */
       while (new <= p) {	/* Skip trailing non-word chars */
-	if (!Strchr(delim, *new) || new > prev && new[-1] == (Char)'\\')
+	if (!Strchr(delim, *new) || (new > prev && new[-1] == (Char)'\\'))
 	  break;
 	new++;
       }
@@ -2574,8 +2574,8 @@ e_tobeg(Char c)
     Cursor = InputBuf;
 
     if (VImode) {
-       while (Isspace(*Cursor)) /* We want FIRST non space character */
-	Cursor++;
+	while (Isspace(*Cursor)) /* We want FIRST non space character */
+	    Cursor++;
 	if (ActionFlag & TCSHOP_DELETE) {
 	    c_delfini();
 	    return(CC_REFRESH);
