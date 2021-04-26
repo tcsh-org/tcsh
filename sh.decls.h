@@ -37,7 +37,7 @@
  */
 extern	Char	 	 *gethdir	(const Char *);
 extern	void		  dosource	(Char **, struct command *);
-extern	void		  exitstat	(void);
+extern	void		  exitstat	(void) __attribute__((__noreturn__));
 extern	void		  goodbye	(Char **, struct command *);
 extern	void		  importpath	(Char *);
 extern	void		  initdesc	(void);
