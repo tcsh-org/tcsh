@@ -781,7 +781,7 @@ fixDolMod(void)
 }
 
 static int
-all_dolmcnts_are_0()
+all_dolmcnts_are_0(void)
 {
     int i = 0;
     for (; i < ndolflags; ++i) {
