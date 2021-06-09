@@ -631,26 +631,39 @@ showall(Char **v, struct command *c)
 	    (unsigned long) membot, (unsigned long) memtop,
 	    (unsigned long) sbrk(0));
 #else /* SYSMALLOC */
-#ifndef HAVE_MALLINFO
+#if !defined(HAVE_MALLINFO) && !defined(HAVE_MALLINFO2)
 #ifdef USE_SBRK
     memtop = sbrk(0);
 #endif /* USE_SBRK */
     xprintf(CGETS(19, 12, "Allocated memory from 0x%lx to 0x%lx (%ld).\n"),
 	    (unsigned long) membot, (unsigned long) memtop,
 	    (unsigned long) (memtop - membot));
-#else /* HAVE_MALLINFO */
+#else
+# if defined(HAVE_MALLINFO2)
+    struct mallinfo2 mi;
+
+    mi = mallinfo2();
+# else
     struct mallinfo mi;
 
     mi = mallinfo();
+# endif
     xprintf(CGETS(19, 13, "%s current memory allocation:\n"), progname);
-    xprintf(CGETS(19, 14, "Total space allocated from system: %d\n"), mi.arena);
-    xprintf(CGETS(19, 15, "Number of non-inuse chunks: %d\n"), mi.ordblks);
-    xprintf(CGETS(19, 16, "Number of mmapped regions: %d\n"), mi.hblks);
-    xprintf(CGETS(19, 17, "Total space in mmapped regions: %d\n"), mi.hblkhd);
-    xprintf(CGETS(19, 18, "Total allocated space: %d\n"), mi.uordblks);
-    xprintf(CGETS(19, 19, "Total non-inuse space: %d\n"), mi.fordblks);
-    xprintf(CGETS(19, 20, "Top-most, releasable space: %d\n"), mi.keepcost);
-#endif /* HAVE_MALLINFO */
+    xprintf(CGETS(19, 14, "Total space allocated from system: %zu\n"),
+	(size_t)mi.arena);
+    xprintf(CGETS(19, 15, "Number of non-inuse chunks: %zu\n"),
+	(size_t)mi.ordblks);
+    xprintf(CGETS(19, 16, "Number of mmapped regions: %zu\n"),
+	(size_t)mi.hblks);
+    xprintf(CGETS(19, 17, "Total space in mmapped regions: %zu\n"),
+	(size_t)mi.hblkhd);
+    xprintf(CGETS(19, 18, "Total allocated space: %zu\n"),
+	(size_t)mi.uordblks);
+    xprintf(CGETS(19, 19, "Total non-inuse space: %zu\n"),
+	(size_t)mi.fordblks);
+    xprintf(CGETS(19, 20, "Top-most, releasable space: %zu\n"),
+	(size_t)mi.keepcost);
+#endif /* HAVE_MALLINFO || HAVE_MALLINFO2 */
 #endif /* SYSMALLOC */
     USE(c);
     USE(v);
