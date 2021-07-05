@@ -103,8 +103,7 @@ static	int	 insert_meta		(const Char *, const Char *,
 static	int	 tilde			(struct Strbuf *, Char *);
 static  int      expand_dir		(const Char *, struct Strbuf *, DIR **,
 					 COMMAND);
-static	int	 nostat			(Char *);
-static	Char	 filetype		(Char *, Char *);
+static	int	 nostat			(const Char *);
 static	int	 t_glob			(Char ***, int);
 static	int	 c_glob			(Char ***);
 static	int	 is_prefix		(Char *, Char *);
@@ -1993,7 +1992,7 @@ expand_dir(const Char *dir, struct Strbuf *edir, DIR **dfd, COMMAND cmd)
  *	or very large directories.
  */
 static int
-nostat(Char *dir)
+nostat(const Char *dir)
 {
     struct varent *vp;
     Char **cp;
@@ -2014,81 +2013,82 @@ nostat(Char *dir)
  *	Return a character that signifies a filetype
  *	symbology from 4.3 ls command.
  */
-static  Char
-filetype(Char *dir, Char *file)
+Char
+filetype(const Char *dir, const Char *file)
 {
-    if (dir) {
-	Char *path;
-	char   *ptr;
-	struct stat statb;
+    Char *path;
+    char   *ptr;
+    struct stat statb;
 
-	if (nostat(dir)) return(' ');
+    if (!dir || nostat(dir))
+	goto out;
 
-	path = Strspl(dir, file);
-	ptr = short2str(path);
-	xfree(path);
+    path = Strspl(dir, file);
+    ptr = short2str(path);
+    xfree(path);
 
-	if (lstat(ptr, &statb) != -1) {
+    if (lstat(ptr, &statb) != -1)
+	goto out;
+
 #ifdef S_ISLNK
-	    if (S_ISLNK(statb.st_mode)) {	/* Symbolic link */
-		if (adrof(STRlistlinks)) {
-		    if (stat(ptr, &statb) == -1)
-			return ('&');
-		    else if (S_ISDIR(statb.st_mode))
-			return ('>');
-		    else
-			return ('@');
-		}
-		else
-		    return ('@');
-	    }
+    if (S_ISLNK(statb.st_mode)) {	/* Symbolic link */
+	if (adrof(STRlistlinks)) {
+	    if (stat(ptr, &statb) == -1)
+		return '&';
+	    else if (S_ISDIR(statb.st_mode))
+		return '>';
+	    else
+		return '@';
+	}
+	else
+	    return '@';
+    }
 #endif
 #ifdef S_ISSOCK
-	    if (S_ISSOCK(statb.st_mode))	/* Socket */
-		return ('=');
+    if (S_ISSOCK(statb.st_mode))	/* Socket */
+	return '=';
 #endif
 #ifdef S_ISFIFO
-	    if (S_ISFIFO(statb.st_mode)) /* Named Pipe */
-		return ('|');
+    if (S_ISFIFO(statb.st_mode)) /* Named Pipe */
+	return '|';
 #endif
 #ifdef S_ISHIDDEN
-	    if (S_ISHIDDEN(statb.st_mode)) /* Hidden Directory [aix] */
-		return ('+');
+    if (S_ISHIDDEN(statb.st_mode)) /* Hidden Directory [aix] */
+	return '+';
 #endif
 #ifdef S_ISCDF
-	    {
-		struct stat hpstatb;
-		char *p2;
+    {
+	struct stat hpstatb;
+	char *p2;
 
-		p2 = strspl(ptr, "+");	/* Must append a '+' and re-stat(). */
-		if ((stat(p2, &hpstatb) != -1) && S_ISCDF(hpstatb.st_mode)) {
-		    xfree(p2);
-		    return ('+');	/* Context Dependent Files [hpux] */
-		}
-		xfree(p2);
-	    }
+	p2 = strspl(ptr, "+");	/* Must append a '+' and re-stat(). */
+	if ((stat(p2, &hpstatb) != -1) && S_ISCDF(hpstatb.st_mode)) {
+	    xfree(p2);
+	    return '+';	/* Context Dependent Files [hpux] */
+	}
+	xfree(p2);
+    }
 #endif
 #ifdef S_ISNWK
-	    if (S_ISNWK(statb.st_mode)) /* Network Special [hpux] */
-		return (':');
+    if (S_ISNWK(statb.st_mode)) /* Network Special [hpux] */
+	return ':';
 #endif
 #ifdef S_ISCHR
-	    if (S_ISCHR(statb.st_mode))	/* char device */
-		return ('%');
+    if (S_ISCHR(statb.st_mode))	/* char device */
+	return '%';
 #endif
 #ifdef S_ISBLK
-	    if (S_ISBLK(statb.st_mode))	/* block device */
-		return ('#');
+    if (S_ISBLK(statb.st_mode))	/* block device */
+	return '#';
 #endif
 #ifdef S_ISDIR
-	    if (S_ISDIR(statb.st_mode))	/* normal Directory */
-		return ('/');
+    if (S_ISDIR(statb.st_mode))	/* normal Directory */
+	return '/';
 #endif
-	    if (statb.st_mode & (S_IXUSR|S_IXGRP|S_IXOTH))
-		return ('*');
-	}
-    }
-    return (' ');
+    if (statb.st_mode & (S_IXUSR|S_IXGRP|S_IXOTH))
+	return '*';
+out:
+    return ' ';
 } /* end filetype */
 
 
