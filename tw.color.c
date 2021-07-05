@@ -157,7 +157,8 @@ static size_t nextensions = 0;
 
 static char *colors = NULL;
 int	     color_context_ls = FALSE;	/* do colored ls */
-static int  color_context_lsmF = FALSE; /* do colored ls-F */
+static int   color_context_lsmF = FALSE; /* do colored ls-F */
+int 	     color_as_referent = FALSE; /* ln=target in LS_COLORS */
 
 static int getstring (char **, const Char **, Str *, int);
 static void put_color (const Str *);
@@ -383,6 +384,9 @@ parseLS_COLORS(const Char *value)
 		    if (i < nvariables) {
 			v += 3;
 			getstring(&c, &v, &variables[i].color, ':');
+			if (i == VSym)
+			    color_as_referent = strcasecmp(
+				variables[VSym].color.s, "target") == 0;
 			continue;
 		    }
 		    else
@@ -471,7 +475,25 @@ print_with_color(const Char *filename, size_t len, Char suffix)
     if (color_context_lsmF &&
 	(haderr ? (didfds ? is2atty : isdiagatty) :
 	 (didfds ? is1atty : isoutatty))) {
-	print_color(filename, len, suffix);
+
+	if (suffix == '@' && color_as_referent) {
+	    char *f = short2str(filename);
+	    Char c = suffix;
+	    char buf[MAXPATHLEN];
+
+	    while (c == '@') {
+		if (readlink(f, buf, MAXPATHLEN) == -1) {
+		    c = '&';
+		    break;
+		}
+
+		c = filetype(STRNULL, str2short(buf));
+		f = buf;
+	    }
+
+	    print_color(filename, len, c);
+	} else
+	    print_color(filename, len, suffix);
 	xprintf("%S", filename);
 	if (0 < variables[VEnd].color.len)
 	    put_color(&variables[VEnd].color);
@@ -480,8 +502,7 @@ print_with_color(const Char *filename, size_t len, Char suffix)
 	    put_color(&variables[VNormal].color);
 	    put_color(&variables[VRight].color);
 	}
-    }
-    else
+    } else
 	xprintf("%S", filename);
     xputwchar(suffix);
 }
