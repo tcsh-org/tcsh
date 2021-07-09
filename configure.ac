@@ -8,7 +8,7 @@ dnl
 dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 
 AC_PREREQ([2.59])dnl Minimum Autoconf version required.
-AC_INIT([tcsh], [6.22.03], [https://bugs.astron.com/])
+AC_INIT([tcsh], [6.22.04], [https://bugs.astron.com/])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([tc.vers.c])
 AC_CONFIG_HEADERS([config.h])
@@ -406,7 +406,8 @@ AC_INCLUDES_DEFAULT([])
 AC_CHECK_FUNC([setlocale], [have_setlocale=yes], [have_setlocale=no])
 AC_CHECK_FUNC([catgets], [have_catgets=yes], [have_catgets=no])
 AC_CHECK_FUNCS([dup2 getauthid getcwd gethostname getpwent] dnl
-	[getutent getutxent mallinfo mblen memmove memset mkstemp nice] dnl
+	[getutent getutxent mallinfo mallinfo2 mblen memmove memset] dnl
+	[mkstemp nice] dnl
 	[nl_langinfo sbrk setpgid setpriority strerror strstr sysconf wcwidth])
 AC_FUNC_GETPGRP
 AC_FUNC_MBRTOWC

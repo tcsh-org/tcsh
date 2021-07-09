@@ -354,7 +354,7 @@ quotspec:
 }
 
 static Char *nulvec[] = { NULL };
-static struct varent nulargv = {nulvec, STRargv, VAR_READWRITE, 
+static struct varent nulargv = {nulvec, STRargv, VAR_READWRITE,
 				{ NULL, NULL, NULL }, 0 };
 
 static void
@@ -734,7 +734,7 @@ fixDolMod(void)
 		}
 		c = DgetC(0);
 	    }
-	    if ((c == 'g' && dolmcnts[ndolflags - 1] != INT_MAX) || 
+	    if ((c == 'g' && dolmcnts[ndolflags - 1] != INT_MAX) ||
 		(c == 'a' && dolaflags[ndolflags - 1] == 0)) {
 		if (c == 'g') {
 		    dolmcnts[ndolflags - 1] = INT_MAX;
@@ -755,7 +755,7 @@ fixDolMod(void)
 		    || Isdigit(delim) || any(" \t\n", delim)) {
 		    seterror(ERR_BADSUBST);
 		    break;
-		}	
+		}
 		while ((c = DgetC(0)) != DEOF) {
 		    if (esc == 0 && c == '\\') {
 			esc = 1;
@@ -787,7 +787,7 @@ fixDolMod(void)
 }
 
 static int
-all_dolmcnts_are_0()
+all_dolmcnts_are_0(void)
 {
     int i = 0;
     for (; i < ndolflags; ++i) {
@@ -955,7 +955,7 @@ randsuf(void) {
 #ifndef WINNT_NATIVE
 	struct timeval tv;
 	(void) gettimeofday(&tv, NULL);
-	return putn((((tcsh_number_t)tv.tv_sec) ^ 
+	return putn((((tcsh_number_t)tv.tv_sec) ^
 	    ((tcsh_number_t)tv.tv_usec) ^
 	    ((tcsh_number_t)getpid())) & 0x00ffffff);
 #else

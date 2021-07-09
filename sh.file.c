@@ -59,7 +59,6 @@ typedef enum {
 static	void	 setup_tty		(int);
 static	void	 back_to_col_1		(void);
 static	void	 pushback		(const Char *);
-static	int	 filetype		(const Char *, const Char *);
 static	void	 print_by_column	(const Char *, Char *[], size_t);
 static	Char 	*tilde			(const Char *);
 static	void	 retype			(void);
@@ -112,7 +111,7 @@ setup_tty(int on)
 	    on = TCSETAF;
 # endif /* POSIX */
 	    tchars.c_lflag |= ICANON;
-    
+
 	}
     }
     else {
