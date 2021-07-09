@@ -2027,7 +2027,7 @@ filetype(const Char *dir, const Char *file)
     ptr = short2str(path);
     xfree(path);
 
-    if (lstat(ptr, &statb) != -1)
+    if (lstat(ptr, &statb) == -1)
 	goto out;
 
 #ifdef S_ISLNK
