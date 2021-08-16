@@ -2984,9 +2984,9 @@ The operators
 and
 .Sq \&!~
 are like
-.Sq \&!=
-and
 .Sq ==
+and
+.Sq \&!=
 except that the right hand side is a
 glob-pattern (see
 .Sx Filename substitution )

@@ -1728,7 +1728,7 @@ Here the precedence increases to the right, `==' `!=' `=~' and `!~', `<='
 `>=' `<' and `>', `<<' and `>>', `+' and `\-', `*' `/' and `%' being, in
 groups, at the same level.  The `==' `!=' `=~' and `!~' operators compare
 their arguments as strings; all others operate on numbers.  The operators
-`=~' and `!~' are like `!=' and `==' except that the right hand side is a
+`=~' and `!~' are like `==' and `!=' except that the right hand side is a
 glob-pattern (see \fBFilename substitution\fR) against which the left hand
 operand is matched.  This reduces the need for use of the \fIswitch\fR
 builtin command in shell scripts when all that is really needed is
