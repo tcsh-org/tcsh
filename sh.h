@@ -78,6 +78,7 @@ typedef unsigned long intptr_t;
 #if defined(KANJI) && defined(WIDE_STRINGS) && defined(HAVE_NL_LANGINFO) && defined(CODESET)
 #define AUTOSET_KANJI
 #endif
+
 /*
  * Sanity
  */
@@ -1027,6 +1028,7 @@ EXTERN struct varent {
  * The following are for interfacing redo substitution in
  * aliases to the lexical routines.
  */
+#define HIST_PURGE	-500000
 EXTERN struct wordent *alhistp IZERO_STRUCT;/* Argument list (first) */
 EXTERN struct wordent *alhistt IZERO_STRUCT;/* Node after last in arg list */
 EXTERN Char  **alvec IZERO_STRUCT,

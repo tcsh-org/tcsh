@@ -153,8 +153,7 @@ lex(struct wordent *hp)
 
     if (!postcmd_active)
 	btell(&lineloc);
-    hp->next = hp->prev = hp;
-    hp->word = STRNULL;
+    initlex(hp);
     hadhist = 0;
     do
 	c = readc(0);
@@ -711,7 +710,7 @@ getexcl(Char sc)
 
     lastev = eventno;
     hp = gethent(sc);
-    if (hp == 0)
+    if (hp == NULL)
 	return;
     hadhist = 1;
     dol = 0;
@@ -901,7 +900,6 @@ getsub(struct wordent *en)
  * We raise the limit to 50000000
  */
 
-#define HIST_PURGE -50000000
 static struct wordent *
 dosub(Char sc, struct wordent *en, int global)
 {
