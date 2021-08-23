@@ -217,6 +217,7 @@ extern  int	  	  t_pmatch	(const Char *, const Char *,
  */
 extern	void	 	  dohist	(Char **, struct command *);
 extern  struct Hist 	 *enthist	(int, struct wordent *, int, int, int);
+extern  void		  cleanhist	(void);
 extern	void	 	  savehist	(struct wordent *, int);
 extern	char		 *fmthist	(int, ptr_t);
 extern	void		  rechist	(Char *, int);

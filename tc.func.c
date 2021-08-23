@@ -999,6 +999,7 @@ aliasrun(int cnt, Char *s1, Char *s2)
 
     getexit(osetexit);
     if (seterr) {
+	cleanhist();
 	xfree(seterr);
 	seterr = NULL;	/* don't repeatedly print err msg. */
     }
@@ -1075,6 +1076,7 @@ aliasrun(int cnt, Char *s1, Char *s2)
     }
     cleanup_until(&w);
     pendjob();
+    cleanhist();
     /* Restore status */
     setv(STRstatus, putn((tcsh_number_t)status), VAR_READWRITE);
 }

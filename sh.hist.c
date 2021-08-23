@@ -1184,6 +1184,17 @@ dohist(Char **vp, struct command *c)
     }
 }
 
+void
+cleanhist(void)
+{
+    struct Hist *hp, *np;
+
+    for (hp = &Histlist; (np = hp->Hnext) != NULL;) {
+	if (np->Hnum != HIST_PURGE)
+	    return;
+	hremove(np), hfree(np);
+    }
+}
 
 char *
 fmthist(int fmt, ptr_t ptr)
