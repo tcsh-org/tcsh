@@ -1136,6 +1136,39 @@ cpy_pad_spaces(Char *dst, Char *src, int width)
     *dst = (Char) 0;
 }
 
+static void
+CalcPosition(int w, int th, int *h, int *v)
+{
+    switch(w) {
+	case NLSCLASS_NL:
+	    *h = 0;
+	    (*v)++;
+	    break;
+	case NLSCLASS_TAB:
+	    while (++(*h) & 07)
+		;
+	    break;
+	case NLSCLASS_CTRL:
+	    *h += 2;
+	    break;
+	case NLSCLASS_ILLEGAL:
+	    *h += 4;
+	    break;
+	case NLSCLASS_ILLEGAL2:
+	case NLSCLASS_ILLEGAL3:
+	case NLSCLASS_ILLEGAL4:
+	case NLSCLASS_ILLEGAL5:
+	    *h += 4 + 2 * NLSCLASS_ILLEGAL_SIZE(w);
+	    break;
+	default:
+	    *h += w;
+    }
+    if (*h >= th) {		/* check, extra long tabs picked up here also */
+	*h -= th;
+	(*v)++;
+    }
+}
+
 void
 RefCursor(void)
 {				/* only move to new cursor pos */
@@ -1154,65 +1187,13 @@ RefCursor(void)
 	}
 	w = NLSClassify(*cp & CHAR, cp == Prompt, 0);
 	cp++;
-	switch(w) {
-	    case NLSCLASS_NL:
-		h = 0;
-		v++;
-		break;
-	    case NLSCLASS_TAB:
-		while (++h & 07)
-		    ;
-		break;
-	    case NLSCLASS_CTRL:
-		h += 2;
-		break;
-	    case NLSCLASS_ILLEGAL:
-		h += 4;
-		break;
-	    case NLSCLASS_ILLEGAL2:
-	    case NLSCLASS_ILLEGAL3:
-	    case NLSCLASS_ILLEGAL4:
-		h += 3 + 2 * NLSCLASS_ILLEGAL_SIZE(w);
-		break;
-	    default:
-		h += w;
-	}
-	if (h >= th) {		/* check, extra long tabs picked up here also */
-	    h -= th;
-	    v++;
-	}
+	CalcPosition(w, th, &h, &v);
     }
 
     for (cp = InputBuf; cp < Cursor;) {	/* do input buffer to Cursor */
 	w = NLSClassify(*cp & CHAR, cp == InputBuf, 0);
 	cp++;
-	switch(w) {
-	    case NLSCLASS_NL:
-		h = 0;
-		v++;
-		break;
-	    case NLSCLASS_TAB:
-		while (++h & 07)
-		    ;
-		break;
-	    case NLSCLASS_CTRL:
-		h += 2;
-		break;
-	    case NLSCLASS_ILLEGAL:
-		h += 4;
-		break;
-	    case NLSCLASS_ILLEGAL2:
-	    case NLSCLASS_ILLEGAL3:
-	    case NLSCLASS_ILLEGAL4:
-		h += 3 + 2 * NLSCLASS_ILLEGAL_SIZE(w);
-		break;
-	    default:
-		h += w;
-	}
-	if (h >= th) {		/* check, extra long tabs picked up here also */
-	    h -= th;
-	    v++;
-	}
+	CalcPosition(w, th, &h, &v);
     }
 
     /* now go there */
