@@ -573,7 +573,7 @@ fixerror(void)
      */
     btoeof();
 
-    setcopy(STRstatus, STR1, VAR_READWRITE);/*FIXRESET*/
+    setcopy(STRstatus, STR1, VAR_READWRITE|VAR_NOERROR);
 #ifdef BSDJOBS
     if (tpgrp > 0)
 	(void) tcsetpgrp(FSHTTY, tpgrp);

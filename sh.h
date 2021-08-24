@@ -1011,6 +1011,7 @@ EXTERN struct varent {
 #define VAR_READONLY	1
 #define VAR_READWRITE	2
 #define VAR_NOGLOB	4
+#define VAR_NOERROR	8
 #define VAR_FIRST       32
 #define VAR_LAST        64
     struct varent *v_link[3];	/* The links, see below */

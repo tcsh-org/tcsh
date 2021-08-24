@@ -1,3 +1,4 @@
+ 20. Prevent infinite recursion with tcsh -fc 'set -r status;:' (Gabriel Ravier)
  19. Fix postcmd trashing history when invoking domod (Jan Macku)
  18. Fix off-by-one in RefCursor (H.Merijn Brand)
  17. add ln=target in LS_COLORS (ajrosen)

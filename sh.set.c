@@ -726,8 +726,11 @@ setq(const Char *name, Char **vec, struct varent *p, int flags)
     while ((c = p->v_link[f]) != 0) {
 	if ((f = *name - *c->v_name) == 0 &&
 	    (f = Strcmp(name, c->v_name)) == 0) {
-	    if (c->v_flags & VAR_READONLY)
+	    if (c->v_flags & VAR_READONLY) {
+		if (flags & VAR_NOERROR)
+		    return;
 		stderror(ERR_READONLY|ERR_NAME, c->v_name);
+	    }
 	    blkfree(c->vec);
 	    c->v_flags = flags;
 	    trim(c->vec = vec);
