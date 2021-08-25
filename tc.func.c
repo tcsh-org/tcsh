@@ -485,7 +485,7 @@ dowhich(Char **v, struct command *c)
 	rv &= cmd_expand(*v, NULL);
 
     if (!rv)
-	setcopy(STRstatus, STR1, VAR_READWRITE);
+	setstatus(0);
 }
 
 static int
@@ -1022,7 +1022,7 @@ aliasrun(int cnt, Char *s1, Char *s2)
     cleanup_push(&w, lex_cleanup);
 
     /* Save the old status */
-    status = getn(varval(STRstatus));
+    status = getstatus();
 
     /* expand aliases like process() does. */
     alias(&w);
@@ -1078,7 +1078,7 @@ aliasrun(int cnt, Char *s1, Char *s2)
     pendjob();
     cleanhist();
     /* Restore status */
-    setv(STRstatus, putn((tcsh_number_t)status), VAR_READWRITE);
+    setstrstatus(putn((tcsh_number_t)status));
 }
 
 void
@@ -2107,7 +2107,7 @@ dotermname(Char **v, struct command *c)
 	/* no luck - the user didn't provide one and none is
 	 * specified in the environment
 	 */
-	setcopy(STRstatus, STR1, VAR_READWRITE);
+	setstatus(1);
 	return;
     }
 
@@ -2120,8 +2120,8 @@ dotermname(Char **v, struct command *c)
      */
     if (tgetent(termcap_buffer, termtype) == 1) {
 	xprintf("%s\n", termtype);
-	setcopy(STRstatus, STR0, VAR_READWRITE);
+	setstatus(0);
     } else
-	setcopy(STRstatus, STR1, VAR_READWRITE);
+	setstatus(1);
 }
 #endif /* WINNT_NATIVE */

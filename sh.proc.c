@@ -576,7 +576,7 @@ pjwait(struct process *pp)
 	xprintf(CGETS(17, 2, "Exit %d\n"), reason);
     reason_str = putn((tcsh_number_t)reason);
     cleanup_push(reason_str, xfree);
-    setv(STRstatus, reason_str, VAR_READWRITE);
+    setstrstatus(reason_str);
     cleanup_ignore(reason_str);
     cleanup_until(reason_str);
     if (reason && exiterr)
