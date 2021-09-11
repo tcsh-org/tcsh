@@ -579,8 +579,8 @@ exp6(Char ***vp, int ignore)
 	}
 	pwait();
 	cleanup_until(&faket);
-	etraci("exp6 {} status", egetn(varval(STRstatus)), vp);
-	return (putn(egetn(varval(STRstatus)) == 0));
+	etraci("exp6 {} status", getstatus(), vp);
+	return putn(getstatus() == 0);
     }
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));
@@ -950,7 +950,7 @@ evalav(Char **v)
     struct command *t;
     struct wordent *wdp = hp;
 
-    setcopy(STRstatus, STR0, VAR_READWRITE);
+    setstatus(0);
     initlex(hp);
     while (*v) {
 	struct wordent *new = xcalloc(1, sizeof *wdp);

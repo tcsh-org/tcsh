@@ -493,7 +493,7 @@ doexit(Char **v, struct command *c)
      */
     v++;
     if (*v) {
-	setv(STRstatus, putn(expr(&v)), VAR_READWRITE);
+	setstrstatus(putn(expr(&v)));
 	if (*v)
 	    stderror(ERR_NAME | ERR_EXPRESSION);
     }
@@ -1370,7 +1370,7 @@ doprintenv(Char **v, struct command *c)
 	cleanup_until(&old_output_raw);
     }
     else
-	setcopy(STRstatus, STR1, VAR_READWRITE);
+	setstatus(1);
 }
 
 /* from "Karl Berry." <karl%mote.umb.edu@relay.cs.net> -- for NeXT things

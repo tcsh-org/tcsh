@@ -1353,3 +1353,21 @@ update_wordchars(void)
 	word_chars = (VImode ? STR_WORD_CHARS_VI : STR_WORD_CHARS);
     }
 }
+
+void
+setstrstatus(Char *str)
+{
+	setv(STRstatus, str, VAR_READWRITE|VAR_NOERROR);
+}
+
+void
+setstatus(int n)
+{
+	setcopy(STRstatus, n ? STR1 : STR0, VAR_READWRITE|VAR_NOERROR);
+}
+
+int
+getstatus(void)
+{
+	return getn(varval(STRstatus));
+}

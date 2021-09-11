@@ -403,6 +403,9 @@ extern	void		  autoset_dspmbyte	(const Char *);
 extern	void		  autoset_kanji	(void);
 #endif
 extern	void		  update_wordchars	(void);
+extern	void		  setstrstatus	(Char *);
+extern	void		  setstatus	(int);
+extern	int		  getstatus	(void);
 
 /*
  * sh.time.c
