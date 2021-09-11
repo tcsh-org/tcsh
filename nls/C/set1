@@ -56,7 +56,7 @@ $set 1
 54 Can't make pipe
 55 %s: %s
 56 %s
-57 Usage: jobs [ -l ]
+57 Usage: jobs [ -lZ ]
 58 Arguments should be jobs or process id's
 59 No current job
 60 No previous job

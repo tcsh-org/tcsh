@@ -56,7 +56,7 @@ $set 1
 54 Nie mogę stworzyć potoku
 55 %s: %s
 56 %s
-57 Użycie: jobs [ -l ]
+57 Użycie: jobs [ -lZ ]
 58 Argumentami powinny być identyfikatory prac lub procesów
 59 Nie ma aktualnej pracy
 60 Brak poprzednich prac

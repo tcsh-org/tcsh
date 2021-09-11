@@ -2976,6 +2976,8 @@ to remove a shared library.  (Domain/OS only)
 Lists the active jobs.  With \fB\-l\fR, lists process
 IDs in addition to the normal information.  On TCF systems, prints
 the site on which each job is executing.
+The \fB-Z\fR option sets the process title using setproctitle(3)
+where available.
 .PP
 .PD 0
 .TP 8

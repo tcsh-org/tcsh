@@ -1,3 +1,4 @@
+ 21. Add jobs -Z to setproctitle(3) like zsh(1)
  20. Prevent infinite recursion with tcsh -fc 'set -r status;:' (Gabriel Ravier)
  19. Fix postcmd trashing history when invoking domod (Jan Macku)
  18. Fix off-by-one in RefCursor (H.Merijn Brand)

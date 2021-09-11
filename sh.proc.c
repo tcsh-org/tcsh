@@ -1320,8 +1320,18 @@ dojobs(Char **v, struct command *c)
     if (chkstop)
 	chkstop = 2;
     if (*++v) {
-	if (v[1] || !eq(*v, STRml))
-	    stderror(ERR_JOBS);
+	if (v[1]) {
+	    if (eq(*v, STRml)) {
+		flag |= FANCY | JOBDIR;
+	    } else if (eq(*v, STRmZ) && v[1]) {
+#ifdef HAVE_SETPROCTITLE
+		setproctitle("%s", short2str(v[1]));
+#endif
+		return;
+	    } else {
+		stderror(ERR_JOBS);
+	    }
+	}
 	flag |= FANCY | JOBDIR;
     }
     for (i = 1; i <= pmaxindex; i++)
