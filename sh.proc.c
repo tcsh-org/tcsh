@@ -1323,9 +1323,13 @@ dojobs(Char **v, struct command *c)
 	if (v[1]) {
 	    if (eq(*v, STRml)) {
 		flag |= FANCY | JOBDIR;
-	    } else if (eq(*v, STRmZ) && v[1]) {
+	    } else if (eq(*v, STRmZ)) {
 #ifdef HAVE_SETPROCTITLE
-		setproctitle("%s", short2str(v[1]));
+		if (v[1] && v[1][0]) {
+		    setproctitle("%s", short2str(v[1]));
+		} else {
+		    setproctitle(NULL);
+		}
 #endif
 		return;
 	    } else {
