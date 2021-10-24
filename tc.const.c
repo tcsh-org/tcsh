@@ -267,6 +267,7 @@ Char STRperiodic[]	= { 'p', 'e', 'r', 'i', 'o', 'd', 'i', 'c', '\0' };
 Char STRtperiod[]	= { 't', 'p', 'e', 'r', 'i', 'o', 'd', '\0' };
 Char STRmf[]		= { '-', 'f', '\0' };
 Char STRml[]		= { '-', 'l', '\0' };
+Char STRmZ[]		= { '-', 'Z', '\0' };
 Char STRslash[]		= { '/', '\0' };
 Char STRdotsl[]		= { '.', '/', '\0' };
 Char STRdotdotsl[]	= { '.', '.', '/', '\0' };

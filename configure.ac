@@ -407,7 +407,7 @@ AC_CHECK_FUNC([setlocale], [have_setlocale=yes], [have_setlocale=no])
 AC_CHECK_FUNC([catgets], [have_catgets=yes], [have_catgets=no])
 AC_CHECK_FUNCS([dup2 getauthid getcwd gethostname getpwent] dnl
 	[getutent getutxent mallinfo mallinfo2 mblen memmove memset] dnl
-	[mkstemp nice] dnl
+	[mkstemp nice setproctitle] dnl
 	[nl_langinfo sbrk setpgid setpriority strerror strstr sysconf wcwidth])
 AC_FUNC_GETPGRP
 AC_FUNC_MBRTOWC

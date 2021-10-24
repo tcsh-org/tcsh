@@ -5255,14 +5255,17 @@ There is no way
 to remove a shared library.
 (Domain/OS only)
 .TP 8
-.B jobs \fR[
-.Fl l\fR]
+.B jobs .Op Fl lZ
 Lists the active jobs.
 With
-.Fl l\fR, lists process
+.Fl l, lists process
 IDs in addition to the normal information.
 On TCF systems, prints
 the site on which each job is executing.
+The
+.Fl Z
+option sets the process title using
+.Xr setproctitle 3.
 .Pp
 .PD 0
 .TP 8
