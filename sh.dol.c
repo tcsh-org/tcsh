@@ -746,6 +746,7 @@ fixDolMod(void)
 
 	    if (c == 's') {	/* [eichin:19910926.0755EST] */
 		int delimcnt = 2;
+		int esc = 0;
 		eChar delim = DgetC(0);
 		Strbuf_append1(&dolmod, (Char) c);
 		Strbuf_append1(&dolmod, (Char) delim);
@@ -756,9 +757,14 @@ fixDolMod(void)
 		    break;
 		}
 		while ((c = DgetC(0)) != DEOF) {
+		    if (esc == 0 && c == '\\') {
+			esc = 1;
+			continue;
+		    }
 		    Strbuf_append1(&dolmod, (Char) c);
-		    if (c == delim) delimcnt--;
+		    if (!esc && c == delim) delimcnt--;
 		    if (!delimcnt) break;
+		    esc = 0;
 		}
 		if (delimcnt) {
 		    seterror(ERR_BADSUBST);

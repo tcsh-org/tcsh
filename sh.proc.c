@@ -576,7 +576,7 @@ pjwait(struct process *pp)
 	xprintf(CGETS(17, 2, "Exit %d\n"), reason);
     reason_str = putn((tcsh_number_t)reason);
     cleanup_push(reason_str, xfree);
-    setv(STRstatus, reason_str, VAR_READWRITE);
+    setstrstatus(reason_str);
     cleanup_ignore(reason_str);
     cleanup_until(reason_str);
     if (reason && exiterr)
@@ -1320,8 +1320,22 @@ dojobs(Char **v, struct command *c)
     if (chkstop)
 	chkstop = 2;
     if (*++v) {
-	if (v[1] || !eq(*v, STRml))
-	    stderror(ERR_JOBS);
+	if (v[1]) {
+	    if (eq(*v, STRml)) {
+		flag |= FANCY | JOBDIR;
+	    } else if (eq(*v, STRmZ)) {
+#ifdef HAVE_SETPROCTITLE
+		if (v[1] && v[1][0]) {
+		    setproctitle("%s", short2str(v[1]));
+		} else {
+		    setproctitle(NULL);
+		}
+#endif
+		return;
+	    } else {
+		stderror(ERR_JOBS);
+	    }
+	}
 	flag |= FANCY | JOBDIR;
     }
     for (i = 1; i <= pmaxindex; i++)

@@ -220,7 +220,7 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 		xclose(0);
 	}
 
-	setcopy(STRstatus, STR0, VAR_READWRITE);
+	setstatus(0);
 
 	/*
 	 * This mess is the necessary kludge to handle the prefix builtins:
@@ -655,7 +655,7 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 		haderr = ohaderr;
 
 		if (adrof(STRprintexitvalue)) {
-		    int rv = getn(varval(STRstatus));
+		    int rv = getstatus();
 		    if (rv != 0)
 			xprintf(CGETS(17, 2, "Exit %d\n"), rv);
 		}
@@ -735,8 +735,7 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 	if (t->t_dcar) {
 	    t->t_dcar->t_dflg |= t->t_dflg & (F_NOINTERRUPT | F_BACKQ);
 	    execute(t->t_dcar, wanttty, NULL, NULL, do_glob);
-	    if ((getn(varval(STRstatus)) == 0) !=
-		(t->t_dtyp == NODE_AND)) {
+	    if ((getstatus() == 0) != (t->t_dtyp == NODE_AND)) {
 		return;
 	    }
 	}

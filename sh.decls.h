@@ -217,6 +217,7 @@ extern  int	  	  t_pmatch	(const Char *, const Char *,
  */
 extern	void	 	  dohist	(Char **, struct command *);
 extern  struct Hist 	 *enthist	(int, struct wordent *, int, int, int);
+extern  void		  cleanhist	(void);
 extern	void	 	  savehist	(struct wordent *, int);
 extern	char		 *fmthist	(int, ptr_t);
 extern	void		  rechist	(Char *, int);
@@ -402,6 +403,9 @@ extern	void		  autoset_dspmbyte	(const Char *);
 extern	void		  autoset_kanji	(void);
 #endif
 extern	void		  update_wordchars	(void);
+extern	void		  setstrstatus	(Char *);
+extern	void		  setstatus	(int);
+extern	int		  getstatus	(void);
 
 /*
  * sh.time.c

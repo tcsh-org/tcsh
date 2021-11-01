@@ -565,7 +565,7 @@ main(int argc, char **argv)
 
     sigset_interrupting(SIGALRM, queue_alrmcatch);
 
-    setcopy(STRstatus, STR0, VAR_READWRITE);
+    setstatus(0);
 
     /*
      * get and set machine specific environment variables
@@ -1830,7 +1830,7 @@ exitstat(void)
      */
     child = 1;
 
-    xexit(getn(varval(STRstatus)));
+    xexit(getstatus());
 }
 
 /*

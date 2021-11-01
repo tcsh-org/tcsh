@@ -1074,7 +1074,7 @@ dowhere(Char **v, struct command *c)
 	found &= find_cmd(*v, 1);
     /* Make status nonzero if any command is not found. */
     if (!found)
-	setcopy(STRstatus, STR1, VAR_READWRITE);
+	setstatus(1);
 }
 
 int
