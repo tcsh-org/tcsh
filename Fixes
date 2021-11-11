@@ -1,3 +1,9 @@
+  1. Merge in patches from pkgsrc:
+     - Modernize the installation targets so that they use INSTALL_DATA,
+       INSTALL_PROGRAM, and MKDIR_P.
+     - Enable SYSMALLOC and SHORT_STRINGS on NetBSD.
+     - Enable NO_FIX_MALLOC and SHORT_STRINGS on OpenBSD.
+
  23. V6.23.00 - 20211111
  22. Guard against running off the beginning of the array (Simon Burge)
  21. Add jobs -Z to setproctitle(3) like zsh(1)
