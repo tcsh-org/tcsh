@@ -356,7 +356,8 @@ P=
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
-mandir=@datarootdir@/man
+datarootdir=@datarootdir@
+mandir=@mandir@
 MANSECT=1
 DESTBIN=${DESTDIR}${bindir}
 DESTMAN=${DESTDIR}${mandir}/man${MANSECT}
@@ -632,7 +633,7 @@ clean.catalogs:
 	@test "x${BUILD_CATALOGS}" = "xyes" && (cd nls; ${MAKE} clean) || exit 0
 
 veryclean: clean
-	${RM} -f Makefile config.h config_p.h
+	${RM} -f Makefile config.h config_p.h nls/Makefile
 	${RM} -f config.status config.cache config.log tcsh.ps
 	${RM} -f missing
 	${RM} -f testsuite.log
