@@ -2972,7 +2972,7 @@ the \fIif\fR must appear alone on its input line or after an
 Adds each \fIshared-library\fR to the current environment.  There is no way
 to remove a shared library.  (Domain/OS only)
 .TP 8
-.B jobs \fR[\fB\-l\fR]
+.B jobs \fR[\fB\-lZ\fR]
 Lists the active jobs.  With \fB\-l\fR, lists process
 IDs in addition to the normal information.  On TCF systems, prints
 the site on which each job is executing.
