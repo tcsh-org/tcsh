@@ -1,0 +1,7 @@
+Announce* export-ignore
+BUG-TRACKING export-ignore
+MAKEDIFFS export-ignore
+MAKESHAR export-ignore
+Makefile.ADMIN export-ignore
+RELEASE-PROCEDURE export-ignore
+push-tcsh-git-mirror export-ignore
