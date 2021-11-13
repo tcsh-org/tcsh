@@ -5088,6 +5088,9 @@ A few terminal programs do not recognize the default end code
 properly.  If all text gets colorized after you do a directory
 listing, try changing the \fBno\fR and \fBfi\fR codes from 0 to the
 numerical codes for your standard fore- and background colors.
+.PP
+For symbolic links the \fBln\fR keyword can be set to \fBtarget\fR, which makes
+the file color the same as the color of the link target.
 .RE
 .TP 8
 .B MACHTYPE \fR(+)

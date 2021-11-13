@@ -8997,6 +8997,9 @@ and
 .Va fi
 codes from 0 to the
 numerical codes for your standard fore- and background colors.
+.Pp     
+For symbolic links the "ln" keyword can be set to "target", which makes
+the file color the same as the color of the link target.
 .RE
 .TP 8
 .B MACHTYPE \fR(+)
