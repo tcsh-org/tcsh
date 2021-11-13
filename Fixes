@@ -1,3 +1,4 @@
+  2. fix and document ln=target
   1. Merge in patches from pkgsrc:
      - Modernize the installation targets so that they use INSTALL_DATA,
        INSTALL_PROGRAM, and MKDIR_P.
