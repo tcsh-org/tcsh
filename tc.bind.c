@@ -385,7 +385,7 @@ parsestring(const Char *str, CStr *buf)
     cleanup_push(&b, Strbuf_cleanup);
     for (p = str; *p != 0; p++) {
 	if ((*p & CHAR) == '\\' || (*p & CHAR) == '^') {
-	    if ((es = parseescape(&p)) == CHAR_ERR) {
+	    if ((es = parseescape(&p, 1)) == CHAR_ERR) {
 		cleanup_until(&b);
 		return 0;
 	    } else

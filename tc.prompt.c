@@ -596,7 +596,7 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 	    }
 	}
 	else if (*cp == '\\' || *cp == '^')
-	    Strbuf_append1(&buf, attributes | parseescape(&cp));
+	    Strbuf_append1(&buf, attributes | parseescape(&cp, TRUE));
 	else if (*cp == HIST) {	/* EGS: handle '!'s in prompts */
 	    if (what == FMT_HISTORY)
 		cz = fmthist('h', info);

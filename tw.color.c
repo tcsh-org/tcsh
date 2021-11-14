@@ -202,7 +202,7 @@ getstring(char **dp, const Char **sp, Str *pd, int f)
 
     while (*s && (*s & CHAR) != (Char)f && (*s & CHAR) != ':') {
 	if ((*s & CHAR) == '\\' || (*s & CHAR) == '^') {
-	    if ((sc = parseescape(&s)) == CHAR_ERR)
+	    if ((sc = parseescape(&s, TRUE)) == CHAR_ERR)
 		return 0;
 	}
 	else

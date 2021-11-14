@@ -604,8 +604,33 @@ unparsech(struct Strbuf *buf, Char ch)
     }
 }
 
+static Char
+parse_hex_range(const Char **cp, size_t l)
+{
+    size_t ui = 0;
+    Char r = 0, c;
+
+    if (l > 8)
+	abort();
+
+    for (; (c = **cp & CHAR) && ui < l && Isxdigit(c & CHAR); (*cp)++, ui++) {
+	Char x = Isdigit(c) ? '0' : ((Isupper(c) ? 'A' : 'a') - 10);
+#ifndef IS_ASCII
+	c = _toascii(c);
+#endif
+	r <<= 4;
+	r |= c - x;
+    }
+    (*cp)--;
+#ifndef IS_ASCII
+    return _toebcdic[r & 0xff];
+#else
+    return r;
+#endif
+}
+
 eChar
-parseescape(const Char **ptr)
+parseescape(const Char **ptr, int e)
 {
     const Char *p;
     Char c;
@@ -613,7 +638,8 @@ parseescape(const Char **ptr)
     p = *ptr;
 
     if ((p[1] & CHAR) == 0) {
-	xprintf(CGETS(9, 8, "Something must follow: %c\n"), (char)*p);
+	if (e)
+	    xprintf(CGETS(9, 8, "Something must follow: %c\n"), (char)*p);
 	return CHAR_ERR;
     }
     if ((*p & CHAR) == '\\') {
@@ -639,6 +665,37 @@ parseescape(const Char **ptr)
 	    break;
 	case 't':
 	    c = CTL_ESC('\011');         /* Horizontal Tab */
+	    break;
+	case 'x':
+	    p++;
+	    if ((*p & CHAR) == '{' && Isxdigit(*(p + 1) & CHAR)) { /* \x{20ac} */
+		const Char *q = p - 2;
+		p++;
+		c = parse_hex_range(&p, 8);
+		if ((p[1] & CHAR) != '}') {
+		    if (e)
+			xprintf("%s", /* CGETS(9, 9, */
+			    "Missing closing brace");
+		    p = q;
+		    c = '\\';
+		    break;
+		}
+		p++;
+	    } else if (Isxdigit(*p & CHAR)) {	/* \x9f */
+		c = parse_hex_range(&p, 2);
+	    } else { /* backward compat */
+		c = '\\';
+		p -= 2;
+	    }
+	    break;
+	case 'u':
+	    p++;
+	    if (Isxdigit(*p & CHAR)) {	/* \u0020ac */
+		c = parse_hex_range(&p, 6);
+	    } else { /* backward compat */
+		c = '\\';
+		p -= 2;
+	    }
 	    break;
 	case 'v':
 	    c = CTL_ESC('\013');         /* Vertical Tab */
@@ -667,14 +724,17 @@ parseescape(const Char **ptr)
 		    val = (val << 3) | (ch - '0');
 		}
 		if ((val & ~0xff) != 0) {
-		    xprintf("%s", CGETS(9, 9,
+		    if (e)
+			xprintf("%s", CGETS(9, 9,
 			    "Octal constant does not fit in a char.\n"));
-		    return 0;
+		    *ptr = p;
+		    return CHAR_ERR;
 		}
 #ifndef IS_ASCII
 		if (CTL_ESC(val) != val && adrof(STRwarnebcdic))
 		    xprintf(/*CGETS(9, 9, no NLS-String yet!*/
-			    "Warning: Octal constant \\%3.3o is interpreted as EBCDIC value.\n", val/*)*/);
+			"Warning: Octal constant \\%3.3o is interpreted as "
+			"EBCDIC value.\n", val/*)*/);
 #endif
 		c = (Char) val;
 		--p;
