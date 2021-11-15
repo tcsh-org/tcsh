@@ -741,6 +741,8 @@ parseescape(const Char **ptr, int e)
 	    }
 	    break;
 	default:
+	    if (!e)
+		--p;
 	    c = *p;
 	    break;
 	}
