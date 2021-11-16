@@ -44,8 +44,8 @@
   # echo h<press key bound to dabbrev-expande>
   # echo hello\ world<cursor>
 
-  The same problem occured if spaces were present in a string withing quotation
-  marks. Example:
+  The same problem occurred if spaces were present in a string withing
+  quotation marks. Example:
 
   # echo "hello world"
   hello world
