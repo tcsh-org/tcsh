@@ -1927,7 +1927,7 @@ In
 .Nm ,
 more than one may be used, for example
 .Bd -literal -offset indent
-% mv wumpus.man /usr/man/man1/wumpus.1
+% mv wumpus.man /usr/share/man/man1/wumpus.1
 % man !$:t:r
 man wumpus
 .Ed
@@ -2481,7 +2481,7 @@ is followed by a character other than a letter or
 or appears elsewhere
 than at the beginning of a word, it is left undisturbed.
 A command like
-.Sq setenv MANPATH /usr/man:/usr/local/man:~/lib/man
+.Sq setenv MANPATH /usr/share/man:/usr/local/share/man:~/lib/man
 does not,
 therefore, do home directory substitution as one might hope.
 .Pp

@@ -1175,7 +1175,7 @@ This is the only history substitution which does not explicitly begin with `!'.
 (+) In \fIcsh\fR as such, only one modifier may be applied to each history
 or variable expansion.  In \fItcsh\fR, more than one may be used, for example
 .IP "" 4
-% mv wumpus.man /usr/man/man1/wumpus.1
+% mv wumpus.man /usr/share/man/man1/wumpus.1
 .br
 % man !$:t:r
 .br
@@ -1466,8 +1466,8 @@ user with that name and substitutes their home directory; thus `~ken' might
 expand to `/usr/ken' and `~ken/chmach' to `/usr/ken/chmach'.  If the character
 `~' is followed by a character other than a letter or `/' or appears elsewhere
 than at the beginning of a word, it is left undisturbed.
-A command like `setenv MANPATH /usr/man:/usr/local/man:~/lib/man' does not,
-therefore, do home directory substitution as one might hope.
+A command like `setenv MANPATH /usr/share/man:/usr/local/share/man:~/lib/man'
+does not, therefore, do home directory substitution as one might hope.
 .PP
 It is an error for a glob-pattern containing `*', `?', `[' or `~', with or
 without `^', not to match any files.  However, only one pattern in a list of

@@ -629,6 +629,12 @@ parse_hex_range(const Char **cp, size_t l)
 #endif
 }
 
+/*
+ * The e parameter is false when we are doing echo and true when we are
+ * using it to parse other escaped strings. For echo, we don't print errors
+ * and we don't unescape backslashes that we don't understand. Perhaps we
+ * always not unescape backslashes we don't understand...
+ */
 eChar
 parseescape(const Char **ptr, int e)
 {
@@ -741,6 +747,8 @@ parseescape(const Char **ptr, int e)
 	    }
 	    break;
 	default:
+	    if (!e)
+		--p;
 	    c = *p;
 	    break;
 	}
