@@ -1,3 +1,4 @@
+  5. don't glob the filetest builtin arguments twice
   4. remove the duplicate echo escape parsing code and use parseescape
   3. add \x{hh} \xhh \uhhh (H.Merijn Brand)
   2. fix and document ln=target

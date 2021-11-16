@@ -227,7 +227,7 @@ dofiletest(Char **v, struct command *c)
     cleanup_push(globbed, blk_cleanup);
 
     while (*(fileptr = v++) != NULL) {
-	res = filetest(ftest, &fileptr, 0);
+	res = filetest(ftest, &fileptr, TEXP_NOGLOB);
 	cleanup_push(res, xfree);
 	xprintf("%S", res);
 	cleanup_until(res);

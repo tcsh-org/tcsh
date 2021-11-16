@@ -1299,4 +1299,8 @@ extern int    filec;
 
 #include "tc.nls.h"
 
+#define TEXP_IGNORE 1	/* in ignore, it means to ignore value, just parse */
+#define TEXP_NOGLOB 2	/* in ignore, it means not to globone */
+
+
 #endif /* _h_sh */
