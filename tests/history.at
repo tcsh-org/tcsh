@@ -270,14 +270,14 @@ checkHistSize () {
     local newHistsize=`ls -l $histfile | awk '{print $5}'`
     local newHistinode=`ls -i $histfile | awk '{print $1}'`
     ls -li $histfile
-    echo size is now $newHistsize date is now $newHistdate at `date`
+    echo size is now $newHistsize inode is now $newHistinode at `date`
     # if the size not zero while the inode and size are not both unchanged then
     # the test is successful
-    [ $newHistsize -eq 0 ] && \
+    [ $newHistsize -le 0 ] && \
         { echo FAILED: history file truncated; return 66; }
-    [ $newHistsize -gt 0 -a \
-      \( $oldS -ne $newHistsize -o $oldI -ne $newHistinode \) ] || \
+    [ $oldS -eq $newHistsize ] && [ $oldI -eq $newHistinode ] && \
         { echo check hist size/inode failed, try rerunning test; return 66; }
+    return 0
 }
 
 tcshPath=`which tcsh`
