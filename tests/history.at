@@ -247,7 +247,7 @@ echo Using $program "($progpath)" to run tcsh inside a pty
 
 set -e
 
-# Don't globber ~/.history and also avoid loading it.
+# Don't clobber ~/.history and also avoid loading it.
 # A large ~/.history might take >1s to load causing a timeout.
 HOME=$PWD
 export HOME
