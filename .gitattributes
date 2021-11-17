@@ -3,6 +3,7 @@
 .travis.yml export-ignore
 Announce* export-ignore
 BUG-TRACKING export-ignore
+COVERITY-SCAN.md export-ignore
 MAKEDIFFS export-ignore
 MAKESHAR export-ignore
 Makefile.ADMIN export-ignore
