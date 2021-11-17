@@ -31,7 +31,7 @@ AT_SETUP([Filename substitution])
 AT_DATA([files.csh],
 [[mkdir d
 cd d
-touch foo baz bar .quux '*'
+touch Fiz foo baz bar .quux '*'
 echo *a* *[ox] [f.]* .q* ./*[ox] ./[f.]* ./.q* \*
 echo [a-g]* [^b]* ^b?r
 echo { ba{z,r} } {}
@@ -43,7 +43,7 @@ echo foo* ab{c,d} ^fo*
 ]])
 AT_CHECK([tcsh -f files.csh], ,
 [bar baz foo foo .quux ./foo ./foo ./.quux *
-bar baz foo * foo * baz foo
+bar baz foo * Fiz foo * Fiz baz foo
 { baz bar } {}
 foo
 nothing*
