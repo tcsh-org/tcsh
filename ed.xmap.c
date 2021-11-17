@@ -613,7 +613,7 @@ parse_hex_range(const Char **cp, size_t l)
     if (l > 8)
 	abort();
 
-    for (; (c = **cp & CHAR) && ui < l && Isxdigit(c & CHAR); (*cp)++, ui++) {
+    for (; (c = (**cp & CHAR)) != '\0' && ui < l && Isxdigit(c); (*cp)++, ui++) {
 	Char x = Isdigit(c) ? '0' : ((Isupper(c) ? 'A' : 'a') - 10);
 #ifndef IS_ASCII
 	c = _toascii(c);
