@@ -6,7 +6,7 @@ AT_SETUP([history])
 # Check history duplicate erase
 AT_DATA([hist-base.csh],
 [[set histdup=erase history=( 5 "%h TIME %R\n")
-echo $histdup $history
+printf "'%s' %s\n" "$histdup" "$history"
 : 1
 : 2
 : 3
@@ -15,8 +15,7 @@ echo $histdup $history
 ]])
 AT_CHECK([{ cat hist-base.csh; echo "!4"; } > hist.csh; \
 	  tcsh -f -q -i < hist.csh], 1,
-[> erase 5 %h TIME %R
-
+[> 'erase' 5 %h TIME %R\n
 > exit
 ],
 [4: Event not found.
@@ -25,8 +24,7 @@ AT_CHECK([{ cat hist-base.csh; echo "!4"; } > hist.csh; \
 # Try all four variants with different values of histdup.
 AT_CHECK([{ cat hist-base.csh; echo : 4; echo history 9; } > hist.csh; ] dnl
 	 [tcsh -f -q -i < hist.csh], ,
-[> erase 5 %h TIME %R
-
+[> 'erase' 5 %h TIME %R\n
      3 TIME : 1
      5 TIME : 3
      6 TIME : 2
@@ -36,8 +34,7 @@ AT_CHECK([{ cat hist-base.csh; echo : 4; echo history 9; } > hist.csh; ] dnl
 ],)
 AT_CHECK([{ sed 's/erase/all/' hist-base.csh; echo : 4; echo history 9;}] dnl
 	 [> hist.csh; tcsh -f -q -i < hist.csh], ,
-[> all 5 %h TIME %R
-
+[> 'all' 5 %h TIME %R\n
      3 TIME : 1
      4 TIME : 2
      5 TIME : 3
@@ -47,8 +44,7 @@ AT_CHECK([{ sed 's/erase/all/' hist-base.csh; echo : 4; echo history 9;}] dnl
 ],)
 AT_CHECK([{ sed 's/erase/prev/' hist-base.csh; echo : 4; echo history 9; }] dnl
 	 [> hist.csh; tcsh -f -q -i < hist.csh], ,
-[> prev 5 %h TIME %R
-
+[> 'prev' 5 %h TIME %R\n
      4 TIME : 2
      5 TIME : 3
      6 TIME : 2
@@ -58,8 +54,7 @@ AT_CHECK([{ sed 's/erase/prev/' hist-base.csh; echo : 4; echo history 9; }] dnl
 ],)
 AT_CHECK([{ sed 's/erase//' hist-base.csh; echo : 4; echo history 9;}] dnl
 	 [> hist.csh; tcsh -f -q -i < hist.csh], ,
-[> 5 %h TIME %R
-
+[> '' 5 %h TIME %R\n
      5 TIME : 3
      6 TIME : 2
      7 TIME : 4
@@ -80,8 +75,7 @@ history 9
 ]])
 AT_CHECK([[cat hist-base.csh hist-ev.csh > hist.csh; ] dnl
 	  [ tcsh -f -q -i < hist.csh ]], ,
-[> erase 5 %h TIME %R
-
+[> 'erase' 5 %h TIME %R\n
      3 TIME : 1
      6 TIME : 2
      8 TIME : : 1
@@ -102,8 +96,7 @@ AT_CHECK([[cat hist-base.csh hist-ev.csh > hist.csh; ] dnl
 # erase mode.
 AT_CHECK([[{ cat hist-base.csh; sed 's/x !6/: !6/' hist-ev.csh;}] dnl
 	  [> hist.csh; tcsh -f -q -i < hist.csh ]], ,
-[> erase 5 %h TIME %R
-
+[> 'erase' 5 %h TIME %R\n
      3 TIME : 1
      6 TIME : 2
      8 TIME : : 1
@@ -157,7 +150,7 @@ set histSize=$1
 set usedup=$2
 set usemerge=$3
 
-: echo in tcshrc with history size $histSize at `date +%F\ %T.%N`
+: echo in tcshrc with history size $histSize at `date +%F\ %T`
 set histfile=test.history
 echo Generating
 @ len = `wc -l < $histfile` / 2
@@ -174,15 +167,15 @@ else
 endif
 : echo "savehist=$savehist" "history=$history"
 : # Cannot use the time built-in because history is a shell function
-echo Loading at `date +%F\ %T.%N`
+echo Loading at `date +%F\ %T`
 history -L
 : 'wc -l $histfile; history | wc -l; history | head -2; history | tail -2'
-echo Saving at `date +%F\ %T.%N`
+echo Saving at `date +%F\ %T`
 history -S
-echo Done at `date +%F\ %T.%N`
+echo Done at `date +%F\ %T`
 ]])
 AT_CHECK([[ tcsh -f -q -i 5000 erase 1 < hist-load-save.csh] dnl
-	  [ | sed 's/ at [-: 0-9.]*/ at TIME/' ]], 0,
+	  [ | sed 's/ at [-: 0-9]*/ at TIME/' ]], 0,
 [> Generating
 Loading at TIME
 Saving at TIME
@@ -191,7 +184,7 @@ Done at TIME
 ], [])
 
 AT_CHECK([[ tcsh -f -q -i 4096 erase 1 < hist-load-save.csh] dnl
-	  [ | sed 's/ at [-: 0-9.]*/ at TIME/' ]], 0,
+	  [ | sed 's/ at [-: 0-9]*/ at TIME/' ]], 0,
 [> Generating
 Loading at TIME
 Saving at TIME
@@ -205,30 +198,34 @@ Done at TIME
 
 AT_CLEANUP
 
-AT_SETUP([history faults])
-
-# Try some things that have caused failures before
-AT_DATA([hist-err.csh],
-[[set histfile=test.history histdup=erase history=0
-set savehist  = (4096 merge)
-echo next
-set history="(5 %h TIME %R\n)"
-]])
-
-AT_CHECK([[ tcsh -f -q -i < hist-err.csh]], 0,
-[> next
-> exit
-], [])
-
-AT_CHECK([[ ( cat hist-err.csh; echo history; echo echo done ) | ] dnl
-	  [ tcsh -f -q -i ]], 1,
-[> next
-> exit
-],
-[history: Badly formed number.
-])
-
-AT_CLEANUP
+### AT_SETUP([history faults])
+###
+### # Try some things that have caused failures before
+### #
+### # XXX: I guess previously setting the history shell variable to a string
+### # XXX: worked and then history would barf. But now set barfs already.
+### #
+### AT_DATA([hist-err.csh],
+### [[set histfile=test.history histdup=erase history=0
+### set savehist  = (4096 merge)
+### echo next
+### set history="(5 %h %R\n)"
+### ]])
+###
+### AT_CHECK([[ tcsh -f -q -i < hist-err.csh]], 0,
+### [> next
+### > exit
+### ], [])
+###
+### AT_CHECK([[ ( cat hist-err.csh; echo history; echo echo done ) | ] dnl
+### 	  [ tcsh -f -q -i ]], 1,
+### [> next
+### > exit
+### ],
+### [history: Badly formed number.
+### ])
+###
+### AT_CLEANUP
 
 AT_SETUP([history hup])
 
@@ -250,46 +247,43 @@ echo Using $program "($progpath)" to run tcsh inside a pty
 
 set -e
 
-saveHistfile=
+# Don't globber ~/.history and also avoid loading it.
+# A large ~/.history might take >1s to load causing a timeout.
+HOME=$PWD
+export HOME
+
 histfile=$PWD/test.history
 # Initialize the history file to something small but non-zero.
 { echo "#+1234567890"; echo echo dummy history; } > $histfile
 
 setHistSize() {
-    histsize=`stat -c %s $histfile`
+    histsize=`ls -l $histfile | awk '{print $5}'`
     [ $histsize -gt 0 ] || exit 3       # should never happen
-    histdate=`stat -c %Y $histfile`
-    ls -l --full-time $histfile
-    echo size is $histsize date is $histdate at `date`
+    histinode=`ls -i $histfile | awk '{print $1}'`
+    ls -li $histfile
+    echo size is $histsize inode is $histinode at `date`
 }
 
 checkHistSize () {
     local oldS=$1
-    local oldD=$2
-    local newHistsize=`stat -c %s $histfile`
-    local newHistdate=`stat -c %Y $histfile`
-    ls -l --full-time $histfile
+    local oldI=$2
+    local newHistsize=`ls -l $histfile | awk '{print $5}'`
+    local newHistinode=`ls -i $histfile | awk '{print $1}'`
+    ls -li $histfile
     echo size is now $newHistsize date is now $newHistdate at `date`
-    # if the size not zero while the date and size are not both unchanged then
+    # if the size not zero while the inode and size are not both unchanged then
     # the test is successful
     [ $newHistsize -eq 0 ] && \
         { echo FAILED: history file truncated; return 66; }
     [ $newHistsize -gt 0 -a \
-      \( $oldS -ne $newHistsize -o $oldD -ne $newHistdate \) ] || \
-        { echo check hist size/date failed, try rerunning test; return 66; }
+      \( $oldS -ne $newHistsize -o $oldI -ne $newHistinode \) ] || \
+        { echo check hist size/inode failed, try rerunning test; return 66; }
 }
 
 tcshPath=`which tcsh`
 [ -x $tcshPath ] || exit 1
 tcshInput=hist-kill.csh
 [ -e $tcshInput ] || exit 2
-
-# To avoid the problem of large history files that may take more than 1 second
-# to read, replace the user's history file with the small one created above.
-saveHistfile=$PWD/save.history.$$
-origHistfile=$HOME/.history
-mv $origHistfile $saveHistfile
-cp $histfile $origHistfile              # initialize contents created above
 
 if [ $program = script ]; then
     # use script to create the pty
@@ -298,6 +292,7 @@ if [ $program = script ]; then
     sleep 1
     setHistSize
     # Not sure if there is a more standard way to do this.
+    # XXX: non-portable use of ps(1) -- could we kill script(1) instead?
     childScript=`ps --ppid $scriptPid --no-headers --format pid`
     [ -n $childScript -a $childScript -gt 1 ] && kill $childScript
 elif [ $program = xterm ]; then
@@ -320,10 +315,7 @@ else
     echo unsupported program $program
 fi
 sleep 1
-checkHistSize $histsize $histdate || rc=$?
-# Restore original history file, if necessary
-[ -n "$saveHistfile" ] && mv $saveHistfile $origHistfile
-[ -z "$rc" ] || exit $rc
+checkHistSize $histsize $histdate || exit $rc
 echo Done testing tcsh with $program successfully
 ]])
 
@@ -332,13 +324,13 @@ AT_DATA([hist-kill.csh],
 set savehist=(20 merge)
 history -S
 echo $version pid=$$
-/bin/ls -l --full-time ~/.hi* ./*history*
+ls -li ~/.hi* ./*history*
 ]])
 
 # Try both variants of this script, then the C version.
-AT_CHECK([sh hist-kill.sh script], 0, stdout, stderr)
-AT_CHECK([[if [ -n "$DISPLAY" ]; then sh hist-kill.sh xterm; ] dnl
-	 [  else echo Skip xterm test: no display; fi]], 0, stdout, stderr)
+### AT_CHECK([sh hist-kill.sh script], 0, stdout, stderr)
+### AT_CHECK([[if [ -n "$DISPLAY" ]; then sh hist-kill.sh xterm; ] dnl
+###	 [  else echo Skip xterm test: no display; fi]], 0, stdout, stderr)
 
 AT_DATA([hist-kill.c],
 [[/* Test tcsh response to loss of pseudo-terminal (pty) master.  Creates a pty
