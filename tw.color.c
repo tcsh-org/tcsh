@@ -479,7 +479,7 @@ print_with_color(const Char *filename, size_t len, Char suffix)
 	if (suffix == '@' && color_as_referent) {
 	    char *f = short2str(filename);
 	    Char c = suffix;
-	    char buf[MAXPATHLEN];
+	    char buf[MAXPATHLEN + 1];
 
 	    while (c == '@') {
 		ssize_t b = readlink(f, buf, MAXPATHLEN);
