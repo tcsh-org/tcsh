@@ -2972,16 +2972,22 @@ the \fIif\fR must appear alone on its input line or after an
 .B inlib \fIshared-library\fR ... (+)
 Adds each \fIshared-library\fR to the current environment.  There is no way
 to remove a shared library.  (Domain/OS only)
+.PP
+.B jobs \fR[\fB\-l\fR]
+.PD 0
 .TP 8
-.B jobs \fR[\fB\-lZ\fR]
+.B jobs \-Z \fR[\fItitle\fR] (+)
 Lists the active jobs.  With \fB\-l\fR, lists process
 IDs in addition to the normal information.  On TCF systems, prints
 the site on which each job is executing.
-The \fB-Z\fR option sets the process title using setproctitle(3)
-where available.
+.PD
+.RS +8
 .PP
-.PD 0
-.TP 8
+The \fB-Z\fR option sets the process title to \fItitle\fR using
+setproctitle(3) where available.
+If no \fItitle\fR is provided, the process title will be cleared.
+.RE
+.PP
 .B kill \fR[\fB\-s \fIsignal\fR] \fB%\fIjob\fR|\fIpid\fR ...
 .PD 0
 .TP 8

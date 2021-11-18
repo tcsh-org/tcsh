@@ -5256,18 +5256,25 @@ to the current environment.
 There is no way
 to remove a shared library.
 (Domain/OS only)
-.TP 8
-.B jobs .Op Fl lZ
+.Pp
+.It Ar jobs Op Fl l
+.It Ar jobs Fl Z Op title (+)
 Lists the active jobs.
 With
-.Fl l, lists process
-IDs in addition to the normal information.
-On TCF systems, prints
-the site on which each job is executing.
+.Fl l ,
+lists process IDs in addition to the normal information.
+On TCF systems, prints the site on which each job is executing.
+.Pp
 The
 .Fl Z
-option sets the process title using
-.Xr setproctitle 3.
+option sets the process title to
+.Ar title
+using
+.Xr setproctitle 3
+where available.
+If no
+.Ar title
+is provided, the process title will be cleared.
 .Pp
 .PD 0
 .TP 8
