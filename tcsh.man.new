@@ -1484,10 +1484,14 @@ controlled by the \fBecho_style\fR shell variable.
 Bell
 .It \eb
 Backspace
-\." XXX: Not implemented by parseescape() in ed.xmap.c
-.\" .It \e\fIc
-.\" The control character denoted by \fI^c\fR in \fIstty\fR(1).  If \fIc\fR
-.\" is a backslash, it must be doubled.
+.It \ec\fIc
+The control character denoted by
+.Va ^c
+in
+.Xr stty 1 .
+If
+.Va c
+is a backslash, it must be doubled.
 .It \ee
 Escape
 .It \ef

@@ -657,6 +657,33 @@ parseescape(const Char **ptr, int e)
 	case 'b':
 	    c = CTL_ESC('\010');         /* Backspace */
 	    break;
+	case 'c':
+	    p++;
+	    if ((*p & CHAR) == '\\') {
+		p++;
+		if ((*p & CHAR) != '\\') {
+		    *ptr = p;
+		    if (e)
+			xprintf(/*CGETS(9, 9, */
+			    "Invalid escape sequence: %s%c\n"/*)*/, "\\c\\", (char)*p);
+		    return CHAR_ERR;
+		}
+		c = (*p & CHAR) & 0237;
+	    } else if ((Isalpha(*p & CHAR) || strchr("@^_?\\|[{]}", *p & CHAR))) {
+		/* XXX: Duplicate code from ^ below */
+#ifdef IS_ASCII
+		c = ((*p & CHAR) == '?') ? CTL_ESC('\177') : ((*p & CHAR) & 0237);
+#else
+		c = ((*p & CHAR) == '?') ? CTL_ESC('\177') : _toebcdic[_toascii[*p & CHAR] & 0237];
+		if (adrof(STRwarnebcdic))
+		    xprintf(/*CGETS(9, 9, no NLS-String yet!*/
+			"Warning: Control character %s%c may be interpreted differently in EBCDIC.\n", "\\c", *p & CHAR /*)*/);
+#endif
+	    } else { /* backward compat */
+		c = '\\';
+		p -= 2;
+	    }
+	    break;
 	case 'e':
 	    c = CTL_ESC('\033');         /* Escape */
 	    break;
@@ -703,7 +730,7 @@ parseescape(const Char **ptr, int e)
 	case 'u':
 	case 'U':
 	    {
-		int limit = (*p & CHAR) == 'u' ? 4 : 6;
+		size_t limit = (*p & CHAR) == 'u' ? 4 : 6;
 		p++;
 		if (Isxdigit(*p & CHAR)) {	/* \u20ac or \U0020ac */
 		    c = parse_hex_range(&p, limit);
@@ -766,7 +793,7 @@ parseescape(const Char **ptr, int e)
 	c = ((*p & CHAR) == '?') ? CTL_ESC('\177') : _toebcdic[_toascii[*p & CHAR] & 0237];
 	if (adrof(STRwarnebcdic))
 	    xprintf(/*CGETS(9, 9, no NLS-String yet!*/
-		"Warning: Control character ^%c may be interpreted differently in EBCDIC.\n", *p & CHAR /*)*/);
+		"Warning: Control character %s%c may be interpreted differently in EBCDIC.\n", "^", *p & CHAR /*)*/);
 #endif
     }
     else
