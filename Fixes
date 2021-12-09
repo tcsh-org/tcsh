@@ -1,4 +1,6 @@
-  6. add $'string with escapes' (Kimmo Suominen)
+  8. V6.23.01 - 20211209
+  7. add \cc and \Uhhh, and document escape sequences
+  6. add $'string with escapes' ("dollar-single-quotes") (Kimmo Suominen)
   5. don't glob the filetest builtin arguments twice
   4. remove the duplicate echo escape parsing code and use parseescape
   3. add \x{hh} \xhh \uhhh (H.Merijn Brand)

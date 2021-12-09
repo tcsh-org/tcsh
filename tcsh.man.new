@@ -65,10 +65,10 @@
 .\"   which aren't already used herein.
 .\"
 .\" UPDATE NEXT LINE FOR RELEASE
-.Dd November 11, 2021
+.Dd December 9, 2021
 .Dt TCSH 1
 .\" UPDATE NEXT LINE FOR RELEASE
-.Os Astron 6.23.00
+.Os Astron 6.23.01
 .Sh NAME
 .Nm tcsh
 .Nd C shell with file name completion and command line editing
@@ -9619,7 +9619,7 @@ malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .Sh VERSION
 .\" UPDATE NEXT LINE FOR RELEASE
-This manual documents tcsh 6.23.00 (Astron) 2021-11-11.
+This manual documents tcsh 6.23.01 (Astron) 2021-12-09.
 .Sh AUTHORS
 .PD 0
 .TP 2
