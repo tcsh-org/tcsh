@@ -30,6 +30,8 @@
  * SUCH DAMAGE.
  */
 #include "sh.h"
+#include "ed.h"
+#include "tw.h"
 
 /*
  * C shell
@@ -385,6 +387,37 @@ Dgetdol(void)
     if (c == DEOF) {
       stderror(ERR_SYNTAX);
       return;
+    }
+    if ((c & TRIM) == '\'') {
+	const Char *cp;
+	struct Strbuf *expanded = Strbuf_alloc();
+
+	for (;;) {
+	    c = DgetC(0);
+	    if ((c & TRIM) == '\'')
+		break;
+	    if ((c & TRIM) == '\\') {
+		Strbuf_append1(name, (Char) c);
+		c = DgetC(0);
+	    }
+	    if (c == '\n' || c == DEOF) {
+		cleanup_until(name);
+		stderror(ERR_MISSING, '\'');
+		return;
+	    }
+	    Strbuf_append1(name, (Char) c);
+	}
+	Strbuf_terminate(name);
+	cleanup_push(expanded, Strbuf_free);
+	for (cp = name->s; (c = *cp) != 0; cp++) {
+	    if (c == '\\' && (c = parseescape(&cp, TRUE)) == CHAR_ERR)
+		c = '\\';
+	    Strbuf_append1(expanded, (Char) c | QUOTE);
+	}
+	Strbuf_terminate(expanded);
+	addla(expanded->s);
+	cleanup_until(name);
+	return;
     }
     if (c == '{')
 	c = DgetC(0);		/* sc is { to take } later */

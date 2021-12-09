@@ -904,6 +904,10 @@ below) can a double-quoted string yield parts of more than one word;
 single-quoted strings never do.  Backward quotes are special: they signal
 \fBCommand substitution\fR (q.v.), which may result in more than one word.
 .PP
+C-style escape sequences can be used in single quoted strings by
+preceding the leading quote with `$'.  (+) See \fBEscape sequences\fR for
+a complete list of recognized escape sequences.
+.PP
 Quoting complex strings, particularly strings which themselves contain quoting
 characters, can be confusing.  Remember that quotes need not be used as they are
 in human writing!  It may be easier to quote not an entire string, but only
@@ -913,6 +917,77 @@ to do so if appropriate.
 The \fBbackslash_quote\fR shell variable (q.v.) can be set to make backslashes
 always quote `\e', `'', and `"'.  (+) This may make complex quoting tasks
 easier, but it can cause syntax errors in \fIcsh\fR(1) scripts.
+.SS "Escape sequences (+)"
+The following escape sequences are always recognized inside a string
+constructed using `$''', and optionally by the \fIecho\fR builtin command as
+controlled by the \fBecho_style\fR shell variable.
+.RS +4
+.TP 12
+.PD 0
+.B \ea
+Bell
+.TP 12
+.B \eb
+Backspace
+\." XXX: Not implemented by parseescape() in ed.xmap.c
+.\" .TP 12
+.\" .B \e\fIc
+.\" The control character denoted by \fI^c\fR in \fIstty\fR(1).  If \fIc\fR
+.\" is a backslash, it must be doubled.
+.TP 12
+.B \ee
+Escape
+.TP 12
+.B \ef
+Form feed
+.TP 12
+.B \en
+Newline
+.TP 12
+.B \er
+Carriage return
+.TP 12
+.B \et
+Horizontal tab
+.TP 12
+.B \ev
+Vertical tab
+.TP 12
+.B \e\e
+Literal backslash
+.TP 12
+.B \e'
+Literal single quote
+.TP 12
+.B \e"
+Literal double quote
+.TP 12
+.B \e\fInnn
+The ASCII character corresponding to the octal number \fInnn\fR
+.TP 12
+.B \ex\fInn
+The ASCII character corresponding to the hexadecimal number \fInn\fR
+.\"
+.\" XXX: sh(1) allows one or more digits after x, but uses only the last two
+.\"
+.TP 12
+.B \ex{\fInnnn\fB}
+The ASCII character corresponding to the hexadecimal number \fInnnn\fR
+.TP 12
+.B \eu\fInnnnnn
+The Unicode code point \fInnnnnn\fR (six hexadecimal digits)
+.\"
+.\" XXX: sh(1) uses lowercase u for 4 digit and uppercase U for 8 digit points
+.\"
+.\" .TP 12
+.\" .B \eu\fInnnn
+.\" The Unicode code point \fInnnn\fR (four hexadecimal digits)
+.\" .TP 12
+.\" .B \eU\fInnnnnnnn
+.\" The Unicode code point \fInnnnnnnn\fR (eight hexadecimal digits)
+.\"
+.PD
+.RE
 .SS Substitutions
 We now describe the various transformations the shell performs on the input in
 the order in which they occur.  We note in passing the data structures involved
@@ -2754,7 +2829,8 @@ The last form clears the directory stack.
 Writes each \fIword\fR to the shell's standard
 output, separated by spaces and terminated with a newline.
 The \fBecho_style\fR shell variable may be set to emulate (or not) the flags and escape
-sequences of the BSD and/or System V versions of \fIecho\fR; see \fIecho\fR(1).
+sequences of the BSD and/or System V versions of \fIecho\fR; see \fBEscape sequences\fR
+and \fIecho\fR(1).
 .TP 8
 .B echotc \fR[\fB\-sv\fR] \fIarg\fR ... (+)
 Exercises the terminal capabilities (see \fItermcap\fR(5)) in \fIargs\fR.

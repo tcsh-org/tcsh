@@ -1447,6 +1447,14 @@ Backward quotes are special: they signal
 .Sx Command substitution
 (q.v.), which may result in more than one word.
 .Pp
+C-style escape sequences can be used in single quoted strings by
+preceding the leading quote with
+.Sq $ .  (+)
+See
+.Sx Escape sequences
+for
+a complete list of recognized escape sequences.
+.Pp
 Quoting complex strings, particularly strings which themselves contain quoting
 characters, can be confusing.
 Remember that quotes need not be used as they are
@@ -1467,6 +1475,66 @@ and
 easier, but it can cause syntax errors in
 .Xr csh 1
 scripts.
+.Ss Escape sequences (+)
+The following escape sequences are always recognized inside a string
+constructed using `$''', and optionally by the \fIecho\fR builtin command as
+controlled by the \fBecho_style\fR shell variable.
+.Bl -tag -width XXXXXXXX -compact -offset indent
+.It \ea
+Bell
+.It \eb
+Backspace
+\." XXX: Not implemented by parseescape() in ed.xmap.c
+.\" .It \e\fIc
+.\" The control character denoted by \fI^c\fR in \fIstty\fR(1).  If \fIc\fR
+.\" is a backslash, it must be doubled.
+.It \ee
+Escape
+.It \ef
+Form feed
+.It \en
+Newline
+.It \er
+Carriage return
+.It \et
+Horizontal tab
+.It \ev
+Vertical tab
+.It \e\e
+Literal backslash
+.It \e\&'
+Literal single quote
+.It \e\&"
+Literal double quote
+.It \e\fInnn
+The ASCII character corresponding to the octal number
+.Va nnn
+.It \ex\fInn
+The ASCII character corresponding to the hexadecimal number
+.Va nn
+.\"
+.\" XXX: sh(1) allows one or more digits after x, but uses only the last two
+.\"
+.It \ex{\fInnnn\fB}
+The ASCII character corresponding to the hexadecimal number
+.Va nnnn
+.It \eu\fInnnnnn
+The Unicode code point
+.Va nnnnnn
+(six hexadecimal digits)
+.\"
+.\" XXX: sh(1) uses lowercase u for 4 digit and uppercase U for 8 digit points
+.\"
+.\" .It \eu\fInnnn
+.\" The Unicode code point
+.\" .Va nnnn
+.\" (four hexadecimal digits)
+.\" .It \eU\fInnnnnnnn
+.\" The Unicode code point
+.\" .Va nnnnnnnn
+.\" (eight hexadecimal digits)
+.\"
+.El
 .Ss Substitutions
 We now describe the various transformations the shell performs on the input in
 the order in which they occur.
@@ -4827,10 +4895,11 @@ The
 .Va echo_style
 shell variable may be set to emulate (or not) the flags and escape
 sequences of the BSD and/or System V versions of
-.Va echo
-; see
-.Va echo
-(1).
+.Xr echo 1 ;
+see
+.Sx Escape sequences
+and
+.Xr echo 1 .
 .TP 8
 .B echotc \fR[
 .Fl sv\fR]

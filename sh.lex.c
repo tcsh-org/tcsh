@@ -511,6 +511,24 @@ getdol(void)
     }
     cleanup_push(&name, Strbuf_cleanup);
     Strbuf_append1(&name, '$');
+    if (c == '\'') {
+	for (;;) {
+	    Strbuf_append1(&name, c);
+	    c = getC(DOEXCL);
+	    if (c == '\'') break;
+	    if (c == '\\') {
+		Strbuf_append1(&name, c);
+		c = getC(DOEXCL);
+	    }
+	    if (c == '\n') {
+		ungetD(c);
+		seterror(ERR_MISSING, '\'');
+		goto end;
+	    }
+	}
+	Strbuf_append1(&name, c);
+	goto end;
+    }
     if (c == '{')
 	Strbuf_append1(&name, c), c = getC(DOEXCL);
     if (c == '#' || c == '?' || c == '%')
