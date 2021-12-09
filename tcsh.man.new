@@ -1516,10 +1516,11 @@ The character corresponding to the octal number
 .It \ex\fInn
 The character corresponding to the hexadecimal number
 .Va nn
-.It \ex{\fInnnn\fB}
+(1\-2 hexadecimal digits)
+.It \ex{\fInnnnnnnn\fB}
 The character corresponding to the hexadecimal number
-.Va nnnn
-(1\-4 hexadecimal digits)
+.Va nnnnnnnn
+(1\-8 hexadecimal digits)
 .It \eu\fInnnn
 The Unicode code point
 .Va nnnn

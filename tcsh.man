@@ -922,58 +922,59 @@ The following escape sequences are always recognized inside a string
 constructed using `$''', and optionally by the \fIecho\fR builtin command as
 controlled by the \fBecho_style\fR shell variable.
 .RS +4
-.TP 10
+.TP 14
 .PD 0
 .B \ea
 Bell
-.TP 10
+.TP 14
 .B \eb
 Backspace
-.TP 10
+.TP 14
 .B \ec\fIc
 The control character denoted by \fI^c\fR in \fIstty\fR(1).  If \fIc\fR
 is a backslash, it must be doubled.
-.TP 10
+.TP 14
 .B \ee
 Escape
-.TP 10
+.TP 14
 .B \ef
 Form feed
-.TP 10
+.TP 14
 .B \en
 Newline
-.TP 10
+.TP 14
 .B \er
 Carriage return
-.TP 10
+.TP 14
 .B \et
 Horizontal tab
-.TP 10
+.TP 14
 .B \ev
 Vertical tab
-.TP 10
+.TP 14
 .B \e\e
 Literal backslash
-.TP 10
+.TP 14
 .B \e'
 Literal single quote
-.TP 10
+.TP 14
 .B \e"
 Literal double quote
-.TP 10
+.TP 14
 .B \e\fInnn
 The character corresponding to the octal number \fInnn\fR
-.TP 10
+.TP 14
 .B \ex\fInn
 The character corresponding to the hexadecimal number \fInn\fR
-.TP 10
-.B \ex{\fInnnn\fB}
-The character corresponding to the hexadecimal number \fInnnn\fR
-(1\-4 hexadecimal digits)
-.TP 10
+(1\-2 hexadecimal digits)
+.TP 14
+.B \ex{\fInnnnnnnn\fB}
+The character corresponding to the hexadecimal number \fInnnnnnnn\fR
+(1\-8 hexadecimal digits)
+.TP 14
 .B \eu\fInnnn
 The Unicode code point \fInnnn\fR (1\-4 hexadecimal digits)
-.TP 10
+.TP 14
 .B \eU\fInnnnnn
 The Unicode code point \fInnnnnn\fR (1\-6 hexadecimal digits).  Note that
 other shells may support up to 8 hexadecimal digits.
