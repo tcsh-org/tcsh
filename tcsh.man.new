@@ -1507,34 +1507,33 @@ Literal single quote
 .It \e\&"
 Literal double quote
 .It \e\fInnn
-The ASCII character corresponding to the octal number
+The character corresponding to the octal number
 .Va nnn
 .It \ex\fInn
-The ASCII character corresponding to the hexadecimal number
+The character corresponding to the hexadecimal number
 .Va nn
-.\"
-.\" XXX: sh(1) allows one or more digits after x, but uses only the last two
-.\"
 .It \ex{\fInnnn\fB}
-The ASCII character corresponding to the hexadecimal number
+The character corresponding to the hexadecimal number
 .Va nnnn
-.It \eu\fInnnnnn
+(1\-4 hexadecimal digits)
+.It \eu\fInnnn
+The Unicode code point
+.Va nnnn
+(1\-4 hexadecimal digits)
+.It \eU\fInnnnnn
 The Unicode code point
 .Va nnnnnn
-(six hexadecimal digits)
-.\"
-.\" XXX: sh(1) uses lowercase u for 4 digit and uppercase U for 8 digit points
-.\"
-.\" .It \eu\fInnnn
-.\" The Unicode code point
-.\" .Va nnnn
-.\" (four hexadecimal digits)
-.\" .It \eU\fInnnnnnnn
-.\" The Unicode code point
-.\" .Va nnnnnnnn
-.\" (eight hexadecimal digits)
-.\"
+(1\-6 hexadecimal digits).
+Note that other shells may support up to 8 hexadecimal digits.
 .El
+.Pp
+The implementations of
+.Ar \ex ,
+.Ar \eu ,
+and
+.Ar \eU
+in other shells may take a varying number of digits.  It is often safest
+to use leading zeros to provide the maximum expected number of digits.
 .Ss Substitutions
 We now describe the various transformations the shell performs on the input in
 the order in which they occur.

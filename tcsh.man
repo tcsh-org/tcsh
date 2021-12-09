@@ -922,72 +922,68 @@ The following escape sequences are always recognized inside a string
 constructed using `$''', and optionally by the \fIecho\fR builtin command as
 controlled by the \fBecho_style\fR shell variable.
 .RS +4
-.TP 12
+.TP 10
 .PD 0
 .B \ea
 Bell
-.TP 12
+.TP 10
 .B \eb
 Backspace
 \." XXX: Not implemented by parseescape() in ed.xmap.c
-.\" .TP 12
+.\" .TP 10
 .\" .B \e\fIc
 .\" The control character denoted by \fI^c\fR in \fIstty\fR(1).  If \fIc\fR
 .\" is a backslash, it must be doubled.
-.TP 12
+.TP 10
 .B \ee
 Escape
-.TP 12
+.TP 10
 .B \ef
 Form feed
-.TP 12
+.TP 10
 .B \en
 Newline
-.TP 12
+.TP 10
 .B \er
 Carriage return
-.TP 12
+.TP 10
 .B \et
 Horizontal tab
-.TP 12
+.TP 10
 .B \ev
 Vertical tab
-.TP 12
+.TP 10
 .B \e\e
 Literal backslash
-.TP 12
+.TP 10
 .B \e'
 Literal single quote
-.TP 12
+.TP 10
 .B \e"
 Literal double quote
-.TP 12
+.TP 10
 .B \e\fInnn
-The ASCII character corresponding to the octal number \fInnn\fR
-.TP 12
+The character corresponding to the octal number \fInnn\fR
+.TP 10
 .B \ex\fInn
-The ASCII character corresponding to the hexadecimal number \fInn\fR
-.\"
-.\" XXX: sh(1) allows one or more digits after x, but uses only the last two
-.\"
-.TP 12
+The character corresponding to the hexadecimal number \fInn\fR
+.TP 10
 .B \ex{\fInnnn\fB}
-The ASCII character corresponding to the hexadecimal number \fInnnn\fR
-.TP 12
-.B \eu\fInnnnnn
-The Unicode code point \fInnnnnn\fR (six hexadecimal digits)
-.\"
-.\" XXX: sh(1) uses lowercase u for 4 digit and uppercase U for 8 digit points
-.\"
-.\" .TP 12
-.\" .B \eu\fInnnn
-.\" The Unicode code point \fInnnn\fR (four hexadecimal digits)
-.\" .TP 12
-.\" .B \eU\fInnnnnnnn
-.\" The Unicode code point \fInnnnnnnn\fR (eight hexadecimal digits)
-.\"
+The character corresponding to the hexadecimal number \fInnnn\fR
+(1\-4 hexadecimal digits)
+.TP 10
+.B \eu\fInnnn
+The Unicode code point \fInnnn\fR (1\-4 hexadecimal digits)
+.TP 10
+.B \eU\fInnnnnn
+The Unicode code point \fInnnnnn\fR (1\-6 hexadecimal digits).  Note that
+other shells may support up to 8 hexadecimal digits.
 .PD
 .RE
+.PP
+The implementations of \fB\ex\fR, \fB\eu\fR, and \fB\eU\fR in other
+shells may take a varying number of digits.  It is often safest to use
+leading zeros to provide the maximum expected number of digits.
 .SS Substitutions
 We now describe the various transformations the shell performs on the input in
 the order in which they occur.  We note in passing the data structures involved

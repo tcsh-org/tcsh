@@ -701,12 +701,16 @@ parseescape(const Char **ptr, int e)
 	    }
 	    break;
 	case 'u':
-	    p++;
-	    if (Isxdigit(*p & CHAR)) {	/* \u0020ac */
-		c = parse_hex_range(&p, 6);
-	    } else { /* backward compat */
-		c = '\\';
-		p -= 2;
+	case 'U':
+	    {
+		int limit = (*p & CHAR) == 'u' ? 4 : 6;
+		p++;
+		if (Isxdigit(*p & CHAR)) {	/* \u20ac or \U0020ac */
+		    c = parse_hex_range(&p, limit);
+		} else { /* backward compat */
+		    c = '\\';
+		    p -= 2;
+		}
 	    }
 	    break;
 	case '0':
