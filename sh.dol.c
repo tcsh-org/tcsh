@@ -392,6 +392,7 @@ Dgetdol(void)
 	const Char *cp;
 	struct Strbuf *expanded = Strbuf_alloc();
 
+	cleanup_push(expanded, Strbuf_free);
 	for (;;) {
 	    c = DgetC(0);
 	    if ((c & TRIM) == '\'')
@@ -408,15 +409,15 @@ Dgetdol(void)
 	    Strbuf_append1(name, (Char) c);
 	}
 	Strbuf_terminate(name);
-	cleanup_push(expanded, Strbuf_free);
 	for (cp = name->s; (c = *cp) != 0; cp++) {
 	    if (c == '\\' && (c = parseescape(&cp, TRUE)) == CHAR_ERR)
 		c = '\\';
 	    Strbuf_append1(expanded, (Char) c | QUOTE);
 	}
 	Strbuf_terminate(expanded);
-	addla(expanded->s);
+	np = Strsave(expanded->s);
 	cleanup_until(name);
+	addla(np);
 	return;
     }
     if (c == '{')
