@@ -672,6 +672,12 @@ parseescape(const Char **ptr, int e)
 	case 't':
 	    c = CTL_ESC('\011');         /* Horizontal Tab */
 	    break;
+	case 'v':
+	    c = CTL_ESC('\013');         /* Vertical Tab */
+	    break;
+	case '\\':
+	    c = '\\';
+	    break;
 	case 'x':
 	    p++;
 	    if ((*p & CHAR) == '{' && Isxdigit(*(p + 1) & CHAR)) { /* \x{20ac} */
@@ -702,12 +708,6 @@ parseescape(const Char **ptr, int e)
 		c = '\\';
 		p -= 2;
 	    }
-	    break;
-	case 'v':
-	    c = CTL_ESC('\013');         /* Vertical Tab */
-	    break;
-	case '\\':
-	    c = '\\';
 	    break;
 	case '0':
 	case '1':
