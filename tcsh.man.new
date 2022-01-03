@@ -1525,11 +1525,10 @@ The character corresponding to the hexadecimal number
 The Unicode code point
 .Va nnnn
 (1\-4 hexadecimal digits)
-.It \eU\fInnnnnn
+.It \eU\fInnnnnnnn
 The Unicode code point
-.Va nnnnnn
-(1\-6 hexadecimal digits).
-Note that other shells may support up to 8 hexadecimal digits.
+.Va nnnnnnnn
+(1\-8 hexadecimal digits).
 .El
 .Pp
 The implementations of

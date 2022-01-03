@@ -730,9 +730,9 @@ parseescape(const Char **ptr, int e)
 	case 'u':
 	case 'U':
 	    {
-		size_t limit = (*p & CHAR) == 'u' ? 4 : 6;
+		size_t limit = (*p & CHAR) == 'u' ? 4 : 8;
 		p++;
-		if (Isxdigit(*p & CHAR)) {	/* \u20ac or \U0020ac */
+		if (Isxdigit(*p & CHAR)) {	/* \u20ac or \U000020ac */
 		    c = parse_hex_range(&p, limit);
 		} else { /* backward compat */
 		    c = '\\';

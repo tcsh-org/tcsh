@@ -975,9 +975,8 @@ The character corresponding to the hexadecimal number \fInnnnnnnn\fR
 .B \eu\fInnnn
 The Unicode code point \fInnnn\fR (1\-4 hexadecimal digits)
 .TP 14
-.B \eU\fInnnnnn
-The Unicode code point \fInnnnnn\fR (1\-6 hexadecimal digits).  Note that
-other shells may support up to 8 hexadecimal digits.
+.B \eU\fInnnnnnnn
+The Unicode code point \fInnnnnnnn\fR (1\-8 hexadecimal digits).
 .PD
 .RE
 .PP
