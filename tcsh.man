@@ -78,7 +78,7 @@
 .\"   which aren't already used herein.
 .\" 
 .\" UPDATE NEXT LINE FOR RELEASE
-.TH TCSH 1 "9 Dec 2021" "Astron 6.23.01"
+.TH TCSH 1 "3 Jan 2022" "Astron 6.23.02"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -5439,7 +5439,7 @@ malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
 .\" UPDATE NEXT LINE FOR RELEASE
-This manual documents tcsh 6.23.01 (Astron) 2021-12-09.
+This manual documents tcsh 6.23.02 (Astron) 2022-01-03.
 .SH AUTHORS
 .PD 0
 .TP 2

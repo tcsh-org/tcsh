@@ -1,3 +1,5 @@
+ 10. V6.23.02 - 20220103
+  9. Make the \U escape up to 8 hex digits.
   8. V6.23.01 - 20211209
   7. add \cc and \Uhhh, and document escape sequences
   6. add $'string with escapes' ("dollar-single-quotes") (Kimmo Suominen)
