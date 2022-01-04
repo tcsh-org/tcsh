@@ -690,7 +690,7 @@ mesginit(void)
 #ifdef SIGPOLL
     if (mesg[SIGPOLL].pname == NULL) {
 	mesg[SIGPOLL].iname = "POLL";
-	mesg[SIGPOLL].pname = CSAVS(2, 63, "Pollable event occured");
+	mesg[SIGPOLL].pname = CSAVS(2, 63, "Pollable event occurred");
     }
 #endif /* SIGPOLL */
 

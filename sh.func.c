@@ -227,7 +227,7 @@ dofiletest(Char **v, struct command *c)
     cleanup_push(globbed, blk_cleanup);
 
     while (*(fileptr = v++) != NULL) {
-	res = filetest(ftest, &fileptr, 0);
+	res = filetest(ftest, &fileptr, TEXP_NOGLOB);
 	cleanup_push(res, xfree);
 	xprintf("%S", res);
 	cleanup_until(res);
@@ -1199,7 +1199,8 @@ doglob(Char **v, struct command *c)
 static void
 xecho(int sep, Char **v)
 {
-    Char *cp, **globbed = NULL;
+    Char **globbed = NULL;
+    const Char *cp;
     int     nonl = 0;
     int	    echo_style = ECHO_STYLE;
     struct varent *vp;
@@ -1235,7 +1236,7 @@ xecho(int sep, Char **v)
 	nonl++, v++;
 
     while ((cp = *v++) != 0) {
-	Char c;
+	eChar c;
 
 	if (setintr) {
 	    int old_pintr_disabled;
@@ -1243,63 +1244,12 @@ xecho(int sep, Char **v)
 	    pintr_push_enable(&old_pintr_disabled);
 	    cleanup_until(&old_pintr_disabled);
 	}
-	while ((c = *cp++) != 0) {
+	for (; (c = *cp) != 0; cp++) {
 	    if ((echo_style & SYSV_ECHO) != 0 && c == '\\') {
-		switch (c = *cp++) {
-		case 'a':
-		    c = '\a';
-		    break;
-		case 'b':
-		    c = '\b';
-		    break;
-		case 'c':
-		    nonl = 1;
-		    goto done;
-		case 'e':
-#if 0			/* Windows does not understand \e */
-		    c = '\e';
-#else
-		    c = CTL_ESC('\033');
-#endif
-		    break;
-		case 'f':
-		    c = '\f';
-		    break;
-		case 'n':
-		    c = '\n';
-		    break;
-		case 'r':
-		    c = '\r';
-		    break;
-		case 't':
-		    c = '\t';
-		    break;
-		case 'v':
-		    c = '\v';
-		    break;
-		case '\\':
+		if ((c = parseescape(&cp, FALSE)) == CHAR_ERR)
 		    c = '\\';
-		    break;
-		case '0':
-		    c = 0;
-		    if (*cp >= '0' && *cp < '8')
-			c = c * 8 + *cp++ - '0';
-		    if (*cp >= '0' && *cp < '8')
-			c = c * 8 + *cp++ - '0';
-		    if (*cp >= '0' && *cp < '8')
-			c = c * 8 + *cp++ - '0';
-		    break;
-		case '\0':
-		    c = '\\';
-		    cp--;
-		    break;
-		default:
-		    xputchar('\\' | QUOTE);
-		    break;
-		}
 	    }
 	    xputwchar(c | QUOTE);
-
 	}
 	if (*v)
 	    xputchar(sep | QUOTE);

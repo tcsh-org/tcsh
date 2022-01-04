@@ -202,7 +202,7 @@ getstring(char **dp, const Char **sp, Str *pd, int f)
 
     while (*s && (*s & CHAR) != (Char)f && (*s & CHAR) != ':') {
 	if ((*s & CHAR) == '\\' || (*s & CHAR) == '^') {
-	    if ((sc = parseescape(&s)) == CHAR_ERR)
+	    if ((sc = parseescape(&s, TRUE)) == CHAR_ERR)
 		return 0;
 	}
 	else
@@ -479,13 +479,15 @@ print_with_color(const Char *filename, size_t len, Char suffix)
 	if (suffix == '@' && color_as_referent) {
 	    char *f = short2str(filename);
 	    Char c = suffix;
-	    char buf[MAXPATHLEN];
+	    char buf[MAXPATHLEN + 1];
 
 	    while (c == '@') {
-		if (readlink(f, buf, MAXPATHLEN) == -1) {
+		ssize_t b = readlink(f, buf, MAXPATHLEN);
+		if (b == -1) {
 		    c = '&';
 		    break;
 		}
+		buf[b] = '\0';
 
 		c = filetype(STRNULL, str2short(buf));
 		f = buf;

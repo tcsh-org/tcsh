@@ -342,6 +342,38 @@ b\tr
 AT_CLEANUP
 
 
+AT_SETUP([$ echo_hex])
+
+AT_DATA([echo_hex.csh],
+[[set echo_style=sysv
+echo '\x'
+echo '\xg'
+echo '\x61'
+echo '\x61g'
+echo '\x{61}'
+echo '\x{61}g'
+echo '\x{61g'
+echo '\u'
+echo '\ug'
+echo '\u61'
+echo '\u61g'
+]])
+AT_CHECK([tcsh -f echo_hex.csh], ,
+[\x
+\xg
+a
+ag
+a
+ag
+\x{61g
+\u
+\ug
+a
+ag
+])
+
+AT_CLEANUP
+
 AT_SETUP([$ edit])
 
 AT_CHECK([if [ ! -t 0 ]; then exit 77; fi],, [Skipping $edit tests])

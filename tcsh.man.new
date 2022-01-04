@@ -64,9 +64,11 @@
 .\"   used here if you can. In particular, please don't use nroff commands
 .\"   which aren't already used herein.
 .\"
-.Dd April 26, 2021
+.\" UPDATE NEXT LINE FOR RELEASE
+.Dd January 3, 2022
 .Dt TCSH 1
-.Os Astron 6.22.04
+.\" UPDATE NEXT LINE FOR RELEASE
+.Os Astron 6.23.02
 .Sh NAME
 .Nm tcsh
 .Nd C shell with file name completion and command line editing
@@ -1445,6 +1447,14 @@ Backward quotes are special: they signal
 .Sx Command substitution
 (q.v.), which may result in more than one word.
 .Pp
+C-style escape sequences can be used in single quoted strings by
+preceding the leading quote with
+.Sq $ .  (+)
+See
+.Sx Escape sequences
+for
+a complete list of recognized escape sequences.
+.Pp
 Quoting complex strings, particularly strings which themselves contain quoting
 characters, can be confusing.
 Remember that quotes need not be used as they are
@@ -1465,6 +1475,69 @@ and
 easier, but it can cause syntax errors in
 .Xr csh 1
 scripts.
+.Ss Escape sequences (+)
+The following escape sequences are always recognized inside a string
+constructed using `$''', and optionally by the \fIecho\fR builtin command as
+controlled by the \fBecho_style\fR shell variable.
+.Bl -tag -width XXXXXXXX -compact -offset indent
+.It \ea
+Bell
+.It \eb
+Backspace
+.It \ec\fIc
+The control character denoted by
+.Va ^c
+in
+.Xr stty 1 .
+If
+.Va c
+is a backslash, it must be doubled.
+.It \ee
+Escape
+.It \ef
+Form feed
+.It \en
+Newline
+.It \er
+Carriage return
+.It \et
+Horizontal tab
+.It \ev
+Vertical tab
+.It \e\e
+Literal backslash
+.It \e\&'
+Literal single quote
+.It \e\&"
+Literal double quote
+.It \e\fInnn
+The character corresponding to the octal number
+.Va nnn
+.It \ex\fInn
+The character corresponding to the hexadecimal number
+.Va nn
+(1\-2 hexadecimal digits)
+.It \ex{\fInnnnnnnn\fB}
+The character corresponding to the hexadecimal number
+.Va nnnnnnnn
+(1\-8 hexadecimal digits)
+.It \eu\fInnnn
+The Unicode code point
+.Va nnnn
+(1\-4 hexadecimal digits)
+.It \eU\fInnnnnnnn
+The Unicode code point
+.Va nnnnnnnn
+(1\-8 hexadecimal digits).
+.El
+.Pp
+The implementations of
+.Ar \ex ,
+.Ar \eu ,
+and
+.Ar \eU
+in other shells may take a varying number of digits.  It is often safest
+to use leading zeros to provide the maximum expected number of digits.
 .Ss Substitutions
 We now describe the various transformations the shell performs on the input in
 the order in which they occur.
@@ -1925,7 +1998,7 @@ In
 .Nm ,
 more than one may be used, for example
 .Bd -literal -offset indent
-% mv wumpus.man /usr/man/man1/wumpus.1
+% mv wumpus.man /usr/share/man/man1/wumpus.1
 % man !$:t:r
 man wumpus
 .Ed
@@ -2479,7 +2552,7 @@ is followed by a character other than a letter or
 or appears elsewhere
 than at the beginning of a word, it is left undisturbed.
 A command like
-.Sq setenv MANPATH /usr/man:/usr/local/man:~/lib/man
+.Sq setenv MANPATH /usr/share/man:/usr/local/share/man:~/lib/man
 does not,
 therefore, do home directory substitution as one might hope.
 .Pp
@@ -4825,10 +4898,11 @@ The
 .Va echo_style
 shell variable may be set to emulate (or not) the flags and escape
 sequences of the BSD and/or System V versions of
-.Va echo
-; see
-.Va echo
-(1).
+.Xr echo 1 ;
+see
+.Sx Escape sequences
+and
+.Xr echo 1 .
 .TP 8
 .B echotc \fR[
 .Fl sv\fR]
@@ -5254,18 +5328,25 @@ to the current environment.
 There is no way
 to remove a shared library.
 (Domain/OS only)
-.TP 8
-.B jobs .Op Fl lZ
+.Pp
+.It Ar jobs Op Fl l
+.It Ar jobs Fl Z Op title (+)
 Lists the active jobs.
 With
-.Fl l, lists process
-IDs in addition to the normal information.
-On TCF systems, prints
-the site on which each job is executing.
+.Fl l ,
+lists process IDs in addition to the normal information.
+On TCF systems, prints the site on which each job is executing.
+.Pp
 The
 .Fl Z
-option sets the process title using
-.Xr setproctitle 3.
+option sets the process title to
+.Ar title
+using
+.Xr setproctitle 3
+where available.
+If no
+.Ar title
+is provided, the process title will be cleared.
 .Pp
 .PD 0
 .TP 8
@@ -8995,6 +9076,9 @@ and
 .Va fi
 codes from 0 to the
 numerical codes for your standard fore- and background colors.
+.Pp     
+For symbolic links the "ln" keyword can be set to "target", which makes
+the file color the same as the color of the link target.
 .RE
 .TP 8
 .B MACHTYPE \fR(+)
@@ -9533,7 +9617,8 @@ pipe(2), setrlimit(2), sigvec(2), stat(2), umask(2), vfork(2), wait(2),
 malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .Sh VERSION
-This manual documents tcsh 6.22.04 (Astron) 2021-04-26.
+.\" UPDATE NEXT LINE FOR RELEASE
+This manual documents tcsh 6.23.02 (Astron) 2022-01-03.
 .Sh AUTHORS
 .PD 0
 .TP 2

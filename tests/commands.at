@@ -380,7 +380,7 @@ TCSH_UNTESTED([fg])
 
 AT_SETUP([filetest])
 
-touch file1 file2
+touch file1 file2 'b{c'
 chmod 6777 file1
 chmod 000 file2
 
@@ -415,6 +415,10 @@ AT_CHECK([tcsh -f -c 'filetest -z file1 nonempty'], ,
 
 AT_CHECK([tcsh -f -c 'filetest -s file1 nonempty'], ,
 [0 1
+])
+
+AT_CHECK([tcsh -f -c 'filetest -f "b{c"'], ,
+[1
 ])
 
 mkdir dir

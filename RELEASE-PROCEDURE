@@ -5,13 +5,17 @@ See TOOLS.md for pre-requisites.
 1)  Update version number and date
     - patchlevel.h
     - Fixes (make a new entry at the top)
-    - tcsh.man (two separate lines, with the date in different formats)
-    - tcsh.man.new (same)
+    - tcsh.man (two separate lines, with the date in different formats;
+      look for an "UPDATE NEXT LINE FOR RELEASE" comment)
+    - tcsh.man.new (same but 3 separate lines)
     - configure.ac (version only)
-2)  Run autoreconf
-3)  Run make distclean; configure && make && make check
-4)  If checks succeed, commit the changed files and tag the release
-	git add patchlevel.h Fixes tcsh.man tcsh.man.new configure.ac configure
+2)  Create Announce-x.yy.zz (if necessary)
+3)  Run autoreconf
+4)  Run make distclean; ./configure && make && make check
+5)  If checks succeed, commit the changed files and tag the release
+	git add Announce-x.yy.zz
+	git add Fixes aclocal.m4 config.h.in configure configure.ac \
+		patchlevel.h tcsh.man tcsh.man.new
 	git commit
 	git push origin
 	git tag TCSHx_yy_zz
@@ -21,11 +25,12 @@ See TOOLS.md for pre-requisites.
 	yy == VERS
 	zz == PATCHLEVEL
     from patchlevel.h (the new values you picked)
-5)  Create the archive and sign it
-	git archive -o tcsh-x.yy.zz.tar.gz --prefix=tcsh-x.yy.zz/ TCSHx_yy_zz
+6)  Create the archive and sign it
+	git archive -o tcsh-x.yy.zz.tar.gz \
+		--prefix=tcsh-x.yy.zz/ TCSHx_yy_zz
 	gpg --armor --detach-sign tcsh-x.yy.zz.tar.gz
-6)  Make the archive and signature available on ftp
-7)  Add the new version to bugs.astron.com:
+7)  Make the archive and signature available on ftp
+8)  Add the new version to bugs.astron.com:
     - Click: Manage > Manage Projects > tcsh
     - Scroll down to "Versions"
     - Click on "Edit" next to the HEAD version

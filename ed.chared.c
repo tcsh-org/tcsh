@@ -44,8 +44,8 @@
   # echo h<press key bound to dabbrev-expande>
   # echo hello\ world<cursor>
 
-  The same problem occured if spaces were present in a string withing quotation
-  marks. Example:
+  The same problem occurred if spaces were present in a string withing
+  quotation marks. Example:
 
   # echo "hello world"
   hello world
@@ -126,7 +126,7 @@ static	void	 c_get_word		(Char **, Char **);
 #endif
 static	Char	*c_preword		(Char *, Char *, int, Char *);
 static	Char	*c_nexword		(Char *, Char *, int);
-static	Char	*c_endword		(Char *, Char *, int, Char *);
+static	Char	*c_endword		(Char *, Char *, Char *, int, Char *);
 static	Char	*c_eword		(Char *, Char *, int);
 static	void	 c_push_kill		(Char *, Char *);
 static	void	 c_save_inputbuf	(void);
@@ -266,7 +266,7 @@ c_preword(Char *p, Char *low, int n, Char *delim)
 
     while (new < p) {
       prev = new;
-      new = c_endword(prev-1, p, 1, delim); /* Skip to next non-word char */
+      new = c_endword(prev-1, low, p, 1, delim); /* Skip to next non-word char */
       new++;			/* Step away from end of word */
       while (new <= p) {	/* Skip trailing non-word chars */
 	if (!Strchr(delim, *new) || (new > prev && new[-1] == (Char)'\\'))
@@ -788,7 +788,7 @@ c_delfini(void)		/* Finish up delete action */
 }
 
 static Char *
-c_endword(Char *p, Char *high, int n, Char *delim)
+c_endword(Char *p, Char *low, Char *high, int n, Char *delim)
 {
     Char inquote = 0;
     p++;
@@ -801,13 +801,14 @@ c_endword(Char *p, Char *high, int n, Char *delim)
         }
 	while (p < high) {	/* Skip string */
 	  if ((*p == (Char)'\'' || *p == (Char)'"')) { /* Quotation marks? */
-	    if (inquote || p[-1] != (Char)'\\') { /* Should it be honored? */
+	    /* Should it be honored? */
+	    if (inquote || (p > low && p[-1] != (Char)'\\')) {
 	      if (inquote == 0) inquote = *p;
 	      else if (inquote == *p) inquote = 0;
 	    }
 	  }
 	  /* Break if unquoted non-word char */
-	  if (!inquote && Strchr(delim, *p) && p[-1] != (Char)'\\')
+	  if (!inquote && Strchr(delim, *p) && p > low && p[-1] != (Char)'\\')
 	    break;
 	  p++;
 	}
@@ -2205,7 +2206,7 @@ e_dabbrev_expand(Char c)
 	    continue;
 	} else {
 	    word++;
-	    len = c_endword(ncp-1, cp, 1, STRshwordsep) - ncp + 1;
+	    len = c_endword(ncp-1, InputBuf, cp, 1, STRshwordsep) - ncp + 1;
 	    cp = ncp;
 	}
 	if (len > patbuf.len && Strncmp(cp, patbuf.s, patbuf.len) == 0) {
@@ -3605,7 +3606,7 @@ v_endword(Char c)
 	return(CC_ERROR);
     /* else */
 
-    Cursor = c_endword(Cursor, LastChar, Argument, STRshwspace);
+    Cursor = c_endword(Cursor, InputBuf, LastChar, Argument, STRshwspace);
 
     if (ActionFlag & TCSHOP_DELETE)
     {

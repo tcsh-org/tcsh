@@ -1,3 +1,20 @@
+ 10. V6.23.02 - 20220103
+  9. Make the \U escape up to 8 hex digits.
+  8. V6.23.01 - 20211209
+  7. add \cc and \Uhhh, and document escape sequences
+  6. add $'string with escapes' ("dollar-single-quotes") (Kimmo Suominen)
+  5. don't glob the filetest builtin arguments twice
+  4. remove the duplicate echo escape parsing code and use parseescape
+  3. add \x{hh} \xhh \uhhh (H.Merijn Brand)
+  2. fix and document ln=target
+  1. Merge in patches from pkgsrc:
+     - Modernize the installation targets so that they use INSTALL_DATA,
+       INSTALL_PROGRAM, and MKDIR_P.
+     - Enable SYSMALLOC and SHORT_STRINGS on NetBSD.
+     - Enable NO_FIX_MALLOC and SHORT_STRINGS on OpenBSD.
+
+ 23. V6.23.00 - 20211111
+ 22. Guard against running off the beginning of the array (Simon Burge)
  21. Add jobs -Z to setproctitle(3) like zsh(1)
  20. Prevent infinite recursion with tcsh -fc 'set -r status;:' (Gabriel Ravier)
  19. Fix postcmd trashing history when invoking domod (Jan Macku)
@@ -748,7 +765,7 @@
  19. NT-specific executable detection moved to NT code (amol)
  18. New "complete module" (Dan Nicolaescu)
  17. Correctly display scaling string in limit error messages (Nathan Ahlstrom)
- 16. Don't display "unset watch" message when not appropriate (kim)
+ 16. Don't display "unset watch" message when not appropriate (Kimmo Suominen)
  15. V6.09.01 - 20000114
  14. Circumvent IRIX4D ESTALE bug by exiting.
  13. IRIS4D de-linting.
@@ -849,12 +866,13 @@
  93. V6.07.12 - 19980918
  92. add cray in configure script (Tom)
  91. nls fixes
- 90. Avoid buffer overflows in directory code (kim)
+ 90. Avoid buffer overflows in directory code (Kimmo Suominen)
  89. Add multibyte character display support (Yoshiyuki Sakakibara)
  88. Make tcsh use getcwd instead of getwd and supply a getcwd.
- 87. Fix remotehost again (kim)
+ 87. Fix remotehost again (Kimmo Suominen)
  86. V6.07.11 - 19980913
- 85. Leave remotehost ip addresses alone (don't try to resolve them) (Kim)
+ 85. Leave remotehost ip addresses alone (don't try to resolve them)
+     (Kimmo Suominen)
  84. Read vs. force_read fixes (Amol)
  83. Make colorls if color is set before the first LS_COLORS setenv
      (Taga Nayuta)
@@ -947,7 +965,7 @@
   7. $rprompt code (Luke Mewburn)
   6. Kanji patches (Huw Rogers)
   5. Cray T3E port (Jorn Amundsen)
-  4. Avoid html redirects in tcsh.man2html (from Kimmo)
+  4. Avoid html redirects in tcsh.man2html (Kimmo Suominen)
   3. HP/UX 10.0 fix for filesize resource limit; don't scale by 512 anymore.
   2. Workaround for TIOCSTAT for NetBSD from lukem@netbsd.org
   1. Return exit status from 0..255 not -128...127, as POSIX mandates.
@@ -958,7 +976,7 @@ V6.07.02, 10/27/96
      storage.
  56. 6.07.01 - 10/19/96
  55. Fix histdup=erase, where after some repetitions, we would get negative
-     history events (kim@gw.com)
+     history events (Kimmo Suominen)
  54. NLS fixes and typo in sh.err.c (Martin.Kraemer@deejai.mch.sni.de)
  53. Output history in raw format in the history file (mveksler@VNET.IBM.COM)
  52. Fix possible core dump when !:<tab> in autoexpand mode (rbrown@ERA.COM)
@@ -1236,7 +1254,7 @@ V6.05.00, 06/19/94
  55. don't remove trailing spaces in history searches.
  54. dirs -L and dirs -S spurious warning elimination.
  53. man page fixes from David.
- 52. Kimmo's patch [makefile, gcc warning, netdb.h include]
+ 52. Kimmo Suominen's patch [makefile, gcc warning, netdb.h include]
  51. 6.04.05 12/12/93
  50. rewrote srcunit() to use st_save and st_restore. The code was
      too messy to be useful before.
@@ -1251,7 +1269,7 @@ V6.05.00, 06/19/94
  42. Removed aliases, bind, linedit builtins [ifdef'ed out as OBSOLETE]
  41. change REMHOST to REMOTEHOST for compatibility with SGI.
  40. $owd was not working correctly.
- 39. Debugging printf elimination (from Kimmo)
+ 39. Debugging printf elimination (from Kimmo Suominen)
  38. Typos in the new hup code in sh.c (from Matt)
  37. Imakefile fix for sequent (from Jaap)
  36. 6.04.03, 10/30/93
@@ -1778,7 +1796,7 @@ V6.00.04, (never released)
 34. (beta-5 11/25/91)
 33. Simplify code in BindArrowKeys()
 32. Get rid of the PNULL's
-31. Support for shadow password in locking code. (From Kimmo)
+31. Support for shadow password in locking code. (From Kimmo Suominen)
 30. Normalize-path editor function.
 29. (beta-4 11/21/91)
 28. minix additions

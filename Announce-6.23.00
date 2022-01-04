@@ -1,0 +1,32 @@
+Hello,
+
+I am pleased to announce that tcsh-6.23 is now available; this is mainly
+a bug fix release (after 2 years) with a couple of new features:
+
+	1. Add "jobs -Z" to setproctitle(3)
+	2. Add ln=target in LS_COLORS
+	3. Add a :Q modifier that preserves empty arguments
+
+Please consult the Fixes file for a complete list of changes.
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most UNIX machines, as well as Windows.
+
+You can get tcsh from ftp://ftp.astron.com/pub/tcsh/tcsh-6.23.00.tar.gz
+The latest source is on github: https://github.com/tcsh-org/tcsh
+
+RMD160 (tcsh-6.23.00.tar.gz) = 956bf3a7cf52f5e4865749d29946cf6e8d512ae3
+
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you can
+get it from ftp.gnu.org or other GNU mirrors.
+
+I would like to thank:
+
+	* everyone who sent bug reports
+	* the beta team for all their help, bug fixes, and suggestions
+
+Kind regards,
++ Kimmo

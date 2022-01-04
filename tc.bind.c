@@ -32,6 +32,7 @@
 #include "sh.h"
 #include "ed.h"
 #include "ed.defns.h"
+#include "tw.h"
 
 static	void   printkey		(const KEYCMD *, CStr *);
 static	KEYCMD parsecmd		(Char *);
@@ -385,7 +386,7 @@ parsestring(const Char *str, CStr *buf)
     cleanup_push(&b, Strbuf_cleanup);
     for (p = str; *p != 0; p++) {
 	if ((*p & CHAR) == '\\' || (*p & CHAR) == '^') {
-	    if ((es = parseescape(&p)) == CHAR_ERR) {
+	    if ((es = parseescape(&p, TRUE)) == CHAR_ERR) {
 		cleanup_until(&b);
 		return 0;
 	    } else
