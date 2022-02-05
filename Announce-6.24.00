@@ -1,0 +1,33 @@
+Hello,
+
+I am pleased to announce that tcsh-6.24 is now available; this release
+provides one new feature:
+
+	1. $'' (dollar-single-quotes or "POSIX quotes")
+
+Text inside the quotes will be interpreted for escapes. Some new escape
+sequences are now recognized as well (\c, \x, \u, and \U).
+
+Please consult the Fixes file for a complete list of changes.
+
+Tcsh is an enhanced version of the Berkeley C-shell that offers command
+line editing and completion plus many other little things that preserve
+the length of your fingers.
+
+Tcsh runs on most UNIX machines, as well as Windows.
+
+You can get tcsh from ftp://ftp.astron.com/pub/tcsh/tcsh-6.24.00.tar.gz
+The latest source is on github: https://github.com/tcsh-org/tcsh
+
+RMD160 (tcsh-6.24.00.tar.gz) = 0416db03a8b83c91a472fbb51cb4a83db156273c
+
+This is a gzip (GNU zip) tar archive. If you don't have GNU zip you can
+get it from ftp.gnu.org or other GNU mirrors.
+
+I would like to thank:
+
+	* everyone who sent bug reports
+	* the beta team for all their help, bug fixes, and suggestions
+
+Kind regards,
++ Kimmo
