@@ -3,16 +3,6 @@
 #
 onintr -
 
-if ( -d /etc/profile.d ) then
-  set nonomatch
-  foreach _s ( /etc/profile.d/*.csh )
-    if ( -r $_s ) then
-      source $_s
-    endif
-  end
-  unset _s nonomatch
-endif
-
 if (! ${?prompt}) goto end
 
 # This is an interactive session
