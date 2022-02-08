@@ -503,7 +503,7 @@ dowhich(Char **v, struct command *c)
 	rv &= cmd_expand(*v, NULL);
 
     if (!rv)
-	setstatus(0);
+	setstatus(1);
 }
 
 static int
