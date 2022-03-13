@@ -98,7 +98,7 @@ expand_lex(const struct wordent *sp0, int from, int to)
     const struct wordent *sp;
     Char *s;
     Char prev_c;
-    int i;
+    int i, dolsq = 0;
 
     prev_c = '\0';
 
@@ -113,11 +113,29 @@ expand_lex(const struct wordent *sp0, int from, int to)
 		 * character {(PWP) and backslash} seem to be dealt with
 		 * elsewhere.
 		 */
-		if ((*s & QUOTE)
-		    && (((*s & TRIM) == HIST && HIST != '\0') ||
-			(((*s & TRIM) == '\'') && (prev_c != '\\')) ||
-			(((*s & TRIM) == '\"') && (prev_c != '\\')))) {
-		    Strbuf_append1(&buf, '\\');
+		if (*s & QUOTE) {
+		    if ((*s & TRIM) == HIST && HIST == '\0')
+			;
+		    else
+			switch (*s & TRIM) {
+			case '\'':
+			    if (prev_c == '\\') break;
+			    if (dolsq) {
+				dolsq = 0;
+				break;
+			    }
+			    if (prev_c == '$') {
+				dolsq++;
+				break;
+			    }
+			    Strbuf_append1(&buf, '\\');
+			    break;
+			case '\"':
+			    if (prev_c == '\\') break;
+			    if (dolsq) break;
+			    Strbuf_append1(&buf, '\\');
+			    break;
+			}
 		}
 #if INVALID_BYTE != 0
 		if ((*s & INVALID_BYTE) != INVALID_BYTE) /* *s < INVALID_BYTE */
@@ -485,7 +503,7 @@ dowhich(Char **v, struct command *c)
 	rv &= cmd_expand(*v, NULL);
 
     if (!rv)
-	setstatus(0);
+	setstatus(1);
 }
 
 static int

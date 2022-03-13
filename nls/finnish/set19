@@ -12,8 +12,8 @@ $set 19
 10 \n\tYhteensä käytössä: %d, yhteensä vapaana: %d\n
 11 \tVarattu muisti alueella 0x%lx .. 0x%lx.  Todellinen huippu 0x%lx\n
 12 Varattu muisti alueella 0x%lx .. 0x%lx (%ld).\n
-13 %s current memory allocation:\n
-14 Total space allocated from system: %zu\n
+13 %s tämänhetkinen muistivaraus:\n
+14 Järjestelmältä varattu kokonaistila: %zu\n
 15 Number of non-inuse chunks: %zu\n
 16 Number of mmapped regions: %zu\n
 17 Total space in mmapped regions: %zu\n

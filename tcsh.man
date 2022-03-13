@@ -78,7 +78,7 @@
 .\"   which aren't already used herein.
 .\" 
 .\" UPDATE NEXT LINE FOR RELEASE
-.TH TCSH 1 "11 Nov 2021" "Astron 6.23.00"
+.TH TCSH 1 "2 Feb 2022" "Astron 6.24.00"
 .SH NAME
 tcsh \- C shell with file name completion and command line editing
 .SH SYNOPSIS
@@ -904,6 +904,10 @@ below) can a double-quoted string yield parts of more than one word;
 single-quoted strings never do.  Backward quotes are special: they signal
 \fBCommand substitution\fR (q.v.), which may result in more than one word.
 .PP
+C-style escape sequences can be used in single quoted strings by
+preceding the leading quote with `$'.  (+) See \fBEscape sequences\fR for
+a complete list of recognized escape sequences.
+.PP
 Quoting complex strings, particularly strings which themselves contain quoting
 characters, can be confusing.  Remember that quotes need not be used as they are
 in human writing!  It may be easier to quote not an entire string, but only
@@ -913,6 +917,72 @@ to do so if appropriate.
 The \fBbackslash_quote\fR shell variable (q.v.) can be set to make backslashes
 always quote `\e', `'', and `"'.  (+) This may make complex quoting tasks
 easier, but it can cause syntax errors in \fIcsh\fR(1) scripts.
+.SS "Escape sequences (+)"
+The following escape sequences are always recognized inside a string
+constructed using `$''', and optionally by the \fIecho\fR builtin command as
+controlled by the \fBecho_style\fR shell variable.
+.RS +4
+.TP 14
+.PD 0
+.B \ea
+Bell
+.TP 14
+.B \eb
+Backspace
+.TP 14
+.B \ec\fIc
+The control character denoted by \fI^c\fR in \fIstty\fR(1).  If \fIc\fR
+is a backslash, it must be doubled.
+.TP 14
+.B \ee
+Escape
+.TP 14
+.B \ef
+Form feed
+.TP 14
+.B \en
+Newline
+.TP 14
+.B \er
+Carriage return
+.TP 14
+.B \et
+Horizontal tab
+.TP 14
+.B \ev
+Vertical tab
+.TP 14
+.B \e\e
+Literal backslash
+.TP 14
+.B \e'
+Literal single quote
+.TP 14
+.B \e"
+Literal double quote
+.TP 14
+.B \e\fInnn
+The character corresponding to the octal number \fInnn\fR
+.TP 14
+.B \ex\fInn
+The character corresponding to the hexadecimal number \fInn\fR
+(1\-2 hexadecimal digits)
+.TP 14
+.B \ex{\fInnnnnnnn\fB}
+The character corresponding to the hexadecimal number \fInnnnnnnn\fR
+(1\-8 hexadecimal digits)
+.TP 14
+.B \eu\fInnnn
+The Unicode code point \fInnnn\fR (1\-4 hexadecimal digits)
+.TP 14
+.B \eU\fInnnnnnnn
+The Unicode code point \fInnnnnnnn\fR (1\-8 hexadecimal digits).
+.PD
+.RE
+.PP
+The implementations of \fB\ex\fR, \fB\eu\fR, and \fB\eU\fR in other
+shells may take a varying number of digits.  It is often safest to use
+leading zeros to provide the maximum expected number of digits.
 .SS Substitutions
 We now describe the various transformations the shell performs on the input in
 the order in which they occur.  We note in passing the data structures involved
@@ -2754,7 +2824,8 @@ The last form clears the directory stack.
 Writes each \fIword\fR to the shell's standard
 output, separated by spaces and terminated with a newline.
 The \fBecho_style\fR shell variable may be set to emulate (or not) the flags and escape
-sequences of the BSD and/or System V versions of \fIecho\fR; see \fIecho\fR(1).
+sequences of the BSD and/or System V versions of \fIecho\fR; see \fBEscape sequences\fR
+and \fIecho\fR(1).
 .TP 8
 .B echotc \fR[\fB\-sv\fR] \fIarg\fR ... (+)
 Exercises the terminal capabilities (see \fItermcap\fR(5)) in \fIargs\fR.
@@ -2972,16 +3043,22 @@ the \fIif\fR must appear alone on its input line or after an
 .B inlib \fIshared-library\fR ... (+)
 Adds each \fIshared-library\fR to the current environment.  There is no way
 to remove a shared library.  (Domain/OS only)
+.PP
+.B jobs \fR[\fB\-l\fR]
+.PD 0
 .TP 8
-.B jobs \fR[\fB\-lZ\fR]
+.B jobs \-Z \fR[\fItitle\fR] (+)
 Lists the active jobs.  With \fB\-l\fR, lists process
 IDs in addition to the normal information.  On TCF systems, prints
 the site on which each job is executing.
-The \fB-Z\fR option sets the process title using setproctitle(3)
-where available.
+.PD
+.RS +8
 .PP
-.PD 0
-.TP 8
+The \fB-Z\fR option sets the process title to \fItitle\fR using
+setproctitle(3) where available.
+If no \fItitle\fR is provided, the process title will be cleared.
+.RE
+.PP
 .B kill \fR[\fB\-s \fIsignal\fR] \fB%\fIjob\fR|\fIpid\fR ...
 .PD 0
 .TP 8
@@ -5362,7 +5439,7 @@ malloc(3), setlocale(3), tty(4), a.out(5), termcap(5), environ(7),
 termio(7), Introduction to the C Shell
 .SH VERSION
 .\" UPDATE NEXT LINE FOR RELEASE
-This manual documents tcsh 6.23.00 (Astron) 2021-11-11.
+This manual documents tcsh 6.24.00 (Astron) 2022-02-02.
 .SH AUTHORS
 .PD 0
 .TP 2

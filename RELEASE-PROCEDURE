@@ -11,7 +11,7 @@ See TOOLS.md for pre-requisites.
     - configure.ac (version only)
 2)  Create Announce-x.yy.zz (if necessary)
 3)  Run autoreconf
-4)  Run make distclean; configure && make && make check
+4)  Run make distclean; ./configure && make && make check
 5)  If checks succeed, commit the changed files and tag the release
 	git add Announce-x.yy.zz
 	git add Fixes aclocal.m4 config.h.in configure configure.ac \
