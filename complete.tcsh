@@ -617,7 +617,7 @@ complete gmake		'c/{--directory=,--include-dir=}/d/' \
 			'n/-f/f/'
 complete mixer		p/1/'(vol bass treble synth pcm speaker mic cd mix \
 			      pcm2 rec igain ogain line1 line2 line3)'/ \
-			p@2@'`mixer $:-1 | awk \{\ print\ \$7\ \}`'@
+			p@2@'`mixer -o $:-1 | awk -F = /volume=/\{\ print\ \$2\ \}`'@
 
 complete mpg123		'c/--/(2to1 4to1 8bit aggressive au audiodevice auth \
 			      buffer cdr check doublespeed equalizer frames \
