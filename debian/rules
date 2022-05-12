@@ -1,0 +1,48 @@
+#!/usr/bin/make -f
+#
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+-include /usr/share/dpkg/buildflags.mk
+export CPPFLAGS CFLAGS LDFLAGS
+
+CFLAGS += -D_FILE_OFFSET_BITS=64
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- --bindir=/bin
+
+override_dh_auto_build:
+	$(MAKE)
+	$(MAKE) catalogs
+
+override_dh_auto_install:
+	dh_auto_install
+	$(MAKE) install.man DESTDIR=$(CURDIR)/debian/tcsh/
+	install -d -m 0755 \
+	    debian/tcsh/etc \
+	    debian/tcsh/etc/csh \
+	    debian/tcsh/etc/csh/login.d \
+	    debian/tcsh/etc/csh/cshrc.d \
+	    debian/tcsh/usr/share/doc/tcsh
+	install    -m 0644 \
+	    debian/csh.cshrc \
+	    debian/csh.login \
+	    complete.tcsh \
+	    debian/tcsh/etc
+	install -D -m 0644 \
+	    csh-mode.el \
+	    debian/tcsh/usr/share/emacs/site-lisp/csh-mode.el
+	dh_installchangelogs -a Fixes
+	dh_installexamples -a complete.tcsh
+	dh_installemacsen
+
+ifeq ($(filter nocheck,$(DEB_BUILD_OPTIONS)),)
+override_dh_auto_test:
+	make check || (cat testsuite.log ; false)
+endif
+
+override_dh_auto_clean:
+	[ ! -f Makefile ] || make veryclean

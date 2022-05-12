@@ -1,0 +1,19 @@
+Source: tcsh
+Section: shells
+Priority: optional
+Maintainer: Kimmo Suominen <kimmo@suominen.com>
+Build-Depends: autotools-dev, libncurses5-dev, debhelper, autoconf
+Vcs-Browser: https://github.com/tcsh-org/tcsh
+Vcs-Git: https://github.com/tcsh-org/tcsh.git
+Standards-Version: 4.4.0
+Homepage: https://www.tcsh.org/
+
+Package: tcsh
+Architecture: any
+Multi-Arch: foreign
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Provides: c-shell
+Description: TENEX C Shell, an enhanced version of Berkeley csh
+ The TENEX C Shell is an enhanced version of the Berkeley Unix C shell.
+ It includes all features of 4.4BSD C shell, plus a command-line editor,
+ programmable word completion, spelling correction and more.

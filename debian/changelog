@@ -1,0 +1,9 @@
+tcsh (6.24.00-1) UNRELEASED; urgency=medium
+
+  * Initial build:
+    - Avoid non-default settings in system-wide init files.
+    - Use https://salsa.debian.org/debian/tcsh/debian resources
+      to maintain compatibility with older versions packaged by
+      Debian.
+
+ -- Kimmo Suominen <kimmo@suominen.com>  Thu, 12 May 2022 21:02:54 +0300
