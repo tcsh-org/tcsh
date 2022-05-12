@@ -1,4 +1,4 @@
-tcsh (6.24.00-1) UNRELEASED; urgency=medium
+tcsh (6.24.01-1) UNRELEASED; urgency=medium
 
   * Initial build:
     - Avoid non-default settings in system-wide init files.
