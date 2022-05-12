@@ -114,8 +114,8 @@ expand_lex(const struct wordent *sp0, int from, int to)
 		 * elsewhere.
 		 */
 		if (*s & QUOTE) {
-		    if ((*s & TRIM) == HIST && HIST == '\0')
-			;
+		    if ((*s & TRIM) == HIST && HIST != '\0')
+			Strbuf_append1(&buf, '\\');
 		    else
 			switch (*s & TRIM) {
 			case '\'':
