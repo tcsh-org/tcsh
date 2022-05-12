@@ -250,7 +250,7 @@ setenv: Too many arguments.
 
    In addition to message catalogs, there are more problems:
 ipi:~/test/tcsh/bin> ls
-tcsh  åäö
+tcsh  Ã¥Ã¤Ã¶
 ipi:~/test/tcsh/bin> set dspmbyte utf8
 ipi:~/test/tcsh/bin> ls ???
 ls: No match.
