@@ -1,3 +1,5 @@
+ 14. Fix quoting of ! characters in history recall (Kimmo Suominen)
+ 13. Fix return status of which (Jamie Landeg-Jones)
  12. V6.24.00 - 20220202
  11. Update config.guess and config.sub so arm64 is recognized
  10. V6.23.02 - 20220103
