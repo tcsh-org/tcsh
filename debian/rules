@@ -39,6 +39,9 @@ override_dh_auto_install:
 	dh_installexamples -a complete.tcsh
 	dh_installemacsen
 
+override_dh_builddeb:
+	dh_builddeb -- -Zxz
+
 ifeq ($(filter nocheck,$(DEB_BUILD_OPTIONS)),)
 override_dh_auto_test:
 	make check || (cat testsuite.log ; false)
