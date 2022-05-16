@@ -1,0 +1,116 @@
+#!/bin/sh
+#
+# Run tcsh builds using Docker images
+#
+# 20220513  Kimmo Suominen
+#
+
+set -eu
+
+Dockerfile()
+{
+    local os suite
+
+    os="${1}"
+    suite="${2}"
+
+    cat <<-EOF
+FROM ${os}:${suite}
+ARG  DEBIAN_FRONTEND=noninteractive
+ARG  APT_LISTCHANGES_FRONTEND=none
+RUN  apt-get -qq update			\
+  && apt-get -qq install		\
+      build-essential			\
+      debhelper				\
+      devscripts			\
+      jetring				\
+      libncurses5-dev			\
+  && apt-get -qq clean
+RUN  useradd -U -m builder
+COPY docker-entrypoint /
+USER builder:builder
+
+ENTRYPOINT ["/docker-entrypoint"]
+CMD ["dpkg-buildpackage", "--no-sign", "-nc"]
+EOF
+}
+
+die()
+{
+    echo "${PROG}: ${@}" 1>&2
+    exit 1
+}
+
+list_suites()
+{
+    local os
+
+    os="${1}"
+
+    case "${os}" in
+    debian)
+	echo bullseye
+	echo buster
+	echo stretch
+	;;
+    ubuntu)
+	echo jammy
+	echo impish
+	echo focal
+	echo bionic
+	;;
+    esac
+}
+
+PROG="${0##*/}"
+
+[ -d deb ] || die 'Are you in the right place? No deb directory found.'
+[ -d src ] || die 'Are you in the right place? No src directory found.'
+
+here="$(realpath .)"
+
+case "${1:-all}" in
+all)
+    ;;
+debian|ubuntu)
+    os_list="${1}"
+    ;;
+*)
+    for os in debian ubuntu
+    do
+	if list_suites "${os}" | grep -q "^${1}$"
+	then
+	    os_list="${os}"
+	    suite_list="${1}"
+	    break
+	fi
+    done
+    case "${os_list:-}" in
+    '')
+	die "Unknown target: ${1}"
+	;;
+    esac
+    ;;
+esac
+
+for os in ${os_list:-debian ubuntu}
+do
+    for suite in ${suite_list:-$(list_suites "${os}")}
+    do
+	image="tcsh-build/${os}-${suite}"
+	dir="$(mktemp -d "${TMPDIR:-/tmp}/${PROG}-img-XXXXXXXXXX")"
+	Dockerfile "${os}" "${suite}" > "${dir}/Dockerfile"
+	cp -p docker-entrypoint "${dir}"
+	docker build -q -t "${image}" "${dir}"
+	rm -rf "${dir}"
+
+	pool="deb/${os}/pool/${suite}/main"
+	[ -d "${pool}" ] && continue
+	mkdir -p "${pool}"
+
+	docker run --rm \
+	    -v "${here}/src":/mnt/src \
+	    -v "${here}/${pool}":/mnt/deb \
+	    "${image}"
+    done
+done

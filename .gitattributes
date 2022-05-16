@@ -8,5 +8,6 @@ MAKEDIFFS export-ignore
 MAKESHAR export-ignore
 Makefile.ADMIN export-ignore
 RELEASE-PROCEDURE export-ignore
+build export-ignore
 push-tcsh-git-mirror export-ignore
 tcsh.man.new export-ignore

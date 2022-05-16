@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# Docker entrypoint for running a build
+#
+# 20220513  Kimmo Suominen
+#
+
+set -e
+
+run_build()
+{
+    pkg="$(tar -tvzf "${file}" | awk 'NR == 1 {print $NF}')"
+    D="$(mktemp -d "${HOME}/build-XXXXXXXXXX")"
+    tar -C "${D}" -xzf "${file}"
+    cd "${D}/${pkg}"
+    "${@}"
+    for deb in "${D}"/*.deb "${D}"/*.ddeb
+    do
+	if [ -f "${deb}" ]
+	then
+	    mv "${deb}" /mnt/deb/
+	fi
+    done
+}
+
+case "${1}" in
+dpkg-buildpackage)
+    for file in /mnt/src/*.orig.tar.gz
+    do
+	run_build "${@}"
+    done
+    exit 0
+    ;;
+esac
+
+exec "${@}"
