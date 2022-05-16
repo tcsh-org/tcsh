@@ -1,14 +1,9 @@
 #!/bin/sh
-# $KimmoSuominen: .cfg/home/dot.cron/push-tcsh-git-mirror,v 1.1 2017/08/31 12:20:18 kim Exp $
 #
 # Push tcsh to GitHub.
 #
 # 20170201  Kimmo Suominen
 #
-
-IDENTITY="${HOME}/.ssh/tcsh-deploy"
-REPO=/p/tcsh/tcsh.git
-REMOTE=github
 
 PATH=/usr/local/bin:/bin:/usr/bin:/usr/pkg/bin
 export PATH
@@ -20,6 +15,21 @@ die()
     echo "${PROG}: ${@}" 1>&2
     exit 1
 }
+
+case "${1:-}" in
+'')
+    die 'Must provide a repository to mirror'
+    ;;
+tcsh|tcsh-archive-keyring)
+    ;;
+*)
+    die "Unknown repository '${1}'"
+    ;;
+esac
+
+IDENTITY="${HOME}/.ssh/${1}-deploy"
+REPO="/p/tcsh/${1}.git"
+REMOTE=github
 
 case "${SSH_AUTH_SOCK}" in
 '')
