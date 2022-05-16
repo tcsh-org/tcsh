@@ -14,18 +14,13 @@ Dockerfile()
     os="${1}"
     suite="${2}"
 
-    cat <<-EOF
+    expand <<EOF
 FROM ${os}:${suite}
 ARG  DEBIAN_FRONTEND=noninteractive
 ARG  APT_LISTCHANGES_FRONTEND=none
-RUN  apt-get -qq update			\
-  && apt-get -qq install		\
-      build-essential			\
-      debhelper				\
-      devscripts			\
-      jetring				\
-      libncurses5-dev			\
-  && apt-get -qq clean
+RUN  apt-get -qq update\
+ && apt-get -qq install $(list_dependencies)\
+ && apt-get -qq clean
 RUN  useradd -U -m builder
 COPY docker-entrypoint /
 USER builder:builder
@@ -39,6 +34,17 @@ die()
 {
     echo "${PROG}: ${@}" 1>&2
     exit 1
+}
+
+list_dependencies()
+{
+    cat <<-EOF | paste -sd ' '
+	build-essential
+	debhelper
+	devscripts
+	jetring
+	libncurses5-dev
+	EOF
 }
 
 list_suites()
@@ -62,7 +68,55 @@ list_suites()
     esac
 }
 
+maybe()
+{
+    if ${noop}
+    then
+	echo - "${@}"
+    else
+	echo + "${@}"
+	"${@}"
+    fi
+}
+
+usage()
+{
+    cat <<EOF
+Usage:	${PROG} [-hn] [target]
+
+Builds deb/* packages from the src/*.orig.tar.gz files for select
+Debian and Ubuntu releases.
+
+Options:
+
+-h	Show this usage
+-n	Do not build anything (no-op)
+EOF
+}
+
 PROG="${0##*/}"
+PDIR="$(dirname $(realpath "${0}"))"
+DEPT="${PDIR}/docker-entrypoint"
+
+noop=false
+
+while getopts hn opt
+do
+    case "${opt}" in
+    h)	usage; exit 0;;
+    n)	noop=true;;
+    *)	usage 1>&2; exit 1;;
+    esac
+done
+shift $((${OPTIND} - 1))
+
+if [ ${#} -gt 1 ]
+then
+    usage 1>&2
+    exit 2
+fi
+
+[ -f "${DEPT}" ] || die "${DEPT} not found"
 
 [ -d deb ] || die 'Are you in the right place? No deb directory found.'
 [ -d src ] || die 'Are you in the right place? No src directory found.'
@@ -93,22 +147,31 @@ debian|ubuntu)
     ;;
 esac
 
+first=true
 for os in ${os_list:-debian ubuntu}
 do
     for suite in ${suite_list:-$(list_suites "${os}")}
     do
 	image="tcsh-build/${os}-${suite}"
+	${first} && first=false || echo
+	echo "* ${image}"
 	dir="$(mktemp -d "${TMPDIR:-/tmp}/${PROG}-img-XXXXXXXXXX")"
-	Dockerfile "${os}" "${suite}" > "${dir}/Dockerfile"
-	cp -p docker-entrypoint "${dir}"
-	docker build -q -t "${image}" "${dir}"
+	maybe install "${DEPT}" "${dir}/docker-entypoint"
+	Dockerfile "${os}" "${suite}" \
+	| if ${noop}
+	then
+	    sed 's/^/> /'
+	else
+	    cat > "${dir}/Dockerfile"
+	fi
+	maybe docker build -q -t "${image}" "${dir}"
 	rm -rf "${dir}"
 
 	pool="deb/${os}/pool/${suite}/main"
 	[ -d "${pool}" ] && continue
-	mkdir -p "${pool}"
+	maybe mkdir -p "${pool}"
 
-	docker run --rm \
+	maybe docker run --rm \
 	    -v "${here}/src":/mnt/src \
 	    -v "${here}/${pool}":/mnt/deb \
 	    "${image}"
