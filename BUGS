@@ -203,11 +203,6 @@ Subject: NICE and NOHUP have no effect as last component of sub-shells.
     % echo `nohup sleep 999;date`
     ... Works.
 
->From idallen
-Subject: you can't nest back-quotes
-    % echo ` echo \`pwd\` `
-    Unmatched `.
-
 From: idallen (Ian! D. Allen)
 Subject: GLOB not applied to names in setenv or unsetenv
     % setenv `echo abc` def
