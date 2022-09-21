@@ -38,7 +38,7 @@ die()
 
 list_dependencies()
 {
-    cat <<-EOF | paste -sd ' '
+    paste -sd ' ' <<-EOF
 	build-essential
 	debhelper
 	devscripts
