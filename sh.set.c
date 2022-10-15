@@ -1126,7 +1126,7 @@ x:
 		cleanup_until(&old_pintr_disabled);
 	    }
 	    len = blklen(p->vec);
-	    xprintf("%S\t", p->v_name);
+	    xprintf("%" TCSH_S "\t", p->v_name);
 	    if (len != 1)
 		xputchar('(');
 	    blkpr(p->vec);

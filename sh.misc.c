@@ -99,7 +99,7 @@ blkpr(Char *const *av)
 {
 
     for (; *av; av++) {
-	xprintf("%S", *av);
+	xprintf("%" TCSH_S, *av);
 	if (av[1])
 	    xprintf(" ");
     }

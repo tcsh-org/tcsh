@@ -93,13 +93,14 @@ typedef unsigned long intptr_t;
 #define TMP_TEMPLATE ".XXXXXX"
 
 #ifdef SHORT_STRINGS
+# define TCSH_S "S"
 # ifdef WIDE_STRINGS
 #include <wchar.h>
 #  ifdef UTF16_STRINGS
 typedef wint_t Char;
 #  else
 typedef wchar_t Char;
-#endif
+#  endif
 typedef unsigned long uChar;
 typedef wint_t eChar; /* Can contain any Char value or CHAR_ERR */
 #define CHAR_ERR WEOF /* Pretty please, use bit 31... */
@@ -115,6 +116,7 @@ typedef int eChar;
 # endif
 # define SAVE(a) (Strsave(str2short(a)))
 #else
+#define TCSH_S "s"
 typedef char Char;
 typedef unsigned char uChar;
 typedef int eChar;
@@ -1124,7 +1126,7 @@ EXTERN Char    PRCHROOT;	/* Prompt symbol for root */
 #define Strend(a)		strend(a)
 #define Strstr(a, b)		strstr(a, b)
 
-#define str2short(a) 		(a)
+#define str2short(a) 		((void *)(intptr_t)(a))
 #define blk2short(a) 		saveblk(a)
 #define short2blk(a) 		saveblk(a)
 #define short2str(a) 		caching_strip(a)

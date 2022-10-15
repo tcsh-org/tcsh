@@ -1133,7 +1133,7 @@ pprint(struct process *pp, int flag)
 	}
 prcomd:
 	if (flag & NAME) {
-	    xprintf("%S", pp->p_command);
+	    xprintf("%" TCSH_S, pp->p_command);
 	    if (pp->p_flags & PPOU)
 		xprintf(" |");
 	    if (pp->p_flags & PDIAG)
@@ -1540,9 +1540,11 @@ pkill(Char **v, int signum)
 	    case SIGTTOU:
 		if ((jobflags & PRUNNING) == 0) {
 # ifdef SUSPENDED
-		    xprintf(CGETS(17, 12, "%S: Already suspended\n"), cp);
+		    xprintf(CGETS(17, 12, "%" TCSH_S ": Already suspended\n"),
+			cp);
 # else /* !SUSPENDED */
-		    xprintf(CGETS(17, 13, "%S: Already stopped\n"), cp);
+		    xprintf(CGETS(17, 13, "%" TCSH_S ": Already stopped\n"),
+			cp);
 # endif /* !SUSPENDED */
 		    err1++;
 		    goto cont;
@@ -1564,7 +1566,7 @@ pkill(Char **v, int signum)
 	    }
 #endif /* BSDJOBS */
 	    if (killpg(pp->p_jobid, signum) < 0) {
-		xprintf("%S: %s\n", cp, strerror(errno));
+		xprintf("%" TCSH_S ": %s\n", cp, strerror(errno));
 		err1++;
 	    }
 #ifdef BSDJOBS

@@ -553,6 +553,7 @@ One_Char_mbtowc(__Char *pwc, const Char *s, size_t n)
 	;
     return one_mbtowc(pwc, buf, n);
 #else
+    (void)n;
     *pwc = *s & CHAR;
     return 1;
 #endif

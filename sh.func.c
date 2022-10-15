@@ -229,7 +229,7 @@ dofiletest(Char **v, struct command *c)
     while (*(fileptr = v++) != NULL) {
 	res = filetest(ftest, &fileptr, TEXP_NOGLOB);
 	cleanup_push(res, xfree);
-	xprintf("%S", res);
+	xprintf("%" TCSH_S, res);
 	cleanup_until(res);
 	if (*v)
 	    xprintf(" ");
@@ -1306,7 +1306,7 @@ doprintenv(Char **v, struct command *c)
 		pintr_push_enable(&old_pintr_disabled);
 		cleanup_until(&old_pintr_disabled);
 	    }
-	    xprintf("%S\n", *ep);
+	    xprintf("%" TCSH_S "\n", *ep);
 	}
 	cleanup_until(&xlate_cr);
     }
@@ -1316,7 +1316,7 @@ doprintenv(Char **v, struct command *c)
 	old_output_raw = output_raw;
 	output_raw = 1;
 	cleanup_push(&old_output_raw, output_raw_restore);
-	xprintf("%S\n", e);
+	xprintf("%" TCSH_S "\n", e);
 	cleanup_until(&old_output_raw);
     }
     else

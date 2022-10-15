@@ -1,3 +1,4 @@
+  4. Make OpenBSD use SHORT_STRINGS and fix non-SHORT_STRINGS compilation.
   3. V6.24.01 - 20220512
   2. Fix quoting of ! characters in history recall (Kimmo Suominen)
   1. Fix return status of which (Jamie Landeg-Jones)

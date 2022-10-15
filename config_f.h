@@ -54,8 +54,6 @@
 # else
 #  undef SHORT_STRINGS
 # endif
-#elif defined(__OpenBSD__)
-# undef SHORT_STRINGS
 #else
 # define SHORT_STRINGS
 #endif

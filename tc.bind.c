@@ -140,7 +140,7 @@ dobindkey(Char **v, struct command *c)
     }
     cleanup_push(in.buf, xfree);
 
-#ifndef WINNT_NATIVE
+#if !defined(WINNT_NATIVE) && defined(SHORT_STRINGS)
     if (in.buf[0] > 0xFF) {
 	bad_spec(in.buf);
 	cleanup_until(in.buf);

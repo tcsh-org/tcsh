@@ -354,7 +354,7 @@ dolist(Char **v, struct command *c)
 		    print_by_column(STRNULL, &v[i], k - i, FALSE);
 		}
 		haderr = 1;
-		xprintf("%S: %s.\n", tmp, strerror(err));
+		xprintf("%" TCSH_S ": %s.\n", tmp, strerror(err));
 		haderr = 0;
 		i = k + 1;
 		ret = 1;
@@ -369,7 +369,7 @@ dolist(Char **v, struct command *c)
 		}
 		if (k != 0 && v[1] != NULL)
 		    xputchar('\n');
-		xprintf("%S:\n", tmp);
+		xprintf("%" TCSH_S ":\n", tmp);
 		buf.len = 0;
 		for (cp = tmp; *cp; cp++)
 		    Strbuf_append1(&buf, (*cp | QUOTE));
@@ -471,7 +471,7 @@ cmd_expand(Char *cmd, Char **str)
 
     if ((vp = adrof1(cmd, &aliases)) != NULL && vp->vec != NULL) {
 	if (str == NULL) {
-	    xprintf(CGETS(22, 1, "%S: \t aliased to "), cmd);
+	    xprintf(CGETS(22, 1, "%" TCSH_S ": \t aliased to "), cmd);
 	    blkpr(vp->vec);
 	    xputchar('\n');
 	}
@@ -1182,7 +1182,7 @@ rmstar(struct wordent *cp)
 	    cmd++;
 #ifdef RMDEBUG
 	if (*tag)
-	    xprintf(CGETS(22, 7, "parsing command line [%S]\n"), cmd);
+	    xprintf(CGETS(22, 7, "parsing command line [%" TCSH_S "]\n"), cmd);
 #endif /* RMDEBUG */
 	if (!StrQcmp(cmd, STRrm)) {
 	    args = we->next;
@@ -1243,7 +1243,7 @@ rmstar(struct wordent *cp)
     if (*tag) {
 	xprintf(CGETS(22, 10, "command line now is:\n"));
 	for (we = cp->next; we != cp; we = we->next)
-	    xprintf("[%S] ", we->word);
+	    xprintf("[%" TCSH_S "] ", we->word);
     }
 #endif /* RMDEBUG */
     pintr_disabled = opintr_disabled;
@@ -1318,7 +1318,7 @@ continue_jobs(struct wordent *cp)
     if (*tag) {
 	xprintf(CGETS(22, 13, "command line now is:\n"));
 	for (we = cp->next; we != cp; we = we->next)
-	    xprintf("%S ", we->word);
+	    xprintf("%" TCSH_S " ", we->word);
     }
 #endif /* CNDEBUG */
     return;

@@ -226,7 +226,7 @@ prlex(struct wordent *sp0)
     struct wordent *sp = sp0->next;
 
     for (;;) {
-	xprintf("%S", sp->word);
+	xprintf("%" TCSH_S, sp->word);
 	sp = sp->next;
 	if (sp == sp0)
 	    break;

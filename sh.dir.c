@@ -283,8 +283,8 @@ printdirs(int dflag)
 	    cur = len;
 	}
 	if (user)
-	    xprintf("~%S", user);
-	xprintf("%-S%c", s, (dflag & DIR_VERT) ? '\n' : ' ');
+	    xprintf("~%" TCSH_S, user);
+	xprintf("%-" TCSH_S "%c", s, (dflag & DIR_VERT) ? '\n' : ' ');
     } while ((dp = dp->di_prev) != dcwd);
     if (!(dflag & DIR_VERT))
 	xputchar('\n');
@@ -295,9 +295,9 @@ dtildepr(Char *dir)
 {
     Char* user;
     if ((user = getusername(&dir)) != NULL)
-	xprintf("~%-S%S", user, dir);
+	xprintf("~%-" TCSH_S "%" TCSH_S, user, dir);
     else
-	xprintf("%S", dir);
+	xprintf("%" TCSH_S, dir);
 }
 
 void
@@ -1405,10 +1405,10 @@ recdirs(Char *fname, int def)
 
 	if (cdflag == 0) {
 	    cdflag = 1;
-	    xprintf("cd %S\n", quote_meta(&qname, dp->di_name));
+	    xprintf("cd %" TCSH_S "\n", quote_meta(&qname, dp->di_name));
 	}
 	else
-	    xprintf("pushd %S\n", quote_meta(&qname, dp->di_name));
+	    xprintf("pushd %" TCSH_S "\n", quote_meta(&qname, dp->di_name));
 
 	if (num-- == 0)
 	    break;

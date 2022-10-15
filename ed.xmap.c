@@ -543,7 +543,7 @@ printOne(const Char *key, const XmapVal *val, int ntype)
     struct KeyFuncs *fp;
     static const char *fmt = "%s\n";
 
-    xprintf("%-15S-> ", key);
+    xprintf("%-15" TCSH_S "-> ", key);
     if (val != NULL)
 	switch (ntype) {
 	case XK_STR:

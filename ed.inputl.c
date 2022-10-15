@@ -668,9 +668,9 @@ int
 GetCmdChar(Char ch)
 {
 #ifndef WINNT_NATIVE // We use more than 256 for various extended keys
-    wint_t c = ch & CHAR;
+    eChar c = ch & CHAR;
 #else
-    wint_t c = ch;
+    eChar c = ch;
 #endif
     return c < NT_NUM_KEYS ? CurrentKeyMap[c] : F_INSERT;
 }

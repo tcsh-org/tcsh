@@ -239,20 +239,33 @@ addWordToHash(struct hashValue *h, const Char *word)
 #endif
 #else
     assert(sizeof(Char) == 1);
+#define GETK    if ((k = *word++) == 0) break
     while (1) {
 	unsigned k;
-	if ((k = *word++) == 0) break; a += k;
-	if ((k = *word++) == 0) break; a += k << 8;
-	if ((k = *word++) == 0) break; a += k << 16;
-	if ((k = *word++) == 0) break; a += k << 24;
-	if ((k = *word++) == 0) break; b += k;
-	if ((k = *word++) == 0) break; b += k << 8;
-	if ((k = *word++) == 0) break; b += k << 16;
-	if ((k = *word++) == 0) break; b += k << 24;
-	if ((k = *word++) == 0) break; c += k;
-	if ((k = *word++) == 0) break; c += k << 8;
-	if ((k = *word++) == 0) break; c += k << 16;
-	if ((k = *word++) == 0) break; c += k << 24;
+	GETK;
+	a += k;
+	GETK;
+	a += k << 8;
+	GETK;
+	a += k << 16;
+	GETK;
+	a += k << 24;
+	GETK;
+	b += k;
+	GETK;
+	b += k << 8;
+	GETK;
+	b += k << 16;
+	GETK;
+	b += k << 24;
+	GETK;
+	c += k;
+	GETK;
+	c += k << 8;
+	GETK;
+	c += k << 16;
+	GETK;
+	c += k << 24;
 	mix(a, b, c);
     }
 #endif
@@ -1072,7 +1085,7 @@ phist(struct Hist *hp, int hflg)
 	    xprintf("#+%010lu\n", (unsigned long)hp->Htime);
 
 	if (HistLit && hp->histline)
-	    xprintf("%S\n", hp->histline);
+	    xprintf("%" TCSH_S "\n", hp->histline);
 	else
 	    prlex(&hp->Hlex);
         cleanup_until(&old_output_raw);
@@ -1207,7 +1220,7 @@ fmthist(int fmt, ptr_t ptr)
 	return xasprintf("%6d", hp->Hnum);
     case 'R':
 	if (HistLit && hp->histline)
-	    return xasprintf("%S", hp->histline);
+	    return xasprintf("%" TCSH_S, hp->histline);
 	else {
 	    Char *istr, *ip;
 	    char *p;
@@ -1325,7 +1338,7 @@ rechist(Char *xfname, int ref)
 	}
     }
     rs = randsuf();
-    xsnprintf(path, sizeof(path), "%S.%S", fname, rs);
+    xsnprintf(path, sizeof(path), "%" TCSH_S ".%" TCSH_S, fname, rs);
     xfree(rs);
 
     fp = xcreat(path, 0600);

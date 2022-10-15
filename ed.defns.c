@@ -1860,7 +1860,7 @@ ed_InitMetaBindings(void)
 	    AddXkey(&cstr, XmapCmd((int) map[CTL_ESC(i)]), XK_CMD);
 	}
     }
-    map[buf[0]] = F_XKEY;
+    map[(unsigned char)buf[0]] = F_XKEY;
 }
 
 void

@@ -496,7 +496,7 @@ print_with_color(const Char *filename, size_t len, Char suffix)
 	    print_color(filename, len, c);
 	} else
 	    print_color(filename, len, suffix);
-	xprintf("%S", filename);
+	xprintf("%" TCSH_S, filename);
 	if (0 < variables[VEnd].color.len)
 	    put_color(&variables[VEnd].color);
 	else {
@@ -505,7 +505,7 @@ print_with_color(const Char *filename, size_t len, Char suffix)
 	    put_color(&variables[VRight].color);
 	}
     } else
-	xprintf("%S", filename);
+	xprintf("%" TCSH_S, filename);
     xputwchar(suffix);
 }
 

@@ -886,11 +886,11 @@ main(int argc, char **argv)
     fix_version();		/* publish the shell version */
 
     if (argc > 1 && strcmp(argv[1], "--version") == 0) {
-	xprintf("%S\n", varval(STRversion));
+	xprintf("%" TCSH_S "\n", varval(STRversion));
 	xexit(0);
     }
     if (argc > 1 && strcmp(argv[1], "--help") == 0) {
-	xprintf("%S\n\n", varval(STRversion));
+	xprintf("%" TCSH_S "\n\n", varval(STRversion));
 	xprintf("%s", CGETS(11, 8, HELP_STRING));
 	xexit(0);
     }

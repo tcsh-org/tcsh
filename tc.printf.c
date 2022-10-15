@@ -305,7 +305,9 @@ doprnt(void (*addchar) (int), const char *sfmt, va_list ap)
 	    case 's':
 	    case 'q':
 		bp = va_arg(ap, char *);
+#ifdef SHORT_STRINGS
 lcase_s:
+#endif
 		if (!bp)
 		    bp = snil;
 		f_width = f_width - strlen(bp);

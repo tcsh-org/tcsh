@@ -234,13 +234,13 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	const Char *p;
 
 	xprintf(CGETS(30, 1, "starting_a_command %d\n"), looking);
-	xprintf("\ncmd_start:%S:\n", qline.s + cmd_start);
-	xprintf("qline:%S:\n", qline.s);
+	xprintf("\ncmd_start:%" TCSH_S ":\n", qline.s + cmd_start);
+	xprintf("qline:%" TCSH_S ":\n", qline.s);
 	xprintf("qline:");
 	for (p = qline.s; *p; p++)
 	    xprintf("%c", *p & QUOTE ? '-' : ' ');
 	xprintf(":\n");
-	xprintf("word:%S:\n", qline.s + word);
+	xprintf("word:%" TCSH_S ":\n", qline.s + word);
 	xprintf("word:");
 	for (p = qline.s + word; *p; p++)
 	    xprintf("%c", *p & QUOTE ? '-' : ' ');
@@ -260,7 +260,7 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	looking = tw_complete(qline.s + cmd_start, &p, &pat, looking, &suf);
 	wordp = p - qline.s;
 #ifdef TDEBUG
-	xprintf(CGETS(30, 3, "complete %d %S\n"), looking, pat);
+	xprintf(CGETS(30, 3, "complete %d %" TCSH_S "\n"), looking, pat);
 #endif
     }
 
@@ -981,7 +981,7 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 	    tw_next_entry[looking](&item, exp_dir, &flags) != 0)) {
 	Strbuf_terminate(&item);
 #ifdef TDEBUG
-	xprintf("item = %S\n", item.s);
+	xprintf("item = %" TCSH_S "\n", item.s);
 #endif
 	switch (looking) {
 	case TW_FILE:
@@ -1197,7 +1197,7 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 	    break;
 	}
 #ifdef TDEBUG
-	xprintf("done item = %S\n", item.s);
+	xprintf("done item = %" TCSH_S "\n", item.s);
 #endif
     }
     cleanup_until(&item);
@@ -1349,7 +1349,7 @@ tw_collect(COMMAND command, int looking, struct Strbuf *exp_dir,
     jmp_buf_t osetexit;
 
 #ifdef TDEBUG
-    xprintf("target = %S\n", target);
+    xprintf("target = %" TCSH_S "\n", target);
 #endif
     ni = 0;
     getexit(osetexit);
@@ -1487,7 +1487,7 @@ tw_list_items(int looking, int numitems, int list_max)
 	Char **w = tw_item_get();
 
 	for (i = 0; i < numitems; i++) {
-	    xprintf("%S", w[i]);
+	    xprintf("%" TCSH_S "", w[i]);
 	    if (Tty_raw_mode)
 		xputchar('\r');
 	    xputchar('\n');
@@ -1599,7 +1599,7 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 
     case TW_EXPLAIN:
 	if (command == LIST && pat != NULL) {
-	    xprintf("%S", pat);
+	    xprintf("%" TCSH_S "", pat);
 	    if (Tty_raw_mode)
 		xputchar('\r');
 	    xputchar('\n');
@@ -1695,7 +1695,7 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 	if ((dir_fd = opendir(short2str(exp_dir.s))) == NULL) {
  	    if (command == RECOGNIZE)
  		xprintf("\n");
- 	    xprintf("%S: %s", exp_dir.s, strerror(errno));
+	    xprintf("%" TCSH_S ": %s", exp_dir.s, strerror(errno));
  	    if (command != RECOGNIZE)
  		xprintf("\n");
  	    NeedsRedraw = 1;
@@ -1956,7 +1956,7 @@ expand_dir(const Char *dir, struct Strbuf *edir, DIR **dfd, COMMAND cmd)
 	 * From: Amos Shapira <amoss@cs.huji.ac.il>
 	 * Print a better message when completion fails
 	 */
-	xprintf("\n%S %s\n", edir->len ? edir->s : (tdir ? tdir : dir),
+	xprintf("\n%" TCSH_S " %s\n", edir->len ? edir->s : (tdir ? tdir : dir),
 		(errno == ENOTDIR ? CGETS(30, 10, "not a directory") :
 		(errno == ENOENT ? CGETS(30, 11, "not found") :
 		 CGETS(30, 12, "unreadable"))));
@@ -2203,11 +2203,12 @@ print_by_column(Char *dir, Char *items[], int count, int no_file_suffix)
 #else /* ifndef COLOR_LS_F */
 		if (no_file_suffix) {
 		    /* Print the command name */
-		    xprintf("%S", items[i]);
+		    xprintf("%" TCSH_S, items[i]);
 		}
 		else {
 		    /* Print filename followed by '/' or '*' or ' ' */
-		    xprintf("%-S%c", items[i], filetype(dir, items[i]));
+		    xprintf("%-" TCSH_S "%c", items[i],
+			filetype(dir, items[i]));
 		    wx++;
 		}
 #endif /* COLOR_LS_F */
