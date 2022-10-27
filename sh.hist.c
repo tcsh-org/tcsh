@@ -1260,7 +1260,7 @@ rechist(Char *xfname, int ref)
     static Char *fname;
     static Char   *dumphist[] = {STRhistory, STRmhT, 0, 0};
 
-    if (fname == NULL && !ref)
+    if (xfname == NULL && !ref)
 	return;
 
     fname = xfname;

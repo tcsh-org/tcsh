@@ -1,3 +1,10 @@
+  5. Fix rechist() check for NULL filename (broke when arg was renamed).
+	> cd
+	> rm .history
+	> unset savehist
+	> history -S /tmp/s
+	> exit
+     A ~/.history has been written when it should not have been.
   4. Make OpenBSD use SHORT_STRINGS and fix non-SHORT_STRINGS compilation.
   3. V6.24.01 - 20220512
   2. Fix quoting of ! characters in history recall (Kimmo Suominen)
