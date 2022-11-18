@@ -1,4 +1,5 @@
-# Special aliases
+AT_BANNER([Special aliases])
+
 
 TCSH_UNTESTED([beepcmd])
 
@@ -13,12 +14,15 @@ AT_CHECK([tcsh -f cwdcmd.csh], ,
 [>> /
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 TCSH_UNTESTED([jobcmd])
+
 TCSH_UNTESTED([helpcommand])
+
 TCSH_UNTESTED([periodic])
+
 TCSH_UNTESTED([precmd])
 
 
@@ -36,7 +40,7 @@ foo
 foo
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([shell])
@@ -53,4 +57,4 @@ AT_CHECK([tcsh -f shell.csh], ,
 [OK
 ])
 
-AT_CLEANUP
+AT_CLEANUP()

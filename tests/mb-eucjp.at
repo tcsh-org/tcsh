@@ -1,5 +1,8 @@
 # EUC-JP multibyte handling test case.  This file uses the EUC-JP encoding.
 
+AT_BANNER([EUC-JP multibyte])
+
+
 AT_SETUP([EUC-JP multibyte test])
 
 AT_DATA([input.csh],
@@ -94,4 +97,4 @@ AT_CHECK([LC_ALL=en_US.UTF-8 tcsh -f input.csh], ,
 [AAA
 ])
 
-AT_CLEANUP
+AT_CLEANUP()

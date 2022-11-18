@@ -1,4 +1,5 @@
-# Expression evaluation
+AT_BANNER([Expression evaluation])
+
 
 AT_SETUP([Arithmetic operators])
 
@@ -70,7 +71,7 @@ AT_CHECK([tcsh -f -c 'exit (~ 254)'], 1)
 
 AT_CHECK([tcsh -f -c 'exit ((3))'], 3)
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([Primary expressions])
@@ -163,5 +164,5 @@ AT_CHECK([tcsh -f -c 'exit ( -Z nonempty )'], 1)
 
 AT_CHECK([tcsh -f -c 'exit ( -N unknown )'], 255)
 
-AT_CLEANUP
+AT_CLEANUP()
 

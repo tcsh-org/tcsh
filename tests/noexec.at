@@ -1,4 +1,5 @@
-# '-n' handling
+AT_BANNER([-n handling])
+
 
 AT_SETUP([-n])
 
@@ -138,4 +139,4 @@ end
 AT_CHECK([tcsh -f -n continuenoskip.csh], 1, [], [Missing name for redirect.
 ])
 
-AT_CLEANUP
+AT_CLEANUP()

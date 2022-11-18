@@ -1,27 +1,34 @@
-# Special shell variables
+AT_BANNER([Special shell variables])
+
 
 # The space after $ is to avoid expanding the variables in testsuite output,
-# to work-around a bug in autotest
+# and to allow the variable names to be used as a testsuite keyword
+# (e.g., "-k time").
+# If the space is not desired, use "$[]foo" instead of "$ foo".
 
-# Not testing any functionality
-m4_define([VAR_UNSET],
-[AT_SETUP([$ $1])
+
+dnl VAR_UNSET - Not testing any specific functionality for variable
+dnl
+m4_define([VAR_UNSET], [dnl
+AT_SETUP([$ $1])
 AT_CHECK([tcsh -f -c 'echo $?$1'], ,
 [0
 ])
-AT_CLEANUP
+AT_CLEANUP()
 ])
-m4_define([ENV_SET],
-[AT_SETUP([$ $1])
+
+m4_define([ENV_SET], [dnl
+AT_SETUP([$ $1])
 AT_CHECK([tcsh -f -c 'printenv $1'], 0, [ignore])
-AT_CLEANUP
+AT_CLEANUP()
 ])
-m4_define([ENV_UNSET],
-[AT_SETUP([$ $1])
+
+m4_define([ENV_UNSET], [dnl
+AT_SETUP([$ $1])
 AT_CHECK([tcsh -f -c 'printenv $1'], 1,
 [0
 ])
-AT_CLEANUP
+AT_CLEANUP()
 ])
 
 
@@ -32,10 +39,11 @@ AT_CHECK([tcsh -f -c 'echo $?addsuffix'], ,
 ])
 # Nothing more
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([afsuser])
+
 VAR_UNSET([ampm])
 
 
@@ -61,7 +69,7 @@ AT_CHECK([tcsh -f exit_status.csh],,
 1
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ argv])
@@ -71,12 +79,15 @@ AT_CHECK([tcsh -f -c 'echo $argv; echo $2' foo bar baz], ,
 bar
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([autocorrect])
+
 VAR_UNSET([autoexpand])
+
 VAR_UNSET([autolist])
+
 TCSH_UNTESTED([$ autologout])
 
 
@@ -115,7 +126,7 @@ foo\bar
 foo\bar
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([catalog])
@@ -137,10 +148,11 @@ AT_CHECK([tcsh -f cdpath.csh], ,
 ~/tcsh_test_dir @&t@
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([color])
+
 VAR_UNSET([colorcat])
 
 
@@ -157,12 +169,15 @@ AT_CHECK([tcsh -f command.csh], ,
 [0
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([complete])
+
 VAR_UNSET([continue])
+
 VAR_UNSET([continue_args])
+
 VAR_UNSET([correct])
 
 
@@ -211,7 +226,7 @@ Invalid null command.
 4
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ cwd])
@@ -244,10 +259,11 @@ CWD
 foo
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([dextract]) # Behavior tested with pushd
+
 VAR_UNSET([dirsfile])
 
 
@@ -273,10 +289,11 @@ AT_CHECK([tcsh -f dirstack.csh | sed "s,$PWD,CWD,g"], ,
 /dev CWD
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 TCSH_UNTESTED([$ dspmbyte])
+
 VAR_UNSET([dunique]) # Behavior tested with pushd
 
 
@@ -309,7 +326,7 @@ some_file
 echo some_*
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ echo_style])
@@ -339,7 +356,7 @@ foob	r
 b\tr
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ echo_hex])
@@ -372,7 +389,8 @@ a
 ag
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([$ edit])
 
@@ -386,7 +404,7 @@ AT_CHECK([TERM=dumb tcsh -f -c 'echo $?edit'], ,
 [0
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ ellipsis])
@@ -414,10 +432,11 @@ AT_CHECK([tcsh -f -i -q < ellipsis0.csh], ,
 [> ~...b exit
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([fignore])
+
 VAR_UNSET([filec])
 
 
@@ -427,7 +446,7 @@ AT_CHECK([(tcsh -f -c 'echo $gid'; id -gr) | uniq | wc -l | tr -d ' \t'], ,
 [1
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ group])
@@ -445,7 +464,7 @@ foo
 bar
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ histchars])
@@ -468,7 +487,7 @@ Ok
 echo Ok
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ histdup])
@@ -522,7 +541,7 @@ AT_CHECK([[tcsh -f -q -i < histdup.csh] dnl
 > exit
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([histfile])
@@ -591,7 +610,7 @@ history
 history -S hist2
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ history])
@@ -610,7 +629,7 @@ CWD,~,     6,     6,     6,%,0,value,>,history
 > exit
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ home])
@@ -645,7 +664,7 @@ AT_CHECK([(unset HOME; tcsh -f -c 'echo $?home; printenv HOME')], 1,
 [0
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([ignoreeof])
@@ -686,10 +705,11 @@ cd ~/subdir
 > exit
 ], [experr])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([inputmode])
+
 VAR_UNSET([killdup])
 
 
@@ -700,7 +720,7 @@ AT_CHECK([tcsh -f -c 'echo $killring'], ,
 ])
 # Nothing more
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ listflags])
@@ -720,14 +740,20 @@ AT_CHECK([tcsh -f listflags.csh], ,
 -xFA -something .
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([listjobs])
-VAR_UNSET([listlinks]) # Functionality tested with ls-F
+
+# Functionality tested with ls-F
+VAR_UNSET([listlinks])
+
 VAR_UNSET([listmax])
+
 VAR_UNSET([listmaxrows])
-VAR_UNSET([loginsh]) # Can't test the other case
+
+VAR_UNSET([loginsh]) dnl Can't test the other case
+
 VAR_UNSET([logout])
 
 
@@ -747,7 +773,7 @@ AT_CHECK([tcsh -f mail.csh], ,
 [0
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ cdtohome])
@@ -763,22 +789,34 @@ esac;
 export HOME;
 tcsh -f -c 'cd'
 ], 0)
-AT_CLEANUP
+AT_CLEANUP()
+
+
 AT_SETUP([$ noimplicithome])
+
 AT_CHECK([tcsh -f -c 'unset cdtohome; cd'], 1, , [cd: Too few arguments.
 ])
-AT_CLEANUP
+
+AT_CLEANUP()
 
 
 VAR_UNSET([matchbeep])
+
 VAR_UNSET([nobeep])
-VAR_UNSET([noclobber]) # Functionality tested with "Command execution"
+
+# Functionality tested with "Command execution"
+VAR_UNSET([noclobber])
+
 VAR_UNSET([noding])
+
 # Functionality tested with "Filename substitution" and
 # "Directory stack substitution"
 VAR_UNSET([noglob])
+
 VAR_UNSET([nostat])
+
 VAR_UNSET([notify])
+
 TCSH_UNTESTED([$ oid])
 
 
@@ -802,7 +840,7 @@ CWD
 /bin
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ path])
@@ -833,7 +871,7 @@ subdir:.
 . foo . bar .
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ printexitvalue])
@@ -854,7 +892,7 @@ Exit 1
 Exit 3
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ prompt])
@@ -873,7 +911,7 @@ AT_CHECK([tcsh -f -i -q < prompt.csh | sed "s,$PWD,CWD,"], ,
 CWD/a/b,~/a/b,b,b,~/a/b,~/a/b,~/<1>b,~/<1>b,b,8,8,8,%,0,value,>,50 exit
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ prompt2])
@@ -882,7 +920,7 @@ AT_CHECK([echo 'echo "$prompt2"' | tcsh -f], ,
 [%R? @&t@
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ prompt3])
@@ -891,7 +929,8 @@ AT_CHECK([echo 'echo "$prompt3"' | tcsh -f], ,
 [CORRECT>%R (y|n|e|a)? @&t@
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([$ promptchars])
 
@@ -904,13 +943,19 @@ AT_CHECK([tcsh -f  -i -q < promptchars.csh], ,
 _ exit
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
-VAR_UNSET([pushdtohome]) # Functionality tested with pushd
-VAR_UNSET([pushdsilent]) # Functionality tested with pushd
+# Functionality tested with pushd
+VAR_UNSET([pushdtohome])
+
+# Functionality tested with pushd
+VAR_UNSET([pushdsilent])
+
 VAR_UNSET([recexact])
+
 VAR_UNSET([recognize_only_executablers])
+
 VAR_UNSET([rmstar])
 
 
@@ -930,11 +975,13 @@ AT_CHECK([tcsh -f -i -q < rprompt.csh | sed "s,$PWD,CWD,"], ,
 > CWD/a/b,~/a/b,b,b,~/a/b,~/a/b,~/<1>b,~/<1>b,b,8,8,8,%,0,value,>,50 exit
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([savedirs])
+
 VAR_UNSET([savehist])
+
 VAR_UNSET([sched])
 
 
@@ -948,7 +995,7 @@ AT_CHECK([SHELL=foo/tcsh tcsh -f -c 'echo $shell'], ,
 [foo/tcsh
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ shlvl])
@@ -974,7 +1021,7 @@ AT_CHECK([env SHLVL=5 tcsh -f shlvl.csh], ,
 4
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ status])
@@ -993,7 +1040,7 @@ OK
 0
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ symlinks])
@@ -1024,7 +1071,7 @@ CWD
 1
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ tcsh])
@@ -1033,7 +1080,7 @@ AT_CHECK([tcsh -f -c 'echo $?tcsh'], ,
 [1
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ term])
@@ -1055,10 +1102,11 @@ AT_CHECK([(unset TERM; tcsh -f -c 'echo $?term; printenv TERM')], 1,
 [0
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([time])
+
 VAR_UNSET([tperiod])
 
 
@@ -1068,7 +1116,7 @@ AT_CHECK([tcsh -f -c 'echo ">$tty<"' < /dev/null], ,
 [><
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ uid])
@@ -1077,7 +1125,7 @@ AT_CHECK([(tcsh -f -c 'echo $uid'; id -ru) | uniq | wc -l | tr -d ' \t'], ,
 [1
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ user])
@@ -1106,7 +1154,7 @@ AT_CHECK([(unset LOGNAME; USER=foo tcsh -f -c 'echo $user; printenv LOGNAME')],
 foo
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ verbose])
@@ -1132,7 +1180,7 @@ AT_CHECK([tcsh -f -i -q < verbose.csh], ,
 echo $verbose
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([$ version])
@@ -1141,12 +1189,15 @@ AT_CHECK([tcsh -f -c 'echo $?version'], ,
 [1
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 VAR_UNSET([visiblebell])
+
 VAR_UNSET([watch])
+
 VAR_UNSET([who])
+
 VAR_UNSET([wordchars])
 
 

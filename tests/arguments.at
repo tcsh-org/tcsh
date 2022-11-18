@@ -1,4 +1,5 @@
-# Command-line argument handling
+AT_BANNER([Command-line argument handling])
+
 
 AT_SETUP([-b])
 
@@ -8,7 +9,7 @@ AT_DATA([-script.csh],
 AT_CHECK([tcsh -f -b -script.csh --version], , [--version
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([-c])
@@ -28,7 +29,7 @@ AT_CHECK([tcsh -f -c 'echo \\'], ,
 
 AT_CHECK([tcsh -f -c])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 TCSH_UNTESTED([-d])
@@ -40,7 +41,7 @@ AT_SETUP([-e])
 AT_CHECK([tcsh -f -e -c 'echo 1; (exit 3); echo 2'], 3, [1
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 TCSH_UNTESTED([-f])
@@ -53,7 +54,7 @@ AT_CHECK([echo 'echo $1' | tcsh -f -q -i foo], ,
 > exit
 ]])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 # Warning message contains strerror(EBADF), libc-dependent; can't be turned
@@ -69,12 +70,13 @@ TCSH_UNTESTED([-m])
 
 
 TCSH_UNTESTED([-q])
+
 #AT_SETUP([-q])
 
 # Nested to make the SIGQUIT reporting predictable
 #AT_CHECK([tcsh -f -q -c 'kill -QUIT $$'], 131, ,)
 
-#AT_CLEANUP
+#AT_CLEANUP()
 
 
 AT_SETUP([-s])
@@ -82,7 +84,7 @@ AT_SETUP([-s])
 AT_CHECK([echo 'echo $1' | tcsh -f -s foo], , [foo
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([-t])
@@ -94,7 +96,7 @@ AT_DATA([input.csh],
 AT_CHECK([tcsh -f -t < input.csh], , [1 2
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([-v])
@@ -106,7 +108,7 @@ OK
 [repeat 2 echo OK
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([-x])
@@ -120,14 +122,15 @@ echo OK
 echo OK
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 TCSH_UNTESTED([-V])
+
 TCSH_UNTESTED([-X])
 
-
 TCSH_UNTESTED([--help])
+
 TCSH_UNTESTED([--version])
 
 
@@ -138,8 +141,7 @@ AT_CHECK([tcsh -f -Z], 1, ,
 Usage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ].
 ]])
 
-AT_CLEANUP
-
+AT_CLEANUP()
 
 
 AT_SETUP([non-option arguments])
@@ -163,4 +165,4 @@ AT_DATA([unreadable.csh],
 chmod 0 unreadable.csh
 AT_CHECK([tcsh -f unreadable.csh], 1, [], [ignore])
 
-AT_CLEANUP
+AT_CLEANUP()

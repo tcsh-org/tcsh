@@ -1,5 +1,8 @@
 # UTF-8 multibyte handling test case.  This file uses the UTF-8 encoding.
 
+AT_BANNER([UTF-8 multibyte])
+
+
 AT_SETUP([UTF-8 multibyte test])
 
 AT_DATA([input.csh],
@@ -94,4 +97,4 @@ AT_CHECK([LC_ALL=ja_JP.eucjp tcsh -f input.csh], ,
 [AAA
 ])
 
-AT_CLEANUP
+AT_CLEANUP()

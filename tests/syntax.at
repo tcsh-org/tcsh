@@ -1,4 +1,5 @@
-# Command syntax
+AT_BANNER([Command syntax])
+
 
 AT_SETUP([Command combinations])
 
@@ -36,7 +37,7 @@ async
 [[[1]    Done                          ( sleep 1; echo async )]]
 )
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([Command execution])
@@ -81,6 +82,7 @@ cat << `EOF`
 $var
 `EOF`
 ]])
+
 AT_CHECK([tcsh -f heredoc.csh], ,
 [[$\`
 abc
@@ -191,4 +193,4 @@ dnl touch output
 dnl AT_CHECK([tcsh -f -c 'set noclobber=(notempty ask); echo OK >& output'])
 
 
-AT_CLEANUP
+AT_CLEANUP()

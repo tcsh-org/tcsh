@@ -1,6 +1,9 @@
 # Test of the history functions.  Some of these are already tested in
 # variables and commands.
 
+AT_BANNER([history])
+
+
 AT_SETUP([history])
 
 # Check history duplicate erase
@@ -116,7 +119,8 @@ AT_CHECK([[{ cat hist-base.csh; sed 's/x !6/: !6/' hist-ev.csh;}] dnl
 # +     7 TIME : 4
 #       8 TIME : : 1
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([history performance])
 
@@ -196,7 +200,8 @@ Done at TIME
 # different histdup settings ("all", "prev", or "") and with merge (for
 # savehist) set to 0 instead of 1.
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 ### AT_SETUP([history faults])
 ###
@@ -225,7 +230,8 @@ AT_CLEANUP
 ### [history: Badly formed number.
 ### ])
 ###
-### AT_CLEANUP
+### AT_CLEANUP()
+
 
 AT_SETUP([history hup])
 
@@ -433,4 +439,4 @@ AT_CHECK([if cc -o hist-kill hist-kill.c -lutil; ] dnl
 	 [ else echo C compiler failed, skipping this approach; fi],
  	 0, stdout, stderr)
 
-AT_CLEANUP
+AT_CLEANUP()
