@@ -1,12 +1,15 @@
 # Process this file with autom4te to create testsuite. -*- Autotest -*-
 
-AT_INIT
+AT_INIT([tcsh])
+
+AT_COLOR_TESTS()
+
 AT_TESTED([tcsh])
 
-m4_define([TCSH_UNTESTED],
-[AT_SETUP([$1])
+m4_define([TCSH_UNTESTED], [dnl
+AT_SETUP([$1])
 AT_CHECK([exit 77])
-AT_CLEANUP
+AT_CLEANUP()
 ])
 
 m4_include([aliases.at])
@@ -17,10 +20,9 @@ m4_include([history.at])
 m4_include([lexical.at])
 m4_include([mb-eucjp.at])
 m4_include([mb-utf8.at])
+m4_include([noexec.at])
 m4_include([parenthesis.at])
+m4_include([sh.dol.at])
 m4_include([subst.at])
 m4_include([syntax.at])
 m4_include([variables.at])
-
-m4_include([noexec.at])
-m4_include([sh.dol.at])

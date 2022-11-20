@@ -1,4 +1,5 @@
-# Lexical analysis and substitutions
+AT_BANNER([Lexical analysis and substitutions])
+
 
 AT_SETUP([Word splitting])
 
@@ -25,7 +26,7 @@ AT_CHECK([tcsh -f oneword.csh], ,
 [&|;<>()&||<<>>space tab end
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([Comments])
@@ -47,7 +48,7 @@ AT_CHECK([tcsh -f comment2.csh], ,
 [testing... OK
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([Escaping special characters])
@@ -78,7 +79,7 @@ dnl " Pacify emacs
 AT_CHECK([tcsh -f -c "echo 'foo\'bar'"], 1, , [Unmatched '''.
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([Preventing substitution])
@@ -149,7 +150,7 @@ AT_CHECK([tcsh -f noalias.csh])
 AT_CHECK([tcsh -f -c 'echo "g?*b"'], , [g?*b
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([History basics])
@@ -199,7 +200,7 @@ AT_CHECK([tcsh -f nohist.csh], ,
 [[! space ! tab != !( newline !
 ]])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([Event specification])
@@ -341,7 +342,7 @@ numberx
 echo numberx
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([Word selection])
@@ -390,7 +391,7 @@ echo 2 3 4
 echo 1 2 3 4 5
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([History modifiers])
@@ -465,7 +466,7 @@ set var= ( foo b r b z quux )
 set var= ( foo b r b z quux )
 ]])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([Alias substitution])
@@ -493,7 +494,7 @@ no bug
 [Alias loop.
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([Variable substitution])
@@ -545,7 +546,7 @@ arg1 arg2
 `"{}$@'
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
 
 
 AT_SETUP([Quoting of expansions in `...`])
@@ -604,7 +605,8 @@ endif
 AT_CHECK([tcsh -f uniformity_test.csh], 0,[OK])
 AT_CHECK([tcsh -f quoting_result_test.csh], 0, [OK])
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([\echo for git_tcsh_completion])
 
@@ -625,7 +627,8 @@ AT_CHECK([tcsh -f escape_echo.csh], 0,
 3
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([:gas work as described in the man pages])
 
@@ -647,7 +650,8 @@ qq we qq wb
 QQ we QQ wb
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([avoid infinite loop in :gas])
 
@@ -661,7 +665,8 @@ AT_CHECK([tcsh -f replace_all.csh], 0,
 [baba
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([/a.b/c:r doesn't remove path elements])
 
@@ -675,7 +680,8 @@ AT_CHECK([tcsh -f colon_r_no_extension.csh], 0,
 [/a.b/c
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([$x:q:h does not cause out of memory crash and yields the full string])
 
@@ -689,7 +695,8 @@ AT_CHECK([tcsh -f x_colon_q_colon_h.csh], 0,
 [a/b c/d.e
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([$x:q:t does not cause out of memory crash and yields the full string])
 
@@ -703,7 +710,8 @@ AT_CHECK([tcsh -f x_colon_q_colon_h.csh], 0,
 [a/b c/d.e
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([$x:q:r yields the full string])
 
@@ -717,7 +725,8 @@ AT_CHECK([tcsh -f x_colon_q_colon_r.csh], 0,
 [a/b c/d.e
 ])
 
-AT_CLEANUP
+AT_CLEANUP()
+
 
 AT_SETUP([$x:q:e yields nothing])
 
@@ -731,5 +740,4 @@ AT_CHECK([tcsh -f x_colon_q_colon_e.csh], 0,
 [
 ])
 
-AT_CLEANUP
-
+AT_CLEANUP()

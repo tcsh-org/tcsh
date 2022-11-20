@@ -1,4 +1,5 @@
-# $... substitution handling
+AT_BANNER([$... substitution handling])
+
 
 AT_SETUP([$<])
 
@@ -11,10 +12,12 @@ end
 END:
   exit 0
 ]])
+
 AT_DATA([input],
 [[foo
 !@#$%^&*()_+-=[]{};':"\|,./<>?`~
 ]])
+
 AT_CHECK([tcsh -f cat.csh < input | cmp -s input -])
 
-AT_CLEANUP
+AT_CLEANUP()
