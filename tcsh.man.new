@@ -933,6 +933,8 @@ on terminals without a meta key.
 Case counts, but commands that are bound
 to letters by default are bound to both lower- and uppercase letters for
 convenience.
+.Pp
+Supported editor commands are:
 .Bl -tag -width indent
 .
 .It Ic backward-char No (^B, left)
@@ -1575,11 +1577,13 @@ controlled by the
 .Ic echo_style
 shell variable.
 .Pp
+Supported escape sequences are:
+.Pp
 .Bl -tag -width 12n -offset indent -compact
 .It Li \ea
-Bell
+Bell.
 .It Li \eb
-Backspace
+Backspace.
 .It Li \ec Ns Ar c
 The control character denoted by
 .Ql ^ Ns Ar c
@@ -1589,38 +1593,38 @@ If
 .Ar c
 is a backslash, it must be doubled.
 .It Li \ee
-Escape
+Escape.
 .It Li \ef
-Form feed
+Form feed.
 .It Li \en
-Newline
+Newline.
 .It Li \er
-Carriage return
+Carriage return.
 .It Li \et
-Horizontal tab
+Horizontal tab.
 .It Li \ev
-Vertical tab
+Vertical tab.
 .It Li \e\e
-Literal backslash
+Literal backslash.
 .It Li \e\&'
-Literal single quote
+Literal single quote.
 .It Li \e\&"
-Literal double quote
+Literal double quote.
 .It Li \e Ns Ar nnn
 The character corresponding to the octal number
-.Ar nnn
+.Ar nnn .
 .It Li \ex Ns Ar nn
 The character corresponding to the hexadecimal number
 .Ar nn
-(1\-2 hexadecimal digits)
+(1\-2 hexadecimal digits).
 .It Li \ex{ Ns Ar nnnnnnnn Ns Li }
 The character corresponding to the hexadecimal number
 .Ar nnnnnnnn
-(1\-8 hexadecimal digits)
+(1\-8 hexadecimal digits).
 .It Li \eu Ns Ar nnnn
 The Unicode code point
 .Ar nnnn
-(1\-4 hexadecimal digits)
+(1\-4 hexadecimal digits).
 .It Li \eU Ns Ar nnnnnnnn
 The Unicode code point
 .Ar nnnnnnnn
@@ -1733,17 +1737,17 @@ which selects particular words from the chosen event, and/or a
 .Dq modifier ,
 which manipulates the selected words.
 .Pp
-An event specification can be
+An event specification can be:
 .Pp
 .Bl -tag -width 5n -offset indent -compact
 .
 .It Ar n
-A number, referring to a particular event
+A number, referring to a particular event.
 .
 .It Li \- Ns Ar n
 An offset, referring to the event
 .Ar n
-before the current event
+before the current event.
 .
 .It Li #
 The current event.
@@ -1755,11 +1759,11 @@ allows 10 levels of recursion. (+)
 .
 .It Li \&!
 The previous event (equivalent to
-.Ql \-1 )
+.Ql \-1 ) .
 .
 .It Ar s
 The most recent event whose first word begins with the string
-.Ar s
+.Ar s .
 .
 .It Li ? Ns Ar s Ns Li ?
 The most recent event which contains the string
@@ -1841,7 +1845,7 @@ To expand
 .Ql !3d
 as in
 .Xr csh 1
-say
+type
 .Ql !{3}d .
 .Pp
 To select words from an event we can follow the event specification by a
@@ -1850,50 +1854,51 @@ and a designator for the desired words.
 The words of an input line are
 numbered from 0, the first (usually command) word being 0, the second word
 (first argument) being 1, etc.
+.Pp
 The basic word designators are:
 .Pp
 .Bl -tag -width 4n -offset indent -compact
 .
 .It Li 0
-The first (command) word
+The first (command) word.
 .
 .It Ar n
 The
 .Ar n Ns
-th argument
+th argument.
 .
 .It Li ^
 The first argument, equivalent to
-.Ql 1
+.Ql 1 .
 .
 .It Li $
-The last argument
+The last argument.
 .
 .It Li %
 The word matched by an
-.Li ? Ns Ar s Ns Li ? No search
+.Li ? Ns Ar s Ns Li ? No search.
 .
 .It Ar x Ns Li \- Ns Ar y
-A range of words
+A range of words.
 .
 .It Li \- Ns Ar y
 Equivalent to
-.Ql 0\- Ns Ar y
+.Ql 0\- Ns Ar y .
 .
 .It Li *
 Equivalent to
 .Ql ^\-$ ,
-but returns nothing if the event contains only 1 word
+but returns nothing if the event contains only 1 word.
 .
 .It Ar x Ns Li *
 Equivalent to
-.Sq Ar x Ns Li \-$
+.Sq Ar x Ns Li \-$ .
 .
 .It Ar x Ns Li \-
 Equivalent to
 .Sq Ar x Ns Li * ,
 but omitting the last word
-.Pq Ql $
+.Pq Ql $ .
 .El
 .Pp
 Selected words are inserted into the command line separated by single blanks.
@@ -1928,7 +1933,7 @@ to refer to the current event.
 would reuse the first two words from the
 .Ql nroff
 command
-to say
+to type
 .Ql nroff \-man hurkle.man .
 .Pp
 The
@@ -2089,16 +2094,18 @@ to remove
 .Ql .old
 from the first argument on the same line
 (`!#^').
-We could say
+We could type
 .Ql echo hello out there ,
 then
 .Ql echo !*:u
 to capitalize
 .Ql hello ,
 .Ql echo !*:au
-to say it out loud, or
+to upper case the first word to
+.QL HELLO ,
+or
 .Ql echo !*:agu
-to really shout.
+to upper case all words.
 We might follow
 .Ql mail \-s \&"I forgot my password\&" rot
 with
@@ -2361,9 +2368,7 @@ multiple words with each word separated by a blank and quoted to prevent later
 command or filename substitution.
 .Pp
 The following metasequences are provided for introducing variable values into
-the shell input.
-Except as noted, it is an error to reference a variable which
-is not set.
+the shell input:
 .Pp
 .Bl -tag -width 10n -offset indent -compact
 .
@@ -2432,6 +2437,9 @@ which is equivalent to
 .Ql $argv[*] .
 .El
 .Pp
+Except as noted, it is an error to reference a variable which
+is not set.
+.Pp
 The
 .Ql \&:
 modifiers described under
@@ -2449,7 +2457,7 @@ within the braces.
 .Pp
 The following substitutions can not be modified with
 .Ql \&:
-modifiers.
+modifiers:
 .Pp
 .Bl -tag -width 10n -offset indent -compact
 .
@@ -3082,7 +3090,9 @@ is given in
 is allowed on empty files;
 if
 .Ql ask
-is set, an interacive confirmation is presented, rather than an
+is given in
+.Ic noclobber ,
+an interacive confirmation is presented, rather than an
 error.
 .Pp
 The forms involving
@@ -3198,7 +3208,7 @@ builtin command (q.v.) has its own separate syntax.
 .
 .Ss "Logical, arithmetical and comparison operators"
 These operators are similar to those of C and have the same precedence.
-They include
+They include:
 .Pp
 .Bl -tag -width 6n -offset indent -compact
 .It Li "||  &&  |  ^  &  ==  !=  =~  !~  <=  >="
@@ -3298,18 +3308,18 @@ They are of the form
 .Fl Ar op file ,
 where
 .Ar op
-is one of
+is one of:
 .Pp
 .Bl -tag -width 3n -offset indent -compact
 .
 .It Li r
-Read access
+Read access.
 .
 .It Li w
-Write access
+Write access.
 .
 .It Li x
-Execute access
+Execute access.
 .
 .It Li X
 Executable in the path or shell builtin, e.g.,
@@ -3319,61 +3329,61 @@ and
 are
 generally true, but
 .Ql \-X /bin/ls
-is not (+)
+is not. (+)
 .
 .It Li e
-Existence
+Existence.
 .
 .It Li o
-Ownership
+Ownership.
 .
 .It Li z
-Zero size
+Zero size.
 .
 .It Li s
-Non-zero size (+)
+Non-zero size. (+)
 .
 .It Li f
-Plain file
+Plain file.
 .
 .It Li d
-Directory
+Directory.
 .
 .It Li l
-Symbolic link (+) *
+Symbolic link. (+) *
 .
 .It Li b
-Block special file (+)
+Block special file. (+)
 .
 .It Li c
-Character special file (+)
+Character special file. (+)
 .
 .It Li p
-Named pipe (fifo) (+) *
+Named pipe (fifo). (+) *
 .
 .It Li S
-Socket special file (+) *
+Socket special file. (+) *
 .
 .It Li u
-Set-user-ID bit is set (+)
+Set-user-ID bit is set. (+)
 .
 .It Li g
-Set-group-ID bit is set (+)
+Set-group-ID bit is set. (+)
 .
 .It Li k
-Sticky bit is set (+)
+Sticky bit is set. (+)
 .
 .It Li t
 .Ar file
 (which must be a digit) is an open file descriptor
-for a terminal device (+)
+for a terminal device. (+)
 .
 .It Li R
-Has been migrated (Convex only) (+)
+Has been migrated (Convex only). (+)
 .
 .It Li L
 Applies subsequent operators in a multiple-operator test to a symbolic link
-rather than to the file to which the link points (+) *
+rather than to the file to which the link points. (+) *
 .El
 .Pp
 .Ar file
@@ -3435,61 +3445,61 @@ or
 (+)
 They have the same format as before;
 .Ar op
-may be one of
+may be one of:
 .Pp
 .Bl -tag -width 6n -offset indent -compact
 .
 .It Li A
-Last file access time, as the number of seconds since the epoch
+Last file access time, as the number of seconds since the epoch.
 .
 .It Li A:
 Like
 .Ql A ,
 but in timestamp format, e.g.,
-.Sq Fri May 14 16:36:10 1993
+.Sq Fri May 14 16:36:10 1993 .
 .
 .It Li M
-Last file modification time
+Last file modification time.
 .
 .It Li M:
 Like
 .Ql M ,
-but in timestamp format
+but in timestamp format.
 .
 .It Li C
-Last inode modification time
+Last inode modification time.
 .
 .It Li C:
 Like
 .Ql C ,
-but in timestamp format
+but in timestamp format.
 .
 .It Li D
-Device number
+Device number.
 .
 .It Li I
-Inode number
+Inode number.
 .
 .It Li F
 Composite
 .Li f Ns
 ile identifier, in the form
 .Ar device : Ns
-.Ar inode
+.Ar inode .
 .
 .It Li L
-The name of the file pointed to by a symbolic link
+The name of the file pointed to by a symbolic link.
 .
 .It Li N
-Number of (hard) links
+Number of (hard) links.
 .
 .It Li P
-Permissions, in octal, without leading zero
+Permissions, in octal, without leading zero.
 .
 .It Li P:
 Like
 .Ql P ,
-with leading zero
+with leading zero.
 .
 .It Li P Ns Ar mode
 Equivalent to
@@ -3505,27 +3515,27 @@ is writable by group and other,
 if by group only,
 and
 .Sq 0
-if by neither
+if by neither.
 .
 .It Li P Ns Ar mode Ns Li \&:
 Like
 .Ql P Ns Ar mode ,
-with leading zero
+with leading zero.
 .
 .It Li U
-Numeric userid
+Numeric userid.
 .
 .It Li U:
-Username, or the numeric userid if the username is unknown
+Username, or the numeric userid if the username is unknown.
 .
 .It Li G
-Numeric groupid
+Numeric groupid.
 .
 .It Li G:
-Groupname, or the numeric groupid if the groupname is unknown
+Groupname, or the numeric groupid if the groupname is unknown.
 .
 .It Li Z
-Size, in bytes
+Size, in bytes.
 .El
 .Pp
 Only one of these operators may appear in a multiple-operator test, and it
@@ -3665,7 +3675,7 @@ is a synonym
 for
 .Ql fg %1 ,
 bringing job 1 back into the foreground.
-Similarly, saying
+Similarly, typing
 .Ql %1 &
 resumes job 1 in the background, just like
 .Ql bg %1 .
@@ -3678,7 +3688,7 @@ normally restart a suspended
 job, if there were only one suspended
 job whose name began with the string
 .Ql ex .
-It is also possible to say
+It is also possible to type
 .Ql %? Ns Ar string
 to specify a job whose text contains
 .Ar string ,
@@ -3740,7 +3750,7 @@ single process so that its status changes will be immediately reported.
 By
 default
 .Ic notify
-marks the current process; simply say
+marks the current process; simply enter
 .Ql notify
 after
 starting a background job to mark it.
@@ -3852,7 +3862,11 @@ When using the system's NLS, the
 .Xr setlocale 3
 function is called
 to determine appropriate character code/classification and sorting
-(e.g., a 'en_CA.UTF-8' would yield "UTF-8" as a character code).
+(e.g.,
+.Sq en_CA.UTF-8
+would yield
+.Sq UTF-8
+as the character code).
 This function typically examines the
 .Ev LANG
 and
@@ -4113,6 +4127,7 @@ The second form assigns the value of
 .Ar expr
 to
 .Ar name .
+.Pp
 The third form assigns the value of
 .Ar expr
 to the
@@ -4233,42 +4248,25 @@ as described under
 .It Ic bindkey Oo Fl l Ns | Ns Fl d Ns | Ns Fl e Ns | Ns Fl v Ns | Ns Fl u Oc No (+)
 .It Ic bindkey Oo Fl a Oc Oo Fl b Oc Oo Fl k Oc Oo Fl r Oc Oo Fl \- Oc Ar key No (+)
 .It Ic bindkey Oo Fl a Oc Oo Fl b Oc Oo Fl k Oc Oo Fl c Ns | Ns Fl s Oc Oo Fl \- Oc Ar key command No (+)
-Without options, the first form lists all bound keys and the editor command to which each is bound,
-the second form lists the editor command to which
+The first form either lists all bound keys and the editor
+command to which each is bound,
+lists a description of the commands,
+or binds all keys to a specific mode.
+.Pp
+The second form lists the editor command to which
 .Ar key
-is bound and
-the third form binds the editor command
+is bound.
+.Pp
+The third form binds the editor command
 .Ar command
 to
 .Ar key .
-Options include:
+.Pp
+Supported
+.Ic bindkey
+options:
 .Pp
 .Bl -tag -width 5n -offset indent -compact
-.
-.It Fl l
-Lists all editor commands and a short description of each.
-.
-.It Fl d
-Binds all keys to the standard bindings for the default editor,
-as per
-.Fl e
-and
-.Fl v
-below.
-.
-.It Fl e
-Binds all keys to
-.Xr emacs 1 Ns
-\-style bindings.
-Unsets
-.Ic vimode .
-.
-.It Fl v
-Binds all keys to
-.Xr vi 1 Ns
-\-style bindings.
-Sets
-.Ic vimode .
 .
 .It Fl a
 Lists or changes key-bindings in the alternative key map.
@@ -4300,6 +4298,25 @@ or an extended prefix key written
 (e.g.,
 .Sq X-A ) .
 .
+.It Fl c
+.Ar command
+is interpreted as a builtin or external command instead of an
+editor command.
+.
+.It Fl d
+Binds all keys to the standard bindings for the default editor,
+as per
+.Fl e
+and
+.Fl v .
+.
+.It Fl e
+Binds all keys to
+.Xr emacs 1 Ns
+\-style bindings.
+Unsets
+.Ic vimode .
+.
 .It Fl k
 .Ar key
 is interpreted as a symbolic arrow key name, which may be one of
@@ -4308,6 +4325,9 @@ is interpreted as a symbolic arrow key name, which may be one of
 .Sq left ,
 or
 .Sq right .
+.
+.It Fl l
+Lists all editor commands and a short description of each.
 .
 .It Fl r
 Removes
@@ -4325,11 +4345,6 @@ to
 .Ar key
 completely.
 .
-.It Fl c
-.Ar command
-is interpreted as a builtin or external command instead of an
-editor command.
-.
 .It Fl s
 .Ar command
 is taken as a literal string and treated as terminal input when
@@ -4340,15 +4355,22 @@ Bound keys in
 are themselves
 reinterpreted, and this continues for ten levels of interpretation.
 .
+.It Fl u No (or any invalid option)
+Prints a usage message.
+.
+.It Fl v
+Binds all keys to
+.Xr vi 1 Ns
+\-style bindings.
+Sets
+.Ic vimode .
+.
 .It Fl \-
 Forces a break from option processing, so the next word is taken as
 .Ar key
 even if it begins with
 .Ql \- .
 .
-.It Fl u
-(or any invalid option).
-Prints a usage message.
 .El
 .Pp
 .Ar key
@@ -4381,24 +4403,24 @@ as follows:
 .Bl -tag -width 5n -offset indent -compact
 .
 .It Li \ea
-Bell
+Bell.
 .It Li \eb
-Backspace
+Backspace.
 .It Li \ee
-Escape
+Escape.
 .It Li \ef
-Form feed
+Form feed.
 .It Li \en
-Newline
+Newline.
 .It Li \er
-Carriage return
+Carriage return.
 .It Li \et
-Horizontal tab
+Horizontal tab.
 .It Li \ev
-Vertical tab
+Vertical tab.
 .It Li \e Ns Ar nnn
 The ASCII character corresponding to the octal number
-.Ar nnn
+.Ar nnn .
 .El
 .Pp
 .Ql \e
@@ -4623,65 +4645,65 @@ the list of possible completions, may be one of the following:
 .Bl -tag -width 5n -offset indent -compact
 .
 .It Li a
-Aliases
+Aliases.
 .
 .It Li b
-Bindings (editor commands)
+Bindings (editor commands).
 .
 .It Li c
-Commands (builtin or external commands)
+Commands (builtin or external commands).
 .
 .It Li C
-External commands which begin with the supplied path prefix
+External commands which begin with the supplied path prefix.
 .
 .It Li d
-Directories
+Directories.
 .
 .It Li D
-Directories which begin with the supplied path prefix
+Directories which begin with the supplied path prefix.
 .
 .It Li e
-Environment variables
+Environment variables.
 .
 .It Li f
-Filenames
+Filenames.
 .
 .It Li F
-Filenames which begin with the supplied path prefix
+Filenames which begin with the supplied path prefix.
 .
 .It Li g
-Groupnames
+Groupnames.
 .
 .It Li j
-Jobs
+Jobs.
 .
 .It Li l
-Limits
+Limits.
 .
 .It Li n
-Nothing
+Nothing.
 .
 .It Li s
-Shell variables
+Shell variables.
 .
 .It Li S
-Signals
+Signals.
 .
 .It Li t
 Plain
 .Dq ( text )
-files
+files.
 .
 .It Li T
 Plain
 .Dq ( text )
-files which begin with the supplied path prefix
+files which begin with the supplied path prefix.
 .
 .It Li v
-Any variables
+Any variables.
 .
 .It Li u
-Usernames
+Usernames.
 .
 .It Li x
 Like
@@ -4693,17 +4715,17 @@ when
 is used.
 .
 .It Li X
-Completions
+Completions.
 .
 .It Li $ Ns Ar var
 Words from the variable
-.Ar var
+.Ar var .
 .
 .It Li (...)
-Words from the given list
+Words from the given list.
 .
 .It Li \`...\`
-Words from the output of command
+Words from the output of command.
 .El
 .Pp
 .Ar select
@@ -4716,7 +4738,14 @@ are considered
 and the
 .Ic fignore
 shell variable is ignored.
-The last three types of completion may not have a
+The
+.Ar list
+types
+.Ql $ Ns Ar var ,
+.Ql (...) ,
+and
+.Ql \`...\`
+may not have a
 .Ar select
 pattern, and
 .Ql x
@@ -5161,7 +5190,7 @@ should be set in
 rather than
 .Pa ~/.login .
 .Pp
-The last form clears the directory stack.
+The third form clears the directory stack.
 .
 .El
 .Bl -tag -width 8n
@@ -5518,7 +5547,7 @@ If
 is set, the first and second forms print and save the literal
 (unexpanded) form of the history list.
 .Pp
-The last form clears the history list.
+The third form clears the history list.
 .
 .El
 .Bl -tag -width 8n
@@ -5647,12 +5676,14 @@ is provided, the process title will be cleared.
 .\" adjacant multi-tag items; add a blank
 .Pp
 .
+.It Ic kill Fl l
 .It Ic kill Xo
 .Op Fl s Ar signal
 .Cm % Ns Ar job Ns | Ns Ar pid No \&...
 .Xc
-.It Ic kill Fl l
-The first form sends the specified
+The first form lists the signal names.
+.Pp
+The second form sends the specified
 .Ar signal
 (or, if none
 is given, the TERM (terminate) signal) to the specified jobs or processes.
@@ -5671,14 +5702,13 @@ stripped of the prefix
 .Sq SIG ) .
 There is no default
 .Ar job ;
-saying just
+entering just
 .Ql kill
 does not send a signal
 to the current job.
 If the signal being sent is TERM (terminate)
 or HUP (hangup), then the job or process is sent a
 CONT (continue) signal as well.
-The second form lists the signal names.
 .
 .El
 .Bl -tag -width 8n
@@ -5711,66 +5741,91 @@ Controllable
 .Ar resource
 types currently include (if supported by the OS):
 .Bl -tag -width 12n -offset indent
+.
 .It Ic cputime
-the maximum number of cpu-seconds to be used by each process
+Maximum number of cpu-seconds to be used by each process.
+.
 .It Ic filesize
-the largest single file which can be created
+Largest single file which can be created.
+.
 .It Ic datasize
-the maximum growth of the data+stack region via
+Maximum growth of the data+stack region via
 .Xr sbrk 2
-beyond the end of the program text
+beyond the end of the program text.
+.
 .It Ic stacksize
-the maximum size of the automatically-extended stack region
+Maximum size of the automatically-extended stack region.
+.
 .It Ic coredumpsize
-the size of the largest core dump that will be created
+Size of the largest core dump that will be created.
+.
 .It Ic memoryuse
-the maximum amount of physical memory a process
-may have allocated to it at a given time
+Maximum amount of physical memory a process
+may have allocated to it at a given time.
+.
 .It Ic vmemoryuse
-the maximum amount of virtual memory a process
-may have allocated to it at a given time (address space)
+Maximum amount of virtual memory a process
+may have allocated to it at a given time (address space).
+.
 .It Ic heapsize
-the maximum amount of memory a process
+Maximum amount of memory a process
 may allocate per
 .Xr brk 2
-system call
+system call.
+.
 .It Ic descriptors No or Ic openfiles
-the maximum number of open files for this process
+Maximum number of open files for this process.
+.
 .It Ic pseudoterminals
-the maximum number of pseudo-terminals for this user
+Maximum number of pseudo-terminals for this user.
+.
 .It Ic kqueues
-the maximum number of kqueues allocated for this process
+Maximum number of kqueues allocated for this process.
+.
 .It Ic concurrency
-the maximum number of threads for this process
+Maximum number of threads for this process.
+.
 .It Ic memorylocked
-the maximum size which a process may lock into memory using
-.Xr mlock 2
+Maximum size which a process may lock into memory using
+.Xr mlock 2 .
+.
 .It Ic maxproc
-the maximum number of simultaneous processes for this user id
+Maximum number of simultaneous processes for this user id.
+.
 .It Ic maxthread
-the maximum number of simultaneous threads (lightweight processes) for this
-user id
+Maximum number of simultaneous threads (lightweight processes) for this
+user id.
+.
 .It Ic threads
-the maximum number of threads for this process
+Maximum number of threads for this process.
+.
 .It Ic sbsize
-the maximum size of socket buffer usage for this user
+Maximum size of socket buffer usage for this user.
+.
 .It Ic swapsize
-the maximum amount of swap space reserved or used for this user
+Maximum amount of swap space reserved or used for this user.
+.
 .It Ic maxlocks
-the maximum number of locks for this user
+Maximum number of locks for this user.
+.
 .It Ic posixlocks
-the maximum number of POSIX advisory locks for this user
+Maximum number of POSIX advisory locks for this user.
+.
 .It Ic maxsignal
-the maximum number of pending signals for this user
+Maximum number of pending signals for this user.
+.
 .It Ic maxmessage
-the maximum number of bytes in POSIX mqueues for this user
+Maximum number of bytes in POSIX mqueues for this user.
+.
 .It Ic maxnice
-the maximum nice priority the user is allowed to raise mapped from [19...-20]
-to [0...39] for this user
+Maximum nice priority the user is allowed to raise mapped from [19...-20]
+to [0...39] for this user.
+.
 .It Ic maxrtprio
-the maximum realtime priority for this user
+Maximum realtime priority for this user.
+.
 .It Ic maxrttime
-the timeout for RT tasks in microseconds for this user
+Timeout for RT tasks in microseconds for this user.
 .El
 .Pp
 .Ar maximum-use
@@ -5856,23 +5911,23 @@ special file in the listing with a special character:
 .Pp
 .Bl -tag -width 5n -offset indent -compact
 .It Li /
-Directory
+Directory.
 .It Li *
-Executable
+Executable.
 .It Li #
-Block device
+Block device.
 .It Li %
-Character device
+Character device.
 .It Li |
-Named pipe (systems with named pipes only)
+Named pipe (systems with named pipes only).
 .It Li =
-Socket (systems with sockets only)
+Socket (systems with sockets only).
 .It Li @
-Symbolic link (systems with symbolic links only)
+Symbolic link (systems with symbolic links only).
 .It Li +
-Hidden directory (AIX only) or context dependent (HP/UX only)
+Hidden directory (AIX only) or context dependent (HP/UX only).
 .It Li :
-Network special (HP/UX only)
+Network special (HP/UX only).
 .El
 .Pp
 If the
@@ -5882,11 +5937,11 @@ in more detail (on only systems that have them, of course):
 .Pp
 .Bl -tag -width 5n -offset indent -compact
 .It Li @
-Symbolic link to a non-directory
+Symbolic link to a non-directory.
 .It Li >
-Symbolic link to a directory
+Symbolic link to a directory.
 .It Li &
-Symbolic link to nowhere
+Symbolic link to nowhere.
 .El
 .Pp
 .Ic listlinks
@@ -5954,6 +6009,8 @@ environment variable.
 .It Ic migrate Fl Ar site No (+)
 The first form migrates the process or job to the site specified or the
 default site determined by the system path.
+(TCF only)
+.Pp
 The second form is equivalent to
 .Ql migrate \- Ns Ar site Li $$ :
 it migrates the
@@ -6316,17 +6373,21 @@ based on the time of day.
 The first form of the command prints the value of all shell variables.
 Variables which contain more than a single word print as a
 parenthesized word list.
+.Pp
 The second form sets
 .Ar name
 to the null string.
+.Pp
 The third form sets
 .Ar name
 to the single
 .Ar word .
+.Pp
 The fourth form sets
 .Ar name
 to the list of words in
 .Ar wordlist .
+.Pp
 In all cases the value is command and filename expanded.
 If
 .Fl r
@@ -6340,6 +6401,7 @@ are specified, set only unique words keeping their order.
 prefers the first occurrence of a word, and
 .Fl l
 the last.
+.Pp
 The fifth form sets the
 .Ar index Ns
 \&'th component of
@@ -6347,10 +6409,13 @@ The fifth form sets the
 to
 .Ar word ;
 this component must already exist.
+.Pp
 The sixth form lists only the names of all shell variables that are read-only.
+.Pp
 The seventh form makes
 .Ar name
 read-only, whether or not it has a value.
+.Pp
 The eighth form is the same as the third form, but
 make
 .Ar name
@@ -6532,7 +6597,7 @@ as described under
 .Sx Jobs .
 There is no default
 .Ar job ;
-saying just
+entering just
 .Ql stop
 does not stop
 the current job.
@@ -6808,6 +6873,8 @@ through the loop as with
 If set, each of these aliases executes automatically at the indicated time.
 They are all initially undefined.
 .Pp
+Supported special aliases are:
+.Pp
 .Bl -tag -width 8n
 .
 .It Ic beepcmd
@@ -7004,6 +7071,9 @@ converts between the different formats of
 .Ic path
 and
 .Ev PATH .
+.
+.Pp
+Supported special shell variables are:
 .
 .Bl -tag -width 8n
 .
@@ -7290,7 +7360,7 @@ and
 shell variables.
 .
 .It Ic dspmbyte No (+)
-Has an effect iff
+Has an effect only if
 .Ql dspm
 is listed as part of the
 .Ic version
@@ -7404,7 +7474,7 @@ command line option.
 The style of the
 .Ic echo
 builtin.
-May be set to
+May be set to:
 .Pp
 .Bl -tag -width 4n -offset indent -compact
 .It Li bsd
@@ -7814,7 +7884,7 @@ shell variable.
 A list of files and directories to check for incoming mail, optionally
 preceded by a numeric word.
 Before each prompt, if 10 minutes have
-passed since the last check, the shell checks each file and says
+passed since the last check, the shell checks each file and displays
 .Sq You have new mail.
 (or, if
 .Ic mail
@@ -7881,6 +7951,14 @@ redirections refer to existing
 files, as described in the
 .Sx Input/output
 section.
+If contains
+.Ql ask ,
+an interacive confirmation is presented, rather than an
+error.
+If contains
+.Ql notempty ,
+.Ql >
+is allowed on empty files.
 .
 .It Ic noding
 If set, disable the printing of
@@ -8015,6 +8093,7 @@ prints
 .
 .It Ic prompt
 The string which is printed before reading each command from the terminal.
+.Pp
 .Ic prompt
 may include any of the following formatting sequences (+), which
 are replaced by the given information:
@@ -8575,7 +8654,9 @@ If there is a second word, it is used as a format string for the output
 of the
 .Ic time
 builtin.
+.Pp
 (u) The following sequences may be used in the
+.Ic time
 format string:
 .Pp
 .Bl -tag -width 4n -offset indent -compact
@@ -8722,19 +8803,23 @@ and a comma-separated
 list of options which were set at compile time.
 Options which are set by default in the distribution are noted.
 .Pp
+Supported
+.Ic version
+options include:
+.Pp
 .Bl -tag -width 4n -offset indent -compact
 .
 .It Li 8b
-The shell is eight bit clean; default
+The shell is eight bit clean; default.
 .
 .It Li 7b
-The shell is not eight bit clean
+The shell is not eight bit clean.
 .
 .It Li wide
-The shell is multibyte encoding clean (like UTF-8)
+The shell is multibyte encoding clean (like UTF-8).
 .
 .It Li nls
-The system's NLS is used; default for systems with NLS
+The system's NLS is used; default for systems with NLS.
 .
 .It Li lf
 Login shells execute
@@ -8752,22 +8837,22 @@ and
 .Ql \&.
 is put last in
 .Ic path
-for security; default
+for security; default.
 .
 .It Li nd
 .Ql \&.
 is omitted from
 .Ic path
-for security
+for security.
 .
 .It Li vi
 .Xr vi 1 Ns
 \-style editing is the default rather than
 .Xr emacs 1 Ns
-\-style
+\-style.
 .
 .It Li dtr
-Login shells drop DTR when exiting
+Login shells drop DTR when exiting.
 .
 .It Li bye
 .Ic bye
@@ -8776,37 +8861,37 @@ is a synonym for
 and
 .Ic log
 is an alternate name for
-.Ic watchlog
+.Ic watchlog .
 .
 .It Li al
 .Ic autologout
-is enabled; default
+is enabled; default.
 .
 .It Li kan
 Kanji is used if appropriate according to locale settings,
 unless the
 .Ic nokanji
-shell variable is set
+shell variable is set.
 .
 .It Li sm
 The system's
 .Xr malloc 3
-is used
+is used.
 .
 .It Li hb
 The
 .Ql #!<program> <args>
-convention is emulated when executing shell scripts
+convention is emulated when executing shell scripts.
 .
 .It Li ng
 The
 .Ic newgrp
-builtin is available
+builtin is available.
 .
 .It Li rh
 The shell attempts to set the
 .Ev REMOTEHOST
-environment variable
+environment variable.
 .
 .It Li afs
 The shell verifies your password with the kerberos server if local
@@ -8980,6 +9065,20 @@ Equivalent to the
 .Ic afsuser
 shell variable.
 .
+.It Ev COMMAND_LINE
+Set by
+.Nm
+to the current command line when invoking programs
+for the
+.Ic complete
+.Ar list
+mode
+.Ql \`...\` .
+See
+.Ic complete
+in
+.Sq Builtin commands .
+.
 .It Ev COLUMNS
 The number of columns in the terminal.
 See
@@ -9055,40 +9154,41 @@ file format; a colon-separated list of expressions of the form
 where
 .Li \&" Ns Ar xx Ns Li \&"
 is a two-character variable name.
+.Pp
 The
 variables with their associated defaults are:
 .Pp
 .Bl -column -offset indent "Li XX" "Li XXXXX" 20n
 .
-.It Li no Ta Li 0 Ta Normal (non-filename) text
+.It Li no Ta Li 0 Ta Normal (non-filename) text.
 .
-.It Li fi Ta Li 0 Ta Regular file
+.It Li fi Ta Li 0 Ta Regular file.
 .
-.It Li di Ta Li 01;34 Ta Directory
+.It Li di Ta Li 01;34 Ta Directory.
 .
-.It Li ln Ta Li 01;36 Ta Symbolic link
+.It Li ln Ta Li 01;36 Ta Symbolic link.
 .
-.It Li pi Ta Li 33 Ta Named pipe (FIFO)
+.It Li pi Ta Li 33 Ta Named pipe (FIFO).
 .
-.It Li so Ta Li 01;35 Ta Socket
+.It Li so Ta Li 01;35 Ta Socket.
 .
-.It Li do Ta Li 01;35 Ta Door
+.It Li do Ta Li 01;35 Ta Door.
 .
-.It Li bd Ta Li 01;33 Ta Block device
+.It Li bd Ta Li 01;33 Ta Block device.
 .
-.It Li cd Ta Li 01;32 Ta Character device
+.It Li cd Ta Li 01;32 Ta Character device.
 .
-.It Li ex Ta Li 01;32 Ta Executable file
+.It Li ex Ta Li 01;32 Ta Executable file.
 .
-.It Li mi Ta (none) Ta Missing file (defaults to Li fi Ns )
+.It Li mi Ta (none) Ta Missing file (defaults to Li fi Ns ) .
 .
-.It Li or Ta (none) Ta Orphaned symbolic link (defaults to Li ln Ns )
+.It Li or Ta (none) Ta Orphaned symbolic link (defaults to Li ln Ns ) .
 .
-.It Li lc Ta Li ^[[ Ta Left code
+.It Li lc Ta Li ^[[ Ta Left code.
 .
-.It Li rc Ta Li m Ta Right code
+.It Li rc Ta Li m Ta Right code.
 .
-.It Li ec Ta (none) Ta End code (replaces Li lc Ns + Ns Li no Ns + Ns Li rc Ns )
+.It Li ec Ta (none) Ta End code (replaces Li lc Ns + Ns Li no Ns + Ns Li rc Ns ) .
 .
 .El
 .Pp
@@ -9150,70 +9250,71 @@ compose the type codes (i.e., all except the
 and
 .Ql ec
 codes) from numerical commands separated by semicolons.
+.Pp
 The
 most common commands are:
 .Pp
 .Bl -tag -width 4n -offset indent -compact
 .
 .It Li 0
-to restore default color
+To restore default color.
 .
 .It Li 1
-for brighter colors
+For brighter colors.
 .
 .It Li 4
-for underlined text
+For underlined text.
 .
 .It Li 5
-for flashing text
+For flashing text.
 .
 .It Li 30
-for black foreground
+For black foreground.
 .
 .It Li 31
-for red foreground
+For red foreground.
 .
 .It Li 32
-for green foreground
+For green foreground.
 .
 .It Li 33
-for yellow (or brown) foreground
+For yellow (or brown) foreground.
 .
 .It Li 34
-for blue foreground
+For blue foreground.
 .
 .It Li 35
-for purple foreground
+For purple foreground.
 .
 .It Li 36
-for cyan foreground
+For cyan foreground.
 .
 .It Li 37
-for white (or gray) foreground
+For white (or gray) foreground.
 .
 .It Li 40
-for black background
+For black background.
 .
 .It Li 41
-for red background
+For red background.
 .
 .It Li 42
-for green background
+For green background.
 .
 .It Li 43
-for yellow (or brown) background
+For yellow (or brown) background.
 .
 .It Li 44
-for blue background
+For blue background.
 .
 .It Li 45
-for purple background
+For purple background.
 .
 .It Li 46
-for cyan background
+For cyan background.
 .
 .It Li 47
-for white (or gray) background
+For white (or gray) background.
 .
 .El
 .Pp
@@ -9310,7 +9411,7 @@ environment variable.
 .El
 .
 .Sh FILES
-.Bl -tag -width 16n -compact
+.Bl -tag -width 8n
 .
 .It Pa /etc/csh.cshrc
 Read first by every shell.
@@ -9970,12 +10071,15 @@ New man page and tcsh.man2html
 .It Larry Schwimmer, Stanford University, 1993
 AFS and HESIOD patches
 .
-.It Luke Mewburn, RMIT University, 1994-6
-Enhanced directory printing in prompt,
-added
+.It Luke Mewburn, 1991-
+Enhanced directory printing in prompt.
+Added
 .Ic ellipsis
 and
 .Ic rprompt .
+.Ic vimode
+improvements.
+Manual page improvements.
 .
 .It Edward Hutchins, Silicon Graphics Inc., 1996
 Added implicit cd.
