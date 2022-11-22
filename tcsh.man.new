@@ -3208,36 +3208,25 @@ builtin command (q.v.) has its own separate syntax.
 .
 .Ss "Logical, arithmetical and comparison operators"
 These operators are similar to those of C and have the same precedence.
-They include:
 .Pp
-.Bl -tag -width 6n -offset indent -compact
-.It Li "||  &&  |  ^  &  ==  !=  =~  !~  <=  >="
-.It Li "<  > <<  >>  +  \-  *  /  %  !  ~  (  )"
+The operators, in descending precedence, with equivalent precedence per line, are:
+.Pp
+.Bl -column -offset indent -compact "XX" "XX" "XX" "XX"
+.It Li \&( Ta Li \&)
+.It Li \&~
+.It Li \&!
+.It Li * Ta Li / Ta Li %
+.It Li + Ta Li \-
+.It Li << Ta Li >>
+.It Li <= Ta Li >= Ta Li < Ta Li >
+.It Li == Ta Li \&!= Ta Li =~ Ta Li \&!~
+.It Li &
+.It Li ^
+.It Li |
+.It Li &&
+.It Li ||
 .El
 .Pp
-Here the precedence increases to the right,
-.Ql ==
-.Ql \&!=
-.Ql =~
-and
-.Ql \&!~ ,
-.Ql <=
-.Ql >=
-.Ql <
-and
-.Ql > ,
-.Ql <<
-and
-.Ql >> ,
-.Ql +
-and
-.Ql \- ,
-.Ql *
-.Ql /
-and
-.Ql %
-being, in
-groups, at the same level.
 The
 .Ql ==
 .Ql \&!=
@@ -3273,11 +3262,11 @@ no two components of an expression can appear in the same word; except
 when adjacent to components of expressions which are syntactically
 significant to the parser
 .Po
-.Ql \&&
-.Ql |
-.Ql <
-.Ql >
-.Ql \&(
+.Ql \&& ,
+.Ql | ,
+.Ql < ,
+.Ql > ,
+.Ql \&( ,
 .Ql \&)
 .Pc
 they should be
