@@ -9,7 +9,7 @@ dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 
 AC_PREREQ([2.69])dnl Minimum Autoconf version required.
 dnl UPDATE NEXT LINE FOR RELEASE
-AC_INIT([tcsh],[6.24.01],[https://bugs.astron.com/])
+AC_INIT([tcsh],[6.24.02],[https://bugs.astron.com/])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([tc.vers.c])
 AC_CONFIG_HEADERS([config.h])

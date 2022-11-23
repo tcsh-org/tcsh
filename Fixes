@@ -1,3 +1,5 @@
+  7. V6.24.02 - 20221124
+  6. Complete mdoc-based manual page (Luke Mewburn)
   5. Fix rechist() check for NULL filename (broke when arg was renamed).
 	> cd
 	> rm .history
