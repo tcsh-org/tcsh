@@ -15,6 +15,7 @@ tc.const.h
 tc.defs.c
 tcsh
 tcsh-*.tar.gz
+tcsh-*.tar.gz.asc
 tests/package.m4
 tests/testsuite
 testsuite.dir/**
