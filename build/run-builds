@@ -16,13 +16,17 @@ Dockerfile()
 
     expand <<EOF
 FROM ${os}:${suite}
-ARG  DEBIAN_FRONTEND=noninteractive
-ARG  APT_LISTCHANGES_FRONTEND=none
-RUN  apt-get -qq update\
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG APT_LISTCHANGES_FRONTEND=none
+RUN apt-get -qq update\
  && apt-get -qq install $(list_dependencies)\
  && apt-get -qq clean
-RUN  useradd -U -m builder
-COPY docker-entrypoint /
+
+RUN useradd -U -m builder
+
+COPY --link docker-entrypoint /
+
 USER builder:builder
 
 ENTRYPOINT ["/docker-entrypoint"]
