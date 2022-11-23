@@ -5731,30 +5731,25 @@ Controllable
 types currently include (if supported by the OS):
 .Bl -tag -width 12n -offset indent
 .
+.It Ic concurrency
+Maximum number of threads for this process.
+.
+.It Ic coredumpsize
+Size of the largest core dump that will be created.
+.
 .It Ic cputime
 Maximum number of cpu-seconds to be used by each process.
-.
-.It Ic filesize
-Largest single file which can be created.
 .
 .It Ic datasize
 Maximum growth of the data+stack region via
 .Xr sbrk 2
 beyond the end of the program text.
 .
-.It Ic stacksize
-Maximum size of the automatically-extended stack region.
+.It Ic descriptors No or Ic openfiles
+Maximum number of open files for this process.
 .
-.It Ic coredumpsize
-Size of the largest core dump that will be created.
-.
-.It Ic memoryuse
-Maximum amount of physical memory a process
-may have allocated to it at a given time.
-.
-.It Ic vmemoryuse
-Maximum amount of virtual memory a process
-may have allocated to it at a given time (address space).
+.It Ic filesize
+Largest single file which can be created.
 .
 .It Ic heapsize
 Maximum amount of memory a process
@@ -5762,46 +5757,11 @@ may allocate per
 .Xr brk 2
 system call.
 .
-.It Ic descriptors No or Ic openfiles
-Maximum number of open files for this process.
-.
-.It Ic pseudoterminals
-Maximum number of pseudo-terminals for this user.
-.
 .It Ic kqueues
 Maximum number of kqueues allocated for this process.
 .
-.It Ic concurrency
-Maximum number of threads for this process.
-.
-.It Ic memorylocked
-Maximum size which a process may lock into memory using
-.Xr mlock 2 .
-.
-.It Ic maxproc
-Maximum number of simultaneous processes for this user id.
-.
-.It Ic maxthread
-Maximum number of simultaneous threads (lightweight processes) for this
-user id.
-.
-.It Ic threads
-Maximum number of threads for this process.
-.
-.It Ic sbsize
-Maximum size of socket buffer usage for this user.
-.
-.It Ic swapsize
-Maximum amount of swap space reserved or used for this user.
-.
 .It Ic maxlocks
 Maximum number of locks for this user.
-.
-.It Ic posixlocks
-Maximum number of POSIX advisory locks for this user.
-.
-.It Ic maxsignal
-Maximum number of pending signals for this user.
 .
 .It Ic maxmessage
 Maximum number of bytes in POSIX mqueues for this user.
@@ -5810,11 +5770,52 @@ Maximum number of bytes in POSIX mqueues for this user.
 Maximum nice priority the user is allowed to raise mapped from [19...-20]
 to [0...39] for this user.
 .
+.It Ic maxproc
+Maximum number of simultaneous processes for this user id.
+.
 .It Ic maxrtprio
 Maximum realtime priority for this user.
 .
 .It Ic maxrttime
 Timeout for RT tasks in microseconds for this user.
+.
+.It Ic maxsignal
+Maximum number of pending signals for this user.
+.
+.It Ic maxthread
+Maximum number of simultaneous threads (lightweight processes) for this
+user id.
+.
+.It Ic memorylocked
+Maximum size which a process may lock into memory using
+.Xr mlock 2 .
+.
+.It Ic memoryuse
+Maximum amount of physical memory a process
+may have allocated to it at a given time.
+.
+.It Ic posixlocks
+Maximum number of POSIX advisory locks for this user.
+.
+.It Ic pseudoterminals
+Maximum number of pseudo-terminals for this user.
+.
+.It Ic sbsize
+Maximum size of socket buffer usage for this user.
+.
+.It Ic stacksize
+Maximum size of the automatically-extended stack region.
+.
+.It Ic swapsize
+Maximum amount of swap space reserved or used for this user.
+.
+.It Ic threads
+Maximum number of threads for this process.
+.
+.It Ic vmemoryuse
+Maximum amount of virtual memory a process
+may have allocated to it at a given time (address space).
+.
 .El
 .Pp
 .Ar maximum-use
