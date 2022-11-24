@@ -7,12 +7,23 @@
 
 set -e
 
+LOCAL=tcsh
+
+get_local_suffix()
+{
+    ID="$(sed -n '/^ID="*/ {s///; s/"$//; p;}' /etc/os-release)"
+    VERSION_ID="$(sed -n '/^VERSION_ID="*/ {s///; s/"$//; p;}' /etc/os-release)"
+    echo "~${LOCAL}+${ID}${VERSION_ID}-"
+}
+
 run_build()
 {
     pkg="$(tar -tvzf "${file}" | awk 'NR == 1 {print $NF}')"
     D="$(mktemp -d "${HOME}/build-XXXXXXXXXX")"
     tar -C "${D}" -xzf "${file}"
     cd "${D}/${pkg}"
+    dch -l "$(get_local_suffix)" "Set ${LOCAL} repo version"
+    dch -r ''
     "${@}"
     for deb in "${D}"/*.deb "${D}"/*.ddeb
     do
