@@ -7,6 +7,9 @@
 
 set -eu
 
+DOCKER_BUILDKIT=1
+export DOCKER_BUILDKIT
+
 Dockerfile()
 {
     local os suite
@@ -15,6 +18,8 @@ Dockerfile()
     suite="${2}"
 
     expand <<EOF
+# syntax=docker/dockerfile:1.4
+
 FROM ${os}:${suite}
 
 ARG DEBIAN_FRONTEND=noninteractive
