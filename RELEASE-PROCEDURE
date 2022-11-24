@@ -9,7 +9,7 @@ See TOOLS.md for pre-requisites.
       * tcsh.man (three separate lines)
       * configure.ac (one line, version only)
     - debian/changelog
-	dch -v x.yy.zz-1 'Release x.yy.zz'
+	dch -v x.yy.zz 'Release x.yy.zz'
 	dch -r ''
 2)  Create Announce-x.yy.zz (if necessary)
 3)  Run autoreconf
