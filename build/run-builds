@@ -79,7 +79,7 @@ list_suites()
 
 maybe()
 {
-    if ${noop}
+    if ${noop:-false}
     then
 	echo - "${@}"
     else
@@ -91,7 +91,7 @@ maybe()
 usage()
 {
     cat <<EOF
-Usage:	${PROG} [-hn] [target]
+Usage:	${PROG} [-hnv] [target]
 
 Builds deb/* packages from the src/*.orig.tar.gz files for select
 Debian and Ubuntu releases.
@@ -100,6 +100,7 @@ Options:
 
 -h	Show this usage
 -n	Do not build anything (no-op)
+-v	Show docker build output (verbose)
 EOF
 }
 
@@ -107,13 +108,15 @@ PROG="${0##*/}"
 PDIR="$(dirname $(realpath "${0}"))"
 DEPT="${PDIR}/docker-entrypoint"
 
-noop=false
+noop=
+quiet_build=-q
 
-while getopts hn opt
+while getopts hnv opt
 do
     case "${opt}" in
     h)	usage; exit 0;;
     n)	noop=true;;
+    v)	quiet_build=;;
     *)	usage 1>&2; exit 1;;
     esac
 done
@@ -167,13 +170,13 @@ do
 	dir="$(mktemp -d "${TMPDIR:-/tmp}/${PROG}-img-XXXXXXXXXX")"
 	maybe install "${DEPT}" "${dir}/docker-entypoint"
 	Dockerfile "${os}" "${suite}" \
-	| if ${noop}
+	| if ${noop:-false}
 	then
 	    sed 's/^/> /'
 	else
 	    cat > "${dir}/Dockerfile"
 	fi
-	maybe docker build -q -t "${image}" "${dir}"
+	maybe docker build ${quiet_build} -t "${image}" "${dir}"
 	rm -rf "${dir}"
 
 	pool="deb/${os}/pool/${suite}/main"
