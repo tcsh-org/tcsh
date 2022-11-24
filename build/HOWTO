@@ -1,0 +1,48 @@
+CREATE BUILD MACHINES
+
+    cd ~/src/cloud/terraform/infra/accounts/Development/dev-build
+    terraform apply
+
+COPY TO AMD64 BUILD MACHINE
+
+    While rototilling the build:
+
+	git archive -o tcsh_6.24.02.orig.tar.gz --prefix=tcsh-6.24.02/ HEAD
+	scp -p tcsh_6.24.02.orig.tar.gz amd64-builder:tcsh-build/src/
+
+    When things don't need massaging (note the renaming here):
+
+	scp -p tcsh-6.24.02.tar.gz amd64-builder:tcsh-build/src/tcsh_6.24.02.orig.tar.gz
+
+COPY TO ARM64 BUILD MACHINE
+
+    On amd64-builder:
+
+	cd ~/src/tcsh-build
+	ssh arm64-builder "mkdir -p src"
+	rsync -PaHvSs ./ arm64-builder:src/tcsh-build/
+	ssh arm64-builder "rm -rf tcsh-build/deb/*"
+
+BUILD ON EACH BUILD MACHINE
+
+    cd ~/src/tcsh-build
+    ./run-builds
+
+
+COPY FROM EACH BUILD MACHINE
+
+    rsync -PaHvSs -c amd64-builder:src/tcsh-build/deb/ work/repos/tcsh/
+    rsync -PaHvSs -c arm64-builder:src/tcsh-build/deb/ work/repos/tcsh/
+
+SIGN REPO
+
+    debrepo -t tcsh release
+
+PUBLISH REPO
+
+    debrepo -t tcsh dist
+
+TEAR DOWN BUILD MACHINES
+
+    cd ~/src/cloud/terraform/infra/accounts/Development/dev-build
+    terraform destroy
