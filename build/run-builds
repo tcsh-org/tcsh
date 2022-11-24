@@ -69,8 +69,8 @@ list_suites()
 	echo stretch
 	;;
     ubuntu)
+	echo kinetic
 	echo jammy
-	echo impish
 	echo focal
 	echo bionic
 	;;
