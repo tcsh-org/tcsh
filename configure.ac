@@ -21,13 +21,11 @@ AC_CANONICAL_HOST()
 AM_ICONV()
 
 AC_MSG_CHECKING([cached host tuple])
-if { test x"${ac_cv_host_system_type+set}" = x"set" &&
-     test x"$ac_cv_host_system_type" != x"$host"; }; then
-  AC_MSG_RESULT([different])
-  AC_MSG_ERROR([remove config.cache and re-run configure])
-else
-  AC_MSG_RESULT(ok)
-fi
+AS_IF([{ test x"${ac_cv_host_system_type+set}" = x"set" &&
+         test x"$ac_cv_host_system_type" != x"$host"; }],
+      [AC_MSG_RESULT([different])
+       AC_MSG_ERROR([remove config.cache and re-run configure])],
+      [AC_MSG_RESULT(ok)])
 ac_cv_host_system_type="$host"
 
 
@@ -298,17 +296,14 @@ AC_PROG_GCC_TRADITIONAL()
 AC_PATH_PROG([GENCAT], [gencat]) 
 
 dnl Require build CC to create gethost helper when cross building
-if test "x${cross_compiling}" = xyes ; then
-  CC_FOR_GETHOST="cc"
-else
-  CC_FOR_GETHOST="\$(CC)"
-fi
+AS_IF([test "x${cross_compiling}" = xyes],
+      [CC_FOR_GETHOST="cc"],
+      [CC_FOR_GETHOST="\$(CC)"])
 AC_SUBST(CC_FOR_GETHOST)
 
-if test "x$GCC" != xyes ; then
-  DFLAGS="$DFLAGS $NON_GNU_DFLAGS"
-  CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
-fi
+AS_IF([test "x$GCC" != xyes],
+      [DFLAGS="$DFLAGS $NON_GNU_DFLAGS"
+       CFLAGS="$CFLAGS $NON_GNU_CFLAGS"])
 
 dnl More recent Android requires PIEs
 case "${host}" in
@@ -416,11 +411,9 @@ AC_CHECK_FUNCS([dup2 getauthid getcwd gethostname getpwent] dnl
         [nl_langinfo sbrk setpgid setpriority strerror strstr sysconf wcwidth])
 AC_FUNC_GETPGRP()
 AC_FUNC_MBRTOWC()
-if test "x${cross_compiling}" != xyes ; then
-  AC_FUNC_SETPGRP()
-else
-  ac_cv_func_setpgrp_void=yes
-fi
+AS_IF([test "x${cross_compiling}" != xyes],
+      [AC_FUNC_SETPGRP()],
+      [ac_cv_func_setpgrp_void=yes])
 AC_FUNC_STRCOLL()
 
 dnl This is not good enough; we need sockaddr_storage too.
@@ -472,36 +465,33 @@ dnl IPv6_CHECK_FUNC(getnameinfo, DFLAGS="$DFLAGS -DINET6")
 AC_SUBST(DFLAGS)
 
 dnl Checks for system services
-if test "$have_setlocale" != no; then
-  AC_ARG_ENABLE([nls], AS_HELP_STRING([--disable-nls], [Disable NLS support]),
-                [], [enable_nls=yes])
-  if test "x$enable_nls" != xno; then
-    AC_DEFINE([NLS], [1], [Support NLS.])
-  fi
-fi
+AS_IF([test "$have_setlocale" != no],
+      [AC_ARG_ENABLE([nls], AS_HELP_STRING([--disable-nls], [Disable NLS support]),
+                     [], [enable_nls=yes])
+       AS_IF([test "x$enable_nls" != xno],
+             [AC_DEFINE([NLS], [1], [Support NLS.])])])
 
-if test "x$enable_nls" != xno -a "$have_catgets" != no -a -n "$GENCAT" ; then
-  AC_ARG_ENABLE([nls-catalogs], AS_HELP_STRING([--disable-nls-catalogs], [Disable NLS catalog support]),
-                [], [enable_nls_catalogs=yes])
-  if test "x$enable_nls_catalogs" != xno; then
-    BUILD_CATALOGS="yes"
-    AC_DEFINE([NLS_CATALOGS], [1], [Support NLS catalogs.])
-  fi
-fi
+AS_IF([{ test "x$enable_nls" != xno &&
+         test "$have_catgets" != no &&
+         test -n "$GENCAT"; }],
+      [AC_ARG_ENABLE([nls-catalogs],
+                     AS_HELP_STRING([--disable-nls-catalogs], [Disable NLS catalog support]),
+                     [], [enable_nls_catalogs=yes])
+       AS_IF([test "x$enable_nls_catalogs" != xno],
+             [BUILD_CATALOGS="yes"
+              AC_DEFINE([NLS_CATALOGS], [1], [Support NLS catalogs.])])])
 
 AC_ARG_WITH(hesiod,
   [  --with-hesiod=PREFIX    Use Hesiod lookup for ~ expansion],
   [hesiod="$withval"], [hesiod=no])
-if test "$hesiod" != no; then
-  HESLIB="-lhesiod"
-  AC_CHECK_FUNC(res_send, :,
-    AC_CHECK_LIB(resolv, res_send, HESLIB="$HESLIB -lresolv"))
-  HESDEF=-DHESIOD
-  if test "$hesiod" != yes; then
-    HESDEF="$HESDEF -I$hesiod/include"
-    HESLIB="-L$hesiod/lib $HESLIB"
-  fi
-fi
+AS_IF([test "$hesiod" != no],
+      [HESLIB="-lhesiod"
+       AC_CHECK_FUNC(res_send, :,
+         AC_CHECK_LIB(resolv, res_send, HESLIB="$HESLIB -lresolv"))
+       HESDEF=-DHESIOD
+       AS_IF([test "$hesiod" != yes],
+             [HESDEF="$HESDEF -I$hesiod/include"
+              HESLIB="-L$hesiod/lib $HESLIB"])])
 AC_SUBST(HESDEF)
 AC_SUBST(HESLIB)
 AC_SUBST(BUILD_CATALOGS)
