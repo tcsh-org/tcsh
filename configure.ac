@@ -416,6 +416,19 @@ AS_IF([test "x${cross_compiling}" != xyes],
       [ac_cv_func_setpgrp_void=yes])
 AC_FUNC_STRCOLL()
 
+AS_IF([test x"$ac_cv_func_sbrk" = x"yes"],
+     [AC_MSG_CHECKING([for working sbrk])
+      AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+#include <unistd.h>
+]], [[
+return sbrk(2048) == (void*)-1;
+]])],
+                    [AC_MSG_RESULT([yes])
+                     AC_DEFINE([HAVE_WORKING_SBRK], [1], [Define to 1 if sbrk(N) works.])],
+                    [AC_MSG_RESULT([no; use system malloc])],
+                    [AC_MSG_RESULT([unknown - cross compiling])])],
+     [AC_MSG_NOTICE([sbrk not present; use system malloc])])
+
 dnl This is not good enough; we need sockaddr_storage too.
 dnl See whether we can use IPv6 related functions
 dnl AC_DEFUN([IPv6_CHECK_FUNC], [
