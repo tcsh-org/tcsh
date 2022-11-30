@@ -1,6 +1,6 @@
 dnl Autoconf script for tcsh
 dnl To rebuild the `configure' script from this, execute the command
-dnl 	autoconf
+dnl     autoreconf
 dnl in the directory containing this script.
 dnl
 dnl You'll also need a version of config.guess from a gnu package
@@ -15,19 +15,17 @@ AC_CONFIG_SRCDIR([tc.vers.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_TESTDIR([.], [.])
 
-AC_PROG_INSTALL
-AC_CANONICAL_HOST
+AC_PROG_INSTALL()
+AC_CANONICAL_HOST()
 
-AM_ICONV
+AM_ICONV()
 
 AC_MSG_CHECKING([cached host tuple])
-if { test x"${ac_cv_host_system_type+set}" = x"set" &&
-     test x"$ac_cv_host_system_type" != x"$host"; }; then
-  AC_MSG_RESULT([different])
-  AC_MSG_ERROR([remove config.cache and re-run configure])
-else
-  AC_MSG_RESULT(ok)
-fi
+AS_IF([{ test x"${ac_cv_host_system_type+set}" = x"set" &&
+         test x"$ac_cv_host_system_type" != x"$host"; }],
+      [AC_MSG_RESULT([different])
+       AC_MSG_ERROR([remove config.cache and re-run configure])],
+      [AC_MSG_RESULT(ok)])
 ac_cv_host_system_type="$host"
 
 
@@ -167,7 +165,7 @@ case "${host}" in
         LIBS='-lbsd'
       ;;
       irix6.[2-9]*) # Irix 6.2 and later
-	tcsh_config_file=irix62
+        tcsh_config_file=irix62
       ;;
     esac
   ;;
@@ -280,32 +278,31 @@ Check tcsh's `Ported' file for manual configuration instructions.])
 
 esac
 
-echo "Tcsh will use configuration file \`$tcsh_config_file'."
 changequote([, ])dnl
+
+AC_MSG_NOTICE([using configuration file `$tcsh_config_file'])
 cp ${srcdir}/config/${tcsh_config_file} config_p.h
+
 AH_BOTTOM(
 [#include "config_p.h"
 #include "config_f.h"])
 
 dnl Checks for programs
-AC_PROG_CC
-AC_PROG_CPP
-AC_PROG_GCC_TRADITIONAL
+AC_PROG_CC()
+AC_PROG_CPP()
+AC_PROG_GCC_TRADITIONAL()
 
 AC_PATH_PROG([GENCAT], [gencat]) 
 
 dnl Require build CC to create gethost helper when cross building
-if test "x${cross_compiling}" = xyes ; then
-  CC_FOR_GETHOST="cc"
-else
-  CC_FOR_GETHOST="\$(CC)"
-fi
+AS_IF([test "x${cross_compiling}" = xyes],
+      [CC_FOR_GETHOST="cc"],
+      [CC_FOR_GETHOST="\$(CC)"])
 AC_SUBST(CC_FOR_GETHOST)
 
-if test "x$GCC" != xyes ; then
-  DFLAGS="$DFLAGS $NON_GNU_DFLAGS"
-  CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
-fi
+AS_IF([test "x$GCC" != xyes],
+      [DFLAGS="$DFLAGS $NON_GNU_DFLAGS"
+       CFLAGS="$CFLAGS $NON_GNU_CFLAGS"])
 
 dnl More recent Android requires PIEs
 case "${host}" in
@@ -327,46 +324,45 @@ AC_SEARCH_LIBS(catgets, catgets)
 
 dnl Checks for header files
 AC_CHECK_HEADERS([auth.h crypt.h features.h inttypes.h paths.h] dnl
-		 [shadow.h stdint.h utmp.h utmpx.h])
+                 [shadow.h stdint.h utmp.h utmpx.h])
 AC_CHECK_HEADERS([wchar.h],
-	[AC_CHECK_SIZEOF([wchar_t], [], [dnl
+        [AC_CHECK_SIZEOF([wchar_t], [], [dnl
 #include <stdio.h>
-#include <wchar.h>])
-	AC_CHECK_HEADERS([wctype.h])])
-AC_HEADER_DIRENT
-AC_HEADER_STAT
+#include <wchar.h>
+])
+         AC_CHECK_HEADERS([wctype.h])])
+AC_HEADER_DIRENT()
+AC_HEADER_STAT()
 
 dnl Checks for types
 AC_CHECK_TYPES([long long])
-AC_TYPE_GETGROUPS
-AC_TYPE_MODE_T
-AC_TYPE_SIZE_T
-AC_TYPE_UID_T
-AC_TYPE_UINT32_T
+AC_TYPE_GETGROUPS()
+AC_TYPE_MODE_T()
+AC_TYPE_SIZE_T()
+AC_TYPE_UID_T()
+AC_TYPE_UINT32_T()
 
 AC_DEFUN([AC_TYPE_SSIZE_T], [
 AC_CHECK_TYPE(ssize_t,,
-AC_DEFINE(ssize_t, int, [Define to `int' not defined in <sys/types.h>.]),
-[
+AC_DEFINE(ssize_t, int, [Define to `int' not defined in <sys/types.h>.]), [dnl
 #include <sys/types.h>
 ])
 ])
-AC_TYPE_SSIZE_T
+AC_TYPE_SSIZE_T()
 
 AC_DEFUN([AC_TYPE_SOCKLEN_T], [
 AC_CHECK_TYPE(socklen_t,,
-AC_DEFINE(socklen_t, int, [Define to `int' if neither <sys/types.h> nor <sys/socket.h> define.]),
-[
+AC_DEFINE(socklen_t, int, [Define to `int' if neither <sys/types.h> nor <sys/socket.h> define.]), [dnl
 #include <sys/types.h>
 #include <sys/socket.h>
 ])
 ])
-AC_TYPE_SOCKLEN_T
+AC_TYPE_SOCKLEN_T()
 
 
 dnl Checks for structures
-AC_CHECK_MEMBERS([struct dirent.d_ino], , ,
-[#ifdef HAVE_DIRENT_H
+AC_CHECK_MEMBERS([struct dirent.d_ino], , , [dnl
+#ifdef HAVE_DIRENT_H
 # include <dirent.h>
 #else
 # ifdef HAVE_NDIR_H
@@ -375,29 +371,32 @@ AC_CHECK_MEMBERS([struct dirent.d_ino], , ,
 #  include <sys/dir.h>
 # endif
 # define dirent direct
-#endif])
+#endif
+])
 AC_CHECK_MEMBERS([struct utmp.ut_host, struct utmp.ut_user, struct utmp.ut_tv,
-		  struct utmp.ut_xtime, struct utmpx.ut_host,
-		  struct utmpx.ut_user, struct utmpx.ut_tv,
-		  struct utmpx.ut_xtime], , ,
-[#include <sys/types.h>
+                  struct utmp.ut_xtime, struct utmpx.ut_host,
+                  struct utmpx.ut_user, struct utmpx.ut_tv,
+                  struct utmpx.ut_xtime], , , [dnl
+#include <sys/types.h>
 #ifdef HAVE_UTMPX_H
 #include <utmpx.h>
 #define utmp utmpx
 #elif defined HAVE_UTMP_H
 #include <utmp.h>
-#endif])
-AC_CHECK_MEMBERS([struct sockaddr_storage.ss_family], , ,
-[#include <sys/types.h>
-#include <sys/socket.h>])
+#endif
+])
+AC_CHECK_MEMBERS([struct sockaddr_storage.ss_family], , , [dnl
+#include <sys/types.h>
+#include <sys/socket.h>
+])
 
 dnl Checks for compiler characteristics
-AC_C_CONST
-AC_C_VOLATILE
+AC_C_CONST()
+AC_C_VOLATILE()
 
 dnl checks for library functions
-AC_CHECK_DECLS([crypt, environ, gethostname, getpgrp], , ,
-[#include "config_p.h"
+AC_CHECK_DECLS([crypt, environ, gethostname, getpgrp], , , [dnl
+#include "config_p.h"
 AC_INCLUDES_DEFAULT([])
 #ifdef HAVE_CRYPT_H
 #include <crypt.h>
@@ -406,17 +405,28 @@ AC_INCLUDES_DEFAULT([])
 AC_CHECK_FUNC([setlocale], [have_setlocale=yes], [have_setlocale=no])
 AC_CHECK_FUNC([catgets], [have_catgets=yes], [have_catgets=no])
 AC_CHECK_FUNCS([dup2 getauthid getcwd gethostname getpwent] dnl
-	[getutent getutxent mallinfo mallinfo2 mblen memmove memset] dnl
-	[mkstemp nice setproctitle] dnl
-	[nl_langinfo sbrk setpgid setpriority strerror strstr sysconf wcwidth])
-AC_FUNC_GETPGRP
-AC_FUNC_MBRTOWC
-if test "x${cross_compiling}" != xyes ; then
-  AC_FUNC_SETPGRP
-else
-  ac_cv_func_setpgrp_void=yes
-fi
-AC_FUNC_STRCOLL
+        [getutent getutxent mallinfo mallinfo2 mblen memmove memset] dnl
+        [mkstemp nice setproctitle] dnl
+        [nl_langinfo sbrk setpgid setpriority strerror strstr sysconf wcwidth])
+AC_FUNC_GETPGRP()
+AC_FUNC_MBRTOWC()
+AS_IF([test "x${cross_compiling}" != xyes],
+      [AC_FUNC_SETPGRP()],
+      [ac_cv_func_setpgrp_void=yes])
+AC_FUNC_STRCOLL()
+
+AS_IF([test x"$ac_cv_func_sbrk" = x"yes"],
+     [AC_MSG_CHECKING([for working sbrk])
+      AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+#include <unistd.h>
+]], [[
+return sbrk(2048) == (void*)-1;
+]])],
+                    [AC_MSG_RESULT([yes])
+                     AC_DEFINE([HAVE_WORKING_SBRK], [1], [Define to 1 if sbrk(N) works.])],
+                    [AC_MSG_RESULT([no; use system malloc])],
+                    [AC_MSG_RESULT([unknown - cross compiling])])],
+     [AC_MSG_NOTICE([sbrk not present; use system malloc])])
 
 dnl This is not good enough; we need sockaddr_storage too.
 dnl See whether we can use IPv6 related functions
@@ -432,7 +442,7 @@ dnl   AC_MSG_CHECKING([whether your system has IPv6 directory])
 dnl   AC_CACHE_VAL(ipv6_cv_dir, [dnl
 dnl     for ipv6_cv_dir in /usr/local/v6 /usr/inet6 no; do
 dnl       if test $ipv6_cv_dir = no -o -d $ipv6_cv_dir; then
-dnl 	break
+dnl     break
 dnl       fi
 dnl     done])dnl
 dnl   AC_MSG_RESULT($ipv6_cv_dir)
@@ -447,8 +457,8 @@ dnl     fi
 dnl     AC_CHECK_LIB(inet6, $1, [dnl
 dnl       AC_DEFINE_UNQUOTED($ac_tr_lib)
 dnl       if test $ipv6_libinet6 = no; then
-dnl 	ipv6_libinet6=yes
-dnl 	LIBS="$LIBS -linet6"
+dnl     ipv6_libinet6=yes
+dnl     LIBS="$LIBS -linet6"
 dnl       fi],)dnl
 dnl     if test $ipv6_libinet6 = no; then
 dnl       LDFLAGS="$SAVELDFLAGS"
@@ -467,39 +477,36 @@ dnl IPv6_CHECK_FUNC(getnameinfo, DFLAGS="$DFLAGS -DINET6")
 AC_SUBST(DFLAGS)
 
 dnl Checks for system services
-if test "$have_setlocale" != no; then
-  AC_ARG_ENABLE([nls], AS_HELP_STRING([--disable-nls], [Disable NLS support]),
-	        [], [enable_nls=yes])
-  if test "x$enable_nls" != xno; then
-    AC_DEFINE([NLS], [1], [Support NLS.])
-  fi
-fi
+AS_IF([test "$have_setlocale" != no],
+      [AC_ARG_ENABLE([nls], AS_HELP_STRING([--disable-nls], [Disable NLS support]),
+                     [], [enable_nls=yes])
+       AS_IF([test "x$enable_nls" != xno],
+             [AC_DEFINE([NLS], [1], [Support NLS.])])])
 
-if test "x$enable_nls" != xno -a "$have_catgets" != no -a -n "$GENCAT" ; then
-  AC_ARG_ENABLE([nls-catalogs], AS_HELP_STRING([--disable-nls-catalogs], [Disable NLS catalog support]),
-	        [], [enable_nls_catalogs=yes])
-  if test "x$enable_nls_catalogs" != xno; then
-    BUILD_CATALOGS="yes"
-    AC_DEFINE([NLS_CATALOGS], [1], [Support NLS catalogs.])
-  fi
-fi
+AS_IF([{ test "x$enable_nls" != xno &&
+         test "$have_catgets" != no &&
+         test -n "$GENCAT"; }],
+      [AC_ARG_ENABLE([nls-catalogs],
+                     AS_HELP_STRING([--disable-nls-catalogs], [Disable NLS catalog support]),
+                     [], [enable_nls_catalogs=yes])
+       AS_IF([test "x$enable_nls_catalogs" != xno],
+             [BUILD_CATALOGS="yes"
+              AC_DEFINE([NLS_CATALOGS], [1], [Support NLS catalogs.])])])
 
 AC_ARG_WITH(hesiod,
   [  --with-hesiod=PREFIX    Use Hesiod lookup for ~ expansion],
   [hesiod="$withval"], [hesiod=no])
-if test "$hesiod" != no; then
-  HESLIB="-lhesiod"
-  AC_CHECK_FUNC(res_send, :,
-    AC_CHECK_LIB(resolv, res_send, HESLIB="$HESLIB -lresolv"))
-  HESDEF=-DHESIOD
-  if test "$hesiod" != yes; then
-    HESDEF="$HESDEF -I$hesiod/include"
-    HESLIB="-L$hesiod/lib $HESLIB"
-  fi
-fi
+AS_IF([test "$hesiod" != no],
+      [HESLIB="-lhesiod"
+       AC_CHECK_FUNC(res_send, :,
+         AC_CHECK_LIB(resolv, res_send, HESLIB="$HESLIB -lresolv"))
+       HESDEF=-DHESIOD
+       AS_IF([test "$hesiod" != yes],
+             [HESDEF="$HESDEF -I$hesiod/include"
+              HESLIB="-L$hesiod/lib $HESLIB"])])
 AC_SUBST(HESDEF)
 AC_SUBST(HESLIB)
 AC_SUBST(BUILD_CATALOGS)
 
 AC_CONFIG_FILES([Makefile nls/Makefile])
-AC_OUTPUT
+AC_OUTPUT()
