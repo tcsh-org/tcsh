@@ -1,5 +1,5 @@
 dnl Autoconf script for tcsh
-dnl To rebuild the 'configure' script from this, execute the command
+dnl To rebuild the `configure' script from this, execute the command
 dnl     autoreconf
 dnl in the directory containing this script.
 dnl
@@ -271,8 +271,8 @@ case "${host}" in
   * )
   changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name
-for '${host}' systems.
-Check tcsh's 'Ported' file for manual configuration instructions.])
+for `${host}' systems.
+Check tcsh's `Ported' file for manual configuration instructions.])
   changequote(, )dnl
   ;;
 
@@ -280,13 +280,12 @@ esac
 
 changequote([, ])dnl
 
-AC_MSG_NOTICE([using configuration file '$tcsh_config_file'])
+AC_MSG_NOTICE([using configuration file `$tcsh_config_file'])
 cp ${srcdir}/config/${tcsh_config_file} config_p.h
 
-AH_BOTTOM([
-#include "config_p.h"
-#include "config_f.h"
-])
+AH_BOTTOM(
+[#include "config_p.h"
+#include "config_f.h"])
 
 dnl Checks for programs
 AC_PROG_CC()
@@ -345,7 +344,7 @@ AC_TYPE_UINT32_T()
 
 AC_DEFUN([AC_TYPE_SSIZE_T], [
 AC_CHECK_TYPE(ssize_t,,
-AC_DEFINE(ssize_t, int, [Define to 'int' not defined in <sys/types.h>.]), [dnl
+AC_DEFINE(ssize_t, int, [Define to `int' not defined in <sys/types.h>.]), [dnl
 #include <sys/types.h>
 ])
 ])
@@ -353,7 +352,7 @@ AC_TYPE_SSIZE_T()
 
 AC_DEFUN([AC_TYPE_SOCKLEN_T], [
 AC_CHECK_TYPE(socklen_t,,
-AC_DEFINE(socklen_t, int, [Define to 'int' if neither <sys/types.h> nor <sys/socket.h> define.]), [dnl
+AC_DEFINE(socklen_t, int, [Define to `int' if neither <sys/types.h> nor <sys/socket.h> define.]), [dnl
 #include <sys/types.h>
 #include <sys/socket.h>
 ])
