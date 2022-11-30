@@ -204,6 +204,9 @@
 /* Define to 1 if you have the `wcwidth' function. */
 #undef HAVE_WCWIDTH
 
+/* Define to 1 if sbrk(N) works. */
+#undef HAVE_WORKING_SBRK
+
 /* Define as const if the declaration of iconv() needs const. */
 #undef ICONV_CONST
 
