@@ -629,6 +629,27 @@ parse_hex_range(const Char **cp, size_t l)
 #endif
 }
 
+static int
+okcontrol(Char c)
+{
+    return c && (isalpha(c & CHAR) || strchr("@^_?\\|[{]}", c));
+}
+
+static Char
+handlecontrol(Char c)
+{
+    Char o;
+#ifdef IS_ASCII
+    o = (c == '?') ? CTL_ESC('\177') : (c & 0237);
+#else
+    o = (c == '?') ? CTL_ESC('\177') : _toebcdic[_toascii[c] & 0237];
+    if (adrof(STRwarnebcdic))
+	xprintf(/*CGETS(9, 9, no NLS-String yet!*/
+	    "Warning: Control character %s%c may be interpreted differently in EBCDIC.\n", "\\c", c /*)*/);
+#endif
+    return o;
+}
+
 /*
  * The e parameter is false when we are doing echo and true when we are
  * using it to parse other escaped strings. For echo, we don't print errors
@@ -662,6 +683,7 @@ parseescape(const Char **ptr, int e)
 	    if ((*p & CHAR) == '\\') {
 		p++;
 		if ((*p & CHAR) != '\\') {
+out:
 		    *ptr = p;
 		    if (e)
 			xprintf(/*CGETS(9, 9, */
@@ -669,19 +691,19 @@ parseescape(const Char **ptr, int e)
 		    return CHAR_ERR;
 		}
 		c = (*p & CHAR) & 0237;
-	    } else if ((Isalpha(*p & CHAR) || strchr("@^_?\\|[{]}", *p & CHAR))) {
-		/* XXX: Duplicate code from ^ below */
-#ifdef IS_ASCII
-		c = ((*p & CHAR) == '?') ? CTL_ESC('\177') : ((*p & CHAR) & 0237);
-#else
-		c = ((*p & CHAR) == '?') ? CTL_ESC('\177') : _toebcdic[_toascii[*p & CHAR] & 0237];
-		if (adrof(STRwarnebcdic))
-		    xprintf(/*CGETS(9, 9, no NLS-String yet!*/
-			"Warning: Control character %s%c may be interpreted differently in EBCDIC.\n", "\\c", *p & CHAR /*)*/);
-#endif
+	    } else if (okcontrol(*p & CHAR)) {
+		c = handlecontrol(*p & CHAR);
 	    } else { /* backward compat */
-		c = '\\';
-		p -= 2;
+		/*
+		 * we allow a plain \c to mean no more output for echo,
+		 * (e is FALSE) and return CHAR_EOF, but we require a
+		 * control character for the rest of the cases.
+		 */
+		if (e)
+			goto out;
+		/* point to the last character */
+		*ptr = p - 1;
+		return CHAR_EOF;
 	    }
 	    break;
 	case 'e':
@@ -784,17 +806,9 @@ parseescape(const Char **ptr, int e)
 	    break;
 	}
     }
-    else if ((*p & CHAR) == '^' && (Isalpha(p[1] & CHAR) ||
-				    strchr("@^_?\\|[{]}", p[1] & CHAR))) {
+    else if ((*p & CHAR) == '^' && okcontrol(p[1] & CHAR)) {
 	p++;
-#ifdef IS_ASCII
-	c = ((*p & CHAR) == '?') ? CTL_ESC('\177') : ((*p & CHAR) & 0237);
-#else
-	c = ((*p & CHAR) == '?') ? CTL_ESC('\177') : _toebcdic[_toascii[*p & CHAR] & 0237];
-	if (adrof(STRwarnebcdic))
-	    xprintf(/*CGETS(9, 9, no NLS-String yet!*/
-		"Warning: Control character %s%c may be interpreted differently in EBCDIC.\n", "^", *p & CHAR /*)*/);
-#endif
+	c = handlecontrol(*p & CHAR);
     }
     else
 	c = *p & CHAR;

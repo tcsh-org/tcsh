@@ -1248,6 +1248,10 @@ xecho(int sep, Char **v)
 	    if ((echo_style & SYSV_ECHO) != 0 && c == '\\') {
 		if ((c = parseescape(&cp, FALSE)) == CHAR_ERR)
 		    c = '\\';
+		else if (c == CHAR_EOF) {
+		    nonl++;
+		    break;
+		}
 	    }
 	    xputwchar(c | QUOTE);
 	}

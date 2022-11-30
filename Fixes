@@ -1,3 +1,5 @@
+  8. Handle \c in echo properly instead of printing garbage past the
+     end of the string.
   7. V6.24.02 - 20221124
   6. Complete mdoc-based manual page (Luke Mewburn)
   5. Fix rechist() check for NULL filename (broke when arg was renamed).
