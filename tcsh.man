@@ -348,7 +348,7 @@ can have only a
 .Pa ~/.cshrc
 which checks for the existence of the
 .Ic tcsh
-shell variable (q.v.) before using
+shell variable before using
 .Nm Ns
 \-specific commands,
 or can have both a
@@ -583,7 +583,7 @@ to run the
 editor command.
 The shell lists the possible completions using the
 .Ic ls\-F
-builtin (q.v.)
+builtin
 and reprints the prompt and unfinished command line, for example:
 .Bd -literal -offset indent
 > ls /usr/l[^D]
@@ -1064,7 +1064,7 @@ Word boundary behavior modified by
 .It Ic end-of-file No (not bound)
 Signals an end of file, causing the shell to exit unless the
 .Ic ignoreeof
-shell variable (q.v.) is set to prevent this.
+shell variable is set to prevent this.
 See also
 .Ic delete-char-or-list-or-eof .
 .
@@ -1494,7 +1494,7 @@ newline.
 .Pp
 Furthermore, all
 .Sx Substitutions
-(see below) except
+except
 .Sx History substitution
 can be prevented by enclosing the strings (or parts of strings)
 in which they appear with single quotes or by quoting the crucial character(s)
@@ -1531,12 +1531,12 @@ Text inside single or double quotes becomes a single word (or part of one).
 Metacharacters in these strings, including blanks and tabs, do not form
 separate words.
 Only in one special case (see
-.Sx Command substitution
-below) can a double-quoted string yield parts of more than one word;
+.Sx Command substitution )
+can a double-quoted string yield parts of more than one word;
 single-quoted strings never do.
 Backward quotes are special: they signal
-.Sx Command substitution
-(q.v.), which may result in more than one word.
+.Sx Command substitution ,
+which may result in more than one word.
 .Pp
 C-style escape sequences can be used in single quoted strings by
 preceding the leading quote with
@@ -1557,7 +1557,7 @@ to do so if appropriate.
 .Pp
 The
 .Ic backslash_quote
-shell variable (q.v.) can be set to make backslashes
+shell variable can be set to make backslashes
 always quote
 .Ql \e ,
 .Ql \&' ,
@@ -1732,13 +1732,20 @@ Any input
 line which contains a history substitution is printed before it is executed.
 .Pp
 A history substitution may have an
-.Dq event specification ,
+.Dq event specification
+(see
+.Sx History event specification ) ,
 which indicates the event from which words are to be taken, a
-.Dq word designator ,
+.Dq word designator
+(see
+.Sx History word designators ) ,
 which selects particular words from the chosen event, and/or a
-.Dq modifier ,
+.Dq word modifier
+(see
+.Sx History word modifiers ) ,
 which manipulates the selected words.
-.Pp
+.
+.Ss History event specification
 An event specification can be:
 .Pp
 .Bl -tag -width 5n -offset indent -compact
@@ -1797,10 +1804,11 @@ can be abbreviated
 if it is
 followed by
 .Ql \&:
-.Po
-.Ql \&:
-is described below
-.Pc .
+.Ql ( \&:
+is described in
+.Sx History word designators
+and
+.Sx History word modifiers ) .
 .Ql !n
 refers to event 9, which begins with
 .Ql n .
@@ -1849,7 +1857,8 @@ as in
 .Xr csh 1
 type
 .Ql !{3}d .
-.Pp
+.
+.Ss History word designators
 To select words from an event we can follow the event specification by a
 .Ql \&:
 and a designator for the desired words.
@@ -1972,7 +1981,8 @@ example, we could have said simply
 .Ql diff !^.old !^
 or, to get the arguments in the opposite order, just
 .Ql diff !* .
-.Pp
+.
+.Ss History word modifiers
 The word or words in a history reference can be edited, or
 .Dq modified ,
 by following it with one or more modifiers, each preceded by a
@@ -2120,17 +2130,6 @@ correct the spelling of
 for a
 different approach).
 .Pp
-There is a special abbreviation for substitutions.
-.Ql ^ ,
-when it is the first character on an input line, is equivalent to
-.Ql !:s^ .
-Thus we might have said
-.Ql ^rot^root
-to make the spelling correction in the
-previous example.
-This is the only history substitution which does not explicitly begin with
-.Ql \&! .
-.Pp
 (+) In
 .Xr csh 1
 as such, only one modifier may be applied to each history
@@ -2167,7 +2166,20 @@ because
 expects another modifier after the second colon
 rather than
 .Ql $ .
-.Pp
+.
+.Ss History abbreviation
+There is a special abbreviation for substitutions.
+.Ql ^ ,
+when it is the first character on an input line, is equivalent to
+.Ql !:s^ .
+Thus we might have said
+.Ql ^rot^root
+to make the spelling correction in the
+previous example.
+This is the only history substitution which does not explicitly begin with
+.Ql \&! .
+.
+.Ss History editor commands
 Finally, history can be accessed through the editor as well as through
 the substitutions just described.
 The
@@ -2214,7 +2226,7 @@ If so, the first word is
 replaced by the alias.
 If the alias contains a history reference, it undergoes
 .Sx History substitution
-(q.v.) as though the original command were the
+as though the original command were the
 previous input line.
 If the alias does not contain a history reference, the
 argument list is left untouched.
@@ -2274,8 +2286,7 @@ and
 .Ic unsetenv .
 .Pp
 (+) Variables may be made read-only with
-.Ql set \-r
-(q.v.).
+.Ql set \-r .
 Read-only variables may not be modified or unset;
 attempting to do so will cause an error.
 Once made read-only, a variable cannot be made writable,
@@ -2333,8 +2344,8 @@ occurs.
 Strings quoted by
 .Ql \`
 are interpreted later (see
-.Sx Command substitution
-below) so
+.Sx Command substitution )
+so
 .Ql $
 substitution does not occur there until later,
 if at all.
@@ -2369,6 +2380,13 @@ modifier is applied to a substitution the variable will expand to
 multiple words with each word separated by a blank and quoted to prevent later
 command or filename substitution.
 .Pp
+The editor command
+.Ic expand-variables ,
+normally bound to
+.Ic ^X-$ ,
+can be used to interactively expand individual variables.
+.
+.Ss Variable substitution metasequences
 The following metasequences are provided for introducing variable values into
 the shell input:
 .Pp
@@ -2445,7 +2463,7 @@ is not set.
 The
 .Ql \&:
 modifiers described under
-.Sx History substitution ,
+.Sx History word modifiers ,
 except for
 .Ql \&:p ,
 can be applied to the substitutions above.
@@ -2453,10 +2471,11 @@ More than one may be used.
 (+)
 Braces may be needed to insulate a variable substitution from a literal colon
 just as with
-.Sx History substitution
-(q.v.); any modifiers must appear
+.Sx History word modifiers ;
+any modifiers must appear
 within the braces.
-.Pp
+.
+.Ss Variable substitution without modifiers
 The following substitutions can not be modified with
 .Ql \&:
 modifiers:
@@ -2552,12 +2571,6 @@ which the line is to be substituted, but
 .Xr csh 1
 does not allow this.
 .El
-.Pp
-The editor command
-.Ic expand-variables ,
-normally bound to
-.Ic ^X-$ ,
-can be used to interactively expand individual variables.
 .
 .Ss "Command, filename and directory stack substitution"
 The remaining substitutions are applied selectively to the arguments
@@ -2816,7 +2829,7 @@ The directory stack is a list of directories, numbered from zero, used by the
 .Ic popd ,
 and
 .Ic dirs
-builtin commands (q.v.).
+builtin commands.
 .Ic dirs
 can print, store in a file, restore and clear the directory stack
 at any time, and the
@@ -2866,7 +2879,7 @@ related to the above but mentioned here for completeness.
 .Em Any
 filename may be expanded to a full path when the
 .Ic symlinks
-variable (q.v.) is set to
+variable is set to
 .Ql expand .
 Quoting prevents this expansion, and
 the
@@ -3206,7 +3219,7 @@ The expressions can include any
 of the operators described in the next three sections.
 Note that the
 .Ic @
-builtin command (q.v.) has its own separate syntax.
+builtin command has its own separate syntax.
 .
 .Ss "Logical, arithmetical and comparison operators"
 These operators are similar to those of C and have the same precedence.
@@ -3564,7 +3577,7 @@ the test will succeed in a POSIX shell but fail in a non-POSIX shell.
 File inquiry operators can also be evaluated with the
 .Ic filetest
 builtin
-command (q.v.) (+).
+command (+).
 .
 .Ss Jobs
 The shell associates a
@@ -4331,8 +4344,8 @@ does
 bind
 .Ar key
 to
-.Ic self-insert-command
-(q.v.), it unbinds
+.Ic self-insert-command ,
+it unbinds
 .Ar key
 completely.
 .
@@ -4951,7 +4964,7 @@ mechanism using the
 .Ic complete-word-raw
 or
 .Ic list-choices-raw
-editor commands (q.v.).
+editor commands.
 .Pp
 The
 .Ql C ,
@@ -6804,7 +6817,7 @@ Sets the universe to
 .It Ic watchlog No (+)
 An alternate name for the
 .Ic log
-builtin command (q.v.).
+builtin command.
 Available only if the shell was so compiled;
 see the
 .Ic version
@@ -7238,7 +7251,7 @@ And display colorful NLS messages.
 .It Ic command No (+)
 If set, the command which was passed to the shell with the
 .Fl c
-flag (q.v.).
+flag.
 .
 .It Ic compat_expr No (+)
 If set, the shell will evaluate expressions right to left, like the original
@@ -7611,8 +7624,7 @@ unset.
 .
 .It Ic histchars
 A string value determining the characters used in
-.Sx History substitution
-(q.v.).
+.Sx History substitution .
 The first character of its value is used as
 the history substitution character, replacing the default character
 .Ql \&! .
@@ -7965,7 +7977,7 @@ If set,
 .Sx Filename substitution
 and
 .Sx Directory stack substitution
-(q.v.) are inhibited.
+are inhibited.
 This is most useful in shell scripts which do not deal
 with filenames, or after a list of filenames has been obtained and further
 expansions are not desirable.
@@ -7981,7 +7993,7 @@ If set, a
 .Sx Filename substitution
 or
 .Sx Directory stack substitution
-(q.v.) which does not match any
+which does not match any
 existing files is left untouched rather than causing an error.
 It is still an error for the substitution to be
 malformed, e.g.,
@@ -8338,8 +8350,7 @@ loops and
 after lines ending in
 .Ql \e .
 The same format sequences may be used as in
-.Ic prompt
-(q.v.);
+.Ic prompt ;
 note the variable meaning of
 .Ql \&%R .
 Set by default to
@@ -8349,8 +8360,7 @@ in interactive shells.
 .It Ic prompt3 No (+)
 The string with which to prompt when confirming automatic spelling correction.
 The same format sequences may be used as in
-.Ic prompt
-(q.v.);
+.Ic prompt ;
 note the variable meaning of
 .Ql \&%R .
 Set by default to
@@ -8640,7 +8650,7 @@ as described under
 .It Ic time
 If set to a number, then the
 .Ic time
-builtin (q.v.) executes automatically
+builtin executes automatically
 after each command which takes more than that many CPU seconds.
 If there is a second word, it is used as a format string for the output
 of the
@@ -9080,8 +9090,7 @@ See
 Used by X Window System (see
 .Xr X 1 ) .
 If set, the shell does not set
-.Ic autologout
-(q.v.).
+.Ic autologout .
 .
 .It Ev EDITOR
 The pathname to a default editor.
@@ -9567,10 +9576,10 @@ and
 builtin commands.
 .Pp
 .Sx Spelling correction
-(q.v.) of filenames, commands and variables.
+of filenames, commands and variables.
 .Pp
 .Sx Editor commands
-(q.v.) which perform other useful functions in the middle of
+which perform other useful functions in the middle of
 typed commands, including documentation lookup
 .Ic ( run-help ) ,
 quick editor restarting
@@ -9634,13 +9643,13 @@ See
 .Pp
 New
 .Sx File inquiry operators
-(q.v.) and a
+and a
 .Ic filetest
 builtin which uses them.
 .Pp
 A variety of
 .Sx Automatic, periodic and timed events
-(q.v.) including
+including
 scheduled events, special aliases, automatic logout and terminal locking,
 command timing and watching for logins and logouts.
 .Pp
@@ -9668,8 +9677,7 @@ New builtin commands including
 .Ic printenv ,
 .Ic which ,
 and
-.Ic where
-(q.v.).
+.Ic where .
 .Pp
 New variables that make useful information easily available to the shell.
 See the
