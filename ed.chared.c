@@ -3568,7 +3568,7 @@ e_load_average(Char c)
 #ifdef TIOCSTAT
     /*
      * Here we pass &c to the ioctl because some os's (NetBSD) expect it
-     * there even if they don't use it. (lukem@netbsd.org)
+     * there even if they don't use it. (Luke Mewburn)
      */
     if (ioctl(SHIN, TIOCSTAT, (ioctl_t) &c) < 0)
 #endif

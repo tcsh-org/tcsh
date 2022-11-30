@@ -38,7 +38,7 @@
  * PWP 4/27/87 -- rearange for tcsh.
  * mrdch@com.tau.edu.il 6/26/89 - added ~, T and .# - rearanged to switch()
  *                 instead of if/elseif
- * Luke Mewburn, <lukem@cs.rmit.edu.au>
+ * Luke Mewburn
  *	6-Sep-91	changed date format
  *	16-Feb-94	rewrote directory prompt code, added $ellipsis
  *	29-Dec-96	added rprompt support
@@ -340,7 +340,6 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 		break;
 	    }
 
-			/* lukem: new directory prompt code */
 	    case '~':
 	    case '/':
 	    case '.':
@@ -453,7 +452,6 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 		while (*z)
 		    Strbuf_append1(&buf, attributes | *z++);
 		break;
-			/* lukem: end of new directory prompt code */
 
 	    case 'n':
 #ifndef HAVENOUTMP
