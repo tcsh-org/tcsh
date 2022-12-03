@@ -348,7 +348,7 @@ can have only a
 .Pa ~/.cshrc
 which checks for the existence of the
 .Ic tcsh
-shell variable (q.v.) before using
+shell variable before using
 .Nm Ns
 \-specific commands,
 or can have both a
@@ -380,7 +380,7 @@ places it on the command history list, parses it and executes each command
 in the line.
 .Pp
 One can log out by typing
-.Sq ^D
+.Ic ^D
 on an empty line,
 .Ic logout
 or
@@ -451,13 +451,13 @@ The shell always binds the arrow keys (as defined in the
 environment variable) to:
 .Pp
 .Bl -tag -width right -offset indent -compact
-.It down
+.It Ic down
 .Ic down-history
-.It up
+.It Ic up
 .Ic up-history
-.It left
+.It Ic left
 .Ic backward-char
-.It right
+.It Ic right
 .Ic forward-char
 .El
 .Pp
@@ -577,13 +577,13 @@ An empty line is
 as a filename.
 .Pp
 You can list the possible completions of a word at any time by typing
-.Sq ^D
+.Ic ^D
 to run the
 .Ic delete-char-or-list-or-eof
 editor command.
 The shell lists the possible completions using the
 .Ic ls\-F
-builtin (q.v.)
+builtin
 and reprints the prompt and unfinished command line, for example:
 .Bd -literal -offset indent
 > ls /usr/l[^D]
@@ -645,7 +645,7 @@ in the middle of a line it deletes the character under the cursor and
 on an empty line it logs one out or, if the
 .Ic ignoreeof
 variable is set, does nothing.
-.Sq M-^D ,
+.Ic M-^D ,
 bound to the editor command
 .Ic list-choices ,
 lists completion
@@ -656,7 +656,7 @@ related editor commands that do or don't delete, list and/or log out,
 listed under
 .Ic delete-char-or-list-or-eof )
 can be bound to
-.Sq ^D
+.Ic ^D
 with the
 .Ic bindkey
 builtin command if so desired.
@@ -726,7 +726,7 @@ and typed
 it would be completed to
 .Ql mail \-f comp.lang.c ,
 and
-.Sq ^D
+.Ql ^D
 would list
 .Ql comp.lang.c
 and
@@ -857,13 +857,13 @@ variable names as well as completing and listing them.
 Individual words can be spelling-corrected with the
 .Ic spell-word
 editor command (usually bound to
-.Sq M-s
+.Ic M-s
 and
-.Sq M-S )
+.Ic M-S )
 and the entire input buffer with
 .Ic spell-line
 (usually bound to
-.Sq M-$ ) .
+.Ic M-$ ) .
 The
 .Ic correct
 shell variable can be set to
@@ -891,7 +891,7 @@ or space to execute the corrected line,
 to leave the uncorrected command in the input buffer,
 .Ql a
 to abort the command as if
-.Sq ^C
+.Ic ^C
 had been hit, and
 anything else to execute the original line unchanged.
 .Pp
@@ -924,11 +924,13 @@ for descriptions of each editor's key bindings.
 .Pp
 The character or characters to which each command is bound by default is
 given in parentheses.
-.Sq ^ Ns Ar character
+.Ic ^ Ns Ar character
 means a control character and
-.Sq M- Ns Ar character
+.Ic M- Ns Ar character
 a meta character, typed as
-.Sq escape- Ns Ar character
+.Ic escape- Ns Ar character
+(or
+.Ic ^ Ns \&[ Ns Ar character )
 on terminals without a meta key.
 Case counts, but commands that are bound
 to letters by default are bound to both lower- and uppercase letters for
@@ -937,32 +939,32 @@ convenience.
 Supported editor commands are:
 .Bl -tag -width indent
 .
-.It Ic backward-char No (^B, left)
+.It Ic backward-char ( ^B , left )
 Move back a character.
 Cursor behavior modified by
 .Ic vimode .
 .
-.It Ic backward-delete-word No (M-^H, M-^?)
+.It Ic backward-delete-word ( M-^H , M-^? )
 Cut from beginning of current word to cursor - saved in cut buffer.
 Word boundary behavior modified by
 .Ic vimode .
 .
-.It Ic backward-word No (M-b, M-B)
+.It Ic backward-word ( M-b , M-B )
 Move to beginning of current word.
 Word boundary and cursor behavior modified by
 .Ic vimode .
 .
-.It Ic beginning-of-line No (^A, home)
+.It Ic beginning-of-line ( ^A , home )
 Move to beginning of line.
 Cursor behavior modified by
 .Ic vimode .
 .
-.It Ic capitalize-word No (M-c, M-C)
+.It Ic capitalize-word ( M-c , M-C )
 Capitalize the characters from cursor to end of current word.
 Word boundary behavior modified by
 .Ic vimode .
 .
-.It Ic complete-word No (tab)
+.It Ic complete-word ( tab )
 Completes a word as described under
 .Sx Completion and listing .
 .
@@ -977,19 +979,19 @@ completions.
 May be repeated to step down through the list.
 At the end of the list, beeps and reverts to the incomplete word.
 .
-.It Ic complete-word-raw No (^X-tab)
+.It Ic complete-word-raw ( ^X-tab )
 Like
 .Ic complete-word ,
 but ignores user-defined completions.
 .
-.It Ic copy-prev-word No (M-^_)
+.It Ic copy-prev-word ( M-^_ )
 Copies the previous word in the current line into the input buffer.
 See also
 .Ic insert-last-word .
 Word boundary behavior modified by
 .Ic vimode .
 .
-.It Ic dabbrev-expand No (M-/)
+.It Ic dabbrev-expand ( M-/ )
 Expands the current word to the most recent preceding one for which
 the current is a leading substring, wrapping around the history list
 (once) if necessary.
@@ -1029,7 +1031,7 @@ at the end of the line.
 See also
 .Ic delete-char-or-list-or-eof .
 .
-.It Ic delete-char-or-list-or-eof No (^D)
+.It Ic delete-char-or-list-or-eof ( ^D )
 Does
 .Ic delete-char
 if there is a character under the cursor,
@@ -1044,17 +1046,17 @@ and
 .Ic list-or-eof ,
 each of which does a different two out of the three.
 .
-.It Ic delete-word No (M-d, M-D)
+.It Ic delete-word ( M-d , M-D )
 Cut from cursor to end of current word - save in cut buffer.
 Word boundary behavior modified by
 .Ic vimode .
 .
-.It Ic down-history No (down-arrow, ^N)
+.It Ic down-history ( down , ^N )
 Like
 .Ic up-history ,
 but steps down, stopping at the original input line.
 .
-.It Ic downcase-word No (M-l, M-L)
+.It Ic downcase-word ( M-l , M-L )
 Lowercase the characters from cursor to end of current word.
 Word boundary behavior modified by
 .Ic vimode .
@@ -1062,16 +1064,16 @@ Word boundary behavior modified by
 .It Ic end-of-file No (not bound)
 Signals an end of file, causing the shell to exit unless the
 .Ic ignoreeof
-shell variable (q.v.) is set to prevent this.
+shell variable is set to prevent this.
 See also
 .Ic delete-char-or-list-or-eof .
 .
-.It Ic end-of-line No (^E, end)
+.It Ic end-of-line ( ^E , end )
 Move cursor to end of line.
 Cursor behavior modified by
 .Ic vimode .
 .
-.It Ic expand-history No (M-space)
+.It Ic expand-history ( M-space )
 Expands history substitutions in the current word.
 See
 .Sx History substitution .
@@ -1082,7 +1084,7 @@ and the
 .Ic autoexpand
 shell variable.
 .
-.It Ic expand-glob No (^X-*)
+.It Ic expand-glob ( ^X-* )
 Expands the glob-pattern to the left of the cursor.
 See
 .Sx Filename substitution .
@@ -1092,22 +1094,22 @@ Like
 .Ic expand-history ,
 but expands history substitutions in each word in the input buffer.
 .
-.It Ic expand-variables No (^X-$)
+.It Ic expand-variables ( ^X-$ )
 Expands the variable to the left of the cursor.
 See
 .Sx Variable substitution .
 .
-.It Ic forward-char No (^F, right)
+.It Ic forward-char ( ^F , right )
 Move forward one character.
 Cursor behavior modified by
 .Ic vimode .
 .
-.It Ic forward-word No (M-f, M-F)
+.It Ic forward-word ( M-f , M-F )
 Move forward to end of current word.
 Word boundary and cursor behavior modified by
 .Ic vimode .
 .
-.It Ic history-search-backward No (M-p, M-P)
+.It Ic history-search-backward ( M-p , M-P )
 Searches backwards through the history list for a command beginning with
 the current contents of the input buffer up to the cursor and copies it
 into the input buffer.
@@ -1130,7 +1132,7 @@ See also
 and
 .Ic i-search-back .
 .
-.It Ic history-search-forward No (M-n, M-N)
+.It Ic history-search-forward ( M-n , M-N )
 Like
 .Ic history-search-backward ,
 but searches forward.
@@ -1155,17 +1157,17 @@ single character for this to work) or one of the following special characters
 may be typed:
 .Pp
 .Bl -tag -width indent -compact
-.It ^W
+.It Ic ^W
 Appends the rest of the word under the cursor to the search pattern.
-.It delete
+.It Ic delete
 (or any character bound to
 .Ic backward-delete-char )
 Undoes the effect of the last character typed and deletes a character
 from the search pattern if appropriate.
-.It ^G
+.It Ic ^G
 If the previous search was successful, aborts the entire search.
 If not, goes back to the last successful search.
-.It escape
+.It Ic escape
 Ends the search, leaving the current line in the input buffer.
 .El
 .Pp
@@ -1190,14 +1192,14 @@ but searches forward.
 Word boundary behavior modified by
 .Ic vimode .
 .
-.It Ic insert-last-word No (M-_)
+.It Ic insert-last-word ( M-_ )
 Inserts the last word of the previous input line
 .Pq Ql \&!$
 into the input buffer.
 See also
 .Ic copy-prev-word .
 .
-.It Ic list-choices No (M-^D)
+.It Ic list-choices ( M-^D )
 Lists completion possibilities as described under
 .Sx Completion and listing .
 See also
@@ -1205,12 +1207,12 @@ See also
 and
 .Ic list-choices-raw .
 .
-.It Ic list-choices-raw No (^X-^D)
+.It Ic list-choices-raw ( ^X-^D )
 Like
 .Ic list-choices ,
 but ignores user-defined completions.
 .
-.It Ic list-glob No (^X-g, ^X-G)
+.It Ic list-glob ( ^X-g , ^X-G )
 Lists (via the
 .Ic ls\-F
 builtin) matches to the glob-pattern
@@ -1236,7 +1238,7 @@ and inserts a space.
 is designed to be bound to the space bar,
 but is not bound by default.
 .
-.It Ic normalize-command No (^X-?)
+.It Ic normalize-command ( ^X-? )
 Searches for the current word in
 .Ev PATH
 and, if it is found, replaces it with
@@ -1250,7 +1252,7 @@ useful with commands that take commands as arguments, e.g.,
 and
 .Ql sh \-x .
 .
-.It Ic normalize-path No (^X-n, ^X-N)
+.It Ic normalize-path ( ^X-n , ^X-N )
 Expands the current word as described under the
 .Ql expand
 setting
@@ -1261,7 +1263,7 @@ shell variable.
 .It Ic overwrite-mode No (unbound)
 Toggles between input and overwrite modes.
 .
-.It Ic run-fg-editor No (M-^Z)
+.It Ic run-fg-editor ( M-^Z )
 Saves the current input line and
 looks for a stopped job where the file name portion of its first word
 is found in the
@@ -1286,11 +1288,11 @@ had been typed.
 This is used to toggle back and forth between an editor and
 the shell easily.
 Some people bind this command to
-.Sq ^Z
+.Ic ^Z
 so they
 can do this even more easily.
 .
-.It Ic run-help No (M-h, M-H)
+.It Ic run-help ( M-h , M-H )
 Searches for documentation on the current command, using the same notion of
 .Dq current command
 as the completion routines, and prints it.
@@ -1331,7 +1333,7 @@ editor in that mode at the beginning of each line.
 See also
 .Ic overwrite-mode .
 .
-.It Ic sequence-lead-in No (arrow prefix, meta prefix, ^X)
+.It Ic sequence-lead-in No (arrow prefix, meta prefix, Ic ^X )
 Indicates that the following characters are part of a
 multi-key sequence.
 Binding a command to a multi-key sequence really creates
@@ -1346,7 +1348,7 @@ are effectively bound to
 .Ic undefined-key
 unless bound to another command.
 .
-.It Ic spell-line No (M-$)
+.It Ic spell-line ( M-$ )
 Attempts to correct the spelling of each word in the input buffer, like
 .Ic spell-word ,
 but ignores words whose first character is one of
@@ -1364,12 +1366,12 @@ to avoid problems with switches, substitutions and the like.
 See
 .Sx Spelling correction .
 .
-.It Ic spell-word No (M-s, M-S)
+.It Ic spell-word ( M-s , M-S )
 Attempts to correct the spelling of the current word as described under
 .Sx Spelling correction .
 Checks each component of a word which appears to be a pathname.
 .
-.It Ic toggle-literal-history No (M-r, M-R)
+.It Ic toggle-literal-history ( M-r , M-R )
 Expands or
 unexpands
 history substitutions in the input buffer.
@@ -1382,14 +1384,14 @@ shell variable.
 .It Ic undefined-key No (any unbound key)
 Beeps.
 .
-.It Ic up-history No (up-arrow, ^P)
+.It Ic up-history ( up , ^P )
 Copies the previous entry in the history list into the input buffer.
 If
 .Ic histlit
 is set, uses the literal form of the entry.
 May be repeated to step up through the history list, stopping at the top.
 .
-.It Ic upcase-word No (M-u, M-U)
+.It Ic upcase-word ( M-u , M-U )
 Uppercase the characters from cursor to end of current word.
 Word boundary behavior modified by
 .Ic vimode .
@@ -1404,7 +1406,7 @@ Vi move to the end of the current word.
 Word boundary behavior modified by
 .Ic vimode .
 .
-.It Ic vi-search-back No (?)
+.It Ic vi-search-back ( \&? )
 Prompts with
 .Sq Li \&?
 for a search string (which may be a glob-pattern, as with
@@ -1417,18 +1419,18 @@ Hitting escape ends the search and executes the match.
 .Ic vi
 mode only.
 .
-.It Ic vi-search-fwd No (/)
+.It Ic vi-search-fwd ( / )
 Like
 .Ic vi-search-back ,
 but searches forward.
 .
-.It Ic which-command No (M-?)
+.It Ic which-command ( M-? )
 Does a
 .Ic which
 (see the description of the builtin command) on the
 first word of the input buffer.
 .
-.It Ic yank-pop No (M-y)
+.It Ic yank-pop ( M-y )
 When executed immediately after a
 .Ic yank
 or another
@@ -1492,7 +1494,7 @@ newline.
 .Pp
 Furthermore, all
 .Sx Substitutions
-(see below) except
+except
 .Sx History substitution
 can be prevented by enclosing the strings (or parts of strings)
 in which they appear with single quotes or by quoting the crucial character(s)
@@ -1529,12 +1531,12 @@ Text inside single or double quotes becomes a single word (or part of one).
 Metacharacters in these strings, including blanks and tabs, do not form
 separate words.
 Only in one special case (see
-.Sx Command substitution
-below) can a double-quoted string yield parts of more than one word;
+.Sx Command substitution )
+can a double-quoted string yield parts of more than one word;
 single-quoted strings never do.
 Backward quotes are special: they signal
-.Sx Command substitution
-(q.v.), which may result in more than one word.
+.Sx Command substitution ,
+which may result in more than one word.
 .Pp
 C-style escape sequences can be used in single quoted strings by
 preceding the leading quote with
@@ -1555,7 +1557,7 @@ to do so if appropriate.
 .Pp
 The
 .Ic backslash_quote
-shell variable (q.v.) can be set to make backslashes
+shell variable can be set to make backslashes
 always quote
 .Ql \e ,
 .Ql \&' ,
@@ -1730,13 +1732,20 @@ Any input
 line which contains a history substitution is printed before it is executed.
 .Pp
 A history substitution may have an
-.Dq event specification ,
+.Dq event specification
+(see
+.Sx History event specification ) ,
 which indicates the event from which words are to be taken, a
-.Dq word designator ,
+.Dq word designator
+(see
+.Sx History word designators ) ,
 which selects particular words from the chosen event, and/or a
-.Dq modifier ,
+.Dq word modifier
+(see
+.Sx History word modifiers ) ,
 which manipulates the selected words.
-.Pp
+.
+.Ss History event specification
 An event specification can be:
 .Pp
 .Bl -tag -width 5n -offset indent -compact
@@ -1795,10 +1804,11 @@ can be abbreviated
 if it is
 followed by
 .Ql \&:
-.Po
-.Ql \&:
-is described below
-.Pc .
+.Ql ( \&:
+is described in
+.Sx History word designators
+and
+.Sx History word modifiers ) .
 .Ql !n
 refers to event 9, which begins with
 .Ql n .
@@ -1847,7 +1857,8 @@ as in
 .Xr csh 1
 type
 .Ql !{3}d .
-.Pp
+.
+.Ss History word designators
 To select words from an event we can follow the event specification by a
 .Ql \&:
 and a designator for the desired words.
@@ -1970,7 +1981,8 @@ example, we could have said simply
 .Ql diff !^.old !^
 or, to get the arguments in the opposite order, just
 .Ql diff !* .
-.Pp
+.
+.Ss History word modifiers
 The word or words in a history reference can be edited, or
 .Dq modified ,
 by following it with one or more modifiers, each preceded by a
@@ -2118,17 +2130,6 @@ correct the spelling of
 for a
 different approach).
 .Pp
-There is a special abbreviation for substitutions.
-.Ql ^ ,
-when it is the first character on an input line, is equivalent to
-.Ql !:s^ .
-Thus we might have said
-.Ql ^rot^root
-to make the spelling correction in the
-previous example.
-This is the only history substitution which does not explicitly begin with
-.Ql \&! .
-.Pp
 (+) In
 .Xr csh 1
 as such, only one modifier may be applied to each history
@@ -2165,7 +2166,20 @@ because
 expects another modifier after the second colon
 rather than
 .Ql $ .
-.Pp
+.
+.Ss History abbreviation
+There is a special abbreviation for substitutions.
+.Ql ^ ,
+when it is the first character on an input line, is equivalent to
+.Ql !:s^ .
+Thus we might have said
+.Ql ^rot^root
+to make the spelling correction in the
+previous example.
+This is the only history substitution which does not explicitly begin with
+.Ql \&! .
+.
+.Ss History editor commands
 Finally, history can be accessed through the editor as well as through
 the substitutions just described.
 The
@@ -2212,7 +2226,7 @@ If so, the first word is
 replaced by the alias.
 If the alias contains a history reference, it undergoes
 .Sx History substitution
-(q.v.) as though the original command were the
+as though the original command were the
 previous input line.
 If the alias does not contain a history reference, the
 argument list is left untouched.
@@ -2272,8 +2286,7 @@ and
 .Ic unsetenv .
 .Pp
 (+) Variables may be made read-only with
-.Ql set \-r
-(q.v.).
+.Ql set \-r .
 Read-only variables may not be modified or unset;
 attempting to do so will cause an error.
 Once made read-only, a variable cannot be made writable,
@@ -2331,8 +2344,8 @@ occurs.
 Strings quoted by
 .Ql \`
 are interpreted later (see
-.Sx Command substitution
-below) so
+.Sx Command substitution )
+so
 .Ql $
 substitution does not occur there until later,
 if at all.
@@ -2367,6 +2380,13 @@ modifier is applied to a substitution the variable will expand to
 multiple words with each word separated by a blank and quoted to prevent later
 command or filename substitution.
 .Pp
+The editor command
+.Ic expand-variables ,
+normally bound to
+.Ic ^X-$ ,
+can be used to interactively expand individual variables.
+.
+.Ss Variable substitution metasequences
 The following metasequences are provided for introducing variable values into
 the shell input:
 .Pp
@@ -2443,7 +2463,7 @@ is not set.
 The
 .Ql \&:
 modifiers described under
-.Sx History substitution ,
+.Sx History word modifiers ,
 except for
 .Ql \&:p ,
 can be applied to the substitutions above.
@@ -2451,10 +2471,11 @@ More than one may be used.
 (+)
 Braces may be needed to insulate a variable substitution from a literal colon
 just as with
-.Sx History substitution
-(q.v.); any modifiers must appear
+.Sx History word modifiers ;
+any modifiers must appear
 within the braces.
-.Pp
+.
+.Ss Variable substitution without modifiers
 The following substitutions can not be modified with
 .Ql \&:
 modifiers:
@@ -2550,12 +2571,6 @@ which the line is to be substituted, but
 .Xr csh 1
 does not allow this.
 .El
-.Pp
-The editor command
-.Ic expand-variables ,
-normally bound to
-.Sq ^X-$ ,
-can be used to interactively expand individual variables.
 .
 .Ss "Command, filename and directory stack substitution"
 The remaining substitutions are applied selectively to the arguments
@@ -2804,7 +2819,7 @@ shell variable can be set to prevent filename substitution,
 and the
 .Ic expand-glob
 editor command, normally bound to
-.Sq ^X-* ,
+.Ic ^X-* ,
 can be
 used to interactively expand individual filename substitutions.
 .
@@ -2814,7 +2829,7 @@ The directory stack is a list of directories, numbered from zero, used by the
 .Ic popd ,
 and
 .Ic dirs
-builtin commands (q.v.).
+builtin commands.
 .Ic dirs
 can print, store in a file, restore and clear the directory stack
 at any time, and the
@@ -2864,7 +2879,7 @@ related to the above but mentioned here for completeness.
 .Em Any
 filename may be expanded to a full path when the
 .Ic symlinks
-variable (q.v.) is set to
+variable is set to
 .Ql expand .
 Quoting prevents this expansion, and
 the
@@ -3204,7 +3219,7 @@ The expressions can include any
 of the operators described in the next three sections.
 Note that the
 .Ic @
-builtin command (q.v.) has its own separate syntax.
+builtin command has its own separate syntax.
 .
 .Ss "Logical, arithmetical and comparison operators"
 These operators are similar to those of C and have the same precedence.
@@ -3562,7 +3577,7 @@ the test will succeed in a POSIX shell but fail in a non-POSIX shell.
 File inquiry operators can also be evaluated with the
 .Ic filetest
 builtin
-command (q.v.) (+).
+command (+).
 .
 .Ss Jobs
 The shell associates a
@@ -3586,7 +3601,7 @@ had one (top-level) process, whose process id was 1234.
 .Pp
 If you are running a job and wish to do something else you may hit the suspend
 key (usually
-.Sq ^Z ) ,
+.Ic ^Z ) ,
 which sends a STOP signal to the current job.
 The shell will then normally
 indicate that the job has been
@@ -3616,7 +3631,7 @@ with
 .Ic run-fg-editor
 editor command.)
 A
-.Sq ^Z
+.Ic ^Z
 takes effect immediately and is like an interrupt
 in that pending output and unread input are discarded when it is typed.
 The
@@ -3625,7 +3640,7 @@ builtin command causes the shell to wait for all background
 jobs to complete.
 .Pp
 The
-.Sq ^]
+.Ic ^]
 key sends a delayed suspend signal, which does not generate a STOP
 signal until a program attempts to
 .Xr read 2
@@ -3633,12 +3648,12 @@ it, to the current job.
 This can usefully be typed ahead when you have prepared some commands for a
 job which you wish to stop after it has read them.
 The
-.Sq ^Y
+.Ic ^Y
 key performs this function in
 .Xr csh 1 ;
 in
 .Nm ,
-.Sq ^Y
+.Ic ^Y
 is an editing command.
 (+)
 .Pp
@@ -3873,7 +3888,7 @@ Sorting is not affected for the simulated NLS.
 .Pp
 In addition, with both real and simulated NLS, all printable
 characters in the range \e200\-\e377, i.e., those that have
-.No M- Ns Ar char
+.Ic M- Ns Ar char
 bindings, are automatically rebound to
 .Ic self-insert-command .
 The corresponding binding for the
@@ -3887,7 +3902,7 @@ is set.
 This may be useful for the simulated NLS or a primitive real NLS
 which assumes full ISO 8859-1.
 Otherwise, all
-.No M- Ns Ar char
+.Ic M- Ns Ar char
 bindings in the
 range \e240\-\e377 are effectively undone.
 Explicitly rebinding the relevant keys with
@@ -4267,25 +4282,25 @@ command mode.
 .Ar key
 is interpreted as
 a control character written
-.No ^ Ns Ar character
+.Ic ^ Ns Ar character
 (e.g.,
-.Sq ^A )
+.Ic ^A )
 or
-.No C- Ns Ar character
+.Ic C- Ns Ar character
 (e.g.,
-.Sq C-A ) ,
+.Ic C-A ) ,
 a meta character written
-.No M- Ns Ar character
+.Ic M- Ns Ar character
 (e.g.,
-.Sq M-A ) ,
+.Ic M-A ) ,
 a function key written
-.No F- Ns Ar string
+.Ic F- Ns Ar string
 (e.g.,
-.Sq F-string ) ,
+.Ic F-string ) ,
 or an extended prefix key written
-.No X- Ns Ar character
+.Ic X- Ns Ar character
 (e.g.,
-.Sq X-A ) .
+.Ic X-A ) .
 .
 .It Fl c
 .Ar command
@@ -4329,8 +4344,8 @@ does
 bind
 .Ar key
 to
-.Ic self-insert-command
-(q.v.), it unbinds
+.Ic self-insert-command ,
+it unbinds
 .Ar key
 completely.
 .
@@ -4374,12 +4389,12 @@ can be literal (they can be typed by preceding
 them with the editor command
 .Ic quoted-insert ,
 normally bound to
-.Sq ^V )
+.Ic ^V )
 or
 written caret-character style, e.g.,
-.Sq ^A .
+.Ic ^A .
 Delete is written
-.Sq ^?
+.Ic ^?
 (caret-question mark).
 .Ar key
 and
@@ -4949,7 +4964,7 @@ mechanism using the
 .Ic complete-word-raw
 or
 .Ic list-choices-raw
-editor commands (q.v.).
+editor commands.
 .Pp
 The
 .Ql C ,
@@ -6595,7 +6610,7 @@ the current job.
 .It Ic suspend
 Causes the shell to stop in its tracks, much as if it had
 been sent a stop signal with
-.Sq ^Z .
+.Ic ^Z .
 This is most often used to
 stop shells started by
 .Xr su 1 .
@@ -6802,7 +6817,7 @@ Sets the universe to
 .It Ic watchlog No (+)
 An alternate name for the
 .Ic log
-builtin command (q.v.).
+builtin command.
 Available only if the shell was so compiled;
 see the
 .Ic version
@@ -7236,7 +7251,7 @@ And display colorful NLS messages.
 .It Ic command No (+)
 If set, the command which was passed to the shell with the
 .Fl c
-flag (q.v.).
+flag.
 .
 .It Ic compat_expr No (+)
 If set, the shell will evaluate expressions right to left, like the original
@@ -7609,8 +7624,7 @@ unset.
 .
 .It Ic histchars
 A string value determining the characters used in
-.Sx History substitution
-(q.v.).
+.Sx History substitution .
 The first character of its value is used as
 the history substitution character, replacing the default character
 .Ql \&! .
@@ -7704,7 +7718,7 @@ and the input device is a terminal,
 the
 .Ic end-of-file
 command (usually generated by the user by typing
-.Sq ^D
+.Ic ^D
 on an empty line) causes the shell to print
 .Ql Use \&"exit\&" to leave tcsh.
 instead of exiting.
@@ -7727,7 +7741,7 @@ th.
 .Ql 1
 is used, i.e., the shell exits on a
 single
-.Sq ^D .
+.Ic ^D .
 .
 .It Ic implicitcd No (+)
 If set, the shell treats a directory name typed as a command as though
@@ -7963,7 +7977,7 @@ If set,
 .Sx Filename substitution
 and
 .Sx Directory stack substitution
-(q.v.) are inhibited.
+are inhibited.
 This is most useful in shell scripts which do not deal
 with filenames, or after a list of filenames has been obtained and further
 expansions are not desirable.
@@ -7979,7 +7993,7 @@ If set, a
 .Sx Filename substitution
 or
 .Sx Directory stack substitution
-(q.v.) which does not match any
+which does not match any
 existing files is left untouched rather than causing an error.
 It is still an error for the substitution to be
 malformed, e.g.,
@@ -8336,8 +8350,7 @@ loops and
 after lines ending in
 .Ql \e .
 The same format sequences may be used as in
-.Ic prompt
-(q.v.);
+.Ic prompt ;
 note the variable meaning of
 .Ql \&%R .
 Set by default to
@@ -8347,8 +8360,7 @@ in interactive shells.
 .It Ic prompt3 No (+)
 The string with which to prompt when confirming automatic spelling correction.
 The same format sequences may be used as in
-.Ic prompt
-(q.v.);
+.Ic prompt ;
 note the variable meaning of
 .Ql \&%R .
 Set by default to
@@ -8544,7 +8556,7 @@ and use the
 editor command
 .Ic normalize-path
 (bound by default to
-.Sq ^X-n )
+.Ic ^X-n )
 when necessary.
 .Pp
 Some examples are in order.
@@ -8638,7 +8650,7 @@ as described under
 .It Ic time
 If set to a number, then the
 .Ic time
-builtin (q.v.) executes automatically
+builtin executes automatically
 after each command which takes more than that many CPU seconds.
 If there is a second word, it is used as a format string for the output
 of the
@@ -9078,8 +9090,7 @@ See
 Used by X Window System (see
 .Xr X 1 ) .
 If set, the shell does not set
-.Ic autologout
-(q.v.).
+.Ic autologout .
 .
 .It Ev EDITOR
 The pathname to a default editor.
@@ -9565,10 +9576,10 @@ and
 builtin commands.
 .Pp
 .Sx Spelling correction
-(q.v.) of filenames, commands and variables.
+of filenames, commands and variables.
 .Pp
 .Sx Editor commands
-(q.v.) which perform other useful functions in the middle of
+which perform other useful functions in the middle of
 typed commands, including documentation lookup
 .Ic ( run-help ) ,
 quick editor restarting
@@ -9632,13 +9643,13 @@ See
 .Pp
 New
 .Sx File inquiry operators
-(q.v.) and a
+and a
 .Ic filetest
 builtin which uses them.
 .Pp
 A variety of
 .Sx Automatic, periodic and timed events
-(q.v.) including
+including
 scheduled events, special aliases, automatic logout and terminal locking,
 command timing and watching for logins and logouts.
 .Pp
@@ -9666,8 +9677,7 @@ New builtin commands including
 .Ic printenv ,
 .Ic which ,
 and
-.Ic where
-(q.v.).
+.Ic where .
 .Pp
 New variables that make useful information easily available to the shell.
 See the
