@@ -8,15 +8,15 @@ The scan service is available to developers at:
 
 Commit changes to the master branch as usual, remembering to
 
-* `git pull` before modifying any files
+* `git pull -r` before modifying any files
 * `git commit`
 * `git push`
 
 Then when you'd like to get a new scan:
 
 ```
-git checkout coverity_scan
-git pull
+git switch coverity_scan
+git pull -r
 git merge master
 git push
 ```
@@ -24,7 +24,7 @@ git push
 And to avoid accidental commits to the `coverity_scan` branch:
 
 ```
-git checkout master
+git switch master
 ```
 
 The merge should always be a fast-forward, if we avoid committing stuff
