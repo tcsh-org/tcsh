@@ -15,10 +15,10 @@ AT_SETUP([@])
 
 # Not testing much...
 AT_CHECK([tcsh -f -c 'set' > out1 && tcsh -f -c '@' > out2])
-AT_CHECK([diff out1 out2 | tail -n +2], ,
-[< command	set
----
-> command	@
+AT_CHECK([diff -U0 out1 out2 | tail -n +3], [], [dnl
+@@ -5 +5 @@
+-command	set
++command	@
 ])
 
 AT_CHECK([tcsh -f -c '@ var=2 * 3; echo $var'], ,
