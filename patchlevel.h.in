@@ -1,0 +1,13 @@
+/*
+ * patchlevel.h: Our life story.
+ */
+#ifndef _h_patchlevel
+#define _h_patchlevel
+
+#define ORIGIN "@PACKAGE_ORIGIN@"
+#define REV @PACKAGE_REV@
+#define VERS @PACKAGE_VERS@
+#define PATCHLEVEL @PACKAGE_PATCHLEVEL@
+#define DATE "@PACKAGE_DATE@"
+
+#endif /* _h_patchlevel */

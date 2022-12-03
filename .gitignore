@@ -10,12 +10,14 @@ config_p.h
 ed.defns.h
 gethost
 nls/*.cat
+patchlevel.h
 sh.err.h
 tc.const.h
 tc.defs.c
 tcsh
 tcsh-*.tar.gz
 tcsh-*.tar.gz.asc
+tcsh.man
 tests/package.m4
 tests/testsuite
 testsuite.dir/**

@@ -56,11 +56,9 @@
 .\"   new features in NEW FEATURES and referenced external commands in SEE
 .\"   ALSO.
 .\"
-.\" UPDATE NEXT LINE FOR RELEASE
-.Dd December 3, 2022
+.Dd @PACKAGE_ENGLISH_DATE@
 .Dt TCSH 1
-.\" UPDATE NEXT LINE FOR RELEASE
-.Os Astron 6.24.03
+.Os @PACKAGE_ORIGIN@ @PACKAGE_VERSION@
 .
 .Sh NAME
 .Nm tcsh
@@ -9802,11 +9800,11 @@ cycles or backward
 s.
 .Pp
 Report bugs at
-.Lk https://bugs.astron.com/
+.Lk @PACKAGE_BUGREPORT@
 preferably with fixes.
 If you want to
 help maintain and test tcsh, add yourself to the mailing list in
-.Lk https://mailman.astron.com/
+.Lk @PACKAGE_MAILLIST@
 .
 .Sh THE T IN TCSH
 In 1964, DEC produced the PDP-6.
@@ -9887,8 +9885,8 @@ substitutions on a single line to 20.
 .Em Introduction to the C Shell
 .
 .Sh VERSION
-.\" UPDATE NEXT LINE FOR RELEASE
-This manual documents tcsh 6.24.03 (Astron) 2022-12-03.
+This manual documents tcsh @PACKAGE_VERSION@
+(@PACKAGE_ORIGIN@) @PACKAGE_DATE@.
 .
 .Sh AUTHORS
 .

@@ -522,18 +522,8 @@ TCOBJS=	tc.alloc.${SUF} tc.bind.${SUF} tc.const.${SUF} tc.defs.${SUF} \
 	tc.prompt.${SUF} tc.sched.${SUF} tc.sig.${SUF} tc.str.${SUF} \
 	tc.vers.${SUF} tc.who.${SUF} 
 
-MISCF = Makefile.std BUILDING Fixes MAKEDIFFS MAKESHAR NewThings README.md \
-	FAQ WishList config_f.h eight-bit.me glob.3 patchlevel.h pathnames.h \
-	tcsh.man Ported src.desc Imakefile imake.config complete.tcsh \
-	Makefile.vms termcap.vms snames.h host.defs gethost.c \
-	Makefile.in configure.ac Makefile.win32 aclocal.m4 dot.login dot.tcshrc
-CONFSRCS=config/[a-z]*
-
-
 SRCS = $(SHSRCS) $(TWSRCS) $(EDSRCS) $(TCSRCS)
 OBJS = $(SHOBJS) $(TWOBJS) $(EDOBJS) $(TCOBJS)
-
-ALLSRCS= $(MISCF) $(SRCS) $(EXTF)
 
 AllTarget(tcsh)
 
@@ -568,38 +558,6 @@ config.h: config_f.h
 	cp config/ConfigH config.h
 
 $(OBJS): sh.err.h tc.const.h ed.defns.h
-
-tar.Z:
-	rm -f tcsh-${VERSION}.tar.Z
-	rm -rf tcsh-${VERSION} 
-	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
-	cp ${ALLSRCS} tcsh-${VERSION}
-	cp ${CONFSRCS} tcsh-${VERSION}/config
-	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
-	tar cvf - tcsh-${VERSION} | compress > tcsh-${VERSION}.tar.Z
-	rm -rf tcsh-${VERSION}
-
-tar.gz:
-	rm -f tcsh-${VERSION}.tar.gz
-	rm -rf tcsh-${VERSION} 
-	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
-	cp ${ALLSRCS} tcsh-${VERSION}
-	cp ${CONFSRCS} tcsh-${VERSION}/config
-	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
-	tar cvf - tcsh-${VERSION} | gzip > tcsh-${VERSION}.tar.gz
-	rm -rf tcsh-${VERSION}
-
-shar:
-	rm -f tcsh-*.shar
-	rm -rf tcsh-${VERSION} 
-	mkdir tcsh-${VERSION} tcsh-${VERSION}/config
-	cp ${ALLSRCS} tcsh-${VERSION}
-	cp ${CONFSRCS} tcsh-${VERSION}/config
-	tar cf - nls/Makefile nls/?*/set?* | (cd tcsh-${VERSION}; tar xpf -)
-	MAKESHAR -v -n tcsh-${VERSION} tcsh-${VERSION} \
-		 tcsh-${VERSION}/?* tcsh-${VERSION}/config/?* \
-		 tcsh-${VERSION}/?*/set?*
-	rm -rf tcsh-${VERSION}
 
 catalogs:
 	@(cd nls; make catalogs)

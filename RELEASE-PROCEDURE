@@ -3,36 +3,34 @@ HOW TO RELEASE TCSH
 See TOOLS.md for pre-requisites.
 
 1)  Update version number and date
-    - patchlevel.h
+
     - Fixes (make a new entry at the top)
-    - Look for an "UPDATE NEXT LINE FOR RELEASE" comment in:
-      * tcsh.man (three separate lines)
-      * configure.ac (one line, version only)
-    - debian/changelog
-	dch -v x.yy.zz 'Release x.yy.zz'
-	dch -r ''
-2)  Create Announce-x.yy.zz (if necessary)
-3)  Run autoreconf
-4)  Run make distclean; ./configure && make && make check
-5)  If checks succeed, commit the changed files and tag the release
-	git add Announce-x.yy.zz
-	git add Fixes aclocal.m4 config.h.in configure configure.ac \
-		debian/changelog patchlevel.h tcsh.man
-	git commit -m 'Release x.yy.zz'
-	git push origin
-	git tag TCSHx_yy_zz
-	git push origin tag TCSHx_yy_zz
-    using the values
-	x  == REV
-	yy == VERS
-	zz == PATCHLEVEL
-    from patchlevel.h (the new values you picked)
-6)  Create the archive and sign it
-	git archive -o tcsh-x.yy.zz.tar.gz \
-		--prefix=tcsh-x.yy.zz/ TCSHx_yy_zz
-	gpg --armor --detach-sign tcsh-x.yy.zz.tar.gz
+    - configure.ac (TCSH_VERSION and TCSH_DATE)
+
+2)  Run autoreconf
+
+3)  Run make distclean; ./configure && make && make test
+
+4)  If necessary, run make Announce
+    Edit the empty file to fill it with content
+
+5)  Update debian/changelog
+	make dch
+
+6)  If checks succeeded, add changed files to git, check the changes,
+    commit and tag the release, push to upstream, and create a signed
+    archive
+
+	make add
+	make diff
+	make commit
+	make push
+	make sign
+
 7)  Make the archive and signature available on ftp
+
 8)  Add the new version to bugs.astron.com:
+
     - Click: Manage > Manage Projects > tcsh
     - Scroll down to "Versions"
     - Click on "Edit" next to the HEAD version
@@ -44,4 +42,5 @@ See TOOLS.md for pre-requisites.
       click on "Add and Edit Version"
     - Set the "Date Order" to 2030-01-01 (i.e. far in the future)
     - Click on "Update Version"
+
 9)  Mail an announcement to tcsh@astron.com

@@ -7,9 +7,53 @@ dnl You'll also need a version of config.guess from a gnu package
 dnl
 dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 
+dnl
+dnl UPDATE THIS SECTION FOR RELEASE
+dnl
+AC_DEFUN([TCSH_VERSION], [6.24.03])
+AC_DEFUN([TCSH_DATE],    [2022-12-03])
+
 AC_PREREQ([2.69])dnl Minimum Autoconf version required.
-dnl UPDATE NEXT LINE FOR RELEASE
-AC_INIT([tcsh],[6.24.03],[https://bugs.astron.com/])
+AC_INIT([Tcsh],TCSH_VERSION,[https://bugs.astron.com/],,[https://www.tcsh.org/])
+
+AC_SUBST(PACKAGE_DATE,     TCSH_DATE)
+AC_SUBST(PACKAGE_ORIGIN,   [Astron])
+AC_SUBST(PACKAGE_MAILLIST, [https://mailman.astron.com/mailman/listinfo/tcsh])
+
+package_year="${PACKAGE_DATE%%-*}"
+package_day="${PACKAGE_DATE##*-}"
+package_day="${package_day#0}"
+package_month="${PACKAGE_DATE#*-}"
+package_month="${package_month%-*}"
+
+case "${package_month}" in
+01) package_month=January;;
+02) package_month=February;;
+03) package_month=March;;
+04) package_month=April;;
+05) package_month=May;;
+06) package_month=June;;
+07) package_month=July;;
+08) package_month=August;;
+09) package_month=September;;
+10) package_month=October;;
+11) package_month=November;;
+12) package_month=December;;
+esac
+
+PACKAGE_ENGLISH_DATE="${package_month} ${package_day}, ${package_year}"
+AC_SUBST(PACKAGE_ENGLISH_DATE)
+
+PACKAGE_REV="${PACKAGE_VERSION%%.*}"
+AC_SUBST(PACKAGE_REV)
+
+PACKAGE_VERS="${PACKAGE_VERSION#*.}"
+PACKAGE_VERS="${PACKAGE_VERS%.*}"
+AC_SUBST(PACKAGE_VERS)
+
+PACKAGE_PATCHLEVEL="${PACKAGE_VERSION##*.}"
+AC_SUBST(PACKAGE_PATCHLEVEL)
+
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([tc.vers.c])
 AC_CONFIG_HEADERS([config.h])
@@ -508,5 +552,5 @@ AC_SUBST(HESDEF)
 AC_SUBST(HESLIB)
 AC_SUBST(BUILD_CATALOGS)
 
-AC_CONFIG_FILES([Makefile nls/Makefile])
+AC_CONFIG_FILES([Makefile nls/Makefile patchlevel.h tcsh.man])
 AC_OUTPUT()
