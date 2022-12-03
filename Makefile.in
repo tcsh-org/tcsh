@@ -26,7 +26,7 @@ all: ${BUILD} catalogs
 ## Packaging
 ################################################################
 
-RELEASE_TAG=TCSH@PACKAGE_REL@_@PACKAGE_VERS@_@PACKAGE_PATCHLEVEL@
+RELEASE_TAG=TCSH@PACKAGE_REV@_@PACKAGE_VERS@_@PACKAGE_PATCHLEVEL@
 
 .PHONY: Announce
 Announce: Announce-${VERSION}
@@ -35,8 +35,8 @@ Announce-${VERSION}:
 
 .PHONY: dch
 dch:
-	dch -v ${VERSION} 'Release ${VERSION}'
-	dch -r ''
+	cd ${srcdir} && dch -v ${VERSION} 'Release ${VERSION}'
+	cd ${srcdir} && dch -r ''
 
 RELEASE_ARTIFACTS= \
 	Fixes aclocal.m4 config.h.in configure configure.ac \
@@ -44,8 +44,12 @@ RELEASE_ARTIFACTS= \
 
 .PHONY: release-add add
 release-add add:
-	test -f Announce-${VERSION} && git add Announce-${VERSION}
-	git add ${RELEASE_ARTIFACTS}
+	cd ${srcdir} \
+	&& test -f Announce-${VERSION} \
+	&& git add Announce-${VERSION} \
+	|| true
+	cd ${srcdir} \
+	&& git add ${RELEASE_ARTIFACTS}
 
 .PHONY: release-diff
 release-diff diff:
@@ -64,12 +68,14 @@ release-push push:
 .PHONY: release-archive tar.gz
 release-archive tar.gz: tcsh-${VERSION}.tar.gz
 tcsh-${VERSION}.tar.gz:
-	git archive -o tcsh-${VERSION}.tar.gz \
+	cd ${srcdir} \
+	&& git archive -o tcsh-${VERSION}.tar.gz \
 	    --prefix=tcsh-${VERSION}/ ${RELEASE_TAG}
 
 .PHONY: release-sign sign
 release-sign sign: tcsh-${VERSION}.tar.gz
-	gpg --armor --detach-sign tcsh-${VERSION}.tar.gz
+	cd ${srcdir} \
+	&& gpg --armor --detach-sign tcsh-${VERSION}.tar.gz
 
 ################################################################
 ## CFLAGS.  For various -D things, see config.h
