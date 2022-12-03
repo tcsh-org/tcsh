@@ -77,10 +77,7 @@ To install tcsh:
 8)  make
 
 9)  Read the documentation while you are waiting.  The file tcsh.man
-    is in standard [nt]roff -man format. If you like, you can run the
-    tcsh.man2html script (requires Perl) to generate an HTML version
-    of the manpage which you can read with Mosaic, lynx or other HTML
-    browser.
+    is in standard [nt]roff -mdoc format.
 
 10) Test tcsh by typing ./tcsh to see that it has compiled correctly.
     The history command should give a time stamp on every entry.
