@@ -57,10 +57,10 @@
 .\"   ALSO.
 .\"
 .\" UPDATE NEXT LINE FOR RELEASE
-.Dd November 24, 2022
+.Dd December 3, 2022
 .Dt TCSH 1
 .\" UPDATE NEXT LINE FOR RELEASE
-.Os Astron 6.24.02
+.Os Astron 6.24.03
 .
 .Sh NAME
 .Nm tcsh
@@ -9878,7 +9878,7 @@ substitutions on a single line to 20.
 .
 .Sh VERSION
 .\" UPDATE NEXT LINE FOR RELEASE
-This manual documents tcsh 6.24.02 (Astron) 2022-11-24.
+This manual documents tcsh 6.24.03 (Astron) 2022-12-03.
 .
 .Sh AUTHORS
 .

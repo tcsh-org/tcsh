@@ -17,8 +17,8 @@ See TOOLS.md for pre-requisites.
 5)  If checks succeed, commit the changed files and tag the release
 	git add Announce-x.yy.zz
 	git add Fixes aclocal.m4 config.h.in configure configure.ac \
-		patchlevel.h tcsh.man
-	git commit
+		debian/changelog patchlevel.h tcsh.man
+	git commit -m 'Release x.yy.zz'
 	git push origin
 	git tag TCSHx_yy_zz
 	git push origin tag TCSHx_yy_zz

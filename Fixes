@@ -1,3 +1,4 @@
+ 11. V6.24.03 - 20221203
  10. Fix set/@ test when diff is from busybox (Luke Mewburn)
   9. Handle \c in echo properly instead of printing garbage past the
      end of the string.
