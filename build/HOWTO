@@ -35,11 +35,11 @@ COPY FROM EACH BUILD MACHINE
 
 SIGN REPO
 
-    debrepo -t tcsh release
+    debrepo -r tcsh release
 
 PUBLISH REPO
 
-    debrepo -t tcsh dist
+    debrepo -r tcsh dist
 
 TEAR DOWN BUILD MACHINES
 
