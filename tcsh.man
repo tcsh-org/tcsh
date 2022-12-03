@@ -10015,6 +10015,12 @@ Minix port
 .It David Dawes, Sydney U. Australia, Physics Dept., 1991
 SVR4 job control fixes
 .
+.It Kimmo Suominen, 1991-
+Various portability and other fixes.
+Added
+.Ql $''
+(dollar-single-quotes).
+.
 .It Jose Sousa, Interactive Systems Corp., 1991
 Extended
 .Ic vi
