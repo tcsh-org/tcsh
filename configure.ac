@@ -10,7 +10,7 @@ dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 dnl
 dnl UPDATE THIS SECTION FOR RELEASE
 dnl
-AC_DEFUN([TCSH_VERSION], [6.24.03])
+AC_DEFUN([TCSH_VERSION], [6.24.04])
 AC_DEFUN([TCSH_DATE],    [2022-12-03])
 
 AC_PREREQ([2.69])dnl Minimum Autoconf version required.

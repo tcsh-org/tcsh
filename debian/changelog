@@ -1,3 +1,9 @@
+tcsh (6.24.04) unstable; urgency=medium
+
+  * Release 6.24.04
+
+ -- Kimmo Suominen <kimmo@suominen.com>  Sat, 03 Dec 2022 22:26:01 +0200
+
 tcsh (6.24.03) unstable; urgency=medium
 
   * Release 6.24.03
