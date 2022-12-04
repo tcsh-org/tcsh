@@ -683,6 +683,7 @@ INSTALL_PROGRAM
 PACKAGE_PATCHLEVEL
 PACKAGE_VERS
 PACKAGE_REV
+PACKAGE_CHANGELOG_DATE
 PACKAGE_ENGLISH_DATE
 PACKAGE_MAILLIST
 PACKAGE_ORIGIN
@@ -2935,10 +2936,10 @@ PACKAGE_MAILLIST=https://mailman.astron.com/mailman/listinfo/tcsh
 
 
 package_year="${PACKAGE_DATE%%-*}"
-package_day="${PACKAGE_DATE##*-}"
-package_day="${package_day#0}"
 package_month="${PACKAGE_DATE#*-}"
 package_month="${package_month%-*}"
+package_day="${PACKAGE_DATE##*-}"
+package_day="${package_day#0}"
 
 case "${package_month}" in
 01) package_month=January;;
@@ -2956,6 +2957,9 @@ case "${package_month}" in
 esac
 
 PACKAGE_ENGLISH_DATE="${package_month} ${package_day}, ${package_year}"
+
+
+PACKAGE_CHANGELOG_DATE="$(TZ=UTC date -d ${PACKAGE_DATE} '+%a, %d %b %Y %T %z')"
 
 
 PACKAGE_REV="${PACKAGE_VERSION%%.*}"

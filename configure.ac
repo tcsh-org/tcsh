@@ -21,10 +21,10 @@ AC_SUBST(PACKAGE_ORIGIN,   [Astron])
 AC_SUBST(PACKAGE_MAILLIST, [https://mailman.astron.com/mailman/listinfo/tcsh])
 
 package_year="${PACKAGE_DATE%%-*}"
-package_day="${PACKAGE_DATE##*-}"
-package_day="${package_day#0}"
 package_month="${PACKAGE_DATE#*-}"
 package_month="${package_month%-*}"
+package_day="${PACKAGE_DATE##*-}"
+package_day="${package_day#0}"
 
 case "${package_month}" in
 01) package_month=January;;
@@ -43,6 +43,9 @@ esac
 
 PACKAGE_ENGLISH_DATE="${package_month} ${package_day}, ${package_year}"
 AC_SUBST(PACKAGE_ENGLISH_DATE)
+
+PACKAGE_CHANGELOG_DATE="$(TZ=UTC date -d ${PACKAGE_DATE} '+%a, %d %b %Y %T %z')"
+AC_SUBST(PACKAGE_CHANGELOG_DATE)
 
 PACKAGE_REV="${PACKAGE_VERSION%%.*}"
 AC_SUBST(PACKAGE_REV)

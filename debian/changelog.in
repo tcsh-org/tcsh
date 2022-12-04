@@ -8,4 +8,4 @@
       to maintain compatibility with older versions packaged by
       Debian.
 
- -- The Tcsh Team <tcsh@astron.com>  @PACKAGE_DATE@
+ -- The Tcsh Team <tcsh@astron.com>  @PACKAGE_CHANGELOG_DATE@
