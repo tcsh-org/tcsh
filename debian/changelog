@@ -1,6 +1,6 @@
-tcsh (6.24.04) unstable; urgency=medium
+tcsh (6.24.05) unstable; urgency=medium
 
-  * Release 6.24.04
+  * Release 6.24.05
   * Please look in the Fixes file for an actual changelog
   * In packaging tcsh:
     - Avoid non-default settings in system-wide init files.
@@ -8,4 +8,4 @@ tcsh (6.24.04) unstable; urgency=medium
       to maintain compatibility with older versions packaged by
       Debian.
 
- -- The Tcsh Team <tcsh@astron.com>  2022-12-03
+ -- The Tcsh Team <tcsh@astron.com>  2022-12-04

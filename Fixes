@@ -1,3 +1,5 @@
+ 15. V6.24.05 - 2022-12-04
+ 14. Build and release process improvements (Luke Mewburn, Kimmo Suominen)
  13. V6.24.04 - 2022-12-03
  12. Fix a test to match output from old bash versions (Corinna Vinschen)
  11. V6.24.03 - 2022-12-03
