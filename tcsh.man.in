@@ -40,9 +40,9 @@
 .\"   However, tcsh is .Nm , because this is the tcsh man page (and
 .\"   see the next note anyway).
 .\"
-.\" - Say `the shell', not `tcsh', unless distinguishing between tcsh and csh.
+.\" - Write `the shell', not `tcsh', unless distinguishing between tcsh and csh.
 .\"
-.\" - Say `shell variable'/`environment variable' instead of `variable'
+.\" - Write `shell variable'/`environment variable' instead of `variable'
 .\"   and `builtin command'/`editor command' instead of `builtin' or `command'
 .\"   unless the distinction is absolutely clear from context.
 .\"
@@ -370,7 +370,8 @@ is not found,
 .Pp
 In the normal case, the shell begins reading commands from the terminal,
 prompting with
-.Sq Li >\ \& .
+.Dl Li >\ \&
+.Pp
 (Processing of arguments and the use of the shell to
 process files containing command scripts are described later.)
 The shell repeatedly reads a line of command input, breaks it into words,
@@ -497,8 +498,8 @@ and some of the characters with special meanings to it, listed under
 .
 .Ss Completion and listing (+)
 The shell is often able to complete words when given a unique abbreviation.
-Type part of a word (for example
-.Ql ls /usr/lost )
+For example, typing part of a word
+.Dl ls /usr/lost
 and hit the tab key to run the
 .Ic complete-word
 editor command.
@@ -535,7 +536,7 @@ to be deleted.
 .Pp
 Commands and variables can be completed in much the same way.
 For example, typing
-.Ql em[tab]
+.Dl em[tab]
 would complete
 .Ql em
 to
@@ -547,8 +548,9 @@ were the only command on your system beginning with
 Completion can find a command in any directory in
 .Ic path
 or if given a full pathname.
+.Pp
 Typing
-.Ql echo $ar[tab]
+.Dl echo $ar[tab]
 would complete
 .Ql $ar
 to
@@ -720,22 +722,25 @@ comp.lang.c++    comp.std.c
 .Ed
 .Pp
 and typed
-.Ql mail \-f c.l.c[tab] ,
+.Dl mail \-f c.l.c[tab]
 it would be completed to
-.Ql mail \-f comp.lang.c ,
-and
-.Ql ^D
+.Dl mail \-f comp.lang.c
+and typing
+.Dl mail \-f c.l.c[^D]
 would list
 .Ql comp.lang.c
 and
 .Ql comp.lang.c++ .
-.Ql mail \-f c..c++[^D]
+.Pp
+Typing
+.Dl mail \-f c..c++[^D]
 would list
 .Ql comp.lang.c++
 and
 .Ql comp.std.c++ .
+.Pp
 Typing
-.Ql rm a\-\-file[^D]
+.Dl rm a\-\-file[^D]
 in the following directory
 .Bd -literal -offset indent
 A_silly_file    a-hyphenated-file    another_silly_file
@@ -755,15 +760,16 @@ ignores case and differences between a hyphen and an underscore word
 separator only when the user types a lowercase character or a hyphen.
 Entering an uppercase character or an underscore will not match the
 corresponding lowercase character or hyphen word separator.
+.Pp
 Typing
-.Ql rm a\-\-file[^D]
+.Dl rm a\-\-file[^D]
 in the directory of the previous example would
 still list all three files, but typing
-.Ql rm A\-\-file
+.Dl rm A\-\-file
 would match only
 .Ql A_silly_file
 and typing
-.Ql rm a__file[^D]
+.Dl rm a__file[^D]
 would match just
 .Ql A_silly_file
 and
@@ -1141,7 +1147,7 @@ Searches backward like
 copies the first match
 into the input buffer with the cursor positioned at the end of the pattern,
 and prompts with
-.Sq Li bck:\ \&
+.Dl bck:\ \&
 and the first match.
 Additional characters may be
 typed to extend the search,
@@ -1407,7 +1413,7 @@ Word boundary behavior modified by
 .
 .It Ic vi-search-back ( \&? )
 Prompts with
-.Sq Li \&?
+.Dl \&?
 for a search string (which may be a glob-pattern, as with
 .Ic history-search-backward ) ,
 searches for it and copies it into the input buffer.
@@ -1795,11 +1801,15 @@ For example, consider this bit of someone's history list:
 .Pp
 The commands are shown with their event numbers and time stamps.
 The current event, which we haven't typed in yet, is event 13.
-.Ql !11
-and
-.Ql !\-2
-refer to event 11.
-.Ql \&!\&!
+.Pp
+Typing
+.Dl !11
+or
+.Dl !\-2
+refers to event 11.
+.Pp
+Typing
+.Dl \&!\&!
 refers to the previous event, 12.
 .Ql \&!\&!
 can be abbreviated
@@ -1812,17 +1822,22 @@ is described in
 .Sx History word designators
 and
 .Sx History word modifiers ) .
-.Ql !n
+.Pp
+Typing
+.Dl !n
 refers to event 9, which begins with
 .Ql n .
-.Ql !\&?old\&?
+.Pp
+Typing
+.Dl !\&?old\&?
 also refers to event 12, which contains
 .Ql old .
+.Pp
 Without word designators or modifiers history references simply expand to the
 entire event, so we might type
-.Ql !cp
+.Dl !cp
 to redo the copy command or
-.Ql !!|more
+.Dl !!|more
 if the
 .Ql diff
 output scrolled off the top of the screen.
@@ -1830,11 +1845,11 @@ output scrolled off the top of the screen.
 History references may be insulated from the surrounding text with braces if
 necessary.
 For example,
-.Ql !vdoc
+.Dl !vdoc
 would look for a command beginning with
 .Ql vdoc ,
 and, in this example, not find one, but
-.Ql !{v}doc
+.Dl !{v}doc
 would expand
 unambiguously to
 .Ql vi wumpus.mandoc .
@@ -1843,7 +1858,7 @@ Even in braces, history substitutions do not nest.
 (+) While
 .Xr csh 1
 expands, for example,
-.Ql !3d
+.Dl !3d
 to event 3 with the
 letter
 .Ql d
@@ -1855,11 +1870,11 @@ with
 only completely numeric arguments are treated as event numbers.
 This makes it possible to recall events beginning with numbers.
 To expand
-.Ql !3d
+.Dl !3d
 as in
 .Xr csh 1
 type
-.Ql !{3}d .
+.Dl !{3}d
 .
 .Ss History word designators
 To select words from an event we can follow the event specification by a
@@ -1921,35 +1936,38 @@ For example, the
 .Ql diff
 command in the previous example might have been
 typed as
-.Ql diff !!:1.old !!:1
+.Dl diff !!:1.old !!:1
 (using
 .Ql \&:1
 to select the first argument
 from the previous event) or
-.Ql diff !\-2:2 !\-2:1
+.Dl diff !\-2:2 !\-2:1
 to select and swap the
 arguments from the
 .Ql cp
 command.
 If we didn't care about the order of the
 .Ql diff
-we might have said
-.Ql diff !\-2:1\-2
+we might have typed
+.Dl diff !\-2:1\-2
 or simply
-.Ql diff !\-2:* .
+.Dl diff !\-2:*
+.Pp
 The
 .Ql cp
 command might have been written
-.Ql cp wumpus.man !#:1.old ,
+.Dl cp wumpus.man !#:1.old
 using
 .Ql #
 to refer to the current event.
-.Ql !n:\- hurkle.man
+.Pp
+Typing
+.Dl !n:\- hurkle.man
 would reuse the first two words from the
 .Ql nroff
 command
-to type
-.Ql nroff \-man hurkle.man .
+to expand to
+.Dl nroff \-man hurkle.man
 .Pp
 The
 .Ql \&:
@@ -1963,11 +1981,11 @@ or
 .Ql \- .
 For example, our
 .Ql diff
-command might have been
-.Ql diff !!^.old !!^
+command might have been typed
+.Dl diff !!^.old !!^
 or,
 equivalently,
-.Ql diff !!$.old !!$ .
+.Dl diff !!$.old !!$
 However, if
 .Ql \&!\&!
 is abbreviated
@@ -1981,10 +1999,10 @@ A history reference may have a word designator but no event specification.
 It then references the previous command.
 Continuing our
 .Ql diff
-example, we could have said simply
-.Ql diff !^.old !^
+example, we could have typed simply
+.Dl diff !^.old !^
 or, to get the arguments in the opposite order, just
-.Ql diff !* .
+.Dl diff !*
 .
 .Ss History word modifiers
 The word or words in a history reference can be edited, or
@@ -2103,29 +2121,31 @@ It is an error for no word to be modifiable.
 For example, the
 .Ql diff
 command might have been written as
-.Ql diff wumpus.man.old !#^:r ,
+.Dl diff wumpus.man.old !#^:r
 using
 .Ql \&:r
 to remove
 .Ql .old
 from the first argument on the same line
-(`!#^').
+.Pq Ql \&!#^ .
+.Pp
 We could type
-.Ql echo hello out there ,
+.Dl echo hello out there
 then
-.Ql echo !*:u
+.Dl echo !*:u
 to capitalize
 .Ql hello ,
-.Ql echo !*:au
+.Dl echo !*:au
 to upper case the first word to
 .Ql HELLO ,
 or
-.Ql echo !*:agu
+.Dl echo !*:agu
 to upper case all words.
+.Pp
 We might follow
-.Ql mail \-s \&"I forgot my password\&" rot
+.Dl mail \-s \&"I forgot my password\&" rot
 with
-.Ql !:s/rot/root
+.Dl !:s/rot/root
 to
 correct the spelling of
 .Ql root
@@ -2150,7 +2170,8 @@ man wumpus
 In
 .Xr csh 1 ,
 the result would be
-.Ql wumpus.1:r .
+.Dl wumpus.1:r
+.Pp
 A substitution followed by a
 colon may need to be insulated from it with braces:
 .Bd -literal -offset indent
@@ -2176,8 +2197,8 @@ There is a special abbreviation for substitutions.
 .Ql ^ ,
 when it is the first character on an input line, is equivalent to
 .Ql !:s^ .
-Thus we might have said
-.Ql ^rot^root
+Thus we might have typed
+.Dl ^rot^root
 to make the spelling correction in the
 previous example.
 This is the only history substitution which does not explicitly begin with
@@ -2238,23 +2259,25 @@ argument list is left untouched.
 Thus if the alias for
 .Ql ls
 were
-.Ql ls \-l
+.Dl ls \-l
 the command
-.Ql ls /usr
+.Dl ls /usr
 would become
-.Ql ls \-l /usr ,
+.Dl ls \-l /usr
 the argument list here being undisturbed.
+.Pp
 If the alias for
 .Ql lookup
 were
-.Ql grep !^ /etc/passwd
+.Dl grep !^ /etc/passwd
 then
-.Ql lookup bill
+.Dl lookup bill
 would become
-.Ql grep bill /etc/passwd .
+.Dl grep bill /etc/passwd
+.Pp
 Aliases can be used to introduce parser metasyntax.
 For example,
-.Sq alias print 'pr \e!* | lpr'
+.Dl alias print 'pr \e!* | lpr'
 defines a
 .Dq command
 .Pq Ql print
@@ -2290,12 +2313,12 @@ and
 .Ic unsetenv .
 .Pp
 (+) Variables may be made read-only with
-.Ql set \-r .
+.Dl set \-r
 Read-only variables may not be modified or unset;
 attempting to do so will cause an error.
 Once made read-only, a variable cannot be made writable,
 so
-.Ql set \-r
+.Dl set \-r
 should be used with caution.
 Environment variables cannot be made read-only.
 .Pp
@@ -2693,15 +2716,15 @@ The metanotation
 is a shorthand for
 .Ql abe ace ade .
 Left-to-right order is preserved:
-.Ql /usr/source/s1/{oldls,ls}.c
+.Dl /usr/source/s1/{oldls,ls}.c
 expands
 to
-.Ql /usr/source/s1/oldls.c /usr/source/s1/ls.c .
+.Dl /usr/source/s1/oldls.c /usr/source/s1/ls.c
 The results of matches are
 sorted separately at a low level to preserve this order:
-.Ql ../{memo,*box}
+.Dl ../{memo,*box}
 might expand to
-.Ql ../memo ../box ../mbox .
+.Dl ../memo ../box ../mbox
 (Note that
 .Ql memo
 was not sorted with the results of matching
@@ -2731,14 +2754,14 @@ name consisting of letters, digits and
 .Ql \-
 characters the shell searches for a
 user with that name and substitutes their home directory; thus
-.Ql ~ken
+.Dl ~ken
 might
 expand to
-.Ql /usr/ken
+.Dl /usr/ken
 and
-.Ql ~ken/chmach
-to
-.Ql /usr/ken/chmach .
+.Dl ~ken/chmach
+might expand to
+.Dl /usr/ken/chmach
 If the character
 .Ql ~
 is followed by a character other than a letter or
@@ -2746,7 +2769,7 @@ is followed by a character other than a letter or
 or appears elsewhere
 than at the beginning of a word, it is left undisturbed.
 A command like
-.Ql setenv MANPATH /usr/share/man:/usr/local/share/man:~/lib/man
+.Dl setenv MANPATH /usr/share/man:/usr/local/share/man:~/lib/man
 does not,
 therefore, do home directory substitution as one might hope.
 .Pp
@@ -2762,7 +2785,7 @@ without
 not to match any files.
 However, only one pattern in a list of
 glob-patterns must match a file (so that, e.g.,
-.Ql rm *.a *.c *.o
+.Dl rm *.a *.c *.o
 would fail
 only if there were no files in the current directory ending in
 .Ql .a ,
@@ -2786,28 +2809,28 @@ a file glob pattern that matches any string of characters including
 .Ql / ,
 recursively traversing any existing sub-directories.
 For example,
-.Ql ls **.c
+.Dl ls **.c
 will list all the .c files in the current directory tree.
-If used by itself, it will match zero or more sub-directories
-(e.g.
-.Ql ls /usr/include/**/time.h
+If used by itself, it will match zero or more sub-directories.
+For example
+.Dl ls /usr/include/**/time.h
 will list any file named
 .Ql time.h
 in the
 .Pa /usr/include
 directory tree;
-.Ql ls /usr/include/**time.h
+.Dl ls /usr/include/**time.h
 will match
 any file in the
 .Pa /usr/include
 directory tree ending in
 .Ql time.h ;
 and
-.Ql ls /usr/include/**time**.h
+.Dl ls /usr/include/**time**.h
 will match any .h file with
 .Ql time
 either
-in a subdirectory name or in the filename itself).
+in a subdirectory name or in the filename itself.
 To prevent problems with recursion, the
 .Ql **
 glob-pattern will not
@@ -3027,7 +3050,7 @@ shell
 variable.
 If so, the shell checks the first line of the file to
 see if it is of the form
-.Ql #! Ns Ar interpreter arg Li \&... .
+.Dl #! Ns Ar interpreter arg Li \&...
 If it is,
 the shell starts
 .Ar interpreter
@@ -3154,8 +3177,7 @@ mechanism should be used to
 present inline data.
 This permits shell command scripts to function as
 components of pipelines and allows the shell to block read its input.
-Note
-that the default standard input for a command run detached is
+Note that the default standard input for a command run detached is
 .Em not
 the empty file
 .Pa /dev/null ,
@@ -3172,7 +3194,7 @@ rather than just
 .Pp
 The shell cannot presently redirect diagnostic output without also redirecting
 standard output, but
-.Ql \&( Ar command Li > Ar output-file Li ) >& Ar error-file
+.Dl \&( Ar command Li > Ar output-file Li ) >& Ar error-file
 is often an acceptable workaround.
 Either
 .Ar output-file
@@ -3612,7 +3634,7 @@ key (usually
 which sends a STOP signal to the current job.
 The shell will then normally
 indicate that the job has been
-.Sq Suspended
+.Dl Suspended
 and print another prompt.
 If the
 .Ic listjobs
@@ -3668,7 +3690,7 @@ A job being run in the background stops if it tries to read from the
 terminal.
 Background jobs are normally allowed to produce output, but this can
 be disabled by giving the command
-.Ql stty tostop .
+.Dl stty tostop
 If you set this tty option,
 then background jobs will stop when they try to produce output like they do
 when they try to read input.
@@ -3679,20 +3701,19 @@ The character
 introduces a job name.
 If you wish to refer to job number 1, you can name it
 as
-.Ql %1 .
+.Dl %1
 Just naming a job brings it to the foreground; thus
-.Ql %1
-is a synonym
-for
-.Ql fg %1 ,
+.Dl %1
+is a synonym for
+.Dl fg %1
 bringing job 1 back into the foreground.
 Similarly, typing
-.Ql %1 &
+.Dl %1 &
 resumes job 1 in the background, just like
-.Ql bg %1 .
+.Dl bg %1
 A job can also be named
 by an unambiguous prefix of the string typed in to start it:
-.Ql %ex
+.Dl %ex
 would
 normally restart a suspended
 .Xr ex 1
@@ -3700,7 +3721,7 @@ job, if there were only one suspended
 job whose name began with the string
 .Ql ex .
 It is also possible to type
-.Ql %? Ns Ar string
+.Dl %? Ns Ar string
 to specify a job whose text contains
 .Ar string ,
 if there is only one such job.
@@ -3762,13 +3783,14 @@ By
 default
 .Ic notify
 marks the current process; simply enter
-.Ql notify
+.Dl notify
 after
-starting a background job to mark it.
+starting a background job to mark it for immediate status reporting.
 .Pp
 When you try to leave the shell while jobs are stopped, you will be
 warned that
-.Sq There are suspended jobs\&. .
+.Dl There are suspended jobs\&.
+.Pp
 You may use the
 .Ic jobs
 command to
@@ -3829,7 +3851,7 @@ of commands which exit with a status other than zero.
 The
 .Ic rmstar
 shell variable can be set to ask the user, when
-.Ql rm *
+.Dl rm *
 is
 typed, if that is really what was meant.
 .Pp
@@ -4169,7 +4191,9 @@ or
 then at least that part of
 .Ar expr
 must be placed within
-.Ql () .
+.Ql (
+and
+.Ql ) .
 Note that the syntax of
 .Ar expr
 has nothing to do with that described
@@ -4208,9 +4232,11 @@ must be separated by spaces.
 .
 .It Ic alias Op Ar name Op Ar wordlist
 Without arguments, prints all aliases.
+.Pp
 With
 .Ar name ,
 prints the alias for name.
+.Pp
 With
 .Ar name
 and
@@ -4221,6 +4247,7 @@ as the alias of
 .Ar name .
 .Ar wordlist
 is command and filename substituted.
+.Pp
 .Ar name
 may not be
 .Sq Ic alias
@@ -4554,16 +4581,16 @@ flags have the same effect on
 as on
 .Ic dirs ,
 and they imply
-.Fl p .
-(+)
+.Fl p
+(+).
 Using
 .Fl \-
 forces a break from option processing so the next word
 is taken as the directory
 .Ar name
 even if it begins with
-.Ql \- .
-(+)
+.Ql \-
+(+).
 .Pp
 See also the
 .Ic implicitcd
@@ -4591,15 +4618,18 @@ builtin command.
 (+)
 .Xc
 Without arguments, lists all completions.
+.Pp
 With
 .Ar command ,
 lists completions for
 .Ar command .
+.Pp
 With
 .Ar command
 and
 .Ar word
-etc., defines completions.
+\&...,
+defines completions.
 .Pp
 .Ar command
 may be a full command name or a glob-pattern
@@ -4879,7 +4909,7 @@ doesn't have any options, so
 .Ql x
 does nothing when completion
 is attempted and prints
-.Sq Truth has no options\&.
+.Dl Truth has no options\&.
 when completion choices are listed.
 .Pp
 Note that the
@@ -5003,9 +5033,9 @@ One might use
 .Ed
 .Pp
 to complete
-.Ql elm \-f =
+.Dl elm \-f =
 as if it were
-.Ql elm \-f ~/Mail/ .
+.Dl elm \-f ~/Mail/
 Note that we used the separator
 .Ql @
 instead of
@@ -5059,16 +5089,16 @@ This completes words following
 .Ql \-newer ,
 .Ql \-cpio ,
 or
-.Ql ncpio
+.Ql \-ncpio
 (note the pattern which matches both) to files,
 words following
 .Ql \-exec
 or
 .Ql \-ok
 to commands, words following
-.Ql user
+.Ql \-user
 and
-.Ql group
+.Ql \-group
 to users and groups respectively
 and words following
 .Ql \-fstype
@@ -5156,18 +5186,18 @@ takes precedence.
 .Fl p
 is accepted but does nothing.
 .Pp
-With
-.Fl S ,
-the second form saves the directory stack to
+The second form with
+.Fl S
+saves the directory stack to
 .Ar filename
 as a series of
 .Ic cd
 and
 .Ic pushd
 commands.
-With
-.Fl L ,
-the shell sources
+The second form with
+.Fl L
+sources
 .Ar filename ,
 which is presumably
 a directory stack file saved by the
@@ -5186,12 +5216,12 @@ is used if
 is unset.
 .Pp
 Note that login shells do the equivalent of
-.Ql dirs \-L
+.Dl dirs \-L
 on startup
 and, if
 .Ic savedirs
 is set,
-.Ql dirs \-S
+.Dl dirs \-S
 before exiting.
 Because only
 .Pa ~/.tcshrc
@@ -5229,13 +5259,13 @@ Exercises the terminal capabilities (see
 in
 .Ar arg .
 For example,
-.Ql echotc home
+.Dl echotc home
 sends the cursor to the home position,
-.Ql echotc cm 3 10
+.Dl echotc cm 3 10
 sends it to column 3 and row 10, and
-.Ql echotc ts 0; echo \&"This is a test.\&"; echotc fs
+.Dl echotc ts 0; echo \&"This is a test.\&"; echotc fs
 prints
-.Sq This is a test\&.
+.Dl This is a test\&.
 in the status line.
 .Pp
 If
@@ -5377,7 +5407,7 @@ the builtin command
 to terminate it prematurely.
 When this command is read from the terminal, the loop is read once
 prompting with
-.Sq Li foreach?\ \&
+.Dl foreach?\ \&
 (or
 .Ic prompt2 )
 before any statements in
@@ -5414,7 +5444,7 @@ yield a string of the form
 The shell rewinds its
 input as much as possible, searches for a line of the
 form
-.Sq Ar label Ns No \&: ,
+.Dl Ar label Ns No \&:
 possibly preceded by blanks or tabs, and
 continues execution after that line.
 .
@@ -5465,19 +5495,20 @@ the history list is printed without leading numbers.
 If
 .Fl T
 is specified, timestamps are printed also in comment form.
-(This can be used to
+This can be used to
 produce files suitable for loading with
-.Ql history \-L
+.Dl history \-L
 or
-.Ql source \-h . )
+.Dl source \-h
+.Pp
 With
 .Fl r ,
 the order of printing is most recent
 first rather than oldest first.
 .Pp
-With
-.Fl S ,
-the second form saves the history list to
+The second form with
+.Fl S
+saves the history list to
 .Ar filename .
 If the first word of the
 .Ic savehist
@@ -5503,16 +5534,16 @@ the history file update
 will be serialized with other shell sessions that would possibly like
 to merge history at exactly the same time.
 .Pp
-With
-.Fl L ,
-the shell appends
-.Ar filename ,
-which is presumably a
+The second form with
+.Fl L
+appends
+.Ar filename
+(which is presumably a
 history list saved by the
 .Fl S
 option or the
 .Ic savehist
-mechanism,
+mechanism)
 to the history list.
 .Fl M
 is like
@@ -5530,19 +5561,20 @@ is not given and
 is used if
 .Ic histfile
 is unset.
-.Ql history \-L
+.Pp
+Note that
+.Dl history \-L
 is exactly like
-.Ql source \-h
-except that it does not require a
-filename.
+.Dl source \-h
+except that it does not require a filename.
 .Pp
 Note that login shells do the equivalent of
-.Ql history \-L
+.Dl history \-L
 on startup
 and, if
 .Ic savehist
 is set,
-.Ql history \-S
+.Dl history \-S
 before exiting.
 Because only
 .Pa ~/.tcshrc
@@ -5668,13 +5700,13 @@ to remove a shared library.
 .
 .It Ic jobs Op Fl l
 .It Ic jobs Fl Z Oo Ar title Oc No (+)
-Lists the active jobs.
+The first form lists the active jobs.
 With
 .Fl l ,
 lists process IDs in addition to the normal information.
 On TCF systems, prints the site on which each job is executing.
 .Pp
-The
+The second form with the
 .Fl Z
 option sets the process title to
 .Ar title
@@ -5712,10 +5744,11 @@ Signals are either given by number or by name (as given in
 .Pa /usr/include/signal.h ,
 stripped of the prefix
 .Sq SIG ) .
+.Pp
 There is no default
 .Ar job ;
 entering just
-.Ql kill
+.Dl kill
 does not send a signal
 to the current job.
 If the signal being sent is TERM (terminate)
@@ -5732,13 +5765,19 @@ process it creates to not individually exceed
 on
 the specified
 .Ar resource .
+.Pp
 If no
 .Ar maximum-use
 is given, then
-the current limit is printed; if no
+the current limit for
+.Ar resource
+is printed.
+.Pp
+If no
 .Ar resource
 is given, then
 all limitations are given.
+.Pp
 If the
 .Fl h
 flag is given, the
@@ -5855,10 +5894,12 @@ or
 .Ql m
 or
 .Ql megabytes
+(1048576 bytes)
 or
 .Ql g
 or
 .Ql gigabytes
+(1073741824 bytes)
 may also be used.
 For
 .Ic cputime
@@ -5917,9 +5958,11 @@ is set.
 (+)
 .Xc
 Lists files like
-.Ql ls \-F ,
+.Dl ls \-F
 but much faster.
-It identifies each type of
+.Pp
+.Ic ls\-F
+identifies each type of
 special file in the listing with a special character:
 .Pp
 .Bl -tag -width 5n -offset indent -compact
@@ -5970,36 +6013,39 @@ shell variable is set to
 .Ql a ,
 or
 .Ql A ,
-or any
-combination thereof (e.g.,
+or any combination thereof (e.g.,
 .Ql xA ) ,
 they are used as flags to
 .Ic ls\-F ,
 making it act like
-.Ql ls \-xF ,
-.Ql ls \-Fa ,
-.Ql ls \-FA ,
-or a combination
-(e.g.,
-.Ql ls \-FxA ) .
+.Bd -literal -offset indent -compact
+ls \-xF
+ls \-Fa
+ls \-FA
+.Ed
+.Pp
+or a combination, for example
+.Dl ls \-FxA
+.Pp
 On machines where
-.Ql ls \-C
+.Dl ls \-C
 is not the default,
 .Ic ls\-F
 acts like
-.Ql ls \-CF ,
+.Dl ls \-CF
 unless
 .Ic listflags
 contains an
 .Ql x ,
 in which case it acts like
-.Ql ls \-xF .
+.Dl ls \-xF
+.Pp
 .Ic ls\-F
 passes its arguments to
 .Xr ls 1
 if it is given any switches,
 so
-.Ql alias ls ls\-F
+.Dl alias ls ls\-F
 generally does the right thing.
 .Pp
 The
@@ -6025,8 +6071,8 @@ default site determined by the system path.
 (TCF only)
 .Pp
 The second form is equivalent to
-.Ql migrate \- Ns Ar site Li $$ :
-it migrates the
+.Dl migrate \- Ns Ar site Li $$
+in that it migrates the
 current process to the specified site.
 Migrating the shell
 itself can cause unexpected behavior, because the shell
@@ -6037,8 +6083,8 @@ does not like to lose its tty.
 .
 .It Ic newgrp Oo Cm \- Oc Oo Ar group Oc No (+)
 Equivalent to
-.Ql exec newgrp ;
-see
+.Dl exec newgrp
+as per
 .Xr newgrp 1 .
 Available only if the shell was so compiled;
 see the
@@ -6063,9 +6109,10 @@ the less cpu
 the process gets.
 The super-user may specify negative
 priority by using
-.Ql nice \- Ns Ar number Li \&... .
-Command is always
-executed in a sub-shell, and the restrictions placed on
+.Dl nice \- Ns Ar number Li \&...
+.Pp
+.Ar command
+is always executed in a sub-shell, and the restrictions placed on
 commands in simple
 .Ic if
 statements apply.
@@ -6078,6 +6125,7 @@ runs
 such that it will ignore hangup signals.
 Note that commands may set their own response to hangups, overriding
 .Ic nohup .
+.Pp
 Without an argument, causes the non-interactive shell only to
 ignore hangups for the remainder of the script.
 See also
@@ -6111,13 +6159,15 @@ Without arguments,
 restores the default action of the shell on interrupts,
 which is to terminate shell scripts or to return to the
 terminal command input level.
+.Pp
 With
 .Ql \- ,
 causes all interrupts to be ignored.
+.Pp
 With
 .Ar label ,
 causes the shell to execute a
-.Ql goto Ar label
+.Dl goto Ar label
 when an interrupt is received or a child process terminates because it was
 interrupted.
 .Pp
@@ -6135,6 +6185,7 @@ where interrupts are disabled anyway.
 .Xc
 Without arguments, pops the directory stack and returns to the new top
 directory.
+.Pp
 With a number
 .Ql + Ns Ar n ,
 discards the
@@ -6182,11 +6233,12 @@ If
 .Ic pushdtohome
 is set,
 .Ic pushd
-without arguments does
-.Ql pushd ~ ,
+without arguments acts as
+.Dl pushd ~
 like
 .Ic cd .
 (+)
+.Pp
 With
 .Ar name ,
 pushes the current working directory onto the directory
@@ -6208,6 +6260,7 @@ removes any instances of
 .Ar name
 from the stack before pushing it onto the stack.
 (+)
+.Pp
 With a number
 .Ql + Ns Ar n ,
 rotates the
@@ -6217,7 +6270,7 @@ directory stack around to be the top element and changes to it.
 If
 .Ic dextract
 is set, however,
-.Ql pushd + Ns Ar n
+.Dl pushd + Ns Ar n
 extracts the
 .Ar n Ns
 th
@@ -6320,8 +6373,9 @@ For example,
 .Ed
 .Pp
 causes the shell to echo
-.Sq It's eleven o'clock\&.
+.Dl It's eleven o'clock\&.
 at 11 AM.
+.Pp
 The time may be in 12-hour AM/PM format
 .Bd -literal -offset indent
 .\" TODO
@@ -6457,7 +6511,8 @@ builtin command.
 .
 .It Ic setenv Op Ar name Op Ar value
 Without arguments, prints the names and values of all environment variables.
-Given
+.Pp
+With
 .Ar name ,
 sets the environment variable
 .Ar name
@@ -6485,7 +6540,7 @@ has the value
 .Ar value .
 No sanity checking is done.
 Concept terminal users may have to
-.Ql settc xn no
+.Dl settc xn no
 to get proper
 wrapping at the rightmost column.
 .
@@ -6506,7 +6561,7 @@ tells
 .Ic setty
 to act
 on the
-.Ql edit ,
+.Sq edit ,
 .Sq quote ,
 or
 .Sq execute
@@ -6542,7 +6597,7 @@ or removes control from
 .Ar mode
 in the chosen set.
 For example,
-.Ql setty +echok echoe
+.Dl setty +echok echoe
 fixes
 .Ql echok
 mode on and allows commands
@@ -6569,6 +6624,7 @@ It is an error for
 .Ic argv
 not to be set or to have
 less than one word as value.
+.Pp
 With
 .Ar variable ,
 performs the
@@ -6592,11 +6648,12 @@ An error in a
 at any level terminates all nested
 .Ic source
 commands.
+.Pp
 With
 .Fl h ,
 commands are placed on the history list instead of being
 executed, much like
-.Ql history \-L .
+.Dl history \-L
 .
 .It Ic stop % Ns Ar job Ns | Ns Ar pid No \&...
 Stops the specified jobs or processes which are executing in the background.
@@ -6609,10 +6666,11 @@ or
 .Ql \-
 as described under
 .Sx Jobs .
+.Pp
 There is no default
 .Ar job ;
 entering just
-.Ql stop
+.Dl stop
 does not stop
 the current job.
 .
@@ -6703,6 +6761,7 @@ and prints a time summary as described under the
 variable.
 If necessary, an extra shell is created to print the time statistic when
 the command completes.
+.Pp
 Without
 .Ar command ,
 prints a time summary for the current shell and its
@@ -6715,6 +6774,7 @@ which is given in octal.
 Common values for the mask are
 002, giving all access to the group and read and execute access to others, and
 022, giving read and execute access to the group and others.
+.Pp
 Without
 .Ar value ,
 prints the current file creation mask.
@@ -6722,8 +6782,9 @@ prints the current file creation mask.
 .It Ic unalias Ar pattern
 Removes all aliases whose names match
 .Ar pattern .
-.Ql unalias *
-thus removes all aliases.
+Thus
+.Dl unalias *
+removes all aliases.
 It is not an error for nothing to be
 .Ic unalias Ns
 ed.
@@ -6731,8 +6792,9 @@ ed.
 .It Ic uncomplete Ar pattern No (+)
 Removes all completions whose names match
 .Ar pattern .
-.Ql uncomplete *
-thus removes all completions.
+Thus
+.Dl uncomplete *
+removes all completions.
 It is not an error for nothing to be
 .Ic uncomplete Ns
 d.
@@ -6755,16 +6817,19 @@ is
 specified, all
 .Ar resource
 limitations.
+.Pp
 With
 .Fl h ,
 the corresponding hard limits are removed.
 Only the super-user may do this.
+.Pp
 Note that
 .Ic unlimit
 may not exit successful, since most systems
 do not allow
 .Ic descriptors
 to be unlimited.
+.Pp
 With
 .Fl f
 errors are ignored.
@@ -6773,31 +6838,37 @@ errors are ignored.
 Removes all variables whose names match
 .Ar pattern ,
 unless they are read-only.
-.Ql unset *
-thus removes all variables unless they are read-only;
+Thus
+.Dl unset *
+removes all variables unless they are read-only;
 this is a bad idea.
+.Pp
 It is not an error for nothing to be
 .Ic unset .
 .
 .It Ic unsetenv Ar pattern
 Removes all environment variables whose names match
 .Ar pattern .
-.Ql unsetenv *
-thus removes all environment variables;
+Thus
+.Dl unsetenv *
+removes all environment variables;
 this is a bad idea.
+.Pp
 It is not an error for nothing to be
-.Ar unsetenv Ns
+.Ic unsetenv Ns
 ed.
 .
 .It Ic ver Oo Ar systype Oo Ar command Oc Oc No (+)
 Without arguments, prints
 .Ev SYSTYPE .
+.Pp
 With
 .Ar systype ,
 sets
 .Ev SYSTYPE
 to
 .Ar systype .
+.Pp
 With
 .Ar systype
 and
@@ -6811,6 +6882,7 @@ may be
 .Ql bsd4.3
 or
 .Ql sys5.3 .
+.Pp
 (Domain/OS only)
 .
 .It Ic wait
@@ -6939,7 +7011,7 @@ but it does not print builtins.
 .Ed
 .Pp
 then executing
-.Ql vi foo.c
+.Dl vi foo.c
 will put the command string in the xterm title bar.
 .
 .It Ic helpcommand
@@ -6955,6 +7027,7 @@ For example, if one does
 .Pp
 then the help display of the command itself will be invoked, using the GNU
 help calling convention.
+.Pp
 Currently there is no easy way to account for various calling conventions (e.g.,
 the customary Unix
 .Ql -h ) ,
@@ -6976,6 +7049,7 @@ if one does
 then the
 .Xr checknews 1
 program runs every 30 minutes.
+.Pp
 If
 .Ic periodic
 is set but
@@ -6995,6 +7069,7 @@ For example, if one does
 then
 .Xr date 1
 runs just before the shell prompts for each command.
+.Pp
 There are no limits on what
 .Ic precmd
 can be set to do, but discretion
@@ -7007,7 +7082,7 @@ Runs before each command gets executed.
 .Ed
 .Pp
 then executing
-.Ql vi foo.c
+.Dl vi foo.c
 will put the command string in the xterm title bar.
 .
 .It Ic shell
@@ -7136,6 +7211,7 @@ each completion attempt.
 If set, the
 .Ic expand-history
 editor command is invoked automatically before each completion attempt.
+.Pp
 If this is set to
 .Ql onlyhistory ,
 then
@@ -7143,6 +7219,7 @@ only history will be expanded and a second completion will expand filenames.
 .
 .It Ic autolist No (+)
 If set, possibilities are listed after an ambiguous completion.
+.Pp
 If set to
 .Ql ambiguous ,
 possibilities are listed only when no new
@@ -7154,7 +7231,7 @@ logout.
 The optional second word is the number of minutes of inactivity
 before automatic locking.
 When the shell automatically logs out, it prints
-.Sq auto-logout ,
+.Dl auto-logout
 sets the
 variable
 .Ic logout
@@ -7164,6 +7241,7 @@ and exits.
 When the shell automatically locks, the user is required to enter their password
 to continue working.
 Five incorrect attempts result in automatic logout.
+.Pp
 Set to
 .Ql 60
 (automatic logout after 60 minutes, and no locking) by default
@@ -7174,6 +7252,7 @@ environment variable is set),
 the tty is a pseudo-tty (pty) or the shell was not so compiled (see the
 .Ic version
 shell variable).
+.Pp
 Unset
 .Ic autologout
 or set it to
@@ -7217,10 +7296,10 @@ The file name of the message catalog.
 If set,
 .Nm
 uses
-.Sq tcsh.${catalog}
+.Pa tcsh.${catalog}
 as a message catalog instead of
 default
-.Sq tcsh .
+.Pa tcsh .
 .
 .It Ic cdpath
 A list of directories in which
@@ -7246,17 +7325,17 @@ and it passes
 to
 .Xr ls 1 .
 Alternatively, it can be set to only
-.Ic ls\-F
+.Ql ls\-F
 or only
-.Ic ls
+.Ql ls
 to enable color to only one command.
 Setting
 it to nothing is equivalent to setting it to
 .Ql (ls\-F ls) .
 .
 .It Ic colorcat
-If set, it enables color escape sequence for NLS message files.
-And display colorful NLS messages.
+If set, it enables color escape sequence for NLS message files,
+and display colorful NLS messages.
 .
 .It Ic command No (+)
 If set, the command which was passed to the shell with the
@@ -7271,6 +7350,7 @@ If set, the shell will evaluate expressions right to left, like the original
 If set to
 .Ql igncase ,
 the completion becomes case insensitive.
+.Pp
 If set to
 .Ql enhance ,
 completion ignores case and considers
@@ -7284,6 +7364,7 @@ and
 .Pc
 as word
 separators.
+.Pp
 If set to
 .Ql Enhance ,
 completion matches uppercase and underscore
@@ -7305,9 +7386,11 @@ echo \`pwd\` $argv > ~/.<cmd>_pause; %<cmd>
 If set to
 .Ql cmd ,
 commands are automatically spelling-corrected.
+.Pp
 If set to
 .Ql complete ,
 commands are automatically completed.
+.Pp
 If set to
 .Ql all ,
 the entire command line is corrected.
@@ -7327,7 +7410,7 @@ shell variables.
 .
 .It Ic dextract No (+)
 If set,
-.Ql pushd + Ns Ar n
+.Dl pushd + Ns Ar n
 extracts the
 .Ar n Ns
 th directory from the directory
@@ -7335,9 +7418,9 @@ stack rather than rotating it to the top.
 .
 .It Ic dirsfile No (+)
 The default location in which
-.Ql dirs \-S
+.Dl dirs \-S
 and
-.Ql dirs \-L
+.Dl dirs \-L
 look for
 a history file.
 If unset,
@@ -7380,18 +7463,23 @@ Has an effect only if
 is listed as part of the
 .Ic version
 shell variable.
+.Pp
 If set to
 .Ql euc ,
 it enables display and editing EUC-kanji(Japanese) code.
+.Pp
 If set to
 .Ql sjis ,
 it enables display and editing Shift-JIS(Japanese) code.
+.Pp
 If set to
 .Ql big5 ,
 it enables display and editing Big5(Chinese) code.
+.Pp
 If set to
 .Ql utf8 ,
 it enables display and editing Utf8(Unicode) code.
+.Pp
 If set to the following format, it enables display and editing of original
 multi-byte code format:
 .Bd -literal -offset indent
@@ -7427,9 +7515,7 @@ Used for both the first byte and second byte of a multi-byte character.
 .\" a complete example), I could fix the text to be grammatically correct.
 .\" (steve.kelem@xilinx.com 1999/09/13)
 .Pp
-Example:
-.Pp
-If set to
+For example, if set to
 .Ql 001322 ,
 the first character (means 0x00 of the ASCII code) and
 second character (means 0x01 of ASCII code) are set to
@@ -7459,12 +7545,11 @@ this version, set the second word of dspmbyte to
 .Ql ls .
 If not, for
 example,
-.Ql ls-F -l
+.Dl ls-F -l
 cannot display multi-byte filenames.
 .Pp
-Note:
-.Pp
-This variable can only be used if KANJI and DSPMBYTE has been defined at
+Note that
+this variable can only be used if KANJI and DSPMBYTE has been defined at
 compile time.
 .
 .It Ic dunique No (+)
@@ -7563,11 +7648,13 @@ Lists file name suffixes to be ignored by completion.
 In
 .Nm ,
 completion is always used and this variable is ignored by default.
+.Pp
 If
 .Ic edit
 is unset, then the traditional
 .Xr csh 1
 completion is used.
+.Pp
 If set in
 .Xr csh 1 ,
 filename completion is used.
@@ -7593,22 +7680,24 @@ file glob patterns will match any string of
 characters including
 .Ql /
 traversing any existing sub-directories.
-(e.g.
-.Ql ls **.c
-will list all the .c files in the current directory tree).
-If used by itself, it will match zero or more sub-directories
-(e.g.
-.Ql ls /usr/include/**/time.h
+For example,
+.Dl ls **.c
+will list all the .c files in the current directory tree.
+.Pp
+If used by itself, it will match zero or more sub-directories.
+For example,
+.Dl ls /usr/include/**/time.h
 will list any file named
 .Ql time.h
 in the
 .Pa /usr/include
 directory tree; whereas
-.Ql ls /usr/include/**time.h
+.Dl ls /usr/include/**time.h
 will match any file in the
 .Pa /usr/include
 directory tree ending in
-.Ql time.h ) .
+.Ql time.h .
+.Pp
 To prevent problems with recursion, the
 .Ql **
 glob-pattern will not
@@ -7635,9 +7724,11 @@ If you care about terminal performance, you may want to leave this unset.
 .It Ic histchars
 A string value determining the characters used in
 .Sx History substitution .
+.Pp
 The first character of its value is used as
 the history substitution character, replacing the default character
 .Ql \&! .
+.Pp
 The second character of its value replaces the character
 .Ql ^
 in
@@ -7645,19 +7736,23 @@ quick substitutions.
 .
 .It Ic histdup No (+)
 Controls handling of duplicate entries in the history list.
+.Pp
 If set to
 .Ql all
 only unique history events are entered in the history list.
+.Pp
 If
 set to
 .Ql prev
 and the last history event is the same as the current
 command, then the current command is not entered in the history.
+.Pp
 If
 set to
 .Ql erase
 and the same event is found in the history list, that
 old event gets erased and the current one gets inserted.
+.Pp
 Note that the
 .Ql prev
 and
@@ -7666,14 +7761,16 @@ options renumber history events so there are no gaps.
 .
 .It Ic histfile No (+)
 The default location in which
-.Ql history \-S
+.Dl history \-S
 and
-.Ql history \-L
+.Dl history \-L
 look for
 a history file.
+.Pp
 If unset,
 .Pa ~/.history
 is used.
+.Pp
 .Ic histfile
 is
 useful when sharing the same home directory between different machines,
@@ -7700,8 +7797,8 @@ editor command.
 .
 .It Ic history
 The first word indicates the number of history events to save.
-The
-optional second word (+) indicates the format in which history is
+.Pp
+The optional second word (+) indicates the format in which history is
 printed; if not given,
 .Ql %h\et%T\et%R\en
 is used.
@@ -7710,6 +7807,7 @@ are described below under
 .Ic prompt ;
 note the variable meaning of
 .Ql \&%R .
+.Pp
 Set to
 .Ql 100
 by default.
@@ -7730,12 +7828,13 @@ the
 command (usually generated by the user by typing
 .Ic ^D
 on an empty line) causes the shell to print
-.Ql Use \&"exit\&" to leave tcsh\&.
+.Dl Use \&"exit\&" to leave tcsh\&.
 instead of exiting.
 This prevents the shell from accidentally
 being killed.
 Historically this setting exited after 26 successive
 EOF's to avoid infinite loops.
+.Pp
 If set to a number
 .Sq Em n ,
 the shell
@@ -7746,8 +7845,9 @@ consecutive
 .Ic end-of-file Ns
 s and exits on the
 .Em n Ns
-th.
-(+) If unset,
+th (+).
+.Pp
+If unset,
 .Ql 1
 is used, i.e., the shell exits on a
 single
@@ -7756,9 +7856,11 @@ single
 .It Ic implicitcd No (+)
 If set, the shell treats a directory name typed as a command as though
 it were a request to change to that directory.
+.Pp
 If set to
 .Ic verbose ,
 the change of directory is echoed to the standard output.
+.Pp
 This behavior
 is inhibited in non-interactive shell scripts, or for command strings
 with more than one word.
@@ -7777,13 +7879,16 @@ at the beginning of each line.
 .
 .It Ic killdup No (+)
 Controls handling of duplicate entries in the kill ring.
+.Pp
 If set to
 .Ql all
 only unique strings are entered in the kill ring.
+.Pp
 If set to
 .Ql prev
 and the last killed string is the same as the current killed
 string, then the current string is not entered in the ring.
+.Pp
 If set
 to
 .Ql erase
@@ -7792,13 +7897,16 @@ string is erased and the current one is inserted.
 .
 .It Ic killring No (+)
 Indicates the number of killed strings to keep in memory.
+.Pp
 Set to
 .Ql 30
 by default.
+.Pp
 If unset or set to less than
 .Ql 2 ,
 the shell will only
 keep the most recently killed string.
+.Pp
 Strings are put in the killring by the editor commands that delete
 (kill) strings of text, e.g.
 .Ic backward-delete-word ,
@@ -7826,23 +7934,32 @@ or any combination thereof (e.g.,
 they are used as flags to
 .Ic ls\-F ,
 making it act like
-.Ql ls \-xF ,
-.Ql ls \-Fa ,
-.Ql ls \-FA ,
-or a combination (e.g.,
-.Ql ls \-FxA ) :
-.Ql a
+.Bd -literal -offset indent -compact
+ls \-xF
+ls \-Fa
+ls \-FA
+.Ed
+.Pp
+or a combination, for example
+.Dl ls \-FxA
+.Pp
+If the first word contains
+.Ql a ,
 shows all
 files (even if they start with a
-.Ql \&. ) ,
-.Ql A
+.Ql \&. ) .
+.Pp
+If the first word contains
+.Ql A ,
 shows all files but
 .Ql \&.
 and
-.Ql \&.. ,
-and
-.Ql x
+.Ql \&.. .
+.Pp
+If the first word contains
+.Ql x ,
 sorts across instead of down.
+.Pp
 If the second word of
 .Ic listflags
 is set, it is used as the path to
@@ -7850,6 +7967,7 @@ is set, it is used as the path to
 .
 .It Ic listjobs No (+)
 If set, all jobs are listed when a job is suspended.
+.Pp
 If set to
 .Ql long ,
 the listing is in long format.
@@ -7899,11 +8017,11 @@ A list of files and directories to check for incoming mail, optionally
 preceded by a numeric word.
 Before each prompt, if 10 minutes have
 passed since the last check, the shell checks each file and displays
-.Sq You have new mail\&.
+.Dl You have new mail\&.
 (or, if
 .Ic mail
 contains multiple files,
-.Sq You have new mail in Ar name Ns \&. )
+.Dl You have new mail in Ar name Ns \&. )
 if the filesize is greater than zero in size
 and has a modification time greater than its access time.
 .Pp
@@ -7917,9 +8035,9 @@ If a file specified in
 .Ic mail
 is a directory, the shell will count each
 file within that directory as a separate message, and will report
-.Sq You have Ar n No mails\&.
+.Dl You have Ar n No mails\&.
 or
-.Sq You have Ar n No mails in Ar name Ns No \&.
+.Dl You have Ar n No mails in Ar name Ns No \&.
 as appropriate.
 This functionality is provided primarily for those systems which store mail
 in this manner, such as the Andrew Mail System.
@@ -7930,24 +8048,27 @@ is numeric it is taken as a different mail
 checking interval, in seconds.
 .Pp
 Under very rare circumstances, the shell may report
-.Sq You have mail\&.
-instead
-of
-.Sq You have new mail\&.
+.Dl You have mail\&.
+instead of
+.Dl You have new mail\&.
 .
 .It Ic matchbeep No (+)
 If set to
 .Ql never ,
 completion never beeps.
+.Pp
 If set to
 .Ql nomatch ,
 it beeps only when there is no match.
+.Pp
 If set to
 .Ql ambiguous ,
 it beeps when there are multiple matches.
+.Pp
 If set to
 .Ql notunique ,
 it beeps when there is one exact and other longer matches.
+.Pp
 If unset,
 .Ql ambiguous
 is used.
@@ -7965,10 +8086,12 @@ redirections refer to existing
 files, as described in the
 .Sx Input/output
 section.
+.Pp
 If contains
 .Ql ask ,
 an interacive confirmation is presented, rather than an
 error.
+.Pp
 If contains
 .Ql notempty ,
 .Ql >
@@ -7976,11 +8099,10 @@ is allowed on empty files.
 .
 .It Ic noding
 If set, disable the printing of
-.Sq DING\&!
+.Dl DING\&!
 in the
 .Ic prompt
-time
-specifiers at the change of hour.
+time specifiers at the change of hour.
 .
 .It Ic noglob
 If set,
@@ -8006,8 +8128,9 @@ or
 which does not match any
 existing files is left untouched rather than causing an error.
 It is still an error for the substitution to be
-malformed, e.g.,
-.Ql echo \&[
+malformed.
+For example,
+.Dl echo \&[
 still gives an error.
 .
 .It Ic nostat No (+)
@@ -8060,19 +8183,23 @@ parsing.
 .
 .It Ic path
 A list of directories in which to look for executable commands.
+.Pp
 A null word specifies the current directory.
+.Pp
 If there is no
 .Ic path
 variable then only full path names will execute.
+.Pp
 .Ic path
 is set by the shell at startup from the
 .Ev PATH
 environment
 variable or, if
 .Ev PATH
-does not exist, to a system-dependent default
-something like
-.Ql (/usr/local/bin /usr/bsd /bin /usr/bin .) .
+does not exist, to a system-dependent default,
+such as
+.Dl (/usr/local/bin /usr/bsd /bin /usr/bin .)
+.Pp
 The shell may put
 .Ql \&.
 first or last in
@@ -8081,6 +8208,7 @@ or omit it entirely
 depending on how it was compiled; see the
 .Ic version
 shell variable.
+.Pp
 A shell which is given neither the
 .Fl c
 nor the
@@ -8094,6 +8222,7 @@ reading
 and each time
 .Ic path
 is reset.
+.Pp
 If one adds a new command to a directory in
 .Ic path
 while the shell
@@ -8104,7 +8233,7 @@ for the shell to find it.
 .It Ic printexitvalue No (+)
 If set and an interactive program exits with a non-zero status, the shell
 prints
-.Sq Exit Ar status .
+.Dl Exit Ar status
 .
 .It Ic prompt
 The string which is printed before reading each command from the terminal.
@@ -8342,14 +8471,14 @@ is used, and
 .Ic noding
 is not set,
 then print
-.Sq DING\&!
+.Dl DING\&!
 on the change of hour (i.e,
 .Sq \&:00
 minutes) instead of
 the actual time.
 .Pp
 Set by default to
-.Ql %#\ \&
+.Sq Li %#\ \&
 in interactive shells.
 .
 .It Ic prompt2 No (+)
@@ -8364,8 +8493,9 @@ The same format sequences may be used as in
 .Ic prompt ;
 note the variable meaning of
 .Ql \&%R .
+.Pp
 Set by default to
-.Ql \&%R?\ \&
+.Sq Li \&%R?\ \&
 in interactive shells.
 .
 .It Ic prompt3 No (+)
@@ -8374,8 +8504,9 @@ The same format sequences may be used as in
 .Ic prompt ;
 note the variable meaning of
 .Ql \&%R .
+.Pp
 Set by default to
-.Ql CORRECT>%R (y|n|e|a)?\ \&
+.Sq Li CORRECT>%R (y|n|e|a)?\ \&
 in interactive shells.
 .
 .It Ic promptchars No (+)
@@ -8390,7 +8521,7 @@ normal users and the second character for the superuser.
 If set,
 .Ic pushd
 without arguments does
-.Ql pushd ~ ,
+.Dl pushd ~
 like
 .Ic cd .
 .
@@ -8412,7 +8543,7 @@ Slow.
 .
 .It Ic rmstar No (+)
 If set, the user is prompted before
-.Ql rm *
+.Dl rm *
 is executed.
 .
 .It Ic rprompt No (+)
@@ -8423,6 +8554,7 @@ It recognizes the same formatting characters as
 It will automatically disappear and reappear as necessary, to ensure that
 command input isn't obscured, and will appear only if the prompt,
 command input, and itself will fit together on the first line.
+.Pp
 If
 .Ic edit
 isn't set, then
@@ -8432,15 +8564,17 @@ the prompt and before the command input.
 .
 .It Ic savedirs No (+)
 If set, the shell does
-.Ql dirs \-S
+.Dl dirs \-S
 before exiting.
+.Pp
 If the first word is set to a number, at most that many directory stack
 entries are saved.
 .
 .It Ic savehist
 If set, the shell does
-.Ql history \-S
+.Dl history \-S
 before exiting.
+.Pp
 If the first word is set to a number, at most that many lines are saved.
 (The number should be less than or equal to the number
 .Ic history
@@ -8450,14 +8584,14 @@ if it is set to greater than the number of
 settings, only
 .Ic history
 entries will be saved.)
+.Pp
 If the second word is set to
 .Ql merge ,
 the history list is merged with
 the existing history file instead of replacing it (if there is one) and
 sorted by time stamp and the most recent events are retained.
-If the second word of
-.Ic savehist
-is
+.Pp
+If the second word is set to
 .Ql merge
 and the third word is set to
 .Ql lock ,
@@ -8469,7 +8603,7 @@ The format in which the
 .Ic sched
 builtin command prints scheduled events;
 if not given,
-.Ql %h\et%T\et%R\en
+.Sq Li %h\et%T\et%R\en
 is used.
 The format sequences are described above under
 .Ic prompt ;
@@ -8540,10 +8674,9 @@ If set to
 the shell tries to construct a current directory
 relative to the current directory before the link was crossed.
 This means that
-.Ic cd Ns
-ing through a symbolic link and then
-.Ql cd \&.. Ns
-ing
+.Dl cd
+through a symbolic link and then
+.Dl cd \&..
 returns one to the original directory.
 This affects only builtin commands
 and filename completion.
@@ -8588,7 +8721,7 @@ unset,
 /tmp/from
 .Ed
 .Pp
-here's the behavior with
+Here's the behavior with
 .Ic symlinks
 set to
 .Ql chase ,
@@ -8599,7 +8732,7 @@ set to
 /tmp/from
 .Ed
 .Pp
-here's the behavior with
+Here's the behavior with
 .Ic symlinks
 set to
 .Ql ignore ,
@@ -8610,7 +8743,7 @@ set to
 /tmp/to
 .Ed
 .Pp
-and here's the behavior with
+Here's the behavior with
 .Ic symlinks
 set to
 .Ql expand .
@@ -8631,13 +8764,23 @@ set to
 .Pp
 Note that
 .Ql expand
-expansion 1) works just like
+expansion:
+.Bl -enum -width 2n -offset indent -compact
+.
+.It
+Works just like
 .Ql ignore
 for builtins
 like
-.Ic cd ,
-2) is prevented by quoting, and 3) happens before
+.Ic cd .
+.
+.It
+Is prevented by quoting.
+.
+.It
+Happens before
 filenames are passed to non-builtin commands.
+.El
 .
 .It Ic tcsh No (+)
 The version number of the shell in the format
@@ -8663,6 +8806,7 @@ If set to a number, then the
 .Ic time
 builtin executes automatically
 after each command which takes more than that many CPU seconds.
+.Pp
 If there is a second word, it is used as a format string for the output
 of the
 .Ic time
@@ -8733,10 +8877,10 @@ The number of involuntary context switches.
 Only the first four sequences are supported on systems without BSD resource
 limit functions.
 The default time format is
-.Ql \&%Uu \&%Ss \&%E \&%P \&%X+%Dk \&%I+%Oio \&%Fpf+%Ww
+.Sq Li \&%Uu \&%Ss \&%E \&%P \&%X+%Dk \&%I+%Oio \&%Fpf+%Ww
 for
 systems that support resource usage reporting and
-.Ql \&%Uu \&%Ss \&%E \&%P
+.Sq Li \&%Uu \&%Ss \&%E \&%P
 for
 systems that do not.
 .Pp
@@ -8779,7 +8923,8 @@ The number of writes to raw disk devices.
 .El
 .Pp
 and the default time format is
-.Ql \&%Uu \&%Ss \&%E \&%P \&%I+%Oio \&%Fpf+%Ww .
+.Sq Li \&%Uu \&%Ss \&%E \&%P \&%I+%Oio \&%Fpf+%Ww .
+.Pp
 Note that the CPU percentage can be higher than 100% on multi-processors.
 .
 .It Ic  tperiod No (+)
@@ -8893,7 +9038,7 @@ is used.
 .
 .It Li hb
 The
-.Ql #!<program> <args>
+.Dl #! Ns Ar interpreter arg Li \&...
 convention is emulated when executing shell scripts.
 .
 .It Li ng
@@ -8961,7 +9106,7 @@ and vice versa.
 Setting
 .Ic watch
 to
-.Ql (any any)
+.Dl (any any)
 watches all users and terminals.
 For example,
 .Bd -literal -offset indent
@@ -9043,10 +9188,11 @@ and
 .Ql %m
 are available on only systems that store the remote hostname in
 .Pa /etc/utmp .
+.Pp
 If unset,
-.Ql %n has %a %l from %m\&.
+.Dl %n has %a %l from %m\&.
 is used, or
-.Ql %n has %a %l\&.
+.Dl %n has %a %l\&.
 on systems
 which don't store the remote hostname.
 .
@@ -9055,12 +9201,13 @@ A list of non-alphanumeric characters to be considered part of a word by the
 .Ic forward-word ,
 .Ic backward-word ,
 etc., editor commands.
+.Pp
 If unset, the default value is determined based on the state of
 .Ic vimode :
 if
 .Ic vimode
 is unset,
-.Ql *?_\-.[]~=
+.Sq Li *?_\-.[]~=
 is used as the default;
 if
 .Ic vimode
@@ -9090,7 +9237,7 @@ mode
 See
 .Ic complete
 in
-.Sq Builtin commands .
+.Sx Builtin commands .
 .
 .It Ev COLUMNS
 The number of columns in the terminal.
@@ -9241,15 +9388,23 @@ and
 .Ql = .
 .Pp
 Each file will be written as
-.Ql <lc> <color-code> <rc> <filename> <ec> .
+.Dl lc Ar color-code Li rc Ar filename Li ec
+.Pp
 If the
-.Ql <ec>
+.Ql ec
 code is undefined, the sequence
-.Ql <lc> <no> <rc>
+.Dl lc no rc
 will be used instead.
 This is generally more convenient
 to use, but less general.
-The left, right and end codes are
+.Pp
+The left code
+.Pq Ql lc ,
+right code
+.Pq Ql rc ,
+and end codes
+.Pq Ql ec
+are
 provided so you don't have to type common parts over and over
 again and to support weird terminals; you will generally not
 need to change them at all unless your terminal does not use
@@ -9428,32 +9583,39 @@ environment variable.
 .
 .It Pa /etc/csh.cshrc
 Read first by every shell.
+.Pp
 ConvexOS, Stellix and Intel use
-.Pa /etc/cshrc
-and
+.Pa /etc/cshrc .
+.Pp
 NeXTs use
 .Pa /etc/cshrc.std .
+.Pp
 A/UX, AMIX, Cray and IRIX have no equivalent in
 .Xr csh 1 ,
 but read this file in
 .Nm
 anyway.
+.Pp
 Solaris 2.x does not have it either, but
 .Nm
 reads
 .Pa /etc/.cshrc .
+.Pp
 (+)
 .
 .It Pa /etc/csh.login
 Read by login shells after
 .Pa /etc/csh.cshrc .
+.Pp
 ConvexOS, Stellix and Intel use
-.Pa /etc/login ,
+.Pa /etc/login .
+.Pp
 NeXTs use
-.Pa /etc/login.std ,
+.Pa /etc/login.std .
+.Pp
 Solaris 2.x uses
-.Pa /etc/.login
-and
+.Pa /etc/.login .
+.Pp
 A/UX, AMIX, Cray and IRIX use
 .Pa /etc/cshrc .
 .
@@ -9469,6 +9631,7 @@ doesn't exist,
 after
 .Pa /etc/csh.cshrc
 or its equivalent.
+.Pp
 This manual uses
 .Sq Pa ~/.tcshrc
 to mean
@@ -9494,6 +9657,7 @@ Read by login shells after
 .Pa ~/.tcshrc
 or
 .Pa ~/.history .
+.Pp
 The shell may be compiled to read
 .Pa ~/.login
 before instead of after
@@ -9514,16 +9678,18 @@ is set, but see also
 .
 .It Pa /etc/csh.logout
 Read by login shells at logout.
+.Pp
 ConvexOS, Stellix and Intel use
-.Pa /etc/logout
-and
+.Pa /etc/logout .
 NeXTs use
 .Pa /etc/logout.std .
+.Pp
 A/UX, AMIX, Cray and IRIX have no equivalent in
 .Xr csh 1 ,
 but read this file in
 .Nm
 anyway.
+.Pp
 Solaris 2.x does not have it either, but
 .Nm
 reads
@@ -10075,7 +10241,7 @@ All the people on the net, for putting up with,
 reporting bugs in, and suggesting new additions to each and every version
 .Pp
 Richard M. Alderson III, for writing the
-.Sq T in tcsh
+.Sx T in tcsh
 section
 .
 .Sh BUGS
@@ -10087,7 +10253,7 @@ be misleading (i.e., wrong) as the job may have changed directories internally.
 Shell builtin functions are not stoppable/restartable.
 Command sequences
 of the form
-.Ql a \&; b \&; c
+.Dl a \&; b \&; c
 are also not handled gracefully when stopping is
 attempted.
 If you suspend
@@ -10100,7 +10266,7 @@ It suffices to place the sequence of commands in
 .Ql () Ns
 \&'s to force it
 to a subshell, i.e.,
-.Ql \&( a \&; b \&; c \&) .
+.Dl \&( a \&; b \&; c \&)
 .Pp
 Control over tty output after processes are started is primitive; perhaps
 this will inspire someone to work on a good virtual terminal interface.
