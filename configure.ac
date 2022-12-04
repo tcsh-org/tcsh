@@ -54,6 +54,7 @@ AC_SUBST(PACKAGE_VERS)
 PACKAGE_PATCHLEVEL="${PACKAGE_VERSION##*.}"
 AC_SUBST(PACKAGE_PATCHLEVEL)
 
+AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([tc.vers.c])
 AC_CONFIG_HEADERS([config.h])
@@ -325,7 +326,7 @@ esac
 changequote([, ])dnl
 
 AC_MSG_NOTICE([using configuration file `$tcsh_config_file'])
-cp ${srcdir}/config/${tcsh_config_file} config_p.h
+cp ${srcdir}/system/${tcsh_config_file} config_p.h
 
 AH_BOTTOM(
 [#include "config_p.h"

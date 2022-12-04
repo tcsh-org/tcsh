@@ -555,7 +555,7 @@ tc.const.h: config.h tc.const.c
 	@echo '#endif /* _h_tc_const */' >> $@
 
 config.h: config_f.h
-	cp config/ConfigH config.h
+	cp system/ConfigH config.h
 
 $(OBJS): sh.err.h tc.const.h ed.defns.h
 
