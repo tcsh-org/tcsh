@@ -81,18 +81,18 @@ UNIX C shell,
 It is a command language interpreter usable both as an interactive login
 shell and a shell script command processor.
 It includes a command-line editor (see
-.Sx The command-line editor ) ,
+.Sx The command-line editor (+) ) ,
 programmable word completion (see
-.Sx Completion and listing ) ,
+.Sx Completion and listing (+) ) ,
 spelling correction (see
-.Sx Spelling correction ) ,
+.Sx Spelling correction (+) ) ,
 a history mechanism (see
 .Sx History substitution ) ,
 job control (see
 .Sx Jobs )
 and a C-like syntax.
 The
-.Sx NEW FEATURES
+.Sx NEW FEATURES (+)
 section describes major enhancements of
 .Nm
 over
@@ -410,15 +410,15 @@ variants; see
 .
 .Ss Editing
 We first describe
-.Sx The command-line editor .
+.Sx The command-line editor (+) .
 The
-.Sx Completion and listing
+.Sx Completion and listing (+)
 and
-.Sx Spelling correction
+.Sx Spelling correction (+)
 sections describe two sets of functionality that are implemented as editor
 commands but which deserve their own treatment.
 Finally,
-.Sx Editor commands
+.Sx Editor commands (+)
 lists and describes
 the editor commands specific to the shell and their default bindings.
 .
@@ -615,7 +615,7 @@ directories abbreviated with
 and directory stack entries abbreviated with
 .Ql =
 (see
-.Sx Directory stack substitution ) .
+.Sx Directory stack substitution (+) ) .
 For example,
 .Bd -literal -offset indent
 > ls ~k[^D]
@@ -810,7 +810,7 @@ before each completion attempt,
 .Ic autocorrect
 can be set to
 spelling-correct the word to be completed (see
-.Sx Spelling correction )
+.Sx Spelling correction (+) )
 before each completion attempt and
 .Ic correct
 can be set to complete commands automatically after one hits
@@ -942,7 +942,7 @@ Move back a character.
 Cursor behavior modified by
 .Ic vimode .
 .
-.It Ic backward-delete-word ( M-^H , M-^? )
+.It Ic backward-delete-word ( M-^H , M-^\&? )
 Cut from beginning of current word to cursor - saved in cut buffer.
 Word boundary behavior modified by
 .Ic vimode .
@@ -964,7 +964,7 @@ Word boundary behavior modified by
 .
 .It Ic complete-word ( tab )
 Completes a word as described under
-.Sx Completion and listing .
+.Sx Completion and listing (+) .
 .
 .It Ic complete-word-back No (not bound)
 Like
@@ -1199,7 +1199,7 @@ See also
 .
 .It Ic list-choices ( M-^D )
 Lists completion possibilities as described under
-.Sx Completion and listing .
+.Sx Completion and listing (+) .
 See also
 .Ic delete-char-or-list-or-eof
 and
@@ -1236,7 +1236,7 @@ and inserts a space.
 is designed to be bound to the space bar,
 but is not bound by default.
 .
-.It Ic normalize-command ( ^X-? )
+.It Ic normalize-command ( ^X-\&? )
 Searches for the current word in
 .Ev PATH
 and, if it is found, replaces it with
@@ -1319,7 +1319,8 @@ If there is more than one help file only the first is printed.
 .It Ic self-insert-command No (text characters)
 In insert mode (the default), inserts the typed character into
 the input line after the character under the cursor.
-In overwrite mode, replaces the character under the cursor with the typed character.
+In overwrite mode, replaces the character under the cursor with the
+typed character.
 The input mode is normally preserved between lines, but the
 .Ic inputmode
 shell variable can be set to
@@ -1331,7 +1332,7 @@ editor in that mode at the beginning of each line.
 See also
 .Ic overwrite-mode .
 .
-.It Ic sequence-lead-in No (arrow prefix, meta prefix, Ic ^X )
+.It Ic sequence-lead-in No ( arrow prefix , meta prefix , Ic ^X )
 Indicates that the following characters are part of a
 multi-key sequence.
 Binding a command to a multi-key sequence really creates
@@ -1362,11 +1363,11 @@ or
 .Ql \&? ,
 to avoid problems with switches, substitutions and the like.
 See
-.Sx Spelling correction .
+.Sx Spelling correction (+) .
 .
 .It Ic spell-word ( M-s , M-S )
 Attempts to correct the spelling of the current word as described under
-.Sx Spelling correction .
+.Sx Spelling correction (+) .
 Checks each component of a word which appears to be a pathname.
 .
 .It Ic toggle-literal-history ( M-r , M-R )
@@ -1422,7 +1423,7 @@ Like
 .Ic vi-search-back ,
 but searches forward.
 .
-.It Ic which-command ( M-? )
+.It Ic which-command ( M-\&? )
 Does a
 .Ic which
 (see the description of the builtin command) on the
@@ -1434,10 +1435,12 @@ When executed immediately after a
 or another
 .Ic yank-pop ,
 replaces the yanked string with the next previous string from the
-killring. This also has the effect of rotating the killring, such that
+killring.
+This also has the effect of rotating the killring, such that
 this string will be considered the most recently killed by a later
 .Ic yank
-command. Repeating
+command.
+Repeating
 .Ic yank-pop
 will cycle through the
 killring any number of times.
@@ -1541,7 +1544,7 @@ preceding the leading quote with
 .Ql $ .
 (+)
 See
-.Sx Escape sequences
+.Sx Escape sequences (+)
 for
 a complete list of recognized escape sequences.
 .Pp
@@ -1561,7 +1564,8 @@ always quote
 .Ql \&' ,
 and
 .Ql \&"
-(+). This may make complex quoting tasks
+(+).
+This may make complex quoting tasks
 easier, but it can cause syntax errors in
 .Xr csh 1
 scripts.
@@ -1636,7 +1640,8 @@ The implementations of
 .Ql \eu ,
 and
 .Ql \eU
-in other shells may take a varying number of digits.  It is often safest
+in other shells may take a varying number of digits.
+It is often safest
 to use leading zeros to provide the maximum expected number of digits.
 .
 .Ss Substitutions
@@ -1772,7 +1777,7 @@ The previous event (equivalent to
 The most recent event whose first word begins with the string
 .Ar s .
 .
-.It Li ? Ns Ar s Ns Li ?
+.It Li \&? Ns Ar s Ns Li \&?
 The most recent event which contains the string
 .Ar s .
 The second
@@ -1794,9 +1799,9 @@ The current event, which we haven't typed in yet, is event 13.
 and
 .Ql !\-2
 refer to event 11.
-.Ql \&!!
+.Ql \&!\&!
 refers to the previous event, 12.
-.Ql \&!!
+.Ql \&!\&!
 can be abbreviated
 .Ql \&!
 if it is
@@ -1810,7 +1815,7 @@ and
 .Ql !n
 refers to event 9, which begins with
 .Ql n .
-.Ql !?old?
+.Ql !\&?old\&?
 also refers to event 12, which contains
 .Ql old .
 Without word designators or modifiers history references simply expand to the
@@ -1885,7 +1890,8 @@ The last argument.
 .
 .It Li %
 The word matched by an
-.Li ? Ns Ar s Ns Li ? No search.
+.Li \&? Ns Ar s Ns Li \&?
+search.
 .
 .It Ar x Ns Li \- Ns Ar y
 A range of words.
@@ -1963,7 +1969,7 @@ or,
 equivalently,
 .Ql diff !!$.old !!$ .
 However, if
-.Ql \&!!
+.Ql \&!\&!
 is abbreviated
 .Ql \&! ,
 an argument selector beginning with
@@ -2112,7 +2118,7 @@ to capitalize
 .Ql hello ,
 .Ql echo !*:au
 to upper case the first word to
-.QL HELLO ,
+.Ql HELLO ,
 or
 .Ql echo !*:agu
 to upper case all words.
@@ -2124,7 +2130,7 @@ to
 correct the spelling of
 .Ql root
 (but see
-.Sx Spelling correction
+.Sx Spelling correction (+)
 for a
 different approach).
 .Pp
@@ -2264,7 +2270,7 @@ Other loops are detected and
 cause an error.
 .Pp
 Some aliases are referred to by the shell; see
-.Sx Special aliases .
+.Sx Special aliases (+) .
 .
 .Ss Variable substitution
 The shell maintains a list of variables, each of which has as value a list of
@@ -2411,8 +2417,8 @@ environment, then that value is returned (but some of the other forms
 given below are not available in this case).
 .
 .Pp
-.It Li $ Ns Ar name Ns Li [ Ns Ar selector Ns Li ]
-.It Li ${ Ns Ar name Ns Li [ Ns Ar selector Ns Li ]}
+.It Li $ Ns Ar name Ns Li \&[ Ns Ar selector Ns Li \&]
+.It Li ${ Ns Ar name Ns Li \&[ Ns Ar selector Ns Li ]}
 Substitutes only the selected words from the value of
 .Ar name .
 The
@@ -2445,7 +2451,7 @@ An error occurs if the name is not known.
 .It Li $ Ns Ar number
 .It Li ${ Ns Ar number Ns Li }
 Equivalent to
-.Ql $argv[ Ns Ar number Ns Li \] .
+.Ql $argv[ Ns Ar number Ns Li \&] .
 .
 .Pp
 .It Li $*
@@ -2480,8 +2486,8 @@ modifiers:
 .Pp
 .Bl -tag -width 10n -offset indent -compact
 .
-.It Li $? Ns Ar name
-.It Li ${? Ns Ar name Ns Li }
+.It Li $\&? Ns Ar name
+.It Li ${\&? Ns Ar name Ns Li }
 Substitutes the string
 .Ql 1
 if
@@ -2524,7 +2530,7 @@ Substitutes the number of characters in
 .It Li $% Ns Ar number
 .It Li ${% Ns Ar number Ns Li }
 Substitutes the number of characters in
-.Ql $argv[ Ns Ar number Ns Li \] .
+.Ql $argv[ Ns Ar number Ns Li \&] .
 (+)
 .
 .Pp
@@ -2570,7 +2576,7 @@ which the line is to be substituted, but
 does not allow this.
 .El
 .
-.Ss "Command, filename and directory stack substitution"
+.Ss Command, filename and directory stack substitution
 The remaining substitutions are applied selectively to the arguments
 of builtin commands.
 This means that portions of expressions which are not evaluated are
@@ -2580,7 +2586,7 @@ shell, the command name is substituted separately from the argument list.
 This occurs very late, after input-output redirection is performed, and
 in a child of the main shell.
 .
-.Ss "Command substitution"
+.Ss Command substitution
 Command substitution is indicated by a command enclosed in
 .Ql \&` .
 The output
@@ -2606,7 +2612,7 @@ unsetting
 .Ic csubstnonl ,
 newlines separate commands as usual.
 .
-.Ss "Filename substitution"
+.Ss Filename substitution
 If a word contains any of the characters
 .Ql * ,
 .Ql \&? ,
@@ -2821,7 +2827,7 @@ editor command, normally bound to
 can be
 used to interactively expand individual filename substitutions.
 .
-.Ss "Directory stack substitution (+)"
+.Ss Directory stack substitution (+)
 The directory stack is a list of directories, numbered from zero, used by the
 .Ic pushd ,
 .Ic popd ,
@@ -2871,7 +2877,7 @@ shell variables and the
 .Ic expand-glob
 editor command apply to directory stack as well as filename substitutions.
 .
-.Ss "Other substitutions (+)"
+.Ss Other substitutions (+)
 There are several more transformations involving filenames, not strictly
 related to the above but mentioned here for completeness.
 .Em Any
@@ -2901,15 +2907,15 @@ This is not a substitution at all, but an abbreviation recognized by only
 those commands.
 Nonetheless, it too can be prevented by quoting.
 .
-.Ss "Commands"
+.Ss Commands
 The next three sections describe how the shell executes commands and
 deals with their input and output.
 .
-.Ss "Simple commands, pipelines and sequences"
+.Ss Simple commands, pipelines and sequences
 A simple command is a sequence of words, the first of which specifies the
 command to be executed.
 A series of simple commands joined by
-.Ql |
+.Ql \&|
 characters
 forms a pipeline.
 The output of each command in a pipeline is connected to the
@@ -2935,7 +2941,7 @@ A command, pipeline or sequence can be executed
 without waiting for it to terminate by following it with an
 .Ql \&& .
 .
-.Ss "Builtin and non-builtin command execution"
+.Ss Builtin and non-builtin command execution
 Builtin commands are executed within the shell.
 If any component of a
 pipeline except the last is a builtin command, the pipeline is executed
@@ -2978,7 +2984,8 @@ try an
 in only a directory where there is a possibility that the
 command resides there.
 This greatly speeds command location when a large
-number of directories are present in the search path. This hashing mechanism is
+number of directories are present in the search path.
+This hashing mechanism is
 not used:
 .Bl -enum -width 2n -offset indent
 .It
@@ -2999,7 +3006,8 @@ If the command contains a
 .Pp
 In the above four cases the shell concatenates each component of the path
 vector with the given command name to form a path name of a file which it
-then attempts to execute it. If execution is successful, the search stops.
+then attempts to execute it.
+If execution is successful, the search stops.
 .Pp
 If the file has execute permissions but is not an executable to the system
 (i.e., it is neither an executable binary nor a script that specifies its
@@ -3028,7 +3036,7 @@ with the given
 s and feeds the
 file to it on standard input.
 .
-.Ss "Input/output"
+.Ss Input/output
 The standard input and standard output of a command may be redirected with the
 following syntax:
 .Pp
@@ -3074,9 +3082,9 @@ resultant text is placed in an anonymous temporary file which is given to the
 command as standard input.
 .Pp
 .It Li > Ar name
-.It Li >! Ar name
+.It Li >\&! Ar name
 .It Li >& Ar name
-.It Li >&! Ar name
+.It Li >&\&! Ar name
 The file
 .Ar name
 is used as standard output.
@@ -3119,8 +3127,8 @@ input filenames are.
 .Pp
 .It Li >> Ar name
 .It Li >>& Ar name
-.It Li >>! Ar name
-.It Li >>&! Ar name
+.It Li >>\&! Ar name
+.It Li >>&\&! Ar name
 Like
 .Ql > ,
 but appends output to the end of
@@ -3174,11 +3182,11 @@ may be
 .Pa /dev/tty
 to send output to the terminal.
 .
-.Ss "Features"
+.Ss Features
 Having described how the shell accepts, parses and executes
 command lines, we now turn to a variety of its useful features.
 .
-.Ss "Control flow"
+.Ss Control flow
 The shell contains a number of commands which can be used to regulate the
 flow of control in command files (shell scripts) and (in limited but
 useful ways) from terminal input.
@@ -3205,7 +3213,7 @@ accomplish the rereading implied by the loop.
 .Ic goto Ns
 s will succeed on non-seekable inputs.)
 .
-.Ss "Expressions"
+.Ss Expressions
 The
 .Ic if ,
 .Ic while ,
@@ -3219,25 +3227,26 @@ Note that the
 .Ic @
 builtin command has its own separate syntax.
 .
-.Ss "Logical, arithmetical and comparison operators"
+.Ss Logical, arithmetical and comparison operators
 These operators are similar to those of C and have the same precedence.
 .Pp
-The operators, in descending precedence, with equivalent precedence per line, are:
+The operators, in descending precedence, with equivalent precedence per line,
+are:
 .Pp
 .Bl -column -offset indent -compact "XX" "XX" "XX" "XX"
-.It Li \&( Ta Li \&)
-.It Li \&~
-.It Li \&!
-.It Li * Ta Li / Ta Li %
-.It Li + Ta Li \-
-.It Li << Ta Li >>
+.It Li \&( Ta Li \&) Ta Ta
+.It Li \&~ Ta Ta Ta
+.It Li \&! Ta Ta Ta
+.It Li * Ta Li / Ta Li % Ta
+.It Li + Ta Li \- Ta Ta
+.It Li << Ta Li >> Ta Ta
 .It Li <= Ta Li >= Ta Li < Ta Li >
 .It Li == Ta Li \&!= Ta Li =~ Ta Li \&!~
-.It Li &
-.It Li ^
-.It Li |
-.It Li &&
-.It Li ||
+.It Li & Ta Ta Ta
+.It Li ^ Ta Ta Ta
+.It Li \&| Ta Ta Ta
+.It Li && Ta Ta Ta
+.It Li || Ta Ta Ta
 .El
 .Pp
 The
@@ -3285,7 +3294,7 @@ significant to the parser
 they should be
 surrounded by spaces.
 .
-.Ss "Command exit status"
+.Ss Command exit status
 Commands can be executed in expressions and their exit status
 returned by enclosing them in braces
 .Pq Ql {} .
@@ -3303,7 +3312,7 @@ expression and the
 .Ic status
 shell variable examined.
 .
-.Ss "File inquiry operators"
+.Ss File inquiry operators
 Some of these operators perform true/false tests on files and related
 objects.
 They are of the form
@@ -3454,7 +3463,7 @@ may be one of:
 .It Li A
 Last file access time, as the number of seconds since the epoch.
 .
-.It Li A:
+.It Li A\&:
 Like
 .Ql A ,
 but in timestamp format, e.g.,
@@ -3463,7 +3472,7 @@ but in timestamp format, e.g.,
 .It Li M
 Last file modification time.
 .
-.It Li M:
+.It Li M\&:
 Like
 .Ql M ,
 but in timestamp format.
@@ -3471,7 +3480,7 @@ but in timestamp format.
 .It Li C
 Last inode modification time.
 .
-.It Li C:
+.It Li C\&:
 Like
 .Ql C ,
 but in timestamp format.
@@ -3498,7 +3507,7 @@ Number of (hard) links.
 .It Li P
 Permissions, in octal, without leading zero.
 .
-.It Li P:
+.It Li P\&:
 Like
 .Ql P ,
 with leading zero.
@@ -3527,13 +3536,13 @@ with leading zero.
 .It Li U
 Numeric userid.
 .
-.It Li U:
+.It Li U\&:
 Username, or the numeric userid if the username is unknown.
 .
 .It Li G
 Numeric groupid.
 .
-.It Li G:
+.It Li G\&:
 Groupname, or the numeric groupid if the groupname is unknown.
 .
 .It Li Z
@@ -3734,7 +3743,7 @@ and the
 builtin command for
 details on setting options in the new tty driver.
 .
-.Ss "Status reporting"
+.Ss Status reporting
 The shell learns immediately whenever a process changes state.
 It normally
 informs you whenever a job becomes blocked so that no further progress is
@@ -3759,7 +3768,7 @@ starting a background job to mark it.
 .Pp
 When you try to leave the shell while jobs are stopped, you will be
 warned that
-.Sq There are suspended jobs.
+.Sq There are suspended jobs\&. .
 You may use the
 .Ic jobs
 command to
@@ -3767,7 +3776,7 @@ see what they are.
 If you do this or immediately try to exit again, the shell
 will not warn you a second time, and the suspended jobs will be terminated.
 .
-.Ss "Automatic, periodic and timed events (+)"
+.Ss Automatic, periodic and timed events (+)
 There are various ways to run commands and take other actions automatically
 at various times in the
 .Dq life cycle
@@ -3777,7 +3786,7 @@ and described in detail under the appropriate
 .Sx Builtin commands ,
 .Sx Special shell variables ,
 and
-.Sx Special aliases .
+.Sx Special aliases (+) .
 .Pp
 The
 .Ic sched
@@ -3792,7 +3801,7 @@ The
 .Ic precmd ,
 and
 .Ic postcmd
-.Sx Special aliases
+.Sx Special aliases (+)
 can be set, respectively, to execute commands:
 when the shell wants to ring the bell,
 when the working directory changes,
@@ -3842,7 +3851,7 @@ selected users log in or out, and the
 builtin command reports
 on those users at any time.
 .
-.Ss "Native Language System support (+)"
+.Ss Native Language System support (+)
 The shell is eight bit clean
 (if so compiled; see the
 .Ic version
@@ -3922,7 +3931,7 @@ command in, e.g., the
 .Pa ~/.login
 file.
 .
-.Ss "OS variant support (+)"
+.Ss OS variant support (+)
 A number of new builtin commands are provided to support features in
 particular operating systems.
 All are described in detail in the
@@ -4014,7 +4023,7 @@ shell variables and the system-dependent locations of
 the shell's input files (see
 .Sx FILES ) .
 .
-.Ss "Signal handling"
+.Ss Signal handling
 Login shells ignore interrupts when reading the file
 .Pa ~/.logout .
 The shell ignores quit signals unless started with
@@ -4044,7 +4053,7 @@ a child when it exits, and
 .Ic nohup
 sets a child to ignore hangups.
 .
-.Ss "Terminal management (+)"
+.Ss Terminal management (+)
 The shell uses three different sets of terminal
 .Dq ( tty )
 modes:
@@ -4093,11 +4102,11 @@ them to reflect the new window size.
 .Sh REFERENCE
 The next sections of this manual describe all of the available
 .Sx Builtin commands ,
-.Sx Special aliases ,
+.Sx Special aliases (+) ,
 and
 .Sx Special shell variables .
 .
-.Ss "Builtin commands"
+.Ss Builtin commands
 .
 .Bl -tag -width 8n
 .
@@ -4439,7 +4448,8 @@ and
 Passes
 .Ar bs2000-command
 to the BS2000 command interpreter for
-execution. Only non-interactive commands can be executed, and it is
+execution.
+Only non-interactive commands can be executed, and it is
 not possible to execute any command that would overlay the image
 of the current process, like /EXECUTE or /CALL-PROCEDURE. (BS2000 only)
 .
@@ -4474,7 +4484,7 @@ see the
 .Ic version
 shell variable.
 .
-.It Ic case Ar label Ns Cm :
+.It Ic case Ar label Ns Cm \&:
 A label in a
 .Ic switch
 statement as discussed below.
@@ -4504,7 +4514,7 @@ is
 .Ql \-
 it is interpreted as the previous working directory
 (see
-.Sx Other substitutions ) .
+.Sx Other substitutions (+) ) .
 (+)
 If
 .Ar name
@@ -4570,7 +4580,7 @@ builtin command.
 .Oo Ar command
 .Oo
 .Sm off
-.Ar word Cm / Ar pattern Cm / Ar list Oo Cm : Ar select Oc Cm / Oo
+.Ar word Cm / Ar pattern Cm / Ar list Oo Cm \&: Ar select Oc Cm / Oo
 .Op Ar suffix
 .Cm /
 .Oc
@@ -4773,7 +4783,8 @@ has the additional environment variable
 .Ev COMMAND_LINE
 set, which
 contains (as its name indicates) contents of the current (already
-typed in) command line. One can examine and use contents of the
+typed in) command line.
+One can examine and use contents of the
 .Ev COMMAND_LINE
 environment variable in a custom script to build more
 sophisticated completions (see completion for
@@ -4868,7 +4879,7 @@ doesn't have any options, so
 .Ql x
 does nothing when completion
 is attempted and prints
-.Sq Truth has no options.
+.Sq Truth has no options\&.
 when completion choices are listed.
 .Pp
 Note that the
@@ -5088,7 +5099,7 @@ or
 .Ic foreach .
 The rest of the commands on the current line are executed.
 .
-.It Ic default:
+.It Ic default\&:
 Labels the default case in a
 .Ic switch
 statement.
@@ -5208,7 +5219,7 @@ shell variable may be set to emulate (or not) the flags and escape
 sequences of the BSD and/or System V versions of
 .Xr echo 1 ;
 see
-.Sx Escape sequences
+.Sx Escape sequences (+)
 and
 .Xr echo 1 .
 .
@@ -5224,7 +5235,7 @@ sends the cursor to the home position,
 sends it to column 3 and row 10, and
 .Ql echotc ts 0; echo \&"This is a test.\&"; echotc fs
 prints
-.Sq This is a test.
+.Sq This is a test\&.
 in the status line.
 .Pp
 If
@@ -5268,7 +5279,6 @@ than causing an error.
 With
 .Fl v ,
 messages are verbose.
-.Pp
 .
 .El
 .Pp
@@ -5860,7 +5870,7 @@ for minutes or
 .Ql h
 for hours, or a time of the
 form
-.Sq Ar mm Ns Li : Ns Ar ss
+.Sq Ar mm Ns Li \&: Ns Ar ss
 giving minutes and seconds may be used.
 .Pp
 If
@@ -5921,7 +5931,7 @@ Executable.
 Block device.
 .It Li %
 Character device.
-.It Li |
+.It Li \&|
 Named pipe (systems with named pipes only).
 .It Li =
 Socket (systems with sockets only).
@@ -5929,7 +5939,7 @@ Socket (systems with sockets only).
 Symbolic link (systems with symbolic links only).
 .It Li +
 Hidden directory (AIX only) or context dependent (HP/UX only).
-.It Li :
+.It Li \&:
 Network special (HP/UX only).
 .El
 .Pp
@@ -6123,7 +6133,8 @@ where interrupts are disabled anyway.
 .Op Fl n Ns | Ns Fl v
 .Op Cm + Ns Ar n
 .Xc
-Without arguments, pops the directory stack and returns to the new top directory.
+Without arguments, pops the directory stack and returns to the new top
+directory.
 With a number
 .Ql + Ns Ar n ,
 discards the
@@ -6150,7 +6161,7 @@ and
 flags have the same effect on
 .Ic popd
 as on
-.Ic dirs.
+.Ic dirs .
 (+)
 .
 .It Ic printenv Oo Ar name Oc No (+)
@@ -6289,7 +6300,7 @@ as
 .It Ic sched No (+)
 .It Ic sched Xo
 .Op Cm + Ns
-.Ar hh Ns Cm : Ns Ar mm
+.Ar hh Ns Cm \&: Ns Ar mm
 .Ar command
 (+)
 .Xc
@@ -6309,7 +6320,7 @@ For example,
 .Ed
 .Pp
 causes the shell to echo
-.Sq It's eleven o'clock.
+.Sq It's eleven o'clock\&.
 at 11 AM.
 The time may be in 12-hour AM/PM format
 .Bd -literal -offset indent
@@ -6369,7 +6380,7 @@ based on the time of day.
 .Ar name Ns Cm =\&( Ns Ar wordlist Ns Cm \&) No \&...
 (+)
 .Xc
-.It Ic set Ar name Ns Cm [ Ns Ar index Ns Cm ]= Ns Ar word No \&...
+.It Ic set Ar name Ns Cm \&[ Ns Ar index Ns Cm ]= Ns Ar word No \&...
 .It Ic set Fl r No (+)
 .It Ic set Fl r Ar name No \&... No (+)
 .It Ic set Fl r Ar name Ns Cm = Ns Ar word No \&... No (+)
@@ -6485,7 +6496,7 @@ wrapping at the rightmost column.
 (+)
 .Xc
 Controls which tty modes (see
-.Sx Terminal management )
+.Sx Terminal management (+) )
 the shell does not allow to change.
 .Fl d ,
 .Fl q ,
@@ -6618,11 +6629,11 @@ stop shells started by
 .Bl -tag -width 8n -compact
 .
 .It Ic switch Cm \&( Ns Ar string Ns Cm \&)
-.It Ic case Ar str1 Ns :
+.It Ic case Ar str1 Ns \&:
 .It Ic \ \ \ \ \&...
 .It Ic \ \ \ \ breaksw
 .It Ic \&...
-.It Ic default:
+.It Ic default\&:
 .It Ic \ \ \ \ \&...
 .It Ic \ \ \ \ breaksw
 .It Ic endsw
@@ -6678,7 +6689,8 @@ is given) has an entry in the hosts
 .Xr termcap 5
 or
 .Xr terminfo 5
-database. Prints the terminal type to stdout and returns 0
+database.
+Prints the terminal type to stdout and returns 0
 if an entry is present otherwise returns 1.
 .
 .It Ic time Op Ar command
@@ -6695,7 +6707,7 @@ Without
 .Ar command ,
 prints a time summary for the current shell and its
 children.
-..
+.
 .It Ic umask Op Ar value
 Sets the file creation mask to
 .Ar value ,
@@ -6844,7 +6856,6 @@ editor command.
 .El
 .Pp
 .Bl -tag -width 8n -compact
-.Pp
 .
 .It Ic while Cm \&( Ns Ar expr Ns Cm \&)
 .It Ic \&...
@@ -6872,12 +6883,12 @@ through the loop as with
 .Ic foreach .
 .El
 .
-.Ss "Special aliases (+)"
+.Ss Special aliases (+)
 If set, each of these aliases executes automatically at the indicated time.
 They are all initially undefined.
 .Pp
 Supported special aliases are:
-.Pp
+.
 .Bl -tag -width 8n
 .
 .It Ic beepcmd
@@ -7010,7 +7021,7 @@ or
 .
 .El
 .
-.Ss "Special shell variables"
+.Ss Special shell variables
 The variables described in this section have special meaning to the shell.
 .Pp
 The shell sets
@@ -7099,7 +7110,8 @@ If set, all times are shown in 12-hour AM/PM format.
 .It Ic anyerror No (+)
 This variable selects what is propagated to the value of the
 .Ic status
-variable. For more information see the description of the
+variable.
+For more information see the description of the
 .Ic status
 variable below.
 .
@@ -7123,8 +7135,8 @@ each completion attempt.
 .It Ic autoexpand No (+)
 If set, the
 .Ic expand-history
-editor command is invoked automatically
-before each completion attempt. If this is set to
+editor command is invoked automatically before each completion attempt.
+If this is set to
 .Ql onlyhistory ,
 then
 only history will be expanded and a second completion will expand filenames.
@@ -7550,8 +7562,8 @@ Lists file name suffixes to be ignored by completion.
 .It Ic filec
 In
 .Nm ,
-completion is always used and this variable is ignored
-by default. If
+completion is always used and this variable is ignored by default.
+If
 .Ic edit
 is unset, then the traditional
 .Xr csh 1
@@ -7617,8 +7629,8 @@ and the region between the mark and the cursor are
 highlighted in reverse video.
 .Pp
 Highlighting requires more frequent terminal writes, which introduces extra
-overhead. If you care about terminal performance, you may want to leave this
-unset.
+overhead.
+If you care about terminal performance, you may want to leave this unset.
 .
 .It Ic histchars
 A string value determining the characters used in
@@ -7718,7 +7730,7 @@ the
 command (usually generated by the user by typing
 .Ic ^D
 on an empty line) causes the shell to print
-.Ql Use \&"exit\&" to leave tcsh.
+.Ql Use \&"exit\&" to leave tcsh\&.
 instead of exiting.
 This prevents the shell from accidentally
 being killed.
@@ -7800,7 +7812,7 @@ editor command will yank the most recently killed string
 into the command-line, while
 .Ic yank-pop
 (see
-.Sx Editor commands )
+.Sx Editor commands (+) )
 can be used to yank earlier killed strings.
 .
 .It Ic listflags No (+)
@@ -7887,7 +7899,7 @@ A list of files and directories to check for incoming mail, optionally
 preceded by a numeric word.
 Before each prompt, if 10 minutes have
 passed since the last check, the shell checks each file and displays
-.Sq You have new mail.
+.Sq You have new mail\&.
 (or, if
 .Ic mail
 contains multiple files,
@@ -7905,7 +7917,7 @@ If a file specified in
 .Ic mail
 is a directory, the shell will count each
 file within that directory as a separate message, and will report
-.Sq You have Ar n No mails.
+.Sq You have Ar n No mails\&.
 or
 .Sq You have Ar n No mails in Ar name Ns No \&.
 as appropriate.
@@ -7918,10 +7930,10 @@ is numeric it is taken as a different mail
 checking interval, in seconds.
 .Pp
 Under very rare circumstances, the shell may report
-.Sq You have mail.
+.Sq You have mail\&.
 instead
 of
-.Sq You have new mail.
+.Sq You have new mail\&.
 .
 .It Ic matchbeep No (+)
 If set to
@@ -7964,7 +7976,7 @@ is allowed on empty files.
 .
 .It Ic noding
 If set, disable the printing of
-.Ql DING!
+.Sq DING\&!
 in the
 .Ic prompt
 time
@@ -7974,7 +7986,7 @@ specifiers at the change of hour.
 If set,
 .Sx Filename substitution
 and
-.Sx Directory stack substitution
+.Sx Directory stack substitution (+)
 are inhibited.
 This is most useful in shell scripts which do not deal
 with filenames, or after a list of filenames has been obtained and further
@@ -7990,12 +8002,12 @@ it is disabled so that the meta key can be used.
 If set, a
 .Sx Filename substitution
 or
-.Sx Directory stack substitution
+.Sx Directory stack substitution (+)
 which does not match any
 existing files is left untouched rather than causing an error.
 It is still an error for the substitution to be
 malformed, e.g.,
-.Ql echo [
+.Ql echo \&[
 still gives an error.
 .
 .It Ic nostat No (+)
@@ -8042,7 +8054,8 @@ versus
 .
 .It Ic parseoctal
 To retain compatibily with older versions numeric variables starting with
-0 are not interpreted as octal. Setting this variable enables proper octal
+0 are not interpreted as octal.
+Setting this variable enables proper octal
 parsing.
 .
 .It Ic path
@@ -8121,8 +8134,8 @@ in a pathname
 in the current session.
 .
 .It Xo
-.Li %c[[0] Ns Ar n Ns Li ] ,
-.Li %.[[0] Ns Ar n Ns Li ]
+.Li %c[[0] Ns Ar n Ns Li \&] ,
+.Li %.[[0] Ns Ar n Ns Li \&]
 .Xc
 The trailing component of the current working directory, or
 .Ar n
@@ -8313,7 +8326,7 @@ superuser shell.
 For example,
 .Pp
 .\" Using Bl not Bd to allow bold formatting in the second line
-.Bl -tag -offset indent -compact
+.Bl -tag -width indent -offset indent -compact
 .It Li > set prompt = \&"%m [%h] \&%B[%@]%b [%/] you rang? \&"
 .It Li tut [37] Cm [2:54pm] Li [/usr/accts/sys] you rang? _
 .El
@@ -8329,7 +8342,7 @@ is used, and
 .Ic noding
 is not set,
 then print
-.Sq DING!
+.Sq DING\&!
 on the change of hour (i.e,
 .Sq \&:00
 minutes) instead of
@@ -8470,7 +8483,7 @@ shells to interpret files which have execute bits set, but
 which are not executable by the system.
 (See the description
 of
-.Sx "Builtin and non-builtin command execution" . )
+.Sx Builtin and non-builtin command execution . )
 Initialized to the
 (system-dependent) home of the shell.
 .
@@ -9031,9 +9044,9 @@ and
 are available on only systems that store the remote hostname in
 .Pa /etc/utmp .
 If unset,
-.Ql %n has %a %l from %m.
+.Ql %n has %a %l from %m\&.
 is used, or
-.Ql %n has %a %l.
+.Ql %n has %a %l\&.
 on systems
 which don't store the remote hostname.
 .
@@ -9082,7 +9095,7 @@ in
 .It Ev COLUMNS
 The number of columns in the terminal.
 See
-.Sx Terminal management .
+.Sx Terminal management (+) .
 .
 .It Ev DISPLAY
 Used by X Window System (see
@@ -9133,17 +9146,17 @@ command looks for command documentation.
 .It Ev LANG
 Gives the preferred character environment.
 See
-.Sx Native Language System support .
+.Sx Native Language System support (+) .
 .
 .It Ev LC_CTYPE
 If set, only ctype character handling is changed.
 See
-.Sx Native Language System support .
+.Sx Native Language System support (+) .
 .
 .It Ev LINES
 The number of lines in the terminal.
 See
-.Sx Terminal management .
+.Sx Terminal management (+) .
 .
 .It Ev LS_COLORS
 The format of this variable is reminiscent of the
@@ -9156,7 +9169,7 @@ is a two-character variable name.
 .Pp
 The
 variables with their associated defaults are:
-.Pp
+.
 .Bl -column -offset indent "Li XX" "Li XXXXX" 20n
 .
 .It Li no Ta Li 0 Ta Normal (non-filename) text.
@@ -9179,15 +9192,15 @@ variables with their associated defaults are:
 .
 .It Li ex Ta Li 01;32 Ta Executable file.
 .
-.It Li mi Ta (none) Ta Missing file (defaults to Li fi Ns ) .
+.It Li mi Ta (none) Ta Missing file (defaults to Li fi ) .
 .
-.It Li or Ta (none) Ta Orphaned symbolic link (defaults to Li ln Ns ) .
+.It Li or Ta (none) Ta Orphaned symbolic link (defaults to Li ln ) .
 .
 .It Li lc Ta Li ^[[ Ta Left code.
 .
 .It Li rc Ta Li m Ta Right code.
 .
-.It Li ec Ta (none) Ta End code (replaces Li lc Ns + Ns Li no Ns + Ns Li rc Ns ) .
+.It Li ec Ta (none) Ta End code (replaces Li lc Ns + Ns Li no Ns + Ns Li rc ) .
 .
 .El
 .Pp
@@ -9337,13 +9350,14 @@ which makes
 the file color the same as the color of the link target.
 .
 .It Ev MACHTYPE No (+)
-The machine type (microprocessor class or machine model), as determined at compile time.
+The machine type (microprocessor class or machine model),
+as determined at compile time.
 .
 .It Ev NOREBIND No (+)
 If set, printable characters are not rebound to
 .Ic self-insert-command .
 See
-.Sx Native Language System support .
+.Sx Native Language System support (+) .
 .
 .It Ev OSTYPE No (+)
 The operating system, as determined at compile time.
@@ -9385,7 +9399,7 @@ shell variable.
 .It Ev TERMCAP
 The terminal capability string.
 See
-.Sx Terminal management .
+.Sx Terminal management (+) .
 .
 .It Ev USER
 Equivalent to the
@@ -9543,7 +9557,7 @@ and the
 .Ic version
 shell variable.
 .
-.Sh "NEW FEATURES (+)"
+.Sh NEW FEATURES (+)
 This manual describes
 .Nm
 as a single entity,
@@ -9560,23 +9574,23 @@ or
 .Xr vi 1 Ns
 \-style key bindings.
 See
-.Sx The command-line editor
+.Sx The command-line editor (+)
 and
-.Sx Editor commands .
+.Sx Editor commands (+) .
 .Pp
 Programmable, interactive word completion and listing.
 See
-.Sx Completion and listing
+.Sx Completion and listing (+)
 and the
 .Ic complete
 and
 .Ic uncomplete
 builtin commands.
 .Pp
-.Sx Spelling correction
+.Sx Spelling correction (+)
 of filenames, commands and variables.
 .Pp
-.Sx Editor commands
+.Sx Editor commands (+)
 which perform other useful functions in the middle of
 typed commands, including documentation lookup
 .Ic ( run-help ) ,
@@ -9622,7 +9636,7 @@ and
 .Ic dirs
 commands and their associated
 shell variables, the description of
-.Sx Directory stack substitution ,
+.Sx Directory stack substitution (+) ,
 the
 .Ic dirstack ,
 .Ic owd ,
@@ -9646,17 +9660,17 @@ and a
 builtin which uses them.
 .Pp
 A variety of
-.Sx Automatic, periodic and timed events
+.Sx Automatic, periodic and timed events (+)
 including
 scheduled events, special aliases, automatic logout and terminal locking,
 command timing and watching for logins and logouts.
 .Pp
 Support for the Native Language System
 (see
-.Sx Native Language System support ) ,
+.Sx Native Language System support (+) ) ,
 OS variant features
 (see
-.Sx OS variant support
+.Sx OS variant support (+)
 and the
 .Ic echo_style
 shell variable)
@@ -9665,7 +9679,7 @@ and system-dependent file locations (see
 .Pp
 Extensive terminal-management capabilities.
 See
-.Sx Terminal management .
+.Sx Terminal management (+) .
 .Pp
 New builtin commands including
 .Ic builtins ,
@@ -9852,13 +9866,13 @@ To detect looping, the shell restricts the number of
 .Ic alias
 substitutions on a single line to 20.
 .
-.Sh "SEE ALSO"
+.Sh SEE ALSO
 .Xr csh 1 ,
 .Xr emacs 1 ,
 .Xr ls 1 ,
 .Xr newgrp 1 ,
-.Xr sh 1 ,
 .Xr setpath 1 ,
+.Xr sh 1 ,
 .Xr stty 1 ,
 .Xr su 1 ,
 .Xr tset 1 ,
@@ -9890,147 +9904,180 @@ This manual documents tcsh @PACKAGE_VERSION@
 .
 .Sh AUTHORS
 .
-.Bl -tag -width 2n -compact
-.
-.It William Joy
+.An William Joy .
 Original author of
-.Xr csh 1
+.Xr csh 1 .
 .
-.It J.E. Kulp, IIASA, Laxenburg, Austria
-Job control and directory stack features
+.An J.E. Kulp ,
+IIASA, Laxenburg, Austria.
+Job control and directory stack features.
 .
-.It Ken Greer, HP Labs, 1981
-File name completion
+.An Ken Greer ,
+HP Labs, 1981.
+File name completion.
 .
-.It Mike Ellis, Fairchild, 1983
-Command name recognition/completion
+.An Mike Ellis ,
+Fairchild, 1983.
+Command name recognition/completion.
 .
-.It Paul Placeway, Ohio State CIS Dept., 1983-1993
+.An Paul Placeway ,
+Ohio State CIS Dept., 1983-1993.
 Command line editor, prompt routines, new glob syntax and numerous fixes
-and speedups
+and speedups.
 .
-.It Karl Kleinpaste, CCI 1983-4
+.An Karl Kleinpaste ,
+CCI, 1983-4.
 Special aliases, directory stack extraction stuff, login/logout watch,
-scheduled events, and the idea of the new prompt format
+scheduled events, and the idea of the new prompt format.
 .
-.It Rayan Zachariassen, University of Toronto, 1984
+.An Rayan Zachariassen ,
+University of Toronto, 1984.
 .Ic ls\-F
 and
 .Ic which
 builtins and numerous bug fixes, modifications
-and speedups
+and speedups.
 .
-.It Chris Kingsley, Caltech
-Fast storage allocator routines
+.An Chris Kingsley ,
+Caltech.
+Fast storage allocator routines.
 .
-.It Chris Grevstad, TRW, 1987
+.An Chris Grevstad ,
+TRW, 1987.
 Incorporated 4.3BSD
 .Xr csh 1
 into
-.Nm
+.Nm .
 .
-.It Christos S. Zoulas, Cornell U. EE Dept., 1987-94
+.An Christos S. Zoulas ,
+Cornell U. EE Dept., 1987-94.
 Ports to HPUX, SVR2 and SVR3, a SysV version of getwd.c, SHORT_STRINGS support
-and a new version of sh.glob.c
+and a new version of sh.glob.c.
 .
-.It James J Dempsey, BBN, and Paul Placeway, OSU, 1988
-A/UX port
+.An James J Dempsey ,
+BBN, and Paul Placeway, OSU, 1988.
+A/UX port.
 .
-.It Daniel Long, NNSC, 1988
-.Ic wordchars
+.An Daniel Long ,
+NNSC, 1988.
+.Ic wordchars .
 .
-.It Patrick Wolfe, Kuck and Associates, Inc., 1988
+.An Patrick Wolfe ,
+Kuck and Associates, Inc., 1988.
 .Ic vi
-mode cleanup
+mode cleanup.
 .
-.It David C Lawrence, Rensselaer Polytechnic Institute, 1989
+.An David C Lawrence ,
+Rensselaer Polytechnic Institute, 1989.
 .Ic autolist
-and ambiguous completion listing
+and ambiguous completion listing.
 .
-.It Alec Wolman, DEC, 1989
-Newlines in the prompt
+.An Alec Wolman ,
+DEC, 1989.
+Newlines in the prompt.
 .
-.It Matt Landau, BBN, 1989
-.Pa ~/.tcshrc
+.An Matt Landau ,
+BBN, 1989.
+.Pa ~/.tcshrc .
 .
-.It Ray Moody, Purdue Physics, 1989
-Magic space bar history expansion
+.An Ray Moody ,
+Purdue Physics, 1989.
+Magic space bar history expansion.
 .
-.It Mordechai ????, Intel, 1989
-printprompt() fixes and additions
+.An Mordechai ???? ,
+Intel, 1989.
+.Fn printprompt
+fixes and additions.
 .
-.It Kazuhiro Honda, Dept. of Computer Science, Keio University, 1989
+.An Kazuhiro Honda ,
+Dept. of Computer Science, Keio University, 1989.
 Automatic spelling correction and
-.Ic prompt3
+.Ic prompt3 .
 .
-.It Per Hedeland, Ellemtel, Sweden, 1990-
-Various bugfixes, improvements and manual updates
+.An Per Hedeland ,
+Ellemtel, Sweden, 1990-.
+Various bugfixes, improvements and manual updates.
 .
-.It Hans J. Albertsson (Sun Sweden)
+.An Hans J. Albertsson ,
+Sun Sweden.
 .Ic ampm ,
 .Ic settc ,
 and
-.Ic telltc
+.Ic telltc .
 .
-.It Michael Bloom
-Interrupt handling fixes
+.An Michael Bloom .
+Interrupt handling fixes.
 .
-.It Michael Fine, Digital Equipment Corp
-Extended key support
+.An Michael Fine ,
+Digital Equipment Corp.
+Extended key support.
 .
-.It Eric Schnoebelen, Convex, 1990
+.An Eric Schnoebelen ,
+Convex, 1990.
 Convex support, lots of
 .Xr csh 1
 bug fixes,
-save and restore of directory stack
+save and restore of directory stack.
 .
-.It Ron Flax, Apple, 1990
-A/UX 2.0 (re)port
+.An Ron Flax ,
+Apple, 1990.
+A/UX 2.0 (re)port.
 .
-.It Dan Oscarsson, LTH Sweden, 1990
-NLS support and simulated NLS support for non NLS sites, fixes
+.An Dan Oscarsson ,
+LTH Sweden, 1990.
+NLS support and simulated NLS support for non NLS sites, fixes.
 .
-.It Johan Widen, SICS Sweden, 1990
+.An Johan Widen ,
+SICS Sweden, 1990.
 .Ic shlvl ,
 Mach support,
 .Ic correct-line ,
-8-bit printing
+8-bit printing.
 .
-.It Matt Day, Sanyo Icon, 1990
-POSIX termio support, SysV limit fixes
+.An Matt Day ,
+Sanyo Icon, 1990.
+POSIX termio support, SysV limit fixes.
 .
-.It Jaap Vermeulen, Sequent, 1990-91
-Vi mode fixes, expand-line, window change fixes, Symmetry port
+.An Jaap Vermeulen ,
+Sequent, 1990-91.
+Vi mode fixes, expand-line, window change fixes, Symmetry port.
 .
-.It Martin Boyer, Institut de recherche d'Hydro-Quebec, 1991
+.An Martin Boyer ,
+Institut de recherche d'Hydro-Quebec, 1991.
 .Ic autolist
 beeping options, modified the history search to search for
 the whole string from the beginning of the line to the cursor.
 .
-.It Scott Krotz, Motorola, 1991
-Minix port
+.An Scott Krotz ,
+Motorola, 1991.
+Minix port.
 .
-.It David Dawes, Sydney U. Australia, Physics Dept., 1991
-SVR4 job control fixes
+.An David Dawes ,
+Sydney U. Australia, Physics Dept., 1991.
+SVR4 job control fixes.
 .
-.It Kimmo Suominen, 1991-
+.An Kimmo Suominen ,
+1991-.
 Various portability and other fixes.
 Added
 .Ql $''
 (dollar-single-quotes).
 .
-.It Jose Sousa, Interactive Systems Corp., 1991
+.An Jose Sousa ,
+Interactive Systems Corp., 1991.
 Extended
 .Ic vi
 fixes and
 .Ic vi
-delete command
+delete command.
 .
-.It Marc Horowitz, MIT, 1991
+.An Marc Horowitz ,
+MIT, 1991.
 ANSIfication fixes, new exec hashing code, imake fixes,
-.Ic where
+.Ic where .
 .
-.It Luke Mewburn, 1991-
+.An Luke Mewburn ,
+1991-.
 Enhanced directory printing in prompt.
 Added
 .Ic ellipsis
@@ -10040,67 +10087,81 @@ and
 improvements.
 Manual page improvements.
 .
-.It Bruce Sterling Woodcock, sterling@netcom.com, 1991-1995
+.An Bruce Sterling Woodcock ,
+sterling@netcom.com, 1991-1995.
 ETA and Pyramid port, Makefile and lint fixes,
-.Ic ignoreeof Ns
-=n addition, and
-various other portability changes and bug fixes
+.Ic ignoreeof= Ns Ar n
+addition, and
+various other portability changes and bug fixes.
 .
-.It Jeff Fink, 1992
+.An Jeff Fink ,
+1992.
 .Ic complete-word-fwd
 and
-.Ic complete-word-back
+.Ic complete-word-back .
 .
-.It Harry C. Pulley, 1992
-Coherent port
+.An Harry C. Pulley ,
+1992.
+Coherent port.
 .
-.It Andy Phillips, Mullard Space Science Lab U.K., 1992
-VMS-POSIX port
+.An Andy Phillips ,
+Mullard Space Science Lab U.K., 1992.
+VMS-POSIX port.
 .
-.It Beto Appleton, IBM Corp., 1992
+.An Beto Appleton ,
+IBM Corp., 1992.
 Walking process group fixes,
 .Xr csh 1
 bug fixes,
-POSIX file tests, POSIX SIGHUP
+POSIX file tests, POSIX SIGHUP.
 .
-.It Scott Bolte, Cray Computer Corp., 1992
-CSOS port
+.An Scott Bolte ,
+Cray Computer Corp., 1992.
+CSOS port.
 .
-.It Kaveh R. Ghazi, Rutgers University, 1992
+.An Kaveh R. Ghazi ,
+Rutgers University, 1992.
 Tek, m88k, Titan and Masscomp ports and fixes.
 Added autoconf support.
 .
-.It Mark Linderman, Cornell University, 1992
-OS/2 port
+.An Mark Linderman ,
+Cornell University, 1992.
+OS/2 port.
 .
-.It Mika Liljeberg, liljeber@kruuna.Helsinki.FI, 1992
-Linux port
+.An Mika Liljeberg ,
+liljeber@kruuna.Helsinki.FI, 1992.
+Linux port.
 .
-.It Tim P. Starrin, NASA Langley Research Center Operations, 1993
-Read-only variables
+.An Tim P. Starrin ,
+NASA Langley Research Center Operations, 1993.
+Read-only variables.
 .
-.It Dave Schweisguth, Yale University, 1993-4
-New man page and tcsh.man2html
+.An Dave Schweisguth ,
+Yale University, 1993-4.
+New man page and tcsh.man2html.
 .
-.It Larry Schwimmer, Stanford University, 1993
-AFS and HESIOD patches
+.An Larry Schwimmer ,
+Stanford University, 1993.
+AFS and HESIOD patches.
 .
-.It Edward Hutchins, Silicon Graphics Inc., 1996
+.An Edward Hutchins ,
+Silicon Graphics Inc., 1996.
 Added implicit cd.
 .
-.It Martin Kraemer, 1997
-Ported to Siemens Nixdorf EBCDIC machine
+.An Martin Kraemer ,
+1997.
+Ported to Siemens Nixdorf EBCDIC machine.
 .
-.It Amol Deshpande, Microsoft, 1997
+.An Amol Deshpande ,
+Microsoft, 1997.
 Ported to WIN32 (Windows/95 and Windows/NT); wrote all the missing library
 and message catalog code to interface to Windows.
 .
-.It Taga Nayuta, 1998
+.An Taga Nayuta ,
+1998.
 Color ls additions.
 .
-.El
-.
-.Sh "THANKS TO"
+.Sh THANKS TO
 Bryan Dunlap, Clayton Elwell, Karl Kleinpaste, Bob Manson, Steve Romig,
 Diana Smetters, Bob Sutterfield, Mark Verber, Elizabeth Zwicky and all
 the other people at Ohio State for suggestions and encouragement
