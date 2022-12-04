@@ -71,6 +71,13 @@ ${srcdir}/tcsh-${VERSION}.tar.gz:
 	&& git archive -o tcsh-${VERSION}.tar.gz \
 	    --prefix=tcsh-${VERSION}/ ${RELEASE_TAG}
 
+.PHONY: head-archive orig.tar.gz
+head-archive orig.tar.gz: ${srcdir}/tcsh_${VERSION}.orig.tar.gz
+${srcdir}/tcsh_${VERSION}.orig.tar.gz:
+	cd ${srcdir} \
+	&& git archive -o tcsh_${VERSION}.orig.tar.gz \
+	    --prefix=tcsh-${VERSION}/ HEAD
+
 .PHONY: release-sign sign
 release-sign sign: ${srcdir}/tcsh-${VERSION}.tar.gz.asc
 ${srcdir}/tcsh-${VERSION}.tar.gz.asc:

@@ -16,6 +16,7 @@ sh.err.h
 tc.const.h
 tc.defs.c
 tcsh
+tcsh_*.orig.tar.gz
 tcsh-*.tar.gz
 tcsh-*.tar.gz.asc
 tcsh.man
