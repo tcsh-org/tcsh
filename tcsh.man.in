@@ -1755,19 +1755,22 @@ which selects particular words from the chosen event, and/or a
 which manipulates the selected words.
 .
 .Ss History event specification
-An event specification can be:
+A history event specification may be one of
+(with the history substitution character
+.Ql \&!
+shown):
 .Pp
 .Bl -tag -width 5n -offset indent -compact
 .
-.It Ar n
+.It Li \&! Ns Ar n
 A number, referring to a particular event.
 .
-.It Li \- Ns Ar n
+.It Li \&!\- Ns Ar n
 An offset, referring to the event
 .Ar n
 before the current event.
 .
-.It Li #
+.It Li \&!#
 The current event.
 This should be used carefully in
 .Xr csh 1 ,
@@ -1775,15 +1778,15 @@ where there is no check for recursion.
 .Nm
 allows 10 levels of recursion. (+)
 .
-.It Li \&!
-The previous event (equivalent to
-.Ql \-1 ) .
+.It Li \&!\&!
+The previous event, equivalent to
+.Ql \&!\-1 .
 .
-.It Ar s
+.It Li \&! Ns Ar s
 The most recent event whose first word begins with the string
 .Ar s .
 .
-.It Li \&? Ns Ar s Ns Li \&?
+.It Li \&!\&? Ns Ar s Ns Li \&?
 The most recent event which contains the string
 .Ar s .
 The second
@@ -1884,49 +1887,51 @@ The words of an input line are
 numbered from 0, the first (usually command) word being 0, the second word
 (first argument) being 1, etc.
 .Pp
-The basic word designators are:
+The basic word designators are (with the leading
+.Ql \&:
+shown):
 .Pp
 .Bl -tag -width 4n -offset indent -compact
 .
-.It Li 0
+.It Li :0
 The first (command) word.
 .
-.It Ar n
+.It Li \&: Ns Ar n
 The
 .Ar n Ns
 th argument.
 .
-.It Li ^
+.It Li :^
 The first argument, equivalent to
-.Ql 1 .
+.Ql :1 .
 .
-.It Li $
+.It Li :$
 The last argument.
 .
-.It Li %
+.It Li :%
 The word matched by an
 .Li \&? Ns Ar s Ns Li \&?
 search.
 .
-.It Ar x Ns Li \- Ns Ar y
+.It Li \&: Ns Ar x Ns Li \- Ns Ar y
 A range of words.
 .
-.It Li \- Ns Ar y
+.It Li \&:\- Ns Ar y
 Equivalent to
-.Ql 0\- Ns Ar y .
+.Ql \&:0\- Ns Ar y .
 .
-.It Li *
+.It Li \&:*
 Equivalent to
-.Ql ^\-$ ,
+.Ql \&:^\-$ ,
 but returns nothing if the event contains only 1 word.
 .
-.It Ar x Ns Li *
+.It Li \&: Ns Ar x Ns Li *
 Equivalent to
-.Sq Ar x Ns Li \-$ .
+.Sq Li \&: Ns Ar x Ns Li \-$ .
 .
-.It Ar x Ns Li \-
+.It Li \&: Ns Ar x Ns Li \-
 Equivalent to
-.Sq Ar x Ns Li * ,
+.Sq Li \&: Ns Ar x Ns Li * ,
 but omitting the last word
 .Pq Ql $ .
 .El
@@ -2007,32 +2012,36 @@ or, to get the arguments in the opposite order, just
 .Ss History word modifiers
 The word or words in a history reference can be edited, or
 .Dq modified ,
-by following it with one or more modifiers, each preceded by a
+by following it with one or more modifiers
+(with the leading
+.Ql \&:
+shown),
+each preceded by a
 .Ql \&: :
 .Pp
 .Bl -tag -width 6n -offset indent -compact
 .
-.It Li h
+.It Li \&:h
 Remove a trailing pathname component, leaving the head.
 .
-.It Li t
+.It Li \&:t
 Remove all leading pathname components, leaving the tail.
 .
-.It Li r
+.It Li \&:r
 Remove a filename extension
 .Sq . Ns Ar xxx ,
 leaving the root name.
 .
-.It Li e
+.It Li \&:e
 Remove all but the extension.
 .
-.It Li u
+.It Li \&:u
 Uppercase the first lowercase letter.
 .
-.It Li l
+.It Li \&:l
 Lowercase the first uppercase letter.
 .
-.It Li s/ Ns Ar l Ns Li / Ns Ar r Ns Li /
+.It Li \&:s/ Ns Ar l Ns Li / Ns Ar r Ns Li /
 Substitute
 .Ar l
 for
@@ -2051,7 +2060,7 @@ a
 can be used to quote the delimiter inside
 .Ar l
 and
-.Ar r
+.Ar r .
 The character
 .Ql &
 in the
@@ -2073,32 +2082,32 @@ from a previous search or event number in event specification is used.
 The trailing delimiter may be omitted if it is immediately followed by a
 newline.
 .
-.It Li \&&
+.It Li \&:\&&
 Repeat the previous substitution.
 .
-.It Li g
+.It Li \&:g
 Apply the following modifier once to each word.
 .
-.It Li a No (+)
+.It Li \&:a No (+)
 Apply the following modifier as many times as possible to a single word.
-.Ql a
+.Ql \&:a
 and
-.Ql g
+.Ql \&:g
 can be used together to apply a modifier globally.
 With the
-.Ql s
+.Ql \&:s
 modifier, only the patterns contained in the original word are
 substituted, not patterns that contain any substitution result.
 .
-.It Li p
+.It Li \&:p
 Print the new command line but do not execute it.
 .
-.It Li q
+.It Li \&:q
 Quote the substituted words, preventing further substitutions.
 .
-.It Li Q
+.It Li \&:Q
 Same as
-.Ql q
+.Ql \&:q
 but in addition preserve empty variables as a string containing a NUL.
 This is useful to preserve positional arguments for example:
 .Bd -literal -offset indent -compact
@@ -2107,14 +2116,15 @@ This is useful to preserve positional arguments for example:
 3
 .Ed
 .
-.It Li x
+.It Li \&:x
 Like
-.Ql q ,
+.Ql \&:q ,
 but break into words at blanks, tabs and newlines.
+.
 .El
 .Pp
 Modifiers are applied to only the first modifiable word (unless
-.Ql g
+.Ql \&:g
 is used).
 It is an error for no word to be modifiable.
 .Pp
@@ -3340,21 +3350,21 @@ objects.
 They are of the form
 .Fl Ar op file ,
 where
-.Ar op
+.Fl Ar op
 is one of:
 .Pp
-.Bl -tag -width 3n -offset indent -compact
+.Bl -tag -width 8n -offset indent -compact
 .
-.It Li r
+.It Fl r
 Read access.
 .
-.It Li w
+.It Fl w
 Write access.
 .
-.It Li x
+.It Fl x
 Execute access.
 .
-.It Li X
+.It Fl X
 Executable in the path or shell builtin, e.g.,
 .Ql \-X ls
 and
@@ -3364,59 +3374,60 @@ generally true, but
 .Ql \-X /bin/ls
 is not. (+)
 .
-.It Li e
+.It Fl e
 Existence.
 .
-.It Li o
+.It Fl o
 Ownership.
 .
-.It Li z
+.It Fl z
 Zero size.
 .
-.It Li s
+.It Fl s
 Non-zero size. (+)
 .
-.It Li f
+.It Fl f
 Plain file.
 .
-.It Li d
+.It Fl d
 Directory.
 .
-.It Li l
+.It Fl l
 Symbolic link. (+) *
 .
-.It Li b
+.It Fl b
 Block special file. (+)
 .
-.It Li c
+.It Fl c
 Character special file. (+)
 .
-.It Li p
+.It Fl p
 Named pipe (fifo). (+) *
 .
-.It Li S
+.It Fl S
 Socket special file. (+) *
 .
-.It Li u
+.It Fl u
 Set-user-ID bit is set. (+)
 .
-.It Li g
+.It Fl g
 Set-group-ID bit is set. (+)
 .
-.It Li k
+.It Fl k
 Sticky bit is set. (+)
 .
-.It Li t
+.It Fl t
 .Ar file
 (which must be a digit) is an open file descriptor
 for a terminal device. (+)
 .
-.It Li R
+.It Fl R
 Has been migrated (Convex only). (+)
 .
-.It Li L
+.It Fl L
 Applies subsequent operators in a multiple-operator test to a symbolic link
 rather than to the file to which the link points. (+) *
+.
 .El
 .Pp
 .Ar file
@@ -3431,10 +3442,10 @@ then all inquiries return false, i.e.,
 .Ql 0 .
 .Pp
 These operators may be combined for conciseness:
-.Ql \- Ns Ar xy file
+.Dl Fl Ns Ar xy file
 is
 equivalent to
-.Ql \- Ns Ar x file Li && \- Ns Ar y file .
+.Dl Fl Ar x file Li && Fl Ar y file
 (+) For example,
 .Ql \-fx
 is true
@@ -3442,19 +3453,19 @@ is true
 .Ql 1 )
 for plain executable files, but not for directories.
 .Pp
-.Ql L
+.Fl L
 may be used in a multiple-operator test to apply subsequent operators
 to a symbolic link rather than to the file to which the link points.
 For example,
-.Ql \-lLo
+.Fl lLo
 is true for links owned by the invoking user.
-.Ql Lr ,
-.Ql Lw ,
+.Fl Lr ,
+.Fl Lw ,
 and
-.Ql Lx
+.Fl Lx
 are always true for links and false for
 non-links.
-.Ql L
+.Fl L
 has a different meaning when it is the last operator
 in a multiple-operator test; see below.
 .Pp
@@ -3463,11 +3474,11 @@ which expect
 .Ar file
 to be a file with operators which do not
 (e.g.,
-.Ql X
+.Fl X
 and
-.Ql t ) .
+.Fl t ) .
 Following
-.Ql L
+.Fl L
 with a non-file operator
 can lead to particularly strange results.
 .Pp
@@ -3477,67 +3488,67 @@ or
 .Ql 1 .
 (+)
 They have the same format as before;
-.Ar op
+.Fl Ar op
 may be one of:
 .Pp
-.Bl -tag -width 6n -offset indent -compact
+.Bl -tag -width 8n -offset indent -compact
 .
-.It Li A
+.It Fl A
 Last file access time, as the number of seconds since the epoch.
 .
-.It Li A\&:
+.It Fl A\&:
 Like
 .Ql A ,
 but in timestamp format, e.g.,
 .Sq Fri May 14 16:36:10 1993 .
 .
-.It Li M
+.It Fl M
 Last file modification time.
 .
-.It Li M\&:
+.It Fl M\&:
 Like
-.Ql M ,
+.Fl M ,
 but in timestamp format.
 .
-.It Li C
+.It Fl C
 Last inode modification time.
 .
-.It Li C\&:
+.It Fl C\&:
 Like
-.Ql C ,
+.Fl C ,
 but in timestamp format.
 .
-.It Li D
+.It Fl D
 Device number.
 .
-.It Li I
+.It Fl I
 Inode number.
 .
-.It Li F
+.It Fl F
 Composite
-.Li f Ns
+.Fl f Ns
 ile identifier, in the form
 .Ar device : Ns
 .Ar inode .
 .
-.It Li L
+.It Fl L
 The name of the file pointed to by a symbolic link.
 .
-.It Li N
+.It Fl N
 Number of (hard) links.
 .
-.It Li P
+.It Fl P
 Permissions, in octal, without leading zero.
 .
-.It Li P\&:
+.It Fl P\&:
 Like
-.Ql P ,
+.Fl P ,
 with leading zero.
 .
-.It Li P Ns Ar mode
+.It Fl P Ns Ar mode
 Equivalent to
-.Ql \-P Ar file Li & Ar mode ,
-e.g.,
+.Dl Fl P Ar file Li & Ar mode
+For example,
 .Ql \-P22 Ar file
 returns
 .Sq 22
@@ -3550,25 +3561,26 @@ and
 .Sq 0
 if by neither.
 .
-.It Li P Ns Ar mode Ns Li \&:
+.It Fl P Ns Ar mode Ns Li \&:
 Like
-.Ql P Ns Ar mode ,
+.Fl P Ns Ar mode ,
 with leading zero.
 .
-.It Li U
+.It Fl U
 Numeric userid.
 .
-.It Li U\&:
+.It Fl U\&:
 Username, or the numeric userid if the username is unknown.
 .
-.It Li G
+.It Fl G
 Numeric groupid.
 .
-.It Li G\&:
+.It Fl G\&:
 Groupname, or the numeric groupid if the groupname is unknown.
 .
-.It Li Z
+.It Fl Z
 Size, in bytes.
+.
 .El
 .Pp
 Only one of these operators may appear in a multiple-operator test, and it
