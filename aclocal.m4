@@ -12,8 +12,8 @@
 # PARTICULAR PURPOSE.
 
 m4_ifndef([AC_CONFIG_MACRO_DIRS], [m4_defun([_AM_CONFIG_MACRO_DIRS], [])m4_defun([AC_CONFIG_MACRO_DIRS], [_AM_CONFIG_MACRO_DIRS($@)])])
-# host-cpu-c-abi.m4 serial 13
-dnl Copyright (C) 2002-2020 Free Software Foundation, Inc.
+# host-cpu-c-abi.m4 serial 15
+dnl Copyright (C) 2002-2022 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -225,7 +225,7 @@ changequote([,])dnl
          # be generating 64-bit code.
          AC_COMPILE_IFELSE(
            [AC_LANG_SOURCE(
-              [[#if defined __powerpc64__ || defined _ARCH_PPC64
+              [[#if defined __powerpc64__ || defined __LP64__
                  int ok;
                 #else
                  error fail
@@ -395,6 +395,9 @@ EOF
 #endif
 #ifndef __ia64__
 #undef __ia64__
+#endif
+#ifndef __loongarch64__
+#undef __loongarch64__
 #endif
 #ifndef __m68k__
 #undef __m68k__
@@ -619,7 +622,7 @@ changequote([,])dnl
            # be generating 64-bit code.
            AC_COMPILE_IFELSE(
              [AC_LANG_SOURCE(
-                [[#if defined __powerpc64__ || defined _ARCH_PPC64
+                [[#if defined __powerpc64__ || defined __LP64__
                    int ok;
                   #else
                    error fail
@@ -688,14 +691,20 @@ changequote([,])dnl
   HOST_CPU_C_ABI_32BIT="$gl_cv_host_cpu_c_abi_32bit"
 ])
 
-# iconv.m4 serial 21
-dnl Copyright (C) 2000-2002, 2007-2014, 2016-2020 Free Software Foundation,
+# iconv.m4 serial 24
+dnl Copyright (C) 2000-2002, 2007-2014, 2016-2022 Free Software Foundation,
 dnl Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
 
 dnl From Bruno Haible.
+
+AC_PREREQ([2.64])
+
+dnl Note: AM_ICONV is documented in the GNU gettext manual
+dnl <https://www.gnu.org/software/gettext/manual/html_node/AM_005fICONV.html>.
+dnl Don't make changes that are incompatible with that documentation!
 
 AC_DEFUN([AM_ICONV_LINKFLAGS_BODY],
 [
@@ -776,8 +785,9 @@ AC_DEFUN([AM_ICONV_LINK],
 #endif
              ]],
              [[int result = 0;
-  /* Test against AIX 5.1 bug: Failures are not distinguishable from successful
-     returns.  */
+  /* Test against AIX 5.1...7.2 bug: Failures are not distinguishable from
+     successful returns.  This is even documented in
+     <https://www.ibm.com/support/knowledgecenter/ssw_aix_72/i_bostechref/iconv.html> */
   {
     iconv_t cd_utf8_to_88591 = iconv_open ("ISO8859-1", "UTF-8");
     if (cd_utf8_to_88591 != (iconv_t)(-1))
@@ -915,8 +925,7 @@ AC_DEFUN([AM_ICONV_LINK],
   AC_SUBST([LTLIBICONV])
 ])
 
-dnl Define AM_ICONV using AC_DEFUN_ONCE for Autoconf >= 2.64, in order to
-dnl avoid warnings like
+dnl Define AM_ICONV using AC_DEFUN_ONCE, in order to avoid warnings like
 dnl "warning: AC_REQUIRE: `AM_ICONV' was expanded before it was required".
 dnl This is tricky because of the way 'aclocal' is implemented:
 dnl - It requires defining an auxiliary macro whose name ends in AC_DEFUN.
@@ -924,61 +933,50 @@ dnl   Otherwise aclocal's initial scan pass would miss the macro definition.
 dnl - It requires a line break inside the AC_DEFUN_ONCE and AC_DEFUN expansions.
 dnl   Otherwise aclocal would emit many "Use of uninitialized value $1"
 dnl   warnings.
-m4_define([gl_iconv_AC_DEFUN],
-  m4_version_prereq([2.64],
-    [[AC_DEFUN_ONCE(
-        [$1], [$2])]],
-    [m4_ifdef([gl_00GNULIB],
-       [[AC_DEFUN_ONCE(
-           [$1], [$2])]],
-       [[AC_DEFUN(
-           [$1], [$2])]])]))
-gl_iconv_AC_DEFUN([AM_ICONV],
+AC_DEFUN_ONCE([AM_ICONV],
 [
   AM_ICONV_LINK
   if test "$am_cv_func_iconv" = yes; then
-    AC_MSG_CHECKING([for iconv declaration])
-    AC_CACHE_VAL([am_cv_proto_iconv], [
-      AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM(
-           [[
+    AC_CACHE_CHECK([whether iconv is compatible with its POSIX signature],
+      [gl_cv_iconv_nonconst],
+      [AC_COMPILE_IFELSE(
+         [AC_LANG_PROGRAM(
+            [[
 #include <stdlib.h>
 #include <iconv.h>
 extern
 #ifdef __cplusplus
 "C"
 #endif
-#if defined(__STDC__) || defined(_MSC_VER) || defined(__cplusplus)
 size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);
-#else
-size_t iconv();
-#endif
-           ]],
-           [[]])],
-        [am_cv_proto_iconv_arg1=""],
-        [am_cv_proto_iconv_arg1="const"])
-      am_cv_proto_iconv="extern size_t iconv (iconv_t cd, $am_cv_proto_iconv_arg1 char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);"])
-    am_cv_proto_iconv=`echo "[$]am_cv_proto_iconv" | tr -s ' ' | sed -e 's/( /(/'`
-    AC_MSG_RESULT([
-         $am_cv_proto_iconv])
+            ]],
+            [[]])],
+         [gl_cv_iconv_nonconst=yes],
+         [gl_cv_iconv_nonconst=no])
+      ])
   else
     dnl When compiling GNU libiconv on a system that does not have iconv yet,
     dnl pick the POSIX compliant declaration without 'const'.
-    am_cv_proto_iconv_arg1=""
+    gl_cv_iconv_nonconst=yes
   fi
-  AC_DEFINE_UNQUOTED([ICONV_CONST], [$am_cv_proto_iconv_arg1],
+  if test $gl_cv_iconv_nonconst = yes; then
+    iconv_arg1=""
+  else
+    iconv_arg1="const"
+  fi
+  AC_DEFINE_UNQUOTED([ICONV_CONST], [$iconv_arg1],
     [Define as const if the declaration of iconv() needs const.])
   dnl Also substitute ICONV_CONST in the gnulib generated <iconv.h>.
   m4_ifdef([gl_ICONV_H_DEFAULTS],
     [AC_REQUIRE([gl_ICONV_H_DEFAULTS])
-     if test -n "$am_cv_proto_iconv_arg1"; then
+     if test $gl_cv_iconv_nonconst != yes; then
        ICONV_CONST="const"
      fi
     ])
 ])
 
-# lib-ld.m4 serial 9
-dnl Copyright (C) 1996-2003, 2009-2020 Free Software Foundation, Inc.
+# lib-ld.m4 serial 10
+dnl Copyright (C) 1996-2003, 2009-2022 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -1101,7 +1099,7 @@ else
       *-*-aix*)
         AC_COMPILE_IFELSE(
           [AC_LANG_SOURCE(
-             [[#if defined __powerpc64__ || defined _ARCH_PPC64
+             [[#if defined __powerpc64__ || defined __LP64__
                 int ok;
                #else
                 error fail
@@ -1146,8 +1144,8 @@ fi
 AC_LIB_PROG_LD_GNU
 ])
 
-# lib-link.m4 serial 31
-dnl Copyright (C) 2001-2020 Free Software Foundation, Inc.
+# lib-link.m4 serial 33
+dnl Copyright (C) 2001-2022 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -1344,8 +1342,8 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
     eval additional_libdir3=\"$exec_prefix/$acl_libdirstem3\"
   ])
   AC_ARG_WITH(PACK[-prefix],
-[[  --with-]]PACK[[-prefix[=DIR]  search for ]PACKLIBS[ in DIR/include and DIR/lib
-  --without-]]PACK[[-prefix     don't search for ]PACKLIBS[ in includedir and libdir]],
+[[  --with-]]PACK[[-prefix[=DIR]  search for ]]PACKLIBS[[ in DIR/include and DIR/lib
+  --without-]]PACK[[-prefix     don't search for ]]PACKLIBS[[ in includedir and libdir]],
 [
     if test "X$withval" = "Xno"; then
       use_additional=no
@@ -1779,7 +1777,20 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
                     ;;
                   -l*)
                     dnl Handle this in the next round.
-                    names_next_round="$names_next_round "`echo "X$dep" | sed -e 's/^X-l//'`
+                    dnl But on GNU systems, ignore -lc options, because
+                    dnl   - linking with libc is the default anyway,
+                    dnl   - linking with libc.a may produce an error
+                    dnl     "/usr/bin/ld: dynamic STT_GNU_IFUNC symbol `strcmp' with pointer equality in `/usr/lib/libc.a(strcmp.o)' can not be used when making an executable; recompile with -fPIE and relink with -pie"
+                    dnl     or may produce an executable that always crashes, see
+                    dnl     <https://lists.gnu.org/archive/html/grep-devel/2020-09/msg00052.html>.
+                    dep=`echo "X$dep" | sed -e 's/^X-l//'`
+                    if test "X$dep" != Xc \
+                       || case $host_os in
+                            linux* | gnu* | k*bsd*-gnu) false ;;
+                            *)                          true ;;
+                          esac; then
+                      names_next_round="$names_next_round $dep"
+                    fi
                     ;;
                   *.la)
                     dnl Handle this in the next round. Throw away the .la's
@@ -1947,8 +1958,8 @@ AC_DEFUN([AC_LIB_LINKFLAGS_FROM_LIBS],
   AC_SUBST([$1])
 ])
 
-# lib-prefix.m4 serial 17
-dnl Copyright (C) 2001-2005, 2008-2020 Free Software Foundation, Inc.
+# lib-prefix.m4 serial 20
+dnl Copyright (C) 2001-2005, 2008-2022 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -2123,14 +2134,14 @@ AC_DEFUN([AC_LIB_PREPARE_MULTILIB],
 
   AC_CACHE_CHECK([for ELF binary format], [gl_cv_elf],
     [AC_EGREP_CPP([Extensible Linking Format],
-       [#ifdef __ELF__
+       [#if defined __ELF__ || (defined __linux__ && defined __EDG__)
         Extensible Linking Format
         #endif
        ],
        [gl_cv_elf=yes],
        [gl_cv_elf=no])
-     ])
-  if test $gl_cv_elf; then
+    ])
+  if test $gl_cv_elf = yes; then
     # Extract the ELF class of a file (5th byte) in decimal.
     # Cf. https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#File_header
     if od -A x < /dev/null >/dev/null 2>/dev/null; then
@@ -2147,20 +2158,23 @@ AC_DEFUN([AC_LIB_PREPARE_MULTILIB],
         echo
       }
     fi
+    # Use 'expr', not 'test', to compare the values of func_elfclass, because on
+    # Solaris 11 OpenIndiana and Solaris 11 OmniOS, the result is 001 or 002,
+    # not 1 or 2.
 changequote(,)dnl
     case $HOST_CPU_C_ABI_32BIT in
       yes)
         # 32-bit ABI.
         acl_is_expected_elfclass ()
         {
-          test "`func_elfclass | sed -e 's/[ 	]//g'`" = 1
+          expr "`func_elfclass | sed -e 's/[ 	]//g'`" = 1 > /dev/null
         }
         ;;
       no)
         # 64-bit ABI.
         acl_is_expected_elfclass ()
         {
-          test "`func_elfclass | sed -e 's/[ 	]//g'`" = 2
+          expr "`func_elfclass | sed -e 's/[ 	]//g'`" = 2 > /dev/null
         }
         ;;
       *)
