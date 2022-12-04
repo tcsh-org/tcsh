@@ -10030,6 +10030,16 @@ delete command
 ANSIfication fixes, new exec hashing code, imake fixes,
 .Ic where
 .
+.It Luke Mewburn, 1991-
+Enhanced directory printing in prompt.
+Added
+.Ic ellipsis
+and
+.Ic rprompt .
+.Ic vimode
+improvements.
+Manual page improvements.
+.
 .It Bruce Sterling Woodcock, sterling@netcom.com, 1991-1995
 ETA and Pyramid port, Makefile and lint fixes,
 .Ic ignoreeof Ns
@@ -10074,16 +10084,6 @@ New man page and tcsh.man2html
 .
 .It Larry Schwimmer, Stanford University, 1993
 AFS and HESIOD patches
-.
-.It Luke Mewburn, 1991-
-Enhanced directory printing in prompt.
-Added
-.Ic ellipsis
-and
-.Ic rprompt .
-.Ic vimode
-improvements.
-Manual page improvements.
 .
 .It Edward Hutchins, Silicon Graphics Inc., 1996
 Added implicit cd.
