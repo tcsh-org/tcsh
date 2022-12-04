@@ -9725,101 +9725,6 @@ Read-only variables.
 See
 .Sx Variable substitution .
 .
-.Sh BUGS
-When a suspended command is restarted, the shell prints the directory
-it started in if this is different from the current directory.
-This can
-be misleading (i.e., wrong) as the job may have changed directories internally.
-.Pp
-Shell builtin functions are not stoppable/restartable.
-Command sequences
-of the form
-.Ql a \&; b \&; c
-are also not handled gracefully when stopping is
-attempted.
-If you suspend
-.Ql b ,
-the shell will then immediately execute
-.Ql c .
-This is especially noticeable if this expansion results from an
-.Ic alias .
-It suffices to place the sequence of commands in
-.Ql () Ns
-\&'s to force it
-to a subshell, i.e.,
-.Ql \&( a \&; b \&; c \&) .
-.Pp
-Control over tty output after processes are started is primitive; perhaps
-this will inspire someone to work on a good virtual terminal interface.
-In a virtual terminal interface much more interesting things could be
-done with output control.
-.Pp
-Alias substitution is most often used to clumsily simulate shell procedures;
-shell procedures should be provided rather than aliases.
-.Pp
-Control structures should be parsed rather than being recognized as
-built-in commands.
-This would allow control commands to be placed anywhere,
-to be combined with
-.Ql | ,
-and to be used with
-.Ql &
-and
-.Ql \&;
-metasyntax.
-.Pp
-.Ic foreach
-doesn't ignore here documents when looking for its
-.Ic end .
-.Pp
-It should be possible to use the
-.Ql \&:
-modifiers on the output of command
-substitutions.
-.Pp
-The screen update for lines longer than the screen width is very poor
-if the terminal cannot move the cursor up (i.e., terminal type
-.Ql dumb ) .
-.Pp
-.Ev HPATH
-and
-.Ev NOREBIND
-don't need to be environment variables.
-.Pp
-Glob-patterns which do not use
-.Ql \&? ,
-.Ql * ,
-or
-.Ql [] ,
-or which use
-.Ql {}
-or
-.Ql ~
-are not negated correctly.
-.Pp
-The single-command form of
-.Ic if
-does output redirection even if
-the expression is false and the command is not executed.
-.Pp
-.Ic ls\-F
-includes file identification characters when sorting filenames
-and does not handle control characters in filenames well.
-It cannot be
-interrupted.
-.Pp
-Command substitution supports multiple commands and conditions, but not
-cycles or backward
-.Ic goto Ns
-s.
-.Pp
-Report bugs at
-.Lk @PACKAGE_BUGREPORT@
-preferably with fixes.
-If you want to
-help maintain and test tcsh, add yourself to the mailing list in
-.Lk @PACKAGE_MAILLIST@
-.
 .Sh THE T IN TCSH
 In 1964, DEC produced the PDP-6.
 The PDP-10 was a later re-implementation.
@@ -10172,3 +10077,98 @@ reporting bugs in, and suggesting new additions to each and every version
 Richard M. Alderson III, for writing the
 .Sq T in tcsh
 section
+.
+.Sh BUGS
+When a suspended command is restarted, the shell prints the directory
+it started in if this is different from the current directory.
+This can
+be misleading (i.e., wrong) as the job may have changed directories internally.
+.Pp
+Shell builtin functions are not stoppable/restartable.
+Command sequences
+of the form
+.Ql a \&; b \&; c
+are also not handled gracefully when stopping is
+attempted.
+If you suspend
+.Ql b ,
+the shell will then immediately execute
+.Ql c .
+This is especially noticeable if this expansion results from an
+.Ic alias .
+It suffices to place the sequence of commands in
+.Ql () Ns
+\&'s to force it
+to a subshell, i.e.,
+.Ql \&( a \&; b \&; c \&) .
+.Pp
+Control over tty output after processes are started is primitive; perhaps
+this will inspire someone to work on a good virtual terminal interface.
+In a virtual terminal interface much more interesting things could be
+done with output control.
+.Pp
+Alias substitution is most often used to clumsily simulate shell procedures;
+shell procedures should be provided rather than aliases.
+.Pp
+Control structures should be parsed rather than being recognized as
+built-in commands.
+This would allow control commands to be placed anywhere,
+to be combined with
+.Ql | ,
+and to be used with
+.Ql &
+and
+.Ql \&;
+metasyntax.
+.Pp
+.Ic foreach
+doesn't ignore here documents when looking for its
+.Ic end .
+.Pp
+It should be possible to use the
+.Ql \&:
+modifiers on the output of command
+substitutions.
+.Pp
+The screen update for lines longer than the screen width is very poor
+if the terminal cannot move the cursor up (i.e., terminal type
+.Ql dumb ) .
+.Pp
+.Ev HPATH
+and
+.Ev NOREBIND
+don't need to be environment variables.
+.Pp
+Glob-patterns which do not use
+.Ql \&? ,
+.Ql * ,
+or
+.Ql [] ,
+or which use
+.Ql {}
+or
+.Ql ~
+are not negated correctly.
+.Pp
+The single-command form of
+.Ic if
+does output redirection even if
+the expression is false and the command is not executed.
+.Pp
+.Ic ls\-F
+includes file identification characters when sorting filenames
+and does not handle control characters in filenames well.
+It cannot be
+interrupted.
+.Pp
+Command substitution supports multiple commands and conditions, but not
+cycles or backward
+.Ic goto Ns
+s.
+.Pp
+Report bugs at
+.Lk @PACKAGE_BUGREPORT@
+preferably with fixes.
+If you want to
+help maintain and test tcsh, add yourself to the mailing list in
+.Lk @PACKAGE_MAILLIST@
