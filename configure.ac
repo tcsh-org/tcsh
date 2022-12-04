@@ -326,7 +326,7 @@ esac
 changequote([, ])dnl
 
 AC_MSG_NOTICE([using configuration file `$tcsh_config_file'])
-cp ${srcdir}/config/${tcsh_config_file} config_p.h
+cp ${srcdir}/system/${tcsh_config_file} config_p.h
 
 AH_BOTTOM(
 [#include "config_p.h"

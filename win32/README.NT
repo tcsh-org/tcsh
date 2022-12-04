@@ -18,7 +18,7 @@ Compiling:
 ---------
 
 tcsh currently only compiles with Microsoft Visual C++ (2.0 and greater) on 
-x86 or Alpha platforms. Simply copy config/win32 to config.h and 
+x86 or Alpha platforms. Simply copy system/win32 to config.h and
 win32/makefile.win32 to the base directory.
 
 run nmake -f makefile.win32
