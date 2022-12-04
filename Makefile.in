@@ -26,17 +26,14 @@ all: ${BUILD} catalogs
 ## Packaging
 ################################################################
 
+RELEASE_GROUP=astron
+RELEASE_USER=${USER}
 RELEASE_TAG=TCSH@PACKAGE_REV@_@PACKAGE_VERS@_@PACKAGE_PATCHLEVEL@
 
 .PHONY: Announce
 Announce: Announce-${VERSION}
 Announce-${VERSION}:
 	touch ${@}
-
-.PHONY: dch
-dch:
-	cd ${srcdir} && dch -v ${VERSION} 'Release ${VERSION}'
-	cd ${srcdir} && dch -r ''
 
 RELEASE_ARTIFACTS= \
 	Fixes aclocal.m4 config.h.in configure configure.ac \
@@ -66,16 +63,39 @@ release-push push:
 	git push origin tag ${RELEASE_TAG}
 
 .PHONY: release-archive tar.gz
-release-archive tar.gz: tcsh-${VERSION}.tar.gz
-tcsh-${VERSION}.tar.gz:
+release-archive tar.gz: ${srcdir}/tcsh-${VERSION}.tar.gz
+${srcdir}/tcsh-${VERSION}.tar.gz:
 	cd ${srcdir} \
 	&& git archive -o tcsh-${VERSION}.tar.gz \
 	    --prefix=tcsh-${VERSION}/ ${RELEASE_TAG}
 
 .PHONY: release-sign sign
-release-sign sign: tcsh-${VERSION}.tar.gz
+release-sign sign: ${srcdir}/tcsh-${VERSION}.tar.gz.asc
+${srcdir}/tcsh-${VERSION}.tar.gz.asc:
 	cd ${srcdir} \
 	&& gpg --armor --detach-sign tcsh-${VERSION}.tar.gz
+
+RELEASE_UPLOAD_FILES= \
+	${srcdir}/Announce-${VERSION} \
+	${srcdir}/FAQ \
+	${srcdir}/Ported \
+	${srcdir}/README.md \
+	${srcdir}/tcsh-${VERSION}.tar.gz \
+	${srcdir}/tcsh-${VERSION}.tar.gz.asc \
+	tcsh.man
+
+RELEASE_UPLOAD_TARGET=rebar.astron.com:/p/astron/ftp/pub/tcsh
+
+.PHONY: release-upload upload
+release-upload upload:
+	rsync -Pv -csgp \
+	    --chmod Fgo-w,a+r \
+	    --numeric-ids \
+	    --groupmap '*:${RELEASE_GROUP}' \
+	    --usermap '*:${RELEASE_USER}' \
+	    --ignore-missing-args \
+	    ${RELEASE_UPLOAD_FILES} \
+	    ${RELEASE_UPLOAD_TARGET}/
 
 ################################################################
 ## CFLAGS.  For various -D things, see config.h

@@ -553,5 +553,5 @@ AC_SUBST(HESDEF)
 AC_SUBST(HESLIB)
 AC_SUBST(BUILD_CATALOGS)
 
-AC_CONFIG_FILES([Makefile nls/Makefile patchlevel.h tcsh.man])
+AC_CONFIG_FILES([Makefile debian/changelog nls/Makefile patchlevel.h tcsh.man])
 AC_OUTPUT()

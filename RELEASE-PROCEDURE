@@ -11,13 +11,14 @@ See TOOLS.md for pre-requisites.
 
 3)  Run make distclean; ./configure && make && make test
 
-4)  If necessary, run make Announce
-    Edit the empty file to fill it with content
+4)  If you want to create a new Announce file for the current version,
+    you can run
 
-5)  Update debian/changelog
-	make dch
+	make Announce
 
-6)  If checks succeeded, add changed files to git, check the changes,
+    Edit the new empty file it creates to fill it with content
+
+5)  If checks succeeded, add changed files to git, check the changes,
     commit and tag the release, push to upstream, and create a signed
     archive
 
@@ -27,9 +28,12 @@ See TOOLS.md for pre-requisites.
 	make push
 	make sign
 
-7)  Make the archive and signature available on ftp
+6)  Make the archive and signature together with some other files
+    available on ftp
 
-8)  Add the new version to bugs.astron.com:
+	make upload
+
+7)  Add the new version to bugs.astron.com:
 
     - Click: Manage > Manage Projects > tcsh
     - Scroll down to "Versions"
@@ -43,4 +47,4 @@ See TOOLS.md for pre-requisites.
     - Set the "Date Order" to 2030-01-01 (i.e. far in the future)
     - Click on "Update Version"
 
-9)  Mail an announcement to tcsh@astron.com
+8)  Mail an announcement to tcsh@astron.com
