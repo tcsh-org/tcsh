@@ -35,7 +35,7 @@ override_dh_auto_install:
 	install -D -m 0644 \
 	    csh-mode.el \
 	    debian/tcsh/usr/share/emacs/site-lisp/csh-mode.el
-	dh_installchangelogs -a Fixes
+	dh_installchangelogs
 	dh_installexamples -a complete.tcsh
 	dh_installemacsen
 
