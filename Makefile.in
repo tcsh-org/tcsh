@@ -491,7 +491,7 @@ tc.defs.c:	gethost host.defs
 
 tcsh.ps: tcsh.man
 	rm -f tcsh.ps
-	-ptroff -t -man $(srcdir)/tcsh.man > tcsh.ps
+	-ptroff -t -man tcsh.man > tcsh.ps
 
 .c.${SUF}:
 	${CC} ${CF} ${CFLAGS} ${CPPFLAGS} ${DFLAGS} ${EXTRAFLAGS} $<
@@ -634,7 +634,7 @@ install.catalogs:
 
 install.man: tcsh.man
 	$(MKDIR_P) ${DESTMAN}
-	$(INSTALL_DATA) $(srcdir)/tcsh.man ${DESTMAN}/tcsh.${MANSECT}
+	$(INSTALL_DATA) tcsh.man ${DESTMAN}/tcsh.${MANSECT}
 
 # Amiga Unix
 #install.man: tcsh.man
