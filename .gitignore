@@ -7,6 +7,7 @@ config.h
 config.log
 config.status
 config_p.h
+dch-template
 ed.defns.h
 gethost
 nls/*.cat

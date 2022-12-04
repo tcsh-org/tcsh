@@ -31,8 +31,8 @@ RELEASE_USER=${USER}
 RELEASE_TAG=TCSH@PACKAGE_REV@_@PACKAGE_VERS@_@PACKAGE_PATCHLEVEL@
 
 .PHONY: Announce
-Announce: Announce-${VERSION}
-Announce-${VERSION}:
+Announce: ${srcdir}/Announce-${VERSION}
+${srcdir}/Announce-${VERSION}:
 	touch ${@}
 
 RELEASE_ARTIFACTS= \
@@ -45,6 +45,8 @@ release-add add:
 	&& test -f Announce-${VERSION} \
 	&& git add Announce-${VERSION} \
 	|| true
+	cmp -s dch-template ${srcdir}/debian/changelog \
+	|| cp dch-template ${srcdir}/debian/changelog
 	cd ${srcdir} \
 	&& git add ${RELEASE_ARTIFACTS}
 
@@ -681,7 +683,7 @@ clean.catalogs:
 
 .PHONY: cleandir distclean veryclean
 cleandir distclean veryclean: clean
-	${RM} -f Makefile config.h config_p.h nls/Makefile patchlevel.h tcsh.man
+	${RM} -f Makefile config.h config_p.h dch-template nls/Makefile patchlevel.h tcsh.man
 	${RM} -f config.status config.cache config.log tcsh.ps
 	${RM} -f missing
 	${RM} -f atconfig testsuite.log

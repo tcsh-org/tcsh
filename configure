@@ -8959,7 +8959,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile debian/changelog nls/Makefile patchlevel.h tcsh.man"
+ac_config_files="$ac_config_files Makefile dch-template nls/Makefile patchlevel.h tcsh.man"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -9660,7 +9660,7 @@ do
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "./atconfig") CONFIG_COMMANDS="$CONFIG_COMMANDS ./atconfig" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "debian/changelog") CONFIG_FILES="$CONFIG_FILES debian/changelog" ;;
+    "dch-template") CONFIG_FILES="$CONFIG_FILES dch-template" ;;
     "nls/Makefile") CONFIG_FILES="$CONFIG_FILES nls/Makefile" ;;
     "patchlevel.h") CONFIG_FILES="$CONFIG_FILES patchlevel.h" ;;
     "tcsh.man") CONFIG_FILES="$CONFIG_FILES tcsh.man" ;;
