@@ -27,24 +27,24 @@ package_day="${PACKAGE_DATE##*-}"
 package_day="${package_day#0}"
 
 case "${package_month}" in
-01) package_month=January;;
-02) package_month=February;;
-03) package_month=March;;
-04) package_month=April;;
-05) package_month=May;;
-06) package_month=June;;
-07) package_month=July;;
-08) package_month=August;;
-09) package_month=September;;
-10) package_month=October;;
-11) package_month=November;;
-12) package_month=December;;
+01) package_month_name=January;;
+02) package_month_name=February;;
+03) package_month_name=March;;
+04) package_month_name=April;;
+05) package_month_name=May;;
+06) package_month_name=June;;
+07) package_month_name=July;;
+08) package_month_name=August;;
+09) package_month_name=September;;
+10) package_month_name=October;;
+11) package_month_name=November;;
+12) package_month_name=December;;
 esac
 
-PACKAGE_ENGLISH_DATE="${package_month} ${package_day}, ${package_year}"
+PACKAGE_ENGLISH_DATE="${package_month_name} ${package_day}, ${package_year}"
 AC_SUBST(PACKAGE_ENGLISH_DATE)
 
-PACKAGE_CHANGELOG_DATE="$(TZ=UTC date -d ${PACKAGE_DATE} '+%a, %d %b %Y %T %z')"
+package_changelog_date_format='+%a, %d %b %Y %T %z'
 AC_SUBST(PACKAGE_CHANGELOG_DATE)
 
 PACKAGE_REV="${PACKAGE_VERSION%%.*}"
@@ -76,37 +76,54 @@ AS_IF([{ test x"${ac_cv_host_system_type+set}" = x"set" &&
       [AC_MSG_RESULT(ok)])
 ac_cv_host_system_type="$host"
 
-
 changequote(, )dnl
+
+case "${host}" in
+  *-*-darwin*|*-*-rhapsody*)
+    PACKAGE_CHANGELOG_DATE="$(
+      TZ=UTC date -v0H -v0M -v0S \
+	-v${package_year}y \
+	-v${package_month}m \
+	-v${package_day}d \
+	"${package_changelog_date_format}"
+    )"
+  ;;
+  *)
+    PACKAGE_CHANGELOG_DATE="$(
+      TZ=UTC date -d ${PACKAGE_DATE} \
+	"${package_changelog_date_format}"
+    )"
+  ;;
+esac
 
 case "${host}" in
 
   ## Alpha (DEC) machines.
-  alpha*-dec-osf* )
+  alpha*-dec-osf*)
     tcsh_config_file=decosf1
   ;;
 
   ## Ultrix
-  *-dec-ultrix* )
+  *-dec-ultrix*)
     tcsh_config_file=ultrix
   ;;
 
   ## DGUX
-  *-dg-dguxR4* )
+  *-dg-dguxR4*)
     tcsh_config_file=dgux5.4
   ;;
-  m88k-dg-dgux5.4R* )
+  m88k-dg-dgux5.4R*)
     tcsh_config_file=dgux5.4
   ;;
 
   ## HP/UX
-  *-hp-hpux7* )
+  *-hp-hpux7*)
     tcsh_config_file=hpux7
   ;;
-  *-hp-hpux[89]* )
+  *-hp-hpux[89]*)
     tcsh_config_file=hpux8
   ;;
-  *-hp-hpux1[0-9]* )
+  *-hp-hpux1[0-9]*)
     tcsh_config_file=hpux11
   ;;
 
@@ -139,10 +156,10 @@ case "${host}" in
   ;;
 
   ## Motorola systems
-  m68k-motorola-sysv* )
+  m68k-motorola-sysv*)
     tcsh_config_file=sysV68
   ;;
-  m88k-motorola-sysv3* )
+  m88k-motorola-sysv3*)
     tcsh_config_file=sysV88
   ;;
 
@@ -187,12 +204,12 @@ case "${host}" in
   ;;
 
   ## Mac OS X Server
-  *-*-rhapsody* )
+  *-*-rhapsody*)
     tcsh_config_file=bsd4.4
   ;;
 
   ## Mac OS X Server
-  *-*-darwin* )
+  *-*-darwin*)
     tcsh_config_file=bsd4.4
   ;;
 
@@ -202,7 +219,7 @@ case "${host}" in
   ;;
 
   ## Silicon Graphics machines
-  *-sgi-iri* )
+  *-sgi-iri*)
     tcsh_config_file=irix
     case "${host_os}" in
       irix[34]*) # Irix-3.x - Irix 4.x
@@ -219,54 +236,54 @@ case "${host}" in
   ;;
 
   ## Suns
-  *-sun-sunos3* )
+  *-sun-sunos3*)
     tcsh_config_file=sunos35
   ;;
-  *-sun-sunos4.0* )
+  *-sun-sunos4.0*)
     tcsh_config_file=sunos40
   ;;
-  *-sun-sunos4.1.[12]* )
+  *-sun-sunos4.1.[12]*)
     tcsh_config_file=sunos41
   ;;
-  *-sun-sunos4.1.[3456]* )
+  *-sun-sunos4.1.[3456]*)
     tcsh_config_file=sunos413
   ;;
-  *-*-solaris2.[01] ) # Should handle sparc or x86
+  *-*-solaris2.[01]) # Should handle sparc or x86
     tcsh_config_file=sol2
   ;;
-  *-sun-solaris2.2 ) # Sparc only release
+  *-sun-solaris2.2) # Sparc only release
     tcsh_config_file=sol22
   ;;
-  *-sun-solaris2.3 ) # Sparc only release
+  *-sun-solaris2.3) # Sparc only release
     tcsh_config_file=sol23
   ;;
-  *-*-solaris2.[45] ) # Should handle sparc, x86 and powerpc
+  *-*-solaris2.[45]) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol24
   ;;
-  *-*-solaris2.[678] ) # Should handle sparc, x86 and powerpc
+  *-*-solaris2.[678]) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol26
   ;;
-  *-*-solaris2.* ) # Should handle sparc, x86 and powerpc
+  *-*-solaris2.*) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol29
   ;;
 
   ## Dell SVR4
-  *-dell-sysv4* )
+  *-dell-sysv4*)
     tcsh_config_file=sysv4
     DFLAGS="$DFLAGS -DDELL"
   ;;
 
   ## SVR4 (Generic and otherwise)
-  *-*-sysv4* )
+  *-*-sysv4*)
     tcsh_config_file=sysv4
   ;;
 
   ## Tektronix systems
-  m68k-tektronix-bsd* )
+  m68k-tektronix-bsd*)
     tcsh_config_file=bsd
     NON_GNU_DFLAGS='-DBSD -DUTek'
   ;;
-  m88k-tektronix-sysv3* )
+  m88k-tektronix-sysv3*)
     tcsh_config_file=tekXD88
   ;;
 
@@ -316,7 +333,7 @@ case "${host}" in
     tcsh_config_file=qnx6
   ;;
 
-  * )
+  *)
   changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name
 for `${host}' systems.
@@ -406,7 +423,6 @@ AC_DEFINE(socklen_t, int, [Define to `int' if neither <sys/types.h> nor <sys/soc
 ])
 ])
 AC_TYPE_SOCKLEN_T()
-
 
 dnl Checks for structures
 AC_CHECK_MEMBERS([struct dirent.d_ino], , , [dnl
