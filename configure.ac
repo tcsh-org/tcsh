@@ -79,7 +79,7 @@ ac_cv_host_system_type="$host"
 changequote(, )dnl
 
 case "${host}" in
-  *-*-darwin*|*-*-rhapsody*)
+  *-*-darwin*|*-*-freebsd*|*-*-rhapsody*)
     PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -v0H -v0M -v0S \
 	-v${package_year}y \
@@ -88,7 +88,15 @@ case "${host}" in
 	"${package_changelog_date_format}"
     )"
   ;;
+  *-*-openbsd*)
+    PACKAGE_CHANGELOG_DATE="$(
+      TZ=UTC date -j \
+	"${package_changelog_date_format}" \
+	${package_year}${package_month}${package_day}0000
+    )"
+  ;;
   *)
+    # NetBSD, GNU core utilities (i.e. most Linux)
     PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -d ${PACKAGE_DATE} \
 	"${package_changelog_date_format}"
