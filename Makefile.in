@@ -81,7 +81,7 @@ ${srcdir}/tcsh_${VERSION}.orig.tar.gz:
 
 .PHONY: release-sign sign
 release-sign sign: ${srcdir}/tcsh-${VERSION}.tar.gz.asc
-${srcdir}/tcsh-${VERSION}.tar.gz.asc:
+${srcdir}/tcsh-${VERSION}.tar.gz.asc: ${srcdir}/tcsh-${VERSION}.tar.gz
 	cd ${srcdir} \
 	&& gpg --armor --detach-sign tcsh-${VERSION}.tar.gz
 
