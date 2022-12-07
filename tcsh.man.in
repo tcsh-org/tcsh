@@ -121,7 +121,7 @@ the
 flag as the only argument.
 .Pp
 The rest of the flag arguments are interpreted as follows:
-.Bl -tag -width indent
+.Bl -tag -width 6n
 .
 .It Fl b
 Forces a
@@ -449,7 +449,7 @@ The shell always binds the arrow keys (as defined in the
 .Ev TERMCAP
 environment variable) to:
 .Pp
-.Bl -tag -width right -offset indent -compact
+.Bl -tag -width "right" -offset indent -compact
 .It Ic down
 .Ic down-history
 .It Ic up
@@ -941,7 +941,7 @@ to letters by default are bound to both lower- and uppercase letters for
 convenience.
 .Pp
 Supported editor commands are:
-.Bl -tag -width indent
+.Bl -tag -width 6n
 .
 .It Ic backward-char ( ^B , left )
 Move back a character.
@@ -1160,7 +1160,7 @@ must be bound to a
 single character for this to work) or one of the following special characters
 may be typed:
 .Pp
-.Bl -tag -width indent -compact
+.Bl -tag -width "delete" -compact
 .It Ic ^W
 Appends the rest of the word under the cursor to the search pattern.
 .It Ic delete
@@ -1589,7 +1589,7 @@ shell variable.
 .Pp
 Supported escape sequences are:
 .Pp
-.Bl -tag -width 12n -offset indent -compact
+.Bl -tag -width ".Li \ex{ Ns Ar nnnnnnnn Ns Li }" -offset indent -compact
 .It Li \ea
 Bell.
 .It Li \eb
@@ -1762,7 +1762,7 @@ A history event specification may be one of
 .Ql \&!
 shown):
 .Pp
-.Bl -tag -width 5n -offset indent -compact
+.Bl -tag -width ".Li \&!\&? Ns Ar s Ns Li \&?" -offset indent -compact
 .
 .It Li \&! Ns Ar n
 A number, referring to a particular event.
@@ -1898,7 +1898,7 @@ and a leading
 .Ql \&!
 (for the abbreviated word designators - see below):
 .Pp
-.Bl -column -offset indent -compact "XXXX" "XXX" ""
+.Bl -column -offset indent -compact ".Li \&: Ns Ar x Ns Li \- Ns Ar y" ".Li \&!\- Ns Ar y" ""
 .
 .It Li :0 Ta Ta
 The first (command) word.
@@ -2030,7 +2030,7 @@ shown),
 each preceded by a
 .Ql \&: :
 .Pp
-.Bl -tag -width 6n -offset indent -compact
+.Bl -tag -width ".Li \&:s/ Ns Ar l Ns Li / Ns Ar r Ns Li /" -offset indent -compact
 .
 .It Li \&:h
 Remove a trailing pathname component, leaving the head.
@@ -2445,7 +2445,7 @@ can be used to interactively expand individual variables.
 The following metasequences are provided for introducing variable values into
 the shell input:
 .Pp
-.Bl -tag -width 10n -offset indent -compact
+.Bl -tag -width ".Li ${ Ns Ar number Ns Li }" -offset indent -compact
 .
 .It Li $ Ns Ar name
 .It Li ${ Ns Ar name Ns Li }
@@ -2535,7 +2535,7 @@ The following substitutions can not be modified with
 .Ql \&:
 modifiers:
 .Pp
-.Bl -tag -width 10n -offset indent -compact
+.Bl -tag -width ".Li ${% Ns Ar number Ns Li }" -offset indent -compact
 .
 .It Li $\&? Ns Ar name
 .It Li ${\&? Ns Ar name Ns Li }
@@ -3038,7 +3038,7 @@ This greatly speeds command location when a large
 number of directories are present in the search path.
 This hashing mechanism is
 not used:
-.Bl -enum -width 2n -offset indent
+.Bl -enum -offset indent
 .It
 If hashing is turned explicitly off via
 .Ic unhash .
@@ -3091,7 +3091,7 @@ file to it on standard input.
 The standard input and standard output of a command may be redirected with the
 following syntax:
 .Pp
-.Bl -tag -width 8n -offset indent -compact
+.Bl -tag -width ".Li << Ar word" -offset indent -compact
 .
 .It Li < Ar name
 Open file
@@ -3283,7 +3283,7 @@ These operators are similar to those of C and have the same precedence.
 The operators, in descending precedence, with equivalent precedence per line,
 are:
 .Pp
-.Bl -column -offset indent -compact "XX" "XX" "XX" "XX"
+.Bl -column -offset indent -compact ".Li <<" ".Li >>" ".Li <<" ".Li >>"
 .It Li \&( Ta Li \&) Ta Ta
 .It Li \&~ Ta Ta Ta
 .It Li \&! Ta Ta Ta
@@ -3371,7 +3371,7 @@ where
 .Fl Ar op
 is one of:
 .Pp
-.Bl -tag -width 8n -offset indent -compact
+.Bl -tag -width ".Fl P Ns Ar mode Ns Li \&:" -offset indent -compact
 .
 .It Fl r
 Read access.
@@ -3509,7 +3509,7 @@ They have the same format as before;
 .Fl Ar op
 may be one of:
 .Pp
-.Bl -tag -width 8n -offset indent -compact
+.Bl -tag -width ".Fl P Ns Ar mode Ns Li \&:" -offset indent -compact
 .
 .It Fl A
 Last file access time, as the number of seconds since the epoch.
@@ -4160,7 +4160,7 @@ and
 .
 .Ss Builtin commands
 .
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic % Ns Ar job
 A synonym for the
@@ -4177,7 +4177,7 @@ Does nothing, successfully.
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic @
 .It Ic @ Ar name Cm = Ar expr
@@ -4258,7 +4258,7 @@ Components of
 must be separated by spaces.
 .
 .El
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic alias Op Ar name Op Ar wordlist
 Without arguments, prints all aliases.
@@ -4311,7 +4311,7 @@ as described under
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic bindkey Oo Fl l Ns | Ns Fl d Ns | Ns Fl e Ns | Ns Fl v Ns | Ns Fl u Oc No (+)
 .It Ic bindkey Oo Fl a Oc Oo Fl b Oc Oo Fl k Oc Oo Fl r Oc Oo Fl \- Oc Ar key No (+)
@@ -4334,7 +4334,7 @@ Supported
 .Ic bindkey
 options:
 .Pp
-.Bl -tag -width 5n -offset indent -compact
+.Bl -tag -width ".Fl a" -offset indent -compact
 .
 .It Fl a
 Lists or changes key-bindings in the alternative key map.
@@ -4468,7 +4468,7 @@ escape sequences (in the style of System V
 .Xr echo 1 )
 as follows:
 .Pp
-.Bl -tag -width 5n -offset indent -compact
+.Bl -tag -width ".Li \e Ns Ar nnn" -offset indent -compact
 .
 .It Li \ea
 Bell.
@@ -4499,7 +4499,7 @@ and
 .Ql ^ .
 .
 .El
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic bs2cmd Ar bs2000-command No (+)
 Passes
@@ -4676,7 +4676,7 @@ is ambiguous.
 specifies which word relative to the current word
 is to be completed, and may be one of the following:
 .Pp
-.Bl -tag -width 5n -offset indent -compact
+.Bl -tag -width ".Li \`...\`" -offset indent -compact
 .
 .It Li c
 Current-word completion.
@@ -4714,7 +4714,7 @@ variables, which must include the current word.
 .Ar list ,
 the list of possible completions, may be one of the following:
 .Pp
-.Bl -tag -width 5n -offset indent -compact
+.Bl -tag -width ".Li \`...\`" -offset indent -compact
 .
 .It Li a
 Aliases.
@@ -5169,7 +5169,7 @@ labels.
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic dirs Xo
 .Op Fl l
@@ -5266,7 +5266,7 @@ rather than
 The third form clears the directory stack.
 .
 .El
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic echo Oo Fl n Oc Ar word No \&...
 Writes each
@@ -5342,7 +5342,7 @@ messages are verbose.
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic else
 .It Ic end
@@ -5357,7 +5357,7 @@ and
 statements below.
 .
 .El
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic eval Ar arg No \&...
 Treats the arguments as input to the
@@ -5413,7 +5413,7 @@ space-separated list.
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic foreach Ar name Cm \&( Ns Ar wordlist Ns Cm \&)
 .It Ic \&...
@@ -5446,7 +5446,7 @@ If you make a mistake typing in a
 loop at the terminal you can rub it out.
 .
 .El
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic getspath No (+)
 Prints the system execution path.
@@ -5498,7 +5498,7 @@ hash buckets.
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic history Xo
 .Op Fl hTr
@@ -5624,7 +5624,7 @@ is set, the first and second forms print and save the literal
 The third form clears the history list.
 .
 .El
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic hup Oo Ar command Oc No (+)
 With
@@ -5672,7 +5672,7 @@ executed; this is a bug.
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic if Cm \&( Ns Ar expr Ns Cm \&) then
 .It Ic \&...
@@ -5714,7 +5714,7 @@ must appear alone on its input line or after an
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic inlib Ar shared-library No \&... No (+)
 Adds each
@@ -5726,7 +5726,7 @@ to remove a shared library.
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic jobs Op Fl l
 .It Ic jobs Fl Z Oo Ar title Oc No (+)
@@ -5786,7 +5786,7 @@ or HUP (hangup), then the job or process is sent a
 CONT (continue) signal as well.
 .
 .El
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic limit Oo Fl h Oc Op Ar resource Op Ar maximum-use
 Limits the consumption by the current process and each
@@ -5821,7 +5821,7 @@ a user may lower or raise the current limits within the legal range.
 Controllable
 .Ar resource
 types currently include (if supported by the OS):
-.Bl -tag -width 12n -offset indent
+.Bl -tag -width ".Ic coredumpsize" -offset indent
 .
 .It Ic concurrency
 Maximum number of threads for this process.
@@ -5995,7 +5995,7 @@ but much faster.
 identifies each type of
 special file in the listing with a special character:
 .Pp
-.Bl -tag -width 5n -offset indent -compact
+.Bl -tag -width ".Li @" -offset indent -compact
 .It Li /
 Directory.
 .It Li *
@@ -6021,7 +6021,7 @@ If the
 shell variable is set, symbolic links are identified
 in more detail (on only systems that have them, of course):
 .Pp
-.Bl -tag -width 5n -offset indent -compact
+.Bl -tag -width ".Li @" -offset indent -compact
 .It Li @
 Symbolic link to a non-directory.
 .It Li >
@@ -6089,7 +6089,7 @@ shell variable and the
 environment variable.
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic migrate Xo
 .Op Fl Ar site
@@ -6109,7 +6109,7 @@ itself can cause unexpected behavior, because the shell
 does not like to lose its tty.
 (TCF only)
 .El
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic newgrp Oo Cm \- Oc Oo Ar group Oc No (+)
 Equivalent to
@@ -6378,7 +6378,7 @@ as
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic sched No (+)
 .It Ic sched Xo
@@ -6536,7 +6536,7 @@ See also the
 builtin command.
 .
 .El
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic setenv Op Ar name Op Ar value
 Without arguments, prints the names and values of all environment variables.
@@ -6713,7 +6713,7 @@ stop shells started by
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic switch Cm \&( Ns Ar string Ns Cm \&)
 .It Ic case Ar str1 Ns \&:
@@ -6759,7 +6759,7 @@ there is no default, execution continues after the
 .Ic endsw .
 .
 .El
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic telltc No (+)
 Lists the values of all terminal capabilities (see
@@ -6956,7 +6956,7 @@ editor command.
 .
 .El
 .Pp
-.Bl -tag -width 8n -compact
+.Bl -tag -width 6n -compact
 .
 .It Ic while Cm \&( Ns Ar expr Ns Cm \&)
 .It Ic \&...
@@ -6990,7 +6990,7 @@ They are all initially undefined.
 .Pp
 Supported special aliases are:
 .
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic beepcmd
 Runs when the shell wants to ring the terminal bell.
@@ -7193,7 +7193,7 @@ and
 .Pp
 Supported special shell variables are:
 .
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ic addsuffix No (+)
 If set, filename completion adds
@@ -7524,7 +7524,7 @@ character
 .\" (position in this table?)
 is set to number 0,1,2 and 3.
 Each number has the following meaning:
-.Bl -tag -width 3n -offset indent -compact
+.Bl -tag -width ".Li 0" -offset indent -compact
 .It Li 0
 Not used for multi-byte characters.
 .It Li 1
@@ -7604,7 +7604,7 @@ The style of the
 builtin.
 May be set to:
 .Pp
-.Bl -tag -width 4n -offset indent -compact
+.Bl -tag -width ".Li both" -offset indent -compact
 .It Li bsd
 Don't echo a newline if the first argument is
 .Fl n ;
@@ -8270,7 +8270,7 @@ The string which is printed before reading each command from the terminal.
 may include any of the following formatting sequences (+), which
 are replaced by the given information:
 .Pp
-.Bl -tag -width 4n -offset indent -compact
+.Bl -tag -width ".Li %/" -offset indent -compact
 .
 .It Li %/
 The current working directory.
@@ -8483,7 +8483,7 @@ superuser shell.
 For example,
 .Pp
 .\" Using Bl not Bd to allow bold formatting in the second line
-.Bl -tag -width indent -offset indent -compact
+.Bl -tag -width 20n -offset indent -compact
 .It Li > set prompt = \&"%m [%h] \&%B[%@]%b [%/] you rang? \&"
 .It Li tut [37] Cm [2:54pm] Li [/usr/accts/sys] you rang? _
 .El
@@ -8793,7 +8793,7 @@ set to
 Note that
 .Ql expand
 expansion:
-.Bl -enum -width 2n -offset indent -compact
+.Bl -enum -offset indent -compact
 .
 .It
 Works just like
@@ -8844,7 +8844,7 @@ builtin.
 .Ic time
 format string:
 .Pp
-.Bl -tag -width 4n -offset indent -compact
+.Bl -tag -width ".Li \&%U" -offset indent -compact
 .
 .It Li \&%U
 The time the process spent in user mode in cpu seconds.
@@ -8922,7 +8922,7 @@ and
 are not
 available, but the following additional sequences are:
 .Pp
-.Bl -tag -width 4n -offset indent -compact
+.Bl -tag -width ".Li \&%Y" -offset indent -compact
 .
 .It Li \&%Y
 The number of system calls performed.
@@ -8993,7 +8993,7 @@ Supported
 .Ic version
 options include:
 .Pp
-.Bl -tag -width 4n -offset indent -compact
+.Bl -tag -width ".Li wide" -offset indent -compact
 .
 .It Li 8b
 The shell is eight bit clean; default.
@@ -9183,7 +9183,7 @@ messages.
 The following sequences
 are replaced by the given information:
 .Pp
-.Bl -tag -width 4n -offset indent -compact
+.Bl -tag -width ".Li %n" -offset indent -compact
 .
 .It Li %n
 The name of the user who logged in/out.
@@ -9246,7 +9246,7 @@ is used as the default.
 .El
 .
 .Sh ENVIRONMENT
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Ev AFSUSER No (+)
 Equivalent to the
@@ -9345,7 +9345,7 @@ is a two-character variable name.
 The
 variables with their associated defaults are:
 .
-.Bl -column -offset indent "Li XX" "Li XXXXX" 20n
+.Bl -column -offset indent ".Li no" ".Li 01;36" ""
 .
 .It Li no Ta Li 0 Ta Normal (non-filename) text.
 .
@@ -9449,7 +9449,7 @@ codes) from numerical commands separated by semicolons.
 The
 most common commands are:
 .Pp
-.Bl -tag -width 4n -offset indent -compact
+.Bl -tag -width ".Li 30" -offset indent -compact
 .
 .It Li 0
 To restore default color.
@@ -9607,7 +9607,7 @@ environment variable.
 .El
 .
 .Sh FILES
-.Bl -tag -width 8n
+.Bl -tag -width 6n
 .
 .It Pa /etc/csh.cshrc
 Read first by every shell.
