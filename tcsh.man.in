@@ -1723,11 +1723,13 @@ is followed by a blank, tab, newline,
 .Ql =
 or
 .Ql \&( .
+.Pp
 History substitutions also
 occur when an input line begins with
-.Ql ^ .
-This special abbreviation will be
-described later.
+.Ql ^ ;
+see
+.Sx History substitution abbreviation .
+.Pp
 The characters used to signal history substitution
 .Po
 .Ql \&!
@@ -1819,12 +1821,11 @@ can be abbreviated
 .Ql \&!
 if it is
 followed by
-.Ql \&:
-.Ql ( \&:
-is described in
+.Ql \&: ,
+which is described in
 .Sx History word designators
 and
-.Sx History word modifiers ) .
+.Sx History word modifiers .
 .Pp
 Typing
 .Dl !n
@@ -1833,17 +1834,19 @@ refers to event 9, which begins with
 .Pp
 Typing
 .Dl !\&?old\&?
-also refers to event 12, which contains
+refers to event 12, which contains
 .Ql old .
 .Pp
 Without word designators or modifiers history references simply expand to the
 entire event, so we might type
 .Dl !cp
-to redo the copy command or
+to redo the
+.Ql cp
+command (event 10) or
 .Dl !!|more
 if the
 .Ql diff
-output scrolled off the top of the screen.
+output in the previous event, 12, scrolled off the top of the screen.
 .Pp
 History references may be insulated from the surrounding text with braces if
 necessary.
@@ -1855,7 +1858,8 @@ and, in this example, not find one, but
 .Dl !{v}doc
 would expand
 unambiguously to
-.Ql vi wumpus.mandoc .
+.Ql vi wumpus.mandoc
+by matching event 11.
 Even in braces, history substitutions do not nest.
 .Pp
 (+) While
@@ -1887,49 +1891,52 @@ The words of an input line are
 numbered from 0, the first (usually command) word being 0, the second word
 (first argument) being 1, etc.
 .Pp
-The basic word designators are (with the leading
+The basic word designators are, with columns for
+a leading
 .Ql \&:
-shown):
+and a leading
+.Ql \&!
+(for the abbreviated word designators - see below):
 .Pp
-.Bl -tag -width 4n -offset indent -compact
+.Bl -column -offset indent -compact "XXXX" "XXX" ""
 .
-.It Li :0
+.It Li :0 Ta Ta
 The first (command) word.
 .
-.It Li \&: Ns Ar n
+.It Li \&: Ns Ar n Ta Ta
 The
 .Ar n Ns
 th argument.
 .
-.It Li :^
+.It Li :^ Ta Li !^ Ta
 The first argument, equivalent to
 .Ql :1 .
 .
-.It Li :$
+.It Li :$ Ta Li !$ Ta
 The last argument.
 .
-.It Li :%
+.It Li :% Ta Li !% Ta
 The word matched by an
 .Li \&? Ns Ar s Ns Li \&?
 search.
 .
-.It Li \&: Ns Ar x Ns Li \- Ns Ar y
+.It Li \&: Ns Ar x Ns Li \- Ns Ar y Ta Ta
 A range of words.
 .
-.It Li \&:\- Ns Ar y
+.It Li \&:\- Ns Ar y Ta Li \&!\- Ns Ar y Ta
 Equivalent to
 .Ql \&:0\- Ns Ar y .
 .
-.It Li \&:*
+.It Li \&:* Ta Li \&!* Ta
 Equivalent to
 .Ql \&:^\-$ ,
 but returns nothing if the event contains only 1 word.
 .
-.It Li \&: Ns Ar x Ns Li *
+.It Li \&: Ns Ar x Ns Li * Ta Ta
 Equivalent to
 .Sq Li \&: Ns Ar x Ns Li \-$ .
 .
-.It Li \&: Ns Ar x Ns Li \-
+.It Li \&: Ns Ar x Ns Li \- Ta Ta
 Equivalent to
 .Sq Li \&: Ns Ar x Ns Li * ,
 but omitting the last word
@@ -1937,10 +1944,13 @@ but omitting the last word
 .El
 .Pp
 Selected words are inserted into the command line separated by single blanks.
+.Pp
 For example, the
 .Ql diff
-command in the previous example might have been
-typed as
+command (event 12) in the history list example in
+.Sx History event specification ,
+.Dl diff wumpus.man.old wumpus.man
+might have been typed as
 .Dl diff !!:1.old !!:1
 (using
 .Ql \&:1
@@ -1950,7 +1960,7 @@ from the previous event) or
 to select and swap the
 arguments from the
 .Ql cp
-command.
+command (event 10).
 If we didn't care about the order of the
 .Ql diff
 we might have typed
@@ -1960,7 +1970,7 @@ or simply
 .Pp
 The
 .Ql cp
-command might have been written
+command (event 10) might have been typed
 .Dl cp wumpus.man !#:1.old
 using
 .Ql #
@@ -1970,8 +1980,7 @@ Typing
 .Dl !n:\- hurkle.man
 would reuse the first two words from the
 .Ql nroff
-command
-to expand to
+command (event 9) to expand to
 .Dl nroff \-man hurkle.man
 .Pp
 The
@@ -1980,13 +1989,14 @@ separating the event specification from the word designator can be
 omitted if the argument selector begins with a
 .Ql ^ ,
 .Ql $ ,
-.Ql * ,
 .Ql % ,
+.Ql \- ,
 or
-.Ql \- .
+.Ql * .
+.Pp
 For example, our
 .Ql diff
-command might have been typed
+command (event 12) might have been typed
 .Dl diff !!^.old !!^
 or,
 equivalently,
@@ -2002,9 +2012,10 @@ specification.
 .Pp
 A history reference may have a word designator but no event specification.
 It then references the previous command.
+.Pp
 Continuing our
 .Ql diff
-example, we could have typed simply
+command example (event 12), we could have typed simply
 .Dl diff !^.old !^
 or, to get the arguments in the opposite order, just
 .Dl diff !*
@@ -2130,7 +2141,10 @@ It is an error for no word to be modifiable.
 .Pp
 For example, the
 .Ql diff
-command might have been written as
+command (event 12) in the history list example in
+.Sx History event specification ,
+.Dl diff wumpus.man.old wumpus.man
+might have been typed as
 .Dl diff wumpus.man.old !#^:r
 using
 .Ql \&:r
@@ -2159,10 +2173,12 @@ with
 to
 correct the spelling of
 .Ql root
-(but see
+(see
+.Sx History word modifiers
+and
 .Sx Spelling correction (+)
-for a
-different approach).
+for
+different approaches).
 .Pp
 (+) In
 .Xr csh 1
@@ -2202,15 +2218,17 @@ expects another modifier after the second colon
 rather than
 .Ql $ .
 .
-.Ss History abbreviation
-There is a special abbreviation for substitutions.
+.Ss History substitution abbreviation
+There is a special abbreviation for substitutions;
 .Ql ^ ,
 when it is the first character on an input line, is equivalent to
 .Ql !:s^ .
-Thus we might have typed
+Thus, we might follow the example from
+.Sx History word modifiers
+.Dl mail \-s \&"I forgot my password\&" rot
+with
 .Dl ^rot^root
-to make the spelling correction in the
-previous example.
+to make the spelling correction.
 This is the only history substitution which does not explicitly begin with
 .Ql \&! .
 .
@@ -6390,7 +6408,6 @@ at 11 AM.
 .Pp
 The time may be in 12-hour AM/PM format
 .Bd -literal -offset indent
-.\" TODO
 > sched 5pm set prompt='[%h] It\e's after 5; go home: >'
 .Ed
 .Pp
@@ -7292,7 +7309,6 @@ this will be done for both
 cases.
 .
 .It Ic backslash_quote No (+)
-.\" TODO
 If set, backslashes (`\e') always quote
 .Ql \e ,
 .Ql \&' ,
