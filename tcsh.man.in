@@ -449,9 +449,12 @@ can change the key bindings to
 .Pp
 The shell always binds the arrow keys (as defined in the
 .Ev TERMCAP
-environment variable) to:
+environment variable) to editor commands:
 .Pp
-.Bl -tag -width "right" -offset indent -compact
+.Bl -tag -width ".Ic right" -offset indent -compact
+.It Sy Key
+.Sy Editor command
+.Pp
 .It Ic down
 .Ic down-history
 .It Ic up
@@ -1161,20 +1164,27 @@ necessary,
 must be bound to a
 single character for this to work) or one of the following special characters
 may be typed:
-.Pp
-.Bl -tag -width "delete" -compact
+.
+.Bl -tag -width ".Ic escape" -offset indent
+.It Sy Key
+.Sy Behavior
+.
 .It Ic ^W
 Appends the rest of the word under the cursor to the search pattern.
-.It Ic delete
-(or any character bound to
+.
+.It Ic delete Xo No (or any character bound to
 .Ic backward-delete-char )
+.Xc
 Undoes the effect of the last character typed and deletes a character
 from the search pattern if appropriate.
+.
 .It Ic ^G
 If the previous search was successful, aborts the entire search.
 If not, goes back to the last successful search.
+.
 .It Ic escape
 Ends the search, leaving the current line in the input buffer.
+.
 .El
 .Pp
 Any other character not bound to
@@ -1590,8 +1600,11 @@ controlled by the
 shell variable.
 .Pp
 Supported escape sequences are:
-.Pp
-.Bl -tag -width ".Li \ex{ Ns Ar nnnnnnnn Ns Li }" -offset indent -compact
+.
+.Bl -tag -width ".Li \ex{ Ns Ar nnnnnnnn Ns Li }" -offset indent
+.It Sy Escape
+.Sy Description
+.
 .It Li \ea
 Bell.
 .It Li \eb
@@ -1763,8 +1776,10 @@ A history event specification may be one of
 (with the history substitution character
 .Ql \&!
 shown):
-.Pp
-.Bl -tag -width ".Li \&!\&? Ns Ar s Ns Li \&?" -offset indent -compact
+.
+.Bl -tag -width ".Sy \&!Event" -offset indent
+.It Sy \&!Event
+.Sy History event specification
 .
 .It Li \&! Ns Ar n
 A number, referring to a particular event.
@@ -1899,50 +1914,62 @@ a leading
 and a leading
 .Ql \&!
 (for the abbreviated word designators - see below):
-.Pp
-.Bl -column -offset indent -compact ".Li \&: Ns Ar x Ns Li \- Ns Ar y" ".Li \&!\- Ns Ar y" ""
 .
+.Bl -column -offset indent ".Sy \&:Word" ".Sy \&!Word" ""
+.It Sy \&:Word Ta Sy \&!Word Ta Sy History word designator
+.
+.Pp
 .It Li :0 Ta Ta
 The first (command) word.
 .
+.Pp
 .It Li \&: Ns Ar n Ta Ta
 The
 .Ar n Ns
 th argument.
 .
+.Pp
 .It Li :^ Ta Li !^ Ta
 The first argument, equivalent to
 .Ql :1 .
 .
+.Pp
 .It Li :$ Ta Li !$ Ta
 The last argument.
 .
+.Pp
 .It Li :% Ta Li !% Ta
 The word matched by an
 .Li \&? Ns Ar s Ns Li \&?
 search.
 .
+.Pp
 .It Li \&: Ns Ar x Ns Li \- Ns Ar y Ta Ta
 A range of words.
 .
+.Pp
 .It Li \&:\- Ns Ar y Ta Li \&!\- Ns Ar y Ta
 Equivalent to
 .Ql \&:0\- Ns Ar y .
 .
+.Pp
 .It Li \&:* Ta Li \&!* Ta
 Equivalent to
 .Ql \&:^\-$ ,
 but returns nothing if the event contains only 1 word.
 .
+.Pp
 .It Li \&: Ns Ar x Ns Li * Ta Ta
 Equivalent to
 .Sq Li \&: Ns Ar x Ns Li \-$ .
 .
+.Pp
 .It Li \&: Ns Ar x Ns Li \- Ta Ta
 Equivalent to
 .Sq Li \&: Ns Ar x Ns Li * ,
 but omitting the last word
 .Pq Ql $ .
+.
 .El
 .Pp
 Selected words are inserted into the command line separated by single blanks.
@@ -2031,8 +2058,10 @@ by following it with one or more modifiers
 shown),
 each preceded by a
 .Ql \&: :
-.Pp
-.Bl -tag -width ".Li \&:s/ Ns Ar l Ns Li / Ns Ar r Ns Li /" -offset indent -compact
+.
+.Bl -tag -width ".Li \&:s/ Ns Ar l Ns Li / Ns Ar r Ns Li /" -offset indent
+.It Sy \&:Word
+.Sy History word modifier
 .
 .It Li \&:h
 Remove a trailing pathname component, leaving the head.
@@ -3284,8 +3313,8 @@ These operators are similar to those of C and have the same precedence.
 .Pp
 The operators, in descending precedence, with equivalent precedence per line,
 are:
-.Pp
-.Bl -column -offset indent -compact ".Li <<" ".Li >>" ".Li <<" ".Li >>"
+.
+.Bl -column -offset indent ".Li <<" ".Li >>" ".Li <<" ".Li >>"
 .It Li \&( Ta Li \&) Ta Ta
 .It Li \&~ Ta Ta Ta
 .It Li \&! Ta Ta Ta
@@ -3374,6 +3403,9 @@ where
 is one of:
 .Pp
 .Bl -tag -width ".Fl P Ns Ar mode Ns Li \&:" -offset indent -compact
+.It Fl op
+.Sy True/false file inquiry operator
+.Pp
 .
 .It Fl r
 Read access.
@@ -3512,6 +3544,9 @@ They have the same format as before;
 may be one of:
 .Pp
 .Bl -tag -width ".Fl P Ns Ar mode Ns Li \&:" -offset indent -compact
+.It Fl op
+.Sy Extended file inquiry operator
+.Pp
 .
 .It Fl A
 Last file access time, as the number of seconds since the epoch.
@@ -4335,8 +4370,11 @@ to
 Supported
 .Ic bindkey
 options:
-.Pp
-.Bl -tag -width ".Fl a" -offset indent -compact
+.
+.Bl -tag -width ".Sy Option"
+.It Sy Option
+.Ic bindkey
+.Sy description
 .
 .It Fl a
 Lists or changes key-bindings in the alternative key map.
@@ -4469,8 +4507,10 @@ can contain backslashed
 escape sequences (in the style of System V
 .Xr echo 1 )
 as follows:
-.Pp
-.Bl -tag -width ".Li \e Ns Ar nnn" -offset indent -compact
+.
+.Bl -tag -width ".Sy Escape"
+.It Sy Escape
+.Sy Description
 .
 .It Li \ea
 Bell.
@@ -4677,8 +4717,10 @@ is ambiguous.
 .Ar word
 specifies which word relative to the current word
 is to be completed, and may be one of the following:
-.Pp
-.Bl -tag -width ".Li \`...\`" -offset indent -compact
+.
+.Bl -tag -width ".Li \`...\`" -offset indent
+.It Ar word
+.Sy Completion word
 .
 .It Li c
 Current-word completion.
@@ -4715,8 +4757,10 @@ variables, which must include the current word.
 .Pp
 .Ar list ,
 the list of possible completions, may be one of the following:
-.Pp
-.Bl -tag -width ".Li \`...\`" -offset indent -compact
+.
+.Bl -tag -width ".Li \`...\`" -offset indent
+.It Ar list
+.Sy Completion item
 .
 .It Li a
 Aliases.
@@ -5824,6 +5868,8 @@ Controllable
 .Ar resource
 types currently include (if supported by the OS):
 .Bl -tag -width ".Ic coredumpsize" -offset indent
+.It Ar resource
+.Sy Resource description
 .
 .It Ic concurrency
 Maximum number of threads for this process.
@@ -5995,9 +6041,12 @@ but much faster.
 .Pp
 .Ic ls\-F
 identifies each type of
-special file in the listing with a special character:
+special file in the listing with a special character suffix:
 .Pp
-.Bl -tag -width ".Li @" -offset indent -compact
+.Bl -tag -width ".Sy Suffix" -offset indent -compact
+.It Sy Suffix
+.Sy Special file type
+.Pp
 .It Li /
 Directory.
 .It Li *
@@ -6023,7 +6072,10 @@ If the
 shell variable is set, symbolic links are identified
 in more detail (on only systems that have them, of course):
 .Pp
-.Bl -tag -width ".Li @" -offset indent -compact
+.Bl -tag -width ".Sy Suffix" -offset indent -compact
+.It Sy Suffix
+.Sy Symbolic link type
+.Pp
 .It Li @
 Symbolic link to a non-directory.
 .It Li >
@@ -7594,8 +7646,11 @@ The style of the
 .Ic echo
 builtin.
 May be set to:
-.Pp
-.Bl -tag -width ".Li both" -offset indent -compact
+.
+.Bl -tag -width ".Sy Value" -offset indent
+.It Sy Value
+.Ic echo
+.Sy style
 .It Li bsd
 Don't echo a newline if the first argument is
 .Fl n ;
@@ -8260,8 +8315,10 @@ The string which is printed before reading each command from the terminal.
 .Ic prompt
 may include any of the following formatting sequences (+), which
 are replaced by the given information:
-.Pp
-.Bl -tag -width ".Li %/" -offset indent -compact
+.
+.Bl -tag -width ".Sy Format" -offset indent
+.It Sy Format
+.Sy Prompt information
 .
 .It Li %/
 The current working directory.
@@ -8834,8 +8891,10 @@ builtin.
 (u) The following sequences may be used in the
 .Ic time
 format string:
-.Pp
-.Bl -tag -width ".Li \&%U" -offset indent -compact
+.
+.Bl -tag -width ".Sy Format" -offset indent
+.It Sy Format
+.Sy Time information
 .
 .It Li \&%U
 The time the process spent in user mode in cpu seconds.
@@ -8912,8 +8971,11 @@ and
 .Ql %s
 are not
 available, but the following additional sequences are:
-.Pp
-.Bl -tag -width ".Li \&%Y" -offset indent -compact
+.
+.Bl -tag -width ".Sy Format" -offset indent
+.It Sy Format
+.Sy Description
+.Sy Sequent DYNIX/ptx time information
 .
 .It Li \&%Y
 The number of system calls performed.
@@ -8983,8 +9045,11 @@ Options which are set by default in the distribution are noted.
 Supported
 .Ic version
 options include:
-.Pp
-.Bl -tag -width ".Li wide" -offset indent -compact
+.
+.Bl -tag -width ".Sy Option" -offset indent
+.
+.It Sy Option
+.Sy Description
 .
 .It Li 8b
 The shell is eight bit clean; default.
@@ -9173,8 +9238,10 @@ The format string for
 messages.
 The following sequences
 are replaced by the given information:
-.Pp
-.Bl -tag -width ".Li %n" -offset indent -compact
+.
+.Bl -tag -width ".Sy Format" -offset indent
+.It Sy Format
+.Sy Who information
 .
 .It Li %n
 The name of the user who logged in/out.
@@ -9333,10 +9400,12 @@ where
 .Li \&" Ns Ar xx Ns Li \&"
 is a two-character variable name.
 .Pp
-The
-variables with their associated defaults are:
+The variables with their associated defaults are:
 .
-.Bl -column -offset indent ".Li no" ".Li 01;36" ""
+.Bl -column -offset indent ".Sy Var" ".Sy Default" ""
+.
+.It Sy Var Ta Sy Default Ta Sy File type
+.Pp
 .
 .It Li no Ta Li 0 Ta Normal (non-filename) text.
 .
@@ -9438,9 +9507,13 @@ and
 codes) from numerical commands separated by semicolons.
 .Pp
 The
-most common commands are:
+most common color commands are:
 .Pp
-.Bl -tag -width ".Li 30" -offset indent -compact
+.Bl -tag -width ".Sy Color" -offset indent -compact
+.
+.It Sy Color
+.Sy Description
+.Pp
 .
 .It Li 0
 To restore default color.
