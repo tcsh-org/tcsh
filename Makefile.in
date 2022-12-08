@@ -518,6 +518,10 @@ tc.defs.c:	gethost host.defs
 	./gethost $(srcdir)/host.defs >> $@.tmp
 	@if [ -f $@ ] && cmp -s $@.tmp $@; then echo $@ unchanged.; rm -f $@.tmp; else mv -f $@.tmp $@; echo $@ recreated.; fi
 
+tcsh.html: tcsh.man
+	rm -f $@
+	-mandoc -Thtml tcsh.man > $@
+
 tcsh.ps: tcsh.man
 	rm -f tcsh.ps
 	-ptroff -t -man tcsh.man > tcsh.ps
@@ -691,7 +695,7 @@ clean.catalogs:
 .PHONY: cleandir distclean veryclean
 cleandir distclean veryclean: clean
 	${RM} -f Makefile config.h config_p.h dch-template nls/Makefile patchlevel.h tcsh.man
-	${RM} -f config.status config.cache config.log tcsh.ps
+	${RM} -f config.status config.cache config.log tcsh.html tcsh.ps
 	${RM} -f missing
 	${RM} -f atconfig testsuite.log
 	${RM} -rf testsuite.dir
