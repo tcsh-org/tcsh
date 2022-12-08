@@ -433,7 +433,9 @@ The editor is active only when the
 shell variable is set, which it is by default in interactive shells.
 The
 .Ic bindkey
-builtin can display and change key bindings.
+builtin can display and change key bindings to editor commands
+(see
+.Sx Editor commands (+) ) .
 .Xr emacs 1 Ns
 \-style key bindings are used by default
 (unless the shell was compiled otherwise; see the
@@ -2531,7 +2533,7 @@ any modifiers must appear
 within the braces.
 .
 .Ss Variable substitution without modifiers
-The following substitutions can not be modified with
+The following substitutions cannot be modified with
 .Ql \&:
 modifiers:
 .Pp
@@ -7508,23 +7510,25 @@ If set to
 .Ql utf8 ,
 it enables display and editing Utf8(Unicode) code.
 .Pp
-If set to the following format, it enables display and editing of original
-multi-byte code format:
-.Bd -literal -offset indent
-> set dspmbyte = 0000....(256 bytes)....0000
-.Ed
+If set to
+.Em exactly
+256 characters in the following format,
+it enables display and editing of original multi-byte code format:
 .Pp
-The table requires
-.Em just
-256 bytes.
-Each character of 256 characters
-corresponds (from left to right) to the ASCII codes 0x00, 0x01, ... 0xff.
-Each
-character
-.\" (position in this table?)
-is set to number 0,1,2 and 3.
-Each number has the following meaning:
-.Bl -tag -width ".Li 0" -offset indent -compact
+.Dl > set dspmbyte = Ar NNN Ns No \&... Ns Em \&[250 characters\&] Ns No \&... Ns Ar NNN
+.Pp
+Each character
+.Ar N
+in the 256 character value
+corresponds (from left to right) to the ASCII codes
+0x00, 0x01, 0x02, ..., 0xfd, 0xfe, 0xff
+at the same index.
+Each character is set to number 0, 1, 2 or 3, with the meaning:
+.Pp
+.Bl -tag -width ".Sy Number" -offset indent -compact
+.It Sy Number
+.Sy Multi-byte purpose
+.Pp
 .It Li 0
 Not used for multi-byte characters.
 .It Li 1
@@ -7534,34 +7538,21 @@ Used for the second byte of a multi-byte character.
 .It Li 3
 Used for both the first byte and second byte of a multi-byte character.
 .El
-.\" SHK: I tried my best to get the following to be grammatically correct.
-.\" However, I still don't understand what's going on here.  In the
-.\" following example, there are three bytes, but the text seems to refer to
-.\" each nybble as a character.  What's going on here?  It this 3-byte code
-.\" in the table?  The text above seems to imply that there are 256
-.\" characters/bytes in the table.  If I get some more info on this (perhaps
-.\" a complete example), I could fix the text to be grammatically correct.
-.\" (steve.kelem@xilinx.com 1999/09/13)
 .Pp
-For example, if set to
+For example, if set to 256 characters starting with
 .Ql 001322 ,
-the first character (means 0x00 of the ASCII code) and
-second character (means 0x01 of ASCII code) are set to
-.Ql 0 .
-Then, it is not
-used for multi-byte characters.
-The 3rd character (0x02) is set to
-.Ql 1 ,
-indicating that it is used for the first byte of a multi-byte character.
-The 4th character (0x03) is set
-.Ql 3 .
-It is used for both the first byte and
-the second byte of a multi-byte character.
-The 5th and 6th characters
-(0x04,0x05) are set to
-.Ql 2 ,
-indicating that they are used for the second
-byte of a multi-byte character.
+the value is interpreted as:
+.
+.Bl -column -offset indent ".Sy Character" ".Sy ASCII" ""
+.It Sy Character Ta Sy ASCII Ta Sy Multi-byte character use
+.Pp
+.It Li 0 Ta 0x00 Ta Not used.
+.It Li 0 Ta 0x01 Ta Not used.
+.It Li 1 Ta 0x02 Ta First byte.
+.It Li 3 Ta 0x03 Ta First byte and second byte.
+.It Li 2 Ta 0x04 Ta Second byte.
+.It Li 2 Ta 0x05 Ta Second byte.
+.El
 .Pp
 The GNU fileutils version of ls cannot display multi-byte
 filenames without the
@@ -9002,7 +8993,7 @@ The shell is eight bit clean; default.
 The shell is not eight bit clean.
 .
 .It Li wide
-The shell is multibyte encoding clean (like UTF-8).
+The shell is multi-byte encoding clean (like UTF-8).
 .
 .It Li nls
 The system's NLS is used; default for systems with NLS.
