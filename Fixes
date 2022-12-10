@@ -2245,3 +2245,19 @@ V5.19.01, 9/26/90.
  3. Fixed the Makefile and MAKEDIFFS so that a tahoe diff can be made.
  2. RS6000: hacked around execv bug, and ed.init.c warning.
  1. Editor should not be enabled when we don't have a tty.
+
+V5.19.00
+ 7. 8 bit clean code, by using 16 bit strings.
+ 6. Mostly shared strings (a side-effect)
+ 5. Highlights everywhere (and in ls-F) filenames that contain characters
+    with the eighth bit set (or passes them unchanged depending on the
+    variable 'nometa')
+ 4. Newline in the prompt via %n.
+ 3. dirs takes also a -v flag for `vertical display'
+ 2. There is a new variable `listjobs' which controls if and how jobs
+    are displayed when a new job is suspended. [Idea from the mtXinu 
+    code, very useful for novice users who hit control-Z 10 times on
+    the same job!]
+    set listjobs=long, jobs -l is executed every time a job is suspended.
+    set listjobs=short, jobs is executed every time a job is suspended.
+ 1.  Passes lint... At least on a sun.
