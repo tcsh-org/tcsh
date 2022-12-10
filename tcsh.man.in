@@ -10067,84 +10067,128 @@ This manual documents tcsh @PACKAGE_VERSION@
 .
 .Sh AUTHORS
 .
-.Bl -tag -width 2n -compact
+.An -nosplit
+.Bl -hang -width 2n -compact
 .
 .It An William Joy .
+.br
 Original author of
 .Xr csh 1 .
 .
-.It An J.E. Kulp , IIASA, Laxenburg, Austria.
+.It An J.E. Kulp ,
+IIASA, Laxenburg, Austria.
+.br
 Job control and directory stack features.
 .
-.It An Ken Greer , HP Labs, 1981.
+.It An Ken Greer ,
+HP Labs, 1981.
+.br
 File name completion.
 .
-.It An Mike Ellis , Fairchild, 1983.
+.It An Mike Ellis ,
+Fairchild, 1983.
+.br
 Command name recognition/completion.
 .
-.It An Paul Placeway , Ohio State CIS Dept., 1983-1993.
+.It An Paul Placeway ,
+Ohio State CIS Dept., 1983-1993.
+.br
 Command line editor, prompt routines, new glob syntax and numerous fixes
 and speedups.
 .
-.It An Karl Kleinpaste , CCI, 1983-4.
+.It An Karl Kleinpaste ,
+CCI, 1983-4.
+.br
 Special aliases, directory stack extraction stuff, login/logout watch,
 scheduled events, and the idea of the new prompt format.
 .
-.It An Rayan Zachariassen , University of Toronto, 1984.
+.It An Rayan Zachariassen ,
+University of Toronto, 1984.
+.br
 .Ic ls\-F
 and
 .Ic which
 builtins and numerous bug fixes, modifications
 and speedups.
 .
-.It An Chris Kingsley , Caltech.
+.It An Chris Kingsley ,
+Caltech.
+.br
 Fast storage allocator routines.
 .
-.It An Chris Grevstad , TRW, 1987.
+.It An Chris Grevstad ,
+TRW, 1987.
+.br
 Incorporated 4.3BSD
 .Xr csh 1
 into
 .Nm .
 .
-.It An Christos S. Zoulas , Cornell U. EE Dept., 1987-94.
+.It An Christos S. Zoulas ,
+Cornell U. EE Dept., 1987-94.
+.br
 Ports to HPUX, SVR2 and SVR3, a SysV version of getwd.c, SHORT_STRINGS support
 and a new version of sh.glob.c.
 .
-.It An James J Dempsey , BBN, and Paul Placeway, OSU, 1988.
+.It An James J Dempsey ,
+BBN, and
+.An Paul Placeway ,
+OSU, 1988.
+.br
 A/UX port.
 .
-.It An Daniel Long , NNSC, 1988.
+.It An Daniel Long ,
+NNSC, 1988.
+.br
 .Ic wordchars .
 .
-.It An Patrick Wolfe , Kuck and Associates, Inc., 1988.
+.It An Patrick Wolfe ,
+Kuck and Associates, Inc., 1988.
+.br
 .Ic vi
 mode cleanup.
 .
-.It An David C Lawrence , Rensselaer Polytechnic Institute, 1989.
+.It An David C Lawrence ,
+Rensselaer Polytechnic Institute, 1989.
+.br
 .Ic autolist
 and ambiguous completion listing.
 .
-.It An Alec Wolman , DEC, 1989.
+.It An Alec Wolman ,
+DEC, 1989.
+.br
 Newlines in the prompt.
 .
-.It An Matt Landau , BBN, 1989.
+.It An Matt Landau ,
+BBN, 1989.
+.br
 .Pa ~/.tcshrc .
 .
-.It An Ray Moody , Purdue Physics, 1989.
+.It An Ray Moody ,
+Purdue Physics, 1989.
+.br
 Magic space bar history expansion.
 .
-.It An Mordechai ???? , Intel, 1989.
+.It An Mordechai ???? ,
+Intel, 1989.
+.br
 .Fn printprompt
 fixes and additions.
 .
-.It An Kazuhiro Honda , Dept. of Computer Science, Keio University, 1989.
+.It An Kazuhiro Honda ,
+Dept. of Computer Science, Keio University, 1989.
+.br
 Automatic spelling correction and
 .Ic prompt3 .
 .
-.It An Per Hedeland , Ellemtel, Sweden, 1990-.
+.It An Per Hedeland ,
+Ellemtel, Sweden, 1990-.
+.br
 Various bugfixes, improvements and manual updates.
 .
-.It An Hans J. Albertsson , Sun Sweden.
+.It An Hans J. Albertsson ,
+Sun Sweden.
+.br
 .Ic ampm ,
 .Ic settc ,
 and
@@ -10153,63 +10197,92 @@ and
 .It An Michael Bloom .
 Interrupt handling fixes.
 .
-.It An Michael Fine , Digital Equipment Corp.
+.It An Michael Fine ,
+Digital Equipment Corp.
+.br
 Extended key support.
 .
-.It An Eric Schnoebelen , Convex, 1990.
+.It An Eric Schnoebelen ,
+Convex, 1990.
+.br
 Convex support, lots of
 .Xr csh 1
 bug fixes,
 save and restore of directory stack.
 .
-.It An Ron Flax , Apple, 1990.
+.It An Ron Flax ,
+Apple, 1990.
+.br
 A/UX 2.0 (re)port.
 .
-.It An Dan Oscarsson , LTH Sweden, 1990.
+.It An Dan Oscarsson ,
+LTH Sweden, 1990.
+.br
 NLS support and simulated NLS support for non NLS sites, fixes.
 .
-.It An Johan Widen , SICS Sweden, 1990.
+.It An Johan Widen ,
+SICS Sweden, 1990.
+.br
 .Ic shlvl ,
 Mach support,
 .Ic correct-line ,
 8-bit printing.
 .
-.It An Matt Day , Sanyo Icon, 1990.
+.It An Matt Day ,
+Sanyo Icon, 1990.
+.br
 POSIX termio support, SysV limit fixes.
 .
-.It An Jaap Vermeulen , Sequent, 1990-91.
+.It An Jaap Vermeulen ,
+Sequent, 1990-91.
+.br
 Vi mode fixes, expand-line, window change fixes, Symmetry port.
 .
-.It An Martin Boyer , Institut de recherche d'Hydro-Quebec, 1991.
+.It An Martin Boyer ,
+Institut de recherche d'Hydro-Quebec, 1991.
+.br
 .Ic autolist
 beeping options, modified the history search to search for
 the whole string from the beginning of the line to the cursor.
 .
-.It An Scott Krotz , Motorola, 1991.
+.It An Scott Krotz ,
+Motorola, 1991.
+.br
 Minix port.
 .
-.It An David Dawes , Sydney U. Australia, Physics Dept., 1991.
+.It An David Dawes ,
+Sydney U. Australia, Physics Dept., 1991.
+.br
 SVR4 job control fixes.
 .
-.It An Kimmo Suominen , 1991-.
+.It An Kimmo Suominen ,
+1991-.
+.br
 Various portability and other fixes.
 Added
 .Ql $''
 (dollar-single-quotes).
 .
-.It An Jose Sousa , Interactive Systems Corp., 1991.
+.It An Jose Sousa ,
+Interactive Systems Corp., 1991.
+.br
 Extended
 .Ic vi
 fixes and
 .Ic vi
 delete command.
 .
-.It An Marc Horowitz , MIT, 1991.
+.It An Marc Horowitz ,
+MIT, 1991.
+.br
 ANSIfication fixes, new exec hashing code, imake fixes,
 .Ic where .
 .
-.It An Luke Mewburn , 1991-.
-Enhanced directory printing in prompt.
+.It An Luke Mewburn ,
+1991-.
+.br
+Enhanced directory printing in
+.Ic prompt .
 Added
 .Ic ellipsis
 and
@@ -10218,62 +10291,94 @@ and
 improvements.
 Manual page improvements.
 .
-.It An Bruce Sterling Woodcock , sterling@netcom.com, 1991-1995.
+.It An Bruce Sterling Woodcock ,
+sterling@netcom.com, 1991-1995.
+.br
 ETA and Pyramid port, Makefile and lint fixes,
 .Ic ignoreeof= Ns Ar n
 addition, and
 various other portability changes and bug fixes.
 .
-.It An Jeff Fink , 1992.
+.It An Jeff Fink ,
+1992.
+.br
 .Ic complete-word-fwd
 and
 .Ic complete-word-back .
 .
-.It An Harry C. Pulley , 1992.
+.It An Harry C. Pulley ,
+1992.
+.br
 Coherent port.
 .
-.It An Andy Phillips , Mullard Space Science Lab U.K., 1992.
+.It An Andy Phillips ,
+Mullard Space Science Lab U.K., 1992.
+.br
 VMS-POSIX port.
 .
-.It An Beto Appleton , IBM Corp., 1992.
+.It An Beto Appleton ,
+IBM Corp., 1992.
+.br
 Walking process group fixes,
 .Xr csh 1
 bug fixes,
 POSIX file tests, POSIX SIGHUP.
 .
-.It An Scott Bolte , Cray Computer Corp., 1992.
+.It An Scott Bolte ,
+Cray Computer Corp., 1992.
+.br
 CSOS port.
 .
-.It An Kaveh R. Ghazi , Rutgers University, 1992.
+.It An Kaveh R. Ghazi ,
+Rutgers University, 1992.
+.br
 Tek, m88k, Titan and Masscomp ports and fixes.
 Added autoconf support.
 .
-.It An Mark Linderman , Cornell University, 1992.
+.It An Mark Linderman ,
+Cornell University, 1992.
+.br
 OS/2 port.
 .
-.It An Mika Liljeberg , liljeber@kruuna.Helsinki.FI, 1992.
+.It An Mika Liljeberg ,
+liljeber@kruuna.Helsinki.FI, 1992.
+.br
 Linux port.
 .
-.It An Tim P. Starrin , NASA Langley Research Center Operations, 1993.
+.It An Tim P. Starrin ,
+NASA Langley Research Center Operations, 1993.
+.br
 Read-only variables.
 .
-.It An Dave Schweisguth , Yale University, 1993-4.
+.It An Dave Schweisguth ,
+Yale University, 1993-4.
+.br
 New man page and tcsh.man2html.
 .
-.It An Larry Schwimmer , Stanford University, 1993.
+.It An Larry Schwimmer ,
+Stanford University, 1993.
+.br
 AFS and HESIOD patches.
 .
-.It An Edward Hutchins , Silicon Graphics Inc., 1996.
+.It An Edward Hutchins ,
+Silicon Graphics Inc., 1996.
+.br
 Added implicit cd.
 .
-.It An Martin Kraemer , 1997.
+.It An Martin Kraemer ,
+1997.
+.br
 Ported to Siemens Nixdorf EBCDIC machine.
 .
-.It An Amol Deshpande , Microsoft, 1997.
+.It An Amol Deshpande ,
+Microsoft, 1997.
+.br
 Ported to WIN32 (Windows/95 and Windows/NT); wrote all the missing library
 and message catalog code to interface to Windows.
 .
-.It An Taga Nayuta , 1998.
+.It An Taga Nayuta ,
+1998.
+.br
 Color ls additions.
 .
 .El
