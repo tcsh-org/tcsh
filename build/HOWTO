@@ -30,8 +30,8 @@ BUILD ON EACH BUILD MACHINE
 
 COPY FROM EACH BUILD MACHINE
 
-    rsync -PaHvSs -c amd64-builder:src/tcsh-build/deb/ work/repos/tcsh/
-    rsync -PaHvSs -c arm64-builder:src/tcsh-build/deb/ work/repos/tcsh/
+    rsync -Pv -crstuOp --chmod Fgo-w,a+rX amd64-builder:src/tcsh-build/deb/ work/repos/tcsh/
+    rsync -Pv -crstuOp --chmod Fgo-w,a+rX arm64-builder:src/tcsh-build/deb/ work/repos/tcsh/
 
 SIGN REPO
 
