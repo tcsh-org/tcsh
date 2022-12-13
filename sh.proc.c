@@ -1055,7 +1055,7 @@ pprint(struct process *pp, int flag)
 		    xprintf("       ");
 	    }
 	    if (flag & FANCY) {
-		xprintf("%5d ", pp->p_procid);
+		xprintf("%7d ", pp->p_procid);
 #ifdef TCF
 		xprintf("%11s ", sitename(pp->p_procid));
 #endif /* TCF */
