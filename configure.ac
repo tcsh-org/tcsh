@@ -76,8 +76,6 @@ AS_IF([{ test x"${ac_cv_host_system_type+set}" = x"set" &&
       [AC_MSG_RESULT(ok)])
 ac_cv_host_system_type="$host"
 
-changequote(, )dnl
-
 case "${host}" in
   *-*-darwin*|*-*-freebsd*|*-*-rhapsody*)
     PACKAGE_CHANGELOG_DATE="$(
@@ -128,10 +126,10 @@ case "${host}" in
   *-hp-hpux7*)
     tcsh_config_file=hpux7
   ;;
-  *-hp-hpux[89]*)
+  *-hp-hpux@<:@89@:>@*)
     tcsh_config_file=hpux8
   ;;
-  *-hp-hpux1[0-9]*)
+  *-hp-hpux1@<:@0-9@:>@*)
     tcsh_config_file=hpux11
   ;;
 
@@ -230,14 +228,14 @@ case "${host}" in
   *-sgi-iri*)
     tcsh_config_file=irix
     case "${host_os}" in
-      irix[34]*) # Irix-3.x - Irix 4.x
+      irix@<:@34@:>@*) # Irix-3.x - Irix 4.x
         NON_GNU_DFLAGS='-D__STDC__'
         LIBS='-lsun -lbsd -lc_s'
       ;;
-      irix5* | irix6.[01]*) # Irix 5.x, Irix 6.0 - 6.1
+      irix5* | irix6.@<:@01@:>@*) # Irix 5.x, Irix 6.0 - 6.1
         LIBS='-lbsd'
       ;;
-      irix6.[2-9]*) # Irix 6.2 and later
+      irix6.@<:@2-9@:>@*) # Irix 6.2 and later
         tcsh_config_file=irix62
       ;;
     esac
@@ -250,13 +248,13 @@ case "${host}" in
   *-sun-sunos4.0*)
     tcsh_config_file=sunos40
   ;;
-  *-sun-sunos4.1.[12]*)
+  *-sun-sunos4.1.@<:@12@:>@*)
     tcsh_config_file=sunos41
   ;;
-  *-sun-sunos4.1.[3456]*)
+  *-sun-sunos4.1.@<:@3456@:>@*)
     tcsh_config_file=sunos413
   ;;
-  *-*-solaris2.[01]) # Should handle sparc or x86
+  *-*-solaris2.@<:@01@:>@) # Should handle sparc or x86
     tcsh_config_file=sol2
   ;;
   *-sun-solaris2.2) # Sparc only release
@@ -265,10 +263,10 @@ case "${host}" in
   *-sun-solaris2.3) # Sparc only release
     tcsh_config_file=sol23
   ;;
-  *-*-solaris2.[45]) # Should handle sparc, x86 and powerpc
+  *-*-solaris2.@<:@45@:>@) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol24
   ;;
-  *-*-solaris2.[678]) # Should handle sparc, x86 and powerpc
+  *-*-solaris2.@<:@678@:>@) # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol26
   ;;
   *-*-solaris2.*) # Should handle sparc, x86 and powerpc
@@ -342,16 +340,12 @@ case "${host}" in
   ;;
 
   *)
-  changequote([, ])dnl
   AC_MSG_ERROR([Tcsh can't guess the configuration file name
 for `${host}' systems.
 Check tcsh's `Ported' file for manual configuration instructions.])
-  changequote(, )dnl
   ;;
 
 esac
-
-changequote([, ])dnl
 
 AC_MSG_NOTICE([using configuration file `$tcsh_config_file'])
 cp ${srcdir}/system/${tcsh_config_file} config_p.h
@@ -503,10 +497,8 @@ return sbrk(2048) == (void*)-1;
 dnl This is not good enough; we need sockaddr_storage too.
 dnl See whether we can use IPv6 related functions
 dnl AC_DEFUN([IPv6_CHECK_FUNC], [
-dnl changequote(, )dnl
-dnl ac_tr_lib=HAVE_`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
+dnl ac_tr_lib=HAVE_`echo $1 | sed -e 's/@<:@^a-zA-Z0-9_@:>@/_/g' \
 dnl   -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-dnl changequote([, ])dnl
 dnl AC_CHECK_FUNC($1, [dnl
 dnl   AC_DEFINE_UNQUOTED($ac_tr_lib)
 dnl   ac_cv_lib_inet6_$1=no], [dnl
