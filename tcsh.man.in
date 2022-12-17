@@ -1913,7 +1913,8 @@ a leading
 .Ql \&:
 and a leading
 .Ql \&!
-(for the abbreviated word designators - see below):
+(for the abbreviated word designators - see
+.Sx History substitution abbreviation ) :
 .
 .Bl -column -offset indent ".Sy \&:Word" ".Sy \&!Word" ""
 .It Sy \&:Word Ta Sy \&!Word Ta Sy History word designator
@@ -1931,7 +1932,7 @@ th argument.
 .Pp
 .It Li :^ Ta Li !^ Ta
 The first argument, equivalent to
-.Ql :1 .
+.Sq Li :1 .
 .
 .Pp
 .It Li :$ Ta Li !$ Ta
@@ -1950,12 +1951,12 @@ A range of words.
 .Pp
 .It Li \&:\- Ns Ar y Ta Li \&!\- Ns Ar y Ta
 Equivalent to
-.Ql \&:0\- Ns Ar y .
+.Sq Li \&:0\- Ns Ar y .
 .
 .Pp
 .It Li \&:* Ta Li \&!* Ta
 Equivalent to
-.Ql \&:^\-$ ,
+.Sq Li \&:^\-$ ,
 but returns nothing if the event contains only 1 word.
 .
 .Pp
@@ -1969,6 +1970,12 @@ Equivalent to
 .Sq Li \&: Ns Ar x Ns Li * ,
 but omitting the last word
 .Pq Ql $ .
+.
+.Pp
+.It Li \&:\- Ta Ta
+Equivalent to
+.Sq Li \&:0\- ;
+the command and all arguments except the last argument.
 .
 .El
 .Pp
