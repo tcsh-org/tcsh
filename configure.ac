@@ -79,23 +79,23 @@ AS_CASE([${host}],
   [*-*-darwin*|*-*-freebsd*|*-*-rhapsody*], [dnl
     PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -v0H -v0M -v0S \
-	-v${package_year}y \
-	-v${package_month}m \
-	-v${package_day}d \
-	"${package_changelog_date_format}"
+        -v${package_year}y \
+        -v${package_month}m \
+        -v${package_day}d \
+        "${package_changelog_date_format}"
     )"],
   [*-*-openbsd*], [dnl
     PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -j \
-	"${package_changelog_date_format}" \
-	${package_year}${package_month}${package_day}0000
+        "${package_changelog_date_format}" \
+        ${package_year}${package_month}${package_day}0000
     )"],
 
     # Default: NetBSD, GNU core utilities (i.e. most Linux)
   [dnl
     PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -d ${PACKAGE_DATE} \
-	"${package_changelog_date_format}"
+        "${package_changelog_date_format}"
     )"])
 
 AS_CASE([${host}], 
