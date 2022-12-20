@@ -2941,19 +2941,33 @@ package_month="${package_month%-*}"
 package_day="${PACKAGE_DATE##*-}"
 package_day="${package_day#0}"
 
-case "${package_month}" in
-01) package_month_name=January;;
-02) package_month_name=February;;
-03) package_month_name=March;;
-04) package_month_name=April;;
-05) package_month_name=May;;
-06) package_month_name=June;;
-07) package_month_name=July;;
-08) package_month_name=August;;
-09) package_month_name=September;;
-10) package_month_name=October;;
-11) package_month_name=November;;
-12) package_month_name=December;;
+case ${package_month} in #(
+  01) :
+    package_month_name=January ;; #(
+  02) :
+    package_month_name=February ;; #(
+  03) :
+    package_month_name=March ;; #(
+  04) :
+    package_month_name=April ;; #(
+  05) :
+    package_month_name=May ;; #(
+  06) :
+    package_month_name=June ;; #(
+  07) :
+    package_month_name=July ;; #(
+  08) :
+    package_month_name=August ;; #(
+  09) :
+    package_month_name=September ;; #(
+  10) :
+    package_month_name=October ;; #(
+  11) :
+    package_month_name=November ;; #(
+  12) :
+    package_month_name=December ;; #(
+  *) :
+     ;;
 esac
 
 PACKAGE_ENGLISH_DATE="${package_month_name} ${package_day}, ${package_year}"
@@ -5921,278 +5935,247 @@ printf "%s\n" "ok" >&6; }
 fi
 ac_cv_host_system_type="$host"
 
-
-case "${host}" in
-  *-*-darwin*|*-*-freebsd*|*-*-rhapsody*)
-    PACKAGE_CHANGELOG_DATE="$(
+case ${host} in #(
+  *-*-darwin*|*-*-freebsd*|*-*-rhapsody*) :
+        PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -v0H -v0M -v0S \
-	-v${package_year}y \
-	-v${package_month}m \
-	-v${package_day}d \
-	"${package_changelog_date_format}"
-    )"
-  ;;
-  *-*-openbsd*)
-    PACKAGE_CHANGELOG_DATE="$(
+        -v${package_year}y \
+        -v${package_month}m \
+        -v${package_day}d \
+        "${package_changelog_date_format}"
+    )" ;; #(
+  *-*-openbsd*) :
+        PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -j \
-	"${package_changelog_date_format}" \
-	${package_year}${package_month}${package_day}0000
-    )"
-  ;;
-  *)
-    # NetBSD, GNU core utilities (i.e. most Linux)
-    PACKAGE_CHANGELOG_DATE="$(
+        "${package_changelog_date_format}" \
+        ${package_year}${package_month}${package_day}0000
+    )" ;; #(
+  *) :
+    # Default: NetBSD, GNU core utilities (i.e. most Linux)
+      PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -d ${PACKAGE_DATE} \
-	"${package_changelog_date_format}"
-    )"
-  ;;
+        "${package_changelog_date_format}"
+    )" ;;
 esac
 
-case "${host}" in
-
+case ${host} in #(
   ## Alpha (DEC) machines.
-  alpha*-dec-osf*)
-    tcsh_config_file=decosf1
-  ;;
-
+  alpha*-dec-osf*) :
+        tcsh_config_file=decosf1
+   ;; #(
   ## Ultrix
-  *-dec-ultrix*)
-    tcsh_config_file=ultrix
-  ;;
-
+  *-dec-ultrix*) :
+        tcsh_config_file=ultrix
+   ;; #(
   ## DGUX
-  *-dg-dguxR4*)
-    tcsh_config_file=dgux5.4
-  ;;
-  m88k-dg-dgux5.4R*)
-    tcsh_config_file=dgux5.4
-  ;;
-
+  *-dg-dguxR4*) :
+        tcsh_config_file=dgux5.4
+   ;; #(
+  m88k-dg-dgux5.4R*) :
+        tcsh_config_file=dgux5.4
+   ;; #(
   ## HP/UX
-  *-hp-hpux7*)
-    tcsh_config_file=hpux7
-  ;;
-  *-hp-hpux[89]*)
-    tcsh_config_file=hpux8
-  ;;
-  *-hp-hpux1[0-9]*)
-    tcsh_config_file=hpux11
-  ;;
-
+  *-hp-hpux7*) :
+        tcsh_config_file=hpux7
+   ;; #(
+  *-hp-hpux[89]*) :
+        tcsh_config_file=hpux8
+   ;; #(
+  *-hp-hpux1[0-9]*) :
+        tcsh_config_file=hpux11
+   ;; #(
   ## IBM AIX systems
-  *-ibm-aix*)
-    tcsh_config_file=aix
-  ;;
-
+  *-ibm-aix*) :
+        tcsh_config_file=aix
+   ;; #(
   ## SX-4
-  sx4-nec-*)
-    CC='cc -h0,ansi,novector,float0'
+  sx4-nec-*) :
+        CC='cc -h0,ansi,novector,float0'
     LDFLAGS='-Gsmall'
     tcsh_config_file=superux8
-  ;;
-
+   ;; #(
   ## IBM OS/390 systems
-  *-ibm-os390*)
-    CC='c89'
+  *-ibm-os390*) :
+        CC='c89'
     tcsh_config_file=os390
-  ;;
-
+   ;; #(
   ## Android
-  *-*-android*)
-    tcsh_config_file=android
-  ;;
-
+  *-*-android*) :
+        tcsh_config_file=android
+   ;; #(
   ## Linux
-  *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
-    tcsh_config_file=linux
-  ;;
-
+  *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu) :
+        tcsh_config_file=linux
+   ;; #(
   ## Motorola systems
-  m68k-motorola-sysv*)
-    tcsh_config_file=sysV68
-  ;;
-  m88k-motorola-sysv3*)
-    tcsh_config_file=sysV88
-  ;;
-
+  m68k-motorola-sysv*) :
+        tcsh_config_file=sysV68
+   ;; #(
+  m88k-motorola-sysv3*) :
+        tcsh_config_file=sysV88
+   ;; #(
   ## Minix systems
-  *-*-minix*)
-    tcsh_config_file=minix
-  ;;
-
+  *-*-minix*) :
+        tcsh_config_file=minix
+   ;; #(
   ## NetBSD systems
-  *-*-netbsd*)
-    tcsh_config_file=bsd4.4
-  ;;
-
+  *-*-netbsd*) :
+        tcsh_config_file=bsd4.4
+   ;; #(
   ## FreeBSD systems
-  *-*-freebsd*)
-    tcsh_config_file=bsd4.4
-  ;;
-
+  *-*-freebsd*) :
+        tcsh_config_file=bsd4.4
+   ;; #(
   ## MidnightBSD systems
-  *-*-midnightbsd*)
-    tcsh_config_file=bsd4.4
-  ;;
-
+  *-*-midnightbsd*) :
+        tcsh_config_file=bsd4.4
+   ;; #(
   ## DragonFlyBSD systems
-  *-*-dragonfly*)
-    tcsh_config_file=bsd4.4
-  ;;
-
+  *-*-dragonfly*) :
+        tcsh_config_file=bsd4.4
+   ;; #(
   ## MirBSD systems
-  *-*-mirbsd*)
-    tcsh_config_file=bsd4.4
-  ;;
-
+  *-*-mirbsd*) :
+        tcsh_config_file=bsd4.4
+   ;; #(
   ## OpenBSD systems
-  *-*-openbsd*)
-    tcsh_config_file=bsd4.4
-  ;;
-
+  *-*-openbsd*) :
+        tcsh_config_file=bsd4.4
+   ;; #(
   ## BSDI systems
-  *-*-bsdi*)
-    tcsh_config_file=bsd4.4
-  ;;
-
+  *-*-bsdi*) :
+        tcsh_config_file=bsd4.4
+   ;; #(
   ## Mac OS X Server
-  *-*-rhapsody*)
-    tcsh_config_file=bsd4.4
-  ;;
-
+  *-*-rhapsody*) :
+        tcsh_config_file=bsd4.4
+   ;; #(
   ## Mac OS X Server
-  *-*-darwin*)
-    tcsh_config_file=bsd4.4
-  ;;
-
+  *-*-darwin*) :
+        tcsh_config_file=bsd4.4
+   ;; #(
   ## DragonFly systems
-  *-*-dragonfly*)
-    tcsh_config_file=bsd4.4
-  ;;
-
+  *-*-dragonfly*) :
+        tcsh_config_file=bsd4.4
+   ;; #(
   ## Silicon Graphics machines
-  *-sgi-iri*)
-    tcsh_config_file=irix
-    case "${host_os}" in
-      irix[34]*) # Irix-3.x - Irix 4.x
+  *-sgi-iri*) :
+        tcsh_config_file=irix
+    case ${host_os} in #(
+  irix[34]*) :
+    # Irix-3.x - Irix 4.x
         NON_GNU_DFLAGS='-D__STDC__'
         LIBS='-lsun -lbsd -lc_s'
-      ;;
-      irix5* | irix6.[01]*) # Irix 5.x, Irix 6.0 - 6.1
+       ;; #(
+  irix5* | irix6.[01]*) :
+    # Irix 5.x, Irix 6.0 - 6.1
         LIBS='-lbsd'
-      ;;
-      irix6.[2-9]*) # Irix 6.2 and later
+       ;; #(
+  irix6.[2-9]*) :
+    # Irix 6.2 and later
         tcsh_config_file=irix62
-      ;;
-    esac
-  ;;
-
+       ;; #(
+  *) :
+     ;;
+esac
+   ;; #(
   ## Suns
-  *-sun-sunos3*)
-    tcsh_config_file=sunos35
-  ;;
-  *-sun-sunos4.0*)
-    tcsh_config_file=sunos40
-  ;;
-  *-sun-sunos4.1.[12]*)
-    tcsh_config_file=sunos41
-  ;;
-  *-sun-sunos4.1.[3456]*)
-    tcsh_config_file=sunos413
-  ;;
-  *-*-solaris2.[01]) # Should handle sparc or x86
+  *-sun-sunos3*) :
+        tcsh_config_file=sunos35
+   ;; #(
+  *-sun-sunos4.0*) :
+        tcsh_config_file=sunos40
+   ;; #(
+  *-sun-sunos4.1.[12]*) :
+        tcsh_config_file=sunos41
+   ;; #(
+  *-sun-sunos4.1.[3456]*) :
+        tcsh_config_file=sunos413
+   ;; #(
+  *-*-solaris2.[01]) :
+    # Should handle sparc or x86
     tcsh_config_file=sol2
-  ;;
-  *-sun-solaris2.2) # Sparc only release
+   ;; #(
+  *-sun-solaris2.2) :
+    # Sparc only release
     tcsh_config_file=sol22
-  ;;
-  *-sun-solaris2.3) # Sparc only release
+   ;; #(
+  *-sun-solaris2.3) :
+    # Sparc only release
     tcsh_config_file=sol23
-  ;;
-  *-*-solaris2.[45]) # Should handle sparc, x86 and powerpc
+   ;; #(
+  *-*-solaris2.[45]) :
+    # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol24
-  ;;
-  *-*-solaris2.[678]) # Should handle sparc, x86 and powerpc
+   ;; #(
+  *-*-solaris2.[678]) :
+    # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol26
-  ;;
-  *-*-solaris2.*) # Should handle sparc, x86 and powerpc
+   ;; #(
+  *-*-solaris2.*) :
+    # Should handle sparc, x86 and powerpc
     tcsh_config_file=sol29
-  ;;
-
+   ;; #(
   ## Dell SVR4
-  *-dell-sysv4*)
-    tcsh_config_file=sysv4
+  *-dell-sysv4*) :
+        tcsh_config_file=sysv4
     DFLAGS="$DFLAGS -DDELL"
-  ;;
-
+   ;; #(
   ## SVR4 (Generic and otherwise)
-  *-*-sysv4*)
-    tcsh_config_file=sysv4
-  ;;
-
+  *-*-sysv4*) :
+        tcsh_config_file=sysv4
+   ;; #(
   ## Tektronix systems
-  m68k-tektronix-bsd*)
-    tcsh_config_file=bsd
+  m68k-tektronix-bsd*) :
+        tcsh_config_file=bsd
     NON_GNU_DFLAGS='-DBSD -DUTek'
-  ;;
-  m88k-tektronix-sysv3*)
-    tcsh_config_file=tekXD88
-  ;;
-
+   ;; #(
+  m88k-tektronix-sysv3*) :
+        tcsh_config_file=tekXD88
+   ;; #(
   ## SCO
-  *-sco3.2v5*)
-    tcsh_config_file=sco32v5
-  ;;
-  *-sco3.2v4*)
-    tcsh_config_file=sco32v4
-  ;;
-  *-sco3.2v2*)
-    tcsh_config_file=sco32v2
-  ;;
-
+  *-sco3.2v5*) :
+        tcsh_config_file=sco32v5
+   ;; #(
+  *-sco3.2v4*) :
+        tcsh_config_file=sco32v4
+   ;; #(
+  *-sco3.2v2*) :
+        tcsh_config_file=sco32v2
+   ;; #(
   ## Siemens BS2000 Mainframe
-  bs2000-siemens-*)
-    tcsh_config_file=bs2000
-  ;;
-
+  bs2000-siemens-*) :
+        tcsh_config_file=bs2000
+   ;; #(
   ## Convex
-  *-convex*)
-    tcsh_config_file=convex
-  ;;
-
+  *-convex*) :
+        tcsh_config_file=convex
+   ;; #(
   ## Cray
-  *-cray-unicos*)
-    tcsh_config_file=cray
-  ;;
-
+  *-cray-unicos*) :
+        tcsh_config_file=cray
+   ;; #(
   ## Red Hat Cygwin
-  *-cygwin)
-    tcsh_config_file=cygwin
-  ;;
-
+  *-cygwin) :
+        tcsh_config_file=cygwin
+   ;; #(
   ## mips-compaq-nonstopux
-  *-*-nonstopux)
-    tcsh_config_file=sysv4
-  ;;
-
+  *-*-nonstopux) :
+        tcsh_config_file=sysv4
+   ;; #(
   ## Apollo Domain/OS
-  *-apollo-*)
-    tcsh_config_file=apollo
-  ;;
-
+  *-apollo-*) :
+        tcsh_config_file=apollo
+   ;; #(
   ## QNX6
-  *-qnx6*)
-    tcsh_config_file=qnx6
-  ;;
-
-  *)
+  *-qnx6*) :
+        tcsh_config_file=qnx6
+   ;; #(
+  *) :
     as_fn_error $? "Tcsh can't guess the configuration file name
 for \`${host}' systems.
-Check tcsh's \`Ported' file for manual configuration instructions." "$LINENO" 5
-    ;;
-
+Check tcsh's \`Ported' file for manual configuration instructions." "$LINENO" 5 ;;
 esac
-
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: using configuration file \`$tcsh_config_file'" >&5
 printf "%s\n" "$as_me: using configuration file \`$tcsh_config_file'" >&6;}
@@ -7169,11 +7152,13 @@ then :
        CFLAGS="$CFLAGS $NON_GNU_CFLAGS"
 fi
 
-case "${host}" in
-  *-*-android*)
-    CFLAGS="${CFLAGS} -fPIE"
+case ${host} in #(
+  *-*-android*) :
+        CFLAGS="${CFLAGS} -fPIE"
     LDFLAGS="${LDFLAGS} -pie"
-    ;;
+ ;; #(
+  *) :
+     ;;
 esac
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing crypt" >&5
@@ -10306,4 +10291,49 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 printf "%s\n" "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: ========= Configuration results =========" >&5
+printf "%s\n" "$as_me: ========= Configuration results =========" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: BUILD_CATALOGS          $BUILD_CATALOGS" >&5
+printf "%s\n" "$as_me: BUILD_CATALOGS          $BUILD_CATALOGS" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: CC                      $CC" >&5
+printf "%s\n" "$as_me: CC                      $CC" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: CC_FOR_GETHOST          $CC_FOR_GETHOST" >&5
+printf "%s\n" "$as_me: CC_FOR_GETHOST          $CC_FOR_GETHOST" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: CFLAGS                  $CFLAGS" >&5
+printf "%s\n" "$as_me: CFLAGS                  $CFLAGS" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: CPP                     $CPP" >&5
+printf "%s\n" "$as_me: CPP                     $CPP" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: CPPFLAGS                $CPPFLAGS" >&5
+printf "%s\n" "$as_me: CPPFLAGS                $CPPFLAGS" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: DFLAGS                  $DFLAGS" >&5
+printf "%s\n" "$as_me: DFLAGS                  $DFLAGS" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: HESDEF                  $HESDEF" >&5
+printf "%s\n" "$as_me: HESDEF                  $HESDEF" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: HESLIB                  $HESLIB" >&5
+printf "%s\n" "$as_me: HESLIB                  $HESLIB" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: LDFLAGS                 $LDFLAGS" >&5
+printf "%s\n" "$as_me: LDFLAGS                 $LDFLAGS" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: LIBICONV                $LIBICONV" >&5
+printf "%s\n" "$as_me: LIBICONV                $LIBICONV" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: LIBS                    $LIBS" >&5
+printf "%s\n" "$as_me: LIBS                    $LIBS" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: PACKAGE_CHANGELOG_DATE  $PACKAGE_CHANGELOG_DATE" >&5
+printf "%s\n" "$as_me: PACKAGE_CHANGELOG_DATE  $PACKAGE_CHANGELOG_DATE" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: PACKAGE_DATE            $PACKAGE_DATE" >&5
+printf "%s\n" "$as_me: PACKAGE_DATE            $PACKAGE_DATE" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: PACKAGE_ENGLISH_DATE    $PACKAGE_ENGLISH_DATE" >&5
+printf "%s\n" "$as_me: PACKAGE_ENGLISH_DATE    $PACKAGE_ENGLISH_DATE" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: PACKAGE_PATCHLEVEL      $PACKAGE_PATCHLEVEL" >&5
+printf "%s\n" "$as_me: PACKAGE_PATCHLEVEL      $PACKAGE_PATCHLEVEL" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: PACKAGE_REV             $PACKAGE_REV" >&5
+printf "%s\n" "$as_me: PACKAGE_REV             $PACKAGE_REV" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: PACKAGE_VERS            $PACKAGE_VERS" >&5
+printf "%s\n" "$as_me: PACKAGE_VERS            $PACKAGE_VERS" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: PACKAGE_VERSION         $PACKAGE_VERSION" >&5
+printf "%s\n" "$as_me: PACKAGE_VERSION         $PACKAGE_VERSION" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: tcsh_config_file        system/$tcsh_config_file" >&5
+printf "%s\n" "$as_me: tcsh_config_file        system/$tcsh_config_file" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: =========================================" >&5
+printf "%s\n" "$as_me: =========================================" >&6;}
 

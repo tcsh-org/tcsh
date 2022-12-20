@@ -26,20 +26,19 @@ package_month="${package_month%-*}"
 package_day="${PACKAGE_DATE##*-}"
 package_day="${package_day#0}"
 
-case "${package_month}" in
-01) package_month_name=January;;
-02) package_month_name=February;;
-03) package_month_name=March;;
-04) package_month_name=April;;
-05) package_month_name=May;;
-06) package_month_name=June;;
-07) package_month_name=July;;
-08) package_month_name=August;;
-09) package_month_name=September;;
-10) package_month_name=October;;
-11) package_month_name=November;;
-12) package_month_name=December;;
-esac
+AS_CASE([${package_month}],
+[01], [package_month_name=January],
+[02], [package_month_name=February],
+[03], [package_month_name=March],
+[04], [package_month_name=April],
+[05], [package_month_name=May],
+[06], [package_month_name=June],
+[07], [package_month_name=July],
+[08], [package_month_name=August],
+[09], [package_month_name=September],
+[10], [package_month_name=October],
+[11], [package_month_name=November],
+[12], [package_month_name=December])
 
 PACKAGE_ENGLISH_DATE="${package_month_name} ${package_day}, ${package_year}"
 AC_SUBST(PACKAGE_ENGLISH_DATE)
@@ -76,282 +75,268 @@ AS_IF([{ test x"${ac_cv_host_system_type+set}" = x"set" &&
       [AC_MSG_RESULT(ok)])
 ac_cv_host_system_type="$host"
 
-changequote(, )dnl
-
-case "${host}" in
-  *-*-darwin*|*-*-freebsd*|*-*-rhapsody*)
+AS_CASE([${host}],
+  [*-*-darwin*|*-*-freebsd*|*-*-rhapsody*], [dnl
     PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -v0H -v0M -v0S \
-	-v${package_year}y \
-	-v${package_month}m \
-	-v${package_day}d \
-	"${package_changelog_date_format}"
-    )"
-  ;;
-  *-*-openbsd*)
+        -v${package_year}y \
+        -v${package_month}m \
+        -v${package_day}d \
+        "${package_changelog_date_format}"
+    )"],
+  [*-*-openbsd*], [dnl
     PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -j \
-	"${package_changelog_date_format}" \
-	${package_year}${package_month}${package_day}0000
-    )"
-  ;;
-  *)
-    # NetBSD, GNU core utilities (i.e. most Linux)
+        "${package_changelog_date_format}" \
+        ${package_year}${package_month}${package_day}0000
+    )"],
+
+    # Default: NetBSD, GNU core utilities (i.e. most Linux)
+  [dnl
     PACKAGE_CHANGELOG_DATE="$(
       TZ=UTC date -d ${PACKAGE_DATE} \
-	"${package_changelog_date_format}"
-    )"
-  ;;
-esac
+        "${package_changelog_date_format}"
+    )"])
 
-case "${host}" in
+AS_CASE([${host}], 
 
   ## Alpha (DEC) machines.
-  alpha*-dec-osf*)
+  [alpha*-dec-osf*], [dnl
     tcsh_config_file=decosf1
-  ;;
+  ],
 
   ## Ultrix
-  *-dec-ultrix*)
+  [*-dec-ultrix*], [dnl
     tcsh_config_file=ultrix
-  ;;
+  ],
 
   ## DGUX
-  *-dg-dguxR4*)
+  [*-dg-dguxR4*], [dnl
     tcsh_config_file=dgux5.4
-  ;;
-  m88k-dg-dgux5.4R*)
+  ],
+  [m88k-dg-dgux5.4R*], [dnl
     tcsh_config_file=dgux5.4
-  ;;
+  ],
 
   ## HP/UX
-  *-hp-hpux7*)
+  [*-hp-hpux7*], [dnl
     tcsh_config_file=hpux7
-  ;;
-  *-hp-hpux[89]*)
+  ],
+  [*-hp-hpux@<:@89@:>@*], [dnl
     tcsh_config_file=hpux8
-  ;;
-  *-hp-hpux1[0-9]*)
+  ],
+  [*-hp-hpux1@<:@0-9@:>@*], [dnl
     tcsh_config_file=hpux11
-  ;;
+  ],
 
   ## IBM AIX systems
-  *-ibm-aix*)
+  [*-ibm-aix*], [dnl
     tcsh_config_file=aix
-  ;;
+  ],
 
   ## SX-4
-  sx4-nec-*)
+  [sx4-nec-*], [dnl
     CC='cc -h0,ansi,novector,float0'
     LDFLAGS='-Gsmall'
     tcsh_config_file=superux8
-  ;;
+  ],
 
   ## IBM OS/390 systems
-  *-ibm-os390*)
+  [*-ibm-os390*], [dnl
     CC='c89'
     tcsh_config_file=os390
-  ;;
+  ],
 
   ## Android
-  *-*-android*)
+  [*-*-android*], [dnl
     tcsh_config_file=android
-  ;;
+  ],
 
   ## Linux
-  *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
+  [*-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu], [dnl
     tcsh_config_file=linux
-  ;;
+  ],
 
   ## Motorola systems
-  m68k-motorola-sysv*)
+  [m68k-motorola-sysv*], [dnl
     tcsh_config_file=sysV68
-  ;;
-  m88k-motorola-sysv3*)
+  ],
+  [m88k-motorola-sysv3*], [dnl
     tcsh_config_file=sysV88
-  ;;
+  ],
 
   ## Minix systems
-  *-*-minix*)
+  [*-*-minix*], [dnl
     tcsh_config_file=minix
-  ;;
+  ],
 
   ## NetBSD systems
-  *-*-netbsd*)
+  [*-*-netbsd*], [dnl
     tcsh_config_file=bsd4.4
-  ;;
+  ],
 
   ## FreeBSD systems
-  *-*-freebsd*)
+  [*-*-freebsd*], [dnl
     tcsh_config_file=bsd4.4
-  ;;
+  ],
 
   ## MidnightBSD systems
-  *-*-midnightbsd*)
+  [*-*-midnightbsd*], [dnl
     tcsh_config_file=bsd4.4
-  ;;
+  ],
   
   ## DragonFlyBSD systems
-  *-*-dragonfly*)
+  [*-*-dragonfly*], [dnl
     tcsh_config_file=bsd4.4
-  ;;
+  ],
 
   ## MirBSD systems
-  *-*-mirbsd*)
+  [*-*-mirbsd*], [dnl
     tcsh_config_file=bsd4.4
-  ;;
+  ],
 
   ## OpenBSD systems
-  *-*-openbsd*)
+  [*-*-openbsd*], [dnl
     tcsh_config_file=bsd4.4
-  ;;
+  ],
 
   ## BSDI systems
-  *-*-bsdi*)
+  [*-*-bsdi*], [dnl
     tcsh_config_file=bsd4.4
-  ;;
+  ],
 
   ## Mac OS X Server
-  *-*-rhapsody*)
+  [*-*-rhapsody*], [dnl
     tcsh_config_file=bsd4.4
-  ;;
+  ],
 
   ## Mac OS X Server
-  *-*-darwin*)
+  [*-*-darwin*], [dnl
     tcsh_config_file=bsd4.4
-  ;;
+  ],
 
   ## DragonFly systems
-  *-*-dragonfly*)
+  [*-*-dragonfly*], [dnl
     tcsh_config_file=bsd4.4
-  ;;
+  ],
 
   ## Silicon Graphics machines
-  *-sgi-iri*)
+  [*-sgi-iri*], [dnl
     tcsh_config_file=irix
-    case "${host_os}" in
-      irix[34]*) # Irix-3.x - Irix 4.x
+    AS_CASE([${host_os}],
+      [irix@<:@34@:>@*], [# Irix-3.x - Irix 4.x
         NON_GNU_DFLAGS='-D__STDC__'
         LIBS='-lsun -lbsd -lc_s'
-      ;;
-      irix5* | irix6.[01]*) # Irix 5.x, Irix 6.0 - 6.1
+      ],
+      [irix5* | irix6.@<:@01@:>@*], [# Irix 5.x, Irix 6.0 - 6.1
         LIBS='-lbsd'
-      ;;
-      irix6.[2-9]*) # Irix 6.2 and later
+      ],
+      [irix6.@<:@2-9@:>@*], [# Irix 6.2 and later
         tcsh_config_file=irix62
-      ;;
-    esac
-  ;;
+      ])
+  ],
 
   ## Suns
-  *-sun-sunos3*)
+  [*-sun-sunos3*], [dnl
     tcsh_config_file=sunos35
-  ;;
-  *-sun-sunos4.0*)
+  ],
+  [*-sun-sunos4.0*], [dnl
     tcsh_config_file=sunos40
-  ;;
-  *-sun-sunos4.1.[12]*)
+  ],
+  [*-sun-sunos4.1.@<:@12@:>@*], [dnl
     tcsh_config_file=sunos41
-  ;;
-  *-sun-sunos4.1.[3456]*)
+  ],
+  [*-sun-sunos4.1.@<:@3456@:>@*], [dnl
     tcsh_config_file=sunos413
-  ;;
-  *-*-solaris2.[01]) # Should handle sparc or x86
+  ],
+  [*-*-solaris2.@<:@01@:>@], [# Should handle sparc or x86
     tcsh_config_file=sol2
-  ;;
-  *-sun-solaris2.2) # Sparc only release
+  ],
+  [*-sun-solaris2.2], [# Sparc only release
     tcsh_config_file=sol22
-  ;;
-  *-sun-solaris2.3) # Sparc only release
+  ],
+  [*-sun-solaris2.3], [# Sparc only release
     tcsh_config_file=sol23
-  ;;
-  *-*-solaris2.[45]) # Should handle sparc, x86 and powerpc
+  ],
+  [*-*-solaris2.@<:@45@:>@], [# Should handle sparc, x86 and powerpc
     tcsh_config_file=sol24
-  ;;
-  *-*-solaris2.[678]) # Should handle sparc, x86 and powerpc
+  ],
+  [*-*-solaris2.@<:@678@:>@], [# Should handle sparc, x86 and powerpc
     tcsh_config_file=sol26
-  ;;
-  *-*-solaris2.*) # Should handle sparc, x86 and powerpc
+  ],
+  [*-*-solaris2.*], [# Should handle sparc, x86 and powerpc
     tcsh_config_file=sol29
-  ;;
+  ],
 
   ## Dell SVR4
-  *-dell-sysv4*)
+  [*-dell-sysv4*], [dnl
     tcsh_config_file=sysv4
     DFLAGS="$DFLAGS -DDELL"
-  ;;
+  ],
 
   ## SVR4 (Generic and otherwise)
-  *-*-sysv4*)
+  [*-*-sysv4*], [dnl
     tcsh_config_file=sysv4
-  ;;
+  ],
 
   ## Tektronix systems
-  m68k-tektronix-bsd*)
+  [m68k-tektronix-bsd*], [dnl
     tcsh_config_file=bsd
     NON_GNU_DFLAGS='-DBSD -DUTek'
-  ;;
-  m88k-tektronix-sysv3*)
+  ],
+  [m88k-tektronix-sysv3*], [dnl
     tcsh_config_file=tekXD88
-  ;;
+  ],
 
   ## SCO
-  *-sco3.2v5*) 
+  [*-sco3.2v5*], [dnl
     tcsh_config_file=sco32v5
-  ;;
-  *-sco3.2v4*)
+  ],
+  [*-sco3.2v4*], [dnl
     tcsh_config_file=sco32v4
-  ;;
-  *-sco3.2v2*)
+  ],
+  [*-sco3.2v2*], [dnl
     tcsh_config_file=sco32v2
-  ;;
+  ],
 
   ## Siemens BS2000 Mainframe
-  bs2000-siemens-*)
+  [bs2000-siemens-*], [dnl
     tcsh_config_file=bs2000
-  ;;
+  ],
 
   ## Convex
-  *-convex*)
+  [*-convex*], [dnl
     tcsh_config_file=convex
-  ;;
+  ],
 
   ## Cray
-  *-cray-unicos*)
+  [*-cray-unicos*], [dnl
     tcsh_config_file=cray
-  ;;
+  ],
 
   ## Red Hat Cygwin
-  *-cygwin)
+  [*-cygwin], [dnl
     tcsh_config_file=cygwin
-  ;;
+  ],
 
   ## mips-compaq-nonstopux
-  *-*-nonstopux)
+  [*-*-nonstopux], [dnl
     tcsh_config_file=sysv4
-  ;;
+  ],
 
   ## Apollo Domain/OS
-  *-apollo-*)
+  [*-apollo-*], [dnl
     tcsh_config_file=apollo
-  ;;
+  ],
 
   ## QNX6
-  *-qnx6*)
+  [*-qnx6*], [dnl
     tcsh_config_file=qnx6
-  ;;
+  ],
 
-  *)
-  changequote([, ])dnl
-  AC_MSG_ERROR([Tcsh can't guess the configuration file name
+  [AC_MSG_ERROR([Tcsh can't guess the configuration file name
 for `${host}' systems.
-Check tcsh's `Ported' file for manual configuration instructions.])
-  changequote(, )dnl
-  ;;
-
-esac
-
-changequote([, ])dnl
+Check tcsh's `Ported' file for manual configuration instructions.])])
 
 AC_MSG_NOTICE([using configuration file `$tcsh_config_file'])
 cp ${srcdir}/system/${tcsh_config_file} config_p.h
@@ -378,12 +363,11 @@ AS_IF([test "x$GCC" != xyes],
        CFLAGS="$CFLAGS $NON_GNU_CFLAGS"])
 
 dnl More recent Android requires PIEs
-case "${host}" in
-  *-*-android*)
+AS_CASE([${host}],
+  [*-*-android*], [dnl
     CFLAGS="${CFLAGS} -fPIE"
     LDFLAGS="${LDFLAGS} -pie"
-    ;;
-esac
+])
 
 dnl Checks for libraries
 AC_SEARCH_LIBS(crypt, crypt)
@@ -503,10 +487,8 @@ return sbrk(2048) == (void*)-1;
 dnl This is not good enough; we need sockaddr_storage too.
 dnl See whether we can use IPv6 related functions
 dnl AC_DEFUN([IPv6_CHECK_FUNC], [
-dnl changequote(, )dnl
-dnl ac_tr_lib=HAVE_`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
+dnl ac_tr_lib=HAVE_`echo $1 | sed -e 's/@<:@^a-zA-Z0-9_@:>@/_/g' \
 dnl   -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-dnl changequote([, ])dnl
 dnl AC_CHECK_FUNC($1, [dnl
 dnl   AC_DEFINE_UNQUOTED($ac_tr_lib)
 dnl   ac_cv_lib_inet6_$1=no], [dnl
@@ -582,3 +564,26 @@ AC_SUBST(BUILD_CATALOGS)
 
 AC_CONFIG_FILES([Makefile dch-template nls/Makefile patchlevel.h tcsh.man])
 AC_OUTPUT()
+
+AC_MSG_NOTICE([========= Configuration results =========])
+AC_MSG_NOTICE([BUILD_CATALOGS          $BUILD_CATALOGS])
+AC_MSG_NOTICE([CC                      $CC])
+AC_MSG_NOTICE([CC_FOR_GETHOST          $CC_FOR_GETHOST])
+AC_MSG_NOTICE([CFLAGS                  $CFLAGS])
+AC_MSG_NOTICE([CPP                     $CPP])
+AC_MSG_NOTICE([CPPFLAGS                $CPPFLAGS])
+AC_MSG_NOTICE([DFLAGS                  $DFLAGS])
+AC_MSG_NOTICE([HESDEF                  $HESDEF])
+AC_MSG_NOTICE([HESLIB                  $HESLIB])
+AC_MSG_NOTICE([LDFLAGS                 $LDFLAGS])
+AC_MSG_NOTICE([LIBICONV                $LIBICONV])
+AC_MSG_NOTICE([LIBS                    $LIBS])
+AC_MSG_NOTICE([PACKAGE_CHANGELOG_DATE  $PACKAGE_CHANGELOG_DATE])
+AC_MSG_NOTICE([PACKAGE_DATE            $PACKAGE_DATE])
+AC_MSG_NOTICE([PACKAGE_ENGLISH_DATE    $PACKAGE_ENGLISH_DATE])
+AC_MSG_NOTICE([PACKAGE_PATCHLEVEL      $PACKAGE_PATCHLEVEL])
+AC_MSG_NOTICE([PACKAGE_REV             $PACKAGE_REV])
+AC_MSG_NOTICE([PACKAGE_VERS            $PACKAGE_VERS])
+AC_MSG_NOTICE([PACKAGE_VERSION         $PACKAGE_VERSION])
+AC_MSG_NOTICE([tcsh_config_file        system/$tcsh_config_file])
+AC_MSG_NOTICE([=========================================])
