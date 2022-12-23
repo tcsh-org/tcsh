@@ -24,11 +24,21 @@ To install tcsh:
     Run "./configure --help" to see possible options.  After running
     configure, goto step 5.
 
-    a)	On Debian you'll want to have development libraries installed.
-	Try the following:
+    You'll want to have development libraries installed:
+
+    a)	On Debian, try the following:
+
 	apt-get install \
 	build-essential \
 	libncurses-dev \
+	;
+
+    b)	On Fedora, try the following:
+
+	dnf group install \
+	"C Development Tools and Libraries" \
+	"Development Libraries" \
+	"Development Tools" \
 	;
 
 2)  If you have imake running on your machine, you may try building with
