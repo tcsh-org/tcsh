@@ -64,6 +64,7 @@ list_suites()
 
     case "${os}" in
     debian)
+	echo bookworm
 	echo bullseye
 	echo buster
 	echo stretch
