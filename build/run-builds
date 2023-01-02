@@ -27,7 +27,18 @@ ARG APT_LISTCHANGES_FRONTEND=none
 RUN apt-get -qq update\
  && apt-get -qq install $(list_dependencies)\
  && apt-get -qq clean
+EOF
 
+    case "${suite}" in
+    bookworm)
+	expand <<EOF
+RUN grep -q '^VERSION_ID=' /etc/os-release\
+ || echo VERSION_ID=12 >> /etc/os-release
+EOF
+	;;
+    esac
+
+    expand <<EOF
 RUN useradd -U -m builder
 
 COPY --link docker-entrypoint /
