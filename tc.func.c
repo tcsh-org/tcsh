@@ -1944,13 +1944,17 @@ getremotehost(int dest_fd)
 	    char *sptr;
 
 	    /* Look for host:display.screen */
-	    /*
-	     * There is conflict with IPv6 address and X DISPLAY.  So,
-	     * we assume there is no IPv6 address in utmp and don't
-	     * touch here.
-	     */
-	    if ((sptr = strchr(name, ':')) != NULL)
-		*sptr = '\0';
+	    if ((sptr = strchr(name, ':')) != NULL) {
+		/*
+		 * Check for IPv6 address and leave it alone
+		 */
+		for (ptr = name; ptr < sptr; ptr++)
+		    if (!isxdigit((unsigned char)*ptr))
+			break;
+		if (ptr != sptr || sptr - name > 4)
+		    *sptr = '\0';
+	    }
+
 	    /* Leave IPv4 address as is */
 	    /*
 	     * we use inet_addr here, not inet_aton because many systems
