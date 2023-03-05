@@ -50,16 +50,20 @@ typedef struct {
 #define NOS '\0' /* no suffix */
 
 typedef struct {
-    const char suffix;
-    const char *variable;
-    Str	    color;
-    Str	    defaultcolor;
+    const char suffix;		/* ls-F suffix */
+    const char *variable;	/* LS_COLORS variable */
+    Str		color;		/* Color: default or user-provided color */
+    Str		defaultcolor;	/* Default color */
 } Variable;
 
+/*
+ * variables[]: array of Variable.
+ * Must be indexed on enum FileType (q.v.).
+ */
 static Variable variables[] = {
     VAR('/', "di", "01;34"),	/* Directory */
     VAR('@', "ln", "01;36"),	/* Symbolic link */
-    VAR('&', "or", ""),		/* Orphanned symbolic link (defaults to ln) */
+    VAR('&', "or", ""),		/* Orphaned (broken) symbolic link. Defaults to ln */
     VAR('|', "pi", "33"),	/* Named pipe (FIFO) */
     VAR('=', "so", "01;35"),	/* Socket */
     VAR('>', "do", "01;35"),	/* Door (solaris fast ipc mechanism)  */
@@ -68,7 +72,7 @@ static Variable variables[] = {
     VAR('*', "ex", "01;32"),	/* Executable file */
     VAR(NOS, "fi", "0"),	/* Regular file */
     VAR(NOS, "no", "0"),	/* Normal (non-filename) text */
-    VAR(NOS, "mi", ""),		/* Missing file (defaults to fi) */
+    VAR(NOS, "mi", ""),		/* Missing file (orphaned symbolic link target). Defaults to fi */
 #ifdef IS_ASCII
     VAR(NOS, "lc", "\033["),	/* Left code (ASCII) */
 #else
@@ -89,6 +93,10 @@ static Variable variables[] = {
 
 #define nvariables (sizeof(variables)/sizeof(variables[0]))
 
+/**
+ * FileType index.
+ * Must be kept in sync with variables[]
+ */
 enum FileType {
     VDir, VSym, VOrph, VPipe, VSock, VDoor, VBlock, VChr, VExe,
     VFile, VNormal, VMiss, VLeft, VRight, VEnd, VSuid, VSgid, VSticky,
