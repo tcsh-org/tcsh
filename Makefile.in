@@ -482,7 +482,7 @@ TCOBJS=	tc.alloc.${SUF} tc.bind.${SUF} tc.const.${SUF} tc.defs.${SUF} \
 # tests/*.at except for tests/testsuite.at
 TESTFILES= \
 	tests/aliases.at tests/arguments.at tests/commands.at \
-	tests/expr.at tests/history.at tests/lexical.at \
+	tests/expr.at tests/history.at tests/lexical.at tests/ls-F.at \
 	tests/mb-eucjp.at tests/mb-utf8.at tests/noexec.at \
 	tests/parenthesis.at tests/sh.dol.at tests/subst.at \
 	tests/syntax.at tests/variables.at

@@ -1017,73 +1017,7 @@ dnl
 dnl	ls-F
 dnl
 
-AT_SETUP([ls-F])
-AT_KEYWORDS([commands])
-
-mkdir dir
-touch file exec .hidden
-chmod a+x exec
-mkfifo pipe
-ln -s file lfile
-ln -s dir ldir
-ln -s nowhere lnowhere
-unset LS_COLORS
-
-AT_CHECK([tcsh -f -c 'ls-F' | grep -vF testsuite.log], ,
-[dir/
-exec*
-file @&t@
-ldir@
-lfile@
-lnowhere@
-pipe|
-])
-
-AT_CHECK([tcsh -f -c 'set listlinks; ls-F' | grep -vF testsuite.log], ,
-[dir/
-exec*
-file @&t@
-ldir>
-lfile@
-lnowhere&
-pipe|
-])
-
-AT_CHECK([tcsh -f -c 'set listflags=x; ls-F' | grep -vF testsuite.log], ,
-[dir/
-exec*
-file @&t@
-ldir@
-lfile@
-lnowhere@
-pipe|
-])
-
-AT_CHECK([tcsh -f -c 'set listflags=A; ls-F' | grep -vF testsuite.log], ,
-[.hidden @&t@
-dir/
-exec*
-file @&t@
-ldir@
-lfile@
-lnowhere@
-pipe|
-])
-
-AT_CHECK([tcsh -f -c 'set listflags=xa; ls-F' | grep -vF testsuite.log], ,
-[../
-./
-.hidden @&t@
-dir/
-exec*
-file @&t@
-ldir@
-lfile@
-lnowhere@
-pipe|
-])
-
-AT_CLEANUP()
+dnl Tested in ls-F.at
 
 
 dnl
