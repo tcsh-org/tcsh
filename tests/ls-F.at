@@ -4,69 +4,189 @@ dnl
 dnl	ls-F
 dnl
 
+dnl
+dnl Note that the test groups don't test multiple columns
+dnl because the terminal doesn't get setup by default with -c.
+dnl
+
 AT_SETUP([ls-F])
 AT_KEYWORDS([commands])
+
+dnl
+dnl Create directory "DIR" with entries:
+dnl
+dnl	-rw-r--r--.  .hidden
+dnl	drwxr-xr-x.  dir/
+dnl	-rwxr-xr-x.  exec*
+dnl	-rw-r--r--.  file
+dnl	lrwxrwxrwx.  ldir -> dir/
+dnl	lrwxrwxrwx.  lexec -> exec*
+dnl	lrwxrwxrwx.  lfile -> file
+dnl	lrwxrwxrwx.  lldir -> ldir@
+dnl	lrwxrwxrwx.  llexec -> lexec@
+dnl	lrwxrwxrwx.  llfile -> lfile@
+dnl	lrwxrwxrwx.  llorphan -> lorphan@
+dnl	lrwxrwxrwx.  llpipe -> lpipe@
+dnl	lrwxrwxrwx.  lorphan -> orphan&
+dnl	lrwxrwxrwx.  lpipe -> pipe|
+dnl	prw-r--r--.  pipe|
+
+mkdir DIR
+(
+cd DIR
 
 mkdir dir
 touch file exec .hidden
 chmod a+x exec
 mkfifo pipe
-ln -s file lfile
+
 ln -s dir ldir
-ln -s nowhere lnowhere
+ln -s exec lexec
+ln -s file lfile
+ln -s orphan lorphan
+ln -s pipe lpipe
+
+ln -s ldir lldir
+ln -s lexec llexec
+ln -s lfile llfile
+ln -s lorphan llorphan
+ln -s lpipe llpipe
+
+)
+
+dnl
+dnl Disable LSCOLORS and LS_COLORS
+dnl
+dnl Note: currently not required since print_with_colors()
+dnl ignores "set color" if !isatty(stdout).
+dnl
+
+unset LSCOLORS
 unset LS_COLORS
 
-AT_CHECK([tcsh -f -c 'ls-F' | grep -vF testsuite.log], ,
-[dir/
-exec*
-file @&t@
-ldir@
-lfile@
-lnowhere@
-pipe|
-])
 
-AT_CHECK([tcsh -f -c 'set listlinks; ls-F' | grep -vF testsuite.log], ,
-[dir/
-exec*
-file @&t@
-ldir>
-lfile@
-lnowhere&
-pipe|
-])
+dnl
+dnl ls-F with default behavior
+dnl
 
-AT_CHECK([tcsh -f -c 'set listflags=x; ls-F' | grep -vF testsuite.log], ,
-[dir/
-exec*
-file @&t@
-ldir@
-lfile@
-lnowhere@
-pipe|
-])
-
-AT_CHECK([tcsh -f -c 'set listflags=A; ls-F' | grep -vF testsuite.log], ,
-[.hidden @&t@
+AT_CHECK([tcsh -f -c 'cd DIR && ls-F'], [0], [dnl
 dir/
 exec*
 file @&t@
 ldir@
+lexec@
 lfile@
-lnowhere@
+lldir@
+llexec@
+llfile@
+llorphan@
+llpipe@
+lorphan@
+lpipe@
 pipe|
 ])
 
-AT_CHECK([tcsh -f -c 'set listflags=xa; ls-F' | grep -vF testsuite.log], ,
-[../
+
+dnl
+dnl listlinks.
+dnl Changes from default:
+dnl	ldir>
+dnl	lldir>
+dnl	llorphan&
+dnl	lorphan&
+dnl
+
+AT_CHECK([tcsh -f -c 'set listlinks; cd DIR && ls-F'], [0], [dnl
+dir/
+exec*
+file @&t@
+ldir>
+lexec@
+lfile@
+lldir>
+llexec@
+llfile@
+llorphan&
+llpipe@
+lorphan&
+lpipe@
+pipe|
+])
+
+
+dnl
+dnl listflags=x
+dnl Note: no changes from default when in in 1 column mode
+dnl
+
+AT_CHECK([tcsh -f -c 'set listflags=x; cd DIR && ls-F'], [0], [dnl
+dir/
+exec*
+file @&t@
+ldir@
+lexec@
+lfile@
+lldir@
+llexec@
+llfile@
+llorphan@
+llpipe@
+lorphan@
+lpipe@
+pipe|
+])
+
+
+dnl
+dnl listflags=A
+dnl Changes from default:
+dnl	.hidden
+dnl
+
+AT_CHECK([tcsh -f -c 'set listflags=A; cd DIR && ls-F'], [0], [dnl
+.hidden @&t@
+dir/
+exec*
+file @&t@
+ldir@
+lexec@
+lfile@
+lldir@
+llexec@
+llfile@
+llorphan@
+llpipe@
+lorphan@
+lpipe@
+pipe|
+])
+
+
+dnl
+dnl listflags=xa
+dnl Changes from default:
+dnl	../
+dnl	./
+dnl	.hidden
+dnl
+
+AT_CHECK([tcsh -f -c 'set listflags=xa; cd DIR && ls-F'], [0], [dnl
+../
 ./
 .hidden @&t@
 dir/
 exec*
 file @&t@
 ldir@
+lexec@
 lfile@
-lnowhere@
+lldir@
+llexec@
+llfile@
+llorphan@
+llpipe@
+lorphan@
+lpipe@
 pipe|
 ])
 
