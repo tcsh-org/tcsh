@@ -6,8 +6,18 @@ AT_COLOR_TESTS()
 
 AT_TESTED([tcsh])
 
+dnl
+dnl TCSH_UNTESTED(NAME)
+dnl
+dnl	Setup test group "NAME" and immediately skip the test.
+dnl	Adds keywords "untested" and `basename __file` without
+dnl	the ".at" suffix (equivalent to tcsh's :t:r modifiers).
+dnl
+
 m4_define([TCSH_UNTESTED], [dnl
 AT_SETUP([$1])
+AT_KEYWORDS([untested])
+AT_KEYWORDS(m4_bpatsubst(m4_bpatsubst(__file__,[^.*/],[]),[.at$],[]))
 AT_CHECK([exit 77])
 AT_CLEANUP()
 ])

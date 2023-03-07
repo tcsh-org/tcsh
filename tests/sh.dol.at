@@ -1,5 +1,8 @@
 AT_BANNER([$... substitution handling])
 
+dnl
+dnl	$<
+dnl
 
 AT_SETUP([$<])
 
