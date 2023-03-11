@@ -723,6 +723,7 @@ $(srcdir)/stamp-h.in: $(srcdir)/configure.ac
 
 check test: atconfig atlocal $(srcdir)/tests/testsuite
 	$(ENVCMD) - \
+		TESTSUITEREGEN="$(TESTSUITEREGEN)" \
 		USER="$(USER)" \
 		$(SHELL) $(srcdir)/tests/testsuite $(TESTSUITEFLAGS)
 
