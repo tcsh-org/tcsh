@@ -6163,8 +6163,10 @@ filetype or extension.
 See the
 .Ic color
 shell variable and the
+.Ev LSCOLORS
+and
 .Ev LS_COLORS
-environment variable.
+environment variables.
 .El
 .Pp
 .Bl -tag -width 6n -compact
@@ -7436,7 +7438,7 @@ Alternatively, it can be set to only
 .Ql ls\-F
 or only
 .Ql ls
-to enable color to only one command.
+to enable color for only one command.
 Setting
 it to nothing is equivalent to setting it to
 .Ql (ls\-F ls) .
@@ -7632,7 +7634,9 @@ the value is interpreted as:
 .It Li 2 Ta 0x05 Ta Second byte.
 .El
 .Pp
-The GNU fileutils version of ls cannot display multi-byte
+The GNU coreutils version of
+.Xr ls 1
+cannot display multi-byte
 filenames without the
 .Fl N
 .Pq Fl -literal
@@ -7642,7 +7646,7 @@ this version, set the second word of dspmbyte to
 .Ql ls .
 If not, for
 example,
-.Dl ls-F -l
+.Dl ls\-F -l
 cannot display multi-byte filenames.
 .Pp
 Note that
@@ -9419,7 +9423,148 @@ The number of lines in the terminal.
 See
 .Sx Terminal management (+) .
 .
+.It Ev LSCOLORS
+One of two environment variables that may be used to
+define the per-file colors used by
+.Ic ls\-F
+(along with
+.Ev LS_COLORS ) .
+This variable is used by some BSD versions of
+.Xr ls 1 .
+On
+.Nm
+startup,
+.Ev LS_COLORS
+takes priority over
+.Ev LSCOLORS .
+If both
+.Ev LSCOLORS
+or
+.Ev LS_COLORS
+are
+.Ic setenv ,
+the most recent
+.Ic setenv
+is used.
+.Pp
+This variable is a 22 character string containing
+a concatenation of pairs of the format
+.Ar f Ns Ar b ,
+where
+.Ar f
+is the foreground color and
+.Ar b
+is the background color.
+.Pp
+The order of the color attribute pairs to file type is as follows:
+.Pp
+.Bl -enum -offset indent -compact
+.It
+Directory.
+.It
+Symbolic link.
+.It
+Socket.
+.It
+Named pipe (FIFO).
+.It
+Executable file.
+.It
+Block device
+.It
+Character device.
+.It
+Executable with setuid bit set.
+(Not yet implemented in
+.Nm ) .
+.It
+Executable with setgid bit set.
+(Not yet implemented in
+.Nm ) .
+.It
+Directory writable to others, with sticky bit.
+(Not yet implemented in
+.Nm ) .
+.It
+Directory writable to others, without sticky bit.
+(Not yet implemented in
+.Nm ) .
+.El
+.Pp
+The color code designators are as follows:
+.Pp
+.Bl -tag -width 4n -offset indent -compact
+.It Sy Code
+.Sy Description
+.It Sy a
+Black.
+.It Sy b
+Red.
+.It Sy c
+Green.
+.It Sy d
+Brown (dark yellow).
+.It Sy e
+Blue.
+.It Sy f
+Magenta.
+.It Sy g
+Cyan.
+.It Sy h
+Light grey.
+.It Sy A
+Bold black, usually shows up as dark grey.
+.It Sy B
+Bold red.
+.It Sy C
+Bold green.
+.It Sy D
+Bold brown, usually shows up as yellow.
+.It Sy E
+Bold blue.
+.It Sy F
+Bold magenta.
+.It Sy G
+Bold cyan.
+.It Sy H
+Bold light grey; looks like bright white.
+.It Sy x
+Default foreground or background.
+.El
+.Pp
+Note that the above are standard ANSI colors.
+The actual display may differ
+depending on the color capabilities of the terminal in use.
+.Pp
+The default colors are described in
+.Ev LS_COLORS .
+.
 .It Ev LS_COLORS
+One of two environment variables that may be used to
+define the per-file colors used by
+.Ic ls\-F
+(along with
+.Ev LSCOLORS ) .
+This variable is used by the GNU coreutils version of
+.Xr ls 1
+and may be setup by
+.Xr dircolors 1 .
+On
+.Nm
+startup,
+.Ev LS_COLORS
+takes priority over
+.Ev LSCOLORS .
+If both
+.Ev LSCOLORS
+or
+.Ev LS_COLORS
+are
+.Ic setenv ,
+the most recent
+.Ic setenv
+is used.
+.Pp
 The format of this variable is reminiscent of the
 .Xr termcap 5
 file format; a
@@ -9543,8 +9688,7 @@ For example,
 .Ql 01;32
 is bright green foreground with default background.
 .Pp
-The
-most common ISO 6429 color codes are:
+The most common ISO 6429 color codes are:
 .Pp
 .Bl -tag -width ".Sy Color" -offset indent -compact
 .
@@ -9556,61 +9700,61 @@ most common ISO 6429 color codes are:
 To restore default color.
 .
 .It Li 1
-For brighter colors.
+Bold / brighter colors.
 .
 .It Li 4
-For underlined text.
+Underlined text.
 .
 .It Li 5
-For flashing text.
+Flashing text.
 .
 .It Li 30
-For black foreground.
+Black foreground.
 .
 .It Li 31
-For red foreground.
+Red foreground.
 .
 .It Li 32
-For green foreground.
+Green foreground.
 .
 .It Li 33
-For yellow (or brown) foreground.
+Yellow (or brown) foreground.
 .
 .It Li 34
-For blue foreground.
+Blue foreground.
 .
 .It Li 35
-For purple foreground.
+Magenta foreground.
 .
 .It Li 36
-For cyan foreground.
+Cyan foreground.
 .
 .It Li 37
-For white (or gray) foreground.
+White (or gray) foreground.
 .
 .It Li 40
-For black background.
+Black background.
 .
 .It Li 41
-For red background.
+Red background.
 .
 .It Li 42
-For green background.
+Green background.
 .
 .It Li 43
-For yellow (or brown) background.
+Yellow (or brown) background.
 .
 .It Li 44
-For blue background.
+Blue background.
 .
 .It Li 45
-For purple background.
+Magenta background.
 .
 .It Li 46
-For cyan background.
+Cyan background.
 .
 .It Li 47
-For white (or gray) background.
+White (or gray) background.
 .
 .El
 .Pp
@@ -10070,6 +10214,7 @@ substitutions on a single line to 20.
 .
 .Sh SEE ALSO
 .Xr csh 1 ,
+.Xr dircolors 1 ,
 .Xr emacs 1 ,
 .Xr ls 1 ,
 .Xr newgrp 1 ,
