@@ -16,6 +16,7 @@ dnl
 
 m4_define([TCSH_UNTESTED], [dnl
 AT_SETUP([$1])
+m4_set_add([TCSH_set_untested], [$1], [], [m4_fatal([$0: $1 already untested])])
 AT_KEYWORDS([untested])
 AT_KEYWORDS(m4_bpatsubst(m4_bpatsubst(__file__,[^.*/],[]),[.at$],[]))
 AT_CHECK([exit 77])
@@ -37,3 +38,7 @@ m4_include([sh.dol.at])
 m4_include([subst.at])
 m4_include([syntax.at])
 m4_include([variables.at])
+
+m4_errprintn()
+m4_errprintn([Expect ]m4_set_size(TCSH_set_untested)[ skipped tests (of untested features) in a full make check])
+m4_errprintn()
