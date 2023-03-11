@@ -1,0 +1,15 @@
+.hidden 
+dir/
+exec*
+file 
+ldir@
+lexec@
+lfile@
+lldir@
+llexec@
+llfile@
+llorphan@
+llpipe@
+lorphan@
+lpipe@
+pipe|

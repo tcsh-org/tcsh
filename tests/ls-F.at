@@ -27,22 +27,8 @@ dnl
 dnl ls-F with default behavior
 dnl
 
-AT_CHECK([tcsh -f -c 'cd DIR && ls-F'], [0], [dnl
-dir/
-exec*
-file @&t@
-ldir@
-lexec@
-lfile@
-lldir@
-llexec@
-llfile@
-llorphan@
-llpipe@
-lorphan@
-lpipe@
-pipe|
-])
+AT_CHECK([tcsh -f -c 'cd DIR && ls-F'], [0], [stdout])
+TCSH_DIFF([${tests_dir}/ls-F-default.out], [stdout])
 
 
 dnl
@@ -54,22 +40,8 @@ dnl	llorphan&
 dnl	lorphan&
 dnl
 
-AT_CHECK([tcsh -f -c 'set listlinks; cd DIR && ls-F'], [0], [dnl
-dir/
-exec*
-file @&t@
-ldir>
-lexec@
-lfile@
-lldir>
-llexec@
-llfile@
-llorphan&
-llpipe@
-lorphan&
-lpipe@
-pipe|
-])
+AT_CHECK([tcsh -f -c 'set listlinks; cd DIR && ls-F'], [0], [stdout])
+TCSH_DIFF([${tests_dir}/ls-F-listlinks.out], [stdout])
 
 
 dnl
@@ -77,22 +49,8 @@ dnl listflags=x
 dnl Note: no changes from default when in in 1 column mode
 dnl
 
-AT_CHECK([tcsh -f -c 'set listflags=x; cd DIR && ls-F'], [0], [dnl
-dir/
-exec*
-file @&t@
-ldir@
-lexec@
-lfile@
-lldir@
-llexec@
-llfile@
-llorphan@
-llpipe@
-lorphan@
-lpipe@
-pipe|
-])
+AT_CHECK([tcsh -f -c 'set listflags=x; cd DIR && ls-F'], [0], [stdout])
+TCSH_DIFF([${tests_dir}/ls-F-listflags-x.out], [stdout])
 
 
 dnl
@@ -101,23 +59,8 @@ dnl Changes from default:
 dnl	.hidden
 dnl
 
-AT_CHECK([tcsh -f -c 'set listflags=A; cd DIR && ls-F'], [0], [dnl
-.hidden @&t@
-dir/
-exec*
-file @&t@
-ldir@
-lexec@
-lfile@
-lldir@
-llexec@
-llfile@
-llorphan@
-llpipe@
-lorphan@
-lpipe@
-pipe|
-])
+AT_CHECK([tcsh -f -c 'set listflags=A; cd DIR && ls-F'], [0], [stdout])
+TCSH_DIFF([${tests_dir}/ls-F-listflags-A.out], [stdout])
 
 
 dnl
@@ -128,24 +71,8 @@ dnl	./
 dnl	.hidden
 dnl
 
-AT_CHECK([tcsh -f -c 'set listflags=xa; cd DIR && ls-F'], [0], [dnl
-../
-./
-.hidden @&t@
-dir/
-exec*
-file @&t@
-ldir@
-lexec@
-lfile@
-lldir@
-llexec@
-llfile@
-llorphan@
-llpipe@
-lorphan@
-lpipe@
-pipe|
-])
+AT_CHECK([tcsh -f -c 'set listflags=xa; cd DIR && ls-F'], [0], [stdout])
+TCSH_DIFF([${tests_dir}/ls-F-listflags-xa.out], [stdout])
+
 
 AT_CLEANUP()

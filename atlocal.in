@@ -1,5 +1,10 @@
 # atlocal: local helpers for testsuite
 
+# path to tests directory
+#
+tests_dir="@abs_top_srcdir@/tests"
+
+
 #
 # create_ls_DIR():
 # 	Create directory "DIR" with entries:
