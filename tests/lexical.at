@@ -40,8 +40,6 @@ dnl
 AT_SETUP([Comments])
 AT_KEYWORDS([lexical])
 
-AT_CHECK([if [ ! -t 0 ]; then exit 77; fi],, [Skipping comment tests])
-
 AT_CHECK([echo 'echo OK@%:@comment' | tcsh -f], , [OK
 ])
 
