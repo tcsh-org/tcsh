@@ -1,0 +1,43 @@
+# atlocal: local helpers for testsuite
+
+#
+# create_ls_DIR():
+# 	Create directory "DIR" with entries:
+#
+#	-rw-r--r--.  .hidden
+#	drwxr-xr-x.  dir/
+#	-rwxr-xr-x.  exec*
+#	-rw-r--r--.  file
+#	lrwxrwxrwx.  ldir -> dir/
+#	lrwxrwxrwx.  lexec -> exec*
+#	lrwxrwxrwx.  lfile -> file
+#	lrwxrwxrwx.  lldir -> ldir@
+#	lrwxrwxrwx.  llexec -> lexec@
+#	lrwxrwxrwx.  llfile -> lfile@
+#	lrwxrwxrwx.  llorphan -> lorphan@
+#	lrwxrwxrwx.  llpipe -> lpipe@
+#	lrwxrwxrwx.  lorphan -> orphan&
+#	lrwxrwxrwx.  lpipe -> pipe|
+#	prw-r--r--.  pipe|
+#
+create_ls_DIR()
+{
+mkdir DIR
+(
+cd DIR
+mkdir dir
+touch file exec .hidden
+chmod a+x exec
+mkfifo pipe
+ln -s dir ldir
+ln -s exec lexec
+ln -s file lfile
+ln -s orphan lorphan
+ln -s pipe lpipe
+ln -s ldir lldir
+ln -s lexec llexec
+ln -s lfile llfile
+ln -s lorphan llorphan
+ln -s lpipe llpipe
+)
+}

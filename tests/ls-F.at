@@ -12,47 +12,7 @@ dnl
 AT_SETUP([ls-F])
 AT_KEYWORDS([commands])
 
-dnl
-dnl Create directory "DIR" with entries:
-dnl
-dnl	-rw-r--r--.  .hidden
-dnl	drwxr-xr-x.  dir/
-dnl	-rwxr-xr-x.  exec*
-dnl	-rw-r--r--.  file
-dnl	lrwxrwxrwx.  ldir -> dir/
-dnl	lrwxrwxrwx.  lexec -> exec*
-dnl	lrwxrwxrwx.  lfile -> file
-dnl	lrwxrwxrwx.  lldir -> ldir@
-dnl	lrwxrwxrwx.  llexec -> lexec@
-dnl	lrwxrwxrwx.  llfile -> lfile@
-dnl	lrwxrwxrwx.  llorphan -> lorphan@
-dnl	lrwxrwxrwx.  llpipe -> lpipe@
-dnl	lrwxrwxrwx.  lorphan -> orphan&
-dnl	lrwxrwxrwx.  lpipe -> pipe|
-dnl	prw-r--r--.  pipe|
-
-mkdir DIR
-(
-cd DIR
-
-mkdir dir
-touch file exec .hidden
-chmod a+x exec
-mkfifo pipe
-
-ln -s dir ldir
-ln -s exec lexec
-ln -s file lfile
-ln -s orphan lorphan
-ln -s pipe lpipe
-
-ln -s ldir lldir
-ln -s lexec llexec
-ln -s lfile llfile
-ln -s lorphan llorphan
-ln -s lpipe llpipe
-
-)
+AT_CHECK([create_ls_DIR])
 
 dnl
 dnl Disable CLICOLOR_FORCE, LSCOLORS, and LS_COLORS

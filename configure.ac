@@ -562,7 +562,14 @@ AC_SUBST(HESDEF)
 AC_SUBST(HESLIB)
 AC_SUBST(BUILD_CATALOGS)
 
-AC_CONFIG_FILES([Makefile dch-template nls/Makefile patchlevel.h tcsh.man])
+AC_CONFIG_FILES([
+    Makefile
+    atlocal
+    dch-template
+    nls/Makefile
+    patchlevel.h
+    tcsh.man
+])
 AC_OUTPUT()
 
 AC_MSG_NOTICE([========= Configuration results =========])

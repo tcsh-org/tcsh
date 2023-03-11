@@ -620,6 +620,8 @@ $(srcdir)/tests/testsuite: $(srcdir)/tests/package.m4 $(srcdir)/tests/testsuite.
 atconfig: config.status
 	$(SHELL) ./config.status ./atconfig
 
+atlocal: config.status
+	$(SHELL) ./config.status ./atlocal
 
 csh.prof: ${OBJS} sh.prof.${SUF} mcrt0.${SUF}
 	rm -f csh.prof
@@ -697,7 +699,7 @@ cleandir distclean veryclean: clean
 	${RM} -f Makefile config.h config_p.h dch-template nls/Makefile patchlevel.h tcsh.man
 	${RM} -f config.status config.cache config.log tcsh.html tcsh.ps
 	${RM} -f missing
-	${RM} -f atconfig testsuite.log
+	${RM} -f atconfig atlocal testsuite.log
 	${RM} -rf testsuite.dir
 	${RM} -rf autom4te.cache
 	${RM} -f *~ #*
@@ -719,7 +721,7 @@ $(srcdir)/stamp-h.in: $(srcdir)/configure.ac
 	cd $(srcdir) && autoheader
 	@echo timestamp > $(srcdir)/stamp-h.in
 
-check test: atconfig $(srcdir)/tests/testsuite
+check test: atconfig atlocal $(srcdir)/tests/testsuite
 	$(ENVCMD) - \
 		USER="$(USER)" \
 		$(SHELL) $(srcdir)/tests/testsuite $(TESTSUITEFLAGS)
