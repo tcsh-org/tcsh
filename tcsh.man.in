@@ -9525,42 +9525,42 @@ Directory writable to others, without sticky bit.
 .Pp
 The color code designators are as follows:
 .Pp
-.Bl -tag -width 4n -offset indent -compact
+.Bl -tag -width "Code" -offset indent -compact
 .It Sy Code
 .Sy Description
-.It Sy a
+.It Li a
 Black.
-.It Sy b
+.It Li b
 Red.
-.It Sy c
+.It Li c
 Green.
-.It Sy d
-Brown (dark yellow).
-.It Sy e
+.It Li d
+Yellow (or brown).
+.It Li e
 Blue.
-.It Sy f
+.It Li f
 Magenta.
-.It Sy g
+.It Li g
 Cyan.
-.It Sy h
+.It Li h
 Light grey.
-.It Sy A
+.It Li A
 Bold black, usually shows up as dark grey.
-.It Sy B
+.It Li B
 Bold red.
-.It Sy C
+.It Li C
 Bold green.
-.It Sy D
-Bold brown, usually shows up as yellow.
-.It Sy E
+.It Li D
+Bold yellow.
+.It Li E
 Bold blue.
-.It Sy F
+.It Li F
 Bold magenta.
-.It Sy G
+.It Li G
 Bold cyan.
-.It Sy H
+.It Li H
 Bold light grey; looks like bright white.
-.It Sy x
+.It Li x
 Default foreground or background.
 .El
 .Pp
@@ -9569,7 +9569,9 @@ The actual display may differ
 depending on the color capabilities of the terminal in use.
 .Pp
 The default colors are described in
-.Ev LS_COLORS .
+.Ev LS_COLORS ,
+and are not the same default as that used by some BSD versions of
+.Xr ls 1 .
 .
 .It Ev LS_COLORS
 One of two environment variables that may be used to
@@ -9616,28 +9618,27 @@ ISO 6429 color code or escape sequences, and file type:
 .
 .Bl -column -offset indent ".Sy Var" ".Sy Default" ""
 .
-.It Sy Var Ta Sy Default Ta Sy File type
-.Pp
+.It Sy Var Ta Sy Default Ta Sy File type. [Default foreground color]
 .
 .It Li no Ta Li 0 Ta Normal (non-filename) text.
 .
 .It Li fi Ta Li 0 Ta Regular file.
 .
-.It Li di Ta Li 01;34 Ta Directory.
+.It Li di Ta Li 01;34 Ta Directory. [Bold blue]
 .
-.It Li ln Ta Li 01;36 Ta Symbolic link.
+.It Li ln Ta Li 01;36 Ta Symbolic link. [Bold cyan]
 .
-.It Li pi Ta Li 33 Ta Named pipe (FIFO).
+.It Li pi Ta Li 33 Ta Named pipe (FIFO). [Yellow (or brown)]
 .
-.It Li so Ta Li 01;35 Ta Socket.
+.It Li so Ta Li 01;35 Ta Socket. [Bold magenta]
 .
-.It Li do Ta Li 01;35 Ta Door.
+.It Li do Ta Li 01;35 Ta Door. [Bold magenta]
 .
-.It Li bd Ta Li 01;33 Ta Block device.
+.It Li bd Ta Li 01;33 Ta Block device. [Bold yellow]
 .
-.It Li cd Ta Li 01;33 Ta Character device.
+.It Li cd Ta Li 01;33 Ta Character device. [Bold yellow]
 .
-.It Li ex Ta Li 01;32 Ta Executable file.
+.It Li ex Ta Li 01;32 Ta Executable file. [Bold green]
 .
 .It Li mi Ta (none) Ta Missing file (orphaned symbolic link target). Defaults to Li fi .
 .
