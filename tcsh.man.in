@@ -6163,7 +6163,8 @@ filetype or extension.
 See the
 .Ic color
 shell variable and the
-.Ev LSCOLORS
+.Ev CLICOLOR_FORCE ,
+.Ev LSCOLORS ,
 and
 .Ev LS_COLORS
 environment variables.
@@ -7433,15 +7434,23 @@ If set, it enables color display for the builtin
 and it passes
 .Fl \-color=auto
 to
-.Xr ls 1 .
+.Xr ls 1
+(or
+.Fl \-color=always
+if
+.Ev CLICOLOR_FORCE
+is set).
 Alternatively, it can be set to only
 .Ql ls\-F
 or only
 .Ql ls
-to enable color for only one command.
+to enable color for a specific command.
 Setting
 it to nothing is equivalent to setting it to
 .Ql (ls\-F ls) .
+Color is disabled if the output is not directed to a terminal, unless
+.Ev CLICOLOR_FORCE
+is set.
 .
 .It Ic colorcat
 If set, it enables color escape sequence for NLS message files,
@@ -9341,6 +9350,29 @@ Equivalent to the
 .Ic afsuser
 shell variable.
 .
+.It Ev CLICOLOR_FORCE
+Color sequences for
+.Ic ls\-F
+are normally disabled if the output is not directed to
+a terminal.
+This can be overridden by setting this variable,
+which also changes the
+.Ic ls\-F
+invocation of
+.Xr ls 1
+to use
+.Fl \-color=always
+instead of
+.Fl \-color=auto .
+.Pp
+Note that
+.Ic color
+must be set for this environment variable to be effective;
+by itself
+.Ev CLICOLOR_FORCE
+does not enable color
+.Ic ls\-F .
+.
 .It Ev COMMAND_LINE
 Set by
 .Nm
@@ -9653,7 +9685,7 @@ can be used to override the default interpretation of
 and
 .Ql = .
 .Pp
-Each file will be output to the terminal as
+Each filename will be output to the terminal as
 .Dl lc Ar color-code Li rc Ar filename Li ec
 .Pp
 If the

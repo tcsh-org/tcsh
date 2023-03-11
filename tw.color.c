@@ -166,7 +166,8 @@ static size_t nextensions = 0;
 static char *colors = NULL;
 int	     color_context_ls = FALSE;	/* do colored ls */
 static int   color_context_lsmF = FALSE; /* do colored ls-F */
-int 	     color_as_referent = FALSE; /* ln=target in LS_COLORS */
+static int   color_as_referent = FALSE;	/* ln=target in LS_COLORS */
+int	     color_force = FALSE;	/* allow colored ls without a tty */
 
 static int getstring (char **, const Char **, Str *, int);
 static void put_color (const Str *);
@@ -272,6 +273,16 @@ makecolor(char **c, int fg, int bg, Str *v)
     v->s = *c;
     v->len = l;
     *c += l + 1;
+}
+
+/* parseCLICOLOR_FORCE():
+ *	Parse the CLICOLOR_FORCE environment variable.
+ *	For compatibility with BSD ls(1), use the presence.
+ */
+void
+parseCLICOLOR_FORCE(const Char *value)
+{
+    color_force = (value != NULL);
 }
 
 /* parseLSCOLORS():
@@ -480,9 +491,9 @@ print_color(const Char *fname, size_t len, Char suffix)
 void
 print_with_color(const Char *filename, size_t len, Char suffix)
 {
-    if (color_context_lsmF &&
+    if (color_context_lsmF && (color_force ||
 	(haderr ? (didfds ? is2atty : isdiagatty) :
-	 (didfds ? is1atty : isoutatty))) {
+	 (didfds ? is1atty : isoutatty)))) {
 
 	if (suffix == '@' && color_as_referent) {
 	    char *f = short2str(filename);

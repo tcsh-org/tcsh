@@ -299,7 +299,11 @@ dolist(Char **v, struct command *c)
 	if (color_context_ls) {
 	    lastword = nextword;
 	    nextword = xcalloc(1, sizeof cmd);
-	    nextword->word = Strsave(STRmmcolormauto);
+	    if (color_force) {
+		nextword->word = Strsave(STRmmcolormalways);
+	    } else {
+		nextword->word = Strsave(STRmmcolormauto);
+	    }
 	    lastword->next = nextword;
 	    nextword->prev = lastword;
 	}

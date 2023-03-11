@@ -806,6 +806,8 @@ main(int argc, char **argv)
 #endif /* _OSD_POSIX */
 
 #ifdef COLOR_LS_F
+    if ((tcp = getenv("CLICOLOR_FORCE")) != NULL)
+	parseCLICOLOR_FORCE(str2short(tcp));
     if ((tcp = getenv("LSCOLORS")) != NULL)
 	parseLSCOLORS(str2short(tcp));
     if ((tcp = getenv("LS_COLORS")) != NULL)

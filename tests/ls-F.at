@@ -55,12 +55,10 @@ ln -s lpipe llpipe
 )
 
 dnl
-dnl Disable LSCOLORS and LS_COLORS
-dnl
-dnl Note: currently not required since print_with_colors()
-dnl ignores "set color" if !isatty(stdout).
+dnl Disable CLICOLOR_FORCE, LSCOLORS, and LS_COLORS
 dnl
 
+unset CLICOLOR_FORCE
 unset LSCOLORS
 unset LS_COLORS
 

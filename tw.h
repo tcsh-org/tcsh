@@ -103,6 +103,7 @@ extern int InsideCompletion;
 extern struct varent completions;
 
 extern int color_context_ls;
+extern int color_force;
 
 #include "tw.decls.h"
 

@@ -490,10 +490,13 @@ Char STRmCF[]		= { '-', 'C', 'F', '\0', '\0' };
 Char STRlsmF[]		= { 'l', 's', '-', 'F', '\0' };
 Char STRcolor[]		= { 'c', 'o', 'l', 'o', 'r', '\0' };
 #ifdef BSD_STYLE_COLORLS
+Char STRmmcolormalways[] = { '-', 'G', '\0' };
 Char STRmmcolormauto[]	= { '-', 'G', '\0' };
 #else
+Char STRmmcolormalways[] = { '-', '-', 'c', 'o', 'l', 'o', 'r', '=', 'a', 'l', 'w', 'a', 'y', 's', '\0' };
 Char STRmmcolormauto[]	= { '-', '-', 'c', 'o', 'l', 'o', 'r', '=', 'a', 'u', 't', 'o', '\0' };
 #endif /* BSD_STYLE_COLORLS */
+Char STRCLICOLOR_FORCE[] = { 'C', 'L', 'I', 'C', 'O', 'L', 'O', 'R', '_', 'F', 'O', 'R', 'C', 'E', '\0' };
 Char STRLS_COLORS[]	= { 'L', 'S', '_', 'C', 'O', 'L', 'O', 'R', 'S', '\0' };
 Char STRLSCOLORS[]	= { 'L', 'S', 'C', 'O', 'L', 'O', 'R', 'S', '\0' };
 #endif /* COLOR_LS_F */
