@@ -806,10 +806,10 @@ main(int argc, char **argv)
 #endif /* _OSD_POSIX */
 
 #ifdef COLOR_LS_F
-    if ((tcp = getenv("LS_COLORS")) != NULL)
-	parseLS_COLORS(str2short(tcp));
     if ((tcp = getenv("LSCOLORS")) != NULL)
 	parseLSCOLORS(str2short(tcp));
+    if ((tcp = getenv("LS_COLORS")) != NULL)
+	parseLS_COLORS(str2short(tcp));
 #endif /* COLOR_LS_F */
 
     mainpid = getpid();
