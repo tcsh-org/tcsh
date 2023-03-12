@@ -1,0 +1,15 @@
+[0m.hidden[0m 
+[31;48mdir[0m/
+[35;48mexec[0m*
+[0mfile[0m 
+[31;48mldir[0m>
+[32;48mlexec[0m@
+[32;48mlfile[0m@
+[31;48mlldir[0m>
+[32;48mllexec[0m@
+[32;48mllfile[0m@
+[mllorphan[0m&
+[32;48mllpipe[0m@
+[mlorphan[0m&
+[32;48mlpipe[0m@
+[34;48mpipe[0m|

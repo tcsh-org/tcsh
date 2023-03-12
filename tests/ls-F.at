@@ -22,14 +22,12 @@ unset CLICOLOR_FORCE
 unset LSCOLORS
 unset LS_COLORS
 
-
 dnl
 dnl ls-F with default behavior
 dnl
 
 AT_CHECK([tcsh -f -c 'cd DIR && ls-F'], [0], [stdout])
 TCSH_DIFF([${tests_dir}/ls-F-default.out], [stdout])
-
 
 dnl
 dnl listlinks.
@@ -43,7 +41,6 @@ dnl
 AT_CHECK([tcsh -f -c 'set listlinks; cd DIR && ls-F'], [0], [stdout])
 TCSH_DIFF([${tests_dir}/ls-F-listlinks.out], [stdout])
 
-
 dnl
 dnl listflags=x
 dnl Note: no changes from default when in in 1 column mode
@@ -51,7 +48,6 @@ dnl
 
 AT_CHECK([tcsh -f -c 'set listflags=x; cd DIR && ls-F'], [0], [stdout])
 TCSH_DIFF([${tests_dir}/ls-F-listflags-x.out], [stdout])
-
 
 dnl
 dnl listflags=A
@@ -61,7 +57,6 @@ dnl
 
 AT_CHECK([tcsh -f -c 'set listflags=A; cd DIR && ls-F'], [0], [stdout])
 TCSH_DIFF([${tests_dir}/ls-F-listflags-A.out], [stdout])
-
 
 dnl
 dnl listflags=xa
@@ -74,5 +69,53 @@ dnl
 AT_CHECK([tcsh -f -c 'set listflags=xa; cd DIR && ls-F'], [0], [stdout])
 TCSH_DIFF([${tests_dir}/ls-F-listflags-xa.out], [stdout])
 
+AT_CLEANUP()
+
+
+dnl
+dnl	ls-F color
+dnl
+
+AT_SETUP([ls-F color])
+AT_KEYWORDS([commands])
+
+AT_CHECK([create_ls_DIR])
+
+dnl
+dnl Enable CLICOLOR_FORCE
+dnl Disable LSCOLORS, and LS_COLORS
+dnl
+
+CLICOLOR_FORCE=
+export CLICOLOR_FORCE
+unset LSCOLORS
+unset LS_COLORS
+
+dnl
+dnl default colors
+dnl
+
+AT_CHECK([tcsh -f -c 'set color listflags=A listlinks; cd DIR && ls-F'], [0], [stdout])
+TCSH_DIFF([${tests_dir}/ls-F-color-default.out], [stdout])
+
+dnl
+dnl LSCOLORS: dim foreground colors,
+dnl except black for set*id and sticky are are not
+dnl currently supported and not expected.
+dnl
+
+AT_CHECK([LSCOLORS=bxcxdxexfxgxhxaxaxaxax tcsh -f -c 'set color listflags=A listlinks; cd DIR && ls-F'], [0], [stdout])
+TCSH_DIFF([${tests_dir}/ls-F-LSCOLORS-dim.out], [stdout])
+
+dnl
+dnl LSCOLORS: bright foreground colors,
+dnl except bright black (dark grey) for set*id and sticky are are not
+dnl currently supported and not expected.
+dnl
+dnl BUG: bright LSCOLORS don't currently work; they output as dim.
+dnl
+
+AT_CHECK([LSCOLORS=BxCxDxExFxGxHxAxAxAxAx tcsh -f -c 'set color listflags=A listlinks; cd DIR && ls-F'], [0], [stdout])
+TCSH_DIFF([${tests_dir}/ls-F-LSCOLORS-bright.out], [stdout])
 
 AT_CLEANUP()
