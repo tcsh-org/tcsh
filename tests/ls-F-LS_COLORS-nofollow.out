@@ -1,0 +1,15 @@
+{LC}{FI}{RC}.hidden{EC} 
+{LC}{DI}{RC}dir{EC}/
+{LC}{EX}{RC}exec{EC}*
+{LC}{FI}{RC}file{EC} 
+{LC}{LN}{RC}ldir{EC}@
+{LC}{LN}{RC}lexec{EC}@
+{LC}{LN}{RC}lfile{EC}@
+{LC}{LN}{RC}lldir{EC}@
+{LC}{LN}{RC}llexec{EC}@
+{LC}{LN}{RC}llfile{EC}@
+{LC}{LN}{RC}llorphan{EC}@
+{LC}{LN}{RC}llpipe{EC}@
+{LC}{LN}{RC}lorphan{EC}@
+{LC}{LN}{RC}lpipe{EC}@
+{LC}{PI}{RC}pipe{EC}|
