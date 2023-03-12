@@ -231,6 +231,7 @@ init(size_t colorlen, size_t extnum)
 {
     size_t i;
 
+    color_as_referent = FALSE;
     xfree(extensions);
     for (i = 0; i < nvariables; i++)
 	variables[i].color = variables[i].defaultcolor;

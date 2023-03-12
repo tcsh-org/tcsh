@@ -104,7 +104,7 @@ TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
 
 dnl
 dnl unsetenv CLICOLOR_FORCE
-dnl Should be same as ls-F-default.out, i.e., without color.
+dnl This should be same as ls-F-default.out, i.e., without color.
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-default.out],
     [set color; unsetenv CLICOLOR_FORCE])
@@ -174,6 +174,16 @@ TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-nolinks.out],
     [set color listflags=A],
     [LSCOLORS=BxCxDxExFxGxHxaxbxcxdx])
 
+dnl
+dnl As ls-F-LSCOLORS-bright.out above, with LS_COLORS=ln=target
+dnl in the environment.
+dnl This should disable ln=target with the LSCOLORS override,
+dnl and be same as ls-F-LSCOLORS-bright.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-bright.out],
+    [setenv LSCOLORS BxCxDxExFxGxHxaxbxcxdx; set color listflags=A listlinks],
+    [LS_COLORS=ln=target])
+
 AT_CLEANUP()
 
 
@@ -222,5 +232,20 @@ dnl
 TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-ln-target.out],
     [set color listflags=A listlinks],
     [LS_COLORS='di={DI}:ln={LN}:or={OR}:pi={PI}:so={SO}:do={DO}:bd={BD}:cd={CD}:ex={EX}:fi={FI}:no={NO}:mi={MI}:lc={LC}:rc={RC}:ec={EC}:su={SU}:sg={SG}:tw={TW}:ow={OW}:st={ST}:rs={RS}:hl={HL}:mh={MH}:ca={CA}:ln=target'])
+
+dnl
+dnl LS_COLORS with just ln=target.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-color-ln-target.out],
+    [set color listflags=A listlinks],
+    [LS_COLORS='ln=target'])
+
+dnl
+dnl LS_COLORS with just ln=target, then unsetenv LS_COLORS.
+dnl This should disable ln=target, and be same as ls-F-color-default.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
+    [unsetenv LS_COLORS; set color listflags=A listlinks],
+    [LS_COLORS='ln=target'])
 
 AT_CLEANUP()
