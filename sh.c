@@ -807,7 +807,7 @@ main(int argc, char **argv)
 
 #ifdef COLOR_LS_F
     if ((tcp = getenv("CLICOLOR_FORCE")) != NULL)
-	parseCLICOLOR_FORCE(str2short(tcp));
+	parseCLICOLOR_FORCE(TRUE, str2short(tcp));
     if ((tcp = getenv("LSCOLORS")) != NULL)
 	parseLSCOLORS(str2short(tcp));
     if ((tcp = getenv("LS_COLORS")) != NULL)

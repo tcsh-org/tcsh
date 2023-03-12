@@ -123,7 +123,7 @@ extern	 int		  tw_complete		(const Char *, Char **,
  */
 extern	 void		  set_color_context	(void);
 extern	 void		  print_with_color	(const Char *, size_t, Char);
-extern	 void		  parseCLICOLOR_FORCE	(const Char *);
+extern	 void		  parseCLICOLOR_FORCE	(int, const Char *);
 extern	 void		  parseLS_COLORS	(const Char *);
 extern	 void		  parseLSCOLORS		(const Char *);
 

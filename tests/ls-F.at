@@ -82,8 +82,8 @@ AT_KEYWORDS([commands])
 AT_CHECK([create_ls_DIR])
 
 dnl
-dnl Enable CLICOLOR_FORCE
-dnl Disable LSCOLORS, and LS_COLORS
+dnl Enable CLICOLOR_FORCE.
+dnl Disable LSCOLORS, and LS_COLORS.
 dnl
 
 CLICOLOR_FORCE=
@@ -92,7 +92,7 @@ unset LSCOLORS
 unset LS_COLORS
 
 dnl
-dnl default colors
+dnl Default colors, listflags=A, listlinks
 dnl
 
 AT_CHECK([tcsh -f -c 'set color listflags=A listlinks; cd DIR && ls-F'], [0], [stdout])
@@ -115,5 +115,13 @@ dnl
 
 AT_CHECK([LSCOLORS=BxCxDxExFxGxHxAxAxAxAx tcsh -f -c 'set color listflags=A listlinks; cd DIR && ls-F'], [0], [stdout])
 TCSH_DIFF([${tests_dir}/ls-F-LSCOLORS-bright.out], [stdout])
+
+dnl
+dnl unsetenv CLICOLOR_FORCE
+dnl Should be same as default ls-F without color.
+dnl
+
+AT_CHECK([tcsh -f -c 'set color; unsetenv CLICOLOR_FORCE; cd DIR && ls-F'], [0], [stdout])
+TCSH_DIFF([${tests_dir}/ls-F-default.out], [stdout])
 
 AT_CLEANUP()

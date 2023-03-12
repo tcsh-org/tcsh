@@ -282,9 +282,9 @@ makecolor(char **c, int fg, int bg, Str *v)
  *	For compatibility with BSD ls(1), use the presence.
  */
 void
-parseCLICOLOR_FORCE(const Char *value)
+parseCLICOLOR_FORCE(int is_setenv, const Char *value)
 {
-    color_force = (value != NULL);
+    color_force = is_setenv;
 }
 
 /* parseLSCOLORS():
