@@ -212,4 +212,14 @@ TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-nofollow.out],
     [set color listflags=A],
     [LS_COLORS='di={DI}:ln={LN}:or={OR}:pi={PI}:so={SO}:do={DO}:bd={BD}:cd={CD}:ex={EX}:fi={FI}:no={NO}:mi={MI}:lc={LC}:rc={RC}:ec={EC}:su={SU}:sg={SG}:tw={TW}:ow={OW}:st={ST}:rs={RS}:hl={HL}:mh={MH}:ca={CA}'])
 
+dnl
+dnl LS_COLORS with all variables overridden and ln=target
+dnl listflags=A, listlinks
+dnl
+dnl BUG: this currently fails because ln=target doesn't work for ls-F DIR.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-ln-target.out],
+    [set color listflags=A listlinks],
+    [LS_COLORS='di={DI}:ln={LN}:or={OR}:pi={PI}:so={SO}:do={DO}:bd={BD}:cd={CD}:ex={EX}:fi={FI}:no={NO}:mi={MI}:lc={LC}:rc={RC}:ec={EC}:su={SU}:sg={SG}:tw={TW}:ow={OW}:st={ST}:rs={RS}:hl={HL}:mh={MH}:ca={CA}:ln=target'])
+
 AT_CLEANUP()
