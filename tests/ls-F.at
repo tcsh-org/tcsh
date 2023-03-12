@@ -112,8 +112,6 @@ dnl LSCOLORS: bright foreground colors,
 dnl except bright black (dark grey) for set*id and sticky are are not
 dnl currently supported and not expected.
 dnl
-dnl BUG: bright LSCOLORS don't currently work; they output as dim.
-dnl
 
 AT_CHECK([LSCOLORS=BxCxDxExFxGxHxAxAxAxAx tcsh -f -c 'set color listflags=A listlinks; cd DIR && ls-F'], [0], [stdout])
 TCSH_DIFF([${tests_dir}/ls-F-LSCOLORS-bright.out], [stdout])
