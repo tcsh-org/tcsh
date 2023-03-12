@@ -6159,7 +6159,7 @@ generally does the right thing.
 The
 .Ic ls\-F
 builtin can list files using different colors depending on the
-filetype or extension.
+file type or extension.
 See the
 .Ic color
 shell variable and the
