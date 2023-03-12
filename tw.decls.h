@@ -48,7 +48,7 @@ extern	 int		  t_search		(struct Strbuf *, COMMAND, int,
 #endif
 extern	 int		  starting_a_command	(Char *, Char *);
 extern	 int		  fcompare		(const void *, const void *);
-extern	 void		  print_by_column	(Char *, Char *[], int, int);
+extern	 void		  print_by_column	(const Char *, Char *[], int, int);
 extern	 int		  StrQcmp		(const Char *, const Char *);
 extern	 Char		 *tgetenv		(Char *);
 
@@ -122,12 +122,12 @@ extern	 int		  tw_complete		(const Char *, Char **,
  * tw.color.c
  */
 extern	 void		  set_color_context	(void);
-extern	 void		  print_with_color	(const Char *, size_t, Char);
+extern	 void		  print_with_color	(const Char *, const Char *, size_t, Char);
 extern	 void		  parseCLICOLOR_FORCE	(int, const Char *);
 extern	 void		  parseLS_COLORS	(const Char *);
 extern	 void		  parseLSCOLORS		(const Char *);
 
-extern Char filetype				(const Char *, const Char *);
+extern Char filetype				(const Char *, const Char *, int);
 #endif /* COLOR_LS_F */
 
 #endif /* _h_tw_decls */

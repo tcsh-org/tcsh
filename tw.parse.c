@@ -122,7 +122,7 @@ static  int      tw_collect		(COMMAND, int, struct Strbuf *,
 static	Char 	 tw_suffix		(int, struct Strbuf *,const Char *,
 					 Char *);
 static	void 	 tw_fixword		(int, struct Strbuf *, Char *, Char *);
-static	void	 tw_list_items		(int, int, int);
+static	void	 tw_list_items		(const Char *, int, int, int);
 static 	void	 add_scroll_tab		(Char *);
 static 	void 	 choose_scroll_tab	(struct Strbuf *, int);
 static	void	 free_scroll_tab	(void);
@@ -1135,13 +1135,13 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 		case TW_COMMAND:
 		    if (!(dir_ok && exec_check))
 			break;
-		    if (filetype(exp_dir->s, item.s) == '/')
+		    if (filetype(exp_dir->s, item.s, TRUE) == '/')
 			Strbuf_append1(&buf, '/');
 		    break;
 
 		case TW_FILE:
 		case TW_DIRECTORY:
-		    Strbuf_append1(&buf, filetype(exp_dir->s, item.s));
+		    Strbuf_append1(&buf, filetype(exp_dir->s, item.s, TRUE));
 		    break;
 
 		default:
@@ -1399,7 +1399,7 @@ tw_collect(COMMAND command, int looking, struct Strbuf *exp_dir,
  *	(by default interpreted as 'items', for backwards compatibility)
  */
 static void
-tw_list_items(int looking, int numitems, int list_max)
+tw_list_items(const Char * dir, int looking, int numitems, int list_max)
 {
     Char *ptr;
     int max_items = 0;
@@ -1477,7 +1477,7 @@ tw_list_items(int looking, int numitems, int list_max)
     if (looking != TW_SIGNAL)
 	qsort(tw_item_get(), numitems, sizeof(Char *), fcompare);
     if (looking != TW_JOB)
-	print_by_column(STRNULL, tw_item_get(), numitems, TRUE);
+	print_by_column(dir, tw_item_get(), numitems, TRUE);
     else {
 	/*
 	 * print one item on every line because jobs can have spaces
@@ -1805,7 +1805,7 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 	break;
 
     case LIST:
-	tw_list_items(looking, numitems, list_max);
+	tw_list_items(exp_dir.s, looking, numitems, list_max);
 	tw_item_free();
 	break;
 
@@ -2014,7 +2014,7 @@ nostat(const Char *dir)
  *	symbology from 4.3 ls command.
  */
 Char
-filetype(const Char *dir, const Char *file)
+filetype(const Char *dir, const Char *file, int use_lstat)
 {
     Char *path;
     char   *ptr;
@@ -2027,8 +2027,13 @@ filetype(const Char *dir, const Char *file)
     ptr = short2str(path);
     xfree(path);
 
-    if (lstat(ptr, &statb) == -1)
-	goto out;
+    if (use_lstat) {
+	if (lstat(ptr, &statb) == -1)
+	    goto out;
+    } else {
+	if (stat(ptr, &statb) == -1)
+	    goto out;
+    }
 
 #ifdef S_ISLNK
     if (S_ISLNK(statb.st_mode)) {	/* Symbolic link */
@@ -2154,7 +2159,7 @@ find_rows(Char *items[], int count, int no_file_suffix)
  *
  */
 void
-print_by_column(Char *dir, Char *items[], int count, int no_file_suffix)
+print_by_column(const Char *dir, Char *items[], int count, int no_file_suffix)
 {
     int i, r, c, columns, rows;
     size_t w;
@@ -2192,12 +2197,13 @@ print_by_column(Char *dir, Char *items[], int count, int no_file_suffix)
 		    /* Print the command name */
 		    Char f = items[i][w - 1];
 		    items[i][w - 1] = 0;
-		    print_with_color(items[i], w - 1, f);
+		    print_with_color(dir, items[i], w - 1, f);
 		    items[i][w - 1] = f;
 		}
 		else {
 		    /* Print filename followed by '/' or '*' or ' ' */
-		    print_with_color(items[i], w, filetype(dir, items[i]));
+		    print_with_color(dir, items[i], w,
+			filetype(dir, items[i], TRUE));
 		    wx++;
 		}
 #else /* ifndef COLOR_LS_F */
@@ -2208,7 +2214,7 @@ print_by_column(Char *dir, Char *items[], int count, int no_file_suffix)
 		else {
 		    /* Print filename followed by '/' or '*' or ' ' */
 		    xprintf("%-" TCSH_S "%c", items[i],
-			filetype(dir, items[i]));
+			filetype(dir, items[i]), TRUE);
 		    wx++;
 		}
 #endif /* COLOR_LS_F */

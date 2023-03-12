@@ -491,29 +491,14 @@ print_color(const Char *fname, size_t len, Char suffix)
 /* print_with_color():
  */
 void
-print_with_color(const Char *filename, size_t len, Char suffix)
+print_with_color(const Char *dir, const Char *filename, size_t len, Char suffix)
 {
     if (color_context_lsmF && (color_force ||
 	(haderr ? (didfds ? is2atty : isdiagatty) :
 	 (didfds ? is1atty : isoutatty)))) {
 
 	if (suffix == '@' && color_as_referent) {
-	    char *f = short2str(filename);
-	    Char c = suffix;
-	    char buf[MAXPATHLEN + 1];
-
-	    while (c == '@') {
-		ssize_t b = readlink(f, buf, MAXPATHLEN);
-		if (b == -1) {
-		    c = '&';
-		    break;
-		}
-		buf[b] = '\0';
-
-		c = filetype(STRNULL, str2short(buf));
-		f = buf;
-	    }
-
+	    Char c = filetype(dir, filename, FALSE);
 	    print_color(filename, len, c);
 	} else
 	    print_color(filename, len, suffix);

@@ -216,7 +216,8 @@ dnl
 dnl LS_COLORS with all variables overridden and ln=target
 dnl listflags=A, listlinks
 dnl
-dnl BUG: this currently fails because ln=target doesn't work for ls-F DIR.
+dnl Changes from ls-F-LS_COLORS-all.out: files have their
+dnl color based on the link target but retain the @ suffix.
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-ln-target.out],
     [set color listflags=A listlinks],
