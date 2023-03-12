@@ -1,3 +1,9 @@
+ 23. Reset ln=target on unsetenv LS_COLORS or setenv LSCOLORS (Luke Mewburn)
+ 22. Fix LS_COLORS ln=target for ls-F directory (Luke Mewburn)
+ 21. Fix LSCOLORS bold/bright color support (Luke Mewburn)
+ 20. Implement CLICOLOR_FORCE (Luke Mewburn)
+ 19. On startup, use LS_COLORS in preference to LSCOLORS (Luke Mewburn)
+ 18. Improve color ls-F documentation (Luke Mewburn)
  17. V6.24.07 - 2022-12-21
  16. V6.24.06 - 2022-12-12
  15. V6.24.05 - 2022-12-04
