@@ -91,15 +91,15 @@ static Variable variables[] = {
 #endif
     VAR(Vrc, CV_NONE,	"rc", "m"),	/* Right code */
     VAR(Vec, CV_NONE,	"ec", ""),	/* End code (replaces lc+no+rc) */
-    VAR(Vsu, CV_NONE,	"su", ""),	/* Setuid file (u+s) */
-    VAR(Vsg, CV_NONE,	"sg", ""),	/* Setgid file (g+s) */
-    VAR(Vtw, CV_NONE,	"tw", ""),	/* Sticky and other writable dir (+t,o+w) */
-    VAR(Vow, CV_NONE,	"ow", ""),	/* Other writable dir (o+w) but not sticky */
-    VAR(Vst, CV_NONE,	"st", ""),	/* Sticky dir (+t) but not other writable */
+    VAR(Vsu, CV_SUID,	"su", "37;41"),	/* Setuid file (u+s) */
+    VAR(Vsg, CV_SGID,	"sg", "30;43"),	/* Setgid file (g+s) */
+    VAR(Vtw, CV_DIR_TW,	"tw", "30;42"),	/* Sticky and other writable dir (+t,o+w) */
+    VAR(Vow, CV_DIR_OW,	"ow", "34;42"),	/* Other writable dir (o+w) but not sticky */
+    VAR(Vst, CV_DIR_ST,	"st", "37;44"),	/* Sticky dir (+t) but not other writable */
     VAR(Vrs, CV_NONE,	"rs", "0"),	/* Reset to normal color */
-    VAR(Vhl, CV_NONE,	"hl", ""),	/* Reg file extra hard links. Obsolete, use mh */
-    VAR(Vmh, CV_NONE,	"mh", "44;37"),	/* Reg file extra hard links */
-    VAR(Vca, CV_NONE,	"ca", "30;41"),	/* File with capability */
+    VAR(Vhl, CV_NONE,	"hl", ""),	/* Obsolete, use mh */
+    VAR(Vmh, CV_HARD,	"mh", ""),	/* Regular file with multiple hard links */
+    VAR(Vca, CV_NONE,	"ca", ""),	/* File with capability. Not implemented. */
 };
 
 #define nvariables (sizeof(variables)/sizeof(variables[0]))
@@ -505,7 +505,8 @@ print_with_color(const Char *dir, const Char *filename, size_t len,
 	(haderr ? (didfds ? is2atty : isdiagatty) :
 	 (didfds ? is1atty : isoutatty)))) {
 
-	if (filetype.colorvar == CV_LNK && color_as_referent) {
+	if (color_as_referent &&
+	    (filetype.colorvar == CV_LNK || filetype.colorvar == CV_LNK_DIR)) {
 	    struct filetype ft = get_filetype(dir, filename, FALSE);
 	    print_color(filename, len, ft.colorvar);
 	} else

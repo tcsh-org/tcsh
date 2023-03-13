@@ -2094,11 +2094,29 @@ get_filetype(const Char *dir, const Char *file, int use_lstat)
 	RETURN_FILETYPE('#', CV_BLK);
 #endif
 #ifdef S_ISDIR
-    if (S_ISDIR(statb.st_mode))	/* normal Directory */
-	RETURN_FILETYPE('/', CV_DIR);
+    if (S_ISDIR(statb.st_mode)) {
+	if ((statb.st_mode & S_ISVTX) && (statb.st_mode & S_IWOTH))
+	    RETURN_FILETYPE('/', CV_DIR_TW);	/* +t o+w directory */
+	if (statb.st_mode & S_IWOTH)
+	    RETURN_FILETYPE('/', CV_DIR_OW);	/* o+w directory */
+	if (statb.st_mode & S_ISVTX)
+	    RETURN_FILETYPE('/', CV_DIR_ST);	/* +t directory */
+	RETURN_FILETYPE('/', CV_DIR);		/* normal directory */
+    }
 #endif
-    if (statb.st_mode & (S_IXUSR|S_IXGRP|S_IXOTH))
-	RETURN_FILETYPE('*', CV_EXE);
+    if (S_ISREG(statb.st_mode)) {
+	const int isexec = statb.st_mode & (S_IXUSR|S_IXGRP|S_IXOTH);
+	const Char suf = isexec ? '*' : ' ';
+	if (statb.st_mode & S_ISUID)
+	    RETURN_FILETYPE(suf, CV_SUID);	/* setuid */
+	if (statb.st_mode & S_ISGID)
+	    RETURN_FILETYPE(suf, CV_SGID);	/* setgid */
+	if (isexec)
+	    RETURN_FILETYPE('*', CV_EXE);
+	if (statb.st_nlink > 1)
+	    RETURN_FILETYPE(' ', CV_HARD);
+	RETURN_FILETYPE(' ', CV_FILE);
+    }
 out:
     RETURN_FILETYPE(' ', CV_FILE);
 

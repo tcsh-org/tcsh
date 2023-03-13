@@ -107,6 +107,12 @@ typedef enum {
     CV_CDF,		/*  +	Context Dependent Files (HP/UX) */
     CV_NWK,		/*  :	Network Special (HP/UX) */
     CV_DOOR,		/*  >	Door (Solaris IPC) */
+    CV_SUID,		/*	Setuid file (u+s) */
+    CV_SGID,		/*	Setgid file (g+s) */
+    CV_DIR_TW,		/*	Sticky and other writable dir (+t,o+w) */
+    CV_DIR_OW,		/*	Other writable dir (o+w) but not sticky */
+    CV_DIR_ST,		/*	Sticky dir (+t) but not other writable */
+    CV_HARD,		/*	Reg file extra hard links */
 } COLORVAR;
 
 #endif /* COLOR_LS_F */

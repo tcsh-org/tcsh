@@ -9507,20 +9507,12 @@ Block device
 Character device.
 .It
 Executable with setuid bit set.
-(Not yet implemented in
-.Nm ) .
 .It
 Executable with setgid bit set.
-(Not yet implemented in
-.Nm ) .
 .It
 Directory writable to others, with sticky bit.
-(Not yet implemented in
-.Nm ) .
 .It
 Directory writable to others, without sticky bit.
-(Not yet implemented in
-.Nm ) .
 .El
 .Pp
 The color code designators are as follows:
@@ -9649,6 +9641,18 @@ ISO 6429 color code or escape sequences, and file type:
 .It Li rc Ta Li m Ta Right code.
 .
 .It Li ec Ta (none) Ta End code. Replaces Li lc Ns + Ns Li no Ns + Ns Li rc .
+.
+.It Li su Ta Li 37;41 Ta Setuid file. [White on red]
+.
+.It Li sg Ta Li 30;43 Ta Setuid file. [Black on yellow]
+.
+.It Li tw Ta Li 30;42 Ta Sticky and other writable directory. [Black on green]
+.
+.It Li ow Ta Li 34;42 Ta Other writable but not sticky directory. [Blue on green]
+.
+.It Li st Ta Li 37;44 Ta Sticky but not other writable directory. [White on blue]
+.
+.It Li mh Ta (none) Ta File with multiple hard links.
 .
 .El
 .Pp

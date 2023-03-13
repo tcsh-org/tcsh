@@ -7,42 +7,67 @@ tests_dir="@abs_top_srcdir@/tests"
 
 #
 # create_ls_DIR():
-# 	Create directory "DIR" with entries:
+#	Create directory "DIR" with entries:
 #
-#	-rw-r--r--.  .hidden
-#	drwxr-xr-x.  dir/
-#	-rwxr-xr-x.  exec*
-#	-rw-r--r--.  file
-#	lrwxrwxrwx.  ldir -> dir/
-#	lrwxrwxrwx.  lexec -> exec*
-#	lrwxrwxrwx.  lfile -> file
-#	lrwxrwxrwx.  lldir -> ldir@
-#	lrwxrwxrwx.  llexec -> lexec@
-#	lrwxrwxrwx.  llfile -> lfile@
-#	lrwxrwxrwx.  llorphan -> lorphan@
-#	lrwxrwxrwx.  llpipe -> lpipe@
-#	lrwxrwxrwx.  lorphan -> orphan&
-#	lrwxrwxrwx.  lpipe -> pipe|
-#	prw-r--r--.  pipe|
+#	drwxr-xr-x  dir/
+#	drwxr-xrwx  dir-ow/
+#	drwxr-xr-t  dir-st/
+#	drwxr-xrwt  dir-tw/
+#	-rwxr-xr-x  exec*
+#	-rw-r--r--  file
+#	lrwxrwxrwx  ldir -> dir/
+#	lrwxrwxrwx  ldir-ow -> dir-ow/
+#	lrwxrwxrwx  ldir-st -> dir-st/
+#	lrwxrwxrwx  ldir-tw -> dir-tw/
+#	lrwxrwxrwx  lexec -> exec*
+#	lrwxrwxrwx  lfile -> file
+#	-rw-r--r--  link1
+#	-rw-r--r--  link2
+#	lrwxrwxrwx  lldir -> ldir/
+#	lrwxrwxrwx  lldir-ow -> ldir-ow/
+#	lrwxrwxrwx  lldir-st -> ldir-st/
+#	lrwxrwxrwx  lldir-tw -> ldir-tw/
+#	lrwxrwxrwx  llexec -> lexec*
+#	lrwxrwxrwx  llfile -> lfile
+#	lrwxrwxrwx  llorphan -> lorphan
+#	lrwxrwxrwx  llpipe -> lpipe|
+#	lrwxrwxrwx  lorphan -> orphan
+#	lrwxrwxrwx  lpipe -> pipe|
+#	prw-r--r--  pipe|
 #
 create_ls_DIR()
 {
-mkdir DIR
-(
-cd DIR
-mkdir dir
-touch file exec .hidden
-chmod a+x exec
-mkfifo pipe
-ln -s dir ldir
-ln -s exec lexec
-ln -s file lfile
-ln -s orphan lorphan
-ln -s pipe lpipe
-ln -s ldir lldir
-ln -s lexec llexec
-ln -s lfile llfile
-ln -s lorphan llorphan
-ln -s lpipe llpipe
-)
+	mkdir DIR
+	(
+	cd DIR
+	mkdir dir
+	mkdir dir-ow dir-st dir-tw
+	chmod o+w dir-ow
+	chmod +t,o-w dir-st
+	chmod +t,o+w dir-tw
+
+	touch file exec .hidden
+	chmod a+x exec
+	touch link1
+	ln link1 link2
+	mkfifo pipe
+
+	ln -s dir ldir
+	ln -s dir-ow ldir-ow
+	ln -s dir-st ldir-st
+	ln -s dir-tw ldir-tw
+	ln -s exec lexec
+	ln -s file lfile
+	ln -s orphan lorphan
+	ln -s pipe lpipe
+
+	ln -s ldir lldir
+	ln -s ldir-ow lldir-ow
+	ln -s ldir-st lldir-st
+	ln -s ldir-tw lldir-tw
+	ln -s lexec llexec
+	ln -s lfile llfile
+	ln -s lorphan llorphan
+	ln -s lpipe llpipe
+	)
 }
