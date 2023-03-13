@@ -620,8 +620,8 @@ $(srcdir)/tests/testsuite: $(srcdir)/tests/package.m4 $(srcdir)/tests/testsuite.
 atconfig: config.status
 	$(SHELL) ./config.status ./atconfig
 
-atlocal: config.status
-	$(SHELL) ./config.status ./atlocal
+atlocal: config.status $(srcdir)/atlocal.in
+	$(SHELL) ./config.status atlocal
 
 csh.prof: ${OBJS} sh.prof.${SUF} mcrt0.${SUF}
 	rm -f csh.prof
