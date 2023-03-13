@@ -1,3 +1,4 @@
+ 23. Support LS_COLORS su,sg,tw,ow,st,mh variables. (Luke Mewburn)
  22. Fixes for LS_COLORS ln=target: ls-F directory; reset on unsetenv;
      intermittent parse bug; only support lower-case "target". (Luke Mewburn)
  21. Fix LSCOLORS bold/bright color support, add to manual (Luke Mewburn)
