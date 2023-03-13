@@ -1,6 +1,6 @@
- 23. Reset ln=target on unsetenv LS_COLORS or setenv LSCOLORS (Luke Mewburn)
- 22. Fix LS_COLORS ln=target for ls-F directory (Luke Mewburn)
- 21. Fix LSCOLORS bold/bright color support (Luke Mewburn)
+ 22. Fixes for LS_COLORS ln=target: ls-F directory; reset on unsetenv;
+     intermittent parse bug; only support lower-case "target". (Luke Mewburn)
+ 21. Fix LSCOLORS bold/bright color support, add to manual (Luke Mewburn)
  20. Implement CLICOLOR_FORCE (Luke Mewburn)
  19. On startup, use LS_COLORS in preference to LSCOLORS (Luke Mewburn)
  18. Improve color ls-F documentation (Luke Mewburn)
