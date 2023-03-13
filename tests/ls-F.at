@@ -103,7 +103,7 @@ TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
     [set color listflags=A listlinks])
 
 dnl
-dnl unsetenv CLICOLOR_FORCE
+dnl unsetenv CLICOLOR_FORCE in tcsh
 dnl This should be same as ls-F-default.out, i.e., without color.
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-default.out],
@@ -137,7 +137,7 @@ TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-dim.out],
     [LSCOLORS=bxcxdxexfxgxhxAxBxCxDx])
 
 dnl
-dnl As ls-F-LSCOLORS-dim.out above, but setenv LSCOLORS inside tcsh.
+dnl As ls-F-LSCOLORS-dim.out above, but setenv LSCOLORS in tcsh.
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-dim.out],
     [set color listflags=A listlinks; setenv LSCOLORS "bxcxdxexfxgxhxAxBxCxDx"])
@@ -156,7 +156,7 @@ TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-bright.out],
     [LSCOLORS=BxCxDxExFxGxHxaxbxcxdx])
 
 dnl
-dnl As ls-F-LSCOLORS-bright.out above, but setenv LSCOLORS inside tcsh.
+dnl As ls-F-LSCOLORS-bright.out above, but setenv LSCOLORS in tcsh.
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-bright.out],
     [setenv LSCOLORS BxCxDxExFxGxHxaxbxcxdx; set color listflags=A listlinks])
@@ -175,8 +175,8 @@ TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-nolinks.out],
     [LSCOLORS=BxCxDxExFxGxHxaxbxcxdx])
 
 dnl
-dnl As ls-F-LSCOLORS-bright.out above, with LS_COLORS=ln=target
-dnl in the environment.
+dnl As ls-F-LSCOLORS-bright.out above, with LS_COLORS=ln=target,
+dnl then setenv LSCOLORS override in tcsh.
 dnl This should disable ln=target with the LSCOLORS override,
 dnl and be same as ls-F-LSCOLORS-bright.out.
 dnl
@@ -201,16 +201,20 @@ export CLICOLOR_FORCE
 unset LSCOLORS
 unset LS_COLORS
 
+dnl LS_COLORS value with all variables set to "vv={VV}" for debugging.
 dnl
-dnl LS_COLORS with all variables overridden.
+m4_pushdef([TCSH_TEXT_LS_COLORS], [di={DI}:ln={LN}:or={OR}:pi={PI}:so={SO}:do={DO}:bd={BD}:cd={CD}:ex={EX}:fi={FI}:no={NO}:mi={MI}:lc={LC}:rc={RC}:ec={EC}:su={SU}:sg={SG}:tw={TW}:ow={OW}:st={ST}:rs={RS}:hl={HL}:mh={MH}:ca={CA}])
+
+dnl
+dnl LS_COLORS as TCSH_TEXT_LS_COLORS.
 dnl listflags=A, listlinks
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-all.out],
     [set color listflags=A listlinks],
-    [LS_COLORS='di={DI}:ln={LN}:or={OR}:pi={PI}:so={SO}:do={DO}:bd={BD}:cd={CD}:ex={EX}:fi={FI}:no={NO}:mi={MI}:lc={LC}:rc={RC}:ec={EC}:su={SU}:sg={SG}:tw={TW}:ow={OW}:st={ST}:rs={RS}:hl={HL}:mh={MH}:ca={CA}'])
+    [LS_COLORS="TCSH_TEXT_LS_COLORS"])
 
 dnl
-dnl LS_COLORS without set listlinks.
+dnl LS_COLORS as TCSH_TEXT_LS_COLORS without set listlinks.
 dnl
 dnl Changes from ls-F-LS_COLORS-all.out:
 dnl     {LC}{LN}{RC}ldir{EC}@
@@ -220,10 +224,10 @@ dnl     {LC}{LN}{RC}lorphan{EC}@
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-nofollow.out],
     [set color listflags=A],
-    [LS_COLORS='di={DI}:ln={LN}:or={OR}:pi={PI}:so={SO}:do={DO}:bd={BD}:cd={CD}:ex={EX}:fi={FI}:no={NO}:mi={MI}:lc={LC}:rc={RC}:ec={EC}:su={SU}:sg={SG}:tw={TW}:ow={OW}:st={ST}:rs={RS}:hl={HL}:mh={MH}:ca={CA}'])
+    [LS_COLORS="TCSH_TEXT_LS_COLORS"])
 
 dnl
-dnl LS_COLORS with all variables overridden and ln=target
+dnl LS_COLORS as TCSH_TEXT_LS_COLORS:ln=target
 dnl listflags=A, listlinks
 dnl
 dnl Changes from ls-F-LS_COLORS-all.out: files have their
@@ -231,14 +235,25 @@ dnl color based on the link target but retain the @ suffix.
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-ln-target.out],
     [set color listflags=A listlinks],
-    [LS_COLORS='di={DI}:ln={LN}:or={OR}:pi={PI}:so={SO}:do={DO}:bd={BD}:cd={CD}:ex={EX}:fi={FI}:no={NO}:mi={MI}:lc={LC}:rc={RC}:ec={EC}:su={SU}:sg={SG}:tw={TW}:ow={OW}:st={ST}:rs={RS}:hl={HL}:mh={MH}:ca={CA}:ln=target'])
+    [LS_COLORS="TCSH_TEXT_LS_COLORS:ln=target"])
 
 dnl
 dnl LS_COLORS with just ln=target.
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-color-ln-target.out],
     [set color listflags=A listlinks],
-    [LS_COLORS='ln=target'])
+    [LS_COLORS="ln=target"])
+
+dnl
+dnl LS_COLORS as TCSH_TEXT_LS_COLORS:ln=target, then setenv without ln=target.
+dnl then setenv LS_COLORS ln=target:TCSH_TEXT_LS_COLORS
+dnl listflags=A, listlinks
+dnl
+dnl This should disable ln=target, and be same as ls-F-LS_COLORS-all.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-all.out],
+    [set color listflags=A listlinks;setenv LS_COLORS "ln=target:TCSH_TEXT_LS_COLORS"],
+    [LS_COLORS="TCSH_TEXT_LS_COLORS:ln=target"])
 
 dnl
 dnl LS_COLORS with just ln=target, then unsetenv LS_COLORS.
@@ -246,6 +261,8 @@ dnl This should disable ln=target, and be same as ls-F-color-default.out.
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
     [unsetenv LS_COLORS; set color listflags=A listlinks],
-    [LS_COLORS='ln=target'])
+    [LS_COLORS="ln=target"])
+
+m4_popdef([TCSH_TEXT_LS_COLORS])
 
 AT_CLEANUP()

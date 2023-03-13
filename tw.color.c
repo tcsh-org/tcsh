@@ -173,6 +173,18 @@ static int getstring (char **, const Char **, Str *, int);
 static void put_color (const Str *);
 static void print_color (const Char *, size_t, Char);
 
+/* Str_equal_literal():
+ *	Does a Str equal a literal string?
+ */
+int
+Str_equal_literal(const Str * left, const char * right)
+{
+    const size_t rlen = strlen(right);
+    if (left->len != rlen)
+	return FALSE;
+    return strncmp(left->s, right, rlen) == 0;
+}
+
 /* set_color_context():
  */
 void
@@ -407,8 +419,8 @@ parseLS_COLORS(const Char *value)
 			v += 3;
 			getstring(&c, &v, &variables[i].color, ':');
 			if (i == VSym)
-			    color_as_referent = strcasecmp(
-				variables[VSym].color.s, "target") == 0;
+			    color_as_referent = Str_equal_literal(
+				&variables[VSym].color, "target");
 			continue;
 		    }
 		    else
