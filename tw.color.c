@@ -34,6 +34,8 @@
 #include "ed.h"
 #include "tc.h"
 
+#include <assert.h>
+
 #ifdef COLOR_LS_F
 
 typedef struct {
@@ -42,84 +44,82 @@ typedef struct {
 } Str;
 
 
-#define VAR(suffix,variable,defaultcolor) \
+#define VAR(varindex,colorvar,variable,defaultcolor) \
 { \
-    suffix, variable, { defaultcolor, sizeof(defaultcolor) - 1 }, \
+    varindex, colorvar, variable, { defaultcolor, sizeof(defaultcolor) - 1 }, \
       { defaultcolor, sizeof(defaultcolor) - 1 } \
 }
-#define NOS '\0' /* no suffix */
+
+/* VARINDEX. LS_COLORS color variable.
+ * Used as index to variables[].
+ */
+typedef enum {
+    Vdi, Vln, Vor, Vpi, Vso, Vdo, Vbd, Vcd,
+    Vex, Vfi, Vno, Vmi, Vlc, Vrc, Vec, Vsu,
+    Vsg, Vtw, Vow, Vst, Vrs, Vhl, Vmh, Vca,
+} VARINDEX;
 
 typedef struct {
-    const char suffix;		/* ls-F suffix */
-    const char *variable;	/* LS_COLORS variable */
-    Str		color;		/* Color: default or user-provided color */
-    Str		defaultcolor;	/* Default color */
+    const VARINDEX	 varindex;	/* Must be same as index in variables[] */
+    const COLORVAR	 colorvar;	/* COLORVAR. Use CV_NONE if no mapping */
+    const char		*variable;	/* LS_COLORS variable */
+    Str			 color;		/* Color: default or user-provided color */
+    const Str		 defaultcolor;	/* Default color */
 } Variable;
 
 /*
  * variables[]: array of Variable.
- * Must be indexed on enum FileType (q.v.).
+ * Must be indexed on enum VARINDEX, and .varindex must be the index.
  */
 static Variable variables[] = {
-    VAR('/', "di", "01;34"),	/* Directory */
-    VAR('@', "ln", "01;36"),	/* Symbolic link */
-    VAR('&', "or", ""),		/* Orphaned (broken) symbolic link. Defaults to ln */
-    VAR('|', "pi", "33"),	/* Named pipe (FIFO) */
-    VAR('=', "so", "01;35"),	/* Socket */
-    VAR('>', "do", "01;35"),	/* Door (solaris fast ipc mechanism)  */
-    VAR('#', "bd", "01;33"),	/* Block device */
-    VAR('%', "cd", "01;33"),	/* Character device */
-    VAR('*', "ex", "01;32"),	/* Executable file */
-    VAR(NOS, "fi", "0"),	/* Regular file */
-    VAR(NOS, "no", "0"),	/* Normal (non-filename) text */
-    VAR(NOS, "mi", ""),		/* Missing file (orphaned symbolic link target). Defaults to fi */
+    VAR(Vdi, CV_DIR,	"di", "01;34"),	/* Directory */
+    VAR(Vln, CV_LNK,	"ln", "01;36"),	/* Symbolic link */
+    VAR(Vor, CV_ORPHAN,	"or", ""),	/* Orphaned (broken) symbolic link. Defaults to ln */
+    VAR(Vpi, CV_FIFO,	"pi", "33"),	/* Named pipe (FIFO) */
+    VAR(Vso, CV_SOCK,	"so", "01;35"),	/* Socket */
+    VAR(Vdo, CV_DOOR,	"do", "01;35"),	/* Door (solaris fast ipc mechanism)  */
+    VAR(Vbd, CV_BLK,	"bd", "01;33"), /* Block device */
+    VAR(Vcd, CV_CHR,	"cd", "01;33"),	/* Character device */
+    VAR(Vex, CV_EXE,	"ex", "01;32"),	/* Executable file */
+    VAR(Vfi, CV_NONE,	"fi", "0"),	/* Regular file, possibly with extension */
+    VAR(Vno, CV_NONE,	"no", "0"),	/* Normal (non-filename) text */
+    VAR(Vmi, CV_NONE,	"mi", ""),	/* Missing file (orphaned symbolic link target). Defaults to fi */
 #ifdef IS_ASCII
-    VAR(NOS, "lc", "\033["),	/* Left code (ASCII) */
+    VAR(Vlc, CV_NONE,	"lc", "\033["),	/* Left code (ASCII) */
 #else
-    VAR(NOS, "lc", "\x27["),	/* Left code (EBCDIC)*/
+    VAR(Vlc, CV_NONE,	"lc", "\x27["),	/* Left code (EBCDIC)*/
 #endif
-    VAR(NOS, "rc", "m"),	/* Right code */
-    VAR(NOS, "ec", ""),		/* End code (replaces lc+no+rc) */
-    VAR(NOS, "su", ""),		/* Setuid file (u+s) */
-    VAR(NOS, "sg", ""),		/* Setgid file (g+s) */
-    VAR(NOS, "tw", ""),		/* Sticky and other writable dir (+t,o+w) */
-    VAR(NOS, "ow", ""),		/* Other writable dir (o+w) but not sticky */
-    VAR(NOS, "st", ""),		/* Sticky dir (+t) but not other writable */
-    VAR(NOS, "rs", "0"),	/* Reset to normal color */
-    VAR(NOS, "hl", "44;37"),    /* Reg file extra hard links, obsolete? */
-    VAR(NOS, "mh", "44;37"),    /* Reg file extra hard links */
-    VAR(NOS, "ca", "30;41"),    /* File with capability */
+    VAR(Vrc, CV_NONE,	"rc", "m"),	/* Right code */
+    VAR(Vec, CV_NONE,	"ec", ""),	/* End code (replaces lc+no+rc) */
+    VAR(Vsu, CV_NONE,	"su", ""),	/* Setuid file (u+s) */
+    VAR(Vsg, CV_NONE,	"sg", ""),	/* Setgid file (g+s) */
+    VAR(Vtw, CV_NONE,	"tw", ""),	/* Sticky and other writable dir (+t,o+w) */
+    VAR(Vow, CV_NONE,	"ow", ""),	/* Other writable dir (o+w) but not sticky */
+    VAR(Vst, CV_NONE,	"st", ""),	/* Sticky dir (+t) but not other writable */
+    VAR(Vrs, CV_NONE,	"rs", "0"),	/* Reset to normal color */
+    VAR(Vhl, CV_NONE,	"hl", ""),	/* Reg file extra hard links. Obsolete, use mh */
+    VAR(Vmh, CV_NONE,	"mh", "44;37"),	/* Reg file extra hard links */
+    VAR(Vca, CV_NONE,	"ca", "30;41"),	/* File with capability */
 };
 
 #define nvariables (sizeof(variables)/sizeof(variables[0]))
 
-/**
- * FileType index.
- * Must be kept in sync with variables[]
- */
-enum FileType {
-    VDir, VSym, VOrph, VPipe, VSock, VDoor, VBlock, VChr, VExe,
-    VFile, VNormal, VMiss, VLeft, VRight, VEnd, VSuid, VSgid, VSticky,
-    VOther, Vstird, VReset, Vhard, Vhard2, VCap
-};
-
 /*
- * Map from LSCOLORS entry index to Variable array index
+ * Map from LSCOLORS entry index to VARINDEX in variables[].
  */
-static const uint8_t map[] = {
-    VDir,	/* Directory */
-    VSym,	/* Symbolic Link */
-    VSock,	/* Socket */
-    VPipe,	/* Named Pipe */
-    VExe,	/* Executable */
-    VBlock,	/* Block Special */
-    VChr,	/* Character Special */
-    VSuid,	/* Setuid Executable */
-    VSgid,	/* Setgid Executable */
-    VSticky,	/* Directory writable to others and sticky */
-    VOther,	/* Directory writable to others but not sticky */
+static const uint8_t lscolors_to_varindex[] = {
+    Vdi,	/* Directory */
+    Vln,	/* Symbolic Link */
+    Vso,	/* Socket */
+    Vpi,	/* Named Pipe */
+    Vex,	/* Executable */
+    Vbd,	/* Block Special */
+    Vcd,	/* Character Special */
+    Vsu,	/* Setuid Executable */
+    Vsg,	/* Setgid Executable */
+    Vtw,	/* Directory writable to others and sticky */
+    Vow,	/* Directory writable to others but not sticky */
 };
-
 
 
 enum ansi {
@@ -171,7 +171,7 @@ int	     color_force = FALSE;	/* allow colored ls without a tty */
 
 static int getstring (char **, const Char **, Str *, int);
 static void put_color (const Str *);
-static void print_color (const Char *, size_t, Char);
+static void print_color (const Char *, size_t, COLORVAR);
 
 /* Str_equal_literal():
  *	Does a Str equal a literal string?
@@ -245,8 +245,10 @@ init(size_t colorlen, size_t extnum)
 
     color_as_referent = FALSE;
     xfree(extensions);
-    for (i = 0; i < nvariables; i++)
+    for (i = 0; i < nvariables; i++) {
+	assert(i == variables[i].varindex);
 	variables[i].color = variables[i].defaultcolor;
+    }
     if (colorlen == 0 && extnum == 0) {
 	extensions = NULL;
 	colors = NULL;
@@ -341,7 +343,8 @@ parseLSCOLORS(const Char *value)
 	    bg = color(*v++);
 	    if (bg == -1)
 		stderror(ERR_BADCOLORVAR, '?', v[-1]);
-	    makecolor(&c, fg, bg, &variables[map[i]].color);
+	    assert(lscolors_to_varindex[i] < nvariables);
+	    makecolor(&c, fg, bg, &variables[lscolors_to_varindex[i]].color);
 	}
 
     }
@@ -418,9 +421,9 @@ parseLS_COLORS(const Char *value)
 		    if (i < nvariables) {
 			v += 3;
 			getstring(&c, &v, &variables[i].color, ':');
-			if (i == VSym)
+			if (i == Vln)
 			    color_as_referent = Str_equal_literal(
-				&variables[VSym].color, "target");
+				&variables[Vln].color, "target");
 			continue;
 		    }
 		    else
@@ -459,73 +462,65 @@ put_color(const Str *colorp)
 /* print_color():
  */
 static void
-print_color(const Char *fname, size_t len, Char suffix)
+print_color(const Char *fname, size_t len, COLORVAR colorvar)
 {
     size_t  i;
     char   *filename = short2str(fname);
     char   *last = filename + len;
-    Str	   *colorp = &variables[VFile].color;
+    Str    *colorp = &variables[Vfi].color;	/* default to fi color */
 
-    switch (suffix) {
-    case '>':			/* File is a symbolic link pointing to
-				 * a directory */
-	colorp = &variables[VDir].color;
-	break;
-    case '+':			/* File is a hidden directory [aix] or
-				 * context dependent [hpux] */
-    case ':':			/* File is network special [hpux] */
-	break;
-    default:
-	for (i = 0; i < nvariables; i++)
-	    if (variables[i].suffix != NOS &&
-		(Char)variables[i].suffix == suffix) {
+    if (colorvar == CV_LNK_DIR) {	/* symlink to dir? use di color */
+	colorp = &variables[Vdi].color;
+    } else if (colorvar == CV_FILE) {	/* file? lookup in extension */
+	for (i = 0; i < nextensions; i++) {
+	    if (len >= extensions[i].extension.len
+		&& strncmp(last - extensions[i].extension.len,
+			   extensions[i].extension.s,
+			   extensions[i].extension.len) == 0) {
+		colorp = &extensions[i].color;
+	    }
+	}
+    } else {				/* all others? lookup variables */
+	for (i = 0; i < nvariables; i++) {
+	    if (variables[i].colorvar == colorvar) {
 		colorp = &variables[i].color;
 		break;
 	    }
-	if (i == nvariables) {
-	    for (i = 0; i < nextensions; i++)
-		if (len >= extensions[i].extension.len
-		    && strncmp(last - extensions[i].extension.len,
-			       extensions[i].extension.s,
-			       extensions[i].extension.len) == 0) {
-		  colorp = &extensions[i].color;
-		break;
-	    }
 	}
-	break;
     }
 
-    put_color(&variables[VLeft].color);
+    put_color(&variables[Vlc].color);
     put_color(colorp);
-    put_color(&variables[VRight].color);
+    put_color(&variables[Vrc].color);
 }
 
 
 /* print_with_color():
  */
 void
-print_with_color(const Char *dir, const Char *filename, size_t len, Char suffix)
+print_with_color(const Char *dir, const Char *filename, size_t len,
+	struct filetype filetype)
 {
     if (color_context_lsmF && (color_force ||
 	(haderr ? (didfds ? is2atty : isdiagatty) :
 	 (didfds ? is1atty : isoutatty)))) {
 
-	if (suffix == '@' && color_as_referent) {
-	    Char c = filetype(dir, filename, FALSE);
-	    print_color(filename, len, c);
+	if (filetype.colorvar == CV_LNK && color_as_referent) {
+	    struct filetype ft = get_filetype(dir, filename, FALSE);
+	    print_color(filename, len, ft.colorvar);
 	} else
-	    print_color(filename, len, suffix);
+	    print_color(filename, len, filetype.colorvar);
 	xprintf("%" TCSH_S, filename);
-	if (0 < variables[VEnd].color.len)
-	    put_color(&variables[VEnd].color);
+	if (0 < variables[Vec].color.len)
+	    put_color(&variables[Vec].color);
 	else {
-	    put_color(&variables[VLeft].color);
-	    put_color(&variables[VNormal].color);
-	    put_color(&variables[VRight].color);
+	    put_color(&variables[Vlc].color);
+	    put_color(&variables[Vno].color);
+	    put_color(&variables[Vrc].color);
 	}
     } else
 	xprintf("%" TCSH_S, filename);
-    xputwchar(suffix);
+    xputwchar(filetype.suffix);
 }
 
 

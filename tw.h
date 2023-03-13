@@ -86,6 +86,41 @@ typedef enum {
     COMMAND_NORMALIZE
 } COMMAND;
 
+
+#ifdef COLOR_LS_F
+
+/* COLORVAR: file color variable
+ */
+typedef enum {
+    CV_NONE,		/*  !   unknown type (shouldn't appear) */
+    CV_FILE,		/*   	Regular file, possibly with extension color */
+    CV_DIR,		/*  /	Directory */
+    CV_EXE,		/*  *	Executable file */
+    CV_BLK,		/*  #	Block device */
+    CV_CHR,		/*  %	Character device */
+    CV_FIFO,		/*  |	Named pipe (FIFO) */
+    CV_SOCK,		/*  =	Socket */
+    CV_LNK,		/*  @	Symbolic link */
+    CV_ORPHAN,		/*  &	Orphaned (broken) symbolic link */
+    CV_LNK_DIR,		/*  >	Symbolic link to directory. Color is CV_DIR */
+    CV_HIDDEN,		/*  +	Hidden dir (AIX) */
+    CV_CDF,		/*  +	Context Dependent Files (HP/UX) */
+    CV_NWK,		/*  :	Network Special (HP/UX) */
+    CV_DOOR,		/*  >	Door (Solaris IPC) */
+} COLORVAR;
+
+#endif /* COLOR_LS_F */
+
+
+/* filetype: file color type and ls-F suffix
+ */
+struct filetype {
+    Char	suffix;		/* suffix for ls-F */
+#ifdef COLOR_LS_F
+    COLORVAR 	colorvar;	/* color variable */
+#endif /* COLOR_LS_F */
+};
+
 struct scroll_tab_list {
 	Char *element;
 	struct scroll_tab_list *next;
