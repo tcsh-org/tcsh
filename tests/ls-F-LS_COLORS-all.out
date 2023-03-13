@@ -5,11 +5,16 @@
 {LC}{DI}{RC}dir{EC}/
 {LC}{EX}{RC}exec{EC}*
 {LC}{FI}{RC}file{EC} 
+{LC}{DOT1}{RC}file.1{EC} 
+{LC}{DOT12}{RC}file.12{EC} 
+{LC}{DOT123}{RC}file.123{EC} 
+{LC}{DOT1234}{RC}file.1234{EC} 
 {LC}{DI}{RC}ldir-ow{EC}>
 {LC}{DI}{RC}ldir-st{EC}>
 {LC}{DI}{RC}ldir-tw{EC}>
 {LC}{DI}{RC}ldir{EC}>
 {LC}{LN}{RC}lexec{EC}@
+{LC}{LN}{RC}lfile.1234{EC}@
 {LC}{LN}{RC}lfile{EC}@
 {LC}{MH}{RC}link1{EC} 
 {LC}{MH}{RC}link2{EC} 
@@ -18,6 +23,7 @@
 {LC}{DI}{RC}lldir-tw{EC}>
 {LC}{DI}{RC}lldir{EC}>
 {LC}{LN}{RC}llexec{EC}@
+{LC}{LN}{RC}llfile.1234{EC}@
 {LC}{LN}{RC}llfile{EC}@
 {LC}{OR}{RC}llorphan{EC}&
 {LC}{LN}{RC}llpipe{EC}@

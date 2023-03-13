@@ -201,9 +201,10 @@ export CLICOLOR_FORCE
 unset LSCOLORS
 unset LS_COLORS
 
-dnl LS_COLORS value with all variables set to "vv={VV}" for debugging.
+dnl LS_COLORS value with all variables set to "vv={VV}" and
+dnl extensions .1 .12 .123 .1234 set.
 dnl
-m4_pushdef([TCSH_TEXT_LS_COLORS], [di={DI}:ln={LN}:or={OR}:pi={PI}:so={SO}:do={DO}:bd={BD}:cd={CD}:ex={EX}:fi={FI}:no={NO}:mi={MI}:lc={LC}:rc={RC}:ec={EC}:su={SU}:sg={SG}:tw={TW}:ow={OW}:st={ST}:rs={RS}:hl={HL}:mh={MH}:ca={CA}])
+m4_pushdef([TCSH_TEXT_LS_COLORS], [di={DI}:ln={LN}:or={OR}:pi={PI}:so={SO}:do={DO}:bd={BD}:cd={CD}:ex={EX}:fi={FI}:no={NO}:mi={MI}:lc={LC}:rc={RC}:ec={EC}:su={SU}:sg={SG}:tw={TW}:ow={OW}:st={ST}:rs={RS}:hl={HL}:mh={MH}:ca={CA}:*.1={DOT1}:*.12={DOT12}:*.123={DOT123}:*.1234={DOT1234}])
 
 dnl
 dnl LS_COLORS as TCSH_TEXT_LS_COLORS.

@@ -5,11 +5,16 @@
 [01;31;48;21mdir[0m/
 [01;35;48;21mexec[0m*
 [0mfile[0m 
+[0mfile.1[0m 
+[0mfile.12[0m 
+[0mfile.123[0m 
+[0mfile.1234[0m 
 [01;32;48;21mldir-ow[0m@
 [01;32;48;21mldir-st[0m@
 [01;32;48;21mldir-tw[0m@
 [01;32;48;21mldir[0m@
 [01;32;48;21mlexec[0m@
+[01;32;48;21mlfile.1234[0m@
 [01;32;48;21mlfile[0m@
 [mlink1[0m 
 [mlink2[0m 
@@ -18,6 +23,7 @@
 [01;32;48;21mlldir-tw[0m@
 [01;32;48;21mlldir[0m@
 [01;32;48;21mllexec[0m@
+[01;32;48;21mllfile.1234[0m@
 [01;32;48;21mllfile[0m@
 [01;32;48;21mllorphan[0m@
 [01;32;48;21mllpipe[0m@

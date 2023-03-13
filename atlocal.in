@@ -15,12 +15,17 @@ tests_dir="@abs_top_srcdir@/tests"
 #	drwxr-xrwt  dir-tw/
 #	-rwxr-xr-x  exec*
 #	-rw-r--r--  file
+#	-rw-r--r--  file.1
+#	-rw-r--r--  file.12
+#	-rw-r--r--  file.123
+#	-rw-r--r--  file.1234
 #	lrwxrwxrwx  ldir -> dir/
 #	lrwxrwxrwx  ldir-ow -> dir-ow/
 #	lrwxrwxrwx  ldir-st -> dir-st/
 #	lrwxrwxrwx  ldir-tw -> dir-tw/
 #	lrwxrwxrwx  lexec -> exec*
 #	lrwxrwxrwx  lfile -> file
+#	lrwxrwxrwx  lfile.1234 -> file.1234
 #	-rw-r--r--  link1
 #	-rw-r--r--  link2
 #	lrwxrwxrwx  lldir -> ldir/
@@ -29,6 +34,7 @@ tests_dir="@abs_top_srcdir@/tests"
 #	lrwxrwxrwx  lldir-tw -> ldir-tw/
 #	lrwxrwxrwx  llexec -> lexec*
 #	lrwxrwxrwx  llfile -> lfile
+#	lrwxrwxrwx  llfile.1234 -> lfile.1234
 #	lrwxrwxrwx  llorphan -> lorphan
 #	lrwxrwxrwx  llpipe -> lpipe|
 #	lrwxrwxrwx  lorphan -> orphan
@@ -46,7 +52,7 @@ create_ls_DIR()
 	chmod +t,o-w dir-st
 	chmod +t,o+w dir-tw
 
-	touch file exec .hidden
+	touch .hidden exec file file.1 file.12 file.123 file.1234
 	chmod a+x exec
 	touch link1
 	ln link1 link2
@@ -58,6 +64,7 @@ create_ls_DIR()
 	ln -s dir-tw ldir-tw
 	ln -s exec lexec
 	ln -s file lfile
+	ln -s file.1234 lfile.1234
 	ln -s orphan lorphan
 	ln -s pipe lpipe
 
@@ -67,6 +74,7 @@ create_ls_DIR()
 	ln -s ldir-tw lldir-tw
 	ln -s lexec llexec
 	ln -s lfile llfile
+	ln -s lfile.1234 llfile.1234
 	ln -s lorphan llorphan
 	ln -s lpipe llpipe
 	)
