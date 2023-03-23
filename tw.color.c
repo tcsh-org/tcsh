@@ -176,7 +176,7 @@ static void print_color (const Char *, size_t, COLORVAR);
 /* Str_equal_literal():
  *	Does a Str equal a literal string?
  */
-int
+static int
 Str_equal_literal(const Str * left, const char * right)
 {
     const size_t rlen = strlen(right);
@@ -299,6 +299,7 @@ makecolor(char **c, int fg, int bg, Str *v)
 void
 parseCLICOLOR_FORCE(int is_setenv, const Char *value)
 {
+    USE(value);
     color_force = is_setenv;
 }
 

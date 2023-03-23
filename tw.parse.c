@@ -2221,11 +2221,12 @@ print_by_column(const Char *dir, Char *items[], int count, int no_file_suffix)
 
 #ifdef COLOR_LS_F
 		if (no_file_suffix) {
-		    /* Print the command name */
+		    /* Print the non-file name */
 		    Char f = items[i][w - 1];
 		    items[i][w - 1] = 0;
-		    print_with_color(dir, items[i], w - 1,
-			get_filetype(dir, items[i], TRUE));
+		    struct filetype ft = get_filetype(dir, items[i], TRUE);
+		    ft.suffix = f;
+		    print_with_color(dir, items[i], w - 1, ft);
 		    items[i][w - 1] = f;
 		}
 		else {
@@ -2236,13 +2237,13 @@ print_by_column(const Char *dir, Char *items[], int count, int no_file_suffix)
 		}
 #else /* ifndef COLOR_LS_F */
 		if (no_file_suffix) {
-		    /* Print the command name */
+		    /* Print the non-file name */
 		    xprintf("%" TCSH_S, items[i]);
 		}
 		else {
 		    /* Print filename followed by '/' or '*' or ' ' */
 		    xprintf("%-" TCSH_S "%c", items[i],
-			get_filetype(dir, items[i]).color, TRUE);
+			get_filetype(dir, items[i], TRUE).suffix);
 		    wx++;
 		}
 #endif /* COLOR_LS_F */
