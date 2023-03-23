@@ -721,7 +721,7 @@ $(srcdir)/stamp-h.in: $(srcdir)/configure.ac
 	cd $(srcdir) && autoheader
 	@echo timestamp > $(srcdir)/stamp-h.in
 
-check test: atconfig atlocal $(srcdir)/tests/testsuite
+check test: atconfig atlocal $(srcdir)/tests/testsuite $(BUILD)
 	$(ENVCMD) - \
 		TESTSUITEREGEN="$(TESTSUITEREGEN)" \
 		USER="$(USER)" \
