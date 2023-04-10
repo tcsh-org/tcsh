@@ -1505,13 +1505,18 @@ dosetenv(Char **v, struct command *c)
     }
 
 #ifdef COLOR_LS_F
+    if (eq(vp, STRCLICOLOR_FORCE)) {
+	parseCLICOLOR_FORCE(TRUE, lp);
+	cleanup_until(lp);
+	return;
+    }
     if (eq(vp, STRLS_COLORS)) {
-        parseLS_COLORS(lp);
+	parseLS_COLORS(lp);
 	cleanup_until(lp);
 	return;
     }
     if (eq(vp, STRLSCOLORS)) {
-        parseLSCOLORS(lp);
+	parseLSCOLORS(lp);
 	cleanup_until(lp);
 	return;
     }
@@ -1640,6 +1645,8 @@ dounsetenv(Char **v, struct command *c)
 		}
 #endif /* WINNT_NATIVE */
 #ifdef COLOR_LS_F
+		else if (eq(name, STRCLICOLOR_FORCE))
+		    parseCLICOLOR_FORCE(FALSE, n);
 		else if (eq(name, STRLS_COLORS))
 		    parseLS_COLORS(n);
 		else if (eq(name, STRLSCOLORS))

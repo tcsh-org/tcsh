@@ -1,7 +1,11 @@
 AT_BANNER([Optional substitutions])
 
+dnl
+dnl	Command substitution
+dnl
 
 AT_SETUP([Command substitution])
+AT_KEYWORDS([subst])
 
 AT_DATA([backq.csh],
 [[set a=(a`echo 1 2; echo 3 4`b)
@@ -28,7 +32,12 @@ AT_CHECK([tcsh -f backq.csh], 1,
 AT_CLEANUP()
 
 
+dnl
+dnl	Filename substitution
+dnl
+
 AT_SETUP([Filename substitution])
+AT_KEYWORDS([subst])
 
 AT_DATA([files.csh],
 [[mkdir d
@@ -86,7 +95,12 @@ echo "echo ~$(id -un)/foo; echo \"\$HOME/foo\"" | tcsh -f | uniq dnl
 AT_CLEANUP()
 
 
+dnl
+dnl	Directory stack substitution
+dnl
+
 AT_SETUP([Directory stack substitution])
+AT_KEYWORDS([subst])
 
 AT_DATA([dirstack.csh],
 [[set home=$cwd

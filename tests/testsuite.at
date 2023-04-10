@@ -2,12 +2,41 @@
 
 AT_INIT([tcsh])
 
+m4_pattern_forbid([^TCSH_])dnl
+
 AT_COLOR_TESTS()
 
 AT_TESTED([tcsh])
 
+dnl
+dnl TCSH_DIFF(SRCFILE, EXPECTFILE)
+dnl
+dnl	diff SRCFILE and EXPECTFILE (usually stdout)
+dnl	and ensure they're identical.
+dnl	If (environment variable) TESTSUITEREGEN is not empty,
+dnl	copy EXPECTFILE over SRCFILE before running diff.
+dnl
+m4_define([TCSH_DIFF], [dnl
+m4_if(m4_eval($# < 2 || $# > 2), [1], [m4_fatal([usage: $0(SRCFILE, EXPECTFILE)])])dnl
+AS_IF([test -n "${TESTSUITEREGEN}"], [dnl
+  AS_IF([cmp -s "$1" "$2"], [], [cp "$2" "$1"])
+])
+AT_CHECK([diff "$1" "$2"])
+])
+
+dnl
+dnl TCSH_UNTESTED(NAME)
+dnl
+dnl	Setup test group "NAME" and immediately skip the test.
+dnl	Adds keywords "untested" and `basename __file` without
+dnl	the ".at" suffix (equivalent to tcsh's :t:r modifiers).
+dnl
 m4_define([TCSH_UNTESTED], [dnl
+m4_if(m4_eval($# < 1 || $# > 1), [1], [m4_fatal([usage: $0(NAME)])])dnl
+m4_set_add([TCSH_set_untested], [$1], [], [m4_fatal([$0: $1 already untested])])dnl
 AT_SETUP([$1])
+AT_KEYWORDS([untested])
+AT_KEYWORDS(m4_bpatsubst(m4_bpatsubst(__file__,[^.*/],[]),[.at$],[]))
 AT_CHECK([exit 77])
 AT_CLEANUP()
 ])
@@ -18,6 +47,7 @@ m4_include([commands.at])
 m4_include([expr.at])
 m4_include([history.at])
 m4_include([lexical.at])
+m4_include([ls-F.at])
 m4_include([mb-eucjp.at])
 m4_include([mb-utf8.at])
 m4_include([noexec.at])
@@ -26,3 +56,7 @@ m4_include([sh.dol.at])
 m4_include([subst.at])
 m4_include([syntax.at])
 m4_include([variables.at])
+
+m4_errprintn()
+m4_errprintn([Expect ]m4_set_size(TCSH_set_untested)[ skipped tests (of untested features) in a full make check])
+m4_errprintn()

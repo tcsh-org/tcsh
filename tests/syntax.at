@@ -1,9 +1,14 @@
 AT_BANNER([Command syntax])
 
 
-AT_SETUP([Command combinations])
+dnl
+dnl	Command combinations
+dnl
 
-# False on OpenSolaris returns 255
+AT_SETUP([Command combinations])
+AT_KEYWORDS([syntax])
+
+dnl False on OpenSolaris returns 255
 echo 'exit 1' > myfalse
 chmod +x myfalse
 
@@ -40,7 +45,12 @@ async
 AT_CLEANUP()
 
 
+dnl
+dnl	Command execution
+dnl
+
 AT_SETUP([Command execution])
+AT_KEYWORDS([syntax])
 
 AT_CHECK([tcsh -f -c '((true | cd ..; pwd); cd ..; pwd)' | uniq | wc -l dnl
 	  | tr -d ' \t'], ,

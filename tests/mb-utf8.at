@@ -1,6 +1,6 @@
-# UTF-8 multibyte handling test case.  This file uses the UTF-8 encoding.
-
 AT_BANNER([UTF-8 multibyte])
+
+dnl UTF-8 multibyte handling test case.  This file uses the UTF-8 encoding.
 
 
 AT_SETUP([UTF-8 multibyte test])

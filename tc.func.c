@@ -299,7 +299,11 @@ dolist(Char **v, struct command *c)
 	if (color_context_ls) {
 	    lastword = nextword;
 	    nextword = xcalloc(1, sizeof cmd);
-	    nextword->word = Strsave(STRmmcolormauto);
+	    if (color_force) {
+		nextword->word = Strsave(STRmmcolormalways);
+	    } else {
+		nextword->word = Strsave(STRmmcolormauto);
+	    }
 	    lastword->next = nextword;
 	    nextword->prev = lastword;
 	}
@@ -351,7 +355,7 @@ dolist(Char **v, struct command *c)
 		if (k != i) {
 		    if (i != 0)
 			xputchar('\n');
-		    print_by_column(STRNULL, &v[i], k - i, FALSE);
+		    print_by_column(tmp, &v[i], k - i, FALSE);
 		}
 		haderr = 1;
 		xprintf("%" TCSH_S ": %s.\n", tmp, strerror(err));
@@ -365,7 +369,7 @@ dolist(Char **v, struct command *c)
 		if (k != i) {
 		    if (i != 0)
 			xputchar('\n');
-		    print_by_column(STRNULL, &v[i], k - i, FALSE);
+		    print_by_column(tmp, &v[i], k - i, FALSE);
 		}
 		if (k != 0 && v[1] != NULL)
 		    xputchar('\n');

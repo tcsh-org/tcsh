@@ -1,10 +1,18 @@
 AT_BANNER([Special aliases])
 
+dnl
+dnl	beepcmd
+dnl
 
 TCSH_UNTESTED([beepcmd])
 
 
+dnl
+dnl	cwdcmd
+dnl
+
 AT_SETUP([cwdcmd])
+AT_KEYWORDS([alias aliases])
 
 AT_DATA([cwdcmd.csh],
 [[alias cwdcmd 'echo ">>" $cwd'
@@ -17,16 +25,33 @@ AT_CHECK([tcsh -f cwdcmd.csh], ,
 AT_CLEANUP()
 
 
-TCSH_UNTESTED([jobcmd])
+dnl
+dnl	helpcommand
+dnl
 
 TCSH_UNTESTED([helpcommand])
 
+
+dnl
+dnl	jobcmd
+dnl
+
+TCSH_UNTESTED([jobcmd])
+
+
+dnl
+dnl	periodic
+dnl
+
 TCSH_UNTESTED([periodic])
 
-TCSH_UNTESTED([precmd])
 
+dnl
+dnl	postcmd
+dnl
 
 AT_SETUP([postcmd])
+AT_KEYWORDS([alias aliases])
 
 AT_DATA([postcmd.csh],
 [[alias postcmd 'echo ">>" "\!#"'
@@ -43,7 +68,19 @@ foo
 AT_CLEANUP()
 
 
+dnl
+dnl	precmd
+dnl
+
+TCSH_UNTESTED([precmd])
+
+
+dnl
+dnl	shell
+dnl
+
 AT_SETUP([shell])
+AT_KEYWORDS([alias aliases])
 
 AT_DATA([script],
 [OK

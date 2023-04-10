@@ -122,7 +122,7 @@ static  int      tw_collect		(COMMAND, int, struct Strbuf *,
 static	Char 	 tw_suffix		(int, struct Strbuf *,const Char *,
 					 Char *);
 static	void 	 tw_fixword		(int, struct Strbuf *, Char *, Char *);
-static	void	 tw_list_items		(int, int, int);
+static	void	 tw_list_items		(const Char *, int, int, int);
 static 	void	 add_scroll_tab		(Char *);
 static 	void 	 choose_scroll_tab	(struct Strbuf *, int);
 static	void	 free_scroll_tab	(void);
@@ -393,7 +393,7 @@ tenematch(Char *inputline, int num_read, COMMAND command)
 	    cleanup_push(ptr, blk_cleanup);
 	if (count > 0) {
 	    if (command == GLOB)
-		print_by_column(STRNULL, ptr, count, 0);
+		print_by_column(STRNULL, ptr, count, FALSE);
 	    else {
 		DeleteBack(str_end - word_start);/* get rid of old word */
 		for (i = 0; i < count; i++)
@@ -1135,13 +1135,13 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
 		case TW_COMMAND:
 		    if (!(dir_ok && exec_check))
 			break;
-		    if (filetype(exp_dir->s, item.s) == '/')
+		    if (get_filetype(exp_dir->s, item.s, TRUE).suffix == '/')
 			Strbuf_append1(&buf, '/');
 		    break;
 
 		case TW_FILE:
 		case TW_DIRECTORY:
-		    Strbuf_append1(&buf, filetype(exp_dir->s, item.s));
+		    Strbuf_append1(&buf, get_filetype(exp_dir->s, item.s, TRUE).suffix);
 		    break;
 
 		default:
@@ -1152,7 +1152,7 @@ tw_collect_items(COMMAND command, int looking, struct Strbuf *exp_dir,
                      || looking == TW_LOGNAME) && tw_item_find(buf.s))
 		    break;
 		else {
-		    /* maximum length 1 (NULL) + 1 (~ or $) + 1 (filetype) */
+		    /* maximum length 1 (NULL) + 1 (~ or $) + 1 (suffix) */
 		    tw_item_add(&buf);
 		    if (command == LIST)
 			numitems++;
@@ -1399,7 +1399,7 @@ tw_collect(COMMAND command, int looking, struct Strbuf *exp_dir,
  *	(by default interpreted as 'items', for backwards compatibility)
  */
 static void
-tw_list_items(int looking, int numitems, int list_max)
+tw_list_items(const Char * dir, int looking, int numitems, int list_max)
 {
     Char *ptr;
     int max_items = 0;
@@ -1477,7 +1477,7 @@ tw_list_items(int looking, int numitems, int list_max)
     if (looking != TW_SIGNAL)
 	qsort(tw_item_get(), numitems, sizeof(Char *), fcompare);
     if (looking != TW_JOB)
-	print_by_column(STRNULL, tw_item_get(), numitems, TRUE);
+	print_by_column(dir, tw_item_get(), numitems, TRUE);
     else {
 	/*
 	 * print one item on every line because jobs can have spaces
@@ -1805,7 +1805,7 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 	break;
 
     case LIST:
-	tw_list_items(looking, numitems, list_max);
+	tw_list_items(exp_dir.s, looking, numitems, list_max);
 	tw_item_free();
 	break;
 
@@ -2009,13 +2009,20 @@ nostat(const Char *dir)
 } /* end nostat */
 
 
-/* filetype():
- *	Return a character that signifies a filetype
- *	symbology from 4.3 ls command.
+/* get_filetype():
+ *	Return a struct filetype based on the file mode.
  */
-Char
-filetype(const Char *dir, const Char *file)
+struct filetype
+get_filetype(const Char *dir, const Char *file, int use_lstat)
 {
+#ifdef COLOR_LS_F
+#define RETURN_FILETYPE(suffix,color) do { \
+    struct filetype r={suffix,color}; return r; } while (0)
+#else
+#define RETURN_FILETYPE(suffix,color) do { \
+    struct filetype r={suffix}; return r; } while (0)
+#endif /* COLOR_LS_F */
+
     Char *path;
     char   *ptr;
     struct stat statb;
@@ -2027,34 +2034,39 @@ filetype(const Char *dir, const Char *file)
     ptr = short2str(path);
     xfree(path);
 
-    if (lstat(ptr, &statb) == -1)
-	goto out;
+    if (use_lstat) {
+	if (lstat(ptr, &statb) == -1)
+	    goto out;
+    } else {
+	if (stat(ptr, &statb) == -1)
+	    goto out;
+    }
 
 #ifdef S_ISLNK
     if (S_ISLNK(statb.st_mode)) {	/* Symbolic link */
 	if (adrof(STRlistlinks)) {
 	    if (stat(ptr, &statb) == -1)
-		return '&';
+		RETURN_FILETYPE('&', CV_ORPHAN);
 	    else if (S_ISDIR(statb.st_mode))
-		return '>';
+		RETURN_FILETYPE('>', CV_LNK_DIR);
 	    else
-		return '@';
+		RETURN_FILETYPE('@', CV_LNK);
 	}
 	else
-	    return '@';
+	    RETURN_FILETYPE('@', CV_LNK);
     }
 #endif
 #ifdef S_ISSOCK
     if (S_ISSOCK(statb.st_mode))	/* Socket */
-	return '=';
+	RETURN_FILETYPE('=', CV_SOCK);
 #endif
 #ifdef S_ISFIFO
     if (S_ISFIFO(statb.st_mode)) /* Named Pipe */
-	return '|';
+	RETURN_FILETYPE('|', CV_FIFO);
 #endif
 #ifdef S_ISHIDDEN
     if (S_ISHIDDEN(statb.st_mode)) /* Hidden Directory [aix] */
-	return '+';
+	RETURN_FILETYPE('+', CV_HIDDEN);
 #endif
 #ifdef S_ISCDF
     {
@@ -2064,32 +2076,52 @@ filetype(const Char *dir, const Char *file)
 	p2 = strspl(ptr, "+");	/* Must append a '+' and re-stat(). */
 	if ((stat(p2, &hpstatb) != -1) && S_ISCDF(hpstatb.st_mode)) {
 	    xfree(p2);
-	    return '+';	/* Context Dependent Files [hpux] */
+	    RETURN_FILETYPE('+', CV_CDF);	/* Context Dependent Files [hpux] */
 	}
 	xfree(p2);
     }
 #endif
 #ifdef S_ISNWK
     if (S_ISNWK(statb.st_mode)) /* Network Special [hpux] */
-	return ':';
+	RETURN_FILETYPE(':', CV_NWK);
 #endif
 #ifdef S_ISCHR
     if (S_ISCHR(statb.st_mode))	/* char device */
-	return '%';
+	RETURN_FILETYPE('%', CV_CHR);
 #endif
 #ifdef S_ISBLK
     if (S_ISBLK(statb.st_mode))	/* block device */
-	return '#';
+	RETURN_FILETYPE('#', CV_BLK);
 #endif
 #ifdef S_ISDIR
-    if (S_ISDIR(statb.st_mode))	/* normal Directory */
-	return '/';
+    if (S_ISDIR(statb.st_mode)) {
+	if ((statb.st_mode & S_ISVTX) && (statb.st_mode & S_IWOTH))
+	    RETURN_FILETYPE('/', CV_DIR_TW);	/* +t o+w directory */
+	if (statb.st_mode & S_IWOTH)
+	    RETURN_FILETYPE('/', CV_DIR_OW);	/* o+w directory */
+	if (statb.st_mode & S_ISVTX)
+	    RETURN_FILETYPE('/', CV_DIR_ST);	/* +t directory */
+	RETURN_FILETYPE('/', CV_DIR);		/* normal directory */
+    }
 #endif
-    if (statb.st_mode & (S_IXUSR|S_IXGRP|S_IXOTH))
-	return '*';
+    if (S_ISREG(statb.st_mode)) {
+	const int isexec = statb.st_mode & (S_IXUSR|S_IXGRP|S_IXOTH);
+	const Char suf = isexec ? '*' : ' ';
+	if (statb.st_mode & S_ISUID)
+	    RETURN_FILETYPE(suf, CV_SUID);	/* setuid */
+	if (statb.st_mode & S_ISGID)
+	    RETURN_FILETYPE(suf, CV_SGID);	/* setgid */
+	if (isexec)
+	    RETURN_FILETYPE('*', CV_EXE);
+	if (statb.st_nlink > 1)
+	    RETURN_FILETYPE(' ', CV_HARD);
+	RETURN_FILETYPE(' ', CV_FILE);
+    }
 out:
-    return ' ';
-} /* end filetype */
+    RETURN_FILETYPE(' ', CV_FILE);
+
+#undef RETURN_FILETYPE
+} /* end get_filetype */
 
 
 /* isadirectory():
@@ -2154,7 +2186,7 @@ find_rows(Char *items[], int count, int no_file_suffix)
  *
  */
 void
-print_by_column(Char *dir, Char *items[], int count, int no_file_suffix)
+print_by_column(const Char *dir, Char *items[], int count, int no_file_suffix)
 {
     int i, r, c, columns, rows;
     size_t w;
@@ -2189,26 +2221,29 @@ print_by_column(Char *dir, Char *items[], int count, int no_file_suffix)
 
 #ifdef COLOR_LS_F
 		if (no_file_suffix) {
-		    /* Print the command name */
+		    /* Print the non-file name */
 		    Char f = items[i][w - 1];
 		    items[i][w - 1] = 0;
-		    print_with_color(items[i], w - 1, f);
+		    struct filetype ft = get_filetype(dir, items[i], TRUE);
+		    ft.suffix = f;
+		    print_with_color(dir, items[i], w - 1, ft);
 		    items[i][w - 1] = f;
 		}
 		else {
-		    /* Print filename followed by '/' or '*' or ' ' */
-		    print_with_color(items[i], w, filetype(dir, items[i]));
+		    /* Print filename in color based on filetype */
+		    print_with_color(dir, items[i], w,
+			get_filetype(dir, items[i], TRUE));
 		    wx++;
 		}
 #else /* ifndef COLOR_LS_F */
 		if (no_file_suffix) {
-		    /* Print the command name */
+		    /* Print the non-file name */
 		    xprintf("%" TCSH_S, items[i]);
 		}
 		else {
 		    /* Print filename followed by '/' or '*' or ' ' */
 		    xprintf("%-" TCSH_S "%c", items[i],
-			filetype(dir, items[i]));
+			get_filetype(dir, items[i], TRUE).suffix);
 		    wx++;
 		}
 #endif /* COLOR_LS_F */

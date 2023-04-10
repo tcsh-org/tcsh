@@ -1,7 +1,11 @@
 AT_BANNER([Command-line argument handling])
 
+dnl
+dnl	-b
+dnl
 
 AT_SETUP([-b])
+AT_KEYWORDS([arguments])
 
 AT_DATA([-script.csh],
 [[echo $1
@@ -12,7 +16,12 @@ AT_CHECK([tcsh -f -b -script.csh --version], , [--version
 AT_CLEANUP()
 
 
+dnl
+dnl	-c
+dnl
+
 AT_SETUP([-c])
+AT_KEYWORDS([arguments])
 
 AT_CHECK([tcsh -f -c 'echo $1' foo], , [foo
 ])
@@ -32,22 +41,40 @@ AT_CHECK([tcsh -f -c])
 AT_CLEANUP()
 
 
+dnl
+dnl	-d
+dnl
+
 TCSH_UNTESTED([-d])
 
 
-AT_SETUP([-e])
+dnl
+dnl	-e
+dnl
 
-# Note that exit is a builtin, won't work here without using a subshell
+AT_SETUP([-e])
+AT_KEYWORDS([arguments])
+
+dnl Note that exit is a builtin, won't work here without using a subshell
 AT_CHECK([tcsh -f -e -c 'echo 1; (exit 3); echo 2'], 3, [1
 ])
 
 AT_CLEANUP()
 
 
+dnl
+dnl	-f
+dnl
+
 TCSH_UNTESTED([-f])
 
 
+dnl
+dnl	-i
+dnl
+
 AT_SETUP([-i])
+AT_KEYWORDS([arguments])
 
 AT_CHECK([echo 'echo $1' | tcsh -f -q -i foo], ,
 [[> foo
@@ -57,29 +84,53 @@ AT_CHECK([echo 'echo $1' | tcsh -f -q -i foo], ,
 AT_CLEANUP()
 
 
-# Warning message contains strerror(EBADF), libc-dependent; can't be turned
-# off using -q because -l works only when alone
+dnl
+dnl	-l
+dnl
+
+dnl Warning message contains strerror(EBADF), libc-dependent; can't be turned
+dnl off using -q because -l works only when alone
 TCSH_UNTESTED([-l])
 
 
+dnl
+dnl	-m
+dnl
 
 TCSH_UNTESTED([-m])
 
 
-# -n tested in noexec.at
+dnl
+dnl	-n
+dnl
 
+dnl -n is tested in noexec.at
+
+
+dnl
+dnl	-q
+dnl
+
+dnl Don't test -q for now because the output is unpredictable
 
 TCSH_UNTESTED([-q])
 
-#AT_SETUP([-q])
+m4_if([
+AT_SETUP([-q])
 
-# Nested to make the SIGQUIT reporting predictable
-#AT_CHECK([tcsh -f -q -c 'kill -QUIT $$'], 131, ,)
+ Nested to make the SIGQUIT reporting predictable
+AT_CHECK([tcsh -f -q -c 'kill -QUIT $$'], 131, ,)
 
-#AT_CLEANUP()
+AT_CLEANUP()
+])
 
+
+dnl
+dnl	-s
+dnl
 
 AT_SETUP([-s])
+AT_KEYWORDS([arguments])
 
 AT_CHECK([echo 'echo $1' | tcsh -f -s foo], , [foo
 ])
@@ -87,7 +138,12 @@ AT_CHECK([echo 'echo $1' | tcsh -f -s foo], , [foo
 AT_CLEANUP()
 
 
+dnl
+dnl	-t
+dnl
+
 AT_SETUP([-t])
+AT_KEYWORDS([arguments])
 
 AT_DATA([input.csh],
 [[echo 1\
@@ -99,7 +155,12 @@ AT_CHECK([tcsh -f -t < input.csh], , [1 2
 AT_CLEANUP()
 
 
+dnl
+dnl	-v
+dnl
+
 AT_SETUP([-v])
+AT_KEYWORDS([arguments])
 
 AT_CHECK([echo 'repeat 2 echo OK' | tcsh -f -v], ,
 [OK
@@ -111,7 +172,12 @@ OK
 AT_CLEANUP()
 
 
+dnl
+dnl	-x
+dnl
+
 AT_SETUP([-x])
+AT_KEYWORDS([arguments])
 
 AT_CHECK([echo 'repeat 2 echo OK' | tcsh -f -x], ,
 [OK
@@ -125,16 +191,37 @@ echo OK
 AT_CLEANUP()
 
 
+dnl
+dnl	-V
+dnl
+
 TCSH_UNTESTED([-V])
+
+dnl
+dnl	-X
+dnl
 
 TCSH_UNTESTED([-X])
 
+dnl
+dnl	--help
+dnl
+
 TCSH_UNTESTED([--help])
+
+dnl
+dnl	--version
+dnl
 
 TCSH_UNTESTED([--version])
 
 
-AT_SETUP([invalid option])
+dnl
+dnl	Invalid option (-Z)
+dnl
+
+AT_SETUP([Invalid option (-Z)])
+AT_KEYWORDS([arguments])
 
 AT_CHECK([tcsh -f -Z], 1, ,
 [[Unknown option: `-Z'
@@ -144,7 +231,12 @@ Usage: tcsh [ -bcdefilmnqstvVxX ] [ argument ... ].
 AT_CLEANUP()
 
 
-AT_SETUP([non-option arguments])
+dnl
+dnl	Non-option arguments
+dnl
+
+AT_SETUP([Non-option arguments])
+AT_KEYWORDS([arguments])
 
 AT_DATA([options.csh],
 [[echo $0

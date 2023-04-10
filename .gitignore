@@ -2,6 +2,7 @@
 **/Makefile
 !win32/msg/Makefile
 atconfig
+atlocal
 autom4te.cache
 config.h
 config.log

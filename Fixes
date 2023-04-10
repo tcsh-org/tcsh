@@ -1,3 +1,10 @@
+ 23. Support LS_COLORS su,sg,tw,ow,st,mh variables. (Luke Mewburn)
+ 22. Fixes for LS_COLORS ln=target: ls-F directory; reset on unsetenv;
+     intermittent parse bug; only support lower-case "target". (Luke Mewburn)
+ 21. Fix LSCOLORS bold/bright color support, add to manual (Luke Mewburn)
+ 20. Implement CLICOLOR_FORCE (Luke Mewburn)
+ 19. On startup, use LS_COLORS in preference to LSCOLORS (Luke Mewburn)
+ 18. Improve color ls-F documentation (Luke Mewburn)
  17. V6.24.07 - 2022-12-21
  16. V6.24.06 - 2022-12-12
  15. V6.24.05 - 2022-12-04
