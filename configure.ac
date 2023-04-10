@@ -10,8 +10,8 @@ dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 dnl
 dnl UPDATE THIS SECTION FOR RELEASE
 dnl
-AC_DEFUN([TCSH_VERSION], [6.24.07])
-AC_DEFUN([TCSH_DATE],    [2022-12-21])
+AC_DEFUN([TCSH_VERSION], [6.24.08])
+AC_DEFUN([TCSH_DATE],    [2023-04-10])
 
 AC_PREREQ([2.69])dnl Minimum Autoconf version required.
 AC_INIT([Tcsh],TCSH_VERSION,[https://bugs.astron.com/],,[https://www.tcsh.org/])
@@ -54,6 +54,7 @@ PACKAGE_VERS="${PACKAGE_VERS%.*}"
 AC_SUBST(PACKAGE_VERS)
 
 PACKAGE_PATCHLEVEL="${PACKAGE_VERSION##*.}"
+PACKAGE_PATCHLEVEL="${PACKAGE_PATCHLEVEL##0}"
 AC_SUBST(PACKAGE_PATCHLEVEL)
 
 AC_CONFIG_AUX_DIR([acaux])

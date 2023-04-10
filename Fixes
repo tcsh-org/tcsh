@@ -1,3 +1,4 @@
+ 24. V6.24.08 - 2023-04-10
  23. Support LS_COLORS su,sg,tw,ow,st,mh variables. (Luke Mewburn)
  22. Fixes for LS_COLORS ln=target: ls-F directory; reset on unsetenv;
      intermittent parse bug; only support lower-case "target". (Luke Mewburn)
