@@ -6733,7 +6733,7 @@ to the left.
 It is an error for
 .Ic argv
 not to be set or to have
-less than one word as value.
+fewer than one word as value.
 .Pp
 With
 .Ar variable ,
@@ -9480,39 +9480,47 @@ the most recent
 is used.
 .Pp
 This variable is a 22 character string containing
-a concatenation of pairs of the format
+a concatenation of 11 pairs of the format
 .Ar f Ns Ar b ,
 where
 .Ar f
 is the foreground color and
 .Ar b
 is the background color.
+If fewer than 11 pairs are provided, default colors are used
+for the remaining entries.
+If more than 11 pairs are provided, the extra values are ignored.
 .Pp
-The order of the color attribute pairs to file type is as follows:
+The order of the color attribute pairs to
+the equivalent
+.Ev LS_COLORS
+variable, the file type, and default color, is as follows:
 .Pp
-.Bl -enum -offset indent -compact
-.It
-Directory.
-.It
-Symbolic link.
-.It
-Socket.
-.It
-Named pipe (FIFO).
-.It
-Executable file.
-.It
-Block device
-.It
-Character device.
-.It
-Executable with setuid bit set.
-.It
-Executable with setgid bit set.
-.It
-Directory writable to others, with sticky bit.
-.It
-Directory writable to others, without sticky bit.
+.Bl -column -offset indent ".Sy Index" ".Sy Var" ""
+.
+.It Sy Index Ta Sy Var Ta Sy File type. [Default color]
+.
+.It 1 Ta Li di Ta Directory. [Bold blue]
+.
+.It 2 Ta Li ln Ta Symbolic link. [Bold cyan]
+.
+.It 3 Ta Li so Ta Socket. [Bold magenta]
+.
+.It 4 Ta Li pi Ta Named pipe (FIFO). [Yellow (or brown)]
+.
+.It 5 Ta Li ex Ta Executable file. [Bold green]
+.
+.It 6 Ta Li bd Ta Block device. [Bold yellow]
+.
+.It 7 Ta Li cd Ta Character device. [Bold yellow]
+.
+.It 8 Ta Li su Ta Setuid file. [White on red]
+.
+.It 9 Ta Li sg Ta Setgid file. [Black on yellow]
+.
+.It 10 Ta Li tw Ta Sticky and other writable directory. [Black on green]
+.
+.It 11 Ta Li ow Ta Other writable but not sticky directory. [Blue on green]
 .El
 .Pp
 The color code designators are as follows:
@@ -9560,9 +9568,9 @@ Note that the above are standard ANSI colors.
 The actual display may differ
 depending on the color capabilities of the terminal in use.
 .Pp
-The default colors are described in
+The default colors are as per the color variables in
 .Ev LS_COLORS ,
-and are not the same default as that used by some BSD versions of
+and are not the same default colors as those used by some BSD versions of
 .Xr ls 1 .
 .
 .It Ev LS_COLORS
@@ -9610,7 +9618,7 @@ ISO 6429 color code or escape sequences, and file type:
 .
 .Bl -column -offset indent ".Sy Var" ".Sy Default" ""
 .
-.It Sy Var Ta Sy Default Ta Sy File type. [Default foreground color]
+.It Sy Var Ta Sy Default Ta Sy File type. [Default color]
 .
 .It Li no Ta Li 0 Ta Normal (non-filename) text.
 .
@@ -9644,7 +9652,7 @@ ISO 6429 color code or escape sequences, and file type:
 .
 .It Li su Ta Li 37;41 Ta Setuid file. [White on red]
 .
-.It Li sg Ta Li 30;43 Ta Setuid file. [Black on yellow]
+.It Li sg Ta Li 30;43 Ta Setgid file. [Black on yellow]
 .
 .It Li tw Ta Li 30;42 Ta Sticky and other writable directory. [Black on green]
 .
