@@ -337,6 +337,8 @@ parseLSCOLORS(const Char *value)
 
 	int fg, bg;
 	for (i = 0; i < len; i++) {
+	    if (i >= (sizeof(lscolors_to_varindex)/sizeof(lscolors_to_varindex[0])))
+		break;
 	    fg = color(*v++);
 	    if (fg == -1)
 		stderror(ERR_BADCOLORVAR, v[-1], '?');
