@@ -127,8 +127,8 @@ extern	 void		  set_color_context	(void);
 extern	 void		  print_with_color	(const Char *, const Char *, size_t,
 						 struct filetype);
 extern	 void		  parseCLICOLOR_FORCE	(int, const Char *);
-extern	 void		  parseLS_COLORS	(const Char *);
-extern	 void		  parseLSCOLORS		(const Char *);
+extern	 void		  parseLS_COLORS	(const Char *, int);
+extern	 void		  parseLSCOLORS		(const Char *, int);
 
 #endif /* COLOR_LS_F */
 

@@ -1511,12 +1511,12 @@ dosetenv(Char **v, struct command *c)
 	return;
     }
     if (eq(vp, STRLS_COLORS)) {
-	parseLS_COLORS(lp);
+	parseLS_COLORS(lp, FALSE);
 	cleanup_until(lp);
 	return;
     }
     if (eq(vp, STRLSCOLORS)) {
-	parseLSCOLORS(lp);
+	parseLSCOLORS(lp, FALSE);
 	cleanup_until(lp);
 	return;
     }
@@ -1647,10 +1647,24 @@ dounsetenv(Char **v, struct command *c)
 #ifdef COLOR_LS_F
 		else if (eq(name, STRCLICOLOR_FORCE))
 		    parseCLICOLOR_FORCE(FALSE, n);
-		else if (eq(name, STRLS_COLORS))
-		    parseLS_COLORS(n);
-		else if (eq(name, STRLSCOLORS))
-		    parseLSCOLORS(n);
+		else if (eq(name, STRLS_COLORS)) {
+		    parseLS_COLORS(n, FALSE);
+		    Char *other = tgetenv(STRLSCOLORS);
+		    if (other) {
+			    /* reapply LSCOLORS, ignoring errors */
+			parseLSCOLORS(other, TRUE);
+			setstatus(0);
+		    }
+		}
+		else if (eq(name, STRLSCOLORS)) {
+		    parseLSCOLORS(n, FALSE);
+		    Char *other = tgetenv(STRLS_COLORS);
+		    if (other) {
+			    /* reapply LS_COLORS, ignoring errors */
+			parseLS_COLORS(other, TRUE);
+			setstatus(0);
+		    }
+		}
 #endif /* COLOR_LS_F */
 #ifdef NLS_CATALOGS
 		else if (eq(name, STRNLSPATH)) {
