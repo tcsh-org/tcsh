@@ -9463,6 +9463,7 @@ define the per-file colors used by
 .Ev LS_COLORS ) .
 This variable is used by some BSD versions of
 .Xr ls 1 .
+.Pp
 On
 .Nm
 startup,
@@ -9478,6 +9479,18 @@ are
 the most recent
 .Ic setenv
 is used.
+If
+.Ev LSCOLORS
+is
+.Ic unsetenv
+while
+.Ev LS_COLORS
+is still
+.Ic setenv ,
+then
+.Ev LS_COLORS
+is parsed again (with any warnings suppressed)
+to reapply its settings.
 .Pp
 This variable is a 22 character string containing
 a concatenation of 11 pairs of the format
@@ -9583,6 +9596,7 @@ This variable is used by the GNU coreutils version of
 .Xr ls 1
 and may be setup by
 .Xr dircolors 1 .
+.Pp
 On
 .Nm
 startup,
@@ -9598,6 +9612,18 @@ are
 the most recent
 .Ic setenv
 is used.
+If
+.Ev LS_COLORS
+is
+.Ic unsetenv
+while
+.Ev LSCOLORS
+is still
+.Ic setenv ,
+then
+.Ev LSCOLORS
+is parsed again (with any warnings suppressed)
+to reapply its settings.
 .Pp
 The format of this variable is reminiscent of the
 .Xr termcap 5

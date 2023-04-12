@@ -222,22 +222,21 @@ TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-dim.out],
     [set color listflags=A listlinks])
 
 dnl
-dnl Fail: unknown environment LSCOLORS foreground color code 'i'.
+dnl Fail: environment LSCOLORS=ix exits with unknown 'i?'.
 dnl
 AT_CHECK([LSCOLORS=ix tcsh -f -c 'set color;cd DIR && ls-F'], [1], [], [dnl
 Unknown colorls variable 'i?'.
 ])
 
 dnl
-dnl Fail: unknown environment LSCOLORS background color code 'j'.
+dnl Fail: environment LSCOLORS=aj exits with unknown '?j'.
 dnl
 AT_CHECK([LSCOLORS=aj tcsh -f -c 'set color;cd DIR && ls-F'], [1], [], [dnl
 Unknown colorls variable '?j'.
 ])
 
 dnl
-dnl setenv LSCOLORS 6 chars: 2 pairs known (which are used), 1 pair unknown
-dnl (warns).
+dnl setenv LSCOLORS 6 chars: "bdDB" per short above, "ix" warns for unknown 'i?'.
 dnl listflags=A, listlinks
 dnl
 dnl As per ls-F-LSCOLORS-short.out.
@@ -246,6 +245,32 @@ TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-short.out],
     [],
     [setenv LSCOLORS "bdDBix"; set color listflags=A listlinks], [dnl
 Unknown colorls variable 'i?'.
+])
+
+dnl
+dnl LSCOLORS bright, override with LS_COLORS=ln=target,
+dnl then unsetenv LS_COLORS to reapply LSCOLORS.
+dnl
+dnl This should reapply LSCOLORS, and be same as ls-F-LSCOLORS-bright.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-bright.out],
+    [LSCOLORS=BxCxDxExFxGxHxaxbxcxdx LS_COLORS=ln=target],
+    [unsetenv LS_COLORS; set color listflags=A listlinks])
+
+dnl
+dnl Check unsetenv LS_COLORS to reapply existing LSCOLORS that contains unknown colors.
+dnl
+dnl setenv LSCOLORS 6 chars: "bdDB" per short above, "xj" warns for unknown '?j',
+dnl override with LS_COLORS=ln=target,
+dnl then unsetenv LS_COLORS to reapply faulty LSCOLORS without warning.
+dnl listflags=A, listlinks
+dnl
+dnl As per ls-F-LSCOLORS-short.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-short.out],
+    [],
+    [setenv LSCOLORS "bdDBxj"; setenv LS_COLORS ln=target; unsetenv LS_COLORS || echo FAIL; set color listflags=A listlinks], [dnl
+Unknown colorls variable '?j'.
 ])
 
 AT_CLEANUP()
@@ -322,6 +347,7 @@ TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-all.out],
 
 dnl
 dnl LS_COLORS with just ln=target, then unsetenv LS_COLORS.
+dnl
 dnl This should disable ln=target, and be same as ls-F-color-default.out.
 dnl
 TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
@@ -329,14 +355,15 @@ TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
     [unsetenv LS_COLORS; set color listflags=A listlinks])
 
 dnl
-dnl Fail: Unknown LS_COLORS color variable 'XX='. (Unknown 'YY' is ignored.)
+dnl Fail: environment LS_COLORS=YY:XX=0 exits with unknown 'XX'.
+dnl (Unknown 'YY' is ignored.)
 dnl
 AT_CHECK([LS_COLORS=YY:XX=0 tcsh -f -c 'set color;cd DIR && ls-F'], [1], [], [dnl
 Unknown colorls variable 'XX'.
 ])
 
 dnl
-dnl Unknown setenv LS_COLORS color variable 'XX='. (Unknown 'YY' is ignored').
+dnl setenv LS_COLORS "YY:XX=0" warns for unknown 'XX='. (Unknown 'YY' is ignored').
 dnl listflags=A, listlinks
 dnl
 dnl As per ls-F-color-default.out.
@@ -349,7 +376,8 @@ Unknown colorls variable 'XX'.
 
 dnl
 dnl Check setenv LS_COLORS that all variables before an unknown variable are used.
-dnl Unknown XX= in setenv LS_COLORS TCSH_TEXT_LS_COLORS:YY:XX=0 .
+dnl
+dnl setenv LS_COLORS TCSH_TEXT_LS_COLORS:YY:XX=0 warns for unknown 'XX'.
 dnl (Unknown 'YY' is ignored').
 dnl listflags=A, listlinks
 dnl
@@ -358,6 +386,30 @@ dnl
 TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-all.out],
     [],
     [setenv LS_COLORS "TCSH_TEXT_LS_COLORS:YY:XX=0"; set color listflags=A listlinks], [dnl
+Unknown colorls variable 'XX'.
+])
+
+dnl
+dnl LS_COLORS as TCSH_TEXT_LS_COLORS, override with setenv LSCOLORS,
+dnl then unsetenv LSCOLORS to reapply LS_COLORS.
+dnl
+dnl This should reapply LS_COLORS, and be the same as ls-F-LS_COLORS-all.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-all.out],
+    [LS_COLORS="TCSH_TEXT_LS_COLORS"],
+    [setenv LSCOLORS BxCxDxExFxGxHxaxbxcxdx; unsetenv LSCOLORS; set color listflags=A listlinks])
+
+dnl
+dnl Check unsetenv LSCOLORS to reapply existing LS_COLORS that contains unknown colors.
+dnl
+dnl setenv LS_COLORS "XX=0" warns for unknown 'XX' (and uses default colors),
+dnl override with LSCOLORS=Aa,
+dnl then unsetenv LSCOLORS to reapply faulty LS_COLORS without warning.
+dnl and results in default colors.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
+    [],
+    [setenv LS_COLORS XX=0; setenv LSCOLORS Aa; unsetenv LSCOLORS || echo FAIL; set color listflags=A listlinks], [dnl
 Unknown colorls variable 'XX'.
 ])
 
