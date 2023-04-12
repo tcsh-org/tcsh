@@ -136,4 +136,4 @@ $set 1
 134 Χρήση: unlimit [-fh] [όρια]
 135 Tο $%S είναι μόνο γιά διάβασμα
 136 Δεν υπάρχει τέτοια εργασία
-137 Unknown colorls variable '%c%c'
+137 Unknown %s color variable '%c%c'
