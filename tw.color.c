@@ -342,11 +342,13 @@ parseLSCOLORS(const Char *value, int silent)
 		break;
 	    fg = color(*v++);
 	    if (fg == -1)
-		stderror(ERR_BADCOLORVAR | (silent ? ERR_SILENT : 0), v[-1], '?');
+		stderror(ERR_BADCOLORVAR | (silent ? ERR_SILENT : 0),
+		    "LSCOLORS", v[-1], '?');
 
 	    bg = color(*v++);
 	    if (bg == -1)
-		stderror(ERR_BADCOLORVAR | (silent ? ERR_SILENT : 0), '?', v[-1]);
+		stderror(ERR_BADCOLORVAR | (silent ? ERR_SILENT : 0),
+		    "LSCOLORS", '?', v[-1]);
 	    assert(lscolors_to_varindex[i] < nvariables);
 	    makecolor(&c, fg, bg, &variables[lscolors_to_varindex[i]].color);
 	}
@@ -433,7 +435,8 @@ parseLS_COLORS(const Char *value, int silent)
 			continue;
 		    }
 		    else
-			stderror(ERR_BADCOLORVAR | (silent ? ERR_SILENT : 0), v[0], v[1]);
+			stderror(ERR_BADCOLORVAR | (silent ? ERR_SILENT : 0),
+			    "LS_COLORS", v[0], v[1]);
 		}
 		break;
 	    }

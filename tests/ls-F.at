@@ -225,14 +225,14 @@ dnl
 dnl Fail: environment LSCOLORS=ix exits with unknown 'i?'.
 dnl
 AT_CHECK([LSCOLORS=ix tcsh -f -c 'set color;cd DIR && ls-F'], [1], [], [dnl
-Unknown colorls variable 'i?'.
+Unknown LSCOLORS color variable 'i?'.
 ])
 
 dnl
 dnl Fail: environment LSCOLORS=aj exits with unknown '?j'.
 dnl
 AT_CHECK([LSCOLORS=aj tcsh -f -c 'set color;cd DIR && ls-F'], [1], [], [dnl
-Unknown colorls variable '?j'.
+Unknown LSCOLORS color variable '?j'.
 ])
 
 dnl
@@ -244,7 +244,7 @@ dnl
 TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-short.out],
     [],
     [setenv LSCOLORS "bdDBix"; set color listflags=A listlinks], [dnl
-Unknown colorls variable 'i?'.
+Unknown LSCOLORS color variable 'i?'.
 ])
 
 dnl
@@ -270,7 +270,7 @@ dnl
 TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-short.out],
     [],
     [setenv LSCOLORS "bdDBxj"; setenv LS_COLORS ln=target; unsetenv LS_COLORS || echo FAIL; set color listflags=A listlinks], [dnl
-Unknown colorls variable '?j'.
+Unknown LSCOLORS color variable '?j'.
 ])
 
 AT_CLEANUP()
@@ -359,7 +359,7 @@ dnl Fail: environment LS_COLORS=YY:XX=0 exits with unknown 'XX'.
 dnl (Unknown 'YY' is ignored.)
 dnl
 AT_CHECK([LS_COLORS=YY:XX=0 tcsh -f -c 'set color;cd DIR && ls-F'], [1], [], [dnl
-Unknown colorls variable 'XX'.
+Unknown LS_COLORS color variable 'XX'.
 ])
 
 dnl
@@ -371,7 +371,7 @@ dnl
 TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
     [],
     [setenv LS_COLORS "YY:XX=0"; set color listflags=A listlinks], [dnl
-Unknown colorls variable 'XX'.
+Unknown LS_COLORS color variable 'XX'.
 ])
 
 dnl
@@ -386,7 +386,7 @@ dnl
 TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-all.out],
     [],
     [setenv LS_COLORS "TCSH_TEXT_LS_COLORS:YY:XX=0"; set color listflags=A listlinks], [dnl
-Unknown colorls variable 'XX'.
+Unknown LS_COLORS color variable 'XX'.
 ])
 
 dnl
@@ -410,7 +410,7 @@ dnl
 TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
     [],
     [setenv LS_COLORS XX=0; setenv LSCOLORS Aa; unsetenv LSCOLORS || echo FAIL; set color listflags=A listlinks], [dnl
-Unknown colorls variable 'XX'.
+Unknown LS_COLORS color variable 'XX'.
 ])
 
 m4_popdef([TCSH_TEXT_LS_COLORS])
