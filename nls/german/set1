@@ -136,4 +136,4 @@ $set 1
 134 Benutzung: unlimit [-fh] [Grenzen]
 135 $%S ist nur lesbar
 136 Kein solcher Job
-137 Unknown colorls variable '%c%c'
+137 Unknown %s color variable '%c%c'

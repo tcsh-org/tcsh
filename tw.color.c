@@ -304,11 +304,12 @@ parseCLICOLOR_FORCE(int is_setenv, const Char *value)
 }
 
 /* parseLSCOLORS():
- * 	Parse the LSCOLORS environment variable
+ * 	Parse the LSCOLORS environment variable.
+ *	Suppress errors if silent is TRUE.
  */
 static const Char *xv;	/* setjmp clobbering */
 void
-parseLSCOLORS(const Char *value)
+parseLSCOLORS(const Char *value, int silent)
 {
     size_t i, len, clen;
     jmp_buf_t osetexit;
@@ -337,13 +338,17 @@ parseLSCOLORS(const Char *value)
 
 	int fg, bg;
 	for (i = 0; i < len; i++) {
+	    if (i >= (sizeof(lscolors_to_varindex)/sizeof(lscolors_to_varindex[0])))
+		break;
 	    fg = color(*v++);
 	    if (fg == -1)
-		stderror(ERR_BADCOLORVAR, v[-1], '?');
+		stderror(ERR_BADCOLORVAR | (silent ? ERR_SILENT : 0),
+		    "LSCOLORS", v[-1], '?');
 
 	    bg = color(*v++);
 	    if (bg == -1)
-		stderror(ERR_BADCOLORVAR, '?', v[-1]);
+		stderror(ERR_BADCOLORVAR | (silent ? ERR_SILENT : 0),
+		    "LSCOLORS", '?', v[-1]);
 	    assert(lscolors_to_varindex[i] < nvariables);
 	    makecolor(&c, fg, bg, &variables[lscolors_to_varindex[i]].color);
 	}
@@ -355,9 +360,11 @@ parseLSCOLORS(const Char *value)
 
 /* parseLS_COLORS():
  *	Parse the LS_COLORS environment variable
+ *	Suppress printing errors if silent is TRUE
+ *	(although a non-zero exit status still occurs).
  */
 void
-parseLS_COLORS(const Char *value)
+parseLS_COLORS(const Char *value, int silent)
 {
     size_t  i, len;
     const Char	 *v;		/* pointer in value */
@@ -428,7 +435,8 @@ parseLS_COLORS(const Char *value)
 			continue;
 		    }
 		    else
-			stderror(ERR_BADCOLORVAR, v[0], v[1]);
+			stderror(ERR_BADCOLORVAR | (silent ? ERR_SILENT : 0),
+			    "LS_COLORS", v[0], v[1]);
 		}
 		break;
 	    }

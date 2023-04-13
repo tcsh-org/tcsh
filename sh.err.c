@@ -363,7 +363,7 @@ errinit(void)
     elst[ERR_ULIMUS] = CSAVS(1, 134, "Usage: unlimit [-fh] [limits]");
     elst[ERR_READONLY] = CSAVS(1, 135, "$%S is read-only");
     elst[ERR_BADJOB] = CSAVS(1, 136, "No such job (badjob)");
-    elst[ERR_BADCOLORVAR] = CSAVS(1, 137, "Unknown colorls variable '%c%c'");
+    elst[ERR_BADCOLORVAR] = CSAVS(1, 137, "Unknown %s color variable '%c%c'");
     elst[ERR_EOF] = CSAVS(1, 138, "Unexpected end of file");
 }
 
