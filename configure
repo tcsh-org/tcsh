@@ -680,6 +680,7 @@ build
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
+RELEASE_TAG
 PACKAGE_PATCHLEVEL
 PACKAGE_VERS
 PACKAGE_REV
@@ -2985,6 +2986,9 @@ PACKAGE_VERS="${PACKAGE_VERS%.*}"
 
 PACKAGE_PATCHLEVEL="${PACKAGE_VERSION##*.}"
 PACKAGE_PATCHLEVEL="${PACKAGE_PATCHLEVEL##0}"
+
+
+RELEASE_TAG="$(echo "TCSH${PACKAGE_VERSION}" | tr . _)"
 
 
 
@@ -10341,6 +10345,8 @@ printf "%s\n" "$as_me: PACKAGE_REV             $PACKAGE_REV" >&6;}
 printf "%s\n" "$as_me: PACKAGE_VERS            $PACKAGE_VERS" >&6;}
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: PACKAGE_VERSION         $PACKAGE_VERSION" >&5
 printf "%s\n" "$as_me: PACKAGE_VERSION         $PACKAGE_VERSION" >&6;}
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: RELEASE_TAG             $RELEASE_TAG" >&5
+printf "%s\n" "$as_me: RELEASE_TAG             $RELEASE_TAG" >&6;}
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: tcsh_config_file        system/$tcsh_config_file" >&5
 printf "%s\n" "$as_me: tcsh_config_file        system/$tcsh_config_file" >&6;}
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: =========================================" >&5
