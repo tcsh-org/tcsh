@@ -1,3 +1,6 @@
+ 27. V6.24.09 - 2023-04-13
+ 26. ls-F: unsetenv LS*COLOR reapplies other LS*COLOR (Luke Mewburn)
+ 25. Don't crash if LSCOLORS contains > 11 pairs (Luke Mewburn)
  24. V6.24.08 - 2023-04-10
  23. Support LS_COLORS su,sg,tw,ow,st,mh variables. (Luke Mewburn)
  22. Fixes for LS_COLORS ln=target: ls-F directory; reset on unsetenv;
