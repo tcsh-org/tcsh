@@ -1,37 +1,39 @@
 CREATE BUILD MACHINES
 
     cd ~/src/cloud/terraform/infra/accounts/Development/dev-build
-    terraform apply
+    terraform plan -out=tfplan
+    terraform apply tfplan
+    rm tfplan
+
+PREP BUILD DIRECTORY
+
+    cd ~/src/tcsh/build && mkdir -p deb src
 
 COPY TO AMD64 BUILD MACHINE
 
     While rototilling the build:
 
-	git archive -o tcsh_6.24.03.orig.tar.gz --prefix=tcsh-6.24.03/ HEAD
-	scp -p tcsh_6.24.03.orig.tar.gz amd64-builder:src/tcsh-build/src/
+	(cd .. && git archive -o build/src/tcsh_6.24.09.orig.tar.gz --prefix=tcsh-6.24.09/ HEAD)
 
     When things don't need massaging (note the renaming here):
 
-	scp -p tcsh-6.24.03.tar.gz amd64-builder:src/tcsh-build/src/tcsh_6.24.03.orig.tar.gz
+	cp -p ../tcsh-6.24.09.tar.gz src/tcsh_6.24.09.orig.tar.gz
 
-COPY TO ARM64 BUILD MACHINE
+COPY TO EACH BUILD MACHINE
 
-    On amd64-builder:
-
-	cd ~/src/tcsh-build
-	rm -rf deb/*
-	ssh arm64-builder "mkdir -p src"
-	rsync -PaHvSs --delete ./ arm64-builder:src/tcsh-build/
+    foreach arch ( amd64 arm64 )
+    rsync -PaHvSs --delete ./ builder-${arch}:tcsh-build/
+    end
 
 BUILD ON EACH BUILD MACHINE
 
-    cd ~/src/tcsh-build
-    ./run-builds
+    cd ~/tcsh-build && ./run-builds
 
 COPY FROM EACH BUILD MACHINE
 
-    rsync -Pv -crstuOp --chmod Fgo-w,a+rX amd64-builder:src/tcsh-build/deb/ work/repos/tcsh/
-    rsync -Pv -crstuOp --chmod Fgo-w,a+rX arm64-builder:src/tcsh-build/deb/ work/repos/tcsh/
+    foreach arch ( amd64 arm64 )
+    rsync -Pv -crstuOp --chmod Fgo-w,a+rX builder-${arch}:tcsh-build/deb/ work/repos/tcsh/
+    end
 
 SIGN REPO
 
