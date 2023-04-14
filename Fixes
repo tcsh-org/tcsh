@@ -1,3 +1,6 @@
+ 29. V6.24.10 - 2023-04-14
+ 28. Restore skipping of the "$edit" and "Comments" tests when not running
+     on a terminal (Kimmo Suominen)
  27. V6.24.09 - 2023-04-13
  26. ls-F: unsetenv LS*COLOR reapplies other LS*COLOR (Luke Mewburn)
  25. Don't crash if LSCOLORS contains > 11 pairs (Luke Mewburn)
