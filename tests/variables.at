@@ -530,6 +530,8 @@ dnl
 AT_SETUP([$ edit])
 AT_KEYWORDS([variables])
 
+AT_CHECK([if [ ! -t 0 ]; then exit 77; fi],, [Skipping $edit tests])
+
 AT_CHECK([TERM=something tcsh -f -c 'echo $?edit'], ,
 [1
 ])
