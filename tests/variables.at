@@ -543,6 +543,11 @@ AT_CHECK([cat stdout], ,
 ])
 ])
 
+dnl Explicitly disable stdin as terminal
+AT_CHECK([TERM=something tcsh -f -c 'echo $?edit' < /dev/null], ,
+[0
+])
+
 AT_CHECK([TERM=dumb tcsh -f -c 'echo $?edit'], ,
 [0
 ])
