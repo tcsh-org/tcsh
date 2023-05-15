@@ -526,14 +526,21 @@ AT_CLEANUP()
 dnl
 dnl	$ edit
 dnl
+dnl Note that editing is disabled if stdin is not a terminal.
+dnl
 
 AT_SETUP([$ edit])
 AT_KEYWORDS([variables])
 
-AT_CHECK([if [ ! -t 0 ]; then exit 77; fi],, [Skipping $edit tests])
-
-AT_CHECK([TERM=something tcsh -f -c 'echo $?edit'], ,
+AT_CHECK([TERM=something tcsh -f -c 'echo $?edit'], , [stdout])
+AS_IF([test -t 0], [dnl
+AT_CHECK([cat stdout], ,
 [1
+])
+], [dnl
+AT_CHECK([cat stdout], ,
+[0
+])
 ])
 
 AT_CHECK([TERM=dumb tcsh -f -c 'echo $?edit'], ,
