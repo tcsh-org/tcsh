@@ -665,9 +665,6 @@ funcerror(Char *n, Char *msg)
     char nconv[Strlen(n) + 1],
 	 msgconv[Strlen(msg) + 1];
 
-    strcpy(nconv, short2str(n));
-    strcpy(msgconv, short2str(msg));
-
-    setname(nconv);
-    stderror(ERR_NAME | ERR_NOTFOUND, msgconv);
+    setname(strcpy(nconv, short2str(n)));
+    stderror(ERR_NAME | ERR_NOTFOUND, strcpy(msgconv, short2str(msg)));
 }

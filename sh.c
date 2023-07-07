@@ -2004,7 +2004,7 @@ process(int catch)
 	     funcmain[] = { 'm', 'a', 'i', 'n', 0 };
 	struct Strbuf aword = Strbuf_INIT;
 	cleanup_push(&aword, Strbuf_cleanup);
-	Sgoal = funcmain;
+	Sgoal = fargv->v[2];
 	Stype = TC_GOTO;
 
 	if (!fargv->prev)
@@ -2027,7 +2027,6 @@ process(int catch)
 	    struct Ain a;
 
 	    cleanup_push(&aword, Strbuf_cleanup);
-	    Sgoal = fargv->v[2];
 	    Stype = TC_EXIT;
 	    a.type = TCSH_F_SEEK;
 	    btell(&a);
@@ -2038,7 +2037,7 @@ process(int catch)
 		Strbuf_terminate(&aword);
 
 		if (aword.s[0] != ':' && lastchr(aword.s) == ':')
-		    funcerror(fargv->v[2], funcexit);
+		    funcerror(Sgoal, funcexit);
 		else if (eq(aword.s, funcexit))
 		    funcdelim = 1;
 
