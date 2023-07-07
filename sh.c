@@ -111,6 +111,7 @@ int	exitset = 0;
 static time_t  chktim;		/* Time mail last checked */
 char *progname;
 int tcsh;
+struct funcargs *fargv = NULL;
 
 /*
  * This preserves the input state of the shell. It is used by
@@ -1995,6 +1996,59 @@ process(int catch)
 
     getexit(osetexit);
     omark = cleanup_push_mark();
+
+    /* If this is a function, setup STRargv and invoke goto. */
+    if (fargv) {
+	int funcdelim = 0;
+	Char funcexit[] = { 'e', 'x', 'i', 't', 0 },
+	     funcmain[] = { 'm', 'a', 'i', 'n', 0 };
+	struct Strbuf aword = Strbuf_INIT;
+	cleanup_push(&aword, Strbuf_cleanup);
+	Sgoal = funcmain;
+	Stype = TC_GOTO;
+
+	if (!fargv->prev)
+	    while (!funcdelim) {
+		(void) getword(&aword);
+		Strbuf_terminate(&aword);
+
+		if (aword.s[0] != ':' && lastchr(aword.s) == ':')
+		    funcerror(funcmain, funcexit);
+		else if (eq(aword.s, funcexit))
+		    funcdelim = 1;
+
+		(void) getword(NULL);
+	    }
+
+	setq(STRargv, &fargv->v[3], &shvhed, 0);
+	dogoto(&fargv->v[1], fargv->t);
+
+	{
+	    struct Ain a;
+
+	    cleanup_push(&aword, Strbuf_cleanup);
+	    Sgoal = fargv->v[2];
+	    Stype = TC_EXIT;
+	    a.type = TCSH_F_SEEK;
+	    btell(&a);
+	    funcdelim = 0;
+
+	    while (!funcdelim) {
+		(void) getword(&aword);
+		Strbuf_terminate(&aword);
+
+		if (aword.s[0] != ':' && lastchr(aword.s) == ':')
+		    funcerror(fargv->v[2], funcexit);
+		else if (eq(aword.s, funcexit))
+		    funcdelim = 1;
+
+		(void) getword(NULL);
+	    }
+
+	    bseek(&a);
+	}
+    }
+
     for (;;) {
 	struct command *t;
 	int hadhist, old_pintr_disabled;
@@ -2179,6 +2233,20 @@ process(int catch)
 	else
 	    haderr = 1;
     }
+
+    if (fargv) {
+	/* Reset STRargv on function exit. */
+	setv(STRargv, NULL, 0);
+
+	if (fargv->prev)
+	{
+	    fargv = fargv->prev;
+	    free(fargv->next);
+	}
+	else
+	    free(fargv);
+    }
+
     cleanup_pop_mark(omark);
     resexit(osetexit);
     exitset--;

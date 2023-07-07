@@ -56,7 +56,6 @@ static	void	preread		(void);
 static	void	doagain		(void);
 static  const char *isrchx	(int);
 static	void	search		(int, int, Char *);
-static	int	getword		(struct Strbuf *);
 static	struct wordent	*histgetword	(struct wordent *);
 static	void	toend		(void);
 static	void	xecho		(int, Char **);
@@ -742,8 +741,8 @@ isrchx(int n)
 }
 
 
-static int Stype;
-static Char *Sgoal;
+int Stype;
+Char *Sgoal;
 
 static void
 search(int type, int level, Char *goal)
@@ -1000,7 +999,7 @@ past:
     return NULL;
 }
 
-static int
+int
 getword(struct Strbuf *wp)
 {
     int found = 0, first;
@@ -1094,6 +1093,11 @@ past:
     case TC_GOTO:
 	setname(short2str(Sgoal));
 	stderror(ERR_NAME | ERR_NOTFOUND, "label");
+	break;
+
+    case TC_EXIT:
+	setname(short2str(Sgoal));
+	stderror(ERR_NAME | ERR_NOTFOUND, "exit");
 	break;
 
     default:
@@ -2718,4 +2722,42 @@ getYN(const char *prompt)
     while (c != '\n' && force_read(SHIN, &c, sizeof(c)) == sizeof(c))
 	continue;
     return doit;
+}
+
+void
+dofunction(Char **v, struct command *t)
+{
+    if (!ffile)
+	stderror(ERR_DOLFUNC);
+
+    {
+	int i, j;
+	Char **vh;
+
+	for (i = 0; v[i]; i++)
+	    ;
+
+	vh = xmalloc((i + 2) * sizeof(Char *));
+	vh[i + 1] = NULL;
+
+	for (j = i--; i; i--, j--) {
+	    vh[j] = xmalloc(((Strlen(v[i]) + 1) * sizeof(Char)));
+	    Strcpy(vh[j], v[i]);
+	}
+	vh[1] = xmalloc(Strlen(ffile) + 1);
+	Strcpy(vh[1], ffile);
+	*vh = xmalloc(Strlen(*v) + 1);
+	Strcpy(*vh, *v);
+
+	if (fargv) {
+	    fargv->next = malloc(sizeof *fargv);
+	    fargv->next->prev = fargv;
+	    fargv = fargv->next;
+	} else {
+	    fargv = malloc(sizeof *fargv);
+	    fargv->prev = NULL;
+	}
+
+	dosource(fargv->v = vh, fargv->t = t);
+    }
 }
