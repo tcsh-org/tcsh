@@ -105,6 +105,7 @@ extern	void		  xfree_indirect(void *);
 extern	void		  errinit	(void);
 extern	void		  seterror	(unsigned int, ...);
 extern	void		  fixerror	(void);
+extern	void		  funcerror	(Char *, Char *);
 extern	void		  stderror	(unsigned int, ...)
     __attribute__((__noreturn__));
 
@@ -150,6 +151,7 @@ extern	void		  doend		(Char **, struct command *);
 extern	void		  doeval	(Char **, struct command *);
 extern	void		  doexit	(Char **, struct command *);
 extern	void		  doforeach	(Char **, struct command *);
+extern	void		  dofunction	(Char **, struct command *);
 extern	void		  doglob	(Char **, struct command *);
 extern	void		  dogoto	(Char **, struct command *);
 extern	void		  doif		(Char **, struct command *);

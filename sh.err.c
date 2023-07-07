@@ -188,7 +188,8 @@ extern int enterhist;
 #define ERR_BADCOLORVAR	134
 #define ERR_EOF		135
 #define ERR_UNAVAILABLE	136
-#define NO_ERRORS	137
+#define ERR_DOLFUNC	137
+#define NO_ERRORS	138
 
 static const char *elst[NO_ERRORS] INIT_ZERO_STRUCT;
 
@@ -367,7 +368,7 @@ errinit(void)
     elst[ERR_BADCOLORVAR] = CSAVS(1, 137, "Unknown %s color variable '%c%c'");
     elst[ERR_EOF] = CSAVS(1, 138, "Unexpected end of file");
     elst[ERR_UNAVAILABLE] = CSAVS(1, 139, "%s: Feature is not available for this platform");
-
+    elst[ERR_DOLFUNC] = CSAVS(1, 140, "Functions are only supported for scripts");
 }
 
 /* Cleanup data. */
@@ -656,4 +657,17 @@ stderror(unsigned int id, ...)
     fixerror();
 
     reset();		/* Unwind */
+}
+
+void
+funcerror(Char *n, Char *msg)
+{
+    char nconv[Strlen(n) + 1],
+	 msgconv[Strlen(msg) + 1];
+
+    strcpy(nconv, short2str(n));
+    strcpy(msgconv, short2str(msg));
+
+    setname(nconv);
+    stderror(ERR_NAME | ERR_NOTFOUND, msgconv);
 }
