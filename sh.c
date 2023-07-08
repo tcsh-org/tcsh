@@ -1997,7 +1997,12 @@ process(int catch)
     getexit(osetexit);
     omark = cleanup_push_mark();
 
-    /* If this is a function, setup STRargv and invoke goto. */
+    /* Functions must have an exit to their end.
+     * if (!fargv->prev) is only true if this is a first function call.
+     * First seek for an exit before jumping to the label,
+     * then seek for an exit on the requested label.
+     * Function arguments are passed to STRargv.
+     * STRargv is reset after the function is done. */
     if (fargv) {
 	int funcdelim = 0;
 	Char funcexit[] = { 'e', 'x', 'i', 't', 0 },
@@ -2229,19 +2234,6 @@ process(int catch)
 	    cleanup_until(&paraml);
 	else
 	    haderr = 1;
-    }
-
-    if (fargv) {
-	/* Reset STRargv on function exit. */
-	setv(STRargv, NULL, VAR_READWRITE);
-
-	if (fargv->prev)
-	{
-	    fargv = fargv->prev;
-	    free(fargv->next);
-	}
-	else
-	    free(fargv);
     }
 
     cleanup_pop_mark(omark);
