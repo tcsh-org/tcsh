@@ -2003,7 +2003,6 @@ process(int catch)
 	Char funcexit[] = { 'e', 'x', 'i', 't', 0 },
 	     funcmain[] = { 'm', 'a', 'i', 'n', 0 };
 	struct Strbuf aword = Strbuf_INIT;
-	cleanup_push(&aword, Strbuf_cleanup);
 	Sgoal = fargv->v[2];
 	Stype = TC_GOTO;
 
@@ -2020,13 +2019,12 @@ process(int catch)
 		(void) getword(NULL);
 	    }
 
-	setq(STRargv, &fargv->v[3], &shvhed, 0);
+	setq(STRargv, &fargv->v[3], &shvhed, VAR_READWRITE);
 	dogoto(&fargv->v[1], fargv->t);
 
 	{
 	    struct Ain a;
 
-	    cleanup_push(&aword, Strbuf_cleanup);
 	    Stype = TC_EXIT;
 	    a.type = TCSH_F_SEEK;
 	    btell(&a);
@@ -2235,7 +2233,7 @@ process(int catch)
 
     if (fargv) {
 	/* Reset STRargv on function exit. */
-	setv(STRargv, NULL, 0);
+	setv(STRargv, NULL, VAR_READWRITE);
 
 	if (fargv->prev)
 	{
