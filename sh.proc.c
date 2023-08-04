@@ -1981,7 +1981,7 @@ setttypgrp(int pgrp)
 	struct sigaction old;
 
         /*
-	 * tcsetpgrp will set SIGTTOU to all the the processes in
+	 * tcsetpgrp will set SIGTTOU to all the processes in
 	 * the background according to POSIX... We ignore this here.
 	 */
 	sigaction(SIGTTOU, NULL, &old);

@@ -339,7 +339,7 @@
   6. Add history.at (Ted Anderson)
   5. Better NLSPATH handling (Norm Jacobs)
   4. Fix hostname building from utmp (Cyrus Rahman)
-  3. Handle pending signals before flush so that the the history file does
+  3. Handle pending signals before flush so that the history file does
      not get truncated.  (Ted Anderson)
   2. Fix AsciiOnly setting that broke 8 bit input. (Juergen Keil)
   1. remember to closedir in mailchk (from Werner Fink, reported by
@@ -827,7 +827,7 @@
 
  65. V6.09.00 - 1999-08-16
  64. Add csh emacs mode (Dan Harkless)
- 63. Make sure the the glob buffer matches the word buffer size (Brian Biswas)
+ 63. Make sure the glob buffer matches the word buffer size (Brian Biswas)
  62. Fix periodic to work without tperiod set (Kenny McCormack)
  61. V6.08.07 - 1999-08-13
  60. Fix e_dabbrev_expand (Bjorn Knutsson)
