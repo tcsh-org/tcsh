@@ -1769,6 +1769,60 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 	cleanup_push(&pintr_disabled, disabled_cleanup);
     }
 
+    /* Functions must have an exit to their end.
+     * if (!fargv->prev) is only true if this is a first function call.
+     * First seek for an exit before jumping to the label,
+     * then seek for an exit on the requested label.
+     * Function arguments are passed to STRargv.
+     * STRargv is reset after the function is done. */
+    if (fargv) {
+	int funcdelim = 0;
+	Char funcexit[] = { 'e', 'x', 'i', 't', 0 },
+	     funcmain[] = { 'm', 'a', 'i', 'n', 0 };
+	struct Strbuf aword = Strbuf_INIT;
+	Sgoal = fargv->v[2];
+	Stype = TC_GOTO;
+
+	if (!fargv->prev)
+	    while (!funcdelim) {
+		(void) getword(&aword);
+		Strbuf_terminate(&aword);
+
+		if (aword.s[0] != ':' && lastchr(aword.s) == ':')
+		    funcerror(funcmain, funcexit);
+		else if (eq(aword.s, funcexit))
+		    funcdelim = 1;
+
+		(void) getword(NULL);
+	    }
+
+	setq(STRargv, &fargv->v[3], &shvhed, VAR_READWRITE);
+	dogoto(&fargv->v[1], fargv->t);
+
+	{
+	    struct Ain a;
+
+	    Stype = TC_EXIT;
+	    a.type = TCSH_F_SEEK;
+	    btell(&a);
+	    funcdelim = 0;
+
+	    while (!funcdelim) {
+		(void) getword(&aword);
+		Strbuf_terminate(&aword);
+
+		if (aword.s[0] != ':' && lastchr(aword.s) == ':')
+		    funcerror(Sgoal, funcexit);
+		else if (eq(aword.s, funcexit))
+		    funcdelim = 1;
+
+		(void) getword(NULL);
+	    }
+
+	    bseek(&a);
+	}
+    }
+
     process(0);		/* 0 -> blow away on errors */
 
     /* Restore the old state */
@@ -1996,60 +2050,6 @@ process(int catch)
 
     getexit(osetexit);
     omark = cleanup_push_mark();
-
-    /* Functions must have an exit to their end.
-     * if (!fargv->prev) is only true if this is a first function call.
-     * First seek for an exit before jumping to the label,
-     * then seek for an exit on the requested label.
-     * Function arguments are passed to STRargv.
-     * STRargv is reset after the function is done. */
-    if (fargv) {
-	int funcdelim = 0;
-	Char funcexit[] = { 'e', 'x', 'i', 't', 0 },
-	     funcmain[] = { 'm', 'a', 'i', 'n', 0 };
-	struct Strbuf aword = Strbuf_INIT;
-	Sgoal = fargv->v[2];
-	Stype = TC_GOTO;
-
-	if (!fargv->prev)
-	    while (!funcdelim) {
-		(void) getword(&aword);
-		Strbuf_terminate(&aword);
-
-		if (aword.s[0] != ':' && lastchr(aword.s) == ':')
-		    funcerror(funcmain, funcexit);
-		else if (eq(aword.s, funcexit))
-		    funcdelim = 1;
-
-		(void) getword(NULL);
-	    }
-
-	setq(STRargv, &fargv->v[3], &shvhed, VAR_READWRITE);
-	dogoto(&fargv->v[1], fargv->t);
-
-	{
-	    struct Ain a;
-
-	    Stype = TC_EXIT;
-	    a.type = TCSH_F_SEEK;
-	    btell(&a);
-	    funcdelim = 0;
-
-	    while (!funcdelim) {
-		(void) getword(&aword);
-		Strbuf_terminate(&aword);
-
-		if (aword.s[0] != ':' && lastchr(aword.s) == ':')
-		    funcerror(Sgoal, funcexit);
-		else if (eq(aword.s, funcexit))
-		    funcdelim = 1;
-
-		(void) getword(NULL);
-	    }
-
-	    bseek(&a);
-	}
-    }
 
     for (;;) {
 	struct command *t;
