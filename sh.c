@@ -1827,6 +1827,7 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 	    a.type = TCSH_F_SEEK;
 	    btell(&a);
 
+	    cleanup_push(&aword, Strbuf_cleanup);
 	    while (1) {
 		(void) getword(&aword);
 		Strbuf_terminate(&aword);
@@ -1873,7 +1874,7 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 	    bseek(&a);
 	}
 
-	cleanup_push(&aword, Strbuf_cleanup);
+	cleanup_until(&aword);
     }
 
     process(0);		/* 0 -> blow away on errors */
