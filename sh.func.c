@@ -2729,7 +2729,7 @@ getYN(const char *prompt)
 void
 dofunction(Char **v, struct command *t)
 {
-    if (!ffile)
+    if (!dolzero)
 	stderror(ERR_FUNC);
 
     {
