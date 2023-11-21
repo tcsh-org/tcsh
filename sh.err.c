@@ -187,7 +187,7 @@ extern int enterhist;
 #define ERR_INVALID	133
 #define ERR_BADCOLORVAR	134
 #define ERR_EOF		135
-#define ERR_DOLFUNC	136
+#define ERR_FUNC	136
 #define NO_ERRORS	137
 
 static const char *elst[NO_ERRORS] INIT_ZERO_STRUCT;
@@ -366,7 +366,7 @@ errinit(void)
     elst[ERR_BADJOB] = CSAVS(1, 136, "No such job (badjob)");
     elst[ERR_BADCOLORVAR] = CSAVS(1, 137, "Unknown %s color variable '%c%c'");
     elst[ERR_EOF] = CSAVS(1, 138, "Unexpected end of file");
-    elst[ERR_DOLFUNC] = CSAVS(1, 139, "Functions are only supported for scripts");
+    elst[ERR_FUNC] = CSAVS(1, 139, "Functions are only supported for scripts");
 }
 
 /* Cleanup data. */
