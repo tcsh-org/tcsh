@@ -1771,27 +1771,48 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 
     /* Functions must have an exit to their end.
      * if (!fargv->prev) is only true if this is a first function call.
-     * First seek for an exit before jumping to the label,
-     * then seek for an exit on the requested label.
+     * First seek for an ending exit before jumping to the label,
+     * then seek for an ending exit on the requested label.
      * Function arguments are passed to STRargv.
      * STRargv is reset after the function is done. */
     if (fargv) {
-	int funcdelim = 0;
 	Char funcexit[] = { 'e', 'x', 'i', 't', 0 },
 	     funcmain[] = { 'm', 'a', 'i', 'n', 0 };
 	struct Strbuf aword = Strbuf_INIT;
 	Sgoal = fargv->v[2];
 	Stype = TC_GOTO;
+	fargv->eof = 0;
 
 	if (!fargv->prev)
-	    while (!funcdelim) {
+	    while (1) {
 		(void) getword(&aword);
 		Strbuf_terminate(&aword);
 
+		if (eq(aword.s, funcexit)) {
+		    int last = 1;
+
+		    while (1) {
+			do {
+			    (void) getword(NULL);
+			    (void) getword(&aword);
+			    Strbuf_terminate(&aword);
+			} while (!aword.s[0]);
+			if (aword.s[0] != ':' && lastchr(aword.s) == ':') {
+			    if (!last)
+				funcerror(funcmain, funcexit);
+			    break;
+			}
+			if (!eq(aword.s, funcexit)) {
+			    last = 0;
+			    continue;
+			}
+			last = 1;
+		    }
+
+		    break;
+		}
 		if (aword.s[0] != ':' && lastchr(aword.s) == ':')
 		    funcerror(funcmain, funcexit);
-		else if (eq(aword.s, funcexit))
-		    funcdelim = 1;
 
 		(void) getword(NULL);
 	    }
@@ -1805,22 +1826,54 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 	    Stype = TC_EXIT;
 	    a.type = TCSH_F_SEEK;
 	    btell(&a);
-	    funcdelim = 0;
 
-	    while (!funcdelim) {
+	    while (1) {
 		(void) getword(&aword);
 		Strbuf_terminate(&aword);
 
+		if (eq(aword.s, funcexit)) {
+		    int last = 1, eof = 0;
+
+		    fargv->eof = 1;
+		    while (1) {
+			do {
+			    (void) getword(NULL);
+			    if ((intptr_t) getword(&aword) == (intptr_t) &fargv) {
+				Strbuf_terminate(&aword);
+				eof = 1;
+				break;
+			    }
+			    Strbuf_terminate(&aword);
+			} while (!aword.s[0]);
+			if (eof) {
+			    if (!last)
+				funcerror(Sgoal, funcexit);
+			    break;
+			}
+			if (aword.s[0] != ':' && lastchr(aword.s) == ':') {
+			    if (!last)
+				funcerror(Sgoal, funcexit);
+			    break;
+			}
+			if (!eq(aword.s, funcexit)) {
+			    last = 0;
+			    continue;
+			}
+			last = 1;
+		    }
+
+		    break;
+		}
 		if (aword.s[0] != ':' && lastchr(aword.s) == ':')
 		    funcerror(Sgoal, funcexit);
-		else if (eq(aword.s, funcexit))
-		    funcdelim = 1;
 
 		(void) getword(NULL);
 	    }
 
 	    bseek(&a);
 	}
+
+	cleanup_push(&aword, Strbuf_cleanup);
     }
 
     process(0);		/* 0 -> blow away on errors */

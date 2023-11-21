@@ -1096,6 +1096,8 @@ past:
 	break;
 
     case TC_EXIT:
+	if (fargv->eof)
+	    return (intptr_t) &fargv;
 	setname(short2str(Sgoal));
 	stderror(ERR_NAME | ERR_NOTFOUND, "exit");
 	break;
