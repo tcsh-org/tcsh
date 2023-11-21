@@ -2739,16 +2739,16 @@ dofunction(Char **v, struct command *t)
 	for (i = 0; v[i]; i++)
 	    ;
 
-	vh = xmalloc((i + 2) * sizeof(Char *));
+	vh = xmalloc(sizeof(Char [i + 2]));
 	vh[i + 1] = NULL;
 
 	for (j = i--; i; i--, j--) {
-	    vh[j] = xmalloc(((Strlen(v[i]) + 1) * sizeof(Char)));
+	    vh[j] = xmalloc(sizeof(Char [Strlen(v[i]) + 1]));
 	    Strcpy(vh[j], v[i]);
 	}
-	vh[1] = xmalloc(Strlen(ffile) + 1);
+	vh[1] = xmalloc(sizeof (Char [Strlen(ffile) + 1]));
 	Strcpy(vh[1], ffile);
-	*vh = xmalloc(Strlen(*v) + 1);
+	*vh = xmalloc(sizeof (Char [Strlen(*v) + 1]));
 	Strcpy(*vh, *v);
 
 	if (fargv) {
