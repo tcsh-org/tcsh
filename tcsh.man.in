@@ -5521,6 +5521,30 @@ the loop are executed.
 If you make a mistake typing in a
 loop at the terminal you can rub it out.
 .
+.It Ic function Ar label Xo
+.Op Ar arg
+\&... (+)
+.Xc
+.Ar label
+is a
+.Ic goto
+label. The shell recurses the current script,
+searches for and continues execution after a line of the form
+.Dl Ar label Ns No \&:
+.Ar arg
+is a list of arguments to be passed to
+.Ic argv Ns No \&.
+Use outside a label is labeled
+.Ar main Ns No \&.
+It's an error
+.Sq Ar label Ns No \&:
+not contain an ending
+.Ic exit Ns No \&.
+It's an error
+.Ar main
+not contain an ending
+.Ic exit Ns No \&.
+.
 .El
 .Bl -tag -width 6n
 .
@@ -10642,6 +10666,12 @@ and message catalog code to interface to Windows.
 .br
 Color ls additions.
 .
+.It Matheus Garcia ,
+2023.
+.br
+.Ic function
+built-in.
+.
 .El
 .
 .Sh THANKS TO
@@ -10743,6 +10773,10 @@ Command substitution supports multiple commands and conditions, but not
 cycles or backward
 .Ic goto Ns
 s.
+.Pp
+Functions fallthrough if the ending
+.Ic exit
+is piped from or executed in background.
 .Pp
 Report bugs at
 .Lk @PACKAGE_BUGREPORT@
