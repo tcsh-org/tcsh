@@ -273,6 +273,22 @@ syn0(const struct wordent *p1, const struct wordent *p2, int flags)
 	    t->t_dcar = t1;
 	    t->t_dcdr = syntax(p, p2, flags);
 	    return (t);
+
+	case '#':
+	    if (intty) {
+		struct wordent *p1 = (struct wordent *) p;
+
+		*(struct wordent **) &p2->prev = p1->prev;
+		*(struct wordent **) &p2->prev->next = (struct wordent *) p2;
+		while (p1->next != p2)
+		    p1 = p1->next;
+		p1->next = (struct wordent *) p;
+		freelex(p1 = p1->next);
+		xfree(p1->word);
+		xfree(p1);
+		*(struct wordent **) &p = (struct wordent *) p2->prev;
+		continue;
+	    }
 	default:
 	    break;
 	}
