@@ -207,7 +207,7 @@ syntax(const struct wordent *p1, const struct wordent *p2, int flags)
 {
 
     while (p1 != p2)
-	if (any(";&\n", p1->word[0]))
+	if (any(intty ? ";&\n#" : ";&\n", p1->word[0]))
 	    p1 = p1->next;
 	else
 	    return (syn0(p1, p2, flags));
@@ -279,15 +279,14 @@ syn0(const struct wordent *p1, const struct wordent *p2, int flags)
 		struct wordent *p1 = (struct wordent *) p;
 
 		*(struct wordent **) &p2->prev = p1->prev;
-		*(struct wordent **) &p2->prev->next = (struct wordent *) p2;
+		p2->prev->next = (struct wordent *) p2;
 		while (p1->next != p2)
 		    p1 = p1->next;
 		p1->next = (struct wordent *) p;
 		freelex(p1 = p1->next);
 		xfree(p1->word);
 		xfree(p1);
-		*(struct wordent **) &p = (struct wordent *) p2->prev;
-		continue;
+		*(struct wordent **) &p = p2->prev;
 	    }
 	default:
 	    break;
