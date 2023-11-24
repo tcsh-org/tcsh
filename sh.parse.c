@@ -276,13 +276,12 @@ syn0(const struct wordent *p1, const struct wordent *p2, int flags)
 
 	case '#':
 	    if (intty) {
-		struct wordent *p1 = p2->prev->prev;
+		struct wordent *p1 = p2->prev;
 
-		xfree(p1->word);
-		p1 = p1->prev;
+		p1 = p1->prev = p1->prev->prev;
+		xfree(p1->next->word);
 		xfree(p1->next);
 		p = p1->next = p2->prev;
-		xfree(p1);
 	    }
 	default:
 	    break;
