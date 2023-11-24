@@ -134,8 +134,6 @@ static Char getCtmp;
 time_t Htime = (time_t)0;
 static time_t a2time_t (Char *);
 
-static int comment;
-
 /*
  * special parsing rules apply for source -h
  */
@@ -150,7 +148,7 @@ lex(struct wordent *hp)
     int     parsehtime = enterhist;
     int	    toolong = 0;
 
-    histvalid = comment = histline.len = 0;
+    histvalid = histline.len = 0;
 
     if (!postcmd_active)
 	btell(&lineloc);
@@ -359,6 +357,13 @@ loop:
 	default:
 	    break;
 	}
+    if (intty && c == '#') {
+	Strbuf_append1(&wbuf, c);
+	while ((c = readc(1)) != CHAR_ERR && c != '\n')
+	    Strbuf_append1(&wbuf, c);
+	unreadc('\n');
+	goto ret;
+    }
     c1 = 0;
     dolflg = DOALL;
     for (;;) {
@@ -483,8 +488,6 @@ getC1(int flag)
 	if (c == CHAR_ERR)
 	    c = '\n';
 
-	if (comment && c != '\n')
-	    return c | QUOTE;
 	if (c == '$' && (flag & DODOL)) {
 	    getdol();
 	    continue;
@@ -493,8 +496,6 @@ getC1(int flag)
 	    getexcl(0);
 	    continue;
 	}
-	if (c == '#')
-	    comment = 1;
 	break;
     }
     return (c);
