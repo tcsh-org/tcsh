@@ -1310,11 +1310,11 @@ extern Char *Sgoal;
 extern int Stype;
 extern struct funcargs {
     Char **v;
-    struct command *t;
+    int eof;
     struct funcargs *prev,
 		    *next;
-    int eof;
 } *fargv;
 extern int getword(struct Strbuf *);
+extern int srcfile(const char *, int, int, Char **);
 
 #endif /* _h_sh */

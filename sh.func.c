@@ -2732,44 +2732,38 @@ dofunction(Char **v, struct command *t)
     if (!dolzero)
 	stderror(ERR_FUNC);
 
+    if (fargv) {
+	fargv->next = malloc(sizeof *fargv);
+	fargv->next->prev = fargv;
+	fargv = fargv->next;
+    } else {
+	fargv = malloc(sizeof *fargv);
+	fargv->prev = NULL;
+    }
+
     {
-	int i, j;
-	Char **vh;
+	int i = 0;
+	Char **vh = NULL;
 
-	for (i = 0; v[i]; i++)
-	    ;
-
-	vh = xmalloc(sizeof(Char [i + 2]));
-	vh[i + 1] = NULL;
-
-	for (j = i--; i; i--, j--) {
-	    vh[j] = xmalloc(sizeof(Char [Strlen(v[i]) + 1]));
-	    Strcpy(vh[j], v[i]);
-	}
-	vh[1] = xmalloc(sizeof (Char [Strlen(ffile) + 1]));
-	Strcpy(vh[1], ffile);
-	*vh = xmalloc(sizeof (Char [Strlen(*v) + 1]));
-	Strcpy(*vh, *v);
-
-	if (fargv) {
-	    fargv->next = malloc(sizeof *fargv);
-	    fargv->next->prev = fargv;
-	    fargv = fargv->next;
-	} else {
-	    fargv = malloc(sizeof *fargv);
-	    fargv->prev = NULL;
+	for (v++; *v; v++, i++) {
+	    vh = xrealloc(vh, sizeof(Char *[i + 2]));
+	    vh[i] = xmalloc(sizeof(Char [Strlen(*v) + 1]));
+	    Strcpy(vh[i], *v);
 	}
 
-	dosource(fargv->v = vh, fargv->t = t);
-	/* Reset STRargv on function exit. */
-	setv(STRargv, NULL, VAR_READWRITE);
+	vh[i] = NULL;
+	fargv->v = vh;
+    }
 
-	if (fargv->prev) {
-	    fargv = fargv->prev;
-	    free(fargv->next);
-	} else {
-	    free(fargv);
-	    fargv = NULL;
-	}
+    srcfile(short2str(ffile), 0, 0, NULL);
+    /* Reset STRargv on function exit. */
+    setv(STRargv, NULL, VAR_READWRITE);
+
+    if (fargv->prev) {
+	fargv = fargv->prev;
+	free(fargv->next);
+    } else {
+	free(fargv);
+	fargv = NULL;
     }
 }

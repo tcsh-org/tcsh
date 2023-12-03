@@ -142,11 +142,6 @@ struct saved_state {
 };
 
 static	int		  srccat	(Char *, Char *);
-#ifndef WINNT_NATIVE
-static	int		  srcfile	(const char *, int, int, Char **);
-#else
-int		  srcfile	(const char *, int, int, Char **);
-#endif /*WINNT_NATIVE*/
 static	void		  srcunit	(int, int, int, Char **);
 static	void		  mailchk	(void);
 #ifndef _PATH_DEFPATH
@@ -1544,11 +1539,7 @@ srccat(Char *cp, Char *dp)
 /*
  * Source to a file putting the file descriptor in a safe place (> 2).
  */
-#ifndef WINNT_NATIVE
-static int
-#else
 int
-#endif /*WINNT_NATIVE*/
 srcfile(const char *f, int onlyown, int flag, Char **av)
 {
     int unit;
@@ -1779,7 +1770,7 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 	Char funcexit[] = { 'e', 'x', 'i', 't', 0 },
 	     funcmain[] = { 'm', 'a', 'i', 'n', 0 };
 	struct Strbuf aword = Strbuf_INIT;
-	Sgoal = fargv->v[2];
+	Sgoal = fargv->v[0];
 	Stype = TC_GOTO;
 	fargv->eof = 0;
 
@@ -1817,8 +1808,8 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 		(void) getword(NULL);
 	    }
 
-	setq(STRargv, &fargv->v[3], &shvhed, VAR_READWRITE);
-	dogoto(&fargv->v[1], fargv->t);
+	setq(STRargv, &fargv->v[1], &shvhed, VAR_READWRITE);
+	gotolab(fargv->v[0]);
 
 	{
 	    struct Ain a;
