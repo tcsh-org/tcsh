@@ -1308,12 +1308,22 @@ extern int    filec;
 /* Function variable(s) and function(s). */
 extern Char *Sgoal;
 extern int Stype;
-extern struct funcargs {
-    Char **v;
-    int eof;
-    struct funcargs *prev,
-		    *next;
-} *fargv;
+extern struct funccurr {
+    struct funcargs {
+	Char **v;
+	struct funcargs *prev,
+			*next;
+    } *fargv;
+    struct funcfile {
+	char *file;
+	struct funcfile *prev,
+			*next;
+    } *ffile;
+    char *file;
+    int eof,
+	src,
+	ready;
+} fcurr;
 extern int getword(struct Strbuf *);
 extern int srcfile(const char *, int, int, Char **);
 

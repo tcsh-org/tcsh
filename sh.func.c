@@ -1096,8 +1096,8 @@ past:
 	break;
 
     case TC_EXIT:
-	if (fargv->eof)
-	    return (intptr_t) &fargv;
+	if (fcurr.eof)
+	    return 1 << 1;
 	setname(short2str(Sgoal));
 	stderror(ERR_NAME | ERR_NOTFOUND, "exit");
 	break;
@@ -2729,16 +2729,19 @@ getYN(const char *prompt)
 void
 dofunction(Char **v, struct command *t)
 {
+    char *file;
+    struct funcargs **fargv;
+
     if (!dolzero)
 	stderror(ERR_FUNC);
 
-    if (fargv) {
-	fargv->next = malloc(sizeof *fargv);
-	fargv->next->prev = fargv;
-	fargv = fargv->next;
+    if (*(fargv = &fcurr.fargv)) {
+	(*fargv)->next = malloc(sizeof **fargv);
+	(*fargv)->next->prev = *fargv;
+	*fargv = (*fargv)->next;
     } else {
-	fargv = malloc(sizeof *fargv);
-	fargv->prev = NULL;
+	*fargv = malloc(sizeof **fargv);
+	(*fargv)->prev = NULL;
     }
 
     {
@@ -2752,18 +2755,23 @@ dofunction(Char **v, struct command *t)
 	}
 
 	vh[i] = NULL;
-	fargv->v = vh;
+	(*fargv)->v = vh;
     }
+    fcurr.ready = 1;
 
-    srcfile(short2str(ffile), 0, 0, NULL);
+    if (!srcfile(file = fcurr.file ? fcurr.file :
+		 strsave(short2str(ffile)), 0, 0, NULL))
+	stderror(ERR_SYSTEM, file, strerror(errno));
+    if (file != fcurr.file)
+	xfree(file);
     /* Reset STRargv on function exit. */
     setv(STRargv, NULL, VAR_READWRITE);
 
-    if (fargv->prev) {
-	fargv = fargv->prev;
-	free(fargv->next);
+    if ((*fargv)->prev) {
+	*fargv = (*fargv)->prev;
+	free((*fargv)->next);
     } else {
-	free(fargv);
-	fargv = NULL;
+	free(*fargv);
+	*fargv = NULL;
     }
 }
