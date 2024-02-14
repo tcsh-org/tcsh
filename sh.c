@@ -111,7 +111,7 @@ int	exitset = 0;
 static time_t  chktim;		/* Time mail last checked */
 char *progname;
 int tcsh;
-struct funcargs *fargv = NULL;
+struct funccurr fcurr;
 
 /*
  * This preserves the input state of the shell. It is used by
@@ -1725,6 +1725,7 @@ static void
 srcunit(int unit, int onlyown, int hflg, Char **av)
 {
     struct saved_state st;
+    struct funcargs *fargv;
 
     st.SHIN = -1;	/* st_restore checks this */
 
@@ -1766,15 +1767,17 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
      * then seek for an ending exit on the requested label.
      * Function arguments are passed to STRargv.
      * STRargv is reset after the function is done. */
-    if (fargv) {
+    if (fcurr.ready) {
 	Char funcexit[] = { 'e', 'x', 'i', 't', 0 },
-	     funcmain[] = { 'm', 'a', 'i', 'n', 0 };
+	     *funcmain = fcurr.ffile ?
+			 strsave(str2short(fcurr.ffile->file)) :
+			 ffile;
 	struct Strbuf aword = Strbuf_INIT;
+
 	Sgoal = fargv->v[0];
 	Stype = TC_GOTO;
-	fargv->eof = 0;
-
-	if (!fargv->prev)
+	fcurr.eof = 0;
+	if (!(fargv = fcurr.fargv)->prev || fcurr.src)
 	    while (1) {
 		(void) getword(&aword);
 		Strbuf_terminate(&aword);
@@ -1799,6 +1802,7 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 			}
 			last = 1;
 		    }
+		    fcurr.src = 0;
 
 		    break;
 		}
@@ -1807,6 +1811,8 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 
 		(void) getword(NULL);
 	    }
+	if (funcmain != ffile)
+	    xfree(funcmain);
 
 	setq(STRargv, &fargv->v[1], &shvhed, VAR_READWRITE);
 	gotolab(fargv->v[0]);
@@ -1826,11 +1832,11 @@ srcunit(int unit, int onlyown, int hflg, Char **av)
 		if (eq(aword.s, funcexit)) {
 		    int last = 1, eof = 0;
 
-		    fargv->eof = 1;
+		    fcurr.eof = 1;
 		    while (1) {
 			do {
 			    (void) getword(NULL);
-			    if ((intptr_t) getword(&aword) == (intptr_t) &fargv) {
+			    if (getword(&aword) == (1 << 1)) {
 				Strbuf_terminate(&aword);
 				eof = 1;
 				break;
@@ -2294,6 +2300,7 @@ dosource(Char **t, struct command *c)
     Char *f;
     int    hflg = 0;
     char *file;
+    struct funcfile **ffile = NULL;
 
     USE(c);
     t++;
@@ -2309,13 +2316,39 @@ dosource(Char **t, struct command *c)
     }
 
     f = globone(*t++, G_ERROR);
-    file = strsave(short2str(f));
+    fcurr.file = file = strsave(short2str(f));
     cleanup_push(file, xfree);
     xfree(f);
     t = glob_all_or_error(t);
     cleanup_push(t, blk_cleanup);
+    if (fcurr.fargv) {
+	if (*(ffile = &fcurr.ffile)) {
+	    (*ffile)->next = malloc(sizeof **ffile);
+	    (*ffile)->next->prev = *ffile;
+	    *ffile = (*ffile)->next;
+	    (*ffile)->file = fcurr.file;
+	} else {
+	    *ffile = malloc(sizeof **ffile);
+	    (*ffile)->prev = NULL;
+	    (*ffile)->file = fcurr.file;
+	}
+    }
+
+    fcurr.ready = 0;
+    fcurr.src = 1;
     if ((!srcfile(file, 0, hflg, t)) && (!hflg) && (!bequiet))
 	stderror(ERR_SYSTEM, file, strerror(errno));
+    if (ffile) {
+	if ((*ffile)->prev) {
+	    *ffile = (*ffile)->prev;
+	    free((*ffile)->next);
+	    fcurr.file = (*ffile)->file;
+	} else {
+	    fcurr.file = (*ffile)->file = NULL;
+	    free(*ffile);
+	    *ffile = NULL;
+	}
+    }
     cleanup_until(file);
 }
 
