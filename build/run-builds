@@ -84,6 +84,7 @@ EOF
 CMD ["dpkg-buildpackage", "--no-sign", "-nc"]
 EOF
 	;;
+    esac
 }
 
 die()
