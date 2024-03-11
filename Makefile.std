@@ -390,7 +390,7 @@ tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
 	${CPP} $(INCLUDES) ${DFLAGS} ${EXTRAFLAGS} -D_h_tc_const\
 	    $(srcdir)/tc.const.c | grep 'Char STR' | \
 	    sed -e 's/Char \([a-zA-Z0-9_]*\) *\[ *\].*/extern Char \1[];/' | \
-	    LC_COLLATE=C sort >> $@
+	    LC_ALL=C sort >> $@
 	@echo '#endif /* _h_tc_const */' >> $@
 
 csh.prof: ${OBJS} sh.prof.${SUF} mcrt0.${SUF}

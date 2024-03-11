@@ -598,7 +598,7 @@ tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
 	${CPP} $(CPPFLAGS) ${DFLAGS} ${EXTRAFLAGS} -D_h_tc_const\
 	    $(srcdir)/tc.const.c | \
 	    sed -n -e 's/^\(Char STR[a-zA-Z0-9_]*\) *\[ *\].*/extern \1[];/p' | \
-	    LC_COLLATE=C sort >> $@.tmp
+	    LC_ALL=C sort >> $@.tmp
 	@echo '#endif /* _h_tc_const */' >> $@.tmp
 	@if [ -f $@ ] && cmp -s $@.tmp $@; then echo $@ unchanged.; rm -f $@.tmp; else mv -f $@.tmp $@; echo $@ recreated.; fi
 
@@ -725,6 +725,7 @@ check test: atconfig atlocal $(srcdir)/tests/testsuite $(BUILD)
 	$(ENVCMD) - \
 		TESTSUITEREGEN="$(TESTSUITEREGEN)" \
 		USER="$(USER)" \
+		LC_ALL=C \
 		$(SHELL) $(srcdir)/tests/testsuite $(TESTSUITEFLAGS)
 
 #
