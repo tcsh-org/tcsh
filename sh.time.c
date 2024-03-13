@@ -147,6 +147,9 @@ donice(Char **v, struct command *c)
 {
     Char *cp;
     int	    nval = 0;
+#if defined(HAVE_SETPRIORITY) && defined(PRIO_PROCESS)
+    int	    oval;
+#endif
 
     USE(c);
     v++, cp = *v++;
@@ -155,6 +158,10 @@ donice(Char **v, struct command *c)
     else if (*v	== 0 &&	any("+-", cp[0]))
 	nval = getn(cp);
 #if defined(HAVE_SETPRIORITY) && defined(PRIO_PROCESS)
+    errno = 0;
+    if ((oval = getpriority(PRIO_PROCESS, 0)) == -1 && errno)
+	stderror(ERR_SYSTEM, "getpriority", strerror(errno));
+    nval += oval;
     if (setpriority(PRIO_PROCESS, 0, nval) == -1 && errno)
 	stderror(ERR_SYSTEM, "setpriority", strerror(errno));
 #else /* !HAVE_SETPRIORITY || !PRIO_PROCESS */

@@ -1,3 +1,5 @@
+ 30. Make nice priority incremental even with setpriority(2) to match
+     how it worked with nice(3) (Kimmo Suominen)
  29. V6.24.10 - 2023-04-14
  28. Restore skipping of the "$edit" and "Comments" tests when not running
      on a terminal (Kimmo Suominen)

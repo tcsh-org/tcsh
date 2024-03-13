@@ -6203,11 +6203,11 @@ see the
 shell variable.
 .
 .It Ic nice Oo Cm + Ns Ar number Oc Op Ar command
-Sets the scheduling priority for the shell to
+Increments the scheduling priority for the shell by
 .Ar number ,
 or, without
 .Ar number ,
-to 4.
+by 4.
 With
 .Ar command ,
 runs
@@ -6218,8 +6218,7 @@ The greater the
 .Ar number ,
 the less cpu
 the process gets.
-The super-user may specify negative
-priority by using
+The super-user may decrement the priority by using
 .Dl nice \- Ns Ar number Li \&...
 .Pp
 .Ar command

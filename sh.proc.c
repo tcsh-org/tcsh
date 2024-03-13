@@ -1879,6 +1879,11 @@ pfork(struct command *t, int wanttty)
 	if (t->t_dflg & F_NICE) {
 	    int nval = SIGN_EXTEND_CHAR(t->t_nice);
 #if defined(HAVE_SETPRIORITY) && defined(PRIO_PROCESS)
+	    int oval;
+	    errno = 0;
+	    if ((oval = getpriority(PRIO_PROCESS, 0)) == -1 && errno)
+		stderror(ERR_SYSTEM, "getpriority", strerror(errno));
+	    nval += oval;
 	    if (setpriority(PRIO_PROCESS, 0, nval) == -1 && errno)
 		stderror(ERR_SYSTEM, "setpriority", strerror(errno));
 #else /* !HAVE_SETPRIORITY || !PRIO_PROCESS */
