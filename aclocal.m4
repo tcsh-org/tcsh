@@ -12,8 +12,8 @@
 # PARTICULAR PURPOSE.
 
 m4_ifndef([AC_CONFIG_MACRO_DIRS], [m4_defun([_AM_CONFIG_MACRO_DIRS], [])m4_defun([AC_CONFIG_MACRO_DIRS], [_AM_CONFIG_MACRO_DIRS($@)])])
-# host-cpu-c-abi.m4 serial 15
-dnl Copyright (C) 2002-2022 Free Software Foundation, Inc.
+# host-cpu-c-abi.m4 serial 17
+dnl Copyright (C) 2002-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -475,224 +475,73 @@ EOF
 
 dnl Sets the HOST_CPU_C_ABI_32BIT variable to 'yes' if the C language ABI
 dnl (application binary interface) is a 32-bit one, to 'no' if it is a 64-bit
-dnl one, or to 'unknown' if unknown.
+dnl one.
 dnl This is a simplified variant of gl_HOST_CPU_C_ABI.
 AC_DEFUN([gl_HOST_CPU_C_ABI_32BIT],
 [
   AC_REQUIRE([AC_CANONICAL_HOST])
   AC_CACHE_CHECK([32-bit host C ABI], [gl_cv_host_cpu_c_abi_32bit],
-    [if test -n "$gl_cv_host_cpu_c_abi"; then
-       case "$gl_cv_host_cpu_c_abi" in
-         i386 | x86_64-x32 | arm | armhf | arm64-ilp32 | hppa | ia64-ilp32 | mips | mipsn32 | powerpc | riscv*-ilp32* | s390 | sparc)
-           gl_cv_host_cpu_c_abi_32bit=yes ;;
-         x86_64 | alpha | arm64 | hppa64 | ia64 | mips64 | powerpc64 | powerpc64-elfv2 | riscv*-lp64* | s390x | sparc64 )
-           gl_cv_host_cpu_c_abi_32bit=no ;;
-         *)
-           gl_cv_host_cpu_c_abi_32bit=unknown ;;
-       esac
-     else
-       case "$host_cpu" in
+    [case "$host_cpu" in
 
-         # CPUs that only support a 32-bit ABI.
-         arc \
-         | bfin \
-         | cris* \
-         | csky \
-         | epiphany \
-         | ft32 \
-         | h8300 \
-         | m68k \
-         | microblaze | microblazeel \
-         | nds32 | nds32le | nds32be \
-         | nios2 | nios2eb | nios2el \
-         | or1k* \
-         | or32 \
-         | sh | sh[1234] | sh[1234]e[lb] \
-         | tic6x \
-         | xtensa* )
-           gl_cv_host_cpu_c_abi_32bit=yes
-           ;;
+       # CPUs that only support a 32-bit ABI.
+       arc \
+       | bfin \
+       | cris* \
+       | csky \
+       | epiphany \
+       | ft32 \
+       | h8300 \
+       | m68k \
+       | microblaze | microblazeel \
+       | nds32 | nds32le | nds32be \
+       | nios2 | nios2eb | nios2el \
+       | or1k* \
+       | or32 \
+       | sh | sh[1234] | sh[1234]e[lb] \
+       | tic6x \
+       | xtensa* )
+         gl_cv_host_cpu_c_abi_32bit=yes
+         ;;
 
-         # CPUs that only support a 64-bit ABI.
+       # CPUs that only support a 64-bit ABI.
 changequote(,)dnl
-         alpha | alphaev[4-8] | alphaev56 | alphapca5[67] | alphaev6[78] \
-         | mmix )
+       alpha | alphaev[4-8] | alphaev56 | alphapca5[67] | alphaev6[78] \
+       | mmix )
 changequote([,])dnl
-           gl_cv_host_cpu_c_abi_32bit=no
-           ;;
+         gl_cv_host_cpu_c_abi_32bit=no
+         ;;
 
-changequote(,)dnl
-         i[34567]86 )
-changequote([,])dnl
-           gl_cv_host_cpu_c_abi_32bit=yes
-           ;;
-
-         x86_64 )
-           # On x86_64 systems, the C compiler may be generating code in one of
-           # these ABIs:
-           # - 64-bit instruction set, 64-bit pointers, 64-bit 'long': x86_64.
-           # - 64-bit instruction set, 64-bit pointers, 32-bit 'long': x86_64
-           #   with native Windows (mingw, MSVC).
-           # - 64-bit instruction set, 32-bit pointers, 32-bit 'long': x86_64-x32.
-           # - 32-bit instruction set, 32-bit pointers, 32-bit 'long': i386.
-           AC_COMPILE_IFELSE(
-             [AC_LANG_SOURCE(
-                [[#if (defined __x86_64__ || defined __amd64__ \
-                       || defined _M_X64 || defined _M_AMD64) \
-                      && !(defined __ILP32__ || defined _ILP32)
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-                ]])],
-             [gl_cv_host_cpu_c_abi_32bit=no],
-             [gl_cv_host_cpu_c_abi_32bit=yes])
-           ;;
-
-         arm* | aarch64 )
-           # Assume arm with EABI.
-           # On arm64 systems, the C compiler may be generating code in one of
-           # these ABIs:
-           # - aarch64 instruction set, 64-bit pointers, 64-bit 'long': arm64.
-           # - aarch64 instruction set, 32-bit pointers, 32-bit 'long': arm64-ilp32.
-           # - 32-bit instruction set, 32-bit pointers, 32-bit 'long': arm or armhf.
-           AC_COMPILE_IFELSE(
-             [AC_LANG_SOURCE(
-                [[#if defined __aarch64__ && !(defined __ILP32__ || defined _ILP32)
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-                ]])],
-             [gl_cv_host_cpu_c_abi_32bit=no],
-             [gl_cv_host_cpu_c_abi_32bit=yes])
-           ;;
-
-         hppa1.0 | hppa1.1 | hppa2.0* | hppa64 )
-           # On hppa, the C compiler may be generating 32-bit code or 64-bit
-           # code. In the latter case, it defines _LP64 and __LP64__.
-           AC_COMPILE_IFELSE(
-             [AC_LANG_SOURCE(
-                [[#ifdef __LP64__
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-                ]])],
-             [gl_cv_host_cpu_c_abi_32bit=no],
-             [gl_cv_host_cpu_c_abi_32bit=yes])
-           ;;
-
-         ia64* )
-           # On ia64 on HP-UX, the C compiler may be generating 64-bit code or
-           # 32-bit code. In the latter case, it defines _ILP32.
-           AC_COMPILE_IFELSE(
-             [AC_LANG_SOURCE(
-                [[#ifdef _ILP32
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-                ]])],
-             [gl_cv_host_cpu_c_abi_32bit=yes],
-             [gl_cv_host_cpu_c_abi_32bit=no])
-           ;;
-
-         mips* )
-           # We should also check for (_MIPS_SZPTR == 64), but gcc keeps this
-           # at 32.
-           AC_COMPILE_IFELSE(
-             [AC_LANG_SOURCE(
-                [[#if defined _MIPS_SZLONG && (_MIPS_SZLONG == 64)
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-                ]])],
-             [gl_cv_host_cpu_c_abi_32bit=no],
-             [gl_cv_host_cpu_c_abi_32bit=yes])
-           ;;
-
-         powerpc* )
-           # Different ABIs are in use on AIX vs. Mac OS X vs. Linux,*BSD.
-           # No need to distinguish them here; the caller may distinguish
-           # them based on the OS.
-           # On powerpc64 systems, the C compiler may still be generating
-           # 32-bit code. And on powerpc-ibm-aix systems, the C compiler may
-           # be generating 64-bit code.
-           AC_COMPILE_IFELSE(
-             [AC_LANG_SOURCE(
-                [[#if defined __powerpc64__ || defined __LP64__
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-                ]])],
-             [gl_cv_host_cpu_c_abi_32bit=no],
-             [gl_cv_host_cpu_c_abi_32bit=yes])
-           ;;
-
-         rs6000 )
-           gl_cv_host_cpu_c_abi_32bit=yes
-           ;;
-
-         riscv32 | riscv64 )
-           # There are 6 ABIs: ilp32, ilp32f, ilp32d, lp64, lp64f, lp64d.
-           # Size of 'long' and 'void *':
-           AC_COMPILE_IFELSE(
-             [AC_LANG_SOURCE(
-                [[#if defined __LP64__
-                    int ok;
-                  #else
-                    error fail
-                  #endif
-                ]])],
-             [gl_cv_host_cpu_c_abi_32bit=no],
-             [gl_cv_host_cpu_c_abi_32bit=yes])
-           ;;
-
-         s390* )
-           # On s390x, the C compiler may be generating 64-bit (= s390x) code
-           # or 31-bit (= s390) code.
-           AC_COMPILE_IFELSE(
-             [AC_LANG_SOURCE(
-                [[#if defined __LP64__ || defined __s390x__
-                    int ok;
-                  #else
-                    error fail
-                  #endif
-                ]])],
-             [gl_cv_host_cpu_c_abi_32bit=no],
-             [gl_cv_host_cpu_c_abi_32bit=yes])
-           ;;
-
-         sparc | sparc64 )
-           # UltraSPARCs running Linux have `uname -m` = "sparc64", but the
-           # C compiler still generates 32-bit code.
-           AC_COMPILE_IFELSE(
-             [AC_LANG_SOURCE(
-                [[#if defined __sparcv9 || defined __arch64__
-                   int ok;
-                  #else
-                   error fail
-                  #endif
-                ]])],
-             [gl_cv_host_cpu_c_abi_32bit=no],
-             [gl_cv_host_cpu_c_abi_32bit=yes])
-           ;;
-
-         *)
+       *)
+         if test -n "$gl_cv_host_cpu_c_abi"; then
+           dnl gl_HOST_CPU_C_ABI has already been run. Use its result.
+           case "$gl_cv_host_cpu_c_abi" in
+             i386 | x86_64-x32 | arm | armhf | arm64-ilp32 | hppa | ia64-ilp32 | mips | mipsn32 | powerpc | riscv*-ilp32* | s390 | sparc)
+               gl_cv_host_cpu_c_abi_32bit=yes ;;
+             x86_64 | alpha | arm64 | aarch64c | hppa64 | ia64 | mips64 | powerpc64 | powerpc64-elfv2 | riscv*-lp64* | s390x | sparc64 )
+               gl_cv_host_cpu_c_abi_32bit=no ;;
+             *)
+               gl_cv_host_cpu_c_abi_32bit=unknown ;;
+           esac
+         else
            gl_cv_host_cpu_c_abi_32bit=unknown
-           ;;
-       esac
-     fi
+         fi
+         if test $gl_cv_host_cpu_c_abi_32bit = unknown; then
+           AC_COMPILE_IFELSE(
+             [AC_LANG_SOURCE(
+                [[int test_pointer_size[sizeof (void *) - 5];
+                ]])],
+             [gl_cv_host_cpu_c_abi_32bit=no],
+             [gl_cv_host_cpu_c_abi_32bit=yes])
+         fi
+         ;;
+     esac
     ])
 
   HOST_CPU_C_ABI_32BIT="$gl_cv_host_cpu_c_abi_32bit"
 ])
 
-# iconv.m4 serial 24
-dnl Copyright (C) 2000-2002, 2007-2014, 2016-2022 Free Software Foundation,
+# iconv.m4 serial 27
+dnl Copyright (C) 2000-2002, 2007-2014, 2016-2024 Free Software Foundation,
 dnl Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -731,7 +580,7 @@ AC_DEFUN([AM_ICONV_LINK],
   dnl because if the user has installed libiconv and not disabled its use
   dnl via --without-libiconv-prefix, he wants to use it. The first
   dnl AC_LINK_IFELSE will then fail, the second AC_LINK_IFELSE will succeed.
-  am_save_CPPFLAGS="$CPPFLAGS"
+  gl_saved_CPPFLAGS="$CPPFLAGS"
   AC_LIB_APPENDTOVAR([CPPFLAGS], [$INCICONV])
 
   AC_CACHE_CHECK([for iconv], [am_cv_func_iconv], [
@@ -748,7 +597,7 @@ AC_DEFUN([AM_ICONV_LINK],
            iconv_close(cd);]])],
       [am_cv_func_iconv=yes])
     if test "$am_cv_func_iconv" != yes; then
-      am_save_LIBS="$LIBS"
+      gl_saved_LIBS="$LIBS"
       LIBS="$LIBS $LIBICONV"
       AC_LINK_IFELSE(
         [AC_LANG_PROGRAM(
@@ -761,14 +610,14 @@ AC_DEFUN([AM_ICONV_LINK],
              iconv_close(cd);]])],
         [am_cv_lib_iconv=yes]
         [am_cv_func_iconv=yes])
-      LIBS="$am_save_LIBS"
+      LIBS="$gl_saved_LIBS"
     fi
   ])
   if test "$am_cv_func_iconv" = yes; then
     AC_CACHE_CHECK([for working iconv], [am_cv_func_iconv_works], [
       dnl This tests against bugs in AIX 5.1, AIX 6.1..7.1, HP-UX 11.11,
       dnl Solaris 10.
-      am_save_LIBS="$LIBS"
+      gl_saved_LIBS="$LIBS"
       if test $am_cv_lib_iconv = yes; then
         LIBS="$LIBS $LIBICONV"
       fi
@@ -898,7 +747,7 @@ AC_DEFUN([AM_ICONV_LINK],
            esac])
         test "$am_cv_func_iconv_works" = no || break
       done
-      LIBS="$am_save_LIBS"
+      LIBS="$gl_saved_LIBS"
     ])
     case "$am_cv_func_iconv_works" in
       *no) am_func_iconv=no am_cv_lib_iconv=no ;;
@@ -917,7 +766,7 @@ AC_DEFUN([AM_ICONV_LINK],
   else
     dnl If $LIBICONV didn't lead to a usable library, we don't need $INCICONV
     dnl either.
-    CPPFLAGS="$am_save_CPPFLAGS"
+    CPPFLAGS="$gl_saved_CPPFLAGS"
     LIBICONV=
     LTLIBICONV=
   fi
@@ -927,12 +776,6 @@ AC_DEFUN([AM_ICONV_LINK],
 
 dnl Define AM_ICONV using AC_DEFUN_ONCE, in order to avoid warnings like
 dnl "warning: AC_REQUIRE: `AM_ICONV' was expanded before it was required".
-dnl This is tricky because of the way 'aclocal' is implemented:
-dnl - It requires defining an auxiliary macro whose name ends in AC_DEFUN.
-dnl   Otherwise aclocal's initial scan pass would miss the macro definition.
-dnl - It requires a line break inside the AC_DEFUN_ONCE and AC_DEFUN expansions.
-dnl   Otherwise aclocal would emit many "Use of uninitialized value $1"
-dnl   warnings.
 AC_DEFUN_ONCE([AM_ICONV],
 [
   AM_ICONV_LINK
@@ -973,10 +816,26 @@ size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, si
        ICONV_CONST="const"
      fi
     ])
+
+  dnl A summary result, for those packages which want to print a summary at the
+  dnl end of the configuration.
+  if test "$am_func_iconv" = yes; then
+    if test -n "$LIBICONV"; then
+      am_cv_func_iconv_summary='yes, in libiconv'
+    else
+      am_cv_func_iconv_summary='yes, in libc'
+    fi
+  else
+    if test "$am_cv_func_iconv" = yes; then
+      am_cv_func_iconv_summary='not working, consider installing GNU libiconv'
+    else
+      am_cv_func_iconv_summary='no, consider installing GNU libiconv'
+    fi
+  fi
 ])
 
-# lib-ld.m4 serial 10
-dnl Copyright (C) 1996-2003, 2009-2022 Free Software Foundation, Inc.
+# lib-ld.m4 serial 13
+dnl Copyright (C) 1996-2003, 2009-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -1006,7 +865,7 @@ AC_DEFUN([AC_LIB_PROG_LD],
 AC_REQUIRE([AC_CANONICAL_HOST])dnl
 
 AC_ARG_WITH([gnu-ld],
-    [AS_HELP_STRING([--with-gnu-ld],
+    [AS_HELP_STRING([[--with-gnu-ld]],
         [assume the C compiler uses GNU ld [default=no]])],
     [test "$withval" = no || with_gnu_ld=yes],
     [with_gnu_ld=no])dnl
@@ -1044,7 +903,7 @@ else
     if test "$GCC" = yes; then
       # Check if gcc -print-prog-name=ld gives a path.
       case $host in
-        *-*-mingw*)
+        *-*-mingw* | windows*)
           # gcc leaves a trailing carriage return which upsets mingw
           acl_output=`($CC -print-prog-name=ld) 2>&5 | tr -d '\015'` ;;
         *)
@@ -1074,9 +933,9 @@ else
     fi
     if test -n "$ac_prog"; then
       # Search for $ac_prog in $PATH.
-      acl_save_ifs="$IFS"; IFS=$PATH_SEPARATOR
+      acl_saved_IFS="$IFS"; IFS=$PATH_SEPARATOR
       for ac_dir in $PATH; do
-        IFS="$acl_save_ifs"
+        IFS="$acl_saved_IFS"
         test -z "$ac_dir" && ac_dir=.
         if test -f "$ac_dir/$ac_prog" || test -f "$ac_dir/$ac_prog$ac_exeext"; then
           acl_cv_path_LD="$ac_dir/$ac_prog"
@@ -1093,7 +952,7 @@ else
           esac
         fi
       done
-      IFS="$acl_save_ifs"
+      IFS="$acl_saved_IFS"
     fi
     case $host in
       *-*-aix*)
@@ -1144,8 +1003,8 @@ fi
 AC_LIB_PROG_LD_GNU
 ])
 
-# lib-link.m4 serial 33
-dnl Copyright (C) 2001-2022 Free Software Foundation, Inc.
+# lib-link.m4 serial 34
+dnl Copyright (C) 2001-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -1215,11 +1074,11 @@ AC_DEFUN([AC_LIB_HAVE_LINKFLAGS],
   dnl Add $INC[]NAME to CPPFLAGS before performing the following checks,
   dnl because if the user has installed lib[]Name and not disabled its use
   dnl via --without-lib[]Name-prefix, he wants to use it.
-  ac_save_CPPFLAGS="$CPPFLAGS"
+  acl_saved_CPPFLAGS="$CPPFLAGS"
   AC_LIB_APPENDTOVAR([CPPFLAGS], [$INC]NAME)
 
   AC_CACHE_CHECK([for lib[]$1], [ac_cv_lib[]Name], [
-    ac_save_LIBS="$LIBS"
+    acl_saved_LIBS="$LIBS"
     dnl If $LIB[]NAME contains some -l options, add it to the end of LIBS,
     dnl because these -l options might require -L options that are present in
     dnl LIBS. -l options benefit only from the -L options listed before it.
@@ -1235,7 +1094,7 @@ AC_DEFUN([AC_LIB_HAVE_LINKFLAGS],
       [AC_LANG_PROGRAM([[$3]], [[$4]])],
       [ac_cv_lib[]Name=yes],
       [ac_cv_lib[]Name='m4_if([$5], [], [no], [[$5]])'])
-    LIBS="$ac_save_LIBS"
+    LIBS="$acl_saved_LIBS"
   ])
   if test "$ac_cv_lib[]Name" = yes; then
     HAVE_LIB[]NAME=yes
@@ -1246,7 +1105,7 @@ AC_DEFUN([AC_LIB_HAVE_LINKFLAGS],
     HAVE_LIB[]NAME=no
     dnl If $LIB[]NAME didn't lead to a usable library, we don't need
     dnl $INC[]NAME either.
-    CPPFLAGS="$ac_save_CPPFLAGS"
+    CPPFLAGS="$acl_saved_CPPFLAGS"
     LIB[]NAME=
     LTLIB[]NAME=
     LIB[]NAME[]_PREFIX=
@@ -1370,7 +1229,7 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
     additional_libdir3=
   fi
   dnl Search the library and its dependencies in $additional_libdir and
-  dnl $LDFLAGS. Using breadth-first-seach.
+  dnl $LDFLAGS. Use breadth-first search.
   LIB[]NAME=
   LTLIB[]NAME=
   INC[]NAME=
@@ -1683,12 +1542,12 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
               dnl Read the .la file. It defines the variables
               dnl dlname, library_names, old_library, dependency_libs, current,
               dnl age, revision, installed, dlopen, dlpreopen, libdir.
-              save_libdir="$libdir"
+              saved_libdir="$libdir"
               case "$found_la" in
                 */* | *\\*) . "$found_la" ;;
                 *) . "./$found_la" ;;
               esac
-              libdir="$save_libdir"
+              libdir="$saved_libdir"
               dnl We use only dependency_libs.
               for dep in $dependency_libs; do
                 case "$dep" in
@@ -1828,18 +1687,18 @@ AC_DEFUN([AC_LIB_LINKFLAGS_BODY],
         alldirs="${alldirs}${alldirs:+$acl_hardcode_libdir_separator}$found_dir"
       done
       dnl Note: acl_hardcode_libdir_flag_spec uses $libdir and $wl.
-      acl_save_libdir="$libdir"
+      acl_saved_libdir="$libdir"
       libdir="$alldirs"
       eval flag=\"$acl_hardcode_libdir_flag_spec\"
-      libdir="$acl_save_libdir"
+      libdir="$acl_saved_libdir"
       LIB[]NAME="${LIB[]NAME}${LIB[]NAME:+ }$flag"
     else
       dnl The -rpath options are cumulative.
       for found_dir in $rpathdirs; do
-        acl_save_libdir="$libdir"
+        acl_saved_libdir="$libdir"
         libdir="$found_dir"
         eval flag=\"$acl_hardcode_libdir_flag_spec\"
-        libdir="$acl_save_libdir"
+        libdir="$acl_saved_libdir"
         LIB[]NAME="${LIB[]NAME}${LIB[]NAME:+ }$flag"
       done
     fi
@@ -1936,18 +1795,18 @@ AC_DEFUN([AC_LIB_LINKFLAGS_FROM_LIBS],
             for dir in $rpathdirs; do
               alldirs="${alldirs}${alldirs:+$acl_hardcode_libdir_separator}$dir"
             done
-            acl_save_libdir="$libdir"
+            acl_saved_libdir="$libdir"
             libdir="$alldirs"
             eval flag=\"$acl_hardcode_libdir_flag_spec\"
-            libdir="$acl_save_libdir"
+            libdir="$acl_saved_libdir"
             $1="$flag"
           else
             dnl The -rpath options are cumulative.
             for dir in $rpathdirs; do
-              acl_save_libdir="$libdir"
+              acl_saved_libdir="$libdir"
               libdir="$dir"
               eval flag=\"$acl_hardcode_libdir_flag_spec\"
-              libdir="$acl_save_libdir"
+              libdir="$acl_saved_libdir"
               $1="${$1}${$1:+ }$flag"
             done
           fi
@@ -1958,8 +1817,8 @@ AC_DEFUN([AC_LIB_LINKFLAGS_FROM_LIBS],
   AC_SUBST([$1])
 ])
 
-# lib-prefix.m4 serial 20
-dnl Copyright (C) 2001-2005, 2008-2022 Free Software Foundation, Inc.
+# lib-prefix.m4 serial 22
+dnl Copyright (C) 2001-2005, 2008-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -2086,10 +1945,10 @@ AC_DEFUN([AC_LIB_PREPARE_PREFIX],
   else
     acl_final_exec_prefix="$exec_prefix"
   fi
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
   eval acl_final_exec_prefix=\"$acl_final_exec_prefix\"
-  prefix="$acl_save_prefix"
+  prefix="$acl_saved_prefix"
 ])
 
 dnl AC_LIB_WITH_FINAL_PREFIX([statement]) evaluates statement, with the
@@ -2097,13 +1956,13 @@ dnl variables prefix and exec_prefix bound to the values they will have
 dnl at the end of the configure script.
 AC_DEFUN([AC_LIB_WITH_FINAL_PREFIX],
 [
-  acl_save_prefix="$prefix"
+  acl_saved_prefix="$prefix"
   prefix="$acl_final_prefix"
-  acl_save_exec_prefix="$exec_prefix"
+  acl_saved_exec_prefix="$exec_prefix"
   exec_prefix="$acl_final_exec_prefix"
   $1
-  exec_prefix="$acl_save_exec_prefix"
-  prefix="$acl_save_prefix"
+  exec_prefix="$acl_saved_exec_prefix"
+  prefix="$acl_saved_prefix"
 ])
 
 dnl AC_LIB_PREPARE_MULTILIB creates
@@ -2216,6 +2075,15 @@ changequote([,])dnl
            esac
          fi
          ;;
+       netbsd*)
+         dnl On NetBSD/sparc64, there is a 'sparc' subdirectory that contains
+         dnl 32-bit libraries.
+         if test $HOST_CPU_C_ABI_32BIT != no; then
+           case "$host_cpu" in
+             sparc*) acl_libdirstem2=lib/sparc ;;
+           esac
+         fi
+         ;;
        *)
          dnl If $CC generates code for a 32-bit ABI, the libraries are
          dnl surely under $prefix/lib or $prefix/lib32, not $prefix/lib64.
@@ -2240,7 +2108,7 @@ changequote([,])dnl
            fi
          fi
          if test -n "$searchpath"; then
-           acl_save_IFS="${IFS= 	}"; IFS=":"
+           acl_saved_IFS="${IFS= 	}"; IFS=":"
            for searchdir in $searchpath; do
              if test -d "$searchdir"; then
                case "$searchdir" in
@@ -2257,7 +2125,7 @@ changequote([,])dnl
                esac
              fi
            done
-           IFS="$acl_save_IFS"
+           IFS="$acl_saved_IFS"
            if test $HOST_CPU_C_ABI_32BIT = yes; then
              # 32-bit ABI.
              acl_libdirstem3=

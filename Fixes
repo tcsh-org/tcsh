@@ -1,3 +1,4 @@
+ 31. V6.24.11 - 2024-03-14
  30. Make nice priority incremental even with setpriority(2) to match
      how it worked with nice(3) (Kimmo Suominen)
  29. V6.24.10 - 2023-04-14
