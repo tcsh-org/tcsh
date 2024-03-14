@@ -56,7 +56,6 @@ static	void	preread		(void);
 static	void	doagain		(void);
 static  const char *isrchx	(int);
 static	void	search		(int, int, Char *);
-static	int	getword		(struct Strbuf *);
 static	struct wordent	*histgetword	(struct wordent *);
 static	void	toend		(void);
 static	void	xecho		(int, Char **);
@@ -742,8 +741,8 @@ isrchx(int n)
 }
 
 
-static int Stype;
-static Char *Sgoal;
+int Stype;
+Char *Sgoal;
 
 static void
 search(int type, int level, Char *goal)
@@ -1000,7 +999,7 @@ past:
     return NULL;
 }
 
-static int
+int
 getword(struct Strbuf *wp)
 {
     int found = 0, first;
@@ -1094,6 +1093,13 @@ past:
     case TC_GOTO:
 	setname(short2str(Sgoal));
 	stderror(ERR_NAME | ERR_NOTFOUND, "label");
+	break;
+
+    case TC_EXIT:
+	if (fcurr.eof)
+	    return 1 << 1;
+	setname(short2str(Sgoal));
+	stderror(ERR_NAME | ERR_NOTFOUND, "exit");
 	break;
 
     default:
@@ -2718,4 +2724,54 @@ getYN(const char *prompt)
     while (c != '\n' && force_read(SHIN, &c, sizeof(c)) == sizeof(c))
 	continue;
     return doit;
+}
+
+void
+dofunction(Char **v, struct command *t)
+{
+    char *file;
+    struct funcargs **fargv;
+
+    if (!dolzero)
+	stderror(ERR_FUNC);
+
+    if (*(fargv = &fcurr.fargv)) {
+	(*fargv)->next = malloc(sizeof **fargv);
+	(*fargv)->next->prev = *fargv;
+	*fargv = (*fargv)->next;
+    } else {
+	*fargv = malloc(sizeof **fargv);
+	(*fargv)->prev = NULL;
+    }
+
+    {
+	int i = 0;
+	Char **vh = NULL;
+
+	for (v++; *v; v++, i++) {
+	    vh = xrealloc(vh, sizeof(Char *[i + 2]));
+	    vh[i] = xmalloc(sizeof(Char [Strlen(*v) + 1]));
+	    Strcpy(vh[i], *v);
+	}
+
+	vh[i] = NULL;
+	(*fargv)->v = vh;
+    }
+    fcurr.ready = 1;
+
+    if (!srcfile(file = fcurr.file ? fcurr.file :
+		 strsave(short2str(ffile)), 0, 0, NULL))
+	stderror(ERR_SYSTEM, file, strerror(errno));
+    if (file != fcurr.file)
+	xfree(file);
+    /* Reset STRargv on function exit. */
+    setv(STRargv, NULL, VAR_READWRITE);
+
+    if ((*fargv)->prev) {
+	*fargv = (*fargv)->prev;
+	free((*fargv)->next);
+    } else {
+	free(*fargv);
+	*fargv = NULL;
+    }
 }

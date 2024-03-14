@@ -1305,5 +1305,26 @@ extern int    filec;
 #define TEXP_IGNORE 1	/* in ignore, it means to ignore value, just parse */
 #define TEXP_NOGLOB 2	/* in ignore, it means not to globone */
 
+/* Function variable(s) and function(s). */
+extern Char *Sgoal;
+extern int Stype;
+extern struct funccurr {
+    struct funcargs {
+	Char **v;
+	struct funcargs *prev,
+			*next;
+    } *fargv;
+    struct funcfile {
+	char *file;
+	struct funcfile *prev,
+			*next;
+    } *ffile;
+    char *file;
+    int eof,
+	src,
+	ready;
+} fcurr;
+extern int getword(struct Strbuf *);
+extern int srcfile(const char *, int, int, Char **);
 
 #endif /* _h_sh */
