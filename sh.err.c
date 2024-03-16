@@ -294,7 +294,7 @@ errinit(void)
     elst[ERR_NOHOME] = CSAVS(1, 78, "No $home variable set");
     elst[ERR_HISTUS] = CSAVS(1, 79,
 	"Usage: history [-%s] [# number of events]");
-    elst[ERR_SPDOLLT] = CSAVS(1, 80, "$, ! or < not allowed with $# or $?");
+    elst[ERR_SPDOLLT] = CSAVS(1, 80, "$ or ! not allowed with $%%, $# or $?");
     elst[ERR_NEWLINE] = CSAVS(1, 81, "Newline in variable name");
     elst[ERR_SPSTAR] = CSAVS(1, 82, "* not allowed with $# or $?");
     elst[ERR_DIGIT] = CSAVS(1, 83, "$?<digit> or $#<digit> not allowed");

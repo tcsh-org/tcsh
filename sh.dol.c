@@ -29,6 +29,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+#include <poll.h>
+
 #include "sh.h"
 #include "ed.h"
 #include "tw.h"
@@ -450,8 +452,21 @@ Dgetdol(void)
     case '<'|QUOTE: {
 	static struct Strbuf wbuf; /* = Strbuf_INIT; */
 
-	if (bitset)
-	    stderror(ERR_NOTALLOWED, "$?<");
+	if (bitset) {
+	    struct pollfd pfd = {
+		OLDSTD,
+		POLLIN
+	    };
+
+	    if (poll(&pfd, 1, 0) > 0 &&
+		pfd.revents & POLLIN)
+		dolp = STR1;
+	    else
+		dolp = STR0;
+	    cleanup_until(name);
+
+	    goto eatbrac;
+	}
 	if (dimen)
 	    stderror(ERR_NOTALLOWED, "$#<");
 	if (length)
