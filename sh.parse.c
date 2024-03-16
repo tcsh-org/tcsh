@@ -207,7 +207,7 @@ syntax(const struct wordent *p1, const struct wordent *p2, int flags)
 {
 
     while (p1 != p2)
-	if (any(";&\n", p1->word[0]))
+	if (any(intty ? ";&\n#" : ";&\n", p1->word[0]))
 	    p1 = p1->next;
 	else
 	    return (syn0(p1, p2, flags));
@@ -273,6 +273,16 @@ syn0(const struct wordent *p1, const struct wordent *p2, int flags)
 	    t->t_dcar = t1;
 	    t->t_dcdr = syntax(p, p2, flags);
 	    return (t);
+
+	case '#':
+	    if (intty) {
+		struct wordent *p1 = p2->prev;
+
+		p1 = p1->prev = p1->prev->prev;
+		xfree(p1->next->word);
+		xfree(p1->next);
+		p = p1->next = p2->prev;
+	    }
 	default:
 	    break;
 	}

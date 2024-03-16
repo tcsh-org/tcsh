@@ -148,8 +148,7 @@ lex(struct wordent *hp)
     int     parsehtime = enterhist;
     int	    toolong = 0;
 
-    histvalid = 0;
-    histline.len = 0;
+    histvalid = histline.len = 0;
 
     if (!postcmd_active)
 	btell(&lineloc);
@@ -358,6 +357,13 @@ loop:
 	default:
 	    break;
 	}
+    if (intty && c == '#') {
+	Strbuf_append1(&wbuf, c);
+	while ((c = readc(1)) != CHAR_ERR && c != '\n')
+	    Strbuf_append1(&wbuf, c);
+	unreadc('\n');
+	goto ret;
+    }
     c1 = 0;
     dolflg = DOALL;
     for (;;) {
