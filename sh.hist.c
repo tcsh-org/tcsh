@@ -64,7 +64,6 @@ static	void	hfree	(struct Hist *);
 
 /* #define DEBUG_HIST 1 */
 
-static const int fastMergeErase = 1;
 static unsigned histCount = 0;		/* number elements on history list */
 static int histlen = 0;
 static struct Hist *histTail = NULL;     /* last element on history list */
@@ -626,15 +625,6 @@ heq(const struct wordent *a0, const struct wordent *b0)
     }
 }
 
-/* Renumber entries following p, which we will be deleting. */
-PG_STATIC void
-renumberHist(struct Hist *p)
-{
-    int n = p->Href;
-    while ((p = p->Hnext))
-        p->Href = n--;
-}
-
 /* The hash table is implemented as an array of pointers to Hist entries.  Each
  * entry is located in the table using hash2tableIndex() and checking the
  * following entries in case of a collision (linear rehash).  Free entries in
@@ -964,8 +954,6 @@ enthist(
                  * to insert the new entry, then remember the place. */
                 if (mflg && Htime != 0 && p->Hprev->Htime >= Htime)
                     pTime = p->Hprev;
-		if (!fastMergeErase)
-		    renumberHist(p);	/* Reset Href of subsequent entries */
                 hremove(p);
 		hfree(p);
                 p = NULL;               /* so new entry is allocated below */
@@ -1031,11 +1019,10 @@ enthist(
               }
           }
         /* pp is now the last entry with time >= to np. */
-	if (!fastMergeErase) {		/* renumber at end of loadhist */
-	    /* Before inserting np after pp, bubble its Hnum & Href values down
-	     * through the earlier part of list. */
-	    bubbleHnumHrefDown(np, pp);
-	}
+	/* renumber at end of loadhist */
+	/* Before inserting np after pp, bubble its Hnum & Href values down
+	 * through the earlier part of list. */
+	bubbleHnumHrefDown(np, pp);
     }
     else
         pp = &Histlist;                 /* insert at beginning of history */
@@ -1389,16 +1376,6 @@ loadhist(Char *fname, int mflg)
 	loadhist_cmd[2] = STRtildothist;
 
     dosource(loadhist_cmd, NULL);
-
-    /* During history merging (enthist sees mflg set), we disable management of
-     * Hnum and Href (because fastMergeErase is true).  So now reset all the
-     * values based on the final ordering of the history list. */
-    if (mflg) {
-	int n = eventno;
-        struct Hist *hp = &Histlist;
-        while ((hp = hp->Hnext))
-	    hp->Hnum = hp->Href = n--;
-    }
 }
 
 void

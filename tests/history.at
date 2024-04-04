@@ -218,6 +218,52 @@ dnl savehist) set to 0 instead of 1.
 
 AT_CLEANUP()
 
+AT_SETUP([History merge])
+dnl Check if history merge really works out
+
+AT_DATA([hist-merge.csh],
+[[set histfile=test.history histdup=prev history=(6 "%h TIME %R\n")
+set savehist=(6 merge)
+printf "'%s' %s\n" "$histdup" "$history"
+history -c
+: 1
+: 2
+: 3
+: 4
+: 5
+history -S
+: a
+: b
+: c
+: d
+: e
+history -S
+history -L
+history 6
+]])
+
+AT_CHECK([tcsh -f -q -i < hist-merge.csh], ,
+[> 'prev' 6 %h TIME %R\n
+    24 TIME : b
+    25 TIME : c
+    26 TIME : d
+    27 TIME : e
+    28 TIME history -S
+    29 TIME history 6
+> exit
+],)
+
+dnl In broken case we see the former history instead
+dnl > 'prev' 6 %h TIME %R\n
+dnl    24 TIME : 4
+dnl    25 TIME : 3
+dnl    26 TIME : 2
+dnl    27 TIME : 1
+dnl    28 TIME history -S
+dnl    29 TIME history 6
+dnl > exit
+
+AT_CLEANUP()
 
 dnl
 dnl	History faults
