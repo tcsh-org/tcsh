@@ -158,6 +158,7 @@ sl_create(size_t size)
     return newsl->data;
 }
 
+#if 0
 /* sl_release_all frees all the strings in the global list of strings */
 static void
 sl_release_all(void)
@@ -171,6 +172,7 @@ sl_release_all(void)
     /* tail has already been freed if we make it here. */
     g_sl_tail = NULL;
 }
+#endif
 
 /* gettoken():
  *	Get : delimited token and remove leading/trailing blanks/newlines
