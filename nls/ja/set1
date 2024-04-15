@@ -137,3 +137,5 @@ $set 1
 135 $%S は読取専用です
 136 jobが見つかりません
 137 不明のcolorls変数です '%c%c'
+138 Unexpected end of file
+139 %s: Feature is not available for this platform

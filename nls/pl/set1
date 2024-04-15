@@ -137,3 +137,5 @@ $set 1
 135 $%S jest tylko-do-odczytu
 136 Brak takiej pracy
 137 Nieznana zmienna colorls '%c%c'
+138 Unexpected end of file
+139 %s: Feature is not available for this platform

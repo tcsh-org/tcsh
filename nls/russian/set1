@@ -137,3 +137,5 @@ $set 1
 135 $%S только для чтения
 136 Нет такого задания
 137 Неизвестное значение '%c%c' переменной colorls
+138 Unexpected end of file
+139 %s: Feature is not available for this platform

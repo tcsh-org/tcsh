@@ -137,3 +137,5 @@ $set 1
 135 Muuttujalle $%S ei voida asettaa arvoa
 136 Viitattua työtä ei ole
 137 Tuntematon colorls-muuttuja '%c%c'
+138 Unexpected end of file
+139 %s: Feature is not available for this platform

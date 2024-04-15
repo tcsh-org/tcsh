@@ -536,11 +536,11 @@ getdol(void)
     Strbuf_append1(&name, c);
     switch (c) {
 
-    case '<':
     case '$':
     case '!':
 	if (special)
 	    seterror(ERR_SPDOLLT);
+    case '<':
 	goto end;
 
     case '\n':

@@ -450,8 +450,19 @@ Dgetdol(void)
     case '<'|QUOTE: {
 	static struct Strbuf wbuf; /* = Strbuf_INIT; */
 
-	if (bitset)
-	    stderror(ERR_NOTALLOWED, "$?<");
+	if (bitset) {
+#ifdef FIONREAD
+	    int chrs;
+
+	    if (ioctl(OLDSTD, FIONREAD, (ioctl_t) &chrs) == -1)
+		chrs = 0;
+	    setDolp(putn((tcsh_number_t) chrs));
+	    cleanup_until(name);
+	    goto eatbrac;
+#else
+	    stderror(ERR_UNAVAILABLE, "$?<");
+#endif
+	}
 	if (dimen)
 	    stderror(ERR_NOTALLOWED, "$#<");
 	if (length)
