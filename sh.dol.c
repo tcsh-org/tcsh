@@ -29,8 +29,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include <poll.h>
-
 #include "sh.h"
 #include "ed.h"
 #include "tw.h"
@@ -453,19 +451,17 @@ Dgetdol(void)
 	static struct Strbuf wbuf; /* = Strbuf_INIT; */
 
 	if (bitset) {
-	    struct pollfd pfd = {
-		OLDSTD,
-		POLLIN
-	    };
+#ifdef FIONREAD
+	    int chrs;
 
-	    if (poll(&pfd, 1, 0) > 0 &&
-		pfd.revents & POLLIN)
-		dolp = STR1;
-	    else
-		dolp = STR0;
+	    if (ioctl(OLDSTD, FIONREAD, (ioctl_t) &chrs) == -1)
+		chrs = 0;
+	    setDolp(putn((tcsh_number_t) chrs));
 	    cleanup_until(name);
-
 	    goto eatbrac;
+#else
+	    stderror(ERR_UNAVAILABLE, "$?<");
+#endif
 	}
 	if (dimen)
 	    stderror(ERR_NOTALLOWED, "$#<");
