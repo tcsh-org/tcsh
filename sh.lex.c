@@ -319,8 +319,15 @@ loop:
 	    goto ret;
 
 	case '#':
-	    if (intty || (enterhist && !parsehtime))
+	    if (enterhist && !parsehtime)
 		break;
+	    if (intty) {
+		do
+		    Strbuf_append1(&wbuf, c);
+		while ((c = getC(0)) != CHAR_ERR && c != '\n');
+		ungetC('\n');
+		goto ret;
+	    }
 	    c = 0;
 	    h = 0;
 	    do {
@@ -357,13 +364,6 @@ loop:
 	default:
 	    break;
 	}
-    if (intty && c == '#') {
-	Strbuf_append1(&wbuf, c);
-	while ((c = readc(1)) != CHAR_ERR && c != '\n')
-	    Strbuf_append1(&wbuf, c);
-	unreadc('\n');
-	goto ret;
-    }
     c1 = 0;
     dolflg = DOALL;
     for (;;) {
