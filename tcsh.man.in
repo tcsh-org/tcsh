@@ -2672,6 +2672,12 @@ typed the user may type an interrupt to interrupt the sequence into
 which the line is to be substituted, but
 .Xr csh 1
 does not allow this.
+.
+.Pp
+.It Li $?<
+Substitutes the amount of available data from the standard input.
+(This feature might be non-portable.)
+(+)
 .El
 .
 .Ss Command, filename and directory stack substitution
