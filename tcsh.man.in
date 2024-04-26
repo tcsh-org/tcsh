@@ -3221,7 +3221,7 @@ if
 .Ql ask
 is given in
 .Ic noclobber ,
-an interacive confirmation is presented, rather than an
+an interactive confirmation is presented, rather than an
 error.
 .Pp
 The forms involving
