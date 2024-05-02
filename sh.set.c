@@ -529,16 +529,26 @@ putn(tcsh_number_t n)
 	*putp++ = '-';
     }
     putn1(n);
+#ifdef IS_ASCII
     *putp = 0;
+#endif
     return (Strsave(nbuf));
 }
 
 static void
 putn1(tcsh_number_t n)
 {
+#ifndef IS_ASCII
+    sprintf(putp, "%l"
+#ifdef HAVE_LONG_LONG
+    "l"
+#endif /* HAVE_LONG_LONG */
+    "u", &n);
+#else
     if (n > 9)
 	putn1(n / 10);
     *putp++ = (Char)(n % 10 + '0');
+#endif /* !IS_ASCII */
 }
 
 tcsh_number_t
@@ -547,6 +557,9 @@ getn(const Char *cp)
     tcsh_number_t n;
     int     sign;
     int base;
+#ifndef IS_ASCII
+    char cps[2];
+#endif
 
     if (!cp)			/* PWP: extra error checking */
 	stderror(ERR_NAME | ERR_BADNUM);
@@ -566,12 +579,29 @@ getn(const Char *cp)
     else
 	base = 10;
 
+#ifndef IS_ASCII
+    cps[1] =
+#endif
     n = 0;
     while (Isdigit(*cp))
     {
+#ifndef IS_ASCII
+	unsigned tcsh_number_t ns;
+#endif
+
 	if (base == 8 && *cp >= '8')
 	    stderror(ERR_NAME | ERR_BADNUM);
+#ifndef IS_ASCII
+	cps[0] = *cp++;
+	sscanf(cps, "%l"
+#ifdef HAVE_LONG_LONG
+	"l"
+#endif /* HAVE_LONG_LONG */
+	"u", &ns);
+	n = n * base + ns;
+#else
 	n = n * base + *cp++ - '0';
+#endif /* !IS_ASCII */
     }
     if (*cp)
 	stderror(ERR_NAME | ERR_BADNUM);
