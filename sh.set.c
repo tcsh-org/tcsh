@@ -543,7 +543,7 @@ putn1(unsigned tcsh_number_t n)
 #ifdef HAVE_LONG_LONG
     "l"
 #endif /* HAVE_LONG_LONG */
-    "u", &n);
+    "u", n);
 #else
     if (n > 9)
 	putn1(n / 10);
