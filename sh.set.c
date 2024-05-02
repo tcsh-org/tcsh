@@ -45,7 +45,7 @@ static	Char		*getinx		(Char *, int *);
 static	void		 asx		(Char *, int, Char *);
 static	struct varent 	*getvx		(Char *, int);
 static	Char		*xset		(Char *, Char ***);
-static	Char		*operate	(int, Char *, Char *);
+static	Char		*operate	(Char, Char *, Char *);
 static	void	 	 putn1		(unsigned tcsh_number_t);
 static	struct varent	*madrof		(Char *, struct varent *);
 static	void		 unsetv1	(struct varent *);
@@ -491,13 +491,13 @@ xset(Char *cp, Char ***vp)
 }
 
 static Char *
-operate(int op, Char *vp, Char *p)
+operate(Char op, Char *vp, Char *p)
 {
     Char    opr[2];
     Char   *vec[5];
     Char **v = vec;
     Char  **vecp = v;
-    tcsh_number_t i;
+    unsigned tcsh_number_t i;
 
     if (op != '=') {
 	if (*vp)

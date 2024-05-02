@@ -51,11 +51,11 @@
 #define NOTEQMATCH 8
 
 static	int	   sh_access	(const Char *, int);
-static	tcsh_number_t  exp1		(Char ***, int);
-static	tcsh_number_t  exp2x	(Char ***, int);
-static	tcsh_number_t  exp2a	(Char ***, int);
-static	tcsh_number_t  exp2b	(Char ***, int);
-static	tcsh_number_t  exp2c	(Char ***, int);
+static	unsigned tcsh_number_t  exp1	(Char ***, int);
+static	unsigned tcsh_number_t  exp2x	(Char ***, int);
+static	unsigned tcsh_number_t  exp2a	(Char ***, int);
+static	unsigned tcsh_number_t  exp2b	(Char ***, int);
+static	unsigned tcsh_number_t  exp2c	(Char ***, int);
 static	Char 	  *exp3		(Char ***, int);
 static	Char 	  *exp3a	(Char ***, int);
 static	Char 	  *exp4		(Char ***, int);
@@ -177,13 +177,13 @@ sh_access(const Char *fname, int mode)
 #endif /* !POSIX */
 }
 
-tcsh_number_t
+unsigned tcsh_number_t
 expr(Char ***vp)
 {
     return (exp0(vp, 0));
 }
 
-tcsh_number_t
+unsigned tcsh_number_t
 exp0(Char ***vp, int ignore)
 {
     unsigned tcsh_number_t p1 = exp1(vp, ignore);
@@ -206,7 +206,7 @@ exp0(Char ***vp, int ignore)
     return (p1);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 exp1(Char ***vp, int ignore)
 {
     unsigned tcsh_number_t p1 = exp2x(vp, ignore);
@@ -230,7 +230,7 @@ exp1(Char ***vp, int ignore)
     return (p1);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 exp2x(Char ***vp, int ignore)
 {
     unsigned tcsh_number_t p1 = exp2a(vp, ignore);
@@ -253,7 +253,7 @@ exp2x(Char ***vp, int ignore)
     return (p1);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 exp2a(Char ***vp, int ignore)
 {
     unsigned tcsh_number_t p1 = exp2b(vp, ignore);
@@ -276,7 +276,7 @@ exp2a(Char ***vp, int ignore)
     return (p1);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 exp2b(Char ***vp, int ignore)
 {
     unsigned tcsh_number_t p1 = exp2c(vp, ignore);
@@ -299,7 +299,7 @@ exp2b(Char ***vp, int ignore)
     return (p1);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 exp2c(Char ***vp, int ignore)
 {
     Char *p1 = exp3(vp, ignore);
