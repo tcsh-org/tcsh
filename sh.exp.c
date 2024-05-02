@@ -63,7 +63,7 @@ static	Char 	  *exp5		(Char ***, int);
 static	Char 	  *exp6		(Char ***, int);
 static	void	   evalav	(Char **);
 static	int	   isa		(Char *, int);
-static	tcsh_number_t  egetn	(const Char *);
+static	unsigned tcsh_number_t  egetn	(const Char *);
 
 #ifdef EDEBUG
 static	void	   etracc	(const char *, const Char *, Char ***);
@@ -186,11 +186,11 @@ expr(Char ***vp)
 tcsh_number_t
 exp0(Char ***vp, int ignore)
 {
-    tcsh_number_t p1 = exp1(vp, ignore);
+    unsigned tcsh_number_t p1 = exp1(vp, ignore);
 
     etraci("exp0 p1", p1, vp);
     while (**vp && eq(**vp, STRor2)) {
-	int p2;
+	unsigned tcsh_number_t p2;
 
 	(*vp)++;
 
@@ -209,11 +209,11 @@ exp0(Char ***vp, int ignore)
 static tcsh_number_t
 exp1(Char ***vp, int ignore)
 {
-    tcsh_number_t p1 = exp2x(vp, ignore);
+    unsigned tcsh_number_t p1 = exp2x(vp, ignore);
 
     etraci("exp1 p1", p1, vp);
     while (**vp && eq(**vp, STRand2)) {
-	tcsh_number_t p2;
+	unsigned tcsh_number_t p2;
 
 	(*vp)++;
 	p2 = compat_expr ?
@@ -233,11 +233,11 @@ exp1(Char ***vp, int ignore)
 static tcsh_number_t
 exp2x(Char ***vp, int ignore)
 {
-    tcsh_number_t p1 = exp2a(vp, ignore);
+    unsigned tcsh_number_t p1 = exp2a(vp, ignore);
 
     etraci("exp2x p1", p1, vp);
     while (**vp && eq(**vp, STRor)) {
-	tcsh_number_t p2;
+	unsigned tcsh_number_t p2;
 
 	(*vp)++;
 	p2 = compat_expr ?
@@ -256,11 +256,11 @@ exp2x(Char ***vp, int ignore)
 static tcsh_number_t
 exp2a(Char ***vp, int ignore)
 {
-    tcsh_number_t p1 = exp2b(vp, ignore);
+    unsigned tcsh_number_t p1 = exp2b(vp, ignore);
 
     etraci("exp2a p1", p1, vp);
     while (**vp && eq(**vp, STRcaret)) {
-	tcsh_number_t p2;
+	unsigned tcsh_number_t p2;
 
 	(*vp)++;
 	p2 = compat_expr ?
@@ -279,11 +279,11 @@ exp2a(Char ***vp, int ignore)
 static tcsh_number_t
 exp2b(Char ***vp, int ignore)
 {
-    tcsh_number_t p1 = exp2c(vp, ignore);
+    unsigned tcsh_number_t p1 = exp2c(vp, ignore);
 
     etraci("exp2b p1", p1, vp);
     while (**vp && eq(**vp, STRand)) {
-	tcsh_number_t p2;
+	unsigned tcsh_number_t p2;
 
 	(*vp)++;
 	p2 = compat_expr ?
@@ -304,7 +304,7 @@ exp2c(Char ***vp, int ignore)
 {
     Char *p1 = exp3(vp, ignore);
     Char *p2;
-    tcsh_number_t i;
+    unsigned tcsh_number_t i;
 
     cleanup_push(p1, xfree);
     etracc("exp2c p1", p1, vp);
@@ -346,7 +346,7 @@ static Char *
 exp3(Char ***vp, int ignore)
 {
     Char *p1, *p2;
-    tcsh_number_t i;
+    unsigned tcsh_number_t i;
 
     p1 = exp3a(vp, ignore);
     etracc("exp3 p1", p1, vp);
@@ -393,7 +393,7 @@ exp3a(Char ***vp, int ignore)
 {
     Char *p1, *p2;
     const Char *op;
-    tcsh_number_t i;
+    unsigned tcsh_number_t i;
 
     p1 = exp4(vp, ignore);
     etracc("exp3a p1", p1, vp);
@@ -421,7 +421,7 @@ static Char *
 exp4(Char ***vp, int ignore)
 {
     Char *p1, *p2;
-    tcsh_number_t i = 0;
+    unsigned tcsh_number_t i = 0;
 
     p1 = exp5(vp, ignore);
     etracc("exp4 p1", p1, vp);
@@ -458,7 +458,7 @@ static Char *
 exp5(Char ***vp, int ignore)
 {
     Char *p1, *p2;
-    tcsh_number_t i = 0;
+    unsigned tcsh_number_t i = 0;
 
     p1 = exp6(vp, ignore);
     etracc("exp5 p1", p1, vp);
@@ -513,8 +513,8 @@ exp5(Char ***vp, int ignore)
 static Char *
 exp6(Char ***vp, int ignore)
 {
-    tcsh_number_t ccode;
-    tcsh_number_t i = 0;
+    unsigned tcsh_number_t ccode,
+			   i = 0;
     Char *cp;
 
     if (**vp == 0)
@@ -1022,7 +1022,7 @@ isa(Char *cp, int what)
     return (0);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 egetn(const Char *cp)
 {
     if (*cp && *cp != '-' && !Isdigit(*cp))
