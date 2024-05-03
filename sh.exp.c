@@ -362,21 +362,58 @@ exp3(Char ***vp, int ignore)
 	etracc("exp3 p2", p2, vp);
 	if (!(ignore & TEXP_IGNORE))
 	    switch ((int)i) {
+		tcsh_number_t is;
 
 	    case GTR:
-		i = egetn(p1) > egetn(p2);
+		if ((i = egetn(p1)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p2)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = is > -(tcsh_number_t) -i;
+		else
+		    i = is > (tcsh_number_t) i;
 		break;
 
 	    case GTR | 1:
-		i = egetn(p1) >= egetn(p2);
+		if ((i = egetn(p1)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p2)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = is >= -(tcsh_number_t) -i;
+		else
+		    i = is >= (tcsh_number_t) i;
 		break;
 
 	    case LSS:
-		i = egetn(p1) < egetn(p2);
+		if ((i = egetn(p1)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p2)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = is < -(tcsh_number_t) -i;
+		else
+		    i = is < (tcsh_number_t) i;
 		break;
 
 	    case LSS | 1:
-		i = egetn(p1) <= egetn(p2);
+		if ((i = egetn(p1)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p2)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = is <= -(tcsh_number_t) -i;
+		else
+		    i = is <= (tcsh_number_t) i;
 		break;
 	    }
 	cleanup_until(p1);
