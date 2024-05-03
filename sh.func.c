@@ -558,7 +558,7 @@ doforeach(Char **v, struct command *c)
 void
 dowhile(Char **v, struct command *c)
 {
-    int status;
+    unsigned tcsh_number_t status;
     int again = whyles != 0 &&
 			  SEEKEQ(&whyles->w_start, &lineloc) &&
 			  whyles->w_fename == 0;
