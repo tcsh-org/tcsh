@@ -519,23 +519,44 @@ exp5(Char ***vp, int ignore)
 	etracc("exp5 p2", p2, vp);
 	if (!(ignore & TEXP_IGNORE))
 	    switch (op[0]) {
+		tcsh_number_t is;
 
 	    case '*':
 		i = egetn(p1) * egetn(p2);
 		break;
 
 	    case '/':
-		i = egetn(p2);
-		if (i == 0)
+		if ((i = egetn(p2)) == 0)
 		    stderror(ERR_DIV0);
-		i = egetn(p1) / i;
+		if (i & ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p1)) ==
+		    ~(~(unsigned tcsh_number_t) 0 >> 1) &&
+		    is == -1)
+		    stderror(ERR_DIVOF);
+		if (i & ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = -(tcsh_number_t) -i / is;
+		else
+		    i /= is;
 		break;
 
 	    case '%':
-		i = egetn(p2);
-		if (i == 0)
+		if ((i = egetn(p2)) == 0)
 		    stderror(ERR_MOD0);
-		i = egetn(p1) % i;
+		if (i & ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p1)) ==
+		    ~(~(unsigned tcsh_number_t) 0 >> 1) &&
+		    is == -1)
+		    stderror(ERR_MODOF);
+		if (i & ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = -(tcsh_number_t) -i % is;
+		else
+		    i %= is;
 		break;
 	    }
 	cleanup_until(p1);
