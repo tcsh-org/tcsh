@@ -29,7 +29,7 @@ EOF
 	jammy|focal|bionic|xenial)
 	    ;;
 	*)
-	    # ubuntu user added in lunar can break existing Dockerfiles
+	    # ubuntu user added in lunar (23.04) can break existing Dockerfiles
 	    # https://bugs.launchpad.net/cloud-images/+bug/2005129
 	    expand <<EOF
 
@@ -119,9 +119,9 @@ list_suites()
 	echo buster	# 10	2024-06-30
 	;;
     ubuntu)		# Vers	EOL
-	#echo noble	# 24.04 2034-04-20
+	#echo oracular	# 24.10	2025-07-20
+	echo noble	# 24.04 2036-04-20
 	echo mantic	# 23.10	2024-07-20
-	echo lunar	# 23.04	2024-01-25
 	echo jammy	# 22.04	2032-04-21
 	echo focal	# 20.04	2030-04-23
 	echo bionic	# 18.04	2028-04-26
