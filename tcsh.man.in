@@ -5424,12 +5424,14 @@ messages are verbose.
 .It Ic end
 .It Ic endif
 .It Ic endsw
+.It Ic return
 See the description of the
 .Ic foreach ,
 .Ic if ,
 .Ic switch ,
+.Ic while ,
 and
-.Ic while
+.Ic return
 statements below.
 .
 .El
@@ -5521,29 +5523,33 @@ the loop are executed.
 If you make a mistake typing in a
 loop at the terminal you can rub it out.
 .
-.It Ic function Ar label Xo
-.Op Ar arg
-\&... (+)
+.It Ic function No (+)
+.It Ic function Ar name No (+)
+.It Ic \&...
+.It Ic return
+.It Ic function Ar name Xo
+.Op Ar arg No ...
+(+)
 .Xc
-.Ar label
-is a
-.Ic goto
-label. The shell recurses the current script,
-searches for and continues execution after a line of the form
-.Dl Ar label Ns No \&:
-.Ar arg
-is a list of arguments to be passed to
-.Ic argv Ns No \&.
-Use outside a label is labeled
-.Ar main Ns No \&.
-It's an error
-.Sq Ar label Ns No \&:
-not contain an ending
-.Ic exit Ns No \&.
-It's an error
-.Ar main
-not contain an ending
-.Ic exit Ns No \&.
+The first form of the command prints the value of all shell functions.
+.Pp
+The second form declares a function
+.Ar name Ns No .
+A declaration ends when a
+.Ic return
+is matched. (Both
+.Ic function
+and
+.Ic return
+must appear alone on separate lines.)
+May not be declared otherwise, and declared
+functions may not be redeclared or undeclared.
+.Pp
+The third form calls a function
+.Ar name Ns No ,
+optionally, preceded by
+.Ar arg Ns No ,
+which is a list of arguments to be passed.
 .
 .El
 .Bl -tag -width 6n

@@ -80,7 +80,7 @@ const struct biltins bfunc[] = {
     { "fg",		dofg,		0,	INF	},
     { "filetest",	dofiletest,	2,	INF	},
     { "foreach",	doforeach,	3,	INF	},
-    { "function",	dofunction,	1,	INF	},
+    { "function",	dofunction,	0,	INF	},
 #ifdef TCF
     { "getspath",	dogetspath,	0,	0	},
     { "getxvers",	dogetxvers,	0,	0	},
@@ -123,6 +123,7 @@ const struct biltins bfunc[] = {
     { "pushd",		dopushd,	0,	INF	},
     { "rehash",		dohash,		0,	3	},
     { "repeat",		dorepeat,	2,	INF	},
+    { "return",		doreturn,		0,	0	},
 #ifdef apollo
     { "rootnode",	dorootnode,	1,	1	},
 #endif /* apollo */

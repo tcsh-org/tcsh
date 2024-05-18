@@ -56,6 +56,7 @@ static	void	preread		(void);
 static	void	doagain		(void);
 static  const char *isrchx	(int);
 static	void	search		(int, int, Char *);
+static	int	getword		(struct Strbuf *);
 static	struct wordent	*histgetword	(struct wordent *);
 static	void	toend		(void);
 static	void	xecho		(int, Char **);
@@ -741,8 +742,8 @@ isrchx(int n)
 }
 
 
-int Stype;
-Char *Sgoal;
+static int Stype;
+static Char *Sgoal;
 
 static void
 search(int type, int level, Char *goal)
@@ -999,7 +1000,7 @@ past:
     return NULL;
 }
 
-int
+static int
 getword(struct Strbuf *wp)
 {
     int found = 0, first;
@@ -1096,10 +1097,8 @@ past:
 	break;
 
     case TC_EXIT:
-	if (fcurr.eof)
-	    return 1 << 1;
 	setname(short2str(Sgoal));
-	stderror(ERR_NAME | ERR_NOTFOUND, "exit");
+	stderror(ERR_NAME | ERR_NOTFOUND, "return");
 	break;
 
     default:
@@ -2727,51 +2726,128 @@ getYN(const char *prompt)
 }
 
 void
-dofunction(Char **v, struct command *t)
+dofunction(Char **v, struct command *c)
 {
-    char *file;
-    struct funcargs **fargv;
+    if (*++v == NULL) {
+	plist(&functions, VAR_ALL);
 
-    if (!dolzero)
-	stderror(ERR_FUNC);
-
-    if (*(fargv = &fcurr.fargv)) {
-	(*fargv)->next = malloc(sizeof **fargv);
-	(*fargv)->next->prev = *fargv;
-	*fargv = (*fargv)->next;
-    } else {
-	*fargv = malloc(sizeof **fargv);
-	(*fargv)->prev = NULL;
+	return;
     }
-
+    Sgoal = *v++;
+    Stype = TC_EXIT;
     {
-	int i = 0;
-	Char **vh = NULL;
+	int pv[2];
+	struct saved_state st;
+	struct varent *varp;
+	Char *p;
 
-	for (v++; *v; v++, i++) {
-	    vh = xrealloc(vh, sizeof(Char *[i + 2]));
-	    vh[i] = xmalloc(sizeof(Char [Strlen(*v) + 1]));
-	    Strcpy(vh[i], *v);
+	if (!letter(*(p = Sgoal)))
+	    stderror(ERR_NAME | ERR_FUNCBEGIN);
+	while (*++p)
+	    if (!alnum(*p))
+		stderror(ERR_NAME | ERR_FUNCALNUM);
+	if ((varp = adrof1(Sgoal, &functions))) {
+	    mypipe(pv);
+	    if (!pfork(c, -1)) {
+		xclose(pv[0]);
+		while (**varp->vec)
+		    xwrite(pv[1], (*varp->vec)++, 1);
+		xclose(pv[1]);
+		xexit(0);
+	    }
+	    pwait();
+
+	    xclose(pv[1]);
+	    st_save(&st, pv[0], 0, NULL, v);
+	    process(0);
+	    st_restore(&st);
+
+	    return;
 	}
+	if (*v || c->t_dflg & (F_PIPEIN | F_PIPEOUT) ||
+	    c->t_dlef || c->t_drit || !isatty(OLDSTD))
+	    stderror(ERR_FUNC, Sgoal);
+	{
+	    Char funcexit[] = { 'r', 'e', 't', 'u', 'r', 'n', '\0' },
+		 *(*varvec)[2];
+	    struct Strbuf aword = Strbuf_INIT,
+			  func = Strbuf_INIT;
+	    struct wordent *histent = NULL,
+			   *ohistent = NULL;
+	    char *prompt = short2str(*c->t_dcom);
 
-	vh[i] = NULL;
-	(*fargv)->v = vh;
+	    cleanup_push(&aword, Strbuf_cleanup);
+	    while (1) {
+		if (intty) {
+		    histent = xmalloc(sizeof(*histent));
+		    ohistent = xmalloc(sizeof(*histent));
+		    ohistent->word = STRNULL;
+		    ohistent->next = histent;
+		    histent->prev = ohistent;
+		}
+		if (intty && fseekp == feobp && aret == TCSH_F_SEEK)
+		    printprompt(1, prompt);
+		(void) getword(&aword);
+		Strbuf_terminate(&aword);
+		if (intty && Strlen(aword.s) > 0) {
+		    histent->word = Strsave(aword.s);
+		    histent->next = xmalloc(sizeof(*histent));
+		    histent->next->prev = histent;
+		    histent = histent->next;
+		}
+
+		if (eq(aword.s, funcexit)) {
+		    if (intty) {
+			ohistent->prev = histgetword(histent);
+			ohistent->prev->next = ohistent;
+			savehist(ohistent, 0);
+			freelex(ohistent);
+			xfree(ohistent);
+		    }
+
+		    break;
+		}
+		Strbuf_append(&func, aword.s);
+		Strbuf_append1(&func, ' ');
+		while (getword(&aword)) {
+		    Strbuf_terminate(&aword);
+		    if (intty && Strlen(aword.s) > 0) {
+			histent->word = Strsave(aword.s);
+			histent->next = xmalloc(sizeof(*histent));
+			histent->next->prev = histent;
+			histent = histent->next;
+		    }
+		    Strbuf_append(&func, aword.s);
+		    Strbuf_append1(&func, ' ');
+		}
+		func.s[func.len - 1] = '\n';
+
+		if (intty) {
+		    ohistent->prev = histgetword(histent);
+		    ohistent->prev->next = ohistent;
+		    savehist(ohistent, 0);
+		    freelex(ohistent);
+		    xfree(ohistent);
+		} else
+		    (void) getword(NULL);
+	    }
+
+	    cleanup_until(&aword);
+	    if (!func.len)
+		return;
+	    Strbuf_terminate(&func);
+	    **(varvec = xmalloc(sizeof *varvec)) = func.s;
+	    *varvec[1] = NULL;
+	    setq(Sgoal, *varvec, &functions, VAR_READONLY);
+	}
     }
-    fcurr.ready = 1;
+}
 
-    if (!srcfile(file = fcurr.file ? fcurr.file :
-		 strsave(short2str(ffile)), 0, 0, NULL))
-	stderror(ERR_SYSTEM, file, strerror(errno));
-    if (file != fcurr.file)
-	xfree(file);
-    /* Reset STRargv on function exit. */
-    setv(STRargv, NULL, VAR_READWRITE);
+void
+doreturn(Char **v, struct command *c)
+{
+    USE(c);
+    USE(v);
 
-    if ((*fargv)->prev) {
-	*fargv = (*fargv)->prev;
-	free((*fargv)->next);
-    } else {
-	free(*fargv);
-	*fargv = NULL;
-    }
+    stderror(ERR_NAME | ERR_RETURN);
 }

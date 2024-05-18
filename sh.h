@@ -1019,7 +1019,9 @@ EXTERN struct varent {
 #define VAR_LAST        64
     struct varent *v_link[3];	/* The links, see below */
     int     v_bal;		/* Balance factor */
-}       shvhed IZERO_STRUCT, aliases IZERO_STRUCT;
+} shvhed IZERO_STRUCT,
+  aliases IZERO_STRUCT,
+  functions IZERO_STRUCT;
 
 #define v_left		v_link[0]
 #define v_right		v_link[1]
@@ -1266,6 +1268,34 @@ EXTERN nl_catd catd;
 extern int    filec;
 #endif /* FILEC */
 
+/*
+ * This preserves the input state of the shell. It is used by
+ * st_save and st_restore to manupulate shell state.
+ */
+struct saved_state {
+    int		  insource;
+    int		  OLDSTD;
+    int		  SHIN;
+    int		  SHOUT;
+    int		  SHDIAG;
+    int		  intty;
+    struct whyle *whyles;
+    Char 	 *gointr;
+    Char 	 *arginp;
+    Char	 *evalp;
+    Char	**evalvec;
+    Char	 *alvecp;
+    Char	**alvec;
+    int		  onelflg;
+    int	  enterhist;
+    Char	**argv;
+    Char	**av;
+    Char	  HIST;
+    int	  cantell;
+    struct Bin	  B;
+    int		  justpr;
+};
+
 #include "sh.decls.h"
 /*
  * Since on some machines characters are unsigned, and the signed
@@ -1305,26 +1335,5 @@ extern int    filec;
 #define TEXP_IGNORE 1	/* in ignore, it means to ignore value, just parse */
 #define TEXP_NOGLOB 2	/* in ignore, it means not to globone */
 
-/* Function variable(s) and function(s). */
-extern Char *Sgoal;
-extern int Stype;
-extern struct funccurr {
-    struct funcargs {
-	Char **v;
-	struct funcargs *prev,
-			*next;
-    } *fargv;
-    struct funcfile {
-	char *file;
-	struct funcfile *prev,
-			*next;
-    } *ffile;
-    char *file;
-    int eof,
-	src,
-	ready;
-} fcurr;
-extern int getword(struct Strbuf *);
-extern int srcfile(const char *, int, int, Char **);
 
 #endif /* _h_sh */

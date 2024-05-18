@@ -52,6 +52,8 @@ extern	void		  done		(int) __attribute__((__noreturn__));
 extern	void		  xexit		(int) __attribute__((__noreturn__));
 #endif
 extern	int		  grabpgrp	(int, pid_t);
+extern	void		  st_save	(struct saved_state *, int, int, Char **, Char **);
+extern	void		  st_restore	(void *);
 
 /*
  * sh.dir.c
@@ -166,6 +168,7 @@ extern	void		  dohup		(Char **, struct command *);
 extern	void		  doonintr	(Char **, struct command *);
 extern	void		  doprintenv	(Char **, struct command *);
 extern	void		  dorepeat	(Char **, struct command *);
+extern	void		  doreturn	(Char **, struct command *);
 extern	void		  dofiletest	(Char **, struct command *);
 extern	void		  dosetenv	(Char **, struct command *);
 extern	void		  dosuspend	(Char **, struct command *);
