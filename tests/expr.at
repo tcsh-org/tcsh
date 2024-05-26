@@ -1,7 +1,11 @@
 AT_BANNER([Expression evaluation])
 
+dnl
+dnl	Arithmetic operators
+dnl
 
 AT_SETUP([Arithmetic operators])
+AT_KEYWORDS([expr expression])
 
 AT_CHECK([tcsh -f -c 'exit (2 || 3)'], 1)
 AT_CHECK([tcsh -f -c 'exit (2 || 0)'], 1)
@@ -74,7 +78,12 @@ AT_CHECK([tcsh -f -c 'exit ((3))'], 3)
 AT_CLEANUP()
 
 
+dnl
+dnl	Primary expressions
+dnl
+
 AT_SETUP([Primary expressions])
+AT_KEYWORDS([expr expression])
 
 AT_CHECK([tcsh -f -c 'set parseoctal; exit (010)'], 8)
 AT_CHECK([tcsh -f -c 'exit (010)'], 10)
@@ -145,7 +154,7 @@ AT_CHECK([tcsh -f -c 'exit ( -Lf link )'], 0)
 
 AT_CHECK([tcsh -f -c 'exit ( -rwx file1 )'], 1)
 
-# -A, -A:, -M, -M:, -C, -C:, -D, -I, -F, -U, -U:, -G, -G: not tested
+dnl -A, -A:, -M, -M:, -C, -C:, -D, -I, -F, -U, -U:, -G, -G: not tested
 
 AT_CHECK([tcsh -f -c 'exit ( -L link == file2 )'], 1)
 
@@ -153,7 +162,7 @@ ln file2 file2link
 AT_CHECK([tcsh -f -c 'exit ( -N file1 )'], 1)
 AT_CHECK([tcsh -f -c 'exit ( -N file2 )'], 2)
 
-# S_ISVTX is masked out
+dnl S_ISVTX is masked out
 AT_CHECK([tcsh -f -c 'exit ( -P file1 == 6777 )'], 1)
 AT_CHECK([tcsh -f -c 'exit ( -P: file1 == 06777 )'], 1)
 AT_CHECK([tcsh -f -c 'exit ( -P111 file1 == 111 )'], 1)
@@ -165,4 +174,3 @@ AT_CHECK([tcsh -f -c 'exit ( -Z nonempty )'], 1)
 AT_CHECK([tcsh -f -c 'exit ( -N unknown )'], 255)
 
 AT_CLEANUP()
-

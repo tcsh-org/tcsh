@@ -1,0 +1,418 @@
+AT_BANNER([ls-F built-in command])
+
+dnl
+dnl TCSH_LS_F(EXPECTFILE, [ENVS], [PRECMD], [STDERR])
+dnl	Check 'cd DIR && ls-F' and 'ls-F DIR'.
+dnl	For 'cd DIR && ls-F', stdout should match EXPECTFILE.
+dnl	For 'ls-F DIR', first line should be 'DIR:' and
+dnl	the rest should match EXPECTFILE.
+dnl	If ENVS isn't empty, use that as the environment to tcsh.
+dnl	If PRECMD isn't empty, run in tcsh before ls-F.
+dnl	If STDERR isn't empty, stderr from PRECMD;ls-F should match STDERR.
+dnl
+m4_define([TCSH_LS_F], [dnl
+m4_if(m4_eval($# < 1 || $# > 4), [1],
+    [m4_fatal([usage: $0(OUTFILE, ENVS, PRECMD, STDERR)])])dnl
+AT_CHECK([$2 tcsh -f -c '$3;cd DIR && ls-F'], [0], [stdout-nolog], [$4])
+TCSH_DIFF([$1], [stdout])
+AT_CHECK([$2 tcsh -f -c '$3;ls-F DIR'], [0], [stdout-nolog], [$4])
+AT_CHECK([sed -e '1!b' -e '/^DIR:/d' stdout], [0], [stdout-nolog])
+AT_CHECK([diff "$1" stdout])
+])
+
+
+dnl
+dnl	ls-F
+dnl
+
+dnl
+dnl Note that the test groups don't test multiple columns
+dnl because the terminal doesn't get setup by default with -c.
+dnl
+
+AT_SETUP([ls-F])
+AT_KEYWORDS([commands])
+
+AT_CHECK([create_ls_DIR])
+
+unset CLICOLOR_FORCE
+unset LSCOLORS
+unset LS_COLORS
+
+dnl
+dnl ls-F with default behavior
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-default.out])
+
+dnl
+dnl listlinks
+dnl
+dnl Changes from ls-F-default.out:
+dnl	ldir>
+dnl	lldir>
+dnl	llorphan&
+dnl	lorphan&
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-listlinks.out], [], [set listlinks])
+
+dnl
+dnl listflags=x
+dnl
+dnl Note: no changes from ls-F-default.out when in in 1 column mode
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-default.out], [], [set listflags=x])
+
+dnl
+dnl listflags=A
+dnl
+dnl Changes from ls-F-default.out:
+dnl	.hidden
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-listflags-A.out], [], [set listflags=A])
+
+dnl
+dnl listflags=xa
+dnl
+dnl Changes from ls-F-default.out:
+dnl	../
+dnl	./
+dnl	.hidden
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-listflags-xa.out], [], [set listflags=xa])
+
+AT_CLEANUP()
+
+
+dnl
+dnl	ls-F color CLICOLOR_FORCE
+dnl
+
+AT_SETUP([ls-F color CLICOLOR_FORCE])
+AT_KEYWORDS([commands])
+
+AT_CHECK([create_ls_DIR])
+
+CLICOLOR_FORCE=
+export CLICOLOR_FORCE
+unset LSCOLORS
+unset LS_COLORS
+
+dnl
+dnl Default colors, listflags=A, listlinks
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-color-default.out], [],
+    [set color listflags=A listlinks])
+
+dnl
+dnl unsetenv CLICOLOR_FORCE in tcsh
+dnl This should be same as ls-F-default.out, i.e., without color.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-default.out], [],
+    [set color; unsetenv CLICOLOR_FORCE])
+
+AT_CLEANUP()
+
+
+dnl
+dnl	ls-F color LSCOLORS
+dnl
+
+AT_SETUP([ls-F color LSCOLORS])
+AT_KEYWORDS([commands])
+
+AT_CHECK([create_ls_DIR])
+
+CLICOLOR_FORCE=
+export CLICOLOR_FORCE
+unset LSCOLORS
+unset LS_COLORS
+
+dnl
+dnl LSCOLORS: dim foreground colors, except bright colors for set*id and sticky.
+dnl listflags=A, listlinks
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-dim.out],
+    [LSCOLORS=bxcxdxexfxgxhxAxBxCxDx],
+    [set color listflags=A listlinks])
+
+dnl
+dnl As per ls-F-LSCOLORS-dim.out above, but setenv LSCOLORS in tcsh.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-dim.out], [],
+    [set color listflags=A listlinks; setenv LSCOLORS "bxcxdxexfxgxhxAxBxCxDx"])
+
+dnl
+dnl LSCOLORS: bright foreground colors (01 present in color string),
+dnl except dim colors for set*id and sticky.
+dnl listflags=A, listlinks
+dnl
+dnl Changes from ls-F-LSCOLORS-dim.out
+dnl	Previous dim are bright, previous bright are dim.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-bright.out],
+    [LSCOLORS=BxCxDxExFxGxHxaxbxcxdx],
+    [set color listflags=A listlinks])
+
+dnl
+dnl As per ls-F-LSCOLORS-bright.out above, but setenv LSCOLORS in tcsh.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-bright.out], [],
+    [setenv LSCOLORS BxCxDxExFxGxHxaxbxcxdx; set color listflags=A listlinks])
+
+dnl
+dnl LSCOLORS without set listlinks.
+dnl
+dnl Changes from ls-F-LSCOLORS-bright.out:
+dnl     ldir@           green not red
+dnl     lldir           green not red
+dnl     llorphan@       green not white
+dnl     lorphan@        green not white
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-nolinks.out],
+    [LSCOLORS=BxCxDxExFxGxHxaxbxcxdx],
+    [set color listflags=A])
+
+dnl
+dnl As per ls-F-LSCOLORS-bright.out above, with LS_COLORS=ln=target,
+dnl then setenv LSCOLORS override in tcsh.
+dnl This should disable ln=target with the LSCOLORS override,
+dnl and be same as ls-F-LSCOLORS-bright.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-bright.out],
+    [LS_COLORS=ln=target],
+    [setenv LSCOLORS BxCxDxExFxGxHxaxbxcxdx; set color listflags=A listlinks])
+
+dnl
+dnl LSCOLORS 4 chars: 2 pairs.
+dnl Directory red on yellow,
+dnl Symlink bright yellow on bright red,
+dnl Using LS_COLORS defaults for remaining indicies.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-short.out],
+    [LSCOLORS=bdDB],
+    [set color listflags=A listlinks])
+
+dnl
+dnl LSCOLORS 5 chars: 2 pairs with extra 'z'
+dnl As previous, ignoring odd 'z' char.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-short.out],
+    [LSCOLORS=bdDBz],
+    [set color listflags=A listlinks])
+
+dnl
+dnl LSCOLORS 23 chars: 11 pairs with dim foreground colors (as earlier),
+dnl ignore trailing (and unknown) 'z'.
+dnl listflags=A, listlinks
+dnl
+dnl As per ls-F-LSCOLORS-dim.out above.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-dim.out],
+    [LSCOLORS=bxcxdxexfxgxhxAxBxCxDxz],
+    [set color listflags=A listlinks])
+
+dnl
+dnl LSCOLORS 24 chars:  11 pairs ignoring extra (and unknown) 'zz'.
+dnl listflags=A, listlinks
+dnl
+dnl As per ls-F-LSCOLORS-dim.out above.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-dim.out],
+    [LSCOLORS=bxcxdxexfxgxhxAxBxCxDxzz],
+    [set color listflags=A listlinks])
+
+dnl
+dnl Fail: environment LSCOLORS=ix exits with unknown 'i?'.
+dnl
+AT_CHECK([LSCOLORS=ix tcsh -f -c 'set color;cd DIR && ls-F'], [1], [], [dnl
+Unknown LSCOLORS color variable 'i?'.
+])
+
+dnl
+dnl Fail: environment LSCOLORS=aj exits with unknown '?j'.
+dnl
+AT_CHECK([LSCOLORS=aj tcsh -f -c 'set color;cd DIR && ls-F'], [1], [], [dnl
+Unknown LSCOLORS color variable '?j'.
+])
+
+dnl
+dnl setenv LSCOLORS 6 chars: "bdDB" per short above, "ix" warns for unknown 'i?'.
+dnl listflags=A, listlinks
+dnl
+dnl As per ls-F-LSCOLORS-short.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-short.out],
+    [],
+    [setenv LSCOLORS "bdDBix"; set color listflags=A listlinks], [dnl
+Unknown LSCOLORS color variable 'i?'.
+])
+
+dnl
+dnl LSCOLORS bright, override with LS_COLORS=ln=target,
+dnl then unsetenv LS_COLORS to reapply LSCOLORS.
+dnl
+dnl This should reapply LSCOLORS, and be same as ls-F-LSCOLORS-bright.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-bright.out],
+    [LSCOLORS=BxCxDxExFxGxHxaxbxcxdx LS_COLORS=ln=target],
+    [unsetenv LS_COLORS; set color listflags=A listlinks])
+
+dnl
+dnl Check unsetenv LS_COLORS to reapply existing LSCOLORS that contains unknown colors.
+dnl
+dnl setenv LSCOLORS 6 chars: "bdDB" per short above, "xj" warns for unknown '?j',
+dnl override with LS_COLORS=ln=target,
+dnl then unsetenv LS_COLORS to reapply faulty LSCOLORS without warning.
+dnl listflags=A, listlinks
+dnl
+dnl As per ls-F-LSCOLORS-short.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LSCOLORS-short.out],
+    [],
+    [setenv LSCOLORS "bdDBxj"; setenv LS_COLORS ln=target; unsetenv LS_COLORS || echo FAIL; set color listflags=A listlinks], [dnl
+Unknown LSCOLORS color variable '?j'.
+])
+
+AT_CLEANUP()
+
+
+dnl
+dnl	ls-F color LS_COLORS
+dnl
+
+AT_SETUP([ls-F color LS_COLORS])
+AT_KEYWORDS([commands])
+
+AT_CHECK([create_ls_DIR])
+
+CLICOLOR_FORCE=
+export CLICOLOR_FORCE
+unset LSCOLORS
+unset LS_COLORS
+
+dnl LS_COLORS value with all variables set to "vv={VV}" and
+dnl extensions .1 .12 .123 .1234 set.
+dnl
+m4_pushdef([TCSH_TEXT_LS_COLORS], [di={DI}:ln={LN}:or={OR}:pi={PI}:so={SO}:do={DO}:bd={BD}:cd={CD}:ex={EX}:fi={FI}:no={NO}:mi={MI}:lc={LC}:rc={RC}:ec={EC}:su={SU}:sg={SG}:tw={TW}:ow={OW}:st={ST}:rs={RS}:hl={HL}:mh={MH}:ca={CA}:*.1={DOT1}:*.12={DOT12}:*.123={DOT123}:*.1234={DOT1234}])
+
+dnl
+dnl LS_COLORS as TCSH_TEXT_LS_COLORS.
+dnl listflags=A, listlinks
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-all.out],
+    [LS_COLORS="TCSH_TEXT_LS_COLORS"],
+    [set color listflags=A listlinks])
+
+dnl
+dnl LS_COLORS as TCSH_TEXT_LS_COLORS without set listlinks.
+dnl
+dnl Changes from ls-F-LS_COLORS-all.out:
+dnl     {LC}{LN}{RC}ldir{EC}@
+dnl     {LC}{LN}{RC}lldir{EC}@
+dnl     {LC}{LN}{RC}llorphan{EC}@
+dnl     {LC}{LN}{RC}lorphan{EC}@
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-nofollow.out],
+    [LS_COLORS="TCSH_TEXT_LS_COLORS"],
+    [set color listflags=A])
+
+dnl
+dnl LS_COLORS as TCSH_TEXT_LS_COLORS:ln=target
+dnl listflags=A, listlinks
+dnl
+dnl Changes from ls-F-LS_COLORS-all.out: files have their
+dnl color based on the link target but retain the @ suffix.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-ln-target.out],
+    [LS_COLORS="TCSH_TEXT_LS_COLORS:ln=target"],
+    [set color listflags=A listlinks])
+
+dnl
+dnl LS_COLORS with just ln=target.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-color-ln-target.out],
+    [LS_COLORS="ln=target"],
+    [set color listflags=A listlinks])
+
+dnl
+dnl LS_COLORS as TCSH_TEXT_LS_COLORS:ln=target,
+dnl then setenv LS_COLORS ln=target:TCSH_TEXT_LS_COLORS.
+dnl listflags=A, listlinks
+dnl
+dnl This should disable ln=target, and be same as ls-F-LS_COLORS-all.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-all.out],
+    [LS_COLORS="TCSH_TEXT_LS_COLORS:ln=target"],
+    [set color listflags=A listlinks; setenv LS_COLORS "ln=target:TCSH_TEXT_LS_COLORS"])
+
+dnl
+dnl LS_COLORS with just ln=target, then unsetenv LS_COLORS.
+dnl
+dnl This should disable ln=target, and be same as ls-F-color-default.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
+    [LS_COLORS="ln=target"],
+    [unsetenv LS_COLORS; set color listflags=A listlinks])
+
+dnl
+dnl Fail: environment LS_COLORS=YY:XX=0 exits with unknown 'XX'.
+dnl (Unknown 'YY' is ignored.)
+dnl
+AT_CHECK([LS_COLORS=YY:XX=0 tcsh -f -c 'set color;cd DIR && ls-F'], [1], [], [dnl
+Unknown LS_COLORS color variable 'XX'.
+])
+
+dnl
+dnl setenv LS_COLORS "YY:XX=0" warns for unknown 'XX='. (Unknown 'YY' is ignored').
+dnl listflags=A, listlinks
+dnl
+dnl As per ls-F-color-default.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
+    [],
+    [setenv LS_COLORS "YY:XX=0"; set color listflags=A listlinks], [dnl
+Unknown LS_COLORS color variable 'XX'.
+])
+
+dnl
+dnl Check setenv LS_COLORS that all variables before an unknown variable are used.
+dnl
+dnl setenv LS_COLORS TCSH_TEXT_LS_COLORS:YY:XX=0 warns for unknown 'XX'.
+dnl (Unknown 'YY' is ignored').
+dnl listflags=A, listlinks
+dnl
+dnl As per ls-F-LS_COLORS-all.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-all.out],
+    [],
+    [setenv LS_COLORS "TCSH_TEXT_LS_COLORS:YY:XX=0"; set color listflags=A listlinks], [dnl
+Unknown LS_COLORS color variable 'XX'.
+])
+
+dnl
+dnl LS_COLORS as TCSH_TEXT_LS_COLORS, override with setenv LSCOLORS,
+dnl then unsetenv LSCOLORS to reapply LS_COLORS.
+dnl
+dnl This should reapply LS_COLORS, and be the same as ls-F-LS_COLORS-all.out.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-LS_COLORS-all.out],
+    [LS_COLORS="TCSH_TEXT_LS_COLORS"],
+    [setenv LSCOLORS BxCxDxExFxGxHxaxbxcxdx; unsetenv LSCOLORS; set color listflags=A listlinks])
+
+dnl
+dnl Check unsetenv LSCOLORS to reapply existing LS_COLORS that contains unknown colors.
+dnl
+dnl setenv LS_COLORS "XX=0" warns for unknown 'XX' (and uses default colors),
+dnl override with LSCOLORS=Aa,
+dnl then unsetenv LSCOLORS to reapply faulty LS_COLORS without warning.
+dnl and results in default colors.
+dnl
+TCSH_LS_F([${tests_dir}/ls-F-color-default.out],
+    [],
+    [setenv LS_COLORS XX=0; setenv LSCOLORS Aa; unsetenv LSCOLORS || echo FAIL; set color listflags=A listlinks], [dnl
+Unknown LS_COLORS color variable 'XX'.
+])
+
+m4_popdef([TCSH_TEXT_LS_COLORS])
+
+AT_CLEANUP()

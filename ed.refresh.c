@@ -832,7 +832,7 @@ update_line(Char *old, Char *new, int cur_line)
      * ^.....................^     ^..................^       ^........^
      * \new                  \nfd  \nsb               \nse     \nls    \ne
      *
-     * fx is the difference in length between the the chars between nfd and
+     * fx is the difference in length between the chars between nfd and
      * nsb, and the chars between ofd and osb, and is thus the number of
      * characters to delete if < 0 (new is shorter than old, as above),
      * or insert (new is longer than short).

@@ -805,7 +805,7 @@ GetNextChar(Char *cp)
 	    cbp++;
 	    if (normal_mbtowc(cp, cbuf, cbp) == -1) {
 		reset_mbtowc();
-		if (cbp < MB_CUR_MAX)
+		if (cbp < (size_t)MB_CUR_MAX)
 		    continue; /* Maybe a partial character */
 		/* And drop the following bytes, if any */
 		*cp = (unsigned char)*cbuf | INVALID_BYTE;

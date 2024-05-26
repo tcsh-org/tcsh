@@ -204,9 +204,8 @@ Subject: NICE and NOHUP have no effect as last component of sub-shells.
     ... Works.
 
 >From idallen
-Subject: you can't nest back-quotes
-    % echo ` echo \`pwd\` `
-    Unmatched `.
+Subject: you can nest back-quotes, but the syntax is ridiculous
+    % echo "`echo "\"'`echo "\"'\''`echo "\`"pwd"\`"`'\''\""`'\""`"
 
 From: idallen (Ian! D. Allen)
 Subject: GLOB not applied to names in setenv or unsetenv

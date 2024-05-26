@@ -1865,7 +1865,13 @@ if the
 .Ql diff
 output in the previous event, 12, scrolled off the top of the screen.
 .Pp
-History references may be insulated from the surrounding text with braces if
+History references may be insulated from the surrounding text with braces
+.Po
+.Ql {
+and
+.Ql }
+.Pc
+if
 necessary.
 For example,
 .Dl !vdoc
@@ -2237,7 +2243,8 @@ the result would be
 .Dl wumpus.1:r
 .Pp
 A substitution followed by a
-colon may need to be insulated from it with braces:
+.Ql \&:
+may need to be insulated from it with braces:
 .Bd -literal -offset indent
 > mv a.out /usr/games/wumpus
 > setenv PATH !$:h:$PATH
@@ -2252,7 +2259,8 @@ but fails in
 .Nm ,
 because
 .Nm
-expects another modifier after the second colon
+expects another modifier after the second
+.Ql \&:
 rather than
 .Ql $ .
 .
@@ -2562,7 +2570,8 @@ except for
 can be applied to the substitutions above.
 More than one may be used.
 (+)
-Braces may be needed to insulate a variable substitution from a literal colon
+Braces may be needed to insulate a variable substitution from a literal
+.Ql \&:
 just as with
 .Sx History word modifiers ;
 any modifiers must appear
@@ -2663,6 +2672,12 @@ typed the user may type an interrupt to interrupt the sequence into
 which the line is to be substituted, but
 .Xr csh 1
 does not allow this.
+.
+.Pp
+.It Li $?<
+Substitutes the number of available bytes from the standard input.
+(This feature might be non-portable.)
+(+)
 .El
 .
 .Ss Command, filename and directory stack substitution
@@ -3022,8 +3037,12 @@ or
 indicating, as in the C language, that the second
 is to be executed only if the first fails or succeeds respectively.
 .Pp
-A simple command, pipeline or sequence may be placed in parentheses,
-.Ql () ,
+A simple command, pipeline or sequence may be placed in parentheses
+.Po
+.Ql \&(
+and
+.Ql \&)
+.Pc
 to form a simple command, which may in turn be a component of a pipeline or
 sequence.
 A command, pipeline or sequence can be executed
@@ -3202,7 +3221,7 @@ if
 .Ql ask
 is given in
 .Ic noclobber ,
-an interacive confirmation is presented, rather than an
+an interactive confirmation is presented, rather than an
 error.
 .Pp
 The forms involving
@@ -3385,7 +3404,11 @@ surrounded by spaces.
 .Ss Command exit status
 Commands can be executed in expressions and their exit status
 returned by enclosing them in braces
-.Pq Ql {} .
+.Po
+.Ql {
+and
+.Ql }
+.Pc .
 Remember that the braces should
 be separated from the words of the command by spaces.
 Command executions
@@ -6088,7 +6111,7 @@ Symbolic link to a non-directory.
 .It Li >
 Symbolic link to a directory.
 .It Li &
-Symbolic link to nowhere.
+Orphaned (broken) symbolic link.
 .El
 .Pp
 .Ic listlinks
@@ -6142,12 +6165,15 @@ generally does the right thing.
 The
 .Ic ls\-F
 builtin can list files using different colors depending on the
-filetype or extension.
+file type or extension.
 See the
 .Ic color
 shell variable and the
+.Ev CLICOLOR_FORCE ,
+.Ev LSCOLORS ,
+and
 .Ev LS_COLORS
-environment variable.
+environment variables.
 .El
 .Pp
 .Bl -tag -width 6n -compact
@@ -6183,11 +6209,11 @@ see the
 shell variable.
 .
 .It Ic nice Oo Cm + Ns Ar number Oc Op Ar command
-Sets the scheduling priority for the shell to
+Increments the scheduling priority for the shell by
 .Ar number ,
 or, without
 .Ar number ,
-to 4.
+by 4.
 With
 .Ar command ,
 runs
@@ -6198,8 +6224,7 @@ The greater the
 .Ar number ,
 the less cpu
 the process gets.
-The super-user may specify negative
-priority by using
+The super-user may decrement the priority by using
 .Dl nice \- Ns Ar number Li \&...
 .Pp
 .Ar command
@@ -6713,7 +6738,7 @@ to the left.
 It is an error for
 .Ic argv
 not to be set or to have
-less than one word as value.
+fewer than one word as value.
 .Pp
 With
 .Ar variable ,
@@ -7071,7 +7096,9 @@ and does
 .Pp
 then the shell will change the title of the running
 .Xr xterm 1
-to be the name of the host, a colon, and the full current working directory.
+to be the name of the host, a
+.Ql \&: ,
+and the full current working directory.
 A fancier way to do that is
 .Bd -literal -offset indent
 > alias cwdcmd 'echo \-n "^[]2;${HOST}:$cwd^G^[]1;${HOST}^G"'
@@ -7412,15 +7439,23 @@ If set, it enables color display for the builtin
 and it passes
 .Fl \-color=auto
 to
-.Xr ls 1 .
+.Xr ls 1
+(or
+.Fl \-color=always
+if
+.Ev CLICOLOR_FORCE
+is set).
 Alternatively, it can be set to only
 .Ql ls\-F
 or only
 .Ql ls
-to enable color to only one command.
+to enable color for a specific command.
 Setting
 it to nothing is equivalent to setting it to
 .Ql (ls\-F ls) .
+Color is disabled if the output is not directed to a terminal, unless
+.Ev CLICOLOR_FORCE
+is set.
 .
 .It Ic colorcat
 If set, it enables color escape sequence for NLS message files,
@@ -7613,7 +7648,9 @@ the value is interpreted as:
 .It Li 2 Ta 0x05 Ta Second byte.
 .El
 .Pp
-The GNU fileutils version of ls cannot display multi-byte
+The GNU coreutils version of
+.Xr ls 1
+cannot display multi-byte
 filenames without the
 .Fl N
 .Pq Fl -literal
@@ -7623,7 +7660,7 @@ this version, set the second word of dspmbyte to
 .Ql ls .
 If not, for
 example,
-.Dl ls-F -l
+.Dl ls\-F -l
 cannot display multi-byte filenames.
 .Pp
 Note that
@@ -9318,6 +9355,29 @@ Equivalent to the
 .Ic afsuser
 shell variable.
 .
+.It Ev CLICOLOR_FORCE
+Color sequences for
+.Ic ls\-F
+are normally disabled if the output is not directed to
+a terminal.
+This can be overridden by setting this variable,
+which also changes the
+.Ic ls\-F
+invocation of
+.Xr ls 1
+to use
+.Fl \-color=always
+instead of
+.Fl \-color=auto .
+.Pp
+Note that
+.Ic color
+must be set for this environment variable to be effective;
+by itself
+.Ev CLICOLOR_FORCE
+does not enable color
+.Ic ls\-F .
+.
 .It Ev COMMAND_LINE
 Set by
 .Nm
@@ -9378,7 +9438,9 @@ This variable is obsolete and
 will be removed in a future version.
 .
 .It Ev HPATH No (+)
-A colon-separated list of directories in which the
+A
+.So Li \&: Sc Ns No \-separated
+list of directories in which the
 .Ic run-help
 editor
 command looks for command documentation.
@@ -9398,68 +9460,253 @@ The number of lines in the terminal.
 See
 .Sx Terminal management (+) .
 .
+.It Ev LSCOLORS
+One of two environment variables that may be used to
+define the per-file colors used by
+.Ic ls\-F
+(along with
+.Ev LS_COLORS ) .
+This variable is used by some BSD versions of
+.Xr ls 1 .
+.Pp
+On
+.Nm
+startup,
+.Ev LS_COLORS
+takes priority over
+.Ev LSCOLORS .
+If both
+.Ev LSCOLORS
+or
+.Ev LS_COLORS
+are
+.Ic setenv ,
+the most recent
+.Ic setenv
+is used.
+If
+.Ev LSCOLORS
+is
+.Ic unsetenv
+while
+.Ev LS_COLORS
+is still
+.Ic setenv ,
+then
+.Ev LS_COLORS
+is parsed again (with any warnings suppressed)
+to reapply its settings.
+.Pp
+This variable is a 22 character string containing
+a concatenation of 11 pairs of the format
+.Ar f Ns Ar b ,
+where
+.Ar f
+is the foreground color and
+.Ar b
+is the background color.
+If fewer than 11 pairs are provided, default colors are used
+for the remaining entries.
+If more than 11 pairs are provided, the extra values are ignored.
+.Pp
+The order of the color attribute pairs to
+the equivalent
+.Ev LS_COLORS
+variable, the file type, and default color, is as follows:
+.Pp
+.Bl -column -offset indent ".Sy Index" ".Sy Var" ""
+.
+.It Sy Index Ta Sy Var Ta Sy File type. [Default color]
+.
+.It 1 Ta Li di Ta Directory. [Bold blue]
+.
+.It 2 Ta Li ln Ta Symbolic link. [Bold cyan]
+.
+.It 3 Ta Li so Ta Socket. [Bold magenta]
+.
+.It 4 Ta Li pi Ta Named pipe (FIFO). [Yellow (or brown)]
+.
+.It 5 Ta Li ex Ta Executable file. [Bold green]
+.
+.It 6 Ta Li bd Ta Block device. [Bold yellow]
+.
+.It 7 Ta Li cd Ta Character device. [Bold yellow]
+.
+.It 8 Ta Li su Ta Setuid file. [White on red]
+.
+.It 9 Ta Li sg Ta Setgid file. [Black on yellow]
+.
+.It 10 Ta Li tw Ta Sticky and other writable directory. [Black on green]
+.
+.It 11 Ta Li ow Ta Other writable but not sticky directory. [Blue on green]
+.El
+.Pp
+The color code designators are as follows:
+.Pp
+.Bl -tag -width "Code" -offset indent -compact
+.It Sy Code
+.Sy Description
+.It Li a
+Black.
+.It Li b
+Red.
+.It Li c
+Green.
+.It Li d
+Yellow (or brown).
+.It Li e
+Blue.
+.It Li f
+Magenta.
+.It Li g
+Cyan.
+.It Li h
+Light grey.
+.It Li A
+Bold black, usually shows up as dark grey.
+.It Li B
+Bold red.
+.It Li C
+Bold green.
+.It Li D
+Bold yellow.
+.It Li E
+Bold blue.
+.It Li F
+Bold magenta.
+.It Li G
+Bold cyan.
+.It Li H
+Bold light grey; looks like bright white.
+.It Li x
+Default foreground or background.
+.El
+.Pp
+Note that the above are standard ANSI colors.
+The actual display may differ
+depending on the color capabilities of the terminal in use.
+.Pp
+The default colors are as per the color variables in
+.Ev LS_COLORS ,
+and are not the same default colors as those used by some BSD versions of
+.Xr ls 1 .
+.
 .It Ev LS_COLORS
+One of two environment variables that may be used to
+define the per-file colors used by
+.Ic ls\-F
+(along with
+.Ev LSCOLORS ) .
+This variable is used by the GNU coreutils version of
+.Xr ls 1
+and may be setup by
+.Xr dircolors 1 .
+.Pp
+On
+.Nm
+startup,
+.Ev LS_COLORS
+takes priority over
+.Ev LSCOLORS .
+If both
+.Ev LSCOLORS
+or
+.Ev LS_COLORS
+are
+.Ic setenv ,
+the most recent
+.Ic setenv
+is used.
+If
+.Ev LS_COLORS
+is
+.Ic unsetenv
+while
+.Ev LSCOLORS
+is still
+.Ic setenv ,
+then
+.Ev LSCOLORS
+is parsed again (with any warnings suppressed)
+to reapply its settings.
+.Pp
 The format of this variable is reminiscent of the
 .Xr termcap 5
-file format; a colon-separated list of expressions of the form
-.Li \&" Ns Ar xx Ns Li = Ns Ar string Ns Li \&" ,
+file format; a
+.So Li \&: Sc Ns No \-separated
+list of expressions of the form
+.Li \&" Ns Ar xx Ns Li = Ns Ar value Ns Li \&"
+or
+.Li \&"* Ns Ar ext Ns Li = Ns Ar value Ns Li \&" .
+.Pp
+The first form
+.Li \&" Ns Ar xx Ns Li = Ns Ar value Ns Li \&" ,
 where
 .Li \&" Ns Ar xx Ns Li \&"
-is a two-character variable name.
-.Pp
-The variables with their associated defaults are:
+is a two-character variable name, supports the
+following variables, their associated default
+ISO 6429 color code or escape sequences, and file type:
 .
 .Bl -column -offset indent ".Sy Var" ".Sy Default" ""
 .
-.It Sy Var Ta Sy Default Ta Sy File type
-.Pp
+.It Sy Var Ta Sy Default Ta Sy File type. [Default color]
 .
 .It Li no Ta Li 0 Ta Normal (non-filename) text.
 .
 .It Li fi Ta Li 0 Ta Regular file.
 .
-.It Li di Ta Li 01;34 Ta Directory.
+.It Li di Ta Li 01;34 Ta Directory. [Bold blue]
 .
-.It Li ln Ta Li 01;36 Ta Symbolic link.
+.It Li ln Ta Li 01;36 Ta Symbolic link. [Bold cyan]
 .
-.It Li pi Ta Li 33 Ta Named pipe (FIFO).
+.It Li pi Ta Li 33 Ta Named pipe (FIFO). [Yellow (or brown)]
 .
-.It Li so Ta Li 01;35 Ta Socket.
+.It Li so Ta Li 01;35 Ta Socket. [Bold magenta]
 .
-.It Li do Ta Li 01;35 Ta Door.
+.It Li do Ta Li 01;35 Ta Door. [Bold magenta]
 .
-.It Li bd Ta Li 01;33 Ta Block device.
+.It Li bd Ta Li 01;33 Ta Block device. [Bold yellow]
 .
-.It Li cd Ta Li 01;32 Ta Character device.
+.It Li cd Ta Li 01;33 Ta Character device. [Bold yellow]
 .
-.It Li ex Ta Li 01;32 Ta Executable file.
+.It Li ex Ta Li 01;32 Ta Executable file. [Bold green]
 .
-.It Li mi Ta (none) Ta Missing file (defaults to Li fi ) .
+.It Li mi Ta (none) Ta Missing file (orphaned symbolic link target). Defaults to Li fi .
 .
-.It Li or Ta (none) Ta Orphaned symbolic link (defaults to Li ln ) .
+.It Li or Ta (none) Ta Orphaned (broken) symbolic link. Defaults to Li ln .
 .
 .It Li lc Ta Li ^[[ Ta Left code.
 .
 .It Li rc Ta Li m Ta Right code.
 .
-.It Li ec Ta (none) Ta End code (replaces Li lc Ns + Ns Li no Ns + Ns Li rc ) .
+.It Li ec Ta (none) Ta End code. Replaces Li lc Ns + Ns Li no Ns + Ns Li rc .
+.
+.It Li su Ta Li 37;41 Ta Setuid file. [White on red]
+.
+.It Li sg Ta Li 30;43 Ta Setgid file. [Black on yellow]
+.
+.It Li tw Ta Li 30;42 Ta Sticky and other writable directory. [Black on green]
+.
+.It Li ow Ta Li 34;42 Ta Other writable but not sticky directory. [Blue on green]
+.
+.It Li st Ta Li 37;44 Ta Sticky but not other writable directory. [White on blue]
+.
+.It Li mh Ta (none) Ta File with multiple hard links.
 .
 .El
 .Pp
 You need to include only the variables you want to change from
 the default.
 .Pp
-File names can also be colorized based on filename extension.
-This is specified in the
-.Ev LS_COLORS
-variable using the syntax
-.Li \&"* Ns Ar ext Ns Li = Ns Ar string Ns Li \&" .
+The second form
+.Li \&"* Ns Ar ext Ns Li = Ns Ar value Ns Li \&"
+colorizes file names based on extension.
 For example, using ISO 6429 codes, to color
 all C\-language source files blue you would specify
 .Li \&"*.c=34\&" .
 This would color all files ending in
 .Ql .c
-in blue (34) color.
+in blue foreground (34) color.
 .Pp
 Control characters can be written either in C\-style\-escaped
 notation, or in stty\-like ^\-notation.
@@ -9482,7 +9729,7 @@ can be used to override the default interpretation of
 and
 .Ql = .
 .Pp
-Each file will be written as
+Each filename will be output to the terminal as
 .Dl lc Ar color-code Li rc Ar filename Li ec
 .Pp
 If the
@@ -9503,18 +9750,21 @@ are
 provided so you don't have to type common parts over and over
 again and to support weird terminals; you will generally not
 need to change them at all unless your terminal does not use
-ISO 6429 color sequences but a different system.
+ISO 6429 color codes but a different system.
 .Pp
-If your terminal does use ISO 6429 color codes, you can
+If your terminal uses ISO 6429 color codes, you can
 compose the type codes (i.e., all except the
 .Ql lc ,
 .Ql rc ,
 and
 .Ql ec
-codes) from numerical commands separated by semicolons.
+codes) from numerical ISO 6429 color codes separated by
+.Ql \&; .
+For example,
+.Ql 01;32
+is bright green foreground with default background.
 .Pp
-The
-most common color commands are:
+The most common ISO 6429 color codes are:
 .Pp
 .Bl -tag -width ".Sy Color" -offset indent -compact
 .
@@ -9526,65 +9776,65 @@ most common color commands are:
 To restore default color.
 .
 .It Li 1
-For brighter colors.
+Bold / brighter colors.
 .
 .It Li 4
-For underlined text.
+Underlined text.
 .
 .It Li 5
-For flashing text.
+Flashing text.
 .
 .It Li 30
-For black foreground.
+Black foreground.
 .
 .It Li 31
-For red foreground.
+Red foreground.
 .
 .It Li 32
-For green foreground.
+Green foreground.
 .
 .It Li 33
-For yellow (or brown) foreground.
+Yellow (or brown) foreground.
 .
 .It Li 34
-For blue foreground.
+Blue foreground.
 .
 .It Li 35
-For purple foreground.
+Magenta foreground.
 .
 .It Li 36
-For cyan foreground.
+Cyan foreground.
 .
 .It Li 37
-For white (or gray) foreground.
+White (or gray) foreground.
 .
 .It Li 40
-For black background.
+Black background.
 .
 .It Li 41
-For red background.
+Red background.
 .
 .It Li 42
-For green background.
+Green background.
 .
 .It Li 43
-For yellow (or brown) background.
+Yellow (or brown) background.
 .
 .It Li 44
-For blue background.
+Blue background.
 .
 .It Li 45
-For purple background.
+Magenta background.
 .
 .It Li 46
-For cyan background.
+Cyan background.
 .
 .It Li 47
-For white (or gray) background.
+White (or gray) background.
 .
 .El
 .Pp
-Not all commands will work on all systems or display devices.
+Not all ISO 6429 color codes will work on all systems or display devices.
 .Pp
 A few terminal programs do not recognize the default end code
 properly.
@@ -9594,7 +9844,7 @@ listing, try changing the
 and
 .Ql fi
 codes from 0 to the
-numerical codes for your standard fore- and background colors.
+numerical codes for your standard foreground and background colors.
 .Pp
 For symbolic links the
 .Ql ln
@@ -9617,7 +9867,9 @@ See
 The operating system, as determined at compile time.
 .
 .It Ev PATH
-A colon-separated list of directories in which to look for executables.
+A
+.So Li \&: Sc Ns No \-separated
+list of directories in which to look for executables.
 Equivalent to the
 .Ic path
 shell variable, but in a different format.
@@ -10038,6 +10290,7 @@ substitutions on a single line to 20.
 .
 .Sh SEE ALSO
 .Xr csh 1 ,
+.Xr dircolors 1 ,
 .Xr emacs 1 ,
 .Xr ls 1 ,
 .Xr newgrp 1 ,

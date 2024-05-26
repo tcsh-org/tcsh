@@ -136,4 +136,6 @@ $set 1
 134 Syntaxe: unlimit [-fh] [limites]
 135 $%S est en lecture seule
 136 Pas de travail de ce type
-137 Unknown colorls variable '%c%c'
+137 Unknown %s color variable '%c%c'
+138 Unexpected end of file
+139 %s: Feature is not available for this platform

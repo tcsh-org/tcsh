@@ -1,0 +1,81 @@
+# atlocal: local helpers for testsuite
+
+# path to tests directory
+#
+tests_dir="@abs_top_srcdir@/tests"
+
+
+#
+# create_ls_DIR():
+#	Create directory "DIR" with entries:
+#
+#	drwxr-xr-x  dir/
+#	drwxr-xrwx  dir-ow/
+#	drwxr-xr-t  dir-st/
+#	drwxr-xrwt  dir-tw/
+#	-rwxr-xr-x  exec*
+#	-rw-r--r--  file
+#	-rw-r--r--  file.1
+#	-rw-r--r--  file.12
+#	-rw-r--r--  file.123
+#	-rw-r--r--  file.1234
+#	lrwxrwxrwx  ldir -> dir/
+#	lrwxrwxrwx  ldir-ow -> dir-ow/
+#	lrwxrwxrwx  ldir-st -> dir-st/
+#	lrwxrwxrwx  ldir-tw -> dir-tw/
+#	lrwxrwxrwx  lexec -> exec*
+#	lrwxrwxrwx  lfile -> file
+#	lrwxrwxrwx  lfile.1234 -> file.1234
+#	-rw-r--r--  link1
+#	-rw-r--r--  link2
+#	lrwxrwxrwx  lldir -> ldir/
+#	lrwxrwxrwx  lldir-ow -> ldir-ow/
+#	lrwxrwxrwx  lldir-st -> ldir-st/
+#	lrwxrwxrwx  lldir-tw -> ldir-tw/
+#	lrwxrwxrwx  llexec -> lexec*
+#	lrwxrwxrwx  llfile -> lfile
+#	lrwxrwxrwx  llfile.1234 -> lfile.1234
+#	lrwxrwxrwx  llorphan -> lorphan
+#	lrwxrwxrwx  llpipe -> lpipe|
+#	lrwxrwxrwx  lorphan -> orphan
+#	lrwxrwxrwx  lpipe -> pipe|
+#	prw-r--r--  pipe|
+#
+create_ls_DIR()
+{
+	mkdir DIR
+	(
+	cd DIR
+	mkdir dir
+	mkdir dir-ow dir-st dir-tw
+	chmod o+w dir-ow
+	chmod +t,o-w dir-st
+	chmod +t,o+w dir-tw
+
+	touch .hidden exec file file.1 file.12 file.123 file.1234
+	chmod a+x exec
+	touch link1
+	ln link1 link2
+	mkfifo pipe
+
+	ln -s dir ldir
+	ln -s dir-ow ldir-ow
+	ln -s dir-st ldir-st
+	ln -s dir-tw ldir-tw
+	ln -s exec lexec
+	ln -s file lfile
+	ln -s file.1234 lfile.1234
+	ln -s orphan lorphan
+	ln -s pipe lpipe
+
+	ln -s ldir lldir
+	ln -s ldir-ow lldir-ow
+	ln -s ldir-st lldir-st
+	ln -s ldir-tw lldir-tw
+	ln -s lexec llexec
+	ln -s lfile llfile
+	ln -s lfile.1234 llfile.1234
+	ln -s lorphan llorphan
+	ln -s lpipe llpipe
+	)
+}

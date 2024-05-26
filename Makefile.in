@@ -29,7 +29,7 @@ all: ${BUILD} catalogs
 
 RELEASE_GROUP=astron
 RELEASE_USER=${USER}
-RELEASE_TAG=TCSH@PACKAGE_REV@_@PACKAGE_VERS@_@PACKAGE_PATCHLEVEL@
+RELEASE_TAG=@RELEASE_TAG@
 
 .PHONY: Announce
 Announce: ${srcdir}/Announce-${VERSION}
@@ -482,7 +482,7 @@ TCOBJS=	tc.alloc.${SUF} tc.bind.${SUF} tc.const.${SUF} tc.defs.${SUF} \
 # tests/*.at except for tests/testsuite.at
 TESTFILES= \
 	tests/aliases.at tests/arguments.at tests/commands.at \
-	tests/expr.at tests/history.at tests/lexical.at \
+	tests/expr.at tests/history.at tests/lexical.at tests/ls-F.at \
 	tests/mb-eucjp.at tests/mb-utf8.at tests/noexec.at \
 	tests/parenthesis.at tests/sh.dol.at tests/subst.at \
 	tests/syntax.at tests/variables.at
@@ -598,7 +598,7 @@ tc.const.h: tc.const.c sh.char.h config.h config_f.h sh.types.h sh.err.h
 	${CPP} $(CPPFLAGS) ${DFLAGS} ${EXTRAFLAGS} -D_h_tc_const\
 	    $(srcdir)/tc.const.c | \
 	    sed -n -e 's/^\(Char STR[a-zA-Z0-9_]*\) *\[ *\].*/extern \1[];/p' | \
-	    LC_COLLATE=C sort >> $@.tmp
+	    LC_ALL=C sort >> $@.tmp
 	@echo '#endif /* _h_tc_const */' >> $@.tmp
 	@if [ -f $@ ] && cmp -s $@.tmp $@; then echo $@ unchanged.; rm -f $@.tmp; else mv -f $@.tmp $@; echo $@ recreated.; fi
 
@@ -620,6 +620,8 @@ $(srcdir)/tests/testsuite: $(srcdir)/tests/package.m4 $(srcdir)/tests/testsuite.
 atconfig: config.status
 	$(SHELL) ./config.status ./atconfig
 
+atlocal: config.status $(srcdir)/atlocal.in
+	$(SHELL) ./config.status atlocal
 
 csh.prof: ${OBJS} sh.prof.${SUF} mcrt0.${SUF}
 	rm -f csh.prof
@@ -697,7 +699,7 @@ cleandir distclean veryclean: clean
 	${RM} -f Makefile config.h config_p.h dch-template nls/Makefile patchlevel.h tcsh.man
 	${RM} -f config.status config.cache config.log tcsh.html tcsh.ps
 	${RM} -f missing
-	${RM} -f atconfig testsuite.log
+	${RM} -f atconfig atlocal testsuite.log
 	${RM} -rf testsuite.dir
 	${RM} -rf autom4te.cache
 	${RM} -f *~ #*
@@ -719,9 +721,11 @@ $(srcdir)/stamp-h.in: $(srcdir)/configure.ac
 	cd $(srcdir) && autoheader
 	@echo timestamp > $(srcdir)/stamp-h.in
 
-check test: atconfig $(srcdir)/tests/testsuite
+check test: atconfig atlocal $(srcdir)/tests/testsuite $(BUILD)
 	$(ENVCMD) - \
+		TESTSUITEREGEN="$(TESTSUITEREGEN)" \
 		USER="$(USER)" \
+		LC_ALL=C \
 		$(SHELL) $(srcdir)/tests/testsuite $(TESTSUITEFLAGS)
 
 #

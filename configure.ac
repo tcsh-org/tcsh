@@ -10,8 +10,8 @@ dnl Written by Kaveh Ghazi (ghazi@caip.rutgers.edu) 5/11/96.
 dnl
 dnl UPDATE THIS SECTION FOR RELEASE
 dnl
-AC_DEFUN([TCSH_VERSION], [6.24.07])
-AC_DEFUN([TCSH_DATE],    [2022-12-21])
+AC_DEFUN([TCSH_VERSION], [6.24.12])
+AC_DEFUN([TCSH_DATE],    [2024-04-05])
 
 AC_PREREQ([2.69])dnl Minimum Autoconf version required.
 AC_INIT([Tcsh],TCSH_VERSION,[https://bugs.astron.com/],,[https://www.tcsh.org/])
@@ -54,7 +54,11 @@ PACKAGE_VERS="${PACKAGE_VERS%.*}"
 AC_SUBST(PACKAGE_VERS)
 
 PACKAGE_PATCHLEVEL="${PACKAGE_VERSION##*.}"
+PACKAGE_PATCHLEVEL="${PACKAGE_PATCHLEVEL##0}"
 AC_SUBST(PACKAGE_PATCHLEVEL)
+
+RELEASE_TAG="$(echo "TCSH${PACKAGE_VERSION}" | tr . _)"
+AC_SUBST(RELEASE_TAG)
 
 AC_CONFIG_AUX_DIR([acaux])
 AC_CONFIG_MACRO_DIR([m4])
@@ -348,7 +352,6 @@ AH_BOTTOM(
 dnl Checks for programs
 AC_PROG_CC()
 AC_PROG_CPP()
-AC_PROG_GCC_TRADITIONAL()
 
 AC_PATH_PROG([GENCAT], [gencat]) 
 
@@ -562,7 +565,14 @@ AC_SUBST(HESDEF)
 AC_SUBST(HESLIB)
 AC_SUBST(BUILD_CATALOGS)
 
-AC_CONFIG_FILES([Makefile dch-template nls/Makefile patchlevel.h tcsh.man])
+AC_CONFIG_FILES([
+    Makefile
+    atlocal
+    dch-template
+    nls/Makefile
+    patchlevel.h
+    tcsh.man
+])
 AC_OUTPUT()
 
 AC_MSG_NOTICE([========= Configuration results =========])
@@ -585,5 +595,6 @@ AC_MSG_NOTICE([PACKAGE_PATCHLEVEL      $PACKAGE_PATCHLEVEL])
 AC_MSG_NOTICE([PACKAGE_REV             $PACKAGE_REV])
 AC_MSG_NOTICE([PACKAGE_VERS            $PACKAGE_VERS])
 AC_MSG_NOTICE([PACKAGE_VERSION         $PACKAGE_VERSION])
+AC_MSG_NOTICE([RELEASE_TAG             $RELEASE_TAG])
 AC_MSG_NOTICE([tcsh_config_file        system/$tcsh_config_file])
 AC_MSG_NOTICE([=========================================])

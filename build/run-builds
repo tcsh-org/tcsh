@@ -21,6 +21,26 @@ Dockerfile()
 # syntax=docker/dockerfile:1.4
 
 FROM ${os}:${suite}
+EOF
+
+    case "${os}" in
+    ubuntu)
+	case "${suite}" in
+	jammy|focal|bionic|xenial)
+	    ;;
+	*)
+	    # ubuntu user added in lunar (23.04) can break existing Dockerfiles
+	    # https://bugs.launchpad.net/cloud-images/+bug/2005129
+	    expand <<EOF
+
+RUN userdel -r ubuntu
+EOF
+	    ;;
+	esac
+	;;
+    esac
+
+    expand <<EOF
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_LISTCHANGES_FRONTEND=none
@@ -30,10 +50,16 @@ RUN apt-get -qq update\
 EOF
 
     case "${suite}" in
-    bookworm)
+    forky)
 	expand <<EOF
 RUN grep -q '^VERSION_ID=' /etc/os-release\
- || echo VERSION_ID=12 >> /etc/os-release
+ || echo VERSION_ID=14 >> /etc/os-release
+EOF
+	;;
+    trixie)
+	expand <<EOF
+RUN grep -q '^VERSION_ID=' /etc/os-release\
+ || echo VERSION_ID=13 >> /etc/os-release
 EOF
 	;;
     esac
@@ -46,8 +72,19 @@ COPY --link docker-entrypoint /
 USER builder:builder
 
 ENTRYPOINT ["/docker-entrypoint"]
+EOF
+    case "${suite}" in
+    xenial)
+	expand <<EOF
+CMD ["dpkg-buildpackage", "-nc"]
+EOF
+	;;
+    *)
+	expand <<EOF
 CMD ["dpkg-buildpackage", "--no-sign", "-nc"]
 EOF
+	;;
+    esac
 }
 
 die()
@@ -74,17 +111,22 @@ list_suites()
     os="${1}"
 
     case "${os}" in
-    debian)
-	echo bookworm
-	echo bullseye
-	echo buster
-	echo stretch
+    debian)		# Vers	EOL
+	#echo forky	# 14	TBA
+	echo trixie	# 13	TBA
+	echo bookworm	# 12	2028-06-30
+	echo bullseye	# 11	2026-06-30
+	echo buster	# 10	2024-06-30
 	;;
-    ubuntu)
-	echo kinetic
-	echo jammy
-	echo focal
-	echo bionic
+    ubuntu)		# Vers	EOL
+	#echo oracular	# 24.10	2025-07-20
+	echo noble	# 24.04 2036-04-20
+	echo mantic	# 23.10	2024-07-20
+	echo jammy	# 22.04	2032-04-21
+	echo focal	# 20.04	2030-04-23
+	echo bionic	# 18.04	2028-04-26
+	# dpkg-checkbuilddeps: error: Unmet build dependencies: autoconf
+	#echo xenial	# 16.04	2026-04-23
 	;;
     esac
 }
@@ -199,5 +241,7 @@ do
 	    -v "${here}/src":/mnt/src \
 	    -v "${here}/${pool}":/mnt/deb \
 	    "${image}"
+
+	[ -d "${pool}" ] && rmdir "${pool}" || :
     done
 done

@@ -1,6 +1,6 @@
-# EUC-JP multibyte handling test case.  This file uses the EUC-JP encoding.
-
 AT_BANNER([EUC-JP multibyte])
+
+dnl EUC-JP multibyte handling test case.  This file uses the EUC-JP encoding.
 
 
 AT_SETUP([EUC-JP multibyte test])

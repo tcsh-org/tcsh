@@ -136,4 +136,6 @@ $set 1
 134 Usage: unlimit [-fh] [limits]
 135 $%S is read-only
 136 No such job
-137 Unknown colorls variable '%c%c'
+137 Unknown %s color variable '%c%c'
+138 Unexpected end of file
+139 %s: Feature is not available for this platform

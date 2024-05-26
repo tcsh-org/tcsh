@@ -1224,7 +1224,7 @@ update_dspmbyte_vars(void)
 	    for (lp = 0; lp < 256 && _enable_mbdisp == 1; lp++) {
 		if (!((dstr1[lp] - '0') >= 0 && (dstr1[lp] - '0') <= 3)) {
 		    xprintf(CGETS(18, 4,
-	   "Warning: bad multibyte code at offset +%d; multibyte diabled\n"),
+	   "Warning: bad multibyte code at offset +%d; multibyte disabled\n"),
 			lp);
 		    _enable_mbdisp = 0;
 		    break;

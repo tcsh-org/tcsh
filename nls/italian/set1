@@ -137,3 +137,5 @@ $set 1
 135 $%S è a sola lettura
 136 Non esiste il lavoro
 137 Variabile '%c%c colorls' sconosciuta
+138 Unexpected end of file
+139 %s: Feature is not available for this platform

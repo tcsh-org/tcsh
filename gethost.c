@@ -46,6 +46,7 @@
 #endif
 
 #include <ctype.h>
+#include <assert.h>
 
 #define ISSPACE(p)	(isspace((unsigned char) (p)) && (p) != '\n')
 
@@ -110,6 +111,68 @@ findtoken(char *ptr)
     return T_NONE;
 }
 
+/* string_list is a global list of dynamically allocated strings
+ * that are collected at the end of main.
+ *
+ * The entire reason for creating this type at all is to make
+ * gethost compile with ASAN enabled. Compiling gethost with
+ * ASAN enabled is not particularly interesting, but gethost
+ * and tcsh as a whole are compiled with the same flags, so it
+ * makes sense to remove memory leaks in this program too, even
+ * if they are harmless.
+ */
+struct string_list {
+    char *data;
+    struct string_list* next;
+};
+typedef struct string_list string_list;
+
+static string_list *g_sl_root;
+static string_list *g_sl_tail;
+
+/* sl_create creates a new string_list entry that's stored in a global
+ * list of string_list's headed by g_sl_root.
+ *
+ * sl_create has the same API as malloc.
+ */
+static char *
+sl_create(size_t size)
+{
+    char *newstr = calloc(size, 1);
+    string_list *newsl = calloc(sizeof(string_list), 1);
+    if (!newstr || !newsl) {
+	free(newstr);
+	free(newsl);
+	return NULL;
+    }
+    newsl->data = newstr;
+    newsl->next = NULL;
+    if (!g_sl_root) {
+	g_sl_root = newsl;
+    }
+    if (g_sl_tail) {
+	assert(g_sl_tail->next == NULL);
+	g_sl_tail->next = newsl;
+    }
+    g_sl_tail = newsl;
+    return newsl->data;
+}
+
+#if 0
+/* sl_release_all frees all the strings in the global list of strings */
+static void
+sl_release_all(void)
+{
+    while (g_sl_root) {
+	string_list *old_root = g_sl_root;
+	g_sl_root = g_sl_root->next;
+	free(old_root->data);
+	free(old_root);
+    }
+    /* tail has already been freed if we make it here. */
+    g_sl_tail = NULL;
+}
+#endif
 
 /* gettoken():
  *	Get : delimited token and remove leading/trailing blanks/newlines
@@ -152,8 +215,8 @@ cat(const char *a, const char *b, size_t len)
 	    l = strlen(a) + len;
 	else
 	    l = len;
-	if ((r = malloc(l)) == NULL)
-		abort();
+	if ((r = sl_create(l)) == NULL)
+	    abort();
 	if (a)
 	    snprintf(r, l, "%s%.*s", a, (int)len, b);
 	else
@@ -196,9 +259,9 @@ explode(const char *defs)
 			return defs;
 		}
 		if (*name != '_' && (*name != 'M' && name[1] != '_')) {
-			char *undername = malloc(len + 10);
+			char *undername = sl_create(len + 10);
 			if (undername == NULL)
-				abort();
+			    abort();
 			buf = cat(buf, ") || defined(", 0);
 			snprintf(undername, len + 10, "__%.*s__)", (int)len,
 			    name);
@@ -213,7 +276,7 @@ explode(const char *defs)
 	if (!eptr) {
 	    (void) fprintf(stderr, "%s: invalid input `%s'\n", pname, defs);
 	    return defs;
-        }
+	}
 	buf = cat(buf, eptr + 1, 0);
 	return buf;
 }
@@ -232,6 +295,7 @@ main(int argc, char *argv[])
     int inprocess = 0;
     int token, state;
     int errs = 0;
+    int res = 1;
 
     if ((pname = strrchr(argv[0], '/')) == NULL)
 	pname = argv[0];
@@ -240,13 +304,13 @@ main(int argc, char *argv[])
 
     if (argc > 2) {
 	(void) fprintf(stderr, "Usage: %s [<filename>]\n", pname);
-	return 1;
+	goto cleanup;
     }
 
     if (argc == 2)
 	if ((fp = fopen(fname = argv[1], "r")) == NULL) {
 	    (void) fprintf(stderr, "%s: Cannot open `%s'\n", pname, fname);
-	    return 1;
+	    goto cleanup;
 	}
 
     state = S_DISCARD;
@@ -311,7 +375,7 @@ main(int argc, char *argv[])
 			       pname, fname, lineno);
 		if (++errs == 30) {
 		    (void) fprintf(stderr, "%s: Too many errors\n", pname);
-		    return 1;
+		    goto cleanup;
 		}
 		break;
 	    }
@@ -321,7 +385,7 @@ main(int argc, char *argv[])
 	default:
 	    (void) fprintf(stderr, "%s: \"%s\", %d: Unexpected token\n",
 			   pname, fname, lineno);
-	    return 1;
+	    goto cleanup;
 	}
 
 	switch (state) {
@@ -338,12 +402,12 @@ main(int argc, char *argv[])
 		if (inprocess) {
 		    (void) fprintf(stderr, "%s: \"%s\", %d: Missing enddef\n",
 				   pname, fname, lineno);
-		    return 1;
+		    goto cleanup;
 		}
 		if (tok == NULL) {
 		    (void) fprintf(stderr, "%s: \"%s\", %d: No defs\n",
 				   pname, fname, lineno);
-		    return 1;
+		    goto cleanup;
 		}
 		(void) fprintf(stdout, "\n\n");
 #ifdef LINEDIRECTIVE
@@ -363,7 +427,7 @@ main(int argc, char *argv[])
 		if (gettoken(&ptr, stmt) == NULL) {
 		    (void) fprintf(stderr, "%s: \"%s\", %d: No statement\n",
 				   pname, fname, lineno);
-		    return 1;
+		    goto cleanup;
 		}
 		(void) fprintf(stdout, "# define _%s_\n", keyword[token]);
 		(void) fprintf(stdout, "    %s = %s;\n", keyword[token], stmt);
@@ -387,18 +451,20 @@ main(int argc, char *argv[])
 	default:
 	    (void) fprintf(stderr, "%s: \"%s\", %d: Unexpected state\n",
 			   pname, fname, lineno);
-	    return 1;
+	    goto cleanup;
 	}
     }
 
     if (inprocess) {
 	(void) fprintf(stderr, "%s: \"%s\", %d: Missing enddef\n",
 		       pname, fname, lineno);
-	return 1;
+	goto cleanup;
     }
 
     if (fp != stdin)
 	(void) fclose(fp);
 
-    return 0;
+    res = 0;
+cleanup:
+    return res;
 }

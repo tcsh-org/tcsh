@@ -1,12 +1,17 @@
-# Test of the history functions.  Some of these are already tested in
-# variables and commands.
+AT_BANNER([History operations])
 
-AT_BANNER([history])
+dnl Test of the history functions.  Some of these are already tested in
+dnl variables and commands.
 
+dnl
+dnl	History duplicate handling
+dnl
 
-AT_SETUP([history])
+AT_SETUP([History duplicate handling])
+AT_KEYWORDS([histdup])
 
-# Check history duplicate erase
+dnl Check history duplicate erase
+
 AT_DATA([hist-base.csh],
 [[set histdup=erase history=( 5 "%h TIME %R\n")
 printf "'%s' %s\n" "$histdup" "$history"
@@ -24,7 +29,8 @@ AT_CHECK([{ cat hist-base.csh; echo "!4"; } > hist.csh; \
 [4: Event not found.
 ])
 
-# Try all four variants with different values of histdup.
+dnl Try all four variants with different values of histdup.
+
 AT_CHECK([{ cat hist-base.csh; echo : 4; echo history 9; } > hist.csh; ] dnl
 	 [tcsh -f -q -i < hist.csh], ,
 [> 'erase' 5 %h TIME %R\n
@@ -35,6 +41,7 @@ AT_CHECK([{ cat hist-base.csh; echo : 4; echo history 9; } > hist.csh; ] dnl
      9 TIME history 9
 > exit
 ],)
+
 AT_CHECK([{ sed 's/erase/all/' hist-base.csh; echo : 4; echo history 9;}] dnl
 	 [> hist.csh; tcsh -f -q -i < hist.csh], ,
 [> 'all' 5 %h TIME %R\n
@@ -45,6 +52,7 @@ AT_CHECK([{ sed 's/erase/all/' hist-base.csh; echo : 4; echo history 9;}] dnl
      7 TIME history 9
 > exit
 ],)
+
 AT_CHECK([{ sed 's/erase/prev/' hist-base.csh; echo : 4; echo history 9; }] dnl
 	 [> hist.csh; tcsh -f -q -i < hist.csh], ,
 [> 'prev' 5 %h TIME %R\n
@@ -55,6 +63,7 @@ AT_CHECK([{ sed 's/erase/prev/' hist-base.csh; echo : 4; echo history 9; }] dnl
      8 TIME history 9
 > exit
 ],)
+
 AT_CHECK([{ sed 's/erase//' hist-base.csh; echo : 4; echo history 9;}] dnl
 	 [> hist.csh; tcsh -f -q -i < hist.csh], ,
 [> '' 5 %h TIME %R\n
@@ -66,9 +75,10 @@ AT_CHECK([{ sed 's/erase//' hist-base.csh; echo : 4; echo history 9;}] dnl
 > exit
 ],)
 
-# Illustrating reference credit scheme (Hist.Href) that preserves
-# recently used items in the history list, instead of using a strictly
-# FIFO discipline.
+dnl Illustrating reference credit scheme (Hist.Href) that preserves
+dnl recently used items in the history list, instead of using a strictly
+dnl FIFO discipline.
+
 AT_DATA([hist-ev.csh],
 [[: !3
 : : !6
@@ -94,9 +104,10 @@ AT_CHECK([[cat hist-base.csh hist-ev.csh > hist.csh; ] dnl
 : x : 2
 ])
 
-# Repeat with a duplicate command.  This demonstrates a problem in the
-# old code that renumbers Href counters following a successful match in
-# erase mode.
+dnl Repeat with a duplicate command.  This demonstrates a problem in the
+dnl old code that renumbers Href counters following a successful match in
+dnl erase mode.
+
 AT_CHECK([[{ cat hist-base.csh; sed 's/x !6/: !6/' hist-ev.csh;}] dnl
 	  [> hist.csh; tcsh -f -q -i < hist.csh ]], ,
 [> 'erase' 5 %h TIME %R\n
@@ -113,21 +124,26 @@ AT_CHECK([[{ cat hist-base.csh; sed 's/x !6/: !6/' hist-ev.csh;}] dnl
 : : : 1
 : : : 2
 ])
-# The old code discards events 3 & 6 and instead retains 7:
-# -     3 TIME : 1
-# -     6 TIME : 2
-# +     7 TIME : 4
-#       8 TIME : : 1
+
+dnl The old code discards events 3 & 6 and instead retains 7:
+dnl -     3 TIME : 1
+dnl -     6 TIME : 2
+dnl +     7 TIME : 4
+dnl       8 TIME : : 1
 
 AT_CLEANUP()
 
 
-AT_SETUP([history performance])
+dnl
+dnl	History performance
+dnl
 
-# Now some scaling tests with large history.  Unfortunately the
-# reasonable settings here will depend on test hardware.
+AT_SETUP([History performance])
 
-# First a "test" that just generates a large history file.
+dnl Now some scaling tests with large history.  Unfortunately the
+dnl reasonable settings here will depend on test hardware.
+
+dnl First a "test" that just generates a large history file.
 AT_DATA([hist-generate.awk],
 [[BEGIN {
     if (ARGC != 2) {
@@ -196,14 +212,64 @@ Done at TIME
 > exit
 ], [])
 
-# Could repeat test with different sizes (on a faster machine), with
-# different histdup settings ("all", "prev", or "") and with merge (for
-# savehist) set to 0 instead of 1.
+dnl Could repeat test with different sizes (on a faster machine), with
+dnl different histdup settings ("all", "prev", or "") and with merge (for
+dnl savehist) set to 0 instead of 1.
 
 AT_CLEANUP()
 
+AT_SETUP([History merge])
+dnl Check if history merge really works out
 
-### AT_SETUP([history faults])
+AT_DATA([hist-merge.csh],
+[[set histfile=test.history histdup=prev history=(6 "%h TIME %R\n")
+set savehist=(6 merge)
+printf "'%s' %s\n" "$histdup" "$history"
+history -c
+: 1
+: 2
+: 3
+: 4
+: 5
+history -S
+: a
+: b
+: c
+: d
+: e
+history -S
+history -L
+history 6
+]])
+
+AT_CHECK([tcsh -f -q -i < hist-merge.csh], ,
+[> 'prev' 6 %h TIME %R\n
+    24 TIME : b
+    25 TIME : c
+    26 TIME : d
+    27 TIME : e
+    28 TIME history -S
+    29 TIME history 6
+> exit
+],)
+
+dnl In broken case we see the former history instead
+dnl > 'prev' 6 %h TIME %R\n
+dnl    24 TIME : 4
+dnl    25 TIME : 3
+dnl    26 TIME : 2
+dnl    27 TIME : 1
+dnl    28 TIME history -S
+dnl    29 TIME history 6
+dnl > exit
+
+AT_CLEANUP()
+
+dnl
+dnl	History faults
+dnl
+
+### AT_SETUP([History faults])
 ###
 ### # Try some things that have caused failures before
 ### #
@@ -233,12 +299,16 @@ AT_CLEANUP()
 ### AT_CLEANUP()
 
 
-AT_SETUP([history hup])
+dnl
+dnl	History hup error handling
+dnl
 
-# Test for problem introduced in 6.15 where the history file gets
-# truncated if a tcsh is run from a pty that is closed unexpectedly.
-# Test this three ways, depending on availability of local programs to
-# create pseudo-ttys (pty).
+AT_SETUP([History hup error handling])
+
+dnl Test for problem introduced in 6.15 where the history file gets
+dnl truncated if a tcsh is run from a pty that is closed unexpectedly.
+dnl Test this three ways, depending on availability of local programs to
+dnl create pseudo-ttys (pty).
 
 AT_DATA([hist-kill.sh],
 [[#!/bin/sh
@@ -333,7 +403,8 @@ echo $version pid=$$
 ls -li ~/.hi* ./*history*
 ]])
 
-# Try both variants of this script, then the C version.
+dnl Try both variants of this script, then the C version.
+
 ### AT_CHECK([sh hist-kill.sh script], 0, stdout, stderr)
 ### AT_CHECK([[if [ -n "$DISPLAY" ]; then sh hist-kill.sh xterm; ] dnl
 ###	 [  else echo Skip xterm test: no display; fi]], 0, stdout, stderr)

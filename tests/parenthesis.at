@@ -1,6 +1,10 @@
 AT_BANNER([Parenthesis handling])
 
 
+dnl
+dnl	Parenthesis no space
+dnl
+
 AT_SETUP([Parenthesis no space])
 
 AT_DATA([no-space.csh],
@@ -20,6 +24,10 @@ AT_CHECK([tcsh -f < no-space.csh], ,[1
 
 AT_CLEANUP()
 
+
+dnl
+dnl	Parenthesis space
+dnl
 
 AT_SETUP([Parenthesis space])
 
@@ -41,6 +49,10 @@ AT_CHECK([tcsh -f < space.csh], ,[1
 AT_CLEANUP()
 
 
+dnl
+dnl	Parenthesis space escaped
+dnl
+
 AT_SETUP([Parenthesis space escaped])
 
 AT_DATA([space-escaped.csh],
@@ -60,6 +72,10 @@ AT_CHECK([tcsh -f < space-escaped.csh], ,[1
 
 AT_CLEANUP()
 
+
+dnl
+dnl	Parenthesis escaped
+dnl
 
 AT_SETUP([Parenthesis escaped])
 

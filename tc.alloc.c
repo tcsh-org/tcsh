@@ -457,7 +457,7 @@ realloc(ptr_t cp, size_t nbytes)
 #ifdef __linux__
 #define M_U_S_CONST
 #else
-#define M_U_S_CONST
+#define M_U_S_CONST const
 #endif
 size_t malloc_usable_size(M_U_S_CONST void *);
 size_t

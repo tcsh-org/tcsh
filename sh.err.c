@@ -187,7 +187,8 @@ extern int enterhist;
 #define ERR_INVALID	133
 #define ERR_BADCOLORVAR	134
 #define ERR_EOF		135
-#define NO_ERRORS	136
+#define ERR_UNAVAILABLE	136
+#define NO_ERRORS	137
 
 static const char *elst[NO_ERRORS] INIT_ZERO_STRUCT;
 
@@ -294,7 +295,7 @@ errinit(void)
     elst[ERR_NOHOME] = CSAVS(1, 78, "No $home variable set");
     elst[ERR_HISTUS] = CSAVS(1, 79,
 	"Usage: history [-%s] [# number of events]");
-    elst[ERR_SPDOLLT] = CSAVS(1, 80, "$, ! or < not allowed with $# or $?");
+    elst[ERR_SPDOLLT] = CSAVS(1, 80, "$ or ! not allowed with $%%, $# or $?");
     elst[ERR_NEWLINE] = CSAVS(1, 81, "Newline in variable name");
     elst[ERR_SPSTAR] = CSAVS(1, 82, "* not allowed with $# or $?");
     elst[ERR_DIGIT] = CSAVS(1, 83, "$?<digit> or $#<digit> not allowed");
@@ -363,8 +364,10 @@ errinit(void)
     elst[ERR_ULIMUS] = CSAVS(1, 134, "Usage: unlimit [-fh] [limits]");
     elst[ERR_READONLY] = CSAVS(1, 135, "$%S is read-only");
     elst[ERR_BADJOB] = CSAVS(1, 136, "No such job (badjob)");
-    elst[ERR_BADCOLORVAR] = CSAVS(1, 137, "Unknown colorls variable '%c%c'");
+    elst[ERR_BADCOLORVAR] = CSAVS(1, 137, "Unknown %s color variable '%c%c'");
     elst[ERR_EOF] = CSAVS(1, 138, "Unexpected end of file");
+    elst[ERR_UNAVAILABLE] = CSAVS(1, 139, "%s: Feature is not available for this platform");
+
 }
 
 /* Cleanup data. */
