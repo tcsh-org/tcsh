@@ -1,3 +1,4 @@
+ 35. Add cross-build support for gethost (josefs10)
  34. Add support for $?< (Matheus Garcia)
  33. V6.24.12 - 2024-04-05
  32. Fix history merge and add a test for it (Werner Fink, Kimmo Suominen)

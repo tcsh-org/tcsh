@@ -361,6 +361,18 @@ AS_IF([test "x${cross_compiling}" = xyes],
       [CC_FOR_GETHOST="\$(CC)"])
 AC_SUBST(CC_FOR_GETHOST)
 
+AS_IF([test "x${cross_compiling}" = xno],
+      [CFLAGS_FOR_BUILD=${CFLAGS_FOR_BUILD:-"\$(CFLAGS)"}])
+AC_SUBST(CFLAGS_FOR_BUILD)
+
+AS_IF([test "x${cross_compiling}" = xno],
+      [CPPFLAGS_FOR_BUILD=${CPPFLAGS_FOR_BUILD:-"\$(CPPFLAGS)"}])
+AC_SUBST(CPPFLAGS_FOR_BUILD)
+
+AS_IF([test "x${cross_compiling}" = xno],
+      [LDFLAGS_FOR_BUILD=${LDFLAGS_FOR_BUILD:-"\$(LDFLAGS)"}])
+AC_SUBST(LDFLAGS_FOR_BUILD)
+
 AS_IF([test "x$GCC" != xyes],
       [DFLAGS="$DFLAGS $NON_GNU_DFLAGS"
        CFLAGS="$CFLAGS $NON_GNU_CFLAGS"])
@@ -579,6 +591,9 @@ AC_MSG_NOTICE([========= Configuration results =========])
 AC_MSG_NOTICE([BUILD_CATALOGS          $BUILD_CATALOGS])
 AC_MSG_NOTICE([CC                      $CC])
 AC_MSG_NOTICE([CC_FOR_GETHOST          $CC_FOR_GETHOST])
+AC_MSG_NOTICE([CFLAGS_FOR_BUILD        $CFLAGS_FOR_BUILD])
+AC_MSG_NOTICE([CPPFLAGS_FOR_BUILD      $CPPFLAGS_FOR_BUILD])
+AC_MSG_NOTICE([LDFLAGS_FOR_BUILD       $LDFLAGS_FOR_BUILD])
 AC_MSG_NOTICE([CFLAGS                  $CFLAGS])
 AC_MSG_NOTICE([CPP                     $CPP])
 AC_MSG_NOTICE([CPPFLAGS                $CPPFLAGS])

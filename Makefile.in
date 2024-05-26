@@ -431,6 +431,9 @@ CC = @CC@
 #CC=	cc	-h0,ansi,novector,float0
 #CC=	lcc	-wa 
 CC_FOR_GETHOST = @CC_FOR_GETHOST@
+CFLAGS_FOR_BUILD = @CFLAGS_FOR_BUILD@
+CPPFLAGS_FOR_BUILD = @CPPFLAGS_FOR_BUILD@
+LDFLAGS_FOR_BUILD = @LDFLAGS_FOR_BUILD@
 ED=	ed
 AS=	as
 RM=	rm
@@ -506,11 +509,11 @@ pure:$(P) ${OBJS}
 #	emxbind tcsh
 
 gethost.${SUF}: gethost.c sh.err.h tc.const.h sh.h
-	${CC_FOR_GETHOST} ${CF} ${CPPFLAGS} ${CFLAGS} $(srcdir)/gethost.c
+	${CC_FOR_GETHOST} ${CF} ${CPPFLAGS_FOR_BUILD} ${CFLAGS_FOR_BUILD} $(srcdir)/gethost.c
 
 gethost:  gethost.${SUF}
 	rm -f gethost
-	${CC_FOR_GETHOST} -o gethost ${CPPFLAGS} ${CFLAGS} ${LDFLAGS} gethost.${SUF}
+	${CC_FOR_GETHOST} -o gethost ${CPPFLAGS_FOR_BUILD} ${CFLAGS_FOR_BUILD} ${LDFLAGS_FOR_BUILD} gethost.${SUF}
 
 tc.defs.c:	gethost host.defs
 	@rm -f $@.tmp
