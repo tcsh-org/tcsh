@@ -337,11 +337,8 @@ doset(Char **v, struct command *c)
 		Char c;
 		struct Strbuf s = Strbuf_INIT;
 
-		while (wide_read(0, &c, (size_t) 1, 0) > 0) {
-		    if (c == '\n')
-			break;
+		while (wide_read(0, &c, (size_t) 1, 0) > 0)
 		    Strbuf_append1(&s, c | LITERAL);
-		}
 		Strbuf_terminate(&s);
 		copy = s.s;
 	    } else
