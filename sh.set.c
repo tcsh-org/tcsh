@@ -248,7 +248,8 @@ doset(Char **v, struct command *c)
     int	    flags = VAR_READWRITE;
     int    first_match = 0;
     int    last_match = 0;
-    int    changed = 0;
+    int    changed;
+    int    pipe;
 
     USE(c);
     v++;
@@ -278,6 +279,9 @@ doset(Char **v, struct command *c)
 	plist(&shvhed, flags);
 	return;
     }
+    pipe = 0;
+    if (c->t_dflg & F_PIPEIN || c->t_dlef)
+	pipe = 1;
     do {
 	hadsub = 0;
 	vp = p;
@@ -300,6 +304,7 @@ doset(Char **v, struct command *c)
 	else if (*v && eq(*v, STRequal)) {
 	    if (*++v != NULL)
 		p = *v++;
+	    pipe = 0;
 	}
 	if (eq(p, STRLparen)) {
 	    Char **e = v;
@@ -328,14 +333,51 @@ doset(Char **v, struct command *c)
 	else if (hadsub) {
 	    Char *copy;
 
-	    copy = Strsave(p);
+	    if (pipe) {
+		Char c;
+		struct Strbuf s = Strbuf_INIT;
+
+		while (wide_read(0, &c, (size_t) 1, 0) > 0) {
+		    if (c == '\n')
+			break;
+		    Strbuf_append1(&s, c | LITERAL);
+		}
+		Strbuf_terminate(&s);
+		copy = s.s;
+	    } else
+		copy = Strsave(p);
 	    cleanup_push(copy, xfree);
 	    asx(vp, subscr, copy);
 	    cleanup_ignore(copy);
 	    cleanup_until(copy);
 	}
-	else
-	    setv(vp, Strsave(p), flags);
+	else {
+	    if (pipe) {
+		Char c;
+		struct Strbuf s = Strbuf_INIT;
+		int empty = 1;
+
+		while (wide_read(0, &c, (size_t) 1, 0) > 0) {
+		    if (c == '\n') {
+			empty = 0;
+
+			break;
+		    }
+		    Strbuf_append1(&s, c | LITERAL);
+		}
+		if (empty && s.s == NULL) {
+		    Char **empty;
+
+		    *(empty = xmalloc(sizeof *empty)) = NULL;
+		    set1(vp, empty, &shvhed, flags);
+		}
+		else {
+		    Strbuf_terminate(&s);
+		    setv(vp, s.s, flags);
+		}
+	    } else
+		setv(vp, Strsave(p), flags);
+	}
 	update_vars(vp);
     } while ((p = *v++) != NULL);
 }
