@@ -367,23 +367,13 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 	if (bifunc && (t->t_dflg & F_PIPEIN))
 	    t->t_dflg &= ~(F_NOFORK);
 #endif /* BACKPIPE */
-	/*
-	 * Prevent forking cd, pushd, popd, chdir cause this will cause the
-	 * shell not to change dir! (XXX: but only for nice?)
-	 */
-	if (bifunc && (bifunc->bfunct == (bfunc_t)dochngd ||
-		       bifunc->bfunct == (bfunc_t)dopushd ||
-		       bifunc->bfunct == (bfunc_t)dopopd))
-	    t->t_dflg &= ~(F_NICE);
-
 	if (((t->t_dflg & F_TIME) || ((t->t_dflg & F_NOFORK) == 0 &&
 	     (!bifunc || t->t_dflg &
 	      (F_PIPEOUT | F_AMPERSAND | F_NICE | F_NOHUP | F_HUP)))) ||
 	/*
-	 * We have to fork for eval too.
+	 * We have to fork for piped built-ins too.
 	 */
-	    (bifunc && (t->t_dflg & F_PIPEIN) != 0 &&
-	     bifunc->bfunct == (bfunc_t)doeval)) {
+	    (bifunc && (t->t_dflg & F_PIPEIN) != 0)) {
 #ifdef VFORK
 	    if (t->t_dtyp == NODE_PAREN ||
 		t->t_dflg & (F_REPEAT | F_AMPERSAND) || bifunc)
@@ -631,17 +621,6 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 	}
 
 	doio(t, pipein, pipeout);
-#ifdef BACKPIPE
-	if (t->t_dflg & F_PIPEIN) {
-	    xclose(pipein[0]);
-	    xclose(pipein[1]);
-	}
-#else /* !BACKPIPE */
-	if (t->t_dflg & F_PIPEOUT) {
-	    xclose(pipeout[0]);
-	    xclose(pipeout[1]);
-	}
-#endif /* BACKPIPE */
 	/*
 	 * Perform a builtin function. If we are not forked, arrange for
 	 * possible stopping
@@ -717,7 +696,6 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 	execute(t->t_dcdr, wanttty, pv, pipeout, do_glob);
 #endif /* BACKPIPE */
 	break;
-
     case NODE_LIST:
 	if (t->t_dcar) {
 	    t->t_dcar->t_dflg |= t->t_dflg & (F_NOINTERRUPT | F_BACKQ);
@@ -871,8 +849,7 @@ doio(struct command *t, int *pipein, int *pipeout)
 	}
 	else if (flags & F_PIPEIN) {
 	    xclose(0);
-	    TCSH_IGNORE(dup(pipein[0]));
-	    xclose(pipein[0]);
+	    OLDSTD = dmove(pipein[0], 0);
 	    xclose(pipein[1]);
 	}
 	else if ((flags & F_NOINTERRUPT) && tpgrp == -1) {
@@ -934,7 +911,7 @@ doio(struct command *t, int *pipein, int *pipeout)
     }
     else if (flags & F_PIPEOUT) {
 	xclose(1);
-	TCSH_IGNORE(dup(pipeout[1]));
+	SHOUT = dcopy(pipeout[1], 1);
 	is1atty = 0;
     }
     else {
@@ -948,7 +925,7 @@ doio(struct command *t, int *pipein, int *pipeout)
 
     xclose(2);
     if (flags & F_STDERR) {
-	TCSH_IGNORE(dup(1));
+	SHDIAG = dcopy(1, 2);
 	is2atty = is1atty;
     }
     else {

@@ -280,7 +280,7 @@ doset(Char **v, struct command *c)
 	return;
     }
     pipe = 0;
-    if (c->t_dflg & F_PIPEIN || c->t_dlef)
+    if (c->t_dlef || !isatty(OLDSTD))
 	pipe = 1;
     do {
 	hadsub = 0;

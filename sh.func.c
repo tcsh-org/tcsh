@@ -1354,7 +1354,7 @@ dosetenv(Char **v, struct command *c)
 	stderror(ERR_NAME | ERR_VARALNUM);
 
     if ((lp = *v++) == 0) {
-	if (c->t_dflg & F_PIPEIN || c->t_dlef) {
+	if (c->t_dlef || !isatty(OLDSTD)) {
 	    Char c;
 	    struct Strbuf s = Strbuf_INIT;
 
