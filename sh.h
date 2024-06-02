@@ -1335,5 +1335,8 @@ struct saved_state {
 #define TEXP_IGNORE 1	/* in ignore, it means to ignore value, just parse */
 #define TEXP_NOGLOB 2	/* in ignore, it means not to globone */
 
+extern int fpipe; /* Write end of a pipe used by dofunction. */
+extern Char *fdecl; /* Pointer to function declaration
+		     * used by dofunction. */
 
 #endif /* _h_sh */

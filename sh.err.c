@@ -192,7 +192,8 @@ extern int enterhist;
 #define ERR_RETURN	138
 #define ERR_FUNCBEGIN	139
 #define ERR_FUNCALNUM	140
-#define NO_ERRORS	141
+#define ERR_RECURSION	141
+#define NO_ERRORS	142
 
 static const char *elst[NO_ERRORS] INIT_ZERO_STRUCT;
 
@@ -375,6 +376,7 @@ errinit(void)
     elst[ERR_RETURN] = CSAVS(1, 141, "Not in a declaration");
     elst[ERR_FUNCBEGIN] = CSAVS(1, 142, "Function name must begin with a letter");
     elst[ERR_FUNCALNUM] = CSAVS(1, 143, "Function name must contain alphanumeric characters");
+    elst[ERR_RECURSION] = CSAVS(1, 144, "Recursion too deep");
 }
 
 /* Cleanup data. */

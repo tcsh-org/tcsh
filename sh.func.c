@@ -2725,17 +2725,21 @@ getYN(const char *prompt)
     return doit;
 }
 
+int fpipe;
+Char *fdecl;
+
 void
 dofunction(Char **v, struct command *c)
 {
     if (*++v == NULL) {
-	plist(&functions, VAR_ALL);
+	plist(&functions, VAR_READONLY);
 
 	return;
     }
     Sgoal = *v++;
     Stype = TC_EXIT;
     {
+	static int l;
 	int pv[2];
 	struct saved_state st;
 	struct varent *varp;
@@ -2747,20 +2751,31 @@ dofunction(Char **v, struct command *c)
 	    if (!alnum(*p))
 		stderror(ERR_NAME | ERR_FUNCALNUM);
 	if ((varp = adrof1(Sgoal, &functions))) {
-	    mypipe(pv);
-	    if (!pfork(c, -1)) {
-		xclose(pv[0]);
-		while (**varp->vec)
-		    xwrite(pv[1], (*varp->vec)++, 1);
-		xclose(pv[1]);
-		xexit(0);
-	    }
-	    pwait();
+	    jmp_buf_t oldexit;
+	    int pvsav, ohaderr;
+	    Char *fsav;
 
-	    xclose(pv[1]);
+	    if (l == 16)
+		stderror(ERR_RECURSION);
+	    mypipe(pv);
 	    st_save(&st, pv[0], 0, NULL, v);
-	    process(0);
+	    pvsav = fpipe;
+	    fpipe = pv[1];
+	    fsav = fdecl;
+	    fdecl = *varp->vec;
+	    ohaderr = haderr;
+	    getexit(oldexit);
+	    if (!setexit()) {
+		l++;
+		process(0);
+	    }
+	    resexit(oldexit);
+	    haderr = ohaderr;
 	    st_restore(&st);
+	    xclose(pv[1]);
+	    fpipe = pvsav;
+	    fdecl = fsav;
+	    l--;
 
 	    return;
 	}
@@ -2774,7 +2789,6 @@ dofunction(Char **v, struct command *c)
 			  func = Strbuf_INIT;
 	    struct wordent *histent = NULL,
 			   *ohistent = NULL;
-	    char *prompt = short2str(*c->t_dcom);
 
 	    cleanup_push(&aword, Strbuf_cleanup);
 	    while (1) {
@@ -2786,7 +2800,7 @@ dofunction(Char **v, struct command *c)
 		    histent->prev = ohistent;
 		}
 		if (intty && fseekp == feobp && aret == TCSH_F_SEEK)
-		    printprompt(1, prompt);
+		    printprompt(1, bname);
 		(void) getword(&aword);
 		Strbuf_terminate(&aword);
 		if (intty && Strlen(aword.s) > 0) {

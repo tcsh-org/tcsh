@@ -1717,6 +1717,11 @@ bgetc(void)
 	    buf = (int) feobp / BUFSIZE;
 	    balloc(buf);
 	    roomleft = BUFSIZE - off;
+	    if (fpipe) {
+		if (!*fdecl)
+		    return CHAR_ERR;
+		(void) xwrite(fpipe, fdecl++, (size_t) 1);
+	    }
 	    c = wide_read(SHIN, fbuf[buf] + off, roomleft, 0);
 	    if (c > 0)
 		feobp += c;
