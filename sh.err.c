@@ -376,7 +376,7 @@ errinit(void)
     elst[ERR_RETURN] = CSAVS(1, 141, "Not in a declaration");
     elst[ERR_FUNCBEGIN] = CSAVS(1, 142, "Function name must begin with a letter");
     elst[ERR_FUNCALNUM] = CSAVS(1, 143, "Function name must contain alphanumeric characters");
-    elst[ERR_RECURSION] = CSAVS(1, 144, "Recursion too deep");
+    elst[ERR_RECURSION] = CSAVS(1, 144, "Too deep a recursion or nest");
 }
 
 /* Cleanup data. */
