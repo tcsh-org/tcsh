@@ -2765,10 +2765,9 @@ dofunction(Char **v, struct command *c)
 	    fdecl = *varp->vec;
 	    ohaderr = haderr;
 	    getexit(oldexit);
-	    if (!setexit()) {
-		l++;
+	    l++;
+	    if (!setexit())
 		process(0);
-	    }
 	    resexit(oldexit);
 	    haderr = ohaderr;
 	    st_restore(&st);
@@ -2810,17 +2809,8 @@ dofunction(Char **v, struct command *c)
 		    histent = histent->next;
 		}
 
-		if (eq(aword.s, funcexit)) {
-		    if (intty) {
-			ohistent->prev = histgetword(histent);
-			ohistent->prev->next = ohistent;
-			savehist(ohistent, 0);
-			freelex(ohistent);
-			xfree(ohistent);
-		    }
-
+		if (eq(aword.s, funcexit))
 		    break;
-		}
 		Strbuf_append(&func, aword.s);
 		Strbuf_append1(&func, ' ');
 		while (getword(&aword)) {
@@ -2846,10 +2836,17 @@ dofunction(Char **v, struct command *c)
 		    (void) getword(NULL);
 	    }
 
+	    if (intty) {
+		ohistent->prev = histgetword(histent);
+		ohistent->prev->next = ohistent;
+		savehist(ohistent, 0);
+		freelex(ohistent);
+		xfree(ohistent);
+	    }
 	    cleanup_until(&aword);
 	    if (!func.len)
 		return;
-	    Strbuf_terminate(&func);
+	    func.s[--func.len] = 0;
 	    **(varvec = xmalloc(sizeof *varvec)) = func.s;
 	    *varvec[1] = NULL;
 	    setq(Sgoal, *varvec, &functions, VAR_READONLY);

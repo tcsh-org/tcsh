@@ -107,7 +107,6 @@ extern	void		  xfree_indirect(void *);
 extern	void		  errinit	(void);
 extern	void		  seterror	(unsigned int, ...);
 extern	void		  fixerror	(void);
-extern	void		  funcerror	(Char *, Char *);
 extern	void		  stderror	(unsigned int, ...)
     __attribute__((__noreturn__));
 
