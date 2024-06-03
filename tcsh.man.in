@@ -5550,6 +5550,8 @@ The third form calls a function
 optionally, preceded by
 .Ar arg Ns No ,
 which is a list of arguments to be passed.
+Function calls may be nested or recursive,
+but too deep a nest or recursion will raise an error.
 .
 .El
 .Bl -tag -width 6n
@@ -10779,10 +10781,6 @@ Command substitution supports multiple commands and conditions, but not
 cycles or backward
 .Ic goto Ns
 s.
-.Pp
-Functions fallthrough if the ending
-.Ic exit
-is piped from or executed in background.
 .Pp
 Report bugs at
 .Lk @PACKAGE_BUGREPORT@
