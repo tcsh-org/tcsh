@@ -5530,6 +5530,9 @@ loop at the terminal you can rub it out.
 .It Ic function Ar name Xo
 .Op Ar arg No ...
 (+)
+.It Ar name Xo
+.Op Ar arg No ...
+(+)
 .Xc
 The first form of the command prints the value of all shell functions.
 .Pp
@@ -5552,6 +5555,10 @@ optionally, preceded by
 which is a list of arguments to be passed.
 Function calls may be nested or recursive,
 but too deep a nest or recursion will raise an error.
+.Pp
+The fourth form is an
+.Ic alias
+for the third form.
 .
 .El
 .Bl -tag -width 6n

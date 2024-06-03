@@ -2783,7 +2783,8 @@ dofunction(Char **v, struct command *c)
 	    stderror(ERR_FUNC, Sgoal);
 	{
 	    Char funcexit[] = { 'r', 'e', 't', 'u', 'r', 'n', '\0' },
-		 *(*varvec)[2];
+		 alarg[] = { '!', '*', '\0' },
+		 *(*varvec)[4];
 	    struct Strbuf aword = Strbuf_INIT,
 			  func = Strbuf_INIT;
 	    struct wordent *histent = NULL,
@@ -2847,9 +2848,16 @@ dofunction(Char **v, struct command *c)
 	    if (!func.len)
 		return;
 	    func.s[--func.len] = 0;
-	    **(varvec = xmalloc(sizeof *varvec)) = func.s;
-	    *varvec[1] = NULL;
+	    **(varvec = xcalloc(1, sizeof *varvec -
+				(sizeof **varvec * 2))) = func.s;
 	    setq(Sgoal, *varvec, &functions, VAR_READONLY);
+	    **(varvec =
+	       xcalloc(1, sizeof *varvec)) = Strsave(str2short(bname));
+	    (*varvec)[1] = Strsave(Sgoal);
+	    (*varvec)[2] = Strsave(alarg);
+	    setq(Sgoal, *varvec, &aliases, VAR_READWRITE);
+
+	    tw_cmd_free();
 	}
     }
 }
