@@ -2739,7 +2739,6 @@ dofunction(Char **v, struct command *c)
     Sgoal = *v++;
     Stype = TC_EXIT;
     {
-	static int l;
 	int pv[2];
 	struct saved_state st;
 	struct varent *varp;
@@ -2751,26 +2750,24 @@ dofunction(Char **v, struct command *c)
 	    if (!alnum(*p))
 		stderror(ERR_NAME | ERR_FUNCALNUM);
 	if ((varp = adrof1(Sgoal, &functions))) {
-	    jmp_buf_t oldexit;
-	    int pvsav, ohaderr;
+	    static int l;
+	    int pvsav;
 	    Char *fsav;
 
-	    if (l == 16)
+	    if (l == 100) {
+		l = 0;
 		stderror(ERR_RECURSION);
+	    }
 	    mypipe(pv);
+	    cleanup_push(&st, st_restore);
 	    st_save(&st, pv[0], 0, NULL, v);
 	    pvsav = fpipe;
 	    fpipe = pv[1];
 	    fsav = fdecl;
 	    fdecl = *varp->vec;
-	    ohaderr = haderr;
-	    getexit(oldexit);
 	    l++;
-	    if (!setexit())
-		process(0);
-	    resexit(oldexit);
-	    haderr = ohaderr;
-	    st_restore(&st);
+	    process(0);
+	    cleanup_until(&st);
 	    xclose(pv[1]);
 	    fpipe = pvsav;
 	    fdecl = fsav;
@@ -2849,10 +2846,11 @@ dofunction(Char **v, struct command *c)
 		return;
 	    func.s[--func.len] = 0;
 	    **(varvec = xcalloc(1, sizeof *varvec -
-				(sizeof **varvec * 2))) = func.s;
+				(sizeof **varvec * 2))) =
+	    func.s;
 	    setq(Sgoal, *varvec, &functions, VAR_READONLY);
-	    **(varvec =
-	       xcalloc(1, sizeof *varvec)) = Strsave(str2short(bname));
+	    **(varvec = xcalloc(1, sizeof *varvec)) =
+	    Strsave(str2short(bname));
 	    (*varvec)[1] = Strsave(Sgoal);
 	    (*varvec)[2] = Strsave(alarg);
 	    setq(Sgoal, *varvec, &aliases, VAR_READWRITE);
