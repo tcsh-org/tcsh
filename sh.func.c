@@ -498,11 +498,18 @@ doexit(Char **v, struct command *c)
 	    stderror(ERR_NAME | ERR_EXPRESSION);
     }
     btoeof();
-#if 0
-    if (intty)
-#endif
-    /* Always close, why only on ttys? */
+
+    /* Always close, except in the context of
+     * dosource or dofunction.
+     * st_restore will handle. */
+    switch (insource) {
+    case 0:
 	xclose(SHIN);
+	SHIN = -1;
+	break;
+    case 2:
+	fdecl += Strlen(fdecl);
+    }
 }
 
 /*ARGSUSED*/
@@ -2760,7 +2767,7 @@ dofunction(Char **v, struct command *c)
 	    }
 	    mypipe(pv);
 	    cleanup_push(&st, st_restore);
-	    st_save(&st, pv[0], 0, NULL, v);
+	    st_save(&st, pv[0], 0, &fdecl, v);
 	    pvsav = fpipe;
 	    fpipe = pv[1];
 	    fsav = fdecl;
