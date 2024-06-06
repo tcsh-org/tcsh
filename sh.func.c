@@ -2732,7 +2732,7 @@ getYN(const char *prompt)
     return doit;
 }
 
-int fpipe;
+int fpipe = -1;
 Char *fdecl;
 
 void
@@ -2758,8 +2758,6 @@ dofunction(Char **v, struct command *c)
 		stderror(ERR_NAME | ERR_FUNCALNUM);
 	if ((varp = adrof1(Sgoal, &functions))) {
 	    static int l;
-	    int pvsav;
-	    Char *fsav;
 
 	    if (l == 100) {
 		l = 0;
@@ -2768,16 +2766,13 @@ dofunction(Char **v, struct command *c)
 	    mypipe(pv);
 	    cleanup_push(&st, st_restore);
 	    st_save(&st, pv[0], 0, &fdecl, v);
-	    pvsav = fpipe;
+	    st.fpipe = fpipe;
 	    fpipe = pv[1];
-	    fsav = fdecl;
+	    st.fdecl = fdecl;
 	    fdecl = *varp->vec;
 	    l++;
 	    process(0);
 	    cleanup_until(&st);
-	    xclose(pv[1]);
-	    fpipe = pvsav;
-	    fdecl = fsav;
 	    l--;
 
 	    return;
@@ -2851,7 +2846,7 @@ dofunction(Char **v, struct command *c)
 	    cleanup_until(&aword);
 	    if (!func.len)
 		return;
-	    func.s[--func.len] = 0;
+	    Strbuf_terminate(&func);
 	    **(varvec = xcalloc(1, sizeof *varvec -
 				(sizeof **varvec * 2))) =
 	    func.s;

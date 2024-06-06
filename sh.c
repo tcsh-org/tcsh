@@ -1670,6 +1670,11 @@ st_restore(void *xst)
 
     xclose(SHIN);
 
+    if (insource == 2) {
+	xclose(fpipe);
+	fpipe = st->fpipe;
+	fdecl = st->fdecl;
+    }
     insource	= st->insource;
     SHIN	= st->SHIN;
     if (st->OLDSTD != -1)

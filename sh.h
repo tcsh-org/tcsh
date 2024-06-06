@@ -1294,6 +1294,8 @@ struct saved_state {
     int	  cantell;
     struct Bin	  B;
     int		  justpr;
+    int		fpipe;
+    Char	*fdecl;
 };
 
 #include "sh.decls.h"

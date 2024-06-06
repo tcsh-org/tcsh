@@ -1717,7 +1717,7 @@ bgetc(void)
 	    buf = (int) feobp / BUFSIZE;
 	    balloc(buf);
 	    roomleft = BUFSIZE - off;
-	    if (fpipe) {
+	    if (insource == 2) {
 		if (!*fdecl)
 		    return CHAR_ERR;
 		(void) xwrite(fpipe, fdecl++, (size_t) 1);
