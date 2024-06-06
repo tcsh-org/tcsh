@@ -365,7 +365,7 @@ doset(Char **v, struct command *c)
 		if (empty && s.s == NULL) {
 		    Char **empty;
 
-		    *(empty = xmalloc(sizeof *empty)) = NULL;
+		    empty = xcalloc(1, sizeof *empty);
 		    set1(vp, empty, &shvhed, flags);
 		}
 		else {
