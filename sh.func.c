@@ -2732,7 +2732,8 @@ getYN(const char *prompt)
     return doit;
 }
 
-int fpipe = -1;
+int flvl,
+    fpipe = -1;
 Char *fdecl;
 
 void
@@ -2757,23 +2758,15 @@ dofunction(Char **v, struct command *c)
 	    if (!alnum(*p))
 		stderror(ERR_NAME | ERR_FUNCALNUM);
 	if ((varp = adrof1(Sgoal, &functions))) {
-	    static int l;
-
-	    if (l == 100) {
-		l = 0;
+	    if (flvl == 100)
 		stderror(ERR_RECURSION);
-	    }
 	    mypipe(pv);
 	    cleanup_push(&st, st_restore);
 	    st_save(&st, pv[0], 0, &fdecl, v);
-	    st.fpipe = fpipe;
 	    fpipe = pv[1];
-	    st.fdecl = fdecl;
 	    fdecl = *varp->vec;
-	    l++;
 	    process(0);
 	    cleanup_until(&st);
-	    l--;
 
 	    return;
 	}

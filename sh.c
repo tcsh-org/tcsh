@@ -1634,6 +1634,9 @@ st_save(struct saved_state *st, int unit, int hflg, Char **al, Char **av)
     if (al == &fdecl) {
 	alvec	= NULL;
 	insource = 2;
+	st->fpipe = fpipe;
+	st->fdecl = *al;
+	flvl++;
     }
     else {
 	alvec	= al;
@@ -1674,6 +1677,7 @@ st_restore(void *xst)
 	xclose(fpipe);
 	fpipe = st->fpipe;
 	fdecl = st->fdecl;
+	flvl--;
     }
     insource	= st->insource;
     SHIN	= st->SHIN;
