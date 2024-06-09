@@ -579,6 +579,13 @@ exp6(Char ***vp, int ignore)
 	etraci("exp6 {} status", getstatus(), vp);
 	return putn(getstatus() == 0);
     }
+    for (cp = **vp; *cp; cp++)
+	if (cmap(*cp, _DOL | QUOTES)) {
+	    (*vp)++;
+	    if (ignore & TEXP_IGNORE)
+		return Strsave(STRNULL);
+	    return Dfix1(cp);
+	}
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));
     cp = *(*vp)++;
