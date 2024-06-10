@@ -248,8 +248,7 @@ doset(Char **v, struct command *c)
     int	    flags = VAR_READWRITE;
     int    first_match = 0;
     int    last_match = 0;
-    int    changed;
-    int    pipe;
+    int    changed, pipe;
 
     USE(c);
     v++;
@@ -283,6 +282,9 @@ doset(Char **v, struct command *c)
     if (c->t_dlef || !isatty(OLDSTD))
 	pipe = 1;
     do {
+	Char c;
+	struct Strbuf s;
+
 	hadsub = 0;
 	vp = p;
 	if (!letter(*p))
@@ -334,11 +336,9 @@ doset(Char **v, struct command *c)
 	    Char *copy;
 
 	    if (pipe) {
-		Char c;
-		struct Strbuf s = Strbuf_INIT;
-
+		memset(&s, 0, sizeof s);
 		while (wide_read(0, &c, (size_t) 1, 0) > 0)
-		    Strbuf_append1(&s, c | LITERAL);
+		    Strbuf_append1(&s, c | QUOTE);
 		Strbuf_terminate(&s);
 		copy = s.s;
 	    } else
@@ -350,17 +350,16 @@ doset(Char **v, struct command *c)
 	}
 	else {
 	    if (pipe) {
-		Char c;
-		struct Strbuf s = Strbuf_INIT;
 		int empty = 1;
 
+		memset(&s, 0, sizeof s);
 		while (wide_read(0, &c, (size_t) 1, 0) > 0) {
 		    if (c == '\n') {
 			empty = 0;
 
 			break;
 		    }
-		    Strbuf_append1(&s, c | LITERAL);
+		    Strbuf_append1(&s, c | QUOTE);
 		}
 		if (empty && s.s == NULL) {
 		    Char **empty;

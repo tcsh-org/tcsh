@@ -1361,7 +1361,7 @@ dosetenv(Char **v, struct command *c)
 	    while (wide_read(0, &c, (size_t) 1, 0) > 0) {
 		if (c == '\n')
 		    break;
-		Strbuf_append1(&s, c | LITERAL);
+		Strbuf_append1(&s, c | QUOTE);
 	    }
 	    Strbuf_terminate(&s);
 	    lp = s.s;
