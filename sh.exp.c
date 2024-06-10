@@ -581,10 +581,16 @@ exp6(Char ***vp, int ignore)
     }
     for (cp = **vp; *cp; cp++)
 	if (cmap(*cp, _DOL | QUOTES)) {
-	    (*vp)++;
-	    if (ignore & TEXP_IGNORE)
+	    Char *buf;
+
+	    if (ignore & TEXP_IGNORE) {
+		(*vp)++;
 		return Strsave(STRNULL);
-	    return Dfix1(cp);
+	    }
+	    cleanup_push(cp = Dfix1(*(*vp)++), xfree);
+	    buf = globone(cp, G_ERROR);
+	    cleanup_until(cp);
+	    return buf;
 	}
     if (isa(**vp, ANYOP))
 	return (Strsave(STRNULL));
