@@ -721,3 +721,53 @@ xwrite(int fildes, const void *buf, size_t nbyte)
     while ((res = write(fildes, buf, nbyte)) == -1 && errno == EINTR);
     return res;
 }
+
+int
+blkcmp(Char **fb, Char **sb)
+{
+    if (blklen(fb) != blklen(sb))
+	return 1;
+    while (*fb == *sb++)
+	if (*fb++ == NULL)
+	    return 0;
+    return 1;
+}
+
+void
+blkcmpfree(Char **fb, Char **sb)
+{
+    if (fb == NULL)
+	fb = xcalloc(1, sizeof *fb);
+    if (sb == NULL)
+	sb = xcalloc(1, sizeof *sb);
+    if (blkcmp(fb, sb)) {
+	Char **ofb, **osb;
+
+	for (ofb = fb, osb = sb; *fb && *sb; fb++, sb++) {
+	    if (*fb != *sb)
+		xfree(*sb);
+	    xfree(*fb);
+	}
+
+	while (*fb)
+	    xfree(*fb++);
+	xfree(ofb);
+	while (*sb)
+	    xfree(*sb++);
+	xfree(osb);
+
+	return;
+    }
+
+    blkfree(fb);
+    xfree(sb);
+}
+
+void
+blkcmp_cleanup(void *xblks)
+{
+    Char **(*blks)[2];
+
+    blks = xblks;
+    blkcmpfree(**blks, (*blks)[1]);
+}

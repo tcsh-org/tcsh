@@ -180,7 +180,40 @@ sh_access(const Char *fname, int mode)
 tcsh_number_t
 expr(Char ***vp)
 {
-    return (exp0(vp, 0));
+    Char **vpi, **vpc, *nblk[2], **blks[2];
+    tcsh_number_t i;
+    int len;
+
+    *blks = blks[1] = NULL;
+    cleanup_push(blks, blkcmp_cleanup);
+    len = blklen(*vp) + 1;
+    vpi = *vp;
+    vpc = *blks = xmalloc(sizeof **blks * len);
+    nblk[1] = NULL;
+    while (*vpi) {
+	*nblk = Strsave(*vpi++);
+	(void) blkcpy(vpc++, nblk);
+    }
+    blks[1] = blkcpy(xmalloc(sizeof *blks[1] * len), vpc = *blks);
+    i = exp0(&vpc, 0);
+    *vp += --len - blklen(vpc);
+    {
+	Char **nvp;
+
+	len -= blklen(vpc);
+	vpi = *blks;
+	cleanup_push(nvp = xmalloc(sizeof *nvp * (len + 1)), xfree);
+	while (vpi != vpc) {
+	    *nblk = *vpi++;
+	    (void) blkcpy(nvp++, nblk);
+	}
+	nvp -= len;
+	xechoit(nvp);
+	cleanup_until(nvp);
+    }
+    cleanup_until(blks);
+
+    return i;
 }
 
 tcsh_number_t
@@ -587,8 +620,8 @@ exp6(Char ***vp, int ignore)
 		(*vp)++;
 		return Strsave(STRNULL);
 	    }
-	    cleanup_push(cp = Dfix1(*(*vp)++), xfree);
-	    buf = globone(cp, G_ERROR);
+	    cleanup_push(cp = Dfix1(**vp), xfree);
+	    *(*vp)++ = Strsave(buf = globone(cp, G_ERROR));
 	    cleanup_until(cp);
 	    return buf;
 	}
