@@ -1,3 +1,4 @@
+ 37. V6.24.13 - 2024-06-12
  36. Fix !^:h and !^:t failing when no / found (Kimmo Suominen)
  35. Add cross-build support for gethost (josefs10)
  34. Add support for $?< (Matheus Garcia)
