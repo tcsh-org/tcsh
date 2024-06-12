@@ -455,6 +455,10 @@ AT_DATA([modifiers.csh],
 [[echo foo bar baz quux /usr/src/sys/sys/malloc.c
 ^baz^bash
 ^bar^kPa^:p
+echo !1:1:h
+echo !1:1:t
+echo !1:1:r
+echo !1:1:e
 echo !1:$:h
 echo !1:$:t
 echo !1:$:r
@@ -480,6 +484,10 @@ echo ${#var}
 AT_CHECK([tcsh -f -q -i < modifiers.csh], ,
 [[> foo bar baz quux /usr/src/sys/sys/malloc.c
 foo bar bash quux /usr/src/sys/sys/malloc.c
+foo
+foo
+foo
+
 /usr/src/sys/sys
 malloc.c
 /usr/src/sys/sys/malloc
@@ -501,6 +509,10 @@ f[oo][oo] bar baz quux /usr/src/sys/sys/mall[oo]c.c
 ]],
 [[echo foo bar bash quux /usr/src/sys/sys/malloc.c
 echo foo kPa bash quux /usr/src/sys/sys/malloc.c
+echo foo
+echo foo
+echo foo
+echo
 echo /usr/src/sys/sys
 echo malloc.c
 echo /usr/src/sys/sys/malloc
