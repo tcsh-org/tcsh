@@ -1353,8 +1353,21 @@ dosetenv(Char **v, struct command *c)
     if (*lp != '\0')
 	stderror(ERR_NAME | ERR_VARALNUM);
 
-    if ((lp = *v++) == 0)
-	lp = STRNULL;
+    if ((lp = *v++) == 0) {
+	if (c->t_dlef || !isatty(OLDSTD)) {
+	    Char c;
+	    struct Strbuf s = Strbuf_INIT;
+
+	    while (wide_read(0, &c, (size_t) 1, 0) > 0) {
+		if (c == '\n')
+		    break;
+		Strbuf_append1(&s, c | QUOTE);
+	    }
+	    Strbuf_terminate(&s);
+	    lp = s.s;
+	} else
+	    lp = STRNULL;
+    }
 
     lp = globone(lp, G_APPEND);
     cleanup_push(lp, xfree);
