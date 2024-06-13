@@ -123,7 +123,7 @@ const struct biltins bfunc[] = {
     { "pushd",		dopushd,	0,	INF	},
     { "rehash",		dohash,		0,	3	},
     { "repeat",		dorepeat,	2,	INF	},
-    { "return",		doreturn,		0,	0	},
+    { "return",		dozip,		0,	0	},
 #ifdef apollo
     { "rootnode",	dorootnode,	1,	1	},
 #endif /* apollo */

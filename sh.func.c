@@ -2772,7 +2772,7 @@ dofunction(Char **v, struct command *c)
 	}
 	if (*v || c->t_dlef || c->t_drit ||
 	    c->t_dflg & (F_PIPEIN | F_PIPEOUT))
-	    stderror(ERR_FUNC, Sgoal);
+	    stderror(ERR_UNDFUNC, Sgoal);
 	{
 	    Char funcexit[] = { 'r', 'e', 't', 'u', 'r', 'n', '\0' },
 		 alarg[] = { '!', '*', '\0' },
@@ -2853,13 +2853,4 @@ dofunction(Char **v, struct command *c)
 	    tw_cmd_free();
 	}
     }
-}
-
-void
-doreturn(Char **v, struct command *c)
-{
-    USE(c);
-    USE(v);
-
-    stderror(ERR_NAME | ERR_RETURN);
 }
