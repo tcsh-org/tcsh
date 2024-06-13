@@ -751,7 +751,8 @@ blkcmpfree(Char **fb, Char **sb)
 
 	while (*fb)
 	    xfree(*fb++);
-	xfree(ofb);
+	if (ofb != osb)
+	    xfree(ofb);
 	while (*sb)
 	    xfree(*sb++);
 	xfree(osb);
@@ -759,8 +760,9 @@ blkcmpfree(Char **fb, Char **sb)
 	return;
     }
 
+    if (fb != sb)
+	xfree(sb);
     blkfree(fb);
-    xfree(sb);
 }
 
 void
