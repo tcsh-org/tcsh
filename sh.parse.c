@@ -197,6 +197,8 @@ freenod(struct wordent *p1, struct wordent *p2)
 #define	P_OUT	4
 #define	P_DIAG	8
 
+char *pchrs;
+
 /*
  * syntax
  *	empty
@@ -205,9 +207,8 @@ freenod(struct wordent *p1, struct wordent *p2)
 struct command *
 syntax(const struct wordent *p1, const struct wordent *p2, int flags)
 {
-
     while (p1 != p2)
-	if (any(";&\n", p1->word[0]))
+	if (any(pchrs, p1->word[0]))
 	    p1 = p1->next;
 	else
 	    return (syn0(p1, p2, flags));
@@ -273,9 +274,21 @@ syn0(const struct wordent *p1, const struct wordent *p2, int flags)
 	    t->t_dcar = t1;
 	    t->t_dcdr = syntax(p, p2, flags);
 	    return (t);
+
+	case '#':
+	    if (intty) {
+		struct wordent *p1 = p2->prev;
+
+		p1 = p1->prev = p1->prev->prev;
+		xfree(p1->next->word);
+		xfree(p1->next);
+		p1->next = p2->prev;
+		goto out;
+	    }
 	default:
 	    break;
 	}
+out:
     if (l == 0)
 	return (syn1(p1, p2, flags));
     seterror(ERR_TOOMANYLP);
