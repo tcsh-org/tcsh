@@ -2675,8 +2675,7 @@ does not allow this.
 .
 .Pp
 .It Li $?<
-Substitutes the number of available bytes from the standard input.
-(This feature might be non-portable.)
+Substitutes whether the standard input is empty or not.
 (+)
 .El
 .
