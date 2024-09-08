@@ -51,7 +51,6 @@ static	Char		*word		(int);
 static	eChar	 	 getC1		(int);
 static	void	 	 getdol		(void);
 static	void	 	 getexcl	(Char);
-static	struct Hist 	*findev		(Char *, int);
 static	void	 	 setexclp	(Char *);
 static	eChar	 	 bgetc		(void);
 static	void		 balloc		(int);
@@ -1313,7 +1312,7 @@ gethent(Char sc)
     return (0);
 }
 
-static struct Hist *
+struct Hist *
 findev(Char *cp, int anyarg)
 {
     struct Hist *hp;

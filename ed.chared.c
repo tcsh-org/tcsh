@@ -490,6 +490,16 @@ excl_sw:
 	buf = expand_lex(&h->Hlex, 1, INT_MAX);
 	break;
 
+    case '?':
+	h = findev(p + 2, 1);
+	if (h == NULL)
+	    goto excl_err;
+	buf = expand_lex(&h->Hlex, 0, INT_MAX);
+	while (*q)
+	    q++;
+	q--;
+	break;
+
     default:
 	if (been_once) {	/* unknown argument */
 	    /* assume it's a modifier, e.g. !foo:h, and get whole cmd */
