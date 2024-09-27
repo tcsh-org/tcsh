@@ -498,11 +498,18 @@ doexit(Char **v, struct command *c)
 	    stderror(ERR_NAME | ERR_EXPRESSION);
     }
     btoeof();
-#if 0
-    if (intty)
-#endif
-    /* Always close, why only on ttys? */
+
+    /* Always close, except in the context of
+     * dosource or dofunction.
+     * st_restore will handle. */
+    switch (insource) {
+    case 0:
 	xclose(SHIN);
+	SHIN = -1;
+	break;
+    case 2:
+	fdecl += Strlen(fdecl);
+    }
 }
 
 /*ARGSUSED*/
@@ -1094,6 +1101,11 @@ past:
     case TC_GOTO:
 	setname(short2str(Sgoal));
 	stderror(ERR_NAME | ERR_NOTFOUND, "label");
+	break;
+
+    case TC_EXIT:
+	setname(short2str(Sgoal));
+	stderror(ERR_NAME | ERR_NOTFOUND, "return");
 	break;
 
     default:
@@ -2718,4 +2730,127 @@ getYN(const char *prompt)
     while (c != '\n' && force_read(SHIN, &c, sizeof(c)) == sizeof(c))
 	continue;
     return doit;
+}
+
+int flvl,
+    fpipe = -1;
+Char *fdecl;
+
+void
+dofunction(Char **v, struct command *c)
+{
+    if (*++v == NULL) {
+	plist(&functions, VAR_READONLY);
+
+	return;
+    }
+    Sgoal = *v++;
+    Stype = TC_EXIT;
+    {
+	int pv[2];
+	struct saved_state st;
+	struct varent *varp;
+	Char *p;
+
+	if (!letter(*(p = Sgoal)))
+	    stderror(ERR_NAME | ERR_FUNCBEGIN);
+	while (*++p)
+	    if (!alnum(*p))
+		stderror(ERR_NAME | ERR_FUNCALNUM);
+	if ((varp = adrof1(Sgoal, &functions))) {
+	    if (flvl == 100)
+		stderror(ERR_RECURSION);
+	    mypipe(pv);
+	    cleanup_push(&st, st_restore);
+	    st_save(&st, pv[0], 0, &fdecl, v);
+	    fpipe = pv[1];
+	    fdecl = *varp->vec;
+	    process(0);
+	    cleanup_until(&st);
+
+	    return;
+	}
+	if (*v || c->t_dlef || c->t_drit ||
+	    c->t_dflg & (F_PIPEIN | F_PIPEOUT))
+	    stderror(ERR_UNDFUNC, Sgoal);
+	{
+	    Char funcexit[] = { 'r', 'e', 't', 'u', 'r', 'n', '\0' },
+		 alarg[] = { '!', '*', '\0' },
+		 *(*varvec)[4];
+	    struct Strbuf aword = Strbuf_INIT,
+			  func = Strbuf_INIT;
+	    struct wordent *histent = NULL,
+			   *ohistent = NULL;
+
+	    cleanup_push(&aword, Strbuf_cleanup);
+	    while (1) {
+		if (intty) {
+		    histent = xmalloc(sizeof(*histent));
+		    ohistent = xmalloc(sizeof(*histent));
+		    ohistent->word = STRNULL;
+		    ohistent->next = histent;
+		    histent->prev = ohistent;
+		}
+		if (intty && fseekp == feobp && aret == TCSH_F_SEEK)
+		    printprompt(1, bname);
+		(void) getword(&aword);
+		Strbuf_terminate(&aword);
+		if (intty && Strlen(aword.s) > 0) {
+		    histent->word = Strsave(aword.s);
+		    histent->next = xmalloc(sizeof(*histent));
+		    histent->next->prev = histent;
+		    histent = histent->next;
+		}
+
+		if (eq(aword.s, funcexit))
+		    break;
+		Strbuf_append(&func, aword.s);
+		Strbuf_append1(&func, ' ');
+		while (getword(&aword)) {
+		    Strbuf_terminate(&aword);
+		    if (intty && Strlen(aword.s) > 0) {
+			histent->word = Strsave(aword.s);
+			histent->next = xmalloc(sizeof(*histent));
+			histent->next->prev = histent;
+			histent = histent->next;
+		    }
+		    Strbuf_append(&func, aword.s);
+		    Strbuf_append1(&func, ' ');
+		}
+		func.s[func.len - 1] = '\n';
+
+		if (intty) {
+		    ohistent->prev = histgetword(histent);
+		    ohistent->prev->next = ohistent;
+		    savehist(ohistent, 0);
+		    freelex(ohistent);
+		    xfree(ohistent);
+		} else
+		    (void) getword(NULL);
+	    }
+
+	    if (intty) {
+		ohistent->prev = histgetword(histent);
+		ohistent->prev->next = ohistent;
+		savehist(ohistent, 0);
+		freelex(ohistent);
+		xfree(ohistent);
+	    }
+	    cleanup_until(&aword);
+	    if (!func.len)
+		return;
+	    Strbuf_terminate(&func);
+	    **(varvec = xcalloc(1, sizeof *varvec -
+				(sizeof **varvec * 2))) =
+	    func.s;
+	    setq(Sgoal, *varvec, &functions, VAR_READONLY);
+	    **(varvec = xcalloc(1, sizeof *varvec)) =
+	    Strsave(str2short(bname));
+	    (*varvec)[1] = Strsave(Sgoal);
+	    (*varvec)[2] = Strsave(alarg);
+	    setq(Sgoal, *varvec, &aliases, VAR_READWRITE);
+
+	    tw_cmd_free();
+	}
+    }
 }
