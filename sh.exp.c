@@ -966,6 +966,8 @@ evalav(Char **v)
     cleanup_push(&paraml1, lex_cleanup);
     alias(&paraml1);
     t = syntax(paraml1.next, &paraml1, 0);
+    if (t->t_dflg & F_REDIR)
+	t->t_dflg |= F_FORK;
     cleanup_push(t, syntax_cleanup);
     if (seterr)
 	stderror(ERR_OLD);

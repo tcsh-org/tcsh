@@ -376,7 +376,7 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 		       bifunc->bfunct == (bfunc_t)dopopd))
 	    t->t_dflg &= ~(F_NICE);
 
-	if (((t->t_dflg & F_TIME) || ((t->t_dflg & F_NOFORK) == 0 &&
+	if (((t->t_dflg & F_TIME|F_FORK) || ((t->t_dflg & F_NOFORK) == 0 &&
 	     (!bifunc || t->t_dflg &
 	      (F_PIPEOUT | F_AMPERSAND | F_NICE | F_NOHUP | F_HUP)))) ||
 	/*
@@ -843,8 +843,7 @@ doio(struct command *t, int *pipein, int *pipeout)
     int fd;
     Char *cp;
     unsigned long flags = t->t_dflg;
-
-    if (didfds || (flags & F_REPEAT))
+    if ((flags & F_FORK) == 0 && (didfds || (flags & F_REPEAT)))
 	return;
     if ((flags & F_READ) == 0) {/* F_READ already done */
 	if (t->t_dlef) {

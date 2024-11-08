@@ -567,6 +567,7 @@ again:
 	    goto savep;
 
 	case '>':
+	    t->t_dflg |= F_REDIR;
 	    if (l != 0)
 		goto savep;
 	    if (p->word[1] == '>')

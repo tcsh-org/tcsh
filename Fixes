@@ -1,3 +1,5 @@
+ 39. Handle redirections in bracketed expressions if { foo > /dev/null }
+     (christos)
  38. Recognize history searches in history expansion !?foo<tab> (christos)
  37. V6.24.13 - 2024-06-12
  36. Fix !^:h and !^:t failing when no / found (Kimmo Suominen)
