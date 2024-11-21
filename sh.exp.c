@@ -51,11 +51,11 @@
 #define NOTEQMATCH 8
 
 static	int	   sh_access	(const Char *, int);
-static	tcsh_number_t  exp1		(Char ***, int);
-static	tcsh_number_t  exp2x	(Char ***, int);
-static	tcsh_number_t  exp2a	(Char ***, int);
-static	tcsh_number_t  exp2b	(Char ***, int);
-static	tcsh_number_t  exp2c	(Char ***, int);
+static	unsigned tcsh_number_t  exp1	(Char ***, int);
+static	unsigned tcsh_number_t  exp2x	(Char ***, int);
+static	unsigned tcsh_number_t  exp2a	(Char ***, int);
+static	unsigned tcsh_number_t  exp2b	(Char ***, int);
+static	unsigned tcsh_number_t  exp2c	(Char ***, int);
 static	Char 	  *exp3		(Char ***, int);
 static	Char 	  *exp3a	(Char ***, int);
 static	Char 	  *exp4		(Char ***, int);
@@ -63,7 +63,7 @@ static	Char 	  *exp5		(Char ***, int);
 static	Char 	  *exp6		(Char ***, int);
 static	void	   evalav	(Char **);
 static	int	   isa		(Char *, int);
-static	tcsh_number_t  egetn	(const Char *);
+static	unsigned tcsh_number_t  egetn	(const Char *);
 
 #ifdef EDEBUG
 static	void	   etracc	(const char *, const Char *, Char ***);
@@ -177,20 +177,20 @@ sh_access(const Char *fname, int mode)
 #endif /* !POSIX */
 }
 
-tcsh_number_t
+unsigned tcsh_number_t
 expr(Char ***vp)
 {
     return (exp0(vp, 0));
 }
 
-tcsh_number_t
+unsigned tcsh_number_t
 exp0(Char ***vp, int ignore)
 {
-    tcsh_number_t p1 = exp1(vp, ignore);
+    unsigned tcsh_number_t p1 = exp1(vp, ignore);
 
     etraci("exp0 p1", p1, vp);
     while (**vp && eq(**vp, STRor2)) {
-	int p2;
+	unsigned tcsh_number_t p2;
 
 	(*vp)++;
 
@@ -206,14 +206,14 @@ exp0(Char ***vp, int ignore)
     return (p1);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 exp1(Char ***vp, int ignore)
 {
-    tcsh_number_t p1 = exp2x(vp, ignore);
+    unsigned tcsh_number_t p1 = exp2x(vp, ignore);
 
     etraci("exp1 p1", p1, vp);
     while (**vp && eq(**vp, STRand2)) {
-	tcsh_number_t p2;
+	unsigned tcsh_number_t p2;
 
 	(*vp)++;
 	p2 = compat_expr ?
@@ -230,14 +230,14 @@ exp1(Char ***vp, int ignore)
     return (p1);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 exp2x(Char ***vp, int ignore)
 {
-    tcsh_number_t p1 = exp2a(vp, ignore);
+    unsigned tcsh_number_t p1 = exp2a(vp, ignore);
 
     etraci("exp2x p1", p1, vp);
     while (**vp && eq(**vp, STRor)) {
-	tcsh_number_t p2;
+	unsigned tcsh_number_t p2;
 
 	(*vp)++;
 	p2 = compat_expr ?
@@ -253,14 +253,14 @@ exp2x(Char ***vp, int ignore)
     return (p1);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 exp2a(Char ***vp, int ignore)
 {
-    tcsh_number_t p1 = exp2b(vp, ignore);
+    unsigned tcsh_number_t p1 = exp2b(vp, ignore);
 
     etraci("exp2a p1", p1, vp);
     while (**vp && eq(**vp, STRcaret)) {
-	tcsh_number_t p2;
+	unsigned tcsh_number_t p2;
 
 	(*vp)++;
 	p2 = compat_expr ?
@@ -276,14 +276,14 @@ exp2a(Char ***vp, int ignore)
     return (p1);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 exp2b(Char ***vp, int ignore)
 {
-    tcsh_number_t p1 = exp2c(vp, ignore);
+    unsigned tcsh_number_t p1 = exp2c(vp, ignore);
 
     etraci("exp2b p1", p1, vp);
     while (**vp && eq(**vp, STRand)) {
-	tcsh_number_t p2;
+	unsigned tcsh_number_t p2;
 
 	(*vp)++;
 	p2 = compat_expr ?
@@ -299,12 +299,12 @@ exp2b(Char ***vp, int ignore)
     return (p1);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 exp2c(Char ***vp, int ignore)
 {
     Char *p1 = exp3(vp, ignore);
     Char *p2;
-    tcsh_number_t i;
+    unsigned tcsh_number_t i;
 
     cleanup_push(p1, xfree);
     etracc("exp2c p1", p1, vp);
@@ -346,7 +346,7 @@ static Char *
 exp3(Char ***vp, int ignore)
 {
     Char *p1, *p2;
-    tcsh_number_t i;
+    unsigned tcsh_number_t i;
 
     p1 = exp3a(vp, ignore);
     etracc("exp3 p1", p1, vp);
@@ -362,21 +362,58 @@ exp3(Char ***vp, int ignore)
 	etracc("exp3 p2", p2, vp);
 	if (!(ignore & TEXP_IGNORE))
 	    switch ((int)i) {
+		tcsh_number_t is;
 
 	    case GTR:
-		i = egetn(p1) > egetn(p2);
+		if ((i = egetn(p1)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p2)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = is > -(tcsh_number_t) -i;
+		else
+		    i = is > (tcsh_number_t) i;
 		break;
 
 	    case GTR | 1:
-		i = egetn(p1) >= egetn(p2);
+		if ((i = egetn(p1)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p2)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = is >= -(tcsh_number_t) -i;
+		else
+		    i = is >= (tcsh_number_t) i;
 		break;
 
 	    case LSS:
-		i = egetn(p1) < egetn(p2);
+		if ((i = egetn(p1)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p2)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = is < -(tcsh_number_t) -i;
+		else
+		    i = is < (tcsh_number_t) i;
 		break;
 
 	    case LSS | 1:
-		i = egetn(p1) <= egetn(p2);
+		if ((i = egetn(p1)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p2)) &
+		    ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = is <= -(tcsh_number_t) -i;
+		else
+		    i = is <= (tcsh_number_t) i;
 		break;
 	    }
 	cleanup_until(p1);
@@ -393,7 +430,7 @@ exp3a(Char ***vp, int ignore)
 {
     Char *p1, *p2;
     const Char *op;
-    tcsh_number_t i;
+    unsigned tcsh_number_t i;
 
     p1 = exp4(vp, ignore);
     etracc("exp3a p1", p1, vp);
@@ -421,7 +458,7 @@ static Char *
 exp4(Char ***vp, int ignore)
 {
     Char *p1, *p2;
-    tcsh_number_t i = 0;
+    unsigned tcsh_number_t i = 0;
 
     p1 = exp5(vp, ignore);
     etracc("exp4 p1", p1, vp);
@@ -458,7 +495,7 @@ static Char *
 exp5(Char ***vp, int ignore)
 {
     Char *p1, *p2;
-    tcsh_number_t i = 0;
+    unsigned tcsh_number_t i = 0;
 
     p1 = exp6(vp, ignore);
     etracc("exp5 p1", p1, vp);
@@ -482,23 +519,44 @@ exp5(Char ***vp, int ignore)
 	etracc("exp5 p2", p2, vp);
 	if (!(ignore & TEXP_IGNORE))
 	    switch (op[0]) {
+		tcsh_number_t is;
 
 	    case '*':
 		i = egetn(p1) * egetn(p2);
 		break;
 
 	    case '/':
-		i = egetn(p2);
-		if (i == 0)
+		if ((i = egetn(p2)) == 0)
 		    stderror(ERR_DIV0);
-		i = egetn(p1) / i;
+		if (i & ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p1)) ==
+		    ~(~(unsigned tcsh_number_t) 0 >> 1) &&
+		    is == -1)
+		    stderror(ERR_DIVOF);
+		if (i & ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = -(tcsh_number_t) -i / is;
+		else
+		    i /= is;
 		break;
 
 	    case '%':
-		i = egetn(p2);
-		if (i == 0)
+		if ((i = egetn(p2)) == 0)
 		    stderror(ERR_MOD0);
-		i = egetn(p1) % i;
+		if (i & ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    is = -(tcsh_number_t) -i;
+		else
+		    is = i;
+		if ((i = egetn(p1)) ==
+		    ~(~(unsigned tcsh_number_t) 0 >> 1) &&
+		    is == -1)
+		    stderror(ERR_MODOF);
+		if (i & ~(~(unsigned tcsh_number_t) 0 >> 1))
+		    i = -(tcsh_number_t) -i % is;
+		else
+		    i %= is;
 		break;
 	    }
 	cleanup_until(p1);
@@ -513,8 +571,8 @@ exp5(Char ***vp, int ignore)
 static Char *
 exp6(Char ***vp, int ignore)
 {
-    tcsh_number_t ccode;
-    tcsh_number_t i = 0;
+    unsigned tcsh_number_t ccode,
+			   i = 0;
     Char *cp;
 
     if (**vp == 0)
@@ -1024,7 +1082,7 @@ isa(Char *cp, int what)
     return (0);
 }
 
-static tcsh_number_t
+static unsigned tcsh_number_t
 egetn(const Char *cp)
 {
     if (*cp && *cp != '-' && !Isdigit(*cp))

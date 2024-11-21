@@ -246,9 +246,9 @@ static __inline void tcsh_ignore(intptr_t a)
 #endif /* __HP_CXD_SPP && !__hpux */
 
 #ifdef HAVE_LONG_LONG
-typedef long long tcsh_number_t;
+#define tcsh_number_t long long
 #else
-typedef long tcsh_number_t;
+#define tcsh_number_t long
 #endif
 /*
  * This macro compares the st_dev field of struct stat. On aix on ibmESA
