@@ -75,7 +75,7 @@ typedef unsigned long intptr_t;
 # define force_read xread
 #endif /*!WINNT_NATIVE */
 
-#if defined(KANJI) && defined(WIDE_STRINGS) && defined(HAVE_NL_LANGINFO) && defined(CODESET)
+#if defined(KANJI) && defined(WIDE_STRINGS) && defined(HAVE_NL_LANGINFO)
 #define AUTOSET_KANJI
 #endif
 
