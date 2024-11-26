@@ -376,7 +376,7 @@ execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
 		       bifunc->bfunct == (bfunc_t)dopopd))
 	    t->t_dflg &= ~(F_NICE);
 
-	if (((t->t_dflg & F_TIME|F_FORK) || ((t->t_dflg & F_NOFORK) == 0 &&
+	if (((t->t_dflg & (F_TIME|F_FORK)) || ((t->t_dflg & F_NOFORK) == 0 &&
 	     (!bifunc || t->t_dflg &
 	      (F_PIPEOUT | F_AMPERSAND | F_NICE | F_NOHUP | F_HUP)))) ||
 	/*
