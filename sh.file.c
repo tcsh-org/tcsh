@@ -590,7 +590,7 @@ again:				/* search for matches */
 static int
 compare(const void *p, const void *q)
 {
-#if defined (WIDE_STRINGS) && !defined (UTF16_STRING)
+#if defined (WIDE_STRINGS) && !defined (UTF16_STRINGS)
     errno = 0;
 
     return (wcscoll(*(Char *const *) p, *(Char *const *) q));
