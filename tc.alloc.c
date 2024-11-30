@@ -454,7 +454,7 @@ realloc(ptr_t cp, size_t nbytes)
  * API, so we cannot use our malloc replacement without providing one.
  * Thanks a lot glibc!
  */
-#ifdef __linux__
+#if defined(__linux__) && defined(SOLARIS2)
 #define M_U_S_CONST
 #else
 #define M_U_S_CONST const
