@@ -726,6 +726,7 @@ $(srcdir)/stamp-h.in: $(srcdir)/configure.ac
 
 check test: atconfig atlocal $(srcdir)/tests/testsuite $(BUILD)
 	$(ENVCMD) - \
+		PATH="$(PATH)" \
 		TESTSUITEREGEN="$(TESTSUITEREGEN)" \
 		USER="$(USER)" \
 		LC_ALL=C \
