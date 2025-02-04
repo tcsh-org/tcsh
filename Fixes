@@ -1,3 +1,4 @@
+ 42. V6.24.15 - 2025-02-04
  41. V6.24.14 - 2024-11-26
  40. Fix issues with S-JIS handling (T. Nosaka)
  39. Handle redirections in bracketed expressions if { foo > /dev/null }
