@@ -126,8 +126,8 @@ extern	int		  find_cmd	(Char *, int);
  * sh.exp.c
  */
 extern  Char		 *filetest      (Char *, Char ***, int);
-extern	tcsh_number_t 	  expr		(Char ***);
-extern	tcsh_number_t	  exp0		(Char ***, int);
+extern	unsigned tcsh_number_t 	  expr	(Char ***);
+extern	unsigned tcsh_number_t	  exp0	(Char ***, int);
 
 /*
  * sh.file.c
@@ -380,8 +380,8 @@ extern	void		  mypipe	(int *);
 extern	struct varent 	 *adrof1	(const Char *, struct varent *);
 extern	void		  doset		(Char **, struct command *);
 extern	void		  dolet		(Char **, struct command *);
-extern	Char		 *putn		(tcsh_number_t);
-extern	tcsh_number_t	  getn		(const Char *);
+extern	Char		 *putn		(unsigned tcsh_number_t);
+extern	unsigned tcsh_number_t	  getn	(const Char *);
 extern	Char		 *value1	(Char *, struct varent *);
 extern	void		  setcopy	(const Char *, const Char *, int);
 extern	void		  setv		(const Char *, Char *, int);
