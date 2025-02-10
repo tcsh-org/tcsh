@@ -449,19 +449,18 @@ Dgetdol(void)
 
     case '<'|QUOTE: {
 	static struct Strbuf wbuf; /* = Strbuf_INIT; */
+	static Char peekc;
 
 	if (bitset) {
-#ifdef FIONREAD
-	    int chrs;
-
-	    if (ioctl(OLDSTD, FIONREAD, (ioctl_t) &chrs) == -1)
-		chrs = 0;
-	    setDolp(putn((tcsh_number_t) chrs));
+	    if (isatty(OLDSTD) || peekc)
+		setDolp(STR0);
+	    else if (force_read(OLDSTD, &c, 1) > 0) {
+		peekc = c;
+		setDolp(STR0);
+	    } else
+		setDolp(STR1);
 	    cleanup_until(name);
 	    goto eatbrac;
-#else
-	    stderror(ERR_UNAVAILABLE, "$?<");
-#endif
 	}
 	if (dimen)
 	    stderror(ERR_NOTALLOWED, "$#<");
@@ -522,6 +521,14 @@ Dgetdol(void)
 	}
 
 	fixDolMod();
+	if (peekc) {
+	    Char (*peekla)[2];
+
+	    **(peekla = xcalloc(1, sizeof *peekla)) =
+	    peekc;
+	    addla(*peekla);
+	    peekc = 0;
+	}
 	setDolp(wbuf.s); /* Kept allocated until next $< expansion */
 	cleanup_until(name);
 	goto eatbrac;
