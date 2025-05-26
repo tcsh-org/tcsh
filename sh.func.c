@@ -131,7 +131,11 @@ func(struct command *t, const struct biltins *bp)
 {
     int     i;
 
-    xechoit(t->t_dcom);
+    if (bp->bfunct != doexit &&
+	bp->bfunct != dolet &&
+	bp->bfunct != doif &&
+	bp->bfunct != dowhile)
+	xechoit(t->t_dcom);
     setname(bp->bname);
     i = blklen(t->t_dcom) - 1;
     if (i < bp->minargs)
