@@ -112,34 +112,6 @@ static time_t  chktim;		/* Time mail last checked */
 char *progname;
 int tcsh;
 
-/*
- * This preserves the input state of the shell. It is used by
- * st_save and st_restore to manupulate shell state.
- */
-struct saved_state {
-    int		  insource;
-    int		  OLDSTD;
-    int		  SHIN;
-    int		  SHOUT;
-    int		  SHDIAG;
-    int		  intty;
-    struct whyle *whyles;
-    Char 	 *gointr;
-    Char 	 *arginp;
-    Char	 *evalp;
-    Char	**evalvec;
-    Char	 *alvecp;
-    Char	**alvec;
-    int		  onelflg;
-    int	  enterhist;
-    Char	**argv;
-    Char	**av;
-    Char	  HIST;
-    int	  cantell;
-    struct Bin	  B;
-    int		  justpr;
-};
-
 static	int		  srccat	(Char *, Char *);
 #ifndef WINNT_NATIVE
 static	int		  srcfile	(const char *, int, int, Char **);
@@ -152,10 +124,6 @@ static	void		  mailchk	(void);
 static	Char	 	**defaultpath	(void);
 #endif
 static	void		  record	(void);
-static	void		  st_save	(struct saved_state *, int, int,
-					 Char **, Char **);
-static	void		  st_restore	(void *);
-
 	int		  main		(int, char **);
 
 #ifndef LOCALEDIR
@@ -1569,7 +1537,7 @@ srcfile(const char *f, int onlyown, int flag, Char **av)
  * Save the shell state, and establish new argument vector, and new input
  * fd.
  */
-static void
+void
 st_save(struct saved_state *st, int unit, int hflg, Char **al, Char **av)
 {
     st->insource	= insource;
@@ -1659,19 +1627,28 @@ st_save(struct saved_state *st, int unit, int hflg, Char **al, Char **av)
     gointr	= 0;
     evalvec	= 0;
     evalp	= 0;
-    alvec	= al;
     alvecp	= 0;
     enterhist	= hflg;
     if (enterhist)
 	HIST	= '\0';
-    insource	= 1;
+    if (al == &fdecl) {
+	alvec	= NULL;
+	insource = 2;
+	st->fpipe = fpipe;
+	st->fdecl = *al;
+	flvl++;
+    }
+    else {
+	alvec	= al;
+	insource = 1;
+    }
 }
 
 
 /*
  * Restore the shell to a saved state
  */
-static void
+void
 st_restore(void *xst)
 {
     struct saved_state *st;
@@ -1696,6 +1673,12 @@ st_restore(void *xst)
 
     xclose(SHIN);
 
+    if (insource == 2) {
+	xclose(fpipe);
+	fpipe = st->fpipe;
+	fdecl = st->fdecl;
+	flvl--;
+    }
     insource	= st->insource;
     SHIN	= st->SHIN;
     if (st->OLDSTD != -1)
