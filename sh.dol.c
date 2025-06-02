@@ -54,8 +54,6 @@ static Char *Dcp, *const *Dvp;	/* Input vector for Dreadc */
 
 #define	unDgetC(c)	Dpeekc = c
 
-#define QUOTES		(_QF|_QB|_ESC)	/* \ ' " ` */
-
 /*
  * The following variables give the information about the current
  * $ expansion, recording the current word position, the remaining
