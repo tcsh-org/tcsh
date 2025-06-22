@@ -538,13 +538,19 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 
 	    case 'j':
 		{
-		    int njobs = -1;
+		    int njobs = 0;
 		    struct process *pp;
 
-		    for (pp = proclist.p_next; pp; pp = pp->p_next)
-			njobs++;
-		    if (njobs == -1)
-			njobs++;
+		    /* this counts jobs which haven't been "reaped" yet, but
+		       unless you've just run kill -9 %1, it shouldn't be an issue */
+		    for (pp = proclist.p_next; pp; pp = pp->p_next) {
+			if (pp->p_index > 0 && pp->p_index <= pmaxindex
+				&& pp->p_procid == pp->p_jobid)
+			{
+			    ++njobs;
+			}
+		    }
+
 		    p = Itoa(njobs, 1, attributes);
 		    Strbuf_append(&buf, p);
 		    xfree(p);
