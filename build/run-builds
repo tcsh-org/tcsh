@@ -215,8 +215,8 @@ do
 	echo "* ${image}"
 	dir="$(mktemp -d "${TMPDIR:-/tmp}/${PROG}-img-XXXXXXXXXX")"
 	maybe install "${DEPT}" "${dir}/docker-entrypoint"
-	Dockerfile "${os}" "${suite}" \
-	| if ${noop:-false}
+	Dockerfile "${os}" "${suite}" |
+	if ${noop:-false}
 	then
 	    sed 's/^/> /'
 	else
