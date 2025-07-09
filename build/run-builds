@@ -56,12 +56,6 @@ RUN grep -q '^VERSION_ID=' /etc/os-release\
  || echo VERSION_ID=14 >> /etc/os-release
 EOF
 	;;
-    trixie)
-	expand <<EOF
-RUN grep -q '^VERSION_ID=' /etc/os-release\
- || echo VERSION_ID=13 >> /etc/os-release
-EOF
-	;;
     esac
 
     expand <<EOF
