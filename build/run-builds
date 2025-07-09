@@ -229,7 +229,12 @@ do
 	[ -d "${pool}" ] && continue
 	maybe mkdir -p "${pool}"
 
-	maybe docker run --rm \
+	# ulimit works around faked-sysv issue
+	# https://github.com/moby/moby/issues/27195
+
+	maybe docker run \
+	    --rm \
+	    --ulimit nofile=1024:524288 \
 	    -v "${here}/src":/mnt/src \
 	    -v "${here}/${pool}":/mnt/deb \
 	    "${image}"
