@@ -301,6 +301,9 @@ extern	int		  xopen		(const char *, int, ...);
 extern	ssize_t		  xread		(int, void *, size_t);
 extern	int		  xtcsetattr	(int, int, const struct termios *);
 extern	ssize_t		  xwrite	(int, const void *, size_t);
+extern	int		  blkcmp	(Char **, Char **);
+extern	void		  blkcmpfree	(Char **, Char **);
+extern	void		  blkcmp_cleanup(void *);
 
 /*
  * sh.parse.c
