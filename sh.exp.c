@@ -829,7 +829,7 @@ filetest(Char *cp, Char ***vp, int ignore)
 
 #ifdef convex
 	    case 'R':
-		i = (stb.st_dmonflags & IMIGRATED) == IMIGRATED;
+		i = (stb.st_dmonflags & IMMIGRATED) == IMMIGRATED;
 		break;
 #endif /* convex */
 

@@ -5823,7 +5823,7 @@ If no
 .Ar title
 is provided, the process title will be cleared.
 .
-.\" adjacant multi-tag items; add a blank
+.\" adjacent multi-tag items; add a blank
 .Pp
 .
 .It Ic kill Fl l
@@ -6537,7 +6537,7 @@ the shell, it has access to shell variables and other structures.
 This provides a mechanism for changing one's working environment
 based on the time of day.
 .
-.\" adjacant multi-tag items; add a blank
+.\" adjacent multi-tag items; add a blank
 .Pp
 .
 .It Ic set
@@ -8207,7 +8207,7 @@ section.
 .Pp
 If contains
 .Ql ask ,
-an interacive confirmation is presented, rather than an
+an interactive confirmation is presented, rather than an
 error.
 .Pp
 If contains
@@ -8294,7 +8294,7 @@ versus
 .Sq 7:45:42 .
 .
 .It Ic parseoctal
-To retain compatibily with older versions numeric variables starting with
+To retain compatibility with older versions numeric variables starting with
 0 are not interpreted as octal.
 Setting this variable enables proper octal
 parsing.

@@ -1038,7 +1038,7 @@ fix_yp_bugs(void)
     extern int yp_get_default_domain (char **);
     /*
      * PWP: The previous version assumed that yp domain was the same as the
-     * internet name domain.  This isn't allways true. (Thanks to Mat Landau
+     * internet name domain.  This isn't always true. (Thanks to Mat Landau
      * <mlandau@bbn.com> for the original version of this.)
      */
     if (yp_get_default_domain(&mydomain) == 0) {	/* if we got a name */

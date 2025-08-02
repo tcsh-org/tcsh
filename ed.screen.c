@@ -38,7 +38,7 @@
 
 /*
  * IMPORTANT NOTE: these routines are allowed to look at the current screen
- * and the current possition assuming that it is correct.  If this is not
+ * and the current position assuming that it is correct.  If this is not
  * true, then the update will be WRONG!  This is (should be) a valid
  * assumption...
  */
@@ -1079,7 +1079,7 @@ mc_again:
 
     if (where >= TermH) {
 #ifdef DEBUG_SCREEN
-	xprintf("MoveToChar: where is riduculous: %d\r\n", where);
+	xprintf("MoveToChar: where is ridiculous: %d\r\n", where);
 	flush();
 #endif /* DEBUG_SCREEN */
 	return;
@@ -1152,7 +1152,7 @@ so_write(Char *cp, int n)
 
     if (n > TermH) {
 #ifdef DEBUG_SCREEN
-	xprintf("so_write: n is riduculous: %d\r\n", n);
+	xprintf("so_write: n is ridiculous: %d\r\n", n);
 	flush();
 #endif /* DEBUG_SCREEN */
 	return;
@@ -1248,7 +1248,7 @@ DeleteChars(int num)		/* deletes <num> characters */
 
     if (num > TermH) {
 #ifdef DEBUG_SCREEN
-	xprintf(CGETS(7, 17, "DeleteChars: num is riduculous: %d\r\n"), num);
+	xprintf(CGETS(7, 17, "DeleteChars: num is ridiculous: %d\r\n"), num);
 	flush();
 #endif /* DEBUG_SCREEN */
 	return;
@@ -1288,7 +1288,7 @@ Insert_write(Char *cp, int num)
 
     if (num > TermH) {
 #ifdef DEBUG_SCREEN
-	xprintf(CGETS(7, 19, "StartInsert: num is riduculous: %d\r\n"), num);
+	xprintf(CGETS(7, 19, "StartInsert: num is ridiculous: %d\r\n"), num);
 	flush();
 #endif /* DEBUG_SCREEN */
 	return;
@@ -1388,7 +1388,7 @@ ClearToBottom(void)
 
 void
 GetTermCaps(void)
-{				/* read in the needed terminal capabilites */
+{				/* read in the needed terminal capabilities */
     int i;
     const char   *ptr;
     char    buf[TC_BUFSIZE];

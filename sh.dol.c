@@ -43,7 +43,7 @@
  * input words.  Here we expand variables and turn quoting via ' and " into
  * QUOTE bits on characters (which prevent further interpretation).
  * If the `:q' modifier was applied during history expansion, then
- * some QUOTEing may have occurred already, so we dont "trim()" here.
+ * some QUOTEing may have occurred already, so we don't "trim()" here.
  */
 
 static eChar Dpeekc;		/* Peek for DgetC */
