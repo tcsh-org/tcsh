@@ -391,7 +391,7 @@ reexecute(struct command *kp)
     kp->t_dflg &= F_SAVE;
     kp->t_dflg |= F_REPEAT;
     /*
-     * If tty is still ours to arbitrate, arbitrate it; otherwise dont even set
+     * If tty is still ours to arbitrate, arbitrate it; otherwise don't even set
      * pgrp's as the jobs would then have no way to get the tty (we can't give
      * it to them, and our parent wouldn't know their pgrp, etc.
      */

@@ -833,7 +833,7 @@ Installation:
            (insert completion))
 	  ;;
 	  ;; write possible completion in the minibuffer,
-	  ;; use this instead of a seperate buffer (usual)
+	  ;; use this instead of a separate buffer (usual)
 	  ;;
           (t
            (let ((list (all-completions pattern csh-completion-list predicate))

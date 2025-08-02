@@ -612,7 +612,7 @@ tw_logname_next(struct Strbuf *res, struct Strbuf *dir, int *flags)
     /*
      * We don't want to get interrupted inside getpwent()
      * because the yellow pages code is not interruptible,
-     * and if we call endpwent() immediatetely after
+     * and if we call endpwent() immediately after
      * (in pintr()) we may be freeing an invalid pointer
      */
     USE(flags);
@@ -678,7 +678,7 @@ tw_grpname_next(struct Strbuf *res, struct Strbuf *dir, int *flags)
     /*
      * We don't want to get interrupted inside getgrent()
      * because the yellow pages code is not interruptible,
-     * and if we call endgrent() immediatetely after
+     * and if we call endgrent() immediately after
      * (in pintr()) we may be freeing an invalid pointer
      */
     USE(flags);

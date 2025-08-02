@@ -494,7 +494,7 @@
 #define C_SH(A)		(1 << (A))
 
 /*
- * Terminal dependend data structures
+ * Terminal dependent data structures
  */
 typedef struct {
 #ifdef WINNT_NATIVE

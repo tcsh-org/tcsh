@@ -197,7 +197,7 @@ struct termios *termios_p;
 
     /* Minix local flags:
      *   ECHO:    set if ECHO is set
-     *   ECHOE:   set if ECHO is set (ERASE echoed as error-corecting backspace)
+     *   ECHOE:   set if ECHO is set (ERASE echoed as error-correcting backspace)
      *   ECHOK:   set if ECHO is set ('\n' echoed after KILL char)
      *   ECHONL:  forced off ('\n' not echoed when ECHO isn't set)
      *   ICANON:  set if neither CBREAK nor RAW
@@ -254,7 +254,7 @@ struct termios *termios_p;
      * but only the input baudrate is valid for both.
      * As our termios emulation will fail, if input baudrate differs
      * from output baudrate, force them to be equal.
-     * Otherwise it would be very suprisingly not to be able to set
+     * Otherwise it would be very surprisingly not to be able to set
      * the terminal back to the state returned by tcgetattr :).
      */
     termios_p->c_ospeed =
@@ -313,7 +313,7 @@ struct termios *termios_p;
      * invalid or unsupported by the hardware, they just couldn't be satisfied
      * by the driver). Not returning an error might be even worse because the
      * driver will act different to what the application requires it to act
-     * after sucessfully setting the attributes as specified.
+     * after successfully setting the attributes as specified.
      * Settings that cannot be emulated fully include:
      *   c_ospeed != 110 && c_cflag & CSTOPB
      *   c_ospeed == 110 && ! c_cflag & CSTOPB
