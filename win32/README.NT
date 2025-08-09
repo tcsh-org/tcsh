@@ -222,7 +222,7 @@ Special Variables
 
  
 
-* TCSH_NOASYNCGUI (Enviroment variable): 
+* TCSH_NOASYNCGUI (Environment variable): 
 
   Makes tcsh wait for win32 GUI apps to terminate, instead of returning 
   immediately.  This affects child processes, so it can be set/unset in 
@@ -370,7 +370,7 @@ set prompt='%{<ESC>[44mfoo%}\>',
 this will print the prompt in the appropriate colors.
 
 The color-ls patch in 6.07.09 implements parsing for ANSI escapes. To keep
-the prompt specification consistent with the availablity of this feature,
+the prompt specification consistent with the availability of this feature,
 the literal string will now accept ANSI escapes like color-ls would.
 
     set prompt='%{^[[1;34m%}%c03%{^[[0m%}\>'

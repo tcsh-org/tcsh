@@ -1,5 +1,5 @@
 /*
- * sh.misc.c: Miscelaneous functions
+ * sh.misc.c: Miscellaneous functions
  */
 /*-
  * Copyright (c) 1980, 1991 The Regents of the University of California.

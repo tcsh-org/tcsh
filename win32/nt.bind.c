@@ -477,7 +477,7 @@ KEYCMD  CcViMap[] = {
 #else /* !KSHVI */
 	F_UNASSIGNED,		/* ^@ */   /* NOTE: These mapping do NOT */
 	F_TOBEG,			/* ^A */   /* Correspond well to the KSH */
-	F_CHARBACK,			/* ^B */   /* VI editting assignments    */
+	F_CHARBACK,			/* ^B */   /* VI editing assignments    */
 	F_TTY_INT,			/* ^C */   /* On the other hand they are */
 	F_LIST_EOF,			/* ^D */   /* convenient any many people */
 	F_TOEND,			/* ^E */   /* have gotten used to them   */

@@ -245,7 +245,7 @@ ruadd(struct process_stats *ru, struct process_stats *ru2)
 
 /* Convert clicks (kernel pages) to kbytes ... */
 /* If there is no PGSHIFT defined, assume it is	11 */
-/* Is this needed for compatability with some old flavor of 4.2	or 4.1?	*/
+/* Is this needed for compatibility with some old flavor of 4.2	or 4.1?	*/
 #ifdef SUNOS4
 # ifndef PGSHIFT
 #  define pagetok(size)	  ((size) << 1)
@@ -332,7 +332,7 @@ prusage(struct tms *bs, struct tms *es, clock_t e, clock_t b)
 #ifdef BSDTIMES
 # ifdef	convex
     static struct system_information sysinfo;
-    long long memtmp;	/* let memory calculations exceede 2Gb */
+    long long memtmp;	/* let memory calculations exceed 2Gb */
 # endif	/* convex */
     int	    ms = (int)
     ((e->tv_sec	- b->tv_sec) * 100 + (e->tv_usec - b->tv_usec) / 10000);
@@ -570,7 +570,7 @@ prusage(struct tms *bs, struct tms *es, clock_t e, clock_t b)
 		    xprintf("?");
 		break;
 # endif	/* convex */
-	    case 'r':		/* PWP:	socket messages	recieved */
+	    case 'r':		/* PWP:	socket messages	received */
 #ifdef _OSD_POSIX
 		xprintf("0",0);
 #else

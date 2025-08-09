@@ -33,15 +33,15 @@
   Bjorn Knutsson @ Thu Jun 24 19:02:17 1999
 
   e_dabbrev_expand() did not do proper completion if quoted spaces were present
-  in the string being completed. Exemple:
+  in the string being completed. Example:
 
   # echo hello\ world
   hello world
-  # echo h<press key bound to dabbrev-expande>
+  # echo h<press key bound to dabbrev-expand>
   # echo hello\<cursor>
 
   Correct behavior is:
-  # echo h<press key bound to dabbrev-expande>
+  # echo h<press key bound to dabbrev-expand>
   # echo hello\ world<cursor>
 
   The same problem occurred if spaces were present in a string withing
@@ -49,7 +49,7 @@
 
   # echo "hello world"
   hello world
-  # echo "h<press key bound to dabbrev-expande>
+  # echo "h<press key bound to dabbrev-expand>
   # echo "hello<cursor>
 
   The former problem could be solved with minor modifications of c_preword()
@@ -539,7 +539,7 @@ excl_sw:
 	     */
 	    if (all_dig) {
 		if (all_dig == 2)
-		    i = -i;	/* make it negitive */
+		    i = -i;	/* make it negative */
 		if (i < 0)	/* if !-4 (for example) */
 		    i = eventno + 1 + i;	/* remember: i is < 0 */
 		for (; h; h = h->Hnext) {
@@ -3779,7 +3779,7 @@ v_undo(Char c)
 	cp = UndoPtr;
 	Cursor = UndoPtr;
 	kp = UndoBuf;
-	size = (int)(Cursor-LastChar); /*  NOT NSL independant */
+	size = (int)(Cursor-LastChar); /*  NOT NSL independent */
 	if (size < UndoSize)
 	    size = UndoSize;
 	for (loop = 0; loop < size; loop++) {

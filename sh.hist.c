@@ -348,7 +348,7 @@ finalizeHash(struct hashValue *h)
 
 #else
 #define hashFcnName "add-mul"
-/* Simple multipy and add hash. */
+/* Simple multiply and add hash. */
 #define PRIME_LENGTH 1			/* need "good" HTL */
 struct hashValue { uint32_t h; };
 static void
@@ -1313,7 +1313,7 @@ rechist(Char *xfname, int ref)
 #ifndef WINNT_NATIVE
 		char *lockpath = strsave(short2str(fname));
 		cleanup_push(lockpath, xfree);
-		/* Poll in 100 miliseconds interval to obtain the lock. */
+		/* Poll in 100 milliseconds interval to obtain the lock. */
 		if ((dot_lock(lockpath, 100) == 0))
 		    cleanup_push(lockpath, dotlock_cleanup);
 #endif

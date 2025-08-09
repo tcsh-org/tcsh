@@ -4,7 +4,7 @@
 #
 # This prints to stdout, so redirect to appropriate place.
 #
-# The alogrithm is simple :
+# The algorithm is simple :
 #
 # String ID = 666 + line number
 #

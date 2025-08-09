@@ -114,7 +114,7 @@ int tcsh;
 
 /*
  * This preserves the input state of the shell. It is used by
- * st_save and st_restore to manupulate shell state.
+ * st_save and st_restore to manipulate shell state.
  */
 struct saved_state {
     int		  insource;
@@ -523,7 +523,7 @@ main(int argc, char **argv)
      * terminal.
      *
      * bugfix by Rich Salz <rsalz@PINEAPPLE.BBN.COM>: For root rsh things
-     * allways first check to see if loginsh or really root, then do things
+     * always first check to see if loginsh or really root, then do things
      * with ttyname()
      *
      * Also by Jean-Francois Lamy <lamy%ai.toronto.edu@RELAY.CS.NET>: check the
@@ -1195,7 +1195,7 @@ main(int argc, char **argv)
 #endif
 	    /*
 	     * Wait till in foreground, in case someone stupidly runs csh &
-	     * dont want to try to grab away the tty.
+	     * don't want to try to grab away the tty.
 	     */
 	    if (isatty(FSHDIAG))
 		f = FSHDIAG;
