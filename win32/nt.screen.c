@@ -41,7 +41,7 @@
 
 /*
  * IMPORTANT NOTE: these routines are allowed to look at the current screen
- * and the current possition assuming that it is correct.  If this is not
+ * and the current position assuming that it is correct.  If this is not
  * true, then the update will be WRONG!  This is (should be) a valid
  * assumption...
  */
@@ -297,7 +297,7 @@ MoveToChar(int where)
 
 	if (where >= TermH) {
 #ifdef DEBUG_SCREEN
-		xprintf("MoveToChar: where is riduculous: %d\r\n", where);
+		xprintf("MoveToChar: where is ridiculous: %d\r\n", where);
 		flush();
 #endif /* DEBUG_SCREEN */
 		return;
@@ -367,7 +367,7 @@ DeleteChars(int num)		/* deletes <num> characters */
 
 	if (num > TermH) {
 #ifdef DEBUG_SCREEN
-		xprintf(CGETS(7, 17, "DeletChars: num is riduculous: %d\r\n"), num);
+		xprintf(CGETS(7, 17, "DeletChars: num is ridiculous: %d\r\n"), num);
 		flush();
 #endif /* DEBUG_SCREEN */
 		return;
@@ -394,7 +394,7 @@ Insert_write(register Char *cp, register int num)
 
 	if (num > TermH) {
 #ifdef DEBUG_SCREEN
-		xprintf(CGETS(7, 19, "StartInsert: num is riduculous: %d\r\n"), num);
+		xprintf(CGETS(7, 19, "StartInsert: num is ridiculous: %d\r\n"), num);
 		flush();
 #endif /* DEBUG_SCREEN */
 		return;

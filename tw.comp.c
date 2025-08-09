@@ -212,7 +212,7 @@ tw_pos(Char *ran, int wno)
 
 
 /* tw_tok():
- *	Return the next word from string, unquoteing it.
+ *	Return the next word from string, unquoting it.
  */
 static Char *
 tw_tok(Char *str)

@@ -1,7 +1,7 @@
 Hello,
 
 I am pleased to announce that tcsh-6.07 is finally available; this is
-a bug fix maintainance release with only two new features:
+a bug fix maintenance release with only two new features:
 
 	- GNU style configure script (ghazi@caip.rutgers.edu)
 	- implicit chdir (hutchins@sgi.com & dbg@sgi.com)

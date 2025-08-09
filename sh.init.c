@@ -804,7 +804,7 @@ mesginit(void)
     /* aiws */
     if (mesg[SIGAIO].pname == NULL) {
 	mesg[SIGAIO].iname = "AIO";
-	mesg[SIGAIO].pname = CSAVS(2, 76, "LAN Asyncronous I/O");
+	mesg[SIGAIO].pname = CSAVS(2, 76, "LAN Asynchronous I/O");
     }
 #endif /* SIGAIO */
 
@@ -837,7 +837,7 @@ mesginit(void)
     if (mesg[SIGRETRACT].pname == NULL) {
 	mesg[SIGRETRACT].iname = "RETRACT";
 	mesg[SIGRETRACT].pname = CSAVS(2, 80,
-				  "HFT monitor mode should be relinguished");
+				  "HFT monitor mode should be relinquished");
     }
 #endif /* SIGRETRACT */
 
@@ -987,7 +987,7 @@ mesginit(void)
     /* SX-4 */
     if (mesg[SIGNMEM].pname == NULL) {
 	mesg[SIGNMEM].iname = "NMEM";
-	mesg[SIGNMEM].pname = CSAVS(2, 99, "exce error for no memory");
+	mesg[SIGNMEM].pname = CSAVS(2, 99, "exec error for no memory");
     }
 #endif /* SIGNMEM */
 
@@ -1031,7 +1031,7 @@ mesginit(void)
     /* SX-4 */
     if (mesg[SIGXXMU].pname == NULL) {
 	mesg[SIGXXMU].iname = "XXMU";
-	mesg[SIGXXMU].pname = CSAVS(2, 104, "exeeded XMU size limit");
+	mesg[SIGXXMU].pname = CSAVS(2, 104, "exceeded XMU size limit");
     }
 #endif /* SIGXXMU */
 
@@ -1039,7 +1039,7 @@ mesginit(void)
     /* SX-4 */
     if (mesg[SIGXRLG0].pname == NULL) {
 	mesg[SIGXRLG0].iname = "XRLG0";
-	mesg[SIGXRLG0].pname = CSAVS(2, 105, "exeeded RLG0 limit");
+	mesg[SIGXRLG0].pname = CSAVS(2, 105, "exceeded RLG0 limit");
     }
 #endif /* SIGXRLG0 */
 
@@ -1047,7 +1047,7 @@ mesginit(void)
     /* SX-4 */
     if (mesg[SIGXRLG1].pname == NULL) {
 	mesg[SIGXRLG1].iname = "XRLG1";
-	mesg[SIGXRLG1].pname = CSAVS(2, 106, "exeeded RLG1 limit");
+	mesg[SIGXRLG1].pname = CSAVS(2, 106, "exceeded RLG1 limit");
     }
 #endif /* SIGXRLG1 */
 
@@ -1055,7 +1055,7 @@ mesginit(void)
     /* SX-4 */
     if (mesg[SIGXRLG2].pname == NULL) {
 	mesg[SIGXRLG2].iname = "XRLG2";
-	mesg[SIGXRLG2].pname = CSAVS(2, 107, "exeeded RLG2 limit");
+	mesg[SIGXRLG2].pname = CSAVS(2, 107, "exceeded RLG2 limit");
     }
 #endif /* SIGXRLG2 */
 
@@ -1063,7 +1063,7 @@ mesginit(void)
     /* SX-4 */
     if (mesg[SIGXRLG3].pname == NULL) {
 	mesg[SIGXRLG3].iname = "XRLG3";
-	mesg[SIGXRLG3].pname = CSAVS(2, 108, "exeeded RLG3 limit");
+	mesg[SIGXRLG3].pname = CSAVS(2, 108, "exceeded RLG3 limit");
     }
 #endif /* SIGXRLG3 */
 }

@@ -215,7 +215,7 @@ Inputl(void)
 
 	case CC_WHICH:		/* tell what this command does */
 	    tellwhat = 1;
-	    *LastChar++ = '\n';	/* for the benifit of CSH */
+	    *LastChar++ = '\n';	/* for the benefit of CSH */
 	    num = (int) (LastChar - InputBuf);	/* number characters read */
 	    break;
 
@@ -827,7 +827,7 @@ GetNextChar(Char *cp)
  * (which may have trailing newline).
  * If cmdonly is set, only check spelling of command words.
  * Return value:
- * -1: Something was incorrectible, and nothing was corrected
+ * -1: Something was uncorrectable, and nothing was corrected
  *  0: Everything was correct
  *  1: Something was corrected
  */

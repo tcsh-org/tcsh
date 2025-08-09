@@ -138,7 +138,7 @@ union wait {
 
 
 # ifndef WNOHANG
-#  define WNOHANG	1	/* dont hang in wait */
+#  define WNOHANG	1	/* don't hang in wait */
 # endif
 
 # ifndef WUNTRACED

@@ -527,7 +527,7 @@ enddef	:
 newdef	: defined(NetBSD) 
 comment : NetBSD
 vendor	: defined(aarch64)				: "arm"
-vendor	: defined(algor)				: "algoritmics"
+vendor	: defined(algor)				: "algorithmics"
 vendor	: defined(arm32) || defined(arm)		: "acorn"
 vendor	: defined(alpha)				: "digital"
 vendor	: defined(amiga)				: "commodore"
@@ -960,7 +960,7 @@ ostype	:						: "masscomp"
 enddef	:
 
 newdef	: defined(MACHTEN)
-comment : Machintosh
+comment : Macintosh
 vendor	:						: "Tenon"
 hosttype:						: "Macintosh"
 ostype	:						: "MachTen"

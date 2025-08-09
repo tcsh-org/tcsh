@@ -1293,7 +1293,7 @@ tw_suffix(int looking, struct Strbuf *word, const Char *exp_dir, Char *exp_name)
 
 
 /* tw_fixword():
- *	Repair a word after a spalling or a recognizwe
+ *	Repair a word after a spalling or a recognize
  */
 static void
 tw_fixword(int looking, struct Strbuf *word, Char *dir, Char *exp_name)
