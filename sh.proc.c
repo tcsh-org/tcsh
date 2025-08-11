@@ -630,7 +630,7 @@ loop:
 	    /* wait for (or pick up alredy blocked) SIGCHLD */
 	    sigsuspend(&pause_mask);
 
-	    /* make the 'wait' interuptable by CTRL-C */
+	    /* make the 'wait' interruptible by CTRL-C */
 	    opintr_disabled = pintr_disabled;
 	    pintr_disabled = 0;
 	    gotsig = handle_pending_signals();

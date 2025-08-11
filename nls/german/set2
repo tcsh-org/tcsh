@@ -75,7 +75,7 @@ $set 2
 73 Third Last Realtime Signal
 74 Second Last Realtime Signal
 75 Last Realtime Signal
-76 LAN Asyncronous I/O
+76 LAN Asynchronous I/O
 77 PTY read/write availability
 78 I/O intervention required
 79 HFT monitor mode granted

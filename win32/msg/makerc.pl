@@ -8,7 +8,7 @@
 #
 # This prints to stdout, so redirect to appropriate place.
 #
-# The alogrithm is simple :
+# The algorithm is simple :
 #
 # String ID = set number * 10,000 + message number
 #

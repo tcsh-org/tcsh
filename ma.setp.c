@@ -48,7 +48,7 @@
  *	-c oldpath newpath	change oldpath to newpath
  *	-c# newpath		change position # to newpath
  *
- *  The "-i newpath" command is equivilent to "-ib 'localsyspath' newpath".
+ *  The "-i newpath" command is equivalent to "-ib 'localsyspath' newpath".
  *
  *  If 'dosuffix' is true, the appropriate suffix will be added to
  *  all command operands for any system path in 'paths'.

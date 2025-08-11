@@ -75,7 +75,7 @@ extern struct KeyFuncs FuncNames[];	/* string names vs. CcFuncTbl indices */
 extern KEYCMD NumFuns;		/* number of KEYCMDs in above table */
 
 #define	CC_ERROR		100	/* there should NOT be 100 different... */
-#define CC_FATAL		101	/* fatal error: inconsistant, must
+#define CC_FATAL		101	/* fatal error: inconsistent, must
 					 * reset */
 #define	CC_NORM			0
 #define	CC_NEWLINE		1
@@ -172,7 +172,7 @@ EXTERN Char *KeyMacro[MAXMACROLEVELS];
    in the middle of a multiple-column character. */
 EXTERN Char **Display;		/* display buffer seed vector */
 EXTERN int CursorV,		/* real cursor vertical (line) */
-        CursorH,		/* real cursor horisontal (column) */
+        CursorH,		/* real cursor horizontal (column) */
         TermV,			/* number of real screen lines
 				 * (sizeof(DisplayBuf) / width */
         TermH;			/* screen width */

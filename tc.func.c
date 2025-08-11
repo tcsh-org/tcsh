@@ -498,7 +498,7 @@ dowhich(Char **v, struct command *c)
     USE(c);
 
     /*
-     * We don't want to glob dowhich args because we lose quoteing
+     * We don't want to glob dowhich args because we lose quoting
      * E.g. which \ls if ls is aliased will not work correctly if
      * we glob here.
      */

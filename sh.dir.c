@@ -458,7 +458,7 @@ dnormalize(const Char *cp, int expnd)
 	    /* Reduction of ".." following the stuff we collected in buf
 	     * only makes sense if the directory item in buf really exists.
 	     * Avoid reduction of "-I../.." (typical compiler call) to ""
-	     * or "/usr/nonexistant/../bin" to "/usr/bin":
+	     * or "/usr/nonexistent/../bin" to "/usr/bin":
 	     */
 	    if (cwd[0]) {
 	        struct stat exists;
@@ -604,7 +604,7 @@ dfollow(Char *cp, int old)
 
     /*
      * if we are ignoring symlinks, try to fix relatives now.
-     * if we are expading symlinks, it should be done by now.
+     * if we are expanding symlinks, it should be done by now.
      */
     dp = dnormalize(cp, symlinks == SYM_IGNORE);
     if (chdir(short2str(dp)) >= 0) {

@@ -32,7 +32,7 @@
 #include "sh.h"
 #include "tw.h"
 
-/* spell_me : return corrrectly spelled filename.  From K&P spname */
+/* spell_me : return correctly spelled filename.  From K&P spname */
 int
 spell_me(struct Strbuf *oldname, int looking, Char *pat, eChar suf)
 {
