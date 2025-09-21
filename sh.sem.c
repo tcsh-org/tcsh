@@ -83,7 +83,7 @@ void
 execute(struct command *t, volatile int wanttty, int *pipein, int *pipeout,
     int do_glob)
 {
-    int    forked = 0;
+    volatile int    forked = 0;
     const struct biltins * volatile bifunc;
     pid_t pid = 0;
     int     pv[2];

@@ -34,7 +34,7 @@
 #ifdef WIDE_STRINGS
 # ifdef HAVE_WCWIDTH
 #  ifdef UTF16_STRINGS
-int
+static int
 xwcwidth (wint_t wchar)
 {
   wchar_t ws[2];

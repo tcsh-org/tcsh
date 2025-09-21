@@ -139,7 +139,7 @@ static char *
 sl_create(size_t size)
 {
     char *newstr = calloc(size, 1);
-    string_list *newsl = calloc(sizeof(string_list), 1);
+    string_list *newsl = calloc(1, sizeof(string_list));
     if (!newstr || !newsl) {
 	free(newstr);
 	free(newsl);
