@@ -388,7 +388,7 @@ AFSDIR = /usr/afsws
 #else
 #define AFS33LIB
 #endif
-/* Auxilliary libs needed for AFS */
+/* Auxiliary libs needed for AFS */
 /* Both HPUX and Solaris need the BSD libraries.  We need -lc before
  * the bsd library to avoid using any more of it than is necessary.
  */

@@ -160,7 +160,7 @@ minix to config.h, and then 'make sh.err.h tc.const.h ed.defns.h'
 
 The OS/dependent files are in mi.termios.h, mi.wait.h, mi.varargs.h
 
-You will get some warnings, but dont worry about them, just ignore them.
+You will get some warnings, but don't worry about them, just ignore them.
 After tcsh has compiled and the gcc binary is converted to a minix
 binary, remember to chmem it to give it more memory - it will need it!
 How much you need depends on how many aliases you have, etc..  Add at

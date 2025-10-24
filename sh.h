@@ -439,7 +439,7 @@ typedef long tcsh_number_t;
 # include <arpa/inet.h>
 # include <sys/socket.h>
 # if (defined(_SS_SIZE) || defined(_SS_MAXSIZE)) && defined(HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY)
-#  if !defined(__APPLE__) /* Damnit, where is getnameinfo() folks? */
+#  if !defined(__APPLE__) /* Damn it, where is getnameinfo() folks? */
 #   if !defined(sgi)
 #    define INET6
 #   endif /* sgi */
@@ -734,7 +734,7 @@ extern struct sigaction parterm;	/* Parents terminate catch */
  * By fix for handling unicode name file, 32nd bit is used.
  * We need use '&' instead of '> or <' when comparing with INVALID_BYTE etc..
  * Cast to uChar is not recommended,
- *  becase Char is 4bytes but uChar is 8bytes on I32LP64. */
+ *  because Char is 4bytes but uChar is 8bytes on I32LP64. */
 # define	QUOTE		0x80000000
 # define	TRIM		0x7FFFFFFF /* Mask to strip quote bit */
 # define	UNDER		0x08000000 /* Underline flag */
@@ -878,7 +878,7 @@ EXTERN size_t lap; /* N/A if == labuf.len, index into labuf.s otherwise */
  *
  * Each command is parsed to a tree of command structures and
  * flags are set bottom up during this process, to be propagated down
- * as needed during the semantics/exeuction pass (sh.sem.c).
+ * as needed during the semantics/execution pass (sh.sem.c).
  */
 struct command {
     unsigned char   t_dtyp;	/* Type of node 		 */

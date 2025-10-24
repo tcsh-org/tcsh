@@ -841,7 +841,7 @@ CONFIG	:	coh3
 ENVIRON	:	gnu tools (see below)
 NOTES	:	The standard make, /bin/sh and sed that come with Coherent are
 NOTES	:	not quite up to the makefile.  Either use gnu make or change 
-NOTES	:	occurances of '# to '\# since Coherent's make takes all '#'s to
+NOTES	:	occurrences of '# to '\# since Coherent's make takes all '#'s to
 NOTES	:	be a comment, even when quoted, except when escaped by '\'.
 NOTES	:	Coherent's /bin/sh does not allow you to set VERSION, etc.
 NOTES	:	since they are hard-wired internal variables.  Either use 

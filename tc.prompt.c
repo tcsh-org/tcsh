@@ -35,8 +35,8 @@
 
 /*
  * kfk 21oct1983 -- add @ (time) and / ($cwd) in prompt.
- * PWP 4/27/87 -- rearange for tcsh.
- * mrdch@com.tau.edu.il 6/26/89 - added ~, T and .# - rearanged to switch()
+ * PWP 4/27/87 -- rearrange for tcsh.
+ * mrdch@com.tau.edu.il 6/26/89 - added ~, T and .# - rearranged to switch()
  *                 instead of if/elseif
  * Luke Mewburn
  *	6-Sep-91	changed date format
@@ -311,7 +311,7 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 		    cz = getenv("HOST");
 		/*
 		 * Bug pointed out by Laurent Dami <dami@cui.unige.ch>: don't
-		 * derefrence that NULL (if HOST is not set)...
+		 * dereference that NULL (if HOST is not set)...
 		 */
 		if (cz != NULL)
 		    tprintf_append_mbs(&buf, cz, attributes);

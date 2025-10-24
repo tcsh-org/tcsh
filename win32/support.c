@@ -466,7 +466,7 @@ int quoteProtect(char *dest, char *src,unsigned long destsize) {
 
 		// Protect " from MS-DOS expansion
 		if (*curr == '"') {
-			// Now, protect each preceeding backslash
+			// Now, protect each preceding backslash
 			for (prev = curr-1; prev >= src && *prev == '\\'; prev--) {
 				*dest++ = '\\';
 				destsize--;

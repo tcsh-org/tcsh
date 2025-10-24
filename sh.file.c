@@ -711,7 +711,7 @@ tenex(Char *inputline, size_t inputline_size)
 	    --str_end;		/* wipeout trailing cmd Char */
 	*str_end = '\0';
 	/*
-	 * Find LAST occurence of a delimiter in the inputline. The word start
+	 * Find LAST occurrence of a delimiter in the inputline. The word start
 	 * is one Character past it.
 	 */
 	for (word_start = str_end; word_start > inputline; --word_start)

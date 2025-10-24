@@ -147,7 +147,7 @@ update_vars(Char *vp)
 
 	cp = Strsave(varval(vp));	/* get the old value back */
 	/*
-	 * convert to cononical pathname (possibly resolving symlinks)
+	 * convert to canonical pathname (possibly resolving symlinks)
 	 */
 	canon = dcanon(cp, cp);
 	cleanup_push(canon, xfree);
@@ -680,7 +680,7 @@ set1(const Char *var, Char **vec, struct varent *head, int flags)
 	    for (num_items = 0; vec[num_items]; num_items++)
 	        continue;
 	    if (flags & VAR_FIRST) {
-		/* delete duplications, keeping first occurance */
+		/* delete duplications, keeping first occurrence */
 		for (i = 1; i < num_items; i++)
 		    for (j = 0; j < i; j++)
 			/* If have earlier identical item, remove i'th item */
@@ -690,7 +690,7 @@ set1(const Char *var, Char **vec, struct varent *head, int flags)
 			    break;
 			}
 	    } else if (flags & VAR_LAST) {
-	      /* delete duplications, keeping last occurance */
+	      /* delete duplications, keeping last occurrence */
 		for (i = 0; i < num_items - 1; i++)
 		    for (j = i + 1; j < num_items; j++)
 			/* If have later identical item, remove i'th item */

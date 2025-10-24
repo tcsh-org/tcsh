@@ -27,7 +27,7 @@
 
 /*
  * fname -- Pathname to lock
- * pollinterval -- Interval (miliseconds) to check for lock, -1 return
+ * pollinterval -- Interval (milliseconds) to check for lock, -1 return
  */
 int dot_lock(const char *fname, int pollinterval);
 void dot_unlock(const char *fname);

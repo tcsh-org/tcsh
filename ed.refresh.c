@@ -178,7 +178,7 @@ Draw(Char *cp, int nocomb, int drawPrompt)
 	    /* ~(UNDER | BOLD | STANDOUT) = 0xf1ffffff */
 	    c = *cp & ~(UNDER | BOLD | STANDOUT);
 
-	    /* if c is ctrl code, we handle *cp as havnig no attributes */
+	    /* if c is ctrl code, we handle *cp as having no attributes */
 	    if ((c < 0x20 && c >= 0) || c == 0x7f) {
 		attr = 0;
 		c = *cp;
@@ -656,7 +656,7 @@ update_line(Char *old, Char *new, int cur_line)
     nls = n;
 
     /*
-     * find same begining and same end
+     * find same beginning and same end
      */
     osb = ols;
     nsb = nls;
@@ -856,7 +856,7 @@ update_line(Char *old, Char *new, int cur_line)
     p = (ols != oe) ? oe : ose;
 
     /*
-     * if (There is a diffence in the beginning) && (we need to insert
+     * if (There is a difference in the beginning) && (we need to insert
      * characters) && (the number of characters to insert is less than the term
      * width) We need to do an insert! else if (we need to delete characters)
      * We need to delete characters! else No insert or delete

@@ -960,7 +960,7 @@ ostype	:						: "masscomp"
 enddef	:
 
 newdef	: defined(MACHTEN)
-comment : Machintosh
+comment : Macintosh
 vendor	:						: "Tenon"
 hosttype:						: "Macintosh"
 ostype	:						: "MachTen"
