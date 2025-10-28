@@ -45,8 +45,8 @@ static	Char		*getinx		(Char *, int *);
 static	void		 asx		(Char *, int, Char *);
 static	struct varent 	*getvx		(Char *, int);
 static	Char		*xset		(Char *, Char ***);
-static	Char		*operate	(int, Char *, Char *);
-static	void	 	 putn1		(tcsh_number_t);
+static	Char		*operate	(Char, Char *, Char *);
+static	void	 	 putn1		(unsigned tcsh_number_t);
 static	struct varent	*madrof		(Char *, struct varent *);
 static	void		 unsetv1	(struct varent *);
 static	void		 exportpath	(Char **);
@@ -491,13 +491,13 @@ xset(Char *cp, Char ***vp)
 }
 
 static Char *
-operate(int op, Char *vp, Char *p)
+operate(Char op, Char *vp, Char *p)
 {
     Char    opr[2];
     Char   *vec[5];
     Char **v = vec;
     Char  **vecp = v;
-    tcsh_number_t i;
+    unsigned tcsh_number_t i;
 
     if (op != '=') {
 	if (*vp)
@@ -519,34 +519,47 @@ operate(int op, Char *vp, Char *p)
 static Char *putp;
 
 Char *
-putn(tcsh_number_t n)
+putn(unsigned tcsh_number_t n)
 {
     Char nbuf[1024]; /* Enough even for octal */
 
     putp = nbuf;
-    if (n < 0) {
+    if (n & ~(~(unsigned tcsh_number_t) 0 >> 1)) {
 	n = -n;
 	*putp++ = '-';
     }
     putn1(n);
+#ifdef IS_ASCII
     *putp = 0;
+#endif
     return (Strsave(nbuf));
 }
 
 static void
-putn1(tcsh_number_t n)
+putn1(unsigned tcsh_number_t n)
 {
+#ifndef IS_ASCII
+    sprintf(putp, "%l"
+#ifdef HAVE_LONG_LONG
+    "l"
+#endif /* HAVE_LONG_LONG */
+    "u", n);
+#else
     if (n > 9)
 	putn1(n / 10);
     *putp++ = (Char)(n % 10 + '0');
+#endif /* !IS_ASCII */
 }
 
-tcsh_number_t
+unsigned tcsh_number_t
 getn(const Char *cp)
 {
-    tcsh_number_t n;
+    unsigned tcsh_number_t n;
     int     sign;
     int base;
+#ifndef IS_ASCII
+    char cps[2];
+#endif
 
     if (!cp)			/* PWP: extra error checking */
 	stderror(ERR_NAME | ERR_BADNUM);
@@ -566,12 +579,29 @@ getn(const Char *cp)
     else
 	base = 10;
 
+#ifndef IS_ASCII
+    cps[1] =
+#endif
     n = 0;
     while (Isdigit(*cp))
     {
+#ifndef IS_ASCII
+	unsigned tcsh_number_t ns;
+#endif
+
 	if (base == 8 && *cp >= '8')
 	    stderror(ERR_NAME | ERR_BADNUM);
+#ifndef IS_ASCII
+	cps[0] = *cp++;
+	sscanf(cps, "%l"
+#ifdef HAVE_LONG_LONG
+	"l"
+#endif /* HAVE_LONG_LONG */
+	"u", &ns);
+	n = n * base + ns;
+#else
 	n = n * base + *cp++ - '0';
+#endif /* !IS_ASCII */
     }
     if (*cp)
 	stderror(ERR_NAME | ERR_BADNUM);
