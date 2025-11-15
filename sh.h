@@ -1307,5 +1307,6 @@ extern int    filec;
 #define TEXP_IGNORE 1	/* in ignore, it means to ignore value, just parse */
 #define TEXP_NOGLOB 2	/* in ignore, it means not to globone */
 
+extern char *pchrs;
 
 #endif /* _h_sh */
