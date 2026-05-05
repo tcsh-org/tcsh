@@ -37,6 +37,7 @@
 
 extern int histvalid;
 extern struct Strbuf histline;
+extern Char     Hstatus[4];
 Char HistLit = 0;
 
 static	int	heq	(const struct wordent *, const struct wordent *);
@@ -49,6 +50,7 @@ static	void	hfree	(struct Hist *);
 #define HIST_CLEAR	0x10
 #define HIST_MERGE	0x20
 #define HIST_TIME	0x40
+#define HIST_SCODE  0x80
 
 /*
  * C shell
@@ -68,6 +70,7 @@ static unsigned histCount = 0;		/* number elements on history list */
 static int histlen = 0;
 static struct Hist *histTail = NULL;     /* last element on history list */
 static struct Hist *histMerg = NULL;	 /* last element merged by Htime */
+struct Hist *current_hist;
 
 static void insertHistHashTable(struct Hist *, unsigned);
 
@@ -980,11 +983,15 @@ enthist(
     /* Pick up timestamp set by lex() in Htime if reading saved history */
     if (Htime != 0) {
 	np->Htime = Htime;
-	Htime = 0;
+    Strncpy(np->Hstatus, Hstatus, 4);
+    Htime = 0;
     }
-    else
+    else {
         (void) time(&(np->Htime));
-
+        current_hist = np;
+        current_hist->Hstatus[0] = '0';
+        current_hist->Hstatus[1] = '\0';
+    }
     if (p == np)
         return np;                      /* reused existing entry */
 
@@ -1063,14 +1070,17 @@ phist(struct Hist *hp, int hflg)
 	old_output_raw = output_raw;
         output_raw = 1;
 	cleanup_push(&old_output_raw, output_raw_restore);
-	if (hflg & HIST_TIME)
+	if (hflg & HIST_TIME) {
 	    /*
 	     * Make file entry with history time in format:
 	     * "+NNNNNNNNNN" (10 digits, left padded with ascii '0')
 	     */
 
-	    xprintf("#+%010lu\n", (unsigned long)hp->Htime);
-
+	    xprintf("#+%010lu", (unsigned long)hp->Htime);
+        if (hp->Hstatus[0] != '\0')
+            xprintf(" %S", hp->Hstatus);
+        xprintf("\n");
+    }
 	if (HistLit && hp->histline)
 	    xprintf("%" TCSH_S "\n", hp->histline);
 	else
@@ -1078,9 +1088,17 @@ phist(struct Hist *hp, int hflg)
         cleanup_until(&old_output_raw);
     }
     else {
-	Char   *cp = str2short("%h\t%T\t%R\n");
+    char *fmt;
+	Char   *cp;
 	Char *p;
 	struct varent *vp = adrof(STRhistory);
+
+    if (hflg & HIST_SCODE)
+        fmt = "%h%E\t%T\t%R\n";
+    else
+        fmt = "%h\t%T\t%R\n";
+
+    cp = str2short(fmt);
 
 	if (vp && vp->vec != NULL && vp->vec[0] && vp->vec[1])
 	    cp = vp->vec[1];
@@ -1147,6 +1165,9 @@ dohist(Char **vp, struct command *c)
 	    case 'r':
 		hflg |= HIST_REV;
 		break;
+        case 's':
+        hflg |= HIST_SCODE;
+        break;
 	    case 'S':
 		hflg |= HIST_SAVE;
 		break;
@@ -1160,7 +1181,7 @@ dohist(Char **vp, struct command *c)
 	    	hflg |= HIST_TIME;
 		break;
 	    default:
-		stderror(ERR_HISTUS, "chrSLMT");
+		stderror(ERR_HISTUS, "chrsSLMT");
 		break;
 	    }
     }
@@ -1205,6 +1226,8 @@ fmthist(int fmt, ptr_t ptr)
     switch (fmt) {
     case 'h':
 	return xasprintf("%6d", hp->Hnum);
+    case 'E':
+    return xasprintf("%*s", sizeof(hp->Hstatus)/sizeof(Char), hp->Hstatus);
     case 'R':
 	if (HistLit && hp->histline)
 	    return xasprintf("%" TCSH_S, hp->histline);

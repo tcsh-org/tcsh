@@ -131,6 +131,7 @@ static Char getCtmp;
  * if reading saved history (sg)
  */
 time_t Htime = (time_t)0;
+Char Hstatus[4];
 static time_t a2time_t (Char *);
 
 /*
@@ -328,6 +329,14 @@ loop:
 		c = getC(0);
 		if (h < 11 && parsehtime)
 		    hbuf[h++] = c;
+		else if (h == 11 & parsehtime) {
+			Hstatus[0] = '\0';
+			h++;
+		}
+		else if (h < 15 && parsehtime) {
+			Hstatus[h++ - 12] = c;
+			Hstatus[h - 12] = '\0';
+		}
 	    } while (c != '\n');
 	    if (parsehtime) {
 		hbuf[11] = '\0';

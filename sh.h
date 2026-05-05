@@ -1083,6 +1083,7 @@ EXTERN struct Hist {
     Char   *histline;
     struct Hist *Hnext, *Hprev;         /* doubly linked list */
     unsigned Hhash;                     /* hash value of command line */
+    Char Hstatus[4];                    /* status code 0 - 255 */
 }       Histlist IZERO_STRUCT;
 
 extern struct wordent paraml;	/* Current lexical word list */

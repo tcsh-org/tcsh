@@ -198,6 +198,13 @@ tprintf(int what, const Char *fmt, const char *str, time_t tim, ptr_t info)
 	if ((*cp == '%') && ! (cp[1] == '\0')) {
 	    cp++;
 	    switch (*cp) {
+		case 'E':
+		if (what == FMT_HISTORY) {
+			cz = fmthist('E', info);
+			tprintf_append_mbs(&buf, cz, attributes);
+		    xfree(cz);
+		}
+		break;
 	    case 'R':
 		if (what == FMT_HISTORY) {
 		    cz = fmthist('R', info);
