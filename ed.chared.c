@@ -804,23 +804,25 @@ c_endword(Char *p, Char *low, Char *high, int n, Char *delim)
     p++;
 
     while (n--) {
-        while (p < high) {	/* Skip non-word chars */
-	  if (!Strchr(delim, *p) || p[-1] == (Char)'\\')
-	    break;
-	  p++;
-        }
+	while (p < high) {	/* Skip non-word chars */
+	    if (!Strchr(delim, *p) || p[-1] == (Char)'\\')
+		break;
+	    p++;
+	}
 	while (p < high) {	/* Skip string */
-	  if ((*p == (Char)'\'' || *p == (Char)'"')) { /* Quotation marks? */
-	    /* Should it be honored? */
-	    if (inquote || (p > low && p[-1] != (Char)'\\')) {
-	      if (inquote == 0) inquote = *p;
-	      else if (inquote == *p) inquote = 0;
+	    if ((*p == (Char)'\'' || *p == (Char)'"')) { /* Quotation marks? */
+		/* Should it be honored? */
+		if (inquote || (p > low && p[-1] != (Char)'\\')) {
+		    if (inquote == 0)
+			inquote = *p;
+		    else if (inquote == *p)
+			inquote = 0;
+		}
 	    }
-	  }
-	  /* Break if unquoted non-word char */
-	  if (!inquote && Strchr(delim, *p) && p > low && p[-1] != (Char)'\\')
-	    break;
-	  p++;
+	    /* Break if unquoted non-word char */
+	    if (!inquote && Strchr(delim, *p) && p > low && p[-1] != (Char)'\\')
+		break;
+	    p++;
 	}
     }
 
