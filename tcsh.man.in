@@ -3288,6 +3288,13 @@ or
 may be
 .Pa /dev/tty
 to send output to the terminal.
+.Pp
+Because diagnostic output can't be
+redirected alone, to pipe the
+output, if the system
+supports file descriptors as files,
+.Dl \&( \&( \&( Ar command Li ; Ar command Li ) > Ar /dev/fd/0 Li ) >& Ar error-file Li < Ar /dev/fd/1 Li ) | Ar command
+suffices.
 .
 .Ss Features
 Having described how the shell accepts, parses and executes
