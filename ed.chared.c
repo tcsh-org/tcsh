@@ -804,16 +804,16 @@ c_endword(Char *p, Char *low, Char *high, int n, Char *delim)
     p++;
 
     while (n--) {
-    #define BSLASH (p > low && p[-1] == (Char)'\\')
+    #define BSLASH(a) (p > low && p[-1] a (Char)'\\')
 	while (p < high) {	/* Skip non-word chars */
-	    if (!Strchr(delim, *p) || BSLASH)
+	    if (!Strchr(delim, *p) || BSLASH(==))
 		break;
 	    p++;
 	}
 	while (p < high) {	/* Skip string */
 	    if ((*p == (Char)'\'' || *p == (Char)'"')) { /* Quotation marks? */
 		/* Should it be honored? */
-		if (inquote || BSLASH) {
+		if (inquote || BSLASH(!=)) {
 		    if (inquote == 0)
 			inquote = *p;
 		    else if (inquote == *p)
@@ -821,7 +821,7 @@ c_endword(Char *p, Char *low, Char *high, int n, Char *delim)
 		}
 	    }
 	    /* Break if unquoted non-word char */
-	    if (!inquote && Strchr(delim, *p) && BSLASH)
+	    if (!inquote && Strchr(delim, *p) && BSLASH(!=))
 		break;
 	    p++;
 	}
