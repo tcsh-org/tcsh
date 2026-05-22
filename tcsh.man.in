@@ -5577,7 +5577,7 @@ hash buckets.
 .Bl -tag -width 6n -compact
 .
 .It Ic history Xo
-.Op Fl hTr
+.Op Fl hTrs
 .Op Ar n
 .Xc
 .It Ic history Xo
@@ -5611,6 +5611,10 @@ With
 .Fl r ,
 the order of printing is most recent
 first rather than oldest first.
+.Pp
+With
+.Fl s ,
+the exit status of each command is printed as an additional column.
 .Pp
 The second form with
 .Fl S

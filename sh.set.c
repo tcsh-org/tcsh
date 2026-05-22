@@ -37,6 +37,7 @@
 #include <langinfo.h>
 #endif
 
+extern struct Hist *current_hist;
 extern int GotTermCaps;
 int numeof = 0;
 
@@ -1357,12 +1358,16 @@ update_wordchars(void)
 void
 setstrstatus(Char *str)
 {
+	if (current_hist)
+		Strncpy(current_hist->Hstatus, str, 3);
 	setv(STRstatus, str, VAR_READWRITE|VAR_NOERROR);
 }
 
 void
 setstatus(int n)
 {
+	if (current_hist)
+		Strncpy(current_hist->Hstatus, n ? STR1 : STR0, 3);
 	setcopy(STRstatus, n ? STR1 : STR0, VAR_READWRITE|VAR_NOERROR);
 }
 
