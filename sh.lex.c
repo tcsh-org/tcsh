@@ -147,8 +147,7 @@ lex(struct wordent *hp)
     int     parsehtime = enterhist;
     int	    toolong = 0;
 
-    histvalid = 0;
-    histline.len = 0;
+    histvalid = histline.len = 0;
 
     if (!postcmd_active)
 	btell(&lineloc);
@@ -319,8 +318,15 @@ loop:
 	    goto ret;
 
 	case '#':
-	    if (intty || (enterhist && !parsehtime))
+	    if (enterhist && !parsehtime)
 		break;
+	    if (intty) {
+		do
+		    Strbuf_append1(&wbuf, c);
+		while ((c = getC(0)) != CHAR_ERR && c != '\n');
+		ungetC('\n');
+		goto ret;
+	    }
 	    c = 0;
 	    h = 0;
 	    do {

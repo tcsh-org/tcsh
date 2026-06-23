@@ -1100,7 +1100,9 @@ main(int argc, char **argv)
 	if (adrof(STRedit))
 	    unsetv(STRedit);
 	editing = 0;
-    }
+	pchrs = ";&\n";
+    } else
+	pchrs = ";&\n#";
     intty |= intact;
 #ifndef convex
     if (intty || (intact && isatty(SHOUT))) {
