@@ -367,7 +367,6 @@ errinit(void)
     elst[ERR_BADCOLORVAR] = CSAVS(1, 137, "Unknown %s color variable '%c%c'");
     elst[ERR_EOF] = CSAVS(1, 138, "Unexpected end of file");
     elst[ERR_UNAVAILABLE] = CSAVS(1, 139, "%s: Feature is not available for this platform");
-
 }
 
 /* Cleanup data. */

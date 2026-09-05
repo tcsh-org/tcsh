@@ -801,8 +801,9 @@ backeval(struct blk_buf *bb, struct Strbuf *word, Char *cp, int literal)
 	    /* The F_BACKQ flag must set so the job output is correct if
 	     * printexitvalue is set.  If it's not set, the job output
 	     * will have "Exit N" appended where N is the exit status. */
-	    if (t)
+	    if (t) {
 		    t->t_dflg = F_BACKQ|F_NOFORK;
+	    }
 	    if (seterr)
 		stderror(ERR_OLD);
 #ifdef SIGTSTP

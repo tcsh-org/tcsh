@@ -185,6 +185,7 @@ extern	void		  wfree		(void);
 extern	void		  dobuiltins	(Char **, struct command *);
 extern	void		  reexecute	(struct command *);
 extern  int		  getYN		(const char *);
+extern	struct CommandList *retlist	(struct command *);
 
 /*
  * sh.glob.c
@@ -310,6 +311,7 @@ extern	void		  freesyn	(struct command *);
 extern struct command 	 *syntax	(const struct wordent *,
 					 const struct wordent *, int);
 extern	void		  syntax_cleanup(void *);
+extern	void		  list		(struct command *);
 
 /*
  * sh.print.c
@@ -373,6 +375,8 @@ extern  struct process   *pfind		(Char *);
 extern	void		  execute	(struct command *, volatile int, int *,
 					 int *, int);
 extern	void		  mypipe	(int *);
+extern	void		  fntmp_cleanup	(void *);
+extern	void		  doltmp_cleanup(void *);
 
 /*
  * sh.set.c
