@@ -2604,6 +2604,7 @@ iconv_catgets(nl_catd ctd, int set_id, int msg_id, const char *s)
     char *orig, *dest, *p;
     ICONV_CONST char *src;
     size_t src_size, dest_size;
+    ptrdiff_t dest_off;
 
     orig = xcatgets(ctd, set_id, msg_id, s);
     if (catgets_iconv == (iconv_t)-1 || orig == s)
@@ -2619,10 +2620,11 @@ iconv_catgets(nl_catd ctd, int set_id, int msg_id, const char *s)
 	    == (size_t)-1) {
 	    switch (errno) {
 	    case E2BIG:
+		dest_off = dest - buf;
 		if ((p = xrealloc(buf, buf_size * 2)) == NULL)
 		    return orig;
 		buf_size *= 2;
-		dest = p + (dest - buf);
+		dest = p + dest_off;
 		buf = p;
 		break;
 

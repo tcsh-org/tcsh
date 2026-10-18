@@ -115,15 +115,18 @@ tw_str_add(stringlist_t *sl, size_t len)
     if (sl->tbuff <= sl->nbuff + len) {
 	size_t i;
 
-	ptr = sl->buff;
 	pintr_disabled++;
 	sl->tbuff += TW_INCR + len;
+	/*
+	 * The list holds pointers into the buffer.  Save them as offsets
+	 * while they are still valid, then re-thread them onto the new
+	 * buffer after realloc().
+	 */
+	for (i = 0; i < sl->nlist; i++)
+	    sl->list[i] = (Char *)(sl->list[i] - sl->buff);
 	sl->buff = xrealloc(sl->buff, sl->tbuff * sizeof(Char));
-	/* Re-thread the new pointer list, if changed */
-	if (ptr != NULL && ptr != sl->buff) {
-	    for (i = 0; i < sl->nlist; i++)
-		sl->list[i] = sl->buff + (sl->list[i] - ptr);
-	}
+	for (i = 0; i < sl->nlist; i++)
+	    sl->list[i] = sl->buff + (ptrdiff_t)sl->list[i];
 	disabled_cleanup(&pintr_disabled);
     }
     ptr = sl->list[sl->nlist++] = &sl->buff[sl->nbuff];

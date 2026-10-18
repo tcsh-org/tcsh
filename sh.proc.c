@@ -726,11 +726,11 @@ morecommand(size_t s)
     Char *ncmdstr;
     ptrdiff_t d;
 
+    d = cmdstr != NULL ? cmdp - cmdstr : 0;
     cmdmax += s;
     ncmdstr = xrealloc(cmdstr, cmdmax * sizeof(*cmdstr));
-    d = ncmdstr - cmdstr;
     cmdstr = ncmdstr;
-    cmdp += d;
+    cmdp = ncmdstr + d;
 }
 
 /* GrP
